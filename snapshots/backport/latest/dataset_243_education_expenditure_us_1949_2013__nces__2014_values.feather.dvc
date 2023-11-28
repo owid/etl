@@ -1,18 +1,14 @@
 meta:
-  namespace: backport
-  short_name: dataset_243_education_expenditure_us_1949_2013__nces__2014_values
-  file_extension: feather
-  date_accessed: 2023-02-23 17:11:45.354122
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/243
+    date_accessed: 2023-08-10 09:07:40.902554
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Education Expenditure US 1949-2013 - NCES (2014)
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/243
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: dad51def4ae2ca4e55ff8331b8b2bfc0
+- md5: 60f8599d17bc69cde9b4119a614f84af
   size: 7242
   path: dataset_243_education_expenditure_us_1949_2013__nces__2014_values.feather

@@ -61,6 +61,16 @@ steps:
     - snapshot://papers/2023-05-26/mueller_et_al_2012.xls
   data://garden/papers/2023-05-26/mueller_et_al_2012:
     - data://meadow/papers/2023-05-26/mueller_et_al_2012
+
+  # GBD Snake Envenoming Collaborators (2022). Global mortality of snakebite envenoming between 1990 and 2019.
+  # https://www.nature.com/articles/s41467-022-33627-9
+  data://meadow/papers/2023-11-21/snakebite:
+    - snapshot://papers/2023-11-21/snakebite.xlsx
+  data://garden/papers/2023-11-21/snakebite:
+    - data://meadow/papers/2023-11-21/snakebite
+  data://grapher/papers/2023-11-21/snakebite:
+    - data://garden/papers/2023-11-21/snakebite
+
   ######################################################################################################################
   # Older versions to be archived once they are not used by any other steps.
 

@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5447
+    date_accessed: 2023-08-14 10:58:51.903808
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Global agricultural land (Ellis et al. 2021)
+  description: ''
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: aa9734a8cf290ec280bc0bbfb494ab2d
+  size: 8194
+  path: dataset_5447_global_agricultural_land__ellis_et_al__2021_values.feather

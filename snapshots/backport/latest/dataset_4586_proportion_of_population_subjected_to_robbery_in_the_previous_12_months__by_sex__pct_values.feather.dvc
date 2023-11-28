@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4586
+    date_accessed: 2023-08-16 10:24:03.072021
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Proportion of population subjected to robbery in the previous 12 months, by
+    sex (%)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 5d90c736930f98eea0241a39154c565b
+  size: 10042
+  path: 
+    dataset_4586_proportion_of_population_subjected_to_robbery_in_the_previous_12_months__by_sex__pct_values.feather

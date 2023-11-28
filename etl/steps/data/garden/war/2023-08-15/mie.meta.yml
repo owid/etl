@@ -1,0 +1,192 @@
+dataset:
+  title: History of war (Gibler and Miller, 2020)
+  description: |-
+      This dataset provides information on militarized interstate confrontations, using Douglas Gibler and Steven Miller's Militarized Interstate Events dataset (version 1.0).
+
+      The dataset provides information on the number of ongoing and new interstate conflicts and the number of deaths in ongoing interstate conflicts.
+
+      Deaths of combatants due to fighting are included.
+
+      We use the world regions of the participants to code the conflicts' world region(s). The regions are defined based on Gleditsch and Ward codes. Find the complete mapping at
+      https://correlatesofwar.org/wp-content/uploads/states2016.csv:
+
+        • Americas: 2-165
+
+        • Europe: 200-395
+
+        • Africa: 402-626
+
+        • Middle East: 630-698
+
+        • Asia: 700-850
+
+        • Oceania: 860-999
+
+      You can find more information about the data in our article: [To be published]
+
+tables:
+  mie:
+    variables:
+      number_ongoing_conflicts:
+        title: Number of ongoing conflicts
+        unit: conflicts
+        description: |-
+          <% if hostility_level == "all" %>
+          The number of all ongoing interstate conflicts in each year.
+
+          An interstate conflict is a disagreement between states where force is threatened, displayed, or used.
+
+          We count a conflict as ongoing in a region even if the conflict is also ongoing in other regions. The sum across all regions can therefore be higher than the total number of ongoing conflicts.
+          <% elif hostility_level == "Threat to use force" %>
+          The number of interstate conflicts where at most the use of force is threatened in each year.
+
+          An interstate conflict is a disagreement between states where force is threatened, displayed, or used.
+
+          We count a conflict as ongoing in a region even if the conflict is also ongoing in other regions. The sum across all regions can therefore be higher than the total number of ongoing conflicts.
+
+          The hostility level for a conflict overall is the highest level across all world regions.
+          <% elif hostility_level == "Display of force" %>
+          The number of interstate conflicts where at most force is displayed in each year.
+
+          An interstate conflict is a disagreement between states where force is threatened, displayed, or used.
+
+          We count a conflict as ongoing in a region even if the conflict is also ongoing in other regions. The sum across all regions can therefore be higher than the total number of ongoing conflicts.
+
+          The hostility level for a conflict overall is the highest level across all world regions.
+          <% elif hostility_level == "Use of force" %>
+          The number of interstate conflicts where force is used, but causes fewer than 1,000 combatant deaths due to fighting, in each year.
+
+          An interstate conflict is a disagreement between states where force is threatened, displayed, or used.
+
+          We count a conflict as ongoing in a region even if the conflict is also ongoing in other regions. The sum across all regions can therefore be higher than the total number of ongoing conflicts.
+
+          The hostility level for a conflict overall is the highest level across all world regions.
+          <% elif hostility_level == "War" %>
+          The number of interstate conflicts where the use of force causes at least 1,000 combatant deaths due to fighting during the year.
+
+          An interstate conflict is a disagreement between states where force is threatened, displayed, or used.
+
+          We count a conflict as ongoing in a region even if the conflict is also ongoing in other regions. The sum across all regions can therefore be higher than the total number of ongoing conflicts.
+
+          The hostility level for a conflict overall is the highest level across all world regions.
+          <% endif %>
+        processing_level: major
+        display:
+          numDecimalPlaces: 0
+        presentation:
+          grapher_config:
+            selectedEntityNames:
+              - Africa
+              - Americas
+              - Asia
+              - Europe
+              - Middle East
+              - Oceania
+      number_new_conflicts:
+        title: Number of new conflicts
+        unit: conflicts
+        description: |-
+          <% if hostility_level == "all" %>
+          The number of all new interstate conflicts in each year.
+
+          A new interstate conflict is a disagreement between states where force is threatened, displayed, or used for the first time.
+
+          We only count a conflict as new when the conflict overall started that year, not if it restarted or changed its hostility level (i.e. escalated or deescalated).
+
+          We count a conflict as new in a region even if the conflict started earlier or at the same time in another region. The sum across all regions can therefore be higher than the total number of new conflicts.
+          <% elif hostility_level == "Threat to use force" %>
+          The number of new interstate conflicts where at most the use of force is threatened in each year.
+
+          A new interstate conflict is a disagreement between states where force is threatened, displayed, or used for the first time.
+
+          We only count a conflict as new when the conflict overall started that year, not if it restarted or changed its hostility level (i.e. escalated or deescalated).
+
+          We count a conflict as new in a region even if the conflict started earlier or at the same time in another region. The sum across all regions can therefore be higher than the total number of new conflicts.
+
+          The hostility level for a conflict overall is the highest level across all world regions.
+          <% elif hostility_level == "Display of force" %>
+          The number of new interstate conflicts where at most force is displayed in each year.
+
+          A new interstate conflict is a disagreement between states where force is threatened, displayed, or used for the first time.
+
+          We only count a conflict as new when the conflict overall started that year, not if it restarted or changed its hostility level (i.e. escalated or deescalated).
+
+          We count a conflict as new in a region even if the conflict started earlier or at the same time in another region. The sum across all regions can therefore be higher than the total number of new conflicts.
+
+          The hostility level for a conflict overall is the highest level across all world regions.
+          <% elif hostility_level == "Use of force" %>
+          The number of new interstate conflicts where force is used, but causes fewer at least 1,000 combatant deaths due to fighting, in each year.
+
+          An interstate conflict is a disagreement between states where force is threatened, displayed, or used for the first time.
+
+          We only count a conflict as new when the conflict overall started that year, not if it restarted or changed its hostility level (i.e. escalated or deescalated).
+
+          We count a conflict as new in a region even if the conflict started earlier or at the same time in another region. The sum across all regions can therefore be higher than the total number of new conflicts.
+
+          The hostility level for a conflict overall is the highest level across all world regions.
+          <% elif hostility_level == "War" %>
+          The number of new interstate conflicts where the use of force causes at least 1,000 combatant deaths due to fighting during the year.
+
+          A new interstate conflict is a disagreement between states where force is threatened, displayed, or used for the first time.
+
+          We only count a conflict as new when the conflict overall started that year, not if it restarted or changed its hostility level (i.e. escalated or deescalated).
+
+          We count a conflict as new in a region even if the conflict started earlier or at the same time in another region. The sum across all regions can therefore be higher than the total number of new conflicts.
+
+          The hostility level for a conflict overall is the highest level across all world regions.
+          <% endif %>
+
+        processing_level: major
+        display:
+          numDecimalPlaces: 0
+        presentation:
+          grapher_config:
+            selectedEntityNames:
+              - Africa
+              - Americas
+              - Asia
+              - Europe
+              - Middle East
+              - Oceania
+      number_deaths_ongoing_conflicts_low:
+        title: Number of deaths in ongoing conflicts (low estimate)
+        unit: deaths
+        description: |-
+          The low estimate of the number of deaths in all ongoing interstate conflicts in each year.
+
+          An ongoing interstate conflict is a disagreement between states where force is threatened, displayed, or used.
+
+          Deaths of combatants due to fighting are included.
+        processing_level: major
+        display:
+          numDecimalPlaces: 0
+        presentation:
+          grapher_config:
+            selectedEntityNames:
+              - Africa
+              - Americas
+              - Asia
+              - Europe
+              - Middle East
+              - Oceania
+      number_deaths_ongoing_conflicts_high:
+        title: Number of deaths in ongoing conflicts (high estimate)
+        unit: deaths
+        description: |-
+          The high estimate of the number of deaths in all ongoing interstate conflicts in each year.
+
+          An ongoing interstate conflict is a disagreement between states where force is threatened, displayed, or used.
+
+          Deaths of combatants due to fighting are included.
+        processing_level: major
+        display:
+          numDecimalPlaces: 0
+        presentation:
+          grapher_config:
+            selectedEntityNames:
+              - Africa
+              - Americas
+              - Asia
+              - Europe
+              - Middle East
+              - Oceania

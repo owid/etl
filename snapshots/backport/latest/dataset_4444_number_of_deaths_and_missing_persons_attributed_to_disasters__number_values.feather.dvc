@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4444
+    date_accessed: 2023-08-16 10:49:16.228202
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Number of deaths and missing persons attributed to disasters (number)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 91d541c7ffa362042c04ed03e48052da
+  size: 17586
+  path: 
+    dataset_4444_number_of_deaths_and_missing_persons_attributed_to_disasters__number_values.feather

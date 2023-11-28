@@ -1,18 +1,15 @@
 meta:
-  namespace: backport
-  short_name: dataset_5239_soil_lifespans__evans_et_al__2020_values
-  file_extension: feather
-  date_accessed: 2023-02-23 19:12:24.456506
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5239
+    date_accessed: 2023-08-10 08:58:13.702689
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Soil Lifespans (Evans et al. 2020)
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/5239
-  source_published_by: Our World in Data catalog backport
   is_public: false
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 283c97d212da418c0e74f0846a0b27be
+- md5: 4ded53e86c6ab7f6af333ca8aa06e4bf
   size: 21698
   path: dataset_5239_soil_lifespans__evans_et_al__2020_values.feather

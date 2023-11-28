@@ -38,13 +38,14 @@ dataset:
 
 
     The authors note that: "For new models (from 2020 onward) it is harder to assess these criteria, so we fall back to a subjective selection. We refer to models meeting our selection criteria as 'milestone models.'"
+
+    In cases where the model name was unavailable, OWID uses the institution name that published the model for identification.
   licenses:
   - name: Public domain
   sources:
   - name: Epoch (2023)
     url: https://epochai.org/mlinputs/visualization
-    date_accessed: '2023-06-21'
-    publication_date: '2023-06-06'
+    date_accessed: '2023-09-18'
     publication_year: 2023
     published_by: 'Epoch, Parameter, Compute and Data Trends in Machine Learning.
       Published online at epochai.org. Retrieved from: https://epochai.org/mlinputs/visualization'
@@ -88,7 +89,7 @@ tables:
         title: Training compute (FLOP)
         unit: 'FLOP'
         display:
-          title: Training compute
+          title: Training computation (petaFLOP)
           numDecimalPlaces: 0
           zeroDay: '1949-01-01'
           yearIsDay: true

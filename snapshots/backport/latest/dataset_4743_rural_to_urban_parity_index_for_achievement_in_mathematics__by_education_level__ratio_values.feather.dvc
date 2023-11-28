@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4743
+    date_accessed: 2023-08-14 15:32:16.043057
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Rural to urban parity index for achievement in mathematics, by education level
+    (ratio)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 0072f0df2d41b4bc511bc5c5cab5ff2b
+  size: 17938
+  path: 
+    dataset_4743_rural_to_urban_parity_index_for_achievement_in_mathematics__by_education_level__ratio_values.feather

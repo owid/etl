@@ -1,19 +1,15 @@
 meta:
-  name: Grapher metadata for dataset_5442_covid_19__decoupling_of_metrics
-  description: ''
   source:
     name: Our World in Data catalog backport
-    description:
     url: https://owid.cloud/admin/datasets/5442
-    source_data_url:
-    owid_data_url:
-    date_accessed: 2023-07-17 14:12:07.970786
+    date_accessed: 2023-08-14 15:01:27.069570
     publication_date: latest
-    publication_year:
     published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_5442_covid_19__decoupling_of_metrics (archived)
+  description: ''
   is_public: false
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 28a3d7650abe0a5e382b4fe5d9ea11c0
-  size: 6673
+- md5: fc1491a630373295758d1d4d394e5748
+  size: 7677
   path: dataset_5442_covid_19__decoupling_of_metrics_config.json

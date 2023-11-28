@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1690
+    date_accessed: 2023-08-14 15:52:50.765348
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1690_refraction_and_accommodation_disorders (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 18b97c71a09bf724089ccb5f8ee6868a
+  size: 17009
+  path: dataset_1690_refraction_and_accommodation_disorders_config.json

@@ -1,18 +1,15 @@
 meta:
-  namespace: backport
-  short_name: dataset_374_so2_emissions_by_region__oecd__2014__and_klimont_et_al__2013_config
-  file_extension: json
-  date_accessed: 2023-02-23 16:37:49.885846
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/374
+    date_accessed: 2023-08-10 07:44:11.704231
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_374_so2_emissions_by_region__oecd__2014__and_klimont_et_al__2013
   description: SO2 emissions (in million tonnes SO2) production by region, 1850-2010
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/374
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: f65f12c5e45ea53b415c9353ecc7d07a
-  size: 3024
-  path: dataset_374_so2_emissions_by_region__oecd__2014__and_klimont_et_al__2013_config.json
+- md5: 946da75f7eed72f528e372c4fa0e6780
+  size: 3179
+  path: 
+    dataset_374_so2_emissions_by_region__oecd__2014__and_klimont_et_al__2013_config.json

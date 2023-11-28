@@ -336,6 +336,7 @@
   aliases:
     - "Central African Rep."
     - "Central African Republic (the)"
+    - "CAR"
 
 - code: "TCD"
   name: "Chad"
@@ -469,6 +470,7 @@
   is_historical: True
   aliases:
     - "Germany, East"
+    - "German Democratic Republic"
   end_year: 1990
   successors:
     - "DEU"
@@ -1138,6 +1140,7 @@
     - "Palestinian Territories"
     - "State of Palestine"
     - "West Bank and Gaza"
+    - "WBG"
   related:
     - "PS_GZA"
 
@@ -1194,6 +1197,8 @@
   name: "Republic of Vietnam"
   is_historical: True
   end_year: 1975
+  aliases:
+    - "South Vietnam"
   successors:
     - "VNM"
 
@@ -1453,6 +1458,8 @@
 
 - code: "TUR"
   name: "Turkey"
+  aliases:
+    - "The Republic of Türkiye"
 
 - code: "TKM"
   name: "Turkmenistan"
@@ -1599,6 +1606,7 @@
   is_historical: True
   aliases:
     - "Germany, West"
+    - "German Federal Republic"
   end_year: 1990
   successors:
     - "DEU"
@@ -1635,6 +1643,8 @@
   name: "Yemen People's Republic"
   is_historical: True
   end_year: 1990
+  aliases:
+    - "South Yemen"
   successors:
     - "YEM"
 

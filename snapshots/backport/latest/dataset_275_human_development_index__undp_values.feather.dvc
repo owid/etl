@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/275
+    date_accessed: 2023-08-16 08:17:53.988536
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Human Development Index - UNDP
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 8d828b09f6082c329be59bd731cca08f
+  size: 29794
+  path: dataset_275_human_development_index__undp_values.feather

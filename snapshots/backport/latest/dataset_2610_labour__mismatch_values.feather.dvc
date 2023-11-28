@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2610
+    date_accessed: 2023-08-16 08:34:17.364020
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Labour - Mismatch
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 6581facfd093f1c26d1e35b43be52786
+  size: 7738
+  path: dataset_2610_labour__mismatch_values.feather

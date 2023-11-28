@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1804
+    date_accessed: 2023-08-11 07:37:44.155467
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: High total cholesterol
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: eb09d6b4edddbab9695235259886b839
+  size: 243066
+  path: dataset_1804_high_total_cholesterol_values.feather

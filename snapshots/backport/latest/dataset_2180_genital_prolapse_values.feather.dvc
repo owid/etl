@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2180
+    date_accessed: 2023-08-16 10:40:29.406723
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Genital prolapse
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 84b53eaae1543f19d9c56e740ff20699
+  size: 1499290
+  path: dataset_2180_genital_prolapse_values.feather

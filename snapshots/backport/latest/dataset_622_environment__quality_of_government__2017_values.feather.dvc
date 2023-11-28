@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/622
+    date_accessed: 2023-08-16 10:25:15.388678
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Environment - Quality of Government (2017)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 0d1623f60137fe58cdfed4d074521505
+  size: 185114
+  path: dataset_622_environment__quality_of_government__2017_values.feather

@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2568
+    date_accessed: 2023-08-16 09:32:26.902348
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Science, Technology and Patents - Patents by technology
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 5740cd93a0615e23f10e84835c313280
+  size: 1700578
+  path: 
+    dataset_2568_science__technology_and_patents__patents_by_technology_values.feather

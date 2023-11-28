@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1626
+    date_accessed: 2023-08-11 07:35:56.510313
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1626_maternal_abortion__miscarriage__and_ectopic_pregnancy
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 55f25e48f98fff4777dae69384336929
+  size: 27991
+  path: dataset_1626_maternal_abortion__miscarriage__and_ectopic_pregnancy_config.json

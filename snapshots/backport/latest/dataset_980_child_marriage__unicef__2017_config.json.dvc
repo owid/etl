@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/980
+    date_accessed: 2023-08-14 15:16:26.662670
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_980_child_marriage__unicef__2017 (archived)
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 1425135b1748f561522fd5c21b3b2861
+  size: 2125
+  path: dataset_980_child_marriage__unicef__2017_config.json

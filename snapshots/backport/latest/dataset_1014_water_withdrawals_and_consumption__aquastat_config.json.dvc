@@ -1,18 +1,14 @@
 meta:
-  namespace: backport
-  short_name: dataset_1014_water_withdrawals_and_consumption__aquastat_config
-  file_extension: json
-  date_accessed: 2023-02-23 17:09:14.794908
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1014
+    date_accessed: 2023-08-10 09:10:39.784140
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_1014_water_withdrawals_and_consumption__aquastat
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/1014
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: c914f1e190bbcd57c3d403dcd27f68a5
-  size: 8740
+- md5: 29ca13a0a2301ad05d7e8a669e94ff9b
+  size: 9274
   path: dataset_1014_water_withdrawals_and_consumption__aquastat_config.json

@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/88
+    date_accessed: 2023-08-16 10:50:34.025439
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: World Bank Economy & Growth - World Bank EdStats (2015)
+  description: ''
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 73a637e8dd58fa5171ddc80122e563c8
+  size: 85234
+  path: 
+    dataset_88_world_bank_economy__and__growth__world_bank_edstats__2015_values.feather

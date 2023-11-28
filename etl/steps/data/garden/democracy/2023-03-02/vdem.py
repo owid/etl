@@ -39,6 +39,10 @@ def run(dest_dir: str) -> None:
     # Create a new table with the processed data.
     tb_garden = Table(df, like=tb_meadow)
 
+    # Set titles to column names
+    for col in tb_garden:
+        tb_garden[col].metadata.title = col
+
     #
     # Save outputs.
     #

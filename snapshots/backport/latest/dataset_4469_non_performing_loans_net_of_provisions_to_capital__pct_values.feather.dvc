@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4469
+    date_accessed: 2023-08-16 10:13:57.859541
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Non-performing loans net of provisions to capital (%)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: dec0f0521298902521af1fa1b0f498a6
+  size: 21970
+  path: 
+    dataset_4469_non_performing_loans_net_of_provisions_to_capital__pct_values.feather

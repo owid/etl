@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4419
+    date_accessed: 2023-08-14 05:52:59.208786
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: '[ILO] Proportion of population covered by at least one social protection
+    benefit, by sex (%)'
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 0567839678216c4e138269db61c5002f
+  size: 9610
+  path: 
+    dataset_4419_ilo__proportion_of_population_covered_by_at_least_one_social_protection_benefit__by_sex__pct_values.feather

@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1073
+    date_accessed: 2023-08-14 15:03:01.365872
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: 'World Bank Poverty and Equity database - Poverty: Shared prosperity'
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 0a046ce9344aecb9cda06b8c6f42ffa5
+  size: 12930
+  path: 
+    dataset_1073_world_bank_poverty_and_equity_database__poverty__shared_prosperity_values.feather

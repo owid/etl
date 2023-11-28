@@ -4,16 +4,28 @@
 #
 
 import re
+import sys
 import tempfile
+from collections.abc import Generator
 from contextlib import contextmanager
 from pathlib import Path
 from typing import Any, Dict, Iterable, Iterator, List, Optional, Set, Union, cast
+from urllib.parse import urljoin
 
+import jsonref
 import pandas as pd
 import structlog
+import yaml
 from owid import catalog
-from owid.catalog import CHANNEL
+from owid.catalog import CHANNEL, DatasetMeta, Table
 from owid.catalog.datasets import DEFAULT_FORMATS, FileFormat
+from owid.catalog.meta import SOURCE_EXISTS_OPTIONS
+from owid.catalog.tables import (
+    combine_tables_description,
+    combine_tables_title,
+    get_unique_licenses_from_tables,
+    get_unique_sources_from_tables,
+)
 from owid.datautils.common import ExceptionFromDocstring
 from owid.walden import Catalog as WaldenCatalog
 from owid.walden import Dataset as WaldenDataset
@@ -75,13 +87,16 @@ def grapher_checks(ds: catalog.Dataset) -> None:
         assert {"year", "country"} <= set(tab.reset_index().columns), "Table must have columns country and year."
         assert (
             tab.reset_index()["year"].dtype in gh.INT_TYPES
-        ), f"year must be of an integer type but was: {tab['country'].dtype}"
+        ), f"year must be of an integer type but was: {tab['year'].dtype}"
         for col in tab:
             if col in ("year", "country"):
                 continue
             catalog.utils.validate_underscore(col)
-            assert tab[col].metadata.unit is not None, f"Column {col} must have a unit."
-            assert tab[col].metadata.title is not None, f"Column {col} must have a title."
+            assert tab[col].metadata.unit is not None, f"Column `{col}` must have a unit."
+            assert tab[col].metadata.title is not None, f"Column `{col}` must have a title."
+            assert (
+                tab[col].m.origins or tab[col].m.sources or ds.metadata.sources
+            ), f"Column `{col}` must have either sources or origins"
 
 
 def create_dataset(
@@ -92,6 +107,8 @@ def create_dataset(
     camel_to_snake: bool = False,
     formats: List[FileFormat] = DEFAULT_FORMATS,
     check_variables_metadata: bool = False,
+    run_grapher_checks: bool = True,
+    if_origins_exist: SOURCE_EXISTS_OPTIONS = "replace",
 ) -> catalog.Dataset:
     """Create a dataset and add a list of tables. The dataset metadata is inferred from
     default_metadata and the dest_dir (which is in the form `channel/namespace/version/short_name`).
@@ -107,6 +124,8 @@ def create_dataset(
     :param underscore_table: Whether to underscore the table name before adding it to the dataset.
     :param camel_to_snake: Whether to convert camel case to snake case for the table name.
     :param check_variables_metadata: Check that all variables in tables have metadata; raise a warning otherwise.
+    :param run_grapher_checks: Run grapher checks on the dataset, only applies to grapher channel.
+    :param if_origins_exist: What to do if origins already exist in the dataset metadata.
 
     Usage:
         ds = create_dataset(dest_dir, [table_a, table_b], default_metadata=snap.metadata)
@@ -114,8 +133,22 @@ def create_dataset(
     """
     from etl.steps.data.converters import convert_snapshot_metadata
 
-    # convert snapshot SnapshotMeta to DatasetMeta
-    if isinstance(default_metadata, SnapshotMeta):
+    if default_metadata is None:
+        # Get titles and descriptions from the tables.
+        # Note: If there are different titles or description, the result will be None.
+        title = combine_tables_title(tables=tables)
+        description = combine_tables_description(tables=tables)
+        # If not defined, gather origins and licenses from the metadata of the tables.
+        licenses = get_unique_licenses_from_tables(tables=tables)
+        if any(["origins" in table[column].metadata.to_dict() for table in tables for column in table.columns]):
+            # If any of the variables contains "origins" this means that it is a recently created dataset.
+            default_metadata = DatasetMeta(licenses=licenses, title=title, description=description)
+        else:
+            # None of the variables includes "origins", which means it is an old dataset, with "sources".
+            sources = get_unique_sources_from_tables(tables=tables)
+            default_metadata = DatasetMeta(licenses=licenses, sources=sources, title=title, description=description)
+    elif isinstance(default_metadata, SnapshotMeta):
+        # convert snapshot SnapshotMeta to DatasetMeta
         default_metadata = convert_snapshot_metadata(default_metadata)
 
     if check_variables_metadata:
@@ -125,9 +158,13 @@ def create_dataset(
     ds = catalog.Dataset.create_empty(dest_dir, metadata=default_metadata)
 
     # add tables to dataset
+    used_short_names = set()
     for table in tables:
         if underscore_table:
             table = catalog.utils.underscore_table(table, camel_to_snake=camel_to_snake)
+        if table.metadata.short_name in used_short_names:
+            raise ValueError(f"Table short name `{table.metadata.short_name}` is already in use.")
+        used_short_names.add(table.metadata.short_name)
         ds.add(table, formats=formats)
 
     # set metadata from dest_dir
@@ -150,16 +187,28 @@ def create_dataset(
     for k, v in match.groupdict().items():
         setattr(ds.metadata, k, v)
 
-    # update metadata from yaml file
-    N = PathFinder(str(paths.STEP_DIR / "data" / Path(dest_dir).relative_to(Path(dest_dir).parents[3])))
-    if N.metadata_path.exists():
-        ds.update_metadata(N.metadata_path)
+    meta_path = get_metadata_path(str(dest_dir))
+    if meta_path.exists():
+        ds.update_metadata(meta_path, if_origins_exist=if_origins_exist)
 
         # check that we are not using metadata inconsistent with path
         for k, v in match.groupdict().items():
             assert str(getattr(ds.metadata, k)) == v, f"Metadata {k} is inconsistent with path {dest_dir}"
 
+    # run grapher checks
+    if ds.metadata.channel == "grapher" and run_grapher_checks:
+        grapher_checks(ds)
+
     return ds
+
+
+def get_metadata_path(dest_dir: str) -> Path:
+    N_archive = PathFinder(str(paths.STEP_DIR / "archive" / Path(dest_dir).relative_to(Path(dest_dir).parents[3])))
+    if N_archive.metadata_path.exists():
+        N = N_archive
+    else:
+        N = PathFinder(str(paths.STEP_DIR / "data" / Path(dest_dir).relative_to(Path(dest_dir).parents[3])))
+    return N.metadata_path
 
 
 def create_dataset_with_combined_metadata(
@@ -298,7 +347,10 @@ class PathFinder:
         self.f = Path(__file__)
 
         # Load dag.
-        self.dag = load_dag()
+        if "/archive/" in __file__:
+            self.dag = load_dag(paths.DAG_ARCHIVE_FILE)
+        else:
+            self.dag = load_dag()
 
         # Current file should be a data step.
         if not self.f.as_posix().startswith(paths.STEP_DIR.as_posix()):
@@ -312,6 +364,9 @@ class PathFinder:
         # Then, if the step is not found in the dag, but it's found as private, is_private will be set to True.
         if is_private is None:
             self.is_private = False
+
+        # Default logger
+        self.log = structlog.get_logger(step=f"{self.namespace}/{self.channel}/{self.version}/{self.short_name}")
 
     @property
     def channel(self) -> str:
@@ -525,15 +580,15 @@ class PathFinder:
 
         return dataset
 
-    def load_snapshot_dependency(self) -> Snapshot:
-        """Load snapshot dependency with the same name."""
-        snap = self.load_dependency(channel="snapshot", short_name=self.short_name)
+    def load_snapshot(self, short_name: Optional[str] = None) -> Snapshot:
+        """Load snapshot dependency. short_name defaults to the current step's short_name."""
+        snap = self.load_dependency(channel="snapshot", short_name=short_name or self.short_name)
         assert isinstance(snap, Snapshot)
         return snap
 
-    def load_dataset_dependency(self) -> catalog.Dataset:
-        """Load dataset dependency with the same name."""
-        dataset = self.load_dependency(short_name=self.short_name)
+    def load_dataset(self, short_name: Optional[str] = None) -> catalog.Dataset:
+        """Load dataset dependency. short_name defaults to the current step's short_name."""
+        dataset = self.load_dependency(short_name=short_name or self.short_name)
         assert isinstance(dataset, catalog.Dataset)
         return dataset
 
@@ -887,3 +942,84 @@ class VersionTracker:
 
 def run_version_tracker_checks():
     VersionTracker().apply_sanity_checks()
+
+
+def print_tables_metadata_template(tables: List[Table]):
+    # This function is meant to be used when creating code in an interactive window (or a notebook).
+    # It prints a template for the metadata of the tables in the list.
+    # The template can be copied and pasted into the corresponding yaml file.
+    # In the future, we should have an interactive tool to add or edit the content of the metadata yaml files, using
+    # AI-generated texts when possible.
+
+    # Initialize output dictionary.
+    dict_tables = {}
+    for tb in tables:
+        dict_variables = {}
+        for column in tb.columns:
+            dict_values = {}
+            for field in ["title", "unit", "short_unit", "description_short", "processing_level"]:
+                value = getattr(tb[column].metadata, field) or ""
+
+                # Add some simple rules to simplify some common cases.
+
+                # If title is empty, or if title is underscore (probably because it is taken from the column name),
+                # create a custom title.
+                if (field == "title") and ((value == "") or ("_" in value)):
+                    value = column.capitalize().replace("_", " ")
+
+                # If unit or short_unit is empty, and the column name contains 'pct', set it to '%'.
+                if (value == "") and (field in ["unit", "short_unit"]) and "pct" in column:
+                    value = "%"
+
+                if field == "processing_level":
+                    # Assume a minor processing level (it will be manually overwritten, if needed).
+                    value = "minor"
+
+                dict_values[field] = value
+            dict_variables[column] = dict_values
+        dict_tables[tb.metadata.short_name] = {"variables": dict_variables}
+    dict_output = {"tables": dict_tables}
+
+    print(yaml.dump(dict_output, default_flow_style=False, sort_keys=False))
+
+
+@contextmanager
+def isolated_env(
+    working_dir: Path,
+    keep_modules: str = r"openpyxl|pyarrow|lxml|PIL|pydantic|sqlalchemy|sqlmodel|pandas|frictionless|numpy",
+) -> Generator[None, None, None]:
+    """Add given directory to pythonpath, run code in context, and
+    then remove from pythonpath and unimport modules imported in context.
+
+    Note that unimporting modules means they'll have to be imported again, but
+    it has minimal impact on performance (ms).
+
+    :param keep_modules: regex of modules to keep imported
+    """
+    # add module dir to pythonpath
+    sys.path.append(working_dir.as_posix())
+
+    # remember modules that were imported before
+    imported_modules = set(sys.modules.keys())
+
+    yield
+
+    # unimport modules imported during execution unless they match `keep_modules`
+    for module_name in set(sys.modules.keys()) - imported_modules:
+        if not re.search(keep_modules, module_name):
+            sys.modules.pop(module_name)
+
+    # remove module dir from pythonpath
+    sys.path.remove(working_dir.as_posix())
+
+
+def read_json_schema(path: Union[Path, str]) -> Dict[str, Any]:
+    """Read JSON schema with resolved references."""
+    path = Path(path)
+
+    # pathlib does not append trailing slashes, but jsonref needs that.
+    base_dir_url = path.parent.absolute().as_uri() + "/"
+    base_file_url = urljoin(base_dir_url, path.name)
+    with path.open("r") as f:
+        dix = jsonref.loads(f.read(), base_uri=base_file_url, lazy_load=False)
+        return cast(Dict[str, Any], dix)

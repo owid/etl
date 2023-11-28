@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1776
+    date_accessed: 2023-08-11 07:40:31.771492
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Child stunting
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: baa507cc5efef69e677b863a47d944f2
+  size: 541946
+  path: dataset_1776_child_stunting_values.feather

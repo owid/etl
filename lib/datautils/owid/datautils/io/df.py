@@ -4,6 +4,7 @@ from pathlib import Path
 from typing import Any, List, Optional, Union
 
 import pandas as pd
+
 from owid.datautils.decorators import enable_file_download
 
 COMPRESSION_SUPPORTED = ["gz", "bz2", "zip", "xz", "zst", "tar"]
@@ -59,8 +60,7 @@ def from_file(
             extension = file_type
         else:
             raise ValueError(
-                "To be able to read from a compressed file, you need to provide a value"
-                " for `file_type`."
+                "To be able to read from a compressed file, you need to provide a value" " for `file_type`."
             )
 
     # Check path is valid
@@ -82,10 +82,7 @@ def from_file(
         "xml": pd.read_xml,
     }
     if extension not in input_methods:
-        raise ValueError(
-            "Failed reading dataframe because of an unknown file extension:"
-            f" {extension}"
-        )
+        raise ValueError("Failed reading dataframe because of an unknown file extension:" f" {extension}")
     # Select the appropriate reading method.
     read_function = input_methods[extension]
 
@@ -94,9 +91,7 @@ def from_file(
     return df
 
 
-def to_file(
-    df: pd.DataFrame, file_path: Union[str, Path], overwrite: bool = True, **kwargs: Any
-) -> None:
+def to_file(df: pd.DataFrame, file_path: Union[str, Path], overwrite: bool = True, **kwargs: Any) -> None:
     """Save dataframe to file.
 
     This function wraps all pandas df.to_* methods, e.g. df.to_csv() or df.to_parquet(), with the following advantages:
@@ -132,9 +127,7 @@ def to_file(
 
     # Avoid overwriting an existing file unless explicitly stated.
     if file_path.is_file() and not overwrite:
-        raise FileExistsError(
-            "Failed to save dataframe because file exists and 'overwrite' is False."
-        )
+        raise FileExistsError("Failed to save dataframe because file exists and 'overwrite' is False.")
 
     # Available output methods (some of them may need additional dependencies to work).
     output_methods = {
@@ -154,18 +147,14 @@ def to_file(
         "xml": df.to_xml,
     }
     if extension not in output_methods:
-        raise ValueError(
-            f"Failed saving dataframe because of an unknown file extension: {extension}"
-        )
+        raise ValueError(f"Failed saving dataframe because of an unknown file extension: {extension}")
     # Select the appropriate storing method.
     save_function = output_methods[extension]
 
     # Decide whether dataframe should be stored with or without an index, if:
     # * The storing method allows for an 'index' argument.
     # * The argument "index" is not explicitly given.
-    if ("index" in inspect.signature(save_function).parameters) and (
-        "index" not in kwargs
-    ):
+    if ("index" in inspect.signature(save_function).parameters) and ("index" not in kwargs):
         # Make 'index' False to avoid storing index if dataframe has a dummy index.
         kwargs["index"] = _has_index(df=df)
 

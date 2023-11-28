@@ -40,7 +40,10 @@ def run(dest_dir: str) -> None:
     )
 
     merged_df = pd.merge(df_pivot_domain, df_pivot_org, on="year").reset_index()
-
+    # Creating a cumulative column
+    for column in merged_df.columns:
+        if column not in ["year", "country"]:
+            merged_df[f"{column}_cumsum"] = merged_df[column].cumsum()
     # Create table
     tb = Table(merged_df, short_name=paths.short_name, underscore=True)
     #

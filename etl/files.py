@@ -3,12 +3,14 @@
 #
 
 import hashlib
+import os
+import subprocess
+import time
 from collections import OrderedDict
 from pathlib import Path
 from threading import Lock
-from typing import Any, Dict, List, Optional, Set, TextIO, Union
+from typing import Any, Dict, Generator, List, Optional, Set, TextIO, Union
 
-import black
 import yaml
 from yaml.dumper import Dumper
 
@@ -64,10 +66,13 @@ def checksum_file(filename: Union[str, Path]) -> str:
     if isinstance(filename, Path):
         filename = filename.as_posix()
 
-    if filename not in CACHE_CHECKSUM_FILE:
-        CACHE_CHECKSUM_FILE.add(filename, checksum_file_nocache(filename))
+    mtime = os.path.getmtime(filename)
+    key = f"{filename}-{mtime}"
 
-    return CACHE_CHECKSUM_FILE[filename]
+    if filename not in CACHE_CHECKSUM_FILE:
+        CACHE_CHECKSUM_FILE.add(key, checksum_file_nocache(filename))
+
+    return CACHE_CHECKSUM_FILE[key]
 
 
 def checksum_str(s: str) -> str:
@@ -89,7 +94,8 @@ def walk(folder: Path, ignore_set: Set[str] = {"__pycache__", ".ipynb_checkpoint
 
 
 class _MyDumper(Dumper):
-    pass
+    def increase_indent(self, flow=False, indentless=False):
+        return super(_MyDumper, self).increase_indent(flow, False)
 
 
 def _str_presenter(dumper: Any, data: Any) -> Any:
@@ -160,18 +166,42 @@ def _strip_lines_in_dict(d: Any) -> Any:
         return d
 
 
-def apply_black_formatter_to_files(file_paths: List[Union[str, Path]]) -> None:
-    """Load project configuration for black formatter, and apply formatter to a list of files.
+def apply_ruff_formatter_to_files(file_paths: List[Union[str, Path]]) -> None:
+    """Apply ruff formatter to a list of files.
 
     Parameters
     ----------
     file_paths : List[Union[str, Path]]
-        Files to be reformatted using black.
+        Files to be reformatted using ruff.
 
     """
-    # Parse black formatter configuration from pyproject.toml file.
-    black_config = black.parse_pyproject_toml(BASE_DIR / "pyproject.toml")  # type: ignore
-    black_mode = black.Mode(**{key: value for key, value in black_config.items() if key not in ["exclude"]})  # type: ignore
-    # Apply black formatter to generated step files.
-    for file_path in file_paths:
-        black.format_file_in_place(src=file_path, fast=True, mode=black_mode, write_back=black.WriteBack.YES)  # type: ignore
+    pyproject_path = BASE_DIR / "pyproject.toml"
+    subprocess.run(["ruff", "format", "--config", str(pyproject_path)] + [str(fp) for fp in file_paths], check=True)
+
+
+def _mtime_mapping(path: Path) -> Dict[Path, float]:
+    return {f: f.stat().st_mtime for f in path.rglob("*") if f.is_file() and "__pycache__" not in f.parts}
+
+
+def watch_folder(path: Path) -> Generator[Path, None, None]:
+    """Watch folder and yield on any changes."""
+    last_seen = _mtime_mapping(path)
+
+    while True:
+        time.sleep(1)
+
+        current_files = _mtime_mapping(path)
+
+        # Check for modifications
+        for f, mtime in current_files.items():
+            # new file
+            if f not in last_seen:
+                yield f
+                break
+            # updated file
+            else:
+                if last_seen[f] != mtime:
+                    yield f
+                    break
+
+        last_seen = current_files

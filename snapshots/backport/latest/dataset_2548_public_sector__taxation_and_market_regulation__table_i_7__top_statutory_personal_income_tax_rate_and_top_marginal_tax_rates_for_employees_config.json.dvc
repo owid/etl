@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2548
+    date_accessed: 2023-08-14 15:30:00.452996
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_2548_public_sector__taxation_and_market_regulation__table_i_7__top_statutory_personal_income_tax_rate_and_top_marginal_tax_rates_for_employees
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 28803d80d8cbefa8af0b55cb1e130eac
+  size: 7500
+  path: 
+    dataset_2548_public_sector__taxation_and_market_regulation__table_i_7__top_statutory_personal_income_tax_rate_and_top_marginal_tax_rates_for_employees_config.json

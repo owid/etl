@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2206
+    date_accessed: 2023-08-14 15:41:43.113535
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_2206_multidrug_resistant_hiv_aids__tuberculosis_without_extensive_drug_resistance
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 6d5705c420a95dc558c13a716ee92ab3
+  size: 35101
+  path: 
+    dataset_2206_multidrug_resistant_hiv_aids__tuberculosis_without_extensive_drug_resistance_config.json

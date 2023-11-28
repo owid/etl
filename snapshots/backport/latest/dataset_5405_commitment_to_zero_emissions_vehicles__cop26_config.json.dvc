@@ -1,18 +1,15 @@
 meta:
-  namespace: backport
-  short_name: dataset_5405_commitment_to_zero_emissions_vehicles__cop26_config
-  file_extension: json
-  date_accessed: 2023-02-23 17:53:08.946057
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5405
+    date_accessed: 2023-08-10 09:10:33.079331
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_5405_commitment_to_zero_emissions_vehicles__cop26
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/5405
-  source_published_by: Our World in Data catalog backport
   is_public: false
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 6c021aa1f52807769cbd8f948a950d97
-  size: 2869
+- md5: 4b1f8122da9331c013358b9f719118d8
+  size: 3020
   path: dataset_5405_commitment_to_zero_emissions_vehicles__cop26_config.json

@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2512
+    date_accessed: 2023-08-16 08:13:36.070501
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Top income shares – World Wealth and Income Database (2018)
+  description: ''
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 6c1aa4604589b3973eb24ce70e5cb05d
+  size: 25770
+  path: 
+    dataset_2512_top_income_shares__world_wealth_and_income_database__2018_values.feather

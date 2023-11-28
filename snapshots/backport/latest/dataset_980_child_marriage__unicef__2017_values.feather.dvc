@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/980
+    date_accessed: 2023-08-14 15:16:30.260291
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Child Marriage – UNICEF (2017)
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 6c43bff5aab85c706ba4691ca017a047
+  size: 10210
+  path: dataset_980_child_marriage__unicef__2017_values.feather

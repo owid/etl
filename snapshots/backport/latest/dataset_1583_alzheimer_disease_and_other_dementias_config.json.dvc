@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1583
+    date_accessed: 2023-08-14 14:34:53.886033
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1583_alzheimer_disease_and_other_dementias (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: ca9679a7e41915bdf1b24b5b97581576
+  size: 32312
+  path: dataset_1583_alzheimer_disease_and_other_dementias_config.json

@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Google Sheet
+    url: https://www.science.org/doi/10.1126/sciadv.aaz5803
+    source_data_url: 
+      https://docs.google.com/spreadsheets/d/e/2PACX-1vTD6oDffmZRLtbnYvEY4GKVbNhQO7oZpuivywu0lC_lIS8EIqy67SPnPYHMlW9ByeuQQ1g4lLt0Igl-/pub?output=csv
+    date_accessed: '2023-09-20'
+    publication_year: '2021'
+    published_by: Google Sheet
+  name: Plastic ocean waste and pollution (Meijer et al. 2021)
+  description: ''
+  license: {}
+wdir: ../../../data/snapshots/fasttrack/latest
+outs:
+- md5: 9622364b41ad11332ca7164e8da26a20
+  size: 12674
+  path: plastic_waste_meijer_2021.csv

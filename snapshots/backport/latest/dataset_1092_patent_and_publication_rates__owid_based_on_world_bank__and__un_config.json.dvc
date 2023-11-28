@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1092
+    date_accessed: 2023-08-14 15:21:23.676734
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1092_patent_and_publication_rates__owid_based_on_world_bank__and__un
+    (archived)
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 702af0892e690201221c76017981f5fa
+  size: 7624
+  path: 
+    dataset_1092_patent_and_publication_rates__owid_based_on_world_bank__and__un_config.json

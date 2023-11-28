@@ -1,4 +1,19 @@
-"""Load a meadow dataset and create a garden dataset."""
+"""Project Mars combines multiple sources to generate a more complete dataset.
+
+It relies heavily on COW.
+
+On regions:
+
+    - Very little is said on regions in the source's documentation. I only found some in their "DividedArmies_CodebookV1.1.pdf" pdf (https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/DUO7IE), page 40, section 12 "Variables: Fixed Effects".
+    - Regions are, along with their COW codes (based on GW):
+        - Asia and Oceania: 700-990 (Afghanistan-Samoa)
+        - Eastern Europe: 200-280 (UK-Mecklenburg Schwerin), 305 (Austria), 325-338 (Italy-Malta), 375-395 (Finland-Iceland)
+        - Western Europe: 290-300 (Poland - Austria-Hungary), 310-317 (Hungary-Slovakia), 339-373 (Albania-Azerbaijan),
+        - Latin America: 31-165 (Bahamas-Uruguay)
+        - North Africa and the Middle East: 432 (Mali), 435-436 (Mauritania-Niger), 483 (Chad), 520-531 (Somalia-Eritrea), 600-698 (Morocco-Oman)
+        - North America: 2-20 (US-Canada)
+        - Sub-Saharan Africa: 402-420 (Cape Verde-Gambia), 433-434 (Senegal-Benin), 437-482 (Ivory Coast-Central African Republic), 484-517 (Congo-Rwanda), 540-591 (Angola-Seychelles)
+"""
 
 from typing import cast
 
@@ -238,6 +253,7 @@ def estimate_metrics(tb: Table) -> Table:
 
     This function also renames columns to fit expected names.
     """
+    # Add metrcs
     tb_ongoing = _create_ongoing_metrics(tb)
     tb_new = _create_metrics_new(tb)
 
@@ -259,6 +275,9 @@ def estimate_metrics(tb: Table) -> Table:
 
 
 def _create_ongoing_metrics(tb: Table) -> Table:
+    # Check that for a given year and conflict, it only has one conflict type
+    tb.groupby(["year", "warcode"])["conflict_type"].nunique().max()
+
     # Estimate number of ongoing conflicts
     agg_ops = {"warcode": "nunique", "kialow": "sum", "kiahigh": "sum"}
     ## Regions

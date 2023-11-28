@@ -1,0 +1,29 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4997
+    date_accessed: 2023-08-10 15:07:50.830633
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: 'Food Balance: Commodity Balances - Crops Primary Equivalent'
+  description: 'Commodity balances show balances of food and agricultural commodities
+    in a standardized form. The scope of standardization is to present these data
+    in a less detailed form for a selected number of commodities without causing any
+    significant loss of the basic variables monitoring the agricultural sector. The
+    selected commodities include the equivalents of their derived products falling
+    in the same commodity group, but exclude the equivalents of by-products and derived
+    commodities, which through processing, change their nature and become part of
+    different commodity groups. A number of commodity/item aggregates have been included
+    to offer synthetic information. Some of these are included with the aim of simplifying
+    the extraction of all component commodities. Data shown in the item aggregates
+    represent the sum of the component commodities as presented in this domain (standardized
+    form). Commodity coverage: The commodity list in this domain has been generally
+    confined to primary commodities - except for sugar, oils and fats and beverages.  Whenever
+    possible trade in processed commodities is expressed in the originating primary
+    commodity equivalent. Rice is expressed in milled equivalent.'
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 5805678b802ea040de4f855032b60ec6
+  size: 23814906
+  path: 
+    dataset_4997_food_balance__commodity_balances__crops_primary_equivalent_values.feather

@@ -1,0 +1,19 @@
+dataset:
+  title: 'Greenaway - Under-five mortality exposure in low- and middle-income countries: A multi-generation and cohort perspective
+    of sibling and offspring loss'
+  description: 'This dataset shows estimated share of mothers who have lost a child under 5 years old, based on large-scale
+    surveys including the Demographic and Health Surveys (DHS) and Multiple Indicator Cluster Surveys (MICS). Citation: Smith-Greenaway,
+    E., Weitzman, A., Lin, Y., & Huss, K. (2023, January 1). Under-five mortality exposure in low- and middle-income countries:
+    A multi-generation and cohort perspective of sibling and offspring loss. https://doi.org/10.31235/osf.io/xvbkj'
+  licenses:
+    - {}
+tables:
+  under_five_mortality_lmics:
+    variables:
+      share_of_mothers_who_have_lost_a_child:
+        title: Share of mothers who have lost a child
+        description: The estimated share of mothers who have lost a child under 5 years old. The denominator refers to women
+          of childbearing age who have given birth to a living child, but whose child(ren) may no longer be alive. Estimates
+          were made for the decade (1960s, 1970s, 1980s) and are listed with the first year (e.g. 1960).
+        unit: '%'
+        short_unit: '%'

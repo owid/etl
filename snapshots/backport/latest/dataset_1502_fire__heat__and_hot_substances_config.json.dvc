@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1502
+    date_accessed: 2023-08-14 15:25:22.949683
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1502_fire__heat__and_hot_substances (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 4639c5be6e0101a8c0167f24d5323865
+  size: 32145
+  path: dataset_1502_fire__heat__and_hot_substances_config.json

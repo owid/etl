@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2027
+    date_accessed: 2023-08-16 10:01:09.640174
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Official development assistance and public expenditure on conservation and
+    sustainable use of biodiversity and ecosystems
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 49cdd046f1edbaa0fe297309394e30cf
+  size: 26802
+  path: 
+    dataset_2027_official_development_assistance_and_public_expenditure_on_conservation_and_sustainable_use_of_biodiversity_and_ecosystems_values.feather

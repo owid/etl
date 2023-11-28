@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1088
+    date_accessed: 2023-08-16 08:49:23.837327
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_1088_world_bank_the_atlas_of_social_protection__indicators_of_resilience_and_equity__country_context
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 06960b98b77a5d1d19e2a2f6764d1e75
+  size: 395272
+  path: 
+    dataset_1088_world_bank_the_atlas_of_social_protection__indicators_of_resilience_and_equity__country_context_config.json

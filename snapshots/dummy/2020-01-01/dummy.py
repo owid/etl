@@ -1,4 +1,4 @@
-"""Script to create a snapshot of dataset 'Dummy dataset'."""
+"""Script to create a snapshot of dataset."""
 
 from pathlib import Path
 

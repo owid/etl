@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2179
+    date_accessed: 2023-08-16 10:37:24.929832
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Endometriosis
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 1ea058d0dce969974be0d679b206ae40
+  size: 1190946
+  path: dataset_2179_endometriosis_values.feather

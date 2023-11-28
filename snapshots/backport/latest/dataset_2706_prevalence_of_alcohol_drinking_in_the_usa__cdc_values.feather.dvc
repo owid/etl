@@ -1,18 +1,14 @@
 meta:
-  namespace: backport
-  short_name: dataset_2706_prevalence_of_alcohol_drinking_in_the_usa__cdc_values
-  file_extension: feather
-  date_accessed: 2023-02-23 17:47:03.389910
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2706
+    date_accessed: 2023-08-10 08:01:23.727397
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Prevalence of alcohol drinking in the USA - CDC
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/2706
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 4ed34f69cfbd13f4ad13daeb6470fb32
+- md5: dde63cfb1d3d89691f5251b9b5eddab3
   size: 6618
   path: dataset_2706_prevalence_of_alcohol_drinking_in_the_usa__cdc_values.feather

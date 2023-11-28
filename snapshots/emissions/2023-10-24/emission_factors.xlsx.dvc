@@ -1,0 +1,33 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/origin/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Emission Factor Database
+    description: |-
+      The Intergovernmental Panel on Climate Change (IPCC) Emission Factor Database (EFDB) is a library of emission factors and parameters that can be used for estimation of national greenhouse gas emissions/removals. For more details, see [the User Manual](https://www.ipccnggip.iges.or.jp/EFDB/documents/EFDB_User_Manual.pdf).
+    date_published: 2023-10-24
+
+    # Citation
+    producer: Intergovernmental Panel on Climate Change
+    citation_full: |-
+      The Intergovernmental Panel on Climate Change (IPCC) Emission Factor Database (EFDB) contains default data from IPCC Guidelines and data from other sources (e.g., peer-reviewed papers) with background information.
+
+      The data extracted from the IPCC EFDB comes from the 2006 IPCC Guidelines for National Greenhouse Gas Inventories, 1A, Sheet 1 of 4 (page A1.6) in Annex 1 of Volume 2.
+    attribution: IPCC - Emission Factor Database (2023)
+    attribution_short: IPCC
+
+    # Files
+    url_main: https://www.ipcc-nggip.iges.or.jp/EFDB/
+    date_accessed: 2023-10-24
+
+    # License
+    license:
+      name: ©IPCC 2023
+      url: https://www.ipcc.ch/copyright/
+
+wdir: ../../../data/snapshots/emissions/2023-10-24
+outs:
+- md5: 4efb88d3ee7a0926dd8310044f0c8464
+  size: 2232494
+  path: emission_factors.xlsx

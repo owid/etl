@@ -1,7 +1,8 @@
 from unittest import mock
-from owid.datautils.google.sheets import GSheetsApi
+
 import pandas as pd
-from gsheets import Sheets
+
+from owid.datautils.google.sheets import GSheetsApi
 
 
 class MockSheets:
@@ -67,9 +68,7 @@ class TestGSheetsApi:
         ws = api.get(spreadsheet_id=self.ss_id, worksheet_id=self.ws_id)
         assert isinstance(ws, MockWorkSheet)
 
-    @mock.patch(
-        "owid.datautils.google.sheets.GSheetsApi.get", return_value=MockWorkSheet()  # type: ignore
-    )
+    @mock.patch("owid.datautils.google.sheets.GSheetsApi.get", return_value=MockWorkSheet())  # type: ignore
     def test_download_worksheet(self, mock_init, mock_sheets):
         api = GSheetsApi(self.clients_secrets, self.credentials_path)
         # with output_path
@@ -77,17 +76,13 @@ class TestGSheetsApi:
         # without output_path
         api.download_worksheet(self.ss_id, self.ws_id)
 
-    @mock.patch(
-        "owid.datautils.google.sheets.GSheetsApi.get", return_value=MockWorkSheet()  # type: ignore
-    )
+    @mock.patch("owid.datautils.google.sheets.GSheetsApi.get", return_value=MockWorkSheet())  # type: ignore
     def test_download_spreadsheet(self, mock_init, mock_sheets_1):
         api = GSheetsApi(self.clients_secrets, self.credentials_path)
         # with output_dir
         api.download_spreadsheet(self.ss_id, output_dir="local-path")
 
-    @mock.patch(
-        "owid.datautils.google.sheets.GSheetsApi.get", return_value=MockWorkSheet()  # type: ignore
-    )
+    @mock.patch("owid.datautils.google.sheets.GSheetsApi.get", return_value=MockWorkSheet())  # type: ignore
     def test_worksheet_to_df(self, mock_init, mock_sheets):
         api = GSheetsApi(self.clients_secrets, self.credentials_path)
         df = api.worksheet_to_df(self.ss_id, self.ws_id)

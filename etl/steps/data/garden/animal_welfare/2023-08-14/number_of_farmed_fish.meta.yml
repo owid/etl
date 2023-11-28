@@ -1,0 +1,84 @@
+definitions:
+  attribution: &attribution Fishcount (2018)
+  description_key: &description_key
+    - This indicator uses data on aquaculture production tonnages and mean weights estimated from available fish size data.
+    - |
+      Note that this study does not include:
+      - Non-fish species, e.g. lobsters.
+      - Fish deaths arising in fish farms prior to harvest, in the capture of wild fish for feed or re-stocking, or from environmental impacts on surrounding wildlife.
+      - Fish farmed for use as bait, whose small production tonnages may comprise large numbers of fish due to their very small size of just a few grams.
+      - Species without an estimated mean weight (which were an additional 17% of reported global fish production).
+  presentation:
+    topic_tags:
+    - Animal Welfare
+    - Fish & Overfishing
+
+tables:
+  number_of_farmed_fish:
+    variables:
+      n_farmed_fish_low:
+        title: Estimated number of farmed fish (lower bound)
+        unit: 'fish'
+        short_unit: ''
+        description_short: Lower bound estimate of the annual number of farmed fish slaughtered for food.
+        description_key: *description_key
+        display:
+          numDecimalPlaces: 0
+        presentation:
+          attribution: *attribution
+      n_farmed_fish:
+        title: Estimated number of farmed fish
+        unit: 'fish'
+        short_unit: ''
+        description_short: Midpoint estimate of the annual number of farmed fish slaughtered for food, calculated as the average between the lower and upper estimates.
+        description_key: *description_key
+        display:
+          numDecimalPlaces: 0
+        presentation:
+          attribution: *attribution
+          grapher_config:
+            subtitle: &subtitle This data does not include lobsters, farmed fish used as bait, and species without an estimated mean weight (which were an additional 17% of reported global fish production).
+            note: Due to large uncertainties, the chart shows upper and lower bounds, and midpoint values (also shown in the map), which are the average of those bounds.
+      n_farmed_fish_high:
+        title: Estimated number of farmed fish (upper bound)
+        unit: 'fish'
+        short_unit: ''
+        description_short: Upper bound estimate of the annual number of farmed fish slaughtered for food.
+        description_key: *description_key
+        display:
+          numDecimalPlaces: 0
+        presentation:
+          attribution: *attribution
+      n_farmed_fish_low_per_capita:
+        title: Estimated number of farmed fish per capita (lower bound)
+        unit: 'fish per person'
+        short_unit: ''
+        description_short: Lower bound estimate of the annual number of farmed fish slaughtered for food per person.
+        description_key: *description_key
+        display:
+          numDecimalPlaces: 2
+        presentation:
+          attribution: *attribution
+      n_farmed_fish_per_capita:
+        title: Estimated number of farmed fish per capita
+        unit: 'fish per person'
+        short_unit: ''
+        description_short: Midpoint estimate of the annual number of farmed fish slaughtered for food per person.
+        description_key: *description_key
+        display:
+          numDecimalPlaces: 2
+        presentation:
+          attribution: *attribution
+          grapher_config:
+            subtitle: *subtitle
+            note: Due to large uncertainties, the chart shows upper and lower bounds, and midpoint values (also shown in the map), which are the average of those bounds.
+      n_farmed_fish_high_per_capita:
+        title: Estimated number of farmed fish per capita (upper bound)
+        unit: 'fish per person'
+        short_unit: ''
+        description_short: Upper bound estimate of the annual number of farmed fish slaughtered for food per person.
+        description_key: *description_key
+        display:
+          numDecimalPlaces: 2
+        presentation:
+          attribution: *attribution

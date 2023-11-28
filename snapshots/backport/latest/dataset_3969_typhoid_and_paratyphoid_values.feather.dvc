@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/3969
+    date_accessed: 2023-08-14 08:50:19.622020
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Typhoid and paratyphoid
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: c093458105f906ceb213e5906dba8fe8
+  size: 2012034
+  path: dataset_3969_typhoid_and_paratyphoid_values.feather

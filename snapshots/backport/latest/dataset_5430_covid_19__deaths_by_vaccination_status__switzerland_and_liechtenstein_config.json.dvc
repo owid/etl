@@ -1,18 +1,17 @@
 meta:
-  namespace: backport
-  short_name: dataset_5430_covid_19__deaths_by_vaccination_status__switzerland_and_liechtenstein_config
-  file_extension: json
-  date_accessed: 2023-04-11 12:06:42.028844
-  name: Grapher metadata for dataset_5430_covid_19__deaths_by_vaccination_status__switzerland_and_liechtenstein
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5430
+    date_accessed: 2023-08-10 09:38:17.289362
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_5430_covid_19__deaths_by_vaccination_status__switzerland_and_liechtenstein
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/5430
-  source_published_by: Our World in Data catalog backport
   is_public: false
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: f448e59e8bfd862a50d873e7cfb22d30
-  size: 3537
-  path: dataset_5430_covid_19__deaths_by_vaccination_status__switzerland_and_liechtenstein_config.json
+- md5: 9dd06df6bb74a47287da9ccacc9b204e
+  size: 3938
+  path: 
+    dataset_5430_covid_19__deaths_by_vaccination_status__switzerland_and_liechtenstein_config.json

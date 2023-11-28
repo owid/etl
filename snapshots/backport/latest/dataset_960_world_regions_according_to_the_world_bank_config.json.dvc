@@ -1,18 +1,14 @@
 meta:
-  namespace: backport
-  short_name: dataset_960_world_regions_according_to_the_world_bank_config
-  file_extension: json
-  date_accessed: 2023-06-01 12:55:55.809143
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/960
+    date_accessed: 2023-08-10 08:56:17.869438
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_960_world_regions_according_to_the_world_bank
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/960
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 2879ee5a210d571376dc3540c2661182
-  size: 1520
+- md5: abd767c83805779536b44ac1869acd94
+  size: 1673
   path: dataset_960_world_regions_according_to_the_world_bank_config.json

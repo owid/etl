@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2625
+    date_accessed: 2023-08-14 15:44:55.685955
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Education and Training - Enrolment data adjusted to financial year
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: e38c8e1ddbce470b228f405f51f3d497
+  size: 9066
+  path: 
+    dataset_2625_education_and_training__enrolment_data_adjusted_to_financial_year_values.feather

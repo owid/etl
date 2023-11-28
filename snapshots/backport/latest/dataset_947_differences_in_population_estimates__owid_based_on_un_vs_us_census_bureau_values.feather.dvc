@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/947
+    date_accessed: 2023-08-16 07:59:18.630218
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Differences in population estimates - OWID based on UN vs US Census Bureau
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: d2dbd85122a7f4797555ed5db584e099
+  size: 13418
+  path: 
+    dataset_947_differences_in_population_estimates__owid_based_on_un_vs_us_census_bureau_values.feather

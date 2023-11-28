@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4866
+    date_accessed: 2023-08-14 10:58:45.123468
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_4866_number_of_adolescents__based_on_un_population_division__2017
+    (archived)
+  description: ''
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: ef4b154dde27bcdfc38a92e810852202
+  size: 2053
+  path: 
+    dataset_4866_number_of_adolescents__based_on_un_population_division__2017_config.json

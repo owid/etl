@@ -1,18 +1,17 @@
 meta:
-  namespace: backport
-  short_name: dataset_4221_methods_used_by_employed_workers_to_find_their_current_jobs__pellizzari__2010_config
-  file_extension: json
-  date_accessed: 2023-02-23 15:10:05.744978
-  name: Grapher metadata for dataset_4221_methods_used_by_employed_workers_to_find_their_current_jobs__pellizzari__2010
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4221
+    date_accessed: 2023-08-10 09:42:53.520774
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_4221_methods_used_by_employed_workers_to_find_their_current_jobs__pellizzari__2010
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/4221
-  source_published_by: Our World in Data catalog backport
   is_public: false
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: d20cf0fbb5e08b02be4bcb9ca057f2e9
-  size: 4862
-  path: dataset_4221_methods_used_by_employed_workers_to_find_their_current_jobs__pellizzari__2010_config.json
+- md5: ee4f126e99d41e421f31c008afc4e919
+  size: 5838
+  path: 
+    dataset_4221_methods_used_by_employed_workers_to_find_their_current_jobs__pellizzari__2010_config.json

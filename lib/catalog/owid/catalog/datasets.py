@@ -8,7 +8,7 @@ import shutil
 import warnings
 from dataclasses import dataclass
 from glob import glob
-from os import environ, mkdir
+from os import environ
 from os.path import join
 from pathlib import Path
 from typing import Any, Iterator, List, Literal, Optional, Union
@@ -19,6 +19,7 @@ import yaml
 
 from . import tables, utils
 from .meta import SOURCE_EXISTS_OPTIONS, DatasetMeta, TableMeta
+from .processing_log import disable_processing_log
 from .properties import metadata_property
 
 FileFormat = Literal["csv", "feather", "parquet"]
@@ -72,7 +73,7 @@ class Dataset:
                 raise Exception(f"refuse to overwrite non-dataset dir at: {path}")
             shutil.rmtree(path)
 
-        mkdir(path)
+        path.mkdir(parents=True, exist_ok=True)
 
         metadata = metadata or DatasetMeta()
 
@@ -102,11 +103,9 @@ class Dataset:
 
         # non-unique index might be causing problems down the line and is typically a mistake
         if not table.index.is_unique:
-            # regions are the only exception where this is acceptable (though not ideal)
-            if "garden/regions/2023-01-01/regions" not in self.path:
-                warnings.warn(
-                    f"Table `{table.metadata.short_name}` from dataset `{self.metadata.short_name}` has non-unique index"
-                )
+            warnings.warn(
+                f"Table `{table.metadata.short_name}` from dataset `{self.metadata.short_name}` has non-unique index"
+            )
 
         if not table.primary_key:
             if "OWID_STRICT" in environ:
@@ -151,7 +150,10 @@ class Dataset:
         for format in SUPPORTED_FORMATS:
             path = stem.with_suffix(f".{format}")
             if path.exists():
-                return tables.Table.read(path)
+                t = tables.Table.read(path)
+                # dataset metadata might have been updated, refresh it
+                t.metadata.dataset = self.metadata
+                return t
 
         raise KeyError(f"Table `{name}` not found, available tables: {', '.join(self.table_names)}")
 
@@ -177,12 +179,19 @@ class Dataset:
         self.metadata.save(self._index_file)
 
         # Update the copy of this datasets metadata in every table in the set.
+        # TODO: this entire part should go away and we should make t.metadata.dataset read only
         for table_name in self.table_names:
-            table = self[table_name]
+            with disable_processing_log():
+                table = self[table_name]
             table.metadata.dataset = self.metadata
             table._save_metadata(join(self.path, table.metadata.checked_name + ".meta.json"))
 
-    def update_metadata(self, metadata_path: Path, if_source_exists: SOURCE_EXISTS_OPTIONS = "replace") -> None:
+    def update_metadata(
+        self,
+        metadata_path: Path,
+        if_source_exists: SOURCE_EXISTS_OPTIONS = "replace",
+        if_origins_exist: SOURCE_EXISTS_OPTIONS = "replace",
+    ) -> None:
         """
         Load YAML file with metadata from given path and update metadata of dataset and its tables.
 
@@ -192,14 +201,19 @@ class Dataset:
             - "replace" (default): replace existing source with new one
             - "append": append new source to existing ones
             - "fail": raise an exception if source already exists
+        :param if_origins_exist: What to do if origin already exists in metadata. Possible values:
+            - "replace" (default): replace existing origin with new one
+            - "append": append new origin to existing ones
+            - "fail": raise an exception if origin already exists
         """
         self.metadata.update_from_yaml(metadata_path, if_source_exists=if_source_exists)
 
         with open(metadata_path) as istream:
             metadata = yaml.safe_load(istream)
             for table_name in metadata.get("tables", {}).keys():
-                table = self[table_name]
-                table.update_metadata_from_yaml(metadata_path, table_name)
+                with disable_processing_log():
+                    table = self[table_name]
+                table.update_metadata_from_yaml(metadata_path, table_name, if_origins_exist=if_origins_exist)
                 table._save_metadata(join(self.path, table.metadata.checked_name + ".meta.json"))
 
     def index(self, catalog_path: Path = Path("/")) -> pd.DataFrame:

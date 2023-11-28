@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Google Sheet
+    url: https://www.nature.com/articles/s41598-022-16529-0
+    source_data_url: 
+      https://docs.google.com/spreadsheets/d/e/2PACX-1vShK8-lh5FUIl954ziCnKzkt9N3B5IdxAxk9mh-QhufRD-SuovXXLKjbQtq8g40yzUbHIPWRVLuVzKZ/pub?output=csv
+    date_accessed: '2023-10-05'
+    publication_year: '2022'
+    published_by: Google Sheet
+  name: Plastics in Great Pacific Garbage Patch (Lebreton)
+  description: ''
+  license: {}
+wdir: ../../../data/snapshots/fasttrack/2023-10-05
+outs:
+- md5: 96e4d3017bd50b72a8bd267198ab1971
+  size: 338
+  path: great_pacific_garbage_lebreton.csv

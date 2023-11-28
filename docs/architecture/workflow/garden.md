@@ -38,14 +38,16 @@ flowchart LR
     classDef node_ss fill:#002147,color:#fff
 ```
 
-However, grapher steps could also depend on other grapher steps. This is often the case for datasets containing _long-run variables_, where different `garden` datasets are combined.
+However, garden steps could also depend on other garden steps. This is often the case for datasets containing _long-run indicators_, where different `garden` datasets are combined.
 
 
-!!! info "Long-run variables"
+!!! info "Long-run indicators"
 
-    A long-run variable is a variable that has datapoints spanning over a broad period of time. For instance, we have a [population variable](https://ourworldindata.org/population-sources) that combines data from the UN and other sources that goes back to 10,000 BCE. In particular, it uses data from the UN, Gapminder and HYDE.
+    A long-run indicator is an indicator that has datapoints spanning over a broad period of time and that typically relies on multiple sources.
 
-    This is how the dependency graph our population variable looks like:
+    For instance, we have a [population indicator](https://ourworldindata.org/population-sources) that combines data from the UN and other sources that goes back to 10,000 BCE. In particular, it uses data from the UN, Gapminder and HYDE.
+
+    This is how the dependency graph our population indicator looks like:
 
     ```yaml
       data://garden/demography/2023-03-31/population:
@@ -55,7 +57,7 @@ However, grapher steps could also depend on other grapher steps. This is often t
       - data://open_numbers/open_numbers/latest/gapminder__systema_globalis
     ```
 
-!!! bug "TODO: Add an example of code"
+!!! danger "TODO: Add an example of code"
 ## Harmonizing labels
 
 In order to understand data within a single dataset, we want to know what is meant by the data.
@@ -64,9 +66,9 @@ For example, a `country` column containing the value `Korea` could be referring 
 
 Harmonization is the editorial process by which we modify the indexing columns for a dataset to ensure that the data is consistent and unambiguous.
 
-### What does Our World In Data harmonize?
+### What does Our World in Data harmonize?
 
-Today, Our World In Data makes a best-effort to harmonize countries and regions. We strive to do this in a way that is consistent with the [ISO 3166-1 standard](https://en.wikipedia.org/wiki/ISO_3166-1), however we use custom editorial labels for countries and regions that are often shorter than those in the standard, in order to make data visualisations richer and more understandable.
+Today, Our World in Data makes a best-effort to harmonize countries and regions. We strive to do this in a way that is consistent with the [ISO 3166-1 standard](https://en.wikipedia.org/wiki/ISO_3166-1), however we use custom editorial labels for countries and regions that are often shorter than those in the standard, in order to make data visualisations richer and more understandable.
 
 Since we also present long-run datasets over multiple centuries, a time period in which national borders have changed, split and merged, we also make a best-effort attempt to harmonize the names of historical countries and regions that no longer exist and are not present in the ISO standard.
 
@@ -81,27 +83,24 @@ There are two methods that we use, both of which are semi-automated and involve 
 The [etl](https://github.com/owid/etl) codebase contains an interactive `harmonize` command-line tool which can be used to harmonize a CSV file that contains a column with country names.
 
 ```
-$ poetry run harmonize --help
-Usage: harmonize [OPTIONS] DATA_FILE COLUMN OUTPUT_FILE [INSTITUTION]
+$ poetry run etl-harmonize --help
+Usage: etl-harmonize [OPTIONS] DATA_FILE COLUMN OUTPUT_FILE [INSTITUTION]
+                     [NUM_SUGGESTIONS]
 
-  Given a DATA_FILE in feather or CSV format, and the name of the COLUMN
-  representing country or region names, interactively generate the JSON
-  mapping OUTPUT_FILE from the given names to OWID's canonical names.
-  Optionally, can use INSTITUTION to append "(institution)" to countries.
+ Given a DATA_FILE in feather or CSV format, and the name of the COLUMN representing country
+ or region names, interactively generate the JSON mapping OUTPUT_FILE from the given names to
+ OWID's canonical names. Optionally, can use INSTITUTION to append "(institution)" to
+ countries.
 
-  When a name is ambiguous, you can use:
+ When a name is ambiguous, you can use:
+ - Choose Option (9) [custom] to enter a custom name
+ - Type `Ctrl-C` to exit and save the partially complete mapping
+ If a mapping file already exists, it will resume where the mapping file left off.
 
-  n: to ignore and skip to the next one
+╭─ Options ───────────────────────────────────────────────────────────────────────────────────╮
+│ --help      Show this message and exit.                                                     │
+╰─────────────────────────────────────────────────────────────────────────────────────────────╯
 
-  s: to suggest matches; you can also enter a manual match here
-
-  q: to quit and save the partially complete mapping
-
-  If a mapping file already exists, it will resume where the mapping file
-  left off.
-
-Options:
-  --help  Show this message and exit.
 ```
 
 As an example, start the harmonization interactive session for table `undp_hdr` from dataset `meadow/un/2022-11-29/undp_hdr`, which has `country` column with the raw country names:
@@ -114,17 +113,24 @@ $ poetry run harmonize data/meadow/un/2022-11-29/undp_hdr/undp_hdr.feather count
   └ 17 ambiguous countries/regions
 
 Beginning interactive harmonization...
+  Select [skip] to skip a country/region mapping
+  Select [custom] to enter a custom name
 
-[1/17] Arab States
-(n) next, (s) suggest, (q) quit
-(Cmd)
+? [1/17] Arab States: (Use shortcuts or arrow keys)
+ » 1) Yemen Arab Republic
+   2) United States Virgin Islands
+   3) United States Minor Outlying Islands
+   4) United States
+   5) United Arab Emirates
+   6) [custom]
+   7) [skip]
 ```
 
 The output mapping is saved in `mapping.json`.
 
 #### Using the Grapher admin
 
-!!! warning "This method is not preferred. Instead, consider using the `harmonize` command tool."
+!!! danger  "This method is not preferred. Instead, consider using the `etl-harmonize` command tool."
 
 The [owid-grapher](https://github.com/owid/owid-grapher) codebase contains a interactive country harmonization tool that can be accessed at [http://localhost:3030/admin/standardize](http://localhost:3030/admin/standardize) when running the dev server.
 
@@ -136,15 +142,8 @@ To use the tool, you upload a CSV file containing a column called `Country`, and
 
 
 ## Metadata
-In our [data model](../design/common-format.md), datasets contain tables of data, and those tables contain variables. Each of these levels supports metadata.
+After adapting and processing the origin's data, we have a curated dataset. This dataset, contains indicators (maybe not present in the origin) that we need to properly document.
 
-!!! warning "This is still being written."
+The metadata in Garden consists mainly of two objects: `dataset` and `tables`. The metadata comes as a YAML file next to the processing scripts.
 
-    Our metadata formats are still in flux, and are likely to change substantially over the coming year.
-
-    Most up-to-date documentation may be found [on Notion :octicons-arrow-right-24:](https://www.notion.so/owid/Metadata-guidelines-29ca6e19b6f1409ea6826a88dbb18bcc)
-
-
-
-
-!!! info "For more up to date details, see the the classes `DatasetMeta`, `TableMeta` and `VariableMeta` in the [`owid.catalog.meta`](https://github.com/owid/owid-catalog-py/blob/master/owid/catalog/meta.py) module."
+!!! info "Learn more in our [dataset reference](../metadata/reference/dataset.md), [tables reference](../metadata/reference/tables.md) and  [indicator reference](../metadata/reference/indicator.md)."

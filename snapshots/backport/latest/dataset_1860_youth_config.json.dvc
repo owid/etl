@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1860
+    date_accessed: 2023-08-16 10:02:46.536022
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1860_youth (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 2db1a4bd5ab3b902139635ecbb3d8d4e
+  size: 17200
+  path: dataset_1860_youth_config.json

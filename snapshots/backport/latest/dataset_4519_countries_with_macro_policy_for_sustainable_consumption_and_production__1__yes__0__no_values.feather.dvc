@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4519
+    date_accessed: 2023-08-16 10:25:44.051394
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Countries with macro policy for sustainable consumption and production (1
+    = YES; 0 = NO)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: cbfb484e31873252b21c84a805e0e181
+  size: 8010
+  path: 
+    dataset_4519_countries_with_macro_policy_for_sustainable_consumption_and_production__1__yes__0__no_values.feather

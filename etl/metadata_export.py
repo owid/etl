@@ -1,11 +1,15 @@
 import copy
-import os
-from typing import Any, Dict, Tuple
+from pathlib import Path
+from typing import Any, Dict, List, Literal, Optional, Tuple, Union
 
 import pandas as pd
 import rich_click as click
-from owid.catalog import Dataset
+import ruamel.yaml
+from owid.catalog import Dataset, utils
+from rich.console import Console
+from rich.syntax import Syntax
 
+from etl import paths
 from etl.files import yaml_dump
 
 
@@ -18,36 +22,95 @@ from etl.files import yaml_dump
     "-o",
     "--output",
     type=click.Path(),
-    help="Save output into YAML file",
+    help="Save output into YAML file. If not specified, save to *.meta.yml",
+)
+@click.option(
+    "--show/--no-show",
+    default=False,
+    type=bool,
+    help="Show output instead of saving it into a file.",
+)
+@click.option(
+    "--decimals",
+    default="auto",
+    type=str,
+    help="Add display.numDecimalPlaces to all numeric variables. Use integer or `auto` for autodetection. Disable with `no`.",
 )
 def cli(
     path: str,
     output: str,
+    show: bool,
+    decimals: Optional[str],
 ) -> None:
     """Export dataset & tables & columns metadata in YAML format. This
     is useful for generating *.meta.yml files that can be later manually edited.
 
+    If the output YAML already exists, it will be updated with new values.
+
     Usage:
-        etl-metadata-export data/garden/ggdc/2020-10-01/ggdc_maddison -o etl/steps/data/garden/ggdc/2020-10-01/ggdc_maddison.meta.yml
+        # save to YAML file etl/steps/data/garden/ggdc/2020-10-01/ggdc_maddison.meta.yml
+        etl-metadata-export data/garden/ggdc/2020-10-01/ggdc_maddison
+
+        # show output instead of saving the file
+        etl-metadata-export data/garden/ggdc/2020-10-01/ggdc_maddison --show
     """
+    if show:
+        assert not output, "Can't use --show and --output at the same time."
+
     ds = Dataset(path)
-    meta_str = metadata_export(ds)
-    if output:
-        os.makedirs(os.path.dirname(output), exist_ok=True)
-        with open(output, "w") as f:
-            f.write(yaml_dump(meta_str, replace_confusing_ascii=True))  # type: ignore
+    meta_dict = metadata_export(ds, prune=True, decimals=int(decimals) if decimals.isnumeric() else decimals)  # type: ignore
+
+    output_path = Path(output) if output else paths.STEP_DIR / "data" / f"{ds.metadata.uri}.meta.yml"
+
+    # if output_path exists, update its values, but keep YAML structure intact
+    if output_path.exists():
+        with open(output_path, "r") as f:
+            doc = ruamel.yaml.load(f, Loader=ruamel.yaml.RoundTripLoader)
+
+        if "dataset" not in doc:
+            doc["dataset"] = {}
+        if "tables" not in doc:
+            doc["tables"] = {}
+
+        doc["dataset"].update(meta_dict["dataset"])
+        for tab_name, tab_dict in meta_dict.get("tables", {}).items():
+            variables = tab_dict.pop("variables", {})
+            if tab_name not in doc["tables"]:
+                doc["tables"][tab_name] = {}
+            doc["tables"][tab_name].update(tab_dict)
+            doc["tables"][tab_name]["variables"].update(variables)
+
+        doc = reorder_fields(doc)
+
+        yaml_str = ruamel.yaml.dump(doc, Dumper=ruamel.yaml.RoundTripDumper)
     else:
-        print(meta_str)
+        yaml_str = yaml_dump(reorder_fields(meta_dict), replace_confusing_ascii=True)
+    assert yaml_str
+
+    if show:
+        Console().print(Syntax(yaml_str, "yaml", line_numbers=True))
+    else:
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        with open(output_path, "w") as f:
+            f.write(yaml_str)  # type: ignore
 
 
 def metadata_export(
     ds: Dataset,
+    prune: bool = False,
+    decimals: Optional[Union[int, Literal["auto", "no"]]] = None,
 ) -> dict:
+    """
+    :param prune: If True, remove origins and licenses that would be propagated from the snapshot.
+    """
     ds_meta = ds.metadata.to_dict()
 
     # transform dataset metadata
     for source in ds_meta.get("sources", []):
         _prune_empty(source)
+
+    for origin in ds_meta.get("origins", []):
+        _prune_empty(origin)
 
     for license in ds_meta.get("licenses", []):
         _prune_empty(license)
@@ -62,7 +125,8 @@ def metadata_export(
     ds_meta.pop("is_public")
     ds_meta.pop("source_checksum", None)
     # move sources at the end
-    ds_meta["sources"] = ds_meta.pop("sources", [])
+    if "sources" in ds_meta:
+        ds_meta["sources"] = ds_meta.pop("sources", [])
 
     # transform tables metadata
     tb_meta = {}
@@ -74,17 +138,48 @@ def metadata_export(
 
         # transform variables metadata
         t["variables"] = {}
+        used_titles = {tab[col].metadata.title for col in tab.columns if tab[col].metadata.title}
         for col in tab.columns:
             if col in ("country", "year"):
                 continue
             variable = tab[col].metadata.to_dict()
 
-            # move units and short units from display
             if "display" in variable:
+                display = variable["display"]
+                # move units and short units from display
                 if not variable.get("unit"):
-                    variable["unit"] = variable["display"].pop("unit", "")
+                    variable["unit"] = display.pop("unit", "")
                 if not variable.get("short_unit"):
-                    variable["short_unit"] = variable["display"].pop("shortUnit", "")
+                    variable["short_unit"] = display.pop("shortUnit", "")
+
+                # includeInTable: true is default, no need to have it here
+                if display.get("includeInTable"):
+                    display.pop("includeInTable")
+
+                # if title is underscored and identical to column name, try to use display name as title
+                if (
+                    col == variable["title"]
+                    and utils.underscore(variable["title"]) == variable["title"]
+                    and display.get("name")
+                    and display["name"] not in used_titles
+                ):
+                    variable["title"] = display.pop("name")
+
+                if not display:
+                    variable.pop("display")
+
+            # add decimals
+            if decimals is not None and decimals != "no" and pd.api.types.is_numeric_dtype(tab[col]):
+                if "display" not in variable:
+                    variable["display"] = {}
+                if decimals == "auto":
+                    variable["display"]["numDecimalPlaces"] = _guess_decimals(tab[col])
+                else:
+                    variable["display"]["numDecimalPlaces"] = decimals
+
+            # we can't have duplicate titles
+            if "title" in variable:
+                used_titles.add(variable["title"])
 
             # remove empty descriptions and short units
             if variable.get("description") == "":
@@ -107,7 +202,7 @@ def metadata_export(
             # fix sources
             for source in variable.get("sources", []):
                 if "date_accessed" in source:
-                    source["date_accessed"] = pd.to_datetime(source["date_accessed"]).date()
+                    source["date_accessed"] = pd.to_datetime(source["date_accessed"], dayfirst=True).date()
 
             t["variables"][col] = variable
 
@@ -115,12 +210,92 @@ def metadata_export(
 
     ds_meta, tb_meta = _move_sources_to_dataset(ds_meta, tb_meta)
 
-    final = {
+    # remove metadata that is propagated from the snapshot
+    # TODO: pruning would be ideally True by default, but we still need some backward compatibility
+    if prune:
+        ds_meta.pop("description", None)
+        ds_meta.pop("origins", None)
+        ds_meta.pop("licenses", None)
+
+        for tab in ds:
+            assert tab.metadata.short_name
+            for var_meta in tb_meta[tab.metadata.short_name]["variables"].values():
+                var_meta.pop("origins", None)
+                var_meta.pop("license", None)
+
+    return {
         "dataset": ds_meta,
         "tables": tb_meta,
     }
 
-    return final
+
+def reorder_fields(m: Dict[str, Any]) -> Dict[str, Any]:
+    """Reorder metadata fields to have consistent YAML."""
+    # make copy and then modify everything in place
+    m = copy.deepcopy(m)
+
+    _reorder_keys(m, ["definitions", "common", "dataset", "tables"])
+
+    origin_order = ["producer", "version_producer", "title", "description", "citation_full"]
+    for origin in m.get("definitions", {}).get("common", {}).get("origins", []):
+        _reorder_keys(origin, origin_order)
+
+    tab_order = [
+        "title",
+        "description",
+        "variables",
+    ]
+    var_order = [
+        "title",
+        "unit",
+        "short_unit",
+        "display",
+        "description_short",
+        "description_key",
+        "description_from_producer",
+        "description_processing",
+        "processing_level",
+    ]
+    presentation_order = [
+        "title_public",
+        "title_variant",
+        "attribution_short",
+        "topic_tags",
+        "faqs",
+        "grapher_config",
+    ]
+    grapher_config_order = [
+        "title",
+        "subtitle",
+        "variantName",
+        "originUrl",
+        "hasMapTab",
+        "tab",
+        "addCountryMode",
+        "yAxis",
+        "selectedFacetStrategy",
+        "hideAnnotationFieldsInTitle",
+        "relatedQuestions",
+        "map",
+        "selectedEntityNames",
+        "$schema",
+    ]
+    for tab in m["tables"].values():
+        _reorder_keys(tab, tab_order)
+        for var_meta in tab["variables"].values():
+            _reorder_keys(var_meta, var_order)
+            if "presentation" in var_meta:
+                _reorder_keys(var_meta["presentation"], presentation_order)
+                _reorder_keys(var_meta["presentation"].get("grapher_config", {}), grapher_config_order)
+
+    return m
+
+
+def _reorder_keys(d: Dict[str, Any], order: List[str]) -> None:
+    keys = order + [k for k in d.keys() if k not in order]
+    for k in keys:
+        if k in d:
+            d[k] = d.pop(k)
 
 
 def _move_sources_to_dataset(ds_meta: Dict[str, Any], tb_meta: Dict[str, Any]) -> Tuple[Dict[str, Any], Dict[str, Any]]:
@@ -157,6 +332,24 @@ def _prune_empty(d: Dict[str, Any]) -> None:
     for k, v in list(d.items()):
         if not v:
             del d[k]
+
+
+def _guess_decimals(s: pd.Series, max_decimals=3) -> int:
+    """Guess the number of decimals in a series."""
+    if pd.api.types.is_integer_dtype(s):
+        return 0
+
+    s = s.dropna()
+    if s.empty:
+        return 0
+
+    assert pd.api.types.is_float_dtype(s)
+
+    for d in range(max_decimals + 1):
+        if (s - s.round(d)).abs().max() < 1e-6:
+            return d
+
+    return max_decimals
 
 
 if __name__ == "__main__":

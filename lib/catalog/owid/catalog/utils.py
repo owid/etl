@@ -1,16 +1,38 @@
 import datetime as dt
 import re
 from pathlib import Path
-from typing import List, Literal, Optional, Union, overload
+from typing import Any, Optional, TypeVar, Union, overload
 
 import dynamic_yaml
-import numpy as np
-import pandas as pd
 import pytz
+import yaml
 from unidecode import unidecode
 
-from .tables import Table
-from .variables import Variable
+T = TypeVar("T")
+
+
+def prune_dict(d: dict) -> dict:
+    """Remove all keys starting with underscore and all empty values from a dictionary."""
+    out = {}
+    for k, v in d.items():
+        if not k.startswith("_") and v not in [None, [], {}]:
+            if isinstance(v, dict):
+                out[k] = prune_dict(v)
+            elif isinstance(v, list):
+                out[k] = [prune_dict(x) if isinstance(x, dict) else x for x in v if x not in [None, [], {}]]
+            else:
+                out[k] = v
+    return out
+
+
+def pruned_json(cls: T) -> T:
+    orig = cls.to_dict  # type: ignore
+
+    # only keep non-null public variables
+    # calling original to_dict returns dictionaries, not objects
+    cls.to_dict = lambda self, **kwargs: prune_dict(orig(self, **kwargs))  # type: ignore
+
+    return cls
 
 
 @overload
@@ -56,6 +78,7 @@ def underscore(name: Optional[str], validate: bool = True, camel_to_snake: bool 
         .replace("-", "_")
         .replace("—", "_")
         .replace("–", "_")
+        .replace("‑", "_")
         .replace(",", "_")
         .replace(".", "_")
         .replace("\t", "_")
@@ -144,91 +167,16 @@ def _camel_to_snake(name: str) -> str:
     return re.sub("([a-z0-9])([A-Z])", r"\1_\2", name).lower()
 
 
-def _resolve_collisions(
-    orig_cols: pd.Index,
-    new_cols: pd.Index,
-    collision: Literal["raise", "rename", "ignore"],
-) -> pd.Index:
-    new_cols = new_cols.copy()
-    vc = new_cols.value_counts()
-
-    colliding_cols = list(vc[vc >= 2].index)
-    for colliding_col in colliding_cols:
-        ixs = np.where(new_cols == colliding_col)[0]
-        if collision == "raise":
-            raise NameError(
-                f"Columns `{orig_cols[ixs[0]]}` and `{orig_cols[ixs[1]]}` are given the same name "
-                f"`{colliding_cols[0]}` after underscoring`"
-            )
-        elif collision == "rename":
-            # give each column numbered suffix
-            for i, ix in enumerate(ixs):
-                new_cols.values[ix] = f"{new_cols[ix]}_{i + 1}"
-        elif collision == "ignore":
-            pass
-        else:
-            raise NotImplementedError()
-    return new_cols
-
-
-def underscore_table(
-    t: Table,
-    collision: Literal["raise", "rename", "ignore"] = "raise",
-    inplace: bool = False,
-    camel_to_snake: bool = False,
-) -> Table:
-    """Convert column and index names to underscore. In extremely rare cases
-    two columns might have the same underscored version. Use `collision` param
-    to control whether to raise an error or append numbered suffix.
-
-    Parameters
-    ----------
-    t : Table
-        Table to underscore.
-    collision : Literal["raise", "rename", "ignore"], optional
-        How to handle collisions, by default "raise".
-    inplace : bool, optional
-        Whether to modify the table in place, by default False.
-    camel_to_snake : bool, optional
-        Whether to convert strings camelCase to snake_case, by default False.
-    """
-    orig_cols = t.columns
-
-    # underscore columns and resolve collisions
-    new_cols = pd.Index([underscore(c, camel_to_snake=camel_to_snake) for c in t.columns])
-    new_cols = _resolve_collisions(orig_cols, new_cols, collision)
-
-    columns_map = {c_old: c_new for c_old, c_new in zip(orig_cols, new_cols)}
-    if inplace:
-        t.rename(columns=columns_map, inplace=True)
-    else:
-        t = t.rename(columns=columns_map)
-
-    t.index.names = [underscore(e, camel_to_snake=camel_to_snake) for e in t.index.names]
-    t.metadata.primary_key = t.primary_key
-    t.metadata.short_name = underscore(t.metadata.short_name, camel_to_snake=camel_to_snake)
-
-    # put original names as titles into metadata by default
-    for c_old, c_new in columns_map.items():
-        if t[c_new].metadata.title is None:
-            t[c_new].metadata.title = c_old
-
-    return t
+def underscore_table(t, *args, **kwargs):
+    """Convert column and index names to underscore. Only for backwards compatibility.
+    Using table.underscore() method is preferred."""
+    return t.underscore(*args, **kwargs)
 
 
 def validate_underscore(name: Optional[str], object_name: str = "Name") -> None:
     """Raise error if name is not snake_case."""
     if name is not None and not re.match("^[a-z_][a-z0-9_]*$", name):
         raise NameError(f"{object_name} must be snake_case. Change `{name}` to `{underscore(name, validate=False)}`")
-
-
-def concat_variables(variables: List[Variable]) -> Table:
-    """Concatenate variables into a single table keeping all metadata."""
-    t = Table(pd.concat(variables, axis=1))
-    for v in variables:
-        if v.name:
-            t._fields[v.name] = v.metadata
-    return t
 
 
 def dynamic_yaml_load(path: Union[Path, str], params: dict = {}) -> dict:
@@ -241,3 +189,9 @@ def dynamic_yaml_load(path: Union[Path, str], params: dict = {}) -> dict:
     yd["TODAY"] = dt.datetime.now().astimezone(pytz.timezone("Europe/London")).strftime("%-d %B %Y")
 
     return yd
+
+
+def dynamic_yaml_to_dict(yd: Any) -> dict:
+    """Convert dynamic yaml to dict. Using dynamic yaml can cause problems when you
+    try to run e.g. Origin(**yd). It's safer to run Origin(**dynamic_yaml_to_dict(yd)) instead."""
+    return yaml.safe_load(dynamic_yaml.dump(yd))

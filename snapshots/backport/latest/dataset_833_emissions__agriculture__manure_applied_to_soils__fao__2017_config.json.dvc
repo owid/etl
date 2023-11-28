@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/833
+    date_accessed: 2023-08-14 14:40:20.456776
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_833_emissions__agriculture__manure_applied_to_soils__fao__2017
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 469b43b47ae15178db79826003804912
+  size: 394769
+  path: 
+    dataset_833_emissions__agriculture__manure_applied_to_soils__fao__2017_config.json

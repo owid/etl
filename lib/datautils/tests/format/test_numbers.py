@@ -1,12 +1,13 @@
+from pytest import raises
+
 from owid.datautils.format.numbers import (
     IntegerNumber,
     IntegerNumberWithSeparators,
     IntegerNumberWithWords,
+    format_number,
     num_to_str,
     remove_multiple_whitespaces,
-    format_number,
 )
-from pytest import raises
 
 
 class TestIntegerNumberWithSeparators:

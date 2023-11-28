@@ -1,19 +1,16 @@
 meta:
-  namespace: backport
-  short_name: dataset_2863_male_and_female_life_expectancy_by_age_in_the_long_run__human_mortality_database__2018__and_others_values
-  file_extension: feather
-  date_accessed: 2023-02-23 17:23:57.110114
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2863
+    date_accessed: 2023-08-10 09:44:20.709570
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Male and female life expectancy by age in the long run (Human Mortality Database
     (2018) and others)
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/2863
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: b22b0a2e954232f50eeeed8647d39739
+- md5: 846be65e6780fa66150ddc6d318ed4c4
   size: 19586
-  path: dataset_2863_male_and_female_life_expectancy_by_age_in_the_long_run__human_mortality_database__2018__and_others_values.feather
+  path: 
+    dataset_2863_male_and_female_life_expectancy_by_age_in_the_long_run__human_mortality_database__2018__and_others_values.feather

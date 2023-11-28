@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1610
+    date_accessed: 2023-08-16 10:22:09.658810
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Visceral leishmaniasis
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 605000b91f275f16c1e4782c648756f8
+  size: 1044138
+  path: dataset_1610_visceral_leishmaniasis_values.feather

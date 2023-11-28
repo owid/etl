@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4562
+    date_accessed: 2023-08-14 15:15:27.695746
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_4562_average_proportion_of_terrestrial_key_biodiversity_areas__kbas__covered_by_protected_areas__pct
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 3d51a6f15b00d93fdeeaddb68cb5c677
+  size: 45166
+  path: 
+    dataset_4562_average_proportion_of_terrestrial_key_biodiversity_areas__kbas__covered_by_protected_areas__pct_config.json

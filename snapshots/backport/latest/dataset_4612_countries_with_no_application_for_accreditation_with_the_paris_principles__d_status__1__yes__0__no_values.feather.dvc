@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4612
+    date_accessed: 2023-08-16 07:28:23.617487
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Countries with no application for accreditation with the Paris Principles,
+    D status  (1 = YES; 0 = NO)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: de6f40abeaa80e8dbb8760af43667543
+  size: 12362
+  path: 
+    dataset_4612_countries_with_no_application_for_accreditation_with_the_paris_principles__d_status__1__yes__0__no_values.feather

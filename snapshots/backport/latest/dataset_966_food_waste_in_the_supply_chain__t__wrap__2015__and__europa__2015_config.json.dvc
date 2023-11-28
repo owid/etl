@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/966
+    date_accessed: 2023-08-14 05:57:14.726245
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_966_food_waste_in_the_supply_chain__t__wrap__2015__and__europa__2015
+    (archived)
+  description: ''
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 6d286b6365ca48731a9dd6ec6a9c5d01
+  size: 5694
+  path: 
+    dataset_966_food_waste_in_the_supply_chain__t__wrap__2015__and__europa__2015_config.json

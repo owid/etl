@@ -1,0 +1,260 @@
+dataset:
+  namespace: cait
+  version: 2022-08-10
+  title: Greenhouse gas emissions by sector (CAIT, 2022)
+  short_name: ghg_emissions_by_sector
+  description: |
+    Emissions are measured in tonnes of carbon dioxide equivalents (CO₂e), based on 100-year global warming potential factors for non-CO₂ gases.
+
+    Emissions are broken down by sector. Further information on sector definitions is available [here](https://ourworldindata.org/ghg-emissions-by-sector).
+  sources:
+    -
+      name: Our World in Data based on Climate Analysis Indicators Tool (CAIT).
+      published_by: CAIT Climate Data Explorer via Climate Watch
+      publication_year: 2022
+      date_accessed: 2022-08-10
+      url: https://www.climatewatchdata.org/data-explorer/historical-emissions
+tables:
+  greenhouse_gas_emissions_by_sector:
+    variables:
+      agriculture:
+        description: "Greenhouse gas emissions from agriculture, measured in million tonnes of carbon dioxide-equivalents."
+      agriculture__per_capita:
+        description: "Greenhouse gas emissions from agriculture, measured in tonnes of carbon dioxide-equivalents per capita."
+      aviation_and_shipping:
+        description: "Greenhouse gas emissions from bunker fuels, measured in million tonnes of carbon dioxide-equivalents."
+      aviation_and_shipping__per_capita:
+        description: "Greenhouse gas emissions from bunker fuels, measured in tonnes of carbon dioxide-equivalents per capita."
+      buildings:
+        description: "Greenhouse gas emissions from buildings, measured in million tonnes of carbon dioxide-equivalents."
+      buildings__per_capita:
+        description: "Greenhouse gas emissions from buildings, measured in tonnes of carbon dioxide-equivalents per capita."
+      electricity_and_heat:
+        description: "Greenhouse gas emissions from electricity and heat, measured in million tonnes of carbon dioxide-equivalents."
+      electricity_and_heat__per_capita:
+        description: "Greenhouse gas emissions from electricity and heat, measured in tonnes of carbon dioxide-equivalents per capita."
+      energy:
+        description: "Greenhouse gas emissions from energy, measured in million tonnes of carbon dioxide-equivalents."
+      energy__per_capita:
+        description: "Greenhouse gas emissions from energy, measured in tonnes of carbon dioxide-equivalents per capita."
+      fugitive_emissions:
+        description: "Fugitive emissions of greenhouse gases from energy production, measured in million tonnes of carbon dioxide-equivalents."
+      fugitive_emissions__per_capita:
+        description: "Fugitive emissions of greenhouse gases from energy production, measured in tonnes of carbon dioxide-equivalents per capita."
+      industry:
+        description: "Greenhouse gas emissions from industry, measured in million tonnes of carbon dioxide-equivalents."
+      industry__per_capita:
+        description: "Greenhouse gas emissions from industry, measured in tonnes of carbon dioxide-equivalents per capita."
+      land_use_change_and_forestry:
+        description: "Greenhouse gas emissions from land use change and forestry, measured in million tonnes of carbon dioxide-equivalents."
+      land_use_change_and_forestry__per_capita:
+        description: "Greenhouse gas emissions from land use change and forestry, measured in tonnes of carbon dioxide-equivalents per capita."
+      manufacturing_and_construction:
+        description: "Greenhouse gas emissions from manufacturing and construction, measured in million tonnes of carbon dioxide-equivalents."
+      manufacturing_and_construction__per_capita:
+        description: "Greenhouse gas emissions from manufacturing and construction, measured in tonnes of carbon dioxide-equivalents per capita."
+      other_fuel_combustion:
+        description: "Greenhouse gas emissions from other fuel combustion, measured in million tonnes of carbon dioxide-equivalents."
+      other_fuel_combustion__per_capita:
+        description: "Greenhouse gas emissions from other fuel combustion, measured in tonnes of carbon dioxide-equivalents per capita."
+      total_excluding_lucf:
+        description: "Total greenhouse gas emissions excluding land-use change and forestry, measured in million tonnes of carbon dioxide-equivalents."
+      total_excluding_lucf__per_capita:
+        description: "Total greenhouse gas emissions excluding land-use change and forestry, measured in tonnes of carbon dioxide-equivalents per capita."
+      total_including_lucf:
+        description: "Total greenhouse gas emissions including land-use change and forestry, measured in million tonnes of carbon dioxide-equivalents."
+      total_including_lucf__per_capita:
+        description: "Total greenhouse gas emissions including land-use change and forestry, measured in tonnes of carbon dioxide-equivalents per capita."
+      transport:
+        description: "Greenhouse gas emissions from transport, measured in million tonnes of carbon dioxide-equivalents."
+      transport__per_capita:
+        description: "Greenhouse gas emissions from transport, measured in tonnes of carbon dioxide-equivalents per capita."
+      waste:
+        description: "Greenhouse gas emissions from waste, measured in million tonnes of carbon dioxide-equivalents."
+      waste__per_capita:
+        description: "Greenhouse gas emissions from waste, measured in tonnes of carbon dioxide-equivalents per capita."
+      # population:
+  carbon_dioxide_emissions_by_sector:
+    variables:
+      aviation_and_shipping:
+        description: "Carbon dioxide emissions from bunker fuels, measured in million tonnes."
+      aviation_and_shipping__per_capita:
+        description: "Carbon dioxide emissions from bunker fuels, measured in tonnes per capita."
+      buildings:
+        description: "Carbon dioxide emissions from buildings, measured in million tonnes."
+      buildings__per_capita:
+        description: "Carbon dioxide emissions from buildings, measured in tonnes per capita."
+      electricity_and_heat:
+        description: "Carbon dioxide emissions from electricity and heat, measured in million tonnes."
+      electricity_and_heat__per_capita:
+        description: "Carbon dioxide emissions from electricity and heat, measured in tonnes per capita."
+      energy:
+        description: "Carbon dioxide emissions from energy, measured in million tonnes."
+      energy__per_capita:
+        description: "Carbon dioxide emissions from energy, measured in tonnes per capita."
+      fugitive_emissions:
+        description: "Fugitive emissions of carbon dioxide from energy production, measured in million tonnes."
+      fugitive_emissions__per_capita:
+        description: "Fugitive emissions of carbon dioxide from energy production, measured in tonnes per capita."
+      industry:
+        description: "Carbon dioxide emissions from industry, measured in million tonnes."
+      industry__per_capita:
+        description: "Carbon dioxide emissions from industry, measured in tonnes per capita."
+      land_use_change_and_forestry:
+        description: "Carbon dioxide emissions from land use change and forestry, measured in million tonnes."
+      land_use_change_and_forestry__per_capita:
+        description: "Carbon dioxide emissions from land use change and forestry, measured in tonnes per capita."
+      manufacturing_and_construction:
+        description: "Carbon dioxide emissions from manufacturing and construction, measured in million tonnes."
+      manufacturing_and_construction__per_capita:
+        description: "Carbon dioxide emissions from manufacturing and construction, measured in tonnes per capita."
+      other_fuel_combustion:
+        description: "Carbon dioxide emissions from other fuel combustion, measured in million tonnes."
+      other_fuel_combustion__per_capita:
+        description: "Carbon dioxide emissions from other fuel combustion, measured in tonnes per capita."
+      total_excluding_lucf:
+        description: "Total carbon dioxide emissions excluding land-use change and forestry, measured in million tonnes."
+      total_excluding_lucf__per_capita:
+        description: "Total carbon dioxide emissions excluding land-use change and forestry, measured in tonnes per capita."
+      total_including_lucf:
+        description: "Total carbon dioxide emissions including land-use change and forestry, measured in million tonnes."
+      total_including_lucf__per_capita:
+        description: "Total carbon dioxide emissions including land-use change and forestry, measured in tonnes per capita."
+      transport:
+        description: "Carbon dioxide emissions from transport, measured in million tonnes."
+      transport__per_capita:
+        description: "Carbon dioxide emissions from transport, measured in tonnes per capita."
+      # population:
+  methane_emissions_by_sector:
+    variables:
+      agriculture:
+        description: "Methane emissions from agriculture, measured in million tonnes of carbon dioxide-equivalents."
+      agriculture__per_capita:
+        description: "Methane emissions from agriculture, measured in tonnes of carbon dioxide-equivalents per capita."
+      aviation_and_shipping:
+        description: "Methane emissions from bunker fuels, measured in million tonnes of carbon dioxide-equivalents."
+      aviation_and_shipping__per_capita:
+        description: "Methane emissions from bunker fuels, measured in tonnes of carbon dioxide-equivalents per capita."
+      buildings:
+        description: "Methane emissions from buildings, measured in million tonnes of carbon dioxide-equivalents."
+      buildings__per_capita:
+        description: "Methane emissions from buildings, measured in tonnes of carbon dioxide-equivalents per capita."
+      electricity_and_heat:
+        description: "Methane emissions from electricity and heat, measured in million tonnes of carbon dioxide-equivalents."
+      electricity_and_heat__per_capita:
+        description: "Methane emissions from electricity and heat, measured in tonnes of carbon dioxide-equivalents per capita."
+      energy:
+        description: "Methane emissions from energy, measured in million tonnes of carbon dioxide-equivalents."
+      energy__per_capita:
+        description: "Methane emissions from energy, measured in tonnes of carbon dioxide-equivalents per capita."
+      fugitive_emissions:
+        description: "Fugitive emissions of methane from energy production, measured in million tonnes of carbon dioxide-equivalents."
+      fugitive_emissions__per_capita:
+        description: "Fugitive emissions of methane from energy production, measured in tonnes of carbon dioxide-equivalents per capita."
+      industry:
+        description: "Methane emissions from industry, measured in million tonnes of carbon dioxide-equivalents."
+      industry__per_capita:
+        description: "Methane emissions from industry, measured in tonnes of carbon dioxide-equivalents per capita."
+      land_use_change_and_forestry:
+        description: "Methane emissions from land use change and forestry, measured in million tonnes of carbon dioxide-equivalents."
+      land_use_change_and_forestry__per_capita:
+        description: "Methane emissions from land use change and forestry, measured in tonnes of carbon dioxide-equivalents per capita."
+      manufacturing_and_construction:
+        description: "Methane emissions from manufacturing and construction, measured in million tonnes of carbon dioxide-equivalents."
+      manufacturing_and_construction__per_capita:
+        description: "Methane emissions from manufacturing and construction, measured in tonnes of carbon dioxide-equivalents per capita."
+      other_fuel_combustion:
+        description: "Methane emissions from other fuel combustion, measured in million tonnes of carbon dioxide-equivalents."
+      other_fuel_combustion__per_capita:
+        description: "Methane emissions from other fuel combustion, measured in tonnes of carbon dioxide-equivalents per capita."
+      total_excluding_lucf:
+        description: "Total methane emissions excluding land-use change and forestry, measured in million tonnes of carbon dioxide-equivalents."
+      total_excluding_lucf__per_capita:
+        description: "Total methane emissions excluding land-use change and forestry, measured in tonnes of carbon dioxide-equivalents per capita."
+      total_including_lucf:
+        description: "Total methane emissions including land-use change and forestry, measured in million tonnes of carbon dioxide-equivalents."
+      total_including_lucf__per_capita:
+        description: "Total methane emissions including land-use change and forestry, measured in tonnes of carbon dioxide-equivalents per capita."
+      transport:
+        description: "Methane emissions from transport, measured in million tonnes of carbon dioxide-equivalents."
+      transport__per_capita:
+        description: "Methane emissions from transport, measured in tonnes of carbon dioxide-equivalents per capita."
+      waste:
+        description: "Methane emissions from waste, measured in million tonnes of carbon dioxide-equivalents."
+      waste__per_capita:
+        description: "Methane emissions from waste, measured in tonnes of carbon dioxide-equivalents per capita."
+      # population:
+  nitrous_oxide_emissions_by_sector:
+    variables:
+      agriculture:
+        description: "Nitrous oxide emissions from agriculture, measured in million tonnes of carbon dioxide-equivalents."
+      agriculture__per_capita:
+        description: "Nitrous oxide emissions from agriculture, measured in tonnes of carbon dioxide-equivalents per capita."
+      aviation_and_shipping:
+        description: "Nitrous oxide emissions from bunker fuels, measured in million tonnes of carbon dioxide-equivalents."
+      aviation_and_shipping__per_capita:
+        description: "Nitrous oxide emissions from bunker fuels, measured in tonnes of carbon dioxide-equivalents per capita."
+      buildings:
+        description: "Nitrous oxide emissions from buildings, measured in million tonnes of carbon dioxide-equivalents."
+      buildings__per_capita:
+        description: "Nitrous oxide emissions from buildings, measured in tonnes of carbon dioxide-equivalents per capita."
+      electricity_and_heat:
+        description: "Nitrous oxide emissions from electricity and heat, measured in million tonnes of carbon dioxide-equivalents."
+      electricity_and_heat__per_capita:
+        description: "Nitrous oxide emissions from electricity and heat, measured in tonnes of carbon dioxide-equivalents per capita."
+      energy:
+        description: "Nitrous oxide emissions from energy, measured in million tonnes of carbon dioxide-equivalents."
+      energy__per_capita:
+        description: "Nitrous oxide emissions from energy, measured in tonnes of carbon dioxide-equivalents per capita."
+      fugitive_emissions:
+        description: "Fugitive emissions of nitrous oxide from energy production, measured in million tonnes of carbon dioxide-equivalents."
+      fugitive_emissions__per_capita:
+        description: "Fugitive emissions of nitrous oxide from energy production, measured in tonnes of carbon dioxide-equivalents per capita."
+      industry:
+        description: "Nitrous oxide emissions from industry, measured in million tonnes of carbon dioxide-equivalents."
+      industry__per_capita:
+        description: "Nitrous oxide emissions from industry, measured in tonnes of carbon dioxide-equivalents per capita."
+      land_use_change_and_forestry:
+        description: "Nitrous oxide emissions from land use change and forestry, measured in million tonnes of carbon dioxide-equivalents."
+      land_use_change_and_forestry__per_capita:
+        description: "Nitrous oxide emissions from land use change and forestry, measured in tonnes of carbon dioxide-equivalents per capita."
+      manufacturing_and_construction:
+        description: "Nitrous oxide emissions from manufacturing and construction, measured in million tonnes of carbon dioxide-equivalents."
+      manufacturing_and_construction__per_capita:
+        description: "Nitrous oxide emissions from manufacturing and construction, measured in tonnes of carbon dioxide-equivalents per capita."
+      other_fuel_combustion:
+        description: "Nitrous oxide emissions from other fuel combustion, measured in million tonnes of carbon dioxide-equivalents."
+      other_fuel_combustion__per_capita:
+        description: "Nitrous oxide emissions from other fuel combustion, measured in tonnes of carbon dioxide-equivalents per capita."
+      total_excluding_lucf:
+        description: "Total nitrous oxide emissions excluding land-use change and forestry, measured in million tonnes of carbon dioxide-equivalents."
+      total_excluding_lucf__per_capita:
+        description: "Total nitrous oxide emissions excluding land-use change and forestry, measured in tonnes of carbon dioxide-equivalents per capita."
+      total_including_lucf:
+        description: "Total nitrous oxide emissions including land-use change and forestry, measured in million tonnes of carbon dioxide-equivalents."
+      total_including_lucf__per_capita:
+        description: "Total nitrous oxide emissions including land-use change and forestry, measured in tonnes of carbon dioxide-equivalents per capita."
+      transport:
+        description: "Nitrous oxide emissions from transport, measured in million tonnes of carbon dioxide-equivalents."
+      transport__per_capita:
+        description: "Nitrous oxide emissions from transport, measured in tonnes of carbon dioxide-equivalents per capita."
+      waste:
+        description: "Nitrous oxide emissions from waste, measured in million tonnes of carbon dioxide-equivalents."
+      waste__per_capita:
+        description: "Nitrous oxide emissions from waste, measured in tonnes of carbon dioxide-equivalents per capita."
+      # population:
+  fluorinated_gas_emissions_by_sector:
+    variables:
+      industry:
+        description: "Fluorinated gas emissions from industry, measured in million tonnes of carbon dioxide-equivalents."
+      industry__per_capita:
+        description: "Fluorinated gas emissions from industry, measured in tonnes of carbon dioxide-equivalents per capita."
+      total_excluding_lucf:
+        description: "Total fluorinated gas emissions excluding land-use change and forestry, measured in million tonnes of carbon dioxide-equivalents."
+      total_excluding_lucf__per_capita:
+        description: "Total fluorinated gas emissions excluding land-use change and forestry, measured in tonnes of carbon dioxide-equivalents per capita."
+      total_including_lucf:
+        description: "Total fluorinated gas emissions including land-use change and forestry, measured in million tonnes of carbon dioxide-equivalents."
+      total_including_lucf__per_capita:
+        description: "Total fluorinated gas emissions including land-use change and forestry, measured in tonnes of carbon dioxide-equivalents per capita."
+      # population:

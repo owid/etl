@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2032
+    date_accessed: 2023-08-10 15:01:19.036988
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_2032_degree_of_integrated_water_resources_management_implementation__0_100
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 0759f334dc7e50400ee2a3726f9fe4a8
+  size: 21247
+  path: 
+    dataset_2032_degree_of_integrated_water_resources_management_implementation__0_100_config.json

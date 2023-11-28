@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2527
+    date_accessed: 2023-08-11 07:41:49.493774
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Information and Communication Technology - ICT Access and Usage by Households
+    and Individuals
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 134f56fa693ebfa646c6b8285b9cf75a
+  size: 86250
+  path: 
+    dataset_2527_information_and_communication_technology__ict_access_and_usage_by_households_and_individuals_values.feather

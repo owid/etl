@@ -1,19 +1,17 @@
 meta:
-  namespace: backport
-  short_name: dataset_5208_united_states_voter_turnout_demographics_in_presidential_elections__united_states_elections_project_values
-  file_extension: feather
-  date_accessed: 2023-02-23 18:21:00.647036
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5208
+    date_accessed: 2023-08-10 09:13:49.583952
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: United States Voter Turnout Demographics in Presidential Elections - United
     States Elections Project
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/5208
-  source_published_by: Our World in Data catalog backport
   is_public: false
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 0cabed3c6fdc0d1df2b064d1f55a3457
+- md5: aeb9b862ebbfe3272c117cb8516a7706
   size: 7034
-  path: dataset_5208_united_states_voter_turnout_demographics_in_presidential_elections__united_states_elections_project_values.feather
+  path: 
+    dataset_5208_united_states_voter_turnout_demographics_in_presidential_elections__united_states_elections_project_values.feather

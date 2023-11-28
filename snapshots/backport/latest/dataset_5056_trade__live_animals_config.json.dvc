@@ -1,0 +1,22 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5056
+    date_accessed: 2023-08-16 09:46:10.655805
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_5056_trade__live_animals (archived)
+  description: 'The food and agricultural trade dataset is collected, processed and
+    disseminated by FAO according to the standard International Merchandise Trade
+    Statistics Methodology. The data is mainly provided by UNSD, Eurostat, and other
+    national authorities as needed. This source data is checked for outliers, trade
+    partner data is used for non-reporting countries or missing cells, and data on
+    food aid is added to take into account total cross-border trade flows. The trade
+    database includes the following variables: export quantity, export value, import
+    quantity and import value. The trade database includes all food and agricultural
+    products imported/exported annually by all the countries in the world.'
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 512d308b4d9ae096abe94143f8c8882c
+  size: 140172
+  path: dataset_5056_trade__live_animals_config.json

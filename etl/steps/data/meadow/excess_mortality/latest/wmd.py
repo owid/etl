@@ -44,6 +44,8 @@ def run(dest_dir: str) -> None:
     #
     # Create a new table and ensure all columns are snake-case.
     tb = Table(df, short_name=paths.short_name, underscore=True)
+    # Set index
+    tb = tb.set_index(["iso3c", "year", "time"], verify_integrity=True)
 
     #
     # Save outputs.

@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5176
+    date_accessed: 2023-08-16 09:44:31.416570
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_5176_renewable_energy_costs__irena__2020 (archived)
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 063feccd3aefca4acdbc5e818d13287f
+  size: 28311
+  path: dataset_5176_renewable_energy_costs__irena__2020_config.json

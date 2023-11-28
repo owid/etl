@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/3907
+    date_accessed: 2023-08-14 05:48:21.556813
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_3907_seborrhoeic_dermatitis (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: c76b1485c51ec8bee987c27abbfb3829
+  size: 16721
+  path: dataset_3907_seborrhoeic_dermatitis_config.json

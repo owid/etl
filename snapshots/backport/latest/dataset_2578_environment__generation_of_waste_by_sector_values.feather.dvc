@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2578
+    date_accessed: 2023-08-14 14:29:37.769222
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Environment - Generation of waste by sector
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: c07746d050ebdaf540d99bfa658f75bf
+  size: 35458
+  path: dataset_2578_environment__generation_of_waste_by_sector_values.feather

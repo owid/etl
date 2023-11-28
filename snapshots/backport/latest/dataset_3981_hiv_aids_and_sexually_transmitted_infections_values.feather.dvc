@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/3981
+    date_accessed: 2023-08-10 14:32:47.387911
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: HIV/AIDS and sexually transmitted infections
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 1b4d7a72f103af319cbdeb3ba59b3de1
+  size: 2012066
+  path: dataset_3981_hiv_aids_and_sexually_transmitted_infections_values.feather

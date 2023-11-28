@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2440
+    date_accessed: 2023-08-16 10:15:19.034366
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: All GEO Subthemes
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: d966b62df1838b9bf4794a6fa4305909
+  size: 6570
+  path: dataset_2440_all_geo_subthemes_values.feather

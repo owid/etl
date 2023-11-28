@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2429
+    date_accessed: 2023-08-16 08:44:03.915534
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2429_vegetation_and_land_cover (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 226f0a07f1eb9cbad88dad799e037141
+  size: 46519
+  path: dataset_2429_vegetation_and_land_cover_config.json

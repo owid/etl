@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2266
+    date_accessed: 2023-08-14 05:42:51.934214
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Other cardiovascular and circulatory diseases
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 0e69bec3d24cfacbc7b22f8a7bbf96cb
+  size: 1069258
+  path: dataset_2266_other_cardiovascular_and_circulatory_diseases_values.feather

@@ -1,8 +1,7 @@
-import pandas as pd
 from owid.catalog import Dataset, Table
 from structlog import get_logger
 
-from etl.helpers import PathFinder
+from etl.helpers import PathFinder, create_dataset
 from etl.paths import DATA_DIR
 
 log = get_logger()
@@ -16,40 +15,31 @@ def run(dest_dir: str) -> None:
 
     # read dataset from meadow
     ds_meadow = Dataset(DATA_DIR / "meadow/biodiversity/2023-01-11/cherry_blossom")
-    tb_meadow = ds_meadow["cherry_blossom"]
-
-    df = pd.DataFrame(tb_meadow)
+    tb = ds_meadow["cherry_blossom"].reset_index()
 
     # Calculate a 20,40 and 50 year average
-    df = calculate_multiple_year_average(df)
+    tb = calculate_multiple_year_average(tb)
 
-    # create new dataset with the same metadata as meadow
-    ds_garden = Dataset.create_empty(dest_dir, metadata=ds_meadow.metadata)
+    #
+    # Save outputs.
+    #
+    # Create a new grapher dataset with the same metadata as the garden dataset.
+    ds = create_dataset(dest_dir, tables=[tb.set_index(["country", "year"])], default_metadata=ds_meadow.metadata)
 
-    # create new table with metadata from meta.yml
-    df = df.reset_index(drop=True)
-    tb_garden = Table(df, short_name=tb_meadow.metadata.short_name)
-    ds_garden.add(tb_garden)
-
-    # update metadata from yaml file
-    ds_garden.update_metadata(paths.metadata_path)
-
-    ds_garden.save()
+    # finally save the dataset
+    ds.save()
 
     log.info("cherry_blossom.end")
 
 
-def calculate_multiple_year_average(df: pd.DataFrame) -> pd.DataFrame:
-    min_year = df["year"].min()
-    max_year = df["year"].max()
+def calculate_multiple_year_average(tb: Table) -> Table:
+    min_year = tb["year"].min()
+    max_year = tb["year"].max()
 
-    df_year = pd.DataFrame()
-    df_year["year"] = pd.Series(range(min_year, max_year))
-    df_year["country"] = "Japan"
-    df_comb = pd.merge(df, df_year, how="outer", on=["country", "year"])
+    tb = tb.set_index("year").reindex(range(min_year, max_year)).reset_index().sort_values("year")
+    tb["country"] = "Japan"
 
-    df_comb = df_comb.sort_values("year")
+    tb["average_20_years"] = tb["full_flowering_date"].rolling(20, min_periods=5).mean()
+    tb["average_20_years"].metadata = tb["full_flowering_date"].metadata
 
-    df_comb["average_20_years"] = df_comb["full_flowering_date"].rolling(20, min_periods=5).mean()
-
-    return df_comb
+    return tb

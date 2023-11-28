@@ -1,13 +1,11 @@
 """Load a snapshot and create a meadow dataset."""
 
-from typing import cast
 
-import pandas as pd
+import numpy as np
 from owid.catalog import Table
 from structlog import get_logger
 
 from etl.helpers import PathFinder, create_dataset
-from etl.snapshot import Snapshot
 
 # Initialize logger.
 log = get_logger()
@@ -23,14 +21,14 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Retrieve snapshot.
-    snap = cast(Snapshot, paths.load_dependency("epoch.csv"))
+    snap = paths.load_snapshot("epoch.csv")
 
-    # Now read the file with pandas
-    df = pd.read_csv(snap.path)
+    # Read snapshot
+    df = snap.read()
     #
     # Process data.
     #
-    # Select columns of interest.
+    # Define columns of interest.
     cols = [
         "System",
         "Domain",
@@ -41,16 +39,26 @@ def run(dest_dir: str) -> None:
         "Training compute (FLOP)",
         "Training dataset size (datapoints)",
         "Training time (hours)",
-        "Inclusion criteria",
+        "Notability criteria",
     ]
+    # Check that the columns of interest are present
+    for col in cols:
+        assert col in df.columns, f"Column '{col}' is missing from the dataframe."
+    # Check that there are no negative values in the training compute column
+    assert not (df["Training compute (FLOP)"] < 0).any(), "Negative values found in 'Training compute (FLOP)' column."
 
+    # Select the columns of interest
     df = df[cols]
-    # df.replace("#REF!", np.nan, inplace=True)
-    # df.replace("", np.nan, inplace=True)
-
+    # Replace empty strings with NaN values
+    df.replace("", np.nan, inplace=True)
+    # Convert the training compute column to float
     df["Training compute (FLOP)"] = df["Training compute (FLOP)"].astype(float)
 
+    # Replace the missing values in the system column with the organization column
     df.loc[df["System"].isna(), "System"] = df.loc[df["System"].isna(), "Organization"]
+    # Check that there are no NaN values in the system column
+    assert not df["System"].isna().any(), "NaN values found in 'System' column after processing."
+    # Drop the organization column
     df.drop("Organization", axis=1, inplace=True)
     #
     # Create a new table and ensure all columns are snake-case.

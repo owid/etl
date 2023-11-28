@@ -1,0 +1,175 @@
+# this metadata file is not used in garden step, but in grapher step
+tables:
+  un_wpp:
+    variables:
+      birth_rate:
+        title: Birth rate
+        unit: births per 1,000 population
+        description_short: Number of births over a given period divided by the person-years lived by the population over that period.
+      births:
+        title: Births
+        unit: births
+        description_short: Number of births over a given period. Refers to live births for annual civil calendar years from 1 January to 31 December.
+        display:
+          conversionFactor: 1
+      child_mortality_rate:
+        title: Child mortality rate
+        short_unit: "%"
+        unit: "%"
+        description_short: Number of deaths under age 5 over a given period. Refers to annual civil calendar years from 1 January to 31 December.
+        display:
+          conversionFactor: 1
+      death_rate:
+        title: Death rate
+        unit: deaths per 1,000 population
+        description_short: Number of deaths over a given period divided by the person-years lived by the population over that period.
+      deaths:
+        title: Deaths
+        unit: deaths
+        description_short: Number of deaths over a given period. Refers to annual civil calendar years from 1 January to 31 December.
+        display:
+          conversionFactor: 1
+      dependency_ratio_child:
+        title: Child dependency ratio
+        short_unit: "%"
+        unit: "%"
+        description_short: |-
+          The ratio of the number of children (under 15 years old) to the working-age population (15-64 years old).
+        description_key:
+          - It is expressed as number of dependants per 100 persons of working age (aged 15-64).
+      dependency_ratio_old:
+        title: Old-age dependency ratio
+        short_unit: "%"
+        unit: "%"
+        description_short: |-
+          The ratio of the number of older persons (65 years or over) to the working-age population (15-64 years old).
+        description_key:
+          - It is expressed as number of dependants per 100 persons of working age (aged 15-64).
+      dependency_ratio_total:
+        title: Total dependency ratio
+        short_unit: "%"
+        unit: "%"
+        description_short: |-
+          The ratio of the dependents (either children aged 0-14 years, or older populations aged over 64 years) to the working-age population (15-64 years old).
+        description_key:
+          - It is expressed as number of dependants per 100 persons of working age (aged 15-64).
+      fertility_rate:
+        title: Fertility rate
+        unit: live births per woman
+        description_short: |-
+          The average number of live births a hypothetical cohort of women would have at the end of their reproductive period if they were subject during their whole lives to the fertility rates of a given period and if they were not subject to mortality.
+        description_key:
+          - |-
+            It is expressed as live births per woman. For age-specific fertility rates, it measuresmber of births to women in a particular age group, divided by the number of women in that age group. The age groups used are: 15-19, 20-24, ..., 45-49. The data refer to annual civil calendar years from 1 January to 31 December.
+
+      growth_natural_rate:
+        title: Natural growth rate
+        short_unit: "%"
+        unit: "%"
+        description_short: Crude birth rate minus the crude death rate. Represents the portion of population growth (or decline) determined exclusively by births and deaths.
+        display:
+          conversionFactor: 1
+      growth_rate:
+        title: Growth rate
+        short_unit: "%"
+        unit: "%"
+        description_short: Average exponential rate of growth of the population over a given period. It is calculated as ln(P2/P1)/n where P1 and P2 are the populations on 1 January of subsequent years, and n is the length of the period between t1 and t2 (n=1 for annual data).
+        display:
+          conversionFactor: 1
+      infant_mortality_rate:
+        title: Infant mortality rate
+        short_unit: "%"
+        unit: "%"
+        description_short: Probability of dying between birth and exact age 1.
+
+      life_expectancy:
+        title: Life expectancy
+        unit: years
+        short_unit: years
+        description_short: |-
+          <% if age == 'at birth' %>
+
+          <% if sex == 'all' %>
+          The period life expectancy at birth, in a given year.
+          <% else %>
+          The period life expectancy at birth among << sex + 's' >>, in a given year.
+          <% endif %>
+
+          <% else %>
+
+          <% if sex == 'all' %>
+          The total period life expectancy at age << age >>, in a given year.
+          <% else %>
+          The total period life expectancy at age << age >> among << sex + 's' >>, in a given year.
+          <% endif %>
+
+          <% endif %>
+        description_key:
+          - Period life expectancy is a metric that summarizes death rates across all age groups in one particular year.
+          - |-
+            <% if (age == 'at birth') %>
+            For a given year, it represents the average lifespan for a hypothetical group of people, if they experienced the same age-specific death rates throughout their lives as the age-specific death rates seen in that particular year.
+            <% else %>
+            For a given year, it represents the average lifespan for a hypothetical group of people, if they experienced the same age-specific death rates throughout the rest of their lives as the age-specific death rates seen in that particular year.
+            <% endif %>
+          - |-
+            <% if (age != 'at birth') %>
+            This shows the total life expectancy among people who have already reached the age << age >> (including the number of years they have already lived), using death rates from their age group and older age groups.
+            <% endif %>
+        display:
+          numDecimalPlaces: 1
+          name: |-
+            Life expectancy at << 'birth' if (age == 'at birth') else age >><< ', ' + sex + 's' if (sex != 'both') >>, period, << variant + " projections" if (variant != 'estimates') else variant >>
+        presentation:
+          title_public: Life expectancy at << 'birth' if (age == 'at birth') else age >>
+          title_variant: << sex + 's' if (sex != 'both') >>, period, << variant + " projections" if (variant != 'estimates') else variant >>
+
+      median_age:
+        title: Median age
+        unit: years
+        description_short: |-
+          Age that divides the population in two parts of equal size, that is, there are as many persons with ages above the median as there are with ages below the median.
+      net_migration:
+        title: Net migration
+        unit: migrants
+        description_short: Net number of migrants, that is, the number of immigrants minus the number of emigrants.
+      net_migration_rate:
+        title: Net migration rate
+        unit: migrants per 1,000 population
+        description_short: The number of immigrants minus the number of emigrants over a period, divided by the person-years lived by the population of the receiving country over that period.
+      population:
+        title: Population
+        unit: persons
+        description_short: De facto population in a country, area or region as of 1 July of the year indicated.
+        display:
+          conversionFactor: 1
+      population_broad:
+        title: Population by broad age group
+        unit: persons
+        description_short: |-
+          De facto population in a country, area or region as of 1 July of the year indicated. Alternative metric to 'population', used for different (and broader) age groups.
+        display:
+          conversionFactor: 1
+      population_change:
+        title: Population change
+        unit: persons
+        description_short: |-
+          Population increment over a period, that is, the difference between the population at the end of the period and that at the beginning of the period. Refers to calendar years from 1 July to 30 June.
+        display:
+          conversionFactor: 1
+      population_density:
+        title: Population density
+        unit: persons per square kilometer
+        description_short: Population per square Kilometer as of 1 July.
+      sex_ratio:
+        title: Sex ratio
+        unit: males per 100 females
+        description_short: Number of males per 100 females in the population.
+      # gdp:
+      #   title: GDP
+      #   short_unit: $
+      #   unit: 2011 int-$
+      #   description: Gross domestic product measured in international-$ using 2011 prices to adjust for price changes over time (inflation) and price differences between countries. Calculated by multiplying GDP per capita with population.
+      #   display:
+      #     entityAnnotationsMap: "Western Offshoots: United States, Canada, Australia and New Zealand"
+      #     numDecimalPlaces: 0

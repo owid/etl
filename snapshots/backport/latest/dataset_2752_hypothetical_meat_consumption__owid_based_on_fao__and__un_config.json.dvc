@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2752
+    date_accessed: 2023-08-14 15:15:30.973363
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2752_hypothetical_meat_consumption__owid_based_on_fao__and__un
+    (archived)
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 5caa54320239451e32f373b574b03a59
+  size: 2509
+  path: 
+    dataset_2752_hypothetical_meat_consumption__owid_based_on_fao__and__un_config.json

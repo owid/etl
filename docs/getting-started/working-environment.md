@@ -177,6 +177,31 @@ This will install the project, and then run all CI checks.
 
 If `make test` succeeds, then you should be able to build any dataset you like, including the entire catalog. If it fails, please raise a [Github issue](https://github.com/owid/etl/issues) (if OWID staff, you can also ask using the `#tech-issues` Slack channel).
 
+
+!!! tip
+
+    Speed it up with multiple processes `make -j 4 test`.
+
+
+## VSCode setup
+
+We highly recommended installing the following extension
+
+* [Ruff](https://marketplace.visualstudio.com/items?itemName=charliermarsh.ruff)
+* [YAML](https://marketplace.visualstudio.com/items?itemName=redhat.vscode-yaml)
+
+And adding this to your User `settings.json` (View -> Command Palette -> Preferences: Open User Settings (JSON))
+
+```json
+  "files.associations": {
+    "*.dvc": "yaml"
+  },
+  "yaml.schemas": {
+    "schemas/snapshot-schema.json": "**/*.dvc",
+    "schemas/dataset-schema.json": ["**/*.meta.yml", "**/*.meta.override.yml"]
+  },
+```
+
 ## Project folder
 The project has multiple folders and directories. Let's try to make sense of them.
 
@@ -195,8 +220,7 @@ This will list all the folders and directories in the project. Find a brief expl
 | `etl/`       | This is home to our ETL library. This is where all the recipes to generate our datasets live. |
 | `snapshots/`       | This is the entry point to ETL. This folder contains metadata and code to get external data and import it to our pipeline. |
 | `dag/`    | Contains the dataset dependencies. That is, if `dataset A` needs `dataset B` to be up to date, this should be listed here. |
-| `walkthrough/`    | High-level tool to help create dataset recipes. |
-| `fasttrack/`    | Very high-level tool to create add dataset recipes. This tool is used in instanced where time is an issue. |
+| `apps/`    | Apps built around and for ETL management. Some include `wizard`, `backport`, `fasttrack`, etc. |
 | `data/`    | When you run the recipe code for a dataset, the dataset will be created under this directory. Note that not all the content from this directory is added to git. |
 | `schemas/`    | Metadata schemas for ETL datasets. |
 | `scripts/`    | Various scripts. |

@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1868
+    date_accessed: 2023-08-10 14:39:17.806912
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1868_safety_and_health_at_work (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: e5417e3720fdaf6553e5f768b214009b
+  size: 3563
+  path: dataset_1868_safety_and_health_at_work_config.json

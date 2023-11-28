@@ -70,6 +70,9 @@ def long_to_wide(df: pd.DataFrame, prune: bool = True) -> pd.DataFrame:
             values="value",
         )
 
+    # remove `variable_name` label
+    df.columns.name = None
+
     # report compression ratio if the file is larger than >1MB
     # NOTE: memory usage can further drop later after repack_frame is called
     wide_mem_usage_mb = df.memory_usage().sum() / 1e6 if not df.empty else 0

@@ -1,20 +1,15 @@
 meta:
-  namespace: backport
-  short_name: 
-    dataset_2478_global_hunger_index_in_2017__listed_2017__global_hunger_index_2017_values
-  file_extension: feather
-  date_accessed: 2023-06-01 13:03:45.715037
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2478
+    date_accessed: 2023-08-10 08:27:50.018088
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Global Hunger Index in 2017 (listed 2017) (Global Hunger Index 2017)
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/2478
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: f42d0d082bb9afe651bb9db010734fe3
+- md5: 30fbc577226fc1b59dbc88784195b5cc
   size: 9730
   path: 
     dataset_2478_global_hunger_index_in_2017__listed_2017__global_hunger_index_2017_values.feather

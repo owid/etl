@@ -1,18 +1,15 @@
 meta:
-  namespace: backport
-  short_name: dataset_3038_te_9_19_values
-  file_extension: feather
-  date_accessed: 2023-02-23 17:06:07.026983
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/3038
+    date_accessed: 2023-08-10 09:23:06.397555
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: TE-9.19
   description: core-econ.org
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/3038
-  source_published_by: Our World in Data catalog backport
   is_public: false
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 0e81ad53455f07e48b77064ebdecf31c
+- md5: b0d3028c758460d38a8e8e2e94dadec6
   size: 7210
   path: dataset_3038_te_9_19_values.feather

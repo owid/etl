@@ -13,16 +13,19 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load garden dataset.
-    ds_garden = paths.load_dataset_dependency()
+    ds_garden = paths.load_dataset()
 
     # Read table from garden dataset.
     tb = ds_garden["excess_mortality_economist"]
+
+    # Reset index
+    tb = tb.reset_index()
 
     # Grapher doesn't support dates, only years, but we can convert it to int and pretend it's a year.
     reference_date = dt.datetime.strptime("2020/01/01", "%Y/%m/%d")
     tb["year"] = (pd.to_datetime(tb["date"].astype(str)) - reference_date).dt.days
 
-    tb = tb.drop(columns=["date"]).set_index(["country", "year"])
+    tb = tb.drop(columns=["date"]).set_index(["country", "year"], verify_integrity=True)
 
     #
     # Save outputs.

@@ -1,0 +1,89 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Population Growth
+    description_processing: |-
+      The population time series is constructed by combining data from multiple sources:
+
+      - 10,000 BCE - 1799: Historical estimates by HYDE (v3.2). Includes some data from Gapminder (Systema Globalis).
+
+      - 1800-1949: Historical estimates by Gapminder. Includes some data from HYDE (v3.2) and Gapminder (Systema Globalis).
+
+      - 1950-2021: Population records by the UN World Population Prospects (2022 revision). Includes some data from HYDE (v3.2), Gapminder (Systema Globalis) and Gapminder (v7).
+
+      - 2022-2100: Projections based on Medium variant by the UN World Population Prospects (2022 revision).
+
+dataset:
+  title: Population (various sources, 2023.1)
+  update_period_days: 365
+  description: &dataset-description |-
+    Our World in Data builds and maintains a long-run dataset on population by country, region, and for the world, based on various sources.
+
+    You can find more information on these sources and how our time series is constructed on this page: https://ourworldindata.org/population-sources
+
+origins_combined: &origins-combined
+  - producer: Various sources
+    title: Population
+    attribution: Population based on various sources (2023)
+    attribution_short: Population
+    citation_full: |-
+      The long-run data on population is based on various sources, described on this page: https://ourworldindata.org/population-sources
+    url_main: https://ourworldindata.org/population-sources
+    date_accessed: 2023-03-31
+    date_published: 2023-03-31
+    description: *dataset-description
+    license:
+      name: CC BY 4.0
+
+tables:
+  population:
+    title: Population
+    description: *dataset-description
+    variables:
+      population:
+        title: Population
+        description_short: &population-description "Population by country, available from 10,000 BCE to 2100, based on data and estimates from different sources."
+        unit: persons
+        display:
+          numDecimalPlaces: 0
+        origins: *origins-combined
+        processing_level: major
+
+      world_pop_share:
+        title: Share of world population
+        description_short: &population-share-description "Share of the world's population by country, available from 10,000 BCE to 2100, based on data and estimates from different sources."
+        unit: "%"
+        short_unit: "%"
+        origins: *origins-combined
+        processing_level: major
+
+      source:
+        title: Source
+        description_short: &population-source-description "Name of the source for a specific data point. The name includes a short name for the source and a link."
+        unit: ""
+        origins: *origins-combined
+        processing_level: major
+
+  population_original:
+    title: Population
+    description: *dataset-description
+    variables:
+      population:
+        title: Population
+        description_short: *population-description
+        unit: persons
+        display:
+          numDecimalPlaces: 0
+        processing_level: major
+      world_pop_share:
+        title: Share of world population
+        description_short: *population-share-description
+        unit: "%"
+        short_unit: "%"
+        processing_level: major
+      source:
+        title: Source
+        description_short: *population-source-description
+        unit: ""
+        processing_level: major

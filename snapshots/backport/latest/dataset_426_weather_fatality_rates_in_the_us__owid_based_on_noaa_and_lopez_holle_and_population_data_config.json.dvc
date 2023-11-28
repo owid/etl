@@ -1,18 +1,16 @@
 meta:
-  namespace: backport
-  short_name: dataset_426_weather_fatality_rates_in_the_us__owid_based_on_noaa_and_lopez_holle_and_population_data_config
-  file_extension: json
-  date_accessed: 2023-02-23 16:45:31.981111
-  name: Grapher metadata for dataset_426_weather_fatality_rates_in_the_us__owid_based_on_noaa_and_lopez_holle_and_population_data
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/426
+    date_accessed: 2023-08-09 13:40:18.802736
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_426_weather_fatality_rates_in_the_us__owid_based_on_noaa_and_lopez_holle_and_population_data
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/426
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 2f3e2dd86c28b019b3562ecb0baac37e
-  size: 7967
-  path: dataset_426_weather_fatality_rates_in_the_us__owid_based_on_noaa_and_lopez_holle_and_population_data_config.json
+- md5: 75ed3c136da161ca47b0d7f89fb8c78e
+  size: 9154
+  path: 
+    dataset_426_weather_fatality_rates_in_the_us__owid_based_on_noaa_and_lopez_holle_and_population_data_config.json

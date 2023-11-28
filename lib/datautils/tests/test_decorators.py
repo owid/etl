@@ -1,9 +1,11 @@
-from owid.datautils.decorators import enable_file_download
+from typing import Any
+from unittest import mock
+
+import boto3
 from pytest import raises
 
-from unittest import mock
-from typing import Any
-import boto3
+from owid.datautils.decorators import enable_file_download
+
 from .mocks import MockResponse
 
 
@@ -38,17 +40,13 @@ class TestEnableDownload:
             _ = func(path=file_name)
 
     @mock.patch("owid.datautils.web.download_file_from_url", return_value=None)
-    @mock.patch(
-        "requests.Session.get", return_value=MockResponse({"key": "value"}, 200)
-    )
+    @mock.patch("requests.Session.get", return_value=MockResponse({"key": "value"}, 200))
     def test_download_kwargs(self, mock_download, mog_session_get):
         func = enable_file_download(path_arg_name="path")(_test_local_file)
         func(path="http://example.ourworldindata.org/test.json")
 
     @mock.patch("owid.datautils.web.download_file_from_url", return_value=None)
-    @mock.patch(
-        "requests.Session.get", return_value=MockResponse({"key": "value"}, 200)
-    )
+    @mock.patch("requests.Session.get", return_value=MockResponse({"key": "value"}, 200))
     def test_download_args(self, mock_download, mog_session_get):
         func = enable_file_download(path_arg_name="path")(_test_local_file)
         func("http://example.ourworldindata.org/test.json")
@@ -63,9 +61,7 @@ class TestEnableDownload:
     )
     @mock.patch.object(boto3.Session, "__init__", return_value=None)
     @mock.patch.object(boto3.Session, "client", return_value="client")
-    def test_download_s3_args(
-        self, mock_download, mock_check_s3, mock_boto_1, mock_boto_2
-    ):
+    def test_download_s3_args(self, mock_download, mock_check_s3, mock_boto_1, mock_boto_2):
         func = enable_file_download(path_arg_name="path")(_test_local_file)
         func("s3://example.com/file.json")
 

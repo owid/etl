@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2120
+    date_accessed: 2023-08-16 09:32:01.272795
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Chronic kidney disease
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 5062b56bc6b21045df00570bfc724012
+  size: 2116402
+  path: dataset_2120_chronic_kidney_disease_values.feather

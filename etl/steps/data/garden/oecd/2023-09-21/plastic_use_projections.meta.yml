@@ -1,0 +1,14 @@
+
+tables:
+  plastic_use_projections:
+    variables:
+      plastic_use:
+        title: Plastic use - projections
+        unit: 'tonnes'
+        short_unit: 't'
+        display:
+          isProjection: true
+          numDecimalPlaces: 0
+        presentation:
+          topic_tags:
+            - Plastic Pollution

@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2420
+    date_accessed: 2023-08-16 07:27:17.113258
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Eating disorders
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 804cfb3d9e88fe7ffbae1579caddd71d
+  size: 3993986
+  path: dataset_2420_eating_disorders_values.feather

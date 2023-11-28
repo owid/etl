@@ -1,18 +1,17 @@
 meta:
-  namespace: backport
-  short_name: dataset_4177_daily_hours_spent_with_digital_media_per_adult_user__us__bond_internet_trends__2019_config
-  file_extension: json
-  date_accessed: 2023-04-03 18:11:21.398371
-  name: Grapher metadata for dataset_4177_daily_hours_spent_with_digital_media_per_adult_user__us__bond_internet_trends__2019
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4177
+    date_accessed: 2023-08-10 07:43:01.287462
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_4177_daily_hours_spent_with_digital_media_per_adult_user__us__bond_internet_trends__2019
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/4177
-  source_published_by: Our World in Data catalog backport
   is_public: false
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 9bdad4786089968bc0413e7deab41606
-  size: 3841
-  path: dataset_4177_daily_hours_spent_with_digital_media_per_adult_user__us__bond_internet_trends__2019_config.json
+- md5: 97d9b5ae96a7e4a88ca8aefd4255e4be
+  size: 4242
+  path: 
+    dataset_4177_daily_hours_spent_with_digital_media_per_adult_user__us__bond_internet_trends__2019_config.json

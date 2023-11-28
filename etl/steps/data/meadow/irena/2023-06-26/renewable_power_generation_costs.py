@@ -10,16 +10,15 @@ structure. So it's likely that, on the next update, this script will not work.
 
 import owid.catalog.processing as pr
 import pandas as pd
-from owid.catalog import Table, TableMeta
+from owid.catalog import Table
 
 from etl.helpers import PathFinder, create_dataset
-from etl.snapshot import Snapshot
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
 
-def prepare_solar_pv_module_prices(excel_object: pr.ExcelFile, metadata: TableMeta) -> Table:
+def prepare_solar_pv_module_prices(excel_object: pr.ExcelFile) -> Table:
     """Prepare yearly data on average solar photovoltaic module prices.
 
     Monthly data will be averaged, and only complete years (with 12 informed months) will be considered.
@@ -45,7 +44,6 @@ def prepare_solar_pv_module_prices(excel_object: pr.ExcelFile, metadata: TableMe
         skiprows=4,
         skipfooter=18,
         usecols=lambda column: "Unnamed" not in column,
-        metadata=metadata,
     )
 
     # Rename table.
@@ -84,7 +82,7 @@ def prepare_solar_pv_module_prices(excel_object: pr.ExcelFile, metadata: TableMe
     return pv_prices
 
 
-def extract_global_cost_for_all_sources_from_excel_file(excel_object: pr.ExcelFile, metadata: TableMeta) -> Table:
+def extract_global_cost_for_all_sources_from_excel_file(excel_object: pr.ExcelFile) -> Table:
     """Extract global weighted-average LCOE of all energy sources from the excel file.
 
     Each energy source is given in a separate sheet, in a different way, to each needs a different treatment.
@@ -103,7 +101,7 @@ def extract_global_cost_for_all_sources_from_excel_file(excel_object: pr.ExcelFi
 
     # Solar photovoltaic.
     solar_pv = (
-        excel_object.parse("Fig 3.1", skiprows=22, metadata=metadata).dropna(how="all", axis=1).rename(columns={"Unnamed: 1": "temp"})  # type: ignore
+        excel_object.parse("Fig 3.1", skiprows=22).dropna(how="all", axis=1).rename(columns={"Unnamed: 1": "temp"})  # type: ignore
     )
     solar_pv = solar_pv[solar_pv["temp"] == "Weighted average"].melt(
         id_vars="temp", var_name="year", value_name="cost"
@@ -111,13 +109,13 @@ def extract_global_cost_for_all_sources_from_excel_file(excel_object: pr.ExcelFi
     solar_pv["technology"] = "Solar photovoltaic"
 
     # Onshore wind.
-    onshore_wind = excel_object.parse("Fig 2.12", skiprows=3, usecols=lambda column: "Unnamed" not in column, metadata=metadata).rename(  # type: ignore
+    onshore_wind = excel_object.parse("Fig 2.12", skiprows=3, usecols=lambda column: "Unnamed" not in column).rename(  # type: ignore
         columns={"Year": "year", "Weighted average": "cost"}
     )
     onshore_wind["technology"] = "Onshore wind"
 
     # Concentrated solar power.
-    csp = excel_object.parse("Fig 5.7", skiprows=4, metadata=metadata).dropna(how="all", axis=1)  # type: ignore
+    csp = excel_object.parse("Fig 5.7", skiprows=4).dropna(how="all", axis=1)  # type: ignore
     csp = (
         csp[csp["2021 USD/kWh"] == "Weighted average"]
         .melt(id_vars="2021 USD/kWh", var_name="year", value_name="cost")[["year", "cost"]]
@@ -126,20 +124,20 @@ def extract_global_cost_for_all_sources_from_excel_file(excel_object: pr.ExcelFi
     csp["technology"] = "Concentrated solar power"
 
     # Offshore wind.
-    offshore_wind = excel_object.parse("Fig 4.13", skiprows=3, metadata=metadata).rename(  # type: ignore
+    offshore_wind = excel_object.parse("Fig 4.13", skiprows=3).rename(  # type: ignore
         columns={"Year": "year", "Weighted average": "cost"}
     )[["year", "cost"]]
     offshore_wind["technology"] = "Offshore wind"
 
     # Geothermal.
-    geothermal = excel_object.parse("Fig 7.4", skiprows=5, metadata=metadata).rename(columns={"Year": "year", "Weighted average": "cost"})[  # type: ignore
+    geothermal = excel_object.parse("Fig 7.4", skiprows=5).rename(columns={"Year": "year", "Weighted average": "cost"})[  # type: ignore
         ["year", "cost"]
     ]
     geothermal["technology"] = "Geothermal"
 
     # Bioenergy.
     bioenergy = (
-        excel_object.parse("Fig 8.1", skiprows=20, metadata=metadata).dropna(axis=1, how="all").rename(columns={"Unnamed: 1": "temp"})  # type: ignore
+        excel_object.parse("Fig 8.1", skiprows=20).dropna(axis=1, how="all").rename(columns={"Unnamed: 1": "temp"})  # type: ignore
     )
     bioenergy = bioenergy[bioenergy["temp"] == "Weighted average"].melt(
         id_vars="temp", var_name="year", value_name="cost"
@@ -148,7 +146,7 @@ def extract_global_cost_for_all_sources_from_excel_file(excel_object: pr.ExcelFi
 
     # Hydropower.
     hydropower = (
-        excel_object.parse("Fig 6.1", skiprows=20, metadata=metadata).dropna(how="all", axis=1).rename(columns={"Unnamed: 1": "temp"})  # type: ignore
+        excel_object.parse("Fig 6.1", skiprows=20).dropna(how="all", axis=1).rename(columns={"Unnamed: 1": "temp"})  # type: ignore
     )
     hydropower = hydropower[hydropower["temp"] == "Weighted average"].melt(
         id_vars="temp", var_name="year", value_name="cost"
@@ -164,7 +162,7 @@ def extract_global_cost_for_all_sources_from_excel_file(excel_object: pr.ExcelFi
     return tb
 
 
-def extract_country_cost_from_excel_file(excel_object: pr.ExcelFile, metadata: TableMeta) -> Table:
+def extract_country_cost_from_excel_file(excel_object: pr.ExcelFile) -> Table:
     """Extract weighted-average LCOE of certain countries and certain energy sources from the excel file.
 
     Only onshore wind and solar photovoltaic seem to have this data, and only for specific countries.
@@ -183,7 +181,7 @@ def extract_country_cost_from_excel_file(excel_object: pr.ExcelFile, metadata: T
 
     # Solar photovoltaic.
     solar_pv = (
-        excel_object.parse("Fig 3.8", skiprows=5, metadata=metadata).dropna(how="all", axis=1).rename(columns={"2021 USD/kWh": "country"})  # type: ignore
+        excel_object.parse("Fig 3.8", skiprows=5).dropna(how="all", axis=1).rename(columns={"2021 USD/kWh": "country"})  # type: ignore
     )
 
     # Last column is the difference between the cost in the last two years. Remove that column.
@@ -191,7 +189,7 @@ def extract_country_cost_from_excel_file(excel_object: pr.ExcelFile, metadata: T
 
     # Onshore wind.
     onshore_wind = (
-        excel_object.parse("Fig 2.13", skiprows=6, metadata=metadata).dropna(how="all", axis=1).rename(columns={"Country": "country"})  # type: ignore
+        excel_object.parse("Fig 2.13", skiprows=6).dropna(how="all", axis=1).rename(columns={"Country": "country"})  # type: ignore
     )
 
     # Country column is repeated. Drop it, and drop column of percentage decrease.
@@ -229,22 +227,20 @@ def combine_global_and_national_data(tb_costs_global: Table, tb_costs_national: 
 
 def run(dest_dir: str) -> None:
     # Retrieve snapshot.
-    snap: Snapshot = paths.load_dependency("renewable_power_generation_costs.xlsx")
-    data = pr.ExcelFile(snap.path)
+    snap = paths.load_snapshot("renewable_power_generation_costs.xlsx")
+    data = snap.ExcelFile()
 
     # Extract global, weighted-average LCOE cost for all energy sources.
-    tb_costs_global = extract_global_cost_for_all_sources_from_excel_file(
-        excel_object=data, metadata=snap.to_table_metadata()
-    )
+    tb_costs_global = extract_global_cost_for_all_sources_from_excel_file(excel_object=data)
 
     # Extract national LCOE for specific countries and technologies.
-    tb_costs_national = extract_country_cost_from_excel_file(excel_object=data, metadata=snap.to_table_metadata())
+    tb_costs_national = extract_country_cost_from_excel_file(excel_object=data)
 
     # Combine global and national data.
     tb_combined = combine_global_and_national_data(tb_costs_global=tb_costs_global, tb_costs_national=tb_costs_national)
 
     # Extract global data on solar photovoltaic module prices.
-    tb_solar_pv_prices = prepare_solar_pv_module_prices(excel_object=data, metadata=snap.to_table_metadata())
+    tb_solar_pv_prices = prepare_solar_pv_module_prices(excel_object=data)
 
     #
     # Save outputs.

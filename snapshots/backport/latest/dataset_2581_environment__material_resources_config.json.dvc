@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2581
+    date_accessed: 2023-08-14 05:51:41.842604
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2581_environment__material_resources (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 4909c690a1fb0dd0d49a78ce5869cf2e
+  size: 85301
+  path: dataset_2581_environment__material_resources_config.json

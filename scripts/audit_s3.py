@@ -7,7 +7,7 @@ import pandas as pd
 import rich_click as click
 import structlog
 
-from backport.datasync.datasync import upload_gzip_dict
+from apps.backport.datasync.datasync import upload_gzip_dict
 from etl.db import get_engine
 from etl.publish import connect_s3
 
@@ -124,7 +124,7 @@ def cli(
     """
     assert dry_run, "Only --dry-run is supported at the moment, we don't want to modify files on S3"
 
-    s3 = connect_s3(r2=True)
+    s3 = connect_s3()
 
     variable_ids = load_variable_ids(limit)
 

@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4571
+    date_accessed: 2023-08-11 07:42:37.163458
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_4571_mountain_green_cover_index (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 5245061370bf4be6066c59e167dc9659
+  size: 11792
+  path: dataset_4571_mountain_green_cover_index_config.json

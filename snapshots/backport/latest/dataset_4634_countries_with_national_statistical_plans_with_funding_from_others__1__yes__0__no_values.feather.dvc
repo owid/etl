@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4634
+    date_accessed: 2023-08-11 07:56:49.802396
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Countries with national statistical plans with funding from others (1 = YES;
+    0 = NO)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: ddda391c1b59be260e8acadf54a9e230
+  size: 11450
+  path: 
+    dataset_4634_countries_with_national_statistical_plans_with_funding_from_others__1__yes__0__no_values.feather

@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2575
+    date_accessed: 2023-08-16 10:08:06.144270
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Environment - Mortality and welfare cost from exposure to air pollution
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: c6884bae68e1668d4f0b73e438207c7b
+  size: 46594
+  path: 
+    dataset_2575_environment__mortality_and_welfare_cost_from_exposure_to_air_pollution_values.feather

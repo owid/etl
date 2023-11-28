@@ -1,18 +1,15 @@
 meta:
-  namespace: backport
-  short_name: dataset_3184_temporary_accommodation_in_england__uk_government__2018_values
-  file_extension: feather
-  date_accessed: 2023-02-23 18:24:47.535932
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/3184
+    date_accessed: 2023-08-10 08:32:13.832953
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Temporary accommodation in England - UK Government (2018)
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/3184
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: a40f184ca2950f2c82fd49cddc0bb8b9
+- md5: 57f527ee5c47c4a98dc494bc63a2604a
   size: 6578
-  path: dataset_3184_temporary_accommodation_in_england__uk_government__2018_values.feather
+  path: 
+    dataset_3184_temporary_accommodation_in_england__uk_government__2018_values.feather

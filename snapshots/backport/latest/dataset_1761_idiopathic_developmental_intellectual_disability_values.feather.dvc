@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1761
+    date_accessed: 2023-08-10 14:41:36.180457
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Idiopathic developmental intellectual disability
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: eabceab338c3964cb1bd8da75c4b94cf
+  size: 1011378
+  path: dataset_1761_idiopathic_developmental_intellectual_disability_values.feather

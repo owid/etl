@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/3617
+    date_accessed: 2023-08-14 15:53:50.728485
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_3617_invasive_non_typhoidal_salmonella__ints
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: dbd45cfd0764bac31db0c4745e7dfc72
+  size: 33646
+  path: dataset_3617_invasive_non_typhoidal_salmonella__ints_config.json

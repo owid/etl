@@ -1,18 +1,14 @@
 meta:
-  namespace: backport
-  short_name: dataset_437_tourism_data_by_world_region__unwto__2019_config
-  file_extension: json
-  date_accessed: 2023-02-23 18:20:14.189379
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/437
+    date_accessed: 2023-08-10 08:38:10.656938
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_437_tourism_data_by_world_region__unwto__2019
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/437
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 582d8f0a21e9f15c2855e9326748bc9d
-  size: 1871
+- md5: f9ba357aabd290136d5531d3b9aef1cb
+  size: 2026
   path: dataset_437_tourism_data_by_world_region__unwto__2019_config.json

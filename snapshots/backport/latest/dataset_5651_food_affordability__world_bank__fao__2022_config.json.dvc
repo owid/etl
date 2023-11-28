@@ -1,18 +1,15 @@
 meta:
-  namespace: backport
-  short_name: dataset_5651_food_affordability__world_bank__fao__2022_config
-  file_extension: json
-  date_accessed: 2023-02-23 15:19:09.123367
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5651
+    date_accessed: 2023-08-16 09:57:41.706271
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_5651_food_affordability__world_bank__fao__2022
+    (archived)
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/5651
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 8d5f6225d3a16945c9f31296c2e021f5
-  size: 23788
+- md5: cb6cc0503dc8c6df27bbc53c43cb80b0
+  size: 26814
   path: dataset_5651_food_affordability__world_bank__fao__2022_config.json

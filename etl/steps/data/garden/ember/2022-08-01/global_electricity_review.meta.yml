@@ -4,20 +4,19 @@ dataset:
   title: Global Electricity Review (Ember, 2022)
   short_name: global_electricity_review
   description: |
-    <a href="https://ember-climate.org/countries-and-regions/">Ember's region definitions</a>, denoted with "(Ember)", are:
+    [Ember's region definitions](https://ember-climate.org/countries-and-regions/), denoted with "(Ember)", are:
+
     * "G20 (Ember)" - Group of Twenty: Argentina, Australia, Brazil, Canada, China, France, Germany, India, Indonesia, Italy, Japan, Mexico, Russia, Saudi Arabia, South Africa, South Korea, Turkey, United Kingdom, United States and the 27 members of the European Union.
     * "G7 (Ember)" - Group of Seven: Canada, France, Germany, Italy, Japan, United Kingdom and United States.
     * "Latin America and Caribbean (Ember)": Antigua and Barbuda, Argentina, Bahamas, Barbados, Belize, Bolivia, Brazil, Chile, Colombia, Costa Rica, Cuba, Dominica, Dominican Republic, Ecuador, El Salvador, Grenada, Guatemala, Guyana, Haiti, Honduras, Jamaica, Mexico, Nicaragua, Panama, Paraguay, Peru, Saint Kitts and Nevis, Saint Lucia, Saint Vincent and the Grenadines, Suriname, Trinidad and Tobago, Uruguay, Venezuela, Aruba, British Virgin Islands, Cayman Islands, Falkland Islands, French Guiana, Guadeloupe, Martinique, Montserrat, Puerto Rico, Turks and Caicos Islands and United States Virgin Islands.
     * "Middle East (Ember)": Bahrain, Iran, Iraq, Israel, Jordan, Kuwait, Lebanon, Oman, Palestine, Qatar, Saudi Arabia, Syria, United Arab Emirates and Yemen.
     * "OECD (Ember)" - Organization For Economic Co-operation and Development: Austria, Belgium, Czech Republic, Denmark, Estonia, Finland, France, Germany, Greece, Hungary, Iceland, Ireland, Italy, Latvia, Lithuania, Luxembourg, Netherlands, Norway, Poland, Portugal, Slovakia, Slovenia, Spain, Sweden, Switzerland, Turkey, United Kingdom, Australia, Canada, Chile, Colombia, Israel, Japan, Mexico, New Zealand, South Korea, and United States.
   sources:
-    -
-      name: Our World in Data based on Ember's Global Electricity Review (2022).
-      published_by: Ember
-      publication_year: 2022
-      date_accessed: 2022-08-01
-      url: https://ember-climate.org/data-catalogue/yearly-electricity-data/
-
+  - name: Our World in Data based on Ember's Global Electricity Review (2022).
+    published_by: Ember
+    publication_year: 2022
+    date_accessed: 2022-08-01
+    url: https://ember-climate.org/data-catalogue/yearly-electricity-data/
 tables:
   capacity:
     variables:
@@ -133,38 +132,38 @@ tables:
     variables:
       clean__pct:
         title: Clean (%)
-        short_unit: "%"
-        unit: "%"
+        short_unit: '%'
+        unit: '%'
         display:
           name: Clean
       fossil__pct:
         title: Fossil (%)
-        short_unit: "%"
-        unit: "%"
+        short_unit: '%'
+        unit: '%'
         display:
           name: Fossil
       gas_and_other_fossil__pct:
         title: Gas and Other Fossil (%)
-        short_unit: "%"
-        unit: "%"
+        short_unit: '%'
+        unit: '%'
         display:
           name: Gas and Other Fossil
       hydro__bioenergy_and_other_renewables__pct:
         title: Hydro, Bioenergy and Other Renewables (%)
-        short_unit: "%"
-        unit: "%"
+        short_unit: '%'
+        unit: '%'
         display:
           name: Hydro, Bioenergy and Other Renewables
       renewables__pct:
         title: Renewables (%)
-        short_unit: "%"
-        unit: "%"
+        short_unit: '%'
+        unit: '%'
         display:
           name: Renewables
       wind_and_solar__pct:
         title: Wind and Solar (%)
-        short_unit: "%"
-        unit: "%"
+        short_unit: '%'
+        unit: '%'
         display:
           name: Wind and Solar
       clean__twh:
@@ -205,56 +204,56 @@ tables:
           name: Wind and Solar
       bioenergy__pct:
         title: Bioenergy (%)
-        short_unit: "%"
-        unit: "%"
+        short_unit: '%'
+        unit: '%'
         display:
           name: Bioenergy
       coal__pct:
         title: Coal (%)
-        short_unit: "%"
-        unit: "%"
+        short_unit: '%'
+        unit: '%'
         display:
           name: Coal
       gas__pct:
         title: Gas (%)
-        short_unit: "%"
-        unit: "%"
+        short_unit: '%'
+        unit: '%'
         display:
           name: Gas
       hydro__pct:
         title: Hydro (%)
-        short_unit: "%"
-        unit: "%"
+        short_unit: '%'
+        unit: '%'
         display:
           name: Hydro
       nuclear__pct:
         title: Nuclear (%)
-        short_unit: "%"
-        unit: "%"
+        short_unit: '%'
+        unit: '%'
         display:
           name: Nuclear
       other_fossil__pct:
         title: Other Fossil (%)
-        short_unit: "%"
-        unit: "%"
+        short_unit: '%'
+        unit: '%'
         display:
           name: Other Fossil
       other_renewables__pct:
         title: Other Renewables (%)
-        short_unit: "%"
-        unit: "%"
+        short_unit: '%'
+        unit: '%'
         display:
           name: Other Renewables
       solar__pct:
         title: Solar (%)
-        short_unit: "%"
-        unit: "%"
+        short_unit: '%'
+        unit: '%'
         display:
           name: Solar
       wind__pct:
         title: Wind (%)
-        short_unit: "%"
-        unit: "%"
+        short_unit: '%'
+        unit: '%'
         display:
           name: Wind
       bioenergy__twh:

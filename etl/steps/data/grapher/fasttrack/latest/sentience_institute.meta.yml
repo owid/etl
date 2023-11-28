@@ -1,0 +1,55 @@
+dataset:
+  title: Survey attitudes to livestock farming (Sentience Institute)
+  description: ''
+  licenses:
+    - {}
+  sources:
+    - name: 'Sentience Institute. Animals, Food, and Technology (AFT) Survey: 2021 Update.'
+      url: https://www.sentienceinstitute.org/aft-survey-2021
+      publication_year: '2021'
+      published_by: Sentience Institute
+tables:
+  sentience_institute:
+    variables:
+      strongly_agree:
+        title: Strongly agree
+        unit: ''
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 0
+      agree:
+        title: Agree
+        unit: ''
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 0
+      somewhat_agree:
+        title: Somewhat agree
+        unit: ''
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 0
+      no_opinion:
+        title: No opinion
+        unit: ''
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 0
+      somewhat_disagree:
+        title: Somewhat disagree
+        unit: ''
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 0
+      disagree:
+        title: Disagree
+        unit: ''
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 0
+      strongly_disagree:
+        title: Strongly disagree
+        unit: ''
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 0

@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1735
+    date_accessed: 2023-08-16 07:21:20.785606
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1735_major_depressive_disorder (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: dc430a6d6b49ab2b625b18767ede552f
+  size: 16733
+  path: dataset_1735_major_depressive_disorder_config.json

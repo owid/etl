@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5156
+    date_accessed: 2023-08-16 08:01:13.835550
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_5156_primary_energy_consumption__bp__and__shift__2020
+    (archived)
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: b7ae32df323e352a70a4f29b17228199
+  size: 6906
+  path: dataset_5156_primary_energy_consumption__bp__and__shift__2020_config.json

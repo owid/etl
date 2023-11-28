@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5849
+    date_accessed: 2023-08-14 15:42:37.381313
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Long-term homicide rates in Europe - Eisner (2014)
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 391a6854548ec39b5cab40fa82a14370
+  size: 7458
+  path: dataset_5849_long_term_homicide_rates_in_europe__eisner__2014_values.feather

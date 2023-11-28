@@ -1,5 +1,4 @@
-from owid.datautils.ui import red, blue, bail, log
-
+from owid.datautils.ui import bail, blue, log, red
 
 mock_strs = ["Test", "1", "Something + weird-no particulár meaning"]
 

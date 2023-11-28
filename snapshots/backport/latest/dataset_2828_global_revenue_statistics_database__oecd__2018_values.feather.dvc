@@ -1,18 +1,14 @@
 meta:
-  namespace: backport
-  short_name: dataset_2828_global_revenue_statistics_database__oecd__2018_values
-  file_extension: feather
-  date_accessed: 2023-02-23 19:49:19.767059
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2828
+    date_accessed: 2023-08-09 14:56:44.883002
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Global Revenue Statistics Database - OECD (2018)
   description: '2021 vintage (22-04-21) available at: https://stats.oecd.org/Index.aspx?DataSetCode=REV#'
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/2828
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: dec381d5e1b474652345339ef020d03b
+- md5: 671432f6d04c3259b52ced95602f3905
   size: 113290
   path: dataset_2828_global_revenue_statistics_database__oecd__2018_values.feather

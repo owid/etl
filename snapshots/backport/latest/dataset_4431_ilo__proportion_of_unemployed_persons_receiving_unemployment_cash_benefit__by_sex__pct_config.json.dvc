@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4431
+    date_accessed: 2023-08-10 14:43:52.831833
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_4431_ilo__proportion_of_unemployed_persons_receiving_unemployment_cash_benefit__by_sex__pct
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 496f3125387a401a0eddb92b90778d01
+  size: 3577
+  path: 
+    dataset_4431_ilo__proportion_of_unemployed_persons_receiving_unemployment_cash_benefit__by_sex__pct_config.json

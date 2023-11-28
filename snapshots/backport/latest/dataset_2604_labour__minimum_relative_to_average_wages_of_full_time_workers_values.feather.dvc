@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2604
+    date_accessed: 2023-08-14 16:11:01.809819
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Labour - Minimum relative to average wages of full-time workers
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: d5cda00da23a9771628e081eb655ef99
+  size: 15378
+  path: 
+    dataset_2604_labour__minimum_relative_to_average_wages_of_full_time_workers_values.feather

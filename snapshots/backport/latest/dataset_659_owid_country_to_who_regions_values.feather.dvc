@@ -1,20 +1,16 @@
 meta:
-  namespace: backport
-  short_name: dataset_659_owid_country_to_who_regions_values
-  file_extension: feather
-  date_accessed: 2023-06-01 15:30:14.314354
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/659
+    date_accessed: 2023-08-10 08:59:11.158241
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: OWID country to WHO regions
   description: WHO groups countries in different regions, and provides information
     on various variables according to this classification. This dataset changes country
     names to OWID names and matches them to WHO regions.
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/659
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: a09062b520ccdb0ed167341c84fee062
+- md5: f9a160f4bb073cc924d5ab5286b0d8e8
   size: 13122
   path: dataset_659_owid_country_to_who_regions_values.feather

@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2980
+    date_accessed: 2023-08-16 10:06:17.425169
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Communicable Diseases – Disability Adjusted Life Years (WHO (2015)) (split)
+  description: ''
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 3f1e01032fa478106fdde469e07efae9
+  size: 13850
+  path: 
+    dataset_2980_communicable_diseases__disability_adjusted_life_years__who__2015__split_values.feather

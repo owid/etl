@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5004
+    date_accessed: 2023-08-14 05:36:20.542592
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_5004_agri_environmental_indicators__emissions_intensities
+    (archived)
+  description: Intensities of greenhouse gas (GHG) emissions by unit of product for
+    a selection of agricultural commodities.
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 619420a91486ad35a8a8b0573791fb78
+  size: 42628
+  path: dataset_5004_agri_environmental_indicators__emissions_intensities_config.json

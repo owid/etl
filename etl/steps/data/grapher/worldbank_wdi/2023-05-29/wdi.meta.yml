@@ -1,0 +1,239 @@
+definitions:
+  # NOTE: we'd like to move this to snapshot, but it's impractical because there are
+  # tons of other downstream datasets that still use sources
+  wdi_origin: &wdi_origin
+    producer: World Bank World Development Indicators
+    title: UNICEF; World Health Organization; World Bank
+    description: |-
+      The World Development Indicators (WDI) is the World Bank's primary collection of development indicators, compiled from officially-recognized international sources. It presents the most current and accurate global development data available and includes national, regional, and global estimates.
+
+      [Text from [World Bank data catalog](https://datacatalog.worldbank.org/dataset/world-development-indicators)]
+    citation_full: World Development Indicators, The World Bank (2023).
+    url_main: https://datacatalog.worldbank.org/search/dataset/0037712/World-Development-Indicators
+    url_download: http://databank.worldbank.org/data/download/WDI_csv.zip
+    date_accessed: '2023-05-29'
+    date_published: '2023-05-11'
+    license:
+      name: CC BY 4.0
+      url: https://www.worldbank.org/en/about/legal/terms-of-use-for-datasets
+
+dataset:
+  update_period_days: 365
+  sources: []
+
+tables:
+  wdi:
+    variables:
+      it_net_user_zs:
+        sources: []
+        origins:
+          - *wdi_origin
+        title: Individuals using the Internet (% of population)
+        description_short: Share of the population who used the Internet in the last three months.
+        description_from_producer: >-
+          Internet users are individuals who have used the Internet (from any location)
+          in the last 3 months. The Internet can be used via a computer, mobile phone,
+          personal digital assistant, games machine, digital TV etc.
+
+          Limitations and exceptions: Operators have traditionally been the main source
+          of telecommunications data, so information on subscriptions has been widely
+          available for most countries. This gives a general idea of access, but a more
+          precise measure is the penetration rate - the share of households with access
+          to telecommunications. During the past few years more information on
+          information and communication technology use has become available from
+          household and business surveys. Also important are data on actual use of
+          telecommunications services. Ideally, statistics on telecommunications (and
+          other information and communications technologies) should be compiled for all
+          three measures: subscriptions, access, and use. The quality of data varies
+          among reporting countries as a result of differences in regulations covering
+          data provision and availability.
+
+          Discrepancies may also arise in cases where the end of a fiscal year differs
+          from that used by ITU, which is the end of December of every year. A number of
+          countries have fiscal years that end in March or June of every
+          year.
+
+          Statistical concept and methodology: The Internet is a world-wide public
+          computer network. It provides access to a number of communication services
+          including the World Wide Web and carries email, news, entertainment and data
+          files, irrespective of the device used (not assumed to be only via a computer -
+          it may also be by mobile phone, PDA, games machine, digital TV etc.). Access
+          can be via a fixed or mobile network. For additional/latest information on
+          sources and country notes, please also refer to:
+          https://www.itu.int/en/ITU-D/Statistics/Pages/stat/default.aspx
+
+          [Text from [World Bank World Development Indicators metadata](https://databank.worldbank.org/metadataglossary/world-development-indicators/series/IT.NET.USER.ZS)]
+        short_unit: '%'
+        unit: '% of population'
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+        description_key:
+          - An Internet user is defined by the International Telecommunication Union as anyone
+            who has accessed the Internet from any location in the last three months.
+          - This can be from any type of device, including a computer, mobile phone, personal digital
+            assistant, games machine, digital TV, and other technological devices.
+        processing_level: minor
+        presentation:
+          title_public: Share of the population using the Internet
+          # title_variant: WDI
+          title_variant: International Telecommunication Union
+          # attribution: # defaults to origin[*].producer so does not have to be set here
+          topic_tags:
+          - Internet
+          - Technological Change
+          - Loneliness & Social Connections
+          faqs: []
+          grapher_config:
+            title: Share of the population using the Internet
+            subtitle: 'Share of the population who [used the Internet](#dod:internetuser) in the last three months.'
+            timelineMinTime: 1990
+            sourceDesc: International Telecommunication Union (via World Bank)
+            originUrl: https://ourworldindata.org/internet
+            hideAnnotationFieldsInTitle:
+              time: true
+              entity: true
+              changeInPrefix: true
+            hasMapTab: true
+            yAxis:
+              min: 0
+              max: 100
+            map:
+              timeTolerance: 5
+              colorScale:
+                  baseColorScheme: Blues
+                  colorSchemeInvert: false
+                  binningStrategy: manual
+                  customNumericMinValue: 0
+                  customNumericValues:
+                    - 10
+                    - 20
+                    - 30
+                    - 40
+                    - 50
+                    - 60
+                    - 70
+                    - 80
+                    - 90
+                    - 100
+                  customNumericLabels:
+                    - ''
+                    - ''
+                    - ''
+                    - ''
+                    - ''
+                    - ''
+                    - ''
+                    - ''
+                    - ''
+                    - ''
+                  legendDescription: Individuals using the Internet (% of population)
+            selectedEntityNames:
+              - South Asia (WB)
+              - North America (WB)
+              - Sub-Saharan Africa (WB)
+              - East Asia and Pacific (WB)
+              - Middle East and North Africa (WB)
+              - Europe and Central Asia (WB)
+              - Latin America and Caribbean (WB)
+              - World
+      sh_sta_stnt_zs:
+        sources: []
+        origins:
+          - *wdi_origin
+        # title: Prevalence of stunting, height for age (% of children under 5)
+        title: Share of children who are stunted
+        unit: '% of children under 5'
+        short_unit: '%'
+        description_short: |-
+          The share of children younger than five years old whose growth is stunted.
+        # description: Prevalence of stunting is the percentage of children under age 5 whose height for age is more than two
+        #   standard deviations below the median for the international reference population ages 0-59 months. For children up
+        #   to two years old height is measured by recumbent length. For older children height is measured by stature while
+        #   standing. The data are based on the WHO's new child growth standards released in 2006.
+        description_key:
+          - Stunting is when a child is significantly shorter than the average for their age.
+          - Stunted growth is a consequence of poor nutrition and/or repeated infection.
+        description_from_producer: |-
+          Prevalence of stunting is the percentage of children under age 5 whose height for age is more than two standard deviations below the median for the international reference population ages 0-59 months. For children up to two years old height is measured by recumbent length. For older children height is measured by stature while standing. The data are based on the WHO's new child growth standards released in 2006.
+
+
+          [Text from World Bank World Development Indicators [metadata glossary](https://databank.worldbank.org/metadataglossary/world-development-indicators/series/SH.STA.STNT.ZS)]
+        presentation:
+          title_public: Share of children who are stunted
+          # title_variant: UNICEF/WHO
+          attribution: UNICEF; World Health Organization; World Bank
+          attribution_short: UNICEF/WHO (via World Bank)
+          topic_tags:
+            - Hunger & Undernourishment
+            - Micronutrient Deficiency
+          faqs:
+            - fragment_id: stunting-definition
+              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+            - fragment_id: stunting-measurement
+              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+            - fragment_id: stunting-causes
+              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+          grapher_config:
+            slug: share-of-children-younger-than-5-who-suffer-from-stunting
+            title: 'Malnutrition: Share of children who are stunted'
+            subtitle: >-
+              The share of children younger than five years old that are defined as stunted.
+              [Stunting](#dod:stunting) is when a child is significantly shorter than the
+              average for their age. It is a consequence of poor nutrition and/or repeated
+              infection.
+            sourceDesc: UNICEF, World Health Organization and World Bank
+            hideAnnotationFieldsInTitle:
+              time: true
+              entity: true
+              changeInPrefix: true
+            hasMapTab: true
+            tab: map
+            variantName: United Nations
+            originUrl: https://ourworldindata.org/hunger-and-undernourishment
+            yAxis:
+              min: 0
+              max: 0
+            map:
+              columnSlug: '735978'
+              timeTolerance: 5
+              colorScale:
+                baseColorScheme: YlOrRd
+                binningStrategy: manual
+                customNumericMinValue: 0
+                customNumericValues:
+                  - 10
+                  - 20
+                  - 30
+                  - 40
+                  - 50
+                  - 60
+                  - 70
+                  - 80
+                customNumericLabels:
+                  - ''
+                  - ''
+                  - ''
+                  - ''
+                  - ''
+                  - ''
+                  - ''
+                  - ''
+                  - ''
+                  - ''
+                customNumericColors:
+                  - null
+                  - null
+                legendDescription: Prevalence of stunting (% of children under 5)
+            selectedEntityNames:
+              - China
+              - Colombia
+              - Kenya
+              - Peru
+              - Bangladesh
+              - United States
+            relatedQuestions:
+              - url: >-
+                  https://ourworldindata.org/grapher/share-of-children-younger-than-5-who-suffer-from-stunting#faqs
+                text: FAQs on this data
+            $schema: https://files.ourworldindata.org/schemas/grapher-schema.003.json

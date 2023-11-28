@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1600
+    date_accessed: 2023-08-16 09:25:48.675229
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Polycystic ovarian syndrome
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: f97fada62f475836c15764d2ebc4f487
+  size: 1229338
+  path: dataset_1600_polycystic_ovarian_syndrome_values.feather

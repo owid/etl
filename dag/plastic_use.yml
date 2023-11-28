@@ -1,0 +1,103 @@
+steps:
+  # OECD plastic production and plastic waste datasets
+  data://meadow/oecd/2023-09-21/plastic_fate_regions:
+    - snapshot://oecd/2023-09-21/plastic_fate_regions.csv
+  data://garden/oecd/2023-09-21/plastic_fate_regions:
+    - data://meadow/oecd/2023-09-21/plastic_fate_regions
+  data://grapher/oecd/2023-09-21/plastic_fate_regions:
+    - data://garden/oecd/2023-09-21/plastic_fate_regions
+
+  data://meadow/oecd/2023-09-21/plastic_waste_2019:
+    - snapshot://oecd/2023-09-21/plastic_waste_2019.csv
+  data://garden/oecd/2023-09-21/plastic_waste_2019:
+    - data://meadow/oecd/2023-09-21/plastic_waste_2019
+  data://grapher/oecd/2023-09-21/plastic_waste_2019:
+    - data://garden/oecd/2023-09-21/plastic_waste_2019
+
+  data://garden/oecd/2023-09-21/plastic_waste_2019_by_polymer:
+    - data://meadow/oecd/2023-09-21/plastic_waste_2019
+  data://grapher/oecd/2023-09-21/plastic_waste_2019_by_polymer:
+    - data://garden/oecd/2023-09-21/plastic_waste_2019_by_polymer
+
+  data://meadow/oecd/2023-09-21/plastic_aquatic_leakage:
+    - snapshot://oecd/2023-09-21/plastic_aquatic_leakage.csv
+  data://garden/oecd/2023-09-21/plastic_aquatic_leakage:
+    - data://meadow/oecd/2023-09-21/plastic_aquatic_leakage
+  data://grapher/oecd/2023-09-21/plastic_aquatic_leakage:
+    - data://garden/oecd/2023-09-21/plastic_aquatic_leakage
+
+  data://meadow/oecd/2023-09-21/plastic_emissions:
+    - snapshot://oecd/2023-09-21/plastic_emissions.csv
+  data://garden/oecd/2023-09-21/plastic_emissions:
+    - data://meadow/oecd/2023-09-21/plastic_emissions
+  data://grapher/oecd/2023-09-21/plastic_emissions:
+    - data://garden/oecd/2023-09-21/plastic_emissions
+
+  data://meadow/oecd/2023-09-21/plastic_use_application:
+    - snapshot://oecd/2023-09-21/plastic_use_application.csv
+  data://garden/oecd/2023-09-21/plastic_use_application:
+    - data://meadow/oecd/2023-09-21/plastic_use_application
+  data://grapher/oecd/2023-09-21/plastic_use_application:
+    - data://garden/oecd/2023-09-21/plastic_use_application
+
+  data://meadow/oecd/2023-09-21/plastic_use_polymer:
+    - snapshot://oecd/2023-09-21/plastic_use_polymer.csv
+  data://garden/oecd/2023-09-21/plastic_use_polymer:
+    - data://meadow/oecd/2023-09-21/plastic_use_polymer
+  data://grapher/oecd/2023-09-21/plastic_use_polymer:
+    - data://garden/oecd/2023-09-21/plastic_use_polymer
+
+
+  data://meadow/oecd/2023-09-21/plastic_use_projections:
+    - snapshot://oecd/2023-09-21/plastic_use_projections.csv
+  data://garden/oecd/2023-09-21/plastic_use_projections:
+    - data://meadow/oecd/2023-09-21/plastic_use_projections
+  data://grapher/oecd/2023-09-21/plastic_use_projections:
+    - data://garden/oecd/2023-09-21/plastic_use_projections
+
+
+  data://meadow/oecd/2023-09-21/plastic_fate_regions_projections:
+    - snapshot://oecd/2023-09-21/plastic_fate_regions_projections.csv
+  data://garden/oecd/2023-09-21/plastic_fate_regions_projections:
+    - data://meadow/oecd/2023-09-21/plastic_fate_regions_projections
+  data://grapher/oecd/2023-09-21/plastic_fate_regions_projections:
+    - data://garden/oecd/2023-09-21/plastic_fate_regions_projections
+
+
+  data://meadow/oecd/2023-09-21/plastic_environment_leakage_projections:
+    - snapshot://oecd/2023-09-21/plastic_environment_leakage_projections.csv
+  data://garden/oecd/2023-09-21/plastic_environment_leakage_projections:
+    - data://meadow/oecd/2023-09-21/plastic_environment_leakage_projections
+  data://grapher/oecd/2023-09-21/plastic_environment_leakage_projections:
+    - data://garden/oecd/2023-09-21/plastic_environment_leakage_projections
+
+
+  data://meadow/oecd/2023-09-21/plastic_aquatic_leakage_projections:
+    - snapshot://oecd/2023-09-21/plastic_aquatic_leakage_projections.csv
+  data://garden/oecd/2023-09-21/plastic_aquatic_leakage_projections:
+    - data://meadow/oecd/2023-09-21/plastic_aquatic_leakage_projections
+  data://grapher/oecd/2023-09-21/plastic_aquatic_leakage_projections:
+    - data://garden/oecd/2023-09-21/plastic_aquatic_leakage_projections
+
+  # Geyer et al. 2017 historical plastic production
+  data://meadow/plastic_waste/2023-09-26/geyer_2017:
+    - snapshot://plastic_waste/2023-09-26/geyer_2017.pdf
+  data://garden/plastic_waste/2023-09-26/geyer_2017:
+    - data://meadow/plastic_waste/2023-09-26/geyer_2017
+    - data://garden/oecd/2023-09-21/plastic_use_application
+  data://grapher/plastic_waste/2023-09-26/geyer_2017:
+    - data://garden/plastic_waste/2023-09-26/geyer_2017
+
+  # UN Comstat plastic trade dataset
+  data://meadow/un/2023-10-09/plastic_waste:
+    - snapshot://un/2023-10-09/plastic_waste_1987_1998.csv
+    - snapshot://un/2023-10-09/plastic_waste_1999_2010.csv
+    - snapshot://un/2023-10-09/plastic_waste_2011_2022.csv
+  data://garden/un/2023-10-09/plastic_waste:
+    - data://meadow/un/2023-10-09/plastic_waste
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2023-04-30/income_groups
+    - data://garden/demography/2023-03-31/population
+
+  data://grapher/un/2023-10-09/plastic_waste:
+    - data://garden/un/2023-10-09/plastic_waste

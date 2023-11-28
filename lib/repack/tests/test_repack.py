@@ -3,14 +3,13 @@ from typing import Any
 import numpy as np
 import pandas as pd
 import pytest
-from owid import repack
 from pandas.testing import assert_frame_equal
+
+from owid import repack
 
 
 def test_repack_non_object_columns():
-    df = pd.DataFrame(
-        {"myint": [1, 2, 3], "myfloat": [1.0, 2.2, 3.0], "mycat": ["a", "b", "c"]}
-    )
+    df = pd.DataFrame({"myint": [1, 2, 3], "myfloat": [1.0, 2.2, 3.0], "mycat": ["a", "b", "c"]})
     df["mycat"] = df["mycat"].astype("category")
 
     df2 = df.copy()
@@ -217,3 +216,13 @@ def test_repack_float64_all_nans():
     s = pd.Series([np.nan, np.nan, np.nan], dtype="float64")
     v = repack.repack_series(s)
     assert v.dtype.name == "Int8"
+
+
+def test_series_eq():
+    a = pd.Series([1, np.nan], dtype="float64")
+    b = pd.Series([2, np.nan], dtype="float64")
+    assert not repack.series_eq(a, b, cast=float)
+
+    a = pd.Series([1, np.nan], dtype="float64")
+    b = pd.Series([1, np.nan], dtype="float64")
+    assert repack.series_eq(a, b, cast=float)

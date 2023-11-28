@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1786
+    date_accessed: 2023-08-16 10:26:55.842647
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Occupational exposure to secondhand smoke
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 5ede1dcc546c4cd38e954992fabf7963
+  size: 243306
+  path: dataset_1786_occupational_exposure_to_secondhand_smoke_values.feather

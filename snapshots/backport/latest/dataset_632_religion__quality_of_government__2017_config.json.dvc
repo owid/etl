@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/632
+    date_accessed: 2023-08-16 08:42:02.694084
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_632_religion__quality_of_government__2017 (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: cb22eb6906aa2c474b848248a3e4d66b
+  size: 77476
+  path: dataset_632_religion__quality_of_government__2017_config.json

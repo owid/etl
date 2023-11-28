@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/869
+    date_accessed: 2023-08-14 05:52:29.964613
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_869_clio_infra__production__klein_goldewijk_and_fink_jensen__2015
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: cea95c845136339042bd55d9ead72faa
+  size: 15985
+  path: 
+    dataset_869_clio_infra__production__klein_goldewijk_and_fink_jensen__2015_config.json

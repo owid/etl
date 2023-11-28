@@ -7,8 +7,9 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, TypeVar, Union, cast
 
 import numpy as np
+import owid.catalog.processing as pr
 import pandas as pd
-from owid.catalog import Dataset, Table
+from owid.catalog import Dataset, Table, Variable
 from owid.datautils.common import ExceptionFromDocstring, warn_on_list_of_entities
 from owid.datautils.dataframes import groupby_agg, map_series
 from owid.datautils.io.json import load_json
@@ -44,13 +45,12 @@ TNAME_WB_INCOME = "wb_income_group"
 
 
 @functools.lru_cache
-def _load_population() -> pd.DataFrame:
+def _load_population() -> Table:
     ####################################################################################################################
     # WARNING: This function is deprecated. All datasets should be loaded using PathFinder.
     ####################################################################################################################
     population = Dataset(DATASET_POPULATION)[TNAME_KEY_INDICATORS]
-    population = population.reset_index()
-    return cast(pd.DataFrame, population)
+    return population.reset_index()
 
 
 @functools.lru_cache
@@ -191,7 +191,7 @@ def list_countries_in_region_that_must_have_data(
 
     # Select population data for reference year for all countries in the region.
     reference = (
-        population[(population["country"].isin(members)) & (population["year"] == reference_year)]
+        population[(population["country"].isin(members)) & (population["year"] == reference_year)]  # type: ignore
         .dropna(subset="population")
         .sort_values("population", ascending=False)
         .reset_index(drop=True)
@@ -229,7 +229,7 @@ def list_countries_in_region_that_must_have_data(
 
 
 def add_region_aggregates(
-    df: pd.DataFrame,
+    df: TableOrDataFrame,
     region: str,
     countries_in_region: Optional[List[str]] = None,
     countries_that_must_have_data: Optional[List[str]] = None,
@@ -240,7 +240,7 @@ def add_region_aggregates(
     aggregations: Optional[Dict[str, Any]] = None,
     keep_original_region_with_suffix: Optional[str] = None,
     population: Optional[pd.DataFrame] = None,
-) -> pd.DataFrame:
+) -> TableOrDataFrame:
     """Add data for regions (e.g. income groups or continents) to a dataset.
 
     If data for a region already exists in the dataset, it will be replaced.
@@ -320,28 +320,27 @@ def add_region_aggregates(
     variables = list(aggregations)
 
     # Initialise dataframe of added regions, and add variables one by one to it.
-    df_region = pd.DataFrame({country_col: [], year_col: []}).astype(dtype={country_col: "object", year_col: "int"})
+    # df_region = Table({country_col: [], year_col: []}).astype(dtype={country_col: "object", year_col: "int"})
     # Select data for countries in the region.
     df_countries = df[df[country_col].isin(countries_in_region)]
-    for variable in variables:
-        df_added = groupby_agg(
-            df=df_countries,
-            groupby_columns=year_col,
-            aggregations={
-                country_col: lambda x: set(countries_that_must_have_data).issubset(set(list(x))),
-                variable: aggregations[variable],
-            },
-            num_allowed_nans=num_allowed_nans_per_year,
-            frac_allowed_nans=frac_allowed_nans_per_year,
-        ).reset_index()
-        # Make nan all aggregates if the most contributing countries were not present.
-        df_added.loc[~df_added[country_col], variable] = np.nan
-        # Replace the column that was used to check if most contributing countries were present by the region's name.
-        df_added[country_col] = region
-        # Include this variable to the dataframe of added regions.
-        df_region = pd.merge(df_region, df_added, on=[country_col, year_col], how="outer")
 
-    if type(keep_original_region_with_suffix) == str:
+    df_region = groupby_agg(
+        df=df_countries,
+        groupby_columns=year_col,
+        aggregations=dict(
+            **aggregations,
+            **{country_col: lambda x: set(countries_that_must_have_data).issubset(set(list(x)))},
+        ),
+        num_allowed_nans=num_allowed_nans_per_year,
+        frac_allowed_nans=frac_allowed_nans_per_year,
+    ).reset_index()
+
+    # Make nan all aggregates if the most contributing countries were not present.
+    df_region.loc[~df_region[country_col], variables] = np.nan
+    # Replace the column that was used to check if most contributing countries were present by the region's name.
+    df_region[country_col] = region
+
+    if isinstance(keep_original_region_with_suffix, str):
         # Keep rows in the original dataframe containing rows for region (adding a suffix to the region name), and then
         # append new rows for region.
         rows_original_region = df[country_col] == region
@@ -359,7 +358,11 @@ def add_region_aggregates(
     # Sort conveniently.
     df_updated = df_updated.sort_values([country_col, year_col]).reset_index(drop=True)
 
-    return df_updated
+    # If the original was Table, copy metadata
+    if isinstance(df, Table):
+        return Table(df_updated).copy_metadata(df)
+    else:
+        return df_updated  # type: ignore
 
 
 def harmonize_countries(
@@ -432,7 +435,7 @@ def harmonize_countries(
         df_harmonized = df_harmonized[~df_harmonized[country_col].isin(excluded_countries)]
 
     # Harmonize all remaining country names.
-    df_harmonized[country_col] = map_series(
+    country_harmonized = map_series(
         series=df_harmonized[country_col],
         mapping=countries,
         make_unmapped_values_nan=make_missing_countries_nan,
@@ -441,11 +444,21 @@ def harmonize_countries(
         show_full_warning=show_full_warning,
     )
 
+    # Put back metadata and add processing log.
+    if isinstance(df_harmonized, Table):
+        country_harmonized = Variable(
+            country_harmonized, name=country_col, metadata=df_harmonized[country_col].metadata
+        ).update_log(
+            operation="harmonize",
+        )
+
+    df_harmonized[country_col] = country_harmonized
+
     return df_harmonized  # type: ignore
 
 
 def add_population_to_dataframe(
-    df: pd.DataFrame,
+    df: TableOrDataFrame,
     ds_population: Optional[Dataset] = None,
     country_col: str = "country",
     year_col: str = "year",
@@ -454,12 +467,12 @@ def add_population_to_dataframe(
     show_full_warning: bool = True,
     interpolate_missing_population: bool = False,
     expected_countries_without_population: Optional[List[str]] = None,
-) -> pd.DataFrame:
+) -> TableOrDataFrame:
     """Add column of population to a dataframe.
 
     Parameters
     ----------
-    df : pd.DataFrame
+    df : TableOrDataFrame
         Original dataframe that contains a column of country names and years.
     ds_population : Dataset or None
         Population dataset.
@@ -530,9 +543,15 @@ def add_population_to_dataframe(
         )
 
     # Add population to original dataframe.
-    df_with_population = pd.merge(df, population, on=[country_col, year_col], how="left")
+    merge = pr.merge if isinstance(df, Table) else pd.merge
 
-    return df_with_population
+    if population.index.names != [None]:
+        # If population has a multiindex, we need to reset it before merging.
+        population = population.reset_index()
+
+    df_with_population = merge(df, population, on=[country_col, year_col], how="left")
+
+    return cast(TableOrDataFrame, df_with_population)
 
 
 def add_population_to_table(
@@ -598,11 +617,6 @@ def add_population_to_table(
     tb_with_population[population_col] = tb_with_population[population_col].copy_metadata(
         ds_population["population"]["population"]
     )
-
-    ####################################################################################################################
-    # NOTE: Currently, column "population" in table "population" does not have licenses. Manually add them.
-    tb_with_population[population_col].metadata.licenses = ds_population.metadata.licenses
-    ####################################################################################################################
 
     return tb_with_population
 
@@ -705,25 +719,24 @@ def list_members_of_region(
     if excluded_members is None:
         excluded_members = []
 
-    # Get main tables from the regions dataset.
-    df_region_definitions = pd.DataFrame(ds_regions["definitions"]).reset_index()
-    df_region_members = pd.DataFrame(ds_regions["members"]).reset_index()
+    # Get the main table from the regions dataset.
+    tb_regions = ds_regions["regions"][["name", "members"]]
 
-    # Get a mapping from region code to name.
-    region_names = df_region_definitions.set_index("code").to_dict()["name"]
+    # Get a mapping from code to region name.
+    mapping = tb_regions["name"].to_dict()
 
-    # Map each region code to its name, and each member code to its name.
-    df_countries_in_region = df_region_members.copy()
-    df_countries_in_region["region"] = map_series(
-        df_countries_in_region["code"], mapping=region_names, warn_on_missing_mappings=True
-    )
-    df_countries_in_region["member"] = map_series(
-        df_countries_in_region["member"], mapping=region_names, warn_on_missing_mappings=True
-    )
+    # Convert strings of lists of members into lists of aliases.
+    tb_regions["members"] = [json.loads(member) if pd.notnull(member) else [] for member in tb_regions["members"]]
+
+    # Explode list of members to have one row per member.
+    tb_regions = tb_regions.explode("members").dropna()
+
+    # Map member codes to names.
+    tb_regions["members"] = map_series(series=tb_regions["members"], mapping=mapping, warn_on_missing_mappings=True)
 
     # Create a column with the list of members in each region
-    df_countries_in_region = (
-        df_countries_in_region.rename(columns={"member": "members"})
+    tb_countries_in_region = (
+        tb_regions.rename(columns={"name": "region"})
         .groupby("region", as_index=True, observed=True)
         .agg({"members": list})
     )
@@ -732,14 +745,12 @@ def list_members_of_region(
         if "wb_income_group" in ds_income_groups.table_names:
             # TODO: Remove this block once the old income groups dataset has been archived.
             # Get the main table from the income groups dataset.
-            df_income = (
-                pd.DataFrame(ds_income_groups["wb_income_group"])
-                .reset_index()
-                .rename(columns={"income_group": "classification"})
+            tb_income = (
+                ds_income_groups["wb_income_group"].reset_index().rename(columns={"income_group": "classification"})
             )
         elif "income_groups_latest" in ds_income_groups.table_names:
             # Get the table with the current definitions of income groups.
-            df_income = ds_income_groups["income_groups_latest"].reset_index()
+            tb_income = ds_income_groups["income_groups_latest"].reset_index()
         else:
             raise KeyError(
                 "Table 'income_groups_latest' not found. "
@@ -753,7 +764,7 @@ def list_members_of_region(
             # Keep only countries that are not in "income_groups_latest".
             # NOTE: This not only includes historical regions, but also countries that don't appear in
             # "income_groups_latest", like Venezuela.
-            historical_regions = historical_regions[~historical_regions["country"].isin(df_income["country"])]
+            historical_regions = historical_regions[~historical_regions["country"].isin(tb_income["country"])]
             # Keep only the latest income group classification of each historical region.
             historical_regions = (
                 historical_regions.sort_values(["country", "year"], ascending=True)
@@ -762,33 +773,33 @@ def list_members_of_region(
                 .reset_index(drop=True)
             )
             # Append historical regions to latest income group classifications.
-            df_income = pd.concat([df_income, historical_regions], ignore_index=True)
+            tb_income = pd.concat([tb_income, historical_regions], ignore_index=True)
 
         # Create a dataframe of countries in each income group.
-        df_countries_in_income_group = (
-            df_income.rename(columns={"classification": "region", "country": "members"})
+        tb_countries_in_income_group = (
+            tb_income.rename(columns={"classification": "region", "country": "members"})  # type: ignore
             .groupby("region", as_index=True, observed=True)
             .agg({"members": list})
         )
 
         # Create a dataframe of members in regions, including income groups.
-        df_countries_in_region = pd.concat([df_countries_in_region, df_countries_in_income_group], ignore_index=False)
+        tb_countries_in_region = pd.concat([tb_countries_in_region, tb_countries_in_income_group], ignore_index=False)
 
     # Get list of default members for the given region, if it's known.
-    if region in df_countries_in_region.index.tolist():
-        countries_set = set(df_countries_in_region.loc[region]["members"])
+    if region in tb_countries_in_region.index.tolist():
+        countries_set = set(tb_countries_in_region.loc[region]["members"])
     else:
         # Initialise an empty set of members.
         countries_set = set()
 
     # List countries from the list of regions included.
     countries_set |= set(
-        sum([df_countries_in_region.loc[region_included]["members"] for region_included in additional_regions], [])
+        sum([tb_countries_in_region.loc[region_included]["members"] for region_included in additional_regions], [])
     )
 
     # Remove all countries from the list of regions excluded.
     countries_set -= set(
-        sum([df_countries_in_region.loc[region_excluded]["members"] for region_excluded in excluded_regions], [])
+        sum([tb_countries_in_region.loc[region_excluded]["members"] for region_excluded in excluded_regions], [])
     )
 
     # Add the list of individual countries to be included.

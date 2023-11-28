@@ -1,3 +1,7 @@
+#
+dataset:
+  update_period_days: 365
+
 tables:
   wdi:
     variables:
@@ -1846,6 +1850,8 @@ tables:
         unit: scale 0 - 100
       iq_sci_ovrl:
         title: Statistical Capacity Score (Overall Average) (scale 0 - 100)
+        display:
+          numDecimalPlaces: 1
       iq_sci_prdc:
         title: Periodicity and timeliness assessment of statistical capacity (scale 0 - 100)
         unit: scale 0 - 100
@@ -1910,7 +1916,6 @@ tables:
         unit: per 1 million people
       it_net_user_zs:
         title: Individuals using the Internet (% of population)
-        short_unit: '%'
         unit: '% of population'
       lp_exp_durs_md:
         title: Lead time to export, median case (days)
@@ -1950,7 +1955,9 @@ tables:
       ms_mil_totl_tf_zs:
         title: Armed forces personnel (% of total labor force)
         short_unit: '%'
-        unit: '% of total labor force'
+        unit: '%'
+        display:
+          numDecimalPlaces: 1
       ms_mil_xpnd_cd:
         title: Military expenditure (current USD)
         unit: current USD
@@ -2500,20 +2507,35 @@ tables:
         title: GDP per capita (current US$)
         short_unit: $
         unit: current US$
+        presentation:
+          topic_tags:
+          - Economic Growth
       ny_gdp_pcap_cn:
         title: GDP per capita (current LCU)
         unit: current LCU
+        presentation:
+          topic_tags:
+          - Economic Growth
       ny_gdp_pcap_kd:
         title: GDP per capita (constant 2015 US$)
         short_unit: $
         unit: constant 2015 US$
+        presentation:
+          topic_tags:
+          - Economic Growth
       ny_gdp_pcap_kd_zg:
         title: GDP per capita growth (annual %)
         short_unit: '%'
         unit: annual %
+        presentation:
+          topic_tags:
+          - Economic Growth
       ny_gdp_pcap_kn:
         title: GDP per capita (constant LCU)
         unit: constant LCU
+        presentation:
+          topic_tags:
+          - Economic Growth
       ny_gdp_pcap_pp_cd:
         title: GDP per capita, PPP (current international $)
         short_unit: $
@@ -2521,6 +2543,9 @@ tables:
         display:
           name: GDP per capita
           numDecimalPlaces: 0
+        presentation:
+          topic_tags:
+          - Economic Growth
       ny_gdp_pcap_pp_kd:
         title: GDP per capita, PPP (constant 2017 international $)
         short_unit: $
@@ -2530,6 +2555,9 @@ tables:
           tolerance: 5
           isProjection: false
           numDecimalPlaces: 0
+        presentation:
+          topic_tags:
+          - Economic Growth
       ny_gdp_petr_rt_zs:
         title: Oil rents (% of GDP)
         short_unit: '%'
@@ -3600,8 +3628,8 @@ tables:
         unit: '%'
       sh_prv_smok:
         title: Prevalence of current tobacco use (% of adults)
-        short_unit: ages 15+
-        unit: ages 15+
+        short_unit: '%'
+        unit: '% of adults'
         display:
           name: Adults who smoke
       sh_prv_smok_fe:
@@ -4848,6 +4876,8 @@ tables:
         title: Completeness of birth registration (%)
         short_unit: '%'
         unit: '%'
+        display:
+          numDecimalPlaces: 1
       sp_reg_dths_zs:
         title: Completeness of death registration with cause-of-death information (%)
         short_unit: '%'
@@ -5272,4 +5302,3 @@ tables:
       omm_goods_exp_share_gdp: {}
       omm_tax_rev_percap: {}
       omm_net_savings_percap: {}
-

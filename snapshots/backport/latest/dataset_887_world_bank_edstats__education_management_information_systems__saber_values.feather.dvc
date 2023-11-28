@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/887
+    date_accessed: 2023-08-10 13:07:07.470945
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: World Bank EdStats - Education Management Information Systems (SABER)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 147235f6e850abfc83da6dd21615cef1
+  size: 7458
+  path: 
+    dataset_887_world_bank_edstats__education_management_information_systems__saber_values.feather

@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2342
+    date_accessed: 2023-08-14 08:15:48.606733
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Drowning
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: ee1ff41e64da3fc42e461ab53406b903
+  size: 2116386
+  path: dataset_2342_drowning_values.feather

@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5370
+    date_accessed: 2023-08-14 15:52:59.376832
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Global Carbon Budget - Global Carbon Project (2020)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 7411560ea70d9a5d8e839e8ee7060a8c
+  size: 4122250
+  path: dataset_5370_global_carbon_budget__global_carbon_project__2020_values.feather

@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/861
+    date_accessed: 2023-08-16 10:10:38.380439
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Fatal aviation accidents & fatalties - Aviation Safety Network (ASN)
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: a8975d4ce74c698bbe5f9b7e2ecf01b1
+  size: 10786
+  path: 
+    dataset_861_fatal_aviation_accidents__and__fatalties__aviation_safety_network__asn_values.feather

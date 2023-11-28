@@ -21,7 +21,7 @@ def run(dest_dir: str) -> None:
 
     # read dataset from meadow
     ds_meadow = Dataset(DATA_DIR / "meadow/papers/2022-11-03/zijdeman_et_al_2015")
-    tb_meadow = ds_meadow["zijdeman_et_al_2015"]
+    tb_meadow = ds_meadow["zijdeman_et_al_2015"].reset_index()
 
     # Create table
     tb_garden = make_table(tb_meadow)

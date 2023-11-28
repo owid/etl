@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4841
+    date_accessed: 2023-08-14 15:43:50.017927
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Proportion of children engaged in economic activity and household chores,
+    by sex and age (%)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: fa54cf672f2c4568b481d025583707cb
+  size: 10546
+  path: 
+    dataset_4841_proportion_of_children_engaged_in_economic_activity_and_household_chores__by_sex_and_age__pct_values.feather

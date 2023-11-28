@@ -1,11 +1,8 @@
 """Load a snapshot and create a meadow dataset."""
 
-import pandas as pd
-from owid.catalog import Table
 from structlog import get_logger
 
 from etl.helpers import PathFinder, create_dataset
-from etl.snapshot import Snapshot
 
 # Initialize logger.
 log = get_logger()
@@ -21,16 +18,17 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Retrieve snapshot.
-    snap: Snapshot = paths.load_dependency("war_brecke.xlsx")
+    snap = paths.load_snapshot("war_brecke.xlsx")
 
     # Load data from snapshot.
-    df = pd.read_excel(snap.path)
+    tb = snap.read_excel()
 
     #
     # Process data.
     #
     # Create a new table and ensure all columns are snake-case.
-    tb = Table(df, short_name=paths.short_name, underscore=True)
+    tb.metadata.short_name = paths.short_name
+    tb = tb.underscore()
 
     #
     # Save outputs.

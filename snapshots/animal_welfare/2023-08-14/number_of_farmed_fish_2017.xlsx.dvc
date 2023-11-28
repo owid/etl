@@ -1,0 +1,20 @@
+meta:
+  origin:
+    title_snapshot: Number of individual farmed fish (2017)
+    title: Number of individual farmed fish
+    description_snapshot: |-
+      Estimated number of individual fish in annual aquaculture production.
+    producer: Fishcount
+    citation_full: Fishcount.org.uk based on data from the Food and Agriculture
+      Organization of the United Nations.
+    url_main: http://fishcount.org.uk/
+    url_download: http://fishcount.org.uk/studydatascreens2/2017/Farmed-fishes-2017-v2.xlsx
+    date_published: '2018'
+    date_accessed: 2023-08-14
+  license:
+    name: CC BY
+wdir: ../../../data/snapshots/animal_welfare/2023-08-14
+outs:
+- md5: bf745d99e978d342cfb11b755a0a9387
+  size: 297434
+  path: number_of_farmed_fish_2017.xlsx

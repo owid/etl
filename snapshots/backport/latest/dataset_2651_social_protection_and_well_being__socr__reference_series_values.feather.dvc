@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2651
+    date_accessed: 2023-08-16 10:01:29.329981
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Social Protection and Well-being - SOCR - Reference series
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 4ddc82f41358a069761ea8fb86f4ced7
+  size: 25138
+  path: 
+    dataset_2651_social_protection_and_well_being__socr__reference_series_values.feather

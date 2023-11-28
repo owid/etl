@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1699
+    date_accessed: 2023-08-16 08:22:05.188969
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Onchocerciasis
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 81967a00d4baaf3332c9ee7c89d77d06
+  size: 190306
+  path: dataset_1699_onchocerciasis_values.feather

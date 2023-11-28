@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5527
+    date_accessed: 2023-08-16 10:01:06.362175
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Methane emissions by sector (CAIT, 2021)
+  description: ''
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 84173bfdba00149386c8d712520342dd
+  size: 484146
+  path: dataset_5527_methane_emissions_by_sector__cait__2021_values.feather

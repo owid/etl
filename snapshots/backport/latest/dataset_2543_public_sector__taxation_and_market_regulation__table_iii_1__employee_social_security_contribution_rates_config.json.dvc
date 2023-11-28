@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2543
+    date_accessed: 2023-08-16 07:27:19.783878
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_2543_public_sector__taxation_and_market_regulation__table_iii_1__employee_social_security_contribution_rates
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 4d386ad59744986292a2e4b8281065ad
+  size: 49162
+  path: 
+    dataset_2543_public_sector__taxation_and_market_regulation__table_iii_1__employee_social_security_contribution_rates_config.json

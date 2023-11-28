@@ -1,0 +1,31 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5037
+    date_accessed: 2023-08-16 10:32:48.661310
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_5037_prices__deflators (archived)
+  description: 'The FAOSTAT Deflators database provides the following selection of
+    implicit price deflator series by country: Gross Domestic Product (GDP) deflator,
+    Gross Fixed Capital Formation (GFCF) deflator, Agriculture, Forestry, Fishery
+    Value-Added (VA_AFF) deflator, andManufacturing Valued-Added (VA_MAN) deflator.  A
+    deflator is a figure expressing the change in prices over a period of time for
+    a product or a basket of products by comparing a reference period to a base period.
+    It is obtained by dividing a current price value of a given aggregate by its real
+    counterpart. When calculated from the major national accounting aggregates such
+    as GDP or agriculture VA, implicit price deflators pertains to wider ranges of
+    goods and services in the economy than that represented by any of the individual
+    price indexes (such as CPIs, PPIs). Movements in an implicit price deflator reflect
+    both changes in price and changes in the composition of the aggregate for which
+    the deflator is calculated.  In the FAOSTAT Deflators database, all series are
+    derived from the United Nations Statistics Division (UNSD) National Accounts Estimates
+    of Main Aggregates database (UNSD NAE). In particular, the implicit GDP deflator,
+    the implicit GFCF deflator and the implicit value added deflator in Agriculture,
+    Forestry, Fishery are obtained by dividing the series in current prices by those
+    in constant 2010 prices (base year).'
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 2a5c6fea1b42cabd506dd2ca5d23e885
+  size: 21000
+  path: dataset_5037_prices__deflators_config.json

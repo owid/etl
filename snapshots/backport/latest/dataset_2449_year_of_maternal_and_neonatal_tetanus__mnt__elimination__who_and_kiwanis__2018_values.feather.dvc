@@ -1,21 +1,16 @@
 meta:
-  namespace: backport
-  short_name: 
-    dataset_2449_year_of_maternal_and_neonatal_tetanus__mnt__elimination__who_and_kiwanis__2018_values
-  file_extension: feather
-  date_accessed: 2023-06-01 14:53:01.420848
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2449
+    date_accessed: 2023-08-10 07:48:35.510263
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Year of Maternal and Neonatal Tetanus (MNT) elimination (WHO and KIWANIS,
     2018)
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/2449
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 6039e6f15840f3a676ea7bb87ed126ca
+- md5: f8f7be52544b5be2ddd940053838892c
   size: 8106
   path: 
     dataset_2449_year_of_maternal_and_neonatal_tetanus__mnt__elimination__who_and_kiwanis__2018_values.feather

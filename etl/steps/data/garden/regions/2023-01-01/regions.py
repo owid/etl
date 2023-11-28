@@ -90,35 +90,9 @@ def run_sanity_checks(df: pd.DataFrame) -> None:
     assert len(aliases_duplicated) == 0, error
 
 
-def _merge_tables(
-    tb_definitions: Table,
-    tb_aliases: Table,
-    tb_members: Table,
-    tb_related: Table,
-    tb_legacy_codes: Table,
-) -> Table:
-    """Merge all regions tables into a single one. 1:n relationships are merged as JSON lists."""
-    tb_regions = tb_definitions.copy()
-
-    # add members as JSON
-    tb_regions["members"] = tb_members["member"].groupby("code").agg(lambda x: json.dumps(list(x)))
-
-    # add aliass as JSON
-    tb_regions["aliases"] = tb_aliases["alias"].groupby("code").agg(lambda x: json.dumps(list(x)))
-
-    # add related as JSON
-    tb_regions["related"] = tb_related["member"].groupby("code").agg(lambda x: json.dumps(list(x)))
-
-    # add legacy codes
-    tb_regions = tb_regions.join(tb_legacy_codes, how="left")
-
-    return tb_regions
-
-
 def run(dest_dir: str) -> None:
     #
     # Load inputs.
-    #
     #
     # Load main regions data from yaml file.
     with open(REGION_DEFINITIONS_FILE) as _file:
@@ -126,13 +100,7 @@ def run(dest_dir: str) -> None:
 
     # Load file of region codes.
     # NOTE: Namibia has iso_code "NA" which would be interpreted as NaN without extra arguments.
-    df_codes = pd.read_csv(
-        REGION_CODES_FILE,
-        keep_default_na=False,
-        na_values=[
-            "",
-        ],
-    )
+    df_codes = pd.read_csv(REGION_CODES_FILE, keep_default_na=False, na_values=[""])
 
     #
     # Process data.
@@ -143,55 +111,22 @@ def run(dest_dir: str) -> None:
     # Run sanity checks on input data.
     run_sanity_checks(df=df)
 
-    # Create an appropriate index for main dataframe and sort conveniently.
-    df = df.set_index(["code"], verify_integrity=True).sort_index()
-
-    # Create an appropriate index for codes dataframe and sort conveniently.
-    df_codes = df_codes.set_index(["code"], verify_integrity=True).sort_index()
-
-    # Create table for region definitions.
-    tb_definitions = Table(
-        df[["name", "short_name", "region_type", "is_historical", "defined_by"]], short_name="definitions"
-    )
-
-    # Create table for aliases.
-    tb_aliases = Table(
-        df.rename(columns={"aliases": "alias"})[["alias"]].explode("alias").dropna(how="all"), short_name="aliases"
-    )
-
-    # Create table for members.
-    tb_members = Table(
-        df.rename(columns={"members": "member"}).explode("member")[["member"]].dropna(how="all"), short_name="members"
-    )
-
-    # Create table for other possible related members.
-    tb_related = Table(
-        df.rename(columns={"related": "member"}).explode("member")[["member"]].dropna(how="all"), short_name="related"
-    )
-
-    # Create table of historical transitions.
-    tb_transitions = Table(
-        df[["end_year", "successors"]]
-        .rename(columns={"successors": "successor"})
-        .explode("successor")
-        .dropna(how="all")
-        .astype({"end_year": int}),
-        short_name="transitions",
-    )
-
     # Create a table of legacy codes (ensuring all numeric codes are integer).
-    tb_legacy_codes = Table(
-        df_codes.astype(
-            {code: pd.Int64Dtype() for code in ["cow_code", "imf_code", "legacy_country_id", "legacy_entity_id"]}
-        ),
-        short_name="legacy_codes",
+    df_codes = df_codes.astype(
+        {code: pd.Int64Dtype() for code in ["cow_code", "imf_code", "legacy_country_id", "legacy_entity_id"]}
     )
 
-    # Create merged flat table with useful columns.
-    tb_regions = Table(
-        _merge_tables(tb_definitions, tb_aliases, tb_members, tb_related, tb_legacy_codes),
-        short_name="regions",
-    )
+    # Combine data with legacy codes.
+    tb_regions = Table(pd.merge(df, df_codes, on="code", how="left"), short_name="regions")
+
+    # Convert columns that are list of strings into jsons.
+    for column in ["aliases", "members", "related", "successors"]:
+        tb_regions[column] = tb_regions.groupby("code")[column].transform(
+            lambda x: json.dumps(sum(list(x), [])) if pd.notna(x.values) else x
+        )
+
+    # Set an appropriate index and sort conveniently.
+    tb_regions = tb_regions.set_index("code", verify_integrity=True).sort_index()
 
     #
     # Save outputs.
@@ -199,7 +134,7 @@ def run(dest_dir: str) -> None:
     # Create a new garden dataset.
     ds_garden = create_dataset(
         dest_dir=dest_dir,
-        tables=[tb_regions, tb_definitions, tb_aliases, tb_members, tb_related, tb_transitions, tb_legacy_codes],
+        tables=[tb_regions],
     )
 
     # Save changes in the new garden dataset.

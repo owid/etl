@@ -1,0 +1,74 @@
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Human Mortality Database
+    description: |-
+      The Human Mortality Database (HMD) contains original calculations of death rates and life tables for national populations (countries or areas), as well as the input data used in constructing those tables. The input data consist of death counts from vital statistics, plus census counts, birth counts, and population estimates from various sources.
+
+
+      # Scope and basic principles
+
+      New data series to this collection. However, the database is limited by design to populations where death registration and census data are virtually complete, since this type of information is required for the uniform method used to reconstruct historical data series. As a result, the countries and areas included here are relatively wealthy and for the most part highly industrialized.
+
+      The main goal of the Human Mortality Database is to document the longevity revolution of the modern era and to facilitate research into its causes and consequences. As much as possible, we have followed four guiding principles in creating this database: comparability, flexibility, accessibility, reproducibility.
+
+
+      # Computing death rates and life tables
+
+      Their process for computing mortality rates and life tables can be described in terms of six steps, corresponding to six data types that are available from the HMD. Here is an overview of the process:
+
+      1. Births. Annual counts of live births by sex are collected for each population over the longest possible time period. These counts are used mainly for making population estimates at younger ages.
+      2. Deaths. Death counts are collected at the finest level of detail available. If raw data are aggregated, uniform methods are used to estimate death counts by completed age (i.e., age-last-birthday at time of death), calendar year of death, and calendar year of birth.
+      3. Population size. Annual estimates of population size on January 1st are either obtained from another source or are derived from census data plus birth and death counts.
+      4. Exposure-to-risk. Estimates of the population exposed to the risk of death during some age-time interval are based on annual (January 1st) population estimates, with a small correction that reflects the timing of deaths within the interval.
+      5. Death rates. Death rates are always a ratio of the death count for a given age-time interval divided by an estimate of the exposure-to-risk in the same interval.
+      6. Life tables. To build a life table, probabilities of death are computed from death rates. These probabilities are used to construct life tables, which include life expectancies and other useful indicators of mortality and longevity.
+
+
+      # Corrections to the data
+
+      The data presented here have been corrected for gross errors (e.g., a processing error whereby 3,800 becomes 38,000 in a published statistical table would be obvious in most cases, and it would be corrected). However, they have not attempted to correct the data for systematic age misstatement (misreporting of age) or coverage errors (over- or under-enumeration of people or events).
+
+      Some available studies assess the completeness of census coverage or death registration in the various countries, and more work is needed in this area. However, in developing the database thus far, they did not consider it feasible or desirable to attempt corrections of this sort, especially since it would be impossible to correct the data by a uniform method across all countries.
+
+
+      # Age misreporting
+
+      Populations are included here if there is a well-founded belief that the coverage of their census and vital registration systems is relatively high, and thus, that fruitful analyses by both specialists and non-specialists should be possible with these data. Nevertheless, there is evidence of both age heaping (overreporting ages ending in "0" or "5") and age exaggeration in these data.
+
+      In general, the degree of age heaping in these data varies by the time period and population considered, but it is usually no burden to scientific analysis. In most cases, it is sufficient to analyze data in five-year age groups in order to avoid the false impressions created by this particular form of age misstatement.
+
+      Age exaggeration, on the other hand, is a more insidious problem. Our approach is guided by the conventional wisdom that age reporting in death registration systems is typically more reliable than in census counts or official population estimates. For this reason, we derive population estimates at older ages from the death counts themselves, employing extinct cohort methods. Such methods eliminate some, but certainly not all, of the biases in old-age mortality estimates due to age exaggeration.
+
+
+      # Uniform set of procedures
+
+      A key goal of this project is to follow a uniform set of procedures for each population. This approach does not guarantee the cross-national comparability of the data. Rather, it ensures only that they have not introduced biases by our own manipulations. Our desire for uniformity had to face the challenge that raw data come in a variety of formats (for example, 1-year versus 5-year age groups). Our general approach to this problem is that the available raw data are used first to estimate two quantities: 1) the number of deaths by completed age, year of birth, and year of death; and 2) population estimates by single years of age on January 1 of each year. For each population, these calculations are performed separately by sex. From these two pieces of information, they compute death rates and life tables in a variety of age-time configurations.
+
+      It is reasonable to ask whether a single procedure is the best method for treating the data from a variety of populations. Here, two points must be considered. First, our uniform methodology is based on procedures that were developed separately, though following similar principles, for various countries and by different researchers. Earlier methods were synthesized by choosing what they considered the best among alternative procedures and by eliminating superficial inconsistencies. The second point is that a uniform procedure is possible only because they have not attempted to correct the data for reporting and coverage errors. Although some general principles could be followed, such problems would have to be addressed individually for each population.
+
+      Although they adhere strictly to a uniform procedure, the data for each population also receive significant individualized attention. Each country or area is assigned to an individual researcher, who takes responsibility for assembling and checking the data for errors. In addition, the person assigned to each country/area checks our data against other available sources. These procedures help to assure a high level of data quality, but assistance from database users in identifying problems is always appreciated!
+    date_published: 2023-09-18
+
+    # Citation
+    producer: Human Mortality Database
+    citation_full: |-
+      HMD. Human Mortality Database. Max Planck Institute for Demographic Research (Germany), University of California, Berkeley (USA), and French Institute for Demographic Studies (France). Available at www.mortality.org.
+
+      See also the methods protocol:
+      Wilmoth, J. R., Andreev, K., Jdanov, D., Glei, D. A., Riffe, T., Boe, C., Bubenheim, M., Philipov, D., Shkolnikov, V., Vachon, P., Winant, C., & Barbieri, M. (2021). Methods protocol for the human mortality database (v6). [Available online](https://www.mortality.org/File/GetDocument/Public/Docs/MethodsProtocolV6.pdf) (needs log in to mortality.org).
+    attribution_short: HMD
+
+    # Files
+    url_main: https://www.mortality.org/Data/ZippedDataFiles
+    date_accessed: 2023-09-27
+
+    # License
+    license:
+      url: https://www.mortality.org/Data/UserAgreement
+      name: CC BY 4.0
+wdir: ../../../data/snapshots/hmd/2023-09-18
+outs:
+- md5: c1c32e48ba7ef168dcd7339f99578a74
+  size: 168421129
+  path: hmd.zip

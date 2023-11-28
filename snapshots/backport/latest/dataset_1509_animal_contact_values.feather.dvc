@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1509
+    date_accessed: 2023-08-10 14:45:23.438454
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Animal contact
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 6b0e1a75cb2c10ba13ed00a61d5207e1
+  size: 2012042
+  path: dataset_1509_animal_contact_values.feather

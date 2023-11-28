@@ -1,18 +1,15 @@
 meta:
-  namespace: backport
-  short_name: dataset_1026_wealth_per_capita_by_component_by_country__world_bank__2017_values
-  file_extension: feather
-  date_accessed: 2023-02-23 17:02:53.512053
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1026
+    date_accessed: 2023-08-10 09:22:04.639621
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Wealth per capita by component by country - World Bank (2017)
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/1026
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 5ac389a19fa4208c4e1002040c273c81
+- md5: 3a0f65f8fdd4b4450ece19da27c45309
   size: 56530
-  path: dataset_1026_wealth_per_capita_by_component_by_country__world_bank__2017_values.feather
+  path: 
+    dataset_1026_wealth_per_capita_by_component_by_country__world_bank__2017_values.feather

@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4664
+    date_accessed: 2023-08-16 10:15:16.897968
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_4664_proportion_of_children_moderately_or_severely_stunted__pct
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: e890698f1f0f6408dff4882adb0a01ef
+  size: 13282
+  path: 
+    dataset_4664_proportion_of_children_moderately_or_severely_stunted__pct_config.json

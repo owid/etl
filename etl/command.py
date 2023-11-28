@@ -3,6 +3,7 @@
 #  etl.py
 #
 
+import itertools
 import re
 import resource
 import sys
@@ -15,9 +16,17 @@ from typing import Any, Callable, Iterator, List, Optional, Set
 import click
 from ipdb import launch_ipdb_on_exception
 
-from etl import config, paths
+from etl import config, files, paths
 from etl.snapshot import snapshot_catalog
-from etl.steps import DAG, DataStep, Step, compile_steps, load_dag, select_dirty_steps
+from etl.steps import (
+    DAG,
+    DataStep,
+    GrapherStep,
+    Step,
+    compile_steps,
+    load_dag,
+    select_dirty_steps,
+)
 
 config.enable_bugsnag()
 
@@ -77,6 +86,11 @@ LIMIT_NOFILE = 4096
     help="Force strict or lax validation on DAG steps, e.g. checks for primary keys in data steps.",
     default=None,
 )
+@click.option(
+    "--watch",
+    is_flag=True,
+    help="Run ETL infinitely and update changed files.",
+)
 @click.argument("steps", nargs=-1)
 def main_cli(
     steps: List[str],
@@ -93,6 +107,7 @@ def main_cli(
     dag_path: Path = paths.DEFAULT_DAG_FILE,
     workers: int = 5,
     strict: Optional[bool] = None,
+    watch: bool = False,
 ) -> None:
     _update_open_file_limit()
 
@@ -119,14 +134,20 @@ def main_cli(
     if workers == 1:
         config.GRAPHER_INSERT_WORKERS = 1
 
-    if ipdb:
-        config.IPDB_ENABLED = True
-        config.GRAPHER_INSERT_WORKERS = 1
-        kwargs["workers"] = 1
-        with launch_ipdb_on_exception():
-            main(**kwargs)  # type: ignore
+    if watch:
+        runs = itertools.chain([None], files.watch_folder(paths.STEP_DIR))
     else:
-        main(**kwargs)  # type: ignore
+        runs = [None]
+
+    for _ in runs:
+        if ipdb:
+            config.IPDB_ENABLED = True
+            config.GRAPHER_INSERT_WORKERS = 1
+            kwargs["workers"] = 1
+            with launch_ipdb_on_exception():
+                main(**kwargs)  # type: ignore
+        else:
+            main(**kwargs)  # type: ignore
 
 
 def main(
@@ -241,19 +262,24 @@ def run_dag(
             f"No steps matched the given input `{' '.join(includes or [])}`. Check spelling or consult `etl --help` for more options"
         )
 
+    # do not run dependencies if `only` is set by setting them to non-dirty
+    if only:
+        for step in steps:
+            _set_dependencies_to_nondirty(step)
+
     if not force:
-        print("Detecting which steps need rebuilding...")
+        print("--- Detecting which steps need rebuilding...")
         start_time = time.time()
         steps = select_dirty_steps(steps, workers)
         click.echo(f"{click.style('OK', fg='blue')} ({time.time() - start_time:.1f}s)")
 
     if not steps:
-        print("All datasets up to date!")
+        print("--- All datasets up to date!")
         return
 
-    print(f"Running {len(steps)} steps:")
+    print(f"--- Running {len(steps)} steps:")
     for i, step in enumerate(steps, 1):
-        print(f"{i}. {step}...")
+        print(f"--- {i}. {step}...")
         if not dry_run:
             strict = _detect_strictness_level(step, strict)
             with strictness_level(strict):
@@ -329,8 +355,12 @@ def _backporting_steps(private: bool, filter_steps: Optional[Set[str]] = None) -
             continue
 
         # two files are generated for each dataset, skip one
-        if snap.metadata.short_name.endswith("_values"):
-            short_name = snap.metadata.short_name.removesuffix("_values")
+        if snap.metadata.short_name.endswith("_config"):
+            # skip archived backported datasets
+            if "(archived)" in snap.metadata.name:  # type: ignore
+                continue
+
+            short_name = snap.metadata.short_name.removesuffix("_config")
 
             private_suffix = "" if snap.metadata.is_public else "-private"
 
@@ -358,6 +388,16 @@ def _update_open_file_limit() -> None:
     soft_limit, hard_limit = resource.getrlimit(resource.RLIMIT_NOFILE)
     if soft_limit < LIMIT_NOFILE:
         resource.setrlimit(resource.RLIMIT_NOFILE, (min(LIMIT_NOFILE, hard_limit), hard_limit))
+
+
+def _set_dependencies_to_nondirty(step: Step) -> None:
+    """Set all dependencies of a step to non-dirty."""
+    if isinstance(step, DataStep):
+        for step_dep in step.dependencies:
+            step_dep.is_dirty = lambda: False
+    if isinstance(step, GrapherStep):
+        for step_dep in step.data_step.dependencies:
+            step.data_step.is_dirty = lambda: False
 
 
 if __name__ == "__main__":

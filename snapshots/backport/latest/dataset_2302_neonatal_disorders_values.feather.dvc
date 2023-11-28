@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2302
+    date_accessed: 2023-08-16 10:43:36.846305
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Neonatal disorders
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: af1a45dadbae30e029fe8e8e0c183ded
+  size: 1489562
+  path: dataset_2302_neonatal_disorders_values.feather

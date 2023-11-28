@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/620
+    date_accessed: 2023-08-16 08:40:36.096024
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Election - Quality of Government (2017)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: e3772cf7fba93b08792f22eab2685b4e
+  size: 1119122
+  path: dataset_620_election__quality_of_government__2017_values.feather

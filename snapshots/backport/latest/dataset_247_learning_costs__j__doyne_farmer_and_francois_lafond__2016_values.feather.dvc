@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/247
+    date_accessed: 2023-08-14 05:58:34.350919
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Learning costs, J. Doyne Farmer and François Lafond (2016)
+  description: ''
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 0de438bbe0317824db724f2722430c91
+  size: 17378
+  path: 
+    dataset_247_learning_costs__j__doyne_farmer_and_francois_lafond__2016_values.feather

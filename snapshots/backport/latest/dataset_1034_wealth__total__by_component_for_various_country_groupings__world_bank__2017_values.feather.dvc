@@ -1,20 +1,17 @@
 meta:
-  namespace: backport
-  short_name: dataset_1034_wealth__total__by_component_for_various_country_groupings__world_bank__2017_values
-  file_extension: feather
-  date_accessed: 2023-02-23 15:08:14.909342
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1034
+    date_accessed: 2023-08-10 09:01:37.392114
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Wealth (total) by component for various country groupings - World Bank (2017)
   description: Wealth is the value of an economy's capital stocks. GDP is seen as
     the return on wealth. The World Bank calculates wealth as the sum of produced
     capital, natural capital, human capital, net foreign assets.
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/1034
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: e1ceaa855658c067611bff32a3d17744
+- md5: 10df68b0d86c92192395f0a32094b48e
   size: 9026
-  path: dataset_1034_wealth__total__by_component_for_various_country_groupings__world_bank__2017_values.feather
+  path: 
+    dataset_1034_wealth__total__by_component_for_various_country_groupings__world_bank__2017_values.feather

@@ -1,18 +1,15 @@
 meta:
-  namespace: backport
-  short_name: dataset_318_incomes_across_the_distribution_database__gini__2016_values
-  file_extension: feather
-  date_accessed: 2023-02-23 18:14:16.460697
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/318
+    date_accessed: 2023-08-14 05:39:41.352951
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Incomes across the Distribution Database, Gini (2016)
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/318
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
+  is_public: false
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 689d3c8cf7b1bf80f3301a7793c8f270
+- md5: e60902caec84a2ae2cd844b890932178
   size: 9514
   path: dataset_318_incomes_across_the_distribution_database__gini__2016_values.feather

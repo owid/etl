@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1077
+    date_accessed: 2023-08-10 14:43:13.220850
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Exposure to impacts - World Bank Climate Change Data
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 1e4ccbc324d44c204632c828722da24f
+  size: 193794
+  path: dataset_1077_exposure_to_impacts__world_bank_climate_change_data_values.feather

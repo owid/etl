@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/3335
+    date_accessed: 2023-08-11 07:53:34.533996
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Particulate matter pollution
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: be3d9755d1625102cc8a34349a5dae2a
+  size: 1381098
+  path: dataset_3335_particulate_matter_pollution_values.feather

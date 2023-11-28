@@ -3,7 +3,6 @@
 from typing import cast
 
 import pandas as pd
-import us_cpi
 from owid.catalog import Table
 from structlog import get_logger
 
@@ -44,7 +43,10 @@ def run(dest_dir: str) -> None:
     df = pd.merge(df, total_df, on=["year", "type", "Total Investment"], how="outer")
 
     # Import US CPI data from the API
-    df_wdi_cpi_us = us_cpi.import_US_cpi_API()
+    snap = cast(Snapshot, paths.load_dependency("us_cpi.csv"))
+
+    # Now read the file with pandas
+    df_wdi_cpi_us = pd.read_csv(snap.path)
     if df_wdi_cpi_us is None:
         log.info("Failed to import US CPI data from the API.")
         return

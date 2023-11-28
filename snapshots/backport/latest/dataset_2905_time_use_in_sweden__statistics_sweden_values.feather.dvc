@@ -1,18 +1,15 @@
 meta:
-  namespace: backport
-  short_name: dataset_2905_time_use_in_sweden__statistics_sweden_values
-  file_extension: feather
-  date_accessed: 2023-02-23 18:56:53.967812
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2905
+    date_accessed: 2023-08-10 08:27:36.469404
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Time use in Sweden - Statistics Sweden
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/2905
-  source_published_by: Our World in Data catalog backport
   is_public: false
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: bb0daca87beb622d72012495e7a9fdd5
+- md5: edb4e2ecf6387cc47f77b10c7f4caecd
   size: 6994
   path: dataset_2905_time_use_in_sweden__statistics_sweden_values.feather

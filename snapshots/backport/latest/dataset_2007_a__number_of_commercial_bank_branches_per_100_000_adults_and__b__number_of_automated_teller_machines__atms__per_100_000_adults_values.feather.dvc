@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2007
+    date_accessed: 2023-08-10 14:40:14.946665
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: (a) Number of commercial bank branches per 100,000 adults and (b) number of
+    automated teller machines (ATMs) per 100,000 adults
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: d08b07d13ebafe49539275ab5ec23869
+  size: 32962
+  path: 
+    dataset_2007_a__number_of_commercial_bank_branches_per_100_000_adults_and__b__number_of_automated_teller_machines__atms__per_100_000_adults_values.feather

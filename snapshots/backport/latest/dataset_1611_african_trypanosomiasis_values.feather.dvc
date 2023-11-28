@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1611
+    date_accessed: 2023-08-16 09:34:54.091799
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: African trypanosomiasis
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 2359a830e4992bda8c02053e928323d1
+  size: 294210
+  path: dataset_1611_african_trypanosomiasis_values.feather

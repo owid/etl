@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4648
+    date_accessed: 2023-08-11 07:57:39.430458
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Net official development assistance (ODA) to small island states (SIDS) from
+    OECD-DAC countries, by donor countries (millions of constant 2017 United States
+    dollars)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 04b543b270ac3da94408bd482d601bf9
+  size: 11498
+  path: 
+    dataset_4648_net_official_development_assistance__oda__to_small_island_states__sids__from_oecd_dac_countries__by_donor_countries__millions_of_constant_2017_united_states_dollars_values.feather

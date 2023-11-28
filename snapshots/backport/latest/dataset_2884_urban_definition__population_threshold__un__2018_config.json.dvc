@@ -1,18 +1,14 @@
 meta:
-  namespace: backport
-  short_name: dataset_2884_urban_definition__population_threshold__un__2018_config
-  file_extension: json
-  date_accessed: 2023-02-23 18:12:17.656267
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2884
+    date_accessed: 2023-08-10 08:49:42.707286
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_2884_urban_definition__population_threshold__un__2018
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/2884
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: d3758e62de4b16934ce28de124e9b0ae
-  size: 2494
+- md5: 3c22c0d2169bae82507e5c44395f631d
+  size: 2647
   path: dataset_2884_urban_definition__population_threshold__un__2018_config.json

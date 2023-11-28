@@ -1,0 +1,133 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    processing_level: minor
+    presentation:
+      topic_tags:
+        - Cardiovascular Diseases
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
+dataset:
+  update_period_days: 365
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
+tables:
+  deaths_from_cardiovascular_diseases_vs_other:
+    title: Mortality Database
+    variables:
+        cancer_and_neoplasms:
+          title: Share of deaths from cancer and neoplasms
+          unit: '%'
+          short_unit: '%'
+          description_short: Based on the underlying cause listed on death certificates.
+          description_processing:
+            The "Cancer and Neoplasms" category aggregates the share of deaths attributed to both malignant neoplasms and other neoplasms.
+          display:
+            name: Cancer and neoplasms
+            numDecimalPlaces: 1
+
+        congenital_and_maternal_conditions:
+          title: Share of deaths from congenital and maternal conditions
+          unit: '%'
+          short_unit: '%'
+          description_short: Based on the underlying cause listed on death certificates.
+          description_processing:
+            The 'Congenital & Maternal Conditions' category aggregates the share of deaths attributed to congenital anomalies, maternal conditions, perinatal conditions, and sudden infant death syndrome.
+          display:
+            name: Congenital and maternal conditions
+            numDecimalPlaces: 1
+
+        digestive_and_oral_health:
+          title: Share of deaths from digestive and oral health
+          unit: '%'
+          short_unit: '%'
+          description_short: Based on the underlying cause listed on death certificates.
+          description_processing:
+            The 'Digestive & Oral Health' category encompasses the share of deaths due to digestive diseases and oral conditions.
+          display:
+            name: Digestive and oral health
+            numDecimalPlaces: 1
+
+        endocrine_and_nutritional_disorders:
+          title: Share of deaths from endocrine and nutritional disorders
+          unit: '%'
+          short_unit: '%'
+          description_short: Based on the underlying cause listed on death certificates.
+          description_processing:
+            The 'Endocrine & Nutritional Disorders' category aggregates the share of deaths resulting from diabetes mellitus, blood and endocrine disorders, as well as nutritional deficiencies.
+          display:
+            name: Endocrine and nutritional disorders
+            numDecimalPlaces: 1
+
+        ill_defined_causes_and_injuries:
+          title: Share of deaths from ill-defined causes and injuries
+          unit: '%'
+          short_unit: '%'
+          description_short: Based on the underlying cause listed on death certificates.
+          description_processing:
+            The 'Ill-defined Causes & Injuries' category sums up the share of deaths from ill-defined diseases, ill-defined injuries, intentional injuries, and unintentional injuries.
+          display:
+            name: Ill-defined causes and injuries
+            numDecimalPlaces: 1
+
+        infectious_diseases:
+          title: Share of deaths from infectious diseases
+          unit: '%'
+          short_unit: '%'
+          description_short: Based on the underlying cause listed on death certificates.
+          description_processing:
+            The 'Infectious Diseases' category aggregates the share of deaths caused by infectious and parasitic diseases, alongside respiratory infections.
+          display:
+            name: Infectious diseases
+            numDecimalPlaces: 1
+
+        neurological_and_mental_health:
+          title: Share of deaths from neurological and mental health
+          unit: '%'
+          short_unit: '%'
+          description_short: Based on the underlying cause listed on death certificates.
+          description_processing:
+            The 'Neurological & Mental Health' category represents the share of deaths due to neuropsychiatric conditions.
+          display:
+            name: Neurological and mental health
+            numDecimalPlaces: 1
+
+        other_diseases_and_conditions:
+          title: Share of deaths from other diseases and conditions
+          unit: '%'
+          short_unit: '%'
+          description_short: Based on the underlying cause listed on death certificates.
+          description_processing:
+            The 'Other Diseases & Conditions' category represents the share of deaths due to musculoskeletal diseases, skin diseases or sense organ diseases.
+          display:
+            name: Other diseases and conditions
+            numDecimalPlaces: 1
+
+        respiratory_diseases:
+          title: Share of deaths from respiratory diseases
+          unit: '%'
+          short_unit: '%'
+          description_short: Based on the underlying cause listed on death certificates.
+          display:
+            name: Respiratory diseases
+            numDecimalPlaces: 1
+
+        cardiovascular_diseases:
+          title: Share of deaths from cardiovascular diseases
+          unit: '%'
+          short_unit: '%'
+          description_short: Based on the underlying cause listed on death certificates.
+          display:
+            name: Cardiovascular diseases
+            numDecimalPlaces: 1
+
+        unidentified_cause:
+          title: Share of deaths from unidentified causes
+          unit: '%'
+          short_unit: '%'
+          description_short: Based on the underlying cause listed on death certificates.
+          display:
+            name: Unidentified causes
+            numDecimalPlaces: 1

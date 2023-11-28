@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2086
+    date_accessed: 2023-08-16 10:28:57.967571
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Meningococcal meningitis
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: befd0c919438a4a1ab8c9cae94403b9f
+  size: 2116402
+  path: dataset_2086_meningococcal_meningitis_values.feather

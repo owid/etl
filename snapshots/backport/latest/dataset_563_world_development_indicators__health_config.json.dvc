@@ -1,18 +1,14 @@
 meta:
-  namespace: backport
-  short_name: dataset_563_world_development_indicators__health_config
-  file_extension: json
-  date_accessed: 2023-06-01 12:41:17.943929
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/563
+    date_accessed: 2023-08-16 10:35:54.549065
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_563_world_development_indicators__health
   description: This is a dataset imported by the automated fetcher
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/563
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: da54ec158fb9e3c40e3282ac3d2ca291
-  size: 548522
+- md5: 246697dc4668db771b4cb13a9b61962d
+  size: 580134
   path: dataset_563_world_development_indicators__health_config.json

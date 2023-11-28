@@ -1,0 +1,32 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/origin/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Production, use, and fate of all plastics ever made
+    description: |-
+      Plastics have outgrown most man-made materials and have long been under environmental scrutiny. However, robust global information, particularly about their end-of-life fate, is lacking. By identifying and synthesizing dispersed data on production, use, and end-of-life management of polymer resins, synthetic fibers, and additives, we present the first global analysis of all mass-produced plastics ever manufactured. We estimate that 8300 million metric tons (Mt) as of virgin plastics have been produced to date. As of 2015, approximately 6300 Mt of plastic waste had been generated, around 9% of which had been recycled, 12% was incinerated, and 79% was accumulated in landfills or the natural environment. If current production and waste management trends continue, roughly 12,000 Mt of plastic waste will be in landfills or in the natural environment by 2050.
+    date_published: 2017-07-19
+    title_snapshot: Production, use, and fate of all plastics ever made (Geyer et
+      al., 2017)
+    description_snapshot: |-
+      Data on annual waste production in million metric tons between 1950 and 2015.
+
+    # Citation
+    producer: Geyer et al.
+    citation_full: |-
+      Geyer et al., Production, use, and fate of all plastics ever made. Sci. Adv.3,e1700782(2017).DOI:10.1126/sciadv.1700782
+
+    # Files
+    url_main: https://www.science.org/doi/10.1126/sciadv.1700782
+    date_accessed: 2023-09-26
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://www.science.org/doi/10.1126/sciadv.1700782
+wdir: ../../../data/snapshots/plastic_waste/2023-09-26
+outs:
+- md5: 36c3af508e73baee35d6a14acf6df340
+  size: 880844
+  path: geyer_2017.pdf

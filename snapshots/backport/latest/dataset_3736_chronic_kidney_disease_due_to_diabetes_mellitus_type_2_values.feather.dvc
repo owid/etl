@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/3736
+    date_accessed: 2023-08-16 10:48:18.804120
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Chronic kidney disease due to diabetes mellitus type 2
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: b960883b6895775a7f5fcb0e43c3dc1c
+  size: 2012082
+  path: 
+    dataset_3736_chronic_kidney_disease_due_to_diabetes_mellitus_type_2_values.feather

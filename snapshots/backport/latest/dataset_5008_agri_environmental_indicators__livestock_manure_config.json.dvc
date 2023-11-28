@@ -1,0 +1,26 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5008
+    date_accessed: 2023-08-16 10:16:12.413394
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_5008_agri_environmental_indicators__livestock_manure
+    (archived)
+  description: "The Livestock Manure domain under the FAOSTAT section of Agri-Environmental
+    Indicators contains estimates of nitrogen (N) inputs to agricultural soils from
+    livestock manure. These estimates are compiled using official FAOSTAT statistics
+    of animal stocks and by applying the internationally approved Guidelines of the
+    Intergovernmental Panel on Climate Change (IPCC). Data are available by country,
+    with global coverage and relative to the period 1961\x962017, with annual updates.
+    The following elements are disseminated: 1) Stocks; 2) Amount excreted in manure
+    (N content);  3) Manure left on pasture (N content); 4) Manure left on pasture
+    that volatilises (N content); 5) Manure left on pasture that leaches (N content);
+    6) Manure treated (N content); 7) Losses from manure treated (N content); 8) Manure
+    applied to soils (N content); 9) Manure applied to soils that volatilises (N content);
+    10) Manure applied to soils that leaches (N content)."
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: d7f49c11e03f18af416288a630f0444b
+  size: 424985
+  path: dataset_5008_agri_environmental_indicators__livestock_manure_config.json

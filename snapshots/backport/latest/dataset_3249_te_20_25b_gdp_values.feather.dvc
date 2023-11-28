@@ -1,18 +1,15 @@
 meta:
-  namespace: backport
-  short_name: dataset_3249_te_20_25b_gdp_values
-  file_extension: feather
-  date_accessed: 2023-02-23 17:48:10.003723
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/3249
+    date_accessed: 2023-08-10 08:10:16.520595
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: TE-20.25b_GDP
   description: core-econ.org
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/3249
-  source_published_by: Our World in Data catalog backport
   is_public: false
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: b6d2eccbda1d077d536b57724c2228a6
+- md5: ac361605a352bf1d4dde05ccb082090e
   size: 11842
   path: dataset_3249_te_20_25b_gdp_values.feather

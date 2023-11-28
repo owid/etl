@@ -21,13 +21,13 @@ N = PathFinder(__file__)
 def run(dest_dir: str) -> None:
     log.info("maddison_database.start")
 
-    # read dataset from meadow
+    # Read dataset from meadow
     ds_meadow = Dataset(DATA_DIR / f"meadow/ggdc/{MEADOW_VERSION}/maddison_database")
     tb_meadow = ds_meadow["maddison_database"]
 
     df = pd.DataFrame(tb_meadow)
 
-    # create new table with the same metadata as meadow and add it to dataset
+    # Create new table with the same metadata as meadow and add it to dataset
     tb_garden = Table(df, like=tb_meadow)
 
     ds_garden = create_dataset(dest_dir, tables=[tb_garden], default_metadata=ds_meadow.metadata)

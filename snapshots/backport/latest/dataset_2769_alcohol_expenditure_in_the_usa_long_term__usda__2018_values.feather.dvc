@@ -1,18 +1,14 @@
 meta:
-  namespace: backport
-  short_name: dataset_2769_alcohol_expenditure_in_the_usa_long_term__usda__2018_values
-  file_extension: feather
-  date_accessed: 2023-02-23 19:14:10.317991
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2769
+    date_accessed: 2023-08-10 07:41:24.456181
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Alcohol expenditure in the USA long-term (USDA, 2018)
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/2769
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 7bd4bf71d6d412b7122067b447b76e52
+- md5: 82c747fb2418165c95b040426d884225
   size: 11570
   path: dataset_2769_alcohol_expenditure_in_the_usa_long_term__usda__2018_values.feather

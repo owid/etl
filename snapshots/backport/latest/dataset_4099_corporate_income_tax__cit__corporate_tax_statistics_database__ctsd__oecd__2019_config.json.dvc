@@ -1,18 +1,17 @@
 meta:
-  namespace: backport
-  short_name: dataset_4099_corporate_income_tax__cit__corporate_tax_statistics_database__ctsd__oecd__2019_config
-  file_extension: json
-  date_accessed: 2023-02-23 17:30:53.211272
-  name: Grapher metadata for dataset_4099_corporate_income_tax__cit__corporate_tax_statistics_database__ctsd__oecd__2019
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4099
+    date_accessed: 2023-08-10 07:45:48.584883
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_4099_corporate_income_tax__cit__corporate_tax_statistics_database__ctsd__oecd__2019
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/4099
-  source_published_by: Our World in Data catalog backport
   is_public: false
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 3c0e6ffadc83ba33fc3048354a9c879f
-  size: 4696
-  path: dataset_4099_corporate_income_tax__cit__corporate_tax_statistics_database__ctsd__oecd__2019_config.json
+- md5: b321adaf6ce4b7737bbf6f723b6e759d
+  size: 5162
+  path: 
+    dataset_4099_corporate_income_tax__cit__corporate_tax_statistics_database__ctsd__oecd__2019_config.json

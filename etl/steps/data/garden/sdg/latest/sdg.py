@@ -7,7 +7,6 @@ from typing import List, Optional
 import pandas as pd
 import structlog
 from owid.catalog import Dataset, Table, Variable
-from owid.catalog.utils import concat_variables
 
 from etl.paths import DATA_DIR
 
@@ -15,6 +14,15 @@ log = structlog.get_logger(__name__)
 
 
 SDG_SOURCES_FILE = Path(__file__).parent / "sdg_sources.csv"
+
+
+def concat_variables(variables: List[Variable]) -> Table:
+    """Concatenate variables into a single table keeping all metadata."""
+    t = Table(pd.concat(variables, axis=1))
+    for v in variables:
+        if v.name:
+            t._fields[v.name] = v.metadata
+    return t
 
 
 def _load_sdg_sources() -> pd.DataFrame:
@@ -83,7 +91,6 @@ def run(dest_dir: str) -> None:
 
     # group by datasets to make sure we load each one only once
     for dataset_name, sdg_group in sdg_sources.groupby("dataset_name"):
-
         # kludge: if dataset is World Bank WDI, then grab metadata from the
         # corresponding garden dataset
         regex = re.search(r"world_development_indicators__world_bank__(\d{4}_\d{2}_\d{2})$", dataset_name)
@@ -101,7 +108,6 @@ def run(dest_dir: str) -> None:
 
         # go over all indicators from that dataset
         for r in sdg_group.itertuples():
-
             # iterate over all tables in a dataset (backported datasets would
             # usually have only one)
             for table_name in ds.table_names:

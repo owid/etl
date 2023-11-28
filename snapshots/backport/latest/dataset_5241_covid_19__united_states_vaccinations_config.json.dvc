@@ -1,19 +1,15 @@
 meta:
-  name: Grapher metadata for dataset_5241_covid_19__united_states_vaccinations
-  description: ''
   source:
     name: Our World in Data catalog backport
-    description:
     url: https://owid.cloud/admin/datasets/5241
-    source_data_url:
-    owid_data_url:
-    date_accessed: 2023-07-19 08:26:04.268878
+    date_accessed: 2023-08-16 07:15:34.059684
     publication_date: latest
-    publication_year:
     published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_5241_covid_19__united_states_vaccinations (archived)
+  description: ''
   is_public: false
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: e689e68499fadd1608475c6c377cb1c2
-  size: 10003
+- md5: 74029df848395adb51dbf23fea132714
+  size: 12312
   path: dataset_5241_covid_19__united_states_vaccinations_config.json

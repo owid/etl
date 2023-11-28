@@ -1,0 +1,76 @@
+dataset:
+  update_period_days: 365
+  sources: []
+definitions:
+  common:
+    sources: []
+    origins:
+      - producer: World Inequality Database (WID.world)
+        title: World Inequality Database
+        description: |-
+          The World Inequality Database (WID), previously The World Wealth and Income Database, is an extensive database on the distribution of income and wealth. It is primarily maintained by the World Inequality Lab (WIL), located at the Paris School of Economics, who coordinate a collaborative effort involving hundreds of researchers.
+        citation_full: World Inequality Database (WID), https://wid.world
+        url_main: https://wid.world/
+        date_accessed: '2023-08-24'
+        date_published: '2023'
+
+    presentation:
+      grapher_config:
+        originUrl: https://ourworldindata.org/economic-inequality
+tables:
+  world_inequality_database:
+    variables:
+      p99p100_share_pretax:
+        title: Top 1% - Share (Pretax) (Estimated)
+        unit: '%'
+        short_unit: '%'
+        description_short: "The share of income received by the richest 1% of the population."
+        display:
+          name: Top 1% - Share (Pretax) (Estimated)
+          tolerance: 5
+          numDecimalPlaces: 1
+        description_key:
+          - Income is ‘pre-tax’ — measured before taxes have been paid and most government benefits have been received. It is, however, measured _after_ the operation of pension schemes, both private and public.
+          - The data is estimated from a combination of household surveys, tax records and national accounts data. This combination can provide a more accurate picture of the incomes of the richest, which tend to be captured poorly in household survey data alone.
+          - These underlying data sources are not always available. For some countries, observations are extrapolated from data relating to other years, or are sometimes modeled based on data observed in other countries.
+        description_processing: |-
+          - **We ingest the original data.** We extract and process the data from WID’s [Stata tool](https://github.com/thomasblanchet/wid-stata-tool).
+          - **Monetary values were converted to international-$ in 2022 prices.** To account for inflation and differences in the cost of living between countries, we transform the data using WID’s `xlcusp` dataset in Stata.
+          - **We calculate additional metrics.** We make transformations of the data to derive some additional metrics that are not available directly from the original World Inequality Database, as percentile and share ratios, derived from income thresholds and shares, respectively.
+        presentation:
+          title_variant: Before tax
+          attribution_short: World Inequality Database
+          topic_tags:
+            - Economic Inequality
+          grapher_config:
+            title: Income share of the richest 1% (before tax)
+            subtitle: >-
+              The share of income received by the richest 1% of the population. Income here is measured before taxes and benefits.
+            note: >-
+              Income is measured before payment of taxes and non-pension benefits, but after
+              the payment of public and private pensions.
+            hasMapTab: true
+            tab: map
+            variantName: WID
+            yAxis:
+              min: 0
+            map:
+              time: 2019
+              colorScale:
+                baseColorScheme: OrRd
+                binningStrategy: manual
+                customNumericValues:
+                  - 5
+                  - 10
+                  - 15
+                  - 20
+                  - 25
+                  - 30
+            selectedEntityNames:
+              - Chile
+              - Brazil
+              - United States
+              - South Africa
+              - China
+              - France
+            $schema: https://files.ourworldindata.org/schemas/grapher-schema.003.json

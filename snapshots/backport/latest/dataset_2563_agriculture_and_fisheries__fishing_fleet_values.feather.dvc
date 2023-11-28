@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2563
+    date_accessed: 2023-08-16 09:48:22.378214
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Agriculture and Fisheries - Fishing fleet
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: f7aacab970d8ac2f385397e9fb2f73ae
+  size: 23298
+  path: dataset_2563_agriculture_and_fisheries__fishing_fleet_values.feather

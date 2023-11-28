@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1581
+    date_accessed: 2023-08-16 07:58:04.956700
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Measles
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 26ce03530ef6f0ba9c051c8dbc6af573
+  size: 1701242
+  path: dataset_1581_measles_values.feather

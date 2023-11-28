@@ -1,12 +1,10 @@
 from datetime import datetime
 
-import pandas as pd
-from owid.catalog import Dataset, Table
+from owid.catalog import Table
 from structlog import get_logger
 
-from etl.helpers import PathFinder
+from etl.helpers import PathFinder, create_dataset
 from etl.snapshot import Snapshot
-from etl.steps.data.converters import convert_snapshot_metadata
 
 log = get_logger()
 
@@ -19,25 +17,17 @@ def run(dest_dir: str) -> None:
 
     # retrieve snapshot
     snap = Snapshot("biodiversity/2023-01-11/cherry_blossom.csv")
-    df = pd.read_csv(snap.path)
+    tb = snap.read()
 
     # clean and transform data
-    df = clean_data(df)
+    tb = clean_data(tb)
+    tb = convert_date(tb)
 
-    df = convert_date(df)
-    # create new dataset and reuse walden metadata
-    ds = Dataset.create_empty(dest_dir, metadata=convert_snapshot_metadata(snap.metadata))
-    ds.metadata.version = "2023-01-11"
-
-    df = df.reset_index(drop=True)
-    # # create table with metadata from dataframe and underscore all columns
-    tb = Table(df, short_name=snap.metadata.short_name, underscore=True)
-
-    # add table to a dataset
-    ds.add(tb)
-
-    # update metadata
-    ds.update_metadata(paths.metadata_path)
+    #
+    # Save outputs.
+    #
+    # Create a new grapher dataset with the same metadata as the garden dataset.
+    ds = create_dataset(dest_dir, tables=[tb.set_index(["country", "year"])], default_metadata=snap.metadata)
 
     # finally save the dataset
     ds.save()
@@ -45,7 +35,7 @@ def run(dest_dir: str) -> None:
     log.info("cherry_blossom.end")
 
 
-def clean_data(df: pd.DataFrame) -> pd.DataFrame:
+def clean_data(df: Table) -> Table:
     df = df.dropna(subset=["Entity", "Full-flowering date"])
 
     return df.rename(columns={"Entity": "country", "Year": "year"}).drop(
@@ -53,7 +43,7 @@ def clean_data(df: pd.DataFrame) -> pd.DataFrame:
     )
 
 
-def convert_date(df: pd.DataFrame) -> pd.DataFrame:
+def convert_date(df: Table) -> Table:
     """
     The full flowering date is formated like MDD, we should change this to day of the year for better biological meaning. For example the 4th April is shown as 404.
     In this function we:
@@ -67,7 +57,7 @@ def convert_date(df: pd.DataFrame) -> pd.DataFrame:
     df["Full-flowering date"] = df["Full-flowering date"].astype("Int64").astype("str").str.zfill(4)
     df["date_combine"] = df["year"] + df["Full-flowering date"]
 
-    df["Full-flowering date"] = list(map(lambda x: datetime.strptime(x, "%Y%m%d").strftime("%j"), df["date_combine"]))
+    df["Full-flowering date"] = df["date_combine"].apply(lambda x: datetime.strptime(x, "%Y%m%d").strftime("%j"))
 
     df = df.drop(columns=["Full-flowering date (DOY)", "date_combine"])
 

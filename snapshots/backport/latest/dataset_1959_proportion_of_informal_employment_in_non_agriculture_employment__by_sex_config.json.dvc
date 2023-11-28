@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1959
+    date_accessed: 2023-08-14 05:52:04.322129
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_1959_proportion_of_informal_employment_in_non_agriculture_employment__by_sex
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 08a0475d1430eff6911a271f72bfb2eb
+  size: 4120
+  path: 
+    dataset_1959_proportion_of_informal_employment_in_non_agriculture_employment__by_sex_config.json

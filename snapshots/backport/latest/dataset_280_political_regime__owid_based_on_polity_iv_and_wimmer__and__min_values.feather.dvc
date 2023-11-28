@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/280
+    date_accessed: 2023-08-16 10:50:04.922629
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Political Regime - OWID based on Polity IV and Wimmer & Min
+  description: ''
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: ebc453c401ae96a48f43682f859405a6
+  size: 25866
+  path: 
+    dataset_280_political_regime__owid_based_on_polity_iv_and_wimmer__and__min_values.feather

@@ -1,16 +1,14 @@
-from owid import catalog
+from etl.helpers import PathFinder, create_dataset
 
-from etl.helpers import PathFinder
-
-N = PathFinder(__file__)
+paths = PathFinder(__file__)
 
 
 def run(dest_dir: str) -> None:
-    # NOTE: this generates shortName `population_density__owid_latest`, perhaps we should keep it as `population_density`
-    # and create unique constraint on (shortName, version, namespace) instead of just (shortName, namespace)
-    dataset = catalog.Dataset.create_empty(dest_dir, N.garden_dataset.metadata)
-    dataset.save()
+    ds_garden = paths.load_dataset("population_density")
 
-    table = N.garden_dataset["population_density"].reset_index()
+    tb = ds_garden["population_density"]
 
-    dataset.add(table)
+    ds_grapher = create_dataset(
+        dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=ds_garden.metadata
+    )
+    ds_grapher.save()

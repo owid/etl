@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2500
+    date_accessed: 2023-08-16 09:39:32.552216
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Population (Clio-infra (2016)), with Island of Ireland (Rep. + Northern)
+  description: The Clio-infra (2016) data with population figures listed under (Ireland)
+    referring to the Island of Ireland after 1921 (partition of Ireland), not just
+    the Rep. of Ireland
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 5de595739fc85ea057c708142358aba7
+  size: 32138
+  path: 
+    dataset_2500_population__clio_infra__2016__with_island_of_ireland__rep__plus_northern_values.feather

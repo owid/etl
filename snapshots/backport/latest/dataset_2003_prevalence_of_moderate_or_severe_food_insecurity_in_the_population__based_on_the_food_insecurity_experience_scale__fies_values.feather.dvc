@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2003
+    date_accessed: 2023-08-14 08:51:29.129988
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Prevalence of moderate or severe food insecurity in the population, based
+    on the Food Insecurity Experience Scale (FIES)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 2e541dd2c6df176c233b7edcf1d21d89
+  size: 12530
+  path: 
+    dataset_2003_prevalence_of_moderate_or_severe_food_insecurity_in_the_population__based_on_the_food_insecurity_experience_scale__fies_values.feather

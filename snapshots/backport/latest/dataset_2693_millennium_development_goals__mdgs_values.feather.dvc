@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2693
+    date_accessed: 2023-08-16 08:45:37.696704
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Millennium Development Goals (MDGs)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 7d42f55551d435117794b8c6aa140807
+  size: 15370
+  path: dataset_2693_millennium_development_goals__mdgs_values.feather

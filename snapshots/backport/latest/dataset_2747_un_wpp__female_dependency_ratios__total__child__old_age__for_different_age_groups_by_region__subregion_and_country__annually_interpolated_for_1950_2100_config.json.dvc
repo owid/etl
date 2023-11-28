@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2747
+    date_accessed: 2023-08-14 05:54:10.970759
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_2747_un_wpp__female_dependency_ratios__total__child__old_age__for_different_age_groups_by_region__subregion_and_country__annually_interpolated_for_1950_2100
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: ad7ff04674349a6eae49306da9c0269b
+  size: 35012
+  path: 
+    dataset_2747_un_wpp__female_dependency_ratios__total__child__old_age__for_different_age_groups_by_region__subregion_and_country__annually_interpolated_for_1950_2100_config.json

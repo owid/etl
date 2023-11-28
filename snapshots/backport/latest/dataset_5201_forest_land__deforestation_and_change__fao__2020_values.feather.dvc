@@ -1,18 +1,14 @@
 meta:
-  namespace: backport
-  short_name: dataset_5201_forest_land__deforestation_and_change__fao__2020_values
-  file_extension: feather
-  date_accessed: 2023-06-01 12:52:15.480078
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5201
+    date_accessed: 2023-08-10 09:06:12.609802
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Forest land, deforestation and change (FAO, 2020)
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/5201
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 36dc5adc17088015c66bd52760076831
+- md5: 63abce3d9fe0946f28898ab6c7b63372
   size: 214050
   path: dataset_5201_forest_land__deforestation_and_change__fao__2020_values.feather

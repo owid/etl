@@ -36,5 +36,3 @@ flowchart LR
     classDef node fill:#002147,color:#002147
     classDef node_ss fill:#002147,color:#fff
 ```
-
-!!! bug "TODO: Add an example of code"

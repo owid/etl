@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4592
+    date_accessed: 2023-08-14 15:06:51.794171
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_4592_detected_victims_of_human_trafficking__by_age_and_sex__number
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: a1f06f364694a6788bb8cac177a3c318
+  size: 10042
+  path: 
+    dataset_4592_detected_victims_of_human_trafficking__by_age_and_sex__number_config.json

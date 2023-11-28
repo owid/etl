@@ -1,0 +1,113 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Plastic Pollution
+
+
+tables:
+  plastic_use_polymer:
+    variables:
+      abs__asa__san:
+        title: AB, ASA, SAN
+        description_short: AB (Acrylonitrile and Butadiene) specializes in oil-resistant applications like gaskets and hoses; ASA (Acrylonitrile, Styrene, and Acrylate) is valued for outdoor applications like siding and furniture due to its weather resistance and strength; and SAN (Styrene and Acrylonitrile) is prevalent in consumer goods like food packaging and kitchenware for its transparency and durability.
+        unit: 'tonnes'
+        short_unit: 't'
+        display:
+          numDecimalPlaces: 0
+      bioplastics:
+        title: Bioplastics
+        description_short: Bioplastics, derived from renewable resources like corn starch and plant oils, offer an eco-friendly alternative to conventional plastics and are used in various applications including packaging, agriculture, and medical implants, with some being biodegradable and others non-biodegradable.
+        unit: 'tonnes'
+        short_unit: 't'
+        display:
+          numDecimalPlaces: 0
+      elastomers__tyres:
+        title: Elastomers tyres
+        description_short: Elastomers, known for their elasticity and resilience, are utilized in a diverse range of applications including tires, medical devices, footwear, seals and gaskets, sporting goods, adhesives, industrial hoses and belts, and various consumer products.
+        unit: 'tonnes'
+        short_unit: 't'
+        display:
+          numDecimalPlaces: 0
+      fibres:
+        title: Fibres
+        description_short: Fibres are elongated pieces or threads, having a length many times their diameter. They can be spun into yarn or made into fabric.
+        unit: 'tonnes'
+        short_unit: 't'
+        display:
+          numDecimalPlaces: 0
+      hdpe:
+        title: HDPE
+        unit: 'tonnes'
+        description_short: HDPE (High-Density Polyethylene) is a durable, chemical-resistant thermoplastic, widely used in containers, pipes, and outdoor furniture. It is lightweight, has high tensile strength, and is recyclable,
+        short_unit: 't'
+        display:
+          numDecimalPlaces: 0
+      ldpe__lldpe:
+        title: LLDPE, LLDPE
+        description_short: LLDPE (Linear Low-Density Polyethylene) is a type of polyethylene plastic that is known for its flexibility, toughness, and relative transparency. It's widely used in applications like plastic bags, films, containers, and tubing due to its high impact and puncture resistance.
+        unit: 'tonnes'
+        short_unit: 't'
+        display:
+          numDecimalPlaces: 0
+      marine_coatings:
+        title: Marine coatings
+        description_short: Marine coatings are specialized protective coatings applied to ships, boats, and other marine structures to protect them from corrosion, fouling, and the harsh marine environment. These coatings are designed to be durable, resistant to saltwater, ultraviolet light, and harsh weather conditions, and are critical for extending the life of marine vessels and structures, improving their performance, and reducing maintenance costs.
+        unit: 'tonnes'
+        short_unit: 't'
+        display:
+          numDecimalPlaces: 0
+      other:
+        title: Other
+        unit: 'tonnes'
+        short_unit: 't'
+        display:
+          numDecimalPlaces: 0
+      pet:
+        title: PET
+        description_short: Polyethylene Terephthalate (PET) is a strong, lightweight, and recyclable plastic, often used to make containers like bottles and food packaging due to its clarity and ability to act as a barrier to moisture and gases. It is one of the most commonly recycled plastics, often used to create polyester fibers for textiles after recycling.
+        unit: 'tonnes'
+        short_unit: 't'
+        display:
+          numDecimalPlaces: 0
+      pp:
+        title: PP
+        description_short: Polypropylene (PP) is a versatile, heat-resistant, and chemical-resistant plastic, commonly used in packaging, automotive components, textiles, and consumer goods.
+        unit: 'tonnes'
+        short_unit: 't'
+        display:
+          numDecimalPlaces: 0
+      ps:
+        title: PS
+        description_short: Polystyrene (PS) is a versatile plastic known for its rigidity, clarity, and heat resistance, and it is commonly used in food packaging, like disposable cups and trays, insulation, and consumer goods. While it is technically recyclable, the actual recycling rate is quite low due to economic and environmental issues associated with its recycling process.
+        unit: 'tonnes'
+        short_unit: 't'
+        display:
+          numDecimalPlaces: 0
+      pur:
+        title: PUR
+        description_short: Polyurethane (PUR) is a versatile polymer known for its elasticity, durability, and resistance to abrasion, and it is commonly used in foam seating, insulation materials, elastomeric wheels and tires, and adhesives. Its recycling is less common due to challenges in breaking down its complex polymers, but some specialized facilities do recycle polyurethane products.
+        unit: 'tonnes'
+        short_unit: 't'
+        display:
+          numDecimalPlaces: 0
+      pvc:
+        title: PVC
+        description_short: Polyvinyl Chloride (PVC) is a durable, versatile plastic used in construction materials like pipes and cables, clothing, and inflatable structures due to its resistance to environmental conditions and chemicals. Its recycling is less common due to the presence of chlorine, but some specialized recycling facilities can handle PVC products.
+        unit: 'tonnes'
+        short_unit: 't'
+        display:
+          numDecimalPlaces: 0
+      road_marking_coatings:
+        title: Road marking coatings
+        description_short: Road marking coatings are specialized paints or materials used to create road markings, such as lanes and pedestrian crossings, essential for road safety and traffic regulation. These coatings are designed to be highly durable, visible, and resistant to weather, abrasion, and chemicals, with some incorporating reflective elements to enhance visibility at night.
+        unit: 'tonnes'
+        short_unit: 't'
+        display:
+          numDecimalPlaces: 0
+      total:
+        title: Total
+        unit: 'tonnes'
+        short_unit: 't'
+        display:
+          numDecimalPlaces: 0

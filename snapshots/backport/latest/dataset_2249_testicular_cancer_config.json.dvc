@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2249
+    date_accessed: 2023-08-16 08:48:49.210651
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2249_testicular_cancer (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 9a37ccc68d16f254edff4c4ffd2e56bf
+  size: 32578
+  path: dataset_2249_testicular_cancer_config.json

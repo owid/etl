@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/417
+    date_accessed: 2023-08-16 07:23:26.505130
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Neglected Tropical Diseases (Lymphatic Filariasis) Population requiring PC
+    not-treated and treated - Enric Jané (2016)
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 148f72a05e1a3ae6b33ab554cafe8dc5
+  size: 15218
+  path: 
+    dataset_417_neglected_tropical_diseases__lymphatic_filariasis__population_requiring_pc_not_treated_and_treated__enric_jane__2016_values.feather

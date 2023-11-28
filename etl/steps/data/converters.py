@@ -37,22 +37,45 @@ def convert_walden_metadata(wd: WaldenDataset) -> DatasetMeta:
 
 def convert_snapshot_metadata(snap: SnapshotMeta) -> DatasetMeta:
     """
-    Copy metadata for a dataset directly from what we have in Walden.
+    Copy metadata for a dataset directly from what we have in Snapshot.
     """
-    return DatasetMeta(
-        short_name=snap.short_name,
-        namespace=snap.namespace,
-        title=snap.name,
-        version=snap.version,
-        description=snap.description,
-        sources=[snap.source],
-        licenses=[snap.license] if snap.license else [],
-    )
+    if snap.origin:
+        ds_meta = DatasetMeta(
+            short_name=snap.short_name,
+            namespace=snap.namespace,
+            version=snap.version,
+            # dataset title and description are filled from origin
+            title=snap.origin.title,
+            description=snap.origin.description,
+            licenses=[snap.license] if snap.license else [],
+        )
+    elif snap.source:
+        ds_meta = DatasetMeta(
+            short_name=snap.short_name,
+            namespace=snap.namespace,
+            title=snap.name,
+            version=snap.version,
+            description=snap.description,
+            licenses=[snap.license] if snap.license else [],
+        )
+    else:
+        raise ValueError("Snapshot must have either origin or source")
+
+    # we allow both origin and source for backward compatiblity
+    if snap.origin:
+        ds_meta.origins = [snap.origin]
+    if snap.source:
+        ds_meta.sources = [snap.source]
+
+    return ds_meta
 
 
 def convert_grapher_source(s: gm.Source) -> Source:
+    description = s.description.get("additionalInfo") or ""
+
     # append publisher source to description
-    description = f"{s.description.get('additionalInfo')}\nPublisher source: {s.description.get('dataPublisherSource')}"
+    if s.description.get("dataPublisherSource"):
+        description += f"\nPublisher source: {s.description.get('dataPublisherSource')}"
 
     return Source(
         name=s.name,

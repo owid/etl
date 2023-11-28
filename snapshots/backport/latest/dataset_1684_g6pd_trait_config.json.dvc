@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1684
+    date_accessed: 2023-08-16 08:34:35.105174
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1684_g6pd_trait (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: fa1f22dc5b5a1af277326d8c5f31adac
+  size: 16418
+  path: dataset_1684_g6pd_trait_config.json

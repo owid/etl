@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/573
+    date_accessed: 2023-08-10 15:05:28.144682
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Natural disasters from 1900 to 2019 - EMDAT (2020)
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 0b24ab368fa614d05d29167e158b133f
+  size: 28266
+  path: dataset_573_natural_disasters_from_1900_to_2019__emdat__2020_values.feather

@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/809
+    date_accessed: 2023-08-10 14:40:12.113445
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: 'Prices: Deflators - FAO (2017)'
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 038ce71301d6e928ee8ff4ab3776662b
+  size: 430114
+  path: dataset_809_prices__deflators__fao__2017_values.feather

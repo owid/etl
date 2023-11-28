@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1614
+    date_accessed: 2023-08-16 10:11:01.598244
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Cystic echinococcosis
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 501051d1bee19774c898933bcf05741e
+  size: 1600130
+  path: dataset_1614_cystic_echinococcosis_values.feather

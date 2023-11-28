@@ -1,19 +1,15 @@
 meta:
-  name: Grapher metadata for dataset_5070_covid_2019__johns_hopkins__2020
-  description: ''
   source:
     name: Our World in Data catalog backport
-    description:
     url: https://owid.cloud/admin/datasets/5070
-    source_data_url:
-    owid_data_url:
-    date_accessed: 2023-07-19 08:46:22.418160
+    date_accessed: 2023-08-16 08:51:05.506053
     publication_date: latest
-    publication_year:
     published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_5070_covid_2019__johns_hopkins__2020 (archived)
+  description: ''
   is_public: false
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 09d5a940cbe53d687b21598cc82e18ac
-  size: 4571
+- md5: e87d72a4bb1b1d6444e94814663860cd
+  size: 5575
   path: dataset_5070_covid_2019__johns_hopkins__2020_config.json

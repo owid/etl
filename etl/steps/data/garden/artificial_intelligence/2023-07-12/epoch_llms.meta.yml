@@ -1,11 +1,10 @@
 dataset:
   title: Large Language Model performance and compute, Epoch (2023)
-  description: EPOCH dataset on how performance on a MMLU language benchmark scales with computational resources.
+  description: Epoch dataset on how performance on a MMLU language benchmark scales with computational resources.
   licenses:
   - name: Creative Commons BY 4.0
   sources:
   - name: Epoch (2023)
-    description: Epoch dataset on how performance on a MMLU language benchmark scales with computational resources.
     url:  https://docs.google.com/spreadsheets/d/1HSGbUVwGy3XLuChH_H16Keux2jmVfKT9rfDrC3uu-SQ/edit?usp=sharing
     date_accessed: '2023-07-12'
     publication_date: '2023-07-12'
@@ -43,6 +42,9 @@ tables:
 
 
           Imagine you're teaching a computer to recognize different types of fruits. The training data size would refer to the number of fruit images you show to the computer during the training process. If you show it 100 images of various fruits, then the training data size would be 100. The more training data you provide, the better the computer can learn to identify different fruits accurately.
+
+
+          The size of the GPT-4 dataset is an estimate and has not been officially disclosed.
         display:
           numDecimalPlaces: 0
 

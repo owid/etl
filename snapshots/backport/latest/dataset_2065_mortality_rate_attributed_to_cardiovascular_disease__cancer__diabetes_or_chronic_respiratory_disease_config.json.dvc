@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2065
+    date_accessed: 2023-08-14 16:09:49.638858
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_2065_mortality_rate_attributed_to_cardiovascular_disease__cancer__diabetes_or_chronic_respiratory_disease
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 32408f3d2702e753a0f4dae82aaae604
+  size: 15285
+  path: 
+    dataset_2065_mortality_rate_attributed_to_cardiovascular_disease__cancer__diabetes_or_chronic_respiratory_disease_config.json

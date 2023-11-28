@@ -22,6 +22,7 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
+    # Make grapher friendly
     tb_garden = make_grapher_friendly(tb_garden)
 
     #
@@ -38,6 +39,7 @@ def run(dest_dir: str) -> None:
 
 
 def make_grapher_friendly(df: Table) -> Table:
+    df = df.reset_index()
     # year
     reference_date = pd.Timestamp(2020, 1, 1)
     df["year"] = pd.to_datetime(df["date"])
@@ -46,4 +48,6 @@ def make_grapher_friendly(df: Table) -> Table:
     df["country"] = df["entity"]
     # drop unused columns
     df = df.drop(columns=["date", "entity"])
+    # Set index
+    df = df.set_index(["country", "year"])
     return df

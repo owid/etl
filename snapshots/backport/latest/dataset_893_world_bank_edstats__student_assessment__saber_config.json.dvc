@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/893
+    date_accessed: 2023-08-16 09:41:37.730123
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_893_world_bank_edstats__student_assessment__saber
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 7ce4289600b244f88cc11905b63d7d95
+  size: 22994
+  path: dataset_893_world_bank_edstats__student_assessment__saber_config.json

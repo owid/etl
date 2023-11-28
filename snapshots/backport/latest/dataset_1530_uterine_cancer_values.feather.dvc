@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1530
+    date_accessed: 2023-08-11 07:52:53.930459
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Uterine cancer
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: a8b6d759ff009da843f13ea504518649
+  size: 1389906
+  path: dataset_1530_uterine_cancer_values.feather

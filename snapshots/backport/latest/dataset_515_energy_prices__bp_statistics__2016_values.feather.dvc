@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/515
+    date_accessed: 2023-08-16 10:47:52.556638
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Energy Prices - BP Statistics (2016)
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: f91a069494b09221266267dc7f884455
+  size: 7074
+  path: dataset_515_energy_prices__bp_statistics__2016_values.feather

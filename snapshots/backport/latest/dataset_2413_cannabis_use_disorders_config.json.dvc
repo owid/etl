@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2413
+    date_accessed: 2023-08-14 14:28:34.875528
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2413_cannabis_use_disorders (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 6cfb7d01ecbfbfaf6e2bc650d281c680
+  size: 84327
+  path: dataset_2413_cannabis_use_disorders_config.json

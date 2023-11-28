@@ -8,9 +8,7 @@ from owid.datautils.common import warn_on_list_of_entities
 from owid.datautils.decorators import enable_file_download
 
 
-def _load_json_data_and_duplicated_keys(
-    ordered_pairs: List[Tuple[Hashable, Any]]
-) -> Any:
+def _load_json_data_and_duplicated_keys(ordered_pairs: List[Tuple[Hashable, Any]]) -> Any:
     clean_dict = {}
     duplicated_keys = []
     for key, value in ordered_pairs:
@@ -50,9 +48,7 @@ def load_json(json_file: Union[str, Path], warn_on_duplicated_keys: bool = True)
     with open(json_file, "r") as _json_file:
         json_content = _json_file.read()
         if warn_on_duplicated_keys:
-            data = json.loads(
-                json_content, object_pairs_hook=_load_json_data_and_duplicated_keys
-            )
+            data = json.loads(json_content, object_pairs_hook=_load_json_data_and_duplicated_keys)
         else:
             data = json.loads(json_content)
 

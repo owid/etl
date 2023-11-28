@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4650
+    date_accessed: 2023-08-16 10:30:02.273525
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_4650_net_official_development_assistance__oda__as_a_percentage_of_oecd_dac_donors_gni__by_donor_countries__pct
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 637dbbc76194225a49fff9a8664a31b7
+  size: 6726
+  path: 
+    dataset_4650_net_official_development_assistance__oda__as_a_percentage_of_oecd_dac_donors_gni__by_donor_countries__pct_config.json

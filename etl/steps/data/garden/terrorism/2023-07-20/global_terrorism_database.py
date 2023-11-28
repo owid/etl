@@ -2,6 +2,7 @@
 
 from typing import List, cast
 
+import numpy as np
 import pandas as pd
 from owid.catalog import Dataset, Table
 
@@ -11,8 +12,7 @@ from etl.helpers import PathFinder, create_dataset
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
-# Regions for which aggregates will be created.
-REGIONS = ["North America", "South America", "Europe", "Africa", "Asia", "Oceania", "World"]
+REGIONS = ["Europe", "Africa", "Asia", "Oceania", "World"]
 
 
 def add_data_for_regions(tb: Table, regions: List[str], ds_regions: Dataset) -> Table:
@@ -106,12 +106,23 @@ def run(dest_dir: str) -> None:
 
     # Process data to calculate statistics related to terrorism incidents.
     tb: Table = geo.harmonize_countries(df=tb_terrorism, countries_file=paths.country_mapping_path)
+    # Make sure year and country are correct datatypes to ensure aggregations are done correctly
     total_df = pd.DataFrame()
+
+    # Check if the 'country' column is of type 'category'; if not, convert it
+    if tb["country"].dtype.name != "category":
+        tb["country"] = tb["country"].astype("category")
+
+    assert (
+        tb["country"].dtype.name == "category"
+    ), "The 'country' column must be of type 'category for subsequent aggregations to be correct'"
+
     total_df["total_killed"] = tb.groupby(["country", "year"])["nkill"].sum()
     total_df["total_wounded"] = tb.groupby(["country", "year"])["nwound"].sum()
     total_df["total_incident_counts"] = tb.groupby(["country", "year"]).size()
-    total_df["total_casualties"] = total_df["total_wounded"] + total_df["total_incident_counts"]
 
+    # Add GTD regions to number of deaths, attacks and wounded
+    total_df = add_regions(tb, total_df)
     tb.loc[tb["nkill"] == 0, "severity"] = "0 deaths"
     tb.loc[(tb["nkill"] >= 1) & (tb["nkill"] <= 5), "severity"] = "1-5 deaths"
     tb.loc[(tb["nkill"] >= 6) & (tb["nkill"] <= 10), "severity"] = "6-10 deaths"
@@ -120,33 +131,21 @@ def run(dest_dir: str) -> None:
     tb.loc[(tb["nkill"] >= 51) & (tb["nkill"] <= 100), "severity"] = "51-99 deaths"
     tb.loc[(tb["nkill"] > 100), "severity"] = "100+"
 
-    # For the total_regions_df
-    total_regions_df = generate_summary_dataframe(tb, ["year", "region_txt"], ["nkill", "nwound"])
-
     # For the total_attack_type
-    total_attack_type = generate_summary_dataframe(tb, ["country", "year", "attacktype1_txt"], ["nkill", "nwound"])
+    total_attack_type = generate_summary_dataframe(tb, "attacktype1_txt", ["nkill", "nwound"])
 
     # For the total_suicide
-    total_suicide = generate_summary_dataframe(tb, ["country", "year", "suicide"], ["nkill", "nwound"])
+    total_suicide = generate_summary_dataframe(tb, "suicide", ["nkill", "nwound"])
     suicide_mapping = {0: "No Suicide", 1: "Suicide"}
     total_suicide["suicide"] = total_suicide["suicide"].map(suicide_mapping)
 
     # For the total_target
-    total_target = generate_summary_dataframe(tb, ["country", "year", "targtype1_txt"], ["nkill", "nwound"])
+    total_target = generate_summary_dataframe(tb, "targtype1_txt", ["nkill", "nwound"])
 
     # For the total_severity
-    total_severity = pd.DataFrame()
-    total_severity["total_incident_severity"] = tb.groupby(["country", "year", "severity"]).size()
-    total_severity.reset_index(inplace=True)
-
+    total_severity = severity(tb)
     # Create a dictionary to store all pivot tables
     pivot_tables = {
-        "regions": pivot_dataframe(
-            total_regions_df,
-            index_columns=["year"],
-            pivot_column="region_txt",
-            value_columns=["total_nkill", "total_nwound", "total_incident_counts"],
-        ),
         "attack_type": pivot_dataframe(
             total_attack_type,
             index_columns=["year", "country"],
@@ -174,11 +173,11 @@ def run(dest_dir: str) -> None:
     }
 
     # Merge all pivot tables
-    merged_df = pivot_tables["regions"]
+    merged_df = pivot_tables["attack_type"]
     for key in pivot_tables:
         if key == "target":
             pivot_tables[key] = add_suffix(pivot_tables[key], "_target")
-        if key != "regions":
+        if key != "attack_type":
             merged_df = pd.merge(merged_df, pivot_tables[key], on=["year", "country"], how="outer")
 
     merge_all = pd.merge(total_df, merged_df, on=["country", "year"], how="outer")
@@ -186,22 +185,18 @@ def run(dest_dir: str) -> None:
     df_pop_deaths = add_deaths_and_population(merge_all)
     ds_regions: Dataset = paths.load_dependency("regions")
     df_pop_deaths = add_data_for_regions(tb=df_pop_deaths, regions=REGIONS, ds_regions=ds_regions)
-
     # Calculate statistics per capita
-    df_pop_deaths["terrorism_wounded_per_capita"] = df_pop_deaths["total_wounded"] / df_pop_deaths["population"]
-    df_pop_deaths["terrorism_deaths_per_capita"] = df_pop_deaths["total_killed"] / df_pop_deaths["population"]
-    df_pop_deaths["terrorism_casualties_per_capita"] = df_pop_deaths["total_casualties"] / df_pop_deaths["population"]
-    df_pop_deaths["share_of_deaths"] = (df_pop_deaths["total_killed"] / df_pop_deaths["deaths"]) * 100
-
-    # Convert relevant columns to float64 data type (to avoid errors related to this issue -  https://github.com/owid/etl/issues/1334)
-    df_pop_deaths["terrorism_casualties_per_capita"] = df_pop_deaths["terrorism_casualties_per_capita"].astype(
-        "float64"
+    df_pop_deaths["terrorism_wounded_per_100k"] = df_pop_deaths["total_wounded"] / (
+        df_pop_deaths["population"] / 100000
     )
-    df_pop_deaths["terrorism_deaths_per_capita"] = df_pop_deaths["terrorism_deaths_per_capita"].astype("float64")
-    df_pop_deaths["terrorism_wounded_per_capita"] = df_pop_deaths["terrorism_wounded_per_capita"].astype("float64")
+    df_pop_deaths["terrorism_deaths_per_100k"] = df_pop_deaths["total_killed"] / (df_pop_deaths["population"] / 100000)
+    df_pop_deaths["share_of_deaths"] = (df_pop_deaths["total_killed"] / df_pop_deaths["deaths"]) * 100
 
     # Drop total deaths and population columns
     df_pop_deaths.drop(["deaths", "population"], axis=1, inplace=True)
+
+    # Clean country entries by setting NaN values for countries in years where they either didn't exist or had collapsed
+    df_pop_deaths = clean_countries(df_pop_deaths)
 
     # Convert DataFrame to a new garden dataset table.
     tb_garden = Table(df_pop_deaths, short_name=paths.short_name, underscore=True)
@@ -223,7 +218,6 @@ def run(dest_dir: str) -> None:
     tb_garden["injured_per_non_suicide_attack"] = (
         tb_garden["total_nwound_no_suicide"] / tb_garden["total_incident_counts_no_suicide"]
     )
-
     # Create a new garden dataset with the same metadata as the meadow dataset.
     ds_garden = create_dataset(dest_dir, tables=[tb_garden], default_metadata=ds_meadow_terrorism.metadata)
 
@@ -251,27 +245,169 @@ def add_suffix(df: pd.DataFrame, suffix: str) -> pd.DataFrame:
     return df
 
 
-def generate_summary_dataframe(df, group_columns, target_columns):
+def clean_countries(df):
     """
-    Generate a summary DataFrame based on the specified group and target columns.
+    Clean a DataFrame by setting NaN values for countries in years where they either didn't exist or had collapsed.
 
     Parameters:
-        df (pandas.DataFrame): The original DataFrame.
-        group_columns (list): List of column names for grouping the data.
-        target_columns (list): List of column names for calculating the summary statistics.
+    df (DataFrame): The input DataFrame that contains at least 'country' and 'year' columns, along with other metrics.
+
+    Returns:
+    DataFrame: A cleaned DataFrame where rows with non-existent or collapsed countries in a given year are set to NaN.
+    """
+
+    # Dictionary mapping modern countries to their years of independence
+    # This is a sample dictionary. Replace or extend it with your own data as necessary.
+    independence_year = {
+        # Czechoslovakia
+        "Czechia": 1993,
+        "Slovakia": 1993,
+        # Yugoslavia
+        "Bosnia and Herzegovina": 1992,
+        "Croatia": 1991,
+        "Kosovo": 1999,
+        "Macedonia": 1991,
+        "Serbia and Montenegro": 2003,
+        "Montenegro": 2006,
+        "Serbia": 2006,
+        "Slovenia": 1991,
+        # USSR
+        "Russia": 1991,
+        "Armenia": 1991,
+        "Azerbaijan": 1991,
+        "Belarus": 1991,
+        "Estonia": 1991,
+        "Georgia": 1991,
+        "Kazakhstan": 1991,
+        "Kyrgyzstan": 1991,
+        "Latvia": 1991,
+        "Lithuania": 1991,
+        "Moldova": 1991,
+        "Tajikistan": 1991,
+        "Turkmenistan": 1991,
+        "Ukraine": 1991,
+        "Uzbekistan": 1991,
+        # Other
+        "Eritrea": 1993,
+        "Germany": 1990,
+    }
+    # Dictionary mapping countries that have collapsed to the years they ceased to exist
+    # This is a sample dictionary. Replace or extend it with your own data as necessary.
+    collapse_years = {
+        "Czechoslovakia": 1993,
+        "USSR": 1991,
+        "East Germany": 1990,
+        "West Germany": 1990,
+        "Yugoslavia": 2003,
+        "Serbia and Montenegro": 2006,
+    }
+
+    # Create a list combining all the country names from both dictionaries
+    all_countries = list(independence_year.keys()) + list(collapse_years.keys())
+
+    # Check if each country exists in df["country"]
+    missing_countries = [country for country in all_countries if country not in df["country"].values]
+
+    # Raise an AssertionError if any country is missing
+    assert not missing_countries, f"The following countries are missing in the dataset: {missing_countries}"
+
+    # Go through DataFrame and set NaNs for countries that did not exist in the given year
+    for index, row in df.iterrows():
+        country = row["country"]
+        year = row["year"]
+
+        # List of columns in df that are neither 'country' nor 'year'
+        # These are the columns whose values will be set to NaN if conditions are met
+        other_columns = [col for col in df.columns if col not in ["country", "year"]]
+
+        # Check if the country in the row became independent after the year in the row
+        # If so, set the metrics for that row to NaN
+        if country in independence_year:
+            if year < independence_year[country]:
+                df.loc[index, other_columns] = np.nan
+
+        # Check if the country in the row collapsed before the year in the row
+        # If so, set the metrics for that row to NaN
+        elif country in collapse_years:
+            if year > collapse_years[country]:
+                df.loc[index, other_columns] = np.nan
+    return df
+
+
+def add_regions(df, total_df):
+    """
+    Aggregates incident data by regions and years, summarizing the total killed, wounded, and incident counts.
+
+    Args:
+        df (pd.DataFrame): A DataFrame containing the columns 'region_txt', 'year', 'nkill', 'nwound',
+                           and 'total_incident_counts'. 'region_txt' refers to the region text, 'nkill'
+                           to the number of people killed, 'nwound' to the number of people wounded,
+                           and 'total_incident_counts' to the total number of incidents.
+
+    Returns:
+        pd.DataFrame: A concatanated DataFrame with original data concatenated with aggregated data grouped by region and year, containing the total number
+                      of killed, wounded, and incidents.
+
+    """
+    grouped_regions_df = df.groupby(["region_txt", "year"])
+    summary_regions_df = pd.DataFrame()
+
+    for column in ["nkill", "nwound"]:
+        summary_regions_df[f"total_{column}"] = grouped_regions_df[column].sum()
+
+    summary_regions_df["total_incident_counts"] = grouped_regions_df.size()
+    summary_regions_df = summary_regions_df.rename_axis(index={"region_txt": "country"})
+
+    summary_regions_df.rename(columns={"total_nkill": "total_killed", "total_nwound": "total_wounded"}, inplace=True)
+    merged_df = pd.concat([summary_regions_df, total_df])
+
+    return merged_df
+
+
+def generate_summary_dataframe(df, group_column, target_columns):
+    """
+    Generate a summary DataFrame based on specified group and target columns. The function groups
+    data by year and the specified group column, which may include "country" or "region_txt."
+    If the group column is not "region_txt," it will also include regional summaries.
+
+    Parameters:
+        df (pandas.DataFrame): The original DataFrame containing the data.
+        group_column (str): The column name by which to group the data. If "region_txt," data
+                            will be grouped by "year" and "region_txt"; otherwise, data will be
+                            grouped by "country," "year," and the specified group column.
+        target_columns (list of str): List of column names for calculating summary statistics
+                                      (e.g., sum of "nkill" and "nwound").
 
     Returns:
         pandas.DataFrame: A summary DataFrame with grouped data and corresponding summary statistics.
+                          If group_column is not "region_txt," the DataFrame also includes regional
+                          summaries, and the index name "region_txt" is renamed to "country."
     """
-    grouped_df = df.groupby(group_columns)
+    if group_column != "region_txt":
+        grouped_df = df.groupby(["country", "year", group_column])
+    else:
+        grouped_df = df.groupby(["year", group_column])
+
     summary_df = pd.DataFrame()
 
     for column in target_columns:
         summary_df[f"total_{column}"] = grouped_df[column].sum()
 
     summary_df["total_incident_counts"] = grouped_df.size()
+    if group_column != "region_txt":
+        grouped_regions_df = df.groupby(["region_txt", "year", group_column])
+        summary_regions_df = pd.DataFrame()
 
-    return summary_df.reset_index()
+        for column in target_columns:
+            summary_regions_df[f"total_{column}"] = grouped_regions_df[column].sum()
+
+        summary_regions_df["total_incident_counts"] = grouped_regions_df.size()
+        summary_regions_df = summary_regions_df.rename_axis(index={"region_txt": "country"})
+        merge_GTD_regions = pd.concat([summary_regions_df, summary_df])
+
+        return merge_GTD_regions.reset_index()
+    else:
+        return summary_df.reset_index()
 
 
 def pivot_dataframe(dataframe, index_columns, pivot_column, value_columns):
@@ -301,3 +437,31 @@ def pivot_dataframe(dataframe, index_columns, pivot_column, value_columns):
         ]
 
     return pivot_df
+
+
+def severity(tb):
+    """
+    Calculate the total incident severity for each country and region by year and severity level.
+    The function groups the input DataFrame by country, year, and severity, and then by region (region_txt),
+    year, and severity. The results are concatenated into a single DataFrame, where the region_txt index
+    level is renamed to "country."
+
+    Parameters:
+        tb (pandas.DataFrame): The original DataFrame containing columns "country," "region_txt,"
+                              "year," and "severity."
+
+    Returns:
+        pandas.DataFrame: A DataFrame containing the total incident severity for each country and region,
+                          grouped by year and severity level. The DataFrame has columns "country," "year,"
+                          "severity," and "total_incident_severity."
+    """
+    total_severity_country = pd.DataFrame()
+    total_severity_country["total_incident_severity"] = tb.groupby(["country", "year", "severity"]).size()
+
+    total_severity_regions = pd.DataFrame()
+    total_severity_regions["total_incident_severity"] = tb.groupby(["region_txt", "year", "severity"]).size()
+
+    total_severity_regions = total_severity_regions.rename_axis(index={"region_txt": "country"})
+    merge_GTD_regions = pd.concat([total_severity_country, total_severity_regions])
+
+    return merge_GTD_regions.reset_index()

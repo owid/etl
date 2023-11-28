@@ -1,0 +1,45 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Life Expectancy
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/en/latest/architecture/metadata/reference/dataset/
+dataset:
+  title: Survivorship percentiles (HMD, Alvarez and Vaupel; 2023)
+  update_period_days: 365
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/en/latest/architecture/metadata/reference/tables/
+tables:
+  survivor_percentiles:
+    variables:
+      age:
+        title: Survivorship age
+        unit: years
+        processing_level: major
+        description_short: |-
+          <% if percentile == 1 %>
+          The age until which the 1st percentile (99% of the population) of the population would survive until, if they experienced the same age-specific death rates throughout their whole lives as the age-specific death rates seen in that particular year.
+          <% else %>
+          The age until which the << percentile>>th percentile (<< 100 - percentile|int>>% of the population) of the population would survive until, if they experienced the same age-specific death rates throughout their whole lives as the age-specific death rates seen in that particular year.
+          <% endif %>
+
+        description_processing: |-
+          This was calculated with the method published in Alvarez and Vaupel (2023), with code provided by the authors:
+
+          Jesús-Adrián Alvarez, James W. Vaupel; Mortality as a Function of Survival. Demography 1 February 2023; 60 (1): 327–342. doi: https://doi.org/10.1215/00703370-10429097
+
+          These estimates were regenerated for data from more recent years in the Human Mortality Database.
+
+          Original R code from: https://github.com/jssalvrz/s-ages
+        description_key:
+          - This is calculated with the period life tables indicators.
+        display:
+          numDecimalPlaces: 1
+        presentation:
+          attribution: |-
+            Alvarez & Vaupel (2023); Human Mortality Database (2023)

@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4721
+    date_accessed: 2023-08-10 14:38:14.054286
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: International Health Regulations (IHR) capacity, by type of IHR capacity (%)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 2409a87b2eaf4b7e9ea4ab62e4cfe302
+  size: 71234
+  path: 
+    dataset_4721_international_health_regulations__ihr__capacity__by_type_of_ihr_capacity__pct_values.feather

@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/864
+    date_accessed: 2023-08-16 10:07:58.363546
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_864_clio_infra__agriculture__klein_goldewijk__2015
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 5e4e5c89e8ba587e4239039dbf4be571
+  size: 25757
+  path: dataset_864_clio_infra__agriculture__klein_goldewijk__2015_config.json

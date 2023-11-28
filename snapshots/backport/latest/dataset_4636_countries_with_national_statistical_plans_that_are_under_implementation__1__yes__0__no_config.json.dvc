@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4636
+    date_accessed: 2023-08-14 16:10:58.771778
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_4636_countries_with_national_statistical_plans_that_are_under_implementation__1__yes__0__no
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 54de098228fe6f1a3d2cdd656dfd7047
+  size: 5152
+  path: 
+    dataset_4636_countries_with_national_statistical_plans_that_are_under_implementation__1__yes__0__no_config.json

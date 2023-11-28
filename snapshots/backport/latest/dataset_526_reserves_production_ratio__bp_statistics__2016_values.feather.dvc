@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/526
+    date_accessed: 2023-08-16 08:25:03.423996
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Reserves-Production Ratio - BP Statistics (2016)
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: b36bd099f3209f53a89eeafcad11ca62
+  size: 6146
+  path: dataset_526_reserves_production_ratio__bp_statistics__2016_values.feather

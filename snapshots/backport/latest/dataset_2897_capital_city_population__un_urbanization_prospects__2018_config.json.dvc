@@ -1,19 +1,15 @@
 meta:
-  namespace: backport
-  short_name: dataset_2897_capital_city_population__un_urbanization_prospects__2018_config
-  file_extension: json
-  date_accessed: 2023-06-01 12:39:19.546276
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2897
+    date_accessed: 2023-08-10 09:25:50.303023
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_2897_capital_city_population__un_urbanization_prospects__2018
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/2897
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: e14b6e7d000e13c9e638c9d5cd85bd4e
-  size: 1837
+- md5: f3b81cae0ded611913fbe7e5517d636f
+  size: 1990
   path: 
     dataset_2897_capital_city_population__un_urbanization_prospects__2018_config.json

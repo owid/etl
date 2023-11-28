@@ -1,0 +1,66 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Plastic Pollution
+
+
+dataset:
+  title: Global Plastics Outlook - Plastics waste in 2019 by region and polymer
+  description: >-
+    Plastic waste from the following polymers includes the folllowing:
+      1. **AB, ASA, SAN**
+        - **AB** (Acrylonitrile and Butadiene) specializes in oil-resistant applications like gaskets and hoses.
+        - **ASA** (Acrylonitrile, Styrene, and Acrylate) is valued for outdoor applications like siding and furniture due to its weather resistance and strength.
+        - **SAN** (Styrene and Acrylonitrile) is prevalent in consumer goods like food packaging and kitchenware for its transparency and durability.
+
+      2. **Bioplastics**
+        - Bioplastics, derived from renewable resources like corn starch and plant oils, offer an eco-friendly alternative to conventional plastics and are used in various applications including packaging, agriculture, and medical implants, with some being biodegradable and others non-biodegradable.
+
+      3. **Elastomers Tyres**
+        - Elastomers, known for their elasticity and resilience, are utilized in a diverse range of applications including tires, medical devices, footwear, seals and gaskets, sporting goods, adhesives, industrial hoses and belts, and various consumer products.
+
+      4. **Fibres**
+        - Fibres are elongated pieces or threads, having a length many times their diameter. They can be spun into yarn or made into fabric.
+
+      5. **HDPE** (High-Density Polyethylene)
+        - HDPE is a durable, chemical-resistant thermoplastic, widely used in containers, pipes, and outdoor furniture. It is lightweight, has high tensile strength, and is recyclable.
+
+      6. **LLDPE, LDPE** (Linear Low-Density Polyethylene)
+        - LLDPE is a type of polyethylene plastic that is known for its flexibility, toughness, and relative transparency. It's widely used in applications like plastic bags, films, containers, and tubing due to its high impact and puncture resistance.
+
+      7. **Marine Coatings**
+        - Marine coatings are specialized protective coatings applied to ships, boats, and other marine structures to protect them from corrosion, fouling, and the harsh marine environment. These coatings are designed to be durable, resistant to saltwater, ultraviolet light, and harsh weather conditions.
+
+      8. **PET** (Polyethylene Terephthalate)
+        - PET is a strong, lightweight, and recyclable plastic, often used to make containers like bottles and food packaging due to its clarity and ability to act as a barrier to moisture and gases.
+
+      9. **PP** (Polypropylene)
+        - PP is a versatile, heat-resistant, and chemical-resistant plastic, commonly used in packaging, automotive components, textiles, and consumer goods.
+
+      10. **PS** (Polystyrene)
+          - PS is a versatile plastic known for its rigidity, clarity, and heat resistance, and it is commonly used in food packaging, like disposable cups and trays, insulation, and consumer goods.
+
+      11. **PUR** (Polyurethane)
+          - PUR is a versatile polymer known for its elasticity, durability, and resistance to abrasion, and it is commonly used in foam seating, insulation materials, elastomeric wheels and tires, and adhesives.
+
+      12. **PVC** (Polyvinyl Chloride)
+          - PVC is a durable, versatile plastic used in construction materials like pipes and cables, clothing, and inflatable structures due to its resistance to environmental conditions and chemicals.
+
+      13. **Road Marking Coatings**
+          - Road marking coatings are specialized paints or materials used to create road markings, such as lanes and pedestrian crossings, essential for road safety and traffic regulation.
+tables:
+  plastic_waste_2019:
+    variables:
+      plastic_waste:
+        title: Plastic waste by polymer in 2019
+        unit: 'tonnes'
+        short_unit: 't'
+        display:
+          numDecimalPlaces: 0
+      share:
+        title: Share of plastic waste by polymer in 2019
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 2

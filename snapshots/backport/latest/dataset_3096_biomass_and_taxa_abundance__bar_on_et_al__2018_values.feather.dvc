@@ -1,18 +1,14 @@
 meta:
-  namespace: backport
-  short_name: dataset_3096_biomass_and_taxa_abundance__bar_on_et_al__2018_values
-  file_extension: feather
-  date_accessed: 2023-02-23 17:33:14.398718
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/3096
+    date_accessed: 2023-08-10 07:46:23.968942
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Biomass and taxa abundance (Bar-On et al. 2018)
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/3096
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: caedd523415b10fc9fca165142a393fc
+- md5: f90036b3aac7899866eb0ee42dc44181
   size: 6674
   path: dataset_3096_biomass_and_taxa_abundance__bar_on_et_al__2018_values.feather

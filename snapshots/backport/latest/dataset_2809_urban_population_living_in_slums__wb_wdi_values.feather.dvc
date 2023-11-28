@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2809
+    date_accessed: 2023-08-16 08:47:17.699228
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Urban population living in slums (WB WDI)
+  description: ''
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 38f68ad97666bba8412b049302924843
+  size: 18898
+  path: dataset_2809_urban_population_living_in_slums__wb_wdi_values.feather

@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2612
+    date_accessed: 2023-08-10 14:46:44.562655
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Prices and Purchasing Power Parities - G20 – CPI All items
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: df553ef0acee6c58d4395f8935e4ea6b
+  size: 7362
+  path: 
+    dataset_2612_prices_and_purchasing_power_parities__g20__cpi_all_items_values.feather

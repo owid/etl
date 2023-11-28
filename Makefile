@@ -6,7 +6,7 @@
 
 include default.mk
 
-SRC = etl snapshots backport walkthrough fasttrack tests
+SRC = etl snapshots apps tests docs
 PYTHON_PLATFORM = $(shell python -c "import sys; print(sys.platform)")
 LIBS = lib/*
 
@@ -67,9 +67,11 @@ watch: .venv
 	fi
 	touch .sanity-check
 
+test: check-formatting lint check-typing unittest version-tracker
+
 .venv: .sanity-check pyproject.toml poetry.toml poetry.lock
 	@echo '==> Installing packages'
-	poetry install || poetry install
+	poetry install --no-ansi || poetry install --no-ansi
 	touch $@
 
 check-typing: .venv

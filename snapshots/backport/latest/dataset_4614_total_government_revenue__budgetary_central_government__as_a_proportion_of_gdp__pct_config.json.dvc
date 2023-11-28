@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4614
+    date_accessed: 2023-08-14 15:09:14.695130
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_4614_total_government_revenue__budgetary_central_government__as_a_proportion_of_gdp__pct
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 92f15b5976725b7802649a9eca7a1459
+  size: 21452
+  path: 
+    dataset_4614_total_government_revenue__budgetary_central_government__as_a_proportion_of_gdp__pct_config.json

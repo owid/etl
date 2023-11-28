@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1484
+    date_accessed: 2023-08-16 09:57:30.284431
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Pneumococcal meningitis
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 088874b4fbcd15982dd8655cc55481a7
+  size: 2012050
+  path: dataset_1484_pneumococcal_meningitis_values.feather

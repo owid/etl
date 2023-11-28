@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1652
+    date_accessed: 2023-08-16 09:22:44.995010
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Chronic myeloid leukemia
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 23811fdd1f321e8965911a1cbf3b0ab2
+  size: 1389898
+  path: dataset_1652_chronic_myeloid_leukemia_values.feather

@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/653
+    date_accessed: 2023-08-16 08:52:13.195456
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Crude Oil Consumption vs. Price - BP Statistics (2016)
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: a498b55a39a3a1870e2c7a3aa648c307
+  size: 7274
+  path: dataset_653_crude_oil_consumption_vs__price__bp_statistics__2016_values.feather

@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2243
+    date_accessed: 2023-08-16 09:42:06.376444
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Other pharynx cancer
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 49c7754dc5c367c72d7e600af5a85ca6
+  size: 1498642
+  path: dataset_2243_other_pharynx_cancer_values.feather

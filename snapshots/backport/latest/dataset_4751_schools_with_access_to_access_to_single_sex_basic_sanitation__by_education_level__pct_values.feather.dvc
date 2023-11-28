@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4751
+    date_accessed: 2023-08-11 07:38:29.097752
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Schools with access to access to single-sex basic sanitation, by education
+    level (%)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 5d9cce8415dd57c0b88e7f20687b1774
+  size: 14426
+  path: 
+    dataset_4751_schools_with_access_to_access_to_single_sex_basic_sanitation__by_education_level__pct_values.feather

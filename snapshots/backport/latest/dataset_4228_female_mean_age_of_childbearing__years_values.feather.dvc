@@ -1,18 +1,15 @@
 meta:
-  namespace: backport
-  short_name: dataset_4228_female_mean_age_of_childbearing__years_values
-  file_extension: feather
-  date_accessed: 2023-06-01 12:41:28.552446
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4228
+    date_accessed: 2023-08-10 08:38:42.879879
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Female mean age of childbearing (years)
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/4228
-  source_published_by: Our World in Data catalog backport
   is_public: false
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: f7156e675de826b5925edc15f0ab3884
+- md5: ca6562815830c31085e7ba792aa3f606
   size: 29354
   path: dataset_4228_female_mean_age_of_childbearing__years_values.feather

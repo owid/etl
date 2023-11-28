@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4763
+    date_accessed: 2023-08-10 15:07:12.459069
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Proportion of time spent on unpaid domestic chores and care work, by sex,
+    age and location (%)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: e2ff772bb35fbc5653baf03da19d24e7
+  size: 26250
+  path: 
+    dataset_4763_proportion_of_time_spent_on_unpaid_domestic_chores_and_care_work__by_sex__age_and_location__pct_values.feather

@@ -1,10 +1,9 @@
 dataset:
   title: UK historical electricity (DUKES, 2023c)
   description: |
-    All data prior to 1985 (and prior to 1965 in the case of renewables), is sourced from <a href="https://www.gov.uk/government/statistics/electricity-chapter-5-digest-of-united-kingdom-energy-statistics-dukes">the Digest of UK Energy Statistics (DUKES), published by the UK's Department for Business, Energy & Industrial Strategy</a>.
+    All data prior to 1985 (and prior to 1965 in the case of renewables), is sourced from [the Digest of UK Energy Statistics (DUKES), published by the UK's Department for Business, Energy & Industrial Strategy](https://www.gov.uk/government/statistics/electricity-chapter-5-digest-of-united-kingdom-energy-statistics-dukes).
 
-    All other data is sourced from the <a href="https://www.energyinst.org/statistical-review">the Energy Institute (EI) Statistical Review of World Energy</a> and <a href="https://ember-climate.org/data-catalogue/yearly-electricity-data/">Ember's Yearly Electricity Data</a>. Where data from Ember is available for a given year, we rely on it as the primary source. We then supplement this with data from EI where data from Ember is not available.
-
+    All other data is sourced from the [the Energy Institute (EI) Statistical Review of World Energy](https://www.energyinst.org/statistical-review) and [Ember's Yearly Electricity Data](https://ember-climate.org/data-catalogue/yearly-electricity-data/). Where data from Ember is available for a given year, we rely on it as the primary source. We then supplement this with data from EI where data from Ember is not available.
 tables:
   uk_historical_electricity:
     variables:

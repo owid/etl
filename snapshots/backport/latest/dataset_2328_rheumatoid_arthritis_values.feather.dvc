@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2328
+    date_accessed: 2023-08-16 09:43:40.031248
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Rheumatoid arthritis
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 897ca1d9fafb188a5e82273b83c91400
+  size: 1807818
+  path: dataset_2328_rheumatoid_arthritis_values.feather

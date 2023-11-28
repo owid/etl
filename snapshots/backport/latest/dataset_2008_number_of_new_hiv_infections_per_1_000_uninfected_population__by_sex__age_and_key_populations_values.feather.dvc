@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2008
+    date_accessed: 2023-08-10 14:39:32.186371
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Number of new HIV infections per 1,000 uninfected population, by sex, age
+    and key populations
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 5e77373ace413ff095e0edeabf1e449d
+  size: 53498
+  path: 
+    dataset_2008_number_of_new_hiv_infections_per_1_000_uninfected_population__by_sex__age_and_key_populations_values.feather

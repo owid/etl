@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/224
+    date_accessed: 2023-08-16 10:25:30.226198
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Fertility - UN Population Division (2015 revision)
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 5f9895a99e2b22162e378df4c15752c8
+  size: 25466
+  path: dataset_224_fertility__un_population_division__2015_revision_values.feather

@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/616
+    date_accessed: 2023-08-14 15:16:08.552600
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Health - Quality of Government (2017)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: f3485eea35bac7f1cd523ad94af20d07
+  size: 134762
+  path: dataset_616_health__quality_of_government__2017_values.feather

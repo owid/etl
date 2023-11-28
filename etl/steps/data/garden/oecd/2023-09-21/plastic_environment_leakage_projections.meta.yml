@@ -1,0 +1,13 @@
+tables:
+  plastic_environment_leakage_projections:
+    variables:
+      value:
+        title: Plastic leakage to the envrionment - projections
+        unit: 'tonnes'
+        short_unit: 't'
+        display:
+          isProjection: true
+          numDecimalPlaces: 0
+        presentation:
+          topic_tags:
+            - Plastic Pollution

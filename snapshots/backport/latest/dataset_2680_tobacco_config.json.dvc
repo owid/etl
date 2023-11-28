@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2680
+    date_accessed: 2023-08-11 07:35:30.038815
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2680_tobacco (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: b089eb60ab915f0327eab60f3b7bd67a
+  size: 27998
+  path: dataset_2680_tobacco_config.json

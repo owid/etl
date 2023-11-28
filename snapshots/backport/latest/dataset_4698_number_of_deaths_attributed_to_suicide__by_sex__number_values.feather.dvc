@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4698
+    date_accessed: 2023-08-14 05:36:12.669039
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Number of deaths attributed to suicide, by sex (number)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 18d41ce3313c7c65efb72de853d76365
+  size: 25770
+  path: 
+    dataset_4698_number_of_deaths_attributed_to_suicide__by_sex__number_values.feather

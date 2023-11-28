@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/866
+    date_accessed: 2023-08-16 08:52:41.727744
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Clio-Infra - Labour Relations
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: f841a2a1d0dd673f8f22a2a295a02575
+  size: 76722
+  path: dataset_866_clio_infra__labour_relations_values.feather

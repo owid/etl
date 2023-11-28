@@ -1,0 +1,15 @@
+tables:
+  uk_egg_statistics:
+    variables:
+      number_of_eggs_from_barns:
+        display:
+          numDecimalPlaces: 0
+      number_of_eggs_from_enriched_cages:
+        display:
+          numDecimalPlaces: 0
+      number_of_eggs_from_non_organic_free_range_farms:
+        display:
+          numDecimalPlaces: 0
+      number_of_eggs_from_organic_free_range_farms:
+        display:
+          numDecimalPlaces: 0

@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1801
+    date_accessed: 2023-08-16 09:35:21.100576
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1801_non_exclusive_breastfeeding (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: bee5dc6f0753d6a4c4ff284069f19d28
+  size: 22222
+  path: dataset_1801_non_exclusive_breastfeeding_config.json

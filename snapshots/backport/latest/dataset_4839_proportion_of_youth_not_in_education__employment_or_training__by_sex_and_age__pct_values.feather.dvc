@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4839
+    date_accessed: 2023-08-10 15:03:37.053194
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Proportion of youth not in education, employment or training, by sex and age
+    (%)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: a2f44408b1d44a181ddb2d1501fc1e9e
+  size: 28170
+  path: 
+    dataset_4839_proportion_of_youth_not_in_education__employment_or_training__by_sex_and_age__pct_values.feather

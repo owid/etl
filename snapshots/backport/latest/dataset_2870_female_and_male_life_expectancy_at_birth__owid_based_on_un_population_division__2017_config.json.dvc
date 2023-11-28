@@ -1,21 +1,16 @@
 meta:
-  namespace: backport
-  short_name: 
-    dataset_2870_female_and_male_life_expectancy_at_birth__owid_based_on_un_population_division__2017_config
-  file_extension: json
-  date_accessed: 2023-06-01 13:06:15.484401
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2870
+    date_accessed: 2023-08-10 07:46:48.762845
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Grapher metadata for 
     dataset_2870_female_and_male_life_expectancy_at_birth__owid_based_on_un_population_division__2017
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/2870
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: a91293666fd54d7e2e60ad0b72e4542e
-  size: 2615
+- md5: da4116b0c5ff4f2bfcd9b1625d3139e0
+  size: 2895
   path: 
     dataset_2870_female_and_male_life_expectancy_at_birth__owid_based_on_un_population_division__2017_config.json

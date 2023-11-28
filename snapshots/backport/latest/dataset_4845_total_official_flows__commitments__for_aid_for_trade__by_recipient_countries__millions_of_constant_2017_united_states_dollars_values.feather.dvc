@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4845
+    date_accessed: 2023-08-11 07:43:23.709075
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Total official flows (commitments) for Aid for Trade, by recipient countries
+    (millions of constant 2017 United States dollars)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 2f62647366d04fe67032f6408d467224
+  size: 26442
+  path: 
+    dataset_4845_total_official_flows__commitments__for_aid_for_trade__by_recipient_countries__millions_of_constant_2017_united_states_dollars_values.feather

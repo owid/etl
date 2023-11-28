@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4584
+    date_accessed: 2023-08-16 09:35:47.414986
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_4584_number_of_victims_of_intentional_homicide__by_sex__number
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: d787b53c1ddb6c72a97e963a7232205b
+  size: 16468
+  path: 
+    dataset_4584_number_of_victims_of_intentional_homicide__by_sex__number_config.json

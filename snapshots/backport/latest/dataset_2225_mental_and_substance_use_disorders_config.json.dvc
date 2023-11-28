@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2225
+    date_accessed: 2023-08-16 09:53:10.683163
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2225_mental_and_substance_use_disorders (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: db5efdd7827ad7aa9486b7916ad996c6
+  size: 33295
+  path: dataset_2225_mental_and_substance_use_disorders_config.json

@@ -1,19 +1,16 @@
 meta:
-  namespace: backport
-  short_name: dataset_2830_distribution_of_bilateral_and_unilateral_trade_partnerships__fouquin_and_hugot__cepii_2016_values
-  file_extension: feather
-  date_accessed: 2023-02-23 18:30:56.277525
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2830
+    date_accessed: 2023-08-10 08:41:00.545203
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Distribution of bilateral and unilateral trade partnerships - Fouquin and
     Hugot (CEPII 2016)
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/2830
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 462d285bdef66371f127e933420b4200
+- md5: 94719b6d4a13be65bf2a7f391a585a64
   size: 7434
-  path: dataset_2830_distribution_of_bilateral_and_unilateral_trade_partnerships__fouquin_and_hugot__cepii_2016_values.feather
+  path: 
+    dataset_2830_distribution_of_bilateral_and_unilateral_trade_partnerships__fouquin_and_hugot__cepii_2016_values.feather

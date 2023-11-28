@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2204
+    date_accessed: 2023-08-16 07:20:20.122541
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Extensively drug-resistant tuberculosis
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 29e2861c13e6540158c7e35b0d25c365
+  size: 2071834
+  path: dataset_2204_extensively_drug_resistant_tuberculosis_values.feather

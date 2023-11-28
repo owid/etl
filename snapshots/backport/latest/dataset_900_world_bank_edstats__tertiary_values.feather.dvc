@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/900
+    date_accessed: 2023-08-16 08:42:55.474418
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: World Bank EdStats - Tertiary
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: bd224bea8f29c9de29b2ee534f3aba6c
+  size: 1933106
+  path: dataset_900_world_bank_edstats__tertiary_values.feather

@@ -1,18 +1,32 @@
 meta:
-  name: Peak Cherry Tree Blossom at Kyoto City (2022)
-  source_name: Multiple datasets compiled by Aono (2021)
-  publication_year: 2021
-  publication_date: 2021-03-26
-  url: http://atmenv.envi.osakafu-u.ac.jp/aono/kyophenotemp4/
-  source_data_url:
-  license_url: http://atmenv.envi.osakafu-u.ac.jp/aono/kyophenotemp4/
-  license_name:
-  date_accessed: 2023-01-11
-  is_public: true
-  description: |
+  origin:
+    producer: Yasuyuki Aono
+    title: Historical Series of Phenological data for Cherry Tree Flowering at Kyoto City (and March Mean Temperature Reconstructions)
+    url_main: http://atmenv.envi.osakafu-u.ac.jp/aono/kyophenotemp4/
+    attribution: Multiple sources compiled by Aono
+    attribution_short: Yasuyuki Aono
+    citation_full: |-
+      Yasuyuki Aono compiled this data based on multiple sources:
+      - Taguchi,T. (1939) Climatic change in historical time in Japan J. Mar. Meteorol. Soc. 19 217–27
 
+      - Sekiguchi,T. (1969) The historical dates of Japanese cherry festival since the 8th century and her climatic changes Tokyo Geog. Pap. 13 175–90
+
+      - Aono,Y. and Omoto,Y. (1994) Estimation of temperature at Kyoto since 11th century using flowering data of cherry tree in old documents J. Agric. Meteorol. 49 263–72
+
+      - Aono,Y. and Kazui,K. (2008) Phenological data series of cherry tree flowering in Kyoto, Japan, and its application to reconstruction of springtime temperatures since the 9th century Int. J. Climatol. 28 905–14
+
+      - Aono,Y. and Saito,S. (2010) Clarifying springtime temperature reconstructions of the medieval period by gap-filling the cherry blossom phenological data series at Kyoto, Japan Int. J. Biometeorol. 54 211–9
+
+      Data for 812-2021 is available here - http://atmenv.envi.osakafu-u.ac.jp/aono/kyophenotemp4/
+
+      Data for 2022 peak blossom is gathered from the Met Office (2022) - https://www.metoffice.gov.uk/about-us/press-office/news/weather-and-climate/2022/kyoto-cherry-blossom-dates-shifted-by-human-influence
+    date_published: 2021-03-26
+    date_accessed: 2023-01-11
+    license:
+      name: Custom license
+      url: http://atmenv.envi.osakafu-u.ac.jp/aono/kyophenotemp4/
 wdir: ../../../data/snapshots/biodiversity/2023-01-11
 outs:
 - md5: e966a7746093969705cf9582cd6109a4
-  size: 42758
   path: cherry_blossom.csv
+  size: 42758

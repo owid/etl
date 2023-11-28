@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2549
+    date_accessed: 2023-08-16 10:37:39.521892
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Public Sector, Taxation and Market Regulation - Table I.6. All-in average
+    personal income tax rates at average wage by family type
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: f14fef60b57e9ed52ffd2c9412f3f113
+  size: 16386
+  path: 
+    dataset_2549_public_sector__taxation_and_market_regulation__table_i_6__all_in_average_personal_income_tax_rates_at_average_wage_by_family_type_values.feather

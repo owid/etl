@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/352
+    date_accessed: 2023-08-14 15:56:51.456816
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: China share of World Poverty - World Bank (WDI) (2017)
+  description: ''
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: c3c2e1ddc7c36e99a596d7c5947d85bb
+  size: 6634
+  path: dataset_352_china_share_of_world_poverty__world_bank__wdi__2017_values.feather

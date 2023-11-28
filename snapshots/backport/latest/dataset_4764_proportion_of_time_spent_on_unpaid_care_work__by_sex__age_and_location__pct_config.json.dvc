@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4764
+    date_accessed: 2023-08-14 11:00:54.010356
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_4764_proportion_of_time_spent_on_unpaid_care_work__by_sex__age_and_location__pct
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 057d2fdc0fa0cae66d9df4f967024044
+  size: 156873
+  path: 
+    dataset_4764_proportion_of_time_spent_on_unpaid_care_work__by_sex__age_and_location__pct_config.json

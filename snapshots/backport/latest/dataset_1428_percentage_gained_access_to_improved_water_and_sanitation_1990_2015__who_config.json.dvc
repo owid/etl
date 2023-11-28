@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1428
+    date_accessed: 2023-08-16 10:07:34.994573
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_1428_percentage_gained_access_to_improved_water_and_sanitation_1990_2015__who
+    (archived)
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: ea3d25d5a82443c45239dfe10fd3962f
+  size: 2980
+  path: 
+    dataset_1428_percentage_gained_access_to_improved_water_and_sanitation_1990_2015__who_config.json

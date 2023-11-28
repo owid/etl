@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2679
+    date_accessed: 2023-08-14 05:38:37.330855
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2679_child_health (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 9bc1e271d3c99d21b11c93bb54ab9aee
+  size: 187091
+  path: dataset_2679_child_health_config.json

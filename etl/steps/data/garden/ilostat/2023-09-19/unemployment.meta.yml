@@ -1,0 +1,20 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Labor Supply & Employment
+
+
+dataset:
+  title: "Unemployment rates, by age and education level (ILOSTAT)"
+tables:
+  unemployment:
+    variables:
+      unemployment_rate:
+        title: Unemployment rate
+        unit: '%'
+        short_unit:  '%'
+        description_short:  'Conveys the number of persons who are unemployed as a percent of the labour force (i.e., the employed plus the unemployed).'
+        display:
+           numDecimalPlaces: 1
+

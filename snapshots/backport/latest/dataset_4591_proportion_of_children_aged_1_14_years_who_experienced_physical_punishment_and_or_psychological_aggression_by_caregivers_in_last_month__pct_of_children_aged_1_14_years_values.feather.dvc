@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4591
+    date_accessed: 2023-08-16 09:42:15.751659
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Proportion of children aged 1-14 years who experienced physical punishment
+    and/or psychological aggression by caregivers in last month (% of children aged
+    1-14 years)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 5bf0867d766fea1d22325b1ec4c67c11
+  size: 9522
+  path: 
+    dataset_4591_proportion_of_children_aged_1_14_years_who_experienced_physical_punishment_and_or_psychological_aggression_by_caregivers_in_last_month__pct_of_children_aged_1_14_years_values.feather

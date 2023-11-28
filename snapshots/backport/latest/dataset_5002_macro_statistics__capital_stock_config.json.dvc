@@ -1,0 +1,51 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5002
+    date_accessed: 2023-08-16 07:57:10.628815
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_5002_macro_statistics__capital_stock (archived)
+  description: "As part of the FAO Agriculture Capital Stock (ACS) database, ESS-FAO
+    publishes country-by-country data on physical investment in agriculture, forestry
+    and fishing as measured by the System of National Accounts (SNA) concept of Gross
+    Fixed Capital Formation (GFCF). Additional variables included in the ACS are Net
+    and Gross Capital Stock, Consumption of Fixed Capital, the Agriculture Investment
+    ratio, and the Gross Fixed Capital Formation Agriculture Orientation Index.  \
+    \ The FAO Agriculture Capital Stock Database is an analytical database: whenever
+    available, the database integrates official National Accounts data harvested from
+    the UNSD National Accounts Main Aggregates Database (UNSD AMA) and the OECD Annual
+    National Accounts Database (OECD ANA). If the full set of official data is not
+    available for any specific country, imputation methods are applied to obtain estimates
+    over the complete time series. Many data points in ACS are estimated and are flagged
+    as such; they do not represent official Member countries' submissions.  With a
+    view of producing internationally comparable net capital stock estimates, we employ
+    the Perpetual Inventory Method (PIM) with a time invariant geometric depreciation
+    rate to impute missing data. The Perpetual Inventory Method is a well-established
+    economic model to calculate Net Capital Stocks (NCS) and Consumption of Fixed
+    Capital (CFC) from time series of Gross Fixed Capital Formation (GFCF). Specifically,
+    annual measures of the NCS are obtained from cumulating historical series on physical
+    investment flows and deducting the part of assets that are depreciated (the Consumption
+    of Fixed Capital that occurs in every period).   In order to implement the PIM,
+    long time series on aggregate GFCF in agriculture, forestry and fishing is required.
+    As much as possible, we rely on National Accounts data published by the OECD and
+    UNSD. When country data are partially or fully missing, we employ econometric
+    techniques to impute missing observations. Depending on the pattern of data missingness
+    for the countries, different imputation methods are applied (selected from the
+    ARMAX, PANEL and OLS classes of econometric models). Working with the above-mentioned
+    data sources, we can rely on country data - though very incomplete in some cases
+    - on agriculture GFCF, CFC and/or NCS for 103 countries to guide us in our data
+    gap filling exercise. For the other 104 countries included in the database, we
+    fully rely on imputation methods. For a detailed description of the imputation
+    methods and our PIM framework, refer to box 20.5.   All data series in the database
+    are provided both in national currencies and in US dollars as well as in current
+    prices and constant prices with base year 2010. Calculation of constant price
+    series is done applying GFCF deflator series. When OECD National Accounts data
+    are available, an OECD implicit deflator for agriculture GFCF is calculated and
+    used. For other cases, the implicit deflators on GFCF for total economy available
+    from the FAOSTAT Deflators database is used."
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 59eba67fed43e00ae67da284fe2ed3be
+  size: 62850
+  path: dataset_5002_macro_statistics__capital_stock_config.json

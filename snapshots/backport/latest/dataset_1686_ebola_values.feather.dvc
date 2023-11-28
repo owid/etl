@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1686
+    date_accessed: 2023-08-14 15:36:12.614850
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Ebola
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 1434d7396e5a08572cc90fca5c022d82
+  size: 98458
+  path: dataset_1686_ebola_values.feather

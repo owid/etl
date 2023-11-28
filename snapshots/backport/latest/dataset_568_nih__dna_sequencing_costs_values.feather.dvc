@@ -1,18 +1,15 @@
 meta:
-  namespace: backport
-  short_name: dataset_568_nih__dna_sequencing_costs_values
-  file_extension: feather
-  date_accessed: 2023-03-03 12:04:19.504359
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/568
+    date_accessed: 2023-08-10 09:02:54.672659
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: NIH - DNA Sequencing Costs
-  description: https://github.com/owid/notebooks/tree/main/EdouardMathieu/nih_dna_sequencing_costs
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/568
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
+  description: 
+    https://github.com/owid/notebooks/tree/main/EdouardMathieu/nih_dna_sequencing_costs
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: fac9ca561563acd95b1c2c635ab07696
+- md5: 460de74c0270491cfa6045aff835651a
   size: 6610
   path: dataset_568_nih__dna_sequencing_costs_values.feather

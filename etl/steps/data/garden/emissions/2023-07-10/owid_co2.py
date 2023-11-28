@@ -354,8 +354,7 @@ def run(dest_dir: str) -> None:
     tb_energy = ds_energy["primary_energy_consumption"]
     tb_gdp = ds_gdp["maddison_gdp"]
     tb_population = ds_population["population"]
-    tb_region_names = ds_regions["definitions"]
-    tb_region_codes = ds_regions["legacy_codes"]
+    tb_regions = ds_regions["regions"]
 
     #
     # Process data.
@@ -369,11 +368,7 @@ def run(dest_dir: str) -> None:
     tb_energy = tb_energy.reset_index()[list(PRIMARY_ENERGY_COLUMNS)].rename(columns=PRIMARY_ENERGY_COLUMNS)
     tb_gdp = tb_gdp.reset_index()[list(GDP_COLUMNS)].rename(columns=GDP_COLUMNS)
     tb_population = tb_population.reset_index()[list(POPULATION_COLUMNS)].rename(columns=POPULATION_COLUMNS)
-    tb_regions = (
-        pd.merge(tb_region_names, tb_region_codes, left_index=True, right_index=True)
-        .reset_index()[list(REGIONS_COLUMNS)]
-        .rename(columns=REGIONS_COLUMNS)
-    )
+    tb_regions = tb_regions.reset_index()[list(REGIONS_COLUMNS)].rename(columns=REGIONS_COLUMNS)
 
     # Combine tables.
     combined = combine_tables(

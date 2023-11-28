@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4624
+    date_accessed: 2023-08-16 10:27:38.602195
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Proportion of results indicators drawn from country-led results frameworks
+    - data by provider (%)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: ffdac476655ee47f627068da8d521d7f
+  size: 7194
+  path: 
+    dataset_4624_proportion_of_results_indicators_drawn_from_country_led_results_frameworks__data_by_provider__pct_values.feather

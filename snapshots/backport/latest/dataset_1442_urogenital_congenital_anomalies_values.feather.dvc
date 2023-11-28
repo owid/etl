@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1442
+    date_accessed: 2023-08-16 10:09:48.821691
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Urogenital congenital anomalies
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: f136cd1f7916a39f2143babe60c7d0ec
+  size: 1855194
+  path: dataset_1442_urogenital_congenital_anomalies_values.feather

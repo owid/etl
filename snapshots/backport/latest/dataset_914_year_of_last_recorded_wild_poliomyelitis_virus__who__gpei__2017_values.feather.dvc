@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/914
+    date_accessed: 2023-08-16 10:16:52.885370
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Year of last recorded wild poliomyelitis virus - WHO (GPEI) (2017)
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 81dbce8461896037225ed9f454e65006
+  size: 12906
+  path: 
+    dataset_914_year_of_last_recorded_wild_poliomyelitis_virus__who__gpei__2017_values.feather

@@ -1,0 +1,283 @@
+dataset:
+  update_period_days: 365
+
+definitions:
+  common:
+    presentation:
+      topic_tags:
+      - State Capacity
+
+  years: |
+    Years are defined from last date aggregations available in the Colonial Dates Dataset. This means that when sources differ, years of colonization are defined from the last date between them. This is different from mean date aggregations (also available), which averages the dates of colonization across the original sources.
+
+    Years have been expanded to show the full range of years in the dataset, from 1462 to 2022. The original dataset only includes the years where a country was colonized.
+
+tables:
+  colonial_dates_dataset:
+    variables:
+      colonizer:
+        title: European colonial power
+        unit: ""
+        short_unit: ""
+        description_short: |
+          Name of European colonial power(s) that colonized from overseas each contemporary nation state in a specific year, between Belgium, United Kingdom, France, Germany, Netherlands, Portugal, Spain, and Italy, or a combination of them.
+        description_processing: |
+          The indicator has been processed to identify the European colonial powers as "Colonizers", the countries not colonized as "Not colonized" and the countries colonized for multiple colonizers in the same year as the name of the colonizers separated by "-".
+
+          {definitions.years}
+        description_from_producer: ""
+        processing_level: major
+        display:
+          name: Colonizer
+          entityAnnotationsMap: ""
+          numDecimalPlaces: 0
+          conversionFactor: 1
+
+      colonizer_grouped:
+        title: European colonial power (grouped)
+        unit: ""
+        short_unit: ""
+        description_short: |
+          Name of European colonial power that colonized from overseas each contemporary nation state in a specific year, between Belgium, United Kingdom, France, Germany, Netherlands, Portugal, Spain, and Italy. When more than one colonizer is present, it is stated as "Multiple colonizers".
+        description_processing: |
+          The indicator has been processed to identify the European colonial powers as "Colonizers", the countries not colonized as "Not colonized" and the countries colonized for multiple colonizers in the same year as "Multiple colonizers".
+
+          {definitions.years}
+        description_from_producer: ""
+        processing_level: major
+        display:
+          name: Colonizer
+          entityAnnotationsMap: ""
+          numDecimalPlaces: 0
+          conversionFactor: 1
+
+      years_colonized:
+        title: Years the country has been colonized
+        unit: "years"
+        short_unit: "years"
+        description_short: |
+          Number of years the country has been colonized from overseas by the European colonial power(s) in a specific year, between Belgium, United Kingdom, France, Germany, Netherlands, Portugal, Spain, and Italy, or a combination of them.
+        description_processing: |
+          This is a cumulative sum of the years the country has been colonized, across the entire time series. Colonizers or countries not colonized show a value of 0.
+
+          {definitions.years}
+        description_from_producer: ""
+        processing_level: major
+        display:
+          name: Years colonized
+          entityAnnotationsMap: ""
+          numDecimalPlaces: 0
+          conversionFactor: 1
+
+      last_colonizer:
+        title: Last European colonial power
+        unit: ""
+        short_unit: ""
+        description_short: |
+          Name of the last European colonial power(s) that colonized from overseas each contemporary nation state in a specific year, between Belgium, United Kingdom, France, Germany, Netherlands, Portugal, Spain, and Italy, or a combination of them.
+        description_processing: |
+          The indicator is constructed by filling years with no colonizers with the last colonizer in the time series for each country. Colonizers are identified as such, countries not colonized as "Not colonized" and countries colonized for multiple colonizers in the same year as the name of the colonizers separated by "-".
+
+          {definitions.years}
+        description_from_producer: ""
+        processing_level: major
+        display:
+          name: Last colonizer
+          entityAnnotationsMap: ""
+          numDecimalPlaces: 0
+          conversionFactor: 1
+
+      last_colonizer_grouped:
+        title: Last European colonial power (grouped)
+        unit: ""
+        short_unit: ""
+        description_short: |
+          Name of the last European colonial power that colonized from overseas each contemporary nation state in a specific year, between Belgium, United Kingdom, France, Germany, Netherlands, Portugal, Spain, and Italy. When more than one colonizer is present, it is stated as "Multiple colonizers".
+        description_processing: |
+          The indicator is constructed by filling years with no colonizers with the last colonizer (grouped) in the time series for each country. Colonizers are identified as such, countries not colonized as "Not colonized" and countries colonized for multiple colonizers in the same year as "Multiple colonizers".
+
+          {definitions.years}
+        description_from_producer: ""
+        processing_level: major
+        display:
+          name: Last colonizer
+          entityAnnotationsMap: ""
+          numDecimalPlaces: 0
+          conversionFactor: 1
+        presentation:
+          grapher_config:
+            hideAnnotationFieldsInTitle:
+              time: true
+            hasChartTab: false
+            hasMapTab: true
+            tab: map
+            map:
+              time: latest
+              hideTimeline: true
+              colorScale:
+                baseColorScheme: Paired
+                colorSchemeInvert: true
+                customCategoryLabels:
+                  z. Multiple colonizers: Multiple colonizers
+                  United Kingdom: United Kingdom
+            $schema: https://files.ourworldindata.org/schemas/grapher-schema.003.json
+
+      total_colonies:
+        title: Number of colonies
+        unit: "countries"
+        short_unit: ""
+        description_short: |
+          Total number of overseas colonies per year colonized by an European colonial power, between Belgium, United Kingdom, France, Germany, Netherlands, Portugal, Spain, and Italy. Colonies are defined in terms of contemporary nation states: along current independent countries and their borders.
+        description_processing: |
+          This is the count of countries each European colonial power colonized each year. Colonized countries or countries not colonized show a null value.
+
+          A total for each year is estimated with the country (entity) "World".
+
+          {definitions.years}
+        description_from_producer: ""
+        processing_level: major
+        display:
+          name: Number of colonies
+          entityAnnotationsMap: ""
+          numDecimalPlaces: 0
+          conversionFactor: 1
+
+      total_colonies_pop:
+        title: Population colonized
+        unit: "people"
+        short_unit: ""
+        description_short: |
+          Population of overseas territories colonized by an European colonial power, between Belgium, United Kingdom, France, Germany, Netherlands, Portugal, Spain, and Italy. Colonies are defined in terms of contemporary nation states: along current independent countries and their borders.
+        description_processing: |
+          This is the sum of the population each European colonial power colonized each year. Colonized countries or countries not colonized show a null value.
+
+          A total for each year is estimated with the country (entity) "World".
+
+          {definitions.years}
+        description_from_producer: ""
+        processing_level: major
+        display:
+          name: Number of colonies
+          entityAnnotationsMap: ""
+          numDecimalPlaces: 0
+          conversionFactor: 1
+
+      colony_number:
+        title: Number of colonies by region
+        unit: "countries"
+        short_unit: ""
+        description_short: |
+          Total number of overseas colonies per year colonized in each region by an European colonial power, between Belgium, United Kingdom, France, Germany, Netherlands, Portugal, Spain, and Italy. Colonies are defined in terms of contemporary nation states: along current independent countries and their borders.
+        description_processing: |
+          This is is an aggregation of the number of countries each European colonial power colonized each year, by OWID geographic region or World Bank income groups.
+
+          We include Europe as a region because we conventionally classify Cyprus as a European country. The Colonial Dates Dataset data meanwhile considers Cyprus a European overseas colony.
+
+          {definitions.years}
+        description_from_producer: ""
+        processing_level: major
+        display:
+          name: Number of colonies
+          entityAnnotationsMap: ""
+          numDecimalPlaces: 0
+          conversionFactor: 1
+
+      colony_pop:
+        title: Population colonized by region
+        unit: "people"
+        short_unit: ""
+        description_short: |
+          Population of overseas colonies per year colonized in each region by an European colonial power, between Belgium, United Kingdom, France, Germany, Netherlands, Portugal, Spain, and Italy. Colonies are defined in terms of contemporary nation states: along current independent countries and their borders.
+        description_processing: |
+          This is is an aggregation of the population of territories each European colonial power colonized each year, by OWID geographic region or World Bank income groups.
+
+          We include Europe as a region because we conventionally classify Cyprus as a European country. The Colonial Dates Dataset data meanwhile considers Cyprus a European overseas colony.
+
+          {definitions.years}
+        description_from_producer: ""
+        processing_level: major
+        display:
+          name: Population colonized
+          entityAnnotationsMap: ""
+          numDecimalPlaces: 0
+          conversionFactor: 1
+
+      not_colonized_nor_colonizer_number:
+        title: Number of countries neither colonized nor colonizer by region
+        unit: "countries"
+        short_unit: ""
+        description_short: |
+          Number of countries not colonized in each region by an European colonial power. Colonies are defined in terms of contemporary nation states: along current independent countries and their borders.
+        description_processing: |
+          This is is an aggregation of the number of countries that are not colonized nor are colonizers in a given year, by OWID geographic region or World Bank income groups.
+
+          We include Europe as a region because we conventionally classify Cyprus as a European country. The Colonial Dates Dataset data meanwhile considers Cyprus a European overseas colony.
+
+          {definitions.years}
+        description_from_producer: ""
+        processing_level: major
+        display:
+          name: Number of countries neither colonized nor colonizer
+          entityAnnotationsMap: ""
+          numDecimalPlaces: 0
+          conversionFactor: 1
+
+      not_colonized_nor_colonizer_pop:
+        title: Population neither colonized nor colonizer by region
+        unit: "people"
+        short_unit: ""
+        description_short: |
+          Population of countries not colonized in each region by an European colonial power. Colonies are defined in terms of contemporary nation states: along current independent countries and their borders.
+        description_processing: |
+          This is is an aggregation of the population of territories not colonized not colonizers in a given year, by OWID geographic region or World Bank income groups.
+
+          We include Europe as a region because we conventionally classify Cyprus as a European country. The Colonial Dates Dataset data meanwhile considers Cyprus a European overseas colony.
+
+          {definitions.years}
+        description_from_producer: ""
+        processing_level: major
+        display:
+          name: Population neither colonized nor colonizer
+          entityAnnotationsMap: ""
+          numDecimalPlaces: 0
+          conversionFactor: 1
+
+      colonizer_number:
+        title: Number of colonizers by region
+        unit: "countries"
+        short_unit: ""
+        description_short: |
+          Number of European colonial powers, between Belgium, United Kingdom, France, Germany, Netherlands, Portugal, Spain, and Italy. Colonies are defined in terms of contemporary nation states: along current independent countries and their borders.
+        description_processing: |
+          This is is an aggregation of the number of countries considered European colonial powers, by OWID geographic region or World Bank income groups.
+
+          We include Europe as a region because we conventionally classify Cyprus as a European country. The Colonial Dates Dataset data meanwhile considers Cyprus a European overseas colony.
+
+          {definitions.years}
+        description_from_producer: ""
+        processing_level: major
+        display:
+          name: Number of colonizers
+          entityAnnotationsMap: ""
+          numDecimalPlaces: 0
+          conversionFactor: 1
+
+      colonizer_pop:
+        title: Population of colonizers by region
+        unit: "people"
+        short_unit: ""
+        description_short: |
+          Population of European colonial powers, between Belgium, United Kingdom, France, Germany, Netherlands, Portugal, Spain, and Italy. Colonies are defined in terms of contemporary nation states: along current independent countries and their borders.
+        description_processing: |
+          This is is an aggregation of the population of European colonial powers, by OWID geographic region or World Bank income groups.
+
+          We include Europe as a region because we conventionally classify Cyprus as a European country. The Colonial Dates Dataset data meanwhile considers Cyprus a European overseas colony.
+
+          {definitions.years}
+        description_from_producer: ""
+        processing_level: major
+        display:
+          name: Population of colonizers
+          entityAnnotationsMap: ""
+          numDecimalPlaces: 0
+          conversionFactor: 1

@@ -129,8 +129,6 @@ def _parse_metadata(js):
 
     # does not have to match
     x.pop("updatedAt")
-    x.pop("dataPath", None)
-    x.pop("metadataPath", None)
 
     return x
 

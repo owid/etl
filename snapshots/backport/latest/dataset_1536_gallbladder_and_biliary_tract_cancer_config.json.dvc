@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1536
+    date_accessed: 2023-08-14 05:32:29.567873
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1536_gallbladder_and_biliary_tract_cancer (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 2737a1200032ebf97061db849ceb2813
+  size: 27544
+  path: dataset_1536_gallbladder_and_biliary_tract_cancer_config.json

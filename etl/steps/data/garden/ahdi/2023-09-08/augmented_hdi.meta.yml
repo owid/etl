@@ -1,0 +1,270 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+      - Human Development Index (HDI)
+    display: &common-display
+      entityAnnotationsMap: "Western offshoots (AHDI): United States, Canada, Australia and New Zealand"
+
+dataset:
+  title: Augmented Human Development Index (AHDI)
+  update_period_days: 1095
+tables:
+  augmented_hdi:
+    variables:
+      ahdi:
+        title: Augmented Human Development Index (AHDI)
+        unit: ""
+        short_unit: ""
+        description_short: |
+          The AHDI seeks to give a historical perspective on human development, in four dimensions: healthy life, knowledge, a decent standard of living, and civil and political freedom.
+        description_from_producer: |
+          Human wellbeing is widely viewed as a multidimensional phenomenon, in which income is only one facet. Human development, originally defined as a process of enlarging people’s choices, namely, enjoying a healthy life, acquiring knowledge and achieving a decent standard of living, provides a multidimensional measure of wellbeing.
+
+          These achievements provide individuals with freedom to choose and the opportunity to lead their own lives. Thus, human development can be depicted as positive freedom by which individuals are granted access to resources, including property, that allow them to develop their personal potential.
+
+          In order to provide a synthetic measure of augmented human development, its different dimensions are expressed in index form,
+
+            - life expectancy at birth as a proxy for a healthy life,
+            - years of schooling as a proxy for access to knowledge,
+            - liberal democracy as a proxy for freedom,
+            - and discounted GDP per head as a surrogate for wellbeing dimensions other than education and health.
+
+          The indices for each dimension are, then, combined using equal weights into an index of human development.
+
+          In an attempt to reduce the substitutability between its different dimensions –namely, to avoid that a high achievement in one dimension linearly compensates for a low achievement in another–, the indices for each dimension are combined into a historical index of human development using a geometric average.
+
+          If we denote the non-linearly transformed values of life expectancy and education as LEB and EDU, LD to represent those of liberal democracy, and the adjusted per capita income as UNY, the historical index of human development can be expressed as,
+
+          _AHDI = (LEB * EDU * LD * UNY)^(1/4)_
+        processing_level: minor
+        description_key:
+          - "{tables.augmented_hdi.variables.ahdi.description_short}"
+          - "Each of these dimensions is measured on a scale from 0 to 1: _Life expectancy_ is the proxy for healthy life, where 1 represents 85 or more years and 0 represents 20 or less years. _Years of schooling_ is the proxy for access to knowledge, where 1 represents 15 or more years of education and 0 represents 0 years of education. The _logarithm of GDP per capita_ is the proxy for a decent standard of living, where 1 represents 47,000 international-$ at 1990 prices and 0 represents 100 international-$ at 1990 prices. [_Varieties of Democracy's Liberal democracy index_](https://ourworldindata.org/vdem-electoral-democracy-data) is the proxy for civil and political freedom, higher values represents more democracy."
+          - The AHDI is then estimated as the geometric mean of these indices, or
+            _AHDI = (Health index * Education index * Income index * Freedom index)^(1/4)_
+        display:
+          name: Augmented Human Development Index (AHDI)
+          numDecimalPlaces: 3
+          <<: *common-display
+        presentation:
+          grapher_config:
+            title: Augmented Human Development Index
+            subtitle: >-
+              The Augmented Human Development Index (AHDI) is a summary measure of
+              historical achievement in four key dimensions of human development: a long and
+              healthy life, being knowledgeable, being free and having a decent standard of living.
+            hasMapTab: true
+            tab: map
+            originUrl: https://ourworldindata.org/human-development-index
+            yAxis:
+              min: 0
+            map:
+              time: latest
+              colorScale:
+                baseColorScheme: YlGnBu
+                binningStrategy: manual
+                customNumericValues:
+                  - 0.1
+                  - 0.2
+                  - 0.3
+                  - 0.4
+                  - 0.5
+                  - 0.6
+                  - 0.7
+                  - 0.8
+                  - 0.1
+            selectedEntityNames:
+            - East Asia (AHDI)
+            - South Asia (AHDI)
+            - Middle East (AHDI)
+            - North Africa (AHDI)
+            - Latin America (AHDI)
+            - Sub Saharan Africa (AHDI)
+            - Western offshoots (AHDI)
+            - Western Europe (AHDI)
+            - Eastern Europe (AHDI)
+            $schema: https://files.ourworldindata.org/schemas/grapher-schema.003.json
+
+          topic_tags:
+            - Human Development Index (HDI)
+            - Life Expectancy
+            - Global Education
+            - Democracy
+            - Economic Growth
+
+      ahdi_excluding_income:
+        title: Augmented Human Development Index (AHDI) (excluding the income dimension)
+        unit: ""
+        short_unit: ""
+        description_short: |
+          The AHDI seeks to give a historical perspective on human development, in four dimensions: healthy life, knowledge, and civil and political freedom. This indicator excludes the income-based wellbeing component.
+        description_from_producer: ""
+        processing_level: minor
+        display:
+          name: AHDI excluding income
+          numDecimalPlaces: 3
+          <<: *common-display
+        presentation:
+          grapher_config:
+            title: Augmented Human Development Index (excluding income)
+            subtitle: >-
+              The Augmented Human Development Index (AHDI) is a summary measure of
+              historical achievement in three key dimensions of human development: a long and
+              healthy life, being knowledgeable, and being free. This version of the indicator excludes national income estimations.
+            hasMapTab: true
+            tab: map
+            originUrl: https://ourworldindata.org/human-development-index
+            yAxis:
+              min: 0
+            map:
+              time: latest
+              colorScale:
+                baseColorScheme: YlGnBu
+                binningStrategy: manual
+                customNumericValues:
+                  - 0.1
+                  - 0.2
+                  - 0.3
+                  - 0.4
+                  - 0.5
+                  - 0.6
+                  - 0.7
+                  - 0.8
+                  - 0.9
+            selectedEntityNames:
+              - United Kingdom
+              - United States
+              - South Korea
+              - India
+              - China
+              - Brazil
+              - Nigeria
+            $schema: https://files.ourworldindata.org/schemas/grapher-schema.003.json
+
+      life_expectancy:
+        title: Life expectancy
+        unit: "years"
+        short_unit: "years"
+        description_short: |
+          Average number of years a newborn would live if age-specific mortality rates in the current year were to stay the same throughout its life.
+        description_from_producer: |
+          Life expectancy is defined as the average number of years of life which would remain for males and females reaching the ages specified if they continued to be subjected to the same mortality experienced in the year(s) to which these life expectancies refer.
+        processing_level: minor
+        display:
+          name: Life expectancy
+          numDecimalPlaces: 1
+          <<: *common-display
+
+      years_of_schooling:
+        title: Years of schooling
+        unit: "years"
+        short_unit: "years"
+        description_short: |
+          Average number of years of total schooling (primary, secondary, and tertiary) for the population aged 15 and over.
+        description_from_producer: |
+          Education attainment is measured by the average years of total schooling (primary, secondary, and tertiary) for the population aged 15 and over.
+        processing_level: minor
+        display:
+          name: Years of schooling
+          numDecimalPlaces: 1
+          <<: *common-display
+
+      liberal_democracy_index:
+        title: Liberal Democracy Index
+        unit: ""
+        short_unit: ""
+        description_short: "Combines two other indices: electoral democracy index, which incorporates measures of freedom of association, expression, suffrage and clean elections; and the liberal democracy index, which includes measures of equality before the law and individual liberty, judicial constraints on the executive, and legislative constraints on the executive."
+        description_from_producer: |
+          The *Liberal Democracy Index* combines the electoral democracy index and the liberal component index. The former incorporates indices of freedom of association, expression, suffrage, and clean elections. The latter includes indices of equality before the law and individual liberty, judicial constraints on the executive, and legislative constraints on the executive.
+
+          As it measures both quantity and quality changes, a linear transformation has been accepted. Thus,
+
+          I = (x – Mo) / (M – Mo),
+
+          Where $I$ is the dimension index, $x$ is an indicator of a country’s standard of living, $M$ and $Mo$ are the maximum and minimum values, respectively, or goalposts, that facilitate comparisons over time and log stands for the natural logarithm. The index for each dimension ranges between 0 and 1.
+
+          Goalposts are set for human development’s different dimensions. In the case of liberal democracy, as it was already in index form, 1 and 0 were accepted as the goalposts.
+        processing_level: minor
+        display:
+          name: Liberal Democracy Index
+          numDecimalPlaces: 3
+          <<: *common-display
+
+      gdp_per_capita:
+        title: GDP per capita
+        unit: international-$ in 1990 prices
+        short_unit: $
+        description_short: GDP per capita expressed in international-$ at 1990 prices to account for inflation and differences in the cost of living between countries.
+        description_from_producer: |
+          GDP per head is expressed in 1990 dollars adjusted for its purchasing power adjusted, that it, for the difference in price level across countries (the so-called Geary-Khamis [G-K] 1990 $).
+        processing_level: minor
+        display:
+          name: GDP per capita
+          numDecimalPlaces: 0
+          <<: *common-display
+
+      life_expectancy_index:
+        title: Kakwani index of life expectancy
+        unit: ""
+        short_unit: ""
+        description_short: Life expectancy measured as an index between 0 and 1, where 1 is the maximum value of 85 years and 0 is the minimum value of 20 years.
+        description_from_producer: |
+          Life expectancy is defined as the average number of years of life which would remain for males and females reaching the ages specified if they continued to be subjected to the same mortality experienced in the year(s) to which these life expectancies refer.
+
+          As social variables (longevity and education) have upper and lower bounds (unlike GDP per head that has not known upper bound), they are transformed non-linearly in order to allow for two main facts: that increases of the same absolute size represent greater achievements the higher the level at which they take place, and those quality improvements are associated to increases in quantity. Thus,
+
+          I = f (x, Mo, M) = (log (M – Mo) – log (M – x)) / log (M – Mo),
+
+          Where $I$ is the dimension index, $x$ is an indicator of a country’s standard of living, $M$ and $Mo$ are the maximum and minimum values, respectively, or goalposts, that facilitate comparisons over time and log stands for the natural logarithm. The index for each dimension ranges between 0 and 1.
+
+          Goalposts are set for human development’s different dimensions. For life expectancy at birth, the maximum and the minimum values were established at 85 and 20 years, respectively.
+
+        processing_level: minor
+        display:
+          name: Life expectancy index
+          numDecimalPlaces: 3
+          <<: *common-display
+
+      schooling_index:
+        title: Kakwani index of schooling
+        unit: ""
+        short_unit: ""
+        description_short: Schooling measured as an index between 0 and 1, where 1 is the maximum value of 15 years and 0 is the minimum value of 0 years.
+        description_from_producer: |
+          Education attainment is measured by the average years of total schooling (primary, secondary, and tertiary) for the population aged 15 and over.
+
+          As social variables (longevity and education) have upper and lower bounds (unlike GDP per head that has not known upper bound), they are transformed non-linearly in order to allow for two main facts: that increases of the same absolute size represent greater achievements the higher the level at which they take place, and those quality improvements are associated to increases in quantity. Thus,
+
+          I = f (x, Mo, M) = (log (M – Mo) – log (M – x)) / log (M – Mo),
+
+          Where $I$ is the dimension index, $x$ is an indicator of a country’s standard of living, $M$ and $Mo$ are the maximum and minimum values, respectively, or goalposts, that facilitate comparisons over time and log stands for the natural logarithm. The index for each dimension ranges between 0 and 1.
+
+          Goalposts are set for human development’s different dimensions. For years of schooling, maximum and minimum values were set at 15 and 0.
+        processing_level: minor
+        display:
+          name: Schooling index
+          numDecimalPlaces: 3
+          <<: *common-display
+
+      adjusted_income_index:
+        title: UNDP adjusted per capita income
+        unit: ""
+        short_unit: ""
+        description_short: |
+          GDP per capita measured as an index between 0 and 1, where 1 is the maximum (log) value of $47,000 and 0 is the minimum value of $100.
+        description_from_producer: |
+          GDP per head is expressed in 1990 dollars adjusted for its purchasing power adjusted, that it, for the difference in price level across countries (the so-called Geary-Khamis [G-K] 1990 $).
+
+          For GDP per head, as it is intended as crude proxy for those dimensions of wellbeing other than education and health, logarithmic transformation has been introduced. The log transformation implies that, in terms of human development, returns of per capita income decline as it reaches higher levels. Given its non-bounded nature, without this transformation, GDP per head would dominate the human development index rendering it redundant. In order to get the income index I have used the same formula used for liberal democracy,
+
+          I = (x – Mo) / (M – Mo),
+
+          except that $x$, $M$, and $Mo$ are expressed in logs. Where $I$ is the dimension index, $x$ is an indicator of a country’s standard of living, $M$ and $Mo$ are the maximum and minimum values, respectively, or goalposts, that facilitate comparisons over time and log stands for the natural logarithm. The index for each dimension ranges between 0 and 1.
+
+          Goalposts are set for human development’s different dimensions. For per capita GDP, the maximum and minimum values over 1870-2020 were G-K 1990 $47,000 and $100, respectively.
+        processing_level: minor
+        display:
+          name: Adjusted income index
+          numDecimalPlaces: 3
+          <<: *common-display

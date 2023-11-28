@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4836
+    date_accessed: 2023-08-10 15:04:35.029744
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Average hourly earnings of managers (ISCO-08) (local currency)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 15ff8a0e11e9f809051854aa04bd959f
+  size: 35698
+  path: 
+    dataset_4836_average_hourly_earnings_of_managers__isco_08__local_currency_values.feather

@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1970
+    date_accessed: 2023-08-16 09:51:33.455621
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Number of countries that adopt and implement national disaster risk reduction
+    strategies in line with the Sendai Framework for Disaster Risk Reduction 2015-2030
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 71add65d8578b0ce7aa698f3a3e838d0
+  size: 11082
+  path: 
+    dataset_1970_number_of_countries_that_adopt_and_implement_national_disaster_risk_reduction_strategies_in_line_with_the_sendai_framework_for_disaster_risk_reduction_2015_2030_values.feather

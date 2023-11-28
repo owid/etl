@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2484
+    date_accessed: 2023-08-16 10:16:56.379765
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: LIS Key Figures – Luxumbourg Income Study
+  description: ''
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: dfd3b019a0da9e0e54d527747fc0edd2
+  size: 11610
+  path: dataset_2484_lis_key_figures__luxumbourg_income_study_values.feather

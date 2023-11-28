@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1892
+    date_accessed: 2023-08-16 09:33:12.716751
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Life expectancy - Riley (2005), Clio Infra (2015), and UN (2019)
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 369df1de254ce8d90c69eec1e2e6e1b0
+  size: 109602
+  path: 
+    dataset_1892_life_expectancy__riley__2005__clio_infra__2015__and_un__2019_values.feather

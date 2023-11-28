@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4666
+    date_accessed: 2023-08-16 10:28:08.225781
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_4666_proportion_of_children_moderately_or_severely_overweight__pct
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: b00239581d568c39dfe1bd652f4c3604
+  size: 3499
+  path: 
+    dataset_4666_proportion_of_children_moderately_or_severely_overweight__pct_config.json

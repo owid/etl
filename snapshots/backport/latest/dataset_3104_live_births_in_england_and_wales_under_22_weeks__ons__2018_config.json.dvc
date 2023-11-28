@@ -1,18 +1,16 @@
 meta:
-  namespace: backport
-  short_name: dataset_3104_live_births_in_england_and_wales_under_22_weeks__ons__2018_config
-  file_extension: json
-  date_accessed: 2023-02-23 17:40:25.384284
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/3104
+    date_accessed: 2023-08-10 08:05:34.308775
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_3104_live_births_in_england_and_wales_under_22_weeks__ons__2018
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/3104
-  source_published_by: Our World in Data catalog backport
   is_public: false
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 83ee5d8ae9dda0426e9081f053d478d0
-  size: 2881
-  path: dataset_3104_live_births_in_england_and_wales_under_22_weeks__ons__2018_config.json
+- md5: 9695a35fb0c010454b4dd092af7a9271
+  size: 3161
+  path: 
+    dataset_3104_live_births_in_england_and_wales_under_22_weeks__ons__2018_config.json

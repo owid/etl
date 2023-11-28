@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4662
+    date_accessed: 2023-08-16 08:03:34.012832
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Prevalence of severe food insecurity in the adult population (%)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 8f5003316742013b1025622d0384dbb5
+  size: 11746
+  path: 
+    dataset_4662_prevalence_of_severe_food_insecurity_in_the_adult_population__pct_values.feather

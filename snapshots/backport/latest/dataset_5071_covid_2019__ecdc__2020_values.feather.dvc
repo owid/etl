@@ -1,18 +1,14 @@
 meta:
-  name: COVID-2019 - ECDC (2020)
-  description: ''
   source:
     name: Our World in Data catalog backport
-    description:
     url: https://owid.cloud/admin/datasets/5071
-    source_data_url:
-    owid_data_url:
-    date_accessed: 2023-07-19 08:45:55.116798
+    date_accessed: 2023-08-16 08:04:36.776415
     publication_date: latest
-    publication_year:
     published_by: Our World in Data catalog backport
+  name: COVID-2019 - ECDC (2020)
+  description: ''
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: ca0fafb3459efe8306f1f972765ceb21
+- md5: 31809687c4040b4998ba02b6936c8c1d
   size: 7220474
   path: dataset_5071_covid_2019__ecdc__2020_values.feather

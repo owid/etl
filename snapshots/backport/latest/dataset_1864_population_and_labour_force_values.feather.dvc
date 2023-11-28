@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1864
+    date_accessed: 2023-08-14 15:15:08.170947
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Population and labour force
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 00e2c4fca9b539d3bf2eaf1f5a9be4a9
+  size: 341810
+  path: dataset_1864_population_and_labour_force_values.feather

@@ -1,0 +1,53 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - State Capacity
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
+dataset:
+  title: States in regions (COW)
+  update_period_days: 1800
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
+tables:
+  cow_ssm_regions:
+    title: States in regions (COW)
+    variables:
+      number_countries:
+        title: Number of states in a region
+        description_short: |-
+          Number of states listed in the state system membership list for a given region.
+        unit: countries
+        processing_level: minor
+        description_processing: |-
+          We use the state system membership from Correlates of War. We assign each country to a region based on the mapping (using COW codes):
+
+            - Americas: 2-165
+            - Europe: 200-399
+            - Africa: 402-626
+            - Middle East: 630-698
+            - Asia and Oceania: 700-999
+        display:
+          numDecimalPlaces: 0
+
+      population:
+        title: Population in region
+        description_short: |-
+          Population in the region, using borders from 2022.
+        unit: countries
+        processing_level: minor
+        description_processing: |-
+          We use the state system membership from Correlates of War. We assign each country to a region based on the mapping (using COW codes):
+
+            - Americas: 2-165
+            - Europe: 200-399
+            - Africa: 402-626
+            - Middle East: 630-698
+            - Asia and Oceania: 700-999
+        display:
+          numDecimalPlaces: 0

@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4239
+    date_accessed: 2023-08-16 08:28:20.618702
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_4239_penn_world_tables_version_9_1__2019 (archived)
+  description: ''
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 00f09cac4bd7db515d73e761a250aa56
+  size: 48377
+  path: dataset_4239_penn_world_tables_version_9_1__2019_config.json

@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1976
+    date_accessed: 2023-08-11 07:54:07.825051
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Domestic material consumption, domestic material consumption per capita, and
+    domestic material consumption per GDP
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 095e3a17d620c171a4ddd9bd4c471a67
+  size: 35082
+  path: 
+    dataset_1976_domestic_material_consumption__domestic_material_consumption_per_capita__and_domestic_material_consumption_per_gdp_values.feather

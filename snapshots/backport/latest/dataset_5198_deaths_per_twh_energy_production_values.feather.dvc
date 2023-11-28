@@ -1,18 +1,14 @@
 meta:
-  namespace: backport
-  short_name: dataset_5198_deaths_per_twh_energy_production_values
-  file_extension: feather
-  date_accessed: 2023-02-23 18:42:26.630146
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5198
+    date_accessed: 2023-08-10 09:42:32.814022
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Deaths per TWh energy production
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/5198
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 16d0a3694bc4895472e0f225d50def1c
+- md5: cc16d64c6bda9399647081fd65dc43ba
   size: 6274
   path: dataset_5198_deaths_per_twh_energy_production_values.feather

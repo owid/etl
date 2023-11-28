@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4461
+    date_accessed: 2023-08-16 10:36:05.553304
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Number of local governments (number)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: ae78402a70c61d982de08ab2655963e3
+  size: 9146
+  path: dataset_4461_number_of_local_governments__number_values.feather

@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2369
+    date_accessed: 2023-08-16 08:24:29.820267
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2369_breast_cancer (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 596c970347113f8b045da52ba2b3b01f
+  size: 32410
+  path: dataset_2369_breast_cancer_config.json

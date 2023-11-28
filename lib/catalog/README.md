@@ -10,7 +10,7 @@ Status: experimental, APIs likely to change
 
 ## Overview
 
-Our World In Data is building a new data catalog, with the goal of our datasets being reproducible and transparent to the general public. That project is our [etl](https://github.com/owid/etl), which going forward will contain the recipes for all the datasets we republish.
+Our World in Data is building a new data catalog, with the goal of our datasets being reproducible and transparent to the general public. That project is our [etl](https://github.com/owid/etl), which going forward will contain the recipes for all the datasets we republish.
 
 This library allows you to query our data catalog programmatically, and get back data in the form of Pandas data frames, perfect for data pipelines or Jupyter notebook explorations.
 
@@ -34,7 +34,7 @@ from owid import catalog
 # look for Covid-19 data, return a data frame of matches
 catalog.find('covid')
 
-# load Covid-19 data from the Our World In Data namespace as a data frame
+# load Covid-19 data from the Our World in Data namespace as a data frame
 df = catalog.find('covid', namespace='owid').load()
 
 # load data from other than the default `garden` channel
@@ -215,6 +215,19 @@ t = Table.read_csv('/tmp/my_table.csv')
 ## Changelog
 
 - `dev`
+  - Switch from isort & black & fake8 to ruff
+- `v0.3.8`
+  - Pin dataclasses-json==0.5.8 to fix error with python3.9
+- `v0.3.7`
+  - Fix bugs.
+  - Improve metadata propagation.
+  - Improve metadata YAML file handling, to have common definitions.
+  - Remove `DatasetMeta.origins`.
+- `v0.3.6`
+  - Fixed tons of bugs
+  - `processing.py` module with pandas-like functions that propagate metadata
+  - Support for Dynamic YAML files
+  - Support for R2 alongside S3
 - `v0.3.5`
   - Remove `catalog.frames`; use `owid-repack` package instead
   - Relax dependency constraints

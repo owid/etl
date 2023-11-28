@@ -1,18 +1,15 @@
 meta:
-  namespace: backport
-  short_name: dataset_3029_male_literacy_rate__schofield__1973__split_values
-  file_extension: feather
-  date_accessed: 2023-02-23 18:03:41.445294
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/3029
+    date_accessed: 2023-08-10 07:43:56.599415
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Male literacy rate (Schofield (1973)) (split)
   description: Literacy figures are nationally representative.
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/3029
-  source_published_by: Our World in Data catalog backport
   is_public: false
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 9790413fe524e3020d2afbb0c48f50f3
+- md5: 99b89e068a9354dbec96f337e03b51ce
   size: 6354
   path: dataset_3029_male_literacy_rate__schofield__1973__split_values.feather

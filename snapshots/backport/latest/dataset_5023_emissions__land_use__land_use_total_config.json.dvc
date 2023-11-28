@@ -1,0 +1,28 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5023
+    date_accessed: 2023-08-14 15:30:03.812178
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_5023_emissions__land_use__land_use_total (archived)
+  description: 'Land Use Total contains all GHG emissions and removals produced in
+    the different Land Use sub-domains, representing the three IPCC Land Use categories:
+    cropland, forest land, and grassland, collectively called emissions/removals from
+    the Forestry and Other Land Use (FOLU) sector. FOLU emissions consist of CO2 (carbon
+    dioxide), CH4 (methane) and N2O (nitrous oxide) associated with land management
+    activities. CO2 emissions/removals are derived from estimated net carbon stock
+    changes in above and below-ground biomass pools of forest land, including forest
+    land converted to other land uses. CH4 and N2O, and additional CO2 emissions are
+    estimated for fires and drainage of organic soils. The FAOSTAT emissions database
+    is computed following Tier 1 IPCC 2006 Guidelines for National GHG Inventories
+    (http://www.ipcc-nggip.iges.or.jp/public/2006gl/index.html). GHG emissions are
+    provided as by country, regions and special groups, with global coverage, relative
+    to the period 1990-most recent available year (with annual updates), expressed
+    as Gg CO2eq  from CH4 and N2O, net emissions/removals as GG CO2 and Gg CO2eq,
+    by underlying land use emission sub-domain and by aggregate (land use total).'
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 99713e964c5a03dd5625652f44b825be
+  size: 31106
+  path: dataset_5023_emissions__land_use__land_use_total_config.json

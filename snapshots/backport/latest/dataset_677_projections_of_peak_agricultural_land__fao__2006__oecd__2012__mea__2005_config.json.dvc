@@ -1,18 +1,16 @@
 meta:
-  namespace: backport
-  short_name: dataset_677_projections_of_peak_agricultural_land__fao__2006__oecd__2012__mea__2005_config
-  file_extension: json
-  date_accessed: 2023-02-23 17:33:26.823346
-  name: Grapher metadata for dataset_677_projections_of_peak_agricultural_land__fao__2006__oecd__2012__mea__2005
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/677
+    date_accessed: 2023-08-10 09:02:23.790891
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_677_projections_of_peak_agricultural_land__fao__2006__oecd__2012__mea__2005
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/677
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: b4308832daa2e93bb73c56394ef98733
-  size: 7314
-  path: dataset_677_projections_of_peak_agricultural_land__fao__2006__oecd__2012__mea__2005_config.json
+- md5: 63c9edcded8236eca222a4f5bdac6c5e
+  size: 8372
+  path: 
+    dataset_677_projections_of_peak_agricultural_land__fao__2006__oecd__2012__mea__2005_config.json

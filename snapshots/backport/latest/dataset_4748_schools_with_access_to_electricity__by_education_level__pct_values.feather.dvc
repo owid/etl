@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4748
+    date_accessed: 2023-08-16 10:46:26.013070
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Schools with access to electricity, by education level (%)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 0ad106dcfecf1f326b51191bbcdee0ac
+  size: 20458
+  path: 
+    dataset_4748_schools_with_access_to_electricity__by_education_level__pct_values.feather

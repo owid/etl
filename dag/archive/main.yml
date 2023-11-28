@@ -25,6 +25,17 @@ steps:
     - data://meadow/met_office_hadley_centre/2023-01-02/near_surface_temperature
   data://grapher/met_office_hadley_centre/2023-01-02/near_surface_temperature:
     - data://garden/met_office_hadley_centre/2023-01-02/near_surface_temperature
+  #
+  # Met Office Hadley Centre - Near surface temperature anomaly (2023-01-17).
+  #
+  data://meadow/met_office_hadley_centre/2023-01-17/near_surface_temperature:
+    - snapshot://met_office_hadley_centre/2023-01-17/near_surface_temperature_global.csv
+    - snapshot://met_office_hadley_centre/2023-01-17/near_surface_temperature_northern_hemisphere.csv
+    - snapshot://met_office_hadley_centre/2023-01-17/near_surface_temperature_southern_hemisphere.csv
+  data://garden/met_office_hadley_centre/2023-01-17/near_surface_temperature:
+    - data://meadow/met_office_hadley_centre/2023-01-17/near_surface_temperature
+  data://grapher/met_office_hadley_centre/2023-01-17/near_surface_temperature:
+    - data://garden/met_office_hadley_centre/2023-01-17/near_surface_temperature
 
 
   # Homicide - UNODC - to archive
@@ -34,6 +45,12 @@ steps:
   - data://meadow/homicide/2023-01-27/unodc
   data://grapher/homicide/2023-01-27/unodc:
   - data://garden/homicide/2023-01-27/unodc
+
+  # HMD
+  data://meadow/hmd/2022-11-04/life_tables:
+    - walden://hmd/2022-11-04/life_tables
+  data://garden/hmd/2022-11-04/life_tables:
+    - data://meadow/hmd/2022-11-04/life_tables
 
   # SDG dataset assmebled from https://sdg-tracker.org/
   # This is commented now to avoid `etl.helpers.LatestVersionOfStepShouldBeActive` error
@@ -68,14 +85,45 @@ steps:
   #   - backport://backport/owid/latest/dataset_943_sexual_violence__unicef__2017
   #   - data://garden/worldbank_wdi/2022-05-26/wdi
 
+  #
+  # EM-DAT Natural disasters (2022).
+  #
+  data://meadow/emdat/2022-11-24/natural_disasters:
+    - snapshot://emdat/2022-11-24/natural_disasters.xlsx
+  # The following dataset has a table for yearly data and another for decadal data.
+  data://garden/emdat/2022-11-24/natural_disasters:
+    - data://meadow/emdat/2022-11-24/natural_disasters
+    - data://garden/owid/latest/key_indicators
+    - data://garden/wb/2021-07-01/wb_income
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/worldbank_wdi/2022-05-26/wdi
+  # The following dataset has all (yearly and decadal) variables together.
+  data://grapher/emdat/2022-11-24/natural_disasters:
+    - data://garden/emdat/2022-11-24/natural_disasters
+  # The following dataset has only global data, and entity corresponds to the type of disaster.
+  data://grapher/emdat/2022-11-24/natural_disasters_global_by_type:
+    - data://garden/emdat/2022-11-24/natural_disasters
+  # Natural disasters explorer.
+  data://explorers/emdat/2022-12-07/natural_disasters:
+    - data://garden/emdat/2022-11-24/natural_disasters
+
+  # International Monetary Fund, World Economic Outlook
+  data://meadow/imf/2023-05-02/world_economic_outlook:
+    - snapshot://imf/2023-05-02/world_economic_outlook.xls
+  data://garden/imf/2023-05-02/world_economic_outlook:
+    - data://meadow/imf/2023-05-02/world_economic_outlook
+  data://grapher/imf/2023-05-02/world_economic_outlook:
+    - data://garden/imf/2023-05-02/world_economic_outlook
+
 # Include all active steps plus all archive steps.
 include:
   - dag/main.yml
+  - dag/archive/animal_welfare.yml
   - dag/archive/agriculture.yml
   # - dag/archive/open_numbers.yml
   - dag/archive/faostat.yml
   - dag/archive/energy.yml
-  # - dag/archive/walkthrough.yml
+  # - dag/archive/wizard.yml
   # - dag/archive/examples.yml
   - dag/archive/emissions.yml
   - dag/archive/papers.yml

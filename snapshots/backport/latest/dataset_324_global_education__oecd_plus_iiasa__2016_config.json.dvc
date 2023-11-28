@@ -1,18 +1,14 @@
 meta:
-  namespace: backport
-  short_name: dataset_324_global_education__oecd_plus_iiasa__2016_config
-  file_extension: json
-  date_accessed: 2023-02-23 15:00:41.036203
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/324
+    date_accessed: 2023-08-10 09:14:09.289446
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_324_global_education__oecd_plus_iiasa__2016
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/324
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 4ec996db1436c59556cef72f8946f737
-  size: 3010
+- md5: b483fb7fe343dcb431731caf6bcdc9e5
+  size: 3294
   path: dataset_324_global_education__oecd_plus_iiasa__2016_config.json

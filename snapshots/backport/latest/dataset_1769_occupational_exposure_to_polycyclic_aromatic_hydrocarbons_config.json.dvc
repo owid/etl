@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1769
+    date_accessed: 2023-08-16 09:30:32.275071
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1769_occupational_exposure_to_polycyclic_aromatic_hydrocarbons
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: d92200e9303b14de89bd8db7de881d62
+  size: 22948
+  path: 
+    dataset_1769_occupational_exposure_to_polycyclic_aromatic_hydrocarbons_config.json

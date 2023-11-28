@@ -1,18 +1,15 @@
 meta:
-  namespace: backport
-  short_name: dataset_5818_algorithmic_efficiency_data__openai__2020_values
-  file_extension: feather
-  date_accessed: 2023-02-23 19:23:56.500639
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5818
+    date_accessed: 2023-08-16 09:35:07.855763
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Algorithmic Efficiency Data – OpenAI (2020)
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/5818
-  source_published_by: Our World in Data catalog backport
   is_public: false
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 6f4b3ad08f3fd1c77556eeb5bbe8a02e
+- md5: 2ab65c0e9a5dde7d6a152e710878d7c4
   size: 6378
   path: dataset_5818_algorithmic_efficiency_data__openai__2020_values.feather

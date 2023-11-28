@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2643
+    date_accessed: 2023-08-14 15:28:55.685604
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Health - Health Care Resources
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: fb63814dd37fd8724e617416a80666dd
+  size: 127426
+  path: dataset_2643_health__health_care_resources_values.feather

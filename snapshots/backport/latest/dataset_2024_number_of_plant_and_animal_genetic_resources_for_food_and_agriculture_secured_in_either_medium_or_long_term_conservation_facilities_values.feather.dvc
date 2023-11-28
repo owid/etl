@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2024
+    date_accessed: 2023-08-16 08:00:39.343540
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Number of plant and animal genetic resources for food and agriculture secured
+    in either medium or long-term conservation facilities
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: bbf3466417e93e52e320bc3b8df52eb7
+  size: 15074
+  path: 
+    dataset_2024_number_of_plant_and_animal_genetic_resources_for_food_and_agriculture_secured_in_either_medium_or_long_term_conservation_facilities_values.feather

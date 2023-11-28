@@ -1,18 +1,15 @@
 meta:
-  namespace: backport
-  short_name: dataset_950_market_share_of_iodized_salt_in_european_countries__european_commission__2006_values
-  file_extension: feather
-  date_accessed: 2023-02-23 18:24:02.299784
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/950
+    date_accessed: 2023-08-10 09:42:15.555635
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Market share of iodized salt in European countries - European Commission (2006)
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/950
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 1b7435e258ab90ee7f7f16932e067ed8
+- md5: 6140e75f0f21370617360025c7d09e7a
   size: 6938
-  path: dataset_950_market_share_of_iodized_salt_in_european_countries__european_commission__2006_values.feather
+  path: 
+    dataset_950_market_share_of_iodized_salt_in_european_countries__european_commission__2006_values.feather

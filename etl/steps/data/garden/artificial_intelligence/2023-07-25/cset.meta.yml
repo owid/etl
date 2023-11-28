@@ -1,0 +1,233 @@
+dataset:
+  title: 'Country Activity Tracker: Artificial Intelligence (Center for Security and     Emerging Technology, 2023)'
+  description: >-
+    CAT, or Country Activity Tracker, is a research tool curated by CSET that offers a wealth of data about artificial
+    intelligence (AI) globally. This data comes from a vast repository known as the Merged Academic Corpus (MAC), which contains
+    details about more than 270 million academic articles worldwide. In CAT, only those articles that are related to AI are
+    utilized.
+
+
+    CSET determines the country of origin for each article by looking at the affiliations of the authors. If an author is
+    associated with an organization in a specific country, that article is attributed to that country.
+
+
+    CAT also provides patent data sourced from 1790 Analytics and Dimensions, encompassing AI-related patents. However, instead
+    of indicating patent ownership, CAT highlights where the patents are filed. For instance, a patent filed in the U.S. patent
+    office is not necessarily owned by an American. CSET is striving to include data regarding the nationality of patent owners
+    in future updates of CAT.
+
+
+    Additionally, CAT uses data from Crunchbase to identify AI-related companies and includes metrics about investments in
+    these companies. The definition of an 'AI company' is not straightforward, but CSET identifies such companies based on
+    specific criteria. These include whether the company description contains AI-related keywords, whether Crunchbase tags
+    it as an AI company, or if it is linked with an AI Publication, AI Patent, or a Top AI Conference Publication as per CSET's
+    Private-sector AI-Related Activity Tracker. CSET aims to encompass a broad range of AI-related companies across the globe.
+    Therefore, some companies may be categorized as AI-related that others may not consider as such. Conversely, some companies
+    perceived as AI-related by others may not meet the criteria set by CSET.
+
+
+    CSET ensures the data in CAT is updated at least quarterly, with plans to provide more frequent updates in the future.
+  licenses:
+  - name: Creative Commons BY 4.0
+    url: https://eto.tech/tou/
+  sources:
+  - name: Center for Security and Emerging Technology (2023)
+    url: https://cat.eto.tech/
+    date_accessed: '2023-07-25'
+    publication_year: 2023
+    published_by: Emerging Technology Observatory Country Activity Tracker, Artificial Intelligence (Center for Security and
+      Emerging Technology, 2023)
+tables:
+  cset:
+    variables:
+      disclosed_investment:
+        title: Disclosed investment
+        description:  >
+          Investments in AI-related companies across various industries where the investment value has been publicly disclosed.
+
+
+          Reporting a time series of AI investments in nominal prices (i.e., without adjusting for inflation) means it makes little sense to compare observations across time; it is therefore not very useful. To make comparisons across time possible, one has to take into account that prices change (e.g., there is inflation).
+
+
+          It is not obvious how to adjust this time series for inflation, and we debated it at some length within our team.
+
+
+          It would be straightforward to adjust the time series for price changes if we knew the prices of the specific goods and services that these investments purchased. This would make it possible to calculate a volume measure of AI investments, and it would tell us how much these investments bought. But such a metric is not available. While a comprehensive price index is not available, we know that the cost for some crucial AI technology has fallen rapidly in price.
+
+
+          In the absence of a comprehensive price index that captures the price of AI-specific goods and services, one has to rely on one of the available metrics for the price of a bundle of goods and services. In the end we decided to use the US Consumer Price Index (CPI).
+
+
+          The US CPI does not provide us with a volume measure of AI goods and services, but it does capture the opportunity costs of these investments. The inflation adjustment of this time series of AI investments therefore lets us understand the size of these investments relative to whatever else these sums of money could have purchased.
+
+        unit: US dollars
+        short_unit: $
+        display:
+          numDecimalPlaces: 0
+
+      investment_estimated:
+        title: Estimated investment
+        description:  >
+          Estimated value of investments in AI-related companies across various industries when exact investment amounts aren't publicly disclosed. The estimate is based on the median value of similar investments from Crunchbase.
+
+
+          Reporting a time series of AI investments in nominal prices (i.e., without adjusting for inflation) means it makes little sense to compare observations across time; it is therefore not very useful. To make comparisons across time possible, one has to take into account that prices change (e.g., there is inflation).
+
+
+          It is not obvious how to adjust this time series for inflation, and we debated it at some length within our team.
+
+
+          It would be straightforward to adjust the time series for price changes if we knew the prices of the specific goods and services that these investments purchased. This would make it possible to calculate a volume measure of AI investments, and it would tell us how much these investments bought. But such a metric is not available. While a comprehensive price index is not available, we know that the cost for some crucial AI technology has fallen rapidly in price.
+
+
+          In the absence of a comprehensive price index that captures the price of AI-specific goods and services, one has to rely on one of the available metrics for the price of a bundle of goods and services. In the end we decided to use the US Consumer Price Index (CPI).
+
+
+          The US CPI does not provide us with a volume measure of AI goods and services, but it does capture the opportunity costs of these investments. The inflation adjustment of this time series of AI investments therefore lets us understand the size of these investments relative to whatever else these sums of money could have purchased.
+
+        unit: US dollars
+        short_unit: $
+        display:
+          numDecimalPlaces: 0
+
+      disclosed_investment_summary:
+        title: Total disclosed investment
+        description: >
+          Investments in AI-related companies across various industries where the investment value has been publicly disclosed.
+
+
+          Reporting a time series of AI investments in nominal prices (i.e., without adjusting for inflation) means it makes little sense to compare observations across time; it is therefore not very useful. To make comparisons across time possible, one has to take into account that prices change (e.g., there is inflation).
+
+
+          It is not obvious how to adjust this time series for inflation, and we debated it at some length within our team.
+
+
+          It would be straightforward to adjust the time series for price changes if we knew the prices of the specific goods and services that these investments purchased. This would make it possible to calculate a volume measure of AI investments, and it would tell us how much these investments bought. But such a metric is not available. While a comprehensive price index is not available, we know that the cost for some crucial AI technology has fallen rapidly in price.
+
+
+          In the absence of a comprehensive price index that captures the price of AI-specific goods and services, one has to rely on one of the available metrics for the price of a bundle of goods and services. In the end we decided to use the US Consumer Price Index (CPI).
+
+
+          The US CPI does not provide us with a volume measure of AI goods and services, but it does capture the opportunity costs of these investments. The inflation adjustment of this time series of AI investments therefore lets us understand the size of these investments relative to whatever else these sums of money could have purchased.
+        unit: US dollars
+        short_unit: $
+        display:
+          numDecimalPlaces: 0
+
+      estimated_investment_summary:
+        title: Total estimated investment
+        description: >
+          Estimated value of investments in AI-related companies across various industries when exact investment amounts aren't publicly disclosed. The estimate is based on the median value of similar investments from Crunchbase.
+
+
+          Reporting a time series of AI investments in nominal prices (i.e., without adjusting for inflation) means it makes little sense to compare observations across time; it is therefore not very useful. To make comparisons across time possible, one has to take into account that prices change (e.g., there is inflation).
+
+
+          It is not obvious how to adjust this time series for inflation, and we debated it at some length within our team.
+
+
+          It would be straightforward to adjust the time series for price changes if we knew the prices of the specific goods and services that these investments purchased. This would make it possible to calculate a volume measure of AI investments, and it would tell us how much these investments bought. But such a metric is not available. While a comprehensive price index is not available, we know that the cost for some crucial AI technology has fallen rapidly in price.
+
+
+          In the absence of a comprehensive price index that captures the price of AI-specific goods and services, one has to rely on one of the available metrics for the price of a bundle of goods and services. In the end we decided to use the US Consumer Price Index (CPI).
+
+
+          The US CPI does not provide us with a volume measure of AI goods and services, but it does capture the opportunity costs of these investments. The inflation adjustment of this time series of AI investments therefore lets us understand the size of these investments relative to whatever else these sums of money could have purchased.
+
+        unit: US dollars
+        short_unit: $
+        display:
+          numDecimalPlaces: 0
+
+      num_patent_applications:
+        title: Patent applications
+        description: Yearly total number of patent applications.
+        unit: applications
+        display:
+          numDecimalPlaces: 0
+
+      num_patent_granted:
+        title: Patent applications granted
+        description: Yearly total number of patents granted.
+        unit: granted applications
+        display:
+          numDecimalPlaces: 0
+
+      num_patent_applications_summary:
+        title: Total patent applications
+        description: Total number of patent applications between 2010-2020.
+        unit: applications
+        display:
+          numDecimalPlaces: 0
+
+      num_patent_granted_summary:
+        title: Total patent applications granted
+        description: Total number of patents granted between 2010-2020.
+        unit: granted applications
+        display:
+          numDecimalPlaces: 0
+
+      num_articles:
+        title: Number of articles
+        description: Yearly number of articles published in AI fields.
+        unit: articles
+        display:
+          numDecimalPlaces: 0
+
+      num_citations:
+        title: Number of citations
+        description: Yearly number of citations in the AI field.
+        unit: citations
+        display:
+          numDecimalPlaces: 0
+
+      num_articles_summary:
+        title: Total number of articles
+        description: Yearly total number of articles in the AI field between 2010-2022
+        unit: articles
+        display:
+          numDecimalPlaces: 0
+
+      num_citations_summary:
+        title: Total number of citations
+        description: The total number of citations in the AI field between 2010-2022
+        unit: citations
+        display:
+          numDecimalPlaces: 0
+
+      proportion_patents_granted:
+        title: Share of patents granted
+        description: Yearly share of patent applications that have been granted.
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 0
+
+      citations_per_article:
+        title: Citations per article, 2010-2022
+        description: The total number of citations per article in the AI field between 2010-2022. Citations take time to accumulate so recent years  may have fewer citations, and the measure for these years may not completely reflective of their eventual total
+        unit: 'citations per article'
+        short_unit: ''
+        display:
+          numDecimalPlaces: 0
+
+      num_patent_applications_per_mil:
+        title: Patent applications per 1 million people
+        description: Yearly total number of patent applications per 1 million people.
+        unit: applications
+        display:
+          numDecimalPlaces: 0
+
+      num_patent_granted_per_mil:
+        title: Patent applications granted per 1 million people
+        description: Yearly total number of patents granted per 1 million people.
+        unit: granted applications
+        display:
+          numDecimalPlaces: 0
+
+      num_articles_per_mil:
+        title: Number of articles per 1 million people
+        description: Yearly number of articles published in AI fields per 1 million people
+        unit: articles
+        display:
+          numDecimalPlaces: 0

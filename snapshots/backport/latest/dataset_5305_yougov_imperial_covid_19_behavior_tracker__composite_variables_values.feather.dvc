@@ -1,20 +1,16 @@
 meta:
-  name: YouGov-Imperial COVID-19 Behavior Tracker, composite variables
-  description: ''
   source:
     name: Our World in Data catalog backport
-    description:
     url: https://owid.cloud/admin/datasets/5305
-    source_data_url:
-    owid_data_url:
-    date_accessed: 2023-07-19 08:36:38.439622
+    date_accessed: 2023-08-16 07:28:50.114570
     publication_date: latest
-    publication_year:
     published_by: Our World in Data catalog backport
+  name: YouGov-Imperial COVID-19 Behavior Tracker, composite variables
+  description: ''
   is_public: false
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: c92a667495bfa2f353c914152ef3c668
+- md5: 9dcf22089f38320166aeae697f4ae846
   size: 10490
   path: 
     dataset_5305_yougov_imperial_covid_19_behavior_tracker__composite_variables_values.feather

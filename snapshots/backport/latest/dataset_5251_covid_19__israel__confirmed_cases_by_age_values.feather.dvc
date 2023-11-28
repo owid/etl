@@ -1,18 +1,15 @@
 meta:
-  namespace: backport
-  short_name: dataset_5251_covid_19__israel__confirmed_cases_by_age_values
-  file_extension: feather
-  date_accessed: 2023-02-23 18:19:15.288375
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5251
+    date_accessed: 2023-08-11 07:59:08.423108
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: 'COVID-19 - Israel: confirmed cases by age'
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/5251
-  source_published_by: Our World in Data catalog backport
   is_public: false
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 0d9bbe23ae75d4b58f79d43a8ee0679d
+- md5: d5f8b7db6b26878cce5ae191a13f204d
   size: 8706
   path: dataset_5251_covid_19__israel__confirmed_cases_by_age_values.feather

@@ -1,0 +1,303 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - War & Peace
+  all:
+    selectedEntityNames: &selected_entities
+      - Africa
+      - Americas
+      - Asia and Oceania
+      - Europe
+      - Middle East
+  number_ongoing_conflicts:
+    description_short: |-
+      <%- if conflict_type == "all" %>
+      The number of all ongoing wars in each year. This includes interstate, intrastate, extrastate, and non-state wars
+      <%- elif conflict_type == "inter-state" -%>
+      The number of ongoing interstate wars in each year
+      <%- elif conflict_type == "intra-state" -%>
+      The number of ongoing intrastate wars in each year
+      <%- elif conflict_type == "intra-state (internationalized)" -%>
+      The number of ongoing internationalized intrastate wars in each year
+      <%- elif conflict_type == "intra-state (non-internationalized)" -%>
+      The number of ongoing non-internationalized intrastate wars in each year
+      <%- elif conflict_type == "extra-state" -%>
+      The number of ongoing extrastate wars in each year
+      <%- elif conflict_type == "non-state" -%>
+      The number of ongoing non-state wars in each year
+      <%- endif -%>
+    description_key: &description_key_ongoing
+      - |-
+        <% if conflict_type == "all" %>
+        An ongoing war is a conflict between organized armed groups that causes at least 1,000 deaths during a year.
+        <% elif conflict_type == "inter-state" %>
+        An ongoing interstate war is a conflict between states that causes at least 1,000 deaths during a year.
+        <% elif conflict_type == "intra-state" %>
+        An ongoing intrastate war is a conflict between a state and a non-state armed group or between non-state armed groups that causes at least 1,000 deaths during a year.
+        <% elif conflict_type == "intra-state (internationalized)" %>
+        An ongoing internationalized intrastate war is a conflict between a state and a non-state armed group or between non-state armed groups, with involvement of a foreign state, that causes at least 1,000 deaths during a year.
+        <% elif conflict_type == "intra-state (non-internationalized)" %>
+        An ongoing non-internationalized intrastate war is a conflict between a state and a non-state armed group or between non-state armed groups, without involvement of a foreign state, that causes at least 1,000 deaths during a year.
+        <% elif conflict_type == "extra-state" %>
+        An ongoing extrastate war is a conflict between a state and a non-state region it seeks to control, or between a state and a colony that seeks policy change or independence, and that causes at least 1,000 deaths during a year.
+        <% elif conflict_type == "non-state" %>
+        An ongoing non-state war is a conflict between non-state armed groups within a region without a state or across state broders, that causes at least 1,000 deaths during a year.
+        <% endif %>
+      - We count a war as ongoing in a region even if the conflict is also ongoing in other regions. The sum across all regions can therefore be higher than the total number of ongoing wars.
+      - |-
+        <% if conflict_type == "all" %>
+        We extend the time-series to 2007, by drawing on Correlates of War's Directed Dyadic Interstate War Dataset (version 4.01), which identifies no interstate wars for the years since 2003.
+        <% elif conflict_type == "inter-state" %>
+        We extend the time-series to 2010, by drawing on Correlates of War's Directed Dyadic Interstate War Dataset (version 4.01), which identifies no wars for the years since 2003.
+        <% endif %>
+  number_new_conflicts:
+    description_short: |-
+      <% if conflict_type == "all" -%>
+      The number of new wars in each year. This includes interstate, intrastate, extrastate, and non-state wars
+      <% elif conflict_type == "inter-state" -%>
+      The number of new interstate wars in each year
+      <% elif conflict_type == "intra-state" -%>
+      The number of new intrastate wars in each year
+      <% elif conflict_type == "intra-state (internationalized)" -%>
+      The number of new internationalized intrastate wars in each year
+      <% elif conflict_type == "intra-state (non-internationalized)" -%>
+      The number of new non-internationalized intrastate wars in each year
+      <% elif conflict_type == "extra-state" -%>
+      The number of new extrastate wars in each year
+      <% elif conflict_type == "non-state" -%>
+      The number of new non-state wars in each year
+      <% endif -%>
+    description_key: &description_key_new
+      - |-
+        <% if conflict_type == "all" %>
+        A new war is a conflict between organized armed groups that causes at least 1,000 deaths during a year for the first time.
+        <% elif conflict_type == "inter-state" %>
+        A new interstate war is a conflict between states that causes at least 1,000 deaths during a year for the first time.
+        <% elif conflict_type == "intra-state" %>
+        A new intrastate war is a conflict between a state and a non-state armed group or between non-state armed groups that causes at least 1,000 deaths during a year for the first time.
+        <% elif conflict_type == "intra-state (internationalized)" %>
+        A new internationalized intrastate war is a conflict between a state and a non-state armed group or between non-state armed groups, with involvement of a foreign state, that causes at least 1,000 deaths during a year for the first time.
+        <% elif conflict_type == "intra-state (non-internationalized)" %>
+        A new non-internationalized intrastate war is a conflict between a state and a non-state armed group or between non-state armed groups, without involvement of a foreign state, that causes at least 1,000 deaths during a year for the first time.
+        <% elif conflict_type == "extra-state" %>
+        A new extrastate war is a conflict between a state and a non-state region it seeks to control, or between a state and a colony that seeks policy change or independence, and that causes at least 1,000 deaths during a year for the first time.
+        <% elif conflict_type == "non-state" %>
+        A new non-state war is a conflict between non-state armed groups within a region without a state or across state broders, that causes at least 1,000 deaths during a year for the first time.
+        <% endif %>
+      - We count a war as new in a region even if the war started at the same time in another region. The sum across all regions can therefore be higher than the total number of new wars.
+      - |-
+        <% if conflict_type == "all" %>
+        We only count a war as new when the war overall started that year, not if it restarted.
+        <% elif conflict_type == "intra-state (internationalized)" %>
+        We also only count an internationalized intrastate war as new when the war overall started that year, not if it became internationalized.
+        <% elif conflict_type == "intra-state (non-internationalized)" %>
+        We also only count a non-internationalized intrastate war as new when the war overall started that year, not if it stopped being internationalized.
+        <% endif %>
+      - |-
+        <% if conflict_type == "all" %>
+        We extend the time-series to 2007, by drawing on Correlates of War's Directed Dyadic Interstate War Dataset (version 4.01), which identifies no interstate wars for the years since 2003.
+        <% elif conflict_type == "inter-state" %>
+        We extend the time-series to 2010, by drawing on Correlates of War's Directed Dyadic Interstate War Dataset (version 4.01), which identifies no wars for the years since 2003.
+        <% endif %>
+  number_deaths:
+    description_short: |-
+      <%- if conflict_type == "all" -%>
+      The estimated number of deaths in all ongoing wars in each year. This includes interstate, intrastate, extrastate, and non-state wars
+      <%- elif conflict_type == "inter-state" -%>
+      The estimated number of deaths in ongoing interstate wars in each year
+      <%- elif conflict_type == "intra-state" -%>
+      The estimated number of deaths in ongoing intrastate wars in each year
+      <%- elif conflict_type == "intra-state (internationalized)" -%>
+      The estimated number of deaths in ongoing internationalized intrastate wars in each year
+      <%- elif conflict_type == "intra-state (non-internationalized)" -%>
+      The estimated number of deaths in ongoing non-internationalized intrastate wars in each year
+      <%- elif conflict_type == "extra-state" -%>
+      The estimated number of deaths in ongoing extrastate wars in each year
+      <%- elif conflict_type == "non-state" -%>
+      The estimated number of deaths in ongoing non-state wars in each year
+      <%- endif -%>
+    description_key: &description_key_deaths
+      - |-
+        <% if conflict_type == "all" %>
+        An ongoing interstate war is a conflict between states that causes at least 1,000 deaths during a year.
+        <% elif conflict_type == "inter-state" %>
+        An ongoing interstate war is a conflict between states that causes at least 1,000 deaths during a year.
+        <% elif conflict_type == "intra-state" %>
+        An ongoing intrastate war is a conflict between a state and a non-state armed group or between non-state armed groups that causes at least 1,000 deaths during a year.
+        <% elif conflict_type == "intra-state (internationalized)" %>
+        An ongoing internationalized intrastate war is a conflict between a state and a non-state armed group or between non-state armed groups, with involvement of a foreign state, that causes at least 1,000 deaths during a year.
+        <% elif conflict_type == "intra-state (non-internationalized)" %>
+        An ongoing non-internationalized intrastate war is a conflict between a state and a non-state armed group or between non-state armed groups, without involvement of a foreign state, that causes at least 1,000 deaths during a year.
+        <% elif conflict_type == "extra-state" %>
+        An ongoing extrastate war is a conflict between a state and a non-state region it seeks to control, or between a state and a colony that seeks policy change or independence, and that causes at least 1,000 deaths during a year.
+        <% elif conflict_type == "non-state" %>
+        An ongoing non-state war is a conflict between non-state armed groups within a region without a state or across state broders, that causes at least 1,000 deaths during a year.
+        <% endif %>
+      - Deaths of combatants due to fighting, disease, and starvation are included.
+      - For wars without any deaths estimate, we conversatively coded Correlates of War's lower bound for including a war, 1,000 deaths each year.
+      - |-
+        If a war lasted more than one year, we distributed its deaths evenly across years.
+        <% if conflict_type == "all" %>
+        If a war was ongoing in more than one world region, we distributed its deaths across the regions of the participants.
+        <% elif conflict_type == "inter-state" %>
+        If a war was ongoing in more than one world region, we distributed its deaths across the regions of the participants.
+        <% endif %>
+      - |-
+        <% if conflict_type == "all" %>
+        We extend the time-series to 2007, by drawing on Correlates of War's Directed Dyadic Interstate War Dataset (version 4.01), which identifies no interstate wars for the years since 2003.
+        <% elif conflict_type == "inter-state" %>
+        We extend the time-series to 2010, by drawing on Correlates of War's Directed Dyadic Interstate War Dataset (version 4.01), which identifies no wars for the years since 2003.
+        <% endif %>
+
+dataset:
+  title: History of war (COW, 2020)
+  description: |-
+    This dataset provides information on wars, using data from Correlates of War's Inter-State War Data (version 4.0), Intra-State War Data (version 5.1), Extra-State War Data (version 4.0), and Non-State War Data (version 4.0).
+
+    We combine these datasets to provide information on the number of ongoing and new wars, the number of ongoing and new war types, as well as the number of deaths in ongoing wars and war types.
+
+    Deaths of combatants due to fighting, disease, and starvation are included.
+
+    We align the world regions across the datasets to be Africa, Americas, Asia, Europe, Middle East, and Oceania. This meant we sometimes had to identify the regions manually. The regions are defined based on Gleditsch and Ward codes. Find the complete mapping at
+    https://correlatesofwar.org/wp-content/uploads/states2016.csv
+
+      • Americas: 2-165
+
+      • Europe: 200-399
+
+      • Africa: 402-626
+
+      • Middle East: 630-698
+
+      • Asia and Oceania: 700-999
+
+    You can find more information about the data in our article: [To be published]
+
+tables:
+
+  # COUNTRY-LEVEL
+  cow_country:
+    variables:
+      participated_in_conflict:
+        title: Participated in conflict
+        unit: ""
+        display:
+          numDecimalPlaces: 0
+        description_short: |-
+          Whether the country participated in a conflict (of a specific kind) in a given year.
+
+      number_participants:
+        title: Number of countries in conflict
+        unit: "countries"
+        display:
+          numDecimalPlaces: 0
+        description_short: |-
+          The number of countries that participated in a conflict (of a specific kind) in a given year and region.
+
+  cow:
+    variables:
+      ##################
+      # Ongoing deaths #
+      ##################
+      number_deaths_ongoing_conflicts:
+        title: Number of battle-related deaths in ongoing conflicts
+        unit: deaths
+        description_short: |-
+          {definitions.number_deaths.description_short}.
+        description_key: *description_key_deaths
+        display:
+          numDecimalPlaces: 0
+        presentation:
+          grapher_config:
+            selectedEntityNames: *selected_entities
+
+      number_deaths_ongoing_conflicts_per_capita:
+        title: Number of battle-related deaths in ongoing conflicts (per capita)
+        unit: deaths per 100,000 people
+        description_short: |-
+          {definitions.number_deaths.description_short}, per capita.
+        description_key: *description_key_deaths
+        display:
+          numDecimalPlaces: 1
+        presentation:
+          grapher_config:
+            selectedEntityNames: *selected_entities
+
+      ####################
+      # Ongoing disputes #
+      ####################
+      number_ongoing_conflicts:
+        title: Number of ongoing conflicts
+        unit: conflicts
+        description_short: |-
+          {definitions.number_ongoing_conflicts.description_short}.
+        description_key: *description_key_ongoing
+        display:
+          numDecimalPlaces: 0
+        presentation:
+          grapher_config:
+            selectedEntityNames: *selected_entities
+
+      number_ongoing_conflicts_per_country:
+        title: Number of ongoing conflicts per country
+        unit: conflicts per country
+        description_short: |-
+          {definitions.number_ongoing_conflicts.description_short}, divided by the number of countries in the region.
+        description_key: *description_key_ongoing
+        display:
+          numDecimalPlaces: 3
+        presentation:
+          grapher_config:
+            selectedEntityNames: *selected_entities
+
+      number_ongoing_conflicts_per_country_pair:
+        title: Number of ongoing conflicts per country-pair
+        unit: conflicts per country-pair
+        description_short: |-
+          {definitions.number_ongoing_conflicts.description_short}, divided by the number of country-pairs in the region.
+        description_key: *description_key_ongoing
+        display:
+          numDecimalPlaces: 5
+        presentation:
+          grapher_config:
+            selectedEntityNames: *selected_entities
+
+      ################
+      # New disputes #
+      ################
+      number_new_conflicts:
+        title: Number of new conflicts
+        unit: conflicts
+        description_short: |-
+          {definitions.number_new_conflicts.description_short}.
+        description_key: *description_key_new
+        display:
+          numDecimalPlaces: 0
+        presentation:
+          grapher_config:
+            selectedEntityNames: *selected_entities
+
+      number_new_conflicts_per_country:
+        title: Number of new conflicts per country
+        unit: conflicts per country
+        description_short: |-
+          {definitions.number_new_conflicts.description_short}, divided by the number of countries in the region.
+        description_key: *description_key_new
+        display:
+          numDecimalPlaces: 3
+        presentation:
+          grapher_config:
+            selectedEntityNames: *selected_entities
+
+      number_new_conflicts_per_country_pair:
+        title: Number of new conflicts per country-pair
+        unit: conflicts per country-pair
+        description_short: |-
+          {definitions.number_new_conflicts.description_short}, divided by the number of country-pairs in the region.
+        description_key: *description_key_new
+        display:
+          numDecimalPlaces: 5
+        presentation:
+          grapher_config:
+            selectedEntityNames: *selected_entities

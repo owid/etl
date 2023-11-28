@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4463
+    date_accessed: 2023-08-14 14:41:43.700499
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_4463_growth_rates_of_household_expenditure_or_income_per_capita_among_the_bottom_40_per_cent_of_the_population__pct
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 4ce8be3bd467663bc378d4ed32085926
+  size: 15208
+  path: 
+    dataset_4463_growth_rates_of_household_expenditure_or_income_per_capita_among_the_bottom_40_per_cent_of_the_population__pct_config.json

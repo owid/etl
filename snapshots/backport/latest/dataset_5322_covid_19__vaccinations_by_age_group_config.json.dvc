@@ -1,19 +1,15 @@
 meta:
-  name: Grapher metadata for dataset_5322_covid_19__vaccinations_by_age_group
-  description: ''
   source:
     name: Our World in Data catalog backport
-    description:
     url: https://owid.cloud/admin/datasets/5322
-    source_data_url:
-    owid_data_url:
-    date_accessed: 2023-07-19 13:20:54.106418
+    date_accessed: 2023-08-14 15:14:02.409526
     publication_date: latest
-    publication_year:
     published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_5322_covid_19__vaccinations_by_age_group (archived)
+  description: ''
   is_public: false
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: bae19a9ee63144749d6ff1686738dee8
-  size: 114996
+- md5: 5c3937ac13c9e81ee9248180590e24fd
+  size: 145014
   path: dataset_5322_covid_19__vaccinations_by_age_group_config.json

@@ -5,13 +5,47 @@ This dataset provides data since 1400, where each row in it denotes a certain co
 Drawback of this dataset is that the field `name` encodes the conflict name and conflict type together as a flat string.
 
 Conflicts in this dataset always occur in the same region, and have the same conflict type. Conflict type can either be "inter-state" or "intra-state".
+
+On regions:
+
+- This dataset provides more granularity in terms of regions. For instance, it includes "Eastern Europe" and "Western Europe".
+
+- We map these regions to more standardised regions (those used in other datasets, e.g. COW or UCDP). E.g. we map "Eastern Europe" to "Europe".
+    For more details, see variable `REGIONS_RENAME`.
+
+- It is not evident which region accounts for data from countries in Oceania.
+
+- It is unclear from the source which countries are included in each region. Some details can be inferred from page 10 in Brecke's 1999 paper "Violent Conflicts 1400 A.D. to the Present in Different Regions of the World" (https://bpb-us-w2.wpmucdn.com/sites.gatech.edu/dist/1/19/files/2018/09/Brecke-PSS-1999-paper-Violent-Conflicts-1400-AD-to-the-Present.pdf).
+
+    We have manually inferred the mappings using COW codes. Our current estimate for the original regions is as follows:
+
+    1. North America, Central America, and the Caribbean: 2-95 (US-Panama)
+    2. South America: 100-165 (Colombia-Uruguay)
+    3. Western Europe: 200-280 (UK-Mecklenburg Schwerin), 305 (Autria), 325-338 (Italy-Malta), 380-395 (Sweden-Iceland)
+    4. Eastern Europe: 290-300 (Poland - Austria-Hungary), 310-317 (Hungary-Slovakia), 339-375 (Albania-Finland), 640 (Turkey)
+    5. Middle East: 630 (Iran), 645-698 (Iraq-Oman)
+    6. North Africa: 600-626 (Morocco-South Sudan) 432 (Mali), 435-436 (Mauritania-Niger), 483 (Niger), 651 (Egypt)
+    7. West & Central Africa: 402-420 (Cape Verde, Gambia), 433-434 (Senegal-Benin), 437-482 (Ivory Coast-Central African Republic), 484-490 (Congo-Democratic Republic of the Congo)
+    8. East & South Africa: 500-591 (Uganda-Seychelles)
+    9. Central Asia: 700-705 (Afghanistan-Kazakhstan)
+    10. South Asia: 750-771 (India-Bangladesh), 780-790 (Sri Lanka-Nepal)
+    11. Southeast Asia: 800-990 (Thailand-Samoa)
+    12. East Asia: 710-740 (Taiwan-Japan)
+
+    With the mapping done with `REGIONS_RENAME`, we have:
+
+    - Americas (1, 2): 2-165
+    - Europe (3, 4): 200-395 (UK-Iceland), 640 (Turkey)
+    - Middle East (5): 630 (Iran), 645-698 (Iraq-Oman)
+    - Africa (6, 7, 8): 402-626 (Cape Verde-South Sudan),
+    - Asia and Oceania (9, 10, 11, 12): 700-990 (Afghanistan-Samoa)
 """
 
-from typing import cast
-
 import numpy as np
+import owid.catalog.processing as pr
 import pandas as pd
-from owid.catalog import Dataset, Table
+from owid.catalog import Table
+from owid.catalog import processing_log as pl
 from structlog import get_logger
 
 from etl.helpers import PathFinder, create_dataset
@@ -22,19 +56,19 @@ paths = PathFinder(__file__)
 log = get_logger()
 # Region mapping
 REGIONS_RENAME = {
-    1: "North America, Central America, and the Caribbean (Brecke)",
-    2: "South America (Brecke)",
-    3: "Western Europe (Brecke)",
-    4: "Eastern Europe (Brecke)",
+    1: "Americas (Brecke)",  # "North America, Central America, and the Caribbean (Brecke)",
+    2: "Americas (Brecke)",  # "South America (Brecke)",
+    3: "Europe (Brecke)",  # "Western Europe (Brecke)",
+    4: "Europe (Brecke)",  # "Eastern Europe (Brecke)",
     5: "Middle East (Brecke)",
-    6: "North Africa (Brecke)",
-    7: "West & Central Africa (Brecke)",
-    8: "East & South Africa (Brecke)",
-    9: "Central Asia (Brecke)",
-    10: "South Asia (Brecke)",
-    11: "Southeast Asia (Brecke)",
-    12: "East Asia (Brecke)",
-    -9: "Unknown",
+    6: "Africa (Brecke)",  # "North Africa (Brecke)",
+    7: "Africa (Brecke)",  # "West & Central Africa (Brecke)",
+    8: "Africa (Brecke)",  # "East & South Africa (Brecke)",
+    9: "Asia and Oceania (Brecke)",  # "Central Asia (Brecke)",
+    10: "Asia and Oceania (Brecke)",  # "South Asia (Brecke)",
+    11: "Asia and Oceania (Brecke)",  # "Southeast Asia (Brecke)",
+    12: "Asia and Oceania (Brecke)",  # "East Asia (Brecke)",
+    -9: -9,  # Unknown
 }
 
 
@@ -44,7 +78,7 @@ def run(dest_dir: str) -> None:
     #
     # Load meadow dataset.
     log.info("war.brecke: start")
-    ds_meadow = cast(Dataset, paths.load_dependency("brecke"))
+    ds_meadow = paths.load_dataset("brecke")
 
     # Read table from meadow dataset.
     tb = ds_meadow["brecke"]
@@ -80,6 +114,11 @@ def run(dest_dir: str) -> None:
     log.info("war.brecke: add lower bound value of deaths")
     tb = add_lower_bound_deaths(tb)
 
+    # Rename regions
+    log.info("war.brecke: rename regions")
+    tb["region"] = tb["region"].map(REGIONS_RENAME)
+    assert tb["region"].isna().sum() == 0, "Unmapped regions!"
+
     # Expand observations
     log.info("war.brecke: expand observations")
     tb = expand_observations(tb)
@@ -96,19 +135,11 @@ def run(dest_dir: str) -> None:
     # Distribute numbers for region -9
     log.info("war.brecke: distributing metrics for region -9")
     tb = distribute_metrics_m9(tb)
-
-    # Rename regions
-    log.info("war.brecke: rename regions")
-    tb["region"] = tb["region"].map(REGIONS_RENAME | {"World": "World"})
-    assert tb["region"].isna().sum() == 0, "Unmapped regions!"
+    assert (tb["region"] != -9).all(), "-9 region still detected!"
 
     # Set index
     log.info("war.brecke: set index")
     tb = tb.set_index(["year", "region", "conflict_type"], verify_integrity=True)
-
-    # Add short_name to table
-    log.info("war.brecke: add shortname to table")
-    tb = Table(tb, short_name=paths.short_name)
 
     #
     # Save outputs.
@@ -168,10 +199,23 @@ def add_conflict_type(tb: Table) -> Table:
         tb["name"] = tb["name"].str.replace(text, text.replace("-", ""))
 
     # Remove year part
-    name_to_year = tb.name.apply(lambda x: ",".join(x.split(",")[:-1]))
+    name_wo_year = tb["name"].apply(lambda x: ",".join(x.split(",")[:-1]))
 
     # Get mask
-    mask = name_to_year.str.contains("-")
+    ## Wars that are inter-state but don't have a hyphen, hence would be classified as internal
+    wars_interstate = [
+        "First World War, 1914-18",
+        "Thirty Years' War, 1618-48",
+        "Napoleonic Wars, 1803-15",
+        "Wars of the French Revolution, 1791-1802",
+        "Vietnam, 1964-75",
+    ]
+    mask_custom = tb["name"].isin(wars_interstate)
+    assert (
+        mask_custom.sum() == len(wars_interstate)
+    ), "Some corrections can't be made, because some war names specified in `wars_interstate` are not found in the data!"
+    ## Build final mask
+    mask = name_wo_year.str.contains("-") | mask_custom
 
     # Set conflict type
     tb["conflict_type"] = "internal"
@@ -192,6 +236,7 @@ def add_lower_bound_deaths(tb: Table) -> Table:
     return tb
 
 
+@pl.wrap("expand_observations")
 def expand_observations(tb: Table) -> Table:
     """Expand to have a row per (year, conflict).
 
@@ -206,13 +251,13 @@ def expand_observations(tb: Table) -> Table:
         Here, each conflict has as many rows as years of activity. Its deaths have been uniformly distributed among the years of activity.
     """
     # For that we scale the number of deaths proportional to the duration of the conflict.
-    tb[["totalfatalities"]] = tb[["totalfatalities"]].div(tb["endyear"] - tb["startyear"] + 1, "index").round()
+    conflict_length = tb["endyear"] - tb["startyear"] + 1
+    tb["totalfatalities"] = (tb["totalfatalities"] / conflict_length).round()
 
     # Add missing years for each triplet ("warcode", "campcode", "ccode")
     YEAR_MIN = tb["startyear"].min()
     YEAR_MAX = tb["endyear"].max()
-    tb_all_years = pd.DataFrame(pd.RangeIndex(YEAR_MIN, YEAR_MAX + 1), columns=["year"])
-    tb = pd.DataFrame(tb)  # to prevent error "AttributeError: 'DataFrame' object has no attribute 'all_columns'"
+    tb_all_years = Table(pd.RangeIndex(YEAR_MIN, YEAR_MAX + 1), columns=["year"])
     tb = tb.merge(tb_all_years, how="cross")
     # Filter only entries that actually existed
     tb = tb[(tb["year"] >= tb["startyear"]) & (tb["year"] <= tb["endyear"])]
@@ -220,6 +265,7 @@ def expand_observations(tb: Table) -> Table:
     return tb
 
 
+@pl.wrap("estimate_metrics", parents=["totalfatalities"])
 def estimate_metrics(tb: Table) -> Table:
     """Remix table to have the desired metrics.
 
@@ -265,7 +311,7 @@ def _add_ongoing_metrics(tb: Table) -> Table:
     ## By region and conflict_type
     tb_ongoing = tb.groupby(["year", "region", "conflict_type"], as_index=False).agg(ops)
 
-    ## All conflicts
+    ## All conflict types
     tb_ongoing_all_conf = tb.groupby(["year", "region"], as_index=False).agg(ops)
     tb_ongoing_all_conf["conflict_type"] = "all"
 
@@ -279,9 +325,11 @@ def _add_ongoing_metrics(tb: Table) -> Table:
     tb_ongoing_world_all_conf["conflict_type"] = "all"
 
     ## Add region=World
-    tb_ongoing = pd.concat([tb_ongoing, tb_ongoing_all_conf, tb_ongoing_world, tb_ongoing_world_all_conf], ignore_index=True).sort_values(  # type: ignore
-        by=["year", "region", "conflict_type"]
+    tb_concat = pr.concat(
+        [tb_ongoing, tb_ongoing_all_conf, tb_ongoing_world, tb_ongoing_world_all_conf], ignore_index=True
     )
+
+    tb_ongoing = tb_concat.sort_values(by=["year", "region", "conflict_type"])  # type: ignore
 
     ## Rename columns
     tb_ongoing = tb_ongoing.rename(  # type: ignore
@@ -314,7 +362,7 @@ def _add_new_metrics(tb: Table) -> Table:
     tb_new_world_all_conf["conflict_type"] = "all"
 
     ## Combine
-    tb_new = pd.concat([tb_new, tb_new_all_conf, tb_new_world, tb_new_world_all_conf], ignore_index=True).sort_values(  # type: ignore
+    tb_new = pr.concat([tb_new, tb_new_all_conf, tb_new_world, tb_new_world_all_conf], ignore_index=True).sort_values(  # type: ignore
         by=["startyear", "region", "conflict_type"]
     )
 

@@ -1,18 +1,15 @@
 meta:
-  namespace: backport
-  short_name: dataset_5192_global_health_indicators__number_of_people__2020_values
-  file_extension: feather
-  date_accessed: 2023-04-23 08:08:02.062161
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5192
+    date_accessed: 2023-08-10 09:43:22.623487
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Global Health Indicators – Number of People (2020)
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/5192
-  source_published_by: Our World in Data catalog backport
   is_public: false
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 66757f1305e3c0190707f6427845dead
-  size: 485186
+- md5: bf4f39475dd6a654b0e7643a31a5699e
+  size: 485074
   path: dataset_5192_global_health_indicators__number_of_people__2020_values.feather

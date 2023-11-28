@@ -1,18 +1,16 @@
 meta:
-  namespace: backport
-  short_name: dataset_2825_new_estimates_of_hours_of_work_per_week__1900_1957__jones__1963_config
-  file_extension: json
-  date_accessed: 2023-02-23 18:26:11.919421
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2825
+    date_accessed: 2023-08-10 08:45:28.775704
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_2825_new_estimates_of_hours_of_work_per_week__1900_1957__jones__1963
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/2825
-  source_published_by: Our World in Data catalog backport
   is_public: false
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 935bb540bdcc85bbbcc5beb921a6aa89
-  size: 9582
-  path: dataset_2825_new_estimates_of_hours_of_work_per_week__1900_1957__jones__1963_config.json
+- md5: 471441e2a35abdec2295649cd31932fe
+  size: 10624
+  path: 
+    dataset_2825_new_estimates_of_hours_of_work_per_week__1900_1957__jones__1963_config.json

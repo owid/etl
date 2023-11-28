@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/225
+    date_accessed: 2023-08-16 09:54:55.731401
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Global Projection, Medium SSP2 - IIASA (2016)
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: c815d76ce6d6d4acd727eccb9852917b
+  size: 7762
+  path: dataset_225_global_projection__medium_ssp2__iiasa__2016_values.feather

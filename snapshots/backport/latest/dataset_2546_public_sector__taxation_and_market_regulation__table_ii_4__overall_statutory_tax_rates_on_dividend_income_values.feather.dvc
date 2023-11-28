@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2546
+    date_accessed: 2023-08-16 08:41:07.579896
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Public Sector, Taxation and Market Regulation - Table II.4. Overall statutory
+    tax rates on dividend income
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 5a570c1e54676c51ca9a82440f228b22
+  size: 21282
+  path: 
+    dataset_2546_public_sector__taxation_and_market_regulation__table_ii_4__overall_statutory_tax_rates_on_dividend_income_values.feather

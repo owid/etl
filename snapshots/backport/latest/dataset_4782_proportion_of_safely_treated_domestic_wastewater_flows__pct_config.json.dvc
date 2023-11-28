@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4782
+    date_accessed: 2023-08-14 05:33:15.410617
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_4782_proportion_of_safely_treated_domestic_wastewater_flows__pct
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: e25fc4fe656c14841561614bfd2e5d12
+  size: 15925
+  path: 
+    dataset_4782_proportion_of_safely_treated_domestic_wastewater_flows__pct_config.json

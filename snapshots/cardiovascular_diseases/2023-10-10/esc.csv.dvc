@@ -1,0 +1,30 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/origin/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: ESC Cardiovascular Statistics
+    description: |-
+      The European Heart Health Institute coordinates the ESC Cardiovascular Statistics and Atlas projects, aiming to support evidence-based policy and practice in European cardiology. The project seeks to understand health systems across Europe, identify cost-effective practices, and facilitate their widespread use. It's a significant initiative that tries to bring detailed, accurate health data to the forefront of policy and practice in cardiology across Europe.
+
+      The ESC Atlas of Cardiology is a key initiative, gathering data on healthcare systems from ESC member countries. It provides a range of information, from geographical and demographic data to specifics about healthcare organization and financing. Notably, it features a detailed section on cardiology, offering insights into cardiac care services, resources, and reimbursement methods where available.
+    date_published: '2023'
+    # Citation
+    producer: European Society of Cardiology
+    citation_full: |-
+      Downloaded from the ESC Atlas of Cardiology website eatlas.escardio.org. Accessed on: 2023-10-10.
+
+    # Files
+    url_main: 
+      https://eatlas.escardio.org/Atlas/ESC-Atlas-of-Cardiology/Cardiovascular-healthcare-delivery/Cardiological-specialists/chr_card_1m_r-cardiologists-total-per-million-people
+    date_accessed: 2023-10-10
+
+    # License
+    license:
+      name: ©producer year
+      url: https://eatlas.escardio.org/About/terms-conditions
+wdir: ../../../data/snapshots/cardiovascular_diseases/2023-10-10
+outs:
+- md5: 53fcaf669fc650c2bf4385bb05502772
+  size: 182246
+  path: esc.csv

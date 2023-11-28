@@ -6,3 +6,11 @@ steps:
     - data-private://meadow/ihme_gbd/2023-03-29/gbd_drug_disorders
   data-private://grapher/ihme_gbd/2023-03-29/gbd_drug_disorders:
     - data-private://garden/ihme_gbd/2023-03-29/gbd_drug_disorders
+  # Karlinsky death completeness (2021)
+  data://meadow/health/2022-12-28/deaths_karlinsky:
+    - snapshot://health/2022-12-28/deaths_karlinsky.csv
+  data://garden/health/2022-12-28/deaths_karlinsky:
+    - data://meadow/health/2022-12-28/deaths_karlinsky
+    - data://garden/owid/latest/key_indicators
+  data://grapher/health/2022-12-28/deaths_karlinsky:
+    - data://garden/health/2022-12-28/deaths_karlinsky

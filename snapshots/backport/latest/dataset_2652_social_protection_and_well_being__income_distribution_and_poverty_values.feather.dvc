@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2652
+    date_accessed: 2023-08-16 10:03:27.104444
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Social Protection and Well-being - Income Distribution and Poverty
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: f3787ade0370cc01bdd1b2a0bfe0172c
+  size: 15770
+  path: 
+    dataset_2652_social_protection_and_well_being__income_distribution_and_poverty_values.feather

@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2246
+    date_accessed: 2023-08-16 08:39:08.936193
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2246_malignant_skin_melanoma (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: e344c7b2c424e66a9c8a7738241bcdd4
+  size: 32830
+  path: dataset_2246_malignant_skin_melanoma_config.json

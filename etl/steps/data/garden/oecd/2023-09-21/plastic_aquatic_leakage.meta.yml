@@ -1,0 +1,22 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Plastic Pollution
+
+
+tables:
+  plastic_aquatic_leakage:
+    variables:
+      value:
+        title: Plastic leakage to aquatic envrionment
+        unit: 'tonnes'
+        short_unit: 't'
+        display:
+          numDecimalPlaces: 0
+      share:
+        title: Share of plastic leakage to aquatic envrionment
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 2

@@ -43,14 +43,19 @@ dataset:
   sources:
   - name: Epoch (2023)
     url: https://epochai.org/mlinputs/visualization
-    date_accessed: '2023-06-21'
-    publication_date: '2023-06-06'
+    date_accessed: '2023-09-18'
     publication_year: 2023
     published_by: 'Epoch, Parameter, Compute and Data Trends in Machine Learning.
       Published online at epochai.org. Retrieved from: https://epochai.org/mlinputs/visualization'
 tables:
   epoch_aggregates:
     variables:
+      audio:
+        title: Audio
+        unit: ''
+      reading:
+        title: Reading
+        unit: ''
       _3d_reconstruction:
         title: 3D reconstruction
         unit: ''
@@ -110,4 +115,82 @@ tables:
         unit: ''
       research_collective:
         title: Research collective
+        unit: ''
+      government:
+        title: Government
+        unit: ''
+      non_profit:
+        title: Non-profit
+        unit: ''
+      audio_cumsum:
+        title: Audio (cumulative)
+        unit: ''
+      reading_cumsum:
+        title: Reading (cumulative)
+        unit: ''
+      _3d_reconstruction_cumsum:
+        title: 3D reconstruction (cumulative)
+        unit: ''
+      drawing_cumsum:
+        title: Drawing (cumulative)
+        unit: ''
+      driving_cumsum:
+        title: Driving (cumulative)
+        unit: ''
+      games_cumsum:
+        title: Games (cumulative)
+        unit: ''
+      language_cumsum:
+        title: Language (cumulative)
+        unit: ''
+      multimodal_cumsum:
+        title: Multimodal (cumulative)
+        unit: ''
+      other_cumsum:
+        title: Other (cumulative)
+        unit: ''
+      recommendation_cumsum:
+        title: Recommendation (cumulative)
+        unit: ''
+      robotics_cumsum:
+        title: Robotics (cumulative)
+        unit: ''
+      search_cumsum:
+        title: Search (cumulative)
+        unit: ''
+      speech_cumsum:
+        title: Speech (cumulative)
+        unit: ''
+      text_to_video_cumsum:
+        title: Text-to-Video (cumulative)
+        unit: ''
+      video_cumsum:
+        title: Video (cumulative)
+        unit: ''
+      vision_cumsum:
+        title: Vision (cumulative)
+        unit: ''
+      academia_cumsum:
+        title: Academia (cumulative)
+        unit: ''
+      industry_cumsum:
+        title: Industry (cumulative)
+        unit: ''
+      collaboration_cumsum:
+        title: Collaboration (cumulative)
+        unit: ''
+      collaboration__majority_academia_cumsum:
+        title: Collaboration, majority academia (cumulative)
+        unit: ''
+      collaboration__majority_industry_cumsum:
+        title: Collaboration, majority industry (cumulative)
+        unit: ''
+      research_collective_cumsum:
+        title: Research collective (cumulative)
+        unit: ''
+      government_cumsum:
+        title: Government (cumulative)
+        unit: ''
+      non_profit_cumsum:
+        title: Non-profit (cumulative)
         unit: ''

@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1485
+    date_accessed: 2023-08-14 05:47:25.006872
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: H influenzae type B meningitis
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 83f836b0d9fbefb459df326392e4fbe3
+  size: 2012058
+  path: dataset_1485_h_influenzae_type_b_meningitis_values.feather

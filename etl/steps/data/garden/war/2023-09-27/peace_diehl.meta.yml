@@ -1,0 +1,138 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  global:
+    region_numbers: |-
+      Two-country relationships within a region are those where both countries are in the same region. If countries are in different regions, the relationship falls into the 'Inter-continental' region.
+
+  common:
+    presentation:
+      topic_tags:
+        - War & Peace
+    description_processing: |-
+      The peace scale level of a relationship for a given year reports the level as of the 31st of December of that year.
+
+      Regions are defined based on their COW (Correlates of War) codes:
+
+      • Americas: 2-165
+      • Europe: 200-399
+      • Africa: 402-626
+      • Middle East: 630-698
+      • Asia and Oceania: 700-999
+
+      Fixes: The source used country codes 936 and 937 instead of 946 (Kiribati) and 947 (Tuvalu), respectively.
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
+dataset:
+  title: Peace data (Diehl et al., 2023)
+  update_period_days: 1000
+  description: |-
+    This dataset provides information on the relationships between countries, using data from Diehl et al. (2023).
+
+    We aggregate the data to the year and world (region).
+
+    The data distinguishes five types of relationships between a pair of countries: severe rivalry, lesser rivalry, negative peace, warm peace, and security community.
+
+    It does not include country pairs without any relationship.
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
+tables:
+  peace_diehl:
+    variables:
+      peace_scale_level:
+        title: Peace scale level
+        unit: ""
+        description_short: |-
+          Describes different levels of peace: severe rivalry, lesser rivalry, negative peace, warm peace, and security community respectively.
+        description_processing: |-
+          The peace scale levels are encoded using float numbers in the range of 0 to 1:
+
+            - 0: severe rivalry
+            - 0.25: lesser rivalry
+            - 0.5: negative peace
+            - 0.75: warm peace
+            - 1: security community
+        processing_level: minor
+
+  peace_diehl_agg:
+    variables:
+      severe_rivalry:
+        title: Number of country-pairs with 'severe rivalry' relationship
+        description_short: |-
+          Severe rivalry between two countries is when these have important unresolved issues, and handle them with frequent and severe violence. Their diplomacy is hostile, and their communication is limited.
+        description_key:
+          - Prominent examples of severe rivalry relationships include the United States and the Soviet Union between 1948 and 1989, and India and Pakistan since 1947.
+          - |-
+            {definitions.global.region_numbers}
+        unit: country-pairs
+        processing_level: minor
+        display:
+          numDecimalPlaces: 0
+
+      lesser_rivalry:
+        title:  Number of country-pairs with 'lesser rivalry' relationship
+        description_short: |-
+          Lesser rivalry between two countries is when these have important unresolved issues, and handle them with infrequent and limited violence. Their diplomacy is hostile, and their communication is limited.
+        description_key:
+          - Prominent examples of lesser rivalry relationships include Colombia and Venezuela between 1841 and 1982, and Russia and the Ottoman Empire between 1849 and 1856.
+          - |-
+            {definitions.global.region_numbers}
+        unit: country-pairs
+        processing_level: minor
+        display:
+          numDecimalPlaces: 0
+
+      negative_peace:
+        title: Number of country-pairs with 'negative peace' relationship
+        description_short: |-
+          Negative peace between two countries is when these have resolved some of their important issues, and rarely handle the remaining ones with violence, but they maintain plans for war. They predominantly use diplomacy, and communication between their governments is common.
+        description_key:
+          - Prominent examples of negative peace relationships include Egypt and Israel since 1989, and Finland and the Soviet Union/Russia since 1944.
+          - |-
+            {definitions.global.region_numbers}
+        unit: country-pairs
+        processing_level: minor
+        display:
+          numDecimalPlaces: 0
+
+      warm_peace:
+        title: Number of country-pairs with 'warm peace' relationship
+        description_short: |-
+          Warm peace peace between two countries is when these have resolved their main issues and violence between them is unthinkable. They have firm diplomatic and societal relations, and coordinate some of their policies.
+        description_key:
+          - Prominent examples of warm peace relationships include Argentina and Brazil since 1986, and Malaysia and Indonesia since 1967.
+          - |-
+            {definitions.global.region_numbers}
+        unit: country-pairs
+        processing_level: minor
+        display:
+          numDecimalPlaces: 0
+
+      security_community:
+        title: Number of country-pairs with 'security community' relationship
+        description_short: |-
+          Security community between two countries is when these have resolved their main issues, violence between them is unthinkable, and the war plans they maintain they make together. They coordinate their diplomacy, harmonize their policies, and share identities and values.
+        description_key:
+          - Prominent examples of security community relationships include France and Germany since 1992, and the United States and Canada since 1987.
+          - |-
+            {definitions.global.region_numbers}
+        unit: country-pairs
+        processing_level: minor
+        display:
+          numDecimalPlaces: 0
+
+      no_relation:
+        title: Number of country-pairs with no relationship
+        description_short: |-
+          There is no official relationship between these two countries.
+        description_key:
+          - |-
+            {definitions.global.region_numbers}
+          - We estimate the number of country-pairs with no relationship by subtracting the number of country-pairs with a relationship from the total number of country-pairs in the world. To estimate the total number of country-pairs in the world for a given year, we consider countries that appear in the dataset with a certain relationship.
+        unit: country-pairs
+        processing_level: minor
+        display:
+          numDecimalPlaces: 0

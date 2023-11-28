@@ -1,18 +1,14 @@
 meta:
-  namespace: backport
-  short_name: dataset_1935_number_of_deaths_in_england_and_wales_by_age__ons_config
-  file_extension: json
-  date_accessed: 2023-02-23 18:24:29.058680
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1935
+    date_accessed: 2023-08-10 07:45:38.710096
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_1935_number_of_deaths_in_england_and_wales_by_age__ons
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/1935
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: cb1919557787db604460693a9c4ed88c
-  size: 2948
+- md5: 13b9a65aae0d4d601ac8e2e8cbf160e0
+  size: 3355
   path: dataset_1935_number_of_deaths_in_england_and_wales_by_age__ons_config.json

@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/3533
+    date_accessed: 2023-08-16 08:23:26.393578
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Bacterial skin diseases
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 3c2556946f195155eced800aaa53614e
+  size: 2116402
+  path: dataset_3533_bacterial_skin_diseases_values.feather

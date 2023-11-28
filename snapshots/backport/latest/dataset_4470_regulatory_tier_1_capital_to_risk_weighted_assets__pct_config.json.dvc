@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4470
+    date_accessed: 2023-08-16 10:19:37.997514
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_4470_regulatory_tier_1_capital_to_risk_weighted_assets__pct
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 3276f31212051f004aad143157f3db00
+  size: 14759
+  path: dataset_4470_regulatory_tier_1_capital_to_risk_weighted_assets__pct_config.json

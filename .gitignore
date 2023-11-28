@@ -29,7 +29,7 @@ examples/data/*
 
 playground*
 playground.ipynb
-!walkthrough/**/playground.ipynb
+!apps/wizard/**/playground.ipynb
 
 docs/_build
 docs/.vscode
@@ -43,3 +43,5 @@ docs/.vscode
 site/
 
 .sanity-check
+
+.wizard

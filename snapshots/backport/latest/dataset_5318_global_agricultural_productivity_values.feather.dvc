@@ -1,18 +1,15 @@
 meta:
-  namespace: backport
-  short_name: dataset_5318_global_agricultural_productivity_values
-  file_extension: feather
-  date_accessed: 2023-02-23 19:33:32.708462
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5318
+    date_accessed: 2023-08-09 14:27:55.224506
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: global_agricultural_productivity
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/5318
-  source_published_by: Our World in Data catalog backport
   is_public: false
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 3fc85d0bf6abb75cf77ff105b961f201
+- md5: 1705a61e755c153bc10728a8e96a689e
   size: 6450
   path: dataset_5318_global_agricultural_productivity_values.feather

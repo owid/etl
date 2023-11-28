@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2013
+    date_accessed: 2023-08-14 05:48:48.261954
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_2013_total_resource_flows_for_development__by_recipient_and_donor_countries_and_type_of_flow__e_g__official_development_assistance__foreign_direct_investment_and_other_flows
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: d16b8ab20ac70d2a251105b9939f0826
+  size: 3246
+  path: 
+    dataset_2013_total_resource_flows_for_development__by_recipient_and_donor_countries_and_type_of_flow__e_g__official_development_assistance__foreign_direct_investment_and_other_flows_config.json

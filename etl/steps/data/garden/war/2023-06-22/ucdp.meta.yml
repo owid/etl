@@ -1,86 +1,232 @@
+definitions:
+  deaths_included: |-
+    Deaths of combatants and civilians due to fighting are included.
+
+  conflict_type: |-
+    <% if conflict_type == "all" %>
+    An ongoing armed conflict is a disagreement between organized groups, or between one organized group and civilians, that causes at least 25 deaths during a year.
+    <% elif conflict_type == "interstate" %>
+    An interstate conflict is a conflict between states that causes at least 25 deaths during a year.
+    <% elif conflict_type == "intrastate" %>
+    An intrastate conflict is a conflict between a state and a non-state armed group that causes at least 25 deaths during a year.
+    <% elif conflict_type == "intrastate (internationalized)" %>
+    An internationalized intrastate conflict is a conflict between a state and a non-state armed group, with involvement of a foreign state, that causes at least 25 deaths during a year.
+    <% elif conflict_type == "intrastate (non-internationalized)" %>
+    A non-internationalized intrastate conflict is a conflict between a state and a non-state armed group, without involvement of a foreign state, that causes at least 25 deaths during a year.
+    <% elif conflict_type == "non-state conflict" %>
+    A non-state conflict is a conflict between non-state armed groups that causes at least 25 deaths during a year.
+    <% elif conflict_type == "one-sided violence" %>
+    One-sided violence is the use of armed force by a state or non-state armed group against civilians that causes at least 25 deaths during a year.
+    <% endif %>
+
+  conflict_type_estimate: |-
+    <% if conflict_type == "all" %>
+    The << estimate >> estimate of the number of deaths in all ongoing armed conflicts in each year. This includes interstate, intrastate, extrasystemic, and non-state conflicts, as well as one-sided violence.
+    <% elif conflict_type == "interstate" %>
+    The << estimate >> estimate of the number of deaths in ongoing interstate conflicts in each year.
+    <% elif conflict_type == "intrastate" %>
+    The << estimate >> estimate of the number of deaths in ongoing intrastate conflicts in each year.
+    <% elif conflict_type == "intrastate (internationalized)" %>
+    The << estimate >> estimate of the number of deaths in ongoing internationalized intrastate conflicts in each year.
+    <% elif conflict_type == "intrastate (non-internationalized)" %>
+    The << estimate >> estimate of the number of deaths in ongoing non-internationalized intrastate conflicts in each year.
+    <% elif conflict_type == "non-state conflict" %>
+    The << estimate >> estimate of the number of deaths in ongoing non-state conflicts in each year.
+    <% elif conflict_type == "one-sided violence" %>
+    The << estimate >> estimate of the number of deaths in conflicts of one-sided violence in each year.
+    <% endif %>
+
+  ongoing_conflicts: |-
+    <% if conflict_type == "all" %>
+    The number of all ongoing armed conflicts in each year. This includes interstate, intrastate, extrasystemic, and non-state conflicts, as well as one-sided violence.
+    <% elif conflict_type == "interstate" %>
+    The number of ongoing interstate conflicts in each year.
+    <% elif conflict_type == "intrastate" %>
+    The number of ongoing intrastate conflicts in each year.
+    <% elif conflict_type == "intrastate (internationalized)" %>
+    The number of ongoing internationalized intrastate conflicts in each year.
+    <% elif conflict_type == "intrastate (non-internationalized)" %>
+    The number of ongoing non-internationalized intrastate conflicts in each year.
+    <% elif conflict_type == "extrasystemic" %>
+    The number of ongoing extrasystemic conflicts in each year.
+    <% elif conflict_type == "non-state conflict" %>
+    The number of non-state conflicts in each year.
+    <% elif conflict_type == "one-sided violence" %>
+    The number of conflicts of one-sided violence in each year.
+    <% endif %>
+
+  new_conflicts: |-
+    <% if conflict_type == "all" %>
+    The number of new armed conflicts in each year. This includes interstate, intrastate, extrasystemic, and non-state conflicts, as well as one-sided violence.
+
+    A new armed conflict is a disagreement between organized groups, or between one organized group and civilians, that causes at least 25 deaths during a year for the first time.
+    <% elif conflict_type == "interstate" %>
+    The number of new interstate conflicts in each year.
+
+    A new interstate conflict is a conflict between states that causes at least 25 deaths during a year for the first time.
+    <% elif conflict_type == "intrastate" %>
+    The number of new intrastate conflicts in each year.
+
+    A new intrastate conflict is a conflict between a state and a non-state armed group that causes at least 25 deaths during a year for the first time.
+    <% elif conflict_type == "intrastate (internationalized)" %>
+    The number of new internationalized intrastate conflicts in each year.
+
+    A new internationalized intrastate conflict is a conflict between a state and a non-state armed group, with involvement of a foreign state, that causes at least 25 deaths during a year for the first time. We also only count an internationalized intrastate conflict as new when the conflict overall started that year, not if it became internationalized.
+    <% elif conflict_type == "intrastate (non-internationalized)" %>
+    The number of new non-internationalized intrastate conflicts in each year.
+
+    A new non-internationalized intrastate conflict is a conflict between a state and a non-state armed group, without involvement of a foreign state, that causes at least 25 deaths during a year for the first time. We also only count a non-internationalized intrastate conflict as new when the conflict overall started that year, not if it stopped being internationalized.
+    <% elif conflict_type == "extrasystemic" %>
+    The number of new extrasystemic conflicts in each year.
+
+    A new extrasystemic conflict is a conflict between a state and a non-state armed group outside its territory that causes at least 25 deaths during a year for the first time.
+    <% elif conflict_type == "non-state conflict" %>
+    The number of new non-state conflicts in each year.
+
+    A new non-state conflict is a conflict between non-state armed groups that causes at least 25 deaths during a year for the first time.
+    <% elif conflict_type == "one-sided violence" %>
+    The number of new conflicts of one-sided violence in each year.
+
+    New one-sided violence is the use of armed force by a state or non-state armed group against civilians that causes at least 25 deaths during a year for the first time.
+    <% endif %>
+
+
 dataset:
   title: History of war (UCDP, 2023)
-  description: >-
-    This dataset contains information on armed conflicts, both internal and external, in the period of 1989 and 2022.
+  description: |-
+    This dataset provides information on armed conflicts, using data from the UCDP Georeferenced Event Dataset (version 23.1), the UCDP/PRIO Armed Conflict Dataset (version 23.1), and the UCDP Battle-Related Deaths Dataset (version 23.1).
 
+    We aggregate the UCDP Georeferenced Event Dataset up to the year and world (region) to identify all conflict deaths, non-state conflicts, and one-sided violence.
 
-    It has been constructed using the Georeferenced Event Dataset version 23.1 by the UCDP.
+    We use the UCDP/PRIO Armed Conflict Dataset to identify state-based conflicts: interstate, intrastate (all, internationalized, and non-internationalized), and extrasystemic.
 
+    We use the UCDP Battle-Related Deaths Dataset to link deaths in the Georeferenced Event Dataset to types of state-based conflicts in the UCDP/PRIO Armed Conflict Dataset.
 
-    More details about Georeferenced Event Dataset version 23.1 by the UCDP:
+    We combine these datasets to provide information on the number of ongoing and new conflicts, the number of ongoing and new conflict types, as well as the number of deaths in ongoing conflicts and conflict types.
+
+    Deaths of combatants and civilians due to fighting are included.
+
+    The Georeferenced Event Dataset has been extracted from the UCDP systems at a certain point in time. However, the UCDP team works with the data all year round, including revisions and updates. Therefore, their dashboard
+    might show slightly more up-to-date data, which sometimes result in minor discrepancies in the data.
+
+    We use the world regions as defined by UCDP/PRIO: Africa, Americas, Asia, Europe, and Middle East. These are defined based on Gleditsch and Ward codes. Find the complete mapping at
+    http://ksgleditsch.com/data/iisystem.dat (states) and http://ksgleditsch.com/data/microstatessystem.dat (micro-states):
+
+      • Americas: 2-199
+
+      • Europe: 200-399
+
+      • Africa: 400-626
+
+      • Middle East: 630-699
+
+      • Asia and Oceania: 700-999
+
+    You can find more information about the data in our article: [To be published]
+
+    This dataset contains information on armed conflicts - state, non-state and one-sided conflicts, in the period of 1989 and 2022.
 
 
 tables:
   ucdp:
-    # (Inherited from meadow, remove if not different.)
     variables:
       number_deaths_ongoing_conflicts:
         title: Number of deaths in ongoing conflicts (best estimate)
         unit: deaths
-        description: >-
-          The best (most likely) estimate of total fatalities in ongoing (active) conflicts in a given year.
-          It includes deaths from both sides in the conflict, civilians and from persons of "unknown status".
+        description: |-
+          <% set estimate = "best" %>
 
+          {definitions.conflict_type_estimate}
 
-          Active conflicts are those resulting into at least 25 deaths each year (based on most plausible estimate).
+          {definitions.conflict_type}
+
+          {definitions.deaths_included}
         display:
           numDecimalPlaces: 0
+        presentation:
+          grapher_config:
+            selectedEntityNames:
+              - Africa
+              - Americas
+              - Asia and Oceania
+              - Europe
+              - Middle East
       number_deaths_ongoing_conflicts_high:
         title: Number of deaths in ongoing conflicts (high estimate)
         unit: deaths
-        description: >-
-          The highest reliable estimate of total fatalities in ongoing (active) conflicts in a given year.
-          It includes deaths from both sides in the conflict, civilians and from persons of "unknown status".
+        description: |-
+          <% set estimate = "high" %>
+          {definitions.conflict_type_estimate}
 
+          {definitions.conflict_type}
 
-          Active conflicts are those resulting into at least 25 deaths each year (based on most plausible estimate).
+          {definitions.deaths_included}
         display:
           numDecimalPlaces: 0
+        presentation:
+          grapher_config:
+            selectedEntityNames:
+              - Africa
+              - Americas
+              - Asia and Oceania
+              - Europe
+              - Middle East
       number_deaths_ongoing_conflicts_low:
         title: Number of deaths in ongoing conflicts (low estimate)
         unit: deaths
-        description: >-
-          The lowest reliable estimate of total fatalities in ongoing (active) conflicts in a given year.
-          It includes deaths from both sides in the conflict, civilians and from persons of "unknown status".
+        description: |-
+          <% set estimate = "low" %>
+          {definitions.conflict_type_estimate}
 
+          {definitions.conflict_type}
 
-          Note that UCDP attempts to distinguish and not include unreasonable
-          claims in the high estimate of fatalities, and tends to be highly conservative when counting
-          fatalities
-
-
-          Active conflicts are those resulting into at least 25 deaths each year (based on most plausible estimate).
+          {definitions.deaths_included}
         display:
           numDecimalPlaces: 0
+        presentation:
+          grapher_config:
+            selectedEntityNames:
+              - Africa
+              - Americas
+              - Asia and Oceania
+              - Europe
+              - Middle East
 
       number_ongoing_conflicts:
         title: Number of ongoing conflicts
         unit: deaths
-        description: >-
-          Number of ongoing (active) conflicts in a given year.
+        description: |-
+          {definitions.ongoing_conflicts}
+
+          {definitions.conflict_type}
 
           We count a conflict as ongoing in a region even if the conflict is also ongoing in other regions. The sum across all regions can therefore be higher than the total number of ongoing conflicts.
-
-
-          Active conflicts are those resulting into at least 25 deaths each year (based on most plausible estimate).
         display:
           numDecimalPlaces: 0
+        presentation:
+          grapher_config:
+            selectedEntityNames:
+              - Africa
+              - Americas
+              - Asia and Oceania
+              - Europe
+              - Middle East
       number_new_conflicts:
         title: Number of new conflicts
         unit: deaths
-        description: >-
-          Number of new (active) conflicts in a given year.
+        description: |-
+          {definitions.new_conflicts}
 
+          We only count a conflict as new when the conflict overall started that year, not if it became active again.
 
-          • New conflicts for the 'World': We only count a conflict as new when the conflict overall started that year, not if it became active again.
-
-          • New conflicts for all regions: We count a conflict as new in a region even if the conflict overall started earlier in another region.
-          The sum across all regions can therefore be higher than the total number of new conflicts.
-
-          • New conflicts by type: We only count an internationalized intrastate conflict as new when the conflict overall started that year, not if it became internationalized.
-          We only count a non-internationalized intrastate conflict as new when the conflict overall started that year, not if it stopped being internationalized.
-
-
-          Active conflicts are those resulting into at least 25 deaths each year (based on most plausible estimate).
+          We count a conflict as new in a region even if the conflict started earlier or at the same time in another region. The sum across all regions can therefore be higher than the total number of new conflicts.
         display:
           numDecimalPlaces: 0
+        presentation:
+          grapher_config:
+            selectedEntityNames:
+              - Africa
+              - Americas
+              - Asia and Oceania
+              - Europe
+              - Middle East

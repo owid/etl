@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2719
+    date_accessed: 2023-08-14 14:29:03.475042
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Pieces of mail and number of post offices - United States Postal Service (2018)
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 4a6f2597d7c7423c83a14311ae9b7171
+  size: 10146
+  path: 
+    dataset_2719_pieces_of_mail_and_number_of_post_offices__united_states_postal_service__2018_values.feather

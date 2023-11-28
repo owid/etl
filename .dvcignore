@@ -1,7 +1,7 @@
 # Add patterns of files dvc should ignore, which could improve
 # the performance. Learn more at
 # https://dvc.org/doc/user-guide/dvcignore
-walkthrough/
+apps/
 etl/
 data/
 tests/
@@ -9,6 +9,6 @@ vendor/
 .cachedir/
 .venv/
 !data/snapshots/
-# this folder contains thousands of .dvc files which slows it down, we dynamically comment it when working with
-# backported snapshots (see _unignore_backports)
-snapshots/backport/
+# this folder contains thousands of .dvc files which slows it down, when we work with backported snapshots, we
+# dynamically exclude it (see _unignore_backports)
+snapshots/backport/latest/*

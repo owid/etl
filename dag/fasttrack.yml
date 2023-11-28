@@ -2,91 +2,123 @@
 # You can use those steps in other DAGs as dependencies, but you can't move the entire step there
 steps:
   data-private://grapher/fasttrack/2022-11-29/ai_index:
-  - snapshot-private://fasttrack/2022-11-29/ai_index.csv
+    - snapshot-private://fasttrack/2022-11-29/ai_index.csv
   data-private://grapher/fasttrack/2022-02-28/nuclear_warhead_inventories:
-  - snapshot-private://fasttrack/2022-02-28/nuclear_warhead_inventories.csv
+    - snapshot-private://fasttrack/2022-02-28/nuclear_warhead_inventories.csv
   # Long-term homicide rates in Europe - Eisner (2014)
   data://grapher/fasttrack/2023-01-03/long_term_homicide_rates_in_europe:
-  - snapshot://fasttrack/2023-01-03/long_term_homicide_rates_in_europe.csv
+    - snapshot://fasttrack/2023-01-03/long_term_homicide_rates_in_europe.csv
   data-private://grapher/fasttrack/2022-11-01/lighting_efficiency_uk:
-  - snapshot-private://fasttrack/2022-11-01/lighting_efficiency_uk.csv
+    - snapshot-private://fasttrack/2022-11-01/lighting_efficiency_uk.csv
   data-private://grapher/fasttrack/latest/metaculus__complementary_data:
-  - snapshot-private://fasttrack/latest/metaculus__complementary_data.csv
+    - snapshot-private://fasttrack/latest/metaculus__complementary_data.csv
   data-private://grapher/fasttrack/latest/global_extreme_poverty_future_scenario:
-  - snapshot-private://fasttrack/latest/global_extreme_poverty_future_scenario.csv
+    - snapshot-private://fasttrack/latest/global_extreme_poverty_future_scenario.csv
   data-private://grapher/fasttrack/latest/child_mortality_future_projections:
-  - snapshot-private://fasttrack/latest/child_mortality_future_projections.csv
+    - snapshot-private://fasttrack/latest/child_mortality_future_projections.csv
   data-private://grapher/fasttrack/latest/literate_population:
-  - snapshot-private://fasttrack/latest/literate_population.csv
-  data-private://grapher/fasttrack/latest/test_co2_emissions:
-  - snapshot-private://fasttrack/latest/test_co2_emissions.csv
+    - snapshot-private://fasttrack/latest/literate_population.csv
   data-private://grapher/fasttrack/latest/test_electricity_projections:
-  - snapshot-private://fasttrack/latest/test_electricity_projections.csv
+    - snapshot-private://fasttrack/latest/test_electricity_projections.csv
   data-private://grapher/fasttrack/latest/battery_costs_per_kwh__ziegler_et_al__and_bnef:
-  - snapshot-private://fasttrack/latest/battery_costs_per_kwh__ziegler_et_al__and_bnef.csv
+    - snapshot-private://fasttrack/latest/battery_costs_per_kwh__ziegler_et_al__and_bnef.csv
   data-private://grapher/fasttrack/latest/biosafety_level_4_facilities:
-  - snapshot-private://fasttrack/latest/biosafety_level_4_facilities.csv
+    - snapshot-private://fasttrack/latest/biosafety_level_4_facilities.csv
   data-private://grapher/fasttrack/latest/germany_hypothetical_constant_nuclear:
-  - snapshot-private://fasttrack/latest/germany_hypothetical_constant_nuclear.csv
+    - snapshot-private://fasttrack/latest/germany_hypothetical_constant_nuclear.csv
   data-private://grapher/fasttrack/latest/oil_prices:
-  - snapshot-private://fasttrack/latest/oil_prices.csv
+    - snapshot-private://fasttrack/latest/oil_prices.csv
   data://grapher/fasttrack/latest/table_5__threatened_species_in_each_major_group_by_country__show_all__1:
-  - snapshot://fasttrack/latest/table_5__threatened_species_in_each_major_group_by_country__show_all__1.csv
+    - snapshot://fasttrack/latest/table_5__threatened_species_in_each_major_group_by_country__show_all__1.csv
   data-private://grapher/fasttrack/latest/evs_per_charger:
-  - snapshot-private://fasttrack/latest/evs_per_charger.csv
+    - snapshot-private://fasttrack/latest/evs_per_charger.csv
   data-private://grapher/fasttrack/latest/who_standard_pop:
-  - snapshot-private://fasttrack/latest/who_standard_pop.csv
+    - snapshot-private://fasttrack/latest/who_standard_pop.csv
   data-private://grapher/fasttrack/latest/pip__gini_vs_wid__top_1pc_share__pretax__1993_to_2015:
-  - snapshot-private://fasttrack/latest/pip__gini_vs_wid__top_1pc_share__pretax__1993_to_2015.csv
+    - snapshot-private://fasttrack/latest/pip__gini_vs_wid__top_1pc_share__pretax__1993_to_2015.csv
   data-private://grapher/fasttrack/latest/compare_wid_and_pip_inequality_data_1980_vs_2018__joe_temp:
-  - snapshot-private://fasttrack/latest/compare_wid_and_pip_inequality_data_1980_vs_2018__joe_temp.csv
+    - snapshot-private://fasttrack/latest/compare_wid_and_pip_inequality_data_1980_vs_2018__joe_temp.csv
   data-private://grapher/fasttrack/latest/compare_wid_and_pip_inequality_data_1993_vs_2015__joe_temp:
-  - snapshot-private://fasttrack/latest/compare_wid_and_pip_inequality_data_1993_vs_2015__joe_temp.csv
+    - snapshot-private://fasttrack/latest/compare_wid_and_pip_inequality_data_1993_vs_2015__joe_temp.csv
   data-private://grapher/fasttrack/latest/compare_wid_and_pip_change_in_inequality_1993_vs_2015__joe_temp:
-  - snapshot-private://fasttrack/latest/compare_wid_and_pip_change_in_inequality_1993_vs_2015__joe_temp.csv
+    - snapshot-private://fasttrack/latest/compare_wid_and_pip_change_in_inequality_1993_vs_2015__joe_temp.csv
   data-private://grapher/fasttrack/latest/quantum_processors_over_time:
-  - snapshot-private://fasttrack/latest/quantum_processors_over_time.csv
+    - snapshot-private://fasttrack/latest/quantum_processors_over_time.csv
   data-private://grapher/fasttrack/2023-05-02/tomitaka_2018:
-  - snapshot-private://fasttrack/2023-05-02/tomitaka_2018.csv
+    - snapshot-private://fasttrack/2023-05-02/tomitaka_2018.csv
   data-private://grapher/fasttrack/2023-05-03/qubits:
-  - snapshot-private://fasttrack/2023-05-03/qubits.csv
+    - snapshot-private://fasttrack/2023-05-03/qubits.csv
   data-private://grapher/fasttrack/2023-05-03/apms_2014:
-  - snapshot-private://fasttrack/2023-05-03/apms_2014.csv
+    - snapshot-private://fasttrack/2023-05-03/apms_2014.csv
   data-private://grapher/fasttrack/latest/gbd_2019_mental_health_country_coverage:
-  - snapshot-private://fasttrack/latest/gbd_2019_mental_health_country_coverage.csv
+    - snapshot-private://fasttrack/latest/gbd_2019_mental_health_country_coverage.csv
   data-private://grapher/fasttrack/latest/owid_upload_gini_compare_1993:
-  - snapshot-private://fasttrack/latest/owid_upload_gini_compare_1993.csv
+    - snapshot-private://fasttrack/latest/owid_upload_gini_compare_1993.csv
   data-private://grapher/fasttrack/latest/owid_upload_top1_percent_compare_1993:
-  - snapshot-private://fasttrack/latest/owid_upload_top1_percent_compare_1993.csv
+    - snapshot-private://fasttrack/latest/owid_upload_top1_percent_compare_1993.csv
   data-private://grapher/fasttrack/latest/owid_upload_gini_compare_1980:
-  - snapshot-private://fasttrack/latest/owid_upload_gini_compare_1980.csv
+    - snapshot-private://fasttrack/latest/owid_upload_gini_compare_1980.csv
   data-private://grapher/fasttrack/latest/owid_upload_top1_percent_compare_1980:
-  - snapshot-private://fasttrack/latest/owid_upload_top1_percent_compare_1980.csv
+    - snapshot-private://fasttrack/latest/owid_upload_top1_percent_compare_1980.csv
   data://grapher/fasttrack/latest/treatment_gap_anxiety_disorders_world_mental_health_surveys:
-  - snapshot://fasttrack/latest/treatment_gap_anxiety_disorders_world_mental_health_surveys.csv
+    - snapshot://fasttrack/latest/treatment_gap_anxiety_disorders_world_mental_health_surveys.csv
   data-private://grapher/fasttrack/latest/lead_paint_regulation__who__2023:
-  - snapshot-private://fasttrack/latest/lead_paint_regulation__who__2023.csv
+    - snapshot-private://fasttrack/latest/lead_paint_regulation__who__2023.csv
   data-private://grapher/fasttrack/latest/lead_paint_regulation_who:
-  - snapshot-private://fasttrack/latest/lead_paint_regulation_who.csv
+    - snapshot-private://fasttrack/latest/lead_paint_regulation_who.csv
   data://grapher/fasttrack/latest/whm_treatment_gap_anxiety_disorders:
-  - snapshot://fasttrack/latest/whm_treatment_gap_anxiety_disorders.csv
+    - snapshot://fasttrack/latest/whm_treatment_gap_anxiety_disorders.csv
   data://grapher/fasttrack/2023-05-31/cholera:
-  - snapshot://fasttrack/2023-05-31/cholera.csv
+    - snapshot://fasttrack/2023-05-31/cholera.csv
   data://grapher/fasttrack/2023-06-16/guinea_worm:
-  - snapshot://fasttrack/2023-06-16/guinea_worm.csv
+    - snapshot://fasttrack/2023-06-16/guinea_worm.csv
   data://grapher/fasttrack/2023-06-28/guinea_worm:
-  - snapshot://fasttrack/2023-06-28/guinea_worm.csv
+    - snapshot://fasttrack/2023-06-28/guinea_worm.csv
   data://grapher/fasttrack/2023-06-19/world_population_comparison:
-  - snapshot://fasttrack/2023-06-19/world_population_comparison.csv
+    - snapshot://fasttrack/2023-06-19/world_population_comparison.csv
   data-private://grapher/fasttrack/latest/fiscal_top1_shares_country_standardized:
-  - snapshot-private://fasttrack/latest/fiscal_top1_shares_country_standardized.csv
+    - snapshot-private://fasttrack/latest/fiscal_top1_shares_country_standardized.csv
   data://grapher/fasttrack/latest/monadic_strategic_nuclear_forces:
-  - snapshot://fasttrack/latest/monadic_strategic_nuclear_forces.csv
+    - snapshot://fasttrack/latest/monadic_strategic_nuclear_forces.csv
   data://grapher/fasttrack/2023-04-30/paratz:
-  - snapshot://fasttrack/2023-04-30/paratz.csv
+    - snapshot://fasttrack/2023-04-30/paratz.csv
   data-private://grapher/fasttrack/latest/pain_hours_hen_systems:
-  - snapshot-private://fasttrack/latest/pain_hours_hen_systems.csv
+    - snapshot-private://fasttrack/latest/pain_hours_hen_systems.csv
   data-private://grapher/fasttrack/latest/antibiotic_usage_livestock:
-  - snapshot-private://fasttrack/latest/antibiotic_usage_livestock.csv
+    - snapshot-private://fasttrack/latest/antibiotic_usage_livestock.csv
   data-private://grapher/fasttrack/latest/antimicrobial_usage_livestock:
-  - snapshot-private://fasttrack/latest/antimicrobial_usage_livestock.csv
+    - snapshot-private://fasttrack/latest/antimicrobial_usage_livestock.csv
+  data://grapher/fasttrack/2023-08-07/pain_hours_days_hen_systems:
+    - snapshot://fasttrack/2023-08-07/pain_hours_days_hen_systems.csv
+  data-private://grapher/fasttrack/latest/historical_france_mortality_cause:
+    - snapshot-private://fasttrack/latest/historical_france_mortality_cause.csv
+  data-private://grapher/fasttrack/latest/welfare_broiler_chickens:
+    - snapshot-private://fasttrack/latest/welfare_broiler_chickens.csv
+  data-private://grapher/fasttrack/2023-08-14/gbif_animal_presence:
+    - snapshot-private://fasttrack/2023-08-14/gbif_animal_presence.csv
+  data://grapher/fasttrack/2023-08-21/survey_livestock_oklahoma:
+    - snapshot://fasttrack/2023-08-21/survey_livestock_oklahoma.csv
+  data://grapher/fasttrack/latest/sentience_institute:
+    - snapshot://fasttrack/latest/sentience_institute.csv
+  data://grapher/fasttrack/latest/nuclear_warhead_stockpiles:
+    - snapshot://fasttrack/latest/nuclear_warhead_stockpiles.csv
+  data://grapher/fasttrack/latest/nuclear_warhead_inventories:
+    - snapshot://fasttrack/latest/nuclear_warhead_inventories.csv
+  data://grapher/fasttrack/latest/smallpox_cases:
+    - snapshot://fasttrack/latest/smallpox_cases.csv
+  data://grapher/fasttrack/latest/transport_co2_emissions_modes:
+    - snapshot://fasttrack/latest/transport_co2_emissions_modes.csv
+  data://grapher/fasttrack/latest/democracy_freedom_house:
+    - snapshot://fasttrack/latest/democracy_freedom_house.csv
+  data://grapher/fasttrack/latest/democracy_lexical_index:
+    - snapshot://fasttrack/latest/democracy_lexical_index.csv
+  data://grapher/fasttrack/latest/global_maternal_offspring_loss:
+    - snapshot://fasttrack/latest/global_maternal_offspring_loss.csv
+  data://grapher/fasttrack/latest/under_five_mortality_lmics:
+    - snapshot://fasttrack/latest/under_five_mortality_lmics.csv
+  data://grapher/fasttrack/latest/plastic_waste_meijer_2021:
+    - snapshot://fasttrack/latest/plastic_waste_meijer_2021.csv
+  data://grapher/fasttrack/2023-09-29/un_space_objects:
+    - snapshot://fasttrack/2023-09-29/un_space_objects.csv
+  data://grapher/fasttrack/2023-10-05/great_pacific_garbage_lebreton:
+    - snapshot://fasttrack/2023-10-05/great_pacific_garbage_lebreton.csv

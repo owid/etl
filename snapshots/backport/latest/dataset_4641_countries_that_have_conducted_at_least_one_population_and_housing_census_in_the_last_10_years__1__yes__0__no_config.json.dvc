@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4641
+    date_accessed: 2023-08-11 07:55:51.626243
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_4641_countries_that_have_conducted_at_least_one_population_and_housing_census_in_the_last_10_years__1__yes__0__no
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 17ed829340e378978ca13e06a240f51e
+  size: 1978
+  path: 
+    dataset_4641_countries_that_have_conducted_at_least_one_population_and_housing_census_in_the_last_10_years__1__yes__0__no_config.json

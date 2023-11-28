@@ -1,0 +1,34 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/origin/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Global Plastics Outlook - Plastic leakage to aquatic environments
+    description: |-
+      This dataset provides estimates of plastics leakage for the 15 global regions of the OECD ENV-Linkages model, detailed in the Annex of the OECD Global Plastics Outlook.
+
+      This database provides estimates for:
+        - Leakage from mismanaged waste and litter to aquatic environments
+        - Transport to oceans
+        - Accumulated stock of plastics in rivers and lakes
+        - Accumulated stock of plastics in oceans
+
+      Plastic leakages to aquatic environments and the subcategory trasport to oceans are estimated by applying the methodology adapted from Lebreton and Andrady (2019), on OECD ENV-Linkages model outputs and plastic leakage from mismanaged and litter. The accumulated stock of plastics leakages in rivers and lakes corresponds to the net cumulative sum of leakages in rivers and lakes from 1951 onwards. The accumulated stock of plastics leakages in oceans corresponds to the net cumulative sum of leakages to oceans from 1951 onwards.
+    date_published: 2022-02-09
+    # Citation
+    producer: OECD
+    citation_full: OECD (2022), Global Plastics Outlook, https://stats.oecd.org/viewhtml.aspx?datasetcode=PLASTIC_LEAKAGE_5&lang=en, accessed on 21 September 2023
+
+    # Files
+    url_main: https://stats.oecd.org/viewhtml.aspx?datasetcode=PLASTIC_LEAKAGE_5&lang=en
+    date_accessed: 2023-09-21
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://www.oecd.org/termsandconditions
+wdir: ../../../data/snapshots/oecd/2023-09-21
+outs:
+- md5: a4673d7ac7dfdf488963b7e6eab6f1ee
+  size: 136268
+  path: plastic_aquatic_leakage.csv

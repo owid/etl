@@ -1,8 +1,10 @@
 meta:
-  namespace: backport
-  short_name: dataset_235_world_happiness_report__2022_values
-  file_extension: feather
-  date_accessed: 2023-04-04 17:09:35.817618
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/235
+    date_accessed: 2023-08-14 05:46:00.123124
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: World Happiness Report (2022)
   description: |-
     Code and data available at: https://github.com/owid/notebooks/tree/main/FionaSpooner/world_happiness_report
@@ -12,14 +14,8 @@ meta:
     2021 data available at: https://happiness-report.s3.amazonaws.com/2021/DataForFigure2.1WHR2021C2.xls
 
     Previous data available at: https://happiness-report.s3.amazonaws.com/2021/DataPanelWHR2021C2.xls
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/235
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 78d8449a686cb82cabc34a36d9227cf3
+- md5: 119f61d6b660ae02e9d72434bff3b3ad
   size: 27442
   path: dataset_235_world_happiness_report__2022_values.feather

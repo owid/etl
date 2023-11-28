@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/329
+    date_accessed: 2023-08-14 15:31:42.490470
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_329_rate_of_natural_population_increase__un_population_division__2015
+    (archived)
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: b6054947e60521e48d595f166731d0bd
+  size: 2222
+  path: 
+    dataset_329_rate_of_natural_population_increase__un_population_division__2015_config.json

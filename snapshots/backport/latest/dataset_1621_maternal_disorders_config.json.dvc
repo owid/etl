@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1621
+    date_accessed: 2023-08-16 08:05:03.084562
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1621_maternal_disorders (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 13a6ad045b789c60d5180957cff1317b
+  size: 26798
+  path: dataset_1621_maternal_disorders_config.json

@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2580
+    date_accessed: 2023-08-16 08:26:10.977102
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2580_environment__environmental_policy_stringency_index
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 203c4f5d23a35da6b8c159640f6b57fe
+  size: 19488
+  path: dataset_2580_environment__environmental_policy_stringency_index_config.json

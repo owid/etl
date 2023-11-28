@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2619
+    date_accessed: 2023-08-10 14:38:10.122448
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2619_education_and_training__teachers_teaching_and_working_time
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 7acf119f00342eaa7037d05acbc63e94
+  size: 6602
+  path: 
+    dataset_2619_education_and_training__teachers_teaching_and_working_time_config.json

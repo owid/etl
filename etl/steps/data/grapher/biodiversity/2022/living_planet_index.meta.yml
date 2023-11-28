@@ -1,0 +1,101 @@
+dataset:
+  update_period_days: 730
+  sources: []
+definitions:
+  common:
+    sources: []
+    origins:
+      - producer: World Wildlife Fund (WWF) and Zoological Society of London
+        title: Zoological Society of London
+        description: >-
+          The Living Planet Database contains tens of thousands of vertebrate population time-series from around the world. It is the largest collection of its kind, and is publicly available, making it an invaluable tool for both research and conservation.
+
+          This dataset contains time-series of population abundance data for vertebrate species spanning years between 1970 and 2021. This is the public version of the database as confidential records that cannot be shared have been removed. The open-source code used to calculate the Living Planet Index using this data set can be found here: [https://github.com/Zoological-Society-of-London/rlpi](https://github.com/Zoological-Society-of-London/rlpi).
+
+          [Text from [Living Planet Index website](https://www.livingplanetindex.org/data_portal)]
+        citation_full:
+          World Wildlife Fund (WWF) and Zoological Society of London (2022). Living Planet Report 2022 – Building
+          a nature-positive society. Almond, R.E.A., Grooten, M., Juffe Bignoli, D. & Petersen, T. (Eds). WWF, Gland, Switzerland.
+        url_main: http://stats.livingplanetindex.org/
+        date_accessed: "2023-09-01"
+        date_published: "2022"
+
+tables:
+  living_planet_index:
+    variables:
+      living_planet_index_average:
+        title: Living Planet Index
+        unit: (1970 = 1)
+        display:
+          name: "Central estimate"
+          unit: "(1970 = 100%)"
+          shortUnit: "%"
+          conversionFactor: 100
+          numDecimalPlaces: 1
+          includeInTable: true
+          color: "#b13507"
+        description_short: The Living Planet Index (LPI) measures the average decline in monitored wildlife populations. The index value measures the change in abundance in 31,821 populations across 5,230 species relative to the year 1970 (i.e. 1970 = 100%).
+        description_key:
+          - The Living Planet Index summarizes the average change in population size of tens of thousands of studied animal populations. It distills this change into a single number, representing the average change in animal populations since 1970.
+          - The Living Planet Index aggregates observations on changes in population size, and similar metrics, across tens of thousands of animal populations.
+          - Its 2022 report included figures across 30,000 wildlife populations. This captures everything from frogs to elephant species, rhinos to owls, from every continent on Earth.
+        description_from_producer: |-
+          The Living Planet Index (LPI) tracks changes in the relative abundance of wild species populations over time. The global Index is constructed by calculating an average trend for tens of thousands of terrestrial, freshwater and marine vertebrate populations from across the globe.
+
+
+          [Text from [Living Planet Report 2022](https://wwfint.awsassets.panda.org/downloads/embargo_13_10_2022_lpr_2022_full_report_single_page_1.pdf)]
+
+
+          The data used in constructing the LPI are time-series of either population size, density (population size per unit area), abundance (number of individuals per sample) or a proxy of abundance (for example, the number of nests recorded may be used instead of a direct population count).
+
+          [Text from [Living Planet Index website](https://www.livingplanetindex.org/about_index)]
+        presentation:
+          title_variant: Zoological Society of London
+          attribution_short: WWF and Zoological Society of London
+          faqs:
+            - fragment_id: lpi-measure
+              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+            - fragment_id: lpi-not-measure
+              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+            - fragment_id: lpi-species-types
+              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+            - fragment_id: lpi-species-coverage
+              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+            - fragment_id: lpi-data-origin
+              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+            - fragment_id: lpi-outcome
+              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+            - fragment_id: lpi-outliers
+              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+          topic_tags:
+            - Biodiversity
+          grapher_config:
+            title: Living Planet Index
+            subtitle: >-
+              The Living Planet Index (LPI) measures the average decline in monitored
+              wildlife [populations](#dod:population). The index value measures the change
+              in abundance in 31,821 populations across 5,230 species relative to the year
+              1970 (i.e. 1970 = 100%).
+            sourceDesc: World Wildlife Fund (WWF) and Zoological Society of London
+            hideAnnotationFieldsInTitle:
+              time: true
+              entity: true
+              changeInPrefix: true
+            addCountryMode: change-country
+            entityType: region/group
+            originUrl: ourworldindata.org/biodiversity
+            yAxis:
+              min: 0
+              max: 0
+            map:
+              time: 1980
+              timeTolerance: 1
+              colorScale:
+                baseColorScheme: BuGn
+                binningStrategy: equalInterval
+                legendDescription: ""
+            selectedEntityNames:
+              - World
+            selectedEntityColors:
+              World: "#adadad"
+            $schema: https://files.ourworldindata.org/schemas/grapher-schema.003.json

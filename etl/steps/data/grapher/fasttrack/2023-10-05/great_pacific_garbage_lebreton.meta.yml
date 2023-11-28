@@ -1,0 +1,29 @@
+dataset:
+  title: Plastics in Great Pacific Garbage Patch (Lebreton)
+  description: ''
+  licenses:
+    - {}
+  sources:
+    - name: Plastics in Great Pacific Garbage Patch (Lebreton et al. 2022)
+      url: https://www.nature.com/articles/s41598-022-16529-0
+      publication_year: '2022'
+      published_by: Lebreton et al. (2022). Industrialised fishing nations largely contribute to floating plastic pollution
+        in the North Pacific subtropical gyre. Nature Scientific Reports.
+tables:
+  great_pacific_garbage_lebreton:
+    variables:
+      share_number_plastic_items:
+        title: share_number_plastic_items
+        description: The share of hard plastic items, larger than 5 centimetres, found in the Great Pacific Garbage Patch.
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 0
+      share_mass_plastic_items:
+        title: share_mass_plastic_items
+        description: The share of the mass of hard plastic items, larger than 5 centimetres, found in the Great Pacific Garbage
+          Patch.
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 2

@@ -1,0 +1,38 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/origin/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Human Capital in the Long Run
+    description: >
+      Datasets on estimated school enrollment ratios from 1820 to 2010 and estimated
+      educational attainment for the total, female, and male populations from 1870
+      to 2010. The estimates are available in five-year intervals for 111 countries.
+
+
+      Datasets were last updated in 2021 September. The research provides insightful
+      analysis on the progression and trends of educational attainment over a long
+      historical period, offering a comprehensive understanding of educational developments
+      globally.
+
+    date_published: '2016'
+    # Citation
+    producer: Lee and Lee
+    citation_full: Lee, Jong-Wha and Hanol Lee, 2016, “Human Capital in the Long Run,”
+      Journal of Development Economics, vol. 122, pp. 147-169.
+
+
+    # Files
+    url_main: https://barrolee.github.io/BarroLeeDataSet/DataLeeLee.html
+    date_accessed: 2023-11-20
+
+    # License
+    license:
+      name: 2021 by Robert J. Barro and Jong-Wha Lee.
+      url: https://barrolee.github.io/BarroLeeDataSet/OUPProj.html
+
+wdir: ../../../data/snapshots/education/2023-07-17
+outs:
+- md5: da6198e7d9f707079997ad7ef0695977
+  size: 3343124
+  path: education_lee_lee.xlsx

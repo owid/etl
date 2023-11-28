@@ -1,0 +1,30 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/origin/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Global Plastics Outlook - Plastics waste in 2019 by region, polymer and
+      application
+    description: |-
+      This dataset provides estimates of plastics waste  per polymer and application for the 15 global regions of the OECD ENV-Linkages model, detailed in the Annex of the OECD Global Plastics Outlook.
+
+      Plastic waste is calculated as a function of plastics use (in volumes), following Geyer, Jambeck and Law (2017), using a methodology based on lifespan distributions.
+    date_published: 2022-02-09
+    # Citation
+    producer: OECD
+    citation_full: OECD (2022), Global Plastics Outlook, https://stats.oecd.org/viewhtml.aspx?datasetcode=PLASTIC_WASTE_7&lang=en, accessed on 21 September 2023
+
+    # Files
+    url_main: https://stats.oecd.org/viewhtml.aspx?datasetcode=PLASTIC_WASTE_7&lang=en
+    date_accessed: 2023-09-21
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://www.oecd.org/termsandconditions
+
+wdir: ../../../data/snapshots/oecd/2023-09-21
+outs:
+- md5: fe9788c98058910e8a1fc6975a343fd8
+  size: 134026
+  path: plastic_waste_2019.csv

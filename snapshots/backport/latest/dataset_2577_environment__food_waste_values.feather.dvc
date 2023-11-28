@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2577
+    date_accessed: 2023-08-16 10:30:15.746214
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Environment - Food Waste
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: e98a8e1fbbfc875ee86099ce075f1027
+  size: 45266
+  path: dataset_2577_environment__food_waste_values.feather

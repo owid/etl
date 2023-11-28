@@ -1,0 +1,118 @@
+dataset:
+  update_period_days: 365
+  sources: []
+definitions:
+  common:
+    sources: []
+    origins:
+      - producer: V-Dem
+        version_producer: "v13"
+        title: Democracy and Human rights, OWID based on Varieties of Democracy (v13) and Regimes of the World
+        description: |-
+          The Varieties of Democracy (V-Dem) project publishes data and research on democracy and human rights.
+
+          It acknowledges that democracy can be characterized differently, and measures electoral, liberal, participatory, deliberative, and egalitarian characterizations of democracy.
+
+          The project relies on evaluations by around 3,500 country experts and supplementary work by its own researchers to assess political institutions and the protection of rights.
+
+          The project is managed by the V-Dem Institute, based at the University of Gothenburg in Sweden.
+        citation_full: |
+          Coppedge, Michael, John Gerring, Carl Henrik Knutsen, Staffan I. Lindberg, Jan Teorell, David Altman, Michael Bernhard, Agnes Cornell, M. Steven Fish, Lisa Gastaldi, Haakon Gjerløw, Adam Glynn, Ana Good God, Sandra Grahn, Allen Hicken, Katrin Kinzelbach, Joshua Krusell, Kyle L. Marquardt, Kelly McMann, Valeriya Mechkova, Juraj Medzihorsky, Natalia Natsika, Anja Neundorf, Pamela Paxton, Daniel Pemstein, Josefine Pernes, Oskar Rydén, Johannes von Römer, Brigitte Seim, Rachel Sigman, Svend-Erik Skaaning, Jeffrey Staton, Aksel Sundström, Eitan Tzelgov, Yi-ting Wang, Tore Wig, Steven Wilson and Daniel Ziblatt. 2023. “V-Dem [Country-Year/Country-Date] Dataset v13” Varieties of Democracy (V-Dem) Project. https://doi.org/10.23696/vdemds23.
+
+          Pemstein, Daniel, Kyle L. Marquardt, Eitan Tzelgov, Yi-ting Wang, Juraj Medzihorsky, Joshua Krusell, Farhad Miri, and Johannes von Römer. 2023. “The V-Dem Measurement Model: Latent Variable Analysis for Cross-National and Cross-Temporal Expert-Coded Data”. V-Dem Working Paper No. 21. 8th edition. University of Gothenburg: Varieties of Democracy Institute.
+        url_main: http://v-dem.net/vdemds.html
+        date_accessed: '2023-03-02'
+        date_published: '2023-03-02'
+
+    processing_level: major
+
+tables:
+  vdem:
+    variables:
+      electdem_vdem_owid:
+        title: Electoral democracy index
+        display:
+          name: Electoral democracy
+        description_short: >-
+          It captures to which extent political leaders are elected under comprehensive voting
+          rights in free and fair elections, and freedoms of association and expression
+          are guaranteed. It ranges from 0 to 1 (most democratic).
+        description_key:
+          - The index is mostly based on evaluations by around 3,500 experts, which are primarily academics and members of the media and civil society, and often are nationals or residents of the country. They therefore know the country’s political system well and can evaluate aspects that are difficult to observe.
+          - We expand the coverage of the original data to include more years when current countries were still non-sovereign territories. We use the index score of the historical entity that they were part of, whenever available.
+        description_from_producer: |-
+          The index (`v2x_polyarchy`) is formed by taking the average of, on the one hand, the weighted average of the indices measuring freedom of association thick (`v2x_frassoc_thick`), clean elections (`v2xel_frefair`), freedom of expression (`v2x_freexp_altinf`), elected officials (`v2x_elecoff`), and suffrage (`v2x_suffr`) and, on the other, the five-way multiplicative interaction between those indices. This is half way between a straight average and strict multiplication, meaning the average of the two. It is thus a compromise between the two most well known aggregation formulas in the literature, both allowing partial "compensation" in one sub-component for lack of polyarchy in the others, but also punishing countries not strong in one sub-component according to the "weakest link" argument. The aggregation is done at the level of Dahl’s subcomponents with the one exception of the non-electoral component. The index is aggregated using this formula:
+
+          `v2x_polyarchy = .5 ∗ MPI + .5 ∗ API`
+
+          `= .5 ∗ (v2x_elecoff ∗ v2xel_frefair ∗ v2x_frassoc_thick∗ v2x_suffr ∗ v2x_freexp_altinf) + .5 ∗ ((1/8) ∗ v2x_elecoff + (1/4) ∗ v2xel_frefair + (1/4) ∗ v2x_frassoc_thick + (1/8) ∗ v2x_suffr + (1/4) ∗ v2x_freexp_altinf)`
+
+          [Text from [V-Dem Codebook v13](https://www.v-dem.net/documents/24/codebook_v13.pdf)]
+        description_processing: |-
+          We ingested the original data from the [V-Dem project website](https://v-dem.net/data/the-v-dem-dataset/) and processed it with Stata.
+
+          We expanded the years and countries covered by V-Dem. To include more of the period when current countries were still non-sovereign territories, we identified the historical entity they were a part of and used that regime’s data whenever available.
+
+          For example, V-Dem only provides regime data since Bangladesh’s independence in 1971. There is, however, regime data for Pakistan and the colony of India, both of which the current territory of Bangladesh was a part. We, therefore, use the regime data of Pakistan for Bangladesh from 1947 to 1970, and the regime data of India from 1789 to 1946. We did so for all countries with a past or current population of more than one million.
+
+          We calculated regional and global averages of the Electoral Democracy Index and its sub-indices, weighted and unweighted by population.
+
+          All code and data is available [on GitHub](https://github.com/owid/notebooks/tree/main/BastianHerre/democracy).
+        presentation:
+          attribution_short: V-Dem
+          topic_tags:
+            - Democracy
+          faqs:
+            - fragment_id: vdem-characteristics
+              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+            - fragment_id: vdem-scoring
+              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+            - fragment_id: vdem-coverage
+              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+            - fragment_id: vdem-measured
+              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+            - fragment_id: vdem-more-info
+              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+          grapher_config:
+            title: Electoral democracy index
+            subtitle: >-
+              Based on the expert assessments and index by [V-Dem](#dod:v-dem). It captures
+              to which extent political leaders are elected under comprehensive voting
+              rights in free and fair elections, and freedoms of association and expression
+              are guaranteed. It ranges from 0 to 1 (most democratic).
+            addCountryMode: change-country
+            hasMapTab: true
+            tab: map
+            variantName: V-Dem
+            originUrl: https://ourworldindata.org/democracy
+            yAxis:
+              min: 0
+              max: 1
+              facetDomain: shared
+            map:
+              time: latest
+              colorScale:
+                baseColorScheme: YlGnBu
+                binningStrategy: manual
+                customNumericValues:
+                  - 0.1
+                  - 0.2
+                  - 0.3
+                  - 0.4
+                  - 0.5
+                  - 0.6
+                  - 0.7
+                  - 0.8
+                  - 0.9
+                  - 1
+            selectedEntityNames:
+              - Argentina
+              - Australia
+              - Botswana
+              - China
+            relatedQuestions:
+              - url: https://ourworldindata.org/grapher/electoral-democracy-index#faqs
+                text: FAQs on this data
+            selectedFacetStrategy: entity
+            $schema: https://files.ourworldindata.org/schemas/grapher-schema.003.json
+

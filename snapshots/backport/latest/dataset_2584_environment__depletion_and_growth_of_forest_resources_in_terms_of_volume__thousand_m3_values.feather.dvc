@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2584
+    date_accessed: 2023-08-16 10:37:12.488481
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Environment - Depletion and growth of forest resources in terms of volume
+    (thousand m3)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: e8a380bfc8f2a67e10e08ab6302599ba
+  size: 13562
+  path: 
+    dataset_2584_environment__depletion_and_growth_of_forest_resources_in_terms_of_volume__thousand_m3_values.feather

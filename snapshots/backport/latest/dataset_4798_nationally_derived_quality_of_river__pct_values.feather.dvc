@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4798
+    date_accessed: 2023-08-14 10:58:48.719263
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Nationally derived quality of river(%)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 5283a984087335755d0d294b33143cd3
+  size: 6946
+  path: dataset_4798_nationally_derived_quality_of_river__pct_values.feather

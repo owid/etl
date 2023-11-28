@@ -1,0 +1,217 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - State Capacity
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
+dataset:
+  title: States in regions (ISD)
+  update_period_days: 1400
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
+tables:
+  isd_regions:
+    title: States in regions (ISD)
+    variables:
+      number_countries:
+        title: Number of states in a region
+        description_short: |-
+          Number of sovereign states in each region.
+        unit: countries
+        processing_level: minor
+        description_processing: |-
+          We assign each sovereign state to a region based on the mapping (using ISD/COW codes):
+
+            - Americas: 2-165
+            - Europe: 200-395, 2558, 3375
+            - Africa: 400-626, 4044-6257
+            - Middle East: 630-698, 6821-6845
+            - Asia and Oceania: 700-990, 7003-9210
+
+          We also provide the following extra regions (note that this overlap with 'Africa' and 'Middle East'). These regions are used in Project Mars dataset.
+
+            - North Africa and the Middle East: 435-436, 483, 600-698, 4352-4354, 4763, 4832, 6251-6845
+            - Sub-Saharan Africa: 402-434, 437-482, 484-591, 4044-4343, 4362-4761, 4765-4831, 4841-5814
+
+        display:
+          numDecimalPlaces: 0
+
+      population:
+        title: Population in region
+        description_short: |-
+          Population in the region, using borders from 2022.
+        unit: countries
+        processing_level: minor
+        description_processing: |-
+          We assign each sovereign state to a region based on the mapping (using ISD/COW codes):
+
+            - Americas: 2-165
+            - Europe: 200-395, 2558, 3375
+            - Africa: 400-626, 4044-6257
+            - Middle East: 630-698, 6821-6845
+            - Asia and Oceania: 700-990, 7003-9210
+
+          We also provide the following extra regions (note that this overlap with 'Africa' and 'Middle East'). These regions are used in Project Mars dataset.
+
+            - North Africa and the Middle East: 435-436, 483, 600-698, 4352-4354, 4763, 4832, 6251-6845
+            - Sub-Saharan Africa: 402-434, 437-482, 484-591, 4044-4343, 4362-4761, 4765-4831, 4841-5814
+        display:
+          numDecimalPlaces: 0
+
+  isd:
+    variables:
+      cowid:
+        title: COW ID
+        description_from_producer: |-
+          A three-letter abbreviation given by the COW dataset. For new cases, a COW ID was created.
+      statename:
+        title: State name
+        description_from_producer: |-
+          The name used for the state in the ISD dataset.
+      othername:
+        title: Other state name
+        description_from_producer: |-
+          Other names by which the state is known.
+      isd_category:
+        title: ISD category
+        description_from_producer: |-
+          Category 1 states have same start and end years as ISD V1. Category 2 states were in ISD V1 but have changed start and/or end years. Category 3 states are new states that were not in ISD V1.
+      region:
+        title: COW Region
+        description_from_producer: |-
+          The COW index number for the geographic region in which the state is located.
+      start_am:
+        title: Start (ambiguity)
+        description_from_producer: |-
+          Was there ambiguity in the coding of the start?
+      estart:
+        title: Had early start
+        description_from_producer: |-
+          What year did the state start if earlier than 1816?
+      estart_am:
+        title: Had early start (ambiguity)
+        description_from_producer: |-
+          Was there ambiguity regarding the early start?
+      declare:
+        title: Declaration of independence
+        description_from_producer: |-
+          Is there evidence of a declaration of independence? (0=no, 1=yes). It can be a pronouncement or a document. By listing “1” for this variable you are directing the future researcher to a case where something occurred.
+
+          May produce false negatives. For example, a “1” indicated that evidence was found for the variable “Border.” A “0” indicates that no evidence was found, NOT that borders did not exist in this case.
+      decdate:
+        title: Date of the declaration of independence
+        description_from_producer: |-
+          Date of the declaration of independence (provide year and date if possible).
+
+          May produce false negatives. For example, a “1” indicated that evidence was found for the variable “Border.” A “0” indicates that no evidence was found, NOT that borders did not exist in this case.
+      population:
+        title: Population
+        description_from_producer: |-
+          List the population for the start year or as close as possible to it.
+      popdate:
+        title: Population estimate date
+        description_from_producer: |-
+          Year population was counted.
+      popam:
+        title: Population estimate (ambiguity)
+        description_from_producer: |-
+          Ambiguity surrounding the population estimate?
+      populationhigh:
+        title: Population high estimate
+        description_from_producer: |-
+          Upper end of population estimates.
+      populationlow:
+        title: Population low estimate
+        description_from_producer: |-
+          Lower end of population estimates.
+      starttype:
+        title: State creation type
+        description_from_producer: |-
+          How was the state created?
+
+          1. Territorial Consolidation = state created over space where none previously existed.
+          2. Secession = state secedes from larger state.
+          3. Dissolution = state is born as a fragment of a larger state that broke apart and ceased to exist (e.g. Austro-Hungarian Empire).
+          4. Unification = state born from the voluntary merging of several (typically equally sized) states.
+          5. Decolonization = state born from decolonization
+          6. Other (please provide information in case narrative)
+      starttype_am:
+        title: State creation type (ambiguity)
+        description_from_producer: |-
+          Was there ambiguity on the start type?
+      startsettle:
+        title: State creation settlement
+        description_from_producer: |-
+          Was there a treaty or formal settlement attending the birth of the state?
+      end_am:
+        title: Ending year
+        description_from_producer: |-
+          Was there ambiguity on the end date?
+      endtype:
+        title: State end type
+        description_from_producer: |-
+          How did the state end?
+
+          1. Colonization = Imperial, non-contiguous colonization.
+          2. Conquest / annexation = State death via foreign take-over.
+          3. Unification = State dies through process of voluntary unification.
+          4. Dissolution = State death via dissolution of state.
+          5. Partition = State death via partition by outside powers.
+          6. . Other (please provide information in case narrative).
+      endtype_am:
+        title: State end type (ambiguity)
+        description_from_producer: |-
+          Was there ambiguity on the end type?
+      endsettle:
+        title: State end settlement
+        description_from_producer: |-
+          Was there a treaty or formal settlement attending the death of the state?
+      sovereignty_am:
+        title: State sovereignty (ambiguity)
+        description_from_producer: |-
+          Was there ambiguity regarding the criterion that the sovereignty of the state is either uncontested or acknowledged by the relevant international actors. 0 = no; 1 = indicated ambiguity / uncertainty.
+      eurodip:
+        title: Had diplomatic relationships with European power
+        description_from_producer: |-
+          Is there evidence that the state had diplomatic relations with a European power? If so, provide information (and citations) in the case narrative.
+
+          May produce false negatives. For example, a “1” indicated that evidence was found for the variable “Border.” A “0” indicates that no evidence was found, NOT that borders did not exist in this case.
+      borders:
+        title: Had borders
+        description_from_producer: |-
+          Is there evidence that the state had clearly defined borders separating it from other states or sources of authority?
+
+          May produce false negatives. For example, a “1” indicated that evidence was found for the variable “Border.” A “0” indicates that no evidence was found, NOT that borders did not exist in this case.
+      borders_am:
+        title: Had borders (ambiguity)
+        description_from_producer: |-
+          Was there ambiguity on the issue of borders?
+      latitude:
+        title: Latitude
+        description_from_producer: |-
+          Latitude Coordinates (GeoLocation)
+      longitude:
+        title: Longitude
+        description_from_producer: |-
+          Longitude coordinates (Geolocation)
+      viostart:
+        title: State born violently
+        description_from_producer: |-
+          Was the state born violently? Violence here is defined as the killing of civilians and combatants.
+      viostart_am:
+        title: State born violently (ambiguity)
+        description_from_producer: |-
+          Is their ambiguity about the starting violence?
+      vioend:
+        title: State died violently
+        description_from_producer: |-
+          Did the state die violently? Violence here is defined as the killing of civilians and combatants.
+      vioend_am:
+        title: State died violently (ambiguity)
+        description_from_producer: |-
+          Is their ambiguity about the ending violence?

@@ -1,18 +1,14 @@
 meta:
-  namespace: backport
-  short_name: dataset_5546_democracy__lexical_index_config
-  file_extension: json
-  date_accessed: 2023-06-01 12:45:30.215113
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5546
+    date_accessed: 2023-09-05 07:01:12.092802
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_5546_democracy__lexical_index
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/5546
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 1ea2ec1b9a883f2cacca8d4153ac7be0
-  size: 53797
+- md5: d2aacebe746cc8e380166410bafbb5af
+  size: 61788
   path: dataset_5546_democracy__lexical_index_config.json

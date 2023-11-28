@@ -1,0 +1,33 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/origin/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Education and Mismatch Indicators (EMI) - Employment
+    description: |-
+      With the aim of promoting international comparability, statistics presented on ILOSTAT are based on standard international definitions wherever feasible and may differ from official national figures. This series is based on the 13th ICLS definitions. For time series comparability, it includes countries that have implemented the 19th ICLS standards, for which data are also available in the Work Statistics -- 19th ICLS (WORK) database. The employment-to-population ratio is the number of persons who are employed as a percent of the total of working-age population. Data disaggregated by level of education are provided on the highest level of education completed, classified according to the International Standard Classification of Education (ISCED). Data may have been regrouped from national classifications, which may not be strictly compatible with ISCED. For more information, refer to the Education and Mismatch Indicators (EMI) database description.
+
+      Data by age includes various age bands, usually including but not limited to youth (ages 15-24), prime-age workers (age 25-54), and older workers (ages 55+). Data by sex includes data on both sexes (total), men (male) and women (female). Educational attainment based on the International Standard Classification of Education (ISCED). Categories include less than basic (less than primary education), basic (primary and lower secondary education), intermediate (upper secondary and post-secondary non-tertiary education) and advanced (short-cycle tertiary education, bachelor's, master's and doctoral or equivalent levels).
+    date_published: 2023-09-09
+    # Citation
+    producer: International Labour Organization
+    citation_full: Education and Mismatch Indicators (EMI) - Employment. International
+      Labour Organization. ILO modelled estimates database, ILOSTAT. https://ilostat.ilo.org/data/.
+    attribution_short: ILOSTAT
+
+    # Files
+    url_main: https://ilostat.ilo.org/data/
+    url_download:
+      https://www.ilo.org/shinyapps/bulkexplorer45/session/122788c35f3169da500a18da4cf708a8/download/download?w=
+
+    date_accessed: 2023-09-19
+
+    # License
+    license:
+      url: https://www.ilo.org/global/copyright/lang--en/index.htm
+      name: CC BY 4.0
+wdir: ../../../data/snapshots/ilostat/2023-09-19
+outs:
+- md5: 57d0e5e8b3bfeb548120646374efdd6d
+  size: 342491003
+  path: employment.csv

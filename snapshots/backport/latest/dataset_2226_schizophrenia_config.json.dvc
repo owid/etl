@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2226
+    date_accessed: 2023-08-16 08:50:24.804948
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2226_schizophrenia (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 82214a9ba2f8dd4ccd928eb68c5438ca
+  size: 32410
+  path: dataset_2226_schizophrenia_config.json

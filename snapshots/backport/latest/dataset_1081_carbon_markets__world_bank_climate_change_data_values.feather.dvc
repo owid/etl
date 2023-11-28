@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1081
+    date_accessed: 2023-08-16 08:02:15.252219
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Carbon markets - World Bank Climate Change Data
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: eb775d9caae4a9ddbe9f38f79b2fe9fc
+  size: 9850
+  path: dataset_1081_carbon_markets__world_bank_climate_change_data_values.feather

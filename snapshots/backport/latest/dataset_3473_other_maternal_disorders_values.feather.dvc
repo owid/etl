@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/3473
+    date_accessed: 2023-08-16 08:20:58.817047
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Other maternal disorders
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 4333d6a74d10b013d849ea050bee546f
+  size: 14722
+  path: dataset_3473_other_maternal_disorders_values.feather

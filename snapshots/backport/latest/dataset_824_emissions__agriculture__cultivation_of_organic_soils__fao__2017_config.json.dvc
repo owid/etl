@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/824
+    date_accessed: 2023-08-10 14:40:21.572035
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_824_emissions__agriculture__cultivation_of_organic_soils__fao__2017
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: f8e870d74bd02b62cc3ebc0dc68216da
+  size: 19817
+  path: 
+    dataset_824_emissions__agriculture__cultivation_of_organic_soils__fao__2017_config.json

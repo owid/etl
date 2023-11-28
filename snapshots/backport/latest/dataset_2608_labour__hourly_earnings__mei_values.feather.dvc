@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2608
+    date_accessed: 2023-08-14 11:03:06.127183
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Labour - Hourly Earnings (MEI)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 2fdb672cda1c51b5d042784819566cd5
+  size: 8602
+  path: dataset_2608_labour__hourly_earnings__mei_values.feather

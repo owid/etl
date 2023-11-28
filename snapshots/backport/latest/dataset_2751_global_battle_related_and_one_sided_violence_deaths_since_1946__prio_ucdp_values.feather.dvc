@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2751
+    date_accessed: 2023-08-16 07:57:59.254227
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Global battle-related and 'one-sided violence' deaths since 1946 – PRIO/UCDP
+  description: Conjunction of PRIO Battle Deaths Dataset 3.1, and UCDP Battle-Related
+    Deaths Dataset, UCDP Non-State Conflict Dataset, UCDP One-sided Violence Dataset
+    (all v17.2)
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 37cab4035e10b67e063803b6b5367382
+  size: 12370
+  path: 
+    dataset_2751_global_battle_related_and_one_sided_violence_deaths_since_1946__prio_ucdp_values.feather

@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1998
+    date_accessed: 2023-08-16 10:33:19.835803
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Renewable energy share in the total final energy consumption
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 969c325a6b61689818550b57609339f3
+  size: 30226
+  path: 
+    dataset_1998_renewable_energy_share_in_the_total_final_energy_consumption_values.feather

@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4766
+    date_accessed: 2023-08-10 14:40:52.012845
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Proportion of elected seats held by women in deliberative bodies of local
+    government (%)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 40f6f71b6ea273a6c86d6a64b24d5e63
+  size: 9298
+  path: 
+    dataset_4766_proportion_of_elected_seats_held_by_women_in_deliberative_bodies_of_local_government__pct_values.feather

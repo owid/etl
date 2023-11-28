@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2033
+    date_accessed: 2023-08-14 14:36:06.445946
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Existence of independent national human rights institutions in compliance
+    with the Paris Principles
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 236105d5987f556c15b4783388ed968d
+  size: 16482
+  path: 
+    dataset_2033_existence_of_independent_national_human_rights_institutions_in_compliance_with_the_paris_principles_values.feather

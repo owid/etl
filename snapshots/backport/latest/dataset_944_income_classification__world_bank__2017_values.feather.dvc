@@ -1,18 +1,14 @@
 meta:
-  namespace: backport
-  short_name: dataset_944_income_classification__world_bank__2017_values
-  file_extension: feather
-  date_accessed: 2023-06-01 15:09:19.855617
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/944
+    date_accessed: 2023-08-10 07:51:47.083947
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Income Classification - World Bank (2017)
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/944
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 3ad77934ce3acd058d46e733ad5cde2a
+- md5: 0fc90a5bc99b83fa1d8437077a1740da
   size: 45002
   path: dataset_944_income_classification__world_bank__2017_values.feather

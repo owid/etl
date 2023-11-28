@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4693
+    date_accessed: 2023-08-16 08:15:49.414712
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_4693_prevalence_of_hepatitis_b_surface_antigen__hbsag__pct
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 0a513d7c69cb01cb305f9fb0fd7ea393
+  size: 3651
+  path: dataset_4693_prevalence_of_hepatitis_b_surface_antigen__hbsag__pct_config.json

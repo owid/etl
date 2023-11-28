@@ -36,7 +36,9 @@ def main(uri: str, dest_dir: str, ipdb: Optional[bool]) -> None:
 
 def _import_and_run(path: str, dest_dir: str) -> None:
     # ensure that the module search path includes the script
-    module_dir = (STEP_DIR / "data" / path).parent
+    step_path = STEP_DIR / "data" / path
+    # path can be either in a module with __init__.py or a single .py file
+    module_dir = step_path if step_path.is_dir() else step_path.parent
     sys.path.append(module_dir.as_posix())
 
     # import the module

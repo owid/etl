@@ -1,18 +1,15 @@
 meta:
-  namespace: backport
-  short_name: dataset_2944_figure_2_18_a_values
-  file_extension: feather
-  date_accessed: 2023-02-23 15:10:51.613590
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2944
+    date_accessed: 2023-08-10 09:21:45.675869
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Figure 2.18-a
   description: core-econ.org
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/2944
-  source_published_by: Our World in Data catalog backport
   is_public: false
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 4bb02bdecb4db375ceb57f4caba370dc
+- md5: 426bc9e66c5273fc70543556d853c26c
   size: 6810
   path: dataset_2944_figure_2_18_a_values.feather

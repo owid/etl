@@ -1,0 +1,33 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Life Expectancy
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
+dataset:
+  title: Gini coefficient of lifespan inequality (HMD, Aburto et al.; 2023)
+  update_period_days: 365
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
+tables:
+  gini_le:
+    variables:
+      life_expectancy_gini:
+        title: Gini coefficient of lifespan inequality
+        unit: ""
+        processing_level: major
+        description_short: |-
+          The level of inequality in lifespans, measured between 0 and 1. A higher Gini coefficient for lifespan indicates greater inequality in ages of death, while a lower coefficient indicates more uniform ages of death.
+        description_processing: |-
+          This was calculated using the algorithm and scripts from Aburto et al. (2020). We regenerated the Gini coefficient, rather than the inverse-log Gini coefficient.
+
+          Citation: Aburto, J. M., Villavicencio, F., Basellini, U., Kjærgaard, S., & Vaupel, J. W. (2020). Dynamics of life expectancy and life span equality. Proceedings of the National Academy of Sciences, 117(10), 5250–5259. https://doi.org/10.1073/pnas.1915884117 Code available on Zenodo: https://zenodo.org/record/3571095
+        presentation:
+          attribution: |-
+            Human Mortality Database (2023); Aburto et al. (2023)

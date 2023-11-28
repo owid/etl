@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2356
+    date_accessed: 2023-08-16 10:45:37.432574
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2356_sexually_transmitted_diseases_excluding_hiv
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: b88b00bdd76612cc2cf4d094f540c0e8
+  size: 33673
+  path: dataset_2356_sexually_transmitted_diseases_excluding_hiv_config.json

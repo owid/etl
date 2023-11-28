@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2156
+    date_accessed: 2023-08-11 07:43:04.975124
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Gynecological diseases
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: d4adc780c68f95591c7a731e23c2ab2f
+  size: 1807834
+  path: dataset_2156_gynecological_diseases_values.feather

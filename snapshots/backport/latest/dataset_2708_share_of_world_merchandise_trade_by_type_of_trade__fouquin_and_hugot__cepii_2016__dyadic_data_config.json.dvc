@@ -1,18 +1,16 @@
 meta:
-  namespace: backport
-  short_name: dataset_2708_share_of_world_merchandise_trade_by_type_of_trade__fouquin_and_hugot__cepii_2016__dyadic_data_config
-  file_extension: json
-  date_accessed: 2023-02-23 18:06:40.896438
-  name: Grapher metadata for dataset_2708_share_of_world_merchandise_trade_by_type_of_trade__fouquin_and_hugot__cepii_2016__dyadic_data
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2708
+    date_accessed: 2023-08-10 09:43:34.318460
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_2708_share_of_world_merchandise_trade_by_type_of_trade__fouquin_and_hugot__cepii_2016__dyadic_data
   description: This dataset uses Fouquin and Hugot (CEPII 2016) dyadic trade data.
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/2708
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 405ee8f65229aef97f8bda5617168281
-  size: 10812
-  path: dataset_2708_share_of_world_merchandise_trade_by_type_of_trade__fouquin_and_hugot__cepii_2016__dyadic_data_config.json
+- md5: a8325650ba34fa51a04aabaf7fe9f157
+  size: 11854
+  path: 
+    dataset_2708_share_of_world_merchandise_trade_by_type_of_trade__fouquin_and_hugot__cepii_2016__dyadic_data_config.json

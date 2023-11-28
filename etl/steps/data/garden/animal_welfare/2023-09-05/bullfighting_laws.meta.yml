@@ -1,0 +1,32 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+      - Animal Welfare
+
+tables:
+  bullfighting_laws:
+    variables:
+      status:
+        title: Banning of bullfighting
+        unit: ""
+        short_unit: ""
+        processing_level: minor
+        presentation:
+          grapher_config:
+            title: Which countries have banned bullfighting?
+            map:
+              hideTimeline: true
+              colorScale:
+                binningStrategy: manual
+                customNumericColorsActive: true
+                customCategoryColors:
+                  Banned: '#759ac8'
+                  Not banned: '#ae2e3f'
+                  Partially banned: '#ca9773'
+            note: "Countries where bullfighting is not banned may have sub-national bans. Partially banned means that the bull cannot be severely injured or killed during the event."
+            subtitle: >-
+              Bullfighting is a physical contest that involves a bullfighter attempting to subdue, immobilize, or kill a bull.
+            hasChartTab: false
+            hasMapTab: true
+            tab: map

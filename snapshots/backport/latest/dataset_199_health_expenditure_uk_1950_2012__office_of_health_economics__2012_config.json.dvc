@@ -1,18 +1,15 @@
 meta:
-  namespace: backport
-  short_name: dataset_199_health_expenditure_uk_1950_2012__office_of_health_economics__2012_config
-  file_extension: json
-  date_accessed: 2023-02-23 19:49:53.044547
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/199
+    date_accessed: 2023-08-10 09:19:54.585050
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_199_health_expenditure_uk_1950_2012__office_of_health_economics__2012
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/199
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: c3e8af56ff28244857db5ca324a0030f
-  size: 1746
-  path: dataset_199_health_expenditure_uk_1950_2012__office_of_health_economics__2012_config.json
+- md5: a79947ba162ad060f3656d1b6e7b4423
+  size: 1903
+  path: 
+    dataset_199_health_expenditure_uk_1950_2012__office_of_health_economics__2012_config.json

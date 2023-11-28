@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2315
+    date_accessed: 2023-08-14 10:58:45.461188
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2315_measles (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: a8354cd78026d2c9590ef13446c6b9eb
+  size: 32158
+  path: dataset_2315_measles_config.json

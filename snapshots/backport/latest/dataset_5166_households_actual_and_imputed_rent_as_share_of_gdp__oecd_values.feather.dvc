@@ -1,18 +1,15 @@
 meta:
-  namespace: backport
-  short_name: dataset_5166_households_actual_and_imputed_rent_as_share_of_gdp__oecd_values
-  file_extension: feather
-  date_accessed: 2023-02-23 18:09:00.786797
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5166
+    date_accessed: 2023-08-10 09:01:52.017548
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Households' actual and imputed rent as share of GDP – OECD
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/5166
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 692f347dd189271ff386120e4a42b7bd
+- md5: 1892469a8785cc253cd8141d081cf931
   size: 31978
-  path: dataset_5166_households_actual_and_imputed_rent_as_share_of_gdp__oecd_values.feather
+  path: 
+    dataset_5166_households_actual_and_imputed_rent_as_share_of_gdp__oecd_values.feather

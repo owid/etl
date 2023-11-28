@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2211
+    date_accessed: 2023-08-10 13:08:27.732522
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2211_hiv_aids_and_tuberculosis (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 5927725508303f2de81cee8079d1d4e3
+  size: 32917
+  path: dataset_2211_hiv_aids_and_tuberculosis_config.json

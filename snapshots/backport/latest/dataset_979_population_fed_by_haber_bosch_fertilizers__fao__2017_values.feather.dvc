@@ -1,18 +1,14 @@
 meta:
-  namespace: backport
-  short_name: dataset_979_population_fed_by_haber_bosch_fertilizers__fao__2017_values
-  file_extension: feather
-  date_accessed: 2023-02-23 15:16:07.545146
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/979
+    date_accessed: 2023-08-10 08:50:48.201920
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Population fed by Haber-Bosch fertilizers - FAO (2017)
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/979
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 897b24e41aa1addd0f4b3bcae63c5844
+- md5: 181c4f43648453f3d2c02f199666c79f
   size: 7786
   path: dataset_979_population_fed_by_haber_bosch_fertilizers__fao__2017_values.feather

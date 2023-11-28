@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1783
+    date_accessed: 2023-08-16 08:11:40.227219
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1783_occupational_exposure_to_cadmium (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: ce72cff0f67be1f54b9ee090076ad940
+  size: 22248
+  path: dataset_1783_occupational_exposure_to_cadmium_config.json

@@ -1,18 +1,14 @@
 meta:
-  namespace: backport
-  short_name: dataset_656_female_labor_force_participation_rate__owid__2017_values
-  file_extension: feather
-  date_accessed: 2023-02-23 17:29:36.174282
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/656
+    date_accessed: 2023-08-10 08:04:35.556820
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Female labor force participation rate - OWID (2017)
   description: This dataset combines historical data with recent series from OECD.stats
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/656
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 3c69ab782098238717d31e265ee318a4
+- md5: 0a7bd805fee4533f422fb6793313c020
   size: 19618
   path: dataset_656_female_labor_force_participation_rate__owid__2017_values.feather

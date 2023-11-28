@@ -1,0 +1,116 @@
+steps:
+  #
+  # Global hen inventory (Welfare Footprint Project, 2022).
+  #
+  data://meadow/animal_welfare/2023-08-01/global_hen_inventory:
+    - snapshot://animal_welfare/2023-08-01/global_hen_inventory.csv
+  data://garden/animal_welfare/2023-08-01/global_hen_inventory:
+    - data://meadow/animal_welfare/2023-08-01/global_hen_inventory
+  data://grapher/animal_welfare/2023-08-01/global_hen_inventory:
+    - data://garden/animal_welfare/2023-08-01/global_hen_inventory
+  #
+  # UK egg statistics (Defra, 2023).
+  #
+  data://meadow/animal_welfare/2023-08-01/uk_egg_statistics:
+    - snapshot://animal_welfare/2023-08-01/uk_egg_statistics.ods
+  data://garden/animal_welfare/2023-08-01/uk_egg_statistics:
+    - data://meadow/animal_welfare/2023-08-01/uk_egg_statistics
+  data://grapher/animal_welfare/2023-08-01/uk_egg_statistics:
+    - data://garden/animal_welfare/2023-08-01/uk_egg_statistics
+  #
+  # US egg production (The Humane League, 2023).
+  #
+  data://meadow/animal_welfare/2023-08-03/us_egg_production:
+    - snapshot://animal_welfare/2023-08-03/us_egg_production.csv
+    - snapshot://animal_welfare/2023-08-03/us_egg_production_share_cage_free.csv
+  data://garden/animal_welfare/2023-08-03/us_egg_production:
+    - data://meadow/animal_welfare/2023-08-03/us_egg_production
+  #
+  # Share of cage-free eggs (Various sources, 2023).
+  #
+  data://garden/animal_welfare/2023-08-03/share_of_cage_free_eggs:
+    - data://garden/animal_welfare/2023-08-03/us_egg_production
+    - data://garden/animal_welfare/2023-08-01/uk_egg_statistics
+  data://grapher/animal_welfare/2023-08-03/share_of_cage_free_eggs:
+    - data://garden/animal_welfare/2023-08-03/share_of_cage_free_eggs
+  #
+  # Farmed finfishes used for food (Mood et al. 2023).
+  #
+  data://meadow/animal_welfare/2023-08-08/farmed_finfishes_used_for_food:
+    - snapshot://animal_welfare/2023-08-08/farmed_finfishes_used_for_food.zip
+  data://garden/animal_welfare/2023-08-08/farmed_finfishes_used_for_food:
+    - data://meadow/animal_welfare/2023-08-08/farmed_finfishes_used_for_food
+    - data://garden/demography/2023-03-31/population
+  data://grapher/animal_welfare/2023-08-08/farmed_finfishes_used_for_food:
+    - data://garden/animal_welfare/2023-08-08/farmed_finfishes_used_for_food
+  #
+  # Number of farmed fish (Fishcount, 2018).
+  #
+  data://meadow/animal_welfare/2023-08-14/number_of_farmed_fish:
+    - snapshot://animal_welfare/2023-08-14/number_of_farmed_fish_2015.xlsx
+    - snapshot://animal_welfare/2023-08-14/number_of_farmed_fish_2016.xlsx
+    - snapshot://animal_welfare/2023-08-14/number_of_farmed_fish_2017.xlsx
+  data://garden/animal_welfare/2023-08-14/number_of_farmed_fish:
+    - data://meadow/animal_welfare/2023-08-14/number_of_farmed_fish
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2023-04-30/income_groups
+    - data://garden/demography/2023-03-31/population
+  data://grapher/animal_welfare/2023-08-14/number_of_farmed_fish:
+    - data://garden/animal_welfare/2023-08-14/number_of_farmed_fish
+  #
+  # Number of decapod crustaceans (Fishcount, 2018).
+  #
+  data://meadow/animal_welfare/2023-08-15/number_of_farmed_decapod_crustaceans:
+    - snapshot://animal_welfare/2023-08-15/number_of_farmed_decapod_crustaceans_2015.xlsx
+    - snapshot://animal_welfare/2023-08-15/number_of_farmed_decapod_crustaceans_2016.xlsx
+    - snapshot://animal_welfare/2023-08-15/number_of_farmed_decapod_crustaceans_2017.xlsx
+  data://garden/animal_welfare/2023-08-15/number_of_farmed_decapod_crustaceans:
+    - data://meadow/animal_welfare/2023-08-15/number_of_farmed_decapod_crustaceans
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2023-04-30/income_groups
+    - data://garden/demography/2023-03-31/population
+  data://grapher/animal_welfare/2023-08-15/number_of_farmed_decapod_crustaceans:
+    - data://garden/animal_welfare/2023-08-15/number_of_farmed_decapod_crustaceans
+  #
+  # Number of wild fish killed for food (Fishcount, 2019).
+  #
+  data://meadow/animal_welfare/2023-08-16/number_of_wild_fish_killed_for_food:
+    - snapshot://animal_welfare/2023-08-16/number_of_wild_fish_killed_for_food.xlsx
+  data://garden/animal_welfare/2023-08-16/number_of_wild_fish_killed_for_food:
+    - data://meadow/animal_welfare/2023-08-16/number_of_wild_fish_killed_for_food
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2023-04-30/income_groups
+    - data://garden/demography/2023-03-31/population
+  data://grapher/animal_welfare/2023-08-16/number_of_wild_fish_killed_for_food:
+    - data://garden/animal_welfare/2023-08-16/number_of_wild_fish_killed_for_food
+  #
+  # Chick culling laws (Various sources, 2023).
+  #
+  data://meadow/animal_welfare/2023-09-01/chick_culling_laws:
+    - snapshot://animal_welfare/2023-09-01/chick_culling_laws.csv
+  data://garden/animal_welfare/2023-09-01/chick_culling_laws:
+    - data://meadow/animal_welfare/2023-09-01/chick_culling_laws
+  data://grapher/animal_welfare/2023-09-01/chick_culling_laws:
+    - data://garden/animal_welfare/2023-09-01/chick_culling_laws
+  #
+  # Bullfighting laws (Various sources, 2023).
+  #
+  data://meadow/animal_welfare/2023-09-05/bullfighting_laws:
+    - snapshot://animal_welfare/2023-09-05/bullfighting_laws.csv
+  data://garden/animal_welfare/2023-09-05/bullfighting_laws:
+    - data://meadow/animal_welfare/2023-09-05/bullfighting_laws
+  data://grapher/animal_welfare/2023-09-05/bullfighting_laws:
+    - data://garden/animal_welfare/2023-09-05/bullfighting_laws
+  #
+  # Fur laws (Fur Free Alliance, 2023).
+  #
+  data://meadow/animal_welfare/2023-10-24/fur_laws:
+    - snapshot://animal_welfare/2023-10-24/fur_laws.xlsx
+  data://garden/animal_welfare/2023-10-24/fur_laws:
+    - data://meadow/animal_welfare/2023-10-24/fur_laws
+  data://grapher/animal_welfare/2023-10-24/fur_laws:
+    - data://garden/animal_welfare/2023-10-24/fur_laws
+  ######################################################################################################################
+  # To be archived:
+
+  ######################################################################################################################

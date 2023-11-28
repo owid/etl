@@ -1,18 +1,15 @@
 meta:
-  namespace: backport
-  short_name: dataset_5356_fish_discards__un_fao_config
-  file_extension: json
-  date_accessed: 2023-02-23 16:42:00.717103
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5356
+    date_accessed: 2023-08-10 07:48:59.638886
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_5356_fish_discards__un_fao
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/5356
-  source_published_by: Our World in Data catalog backport
   is_public: false
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 855dbdff104b26f0733cd3f42489ee19
-  size: 4452
+- md5: 4aa49d4ec1115eb71ce7ee4c85f2ee33
+  size: 4978
   path: dataset_5356_fish_discards__un_fao_config.json

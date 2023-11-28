@@ -1,18 +1,15 @@
 meta:
-  namespace: backport
-  short_name: dataset_5376_national_net_zero_targets__net_zero_tracker_config
-  file_extension: json
-  date_accessed: 2023-06-01 14:53:16.780425
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5376
+    date_accessed: 2023-08-10 08:25:49.984754
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_5376_national_net_zero_targets__net_zero_tracker
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/5376
-  source_published_by: Our World in Data catalog backport
   is_public: false
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 41669e715e688853848b0195e4f84d94
-  size: 4268
+- md5: a365f8b82a41b357a23537ac5915e083
+  size: 4669
   path: dataset_5376_national_net_zero_targets__net_zero_tracker_config.json

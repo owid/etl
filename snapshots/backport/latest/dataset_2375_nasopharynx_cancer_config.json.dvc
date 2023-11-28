@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2375
+    date_accessed: 2023-08-14 15:17:27.198646
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2375_nasopharynx_cancer (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 0130086b5c500577f5b4d6759d144931
+  size: 32620
+  path: dataset_2375_nasopharynx_cancer_config.json

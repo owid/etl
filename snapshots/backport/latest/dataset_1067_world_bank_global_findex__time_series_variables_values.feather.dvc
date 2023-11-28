@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1067
+    date_accessed: 2023-08-16 10:23:07.501902
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: World Bank Global Findex - Time Series Variables
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 30bce82a772e74c642e379b013f5dd3f
+  size: 202138
+  path: dataset_1067_world_bank_global_findex__time_series_variables_values.feather

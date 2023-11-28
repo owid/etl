@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2039
+    date_accessed: 2023-08-16 07:28:38.933647
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_2039_proportion_of_women_aged_15_49_years_who_make_their_own_informed_decisions_regarding_sexual_relations__contraceptive_use_and_reproductive_health_care
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: c12d70a39ad801eba8fce3cc7ae78935
+  size: 8607
+  path: 
+    dataset_2039_proportion_of_women_aged_15_49_years_who_make_their_own_informed_decisions_regarding_sexual_relations__contraceptive_use_and_reproductive_health_care_config.json

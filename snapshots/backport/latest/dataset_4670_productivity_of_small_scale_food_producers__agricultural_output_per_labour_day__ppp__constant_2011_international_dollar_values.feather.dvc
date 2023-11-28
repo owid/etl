@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4670
+    date_accessed: 2023-08-16 07:19:22.739954
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Productivity of small-scale food producers (agricultural output per labour
+    day, PPP) (constant 2011 international $)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 869aaf121b32d2a2449762fe2e9cc1cf
+  size: 6770
+  path: 
+    dataset_4670_productivity_of_small_scale_food_producers__agricultural_output_per_labour_day__ppp__constant_2011_international_dollar_values.feather

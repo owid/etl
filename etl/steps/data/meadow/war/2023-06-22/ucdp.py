@@ -33,7 +33,7 @@ def run(dest_dir: str) -> None:
         "prio_armed_conflict",
     }
     for short_name in short_names:
-        snap = cast(Snapshot, paths.load_dependency(short_name=f"ucdp.{short_name}.zip"))
+        snap = cast(Snapshot, paths.load_dependency(short_name=f"ucdp_{short_name}.zip"))
         log.info(f"war_ucdp: creating table from {snap.path}")
 
         # Load data from snapshot.

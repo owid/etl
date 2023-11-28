@@ -1,0 +1,25 @@
+meta:
+  source:
+    name: Google Sheet
+    url: https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/29106
+    source_data_url: 
+      https://docs.google.com/spreadsheets/d/e/2PACX-1vT14CztQpK4EGV898Xlw8Lirh_SYsAH5DnxHBr329XKLGkK5Bl3PEmOsnWwbHn_n6TE4uEnksOBSfp-/pub?output=csv
+    date_accessed: '2023-09-05'
+    published_by: Google Sheet
+  name: Democracy - Lexical Index
+  description: >-
+    This dataset provides information on political regimes, using data from Skaaning
+    et al. (2015).
+
+
+    You can read a description of the data in this post: https://ourworldindata.org/democracies-measurement
+
+
+    You can download the code and complete dataset, including supplementary variables,
+    from GitHub: https://github.com/owid/notebooks/tree/main/BastianHerre/democracy
+  license: {}
+wdir: ../../../data/snapshots/fasttrack/latest
+outs:
+- md5: 15589adf3d1d43fcb9dd8db563996559
+  size: 4812283
+  path: democracy_lexical_index.csv

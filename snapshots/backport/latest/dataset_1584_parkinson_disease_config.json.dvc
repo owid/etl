@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1584
+    date_accessed: 2023-08-16 08:46:17.091775
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1584_parkinson_disease (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 87300e2784e69d2aac2bbf8aa15614c3
+  size: 31605
+  path: dataset_1584_parkinson_disease_config.json

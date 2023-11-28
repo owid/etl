@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/3898
+    date_accessed: 2023-08-16 07:58:20.296449
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Other non-rheumatic valve diseases
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 3b9cbd4696d25515582ee1df1e8e4eac
+  size: 1389890
+  path: dataset_3898_other_non_rheumatic_valve_diseases_values.feather

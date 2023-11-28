@@ -1,0 +1,54 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - State Capacity
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
+dataset:
+  title: States in regions (Gleditsch)
+  update_period_days: 1800
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
+tables:
+  gleditsch_regions:
+    title: States in regions (Gleditsch)
+    variables:
+      number_countries:
+        title: Number of states in a region
+        description_short: |-
+          Number of states (and microstates) in each region.
+        unit: countries
+        processing_level: minor
+        description_processing: |-
+          We use the list of independent states and microstates from Gleditsch and Ward. We assign each country to a region based on the mapping (using GW codes):
+
+            - Americas: 2-199
+            - Europe: 200-399
+            - Africa: 400-626
+            - Middle East: 630-699
+            - Asia and Oceania: 700-999
+        display:
+          numDecimalPlaces: 0
+
+      population:
+        title: Population in region
+        description_short: |-
+          Population in the region, using borders from 2022.
+        unit: countries
+        processing_level: minor
+        description_processing: |-
+          We use the list of independent states and microstates from Gleditsch and Ward. We assign each country to a region based on the mapping (using GW codes):
+
+            - Americas: 2-199
+            - Europe: 200-399
+            - Africa: 400-626
+            - Middle East: 630-699
+            - Asia and Oceania: 700-999
+        display:
+          numDecimalPlaces: 0

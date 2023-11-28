@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4151
+    date_accessed: 2023-08-16 08:21:06.926580
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_4151_expected_years_of_schooling__undp__2018
+    (archived)
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 28153cb2f22ee90e55247454674d03c4
+  size: 2197
+  path: dataset_4151_expected_years_of_schooling__undp__2018_config.json

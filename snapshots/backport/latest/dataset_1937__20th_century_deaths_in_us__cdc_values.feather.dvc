@@ -1,18 +1,14 @@
 meta:
-  namespace: backport
-  short_name: dataset_1937__20th_century_deaths_in_us__cdc_values
-  file_extension: feather
-  date_accessed: 2023-02-23 16:59:07.524132
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1937
+    date_accessed: 2023-08-10 09:25:13.885096
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: 20th century deaths in US - CDC
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/1937
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 6286ba6e4f3d92b76d080c6981b693c2
+- md5: c0ae6ab36c250e3452ed425f635dd065
   size: 27834
   path: dataset_1937__20th_century_deaths_in_us__cdc_values.feather

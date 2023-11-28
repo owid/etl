@@ -1,23 +1,51 @@
-# (Inherited from meadow, remove if not different.)
-all_sources:
-- source_testing: &source-testing
-    name: Dummy source
-    published_by:
-    url:
-    date_accessed:
-    publication_date:
-    publication_year:
-dataset:
-  title: Dummy dataset
-  licenses:
-  - name:
-    url:
-  sources:
-  - *source-testing
+definitions:
+  common:
+    presentation:
+      topic_tags:
+      - Uncategorized
 
 tables:
   dummy:
-    # (Inherited from meadow, remove if not different.)
     variables:
       dummy_variable:
-        unit: dummy unit
+        title: Dummy
+        licenses: []
+        unit: Dummy unit
+        short_unit: Du
+        display:
+          isProjection: true
+          conversionFactor: 1000
+          numDecimalPlaces: 1
+          tolerance: 5
+          yearIsDay: false
+          zeroDay: '1900-01-01'
+          entityAnnotationsMap: 'Germany: dummy annotation'
+          includeInTable: true
+        description_short: Short description of the dummy indicator.
+        description_from_producer: The description of the dummy indicator by the producer,
+          shown separately on a data page.
+        description_key:
+          - First bullet point info about the data. [Detail on demand link](#dod:primaryenergy)
+          - Second bullet point with **bold** text and a [normal link](https://ourworldindata.org)
+        processing_level: major
+        license:
+          name: CC-BY 4.0
+          url: ''
+        presentation:
+          grapher_config:
+            title: The dummy indicator - chart title
+            subtitle: You'll never guess where the line will go
+            hasMapTab: true
+            selectedEntityNames:
+            - Germany
+            - Italy
+            - France
+          title_public: The dummy indicator - data page title
+          title_variant: historical data
+          attribution_short: ACME
+          attribution: ACME project
+          topic_tags:
+          - Internet
+          faqs:
+          - fragment_id: cherries
+            gdoc_id: 16uGVylqtS-Ipc3OCxqapJ3BEVGjWf648wvZpzio1QFE

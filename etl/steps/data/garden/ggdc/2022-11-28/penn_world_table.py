@@ -35,6 +35,13 @@ def run(dest_dir: str) -> None:
     # Multiplying by 1 million to get "people" instead of "millions of people"
     df[["pop", "emp"]] *= 1000000
 
+    # Replace rgdpo values of Bermuda with cgdpo values, because of issues with the data
+    # Recommended by Robert Inklaar:
+    # The chaining of reference prices may be causing these problems. Normally, cgdpo and rgdpo are not too different, but with the wild swings and even negative prices for Bermuda, that seems an exception.
+    # Perhaps the most elegant way would be to either using cgdpo for all countries or just for Bermuda.
+
+    df.loc[df["countrycode"] == "BMU", "rgdpo"] = df.loc[df["countrycode"] == "BMU", "cgdpo"]
+
     # %% [markdown]
     # A range of variables are provided as shares (0-1), which we multiply by 100 to express as a percentage.
 
@@ -64,6 +71,15 @@ def run(dest_dir: str) -> None:
     # %%
     # Productivity = (rgdpo) / (avh*emp) – NB, both rgdpo and emp have been multiplied by 1,000,000 above.
     df["productivity"] = df["rgdpo"] / (df["avh"] * df["emp"])
+
+    # Filter dataframe with i_outlier different to "Outlier"
+    # From Robert Inklaar:
+    # Some country/year observations, we label as outliers because indeed the relative price levels become implausible.
+    # See the i_outlier variable for those observations and in our documentation we have discussion in what qualifies as an outlier.
+    df = df[df["i_outlier"] != "Outlier"]
+
+    # Drop i_outlier column
+    df = df.drop(columns=["i_outlier"])
 
     # Harmonize countries from main dataset before merge with national accounts data
     df = harmonize_countries(df)

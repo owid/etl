@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1030
+    date_accessed: 2023-08-16 10:15:27.305185
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Absolute population change - OWID based on HYDE & UN
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: e2fe733b6b0d5105d171fcfd4e0c2794
+  size: 106482
+  path: 
+    dataset_1030_absolute_population_change__owid_based_on_hyde__and__un_values.feather

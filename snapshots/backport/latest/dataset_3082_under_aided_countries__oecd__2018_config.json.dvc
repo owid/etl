@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/3082
+    date_accessed: 2023-08-16 08:35:59.450806
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_3082_under_aided_countries__oecd__2018 (archived)
+  description: For OECD report - do not delete.
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 2a642961facd7f8c9c4a0862bc534e53
+  size: 3118
+  path: dataset_3082_under_aided_countries__oecd__2018_config.json

@@ -1,0 +1,20 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Working Hours
+
+
+dataset:
+  title: "Average hours of work, by education level and economic activity (ILOSTAT)"
+tables:
+  average_work_hours:
+    variables:
+      average_work_hours:
+        title: Average hours of work per employed person
+        unit: 'hours'
+        short_unit:  ''
+        description_short: 'Average number of hours of work per week in the main job regardless of working time arrangements (e.g. full-time and part-time).'
+        display:
+           numDecimalPlaces: 1
+

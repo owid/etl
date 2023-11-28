@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4607
+    date_accessed: 2023-08-16 10:28:47.044177
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Proportion of children under 5 years of age whose births have been registered
+    with a civil authority (% of children under 5 years of age)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: d38814175064308eaab3aaf66ff6a50e
+  size: 13018
+  path: 
+    dataset_4607_proportion_of_children_under_5_years_of_age_whose_births_have_been_registered_with_a_civil_authority__pct_of_children_under_5_years_of_age_values.feather

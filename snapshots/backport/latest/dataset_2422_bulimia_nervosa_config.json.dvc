@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2422
+    date_accessed: 2023-08-16 10:03:35.873475
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2422_bulimia_nervosa (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 4db7d70a389a2e95697eca9012380b75
+  size: 83578
+  path: dataset_2422_bulimia_nervosa_config.json

@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2566
+    date_accessed: 2023-08-14 05:44:42.663684
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Finance - Central Government Debt
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: dae2dc439ab392d3e31f2f0da633fd42
+  size: 10170
+  path: dataset_2566_finance__central_government_debt_values.feather

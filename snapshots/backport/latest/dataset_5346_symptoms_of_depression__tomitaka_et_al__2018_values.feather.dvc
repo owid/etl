@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5346
+    date_accessed: 2023-08-10 14:42:51.341177
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Symptoms of depression (Tomitaka et al. 2018)
+  description: ''
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 814f4393d2aa9e6aa062d010d79fe2f3
+  size: 6658
+  path: dataset_5346_symptoms_of_depression__tomitaka_et_al__2018_values.feather

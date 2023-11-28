@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2411
+    date_accessed: 2023-08-16 10:42:19.407239
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Cocaine use disorders
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 0c883f9295ee9b0cbe2cb344e4146838
+  size: 4149298
+  path: dataset_2411_cocaine_use_disorders_values.feather

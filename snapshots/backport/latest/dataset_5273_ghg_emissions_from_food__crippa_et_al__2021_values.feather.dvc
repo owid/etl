@@ -1,18 +1,15 @@
 meta:
-  namespace: backport
-  short_name: dataset_5273_ghg_emissions_from_food__crippa_et_al__2021_values
-  file_extension: feather
-  date_accessed: 2023-06-01 12:55:01.311318
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5273
+    date_accessed: 2023-08-10 08:44:28.564729
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: GHG emissions from food (Crippa et al. 2021)
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/5273
-  source_published_by: Our World in Data catalog backport
   is_public: false
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 7e7bae14fc7b2a2ea9301fb24d87556b
+- md5: a6b836070806a79800713affbc964083
   size: 157810
   path: dataset_5273_ghg_emissions_from_food__crippa_et_al__2021_values.feather

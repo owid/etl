@@ -1,0 +1,24 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Plastic Pollution
+
+
+dataset:
+  title: Global Plastics Outlook - Plastics waste in 2019 by region and application
+tables:
+  plastic_waste_2019:
+    variables:
+      plastic_waste:
+        title: Plastic waste by application in 2019
+        unit: 'tonnes'
+        short_unit: 't'
+        display:
+          numDecimalPlaces: 0
+      share:
+        title: Share of plastic waste by application in 2019
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 2

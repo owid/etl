@@ -1,0 +1,28 @@
+meta:
+  name: United Nations Inter-agency Group for Child Mortality Estimation (2023)
+  publication_year: 2023
+  source_name: United Nations Inter-agency Group for Child Mortality Estimation (2023)
+  source_published_by:
+    "United Nations Inter-agency Group for Child Mortality Estimation
+    (UN IGME), Levels & Trends in Child Mortality: Report 2022, Estimates developed
+    by the United Nations Inter-agency Group for Child Mortality Estimation, United
+    Nations Children’s Fund, New York, 2023."
+  url: https://childmortality.org/data
+  source_data_url: https://childmortality.org/wp-content/uploads/2021/09/UN-IGME-2022.zip
+  license_url: https://www.unicef.org/legal#copyright
+  license_name: ""
+  date_accessed: 2023-08-16
+  is_public: true
+  description: |
+    The United Nations Inter-agency Group for Child Mortality Estimation (UN IGME) was formed in 2004 to share data on child mortality, improve methods for child mortality estimation, report on progress towards child survival goals, and enhance country capacity to produce timely and properly assessed estimates of child mortality. The UN IGME is led by the United Nations Children’s Fund (UNICEF) and includes the World Health Organization (WHO), the World Bank Group and the United Nations Population Division of the Department of Economic and Social Affairs as full members.
+
+    UN IGME’s independent Technical Advisory Group (TAG), comprised of leading academic scholars and independent experts in demography and biostatistics, provides guidance on estimation methods, technical issues, and strategies for data analysis and data quality assessment.
+
+    UN IGME updates its child mortality estimates annually after reviewing newly available data and assessing data quality. The web portal contains the latest UN IGME estimates of child mortality at the country, regional and global levels, and the data used to derive them.
+
+    Details on the methods used to estimate child mortality are available here: https://childmortality.org/methods.
+wdir: ../../../data/snapshots/un/2023-08-16
+outs:
+  - md5: ef59edbab7791b7a16b2551248e835c9
+    size: 17737197
+    path: igme.zip

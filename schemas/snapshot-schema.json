@@ -1,104 +1,103 @@
 {
-    "$schema": "http://json-schema.org/draft-04/schema#",
-    "type": "object",
-    "additionalProperties": false,
-    "properties": {
-      "meta": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "namespace": {
-            "type": "string"
-          },
-          "short_name": {
-            "type": "string"
-          },
-          "name": {
-            "type": "string"
-          },
-          "version": {
-            "type": "string"
-          },
-          "source_name": {
-            "type": "string"
-          },
-          "publication_year": {
-            "type": "integer"
-          },
-          "publication_date": {
-            "type": ["string", "null"],
-            "format": "date"
-          },
-          "url": {
-            "type": "string"
-          },
-          "source_data_url": {
-            "type": ["string", "null"]
-          },
-          "source_published_by": {
-            "type": "string"
-          },
-          "file_extension": {
-            "type": "string"
-          },
-          "license_url": {
-            "type": ["string", "null"]
-          },
-          "license_name": {
-            "type": ["string", "null"]
-          },
-          "date_accessed": {
-            "type": "string",
-            "format": "date"
-          },
-          "description": {
-            "type": "string"
-          },
-          "access_notes": {
-            "type": "string"
-          },
-          "is_public": {
-            "type": "boolean"
-          }
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "meta": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string"
         },
-        "required": [
-          "name",
-          "source_name",
-          "url",
-          "date_accessed",
-          "description"
-        ]
-      },
-      "wdir": {
-        "type": "string"
-      },
-      "outs": {
-        "type": "array",
-        "items": [
-          {
-            "type": "object",
-            "additionalProperties": false,
-            "properties": {
-              "md5": {
-                "type": "string"
-              },
-              "size": {
-                "type": "integer"
-              },
-              "path": {
-                "type": "string"
-              }
-            },
-            "required": [
-              "md5",
-              "size",
-              "path"
-            ]
-          }
-        ]
+        "source_name": {
+          "type": "string"
+        },
+        "publication_year": {
+          "type": "integer"
+        },
+        "publication_date": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date"
+        },
+        "url": {
+          "type": "string"
+        },
+        "source_data_url": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "source_published_by": {
+          "type": "string"
+        },
+        "license_url": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "license_name": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "date_accessed": {
+          "type": "string",
+          "format": "date"
+        },
+        "description": {
+          "type": "string"
+        },
+        "access_notes": {
+          "type": "string"
+        },
+        "is_public": {
+          "type": "boolean"
+        },
+        "origin": {
+          "$ref": "definitions.json#/origin"
+        },
+        "source": {
+          "$ref": "definitions.json#/source"
+        }
       }
     },
-    "required": [
-      "meta"
-    ]
-  }
+    "wdir": {
+      "type": "string"
+    },
+    "outs": {
+      "type": "array",
+      "items": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "md5": {
+              "type": "string"
+            },
+            "size": {
+              "type": "integer"
+            },
+            "path": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "md5",
+            "size",
+            "path"
+          ]
+        }
+      ]
+    }
+  },
+  "required": [
+    "meta"
+  ]
+}

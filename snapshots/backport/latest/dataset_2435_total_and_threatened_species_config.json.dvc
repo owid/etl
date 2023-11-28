@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2435
+    date_accessed: 2023-08-16 08:12:35.149689
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2435_total_and_threatened_species (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 44f0cea0afa4a55f136384b277e016ec
+  size: 154090
+  path: dataset_2435_total_and_threatened_species_config.json

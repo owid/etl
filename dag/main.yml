@@ -10,7 +10,7 @@ steps:
   data://meadow/gapminder/2023-03-31/population:
     - snapshot://gapminder/2023-03-31/population.xlsx
   data://garden/gapminder/2023-03-31/population:
-  - data://meadow/gapminder/2023-03-31/population
+    - data://meadow/gapminder/2023-03-31/population
   # Key indicators
   data://garden/owid/latest/key_indicators:
     - data://garden/demography/2022-12-08/population
@@ -91,11 +91,11 @@ steps:
 
   # Homicide - UNODC - current
   data://meadow/homicide/2023-07-04/unodc:
-  - snapshot://homicide/2023-07-04/unodc.xlsx
+    - snapshot://homicide/2023-07-04/unodc.xlsx
   data://garden/homicide/2023-07-04/unodc:
-  - data://meadow/homicide/2023-07-04/unodc
+    - data://meadow/homicide/2023-07-04/unodc
   data://grapher/homicide/2023-07-04/unodc:
-  - data://garden/homicide/2023-07-04/unodc
+    - data://garden/homicide/2023-07-04/unodc
 
   # Homicide - OMM
   data://garden/homicide/2023-01-03/homicide_long_run_omm:
@@ -110,23 +110,23 @@ steps:
   data://grapher/un/2022-07-11/un_wpp:
     - data://garden/un/2022-07-11/un_wpp
 
- # UN SDG - current
-  data://meadow/un/2023-01-24/un_sdg:
-    - snapshot://un/2023-01-24/un_sdg.feather
-  data://garden/un/2023-01-24/un_sdg:
-    - data://meadow/un/2023-01-24/un_sdg
-    - snapshot://un/2023-01-24/un_sdg_unit.csv
-    - snapshot://un/2023-01-24/un_sdg_dimension.json
-  data://grapher/un/2023-01-24/un_sdg:
-    - data://garden/un/2023-01-24/un_sdg
+  # UN SDG - current
+  data://meadow/un/2023-08-16/un_sdg:
+    - snapshot://un/2023-08-16/un_sdg.feather
+  data://garden/un/2023-08-16/un_sdg:
+    - data://meadow/un/2023-08-16/un_sdg
+    - snapshot://un/2023-08-16/un_sdg_unit.csv
+    - snapshot://un/2023-08-16/un_sdg_dimension.json
+  data://grapher/un/2023-08-16/un_sdg:
+    - data://garden/un/2023-08-16/un_sdg
 
-# IHME SDG
+  # IHME SDG
   data-private://meadow/ihme/2023-05-09/sdg:
-  - snapshot-private://ihme/2023-05-05/sdg.csv
+    - snapshot-private://ihme/2023-05-05/sdg.csv
   data-private://garden/ihme/2023-05-09/sdg:
-  - data-private://meadow/ihme/2023-05-09/sdg
+    - data-private://meadow/ihme/2023-05-09/sdg
   data-private://grapher/ihme/2023-05-09/sdg:
-  - data-private://garden/ihme/2023-05-09/sdg
+    - data-private://garden/ihme/2023-05-09/sdg
 
   # Internet
   data://garden/technology/2022/internet:
@@ -164,10 +164,6 @@ steps:
     - data://garden/aviation_safety_network/2023-04-18/aviation_statistics
 
   # HMD
-  data://meadow/hmd/2022-11-04/life_tables:
-    - walden://hmd/2022-11-04/life_tables
-  data://garden/hmd/2022-11-04/life_tables:
-    - data://meadow/hmd/2022-11-04/life_tables
   data://meadow/hmd/2022-12-07/life_tables:
     - snapshot://hmd/2022-12-07/hmd.zip
   data://garden/hmd/2022-12-07/life_tables:
@@ -183,26 +179,26 @@ steps:
     - data://garden/un/2022-11-29/undp_hdr
 
   #
-  # EM-DAT Natural disasters (2022).
+  # EM-DAT Natural disasters (2023).
   #
-  data://meadow/emdat/2022-11-24/natural_disasters:
-    - snapshot://emdat/2022-11-24/natural_disasters.xlsx
+  data://meadow/emdat/2023-09-20/natural_disasters:
+    - snapshot://emdat/2023-09-20/natural_disasters.xlsx
   # The following dataset has a table for yearly data and another for decadal data.
-  data://garden/emdat/2022-11-24/natural_disasters:
-    - data://meadow/emdat/2022-11-24/natural_disasters
-    - data://garden/owid/latest/key_indicators
-    - data://garden/wb/2021-07-01/wb_income
+  data://garden/emdat/2023-09-20/natural_disasters:
+    - data://meadow/emdat/2023-09-20/natural_disasters
+    - data://garden/demography/2023-03-31/population
+    - data://garden/wb/2023-04-30/income_groups
     - data://garden/regions/2023-01-01/regions
-    - data://garden/worldbank_wdi/2022-05-26/wdi
+    - data://garden/worldbank_wdi/2023-05-29/wdi
   # The following dataset has all (yearly and decadal) variables together.
-  data://grapher/emdat/2022-11-24/natural_disasters:
-    - data://garden/emdat/2022-11-24/natural_disasters
+  data://grapher/emdat/2023-09-20/natural_disasters:
+    - data://garden/emdat/2023-09-20/natural_disasters
   # The following dataset has only global data, and entity corresponds to the type of disaster.
-  data://grapher/emdat/2022-11-24/natural_disasters_global_by_type:
-    - data://garden/emdat/2022-11-24/natural_disasters
+  data://grapher/emdat/2023-09-20/natural_disasters_global_by_type:
+    - data://garden/emdat/2023-09-20/natural_disasters
   # Natural disasters explorer.
-  data://explorers/emdat/2022-12-07/natural_disasters:
-    - data://garden/emdat/2022-11-24/natural_disasters
+  data://explorers/emdat/2023-09-20/natural_disasters:
+    - data://garden/emdat/2023-09-20/natural_disasters
 
   # Country profiles - overview
   data://garden/country_profile/2022/overview:
@@ -210,10 +206,10 @@ steps:
     - backport://backport/owid/latest/dataset_4129_years_of_schooling__based_on_lee_lee__2016__barro_lee__2018__and_undp__2018
     - backport://backport/owid/latest/dataset_2710_child_mortality_rates__selected_gapminder__v10__2017
     - backport://backport/owid/latest/dataset_581_daily_supply_of_calories_per_person__owid_based_on_un_fao__and__historical_sources
-    - data://garden/demography/2023-02-03/life_expectancy
+    - data://garden/demography/2023-10-09/life_expectancy
     - data://garden/owid/latest/key_indicators
     - data://garden/regions/2023-01-01/regions
-    - data://garden/gcp/2023-07-10/global_carbon_budget
+    - data://garden/gcp/2023-09-28/global_carbon_budget
     - data://garden/democracy/2023-03-02/vdem
     - data://garden/energy/2023-07-10/energy_mix
     - data://garden/worldbank_wdi/2022-05-26/wdi
@@ -251,222 +247,227 @@ steps:
     - data://garden/ggdc/2022-11-28/penn_world_table
 
   #
-  # Met Office Hadley Centre - Near surface temperature anomaly.
+  # Met Office Hadley Centre - Near surface temperature anomaly (2023-10-18).
   #
-  data://meadow/met_office_hadley_centre/2023-01-17/near_surface_temperature:
-    - snapshot://met_office_hadley_centre/2023-01-17/near_surface_temperature_global.csv
-    - snapshot://met_office_hadley_centre/2023-01-17/near_surface_temperature_northern_hemisphere.csv
-    - snapshot://met_office_hadley_centre/2023-01-17/near_surface_temperature_southern_hemisphere.csv
-  data://garden/met_office_hadley_centre/2023-01-17/near_surface_temperature:
-    - data://meadow/met_office_hadley_centre/2023-01-17/near_surface_temperature
-  data://grapher/met_office_hadley_centre/2023-01-17/near_surface_temperature:
-    - data://garden/met_office_hadley_centre/2023-01-17/near_surface_temperature
+  data://meadow/met_office_hadley_centre/2023-10-18/near_surface_temperature:
+    - snapshot://met_office_hadley_centre/2023-10-18/near_surface_temperature_global.csv
+    - snapshot://met_office_hadley_centre/2023-10-18/near_surface_temperature_northern_hemisphere.csv
+    - snapshot://met_office_hadley_centre/2023-10-18/near_surface_temperature_southern_hemisphere.csv
+  data://garden/met_office_hadley_centre/2023-10-18/near_surface_temperature:
+    - data://meadow/met_office_hadley_centre/2023-10-18/near_surface_temperature
+  data://grapher/met_office_hadley_centre/2023-10-18/near_surface_temperature:
+    - data://garden/met_office_hadley_centre/2023-10-18/near_surface_temperature
 
   #Luxembourg Income Study
-  data://meadow/lis/2023-01-18/luxembourg_income_study:
-    - snapshot://lis/2023-01-18/lis_keyvars.csv
-    - snapshot://lis/2023-01-18/lis_abs_poverty.csv
-    - snapshot://lis/2023-01-18/lis_distribution.csv
+  data://meadow/lis/2023-08-30/luxembourg_income_study:
+    - snapshot://lis/2023-08-30/lis_keyvars.csv
+    - snapshot://lis/2023-08-30/lis_abs_poverty.csv
+    - snapshot://lis/2023-08-30/lis_distribution.csv
+    - snapshot://lis/2023-08-30/lis_keyvars_adults.csv
+    - snapshot://lis/2023-08-30/lis_abs_poverty_adults.csv
+    - snapshot://lis/2023-08-30/lis_distribution_adults.csv
+    - snapshot://lis/2023-08-30/lis_percentiles.csv
+    - snapshot://lis/2023-08-30/lis_percentiles_adults.csv
     - data://garden/regions/2023-01-01/regions
-  data://garden/lis/2023-01-18/luxembourg_income_study:
-    - data://meadow/lis/2023-01-18/luxembourg_income_study
-  data://grapher/lis/2023-01-18/luxembourg_income_study:
-    - data://garden/lis/2023-01-18/luxembourg_income_study
-  data://explorers/lis/2023-01-18/luxembourg_income_study:
-    - data://garden/lis/2023-01-18/luxembourg_income_study
+  data://garden/lis/2023-08-30/luxembourg_income_study:
+    - data://meadow/lis/2023-08-30/luxembourg_income_study
+  data://grapher/lis/2023-08-30/luxembourg_income_study:
+    - data://garden/lis/2023-08-30/luxembourg_income_study
+  data://explorers/lis/2023-08-30/luxembourg_income_study:
+    - data://garden/lis/2023-08-30/luxembourg_income_study
 
   # World Inequality Database
-  data://meadow/wid/2023-01-27/world_inequality_database:
+  data://meadow/wid/2023-08-24/world_inequality_database:
     - data://garden/regions/2023-01-01/regions
-    - snapshot://wid/2023-01-27/world_inequality_database.csv
-    - snapshot://wid/2023-01-27/world_inequality_database_with_extrapolations.csv
-  data://garden/wid/2023-01-27/world_inequality_database:
-    - data://meadow/wid/2023-01-27/world_inequality_database
-  data://grapher/wid/2023-01-27/world_inequality_database:
-    - data://garden/wid/2023-01-27/world_inequality_database
-  data://explorers/wid/2023-01-27/world_inequality_database:
-    - data://garden/wid/2023-01-27/world_inequality_database
+    - snapshot://wid/2023-08-24/world_inequality_database.csv
+    - snapshot://wid/2023-08-24/world_inequality_database_with_extrapolations.csv
+    - snapshot://wid/2023-08-24/world_inequality_database_distribution.csv
+    - snapshot://wid/2023-08-24/world_inequality_database_distribution_with_extrapolations.csv
+  data://garden/wid/2023-08-24/world_inequality_database:
+    - data://meadow/wid/2023-08-24/world_inequality_database
+  data://grapher/wid/2023-08-24/world_inequality_database:
+    - data://garden/wid/2023-08-24/world_inequality_database
+  data://explorers/wid/2023-08-24/world_inequality_database:
+    - data://garden/wid/2023-08-24/world_inequality_database
 
   # Poverty and inequality dataset for comparison explorers
-  data://explorers/poverty_inequality/2023-03-01/poverty_inequality:
-    - data://explorers/wid/2023-01-27/world_inequality_database
-    - data://explorers/lis/2023-01-18/luxembourg_income_study
+  data://explorers/poverty_inequality/2023-08-24/poverty_inequality:
+    - data://explorers/wid/2023-08-24/world_inequality_database
+    - data://explorers/lis/2023-08-30/luxembourg_income_study
 
   # Global mobile money dataset (GSMA)
   data://meadow/technology/2023-03-06/mobile_money:
-  - snapshot://technology/2023-03-06/mobile_money.xlsx
+    - snapshot://technology/2023-03-06/mobile_money.xlsx
   data://garden/technology/2023-03-06/mobile_money:
-  - data://meadow/technology/2023-03-06/mobile_money
+    - data://meadow/technology/2023-03-06/mobile_money
   data://grapher/technology/2023-03-06/mobile_money:
-  - data://garden/technology/2023-03-06/mobile_money
-
+    - data://garden/technology/2023-03-06/mobile_money
 
   #
   # Regions - Regions (2023).
   #
   data://garden/regions/2023-01-01/regions:
   data://grapher/regions/latest/regions:
-  - data://garden/regions/2023-01-01/regions
+    - data://garden/regions/2023-01-01/regions
 
   # Democracy and Human rights - V-Dem index
   data://meadow/democracy/2023-03-02/vdem:
-  - snapshot://democracy/2023-03-02/vdem.csv
+    - snapshot://democracy/2023-03-02/vdem.csv
   data://garden/democracy/2023-03-02/vdem:
-  - data://meadow/democracy/2023-03-02/vdem
+    - data://meadow/democracy/2023-03-02/vdem
   data://grapher/democracy/2023-03-02/vdem:
-  - data://garden/democracy/2023-03-02/vdem
+    - data://garden/democracy/2023-03-02/vdem
 
   # Microprocessor trend data
   data://meadow/technology/2023-03-08/microprocessor_trend:
-  - snapshot://technology/2023-03-08/microprocessor_trend.dat
+    - snapshot://technology/2023-03-08/microprocessor_trend.dat
   data://garden/technology/2023-03-08/microprocessor_trend:
-  - data://meadow/technology/2023-03-08/microprocessor_trend
+    - data://meadow/technology/2023-03-08/microprocessor_trend
   data://grapher/technology/2023-03-09/microprocessor_trend:
-  - data://garden/technology/2023-03-08/microprocessor_trend
+    - data://garden/technology/2023-03-08/microprocessor_trend
 
   # Trust questions in World Values Survey
   data://meadow/wvs/2023-03-08/wvs_trust:
-  - snapshot://wvs/2023-03-08/wvs_trust.csv
+    - snapshot://wvs/2023-03-08/wvs_trust.csv
   data://garden/wvs/2023-03-08/wvs_trust:
-  - data://meadow/wvs/2023-03-08/wvs_trust
+    - data://meadow/wvs/2023-03-08/wvs_trust
   data://grapher/wvs/2023-03-08/wvs_trust:
-  - data://garden/wvs/2023-03-08/wvs_trust
+    - data://garden/wvs/2023-03-08/wvs_trust
 
   # Terrorism questions in World Values Survey (longitudinal)
   data://meadow/wvs/2023-06-25/longitudinal_wvs:
-  - snapshot://wvs/2023-06-25/longitudinal_wvs.csv
-  - data://garden/regions/2023-01-01/regions
+    - snapshot://wvs/2023-06-25/longitudinal_wvs.csv
+    - data://garden/regions/2023-01-01/regions
   data://garden/wvs/2023-06-25/longitudinal_wvs:
-  - data://meadow/wvs/2023-06-25/longitudinal_wvs
+    - data://meadow/wvs/2023-06-25/longitudinal_wvs
   data://grapher/wvs/2023-06-25/longitudinal_wvs:
-  - data://garden/wvs/2023-06-25/longitudinal_wvs
+    - data://garden/wvs/2023-06-25/longitudinal_wvs
 
   # USA consumer prices (US Bureau of Labor Statistics)
   data://meadow/bls/2023-03-10/us_consumer_prices:
-  - snapshot://bls/2023-03-09/us_consumer_prices.csv
+    - snapshot://bls/2023-03-09/us_consumer_prices.csv
   data://garden/bls/2023-03-10/us_consumer_prices:
-  - data://meadow/bls/2023-03-10/us_consumer_prices
+    - data://meadow/bls/2023-03-10/us_consumer_prices
   data://grapher/bls/2023-03-10/us_consumer_prices:
-  - data://garden/bls/2023-03-10/us_consumer_prices
+    - data://garden/bls/2023-03-10/us_consumer_prices
 
   # Historical Cross Country Technology Adoption Dataset (Comin & Hobijn, 2004)
   data://meadow/technology/2023-03-16/hcctad:
-  - snapshot://technology/2023-03-16/hcctad.txt
+    - snapshot://technology/2023-03-16/hcctad.txt
   data://garden/technology/2023-03-16/hcctad:
-  - data://meadow/technology/2023-03-16/hcctad
+    - data://meadow/technology/2023-03-16/hcctad
   data://grapher/technology/2023-03-16/hcctad:
-  - data://garden/technology/2023-03-16/hcctad
+    - data://garden/technology/2023-03-16/hcctad
 
   # Happiness report
   data://meadow/happiness/2023-03-20/happiness:
-  - snapshot://happiness/2023-03-20/happiness.xls
+    - snapshot://happiness/2023-03-20/happiness.xls
   data://meadow/happiness/2022-03-20/happiness:
-  - snapshot://happiness/2022-03-20/happiness.xls
+    - snapshot://happiness/2022-03-20/happiness.xls
   data://meadow/happiness/2021-03-20/happiness:
-  - snapshot://happiness/2021-03-20/happiness.xls
+    - snapshot://happiness/2021-03-20/happiness.xls
   data://meadow/happiness/2020-03-20/happiness:
-  - snapshot://happiness/2020-03-20/happiness.xls
+    - snapshot://happiness/2020-03-20/happiness.xls
   data://meadow/happiness/2019-03-20/happiness:
-  - snapshot://happiness/2019-03-20/happiness.xls
+    - snapshot://happiness/2019-03-20/happiness.xls
   data://meadow/happiness/2018-03-20/happiness:
-  - snapshot://happiness/2018-03-20/happiness.xls
+    - snapshot://happiness/2018-03-20/happiness.xls
   data://meadow/happiness/2017-03-20/happiness:
-  - snapshot://happiness/2017-03-20/happiness.xlsx
+    - snapshot://happiness/2017-03-20/happiness.xlsx
   data://meadow/happiness/2016-03-20/happiness:
-  - snapshot://happiness/2016-03-20/happiness.xlsx
+    - snapshot://happiness/2016-03-20/happiness.xlsx
   data://meadow/happiness/2015-03-20/happiness:
-  - snapshot://happiness/2015-03-20/happiness.xlsx
+    - snapshot://happiness/2015-03-20/happiness.xlsx
   data://meadow/happiness/2012-03-20/happiness:
-  - snapshot://happiness/2012-03-20/happiness.xlsx
+    - snapshot://happiness/2012-03-20/happiness.xlsx
 
   data://garden/happiness/2023-03-20/happiness:
-  - data://meadow/happiness/2023-03-20/happiness
-  - data://meadow/happiness/2022-03-20/happiness
-  - data://meadow/happiness/2021-03-20/happiness
-  - data://meadow/happiness/2020-03-20/happiness
-  - data://meadow/happiness/2019-03-20/happiness
-  - data://meadow/happiness/2018-03-20/happiness
-  - data://meadow/happiness/2017-03-20/happiness
-  - data://meadow/happiness/2016-03-20/happiness
-  - data://meadow/happiness/2015-03-20/happiness
-  - data://meadow/happiness/2012-03-20/happiness
+    - data://meadow/happiness/2023-03-20/happiness
+    - data://meadow/happiness/2022-03-20/happiness
+    - data://meadow/happiness/2021-03-20/happiness
+    - data://meadow/happiness/2020-03-20/happiness
+    - data://meadow/happiness/2019-03-20/happiness
+    - data://meadow/happiness/2018-03-20/happiness
+    - data://meadow/happiness/2017-03-20/happiness
+    - data://meadow/happiness/2016-03-20/happiness
+    - data://meadow/happiness/2015-03-20/happiness
+    - data://meadow/happiness/2012-03-20/happiness
   data://grapher/happiness/2023-03-20/happiness:
-  - data://garden/happiness/2023-03-20/happiness
+    - data://garden/happiness/2023-03-20/happiness
 
-# Equaldex dataset
+  # Equaldex dataset
   data://meadow/lgbt_rights/2023-04-13/equaldex:
-  - snapshot://lgbt_rights/2023-04-13/equaldex.csv
-  - snapshot://lgbt_rights/2023-04-13/equaldex_current.csv
+    - snapshot://lgbt_rights/2023-04-13/equaldex.csv
+    - snapshot://lgbt_rights/2023-04-13/equaldex_current.csv
   data://garden/lgbt_rights/2023-04-13/equaldex:
-  - data://meadow/lgbt_rights/2023-04-13/equaldex
+    - data://meadow/lgbt_rights/2023-04-13/equaldex
   data://grapher/lgbt_rights/2023-04-13/equaldex:
-  - data://garden/lgbt_rights/2023-04-13/equaldex
+    - data://garden/lgbt_rights/2023-04-13/equaldex
 
-# LGBTI Policy Index (Velasco, 2020)
+  # LGBTI Policy Index (Velasco, 2020)
   data://meadow/lgbt_rights/2023-04-27/lgbti_policy_index:
-  - snapshot://lgbt_rights/2023-04-27/lgbti_policy_index.xlsx
+    - snapshot://lgbt_rights/2023-04-27/lgbti_policy_index.xlsx
   data://garden/lgbt_rights/2023-04-27/lgbti_policy_index:
-  - data://meadow/lgbt_rights/2023-04-27/lgbti_policy_index
-  - data://garden/demography/2023-03-31/population
-  - data://garden/wb/2021-07-01/wb_income
+    - data://meadow/lgbt_rights/2023-04-27/lgbti_policy_index
+    - data://garden/demography/2023-03-31/population
+    - data://garden/wb/2021-07-01/wb_income
   data://grapher/lgbt_rights/2023-04-27/lgbti_policy_index:
-  - data://garden/lgbt_rights/2023-04-27/lgbti_policy_index
+    - data://garden/lgbt_rights/2023-04-27/lgbti_policy_index
 
   # Ethnic Power Relations Dataset
   data://meadow/eth/2023-03-15/growup:
-  - snapshot://eth/2023-03-15/growup.csv
+    - snapshot://eth/2023-03-15/growup.csv
   data://garden/eth/2023-03-15/ethnic_power_relations:
-  - data://meadow/eth/2023-03-15/growup
-  - data://garden/demography/2023-03-31/population
-  - data://garden/wb/2021-07-01/wb_income
-  - data://garden/regions/2023-01-01/regions
+    - data://meadow/eth/2023-03-15/growup
+    - data://garden/demography/2023-03-31/population
+    - data://garden/wb/2021-07-01/wb_income
+    - data://garden/regions/2023-01-01/regions
   data://grapher/eth/2023-03-15/ethnic_power_relations:
-  - data://garden/eth/2023-03-15/ethnic_power_relations
+    - data://garden/eth/2023-03-15/ethnic_power_relations
 
-# Oil Spills
+  # Oil Spills
   data://meadow/itopf/2023-05-18/oil_spills:
-  - snapshot://itopf/2023-05-18/oil_spills.pdf
+    - snapshot://itopf/2023-05-18/oil_spills.pdf
   data://garden/itopf/2023-05-18/oil_spills:
-  - data://meadow/itopf/2023-05-18/oil_spills
+    - data://meadow/itopf/2023-05-18/oil_spills
   data://grapher/itopf/2023-05-18/oil_spills:
-  - data://garden/itopf/2023-05-18/oil_spills
+    - data://garden/itopf/2023-05-18/oil_spills
 
-# UNWTO tourism
-    # Key indicators
+  # UNWTO tourism
+  # Key indicators
   data://meadow/tourism/2023-05-05/unwto:
-  - snapshot://tourism/2023-05-04/unwto.xlsx
+    - snapshot://tourism/2023-05-04/unwto.xlsx
   data://garden/tourism/2023-05-05/unwto:
-  - data://meadow/tourism/2023-05-05/unwto
-  - data://garden/owid/latest/key_indicators
-  - data://garden/worldbank_wdi/2022-05-26/wdi
-  - data://garden/oecd/2023-06-20/ppp_exchange_rates
+    - data://meadow/tourism/2023-05-05/unwto
+    - data://garden/owid/latest/key_indicators
+    - data://garden/worldbank_wdi/2022-05-26/wdi
+    - data://garden/oecd/2023-06-20/ppp_exchange_rates
   data://grapher/tourism/2023-05-11/unwto:
-  - data://garden/tourism/2023-05-05/unwto
+    - data://garden/tourism/2023-05-05/unwto
   # Environment Tables Implementations
   data://meadow/tourism/2023-05-09/unwto_environment:
-  - snapshot://tourism/2023-05-09/unwto_environment.xlsx
+    - snapshot://tourism/2023-05-09/unwto_environment.xlsx
   data://garden/tourism/2023-05-10/unwto_environment:
-  - data://meadow/tourism/2023-05-09/unwto_environment
+    - data://meadow/tourism/2023-05-09/unwto_environment
   data://grapher/tourism/2023-05-23/unwto_environment:
-  - data://garden/tourism/2023-05-10/unwto_environment
+    - data://garden/tourism/2023-05-10/unwto_environment
 
   # GDP
   data://meadow/tourism/2023-05-09/unwto_gdp:
-  - snapshot://tourism/2023-05-09/unwto_gdp.xlsx
+    - snapshot://tourism/2023-05-09/unwto_gdp.xlsx
   data://garden/tourism/2023-05-10/unwto_gdp:
-  - data://meadow/tourism/2023-05-09/unwto_gdp
+    - data://meadow/tourism/2023-05-09/unwto_gdp
   data://grapher/tourism/2023-05-23/unwto_gdp:
-  - data://garden/tourism/2023-05-10/unwto_gdp
+    - data://garden/tourism/2023-05-10/unwto_gdp
 
-# CO2 emissions from air transport (OECD)
+  # CO2 emissions from air transport (OECD)
   data://meadow/oecd/2023-05-18/co2_air_transport:
-  - snapshot://oecd/2023-05-18/co2_air_transport.csv
+    - snapshot://oecd/2023-05-18/co2_air_transport.csv
   data://garden/oecd/2023-05-19/co2_air_transport:
-  - data://garden/tourism/2023-05-05/unwto
-  - data://meadow/oecd/2023-05-18/co2_air_transport
+    - data://garden/tourism/2023-05-05/unwto
+    - data://meadow/oecd/2023-05-18/co2_air_transport
   data://grapher/oecd/2023-05-19/co2_air_transport:
-  - data://garden/oecd/2023-05-19/co2_air_transport
-
+    - data://garden/oecd/2023-05-19/co2_air_transport
 
   # WB income groups
   data://meadow/wb/2023-04-30/income_groups:
@@ -476,13 +477,13 @@ steps:
   data://grapher/wb/2023-04-30/income_groups:
     - data://garden/wb/2023-04-30/income_groups
 
-# International Monetary Fund, World Economic Outlook
-  data://meadow/imf/2023-05-02/world_economic_outlook:
-  - snapshot://imf/2023-05-02/world_economic_outlook.xls
-  data://garden/imf/2023-05-02/world_economic_outlook:
-  - data://meadow/imf/2023-05-02/world_economic_outlook
-  data://grapher/imf/2023-05-02/world_economic_outlook:
-  - data://garden/imf/2023-05-02/world_economic_outlook
+  # International Monetary Fund, World Economic Outlook
+  data://meadow/imf/2023-11-02/world_economic_outlook:
+    - snapshot://imf/2023-11-02/world_economic_outlook.xls
+  data://garden/imf/2023-11-02/world_economic_outlook:
+    - data://meadow/imf/2023-11-02/world_economic_outlook
+  data://grapher/imf/2023-11-02/world_economic_outlook:
+    - data://garden/imf/2023-11-02/world_economic_outlook
 
   # Patents & journal articles (World Bank, United Nations)
   data://garden/research_development/2023-05-05/patents_articles:
@@ -493,53 +494,192 @@ steps:
 
   # World Bank's Women, Business and the Law additional data
   data://meadow/wb/2023-05-12/women_business_law_additional:
-  - snapshot://wb/2023-05-12/women_business_law_additional.xlsx
+    - snapshot://wb/2023-05-12/women_business_law_additional.xlsx
   data://garden/wb/2023-05-12/women_business_law_additional:
-  - data://meadow/wb/2023-05-12/women_business_law_additional
+    - data://meadow/wb/2023-05-12/women_business_law_additional
   data://grapher/wb/2023-05-12/women_business_law_additional:
-  - data://garden/wb/2023-05-12/women_business_law_additional
+    - data://garden/wb/2023-05-12/women_business_law_additional
 
   # U.S. patent activity since 1790 (USPTO)
   data://meadow/research_development/2023-05-24/us_patents:
-  - snapshot://research_development/2023-05-24/us_patents.htm
+    - snapshot://research_development/2023-05-24/us_patents.htm
   data://garden/research_development/2023-05-25/us_patents:
-  - data://meadow/research_development/2023-05-24/us_patents
+    - data://meadow/research_development/2023-05-24/us_patents
   data://grapher/research_development/2023-05-25/us_patents:
-  - data://garden/research_development/2023-05-25/us_patents
+    - data://garden/research_development/2023-05-25/us_patents
 
   # OECD Income Distribution Database
   data://meadow/oecd/2023-06-06/income_distribution_database:
-  - snapshot://oecd/2023-06-06/income_distribution_database.csv
+    - snapshot://oecd/2023-06-06/income_distribution_database.csv
   data://garden/oecd/2023-06-06/income_distribution_database:
-  - data://meadow/oecd/2023-06-06/income_distribution_database
+    - data://meadow/oecd/2023-06-06/income_distribution_database
   data://grapher/oecd/2023-06-06/income_distribution_database:
-  - data://garden/oecd/2023-06-06/income_distribution_database
+    - data://garden/oecd/2023-06-06/income_distribution_database
 
   # Real commodity prices
   data://grapher/papers/2023-06-07/commodity_prices:
-  - data://garden/papers/2023-06-07/commodity_prices
+    - data://garden/papers/2023-06-07/commodity_prices
   data://garden/papers/2023-06-07/commodity_prices:
-  - snapshot://papers/2023-06-07/commodity_prices.xlsx
+    - snapshot://papers/2023-06-07/commodity_prices.xlsx
 
-
-# OECD exchange rates
+  # OECD exchange rates
   data://meadow/oecd/2023-06-20/ppp_exchange_rates:
-  - snapshot://oecd/2023-06-20/ppp_exchange_rates.csv
+    - snapshot://oecd/2023-06-20/ppp_exchange_rates.csv
   data://garden/oecd/2023-06-20/ppp_exchange_rates:
-  - data://meadow/oecd/2023-06-20/ppp_exchange_rates
+    - data://meadow/oecd/2023-06-20/ppp_exchange_rates
 
-# Terrorism
+  # Terrorism
   data://meadow/terrorism/2023-07-20/global_terrorism_database:
-  - snapshot://terrorism/2023-07-20/global_terrorism_database.csv
-  - snapshot://terrorism/2023-07-20/global_terrorism_database_2021.csv
+    - snapshot://terrorism/2023-07-20/global_terrorism_database.csv
+    - snapshot://terrorism/2023-07-20/global_terrorism_database_2021.csv
   data://garden/terrorism/2023-07-20/global_terrorism_database:
-  - data://meadow/terrorism/2023-07-20/global_terrorism_database
-  - data://garden/un/2022-07-11/un_wpp
-  - data://garden/demography/2023-03-31/population
-  - data://garden/regions/2023-01-01/regions
+    - data://meadow/terrorism/2023-07-20/global_terrorism_database
+    - data://garden/un/2022-07-11/un_wpp
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/demography/2023-03-31/population
   data://grapher/terrorism/2023-07-20/global_terrorism_database:
-  - data://garden/terrorism/2023-07-20/global_terrorism_database
+    - data://garden/terrorism/2023-07-20/global_terrorism_database
 
+  # UN IGME Child Mortality
+  data://meadow/un/2023-08-16/igme:
+    - snapshot://un/2023-08-16/igme.zip
+  data://garden/un/2023-08-16/igme:
+    - data://meadow/un/2023-08-16/igme
+    - data://garden/un/2018/igme
+  data://grapher/un/2023-08-16/igme:
+    - data://garden/un/2023-08-16/igme
+
+  # Colonial Dates Dataset (COLDAT)
+  data://meadow/harvard/2023-09-18/colonial_dates_dataset:
+    - snapshot://harvard/2023-09-18/colonial_dates_dataset.csv
+  data://garden/harvard/2023-09-18/colonial_dates_dataset:
+    - data://meadow/harvard/2023-09-18/colonial_dates_dataset
+    - data://garden/wb/2021-07-01/wb_income
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/demography/2023-03-31/population
+  data://grapher/harvard/2023-09-18/colonial_dates_dataset:
+    - data://garden/harvard/2023-09-18/colonial_dates_dataset
+
+  # Augmented Human Development Index
+  data://meadow/ahdi/2023-09-08/augmented_hdi:
+    - snapshot://ahdi/2023-09-08/augmented_hdi.xlsx
+    - snapshot://ahdi/2023-09-08/augmented_hdi_region.xlsx
+  data://garden/ahdi/2023-09-08/augmented_hdi:
+    - data://meadow/ahdi/2023-09-08/augmented_hdi
+  data://grapher/ahdi/2023-09-08/augmented_hdi:
+    - data://garden/ahdi/2023-09-08/augmented_hdi
+
+  # Gapminder  - Under five mortality v7
+  data://meadow/gapminder/2023-09-18/under_five_mortality:
+    - snapshot://gapminder/2023-09-18/under_five_mortality.xlsx
+  data://garden/gapminder/2023-09-18/under_five_mortality:
+    - data://meadow/gapminder/2023-09-18/under_five_mortality
+
+  #  Gapminder  - Under five mortality v11
+  data://meadow/gapminder/2023-09-21/under_five_mortality:
+    - snapshot://gapminder/2023-09-21/under_five_mortality.xlsx
+  data://garden/gapminder/2023-09-21/under_five_mortality:
+    - data://meadow/gapminder/2023-09-21/under_five_mortality
+
+  # Long-run child mortality, Gapminder + UN IGME
+  data://garden/un/2023-08-29/long_run_child_mortality:
+    - data://garden/un/2023-08-16/igme
+    - data://garden/gapminder/2023-09-18/under_five_mortality
+    - data://garden/gapminder/2023-09-21/under_five_mortality
+  data://grapher/un/2023-09-19/long_run_child_mortality:
+    - data://garden/un/2023-08-29/long_run_child_mortality
+
+  # Older vintage UN IGME (with longer time-series)
+  data://meadow/un/2018/igme:
+    - snapshot://un/2018/igme.csv
+  data://garden/un/2018/igme:
+    - data://meadow/un/2018/igme
+
+  # Country lists
+  data://meadow/countries/2023-09-25/isd:
+    - snapshot://countries/2023-09-22/isd.xlsx
+  data://garden/countries/2023-09-25/isd:
+    - data://meadow/countries/2023-09-25/isd
+    - data://garden/demography/2023-03-31/population
+  data://grapher/countries/2023-10-01/isd:
+    - data://garden/countries/2023-09-25/isd
+  data://meadow/countries/2023-09-25/gleditsch:
+    - snapshot://countries/2023-09-22/gleditsch_states.dat
+    - snapshot://countries/2023-09-22/gleditsch_microstates.dat
+  data://garden/countries/2023-09-25/gleditsch:
+    - data://meadow/countries/2023-09-25/gleditsch
+    - data://garden/demography/2023-03-31/population
+  data://grapher/countries/2023-10-01/gleditsch:
+    - data://garden/countries/2023-09-25/gleditsch
+  data://meadow/countries/2023-09-29/cow_ssm:
+    - snapshot://countries/2023-09-22/cow_ssm_majors.csv
+    - snapshot://countries/2023-09-22/cow_ssm_states.csv
+    - snapshot://countries/2023-09-22/cow_ssm_system.csv
+  data://garden/countries/2023-09-29/cow_ssm:
+    - data://meadow/countries/2023-09-29/cow_ssm
+    - data://garden/demography/2023-03-31/population
+  data://grapher/countries/2023-09-29/cow_ssm:
+    - data://garden/countries/2023-09-29/cow_ssm
+
+  # Fertility rate, Gapminder
+  data://meadow/gapminder/2023-09-22/total_fertility_rate:
+    - snapshot://gapminder/2023-09-22/total_fertility_rate.xlsx
+  data://garden/gapminder/2023-09-22/total_fertility_rate:
+    - data://meadow/gapminder/2023-09-22/total_fertility_rate
+    - data://garden/un/2023-08-29/long_run_child_mortality
+    - data://garden/un/2022-07-11/un_wpp
+  data://grapher/gapminder/2023-09-22/total_fertility_rate:
+    - data://garden/gapminder/2023-09-22/total_fertility_rate
+
+  # State Capacity Dataset
+  data://meadow/state_capacity/2023-10-19/state_capacity_dataset:
+    - snapshot://state_capacity/2023-10-19/state_capacity_dataset.dta
+  data://garden/state_capacity/2023-10-19/state_capacity_dataset:
+    - data://meadow/state_capacity/2023-10-19/state_capacity_dataset
+    - data://garden/wb/2021-07-01/wb_income
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/demography/2023-03-31/population
+  data://grapher/state_capacity/2023-10-19/state_capacity_dataset:
+    - data://garden/state_capacity/2023-10-19/state_capacity_dataset
+
+  # United Nations members
+  data://meadow/un/2023-10-30/un_members:
+    - snapshot://un/2023-10-30/un_members.csv
+  data://garden/un/2023-10-30/un_members:
+    - data://meadow/un/2023-10-30/un_members
+    - data://garden/wb/2021-07-01/wb_income
+    - data://garden/regions/2023-01-01/regions
+    - data://grapher/regions/latest/regions
+    - data://garden/demography/2023-03-31/population
+  data://grapher/un/2023-10-30/un_members:
+    - data://garden/un/2023-10-30/un_members
+
+  # UNU-WIDER Government Revenue Dataset
+  data://meadow/unu_wider/2023-11-01/government_revenue_dataset:
+    - snapshot://unu_wider/2023-11-01/government_revenue_dataset.dta
+  data://garden/unu_wider/2023-11-01/government_revenue_dataset:
+    - data://meadow/unu_wider/2023-11-01/government_revenue_dataset
+  data://grapher/unu_wider/2023-11-01/government_revenue_dataset:
+    - data://garden/unu_wider/2023-11-01/government_revenue_dataset
+
+  # World Bank - Worldwide Bureaucracy Indicators
+  data://meadow/wb/2023-11-21/worldwide_bureaucracy_indicators:
+    - snapshot://wb/2023-11-21/worldwide_bureaucracy_indicators.csv
+  data://garden/wb/2023-11-21/worldwide_bureaucracy_indicators:
+    - data://meadow/wb/2023-11-21/worldwide_bureaucracy_indicators
+  data://grapher/wb/2023-11-21/worldwide_bureaucracy_indicators:
+    - data://garden/wb/2023-11-21/worldwide_bureaucracy_indicators
+    
+  # Information Capacity Dataset
+  data://meadow/state_capacity/2023-11-10/information_capacity_dataset:
+    - snapshot://state_capacity/2023-11-10/information_capacity_dataset.dta
+  data://garden/state_capacity/2023-11-10/information_capacity_dataset:
+    - data://meadow/state_capacity/2023-11-10/information_capacity_dataset
+    - data://garden/wb/2021-07-01/wb_income
+    - data://garden/regions/2023-01-01/regions
+  data://grapher/state_capacity/2023-11-20/information_capacity_dataset:
+    - data://garden/state_capacity/2023-11-10/information_capacity_dataset
+    
 # European Social Survey - Trust questions
   data://meadow/ess/2023-08-02/ess_trust:
   - snapshot://ess/2023-08-02/ess_trust.csv
@@ -573,13 +713,26 @@ steps:
   data://grapher/survey/2023-08-04/trust_surveys:
   - data://garden/survey/2023-08-04/trust_surveys
 
+  ######################################################################################################################
+  # Older versions to be archived once they are not used by any other steps.
 
-# Sub-dags to import
+  # UN SDG - archive
+  data://meadow/un/2023-01-24/un_sdg:
+    - snapshot://un/2023-01-24/un_sdg.feather
+  data://garden/un/2023-01-24/un_sdg:
+    - data://meadow/un/2023-01-24/un_sdg
+    - snapshot://un/2023-01-24/un_sdg_unit.csv
+    - snapshot://un/2023-01-24/un_sdg_dimension.json
+  data://grapher/un/2023-01-24/un_sdg:
+    - data://garden/un/2023-01-24/un_sdg
+
+  ######################################################################################################################
+
 include:
   - dag/open_numbers.yml
   - dag/faostat.yml
   - dag/energy.yml
-  - dag/walkthrough.yml
+  - dag/wizard.yml
   - dag/examples.yml
   - dag/emissions.yml
   - dag/papers.yml
@@ -594,4 +747,8 @@ include:
   - dag/agriculture.yml
   - dag/space.yml
   - dag/artificial_intelligence.yml
+  - dag/education.yml
   - dag/covid.yml
+  - dag/animal_welfare.yml
+  - dag/plastic_use.yml
+  - dag/statins.yml

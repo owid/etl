@@ -1,18 +1,14 @@
 meta:
-  namespace: backport
-  short_name: dataset_443_life_satisfaction__eurobarometer__2017_values
-  file_extension: feather
-  date_accessed: 2023-02-23 18:49:28.079033
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/443
+    date_accessed: 2023-08-10 09:12:19.690425
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Life satisfaction – Eurobarometer (2017)
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/443
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: d079111bed5b49c71601cbaeef40162b
+- md5: d4eb6c4ef0b20c14f646bb30493d867d
   size: 13930
   path: dataset_443_life_satisfaction__eurobarometer__2017_values.feather

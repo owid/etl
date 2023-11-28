@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4643
+    date_accessed: 2023-08-11 07:17:53.539764
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_4643_countries_with_death_registration_data_that_are_at_least_75_percent_complete__1__yes__0__no
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: b42a4ebb591f159547da07b7d5884926
+  size: 1927
+  path: 
+    dataset_4643_countries_with_death_registration_data_that_are_at_least_75_percent_complete__1__yes__0__no_config.json

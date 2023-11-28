@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/865
+    date_accessed: 2023-08-10 14:44:02.767166
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Clio-Infra - Institutions
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: af5fb1ff17736c9b60ad47d1ba3e68b4
+  size: 381554
+  path: dataset_865_clio_infra__institutions_values.feather

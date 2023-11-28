@@ -1,12 +1,10 @@
 """Load a snapshot and create a meadow dataset."""
 
-from typing import Dict, List, cast
+from typing import Dict, List
 
-import owid.catalog.processing as pr
 from owid.catalog import Table
 
 from etl.helpers import PathFinder, create_dataset
-from etl.snapshot import Snapshot
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -74,14 +72,14 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Retrieve snapshot.
-    snap = cast(Snapshot, paths.load_dependency("uk_historical_electricity.xls"))
+    snap = paths.load_snapshot("uk_historical_electricity.xls")
 
     # Load data from the two relevant sheets of the excel file.
     # The original excel file is poorly formatted and will be hard to parse automatically.
-    data = pr.ExcelFile(snap.path)
-    tb_fuel_input = data.parse(sheet_name="Fuel input", metadata=snap.to_table_metadata())
-    tb_supply = data.parse(sheet_name="Supply, availability & consump", metadata=snap.to_table_metadata())
-    tb_efficiency = data.parse(sheet_name="Generated and supplied", metadata=snap.to_table_metadata())
+    data = snap.ExcelFile()
+    tb_fuel_input = data.parse(sheet_name="Fuel input")
+    tb_supply = data.parse(sheet_name="Supply, availability & consump")
+    tb_efficiency = data.parse(sheet_name="Generated and supplied")
 
     #
     # Process data.

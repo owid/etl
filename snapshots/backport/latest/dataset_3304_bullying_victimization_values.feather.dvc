@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/3304
+    date_accessed: 2023-08-10 15:04:21.406606
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Bullying victimization
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 14242432635a35d2dda70ae8c1e28b06
+  size: 389010
+  path: dataset_3304_bullying_victimization_values.feather

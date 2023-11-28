@@ -1,20 +1,15 @@
 meta:
-  namespace: backport
-  short_name: 
-    dataset_482_renewable_energy__pct_electricity_production__world_bank__2015_config
-  file_extension: json
-  date_accessed: 2023-06-01 13:11:33.813890
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/482
+    date_accessed: 2023-08-10 08:40:41.833096
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_482_renewable_energy__pct_electricity_production__world_bank__2015
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/482
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 974562f6d066ccaa8dc514766832c87e
-  size: 2068
+- md5: a32f1b8adc996b73d64d3a2f1a18d3a1
+  size: 2223
   path: 
     dataset_482_renewable_energy__pct_electricity_production__world_bank__2015_config.json

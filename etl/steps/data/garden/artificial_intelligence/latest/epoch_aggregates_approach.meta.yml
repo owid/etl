@@ -1,0 +1,50 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    processing_level: minor
+    presentation:
+      topic_tags:
+        - Artificial Intelligence
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
+dataset:
+  update_period_days: 31
+  title: Notable AI systems by machine learning approach
+
+origin:
+  date_published: '2023-10-27'
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
+tables:
+  epoch:
+    variables:
+      yearly_count:
+        title: Annual number of AI systems by machine learning approach
+        unit: 'AI systems'
+        short_unit: ''
+        description_key:
+            - The authors of the Epoch dataset have established a set of criteria to identify key AI systems, which they refer to as notable. These systems must demonstrate the ability to learn, show tangible experimental results, and contribute advancements that push the boundaries of existing AI technology. In terms of notability, the AI must have garnered extensive academic attention, evidenced by a high citation count, hold historical significance in the field, mark a substantial advancement in technology, or be implemented in a significant real-world context. Recognizing the difficulty in evaluating the impact of newer AI systems since 2020 due to less available data, the authors also employ subjective judgment in their selection process for recent developments.
+            - Self-supervised learning is a machine learning technique where the model learns from the data itself without requiring external labels or annotations. It leverages inherent structures or relationships within the data to create meaningful representations. Self-supervised learning is commonly used in natural language processing and computer vision tasks, where models learn to understand context and semantics from large unlabeled datasets.
+            - Unsupervised learning is a machine learning paradigm where the AI system explores patterns and structures within data without the presence of labeled examples. It aims to discover hidden relationships or groupings in the data. Unsupervised learning is applied in clustering, dimensionality reduction, and anomaly detection tasks. It's used when there are no predefined labels for the data.
+            - Reinforcement learning is a type of machine learning where an agent learns to make decisions by interacting with an environment. It receives feedback in the form of rewards or penalties for its actions and aims to maximize the cumulative reward over time. Reinforcement learning is commonly used in robotics, game playing (e.g., AlphaGo), and autonomous systems where agents must learn to make sequential decisions.
+            - Supervised learning  is a machine learning approach where the AI system is trained on a labeled dataset, meaning each input data point is associated with a known output or target. The model learns to map inputs to outputs based on this labeled data. Supervised learning is widely used in tasks such as image classification, sentiment analysis, and regression, where the goal is to make predictions or classifications based on labeled training data.
+        description_processing: >
+          Processing involved calculating total number of AI systems developed with each machine learning approach for each year.
+
+        display:
+          numDecimalPlaces: 0
+      cumulative_count:
+        title: Cumulative number of AI systems by machine learning approach
+        unit: 'AI systems'
+        short_unit: ''
+        description_key:
+            - The authors of the Epoch dataset have established a set of criteria to identify key AI systems, which they refer to as notable. These systems must demonstrate the ability to learn, show tangible experimental results, and contribute advancements that push the boundaries of existing AI technology. In terms of notability, the AI must have garnered extensive academic attention, evidenced by a high citation count, hold historical significance in the field, mark a substantial advancement in technology, or be implemented in a significant real-world context. Recognizing the difficulty in evaluating the impact of newer AI systems since 2020 due to less available data, the authors also employ subjective judgment in their selection process for recent developments.
+            - Self-supervised learning is a machine learning technique where the model learns from the data itself without requiring external labels or annotations. It leverages inherent structures or relationships within the data to create meaningful representations. Self-supervised learning is commonly used in natural language processing and computer vision tasks, where models learn to understand context and semantics from large unlabeled datasets.
+            - Unsupervised learning is a machine learning paradigm where the AI system explores patterns and structures within data without the presence of labeled examples. It aims to discover hidden relationships or groupings in the data. Unsupervised learning is applied in clustering, dimensionality reduction, and anomaly detection tasks. It's used when there are no predefined labels for the data.
+            - Reinforcement learning is a type of machine learning where an agent learns to make decisions by interacting with an environment. It receives feedback in the form of rewards or penalties for its actions and aims to maximize the cumulative reward over time. Reinforcement learning is commonly used in robotics, game playing (e.g., AlphaGo), and autonomous systems where agents must learn to make sequential decisions.
+            - Supervised learning  is a machine learning approach where the AI system is trained on a labeled dataset, meaning each input data point is associated with a known output or target. The model learns to map inputs to outputs based on this labeled data. Supervised learning is widely used in tasks such as image classification, sentiment analysis, and regression, where the goal is to make predictions or classifications based on labeled training data.
+        description_processing: >
+          For each year starting from 1950, the total number of AI systems developed with each machine learning approach was calculated by adding that year's count to the previous years' counts. This provides a running total or cumulative count of AI systems for each year and machine learning approach.
+
+        display:
+          numDecimalPlaces: 0

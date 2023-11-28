@@ -1,3 +1,9 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Population Growth
+
 dataset:
   title: Population doubling times (various sources, 2023.1)
   description: >-
@@ -10,15 +16,15 @@ tables:
       years_since_half_population:
         title: Years since population was half
         unit: years
-        description:
+        description_short:
           Number of years it took for a country or region to reach the current population since it had half of it.
       population:
         title: Population
         unit: people
-        description: >-
+        description_short: >-
           Population of a country or region for a given year.
       population_rounded:
         title: Population (rounded)
         unit: people
-        description:
+        description_short:
           Population of a country or region for a given year. It is measured in 10^8 precision. That means that, e.g. 521,000,000 gets rounded to 500,000,000.

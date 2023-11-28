@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2686
+    date_accessed: 2023-08-16 10:48:42.784105
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2686_urban_health (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: c22a26715f2e52fcb15e67b2459877bb
+  size: 111782
+  path: dataset_2686_urban_health_config.json

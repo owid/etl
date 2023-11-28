@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1454
+    date_accessed: 2023-08-10 14:39:45.249717
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Other cardiomyopathy
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 4d77e6f5e233367bdb6013946245ad87
+  size: 2012042
+  path: dataset_1454_other_cardiomyopathy_values.feather

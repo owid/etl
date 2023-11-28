@@ -1,18 +1,15 @@
 meta:
-  namespace: backport
-  short_name: dataset_697_us_female_labor_force_participation_1890_2005__olivetti__2013_values
-  file_extension: feather
-  date_accessed: 2023-02-23 16:45:04.803787
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/697
+    date_accessed: 2023-08-10 08:37:17.698628
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: US Female Labor Force Participation 1890-2005 - Olivetti (2013)
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/697
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: b6651cb55ee4d60192d07a766cd74941
+- md5: e7ffd5f1515b0125163e3914a056404a
   size: 6410
-  path: dataset_697_us_female_labor_force_participation_1890_2005__olivetti__2013_values.feather
+  path: 
+    dataset_697_us_female_labor_force_participation_1890_2005__olivetti__2013_values.feather

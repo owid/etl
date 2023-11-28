@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/831
+    date_accessed: 2023-08-14 10:59:34.394685
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_831_agri_environmental_indicators__livestock_patterns__fao__2017
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 45f70a460f082b6aa8416e5878eaa060
+  size: 74945
+  path: 
+    dataset_831_agri_environmental_indicators__livestock_patterns__fao__2017_config.json

@@ -1,7 +1,80 @@
-"""Load a meadow dataset and create a garden dataset."""
+"""COW War data dataset.
+
+- This dataset is built from four different files. Each of them come from the COW site, but have minor differences in
+the fields they contain, etc.
+
+- Each of the source files concerns a specific conflict type (i.e. one file only contains data on "inter-state" conflicts).
+    - Therefore, a conflict (or at least how it is identified in this dataset) never changes its type.
+    - There are fields explaining if a conflict transformed to another conflict (i.e. it stops being in the "inter-state" table with id X, and
+    starts being in the "intra-state" table with id Y).
+
+
+ON REGIONS
+
+    - Handling regions in COW dataset is complex because we are integrating four different datasets:
+        - Extra-state: Regions are as defined by REGIONS_RENAME.
+
+                        Originally encoded regions:
+
+                        1 = W. Hemisphere
+                        2 = Europe
+                        4 = Africa
+                        6 = Middle East
+                        7 = Asia
+                        9 = Oceania
+
+        - Non-state: Regions are as defined by REGIONS_RENAME.
+
+                        Originally encoded regions:
+
+                        1 = W. Hemisphere
+                        2 = Europe
+                        4 = Africa
+                        6 = Middle East
+                        7 = Asia
+                        9 = Oceania
+
+        - Inter-state: Contains several region composites*. We de-aggregate these and distribute deaths uniformly across its regions.
+                        If there are 10 deaths in "Asia & Europe", we assign 5 deaths to Asia and 5 deaths to Europe.
+
+                        Originally encoded regions:
+
+                        1 = W. Hemisphere
+                        2 = Europe
+                        4 = Africa
+                        6 = Middle East
+                        7 = Asia
+                        9 = Oceania
+                        11 = Europe & Middle East
+                        12 = Europe & Asia
+                        13 = W. Hemisphere & Asia
+                        14 = Europe, Africa & Middle East
+                        15 = Europe, Africa, Middle East, & Asia
+                        16 = Africa, Middle East, Asia & Oceania
+                        17 = Asia & Oceania
+                        18 = Africa & Middle East
+                        19 = Europe, Africa, Middle East, Asia & Oceania
+
+        - Intra-state: For some reason, regions follow a different numbering. Therefore we standardise this in `standardise_region_ids` (i.e. assign the correct numbers).
+                        Also, we have "undone" region composites. Note that we can't assign a conflict to multiple regions, since these are intra-state (i.e. should only be mapped to one region!).
+
+                        TODO: Why does intra-state use a different region numbering? (contact people from COW)
+
+                        Originally encoded regions:
+
+                        1 = North America
+                        2 = South America
+                        3 = Europe
+                        4 = Sub-Saharan Africa
+                        5 = Middle East and North Africa
+                        6 = Asia and Oceania.
+
+* A "region composite" is a region such that it is a combination of several regions, e.g. "Europe & Asia".
+
+"""
 
 import json
-from typing import List, Set, Tuple, cast
+from typing import List, Set, Tuple
 
 import numpy as np
 import pandas as pd
@@ -15,7 +88,8 @@ from etl.helpers import PathFinder, create_dataset
 paths = PathFinder(__file__)
 # Logger
 log = get_logger()
-# Region mapping (extra- and non-state, inter after de-aggregating)
+# Region mapping (extra- and non-state, intra after region code standardisation, and inter after de-aggregating composite regions)
+# Source suffix (e.g. '(COW)') is added later, in `combine_tables`
 REGIONS_RENAME = {
     1: "Americas",
     2: "Europe",
@@ -29,13 +103,20 @@ REGIONS_RENAME = {
 ## We have done this manually, and is summarised in the dictionary below.
 PATH_CUSTOM_REGIONS_INTRASTATE = paths.directory / "cow.intrastate.region_mapping_custom.json"
 
+# Last reported end years for each of the building datasets
+END_YEAR_MAX_EXTRA = 2007
+END_YEAR_MAX_INTRA = 2014
+END_YEAR_MAX_INTER = 2003
+END_YEAR_MAX_NONSTATE = 2005
+END_YEAR_MAX = min([END_YEAR_MAX_EXTRA, END_YEAR_MAX_INTRA, END_YEAR_MAX_INTER, END_YEAR_MAX_NONSTATE])
+
 
 def run(dest_dir: str) -> None:
     #
     # Load inputs.
     #
     # Load meadow dataset.
-    ds_meadow = cast(Dataset, paths.load_dependency("cow"))
+    ds_meadow = paths.load_dataset("cow")
 
     # Read data (there are four different tables)
     log.info("war.cow: load data")
@@ -201,6 +282,9 @@ def combine_tables(tb_extra: Table, tb_nonstate: Table, tb_inter: Table, tb_intr
     log.info("war.cow: rename regions")
     tb["region"] = tb["region"].map(REGIONS_RENAME | {"World": "World"})
     assert tb["region"].isna().sum() == 0, "Unmapped regions!"
+    # Add suffix with source name
+    msk = tb["region"] != "World"
+    tb.loc[msk, "region"] = tb.loc[msk, "region"] + " (COW)"
 
     # Sanity check on NaNs
     log.info("war.cow: check NaNs in `number_deaths_ongoing_conflicts`")
@@ -261,6 +345,10 @@ def _sanity_checks_extra(tb: Table) -> None:
     assert set(tb.loc[tb[col] < 0, col]) == {-9, -8}, f"Negative values other than -9 or -8 found for {col}"
     col = "year_end"
     assert set(tb.loc[tb[col] < 0, col]) == {-7}, f"Negative values other than -7 found for {col}"
+    # Check max end year is as expected
+    assert (
+        tb["year_end"].max() == END_YEAR_MAX_EXTRA - 1
+    ), f"Extra-state data is expected to have its latest end year by {END_YEAR_MAX_EXTRA - 1}, but that was not the case! Revisit this assertion and 'set NaNs' section in `replace_missing_data_with_zeros` function."
 
 
 def replace_negative_values_extra(tb: Table) -> Table:
@@ -344,6 +432,14 @@ def _sanity_check_nonstate(tb: Table) -> None:
     assert set(tb.loc[tb[col] < 0, col]) == {-9}, f"Negative values other than -9 found for {col}"
     # Check year end
     assert (tb["year_end"] > 1819).all(), "Unexpected value for `year_end`!"
+    # Check latest end year
+    assert (
+        tb["year_end"].max() == END_YEAR_MAX_NONSTATE
+    ), f"Non-state data is expected to have its latest end year by {END_YEAR_MAX_NONSTATE}, but that was not the case! Revisit this assertion and 'set NaNs' section in `replace_missing_data_with_zeros` function."
+    # Check outcome
+    assert (
+        tb["outcome"] != 5
+    ).all(), "Some conflicts are coded as if they were still on going in 2007! That shouldn't be the case! Check if maximum value for `year_end` has changed."
 
 
 ########################################################################
@@ -385,7 +481,15 @@ def _sanity_checks_inter(tb: Table) -> Table:
     col = "number_deaths_ongoing_conflicts"
     assert set(tb.loc[tb[col] < 0, col]) == {-9}, f"Negative values other than -9 found for {col}"
     # Check year end
-    assert not (tb["year_end"].isna().any()), "Unexpected NaN value for `year_end`!"
+    assert not (tb["year_end"].isna().any()), "Unexpected NaN values for `year_end`!"
+    assert not ((tb["year_end"] < 0).any()), "Unexpected negative values for `year_end`!"
+    assert (
+        tb["year_end"].max() == END_YEAR_MAX_INTER
+    ), f"Inter-state data is expected to have its latest end year by {END_YEAR_MAX_INTER}, but that was not the case! Revisit this assertion and 'set NaNs' section in `replace_missing_data_with_zeros` function."
+    # Check outcome
+    assert (
+        tb["outcome"] != 5
+    ).all(), "Some conflicts are coded as if they were still on going in 2007! That shouldn't be the case! Check if maximum value for `year_end` has changed."
 
 
 def aggregate_rows_by_periods_inter(tb: Table) -> Table:
@@ -425,23 +529,23 @@ def split_regions_composites(tb: Table) -> Table:
     to Europe and Asia, respectively.
     """
     REGIONS_INTER_SPLIT = {
-        # Europe & Middle East
+        # Europe & Middle East -> Europe, Middle East
         11: [2, 6],
-        # Europe & Asia
+        # Europe & Asia -> Europe, Asia
         12: [2, 7],
-        # Americas & Asia
+        # Americas & Asia -> Americas, Asia
         13: [1, 7],
-        # Europe & Africa & Middle East
+        # Europe & Africa & Middle East -> Europe, Africa, Middle East
         14: [2, 4, 6],
-        # Europe & Africa & Middle East & Asia
+        # Europe & Africa & Middle East & Asia -> Europe, Africa, Middle East, Asia
         15: [2, 4, 6, 7],
-        # Africa, Middle East, Asia & Oceania
+        # Africa, Middle East, Asia & Oceania -> Africa, Middle East, Asia, Oceania
         16: [4, 6, 7, 9],
-        # Asia & Oceania
+        # Asia & Oceania -> Asia, Oceania
         17: [7, 9],
-        # Africa & Middle East
+        # Africa & Middle East -> Africa, Middle East
         18: [4, 6],
-        # Europe, Africa, Middle East, Asia & Oceania
+        # Europe, Africa, Middle East, Asia & Oceania -> Europe, Africa, Middle East, Asia, Oceania
         19: [2, 4, 6, 7, 9],
     }
     tb["region"] = tb["region"].map(REGIONS_INTER_SPLIT).fillna(tb["region"])
@@ -501,6 +605,9 @@ def _sanity_checks_intra(tb: Table) -> None:
     col = "year_end"
     assert not (tb[col].isna().any()), "Unexpected NaN value for `year_end`!"
     assert set(tb.loc[tb[col] < 0, col]) == {-7}, f"Negative values other than -7 found for {col}"
+    assert (
+        tb["year_end"].max() == END_YEAR_MAX_INTRA
+    ), f"Intra-state data is expected to have its latest end year by {END_YEAR_MAX_INTRA}, but that was not the case! Revisit this assertion and 'set NaNs' section in `replace_missing_data_with_zeros` function."
 
 
 def replace_negative_values_intra(tb: Table) -> Table:
@@ -523,10 +630,10 @@ def standardise_region_ids(tb: Table) -> Table:
 
     Also, this dataset uses composite regions, such as "Middle East and Northern Africa" or "Asia and Oceania". This function
     replaces rows with these composites with individual valid regions. That is, assigns "Africa" to a conflict labeled with region
-    "Middle East and Northern Afrrica", if that's the actual region. This has been done manually, bu carefully assigning regions to
+    "Middle East and Northern Africa", if that's the actual region. This has been done manually, by carefully assigning regions to
     each conflict.
     """
-    # Map to standard numbering
+    # Map to standard numbering (COW Intra-state uses different numbering)
     regions_mapping = {
         1: 1,  # Americas (NA)
         2: 1,  # Americas (SA)
@@ -591,7 +698,10 @@ def load_cow_table(
     check_unique_for_location: bool = True,
 ):
     """Read table from dataset."""
-    tb = ds[table_name]
+    tb = ds[table_name].reset_index()
+
+    # Reset index
+    tb = tb.reset_index()
 
     # Check year start/end (missing?)
     assert (tb[column_start_year] != -9).all(), "There is at least one entry with unknown `column_start_year`"
@@ -638,7 +748,6 @@ def load_cow_table(
     for col in columns_deaths:
         tb[col] = tb[col].astype(str).str.replace(",", "").astype("Int64")
     tb["warnum"] = tb["warnum"].astype(float).round(1)
-
     return tb
 
 
@@ -730,7 +839,17 @@ def _get_ongoing_metrics(tb: Table) -> Table:
     tb_ongoing_world_intra["conflict_type"] = "intra-state"
 
     ## Combine all
-    tb_ongoing = pd.concat([tb_ongoing, tb_ongoing_alltypes, tb_ongoing_world, tb_ongoing_world_alltypes, tb_ongoing_intra, tb_ongoing_world_intra], ignore_index=True).sort_values(  # type: ignore
+    tb_ongoing = pd.concat(
+        [
+            tb_ongoing,
+            tb_ongoing_alltypes,
+            tb_ongoing_world,
+            tb_ongoing_world_alltypes,
+            tb_ongoing_intra,
+            tb_ongoing_world_intra,
+        ],
+        ignore_index=True,
+    ).sort_values(  # type: ignore
         by=["year", "region", "conflict_type"]
     )
 
@@ -783,7 +902,10 @@ def _get_new_metrics(tb: Table) -> Table:
     tb_new_world_intra["conflict_type"] = "intra-state"
 
     ## Combine
-    tb_new = pd.concat([tb_new, tb_new_alltypes, tb_new_world, tb_new_world_alltypes, tb_new_intra, tb_new_world_intra], ignore_index=True).sort_values(  # type: ignore
+    tb_new = pd.concat(
+        [tb_new, tb_new_alltypes, tb_new_world, tb_new_world_alltypes, tb_new_intra, tb_new_world_intra],
+        ignore_index=True,
+    ).sort_values(  # type: ignore
         by=["year_start", "region", "conflict_type"]
     )
 
@@ -818,4 +940,21 @@ def replace_missing_data_with_zeros(tb: Table) -> Table:
     ]
     tb.loc[:, columns] = tb.loc[:, columns].fillna(0)
 
+    # Set NaNs
+    tb.loc[(tb["year"] > END_YEAR_MAX) & (tb["conflict_type"] == "all"), columns] = np.nan
+    tb.loc[(tb["year"] > END_YEAR_MAX_EXTRA) & (tb["conflict_type"] == "extra-state"), columns] = np.nan
+    tb.loc[(tb["year"] > END_YEAR_MAX_INTER) & (tb["conflict_type"] == "inter-state"), columns] = np.nan
+    tb.loc[
+        (tb["year"] > END_YEAR_MAX_INTRA)
+        & (
+            tb["conflict_type"].isin(
+                ["intra-state", "intra-state (internationalized)", "intra-state (non-internationalized)"]
+            )
+        ),
+        columns,
+    ] = np.nan
+    tb.loc[(tb["year"] > END_YEAR_MAX_NONSTATE) & (tb["conflict_type"] == "non-state"), columns] = np.nan
+
+    # Drop all-NaN rows
+    tb = tb.dropna(subset=columns, how="all")
     return tb

@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4758
+    date_accessed: 2023-08-14 15:50:53.215371
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_4758_legal_frameworks_that_promote__enforce_and_monitor_gender_equality__percentage_of_achievement__0__100__area_2__violence_against_women
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: eb1d057f5acc22d7ac5c0c0a3cc37bda
+  size: 22504
+  path: 
+    dataset_4758_legal_frameworks_that_promote__enforce_and_monitor_gender_equality__percentage_of_achievement__0__100__area_2__violence_against_women_config.json

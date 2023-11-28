@@ -1,18 +1,14 @@
 meta:
-  namespace: backport
-  short_name: dataset_805_agri_environmental_indicators__energy__fao__2017_values
-  file_extension: feather
-  date_accessed: 2023-02-23 16:27:39.075674
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/805
+    date_accessed: 2023-08-10 09:06:25.181062
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: 'Agri-Environmental Indicators: Energy - FAO (2017)'
   description: This is a dataset imported by the automated fetcher
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/805
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 7bcdc121f2f3a179264cdafe74fa81f7
+- md5: 0a7921b1be89e5deb4da04161312d1c3
   size: 53250
   path: dataset_805_agri_environmental_indicators__energy__fao__2017_values.feather

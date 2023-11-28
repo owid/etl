@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1645
+    date_accessed: 2023-08-16 09:40:21.888155
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Vitamin A deficiency
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 1af77d63ce67d4559e0c1aeb811e763d
+  size: 840154
+  path: dataset_1645_vitamin_a_deficiency_values.feather

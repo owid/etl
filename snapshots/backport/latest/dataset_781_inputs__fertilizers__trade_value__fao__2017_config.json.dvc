@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/781
+    date_accessed: 2023-08-14 15:32:45.882218
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_781_inputs__fertilizers__trade_value__fao__2017
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 756a5347cbb85f133519a1a94dc80839
+  size: 20609
+  path: dataset_781_inputs__fertilizers__trade_value__fao__2017_config.json

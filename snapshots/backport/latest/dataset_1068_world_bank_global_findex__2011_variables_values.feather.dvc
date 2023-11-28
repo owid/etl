@@ -1,18 +1,14 @@
 meta:
-  namespace: backport
-  short_name: dataset_1068_world_bank_global_findex__2011_variables_values
-  file_extension: feather
-  date_accessed: 2023-02-23 17:53:02.834098
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1068
+    date_accessed: 2023-08-10 09:06:16.701356
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: World Bank Global Findex - 2011 Variables
   description: This is a dataset imported by the automated fetcher
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/1068
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: a9f52bc101aa37589eb3ab0c26d78d9e
+- md5: a1a912cdf4622a95f3c3564fb8565552
   size: 376146
   path: dataset_1068_world_bank_global_findex__2011_variables_values.feather

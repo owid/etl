@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1448
+    date_accessed: 2023-08-10 14:35:01.822391
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1448_cellulitis (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: ba5d15d5be2272d335bc1fa0a7b68450
+  size: 31175
+  path: dataset_1448_cellulitis_config.json

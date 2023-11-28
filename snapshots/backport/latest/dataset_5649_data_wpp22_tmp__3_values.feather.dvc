@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5649
+    date_accessed: 2023-08-16 09:33:15.967906
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: data-wpp22-tmp(3)
+  description: ''
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 559100d0f8efa30e16dea3a2a47b57ca
+  size: 9058
+  path: dataset_5649_data_wpp22_tmp__3_values.feather

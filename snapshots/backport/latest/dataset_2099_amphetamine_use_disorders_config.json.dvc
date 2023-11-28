@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2099
+    date_accessed: 2023-08-14 08:14:27.267846
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2099_amphetamine_use_disorders (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: a85c6a79db9b61b6ec77f7be6da27b20
+  size: 32914
+  path: dataset_2099_amphetamine_use_disorders_config.json

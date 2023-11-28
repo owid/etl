@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2787
+    date_accessed: 2023-08-16 08:15:20.072651
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_2787_population_using_informal_saving__pct__world_bank_world_development_report__2013
+    (archived)
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: c5dba29b3727431b7f2713273b1fea11
+  size: 2412
+  path: 
+    dataset_2787_population_using_informal_saving__pct__world_bank_world_development_report__2013_config.json

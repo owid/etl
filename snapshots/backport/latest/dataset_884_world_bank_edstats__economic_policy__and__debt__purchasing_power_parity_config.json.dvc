@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/884
+    date_accessed: 2023-08-14 05:43:49.565066
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_884_world_bank_edstats__economic_policy__and__debt__purchasing_power_parity
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 93a474162a71dbfd4b140165cc181dc9
+  size: 12199
+  path: 
+    dataset_884_world_bank_edstats__economic_policy__and__debt__purchasing_power_parity_config.json

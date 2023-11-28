@@ -1,0 +1,45 @@
+meta:
+  source:
+    name: Google Sheet
+    url: https://www.unoosa.org/oosa/osoindex/search-ng.jspx
+    source_data_url: 
+      https://docs.google.com/spreadsheets/d/e/2PACX-1vS0rsoIS37xrLx_JRHO2mdsqHmVreN255IRUSP1YLEP26NnIOz3bHLz5fDmR2bnTwwEY5gttb17fZgU/pub?output=csv
+    date_accessed: '2023-09-29'
+    publication_year: '2023'
+    published_by: Google Sheet
+  name: Online Index of Objects Launched into Outer Space (UN, 2023-09-29)
+  description: >-
+    This data is compiled from the Online Index of Objects Launched into Outer Space,
+    maintained by the United Nations Office
+    for Outer Space Affairs.
+
+
+    Since 1962, the United Nations has maintained a Register of Objects Launched into
+    Outer Space. Originally established
+    as a mechanism to aid the United Nations Committee on the Peaceful Uses of Outer
+    Space in its discussions on the political,
+    legal, and technical issues concerning outer space, the evolution of international
+    space law resulted in space object
+    registration becoming a means of identifying which States' bear international
+    responsibility and liability for space objects.
+
+
+    The source indicates that around 87% of all satellites, probes, landers, crewed
+    spacecraft, and space station flight elements
+    launched into Earth orbit or beyond have been registered with the Secretary-General.
+
+
+    In the data shown on our charts:
+
+    - when an object is launched by a country on behalf of another one, it is attributed
+    to the latter;
+
+    - when a launch is made jointly by several countries, it is recorded in each of
+    these countries' time series, but only
+    once in the 'World' series.
+  license: {}
+wdir: ../../../data/snapshots/fasttrack/2023-09-29
+outs:
+- md5: 44879ab7f57a44915bcd36b4b7833fd5
+  size: 22610
+  path: un_space_objects.csv

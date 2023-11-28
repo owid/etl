@@ -1,18 +1,15 @@
 meta:
-  namespace: backport
-  short_name: dataset_5534_nuclear_weapons_tests__arms_control_association__2020_values
-  file_extension: feather
-  date_accessed: 2023-02-23 18:57:00.988217
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5534
+    date_accessed: 2023-08-10 08:55:02.013837
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Nuclear weapons tests – Arms Control Association (2020)
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/5534
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 8860d2656f630aa9fa619acf60c9e90d
+- md5: a5eaa731a899bd78594174b3fa82e34d
   size: 7434
-  path: dataset_5534_nuclear_weapons_tests__arms_control_association__2020_values.feather
+  path: 
+    dataset_5534_nuclear_weapons_tests__arms_control_association__2020_values.feather

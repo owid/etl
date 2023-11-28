@@ -1,13 +1,15 @@
 import copy
 import warnings
 from copy import deepcopy
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, is_dataclass
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Literal, Optional, Set, cast
 
+import jinja2
 import numpy as np
 import pandas as pd
 import structlog
+from jinja2 import Environment
 from owid import catalog
 from owid.catalog.utils import underscore
 
@@ -16,16 +18,19 @@ from etl.db_utils import DBUtils
 
 log = structlog.get_logger()
 
-
-INT_TYPES = (
-    "int",
-    "uint16",
-    "Int16",
-    "uint32",
-    "Int32",
-    "uint64",
-    "Int64",
+jinja_env = Environment(
+    block_start_string="<%",
+    block_end_string="%>",
+    variable_start_string="<<",
+    variable_end_string=">>",
+    comment_start_string="<#",
+    comment_end_string="#>",
+    trim_blocks=True,
+    lstrip_blocks=True,
 )
+
+# this might work too pd.api.types.is_integer_dtype(col)
+INT_TYPES = tuple({f"{n}{b}" for n in ("int", "Int", "uint", "UInt") for b in ("8", "16", "32", "64")})
 
 
 def as_table(df: pd.DataFrame, table: catalog.Table) -> catalog.Table:
@@ -36,10 +41,36 @@ def as_table(df: pd.DataFrame, table: catalog.Table) -> catalog.Table:
     return t
 
 
+def expand_dimensions(tb: catalog.Table) -> catalog.Table:
+    """Expands dataframe with extra dimensions beyond country and year into multiple tables.
+    For instance DataFrame with index names [country, year, sex, a] would expand into a table
+    with columns [country, year, a__sex_male, a__sex_female].
+
+    This function is not very memory efficient as it returns a table that will be very sparse.
+    """
+    # rename country to entity_id for the sake of `_yield_wide_table`
+    tb = tb.reset_index("country").rename(columns={"country": "entity_id"}).set_index("entity_id", append=True)
+    tables = list(_yield_wide_table(tb, na_action="drop", warn_null_variables=False))
+
+    # join all tables
+    # NOTE: we could also return individual tables to reduce memory usage
+    expanded_table = catalog.tables.concat(tables, axis=1)
+
+    # rename entity_id back to country
+    expanded_table = (
+        expanded_table.reset_index("entity_id")
+        .rename(columns={"entity_id": "country"})
+        .set_index("country", append=True)
+    )
+
+    return expanded_table
+
+
 def _yield_wide_table(
     table: catalog.Table,
     na_action: Literal["drop", "raise"] = "raise",
     dim_titles: Optional[List[str]] = None,
+    warn_null_variables: bool = True,
 ) -> Iterable[catalog.Table]:
     """We have 5 dimensions but graphers data model can only handle 2 (year and entityId). This means
     we have to iterate all combinations of the remaining 3 dimensions and create a new variable for
@@ -76,20 +107,21 @@ def _yield_wide_table(
         dim_titles = dim_names
 
     if dim_names:
-        grouped = table.groupby(dim_names, as_index=False, observed=True)
+        grouped = table.groupby(dim_names if len(dim_names) > 1 else dim_names[0], as_index=False, observed=True)
     else:
         # a situation when there's only year and entity_id in index with no additional dimensions
         grouped = [([], table)]
 
-    for dims, table_to_yield in grouped:
-        dims = [dims] if isinstance(dims, str) else dims
+    for dim_values, table_to_yield in grouped:
+        dim_values = [dim_values] if isinstance(dim_values, str) else dim_values
 
         # Now iterate over every column in the original dataset and export the
         # subset of data that we prepared above
         for column in table_to_yield.columns:
             # If all values are null, skip variable
             if table_to_yield[column].isnull().all():
-                log.warning("yield_wide_table.null_variable", column=column, dims=dims)
+                if warn_null_variables:
+                    log.warning("yield_wide_table.null_variable", column=column, dims=dim_values)
                 continue
 
             # Safety check to see if the metadata is still intact
@@ -99,40 +131,85 @@ def _yield_wide_table(
 
             # Select only one column and dimensions for performance
             tab = table_to_yield[[column]].copy()
-            tab.metadata = copy.deepcopy(tab.metadata)
 
             # Drop NA values
             tab = tab.dropna() if na_action == "drop" else tab
 
             # Create underscored name of a new column from the combination of column and dimensions
-            short_name = _underscore_column_and_dimensions(column, dims, dim_names)
+            short_name = _underscore_column_and_dimensions(column, dim_values, dim_names)
 
             # set new metadata with dimensions
             tab.metadata.short_name = short_name
             tab = tab.rename(columns={column: short_name})
 
             # add info about dimensions to metadata
-            if dims:
+            if dim_values:
                 tab[short_name].metadata.additional_info = {
                     "dimensions": {
                         "originalShortName": column,
                         "originalName": tab[short_name].metadata.title,
                         "filters": [
-                            {"name": dim_name, "value": dim_value} for dim_name, dim_value in zip(dim_names, dims)
+                            {"name": dim_name, "value": sanitize_numpy(dim_value)}
+                            for dim_name, dim_value in zip(dim_names, dim_values)
                         ],
                     }
                 }
 
+            dim_dict = dict(zip(dim_names, dim_values))
+
             # Add dimensions to title (which will be used as variable name in grapher)
-            title_with_dims: Optional[str]
             if tab[short_name].metadata.title:
-                title_with_dims = _title_column_and_dimensions(tab[short_name].metadata.title, dims, dim_titles)
+                # We use template as a title
+                if _uses_jinja(tab[short_name].metadata.title):
+                    title_with_dims = _expand_jinja_text(tab[short_name].metadata.title, dim_dict)
+                # Otherwise use default
+                else:
+                    title_with_dims = _title_column_and_dimensions(
+                        tab[short_name].metadata.title, dim_values, dim_titles
+                    )
+
                 tab[short_name].metadata.title = title_with_dims
-            else:
-                title_with_dims = None
+
+            # traverse metadata and expand Jinja
+            tab[short_name].metadata = _expand_jinja(tab[short_name].metadata, dim_dict)
 
             # Keep only entity_id and year in index
             yield tab.reset_index().set_index(["entity_id", "year"])[[short_name]]
+
+
+def _uses_jinja(text: Optional[str]):
+    if not text:
+        return False
+    return "<%" in text or "<<" in text
+
+
+def _expand_jinja_text(text: str, dim_dict: Dict[str, str]) -> str:
+    if not _uses_jinja(text):
+        return text
+
+    try:
+        return jinja_env.from_string(text).render(dim_dict)
+    except jinja2.exceptions.TemplateSyntaxError as e:
+        new_message = f"{e.message}\n\nDimensions:\n{dim_dict}\n\nTemplate:\n{text}\n"
+        raise e.__class__(new_message, e.lineno, e.name, e.filename) from e
+
+
+def _expand_jinja(obj: Any, dim_dict: Dict[str, str]) -> Any:
+    """Expand Jinja in all metadata fields."""
+    if obj is None:
+        return None
+    elif isinstance(obj, str):
+        return _expand_jinja_text(obj, dim_dict)
+    elif is_dataclass(obj):
+        for k, v in obj.__dict__.items():
+            setattr(obj, k, _expand_jinja(v, dim_dict))
+        return obj
+    elif isinstance(obj, list):
+        return type(obj)([_expand_jinja(v, dim_dict) for v in obj])
+    elif isinstance(obj, dict):
+        return {k: _expand_jinja(v, dim_dict) for k, v in obj.items()}
+    else:
+        return obj
 
 
 def _title_column_and_dimensions(title: str, dims: List[str], dim_names: List[str]) -> str:
@@ -345,19 +422,20 @@ def _adapt_dataset_metadata_for_grapher(
 
     """
     # Combine metadata sources into one.
-    metadata.sources = [combine_metadata_sources(metadata.sources)]
+    if metadata.sources:
+        metadata.sources = [combine_metadata_sources(metadata.sources)]
 
-    # Add the dataset description as if it was a source's description.
-    if metadata.description is not None:
-        if metadata.sources[0].description:
-            # If descriptions are not subsets of each other (or equal), add them together
-            if (
-                metadata.sources[0].description not in metadata.description
-                and metadata.description not in metadata.sources[0].description
-            ):
-                metadata.sources[0].description = metadata.description + "\n" + metadata.sources[0].description
-        else:
-            metadata.sources[0].description = metadata.description
+        # Add the dataset description as if it was a source's description.
+        if metadata.description is not None:
+            if metadata.sources[0].description:
+                # If descriptions are not subsets of each other (or equal), add them together
+                if (
+                    metadata.sources[0].description not in metadata.description
+                    and metadata.description not in metadata.sources[0].description
+                ):
+                    metadata.sources[0].description = metadata.description + "\n" + metadata.sources[0].description
+            else:
+                metadata.sources[0].description = metadata.description
 
     # Empty dataset description (otherwise it will appear in `Internal notes` in the admin UI).
     metadata.description = ""
@@ -422,6 +500,12 @@ def _ensure_source_per_variable(table: catalog.Table) -> catalog.Table:
     dataset_meta = table.metadata.dataset
     for column in table.columns:
         variable_meta: catalog.VariableMeta = table[column].metadata
+
+        # If neither variable and dataset has no sources, we're using origins instead.
+        if len(variable_meta.sources) == 0 and len(dataset_meta.sources) == 0:
+            assert len(variable_meta.origins) > 0, f"Variable `{column}` has no sources or origins."
+            continue
+
         if len(variable_meta.sources) == 0:
             # Take the metadata sources from the dataset's metadata (after combining them into one).
             assert (
@@ -492,3 +576,105 @@ class IntRange:
 def contains_inf(s: pd.Series) -> bool:
     """Check if a series contains infinity."""
     return pd.api.types.is_numeric_dtype(s.dtype) and np.isinf(s).any()  # type: ignore
+
+
+def sanitize_numpy(obj: Any) -> Any:
+    """Sanitize numpy types so that we can insert them into MySQL."""
+    if isinstance(obj, np.integer):
+        return int(obj)
+    elif isinstance(obj, np.floating):
+        return float(obj)
+    elif isinstance(obj, np.ndarray):
+        return obj.tolist()
+    return obj
+
+
+def add_columns_for_multiindicator_chart(
+    table: catalog.Table,
+    columns_in_chart: List[str],
+    chart_slug: str,
+    suffix_for_titles: Optional[str] = None,
+    columns_to_fill_with_zeros: Optional[List[str]] = None,
+) -> catalog.Table:
+    """Add columns that will be used in a specific multi-indicator (e.g. a stacked area) chart handling issues with
+    missing data.
+
+    There are two common data issues that affect multi-indicator charts:
+    1. Some indicators have missing data that should be zeros. This is a common bad practice done by data producers.
+      For example, in the Statistical Review of World Energy, nuclear power for Australia before 2000 is missing, and
+      Kazakhstan has no data on nuclear energy after 2000. In both cases, those missing values should be zero (since
+      there was no nuclear power for those years in those countries).
+    2. Different indicators have missing data for different years. This makes sense: Some indicators are better informed
+      than others.
+      For example, in the Electricity Mix dataset, Algeria in 2022 has data for renewables but not for fossil fuels.
+      In stacked area charts showing renewable and fossil electricity, Algeria appears as 100% renewable in 2022,
+      which is clearly wrong.
+
+    This function can be used to create columns for all indicators used in a specific multi-indicator chart.
+    It will:
+    * Optionally, fill missing data for some of the new columns with zeros.
+      In the example of issue 1, nuclear power could be filled with zeros.
+    * Make nan rows in the new columns if any indicator used in the chart is nan.
+      In the example of issue 2, Algeria's renewable electricity in 2022 would be nan.
+
+    NOTES:
+    * This function assumes a wide-format table.
+    * In the grapher admin, ensure you select "Hide entities with missing data" in the corresponding chart.
+    * This function creates new columns and does not affect already existing ones.
+
+    Parameters
+    ----------
+    table : Table
+        Original table.
+    columns_in_chart : List[str]
+        Column names in the relevant multi-indicator chart.
+    chart_slug : str
+        URL slug of the chart, which will be added to the name of the new columns.
+        By convention, the suffix added to columns will be "_chart_" followed by the chart's slug in snake case format.
+    suffix_for_titles: Optional[str]
+        Suffix to be added to the new columns' titles, to avoid having multiple indicators with the same title.
+    columns_to_fill_with_zeros : Optional[List[str]]
+        Subset of columns_in_chart whose nans should be filled with zeros.
+        Note: The original columns will not be affected, only the newly created ones.
+
+    Returns
+    -------
+    table: Table
+        Original table with new columns.
+
+    """
+    table = table.copy()
+
+    def _rename_column(old_column_name: str, chart_slug: str) -> str:
+        # Generate a name for a new column based on the old column name and the chart slug.
+        return f"{old_column_name}_chart_{underscore(chart_slug)}"
+
+    # Create new columns.
+    new_columns = [_rename_column(old_column_name=column, chart_slug=chart_slug) for column in columns_in_chart]
+    table[new_columns] = table[columns_in_chart].copy()
+
+    # Optionally fill some of the new columns with zeros.
+    if columns_to_fill_with_zeros is not None:
+        # Sanity check.
+        error = "columns_to_fill_with_zeros should be a subset of columns_in_chart."
+        assert set(columns_to_fill_with_zeros) <= set(columns_in_chart), error
+        # Fill nans with zeros (in new columns).
+        new_columns_to_fill_with_zeros = [
+            _rename_column(old_column_name=column, chart_slug=chart_slug) for column in columns_to_fill_with_zeros
+        ]
+        table[new_columns_to_fill_with_zeros] = table[new_columns_to_fill_with_zeros].fillna(0)
+
+    # For each row, if any of the columns in the chart is nan, fill other columns in the same row with nan.
+    table.loc[table[new_columns].isnull().any(axis=1), new_columns] = np.nan
+
+    # Handle metadata.
+    for column in new_columns:
+        # If the indicator did not have any display name, use the original title.
+        if ("name" not in table[column].display) or (table[column].metadata.display["name"] is None):
+            table[column].metadata.display["name"] = table[column].metadata.title
+        # To avoid having multiple indicators with the same title, add a suffix to the title.
+        if suffix_for_titles is None:
+            suffix_for_titles = f" (adapted for visualization of chart {chart_slug})"
+        table[column].metadata.title += suffix_for_titles
+
+    return table

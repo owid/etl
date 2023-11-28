@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/139
+    date_accessed: 2023-08-16 08:43:41.350200
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_139_life_expectancy_at_age_10__1750_2100__united_nations_population_division_and_human_mortality_database__2015
+    (archived)
+  description: ''
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: da6558858df787e068e43e76365ca57d
+  size: 3088
+  path: 
+    dataset_139_life_expectancy_at_age_10__1750_2100__united_nations_population_division_and_human_mortality_database__2015_config.json

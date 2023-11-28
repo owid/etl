@@ -10,10 +10,12 @@ import re
 import subprocess
 import sys
 import tempfile
+import time
 import warnings
 from collections import defaultdict
 from dataclasses import dataclass, field
 from glob import glob
+from importlib import import_module
 from pathlib import Path
 from threading import Lock
 from typing import Any, Dict, Iterable, List, Optional, Protocol, Set, Union, cast
@@ -27,11 +29,10 @@ from owid import catalog
 from owid.walden import CATALOG as WALDEN_CATALOG
 from owid.walden import Dataset as WaldenDataset
 
-from etl import config, files, git
+from etl import config, files, git, paths
 from etl import grapher_helpers as gh
-from etl import paths
 from etl.db import get_engine
-from etl.snapshot import _unignore_backports
+from etl.snapshot import _unignore_backports, get_dvc
 
 log = structlog.get_logger()
 
@@ -97,8 +98,8 @@ def filter_to_subgraph(graph: Graph, includes: Iterable[str], downstream: bool =
     included = {s for s in all_steps if any(re.findall(pattern, s) for pattern in includes)}
 
     if only:
-        # Do not search for dependencies, only include explicitly selected nodes
-        return {step: set() for step in included}
+        # Only include explicitly selected nodes
+        return {step: graph[step] & included for step in included}
 
     if downstream:
         # Reverse the graph to find all nodes dependent on included nodes (forward deps)
@@ -196,6 +197,7 @@ def parse_step(step_name: str, dag: Dict[str, Any]) -> "Step":
     parts = urlparse(step_name)
     step_type = parts.scheme
     path = parts.netloc + parts.path
+    # dependencies are new objects
     dependencies = [parse_step(s, dag) for s in dag.get(step_name, [])]
 
     step: Step
@@ -367,6 +369,11 @@ class DataStep(Step):
     def _dataset_index_mtime(self) -> Optional[float]:
         try:
             return os.stat(self._output_dataset._index_file).st_mtime
+        except KeyError as e:
+            if _uses_old_schema(e):
+                return None
+            else:
+                raise e
         except Exception as e:
             if str(e) == "dataset has not been created yet":
                 return None
@@ -381,7 +388,10 @@ class DataStep(Step):
 
         sp = self._search_path
         if sp.with_suffix(".py").exists() or (sp / "__init__.py").exists():
-            self._run_py()
+            if config.DEBUG:
+                self._run_py_isolated()
+            else:
+                self._run_py()
 
         elif sp.with_suffix(".ipynb").exists():
             self._run_notebook()
@@ -410,7 +420,13 @@ class DataStep(Step):
         if not self.has_existing_data() or any(d.is_dirty() for d in self.dependencies):
             return True
 
-        found_source_checksum = catalog.Dataset(self._dest_dir.as_posix()).metadata.source_checksum
+        try:
+            found_source_checksum = catalog.Dataset(self._dest_dir.as_posix()).metadata.source_checksum
+        except KeyError as e:
+            if _uses_old_schema(e):
+                return True
+            else:
+                raise e
         exp_source_checksum = self.checksum_input()
 
         if found_source_checksum != exp_source_checksum:
@@ -471,11 +487,35 @@ class DataStep(Step):
 
     @property
     def _search_path(self) -> Path:
-        return paths.STEP_DIR / "data" / self.path
+        # step might have been moved to an archive folder, try that folder first
+        archive_path = paths.STEP_DIR / "archive" / self.path
+        if list(archive_path.parent.glob(archive_path.name + "*")):
+            return archive_path
+        else:
+            return paths.STEP_DIR / "data" / self.path
 
     @property
     def _dest_dir(self) -> Path:
         return paths.DATA_DIR / self.path.lstrip("/")
+
+    def _run_py_isolated(self) -> None:
+        """
+        Import the Python module for this step and call run() on it. This method
+        does not have overhead from forking an extra process like _run_py and
+        should be used with caution.
+        """
+        from etl.helpers import isolated_env
+
+        # path can be either in a module with __init__.py or a single .py file
+        module_dir = self._search_path if self._search_path.is_dir() else self._search_path.parent
+
+        with isolated_env(module_dir):
+            step_module = import_module(self._search_path.relative_to(paths.BASE_DIR).as_posix().replace("/", "."))
+            if not hasattr(step_module, "run"):
+                raise Exception(f'no run() method defined for module "{step_module}"')
+
+            # data steps
+            step_module.run(self._dest_dir.as_posix())  # type: ignore
 
     def _run_py(self) -> None:
         """
@@ -603,23 +643,35 @@ class SnapshotStep(Step):
     def __str__(self) -> str:
         return f"snapshot://{self.path}"
 
+    def _cached_dvc_repo(self) -> Any:
+        """Return DVC repo and cache it. Backported steps do not use cached repository."""
+        if "backport" in self._dvc_path:
+            # The repo has to be created again to pick unignored files
+            return get_dvc(use_cache=False)
+        else:
+            return get_dvc(use_cache=True)
+
     def run(self) -> None:
-        from dvc.repo import Repo
+        from dvc.exceptions import CheckoutError
 
         with _unignore_backports(Path(self._path)):
-            Repo(paths.BASE_DIR).pull(self._path, remote="public-read", force=True)
+            try:
+                self._cached_dvc_repo().pull(self._path, remote="public-read", force=True)
+            except CheckoutError as e:
+                raise Exception(
+                    "File not found in DVC. Have you run the snapshot script? Make sure you're not using `is_public: false`."
+                ) from e
 
     def is_dirty(self) -> bool:
         # check if the snapshot has been added to DVC
         from dvc.dvcfile import load_file
-        from dvc.repo import Repo
 
         with open(self._dvc_path) as istream:
             if "outs:\n" not in istream.read():
                 raise Exception(f"File {self._dvc_path} has not been added to DVC. Run snapshot script to add it.")
 
         with _unignore_backports(Path(self._dvc_path)), dvc_lock:
-            repo = Repo(paths.BASE_DIR)
+            repo = self._cached_dvc_repo()
             dvc_file = load_file(repo, self._dvc_path)
             with repo.lock:
                 # DVC returns empty dictionary if file is up to date
@@ -650,10 +702,16 @@ class SnapshotStepPrivate(SnapshotStep):
         return f"snapshot-private://{self.path}"
 
     def run(self) -> None:
-        from dvc.repo import Repo
+        from dvc.exceptions import CheckoutError
 
         with _unignore_backports(Path(self._path)):
-            Repo(paths.BASE_DIR).pull(self._path, remote="private", force=True)
+            try:
+                # The repo has to be created again to pick unignored files
+                get_dvc(use_cache=False).pull(self._path, remote="private", force=True)
+            except CheckoutError as e:
+                raise Exception(
+                    "File not found in DVC. Have you run the snapshot script with `is_public: false`?"
+                ) from e
 
 
 class GrapherStep(Step):
@@ -701,6 +759,9 @@ class GrapherStep(Step):
     def run(self) -> None:
         import etl.grapher_import as gi
 
+        if "DATA_API_ENV" not in os.environ:
+            warnings.warn(f"DATA_API_ENV not set, using '{config.DATA_API_ENV}'")
+
         # save dataset to grapher DB
         dataset = self.dataset
 
@@ -716,32 +777,53 @@ class GrapherStep(Step):
             dataset.metadata.sources,
         )
 
-        thread_pool = concurrent.futures.ThreadPoolExecutor(max_workers=config.GRAPHER_INSERT_WORKERS)
-        futures = []
+        with concurrent.futures.ThreadPoolExecutor(max_workers=config.GRAPHER_INSERT_WORKERS) as thread_pool:
+            futures = []
+            verbose = True
+            i = 0
 
-        # NOTE: multiple tables will be saved under a single dataset, this could cause problems if someone
-        # is fetching the whole dataset from data-api as they would receive all tables merged in a single
-        # table. This won't be a problem after we introduce the concept of "tables"
-        for table in dataset:
-            catalog_path = f"{self.path}/{table.metadata.short_name}"
+            # NOTE: multiple tables will be saved under a single dataset, this could cause problems if someone
+            # is fetching the whole dataset from data-api as they would receive all tables merged in a single
+            # table. This won't be a problem after we introduce the concept of "tables"
+            for table in dataset:
+                assert not table.empty, f"table {table.metadata.short_name} is empty"
 
-            table = gh._adapt_table_for_grapher(table)
+                # if GRAPHER_FILTER is set, only upsert matching columns
+                if config.GRAPHER_FILTER:
+                    cols = table.filter(regex=config.GRAPHER_FILTER).columns.tolist()
+                    cols += [c for c in table.columns if c in {"year", "country"} and c not in cols]
+                    table = table.loc[:, cols]
 
-            # generate table with entity_id, year and value for every column
-            upsert = lambda t: gi.upsert_table(  # noqa: E731
-                engine,
-                t,
-                dataset_upsert_results,
-                catalog_path=catalog_path,
-                dimensions=(t.iloc[:, 0].metadata.additional_info or {}).get("dimensions"),
-            )
+                table = gh._adapt_table_for_grapher(table)
 
-            for t in gh._yield_wide_table(table, na_action="drop"):
-                futures.append(thread_pool.submit(upsert, t))
+                # generate table with entity_id, year and value for every column
+                upsert = lambda t, catalog_path, verbose: gi.upsert_table(  # noqa: E731
+                    engine,
+                    t,
+                    dataset_upsert_results,
+                    catalog_path=catalog_path,
+                    dimensions=(t.iloc[:, 0].metadata.additional_info or {}).get("dimensions"),
+                    verbose=verbose,
+                )
 
-        variable_upsert_results = [future.result() for future in concurrent.futures.as_completed(futures)]
+                for t in gh._yield_wide_table(table, na_action="drop"):
+                    i += 1
+                    assert len(t.columns) == 1
+                    catalog_path = f"{self.path}/{table.metadata.short_name}#{t.columns[0]}"
 
-        self._cleanup_ghost_resources(dataset_upsert_results, variable_upsert_results)
+                    # stop logging to stop cluttering logs
+                    if i > 20 and verbose:
+                        verbose = False
+                        thread_pool.submit(
+                            lambda: (time.sleep(10), log.info("upsert_dataset.continue_without_logging"))
+                        )
+
+                    futures.append(thread_pool.submit(upsert, t, catalog_path=catalog_path, verbose=verbose))
+
+            variable_upsert_results = [future.result() for future in concurrent.futures.as_completed(futures)]
+
+        if not config.GRAPHER_FILTER:
+            self._cleanup_ghost_resources(dataset_upsert_results, variable_upsert_results)
 
         # set checksum and updatedAt timestamps after all data got inserted
         gi.set_dataset_checksum_and_editedAt(dataset_upsert_results.dataset_id, self.data_step.checksum_input())
@@ -771,9 +853,9 @@ class GrapherStep(Step):
         gi.cleanup_ghost_variables(
             dataset_upsert_results.dataset_id,
             upserted_variable_ids,
-            workers=config.GRAPHER_INSERT_WORKERS,
         )
         gi.cleanup_ghost_sources(dataset_upsert_results.dataset_id, upserted_source_ids)
+        # TODO: cleanup origins that are not used by any variable
 
 
 @dataclass
@@ -925,3 +1007,9 @@ def _add_is_dirty_cached(s: Step, cache: files.RuntimeCache) -> None:
     s.is_dirty = lambda s=s: _cached_is_dirty(s, cache)  # type: ignore
     for dep in getattr(s, "dependencies", []):
         _add_is_dirty_cached(dep, cache)
+
+
+def _uses_old_schema(e: KeyError) -> bool:
+    """Origins without `title` use old schema before rename. This can be removed once
+    we recompute all datasets."""
+    return e.args[0] == "title"

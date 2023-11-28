@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1684
+    date_accessed: 2023-08-16 08:35:18.224197
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: G6PD trait
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: fa68295d1d3469d776251d5170c93543
+  size: 1011346
+  path: dataset_1684_g6pd_trait_values.feather

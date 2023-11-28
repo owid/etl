@@ -1,8 +1,5 @@
 meta:
-  namespace: war
-  short_name: war_mars
   name: Project Mars (Lyall, 2020)
-  version: '2023-06-09'
   publication_year: 2020
 
   publication_date: '2020-10-26'
@@ -11,15 +8,17 @@ meta:
     in Modern War (Princeton, NJ: Princeton University Press, 2020)'
   url: https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/DUO7IE
   source_data_url: https://dataverse.harvard.edu/api/access/datafile/5857675
-  file_extension: xls
-  license_url: https://dataverse.org/best-practices/dataverse-community-norms
-  license_name: CC0 Public Domain
+  license_url: https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/DUO7IE
+  license_name: Public Domain
   date_accessed: 2023-06-09
   is_public: true
   description: >-
-    Project Mars. This dataset records new data on 229 unique belligerents in 252 conventional wars fought between 1800 and 2011.
-    Project Mars introduces new data about these belligerents, including their level of prewar military inequality, and new measures
-    of battlefield performance, including desertion, defection, and fratricidal violence. The latest version is Version 1.1. (2022-02-08).
+    Project Mars. This dataset records new data on 229 unique belligerents in 252
+    conventional wars fought between 1800 and 2011.
+    Project Mars introduces new data about these belligerents, including their level
+    of prewar military inequality, and new measures
+    of battlefield performance, including desertion, defection, and fratricidal violence.
+    The latest version is Version 1.1. (2022-02-08).
 
 
     You can find more details on the dataset in its notes at https://web.archive.org/web/20230717140532/https://dataverse.harvard.edu/file.xhtml?fileId=5857673&version=2.0

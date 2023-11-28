@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/923
+    date_accessed: 2023-08-16 07:18:44.945446
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_923_percentage_of_total_population_by_broad_age_group__region__subregion_and_country__annually_interpolated_for_1950_2100__un_population_division__2017
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 5db8bc97963dd34527cc998bb463091b
+  size: 102621
+  path: 
+    dataset_923_percentage_of_total_population_by_broad_age_group__region__subregion_and_country__annually_interpolated_for_1950_2100__un_population_division__2017_config.json

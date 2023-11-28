@@ -10,6 +10,7 @@ manually. This script is a CLI tool that may help in either scenario.
 
 import json
 import os
+from pathlib import Path
 from typing import Any, Dict, List, Tuple, Union, cast
 
 import click
@@ -41,7 +42,7 @@ SIMILARITY_NAMES = {
     "-f",
     "--output-file",
     type=str,
-    help="Path to output json file.",
+    help="Path to output JSON file.",
     required=True,
 )
 @click.option(
@@ -116,6 +117,11 @@ def main(
     similarity_name: str = SIMILARITY_NAME,
     max_suggestions: int = N_MAX_SUGGESTIONS,
 ) -> None:
+    if os.path.isdir(output_file):
+        raise ValueError(f"`output_file` ({output_file}) should point to a JSON file ('*.json') and not a directory!")
+    if Path(output_file).suffix != ".json":
+        raise ValueError(f"`output_file` ({output_file}) should point to a JSON file ('*.json')!")
+
     with db.get_connection() as db_conn:
         # Get old and new dataset ids.
         old_dataset_id = db.get_dataset_id(db_conn=db_conn, dataset_name=old_dataset_name)

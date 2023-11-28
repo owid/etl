@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4824
+    date_accessed: 2023-08-10 15:02:08.919214
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_4824_annual_growth_rate_of_real_gdp_per_capita__pct
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 0de6a09c4d6d252fb609bb0c5f4172ef
+  size: 17881
+  path: dataset_4824_annual_growth_rate_of_real_gdp_per_capita__pct_config.json

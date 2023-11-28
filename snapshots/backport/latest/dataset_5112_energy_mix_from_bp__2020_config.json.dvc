@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5112
+    date_accessed: 2023-08-14 15:02:28.937677
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_5112_energy_mix_from_bp__2020 (archived)
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 5ffecfed1f675ab953eb13712bf340dd
+  size: 60651
+  path: dataset_5112_energy_mix_from_bp__2020_config.json

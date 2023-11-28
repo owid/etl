@@ -1,5 +1,5 @@
 """Depenndency ratio table"""
-import pandas as pd
+from owid.catalog import Table
 
 from .dtypes import optimize_dtypes
 
@@ -29,7 +29,7 @@ MAPPINNG_SEX = {
 COLUMNS_ORDER = ["location", "year", "metric", "sex", "age", "variant", "value"]
 
 
-def process(df: pd.DataFrame, country_std: str) -> pd.DataFrame:
+def process(df: Table, country_std: str) -> Table:
     df = df.reset_index()
     df = df.melt(COLUMNS_ID.keys(), COLUMNNS_METRICS.keys(), "metric", "value")
     # Add columns, rename columns

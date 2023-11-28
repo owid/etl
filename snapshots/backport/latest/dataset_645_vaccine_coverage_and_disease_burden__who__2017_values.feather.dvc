@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/645
+    date_accessed: 2023-08-14 11:00:37.455676
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Vaccine Coverage and Disease Burden - WHO (2017)
+  description: WHO dataset on the number of cases for different diseases, and the
+    coverage of different vaccines against these disease. For TB, instead of the number
+    of cases, we have number of deaths.
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: ff9ef294919c289af4bfa7f3f10702ce
+  size: 219234
+  path: dataset_645_vaccine_coverage_and_disease_burden__who__2017_values.feather

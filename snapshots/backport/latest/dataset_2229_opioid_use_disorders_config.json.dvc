@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2229
+    date_accessed: 2023-08-16 09:40:25.289535
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2229_opioid_use_disorders (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 6cd445a968ef69de5d606508ca689f4c
+  size: 32704
+  path: dataset_2229_opioid_use_disorders_config.json

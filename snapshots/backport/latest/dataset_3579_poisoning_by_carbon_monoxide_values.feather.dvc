@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/3579
+    date_accessed: 2023-08-16 10:30:23.415224
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Poisoning by carbon monoxide
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: ea0b81d1e4b7f57bef373e4fae316b87
+  size: 2116410
+  path: dataset_3579_poisoning_by_carbon_monoxide_values.feather

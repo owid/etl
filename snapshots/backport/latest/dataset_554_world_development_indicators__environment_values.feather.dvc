@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/554
+    date_accessed: 2023-08-14 15:07:47.200893
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: World Development Indicators - Environment
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 5356ee9450c4b97a62f2a4c316ed65c5
+  size: 6203394
+  path: dataset_554_world_development_indicators__environment_values.feather

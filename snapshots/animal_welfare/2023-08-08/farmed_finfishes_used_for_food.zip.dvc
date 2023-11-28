@@ -1,0 +1,24 @@
+meta:
+  origin:
+    title: Number of farmed fish killed for food worldwide
+    description: |-
+      Global farmed finfish production increased from 9 to 56 million tonnes between 1990 and 2019. Although finfishes are now widely recognised as sentient beings, production is still being quantified as biomass rather than number of individuals (in contrast to farmed mammals and birds). Here, we estimate the global number of farmed finfishes slaughtered using FAO aquaculture production tonnages (1990–2019 data) and estimates of individual weight at killing (determined from internet searches at species and country level where possible). We relate these numbers to knowledge on humane slaughter, animal welfare law, and certification schemes. Since 1990, farmed finfish numbers killed annually for food have increased nine-fold, to 124 billion (1.24 × 1011, range 78–171 billion) in 2019. This figure does not represent the total number farmed (due to mortalities during rearing and non-food production) and is expected to increase as aquaculture expands. Our estimates indicate that farmed finfishes now outnumber the 80 billion farmed birds and mammals killed globally each year for food. The majority are produced in Asia. Inhumane slaughter practices cause suffering for most farmed finfishes. Most, 70–72%, have no legal welfare protection, and less than 1% have any fish-specific legal protection, at slaughter. The main global certification schemes in 2013–2015 accounted for 2% of slaughtered farmed finfishes. Fishes for which species-specific parameters for automated humane stunning are published comprise 20–24%. As the dominant taxa of farmed vertebrates, finfishes would benefit from better welfare if species-specific humane slaughter was defined and incorporated into laws and certification schemes.
+    producer: Mood et al.
+    citation_full: Mood, A., Lara, E., Boyland, N., & Brooke, P. (2023). Estimating
+      global numbers of farmed fishes killed for food annually from 1990 to 2019.
+      Animal Welfare, 32, E12. doi:10.1017/awf.2023.4
+    url_main:
+      https://www.cambridge.org/core/journals/animal-welfare/article/estimating-global-numbers-of-farmed-fishes-killed-for-food-annually-from-1990-to-2019/765A7CCA23ADA0249EF37CFC5014D351
+    url_download:
+      https://static.cambridge.org/content/id/urn:cambridge.org:id:article:S0962728623000040/resource/name/S0962728623000040sup001.zip
+    date_published: 2023-02-06
+    date_accessed: 2023-08-08
+  license:
+    url:
+      https://s100.copyright.com/AppDispatchServlet?publisherName=CUP&publication=AWF&title=Estimating%20global%20numbers%20of%20farmed%20fishes%20killed%20for%20food%20annually%20from%201990%20to%202019&publicationDate=06%20February%202023&author=Alison%20Mood%2C%20Elena%20Lara%2C%20Natasha%20K%20Boyland%2C%20Phil%20Brooke&copyright=%C2%A9%20The%20Author(s)%2C%202023.%20Published%20by%20Cambridge%20University%20Press%20on%20behalf%20of%20The%20Universities%20Federation%20for%20Animal%20Welfare&contentID=10.1017%2Fawf.2023.4&startPage=&endPage=&orderBeanReset=True&volumeNum=32&issueNum=&oa=CC-BY
+    name: Creative Commons CC BY
+wdir: ../../../data/snapshots/animal_welfare/2023-08-08
+outs:
+- md5: d0d46c11581778d18c9dfe2a0b580d97
+  size: 2033309
+  path: farmed_finfishes_used_for_food.zip

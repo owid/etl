@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/618
+    date_accessed: 2023-08-16 09:56:57.667645
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Civil Society - Quality of Government (QoG) (2017)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: c05bb3893346f0f66df5e2849b0b0d19
+  size: 1675170
+  path: dataset_618_civil_society__quality_of_government__qog__2017_values.feather

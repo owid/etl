@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/621
+    date_accessed: 2023-08-14 05:37:39.873080
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Energy and Infrastructure - Quality of Government (2017)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: d108a00a19ae327747de3923047a3515
+  size: 487986
+  path: 
+    dataset_621_energy_and_infrastructure__quality_of_government__2017_values.feather

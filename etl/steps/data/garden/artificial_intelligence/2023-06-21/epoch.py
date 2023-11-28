@@ -28,9 +28,9 @@ def run(dest_dir: str) -> None:
     tb = ds_meadow["epoch"]
     df = pd.DataFrame(tb)
 
-    # Filter notable systems by selecting rows where 'inclusion_criteria' is not nan
-    df = df[df["inclusion_criteria"].notna()].reset_index(drop=True)
-    df.drop("inclusion_criteria", axis=1, inplace=True)
+    # Filter notable systems by selecting rows where 'notability_criteria' is not nan
+    df = df[df["notability_criteria"].notna()].reset_index(drop=True)
+    df.drop("notability_criteria", axis=1, inplace=True)
     #
     # Process data.
     # Clean up researcher affiliation in column 'organization_categorization'

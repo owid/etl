@@ -1,8 +1,8 @@
 dataset:
   sources:
     -
-      name: Robbie Andrews, based on the Global Carbon Project
-      published_by: Robbie Andrews
+      name: Robbie Andrew, based on the Global Carbon Project
+      published_by: Robbie Andrew
       date_accessed: 2022-09-28
       url: https://folk.universitetetioslo.no/roberan/t/global_mitigation_curves.shtml
       description: Data comes from historical emissions to 2017 from CDIAC/Global Carbon Project, projection to 2018 from Global Carbon Project (Le Quéré et al. 2018)
@@ -15,7 +15,7 @@ tables:
 
       For example, 'Start in 2010' marks the necessary future emissions pathway to have a >66% chance of keeping global average temperatures below 1.5°C warming if global CO2 emissions mitigation had started in 2010, very quickly peaking then falling.
 
-      Data is sourced from Robbie Andrew, and available for download <a href="http://folk.uio.no/roberan/t/global_mitigation_curves.shtml">here</a>.
+      Data is sourced from Robbie Andrew, and available for download [here](http://folk.uio.no/roberan/t/global_mitigation_curves.shtml).
 
       Historical emissions to 2017 are sourced from CDIAC/Global Carbon Project, projection to 2018 from Global Carbon Project (Le Quéré et al. 2018).
 
@@ -34,7 +34,7 @@ tables:
 
       For example, 'Start in 2010' marks the necessary future emissions pathway to have a >66% chance of keeping global average temperatures below 2°C warming if global CO2 emissions mitigation had started in 2010, very quickly peaking then falling.
 
-      Data is sourced from Robbie Andrew, and available for download <a href="http://folk.uio.no/roberan/t/global_mitigation_curves.shtml">here</a>.
+      Data is sourced from Robbie Andrew, and available for download [here](http://folk.uio.no/roberan/t/global_mitigation_curves.shtml).
 
       Historical emissions to 2017 are sourced from CDIAC/Global Carbon Project, projection to 2018 from Global Carbon Project (Le Quéré et al. 2018).
 

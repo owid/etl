@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/593
+    date_accessed: 2023-08-14 05:58:38.289037
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Global Hunger Index- IFPRI (2018)
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 2c0ad9e68b27407f26db608d91f2d3d7
+  size: 13834
+  path: dataset_593_global_hunger_index__ifpri__2018_values.feather

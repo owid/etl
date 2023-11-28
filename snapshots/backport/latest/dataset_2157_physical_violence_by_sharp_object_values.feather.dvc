@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2157
+    date_accessed: 2023-08-14 15:29:44.496395
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Physical violence by sharp object
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: ce23ea1c7175c3e4d1b65b2977ccbe9e
+  size: 2116418
+  path: dataset_2157_physical_violence_by_sharp_object_values.feather

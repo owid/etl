@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4555
+    date_accessed: 2023-08-14 16:09:18.246509
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_4555_progress_by_countries_in_the_degree_of_implementation_of_international_instruments_aiming_to_combat_illegal__unreported_and_unregulated_fishing__level_of_implementation__1_lowest_to_5_highest
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: d720388ad8efb01775b76f226c4949f1
+  size: 38372
+  path: 
+    dataset_4555_progress_by_countries_in_the_degree_of_implementation_of_international_instruments_aiming_to_combat_illegal__unreported_and_unregulated_fishing__level_of_implementation__1_lowest_to_5_highest_config.json

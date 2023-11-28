@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2383
+    date_accessed: 2023-08-10 14:48:34.987934
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2383_pulmonary_aspiration_and_foreign_body_in_airway
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 4be3a865b70ea564765d9be0030edb43
+  size: 33838
+  path: dataset_2383_pulmonary_aspiration_and_foreign_body_in_airway_config.json

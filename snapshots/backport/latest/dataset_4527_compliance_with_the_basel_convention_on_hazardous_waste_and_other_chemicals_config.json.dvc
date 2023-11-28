@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4527
+    date_accessed: 2023-08-14 15:49:07.883205
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_4527_compliance_with_the_basel_convention_on_hazardous_waste_and_other_chemicals
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: a7f5399e7b88e198ef2522cb3b6972cd
+  size: 16986
+  path: 
+    dataset_4527_compliance_with_the_basel_convention_on_hazardous_waste_and_other_chemicals_config.json

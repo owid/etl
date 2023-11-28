@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2123
+    date_accessed: 2023-08-16 08:52:09.892551
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2123_fungal_skin_diseases (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 3f677b0608c5c6ade7a1ae2816957982
+  size: 32704
+  path: dataset_2123_fungal_skin_diseases_config.json

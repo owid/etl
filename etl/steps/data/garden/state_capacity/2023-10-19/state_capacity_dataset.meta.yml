@@ -1,0 +1,461 @@
+# NOTE: To learn more about the fields, hover over their names.
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
+dataset:
+  update_period_days: 365
+
+definitions:
+  common:
+    display: &common-display
+      numDecimalPlaces: 1
+      tolerance: 5
+    presentation:
+      topic_tags:
+      - State Capacity
+
+  exp_conversion: The data has been reconverted with the exponential function, to represent meaningful values.
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
+tables:
+  state_capacity_dataset:
+    variables:
+      capacity:
+        title: State capacity estimate
+        unit: ""
+        short_unit: ""
+        description_short: "Measures state capacity by combining 21 different indicators related to three key dimensions: extractive capacity, coercive capacity, and administrative capacity. Higher values indicate greater state capacity."
+        # NOTE: Include a producer description if available
+        # description_from_producer: Description of state capacity from producer.
+        processing_level: major
+        description_processing: Regional aggregations were included, where at least a 70% of the countries in the region had data available.
+        display:
+          name: State capacity
+          <<: *common-display
+      capacity_sd:
+        title: Standard deviation of state capacity estimate
+        unit: ""
+        short_unit: ""
+        processing_level: minor
+        display:
+          name: State capacity standard deviation
+          <<: *common-display
+      admeffic:
+        title: Administrative efficiency
+        unit: ""
+        short_unit: ""
+        description_short: "Based on the expert assessments by Adelman and Morris (1967). It captures efficiency of public administration by combining measures of permanence and training of administrators, corruption and inefficiencies, and instability of policy. It ranges from 0 to 8 (most efficient)"
+        description_from_producer: >-
+          As part of a study on the social and political sources of economic growth in developing countries,
+          Adelman and Morris (1967) produced a measure of “degree of administrative efficiency” for 69
+          countries. The measure encompasses three categories of the efficiency of public administration:
+          “the degree of permanence and training of administrators,” the “extent to which corruption, inefficiency and incompetence seriously hamper government functioning,” and the “extent to which
+          instability of policy at higher levels of administration promotes inefficiency”.
+
+
+          To make these assessments, Adelman and Morris interviewed regional and country experts,
+          compiled information from country studies, and checked their findings against those of other analysts. The period of observation was 1957-1962, overlapping our period of analysis for the years
+          1960-1962.
+
+
+          The ratings reflect a letter grade system akin to those of student in school, including minuses
+          and plusses:
+          - A grade of A signifies that the country has a reasonably efficient public administration with
+          “well-trained civil services” and low levels of corruption.
+          - A grade of B signifies that the country has “considerable bureaucratic inefficiency but . . .
+          a permanent body of administrators”. Corruption and policy instability were present
+          but did not significantly interfere with government functioning.
+          - A grade of C signifies “extreme bureaucratic inefficiency and/or widespread corruption and/or
+          serious instability of policy at higher administrative levels”.
+
+
+          Once accounting for pluses and minuses, this measurement strategy produces a nine-point scale
+          (0 to 8).
+        processing_level: minor
+        display:
+          name: Administrative efficiency
+          <<: *common-display
+      bureau_qual:
+        title: Bureaucratic quality
+        unit: ""
+        short_unit: ""
+        description_short: Measures the institutional strength and quality of the bureaucracy. It ranges from 0 to 4 (greater bureaucratic quality).
+        description_from_producer: >-
+          As part of its International Country Risk Guide (ICRG), the PRS Group rates the “institutional
+          strength and quality of the bureaucracy” in a country on a 5-point scale (0 to 4). High values
+          represent bureaucracies that have the “strength and expertise to govern without drastic changes in
+          policy or interruptions of government services.” Among the criteria for bureaucratic quality are the
+          degree of autonomy from political pressure and protocols for recruitment and training of staff. See
+          Howell (2011). Coverage is 1984-2015.
+        processing_level: minor
+        display:
+          name: Bureaucratic quality
+          <<: *common-display
+      law_order:
+        title: Law and order
+        unit: ""
+        short_unit: ""
+        description_short: Measures the strength and impartiality of the legal system and the popular observance of the law. It ranges from 0 to 6 (greater law and order).
+        description_from_producer: >-
+          As part of its International Country Risk Guide (ICRG), the PRS Group rates the components
+          of law and order in a country to create a 7-point scale (0 to 6). For law, up to three points are
+          allocated according to the strength and impartiality of the legal system. For order, up to three
+          points are allocated according to an assessment of popular observance of the law. See Howell
+          (2011). Coverage is 1984-2015.
+        processing_level: minor
+        display:
+          name: Law and order
+          <<: *common-display
+      censusfreq:
+        title: Census frequency
+        unit: ""
+        short_unit: ""
+        description_short: Frequency with which a census is conducted. It equals 1 if a country has a census every ten years and moves toward 0 the greater the number of years between censuses.
+        description_from_producer: >-
+          Census frequency is inspired by Soifer (2013) and adapted from Hanson (2015). For each year,
+          the variable is calculated as 10 divided by the number of years between censuses, with the annual
+          values smoothed using a five-year moving average. The measure thus equals 1 if a country has
+          a census every ten years and moves toward 0 the greater the number of years between censuses.
+          Source data on census dates come from the International Programs Center of the U.S. Census
+          Bureau (2008) and the United Nations Statistical Division (2013). Coverage is 1960-2015.
+        processing_level: minor
+        display:
+          name: Census frequency
+          <<: *common-display
+      v2clrspct:
+        title: Rigourous and Impartial Public Administration
+        unit: ""
+        short_unit: ""
+        description_short: Based on the expert assessments by V-Dem. It captures the extent to which public officials are expected to follow the law and are not biased in their administration of the law. It ranges from 0 to 4 (more rigorous and impartial public administration).
+        description_from_producer: >-
+          This is the `v2clrspct` variable from version 9 of the Varieties of Democracy project (Coppedge et al.
+          2019). The measure comes from a Bayesian item response theory measurement model using expert
+          survey data in which the respondents rated countries based on the following category descriptions:
+          - 0: The law is not respected by public officials. Arbitrary or biased administration of the law
+          is rampant.
+          - 1: The law is weakly respected by public officials. Arbitrary or biased administration of the
+          law is widespread.
+          - 2: The law is modestly respected by public officials. Arbitrary or biased administration of
+          the law is moderate.
+          - 3: The law is mostly respected by public officials. Arbitrary or biased administration of the
+          law is limited.
+          - 4: The law is generally fully respected by the public officials. Arbitrary or biased administration of the law is very limited.
+
+
+          We use data covering 177 countries from 1960-2015.
+        processing_level: minor
+        display:
+          name: Rigourous and Impartial Public Administration
+          <<: *common-display
+      v2stfisccap:
+        title: Fiscal capacity
+        unit: ""
+        short_unit: ""
+        description_short: Based on the expert assessments by V-Dem. It captures the capacity of the state to fund itself through taxes that are of greater administrative complexity. It ranges from 0 to 4 (greater fiscal capacity).
+        description_from_producer: >-
+          This is the state fiscal capacity (`v2stfisccap`) variable from version 9 of the Varieties of Democracy
+          project (Coppedge et al. 2019). The measure is a Bayesian item response theory measurement
+          model based on a five-point ordinal scale (0-4) in which higher values indicate that the state has
+          greater capacity to fund itself through taxes that are of greater administrative complexity.
+          - 0: The state is not capable of raising revenue to finance itself.
+          - 1: The state primarily relies on external sources of funding (loans and foreign aid) to finance
+          its activities.
+          - 2: The state primarily relies on directly controlling economic assets (natural resource rents,
+          public monopolies, and the expropriation of assets within and outside the country) to finance
+          its activities.
+          - 3: The state primarily relies on taxes on property (land taxes) and trade (customs duties).
+          - 4: The state primarily relies on taxes on economic transactions (such as sales taxes) and/or
+          taxes on income, corporate profits and capital
+        processing_level: minor
+        display:
+          name: Fiscal capacity
+          <<: *common-display
+      v2terr:
+        title: State Authority over Territory
+        unit: ""
+        short_unit: ""
+        description_short: Based on the expert assessments by V-Dem. It captures the extent to which the state has effective control over its territory.
+        description_from_producer: >-
+          For this indicator, we start with the `v2svstterr` measure of state authority over territory from V-Dem.
+          This is a measure in which country experts are asked to estimate the percentage of the territory
+          in a country over which the state has effective control. Given the highly skewed distribution of
+          this variable, we convert the percentage to a proportion and then transform it using the inverse
+          normal. Where a state has control of 100% of country territory, and the inverse normal is thus
+          undefined, we instead use the inverse normal of .9999. The resulting scale is thus similar to that of
+          a standard normal distribution, and the effect is to widen the range of scores where the data are very
+          concentrated at near 100% territorial control. The data cover 177 countries during the 1960-2015
+          time period.
+        processing_level: minor
+        display:
+          name: State Authority over Territory
+          <<: *common-display
+      infcap:
+        title: Information capacity filled
+        unit: ""
+        short_unit: ""
+        description_short: Measures the ability of the state to collect and process information. It ranges from 0 to 1 (greater information capacity).
+        description_from_producer: >-
+          The original measure was estimated using an Item Response Theory (IRT) model using the following indicators:
+          - when the country first established a statistical agency
+          - whether the country has a civil register
+          - whether the country has a population register
+          - a measure of the country’s ability to conduct a regular census
+          - a measure of the country’s ability to produce an annual statistical yearbook.
+
+
+          Coverage is 1960-2015 for 66 countries. For a small number of country-years at the end of this
+          period, where the IRT estimates were not available, values were constructed using a parallel set
+          of estimates from a principal components analysis (PCA) involving the same indicators. First, if
+          the estimates from the PCA model did not change from one year to the next, IRT estimates were
+          extended forward. Second, all remaining cases use the predicted values from regressing the IRT
+          estimates on the PCA estimates.
+        processing_level: minor
+        display:
+          name: Information capacity filled
+          <<: *common-display
+      irai_qbfm:
+        title: Quality of Budgetary and Financial Management
+        unit: ""
+        short_unit: ""
+        description_short: It ranges from 0 to 6 (greater quality of budgetary and financial management).
+        description_from_producer: >-
+          This is a scale, recoded to run from 0 to 6, in which World Bank staff rate countries on the following
+          criteria:
+          - the extent to which there is a comprehensive and credible budget
+          - the extent to which budgets are formulated through extensive consultation with spending
+          ministries and the legislature.
+          - the budget classification system is comprehensive and consistent with international standards.
+          - budgets include estimates of the budgetary impact of revenue and expenditure policy changes
+          - effective financial management systems that ensure implementation of the budget
+          - timely and accurate accounting, including public access to annual budget documentation
+
+
+          The data cover 72 countries from 2005-2015.
+        processing_level: minor
+        display:
+          name: Quality of Budgetary and Financial Management
+          <<: *common-display
+      irai_qpa:
+        title: Quality of Public Administration
+        unit: ""
+        short_unit: ""
+        description_short: Measures the extent to which civilian central government staff are structured to design and implement government policy and deliver services effectively. It ranges from 0 to 4 (greater quality of public administration).
+        description_from_producer: >-
+          In this scale, recoded to run from 0 to 4, World Bank staff rate countries on the extent to which
+          civilian central government staff are “structured to design and implement government policy and
+          deliver services effectively.” The criteria involve:
+          - the extent to which there are effective coordination mechanisms that ensure policy consistency across departmental boundaries.
+          - the extent to which organizational structures follow functional lines and avoid duplication
+          - the extent to which hiring and promotion are based on merit and performance
+          - the extent to which pay and benefit levels to not discourage people from working in the
+          public sector.
+          - the sustainability of the public wage bill
+
+
+          The data cover 72 countries from 2005-2015.
+        processing_level: minor
+        display:
+          name: Quality of Public Administration
+          <<: *common-display
+      irai_erm:
+        title: Efficiency of Revenue Mobilization
+        unit: ""
+        short_unit: ""
+        description_short: Measures the extent to which the tax system and tax administration are efficient. It ranges from 0 to 4 (greater efficiency of revenue mobilization).
+        description_from_producer: >-
+          This is a five-point scale (rescaled 0 to 4) in which World Bank staff rate countries on tax systems
+          and tax administration. Higher scores are given to higher-quality systems of taxation. Criteria
+          include:
+          - the extent to which the tax laws are “stable, certain, and clear.”
+          - the extent to which tax administration is “effective, and entirely rule-based.”
+          - administrative and compliance costs are low, and information systems are functioning.
+          - the extent to which taxes come from sales/VAT taxes, property taxes, and corporate/personal
+          income taxes applied to a broad base, rather than from taxes on international trade.
+
+
+          Coverage is 2005-2015.
+        processing_level: minor
+        display:
+          name: Efficiency of Revenue Mobilization
+          <<: *common-display
+      milexpercap:
+        title: Military expenditures per capita
+        unit: ""
+        short_unit: ""
+        description_short: Measures the amount of money spent on the military per capita.
+        description_from_producer: >-
+          Data on military spending from the SIPRI Military Expenditure Database (2020), which cover
+          the years 1949-2019. Missing data are filled from from the Correlates of War Project’s National
+          Military Capabilities dataset version 5.0 (Singer et al. 1972; Singer 1987). Population data are
+          from the United Nations World Population Prospects (2019).
+        description_processing: "{definitions.exp_conversion}"
+        processing_level: major
+        display:
+          name: Military expenditures per capita
+          <<: *common-display
+      milpercap:
+        title: Military personnel per 1,000 people
+        unit: ""
+        short_unit: ""
+        description_short: Measures the number of military personnel per 1,000 people.
+        description_from_producer: >-
+          Data on the number of military personnel (in thousands) from 1960-2012 comes primarily from
+          the Correlates of War Project’s National Military Capabilities dataset version 5.0 (Singer et al.
+          1972; Singer 1987). Data on military personnel for 2013-2015 come from the World Development
+          Indicators (World Bank). Population data are from the United Nations World Population Prospects
+          (2019).
+        processing_level: major
+        description_processing: "{definitions.exp_conversion}"
+        display:
+          name: Military personnel per 1,000 people
+          <<: *common-display
+      policecap:
+        title: Police Officers per 1,000 people
+        unit: ""
+        short_unit: ""
+        description_short: Measures the number of police officers per 1,000 people
+        description_from_producer: >-
+          Data on police personnel come from the United Nations Survey of Crime Trends and Operations of
+          Criminal Justice Systems (UNODC) from various years. These are country-reported data covering
+          the years 1973-2015 for a varying number of countries each year.
+        processing_level: major
+        description_processing: "{definitions.exp_conversion}"
+        display:
+          name: Police Officers per 1,000 people
+          <<: *common-display
+      statehist50s:
+        title: State Antiquity Index
+        unit: ""
+        short_unit: ""
+        description_short: Measures the antiquity and sovereignty of the state. It ranges from 0 to 1, with higher values indicating greater antiquity and sovereignty.
+        description_from_producer: >-
+          In the original data, this index codes three items for contemporary countries, based on 1950 borders,
+          for each 50-year period starting in the year 0 C.E.:
+          - whether the territory of the present-day country contained a state at that period in time
+          - whether this state was sovereign or under the control of an outside entity
+          - the proportion of the contemporary territory of the country that was under the domain of this
+          state
+
+
+          The original dataset stops with the year 1950. We add coverage of several countries not included
+          in the original dataset, and we then extend the data with annual coding of the three components
+          through 2015. We adopt the same formula for discounting past periods as the `StateHist50` index.
+        processing_level: minor
+        display:
+          name: State Antiquity Index
+          <<: *common-display
+      bti_mo:
+        title: Monopoly of Force
+        unit: ""
+        short_unit: ""
+        description_short: Measures the extent to which the state has a monopoly on the use of force. It ranges from 0 to 10 (greater monopoly of force).
+        description_from_producer: >-
+          The Bertlesmann Transformation Index is coded by country experts on a range of questions. For
+          the monopoly on the use of force indicator, the methodology produces a 10-point scale in which:
+          (1) indicates that the state has no monopoly on the use of force; (4) indicates the state’s monopoly
+          on force is established only in key parts of the country; (7) indicates the state’s monopoly on
+          force is established in principle but is challenged in territorial enclaves; (10) indicates there is no
+          competition on the state’s monopoly on the use of force. Experts can use ratings between these
+          specified values. The index is published every two years beginning in 2006. For years in which the
+          index is not published, we use the midpoint between the surrounding years.
+        processing_level: minor
+        display:
+          name: Monopoly of Force
+          <<: *common-display
+      weberian:
+        title: Index of Weberianness
+        unit: ""
+        short_unit: ""
+        description_short: Measures the degree to which state agencies involved with economic policy exhibit Weberian characteristics. It ranges from 0 to 1 (greater Weberian characteristics).
+        description_from_producer: >-
+          An index created from expert ratings on the degree to which state agencies involved with economic
+          policy exhibit Weberian characteristics: degree of hiring through meritocratic processes, longevity
+          of employment in agencies, prospects for promotion within agencies, degree to which agency
+          staff remain in public service rather than move in and out of public sector, salary parity with
+          private sector for positions requiring comparable training, proportion of earnings coming through
+          salary rather than bribe collection, and the availability of non-public sector employment options
+          for graduates of elite universities. Country experts were asked to rate the years 1970 to 1990. We
+          use data for 34 countries.
+        processing_level: minor
+        display:
+          name: Index of Weberiannes
+          <<: *common-display
+      wbstat:
+        title: Statistical Capacity
+        unit: ""
+        short_unit: ""
+        description_short: Measures the capacity of a country to collect and process statistical data. It ranges from 0 to 1 (greater statistical capacity).
+        description_from_producer: >-
+          In the original, the World Bank’s Statistical Capacity Indicator is a scale that ranges from 0 to 100.
+          It is based on a set of 25 criteria that fall into three main categories: methodology, sources of data,
+          and periodicity/timeliness of data:
+          - Methodology includes: balance of payments manual in use, CPI base year, government finance accounting, external debt reporting, import/export price indices, industrial production
+          index, national accounts base year, accuracy of data on national immunization coverage,
+          special dissemination standard, and UNESCO reporting.
+          - Sources include: agricultural census, health survey, population census, poverty survey, and
+          vital registration system coverage.
+          - Periodicity/timeliness measures reporting of data on: access to water, child malnutrition,
+          child mortality, gender equality, HIV/AIDS, immunizations, income poverty, maternal health,
+          per capita GDP growth, and primary school completion.
+
+
+          We have divided the resulting measure by 100 so that 1 is the highest possible value. The data
+          cover 127 countries from 2004 to 2015.
+        processing_level: minor
+        display:
+          name: Statistical Capacity
+          <<: *common-display
+      tax_inc_tax:
+        title: Taxes on income, profits and capital gains (as a share of total tax revenue)
+        unit: "%"
+        short_unit: "%"
+        description_short: Measures the percentage of total tax revenue that comes from taxes on income, profits, and capital gains.
+        description_from_producer: >-
+          For this measure, we start with the Government Revenue Dataset from the International Centre
+          for Tax and Development (ICTD). We then expand coverage of these data considerably through a
+          variety of sources: International Monetary Fund yearbooks, electronic archives of older IMF data,
+          and a collection of estimates from scholars studying specific countries. Using these source data, we
+          calculate the percentage of total tax revenue that comes from taxes on income, profits, and capital
+          gains. For use in analysis, we rescale this percentage to a proportion. The data cover 1963-2015
+          for 168 countries, with broad coverage beginning in the early 1970s.
+        processing_level: minor
+        display:
+          name: Taxes on income (% of total revenue)
+          <<: *common-display
+      tax_trade_tax:
+        title: Taxes on international trade (as a share of total tax revenue)
+        unit: "%"
+        short_unit: "%"
+        description_short: Measures the percentage of total tax revenue that comes from taxes on international trade.
+        description_from_producer: >-
+          For this measure, we start with the Government Revenue Dataset from the International Centre
+          for Tax and Development (ICTD). We then expand coverage of these data considerably through a
+          variety of sources: International Monetary Fund yearbooks, electronic archives of older IMF data,
+          and a collection of estimates from scholars studying specific countries. Using these source data,
+          we calculate the percentage of total tax revenue that comes from taxes on international trade. For
+          use in analysis, we rescale this percentage to a proportion. The data cover 1960-2015 for 167
+          countries, with broad coverage beginning in the early 1970s.
+        processing_level: minor
+        display:
+          name: Taxes on international trade (% of total revenue)
+          <<: *common-display
+      taxrev_gdp:
+        title: Tax revenue (as a share of GDP)
+        unit: "%"
+        short_unit: "%"
+        description_from_producer: >-
+          For this measure, we start with the Government Revenue Dataset from the International Centre
+          for Tax and Development (ICTD). We then expand coverage of these data considerably through a
+          variety of sources: the OECD, International Monetary Fund yearbooks, electronic archives of older
+          IMF data, and a collection of estimates from scholars studying specific countries. Data on GDP in
+          local currency units comes from the IMF and WDI. Using these source data, we calculate total tax
+          revenue as a percentage of GDP (resource revenues are not included as tax revenues). For use in
+          analysis, we rescale this percentage to a proportion. The data cover 1960-2015 for 167 countries,
+          with broad coverage beginning in the early 1970s.
+        processing_level: minor
+        display:
+          name: Tax revenue (% GDP)
+          <<: *common-display

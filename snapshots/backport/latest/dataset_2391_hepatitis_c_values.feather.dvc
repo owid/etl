@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2391
+    date_accessed: 2023-08-14 15:53:39.854354
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Hepatitis C
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: fe89a2b2031c2d3e56e946d991d6b48c
+  size: 2116394
+  path: dataset_2391_hepatitis_c_values.feather

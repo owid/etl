@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2748
+    date_accessed: 2023-08-11 07:36:31.543262
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_2748_un_wpp__interpolated_female_population_by_broad_age_group__region__subregion_and_country__annually_for_1950_2100__thousands
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 3124eaf1d873e5e949c33a9f8ac7da7a
+  size: 95467
+  path: 
+    dataset_2748_un_wpp__interpolated_female_population_by_broad_age_group__region__subregion_and_country__annually_for_1950_2100__thousands_config.json

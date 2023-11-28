@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4784
+    date_accessed: 2023-08-16 10:24:34.757709
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Proportion of open water bodies with good ambient water quality (%)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: c3bb80918d999ec48e8f46507d6bb8e4
+  size: 7194
+  path: 
+    dataset_4784_proportion_of_open_water_bodies_with_good_ambient_water_quality__pct_values.feather

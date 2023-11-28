@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4669
+    date_accessed: 2023-08-16 07:57:38.541531
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_4669_children_moderately_or_severely_wasted__millions
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 5838905ac06872bfe3ada07e1fb8dd75
+  size: 3465
+  path: dataset_4669_children_moderately_or_severely_wasted__millions_config.json

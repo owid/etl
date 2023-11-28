@@ -5,9 +5,10 @@ from typing import Any, Callable, Dict, List, Optional, Tuple, Union, cast
 
 import numpy as np
 import pandas as pd
+from pandas.api.types import union_categoricals
+
 from owid.datautils.common import ExceptionFromDocstring, warn_on_list_of_entities
 from owid.datautils.io.df import to_file as to_file_
-from pandas.api.types import union_categoricals
 
 
 # Backwards compatibility
@@ -95,7 +96,7 @@ def compare(
 
     """
     # Ensure dataframes can be compared.
-    if (type(df1) != pd.DataFrame) or (type(df2) != pd.DataFrame):
+    if (not isinstance(df1, pd.DataFrame)) or (not isinstance(df2, pd.DataFrame)):
         raise ObjectsAreNotDataframes
     if len(df1) != len(df2):
         raise DataFramesHaveDifferentLengths
@@ -107,9 +108,7 @@ def compare(
     # Compare, column by column, the elements of the two dataframes.
     compared = pd.DataFrame()
     for col in columns:
-        if (df1[col].dtype in (object, "category")) or (
-            df2[col].dtype in (object, "category")
-        ):
+        if (df1[col].dtype in (object, "category")) or (df2[col].dtype in (object, "category")):
             # Apply a direct comparison for strings or categories
             compared_row = df1[col].values == df2[col].values
         else:
@@ -201,15 +200,11 @@ def are_equal(
         for col in common_columns:
             if df1[col].dtype != df2[col].dtype:
                 summary += (
-                    f"  * Column {col} is of type {df1[col].dtype} for df1, but type"
-                    f" {df2[col].dtype} for df2."
+                    f"  * Column {col} is of type {df1[col].dtype} for df1, but type" f" {df2[col].dtype} for df2."
                 )
                 equal = False
     else:
-        summary += (
-            f"\n* Only {len(common_columns)} common columns out of"
-            f" {len(all_columns)} distinct columns."
-        )
+        summary += f"\n* Only {len(common_columns)} common columns out of" f" {len(all_columns)} distinct columns."
         equal = False
 
     if not can_be_compared:
@@ -219,10 +214,7 @@ def are_equal(
     else:
         # Check if indexes are equal.
         if (df1.index != df2.index).any():
-            summary += (
-                "\n* Dataframes have different indexes (consider resetting indexes of"
-                " input dataframes)."
-            )
+            summary += "\n* Dataframes have different indexes (consider resetting indexes of" " input dataframes)."
             equal = False
 
         # Dataframes can be compared cell by cell (two nans on the same cell are considered equal).
@@ -235,10 +227,7 @@ def are_equal(
         )
         all_values_equal = compared.all().all()
         if not all_values_equal:
-            summary += (
-                "\n* Values differ by more than the given absolute and relative"
-                " tolerances."
-            )
+            summary += "\n* Values differ by more than the given absolute and relative" " tolerances."
 
         # Dataframes are equal only if all previous checks have passed.
         equal = equal & all_values_equal
@@ -309,9 +298,7 @@ def groupby_agg(
         groupby_columns = [groupby_columns]
 
     if aggregations is None:
-        columns_to_aggregate = [
-            column for column in df.columns if column not in groupby_columns
-        ]
+        columns_to_aggregate = [column for column in df.columns if column not in groupby_columns]
         aggregations = {column: "sum" for column in columns_to_aggregate}
 
     # Default groupby arguments, `observed` makes sure the final dataframe
@@ -326,31 +313,23 @@ def groupby_agg(
 
     if num_allowed_nans is not None:
         # Count the number of missing values in each group.
-        num_nans_detected = count_missing_in_groups(
-            df, groupby_columns, **groupby_kwargs
-        )
+        num_nans_detected = count_missing_in_groups(df, groupby_columns, **groupby_kwargs)
 
         # Make nan any aggregation where there were too many missing values.
         grouped = grouped[num_nans_detected <= num_allowed_nans]
 
     if frac_allowed_nans is not None:
         # Count the number of missing values in each group.
-        num_nans_detected = count_missing_in_groups(
-            df, groupby_columns, **groupby_kwargs
-        )
+        num_nans_detected = count_missing_in_groups(df, groupby_columns, **groupby_kwargs)
         # Count number of elements in each group (avoid using 'count' method, which ignores nans).
         num_elements = df.groupby(groupby_columns, **groupby_kwargs).size()  # type: ignore
         # Make nan any aggregation where there were too many missing values.
-        grouped = grouped[
-            num_nans_detected.divide(num_elements, axis="index") <= frac_allowed_nans
-        ]
+        grouped = grouped[num_nans_detected.divide(num_elements, axis="index") <= frac_allowed_nans]
 
     return grouped
 
 
-def count_missing_in_groups(
-    df: pd.DataFrame, groupby_columns: List[str], **kwargs: Any
-) -> pd.DataFrame:
+def count_missing_in_groups(df: pd.DataFrame, groupby_columns: List[str], **kwargs: Any) -> pd.DataFrame:
     """Count the number of missing values in each group.
 
     Faster version of:
@@ -362,19 +341,12 @@ def count_missing_in_groups(
     """
     nan_columns = [c for c in df.columns if c not in groupby_columns]
 
-    num_nans_detected = (
-        df[nan_columns]
-        .isnull()
-        .groupby([df[c] for c in groupby_columns], **kwargs)
-        .sum()
-    )
+    num_nans_detected = df[nan_columns].isnull().groupby([df[c] for c in groupby_columns], **kwargs).sum()
 
     return cast(pd.DataFrame, num_nans_detected)
 
 
-def multi_merge(
-    dfs: List[pd.DataFrame], on: Union[List[str], str], how: str = "inner"
-) -> pd.DataFrame:
+def multi_merge(dfs: List[pd.DataFrame], on: Union[List[str], str], how: str = "inner") -> pd.DataFrame:
     """Merge multiple dataframes.
 
     This is a helper function when merging more than two dataframes on common columns.
@@ -467,9 +439,7 @@ def map_series(
 
         # Detect values in the mapping that were intended to be mapped to nan.
         values_mapped_to_nan = [
-            original_value
-            for original_value, target_value in mapping.items()
-            if pd.isnull(target_value)
+            original_value for original_value, target_value in mapping.items() if pd.isnull(target_value)
         ]
 
         # Make a mask that is True for new nans that need to be replaced back to their original values.
@@ -520,18 +490,14 @@ def rename_categories(series: pd.Series, mapping: Dict[Any, Any]) -> pd.Series:
         # Non-unique category, replace it first
         elif map_to in new_mapping.values():
             # Find the category that maps to map_to
-            series[series == map_from] = [
-                k for k, v in new_mapping.items() if v == map_to
-            ][0]
+            series[series == map_from] = [k for k, v in new_mapping.items() if v == map_to][0]
         else:
             new_mapping[map_from] = map_to
 
     # NOTE: removing unused categories is necessary because of renaming
     return cast(
         pd.Series,
-        series.cat.remove_unused_categories()
-        .cat.rename_categories(new_mapping)
-        .cat.remove_unused_categories(),
+        series.cat.remove_unused_categories().cat.rename_categories(new_mapping).cat.remove_unused_categories(),
     )
 
 
@@ -541,9 +507,7 @@ def concatenate(dfs: List[pd.DataFrame], **kwargs: Any) -> pd.DataFrame:
     Original source code from https://stackoverflow.com/a/57809778/1275818.
     """
     # Iterate on categorical columns common to all dfs
-    for col in set.intersection(
-        *[set(df.select_dtypes(include="category").columns) for df in dfs]
-    ):
+    for col in set.intersection(*[set(df.select_dtypes(include="category").columns) for df in dfs]):
         # Generate the union category across dfs for this column
         uc = union_categoricals([df[col] for df in dfs])
         # Change to union category for all dataframes
@@ -553,9 +517,7 @@ def concatenate(dfs: List[pd.DataFrame], **kwargs: Any) -> pd.DataFrame:
     return pd.concat(dfs, **kwargs)
 
 
-def apply_on_categoricals(
-    cat_series: List[pd.Series], func: Callable[..., str]
-) -> pd.Series:
+def apply_on_categoricals(cat_series: List[pd.Series], func: Callable[..., str]) -> pd.Series:
     """Apply a function on a list of categorical series.
 
     This is much faster than converting them to strings first and then applying the function and it prevents memory
@@ -576,10 +538,7 @@ def apply_on_categoricals(
         if cat_codes not in seen:
             # add category
             # -1 is a special code for missing values
-            cat_values = [
-                s.cat.categories[code] if code != -1 else np.nan
-                for s, code in zip(cat_series, cat_codes)
-            ]
+            cat_values = [s.cat.categories[code] if code != -1 else np.nan for s, code in zip(cat_series, cat_codes)]
             categories.append(func(*cat_values))
             seen[cat_codes] = len(categories) - 1
 
@@ -633,10 +592,7 @@ def combine_two_overlapping_dataframes(
     if index_columns is not None:
         # Ensure dataframes have a dummy index.
         if not ((df1.index.names == [None]) and (df2.index.names == [None])):
-            warnings.warn(
-                "If index_columns is given, dataframes should have a dummy index. Use"
-                " reset_index()."
-            )
+            warnings.warn("If index_columns is given, dataframes should have a dummy index. Use" " reset_index().")
         # Set index columns.
         df1 = df1.set_index(index_columns)
         df2 = df2.set_index(index_columns)

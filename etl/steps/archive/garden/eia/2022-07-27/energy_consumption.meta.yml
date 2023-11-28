@@ -1,0 +1,24 @@
+dataset:
+  namespace: eia
+  version: 2022-07-27
+  title: Total energy consumption (EIA, 2022)
+  short_name: energy_consumption
+  description: |
+    Total energy consumption, extracted from EIA's international energy data from the EIA, downloaded using their [Bulk Download Facility](https://www.eia.gov/opendata/bulkfiles.php).
+
+    EIA's region definitions sometimes differ from Our World in Data's definitions. For example, in EIA's data, Russia is not included in Europe, whereas Our World in Data includes Russia in Europe (see a map with [our region definitions](https://ourworldindata.org/world-region-map-definitions)). For this reason, we include in the dataset regions like "Europe (EIA)" to refer to EIA's original data using their definition of the region, as well as "Europe", which is data aggregated by Our World in Data using our definition. These aggregates are constructed by adding up (when possible) the contributions from the countries in the region.
+  sources:
+  - name: Our World in Data based on EIA's total energy consumption (2022)
+    published_by: U.S. Energy Information Administration (EIA)
+    publication_year: 2022
+    date_accessed: 2022-07-27
+    url: https://www.eia.gov/opendata/bulkfiles.php
+tables:
+  energy_consumption:
+    variables:
+      energy_consumption:
+        title: Total energy consumption (TWh)
+        short_unit: TWh
+        unit: terawatt-hours
+        display:
+          name: Total energy consumption

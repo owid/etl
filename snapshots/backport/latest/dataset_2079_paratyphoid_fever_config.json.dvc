@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2079
+    date_accessed: 2023-08-16 10:43:37.636583
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2079_paratyphoid_fever (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 2896f3ac0767fc8c50abc41f68dd8f2d
+  size: 32578
+  path: dataset_2079_paratyphoid_fever_config.json

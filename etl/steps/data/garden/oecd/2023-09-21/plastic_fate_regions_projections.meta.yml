@@ -1,0 +1,88 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Plastic Pollution
+
+
+tables:
+  plastic_fate_regions_projections:
+    variables:
+      value_incinerated:
+        title: Incinerated - projections
+        unit: 'tonnes'
+        short_unit: 't'
+        display:
+          numDecimalPlaces: 0
+      value_landfilled:
+        title: Landfilled  - projections
+        unit: 'tonnes'
+        short_unit: 't'
+        display:
+          numDecimalPlaces: 0
+      value_mismanaged:
+        title: Mismanaged  - projections
+        unit: 'tonnes'
+        short_unit: 't'
+        display:
+          numDecimalPlaces: 0
+      value_recycled:
+        title: Recycled  - projections
+        unit: 'tonnes'
+        short_unit: 't'
+        display:
+          numDecimalPlaces: 0
+      value_total:
+        title: Total waste - projections
+        unit: 'tonnes'
+        short_unit: 't'
+        display:
+          numDecimalPlaces: 0
+      share_incinerated:
+        title: Share of waste incinerated from global total - projections
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 0
+      share_landfilled:
+        title: Share of waste landfilled from global total - projections
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 0
+      share_mismanaged:
+        title: Share of waste mismanaged from global total - projections
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 0
+      share_recycled:
+        title: Share of waste recycled from global total - projections
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 0
+      value_incinerated_share:
+        title: Share of waste incinerated from total regional waste - projections
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 0
+      value_landfilled_share:
+        title: Share of waste landfilled from total regional waste - projections
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 0
+      value_mismanaged_share:
+        title: Share of waste mismanaged from total regional waste - projections
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 0
+      value_recycled_share:
+        title: Share of waste recycled from total regional waste - projections
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 0

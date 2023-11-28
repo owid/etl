@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4813
+    date_accessed: 2023-08-16 07:27:24.978149
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Proportion of countries with clearly defined procedures in law or policy for
+    participation by service users/communities in planning program in rural drinking-water
+    supply (%)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: e7cd73c5a0a4b1be05bce2987535d393
+  size: 7362
+  path: 
+    dataset_4813_proportion_of_countries_with_clearly_defined_procedures_in_law_or_policy_for_participation_by_service_users_communities_in_planning_program_in_rural_drinking_water_supply__pct_values.feather

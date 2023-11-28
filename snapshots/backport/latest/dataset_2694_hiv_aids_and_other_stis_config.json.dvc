@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2694
+    date_accessed: 2023-08-16 08:01:58.521309
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2694_hiv_aids_and_other_stis (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 86ce828ff38e25513ed02c93d6e999e8
+  size: 93795
+  path: dataset_2694_hiv_aids_and_other_stis_config.json

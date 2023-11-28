@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4729
+    date_accessed: 2023-08-14 10:58:56.138985
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Gender parity index for youth/adults with information and communications technology
+    (ICT) skills, by type of skill (ratio)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: c59dc39224f91866eee9e760c3803830
+  size: 10170
+  path: 
+    dataset_4729_gender_parity_index_for_youth_adults_with_information_and_communications_technology__ict__skills__by_type_of_skill__ratio_values.feather

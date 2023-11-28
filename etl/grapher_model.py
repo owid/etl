@@ -5,10 +5,11 @@ sqlacodegen --generator sqlmodels mysql://root@localhost:3306/owid
 It has been slightly modified since then.
 """
 import json
-from datetime import datetime
-from typing import Any, Dict, List, Optional, TypedDict
+from datetime import date, datetime
+from typing import Annotated, Any, Dict, List, Optional, TypedDict, Union
 from urllib.parse import quote
 
+import humps
 import pandas as pd
 import structlog
 from owid import catalog
@@ -23,7 +24,15 @@ from sqlalchemy import (
     Table,
     text,
 )
-from sqlalchemy.dialects.mysql import LONGBLOB, LONGTEXT, MEDIUMTEXT, TINYINT, VARCHAR
+from sqlalchemy.dialects.mysql import (
+    ENUM,
+    LONGBLOB,
+    LONGTEXT,
+    MEDIUMTEXT,
+    TINYINT,
+    VARCHAR,
+)
+from sqlalchemy.exc import NoResultFound
 from sqlalchemy.future import Engine as _FutureEngine
 from sqlmodel import JSON as _JSON
 from sqlmodel import (
@@ -39,6 +48,7 @@ from sqlmodel import (
 from sqlmodel.sql.expression import Select, SelectOfScalar
 
 from etl import config
+from etl.config import GRAPHER_USER_ID
 
 log = structlog.get_logger()
 
@@ -94,8 +104,6 @@ class Entity(SQLModel, table=True):
     updatedAt: datetime = Field(sa_column=Column("updatedAt", DateTime, nullable=False))
     displayName: str = Field(sa_column=Column("displayName", String(255, "utf8mb4_0900_as_cs"), nullable=False))
     code: Optional[str] = Field(default=None, sa_column=Column("code", String(255, "utf8mb4_0900_as_cs")))
-
-    data_values: List["DataValues"] = Relationship(back_populates="entities")
 
 
 class Namespace(SQLModel, table=True):
@@ -160,7 +168,7 @@ t_post_tags = Table(
 
 
 class Tag(SQLModel, table=True):
-    __tablename__: "tags"  # type: ignore
+    __tablename__: str = "tags"  # type: ignore
     __table_args__ = (
         ForeignKeyConstraint(["parentId"], ["tags.id"], name="tags_ibfk_1"),
         Index("dataset_subcategories_name_fk_dst_cat_id_6ce1cc36_uniq", "name", "parentId", unique=True),
@@ -175,12 +183,31 @@ class Tag(SQLModel, table=True):
     isBulkImport: int = Field(sa_column=Column("isBulkImport", TINYINT(1), nullable=False, server_default=text("'0'")))
     parentId: Optional[int] = Field(default=None, sa_column=Column("parentId", Integer))
     specialType: Optional[str] = Field(default=None, sa_column=Column("specialType", String(255, "utf8mb4_0900_as_cs")))
+    isTopic: int = Field(sa_column=Column("isTopic", TINYINT(1), nullable=False, server_default=text("'0'")))
 
     post: List["Posts"] = Relationship(back_populates="tag")
     tags: Optional["Tag"] = Relationship(back_populates="tags_reverse")
     tags_reverse: List["Tag"] = Relationship(back_populates="tags")
     datasets: List["Dataset"] = Relationship(back_populates="tags")
     chart_tags: List["ChartTags"] = Relationship(back_populates="tags")
+
+    @classmethod
+    def load_tags(cls, session: Session, is_topic: bool = True) -> List["Tag"]:  # type: ignore
+        return session.exec(select(cls).where(cls.isTopic == is_topic)).all()  # type: ignore
+
+    @classmethod
+    def load_tags_by_names(cls, session: Session, tag_names: List[str]) -> List["Tag"]:
+        """Load topic tags by their names in the order given in `tag_names`."""
+        tags = session.exec(select(Tag).where(Tag.name.in_(tag_names), Tag.isTopic == 1)).all()  # type: ignore
+
+        if len(tags) != len(tag_names):
+            found_tags = [tag.name for tag in tags]
+            missing_tags = [tag for tag in tag_names if tag not in found_tags]
+            tag_names = found_tags
+            log.warning("create_links.missing_tags", tags=missing_tags)
+
+        tags = [next(tag for tag in tags if tag.name == ordered_name) for ordered_name in tag_names]
+        return tags
 
 
 class User(SQLModel, table=True):
@@ -258,9 +285,13 @@ class Chart(SQLModel, table=True):
     chart_dimensions: List["ChartDimensions"] = Relationship(back_populates="charts")
 
     @classmethod
-    def load_chart(cls, session: Session, chart_id: int) -> "Chart":
+    def load_chart(cls, session: Session, chart_id: Optional[int] = None, slug: Optional[str] = None) -> "Chart":
         """Load chart with id `chart_id`."""
-        return session.exec(select(cls).where(cls.id == chart_id)).one()
+        if chart_id:
+            cond = cls.id == chart_id
+        elif slug:
+            cond = _json_is(cls.config, "slug", slug)
+        return session.exec(select(cls).where(cond)).one()  # type: ignore
 
     @classmethod
     def load_charts_using_variables(cls, session: Session, variable_ids: List[int]) -> List["Chart"]:
@@ -273,6 +304,84 @@ class Chart(SQLModel, table=True):
         )
         # Find charts
         return session.exec(select(Chart).where(Chart.id.in_(chart_ids))).all()  # type: ignore
+
+    def load_chart_variables(self, session: Session) -> Dict[int, "Variable"]:
+        q = """
+        select
+            v.*
+        from chart_dimensions as cd
+        join variables as v on v.id = cd.variableId
+        where cd.chartId = :chart_id
+        """
+        rows = session.execute(q, params={"chart_id": self.id}).fetchall()  # type: ignore
+        variables = {r["id"]: Variable(**r) for r in rows}
+
+        # add columnSlug if present
+        column_slug = self.config.get("map", {}).get("columnSlug")
+        if column_slug:
+            variables[int(column_slug)] = Variable.load_variable(session, column_slug)
+
+        return variables
+
+    def migrate_to_db(self, source_session: Session, target_session: Session) -> "Chart":
+        """Remap variable ids from source to target session. Variable in source is uniquely identified
+        by its catalogPath if available, or by name and datasetId otherwise. It is looked up
+        by this identifier in the target session to get the new variable id.
+
+        Once we get the `source variable id -> target variable id` mapping, we remap all variables in the
+        chart config.
+        """
+        assert self.id, "Chart must come from a database"
+        source_variables = self.load_chart_variables(source_session)
+
+        remap_ids = {}
+        for source_var_id, source_var in source_variables.items():
+            if source_var.catalogPath:
+                try:
+                    target_var = Variable.load_from_catalog_path(target_session, source_var.catalogPath)
+                except NoResultFound:
+                    raise ValueError(f"variables.catalogPath not found in target: {source_var.catalogPath}")
+            # old style variable, match it on name and dataset id
+            else:
+                try:
+                    target_var = target_session.exec(
+                        select(Variable).where(
+                            Variable.name == source_var.name, Variable.datasetId == source_var.datasetId
+                        )
+                    ).one()
+
+                except NoResultFound:
+                    raise ValueError(
+                        f"variable with name `{source_var.name}` and datasetId `{source_var.datasetId}` not found in target"
+                    )
+
+            # log.debug("remap_variables", old_name=source_var.name, new_name=target_var.name)
+            remap_ids[source_var_id] = target_var.id
+
+        target_chart = Chart(**self.dict())
+        del target_chart.id
+        target_chart.config = _remap_variable_ids(target_chart.config, remap_ids)
+
+        # set proper GRAPHER_USER_ID
+        assert GRAPHER_USER_ID
+        target_chart.lastEditedByUserId = int(GRAPHER_USER_ID)
+
+        return target_chart
+
+    def tags(self, session: Session) -> List[Dict[str, Any]]:
+        """Return tags in a format suitable for Admin API."""
+        q = """
+        select
+            tagId as id,
+            t.name,
+            ct.isApproved,
+            ct.keyChartLevel
+        from chart_tags as ct
+        join tags as t on ct.tagId = t.id
+        where ct.chartId = :chart_id
+        """
+        rows = session.execute(q, params={"chart_id": self.id}).fetchall()  # type: ignore
+        return rows
 
 
 class Dataset(SQLModel, table=True):
@@ -341,6 +450,7 @@ class Dataset(SQLModel, table=True):
     sourceChecksum: Optional[str] = Field(
         default=None, sa_column=Column("sourceChecksum", String(64, "utf8mb4_0900_as_cs"))
     )
+    updatePeriodDays: Optional[int] = Field(sa_column=Column("updatePeriodDays", Integer, nullable=True))
 
     users: Optional["User"] = Relationship(back_populates="datasets")
     users_: Optional["User"] = Relationship(back_populates="datasets_")
@@ -366,6 +476,7 @@ class Dataset(SQLModel, table=True):
             ds.dataEditedByUserId = self.dataEditedByUserId
             ds.createdByUserId = self.createdByUserId
             ds.isPrivate = self.isPrivate
+            ds.updatePeriodDays = self.updatePeriodDays
             ds.updatedAt = datetime.utcnow()
             ds.metadataEditedAt = datetime.utcnow()
             ds.dataEditedAt = datetime.utcnow()
@@ -396,6 +507,7 @@ class Dataset(SQLModel, table=True):
             createdByUserId=user_id,
             description=metadata.description or "",
             isPrivate=not metadata.is_public,
+            updatePeriodDays=metadata.update_period_days,
         )
 
     @classmethod
@@ -411,7 +523,7 @@ class Dataset(SQLModel, table=True):
     @classmethod
     def load_variables_for_dataset(cls, session: Session, dataset_id: int) -> list["Variable"]:
         vars = session.exec(select(Variable).where(Variable.datasetId == dataset_id)).all()
-        assert vars
+        assert vars, f"Dataset {dataset_id} has no variables"
         return vars
 
 
@@ -527,18 +639,12 @@ class Source(SQLModel, table=True):
         conds = [
             cls.name == self.name,
             cls.datasetId == self.datasetId,
+            _json_is(cls.description, "additionalInfo", self.description.get("additionalInfo")),
+            _json_is(cls.description, "dataPublishedBy", self.description.get("dataPublishedBy")),
         ]
-        if self.description.get("additionalInfo"):
-            conds.append(cls.description["additionalInfo"] == self.description["additionalInfo"])  # type: ignore
-
-        if self.description.get("dataPublishedBy"):
-            conds.append(cls.description["dataPublishedBy"] == self.description["dataPublishedBy"])  # type: ignore
-
         return select(cls).where(*conds)  # type: ignore
 
     def upsert(self, session: Session) -> "Source":
-        # NOTE: we match on both name and additionalInfo (source's description) so that we can
-        # have sources with the same name, but different descriptions
         ds = session.exec(self._upsert_select).one_or_none()
 
         if not ds:
@@ -678,7 +784,7 @@ class SuggestedChartRevisions(SQLModel, table=True):
     users_: Optional["User"] = Relationship(back_populates="suggested_chart_revisions_")
 
     @classmethod
-    def load_pending(cls, session: Session, user_id: Optional[int] = None):
+    def load_pending(cls, session: Session, user_id: Optional[int] = None) -> List["SuggestedChartRevisions"]:
         if user_id is None:
             return session.exec(
                 select(SuggestedChartRevisions).where((SuggestedChartRevisions.status == "pending"))
@@ -690,6 +796,10 @@ class SuggestedChartRevisions(SQLModel, table=True):
                 .where(SuggestedChartRevisions.createdBy == user_id)
             ).all()
 
+    @classmethod
+    def load_revisions(cls, session: Session, chart_id: int) -> List["SuggestedChartRevisions"]:
+        return session.exec(select(SuggestedChartRevisions).where(SuggestedChartRevisions.chartId == chart_id)).all()
+
 
 class DimensionFilter(TypedDict):
     name: str
@@ -700,6 +810,158 @@ class Dimensions(TypedDict):
     originalShortName: str
     originalName: str
     filters: List[DimensionFilter]
+
+
+class PostsGdocs(SQLModel, table=True):
+    __tablename__ = "posts_gdocs"  # type: ignore
+    __table_args__ = {"extend_existing": True}
+
+    id: Optional[str] = Field(default=None, sa_column=Column("id", VARCHAR(255), primary_key=True))
+    slug: str = Field(sa_column=Column("slug", VARCHAR(255), nullable=False))
+    content: dict = Field(sa_column=Column("content", JSON, nullable=False))
+    published: int = Field(sa_column=Column("published", TINYINT, nullable=False))
+    createdAt: datetime = Field(sa_column=Column("createdAt", DateTime, nullable=False))
+    publicationContext: str = Field(
+        sa_column=Column(
+            "publicationContext", ENUM("unlisted", "listed"), nullable=False, server_default=text("'unlisted'")
+        )
+    )
+    publishedAt: Optional[datetime] = Field(default=None, sa_column=Column("publishedAt", DateTime))
+    updatedAt: Optional[datetime] = Field(default=None, sa_column=Column("updatedAt", DateTime))
+    revisionId: Optional[str] = Field(default=None, sa_column=Column("revisionId", VARCHAR(255)))
+
+
+class OriginsVariablesLink(SQLModel, table=True):
+    __tablename__: str = "origins_variables"  # type: ignore
+    __table_args__ = {"extend_existing": True}
+
+    originId: int = Field(default=None, foreign_key="origins.id", primary_key=True)
+    variableId: int = Field(default=None, foreign_key="variables.id", primary_key=True)
+    displayOrder: int = Field(sa_column=Column("displayOrder", Integer, nullable=False, default=0))
+
+    @classmethod
+    def link_with_variable(cls, session: Session, variable_id: int, new_origin_ids: List[int]) -> None:
+        """Link the given Variable ID with the given Origin IDs."""
+        # Fetch current linked Origins for the given Variable ID
+        existing_links = session.query(cls.originId, cls.displayOrder).filter(cls.variableId == variable_id).all()
+
+        existing_origins = {(link.originId, link.displayOrder) for link in existing_links}
+        new_origins = {(origin_id, i) for i, origin_id in enumerate(new_origin_ids)}
+
+        # Find the Origin IDs to delete and the IDs to add
+        to_delete = existing_origins - new_origins
+        to_add = new_origins - existing_origins
+
+        # Delete the obsolete Origin-Variable links
+        for origin_id, display_order in to_delete:
+            session.query(cls).filter(
+                cls.variableId == variable_id,
+                cls.originId == origin_id,
+                cls.displayOrder == display_order,
+            ).delete(synchronize_session="fetch")
+
+        # Add the new Origin-Variable links
+        if to_add:
+            session.add_all(
+                [
+                    cls(originId=origin_id, variableId=variable_id, displayOrder=display_order)
+                    for origin_id, display_order in to_add
+                ]
+            )
+
+
+class PostsGdocsVariablesFaqsLink(SQLModel, table=True):
+    __tablename__ = "posts_gdocs_variables_faqs"  # type: ignore
+    __table_args__ = (
+        ForeignKeyConstraint(["gdocId"], ["posts_gdocs.id"], name="posts_gdocs_variables_faqs_ibfk_1"),
+        ForeignKeyConstraint(["variableId"], ["variables.id"], name="posts_gdocs_variables_faqs_ibfk_2"),
+        Index("variableId", "variableId"),
+        {"extend_existing": True},
+    )
+
+    gdocId: Optional[str] = Field(
+        default=None, sa_column=Column("gdocId", VARCHAR(255), primary_key=True, nullable=False)
+    )
+    variableId: int = Field(sa_column=Column("variableId", Integer, primary_key=True, nullable=False))
+    fragmentId: Optional[str] = Field(
+        default=None, sa_column=Column("fragmentId", String(255), primary_key=True, nullable=False)
+    )
+    displayOrder: int = Field(sa_column=Column("displayOrder", Integer, nullable=False, default=0))
+
+    @classmethod
+    def link_with_variable(cls, session: Session, variable_id: int, new_faqs: List[catalog.FaqLink]) -> None:
+        """Link the given Variable ID with Faqs"""
+        # Fetch current linked Faqs for the given Variable ID
+        existing_faqs = session.query(cls).filter(cls.variableId == variable_id).all()
+
+        # Work with tuples instead
+        existing_gdoc_fragment = {(f.gdocId, f.fragmentId, f.displayOrder) for f in existing_faqs}
+        new_gdoc_fragment = {(f.gdoc_id, f.fragment_id, i) for i, f in enumerate(new_faqs)}
+
+        to_delete = existing_gdoc_fragment - new_gdoc_fragment
+        to_add = new_gdoc_fragment - existing_gdoc_fragment
+
+        # Delete the obsolete links
+        for gdoc_id, fragment_id, display_order in to_delete:
+            session.query(cls).filter(
+                cls.variableId == variable_id,
+                cls.gdocId == gdoc_id,
+                cls.fragmentId == fragment_id,
+                cls.displayOrder == display_order,
+            ).delete(synchronize_session="fetch")
+
+        # Add the new links
+        if to_add:
+            session.add_all(
+                [
+                    cls(gdocId=gdoc_id, fragmentId=fragment_id, displayOrder=display_order, variableId=variable_id)
+                    for gdoc_id, fragment_id, display_order in to_add
+                ]
+            )
+
+
+class TagsVariablesTopicTagsLink(SQLModel, table=True):
+    __tablename__ = "tags_variables_topic_tags"  # type: ignore
+    __table_args__ = (
+        ForeignKeyConstraint(["tagId"], ["tags.id"], name="tags_variables_topic_tags_ibfk_1"),
+        ForeignKeyConstraint(["variableId"], ["variables.id"], name="tags_variables_topic_tags_ibfk_2"),
+        Index("variableId", "variableId"),
+        {"extend_existing": True},
+    )
+
+    tagId: Optional[str] = Field(default=None, sa_column=Column("tagId", Integer, primary_key=True, nullable=False))
+    variableId: int = Field(sa_column=Column("variableId", Integer, primary_key=True, nullable=False))
+    displayOrder: int = Field(sa_column=Column("displayOrder", Integer, nullable=False, default=0))
+
+    @classmethod
+    def link_with_variable(cls, session: Session, variable_id: int, new_tag_ids: List[str]) -> None:
+        """Link the given Variable ID with the given Tag IDs."""
+        # Fetch current linked tags for the given Variable ID
+        existing_links = session.query(cls.tagId, cls.displayOrder).filter(cls.variableId == variable_id).all()
+
+        existing_tags = {(link.tagId, link.displayOrder) for link in existing_links}
+        new_tags = {(tag_id, i) for i, tag_id in enumerate(new_tag_ids)}
+
+        # Find the tag IDs to delete and the IDs to add
+        to_delete = existing_tags - new_tags
+        to_add = new_tags - existing_tags
+
+        # Delete the obsolete links
+        for tag_id, display_order in to_delete:
+            session.query(cls).filter(
+                cls.variableId == variable_id,
+                cls.tagId == tag_id,
+                cls.displayOrder == display_order,
+            ).delete(synchronize_session="fetch")
+
+        # Add the new links
+        if to_add:
+            session.add_all(
+                [
+                    cls(tagId=tag_id, variableId=variable_id, displayOrder=display_order)
+                    for tag_id, display_order in to_add
+                ]
+            )
 
 
 class Variable(SQLModel, table=True):
@@ -720,7 +982,7 @@ class Variable(SQLModel, table=True):
         'display': '{}',
         'columnOrder': 0,
         'originalMetadata': '{}',
-        'grapherConfig': None
+        'grapherConfigAdmin': None
     }
     """
 
@@ -750,7 +1012,7 @@ class Variable(SQLModel, table=True):
     )
     coverage: str = Field(sa_column=Column("coverage", String(255, "utf8mb4_0900_as_cs"), nullable=False))
     timespan: str = Field(sa_column=Column("timespan", String(255, "utf8mb4_0900_as_cs"), nullable=False))
-    sourceId: int = Field(sa_column=Column("sourceId", Integer, nullable=False))
+    sourceId: Optional[int] = Field(sa_column=Column("sourceId", Integer, nullable=True))
     display: Dict[str, Any] = Field(sa_column=Column("display", JSON, nullable=False))
     columnOrder: int = Field(
         default=0, sa_column=Column("columnOrder", Integer, nullable=False, server_default=text("'0'"))
@@ -758,16 +1020,35 @@ class Variable(SQLModel, table=True):
     code: Optional[str] = Field(default=None, sa_column=Column("code", String(255, "utf8mb4_0900_as_cs")))
     shortUnit: Optional[str] = Field(default=None, sa_column=Column("shortUnit", String(255, "utf8mb4_0900_as_cs")))
     originalMetadata: Optional[Dict[Any, Any]] = Field(default=None, sa_column=Column("originalMetadata", JSON))
-    grapherConfig: Optional[Dict[Any, Any]] = Field(default=None, sa_column=Column("grapherConfig", JSON))
+    grapherConfigAdmin: Optional[Dict[Any, Any]] = Field(default=None, sa_column=Column("grapherConfigAdmin", JSON))
+    grapherConfigETL: Optional[Dict[Any, Any]] = Field(default=None, sa_column=Column("grapherConfigETL", JSON))
     catalogPath: Optional[str] = Field(default=None, sa_column=Column("catalogPath", LONGTEXT))
-    dataPath: Optional[str] = Field(default=None, sa_column=Column("dataPath", LONGTEXT))
-    metadataPath: Optional[str] = Field(default=None, sa_column=Column("metadataPath", LONGTEXT))
     dimensions: Optional[Dimensions] = Field(sa_column=Column("dimensions", JSON, nullable=True))
+
+    schemaVersion: Optional[int] = Field(default=None, sa_column=Column("schemaVersion", Integer))
+    # processingLevel: Optional[str] = Field(
+    #     default=None, sa_column=Column("processingLevel", ENUM("minor", "medium", "major"))
+    # )
+    processingLevel: Optional[Optional[Annotated[str, catalog.meta.PROCESSING_LEVELS]]] = Field(default=None)
+    processingLog: Optional[dict] = Field(default=None, sa_column=Column("processingLog", JSON))
+    titlePublic: Optional[str] = Field(default=None, sa_column=Column("titlePublic", LONGTEXT))
+    titleVariant: Optional[str] = Field(default=None, sa_column=Column("titleVariant", LONGTEXT))
+    attributionShort: Optional[str] = Field(default=None, sa_column=Column("attributionShort", LONGTEXT))
+    attribution: Optional[str] = Field(default=None, sa_column=Column("attribution", LONGTEXT))
+    descriptionShort: Optional[str] = Field(default=None, sa_column=Column("descriptionShort", LONGTEXT))
+    descriptionFromProducer: Optional[str] = Field(default=None, sa_column=Column("descriptionFromProducer", LONGTEXT))
+    descriptionKey: Optional[List[str]] = Field(default=None, sa_column=Column("descriptionKey", JSON))
+    descriptionProcessing: Optional[str] = Field(default=None, sa_column=Column("descriptionProcessing", LONGTEXT))
+    # NOTE: Use of `licenses` is discouraged, they should be captured in origins.
+    licenses: Optional[List[dict]] = Field(default=None, sa_column=Column("licenses", JSON))
+    # NOTE: License should be the resulting license, given all licenses of the indicator’s origins and given the indicator’s processing level.
+    license: Optional[dict] = Field(default=None, sa_column=Column("license", JSON))
 
     datasets: Optional["Dataset"] = Relationship(back_populates="variables")
     sources: Optional["Source"] = Relationship(back_populates="variables")
     chart_dimensions: List["ChartDimensions"] = Relationship(back_populates="variables")
-    data_values: List["DataValues"] = Relationship(back_populates="variables")
+    origins: List["Origin"] = Relationship(back_populates="origins", link_model=OriginsVariablesLink)
+    posts_gdocs: List["PostsGdocs"] = Relationship(back_populates="posts_gdocs", link_model=PostsGdocsVariablesFaqsLink)
 
     def upsert(self, session: Session) -> "Variable":
         assert self.shortName
@@ -808,9 +1089,20 @@ class Variable(SQLModel, table=True):
             ds.coverage = self.coverage
             ds.display = self.display
             ds.catalogPath = self.catalogPath
-            ds.dataPath = self.dataPath
-            ds.metadataPath = self.metadataPath
             ds.dimensions = self.dimensions
+            ds.schemaVersion = self.schemaVersion
+            ds.processingLevel = self.processingLevel
+            ds.processingLog = self.processingLog
+            ds.titlePublic = self.titlePublic
+            ds.titleVariant = self.titleVariant
+            ds.attributionShort = self.attributionShort
+            ds.attribution = self.attribution
+            ds.descriptionShort = self.descriptionShort
+            ds.descriptionFromProducer = self.descriptionFromProducer
+            ds.descriptionKey = self.descriptionKey
+            ds.descriptionProcessing = self.descriptionProcessing
+            ds.licenses = self.licenses
+            ds.license = self.license
             ds.updatedAt = datetime.utcnow()
             # do not update these fields unless they're specified
             if self.columnOrder is not None:
@@ -819,8 +1111,9 @@ class Variable(SQLModel, table=True):
                 ds.code = self.code
             if self.originalMetadata is not None:
                 ds.originalMetadata = self.originalMetadata
-            if self.grapherConfig is not None:
-                ds.grapherConfig = self.grapherConfig
+            if self.grapherConfigETL is not None:
+                ds.grapherConfigETL = self.grapherConfigETL
+            assert self.grapherConfigAdmin is None, "grapherConfigETL should be used instead of grapherConfigAdmin"
 
         session.add(ds)
 
@@ -838,12 +1131,32 @@ class Variable(SQLModel, table=True):
         short_name: str,
         timespan: str,
         dataset_id: int,
-        source_id: int,
+        source_id: Optional[int],
         catalog_path: Optional[str],
         dimensions: Optional[Dimensions],
     ) -> "Variable":
         # `unit` can be an empty string, but cannot be null
         assert metadata.unit is not None
+        if catalog_path:
+            assert "#" in catalog_path, "catalog_path should end with #indicator_short_name"
+
+        if metadata.presentation:
+            presentation_dict = metadata.presentation.to_dict()  # type: ignore
+            # convert all fields from snake_case to camelCase
+            presentation_dict = humps.camelize(presentation_dict)
+        else:
+            presentation_dict = {}
+
+        # TODO: implement `topicTagsLinks`
+        presentation_dict.pop("topicTagsLinks", None)
+
+        if metadata.description_key:
+            assert isinstance(metadata.description_key, list), "descriptionKey should be a list of bullet points"
+
+        # rename grapherConfig to grapherConfigETL
+        if "grapherConfig" in presentation_dict:
+            presentation_dict["grapherConfigETL"] = presentation_dict.pop("grapherConfig")
+
         return cls(
             shortName=short_name,
             name=metadata.title,
@@ -857,6 +1170,15 @@ class Variable(SQLModel, table=True):
             display=metadata.display or {},
             catalogPath=catalog_path,
             dimensions=dimensions,
+            schemaVersion=metadata.schema_version,
+            processingLevel=metadata.processing_level,
+            descriptionShort=metadata.description_short,
+            descriptionFromProducer=metadata.description_from_producer,
+            descriptionKey=metadata.description_key,
+            descriptionProcessing=metadata.description_processing,
+            licenses=[license.to_dict() for license in metadata.licenses] if metadata.licenses else None,
+            license=metadata.license.to_dict() if metadata.license else None,
+            **presentation_dict,
         )
 
     @classmethod
@@ -866,6 +1188,39 @@ class Variable(SQLModel, table=True):
     @classmethod
     def load_variables(cls, session: Session, variables_id: List[int]) -> List["Variable"]:
         return session.exec(select(cls).where(cls.id.in_(variables_id))).all()  # type: ignore
+
+    @classmethod
+    def load_from_catalog_path(cls, session: Session, catalog_path: str) -> "Variable":
+        assert "#" in catalog_path, "catalog_path should end with #indicator_short_name"
+        return session.exec(select(cls).where(cls.catalogPath == catalog_path)).one()
+
+    def update_links(
+        self, session: Session, db_origins: List["Origin"], faqs: List[catalog.FaqLink], tag_names: List[str]
+    ):
+        """
+        Establishes relationships between the current variable and a list of origins and a list of posts.
+        """
+        assert self.id
+
+        # establish relationships between variables and origins
+        OriginsVariablesLink.link_with_variable(session, self.id, [origin.id for origin in db_origins])  # type: ignore
+
+        # establish relationships between variables and posts
+        required_gdoc_ids = {faq.gdoc_id for faq in faqs}
+        query = select(PostsGdocs).where(PostsGdocs.id.in_(required_gdoc_ids))  # type: ignore
+        gdoc_posts = session.exec(query).all()
+        existing_gdoc_ids = {gdoc_post.id for gdoc_post in gdoc_posts}
+        missing_gdoc_ids = required_gdoc_ids - existing_gdoc_ids
+        if missing_gdoc_ids:
+            log.warning("create_links.missing_faqs", missing_gdoc_ids=missing_gdoc_ids)
+        PostsGdocsVariablesFaqsLink.link_with_variable(
+            session, self.id, [faq for faq in faqs if faq.gdoc_id in existing_gdoc_ids]
+        )
+
+        # establish relationships between variables and tags
+        tags = Tag.load_tags_by_names(session, tag_names)
+
+        TagsVariablesTopicTagsLink.link_with_variable(session, self.id, [tag.id for tag in tags])  # type: ignore
 
     def s3_data_path(self) -> str:
         """Path to S3 with data in JSON format for Grapher. Typically
@@ -914,22 +1269,136 @@ t_country_latest_data = Table(
 )
 
 
-# data_values table is gonna be deprecated!
-class DataValues(SQLModel, table=True):
-    __tablename__: str = "data_values"  # type: ignore
-    __table_args__ = (
-        ForeignKeyConstraint(["entityId"], ["entities.id"], name="data_values_entityId_entities_id"),
-        ForeignKeyConstraint(["variableId"], ["variables.id"], name="data_values_variableId_variables_id"),
-        Index("data_values_fk_ent_id_fk_var_id_year_e0eee895_uniq", "entityId", "variableId", "year", unique=True),
-        Index("data_values_variableId_variables_id", "variableId"),
-        Index("data_values_year", "year"),
-        {"extend_existing": True},
-    )
+class Origin(SQLModel, table=True):
+    """Get CREATE TABLE statement for origins table with
+    ```
+    from sqlalchemy.schema import CreateTable
+    from etl.grapher_model import Origin
+    print(str(CreateTable(Origin.__table__).compile(engine)))
+    ```
+    """
 
-    value: str = Field(sa_column=Column("value", String(255, "utf8mb4_0900_as_cs"), nullable=False))
-    year: int = Field(sa_column=Column("year", Integer, primary_key=True, nullable=False))
-    entityId: int = Field(sa_column=Column("entityId", Integer, primary_key=True, nullable=False))
-    variableId: int = Field(sa_column=Column("variableId", Integer, primary_key=True, nullable=False))
+    __tablename__: str = "origins"  # type: ignore
+    __table_args__ = {"extend_existing": True}
 
-    entities: Optional["Entity"] = Relationship(back_populates="data_values")
-    variables: Optional["Variable"] = Relationship(back_populates="data_values")
+    id: Optional[int] = Field(default=None, primary_key=True)
+    producer: Optional[str] = None
+    title: Optional[str] = None
+    description: Optional[str] = None
+    titleSnapshot: Optional[str] = None
+    descriptionSnapshot: Optional[str] = None
+    citationFull: Optional[str] = None
+    attribution: Optional[str] = None
+    attributionShort: Optional[str] = None
+    versionProducer: Optional[str] = None
+    urlMain: Optional[str] = None
+    urlDownload: Optional[str] = None
+    dateAccessed: Optional[date] = None
+    datePublished: Optional[str] = None
+    license: Optional[dict] = Field(default=None, sa_column=Column("license", JSON))
+
+    variables: list["Variable"] = Relationship(back_populates="origins", link_model=OriginsVariablesLink)
+
+    @classmethod
+    def from_origin(
+        cls,
+        origin: catalog.Origin,
+    ) -> "Origin":
+        return cls(
+            producer=origin.producer,
+            citationFull=origin.citation_full,
+            titleSnapshot=origin.title_snapshot,
+            title=origin.title,
+            attribution=origin.attribution,
+            attributionShort=origin.attribution_short,
+            versionProducer=origin.version_producer,
+            license=origin.license.to_dict() if origin.license else None,
+            urlMain=origin.url_main,
+            urlDownload=origin.url_download,
+            descriptionSnapshot=origin.description_snapshot,
+            description=origin.description,
+            datePublished=origin.date_published,
+            dateAccessed=origin.date_accessed,
+        )
+
+    @property
+    def _upsert_select(self) -> SelectOfScalar["Origin"]:
+        # match on all fields for now, otherwise we could get an origin from a different dataset
+        # and modify it, which would make it out of sync with origin from its recipe
+        # NOTE: we don't match on license because it's JSON and hard to compare
+        cls = self.__class__
+        return select(cls).where(
+            cls.producer == self.producer,
+            cls.citationFull == self.citationFull,
+            cls.titleSnapshot == self.titleSnapshot,
+            cls.title == self.title,
+            cls.attribution == self.attribution,
+            cls.attributionShort == self.attributionShort,
+            cls.versionProducer == self.versionProducer,
+            cls.urlMain == self.urlMain,
+            cls.urlDownload == self.urlDownload,
+            cls.descriptionSnapshot == self.descriptionSnapshot,
+            cls.description == self.description,
+            cls.datePublished == self.datePublished,
+            cls.dateAccessed == self.dateAccessed,
+        )  # type: ignore
+
+    def upsert(self, session: Session) -> "Origin":
+        """
+        # NOTE: this would be an ideal solution if we only stored unique rows in
+        # origins table, but there are weird race conditions and we cannot have
+        # index on all columns because it would be too long.
+        # Storing duplicate origins is not a big deal though
+
+        origin = session.exec(self._upsert_select).one_or_none()
+        if origin is None:
+            # create new origin
+            origin = self
+        else:
+            # we match on all fields, so there's nothing to update
+            pass
+
+        session.add(origin)
+
+        # select added object to get its id
+        return session.exec(self._upsert_select).one()
+        """
+
+        origins = session.exec(self._upsert_select).all()
+        if not origins:
+            # create new origin
+            origin = self
+            session.add(origin)
+        else:
+            # we match on all fields, so there's nothing to update
+            # just pick any origin
+            origin = origins[0]
+
+        return origin
+
+
+def _json_is(json_field: Any, key: str, val: Any) -> Any:
+    """SQLAlchemy condition for checking if a JSON field has a key with a given value. Works for null."""
+    if val is None:
+        return text(f"JSON_VALUE({json_field.key}, '$.{key}') IS NULL")
+    else:
+        return json_field[key] == val
+
+
+def _remap_variable_ids(config: Union[List, Dict[str, Any]], remap_ids: Dict[int, int]) -> Any:
+    """Replace variableIds from chart config using `remap_ids` mapping."""
+    if isinstance(config, dict):
+        out = {}
+        for k, v in config.items():
+            if k == "variableId":
+                out[k] = remap_ids[int(v)]
+            # columnSlug is actually a variable id, but stored as a string (it wasn't a great decision)
+            elif k == "columnSlug":
+                out[k] = str(remap_ids[int(v)])
+            else:
+                out[k] = _remap_variable_ids(v, remap_ids)
+        return out
+    elif isinstance(config, list):
+        return [_remap_variable_ids(item, remap_ids) for item in config]
+    else:
+        return config

@@ -69,11 +69,14 @@ def read_and_clean_data(local_file: str) -> pd.DataFrame:
 def fix_percent(df: pd.DataFrame) -> pd.DataFrame:
     """
     IHME doesn't seem to be consistent with how it stores percentages.
-    If the percent value for all causes == 1 for a particular dataset we need to multiply it by 100
+    If the maximum percent value for any cause of death is less than or equal 1,
+    it indicates all values are 100x too small and we need to multiply values by 100
     """
-
-    if all(df[(df["cause"] == "All causes") & (df["metric"] == "Percent")] == 1):
-        df["value"][(df["metric"] == "Percent")] = df["value"][(df["metric"] == "Percent")] * 100
+    if "Percent" in df["metric"].unique():
+        if max(df["value"][df["metric"] == "Percent"]) <= 1:
+            subset_percent = df["metric"] == "Percent"
+            df.loc[subset_percent, "value"] *= 100
+            # df["value"][(df["metric"] == "Percent")] = df["value"][(df["metric"] == "Percent")] * 100
     return df
 
 

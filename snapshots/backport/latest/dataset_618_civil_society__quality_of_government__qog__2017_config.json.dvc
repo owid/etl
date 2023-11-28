@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/618
+    date_accessed: 2023-08-16 09:56:07.714682
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_618_civil_society__quality_of_government__qog__2017
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 6b6042cf95647cb41333f59b8bb6e170
+  size: 145667
+  path: dataset_618_civil_society__quality_of_government__qog__2017_config.json

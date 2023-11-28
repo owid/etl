@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5558
+    date_accessed: 2023-08-16 09:24:51.090653
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_5558_ukraine_russia_food_exports_with_fuel_and_feed_context__un_fao
+    (archived)
+  description: ''
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 579e693dc8b6a17cd0ada5103af983a0
+  size: 8229
+  path: 
+    dataset_5558_ukraine_russia_food_exports_with_fuel_and_feed_context__un_fao_config.json

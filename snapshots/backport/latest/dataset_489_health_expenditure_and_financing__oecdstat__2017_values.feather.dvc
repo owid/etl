@@ -1,18 +1,14 @@
 meta:
-  namespace: backport
-  short_name: dataset_489_health_expenditure_and_financing__oecdstat__2017_values
-  file_extension: feather
-  date_accessed: 2023-02-23 17:14:03.313954
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/489
+    date_accessed: 2023-08-10 08:30:12.949921
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Health Expenditure and Financing - OECDstat (2017)
   description: Per capita health expenditure in 2010 international-$
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/489
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 20007755018e09e91f6631afe309b78c
+- md5: 019bb7c42d80d06dd57d3a3ac91cc334
   size: 24210
   path: dataset_489_health_expenditure_and_financing__oecdstat__2017_values.feather

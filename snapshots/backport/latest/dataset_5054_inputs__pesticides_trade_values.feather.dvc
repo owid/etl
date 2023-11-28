@@ -1,0 +1,29 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5054
+    date_accessed: 2023-08-14 11:02:00.677728
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: 'Inputs: Pesticides Trade'
+  description: 'This domain contains data on pesticides and covers two different categories:
+    pesticides traded in form or packagingfor retail sale or as preparations or articles,
+    and pesticides traded as separate chemically defined compounds (if relevant for
+    the Rotterdam Convention on the Prior Informed Consent Procedure for Certain Hazardous
+    Chemicals and Pesticides in International Trade). The pesticides traded for retail
+    sale or as preparations or articles are those classified under code 38.08 in the
+    Harmonized System Nomenclature (HS) and include: hazardous pesticides, insecticides,
+    fungicides, herbicides, disinfectants and other. For these pesticides, this domain
+    contains trade data (imports and exports) in values only (current 1000 US dollars),
+    and the time series extends from 1961 onwards. The pesticides traded as separate
+    chemically defined compounds are those listed in Annex III of the Rotterdam Convention
+    (excluding industrial chemicals) and therefore subject to the Prior Informed Consent
+    (PIC) procedure. The correspondence with the HS Nomenclature is shown in the table  at
+    the Related Documents section. For these pesticides, this domain contains trade
+    data (imports and exports) in both value (current 1000 US dollars) and quantity
+    (net weight in tonnes), and the time series extends from 2007 onwards.'
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: ad101783aae88c1cb3c0afb1c9473cef
+  size: 604418
+  path: dataset_5054_inputs__pesticides_trade_values.feather

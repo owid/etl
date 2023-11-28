@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1988
+    date_accessed: 2023-08-14 15:39:33.103455
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1988_researchers__in_full_time_equivalent__per_million_inhabitants
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 113fd82cd79022e094df50f754309863
+  size: 2565
+  path: 
+    dataset_1988_researchers__in_full_time_equivalent__per_million_inhabitants_config.json
