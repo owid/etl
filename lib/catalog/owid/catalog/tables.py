@@ -689,8 +689,12 @@ class Table(pd.DataFrame):
 
         return t
 
-    def dropna(self, *args, **kwargs) -> "Table":
-        tb = super().dropna(*args, **kwargs).copy()
+    def dropna(self, *args, **kwargs) -> Optional["Table"]:
+        tb = super().dropna(*args, **kwargs)
+        # inplace returns None
+        if tb is None:
+            return None
+        tb = tb.copy()
         for column in list(tb.all_columns):
             tb._fields[column].processing_log.add_entry(
                 variable=column,
@@ -854,7 +858,10 @@ class Table(pd.DataFrame):
             by_list = [args[0]] if isinstance(args[0], str) else args[0]
             for by in by_list:
                 if isinstance(by, str):
-                    by_type = self.dtypes[by] if by in self.dtypes else self.index.dtypes[by]  # type: ignore
+                    try:
+                        by_type = self.dtypes[by] if by in self.dtypes else self.index.dtypes[by]  # type: ignore
+                    except AttributeError:
+                        by_type = by
                 elif isinstance(by, pd.Series):
                     by_type = by.dtype
                 else:
