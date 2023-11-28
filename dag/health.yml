@@ -355,5 +355,6 @@ steps:
     - snapshot://tuberculosis/2023-11-27/data_dictionary.csv
     - data://garden/regions/2023-01-01/regions
     - data://garden/wb/2023-04-30/income_groups
+    - data://garden/demography/2023-03-31/population
   data://grapher/tuberculosis/2023-11-27/burden_estimates:
     - data://garden/tuberculosis/2023-11-27/burden_estimates

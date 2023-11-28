@@ -34,9 +34,11 @@ def run(dest_dir: str) -> None:
     snap = paths.load_snapshot("data_dictionary.csv")
     # Load regions dataset.
     ds_regions = paths.load_dependency("regions")
-
     # Load income groups dataset.
     ds_income_groups = paths.load_dependency("income_groups")
+    # Load population dataset.
+    ds_population = paths.load_dependency("population")
+
     # Load data dictionary from snapshot.
     dd = snap.read()
     # Read table from meadow dataset.
@@ -54,7 +56,10 @@ def run(dest_dir: str) -> None:
     cols_to_aggregate = tb.columns[tb.columns.str.contains("num")].tolist()
     tb_agg = tb[cols_to_aggregate].reset_index()
     tb_no_agg = tb.drop(columns=cols_to_aggregate).reset_index()
-    tb_agg = add_region_aggregates(tb_agg, ds_regions=ds_regions, ds_income_groups=ds_income_groups).copy_metadata(tb)
+    tb_agg = add_region_sum_aggregates(tb_agg, ds_regions=ds_regions, ds_income_groups=ds_income_groups).copy_metadata(
+        tb
+    )
+    tb_agg = calculate_region_rates(tb_agg, ds_population=ds_population)
 
     # Combine aggregated and non-aggregated tables.
     tb = pr.merge(tb_agg, tb_no_agg, on=["country", "year"], how="outer", validate="one_to_one", copy=False)
@@ -78,7 +83,9 @@ def add_variable_description_from_producer(tb, dd):
     return tb
 
 
-def add_region_aggregates(tb: Table, ds_regions: Dataset, ds_income_groups: Dataset) -> Table:
+def add_region_sum_aggregates(
+    tb: Table, ds_regions: Dataset, ds_income_groups: Dataset, ds_population: Dataset
+) -> Table:
     tb = tb.copy()
     for region in REGIONS_TO_ADD:
         # List of countries in region.
@@ -96,4 +103,13 @@ def add_region_aggregates(tb: Table, ds_regions: Dataset, ds_income_groups: Data
             frac_allowed_nans_per_year=0.5,
             num_allowed_nans_per_year=None,
         )
+
+    return tb
+
+
+def calculate_region_rates(tb: Table, ds_population: Dataset) -> Table:
+    # Add population to table to calculate rate variables
+    tb = geo.add_population_to_table(tb=tb, ds_population=ds_population)
+    tb = tb.drop(columns=["e_pop_num"])
+
     return tb
