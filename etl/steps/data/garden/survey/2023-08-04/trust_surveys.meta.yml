@@ -1,5 +1,4 @@
-dataset:
-  title: Trust questions in the European Social Survey and several regional barometers (OWID, 2023)
+# dataset:
   # description: |
   #   This dataset combines trust questions from the European Social Survey (ESS) and several regional barometers.
 
@@ -36,6 +35,7 @@ definitions:
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
 dataset:
+  title: Trust questions in the European Social Survey and several regional barometers
   update_period_days: 365
 
 
