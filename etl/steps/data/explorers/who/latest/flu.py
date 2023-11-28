@@ -142,7 +142,7 @@ def create_monthly_aggregates(df: pd.DataFrame, days_held_back: int) -> pd.DataF
     """
     Aggregate weekly data into months. For simplicity, if the week commences in a certain month we include it in that month.
 
-    We sum counts and average rates to calculate the monthly values.
+    We sum counts and average rates to calculate monthly values.
 
     We hold back from showing the values for a month until it is at least {days_held_back} days into the month
 
