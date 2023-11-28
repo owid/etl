@@ -669,7 +669,7 @@ steps:
     - data://meadow/wb/2023-11-21/worldwide_bureaucracy_indicators
   data://grapher/wb/2023-11-21/worldwide_bureaucracy_indicators:
     - data://garden/wb/2023-11-21/worldwide_bureaucracy_indicators
-    
+
   # Information Capacity Dataset
   data://meadow/state_capacity/2023-11-10/information_capacity_dataset:
     - snapshot://state_capacity/2023-11-10/information_capacity_dataset.dta
@@ -692,6 +692,13 @@ steps:
     - snapshot://un/2023-01-24/un_sdg_dimension.json
   data://grapher/un/2023-01-24/un_sdg:
     - data://garden/un/2023-01-24/un_sdg
+
+  ######################################################################################################################
+  # Map (Natural Earth)
+  data://meadow/geography/2023-11-28/nat_earth_110:
+    - snapshot://geography/2023-11-28/nat_earth_110.zip
+  data://garden/geography/2023-11-28/nat_earth_110:
+    - data://meadow/geography/2023-11-28/nat_earth_110
 
   ######################################################################################################################
 
