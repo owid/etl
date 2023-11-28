@@ -838,7 +838,7 @@ def estimate_metrics_country_level_locations(tb: Table, tb_maps: Table, tb_codes
     tb_locations = _estimate_location_in_ucdp_ged(tb, tb_maps).copy()
 
     # TODO: Add column with region of country (use tb_codes)
-    ## There are some countries not in GW:
+    # TODO: There are some countries not in GW (remove, replace?):
     ## - Palestine
     ## - Siachen Glacier
     ## - Western Sahara
