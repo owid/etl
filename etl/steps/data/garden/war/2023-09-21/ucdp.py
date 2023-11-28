@@ -21,10 +21,12 @@ Notes:
 
 from typing import List, Optional
 
+import geopandas as gpd
 import numpy as np
 import pandas as pd
 from owid.catalog import Dataset, Table
 from owid.catalog import processing as pr
+from shapely import wkt
 from shared import (
     add_indicators_extra,
     aggregate_conflict_types,
@@ -76,6 +78,11 @@ def run(dest_dir: str) -> None:
     tb_regions = ds_gw["gleditsch_regions"].reset_index()
     tb_codes = ds_gw["gleditsch_countries"]
 
+    # Load maps table
+    short_name = "nat_earth_110"
+    ds_maps = paths.load_dataset(short_name)
+    tb_maps = ds_maps[short_name].reset_index()
+
     #
     # Process data.
     #
@@ -100,7 +107,7 @@ def run(dest_dir: str) -> None:
 
     # Get country-level stuff
     paths.log.info("getting country-level indicators")
-    tb_country = estimate_metrics_country_level(tb, tb_codes)
+    tb_country = estimate_metrics_country_level(tb, tb_codes, tb_maps)
 
     # Sanity check conflict_type transitions
     ## Only consider transitions between intrastate and intl intrastate. If other transitions are detected, raise error.
@@ -733,9 +740,12 @@ def adapt_region_names(tb: Table) -> Table:
     return tb
 
 
-def estimate_metrics_country_level(tb: Table, tb_codes: Table) -> Table:
+def estimate_metrics_country_level(tb: Table, tb_codes: Table, tb_maps: Table) -> Table:
     """Add country-level indicators."""
+    # Participants
     tb_country = estimate_metrics_country_level_participants(tb, tb_codes)
+    # Locations
+    tb_country_locations = estimate_metrics_country_level_locations(tb, tb_maps)
     return tb_country
 
 
@@ -818,9 +828,26 @@ def estimate_metrics_country_level_participants(tb: Table, tb_codes: Table) -> T
     return tb_country
 
 
-def estimate_metrics_country_level_locations(tb: Table, tb_codes: Table) -> Table:
+def estimate_metrics_country_level_locations(tb: Table, tb_maps: Table) -> Table:
     """Add participant information at country-level.
 
-    reference: https://github.com/owid/notebooks/blob/main/JoeHasell/UCDP%20and%20PRIO/UCDP_georeferenced/ucdp_country_extract.ipynb"""
+    reference: https://github.com/owid/notebooks/blob/main/JoeHasell/UCDP%20and%20PRIO/UCDP_georeferenced/ucdp_country_extract.ipynb
+    """
+    # Convert the UCDP data to a GeoDataFrame (so it can be mapped and used in spatial analysis).
+    # The 'wkt.loads' function takes the coordinates in the 'geometry' column and ensures geopandas will use it to map the data.
+    df_geo = tb[["relid", "geom_wkt"]]
+    df_geo.rename(columns={"geom_wkt": "geometry"}, inplace=True)
+    df_geo["geometry"] = df_geo["geometry"].apply(wkt.loads)
+    gdf = gpd.GeoDataFrame(df_geo, crs="epsg:4326")
 
+    # Format the map to be a GeoDataFrame with a gemoetry column
+    gdf_maps = gpd.GeoDataFrame(tb_maps)
+    gdf_maps["geometry"] = gdf_maps["geometry"].apply(wkt.loads)
+    gdf_maps = gdf_maps.set_geometry("geometry")
+
+    # Use the overlay function to extract data from the world map that each point sits on top of.
+    ucdp_ne = gpd.overlay(gdf, gdf_maps, how="intersection")
+    # Events not assigned to any country
+    # There are 1618 points that are missed - likely because they are in the sea perhaps due to the conflict either happening at sea or at the coast and the coordinates are slightly inaccurate.
+    assert gdf.shape[0] - ucdp_ne.shape[0] == 1618, "Unexpected number of events without exact coordinate match!"
     return tb

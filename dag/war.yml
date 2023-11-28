@@ -42,6 +42,7 @@ steps:
   data://garden/war/2023-09-21/ucdp:
     - data://meadow/war/2023-09-21/ucdp
     - data://garden/countries/2023-09-25/gleditsch
+    - data://garden/geography/2023-11-28/nat_earth_110
   data://grapher/war/2023-09-21/ucdp:
     - data://garden/war/2023-09-21/ucdp
 
