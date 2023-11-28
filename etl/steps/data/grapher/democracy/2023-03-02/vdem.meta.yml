@@ -47,53 +47,51 @@ tables:
         title: Electoral democracy index
         display:
           name: Electoral democracy
-        description_short: >-
-          It captures to which extent political leaders are elected under comprehensive voting
-          rights in free and fair elections, and freedoms of association and expression
-          are guaranteed. It ranges from 0 to 1 (most democratic).
+        description_short: Based on the expert assessments and index by [V-Dem](#dod:v-dem). It captures to which extent political leaders are elected under comprehensive voting rights in free and fair elections, and freedoms of association and expression are guaranteed. It ranges from 0 to 1 (most democratic).
         description_key:
-          - The index is mostly based on evaluations by around 3,500 experts, which are primarily academics and members of the media and civil society, and often are nationals or residents of the country. They therefore know the country’s political system well and can evaluate aspects that are difficult to observe.
-          - We expand the coverage of the original data to include more years when current countries were still non-sovereign territories. We use the index score of the historical entity that they were part of, whenever available.
-        description_from_producer: |-
-          The index (`v2x_polyarchy`) is formed by taking the average of, on the one hand, the weighted average of the indices measuring freedom of association thick (`v2x_frassoc_thick`), clean elections (`v2xel_frefair`), freedom of expression (`v2x_freexp_altinf`), elected officials (`v2x_elecoff`), and suffrage (`v2x_suffr`) and, on the other, the five-way multiplicative interaction between those indices. This is half way between a straight average and strict multiplication, meaning the average of the two. It is thus a compromise between the two most well known aggregation formulas in the literature, both allowing partial "compensation" in one sub-component for lack of polyarchy in the others, but also punishing countries not strong in one sub-component according to the "weakest link" argument. The aggregation is done at the level of Dahl’s subcomponents with the one exception of the non-electoral component. The index is aggregated using this formula:
-
-          `v2x_polyarchy = .5 ∗ MPI + .5 ∗ API`
-
-          `= .5 ∗ (v2x_elecoff ∗ v2xel_frefair ∗ v2x_frassoc_thick∗ v2x_suffr ∗ v2x_freexp_altinf) + .5 ∗ ((1/8) ∗ v2x_elecoff + (1/4) ∗ v2xel_frefair + (1/4) ∗ v2x_frassoc_thick + (1/8) ∗ v2x_suffr + (1/4) ∗ v2x_freexp_altinf)`
-
-          [Text from [V-Dem Codebook v13](https://www.v-dem.net/documents/24/codebook_v13.pdf)]
-        description_processing: |-
-          We ingested the original data from the [V-Dem project website](https://v-dem.net/data/the-v-dem-dataset/) and processed it with Stata.
-
-          We expanded the years and countries covered by V-Dem. To include more of the period when current countries were still non-sovereign territories, we identified the historical entity they were a part of and used that regime’s data whenever available.
-
-          For example, V-Dem only provides regime data since Bangladesh’s independence in 1971. There is, however, regime data for Pakistan and the colony of India, both of which the current territory of Bangladesh was a part. We, therefore, use the regime data of Pakistan for Bangladesh from 1947 to 1970, and the regime data of India from 1789 to 1946. We did so for all countries with a past or current population of more than one million.
-
-          We calculated regional and global averages of the Electoral Democracy Index and its sub-indices, weighted and unweighted by population.
-
-          All code and data is available [on GitHub](https://github.com/owid/notebooks/tree/main/BastianHerre/democracy).
+          - TBD - List of key pieces of information about the indicator.
+        description_from_producer: TBD - Indicator's description given by the producer
+        description_processing: TBD - Indicator's processing description
+        description: "The variable denotes the best estimate of the extent to which political leaders are elected under comprehensive suffrage in free and fair elections, and freedoms of association and expression are guaranteed.\n\nIt is based on the V-Dem variable v2x_polyarchy, and we expand it to cover more years for some countries.\n\nThe index reaches from 0 to 1 (most democratic)."
         presentation:
+          title_public: TBD - Indicator title to be shown in data pages, that overrides the indicator's title.
+          title_variant: TBD - Indicator's title variant
+          attribution_short: TBD - Indicator's attribution (shorter version)
+          faqs:
+            - fragment_id: TBD - Question identifier from FAQ GDoc
+              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
           grapher_config:
             title: Electoral democracy index
-            subtitle: >-
-              Based on the expert assessments and index by [V-Dem](#dod:v-dem). It captures
-              to which extent political leaders are elected under comprehensive voting
-              rights in free and fair elections, and freedoms of association and expression
-              are guaranteed. It ranges from 0 to 1 (most democratic).
-            addCountryMode: change-country
-            hasMapTab: true
-            tab: map
+            subtitle: Based on the expert assessments and index by [V-Dem](#dod:v-dem). It captures to which extent political leaders are elected under comprehensive voting rights in free and fair elections, and freedoms of association and expression are guaranteed. It ranges from 0 to 1 (most democratic).
             variantName: V-Dem
             originUrl: https://ourworldindata.org/democracy
+            hasMapTab: true
+            tab: map
+            addCountryMode: change-country
             yAxis:
-              min: 0
               max: 1
+              min: 0
               facetDomain: shared
+            selectedFacetStrategy: entity
+            relatedQuestions:
+              - url: https://ourworldindata.org/grapher/electoral-democracy-index#faqs
+                text: FAQs on this data
             map:
               time: latest
               colorScale:
                 baseColorScheme: YlGnBu
                 binningStrategy: manual
+                customNumericColors:
+                  - '#9f0026'
+                  - '#e31a1c'
+                  - '#fd8d3c'
+                  - '#fed976'
+                  - '#ffeda0'
+                  - '#edf8b1'
+                  - '#c7e9b4'
+                  - '#41b6c4'
+                  - '#225ea8'
+                  - '#172976'
                 customNumericValues:
                   - 0.1
                   - 0.2
@@ -110,10 +108,6 @@ tables:
               - Australia
               - Botswana
               - China
-            relatedQuestions:
-              - url: https://ourworldindata.org/grapher/electoral-democracy-index#faqs
-                text: FAQs on this data
-            selectedFacetStrategy: entity
             $schema: https://files.ourworldindata.org/schemas/grapher-schema.003.json
       civ_libs_vdem_owid:
         title: civ_libs_vdem_owid
@@ -180,4 +174,69 @@ tables:
               - Botswana
               - China
               - World
+            $schema: https://files.ourworldindata.org/schemas/grapher-schema.003.json
+      regime_row_owid:
+        title: regime_row_owid
+        display:
+          name: Political regime
+        description_short: Based on the criteria of the classification by Lührmann et al. (2018) and the assessment by [V-Dem](#dod:v-dem)’s experts.
+        description_key:
+          - TBD - List of key pieces of information about the indicator.
+        description_from_producer: TBD - Indicator's description given by the producer
+        description_processing: TBD - Indicator's processing description
+        description: "The variable identifies the political regime of a country using the Regimes of the World classification by political scientists Anna Lührmann, Marcus Tannenberg and Staffan Lindberg. It distinguishes between closed autocracies (score 0), electoral autocracies (score 1), electoral democracies (score 2), and liberal democracies (score 3).\n\nIn closed autocracies, citizens do not have the right to either choose the chief executive of the government or the legislature through multi-party elections.\n\nIn electoral autocracies, citizens have the right to choose the chief executive and the legislature through multi-party elections; but they lack some freedoms, such as the freedoms of association or expression, that make the elections meaningful, free, and fair.\n\nIn electoral democracies, citizens have the right to participate in meaningful, free and fair, and multi-party elections.\n\nIn liberal democracies, citizens have further individual and minority rights, are equal before the law, and the actions of the executive are constrained by the legislative and the courts."
+        presentation:
+          title_public: TBD - Indicator title to be shown in data pages, that overrides the indicator's title.
+          title_variant: TBD - Indicator's title variant
+          attribution_short: TBD - Indicator's attribution (shorter version)
+          faqs:
+            - fragment_id: TBD - Question identifier from FAQ GDoc
+              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+          grapher_config:
+            title: Political regime
+            subtitle: Based on the criteria of the classification by Lührmann et al. (2018) and the assessment by [V-Dem](#dod:v-dem)’s experts.
+            variantName: Regimes of the World
+            originUrl: ourworldindata.org/democracy
+            hasMapTab: true
+            tab: map
+            yAxis:
+              max: 0
+              min: 0
+              facetDomain: shared
+            selectedFacetStrategy: entity
+            hideAnnotationFieldsInTitle:
+              time: true
+              entity: true
+              changeInPrefix: true
+            relatedQuestions:
+              - url: https://ourworldindata.org/regimes-of-the-world-data
+                text: "The 'Regimes of the World' data: how do researchers measure democracy?"
+            map:
+              time: latest
+              colorScale:
+                baseColorScheme: RdYlBu
+                binningStrategy: manual
+                customNumericColors:
+                  - '#ff0000'
+                  - '#ffc0c0'
+                  - '#80ff80'
+                  - '#008000'
+                customNumericLabels:
+                  - Closed autocracy
+                  - Electoral autocracy
+                  - Electoral democracy
+                  - Liberal democracy
+                customNumericValues:
+                  - 0
+                  - 1
+                  - 2
+                  - 3
+              columnSlug: '164988'
+              tooltipUseCustomLabels: true
+            selectedEntityNames:
+              - Argentina
+              - Australia
+              - Botswana
+              - China
+            note: The Chart tab uses numeric values, ranging from 0 for closed autocracies to 3 for liberal democracies.
             $schema: https://files.ourworldindata.org/schemas/grapher-schema.003.json

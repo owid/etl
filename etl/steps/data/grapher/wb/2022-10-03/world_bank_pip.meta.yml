@@ -213,3 +213,53 @@ tables:
               - France
               - China
             $schema: https://files.ourworldindata.org/schemas/grapher-schema.003.json
+      _50pct_of_median__share_of_population_below_poverty_line:
+        title: 50% of median - share of population below poverty line
+        unit: '%'
+        short_unit: '%'
+        description_short: Relative poverty is measured in terms of a poverty line that rises and falls over time with average incomes – in this case set at 50% of median income.
+        description_key:
+          - TBD - List of key pieces of information about the indicator.
+        description_from_producer: TBD - Indicator's description given by the producer
+        description_processing: TBD - Indicator's processing description
+        description: '% of population living in households with an income or expenditure per person below 50% of the median'
+        presentation:
+          title_public: TBD - Indicator title to be shown in data pages, that overrides the indicator's title.
+          title_variant: TBD - Indicator's title variant
+          attribution_short: TBD - Indicator's attribution (shorter version)
+          faqs:
+            - fragment_id: TBD - Question identifier from FAQ GDoc
+              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+          grapher_config:
+            title: 'Relative poverty: Share of people below 50% of median income'
+            subtitle: Relative poverty is measured in terms of a poverty line that rises and falls over time with average incomes – in this case set at 50% of median income.
+            originUrl: https://ourworldindata.org/poverty
+            hasMapTab: true
+            tab: map
+            colorScale:
+              baseColorScheme: OwidDistinctLines
+            map:
+              time: 2019
+              colorScale:
+                baseColorScheme: YlOrBr
+                binningStrategy: manual
+                customNumericValues:
+                  - 4
+                  - 8
+                  - 12
+                  - 16
+                  - 20
+                  - 24
+                  - 28
+                  - 32
+                  - 36
+                binningStrategyBinCount: 8
+              columnSlug: '815365'
+              timeTolerance: 10
+            selectedEntityNames:
+              - Iran
+              - Belgium
+              - Denmark
+              - Bolivia
+              - Indonesia
+            note: Depending on the country and year, the data relates to income measured after taxes and benefits, or to consumption, [per capita](#dod:per-capita).

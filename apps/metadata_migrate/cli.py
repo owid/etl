@@ -1,4 +1,5 @@
 import json
+import webbrowser
 from typing import Any, Dict, List, Optional
 
 import click
@@ -11,9 +12,9 @@ from rich.syntax import Syntax
 from sqlalchemy.engine import Engine
 from sqlmodel import Session
 
+from etl import config
 from etl import grapher_model as gm
 from etl.command import main as etl_main
-from etl.config import STAGING
 from etl.db import get_engine
 from etl.metadata_export import merge_or_create_yaml, reorder_fields
 from etl.paths import DAG_FILE, DATA_DIR, STEP_DIR
@@ -80,7 +81,7 @@ def cli(
         # create YAML file in grapher step
         STAGING=mojmir etl-metadata-migrate --chart-slug political-regime
     """
-    assert STAGING, "You have to run this as STAGING=mystaging etl-metadata-migrate ..."
+    assert config.STAGING, "You have to run this as STAGING=mystaging etl-metadata-migrate ..."
 
     engine = get_engine()
     col = None
@@ -246,6 +247,18 @@ def cli(
         with open(output_path, "w") as f:
             f.write(yaml_str)  # type: ignore
 
+        if run_etl:
+            log.info(f"Running ETL for {uri}")
+            config.GRAPHER_FILTER = f"^{col}$"
+            etl_main(
+                dag_path=DAG_FILE,
+                steps=[uri],
+                grapher=True,
+            )
+
+        data_page_url = f"http://staging-site-{config.STAGING}/admin/datapage-preview/{var_id}"
+        webbrowser.open_new_tab(data_page_url)
+
         print("\n[bold yellow]Follow-up instructions:[/bold yellow]")
         print(
             "[green]1.[/green] Pick topic tags [link=http://datasette-private/owid?sql=SELECT+tags.%60name%60+from+tags+where+isTopic+%3D+1+ORDER+BY+tags.%60name%60%0D%0A]from the list[/link].",
@@ -254,13 +267,16 @@ def cli(
             "[green]2.[/green] Check [link=https://docs.google.com/document/d/1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw/edit]FAQs GDoc document[/link].",
         )
         print(
-            f"[green]3.[/green] Run ETL with `STAGING={STAGING} GRAPHER_FILTER={col} etl {uri} --grapher`.",
+            f"[green]3.[/green] Review opened [link={data_page_url}]Data Page[/link].",
         )
         print(
-            f"[green]3.[/green] Open and review [link=http://staging-site-{STAGING}/admin/datapage-preview/{var_id}]Data Page[/link].",
+            "[green]4.[/green] Update generated YAML file.",
         )
         print(
-            "[green]4.[/green] (Optional) Move YAML from grapher to garden.",
+            "[green]5.[/green] (Optional) Move YAML from grapher to garden.",
+        )
+        print(
+            f"[green]6.[/green] Re-run ETL with `STAGING={config.STAGING} GRAPHER_FILTER={col} etl {uri} --grapher`.",
         )
 
 
