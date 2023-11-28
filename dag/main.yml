@@ -683,6 +683,8 @@ steps:
   # National Human Genome Research Institute - DNA Sequencing Costs
   data://meadow/technology/2023-11-28/dna_sequencing:
     - snapshot://technology/2023-11-28/dna_sequencing.xls
+  data://garden/technology/2023-11-28/dna_sequencing:
+    - data://meadow/technology/2023-11-28/dna_sequencing
 
   ######################################################################################################################
   # Older versions to be archived once they are not used by any other steps.
