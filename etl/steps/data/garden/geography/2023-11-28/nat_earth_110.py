@@ -25,7 +25,12 @@ def run(dest_dir: str) -> None:
         countries_file=paths.country_mapping_path,
         country_col="name",
     )
-    tb = tb.set_index(["name", ], verify_integrity=True)
+    tb = tb.set_index(
+        [
+            "name",
+        ],
+        verify_integrity=True,
+    )
 
     #
     # Save outputs.
