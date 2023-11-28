@@ -18,7 +18,7 @@ meta:
     # Citation
     producer: UN Comtrade
     citation_full: |-
-      United Nations Comtrade Database
+      United Nations, Comtrade Database (accessed online https://comtrade.un.org, 2023).
 
     # Files
     url_main: https://comtradeplus.un.org/
