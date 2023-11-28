@@ -51,21 +51,20 @@ def run(dest_dir: str) -> None:
 
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
     tb = tb.drop(columns="e_pop_num")
-    # tb = tb.set_index(["country", "year"], verify_integrity=True)
 
     # Add region aggregates.
     cols_to_aggregate = tb.columns[tb.columns.str.contains("num")].tolist()
     cols_to_aggregate = ["country", "year"] + cols_to_aggregate
     tb_agg = tb[cols_to_aggregate]
-    # tb_no_agg = tb.drop(columns=cols_to_aggregate).reset_index()
     tb_agg = add_region_sum_aggregates(tb_agg, ds_regions=ds_regions, ds_income_groups=ds_income_groups).copy_metadata(
         tb
     )
     tb_agg = calculate_region_rates(tb_agg, ds_population=ds_population)
 
-    # Combine aggregated and non-aggregated tables.
-    # tb = pr.merge(tb_agg, tb_no_agg, on=["country", "year"], how="outer", validate="one_to_one", copy=False)
+    # Combine aggregated and original country-level tables.
     tb = pr.concat([tb, tb_agg], axis=0, ignore_index=True, copy=False)
+    tb = tb.set_index(["country", "year"], verify_integrity=True)
+
     #
     # Save outputs.
     #
