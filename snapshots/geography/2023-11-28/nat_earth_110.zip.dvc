@@ -1,0 +1,50 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/origin/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Large scale data (1:10m Cultural Vectors), Admin 0 Countries
+    description: |-
+      There are 258 countries in the world. Greenland as separate from Denmark. Most users will want this file instead of sovereign states, though some users will want map units instead when distinguishing overseas regions of France.
+
+      Natural Earth shows [de facto](https://www.naturalearthdata.com/about/disputed-boundaries-policy/) boundaries by default according to who controls the territory, versus de jure. Optional point-of-view (POV) variants are available for several dozen countries in the next section. 
+
+      Countries distinguish between metropolitan (homeland) and independent and semi-independent portions of sovereign states. If you want to see the dependent overseas regions broken out (like in ISO codes, see France for example), use [map units](https://www.naturalearthdata.com/downloads/10m-political-vectors/10m-admin-0-details/) instead.
+
+      Each country is coded with a world region that roughly follows the [United Nations setup](http://unstats.un.org/unsd/methods/m49/m49regin.htm).
+
+      Countries are coded with standard ISO and FIPS codes. French [INSEE codes](http://en.wikipedia.org/wiki/INSEE) are also included.
+
+      Includes some thematic data from the United Nations, U.S. Central Intelligence Agency, and elsewhere.
+
+      This is the most detailed. Suitable for making zoomed-in maps of countries and regions. Show the world on a large wall poster:
+
+      1:10,000,000
+      1″ = 158 miles
+      1 cm = 100 km
+
+      All users of Natural Earth are highly encouraged to read about data sources and manipulation in the [Data Creation section](https://www.naturalearthdata.com/about/data-creation/).
+    date_published: 2022-05-13
+    version_producer: 5.1.1
+
+    # Citation
+    producer: Natural Earth
+    citation_full: |-
+      Natural Earth. Free vector and raster map data @ naturalearthdata.com
+
+    # Files
+    url_main: 
+      https://www.naturalearthdata.com/downloads/10m-cultural-vectors/10m-admin-0-countries/
+    url_download: https://naciscdn.org/naturalearth/10m/cultural/ne_10m_admin_0_countries.zip
+    date_accessed: 2023-11-28
+
+    # License
+    license:
+      name: CC0
+      url: https://www.naturalearthdata.com/about/terms-of-use/
+
+wdir: ../../../data/snapshots/geography/2023-11-28
+outs:
+- md5: 0bc33f3e6f9ab457917430e57f6122a9
+  size: 4930492
+  path: nat_earth_110.zip
