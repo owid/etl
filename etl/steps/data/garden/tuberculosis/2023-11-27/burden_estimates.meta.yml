@@ -18,11 +18,6 @@ tables:
       epidemic, and of progress in prevention, diagnosis and treatment of the disease
       at global, regional and country levels.
     variables:
-      e_pop_num:
-        title: Estimated population
-        unit: ""
-        display:
-          numDecimalPlaces: 0
       e_inc_100k:
         title: Estimated incidence of all forms of tuberculosis
         description_short: The number of new cases of tuberculosis per 100,000 people.
