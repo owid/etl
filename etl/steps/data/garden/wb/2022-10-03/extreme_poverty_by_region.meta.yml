@@ -1,0 +1,9 @@
+dataset:
+  title: Number of people living in extreme poverty, by world region (World Bank PIP)
+tables:
+  extreme_poverty_by_region:
+    variables:
+      number_of_people_living_in_extreme_poverty__by_world_region:
+        title: Number of people living in extreme poverty - by world region
+        description: The number of people living under 1.9$ a day using 2011 PPP.
+        unit: ''
