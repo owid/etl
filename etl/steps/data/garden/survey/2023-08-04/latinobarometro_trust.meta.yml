@@ -1,0 +1,30 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Trust
+    processing_level: major
+    description_processing: |
+      The indicators are processed from microdata of the Latinobarómetro survey using Stata. Weights are applied in each country.
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
+dataset:
+  update_period_days: 365
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
+tables:
+  latinobarometro_trust:
+    variables:
+      trust:
+        title: Agree "Most people can be trusted"
+        description_short: '% of respondents replying "One can trust most people" when asked "Generally speaking, would you say that you can trust most people, or that you can never be too careful in dealing with others?" Possible answers include "One can trust most people" and "One can never be too careful in dealing with others".'
+        unit: "%"
+        short_unit: "%"
+        display:
+          name: Agree "Most people can be trusted"
+          numDecimalPlaces: 1

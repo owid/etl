@@ -1,0 +1,30 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Trust
+    processing_level: major
+    description_processing: |
+      The indicators are processed from microdata of the Arab Barometer survey using Stata. Weights are applied in each country.
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
+dataset:
+  update_period_days: 365
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
+tables:
+  arab_barometer_trust:
+    variables:
+      trust:
+        title: Agree "Most people can be trusted"
+        description_short: '% of respondents replying "Most people can be trusted" when asked "Generally speaking, would you say that most people can be trusted or that you must be very careful in dealing with people?" Possible answers include "Most people can be trusted" and "Must be very careful".'
+        unit: "%"
+        short_unit: "%"
+        display:
+          name: Agree "Most people can be trusted"
+          numDecimalPlaces: 1

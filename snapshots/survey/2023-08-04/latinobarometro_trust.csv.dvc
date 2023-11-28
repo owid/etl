@@ -1,0 +1,29 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/origin/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Trust questions in the Latinobarómetro Dataset
+    description: |-
+      Latinobarómetro is an annual public opinion survey that involves some 20,000 interviews in 18 Latin American countries, representing more than 600 million inhabitants.
+    date_published: 2021
+
+    # Citation
+    producer: Latinobarómetro
+    citation_full: |-
+     'Latinobarómetro (2021). Data Bank: Stata files 1996-2020. Retrieved 03-08-2023 from https://www.latinobarometro.org/'
+
+    # Files
+    url_main: https://www.latinobarometro.org/
+    date_accessed: 2023-08-04
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://www.latinobarometro.org/
+
+wdir: ../../../data/snapshots/survey/2023-08-04
+outs:
+- md5: 76a3b517106066b58876f4ce26b394c8
+  size: 8702
+  path: latinobarometro_trust.csv
