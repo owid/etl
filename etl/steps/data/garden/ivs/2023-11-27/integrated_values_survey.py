@@ -50,27 +50,13 @@ def drop_indicators(tb: Table) -> Table:
         "trust_first_not_very_much",
         "trust_personally_not_very_much",
         "confidence_confidence_in_cer_with_australia",  # Only New Zealand
-        # "confidence_american_forces",  # Only Iraq
-        # "confidence_non_iraqi_television",  # Only Iraq
-        # "confidence_mainland_government",  # Only Hong Kong
         "confidence_free_commerce_treaty__tratado_de_libre_comercio",  # Only Mexico and Chile
         "confidence_united_american_states_organization",  # Only Peru and Dominican Republic
-        # "confidence_movimiento_en_pro_de_vieques__puerto_rico",  # Only Puerto Rico
         "confidence_education_system",  # most of the data is in 1993
         "confidence_social_security_system",  # most of the data is in 1993
         "confidence_andean_pact",  # Only Venezuela
-        # "confidence_eco",  # Only Iran
-        # "confidence_east_african_cooperation__eac",  # Only Tanzania
-        # "confidence_presidency",  # Only Algeria
         "confidence_local_regional_government",  # Only Argentina and Puerto Rico
-        # "confidence_civil_society_groups",  # Only Algeria
-        # "confidence_non_governmental_organizations__ngos",  # Only Argentina
-        # "confidence_religious_leaders",  # Only Jordan
-        # "confidence_tv_news",  # Only Argentina
-        # "confidence_evangelic_church",  # Only Peru
         "confidence_organization_of_american_states__oae",  # Only Peru
-        # "confidence_unasur",  # Only Colombia
-        # "confidence_undp_united_nations_development_programme",  # Only Egypt, Iraq and Lebanon
     ]
     tb = tb.drop(columns=vars_to_drop)
 
