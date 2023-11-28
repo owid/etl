@@ -122,7 +122,6 @@ def cli(
         assert "grapher" not in uri, "uri should be without channel"
         assert "garden" not in uri, "uri should be without channel"
 
-    ds = Dataset(DATA_DIR / "grapher" / uri)
     if run_etl:
         log.info(f"Running ETL for {uri}")
         etl_main(
@@ -130,6 +129,8 @@ def cli(
             steps=[uri],
             grapher=False,
         )
+
+    ds = Dataset(DATA_DIR / "grapher" / uri)
 
     if not table_name:
         assert len(ds.table_names) == 1, f"Multiple tables found {ds.table_names}, specify it with --table-name"

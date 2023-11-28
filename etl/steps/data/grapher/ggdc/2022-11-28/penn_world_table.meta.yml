@@ -1,0 +1,91 @@
+definitions:
+  common:
+    processing_level: TBD - major or minor
+    presentation:
+      topic_tags:
+        - TBD - Indicator's topic tags
+    sources: []
+    origins:
+      - producer: Feenstra et al. (2015), Penn World Table (2021)
+        title: Penn World Table (GGDC, 2021)
+        description: >-
+          Penn World Table is a database with information on GDP and its composition, employment, productivity and trade,
+          covering 183 countries between 1950 and 2019.
+
+          Data comes from national accounts, ICP PPP estimations, multiple other sources
+        citation_full: Feenstra, R. C., Inklaar, R. and Timmer, M.P. (2015), "The Next Generation of the Penn World Table". American Economic Review, 105(10), 3150-3182
+        url_main: https://www.rug.nl/ggdc/productivity/pwt/
+        date_accessed: '2022-11-28'
+        date_published: '2021-06-18'
+        license:
+          name: Creative Commons BY 4.0
+          url: https://www.rug.nl/ggdc/productivity/pwt
+dataset:
+  update_period_days: TBD - Number of days between OWID updates
+  sources: []
+tables:
+  penn_world_table:
+    variables:
+      rgdpo_pc:
+        title: GDP per capita (output, multiple price benchmarks)
+        unit: international-$ in 2017 prices
+        short_unit: $
+        display:
+          name: GDP per capita
+          numDecimalPlaces: 0
+        description_short: This data is adjusted for inflation and for differences in the cost of living between countries.
+        description_key:
+          - TBD - List of key pieces of information about the indicator.
+        description_from_producer: TBD - Indicator's description given by the producer
+        description_processing: TBD - Indicator's processing description
+        description: "Estimated as the GDP (output, multiple price benchmarks) divided by the population of each country.\nThis variable uses ICP PPP benchmarks from multiple years to correct for changing prices over time.\nValues for Bermuda have been replaced by estimates on GDP per capita (output, single price benchmark) due to the unusual changes on prices in this country.\nValues considered outliers from the original dataset (`i_outlier = \"Outlier\"`) have been excluded from the dataset, due to implausible relative prices (PPPs divided by exchange rates).\n"
+        presentation:
+          title_public: TBD - Indicator title to be shown in data pages, that overrides the indicator's title.
+          title_variant: TBD - Indicator's title variant
+          attribution_short: TBD - Indicator's attribution (shorter version)
+          faqs:
+            - fragment_id: TBD - Question identifier from FAQ GDoc
+              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+          grapher_config:
+            title: GDP per capita
+            subtitle: This data is adjusted for inflation and for differences in the cost of living between countries.
+            variantName: Penn World Table, constant international-$
+            sourceDesc: Feenstra et al. (2015), Penn World Table (2021)
+            originUrl: https://ourworldindata.org/economic-growth
+            hasMapTab: true
+            tab: map
+            yAxis:
+              min: 0
+              canChangeScaleType: true
+            hideRelativeToggle: false
+            map:
+              time: latest
+              colorScale:
+                baseColorScheme: GnBu
+                binningStrategy: manual
+                colorSchemeInvert: false
+                legendDescription: Real GDP per capita (in 2005 international dollars)
+                customNumericColors:
+                  - '#c00'
+                  - '#00c'
+                  - 
+                customNumericValues:
+                  - 1000
+                  - 2000
+                  - 5000
+                  - 10000
+                  - 20000
+                  - 50000
+                  - 100000
+                customNumericMinValue: 0
+            selectedEntityNames:
+              - Germany
+              - United States
+              - China
+              - United Kingdom
+              - Japan
+              - India
+              - France
+              - South Korea
+            note: This data is expressed in [international-$](#dod:int_dollar_abbreviation) at 2017 prices, using multiple benchmark years to adjust for differences in the cost of living between countries over time.
+            $schema: https://files.ourworldindata.org/schemas/grapher-schema.003.json
