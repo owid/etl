@@ -50,19 +50,22 @@ def run(dest_dir: str) -> None:
     tb = add_variable_description_from_producer(tb, dd)
 
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
-    tb = tb.set_index(["country", "year"], verify_integrity=True)
+    tb = tb.drop(columns="e_pop_num")
+    # tb = tb.set_index(["country", "year"], verify_integrity=True)
 
     # Add region aggregates.
     cols_to_aggregate = tb.columns[tb.columns.str.contains("num")].tolist()
-    tb_agg = tb[cols_to_aggregate].reset_index()
-    tb_no_agg = tb.drop(columns=cols_to_aggregate).reset_index()
+    cols_to_aggregate = ["country", "year"] + cols_to_aggregate
+    tb_agg = tb[cols_to_aggregate]
+    # tb_no_agg = tb.drop(columns=cols_to_aggregate).reset_index()
     tb_agg = add_region_sum_aggregates(tb_agg, ds_regions=ds_regions, ds_income_groups=ds_income_groups).copy_metadata(
         tb
     )
     tb_agg = calculate_region_rates(tb_agg, ds_population=ds_population)
 
     # Combine aggregated and non-aggregated tables.
-    tb = pr.merge(tb_agg, tb_no_agg, on=["country", "year"], how="outer", validate="one_to_one", copy=False)
+    # tb = pr.merge(tb_agg, tb_no_agg, on=["country", "year"], how="outer", validate="one_to_one", copy=False)
+    tb = pr.concat([tb, tb_agg], axis=0, ignore_index=True, copy=False)
     #
     # Save outputs.
     #
@@ -83,9 +86,7 @@ def add_variable_description_from_producer(tb, dd):
     return tb
 
 
-def add_region_sum_aggregates(
-    tb: Table, ds_regions: Dataset, ds_income_groups: Dataset, ds_population: Dataset
-) -> Table:
+def add_region_sum_aggregates(tb: Table, ds_regions: Dataset, ds_income_groups: Dataset) -> Table:
     tb = tb.copy()
     for region in REGIONS_TO_ADD:
         # List of countries in region.
@@ -104,12 +105,21 @@ def add_region_sum_aggregates(
             num_allowed_nans_per_year=None,
         )
 
+    tb = tb[tb["country"].isin(REGIONS_TO_ADD)]
+
     return tb
 
 
 def calculate_region_rates(tb: Table, ds_population: Dataset) -> Table:
     # Add population to table to calculate rate variables
     tb = geo.add_population_to_table(tb=tb, ds_population=ds_population)
-    tb = tb.drop(columns=["e_pop_num"])
+
+    cols = tb.columns.difference(["country", "year", "population"])
+    rate_cols = cols.str.replace("num", "100k", regex=True)
+
+    for col, rate_col in zip(cols, rate_cols):
+        tb[rate_col] = tb[col] / tb["population"] * 100000  # per 100k
+
+    tb = tb.drop(columns=["population"])
 
     return tb
