@@ -79,7 +79,7 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
-    paths.log.info("war.ucdp: sanity checks")
+    paths.log.info("sanity checks")
     _sanity_checks(ds_meadow)
 
     # Load relevant tables
@@ -88,14 +88,14 @@ def run(dest_dir: str) -> None:
     tb_prio = ds_meadow["ucdp_prio_armed_conflict"].reset_index()
 
     # Keep only active conflicts
-    paths.log.info("war.ucdp: keep active conflicts")
+    paths.log.info("keep active conflicts")
     tb_geo = tb_geo[tb_geo["active_year"] == 1]
 
     # Change region named "Asia" to "Asia and Oceania" (in GED)
     tb_geo["region"] = tb_geo["region"].replace(to_replace={"Asia": "Asia and Oceania"})
 
     # Create `conflict_type` column
-    paths.log.info("war.ucdp: add field `conflict_type`")
+    paths.log.info("add field `conflict_type`")
     tb = add_conflict_type(tb_geo, tb_conflict)
 
     # Get country-level stuff
@@ -108,28 +108,28 @@ def run(dest_dir: str) -> None:
     _sanity_check_prio_conflict_types(tb_prio)
 
     # Add number of new conflicts and ongoing conflicts (also adds data for the World)
-    paths.log.info("war.ucdp: get metrics for main dataset (also estimate values for 'World')")
+    paths.log.info("get metrics for main dataset (also estimate values for 'World')")
     tb = estimate_metrics(tb)
 
     # Add table from UCDP/PRIO
-    paths.log.info("war.ucdp: prepare data from ucdp/prio table (also estimate values for 'World')")
+    paths.log.info("prepare data from ucdp/prio table (also estimate values for 'World')")
     tb_prio = prepare_prio_data(tb_prio)
 
     # Fill NaNs
-    paths.log.info("war.ucdp: replace missing data with zeros (where applicable)")
+    paths.log.info("replace missing data with zeros (where applicable)")
     tb_prio = replace_missing_data_with_zeros(tb_prio)
     tb = replace_missing_data_with_zeros(tb)
 
     # Combine main dataset with PRIO/UCDP
-    paths.log.info("war.ucdp: add data from ucdp/prio table")
+    paths.log.info("add data from ucdp/prio table")
     tb = combine_tables(tb, tb_prio)
 
     # Add extra-systemic after 1989
-    paths.log.info("war.ucdp: fix extra-systemic nulls")
+    paths.log.info("fix extra-systemic nulls")
     tb = fix_extrasystemic_entries(tb)
 
     # Add data for "all conflicts" conflict type
-    paths.log.info("war.ucdp: add data for 'all conflicts'")
+    paths.log.info("add data for 'all conflicts'")
     tb = add_conflict_all(tb)
 
     # Add data for "all intrastate" conflict types
@@ -161,7 +161,7 @@ def run(dest_dir: str) -> None:
     tb_country = tb_country.set_index(["year", "country", "conflict_type"], verify_integrity=True).sort_index()
 
     # Add short_name to table
-    paths.log.info("war.ucdp: add shortname to table")
+    paths.log.info("add shortname to table")
     tb.metadata.short_name = paths.short_name
 
     # Tables
@@ -398,14 +398,14 @@ def estimate_metrics(tb: Table) -> Table:
     we need to access the actual conflict_id field to find the number of unique values. This can only be done here.
     """
     # Get number of ongoing conflicts, and deaths in ongoing conflicts
-    paths.log.info("war.ucdp: get number of ongoing conflicts and deaths in ongoing conflicts")
+    paths.log.info("get number of ongoing conflicts and deaths in ongoing conflicts")
     tb_ongoing = _get_ongoing_metrics(tb)
 
     # Get number of new conflicts every year
-    paths.log.info("war.ucdp: get number of new conflicts every year")
+    paths.log.info("get number of new conflicts every year")
     tb_new = _get_new_metrics(tb)
     # Combine and build single table
-    paths.log.info("war.ucdp: combine and build single table")
+    paths.log.info("combine and build single table")
     tb = tb_ongoing.merge(
         tb_new,
         left_on=["year", "region", "conflict_type"],
@@ -735,6 +735,12 @@ def adapt_region_names(tb: Table) -> Table:
 
 def estimate_metrics_country_level(tb: Table, tb_codes: Table) -> Table:
     """Add country-level indicators."""
+    tb_country = estimate_metrics_country_level_participants(tb, tb_codes)
+    return tb_country
+
+
+def estimate_metrics_country_level_participants(tb: Table, tb_codes: Table) -> Table:
+    """Add participant information at country-level."""
     ###################
     # Participated in #
     ###################
@@ -810,3 +816,11 @@ def estimate_metrics_country_level(tb: Table, tb_codes: Table) -> Table:
     tb_country.metadata.short_name = f"{paths.short_name}_country"
 
     return tb_country
+
+
+def estimate_metrics_country_level_locations(tb: Table, tb_codes: Table) -> Table:
+    """Add participant information at country-level.
+
+    reference: https://github.com/owid/notebooks/blob/main/JoeHasell/UCDP%20and%20PRIO/UCDP_georeferenced/ucdp_country_extract.ipynb"""
+
+    return tb
