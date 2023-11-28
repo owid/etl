@@ -745,7 +745,7 @@ def estimate_metrics_country_level(tb: Table, tb_codes: Table, tb_maps: Table) -
     # Participants
     tb_country = estimate_metrics_country_level_participants(tb, tb_codes)
     # Locations
-    tb_country_locations = estimate_metrics_country_level_locations(tb, tb_maps)
+    _ = estimate_metrics_country_level_locations(tb, tb_maps)
     return tb_country
 
 
