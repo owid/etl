@@ -23,7 +23,21 @@ definitions:
         url_main: http://v-dem.net/vdemds.html
         date_accessed: '2023-03-02'
         date_published: '2023-03-02'
-
+    presentation:
+      attribution_short: V-Dem
+      topic_tags:
+        - Democracy
+      faqs:
+        - fragment_id: vdem-characteristics
+          gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+        - fragment_id: vdem-scoring
+          gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+        - fragment_id: vdem-coverage
+          gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+        - fragment_id: vdem-measured
+          gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+        - fragment_id: vdem-more-info
+          gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
     processing_level: major
 
 tables:
@@ -59,20 +73,6 @@ tables:
 
           All code and data is available [on GitHub](https://github.com/owid/notebooks/tree/main/BastianHerre/democracy).
         presentation:
-          attribution_short: V-Dem
-          topic_tags:
-            - Democracy
-          faqs:
-            - fragment_id: vdem-characteristics
-              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
-            - fragment_id: vdem-scoring
-              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
-            - fragment_id: vdem-coverage
-              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
-            - fragment_id: vdem-measured
-              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
-            - fragment_id: vdem-more-info
-              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
           grapher_config:
             title: Electoral democracy index
             subtitle: >-
@@ -116,3 +116,236 @@ tables:
             selectedFacetStrategy: entity
             $schema: https://files.ourworldindata.org/schemas/grapher-schema.003.json
 
+      civ_libs_vdem_owid:
+        title: civ_libs_vdem_owid
+        description_short: Based on the expert assessments and index by [V-Dem](#dod:v-dem). It captures the extent to which people are free from government torture, political killings, and forced labor; they have property rights; and enjoy the freedoms of movement, religion, expression, and association. The variable ranges from 0 to 1 (most rights).
+        description_key:
+          - TBD - List of key pieces of information about the indicator.
+        description_from_producer: TBD - Indicator's description given by the producer
+        description_processing: TBD - Indicator's processing description
+        description: "The variable denotes the central estimate of the extent to which people are free from government torture, political killings, and forced labor, they have property rights, and enjoy the freedoms of movement, religion, expression, and association.\n\nIt is based on the V-Dem variable v2x_civlib and we expand it to cover more years for some countries.\n\nThe variable ranges from 0 to 1 (most rights)."
+        presentation:
+          title_public: TBD - Indicator title to be shown in data pages, that overrides the indicator's title.
+          title_variant: TBD - Indicator's title variant
+          grapher_config:
+            title: Human rights index
+            subtitle: Based on the expert assessments and index by [V-Dem](#dod:v-dem). It captures the extent to which people are free from government torture, political killings, and forced labor; they have property rights; and enjoy the freedoms of movement, religion, expression, and association. The variable ranges from 0 to 1 (most rights).
+            originUrl: https://ourworldindata.org/human-rights
+            hasMapTab: true
+            tab: map
+            addCountryMode: change-country
+            yAxis:
+              max: 1
+              min: 0
+              facetDomain: shared
+            selectedFacetStrategy: entity
+            hideAnnotationFieldsInTitle:
+              time: true
+            relatedQuestions:
+              - url: https://ourworldindata.org/vdem-human-rights-data
+                text: "The 'Varieties of Democracy' data: how do researchers measure human rights?"
+            map:
+              time: latest
+              colorScale:
+                baseColorScheme: YlGnBu
+                binningStrategy: manual
+                customNumericColors:
+                  - '#9f0026'
+                  - '#e31a1c'
+                  - '#fd8d3c'
+                  - '#fed976'
+                  - '#ffeda0'
+                  - '#edf8b1'
+                  - '#c7e9b4'
+                  - '#41b6c4'
+                  - '#225ea8'
+                  - '#172976'
+                customNumericValues:
+                  - 0.1
+                  - 0.2
+                  - 0.3
+                  - 0.4
+                  - 0.5
+                  - 0.6
+                  - 0.7
+                  - 0.8
+                  - 0.9
+                  - 1
+            selectedEntityNames:
+              - Argentina
+              - Australia
+              - Botswana
+              - China
+              - World
+            $schema: https://files.ourworldindata.org/schemas/grapher-schema.003.json
+      regime_row_owid:
+        title: regime_row_owid
+        display:
+          name: Political regime
+        description_short: Based on the criteria of the classification by Lührmann et al. (2018) and the assessment by [V-Dem](#dod:v-dem)’s experts.
+        description_key:
+          - TBD - List of key pieces of information about the indicator.
+        description_from_producer: TBD - Indicator's description given by the producer
+        description_processing: TBD - Indicator's processing description
+        description: "The variable identifies the political regime of a country using the Regimes of the World classification by political scientists Anna Lührmann, Marcus Tannenberg and Staffan Lindberg. It distinguishes between closed autocracies (score 0), electoral autocracies (score 1), electoral democracies (score 2), and liberal democracies (score 3).\n\nIn closed autocracies, citizens do not have the right to either choose the chief executive of the government or the legislature through multi-party elections.\n\nIn electoral autocracies, citizens have the right to choose the chief executive and the legislature through multi-party elections; but they lack some freedoms, such as the freedoms of association or expression, that make the elections meaningful, free, and fair.\n\nIn electoral democracies, citizens have the right to participate in meaningful, free and fair, and multi-party elections.\n\nIn liberal democracies, citizens have further individual and minority rights, are equal before the law, and the actions of the executive are constrained by the legislative and the courts."
+        presentation:
+          title_public: TBD - Indicator title to be shown in data pages, that overrides the indicator's title.
+          title_variant: TBD - Indicator's title variant
+          grapher_config:
+            title: Political regime
+            subtitle: Based on the criteria of the classification by Lührmann et al. (2018) and the assessment by [V-Dem](#dod:v-dem)’s experts.
+            variantName: Regimes of the World
+            originUrl: ourworldindata.org/democracy
+            hasMapTab: true
+            tab: map
+            yAxis:
+              max: 0
+              min: 0
+              facetDomain: shared
+            selectedFacetStrategy: entity
+            hideAnnotationFieldsInTitle:
+              time: true
+              entity: true
+              changeInPrefix: true
+            relatedQuestions:
+              - url: https://ourworldindata.org/regimes-of-the-world-data
+                text: "The 'Regimes of the World' data: how do researchers measure democracy?"
+            map:
+              time: latest
+              colorScale:
+                baseColorScheme: RdYlBu
+                binningStrategy: manual
+                customNumericColors:
+                  - '#ff0000'
+                  - '#ffc0c0'
+                  - '#80ff80'
+                  - '#008000'
+                customNumericLabels:
+                  - Closed autocracy
+                  - Electoral autocracy
+                  - Electoral democracy
+                  - Liberal democracy
+                customNumericValues:
+                  - 0
+                  - 1
+                  - 2
+                  - 3
+              columnSlug: '164988'
+              tooltipUseCustomLabels: true
+            selectedEntityNames:
+              - Argentina
+              - Australia
+              - Botswana
+              - China
+            note: The Chart tab uses numeric values, ranging from 0 for closed autocracies to 3 for liberal democracies.
+            $schema: https://files.ourworldindata.org/schemas/grapher-schema.003.json
+      wom_emp_vdem_owid:
+        title: wom_emp_vdem_owid
+        description_short: Based on the expert assessments and index by [V-Dem](#dod:v-dem). It captures the extent to which women enjoy civil liberties, can participate in civil society, and are represented in politics. It ranges from 0 to 1 (most empowered).
+        description_key:
+          - TBD - List of key pieces of information about the indicator.
+        description_from_producer: TBD - Indicator's description given by the producer
+        description_processing: TBD - Indicator's processing description
+        description: "The variable denotes the best estimate of the extent to which women enjoy civil liberties, can participate in civil society, and are represented in politics.\n\nIt is based on the V-Dem variable v2x_gender, and we expand it to cover more years for some countries.\n\nThe variable ranges from 0 to 1 (most empowered)."
+        presentation:
+          title_public: TBD - Indicator title to be shown in data pages, that overrides the indicator's title.
+          title_variant: TBD - Indicator's title variant
+          grapher_config:
+            title: Women's political empowerment index
+            subtitle: Based on the expert assessments and index by [V-Dem](#dod:v-dem). It captures the extent to which women enjoy civil liberties, can participate in civil society, and are represented in politics. It ranges from 0 to 1 (most empowered).
+            originUrl: https://ourworldindata.org/women-rights
+            hasMapTab: true
+            tab: map
+            yAxis:
+              max: 1
+              min: 0
+            selectedFacetStrategy: entity
+            hideAnnotationFieldsInTitle:
+              time: true
+            map:
+              time: latest
+              colorScale:
+                baseColorScheme: PuBu
+                binningStrategy: manual
+                customNumericColors:
+                  - '#e5d2a1'
+                  - '#e2b99c'
+                  - '#dba198'
+                  - '#d08a94'
+                  - '#c37491'
+                  - '#b2608f'
+                  - '#9d4e8d'
+                  - '#863d8c'
+                  - '#69308b'
+                  - '#44268b'
+                customNumericValues:
+                  - 0.1
+                  - 0.2
+                  - 0.3
+                  - 0.4
+                  - 0.5
+                  - 0.6
+                  - 0.7
+                  - 0.8
+                  - 0.9
+                  - 1
+                customNumericColorsActive: true
+            selectedEntityNames:
+              - Argentina
+              - Australia
+              - Botswana
+              - China
+            $schema: https://files.ourworldindata.org/schemas/grapher-schema.003.json
+      terr_contr_vdem_owid:
+        title: terr_contr_vdem_owid
+        description_short: Based on the expert assessments by [V-Dem](#dod:v-dem). They consider the extent to which the government is recognized as the main authority, or rejected by others, such as insurgent groups, criminal organizations, or other countries.
+        description_key:
+          - TBD - List of key pieces of information about the indicator.
+        description_from_producer: TBD - Indicator's description given by the producer
+        description_processing: TBD - Indicator's processing description
+        description: "The indicator denotes the best estimate of the percentage of territory controlled by the government.\n\nIt is based on the V-Dem indicator `v2svstterr`, and we expand it to cover more years for some countries.\n\nThe indicator reaches from 0 to 100%.\n"
+        presentation:
+          title_public: TBD - Indicator title to be shown in data pages, that overrides the indicator's title.
+          title_variant: TBD - Indicator's title variant
+          grapher_config:
+            title: Percentage of territory effectively controlled by government
+            subtitle: Based on the expert assessments by [V-Dem](#dod:v-dem). They consider the extent to which the government is recognized as the main authority, or rejected by others, such as insurgent groups, criminal organizations, or other countries.
+            originUrl: ourworldindata.org/state-capacity
+            hasMapTab: true
+            tab: map
+            yAxis:
+              max: 100
+              min: 0
+            selectedFacetStrategy: entity
+            map:
+              time: latest
+              colorScale:
+                baseColorScheme: GnBu
+                binningStrategy: manual
+                customNumericColors:
+                  -
+                  -
+                  -
+                customNumericLabels:
+                  - ''
+                  - ''
+                  -
+                  -
+                  -
+                  -
+                  -
+                customNumericValues:
+                  - 50
+                  - 70
+                  - 80
+                  - 90
+                  - 95
+                  - 100
+                customNumericMinValue: 100
+            selectedEntityNames:
+              - Argentina
+              - Australia
+              - Botswana
+              - China
+            note: Values are missing if the country is not independent.
+            $schema: https://files.ourworldindata.org/schemas/grapher-schema.003.json

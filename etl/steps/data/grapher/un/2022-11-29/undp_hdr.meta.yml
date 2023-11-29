@@ -1,0 +1,139 @@
+definitions:
+  common:
+    processing_level: TBD - major or minor
+    presentation:
+      topic_tags:
+        - TBD - Indicator's topic tags
+    sources: []
+    origins:
+      - producer: UNDP, Human Development Report (2021-22)
+        title: Human Development Report - UNDP (2021-22)
+        description: >-
+          The 2021/2022 Human Development Report is the latest in the series of global Human Development Reports published
+          by the United Nations Development Programme (UNDP) since 1990 as independent and analytically and empirically grounded
+          discussions of major development issues, trends and policies.
+
+
+          Additional resources related to the 2021/2022 Human Development Report can be found online at http://hdr.undp.org.
+          Resources on the website include digital versions and translations of the Report and the overview in more than 10
+          languages, an interactive web version of the Report, a set of background papers and think pieces commissioned for
+          the Report, interactive data visualizations and databases of human development indicators, full explanations of
+          the sources and methodologies used in the Report's composite indices, country insights and other background materials,
+          and previous global, regional and national Human Development Reports. Corrections and addenda are also available
+          online.
+
+
+          Technical notes may be found at https://hdr.undp.org/sites/default/files/2021-22_HDR/hdr2021-22_technical_notes.pdf.
+
+
+          The 2021/2022 Human Development Report is the latest in the series of global Human Development Reports published
+          by the United Nations Development Programme (UNDP) since 1990 as independent and analytically and empirically grounded
+          discussions of major development issues, trends and policies.
+
+
+          Additional resources related to the 2021/2022 Human Development Report can be found online at http://hdr.undp.org.
+          Resources on the website include digital versions and translations of the Report and the overview in more than 10
+          languages, an interactive web version of the Report, a set of background papers and think pieces commissioned for
+          the Report, interactive data visualizations and databases of human development indicators, full explanations of
+          the sources and methodologies used in the Report's composite indices, country insights and other background materials,
+          and previous global, regional and national Human Development Reports. Corrections and addenda are also available
+          online.
+
+
+          Technical notes (region definitions, reports, etc.) can be found at https://hdr.undp.org/sites/default/files/2021-22_HDR/hdr2021-22_technical_notes.pdf.
+        url_main: https://hdr.undp.org/
+        url_download: https://hdr.undp.org/sites/default/files/2021-22_HDR/HDR21-22_Composite_indices_complete_time_series.csv
+        date_accessed: '2022-11-29'
+        date_published: '2022-09-08'
+        license:
+          name: CC BY 3.0 IGO
+          url: https://hdr.undp.org/copyright-and-terms-use
+dataset:
+  update_period_days: TBD - Number of days between OWID updates
+  sources: []
+tables:
+  undp_hdr:
+    variables:
+      hdi:
+        title: Human Development Index
+        display:
+          numDecimalPlaces: 3
+        description_short: 'The Human Development Index (HDI) is a summary measure of key dimensions of human development:
+          a long and healthy life, a good education, and a decent standard of living. Higher values indicate higher human
+          development.'
+        description_key:
+          - TBD - List of key pieces of information about the indicator.
+        description_from_producer: TBD - Indicator's description given by the producer
+        description_processing: TBD - Indicator's processing description
+        description: >-
+          The Human Development Index (HDI) is a summary measure of achievements in three key dimensions of human development:
+          A long and healthy life, access to knowledge and a decent standard of living.
+
+
+          Measured by:
+
+
+          - Life expectancy at birth
+
+          - Mean years of schooling & Expected years of schooling
+
+          - GNI per capita (in PPP adjusted international-$)
+
+
+          The HDI is the geometric mean of normalized indices for each of the three dimensions.
+
+
+          For more details read the technical note 1 at https://hdr.undp.org/sites/default/files/2021-22_HDR/hdr2021-22_technical_notes.pdf.
+        presentation:
+          title_public: TBD - Indicator title to be shown in data pages, that overrides the indicator's title.
+          title_variant: TBD - Indicator's title variant
+          attribution_short: TBD - Indicator's attribution (shorter version)
+          faqs:
+            - fragment_id: TBD - Question identifier from FAQ GDoc
+              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+          grapher_config:
+            title: Human Development Index
+            subtitle: 'The Human Development Index (HDI) is a summary measure of key dimensions of human development: a long
+              and healthy life, a good education, and a decent standard of living. Higher values indicate higher human development.'
+            originUrl: https://ourworldindata.org/human-development-index/
+            hasMapTab: true
+            tab: map
+            yAxis:
+              max: 1
+              min: 0
+            hideRelativeToggle: false
+            map:
+              time: latest
+              colorScale:
+                baseColorScheme: GnBu
+                binningStrategy: manual
+                legendDescription: ''
+                customNumericColors:
+                  - '#6de354'
+                  - '#59ba47'
+                  - '#60d4f2'
+                  - '#21c1fc'
+                  - '#6babeb'
+                  - '#3288ce'
+                  - '#006eb5'
+                customNumericValues:
+                  - 0.4
+                  - 0.5
+                  - 0.6
+                  - 0.7
+                  - 0.8
+                  - 0.9
+                  - 1
+                customNumericMinValue: 1
+            selectedEntityNames:
+              - United Kingdom
+              - United States
+              - South Korea
+              - India
+              - China
+              - Brazil
+              - Nigeria
+              - Democratic Republic of Congo
+              - Niger
+              - Chile
+            $schema: https://files.ourworldindata.org/schemas/grapher-schema.003.json

@@ -1,0 +1,69 @@
+definitions:
+  common:
+    processing_level: TBD - major or minor
+    presentation:
+      topic_tags:
+        - TBD - Indicator's topic tags
+dataset:
+  update_period_days: TBD - Number of days between OWID updates
+tables:
+  government_revenue_dataset:
+    variables:
+      tax_inc_sc:
+        title: Taxes including social contributions (as a share of GDP)
+        unit: '%'
+        short_unit: '%'
+        display:
+          name: Taxes including social contributions
+          numDecimalPlaces: 1
+          tolerance: 5
+        description_short: Direct and indirect taxes as well as social contributions included.
+        description_key:
+          - TBD - List of key pieces of information about the indicator.
+        description_from_producer: TBD - Indicator's description given by the producer
+        description_processing: TBD - Indicator's processing description
+        presentation:
+          title_public: TBD - Indicator title to be shown in data pages, that overrides the indicator's title.
+          title_variant: TBD - Indicator's title variant
+          attribution_short: TBD - Indicator's attribution (shorter version)
+          faqs:
+            - fragment_id: TBD - Question identifier from FAQ GDoc
+              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+          grapher_config:
+            title: Tax revenues as a share of GDP
+            subtitle: Direct and indirect taxes as well as social contributions included.
+            variantName: ICTD
+            originUrl: https://ourworldindata.org/taxation/
+            hasMapTab: true
+            tab: map
+            yAxis:
+              max: 0
+              min: 0
+            hideAnnotationFieldsInTitle:
+              time: true
+            map:
+              colorScale:
+                baseColorScheme: YlGn
+                binningStrategy: manual
+                legendDescription: ''
+                customNumericValues:
+                  - 5
+                  - 10
+                  - 15
+                  - 20
+                  - 25
+                  - 30
+                  - 35
+                  - 40
+                  - 45
+                  - 50
+                customNumericMinValue: 0
+              timeTolerance: 3
+            selectedEntityNames:
+              - Colombia
+              - Ghana
+              - Turkey
+              - United States
+              - France
+              - United Kingdom
+            $schema: https://files.ourworldindata.org/schemas/grapher-schema.003.json
