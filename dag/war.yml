@@ -120,3 +120,10 @@ steps:
     - data://garden/countries/2023-09-25/gleditsch
   data://grapher/war/2023-10-24/ucdp_prio:
     - data://garden/war/2023-09-21/ucdp_prio
+
+  # Chupilkin and Koczan (Supplementary dataset to CoW)
+  data://meadow/war/2023-11-29/chupilkin_koczan:
+    - snapshot://war/2023-11-29/chupilkin_koczan.csv
+  data://garden/war/2023-11-29/chupilkin_koczan:
+    - data://meadow/war/2023-11-29/chupilkin_koczan
+    - data://garden/countries/2023-09-29/cow_ssm
