@@ -65,6 +65,7 @@ steps:
   data://garden/war/2023-09-21/cow:
     - data://meadow/war/2023-09-21/cow
     - data://garden/countries/2023-09-29/cow_ssm
+    - data://garden/war/2023-11-29/chupilkin_koczan
   data://grapher/war/2023-09-21/cow:
     - data://garden/war/2023-09-21/cow
 
@@ -123,7 +124,6 @@ steps:
 
   # Chupilkin and Koczan (Supplementary dataset to CoW)
   data://meadow/war/2023-11-29/chupilkin_koczan:
-    - snapshot://war/2023-11-29/chupilkin_koczan.csv
+    - snapshot://war/2023-11-29/chupilkin_koczan.dta
   data://garden/war/2023-11-29/chupilkin_koczan:
     - data://meadow/war/2023-11-29/chupilkin_koczan
-    - data://garden/countries/2023-09-29/cow_ssm

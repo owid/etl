@@ -11,7 +11,7 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Retrieve snapshot.
-    snap = paths.load_snapshot("chupilkin_koczan.csv")
+    snap = paths.load_snapshot("chupilkin_koczan.dta")
 
     # Load data from snapshot.
     tb = snap.read()
