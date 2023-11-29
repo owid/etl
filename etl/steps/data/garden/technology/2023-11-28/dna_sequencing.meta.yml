@@ -1,0 +1,27 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Technological Change
+    processing_level: minor
+
+dataset:
+  update_period_days: 365
+
+tables:
+  dna_sequencing:
+    variables:
+      cost_per_genome:
+        title: Cost of sequencing a full human genome
+        unit: "current US$"
+        short_unit: "$"
+        description_short: "The cost of sequencing the full genetic information of a human, measured in US$. This data is not adjusted for inflation."
+        display:
+          numDecimalPlaces: 0
+      cost_per_gb:
+        title: Cost per billion pairs of DNA sequencing
+        unit: "current US$"
+        short_unit: "$"
+        description_short: "The cost of sequencing one billion base pairs of DNA, measured in US$. This data is not adjusted for inflation."
+        display:
+          numDecimalPlaces: 2

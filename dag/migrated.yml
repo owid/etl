@@ -24,3 +24,7 @@ steps:
     - data://garden/wb/2022-10-03/world_bank_pip
   data://garden/wb/2022-10-03/world_bank_pip:
     - snapshot://wb/2022-10-03/world_bank_pip.feather
+  data://grapher/wb/2022-10-03/extreme_poverty_by_region:
+    - data://garden/wb/2022-10-03/extreme_poverty_by_region
+  data://garden/wb/2022-10-03/extreme_poverty_by_region:
+    - snapshot://wb/2022-10-03/extreme_poverty_by_region.feather
