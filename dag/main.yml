@@ -697,19 +697,19 @@ steps:
   data://grapher/ess/2023-08-02/ess_trust:
   - data://garden/ess/2023-08-02/ess_trust
 
-# Latinobarómetro survey - Trust
+  # Latinobarómetro survey - Trust
   data://meadow/survey/2023-08-04/latinobarometro_trust:
   - snapshot://survey/2023-08-04/latinobarometro_trust.csv
   data://garden/survey/2023-08-04/latinobarometro_trust:
   - data://meadow/survey/2023-08-04/latinobarometro_trust
 
-# Afrobarometer survey - Trust
+  # Afrobarometer survey - Trust
   data://meadow/survey/2023-08-07/afrobarometer_trust:
   - snapshot://survey/2023-08-07/afrobarometer_trust.csv
   data://garden/survey/2023-08-07/afrobarometer_trust:
   - data://meadow/survey/2023-08-07/afrobarometer_trust
 
-# Trust surveys
+  # Trust surveys
   data://garden/survey/2023-08-04/trust_surveys:
   - data://garden/survey/2023-08-04/latinobarometro_trust
   - data://garden/survey/2023-08-07/afrobarometer_trust
