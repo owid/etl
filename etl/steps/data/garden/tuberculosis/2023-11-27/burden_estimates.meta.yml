@@ -9,14 +9,6 @@ definitions:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
 tables:
   burden_estimates:
-    # Learn more about the available fields:
-    # http://docs.owid.io/projects/etl/architecture/metadata/reference/indicator/
-    title: Global tuberculosis report
-    description:
-      WHO has published a global tuberculosis (TB) report every year since
-      1997. The report provides a comprehensive and up-to-date assessment of the TB
-      epidemic, and of progress in prevention, diagnosis and treatment of the disease
-      at global, regional and country levels.
     variables:
       e_inc_100k:
         title: Estimated incidence of all forms of tuberculosis
@@ -83,143 +75,146 @@ tables:
           numDecimalPlaces: 1
       e_inc_tbhiv_num:
         title: Estimated number of incident tuberculosis cases who are HIV-positive
-        unit: ""
+        unit: "cases"
         display:
           numDecimalPlaces: 0
       e_inc_tbhiv_num_lo:
         title: Estimated number of incident tuberculosis cases who are HIV-positive (low bound)
-        unit: ""
+        unit: "cases"
         display:
           numDecimalPlaces: 0
       e_inc_tbhiv_num_hi:
         title: Estimated number of incident tuberculosis cases who are HIV-positive (high bound)
-        unit: ""
+        unit: "cases"
         display:
           numDecimalPlaces: 0
       e_mort_exc_tbhiv_100k:
         title: Estimated mortality from all forms of tuberculosis excluding HIV-positive cases per 100,000 population
-        unit: ""
+        unit: "deaths per 100,000 people"
         display:
           numDecimalPlaces: 1
       e_mort_exc_tbhiv_100k_lo:
         title: Estimated mortality from all forms of tuberculosis excluding HIV-positive cases per 100,000 population (low bound)
-        unit: ""
+        unit: "deaths per 100,000 people"
         display:
           numDecimalPlaces: 1
       e_mort_exc_tbhiv_100k_hi:
         title: Estimated mortality from all forms of tuberculosis excluding HIV-positive cases per 100,000 population (high bound)
-        unit: ""
+        unit: "deaths per 100,000 people"
         display:
           numDecimalPlaces: 1
       e_mort_exc_tbhiv_num:
         title: Estimated number of deaths from all forms of tuberculosis excluding HIV-positive cases
-        unit: ""
+        unit: "deaths"
         display:
           numDecimalPlaces: 0
       e_mort_exc_tbhiv_num_lo:
         title: Estimated number of deaths from all forms of tuberculosis excluding HIV-positive cases (low bound)
-        unit: ""
+        unit: "deaths"
         display:
           numDecimalPlaces: 0
       e_mort_exc_tbhiv_num_hi:
         title: Estimated number of deaths from all forms of tuberculosis excluding HIV-positive cases (high bound)
-        unit: ""
+        unit: "deaths"
         display:
           numDecimalPlaces: 0
       e_mort_tbhiv_100k:
         title: Estimated mortality from tuberculosis cases who are HIV-positive per 100,000 population
-        unit: ""
+        unit: "deaths per 100,000 people"
         display:
           numDecimalPlaces: 2
       e_mort_tbhiv_100k_lo:
         title: Estimated mortality from tuberculosis cases who are HIV-positive per 100,000 population (low bound)
-        unit: ""
+        unit: "deaths per 100,000 people"
         display:
           numDecimalPlaces: 2
       e_mort_tbhiv_100k_hi:
         title: Estimated mortality from tuberculosis cases who are HIV-positive per 100,000 population (high bound)
-        unit: ""
+        unit: "deaths per 100,000 people"
         display:
           numDecimalPlaces: 2
       e_mort_tbhiv_num:
         title: Estimated number of deaths from TB in people who are HIV-positive
-        unit: ""
+        unit: "deaths"
         display:
           numDecimalPlaces: 0
       e_mort_tbhiv_num_lo:
         title: Estimated number of deaths from TB in people who are HIV-positive (low bound)
-        unit: ""
+        unit: "deaths"
         display:
           numDecimalPlaces: 0
       e_mort_tbhiv_num_hi:
         title: Estimated number of deaths from TB in people who are HIV-positive (high bound)
-        unit: ""
+        unit: "deaths"
         display:
           numDecimalPlaces: 0
       e_mort_100k:
         title: Estimated mortality from all forms of tuberculosis per 100,000 population
-        unit: ""
+        unit: "deaths per 100,000 people"
         display:
           numDecimalPlaces: 1
       e_mort_100k_lo:
         title: Estimated mortality from all forms of tuberculosis per 100,000 population (low bound)
-        unit: ""
+        unit: "deaths per 100,000 people"
         display:
           numDecimalPlaces: 1
       e_mort_100k_hi:
         title: Estimated mortality from all forms of tuberculosis per 100,000 population (high bound)
-        unit: ""
+        unit: "deaths per 100,000 people"
         display:
           numDecimalPlaces: 1
       e_mort_num:
         title: Estimated number of deaths from all forms of tuberculosis
-        unit: ""
+        unit: "deaths"
         display:
           numDecimalPlaces: 0
       e_mort_num_lo:
         title: Estimated number of deaths from all forms of tuberculosis (low bound)
-        unit: ""
+        unit: "deaths"
         display:
           numDecimalPlaces: 0
       e_mort_num_hi:
         title: Estimated number of deaths from all forms of tuberculosis (high bound)
-        unit: ""
+        unit: "deaths"
         display:
           numDecimalPlaces: 0
       cfr:
         title: Case fatality ratio
         description_short: The proportion of people diagnosed with [tuberculosis](#dod:tuberculosis), who end up dying of it.
-        unit: ""
+        unit: "deaths per individual diagnosed with tuberculosis"
         display:
           numDecimalPlaces: 2
       cfr_lo:
         title: Case fatality ratio (low bound)
         description_short: The proportion of people diagnosed with [tuberculosis](#dod:tuberculosis), who end up dying of it.
-        unit: ""
+        unit: "deaths per individual diagnosed with tuberculosis"
         display:
           numDecimalPlaces: 2
       cfr_hi:
         title: Case fatality ratio (high bound)
         description_short: The proportion of people diagnosed with [tuberculosis](#dod:tuberculosis), who end up dying of it.
-        unit: ""
+        unit: "deaths per individual diagnosed with tuberculosis"
         display:
           numDecimalPlaces: 2
       cfr_pct:
         title: Case fatality ratio (percentage)
         description_short: The percentage of people diagnosed with [tuberculosis](#dod:tuberculosis), who end up dying of it.
         unit: "%"
+        short_unit: "%"
         display:
           numDecimalPlaces: 1
       cfr_pct_lo:
         title: Case fatality ratio (percentage; low bound)
         description_short: The percentage of people diagnosed with [tuberculosis](#dod:tuberculosis), who end up dying of it.
         unit: "%"
+        short_unit: "%"
         display:
           numDecimalPlaces: 1
       cfr_pct_hi:
         title: Case fatality ratio (percentage; high bound)
         description_short: The percentage of people diagnosed with [tuberculosis](#dod:tuberculosis), who end up dying of it.
         unit: "%"
+        short_unit: "%"
         display:
           numDecimalPlaces: 1
       c_newinc_100k:
