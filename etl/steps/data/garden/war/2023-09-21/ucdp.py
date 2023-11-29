@@ -108,7 +108,8 @@ def run(dest_dir: str) -> None:
 
     # Get country-level stuff
     paths.log.info("getting country-level indicators")
-    tb_country = estimate_metrics_country_level(tb, tb_codes, tb_maps)
+    tb_participants = estimate_metrics_participants(tb, tb_codes)
+    tb_locations = estimate_metrics_locations(tb, tb_maps)
 
     # Sanity check conflict_type transitions
     ## Only consider transitions between intrastate and intl intrastate. If other transitions are detected, raise error.
@@ -166,7 +167,10 @@ def run(dest_dir: str) -> None:
 
     # Set index, sort rows
     tb = tb.set_index(["year", "region", "conflict_type"], verify_integrity=True).sort_index()
-    tb_country = tb_country.set_index(["year", "country", "conflict_type"], verify_integrity=True).sort_index()
+    tb_participants = tb_participants.set_index(
+        ["year", "country", "conflict_type"], verify_integrity=True
+    ).sort_index()
+    tb_locations = tb_locations.set_index(["year", "country", "conflict_type"], verify_integrity=True).sort_index()
 
     # Add short_name to table
     paths.log.info("add shortname to table")
@@ -175,7 +179,8 @@ def run(dest_dir: str) -> None:
     # Tables
     tables = [
         tb,
-        tb_country,
+        tb_participants,
+        tb_locations,
     ]
 
     #
@@ -741,16 +746,7 @@ def adapt_region_names(tb: Table) -> Table:
     return tb
 
 
-def estimate_metrics_country_level(tb: Table, tb_codes: Table, tb_maps: Table) -> Table:
-    """Add country-level indicators."""
-    # Participants
-    tb_country = estimate_metrics_country_level_participants(tb, tb_codes)
-    # Locations
-    _ = estimate_metrics_country_level_locations(tb, tb_maps)
-    return tb_country
-
-
-def estimate_metrics_country_level_participants(tb: Table, tb_codes: Table) -> Table:
+def estimate_metrics_participants(tb: Table, tb_codes: Table) -> Table:
     """Add participant information at country-level."""
     ###################
     # Participated in #
@@ -829,46 +825,172 @@ def estimate_metrics_country_level_participants(tb: Table, tb_codes: Table) -> T
     return tb_country
 
 
-def estimate_metrics_country_level_locations(tb: Table, tb_maps: Table, tb_codes: Table) -> Table:
+def estimate_metrics_locations(tb: Table, tb_maps: Table) -> Table:
     """Add participant information at country-level.
 
     reference: https://github.com/owid/notebooks/blob/main/JoeHasell/UCDP%20and%20PRIO/UCDP_georeferenced/ucdp_country_extract.ipynb
     """
     # Add country name using geometry
-    tb_locations = _estimate_location_in_ucdp_ged(tb, tb_maps).copy()
+    paths.log.info("adding location name of conflict event...")
+    tb_locations = _get_location_of_conflict_in_ucdp_ged(tb, tb_maps).copy()
 
-    # TODO: Add column with region of country (use tb_codes)
-    # TODO: There are some countries not in GW (remove, replace?):
-    ## - Palestine
-    ## - Siachen Glacier
-    ## - Western Sahara
+    ###################
+    # COUNTRY-LEVEL: Country in conflict or not (1 or 0)
+    ###################
+    paths.log.info("estimating country flag 'is_location_of_conflict'...")
+    # There are some countries not in GW (remove, replace?). We keep Palestine and Western Sahara since
+    # these are mappable in OWID maps.
+    # We map entry with id "53238" and relid "PAK-2003-1-345-88" from "Siachen Glacier" to "Pakistan" based on
+    # the text in `where_description` field, which says: "Giang sector in Siachen, Pakistani Kashmir"
+    tb_locations.loc[tb_locations["country_name_location"] == "Siachen Glacier", "country_name_location"] = "Pakistan"
 
-    tb_locations = tb_locations.merge(
-        tb_codes.reset_index(), left_on="country_name_location", right_on="country", how="left"
-    )
+    # tb_locations = tb_locations.merge(
+    #     tb_codes.reset_index(), left_on="country_name_location", right_on="country", how="left"
+    # )
 
     # Estimate number of conflicts ocurring in each country
-    tb_locations.groupby(["country_name_location", "year", "conflict_type"], as_index=False).conflict_new_id.nunique()
+    tb_locations_country = (
+        tb_locations.groupby(["country_name_location", "year", "conflict_type"], as_index=False)["conflict_new_id"]
+        .nunique()
+        .rename(
+            columns={
+                "conflict_new_id": "is_location_of_conflict",
+                "country_name_location": "country",
+            }
+        )
+    )
+    assert tb_locations_country["is_location_of_conflict"].notna().all(), "Missing values in `is_location_of_conflict`!"
+
+    # Convert into a binary indicator: 1 (if more than one conflict), 0 (otherwise)
+    tb_locations_country["is_location_of_conflict"] = tb_locations_country["is_location_of_conflict"].apply(
+        lambda x: 1 if x > 0 else 0
+    )
 
     # Fill with zeroes
-    tb_locations = fill_gaps_with_zeroes(
-        tb=tb_locations,
-        columns=["country_name_location", "year", "conflict_type"],
+    tb_locations_country = fill_gaps_with_zeroes(
+        tb=tb_locations_country,
+        columns=["country", "year", "conflict_type"],
         cols_use_range=["year"],
     )
 
-    # Output columns:
-    ## number_conflicts_in_location: number of conflicts in country, for a given year and conflict type.
-    ## is_location_of_conflict: if there are at least one conflict in a country, for a given year and conflict type.
-    tb_locations = tb_locations.rename(columns={"conflict_new_id": "number_conflicts_in_location"})
-    mask = tb_locations["number_conflicts_in_location"] > 0
-    tb_locations["is_location_of_conflict"] = 0
-    tb_locations.loc[mask, "is_location_of_conflict"] = 1
-    tb_locations["is_location_of_conflict"].m.origins = tb_locations["number_conflicts_in_location"].m.origins
-    return tb
+    # Add origins from Natural Earth
+    tb_locations_country["is_location_of_conflict"].origins += tb_maps["name"].m.origins
+
+    ###################
+    # Add conflict type aggregates
+    ###################
+    paths.log.info("adding conflict type aggregates...")
+
+    # Add missing conflict types
+    # Add intrastate (all)
+    tb_locations_country = aggregate_conflict_types(
+        tb=tb_locations_country,
+        parent_name="intrastate",
+        children_names=["intrastate (non-internationalized)", "intrastate (internationalized)"],
+        columns_to_aggregate=["is_location_of_conflict"],
+        columns_to_groupby=["country", "year"],
+    )
+    # Add state-based
+    state_based_conflicts = list(TYPE_OF_CONFLICT_MAPPING.values())
+    tb_locations_country = aggregate_conflict_types(
+        tb=tb_locations_country,
+        parent_name="state-based",
+        children_names=list(state_based_conflicts),
+        columns_to_aggregate=["is_location_of_conflict"],
+        columns_to_groupby=["country", "year"],
+    )
+    # Add all
+    non_state_conflicts = list(TYPE_OF_VIOLENCE_MAPPING.values())
+    tb_locations_country = aggregate_conflict_types(
+        tb=tb_locations_country,
+        parent_name="all",
+        children_names=list(state_based_conflicts + non_state_conflicts),
+        columns_to_aggregate=["is_location_of_conflict"],
+        columns_to_groupby=["country", "year"],
+    )
+
+    ###################
+    # REGION-LEVEL: Number of locations with conflict
+    ###################
+    paths.log.info("estimating number of locations with conflict...")
+
+    # Add regions
+    cols = ["region", "year", "conflict_type"]
+    tb_locations_regions = (
+        tb_locations.groupby(cols)["country_name_location"]
+        .nunique()
+        .reset_index()
+        .sort_values(cols)
+        .rename(
+            columns={
+                "country_name_location": "number_locations",
+                "region": "country",
+            }
+        )
+    )
+    # World
+    cols = ["year", "conflict_type"]
+    tb_locations_world = (
+        tb_locations.groupby(cols)["country_name_location"]
+        .nunique()
+        .reset_index()
+        .sort_values(cols)
+        .rename(
+            columns={
+                "country_name_location": "number_locations",
+                "region": "country",
+            }
+        )
+    )
+    tb_locations_world["country"] = "World"
+    # Combine
+    tb_locations_regions = pr.concat([tb_locations_regions, tb_locations_world], ignore_index=True)
+
+    # Add origins
+    tb_locations_regions["number_locations"].m.origins = tb_locations["conflict_new_id"].origins
+
+    paths.log.info("adding conflict type aggregates...")
+    # Add aggregates of conflict types
+    tb_locations_regions = aggregate_conflict_types(
+        tb=tb_locations_regions,
+        parent_name="intrastate",
+        children_names=["intrastate (non-internationalized)", "intrastate (internationalized)"],
+        columns_to_aggregate=["number_locations"],
+        columns_to_aggregate_absolute=["number_locations"],
+        columns_to_groupby=["country", "year"],
+    )
+    # Add state-based
+    state_based_conflicts = list(TYPE_OF_CONFLICT_MAPPING.values())
+    tb_locations_regions = aggregate_conflict_types(
+        tb=tb_locations_regions,
+        parent_name="state-based",
+        children_names=list(state_based_conflicts),
+        columns_to_aggregate=["number_locations"],
+        columns_to_aggregate_absolute=["number_locations"],
+        columns_to_groupby=["country", "year"],
+    )
+    # Add all
+    non_state_conflicts = list(TYPE_OF_VIOLENCE_MAPPING.values())
+    tb_locations_regions = aggregate_conflict_types(
+        tb=tb_locations_regions,
+        parent_name="all",
+        children_names=list(state_based_conflicts + non_state_conflicts),
+        columns_to_aggregate=["number_locations"],
+        columns_to_aggregate_absolute=["number_locations"],
+        columns_to_groupby=["country", "year"],
+    )
+
+    ###################
+    # COMBINE: Country flag + Regional counts
+    ###################
+    paths.log.info("combining country flag and regional counts...")
+    tb_locations = pr.concat(
+        [tb_locations_country, tb_locations_regions], short_name=f"{paths.short_name}_locations", ignore_index=True
+    )
+    return tb_locations
 
 
-def _estimate_location_in_ucdp_ged(tb: Table, tb_maps: Table) -> Table:
+def _get_location_of_conflict_in_ucdp_ged(tb: Table, tb_maps: Table) -> Table:
     """Add column with country name of the conflict."""
     # Convert the UCDP data to a GeoDataFrame (so it can be mapped and used in spatial analysis).
     # The 'wkt.loads' function takes the coordinates in the 'geometry' column and ensures geopandas will use it to map the data.

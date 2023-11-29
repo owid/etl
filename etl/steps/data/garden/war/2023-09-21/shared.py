@@ -323,16 +323,27 @@ def aggregate_conflict_types(
     tb: Table,
     parent_name: str,
     children_names: Optional[List[str]] = None,
-    columns_to_aggregate: List[str] = ["participated_in_conflict"],
+    columns_to_aggregate: Optional[List[str]] = None,
+    columns_to_aggregate_absolute: Optional[List[str]] = None,
+    columns_to_groupby: Optional[List[str]] = None,
     dim_name: str = "conflict_type",
 ) -> Table:
     """Aggregate metrics in broader conflict types."""
+    if columns_to_aggregate is None:
+        columns_to_aggregate = ["participated_in_conflict"]
+    if columns_to_groupby is None:
+        columns_to_groupby = ["year", "country", "id"]
+    if columns_to_aggregate_absolute is None:
+        columns_to_aggregate_absolute = []
     if children_names is None:
         tb_agg = tb.copy()
     else:
         tb_agg = tb[tb[dim_name].isin(children_names)].copy()
-    tb_agg = tb_agg.groupby(["year", "country", "id"], as_index=False).agg(
-        {col: lambda x: min(x.sum(), 1) for col in columns_to_aggregate}
+    tb_agg = tb_agg.groupby(columns_to_groupby, as_index=False).agg(
+        {
+            col: lambda x: min(x.sum(), 1) if col not in columns_to_aggregate_absolute else x.sum()
+            for col in columns_to_aggregate
+        }
     )
     tb_agg[dim_name] = parent_name
 

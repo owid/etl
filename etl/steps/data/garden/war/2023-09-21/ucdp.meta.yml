@@ -184,6 +184,27 @@ tables:
         description_short: |-
           The number of countries that participated in a conflict (of a specific kind) in a given year and region.
 
+  ucdp_locations:
+    variables:
+      is_location_of_conflict:
+        title: Location of conflict
+        unit: ""
+        display:
+          numDecimalPlaces: 0
+        description_short: |-
+          Whether there was at least one conflict (of a specific kind) event in the country in a given year.
+        description_key:
+          - |-
+            '1' indicates that there was a conflict event in the given country. '0' indicates that there was no conflict event in the given country.
+
+      number_locations:
+        title: Number of countries being locations of conflicts
+        unit: "countries"
+        display:
+          numDecimalPlaces: 0
+        description_short: |-
+          The number of countries where at least one conflict (of a specific kind) event occurred, for a given year and region.
+
   ucdp:
     variables:
       ##################
