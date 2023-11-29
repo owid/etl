@@ -22,21 +22,17 @@ definitions:
         <% endif %>
       point_2: |-
         <% if type == "period" %>
-
         <% if age == '0' %>
         For a given year, it represents the average lifespan for a hypothetical group of people, if they experienced the same age-specific death rates throughout their whole lives as the age-specific death rates seen in that particular year.
         <% else %>
         For a given year, it represents the remaining average lifespan for a hypothetical group of people, if they experienced the same age-specific death rates throughout the rest of their lives as the age-specific death rates seen in that particular year.
         <% endif %>
-
         <% else %>
-
         <% if age == '0' %>
         It is calculated by tracking individuals from that cohort throughout their lives until death, and calculating their average lifespan.
         <% else %>
         It is calculated by tracking individuals from that cohort throughout the rest of their lives until death, and calculating their average remaining lifespan.
         <% endif %>
-
         <% endif %>
 
 
@@ -196,17 +192,17 @@ tables:
         unit: years
         description_short: |-
           <% if age == '0' %>
-            <% if sex == 'both' %>
-              The << type >> life expectancy at birth, in a given year.
-            <% else %>
-              The << type >> life expectancy at birth among << sex + 's' >>, in a given year.
-            <% endif %>
+          <% if sex == 'both' %>
+          The << type >> life expectancy at birth, in a given year.
           <% else %>
-            <% if sex == 'both' %>
-              The remaining << type >> life expectancy at age << age >>, in a given year.
-            <% else %>
-              The remaining << type >> life expectancy at age << age >> among << sex + 's' >>, in a given year.
-            <% endif %>
+          The << type >> life expectancy at birth among << sex + 's' >>, in a given year.
+          <% endif %>
+          <% else %>
+          <% if sex == 'both' %>
+          The remaining << type >> life expectancy at age << age >>, in a given year.
+          <% else %>
+          The remaining << type >> life expectancy at age << age >> among << sex + 's' >>, in a given year.
+          <% endif %>
           <% endif %>
         description_key:
           - |-
@@ -215,13 +211,11 @@ tables:
             {definitions.global.life_expectancy.point_2}
           - |-
             <% if age != '0' %>
-
             <% if type == "period" %>
             This shows the remaining period life expectancy among people who have already reached the age << age >>, using death rates from their age group and older age groups.
             <% else %>
             This shows the remaining cohort life expectancy of people who have reached the age << age >>.
             <% endif %>
-
             <% endif %>
         display:
           numDecimalPlaces: 1
