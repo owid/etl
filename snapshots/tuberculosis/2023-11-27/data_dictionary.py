@@ -1,4 +1,7 @@
-"""Script to create a snapshot of dataset."""
+"""Script to create a snapshot of dataset.
+
+This data dictionary will be used by multiple datasets in the garden steps of the tuberculosis namespace.
+"""
 
 from pathlib import Path
 
