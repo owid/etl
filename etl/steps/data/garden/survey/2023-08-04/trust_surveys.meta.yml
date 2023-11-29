@@ -11,7 +11,7 @@ definitions:
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
 dataset:
-  title: Trust questions in the European Social Survey and several regional barometers
+  title: Trust questions in the European Social Survey, Latinobarómetro and Afrobarometer
   update_period_days: 365
 
 # Learn more about the available fields:
