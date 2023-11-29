@@ -1,4 +1,10 @@
-"""Script to create a snapshot of dataset 'Trust questions in the Arab Barometer Dataset (Arab Barometer, 2021)'."""
+"""
+Script to create a snapshot of dataset 'Trust questions in the Arab Barometer Dataset (Arab Barometer, 2021)'.
+
+NOTE: Due to problems with the entities, for now we are not using this data in the analysis.
+TODO: Fix the entities and add this data to the analysis.
+
+"""
 
 from pathlib import Path
 
