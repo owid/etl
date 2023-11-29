@@ -1,0 +1,39 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/origin/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Trust questions in the European Social Survey dataset
+    description: |-
+      The European Social Survey (ESS) is an academically driven cross-national survey that has been conducted across Europe since its establishment in 2001. Every two years, face-to-face interviews are conducted with newly selected, cross-sectional samples.
+
+      The survey measures the attitudes, beliefs and behaviour patterns of diverse populations in more than thirty nations. The main aims of the ESS are to:
+
+      <ul><li>operate a Research Infrastructure providing high quality data measuring change (and stability) over time within and between European countries in their living conditions, social structure, public opinion and attitudes;</li>
+      <li>practise and promote the highest scientific standards in cross-national comparative research in the social sciences;</li>
+      <li>continue the development of ESS infrastructure through ongoing methodological research and innovation;</li>
+      <li>facilitate training in the effective use of ESS data;</li>
+      <li>ensure the visibility, accessibility and reach of ESS data among researchers in the social sciences and beyond, policy makers and the wider public, at both the national and international level.</li></ul>
+
+      The ESS data is available free of charge for non-commercial use and can be downloaded from the <a href="https://ess-search.nsd.no/">ESS Data Portal</a>.
+    date_published: 2023-07-05
+
+    # Citation
+    producer: European Social Survey
+    citation_full: |-
+      European Social Survey Cumulative File, ESS 9-10 (2020). Data file edition 1.0. Sikt - Norwegian Agency for Shared Services in Education and Research, Norway, Norway - Data Archive and distributor of ESS data for ESS ERIC. doi:10.21338/NSD-ESS-CUMULATIVE.
+
+    # Files
+    url_main: https://www.europeansocialsurvey.org/
+    date_accessed: 2023-08-02
+
+    # License
+    license:
+      name: Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)
+      url: https://www.europeansocialsurvey.org/data/conditions_of_use.html
+
+wdir: ../../../data/snapshots/ess/2023-08-02
+outs:
+- md5: 0f7bfe817eb4b0bdb7431ce9457d3f70
+  size: 3812
+  path: ess_trust.csv
