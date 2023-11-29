@@ -1,26 +1,3 @@
-# dataset:
-  # description: |
-  #   This dataset combines trust questions from the European Social Survey (ESS) and several regional barometers.
-
-  #   The main question in the dataset relates to interpersonal trust:
-  #   - ESS: "Would you say that most people can be trusted or that you cannot be too careful?"
-  #   - Latinobarómetro: "Would you say that you can trust most people, or that you can never be too careful in dealing with others?"
-
-  #   Though in the ESS the question is asked in a 0-10 scale, we only consider the answers from 6 to 10 as "agreeing" that most people can be trusted. In the Latinobarómetro, we only consider the answers "One can trust most people" as "agreeing" that most people can be trusted.
-  # licenses:
-  #   - name: Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)
-  #     url: https://www.europeansocialsurvey.org/data/conditions_of_use.html
-  # sources:
-  #   - name: European Social Survey (2023)
-  #     url: https://www.europeansocialsurvey.org/
-  #     date_accessed: 2023-08-02
-  #     publication_date: '2023-07-05'
-  #     published_by: European Social Survey Cumulative File, ESS 9-10 (2020). Data file edition 1.0. Sikt - Norwegian Agency for Shared Services in Education and Research, Norway, Norway - Data Archive and distributor of ESS data for ESS ERIC. doi:10.21338/NSD-ESS-CUMULATIVE.
-  #   - name: Latinobarómetro (2021)
-  #     url: https://www.latinobarometro.org/
-  #     date_accessed: 2023-08-04
-  #     publication_year: 2021
-  #     published_by: 'Latinobarómetro (2021). Data Bank: Stata files 1996-2020. Retrieved 03-08-2023 from https://www.latinobarometro.org/'
 # NOTE: To learn more about the fields, hover over their names.
 definitions:
   common:
@@ -29,15 +6,30 @@ definitions:
         - Trust
     processing_level: major
     description_processing: |
-      The indicators are processed from microdata of several different continental barometers using Stata. Weights are applied in each country.
-
+      The indicators are processed from microdata of several different regional surveys using Stata. Weights are applied in each country.
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
 dataset:
   title: Trust questions in the European Social Survey and several regional barometers
   update_period_days: 365
+  description: |
+    This dataset combines trust questions from the European Social Survey (ESS) and regional barometers: Latinobarómetro and Afrobarometer.
 
+    The main question in the dataset relates to interpersonal trust:
+    - ESS: "Would you say that most people can be trusted or that you cannot be too careful?"
+    - Latinobarómetro: "Would you say that you can trust most people, or that you can never be too careful in dealing with others?"
+    - Afrobarometer: "Generally speaking, would you say that most people can be trusted or that you must be very careful in dealing with people?"
+
+    Though in the ESS the question is asked in a 0-10 scale, we only consider the answers from 6 to 10 as "agreeing" that most people can be trusted. In the Latinobarómetro and Afrobarometer survets, we only consider the answers "One can trust most people" as "agreeing" that most people can be trusted.
+
+  licenses:
+    - name: Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)
+      url: https://www.europeansocialsurvey.org/data/conditions_of_use.html
+    - name: CC BY 4.0
+      url: https://www.latinobarometro.org/
+    - name: Data usage and access policy
+      url: https://www.afrobarometer.org/data/data-usage-and-access-policy/
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/

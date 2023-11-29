@@ -1,9 +1,6 @@
 """Load a meadow dataset and create a garden dataset."""
 
-from typing import cast
-
 import owid.catalog.processing as pr
-from owid.catalog import Dataset
 
 from etl.helpers import PathFinder, create_dataset
 
@@ -15,28 +12,22 @@ def run(dest_dir: str) -> None:
     #
     # Load inputs.
     #
-    # Load meadow dataset.
-    ds_meadow_latino = cast(Dataset, paths.load_dependency("latinobarometro_trust"))
-
-    # Read table from meadow dataset.
+    # Load Latinobarómetro table
+    ds_meadow_latino = paths.load_dataset("latinobarometro_trust")
     tb_latino = ds_meadow_latino["latinobarometro_trust"].reset_index()
 
-    # Load meadow dataset.
-    ds_meadow_afro = cast(Dataset, paths.load_dependency("afrobarometer_trust"))
-
-    # Read table from meadow dataset.
+    # Load Afrobarometer table
+    ds_meadow_afro = paths.load_dataset("afrobarometer_trust")
     tb_afro = ds_meadow_afro["afrobarometer_trust"].reset_index()
 
-    # Load meadow dataset.
-    ds_meadow_ess = cast(Dataset, paths.load_dependency("ess_trust"))
-
-    # Read table from meadow dataset.
+    # Load ESS table
+    ds_meadow_ess = paths.load_dataset("ess_trust")
     tb_ess = ds_meadow_ess["ess_trust"].reset_index()
 
     #
     # Process data.
 
-    # Concatenate the two tables.
+    # Concatenate the tables
     tb = pr.concat(
         [tb_latino, tb_afro, tb_ess[["country", "year", "trust"]]], ignore_index=True, short_name="trust_surveys"
     )
