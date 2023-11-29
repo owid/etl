@@ -1,18 +1,15 @@
 """Load a snapshot and create a meadow dataset."""
 
-from typing import cast
 
-import pandas as pd
 from owid.catalog import Table
 
 from etl.helpers import PathFinder, create_dataset
-from etl.snapshot import Snapshot
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
 
-def replace_country_codes(df: pd.DataFrame) -> pd.DataFrame:
+def replace_country_codes(tb: Table) -> Table:
     """The exported file keeps some country codes instead of names. In this function I replace them."""
     country_dict = {
         "17": "Saudi Arabia",
@@ -23,12 +20,12 @@ def replace_country_codes(df: pd.DataFrame) -> pd.DataFrame:
         "6": "Lebanon",
     }
 
-    df["country"] = df["country"].replace(country_dict)
+    tb["country"] = tb["country"].replace(country_dict)
 
     # Set indices, verify integrity and sort.
-    df = df.set_index(["country", "year"], verify_integrity=True).sort_index()
+    tb = tb.set_index(["country", "year"], verify_integrity=True).sort_index()
 
-    return df
+    return tb
 
 
 def run(dest_dir: str) -> None:
@@ -36,18 +33,18 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Retrieve snapshot.
-    snap = cast(Snapshot, paths.load_dependency("arab_barometer_trust.csv"))
+    snap = paths.load_snapshot("arab_barometer_trust.csv")
 
     # Load data from snapshot.
-    df = pd.read_csv(snap.path)
+    tb = snap.read()
 
     #
     # Process data.
     # Replace country codes with country names.
-    df = replace_country_codes(df)
+    tb = replace_country_codes(tb)
 
     # Create a new table and ensure all columns are snake-case.
-    tb = Table(df, short_name=paths.short_name, underscore=True)
+    tb = tb.underscore()
 
     #
     # Save outputs.

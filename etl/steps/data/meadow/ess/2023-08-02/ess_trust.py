@@ -1,13 +1,11 @@
 """Load a snapshot and create a meadow dataset."""
 
-from typing import cast
 
-import pandas as pd
-from owid.catalog import Dataset, Table
+import owid.catalog.processing as pr
+from owid.catalog import Table
 from structlog import get_logger
 
 from etl.helpers import PathFinder, create_dataset
-from etl.snapshot import Snapshot
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -16,7 +14,7 @@ paths = PathFinder(__file__)
 log = get_logger()
 
 
-def rename_columns(df: pd.DataFrame) -> pd.DataFrame:
+def rename_columns(tb: Table) -> Table:
     """Rename trust questions columns and separate country and year."""
 
     # Define dictionary of columns to rename ppltrst trstep trstlgl trstplc trstplt trstprl trstprt trstun gvimpc19 trstsci
@@ -34,35 +32,36 @@ def rename_columns(df: pd.DataFrame) -> pd.DataFrame:
     }
 
     # Rename columns.
-    df = df.rename(columns=rename_dict)
+    tb = tb.rename(columns=rename_dict)
 
     # Extract first two characters from survey column and name it country. Extract last four characters from survey column and name it year.
-    df["country"] = df["survey"].str[:2]
-    df["year"] = df["survey"].str[-4:].astype(int)
+    tb["country"] = tb["survey"].str[:2]
+    tb["year"] = tb["survey"].str[-4:].astype(int)
 
     # Remove survey column and move country and year to the front.
-    df = df.drop(columns=["survey"])
-    df = df[["country", "year"] + list(df.columns[:-2])]
+    tb = tb.drop(columns=["survey"])
+    tb = tb[["country", "year"] + list(tb.columns[:-2])]
 
     # Harmonize ISO2 codes to OWID standard
-    df = harmonize_countries(df)
+    tb = harmonize_countries(tb)
 
     # Set index and verify that it is unique. And sort.
-    df = df.set_index(["country", "year"], verify_integrity=True).sort_index()
+    tb = tb.set_index(["country", "year"], verify_integrity=True).sort_index()
 
-    return df
+    return tb
 
 
-def harmonize_countries(df: pd.DataFrame) -> pd.DataFrame:
+def harmonize_countries(tb: Table) -> Table:
     # Load reference file with country names in OWID standard
-    df_countries_regions = cast(Dataset, paths.load_dependency("regions"))["regions"]
+    ds_countries_regions = paths.load_dataset("regions")
+    tb_countries_regions = ds_countries_regions["regions"].reset_index()
 
     # Merge dataset and country dictionary to get the name of the country
-    df = pd.merge(
-        df, df_countries_regions[["name", "iso_alpha2"]], left_on="country", right_on="iso_alpha2", how="left"
+    tb = pr.merge(
+        tb, tb_countries_regions[["name", "iso_alpha2"]], left_on="country", right_on="iso_alpha2", how="left"
     )
 
-    missing_list = list(df[df["name"].isnull()]["country"].unique())
+    missing_list = list(tb[tb["name"].isnull()]["country"].unique())
     missing_count = len(missing_list)
 
     # Warns if there are still entities missing
@@ -72,12 +71,12 @@ def harmonize_countries(df: pd.DataFrame) -> pd.DataFrame:
         )
 
     # Drop rows without match
-    df = df[~df["name"].isnull()].reset_index(drop=True)
+    tb = tb[~tb["name"].isnull()].reset_index(drop=True)
     # Drop old country and ISO alpha 2 variable. Rename the newly built variable as `country`
-    df = df.drop(columns=["country", "iso_alpha2"])
-    df = df.rename(columns={"name": "country"})
+    tb = tb.drop(columns=["country", "iso_alpha2"])
+    tb = tb.rename(columns={"name": "country"})
 
-    return df
+    return tb
 
 
 def run(dest_dir: str) -> None:
@@ -85,17 +84,17 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Retrieve snapshot.
-    snap = cast(Snapshot, paths.load_dependency("ess_trust.csv"))
+    snap = paths.load_snapshot("ess_trust.csv")
 
     # Load data from snapshot.
-    df = pd.read_csv(snap.path)
+    tb = snap.read()
 
     #
     # Process data.
-    df = rename_columns(df)
+    tb = rename_columns(tb)
 
     # Create a new table and ensure all columns are snake-case.
-    tb = Table(df, short_name=paths.short_name, underscore=True)
+    tb = tb.underscore()
 
     #
     # Save outputs.

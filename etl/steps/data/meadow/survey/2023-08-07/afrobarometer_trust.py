@@ -1,12 +1,8 @@
 """Load a snapshot and create a meadow dataset."""
 
-from typing import cast
 
-import pandas as pd
-from owid.catalog import Table
 
 from etl.helpers import PathFinder, create_dataset
-from etl.snapshot import Snapshot
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -17,18 +13,18 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Retrieve snapshot.
-    snap = cast(Snapshot, paths.load_dependency("afrobarometer_trust.csv"))
+    snap = paths.load_snapshot("afrobarometer_trust.csv")
 
     # Load data from snapshot.
-    df = pd.read_csv(snap.path)
+    tb = snap.read()
 
     #
     # Process data.
     # Set indices, verify integrity and sort.
-    df = df.set_index(["country", "year"], verify_integrity=True).sort_index()
+    tb = tb.set_index(["country", "year"], verify_integrity=True).sort_index()
 
     # Create a new table and ensure all columns are snake-case.
-    tb = Table(df, short_name=paths.short_name, underscore=True)
+    tb = tb.underscore()
 
     #
     # Save outputs.
