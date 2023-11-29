@@ -669,7 +669,7 @@ steps:
     - data://meadow/wb/2023-11-21/worldwide_bureaucracy_indicators
   data://grapher/wb/2023-11-21/worldwide_bureaucracy_indicators:
     - data://garden/wb/2023-11-21/worldwide_bureaucracy_indicators
-    
+
   # Information Capacity Dataset
   data://meadow/state_capacity/2023-11-10/information_capacity_dataset:
     - snapshot://state_capacity/2023-11-10/information_capacity_dataset.dta
@@ -679,6 +679,14 @@ steps:
     - data://garden/regions/2023-01-01/regions
   data://grapher/state_capacity/2023-11-20/information_capacity_dataset:
     - data://garden/state_capacity/2023-11-10/information_capacity_dataset
+
+  # National Human Genome Research Institute - DNA Sequencing Costs
+  data://meadow/technology/2023-11-28/dna_sequencing:
+    - snapshot://technology/2023-11-28/dna_sequencing.xls
+  data://garden/technology/2023-11-28/dna_sequencing:
+    - data://meadow/technology/2023-11-28/dna_sequencing
+  data://grapher/technology/2023-11-28/dna_sequencing:
+    - data://garden/technology/2023-11-28/dna_sequencing
 
   ######################################################################################################################
   # Older versions to be archived once they are not used by any other steps.

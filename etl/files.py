@@ -3,6 +3,7 @@
 #
 
 import hashlib
+import io
 import os
 import subprocess
 import time
@@ -11,6 +12,7 @@ from pathlib import Path
 from threading import Lock
 from typing import Any, Dict, Generator, List, Optional, Set, TextIO, Union
 
+import ruamel.yaml
 import yaml
 from yaml.dumper import Dumper
 
@@ -143,6 +145,22 @@ def yaml_dump(
             .replace(" ", " ")
         )
     return s
+
+
+def ruamel_dump(d: Dict[str, Any]) -> str:
+    """Dump dictionary with a consistent style using ruamel.yaml."""
+    yml = ruamel.yaml.YAML()
+    yml.indent(mapping=2, sequence=4, offset=2)
+    # prevent line-wrap
+    yml.width = 4096
+
+    stream = io.StringIO()
+    yml.dump(d, stream)
+    return stream.getvalue()
+
+
+def ruamel_load(f: io.TextIOWrapper) -> Dict[str, Any]:
+    return ruamel.yaml.load(f, Loader=ruamel.yaml.RoundTripLoader, preserve_quotes=True)
 
 
 def _strip_lines(s: str) -> str:

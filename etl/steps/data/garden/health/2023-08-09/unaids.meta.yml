@@ -27,7 +27,6 @@ tables:
         unit: deaths
         description_short: |-
           Deaths that were prevented thanks to the usage of antiretroviral therapy (ART).
-
         processing_level: minor
         display:
           numDecimalPlaces: 0
@@ -38,12 +37,10 @@ tables:
         short_unit: $
         description_short: |-
           HIV expenditure by funding source.
-
         description_from_producer: |-
           The indicator to be reported is total and subtotal HIV expenditures by services or programme categories and by financing sources. There are eight core sub-indicators that map to this reporting. These are outlined under Annex 3.
 
           The calculation of each service/programme or sub-indicator may have individual characteristics to ensure proper accounting of all components (e.g., direct and shared costs of service provision) and to avoid double-counting; these calculations may be different by each financing source and service delivery modality (or even by service provider). Further guidance is available in the respective guidelines and manuals listed at the end of this section.
-
         processing_level: minor
 
       domestic_spending_fund_source_per_capita:
@@ -51,7 +48,6 @@ tables:
         unit: US$ per capita
         description_short: |-
           HIV expenditure by funding source per capita.
-
         description_from_producer: |-
           The indicator to be reported is total and subtotal HIV expenditures by services or programme categories and by financing sources. There are eight core sub-indicators that map to this reporting. These are outlined under Annex 3.
 
@@ -63,8 +59,6 @@ tables:
         short_unit: "%"
         description_short: |-
           Percentage of people in a specific key population who test positive for HIV.
-
-          Additionally, upper and lower estimates are provided.
         processing_level: minor
 
       aids_orphans:
@@ -79,8 +73,7 @@ tables:
         short_unit: "%"
         unit: "%"
         description_short: |-
-          Share of people in a population, who reported the use of a condom the last time they had sexual intercourse with a non-marital,
-          non-cohabiting sexual partner.
+          Share of people in a population, who reported the use of a condom the last time they had sexual intercourse with a non-marital, non-cohabiting sexual partner.
         processing_level: minor
 
       discriminatory_attitudes:
@@ -90,8 +83,9 @@ tables:
         description_short: |-
           Percentage of people in a population who report discriminatory attitudes towards people living with HIV, countries with available data, 2018–2022.
 
-
-          Discriminatory attitudes are measured through “No” responses to either of two questions: (1) Would you buy fresh vegetables from a shopkeeper or vendor if you knew this person had HIV?; and (2) Do you think children living with HIV should be able to attend school with children who are HIV-negative?
+        description_key:
+          - |-
+            Discriminatory attitudes are measured through “No” responses to either of two questions: (1) Would you buy fresh vegetables from a shopkeeper or vendor if you knew this person had HIV?; and (2) Do you think children living with HIV should be able to attend school with children who are HIV-negative?
         processing_level: minor
 
       gap_on_art:
@@ -108,9 +102,9 @@ tables:
         unit: "infections per 1000 uninfected population"
         description_from_producer: |-
           Number of new HIV infections per 1000 uninfected population. The incidence rate is the number of new cases per populationat risk in a given time period. Numerator: Number of new HIV infections. Denominator: Uninfected population (which isthe total population minus people living with HIV).
-
-          Diaggregation: Age groups (0−14, 15−24, 15−49, 50+ years), General population, Key populations(men who have sex with men,sex workers,People who inject drugs,transgender people, prisoners, Keypopulations (less than 25 years, 25+ years), Mode of transmission for children (includingmother-to-child transmission), Geographic location, Sex.
-
+        description_key:
+          - |-
+            The indicator is disaggregated by age groups (0−14, 15−24, 15−49, 50+ years, less than 25 years, 25+ years), general population, key populations (men who have sex with men,sex workers, people who inject drugs, transgender people, prisoners, mode of transmission for children (includingmother-to-child transmission), geographic location, sex.
         processing_level: minor
 
       hiv_tb_patients_receiving_art:
@@ -119,7 +113,6 @@ tables:
         unit: "patients"
         description_from_producer: |-
           The number of patients with tuberculosis living with HIV that are receiving ART.
-
         processing_level: minor
 
       infections_averted_pmtct:
@@ -156,15 +149,14 @@ tables:
 
           The first three questions should not be altered. Questions 4 and 5 ask about local misconceptions and may be replaced by the most common misconceptions in your country. Examples include: “Can a person get HIV by hugging or shaking hands with a person who is infected?” and “Can a person get HIV through supernatural means?”
 
-          Those who have never heard of HIV and AIDS should be excluded from the numerator but included in the denominator. An answer of “don’t know” should be recorded as an incorrect answer.
+          Those who have never heard of HIV and AIDS should be excluded from the numerator but included in the denominator. An answer of “don't know” should be recorded as an incorrect answer.
 
           Scores for each of the individual questions (based on the same denominator) are required as well as the score for the composite indicator.
 
           Disaggregation:
 
-            • Age (15–19 and 20–24 years)
-
-            • Gender (male, female)
+          - Age (15–19 and 20–24 years)
+          - Gender (male, female)
         processing_level: minor
 
       msm_condom_use:
@@ -188,7 +180,7 @@ tables:
 
           Disaggregation:
 
-            • Age (<25 and 25+ years)
+          - Age (<25 and 25+ years)
 
         processing_level: minor
 
