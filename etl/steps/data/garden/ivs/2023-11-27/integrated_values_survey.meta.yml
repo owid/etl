@@ -8,7 +8,7 @@ definitions:
     description_processing: |
       The data is collected by merging the World Values Survey and the European Values Study, following the methodology described in the [Integrated Values Surveys website](https://www.worldvaluessurvey.org/WVSEVStrend.jsp).
 
-      The indicators are processed from microdata of the Integrated Values Surveys (IVS) using Stata. Weights are not applied in each country.
+      The indicators are processed from microdata of the Integrated Values Surveys (IVS) using Stata. Weights are applied for each country.
     display: &common-display
       numDecimalPlaces: 1
 
