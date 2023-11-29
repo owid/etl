@@ -1,0 +1,33 @@
+meta:
+  source:
+    name: World Bank Poverty and Inequality Platform (2022)
+    description: >-
+      PIP provides regional aggregate figures for the number of people living below
+      the international poverty line of int-$
+      2.15 using 2011 PPPs.
+
+
+      Unfortunately, for certain regions and years the data survey coverage is too
+      low and the results are suppressed.  From
+      1990 onwards  it is only for South Asia and South Saharan Africa (on different
+      years) that regional estimates are sometimes
+      missing.
+
+
+      For these years we calculate the number of poor in the region as the difference
+      between the estimated total number of
+      poor across the world and the sum of the number of poor across all other regions.
+
+
+      Prior to 1990 estimates for more than one region are missing, precluding this
+      method.
+    url: https://pip.worldbank.org/
+    date_accessed: 2022-10-03
+    published_by: World Bank Poverty and Inequality Platform
+  name: Number of people living in extreme poverty, by world region (World Bank PIP)
+  description: Version 20220909_2017_01_02_PROD
+wdir: ../../../data/snapshots/wb/2022-10-03
+outs:
+- md5: ecce40bfdb6d88bfe4b84f3d227e2f3b
+  size: 5666
+  path: extreme_poverty_by_region.feather
