@@ -75,7 +75,7 @@ gen trust = 0
 replace trust = 1 if A165 == 1
 
 * Make dataset of the mean trust (which ends up being the % of people saying "most people can be trusted") by wave and country (CHECK WEIGHTS)
-collapse (mean) trust, by (year country)
+collapse (mean) trust [w=S017], by (year country)
 tempfile trust_file
 save "`trust_file'"
 
@@ -97,7 +97,7 @@ replace trust_first_not_very_much = 1 if G007_34 == 3
 gen trust_first_not_at_all = 0
 replace trust_first_not_at_all = 1 if G007_34 == 4
 
-collapse (mean) trust_first trust_first_not_very_much trust_first_not_at_all, by (year country)
+collapse (mean) trust_first trust_first_not_very_much trust_first_not_at_all [w=S017], by (year country)
 tempfile trust_first_file
 save "`trust_first_file'"
 
@@ -119,7 +119,7 @@ replace trust_personally_not_very_much = 1 if G007_33 == 3
 gen trust_personally_not_at_all = 0
 replace trust_personally_not_at_all = 1 if G007_33 == 4
 
-collapse (mean) trust_personally trust_personally_not_very_much trust_personally_not_at_all, by (year country)
+collapse (mean) trust_personally trust_personally_not_very_much trust_personally_not_at_all [w=S017], by (year country)
 tempfile trust_personally_file
 save "`trust_personally_file'"
 
@@ -135,7 +135,7 @@ keep if A168 >= -1
 gen take_advantage = 0
 replace take_advantage = 1 if A168 == 1
 
-collapse (mean) take_advantage, by (year country)
+collapse (mean) take_advantage [w=S017], by (year country)
 tempfile take_advantage_file
 save "`take_advantage_file'"
 
@@ -152,7 +152,7 @@ foreach var in $additional_questions {
 	gen confidence_`var' = 0
 	replace confidence_`var' = 1 if `var' == 1 | `var' == 2
 
-	collapse (mean) confidence_`var', by (year country)
+	collapse (mean) confidence_`var' [w=S017], by (year country)
 	tempfile confidence_`var'_file
 	save "`confidence_`var'_file'"
 
