@@ -1,4 +1,4 @@
-from typing import List, Literal, Optional, Type
+from typing import List, Literal, Optional, Type, cast
 
 import numpy as np
 import owid.catalog.processing as pr
@@ -341,7 +341,7 @@ def aggregate_conflict_types(
         tb_agg = tb[tb[dim_name].isin(children_names)].copy()
     tb_agg = tb_agg.groupby(columns_to_groupby, as_index=False).agg(
         {
-            col: lambda x: min(x.sum(), 1) if col not in columns_to_aggregate_absolute else x.sum()
+            col: lambda x: min(x.sum(), 1) if col not in cast(List, columns_to_aggregate_absolute) else x.sum()
             for col in columns_to_aggregate
         }
     )
