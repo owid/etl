@@ -2,14 +2,16 @@
 COMMANDS TO EXTRACT TRUST QUESTIONS FROM THE EUROPEAN SOCIAL SURVEY
 This code collapses microdata on trust from the European Social Survey and generates a csv file.
 
+NOTE: For now I will keep only rounds >=9, because to make the other work I need to merge the datasets with several other files
+
 INSTRUCTIONS
 
 	1. In the ESS Data Portal, register and download all the survey files from the Data Wizard, https://ess-search.nsd.no/CDW/RoundCountry.
 	2. Extract the dta file from the zip file.
 	3. Run this do-file in Stata. If it fails, check the name of the dta file in the first line of the code.
 	4. The output is given in Stata's output window. Copy and paste it into a csv file, called `ess_trust.csv`.
-	5. Add snapshot. Currently the command is
- 		python snapshots/ess/2023-08-02/ess_trust.py --path-to-file snapshots/ess/2023-08-02/ess_trust.csv
+	5. Add snapshot. The command is:
+ 		python snapshots/ess/{version}/ess_trust.py --path-to-file snapshots/ess/{version}/ess_trust.csv
 	6. Delete csv file
 	7. Run `etl ess_trust`
 
@@ -40,7 +42,7 @@ replace year = 2016 if essround == 8
 replace year = 2018 if essround == 9
 replace year = 2020 if essround == 10
 
-* For now I will keep only rounds >=9, because to make the other work I need to merge the datasets with several oher files
+* For now I will keep only rounds >=9, because to make the other work I need to merge the datasets with several other files
 keep if essround >= 9
 
 * Combine country and year

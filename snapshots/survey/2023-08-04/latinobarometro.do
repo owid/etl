@@ -1,3 +1,19 @@
+/*
+COMMANDS TO EXTRACT TRUST QUESTIONS FROM LATINOBARÓMETRO
+This code collapses microdata on trust from Latinobarómetro and generates a csv file.
+
+INSTRUCTIONS
+
+	1. Go to the Latinobarómetro portal, https://www.latinobarometro.org/, to the Data (Datos) tab, and download all the survey files in the Stata column.
+	2. Extract the dta files from the zip files and keep them in the same folder.
+	3. Run this do-file in Stata from the same folder as the datasets.
+	4. It generates a csv file, latinobarometro_trust.csv. Copy it to this folder.
+	5. Add snapshot. The command is:
+ 		python snapshots/survey/{version}/latinobarometro_trust.py --path-to-file snapshots/survey/{version}/latinobarometro_trust.csv
+	6. Delete csv file
+	7. Run `etl latinobarometro_trust`
+
+*/
 
 * Define survey years (update when needed)
 local survey_years 1996 1997 1998 2000 2001 2002 2003 2004 2005 2006 2007 2008 2009 2010 2011 2013 2015 2016 2017 2018 2020

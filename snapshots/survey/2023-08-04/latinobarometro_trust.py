@@ -1,4 +1,20 @@
-"""Script to create a snapshot of dataset 'Trust questions in the Latinobarómetro Dataset (Latinobarómetro, 2021)'."""
+"""
+Script to create a snapshot of dataset 'Trust questions in the Latinobarómetro Dataset (Latinobarómetro, 2021)'.
+
+INSTRUCTIONS
+
+	1. Go to the Latinobarómetro portal, https://www.latinobarometro.org/, to the Data (Datos) tab, and download all the survey files in the Stata column.
+	2. Extract the dta files from the zip files and keep them in the same folder.
+	3. Run latinobarometro.do in Stata from the same folder as the datasets.
+	4. It generates a csv file, latinobarometro_trust.csv. Copy it to this folder.
+	5. Add snapshot. The command is:
+ 		python snapshots/survey/{version}/latinobarometro_trust.py --path-to-file snapshots/survey/{version}/latinobarometro_trust.csv
+	6. Delete csv file
+	7. Run `etl latinobarometro_trust`
+
+*/
+
+"""
 
 from pathlib import Path
 
