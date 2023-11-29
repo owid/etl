@@ -834,15 +834,16 @@ def estimate_metrics_locations(tb: Table, tb_maps: Table) -> Table:
     paths.log.info("adding location name of conflict event...")
     tb_locations = _get_location_of_conflict_in_ucdp_ged(tb, tb_maps).copy()
 
-    ###################
-    # COUNTRY-LEVEL: Country in conflict or not (1 or 0)
-    ###################
-    paths.log.info("estimating country flag 'is_location_of_conflict'...")
     # There are some countries not in GW (remove, replace?). We keep Palestine and Western Sahara since
     # these are mappable in OWID maps.
     # We map entry with id "53238" and relid "PAK-2003-1-345-88" from "Siachen Glacier" to "Pakistan" based on
     # the text in `where_description` field, which says: "Giang sector in Siachen, Pakistani Kashmir"
     tb_locations.loc[tb_locations["country_name_location"] == "Siachen Glacier", "country_name_location"] = "Pakistan"
+
+    ###################
+    # COUNTRY-LEVEL: Country in conflict or not (1 or 0)
+    ###################
+    paths.log.info("estimating country flag 'is_location_of_conflict'...")
 
     # tb_locations = tb_locations.merge(
     #     tb_codes.reset_index(), left_on="country_name_location", right_on="country", how="left"
