@@ -20,19 +20,19 @@ tables:
     variables:
       e_inc_100k:
         title: Estimated incidence of all forms of tuberculosis
-        description_short: The number of new cases of tuberculosis per 100,000 people.
+        description_short: The number of new cases of [tuberculosis](#dod:tuberculosis) per 100,000 people.
         unit: cases per 100,000 people
         display:
           numDecimalPlaces: 1
       e_inc_100k_lo:
         title: Estimated incidence of all forms of tuberculosis (low bound)
-        description_short: The number of new cases of tuberculosis per 100,000 people.
+        description_short: The number of new cases of [tuberculosis](#dod:tuberculosis) per 100,000 people.
         unit: cases per 100,000 people
         display:
           numDecimalPlaces: 1
       e_inc_100k_hi:
         title: Estimated incidence of all forms of tuberculosis (high bound)
-        description_short: The number of new cases of tuberculosis per 100,000 people.
+        description_short: The number of new cases of [tuberculosis](#dod:tuberculosis) per 100,000 people.
         unit: cases per 100,000 people
         display:
           numDecimalPlaces: 1
@@ -52,17 +52,17 @@ tables:
         display:
           numDecimalPlaces: 0
       e_tbhiv_prct:
-        title: Estimated HIV in incident TB
+        title: Estimated HIV in incident tuberculosis
         unit: "%"
         display:
           numDecimalPlaces: 1
       e_tbhiv_prct_lo:
-        title: Estimated HIV in incident TB (low bound)
+        title: Estimated HIV in incident tuberculosis (low bound)
         unit: "%"
         display:
           numDecimalPlaces: 1
       e_tbhiv_prct_hi:
-        title: Estimated HIV in incident TB (high bound)
+        title: Estimated HIV in incident tuberculosis (high bound)
         unit: "%"
         display:
           numDecimalPlaces: 1
@@ -188,61 +188,61 @@ tables:
           numDecimalPlaces: 0
       cfr:
         title: Case fatality ratio
-        description_short: The proportion of people diagnosed with tuberculosis, who end up dying of it.
+        description_short: The proportion of people diagnosed with [tuberculosis](#dod:tuberculosis), who end up dying of it.
         unit: ""
         display:
           numDecimalPlaces: 2
       cfr_lo:
         title: Case fatality ratio (low bound)
-        description_short: The proportion of people diagnosed with tuberculosis, who end up dying of it.
+        description_short: The proportion of people diagnosed with [tuberculosis](#dod:tuberculosis), who end up dying of it.
         unit: ""
         display:
           numDecimalPlaces: 2
       cfr_hi:
         title: Case fatality ratio (high bound)
-        description_short: The proportion of people diagnosed with tuberculosis, who end up dying of it.
+        description_short: The proportion of people diagnosed with [tuberculosis](#dod:tuberculosis), who end up dying of it.
         unit: ""
         display:
           numDecimalPlaces: 2
       cfr_pct:
         title: Case fatality ratio (percentage)
-        description_short: The percentage of people diagnosed with tuberculosis, who end up dying of it.
+        description_short: The percentage of people diagnosed with [tuberculosis](#dod:tuberculosis), who end up dying of it.
         unit: "%"
         display:
           numDecimalPlaces: 1
       cfr_pct_lo:
         title: Case fatality ratio (percentage; low bound)
-        description_short: The percentage of people diagnosed with tuberculosis, who end up dying of it.
+        description_short: The percentage of people diagnosed with [tuberculosis](#dod:tuberculosis), who end up dying of it.
         unit: "%"
         display:
           numDecimalPlaces: 1
       cfr_pct_hi:
         title: Case fatality ratio (percentage; high bound)
-        description_short: The percentage of people diagnosed with tuberculosis, who end up dying of it.
+        description_short: The percentage of people diagnosed with [tuberculosis](#dod:tuberculosis), who end up dying of it.
         unit: "%"
         display:
           numDecimalPlaces: 1
       c_newinc_100k:
         title: Case notification rate
-        description_short: The total of new and relapse cases and cases with unknown previous TB treatment history per 100,000 population
+        description_short: The total of new and relapse [tuberculosis](#dod:tuberculosis) cases and cases with unknown previous tuberculosis treatment history per 100,000 population
         unit: ""
         display:
           numDecimalPlaces: 1
       c_cdr:
         title: Case detection rate (all forms)
-        description_short: The number of new and relapse TB cases diagnosed and treated in national TB control  programmes and notified to WHO, divided by WHO's estimate of the number of incident TB cases for the same year.
+        description_short: The number of new and relapse [tuberculosis](#dod:tuberculosis) cases diagnosed and treated in national TB control  programmes and notified to WHO, divided by WHO's estimate of the number of incident TB cases for the same year.
         unit: "%"
         display:
           numDecimalPlaces: 1
       c_cdr_lo:
         title: Case detection rate (all forms; low bound)
-        description_short: The number of new and relapse TB cases diagnosed and treated in national TB control  programmes and notified to WHO, divided by WHO's estimate of the number of incident TB cases for the same year.
+        description_short: The number of new and relapse [tuberculosis](#dod:tuberculosis) cases diagnosed and treated in national TB control  programmes and notified to WHO, divided by WHO's estimate of the number of incident TB cases for the same year.
         unit: "%"
         display:
           numDecimalPlaces: 1
       c_cdr_hi:
         title: Case detection rate (all forms; high bound)
-        description_short: The number of new and relapse TB cases diagnosed and treated in national TB control  programmes and notified to WHO, divided by WHO's estimate of the number of incident TB cases for the same year.
+        description_short: The number of new and relapse [tuberculosis](#dod:tuberculosis) cases diagnosed and treated in national TB control  programmes and notified to WHO, divided by WHO's estimate of the number of incident TB cases for the same year.
         unit: "%"
         display:
           numDecimalPlaces: 1
