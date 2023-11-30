@@ -680,6 +680,14 @@ steps:
   data://grapher/state_capacity/2023-11-20/information_capacity_dataset:
     - data://garden/state_capacity/2023-11-10/information_capacity_dataset
 
+  # Integrated Values Survey
+  data://meadow/ivs/2023-11-27/integrated_values_survey:
+    - snapshot://ivs/2023-11-27/integrated_values_survey.csv
+  data://garden/ivs/2023-11-27/integrated_values_survey:
+    - data://meadow/ivs/2023-11-27/integrated_values_survey
+  data://grapher/ivs/2023-11-27/integrated_values_survey:
+    - data://garden/ivs/2023-11-27/integrated_values_survey
+
   # National Human Genome Research Institute - DNA Sequencing Costs
   data://meadow/technology/2023-11-28/dna_sequencing:
     - snapshot://technology/2023-11-28/dna_sequencing.xls
