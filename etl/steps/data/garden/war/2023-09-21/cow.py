@@ -88,6 +88,7 @@ from shared import (
     add_region_from_code,
     aggregate_conflict_types,
     expand_observations,
+    fill_gaps_with_zeroes,
     get_number_of_countries_in_conflict_by_region,
 )
 from structlog import get_logger
@@ -1144,7 +1145,10 @@ def estimate_metrics_locations(tb_chupilkin: Table, tb_system: Table, tb_partici
     tb_participants: contains countries that participated in a conflict. Useful for locations in intra-states, since location = participant in there.
     """
     tb_system = tb_system.rename(columns={"statenme": "country"})
-    # INTER-STATE ####
+
+    ########################################
+    # 1) INTER-STATE ####
+    # Get locations for inter-state wars: ccode, year, country, is_location_of_conflict
     # Sanity check
     assert (
         tb_chupilkin["warnum"] <= 227
@@ -1161,63 +1165,36 @@ def estimate_metrics_locations(tb_chupilkin: Table, tb_system: Table, tb_partici
     )
     # Relevant columns
     tb_locations_inter = tb_locations_inter[["year", "country", "is_location_of_conflict"]]
-
-    # Add region
-    ## Get country code
-    tb_c2c = tb_system[["country", "ccode"]].drop_duplicates()
-    tb_locations_inter_regions = tb_locations_inter.merge(tb_c2c, how="left", on=["country"])
-    assert tb_locations_inter_regions["ccode"].notna().all(), "Some countries were not found!"
-    ## Get to region from country code
-    tb_locations_inter_regions = add_region_from_code(tb_locations_inter_regions, "cow", col_code="ccode")
-    ## Drop country code
-    tb_locations_inter_regions = tb_locations_inter_regions.drop(columns=["ccode"])
-
-    # Get number of locations
-    tb_locations_inter_regions = (
-        tb_locations_inter_regions.groupby(["region", "year"], as_index=False, observed=True)["is_location_of_conflict"]
-        .sum()
-        .rename(
-            columns={
-                "is_location_of_conflict": "number_locations",
-                "region": "country",
-            }
-        )
-    )
-    ## World
-    tb_locations_inter_regions_world = tb_locations_inter_regions.groupby(["year"], as_index=False, observed=True)[
-        "number_locations"
-    ].sum()
-    tb_locations_inter_regions_world["country"] = "World"
-
-    # Combine countries and regions
-    tb_locations_inter = pr.concat(
-        [
-            tb_locations_inter_regions,
-            tb_locations_inter_regions_world,
-            tb_locations_inter,
-        ],
-        ignore_index=True,
-    )
     # Add conflict type
     tb_locations_inter["conflict_type"] = CTYPE_INTER
 
+    ########################################
+    # 2) INTRA-STATE ####
+    # Get locations for intra-state wars: ccode, year, country, is_location_of_conflict
     # INTRA-STATE ####
+    tb_system_ = tb_system.drop(columns=["stateabb", "version"])
+
     tb_locations_intra = tb_participants.reset_index().copy()
     tb_locations_intra = tb_locations_intra[
         tb_locations_intra["conflict_type"].isin([CTYPE_INTRA, CTYPE_INTRA_INTL, CTYPE_INTRA_NINTL])
     ]
-    tb_locations_intra = tb_locations_intra.rename(
-        columns={
-            "participated_in_conflict": "is_location_of_conflict",
-            "number_participants": "number_locations",
-        }
+    tb_locations_intra = (
+        tb_locations_intra.rename(
+            columns={
+                "participated_in_conflict": "is_location_of_conflict",
+            }
+        )
+        .drop(columns=["number_participants"])
+        .dropna()
     )
     # Merge with COW SSM (for each conflict_type)
     tbs = []
     for ctype in [CTYPE_INTRA_INTL, CTYPE_INTRA_NINTL, CTYPE_INTRA]:
         tb_ = tb_locations_intra[tb_locations_intra["conflict_type"] == ctype].copy()
-        tb_ = tb_system.merge(tb_, on=["country", "year"], how="left")
+        year_max = tb_["year"].max()
+        tb_ = tb_system_.merge(tb_, on=["country", "year"], how="left")
         tb_["conflict_type"] = ctype
+        tb_ = tb_[tb_["year"] <= year_max]
         tbs.append(tb_)
     tb_locations_intra_countries = pr.concat(tbs, ignore_index=True)
     # Fill NaNs
@@ -1225,39 +1202,101 @@ def estimate_metrics_locations(tb_chupilkin: Table, tb_system: Table, tb_partici
         "is_location_of_conflict"
     ].fillna(0)
 
+    # Replace Yugoslavia -> Serbia
+    # tb_locations_intra_countries["country"] = tb_locations_intra_countries["country"].rename({"Yugoslavia": "Serbia"})
+
     # Drop ccode
     tb_locations_intra_countries = tb_locations_intra_countries.drop(columns=["ccode"])
 
-    # Regions and world
-    tb_locations_intra_regions = tb_locations_intra.dropna(subset=["number_locations"]).copy()
+    ########################################
+    # 3) COMBINE INTRA + INTER ####
 
-    # Merge countries and regions
-    tb_locations_intra = pr.concat(
-        [
-            tb_locations_intra_countries,
-            tb_locations_intra_regions,
-        ],
-        ignore_index=True,
-    )
+    # COMBINE INTER + INTRA
+    tb_locations = pr.concat([tb_locations_inter, tb_locations_intra_countries], ignore_index=True)
 
-    ###############
-    # Final steps #
-    ###############
-
-    # Combine inter and intra
-    tb_locations = pr.concat([tb_locations_inter, tb_locations_intra], ignore_index=True, short_name="cow_locations")
-
-    # Add 'all' conflicts
+    # Add state-based
     tb_locations = aggregate_conflict_types(
         tb=tb_locations,
         parent_name="state-based",
         children_names=[CTYPE_INTRA, CTYPE_INTER],
-        columns_to_aggregate=["is_location_of_conflict", "number_locations"],
-        columns_to_aggregate_absolute=["number_locations"],
+        columns_to_aggregate=["is_location_of_conflict"],
         columns_to_groupby=["country", "year"],
     )
 
+    ###########################################
+    # 4) ADD REGIONS AND WORLD DATA
+    # Add region
+    ## Quick fix (1/2): Serbia -> Yugoslavia
+    tb_locations["country"] = tb_locations["country"].replace({"Serbia": "Yugoslavia"})
+    ## Get country code
+    tb_c2c = tb_system[["country", "ccode"]].drop_duplicates()
+    tb_locations = tb_locations.merge(tb_c2c, how="left", on=["country"])
+    assert tb_locations["ccode"].notna().all(), "Some countries were not found!"
+    ## Add region name
+    tb_locations = add_region_from_code(tb_locations, "cow", col_code="ccode")
+    assert tb_locations.isna().sum().sum() == 0, "Some NaNs were found!"
+    ## Quick fix (2/2): Yugoslavia -> Serbia
+    tb_locations["country"] = tb_locations["country"].rename({"Yugoslavia": "Serbia"})
+
+    # Get only entries with flag '1'
+    tb_locations_active = tb_locations[tb_locations["is_location_of_conflict"] == 1].copy()
+
+    # Get number of locations
+    tb_locations_regions = tb_locations_active.groupby(
+        ["year", "region", "conflict_type"], as_index=False, observed=True
+    )["ccode"].nunique()
+    tb_locations_world = tb_locations_active.groupby(["year", "conflict_type"], as_index=False, observed=True)[
+        "ccode"
+    ].nunique()
+    tb_locations_world["country"] = "World"
+
+    # Fix column names
+    tb_locations_regions = tb_locations_regions.rename(
+        columns={
+            "ccode": "number_locations",
+            "region": "country",
+        }
+    )
+    tb_locations_world = tb_locations_world.rename(
+        columns={
+            "ccode": "number_locations",
+        }
+    )
+
+    # Concat World with regions
+    tb_locations_regions = pr.concat(
+        [
+            tb_locations_regions,
+            tb_locations_world,
+        ],
+        ignore_index=True,
+    )
+
+    # Fill empty time periods with zero
+    tb_locations_regions = fill_gaps_with_zeroes(
+        tb=tb_locations_regions,
+        columns=["country", "year", "conflict_type"],
+        cols_use_range=["year"],
+    )
+
+    ###########################################
+    # 5) FINAL CONCAT, INDEX
+    columns_idx = ["year", "country", "conflict_type"]
+
+    # Drop ccode
+    tb_locations = tb_locations.drop(columns=["ccode"])
+
+    # Merge countries and regions
+    tb_locations = pr.concat(
+        [
+            tb_locations[columns_idx + ["is_location_of_conflict"]],
+            tb_locations_regions[columns_idx + ["number_locations"]],
+        ],
+        ignore_index=True,
+        short_name="cow_locations",
+    )
+
     # Set index
-    tb_locations = tb_locations.set_index(["year", "country", "conflict_type"], verify_integrity=True)
+    tb_locations = tb_locations.set_index(["year", "country", "conflict_type"], verify_integrity=True).sort_index()
 
     return tb_locations
