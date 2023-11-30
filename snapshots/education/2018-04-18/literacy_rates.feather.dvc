@@ -3,7 +3,7 @@
 meta:
   origin:
     # Data product / Snapshot
-    title: Cross-country literacy rates - World Bank, CIA World Factbook, and other Sources
+    title: Cross-country literacy rates
     description: >
       This dataset combines long-run cross-country literacy rates from several sources
       including the World Bank's WDI, CIA Factbook, and other historical data series.
@@ -17,7 +17,7 @@ meta:
     producer: Various sources
     citation_full: 'Literacy rates (World Bank, CIA World Factbook, and other sources)'
     # Files
-    url_main: 'https://data.worldbank.org/indicator/SE.ADT.LITR.ZS, https://www.cia.gov/library/publications/the-world-factbook/, and other sources.'
+    url_main: https://data.worldbank.org/indicator/SE.ADT.LITR.ZS
     date_accessed: 2018-04-18
     date_published: '2018'
 wdir: ../../../data/snapshots/education/2018-04-18

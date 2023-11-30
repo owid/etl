@@ -3,9 +3,9 @@
 meta:
   origin:
     # Data product / Snapshot
-    title: Public Expenditure on Education OECD - Tanzi & Schuknecht (2000)
+    title: Public Expenditure on Education OECD
     description: >
-      The underlying sources for Tanzi & Schuknecht (2000) include: League
+      The underlying sources include: League
       of Nations Statistical Yearbook (various years), Mitchell (1962), OECD Education
       at a Glance (1996), UNESCO World Education Report (1993), UNDP Human Development
       Report (1996), UN World Economics Survey (various years). To the extent that

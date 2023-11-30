@@ -77,12 +77,11 @@ def run(dest_dir: str) -> None:
     # Combine recent literacy estimates and expenditure data with historical estimates from a migrated dataset
     tb = combine_historical_literacy_expenditure(tb, tb_literacy, tb_expenditure)
 
-    # Compare two columnst that seem to have identical indicies (if values are the same then remove)
-    if tb["SE.XPD.TOTL.GD.ZS"].equals(tb["SE.XPD.TOTL.GD.ZS."]):
-        # If they are the same, drop one of the columns
-        tb.drop("SE.XPD.TOTL.GD.ZS.", axis=1, inplace=True)
-    else:
-        print("The columns are not the same.")
+    # Assert that the two columns are identical
+    assert tb["SE.XPD.TOTL.GD.ZS"].equals(tb["SE.XPD.TOTL.GD.ZS."]), "The columns are not the same."
+
+    # If the assertion passes (the columns are identical), drop one of the columns
+    tb.drop(columns="SE.XPD.TOTL.GD.ZS.", inplace=True)
 
     # Set an appropriate index and sort.
     tb = tb.underscore().set_index(["country", "year"], verify_integrity=True).sort_index().sort_index(axis=1)
@@ -102,29 +101,29 @@ def run(dest_dir: str) -> None:
 
 def combine_historical_literacy_expenditure(tb, tb_literacy, tb_expenditure):
     """
-    Merges historical and recent literacy and expenditure data into a single DataFrame.
+    Merge historical and recent literacy and expenditure data into a single Table.
 
-    This function integrates data from two separate DataFrames containing historical literacy rates and
-    public expenditure on education with a primary DataFrame. It merges these datasets based on common
-    'year' and 'country' columns. The resulting DataFrame includes two new columns, 'combined_literacy'
+    This function integrates data from two separate Tables containing historical literacy rates and
+    public expenditure on education with a primary Table. It merges these datasets based on common
+    'year' and 'country' columns. The resulting Table includes two new columns, 'combined_literacy'
     and 'combined_expenditure', which contain the respective literacy and expenditure data. The function
     prioritizes recent data over historical data when both are available.
 
     Parameters:
-    - tb (DataFrame): The primary DataFrame containing recent literacy and expenditure data.
-    - tb_literacy (DataFrame): A DataFrame containing historical literacy data with columns
+    - tb (Table): The primary Table containing recent literacy and expenditure data.
+    - tb_literacy (Table): A Table containing historical literacy data with columns
       ['year', 'country', 'literacy_rates__world_bank__cia_world_factbook__and_other_sources'].
-    - tb_expenditure (DataFrame): A DataFrame containing historical expenditure data with columns
+    - tb_expenditure (Table): A Table containing historical expenditure data with columns
       ['year', 'country', 'public_expenditure_on_education__tanzi__and__schuktnecht__2000'].
 
     The function handles missing data by favoring recent World Bank data; if this is not available,
     it falls back to historical data, which could also be missing (NaN).
 
     Returns:
-    DataFrame: The merged DataFrame with new columns 'combined_literacy' and 'combined_expenditure',
+    Table: The merged Table with new columns 'combined_literacy' and 'combined_expenditure',
     and metadata about data origins added to these columns.
 
-    This function assumes that the input DataFrames share a common structure in terms of the 'year' and
+    This function assumes that the input Tables share a common structure in terms of the 'year' and
     'country' columns, and that these columns are used as keys for merging the datasets.
     The function adds metadata to the new columns, indicating the origin of the data.
     """
@@ -192,7 +191,7 @@ def add_metadata(tb: Table, metadata_tb: Table) -> None:
         "combined_literacy",
         "combined_expenditure",
     ]
-    # Loop through the DataFrame columns
+    # Loop through the Table columns
     for column in tqdm(tb.columns, desc="Processing metadata for indicators"):
         if column not in custom_cols:
             # Extract the title from the default metadata to find the corresponding World Bank indicator
