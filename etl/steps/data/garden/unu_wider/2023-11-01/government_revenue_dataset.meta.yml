@@ -45,6 +45,11 @@ definitions:
     Grants include transfers from other government
     units (foreign) and international organisations.
 
+  natural_resources_def: >-
+    Regarding natural resources, please note that they
+    refer to natural resources that include a significant component of economic rent, primarily from
+    oil and mining activities.
+
   revenue: >-
     Revenue refers to total government revenue, providing a set of variables that differentiates
     between sources and sub-components considered. Revenue contains four sub-components,
@@ -69,9 +74,7 @@ definitions:
     {definitions.grants_def}
 
 
-    Regarding natural resources, please note that they
-    refer to natural resources that include a significant component of economic rent, primarily from
-    oil and mining activities.
+    {definitions.natural_resources_def}
 
   total_taxes: >-
     The Taxes variables presents aggregate indicators that capture all tax revenue as defined above.
@@ -82,8 +85,7 @@ definitions:
 
   direct_taxes: >-
     Direct taxes include taxes on income, profits and capital gains, taxes on payroll and workforce as
-    well as taxes on property. Please note that the total values of direct taxes (total direct tax
-    mentioned in all variables listed below) may sometimes exceed the sum of the
+    well as taxes on property. Please note that the total values of direct taxes may sometimes exceed the sum of the
     aforementioned sub-components, owing to revenue that is unclassified among these subcomponents. When specified as direct taxes excluding resource revenue, direct taxes comprise
     non-resource taxes on the mentioned sub-components (e.g., excluding corporate taxes accruing
     from entities engaged in the extraction of natural resource).
@@ -94,12 +96,12 @@ definitions:
     in individuals and corporations and other enterprises, due to revenues that are unallocated between the
     two.
 
-  taxes_payroll_workforce:
+  taxes_payroll_workforce: >-
     Total taxes on payroll and workforce are always reported excluding social contributions, although
     in underlying sources, for certain countries, there is an element of conflation between the reporting
     of social contributions and payroll taxes; see McNabb (2017).
 
-  taxes_property:
+  taxes_property: >-
     This variable displays the total taxation on property, comprising mostly recurrent taxes on
     immovable property and net wealth, estate, inheritance and gift taxes, capital levies and other
     recurrent taxes on property. Note that the OECD’s revenue statistics class taxes on financial and
@@ -113,11 +115,11 @@ definitions:
     sub-components due to unallocated revenue not classified in any of these categories. Note that the
     component of indirect taxes from natural resources is only non-zero in a small number of cases.
 
-  taxes_goods_services:
+  taxes_goods_services: >-
     The majority of taxes on goods and services is comprised of sales taxes, value-added taxes (VAT)
     and excise duties. The OECD’s Revenue Statistics classes taxes on international trade and
     transactions under taxes on goods and services; thus for the GRD it is stripped out and reallocated
-    as shown below. Note that the total of ‘Taxes on Goods and Services’ may be greater than the
+    . Note that the total of ‘Taxes on Goods and Services’ may be greater than the
     sum of the subcomponents due to unallocated residual revenues. Note also that, historically, a
     large number of countries classed VAT and Excise duty collected on imports as trade taxes. Both
     the IMF and OECD classify these as taxes on goods and services, and thus fall in this category. In
@@ -206,6 +208,8 @@ tables:
           {definitions.taxes_def}
 
           {definitions.total_taxes}
+
+          {definitions.social_contributions_def}
         display:
           name: Taxes including social contributions
           <<: *common-display
@@ -265,6 +269,8 @@ tables:
           {definitions.taxes_def}
 
           {definitions.total_taxes}
+
+          {definitions.natural_resources_def}
         display:
           name: Resource taxes
           <<: *common-display
@@ -275,6 +281,8 @@ tables:
           {definitions.taxes_def}
 
           {definitions.total_taxes}
+
+          {definitions.social_contributions_def}
         display:
           name: Non-resource taxes including social contributions
           <<: *common-display
@@ -295,6 +303,10 @@ tables:
           {definitions.taxes_def}
 
           {definitions.direct_taxes}
+
+          {definitions.social_contributions_def}
+
+          {definitions.natural_resources_def}
         display:
           name: Direct taxes including social contributions and resource revenue
           <<: *common-display
@@ -305,6 +317,8 @@ tables:
           {definitions.taxes_def}
 
           {definitions.direct_taxes}
+
+          {definitions.social_contributions_def}
         display:
           name: Direct taxes including social contributions and excluding resource revenue
           <<: *common-display
@@ -315,6 +329,8 @@ tables:
           {definitions.taxes_def}
 
           {definitions.direct_taxes}
+
+          {definitions.natural_resources_def}
         display:
           name: Direct taxes excluding social contributions and including resource revenue
           <<: *common-display
@@ -349,6 +365,8 @@ tables:
           {definitions.direct_taxes}
 
           {definitions.taxes_income_profits_capital_gains}
+
+          {definitions.natural_resources_def}
         display:
           name: Resource component of taxes on income, profits, and capital gains
           <<: *common-display
@@ -393,6 +411,8 @@ tables:
           {definitions.direct_taxes}
 
           {definitions.taxes_income_profits_capital_gains}
+
+          {definitions.natural_resources_def}
         display:
           name: Resource component of taxes on corporations and other enterprises
           <<: *common-display
@@ -447,6 +467,8 @@ tables:
           {definitions.taxes_def}
 
           {definitions.indirect_taxes}
+
+          {definitions.natural_resources_def}
         display:
           name: Resource component of indirect taxes
           <<: *common-display
@@ -565,6 +587,8 @@ tables:
           {definitions.non_tax_revenue_def}
 
           {definitions.non_tax_revenue}
+
+          {definitions.natural_resources_def}
         display:
           name: Resource component of non-tax revenue
           <<: *common-display
