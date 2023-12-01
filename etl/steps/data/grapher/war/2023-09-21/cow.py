@@ -15,7 +15,8 @@ def run(dest_dir: str) -> None:
 
     # Read table from garden dataset.
     tb = ds_garden["cow"]
-    tb_country = ds_garden["cow_country"]
+    tb_participants = ds_garden["cow_country"]
+    tb_locations = ds_garden["cow_locations"]
 
     #
     # Process data.
@@ -32,7 +33,8 @@ def run(dest_dir: str) -> None:
     #
     tables = [
         tb,
-        tb_country,
+        tb_participants,
+        tb_locations,
     ]
     # Create a new grapher dataset with the same metadata as the garden dataset.
     ds_grapher = create_dataset(
