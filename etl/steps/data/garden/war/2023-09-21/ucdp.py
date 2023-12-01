@@ -849,18 +849,25 @@ def estimate_metrics_locations(tb: Table, tb_maps: Table) -> Table:
     #     tb_codes.reset_index(), left_on="country_name_location", right_on="country", how="left"
     # )
 
-    # Estimate number of conflicts ocurring in each country
+    # Estimate if a conflict occured in a country
     tb_locations_country = (
-        tb_locations.groupby(["country_name_location", "year", "conflict_type"], as_index=False)["conflict_new_id"]
-        .nunique()
+        tb_locations.groupby(["country_name_location", "year", "conflict_type"], as_index=False)
+        .agg(
+            {
+                "conflict_new_id": "nunique",
+                "best": "sum",
+            }
+        )
         .rename(
             columns={
                 "conflict_new_id": "is_location_of_conflict",
                 "country_name_location": "country",
+                "best": "number_deaths",
             }
         )
     )
     assert tb_locations_country["is_location_of_conflict"].notna().all(), "Missing values in `is_location_of_conflict`!"
+    assert tb_locations_country["number_deaths"].notna().all(), "Missing values in `number_deaths`!"
 
     # Convert into a binary indicator: 1 (if more than one conflict), 0 (otherwise)
     tb_locations_country["is_location_of_conflict"] = tb_locations_country["is_location_of_conflict"].apply(
@@ -875,7 +882,9 @@ def estimate_metrics_locations(tb: Table, tb_maps: Table) -> Table:
     )
 
     # Add origins from Natural Earth
-    tb_locations_country["is_location_of_conflict"].origins += tb_maps["name"].m.origins
+    cols = ["is_location_of_conflict", "number_deaths"]
+    for col in cols:
+        tb_locations_country[col].origins += tb_maps["name"].m.origins
 
     ###################
     # Add conflict type aggregates
@@ -888,7 +897,8 @@ def estimate_metrics_locations(tb: Table, tb_maps: Table) -> Table:
         tb=tb_locations_country,
         parent_name="intrastate",
         children_names=["intrastate (non-internationalized)", "intrastate (internationalized)"],
-        columns_to_aggregate=["is_location_of_conflict"],
+        columns_to_aggregate=["is_location_of_conflict", "number_deaths"],
+        columns_to_aggregate_absolute=["number_deaths"],
         columns_to_groupby=["country", "year"],
     )
     # Add state-based
@@ -897,7 +907,8 @@ def estimate_metrics_locations(tb: Table, tb_maps: Table) -> Table:
         tb=tb_locations_country,
         parent_name="state-based",
         children_names=list(state_based_conflicts),
-        columns_to_aggregate=["is_location_of_conflict"],
+        columns_to_aggregate=["is_location_of_conflict", "number_deaths"],
+        columns_to_aggregate_absolute=["number_deaths"],
         columns_to_groupby=["country", "year"],
     )
     # Add all
@@ -906,7 +917,8 @@ def estimate_metrics_locations(tb: Table, tb_maps: Table) -> Table:
         tb=tb_locations_country,
         parent_name="all",
         children_names=list(state_based_conflicts + non_state_conflicts),
-        columns_to_aggregate=["is_location_of_conflict"],
+        columns_to_aggregate=["is_location_of_conflict", "number_deaths"],
+        columns_to_aggregate_absolute=["number_deaths"],
         columns_to_groupby=["country", "year"],
     )
 
@@ -918,8 +930,12 @@ def estimate_metrics_locations(tb: Table, tb_maps: Table) -> Table:
     # Add regions
     cols = ["region", "year", "conflict_type"]
     tb_locations_regions = (
-        tb_locations.groupby(cols)["country_name_location"]
-        .nunique()
+        tb_locations.groupby(cols)
+        .agg(
+            {
+                "country_name_location": "nunique",
+            }
+        )
         .reset_index()
         .sort_values(cols)
         .rename(
@@ -932,8 +948,12 @@ def estimate_metrics_locations(tb: Table, tb_maps: Table) -> Table:
     # World
     cols = ["year", "conflict_type"]
     tb_locations_world = (
-        tb_locations.groupby(cols)["country_name_location"]
-        .nunique()
+        tb_locations.groupby(cols)
+        .agg(
+            {
+                "country_name_location": "nunique",
+            }
+        )
         .reset_index()
         .sort_values(cols)
         .rename(

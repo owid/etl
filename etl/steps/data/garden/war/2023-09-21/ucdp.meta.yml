@@ -213,6 +213,15 @@ tables:
         description_short: |-
           The number of countries where at least one conflict (of a specific kind) event occurred, for a given year and region.
 
+      number_deaths:
+        title: Number of conflict deaths in countries
+        unit: "deaths"
+        display:
+          numDecimalPlaces: 0
+        description_short: |-
+          The number of deaths from conflict events that occurred in the country, for a given year and region.
+
+
   ucdp:
     variables:
       ##################
