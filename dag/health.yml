@@ -335,9 +335,9 @@ steps:
 
   # WHO Cardiovascular diseases deaths
   data://garden/cardiovascular_diseases/2023-11-01/deaths_from_cardiovascular_diseases_vs_other:
-   - data://garden/who/2023-08-01/mortality_database
+    - data://garden/who/2023-08-01/mortality_database
   data://grapher/cardiovascular_diseases/2023-11-01/deaths_from_cardiovascular_diseases_vs_other:
-   - data://garden/cardiovascular_diseases/2023-11-01/deaths_from_cardiovascular_diseases_vs_other
+    - data://garden/cardiovascular_diseases/2023-11-01/deaths_from_cardiovascular_diseases_vs_other
 
   # WHO Medical Devices Atlas
   data://meadow/who/2023-11-01/who_statins:
@@ -347,7 +347,7 @@ steps:
   data://grapher/who/2023-11-01/who_statins:
     - data://garden/who/2023-11-01/who_statins
 
-  # Tuberculosis
+  # Tuberculosis burden estimates - WHO
   data://meadow/tuberculosis/2023-11-27/burden_estimates:
     - snapshot://tuberculosis/2023-11-27/burden_estimates.csv
   data://garden/tuberculosis/2023-11-27/burden_estimates:
@@ -358,3 +358,9 @@ steps:
     - data://garden/demography/2023-03-31/population
   data://grapher/tuberculosis/2023-11-27/burden_estimates:
     - data://garden/tuberculosis/2023-11-27/burden_estimates
+
+  # Tuberculosis budget
+  data://meadow/tuberculosis/2023-12-01/budget:
+    - snapshot://tuberculosis/2023-12-01/budget.csv
+  data://garden/tuberculosis/2023-11-27/budget:
+    - data://meadow/tuberculosis/2023-12-01/budget
