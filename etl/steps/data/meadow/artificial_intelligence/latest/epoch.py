@@ -31,7 +31,7 @@ def run(dest_dir: str) -> None:
         "System",
         "Domain",
         "Organization",
-        "Organization Categorization",
+        "Organization categorization",
         "Publication date",
         "Parameters",
         "Training compute (FLOP)",
