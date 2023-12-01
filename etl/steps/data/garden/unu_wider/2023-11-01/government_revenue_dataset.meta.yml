@@ -213,10 +213,12 @@ tables:
         display:
           name: Taxes including social contributions
           <<: *common-display
-        description_short: Direct and indirect taxes as well as social contributions included.
         description_key:
-          - TBD - List of key pieces of information about the indicator.
+          - Taxes are defined as compulsory, unrequited payments to the government, following IMF and OECD definitions.
+          - Resource taxes (mostly related to oil and mining) are not systematically defined or captured in the data.
+          - Social contributions include both compulsory and voluntary social insurance contributions from employers, employees, and the self-employed.
         presentation:
+          attribution_short: UNU-WIDER
           grapher_config:
             title: Tax revenues as a share of GDP
             subtitle: Direct and indirect taxes as well as social contributions included.
