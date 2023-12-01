@@ -108,12 +108,8 @@ def main(path_to_file: str):
 
 def read_metadata_file(path_to_file: str) -> str:
     """Reads a metadata file and returns its content."""
-    try:
-        with open(path_to_file, "r") as file:
-            return file.read()
-    except IOError as e:
-        log.error("Error reading file", file_path=path_to_file, error=str(e))
-        raise
+    with open(path_to_file, "r") as file:
+        return file.read()
 
 
 def generate_metadata_update(path_to_file: str, metadata: str) -> str:
@@ -125,6 +121,8 @@ def generate_metadata_update(path_to_file: str, metadata: str) -> str:
             temperature=0,
             messages=messages,
         )
+        log.info(f"Cost GPT4: ${response['usage']['total_tokens'] / 1000 * 0.03:.2f}")
+
         return response["choices"][0]["message"]["content"]
     except openai.error as e:
         log.error("OpenAI API error", error=str(e))
@@ -155,7 +153,7 @@ def create_system_prompt(path_to_file: str, metadata: str) -> str:
 
     elif "grapher" in path_to_file:
         system_prompt = f"""
-            You are given a metadata file. We need to fill out the fields that start with TBD. Some of these only the user can do so keep them as they are but could you help us with at least filling out the following for each indicator:
+            You are given a metadata file. Could you help us with at least filling out the following for each indicator:
 
             - description_from_producer - do a web search based on other information and URLs in the metadata file to find a description of the variable.
             - description_key - based on a web search and if description exists come up with some key bullet points (in a sentence format) that would help someone interpret the indicator. Can you make sure that these are going to be useful for the public to understand the indicator? Expand on any acronyms or any terms that a layperson might not be familiar with. Each bullet point can be more than one sentence if necessary but don't make it too long.
@@ -166,13 +164,14 @@ def create_system_prompt(path_to_file: str, metadata: str) -> str:
 
             Now, can you try to infer the above based on the other information in the metadata file and by browsing the web?
 
-            You can use any links in the metadata file to help you. Generate a new metadata file with these fields filled out. Remove decsiption field at the indicator level (not the origins level) from the new metadata as it will no longer be used.
+            You can use any links in the metadata file to help you. Generate a new metadata file with these fields filled out. Remove description field at the indicator level (not the origins level) from the new metadata as it will no longer be used.
 
             Don't include any additional responses/notes in your response beyond the existing field as this will be saved directly as a file.
             Metadata file:
             {metadata}
 
             """
+
         messages = [
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": metadata},
