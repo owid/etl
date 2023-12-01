@@ -1,11 +1,12 @@
 definitions:
   common:
-    processing_level: TBD - major or minor
+    processing_level: major
     presentation:
       topic_tags:
-        - TBD - Indicator's topic tags
+        - Economy
+        - Global Development
 dataset:
-  update_period_days: TBD - Number of days between OWID updates
+  update_period_days: 365
 tables:
   maddison_gdp:
     variables:
@@ -16,15 +17,17 @@ tables:
         display:
           entityAnnotationsMap: 'Western offshoots (MPD): United States, Canada, Australia and New Zealand'
           numDecimalPlaces: 0
-        description_short: This data is adjusted for inflation and for differences in the cost of living between countries.
+        description_short: This indicator measures the economic output per person, adjusted for inflation and differences in cost of living between countries.
         description_key:
-          - TBD - List of key pieces of information about the indicator.
-        description_from_producer: TBD - Indicator's description given by the producer
-        description_processing: TBD - Indicator's processing description
+          - The GDP per capita is a measure of the total output of a country that takes the gross domestic product (GDP) and divides it by the number of people in the country.
+          - The values are expressed in international dollars, a hypothetical currency that has the same purchasing power parity that the U.S. dollar had in the United States at a given point in time, 2011 in this case.
+          - The data is adjusted for inflation, meaning it reflects the value of money at a specific base year to account for the general increase in prices and fall in the purchasing value of money over time.
+          - It also accounts for differences in the cost of living between countries, allowing for more accurate comparisons.
+        description_from_producer: The Maddison Project Database provides information on comparative economic growth and income levels over the very long run. The 2018 version of this database covers 169 countries and the period up to 2016.
+        description_processing: The data is sourced from the Maddison Project Database, processed to adjust for inflation and differences in cost of living, and then presented in a user-friendly format on Our World in Data.
         presentation:
-          title_public: TBD - Indicator title to be shown in data pages, that overrides the indicator's title.
-          title_variant: TBD - Indicator's title variant
-          attribution_short: TBD - Indicator's attribution (shorter version)
+          title_public: "Gdp per capita (inflation and cost of living adjusted)"
+          attribution_short: Maddison Project Database
           faqs:
             - fragment_id: TBD - Question identifier from FAQ GDoc
               gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw

@@ -1,11 +1,12 @@
 definitions:
   common:
-    processing_level: TBD - major or minor
+    processing_level: major
     presentation:
       topic_tags:
-        - TBD - Indicator's topic tags
+        - Economy
+        - Government Revenue
 dataset:
-  update_period_days: TBD - Number of days between OWID updates
+  update_period_days: 365
 tables:
   government_revenue_dataset:
     variables:
@@ -17,15 +18,16 @@ tables:
           name: Taxes including social contributions
           numDecimalPlaces: 1
           tolerance: 5
-        description_short: Direct and indirect taxes as well as social contributions included.
+        description_short: This indicator measures the share of GDP that comes from direct and indirect taxes as well as social contributions.
         description_key:
-          - TBD - List of key pieces of information about the indicator.
-        description_from_producer: TBD - Indicator's description given by the producer
-        description_processing: TBD - Indicator's processing description
+          - This indicator includes both direct taxes (like income tax) and indirect taxes (like sales tax).
+          - Social contributions refer to payments made into social security systems.
+          - The indicator is expressed as a percentage of a country's Gross Domestic Product (GDP), which is the total value of all goods and services produced in a country in a given year.
+        description_from_producer: This indicator measures the share of a country's GDP that comes from direct and indirect taxes, as well as social contributions. It provides an insight into the size of a country's public sector and the extent of its tax burden.
+        description_processing: The data for this indicator is collected from national tax and revenue agencies, and then standardized to allow for comparison between countries.
         presentation:
-          title_public: TBD - Indicator title to be shown in data pages, that overrides the indicator's title.
-          title_variant: TBD - Indicator's title variant
-          attribution_short: TBD - Indicator's attribution (shorter version)
+          title_public: Tax and social contribution as a share of GDP
+          attribution_short: Our World in Data
           faqs:
             - fragment_id: TBD - Question identifier from FAQ GDoc
               gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw

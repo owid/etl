@@ -1,9 +1,9 @@
 definitions:
   common:
-    processing_level: TBD - major or minor
+    processing_level: major
     presentation:
       topic_tags:
-        - TBD - Indicator's topic tags
+        - Economy
     sources: []
     origins:
       - producer: Feenstra et al. (2015), Penn World Table (2021)
@@ -21,7 +21,7 @@ definitions:
           name: Creative Commons BY 4.0
           url: https://www.rug.nl/ggdc/productivity/pwt
 dataset:
-  update_period_days: TBD - Number of days between OWID updates
+  update_period_days: 365
   sources: []
 tables:
   penn_world_table:
@@ -33,16 +33,16 @@ tables:
         display:
           name: GDP per capita
           numDecimalPlaces: 0
-        description_short: This data is adjusted for inflation and for differences in the cost of living between countries.
+        description_short: This data represents the GDP per capita, adjusted for inflation and cost of living differences between countries.
         description_key:
-          - TBD - List of key pieces of information about the indicator.
-        description_from_producer: TBD - Indicator's description given by the producer
-        description_processing: TBD - Indicator's processing description
-        description: "Estimated as the GDP (output, multiple price benchmarks) divided by the population of each country.\nThis variable uses ICP PPP benchmarks from multiple years to correct for changing prices over time.\nValues for Bermuda have been replaced by estimates on GDP per capita (output, single price benchmark) due to the unusual changes on prices in this country.\nValues considered outliers from the original dataset (`i_outlier = \"Outlier\"`) have been excluded from the dataset, due to implausible relative prices (PPPs divided by exchange rates).\n"
+          - The GDP per capita is calculated by dividing the GDP by the population of each country.
+          - The data is adjusted for inflation and differences in the cost of living between countries using ICP PPP benchmarks from multiple years.
+          - Outliers and unusual changes in prices, such as those in Bermuda, have been corrected or excluded for accuracy.
+        description_from_producer: The Penn World Table provides a comprehensive set of data on GDP per capita, adjusted for inflation and cost of living differences between countries. It covers 183 countries from 1950 to 2019.
+        description_processing: The data is processed by dividing the GDP by the population of each country, adjusting for inflation and cost of living differences using ICP PPP benchmarks from multiple years. Outliers and unusual changes in prices have been corrected or excluded.
         presentation:
-          title_public: TBD - Indicator title to be shown in data pages, that overrides the indicator's title.
-          title_variant: TBD - Indicator's title variant
-          attribution_short: TBD - Indicator's attribution (shorter version)
+          title_public: "Gdp per capita (adjusted for inflation and cost of living)"
+          attribution_short: Penn World Table (2021)
           faqs:
             - fragment_id: TBD - Question identifier from FAQ GDoc
               gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
@@ -68,7 +68,6 @@ tables:
                 customNumericColors:
                   - '#c00'
                   - '#00c'
-                  - 
                 customNumericValues:
                   - 1000
                   - 2000

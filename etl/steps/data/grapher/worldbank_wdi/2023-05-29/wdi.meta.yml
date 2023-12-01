@@ -1,13 +1,8 @@
 definitions:
-  # NOTE: we'd like to move this to snapshot, but it's impractical because there are
-  # tons of other downstream datasets that still use sources
   wdi_origin: &wdi_origin
     producer: World Bank World Development Indicators
     title: UNICEF; World Health Organization; World Bank
-    description: |-
-      The World Development Indicators (WDI) is the World Bank's primary collection of development indicators, compiled from officially-recognized international sources. It presents the most current and accurate global development data available and includes national, regional, and global estimates.
-
-      [Text from [World Bank data catalog](https://datacatalog.worldbank.org/dataset/world-development-indicators)]
+    description: The World Development Indicators (WDI) is the World Bank's primary collection of development indicators, compiled from officially-recognized international sources. It presents the most current and accurate global development data available and includes national, regional, and global estimates.
     citation_full: World Development Indicators, The World Bank (2023).
     url_main: https://datacatalog.worldbank.org/search/dataset/0037712/World-Development-Indicators
     url_download: http://databank.worldbank.org/data/download/WDI_csv.zip
@@ -30,61 +25,27 @@ tables:
           - *wdi_origin
         title: Individuals using the Internet (% of population)
         description_short: Share of the population who used the Internet in the last three months.
-        description_from_producer: >-
-          Internet users are individuals who have used the Internet (from any location)
-          in the last 3 months. The Internet can be used via a computer, mobile phone,
-          personal digital assistant, games machine, digital TV etc.
-
-          Limitations and exceptions: Operators have traditionally been the main source
-          of telecommunications data, so information on subscriptions has been widely
-          available for most countries. This gives a general idea of access, but a more
-          precise measure is the penetration rate - the share of households with access
-          to telecommunications. During the past few years more information on
-          information and communication technology use has become available from
-          household and business surveys. Also important are data on actual use of
-          telecommunications services. Ideally, statistics on telecommunications (and
-          other information and communications technologies) should be compiled for all
-          three measures: subscriptions, access, and use. The quality of data varies
-          among reporting countries as a result of differences in regulations covering
-          data provision and availability.
-
-          Discrepancies may also arise in cases where the end of a fiscal year differs
-          from that used by ITU, which is the end of December of every year. A number of
-          countries have fiscal years that end in March or June of every
-          year.
-
-          Statistical concept and methodology: The Internet is a world-wide public
-          computer network. It provides access to a number of communication services
-          including the World Wide Web and carries email, news, entertainment and data
-          files, irrespective of the device used (not assumed to be only via a computer -
-          it may also be by mobile phone, PDA, games machine, digital TV etc.). Access
-          can be via a fixed or mobile network. For additional/latest information on
-          sources and country notes, please also refer to:
-          https://www.itu.int/en/ITU-D/Statistics/Pages/stat/default.aspx
-
-          [Text from [World Bank World Development Indicators metadata](https://databank.worldbank.org/metadataglossary/world-development-indicators/series/IT.NET.USER.ZS)]
+        description_from_producer: Internet users are individuals who have used the Internet (from any location) in the last 3 months. The Internet can be used via a computer, mobile phone, personal digital assistant, games machine, digital TV etc.
         short_unit: '%'
         unit: '% of population'
         display:
           numDecimalPlaces: 1
           tolerance: 5
         description_key:
-          - An Internet user is defined by the International Telecommunication Union as anyone who has accessed the Internet from any location in the last three months.
-          - This can be from any type of device, including a computer, mobile phone, personal digital assistant, games machine, digital TV, and other technological devices.
+          - Internet users are defined as individuals who have used the Internet from any location in the last 3 months.
+          - The Internet can be accessed via various devices such as a computer, mobile phone, personal digital assistant, games machine, digital TV etc.
         processing_level: minor
         presentation:
-          title_public: Share of the population using the Internet
-          # title_variant: WDI
+          title_public: Internet usage by population
           title_variant: International Telecommunication Union
-          # attribution: # defaults to origin[*].producer so does not have to be set here
           topic_tags:
             - Internet
             - Technological Change
             - Loneliness & Social Connections
           faqs: []
           grapher_config:
-            title: Share of the population using the Internet
-            subtitle: 'Share of the population who [used the Internet](#dod:internetuser) in the last three months.'
+            title: Internet usage by population
+            subtitle: 'Share of the population who used the Internet in the last three months.'
             timelineMinTime: 1990
             sourceDesc: International Telecommunication Union (via World Bank)
             originUrl: https://ourworldindata.org/internet
@@ -142,19 +103,13 @@ tables:
         title: Share of children who are stunted
         unit: '% of children under 5'
         short_unit: '%'
-        description_short: |-
-          The share of children younger than five years old whose growth is stunted.
+        description_short: The share of children younger than five years old whose growth is stunted.
         description_key:
-          - Stunting is when a child is significantly shorter than the average for their age.
-          - Stunted growth is a consequence of poor nutrition and/or repeated infection.
-        description_from_producer: |-
-          Prevalence of stunting is the percentage of children under age 5 whose height for age is more than two standard deviations below the median for the international reference population ages 0-59 months. For children up to two years old height is measured by recumbent length. For older children height is measured by stature while standing. The data are based on the WHO's new child growth standards released in 2006.
-
-
-          [Text from World Bank World Development Indicators [metadata glossary](https://databank.worldbank.org/metadataglossary/world-development-indicators/series/SH.STA.STNT.ZS)]
+          - Stunting is a condition where a child is significantly shorter than the average for their age.
+          - Stunted growth is often a result of poor nutrition and/or repeated infection.
+        description_from_producer: Prevalence of stunting is the percentage of children under age 5 whose height for age is more than two standard deviations below the median for the international reference population ages 0-59 months.
         presentation:
-          title_public: Share of children who are stunted
-          # title_variant: UNICEF/WHO
+          title_public: Prevalence of stunting in children under 5
           attribution: UNICEF; World Health Organization; World Bank
           attribution_short: UNICEF/WHO (via World Bank)
           topic_tags:
@@ -170,11 +125,7 @@ tables:
           grapher_config:
             slug: share-of-children-younger-than-5-who-suffer-from-stunting
             title: 'Malnutrition: Share of children who are stunted'
-            subtitle: >-
-              The share of children younger than five years old that are defined as stunted.
-              [Stunting](#dod:stunting) is when a child is significantly shorter than the
-              average for their age. It is a consequence of poor nutrition and/or repeated
-              infection.
+            subtitle: The share of children younger than five years old that are defined as stunted.
             sourceDesc: UNICEF, World Health Organization and World Bank
             hideAnnotationFieldsInTitle:
               time: true
@@ -214,9 +165,6 @@ tables:
                   - ''
                   - ''
                   - ''
-                customNumericColors:
-                  - null
-                  - null
                 legendDescription: Prevalence of stunting (% of children under 5)
             selectedEntityNames:
               - China
@@ -226,10 +174,8 @@ tables:
               - Bangladesh
               - United States
             relatedQuestions:
-              - url: >-
-                  https://ourworldindata.org/grapher/share-of-children-younger-than-5-who-suffer-from-stunting#faqs
+              - url: https://ourworldindata.org/grapher/share-of-children-younger-than-5-who-suffer-from-stunting#faqs
                 text: FAQs on this data
-            $schema: https://files.ourworldindata.org/schemas/grapher-schema.003.json
       ny_gdp_pcap_pp_kd:
         sources: []
         origins:
@@ -244,54 +190,12 @@ tables:
           tolerance: 5
         description_short: This data is adjusted for inflation and for differences in the cost of living between countries.
         description_key:
-          - TBD - List of key pieces of information about the indicator.
-        description_from_producer: TBD - Indicator's description given by the producer
-        description_processing: TBD - Indicator's processing description
-        description: "GDP per capita based on purchasing power parity (PPP). PPP GDP is gross domestic product converted to international dollars using purchasing power parity rates. An international dollar has the same purchasing power over GDP as the U.S. dollar has in the United States. GDP at purchaser's prices is the sum of gross value added by all resident producers in the country plus any product taxes and minus any subsidies not included in the value of the products. It is calculated without making deductions for depreciation of fabricated assets or for depletion and degradation of natural resources. Data are in constant 2017 international dollars.\n\nStatistical concept and methodology: For the concept and methodology of 2017 PPP, please refer to the International Comparison Program (ICP)’s website (https://www.worldbank.org/en/programs/icp)."
+          - GDP per capita based on purchasing power parity (PPP) is a measure of the average economic output per person, adjusted for price differences across countries.
+          - This data is expressed in international dollars, a hypothetical currency that has the same purchasing power parity that the U.S. dollar had in the United States at a given point in time.
+        description_from_producer: GDP per capita based on purchasing power parity (PPP). PPP GDP is gross domestic product converted to international dollars using purchasing power parity rates. An international dollar has the same purchasing power over GDP as the U.S. dollar has in the United States. GDP at purchaser's prices is the sum of gross value added by all resident producers in the country plus any product taxes and minus any subsidies not included in the value of the products. It is calculated without making deductions for depreciation of fabricated assets or for depletion and degradation of natural resources. Data are in constant 2017 international dollars.
         presentation:
-          title_public: TBD - Indicator title to be shown in data pages, that overrides the indicator's title.
-          title_variant: TBD - Indicator's title variant
-          attribution_short: TBD - Indicator's attribution (shorter version)
+          title_public: GDP per capita (PPP)
+          attribution_short: World Bank
           faqs:
-            - fragment_id: TBD - Question identifier from FAQ GDoc
+            - fragment_id: gdp-definition
               gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
-          grapher_config:
-            title: GDP per capita
-            subtitle: This data is adjusted for inflation and for differences in the cost of living between countries.
-            variantName: World Bank, constant international-$
-            originUrl: https://ourworldindata.org/economic-growth
-            hasMapTab: true
-            tab: map
-            yAxis:
-              min: 0
-              canChangeScaleType: true
-            hideAnnotationFieldsInTitle:
-              time: true
-              entity: true
-              changeInPrefix: true
-            hideRelativeToggle: false
-            map:
-              colorScale:
-                baseColorScheme: GnBu
-                binningStrategy: manual
-                legendDescription: GDP per capita, PPP (in constant 2011 int-$)
-                customNumericValues:
-                  - 1000
-                  - 2000
-                  - 5000
-                  - 10000
-                  - 20000
-                  - 50000
-                  - 100000
-                customNumericMinValue: 0
-            selectedEntityNames:
-              - United States
-              - Germany
-              - United Kingdom
-              - France
-              - South Korea
-              - Japan
-              - China
-              - India
-            note: This data is expressed in [international-$](#dod:int_dollar_abbreviation) at 2017 prices.
-            $schema: https://files.ourworldindata.org/schemas/grapher-schema.003.json
