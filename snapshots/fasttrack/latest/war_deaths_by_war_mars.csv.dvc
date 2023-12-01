@@ -2,7 +2,7 @@ meta:
   source:
     name: Unknown
     source_data_url: 
-      gAAAAABlaj-COaa8-pkZ-R5c1Mu1cYav8cfPkilobWWTHXqi_gnFyNlGp3p_YJXYaTegOwOMSfg9DN2S-meNtVk_wEsXK5cPQZSQYNOfv61YFs1kCBEUFqZHoPoYfYj2D8wv8hwuZykEMaTpWCUP59ApspQHuBt84OMH7NYvmpiR3TiI6Lk-3JrMp8TtzrkuzGgADSikZrFc914DhCK0pXUUVXeVL0EgIw0nsDKWkMdl8Fz3qaYc0Pn3TL3cPGGyOwE8-x2JmHM4
+      gAAAAABlakM5jMsg05MwqUCeayD-hIgY1p8W3UtziZ67qNcLYHqGHbTvempi7VQRXrS4_To1fRN61QeyGx6fjQlrmiVMs6nbFYwbgtQFbcFHvFShDWXIO6ZGh55RmoYI7pTGUTOla3na-a__gCwIVmiWF_9kWVinxoWehd6aHEIJNjsSQZNHNDvOgMV4AHK_jAMvHPQ-BqDpumgwCIDb_7gwyNtEdYjGA2Kw0cy8ywwHkhbxbn3tZ26xlzPArdtssYlrzE7Rquyn
     date_accessed: '2023-12-01'
     publication_year: 2023
     published_by: Unknown
@@ -13,6 +13,6 @@ meta:
   is_public: false
 wdir: ../../../data/snapshots/fasttrack/latest
 outs:
-- md5: 69a6bfc35eb038cf668a001cd525e377
-  size: 9797
+- md5: 1216d5fc24b9763755c9474d4a24df92
+  size: 12739
   path: war_deaths_by_war_mars.csv
