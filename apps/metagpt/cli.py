@@ -1,9 +1,10 @@
-import os
-from typing import Any
+import json
+import re
 
 import click
-import openai
 import structlog
+import yaml
+from openai import OpenAI
 
 from etl.paths import BASE_DIR
 
@@ -99,8 +100,7 @@ def main(path_to_file: str):
     log.info("Starting metadata update process.")
     try:
         metadata = read_metadata_file(path_to_file)
-        updated_metadata = generate_metadata_update(path_to_file, metadata)
-        save_updated_metadata(path_to_file, updated_metadata)
+        generate_metadata_update(path_to_file, metadata)
         log.info("Metadata update process completed successfully.")
     except Exception as e:
         log.error("Metadata update process failed.", error=str(e))
@@ -116,16 +116,53 @@ def generate_metadata_update(path_to_file: str, metadata: str) -> str:
     """Generates updated metadata using OpenAI GPT."""
     messages = create_system_prompt(path_to_file, metadata)
     try:
-        response = openai.ChatCompletion.create(
-            model="gpt-4",
-            temperature=0,
-            messages=messages,
-        )
-        log.info(f"Cost GPT4: ${response['usage']['total_tokens'] / 1000 * 0.03:.2f}")
+        client = OpenAI()
 
-        return response["choices"][0]["message"]["content"]
-    except openai.error as e:
-        log.error("OpenAI API error", error=str(e))
+        chat_completion = client.chat.completions.create(messages=messages, model="gpt-4", temperature=0)
+
+        log.info(f"Cost GPT4: ${chat_completion.usage.total_tokens/ 1000 * 0.03:.2f}")
+        if "snap" in path_to_file:
+            message_content = chat_completion.choices[0].message.content
+
+            with open(path_to_file, "w") as file:
+                file.write(message_content)
+
+        elif "grapher" in path_to_file:
+            message_content = chat_completion.choices[0].message.content
+            # This regular expression attempts to differentiate between single quotes used as delimiters and those used in data
+            json_string_fixed = re.sub(r"(\W)'|'(\W)", r'\1"\2', message_content)
+
+            # Parse the corrected string
+            try:
+                parsed_dict = json.loads(json_string_fixed)
+            except json.JSONDecodeError as e:
+                print("Error decoding JSON:", e)
+
+            # Load the original YAML content
+            with open(path_to_file, "r") as file:
+                original_yaml_content = yaml.safe_load(file)
+            # Update the YAML data
+            for table, table_data in parsed_dict["tables"].items():
+                for variable, variable_updates in table_data["variables"].items():
+                    if (
+                        table in original_yaml_content["tables"]
+                        and variable in original_yaml_content["tables"][table]["variables"]
+                    ):
+                        # Formatting 'description_key' as bullet points
+                        if "description_key" in variable_updates:
+                            variable_updates["description_key"] = "\n".join(
+                                f"- {item}" for item in variable_updates["description_key"]
+                            )
+                        original_yaml_content["tables"][table]["variables"][variable].update(variable_updates)
+
+            # Write the updated YAML back to the file
+            with open(path_to_file, "w") as file:
+                yaml.dump(original_yaml_content, file, default_flow_style=False, sort_keys=False)
+
+    except Exception as e:  # Catch a general exception
+        error_message = str(e)
+        log.error("OpenAI API error", error=error_message)
+        print(f"Error: {error_message}")  # Print the actual error message
         raise
 
 
@@ -135,15 +172,19 @@ def create_system_prompt(path_to_file: str, metadata: str) -> str:
     if "snapshot" in path_to_file:
         # Load example of new metadata format
         new_metadata_file = read_metadata_file(NEW_METADATA_EXAMPLE)
-
         system_prompt = f"""
-        You are given a metadata file with information about the sources of the data in the old format. Now, we've transitioned to a new format. Update the metadata file to the new format. The new metadata file is as follows:
+        You are given an old metadata file with information about the sources of the data in the old format. Now, we've transitioned to a new format.
 
-        New metadata format:
+        The new metadata file needs to be structured in an identical way. Infer the fields and arrange them in the same order as in the new metadata file. Update the old metadata file to the new format based on this example.
+
+        Please format your responses (e.g., year shouldn't exist in producer field etc) and add any additional fields if possible/necessary based on these additional instructions:
+        {ADDITIONAL_INSTRUCTIONS}
+
+        The new metadata file is as follows. Structure your response in the same way:
         {new_metadata_file}
 
-        Format your response and add any additional fields based on these additional instructions:
-        {ADDITIONAL_INSTRUCTIONS}
+        Please output it in the same format (yaml).License" is a part of "origin", not a separate dictionary. Don't include any additional responses/notes in your response beyond the existing field as this will be saved directly as a file.
+
         """
         messages = [
             {"role": "system", "content": system_prompt},
@@ -152,24 +193,32 @@ def create_system_prompt(path_to_file: str, metadata: str) -> str:
         return messages
 
     elif "grapher" in path_to_file:
-        system_prompt = f"""
-            You are given a metadata file. Could you help us with at least filling out the following for each indicator:
+        system_prompt = """
+            You are given a metadata file. Could you help us fill out the following for each variable:
 
             - description_from_producer - do a web search based on other information and URLs in the metadata file to find a description of the variable.
             - description_key - based on a web search and if description exists come up with some key bullet points (in a sentence format) that would help someone interpret the indicator. Can you make sure that these are going to be useful for the public to understand the indicator? Expand on any acronyms or any terms that a layperson might not be familiar with. Each bullet point can be more than one sentence if necessary but don't make it too long.
-            - title_public - come up with a succinct title for the indicator that will be presented to the public
-            - if description_short is not filled out, use the description_key and a web search to come up with one sentence to describe the indicator.
-            - in make title_public ensure only the first letter is capitalized and the rest are lowercase unless it's an acryonym (e.g. GDP)
-            - ignore title_variant for now
+            - if description_short is not filled out, use the description_key and a web search to come up with one sentence to describe the indicator. It should be very brief and to the point.
+
+            The output should always have these fields but as a python dictionary. This format is mandatory, don't miss fields and don't include any irrelevant information but make it JSON readable.:
+
+            {'tables': {'maddison_gdp': {'variables': {'gdp_per_capita': {'description_short': '...', 'description_from_producer': '...', 'description_key': ['...', '...']}}}}}
+
+
+            Don't include any other fields. This is mandatory.
 
             Now, can you try to infer the above based on the other information in the metadata file and by browsing the web?
 
-            You can use any links in the metadata file to help you. Generate a new metadata file with these fields filled out. Remove description field at the indicator level (not the origins level) from the new metadata as it will no longer be used.
+            You can use any links in the metadata file to help you.
 
-            Don't include any additional responses/notes in your response beyond the existing field as this will be saved directly as a file.
-            Metadata file:
-            {metadata}
 
+            Don't include any other information so that I can easily access these fields. If you can't fill these out for some indicators, please fill them out with 'ChatGPT could not infer'.
+
+            e.g. never include a starting sentence like 'Based on the metadata file and a web search, here is the inferred information'. Don't include `json` or `yaml` at the start of your response. Just include the fields you've changed.
+
+            'description_key' should be a list of bullet points. Each bullet point should be a string. e.g. ['bullet point 1', 'bullet point 2']
+
+            If information is already filled out, just try to improve it. .
             """
 
         messages = [
@@ -183,14 +232,6 @@ def create_system_prompt(path_to_file: str, metadata: str) -> str:
 
     else:
         log.error("Invalid file path", file_path=path_to_file)
-
-
-def save_updated_metadata(original_file: str, updated_metadata: str):
-    """Saves the updated metadata to a file."""
-    output_file_name = "updated_with_gpt_" + os.path.basename(original_file)
-    output_file_path = os.path.join(os.path.dirname(original_file), output_file_name)
-    with open(output_file_path, "w") as file:
-        file.write(updated_metadata)
 
 
 if __name__ == "__main__":
