@@ -3,7 +3,7 @@
 meta:
   origin:
     # Data product / Snapshot
-    title:
+    title: Global tuberculosis report
     description: |-
       WHO has published a global tuberculosis (TB) report every year since 1997. The report provides a comprehensive and up-to-date assessment of the TB epidemic, and of progress in prevention, diagnosis and treatment of the disease at global, regional and country levels.
     date_published: 2023-11-07

@@ -1,9 +1,7 @@
 from owid.catalog import Table
 
-from etl.snapshot import Snapshot
 
-
-def add_variable_description_from_producer(tb: Table, dd: Snapshot) -> Table:
+def add_variable_description_from_producer(tb: Table, dd: Table) -> Table:
     """Add variable description from the data dictionary to each variable."""
     columns = tb.columns.difference(["country", "year"])
     for col in columns:
