@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Unknown
+    source_data_url: 
+      gAAAAABlaj-COaa8-pkZ-R5c1Mu1cYav8cfPkilobWWTHXqi_gnFyNlGp3p_YJXYaTegOwOMSfg9DN2S-meNtVk_wEsXK5cPQZSQYNOfv61YFs1kCBEUFqZHoPoYfYj2D8wv8hwuZykEMaTpWCUP59ApspQHuBt84OMH7NYvmpiR3TiI6Lk-3JrMp8TtzrkuzGgADSikZrFc914DhCK0pXUUVXeVL0EgIw0nsDKWkMdl8Fz3qaYc0Pn3TL3cPGGyOwE8-x2JmHM4
+    date_accessed: '2023-12-01'
+    publication_year: 2023
+    published_by: Unknown
+  name: War Deaths by War — Project Mars
+  description: This dataset provides information on number of combatant deaths in
+    wars by war, using data from Project Mars (Jason Lyall 2020)
+  license: {}
+  is_public: false
+wdir: ../../../data/snapshots/fasttrack/latest
+outs:
+- md5: 69a6bfc35eb038cf668a001cd525e377
+  size: 9797
+  path: war_deaths_by_war_mars.csv

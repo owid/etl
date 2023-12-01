@@ -1,0 +1,18 @@
+dataset:
+  title: War Deaths by War — Project Mars
+  description: This dataset provides information on number of combatant deaths in wars by war, using data from Project Mars
+    (Jason Lyall 2020)
+  licenses:
+    - {}
+tables:
+  war_deaths_by_war_mars:
+    variables:
+      war_deaths_low:
+        title: war_deaths_low
+        unit: ''
+      war_deaths_high:
+        title: war_deaths_high
+        unit: ''
+      civil_war:
+        title: civil_war
+        unit: ''
