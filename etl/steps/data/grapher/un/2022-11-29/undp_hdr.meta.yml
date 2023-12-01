@@ -1,9 +1,13 @@
 definitions:
   common:
-    processing_level: TBD - major or minor
+    processing_level: minor
     presentation:
       topic_tags:
-        - TBD - Indicator's topic tags
+        - Human Development Index (HDI)
+        - Life Expectancy
+        - Global Education
+        - Democracy
+        - Economic Growth
     sources: []
     origins:
       - producer: UNDP, Human Development Report (2021-22)
@@ -24,23 +28,8 @@ definitions:
 
 
           Technical notes may be found at https://hdr.undp.org/sites/default/files/2021-22_HDR/hdr2021-22_technical_notes.pdf.
-
-
-          The 2021/2022 Human Development Report is the latest in the series of global Human Development Reports published
-          by the United Nations Development Programme (UNDP) since 1990 as independent and analytically and empirically grounded
-          discussions of major development issues, trends and policies.
-
-
-          Additional resources related to the 2021/2022 Human Development Report can be found online at http://hdr.undp.org.
-          Resources on the website include digital versions and translations of the Report and the overview in more than 10
-          languages, an interactive web version of the Report, a set of background papers and think pieces commissioned for
-          the Report, interactive data visualizations and databases of human development indicators, full explanations of
-          the sources and methodologies used in the Report's composite indices, country insights and other background materials,
-          and previous global, regional and national Human Development Reports. Corrections and addenda are also available
-          online.
-
-
-          Technical notes (region definitions, reports, etc.) can be found at https://hdr.undp.org/sites/default/files/2021-22_HDR/hdr2021-22_technical_notes.pdf.
+        citation_full: |
+          UNDP (United Nations Development Programme). 2022. Human Development Report 2021-22: Uncertain Times, Unsettled Lives: Shaping our Future in a Transforming World. New York.
         url_main: https://hdr.undp.org/
         url_download: https://hdr.undp.org/sites/default/files/2021-22_HDR/HDR21-22_Composite_indices_complete_time_series.csv
         date_accessed: '2022-11-29'
@@ -49,7 +38,7 @@ definitions:
           name: CC BY 3.0 IGO
           url: https://hdr.undp.org/copyright-and-terms-use
 dataset:
-  update_period_days: TBD - Number of days between OWID updates
+  update_period_days: 365
   sources: []
 tables:
   undp_hdr:
@@ -58,43 +47,30 @@ tables:
         title: Human Development Index
         display:
           numDecimalPlaces: 3
-        description_short: 'The Human Development Index (HDI) is a summary measure of key dimensions of human development:
-          a long and healthy life, a good education, and a decent standard of living. Higher values indicate higher human
-          development.'
+        description_short: 'The HDI is a summary measure of key dimensions of human development: a long and healthy life, a good education, and a decent standard of living. Higher values indicate higher human development.'
         description_key:
-          - TBD - List of key pieces of information about the indicator.
-        description_from_producer: TBD - Indicator's description given by the producer
-        description_processing: TBD - Indicator's processing description
-        description: >-
-          The Human Development Index (HDI) is a summary measure of achievements in three key dimensions of human development:
-          A long and healthy life, access to knowledge and a decent standard of living.
+          - "Each of the dimensions of the HDI is measured with four indicators: a long and healthy life is measured by _life expectancy at birth_, good education (knowledge) is measured by two indicators, _expected_ and _mean_ _years of schooling_; and a decent standard of living is measured by _Gross National Income (GNI) per capita_, logarithmized to reflect that incomes become less important as they increase."
+          - "The index is then calculated by normalizing and aggregating the indicators. First, the indicators are brought onto the same scale, ranging from 0 to 1. This is done by setting minimum and maximum values for each indicator, and a country at or below the minimum value receiving a score of 0, and a country at or above the maximum value receiving a score of 1."
+          - "The minimum and maximum values for each indicator are defined as follows: _Life expectancy at birth_ ranges between 20 and 85 years; _expected years of schooling_ between 0 and 18 years; _mean years of schooling_, between 0 and 15 years; and _GNI per capita_ between 100 and 75,000 international-$ at 2017 prices."
+          - The HDI is then estimated as the geometric mean of these indices, or _HDI = (Health index * Education index * Income index)^(1/3)_. The education index is the arithmetic mean (average) of the mean years of schooling and expected years of schooling.
+        description_from_producer: >-
+          The Human Development Index (HDI) is a summary measure of average achievement in key dimensions of human development: a long and healthy life, being knowledgeable and having a decent standard of living. The HDI is the geometric mean of normalized indices for each of the three dimensions.
 
 
-          Measured by:
+          The health dimension is assessed by life expectancy at birth, the education dimension is measured by mean of years of schooling for adults aged 25 years and more and expected years of schooling for children of school entering age. The standard of living dimension is measured by gross national income per capita. The HDI uses the logarithm of income, to reflect the diminishing importance of income with increasing GNI. The scores for the three HDI dimension indices are then aggregated into a composite index using geometric mean. Refer to Technical notes for more details.
 
 
-          - Life expectancy at birth
-
-          - Mean years of schooling & Expected years of schooling
-
-          - GNI per capita (in PPP adjusted international-$)
+          The HDI can be used to question national policy choices, asking how two countries with the same level of GNI per capita can end up with different human development outcomes. These contrasts can stimulate debate about government policy priorities.
 
 
-          The HDI is the geometric mean of normalized indices for each of the three dimensions.
+          The HDI simplifies and captures only part of what human development entails. It does not reflect on inequalities, poverty, human security, empowerment, etc. The HDRO provides other composite indices as broader proxy on some of the key issues of human development, inequality, gender disparity and poverty.
 
 
-          For more details read the technical note 1 at https://hdr.undp.org/sites/default/files/2021-22_HDR/hdr2021-22_technical_notes.pdf.
+          A fuller picture of a country's level of human development requires analysis of other indicators and information presented in the HDR statistical annex.
         presentation:
-          title_public: TBD - Indicator title to be shown in data pages, that overrides the indicator's title.
-          title_variant: TBD - Indicator's title variant
-          attribution_short: TBD - Indicator's attribution (shorter version)
-          faqs:
-            - fragment_id: TBD - Question identifier from FAQ GDoc
-              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
           grapher_config:
             title: Human Development Index
-            subtitle: 'The Human Development Index (HDI) is a summary measure of key dimensions of human development: a long
-              and healthy life, a good education, and a decent standard of living. Higher values indicate higher human development.'
+            subtitle: "The Human Development Index (HDI) is a summary measure of key dimensions of human development: a long and healthy life, a good education, and a decent standard of living. Higher values indicate higher human development."
             originUrl: https://ourworldindata.org/human-development-index/
             hasMapTab: true
             tab: map
@@ -108,14 +84,6 @@ tables:
                 baseColorScheme: GnBu
                 binningStrategy: manual
                 legendDescription: ''
-                customNumericColors:
-                  - '#6de354'
-                  - '#59ba47'
-                  - '#60d4f2'
-                  - '#21c1fc'
-                  - '#6babeb'
-                  - '#3288ce'
-                  - '#006eb5'
                 customNumericValues:
                   - 0.4
                   - 0.5
