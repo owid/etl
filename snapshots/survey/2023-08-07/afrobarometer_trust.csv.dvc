@@ -3,7 +3,7 @@
 meta:
   origin:
     # Data product / Snapshot
-    title: Trust questions in the Afrobarometer Dataset
+    title: Trust questions in the Afrobarometer dataset
     description: |-
       Afrobarometer provides reliable, timely data on the views of ordinary Africans to inform development and policy decision making.
 

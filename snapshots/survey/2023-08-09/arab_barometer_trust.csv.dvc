@@ -3,7 +3,7 @@
 meta:
   origin:
     # Data product / Snapshot
-    title: Trust questions in the Arab Barometer Dataset
+    title: Trust questions in the Arab Barometer dataset
     description: |-
       Arab Barometer gives voice to the opinions and concerns of ordinary citizens across the Arab world. It is the first and largest project of its kind: their surveys have been conducted one or more times in Algeria, Bahrain, Egypt, Iraq, Jordan, Kuwait, Lebanon, Libya, Morocco, Palestine, Saudi Arabia, Sudan, Tunisia, Qatar, and Yemen.
     date_published: 2022
