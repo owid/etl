@@ -9,7 +9,7 @@ definitions:
       numDecimalPlaces: 0
     processing_level: minor
   sex: |-
-    <% if sex == "a" %>males and females <% elif sex == "m" %>males <% elif sex == "f" %>females <%- endif -%>
+    <% if sex == "a" %>males and females <% elif sex == "m" %>males <% elif sex == "f" %>females  <%- endif -%>
   age_group: |-
     <% if age_group == "0-14" %>0-14 years<% elif age_group == "0-4" %>0-4 years<% elif age_group == "15-24" %>15-24 years<% elif age_group == "15plus" %>over 15 years<% elif age_group == "18plus" %>over 18 years<% elif age_group == "25-34" %>25-34 years<% elif age_group == "35-44" %>35-44 years<% elif age_group == "45-54" %>45-54 years<% elif age_group == "5-14" %>5-14 years<% elif age_group == "55-64" %>55-64 years<% elif age_group == "65plus" %>over 65 years<% elif age_group == "all" %><% endif -%>
   risk_factor: |-
