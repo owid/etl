@@ -33,7 +33,7 @@ AGE_GROUPS_RANGES = {
     "15plus": [15, None],
     "18plus": [18, None],
     "25-34": [25, 34],
-    "35-44": [35, 4],
+    "35-44": [35, 44],
     "45-54": [45, 54],
     "5-14": [5, 14],
     "55-64": [55, 64],
@@ -60,6 +60,7 @@ def run(dest_dir: str) -> None:
     #
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
     tb = tb.drop(columns=["measure", "unit"])
+    tb = add_population_column(tb)
     tb = combining_sexes_for_all_age_groups(tb)
     tb = add_region_sum_aggregates(tb, ds_regions=ds_regions, ds_income_groups=ds_income_groups)
     tb = calculate_incidence_rates(tb)
@@ -88,7 +89,7 @@ def combining_sexes_for_all_age_groups(tb: Table) -> Table:
     tb_age = tb[~msk]
     tb_gr = tb_age.groupby(["country", "year", "age_group", "risk_factor"]).sum(numeric_only=True).reset_index()
 
-    tb = pr.concat([tb, tb_gr], axis=0, ignore_index=True, copy=False)
+    tb = pr.concat([tb, tb_gr], axis=0, ignore_index=True, short_name=paths.short_name)
 
     return tb
 
@@ -124,12 +125,15 @@ def add_region_sum_aggregates(tb: Table, ds_regions: Dataset, ds_income_groups: 
             # Combine the region values with the original group.
             gr = pr.concat([gr, gr_reg], axis=0, ignore_index=True, copy=False)
         # Add the group to the output table.
-        tb_gr_out = pr.concat([tb_gr_out, gr], axis=0, ignore_index=True, copy=False)
+        tb_gr_out = pr.concat([tb_gr_out, gr], axis=0, ignore_index=True, short_name=paths.short_name)
 
     return tb_gr_out
 
 
-def calculate_incidence_rates(tb: Table) -> Table:
+def add_population_column(tb: Table) -> Table:
+    """
+    Adding the population for each age-group.
+    """
     tb_age = add_population(
         df=tb,
         country_col="country",
@@ -141,9 +145,17 @@ def calculate_incidence_rates(tb: Table) -> Table:
         age_col="age_group",
         age_group_mapping=AGE_GROUPS_RANGES,
     )
-
-    tb_age["best_rate"] = (tb_age["best"].div(tb_age["population"]).replace(np.inf, np.nan)) * 100000
-    tb_age["low_rate"] = (tb_age["lo"].div(tb_age["population"]).replace(np.inf, np.nan)) * 100000
-    tb_age["high_rate"] = (tb_age["hi"].div(tb_age["population"]).replace(np.inf, np.nan)) * 100000
-
     return tb_age
+
+
+def calculate_incidence_rates(tb: Table) -> Table:
+    """
+    Calculating the incidence rate per 100,000 people for each age-group.
+    """
+
+    assert tb["population"].isna().sum() == 0, "There are missing population values."
+    tb["best_rate"] = (tb["best"].div(tb["population"]).replace(np.inf, np.nan)) * 100000
+    tb["low_rate"] = (tb["lo"].div(tb["population"]).replace(np.inf, np.nan)) * 100000
+    tb["high_rate"] = (tb["hi"].div(tb["population"]).replace(np.inf, np.nan)) * 100000
+
+    return tb
