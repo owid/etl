@@ -63,16 +63,15 @@ def run(dest_dir: str) -> None:
     tb = add_population_column(tb)
     tb = combining_sexes_for_all_age_groups(tb)
     tb = add_region_sum_aggregates(tb, ds_regions=ds_regions, ds_income_groups=ds_income_groups)
-    tb = calculate_incidence_rates(tb)
-    tb = tb.drop(columns=["population"])
+    tb, tb_rate = calculate_incidence_rates(tb)
     tb = tb.set_index(["country", "year", "age_group", "sex", "risk_factor"], verify_integrity=True)
-
+    tb_rate = tb_rate.set_index(["country", "year", "age_group", "sex", "risk_factor"], verify_integrity=True)
     #
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
     ds_garden = create_dataset(
-        dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=ds_meadow.metadata
+        dest_dir, tables=[tb, tb_rate], check_variables_metadata=True, default_metadata=ds_meadow.metadata
     )
 
     # Save changes in the new garden dataset.
@@ -164,6 +163,7 @@ def add_population_column(tb: Table) -> Table:
 def calculate_incidence_rates(tb: Table) -> Table:
     """
     Calculating the incidence rate per 100,000 people for each age-group.
+    Return two tables, one with absolute values and one with rates, so that it is simpler to reduce the number of variables in grapher that are just NA
     """
     tb_pop = tb[tb["risk_factor"] == "all"]
     tb_no_pop = tb[tb["risk_factor"] != "all"]
@@ -173,4 +173,10 @@ def calculate_incidence_rates(tb: Table) -> Table:
     tb_pop["high_rate"] = (tb_pop["hi"].div(tb_pop["population"]).replace(np.inf, np.nan)) * 100000
 
     tb = pr.concat([tb_pop, tb_no_pop], axis=0, ignore_index=True, short_name=paths.short_name)
-    return tb
+
+    tb_abs = tb[["country", "year", "sex", "age_group", "risk_factor", "best", "lo", "hi"]]
+    tb_rate = tb[["country", "year", "sex", "age_group", "risk_factor", "best_rate", "low_rate", "high_rate"]].dropna(
+        subset=["best_rate"]
+    )
+    tb_rate.metadata.short_name = paths.short_name + "_rate"
+    return tb_abs, tb_rate

@@ -88,6 +88,8 @@ tables:
           title_public: |-
             {definitions.indicator.presentation_title_absolute}
           title_variant: high estimate
+  burden_disaggregated_rate:
+    variables:
       best_rate:
         title: |-
           Best estimate: {definitions.indicator.presentation_title_rate}
