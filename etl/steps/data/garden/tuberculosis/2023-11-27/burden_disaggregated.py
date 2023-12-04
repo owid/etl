@@ -64,6 +64,7 @@ def run(dest_dir: str) -> None:
     tb = combining_sexes_for_all_age_groups(tb)
     tb = add_region_sum_aggregates(tb, ds_regions=ds_regions, ds_income_groups=ds_income_groups)
     tb = calculate_incidence_rates(tb)
+    tb = tb.drop(columns=["population"])
     tb = tb.set_index(["country", "year", "age_group", "sex", "risk_factor"], verify_integrity=True)
 
     #

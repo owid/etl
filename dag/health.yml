@@ -359,7 +359,7 @@ steps:
   data://grapher/tuberculosis/2023-11-27/burden_estimates:
     - data://garden/tuberculosis/2023-11-27/burden_estimates
 
-  # Tuberculosis budget
+  # Tuberculosis budget - WHO
   data://meadow/tuberculosis/2023-12-01/budget:
     - snapshot://tuberculosis/2023-12-01/budget.csv
   data://garden/tuberculosis/2023-11-27/budget:
@@ -368,7 +368,7 @@ steps:
   data://grapher/tuberculosis/2023-11-27/budget:
     - data://garden/tuberculosis/2023-11-27/budget
 
-  # Tuberculosis burden disaggregated
+  # Tuberculosis burden disaggregated - WHO
   data://meadow/tuberculosis/2023-12-04/burden_disaggregated:
     - snapshot://tuberculosis/2023-12-04/burden_disaggregated.csv
   data://garden/tuberculosis/2023-11-27/burden_disaggregated:
