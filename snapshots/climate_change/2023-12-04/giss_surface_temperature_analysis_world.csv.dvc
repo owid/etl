@@ -1,0 +1,28 @@
+meta:
+  origin:
+    # Data product / Snapshot
+    title: GISS Surface Temperature Analysis
+    title_snapshot: GISS Surface Temperature Analysis - World
+    date_published: 2023-12-04
+
+    # Citation
+    producer: NASA Goddard Institute for Space Studies
+    version_producer: v4
+    citation_full: |-
+      NASA. GISS Surface Temperature Analysis (GISTEMP v4)
+    attribution_short: NASA
+
+    # Files
+    url_main: https://data.giss.nasa.gov/gistemp/
+    url_download: https://data.giss.nasa.gov/gistemp/tabledata_v4/GLB.Ts+dSST.csv
+    date_accessed: 2023-12-04
+
+    # License
+    license:
+      name: CC BY 4.0
+
+wdir: ../../../data/snapshots/climate_change/2023-12-04
+outs:
+- md5: 725ef181276e20e5fe27f8d6f3df8cf3
+  size: 12602
+  path: giss_surface_temperature_analysis_world.csv

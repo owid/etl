@@ -246,18 +246,6 @@ steps:
   data://grapher/ggdc/2022-11-28/penn_world_table:
     - data://garden/ggdc/2022-11-28/penn_world_table
 
-  #
-  # Met Office Hadley Centre - Near surface temperature anomaly (2023-10-18).
-  #
-  data://meadow/met_office_hadley_centre/2023-10-18/near_surface_temperature:
-    - snapshot://met_office_hadley_centre/2023-10-18/near_surface_temperature_global.csv
-    - snapshot://met_office_hadley_centre/2023-10-18/near_surface_temperature_northern_hemisphere.csv
-    - snapshot://met_office_hadley_centre/2023-10-18/near_surface_temperature_southern_hemisphere.csv
-  data://garden/met_office_hadley_centre/2023-10-18/near_surface_temperature:
-    - data://meadow/met_office_hadley_centre/2023-10-18/near_surface_temperature
-  data://grapher/met_office_hadley_centre/2023-10-18/near_surface_temperature:
-    - data://garden/met_office_hadley_centre/2023-10-18/near_surface_temperature
-
   #Luxembourg Income Study
   data://meadow/lis/2023-08-30/luxembourg_income_study:
     - snapshot://lis/2023-08-30/lis_keyvars.csv
@@ -725,14 +713,6 @@ steps:
   data://grapher/survey/2023-08-04/trust_surveys:
   - data://garden/survey/2023-08-04/trust_surveys
 
-  # Temporary chart for global temperature anomaly.
-  data://meadow/climate_change/2023-11-17/temperature_anomaly:
-    - snapshot://climate_change/2023-11-17/temperature_anomaly.csv
-  data://garden/climate_change/2023-11-17/temperature_anomaly:
-    - data://meadow/climate_change/2023-11-17/temperature_anomaly
-  data://grapher/climate_change/2023-11-17/temperature_anomaly:
-    - data://garden/climate_change/2023-11-17/temperature_anomaly
-
   ######################################################################################################################
   # Older versions to be archived once they are not used by any other steps.
 
@@ -772,3 +752,4 @@ include:
   - dag/animal_welfare.yml
   - dag/plastic_use.yml
   - dag/statins.yml
+  - dag/climate_change.yml
