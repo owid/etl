@@ -7,25 +7,26 @@ meta:
     description: |-
       WHO has published a global tuberculosis (TB) report every year since 1997. The report provides a comprehensive and up-to-date assessment of the TB epidemic, and of progress in prevention, diagnosis and treatment of the disease at global, regional and country levels.
     date_published: 2023-11-07
-    title_snapshot: Global Tuberculosis Report - Burden Estimates
+    title_snapshot: Global Tuberculosis Report - Disaggregated Burden Estimates
 
     # Citation
     producer: WHO
     citation_full: |-
       Global tuberculosis report 2023. Geneva: World Health Organization; 2023. Licence: CC BY-NC-SA 3.0 IGO
     attribution_short: WHO
+
     # Files
     url_main: https://www.who.int/teams/global-tuberculosis-programme/data
-    url_download: https://extranet.who.int/tme/generateCSV.asp?ds=estimates
-    date_accessed: 2023-11-27
+    url_download: https://extranet.who.int/tme/generateCSV.asp?ds=estimates_age_sex
+    date_accessed: 2023-12-04
 
     # License
     license:
       name: CC BY-NC-SA 3.0 IGO
       url: https://creativecommons.org/licenses/by-nc-sa/3.0/igo/
 
-wdir: ../../../data/snapshots/tuberculosis/2023-11-27
+wdir: ../../../data/snapshots/tuberculosis/2023-12-04
 outs:
-  - md5: e43b1122a8387c2f4e3d7278caada121
-    size: 1015793
-    path: burden_estimates.csv
+- md5: c3457c48d0399c65ffbf33c78c1fcc22
+  size: 560909
+  path: burden_disaggregated.csv
