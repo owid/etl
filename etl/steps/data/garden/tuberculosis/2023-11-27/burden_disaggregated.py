@@ -1,13 +1,45 @@
 """Load a meadow dataset and create a garden dataset."""
 
-from owid.catalog import Table
+import numpy as np
+from owid.catalog import Dataset, Table
 from owid.catalog import processing as pr
 
 from etl.data_helpers import geo
+from etl.data_helpers.population import add_population
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
+
+# Regions to create aggregates for.
+REGIONS_TO_ADD = [
+    "North America",
+    "South America",
+    "Europe",
+    "Africa",
+    "Asia",
+    "Oceania",
+    "Low-income countries",
+    "Upper-middle-income countries",
+    "Lower-middle-income countries",
+    "High-income countries",
+    "World",
+]
+
+AGE_GROUPS_RANGES = {
+    "0-14": [0, 14],
+    "0-4": [0, 4],
+    "15-24": [15, 24],
+    "15plus": [15, None],
+    "18plus": [18, None],
+    "25-34": [25, 34],
+    "35-44": [35, 4],
+    "45-54": [45, 54],
+    "5-14": [5, 14],
+    "55-64": [55, 64],
+    "65plus": [65, None],
+    "all": [0, None],
+}
 
 
 def run(dest_dir: str) -> None:
@@ -19,13 +51,18 @@ def run(dest_dir: str) -> None:
 
     # Read table from meadow dataset.
     tb = ds_meadow["burden_disaggregated"].reset_index()
-
+    # Load regions dataset.
+    ds_regions = paths.load_dependency("regions")
+    # Load income groups dataset.
+    ds_income_groups = paths.load_dependency("income_groups")
     #
     # Process data.
     #
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
     tb = tb.drop(columns=["measure", "unit"])
     tb = combining_sexes_for_all_age_groups(tb)
+    tb = add_region_sum_aggregates(tb, ds_regions=ds_regions, ds_income_groups=ds_income_groups)
+    tb = calculate_incidence_rates(tb)
     tb = tb.set_index(["country", "year", "age_group", "sex", "risk_factor"], verify_integrity=True)
 
     #
@@ -49,8 +86,64 @@ def combining_sexes_for_all_age_groups(tb: Table) -> Table:
     age_groups_with_both_sexes = tb[tb["sex"] == "a"]["age_group"].drop_duplicates().to_list()
     msk = tb["age_group"].isin(age_groups_with_both_sexes)
     tb_age = tb[~msk]
-    tb_gr = tb_age.groupby(["country", "year", "age_group", "risk_factor"]).sum().reset_index()
+    tb_gr = tb_age.groupby(["country", "year", "age_group", "risk_factor"]).sum(numeric_only=True).reset_index()
 
     tb = pr.concat([tb, tb_gr], axis=0, ignore_index=True, copy=False)
 
     return tb
+
+
+def add_region_sum_aggregates(tb: Table, ds_regions: Dataset, ds_income_groups: Dataset) -> Table:
+    """
+    Calculate region aggregates for all for each combination of age-group, sex and risk factor in the dataset.
+    """
+    # Create the groups we want to aggregate over.
+    tb_gr = tb.groupby(["year", "age_group", "sex", "risk_factor"])
+    tb_gr_out = Table()
+    for gr_name, gr in tb_gr:
+        for region in REGIONS_TO_ADD:
+            # List of countries in region.
+            countries_in_region = geo.list_members_of_region(
+                region=region,
+                ds_regions=ds_regions,
+                ds_income_groups=ds_income_groups,
+            )
+            gr_cal = gr[["country", "year", "best", "lo", "hi"]]
+            # Add region aggregates.
+            gr_reg = geo.add_region_aggregates(
+                df=gr_cal,
+                region=region,
+                countries_in_region=countries_in_region,
+                frac_allowed_nans_per_year=0.5,
+                num_allowed_nans_per_year=None,
+            )
+            # Take only region values
+            gr_reg = gr_reg[gr_reg["country"] == region]
+            # Ensure the region values are assigned the same group values as the original group.
+            gr_reg[["age_group", "sex", "risk_factor"]] = [gr_name[1], gr_name[2], gr_name[3]]
+            # Combine the region values with the original group.
+            gr = pr.concat([gr, gr_reg], axis=0, ignore_index=True, copy=False)
+        # Add the group to the output table.
+        tb_gr_out = pr.concat([tb_gr_out, gr], axis=0, ignore_index=True, copy=False)
+
+    return tb_gr_out
+
+
+def calculate_incidence_rates(tb: Table) -> Table:
+    tb_age = add_population(
+        df=tb,
+        country_col="country",
+        year_col="year",
+        sex_col="sex",
+        sex_group_all="a",
+        sex_group_female="f",
+        sex_group_male="m",
+        age_col="age_group",
+        age_group_mapping=AGE_GROUPS_RANGES,
+    )
+
+    tb_age["best_rate"] = (tb_age["best"].div(tb_age["population"]).replace(np.inf, np.nan)) * 100000
+    tb_age["low_rate"] = (tb_age["lo"].div(tb_age["population"]).replace(np.inf, np.nan)) * 100000
+    tb_age["high_rate"] = (tb_age["hi"].div(tb_age["population"]).replace(np.inf, np.nan)) * 100000
+
+    return tb_age
