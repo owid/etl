@@ -85,7 +85,7 @@ def run(dest_dir: str) -> None:
     tb_yields = tb_yields.rename(columns=COLUMNS, errors="raise")
 
     # Combine both tables.
-    tb = pd.merge(tb_yields, tb_mueller.drop(columns=["year"]), on=["country"], how="inner")
+    tb = pd.merge(tb_yields, tb_mueller.drop(columns=["year"]), on=["country"], how="outer")
 
     # Set an appropriate index and sort conveniently.
     tb = tb.set_index(["country", "year"], verify_integrity=True).sort_index()
