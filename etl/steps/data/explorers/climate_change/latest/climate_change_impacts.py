@@ -19,17 +19,26 @@ def run(dest_dir: str) -> None:
     #
     # Load inputs.
     #
-    # Load dataset of GISS surface temperature analysis, and read monthly data.
+    # Load GISS dataset surface temperature analysis, and read monthly data.
     ds_giss = paths.load_dataset("surface_temperature_analysis")
     tb_giss = ds_giss["surface_temperature_analysis"].reset_index()
+
+    # Load NSIDC dataset of sea ice index.
+    ds_nsidc = paths.load_dataset("sea_ice_index")
+    tb_nsidc = ds_nsidc["sea_ice_index"].reset_index()
 
     #
     # Process data.
     #
     # Combine monthly data from different tables.
     # NOTE: For now, use only the existing data from GISS.
-    tb_monthly = tb_giss.copy()
-    tb_monthly.metadata.short_name = "climate_change_impacts_monthly"
+    tb_monthly = tb_giss.merge(
+        tb_nsidc,
+        how="outer",
+        on=["location", "date"],
+        validate="one_to_one",
+        short_name="climate_change_impacts_monthly",
+    )
 
     # Create table of annual data.
     # tb_annual = resample_monthly_to_yearly_data(tb_monthly)
