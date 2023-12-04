@@ -174,7 +174,8 @@ def calculate_incidence_rates(tb: Table) -> Table:
 
     tb = pr.concat([tb_pop, tb_no_pop], axis=0, ignore_index=True, short_name=paths.short_name)
 
-    tb_abs = tb[["country", "year", "sex", "age_group", "risk_factor", "best", "lo", "hi"]]
+    # Pulling out the absolute values and the rates into two separate tables and dropping the rows where the rates are NA
+    tb_abs = tb[["country", "year", "sex", "age_group", "risk_factor", "best", "lo", "hi"]].dropna(subset=["best"])
     tb_rate = tb[["country", "year", "sex", "age_group", "risk_factor", "best_rate", "low_rate", "high_rate"]].dropna(
         subset=["best_rate"]
     )
