@@ -2,8 +2,8 @@ meta:
   source:
     name: Unknown
     source_data_url: 
-      gAAAAABlakM5jMsg05MwqUCeayD-hIgY1p8W3UtziZ67qNcLYHqGHbTvempi7VQRXrS4_To1fRN61QeyGx6fjQlrmiVMs6nbFYwbgtQFbcFHvFShDWXIO6ZGh55RmoYI7pTGUTOla3na-a__gCwIVmiWF_9kWVinxoWehd6aHEIJNjsSQZNHNDvOgMV4AHK_jAMvHPQ-BqDpumgwCIDb_7gwyNtEdYjGA2Kw0cy8ywwHkhbxbn3tZ26xlzPArdtssYlrzE7Rquyn
-    date_accessed: '2023-12-01'
+      gAAAAABlbZjgOz9qSRSTLZSHJ6F6xoHyCuM6IdLtrVQ4vKB6LWBJIXRgnt23E3v1EEtX4vl5guF-ZB9FvfeYAa8WzL7OSu7xh66Or8uXgaAe1FnVFBX1gYKjKeHPD74S4vs3c5xs2LMfg-lEX8RhQLQD8gdHkZOaAL0fFj3ivg1azCQeWfM_1qidNxXW8DGGEzbZiPsI9upAI4VD7kptXgqTdRJWuCDvCVbo4pCFfa55Av3HG6n6qYafB55Dn9N6UBnt14eStLD0
+    date_accessed: '2023-12-04'
     publication_year: 2023
     published_by: Unknown
   name: War Deaths by War — Project Mars
@@ -13,6 +13,6 @@ meta:
   is_public: false
 wdir: ../../../data/snapshots/fasttrack/latest
 outs:
-- md5: 1216d5fc24b9763755c9474d4a24df92
-  size: 12739
+- md5: afe30cae07d25dedcbbcadf95388aee4
+  size: 12738
   path: war_deaths_by_war_mars.csv
