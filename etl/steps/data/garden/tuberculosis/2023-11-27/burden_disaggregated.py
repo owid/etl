@@ -117,7 +117,7 @@ def add_region_sum_aggregates(tb: Table, ds_regions: Dataset, ds_income_groups: 
                 ds_regions=ds_regions,
                 ds_income_groups=ds_income_groups,
             )
-            gr_cal = gr[["country", "year", "best", "lo", "hi"]]
+            gr_cal = gr[["country", "year", "best", "lo", "hi", "population"]]
             # Add region aggregates.
             gr_reg = geo.add_region_aggregates(
                 df=gr_cal,

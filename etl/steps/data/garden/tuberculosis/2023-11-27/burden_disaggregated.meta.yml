@@ -98,7 +98,7 @@ tables:
           title_public: |-
             {definitions.indicator.presentation_title_rate}
           title_variant: best estimate
-      lo_rate:
+      low_rate:
         title: |-
           Low estimate: {definitions.indicator.presentation_title_rate}
         description_short: |-
@@ -108,7 +108,7 @@ tables:
           title_public: |-
             {definitions.indicator.presentation_title_rate}
           title_variant: low estimate
-      hi_rate:
+      high_rate:
         title: |-
           High estimate: {definitions.indicator.presentation_title_rate}
         description_short: |-
