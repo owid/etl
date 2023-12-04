@@ -1,6 +1,8 @@
-TODO - improve docs
-
 ## Data Manager Workflow
+
+Dedicated staging servers are automatically created from every ETL pull request. That gives data manager the ability to share and test their changes before they are merged into the live site.
+
+Once the PR is ready, data manager should merge it into master, wait for deploy process to run ETL with their updates and then migrate all charts to the live site. This has to be done within 24 hours after the PR is merged, then the staging server will be destroyed.
 
 ```mermaid
 sequenceDiagram
@@ -20,6 +22,8 @@ sequenceDiagram
 ```
 
 ## Staging Sync Workflow
+
+Once the work is merged, data manager should run `etl-staging-sync` to migrate all charts to the live site. This command will sync all charts from staging to live as either draft charts or revisions.
 
 ```mermaid
 sequenceDiagram
@@ -46,3 +50,5 @@ sequenceDiagram
     UpdatedChart->>PublishedChart: Updates with approved revision on staging are applied directly (with --approve-revisions flag)
     Note over UpdatedChart, PublishedChart: Submit revision if chart has been modified on live
 ```
+
+!!! info "Run `etl-staging-sync --help` for more details"

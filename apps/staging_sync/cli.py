@@ -183,7 +183,7 @@ def cli(
                         print(
                             f"[bold red]WARNING[/bold red]: [bright_cyan]Chart [bold]{target_chart.config['slug']}[/bold] has been modified in target[/bright_cyan]"
                         )
-                        print(f"[yellow]\tDifferences from source chart[/yellow]")
+                        print("[yellow]\tDifferences from source chart[/yellow]")
                         print(_chart_config_diff(target_chart.config, existing_chart.config))
                         print()
 
@@ -224,6 +224,14 @@ def cli(
                             updatedAt=dt.datetime.utcnow(),
                         )
                         if not dry_run:
+                            # delete previously submitted revisions
+                            (
+                                target_session.query(gm.SuggestedChartRevisions)
+                                .filter_by(chartId=existing_chart.id, status="pending", createdBy=int(GRAPHER_USER_ID))  # type: ignore
+                                .filter(gm.SuggestedChartRevisions.createdAt > staging_created_at)
+                                .delete()
+                            )
+
                             try:
                                 target_session.add(chart_revision)
                                 target_session.commit()
@@ -318,7 +326,7 @@ def _prune_chart_config(config: Dict[str, Any]) -> Dict[str, Any]:
 
 
 def _chart_config_diff(source_config: Dict[str, Any], target_config: Dict[str, Any]) -> str:
-    return _dict_diff(_prune_chart_config(source_config), _prune_chart_config(target_config), tabs=1)
+    return _dict_diff(_prune_chart_config(source_config), _prune_chart_config(target_config), tabs=1, width=500)
 
 
 def _charts_configs_are_equal(config_1, config_2):
