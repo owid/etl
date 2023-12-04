@@ -23,21 +23,6 @@ definitions:
         url_main: http://v-dem.net/vdemds.html
         date_accessed: '2023-03-02'
         date_published: '2023-03-02'
-    presentation:
-      attribution_short: V-Dem
-      topic_tags:
-        - Democracy
-      faqs:
-        - fragment_id: vdem-characteristics
-          gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
-        - fragment_id: vdem-scoring
-          gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
-        - fragment_id: vdem-coverage
-          gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
-        - fragment_id: vdem-measured
-          gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
-        - fragment_id: vdem-more-info
-          gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
     processing_level: major
 
 tables:
@@ -73,6 +58,20 @@ tables:
 
           All code and data is available [on GitHub](https://github.com/owid/notebooks/tree/main/BastianHerre/democracy).
         presentation:
+          attribution_short: V-Dem
+          topic_tags:
+            - Democracy
+          faqs:
+            - fragment_id: vdem-characteristics
+              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+            - fragment_id: vdem-scoring
+              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+            - fragment_id: vdem-coverage
+              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+            - fragment_id: vdem-measured
+              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+            - fragment_id: vdem-more-info
+              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
           grapher_config:
             title: Electoral democracy index
             subtitle: >-
@@ -116,81 +115,163 @@ tables:
             selectedFacetStrategy: entity
             $schema: https://files.ourworldindata.org/schemas/grapher-schema.003.json
 
-      civ_libs_vdem_owid:
-        title: civ_libs_vdem_owid
-        description_short: Based on the expert assessments and index by [V-Dem](#dod:v-dem). It captures the extent to which people are free from government torture, political killings, and forced labor; they have property rights; and enjoy the freedoms of movement, religion, expression, and association. The variable ranges from 0 to 1 (most rights).
-        description_key:
-          - TBD - List of key pieces of information about the indicator.
-        description_from_producer: TBD - Indicator's description given by the producer
-        description_processing: TBD - Indicator's processing description
-        description: "The variable denotes the central estimate of the extent to which people are free from government torture, political killings, and forced labor, they have property rights, and enjoy the freedoms of movement, religion, expression, and association.\n\nIt is based on the V-Dem variable v2x_civlib and we expand it to cover more years for some countries.\n\nThe variable ranges from 0 to 1 (most rights)."
-        presentation:
-          title_public: TBD - Indicator title to be shown in data pages, that overrides the indicator's title.
-          title_variant: TBD - Indicator's title variant
-          grapher_config:
-            title: Human rights index
-            subtitle: Based on the expert assessments and index by [V-Dem](#dod:v-dem). It captures the extent to which people are free from government torture, political killings, and forced labor; they have property rights; and enjoy the freedoms of movement, religion, expression, and association. The variable ranges from 0 to 1 (most rights).
-            originUrl: https://ourworldindata.org/human-rights
-            hasMapTab: true
-            tab: map
-            addCountryMode: change-country
-            yAxis:
-              max: 1
-              min: 0
-              facetDomain: shared
-            selectedFacetStrategy: entity
-            hideAnnotationFieldsInTitle:
-              time: true
-            relatedQuestions:
-              - url: https://ourworldindata.org/vdem-human-rights-data
-                text: "The 'Varieties of Democracy' data: how do researchers measure human rights?"
-            map:
-              time: latest
-              colorScale:
-                baseColorScheme: YlGnBu
-                binningStrategy: manual
-                customNumericColors:
-                  - '#9f0026'
-                  - '#e31a1c'
-                  - '#fd8d3c'
-                  - '#fed976'
-                  - '#ffeda0'
-                  - '#edf8b1'
-                  - '#c7e9b4'
-                  - '#41b6c4'
-                  - '#225ea8'
-                  - '#172976'
-                customNumericValues:
-                  - 0.1
-                  - 0.2
-                  - 0.3
-                  - 0.4
-                  - 0.5
-                  - 0.6
-                  - 0.7
-                  - 0.8
-                  - 0.9
-                  - 1
-            selectedEntityNames:
-              - Argentina
-              - Australia
-              - Botswana
-              - China
-              - World
-            $schema: https://files.ourworldindata.org/schemas/grapher-schema.003.json
+      # civ_libs_vdem_owid:
+      #   title: civ_libs_vdem_owid
+      #   description_short: Based on the expert assessments and index by [V-Dem](#dod:v-dem). It captures the extent to which people are free from government torture, political killings, and forced labor; they have property rights; and enjoy the freedoms of movement, religion, expression, and association. The variable ranges from 0 to 1 (most rights).
+      #   description_key:
+      #     - TBD - List of key pieces of information about the indicator.
+      #   description_from_producer: TBD - Indicator's description given by the producer
+      #   description_processing: TBD - Indicator's processing description
+      #   description: "The variable denotes the central estimate of the extent to which people are free from government torture, political killings, and forced labor, they have property rights, and enjoy the freedoms of movement, religion, expression, and association.\n\nIt is based on the V-Dem variable v2x_civlib and we expand it to cover more years for some countries.\n\nThe variable ranges from 0 to 1 (most rights)."
+      #   presentation:
+      #     title_public: TBD - Indicator title to be shown in data pages, that overrides the indicator's title.
+      #     title_variant: TBD - Indicator's title variant
+      #     grapher_config:
+      #       title: Human rights index
+      #       subtitle: Based on the expert assessments and index by [V-Dem](#dod:v-dem). It captures the extent to which people are free from government torture, political killings, and forced labor; they have property rights; and enjoy the freedoms of movement, religion, expression, and association. The variable ranges from 0 to 1 (most rights).
+      #       originUrl: https://ourworldindata.org/human-rights
+      #       hasMapTab: true
+      #       tab: map
+      #       addCountryMode: change-country
+      #       yAxis:
+      #         max: 1
+      #         min: 0
+      #         facetDomain: shared
+      #       selectedFacetStrategy: entity
+      #       hideAnnotationFieldsInTitle:
+      #         time: true
+      #       relatedQuestions:
+      #         - url: https://ourworldindata.org/vdem-human-rights-data
+      #           text: "The 'Varieties of Democracy' data: how do researchers measure human rights?"
+      #       map:
+      #         time: latest
+      #         colorScale:
+      #           baseColorScheme: YlGnBu
+      #           binningStrategy: manual
+      #           customNumericColors:
+      #             - '#9f0026'
+      #             - '#e31a1c'
+      #             - '#fd8d3c'
+      #             - '#fed976'
+      #             - '#ffeda0'
+      #             - '#edf8b1'
+      #             - '#c7e9b4'
+      #             - '#41b6c4'
+      #             - '#225ea8'
+      #             - '#172976'
+      #           customNumericValues:
+      #             - 0.1
+      #             - 0.2
+      #             - 0.3
+      #             - 0.4
+      #             - 0.5
+      #             - 0.6
+      #             - 0.7
+      #             - 0.8
+      #             - 0.9
+      #             - 1
+      #       selectedEntityNames:
+      #         - Argentina
+      #         - Australia
+      #         - Botswana
+      #         - China
+      #         - World
+      #       $schema: https://files.ourworldindata.org/schemas/grapher-schema.003.json
       regime_row_owid:
-        title: regime_row_owid
+        title: Political regime
         display:
           name: Political regime
-        description_short: Based on the criteria of the classification by Lührmann et al. (2018) and the assessment by [V-Dem](#dod:v-dem)’s experts.
+        description_short: Identifies the political regime of a country by distinguishing between closed autocracies, electoral autocracies, electoral democracies, and liberal democracies.
         description_key:
-          - TBD - List of key pieces of information about the indicator.
-        description_from_producer: TBD - Indicator's description given by the producer
-        description_processing: TBD - Indicator's processing description
-        description: "The variable identifies the political regime of a country using the Regimes of the World classification by political scientists Anna Lührmann, Marcus Tannenberg and Staffan Lindberg. It distinguishes between closed autocracies (score 0), electoral autocracies (score 1), electoral democracies (score 2), and liberal democracies (score 3).\n\nIn closed autocracies, citizens do not have the right to either choose the chief executive of the government or the legislature through multi-party elections.\n\nIn electoral autocracies, citizens have the right to choose the chief executive and the legislature through multi-party elections; but they lack some freedoms, such as the freedoms of association or expression, that make the elections meaningful, free, and fair.\n\nIn electoral democracies, citizens have the right to participate in meaningful, free and fair, and multi-party elections.\n\nIn liberal democracies, citizens have further individual and minority rights, are equal before the law, and the actions of the executive are constrained by the legislative and the courts."
+          - The indicator uses the Regimes of the World classification by political scientists Anna Lührmann, Marcus Tannenberg and Staffan Lindberg.
+          - The classification distinguishes between closed autocracies (score 0), electoral autocracies (score 1), electoral democracies (score 2), and liberal democracies (score 3).
+          - In _closed autocracies_, citizens do not have the right to either choose the chief executive of the government or the legislature through multi-party elections.
+          - In _electoral autocracies_, citizens have the right to choose the chief executive and the legislature through multi-party elections; but they lack some freedoms, such as the freedoms of association or expression, that make the elections meaningful, free, and fair.
+          - In _electoral democracies_, citizens have the right to participate in meaningful, free and fair, and multi-party elections.
+          - In _liberal demoracies_, citizens have further individual and minority rights, are equal before the law, and the actions of the executive are constrained by the legislative and the courts.
+        description_from_producer: >-
+          How can the political regime overall be classified considering the competitiveness of access to power (polyarchy) as well as liberal principles?
+
+
+          0: Closed autocracy: No multiparty elections for the chief executive or the legislature.
+
+
+          1: Electoral autocracy: De-jure multiparty elections for the chief executive and the
+          legislature, but failing to achieve that elections are free and fair, or de-facto multiparty, or a
+          minimum level of Dahl’s institutional prerequisites of polyarchy as measured by V-Dem’s
+          Electoral Democracy Index (`v2x_polyarchy`).
+
+
+          2: Electoral democracy: De-facto free and fair multiparty elections and a minimum level of
+          Dahl’s institutional prerequisites for polyarchy as measured by V- Dem’s Electoral
+          Democracy Index (`v2x_polyarchy`), but either access to justice, or transparent law
+          enforcement, or liberal principles of respect for personal liberties, rule of law, and judicial as
+          well as legislative constraints on the executive not satisfied as measured by V-Dem’s Liberal
+          Component Index (`v2x_liberal`).
+
+
+          3: Liberal democracy: De-facto free and fair multiparty elections and a minimum level of
+          Dahl’s institutional prerequisites for polyarchy as measured by V- Dem’s Electoral
+          Democracy Index (`v2x_polyarchy`) are guaranteed as well as access to justice, transparent
+          law enforcement and the liberal principles of respect for personal liberties, rule of law, and
+          judicial as well as legislative constraints on the executive satisfied as measured by V-Dem’s
+          Liberal Component Index (`v2x_liberal`).
+
+
+          Electoral democracies score above 2 on the indicators for multi–party
+          (`v2elmulpar_osp`) and free and fair elections (`v2elfrfair_osp`), as well as above 0.5 on the
+          Electoral Democracy Index (`v2x_polyarchy`). Liberal democracy meets the criteria for
+          Electoral democracy but also satisfy the liberal dimensions by a score above 0.8 on the
+          V–Dem Liberal Component index (`v2x_liberal`), as well as a score above 3 on transparent
+          law enforcement (`v2cltrnslw_osp`), access to justice for men (`v2clacjstm_osp`) and women
+          (`v2clacjstw_osp`). Electoral autocracies fail to meet one or more of the above–mentioned
+          criteria of electoral democracies, but subject the chief executive and the legislature to de–jure
+          multiparty elections as indicated by a score above 1 on the V–Dem multiparty elections
+          indicator (`v2elmulpar_osp`). Closed autocracy if either no multiparty elections for the
+          legislature take place (`v2xlg_elecreg == 0`) or the chief executive is not elected in direct or
+          indirect multiparty elections. To identify whether this is the case, we take into account if
+          there is no basic multiparty competition in elections (v2elmulpar_osp < 1) and the relative
+          power of the Head of State (HoS) and the Head of Government (HoG) as well as the
+          appointment procedures. The V–Dem variable `v2ex_hosw` identifies if the HoS (`v2ex_hosw`
+          > 0.5) or HoG (`v2ex_hosw` < or equal to 0.5) is the chief executive. If the HoG is the chief
+          executive, the variable `v2expathhg` indicates whether the HoG is directly (8) or indirectly (7)
+          elected or appointed by the HoS (6). In the first case, we consider whether executive elections
+          (`v2xex_elecreg == 0`) take place, in the second case whether legislative elections take place
+          (`v2xlg_elecreg == 0`) and in the third case how HoS is selected as follows. The variable
+          `v2expathhs` indicates whether the HoS is directly (7) or indirectly (6) elected. Thus, in the
+          first case, we consider whether executive elections (`v2xex_elecreg`) take place, in the second
+          case whether legislative elections take place and the legislature approves on HoG
+          (`v2xlg_elecreg == 0` and `v2exaphog == 0`). This also applies for the cases if the HoS is the
+          chief executive.
+
+
+          [Text from [V-Dem Codebook v13](https://www.v-dem.net/documents/24/codebook_v13.pdf)]
+        description_processing: |-
+          We ingested the original data from the [V-Dem project website](https://v-dem.net/data/the-v-dem-dataset/) and processed it with Stata.
+
+          We expanded the years and countries covered by V-Dem. To include more of the period when current countries were still non-sovereign territories, we identified the historical entity they were a part of and used that regime’s data whenever available.
+
+          For example, V-Dem only provides regime data since Bangladesh’s independence in 1971. There is, however, regime data for Pakistan and the colony of India, both of which the current territory of Bangladesh was a part. We, therefore, use the regime data of Pakistan for Bangladesh from 1947 to 1970, and the regime data of India from 1789 to 1946. We did so for all countries with a past or current population of more than one million.
+
+          Finally, we make some additional minor changes to the coding rules. The two most consequential changes we make relate to RoW’s identification of whether a country’s chief executive is elected. One way RoW considers a chief executive to have been elected — even if they are not directly elected or appointed by the legislature — is if they are the head of state, they depend on the approval of the legislature, and there were multi-party elections for the executive. This last part is likely a coding error because to be consistent with RoW's other definitions, this should depend on multi-party legislative, not executive, elections. Only if the legislature has been chosen in multi-party elections does it make an otherwise unelected chief executive—who must be approved by that legislature—dependent on multi-party elections. We correct this error. Furthermore, RoW considers a chief executive to have been elected if the country had chosen both its legislature and executive in multi-party elections. But this considers some chief executives as elected even if they came to power through force after elections were previously held. Examples include the coup d’états led by Fulgencio Batista in Cuba in 1952 and by Muhammadu Buhari in Nigeria in 1983. We instead consider such chief executives as unelected.
+
+          All code and data is available [on GitHub](https://github.com/owid/notebooks/tree/main/BastianHerre/democracy).
         presentation:
-          title_public: TBD - Indicator title to be shown in data pages, that overrides the indicator's title.
-          title_variant: TBD - Indicator's title variant
+          title_public: Political regime
+          attribution_short: Regimes of the World
+          topic_tags:
+            - Democracy
+          faqs:
+            - fragment_id: row-characteristics
+              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+            - fragment_id: row-scoring
+              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+            - fragment_id: row-coverage
+              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+            - fragment_id: row-measured
+              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+            - fragment_id: row-more-info
+              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
           grapher_config:
             title: Political regime
             subtitle: Based on the criteria of the classification by Lührmann et al. (2018) and the assessment by [V-Dem](#dod:v-dem)’s experts.
@@ -199,7 +280,6 @@ tables:
             hasMapTab: true
             tab: map
             yAxis:
-              max: 0
               min: 0
               facetDomain: shared
             selectedFacetStrategy: entity
@@ -208,8 +288,8 @@ tables:
               entity: true
               changeInPrefix: true
             relatedQuestions:
-              - url: https://ourworldindata.org/regimes-of-the-world-data
-                text: "The 'Regimes of the World' data: how do researchers measure democracy?"
+              - url: https://ourworldindata.org/grapher/political-regime#faqs
+                text: "FAQs on this data"
             map:
               time: latest
               colorScale:
@@ -230,7 +310,6 @@ tables:
                   - 1
                   - 2
                   - 3
-              columnSlug: '164988'
               tooltipUseCustomLabels: true
             selectedEntityNames:
               - Argentina
