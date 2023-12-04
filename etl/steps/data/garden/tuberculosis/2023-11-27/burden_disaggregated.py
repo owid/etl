@@ -1,5 +1,8 @@
 """Load a meadow dataset and create a garden dataset."""
 
+from owid.catalog import Table
+from owid.catalog import processing as pr
+
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
 
@@ -20,10 +23,9 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
-    tb = geo.harmonize_countries(
-        df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
-    )
+    tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
     tb = tb.drop(columns=["measure", "unit"])
+    tb = combining_sexes_for_all_age_groups(tb)
     tb = tb.set_index(["country", "year", "age_group", "sex", "risk_factor"], verify_integrity=True)
 
     #
@@ -36,3 +38,19 @@ def run(dest_dir: str) -> None:
 
     # Save changes in the new garden dataset.
     ds_garden.save()
+
+
+def combining_sexes_for_all_age_groups(tb: Table) -> Table:
+    """
+    Not all of the age-groups provided by the WHO have a value for both sexes, so we need to combine values for males and females to calculate these.
+    """
+
+    tb["age_group"] = tb["age_group"].astype("str")
+    age_groups_with_both_sexes = tb[tb["sex"] == "a"]["age_group"].drop_duplicates().to_list()
+    msk = tb["age_group"].isin(age_groups_with_both_sexes)
+    tb_age = tb[~msk]
+    tb_gr = tb_age.groupby(["country", "year", "age_group", "risk_factor"]).sum().reset_index()
+
+    tb = pr.concat([tb, tb_gr], axis=0, ignore_index=True, copy=False)
+
+    return tb

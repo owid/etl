@@ -7,6 +7,7 @@ definitions:
         - Causes of Death
     display:
       numDecimalPlaces: 0
+    processing_level: minor
   sex: |-
     <% if sex == "a" %>males and females<% elif sex == "m" %>males <% elif sex == "f" %>females <%- endif -%>
   age_group: |-
@@ -15,6 +16,16 @@ definitions:
     <% if risk_factor == "all" %><% elif risk_factor == "alc" %>harmful use of alcohol<% elif risk_factor == "smoking" %>smoking<% elif risk_factor == "dia" %>diabetes<% elif risk_factor == "und" %>undernourishment<% elif risk_factor == "hiv" %>HIV infection<% endif -%>
   indicator:
     presentation_title: |-
+      <% if risk_factor != "all" and age_group == "all" %>
+      Tuberculosis incidence attributed to {definitions.risk_factor} in {definitions.sex}
+      <% elif risk_factor != "all" and age_group != "all" %>
+      Tuberculosis incidence attributed to {definitions.risk_factor} in {definitions.sex} aged {definitions.age_group}
+      <% elif risk_factor == "all" and age_group == "all" %>
+      Tuberculosis incidence in {definitions.sex}
+      <% elif risk_factor == "all" and age_group != "all" %>
+      Tuberculosis incidence in {definitions.sex} aged {definitions.age_group}
+      <%- endif -%>
+    description_short: |-
       <% if risk_factor != "all" and age_group == "all" %>
       The estimated incidence of tuberculosis cases attributed to {definitions.risk_factor} in {definitions.sex}.
       <% elif risk_factor != "all" and age_group != "all" %>
@@ -31,7 +42,7 @@ tables:
         title: |-
           Best estimate: {definitions.indicator.presentation_title}
         description_short: |-
-          {definitions.indicator.presentation_title}
+          {definitions.indicator.description_short}.
         unit: cases
         presentation:
           title_public: |-
@@ -41,7 +52,7 @@ tables:
         title: |-
           Low estimate: {definitions.indicator.presentation_title}
         description_short: |-
-          {definitions.indicator.presentation_title}
+          {definitions.indicator.presentation_title}.
         unit: cases
         presentation:
           title_public: |-
@@ -51,7 +62,7 @@ tables:
         title: |-
           High estimate: {definitions.indicator.presentation_title}
         description_short: |-
-          {definitions.indicator.presentation_title}
+          {definitions.indicator.presentation_title}.
         unit: cases
         presentation:
           title_public: |-
