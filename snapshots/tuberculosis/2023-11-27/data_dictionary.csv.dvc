@@ -1,0 +1,32 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/origin/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Global tuberculosis report
+    description: |-
+      WHO has published a global tuberculosis (TB) report every year since 1997. The report provides a comprehensive and up-to-date assessment of the TB epidemic, and of progress in prevention, diagnosis and treatment of the disease at global, regional and country levels.
+    date_published: 2023-11-07
+    title_snapshot: Global tuberculosis report - data dictionary
+
+    # Citation
+    producer: WHO
+    citation_full: |-
+      Global tuberculosis report 2023. Geneva: World Health Organization; 2023. Licence: CC BY-NC-SA 3.0 IGO
+    attribution_short: WHO
+
+    # Files
+    url_main: https://www.who.int/teams/global-tuberculosis-programme/data
+    url_download: https://extranet.who.int/tme/generateCSV.asp?ds=dictionary
+    date_accessed: 2023-11-27
+
+    # License
+    license:
+      name: CC BY-NC-SA 3.0 IGO
+      url: https://creativecommons.org/licenses/by-nc-sa/3.0/igo/
+
+wdir: ../../../data/snapshots/tuberculosis/2023-11-27
+outs:
+- md5: 448a7b668c0234746af432350682792b
+  size: 97992
+  path: data_dictionary.csv
