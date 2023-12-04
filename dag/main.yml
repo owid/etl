@@ -727,6 +727,13 @@ steps:
     - data://garden/un/2023-01-24/un_sdg
 
   ######################################################################################################################
+  # Map (Natural Earth)
+  data://meadow/geography/2023-11-28/nat_earth_110:
+    - snapshot://geography/2023-11-28/nat_earth_110.zip
+  data://garden/geography/2023-11-28/nat_earth_110:
+    - data://meadow/geography/2023-11-28/nat_earth_110
+
+  ######################################################################################################################
 
 include:
   - dag/open_numbers.yml
