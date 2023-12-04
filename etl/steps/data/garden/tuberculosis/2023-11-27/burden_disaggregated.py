@@ -87,8 +87,16 @@ def combining_sexes_for_all_age_groups(tb: Table) -> Table:
     age_groups_with_both_sexes = tb[tb["sex"] == "a"]["age_group"].drop_duplicates().to_list()
     msk = tb["age_group"].isin(age_groups_with_both_sexes)
     tb_age = tb[~msk]
-    tb_gr = tb_age.groupby(["country", "year", "age_group", "risk_factor"]).sum(numeric_only=True).reset_index()
-
+    tb_gr = (
+        tb_age.groupby(["country", "year", "age_group", "risk_factor"], dropna=False)[
+            ["best", "lo", "hi", "population"]
+        ]
+        .sum()
+        .reset_index()
+    )
+    tb_gr["sex"] = "a"
+    # Set population to nan for rows where the risk factor is not "all"
+    tb_gr.loc[tb_gr["risk_factor"] != "all", "population"] = np.nan
     tb = pr.concat([tb, tb_gr], axis=0, ignore_index=True, short_name=paths.short_name)
 
     return tb
@@ -132,10 +140,12 @@ def add_region_sum_aggregates(tb: Table, ds_regions: Dataset, ds_income_groups: 
 
 def add_population_column(tb: Table) -> Table:
     """
-    Adding the population for each age-group.
+    Adding the population for each age-group, in rows where the risk factor is "all".
     """
-    tb_age = add_population(
-        df=tb,
+    tb_pop = tb[tb["risk_factor"] == "all"]
+    tb_no_pop = tb[tb["risk_factor"] != "all"]
+    tb_pop = add_population(
+        df=tb_pop,
         country_col="country",
         year_col="year",
         sex_col="sex",
@@ -145,17 +155,21 @@ def add_population_column(tb: Table) -> Table:
         age_col="age_group",
         age_group_mapping=AGE_GROUPS_RANGES,
     )
-    return tb_age
+    tb_no_pop["population"] = np.nan
+    tb = pr.concat([tb_pop, tb_no_pop], axis=0, ignore_index=True, short_name=paths.short_name)
+    return tb
 
 
 def calculate_incidence_rates(tb: Table) -> Table:
     """
     Calculating the incidence rate per 100,000 people for each age-group.
     """
+    tb_pop = tb[tb["risk_factor"] == "all"]
+    tb_no_pop = tb[tb["risk_factor"] != "all"]
+    assert tb_pop["population"].isna().sum() == 0, "There are missing population values."
+    tb_pop["best_rate"] = (tb_pop["best"].div(tb_pop["population"]).replace(np.inf, np.nan)) * 100000
+    tb_pop["low_rate"] = (tb_pop["lo"].div(tb_pop["population"]).replace(np.inf, np.nan)) * 100000
+    tb_pop["high_rate"] = (tb_pop["hi"].div(tb_pop["population"]).replace(np.inf, np.nan)) * 100000
 
-    assert tb["population"].isna().sum() == 0, "There are missing population values."
-    tb["best_rate"] = (tb["best"].div(tb["population"]).replace(np.inf, np.nan)) * 100000
-    tb["low_rate"] = (tb["lo"].div(tb["population"]).replace(np.inf, np.nan)) * 100000
-    tb["high_rate"] = (tb["hi"].div(tb["population"]).replace(np.inf, np.nan)) * 100000
-
+    tb = pr.concat([tb_pop, tb_no_pop], axis=0, ignore_index=True, short_name=paths.short_name)
     return tb
