@@ -158,9 +158,13 @@ def create_dataset(
     ds = catalog.Dataset.create_empty(dest_dir, metadata=default_metadata)
 
     # add tables to dataset
+    used_short_names = set()
     for table in tables:
         if underscore_table:
             table = catalog.utils.underscore_table(table, camel_to_snake=camel_to_snake)
+        if table.metadata.short_name in used_short_names:
+            raise ValueError(f"Table short name `{table.metadata.short_name}` is already in use.")
+        used_short_names.add(table.metadata.short_name)
         ds.add(table, formats=formats)
 
     # set metadata from dest_dir
@@ -190,6 +194,11 @@ def create_dataset(
         # check that we are not using metadata inconsistent with path
         for k, v in match.groupdict().items():
             assert str(getattr(ds.metadata, k)) == v, f"Metadata {k} is inconsistent with path {dest_dir}"
+
+    # another override YAML file with higher priority
+    meta_override_path = get_metadata_path(str(dest_dir)).with_suffix(".override.yml")
+    if meta_override_path.exists():
+        ds.update_metadata(meta_override_path, if_origins_exist=if_origins_exist)
 
     # run grapher checks
     if ds.metadata.channel == "grapher" and run_grapher_checks:

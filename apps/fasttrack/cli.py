@@ -35,7 +35,7 @@ from etl import grapher_model as gm
 from etl.command import main as etl_main
 from etl.compare import diff_print
 from etl.db import get_engine
-from etl.files import apply_black_formatter_to_files, yaml_dump
+from etl.files import apply_ruff_formatter_to_files, yaml_dump
 from etl.metadata_export import metadata_export
 from etl.paths import (
     BASE_DIR,
@@ -535,7 +535,10 @@ def _load_data_and_meta(dummies: dict[str, str]) -> Tuple[Dataset, Optional[Orig
 def _dataset_id(ds_meta: DatasetMeta) -> int:
     with Session(get_engine()) as session:
         ds = gm.Dataset.load_with_path(
-            session, namespace=ds_meta.namespace, short_name=ds_meta.short_name, version=str(ds_meta.version)  # type: ignore
+            session,
+            namespace=ds_meta.namespace,
+            short_name=ds_meta.short_name,
+            version=str(ds_meta.version),  # type: ignore
         )
         assert ds.id
         return ds.id
@@ -770,7 +773,7 @@ def _metadata_diff(fast_import: FasttrackImport) -> bool:
 
 def _commit_and_push(fast_import: FasttrackImport, snapshot_path: Path) -> str:
     """Format generated files, commit them and push to GitHub."""
-    apply_black_formatter_to_files([fast_import.step_path])
+    apply_ruff_formatter_to_files([fast_import.step_path])
 
     repo = Repo(BASE_DIR)
     repo.index.add(

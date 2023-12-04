@@ -44,9 +44,7 @@ def _organize_variants(df: pd.DataFrame) -> pd.DataFrame:
             df.loc[df.year < YEAR_SPLIT].assign(variant="high").astype({"variant": "category"}),
             df.loc[df.year >= YEAR_SPLIT],
         ]
-    ).astype(
-        {"variant": "category"}
-    )  # type: ignore
+    ).astype({"variant": "category"})  # type: ignore
     return df
 
 

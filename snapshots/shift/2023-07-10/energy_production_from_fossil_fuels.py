@@ -378,7 +378,8 @@ def fetch_all_data_for_energy_source(energy_source: str) -> pd.DataFrame:
     for countries_chunk in tqdm(countries_chunks, desc="Subset of countries", file=sys.stdout):
         # Fetch data for current chunk of countries and specified energy source.
         df = fetch_data_for_energy_source_and_a_list_of_countries(
-            energy_source=energy_source, countries=countries_chunk  # type: ignore
+            energy_source=energy_source,
+            countries=countries_chunk,  # type: ignore
         )
         # Wait between consecutive requests.
         sleep(TIME_BETWEEN_QUERIES)

@@ -10,13 +10,11 @@ import re
 import shutil
 import tempfile
 from copy import deepcopy
-from io import StringIO
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Literal, Optional, Type, cast
 
 import jsonref
 import jsonschema
-import ruamel.yaml
 import streamlit as st
 from cookiecutter.main import cookiecutter
 from MySQLdb import OperationalError
@@ -25,7 +23,7 @@ from typing_extensions import Self
 
 from etl import config
 from etl.db import get_connection
-from etl.files import apply_black_formatter_to_files
+from etl.files import apply_ruff_formatter_to_files, ruamel_dump, ruamel_load
 from etl.paths import (
     APPS_DIR,
     BASE_DIR,
@@ -91,33 +89,26 @@ DUMMY_DATA = {
 def add_to_dag(dag: DAG, dag_path: Path = DAG_WIZARD_PATH) -> str:
     """Add dag to dag_path file."""
     with open(dag_path, "r") as f:
-        doc = ruamel.yaml.load(f, Loader=ruamel.yaml.RoundTripLoader)
+        doc = ruamel_load(f)
 
     doc["steps"].update(dag)
 
     with open(dag_path, "w") as f:
-        # Add new step to DAG
-        yml = ruamel.yaml.YAML()
-        yml.indent(mapping=2, sequence=4, offset=2)
-        yml.dump(doc, stream=f)
-        # Get subdag as string
-        with StringIO() as string_stream:
-            yml.dump({"steps": dag}, stream=string_stream)
-            output_str = string_stream.getvalue()
-    return output_str
+        f.write(ruamel_dump(doc))
+
+    # Get subdag as string
+    return ruamel_dump({"steps": dag})
 
 
 def remove_from_dag(step: str, dag_path: Path = DAG_WIZARD_PATH) -> None:
     with open(dag_path, "r") as f:
-        doc = ruamel.yaml.load(f, Loader=ruamel.yaml.RoundTripLoader)
+        doc = ruamel_load(f)
 
     doc["steps"].pop(step, None)
 
     with open(dag_path, "w") as f:
         # Add new step to DAG
-        yml = ruamel.yaml.YAML()
-        yml.indent(mapping=2, sequence=4, offset=2)
-        yml.dump(doc, f)
+        f.write(ruamel_dump(doc))
 
 
 def generate_step(cookiecutter_path: Path, data: Dict[str, Any], target_dir: Path) -> None:
@@ -138,7 +129,7 @@ def generate_step(cookiecutter_path: Path, data: Dict[str, Any], target_dir: Pat
             config_path.unlink()
 
         # Apply black formatter to generated files.
-        apply_black_formatter_to_files(file_paths=list(Path(temp_dir).glob("**/*.py")))
+        apply_ruff_formatter_to_files(file_paths=list(Path(temp_dir).glob("**/*.py")))
 
         shutil.copytree(
             Path(temp_dir),
@@ -371,7 +362,8 @@ class StepForm(BaseModel):
     def to_yaml(self: Self, path: Path) -> None:
         """Export form (metadata) to yaml file."""
         with open(path, "w") as f:
-            ruamel.yaml.dump(self.metadata, f, Dumper=ruamel.yaml.RoundTripDumper)
+            assert self.metadata
+            f.write(ruamel_dump(self.metadata))
 
     def validate_schema(self: Self, schema: Dict[str, Any], ignore_keywords: Optional[List[str]] = None) -> None:
         """Validate form fields against schema.

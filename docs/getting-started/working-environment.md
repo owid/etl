@@ -177,6 +177,31 @@ This will install the project, and then run all CI checks.
 
 If `make test` succeeds, then you should be able to build any dataset you like, including the entire catalog. If it fails, please raise a [Github issue](https://github.com/owid/etl/issues) (if OWID staff, you can also ask using the `#tech-issues` Slack channel).
 
+
+!!! tip
+
+    Speed it up with multiple processes `make -j 4 test`.
+
+
+## VSCode setup
+
+We highly recommended installing the following extension
+
+* [Ruff](https://marketplace.visualstudio.com/items?itemName=charliermarsh.ruff)
+* [YAML](https://marketplace.visualstudio.com/items?itemName=redhat.vscode-yaml)
+
+And adding this to your User `settings.json` (View -> Command Palette -> Preferences: Open User Settings (JSON))
+
+```json
+  "files.associations": {
+    "*.dvc": "yaml"
+  },
+  "yaml.schemas": {
+    "schemas/snapshot-schema.json": "**/*.dvc",
+    "schemas/dataset-schema.json": ["**/*.meta.yml", "**/*.meta.override.yml"]
+  },
+```
+
 ## Project folder
 The project has multiple folders and directories. Let's try to make sense of them.
 

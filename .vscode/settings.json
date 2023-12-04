@@ -13,10 +13,14 @@
     "editor.codeActionsOnSave": {
       "source.organizeImports": true
     },
-    "editor.formatOnType": true,
-    "editor.defaultFormatter": "ms-python.black-formatter"
+    "editor.defaultFormatter": "charliermarsh.ruff"
   },
-  "isort.args": ["--profile", "black"],
+  "flake8.ignorePatterns": [
+    "**/*"
+  ],
+  "pylint.ignorePatterns": [
+    "**/*"
+  ],
   "grammarly.files.include": [
       "**/README.md",
       "**/readme.md",
@@ -76,5 +80,5 @@
   "search.exclude": {
       "etl/steps/archive": true,
       "snapshots/archive": true
-  }
+  },
 }

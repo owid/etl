@@ -29,11 +29,13 @@ import pyarrow
 import pyarrow.parquet as pq
 import rdata
 import structlog
-from owid.repack import repack_frame
 from pandas._typing import FilePath, ReadCsvBuffer, Scalar  # type: ignore
 from pandas.core.series import Series
 from pandas.util._decorators import rewrite_axis_style_signature
 
+from owid.repack import repack_frame
+
+from . import processing_log as pl
 from . import variables
 from .meta import (
     SOURCE_EXISTS_OPTIONS,
@@ -404,19 +406,9 @@ class Table(pd.DataFrame):
                     # variable.
                     # WARNING: This process assumes that all instances of unnamed variable tag correspond to the new
                     #  variable.
-                    variables.update_variable_name(variable=value, name=key)
+                    value.name = key
                 self._fields[key] = value.metadata
-                # TODO: The only reason why we have to check if variables.PROCESSING_LOG is true is the test
-                #   "test_field_access_can_be_typecast". Consider adapting the test and then remove this check.
-                if variables.PROCESSING_LOG and len(value.metadata.processing_log) > 0:
-                    # If a new variable is added to a table, check its last entry in the processing log.
-                    # If the last variable name is different to the name of the new column, add an entry to the log,
-                    # stating that the variable has changed name (from the old to the current one).
-                    last_variable_name = value.metadata.processing_log[-1]["variable"]
-                    if last_variable_name != key:
-                        value.update_log(
-                            parents=[last_variable_name], operation="rename", variable_name=key, inplace=True
-                        )
+                value.update_log(operation="rename", variable=key)
             else:
                 self._fields[key] = VariableMeta()
 
@@ -447,12 +439,22 @@ class Table(pd.DataFrame):
         if inplace:
             new_table = self
         else:
+            assert new_table is not None
             # construct new _fields attribute
             fields = {}
             for old_col, new_col in zip(old_cols, new_table.all_columns):
                 fields[new_col] = self._fields[old_col].copy()
 
             new_table._fields = defaultdict(VariableMeta, fields)
+
+        for old_col, new_col in zip(old_cols, new_table.all_columns):
+            # Update processing log.
+            if old_col != new_col:
+                new_table._fields[new_col].processing_log.add_entry(
+                    variable=new_col,
+                    parents=[self._fields[old_col]],
+                    operation="rename",
+                )
 
         if inplace:
             return None
@@ -465,15 +467,6 @@ class Table(pd.DataFrame):
             for old_col, new_col in zip(self.columns, value):
                 if old_col in self._fields:
                     self._fields[new_col] = self._fields.pop(old_col)
-
-                # Update processing log.
-                if old_col != new_col:
-                    self._fields[new_col].processing_log = variables.add_entry_to_processing_log(
-                        processing_log=self._fields[new_col].processing_log,
-                        variable_name=new_col,
-                        parents=[old_col],
-                        operation="rename",
-                    )
 
         super().__setattr__(name, value)
 
@@ -696,13 +689,16 @@ class Table(pd.DataFrame):
 
         return t
 
-    def dropna(self, *args, **kwargs) -> "Table":
-        tb = super().dropna(*args, **kwargs).copy()
+    def dropna(self, *args, **kwargs) -> Optional["Table"]:
+        tb = super().dropna(*args, **kwargs)
+        # inplace returns None
+        if tb is None:
+            return None
+        tb = tb.copy()
         for column in list(tb.all_columns):
-            tb._fields[column].processing_log = variables.add_entry_to_processing_log(
-                processing_log=tb._fields[column].processing_log,
-                variable_name=column,
-                parents=[column],
+            tb._fields[column].processing_log.add_entry(
+                variable=column,
+                parents=[tb.get_column_or_index(column)],
                 operation="dropna",
             )
 
@@ -714,42 +710,53 @@ class Table(pd.DataFrame):
         parents: Optional[List[Any]] = None,
         variable_names: Optional[List[str]] = None,
         comment: Optional[str] = None,
-        inplace: bool = False,
-    ) -> Optional["Table"]:
-        return update_log(
-            table=self,
-            operation=operation,
-            parents=parents,
-            variable_names=variable_names,
-            comment=comment,
-            inplace=inplace,  # type: ignore
-        )
+    ) -> None:
+        # Append a new entry to the processing log of the required variables.
+        if variable_names is None:
+            # If no variable is specified, assume all (including index columns).
+            variable_names = list(self.all_columns)
+        for column in variable_names:
+            # If parents is not defined, assume the parents are simply the current variable.
+            _parents = parents or [column]
+            # Update (in place) the processing log of current variable.
+            self._fields[column].processing_log.add_entry(
+                variable=column,
+                parents=_parents,
+                operation=operation,
+                comment=comment,
+            )
 
-    def amend_log(
-        self,
-        operation: str,
-        parents: Optional[List[Any]] = None,
-        variable_names: Optional[List[str]] = None,
-        comment: Optional[str] = None,
-        entry_num: Optional[int] = -1,
-        inplace: bool = False,
-    ) -> Optional["Table"]:
-        return amend_log(
-            table=self,
-            operation=operation,
-            parents=parents,
-            variable_names=variable_names,
-            comment=comment,
-            entry_num=entry_num,
-            inplace=inplace,
-        )
+    # TODO: make this work with plog
+    # def amend_log(
+    #     self,
+    #     operation: str,
+    #     parents: Optional[List[Any]] = None,
+    #     variable_names: Optional[List[str]] = None,
+    #     comment: Optional[str] = None,
+    #     entry_num: Optional[int] = -1,
+    #     inplace: bool = False,
+    # ) -> Optional["Table"]:
+    #     return amend_log(
+    #         table=self,
+    #         operation=operation,
+    #         parents=parents,
+    #         variable_names=variable_names,
+    #         comment=comment,
+    #         entry_num=entry_num,
+    #         inplace=inplace,
+    #     )
 
     def sort_values(self, by: str, *args, **kwargs) -> "Table":
         tb = super().sort_values(by=by, *args, **kwargs).copy()
         for column in list(tb.all_columns):
-            tb._fields[column].processing_log = variables.add_entry_to_processing_log(
-                processing_log=tb._fields[column].processing_log, variable_name=column, parents=[by], operation="sort"
-            )
+            if isinstance(by, str):
+                parents = [by, column]
+            else:
+                parents = by + [column]
+
+            parent_variables = [tb.get_column_or_index(parent) for parent in parents]
+
+            tb._fields[column].processing_log.add_entry(variable=column, parents=parent_variables, operation="sort")
 
         return cast("Table", tb)
 
@@ -774,84 +781,72 @@ class Table(pd.DataFrame):
     def assign(self, *args, **kwargs) -> "Table":
         return super().assign(*args, **kwargs)  # type: ignore
 
-    def __add__(self, other: Union[Scalar, Series, variables.Variable]) -> "Table":
-        tb = cast(Table, Table(super().__add__(other=other)).copy_metadata(self))
+    @staticmethod
+    def _update_log(tb: "Table", other: Union[Scalar, Series, variables.Variable, "Table"], operation: str) -> None:
         # The following would have a parents only the scalar, not the scalar and the corresponding variable.
         # tb = update_log(table=tb, operation="+", parents=[other], variable_names=tb.columns)
         # Instead, update the processing log of each variable in the table.
         for column in tb.columns:
-            tb[column] = variables.update_log(
-                variable=tb[column], parents=[column, other], operation="+", variable_name=column
-            )
+            if isinstance(other, pd.DataFrame):
+                parents = [tb[column], other[column]]
+            else:
+                parents = [tb[column], other]
+            tb[column].update_log(parents=parents, operation=operation)
+
+    def __add__(self, other: Union[Scalar, Series, variables.Variable, "Table"]) -> "Table":
+        tb = cast(Table, Table(super().__add__(other=other)).copy_metadata(self))
+        self._update_log(tb, other, "+")
         return tb
 
-    def __iadd__(self, other: Union[Scalar, Series, variables.Variable]) -> "Table":
+    def __iadd__(self, other: Union[Scalar, Series, variables.Variable, "Table"]) -> "Table":
         return self.__add__(other)
 
-    def __sub__(self, other: Union[Scalar, Series, variables.Variable]) -> "Table":
+    def __sub__(self, other: Union[Scalar, Series, variables.Variable, "Table"]) -> "Table":
         tb = cast(Table, Table(super().__sub__(other=other)).copy_metadata(self))
-        for column in tb.columns:
-            tb[column] = variables.update_log(
-                variable=tb[column], parents=[column, other], operation="-", variable_name=column
-            )
+        self._update_log(tb, other, "-")
         return tb
 
-    def __isub__(self, other: Union[Scalar, Series, variables.Variable]) -> "Table":
+    def __isub__(self, other: Union[Scalar, Series, variables.Variable, "Table"]) -> "Table":
         return self.__sub__(other)
 
-    def __mul__(self, other: Union[Scalar, Series, variables.Variable]) -> "Table":
+    def __mul__(self, other: Union[Scalar, Series, variables.Variable, "Table"]) -> "Table":
         tb = cast(Table, Table(super().__mul__(other=other)).copy_metadata(self))
-        for column in tb.columns:
-            tb[column] = variables.update_log(
-                variable=tb[column], parents=[column, other], operation="*", variable_name=column
-            )
+        self._update_log(tb, other, "*")
         return tb
 
-    def __imul__(self, other: Union[Scalar, Series, variables.Variable]) -> "Table":
+    def __imul__(self, other: Union[Scalar, Series, variables.Variable, "Table"]) -> "Table":
         return self.__mul__(other)
 
-    def __truediv__(self, other: Union[Scalar, Series, variables.Variable]) -> "Table":
+    def __truediv__(self, other: Union[Scalar, Series, variables.Variable, "Table"]) -> "Table":
         tb = cast(Table, Table(super().__truediv__(other=other)).copy_metadata(self))
-        for column in tb.columns:
-            tb[column] = variables.update_log(
-                variable=tb[column], parents=[column, other], operation="/", variable_name=column
-            )
+        self._update_log(tb, other, "/")
         return tb
 
-    def __itruediv__(self, other: Union[Scalar, Series, variables.Variable]) -> "Table":
+    def __itruediv__(self, other: Union[Scalar, Series, variables.Variable, "Table"]) -> "Table":
         return self.__truediv__(other)
 
-    def __floordiv__(self, other: Union[Scalar, Series, variables.Variable]) -> "Table":
+    def __floordiv__(self, other: Union[Scalar, Series, variables.Variable, "Table"]) -> "Table":
         tb = cast(Table, Table(super().__floordiv__(other=other)).copy_metadata(self))
-        for column in tb.columns:
-            tb[column] = variables.update_log(
-                variable=tb[column], parents=[column, other], operation="//", variable_name=column
-            )
+        self._update_log(tb, other, "//")
         return tb
 
-    def __ifloordiv__(self, other: Union[Scalar, Series, variables.Variable]) -> "Table":
+    def __ifloordiv__(self, other: Union[Scalar, Series, variables.Variable, "Table"]) -> "Table":
         return self.__floordiv__(other)
 
-    def __mod__(self, other: Union[Scalar, Series, variables.Variable]) -> "Table":
+    def __mod__(self, other: Union[Scalar, Series, variables.Variable, "Table"]) -> "Table":
         tb = cast(Table, Table(super().__mod__(other=other)).copy_metadata(self))
-        for column in tb.columns:
-            tb[column] = variables.update_log(
-                variable=tb[column], parents=[column, other], operation="%", variable_name=column
-            )
+        self._update_log(tb, other, "%")
         return tb
 
-    def __imod__(self, other: Union[Scalar, Series, variables.Variable]) -> "Table":
+    def __imod__(self, other: Union[Scalar, Series, variables.Variable, "Table"]) -> "Table":
         return self.__mod__(other)
 
-    def __pow__(self, other: Union[Scalar, Series, variables.Variable]) -> "Table":
+    def __pow__(self, other: Union[Scalar, Series, variables.Variable, "Table"]) -> "Table":
         tb = cast(Table, Table(super().__pow__(other=other)).copy_metadata(self))
-        for column in tb.columns:
-            tb[column] = variables.update_log(
-                variable=tb[column], parents=[column, other], operation="**", variable_name=column
-            )
+        self._update_log(tb, other, "**")
         return tb
 
-    def __ipow__(self, other: Union[Scalar, Series, variables.Variable]) -> "Table":
+    def __ipow__(self, other: Union[Scalar, Series, variables.Variable, "Table"]) -> "Table":
         return self.__pow__(other)
 
     def sort_index(self, *args, **kwargs) -> "Table":
@@ -863,7 +858,10 @@ class Table(pd.DataFrame):
             by_list = [args[0]] if isinstance(args[0], str) else args[0]
             for by in by_list:
                 if isinstance(by, str):
-                    by_type = self.dtypes[by] if by in self.dtypes else self.index.dtypes[by]  # type: ignore
+                    try:
+                        by_type = self.dtypes[by] if by in self.dtypes else self.index.dtypes[by]  # type: ignore
+                    except AttributeError:
+                        by_type = by
                 elif isinstance(by, pd.Series):
                     by_type = by.dtype
                 else:
@@ -933,7 +931,16 @@ class TableGroupBy:
                     # output is series, e.g. `size` function
                     return df
                 else:
-                    return _create_table(df, self.metadata, self._fields)
+                    tb = _create_table(df, self.metadata, self._fields)
+                    if pl.enabled():
+                        for col in tb.columns:
+                            # parents are grouping columns and grouped one
+                            index_parents = [tb.get_column_or_index(n) for n in tb.index.names]
+                            tb[col].update_log(
+                                operation=f"groupby_{name}",
+                                parents=[tb[col]] + index_parents,
+                            )
+                    return tb
 
             self.__annotations__[name] = Callable[..., "Table"]
             return func
@@ -967,6 +974,15 @@ class TableGroupBy:
         # kwargs rename fields
         for new_col, (col, _) in kwargs.items():
             tb._fields[new_col] = self._fields[col]
+
+        if pl.enabled():
+            for col in tb.columns:
+                # parents are grouping columns and grouped one
+                index_parents = [tb.get_column_or_index("b") for n in tb.index.names]
+                tb[col].update_log(
+                    operation=f"agg_{func}",
+                    parents=[tb[col]] + index_parents,
+                )
 
         return tb
 
@@ -1224,12 +1240,13 @@ def pivot(
         else:
             column_name = column[0]
         variables_to_combine = [data[column_name]]
-        # "column" is a tuple with all column index levels.
+        # variables_to_combine = _extract_variables(data, columns) + _extract_variables(data, values)
+
         # For now, I assume the only metadata we want to propagate is the one of the upper level.
         # Alternatively, we could combine the metadata of the upper level variable with the metadata of the original
         # variable of all subsequent levels.
         column_metadata = variables.combine_variables_metadata(
-            variables=variables_to_combine, operation="pivot", name=column_name
+            variables=variables_to_combine, operation="pivot", name=column
         )
         # Assign metadata of the original variable in the upper level to the new multiindex column.
         # NOTE: This allows accessing the metadata via, e.g. `table[("level_0", "level_1", "level_2")].metadata`,
@@ -1265,7 +1282,7 @@ def _add_table_and_variables_metadata_to_table(
     table: Table, metadata: Optional[TableMeta], origin: Optional[Origin]
 ) -> Table:
     if metadata is not None:
-        table.metadata = metadata
+        table.metadata = metadata.copy()
         for column in list(table.all_columns):
             if origin:
                 table._fields[column].origins = [origin]
@@ -1287,12 +1304,6 @@ def read_csv(
 ) -> Table:
     table = Table(pd.read_csv(filepath_or_buffer=filepath_or_buffer, *args, **kwargs), underscore=underscore)
     table = _add_table_and_variables_metadata_to_table(table=table, metadata=metadata, origin=origin)
-    if isinstance(filepath_or_buffer, (str, Path)):
-        table = update_log(table=table, operation="load", parents=[filepath_or_buffer])
-    else:
-        # NOTE: Currently, the processing log cannot be updated unless you pass a path to read_csv.
-        table = update_log(table=table, operation="load", parents=["unknown"])
-
     return cast(Table, table)
 
 
@@ -1306,11 +1317,6 @@ def read_fwf(
 ) -> Table:
     table = Table(pd.read_fwf(filepath_or_buffer=filepath_or_buffer, *args, **kwargs), underscore=underscore)
     table = _add_table_and_variables_metadata_to_table(table=table, metadata=metadata, origin=origin)
-    if isinstance(filepath_or_buffer, (str, Path)):
-        table = update_log(table=table, operation="load", parents=[filepath_or_buffer])
-    else:
-        log.warning("Currently, the processing log cannot be updated unless you pass a path to read_fwf.")
-
     return cast(Table, table)
 
 
@@ -1324,8 +1330,6 @@ def read_feather(
 ) -> Table:
     table = Table(pd.read_feather(filepath, *args, **kwargs), underscore=underscore)
     table = _add_table_and_variables_metadata_to_table(table=table, metadata=metadata, origin=origin)
-    table = update_log(table=table, operation="load", parents=[filepath])
-
     return cast(Table, table)
 
 
@@ -1339,10 +1343,8 @@ def read_excel(
 ) -> Table:
     assert not isinstance(kwargs.get("sheet_name"), list), "Argument 'sheet_name' must be a string or an integer."
     table = Table(pd.read_excel(io=io, *args, **kwargs), underscore=underscore)
-    table = _add_table_and_variables_metadata_to_table(table=table, metadata=metadata, origin=origin)
     # Note: Maybe we should include the sheet name in parents.
-    table = update_log(table=table, operation="load", parents=[io], inplace=False)
-
+    table = _add_table_and_variables_metadata_to_table(table=table, metadata=metadata, origin=origin)
     return cast(Table, table)
 
 
@@ -1356,9 +1358,6 @@ def read_from_records(
 ):
     table = Table(pd.DataFrame.from_records(data=data, *args, **kwargs), underscore=underscore)
     table = _add_table_and_variables_metadata_to_table(table=table, metadata=metadata, origin=origin)
-    # NOTE: Parents could be passed as arguments, or extracted from metadata.
-    table = update_log(table=table, operation="load", parents=["local_data"], inplace=False)
-
     return table
 
 
@@ -1372,9 +1371,6 @@ def read_from_dict(
 ) -> Table:
     table = Table(pd.DataFrame.from_dict(data=data, *args, **kwargs), underscore=underscore)
     table = _add_table_and_variables_metadata_to_table(table=table, metadata=metadata, origin=origin)
-    # NOTE: Parents could be passed as arguments, or extracted from metadata.
-    table = update_log(table=table, operation="load", parents=["local_data"], inplace=False)
-
     return table
 
 
@@ -1388,11 +1384,6 @@ def read_json(
 ) -> Table:
     table = Table(pd.read_json(path_or_buf=path_or_buf, *args, **kwargs), underscore=underscore)
     table = _add_table_and_variables_metadata_to_table(table=table, metadata=metadata, origin=origin)
-    if isinstance(path_or_buf, (str, Path)):
-        table = update_log(table=table, operation="load", parents=[path_or_buf])
-    else:
-        log.warning("Currently, the processing log cannot be updated unless you pass a path to read_json.")
-
     return cast(Table, table)
 
 
@@ -1406,11 +1397,6 @@ def read_stata(
 ) -> Table:
     table = Table(pd.read_stata(filepath_or_buffer=filepath_or_buffer, *args, **kwargs), underscore=underscore)
     table = _add_table_and_variables_metadata_to_table(table=table, metadata=metadata, origin=origin)
-    if isinstance(filepath_or_buffer, (str, Path)):
-        table = update_log(table=table, operation="load", parents=[filepath_or_buffer])
-    else:
-        log.warning("Currently, the processing log cannot be updated unless you pass a path to read_stata.")
-
     return cast(Table, table)
 
 
@@ -1428,11 +1414,6 @@ def read_rda(
         raise ValueError(f"Table {table_name} not found in RDA file.")
     table = Table(converted[table_name], underscore=underscore)
     table = _add_table_and_variables_metadata_to_table(table=table, metadata=metadata, origin=origin)
-    if isinstance(filepath_or_buffer, (str, Path)):
-        table = update_log(table=table, operation="load", parents=[filepath_or_buffer])
-    else:
-        log.warning("Currently, the processing log cannot be updated unless you pass a path to read_stata.")
-
     return cast(Table, table)
 
 
@@ -1459,9 +1440,6 @@ class ExcelFile(pd.ExcelFile):
         table = Table(df, underscore=underscore, short_name=str(sheet_name))
         if metadata is not None:
             table = _add_table_and_variables_metadata_to_table(table=table, metadata=metadata, origin=origin)
-        # Note: Maybe we should include the sheet name in parents.
-        table = update_log(table=table, operation="load", parents=[self.io], inplace=False)
-
         return table
 
 
@@ -1477,7 +1455,18 @@ def update_processing_logs_when_loading_or_creating_table(table: Table) -> Table
         parents = []
         operation = "create"
 
-    table = _add_processing_log_entry_to_each_variable(table=table, parents=parents, operation=operation)
+    # Add log entries to all columns
+    for column in list(table.all_columns):
+        pl = table._fields[column].processing_log
+
+        # Clear processing log, we're not keeping log from previous channels. It can always be reconstructed
+        # by concatenating processing log of indicators accross channels.
+        pl.clear()
+        pl.add_entry(
+            variable=column,
+            parents=parents,
+            operation=operation,
+        )
 
     return table
 
@@ -1488,29 +1477,15 @@ def update_processing_logs_when_saving_table(table: Table, path: Union[str, Path
     # error, as long as path is a Path.
     path = Path(path)
     uri = "/".join(path.absolute().parts[-5:-1] + tuple([path.stem]))
-    table = _add_processing_log_entry_to_each_variable(table=table, parents=[uri], operation="save")
 
-    return table
-
-
-def _add_processing_log_entry_to_each_variable(
-    table: Table, parents: List[Any], operation: variables.OPERATION
-) -> Table:
     # Add a processing log entry to each column, including index columns.
     for column in list(table.all_columns):
-        # New entry to add to the processing log.
-        # Note: The function add_entry_to_processing_log receives the argument variable_name, but in the processing log,
-        # the entry has the field "variable" (for simplicity).
-        log_new_entry = {"variable_name": column, "parents": parents, "operation": operation}
-
-        if log_new_entry not in table._fields[column].processing_log:
-            # If the processing log is not empty but the last entry is identical to the one we want to insert, skip, to
-            # avoid storing the same entry multiple times.
-            # This happens for example when saving tables, given that tables are stored in different formats.
-            # Otherwise, append a new entry to the processing log.
-            table._fields[column].processing_log = variables.add_entry_to_processing_log(
-                processing_log=table._fields[column].processing_log, **log_new_entry
-            )
+        table._fields[column].processing_log.add_entry(
+            target=uri,
+            parents=[table._fields[column]],
+            operation="save",
+            variable=column,
+        )
 
     return table
 
@@ -1534,92 +1509,38 @@ def copy_metadata(from_table: Table, to_table: Table, deep=False) -> Table:
     return tab
 
 
-@overload
-def update_log(
-    table: Table,
-    operation: str,
-    parents: Optional[List[Any]] = None,
-    variable_names: Optional[List[str]] = None,
-    comment: Optional[str] = None,
-    inplace: Literal[True] = True,
-) -> None:
-    ...
+# TODO: make this work
+# def amend_log(
+#     table: Table,
+#     operation: str,
+#     parents: Optional[List[Any]] = None,
+#     variable_names: Optional[List[str]] = None,
+#     comment: Optional[str] = None,
+#     entry_num: Optional[int] = -1,
+#     inplace: bool = False,
+# ) -> Optional[Table]:
+#     if not inplace:
+#         table = table.copy()
 
+#     # Append a new entry to the processing log of the required variables.
+#     if variable_names is None:
+#         # If no variable is specified, assume all (including index columns).
+#         variable_names = list(table.all_columns)
+#     for column in variable_names:
+#         # If parents is not defined, assume the parents are simply the current variable.
+#         _parents = parents or [column]
+#         # Update (in place) the processing log of current variable.
+#         table._fields[column].processing_log = variables.amend_entry_in_processing_log(
+#             processing_log=table._fields[column].processing_log,
+#             variable_name=column,
+#             parents=_parents,
+#             operation=operation,
+#             comment=comment,
+#             entry_num=entry_num,
+#         )
 
-@overload
-def update_log(
-    table: Table,
-    operation: str,
-    parents: Optional[List[Any]] = None,
-    variable_names: Optional[List[str]] = None,
-    comment: Optional[str] = None,
-    inplace: Literal[False] = False,
-) -> Table:
-    ...
-
-
-def update_log(
-    table: Table,
-    operation: str,
-    parents: Optional[List[Any]] = None,
-    variable_names: Optional[List[str]] = None,
-    comment: Optional[str] = None,
-    inplace: bool = False,
-) -> Optional[Table]:
-    if not inplace:
-        table = table.copy()
-
-    # Append a new entry to the processing log of the required variables.
-    if variable_names is None:
-        # If no variable is specified, assume all (including index columns).
-        variable_names = list(table.all_columns)
-    for column in variable_names:
-        # If parents is not defined, assume the parents are simply the current variable.
-        _parents = parents or [column]
-        # Update (in place) the processing log of current variable.
-        table._fields[column].processing_log = variables.add_entry_to_processing_log(
-            processing_log=table._fields[column].processing_log,
-            variable_name=column,
-            parents=_parents,
-            operation=operation,
-            comment=comment,
-        )
-
-    if not inplace:
-        return table
-
-
-def amend_log(
-    table: Table,
-    operation: str,
-    parents: Optional[List[Any]] = None,
-    variable_names: Optional[List[str]] = None,
-    comment: Optional[str] = None,
-    entry_num: Optional[int] = -1,
-    inplace: bool = False,
-) -> Optional[Table]:
-    if not inplace:
-        table = table.copy()
-
-    # Append a new entry to the processing log of the required variables.
-    if variable_names is None:
-        # If no variable is specified, assume all (including index columns).
-        variable_names = list(table.all_columns)
-    for column in variable_names:
-        # If parents is not defined, assume the parents are simply the current variable.
-        _parents = parents or [column]
-        # Update (in place) the processing log of current variable.
-        table._fields[column].processing_log = variables.amend_entry_in_processing_log(
-            processing_log=table._fields[column].processing_log,
-            variable_name=column,
-            parents=_parents,
-            operation=operation,
-            comment=comment,
-            entry_num=entry_num,
-        )
-
-    if not inplace:
-        return table
+#     if not inplace:
+#         return table
 
 
 def get_unique_sources_from_tables(tables: List[Table]) -> List[Source]:
@@ -1707,3 +1628,11 @@ def _resolve_collisions(
         else:
             raise NotImplementedError()
     return new_cols
+
+
+def _extract_variables(t: Table, cols: Optional[Union[List[str], str]]) -> List[variables.Variable]:
+    if not cols:
+        return []
+    if isinstance(cols, str):
+        cols = [cols]
+    return [t[col] for col in cols]  # type: ignore

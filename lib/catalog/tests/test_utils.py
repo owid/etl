@@ -1,5 +1,6 @@
 import pandas as pd
 import pytest
+
 from owid.catalog import Origin, Table, VariableMeta, VariablePresentationMeta
 from owid.catalog.utils import underscore
 

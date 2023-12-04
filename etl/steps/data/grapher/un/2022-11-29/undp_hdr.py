@@ -1,19 +1,35 @@
-from owid import catalog
+"""Load a garden dataset and create a grapher dataset."""
 
-from etl.helpers import PathFinder
+from etl.helpers import PathFinder, create_dataset, grapher_checks
 
-N = PathFinder(__file__)
+# Get paths and naming conventions for current step.
+paths = PathFinder(__file__)
 
 
 def run(dest_dir: str) -> None:
-    # Initiate grapher dataset
-    dataset = catalog.Dataset.create_empty(dest_dir, N.garden_dataset.metadata)
+    #
+    # Load inputs.
+    #
+    # Load garden dataset.
+    ds_garden = paths.load_dataset("undp_hdr")
 
-    # get table from dataset
-    table = N.garden_dataset["undp_hdr"]
+    # Read table from garden dataset.
+    tb = ds_garden["undp_hdr"]
 
-    # add table to dataset
-    dataset.add(table)
+    #
+    # Process data.
+    #
 
-    # save and exit
-    dataset.save()
+    #
+    # Save outputs.
+    #
+    # Create a new grapher dataset with the same metadata as the garden dataset.
+    ds_grapher = create_dataset(dest_dir, tables=[tb], default_metadata=ds_garden.metadata)
+
+    #
+    # Checks.
+    #
+    grapher_checks(ds_grapher)
+
+    # Save changes in the new grapher dataset.
+    ds_grapher.save()

@@ -13,17 +13,25 @@ definitions:
 
   global:
     life_expectancy:
-      description_short: |-
-        <% if type == "period" %>
-        The average number of years a person is expected to live, based on mortality rates seen across all age groups in a given interval.
-        <% elif type == "cohort" %>
-        The average number of years that individuals born in a given interval actually lived, based on tracking that birth cohort over time.
-        <% endif %>
       point_1: |-
         <% if type == "period" %>
-        This is based on a synthetic cohort created using mortality rates across age groups in a given year.
-        <% elif type == "cohort" %>
-        Rather than waiting for the entire cohort to have died before calculating the cohort life expectancy, researchers may use data from birth cohorts that are 'almost extinct'.
+        Period life expectancy is a metric that summarizes death rates across all age groups in one particular year.
+        <% else %>
+        Cohort life expectancy is the average lifespan of a group of people, usually a birth cohort – people born in the same year.
+        <% endif %>
+      point_2: |-
+        <% if type == "period" %>
+        <% if age == '0' %>
+        For a given year, it represents the average lifespan for a hypothetical group of people, if they experienced the same age-specific death rates throughout their whole lives as the age-specific death rates seen in that particular year.
+        <% else %>
+        For a given year, it represents the remaining average lifespan for a hypothetical group of people, if they experienced the same age-specific death rates throughout the rest of their lives as the age-specific death rates seen in that particular year.
+        <% endif %>
+        <% else %>
+        <% if age == '0' %>
+        It is calculated by tracking individuals from that cohort throughout their lives until death, and calculating their average lifespan.
+        <% else %>
+        It is calculated by tracking individuals from that cohort throughout the rest of their lives until death, and calculating their average remaining lifespan.
+        <% endif %>
         <% endif %>
     data_used: |-
       Prior to 1950, we use HMD (2023) data. From 1950 onwards, we use UN WPP (2022) data.
@@ -49,10 +57,14 @@ tables:
         title: Central death rate
         unit: deaths per 1,000 people
         description_short: |-
-          For a given population or cohort, the central death rate during a given 12 month interval is calculated as the number of deaths during the interval, divided by the number of person-years lived during that interval.
+          The death rate, calculated as the number of deaths divided by the average number of people alive during the interval.
         description_key:
           - |-
-            Person-years refers to the combined total time that a group of people has lived. For example, if 10 people each live for 2 years, they collectively contribute 20 person-years. This makes the value very slightly different from the 'probability of death' during the interval, because the 'probability of death' metric uses a different denominator: the number of people alive at that age at the start of the interval.
+            The death rate is measured using the number of person-years lived during the interval.
+          - |-
+            Person-years refers to the combined total time that a group of people has lived. For example, if 10 people each live for 2 years, they collectively contribute 20 person-years.
+          - |-
+            The death rate is slightly different from the 'probability of death' during the interval, because the 'probability of death' metric uses a different denominator: the number of people alive at that age at the start of the interval, while this indicator uses the average number of people alive during the interval.
           - |-
             {definitions.global.data_used}
         description_processing: |-
@@ -146,16 +158,32 @@ tables:
         short_unit: years
         unit: years
         description_short: |-
-          {definitions.global.life_expectancy.description_short}
+          <% if age == '0' %>
+          <% if sex == 'both' %>
+          The << type >> life expectancy at birth, in a given year.
+          <% else %>
+          The << type >> life expectancy at birth among << sex + 's' >>, in a given year.
+          <% endif %>
+          <% else %>
+          <% if sex == 'both' %>
+          The remaining << type >> life expectancy at age << age >>, in a given year.
+          <% else %>
+          The remaining << type >> life expectancy at age << age >> among << sex + 's' >>, in a given year.
+          <% endif %>
+          <% endif %>
         description_key:
           - |-
-            <% if age == 0 %>
-            Life expectancy at age 0 refers to life expectancy at birth.
-            <% else %>
-            It refers to the remaining life expectancy for people who have already survived to the given age.
-            <% endif %>
-          - |-
             {definitions.global.life_expectancy.point_1}
+          - |-
+            {definitions.global.life_expectancy.point_2}
+          - |-
+            <% if age != '0' %>
+            <% if type == "period" %>
+            This shows the remaining life expectancy among people who have already reached the age << age >>, using death rates from their age group and older age groups.
+            <% else %>
+            This shows the remaining cohort life expectancy of people who have reached the age << age >>.
+            <% endif %>
+            <% endif %>
           - |-
             {definitions.global.data_used}
         display:
@@ -171,17 +199,13 @@ tables:
         short_unit: years
         unit: years
         description_short: |-
-          <% if type == "cohort" %>
-          The difference in cohort life expectancy (females - males) at a given age.
-          <% elif type == "period" %>
-          The difference in period life expectancy (females - males) at a given age.
-          <% endif %>
+          The difference in << type >> life expectancy (females - males) at a given age.
         description_key:
           - Higher values indicate longer life expectancy among females than males.
           - |-
-            {definitions.global.life_expectancy.description_short}
-          - |-
             {definitions.global.life_expectancy.point_1}
+          - |-
+            {definitions.global.life_expectancy.point_2}
           - |-
             {definitions.global.data_used}
         display:
@@ -200,17 +224,13 @@ tables:
         unit: ""
         short_unit: ""
         description_short: |-
-          <% if type == "cohort" %>
-          The ratio of cohort life expectancy (females/males) at a given age.
-          <% elif type == "period" %>
-          The ratio of period life expectancy (females/males) at a given age.
-          <% endif %>
+          The ratio of << type >> life expectancy (females/males) at a given age.
         description_key:
           - Higher values indicate longer life expectancy among females than males.
           - |-
-            {definitions.global.life_expectancy.description_short}
-          - |-
             {definitions.global.life_expectancy.point_1}
+          - |-
+            {definitions.global.life_expectancy.point_2}
           - |-
             {definitions.global.data_used}
         display:

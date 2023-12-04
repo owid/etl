@@ -5,9 +5,6 @@ steps:
 
   data://garden/wb/2023-07-10/education:
   - data://meadow/wb/2023-07-10/education
-  - data://garden/regions/2023-01-01/regions
-  - data://garden/wb/2023-04-30/income_groups
-  - data://garden/owid/latest/key_indicators
   - data://garden/education/2017-09-30/public_expenditure
   - data://garden/education/2018-04-18/literacy_rates
 
@@ -22,7 +19,6 @@ steps:
   data://garden/education/2023-07-17/education_barro_lee_projections:
   - data://meadow/education/2023-07-17/education_barro_lee_projections
   - data://garden/regions/2023-01-01/regions
-  - data://garden/wb/2023-04-30/income_groups
   - data://garden/education/2023-07-17/education_lee_lee
   data://grapher/education/2023-07-17/education_barro_lee_projections:
   - data://garden/education/2023-07-17/education_barro_lee_projections
@@ -35,7 +31,6 @@ steps:
   data://garden/education/2023-07-17/education_lee_lee:
   - data://meadow/education/2023-07-17/education_lee_lee
   - data://garden/regions/2023-01-01/regions
-  - data://garden/wb/2023-04-30/income_groups
   - data://garden/worldbank_wdi/2023-05-29/wdi
   - data://garden/owid/latest/key_indicators
   data://grapher/education/2023-07-17/education_lee_lee:

@@ -433,7 +433,7 @@ def add_variable_metadata(table: Table) -> Table:
             unit=unit,
             short_unit=short_unit,
             display=display,
-            additional_info=None
+            additional_info=None,
             # licenses=[var['license_type']]
         )
 

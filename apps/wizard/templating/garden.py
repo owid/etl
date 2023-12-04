@@ -3,7 +3,6 @@ import os
 from pathlib import Path
 from typing import List, cast
 
-import ruamel.yaml
 import streamlit as st
 from owid.catalog import Dataset
 from st_pages import add_indentation
@@ -12,6 +11,7 @@ from typing_extensions import Self
 import etl.grapher_model as gm
 from apps.wizard import utils
 from etl.db import get_session
+from etl.files import ruamel_dump, ruamel_load
 from etl.paths import BASE_DIR, DAG_DIR, DATA_DIR
 
 #########################################################
@@ -38,6 +38,7 @@ dummy_values = {
 with get_session() as session:
     tag_list = gm.Tag.load_tags(session)
 tag_list = ["Uncategorized"] + sorted([tag.name for tag in tag_list])
+
 
 #########################################################
 # FUNCTIONS & CLASSES ###################################
@@ -121,7 +122,7 @@ def _fill_dummy_metadata_yaml(metadata_path: Path) -> None:
     Only useful when `--dummy-data` is used. We need this to avoid errors in `etl-wizard grapher --dummy-data`.
     """
     with open(metadata_path, "r") as f:
-        doc = ruamel.yaml.load(f, Loader=ruamel.yaml.RoundTripLoader)
+        doc = ruamel_load(f)
 
     # add all available metadata fields to dummy variable
     variable_meta = {
@@ -171,7 +172,7 @@ def _fill_dummy_metadata_yaml(metadata_path: Path) -> None:
     doc["tables"]["dummy"]["variables"] = {"dummy_variable": variable_meta}
 
     with open(metadata_path, "w") as f:
-        ruamel.yaml.dump(doc, f, Dumper=ruamel.yaml.RoundTripDumper)
+        f.write(ruamel_dump(doc))
 
 
 #########################################################
@@ -387,11 +388,21 @@ if submitted:
 
         2. (Optional) Generated notebook `{notebook_path.relative_to(BASE_DIR)}` can be used to examine the dataset output interactively.
 
-        3. (Optional) You can manually move steps from `dag/walkthrough.yml` to some other `dag/*.yml` if you feel like it belongs there. After you are happy with your code, run `make test` to find any issues.
+        3. (Optional) Generate metadata file `{form.short_name}.meta.yml` from your dataset with
+            ```
+            poetry run etl-metadata-export data/garden/{form.namespace}/{form.version}/{form.short_name}
+            ```
+            then manual edit it and rerun the step again with
+            ```
+            poetry run etl data{private_suffix}://garden/{form.namespace}/{form.version}/{form.short_name} {"--private" if form.is_private else ""}
+            ```
+            Note that origins are inherited from previous step (snapshot) and you don't have to repeat them.
 
-        4. Create a pull request in [ETL](https://github.com/owid/etl), get it reviewed and merged.
+        4. (Optional) You can manually move steps from `dag/walkthrough.yml` to some other `dag/*.yml` if you feel like it belongs there. After you are happy with your code, run `make test` to find any issues.
 
-        5. (Optional) Once your changes are merged, your steps will be run automatically by our server and published to the OWID catalog. Then it can be loaded by anyone using:
+        5. Create a pull request in [ETL](https://github.com/owid/etl), get it reviewed and merged.
+
+        6. (Optional) Once your changes are merged, your steps will be run automatically by our server and published to the OWID catalog. Then it can be loaded by anyone using:
 
             ```python
             from owid.catalog import find_one
@@ -400,7 +411,7 @@ if submitted:
             print(tab.head())
             ```
 
-        6. If you are an internal OWID member and want to push data to our Grapher DB, continue to the grapher step or to explorers step.
+        7. If you are an internal OWID member and want to push data to our Grapher DB, continue to the grapher step or to explorers step.
         """
             )
 

@@ -3,6 +3,7 @@
 from typing import Any, Dict, List, Optional, Union, cast
 
 import numpy as np
+import owid.catalog.processing as pr
 import pandas as pd
 from owid.datautils.dataframes import groupby_agg
 
@@ -114,13 +115,16 @@ def add_region_aggregates_education(
         aggregations = {variable: "sum" for variable in df.columns if variable not in fixed_columns}
     variables = list(aggregations)
 
-    # Initialise dataframe of added regions, and add variables one by one to it.
-    df_region = pd.DataFrame({country_col: [], year_col: []}).astype(dtype={country_col: "object", year_col: "int"})
     # Select data for countries in the region.
     df_countries = df[df[country_col].isin(countries_in_region)]
     df_countries = geo.add_population_to_dataframe(df_countries)
 
     weights = df_countries["population"]
+
+    # Definte aggregations for each variable.
+    aggs = {
+        country_col: lambda x: set(countries_that_must_have_data).issubset(set(list(x))),
+    }
     for variable in variables:
         # If aggreggate is mean then do weighted average using population data, replacing `aggregations[variable]` with a lambda function
 
@@ -145,22 +149,20 @@ def add_region_aggregates_education(
         else:
             variable_agg = aggregations[variable]
 
-        df_added = groupby_agg(
-            df=df_countries,
-            groupby_columns=year_col,
-            aggregations={
-                country_col: lambda x: set(countries_that_must_have_data).issubset(set(list(x))),
-                variable: variable_agg,
-            },
-            num_allowed_nans=num_allowed_nans_per_year,
-            frac_allowed_nans=frac_allowed_nans_per_year,
-        ).reset_index()
-        # Make nan all aggregates if the most contributing countries were not present.
-        df_added.loc[~df_added[country_col], variable] = np.nan
-        # Replace the column that was used to check if most contributing countries were present by the region's name.
-        df_added[country_col] = region
-        # Include this variable to the dataframe of added regions.
-        df_region = pd.merge(df_region, df_added, on=[country_col, year_col], how="outer")
+        aggs[variable] = variable_agg
+
+    df_region = groupby_agg(
+        df=df_countries,
+        groupby_columns=year_col,
+        aggregations=aggs,
+        num_allowed_nans=num_allowed_nans_per_year,
+        frac_allowed_nans=frac_allowed_nans_per_year,
+    ).reset_index()
+
+    # Make nan all aggregates if the most contributing countries were not present.
+    df_region.loc[~df_region[country_col], variables] = np.nan
+    # Replace the column that was used to check if most contributing countries were present by the region's name.
+    df_region[country_col] = region
 
     if isinstance(keep_original_region_with_suffix, str):
         # Keep rows in the original dataframe containing rows for region (adding a suffix to the region name), and then
@@ -169,13 +171,13 @@ def add_region_aggregates_education(
         df_original_region = df[rows_original_region].reset_index(drop=True)
         # Append suffix at the end of the name of the original region.
         df_original_region[country_col] = region + cast(str, keep_original_region_with_suffix)
-        df_updated = pd.concat(
+        df_updated = pr.concat(
             [df[~rows_original_region], df_original_region, df_region],
             ignore_index=True,
         )
     else:
         # Remove rows in the original dataframe containing rows for region, and append new rows for region.
-        df_updated = pd.concat([df[~(df[country_col] == region)], df_region], ignore_index=True)
+        df_updated = pr.concat([df[~(df[country_col] == region)], df_region], ignore_index=True)
 
     # Sort conveniently.
     df_updated = df_updated.sort_values([country_col, year_col]).reset_index(drop=True)

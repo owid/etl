@@ -131,8 +131,11 @@ def migrate(
         f"[green]1.[/green] Execute snapshot with [bold]`python snapshots/{namespace}/{version}/{short_name}.py`[/bold]"
     )
     print(f"[green]2.[/green] Import dataset with [bold]`etl {namespace}/{version}/{short_name} --grapher`[/bold]")
-    print("[green]3.[/green] Run chart revisions with [bold]`ENV=.env.prod.write etl-wizard charts`[/bold]")
-    print("[green]4.[/green] [bold]Delete[/bold] or archive the old dataset")
+    print(
+        "[green]3.[/green] Merge changes or run it directly against production with [bold]`ENV=.env.prod.write etl {namespace}/{version}/{short_name} --grapher`[/bold]"
+    )
+    print("[green]4.[/green] Run chart revisions with [bold]`ENV=.env.prod.write etl-wizard charts`[/bold]")
+    print("[green]5.[/green] [bold]Delete[/bold] or archive the old dataset")
 
 
 def _add_to_migrated_dag(namespace: str, version: str, short_name: str):

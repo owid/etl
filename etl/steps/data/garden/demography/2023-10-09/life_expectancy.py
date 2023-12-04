@@ -234,9 +234,7 @@ def process_ri(tb: Table) -> Table:
     # Filter
     ## dimension values: metric=life_expectancy, variant=medium, year >= YEAR_ESTIMATE_LAST
     ## columns: location, year, value, sex, age
-    tb = tb.loc[
-        (tb["year"] < 1950),
-    ]
+    tb = tb.loc[(tb["year"] < 1950),]
 
     # Rename column names
     tb = tb.rename(columns={"entity": "location"})
@@ -298,9 +296,7 @@ def add_americas(tb: Table, ds_population: Dataset) -> Table:
     """
     # filter only member countries of the region
     AMERICAS_MEMBERS = ["Northern America", "Latin America and the Caribbean"]
-    tb_am = tb.loc[
-        (tb["country"].isin(AMERICAS_MEMBERS)) & (tb["sex"] == "all") & (tb["age"] == 0),
-    ].copy()
+    tb_am = tb.loc[(tb["country"].isin(AMERICAS_MEMBERS)) & (tb["sex"] == "all") & (tb["age"] == 0),].copy()
 
     # sanity check
     assert (

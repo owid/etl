@@ -3,14 +3,16 @@
 #
 
 import hashlib
+import io
 import os
+import subprocess
 import time
 from collections import OrderedDict
 from pathlib import Path
 from threading import Lock
 from typing import Any, Dict, Generator, List, Optional, Set, TextIO, Union
 
-import black
+import ruamel.yaml
 import yaml
 from yaml.dumper import Dumper
 
@@ -145,6 +147,22 @@ def yaml_dump(
     return s
 
 
+def ruamel_dump(d: Dict[str, Any]) -> str:
+    """Dump dictionary with a consistent style using ruamel.yaml."""
+    yml = ruamel.yaml.YAML()
+    yml.indent(mapping=2, sequence=4, offset=2)
+    # prevent line-wrap
+    yml.width = 4096
+
+    stream = io.StringIO()
+    yml.dump(d, stream)
+    return stream.getvalue()
+
+
+def ruamel_load(f: io.TextIOWrapper) -> Dict[str, Any]:
+    return ruamel.yaml.load(f, Loader=ruamel.yaml.RoundTripLoader, preserve_quotes=True)
+
+
 def _strip_lines(s: str) -> str:
     """Strip all lines in a string."""
     s = "\n".join([line.strip() for line in s.split("\n")])
@@ -166,21 +184,17 @@ def _strip_lines_in_dict(d: Any) -> Any:
         return d
 
 
-def apply_black_formatter_to_files(file_paths: List[Union[str, Path]]) -> None:
-    """Load project configuration for black formatter, and apply formatter to a list of files.
+def apply_ruff_formatter_to_files(file_paths: List[Union[str, Path]]) -> None:
+    """Apply ruff formatter to a list of files.
 
     Parameters
     ----------
     file_paths : List[Union[str, Path]]
-        Files to be reformatted using black.
+        Files to be reformatted using ruff.
 
     """
-    # Parse black formatter configuration from pyproject.toml file.
-    black_config = black.parse_pyproject_toml(BASE_DIR / "pyproject.toml")  # type: ignore
-    black_mode = black.Mode(**{key: value for key, value in black_config.items() if key not in ["exclude"]})  # type: ignore
-    # Apply black formatter to generated step files.
-    for file_path in file_paths:
-        black.format_file_in_place(src=file_path, fast=True, mode=black_mode, write_back=black.WriteBack.YES)  # type: ignore
+    pyproject_path = BASE_DIR / "pyproject.toml"
+    subprocess.run(["ruff", "format", "--config", str(pyproject_path)] + [str(fp) for fp in file_paths], check=True)
 
 
 def _mtime_mapping(path: Path) -> Dict[Path, float]:

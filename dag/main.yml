@@ -478,12 +478,12 @@ steps:
     - data://garden/wb/2023-04-30/income_groups
 
   # International Monetary Fund, World Economic Outlook
-  data://meadow/imf/2023-05-02/world_economic_outlook:
-    - snapshot://imf/2023-05-02/world_economic_outlook.xls
-  data://garden/imf/2023-05-02/world_economic_outlook:
-    - data://meadow/imf/2023-05-02/world_economic_outlook
-  data://grapher/imf/2023-05-02/world_economic_outlook:
-    - data://garden/imf/2023-05-02/world_economic_outlook
+  data://meadow/imf/2023-11-02/world_economic_outlook:
+    - snapshot://imf/2023-11-02/world_economic_outlook.xls
+  data://garden/imf/2023-11-02/world_economic_outlook:
+    - data://meadow/imf/2023-11-02/world_economic_outlook
+  data://grapher/imf/2023-11-02/world_economic_outlook:
+    - data://garden/imf/2023-11-02/world_economic_outlook
 
   # Patents & journal articles (World Bank, United Nations)
   data://garden/research_development/2023-05-05/patents_articles:
@@ -661,6 +661,69 @@ steps:
     - data://meadow/unu_wider/2023-11-01/government_revenue_dataset
   data://grapher/unu_wider/2023-11-01/government_revenue_dataset:
     - data://garden/unu_wider/2023-11-01/government_revenue_dataset
+
+  # World Bank - Worldwide Bureaucracy Indicators
+  data://meadow/wb/2023-11-21/worldwide_bureaucracy_indicators:
+    - snapshot://wb/2023-11-21/worldwide_bureaucracy_indicators.csv
+  data://garden/wb/2023-11-21/worldwide_bureaucracy_indicators:
+    - data://meadow/wb/2023-11-21/worldwide_bureaucracy_indicators
+  data://grapher/wb/2023-11-21/worldwide_bureaucracy_indicators:
+    - data://garden/wb/2023-11-21/worldwide_bureaucracy_indicators
+
+  # Information Capacity Dataset
+  data://meadow/state_capacity/2023-11-10/information_capacity_dataset:
+    - snapshot://state_capacity/2023-11-10/information_capacity_dataset.dta
+  data://garden/state_capacity/2023-11-10/information_capacity_dataset:
+    - data://meadow/state_capacity/2023-11-10/information_capacity_dataset
+    - data://garden/wb/2021-07-01/wb_income
+    - data://garden/regions/2023-01-01/regions
+  data://grapher/state_capacity/2023-11-20/information_capacity_dataset:
+    - data://garden/state_capacity/2023-11-10/information_capacity_dataset
+
+  # Integrated Values Survey
+  data://meadow/ivs/2023-11-27/integrated_values_survey:
+    - snapshot://ivs/2023-11-27/integrated_values_survey.csv
+  data://garden/ivs/2023-11-27/integrated_values_survey:
+    - data://meadow/ivs/2023-11-27/integrated_values_survey
+  data://grapher/ivs/2023-11-27/integrated_values_survey:
+    - data://garden/ivs/2023-11-27/integrated_values_survey
+
+  # National Human Genome Research Institute - DNA Sequencing Costs
+  data://meadow/technology/2023-11-28/dna_sequencing:
+    - snapshot://technology/2023-11-28/dna_sequencing.xls
+  data://garden/technology/2023-11-28/dna_sequencing:
+    - data://meadow/technology/2023-11-28/dna_sequencing
+  data://grapher/technology/2023-11-28/dna_sequencing:
+    - data://garden/technology/2023-11-28/dna_sequencing
+
+  # European Social Survey - Trust questions
+  data://meadow/ess/2023-08-02/ess_trust:
+  - snapshot://ess/2023-08-02/ess_trust.csv
+  - data://garden/regions/2023-01-01/regions
+  data://garden/ess/2023-08-02/ess_trust:
+  - data://meadow/ess/2023-08-02/ess_trust
+  data://grapher/ess/2023-08-02/ess_trust:
+  - data://garden/ess/2023-08-02/ess_trust
+
+  # Latinobarómetro survey - Trust
+  data://meadow/survey/2023-08-04/latinobarometro_trust:
+  - snapshot://survey/2023-08-04/latinobarometro_trust.csv
+  data://garden/survey/2023-08-04/latinobarometro_trust:
+  - data://meadow/survey/2023-08-04/latinobarometro_trust
+
+  # Afrobarometer survey - Trust
+  data://meadow/survey/2023-08-07/afrobarometer_trust:
+  - snapshot://survey/2023-08-07/afrobarometer_trust.csv
+  data://garden/survey/2023-08-07/afrobarometer_trust:
+  - data://meadow/survey/2023-08-07/afrobarometer_trust
+
+  # Trust surveys
+  data://garden/survey/2023-08-04/trust_surveys:
+  - data://garden/survey/2023-08-04/latinobarometro_trust
+  - data://garden/survey/2023-08-07/afrobarometer_trust
+  - data://garden/ess/2023-08-02/ess_trust
+  data://grapher/survey/2023-08-04/trust_surveys:
+  - data://garden/survey/2023-08-04/trust_surveys
 
   # Temporary chart for global temperature anomaly.
   data://meadow/climate_change/2023-11-17/temperature_anomaly:

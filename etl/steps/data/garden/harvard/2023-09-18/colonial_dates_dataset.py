@@ -25,8 +25,8 @@ def run(dest_dir: str) -> None:
     tb = ds_meadow["colonial_dates_dataset"].reset_index()
 
     # Load population data.
-    tb_pop = paths.load_dataset("population")
-    tb_pop = tb_pop["population"].reset_index()
+    ds_pop = paths.load_dataset("population")
+    tb_pop = ds_pop["population"].reset_index()
 
     #
     # Process data.
@@ -37,6 +37,9 @@ def run(dest_dir: str) -> None:
 
     # Create regional aggregations for total_colonies
     tb = regional_aggregations(tb, tb_pop)
+
+    # Make European countries not colonizers nor colonized as missing
+    tb = correct_european_countries(tb)
 
     tb = tb.set_index(["country", "year"], verify_integrity=True).sort_index()
 
@@ -140,9 +143,20 @@ def process_data(tb: Table, tb_pop: Table) -> Table:
 
     # For countries in colonizers_list, assign the value "Colonizer" to colonizer, colonizer_grouped, last_colonizer and last_colonizer_group column
     for col in ["colonizer", "colonizer_grouped", "last_colonizer", "last_colonizer_grouped"]:
-        tb[f"{col}"] = tb[f"{col}"].where(~tb["country"].isin(colonizers_list), "zz. Colonizer")
-        tb[f"{col}"] = tb[f"{col}"].where(tb["country"].isin(colonized_list + colonizers_list), "zzz. Not colonized")
-        tb[f"{col}"] = tb[f"{col}"].where(~tb[f"{col}"].isnull(), "zzz. Not colonized")
+        tb[col] = tb[col].where(~tb["country"].isin(colonizers_list), "zz. Colonizer")
+        tb[col] = tb[col].where(tb["country"].isin(colonized_list + colonizers_list), "zzz. Not colonized")
+        tb[col] = tb[col].where(~tb[col].isnull(), "zzz. Not colonized")
+
+    # For columns last_colonizer and last_colonizer_grouped, replace "zzz. Not colonized" by "zzz. Never colonized"
+    for col in ["last_colonizer", "last_colonizer_grouped"]:
+        tb[col] = tb[col].replace("zzz. Not colonized", "zzzz. Never colonized")
+
+    # If colonizer is "zzz. Not colonized" and last_colonizer is different from "zzzz. Never colonized", assign last_colonizer to colonizer
+    for col in ["colonizer", "colonizer_grouped"]:
+        tb[col] = tb[col].where(
+            ~((tb[col] == "zzz. Not colonized") & (tb["last_colonizer"] != "zzzz. Never colonized")),
+            "zzzz. No longer colonized",
+        )
 
     # For countries in colonizers_list total_colonies, assign 0 when it is null
     tb["total_colonies"] = tb["total_colonies"].where(
@@ -166,7 +180,7 @@ def regional_aggregations(tb: Table, tb_pop: Table) -> Table:
     tb_regions = tb_regions.merge(tb_pop[["country", "year", "population"]], how="left", on=["country", "year"])
 
     # Define non-colonies identifiers for `colonizer`
-    non_colonies = ["zz. Colonizer", "zzz. Not colonized"]
+    non_colonies = ["zz. Colonizer", "zzz. Not colonized", "zzzz. No longer colonized"]
 
     # Define colony_number, which is 1 if countries are not in non_colonies and colony_pop, which is the product of colony and population
     tb_regions["colony_number"] = tb_regions["colonizer"].apply(lambda x: 0 if x in non_colonies else 1)
@@ -182,7 +196,7 @@ def regional_aggregations(tb: Table, tb_pop: Table) -> Table:
 
     # Define not_colonized_number, which is 1 if countries are in non_colonies and not_colonized_pop, which is the product of not_colonized and population
     tb_regions["not_colonized_number"] = tb_regions["colonizer"].apply(
-        lambda x: 1 if x in ["zzz. Not colonized"] else 0
+        lambda x: 1 if x in ["zzz. Not colonized", "zzzz. No longer colonized"] else 0
     )
     tb_regions["not_colonized_pop"] = tb_regions["population"] * tb_regions["not_colonized_number"]
 
@@ -297,5 +311,24 @@ def regional_aggregations(tb: Table, tb_pop: Table) -> Table:
             "missing_pop",
         ]
     )
+
+    return tb
+
+
+def correct_european_countries(tb: Table) -> Table:
+    """
+    Make European countries not colonizers nor colonized as missing.
+    This is because the dataset focuses on overseas territories (beyond Europe)
+    """
+
+    # Get list of European countries
+    european_countries = geo.list_countries_in_region(region="Europe")
+
+    # If the country is in european_countries and last_colonizer is not "zzzz. Never colonized", assign nan to colonizer
+    for col in ["colonizer", "colonizer_grouped", "last_colonizer", "last_colonizer_grouped"]:
+        tb[col] = tb[col].where(
+            ~((tb["country"].isin(european_countries)) & (tb["last_colonizer_grouped"] == "zzzz. Never colonized")),
+            np.nan,
+        )
 
     return tb

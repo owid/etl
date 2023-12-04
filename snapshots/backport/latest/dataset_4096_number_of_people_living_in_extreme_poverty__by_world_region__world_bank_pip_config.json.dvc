@@ -2,7 +2,7 @@ meta:
   source:
     name: Our World in Data catalog backport
     url: https://owid.cloud/admin/datasets/4096
-    date_accessed: 2023-08-10 08:57:04.316515
+    date_accessed: 2023-11-28 16:02:07.085827
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Grapher metadata for 
@@ -10,7 +10,7 @@ meta:
   description: Version 20220909_2017_01_02_PROD
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 915f6d2285b432430203c6f2bd31b295
-  size: 2643
+- md5: fb43643465ea436f4ef3afb6abd1ee26
+  size: 2656
   path: 
     dataset_4096_number_of_people_living_in_extreme_poverty__by_world_region__world_bank_pip_config.json

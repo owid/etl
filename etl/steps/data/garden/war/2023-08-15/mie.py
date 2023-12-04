@@ -265,7 +265,9 @@ def _add_ongoing_metrics(tb: Table) -> Table:
     tb_ongoing_world_alltypes["hostility_level"] = "all"
 
     ## Combine tables
-    tb_ongoing = pr.concat([tb_ongoing, tb_ongoing_world, tb_ongoing_alltypes, tb_ongoing_world_alltypes], ignore_index=True).sort_values(  # type: ignore
+    tb_ongoing = pr.concat(
+        [tb_ongoing, tb_ongoing_world, tb_ongoing_alltypes, tb_ongoing_world_alltypes], ignore_index=True
+    ).sort_values(  # type: ignore
         by=["year", "region", "hostility_level"]
     )
 
