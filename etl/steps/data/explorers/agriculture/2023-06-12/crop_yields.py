@@ -25,7 +25,9 @@ def run(dest_dir: str) -> None:
     tb_garden = ds_garden["attainable_yields"].reset_index()
 
     # Remove custom regions (that clutter the explorer and do not show in the map).
-    tb_garden = tb_garden[~tb_garden["country"].str.contains("(Mueller et al. (2012))", regex=False)].reset_index(drop=True)
+    tb_garden = tb_garden[~tb_garden["country"].str.contains("(Mueller et al. (2012))", regex=False)].reset_index(
+        drop=True
+    )
 
     # Set an appropriate index and sort conveniently.
     tb_garden = tb_garden.set_index(["country", "year"], verify_integrity=True).sort_index()
