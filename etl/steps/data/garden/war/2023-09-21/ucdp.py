@@ -35,6 +35,7 @@ from shared import (
 )
 from structlog import get_logger
 
+from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
 
 log = get_logger()
@@ -84,6 +85,9 @@ def run(dest_dir: str) -> None:
     ds_maps = paths.load_dataset(short_name)
     tb_maps = ds_maps[short_name].reset_index()
 
+    # Load population
+    ds_population = paths.load_dataset("population")
+
     #
     # Process data.
     #
@@ -109,7 +113,7 @@ def run(dest_dir: str) -> None:
     # Get country-level stuff
     paths.log.info("getting country-level indicators")
     tb_participants = estimate_metrics_participants(tb, tb_codes)
-    tb_locations = estimate_metrics_locations(tb, tb_maps)
+    tb_locations = estimate_metrics_locations(tb, tb_maps, ds_population)
 
     # Sanity check conflict_type transitions
     ## Only consider transitions between intrastate and intl intrastate. If other transitions are detected, raise error.
@@ -825,7 +829,7 @@ def estimate_metrics_participants(tb: Table, tb_codes: Table) -> Table:
     return tb_country
 
 
-def estimate_metrics_locations(tb: Table, tb_maps: Table) -> Table:
+def estimate_metrics_locations(tb: Table, tb_maps: Table, ds_population: Dataset) -> Table:
     """Add participant information at country-level.
 
     reference: https://github.com/owid/notebooks/blob/main/JoeHasell/UCDP%20and%20PRIO/UCDP_georeferenced/ucdp_country_extract.ipynb
@@ -849,13 +853,15 @@ def estimate_metrics_locations(tb: Table, tb_maps: Table) -> Table:
     #     tb_codes.reset_index(), left_on="country_name_location", right_on="country", how="left"
     # )
 
-    # Estimate if a conflict occured in a country
+    # Estimate if a conflict occured in a country, and the number of deaths in it
     tb_locations_country = (
         tb_locations.groupby(["country_name_location", "year", "conflict_type"], as_index=False)
         .agg(
             {
                 "conflict_new_id": "nunique",
                 "best": "sum",
+                "low": "sum",
+                "high": "sum",
             }
         )
         .rename(
@@ -863,12 +869,15 @@ def estimate_metrics_locations(tb: Table, tb_maps: Table) -> Table:
                 "conflict_new_id": "is_location_of_conflict",
                 "country_name_location": "country",
                 "best": "number_deaths",
+                "low": "number_deaths_low",
+                "high": "number_deaths_high",
             }
         )
     )
     assert tb_locations_country["is_location_of_conflict"].notna().all(), "Missing values in `is_location_of_conflict`!"
-    assert tb_locations_country["number_deaths"].notna().all(), "Missing values in `number_deaths`!"
-
+    cols_num_deaths = ["number_deaths", "number_deaths_low", "number_deaths_high"]
+    for col in cols_num_deaths:
+        assert tb_locations_country[col].notna().all(), f"Missing values in `{col}`!"
     # Convert into a binary indicator: 1 (if more than one conflict), 0 (otherwise)
     tb_locations_country["is_location_of_conflict"] = tb_locations_country["is_location_of_conflict"].apply(
         lambda x: 1 if x > 0 else 0
@@ -882,7 +891,7 @@ def estimate_metrics_locations(tb: Table, tb_maps: Table) -> Table:
     )
 
     # Add origins from Natural Earth
-    cols = ["is_location_of_conflict", "number_deaths"]
+    cols = ["is_location_of_conflict"] + cols_num_deaths
     for col in cols:
         tb_locations_country[col].origins += tb_maps["name"].m.origins
 
@@ -892,35 +901,43 @@ def estimate_metrics_locations(tb: Table, tb_maps: Table) -> Table:
     paths.log.info("adding conflict type aggregates...")
 
     # Add missing conflict types
-    # Add intrastate (all)
-    tb_locations_country = aggregate_conflict_types(
+    CTYPES_AGGREGATES = {
+        "intrastate": ["intrastate (non-internationalized)", "intrastate (internationalized)"],
+        "state-based": list(TYPE_OF_CONFLICT_MAPPING.values()),
+        "all": list(TYPE_OF_VIOLENCE_MAPPING.values()) + list(TYPE_OF_CONFLICT_MAPPING.values()),
+    }
+    for ctype_agg, ctypes in CTYPES_AGGREGATES.items():
+        tb_locations_country = aggregate_conflict_types(
+            tb=tb_locations_country,
+            parent_name=ctype_agg,
+            children_names=ctypes,
+            columns_to_aggregate=["is_location_of_conflict"] + cols_num_deaths,
+            columns_to_aggregate_absolute=cols_num_deaths,
+            columns_to_groupby=["country", "year"],
+        )
+
+    ###################
+    # Add rates
+    ###################
+    # Add population column
+    tb_locations_country = geo.add_population_to_table(
         tb=tb_locations_country,
-        parent_name="intrastate",
-        children_names=["intrastate (non-internationalized)", "intrastate (internationalized)"],
-        columns_to_aggregate=["is_location_of_conflict", "number_deaths"],
-        columns_to_aggregate_absolute=["number_deaths"],
-        columns_to_groupby=["country", "year"],
+        ds_population=ds_population,
     )
-    # Add state-based
-    state_based_conflicts = list(TYPE_OF_CONFLICT_MAPPING.values())
-    tb_locations_country = aggregate_conflict_types(
-        tb=tb_locations_country,
-        parent_name="state-based",
-        children_names=list(state_based_conflicts),
-        columns_to_aggregate=["is_location_of_conflict", "number_deaths"],
-        columns_to_aggregate_absolute=["number_deaths"],
-        columns_to_groupby=["country", "year"],
+    # Divide and obtain rates
+    factor = 100_000
+    tb_locations_country["death_rate"] = (
+        factor * tb_locations_country["number_deaths"] / tb_locations_country["population"]
     )
-    # Add all
-    non_state_conflicts = list(TYPE_OF_VIOLENCE_MAPPING.values())
-    tb_locations_country = aggregate_conflict_types(
-        tb=tb_locations_country,
-        parent_name="all",
-        children_names=list(state_based_conflicts + non_state_conflicts),
-        columns_to_aggregate=["is_location_of_conflict", "number_deaths"],
-        columns_to_aggregate_absolute=["number_deaths"],
-        columns_to_groupby=["country", "year"],
+    tb_locations_country["death_rate_low"] = factor * (
+        tb_locations_country["number_deaths_low"] / tb_locations_country["population"]
     )
+    tb_locations_country["death_rate_high"] = factor * (
+        tb_locations_country["number_deaths_high"] / tb_locations_country["population"]
+    )
+
+    # Drop population column
+    tb_locations_country = tb_locations_country.drop(columns=["population"])
 
     ###################
     # REGION-LEVEL: Number of locations with conflict
@@ -972,34 +989,15 @@ def estimate_metrics_locations(tb: Table, tb_maps: Table) -> Table:
 
     paths.log.info("adding conflict type aggregates...")
     # Add aggregates of conflict types
-    tb_locations_regions = aggregate_conflict_types(
-        tb=tb_locations_regions,
-        parent_name="intrastate",
-        children_names=["intrastate (non-internationalized)", "intrastate (internationalized)"],
-        columns_to_aggregate=["number_locations"],
-        columns_to_aggregate_absolute=["number_locations"],
-        columns_to_groupby=["country", "year"],
-    )
-    # Add state-based
-    state_based_conflicts = list(TYPE_OF_CONFLICT_MAPPING.values())
-    tb_locations_regions = aggregate_conflict_types(
-        tb=tb_locations_regions,
-        parent_name="state-based",
-        children_names=list(state_based_conflicts),
-        columns_to_aggregate=["number_locations"],
-        columns_to_aggregate_absolute=["number_locations"],
-        columns_to_groupby=["country", "year"],
-    )
-    # Add all
-    non_state_conflicts = list(TYPE_OF_VIOLENCE_MAPPING.values())
-    tb_locations_regions = aggregate_conflict_types(
-        tb=tb_locations_regions,
-        parent_name="all",
-        children_names=list(state_based_conflicts + non_state_conflicts),
-        columns_to_aggregate=["number_locations"],
-        columns_to_aggregate_absolute=["number_locations"],
-        columns_to_groupby=["country", "year"],
-    )
+    for ctype_agg, ctypes in CTYPES_AGGREGATES.items():
+        tb_locations_regions = aggregate_conflict_types(
+            tb=tb_locations_regions,
+            parent_name=ctype_agg,
+            children_names=ctypes,
+            columns_to_aggregate=["number_locations"],
+            columns_to_aggregate_absolute=["number_locations"],
+            columns_to_groupby=["country", "year"],
+        )
 
     ###################
     # COMBINE: Country flag + Regional counts
