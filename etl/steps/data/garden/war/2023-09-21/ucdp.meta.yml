@@ -31,7 +31,7 @@ definitions:
       A state-based conflict is a conflict between two armed groups, at least one of which is a state, that causes at least 25 deaths during a year.
       <%- endif -%>
     location_conflicts_method: |-
-      UCDP provides geo coordinates of each conflict event. We have mapped this coordinates to countries by means of the Natural Earth dataset.
+      UCDP provides geographical coordinates of each conflict event. We have mapped this coordinates to countries by means of the Natural Earth dataset.
 
       In some instances, the event's coordinates fall within the borders of a country. Other times, the event's coordinates fall outside the borders of a country. In the latter case, we have mapped the event to the country that is closest to the event's coordinates.
 
