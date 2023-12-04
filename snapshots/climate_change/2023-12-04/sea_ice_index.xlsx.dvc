@@ -19,4 +19,4 @@ wdir: ../../../data/snapshots/climate_change/2023-12-04
 outs:
 - md5: 9cbc230482352aaec03b07d0dfc0e3e2
   size: 25035
-  path: nsidc_sea_ice_index.xlsx
+  path: sea_ice_index.xlsx

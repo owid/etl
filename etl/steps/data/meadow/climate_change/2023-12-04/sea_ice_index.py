@@ -13,7 +13,7 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Retrieve snapshot.
-    snap = paths.load_snapshot("nsidc_sea_ice_index.xlsx")
+    snap = paths.load_snapshot("sea_ice_index.xlsx")
 
     # Read data from snapshot.
     data = snap.ExcelFile()
@@ -26,8 +26,8 @@ def run(dest_dir: str) -> None:
     tb_sh = data.parse("SH-Extent").assign(**{"location": "Southern Hemisphere"})
 
     # Sanity check.
-    assert tb_nh.iloc[0, 0] == 1978, "First cell in NH spreadshet was expected to be 1978. Data has changed."
-    assert tb_sh.iloc[0, 0] == 1978, "First cell in SH spreadshet was expected to be 1978. Data has changed."
+    assert tb_nh.iloc[0, 0] == 1978, "First cell in NH spreadsheet was expected to be 1978. Data has changed."
+    assert tb_sh.iloc[0, 0] == 1978, "First cell in SH spreadsheet was expected to be 1978. Data has changed."
 
     # Concatenate both tables.
     tb = pr.concat([tb_sh, tb_nh], ignore_index=True, short_name=paths.short_name)

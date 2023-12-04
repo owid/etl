@@ -16,4 +16,4 @@ wdir: ../../../data/snapshots/climate_change/2023-12-04
 outs:
 - md5: 791a1370c7ccb420e54827b6dd08fd75
   size: 12636
-  path: giss_surface_temperature_analysis_southern_hemisphere.csv
+  path: surface_temperature_analysis_southern_hemisphere.csv

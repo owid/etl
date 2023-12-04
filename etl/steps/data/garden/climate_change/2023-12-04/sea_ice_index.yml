@@ -8,7 +8,7 @@ dataset:
   title: GISS surface temperature analysis
 
 tables:
-  giss_surface_temperature_analysis:
+  sea_ice_index:
     variables:
       temperature_anomaly:
         title: "Global warming: monthly temperature anomaly"

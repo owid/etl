@@ -14,10 +14,10 @@ CURRENT_YEAR = SNAPSHOT_VERSION.split("-")[0]
 
 # Names of data files from GISS NASA.
 FILES = [
-    # "giss_surface_temperature_analysis_world.csv",
-    # "giss_surface_temperature_analysis_northern_hemisphere.csv",
-    # "giss_surface_temperature_analysis_southern_hemisphere.csv",
-    "nsidc_sea_ice_index.xlsx",
+    "surface_temperature_analysis_world.csv",
+    "surface_temperature_analysis_northern_hemisphere.csv",
+    "surface_temperature_analysis_southern_hemisphere.csv",
+    "sea_ice_index.xlsx",
 ]
 
 # To ease the recurrent task of updating these files, fetch the access date from the version, and write it to files.
@@ -37,7 +37,7 @@ def main(upload: bool) -> None:
         snap.metadata.origin.date_accessed = DATE_ACCESSED  # type: ignore
         snap.metadata.origin.date_published = DATE_PUBLISHED  # type: ignore
 
-        if file_name == "nsidc_sea_ice_index.xlsx":
+        if file_name == "sea_ice_index.xlsx":
             snap.metadata.origin.attribution = f"National Snow and Ice Data Center - Sea Ice Index ({CURRENT_YEAR})"  # type: ignore
 
         # Rewrite metadata to dvc file.

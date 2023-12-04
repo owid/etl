@@ -2,18 +2,18 @@ meta:
   origin:
     producer: NASA Goddard Institute for Space Studies
     title: GISS Surface Temperature Analysis
-    title_snapshot: GISS Surface Temperature Analysis - Northern hemisphere
+    title_snapshot: GISS Surface Temperature Analysis - World
     citation_full: NASA. GISS Surface Temperature Analysis (GISTEMP v4)
     attribution_short: NASA
     version_producer: v4
     url_main: https://data.giss.nasa.gov/gistemp/
-    url_download: https://data.giss.nasa.gov/gistemp/tabledata_v4/NH.Ts+dSST.csv
+    url_download: https://data.giss.nasa.gov/gistemp/tabledata_v4/GLB.Ts+dSST.csv
     date_accessed: '2023-12-04'
     date_published: '2023-12-04'
     license:
       name: CC BY 4.0
 wdir: ../../../data/snapshots/climate_change/2023-12-04
 outs:
-- md5: 1ad9e6b31dcb1d37261c5ccb70bc4f2f
-  size: 12643
-  path: giss_surface_temperature_analysis_northern_hemisphere.csv
+- md5: 725ef181276e20e5fe27f8d6f3df8cf3
+  size: 12602
+  path: surface_temperature_analysis_world.csv

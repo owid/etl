@@ -13,10 +13,10 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load meadow dataset.
-    ds_meadow = paths.load_dataset("nsidc_sea_ice_index")
+    ds_meadow = paths.load_dataset("sea_ice_index")
 
     # Read table from meadow dataset.
-    tb = ds_meadow["nsidc_sea_ice_index"].reset_index()
+    tb = ds_meadow["sea_ice_index"].reset_index()
 
     #
     # Process data.

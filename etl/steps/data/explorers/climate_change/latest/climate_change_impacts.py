@@ -20,8 +20,8 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load dataset of GISS surface temperature analysis, and read monthly data.
-    ds_giss = paths.load_dataset("giss_surface_temperature_analysis")
-    tb_giss = ds_giss["giss_surface_temperature_analysis"].reset_index()
+    ds_giss = paths.load_dataset("surface_temperature_analysis")
+    tb_giss = ds_giss["surface_temperature_analysis"].reset_index()
 
     #
     # Process data.

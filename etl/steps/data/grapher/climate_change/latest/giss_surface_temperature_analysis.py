@@ -17,10 +17,10 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load garden dataset.
-    ds_garden = paths.load_dataset("giss_surface_temperature_analysis")
+    ds_garden = paths.load_dataset("surface_temperature_analysis")
 
     # Read table from garden dataset.
-    tb = ds_garden["giss_surface_temperature_analysis"].reset_index()
+    tb = ds_garden["surface_temperature_analysis"].reset_index()
 
     #
     # Process data.

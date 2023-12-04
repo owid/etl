@@ -8,9 +8,9 @@ paths = PathFinder(__file__)
 
 # Names of snapshot files to load and process.
 FILES = [
-    "giss_surface_temperature_analysis_world",
-    "giss_surface_temperature_analysis_northern_hemisphere",
-    "giss_surface_temperature_analysis_southern_hemisphere",
+    "surface_temperature_analysis_world",
+    "surface_temperature_analysis_northern_hemisphere",
+    "surface_temperature_analysis_southern_hemisphere",
 ]
 
 

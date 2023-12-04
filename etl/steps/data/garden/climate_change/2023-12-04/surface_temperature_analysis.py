@@ -14,10 +14,10 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load meadow dataset.
-    ds_meadow = paths.load_dataset("giss_surface_temperature_analysis")
+    ds_meadow = paths.load_dataset("surface_temperature_analysis")
 
     # Read table from meadow dataset.
-    tb = ds_meadow["giss_surface_temperature_analysis_world"]
+    tb = ds_meadow["surface_temperature_analysis_world"]
 
     #
     # Process data.
