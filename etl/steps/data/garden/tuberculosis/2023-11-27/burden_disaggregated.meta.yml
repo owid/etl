@@ -13,7 +13,7 @@ definitions:
   age_group: |-
     <% if age_group == "0-14" %>0-14 years<% elif age_group == "0-4" %>0-4 years<% elif age_group == "15-24" %>15-24 years<% elif age_group == "15plus" %>over 15 years<% elif age_group == "18plus" %>over 18 years<% elif age_group == "25-34" %>25-34 years<% elif age_group == "35-44" %>35-44 years<% elif age_group == "45-54" %>45-54 years<% elif age_group == "5-14" %>5-14 years<% elif age_group == "55-64" %>55-64 years<% elif age_group == "65plus" %>over 65 years<% elif age_group == "all" %><% endif -%>
   risk_factor: |-
-    <% if risk_factor == "all" %><% elif risk_factor == "alc" %>harmful use of alcohol<% elif risk_factor == "smoking" %>smoking<% elif risk_factor == "dia" %>diabetes<% elif risk_factor == "und" %>undernourishment<% elif risk_factor == "hiv" %>HIV infection<% endif -%>
+    <% if risk_factor == "all" %><% elif risk_factor == "alc" %>harmful use of alcohol <% elif risk_factor == "smk" %>smoking <% elif risk_factor == "dia" %>diabetes <% elif risk_factor == "und" %>undernourishment <% elif risk_factor == "hiv" %>HIV infection <% endif -%>
   indicator:
     presentation_title_absolute: |-
       <% if risk_factor != "all" and age_group == "all" %>
