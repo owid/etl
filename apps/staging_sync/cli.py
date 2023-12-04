@@ -1,3 +1,4 @@
+import copy
 import datetime as dt
 import subprocess
 from pathlib import Path
@@ -136,6 +137,9 @@ def cli(
 
             for chart_id in chart_ids:
                 source_chart = gm.Chart.load_chart(source_session, chart_id)
+
+                _remove_nonexisting_column_slug(source_chart, source_session)
+
                 target_chart = source_chart.migrate_to_db(source_session, target_session)
 
                 # try getting chart with the same slug
@@ -288,10 +292,33 @@ def _get_engine_for_env(env: Path) -> Engine:
     return get_engine(config)
 
 
+def _remove_nonexisting_column_slug(source_chart: gm.Chart, source_session: Session) -> None:
+    # remove map.columnSlug if the variable doesn't exist
+    column_slug = source_chart.config.get("map", {}).get("columnSlug", None)
+    if column_slug:
+        try:
+            gm.Variable.load_variable(source_session, int(column_slug))
+        except NoResultFound:
+            # When there are multiple indicators in a chart and it also has a map then this field tells the map which indicator to use.
+            # If the chart doesn't have the map tab active then it can be invalid quite often
+            log.warning(
+                "staging_sync.remove_missing_map_column_slug",
+                chart_id=source_chart.id,
+                column_slug=column_slug,
+            )
+            source_chart.config["map"].pop("columnSlug")
+
+
+def _prune_chart_config(config: Dict[str, Any]) -> Dict[str, Any]:
+    config = copy.deepcopy(config)
+    config = {k: v for k, v in config.items() if k not in ("version",)}
+    for dim in config["dimensions"]:
+        dim.pop("variableId", None)
+    return config
+
+
 def _chart_config_diff(source_config: Dict[str, Any], target_config: Dict[str, Any]) -> str:
-    source_config = {k: v for k, v in source_config.items() if k not in ("version",)}
-    target_config = {k: v for k, v in target_config.items() if k not in ("version",)}
-    return _dict_diff(source_config, target_config, tabs=1)
+    return _dict_diff(_prune_chart_config(source_config), _prune_chart_config(target_config), tabs=1)
 
 
 def _charts_configs_are_equal(config_1, config_2):

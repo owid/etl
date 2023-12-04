@@ -319,7 +319,10 @@ class Chart(SQLModel, table=True):
         # add columnSlug if present
         column_slug = self.config.get("map", {}).get("columnSlug")
         if column_slug:
-            variables[int(column_slug)] = Variable.load_variable(session, column_slug)
+            try:
+                variables[int(column_slug)] = Variable.load_variable(session, column_slug)
+            except NoResultFound:
+                raise ValueError(f"columnSlug variable {column_slug} for chart {self.id} not found")
 
         return variables
 
