@@ -7,7 +7,7 @@ definitions:
         - Causes of Death
     display:
       numDecimalPlaces: 0
-    processing_level: minor
+    processing_level: major
   sex: |-
     <% if sex == "a" %>males and females <% elif sex == "m" %>males <% elif sex == "f" %>females  <%- endif -%>
   age_group: |-
