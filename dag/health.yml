@@ -369,3 +369,5 @@ steps:
     - snapshot://tuberculosis/2023-12-04/burden_disaggregated.csv
   data://garden/tuberculosis/2023-11-27/burden_disaggregated:
     - data://meadow/tuberculosis/2023-12-04/burden_disaggregated
+  data://grapher/tuberculosis/2023-11-27/burden_disaggregated:
+    - data://garden/tuberculosis/2023-11-27/burden_disaggregated

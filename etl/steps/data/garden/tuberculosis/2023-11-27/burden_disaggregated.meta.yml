@@ -5,54 +5,55 @@ definitions:
       topic_tags:
         - Tuberculosis
         - Causes of Death
-
-
-# Learn more about the available fields:
-# http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
-dataset:
-  update_period_days: 365
-
-
-# Learn more about the available fields:
-# http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
+    display:
+      numDecimalPlaces: 0
+  sex: |-
+    <% if sex == "a" %>males and females<% elif sex == "m" %>males <% elif sex == "f" %>females <%- endif -%>
+  age_group: |-
+    <% if age_group == "0-14" %>0-14 years<% elif age_group == "0-4" %>0-4 years<% elif age_group == "15-24" %>15-24 years<% elif age_group == "15plus" %>over 15 years<% elif age_group == "18plus" %>over 18 years<% elif age_group == "25-34" %>25-34 years<% elif age_group == "35-44" %>35-44 years<% elif age_group == "45-54" %>45-54 years<% elif age_group == "5-14" %>5-14 years<% elif age_group == "55-64" %>55-64 years<% elif age_group == "65plus" %>over 65 years<% elif age_group == "all" %><% endif -%>
+  risk_factor: |-
+    <% if risk_factor == "all" %><% elif risk_factor == "alc" %>harmful use of alcohol<% elif risk_factor == "smoking" %>smoking<% elif risk_factor == "dia" %>diabetes<% elif risk_factor == "und" %>undernourishment<% elif risk_factor == "hiv" %>HIV infection<% endif -%>
+  indicator:
+    presentation_title: |-
+      <% if risk_factor != "all" and age_group == "all" %>
+      The estimated incidence of tuberculosis cases attributed to {definitions.risk_factor} in {definitions.sex}.
+      <% elif risk_factor != "all" and age_group != "all" %>
+      The estimated incidence of tuberculosis cases attributed to {definitions.risk_factor} in {definitions.sex} aged {definitions.age_group}.
+      <% elif risk_factor == "all" and age_group == "all" %>
+      The estimated incidence of tuberculosis cases in {definitions.sex}.
+      <% elif risk_factor == "all" and age_group != "all" %>
+      The estimated incidence of tuberculosis cases in {definitions.sex} aged {definitions.age_group}.
+      <%- endif -%>
 tables:
   burden_disaggregated:
-    # Learn more about the available fields:
-    # http://docs.owid.io/projects/etl/architecture/metadata/reference/indicator/
     variables:
-      # testing_variable:
-      #   title: Testing variable title
-      #   unit: arbitrary units
-      #   short_unit: au
-      #   description_short: Short description of testing variable.
-      #   description_processing: Description of processing of testing variable.
-      #   description_key: List of key points about the indicator.
-      #   description_from_producer: Description of testing variable from producer.
-      #   processing_level: minor
-      #   presentation:
-      #     attribution:
-      #     attribution_short:
-      #     faqs:
-      #     grapher_config:
-      #     title_public:
-      #     title_variant:
-      #     topic_tags:
-      #   display:
-      #     color:
-      #     conversionFactor: 1
-      #     description:
-      #     entityAnnotationsMap: Test annotation
-      #     includeInTable:
-      #     isProjection: false
-      #     name: Testing variable
-      #     numDecimalPlaces: 0
-      #     shortUnit: au
-      #     tableDisplay:
-      #       hideAbsoluteChange:
-      #       hideRelativeChange:
-      #     tolerance: 0
-      #     unit: arbitrary units
-      #     yearIsDay: false
-      #     zeroDay:
-      {}
-
+      best:
+        title: |-
+          Best estimate: {definitions.indicator.presentation_title}
+        description_short: |-
+          {definitions.indicator.presentation_title}
+        unit: cases
+        presentation:
+          title_public: |-
+            {definitions.indicator.presentation_title}
+          title_variant: best estimate
+      lo:
+        title: |-
+          Low estimate: {definitions.indicator.presentation_title}
+        description_short: |-
+          {definitions.indicator.presentation_title}
+        unit: cases
+        presentation:
+          title_public: |-
+            {definitions.indicator.presentation_title}
+          title_variant: low estimate
+      hi:
+        title: |-
+          High estimate: {definitions.indicator.presentation_title}
+        description_short: |-
+          {definitions.indicator.presentation_title}
+        unit: cases
+        presentation:
+          title_public: |-
+            {definitions.indicator.presentation_title}
+          title_variant: high estimate
