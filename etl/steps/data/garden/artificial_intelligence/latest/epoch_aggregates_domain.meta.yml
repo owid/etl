@@ -11,8 +11,7 @@ dataset:
   update_period_days: 31
   title: Notable AI systems by domain type
 
-origin:
-  date_published: '2023-10-27'
+
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
 tables:

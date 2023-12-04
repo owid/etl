@@ -680,6 +680,14 @@ steps:
   data://grapher/state_capacity/2023-11-20/information_capacity_dataset:
     - data://garden/state_capacity/2023-11-10/information_capacity_dataset
 
+  # Integrated Values Survey
+  data://meadow/ivs/2023-11-27/integrated_values_survey:
+    - snapshot://ivs/2023-11-27/integrated_values_survey.csv
+  data://garden/ivs/2023-11-27/integrated_values_survey:
+    - data://meadow/ivs/2023-11-27/integrated_values_survey
+  data://grapher/ivs/2023-11-27/integrated_values_survey:
+    - data://garden/ivs/2023-11-27/integrated_values_survey
+
   # National Human Genome Research Institute - DNA Sequencing Costs
   data://meadow/technology/2023-11-28/dna_sequencing:
     - snapshot://technology/2023-11-28/dna_sequencing.xls
@@ -687,6 +695,35 @@ steps:
     - data://meadow/technology/2023-11-28/dna_sequencing
   data://grapher/technology/2023-11-28/dna_sequencing:
     - data://garden/technology/2023-11-28/dna_sequencing
+
+  # European Social Survey - Trust questions
+  data://meadow/ess/2023-08-02/ess_trust:
+  - snapshot://ess/2023-08-02/ess_trust.csv
+  - data://garden/regions/2023-01-01/regions
+  data://garden/ess/2023-08-02/ess_trust:
+  - data://meadow/ess/2023-08-02/ess_trust
+  data://grapher/ess/2023-08-02/ess_trust:
+  - data://garden/ess/2023-08-02/ess_trust
+
+  # Latinobarómetro survey - Trust
+  data://meadow/survey/2023-08-04/latinobarometro_trust:
+  - snapshot://survey/2023-08-04/latinobarometro_trust.csv
+  data://garden/survey/2023-08-04/latinobarometro_trust:
+  - data://meadow/survey/2023-08-04/latinobarometro_trust
+
+  # Afrobarometer survey - Trust
+  data://meadow/survey/2023-08-07/afrobarometer_trust:
+  - snapshot://survey/2023-08-07/afrobarometer_trust.csv
+  data://garden/survey/2023-08-07/afrobarometer_trust:
+  - data://meadow/survey/2023-08-07/afrobarometer_trust
+
+  # Trust surveys
+  data://garden/survey/2023-08-04/trust_surveys:
+  - data://garden/survey/2023-08-04/latinobarometro_trust
+  - data://garden/survey/2023-08-07/afrobarometer_trust
+  - data://garden/ess/2023-08-02/ess_trust
+  data://grapher/survey/2023-08-04/trust_surveys:
+  - data://garden/survey/2023-08-04/trust_surveys
 
   ######################################################################################################################
   # Older versions to be archived once they are not used by any other steps.
