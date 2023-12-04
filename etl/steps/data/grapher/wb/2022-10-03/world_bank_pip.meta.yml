@@ -14,7 +14,10 @@ definitions:
         citation_full: World Bank. (2022). Poverty and Inequality Platform (version 20220909_2017_01_02_PROD) [Data set]. World Bank Group. https://pip.worldbank.org/. Accessed 2022-10-03.
         url_main: https://pip.worldbank.org/
         date_accessed: '2022-10-03'
-        date_published: '2022-10-03'
+        date_published: '2022-09-09'
+    display:
+      numDecimalPlaces: 1
+      tolerance: 5
 
     presentation:
       attribution_short: World Bank
@@ -78,12 +81,71 @@ tables:
               min: 0
             map:
               time: 2019
-              timeTolerance: 5
               colorScale:
                 baseColorScheme: OrRd
                 binningStrategy: manual
                 customNumericValues:
                   - 3
+                  - 10
+                  - 20
+                  - 30
+                  - 40
+                  - 50
+                  - 60
+                  - 70
+                  - 80
+                  - 90
+                  - 100
+            selectedEntityNames:
+              - Bangladesh
+              - Bolivia
+              - Madagascar
+              - India
+              - China
+              - Ethiopia
+
+      dollar30_a_day__share_of_population_below_poverty_line:
+        title: $30 a day - share of population below poverty line
+        unit: '%'
+        short_unit: '%'
+        description_short: "% of population living in households with an income or consumption per person below $30 a day."
+        description_key:
+          - A poverty line of $30 a day represents definitions of national poverty lines in high-income countries.
+          - The data is measured in international-$ at 2017 prices – this adjusts for inflation and for differences in the cost of living between countries.
+          - "{definitions.income_consumption_pc}"
+          - "{definitions.non_market_income}"
+        description_processing: |-
+          {definitions.processing_notes}
+        presentation:
+          title_public: Share of population living on less than $30 a day
+          topic_tags:
+            - Poverty
+            - Economic Growth
+            - Economic Inequality
+          faqs:
+            - fragment_id: poverty-international-dollars
+              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+            - fragment_id: poverty-comparability
+              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+            - fragment_id: poverty-regional-estimates
+              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+          grapher_config:
+            title: "Poverty: Share of population living on less than $30 a day"
+            subtitle: >-
+              This data is adjusted for inflation and for differences in the cost of living between countries.
+            note: >-
+              This data is expressed in [international-$](#dod:int_dollar_abbreviation) at 2017 prices. Depending on the country and year, it relates to income measured after taxes and benefits, or to consumption, [per capita](#dod:per-capita).
+            hasMapTab: true
+            tab: map
+            variantName: Line chart
+            yAxis:
+              min: 0
+            map:
+              time: 2019
+              colorScale:
+                baseColorScheme: OrRd
+                binningStrategy: manual
+                customNumericValues:
                   - 10
                   - 20
                   - 30
@@ -139,7 +201,6 @@ tables:
               baseColorScheme: OwidDistinctLines
             map:
               time: 2019
-              timeTolerance: 5
               colorScale:
                 baseColorScheme: YlOrBr
                 binningStrategy: manual
@@ -164,6 +225,7 @@ tables:
         description_short: The Gini coefficient measures inequality on a scale from 0 to 1. Higher values indicate higher inequality.
         display:
           numDecimalPlaces: 2
+          tolerance: 5
         description_key:
           - "{definitions.income_consumption_pc}"
           - "{definitions.non_market_income}"
@@ -195,7 +257,6 @@ tables:
               min: 0
             map:
               time: 2019
-              timeTolerance: 5
               colorScale:
                 baseColorScheme: Oranges
                 binningStrategy: manual
@@ -251,7 +312,6 @@ tables:
               baseColorScheme: OwidDistinctLines
             map:
               time: 2019
-              timeTolerance: 5
               colorScale:
                 baseColorScheme: YlOrBr
                 binningStrategy: manual
