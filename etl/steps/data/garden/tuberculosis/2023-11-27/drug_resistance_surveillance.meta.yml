@@ -12,128 +12,141 @@ tables:
     variables:
       pulm_labconf_new:
         title: "New bacteriologically confirmed pulmonary TB cases"
-        unit: "confirmed cases"
-        description_short: "Number of new bacteriologically confirmed pulmonary TB cases"
+        unit: confirmed cases
+        description_short: Number of new bacteriologically confirmed pulmonary TB cases
         description_from_producer: Number of new bacteriologically confirmed pulmonary TB cases
       pulm_labconf_ret:
-        title: "Previously treated bacteriologically confirmed pulmonary TB cases"
-        description_short: "Number of individuals with previously treated for TB that newly have bacteriologically confirmed pulmonary TB"
-        unit: "confirmed cases"
+        title: Previously treated bacteriologically confirmed pulmonary TB cases
+        description_short: Number of individuals with previously treated for TB that newly have bacteriologically confirmed pulmonary TB
+        unit: confirmed cases
         description_from_producer: Number of previously treated bacteriologically confirmed pulmonary TB cases
       pulm_labconf_unk:
-        title: "Bacteriologically confirmed pulmonary TB cases with unknown treatment history"
-        description_short: "Number of individuals with unknown treatment history that newly have bacteriologically confirmed pulmonary TB"
-        unit: "confirmed cases"
+        title: Bacteriologically confirmed pulmonary TB cases with unknown treatment history
+        description_short: Number of individuals with unknown treatment history that newly have bacteriologically confirmed pulmonary TB
+        unit: confirmed cases
         description_from_producer: Number of bacteriologically confirmed pulmonary TB cases with unknown TB treatment history
       r_rlt_new:
-        title: "New bacteriologically confirmed pulmonary TB cases tested for rifampicin resistance"
-        description_short: "Number of new bacteriologically confirmed pulmonary TB cases tested for rifampicin resistance"
-        unit: "confirmed cases tested for rifampicin resistance"
+        title: New bacteriologically confirmed pulmonary TB cases tested for rifampicin resistance
+        description_short: Number of new bacteriologically confirmed pulmonary TB cases tested for rifampicin resistance
+        unit: confirmed cases tested for rifampicin resistance
         description_from_producer: Number of new bacteriologically confirmed pulmonary TB patients with test results for rifampicin
       r_rlt_ret:
-        title: "Previously treated bacteriologically confirmed pulmonary TB cases tested for rifampicin resistance"
-        unit: "confirmed cases tested for rifampicin resistance"
-        description_short: "Number of previously treated bacteriologically confirmed pulmonary TB cases tested for rifampicin resistance"
+        title: Previously treated bacteriologically confirmed pulmonary TB cases tested for rifampicin resistance
+        unit: confirmed cases tested for rifampicin resistance
+        description_short: Number of previously treated bacteriologically confirmed pulmonary TB cases tested for rifampicin resistance
         description_from_producer: Number of previously treated bacteriologically confirmed pulmonary TB patients with test results for rifampicin
       rr_new:
-        title: "New bacteriologically confirmed pulmonary TB cases with rifampicin resistance"
-        unit: "new patients with rifampicin resistance"
-        description_short: "Number of new bacteriologically confirmed pulmonary TB cases with rifampicin resistance"
+        title: New bacteriologically confirmed pulmonary TB cases with rifampicin resistance
+        unit: new patients with rifampicin resistance
+        description_short: Number of new bacteriologically confirmed pulmonary TB cases with rifampicin resistance
         description_from_producer: Number of new bacteriologically confirmed pulmonary TB patients with resistance to rifampicin (RR-TB)
       rr_ret:
-        title: "Previously treated bacteriologically confirmed pulmonary TB cases with rifampicin resistance"
-        description_short: "Number of previously treated bacteriologically confirmed pulmonary TB cases with rifampicin resistance"
-        unit: "previously treated patients with rifampicin resistance"
+        title: Previously treated bacteriologically confirmed pulmonary TB cases with rifampicin resistance
+        description_short: Number of previously treated bacteriologically confirmed pulmonary TB cases with rifampicin resistance
+        unit: previously treated patients with rifampicin resistance
         description_from_producer: Number of previously treated bacteriologically confirmed pulmonary TB patients with resistance to rifampicin (RR-TB)
       r_rlt_rel:
-        title: "Bacteriologically confirmed pulmonary relapse TB cases tested for rifampicin resistance"
-        description_short: "Number of bacteriologically confirmed pulmonary relapse TB cases tested for rifampicin resistance"
-        unit: "relapse cases tested for rifampicin resistance"
+        title: Bacteriologically confirmed pulmonary relapse TB cases tested for rifampicin resistance
+        description_short: Number of bacteriologically confirmed pulmonary relapse TB cases tested for rifampicin resistance
+        unit: relapse cases tested for rifampicin resistance
         description_from_producer: Number of bacteriologically confirmed pulmonary relapse TB patients with test results for rifampicin
       rr_rel:
-        title: "Bacteriologically confirmed pulmonary relapse TB cases with rifampicin resistance"
-        description_short: "Number of bacteriologically confirmed pulmonary relapse TB cases with rifampicin resistance"
-        unit: "relapse cases with rifampicin resistance"
+        title: Bacteriologically confirmed pulmonary relapse TB cases with rifampicin resistance
+        description_short: Number of bacteriologically confirmed pulmonary relapse TB cases with rifampicin resistance
+        unit: relapse cases with rifampicin resistance
         description_from_producer: Number of bacteriologically confirmed pulmonary relapse TB patients with resistance to rifampicin (RR-TB)
       dst_rlt_new:
-        title: "New bacteriologically confirmed pulmonary TB cases tested for isoniazid and rifampicin resistance"
-        description_short: "Number of new bacteriologically confirmed pulmonary TB cases tested for isoniazid and rifampicin resistance"
-        unit: "new cases tested for isoniazid and rifampicin resistance"
+        title: New bacteriologically confirmed pulmonary TB cases tested for isoniazid and rifampicin resistance
+        description_short: Number of new bacteriologically confirmed pulmonary TB cases tested for isoniazid and rifampicin resistance
+        unit: new cases tested for isoniazid and rifampicin resistance
         description_from_producer: "Among new pulmonary TB patients with positive identification for M. Tuberculosis complex (confirmed by culture and/or line-probe assay): number of patients with available drug susceptibility testing results for isoniazid and rifampicine"
       dst_rlt_ret:
-        title: "Previously treated bacteriologically confirmed pulmonary TB cases tested for isoniazid and rifampicin resistance"
-        description_short: "Number of previously treated bacteriologically confirmed pulmonary TB cases tested for isoniazid and rifampicin resistance"
-        unit: "previously treated cases tested for isoniazid and rifampicin resistance"
+        title: Previously treated bacteriologically confirmed pulmonary TB cases tested for isoniazid and rifampicin resistance
+        description_short: Number of previously treated bacteriologically confirmed pulmonary TB cases tested for isoniazid and rifampicin resistance
+        unit: previously treated cases tested for isoniazid and rifampicin resistance
         description_from_producer: "Among patients previously treated for TB with positive identification for M. Tuberculosis complex (confirmed by culture and/or line-probe assay): number of patients with available drug susceptibility testing results for isoniazid and rifampicin"
       dst_rlt_hr_new:
-        title: "New bacteriologically confirmed pulmonary TB cases with isoniazid resistance"
-        description_short: "Number of new bacteriologically confirmed pulmonary TB cases tested for isoniazid and rifampicin resistance with isoniazid resistance"
-        unit: "new cases with isoniazid resistance"
+        title: New bacteriologically confirmed pulmonary TB cases with isoniazid resistance
+        description_short: Number of new bacteriologically confirmed pulmonary TB cases tested for isoniazid and rifampicin resistance with isoniazid resistance
+        unit: new cases with isoniazid resistance
         description_from_producer: Number of new bacteriologically confirmed pulmonary TB patients with test results for rifampicin and isoniazid and with resistance to isoniazid (regardless of result for rifampicin)
       dst_rlt_hr_ret:
-        title: "Previously treated bacteriologically confirmed pulmonary TB cases with isoniazid resistance"
-        description_short: "Number of previously treated bacteriologically confirmed pulmonary TB cases tested for isoniazid and rifampicin resistance with isoniazid resistance"
-        unit: "previously treated cases with isoniazid resistance"
+        title: Previously treated bacteriologically confirmed pulmonary TB cases with isoniazid resistance
+        description_short: Number of previously treated bacteriologically confirmed pulmonary TB cases tested for isoniazid and rifampicin resistance with isoniazid resistance
+        unit: previously treated cases with isoniazid resistance
         description_from_producer: Number of previously treated bacteriologically confirmed pulmonary TB patients with test results for rifampicin and isoniazid and with resistance to isoniazid (regardless of result for rifampicin)
       dst_rlt_rr_new:
-        title: "New bacteriologically confirmed pulmonary TB cases with rifampicin resistance"
-        description_short: "Number of new bacteriologically confirmed pulmonary TB cases tested for isoniazid and rifampicin resistance with rifampicin resistance"
-        unit: "new cases with rifampicin resistance"
+        title: New bacteriologically confirmed pulmonary TB cases with rifampicin resistance
+        description_short: Number of new bacteriologically confirmed pulmonary TB cases tested for isoniazid and rifampicin resistance with rifampicin resistance"
+        unit: new cases with rifampicin resistance
         description_from_producer: Number of new bacteriologically confirmed pulmonary TB patients with test results for rifampicin and isoniazid and with resistance to rifampicin (regardless of result for isoniazid)
       dst_rlt_rr_ret:
-        title: "Previously treated bacteriologically confirmed pulmonary TB cases with rifampicin resistance"
-        description_short: "Number of previously treated bacteriologically confirmed pulmonary TB cases tested for isoniazid and rifampicin resistance with rifampicin resistance"
-        unit: "previously treated cases with rifampicin resistance"
+        title: Previously treated bacteriologically confirmed pulmonary TB cases with rifampicin resistance
+        description_short: Number of previously treated bacteriologically confirmed pulmonary TB cases tested for isoniazid and rifampicin resistance with rifampicin resistance
+        unit: previously treated cases with rifampicin resistance
         description_from_producer: Number of previously treated bacteriologically confirmed pulmonary TB patients with test results for rifampicin and isoniazid and with resistance to rifampicin (regardless of result for isoniazid)
       mdr_new:
-        title: "New bacteriologically confirmed pulmonary TB cases with MDR-TB"
-        description_short: "Number of new bacteriologically confirmed pulmonary TB cases with MDR-TB"
-        unit: "new cases with MDR-TB"
+        title: New bacteriologically confirmed pulmonary TB cases with MDR-TB
+        description_short: Number of new bacteriologically confirmed pulmonary TB cases with MDR-TB
+        unit: new cases with MDR-TB
         description_from_producer: "Among new TB patients with available drug susceptibility testing results (variable dst_rlt_new): number of patients with resistance to isoniazid and rifampicin  (MDR-TB)"
       mdr_ret:
-        title: "Previously treated bacteriologically confirmed pulmonary TB cases with MDR-TB"
-        description_short: "Number of previously treated bacteriologically confirmed pulmonary TB cases with MDR-TB"
-        unit: "previously treated cases with MDR-TB"
+        title: Previously treated bacteriologically confirmed pulmonary TB cases with MDR-TB
+        description_short: Number of previously treated bacteriologically confirmed pulmonary TB cases with MDR-TB
+        unit: previously treated cases with MDR-TB
         description_from_producer: "Among patients previously treated for TB with available drug susceptibility testing results (variable dst_rlt_ret):  number of patients with resistance to isoniazid and rifampicin (MDR-TB)"
       rr_hivpos:
         title: "Bacteriologically confirmed pulmonary TB patients with rifampicin resistance who are HIV-positive"
-        unit: "cases with rifampicin resistance and HIV-positive"
+        description_short: "Number of bacteriologically confirmed pulmonary TB patients with rifampicin resistance who are HIV-positive"
+        unit: "patients with rifampicin resistance that are HIV-positive"
         description_from_producer: Among new and previously treated patients that have confirmed pulmonary TB cases with results for rifampicin testing, the number resistant to rifampicin and who are HIV-positive.
       rr_hivneg:
         title: "Bacteriologically confirmed pulmonary TB patients with rifampicin resistance who are HIV-negative"
-        unit: "cases with rifampicin resistance and HIV-negative"
+        description_short: "Number of bacteriologically confirmed pulmonary TB patients with rifampicin resistance who are HIV-negative"
+        unit: "patients with rifampicin resistance that are HIV-negative"
         description_from_producer: Among new and previously treated patients that have confirmed pulmonary TB cases with results for rifampicin testing, the number resistant to rifampicin and who are HIV-negative.
       rr_hivunk:
         title: "Bacteriologically confirmed pulmonary TB patients with rifampicin resistance whose HIV status is unknown"
-        unit: "cases with rifampicin resistance and HIV status unknown"
+        description_short: "Number of bacteriologically confirmed pulmonary TB patients with rifampicin resistance whose HIV status is unknown"
+        unit: "patients with rifampicin resistance with unknown HIV status"
         description_from_producer: Among new and previously treated patients that have confirmed pulmonary TB cases with results for rifampicin testing, the number resistant to rifampicin and whose HIV status is unknown
       nrr_hivpos:
-        unit: ""
-        description_from_producer: Among patients with results for rifampicin testing in r_rlt_new and r_rlt_ret, number susceptible to rifampicin and who are HIV-positive
+        title: "Bacteriologically confirmed pulmonary TB patients with rifampicin susceptibility who are HIV-positive"
+        description_short: "Number of bacteriologically confirmed pulmonary TB patients with rifampicin susceptibility who are HIV-positive"
+        unit: "patients with rifampicin susceptibility that are HIV-positive"
+        description_from_producer: Among new and previously treated patients that have confirmed pulmonary TB cases with results for rifampicin testing, the number susceptible to rifampicin and who are HIV-positive
       nrr_hivneg:
-        unit: ""
-        description_from_producer: Among patients with results for rifampicin testing in r_rlt_new and r_rlt_ret, number susceptible to rifampicin and who are HIV-negative
+        title: "Bacteriologically confirmed pulmonary TB patients with rifampicin susceptibility who are HIV-negative"
+        description_short: "Number of bacteriologically confirmed pulmonary TB patients with rifampicin susceptibility who are HIV-negative"
+        unit: "patients with rifampicin susceptibility that are HIV-negative"
+        description_from_producer: Among new and previously treated patients that have confirmed pulmonary TB cases with results for rifampicin testing, the number susceptible to rifampicin and who are HIV-negative
       nrr_hivunk:
-        unit: ""
-        description_from_producer: Among patients with results for rifampicin testing in r_rlt_new and r_rlt_ret, number susceptible to rifampicin and whose HIV status is unknown
+        title: "Bacteriologically confirmed pulmonary TB patients with rifampicin susceptibility whose HIV status is unknown"
+        unit: "patients with rifampicin susceptibility with unknown HIV status"
+        description_short: "Number of bacteriologically confirmed pulmonary TB patients with rifampicin susceptibility whose HIV status is unknown"
+        description_from_producer: Among new and previously treated patients that have confirmed pulmonary TB cases with results for rifampicin testing, number susceptible to rifampicin and whose HIV status is unknown
       rr_014:
-        unit: ""
-        description_from_producer: Among patients with results for rifampicin testing in r_rlt_new and r_rlt_ret, number resistant to rifampicin and who are aged 0-14 years
+        title: "Bacteriologically confirmed pulmonary TB patients with rifampicin resistance who are aged 0-14 years"
+        unit: "patients with rifampicin resistance"
+        description_short: Number of bacteriologically confirmed pulmonary TB patients with rifampicin resistance who are aged 0-14 years.
+        description_from_producer: Among new and previously treated patients that have confirmed pulmonary TB cases with results for rifampicin testing, number resistant to rifampicin and who are aged 0-14 years.
       rr_15plus:
-        unit: ""
-        description_from_producer: Among patients with results for rifampicin testing in r_rlt_new and r_rlt_ret, number resistant to rifampicin and who are aged 15 years and over
+        title: "Bacteriologically confirmed pulmonary TB patients with rifampicin resistance who are aged 15 years and over"
+        unit: "patients with rifampicin resistance"
+        description_short: Number of bacteriologically confirmed pulmonary TB patients with rifampicin resistance who are aged 15 years and over.
+        description_from_producer: Among new and previously treated patients that have confirmed pulmonary TB cases with results for rifampicin testing, number resistant to rifampicin and who are aged 15 years and over.
       rr_ageunk:
         unit: ""
-        description_from_producer: Among patients with results for rifampicin testing in r_rlt_new and r_rlt_ret, number resistant to rifampicin and whose age is unknown
+        description_from_producer: Among new and previously treated patients that have confirmed pulmonary TB cases with results for rifampicin testing, number resistant to rifampicin and whose age is unknown
       nrr_014:
         unit: ""
-        description_from_producer: Among patients with results for rifampicin testing in r_rlt_new and r_rlt_ret, number susceptible to rifampicin and who are aged 0-14 years
+        description_from_producer: Among new and previously treated patients that have confirmed pulmonary TB cases with results for rifampicin testing, number susceptible to rifampicin and who are aged 0-14 years
       nrr_15plus:
         unit: ""
-        description_from_producer: Among patients with results for rifampicin testing in r_rlt_new and r_rlt_ret, number susceptible to rifampicin and who are aged 15 years and over
+        description_from_producer: Among new and previously treated patients that have confirmed pulmonary TB cases with results for rifampicin testing, number susceptible to rifampicin and who are aged 15 years and over
       nrr_ageunk:
         unit: ""
-        description_from_producer: Among patients with results for rifampicin testing in r_rlt_new and r_rlt_ret, number susceptible to rifampicin and whose age is unknown
+        description_from_producer: Among new and previously treated patients that have confirmed pulmonary TB cases with results for rifampicin testing, number susceptible to rifampicin and whose age is unknown
       rr_dst_rlt:
         unit: ""
         description_from_producer: Number of new or previously treated bacteriologically confirmed pulmonary TB patients with resistance to rifampicin and with test results for any fluoroquinolone and any second-line injectable agent
@@ -184,7 +197,7 @@ tables:
         description_from_producer: Number of new or previously treated bacteriologically confirmed pulmonary TB patients with resistance to rifampicin and fluoroquinolones, but with unknown resistance to bedaquiline and linezolid.
       mdr_dst_rlt:
         unit: ""
-        description_from_producer: "Drug resistance surveillance: Total number of pulmonary MDR-TB patients with drug susceptibility test results for any fluoroquinolone and any second-line injectable agent"
+        description_from_producer: "Total number of pulmonary MDR-TB patients with drug susceptibility test results for any fluoroquinolone and any second-line injectable agent"
       xdr:
         unit: ""
-        description_from_producer: "Drug resistance surveillance: Among pulmonary MDR-TB patients with drug susceptibility test results for any fluoroquinolone (FQ) and any second-line injectable agent (2LI) (variable mdr_dst_rlt): number with any resistance to both FQ and 2LI (i.e. XDR-TB in pre-2020 definitions)"
+        description_from_producer: "Among pulmonary MDR-TB patients with drug susceptibility test results for any fluoroquinolone (FQ) and any second-line injectable agent (2LI) (variable mdr_dst_rlt): number with any resistance to both FQ and 2LI (i.e. XDR-TB in pre-2020 definitions)"
