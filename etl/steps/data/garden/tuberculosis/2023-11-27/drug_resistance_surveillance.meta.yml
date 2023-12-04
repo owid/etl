@@ -1,0 +1,155 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Tuberculosis
+        - Causes of Death
+  display:
+    numDecimalPlaces: 0
+tables:
+  drug_resistance_surveillance:
+    variables:
+      pulm_labconf_new:
+        title: "New bacteriologically confirmed pulmonary TB cases"
+        unit: "confirmed cases"
+        description_short: "Number of new bacteriologically confirmed pulmonary TB cases"
+        description_from_producer: Number of new bacteriologically confirmed pulmonary TB cases
+      pulm_labconf_ret:
+        unit: ""
+        description_from_producer: Number of previously treated bacteriologically confirmed pulmonary TB cases
+      pulm_labconf_unk:
+        unit: ""
+        description_from_producer: Number of bacteriologically confirmed pulmonary TB cases with unknown TB treatment history
+      r_rlt_new:
+        unit: ""
+        description_from_producer: Number of new bacteriologically confirmed pulmonary TB patients with test results for rifampicin
+      r_rlt_ret:
+        unit: ""
+        description_from_producer: Number of previously treated bacteriologically confirmed pulmonary TB patients with test results for rifampicin
+      rr_new:
+        unit: ""
+        description_from_producer: Number of new bacteriologically confirmed pulmonary TB patients with resistance to rifampicin (RR-TB)
+      rr_ret:
+        unit: ""
+        description_from_producer: Number of previously treated bacteriologically confirmed pulmonary TB patients with resistance to rifampicin (RR-TB)
+      r_rlt_rel:
+        unit: ""
+        description_from_producer: Number of bacteriologically confirmed pulmonary relapse TB patients with test results for rifampicin
+      rr_rel:
+        unit: ""
+        description_from_producer: Number of bacteriologically confirmed pulmonary relapse TB patients  with resistance to rifampicin (RR-TB)
+      dst_rlt_new:
+        unit: ""
+        description_from_producer: "Drug resistance surveillance: Among new pulmonary TB patients with positive identification for M. Tuberculosis complex (confirmed by culture and/or line-probe assay): number of patients with available drug susceptibility testing results for isoniazid and rifampicine"
+      dst_rlt_ret:
+        unit: ""
+        description_from_producer: "Drug resistance surveillance: Among patients previously treated for TB with positive identification for M. Tuberculosis complex (confirmed by culture and/or line-probe assay): number of patients with available drug susceptibility testing results for isoniazid and rifampicin"
+      dst_rlt_hr_new:
+        unit: ""
+        description_from_producer: Number of new bacteriologically confirmed pulmonary TB patients with test results for rifampicin and isoniazid and with resistance to isoniazid (regardless of result for rifampicin)
+      dst_rlt_hr_ret:
+        unit: ""
+        description_from_producer: Number of previously treated bacteriologically confirmed pulmonary TB patients with test results for rifampicin and isoniazid and with resistance to isoniazid (regardless of result for rifampicin)
+      dst_rlt_rr_new:
+        unit: ""
+        description_from_producer: Number of new bacteriologically confirmed pulmonary TB patients with test results for rifampicin and isoniazid and with resistance to rifampicin (regardless of result for isoniazid)
+      dst_rlt_rr_ret:
+        unit: ""
+        description_from_producer: Number of previously treated bacteriologically confirmed pulmonary TB patients with test results for rifampicin and isoniazid and with resistance to rifampicin (regardless of result for isoniazid)
+      mdr_new:
+        unit: ""
+        description_from_producer: "Drug resistance surveillance: Among new TB patients with available drug susceptibility testing results (variable dst_rlt_new):  number of patients with resistance to isoniazid and rifampicin  (MDR-TB)"
+      mdr_ret:
+        unit: ""
+        description_from_producer: "Drug resistance surveillance: Among patients previously treated for TB with available drug susceptibility testing results (variable dst_rlt_ret):  number of patients with resistance to isoniazid and rifampicin  (MDR-TB)"
+      rr_hivpos:
+        unit: ""
+        description_from_producer: Among patients with results for rifampicin testing in r_rlt_new and r_rlt_ret, number resistant to rifampicin and who are HIV-positive
+      rr_hivneg:
+        unit: ""
+        description_from_producer: Among patients with results for rifampicin testing in r_rlt_new and r_rlt_ret, number resistant to rifampicin and who are HIV-negative
+      rr_hivunk:
+        unit: ""
+        description_from_producer: Among patients with results for rifampicin testing in r_rlt_new and r_rlt_ret, number resistant to rifampicin and whose HIV status is unknown
+      nrr_hivpos:
+        unit: ""
+        description_from_producer: Among patients with results for rifampicin testing in r_rlt_new and r_rlt_ret, number susceptible to rifampicin and who are HIV-positive
+      nrr_hivneg:
+        unit: ""
+        description_from_producer: Among patients with results for rifampicin testing in r_rlt_new and r_rlt_ret, number susceptible to rifampicin and who are HIV-negative
+      nrr_hivunk:
+        unit: ""
+        description_from_producer: Among patients with results for rifampicin testing in r_rlt_new and r_rlt_ret, number susceptible to rifampicin and whose HIV status is unknown
+      rr_014:
+        unit: ""
+        description_from_producer: Among patients with results for rifampicin testing in r_rlt_new and r_rlt_ret, number resistant to rifampicin and who are aged 0-14 years
+      rr_15plus:
+        unit: ""
+        description_from_producer: Among patients with results for rifampicin testing in r_rlt_new and r_rlt_ret, number resistant to rifampicin and who are aged 15 years and over
+      rr_ageunk:
+        unit: ""
+        description_from_producer: Among patients with results for rifampicin testing in r_rlt_new and r_rlt_ret, number resistant to rifampicin and whose age is unknown
+      nrr_014:
+        unit: ""
+        description_from_producer: Among patients with results for rifampicin testing in r_rlt_new and r_rlt_ret, number susceptible to rifampicin and who are aged 0-14 years
+      nrr_15plus:
+        unit: ""
+        description_from_producer: Among patients with results for rifampicin testing in r_rlt_new and r_rlt_ret, number susceptible to rifampicin and who are aged 15 years and over
+      nrr_ageunk:
+        unit: ""
+        description_from_producer: Among patients with results for rifampicin testing in r_rlt_new and r_rlt_ret, number susceptible to rifampicin and whose age is unknown
+      rr_dst_rlt:
+        unit: ""
+        description_from_producer: Number of new or previously treated bacteriologically confirmed pulmonary TB patients with resistance to rifampicin and with test results for any fluoroquinolone and any second-line injectable agent
+      rr_ds_fq2li:
+        unit: ""
+        description_from_producer: Number of new or previously treated bacteriologically confirmed pulmonary TB patients with resistance to rifampicin and susceptible to both fluoroquinolones and second-line injectable agents
+      rr_dr_fq:
+        unit: ""
+        description_from_producer: Number of new or previously treated bacteriologically confirmed pulmonary TB patients with resistance to rifampicin and resistance to fluoroquinolones
+      rr_dr_2li:
+        unit: ""
+        description_from_producer: Number of new or previously treated bacteriologically confirmed pulmonary TB patients with resistance to rifampicin and resistance to second-line injectable agents
+      rr_dr_fq_2li:
+        unit: ""
+        description_from_producer: Number of new or previously treated bacteriologically confirmed pulmonary TB patients with resistance to rifampicin and resistance to both fluoroquinolones and second-line injectable agents
+      rr_dst_rlt_fq:
+        unit: ""
+        description_from_producer: Number of new or previously treated bacteriologically confirmed pulmonary TB patients with resistance to rifampicin and with test results for any fluoroquinolone
+      rr_fqr:
+        unit: ""
+        description_from_producer: Number of new or previously treated bacteriologically confirmed pulmonary TB patients with resistance to rifampicin and resistance to fluoroquinolones
+      rr_fqr_bdqr_lzdr:
+        unit: ""
+        description_from_producer: Number of new or previously treated bacteriologically confirmed pulmonary TB patients with resistance to rifampicin, fluoroquinolones, bedaquiline and linezolid.
+      rr_fqr_bdqr_lzds:
+        unit: ""
+        description_from_producer: Number of new or previously treated bacteriologically confirmed pulmonary TB patients with resistance to rifampicin, fluoroquinolones and bedaquiline but susceptible to linezolid.
+      rr_fqr_bdqr_lzdu:
+        unit: ""
+        description_from_producer: Number of new or previously treated bacteriologically confirmed pulmonary TB patients with resistance to rifampicin, fluoroquinolones and bedaquiline but unknown resistance to linezolid.
+      rr_fqr_bdqs_lzdr:
+        unit: ""
+        description_from_producer: Number of new or previously treated bacteriologically confirmed pulmonary TB patients with resistance to rifampicin, fluoroquinolones and linezolid, but susceptible to bedaquiline.
+      rr_fqr_bdqs_lzds:
+        unit: ""
+        description_from_producer: Number of new or previously treated bacteriologically confirmed pulmonary TB patients with resistance to rifampicin, fluoroquinolones but susceptible to bedaquiline and linezolid.
+      rr_fqr_bdqs_lzdu:
+        unit: ""
+        description_from_producer: Number of new or previously treated bacteriologically confirmed pulmonary TB patients with resistance to rifampicin and fluoroquinolones, but susceptible to bedaquiline and with unknown resistance to linezolid.
+      rr_fqr_bdqu_lzdr:
+        unit: ""
+        description_from_producer: Number of new or previously treated bacteriologically confirmed pulmonary TB patients with resistance to rifampicin, fluoroquinolones and linezolid, but unknown resistance to bedaquiline.
+      rr_fqr_bdqu_lzds:
+        unit: ""
+        description_from_producer: Number of new or previously treated bacteriologically confirmed pulmonary TB patients with resistance to rifampicin, fluoroquinolones but susceptible to linezolid and unknown resistance to bedaquiline.
+      rr_fqr_bdqu_lzdu:
+        unit: ""
+        description_from_producer: Number of new or previously treated bacteriologically confirmed pulmonary TB patients with resistance to rifampicin and fluoroquinolones, but with unknown resistance to bedaquiline and linezolid.
+      mdr_dst_rlt:
+        unit: ""
+        description_from_producer: "Drug resistance surveillance: Total number of pulmonary MDR-TB patients with drug susceptibility test results for any fluoroquinolone and any second-line injectable agent"
+      xdr:
+        unit: ""
+        description_from_producer: "Drug resistance surveillance: Among pulmonary MDR-TB patients with drug susceptibility test results for any fluoroquinolone (FQ) and any second-line injectable agent (2LI) (variable mdr_dst_rlt): number with any resistance to both FQ and 2LI (i.e. XDR-TB in pre-2020 definitions)"
