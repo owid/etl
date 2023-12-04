@@ -11,7 +11,7 @@ steps:
   data://grapher/met_office_hadley_centre/2023-10-18/near_surface_temperature:
     - data://garden/met_office_hadley_centre/2023-10-18/near_surface_temperature
   #
-  # GISS Surface temperature analysis (GISS NASA).
+  # GISS - Surface temperature analysis.
   #
   data://meadow/climate_change/2023-12-04/giss_surface_temperature_analysis:
     - snapshot://climate_change/2023-12-04/giss_surface_temperature_analysis_world.csv
@@ -21,6 +21,16 @@ steps:
     - data://meadow/climate_change/2023-12-04/giss_surface_temperature_analysis
   data://grapher/climate_change/latest/giss_surface_temperature_analysis:
     - data://garden/climate_change/2023-12-04/giss_surface_temperature_analysis
+  #
+  # NSIDC - Arctic sea ice extent.
+  #
+  data://meadow/climate_change/2023-12-04/nsidc_sea_ice_index:
+    - snapshot://climate_change/2023-12-04/nsidc_sea_ice_index.xlsx
+  data://garden/climate_change/2023-12-04/nsidc_sea_ice_index:
+    - data://meadow/climate_change/2023-12-04/nsidc_sea_ice_index
+  #
+  # Climate change impacts data explorer.
+  #
   data://explorers/climate_change/latest/climate_change_impacts:
     - data://garden/climate_change/2023-12-04/giss_surface_temperature_analysis
 
