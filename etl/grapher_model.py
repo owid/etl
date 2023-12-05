@@ -178,6 +178,7 @@ class Tag(SQLModel, table=True):
 
     id: Optional[int] = Field(default=None, sa_column=Column("id", Integer, primary_key=True))
     name: str = Field(sa_column=Column("name", String(255, "utf8mb4_0900_as_cs"), nullable=False))
+    slug: str = Field(sa_column=Column("slug", String(255, "utf8mb4_0900_as_cs"), nullable=False))
     createdAt: datetime = Field(sa_column=Column("createdAt", DateTime, nullable=False))
     updatedAt: datetime = Field(sa_column=Column("updatedAt", DateTime, nullable=False))
     isBulkImport: int = Field(sa_column=Column("isBulkImport", TINYINT(1), nullable=False, server_default=text("'0'")))
@@ -192,12 +193,12 @@ class Tag(SQLModel, table=True):
 
     @classmethod
     def load_tags(cls, session: Session) -> List["Tag"]:  # type: ignore
-        return session.exec(select(cls)).all()  # type: ignore
+        return session.exec(select(cls).where(cls.slug.isnot(None))).all()  # type: ignore
 
     @classmethod
     def load_tags_by_names(cls, session: Session, tag_names: List[str]) -> List["Tag"]:
         """Load topic tags by their names in the order given in `tag_names`."""
-        tags = session.exec(select(Tag).where(Tag.name.in_(tag_names))).all()  # type: ignore
+        tags = session.exec(select(Tag).where(Tag.name.in_(tag_names), Tag.slug.isnot(None))).all()  # type: ignore
 
         if len(tags) != len(tag_names):
             found_tags = [tag.name for tag in tags]
@@ -938,6 +939,8 @@ class TagsVariablesTopicTagsLink(SQLModel, table=True):
     @classmethod
     def link_with_variable(cls, session: Session, variable_id: int, new_tag_ids: List[str]) -> None:
         """Link the given Variable ID with the given Tag IDs."""
+        assert len(new_tag_ids) == len(set(new_tag_ids)), "Tag IDs must be unique"
+
         # Fetch current linked tags for the given Variable ID
         existing_links = session.query(cls.tagId, cls.displayOrder).filter(cls.variableId == variable_id).all()
 

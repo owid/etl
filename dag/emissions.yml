@@ -45,11 +45,11 @@ steps:
   data://grapher/gcp/2023-12-05/global_carbon_budget:
     - data://garden/gcp/2023-12-05/global_carbon_budget
   #
-  # Emissions - CO2 dataset (2023-11-23).
+  # Emissions - CO2 dataset (2023-12-05).
   #
-  data://garden/emissions/2023-11-23/owid_co2:
+  data://garden/emissions/2023-12-05/owid_co2:
     - data://garden/emissions/2023-11-23/national_contributions
-    - data://garden/gcp/2023-09-28/global_carbon_budget
+    - data://garden/gcp/2023-12-05/global_carbon_budget
     - data://garden/climate_watch/2023-10-31/emissions_by_sector
     - data://garden/energy/2023-07-10/primary_energy_consumption
     - data://garden/demography/2023-03-31/population
@@ -90,14 +90,6 @@ steps:
   data://grapher/emissions/2023-11-23/national_contributions:
     - data://garden/emissions/2023-11-23/national_contributions
   #
-  # Decoupling of GDP and CO2 (2023).
-  #
-  # The data from the following step will be used in a static chart.
-  # TODO: Add reference here when it's live.
-  data://garden/emissions/2023-10-06/gdp_and_co2_decoupling:
-    - data://garden/gcp/2023-09-28/global_carbon_budget
-    - data://garden/worldbank_wdi/2022-05-26/wdi
-  #
   # IPCC - Emission Factor Database (2023-10-24).
   #
   data://meadow/emissions/2023-10-24/emission_factors:
@@ -126,7 +118,12 @@ steps:
     - data://garden/emissions/2023-11-06/global_warming_potential_factors
 
   ######################################################################################################################
-  # Older versions to be archived once they are not used by any other steps.
+  # Older versions that should be archived once they are not used by any other steps.
+
+  ######################################################################################################################
+
+  ######################################################################################################################
+  # Older versions that can safely be archived at any point, if needed.
   #
   # GCP - Global Carbon Budget (2023-09-28).
   #
@@ -148,5 +145,24 @@ steps:
     - data://garden/wb/2023-04-30/income_groups
   data://grapher/gcp/2023-09-28/global_carbon_budget:
     - data://garden/gcp/2023-09-28/global_carbon_budget
+  #
+  # Emissions - CO2 dataset (2023-11-23).
+  #
+  data://garden/emissions/2023-11-23/owid_co2:
+    - data://garden/emissions/2023-11-23/national_contributions
+    - data://garden/gcp/2023-09-28/global_carbon_budget
+    - data://garden/climate_watch/2023-10-31/emissions_by_sector
+    - data://garden/energy/2023-07-10/primary_energy_consumption
+    - data://garden/demography/2023-03-31/population
+    - data://garden/ggdc/2020-10-01/ggdc_maddison
+    - data://garden/regions/2023-01-01/regions
+  #
+  # Decoupling of GDP and CO2 (2023).
+  #
+  # The data from the following step will be used in this static chart:
+  # https://drive.google.com/file/d/1PflfQpr4mceVWRSGEqMP6Gbo1tFQZzOp/view?usp=sharing
+  data://garden/emissions/2023-10-06/gdp_and_co2_decoupling:
+    - data://garden/gcp/2023-09-28/global_carbon_budget
+    - data://garden/worldbank_wdi/2022-05-26/wdi
 
   ######################################################################################################################
