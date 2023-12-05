@@ -82,10 +82,10 @@ tables:
           title: Cardiac MRI units per million people
           unit: 'per million people'
           short_unit: ''
-          description_short: Number of cardiac magnetic resonance imaging (MRI) units for diagnostic purposes, per million people in the population.
+          description_short: Number of cardiac [MRI](#dod:mri-imaging) units for diagnostic purposes, per million people in the population.
           processing_level: minor
           display:
-            numDecimalPlaces: 0
+            numDecimalPlaces: 1
 
         cardiac_resynchronization_therapy_device__crt_d_and_crt_p__implantations__per_million_people:
           title: Cardiac resynchronization therapy device (CRT-D and CRT-P) implantations per million people
@@ -103,7 +103,7 @@ tables:
           description_short: Number of cardiac surgeons per million people in the population.
           processing_level: minor
           display:
-            numDecimalPlaces: 0
+            numDecimalPlaces: 1
 
         cardiologists__total__per_million_people:
           title: Total cardiologists per million people
@@ -136,7 +136,7 @@ tables:
           title: Coronary angiography and diagnostic cardiac catheterization per million people
           unit: 'per million people'
           short_unit: ''
-          description_short: 'Number of two key procedures in cardiology, used to diagnose cardiovascular disease: coronary angiographies (used to visualize heart vessels), and diagnostic cardiac catheterizations (used to measure various heart functions), per million people in the population.'
+          description_short: Number of coronary angiographies, a technique for visualizing heart vessels, and diagnostic cardiac catheterizations, a procedure for examining heart health, per million people in the population.
           processing_level: minor
           display:
             numDecimalPlaces: 0
@@ -172,10 +172,10 @@ tables:
           title: Hospitals with cath labs per million people
           unit: 'per million people'
           short_unit: ''
-          description_short: Number of hospitals with catheterization labs (cath labs), per million people in the population.
+          description_short: Number of hospitals with [catheterization labs](#dod:catheterization-labs), per million people in the population.
           processing_level: minor
           display:
-            numDecimalPlaces: 0
+            numDecimalPlaces: 1
 
         hospitals_implanting_mitraclip__per_million_people:
           title: Hospitals implanting MitraClip per million people
@@ -337,7 +337,7 @@ tables:
           description_short: Number of hospitals with dedicated heart failure (HF) centers, per million people in the population.
           processing_level: minor
           display:
-            numDecimalPlaces: 0
+            numDecimalPlaces: 1
 
         hospitals_with_dedicated_coronary_care_units__per_million_people:
           title: Hospitals with dedicated coronary care units per million people
@@ -355,16 +355,16 @@ tables:
           description_short: Number of hospitals with dedicated stroke units, per million people in the population.
           processing_level: minor
           display:
-            numDecimalPlaces: 0
+            numDecimalPlaces: 1
 
         implantable_cardioverter_defibrillator__icd__implantations__per_million_people:
           title: Implantable cardioverter defibrillator (ICD) implantations per million people
           unit: 'per million people'
           short_unit: ''
-          description_short: Number of implantable cardioverter defibrillator (ICD) implantations, per million people in the population.
+          description_short: Number of [implantable cardioverter-defibrillators (ICDs)](#dod:implantable-cardioverter-defibrillators), per million people in the population. - 1 decimal place
           processing_level: minor
           display:
-            numDecimalPlaces: 0
+            numDecimalPlaces: 1
 
         interventional_cardiologists__per_million_people:
           title: Interventional cardiologists per million people
@@ -416,7 +416,7 @@ tables:
           title: Pacemaker implantations per million people
           unit: 'per million people'
           short_unit: ''
-          description_short: Number of pacemaker implantations used to treat heart rhythm disorders, per million people in the population.
+          description_short: Number of [pacemaker](#dod:pacemaker) implantations used to treat heart rhythm disorders, per million people in the population.
           processing_level: minor
           display:
             numDecimalPlaces: 0
@@ -434,10 +434,10 @@ tables:
           title: Percentage of percutaneous coronary interventions (PCI) performed by transradial access
           unit: '%'
           short_unit: '%'
-          description_short: Percentage of percutaneous coronary interventions (PCI) performed using transradial access.
+          description_short: Proportion of cases in which cardiologists access coronary arteries via the radial artery in the wrist, rather than the traditional femoral artery approach through the groin. This reflects the adoption of a less invasive and potentially safer approach to cardiac procedures.
           processing_level: minor
           display:
-            numDecimalPlaces: 0
+            numDecimalPlaces: 2
 
         percutaneous_aortic_valve_implantation__tavi__per_million_people:
           title: Percutaneous aortic valve implantation (TAVI) per million people
@@ -596,10 +596,10 @@ tables:
           title: Total catheterization labs per million people
           unit: 'per million people'
           short_unit: ''
-          description_short: Number of catheterization labs (cath labs), which are facilities equipped for heart-related diagnostic and therapeutic procedures, per million people in the population.
+          description_short: Number of [catheterization labs](#dod:catheterization-labs), which are facilities equipped for heart-related diagnostic and therapeutic procedures, per million people in the population.
           processing_level: minor
           display:
-            numDecimalPlaces: 0
+            numDecimalPlaces: 1
 
         use_of_hemodynamic_support_devices__per_million_people:
           title: Use of hemodynamic support devices per million people
