@@ -31,7 +31,7 @@ definitions:
       A state-based conflict is a conflict between two armed groups, at least one of which is a state, that causes at least 25 deaths during a year.
       <%- endif -%>
     location_conflicts_method: |-
-      UCDP provides geo coordinates of each conflict event. We have mapped this coordinates to countries by means of the Natural Earth dataset.
+      UCDP provides geographical coordinates of each conflict event. We have mapped this coordinates to countries by means of the Natural Earth dataset.
 
       In some instances, the event's coordinates fall within the borders of a country. Other times, the event's coordinates fall outside the borders of a country. In the latter case, we have mapped the event to the country that is closest to the event's coordinates.
 
@@ -201,7 +201,7 @@ tables:
         display:
           numDecimalPlaces: 0
         description_short: |-
-          Whether there was at least one conflict (of a specific kind) event in the country in a given year.
+          Whether there was at least one conflict event, for a given country, year and and conflict type.
         description_key:
           - |-
             '1' indicates that there was a conflict event in the given country. '0' indicates that there was no conflict event in the given country.
@@ -211,7 +211,56 @@ tables:
         display:
           numDecimalPlaces: 0
         description_short: |-
-          The number of countries where at least one conflict (of a specific kind) event occurred, for a given year and region.
+          The number of countries where at least one conflict event occurred, for a given year and and conflict type.
+
+      number_deaths:
+        title: Number of conflict deaths in a country (best estimate)
+        unit: "deaths"
+        display:
+          numDecimalPlaces: 0
+        description_short: |-
+          The best estimate on the number of deaths from conflict events that occurred in a country, for a given year and and conflict type.
+
+      number_deaths_low:
+        title: Number of conflict deaths in a country (low estimate)
+        unit: "deaths"
+        display:
+          numDecimalPlaces: 0
+        description_short: |-
+          The low estimate on the number of deaths from conflict events that occurred in a country, for a given year and and conflict type.
+
+      number_deaths_high:
+        title: Number of conflict deaths in a country (high estimate)
+        unit: "deaths"
+        display:
+          numDecimalPlaces: 0
+        description_short: |-
+          The high estimate on the number of deaths from conflict events that occurred in a country, for a given year and and conflict type.
+
+      death_rate:
+        title: Death rate of conflicts located in a country (best estimate)
+        unit: "deaths per 100,000 people"
+        display:
+          numDecimalPlaces: 1
+        description_short: |-
+          The best estimate on the death rate from conflict events that occurred in a country, for a given year and and conflict type.
+
+      death_rate_low:
+        title: Death rate of conflicts located in a country (low estimate)
+        unit: "deaths per 100,000 people"
+        display:
+          numDecimalPlaces: 1
+        description_short: |-
+          The low estimate on the death rate from conflict events that occurred in a country, for a given year and and conflict type.
+
+      death_rate_high:
+        title: Death rate of conflicts located in a country (high estimate)
+        unit: "deaths per 100,000 people"
+        display:
+          numDecimalPlaces: 1
+        description_short: |-
+          The high estimate on the death rate from conflict events that occurred in a country, for a given year and and conflict type.
+
 
   ucdp:
     variables:

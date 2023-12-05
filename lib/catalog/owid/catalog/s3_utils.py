@@ -1,13 +1,11 @@
 import logging
-import os
-from os import path
+from os import environ as env
 from typing import Any, Tuple
 from urllib.parse import urlparse
 
 from botocore.exceptions import ClientError
 
 R2_ENDPOINT = "https://078fcdfed9955087315dd86792e71a7e.r2.cloudflarestorage.com"
-AWS_PROFILE = os.environ.get("AWS_PROFILE", "default")
 
 
 def s3_bucket_key(url: str) -> Tuple[str, str]:
@@ -43,30 +41,20 @@ def connect() -> Any:
     "Return a connection to Cloudflare's R2."
     import boto3
 
-    check_for_default_profile()
+    R2_ACCESS_KEY = env.get("R2_ACCESS_KEY")
+    R2_SECRET_KEY = env.get("R2_SECRET_KEY")
 
-    session = boto3.Session(profile_name=AWS_PROFILE)
-    client = session.client(
+    assert R2_ACCESS_KEY and R2_SECRET_KEY, "Missing R2_ACCESS_KEY and R2_SECRET_KEY environment variables."
+
+    client = boto3.client(
         service_name="s3",
         endpoint_url=R2_ENDPOINT,
+        aws_access_key_id=R2_ACCESS_KEY,
+        aws_secret_access_key=R2_SECRET_KEY,
+        region_name="auto",
     )
+
     return client
-
-
-def check_for_default_profile() -> None:
-    filename = path.expanduser("~/.aws/config")
-    if not path.exists(filename) or f"[{AWS_PROFILE}]" not in open(filename).read():
-        raise MissingCredentialsError(
-            f"""you must set up a config file at ~/.aws/config
-
-it should look like:
-
-[{AWS_PROFILE}]
-aws_access_key_id = ...
-aws_secret_access_key = ...
-region = ...
-"""
-        )
 
 
 class MissingCredentialsError(Exception):

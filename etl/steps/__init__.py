@@ -825,8 +825,8 @@ class GrapherStep(Step):
         if not config.GRAPHER_FILTER:
             self._cleanup_ghost_resources(dataset_upsert_results, variable_upsert_results)
 
-        # set checksum and updatedAt timestamps after all data got inserted
-        gi.set_dataset_checksum_and_editedAt(dataset_upsert_results.dataset_id, self.data_step.checksum_input())
+            # set checksum and updatedAt timestamps after all data got inserted
+            gi.set_dataset_checksum_and_editedAt(dataset_upsert_results.dataset_id, self.data_step.checksum_input())
 
     def checksum_output(self) -> str:
         raise NotImplementedError("GrapherStep should not be used as an input")

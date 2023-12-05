@@ -130,7 +130,7 @@ class Snapshot:
         else:
             raise ValueError("Neither origin nor source is set")
         self.path.parent.mkdir(exist_ok=True, parents=True)
-        if download_url.startswith("s3://"):
+        if download_url.startswith("s3://") or download_url.startswith("r2://"):
             s3_utils.download(download_url, str(self.path))
         else:
             files.download(download_url, str(self.path))
