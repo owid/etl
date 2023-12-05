@@ -115,6 +115,14 @@ steps:
   data://grapher/imf/2023-05-02/world_economic_outlook:
     - data://garden/imf/2023-05-02/world_economic_outlook
 
+  # Trust questions in World Values Survey
+  data://meadow/wvs/2023-03-08/wvs_trust:
+    - snapshot://wvs/2023-03-08/wvs_trust.csv
+  data://garden/wvs/2023-03-08/wvs_trust:
+    - data://meadow/wvs/2023-03-08/wvs_trust
+  data://grapher/wvs/2023-03-08/wvs_trust:
+    - data://garden/wvs/2023-03-08/wvs_trust
+
 # Include all active steps plus all archive steps.
 include:
   - dag/main.yml

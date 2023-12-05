@@ -16,7 +16,6 @@ def run(dest_dir: str) -> None:
     # Read table from garden dataset.
     tb = ds_garden["ucdp"]
 
-    #
     # Process data.
     #
     # Rename index column `region` to `country`.
@@ -27,11 +26,13 @@ def run(dest_dir: str) -> None:
     tb = tb.set_index(["year", "country", "conflict_type"])
 
     # Get country-level data
-    tb_country = ds_garden["ucdp_country"]
+    tb_participants = ds_garden["ucdp_country"]
+    tb_locations = ds_garden["ucdp_locations"]
 
     tables = [
         tb,
-        tb_country,
+        tb_participants,
+        tb_locations,
     ]
 
     #

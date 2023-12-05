@@ -1,0 +1,28 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/origin/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Wars on territory
+    date_published: 2022-11-01
+
+    # Citation
+    producer: Chupilkin and Kóczán
+    citation_full: |-
+      Chupilkin, Maxim, and Zsóka Kóczán. 2022. “The economic consequences of war: Estimates using synthetic controls.” EBRD Working Paper No. 271.
+
+    # Files
+    url_main: 
+      https://www.ebrd.com/sites/Satellite?c=Content&cid=1395309927403&d=&pagename=EBRD%2FContent%2FContentLayout&rendermode=live%3Fsrch-pg%3Fsrch-pg%3FfilterCountry%3DJordan%3FfilterCountry%3DPoland%3FfilterSector%3DEnergy
+    date_accessed: 2023-11-29
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://creativecommons.org/licenses/by/4.0/
+
+wdir: ../../../data/snapshots/war/2023-11-29
+outs:
+- md5: fec6fdf0e35687e8f122c1d2630c3d80
+  size: 27614
+  path: chupilkin_koczan.dta

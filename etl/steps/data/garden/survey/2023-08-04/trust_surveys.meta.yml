@@ -8,6 +8,8 @@ definitions:
     description_processing: |
       The indicators are processed from microdata of several different regional surveys using Stata. Weights are applied in each country.
 
+      The European Social Survey uses a 1-10 scale to measure interpersonal trust, where higher values represent higher trust. To make this data comparable with other surveys, we selected the answers with a score from 6 to 10 and calculated the percentage of the total number of answers.
+
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
 dataset:

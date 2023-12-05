@@ -21,17 +21,21 @@ Notes:
 
 from typing import List, Optional
 
+import geopandas as gpd
 import numpy as np
 import pandas as pd
 from owid.catalog import Dataset, Table
 from owid.catalog import processing as pr
+from shapely import wkt
 from shared import (
     add_indicators_extra,
     aggregate_conflict_types,
+    fill_gaps_with_zeroes,
     get_number_of_countries_in_conflict_by_region,
 )
 from structlog import get_logger
 
+from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
 
 log = get_logger()
@@ -76,10 +80,18 @@ def run(dest_dir: str) -> None:
     tb_regions = ds_gw["gleditsch_regions"].reset_index()
     tb_codes = ds_gw["gleditsch_countries"]
 
+    # Load maps table
+    short_name = "nat_earth_110"
+    ds_maps = paths.load_dataset(short_name)
+    tb_maps = ds_maps[short_name].reset_index()
+
+    # Load population
+    ds_population = paths.load_dataset("population")
+
     #
     # Process data.
     #
-    paths.log.info("war.ucdp: sanity checks")
+    paths.log.info("sanity checks")
     _sanity_checks(ds_meadow)
 
     # Load relevant tables
@@ -88,19 +100,20 @@ def run(dest_dir: str) -> None:
     tb_prio = ds_meadow["ucdp_prio_armed_conflict"].reset_index()
 
     # Keep only active conflicts
-    paths.log.info("war.ucdp: keep active conflicts")
+    paths.log.info("keep active conflicts")
     tb_geo = tb_geo[tb_geo["active_year"] == 1]
 
     # Change region named "Asia" to "Asia and Oceania" (in GED)
     tb_geo["region"] = tb_geo["region"].replace(to_replace={"Asia": "Asia and Oceania"})
 
     # Create `conflict_type` column
-    paths.log.info("war.ucdp: add field `conflict_type`")
+    paths.log.info("add field `conflict_type`")
     tb = add_conflict_type(tb_geo, tb_conflict)
 
     # Get country-level stuff
     paths.log.info("getting country-level indicators")
-    tb_country = estimate_metrics_country_level(tb, tb_codes)
+    tb_participants = estimate_metrics_participants(tb, tb_codes)
+    tb_locations = estimate_metrics_locations(tb, tb_maps, ds_population)
 
     # Sanity check conflict_type transitions
     ## Only consider transitions between intrastate and intl intrastate. If other transitions are detected, raise error.
@@ -108,28 +121,28 @@ def run(dest_dir: str) -> None:
     _sanity_check_prio_conflict_types(tb_prio)
 
     # Add number of new conflicts and ongoing conflicts (also adds data for the World)
-    paths.log.info("war.ucdp: get metrics for main dataset (also estimate values for 'World')")
+    paths.log.info("get metrics for main dataset (also estimate values for 'World')")
     tb = estimate_metrics(tb)
 
     # Add table from UCDP/PRIO
-    paths.log.info("war.ucdp: prepare data from ucdp/prio table (also estimate values for 'World')")
+    paths.log.info("prepare data from ucdp/prio table (also estimate values for 'World')")
     tb_prio = prepare_prio_data(tb_prio)
 
     # Fill NaNs
-    paths.log.info("war.ucdp: replace missing data with zeros (where applicable)")
+    paths.log.info("replace missing data with zeros (where applicable)")
     tb_prio = replace_missing_data_with_zeros(tb_prio)
     tb = replace_missing_data_with_zeros(tb)
 
     # Combine main dataset with PRIO/UCDP
-    paths.log.info("war.ucdp: add data from ucdp/prio table")
+    paths.log.info("add data from ucdp/prio table")
     tb = combine_tables(tb, tb_prio)
 
     # Add extra-systemic after 1989
-    paths.log.info("war.ucdp: fix extra-systemic nulls")
+    paths.log.info("fix extra-systemic nulls")
     tb = fix_extrasystemic_entries(tb)
 
     # Add data for "all conflicts" conflict type
-    paths.log.info("war.ucdp: add data for 'all conflicts'")
+    paths.log.info("add data for 'all conflicts'")
     tb = add_conflict_all(tb)
 
     # Add data for "all intrastate" conflict types
@@ -158,16 +171,20 @@ def run(dest_dir: str) -> None:
 
     # Set index, sort rows
     tb = tb.set_index(["year", "region", "conflict_type"], verify_integrity=True).sort_index()
-    tb_country = tb_country.set_index(["year", "country", "conflict_type"], verify_integrity=True).sort_index()
+    tb_participants = tb_participants.set_index(
+        ["year", "country", "conflict_type"], verify_integrity=True
+    ).sort_index()
+    tb_locations = tb_locations.set_index(["year", "country", "conflict_type"], verify_integrity=True).sort_index()
 
     # Add short_name to table
-    paths.log.info("war.ucdp: add shortname to table")
+    paths.log.info("add shortname to table")
     tb.metadata.short_name = paths.short_name
 
     # Tables
     tables = [
         tb,
-        tb_country,
+        tb_participants,
+        tb_locations,
     ]
 
     #
@@ -398,14 +415,14 @@ def estimate_metrics(tb: Table) -> Table:
     we need to access the actual conflict_id field to find the number of unique values. This can only be done here.
     """
     # Get number of ongoing conflicts, and deaths in ongoing conflicts
-    paths.log.info("war.ucdp: get number of ongoing conflicts and deaths in ongoing conflicts")
+    paths.log.info("get number of ongoing conflicts and deaths in ongoing conflicts")
     tb_ongoing = _get_ongoing_metrics(tb)
 
     # Get number of new conflicts every year
-    paths.log.info("war.ucdp: get number of new conflicts every year")
+    paths.log.info("get number of new conflicts every year")
     tb_new = _get_new_metrics(tb)
     # Combine and build single table
-    paths.log.info("war.ucdp: combine and build single table")
+    paths.log.info("combine and build single table")
     tb = tb_ongoing.merge(
         tb_new,
         left_on=["year", "region", "conflict_type"],
@@ -733,8 +750,8 @@ def adapt_region_names(tb: Table) -> Table:
     return tb
 
 
-def estimate_metrics_country_level(tb: Table, tb_codes: Table) -> Table:
-    """Add country-level indicators."""
+def estimate_metrics_participants(tb: Table, tb_codes: Table) -> Table:
+    """Add participant information at country-level."""
     ###################
     # Participated in #
     ###################
@@ -810,3 +827,261 @@ def estimate_metrics_country_level(tb: Table, tb_codes: Table) -> Table:
     tb_country.metadata.short_name = f"{paths.short_name}_country"
 
     return tb_country
+
+
+def estimate_metrics_locations(tb: Table, tb_maps: Table, ds_population: Dataset) -> Table:
+    """Add participant information at country-level.
+
+    reference: https://github.com/owid/notebooks/blob/main/JoeHasell/UCDP%20and%20PRIO/UCDP_georeferenced/ucdp_country_extract.ipynb
+    """
+    # Add country name using geometry
+    paths.log.info("adding location name of conflict event...")
+    tb_locations = _get_location_of_conflict_in_ucdp_ged(tb, tb_maps).copy()
+
+    # There are some countries not in GW (remove, replace?). We keep Palestine and Western Sahara since
+    # these are mappable in OWID maps.
+    # We map entry with id "53238" and relid "PAK-2003-1-345-88" from "Siachen Glacier" to "Pakistan" based on
+    # the text in `where_description` field, which says: "Giang sector in Siachen, Pakistani Kashmir"
+    tb_locations.loc[tb_locations["country_name_location"] == "Siachen Glacier", "country_name_location"] = "Pakistan"
+
+    ###################
+    # COUNTRY-LEVEL: Country in conflict or not (1 or 0)
+    ###################
+    paths.log.info("estimating country flag 'is_location_of_conflict'...")
+
+    # tb_locations = tb_locations.merge(
+    #     tb_codes.reset_index(), left_on="country_name_location", right_on="country", how="left"
+    # )
+
+    # Estimate if a conflict occured in a country, and the number of deaths in it
+    tb_locations_country = (
+        tb_locations.groupby(["country_name_location", "year", "conflict_type"], as_index=False)
+        .agg(
+            {
+                "conflict_new_id": "nunique",
+                "best": "sum",
+                "low": "sum",
+                "high": "sum",
+            }
+        )
+        .rename(
+            columns={
+                "conflict_new_id": "is_location_of_conflict",
+                "country_name_location": "country",
+                "best": "number_deaths",
+                "low": "number_deaths_low",
+                "high": "number_deaths_high",
+            }
+        )
+    )
+    assert tb_locations_country["is_location_of_conflict"].notna().all(), "Missing values in `is_location_of_conflict`!"
+    cols_num_deaths = ["number_deaths", "number_deaths_low", "number_deaths_high"]
+    for col in cols_num_deaths:
+        assert tb_locations_country[col].notna().all(), f"Missing values in `{col}`!"
+    # Convert into a binary indicator: 1 (if more than one conflict), 0 (otherwise)
+    tb_locations_country["is_location_of_conflict"] = tb_locations_country["is_location_of_conflict"].apply(
+        lambda x: 1 if x > 0 else 0
+    )
+
+    # Fill with zeroes
+    tb_locations_country = fill_gaps_with_zeroes(
+        tb=tb_locations_country,
+        columns=["country", "year", "conflict_type"],
+        cols_use_range=["year"],
+    )
+
+    # Add origins from Natural Earth
+    cols = ["is_location_of_conflict"] + cols_num_deaths
+    for col in cols:
+        tb_locations_country[col].origins += tb_maps["name"].m.origins
+
+    ###################
+    # Add conflict type aggregates
+    ###################
+    paths.log.info("adding conflict type aggregates...")
+
+    # Add missing conflict types
+    CTYPES_AGGREGATES = {
+        "intrastate": ["intrastate (non-internationalized)", "intrastate (internationalized)"],
+        "state-based": list(TYPE_OF_CONFLICT_MAPPING.values()),
+        "all": list(TYPE_OF_VIOLENCE_MAPPING.values()) + list(TYPE_OF_CONFLICT_MAPPING.values()),
+    }
+    for ctype_agg, ctypes in CTYPES_AGGREGATES.items():
+        tb_locations_country = aggregate_conflict_types(
+            tb=tb_locations_country,
+            parent_name=ctype_agg,
+            children_names=ctypes,
+            columns_to_aggregate=["is_location_of_conflict"] + cols_num_deaths,
+            columns_to_aggregate_absolute=cols_num_deaths,
+            columns_to_groupby=["country", "year"],
+        )
+
+    ###################
+    # Add rates
+    ###################
+    # Add population column
+    tb_locations_country = geo.add_population_to_table(
+        tb=tb_locations_country,
+        ds_population=ds_population,
+    )
+    # Divide and obtain rates
+    factor = 100_000
+    tb_locations_country["death_rate"] = (
+        factor * tb_locations_country["number_deaths"] / tb_locations_country["population"]
+    )
+    tb_locations_country["death_rate_low"] = factor * (
+        tb_locations_country["number_deaths_low"] / tb_locations_country["population"]
+    )
+    tb_locations_country["death_rate_high"] = factor * (
+        tb_locations_country["number_deaths_high"] / tb_locations_country["population"]
+    )
+
+    # Drop population column
+    tb_locations_country = tb_locations_country.drop(columns=["population"])
+
+    ###################
+    # REGION-LEVEL: Number of locations with conflict
+    ###################
+    paths.log.info("estimating number of locations with conflict...")
+
+    # Add regions
+    cols = ["region", "year", "conflict_type"]
+    tb_locations_regions = (
+        tb_locations.groupby(cols)
+        .agg(
+            {
+                "country_name_location": "nunique",
+            }
+        )
+        .reset_index()
+        .sort_values(cols)
+        .rename(
+            columns={
+                "country_name_location": "number_locations",
+                "region": "country",
+            }
+        )
+    )
+    # World
+    cols = ["year", "conflict_type"]
+    tb_locations_world = (
+        tb_locations.groupby(cols)
+        .agg(
+            {
+                "country_name_location": "nunique",
+            }
+        )
+        .reset_index()
+        .sort_values(cols)
+        .rename(
+            columns={
+                "country_name_location": "number_locations",
+                "region": "country",
+            }
+        )
+    )
+    tb_locations_world["country"] = "World"
+    # Combine
+    tb_locations_regions = pr.concat([tb_locations_regions, tb_locations_world], ignore_index=True)
+
+    # Add origins
+    tb_locations_regions["number_locations"].m.origins = tb_locations["conflict_new_id"].origins
+
+    paths.log.info("adding conflict type aggregates...")
+    # Add aggregates of conflict types
+    for ctype_agg, ctypes in CTYPES_AGGREGATES.items():
+        tb_locations_regions = aggregate_conflict_types(
+            tb=tb_locations_regions,
+            parent_name=ctype_agg,
+            children_names=ctypes,
+            columns_to_aggregate=["number_locations"],
+            columns_to_aggregate_absolute=["number_locations"],
+            columns_to_groupby=["country", "year"],
+        )
+
+    ###################
+    # COMBINE: Country flag + Regional counts
+    ###################
+    paths.log.info("combining country flag and regional counts...")
+    tb_locations = pr.concat(
+        [tb_locations_country, tb_locations_regions], short_name=f"{paths.short_name}_locations", ignore_index=True
+    )
+    return tb_locations
+
+
+def _get_location_of_conflict_in_ucdp_ged(tb: Table, tb_maps: Table) -> Table:
+    """Add column with country name of the conflict."""
+    # Convert the UCDP data to a GeoDataFrame (so it can be mapped and used in spatial analysis).
+    # The 'wkt.loads' function takes the coordinates in the 'geometry' column and ensures geopandas will use it to map the data.
+    gdf = tb[["relid", "geom_wkt"]]
+    gdf.rename(columns={"geom_wkt": "geometry"}, inplace=True)
+    gdf["geometry"] = gdf["geometry"].apply(wkt.loads)
+    gdf = gpd.GeoDataFrame(gdf, crs="epsg:4326")
+
+    # Format the map to be a GeoDataFrame with a gemoetry column
+    gdf_maps = gpd.GeoDataFrame(tb_maps)
+    gdf_maps["geometry"] = gdf_maps["geometry"].apply(wkt.loads)
+    gdf_maps = gdf_maps.set_geometry("geometry")
+    gdf_maps.crs = "epsg:4326"
+
+    # Use the overlay function to extract data from the world map that each point sits on top of.
+    gdf_match = gpd.overlay(gdf, gdf_maps, how="intersection")
+    # Events not assigned to any country
+    # There are 1618 points that are missed - likely because they are in the sea perhaps due to the conflict either happening at sea or at the coast and the coordinates are slightly inaccurate.
+    assert gdf.shape[0] - gdf_match.shape[0] == 1618, "Unexpected number of events without exact coordinate match!"
+
+    # Get missing entries
+    ids_missing = set(gdf["relid"]) - set(gdf_match["relid"])
+    gdf_missing = gdf[gdf["relid"].isin(ids_missing)]
+
+    # Reprojecting the points and the world into the World Equidistant Cylindrical Sphere projection.
+    wec_crs = "+proj=eqc +lat_ts=0 +lat_0=0 +lon_0=0 +x_0=0 +y_0=0 +a=6371007 +b=6371007 +units=m +no_defs"
+    gdf_missing_wec = gdf_missing.to_crs(wec_crs)
+    gdf_maps_wec = gdf_maps.to_crs(wec_crs)
+    # For these points we can find the nearest country using the distance function
+    polygon_near = []
+    for _, row in gdf_missing_wec.iterrows():
+        polygon_index = gdf_maps_wec.distance(row["geometry"]).sort_values().index[0]
+        ne_country_name = gdf_maps_wec["name"][polygon_index]
+        polygon_near.append(ne_country_name)
+    # Assign
+    gdf_missing["name"] = polygon_near
+
+    # Combining and adding name to original table
+    COLUMN_COUNTRY_NAME = "country_name_location"
+    gdf_country_names = pr.concat([Table(gdf_match[["relid", "name"]]), Table(gdf_missing[["relid", "name"]])])
+    tb = tb.merge(gdf_country_names, on="relid", how="left", validate="one_to_one").rename(
+        columns={"name": COLUMN_COUNTRY_NAME}
+    )
+    assert tb[COLUMN_COUNTRY_NAME].notna().all(), "Some missing values found in `COLUMN_COUNTRY_NAME`"
+
+    # SOME CORRECTIONS #
+    # To align with OWID borders we will rename the conflicts in Somaliland to Somalia and the conflicts in Morocco that were below 27.66727 latitude to Western Sahara.
+    ## Somaliland -> Somalia
+    mask = tb[COLUMN_COUNTRY_NAME] == "Somaliland"
+    paths.log.info(f"{len(tb.loc[mask, COLUMN_COUNTRY_NAME])} datapoints in Somaliland")
+    tb.loc[mask, COLUMN_COUNTRY_NAME] = "Somalia"
+    ## Morocco -> Western Sahara
+    mask = (tb[COLUMN_COUNTRY_NAME] == "Morocco") & (tb["latitude"] < 27.66727)
+    paths.log.info(f"{len(tb.loc[mask, COLUMN_COUNTRY_NAME])} datapoints in land contested by Morocco/W.Sahara")
+    tb.loc[mask, COLUMN_COUNTRY_NAME] = "Western Sahara"
+
+    # Add a flag column for points likely to have inccorect corrdinates:
+    # a) points where coordiantes are (0 0), or points where latitude and longitude are exactly the same
+    tb["flag"] = ""
+    # Items are (mask, flag_message)
+    errors = [
+        (
+            tb["geom_wkt"] == "POINT (0 0)",
+            "coordinates (0 0)",
+        ),
+        (tb["latitude"] == tb["longitude"], "latitude = longitude"),
+    ]
+    for error in errors:
+        tb.loc[error[0], "flag"] = error[1]
+        tb.loc[mask, COLUMN_COUNTRY_NAME] = np.nan
+
+    assert tb["country_name_location"].isna().sum() == 4, "4 missing values were expected! Found a different amount!"
+    tb = tb.dropna(subset=["country_name_location"])
+
+    return tb

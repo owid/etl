@@ -326,14 +326,6 @@ steps:
   data://grapher/technology/2023-03-09/microprocessor_trend:
     - data://garden/technology/2023-03-08/microprocessor_trend
 
-  # Trust questions in World Values Survey
-  data://meadow/wvs/2023-03-08/wvs_trust:
-    - snapshot://wvs/2023-03-08/wvs_trust.csv
-  data://garden/wvs/2023-03-08/wvs_trust:
-    - data://meadow/wvs/2023-03-08/wvs_trust
-  data://grapher/wvs/2023-03-08/wvs_trust:
-    - data://garden/wvs/2023-03-08/wvs_trust
-
   # Terrorism questions in World Values Survey (longitudinal)
   data://meadow/wvs/2023-06-25/longitudinal_wvs:
     - snapshot://wvs/2023-06-25/longitudinal_wvs.csv
@@ -737,6 +729,13 @@ steps:
     - snapshot://un/2023-01-24/un_sdg_dimension.json
   data://grapher/un/2023-01-24/un_sdg:
     - data://garden/un/2023-01-24/un_sdg
+
+  ######################################################################################################################
+  # Map (Natural Earth)
+  data://meadow/geography/2023-11-28/nat_earth_110:
+    - snapshot://geography/2023-11-28/nat_earth_110.zip
+  data://garden/geography/2023-11-28/nat_earth_110:
+    - data://meadow/geography/2023-11-28/nat_earth_110
 
   ######################################################################################################################
 

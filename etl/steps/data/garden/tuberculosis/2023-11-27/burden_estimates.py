@@ -2,6 +2,7 @@
 
 from owid.catalog import Dataset, Table
 from owid.catalog import processing as pr
+from shared import add_variable_description_from_producer
 
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
@@ -75,14 +76,6 @@ def run(dest_dir: str) -> None:
 
     # Save changes in the new garden dataset.
     ds_garden.save()
-
-
-def add_variable_description_from_producer(tb, dd):
-    """Add variable description from the data dictionary to each variable."""
-    columns = tb.columns.difference(["country", "year"])
-    for col in columns:
-        tb[col].metadata.description_from_producer = dd.loc[dd.variable_name == col, "definition"].values[0]
-    return tb
 
 
 def add_region_sum_aggregates(tb: Table, ds_regions: Dataset, ds_income_groups: Dataset) -> Table:

@@ -23,7 +23,7 @@ def run(dest_dir: str) -> None:
     # Process data.
 
     # Drop columns
-    tb = drop_indicators(tb)
+    tb = drop_indicators_and_replace_nans(tb)
 
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
     tb = tb.set_index(["country", "year"], verify_integrity=True)
@@ -40,9 +40,10 @@ def run(dest_dir: str) -> None:
     ds_garden.save()
 
 
-def drop_indicators(tb: Table) -> Table:
+def drop_indicators_and_replace_nans(tb: Table) -> Table:
     """
     Drop indicators/questions not useful enough for OWID's purposes (too few data points, for too few countries, etc.)
+    Also, replace zero values appearing in IVS data with nulls. This did not happen in WVS data.
     """
 
     # Drop selected variables
@@ -59,5 +60,11 @@ def drop_indicators(tb: Table) -> Table:
         "confidence_organization_of_american_states__oae",  # Only Peru
     ]
     tb = tb.drop(columns=vars_to_drop)
+
+    # Replace zero values with nulls
+    tb = tb.replace(0, float("nan"))
+
+    # Drop rows with all null values in columns not country and year
+    tb = tb.dropna(how="all", subset=tb.columns.difference(["country", "year"]))
 
     return tb

@@ -3,7 +3,7 @@
 meta:
   origin:
     # Data product / Snapshot
-    title: Trust questions in the Latinobarómetro Dataset
+    title: Trust questions in the Latinobarómetro dataset
     description: |-
       Latinobarómetro is an annual public opinion survey that involves some 20,000 interviews in 18 Latin American countries, representing more than 600 million inhabitants.
     date_published: "2021"
