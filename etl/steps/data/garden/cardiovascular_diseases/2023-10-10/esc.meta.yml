@@ -361,10 +361,10 @@ tables:
           title: Implantable cardioverter defibrillator (ICD) implantations per million people
           unit: 'per million people'
           short_unit: ''
-          description_short: Number of [implantable cardioverter-defibrillators (ICDs)](#dod:implantable-cardioverter-defibrillators), per million people in the population. - 1 decimal place
+          description_short: Number of [implantable cardioverter-defibrillators (ICDs)](#dod:implantable-cardioverter-defibrillators), per million people in the population.
           processing_level: minor
           display:
-            numDecimalPlaces: 1
+            numDecimalPlaces: 0
 
         interventional_cardiologists__per_million_people:
           title: Interventional cardiologists per million people
