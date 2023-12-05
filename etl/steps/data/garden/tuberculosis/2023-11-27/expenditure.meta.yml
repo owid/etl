@@ -158,6 +158,7 @@ tables:
       hcfvisit_mdr:
         title: Visits to health facilities after diagnosis for patients starting multidrug or extensively drug resistant treatment
         unit: visits
+        short_unit: ""
         description_short: Typical number of visits to a health facility after diagnosis for patients starting  multidrug or extensively drug resistant tuberculosis treatment.
         description_from_producer: Typical number of visits to a health facility after diagnosis for patients starting MDR-TB/XDR-TB
           treatment
@@ -178,17 +179,20 @@ tables:
       hospd_dstb_dur:
         title: Average duration of stay if patients starting first-line tuberculosis treatment are hospitalized
         unit: "days"
+        short_unit: ""
         description_short: Estimated average duration of stay if patients starting first-line tuberculosis treatment are hospitalized.
         description_from_producer: Estimated average duration of stay if patients starting first-line TB treatment are hospitalized
           (days)
       hospd_mdr_dur:
         title: Average duration of stay if patients starting multidrug or extensively drug resistant tuberculosis treatment are hospitalized
         unit: "days"
+        short_unit: ""
         description_short: Estimated average duration of stay if patients starting multidrug or extensively drug resistant tuberculosis treatment are hospitalized.
         description_from_producer: Estimated average duration of stay if patients starting MDR-TB/XDR-TB treatment are hospitalized
           (days)
       hosp_type_mdr:
         title: Type of facility most often used if patients starting multidrug or extensively drug resistant tuberculosis treatment are hospitalized
         unit: ""
+        short_unit: ""
         description_short: Type of facility most often used if patients starting multidrug or extensively drug resistant tuberculosis treatment are hospitalized.
         description_from_producer: Type of facility most often used if MDR-TB patients are hospitalized
