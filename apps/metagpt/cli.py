@@ -108,92 +108,86 @@ def main(path_to_file, output_dir: str, overwrite: bool):
     log.info("Starting metadata update process.")
 
     # Determine the output file path
-    if output_dir is None:
-        output_dir = os.path.dirname(path_to_file)
-
-    output_file_path = os.path.join(output_dir, "gpt_" + os.path.basename(path_to_file))
-
-    # Check if the file exists and if overwrite is set to True
-    if os.path.exists(output_file_path) and overwrite:
-        os.remove(output_file_path)
+    if overwrite:
+        output_file_path = path_to_file
+    else:
+        if output_dir is None:
+            output_dir = os.path.dirname(path_to_file)
+        output_file_path = os.path.join(output_dir, "gpt_" + os.path.basename(path_to_file))
 
     try:
         metadata = read_metadata_file(path_to_file)
         generate_metadata_update(path_to_file, metadata, output_file_path)
-        log.info("Metadata update process completed successfully.")
     except Exception as e:
         log.error("Metadata update process failed.", error=str(e))
 
 
-def read_metadata_file(path_to_file: str) -> str:
+def read_metadata_file(path_to_file):
     """Reads a metadata file and returns its content."""
     with open(path_to_file, "r") as file:
         return file.read()
 
 
+def process_chat_completion(chat_completion):
+    """Processes the chat completion response."""
+    if chat_completion is not None:
+        chat_completion_tokens = chat_completion.usage.total_tokens
+        log.info(f"Cost GPT4: ${chat_completion_tokens/ 1000 * 0.03:.2f}")
+        message_content = chat_completion.choices[0].message.content
+        return message_content
+    return None
+
+
 def generate_metadata_update(path_to_file: str, metadata: str, output_file_path: str):
     """Generates updated metadata using OpenAI GPT."""
+    client = OpenAI()
     messages = create_system_prompt(path_to_file, metadata)
-    try:
-        client = OpenAI()
 
+    if "snap" in path_to_file:
         chat_completion = client.chat.completions.create(messages=messages, model="gpt-4", temperature=0)
-
-        log.info(f"Cost GPT4: ${chat_completion.usage.total_tokens/ 1000 * 0.03:.2f}")
-        if "snap" in path_to_file:
-            message_content = chat_completion.choices[0].message.content
-
-            # Load the YAML content from the string
+        message_content = process_chat_completion(chat_completion)
+        if message_content:
             new_yaml_content = yaml.safe_load(message_content)
-            # Write the updated YAML back to the file
-            with open(output_file_path, "w") as file:
-                yaml.dump(new_yaml_content, file, default_flow_style=False, sort_keys=False, indent=4)
-        elif "grapher" in path_to_file:
-            message_content = chat_completion.choices[0].message.content
-            # This regular expression attempts to differentiate between single quotes used as delimiters and those used in data
-            json_string_fixed = re.sub(r"(\W)'|'(\W)", r'\1"\2', message_content)
-
-            # Initialize parsed_dict before the try/except block
-            parsed_dict = None
-
-            # Parse the corrected string
-            try:
-                parsed_dict = json.loads(json_string_fixed)
-            except json.JSONDecodeError as e:
-                print("Error decoding JSON:", e)
-
-            # Load the original YAML content
-            try:
-                with open(path_to_file, "r") as file:
-                    original_yaml_content = yaml.safe_load(file)
-            except Exception as e:
-                print(f"Error opening or reading file {path_to_file}: {e}")
-                return
-            # Now parsed_dict is guaranteed to be defined, although it might be None
-            if parsed_dict is not None:
-                # Update the YAML data
-                for table, table_data in parsed_dict["tables"].items():
-                    for variable, variable_updates in table_data["variables"].items():
-                        if (
-                            table in original_yaml_content["tables"]
-                            and variable in original_yaml_content["tables"][table]["variables"]
-                        ):
-                            # Formatting 'description_key' as bullet points
-                            if "description_key" in variable_updates:
-                                variable_updates["description_key"] = "\n".join(
-                                    f"- {item}" for item in variable_updates["description_key"]
-                                )
-                            original_yaml_content["tables"][table]["variables"][variable].update(variable_updates)
-
-                # Write the updated YAML back to the file
+            if new_yaml_content:
                 with open(output_file_path, "w") as file:
-                    yaml.dump(original_yaml_content, file, default_flow_style=False, sort_keys=False)
+                    yaml.dump(new_yaml_content, file, default_flow_style=False, sort_keys=False, indent=4)
+                    log.info("Metadata update for 'snap' completed successfully.")
 
-    except Exception as e:  # Catch a general exception
-        error_message = str(e)
-        log.error("OpenAI API error", error=error_message)
-        print(f"Error: {error_message}")  # Print the actual error message
-        raise
+    elif "grapher" in path_to_file:
+        for attempt in range(5):  # MAX_ATTEMPTS
+            chat_completion = client.chat.completions.create(messages=messages, model="gpt-4", temperature=0)
+            message_content = process_chat_completion(chat_completion)
+            if message_content:
+                try:
+                    # Fix the single quotes
+                    json_string_fixed = re.sub(r"(\W)'|'(\W)", r'\1"\2', message_content)
+                    parsed_dict = json.loads(json_string_fixed)
+                    if check_gpt_response_format(parsed_dict):
+                        with open(path_to_file, "r") as file:
+                            original_yaml_content = yaml.safe_load(file)
+                            if original_yaml_content:
+                                for table, table_data in parsed_dict["tables"].items():
+                                    for variable, variable_updates in table_data["variables"].items():
+                                        if (
+                                            table in original_yaml_content["tables"]
+                                            and variable in original_yaml_content["tables"][table]["variables"]
+                                        ):
+                                            # Formatting 'description_key' as bullet points
+                                            # If 'description_key' is in variable_updates, keep it as a list of strings
+                                            if "description_key" in variable_updates:
+                                                variable_updates["description_key"] = [
+                                                    f"{item}" for item in variable_updates["description_key"]
+                                                ]
+                                            original_yaml_content["tables"][table]["variables"][variable].update(
+                                                variable_updates
+                                            )
+                            with open(output_file_path, "w") as file:
+                                yaml.dump(original_yaml_content, file, default_flow_style=False, sort_keys=False)
+                                log.info("Metadata update for 'grapher' completed successfully.")
+                                return
+                except json.JSONDecodeError as e:
+                    log.error(f"JSON decoding failed on attempt {attempt + 1}: {e}")
+        raise Exception("Unable to parse GPT response after multiple attempts.")
 
 
 def create_system_prompt(path_to_file, metadata: str):
@@ -262,6 +256,47 @@ def create_system_prompt(path_to_file, metadata: str):
 
     else:
         log.error("Invalid file path", file_path=path_to_file)
+
+
+def check_gpt_response_format(message_content):
+    """
+    Processes ChatGPT response and checks if it's in the correct format.
+
+    :param data: The data to be processed.
+    :return: A message indicating whether the data is correctly formatted.
+    """
+
+    # Check if the top-level structure is a dictionary with the key 'tables'
+    if not isinstance(message_content, dict) or "tables" not in message_content:
+        return False
+
+    tables = message_content["tables"]
+    if not isinstance(tables, dict):
+        return False
+
+    # Iterate over each table
+    for table_name, table_content in tables.items():
+        if not isinstance(table_content, dict) or "variables" not in table_content:
+            return False
+
+        variables = table_content["variables"]
+        if not isinstance(variables, dict):
+            return False
+
+        # Iterate over each variable in the table
+        for var_name, var_content in variables.items():
+            if not isinstance(var_content, dict):
+                return False
+
+            # Check for 'description_short' and 'description_key'
+            if "description_short" not in var_content or "description_key" not in var_content:
+                return False
+
+            # Check if 'description_key' is a list
+            if not isinstance(var_content["description_key"], list):
+                return False
+
+    return True
 
 
 if __name__ == "__main__":
