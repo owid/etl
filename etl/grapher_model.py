@@ -183,7 +183,6 @@ class Tag(SQLModel, table=True):
     isBulkImport: int = Field(sa_column=Column("isBulkImport", TINYINT(1), nullable=False, server_default=text("'0'")))
     parentId: Optional[int] = Field(default=None, sa_column=Column("parentId", Integer))
     specialType: Optional[str] = Field(default=None, sa_column=Column("specialType", String(255, "utf8mb4_0900_as_cs")))
-    isTopic: int = Field(sa_column=Column("isTopic", TINYINT(1), nullable=False, server_default=text("'0'")))
 
     post: List["Posts"] = Relationship(back_populates="tag")
     tags: Optional["Tag"] = Relationship(back_populates="tags_reverse")
@@ -192,13 +191,13 @@ class Tag(SQLModel, table=True):
     chart_tags: List["ChartTags"] = Relationship(back_populates="tags")
 
     @classmethod
-    def load_tags(cls, session: Session, is_topic: bool = True) -> List["Tag"]:  # type: ignore
-        return session.exec(select(cls).where(cls.isTopic == is_topic)).all()  # type: ignore
+    def load_tags(cls, session: Session) -> List["Tag"]:  # type: ignore
+        return session.exec(select(cls)).all()  # type: ignore
 
     @classmethod
     def load_tags_by_names(cls, session: Session, tag_names: List[str]) -> List["Tag"]:
         """Load topic tags by their names in the order given in `tag_names`."""
-        tags = session.exec(select(Tag).where(Tag.name.in_(tag_names), Tag.isTopic == 1)).all()  # type: ignore
+        tags = session.exec(select(Tag).where(Tag.name.in_(tag_names))).all()  # type: ignore
 
         if len(tags) != len(tag_names):
             found_tags = [tag.name for tag in tags]
@@ -319,7 +318,10 @@ class Chart(SQLModel, table=True):
         # add columnSlug if present
         column_slug = self.config.get("map", {}).get("columnSlug")
         if column_slug:
-            variables[int(column_slug)] = Variable.load_variable(session, column_slug)
+            try:
+                variables[int(column_slug)] = Variable.load_variable(session, column_slug)
+            except NoResultFound:
+                raise ValueError(f"columnSlug variable {column_slug} for chart {self.id} not found")
 
         return variables
 
