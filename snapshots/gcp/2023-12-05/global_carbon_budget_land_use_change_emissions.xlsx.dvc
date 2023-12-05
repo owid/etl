@@ -65,7 +65,6 @@ meta:
   license:
     name: CC BY 4.0
     url: https://www.icos-cp.eu/data-services/about-data-portal/data-license
-  is_public: false
 wdir: ../../../data/snapshots/gcp/2023-12-05
 outs:
 - md5: 91ec19c4b60426b339c1d6d72b18ff5d
