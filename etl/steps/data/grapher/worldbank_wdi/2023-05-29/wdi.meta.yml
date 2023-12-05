@@ -164,7 +164,6 @@ tables:
             - fragment_id: stunting-causes
               gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
           grapher_config:
-            slug: share-of-children-younger-than-5-who-suffer-from-stunting
             title: 'Malnutrition: Share of children who are stunted'
             subtitle: >-
               The share of children younger than five years old that are defined as stunted.
@@ -182,9 +181,7 @@ tables:
             originUrl: https://ourworldindata.org/hunger-and-undernourishment
             yAxis:
               min: 0
-              max: 0
             map:
-              columnSlug: '735978'
               timeTolerance: 5
               colorScale:
                 baseColorScheme: YlOrRd
