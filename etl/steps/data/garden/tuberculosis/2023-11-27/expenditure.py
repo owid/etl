@@ -1,5 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
 
+import numpy as np
+from owid.catalog import Table
 from shared import add_variable_description_from_producer
 
 from etl.data_helpers import geo
@@ -24,6 +26,7 @@ def run(dest_dir: str) -> None:
     #
     tb = add_variable_description_from_producer(tb, dd)
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
+    tb = add_values_to_hospital_type(tb)
     tb = tb.set_index(["country", "year"], verify_integrity=True)
 
     #
@@ -36,3 +39,19 @@ def run(dest_dir: str) -> None:
 
     # Save changes in the new garden dataset.
     ds_garden.save()
+
+
+def add_values_to_hospital_type(tb: Table) -> Table:
+    """
+    Add values from data dictionary to hospital_type variable.
+    """
+    hosp_dict = {
+        2: np.nan,
+        140: "Primary-level hospital",
+        141: "Secondary-level hospital",
+        142: "Tertiary-level hospital",
+    }
+    tb["hosp_type_mdr"] = tb["hosp_type_mdr"].astype(object)
+    tb["hosp_type_mdr"] = tb["hosp_type_mdr"].replace(hosp_dict)
+
+    return tb
