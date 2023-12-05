@@ -36,10 +36,10 @@ tables:
         description_short: This data is adjusted for inflation and for differences in the cost of living between countries.
         description_key:
           - This GDP per capita indicator provides information on economic growth and income levels in the medium run. Some country estimates are available as far back as 1950.
-          - For GDP per capita estimates in the very long run, see the [Maddison Project Database's indicator](https://ourworldindata.org/grapher/gdp-per-capita-maddison).
-          - For more up-to-date estimates of GDP per capita, see the [World Bank's indicator](https://ourworldindata.org/grapher/gdp-per-capita-worldbank).
           - This data is adjusted for inflation and for differences in the cost of living between countries.
           - This data is expressed in international-$ at 2017 prices, using multiple benchmark years to adjust for differences in the cost of living between countries over time.
+          - For GDP per capita estimates in the very long run, see the [Maddison Project Database's indicator](https://ourworldindata.org/grapher/gdp-per-capita-maddison).
+          - For more up-to-date estimates of GDP per capita, see the [World Bank's indicator](https://ourworldindata.org/grapher/gdp-per-capita-worldbank).
         description_from_producer: Output-side real GDP at chained PPPs (in mil. 2017US$) [From GDP description]
         description_processing: |
           Estimated as the GDP (output, multiple price benchmarks) divided by the population of each country.

@@ -4,8 +4,8 @@ definitions:
   common:
     sources: []
     origins:
-      - producer: World Bank World Development Indicators
-        title: UNICEF; World Health Organization; World Bank
+      - producer: World Bank
+        title: World Bank World Development Indicators
         description: |-
           The World Development Indicators (WDI) is the World Bank's primary collection of development indicators, compiled from officially-recognized international sources. It presents the most current and accurate global development data available and includes national, regional, and global estimates.
 
@@ -231,22 +231,25 @@ tables:
         unit: international-$ in 2017 prices
         short_unit: $
         display:
-          isProjection: false
           name: GDP per capita
           numDecimalPlaces: 0
           tolerance: 5
         description_short: This data is adjusted for inflation and for differences in the cost of living between countries.
         description_key:
-          - TBD - List of key pieces of information about the indicator.
-        description_from_producer: TBD - Indicator's description given by the producer
-        description_processing: TBD - Indicator's processing description
-        description: "GDP per capita based on purchasing power parity (PPP). PPP GDP is gross domestic product converted to international dollars using purchasing power parity rates. An international dollar has the same purchasing power over GDP as the U.S. dollar has in the United States. GDP at purchaser's prices is the sum of gross value added by all resident producers in the country plus any product taxes and minus any subsidies not included in the value of the products. It is calculated without making deductions for depreciation of fabricated assets or for depletion and degradation of natural resources. Data are in constant 2017 international dollars.\n\nStatistical concept and methodology: For the concept and methodology of 2017 PPP, please refer to the International Comparison Program (ICP)’s website (https://www.worldbank.org/en/programs/icp)."
+          - This GDP per capita indicator provides information on economic growth and income levels from 1990.
+          - This data is adjusted for inflation and for differences in the cost of living between countries.
+          - This data is expressed in international-$ at 2017 prices.
+          - For GDP per capita estimates in the very long run, see the [Maddison Project Database's indicator](https://ourworldindata.org/grapher/gdp-per-capita-maddison).
+        description_from_producer: |
+          GDP per capita based on purchasing power parity (PPP). PPP GDP is gross domestic product converted to international dollars using purchasing power parity rates. An international dollar has the same purchasing power over GDP as the U.S. dollar has in the United States. GDP at purchaser's prices is the sum of gross value added by all resident producers in the country plus any product taxes and minus any subsidies not included in the value of the products. It is calculated without making deductions for depreciation of fabricated assets or for depletion and degradation of natural resources. Data are in constant 2017 international dollars.
+
+          For the concept and methodology of 2017 PPP, please refer to the [International Comparison Program (ICP)’s website](https://www.worldbank.org/en/programs/icp).
+        processing_level: minor
         presentation:
-          title_public: TBD - Indicator title to be shown in data pages, that overrides the indicator's title.
-          title_variant: TBD - Indicator's title variant
-          attribution_short: TBD - Indicator's attribution (shorter version)
+          title_public: GDP per capita
+          attribution_short: World Bank
           faqs:
-            - fragment_id: TBD - Question identifier from FAQ GDoc
+            - fragment_id: poverty-international-dollars
               gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
           grapher_config:
             title: GDP per capita
@@ -267,7 +270,6 @@ tables:
               colorScale:
                 baseColorScheme: GnBu
                 binningStrategy: manual
-                legendDescription: GDP per capita, PPP (in constant 2011 int-$)
                 customNumericValues:
                   - 1000
                   - 2000
