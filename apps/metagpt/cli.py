@@ -1,4 +1,5 @@
 import json
+import os
 import re
 
 import click
@@ -95,12 +96,30 @@ Metadata Field Guidelines:
 # Main CLI command setup with Click
 @click.command()
 @click.option("--path-to-file", prompt=True, type=str, help="Path to the metadata file.")
-def main(path_to_file: str):
+@click.option("--output-dir", default=None, type=str, help="Path to save the new metadata file.")
+@click.option(
+    "--overwrite",
+    default=False,
+    is_flag=True,
+    help="Overwrite input file if set to True. Otherwise, save the new file in the output directory.",
+)
+def main(path_to_file: str, output_dir: str, overwrite: bool):
     """Process and update metadata using GPT-based tool."""
     log.info("Starting metadata update process.")
+
+    # Determine the output file path
+    if output_dir is None:
+        output_dir = os.path.dirname(path_to_file)
+
+    output_file_path = os.path.join(output_dir, "gpt_" + os.path.basename(path_to_file))
+
+    # Check if the file exists and if overwrite is set to True
+    if os.path.exists(output_file_path) and overwrite:
+        os.remove(output_file_path)
+
     try:
         metadata = read_metadata_file(path_to_file)
-        generate_metadata_update(path_to_file, metadata)
+        generate_metadata_update(path_to_file, metadata, output_file_path)
         log.info("Metadata update process completed successfully.")
     except Exception as e:
         log.error("Metadata update process failed.", error=str(e))
@@ -112,7 +131,7 @@ def read_metadata_file(path_to_file: str) -> str:
         return file.read()
 
 
-def generate_metadata_update(path_to_file: str, metadata: str) -> str:
+def generate_metadata_update(path_to_file: str, metadata: str, output_file_path: str) -> str:
     """Generates updated metadata using OpenAI GPT."""
     messages = create_system_prompt(path_to_file, metadata)
     try:
@@ -124,9 +143,11 @@ def generate_metadata_update(path_to_file: str, metadata: str) -> str:
         if "snap" in path_to_file:
             message_content = chat_completion.choices[0].message.content
 
-            with open(path_to_file, "w") as file:
-                file.write(message_content)
-
+            # Load the YAML content from the string
+            new_yaml_content = yaml.safe_load(message_content)
+            # Write the updated YAML back to the file
+            with open(output_file_path, "w") as file:
+                yaml.dump(new_yaml_content, file, default_flow_style=False, sort_keys=False, indent=4)
         elif "grapher" in path_to_file:
             message_content = chat_completion.choices[0].message.content
             # This regular expression attempts to differentiate between single quotes used as delimiters and those used in data
@@ -139,8 +160,12 @@ def generate_metadata_update(path_to_file: str, metadata: str) -> str:
                 print("Error decoding JSON:", e)
 
             # Load the original YAML content
-            with open(path_to_file, "r") as file:
-                original_yaml_content = yaml.safe_load(file)
+            try:
+                with open(path_to_file, "r") as file:
+                    original_yaml_content = yaml.safe_load(file)
+            except Exception as e:
+                print(f"Error opening or reading file {path_to_file}: {e}")
+                return
             # Update the YAML data
             for table, table_data in parsed_dict["tables"].items():
                 for variable, variable_updates in table_data["variables"].items():
@@ -155,9 +180,9 @@ def generate_metadata_update(path_to_file: str, metadata: str) -> str:
                             )
                         original_yaml_content["tables"][table]["variables"][variable].update(variable_updates)
 
-            # Write the updated YAML back to the file
-            with open(path_to_file, "w") as file:
-                yaml.dump(original_yaml_content, file, default_flow_style=False, sort_keys=False)
+                # Write the updated YAML back to the file
+                with open(output_file_path, "w") as file:
+                    yaml.dump(original_yaml_content, file, default_flow_style=False, sort_keys=False)
 
     except Exception as e:  # Catch a general exception
         error_message = str(e)

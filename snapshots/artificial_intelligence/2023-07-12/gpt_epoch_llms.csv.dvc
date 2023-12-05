@@ -1,0 +1,34 @@
+meta:
+    origin:
+        title_snapshot: Large Language Model Performance and Compute - Annual Report
+        title: Large Language Model Performance and Compute
+        description: 'This dataset provides an analysis of how performance on a multi-modal
+            language understanding (MMLU) benchmark scales with computational resources.
+            It includes data on various large language models and their performance
+            metrics.
+
+
+            The dataset includes performance metrics for different language models,
+            including their F1 score, perplexity, and other relevant metrics. The
+            models are evaluated on a variety of tasks, including translation, summarization,
+            and question answering.
+
+
+            The data is collected from various sources, including published papers,
+            preprints, and directly from the model developers. The dataset is updated
+            annually to include the latest models and their performance metrics.'
+        producer: Owen, David et al.
+        citation_full: Owen, David et al. (2023). Large Language Model Performance
+            and Compute [Data set]. In Scientific Data (2023.1). EpochAI.
+        url_main: https://epochai.org/blog/extrapolating-performance-in-language-modelling-benchmarks
+        url_download: https://docs.google.com/spreadsheets/d/1HSGbUVwGy3XLuChH_H16Keux2jmVfKT9rfDrC3uu-SQ/edit?usp=sharing
+        date_accessed: 2023-07-12
+        date_published: 2023-07-12
+        license:
+            name: CC BY 4.0
+            url: https://creativecommons.org/licenses/by/4.0/
+    wdir: ../../../data/snapshots/artificial_intelligence/2023-07-12
+    outs:
+    -   md5: 30e9dea32e9a2952e2f021f90290eb54
+        size: 1574
+        path: epoch_llms.csv
