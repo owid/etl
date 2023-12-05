@@ -230,7 +230,7 @@ tables:
         title: Bacteriologically confirmed pulmonary tuberculosis patients with multidrug-resistant tuberculosis tested for any fluoroquinolone and any second-line injectable agent
         unit: patients
         description_short: Number of bacteriologically confirmed pulmonary tuberculosis patients with multidrug-resistant tuberculosis tested for any fluoroquinolone and any second-line injectable agent. Rifampicin resistance is the ability of tuberculosis bacteria, to resist the effects of the antibiotic rifampicin due to genetic mutations, hindering the drug's ability to inhibit bacterial growth. Fluoroquinolones, bedaquiline and linezolid are antibiotics used to treat tuberculosis after first-line drugs such as rifampicin are no longer effective.
-        description_from_producer: Total number of pulmonary MDR-tuberculosis patients with drug susceptibility test results for any fluoroquinolone and any second-line injectable agent
+        description_from_producer: Total number of pulmonary  multidrug-resistant tuberculosis patients with drug susceptibility test results for any fluoroquinolone and any second-line injectable agent
       xdr:
         title: Bacteriologically confirmed pulmonary tuberculosis patients with extensively drug-resistant tuberculosis
         unit: patients
