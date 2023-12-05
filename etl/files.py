@@ -5,6 +5,7 @@
 import hashlib
 import io
 import os
+import re
 import subprocess
 import time
 from collections import OrderedDict
@@ -72,7 +73,19 @@ def checksum_file(filename: Union[str, Path]) -> str:
     key = f"{filename}-{mtime}"
 
     if filename not in CACHE_CHECKSUM_FILE:
-        CACHE_CHECKSUM_FILE.add(key, checksum_file_nocache(filename))
+        # Special case for regions.yml, we want to ignore the 'aliases' key
+        if os.path.basename(filename) == "regions.yml":
+            with open(filename, "r") as f:
+                s = f.read()
+
+            # Regular expression to match the 'aliases' and its list
+            regex_pattern = r"  aliases:\n(\s+-[^\n]*\n?)*"
+            s = re.sub(regex_pattern, "", s)
+
+            checksum = checksum_str(s.strip())
+        else:
+            checksum = checksum_file_nocache(filename)
+        CACHE_CHECKSUM_FILE.add(key, checksum)
 
     return CACHE_CHECKSUM_FILE[key]
 
@@ -121,7 +134,11 @@ _MyDumper.add_representer(
 
 
 def yaml_dump(
-    d: Dict[str, Any], stream: Optional[TextIO] = None, strip_lines: bool = True, replace_confusing_ascii: bool = False
+    d: Dict[str, Any],
+    stream: Optional[TextIO] = None,
+    strip_lines: bool = True,
+    replace_confusing_ascii: bool = False,
+    width: int = 120,
 ) -> Optional[str]:
     """Alternative to yaml.dump which produces good looking multi-line strings and perserves ordering
     of keys. If strip_lines is True, all lines in the string will be stripped and all tabs will be
@@ -129,7 +146,7 @@ def yaml_dump(
     # strip lines, otherwise YAML won't output strings in literal format
     if strip_lines:
         d = _strip_lines_in_dict(d)
-    s = yaml.dump(d, stream=stream, sort_keys=False, allow_unicode=True, Dumper=_MyDumper, width=120)
+    s = yaml.dump(d, stream=stream, sort_keys=False, allow_unicode=True, Dumper=_MyDumper, width=width)
     if replace_confusing_ascii:
         assert s, "replace_confusing_ascii does not work for streams"
         s = (

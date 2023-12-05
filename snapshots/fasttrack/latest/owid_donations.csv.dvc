@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Unknown
+    source_data_url: 
+      gAAAAABlb0DmUZW6RlD53YZUZyrjtW1jfsExVLMoNKN16_pJyprwripSw5JEVPrUkXX_IDciwkz2si-n-7JKMdCZFHTEYS8_91amGgh1nAYq0PLTNqVExmXmiyjG4tCNYdWzMoNsbjg1daat1zQ15tzSkZm_3Cotpk7YpcczZGzIdrjfkUytdFikEmG-0s-Wgicd4w1NNRanbZX1P0NK-qOVKAhB0fcV0Ir1VFsJc3KM1gDt2Pb_-PF8LY3gbgZhlXgo24VuyQqe
+    date_accessed: '2023-12-05'
+    publication_year: 2023
+    published_by: Unknown
+  name: DRAFT OWID Donations
+  description: ''
+  license: {}
+  is_public: false
+wdir: ../../../data/snapshots/fasttrack/latest
+outs:
+- md5: fc2641e11c4a6af3a5a36861d9aaee55
+  size: 5042
+  path: owid_donations.csv

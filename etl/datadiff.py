@@ -374,10 +374,10 @@ def _index_equals(table_a: pd.DataFrame, table_b: pd.DataFrame, sample: int = 10
     return index_a.equals(index_b)
 
 
-def _dict_diff(dict_a: Dict[str, Any], dict_b: Dict[str, Any], tabs) -> str:
+def _dict_diff(dict_a: Dict[str, Any], dict_b: Dict[str, Any], tabs: int = 0, **kwargs) -> str:
     """Convert dictionaries into YAML and compare them using difflib. Return colored diff as a string."""
-    meta_a = yaml_dump(dict_a)
-    meta_b = yaml_dump(dict_b)
+    meta_a = yaml_dump(dict_a, **kwargs)
+    meta_b = yaml_dump(dict_b, **kwargs)
 
     lines = difflib.ndiff(meta_a.splitlines(keepends=True), meta_b.splitlines(keepends=True))  # type: ignore
     # do not print lines that are identical
