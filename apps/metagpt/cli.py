@@ -103,7 +103,7 @@ Metadata Field Guidelines:
     is_flag=True,
     help="Overwrite input file if set to True. Otherwise, save the new file in the output directory.",
 )
-def main(path_to_file: str, output_dir: str, overwrite: bool):
+def main(path_to_file, output_dir: str, overwrite: bool):
     """Process and update metadata using GPT-based tool."""
     log.info("Starting metadata update process.")
 
@@ -131,7 +131,7 @@ def read_metadata_file(path_to_file: str) -> str:
         return file.read()
 
 
-def generate_metadata_update(path_to_file: str, metadata: str, output_file_path: str) -> str:
+def generate_metadata_update(path_to_file: str, metadata: str, output_file_path: str):
     """Generates updated metadata using OpenAI GPT."""
     messages = create_system_prompt(path_to_file, metadata)
     try:
@@ -153,6 +153,9 @@ def generate_metadata_update(path_to_file: str, metadata: str, output_file_path:
             # This regular expression attempts to differentiate between single quotes used as delimiters and those used in data
             json_string_fixed = re.sub(r"(\W)'|'(\W)", r'\1"\2', message_content)
 
+            # Initialize parsed_dict before the try/except block
+            parsed_dict = None
+
             # Parse the corrected string
             try:
                 parsed_dict = json.loads(json_string_fixed)
@@ -166,19 +169,21 @@ def generate_metadata_update(path_to_file: str, metadata: str, output_file_path:
             except Exception as e:
                 print(f"Error opening or reading file {path_to_file}: {e}")
                 return
-            # Update the YAML data
-            for table, table_data in parsed_dict["tables"].items():
-                for variable, variable_updates in table_data["variables"].items():
-                    if (
-                        table in original_yaml_content["tables"]
-                        and variable in original_yaml_content["tables"][table]["variables"]
-                    ):
-                        # Formatting 'description_key' as bullet points
-                        if "description_key" in variable_updates:
-                            variable_updates["description_key"] = "\n".join(
-                                f"- {item}" for item in variable_updates["description_key"]
-                            )
-                        original_yaml_content["tables"][table]["variables"][variable].update(variable_updates)
+            # Now parsed_dict is guaranteed to be defined, although it might be None
+            if parsed_dict is not None:
+                # Update the YAML data
+                for table, table_data in parsed_dict["tables"].items():
+                    for variable, variable_updates in table_data["variables"].items():
+                        if (
+                            table in original_yaml_content["tables"]
+                            and variable in original_yaml_content["tables"][table]["variables"]
+                        ):
+                            # Formatting 'description_key' as bullet points
+                            if "description_key" in variable_updates:
+                                variable_updates["description_key"] = "\n".join(
+                                    f"- {item}" for item in variable_updates["description_key"]
+                                )
+                            original_yaml_content["tables"][table]["variables"][variable].update(variable_updates)
 
                 # Write the updated YAML back to the file
                 with open(output_file_path, "w") as file:
@@ -191,7 +196,7 @@ def generate_metadata_update(path_to_file: str, metadata: str, output_file_path:
         raise
 
 
-def create_system_prompt(path_to_file: str, metadata: str) -> str:
+def create_system_prompt(path_to_file, metadata: str):
     """Creates the system prompt for the GPT model based on file path."""
 
     if "snapshot" in path_to_file:
