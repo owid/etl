@@ -49,6 +49,7 @@ nav:
           - ETag: "architecture/workflow/other-steps/etag.md"
           - GitHub: "architecture/workflow/other-steps/github.md"
           - Private steps: "architecture/workflow/other-steps/private.md"
+        - Staging servers: "architecture/workflow/staging-servers.md"
       - Metadata:
         - Metadata: "architecture/metadata/index.md"
         # - Workflow with metadata: "architecture/metadata/workflow.md"
