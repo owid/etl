@@ -1,23 +1,21 @@
 definitions:
   # NOTE: we'd like to move this to snapshot, but it's impractical because there are
   # tons of other downstream datasets that still use sources
-  common:
-    sources: []
-    origins:
-      - producer: World Bank
-        title: World Bank World Development Indicators
-        description: |-
-          The World Development Indicators (WDI) is the World Bank's primary collection of development indicators, compiled from officially-recognized international sources. It presents the most current and accurate global development data available and includes national, regional, and global estimates.
+  wdi_origin: &wdi_origin
+    producer: World Bank
+    title: World Bank World Development Indicators
+    description: |-
+      The World Development Indicators (WDI) is the World Bank's primary collection of development indicators, compiled from officially-recognized international sources. It presents the most current and accurate global development data available and includes national, regional, and global estimates.
 
-          [Text from [World Bank data catalog](https://datacatalog.worldbank.org/dataset/world-development-indicators)]
-        citation_full: World Development Indicators, The World Bank (2023).
-        url_main: https://datacatalog.worldbank.org/search/dataset/0037712/World-Development-Indicators
-        url_download: http://databank.worldbank.org/data/download/WDI_csv.zip
-        date_accessed: '2023-05-29'
-        date_published: '2023-05-11'
-        license:
-          name: CC BY 4.0
-          url: https://www.worldbank.org/en/about/legal/terms-of-use-for-datasets
+      [Text from [World Bank data catalog](https://datacatalog.worldbank.org/dataset/world-development-indicators)]
+    citation_full: World Development Indicators, The World Bank (2023).
+    url_main: https://datacatalog.worldbank.org/search/dataset/0037712/World-Development-Indicators
+    url_download: http://databank.worldbank.org/data/download/WDI_csv.zip
+    date_accessed: '2023-05-29'
+    date_published: '2023-05-11'
+    license:
+      name: CC BY 4.0
+      url: https://www.worldbank.org/en/about/legal/terms-of-use-for-datasets
 
 dataset:
   update_period_days: 365
@@ -27,6 +25,9 @@ tables:
   wdi:
     variables:
       it_net_user_zs:
+        sources: []
+        origins:
+          - *wdi_origin
         title: Individuals using the Internet (% of population)
         description_short: Share of the population who used the Internet in the last three months.
         description_from_producer: >-
@@ -135,6 +136,9 @@ tables:
               - Latin America and Caribbean (WB)
               - World
       sh_sta_stnt_zs:
+        sources: []
+        origins:
+          - *wdi_origin
         title: Share of children who are stunted
         unit: '% of children under 5'
         short_unit: '%'
@@ -224,6 +228,9 @@ tables:
                 text: FAQs on this data
             $schema: https://files.ourworldindata.org/schemas/grapher-schema.003.json
       ny_gdp_pcap_pp_kd:
+        sources: []
+        origins:
+          - *wdi_origin
         title: GDP per capita, PPP (constant 2017 international $)
         unit: international-$ in 2017 prices
         short_unit: $
