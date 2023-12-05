@@ -19,7 +19,7 @@ tables:
           title: Ablations to correct heart rhythm disorders per million people
           unit: 'per million people'
           short_unit: ''
-          description_short: Number of ablation to correct heart rhythm disorders.
+          description_short: Number of ablations to correct heart rhythm disorders.
           processing_level: minor
           display:
             numDecimalPlaces: 0
