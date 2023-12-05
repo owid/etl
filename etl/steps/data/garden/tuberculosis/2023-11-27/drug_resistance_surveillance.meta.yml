@@ -98,106 +98,149 @@ tables:
       rr_hivpos:
         title: Bacteriologically confirmed pulmonary TB patients with rifampicin resistance who are HIV-positive
         description_short: Number of bacteriologically confirmed pulmonary TB patients with rifampicin resistance who are HIV-positive.
-        unit: patients with rifampicin resistance that are HIV-positive
+        unit: patients
         description_from_producer: Among new and previously treated patients that have confirmed pulmonary TB cases with results for rifampicin testing, the number resistant to rifampicin and who are HIV-positive.
       rr_hivneg:
         title: Bacteriologically confirmed pulmonary TB patients with rifampicin resistance who are HIV-negative
         description_short: Number of bacteriologically confirmed pulmonary TB patients with rifampicin resistance who are HIV-negative.
-        unit: patients with rifampicin resistance that are HIV-negative
+        unit: patients
         description_from_producer: Among new and previously treated patients that have confirmed pulmonary TB cases with results for rifampicin testing, the number resistant to rifampicin and who are HIV-negative.
       rr_hivunk:
         title: Bacteriologically confirmed pulmonary TB patients with rifampicin resistance whose HIV status is unknown
         description_short: Number of bacteriologically confirmed pulmonary TB patients with rifampicin resistance whose HIV status is unknown.
-        unit: patients with rifampicin resistance with unknown HIV status
+        unit: patients
         description_from_producer: Among new and previously treated patients that have confirmed pulmonary TB cases with results for rifampicin testing, the number resistant to rifampicin and whose HIV status is unknown.
       nrr_hivpos:
         title: Bacteriologically confirmed pulmonary TB patients with rifampicin susceptibility who are HIV-positive
         description_short: Number of bacteriologically confirmed pulmonary TB patients with rifampicin susceptibility who are HIV-positive.
-        unit: patients with rifampicin susceptibility that are HIV-positive
+        unit: patients
         description_from_producer: Among new and previously treated patients that have confirmed pulmonary TB cases with results for rifampicin testing, the number susceptible to rifampicin and who are HIV-positive.
       nrr_hivneg:
         title: Bacteriologically confirmed pulmonary TB patients with rifampicin susceptibility who are HIV-negative
         description_short: Number of bacteriologically confirmed pulmonary TB patients with rifampicin susceptibility who are HIV-negative.
-        unit: patients with rifampicin susceptibility that are HIV-negative
+        unit: patients
         description_from_producer: Among new and previously treated patients that have confirmed pulmonary TB cases with results for rifampicin testing, the number susceptible to rifampicin and who are HIV-negative.
       nrr_hivunk:
         title: Bacteriologically confirmed pulmonary TB patients with rifampicin susceptibility whose HIV status is unknown
-        unit: patients with rifampicin susceptibility with unknown HIV status
+        unit: patients
         description_short: Number of bacteriologically confirmed pulmonary TB patients with rifampicin susceptibility whose HIV status is unknown.
         description_from_producer: Among new and previously treated patients that have confirmed pulmonary TB cases with results for rifampicin testing, number susceptible to rifampicin and whose HIV status is unknown.
       rr_014:
         title: Bacteriologically confirmed pulmonary TB patients with rifampicin resistance who are aged 0-14 years
-        unit: patients with rifampicin resistance
+        unit: patients
         description_short: Number of bacteriologically confirmed pulmonary TB patients with rifampicin resistance who are aged 0-14 years.
         description_from_producer: Among new and previously treated patients that have confirmed pulmonary TB cases with results for rifampicin testing, number resistant to rifampicin and who are aged 0-14 years.
       rr_15plus:
         title: Bacteriologically confirmed pulmonary TB patients with rifampicin resistance who are aged 15 years and over
-        unit: patients with rifampicin resistance
+        unit: patients
         description_short: Number of bacteriologically confirmed pulmonary TB patients with rifampicin resistance who are aged 15 years and over.
         description_from_producer: Among new and previously treated patients that have confirmed pulmonary TB cases with results for rifampicin testing, number resistant to rifampicin and who are aged 15 years and over.
       rr_ageunk:
-        unit: ""
+        title: Bacteriologically confirmed pulmonary TB patients with rifampicin resistance whose age is unknown
+        unit: patients
+        description_short: Number of bacteriologically confirmed pulmonary TB patients with rifampicin resistance whose age is unknown.
         description_from_producer: Among new and previously treated patients that have confirmed pulmonary TB cases with results for rifampicin testing, number resistant to rifampicin and whose age is unknown
       nrr_014:
-        unit: ""
+        title: Bacteriologically confirmed pulmonary TB patients with rifampicin susceptibility who are aged 0-14 years
+        unit: patients
+        description_short: Number of bacteriologically confirmed pulmonary TB patients with rifampicin susceptibility who are aged 0-14 years.
         description_from_producer: Among new and previously treated patients that have confirmed pulmonary TB cases with results for rifampicin testing, number susceptible to rifampicin and who are aged 0-14 years
       nrr_15plus:
-        unit: ""
+        title: Bacteriologically confirmed pulmonary TB patients with rifampicin susceptibility who are aged 15 years and over
+        unit: patients
+        description_short: Number of bacteriologically confirmed pulmonary TB patients with rifampicin susceptibility who are aged 15 years and over.
         description_from_producer: Among new and previously treated patients that have confirmed pulmonary TB cases with results for rifampicin testing, number susceptible to rifampicin and who are aged 15 years and over
       nrr_ageunk:
-        unit: ""
+        title: Bacteriologically confirmed pulmonary TB patients with rifampicin susceptibility whose age is unknown
+        unit: patients
+        description_short: Number of bacteriologically confirmed pulmonary TB patients with rifampicin susceptibility whose age is unknown.
         description_from_producer: Among new and previously treated patients that have confirmed pulmonary TB cases with results for rifampicin testing, number susceptible to rifampicin and whose age is unknown
       rr_dst_rlt:
-        unit: ""
+        title: Bacteriologically confirmed pulmonary TB patients with rifampicin resistance tested for any fluoroquinolone and any second-line injectable agent
+        unit: patients
         description_from_producer: Number of new or previously treated bacteriologically confirmed pulmonary TB patients with resistance to rifampicin and with test results for any fluoroquinolone and any second-line injectable agent
       rr_ds_fq2li:
-        unit: ""
+        title: Bacteriologically confirmed pulmonary TB patients with rifampicin resistance and resistance to both fluoroquinolones and second-line injectable agents
+        unit: patients
+        description_short: Number of bacteriologically confirmed pulmonary TB patients with rifampicin resistance and resistance to both fluoroquinolones and second-line injectable agents.
         description_from_producer: Number of new or previously treated bacteriologically confirmed pulmonary TB patients with resistance to rifampicin and susceptible to both fluoroquinolones and second-line injectable agents
       rr_dr_fq:
-        unit: ""
+        title: Bacteriologically confirmed pulmonary TB patients with rifampicin resistance and resistance to fluoroquinolones
+        unit: patients
+        description_short: Number of bacteriologically confirmed pulmonary TB patients with rifampicin resistance and resistance to fluoroquinolones.
         description_from_producer: Number of new or previously treated bacteriologically confirmed pulmonary TB patients with resistance to rifampicin and resistance to fluoroquinolones
       rr_dr_2li:
-        unit: ""
+        title: Bacteriologically confirmed pulmonary TB patients with rifampicin resistance and resistance to second-line injectable agents
+        unit: patients
+        description_short: Number of bacteriologically confirmed pulmonary TB patients with rifampicin resistance and resistance to second-line injectable agents.
         description_from_producer: Number of new or previously treated bacteriologically confirmed pulmonary TB patients with resistance to rifampicin and resistance to second-line injectable agents
       rr_dr_fq_2li:
-        unit: ""
+        title: Bacteriologically confirmed pulmonary TB patients with rifampicin resistance and resistance to fluoroquinolones and second-line injectable agents
+        unit: patients
+        description_short: Number of bacteriologically confirmed pulmonary TB patients with rifampicin resistance and resistance to fluoroquinolones and second-line injectable agents.
         description_from_producer: Number of new or previously treated bacteriologically confirmed pulmonary TB patients with resistance to rifampicin and resistance to both fluoroquinolones and second-line injectable agents
       rr_dst_rlt_fq:
-        unit: ""
+        title: Bacteriologically confirmed pulmonary TB patients with rifampicin resistance tested for any fluoroquinolone
+        unit: patients
+        description_short: Number of bacteriologically confirmed pulmonary TB patients with rifampicin resistance tested for any fluoroquinolone.
         description_from_producer: Number of new or previously treated bacteriologically confirmed pulmonary TB patients with resistance to rifampicin and with test results for any fluoroquinolone
       rr_fqr:
-        unit: ""
+        title: Bacteriologically confirmed pulmonary TB patients with rifampicin resistance and resistance to fluoroquinolones
+        unit: patients
+        description_short: Number of bacteriologically confirmed pulmonary TB patients with rifampicin resistance and resistance to fluoroquinolones.
         description_from_producer: Number of new or previously treated bacteriologically confirmed pulmonary TB patients with resistance to rifampicin and resistance to fluoroquinolones
       rr_fqr_bdqr_lzdr:
-        unit: ""
+        title: Bacteriologically confirmed pulmonary TB patients with rifampicin resistance and resistance to fluoroquinolones, bedaquiline and linezolid
+        unit: patients
+        description_short: Number of bacteriologically confirmed pulmonary TB patients with rifampicin resistance and resistance to fluoroquinolones, bedaquiline and linezolid.
         description_from_producer: Number of new or previously treated bacteriologically confirmed pulmonary TB patients with resistance to rifampicin, fluoroquinolones, bedaquiline and linezolid.
       rr_fqr_bdqr_lzds:
-        unit: ""
+        title: Bacteriologically confirmed pulmonary TB patients with rifampicin resistance and resistance to fluoroquinolones and bedaquiline, but susceptible to linezolid
+        unit: patients
+        description_short: Number of bacteriologically confirmed pulmonary TB patients with rifampicin resistance and resistance to fluoroquinolones and bedaquiline, but susceptible to linezolid.
         description_from_producer: Number of new or previously treated bacteriologically confirmed pulmonary TB patients with resistance to rifampicin, fluoroquinolones and bedaquiline but susceptible to linezolid.
       rr_fqr_bdqr_lzdu:
-        unit: ""
+        title: Bacteriologically confirmed pulmonary TB patients with rifampicin resistance and resistance to fluoroquinolones and bedaquiline, but unknown resistance to linezolid
+        unit: patients
+        description_short: Number of bacteriologically confirmed pulmonary TB patients with rifampicin resistance and resistance to fluoroquinolones and bedaquiline, but unknown resistance to linezolid.
         description_from_producer: Number of new or previously treated bacteriologically confirmed pulmonary TB patients with resistance to rifampicin, fluoroquinolones and bedaquiline but unknown resistance to linezolid.
       rr_fqr_bdqs_lzdr:
-        unit: ""
+        title: Bacteriologically confirmed pulmonary TB patients with rifampicin resistance and resistance to fluoroquinolones, bedaquiline and linezolid, but susceptible to second-line injectable agents
+        unit: patients
+        description_short: Number of bacteriologically confirmed pulmonary TB patients with rifampicin resistance and resistance to fluoroquinolones, bedaquiline and linezolid, but susceptible to second-line injectable agents.
         description_from_producer: Number of new or previously treated bacteriologically confirmed pulmonary TB patients with resistance to rifampicin, fluoroquinolones and linezolid, but susceptible to bedaquiline.
       rr_fqr_bdqs_lzds:
-        unit: ""
+        title: Bacteriologically confirmed pulmonary TB patients with rifampicin resistance and resistance to fluoroquinolones, bedaquiline, but susceptible to linezolid and second-line injectable agents
+        unit: patients
+        description_short: Number of bacteriologically confirmed pulmonary TB patients with rifampicin resistance and resistance to fluoroquinolones, bedaquiline, but susceptible to linezolid and second-line injectable agents.
         description_from_producer: Number of new or previously treated bacteriologically confirmed pulmonary TB patients with resistance to rifampicin, fluoroquinolones but susceptible to bedaquiline and linezolid.
       rr_fqr_bdqs_lzdu:
-        unit: ""
+        title: Bacteriologically confirmed pulmonary TB patients with rifampicin resistance and resistance to fluoroquinolones, bedaquiline, but unknown resistance to linezolid and second-line injectable agents
+        unit: patients
+        description_short: Number of bacteriologically confirmed pulmonary TB patients with rifampicin resistance and resistance to fluoroquinolones, bedaquiline, but unknown resistance to linezolid and second-line injectable agents.
         description_from_producer: Number of new or previously treated bacteriologically confirmed pulmonary TB patients with resistance to rifampicin and fluoroquinolones, but susceptible to bedaquiline and with unknown resistance to linezolid.
       rr_fqr_bdqu_lzdr:
-        unit: ""
+        title: Bacteriologically confirmed pulmonary TB patients with rifampicin resistance and resistance to fluoroquinolones, but susceptible to bedaquiline, linezolid and second-line injectable agents
+        unit: patients
+        description_short: Number of bacteriologically confirmed pulmonary TB patients with rifampicin resistance and resistance to fluoroquinolones, but susceptible to bedaquiline, linezolid and second-line injectable agents.
         description_from_producer: Number of new or previously treated bacteriologically confirmed pulmonary TB patients with resistance to rifampicin, fluoroquinolones and linezolid, but unknown resistance to bedaquiline.
       rr_fqr_bdqu_lzds:
-        unit: ""
+        title: Bacteriologically confirmed pulmonary TB patients with rifampicin resistance and resistance to fluoroquinolones, but susceptible to bedaquiline and linezolid
+        unit: patients
+        description_short: Number of bacteriologically confirmed pulmonary TB patients with rifampicin resistance and resistance to fluoroquinolones, but susceptible to bedaquiline and linezolid.
         description_from_producer: Number of new or previously treated bacteriologically confirmed pulmonary TB patients with resistance to rifampicin, fluoroquinolones but susceptible to linezolid and unknown resistance to bedaquiline.
       rr_fqr_bdqu_lzdu:
-        unit: ""
+        title: Bacteriologically confirmed pulmonary TB patients with rifampicin resistance and resistance to fluoroquinolones, but unknown resistance to bedaquiline, linezolid and second-line injectable agents
+        unit: patients
+        description_short: Number of bacteriologically confirmed pulmonary TB patients with rifampicin resistance and resistance to fluoroquinolones, but unknown resistance to bedaquiline, linezolid and second-line injectable agents.
         description_from_producer: Number of new or previously treated bacteriologically confirmed pulmonary TB patients with resistance to rifampicin and fluoroquinolones, but with unknown resistance to bedaquiline and linezolid.
       mdr_dst_rlt:
-        unit: ""
-        description_from_producer: "Total number of pulmonary MDR-TB patients with drug susceptibility test results for any fluoroquinolone and any second-line injectable agent"
+        title: Bacteriologically confirmed pulmonary TB patients with MDR-TB tested for any fluoroquinolone and any second-line injectable agent
+        unit: patients
+        description_short: Number of bacteriologically confirmed pulmonary TB patients with MDR-TB tested for any fluoroquinolone and any second-line injectable agent.
+        description_from_producer: Total number of pulmonary MDR-TB patients with drug susceptibility test results for any fluoroquinolone and any second-line injectable agent
       xdr:
-        unit: ""
+        title: Bacteriologically confirmed pulmonary TB patients with extensively drug-resistant TB
+        unit: patients
+        description_short: Number of bacteriologically confirmed pulmonary TB patients with extensively drug-resistant TB.
         description_from_producer: "Among pulmonary MDR-TB patients with drug susceptibility test results for any fluoroquinolone (FQ) and any second-line injectable agent (2LI) (variable mdr_dst_rlt): number with any resistance to both FQ and 2LI (i.e. XDR-TB in pre-2020 definitions)"
