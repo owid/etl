@@ -42,6 +42,8 @@ def run(dest_dir: str) -> None:
     # Process data.
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
 
+    # Remove variables `rr_fqr` and `rr_dr_fq` as it's not clear from their desecriptions how they differ from eachother.
+    tb = tb.drop(columns=["rr_dr_fq", "rr_fqr"])
     tb = add_region_sum_aggregates(tb, ds_regions=ds_regions, ds_income_groups=ds_income_groups)
 
     tb = add_variable_description_from_producer(tb, dd)

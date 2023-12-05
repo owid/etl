@@ -26,7 +26,7 @@ tables:
         unit: confirmed cases
         description_from_producer: Number of bacteriologically confirmed pulmonary TB cases with unknown TB treatment history.
       r_rlt_new:
-        title: New bacteriologically confirmed pulmonary TB cases tested for rifampicin resistance.
+        title: New bacteriologically confirmed pulmonary TB cases tested for rifampicin resistance
         description_short: Number of new bacteriologically confirmed pulmonary TB cases tested for rifampicin resistance.
         unit: confirmed cases tested for rifampicin resistance
         description_from_producer: Number of new bacteriologically confirmed pulmonary TB patients with test results for rifampicin.
@@ -76,12 +76,12 @@ tables:
         unit: previously treated cases with isoniazid resistance
         description_from_producer: Number of previously treated bacteriologically confirmed pulmonary TB patients with test results for rifampicin and isoniazid and with resistance to isoniazid (regardless of result for rifampicin).
       dst_rlt_rr_new:
-        title: New bacteriologically confirmed pulmonary TB cases with rifampicin resistance
+        title: New bacteriologically confirmed pulmonary TB cases tested for isoniazid and rifampicin resistance with rifampicin resistance
         description_short: Number of new bacteriologically confirmed pulmonary TB cases tested for isoniazid and rifampicin resistance with rifampicin resistance.
         unit: new cases with rifampicin resistance
         description_from_producer: Number of new bacteriologically confirmed pulmonary TB patients with test results for rifampicin and isoniazid and with resistance to rifampicin (regardless of result for isoniazid).
       dst_rlt_rr_ret:
-        title: Previously treated bacteriologically confirmed pulmonary TB cases with rifampicin resistance
+        title: Previously treated bacteriologically confirmed pulmonary TB cases tested for isoniazid and rifampicin resistance with rifampicin resistance
         description_short: Number of previously treated bacteriologically confirmed pulmonary TB cases tested for isoniazid and rifampicin resistance with rifampicin resistance.
         unit: previously treated cases with rifampicin resistance
         description_from_producer: Number of previously treated bacteriologically confirmed pulmonary TB patients with test results for rifampicin and isoniazid and with resistance to rifampicin (regardless of result for isoniazid).
@@ -164,11 +164,6 @@ tables:
         unit: patients
         description_short: Number of bacteriologically confirmed pulmonary TB patients with rifampicin resistance and resistance to both fluoroquinolones and second-line injectable agents.
         description_from_producer: Number of new or previously treated bacteriologically confirmed pulmonary TB patients with resistance to rifampicin and susceptible to both fluoroquinolones and second-line injectable agents
-      rr_dr_fq:
-        title: Bacteriologically confirmed pulmonary TB patients with rifampicin resistance and resistance to fluoroquinolones
-        unit: patients
-        description_short: Number of bacteriologically confirmed pulmonary TB patients with rifampicin resistance and resistance to fluoroquinolones.
-        description_from_producer: Number of new or previously treated bacteriologically confirmed pulmonary TB patients with resistance to rifampicin and resistance to fluoroquinolones
       rr_dr_2li:
         title: Bacteriologically confirmed pulmonary TB patients with rifampicin resistance and resistance to second-line injectable agents
         unit: patients
@@ -184,11 +179,6 @@ tables:
         unit: patients
         description_short: Number of bacteriologically confirmed pulmonary TB patients with rifampicin resistance tested for any fluoroquinolone.
         description_from_producer: Number of new or previously treated bacteriologically confirmed pulmonary TB patients with resistance to rifampicin and with test results for any fluoroquinolone
-      rr_fqr:
-        title: Bacteriologically confirmed pulmonary TB patients with rifampicin resistance and resistance to fluoroquinolones
-        unit: patients
-        description_short: Number of bacteriologically confirmed pulmonary TB patients with rifampicin resistance and resistance to fluoroquinolones.
-        description_from_producer: Number of new or previously treated bacteriologically confirmed pulmonary TB patients with resistance to rifampicin and resistance to fluoroquinolones
       rr_fqr_bdqr_lzdr:
         title: Bacteriologically confirmed pulmonary TB patients with rifampicin resistance and resistance to fluoroquinolones, bedaquiline and linezolid
         unit: patients
