@@ -1,0 +1,222 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    processing_level: minor
+    presentation:
+      topic_tags:
+        - Tuberculosis
+tables:
+  expenditure:
+    variables:
+      exp_cpp_dstb:
+        unit: ""
+        display:
+          numDecimalPlaces: 0
+        description_from_producer: Average cost of drugs spent per patient starting first-line TB treatment, excluding buffer
+          stock (US Dollars)
+      exp_cpp_mdr:
+        unit: ""
+        display:
+          numDecimalPlaces: 0
+        description_from_producer: Average cost of drugs spent per patient starting second-line treatment for MDR-TB, excluding
+          buffer stock (US Dollars)
+      exp_cpp_xdr:
+        unit: ""
+        display:
+          numDecimalPlaces: 0
+        description_from_producer: Average cost of drugs spent per patient starting pre-XDR/XDR-TB treatment, excluding buffer
+          stock (US Dollars)
+      exp_cpp_tpt:
+        unit: ""
+        display:
+          numDecimalPlaces: 0
+        description_from_producer: Average cost of drugs spent per person starting TB preventive treatment, excluding buffer
+          stock (US Dollars)
+      exp_lab:
+        unit: ""
+        display:
+          numDecimalPlaces: 0
+        description_from_producer: Actual expenditure on laboratory infrastructure, equipment and supplies (US Dollars)
+      rcvd_lab:
+        unit: ""
+        display:
+          numDecimalPlaces: 0
+        description_from_producer: Funding received for laboratory infrastructure, equipment and supplies (US Dollars)
+      exp_staff:
+        unit: ""
+        display:
+          numDecimalPlaces: 0
+        description_from_producer: Actual expenditure on National TB Programme staff (central unit staff and subnational TB
+          staff)  (US Dollars)
+      rcvd_staff:
+        unit: ""
+        display:
+          numDecimalPlaces: 0
+        description_from_producer: Funding received for National TB Programme staff (central unit staff and subnational TB
+          staff)  (US Dollars)
+      exp_fld:
+        unit: ""
+        display:
+          numDecimalPlaces: 0
+        description_from_producer: Actual expenditure on drugs to treat drug-susceptible TB (US Dollars)
+      rcvd_fld:
+        unit: ""
+        display:
+          numDecimalPlaces: 0
+        description_from_producer: Funding received for drugs to treat drug-susceptible TB (US Dollars)
+      exp_prog:
+        unit: ""
+        display:
+          numDecimalPlaces: 0
+        description_from_producer: Actual expenditure on programme costs to treat drug-susceptible TB (US Dollars)
+      rcvd_prog:
+        unit: ""
+        display:
+          numDecimalPlaces: 0
+        description_from_producer: Funding received for programme costs to treat drug-susceptible TB (US Dollars)
+      exp_sld:
+        unit: ""
+        display:
+          numDecimalPlaces: 0
+        description_from_producer: Actual expenditure on drugs to treat drug-resistant TB (US Dollars)
+      rcvd_sld:
+        unit: ""
+        display:
+          numDecimalPlaces: 0
+        description_from_producer: Funding received for drugs to treat drug-resistant TB (US Dollars)
+      exp_mdrmgt:
+        unit: ""
+        display:
+          numDecimalPlaces: 0
+        description_from_producer: Actual expenditure on programme costs to treat drug-resistant TB (US Dollars)
+      rcvd_mdrmgt:
+        unit: ""
+        display:
+          numDecimalPlaces: 0
+        description_from_producer: Funding received for programme costs to treat drug-resistant TB (US Dollars)
+      exp_tpt:
+        unit: ""
+        display:
+          numDecimalPlaces: 0
+        description_from_producer: Actual expenditure on drugs for TB preventive treatment (US Dollars)
+      rcvd_tpt:
+        unit: ""
+        display:
+          numDecimalPlaces: 0
+        description_from_producer: Funding received for drugs for TB preventive treatment (US Dollars)
+      exp_tbhiv:
+        unit: ""
+        display:
+          numDecimalPlaces: 0
+        description_from_producer: Actual expenditure on collaborative TB/HIV activities (US Dollars)
+      rcvd_tbhiv:
+        unit: ""
+        display:
+          numDecimalPlaces: 0
+        description_from_producer: Funding received for collaborative TB/HIV activities (US Dollars)
+      exp_patsup:
+        unit: ""
+        display:
+          numDecimalPlaces: 0
+        description_from_producer: Actual expenditure on patient support (US Dollars)
+      rcvd_patsup:
+        unit: ""
+        display:
+          numDecimalPlaces: 0
+        description_from_producer: Funding received for patient support (US Dollars)
+      exp_orsrvy:
+        unit: ""
+        display:
+          numDecimalPlaces: 0
+        description_from_producer: Actual expenditure on operational research and surveys (US Dollars)
+      rcvd_orsrvy:
+        unit: ""
+        display:
+          numDecimalPlaces: 0
+        description_from_producer: Funding received for operational research and surveys (US Dollars)
+      exp_oth:
+        unit: ""
+        display:
+          numDecimalPlaces: 0
+        description_from_producer: Actual expenditure on all other budget line items (US Dollars)
+      rcvd_oth:
+        unit: ""
+        display:
+          numDecimalPlaces: 0
+        description_from_producer: Funding received for all other budget line items (US Dollars)
+      exp_tot:
+        unit: ""
+        display:
+          numDecimalPlaces: 0
+        description_from_producer: Total actual expenditure (US Dollars)
+      rcvd_tot:
+        unit: ""
+        display:
+          numDecimalPlaces: 0
+        description_from_producer: Total funding received for all budget line items (US Dollars)
+      rcvd_tot_domestic:
+        unit: ""
+        display:
+          numDecimalPlaces: 0
+        description_from_producer: Funding received from domestic sources, including loans (US Dollars)
+      rcvd_tot_gf:
+        unit: ""
+        display:
+          numDecimalPlaces: 0
+        description_from_producer: Funding received from the Global Fund to Fight AIDS, Tuberculosis and Malaria (US Dollars)
+      rcvd_tot_usaid:
+        unit: ""
+        display:
+          numDecimalPlaces: 0
+        description_from_producer: Funding received from USAID (US Dollars)
+      rcvd_tot_grnt:
+        unit: ""
+        display:
+          numDecimalPlaces: 0
+        description_from_producer: Funding received from other sources (US Dollars)
+      rcvd_tot_sources:
+        unit: ""
+        display:
+          numDecimalPlaces: 0
+        description_from_producer: Total funding received from all sources (US Dollars)
+      hcfvisit_dstb:
+        unit: ""
+        display:
+          numDecimalPlaces: 0
+        description_from_producer: Typical number of visits to a health facility after diagnosis for patients starting first-line
+          TB treatment
+      hcfvisit_mdr:
+        unit: ""
+        display:
+          numDecimalPlaces: 0
+        description_from_producer: Typical number of visits to a health facility after diagnosis for patients starting MDR-TB/XDR-TB
+          treatment
+      hospd_dstb_prct:
+        unit: ""
+        display:
+          numDecimalPlaces: 0
+        description_from_producer: Estimated percentage of patients starting first-line TB treatment that are hospitalized
+          (%)
+      hospd_mdr_prct:
+        unit: ""
+        display:
+          numDecimalPlaces: 0
+        description_from_producer: Estimated percentage of patients starting MDR-TB/XDR-TB treatment that are hospitalized
+          (%)
+      hospd_dstb_dur:
+        unit: ""
+        display:
+          numDecimalPlaces: 0
+        description_from_producer: Estimated average duration of stay if patients starting first-line TB treatment are hospitalized
+          (days)
+      hospd_mdr_dur:
+        unit: ""
+        display:
+          numDecimalPlaces: 0
+        description_from_producer: Estimated average duration of stay if patients starting MDR-TB/XDR-TB treatment are hospitalized
+          (days)
+      hosp_type_mdr:
+        unit: ""
+        display:
+          numDecimalPlaces: 0
+        description_from_producer: Type of facility most often used if MDR-TB patients are hospitalized
