@@ -24,30 +24,34 @@ tables:
         title: Top 1% - Share (Pretax) (Estimated)
         unit: '%'
         short_unit: '%'
+        description_short: "The share of income received by the richest 1% of the population."
         display:
           name: Top 1% - Share (Pretax) (Estimated)
-          numDecimalPlaces: 1
           tolerance: 5
-        description_short: The share of income received by the richest 1% of the population. Income here is measured before taxes and benefits.
+          numDecimalPlaces: 1
         description_key:
-          - TBD - List of key pieces of information about the indicator.
-        description_from_producer: TBD - Indicator's description given by the producer
-        description_processing: TBD - Indicator's processing description
-        description: "The share of income received by the richest 1%.\n\n            Income is ‘pre-tax’ — measured before taxes have been paid and most government benefits have been received. It is, however, measured after the operation of pension schemes, both private and public.\n\n            \nThe data is estimated from a combination of household surveys, tax records and national accounts data. This combination can provide a more accurate picture of the incomes of the richest, which tend to be captured poorly in household survey data alone.\nThese underlying data sources are not always available. For some countries, observations are extrapolated from data relating to other years, or are sometimes modeled based on data observed in other countries.\n"
+          - Income is ‘pre-tax’ — measured before taxes have been paid and most government benefits have been received. It is, however, measured _after_ the operation of pension schemes, both private and public.
+          - The data is estimated from a combination of household surveys, tax records and national accounts data. This combination can provide a more accurate picture of the incomes of the richest, which tend to be captured poorly in household survey data alone.
+          - These underlying data sources are not always available. For some countries, observations are extrapolated from data relating to other years, or are sometimes modeled based on data observed in other countries.
+        description_processing: |-
+          - **We ingest the original data.** We extract and process the data from WID’s [Stata tool](https://github.com/thomasblanchet/wid-stata-tool).
+          - **Monetary values were converted to international-$ in 2022 prices.** To account for inflation and differences in the cost of living between countries, we transform the data using WID’s `xlcusp` dataset in Stata.
+          - **We calculate additional metrics.** We make transformations of the data to derive some additional metrics that are not available directly from the original World Inequality Database, as percentile and share ratios, derived from income thresholds and shares, respectively.
         presentation:
-          title_public: TBD - Indicator title to be shown in data pages, that overrides the indicator's title.
-          title_variant: TBD - Indicator's title variant
-          attribution_short: TBD - Indicator's attribution (shorter version)
-          faqs:
-            - fragment_id: TBD - Question identifier from FAQ GDoc
-              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+          title_variant: Before tax
+          attribution_short: World Inequality Database
+          topic_tags:
+            - Economic Inequality
           grapher_config:
             title: Income share of the richest 1% (before tax)
-            subtitle: The share of income received by the richest 1% of the population. Income here is measured before taxes and benefits.
-            variantName: WID
-            originUrl: https://ourworldindata.org/economic-inequality
+            subtitle: >-
+              The share of income received by the richest 1% of the population. Income here is measured before taxes and benefits.
+            note: >-
+              Income is measured before payment of taxes and non-pension benefits, but after
+              the payment of public and private pensions.
             hasMapTab: true
             tab: map
+            variantName: WID
             yAxis:
               min: 0
             map:
@@ -69,4 +73,4 @@ tables:
               - South Africa
               - China
               - France
-            note: Income is measured before payment of taxes and non-pension benefits, but after the payment of public and private pensions.
+            $schema: https://files.ourworldindata.org/schemas/grapher-schema.003.json

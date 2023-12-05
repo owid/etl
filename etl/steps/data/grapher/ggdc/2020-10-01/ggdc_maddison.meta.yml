@@ -1,11 +1,11 @@
 definitions:
   common:
-    processing_level: TBD - major or minor
+    processing_level: minor
     presentation:
       topic_tags:
-        - TBD - Indicator's topic tags
+        - Economic Growth
 dataset:
-  update_period_days: TBD - Number of days between OWID updates
+  update_period_days: 365
 tables:
   maddison_gdp:
     variables:
@@ -18,15 +18,17 @@ tables:
           numDecimalPlaces: 0
         description_short: This data is adjusted for inflation and for differences in the cost of living between countries.
         description_key:
-          - TBD - List of key pieces of information about the indicator.
-        description_from_producer: TBD - Indicator's description given by the producer
-        description_processing: TBD - Indicator's processing description
+          - This GDP per capita indicator provides information on economic growth and income levels in the very long run. Some country estimates are available as far back as 1 CE and regional estimates as far back as 1820 CE.
+          - For more up-to-date estimates of GDP per capita, see the [World Bank's indicator](https://ourworldindata.org/grapher/gdp-per-capita-worldbank).
+          - This data is adjusted for inflation and for differences in the cost of living between countries.
+          - This data is expressed in international-$ at 2011 prices, using a combination of 2011 and 1990 PPPs for historical data.
+        description_from_producer: Real GDP per capita in 2011$
         presentation:
-          title_public: TBD - Indicator title to be shown in data pages, that overrides the indicator's title.
-          title_variant: TBD - Indicator's title variant
-          attribution_short: TBD - Indicator's attribution (shorter version)
+          title_public: GDP per capita
+          title_variant: Historical data
+          attribution_short: Maddison Project Database
           faqs:
-            - fragment_id: TBD - Question identifier from FAQ GDoc
+            - fragment_id: poverty-international-dollars
               gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
           grapher_config:
             title: GDP per capita

@@ -19,6 +19,8 @@ definitions:
       numDecimalPlaces: 1
       tolerance: 5
 
+    processing_level: major
+
     presentation:
       attribution_short: World Bank
       grapher_config:
