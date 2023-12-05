@@ -59,7 +59,7 @@ meta:
       2023.
     attribution: Global Carbon Budget (2023)
     url_main: https://globalcarbonbudget.org/
-    url_download: s3://owid-private/global_carbon_budget_national_emissions.xlsx
+    url_download: https://globalcarbonbudget.org/download/936/?tmstv=1701441540
     date_accessed: '2023-12-05'
     date_published: '2023-12-05'
   license:
@@ -68,6 +68,6 @@ meta:
   is_public: false
 wdir: ../../../data/snapshots/gcp/2023-12-05
 outs:
-- md5: c0e28a78602c655fd519e853f6d334ac
-  size: 737973
+- md5: 2aa5c1e710a1ea999855d432fc1f7b2a
+  size: 1017958
   path: global_carbon_budget_national_emissions.xlsx

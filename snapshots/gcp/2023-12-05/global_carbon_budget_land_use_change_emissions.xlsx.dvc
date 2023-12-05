@@ -59,7 +59,7 @@ meta:
       2023.
     attribution: Global Carbon Budget (2023)
     url_main: https://globalcarbonbudget.org/
-    url_download: s3://owid-private/global_carbon_budget_land_use_change_emissions.xlsx
+    url_download: https://globalcarbonbudget.org/download/939/?tmstv=1701441574
     date_accessed: '2023-12-05'
     date_published: '2023-12-05'
   license:
