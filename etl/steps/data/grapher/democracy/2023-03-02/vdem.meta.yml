@@ -408,7 +408,8 @@ tables:
         title: Percentage of territory effectively controlled by government
         description_short: Considers the extent to which the government is recognized as the main authority, or rejected by others, such as insurgent groups, criminal organizations, or other countries.
         description_key:
-          - TBD - List of key pieces of information about the indicator.
+          - V-Dem’s experts consider the extent to which the government is recognized as the main authority and can assert its power over other actors if necessary. Such actors include insurgent groups, criminal organizations, and other countries. They also consider that some countries may be so weak their reach cannot cover remote areas.
+          - V-Dem combines the experts’ ratings with supplementary information (the experts’ ratings of hypothetical countries, their stated uncertainties, and personal demographics) to produce best, upper-, and lower-bound estimates of the indicator.
         description_from_producer: >-
           Over what percentage (%) of the territory does the state have effective control?
 
