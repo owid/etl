@@ -144,7 +144,7 @@ def generate_metadata_update(path_to_file: str, metadata: str, output_file_path:
     messages = create_system_prompt(path_to_file, metadata)
 
     if "snap" in path_to_file:
-        chat_completion = client.chat.completions.create(messages=messages, model="gpt-4", temperature=0)
+        chat_completion = client.chat.completions.create(messages=messages, model="gpt-4", temperature=0)  # type: ignore
         message_content = process_chat_completion(chat_completion)
         if message_content:
             new_yaml_content = yaml.safe_load(message_content)
@@ -155,7 +155,7 @@ def generate_metadata_update(path_to_file: str, metadata: str, output_file_path:
 
     elif "grapher" in path_to_file:
         for attempt in range(5):  # MAX_ATTEMPTS
-            chat_completion = client.chat.completions.create(messages=messages, model="gpt-4", temperature=0)
+            chat_completion = client.chat.completions.create(messages=messages, model="gpt-4", temperature=0)  # type: ignore
             message_content = process_chat_completion(chat_completion)
             if message_content:
                 try:
