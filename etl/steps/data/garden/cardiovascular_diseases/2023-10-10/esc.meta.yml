@@ -19,7 +19,7 @@ tables:
           title: Ablations to correct heart rhythm disorders per million people
           unit: 'per million people'
           short_unit: ''
-          description_short: Number of ablations to correct heart rhythm disorders.
+          description_short: Number of ablations to correct heart rhythm disorders, per million people in the population.
           processing_level: minor
           display:
             numDecimalPlaces: 0
@@ -28,7 +28,7 @@ tables:
           title: Adjunctive intracoronary imaging techniques per million people
           unit: 'per million people'
           short_unit: ''
-          description_short: Number of intracoronary imaging techniques alongside other procedures for diagnostic or interventional purposes.
+          description_short: Number of intracoronary imaging techniques alongside other procedures for diagnostic or interventional purposes, per million people in the population.
           processing_level: minor
           display:
             numDecimalPlaces: 0
@@ -37,7 +37,7 @@ tables:
           title: Adjunctive intracoronary physiology measurements per million people
           unit: 'per million people'
           short_unit: ''
-          description_short: Number of intracoronary physiology measurements alongside other procedures for diagnostic or interventional purposes.
+          description_short: Number of intracoronary physiology measurements alongside other procedures for diagnostic or interventional purposes, per million people in the population.
           processing_level: minor
           display:
             numDecimalPlaces: 0
@@ -46,7 +46,7 @@ tables:
           title: Alcohol septum ablations per million people
           unit: 'per million people'
           short_unit: ''
-          description_short: Number of alcohol septum ablations as a medical procedure for certain conditions.
+          description_short: Number of alcohol septum ablations as a medical procedure for certain conditions, per million people in the population.
           processing_level: minor
           display:
             numDecimalPlaces: 0
@@ -55,7 +55,7 @@ tables:
           title: Aortic balloon valvuloplasties per million people
           unit: 'per million people'
           short_unit: ''
-          description_short: Medical procedures involving aortic balloon valvuloplasties for specific conditions.
+          description_short: Number of medical procedures involving aortic balloon valvuloplasties for specific conditions, per million people in the population.
           processing_level: minor
           display:
             numDecimalPlaces: 0
@@ -64,7 +64,7 @@ tables:
           title: Atrial septum closures per million people
           unit: 'per million people'
           short_unit: ''
-          description_short: Procedures related to atrial septum closures in medical practice.
+          description_short: Procedures related to atrial septum closures in medical practice, per million people in the population, per million people in the population.
           processing_level: minor
           display:
             numDecimalPlaces: 0
@@ -91,7 +91,7 @@ tables:
           title: Cardiac resynchronization therapy device (CRT-D and CRT-P) implantations per million people
           unit: 'per million people'
           short_unit: ''
-          description_short: The number of cardiac resynchronization therapy device (CRT-D and CRT-P) implantations per million people.
+          description_short: Number of cardiac resynchronization therapy device (CRT-D and CRT-P) implantations, per million people in the population.
           processing_level: minor
           display:
             numDecimalPlaces: 0
@@ -118,7 +118,7 @@ tables:
           title: Female cardiologists as a percentage of total cardiologists
           unit: '%'
           short_unit: '%'
-          description_short: The percentage of female cardiologists out of the total number of cardiologists.
+          description_short: Percentage of female cardiologists out of the total number of cardiologists.
           processing_level: minor
           display:
             numDecimalPlaces: 0
@@ -127,7 +127,7 @@ tables:
           title: Cardiology departments performing device-based decongestion therapy per million people
           unit: 'per million people'
           short_unit: ''
-          description_short: The number of cardiology departments performing device-based decongestion therapy per million people.
+          description_short: Number of cardiology departments performing device-based decongestion therapy, per million people in the population.
           processing_level: minor
           display:
             numDecimalPlaces: 0
@@ -145,7 +145,7 @@ tables:
           title: Coronary bioresorbable vascular scaffolds per million people
           unit: 'per million people'
           short_unit: ''
-          description_short: Number of coronary bioresorbable vascular scaffolds in medical procedures per million people.
+          description_short: Number of coronary bioresorbable vascular scaffolds in medical procedures, per million people in the population.
           processing_level: minor
           display:
             numDecimalPlaces: 0
@@ -154,7 +154,7 @@ tables:
           title: Coronary drug-eluting stents per million people
           unit: 'per million people'
           short_unit: ''
-          description_short: The utilization of coronary drug-eluting stents in medical procedures per million people.
+          description_short: Number of coronary drug-eluting stents, per million people in the population.
           processing_level: minor
           display:
             numDecimalPlaces: 0
@@ -163,7 +163,7 @@ tables:
           title: Coronary stents per million people
           unit: 'per million people'
           short_unit: ''
-          description_short: Number of coronary stent implantations, which are devices that open and support blocked arteries to improve heart blood flow, per million people.
+          description_short: Number of coronary stent implantations, which are devices that open and support blocked arteries to improve heart blood flow, per million people in the population.
           processing_level: minor
           display:
             numDecimalPlaces: 0
@@ -172,7 +172,7 @@ tables:
           title: Hospitals with cath labs per million people
           unit: 'per million people'
           short_unit: ''
-          description_short: The availability of hospitals with catheterization labs (cath labs) per million people.
+          description_short: Number of hospitals with catheterization labs (cath labs), per million people in the population.
           processing_level: minor
           display:
             numDecimalPlaces: 0
@@ -181,7 +181,7 @@ tables:
           title: Hospitals implanting MitraClip per million people
           unit: 'per million people'
           short_unit: ''
-          description_short: The number of hospitals performing MitraClip implantations per million people.
+          description_short: Number of hospitals performing MitraClip implantations, per million people in the population.
           processing_level: minor
           display:
             numDecimalPlaces: 0
@@ -190,7 +190,7 @@ tables:
           title: Hospitals implanting cardiac resynchronization therapy (CRT) devices per million people
           unit: 'per million people'
           short_unit: ''
-          description_short: The number of hospitals implanting cardiac resynchronization therapy (CRT) devices per million people.
+          description_short: Number of hospitals implanting cardiac resynchronization therapy (CRT) devices, per million people in the population.
           processing_level: minor
           display:
             numDecimalPlaces: 0
@@ -199,7 +199,7 @@ tables:
           title: Hospitals implanting cardioverter defibrillators (ICDs) per million people
           unit: 'per million people'
           short_unit: ''
-          description_short: The number of hospitals implanting cardioverter defibrillators (ICDs) per million people.
+          description_short: Number of hospitals implanting cardioverter defibrillators (ICDs), per million people in the population.
           processing_level: minor
           display:
             numDecimalPlaces: 0
@@ -208,7 +208,7 @@ tables:
           title: Hospitals implanting left ventricular assist devices (LVADs) per million people
           unit: 'per million people'
           short_unit: ''
-          description_short: The number of hospitals implanting left ventricular assist devices (LVADs) per million people.
+          description_short: Number of hospitals implanting left ventricular assist devices (LVADs), per million people in the population.
           processing_level: minor
           display:
             numDecimalPlaces: 0
@@ -226,7 +226,7 @@ tables:
           title: Hospitals performing heart failure (HF) exercise programs for HF patients per million people
           unit: 'per million people'
           short_unit: ''
-          description_short: The number of hospitals offering HF exercise programs for HF patients per million people.
+          description_short: Number of hospitals offering HF exercise programs for HF patients, per million people in the population.
           processing_level: minor
           display:
             numDecimalPlaces: 0
@@ -235,7 +235,7 @@ tables:
           title: Hospitals performing spiroergometry per million people
           unit: 'per million people'
           short_unit: ''
-          description_short: The number of hospitals performing spiroergometry tests per million people.
+          description_short: Number of hospitals performing spiroergometry tests per million people in the population.
           processing_level: minor
           display:
             numDecimalPlaces: 0
@@ -244,7 +244,7 @@ tables:
           title: Hospitals undertaking congenital heart disease surgery per million people
           unit: 'per million people'
           short_unit: ''
-          description_short: The number of hospitals performing surgery for congenital heart disease per million people.
+          description_short: Number of hospitals performing surgery for congenital heart disease per million people in the population.
           processing_level: minor
           display:
             numDecimalPlaces: 0
@@ -253,7 +253,7 @@ tables:
           title: Hospitals undertaking electrophysiology procedures per million people
           unit: 'per million people'
           short_unit: ''
-          description_short: The number of hospitals performing electrophysiology procedures per million people.
+          description_short: Number of hospitals performing electrophysiology procedures per million people in the population.
           processing_level: minor
           display:
             numDecimalPlaces: 0
@@ -262,7 +262,7 @@ tables:
           title: Hospitals with advanced ultrasound imaging per million people
           unit: 'per million people'
           short_unit: ''
-          description_short: The number of hospitals equipped with advanced ultrasound imaging technology per million people.
+          description_short: Number of hospitals equipped with advanced ultrasound imaging technology per million people in the population.
           processing_level: minor
           display:
             numDecimalPlaces: 0
@@ -271,7 +271,7 @@ tables:
           title: Hospitals with availability to obtain BNP/NT-proBNP in ER per million people
           unit: 'per million people'
           short_unit: ''
-          description_short: The number of hospitals with the capability to obtain B-type natriuretic peptide (BNP) or N-terminal pro B-type natriuretic peptide (NT-proBNP) in the emergency room per million people.
+          description_short: Number of hospitals with the capability to obtain B-type natriuretic peptide (BNP) or N-terminal pro B-type natriuretic peptide (NT-proBNP) in the emergency room, per million people in the population.
           processing_level: minor
           display:
             numDecimalPlaces: 0
@@ -280,7 +280,7 @@ tables:
           title: Hospitals with cardiac rehabilitation programmes per million people
           unit: 'per million people'
           short_unit: ''
-          description_short: The number of hospitals offering cardiac rehabilitation programs per million people.
+          description_short: Number of hospitals offering cardiac rehabilitation programs, per million people in the population.
           processing_level: minor
           display:
             numDecimalPlaces: 0
@@ -289,7 +289,7 @@ tables:
           title: Hospitals with cath labs and on-site cardiac surgery per million people
           unit: 'per million people'
           short_unit: ''
-          description_short: The number of hospitals with catheterization labs (cath labs) and on-site cardiac surgery capabilities per million people.
+          description_short: Number of hospitals with catheterization labs (cath labs) and on-site cardiac surgery capabilities, per million people in the population.
           processing_level: minor
           display:
             numDecimalPlaces: 0
@@ -298,7 +298,7 @@ tables:
           title: Hospitals with cath labs on 24-jour, 7-days service per million people
           unit: 'per million people'
           short_unit: ''
-          description_short: The number of hospitals with catheterization labs (cath labs) providing 24-hour, 7-days service per million people.
+          description_short: Number of hospitals with catheterization labs (cath labs) providing 24-hour, 7-days service, per million people in the population.
           processing_level: minor
           display:
             numDecimalPlaces: 0
@@ -307,7 +307,7 @@ tables:
           title: Hospitals with cath labs performing transcatheter aortic valve implantation (TAVI) per million people
           unit: 'per million people'
           short_unit: ''
-          description_short: The number of hospitals with catheterization labs (cath labs) performing transcatheter aortic valve implantation (TAVI) procedures per million people.
+          description_short: Number of hospitals with catheterization labs (cath labs) performing transcatheter aortic valve implantation (TAVI) procedures, per million people in the population.
           processing_level: minor
           display:
             numDecimalPlaces: 0
@@ -316,7 +316,7 @@ tables:
           title: Hospitals with cath labs performing structural heart disease interventions in children per million people
           unit: 'per million people'
           short_unit: ''
-          description_short: The number of hospitals with catheterization labs (cath labs) performing structural heart disease interventions in children per million people.
+          description_short: Number of hospitals with catheterization labs (cath labs) performing structural heart disease interventions in children, per million people in the population.
           processing_level: minor
           display:
             numDecimalPlaces: 0
@@ -325,7 +325,7 @@ tables:
           title: Hospitals with cath labs performing structural heart disease interventions in adults per million people
           unit: 'per million people'
           short_unit: ''
-          description_short: The number of hospitals with catheterization labs (cath labs) performing structural heart disease interventions in adults per million people.
+          description_short: Number of hospitals with catheterization labs (cath labs) performing structural heart disease interventions in adults, per million people in the population.
           processing_level: minor
           display:
             numDecimalPlaces: 0
@@ -334,7 +334,7 @@ tables:
           title: Hospitals with dedicated heart failure (HF) centers per million people
           unit: 'per million people'
           short_unit: ''
-          description_short: The number of hospitals with dedicated heart failure (HF) centers per million people.
+          description_short: Number of hospitals with dedicated heart failure (HF) centers, per million people in the population.
           processing_level: minor
           display:
             numDecimalPlaces: 0
@@ -343,7 +343,7 @@ tables:
           title: Hospitals with dedicated coronary care units per million people
           unit: 'per million people'
           short_unit: ''
-          description_short: The number of hospitals with dedicated coronary care units (CCUs) per million people.
+          description_short: Number of hospitals with dedicated coronary care units (CCUs), per million people in the population.
           processing_level: minor
           display:
             numDecimalPlaces: 0
@@ -352,7 +352,7 @@ tables:
           title: Hospitals with dedicated stroke units per million people
           unit: 'per million people'
           short_unit: ''
-          description_short: The number of hospitals with dedicated stroke units per million people.
+          description_short: Number of hospitals with dedicated stroke units, per million people in the population.
           processing_level: minor
           display:
             numDecimalPlaces: 0
@@ -361,7 +361,7 @@ tables:
           title: Implantable cardioverter defibrillator (ICD) implantations per million people
           unit: 'per million people'
           short_unit: ''
-          description_short: The number of implantable cardioverter defibrillator (ICD) implantations per million people.
+          description_short: Number of implantable cardioverter defibrillator (ICD) implantations, per million people in the population.
           processing_level: minor
           display:
             numDecimalPlaces: 0
@@ -370,7 +370,7 @@ tables:
           title: Interventional cardiologists per million people
           unit: 'per million people'
           short_unit: ''
-          description_short: The number of interventional cardiologists per million people.
+          description_short: Number of interventional cardiologists, per million people in the population.
           processing_level: minor
           display:
             numDecimalPlaces: 0
@@ -379,7 +379,7 @@ tables:
           title: Left atrial appendage occlusions per million people
           unit: 'per million people'
           short_unit: ''
-          description_short: Number of left atrial appendage occlusions as a medical procedure per million people.
+          description_short: Number of left atrial appendage occlusions as a medical procedure, per million people in the population.
           processing_level: minor
           display:
             numDecimalPlaces: 0
@@ -389,7 +389,7 @@ tables:
           title: Left, right, and both bentricular assist device implantations per million people
           unit: 'per million people'
           short_unit: ''
-          description_short: The number of left, right, and both ventricular assist device (VAD) implantations per million people.
+          description_short: Number of left, right, and both ventricular assist device (VAD) implantations, per million people in the population.
           processing_level: minor
           display:
             numDecimalPlaces: 0
@@ -398,7 +398,7 @@ tables:
           title: Mitral balloon valvuloplasties per million people
           unit: 'per million people'
           short_unit: ''
-          description_short: The utilization of mitral balloon valvuloplasties in medical procedures per million people.
+          description_short: Number of mitral balloon valvuloplasties, per million people in the population.
           processing_level: minor
           display:
             numDecimalPlaces: 0
@@ -407,7 +407,7 @@ tables:
           title: Number of heart failure (HF)-related hospital discharges per million people
           unit: 'per million people'
           short_unit: ''
-          description_short: The number of hospital discharges related to heart failure (HF) per million people.
+          description_short: Number of hospital discharges related to heart failure (HF), per million people in the population.
           processing_level: minor
           display:
             numDecimalPlaces: 0
@@ -425,7 +425,7 @@ tables:
           title: Palliative care units for patients with advanced end-stage heart failure (HF) per million people
           unit: 'per million people'
           short_unit: ''
-          description_short: The availability of palliative care units for patients with advanced end-stage heart failure (HF) per million people.
+          description_short: Number of palliative care units for patients with advanced end-stage heart failure (HF), per million people in the population.
           processing_level: minor
           display:
             numDecimalPlaces: 0
@@ -434,7 +434,7 @@ tables:
           title: Percentage of percutaneous coronary interventions (PCI) performed by transradial access
           unit: '%'
           short_unit: '%'
-          description_short: The percentage of percutaneous coronary interventions (PCI) performed using transradial access.
+          description_short: Percentage of percutaneous coronary interventions (PCI) performed using transradial access.
           processing_level: minor
           display:
             numDecimalPlaces: 0
@@ -443,7 +443,7 @@ tables:
           title: Percutaneous aortic valve implantation (TAVI) per million people
           unit: 'per million people'
           short_unit: ''
-          description_short: The number of percutaneous aortic valve implantation (TAVI) procedures per million people.
+          description_short: Number of percutaneous aortic valve implantation (TAVI) procedures, per million people in the population.
           processing_level: minor
           display:
             numDecimalPlaces: 0
@@ -452,7 +452,7 @@ tables:
           title: Percutaneous coronary interventions (PCI) per million people
           unit: 'per million people'
           short_unit: ''
-          description_short: Number of percutaneous coronary interventions (PCI) in medical procedures per million people.
+          description_short: Number of percutaneous coronary interventions (PCI) in medical procedures, per million people in the population.
           processing_level: minor
           display:
             numDecimalPlaces: 0
@@ -461,7 +461,7 @@ tables:
           title: Percutaneous coronary interventions (PCI) for in-stent restenosis per million people
           unit: 'per million people'
           short_unit: ''
-          description_short: The number of percutaneous coronary interventions (PCI) performed for in-stent restenosis per million people.
+          description_short: Number of percutaneous coronary interventions (PCI) performed for in-stent restenosis, per million people in the population.
           processing_level: minor
           display:
             numDecimalPlaces: 0
@@ -470,7 +470,7 @@ tables:
           title: Percutaneous coronary interventions (PCI) in coronary artery with chronic total occlusions (CTO) per million people
           unit: 'per million people'
           short_unit: ''
-          description_short: The number of percutaneous coronary interventions (PCI) performed in coronary arteries with chronic total occlusions (CTO) per million people.
+          description_short: Number of percutaneous coronary interventions (PCI) performed in coronary arteries with chronic total occlusions (CTO), per million people in the population.
           processing_level: minor
           display:
             numDecimalPlaces: 0
@@ -479,7 +479,7 @@ tables:
           title: Percutaneous coronary interventions (PCI) in unprotected left main (LM) coronary artery per million people
           unit: 'per million people'
           short_unit: ''
-          description_short: The number of percutaneous coronary interventions (PCI) performed in the unprotected left main (LM) coronary artery per million people.
+          description_short: Number of percutaneous coronary interventions (PCI) performed in the unprotected left main (LM) coronary artery, per million people in the population.
           processing_level: minor
           display:
             numDecimalPlaces: 0
@@ -488,7 +488,7 @@ tables:
           title: Percutaneous coronary interventions (PCI) performed with adjunctive intracoronary imaging techniques per million people
           unit: 'per million people'
           short_unit: ''
-          description_short: The number of percutaneous coronary interventions (PCI) performed with adjunctive intracoronary imaging techniques per million people.
+          description_short: Number of percutaneous coronary interventions (PCI) performed with adjunctive intracoronary imaging techniques, per million people in the population.
           processing_level: minor
           display:
             numDecimalPlaces: 0
@@ -497,7 +497,7 @@ tables:
           title: Percutaneous coronary interventions (PCI) performed with adjunctive intracoronary physiology measurements per million people
           unit: 'per million people'
           short_unit: ''
-          description_short: The number of percutaneous coronary interventions (PCI) performed with adjunctive intracoronary physiology measurements per million people.
+          description_short: Number of percutaneous coronary interventions (PCI) performed with adjunctive intracoronary physiology measurements, per million people in the population.
           processing_level: minor
           display:
             numDecimalPlaces: 0
@@ -506,7 +506,7 @@ tables:
           title: Percutaneous coronary interventions (PCI) with drug-eluting balloons per million people
           unit: 'per million people'
           short_unit: ''
-          description_short: The number of percutaneous coronary interventions (PCI) performed using drug-eluting balloons per million people.
+          description_short: Number of percutaneous coronary interventions (PCI) performed using drug-eluting balloons, per million people in the population.
           processing_level: minor
           display:
             numDecimalPlaces: 0
@@ -515,7 +515,7 @@ tables:
           title: Percutaneous coronary interventions (PCI) with rotational or orbital atherectomy per million people
           unit: 'per million people'
           short_unit: ''
-          description_short: The number of percutaneous coronary interventions (PCI) performed using rotational or orbital atherectomy per million people.
+          description_short: Number of percutaneous coronary interventions (PCI) performed using rotational or orbital atherectomy, per million people in the population.
           processing_level: minor
           display:
             numDecimalPlaces: 0
@@ -524,7 +524,7 @@ tables:
           title: Percutaneous coronary interventions (PCI) without stent per million people
           unit: 'per million people'
           short_unit: ''
-          description_short: The number of percutaneous coronary interventions (PCI) performed without stent placement per million people.
+          description_short: Number of percutaneous coronary interventions (PCI) performed without stent placement, per million people in the population.
           processing_level: minor
           display:
             numDecimalPlaces: 0
@@ -533,7 +533,7 @@ tables:
           title: Percutaneous mitral valve interventions per million people
           unit: 'per million people'
           short_unit: ''
-          description_short: The number of percutaneous mitral valve interventions per million people.
+          description_short: Number of percutaneous mitral valve interventions, per million people in the population.
           processing_level: minor
           display:
             numDecimalPlaces: 0
@@ -542,7 +542,7 @@ tables:
           title: Percutaneous procedures for congenital heart disease per million people
           unit: 'per million people'
           short_unit: ''
-          description_short: The number of percutaneous procedures performed for congenital heart disease per million people.
+          description_short: Number of percutaneous procedures performed for congenital heart disease, per million people in the population.
           processing_level: minor
           display:
             numDecimalPlaces: 0
@@ -551,7 +551,7 @@ tables:
           title: Percutaneous tricuspid valve interventions per million people
           unit: 'per million people'
           short_unit: ''
-          description_short: The number of percutaneous tricuspid valve interventions per million people.
+          description_short: Number of percutaneous tricuspid valve interventions, per million people in the population.
           processing_level: minor
           display:
             numDecimalPlaces: 0
@@ -560,7 +560,7 @@ tables:
           title: Peri-valvular leaks closures per million people
           unit: 'per million people'
           short_unit: ''
-          description_short: The number of peri-valvular leaks closures performed per million people.
+          description_short: Number of peri-valvular leaks closures performed, per million people in the population.
           processing_level: minor
           display:
             numDecimalPlaces: 0
@@ -569,7 +569,7 @@ tables:
           title: Primary percutaneous coronary intervention (PPCI) per million people
           unit: 'per million people'
           short_unit: ''
-          description_short: The number of primary percutaneous coronary interventions (PPCI) performed per million people.
+          description_short: Number of primary percutaneous coronary interventions (PPCI) performed, per million people in the population.
           processing_level: minor
           display:
             numDecimalPlaces: 0
@@ -578,7 +578,7 @@ tables:
           title: Procedures with cerebral embolic protection devices per million people
           unit: 'per million people'
           short_unit: ''
-          description_short: The number of procedures performed using cerebral embolic protection devices per million people.
+          description_short: Number of procedures performed using cerebral embolic protection devices, per million people in the population.
           processing_level: minor
           display:
             numDecimalPlaces: 0
@@ -587,7 +587,7 @@ tables:
           title: Surgical interventions in congenital heart disease per million people
           unit: 'per million people'
           short_unit: ''
-          description_short: The number of surgical interventions performed in congenital heart disease cases per million people.
+          description_short: Number of surgical interventions performed in congenital heart disease cases, per million people in the population.
           processing_level: minor
           display:
             numDecimalPlaces: 0
@@ -605,7 +605,7 @@ tables:
           title: Use of hemodynamic support devices per million people
           unit: 'per million people'
           short_unit: ''
-          description_short: The utilization of hemodynamic support devices in medical procedures per million people.
+          description_short: The utilization of hemodynamic support devices in medical procedures, per million people in the population.
           processing_level: minor
           display:
             numDecimalPlaces: 0
@@ -614,7 +614,7 @@ tables:
           title: Valve-in-valve percutaneous implantations per million people
           unit: 'per million people'
           short_unit: ''
-          description_short: The number of valve-in-valve percutaneous implantations per million people.
+          description_short: Number of valve-in-valve percutaneous implantations, per million people in the population.
           processing_level: minor
           display:
             numDecimalPlaces: 0
@@ -623,7 +623,7 @@ tables:
           title: Ventricular septum closures per million people
           unit: 'per million people'
           short_unit: ''
-          description_short: The number of ventricular septum closures performed per million people.
+          description_short: Number of ventricular septum closures performed, per million people in the population.
           processing_level: minor
           display:
             numDecimalPlaces: 0
