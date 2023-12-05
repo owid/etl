@@ -1,0 +1,106 @@
+dataset:
+  update_period_days: 365
+  sources: []
+
+definitions:
+  common:
+    sources: []
+    origins:
+      - producer: World Bank Poverty and Inequality Platform
+        title: World Bank Poverty and Inequality Platform
+        version_producer: '20220909_2017_01_02_PROD'
+        description: |-
+          The Poverty and Inequality Platform (PIP) is an interactive computational tool that offers users quick access to the World Bank’s estimates of poverty, inequality, and shared prosperity. PIP provides a comprehensive view of global, regional, and country-level trends for more than 160 economies around the world.
+        citation_full: World Bank. (2022). Poverty and Inequality Platform (version 20220909_2017_01_02_PROD) [Data set]. World Bank Group. https://pip.worldbank.org/. Accessed 2022-10-03.
+        url_main: https://pip.worldbank.org/
+        date_accessed: '2022-10-03'
+        date_published: '2022-09-09'
+    display:
+      numDecimalPlaces: 0
+      tolerance: 5
+
+    processing_level: major
+
+    presentation:
+      attribution_short: World Bank
+      grapher_config:
+        originUrl: https://ourworldindata.org/poverty
+        $schema: https://files.ourworldindata.org/schemas/grapher-schema.003.json
+
+  income_consumption_pc: Depending on the country and year, the data relates to income measured after taxes and benefits, or to consumption, per capita. 'Per capita' means that the incomes of each household are attributed equally to each member of the household (including children).
+  non_market_income: Non-market sources of income, including food grown by subsistence farmers for their own consumption, are taken into account.
+  processing_notes: |-
+    For a small number of country-year observations, the World Bank PIP data contains two estimates: one based on income data and one based on consumption data. In these cases we keep only the consumption estimate in order to obtain a single series for each country.
+
+    You can find the data with all available income and consumption data points, including these overlapping estimates, in our [complete dataset](https://github.com/owid/poverty-data#a-global-dataset-of-poverty-and-inequality-measures-prepared-by-our-world-in-data-from-the-world-banks-poverty-and-inequality-platform-pip-database) of the World Bank PIP data.
+
+
+
+tables:
+  extreme_poverty_by_region:
+    variables:
+      number_of_people_living_in_extreme_poverty__by_world_region:
+        title: Number of people living in extreme poverty, by world region
+        unit: ''
+        short_unit: ''
+        description_short: "Number of people living in households with an income or consumption per person below $2.15 a day, by region."
+        description_key:
+          - Extreme poverty here is defined as living below the International Poverty Line of $2.15 per day.
+          - The data is measured in international-$ at 2017 prices – this adjusts for inflation and for differences in the cost of living between countries.
+          - "{definitions.income_consumption_pc}"
+          - "{definitions.non_market_income}"
+        description_processing: |-
+          {definitions.processing_notes}
+
+          PIP provides regional aggregate figures for the number of people living below the International Poverty Line. Unfortunately, for certain regions and years the data survey coverage is too low and the results are suppressed. From 1990 onwards, it is only for South Asia and South Saharan Africa (on different years) that regional estimates are sometimes missing.
+
+          For these years we calculate the number of poor in the region as the difference between the estimated total number of poor across the world and the sum of the number of poor across all other regions.
+
+          Prior to 1990 estimates for more than one region are missing, precluding this method.
+        presentation:
+          title_public: Share of population living in extreme poverty
+          topic_tags:
+            - Poverty
+            - Economic Growth
+            - Economic Inequality
+          faqs:
+            - fragment_id: poverty-international-poverty-line
+              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+            - fragment_id: poverty-international-dollars
+              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+            - fragment_id: poverty-comparability
+              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+            - fragment_id: poverty-regional-estimates
+              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+          grapher_config:
+            title: Total population living in extreme poverty by world region
+            subtitle: >-
+              Extreme poverty is defined as living below the International Poverty Line of
+              $2.15 per day. This data is adjusted for inflation and for differences in the
+              cost of living between countries.
+            note: >-
+              This data is expressed in [international-$](#dod:int_dollar_abbreviation) at
+              2017 prices. Depending on the country and year, it relates to income measured
+              after taxes and benefits, or to consumption, [per capita](#dod:per-capita).
+            type: StackedArea
+            addCountryMode: disabled
+            hideRelativeToggle: false
+            originUrl: https://ourworldindata.org/poverty
+            baseColorScheme: OwidCategoricalC
+            invertColorScheme: true
+            yAxis:
+              min: 0
+            selectedEntityNames:
+              - High income countries
+              - Latin America and the Caribbean
+              - East Asia and Pacific
+              - South Asia
+              - Middle East and North Africa
+              - Europe and Central Asia
+              - Sub-Saharan Africa
+            $schema: https://files.ourworldindata.org/schemas/grapher-schema.003.json
+
+
+
+
+
