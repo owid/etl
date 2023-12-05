@@ -367,5 +367,7 @@ steps:
     - snapshot://tuberculosis/2023-11-27/data_dictionary.csv
   data://grapher/tuberculosis/2023-11-27/budget:
     - data://garden/tuberculosis/2023-11-27/budget
+
+  # Tuberculosis expenditure and utilization - WHO
   data://meadow/tuberculosis/2023-12-05/expenditure:
     - snapshot://tuberculosis/2023-12-05/expenditure.csv
