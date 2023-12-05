@@ -262,7 +262,7 @@ def cli(
 
         print("\n[bold yellow]Follow-up instructions:[/bold yellow]")
         print(
-            "[green]1.[/green] Pick topic tags [link=http://datasette-private/owid?sql=SELECT+tags.%60name%60+from+tags+where+isTopic+%3D+1+ORDER+BY+tags.%60name%60%0D%0A]from the list[/link].",
+            "[green]1.[/green] Pick topic tags [link=http://datasette-private/owid?sql=SELECT+tags.%60name%60+from+tags+ORDER+BY+tags.%60name%60%0D%0A]from the list[/link].",
         )
         print(
             "[green]2.[/green] Check [link=https://docs.google.com/document/d/1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw/edit]FAQs GDoc document[/link].",
