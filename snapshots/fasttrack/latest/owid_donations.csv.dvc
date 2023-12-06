@@ -2,7 +2,7 @@ meta:
   source:
     name: Unknown
     source_data_url: 
-      gAAAAABlcDXbxOz1nPwpD-epD54e8bH_fcsRpYM5pw97q1UBwp--KuXpaMlarm63tSMb33Iveqqc_JnbXfhzYg46o8diwuWgFeKQ9lb8RO8bbiU2cbBp7ckMowvPlU2eNlrlBeniKV1iEPXD4O9wqrUhDayLnQJL824yZ3_cMCYCA7wBKSTeno3UcTIfYD_88JtM16B4qDRpvu8rCqMkJdSlptSWEcgKQpwh2PXh_qFVTSmxnUC13yF1kwsBZ2Yz6ZOBbZHHgsza
+      gAAAAABlcDoXRUU4H7YeGlWbpIfgPUDzV8G_z3DlfsYc8XhzJ80HaJSDYscfCrSk-jhf63BU1BvbwfdquawJQ3y60ZCNIJZKVLK-evxU2natiyXRQTcCpoVPH84bxKR7Yq5KFf7ZkukxI2y4XUHBjO3v_NR1T9Hhnp0C_NAL9N-26T59XgCDUwfYRjYkHrDp_fORlCEFmA8HpHH7LJb7-ehQwjJESw96Tli3QMvVpu1yr49-a_Diyk3A6pzDs5mrz5NMCUiJXK8F
     date_accessed: '2023-12-06'
     publication_year: 2023
     published_by: Unknown
@@ -12,6 +12,6 @@ meta:
   is_public: false
 wdir: ../../../data/snapshots/fasttrack/latest
 outs:
-- md5: 831b743c06206e7a4cb454175b24570e
-  size: 9213
+- md5: e1d67ddc8bfabcbe6e5403bc694b818f
+  size: 9317
   path: owid_donations.csv
