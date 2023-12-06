@@ -833,6 +833,10 @@ def estimate_metrics_locations(tb: Table, tb_maps: Table, ds_population: Dataset
     """Add participant information at country-level.
 
     reference: https://github.com/owid/notebooks/blob/main/JoeHasell/UCDP%20and%20PRIO/UCDP_georeferenced/ucdp_country_extract.ipynb
+
+    TODO:
+        - Fix number of countries being locations of conflicts by region. Currently there are duplicates for aggregate ctypes and regions.
+        - 
     """
     # Add country name using geometry
     paths.log.info("adding location name of conflict event...")
@@ -944,8 +948,15 @@ def estimate_metrics_locations(tb: Table, tb_maps: Table, ds_population: Dataset
     ###################
     paths.log.info("estimating number of locations with conflict...")
 
-    # Add regions
+    # Only count population only when country is location of conflict
+    # tb_locations_country["population"] = (
+    #     tb_locations_country["population"] * tb_locations_country["is_location_of_conflict"]
+    # )
+
+    # Regions
+    tbs_locations_regions = []
     cols = ["region", "year", "conflict_type"]
+    ## Number of countries
     tb_locations_regions = (
         tb_locations.groupby(cols)
         .agg(
@@ -962,8 +973,51 @@ def estimate_metrics_locations(tb: Table, tb_maps: Table, ds_population: Dataset
             }
         )
     )
+    tbs_locations_regions.append(tb_locations_regions)
+    ## TODO
+    ## Extra conflict type (aggregates)
+    for ctype_agg, ctypes in CTYPES_AGGREGATES.items():
+        tb_locations_ = tb_locations[tb_locations["conflict_type"].isin(ctypes)]
+        cols = ["region", "year"]
+        tb_locations_regions_ = (
+            tb_locations_.groupby(cols)
+            .agg(
+                {
+                    "country_name_location": "nunique",
+                }
+            )
+            .reset_index()
+            .sort_values(cols)
+            .rename(
+                columns={
+                    "country_name_location": "number_locations",
+                    "region": "country",
+                }
+            )
+        )
+        tb_locations_regions_["conflict_type"] = ctype_agg
+        tbs_locations_regions.append(tb_locations_regions_)
+
+    ## Population
+    # tb_locations_regions_population = (
+    #     tb_locations_country.groupby(cols)
+    #     .agg(
+    #         {
+    #             "population": "sum",
+    #         }
+    #     )
+    #     .reset_index()
+    #     .sort_values(cols)
+    #     .rename(
+    #         columns={
+    #             "country_name_location": "number_locations",
+    #             "region": "country",
+    #         }
+    #     )
+    # )
     # World
     cols = ["year", "conflict_type"]
+    ## Number of countries
     tb_locations_world = (
         tb_locations.groupby(cols)
         .agg(
@@ -981,8 +1035,40 @@ def estimate_metrics_locations(tb: Table, tb_maps: Table, ds_population: Dataset
         )
     )
     tb_locations_world["country"] = "World"
+    ## Population
+    # tb_locations_world_pop = (
+    #     tb_locations_country.groupby(cols)
+    #     .agg(
+    #         {
+    #             "population": "sum",
+    #         }
+    #     )
+    #     .reset_index()
+    #     .sort_values(cols)
+    #     .rename(
+    #         columns={
+    #             "country_name_location": "number_locations",
+    #             "region": "country",
+    #         }
+    #     )
+    # )
+    # tb_locations_world_pop["country"] = "World"
     # Combine
-    tb_locations_regions = pr.concat([tb_locations_regions, tb_locations_world], ignore_index=True)
+    tb_locations_regions = pr.concat(
+        [
+            tb_locations_regions,
+            tb_locations_world,
+            # tb_locations_world_pop,
+        ],
+        ignore_index=True,
+    )
+    # tb_locations_regions = pr.concat(
+
+    #         tbs_locations_regions + tbs_locations_world,
+    #         # tb_locations_world_pop,
+    #     ,
+    #     ignore_index=True,
+    # )
 
     # Add origins
     tb_locations_regions["number_locations"].m.origins = tb_locations["conflict_new_id"].origins
