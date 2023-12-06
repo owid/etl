@@ -6,7 +6,7 @@ paths = PathFinder(__file__)
 
 def run(dest_dir: str) -> None:
     # load snapshot
-    snap = Snapshot("fasttrack/latest/transport_co2_emissions_modes.csv")
+    snap = Snapshot("fasttrack/latest/owid_donations.csv")
 
     # load data
     tb = snap.read_csv()
