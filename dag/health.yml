@@ -359,7 +359,7 @@ steps:
   data://grapher/tuberculosis/2023-11-27/burden_estimates:
     - data://garden/tuberculosis/2023-11-27/burden_estimates
 
-  # Tuberculosis budget
+  # Tuberculosis budget - WHO
   data://meadow/tuberculosis/2023-12-01/budget:
     - snapshot://tuberculosis/2023-12-01/budget.csv
   data://garden/tuberculosis/2023-11-27/budget:
@@ -368,13 +368,14 @@ steps:
   data://grapher/tuberculosis/2023-11-27/budget:
     - data://garden/tuberculosis/2023-11-27/budget
 
-  # Tuberculosis drug resistance surveillance
-  data://meadow/tuberculosis/2023-12-04/drug_resistance_surveillance:
-    - snapshot://tuberculosis/2023-12-04/drug_resistance_surveillance.csv
-  data://garden/tuberculosis/2023-11-27/drug_resistance_surveillance:
-    - data://meadow/tuberculosis/2023-12-04/drug_resistance_surveillance
-    - snapshot://tuberculosis/2023-11-27/data_dictionary.csv
+  # Tuberculosis burden disaggregated - WHO
+  data://meadow/tuberculosis/2023-12-04/burden_disaggregated:
+    - snapshot://tuberculosis/2023-12-04/burden_disaggregated.csv
+  data://garden/tuberculosis/2023-11-27/burden_disaggregated:
+    - data://meadow/tuberculosis/2023-12-04/burden_disaggregated
     - data://garden/regions/2023-01-01/regions
     - data://garden/wb/2023-04-30/income_groups
-  data://grapher/tuberculosis/2023-11-27/drug_resistance_surveillance:
-    - data://garden/tuberculosis/2023-11-27/drug_resistance_surveillance
+    - data://garden/demography/2023-03-31/population
+    - data://garden/un/2022-07-11/un_wpp
+  data://grapher/tuberculosis/2023-11-27/burden_disaggregated:
+    - data://garden/tuberculosis/2023-11-27/burden_disaggregated
