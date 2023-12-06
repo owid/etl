@@ -1,7 +1,5 @@
 """Load a meadow dataset and create a garden dataset."""
 
-from shared import add_variable_description_from_producer
-
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
 
@@ -14,20 +12,17 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load meadow dataset.
-    ds_meadow = paths.load_dataset("laboratories")
-    snap = paths.load_snapshot("data_dictionary.csv")
-    # Load data dictionary from snapshot.
-    dd = snap.read()
+    ds_meadow = paths.load_dataset("latent")
+
     # Read table from meadow dataset.
-    tb = ds_meadow["laboratories"].reset_index()
+    tb = ds_meadow["latent"].reset_index()
 
     #
     # Process data.
     #
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
-    tb = tb[["country", "year", "culture", "m_wrd"]]
-    tb = add_variable_description_from_producer(tb, dd)
-    tb = tb.dropna(subset=["culture", "m_wrd"], how="all")
+    tb = tb[["country", "year", "e_prevtx_hh_contacts_pct"]]
+    tb = tb.dropna(subset=["e_prevtx_hh_contacts_pct"], how="all")
     tb = tb.set_index(["country", "year"], verify_integrity=True)
 
     #
