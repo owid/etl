@@ -4,21 +4,15 @@ dataset:
     UK Government's Department for Energy Security and Net Zero. It is based on average emissions of transport modes in the
     UK, based on standard vehicle standards and the UK's electricity mix.
   licenses:
-  - {}
-  sources:
-  - name: CO2 emissions of transport modes (UK Government)
-    url: https://www.gov.uk/government/publications/greenhouse-gas-reporting-conversion-factors-2022
-    publication_year: '2022'
-    published_by: UK Government, Department for Energy Security and Net Zero
+    - {}
 tables:
   transport_co2_emissions_modes:
     variables:
       transport_emissions_factor:
-        title: transport_emissions_factor
-        description: Estimated greenhouse gas emissions per kilometer travelled. This is measured in kilograms of carbon-dioxide
-          equivalents (CO2e) per kilometer.
+        title: Transport emissions per kilometer travelled
         unit: kgCO2e
         short_unit: kg
         display:
-          name: Transport emissions per kilometer travelled
           numDecimalPlaces: 2
+        description: Estimated greenhouse gas emissions per kilometer travelled. This is measured in kilograms of carbon-dioxide
+          equivalents (CO2e) per kilometer.
