@@ -90,18 +90,18 @@ def run(dest_dir: str) -> None:
         ],
     )
 
-    tb_country = make_tb_country(tb_ucdp_countries, tb_prio_countries)
+    # tb_country = make_tb_country(tb_ucdp_countries, tb_prio_countries)
 
     # Set index
     tb = tb.set_index(COLUMNS_INDEX, verify_integrity=True)
-    tb_country = tb_country.set_index(COLUMNS_INDEX_COUNTRY, verify_integrity=True)
+    # tb_country = tb_country.set_index(COLUMNS_INDEX_COUNTRY, verify_integrity=True)
 
     #
     # Save outputs.
     #
     tables = [
         tb,
-        tb_country,
+        # tb_country,
     ]
     # Create a new garden dataset with the same metadata as the meadow dataset.
     ds_garden = create_dataset(
