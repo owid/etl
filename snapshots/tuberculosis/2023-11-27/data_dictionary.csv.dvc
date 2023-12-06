@@ -12,9 +12,8 @@ meta:
     # Citation
     producer: WHO
     citation_full: |-
-      Global tuberculosis report 2023. Geneva: World Health Organization; 2023. Licence: CC BY-NC-SA 3.0 IGO
+      Global tuberculosis report 2023. Geneva: World Health Organization; 2023.
     attribution_short: WHO
-
     # Files
     url_main: https://www.who.int/teams/global-tuberculosis-programme/data
     url_download: https://extranet.who.int/tme/generateCSV.asp?ds=dictionary
@@ -23,10 +22,10 @@ meta:
     # License
     license:
       name: CC BY-NC-SA 3.0 IGO
-      url: https://creativecommons.org/licenses/by-nc-sa/3.0/igo/
+      url: https://www.who.int/about/policies/publishing/data-policy
 
 wdir: ../../../data/snapshots/tuberculosis/2023-11-27
 outs:
-- md5: 448a7b668c0234746af432350682792b
-  size: 97992
-  path: data_dictionary.csv
+  - md5: 448a7b668c0234746af432350682792b
+    size: 97992
+    path: data_dictionary.csv

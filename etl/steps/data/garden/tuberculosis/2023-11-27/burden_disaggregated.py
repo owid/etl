@@ -123,6 +123,7 @@ def add_region_sum_aggregates(tb: Table, ds_regions: Dataset, ds_income_groups: 
                 df=gr_cal,
                 region=region,
                 countries_in_region=countries_in_region,
+                countries_that_must_have_data=[],
                 frac_allowed_nans_per_year=0.5,
                 num_allowed_nans_per_year=None,
             )
@@ -142,8 +143,8 @@ def add_population_column(tb: Table) -> Table:
     """
     Adding the population for each age-group, in rows where the risk factor is "all".
     """
-    tb_pop = tb[tb["risk_factor"] == "all"]
-    tb_no_pop = tb[tb["risk_factor"] != "all"]
+    tb_pop = tb[tb["risk_factor"] == "all"].reset_index(drop=True)
+    tb_no_pop = tb[tb["risk_factor"] != "all"].reset_index(drop=True)
     tb_pop = add_population(
         df=tb_pop,
         country_col="country",

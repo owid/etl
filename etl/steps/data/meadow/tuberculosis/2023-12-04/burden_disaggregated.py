@@ -15,10 +15,10 @@ def run(dest_dir: str) -> None:
 
     # Load data from snapshot.
     tb = snap.read()
-    tb = tb.drop(columns=["iso2", "iso3", "iso_numeric"])
     #
     # Process data.
     #
+    tb = tb.drop(columns=["iso2", "iso3", "iso_numeric"])
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
     tb = (
         tb.underscore()
