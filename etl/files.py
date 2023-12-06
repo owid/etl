@@ -5,6 +5,7 @@
 import hashlib
 import io
 import os
+import re
 import subprocess
 import time
 from collections import OrderedDict
@@ -72,7 +73,19 @@ def checksum_file(filename: Union[str, Path]) -> str:
     key = f"{filename}-{mtime}"
 
     if filename not in CACHE_CHECKSUM_FILE:
-        CACHE_CHECKSUM_FILE.add(key, checksum_file_nocache(filename))
+        # Special case for regions.yml, we want to ignore the 'aliases' key
+        if os.path.basename(filename) == "regions.yml":
+            with open(filename, "r") as f:
+                s = f.read()
+
+            # Regular expression to match the 'aliases' and its list
+            regex_pattern = r"  aliases:\n(\s+-[^\n]*\n?)*"
+            s = re.sub(regex_pattern, "", s)
+
+            checksum = checksum_str(s.strip())
+        else:
+            checksum = checksum_file_nocache(filename)
+        CACHE_CHECKSUM_FILE.add(key, checksum)
 
     return CACHE_CHECKSUM_FILE[key]
 

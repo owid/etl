@@ -209,7 +209,7 @@ steps:
     - data://garden/demography/2023-10-09/life_expectancy
     - data://garden/owid/latest/key_indicators
     - data://garden/regions/2023-01-01/regions
-    - data://garden/gcp/2023-09-28/global_carbon_budget
+    - data://garden/gcp/2023-12-05/global_carbon_budget
     - data://garden/democracy/2023-03-02/vdem
     - data://garden/energy/2023-07-10/energy_mix
     - data://garden/worldbank_wdi/2022-05-26/wdi
@@ -325,14 +325,6 @@ steps:
     - data://meadow/technology/2023-03-08/microprocessor_trend
   data://grapher/technology/2023-03-09/microprocessor_trend:
     - data://garden/technology/2023-03-08/microprocessor_trend
-
-  # Trust questions in World Values Survey
-  data://meadow/wvs/2023-03-08/wvs_trust:
-    - snapshot://wvs/2023-03-08/wvs_trust.csv
-  data://garden/wvs/2023-03-08/wvs_trust:
-    - data://meadow/wvs/2023-03-08/wvs_trust
-  data://grapher/wvs/2023-03-08/wvs_trust:
-    - data://garden/wvs/2023-03-08/wvs_trust
 
   # Terrorism questions in World Values Survey (longitudinal)
   data://meadow/wvs/2023-06-25/longitudinal_wvs:

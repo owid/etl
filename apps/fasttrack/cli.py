@@ -660,7 +660,16 @@ def _harmonize_countries(df: pd.DataFrame) -> Tuple[pd.DataFrame, List[str]]:
     po.put_markdown("""## Harmonizing countries...""")
 
     # Read the main table of the regions dataset.
-    tb_regions = Dataset(LATEST_REGIONS_DATASET_PATH)["regions"][["name", "aliases"]]
+    tb_regions = Dataset(LATEST_REGIONS_DATASET_PATH)["regions"][["name", "aliases", "iso_alpha2", "iso_alpha3"]]
+
+    # First convert ISO2 and ISO3 country codes.
+    df = df.reset_index()
+    for iso_col in ["iso_alpha2", "iso_alpha3"]:
+        df["country"] = df["country"].replace(tb_regions.set_index(iso_col)["name"])
+        # lowercase
+        df["country"] = df["country"].replace(
+            tb_regions.assign(**{iso_col: tb_regions.iso_alpha2.str.lower()}).set_index(iso_col)["name"]
+        )
 
     # Convert strings of lists of aliases into lists of aliases.
     tb_regions["aliases"] = [json.loads(alias) if pd.notnull(alias) else [] for alias in tb_regions["aliases"]]
@@ -670,8 +679,6 @@ def _harmonize_countries(df: pd.DataFrame) -> Tuple[pd.DataFrame, List[str]]:
 
     # Create a series that maps aliases to country names.
     alias_to_country = tb_regions.rename(columns={"aliases": "alias"}).set_index("alias")["name"]
-
-    df = df.reset_index()
 
     unknown_countries = []
 

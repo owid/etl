@@ -907,7 +907,7 @@
                       "requirement_level": "recommended (for curated indicators)",
                       "guidelines": [
                         [
-                          "Must be an existing topic tag, and be spelled correctly (see the list of topic tags in [datasette](http://datasette-private/owid?sql=SELECT+tags.%60name%60+from+tags+where+isTopic+%3D+1+ORDER+BY+tags.%60name%60%0D%0A) (requires Tailscale)."
+                          "Must be an existing topic tag, and be spelled correctly (see the list of topic tags in [datasette](http://datasette-private/owid?sql=SELECT+tags.%60name%60+from+tags+where+slug+is+not+null+ORDER+BY+tags.%60name%60%0D%0A) (requires Tailscale)."
                         ],
                         [
                           "The first tag must correspond to the most relevant topic page (since that topic page will be used in citations of this indicator)."
