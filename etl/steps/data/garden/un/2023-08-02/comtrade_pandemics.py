@@ -192,7 +192,14 @@ def add_regions(tb: Table, ds_regions: Dataset) -> Table:
             region=region,
             ds_regions=ds_regions,
         )
-        tb_region = geo.add_region_aggregates(tb, region, countries_in_region=countries_in_region)
+        tb_region = geo.add_region_aggregates(
+            tb,
+            region,
+            countries_in_region=countries_in_region,
+            countries_that_must_have_data="auto",
+            num_allowed_nans_per_year=None,
+            frac_allowed_nans_per_year=0.2,
+        )
         tb = pr.concat(
             [
                 tb[tb["country"] != region],
