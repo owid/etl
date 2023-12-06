@@ -27,7 +27,7 @@ DATA_FILES = [
 
 # Define common metadata fields (to be written to dvc files).
 ATTRIBUTION = "Global Carbon Budget (2023)"
-CITATION_FULL = """Andrew, R. M., & Peters, G. P. (2023). The Global Carbon Project's fossil CO2 emissions dataset (2023v28) [Data set]. Zenodo. Data and methodology can be found at: https://doi.org/10.5281/zenodo.10065794
+CITATION_FULL = """Andrew, R. M., & Peters, G. P. (2023). The Global Carbon Project's fossil CO2 emissions dataset (2023v36) [Data set]. Zenodo. https://doi.org/10.5281/zenodo.10177738
 
 The data files of the Global Carbon Budget can be found at: https://globalcarbonbudget.org/carbonbudget/
 

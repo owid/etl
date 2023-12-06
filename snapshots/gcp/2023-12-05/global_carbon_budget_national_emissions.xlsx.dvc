@@ -18,8 +18,8 @@ meta:
     title_snapshot: Global Carbon Budget - National emissions
     citation_full: >-
       Andrew, R. M., & Peters, G. P. (2023). The Global Carbon Project's fossil CO2
-      emissions dataset (2023v28) [Data set].
-      Zenodo. Data and methodology can be found at: https://doi.org/10.5281/zenodo.10065794
+      emissions dataset (2023v36) [Data set].
+      Zenodo. https://doi.org/10.5281/zenodo.10177738
 
 
       The data files of the Global Carbon Budget can be found at: https://globalcarbonbudget.org/carbonbudget/
@@ -59,7 +59,8 @@ meta:
       2023.
     attribution: Global Carbon Budget (2023)
     url_main: https://globalcarbonbudget.org/
-    url_download: https://globalcarbonbudget.org/download/936/?tmstv=1701441540
+    url_download: 
+      https://globalcarbonbudgetdata.org/downloads/latest-data/National_Fossil_Carbon_Emissions_2023v1.0.xlsx
     date_accessed: '2023-12-05'
     date_published: '2023-12-05'
   license:
@@ -67,6 +68,6 @@ meta:
     url: https://www.icos-cp.eu/data-services/about-data-portal/data-license
 wdir: ../../../data/snapshots/gcp/2023-12-05
 outs:
-- md5: 2aa5c1e710a1ea999855d432fc1f7b2a
-  size: 1017958
+- md5: c0e28a78602c655fd519e853f6d334ac
+  size: 737973
   path: global_carbon_budget_national_emissions.xlsx

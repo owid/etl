@@ -1,0 +1,21 @@
+dataset:
+  title: Global Tuberculosis Report
+tables:
+  laboratories:
+    title: Global Tuberculosis Report
+    description: WHO has published a global tuberculosis (TB) report every year since 1997. The report provides a comprehensive
+      and up-to-date assessment of the TB epidemic, and of progress in prevention, diagnosis and treatment of the disease
+      at global, regional and country levels.
+    variables:
+      culture:
+        unit: ''
+        display:
+          numDecimalPlaces: 0
+        description_from_producer: Number of sites providing TB diagnostic services using culture at the end of the reporting
+          year
+      m_wrd:
+        unit: ''
+        display:
+          numDecimalPlaces: 0
+        description_from_producer: Number of sites providing TB diagnostic services using molecular WHO-recommended rapid
+          diagnostics at the end of the reporting year
