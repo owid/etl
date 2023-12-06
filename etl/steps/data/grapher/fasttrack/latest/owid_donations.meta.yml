@@ -9,3 +9,6 @@ tables:
       donations:
         title: Donations
         unit: ''
+      cumulative_donations:
+        title: Cumulative Donations
+        unit: ''
