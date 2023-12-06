@@ -1,0 +1,33 @@
+meta:
+  origin:
+    # Data product / Snapshot
+    title: PISA Database
+    description: |-
+      The Programme for International Student Assessment (PISA) by OECD provides a comprehensive and rigorous international assessment of the knowledge and skills of 15-year-old students around the world. The assessment covers areas such as mathematics, science, and reading. PISA aims to provide comparable data that will enable countries to improve their education policies and outcomes. Data is collected every three years from a globally diverse cohort of students.
+
+      The dataset contains scores, demographic information, and various indicators related to education systems of participating countries.
+
+    date_published: '2023'
+    title_snapshot: 'PISA Database: Educational Attainment, Reading, split by sex'
+    description_snapshot: |-
+      Subset of PISA database focusing on educational attainment in reading.
+
+      This snapshot includes data for female and male students, detailing student performance in reading tests across different countries.
+
+    # Citation
+    producer: OECD
+    citation_full: OECD Programme for International Student Assessment (PISA) (2023),
+      https://www.oecd.org/pisa/data/, accessed on 6th December 2023.
+    # Files
+    url_main: https://www.oecd.org/pisa/data/
+    date_accessed: 2023-12-06
+
+    # License
+    license:
+      name: ©producer year
+      url: https://www.oecd.org/termsandconditions
+wdir: ../../../data/snapshots/oecd/2023-12-06
+outs:
+- md5: abb8c84b41d568b8f1e495dc722cf960
+  size: 108544
+  path: pisa_reading_boys_girls.xls

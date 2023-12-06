@@ -1,0 +1,218 @@
+tables:
+  pisa_math_boys_girls:
+    variables:
+      pisa_math_average_boys:
+        title: "Average performance of 15 year old boys on the mathematics scale"
+        description_short: Assessed through the PISA mathematics scale, which is based on an OECD country mean of 500 points and a standard deviation of 100 points.
+        unit: 'score'
+        short_unit: ''
+        display:
+          numDecimalPlaces: 0
+
+      pisa_math_average_girls:
+        title: "Average performance of 15 year old girls on the mathematics scale"
+        description_short: Assessed through the PISA mathematics scale, which is based on an OECD country mean of 500 points and a standard deviation of 100 points.
+        unit: 'score'
+        short_unit: ''
+        display:
+          numDecimalPlaces: 0
+
+      pisa_science_average_boys:
+        title: "Average performnace of 15 year old boys on the science scale"
+        description_short: Assessed through the PISA science scale, which is based on an OECD country mean of 500 points and a standard deviation of 100 points.
+        unit: 'score'
+        short_unit: ''
+        display:
+          numDecimalPlaces: 0
+
+      pisa_science_average_girls:
+        title: "Average performance of 15 year old girls on the science scale"
+        description_short: Assessed through the PISA science scale, which is based on an OECD country mean of 500 points and a standard deviation of 100 points.
+        unit: 'score'
+        short_unit: ''
+        display:
+          numDecimalPlaces: 0
+
+      pisa_reading_average_boys:
+        title: "Average performance of 15 year old boys on the reading scale"
+        description_short: Assessed through the PISA reading scale, which is based on an OECD country mean of 500 points and a standard deviation of 100 points.
+        unit: 'score'
+        short_unit: ''
+        display:
+         numDecimalPlaces: 0
+
+      pisa_reading_average_girls:
+        title: "Average performance of 15 year old girls on the reading scale"
+        description_short: Assessed through the PISA reading scale, which is based on an OECD country mean of 500 points and a standard deviation of 100 points.
+        unit: 'score'
+        short_unit: ''
+        display:
+          numDecimalPlaces: 0
+
+      pisa_math_all_average:
+        title: "Average performance of 15 year olds on the mathematics scale"
+        description_short: Assessed through the PISA mathematics scale, which is based on an OECD country mean of 500 points and a standard deviation of 100 points.
+        unit: 'score'
+        short_unit: ''
+        display:
+          numDecimalPlaces: 0
+
+      pisa_science_all_average:
+        title: "Average performance of 15 year olds on the science scale"
+        description_short: Assessed through the PISA science scale, which is based on an OECD country mean of 500 points and a standard deviation of 100 points.
+        unit: 'score'
+        short_unit: ''
+        display:
+          numDecimalPlaces: 0
+
+      pisa_reading_all_average:
+        title: "Average performance of 15 year olds on the reading scale"
+        description_short: Assessed through the PISA reading scale, which is based on an OECD country mean of 500 points and a standard deviation of 100 points.
+        unit: 'score'
+        short_unit: ''
+        display:
+          numDecimalPlaces: 0
+
+      pisa_reading_lower_bound_girls:
+        title: "Lower bound of average performance of 15 year old girls on the reading scale"
+        description_short: Lower bound calculated as the average minus the standard error.
+        unit: 'score'
+        short_unit: ''
+        display:
+          numDecimalPlaces: 0
+
+      pisa_reading_upper_bound_girls:
+        title: "Upper bound of average performance of 15 year old girls on the reading scale"
+        description_short: Upper bound calculated as the average plus the standard error.
+        unit: 'score'
+        short_unit: ''
+        display:
+          numDecimalPlaces: 0
+
+      pisa_reading_lower_bound_boys:
+        title: "Lower bound of average performance of 15 year old boys on the reading scale"
+        description_short: Lower bound calculated as the average minus the standard error.
+        unit: 'score'
+        short_unit: ''
+        display:
+          numDecimalPlaces: 0
+
+      pisa_reading_upper_bound_boys:
+        title: "Upper bound of average performance of 15 year old boys on the reading scale"
+        description_short: Upper bound calculated as the average plus the standard error.
+        unit: 'score'
+        short_unit: ''
+        display:
+          numDecimalPlaces: 0
+
+      pisa_science_lower_bound_girls:
+        title: "Lower bound of average performance of 15 year old girls on the science scale"
+        description_short: Lower bound calculated as the average minus the standard error.
+        unit: 'score'
+        short_unit: ''
+        display:
+          numDecimalPlaces: 0
+
+      pisa_science_upper_bound_girls:
+        title: "Upper bound of average performance of 15 year old girls on the science scale"
+        description_short: Upper bound calculated as the average plus the standard error.
+        unit: 'score'
+        short_unit: ''
+        display:
+          numDecimalPlaces: 0
+
+      pisa_science_lower_bound_boys:
+        title: "Lower bound of average performance of 15 year old boys on the science scale"
+        description_short: Lower bound calculated as the average minus the standard error.
+        unit: 'score'
+        short_unit: ''
+        display:
+          numDecimalPlaces: 0
+
+      pisa_science_upper_bound_boys:
+        title: "Upper bound of average performance of 15 year old boys on the science scale"
+        description_short: Upper bound calculated as the average plus the standard error.
+        unit: 'score'
+        short_unit: ''
+        display:
+          numDecimalPlaces: 0
+
+      pisa_math_lower_bound_girls:
+        title: "Lower bound of average performance of 15 year old girls on the mathematics scale"
+        description_short: Lower bound calculated as the average minus the standard error.
+        unit: 'score'
+        short_unit: ''
+        display:
+          numDecimalPlaces: 0
+
+      pisa_math_upper_bound_girls:
+        title: "Upper bound of average performance of 15 year old girls on the mathematics scale"
+        description_short: Upper bound calculated as the average plus the standard error.
+        unit: 'score'
+        short_unit: ''
+        display:
+          numDecimalPlaces: 0
+
+      pisa_math_lower_bound_boys:
+        title: "Lower bound of average performance of 15 year old boys on the mathematics scale"
+        description_short: Lower bound calculated as the average minus the standard error.
+        unit: 'score'
+        short_unit: ''
+        display:
+          numDecimalPlaces: 0
+
+      pisa_math_upper_bound_boys:
+        title: "Upper bound of average performance of 15 year old boys on the mathematics scale"
+        description_short: Upper bound calculated as the average plus the standard error.
+        unit: 'score'
+        short_unit: ''
+        display:
+          numDecimalPlaces: 0
+
+      pisa_math_all_lower_bound:
+        title: "Lower bound of average performance of 15 year olds on the mathematics scale"
+        description_short: Lower bound calculated as the average minus the standard error.
+        unit: 'score'
+        short_unit: ''
+        display:
+          numDecimalPlaces: 0
+
+      pisa_math_all_upper_bound:
+        title: "Upper bound of average performance of 15 year olds on the mathematics scale"
+        description_short: Upper bound calculated as the average plus the standard error.
+        unit: 'score'
+        short_unit: ''
+        display:
+          numDecimalPlaces: 0
+
+      pisa_science_all_lower_bound:
+        title: "Lower bound of average performance of 15 year olds on the science scale"
+        description_short: Lower bound calculated as the average minus the standard error.
+        unit: 'score'
+        short_unit: ''
+        display:
+          numDecimalPlaces: 0
+
+      pisa_science_all_upper_bound:
+        title: "Upper bound of average performance of 15 year olds on the science scale"
+        description_short: Upper bound calculated as the average plus the standard error.
+        unit: 'score'
+        short_unit: ''
+        display:
+          numDecimalPlaces: 0
+
+      pisa_reading_all_lower_bound:
+        title: "Lower bound of average performance of 15 year olds on the reading scale"
+        description_short: Lower bound calculated as the average minus the standard error.
+        unit: 'score'
+        short_unit: ''
+        display:
+          numDecimalPlaces: 0
+
+      pisa_reading_all_upper_bound:
+        title: "Upper bound of average performance of 15 year olds on the reading scale"
+        description_short: Upper bound calculated as the average plus the standard error.
+        unit: 'score'
+        short_unit: ''
+        display:
+          numDecimalPlaces: 0
