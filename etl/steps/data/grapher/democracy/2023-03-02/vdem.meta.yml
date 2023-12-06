@@ -1,3 +1,6 @@
+# NOTE: some of the indicators are commented because data pages do not support multiple indicators yet
+# These charts use three indicators: central estimate and lower and upper bounds.
+
 dataset:
   update_period_days: 365
   sources: []
@@ -28,98 +31,98 @@ definitions:
 tables:
   vdem:
     variables:
-      electdem_vdem_owid:
-        title: Electoral democracy index
-        display:
-          name: Electoral democracy
-        description_short: >-
-          It captures to which extent political leaders are elected under comprehensive voting
-          rights in free and fair elections, and freedoms of association and expression
-          are guaranteed. It ranges from 0 to 1 (most democratic).
-        description_key:
-          - The index is mostly based on evaluations by around 3,500 experts, which are primarily academics and members of the media and civil society, and often are nationals or residents of the country. They therefore know the country’s political system well and can evaluate aspects that are difficult to observe.
-          - We expand the coverage of the original data to include more years when current countries were still non-sovereign territories. We use the index score of the historical entity that they were part of, whenever available.
-        description_from_producer: |-
-          The index (`v2x_polyarchy`) is formed by taking the average of, on the one hand, the weighted average of the indices measuring freedom of association thick (`v2x_frassoc_thick`), clean elections (`v2xel_frefair`), freedom of expression (`v2x_freexp_altinf`), elected officials (`v2x_elecoff`), and suffrage (`v2x_suffr`) and, on the other, the five-way multiplicative interaction between those indices. This is half way between a straight average and strict multiplication, meaning the average of the two. It is thus a compromise between the two most well known aggregation formulas in the literature, both allowing partial "compensation" in one sub-component for lack of polyarchy in the others, but also punishing countries not strong in one sub-component according to the "weakest link" argument. The aggregation is done at the level of Dahl’s subcomponents with the one exception of the non-electoral component. The index is aggregated using this formula:
+      # electdem_vdem_owid:
+      #   title: Electoral democracy index
+      #   display:
+      #     name: Electoral democracy
+      #   description_short: >-
+      #     It captures to which extent political leaders are elected under comprehensive voting
+      #     rights in free and fair elections, and freedoms of association and expression
+      #     are guaranteed. It ranges from 0 to 1 (most democratic).
+      #   description_key:
+      #     - The index is mostly based on evaluations by around 3,500 experts, which are primarily academics and members of the media and civil society, and often are nationals or residents of the country. They therefore know the country’s political system well and can evaluate aspects that are difficult to observe.
+      #     - We expand the coverage of the original data to include more years when current countries were still non-sovereign territories. We use the index score of the historical entity that they were part of, whenever available.
+      #   description_from_producer: |-
+      #     The index (`v2x_polyarchy`) is formed by taking the average of, on the one hand, the weighted average of the indices measuring freedom of association thick (`v2x_frassoc_thick`), clean elections (`v2xel_frefair`), freedom of expression (`v2x_freexp_altinf`), elected officials (`v2x_elecoff`), and suffrage (`v2x_suffr`) and, on the other, the five-way multiplicative interaction between those indices. This is half way between a straight average and strict multiplication, meaning the average of the two. It is thus a compromise between the two most well known aggregation formulas in the literature, both allowing partial "compensation" in one sub-component for lack of polyarchy in the others, but also punishing countries not strong in one sub-component according to the "weakest link" argument. The aggregation is done at the level of Dahl’s subcomponents with the one exception of the non-electoral component. The index is aggregated using this formula:
 
-          `v2x_polyarchy = .5 ∗ MPI + .5 ∗ API`
+      #     `v2x_polyarchy = .5 ∗ MPI + .5 ∗ API`
 
-          `= .5 ∗ (v2x_elecoff ∗ v2xel_frefair ∗ v2x_frassoc_thick∗ v2x_suffr ∗ v2x_freexp_altinf) + .5 ∗ ((1/8) ∗ v2x_elecoff + (1/4) ∗ v2xel_frefair + (1/4) ∗ v2x_frassoc_thick + (1/8) ∗ v2x_suffr + (1/4) ∗ v2x_freexp_altinf)`
+      #     `= .5 ∗ (v2x_elecoff ∗ v2xel_frefair ∗ v2x_frassoc_thick∗ v2x_suffr ∗ v2x_freexp_altinf) + .5 ∗ ((1/8) ∗ v2x_elecoff + (1/4) ∗ v2xel_frefair + (1/4) ∗ v2x_frassoc_thick + (1/8) ∗ v2x_suffr + (1/4) ∗ v2x_freexp_altinf)`
 
-          [Text from [V-Dem Codebook v13](https://www.v-dem.net/documents/24/codebook_v13.pdf)]
-        description_processing: |-
-          We ingested the original data from the [V-Dem project website](https://v-dem.net/data/the-v-dem-dataset/) and processed it with Stata.
+      #     [Text from [V-Dem Codebook v13](https://www.v-dem.net/documents/24/codebook_v13.pdf)]
+      #   description_processing: |-
+      #     We ingested the original data from the [V-Dem project website](https://v-dem.net/data/the-v-dem-dataset/) and processed it with Stata.
 
-          We expanded the years and countries covered by V-Dem. To include more of the period when current countries were still non-sovereign territories, we identified the historical entity they were a part of and used that regime’s data whenever available.
+      #     We expanded the years and countries covered by V-Dem. To include more of the period when current countries were still non-sovereign territories, we identified the historical entity they were a part of and used that regime’s data whenever available.
 
-          For example, V-Dem only provides regime data since Bangladesh’s independence in 1971. There is, however, regime data for Pakistan and the colony of India, both of which the current territory of Bangladesh was a part. We, therefore, use the regime data of Pakistan for Bangladesh from 1947 to 1970, and the regime data of India from 1789 to 1946. We did so for all countries with a past or current population of more than one million.
+      #     For example, V-Dem only provides regime data since Bangladesh’s independence in 1971. There is, however, regime data for Pakistan and the colony of India, both of which the current territory of Bangladesh was a part. We, therefore, use the regime data of Pakistan for Bangladesh from 1947 to 1970, and the regime data of India from 1789 to 1946. We did so for all countries with a past or current population of more than one million.
 
-          We calculated regional and global averages of the Electoral Democracy Index and its sub-indices, weighted and unweighted by population.
+      #     We calculated regional and global averages of the Electoral Democracy Index and its sub-indices, weighted and unweighted by population.
 
-          All code and data is available [on GitHub](https://github.com/owid/notebooks/tree/main/BastianHerre/democracy).
-        presentation:
-          attribution_short: V-Dem
-          topic_tags:
-            - Democracy
-          faqs:
-            - fragment_id: vdem-characteristics
-              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
-            - fragment_id: vdem-scoring
-              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
-            - fragment_id: vdem-coverage
-              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
-            - fragment_id: vdem-measured
-              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
-            - fragment_id: vdem-more-info
-              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
-            - fragment_id: vdem-shortcomings
-              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
-            - fragment_id: vdem-strengths
-              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
-            - fragment_id: vdem-assessment
-              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
-          grapher_config:
-            title: Electoral democracy index
-            subtitle: >-
-              Based on the expert assessments and index by [V-Dem](#dod:v-dem). It captures
-              to which extent political leaders are elected under comprehensive voting
-              rights in free and fair elections, and freedoms of association and expression
-              are guaranteed. It ranges from 0 to 1 (most democratic).
-            addCountryMode: change-country
-            hasMapTab: true
-            tab: map
-            variantName: V-Dem
-            originUrl: https://ourworldindata.org/democracy
-            yAxis:
-              min: 0
-              max: 1
-              facetDomain: shared
-            map:
-              time: latest
-              colorScale:
-                baseColorScheme: YlGnBu
-                binningStrategy: manual
-                customNumericValues:
-                  - 0.1
-                  - 0.2
-                  - 0.3
-                  - 0.4
-                  - 0.5
-                  - 0.6
-                  - 0.7
-                  - 0.8
-                  - 0.9
-                  - 1
-            selectedEntityNames:
-              - Argentina
-              - Australia
-              - Botswana
-              - China
-            relatedQuestions:
-              - url: https://ourworldindata.org/grapher/electoral-democracy-index#faqs
-                text: FAQs on this data
-            selectedFacetStrategy: entity
-            $schema: https://files.ourworldindata.org/schemas/grapher-schema.003.json
+      #     All code and data is available [on GitHub](https://github.com/owid/notebooks/tree/main/BastianHerre/democracy).
+      #   presentation:
+      #     attribution_short: V-Dem
+      #     topic_tags:
+      #       - Democracy
+      #     faqs:
+      #       - fragment_id: vdem-characteristics
+      #         gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+      #       - fragment_id: vdem-scoring
+      #         gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+      #       - fragment_id: vdem-coverage
+      #         gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+      #       - fragment_id: vdem-measured
+      #         gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+      #       - fragment_id: vdem-more-info
+      #         gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+      #       - fragment_id: vdem-shortcomings
+      #         gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+      #       - fragment_id: vdem-strengths
+      #         gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+      #       - fragment_id: vdem-assessment
+      #         gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+      #     grapher_config:
+      #       title: Electoral democracy index
+      #       subtitle: >-
+      #         Based on the expert assessments and index by [V-Dem](#dod:v-dem). It captures
+      #         to which extent political leaders are elected under comprehensive voting
+      #         rights in free and fair elections, and freedoms of association and expression
+      #         are guaranteed. It ranges from 0 to 1 (most democratic).
+      #       addCountryMode: change-country
+      #       hasMapTab: true
+      #       tab: map
+      #       variantName: V-Dem
+      #       originUrl: https://ourworldindata.org/democracy
+      #       yAxis:
+      #         min: 0
+      #         max: 1
+      #         facetDomain: shared
+      #       map:
+      #         time: latest
+      #         colorScale:
+      #           baseColorScheme: YlGnBu
+      #           binningStrategy: manual
+      #           customNumericValues:
+      #             - 0.1
+      #             - 0.2
+      #             - 0.3
+      #             - 0.4
+      #             - 0.5
+      #             - 0.6
+      #             - 0.7
+      #             - 0.8
+      #             - 0.9
+      #             - 1
+      #       selectedEntityNames:
+      #         - Argentina
+      #         - Australia
+      #         - Botswana
+      #         - China
+      #       relatedQuestions:
+      #         - url: https://ourworldindata.org/grapher/electoral-democracy-index#faqs
+      #           text: FAQs on this data
+      #       selectedFacetStrategy: entity
+      #       $schema: https://files.ourworldindata.org/schemas/grapher-schema.003.json
 
       # civ_libs_vdem_owid:
       #   title: civ_libs_vdem_owid
@@ -331,173 +334,173 @@ tables:
               - China
             note: The Chart tab uses numeric values, ranging from 0 for closed autocracies to 3 for liberal democracies.
             $schema: https://files.ourworldindata.org/schemas/grapher-schema.003.json
-      wom_emp_vdem_owid:
-        title: Women's political empowerment index
-        description_short: Captures the extent to which women enjoy civil liberties, can participate in civil society, and are represented in politics. It ranges from 0 to 1 (most empowered).
-        description_key:
-          - The index scores each country on a spectrum, with some countries empowering women politically more than others. More specifically, this entails women's civil liberties, civil society participation and political participation.
-          - _Women's civil liberties_ refers to women being free from forced labor, having property rights and access to the justice system, and enjoying freedom of movement (move unrestricted within, to, and from the country).
-          - _Women's civil society participation_ refers to women being able to discuss political issues, participating in civil society organizations, and being represented among journalists.
-          - _Women's political participation_ refers to women being represented in the legislature and having an equal share of political power.
-        description_from_producer: >-
-          Women’s political empowerment is defined as a process of increasing capacity for
-          women, leading to greater choice, agency, and participation in societal decision-making. It
-          is understood to incorporate three equally-weighted dimensions: fundamental civil liberties,
-          women’s open discussion of political issues and participation in civil society organizations, and
-          the descriptive representation of women in formal political positions.
+      # wom_emp_vdem_owid:
+      #   title: Women's political empowerment index
+      #   description_short: Captures the extent to which women enjoy civil liberties, can participate in civil society, and are represented in politics. It ranges from 0 to 1 (most empowered).
+      #   description_key:
+      #     - The index scores each country on a spectrum, with some countries empowering women politically more than others. More specifically, this entails women's civil liberties, civil society participation and political participation.
+      #     - _Women's civil liberties_ refers to women being free from forced labor, having property rights and access to the justice system, and enjoying freedom of movement (move unrestricted within, to, and from the country).
+      #     - _Women's civil society participation_ refers to women being able to discuss political issues, participating in civil society organizations, and being represented among journalists.
+      #     - _Women's political participation_ refers to women being represented in the legislature and having an equal share of political power.
+      #   description_from_producer: >-
+      #     Women’s political empowerment is defined as a process of increasing capacity for
+      #     women, leading to greater choice, agency, and participation in societal decision-making. It
+      #     is understood to incorporate three equally-weighted dimensions: fundamental civil liberties,
+      #     women’s open discussion of political issues and participation in civil society organizations, and
+      #     the descriptive representation of women in formal political positions.
 
 
-          The index is formed by taking the average of women’s civil liberties index (`v2x_gencl`),
-          women’s civil society participation index (`v2x_gencs`), and women’s political participation
-          index (`v2x_genpp`).
-        description_processing: |-
-          We ingested the original data from the [V-Dem project website](https://v-dem.net/data/the-v-dem-dataset/) and processed it with Stata.
+      #     The index is formed by taking the average of women’s civil liberties index (`v2x_gencl`),
+      #     women’s civil society participation index (`v2x_gencs`), and women’s political participation
+      #     index (`v2x_genpp`).
+      #   description_processing: |-
+      #     We ingested the original data from the [V-Dem project website](https://v-dem.net/data/the-v-dem-dataset/) and processed it with Stata.
 
-          We expanded the years and countries covered by V-Dem. To include more of the period when current countries were still non-sovereign territories, we identified the historical entity they were a part of and used that regime’s data whenever available.
+      #     We expanded the years and countries covered by V-Dem. To include more of the period when current countries were still non-sovereign territories, we identified the historical entity they were a part of and used that regime’s data whenever available.
 
-          For example, V-Dem only provides regime data since Bangladesh’s independence in 1971. There is, however, regime data for Pakistan and the colony of India, both of which the current territory of Bangladesh was a part. We, therefore, use the regime data of Pakistan for Bangladesh from 1947 to 1970, and the regime data of India from 1789 to 1946. We did so for all countries with a past or current population of more than one million.
+      #     For example, V-Dem only provides regime data since Bangladesh’s independence in 1971. There is, however, regime data for Pakistan and the colony of India, both of which the current territory of Bangladesh was a part. We, therefore, use the regime data of Pakistan for Bangladesh from 1947 to 1970, and the regime data of India from 1789 to 1946. We did so for all countries with a past or current population of more than one million.
 
-          We calculated regional and global averages of the Women's Political Empowerment Index and its sub-indices, weighted and unweighted by population.
+      #     We calculated regional and global averages of the Women's Political Empowerment Index and its sub-indices, weighted and unweighted by population.
 
-          All code and data is available [on GitHub](https://github.com/owid/notebooks/tree/main/BastianHerre/democracy).
-        presentation:
-          title_public: Women's political empowerment index
-          attribution_short: V-Dem
-          topic_tags:
-            - Women's Rights
-            - Human Rights
-          faqs:
-            - fragment_id: vdem-coverage
-              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
-            - fragment_id: vdem-more-info
-              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
-          grapher_config:
-            title: Women's political empowerment index
-            subtitle: Based on the expert assessments and index by [V-Dem](#dod:v-dem). It captures the extent to which women enjoy civil liberties, can participate in civil society, and are represented in politics. It ranges from 0 to 1 (most empowered).
-            originUrl: https://ourworldindata.org/women-rights
-            hasMapTab: true
-            tab: map
-            yAxis:
-              max: 1
-              min: 0
-            selectedFacetStrategy: entity
-            hideAnnotationFieldsInTitle:
-              time: true
-            map:
-              time: latest
-              colorScale:
-                baseColorScheme: PuBu
-                binningStrategy: manual
-                customNumericColors:
-                  - '#e5d2a1'
-                  - '#e2b99c'
-                  - '#dba198'
-                  - '#d08a94'
-                  - '#c37491'
-                  - '#b2608f'
-                  - '#9d4e8d'
-                  - '#863d8c'
-                  - '#69308b'
-                  - '#44268b'
-                customNumericValues:
-                  - 0.1
-                  - 0.2
-                  - 0.3
-                  - 0.4
-                  - 0.5
-                  - 0.6
-                  - 0.7
-                  - 0.8
-                  - 0.9
-                  - 1
-                customNumericColorsActive: true
-            selectedEntityNames:
-              - Argentina
-              - Australia
-              - Botswana
-              - China
-            $schema: https://files.ourworldindata.org/schemas/grapher-schema.003.json
-      terr_contr_vdem_owid:
-        title: Percentage of territory effectively controlled by government
-        unit: "%"
-        short_unit: "%"
-        display:
-          name: Percentage of territory effectively controlled by government
-          numDecimalPlaces: 1
-        description_short: Considers the extent to which the government is recognized as the main authority, or rejected by others, such as insurgent groups, criminal organizations, or other countries.
-        description_key:
-          - V-Dem’s experts consider the extent to which the government is recognized as the main authority and can assert its power over other actors if necessary. Such actors include insurgent groups, criminal organizations, and other countries. They also consider that some countries may be so weak their reach cannot cover remote areas.
-          - V-Dem combines the experts’ ratings with supplementary information (the experts’ ratings of hypothetical countries, their stated uncertainties, and personal demographics) to produce best, upper-, and lower-bound estimates of the indicator.
-        description_from_producer: >-
-          Over what percentage (%) of the territory does the state have effective control?
-
-
-          With this question we seek to judge the extent of recognition of the preeminent
-          authority of the state over its territory. We are not interested here in perfect control by the
-          state, or whether it is relatively effective in comparison to other states, but an assessment of the
-          areas over which it is hegemonic, e.g. where it is recognized as the preeminent authority and in
-          a contest of wills it can assert its control over political forces that reject its authority. Several
-          illustrative examples may help in this coding. During civil wars the claim of the state to rule is
-          effectively neutralized by insurgent groups (e.g., the Tamil Tigers in Sri Lanka). There are also
-          situations in which criminals or warlords exert control in contravention of state authority (e.g.
-          opium growers in parts of Indochina). There are also cases of failed states where the central
-          government cannot assert control over a share of its territory (e.g., contemporary Somalia).
-          Here, we ask you to estimate the size of the territory that the state has effective control over,
-          as a percentage (%) of the total territory that is officially part of the country.
+      #     All code and data is available [on GitHub](https://github.com/owid/notebooks/tree/main/BastianHerre/democracy).
+      #   presentation:
+      #     title_public: Women's political empowerment index
+      #     attribution_short: V-Dem
+      #     topic_tags:
+      #       - Women's Rights
+      #       - Human Rights
+      #     faqs:
+      #       - fragment_id: vdem-coverage
+      #         gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+      #       - fragment_id: vdem-more-info
+      #         gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+      #     grapher_config:
+      #       title: Women's political empowerment index
+      #       subtitle: Based on the expert assessments and index by [V-Dem](#dod:v-dem). It captures the extent to which women enjoy civil liberties, can participate in civil society, and are represented in politics. It ranges from 0 to 1 (most empowered).
+      #       originUrl: https://ourworldindata.org/women-rights
+      #       hasMapTab: true
+      #       tab: map
+      #       yAxis:
+      #         max: 1
+      #         min: 0
+      #       selectedFacetStrategy: entity
+      #       hideAnnotationFieldsInTitle:
+      #         time: true
+      #       map:
+      #         time: latest
+      #         colorScale:
+      #           baseColorScheme: PuBu
+      #           binningStrategy: manual
+      #           customNumericColors:
+      #             - '#e5d2a1'
+      #             - '#e2b99c'
+      #             - '#dba198'
+      #             - '#d08a94'
+      #             - '#c37491'
+      #             - '#b2608f'
+      #             - '#9d4e8d'
+      #             - '#863d8c'
+      #             - '#69308b'
+      #             - '#44268b'
+      #           customNumericValues:
+      #             - 0.1
+      #             - 0.2
+      #             - 0.3
+      #             - 0.4
+      #             - 0.5
+      #             - 0.6
+      #             - 0.7
+      #             - 0.8
+      #             - 0.9
+      #             - 1
+      #           customNumericColorsActive: true
+      #       selectedEntityNames:
+      #         - Argentina
+      #         - Australia
+      #         - Botswana
+      #         - China
+      #       $schema: https://files.ourworldindata.org/schemas/grapher-schema.003.json
+      # terr_contr_vdem_owid:
+      #   title: Percentage of territory effectively controlled by government
+      #   unit: "%"
+      #   short_unit: "%"
+      #   display:
+      #     name: Percentage of territory effectively controlled by government
+      #     numDecimalPlaces: 1
+      #   description_short: Considers the extent to which the government is recognized as the main authority, or rejected by others, such as insurgent groups, criminal organizations, or other countries.
+      #   description_key:
+      #     - V-Dem’s experts consider the extent to which the government is recognized as the main authority and can assert its power over other actors if necessary. Such actors include insurgent groups, criminal organizations, and other countries. They also consider that some countries may be so weak their reach cannot cover remote areas.
+      #     - V-Dem combines the experts’ ratings with supplementary information (the experts’ ratings of hypothetical countries, their stated uncertainties, and personal demographics) to produce best, upper-, and lower-bound estimates of the indicator.
+      #   description_from_producer: >-
+      #     Over what percentage (%) of the territory does the state have effective control?
 
 
-          By "officially part of the country" we refer to international law. In cases where international
-          law is not entirely clear, we refer you to general understandings. For example, China claims
-          sovereignty over Taiwan, but it remains under the control of its own government. For purposes
-          of this question, Taiwan should not be considered a failure to control its territory by the
-          government of the PRC.
-        description_processing: |-
-          We ingested the original data from the [V-Dem project website](https://v-dem.net/data/the-v-dem-dataset/) and processed it with Stata.
+      #     With this question we seek to judge the extent of recognition of the preeminent
+      #     authority of the state over its territory. We are not interested here in perfect control by the
+      #     state, or whether it is relatively effective in comparison to other states, but an assessment of the
+      #     areas over which it is hegemonic, e.g. where it is recognized as the preeminent authority and in
+      #     a contest of wills it can assert its control over political forces that reject its authority. Several
+      #     illustrative examples may help in this coding. During civil wars the claim of the state to rule is
+      #     effectively neutralized by insurgent groups (e.g., the Tamil Tigers in Sri Lanka). There are also
+      #     situations in which criminals or warlords exert control in contravention of state authority (e.g.
+      #     opium growers in parts of Indochina). There are also cases of failed states where the central
+      #     government cannot assert control over a share of its territory (e.g., contemporary Somalia).
+      #     Here, we ask you to estimate the size of the territory that the state has effective control over,
+      #     as a percentage (%) of the total territory that is officially part of the country.
 
-          We expanded the years and countries covered by V-Dem. To include more of the period when current countries were still non-sovereign territories, we identified the historical entity they were a part of and used that regime’s data whenever available.
 
-          For example, V-Dem only provides regime data since Bangladesh’s independence in 1971. There is, however, regime data for Pakistan and the colony of India, both of which the current territory of Bangladesh was a part. We, therefore, use the regime data of Pakistan for Bangladesh from 1947 to 1970, and the regime data of India from 1789 to 1946. We did so for all countries with a past or current population of more than one million.
+      #     By "officially part of the country" we refer to international law. In cases where international
+      #     law is not entirely clear, we refer you to general understandings. For example, China claims
+      #     sovereignty over Taiwan, but it remains under the control of its own government. For purposes
+      #     of this question, Taiwan should not be considered a failure to control its territory by the
+      #     government of the PRC.
+      #   description_processing: |-
+      #     We ingested the original data from the [V-Dem project website](https://v-dem.net/data/the-v-dem-dataset/) and processed it with Stata.
 
-          We calculated regional and global averages of the Women's Political Empowerment Index and its sub-indices, weighted and unweighted by population.
+      #     We expanded the years and countries covered by V-Dem. To include more of the period when current countries were still non-sovereign territories, we identified the historical entity they were a part of and used that regime’s data whenever available.
 
-          All code and data is available [on GitHub](https://github.com/owid/notebooks/tree/main/BastianHerre/democracy).
-        presentation:
-          title_public: Percentage of territory effectively controlled by government
-          attribution_short: V-Dem
-          topic_tags:
-            - State Capacity
-          faqs:
-            - fragment_id: vdem-coverage
-              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
-            - fragment_id: vdem-more-info
-              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
-          grapher_config:
-            title: Percentage of territory effectively controlled by government
-            subtitle: Based on the expert assessments by [V-Dem](#dod:v-dem). They consider the extent to which the government is recognized as the main authority, or rejected by others, such as insurgent groups, criminal organizations, or other countries.
-            originUrl: ourworldindata.org/state-capacity
-            hasMapTab: true
-            tab: map
-            yAxis:
-              max: 100
-              min: 0
-            selectedFacetStrategy: entity
-            map:
-              time: latest
-              colorScale:
-                baseColorScheme: GnBu
-                binningStrategy: manual
-                customNumericValues:
-                  - 50
-                  - 70
-                  - 80
-                  - 90
-                  - 95
-                  - 100
-                customNumericMinValue: 100
-            selectedEntityNames:
-              - Argentina
-              - Australia
-              - Botswana
-              - China
-            note: Values are missing if the country is not independent.
-            $schema: https://files.ourworldindata.org/schemas/grapher-schema.003.json
+      #     For example, V-Dem only provides regime data since Bangladesh’s independence in 1971. There is, however, regime data for Pakistan and the colony of India, both of which the current territory of Bangladesh was a part. We, therefore, use the regime data of Pakistan for Bangladesh from 1947 to 1970, and the regime data of India from 1789 to 1946. We did so for all countries with a past or current population of more than one million.
+
+      #     We calculated regional and global averages of the Women's Political Empowerment Index and its sub-indices, weighted and unweighted by population.
+
+      #     All code and data is available [on GitHub](https://github.com/owid/notebooks/tree/main/BastianHerre/democracy).
+      #   presentation:
+      #     title_public: Percentage of territory effectively controlled by government
+      #     attribution_short: V-Dem
+      #     topic_tags:
+      #       - State Capacity
+      #     faqs:
+      #       - fragment_id: vdem-coverage
+      #         gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+      #       - fragment_id: vdem-more-info
+      #         gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+      #     grapher_config:
+      #       title: Percentage of territory effectively controlled by government
+      #       subtitle: Based on the expert assessments by [V-Dem](#dod:v-dem). They consider the extent to which the government is recognized as the main authority, or rejected by others, such as insurgent groups, criminal organizations, or other countries.
+      #       originUrl: ourworldindata.org/state-capacity
+      #       hasMapTab: true
+      #       tab: map
+      #       yAxis:
+      #         max: 100
+      #         min: 0
+      #       selectedFacetStrategy: entity
+      #       map:
+      #         time: latest
+      #         colorScale:
+      #           baseColorScheme: GnBu
+      #           binningStrategy: manual
+      #           customNumericValues:
+      #             - 50
+      #             - 70
+      #             - 80
+      #             - 90
+      #             - 95
+      #             - 100
+      #           customNumericMinValue: 100
+      #       selectedEntityNames:
+      #         - Argentina
+      #         - Australia
+      #         - Botswana
+      #         - China
+      #       note: Values are missing if the country is not independent.
+      #       $schema: https://files.ourworldindata.org/schemas/grapher-schema.003.json
