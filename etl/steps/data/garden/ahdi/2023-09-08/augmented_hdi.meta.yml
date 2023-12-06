@@ -39,10 +39,10 @@ tables:
           _AHDI = (LEB * EDU * LD * UNY)^(1/4)_
         processing_level: minor
         description_key:
-          - "{tables.augmented_hdi.variables.ahdi.description_short}"
-          - "Each of these dimensions is measured on a scale from 0 to 1: _Life expectancy_ is the proxy for healthy life, where 1 represents 85 or more years and 0 represents 20 or less years. _Years of schooling_ is the proxy for access to knowledge, where 1 represents 15 or more years of education and 0 represents 0 years of education. The _logarithm of GDP per capita_ is the proxy for a decent standard of living, where 1 represents 47,000 international-$ at 1990 prices and 0 represents 100 international-$ at 1990 prices. [_Varieties of Democracy's Liberal democracy index_](https://ourworldindata.org/vdem-electoral-democracy-data) is the proxy for civil and political freedom, higher values represents more democracy."
-          - The AHDI is then estimated as the geometric mean of these indices, or
-            _AHDI = (Health index * Education index * Income index * Freedom index)^(1/4)_
+          - "Each of the dimensions of the AHDI is measured with four indicators: a long and healthy life is measured by _life expectancy at birth_, knowledge is measured by _mean_ _years of schooling_; a decent standard of living is measured by _GDP per capita_, logarithmized to reflect that incomes become less important as they increase; and civil and political freedom is measured by [_Varieties of Democracy's Liberal democracy index_](https://ourworldindata.org/vdem-electoral-democracy-data)."
+          - "The index is then calculated by normalizing the indicators. First, the indicators are brought onto the same scale, ranging from 0 to 1. This is done by setting minimum and maximum values for each indicator, and a country at or below the minimum value receiving a score of 0, and a country at or above the maximum value receiving a score of 1."
+          - "The minimum and maximum values for each indicator are defined as follows: _Life expectancy at birth_ ranges between 20 and 85 years; _mean years of schooling_, between 0 and 15 years; _GDP per capita_ between 100 and 47,000 international-$ at 1990 prices; and V-Dem's Liberal democracy index is already standardized between 0 and 1 (most democratic)."
+          - The AHDI is then estimated as the geometric mean of these indices, or _AHDI = (Health index * Education index * Income index * Freedom index)^(1/4)_.
         display:
           name: Augmented Human Development Index (AHDI)
           numDecimalPlaces: 3
