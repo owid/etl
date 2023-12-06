@@ -29,33 +29,6 @@ def run(dest_dir: str) -> None:
 
     # Renaming columns to remove '_boys_girls'
     tb = tb.rename(columns=lambda x: x.replace("_boys_girls", ""))
-    # Create lower and upper bounds for each variable
-    tb["pisa_reading_lower_bound_girls"] = tb["pisa_reading_average_girls"] - tb["pisa_reading_se_girls"]
-    tb["pisa_reading_upper_bound_girls"] = tb["pisa_reading_average_girls"] + tb["pisa_reading_se_girls"]
-
-    tb["pisa_reading_lower_bound_boys"] = tb["pisa_reading_average_boys"] - tb["pisa_reading_se_boys"]
-    tb["pisa_reading_upper_bound_boys"] = tb["pisa_reading_average_boys"] + tb["pisa_reading_se_boys"]
-
-    tb["pisa_science_lower_bound_girls"] = tb["pisa_science_average_girls"] - tb["pisa_science_se_girls"]
-    tb["pisa_science_upper_bound_girls"] = tb["pisa_science_average_girls"] + tb["pisa_science_se_girls"]
-
-    tb["pisa_science_lower_bound_boys"] = tb["pisa_science_average_boys"] - tb["pisa_science_se_boys"]
-    tb["pisa_science_upper_bound_boys"] = tb["pisa_science_average_boys"] + tb["pisa_science_se_boys"]
-
-    tb["pisa_math_lower_bound_girls"] = tb["pisa_math_average_girls"] - tb["pisa_math_se_girls"]
-    tb["pisa_math_upper_bound_girls"] = tb["pisa_math_average_girls"] + tb["pisa_math_se_girls"]
-
-    tb["pisa_math_lower_bound_boys"] = tb["pisa_math_average_boys"] - tb["pisa_math_se_boys"]
-    tb["pisa_math_upper_bound_boys"] = tb["pisa_math_average_boys"] + tb["pisa_math_se_boys"]
-
-    tb["pisa_math_all_lower_bound"] = tb["pisa_math_all_average"] - tb["pisa_math_all_se"]
-    tb["pisa_math_all_upper_bound"] = tb["pisa_math_all_average"] + tb["pisa_math_all_se"]
-
-    tb["pisa_science_all_lower_bound"] = tb["pisa_science_all_average"] - tb["pisa_science_all_se"]
-    tb["pisa_science_all_upper_bound"] = tb["pisa_science_all_average"] + tb["pisa_science_all_se"]
-
-    tb["pisa_reading_all_lower_bound"] = tb["pisa_reading_all_average"] - tb["pisa_reading_all_se"]
-    tb["pisa_reading_all_upper_bound"] = tb["pisa_reading_all_average"] + tb["pisa_reading_all_se"]
 
     # Remove columns with standard errors
     tb = tb.drop(
@@ -71,6 +44,38 @@ def run(dest_dir: str) -> None:
             "pisa_reading_all_se",
         ]
     )
+
+    for column in tb.columns:
+        if "math" in column:
+            subject = "math"
+        elif "reading" in column:
+            subject = "reading"
+        elif "science" in column:
+            subject = "science"
+        if "all" in column:
+            sex = "students"
+        if "_girls" in column:
+            sex = "female students"
+        elif "_boys" in column:
+            sex = "male students"
+        tb[column].metadata.display = {}
+        tb[column].metadata.unit = "score"
+        tb[column].metadata.display["numDecimalPlaces"] = 0
+
+        tb[column].metadata.description_from_producer = (
+            f"Average score of 15-year-old {sex} on the PISA {subject} scale. "
+            "The metric for the overall {subject} scale is based on a mean for OECD countries "
+            "of 500 points and a standard deviation of 100 points. Data reflects country performance "
+            "in the stated year according to PISA reports, but may not be comparable across years or countries. "
+            "Consult the PISA website for more detailed information: http://www.oecd.org/pisa/"
+        )
+
+        tb[column].metadata.title = f"Average performance of 15 year old {sex} on the {subject} scale"
+        tb[column].metadata.description_short = (
+            f"Assessed through the PISA {subject} scale, which is based on an OECD country mean of 500 points "
+            "and a standard deviation of 100 points."
+        )
+
     #
     # Save outputs.
     #
