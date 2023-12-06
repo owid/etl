@@ -30,7 +30,7 @@ def run(dest_dir: str) -> None:
     # Renaming columns to remove '_boys_girls'
     tb = tb.rename(columns=lambda x: x.replace("_boys_girls", ""))
 
-    # Remove columns with standard errors
+    # Remove columns with standard errors for now
     tb = tb.drop(
         columns=[
             "pisa_reading_se_girls",
@@ -44,7 +44,7 @@ def run(dest_dir: str) -> None:
             "pisa_reading_all_se",
         ]
     )
-
+    # Add metadata.
     for column in tb.columns:
         subject = ""
         if "math" in column:
