@@ -46,12 +46,14 @@ def run(dest_dir: str) -> None:
     )
 
     for column in tb.columns:
+        subject = ""
         if "math" in column:
             subject = "math"
         elif "reading" in column:
             subject = "reading"
         elif "science" in column:
             subject = "science"
+        sex = ""
         if "all" in column:
             sex = "students"
         if "_girls" in column:
