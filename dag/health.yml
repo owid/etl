@@ -387,3 +387,5 @@ steps:
   data://garden/tuberculosis/2023-11-27/laboratories:
     - data://meadow/tuberculosis/2023-12-06/laboratories
     - snapshot://tuberculosis/2023-11-27/data_dictionary.csv
+  data://grapher/tuberculosis/2023-11-27/laboratories:
+    - data://garden/tuberculosis/2023-11-27/laboratories

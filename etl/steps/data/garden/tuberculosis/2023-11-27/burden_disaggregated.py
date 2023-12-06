@@ -80,7 +80,7 @@ def run(dest_dir: str) -> None:
 
 def combining_sexes_for_all_age_groups(tb: Table) -> Table:
     """
-    Not all of the age-groups provided by the WHO have a value for both sexes, so we need to combine values for males and females to calculate these.
+    Not all of the age-groups provided by the WHO have a combined value for both sexes, so we need to combine values for males and females to calculate these.
     """
 
     tb["age_group"] = tb["age_group"].astype("str")
