@@ -786,7 +786,7 @@ def estimate_metrics_participants(tb: Table, tb_prio: Table, tb_codes: Table) ->
     tb_country["participated_in_conflict"].m.origins = tb["gwnoa"].m.origins
 
     # Prepare GW table
-    ctypes_all = list(set(tb_country["conflict_type"]) | {"extrasystemic"})
+    ctypes_all = list(set(tb_country["conflict_type"]))
     tb_alltypes = Table(pd.DataFrame({"conflict_type": ctypes_all}))
     tb_codes_ = tb_codes.reset_index().merge(tb_alltypes, how="cross")
     tb_codes_["country"] = tb_codes_["country"].astype(str)
