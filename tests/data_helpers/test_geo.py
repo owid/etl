@@ -803,3 +803,95 @@ class TestAddRegionAggregates:
         )
         assert dataframes.are_equal(df1=df, df2=df_out)[0]
         assert df.var_01.m.title == "Var 01"
+
+
+class MockRegionsDataset:
+    def __getitem__(self, name: str) -> Table:
+        mock_tb_regions = Table(
+            {
+                "code": ["OWID_EUR", "BLR", "FRA", "ITA", "RUS", "ESP", "OWID_USS"],
+                "name": ["Europe", "Belarus", "France", "Italy", "Russia", "Spain", "USSR"],
+                "members": ['["BLR", "FRA", "ITA", "RUS", "ESP", "OWID_USS"]', "[]", "[]", "[]", "[]", "[]", "[]"],
+                "successors": ["[]", "[]", "[]", "[]", "[]", "[]", '["BLR", "RUS"]'],
+            }
+        ).set_index("code")
+        return mock_tb_regions
+
+
+class TestAddRegionsToTable:
+    def test_1(self):
+        ds_regions = MockRegionsDataset()
+        tb_in = Table(
+            {"country": ["USSR", "USSR", "Russia", "Russia"], "year": [1985, 1986, 1986, 2000], "a": [1, 2, 3, 4]}
+        )
+        tb_out = geo.add_regions_to_table(tb=tb_in, ds_regions=ds_regions, check_for_region_overlaps=False)
+        assert tb_out.to_dict() == {
+            "country": {0: "Europe", 1: "Europe", 2: "Europe", 3: "Russia", 4: "Russia", 5: "USSR", 6: "USSR"},
+            "year": {0: 1985, 1: 1986, 2: 2000, 3: 1986, 4: 2000, 5: 1985, 6: 1986},
+            "a": {0: 1.0, 1: 5.0, 2: 4.0, 3: 3.0, 4: 4.0, 5: 1.0, 6: 2.0},
+        }
+
+        # TODO: This should fail because there is an overlap.
+        # new = add_regions_to_table(tb=tb, ds_regions=ds_regions, check_for_region_overlaps=True)
+        # This should work.
+
+        tb_out = geo.add_regions_to_table(
+            tb=tb_in,
+            ds_regions=ds_regions,
+            check_for_region_overlaps=True,
+            accepted_overlaps={1986: {"Russia", "USSR"}},
+        )
+        assert tb_out.to_dict() == {
+            "country": {0: "Europe", 1: "Europe", 2: "Europe", 3: "Russia", 4: "Russia", 5: "USSR", 6: "USSR"},
+            "year": {0: 1985, 1: 1986, 2: 2000, 3: 1986, 4: 2000, 5: 1985, 6: 1986},
+            "a": {0: 1.0, 1: 5.0, 2: 4.0, 3: 3.0, 4: 4.0, 5: 1.0, 6: 2.0},
+        }
+
+    # # All the following should fail.
+    # new = add_regions_to_table(tb=tb, ds_regions=ds_regions, check_for_region_overlaps=True, accepted_overlaps={1986: {"Russia", "USSR", "Georgia"}})
+    # new = add_regions_to_table(tb=tb, ds_regions=ds_regions, check_for_region_overlaps=True, accepted_overlaps={1985: {"USSR", "Georgia"}})
+    # new = add_regions_to_table(tb=tb, ds_regions=ds_regions, check_for_region_overlaps=True, accepted_overlaps={1986: {"Russia", "USSR"}, 1985: {"USSR", "Georgia"}})
+    # # This should work.
+    # ds_income_groups = Dataset(DATA_DIR / "garden/wb/2023-04-30/income_groups")
+    # new = add_regions_to_table(tb=tb, ds_regions=ds_regions, ds_income_groups=ds_income_groups, check_for_region_overlaps=True, accepted_overlaps={1986: {"Russia", "USSR"}})
+    # # This should work because we impose that we ignore overlaps of zeros.
+    # tb = Table({"country": ["USSR", "USSR", "Russia", "Russia"], "year": [1985, 1986, 1986, 2000], "a": [1, 0, 0, 4]})
+    # new = add_regions_to_table(tb=tb, ds_regions=ds_regions, check_for_region_overlaps=True, ignore_overlaps_of_zeros=True)
+    # # The following should create no aggregate, since we have no data for African countries.
+    # new = add_regions_to_table(tb=tb, ds_regions=ds_regions, regions=["Africa"], ds_income_groups=ds_income_groups, check_for_region_overlaps=True, accepted_overlaps={1986: {"Russia", "USSR"}})
+    # # The following should create an aggregate only for Europe.
+    # new = add_regions_to_table(tb=tb, ds_regions=ds_regions, regions=["Europe"], ds_income_groups=ds_income_groups, check_for_region_overlaps=True, accepted_overlaps={1986: {"Russia", "USSR"}})
+    # new = add_regions_to_table(tb=tb, ds_regions=ds_regions, regions={"Europe": {}}, ds_income_groups=ds_income_groups, check_for_region_overlaps=True, accepted_overlaps={1986: {"Russia", "USSR"}})
+    # # The following should create an aggregate for Europe, excluding USSR.
+    # new = add_regions_to_table(tb=tb, ds_regions=ds_regions, regions={"Europe": {"excluded_members": {"USSR"}}}, ds_income_groups=ds_income_groups, check_for_region_overlaps=True, accepted_overlaps={1986: {"Russia", "USSR"}})
+    # # This should raise a warning:
+    # new = add_regions_to_table(tb=tb, ds_regions=ds_regions, regions={"Europe": {"typo_excluded_members": {"USSR"}}}, ds_income_groups=ds_income_groups, check_for_region_overlaps=True, accepted_overlaps={1986: {"Russia", "USSR"}})
+    # tb = Table({"country": ["France", "France", "Italy", "Italy"], "year": [2020, 2021, 2021, 2022], "a": [1, 2, 3, 4], "b": [5, 6, 7, 8]})
+    # new = add_regions_to_table(tb=tb, ds_regions=ds_regions, ds_income_groups=ds_income_groups)
+    # new = add_regions_to_table(tb=tb, ds_regions=ds_regions, ds_income_groups=ds_income_groups, aggregations={"a": "sum", "b": "sum"})
+    # new = add_regions_to_table(tb=tb, ds_regions=ds_regions, ds_income_groups=ds_income_groups, aggregations={"a": "sum", "b": "mean"})
+    # new = add_regions_to_table(tb=tb, ds_regions=ds_regions, ds_income_groups=ds_income_groups, aggregations={"a": "sum"})
+    # tb = Table({"country": ["France", "France", "Italy", "Italy", "Europe", "Europe"], "year": [2020, 2021, 2021, 2022, 2020, 2021], "a": [1, 2, 3, 4, 0, 0], "b": [5, 6, 7, 8, 0, 0]})
+    # # The old data for Europe should be replaced by the new aggregates.
+    # new = add_regions_to_table(tb=tb, ds_regions=ds_regions, ds_income_groups=ds_income_groups)
+    # # The old data for Europe should be kept, with the appended text.
+    # new = add_regions_to_table(tb=tb, ds_regions=ds_regions, ds_income_groups=ds_income_groups, keep_original_region_with_suffix=" (old)")
+    # # In the following ambiguous case, the old Europe should be deleted, and a warning should be raised.
+    # new = add_regions_to_table(tb=tb, ds_regions=ds_regions, ds_income_groups=ds_income_groups, aggregations={"a": "mean"})
+    # tb = Table({"country": ["France", "France", "Italy", "Italy", "Spain", "Spain"], "year": [2020, 2021, 2021, 2022, 2021, 2022], "a": [1, 2, 3, 4, None, 6], "b": [7, 8, 9, 10, 11, 12]})
+    # new = add_regions_to_table(tb=tb, ds_regions=ds_regions, regions=["Europe"], num_allowed_nans_per_year=0)
+    # new = add_regions_to_table(tb=tb, ds_regions=ds_regions, regions=["Europe"], num_allowed_nans_per_year=1)
+    # tb = Table({"country": ["France", "France", "Italy", "Italy", "Spain", "Spain"], "year": [2020, 2021, 2021, 2022, 2021, 2022], "a": [1, 2, None, 4, None, 6], "b": [7, 8, 9, 10, 11, 12]})
+    # new = add_regions_to_table(tb=tb, ds_regions=ds_regions, regions=["Europe"], num_allowed_nans_per_year=1)
+    # new = add_regions_to_table(tb=tb, ds_regions=ds_regions, regions=["Europe"], num_allowed_nans_per_year=2)
+    # new = add_regions_to_table(tb=tb, ds_regions=ds_regions, regions=["Europe"], frac_allowed_nans_per_year=0)
+    # new = add_regions_to_table(tb=tb, ds_regions=ds_regions, regions=["Europe"], frac_allowed_nans_per_year=0.5)
+    # new = add_regions_to_table(tb=tb, ds_regions=ds_regions, regions=["Europe"], frac_allowed_nans_per_year=0.7)
+    # tb = Table({"c": ["France", "France", "Italy", "Italy", "Spain", "Spain"], "y": [2020, 2021, 2021, 2022, 2021, 2022], "a": [1, 2, None, 4, None, 6], "b": [7, 8, 9, 10, 11, 12]})
+    # new = add_regions_to_table(tb=tb, ds_regions=ds_regions, regions=["Europe"], country_col="c", year_col="y")
+
+    # # TODO: I think min_num_values_per_year is not working as expected. Fix it in groupby_agg.
+    # # new = add_regions_to_table(tb=tb, ds_regions=ds_regions, regions=["Europe"], min_num_values_per_year=0)
+    # # new = add_regions_to_table(tb=tb, ds_regions=ds_regions, regions=["Europe"], min_num_values_per_year=1)
+    # # new = add_regions_to_table(tb=tb, ds_regions=ds_regions, regions=["Europe"], min_num_values_per_year=2)
+    # # TODO: Should include_historical_regions_in_income_groups be a parameter of add_regions_to_table?
