@@ -730,7 +730,7 @@ def add_gdp_to_table(
     return tb_with_gdp
 
 
-def create_table_of_regions_and_subregions(ds_regions: Dataset, subregion_type: str = "member") -> Table:
+def create_table_of_regions_and_subregions(ds_regions: Dataset, subregion_type: str = "members") -> Table:
     # Subregion type can be "members" or "successors" (or in principle also "related").
     # Get the main table from the regions dataset.
     tb_regions = ds_regions["regions"][["name", subregion_type]]
