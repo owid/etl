@@ -104,11 +104,11 @@ def add_metadata_and_prepare_for_grapher(df_gr: pd.DataFrame, ds_garden: Dataset
     source_desc_out = create_metadata_desc(
         indicator=indicator, series_code=series_code, source_desc=source_desc, series_description=series_description
     )
-    log.info(
-        "Creating metadata...",
-        indicator=indicator,
-        var_name=df_gr["variable_name"].iloc[0],
-    )
+    # log.info(
+    #     "Creating metadata...",
+    #     indicator=indicator,
+    #     var_name=df_gr["variable_name"].iloc[0],
+    # )
     df_gr = Table(df_gr, short_name=df_gr["variable_name"].iloc[0])
 
     source = Source(

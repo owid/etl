@@ -42,8 +42,10 @@ def run(dest_dir: str) -> None:
 
     for var in ds_garden.table_names:
         if INCLUDE and not re.search(INCLUDE, var):
-            log.warning("un_sdg.skip", var=var)
+            log.warning("un_sdg.skip", table_name=var)
             continue
+
+        log.info("un_sdg.process", table_name=var)
 
         var_df = create_dataframe_with_variable_name(ds_garden, var)
         var_df["source"] = clean_source_name(var_df["source"], clean_source_map)
@@ -121,11 +123,6 @@ def add_metadata_and_prepare_for_grapher(df_gr: pd.DataFrame, ds_garden: Dataset
     series_description = df_gr["seriesdescription"].iloc[0]
     source_desc_out = create_metadata_desc(
         indicator=indicator, series_code=series_code, source_desc=source_desc, series_description=series_description
-    )
-    log.info(
-        "Creating metadata...",
-        indicator=indicator,
-        var_name=df_gr["variable_name"].iloc[0],
     )
     df_gr = Table(df_gr, short_name=df_gr["variable_name"].iloc[0])
 
