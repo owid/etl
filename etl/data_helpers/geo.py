@@ -887,24 +887,24 @@ def list_members_of_region(
 
 
 def detect_overlapping_regions(
-    tb, index_columns, region_and_members, country_col="country", year_col="year", ignore_zeros=True
+    df, index_columns, regions_and_members, country_col="country", year_col="year", ignore_overlaps_of_zeros=True
 ):
     """Detect years on which the data for two regions overlap, e.g. a historical region and one of its successors.
 
     Parameters
     ----------
-    tb : _type_
+    df : TableOrDataFrame
         Data (with a dummy index).
-    index_columns : _type_
+    index_columns : list
         Names of index columns.
-    region_and_members : _type_
+    regions_and_members : dict
         Regions to check for overlaps. Each region must have a dictionary "regions_included", listing the subregions
         contained. If the region is historical, "regions_included" would be the list of successor countries.
     country_col : str, optional
         Name of country column (usually "country").
     year_col : str, optional
         Name of year column (usually "year").
-    ignore_zeros : bool, optional
+    ignore_overlaps_of_zeros : bool, optional
         True to ignore overlaps of zeros.
 
     Returns
@@ -915,26 +915,26 @@ def detect_overlapping_regions(
     """
     # Sum over all columns to get the total sum of each column for each country-year.
     tb_total = (
-        tb.groupby([country_col, year_col])
-        .agg({column: "sum" for column in tb.columns if column not in index_columns})
+        df.groupby([country_col, year_col])
+        .agg({column: "sum" for column in df.columns if column not in index_columns})
         .reset_index()
     )
     # Create a list of values that will be ignored in overlaps (usually zero or nothing).
-    if ignore_zeros:
+    if ignore_overlaps_of_zeros:
         overlapping_values_to_ignore = [0]
     else:
         overlapping_values_to_ignore = []
     # List all variables in data (ignoring index columns).
-    variables = [column for column in tb.columns if column not in index_columns]
+    variables = [column for column in df.columns if column not in index_columns]
     # List all country names found in data.
-    countries_in_data = tb[country_col].unique().tolist()
+    countries_in_data = df[country_col].unique().tolist()
     # List all regions found in data.
-    regions = [country for country in list(region_and_members) if country in countries_in_data]
+    regions = [country for country in list(regions_and_members) if country in countries_in_data]
     # Initialize a dictionary that will store all overlaps found.
     all_overlaps = {}
     for region in regions:
         # List members of current region.
-        members = [member for member in region_and_members[region] if member in countries_in_data]
+        members = [member for member in regions_and_members[region] if member in countries_in_data]
         for member in members:
             # Select data for current region.
             region_values = (
@@ -976,23 +976,32 @@ def add_regions_to_table(
     include_historical_regions_in_income_groups: bool = True,
     check_for_region_overlaps: bool = True,
     accepted_overlaps: Optional[Dict[int, Set[str]]] = None,
+    ignore_overlaps_of_zeros: bool = False,
 ) -> Table:
-    tb_with_regions = tb.copy()
+    df_with_regions = pd.DataFrame(tb).copy()
 
     if check_for_region_overlaps:
         # Find overlaps between regions and its members.
 
+        if accepted_overlaps is None:
+            accepted_overlaps = {}
+
         # Create a dictionary of regions and its members.
-        tb_regions_and_members = create_table_of_regions_and_subregions(
+        df_regions_and_members = create_table_of_regions_and_subregions(
             ds_regions=ds_regions, subregion_type="successors"
         )
-        regions_and_members = tb_regions_and_members["successors"].to_dict()
+        regions_and_members = df_regions_and_members["successors"].to_dict()
 
         # Assume incoming table has a dummy index (the whole function may not work otherwise).
         # Example of region_and_members:
         # {"Czechoslovakia": ["Czechia", "Slovakia"]}
         all_overlaps = detect_overlapping_regions(
-            tb=tb_with_regions, region_and_members=regions_and_members, index_columns=[country_col, year_col]
+            df=df_with_regions,
+            regions_and_members=regions_and_members,
+            country_col=country_col,
+            year_col=year_col,
+            index_columns=[country_col, year_col],
+            ignore_overlaps_of_zeros=ignore_overlaps_of_zeros,
         )
         # Example of accepted_overlaps:
         # {1991: {"Georgia", "USSR"}}
@@ -1001,12 +1010,8 @@ def add_regions_to_table(
         assert accepted_overlaps == all_overlaps, error
 
     if aggregations is None:
-        # Create region aggregates for all columns (with a simple sum) except for the column of efficiency factors.
-        aggregations = {
-            column: "sum"
-            for column in tb_with_regions.columns
-            if column not in ["country", "year", "efficiency_factor"]
-        }
+        # Create region aggregates for all columns (with a simple sum) except for index columns.
+        aggregations = {column: "sum" for column in df_with_regions.columns if column not in [country_col, year_col]}
 
     if regions is None:
         regions = REGIONS
@@ -1036,8 +1041,8 @@ def add_regions_to_table(
             include_historical_regions_in_income_groups=include_historical_regions_in_income_groups,
         )
         # Add aggregate data for current region.
-        tb_with_regions = add_region_aggregates(
-            df=tb_with_regions,
+        df_with_regions = add_region_aggregates(
+            df=df_with_regions,
             region=region,
             aggregations=aggregations,
             countries_in_region=members,
@@ -1054,7 +1059,9 @@ def add_regions_to_table(
             # its main table.
             population=None,
         )
-    # Copy metadata of original table.
-    tb_with_regions = tb_with_regions.copy_metadata(from_table=tb)
 
-    return tb_with_regions
+    # If the original object was a Table, copy metadata
+    if isinstance(tb, Table):
+        return Table(df_with_regions).copy_metadata(tb)
+    else:
+        return df_with_regions  # type: ignore
