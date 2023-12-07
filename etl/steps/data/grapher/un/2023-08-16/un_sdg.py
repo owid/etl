@@ -1,6 +1,7 @@
 """Load a garden dataset and create a grapher dataset."""
 import json
 import os
+import re
 from functools import cache
 from typing import Any, Dict, cast
 
@@ -11,11 +12,16 @@ from owid.catalog.utils import underscore
 from structlog import getLogger
 
 from etl import grapher_helpers as gh
-from etl.helpers import PathFinder
+from etl.helpers import PathFinder, create_dataset
 
 log = getLogger()
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
+
+
+# only include tables containing INCLUDE string, this is useful for debugging
+# but should be None before merging to master!!
+INCLUDE = "_6_1_1|_6_2_1"
 
 
 def run(dest_dir: str) -> None:
@@ -23,15 +29,19 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load garden dataset.
-    ds_garden: Dataset = paths.load_dependency("un_sdg")
-
-    # Create a new grapher dataset with the same metadata as the garden dataset.
-    ds_grapher = Dataset.create_empty(dest_dir, ds_garden.metadata)
+    ds_garden = paths.load_dataset("un_sdg")
 
     # Add table of processed data to the new dataset.
     # add tables to dataset
     clean_source_map = load_clean_source_mapping()
+
+    all_tables = []
+
     for var in ds_garden.table_names:
+        if INCLUDE and not re.search(INCLUDE, var):
+            log.warning("un_sdg.skip", var=var)
+            continue
+
         var_df = create_dataframe_with_variable_name(ds_garden, var)
         var_df["source"] = clean_source_name(var_df["source"], clean_source_map)
         var_gr = var_df.groupby("variable_name")
@@ -50,9 +60,14 @@ def run(dest_dir: str) -> None:
                 # table is generated for every column, use it as a table name
                 # shorten it under 255 characteres as this is the limit for file name
                 wide_table.metadata.short_name = wide_table.columns[0][:245]
-                ds_grapher.add(wide_table)
 
-    # Save changes in the new grapher dataset.
+                # ds_grapher.add(wide_table)
+                all_tables.append(wide_table)
+
+    #
+    # Save outputs.
+    #
+    ds_grapher = create_dataset(dest_dir, tables=all_tables, default_metadata=ds_garden.metadata)
     ds_grapher.save()
 
 
