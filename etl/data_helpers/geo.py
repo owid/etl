@@ -4,7 +4,7 @@ import functools
 import json
 import warnings
 from pathlib import Path
-from typing import Any, Dict, List, Literal, Optional, TypeVar, Union, cast
+from typing import Any, Dict, List, Literal, Optional, Set, TypeVar, Union, cast
 
 import numpy as np
 import owid.catalog.processing as pr
@@ -730,6 +730,37 @@ def add_gdp_to_table(
     return tb_with_gdp
 
 
+def create_table_of_regions_and_subregions(ds_regions: Dataset, subregion_type: str = "member") -> Table:
+    # Subregion type can be "members" or "successors" (or in principle also "related").
+    # Get the main table from the regions dataset.
+    tb_regions = ds_regions["regions"][["name", subregion_type]]
+
+    # Get a mapping from code to region name.
+    mapping = tb_regions["name"].to_dict()
+
+    # Convert strings of lists of members into lists of aliases.
+    tb_regions[subregion_type] = [
+        json.loads(member) if pd.notnull(member) else [] for member in tb_regions[subregion_type]
+    ]
+
+    # Explode list of members to have one row per member.
+    tb_regions = tb_regions.explode(subregion_type).dropna()
+
+    # Map member codes to names.
+    tb_regions[subregion_type] = map_series(
+        series=tb_regions[subregion_type], mapping=mapping, warn_on_missing_mappings=True
+    )
+
+    # Create a column with the list of members in each region
+    tb_countries_in_region = (
+        tb_regions.rename(columns={"name": "region"})
+        .groupby("region", as_index=True, observed=True)
+        .agg({subregion_type: list})
+    )
+
+    return tb_countries_in_region
+
+
 def list_members_of_region(
     region: str,
     ds_regions: Dataset,
@@ -779,27 +810,8 @@ def list_members_of_region(
     if excluded_members is None:
         excluded_members = []
 
-    # Get the main table from the regions dataset.
-    tb_regions = ds_regions["regions"][["name", "members"]]
-
-    # Get a mapping from code to region name.
-    mapping = tb_regions["name"].to_dict()
-
-    # Convert strings of lists of members into lists of aliases.
-    tb_regions["members"] = [json.loads(member) if pd.notnull(member) else [] for member in tb_regions["members"]]
-
-    # Explode list of members to have one row per member.
-    tb_regions = tb_regions.explode("members").dropna()
-
-    # Map member codes to names.
-    tb_regions["members"] = map_series(series=tb_regions["members"], mapping=mapping, warn_on_missing_mappings=True)
-
-    # Create a column with the list of members in each region
-    tb_countries_in_region = (
-        tb_regions.rename(columns={"name": "region"})
-        .groupby("region", as_index=True, observed=True)
-        .agg({"members": list})
-    )
+    # Get the main table from the regions dataset and create a new table that has regions and members.
+    tb_countries_in_region = create_table_of_regions_and_subregions(ds_regions=ds_regions, subregion_type="members")
 
     if ds_income_groups is not None:
         if "wb_income_group" in ds_income_groups.table_names:
@@ -874,11 +886,86 @@ def list_members_of_region(
     return countries
 
 
+def detect_overlapping_regions(
+    tb, index_columns, region_and_members, country_col="country", year_col="year", ignore_zeros=True
+):
+    """Detect years on which the data for two regions overlap, e.g. a historical region and one of its successors.
+
+    Parameters
+    ----------
+    tb : _type_
+        Data (with a dummy index).
+    index_columns : _type_
+        Names of index columns.
+    region_and_members : _type_
+        Regions to check for overlaps. Each region must have a dictionary "regions_included", listing the subregions
+        contained. If the region is historical, "regions_included" would be the list of successor countries.
+    country_col : str, optional
+        Name of country column (usually "country").
+    year_col : str, optional
+        Name of year column (usually "year").
+    ignore_zeros : bool, optional
+        True to ignore overlaps of zeros.
+
+    Returns
+    -------
+    all_overlaps : dict
+        All overlaps found.
+
+    """
+    # Sum over all columns to get the total sum of each column for each country-year.
+    tb_total = (
+        tb.groupby([country_col, year_col])
+        .agg({column: "sum" for column in tb.columns if column not in index_columns})
+        .reset_index()
+    )
+    # Create a list of values that will be ignored in overlaps (usually zero or nothing).
+    if ignore_zeros:
+        overlapping_values_to_ignore = [0]
+    else:
+        overlapping_values_to_ignore = []
+    # List all variables in data (ignoring index columns).
+    variables = [column for column in tb.columns if column not in index_columns]
+    # List all country names found in data.
+    countries_in_data = tb[country_col].unique().tolist()
+    # List all regions found in data.
+    regions = [country for country in list(region_and_members) if country in countries_in_data]
+    # Initialize a dictionary that will store all overlaps found.
+    all_overlaps = {}
+    for region in regions:
+        # List members of current region.
+        members = [member for member in region_and_members[region] if member in countries_in_data]
+        for member in members:
+            # Select data for current region.
+            region_values = (
+                tb_total[tb_total[country_col] == region]
+                .replace(overlapping_values_to_ignore, np.nan)
+                .dropna(subset=variables, how="all")
+            )
+            # Select data for current member.
+            member_values = (
+                tb_total[tb_total[country_col] == member]
+                .replace(overlapping_values_to_ignore, np.nan)
+                .dropna(subset=variables, how="all")
+            )
+            # Concatenate both selections of data, and select duplicated rows.
+            combined = pd.concat([region_values, member_values])
+            overlaps = combined[combined.duplicated(subset=[year_col], keep=False)]  # type: ignore
+            if len(overlaps) > 0:
+                # Add the overlap found to the dictionary of all overlaps.
+                all_overlaps.update({year: set(overlaps[country_col]) for year in overlaps[year_col].unique()})
+
+    # Sort overlaps conveniently.
+    all_overlaps = {year: all_overlaps[year] for year in sorted(list(all_overlaps))}
+
+    return all_overlaps
+
+
 def add_regions_to_table(
     tb: TableOrDataFrame,
-    regions: Optional[Union[List[str], Dict[str, Any]]] = None,
-    ds_regions: Optional[Dataset] = None,
+    ds_regions: Dataset,
     ds_income_groups: Optional[Dataset] = None,
+    regions: Optional[Union[List[str], Dict[str, Any]]] = None,
     aggregations: Optional[Dict[str, str]] = None,
     num_allowed_nans_per_year: Optional[int] = None,
     frac_allowed_nans_per_year: Optional[float] = None,
@@ -887,20 +974,38 @@ def add_regions_to_table(
     year_col: str = "year",
     keep_original_region_with_suffix: Optional[str] = None,
     include_historical_regions_in_income_groups: bool = True,
+    check_for_region_overlaps: bool = True,
+    accepted_overlaps: Optional[Dict[int, Set[str]]] = None,
 ) -> Table:
-    tb_regions = tb.copy()
+    tb_with_regions = tb.copy()
 
-    if ds_regions is None:
-        # TODO: Let list_members_of_region have ds_regions as optional, in case one only wants to add income groups.
-        raise NotImplementedError(
-            "ds_regions must be given. "
-            "In the future, this may be optional, in case one only wants to add income groups."
+    if check_for_region_overlaps:
+        # Find overlaps between regions and its members.
+
+        # Create a dictionary of regions and its members.
+        tb_regions_and_members = create_table_of_regions_and_subregions(
+            ds_regions=ds_regions, subregion_type="successors"
         )
+        regions_and_members = tb_regions_and_members["successors"].to_dict()
+
+        # Assume incoming table has a dummy index (the whole function may not work otherwise).
+        # Example of region_and_members:
+        # {"Czechoslovakia": ["Czechia", "Slovakia"]}
+        all_overlaps = detect_overlapping_regions(
+            tb=tb_with_regions, region_and_members=regions_and_members, index_columns=[country_col, year_col]
+        )
+        # Example of accepted_overlaps:
+        # {1991: {"Georgia", "USSR"}}
+        # Check whether all accepted overlaps are found in the data, and that there are no new unknown overlaps.
+        error = "Either the list of accepted overlaps is not found in the data, or there are new unknown overlaps."
+        assert accepted_overlaps == all_overlaps, error
 
     if aggregations is None:
         # Create region aggregates for all columns (with a simple sum) except for the column of efficiency factors.
         aggregations = {
-            column: "sum" for column in tb_regions.columns if column not in ["country", "year", "efficiency_factor"]
+            column: "sum"
+            for column in tb_with_regions.columns
+            if column not in ["country", "year", "efficiency_factor"]
         }
 
     if regions is None:
@@ -910,7 +1015,16 @@ def add_regions_to_table(
         regions = {region: {} for region in regions}
 
     # Add region aggregates.
-    for region in REGIONS:
+    for region in regions:
+        # Check that the content of the region dictionary is as expected.
+        expected_items = {"additional_regions", "excluded_regions", "additional_members", "excluded_members"}
+        unknown_items = set(regions[region]) - expected_items
+        if len(unknown_items) > 0:
+            log.warning(
+                f"Unknown items in dictionary of regions {region}: {unknown_items}. Expected: {expected_items}."
+            )
+
+        # List members of the region.
         members = list_members_of_region(
             region=region,
             ds_regions=ds_regions,
@@ -921,8 +1035,9 @@ def add_regions_to_table(
             excluded_members=regions[region].get("excluded_members"),
             include_historical_regions_in_income_groups=include_historical_regions_in_income_groups,
         )
-        tb_regions = add_region_aggregates(
-            df=tb_regions,
+        # Add aggregate data for current region.
+        tb_with_regions = add_region_aggregates(
+            df=tb_with_regions,
             region=region,
             aggregations=aggregations,
             countries_in_region=members,
@@ -940,6 +1055,6 @@ def add_regions_to_table(
             population=None,
         )
     # Copy metadata of original table.
-    tb_regions = tb_regions.copy_metadata(from_table=tb)
+    tb_with_regions = tb_with_regions.copy_metadata(from_table=tb)
 
-    return tb_regions
+    return tb_with_regions
