@@ -1,0 +1,69 @@
+definitions:
+  common:
+    processing_level: minor
+    presentation:
+      topic_tags:
+        - Economic Growth
+dataset:
+  update_period_days: 365
+tables:
+  maddison_gdp:
+    variables:
+      gdp_per_capita:
+        title: GDP per capita
+        unit: international-$ in 2011 prices
+        short_unit: $
+        display:
+          entityAnnotationsMap: 'Western offshoots (MPD): United States, Canada, Australia and New Zealand'
+          numDecimalPlaces: 0
+        description_short: This data is adjusted for inflation and for differences in the cost of living between countries.
+        description_key:
+          - This GDP per capita indicator provides information on economic growth and income levels in the very long run. Some country estimates are available as far back as 1 CE and regional estimates as far back as 1820 CE.
+          - This data is adjusted for inflation and for differences in the cost of living between countries.
+          - This data is expressed in international-$ at 2011 prices, using a combination of 2011 and 1990 PPPs for historical data.
+          - For more up-to-date estimates of GDP per capita, see the [World Bank's indicator](https://ourworldindata.org/grapher/gdp-per-capita-worldbank).
+        description_from_producer: Real GDP per capita in 2011$
+        presentation:
+          title_public: GDP per capita
+          title_variant: Historical data
+          attribution_short: Maddison Project Database
+          faqs:
+            - fragment_id: poverty-international-dollars
+              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+          grapher_config:
+            title: GDP per capita
+            subtitle: This data is adjusted for inflation and for differences in the cost of living between countries.
+            variantName: Maddison Project Database, constant international-$
+            originUrl: https://ourworldindata.org/economic-growth
+            hasMapTab: true
+            tab: map
+            yAxis:
+              min: 0
+              canChangeScaleType: true
+            map:
+              time: latest
+              colorScale:
+                baseColorScheme: GnBu
+                binningStrategy: manual
+                customNumericValues:
+                  - 1000
+                  - 2000
+                  - 5000
+                  - 10000
+                  - 20000
+                  - 50000
+                  - 100000
+                binningStrategyBinCount: 9
+            selectedEntityNames:
+              - World
+              - South and South-East Asia (MPD)
+              - Sub-Saharan Africa (MPD)
+              - Western Europe (MPD)
+              - Eastern Europe (MPD)
+              - Latin America (MPD)
+              - Middle East (MPD)
+              - East Asia (MPD)
+              - Western offshoots (MPD)
+            note: This data is expressed in [international-$](#dod:int_dollar_abbreviation) at 2011 prices.
+            $schema: https://files.ourworldindata.org/schemas/grapher-schema.003.json
+            hideRelativeToggle: false
