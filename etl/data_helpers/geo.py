@@ -22,6 +22,27 @@ log = get_logger()
 
 TableOrDataFrame = TypeVar("TableOrDataFrame", pd.DataFrame, Table)
 
+# Default regions when creating region aggregates.
+REGIONS = {
+    # Default continents.
+    "Africa": {},
+    "Asia": {},
+    "Europe": {},
+    "North America": {},
+    "Oceania": {},
+    "South America": {},
+    # Income groups.
+    "Low-income countries": {},
+    "Upper-middle-income countries": {},
+    "Lower-middle-income countries": {},
+    "High-income countries": {},
+    # Other special regions.
+    "European Union (27)": {},
+}
+
+########################################################################################################################
+# Default parameters when imposing a list of countries that must be informed when creating region aggregates:
+
 # When creating region aggregates for a certain variable in a certain year, some mandatory countries must be
 # informed, otherwise the aggregate will be nan (since we consider that there is not enough information).
 # A country will be considered mandatory if they exceed this minimum fraction of the total population of the region.
@@ -31,11 +52,10 @@ MIN_FRAC_INDIVIDUAL_POPULATION = 0.0
 MIN_FRAC_CUMULATIVE_POPULATION = 0.7
 # Reference year to build the list of mandatory countries.
 REFERENCE_YEAR = 2018
-# Maximum fraction of nans allowed per year when doing aggregations (None to allow any fraction of nans).
-FRAC_ALLOWED_NANS_PER_YEAR = 0.2
-# Maximum number of nans allowed per year when doing aggregations (None to allow any number of nans).
-NUM_ALLOWED_NANS_PER_YEAR = None
+########################################################################################################################
 
+########################################################################################################################
+# DEPRECATED: Default paths when silently loading population and income groups datasets.
 # Paths to datasets used in this module. Feel free to update the versions or paths whenever there is a
 # new version of the datasets.
 # Path to Key Indicators dataset (TODO: should change it)
@@ -46,6 +66,7 @@ TNAME_KEY_INDICATORS = "population"
 # TODO: we should update it to latest garden/wb/*/income_groups dataset
 DATASET_WB_INCOME = DATA_DIR / "garden" / "wb" / "2021-07-01" / "wb_income"
 TNAME_WB_INCOME = "wb_income_group"
+########################################################################################################################
 
 
 @functools.lru_cache
@@ -181,16 +202,16 @@ def list_countries_in_region_that_must_have_data(
         Countries that are expected to have the largest contribution.
 
     """
-    # TODO: we should be passing countries_regions explicitly and get rid of `_load_countries_regions`
     if countries_regions is None:
+        # NOTE: This should be avoided, and it will raise a warning if used.
         countries_regions = _load_countries_regions()
 
-    # TODO: we should be passing population explicitly and get rid of `_load_population`
     if population is None:
+        # NOTE: This should be avoided, and it will raise a warning if used.
         population = _load_population()
 
-    # TODO: we should be passing income groups explicitly and get rid of `_load_income_groups`
     if income_groups is None:
+        # NOTE: This should be avoided, and it will raise a warning if used.
         income_groups = _load_income_groups().reset_index()
 
     # List all countries in the selected region.
@@ -851,3 +872,74 @@ def list_members_of_region(
     countries = sorted(countries_set)
 
     return countries
+
+
+def add_regions_to_table(
+    tb: TableOrDataFrame,
+    regions: Optional[Union[List[str], Dict[str, Any]]] = None,
+    ds_regions: Optional[Dataset] = None,
+    ds_income_groups: Optional[Dataset] = None,
+    aggregations: Optional[Dict[str, str]] = None,
+    num_allowed_nans_per_year: Optional[int] = None,
+    frac_allowed_nans_per_year: Optional[float] = None,
+    min_num_values_per_year: Optional[int] = None,
+    country_col: str = "country",
+    year_col: str = "year",
+    keep_original_region_with_suffix: Optional[str] = None,
+    include_historical_regions_in_income_groups: bool = True,
+) -> Table:
+    tb_regions = tb.copy()
+
+    if ds_regions is None:
+        # TODO: Let list_members_of_region have ds_regions as optional, in case one only wants to add income groups.
+        raise NotImplementedError(
+            "ds_regions must be given. "
+            "In the future, this may be optional, in case one only wants to add income groups."
+        )
+
+    if aggregations is None:
+        # Create region aggregates for all columns (with a simple sum) except for the column of efficiency factors.
+        aggregations = {
+            column: "sum" for column in tb_regions.columns if column not in ["country", "year", "efficiency_factor"]
+        }
+
+    if regions is None:
+        regions = REGIONS
+    elif isinstance(regions, list):
+        # Assume they are known regions and they have no modifications.
+        regions = {region: {} for region in regions}
+
+    # Add region aggregates.
+    for region in REGIONS:
+        members = list_members_of_region(
+            region=region,
+            ds_regions=ds_regions,
+            ds_income_groups=ds_income_groups,
+            additional_regions=regions[region].get("additional_regions"),
+            excluded_regions=regions[region].get("excluded_regions"),
+            additional_members=regions[region].get("additional_members"),
+            excluded_members=regions[region].get("excluded_members"),
+            include_historical_regions_in_income_groups=include_historical_regions_in_income_groups,
+        )
+        tb_regions = add_region_aggregates(
+            df=tb_regions,
+            region=region,
+            aggregations=aggregations,
+            countries_in_region=members,
+            # TODO: This could be a dictionary, with different lists of countries for different regions.
+            countries_that_must_have_data=[],
+            num_allowed_nans_per_year=num_allowed_nans_per_year,
+            frac_allowed_nans_per_year=frac_allowed_nans_per_year,
+            min_num_values_per_year=min_num_values_per_year,
+            country_col=country_col,
+            year_col=year_col,
+            keep_original_region_with_suffix=keep_original_region_with_suffix,
+            # Population is only required if countries_that_must_have_data is "auto", which is not yet implemented.
+            # TODO: Once countries_that_must_have_data is implemented, pass ds_population as an argument, and input here
+            # its main table.
+            population=None,
+        )
+    # Copy metadata of original table.
+    tb_regions = tb_regions.copy_metadata(from_table=tb)
+
+    return tb_regions
