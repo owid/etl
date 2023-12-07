@@ -131,6 +131,10 @@ tb = {_snippet_dataset(ds_b, table_name)}
             if len(table_a) != len(table_b) or not _index_equals(table_a, table_b):
                 index_diff = True
                 table_a, table_b, eq_index = _align_tables(table_a, table_b)
+
+                # if only index order has changed, don't report it
+                if eq_index.all():
+                    index_diff = False
             else:
                 index_diff = False
                 eq_index = pd.Series(True, index=table_a.index)
