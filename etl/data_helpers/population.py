@@ -66,7 +66,7 @@ def add_population(
         Dataframe with extra column `population`.
     """
     if ds_un_wpp is None:
-        ds_un_wpp_path = DATA_DIR / "garden" / "un" / "2022-07-11" / "un_wpp"
+        ds_un_wpp_path = DATA_DIR / "garden/un/2022-07-11/un_wpp"
         log.warning(f"Dataset {ds_un_wpp_path} is silently being loaded.")
         # Load granular population dataset
         ds_un_wpp = Dataset(ds_un_wpp_path)
