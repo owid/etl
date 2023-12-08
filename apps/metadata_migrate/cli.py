@@ -234,7 +234,7 @@ def cli(
         definitions["common"]["sources"] = []
         definitions["common"]["origins"] = [origin.to_dict() for origin in origins]
 
-    meta_dict = {"dataset": dataset, "definitions": definitions, "tables": {ds.table_names[0]: {"variables": vars}}}
+    meta_dict = {"dataset": dataset, "definitions": definitions, "tables": {table_name: {"variables": vars}}}
 
     meta_dict = reorder_fields(meta_dict)
 

@@ -336,7 +336,7 @@ def cli(
             continue
         except Exception as e:
             # soft fail and continue with another dataset
-            log.error(e)
+            log.error(e, exc_info=True)
             any_error = True
             continue
 
@@ -544,7 +544,7 @@ def _dataset_metadata_dict(ds: Dataset) -> Dict[str, Any]:
 
     # sort sources by name
     if "sources" in d:
-        d["sources"] = sorted(d["sources"], key=lambda x: x["name"] or "")
+        d["sources"] = sorted(d["sources"], key=lambda x: x.get("name") or "")
 
     d.pop("source_checksum", None)
     return d
@@ -600,7 +600,10 @@ def _remote_catalog_datasets(channels: Iterable[CHANNEL], include: str, exclude:
     mapping = {}
     for path in ds_paths:
         uri = f"{OWID_CATALOG_URI}{path}/index.json"
-        ds_meta = DatasetMeta(**requests.get(uri).json())
+        js = requests.get(uri).json()
+        # drop origins for backward compatibility
+        js.pop("origins", None)
+        ds_meta = DatasetMeta(**js)
         # TODO: channel should be in DatasetMeta by default
         ds_meta.channel = path.split("/")[0]  # type: ignore
         table_names = frame.loc[frame["ds_paths"] == path, "table"].tolist()

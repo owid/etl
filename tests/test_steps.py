@@ -134,6 +134,9 @@ class DummyStep(Step):  # type: ignore
     def __init__(self, name: str):
         self.path = name
 
+    def __str__(self):
+        return self.path
+
     def __repr__(self):
         return self.path
 
