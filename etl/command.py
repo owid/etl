@@ -11,7 +11,7 @@ import time
 from concurrent.futures import FIRST_COMPLETED, Future, ProcessPoolExecutor, ThreadPoolExecutor, wait
 from contextlib import contextmanager
 from graphlib import TopologicalSorter
-from os import cpu_count, environ
+from os import environ
 from pathlib import Path
 from typing import Any, Callable, Dict, Iterator, List, Optional, Set
 
@@ -127,7 +127,7 @@ def main_cli(
     # enable grapher channel when called with --grapher
     grapher_channel = grapher_channel or grapher
 
-    # propagate workers to grapher upserts
+    # make everything single threaded, useful for debugging
     if not use_threads:
         config.GRAPHER_INSERT_WORKERS = 1
         config.DIRTY_STEPS_WORKERS = 1
@@ -160,6 +160,7 @@ def main_cli(
             config.IPDB_ENABLED = True
             config.GRAPHER_INSERT_WORKERS = 1
             config.DIRTY_STEPS_WORKERS = 1
+            config.RUN_STEPS_WORKERS = 1
             kwargs["workers"] = 1
             with launch_ipdb_on_exception():
                 main(**kwargs)  # type: ignore
@@ -252,7 +253,7 @@ def run_dag(
     downstream: bool = False,
     only: bool = False,
     excludes: Optional[List[str]] = None,
-    workers: int = cpu_count(),  # type: ignore
+    workers: int = config.DIRTY_STEPS_WORKERS,
     strict: Optional[bool] = None,
 ) -> None:
     """
@@ -335,7 +336,16 @@ def exec_steps_parallel(steps: List[Step], workers: int, dag: DAG, strict: Optio
 def exec_graph_parallel(
     exec_graph: Dict[str, Any], func: Callable[[str], None], workers: int, use_threads=False, **kwargs
 ) -> None:
-    # Create a topological sorter and add tasks with their dependencies
+    """
+    Execute a graph of tasks in parallel using multiple workers. TopologicalSorter orders nodes in the
+    graph in a way that no node depends on a node that comes after it, i.e. all dependencies are
+    guaranteed to be completed.
+    :param exec_graph: A dictionary representing the execution graph of tasks.
+    :param func: The function to be executed for each task.
+    :param workers: The number of workers to use for parallel execution.
+    :param use_threads: Flag indicating whether to use threads instead of processes for parallel execution.
+    :param kwargs: Additional keyword arguments to be passed to the function.
+    """
     topological_sorter = TopologicalSorter(exec_graph)
     topological_sorter.prepare()
 
@@ -380,7 +390,7 @@ def _exec_step_job(step_name: str, dag: Optional[DAG] = None, strict: Optional[b
 
 def enumerate_steps(steps: List[Step]) -> None:
     for i, step in enumerate(steps, 1):
-        print(f"{i}. {step}...")
+        print(f"{i}. {step}")
 
 
 def _detect_strictness_level(step: Step, strict: Optional[bool] = None) -> bool:
