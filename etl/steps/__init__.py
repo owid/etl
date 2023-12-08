@@ -102,7 +102,7 @@ def filter_to_subgraph(graph: Graph, includes: Iterable[str], downstream: bool =
 
     if only:
         # Only include explicitly selected nodes
-        return {step: graph[step] & included for step in included}
+        return {step: graph.get(step, set()) & included for step in included}
 
     if downstream:
         # Reverse the graph to find all nodes dependent on included nodes (forward deps)
@@ -723,7 +723,10 @@ class SnapshotStepPrivate(SnapshotStep):
         with _unignore_backports(Path(self._path)):
             try:
                 # The repo has to be created again to pick unignored files
-                get_dvc(use_cache=False).pull(self._path, remote="private", force=True)
+                # DVC must be locked across processes. This is pretty limiting as it allows us to only pull
+                # one snapshot at a time. One option is to pre-pull all snapshot steps.
+                with dvc_pull_lock:
+                    get_dvc(use_cache=False).pull(self._path, remote="private", force=True)
             except CheckoutError as e:
                 raise Exception(
                     "File not found in DVC. Have you run the snapshot script with `is_public: false`?"
