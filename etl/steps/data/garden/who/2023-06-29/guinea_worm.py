@@ -29,7 +29,7 @@ def run(dest_dir: str) -> None:
     )
     # Read table from meadow dataset.
     tb = ds_meadow["guinea_worm"]
-    tb_fasttrack = ds_fasttrack["guinea_worm"]
+    tb_fasttrack = ds_fasttrack["guinea_worm"].reset_index().astype({"year": int})
     #
     # Process data.
     #
