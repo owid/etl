@@ -7,7 +7,6 @@ from owid.catalog import Table
 from structlog import get_logger
 
 from etl.helpers import PathFinder, create_dataset
-from etl.snapshot import Snapshot
 
 # Initialize logger.
 log = get_logger()
@@ -23,7 +22,7 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Retrieve snapshot.
-    snap: Snapshot = paths.load_dependency("un_sdg.feather")
+    snap = paths.load_snapshot("un_sdg.feather")
 
     # Load data from snapshot.
     df = pd.read_feather(snap.path)
@@ -34,9 +33,6 @@ def run(dest_dir: str) -> None:
     df = df.reset_index(drop=True).drop(columns="index")
     tb = Table(df, short_name=paths.short_name, underscore=True)
     ds = create_dataset(dest_dir, tables=[tb], default_metadata=snap.metadata)
-    # ds.metadata.version = paths.version
-    # ds.add(tb)
-    # ds.update_metadata(paths.metadata_path)
     ds.save()
     log.info("un_sdg.end")
 

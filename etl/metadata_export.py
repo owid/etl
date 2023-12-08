@@ -96,6 +96,8 @@ def merge_or_create_yaml(meta_dict: Dict[str, Any], output_path: Path) -> str:
             if tab_name not in doc["tables"]:
                 doc["tables"][tab_name] = {}
             doc["tables"][tab_name].update(tab_dict)
+            if "variables" not in doc["tables"][tab_name]:
+                doc["tables"][tab_name]["variables"] = {}
             doc["tables"][tab_name]["variables"].update(variables)
 
         return ruamel_dump(doc)

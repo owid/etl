@@ -21,7 +21,9 @@ paths = PathFinder(__file__)
 
 # only include tables containing INCLUDE string, this is useful for debugging
 # but should be None before merging to master!!
-INCLUDE = "_6_1_1|_6_2_1"
+# TODO: set this to None before merging to master
+# INCLUDE = "_6_1_1|_6_2_1"
+INCLUDE = None
 
 
 def run(dest_dir: str) -> None:
@@ -30,6 +32,7 @@ def run(dest_dir: str) -> None:
     #
     # Load garden dataset.
     ds_garden = paths.load_dataset("un_sdg")
+    assert len(ds_garden.m.sources) == 1, "Expected only one source"
 
     # Add table of processed data to the new dataset.
     # add tables to dataset
