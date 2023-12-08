@@ -12,6 +12,7 @@ import pandas as pd
 from owid.catalog import Table
 from owid.datautils import dataframes
 from pytest import warns
+from structlog.testing import capture_logs
 
 from etl.data_helpers import geo
 
@@ -524,7 +525,7 @@ class TestAddRegionAggregates:
                 ],
                 "year": [2020, 2021, 2020, 2022, 2022, 2022, 2022],
                 "var_01": [1, 2, 3, np.nan, 6, 5, 0.0],
-                "var_02": [10.0, 20.0, 30.0, 40.0, 60.0, 50.0, 40.0],
+                "var_02": [10, 20, 30, 40, 60, 50, 40],
             }
         )
         assert dataframes.are_equal(df1=df, df2=df_out)[0]
@@ -552,7 +553,7 @@ class TestAddRegionAggregates:
                 ],
                 "year": [2020, 2021, 2020, 2022, 2022, 2022, 2022],
                 "var_01": [1, 2, 3, np.nan, 6, 5, np.nan],
-                "var_02": [10.0, 20.0, 30.0, 40.0, 60.0, 50.0, 40.0],
+                "var_02": [10, 20, 30, 40, 60, 50, 40],
             }
         )
         assert dataframes.are_equal(df1=df, df2=df_out)[0]
@@ -581,7 +582,7 @@ class TestAddRegionAggregates:
                 ],
                 "year": [2020, 2021, 2020, 2022, 2022, 2020, 2021, 2022],
                 "var_01": [1, 2, 3, np.nan, 6, 1, 2, 5],
-                "var_02": [10.0, 20.0, 30.0, 40.0, 60.0, 10.0, 20.0, 50.0],
+                "var_02": [10, 20, 30, 40, 60, 10, 20, 50],
             }
         )
         assert dataframes.are_equal(df1=df, df2=df_out)[0]
@@ -611,7 +612,7 @@ class TestAddRegionAggregates:
                 ],
                 "year": [2020, 2021, 2020, 2022, 2022, 2020, 2021],
                 "var_01": [1, 2, 3, np.nan, 6, 1 + 3, 2],
-                "var_02": [10.0, 20.0, 30.0, 40.0, 60.0, 10.0 + 30.0, 20.0],
+                "var_02": [10, 20, 30, 40, 60, 10 + 30, 20],
             }
         )
         assert dataframes.are_equal(df1=df, df2=df_out)[0]
@@ -737,7 +738,7 @@ class TestAddRegionAggregates:
                 ],
                 "year": [2020, 2021, 2020, 2022, 2022, 2020, 2021, 2022],
                 "var_01": [1, 2, 3, np.nan, 6, 1, 2, 5],
-                "var_02": [10.0, 20.0, 30.0, 40.0, 60.0, 10.0, 20.0, 50.0],
+                "var_02": [10, 20, 30, 40, 60, 10, 20, 50],
             }
         )
         assert dataframes.are_equal(df1=df, df2=df_out)[0]
@@ -767,12 +768,12 @@ class TestAddRegionAggregates:
                 ],
                 "year": [2020, 2021, 2020, 2022, 2022, 2020, 2021, 2022],
                 "var_01": [1, 2, 3, np.nan, 6, 4, 2, 5],
-                "var_02": [10.0, 20.0, 30.0, 40.0, 60.0, 40.0, 20.0, 50.0],
+                "var_02": [10, 20, 30, 40, 60, 40, 20, 50],
             }
         )
         assert dataframes.are_equal(df1=df, df2=df_out)[0]
 
-    def test_add_region_with_Table(self):
+    def test_add_region_with_table(self):
         tb = Table(self.df_in)
         tb.var_01.m.title = "Var 01"
         df = geo.add_region_aggregates(
@@ -798,7 +799,7 @@ class TestAddRegionAggregates:
                 ],
                 "year": [2020, 2021, 2020, 2022, 2022, 2022, 2022],
                 "var_01": [1, 2, 3, np.nan, 6, 5, 0.0],
-                "var_02": [10.0, 20.0, 30.0, 40.0, 60.0, 50.0, 40.0],
+                "var_02": [10, 20, 30, 40, 60, 50, 40],
             }
         )
         assert dataframes.are_equal(df1=df, df2=df_out)[0]
@@ -818,80 +819,635 @@ class MockRegionsDataset:
         return mock_tb_regions
 
 
+class MockIncomeGroupsDataset:
+    table_names = ["income_groups", "income_groups_latest"]
+
+    def __getitem__(self, name: str) -> Table:
+        mock_tb_income_groups = Table(
+            {
+                "country": ["Belarus", "France", "Italy", "Russia", "Spain"],
+                "year": [1991, 1987, 1987, 1991, 1987],
+                "classification": [
+                    "Upper-middle-income countries",
+                    "High-income countries",
+                    "High-income countries",
+                    "Upper-middle-income countries",
+                    "High-income countries",
+                ],
+            }
+        ).set_index(["country", "year"])
+        mock_tb_income_groups_latest = Table(
+            {
+                "country": ["Belarus", "France", "Italy", "Russia", "Spain"],
+                "classification": [
+                    "Upper-middle-income countries",
+                    "High-income countries",
+                    "High-income countries",
+                    "Upper-middle-income countries",
+                    "High-income countries",
+                ],
+            }
+        ).set_index(["country"])
+
+        if name == "income_groups":
+            return mock_tb_income_groups
+        elif name == "income_groups_latest":
+            return mock_tb_income_groups_latest
+
+
+ds_regions = MockRegionsDataset()
+ds_income_groups = MockIncomeGroupsDataset()
+
+
 class TestAddRegionsToTable:
-    def test_1(self):
-        ds_regions = MockRegionsDataset()
-        tb_in = Table(
-            {"country": ["USSR", "USSR", "Russia", "Russia"], "year": [1985, 1986, 1986, 2000], "a": [1, 2, 3, 4]}
+    def test_overlaps_without_income_groups(self):
+        tb_in = Table.from_records(
+            [("USSR", 1985, 1), ("USSR", 1986, 2), ("Russia", 1986, 3), ("Russia", 2000, 4)],
+            columns=["country", "year", "a"],
         )
+        tb_expected = Table.from_records(
+            [
+                ["Europe", 1985, 1],
+                ["Europe", 1986, 5],
+                ["Europe", 2000, 4],
+                ["Russia", 1986, 3],
+                ["Russia", 2000, 4],
+                ["USSR", 1985, 1],
+                ["USSR", 1986, 2],
+            ],
+            columns=["country", "year", "a"],
+        )
+        # Do not check for overlaps.
         tb_out = geo.add_regions_to_table(tb=tb_in, ds_regions=ds_regions, check_for_region_overlaps=False)
-        assert tb_out.to_dict() == {
-            "country": {0: "Europe", 1: "Europe", 2: "Europe", 3: "Russia", 4: "Russia", 5: "USSR", 6: "USSR"},
-            "year": {0: 1985, 1: 1986, 2: 2000, 3: 1986, 4: 2000, 5: 1985, 6: 1986},
-            "a": {0: 1.0, 1: 5.0, 2: 4.0, 3: 3.0, 4: 4.0, 5: 1.0, 6: 2.0},
-        }
+        assert dataframes.are_equal(tb_out, tb_expected)
 
-        # TODO: This should fail because there is an overlap.
-        # new = add_regions_to_table(tb=tb, ds_regions=ds_regions, check_for_region_overlaps=True)
-        # This should work.
+        # Check for overlaps. Now a warning should be raised, since Russia and USSR overlap in 1986.
+        with capture_logs() as captured_logs:
+            tb_out = geo.add_regions_to_table(tb=tb_in, ds_regions=ds_regions, check_for_region_overlaps=True)
+        assert captured_logs[0]["log_level"] == "warning"
+        assert "overlap" in captured_logs[0]["event"]
+        assert dataframes.are_equal(tb_out, tb_expected)
 
+        # Now run the same line again, but passing the expected overlap. No warning should be raised.
+        with capture_logs() as captured_logs:
+            tb_out = geo.add_regions_to_table(
+                tb=tb_in,
+                ds_regions=ds_regions,
+                check_for_region_overlaps=True,
+                accepted_overlaps={1986: {"Russia", "USSR"}},
+            )
+        assert captured_logs == []
+        assert dataframes.are_equal(tb_out, tb_expected)
+
+        # All the following should raise a warning, since the given overlaps are not exactly right.
+        for accepted_overlaps in [
+            {1986: {"Russia", "USSR", "Georgia"}},
+            {1985: {"USSR", "Georgia"}},
+            {1986: {"Russia", "USSR"}, 1985: {"USSR", "Georgia"}},
+        ]:
+            with capture_logs() as captured_logs:
+                tb_out = geo.add_regions_to_table(
+                    tb=tb_in, ds_regions=ds_regions, check_for_region_overlaps=True, accepted_overlaps=accepted_overlaps
+                )
+            assert captured_logs[0]["log_level"] == "warning"
+            assert "overlap" in captured_logs[0]["event"]
+            assert dataframes.are_equal(tb_out, tb_expected)
+
+    def test_overlaps_with_income_groups(self):
+        tb_in = Table.from_records(
+            [("USSR", 1985, 1), ("USSR", 1986, 2), ("Russia", 1986, 3), ("Russia", 2000, 4)],
+            columns=["country", "year", "a"],
+        )
+        tb_expected = Table.from_records(
+            [
+                ["Europe", 1985, 1],
+                ["Europe", 1986, 5],
+                ["Europe", 2000, 4],
+                ["Russia", 1986, 3],
+                ["Russia", 2000, 4],
+                ["USSR", 1985, 1],
+                ["USSR", 1986, 2],
+                ["Upper-middle-income countries", 1986, 3],
+                ["Upper-middle-income countries", 2000, 4],
+            ],
+            columns=["country", "year", "a"],
+        )
+        # Do not check for overlaps.
+        tb_out = geo.add_regions_to_table(
+            tb=tb_in, ds_regions=ds_regions, ds_income_groups=ds_income_groups, check_for_region_overlaps=False
+        )
+        assert dataframes.are_equal(tb_out, tb_expected)
+
+        # Check for overlaps.
         tb_out = geo.add_regions_to_table(
             tb=tb_in,
             ds_regions=ds_regions,
+            ds_income_groups=ds_income_groups,
             check_for_region_overlaps=True,
             accepted_overlaps={1986: {"Russia", "USSR"}},
         )
-        assert tb_out.to_dict() == {
-            "country": {0: "Europe", 1: "Europe", 2: "Europe", 3: "Russia", 4: "Russia", 5: "USSR", 6: "USSR"},
-            "year": {0: 1985, 1: 1986, 2: 2000, 3: 1986, 4: 2000, 5: 1985, 6: 1986},
-            "a": {0: 1.0, 1: 5.0, 2: 4.0, 3: 3.0, 4: 4.0, 5: 1.0, 6: 2.0},
+        assert dataframes.are_equal(tb_out, tb_expected)
+
+    def test_overlaps_of_zeros(self):
+        tb_in = Table.from_records(
+            [("USSR", 1985, 1), ("USSR", 1986, 0), ("Russia", 1986, 0), ("Russia", 2000, 4)],
+            columns=["country", "year", "a"],
+        )
+        tb_expected = Table.from_records(
+            [
+                ["Europe", 1985, 1],
+                ["Europe", 1986, 0],
+                ["Europe", 2000, 4],
+                ["Russia", 1986, 0],
+                ["Russia", 2000, 4],
+                ["USSR", 1985, 1],
+                ["USSR", 1986, 0],
+            ],
+            columns=["country", "year", "a"],
+        )
+        # This should work because we impose that we ignore overlaps of zeros.
+        tb_out = geo.add_regions_to_table(
+            tb=tb_in, ds_regions=ds_regions, check_for_region_overlaps=True, ignore_overlaps_of_zeros=True
+        )
+        assert dataframes.are_equal(tb_out, tb_expected)
+
+    def test_passing_explicit_list_of_countries(self):
+        tb_in = Table.from_records(
+            [("Russia", 1986, 1), ("Russia", 2000, 4), ("USSR", 1985, 1), ("USSR", 1986, 2)],
+            columns=["country", "year", "a"],
+        )
+        # The following should create no aggregate, since we have no data for African countries.
+        tb_out = geo.add_regions_to_table(
+            tb=tb_in,
+            ds_regions=ds_regions,
+            regions=["Africa"],
+            ds_income_groups=ds_income_groups,
+            check_for_region_overlaps=False,
+        )
+        # The input table should be identical to the output.
+        assert tb_in.to_dict(orient="split") == tb_out.to_dict(orient="split")
+        tb_expected = Table.from_records(
+            [
+                ["Europe", 1985, 1],
+                ["Europe", 1986, 3],
+                ["Europe", 2000, 4],
+                ["Russia", 1986, 1],
+                ["Russia", 2000, 4],
+                ["USSR", 1985, 1],
+                ["USSR", 1986, 2],
+            ],
+            columns=["country", "year", "a"],
+        )
+        # The following should create an aggregate only for Europe.
+        tb_out = geo.add_regions_to_table(
+            tb=tb_in,
+            ds_regions=ds_regions,
+            regions=["Europe"],
+            ds_income_groups=ds_income_groups,
+            check_for_region_overlaps=False,
+        )
+        assert dataframes.are_equal(tb_out, tb_expected)
+        # Idem when passing a dictionary without modifications.
+        tb_out = geo.add_regions_to_table(
+            tb=tb_in,
+            ds_regions=ds_regions,
+            regions={"Europe": {}},
+            ds_income_groups=ds_income_groups,
+            check_for_region_overlaps=False,
+        )
+        assert dataframes.are_equal(tb_out, tb_expected)
+        # The following should create an aggregate for Europe, excluding USSR.
+        tb_out = geo.add_regions_to_table(
+            tb=tb_in,
+            ds_regions=ds_regions,
+            regions={"Europe": {"excluded_members": {"USSR"}}},
+            ds_income_groups=ds_income_groups,
+            check_for_region_overlaps=False,
+        )
+        assert tb_out.to_dict(orient="split") == {
+            "index": [0, 1, 2, 3, 4, 5],
+            "columns": ["country", "year", "a"],
+            "data": [
+                ["Europe", 1986, 1],
+                ["Europe", 2000, 4],
+                ["Russia", 1986, 1],
+                ["Russia", 2000, 4],
+                ["USSR", 1985, 1],
+                ["USSR", 1986, 2],
+            ],
         }
 
-    # # All the following should fail.
-    # new = add_regions_to_table(tb=tb, ds_regions=ds_regions, check_for_region_overlaps=True, accepted_overlaps={1986: {"Russia", "USSR", "Georgia"}})
-    # new = add_regions_to_table(tb=tb, ds_regions=ds_regions, check_for_region_overlaps=True, accepted_overlaps={1985: {"USSR", "Georgia"}})
-    # new = add_regions_to_table(tb=tb, ds_regions=ds_regions, check_for_region_overlaps=True, accepted_overlaps={1986: {"Russia", "USSR"}, 1985: {"USSR", "Georgia"}})
-    # # This should work.
-    # ds_income_groups = Dataset(DATA_DIR / "garden/wb/2023-04-30/income_groups")
-    # new = add_regions_to_table(tb=tb, ds_regions=ds_regions, ds_income_groups=ds_income_groups, check_for_region_overlaps=True, accepted_overlaps={1986: {"Russia", "USSR"}})
-    # # This should work because we impose that we ignore overlaps of zeros.
-    # tb = Table({"country": ["USSR", "USSR", "Russia", "Russia"], "year": [1985, 1986, 1986, 2000], "a": [1, 0, 0, 4]})
-    # new = add_regions_to_table(tb=tb, ds_regions=ds_regions, check_for_region_overlaps=True, ignore_overlaps_of_zeros=True)
-    # # The following should create no aggregate, since we have no data for African countries.
-    # new = add_regions_to_table(tb=tb, ds_regions=ds_regions, regions=["Africa"], ds_income_groups=ds_income_groups, check_for_region_overlaps=True, accepted_overlaps={1986: {"Russia", "USSR"}})
-    # # The following should create an aggregate only for Europe.
-    # new = add_regions_to_table(tb=tb, ds_regions=ds_regions, regions=["Europe"], ds_income_groups=ds_income_groups, check_for_region_overlaps=True, accepted_overlaps={1986: {"Russia", "USSR"}})
-    # new = add_regions_to_table(tb=tb, ds_regions=ds_regions, regions={"Europe": {}}, ds_income_groups=ds_income_groups, check_for_region_overlaps=True, accepted_overlaps={1986: {"Russia", "USSR"}})
-    # # The following should create an aggregate for Europe, excluding USSR.
-    # new = add_regions_to_table(tb=tb, ds_regions=ds_regions, regions={"Europe": {"excluded_members": {"USSR"}}}, ds_income_groups=ds_income_groups, check_for_region_overlaps=True, accepted_overlaps={1986: {"Russia", "USSR"}})
-    # # This should raise a warning:
-    # new = add_regions_to_table(tb=tb, ds_regions=ds_regions, regions={"Europe": {"typo_excluded_members": {"USSR"}}}, ds_income_groups=ds_income_groups, check_for_region_overlaps=True, accepted_overlaps={1986: {"Russia", "USSR"}})
-    # tb = Table({"country": ["France", "France", "Italy", "Italy"], "year": [2020, 2021, 2021, 2022], "a": [1, 2, 3, 4], "b": [5, 6, 7, 8]})
-    # new = add_regions_to_table(tb=tb, ds_regions=ds_regions, ds_income_groups=ds_income_groups)
-    # new = add_regions_to_table(tb=tb, ds_regions=ds_regions, ds_income_groups=ds_income_groups, aggregations={"a": "sum", "b": "sum"})
-    # new = add_regions_to_table(tb=tb, ds_regions=ds_regions, ds_income_groups=ds_income_groups, aggregations={"a": "sum", "b": "mean"})
-    # new = add_regions_to_table(tb=tb, ds_regions=ds_regions, ds_income_groups=ds_income_groups, aggregations={"a": "sum"})
-    # tb = Table({"country": ["France", "France", "Italy", "Italy", "Europe", "Europe"], "year": [2020, 2021, 2021, 2022, 2020, 2021], "a": [1, 2, 3, 4, 0, 0], "b": [5, 6, 7, 8, 0, 0]})
-    # # The old data for Europe should be replaced by the new aggregates.
-    # new = add_regions_to_table(tb=tb, ds_regions=ds_regions, ds_income_groups=ds_income_groups)
-    # # The old data for Europe should be kept, with the appended text.
-    # new = add_regions_to_table(tb=tb, ds_regions=ds_regions, ds_income_groups=ds_income_groups, keep_original_region_with_suffix=" (old)")
-    # # In the following ambiguous case, the old Europe should be deleted, and a warning should be raised.
-    # new = add_regions_to_table(tb=tb, ds_regions=ds_regions, ds_income_groups=ds_income_groups, aggregations={"a": "mean"})
-    # tb = Table({"country": ["France", "France", "Italy", "Italy", "Spain", "Spain"], "year": [2020, 2021, 2021, 2022, 2021, 2022], "a": [1, 2, 3, 4, None, 6], "b": [7, 8, 9, 10, 11, 12]})
-    # new = add_regions_to_table(tb=tb, ds_regions=ds_regions, regions=["Europe"], num_allowed_nans_per_year=0)
-    # new = add_regions_to_table(tb=tb, ds_regions=ds_regions, regions=["Europe"], num_allowed_nans_per_year=1)
-    # tb = Table({"country": ["France", "France", "Italy", "Italy", "Spain", "Spain"], "year": [2020, 2021, 2021, 2022, 2021, 2022], "a": [1, 2, None, 4, None, 6], "b": [7, 8, 9, 10, 11, 12]})
-    # new = add_regions_to_table(tb=tb, ds_regions=ds_regions, regions=["Europe"], num_allowed_nans_per_year=1)
-    # new = add_regions_to_table(tb=tb, ds_regions=ds_regions, regions=["Europe"], num_allowed_nans_per_year=2)
-    # new = add_regions_to_table(tb=tb, ds_regions=ds_regions, regions=["Europe"], frac_allowed_nans_per_year=0)
-    # new = add_regions_to_table(tb=tb, ds_regions=ds_regions, regions=["Europe"], frac_allowed_nans_per_year=0.5)
-    # new = add_regions_to_table(tb=tb, ds_regions=ds_regions, regions=["Europe"], frac_allowed_nans_per_year=0.7)
-    # tb = Table({"c": ["France", "France", "Italy", "Italy", "Spain", "Spain"], "y": [2020, 2021, 2021, 2022, 2021, 2022], "a": [1, 2, None, 4, None, 6], "b": [7, 8, 9, 10, 11, 12]})
-    # new = add_regions_to_table(tb=tb, ds_regions=ds_regions, regions=["Europe"], country_col="c", year_col="y")
+        # This should raise a warning (because field "excluded_members" has a typo):
+        with capture_logs() as captured_logs:
+            tb_out = geo.add_regions_to_table(
+                tb=tb_in,
+                ds_regions=ds_regions,
+                regions={"Europe": {"typo_excluded_member": {"USSR"}}},
+                ds_income_groups=ds_income_groups,
+                check_for_region_overlaps=False,
+            )
+        assert captured_logs[0]["log_level"] == "warning"
+        assert "typo_excluded_member" in captured_logs[0]["event"]
+        assert dataframes.are_equal(tb_out, tb_expected)
 
-    # # TODO: I think min_num_values_per_year is not working as expected. Fix it in groupby_agg.
-    # # new = add_regions_to_table(tb=tb, ds_regions=ds_regions, regions=["Europe"], min_num_values_per_year=0)
-    # # new = add_regions_to_table(tb=tb, ds_regions=ds_regions, regions=["Europe"], min_num_values_per_year=1)
-    # # new = add_regions_to_table(tb=tb, ds_regions=ds_regions, regions=["Europe"], min_num_values_per_year=2)
-    # # TODO: Should include_historical_regions_in_income_groups be a parameter of add_regions_to_table?
+    def test_aggregates_with_income_groupos(self):
+        tb_in = Table.from_records(
+            [("France", 2020, 1, 5), ("France", 2021, 2, 6), ("Italy", 2021, 3, 7), ("Italy", 2022, 4, 8)],
+            columns=["country", "year", "a", "b"],
+        )
+        tb_expected = Table.from_records(
+            [
+                ("Europe", 2020, 1, 5),
+                ("Europe", 2021, 5, 13),
+                ("Europe", 2022, 4, 8),
+                ("France", 2020, 1, 5),
+                ("France", 2021, 2, 6),
+                ("High-income countries", 2020, 1, 5),
+                ("High-income countries", 2021, 5, 13),
+                ("High-income countries", 2022, 4, 8),
+                ("Italy", 2021, 3, 7),
+                ("Italy", 2022, 4, 8),
+            ],
+            columns=["country", "year", "a", "b"],
+        )
+        tb_out = geo.add_regions_to_table(tb=tb_in, ds_regions=ds_regions, ds_income_groups=ds_income_groups)
+        assert dataframes.are_equal(tb_out, tb_expected)
+
+    def test_specify_aggregates(self):
+        tb_in = Table.from_records(
+            [("France", 2020, 1, 5), ("France", 2021, 2, 6), ("Italy", 2021, 3, 7), ("Italy", 2022, 4, 8)],
+            columns=["country", "year", "a", "b"],
+        )
+        tb_expected = Table.from_records(
+            [
+                ("Europe", 2020, 1, 5),
+                ("Europe", 2021, 5, 13),
+                ("Europe", 2022, 4, 8),
+                ("France", 2020, 1, 5),
+                ("France", 2021, 2, 6),
+                ("High-income countries", 2020, 1, 5),
+                ("High-income countries", 2021, 5, 13),
+                ("High-income countries", 2022, 4, 8),
+                ("Italy", 2021, 3, 7),
+                ("Italy", 2022, 4, 8),
+            ],
+            columns=["country", "year", "a", "b"],
+        )
+        # Specify the aggregates for each column.
+        tb_out = geo.add_regions_to_table(
+            tb=tb_in, ds_regions=ds_regions, ds_income_groups=ds_income_groups, aggregations={"a": "sum", "b": "sum"}
+        )
+        assert dataframes.are_equal(tb_out, tb_expected)
+        # Idem, but now one of the columns uses sum and the other mean.
+        tb_expected = Table.from_records(
+            [
+                ("Europe", 2020, 1, 5),
+                ("Europe", 2021, 5, 6.5),
+                ("Europe", 2022, 4, 8),
+                ("France", 2020, 1, 5),
+                ("France", 2021, 2, 6),
+                ("High-income countries", 2020, 1, 5),
+                ("High-income countries", 2021, 5, 6.5),
+                ("High-income countries", 2022, 4, 8),
+                ("Italy", 2021, 3, 7),
+                ("Italy", 2022, 4, 8),
+            ],
+            columns=["country", "year", "a", "b"],
+        )
+        tb_out = geo.add_regions_to_table(
+            tb=tb_in, ds_regions=ds_regions, ds_income_groups=ds_income_groups, aggregations={"a": "sum", "b": "mean"}
+        )
+        assert dataframes.are_equal(tb_out, tb_expected)
+        # Now only one of the columns has an aggregate.
+        # The other column should keep its original data, but aggregates will only have nans in that column.
+        # Because of the nans, other values in that column become floats.
+        tb_expected = Table.from_records(
+            [
+                ("Europe", 2020, 1, np.nan),
+                ("Europe", 2021, 5, np.nan),
+                ("Europe", 2022, 4, np.nan),
+                ("France", 2020, 1, 5.0),
+                ("France", 2021, 2, 6.0),
+                ("High-income countries", 2020, 1, np.nan),
+                ("High-income countries", 2021, 5, np.nan),
+                ("High-income countries", 2022, 4, np.nan),
+                ("Italy", 2021, 3, 7.0),
+                ("Italy", 2022, 4, 8.0),
+            ],
+            columns=["country", "year", "a", "b"],
+        )
+        tb_out = geo.add_regions_to_table(
+            tb=tb_in, ds_regions=ds_regions, ds_income_groups=ds_income_groups, aggregations={"a": "sum"}
+        )
+        assert dataframes.are_equal(tb_out, tb_expected)
+
+    def test_region_data_already_existed(self):
+        tb_in = Table.from_records(
+            [
+                ("France", 2020, 1, 5),
+                ("France", 2021, 2, 6),
+                ("Italy", 2021, 3, 7),
+                ("Italy", 2022, 4, 8),
+                ("Europe", 2020, 0, 0),
+                ("Europe", 2021, 0, 0),
+                ("Europe", 2022, 0, 0),
+            ],
+            columns=["country", "year", "a", "b"],
+        )
+        # The old data for Europe should be replaced by the new aggregates.
+        tb_expected = Table.from_records(
+            [
+                ("Europe", 2020, 1, 5),
+                ("Europe", 2021, 5, 13),
+                ("Europe", 2022, 4, 8),
+                ("France", 2020, 1, 5),
+                ("France", 2021, 2, 6),
+                ("High-income countries", 2020, 1, 5),
+                ("High-income countries", 2021, 5, 13),
+                ("High-income countries", 2022, 4, 8),
+                ("Italy", 2021, 3, 7),
+                ("Italy", 2022, 4, 8),
+            ],
+            columns=["country", "year", "a", "b"],
+        )
+        tb_out = geo.add_regions_to_table(tb=tb_in, ds_regions=ds_regions, ds_income_groups=ds_income_groups)
+        assert dataframes.are_equal(tb_out, tb_expected)
+        # Now the old data for Europe should be kept, with the appended text.
+        tb_out = geo.add_regions_to_table(
+            tb=tb_in,
+            ds_regions=ds_regions,
+            ds_income_groups=ds_income_groups,
+            keep_original_region_with_suffix=" (old)",
+        )
+        tb_expected = Table.from_records(
+            [
+                ("Europe", 2020, 1, 5),
+                ("Europe", 2021, 5, 13),
+                ("Europe", 2022, 4, 8),
+                ("Europe (old)", 2020, 0, 0),
+                ("Europe (old)", 2021, 0, 0),
+                ("Europe (old)", 2022, 0, 0),
+                ("France", 2020, 1, 5),
+                ("France", 2021, 2, 6),
+                ("High-income countries", 2020, 1, 5),
+                ("High-income countries", 2021, 5, 13),
+                ("High-income countries", 2022, 4, 8),
+                ("Italy", 2021, 3, 7),
+                ("Italy", 2022, 4, 8),
+            ],
+            columns=["country", "year", "a", "b"],
+        )
+        assert dataframes.are_equal(tb_out, tb_expected)
+        # In the following case, Europe already has data for a column that does not have a defined aggregation ('b').
+        # That data will become nan, and a warning will be raised.
+        with capture_logs() as captured_logs:
+            tb_out = geo.add_regions_to_table(
+                tb=tb_in, ds_regions=ds_regions, ds_income_groups=ds_income_groups, aggregations={"a": "mean"}
+            )
+        assert captured_logs[0]["log_level"] == "warning"
+        assert "Europe" in captured_logs[0]["event"]
+        tb_expected = Table.from_records(
+            [
+                ("Europe", 2020, 1.0, None),
+                ("Europe", 2021, 2.5, None),
+                ("Europe", 2022, 4.0, None),
+                ("France", 2020, 1, 5.0),
+                ("France", 2021, 2, 6.0),
+                ("High-income countries", 2020, 1.0, None),
+                ("High-income countries", 2021, 2.5, None),
+                ("High-income countries", 2022, 4.0, None),
+                ("Italy", 2021, 3.0, 7.0),
+                ("Italy", 2022, 4.0, 8.0),
+            ],
+            columns=["country", "year", "a", "b"],
+        )
+        assert dataframes.are_equal(tb_out, tb_expected)
+
+    def test_nan_conditions(self):
+        tb_in = Table.from_records(
+            [
+                ("France", 2020, 1, 7),
+                ("France", 2021, 2, 8),
+                ("Italy", 2021, 3, 9),
+                ("Italy", 2022, 4, 10),
+                ("Spain", 2021, None, 11),
+                ("Spain", 2022, 6, 12),
+            ],
+            columns=["country", "year", "a", "b"],
+        )
+
+        # First allow zero nans.
+        tb_out = geo.add_regions_to_table(tb=tb_in, ds_regions=ds_regions, num_allowed_nans_per_year=0)
+        tb_expected = Table.from_records(
+            [
+                ("Europe", 2020, 1.0, 7),
+                ("Europe", 2021, None, 28),
+                ("Europe", 2022, 10.0, 22),
+                ("France", 2020, 1.0, 7),
+                ("France", 2021, 2.0, 8),
+                ("Italy", 2021, 3.0, 9),
+                ("Italy", 2022, 4.0, 10),
+                ("Spain", 2021, None, 11),
+                ("Spain", 2022, 6.0, 12),
+            ],
+            columns=["country", "year", "a", "b"],
+        )
+        assert dataframes.are_equal(tb_out, tb_expected)
+
+        # Now only one 1 nan is allowed.
+        tb_out = geo.add_regions_to_table(tb=tb_in, ds_regions=ds_regions, num_allowed_nans_per_year=1)
+        tb_expected = Table.from_records(
+            [
+                ("Europe", 2020, 1.0, 7),
+                ("Europe", 2021, 5.0, 28),
+                ("Europe", 2022, 10.0, 22),
+                ("France", 2020, 1.0, 7),
+                ("France", 2021, 2.0, 8),
+                ("Italy", 2021, 3.0, 9),
+                ("Italy", 2022, 4.0, 10),
+                ("Spain", 2021, None, 11),
+                ("Spain", 2022, 6.0, 12),
+            ],
+            columns=["country", "year", "a", "b"],
+        )
+        assert dataframes.are_equal(tb_out, tb_expected)
+
+        # Another example allowing 1 nan.
+        tb_in = Table.from_records(
+            [
+                ("France", 2020, 1, 7),
+                ("France", 2021, 2, 8),
+                ("Italy", 2021, None, 9),
+                ("Italy", 2022, 4, 10),
+                ("Spain", 2021, None, 11),
+                ("Spain", 2022, 6, 12),
+            ],
+            columns=["country", "year", "a", "b"],
+        )
+        tb_out = geo.add_regions_to_table(tb=tb_in, ds_regions=ds_regions, num_allowed_nans_per_year=1)
+        tb_expected = Table.from_records(
+            [
+                ("Europe", 2020, 1.0, 7),
+                ("Europe", 2021, None, 28),
+                ("Europe", 2022, 10.0, 22),
+                ("France", 2020, 1.0, 7),
+                ("France", 2021, 2.0, 8),
+                ("Italy", 2021, None, 9),
+                ("Italy", 2022, 4.0, 10),
+                ("Spain", 2021, None, 11),
+                ("Spain", 2022, 6.0, 12),
+            ],
+            columns=["country", "year", "a", "b"],
+        )
+        assert dataframes.are_equal(tb_out, tb_expected)
+
+        # Now allow 2 nans.
+        tb_out = geo.add_regions_to_table(tb=tb_in, ds_regions=ds_regions, num_allowed_nans_per_year=2)
+        tb_expected = Table.from_records(
+            [
+                ("Europe", 2020, 1.0, 7),
+                ("Europe", 2021, 2.0, 28),
+                ("Europe", 2022, 10.0, 22),
+                ("France", 2020, 1.0, 7),
+                ("France", 2021, 2.0, 8),
+                ("Italy", 2021, None, 9),
+                ("Italy", 2022, 4.0, 10),
+                ("Spain", 2021, None, 11),
+                ("Spain", 2022, 6.0, 12),
+            ],
+            columns=["country", "year", "a", "b"],
+        )
+        assert dataframes.are_equal(tb_out, tb_expected)
+
+        # Now impose a fraction of allowed nans of exactly zero.
+        tb_out = geo.add_regions_to_table(tb=tb_in, ds_regions=ds_regions, frac_allowed_nans_per_year=0)
+        tb_expected = Table.from_records(
+            [
+                ("Europe", 2020, 1.0, 7),
+                ("Europe", 2021, None, 28),
+                ("Europe", 2022, 10.0, 22),
+                ("France", 2020, 1.0, 7),
+                ("France", 2021, 2.0, 8),
+                ("Italy", 2021, None, 9),
+                ("Italy", 2022, 4.0, 10),
+                ("Spain", 2021, None, 11),
+                ("Spain", 2022, 6.0, 12),
+            ],
+            columns=["country", "year", "a", "b"],
+        )
+        assert dataframes.are_equal(tb_out, tb_expected)
+
+        # Now allow for 50% nans.
+        tb_out = geo.add_regions_to_table(tb=tb_in, ds_regions=ds_regions, frac_allowed_nans_per_year=0.5)
+        tb_expected = Table.from_records(
+            [
+                ("Europe", 2020, 1.0, 7),
+                ("Europe", 2021, None, 28),
+                ("Europe", 2022, 10.0, 22),
+                ("France", 2020, 1.0, 7),
+                ("France", 2021, 2.0, 8),
+                ("Italy", 2021, None, 9),
+                ("Italy", 2022, 4.0, 10),
+                ("Spain", 2021, None, 11),
+                ("Spain", 2022, 6.0, 12),
+            ],
+            columns=["country", "year", "a", "b"],
+        )
+        assert dataframes.are_equal(tb_out, tb_expected)
+
+        # Now allow for maximum 70% nans.
+        tb_out = geo.add_regions_to_table(tb=tb_in, ds_regions=ds_regions, frac_allowed_nans_per_year=0.7)
+        tb_expected = Table.from_records(
+            [
+                ("Europe", 2020, 1.0, 7),
+                ("Europe", 2021, 2.0, 28),
+                ("Europe", 2022, 10.0, 22),
+                ("France", 2020, 1.0, 7),
+                ("France", 2021, 2.0, 8),
+                ("Italy", 2021, None, 9),
+                ("Italy", 2022, 4.0, 10),
+                ("Spain", 2021, None, 11),
+                ("Spain", 2022, 6.0, 12),
+            ],
+            columns=["country", "year", "a", "b"],
+        )
+        assert dataframes.are_equal(tb_out, tb_expected)
+
+        # Now impose a minimum number of valid values of zero (which is always fulfilled).
+        tb_out = geo.add_regions_to_table(tb=tb_in, ds_regions=ds_regions, min_num_values_per_year=0)
+        tb_expected = Table.from_records(
+            [
+                ("Europe", 2020, 1.0, 7),
+                ("Europe", 2021, 2.0, 28),
+                ("Europe", 2022, 10.0, 22),
+                ("France", 2020, 1.0, 7),
+                ("France", 2021, 2.0, 8),
+                ("Italy", 2021, None, 9),
+                ("Italy", 2022, 4.0, 10),
+                ("Spain", 2021, None, 11),
+                ("Spain", 2022, 6.0, 12),
+            ],
+            columns=["country", "year", "a", "b"],
+        )
+        assert dataframes.are_equal(tb_out, tb_expected)
+
+        # Now impose a minimum of 1 valid value per group.
+        tb_out = geo.add_regions_to_table(tb=tb_in, ds_regions=ds_regions, min_num_values_per_year=1)
+        tb_expected = Table.from_records(
+            [
+                ("Europe", 2020, 1.0, 7),
+                ("Europe", 2021, 2.0, 28),
+                ("Europe", 2022, 10.0, 22),
+                ("France", 2020, 1.0, 7),
+                ("France", 2021, 2.0, 8),
+                ("Italy", 2021, None, 9),
+                ("Italy", 2022, 4.0, 10),
+                ("Spain", 2021, None, 11),
+                ("Spain", 2022, 6.0, 12),
+            ],
+            columns=["country", "year", "a", "b"],
+        )
+        assert dataframes.are_equal(tb_out, tb_expected)
+
+        # Now impose a minimum of 2 valid values per group.
+        tb_out = geo.add_regions_to_table(tb=tb_in, ds_regions=ds_regions, min_num_values_per_year=2)
+        tb_expected = Table.from_records(
+            [
+                ("Europe", 2020, 1.0, 7),
+                ("Europe", 2021, None, 28),
+                ("Europe", 2022, 10.0, 22),
+                ("France", 2020, 1.0, 7),
+                ("France", 2021, 2.0, 8),
+                ("Italy", 2021, None, 9),
+                ("Italy", 2022, 4.0, 10),
+                ("Spain", 2021, None, 11),
+                ("Spain", 2022, 6.0, 12),
+            ],
+            columns=["country", "year", "a", "b"],
+        )
+        assert dataframes.are_equal(tb_out, tb_expected)
+
+    def test_changing_country_and_year_col(self):
+        tb_in = Table.from_records(
+            [
+                ("France", 2020, 1, 5),
+                ("France", 2021, 2, 6),
+                ("Spain", 2021, 3, 7),
+                ("Spain", 2022, 4, 8),
+            ],
+            columns=["c", "y", "a", "b"],
+        )
+        tb_out = geo.add_regions_to_table(tb=tb_in, ds_regions=ds_regions, country_col="c", year_col="y")
+        tb_expected = Table.from_records(
+            [
+                ("Europe", 2020, 1, 5),
+                ("Europe", 2021, 5, 13),
+                ("Europe", 2022, 4, 8),
+                ("France", 2020, 1, 5),
+                ("France", 2021, 2, 6),
+                ("Spain", 2021, 3, 7),
+                ("Spain", 2022, 4, 8),
+            ],
+            columns=["c", "y", "a", "b"],
+        )
+        assert dataframes.are_equal(tb_out, tb_expected)
