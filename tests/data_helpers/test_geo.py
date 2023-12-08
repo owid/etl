@@ -859,7 +859,7 @@ ds_regions = MockRegionsDataset()
 ds_income_groups = MockIncomeGroupsDataset()
 
 
-class TestAddRegionsToTable:
+class TestAddRegionsToTable(unittest.TestCase):
     def test_overlaps_without_income_groups(self):
         tb_in = Table.from_records(
             [("USSR", 1985, 1), ("USSR", 1986, 2), ("Russia", 1986, 3), ("Russia", 2000, 4)],
@@ -879,14 +879,14 @@ class TestAddRegionsToTable:
         )
         # Do not check for overlaps.
         tb_out = geo.add_regions_to_table(tb=tb_in, ds_regions=ds_regions, check_for_region_overlaps=False)
-        assert dataframes.are_equal(tb_out, tb_expected)
+        assert dataframes.are_equal(tb_out, tb_expected)[0]
 
         # Check for overlaps. Now a warning should be raised, since Russia and USSR overlap in 1986.
         with capture_logs() as captured_logs:
             tb_out = geo.add_regions_to_table(tb=tb_in, ds_regions=ds_regions, check_for_region_overlaps=True)
         assert captured_logs[0]["log_level"] == "warning"
         assert "overlap" in captured_logs[0]["event"]
-        assert dataframes.are_equal(tb_out, tb_expected)
+        assert dataframes.are_equal(tb_out, tb_expected)[0]
 
         # Now run the same line again, but passing the expected overlap. No warning should be raised.
         with capture_logs() as captured_logs:
@@ -897,7 +897,7 @@ class TestAddRegionsToTable:
                 accepted_overlaps={1986: {"Russia", "USSR"}},
             )
         assert captured_logs == []
-        assert dataframes.are_equal(tb_out, tb_expected)
+        assert dataframes.are_equal(tb_out, tb_expected)[0]
 
         # All the following should raise a warning, since the given overlaps are not exactly right.
         for accepted_overlaps in [
@@ -911,7 +911,7 @@ class TestAddRegionsToTable:
                 )
             assert captured_logs[0]["log_level"] == "warning"
             assert "overlap" in captured_logs[0]["event"]
-            assert dataframes.are_equal(tb_out, tb_expected)
+            assert dataframes.are_equal(tb_out, tb_expected)[0]
 
     def test_overlaps_with_income_groups(self):
         tb_in = Table.from_records(
@@ -936,7 +936,7 @@ class TestAddRegionsToTable:
         tb_out = geo.add_regions_to_table(
             tb=tb_in, ds_regions=ds_regions, ds_income_groups=ds_income_groups, check_for_region_overlaps=False
         )
-        assert dataframes.are_equal(tb_out, tb_expected)
+        assert dataframes.are_equal(tb_out, tb_expected)[0]
 
         # Check for overlaps.
         tb_out = geo.add_regions_to_table(
@@ -946,7 +946,7 @@ class TestAddRegionsToTable:
             check_for_region_overlaps=True,
             accepted_overlaps={1986: {"Russia", "USSR"}},
         )
-        assert dataframes.are_equal(tb_out, tb_expected)
+        assert dataframes.are_equal(tb_out, tb_expected)[0]
 
     def test_overlaps_of_zeros(self):
         tb_in = Table.from_records(
@@ -969,7 +969,7 @@ class TestAddRegionsToTable:
         tb_out = geo.add_regions_to_table(
             tb=tb_in, ds_regions=ds_regions, check_for_region_overlaps=True, ignore_overlaps_of_zeros=True
         )
-        assert dataframes.are_equal(tb_out, tb_expected)
+        assert dataframes.are_equal(tb_out, tb_expected)[0]
 
     def test_passing_explicit_list_of_countries(self):
         tb_in = Table.from_records(
@@ -1006,7 +1006,7 @@ class TestAddRegionsToTable:
             ds_income_groups=ds_income_groups,
             check_for_region_overlaps=False,
         )
-        assert dataframes.are_equal(tb_out, tb_expected)
+        assert dataframes.are_equal(tb_out, tb_expected)[0]
         # Idem when passing a dictionary without modifications.
         tb_out = geo.add_regions_to_table(
             tb=tb_in,
@@ -1015,7 +1015,7 @@ class TestAddRegionsToTable:
             ds_income_groups=ds_income_groups,
             check_for_region_overlaps=False,
         )
-        assert dataframes.are_equal(tb_out, tb_expected)
+        assert dataframes.are_equal(tb_out, tb_expected)[0]
         # The following should create an aggregate for Europe, excluding USSR.
         tb_out = geo.add_regions_to_table(
             tb=tb_in,
@@ -1048,7 +1048,7 @@ class TestAddRegionsToTable:
             )
         assert captured_logs[0]["log_level"] == "warning"
         assert "typo_excluded_member" in captured_logs[0]["event"]
-        assert dataframes.are_equal(tb_out, tb_expected)
+        assert dataframes.are_equal(tb_out, tb_expected)[0]
 
     def test_aggregates_with_income_groupos(self):
         tb_in = Table.from_records(
@@ -1071,7 +1071,7 @@ class TestAddRegionsToTable:
             columns=["country", "year", "a", "b"],
         )
         tb_out = geo.add_regions_to_table(tb=tb_in, ds_regions=ds_regions, ds_income_groups=ds_income_groups)
-        assert dataframes.are_equal(tb_out, tb_expected)
+        assert dataframes.are_equal(tb_out, tb_expected)[0]
 
     def test_specify_aggregates(self):
         tb_in = Table.from_records(
@@ -1097,7 +1097,7 @@ class TestAddRegionsToTable:
         tb_out = geo.add_regions_to_table(
             tb=tb_in, ds_regions=ds_regions, ds_income_groups=ds_income_groups, aggregations={"a": "sum", "b": "sum"}
         )
-        assert dataframes.are_equal(tb_out, tb_expected)
+        assert dataframes.are_equal(tb_out, tb_expected)[0]
         # Idem, but now one of the columns uses sum and the other mean.
         tb_expected = Table.from_records(
             [
@@ -1117,7 +1117,7 @@ class TestAddRegionsToTable:
         tb_out = geo.add_regions_to_table(
             tb=tb_in, ds_regions=ds_regions, ds_income_groups=ds_income_groups, aggregations={"a": "sum", "b": "mean"}
         )
-        assert dataframes.are_equal(tb_out, tb_expected)
+        assert dataframes.are_equal(tb_out, tb_expected)[0]
         # Now only one of the columns has an aggregate.
         # The other column should keep its original data, but aggregates will only have nans in that column.
         # Because of the nans, other values in that column become floats.
@@ -1139,7 +1139,7 @@ class TestAddRegionsToTable:
         tb_out = geo.add_regions_to_table(
             tb=tb_in, ds_regions=ds_regions, ds_income_groups=ds_income_groups, aggregations={"a": "sum"}
         )
-        assert dataframes.are_equal(tb_out, tb_expected)
+        assert dataframes.are_equal(tb_out, tb_expected)[0]
 
     def test_region_data_already_existed(self):
         tb_in = Table.from_records(
@@ -1171,7 +1171,7 @@ class TestAddRegionsToTable:
             columns=["country", "year", "a", "b"],
         )
         tb_out = geo.add_regions_to_table(tb=tb_in, ds_regions=ds_regions, ds_income_groups=ds_income_groups)
-        assert dataframes.are_equal(tb_out, tb_expected)
+        assert dataframes.are_equal(tb_out, tb_expected)[0]
         # Now the old data for Europe should be kept, with the appended text.
         tb_out = geo.add_regions_to_table(
             tb=tb_in,
@@ -1197,7 +1197,7 @@ class TestAddRegionsToTable:
             ],
             columns=["country", "year", "a", "b"],
         )
-        assert dataframes.are_equal(tb_out, tb_expected)
+        assert dataframes.are_equal(tb_out, tb_expected)[0]
         # In the following case, Europe already has data for a column that does not have a defined aggregation ('b').
         # That data will become nan, and a warning will be raised.
         with capture_logs() as captured_logs:
@@ -1221,7 +1221,7 @@ class TestAddRegionsToTable:
             ],
             columns=["country", "year", "a", "b"],
         )
-        assert dataframes.are_equal(tb_out, tb_expected)
+        assert dataframes.are_equal(tb_out, tb_expected)[0]
 
     def test_nan_conditions(self):
         tb_in = Table.from_records(
@@ -1252,7 +1252,7 @@ class TestAddRegionsToTable:
             ],
             columns=["country", "year", "a", "b"],
         )
-        assert dataframes.are_equal(tb_out, tb_expected)
+        assert dataframes.are_equal(tb_out, tb_expected)[0]
 
         # Now only one 1 nan is allowed.
         tb_out = geo.add_regions_to_table(tb=tb_in, ds_regions=ds_regions, num_allowed_nans_per_year=1)
@@ -1270,7 +1270,7 @@ class TestAddRegionsToTable:
             ],
             columns=["country", "year", "a", "b"],
         )
-        assert dataframes.are_equal(tb_out, tb_expected)
+        assert dataframes.are_equal(tb_out, tb_expected)[0]
 
         # Another example allowing 1 nan.
         tb_in = Table.from_records(
@@ -1299,7 +1299,7 @@ class TestAddRegionsToTable:
             ],
             columns=["country", "year", "a", "b"],
         )
-        assert dataframes.are_equal(tb_out, tb_expected)
+        assert dataframes.are_equal(tb_out, tb_expected)[0]
 
         # Now allow 2 nans.
         tb_out = geo.add_regions_to_table(tb=tb_in, ds_regions=ds_regions, num_allowed_nans_per_year=2)
@@ -1317,7 +1317,7 @@ class TestAddRegionsToTable:
             ],
             columns=["country", "year", "a", "b"],
         )
-        assert dataframes.are_equal(tb_out, tb_expected)
+        assert dataframes.are_equal(tb_out, tb_expected)[0]
 
         # Now impose a fraction of allowed nans of exactly zero.
         tb_out = geo.add_regions_to_table(tb=tb_in, ds_regions=ds_regions, frac_allowed_nans_per_year=0)
@@ -1335,7 +1335,7 @@ class TestAddRegionsToTable:
             ],
             columns=["country", "year", "a", "b"],
         )
-        assert dataframes.are_equal(tb_out, tb_expected)
+        assert dataframes.are_equal(tb_out, tb_expected)[0]
 
         # Now allow for 50% nans.
         tb_out = geo.add_regions_to_table(tb=tb_in, ds_regions=ds_regions, frac_allowed_nans_per_year=0.5)
@@ -1353,7 +1353,7 @@ class TestAddRegionsToTable:
             ],
             columns=["country", "year", "a", "b"],
         )
-        assert dataframes.are_equal(tb_out, tb_expected)
+        assert dataframes.are_equal(tb_out, tb_expected)[0]
 
         # Now allow for maximum 70% nans.
         tb_out = geo.add_regions_to_table(tb=tb_in, ds_regions=ds_regions, frac_allowed_nans_per_year=0.7)
@@ -1371,7 +1371,7 @@ class TestAddRegionsToTable:
             ],
             columns=["country", "year", "a", "b"],
         )
-        assert dataframes.are_equal(tb_out, tb_expected)
+        assert dataframes.are_equal(tb_out, tb_expected)[0]
 
         # Now impose a minimum number of valid values of zero (which is always fulfilled).
         tb_out = geo.add_regions_to_table(tb=tb_in, ds_regions=ds_regions, min_num_values_per_year=0)
@@ -1389,7 +1389,7 @@ class TestAddRegionsToTable:
             ],
             columns=["country", "year", "a", "b"],
         )
-        assert dataframes.are_equal(tb_out, tb_expected)
+        assert dataframes.are_equal(tb_out, tb_expected)[0]
 
         # Now impose a minimum of 1 valid value per group.
         tb_out = geo.add_regions_to_table(tb=tb_in, ds_regions=ds_regions, min_num_values_per_year=1)
@@ -1407,7 +1407,7 @@ class TestAddRegionsToTable:
             ],
             columns=["country", "year", "a", "b"],
         )
-        assert dataframes.are_equal(tb_out, tb_expected)
+        assert dataframes.are_equal(tb_out, tb_expected)[0]
 
         # Now impose a minimum of 2 valid values per group.
         tb_out = geo.add_regions_to_table(tb=tb_in, ds_regions=ds_regions, min_num_values_per_year=2)
@@ -1425,7 +1425,7 @@ class TestAddRegionsToTable:
             ],
             columns=["country", "year", "a", "b"],
         )
-        assert dataframes.are_equal(tb_out, tb_expected)
+        assert dataframes.are_equal(tb_out, tb_expected)[0]
 
     def test_changing_country_and_year_col(self):
         tb_in = Table.from_records(
@@ -1450,4 +1450,70 @@ class TestAddRegionsToTable:
             ],
             columns=["c", "y", "a", "b"],
         )
-        assert dataframes.are_equal(tb_out, tb_expected)
+        assert dataframes.are_equal(tb_out, tb_expected)[0]
+
+    def test_countries_that_must_have_data(self):
+        tb_in = Table.from_records(
+            [
+                ("France", 2020, 1, 5),
+                ("France", 2021, 2, 6),
+                ("Italy", 2021, 3, 7),
+                ("Italy", 2022, 4, 8),
+            ],
+            columns=["country", "year", "a", "b"],
+        )
+        # First check result without countries_that_must_have_data.
+        # Also check that the result is identical if countries_that_must_have_data is [] or {}.
+        for countries_that_must_have_data in [[], {}, None]:
+            tb_out = geo.add_regions_to_table(
+                tb=tb_in,
+                regions=["Europe"],
+                ds_regions=ds_regions,
+                ds_income_groups=ds_income_groups,
+                countries_that_must_have_data=countries_that_must_have_data,
+            )
+            tb_expected = Table.from_records(
+                [
+                    ("Europe", 2020, 1, 5),
+                    ("Europe", 2021, 5, 13),
+                    ("Europe", 2022, 4, 8),
+                    ("France", 2020, 1, 5),
+                    ("France", 2021, 2, 6),
+                    ("Italy", 2021, 3, 7),
+                    ("Italy", 2022, 4, 8),
+                ],
+                columns=["country", "year", "a", "b"],
+            )
+            assert dataframes.are_equal(tb_out, tb_expected)[0]
+
+        # Now impose that a country must have data.
+        tb_out = geo.add_regions_to_table(
+            tb=tb_in,
+            regions=["Europe"],
+            ds_regions=ds_regions,
+            ds_income_groups=ds_income_groups,
+            countries_that_must_have_data={"Europe": ["Italy"]},
+        )
+        tb_expected = Table.from_records(
+            [
+                ("Europe", 2020, None, None),
+                ("Europe", 2021, 5, 13),
+                ("Europe", 2022, 4, 8),
+                ("France", 2020, 1, 5),
+                ("France", 2021, 2, 6),
+                ("Italy", 2021, 3, 7),
+                ("Italy", 2022, 4, 8),
+            ],
+            columns=["country", "year", "a", "b"],
+        )
+        assert dataframes.are_equal(tb_out, tb_expected)[0]
+
+        # If the keys of the dictionary are not known regions, an error should be raised.
+        with self.assertRaises(AssertionError):
+            _ = geo.add_regions_to_table(
+                tb=tb_in,
+                regions=["Europe"],
+                ds_regions=ds_regions,
+                ds_income_groups=ds_income_groups,
+                countries_that_must_have_data={"Unknown region": ["Random"]},
+            )
