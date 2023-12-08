@@ -1121,7 +1121,8 @@ def add_regions_to_table(
         # {1991: {"Georgia", "USSR"}}
         # Check whether all accepted overlaps are found in the data, and that there are no new unknown overlaps.
         if accepted_overlaps != all_overlaps:
-            log.warning("Either the list of accepted overlaps is not found in the data, or there are unknown overlaps.")
+            log.warning("Either the list of accepted overlaps is not found in the data or there are unknown overlaps. "\
+                        f"Accepted overlaps: {accepted_overlaps}.\nFound overlaps: {all_overlaps}.")
 
     if aggregations is None:
         # Create region aggregates for all columns (with a simple sum) except for index columns.
