@@ -58,12 +58,10 @@ REFERENCE_YEAR = 2018
 # DEPRECATED: Default paths when silently loading population and income groups datasets.
 # Paths to datasets used in this module. Feel free to update the versions or paths whenever there is a
 # new version of the datasets.
-# Path to Key Indicators dataset (TODO: should change it)
 # DATASET_POPULATION = DATA_DIR / "garden" / "demography" / "2023-03-31" / "population"
 DATASET_POPULATION = DATA_DIR / "garden" / "owid" / "latest" / "key_indicators"
 TNAME_KEY_INDICATORS = "population"
 # Path to Key Indicators dataset
-# TODO: we should update it to latest garden/wb/*/income_groups dataset
 DATASET_WB_INCOME = DATA_DIR / "garden" / "wb" / "2021-07-01" / "wb_income"
 TNAME_WB_INCOME = "wb_income_group"
 ########################################################################################################################
@@ -132,13 +130,10 @@ def list_countries_in_region(
     if countries_regions is None:
         countries_regions = _load_countries_regions()
 
-    # TODO: Remove lines related to income_groups once they are included in countries-regions dataset.
     if income_groups is None:
         income_groups = _load_income_groups().reset_index()
     income_groups_names = income_groups["income_group"].dropna().unique().tolist()  # type: ignore
 
-    # TODO: Once countries-regions has additional columns 'is_historic' and 'is_country', select only countries, and not
-    #  historical regions.
     if region in countries_regions["name"].tolist():
         # Find codes of member countries in this region.
         member_codes_str = countries_regions[countries_regions["name"] == region]["members"].item()
@@ -979,6 +974,7 @@ def add_regions_to_table(
     check_for_region_overlaps: bool = True,
     accepted_overlaps: Optional[Dict[int, Set[str]]] = None,
     ignore_overlaps_of_zeros: bool = False,
+    countries_that_must_have_data: Optional[Dict[str, List[str]]] = None,
 ) -> Table:
     df_with_regions = pd.DataFrame(tb).copy()
 
@@ -1021,6 +1017,18 @@ def add_regions_to_table(
         # Assume they are known regions and they have no modifications.
         regions = {region: {} for region in regions}
 
+    if countries_that_must_have_data:
+        # If countries_that_must_have_data is neither None or [], it must be a dictionary with regions as keys.
+        # Check that the dictionary has the right format.
+        error = "Argument countries_that_must_have_data must be a dictionary with regions as keys."
+        assert set(countries_that_must_have_data) <= set(regions), error
+        # Fill missing regions with an empty list.
+        countries_that_must_have_data = {
+            region: countries_that_must_have_data.get(region, []) for region in list(regions)
+        }
+    else:
+        countries_that_must_have_data = {region: [] for region in list(regions)}
+
     # Add region aggregates.
     for region in regions:
         # Check that the content of the region dictionary is as expected.
@@ -1049,18 +1057,13 @@ def add_regions_to_table(
             region=region,
             aggregations=aggregations,
             countries_in_region=members,
-            # TODO: This could be a dictionary, with different lists of countries for different regions.
-            countries_that_must_have_data=[],
+            countries_that_must_have_data=countries_that_must_have_data[region],
             num_allowed_nans_per_year=num_allowed_nans_per_year,
             frac_allowed_nans_per_year=frac_allowed_nans_per_year,
             min_num_values_per_year=min_num_values_per_year,
             country_col=country_col,
             year_col=year_col,
             keep_original_region_with_suffix=keep_original_region_with_suffix,
-            # Population is only required if countries_that_must_have_data is "auto", which is not yet implemented.
-            # TODO: Once countries_that_must_have_data is implemented, pass ds_population as an argument, and input here
-            # its main table.
-            population=None,
         )
 
     # If the original object was a Table, copy metadata
@@ -1068,3 +1071,29 @@ def add_regions_to_table(
         return Table(df_with_regions).copy_metadata(tb)
     else:
         return df_with_regions  # type: ignore
+
+
+# from etl.paths import DATA_DIR
+# from owid.catalog import Dataset, Table
+
+ds_regions = Dataset(DATA_DIR / "garden/regions/2023-01-01/regions")
+ds_income_groups = Dataset(DATA_DIR / "garden/wb/2023-04-30/income_groups")
+tb_in = Table.from_records(
+    [
+        ("France", 2020, 1, 5),
+        ("France", 2021, 2, 6),
+        ("Italy", 2021, 3, 7),
+        ("Italy", 2022, 4, 8),
+        ("Europe", 2020, 0, 0),
+        ("Europe", 2021, 0, 0),
+        ("Europe", 2022, 0, 0),
+    ],
+    columns=["country", "year", "a", "b"],
+)
+add_regions_to_table(
+    tb=tb_in,
+    regions=["Europe"],
+    ds_regions=ds_regions,
+    ds_income_groups=ds_income_groups,
+    countries_that_must_have_data={"Europe": ["Italy"]},
+)
