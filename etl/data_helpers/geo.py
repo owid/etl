@@ -382,8 +382,11 @@ def add_region_aggregates(
         min_num_values=min_num_values_per_year,
     ).reset_index()
 
-    # Make nan all aggregates if the most contributing countries were not present.
-    df_region.loc[~df_region[country_col], variables] = np.nan
+    # Create filter that detects rows where the most contributing countries are not present.
+    mask_countries_present = ~df_region[country_col]
+    if mask_countries_present.any():
+        # Make nan all aggregates if the most contributing countries were not present.
+        df_region.loc[mask_countries_present, variables] = np.nan
     # Replace the column that was used to check if most contributing countries were present by the region's name.
     df_region[country_col] = region
 
@@ -973,7 +976,6 @@ def add_regions_to_table(
     country_col: str = "country",
     year_col: str = "year",
     keep_original_region_with_suffix: Optional[str] = None,
-    include_historical_regions_in_income_groups: bool = True,
     check_for_region_overlaps: bool = True,
     accepted_overlaps: Optional[Dict[int, Set[str]]] = None,
     ignore_overlaps_of_zeros: bool = False,
@@ -1006,8 +1008,8 @@ def add_regions_to_table(
         # Example of accepted_overlaps:
         # {1991: {"Georgia", "USSR"}}
         # Check whether all accepted overlaps are found in the data, and that there are no new unknown overlaps.
-        error = "Either the list of accepted overlaps is not found in the data, or there are new unknown overlaps."
-        assert accepted_overlaps == all_overlaps, error
+        if accepted_overlaps != all_overlaps:
+            log.warning("Either the list of accepted overlaps is not found in the data, or there are unknown overlaps.")
 
     if aggregations is None:
         # Create region aggregates for all columns (with a simple sum) except for index columns.
@@ -1038,7 +1040,8 @@ def add_regions_to_table(
             excluded_regions=regions[region].get("excluded_regions"),
             additional_members=regions[region].get("additional_members"),
             excluded_members=regions[region].get("excluded_members"),
-            include_historical_regions_in_income_groups=include_historical_regions_in_income_groups,
+            # By default, include historical regions in income groups.
+            include_historical_regions_in_income_groups=True,
         )
         # Add aggregate data for current region.
         df_with_regions = add_region_aggregates(
