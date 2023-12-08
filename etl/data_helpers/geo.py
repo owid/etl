@@ -1071,29 +1071,3 @@ def add_regions_to_table(
         return Table(df_with_regions).copy_metadata(tb)
     else:
         return df_with_regions  # type: ignore
-
-
-# from etl.paths import DATA_DIR
-# from owid.catalog import Dataset, Table
-
-ds_regions = Dataset(DATA_DIR / "garden/regions/2023-01-01/regions")
-ds_income_groups = Dataset(DATA_DIR / "garden/wb/2023-04-30/income_groups")
-tb_in = Table.from_records(
-    [
-        ("France", 2020, 1, 5),
-        ("France", 2021, 2, 6),
-        ("Italy", 2021, 3, 7),
-        ("Italy", 2022, 4, 8),
-        ("Europe", 2020, 0, 0),
-        ("Europe", 2021, 0, 0),
-        ("Europe", 2022, 0, 0),
-    ],
-    columns=["country", "year", "a", "b"],
-)
-add_regions_to_table(
-    tb=tb_in,
-    regions=["Europe"],
-    ds_regions=ds_regions,
-    ds_income_groups=ds_income_groups,
-    countries_that_must_have_data={"Europe": ["Italy"]},
-)
