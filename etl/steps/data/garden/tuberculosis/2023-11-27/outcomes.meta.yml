@@ -1,0 +1,118 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Tuberculosis
+        - Causes of Death
+    display:
+      numDecimalPlaces: 0
+    processing_level: minor
+    unit: cases
+tables:
+  outcomes:
+    variables:
+      rel_with_new_flg:
+        title: Are outcomes of relapse cases included in the new and relapse cases outcome variables?
+        unit: ""
+      used_2021_defs_flg:
+        title: Are the 2021 definitions used?
+        description_short: Are outcomes for both drug-susceptible and drug-resistant TB reported in line with the revised definitions published by WHO in April 2021 at https://www.who.int/publications/i/item/9789240022195?
+        unit: ""
+      newrel_coh:
+        title: New and relapse cases - cohort size
+        description_short: Number of previously treated cases in the cohort.
+      newrel_succ:
+        title: New and relapse cases - treatment success
+        description_short: Number of previously treated cases who were cureed or completed treatment.
+      newrel_fail:
+        title: New and relapse cases - treatment failure
+        description_short: Number of previously treated cases were the treatment failed.
+      newrel_died:
+        title: New and relapse cases - died
+        description_short: Number of previously treated cases who died.
+      newrel_lost:
+        title: New and relapse cases - lost to follow-up
+        description_short: Number of previously treated cases who were lost to follow-up.
+      c_new_tsr:
+        title: Treatment success rate for new and relapse cases
+        description_short: Treatment success rate among new and relapse cases.
+        description_key:
+          - Relapse cases may not consistently be included in this variable
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+      ret_nrel_coh:
+        title: Re-treatment cases - cohort size
+        description_short: Number of previously treated cases in the cohort.
+      ret_nrel_succ:
+        title: Re-treatment cases - treatment success
+        description_short: Number of previously treated cases who were cureed or completed treatment.
+      ret_nrel_fail:
+        title: Re-treatment cases - treatment failure
+        description_short: Number of previously treated cases were the treatment failed.
+      ret_nrel_died:
+        title: Re-treatment cases - died
+        description_short: Number of previously treated cases who died.
+      ret_nrel_lost:
+        title: Re-treatment cases - lost to follow-up
+        description_short: Number of previously treated cases who were lost to follow-up.
+      c_ret_tsr:
+        title: Treatment success rate for re-treatment cases
+        description_short: Treatment success rate among re-treatment cases.
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+      tbhiv_coh:
+        title: HIV-positive TB cases - cohort size
+        description_short: Number of HIV-positive TB cases in the cohort.
+      tbhiv_succ:
+        title: HIV-positive TB cases - treatment success
+        description_short: Number of HIV-positive TB cases who were cureed or completed treatment.
+      tbhiv_fail:
+        title: HIV-positive TB cases - treatment failure
+        description_short: Number of HIV-positive TB cases were the treatment failed.
+      tbhiv_died:
+        title: HIV-positive TB cases - died
+        description_short: Number of HIV-positive TB cases who died.
+      tbhiv_lost:
+        title: HIV-positive TB cases - lost to follow-up
+        description_short: Number of HIV-positive TB cases who were lost to follow-up.
+      c_tbhiv_tsr:
+        title: Treatment success rate for HIV-positive TB cases
+        description_short: Treatment success rate among HIV-positive TB cases.
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+      mdr_coh:
+        title: Multidrug-resistant TB cases - cohort size
+        description_short: Number of multidrug-resistant TB cases in the cohort.
+      mdr_succ:
+        title: Multidrug-resistant TB cases - treatment success
+        description_short: Number of multidrug-resistant TB cases who were cureed or completed treatment.
+      mdr_fail:
+        title: Multidrug-resistant TB cases - treatment failure
+        description_short: Number of multidrug-resistant TB cases were the treatment failed.
+      mdr_died:
+        title: Multidrug-resistant TB cases - died
+        description_short: Number of multidrug-resistant TB cases who died.
+      mdr_lost:
+        title: Multidrug-resistant TB cases - lost to follow-up
+        description_short: Number of multidrug-resistant TB cases who were lost to follow-up.
+      xdr_coh:
+        title: Extensively drug-resistant TB cases - cohort size
+        description_short: Number of extensively drug-resistant TB cases in the cohort.
+      xdr_succ:
+        title: Extensively drug-resistant TB cases - treatment success
+        description_short: Number of extensively drug-resistant TB cases who were cureed or completed treatment.
+      xdr_fail:
+        title: Extensively drug-resistant TB cases - treatment failure
+        description_short: Number of extensively drug-resistant TB cases were the treatment failed.
+      xdr_died:
+        title: Extensively drug-resistant TB cases - died
+        description_short: Number of extensively drug-resistant TB cases who died.
+      xdr_lost:
+        title: Extensively drug-resistant TB cases - lost to follow-up
+        description_short: Number of extensively drug-resistant TB cases who were lost to follow-up.
