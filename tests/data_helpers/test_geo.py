@@ -894,16 +894,16 @@ class TestAddRegionsToTable(unittest.TestCase):
                 tb=tb_in,
                 ds_regions=ds_regions,
                 check_for_region_overlaps=True,
-                accepted_overlaps={1986: {"Russia", "USSR"}},
+                accepted_overlaps=[{1986: {"Russia", "USSR"}}],
             )
         assert captured_logs == []
         assert dataframes.are_equal(tb_out, tb_expected)[0]
 
         # All the following should raise a warning, since the given overlaps are not exactly right.
         for accepted_overlaps in [
-            {1986: {"Russia", "USSR", "Georgia"}},
-            {1985: {"USSR", "Georgia"}},
-            {1986: {"Russia", "USSR"}, 1985: {"USSR", "Georgia"}},
+            [{1986: {"Russia", "USSR", "Georgia"}}],
+            [{1985: {"USSR", "Georgia"}}],
+            [{1986: {"Russia", "USSR"}, 1985: {"USSR", "Georgia"}}],
         ]:
             with capture_logs() as captured_logs:
                 tb_out = geo.add_regions_to_table(
@@ -944,7 +944,7 @@ class TestAddRegionsToTable(unittest.TestCase):
             ds_regions=ds_regions,
             ds_income_groups=ds_income_groups,
             check_for_region_overlaps=True,
-            accepted_overlaps={1986: {"Russia", "USSR"}},
+            accepted_overlaps=[{1986: {"Russia", "USSR"}}],
         )
         assert dataframes.are_equal(tb_out, tb_expected)[0]
 

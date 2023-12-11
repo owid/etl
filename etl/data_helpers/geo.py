@@ -946,8 +946,8 @@ def detect_overlapping_regions(
     countries_in_data = df[country_col].unique().tolist()
     # List all regions found in data.
     regions = [country for country in list(regions_and_members) if country in countries_in_data]
-    # Initialize a dictionary that will store all overlaps found.
-    all_overlaps = {}
+    # Initialize a list that will store all overlaps found.
+    all_overlaps = []
     for region in regions:
         # List members of current region.
         members = [member for member in regions_and_members[region] if member in countries_in_data]
@@ -968,11 +968,11 @@ def detect_overlapping_regions(
             combined = pd.concat([region_values, member_values])
             overlaps = combined[combined.duplicated(subset=[year_col], keep=False)]  # type: ignore
             if len(overlaps) > 0:
+                # Define new overlap in a convenient format.
+                new_overlap = {year: set(overlaps[country_col]) for year in overlaps[year_col].unique()}
                 # Add the overlap found to the dictionary of all overlaps.
-                all_overlaps.update({year: set(overlaps[country_col]) for year in overlaps[year_col].unique()})
-
-    # Sort overlaps conveniently.
-    all_overlaps = {year: all_overlaps[year] for year in sorted(list(all_overlaps))}
+                if new_overlap not in all_overlaps:
+                    all_overlaps.append(new_overlap)
 
     return all_overlaps
 
@@ -990,7 +990,7 @@ def add_regions_to_table(
     year_col: str = "year",
     keep_original_region_with_suffix: Optional[str] = None,
     check_for_region_overlaps: bool = True,
-    accepted_overlaps: Optional[Dict[int, Set[str]]] = None,
+    accepted_overlaps: Optional[List[Dict[int, Set[str]]]] = None,
     ignore_overlaps_of_zeros: bool = False,
     subregion_type: str = "successors",
     countries_that_must_have_data: Optional[Dict[str, List[str]]] = None,
@@ -1072,12 +1072,12 @@ def add_regions_to_table(
             Consider adding the option to remove the data for the historical region, or the data for the successor, at
             the moment the aggregate is created.
         * If False, any possible overlap is ignored.
-    accepted_overlaps : Optional[Dict[int, Set[str]]], default: None
+    accepted_overlaps : Optional[List[Dict[int, Set[str]]]], default: None
         Only relevant if check_for_region_overlaps is True.
         * If a dictionary is passed, it must contain years as keys, and sets of overlapping countries as values.
           This is used to avoid warnings when there are known overlaps in the data that are accepted.
           Note that, if the overlaps passed here are not present in the data, a warning is also raised.
-          Example: {1991: {"Georgia", "USSR"}}
+          Example: [{1991: {"Georgia", "USSR"}}, {2000: {"Some region", "Some overlapping region"}}]
         * If None, any possible overlap in the data will raise a warning.
     ignore_overlaps_of_zeros : bool, default: False
         Only relevant if check_for_region_overlaps is True.
@@ -1107,7 +1107,7 @@ def add_regions_to_table(
         # Find overlaps between regions and its members.
 
         if accepted_overlaps is None:
-            accepted_overlaps = {}
+            accepted_overlaps = []
 
         # Create a dictionary of regions and its members.
         df_regions_and_members = create_table_of_regions_and_subregions(
@@ -1127,12 +1127,14 @@ def add_regions_to_table(
             ignore_overlaps_of_zeros=ignore_overlaps_of_zeros,
         )
         # Example of accepted_overlaps:
-        # {1991: {"Georgia", "USSR"}}
+        # [{1991: {"Georgia", "USSR"}}, {2000: {"Some region", "Some overlapping region"}}]
         # Check whether all accepted overlaps are found in the data, and that there are no new unknown overlaps.
-        if accepted_overlaps != all_overlaps:
+        all_overlaps_sorted = sorted(all_overlaps, key=lambda d: str(d))
+        accepted_overlaps_sorted = sorted(accepted_overlaps, key=lambda d: str(d))
+        if all_overlaps_sorted != accepted_overlaps_sorted:
             log.warning(
                 "Either the list of accepted overlaps is not found in the data or there are unknown overlaps. "
-                f"Accepted overlaps: {accepted_overlaps}.\nFound overlaps: {all_overlaps}."
+                f"Accepted overlaps: {accepted_overlaps_sorted}.\nFound overlaps: {all_overlaps_sorted}."
             )
 
     if aggregations is None:
@@ -1179,6 +1181,10 @@ def add_regions_to_table(
             # By default, include historical regions in income groups.
             include_historical_regions_in_income_groups=True,
         )
+        # TODO: Here we could optionally define _df_with_regions, which is passed to add_region_aggregates, and is
+        #   identical to df_with_regions, but overlaps in accepted_overlaps are solved (e.g. the data for the historical
+        #   or parent region is made nan).
+
         # Add aggregate data for current region.
         df_with_regions = add_region_aggregates(
             df=df_with_regions,
