@@ -1067,6 +1067,9 @@ def add_regions_to_table(
         * If None, the original data for a region will be replaced by new aggregate data constructed by this function.
     check_for_region_overlaps : bool, default: True
         * If True, a warning is raised if a historical region has data on the same year as any of its successors.
+          TODO: For now, this function simply warns about overlaps, but does nothing else about them.
+            Consider adding the option to remove the data for the historical region, or the data for the successor, at
+            the moment the aggregate is created.
         * If False, any possible overlap is ignored.
     accepted_overlaps : Optional[Dict[int, Set[str]]], default: None
         Only relevant if check_for_region_overlaps is True.
@@ -1121,8 +1124,10 @@ def add_regions_to_table(
         # {1991: {"Georgia", "USSR"}}
         # Check whether all accepted overlaps are found in the data, and that there are no new unknown overlaps.
         if accepted_overlaps != all_overlaps:
-            log.warning("Either the list of accepted overlaps is not found in the data or there are unknown overlaps. "\
-                        f"Accepted overlaps: {accepted_overlaps}.\nFound overlaps: {all_overlaps}.")
+            log.warning(
+                "Either the list of accepted overlaps is not found in the data or there are unknown overlaps. "
+                f"Accepted overlaps: {accepted_overlaps}.\nFound overlaps: {all_overlaps}."
+            )
 
     if aggregations is None:
         # Create region aggregates for all columns (with a simple sum) except for index columns.
@@ -1185,6 +1190,7 @@ def add_regions_to_table(
 
     # If the original object was a Table, copy metadata
     if isinstance(tb, Table):
+        # TODO: Add entry to processing log.
         return Table(df_with_regions).copy_metadata(tb)
     else:
         return df_with_regions  # type: ignore
