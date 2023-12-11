@@ -64,6 +64,11 @@ class Dataset:
 
         self.metadata = DatasetMeta.load(self._index_file)
 
+    @property
+    def m(self) -> DatasetMeta:
+        """Metadata alias to save typing."""
+        return self.metadata
+
     @classmethod
     def create_empty(cls, path: Union[str, Path], metadata: Optional["DatasetMeta"] = None) -> "Dataset":
         path = Path(path)

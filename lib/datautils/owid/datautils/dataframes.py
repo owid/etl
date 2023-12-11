@@ -248,9 +248,10 @@ def are_equal(
 def groupby_agg(
     df: pd.DataFrame,
     groupby_columns: Union[List[str], str],
-    aggregations: Union[Dict[str, Any], None] = None,
-    num_allowed_nans: Union[int, None] = 0,
-    frac_allowed_nans: Union[float, None] = None,
+    aggregations: Optional[Dict[str, Any]] = None,
+    num_allowed_nans: Optional[int] = None,
+    frac_allowed_nans: Optional[float] = None,
+    min_num_values: Optional[int] = None,
 ) -> pd.DataFrame:
     """Group dataframe by certain columns, and aggregate using a certain method, and decide how to handle nans.
 
@@ -260,20 +261,26 @@ def groupby_agg(
     > df.groupby(groupby_columns).sum()
     will treat nans as zeros, which can be misleading.
 
-    When both num_allowed_nans and frac_allowed_nans are None, this function behaves like the default pandas behaviour
-    (and nans will be treated as zeros).
+    When both num_allowed_nans, frac_allowed_nans, and min_num_values are None, this function behaves like the default
+    pandas groupby().agg() (and nans may be treated as zeros).
 
-    On the other hand, if num_allowed_nans is not None, then a group will be nan if the number of nans in that group is
-    larger than num_allowed_nans, otherwise nans will be treated as zeros.
+    Otherwise, if any of those parameters is not None, then the following conditions are applied (one after the other):
 
-    Similarly, if frac_allowed_nans is not None, then a group will be nan if the fraction of nans in that group is
-    larger than frac_allowed_nans, otherwise nans will be treated as zeros.
+    1. If num_allowed_nans is not None, then a group will be nan if the number of nans in that group is larger than
+      num_allowed_nans.
+      For example, if num_allowed_nans is set to 1, and there are 2 or more nans in a group, the aggregate will be nan.
 
-    If both num_allowed_nans and frac_allowed_nans are not None, both conditions are applied. This means that, each
-    group must have a number of nans <= num_allowed_nans, and a fraction of nans <= frac_allowed_nans, otherwise that
-    group will be nan.
+    2. If frac_allowed_nans is not None, then a group will be nan if the fraction of nans in that group is larger than
+      frac_allowed_nans.
+      For example, if frac_allowed_nans is set to 0.2, and the fraction of nans in a group 0.201, the aggregate will be
+      nan.
 
-    Note: This function won't work when using multiple aggregations for the same column (e.g. {'a': ('sum', 'mean')}).
+    3. If min_num_values is not None, then a group will be nan if the number of non-nan values is smaller than
+      min_num_values. Note that, for this condition to be relevant, min_num_values must be >= 1.
+      For example, if min_num_values is set to 1, and all values in a group are nan, the aggregate will be nan (instead
+      of a spurious zero, as it commonly happens).
+
+    NOTE: This function won't work when using multiple aggregations for the same column (e.g. {'a': ('sum', 'mean')}).
 
     Parameters
     ----------
@@ -287,6 +294,8 @@ def groupby_agg(
         Maximum number of nans that are allowed in a group.
     frac_allowed_nans : float or None
         Maximum fraction of nans that are allowed in a group.
+    min_num_values : int or None
+        Minimum number of non-nan values that a group must have. If fewer values are found, the aggregate will be nan.
 
     Returns
     -------
@@ -308,25 +317,31 @@ def groupby_agg(
         "observed": True,
     }
 
-    # Group by and aggregate.
+    # Group by and aggregate in the usual way.
     grouped = df.groupby(groupby_columns, **groupby_kwargs).agg(aggregations)  # type: ignore
 
-    if num_allowed_nans is not None:
+    # Calculate a few necessary parameters related to the number of nans and valid elements.
+    if (num_allowed_nans is not None) or (frac_allowed_nans is not None):
         # Count the number of missing values in each group.
         num_nans_detected = count_missing_in_groups(df, groupby_columns, **groupby_kwargs)
-
-        # Make nan any aggregation where there were too many missing values.
-        grouped = grouped[num_nans_detected <= num_allowed_nans]
-
-    if frac_allowed_nans is not None:
-        # Count the number of missing values in each group.
-        num_nans_detected = count_missing_in_groups(df, groupby_columns, **groupby_kwargs)
+    if (frac_allowed_nans is not None) or (min_num_values is not None):
         # Count number of elements in each group (avoid using 'count' method, which ignores nans).
         num_elements = df.groupby(groupby_columns, **groupby_kwargs).size()  # type: ignore
-        # Make nan any aggregation where there were too many missing values.
-        grouped = grouped[num_nans_detected.divide(num_elements, axis="index") <= frac_allowed_nans]
 
-    return grouped
+    # Apply conditions sequentially.
+    if num_allowed_nans is not None:
+        # Make nan any aggregation where there were too many missing values.
+        grouped = grouped[num_nans_detected <= num_allowed_nans]  # type: ignore
+
+    if frac_allowed_nans is not None:
+        # Make nan any aggregation where there were too many missing values.
+        grouped = grouped[num_nans_detected.divide(num_elements, axis="index") <= frac_allowed_nans]  # type: ignore
+
+    if min_num_values is not None:
+        # Make nan any aggregation where there were too few non-nan values.
+        grouped = grouped[num_elements >= min_num_values]  # type: ignore
+
+    return cast(pd.DataFrame, grouped)
 
 
 def count_missing_in_groups(df: pd.DataFrame, groupby_columns: List[str], **kwargs: Any) -> pd.DataFrame:

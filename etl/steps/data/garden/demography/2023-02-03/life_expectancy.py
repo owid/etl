@@ -464,7 +464,15 @@ def add_region_aggregates(frame: pd.DataFrame) -> pd.DataFrame:
     df["life_expectancy_80"] *= df["population"]
     # z(region) = sum{ y(country) } for country in region
     for region in regions_new:
-        df = geo.add_region_aggregates(df, region=region)
+        # TODO: Check if keeping the default countries_that_must_have_data, num_allowed_nans_per_year, and
+        #   frac_allowed_nans_per_year makes makes no difference. In that case, keep default.
+        df = geo.add_region_aggregates(
+            df,
+            region=region,
+            countries_that_must_have_data="auto",
+            num_allowed_nans_per_year=None,
+            frac_allowed_nans_per_year=0.2,
+        )
     df = df[df["country"].isin(regions_new)]
     # z(region) /  sum{ population(country) } for country in region
     df["life_expectancy_0"] /= df["population"]
