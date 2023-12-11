@@ -11,7 +11,7 @@ import time
 from collections import OrderedDict
 from pathlib import Path
 from threading import Lock
-from typing import Any, Dict, Generator, List, Optional, Set, TextIO, Union
+from typing import Any, Dict, Generator, List, Literal, Optional, Set, TextIO, Union
 
 import ruamel.yaml
 import yaml
@@ -50,27 +50,63 @@ class RuntimeCache:
 
 CACHE_CHECKSUM_FILE = RuntimeCache()
 
+HASH_TYPES = Literal["md5sum", "dvc"]
 
-def checksum_file_nocache(filename: Union[str, Path]) -> str:
+TEXT_CHARS = bytes(range(32, 127)) + b"\n\r\t\f\b"
+DEFAULT_CHUNK_SIZE = 512
+
+
+def dos2unix(data: bytes) -> bytes:
+    return data.replace(b"\r\n", b"\n")
+
+
+def istextblock(block: bytes) -> bool:
+    if not block:
+        # An empty file is considered a valid text file
+        return True
+
+    if b"\x00" in block:
+        # Files with null bytes are binary
+        return False
+
+    # Use translate's 'deletechars' argument to efficiently remove all
+    # occurrences of TEXT_CHARS from the block
+    nontext = block.translate(None, TEXT_CHARS)
+    return float(len(nontext)) / len(block) <= 0.30
+
+
+def checksum_str(s: str, typ: HASH_TYPES = "md5sum") -> str:
+    "Return the md5 hex digest of the string."
+    buf = s.encode()
+    if typ == "dvc":
+        buf = dos2unix(buf)
+    return hashlib.md5(buf).hexdigest()
+
+
+def checksum_file_nocache(filename: Union[str, Path], typ: HASH_TYPES = "md5sum") -> str:
     "Return the md5 hex digest of the file without using cache."
     chunk_size = 2**20
     _hash = hashlib.md5()
     with open(filename, "rb") as istream:
         chunk = istream.read(chunk_size)
         while chunk:
+            if typ == "dvc":
+                if istextblock(chunk[:DEFAULT_CHUNK_SIZE]):
+                    chunk = dos2unix(chunk)
+
             _hash.update(chunk)
             chunk = istream.read(chunk_size)
 
     return _hash.hexdigest()
 
 
-def checksum_file(filename: Union[str, Path]) -> str:
+def checksum_file(filename: Union[str, Path], typ: HASH_TYPES = "md5sum") -> str:
     "Return the md5 hex digest of the file contents."
     if isinstance(filename, Path):
         filename = filename.as_posix()
 
     mtime = os.path.getmtime(filename)
-    key = f"{filename}-{mtime}"
+    key = f"{filename}-{mtime}-{typ}"
 
     if filename not in CACHE_CHECKSUM_FILE:
         # Special case for regions.yml, we want to ignore the 'aliases' key
@@ -82,17 +118,12 @@ def checksum_file(filename: Union[str, Path]) -> str:
             regex_pattern = r"  aliases:\n(\s+-[^\n]*\n?)*"
             s = re.sub(regex_pattern, "", s)
 
-            checksum = checksum_str(s.strip())
+            checksum = checksum_str(s.strip(), typ=typ)
         else:
-            checksum = checksum_file_nocache(filename)
+            checksum = checksum_file_nocache(filename, typ=typ)
         CACHE_CHECKSUM_FILE.add(key, checksum)
 
     return CACHE_CHECKSUM_FILE[key]
-
-
-def checksum_str(s: str) -> str:
-    "Return the md5 hex digest of the string."
-    return hashlib.md5(s.encode()).hexdigest()
 
 
 def walk(folder: Path, ignore_set: Set[str] = {"__pycache__", ".ipynb_checkpoints"}) -> List[Path]:
