@@ -113,7 +113,7 @@ def run(dest_dir: str) -> None:
     # Get country-level stuff
     paths.log.info("getting country-level indicators")
     tb_participants = estimate_metrics_participants(tb, tb_prio, tb_codes)
-    tb_locations = estimate_metrics_locations(tb, tb_maps, ds_population)
+    tb_locations = estimate_metrics_locations(tb, tb_maps, tb_codes, ds_population)
 
     # Sanity check conflict_type transitions
     ## Only consider transitions between intrastate and intl intrastate. If other transitions are detected, raise error.
@@ -935,15 +935,23 @@ def estimate_metrics_participants_prio(tb_prio: Table, tb_codes: Table) -> Table
     return tb_country
 
 
-def estimate_metrics_locations(tb: Table, tb_maps: Table, ds_population: Dataset) -> Table:
+def estimate_metrics_locations(tb: Table, tb_maps: Table, tb_codes: Table, ds_population: Dataset) -> Table:
     """Add participant information at country-level.
 
     reference: https://github.com/owid/notebooks/blob/main/JoeHasell/UCDP%20and%20PRIO/UCDP_georeferenced/ucdp_country_extract.ipynb
 
+    tb: actual data
+    tb_maps: map data (borders and stuff)
+    tb_codes: from gw codes. so that all countries have either a 1 or 0 (instead of missing data).
+    ds_population: population data (for rates)
+
     TODO:
         - Fix number of countries being locations of conflicts by region. Currently there are duplicates for aggregate ctypes and regions.
-        - 
+        -
     """
+    tb_codes_ = tb_codes.reset_index().drop(columns=["id"]).copy()
+    tb_codes_ = tb_codes_[tb_codes_["year"] >= 1989]
+
     # Add country name using geometry
     paths.log.info("adding location name of conflict event...")
     tb_locations = _get_location_of_conflict_in_ucdp_ged(tb, tb_maps).copy()
@@ -992,6 +1000,29 @@ def estimate_metrics_locations(tb: Table, tb_maps: Table, ds_population: Dataset
     tb_locations_country["is_location_of_conflict"] = tb_locations_country["is_location_of_conflict"].apply(
         lambda x: 1 if x > 0 else 0
     )
+
+    # Add missing countries using tb_codes as reference
+    tb_locations_country = tb_codes_.merge(
+        tb_locations_country,
+        on=["country", "year"],
+        how="outer",
+    )
+    # Add Greenland
+    assert (
+        "Greenland" not in set(tb_locations_country.country)
+    ), "Greenland is not expected to be there! That's why we force it to zero. If it appears, just remove the following code line"
+    tb_green = Table(pd.DataFrame({"country": ["Greenland"], "year": [2022]}))
+    tb_locations_country = pr.concat([tb_locations_country, tb_green], ignore_index=True)
+
+    # NaNs of numeric indicators to zero
+    cols_indicators = ["is_location_of_conflict"] + cols_num_deaths
+    tb_locations_country[cols_indicators] = tb_locations_country[cols_indicators].fillna(0)
+    # NaN in conflict_type to arbitrary (since missing ones are filled from the next operation with fill_gaps_with_zeroes)
+    mask = tb_locations_country["conflict_type"].isna()
+    assert (
+        tb_locations_country.loc[mask, cols_indicators].sum().sum() == 0
+    ), "There are some non-NaNs for NaN-valued conflict types!"
+    tb_locations_country["conflict_type"] = tb_locations_country["conflict_type"].fillna("one-sided violence")
 
     # Fill with zeroes
     tb_locations_country = fill_gaps_with_zeroes(
