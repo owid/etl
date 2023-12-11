@@ -17,7 +17,6 @@ from dataclasses import dataclass, field
 from glob import glob
 from importlib import import_module
 from pathlib import Path
-from threading import Lock
 from typing import Any, Dict, Iterable, List, Optional, Protocol, Set, Union, cast
 from urllib.parse import urlparse
 
@@ -33,15 +32,14 @@ from owid.walden import Dataset as WaldenDataset
 from etl import config, files, git, paths
 from etl import grapher_helpers as gh
 from etl.db import get_engine
-from etl.snapshot import _unignore_backports, get_dvc
+from etl.snapshot import Snapshot
 
 log = structlog.get_logger()
 
 Graph = Dict[str, Set[str]]
 DAG = Dict[str, Any]
 
-dvc_lock = Lock()
-dvc_pull_lock = fasteners.InterProcessLock(paths.BASE_DIR / ".dvc/tmp/dvc_pull_lock")
+
 ipynb_lock = fasteners.InterProcessLock(paths.BASE_DIR / ".dvc/tmp/ipynb_lock")
 
 
@@ -655,48 +653,23 @@ class SnapshotStep(Step):
     def __str__(self) -> str:
         return f"snapshot://{self.path}"
 
-    def _cached_dvc_repo(self) -> Any:
-        """Return DVC repo and cache it. Backported steps do not use cached repository."""
-        if "backport" in self._dvc_path:
-            # The repo has to be created again to pick unignored files
-            return get_dvc(use_cache=False)
-        else:
-            return get_dvc(use_cache=True)
-
     def run(self) -> None:
-        from dvc.exceptions import CheckoutError
-
-        with _unignore_backports(Path(self._path)):
-            try:
-                repo = self._cached_dvc_repo()
-                # DVC must be locked across processes. This is pretty limiting as it allows us to only pull
-                # one snapshot at a time. One option is to pre-pull all snapshot steps.
-                with dvc_pull_lock:
-                    repo.pull(self._path, remote="public-read", force=True)
-            except CheckoutError as e:
-                raise Exception(
-                    "File not found in DVC. Have you run the snapshot script? Make sure you're not using `is_public: false`."
-                ) from e
+        snap = Snapshot(self.path)
+        snap.pull(force=True)
 
     def is_dirty(self) -> bool:
-        # check if the snapshot has been added to DVC
-        from dvc.dvcfile import load_file
-
-        with open(self._dvc_path) as istream:
-            if "outs:\n" not in istream.read():
-                raise Exception(f"File {self._dvc_path} has not been added to DVC. Run snapshot script to add it.")
-
-        with _unignore_backports(Path(self._dvc_path)), dvc_lock:
-            repo = self._cached_dvc_repo()
-            dvc_file = load_file(repo, self._dvc_path)
-            with repo.lock:
-                # DVC returns empty dictionary if file is up to date
-                return dvc_file.stage.status() != {}
+        snap = Snapshot(self.path)
+        return snap.is_dirty()
 
     def has_existing_data(self) -> bool:
         return True
 
     def checksum_output(self) -> str:
+        # NOTE: we could use the checksum from `_dvc_path` to
+        # speed this up. Test the performance on
+        # time poetry run etl garden --dry-run
+        # Make sure that the checksum below is the same as DVC checksum! It
+        # looks like it might be different for some reason
         return files.checksum_file(self._dvc_path)
 
     @property
@@ -718,19 +691,9 @@ class SnapshotStepPrivate(SnapshotStep):
         return f"snapshot-private://{self.path}"
 
     def run(self) -> None:
-        from dvc.exceptions import CheckoutError
-
-        with _unignore_backports(Path(self._path)):
-            try:
-                # The repo has to be created again to pick unignored files
-                # DVC must be locked across processes. This is pretty limiting as it allows us to only pull
-                # one snapshot at a time. One option is to pre-pull all snapshot steps.
-                with dvc_pull_lock:
-                    get_dvc(use_cache=False).pull(self._path, remote="private", force=True)
-            except CheckoutError as e:
-                raise Exception(
-                    "File not found in DVC. Have you run the snapshot script with `is_public: false`?"
-                ) from e
+        snap = Snapshot(self.path)
+        assert snap.metadata.is_public is False
+        snap.pull(force=True)
 
 
 class GrapherStep(Step):
