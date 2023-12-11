@@ -397,3 +397,12 @@ steps:
     - data://meadow/tuberculosis/2023-12-06/latent
   data://grapher/tuberculosis/2023-11-27/latent:
     - data://garden/tuberculosis/2023-11-27/latent
+
+  # Tuberculosis outcomes - WHO
+  data://meadow/tuberculosis/2023-12-11/outcomes:
+    - snapshot://tuberculosis/2023-12-11/outcomes.csv
+  data://garden/tuberculosis/2023-11-27/outcomes:
+    - data://meadow/tuberculosis/2023-12-11/outcomes
+    - snapshot://tuberculosis/2023-11-27/data_dictionary.csv
+  data://grapher/tuberculosis/2023-11-27/outcomes:
+    - data://garden/tuberculosis/2023-11-27/outcomes
