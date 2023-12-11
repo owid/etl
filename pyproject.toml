@@ -89,6 +89,7 @@ scipy = "^1.11.2"
 selenium = "^4.15.1"
 geopandas = "^0.14.1"
 shapely = "^2.0.2"
+fasteners = "^0.19"
 
 [tool.poetry.group.dev.dependencies]
 pytest = ">=7.1.2"

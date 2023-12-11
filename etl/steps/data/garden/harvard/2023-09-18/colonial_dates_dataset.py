@@ -245,6 +245,8 @@ def regional_aggregations(tb: Table, tb_pop: Table) -> Table:
             region=region,
             aggregations=aggregations,
             countries_that_must_have_data=[],
+            num_allowed_nans_per_year=None,
+            frac_allowed_nans_per_year=0.2,
         )
 
     # Call the population data again to get regional total population
