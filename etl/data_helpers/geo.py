@@ -966,10 +966,15 @@ def detect_overlapping_regions(
             )
             # Concatenate both selections of data, and select duplicated rows.
             combined = pd.concat([region_values, member_values])
-            overlaps = combined[combined.duplicated(subset=[year_col], keep=False)]  # type: ignore
+            # Option 1: Check if there is an overlap on the same year (even if not on the same variable).
+            # overlaps = combined[combined.duplicated(subset=[year_col], keep=False)]  # type: ignore
+            # Option 2: Check if there is an overlap on the same year and on the same variable.
+            # Count how many non-nan values are present for each year, among the two countries considered.
+            counts = combined.drop(columns=country_col).groupby(year_col, as_index=True, observed=True).count()
+            overlaps = counts[counts.max(axis=1) > 1]
             if len(overlaps) > 0:
                 # Define new overlap in a convenient format.
-                new_overlap = {year: set(overlaps[country_col]) for year in overlaps[year_col].unique()}
+                new_overlap = {year: {region, member} for year in set(overlaps.index)}
                 # Add the overlap found to the dictionary of all overlaps.
                 if new_overlap not in all_overlaps:
                     all_overlaps.append(new_overlap)
