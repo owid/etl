@@ -74,6 +74,21 @@ def test_agg() -> None:
 
 
 @enable_pl
+def test_amend_log() -> None:
+    t: Table = Table({"a": [1, 2, 3], "b": ["a", "a", "b"]})
+    tb = t.groupby("b").agg("sum").amend_log(["a"], comment="sum over b", operation="my_sum")
+    assert tb["a"].metadata.processing_log.as_dict() == [
+        {
+            "variable": "a",
+            "operation": "my_sum",
+            "target": "a#7921731533",
+            "parents": ["a", "b"],
+            "comment": "sum over b",
+        }
+    ]
+
+
+@enable_pl
 def test_proper_type_after_copy():
     v1 = Variable([1], name="v", metadata=VariableMeta(processing_log=ProcessingLog([LogEntry("a", "+", "")])))
     assert isinstance(v1.metadata.processing_log, ProcessingLog)

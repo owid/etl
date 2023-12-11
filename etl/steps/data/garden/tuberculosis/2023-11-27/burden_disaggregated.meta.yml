@@ -1,0 +1,122 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Tuberculosis
+        - Causes of Death
+    display:
+      numDecimalPlaces: 0
+    processing_level: major
+  sex: |-
+    <% if sex == "a" %>males and females <% elif sex == "m" %>males <% elif sex == "f" %>females  <%- endif -%>
+  age_group: |-
+    <% if age_group == "0-14" %>0-14 years<% elif age_group == "0-4" %>0-4 years<% elif age_group == "15-24" %>15-24 years<% elif age_group == "15plus" %>over 15 years<% elif age_group == "18plus" %>over 18 years<% elif age_group == "25-34" %>25-34 years<% elif age_group == "35-44" %>35-44 years<% elif age_group == "45-54" %>45-54 years<% elif age_group == "5-14" %>5-14 years<% elif age_group == "55-64" %>55-64 years<% elif age_group == "65plus" %>over 65 years<% elif age_group == "all" %><% endif -%>
+  risk_factor: |-
+    <% if risk_factor == "all" %><% elif risk_factor == "alc" %>harmful use of alcohol <% elif risk_factor == "smk" %>smoking <% elif risk_factor == "dia" %>diabetes <% elif risk_factor == "und" %>undernourishment <% elif risk_factor == "hiv" %>HIV infection <% endif -%>
+  indicator:
+    presentation_title_absolute: |-
+      <% if risk_factor != "all" and age_group == "all" %>
+      Tuberculosis incidence attributed to {definitions.risk_factor} in {definitions.sex}
+      <% elif risk_factor != "all" and age_group != "all" %>
+      Tuberculosis incidence attributed to {definitions.risk_factor} in {definitions.sex} aged {definitions.age_group}
+      <% elif risk_factor == "all" and age_group == "all" %>
+      Tuberculosis incidence in {definitions.sex}
+      <% elif risk_factor == "all" and age_group != "all" %>
+      Tuberculosis incidence in {definitions.sex} aged {definitions.age_group}
+      <%- endif -%>
+    description_short_absolute: |-
+      <% if risk_factor != "all" and age_group == "all" %>
+      The estimated incidence of tuberculosis cases attributed to {definitions.risk_factor} in {definitions.sex}.
+      <% elif risk_factor != "all" and age_group != "all" %>
+      The estimated incidence of tuberculosis cases attributed to {definitions.risk_factor} in {definitions.sex} aged {definitions.age_group}.
+      <% elif risk_factor == "all" and age_group == "all" %>
+      The estimated incidence of tuberculosis cases in {definitions.sex}.
+      <% elif risk_factor == "all" and age_group != "all" %>
+      The estimated incidence of tuberculosis cases in {definitions.sex} aged {definitions.age_group}.
+      <%- endif -%>
+    presentation_title_rate: |-
+      <% if risk_factor != "all" and age_group == "all" %>
+      Tuberculosis incidence rate attributed to {definitions.risk_factor} in {definitions.sex}
+      <% elif risk_factor != "all" and age_group != "all" %>
+      Tuberculosis incidence rate attributed to {definitions.risk_factor} in {definitions.sex} aged {definitions.age_group}
+      <% elif risk_factor == "all" and age_group == "all" %>
+      Tuberculosis incidence rate in {definitions.sex}
+      <% elif risk_factor == "all" and age_group != "all" %>
+      Tuberculosis incidence rate in {definitions.sex} aged {definitions.age_group}
+      <%- endif -%>
+    description_short_rate: |-
+      <% if risk_factor != "all" and age_group == "all" %>
+      The estimated incidence rate of tuberculosis cases attributed to {definitions.risk_factor} in {definitions.sex}, per 100,000 people.
+      <% elif risk_factor != "all" and age_group != "all" %>
+      The estimated incidence rate of tuberculosis cases attributed to {definitions.risk_factor} in {definitions.sex} aged {definitions.age_group}, per 100,000 people.
+      <% elif risk_factor == "all" and age_group == "all" %>
+      The estimated incidence rate of tuberculosis cases in {definitions.sex}, per 100,000 people.
+      <% elif risk_factor == "all" and age_group != "all" %>
+      The estimated incidence rate of tuberculosis cases in {definitions.sex} aged {definitions.age_group}, per 100,000 people.
+      <%- endif -%>
+tables:
+  burden_disaggregated:
+    variables:
+      best:
+        title: |-
+          Best estimate: {definitions.indicator.presentation_title_absolute}
+        description_short: |-
+          {definitions.indicator.description_short_absolute}.
+        unit: cases
+        presentation:
+          title_public: |-
+            {definitions.indicator.presentation_title_absolute}
+          title_variant: best estimate
+      lo:
+        title: |-
+          Low estimate: {definitions.indicator.presentation_title_absolute}
+        description_short: |-
+          {definitions.indicator.presentation_title_absolute}.
+        unit: cases
+        presentation:
+          title_public: |-
+            {definitions.indicator.presentation_title_absolute}
+          title_variant: low estimate
+      hi:
+        title: |-
+          High estimate: {definitions.indicator.presentation_title_absolute}
+        description_short: |-
+          {definitions.indicator.presentation_title_absolute}.
+        unit: cases
+        presentation:
+          title_public: |-
+            {definitions.indicator.presentation_title_absolute}
+          title_variant: high estimate
+  burden_disaggregated_rate:
+    variables:
+      best_rate:
+        title: |-
+          Best estimate: {definitions.indicator.presentation_title_rate}
+        description_short: |-
+          {definitions.indicator.description_short_rate}.
+        unit: cases per 100,000 people
+        presentation:
+          title_public: |-
+            {definitions.indicator.presentation_title_rate}
+          title_variant: best estimate
+      low_rate:
+        title: |-
+          Low estimate: {definitions.indicator.presentation_title_rate}
+        description_short: |-
+          {definitions.indicator.presentation_title_rate}.
+        unit: cases per 100,000 people
+        presentation:
+          title_public: |-
+            {definitions.indicator.presentation_title_rate}
+          title_variant: low estimate
+      high_rate:
+        title: |-
+          High estimate: {definitions.indicator.presentation_title_rate}
+        description_short: |-
+          {definitions.indicator.presentation_title_rate}.
+        unit: cases per 100,000 people
+        presentation:
+          title_public: |-
+            {definitions.indicator.presentation_title_rate}
+          title_variant: high estimate

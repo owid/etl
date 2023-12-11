@@ -96,3 +96,7 @@ index.json
 ```
 
 Several files got built for the dataset: `index.json` gives metadata about the whole dataset, and the remaining three files all represent a single data table, which is saved in both Feather and Parquet formats.
+
+??? note "Parallel execution"
+
+    There's a flag `etl ... --workers 4` you can use to run the ETL in parallel. This is useful when rebuilding large part of ETL (e.g. after updating regions).

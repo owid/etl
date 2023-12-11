@@ -38,13 +38,13 @@ def run(dest_dir: str) -> None:
     ds_ucdp = paths.load_dataset("ucdp")
     # Read table from meadow dataset.
     tb_ucdp = ds_ucdp["ucdp"].reset_index()
-    tb_ucdp_countries = ds_ucdp["ucdp_country"].reset_index()
+    # tb_ucdp_countries = ds_ucdp["ucdp_country"].reset_index()
 
     # Load meadow dataset.
     ds_prio = paths.load_dataset("prio_v31")
     # Read table from meadow dataset.
     tb_prio = ds_prio["prio_v31"].reset_index()
-    tb_prio_countries = ds_prio["prio_v31_country"].reset_index()
+    # tb_prio_countries = ds_prio["prio_v31_country"].reset_index()
 
     # Read table from COW codes
     ds_gw = paths.load_dataset("gleditsch")
@@ -90,18 +90,18 @@ def run(dest_dir: str) -> None:
         ],
     )
 
-    tb_country = make_tb_country(tb_ucdp_countries, tb_prio_countries)
+    # tb_country = make_tb_country(tb_ucdp_countries, tb_prio_countries)
 
     # Set index
     tb = tb.set_index(COLUMNS_INDEX, verify_integrity=True)
-    tb_country = tb_country.set_index(COLUMNS_INDEX_COUNTRY, verify_integrity=True)
+    # tb_country = tb_country.set_index(COLUMNS_INDEX_COUNTRY, verify_integrity=True)
 
     #
     # Save outputs.
     #
     tables = [
         tb,
-        tb_country,
+        # tb_country,
     ]
     # Create a new garden dataset with the same metadata as the meadow dataset.
     ds_garden = create_dataset(

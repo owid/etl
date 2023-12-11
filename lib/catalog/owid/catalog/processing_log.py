@@ -145,6 +145,27 @@ class ProcessingLog(List[LogEntry]):
 
         self.append(entry)
 
+    def amend_entry(
+        self,
+        operation: Optional[str] = None,
+        comment: Optional[str] = None,
+    ) -> None:
+        """Amend last entry in the log."""
+        if not enabled():
+            # Avoid any processing
+            return
+
+        if len(self) == 0:
+            raise ValueError("Cannot amend empty processing log.")
+
+        kwargs = {}
+        if operation:
+            kwargs["operation"] = operation
+        if comment:
+            kwargs["comment"] = comment
+
+        self[-1] = self[-1].clone(**kwargs)
+
     def display(
         self,
         data_dir: Optional[Path] = None,

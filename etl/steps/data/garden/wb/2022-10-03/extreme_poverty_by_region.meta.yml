@@ -5,5 +5,5 @@ tables:
     variables:
       number_of_people_living_in_extreme_poverty__by_world_region:
         title: Number of people living in extreme poverty - by world region
-        description: The number of people living under 1.9$ a day using 2011 PPP.
+        description: "Number of people living in households with an income or consumption per person below $2.15 a day, by region."
         unit: ''

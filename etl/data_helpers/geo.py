@@ -4,7 +4,7 @@ import functools
 import json
 import warnings
 from pathlib import Path
-from typing import Any, Dict, List, Optional, TypeVar, Union, cast
+from typing import Any, Dict, List, Literal, Optional, TypeVar, Union, cast
 
 import numpy as np
 import owid.catalog.processing as pr
@@ -13,8 +13,12 @@ from owid.catalog import Dataset, Table, Variable
 from owid.datautils.common import ExceptionFromDocstring, warn_on_list_of_entities
 from owid.datautils.dataframes import groupby_agg, map_series
 from owid.datautils.io.json import load_json
+from structlog import get_logger
 
 from etl.paths import DATA_DIR, LATEST_REGIONS_DATASET_PATH
+
+# Initialize logger.
+log = get_logger()
 
 TableOrDataFrame = TypeVar("TableOrDataFrame", pd.DataFrame, Table)
 
@@ -49,6 +53,7 @@ def _load_population() -> Table:
     ####################################################################################################################
     # WARNING: This function is deprecated. All datasets should be loaded using PathFinder.
     ####################################################################################################################
+    log.warning(f"Dataset {DATASET_POPULATION} is silently being loaded.")
     population = Dataset(DATASET_POPULATION)[TNAME_KEY_INDICATORS]
     return population.reset_index()
 
@@ -58,6 +63,7 @@ def _load_countries_regions() -> pd.DataFrame:
     ####################################################################################################################
     # WARNING: This function is deprecated. All datasets should be loaded using PathFinder.
     ####################################################################################################################
+    log.warning(f"Dataset {LATEST_REGIONS_DATASET_PATH} is silently being loaded.")
     countries_regions = Dataset(LATEST_REGIONS_DATASET_PATH)["regions"]
     return cast(pd.DataFrame, countries_regions)
 
@@ -67,6 +73,7 @@ def _load_income_groups() -> pd.DataFrame:
     ####################################################################################################################
     # WARNING: This function is deprecated. All datasets should be loaded using PathFinder.
     ####################################################################################################################
+    log.warning(f"Dataset {DATASET_WB_INCOME} is silently being loaded.")
     income_groups = Dataset(DATASET_WB_INCOME)[TNAME_WB_INCOME]
     return cast(pd.DataFrame, income_groups)
 
@@ -232,18 +239,22 @@ def add_region_aggregates(
     df: TableOrDataFrame,
     region: str,
     countries_in_region: Optional[List[str]] = None,
-    countries_that_must_have_data: Optional[List[str]] = None,
-    num_allowed_nans_per_year: Union[int, None] = NUM_ALLOWED_NANS_PER_YEAR,
-    frac_allowed_nans_per_year: Union[float, None] = FRAC_ALLOWED_NANS_PER_YEAR,
+    countries_that_must_have_data: Optional[Union[List[str], Literal["auto"]]] = None,
+    num_allowed_nans_per_year: Optional[int] = None,
+    frac_allowed_nans_per_year: Optional[float] = None,
+    min_num_values_per_year: Optional[int] = None,
     country_col: str = "country",
     year_col: str = "year",
     aggregations: Optional[Dict[str, Any]] = None,
     keep_original_region_with_suffix: Optional[str] = None,
     population: Optional[pd.DataFrame] = None,
 ) -> TableOrDataFrame:
-    """Add data for regions (e.g. income groups or continents) to a dataset.
+    """Add aggregate data for a specific region (e.g. a continent or an income group) to a table.
 
-    If data for a region already exists in the dataset, it will be replaced.
+    If data for a region already exists:
+    * If keep_original_region_with_suffix is None, the original data for the region will be replaced by a new aggregate.
+    * If keep_original_region_with_suffix is not None, the original data for the region will be kept, and the value of
+      keep_original_region_with_suffix will be appended to the name of the region.
 
     When adding up the contribution from different countries (e.g. Spain, France, etc.) of a region (e.g. Europe), we
     want to avoid two problems:
@@ -263,22 +274,32 @@ def add_region_aggregates(
 
     Parameters
     ----------
-    df : pd.Dataframe
-        Original dataset, which may contain data for that region (in which case, it will be replaced by the ).
+    df : TableOrDataFrame
+        Original table, which may already contain data for the region.
     region : str
         Region to add.
     countries_in_region : list or None
         List of countries that are members of this region. None to load them from countries-regions dataset.
-    countries_that_must_have_data : list or None
-        List of countries that must have data for a particular variable and year, otherwise the region will have nan for
-        that particular variable and year. See function list_countries_in_region_that_must_have_data for more
-        details.
+    countries_that_must_have_data : list or None or str
+        * If a list of countries is passed, those countries must have data for a particular variable and year. If any of
+          those countries is not informed on a particular variable and year, the region will have nan for that particular
+          variable and year.
+        * If "auto", a list of countries that must have data is automatically generated, based on population. When
+          choosing this option, explicitly pass population as an argument (otherwise it will be silently loaded).
+          See function list_countries_in_region_that_must_have_data for more details.
+        * If None, nothing happens: An aggregate is constructed even if important countries are missing.
     num_allowed_nans_per_year : int or None
-        Maximum number of nans that can be present in a particular variable and year. If exceeded, the aggregation will
-        be nan.
+        * If a number is passed, this is the maximum number of nans that can be present in a particular variable and
+          year. If that number of nans is exceeded, the aggregate will be nan.
+        * If None, nothing happens: An aggregate is constructed regardless of the number of nans.
     frac_allowed_nans_per_year : float or None
-        Maximum fraction of nans that can be present in a particular variable and year. If exceeded, the aggregation
-        will be nan.
+        * If a number is passed, this is the maximum fraction of nans that can be present in a particular variable and
+          year. If that fraction of nans is exceeded, the aggregate will be nan.
+        * If None, nothing happens: An aggregate is constructed regardless of the fraction of nans.
+    min_num_values_per_year : int or None
+        * If a number is passed, this is the minimum number of non-nan values that must be present in a particular
+          variable and year. If that number of values is not reached, the aggregate will be nan.
+        * If None, nothing happens: An aggregate is constructed regardless of the number of non-nan values.
     country_col : str
         Name of country column.
     year_col : str
@@ -288,11 +309,13 @@ def add_region_aggregates(
         region will be summed. Otherwise, only the variables indicated in the dictionary will be affected. All remaining
         variables will be nan.
     keep_original_region_with_suffix : str or None
-        If None, original data for region will be replaced by aggregate data constructed by this function. If not None,
-        original data for region will be kept, with the same name, but having suffix keep_original_region_with_suffix
-        added to its name.
+        * If not None, the original data for a region will be kept, with the same name, but having suffix
+          keep_original_region_with_suffix appended to its name.
+        * If None, the original data for a region will be replaced by aggregate data constructed by this function.
     population : pd.DataFrame or None
-        Population dataset, or None, to load it from owid catalog.
+        Only relevant if countries_that_must_have_data is "auto", otherwise ignored.
+        * If not None, it should be the main population table from the population dataset.
+        * If None, the population table will be silently loaded.
 
     Returns
     -------
@@ -307,6 +330,8 @@ def add_region_aggregates(
         )
 
     if countries_that_must_have_data is None:
+        countries_that_must_have_data = []
+    elif countries_that_must_have_data == "auto":
         # List countries that should present in the data (since they are expected to contribute the most).
         countries_that_must_have_data = list_countries_in_region_that_must_have_data(
             region=region,
@@ -333,6 +358,7 @@ def add_region_aggregates(
         ),
         num_allowed_nans=num_allowed_nans_per_year,
         frac_allowed_nans=frac_allowed_nans_per_year,
+        min_num_values=min_num_values_per_year,
     ).reset_index()
 
     # Make nan all aggregates if the most contributing countries were not present.
@@ -352,8 +378,21 @@ def add_region_aggregates(
             ignore_index=True,
         )
     else:
-        # Remove rows in the original dataframe containing rows for region, and append new rows for region.
+        # Remove rows in the original table containing rows for region, and append new rows for region.
         df_updated = pd.concat([df[~(df[country_col] == region)], df_region], ignore_index=True)
+        # WARNING: When an aggregate is added (e.g. "Europe") just for one of the columns (and no aggregation is
+        # specified for the rest of columns) and there was already data for that region, the data for the rest of
+        # columns is deleted for that particular region (in the following line).
+        # This is an unusual scenario, because you would normally want to replace all data for a certain region, not
+        # just certain columns. However, the expected behavior would be to just replace the region data for the
+        # specified column.
+        # For now, simply warn that the original data for the region for those columns was deleted.
+        columns_without_aggregate = set(df.drop(columns=fixed_columns).columns) - set(aggregations)
+        if (len(columns_without_aggregate) > 0) and (len(df[df[country_col] == region]) > 0):
+            log.warning(
+                f"Region {region} already has data for columns that do not have a defined aggregation method: "
+                f"({columns_without_aggregate}). That data will become nan."
+            )
 
     # Sort conveniently.
     df_updated = df_updated.sort_values([country_col, year_col]).reset_index(drop=True)

@@ -3,14 +3,19 @@ from typing import Any, Dict, Optional
 
 import pandas as pd
 from owid.catalog import Dataset
+from structlog import get_logger
 
 from etl.paths import DATA_DIR
+
+# Initialize logger.
+log = get_logger()
 
 
 def add_population(
     df: pd.DataFrame,
     country_col: str,
     year_col: str,
+    ds_un_wpp: Optional[Dataset] = None,
     sex_col: Optional[str] = None,
     sex_group_all: Optional[str] = None,
     sex_group_female: Optional[str] = None,
@@ -32,6 +37,9 @@ def add_population(
         Name of column with country names.
     year_col : str
         Name of column with years.
+    ds_un_wpp : Dataset, optional
+        Population dataset from UN WPP. It should always be provided. But, for compatibility with old steps, if not
+        provided, it will be silently loaded.
     sex_col: str, optional
         Name of the column with sex group dimension.
     sex_group_all: str, optional
@@ -57,9 +65,12 @@ def add_population(
     pd.DataFrame
         Dataframe with extra column `population`.
     """
-    # Load granular population dataset
-    ds = Dataset(DATA_DIR / "garden" / "un" / "2022-07-11" / "un_wpp")
-    pop = ds["population_granular"].reset_index()
+    if ds_un_wpp is None:
+        ds_un_wpp_path = DATA_DIR / "garden/un/2022-07-11/un_wpp"
+        log.warning(f"Dataset {ds_un_wpp_path} is silently being loaded.")
+        # Load granular population dataset
+        ds_un_wpp = Dataset(ds_un_wpp_path)
+    pop = ds_un_wpp["population_granular"].reset_index()  # type: ignore
     # Keep only variant='medium'
     pop = pop[pop["variant"] == "medium"].drop(columns=["variant"])
     # Keep only metric='population'
