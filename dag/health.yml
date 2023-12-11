@@ -410,10 +410,10 @@ steps:
     - data://garden/tuberculosis/2023-11-27/drug_resistance_surveillance
 
   # Tuberculosis outcomes - WHO
-  data://meadow/tuberculosis/2023-12-11/outcomes:
-    - snapshot://tuberculosis/2023-12-11/outcomes.csv
-  data://garden/tuberculosis/2023-11-27/outcomes:
-    - data://meadow/tuberculosis/2023-12-11/outcomes
+  data://meadow/tuberculosis/2023-12-05/expenditure:
+    - snapshot://tuberculosis/2023-12-05/expenditure.csv
+  data://garden/tuberculosis/2023-11-27/expenditure:
+    - data://meadow/tuberculosis/2023-12-05/expenditure
     - snapshot://tuberculosis/2023-11-27/data_dictionary.csv
-  data://grapher/tuberculosis/2023-11-27/outcomes:
-    - data://garden/tuberculosis/2023-11-27/outcomes
+  data://grapher/tuberculosis/2023-11-27/expenditure:
+    - data://garden/tuberculosis/2023-11-27/expenditure
