@@ -992,6 +992,7 @@ def add_regions_to_table(
     check_for_region_overlaps: bool = True,
     accepted_overlaps: Optional[Dict[int, Set[str]]] = None,
     ignore_overlaps_of_zeros: bool = False,
+    subregion_type: str = "successors",
     countries_that_must_have_data: Optional[Dict[str, List[str]]] = None,
 ) -> Table:
     """Add one or more region aggregates to a table (or dataframe).
@@ -1083,6 +1084,11 @@ def add_regions_to_table(
         * If True, overlaps of values of zero are ignored. In other words, if a region and one of its successors have
           both data on the same year, and that data is zero for both, no warning is raised.
         * If False, overlaps of values of zero are not ignored.
+    subregion_type : str, default: "successors"
+        Only relevant if check_for_region_overlaps is True.
+        * If "successors", the function will look for overlaps between historical regions and their successors.
+        * If "related", the function will look for overlaps between regions and their possibly related members (e.g.
+          overseas territories).
     countries_that_must_have_data : Optional[Dict[str, List[str]]], default: None
         * If a dictionary is passed, each key must be a valid region, and the value should be a list of countries that
           must have data for that region. If any of those countries is not informed on a particular variable and year,
@@ -1105,9 +1111,9 @@ def add_regions_to_table(
 
         # Create a dictionary of regions and its members.
         df_regions_and_members = create_table_of_regions_and_subregions(
-            ds_regions=ds_regions, subregion_type="successors"
+            ds_regions=ds_regions, subregion_type=subregion_type
         )
-        regions_and_members = df_regions_and_members["successors"].to_dict()
+        regions_and_members = df_regions_and_members[subregion_type].to_dict()
 
         # Assume incoming table has a dummy index (the whole function may not work otherwise).
         # Example of region_and_members:
