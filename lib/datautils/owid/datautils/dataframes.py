@@ -321,11 +321,11 @@ def groupby_agg(
     grouped = df.groupby(groupby_columns, **groupby_kwargs).agg(aggregations)  # type: ignore
 
     # Calculate a few necessary parameters related to the number of nans and valid elements.
-    if (num_allowed_nans is not None) or (frac_allowed_nans is not None):
+    if (num_allowed_nans is not None) or (frac_allowed_nans is not None) or (min_num_values is not None):
         # Count the number of missing values in each group.
         num_nans_detected = count_missing_in_groups(df, groupby_columns, **groupby_kwargs)
     if (frac_allowed_nans is not None) or (min_num_values is not None):
-        # Count number of elements in each group (avoid using 'count' method, which ignores nans).
+        # Count number of total elements in each group (counting both nans and non-nan values).
         num_elements = df.groupby(groupby_columns, **groupby_kwargs).size()  # type: ignore
 
     # Apply conditions sequentially.
@@ -338,8 +338,17 @@ def groupby_agg(
         grouped = grouped[num_nans_detected.divide(num_elements, axis="index") <= frac_allowed_nans]  # type: ignore
 
     if min_num_values is not None:
-        # Make nan any aggregation where there were too few non-nan values.
-        grouped = grouped[num_elements >= min_num_values]  # type: ignore
+        # Make nan any aggregation where there were too few valid (non-nan) values.
+        # The number of valid values is the number of elements minus the number of nans. So, a priori, what we need is:
+        # grouped = grouped[(-num_nans_detected.subtract(num_elements, axis="index") >= min_num_values)]
+        # However, if a group has fewer elements than min_num_values, the condition is not fulfilled, and the aggregate
+        # is nan. But that is probably not the desired behavior. Instead, if all elements in a group are valid, the
+        # aggregate should exist, even if that number of valid values is smaller than min_num_values.
+        # Therefore, we impose that either the number of valid values is >= min_num_values, or that there are no nans
+        # (and hence all values are valid).
+        grouped = grouped[
+            (-num_nans_detected.subtract(num_elements, axis="index") >= min_num_values) | (num_nans_detected == 0)  # type: ignore
+        ]
 
     return cast(pd.DataFrame, grouped)
 
