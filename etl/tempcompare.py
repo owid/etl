@@ -132,7 +132,13 @@ def series_equals(
     else:
         raise ValueError(f"Unsupported dtype {s1.dtype} for column {s1.name}")
 
-    return s1.eq(s2) | (s1.isnull() & s2.isnull())
+    # first see if NaNs are in both series
+    eq = s1.isnull() & s2.isnull()
+    # then compare the rest of non-nan values (we cannot compare the entire series because pandas
+    # complains with `TypeError: boolean value of NA is ambiguous`)
+    ix = ~s1.isnull() & ~s2.isnull()
+    eq[ix] |= s1[ix].eq(s2[ix])
+    return eq
 
 
 def df_equals(df1: pd.DataFrame, df2: pd.DataFrame, **kwargs) -> pd.DataFrame:

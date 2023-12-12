@@ -98,7 +98,7 @@ def variable_metadata_url(variable_id):
 IPDB_ENABLED = False
 
 # number of workers for grapher inserts to DB
-GRAPHER_INSERT_WORKERS = int(env.get("GRAPHER_WORKERS", 40))
+GRAPHER_INSERT_WORKERS = int(env.get("GRAPHER_WORKERS", 20))
 
 # number of workers for checking dirty steps, we need to parallelize this
 # because we're making a lot of HTTP requests
