@@ -780,16 +780,6 @@ class GrapherStep(Step):
 
                 table = gh._adapt_table_for_grapher(table)
 
-                # generate table with entity_id, year and value for every column
-                upsert = lambda t, catalog_path, verbose: gi.upsert_table(  # noqa: E731
-                    engine,
-                    t,
-                    dataset_upsert_results,
-                    catalog_path=catalog_path,
-                    dimensions=(t.iloc[:, 0].metadata.additional_info or {}).get("dimensions"),
-                    verbose=verbose,
-                )
-
                 for t in gh._yield_wide_table(table, na_action="drop"):
                     i += 1
                     assert len(t.columns) == 1
@@ -802,7 +792,18 @@ class GrapherStep(Step):
                             lambda: (time.sleep(10), log.info("upsert_dataset.continue_without_logging"))
                         )
 
-                    futures.append(thread_pool.submit(upsert, t, catalog_path=catalog_path, verbose=verbose))
+                    # generate table with entity_id, year and value for every column
+                    futures.append(
+                        thread_pool.submit(
+                            gi.upsert_table,
+                            engine,
+                            t,
+                            dataset_upsert_results,
+                            catalog_path=catalog_path,
+                            dimensions=(t.iloc[:, 0].metadata.additional_info or {}).get("dimensions"),
+                            verbose=verbose,
+                        )
+                    )
 
             variable_upsert_results = [future.result() for future in as_completed(futures)]
 
