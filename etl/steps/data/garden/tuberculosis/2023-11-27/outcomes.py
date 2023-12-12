@@ -23,9 +23,7 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
-    tb = geo.harmonize_countries(
-        df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
-    )
+    tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
     tb = removing_old_variables(tb, dd, dataset_name="Outcomes")
     tb = add_variable_description_from_producer(tb, dd)
     tb = tb.set_index(["country", "year"], verify_integrity=True)
