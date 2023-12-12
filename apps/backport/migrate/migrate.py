@@ -132,7 +132,7 @@ def migrate(
     )
     print(f"[green]2.[/green] Import dataset with [bold]`etl {namespace}/{version}/{short_name} --grapher`[/bold]")
     print(
-        "[green]3.[/green] Merge changes or run it directly against production with [bold]`ENV=.env.prod.write etl {namespace}/{version}/{short_name} --grapher`[/bold]"
+        f"[green]3.[/green] Merge changes or run it directly against production with [bold]`ENV=.env.prod.write etl {namespace}/{version}/{short_name} --grapher`[/bold]"
     )
     print("[green]4.[/green] Run chart revisions with [bold]`ENV=.env.prod.write etl-wizard charts`[/bold]")
     print("[green]5.[/green] [bold]Delete[/bold] or archive the old dataset")

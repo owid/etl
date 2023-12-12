@@ -4,13 +4,12 @@ from typing import Any, Dict, List, Literal, Optional, Tuple, Union
 
 import pandas as pd
 import rich_click as click
-import ruamel.yaml
 from owid.catalog import Dataset, utils
 from rich.console import Console
 from rich.syntax import Syntax
 
 from etl import paths
-from etl.files import yaml_dump
+from etl.files import ruamel_dump, ruamel_load, yaml_dump
 
 
 @click.command(help=__doc__)
@@ -62,30 +61,13 @@ def cli(
 
     output_path = Path(output) if output else paths.STEP_DIR / "data" / f"{ds.metadata.uri}.meta.yml"
 
-    # if output_path exists, update its values, but keep YAML structure intact
-    if output_path.exists():
-        with open(output_path, "r") as f:
-            doc = ruamel.yaml.load(f, Loader=ruamel.yaml.RoundTripLoader)
+    # reorder fields to have consistent YAML
+    meta_dict = reorder_fields(meta_dict)
 
-        if "dataset" not in doc:
-            doc["dataset"] = {}
-        if "tables" not in doc:
-            doc["tables"] = {}
-
-        doc["dataset"].update(meta_dict["dataset"])
-        for tab_name, tab_dict in meta_dict.get("tables", {}).items():
-            variables = tab_dict.pop("variables", {})
-            if tab_name not in doc["tables"]:
-                doc["tables"][tab_name] = {}
-            doc["tables"][tab_name].update(tab_dict)
-            doc["tables"][tab_name]["variables"].update(variables)
-
-        doc = reorder_fields(doc)
-
-        yaml_str = ruamel.yaml.dump(doc, Dumper=ruamel.yaml.RoundTripDumper)
-    else:
-        yaml_str = yaml_dump(reorder_fields(meta_dict), replace_confusing_ascii=True)
-    assert yaml_str
+    yaml_str = merge_or_create_yaml(
+        meta_dict,
+        output_path,
+    )
 
     if show:
         Console().print(Syntax(yaml_str, "yaml", line_numbers=True))
@@ -93,6 +75,34 @@ def cli(
         output_path.parent.mkdir(parents=True, exist_ok=True)
         with open(output_path, "w") as f:
             f.write(yaml_str)  # type: ignore
+
+
+def merge_or_create_yaml(meta_dict: Dict[str, Any], output_path: Path) -> str:
+    """Merge metadata with existing YAML file or create a new one and return it as string."""
+    # if output_path exists, update its values, but keep YAML structure intact
+    if output_path.exists():
+        with open(output_path, "r") as f:
+            doc = ruamel_load(f)
+
+        if "dataset" not in doc:
+            doc["dataset"] = {}
+        if "tables" not in doc:
+            doc["tables"] = {}
+
+        for k, v in meta_dict["dataset"].items():
+            doc["dataset"].setdefault(k, v)
+        for tab_name, tab_dict in meta_dict.get("tables", {}).items():
+            variables = tab_dict.pop("variables", {})
+            if tab_name not in doc["tables"]:
+                doc["tables"][tab_name] = {}
+            doc["tables"][tab_name].update(tab_dict)
+            if "variables" not in doc["tables"][tab_name]:
+                doc["tables"][tab_name]["variables"] = {}
+            doc["tables"][tab_name]["variables"].update(variables)
+
+        return ruamel_dump(doc)
+    else:
+        return yaml_dump(meta_dict, replace_confusing_ascii=True)  # type: ignore
 
 
 def metadata_export(
@@ -223,10 +233,11 @@ def metadata_export(
                 var_meta.pop("origins", None)
                 var_meta.pop("license", None)
 
-    return {
+    meta = {
         "dataset": ds_meta,
         "tables": tb_meta,
     }
+    return reorder_fields(meta)
 
 
 def reorder_fields(m: Dict[str, Any]) -> Dict[str, Any]:
@@ -268,16 +279,22 @@ def reorder_fields(m: Dict[str, Any]) -> Dict[str, Any]:
         "title",
         "subtitle",
         "variantName",
+        "sourceDesc",
         "originUrl",
         "hasMapTab",
         "tab",
         "addCountryMode",
         "yAxis",
+        "colorScale",
+        "minTime",
+        "timelineMaxTime",
         "selectedFacetStrategy",
         "hideAnnotationFieldsInTitle",
+        "hideRelativeToggle",
         "relatedQuestions",
         "map",
         "selectedEntityNames",
+        "note",
         "$schema",
     ]
     for tab in m["tables"].values():

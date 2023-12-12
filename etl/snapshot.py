@@ -3,10 +3,11 @@ import json
 import re
 from contextlib import contextmanager
 from dataclasses import dataclass
+from multiprocessing import Lock
 from pathlib import Path
-from threading import Lock
 from typing import TYPE_CHECKING, Any, Dict, Iterator, Optional, Union
 
+import fasteners
 import owid.catalog.processing as pr
 import pandas as pd
 import yaml
@@ -36,6 +37,7 @@ from etl.files import RuntimeCache, yaml_dump
 # DVC is not thread-safe, so we need to lock it
 dvc_lock = Lock()
 unignore_backports_lock = Lock()
+dvc_pull_lock = fasteners.InterProcessLock(paths.BASE_DIR / ".dvc/tmp/dvc_pull_lock")
 
 DVC_REPO_CACHE = RuntimeCache()
 
@@ -106,11 +108,55 @@ class Snapshot:
         else:
             return Path(f"{paths.SNAPSHOTS_DIR / self.uri}.dvc")
 
+    def _cached_dvc_repo(self) -> Any:
+        """Return DVC repo and cache it. Backported steps do not use cached repository."""
+        if "backport" in str(self.metadata_path):
+            # The repo has to be created again to pick unignored files
+            return get_dvc(use_cache=False)
+        else:
+            return get_dvc(use_cache=True)
+
     def pull(self, force=True) -> None:
         """Pull file from S3."""
-        with _unignore_backports(self.path):
-            dvc = get_dvc()
-            dvc.pull(str(self.path), remote="public-read" if self.metadata.is_public else "private", force=force)
+        if not force and not self.is_dirty():
+            return
+
+        from dvc.exceptions import CheckoutError
+
+        # DVC locking is terrible. It'd fail if we didn't use our own file locks.
+        # This is pretty limiting as it allows us to only pull
+        # one snapshot at a time. One option is to pre-pull all snapshot steps or
+        # we could just download the file directly.
+        # The combination of different kinds of locks is kinda magical and waiting
+        # to be refactored soon.
+        with dvc_pull_lock, _unignore_backports(self.path):
+            try:
+                repo = self._cached_dvc_repo()
+                repo.pull(str(self.path), remote="public-read" if self.metadata.is_public else "private", force=force)
+            except CheckoutError as e:
+                raise Exception(
+                    "File not found in DVC. Have you run the snapshot script? Make sure you're not using `is_public: false`."
+                ) from e
+
+    def is_dirty(self) -> bool:
+        """Return True if snapshot exists and is in DVC."""
+        from dvc.dvcfile import load_file
+
+        if not self.path.exists():
+            return True
+
+        with open(self.metadata_path) as istream:
+            if "outs:\n" not in istream.read():
+                raise Exception(f"File {self.metadata_path} has not been added to DVC. Run snapshot script to add it.")
+
+        # See notes about locking in `pull` method.
+        with dvc_lock, _unignore_backports(self.metadata_path):
+            repo = self._cached_dvc_repo()
+            dvc_file = load_file(repo, self.metadata_path.as_posix())
+            with repo.lock:
+                # DVC returns empty dictionary if file is up to date
+                stage = dvc_file.stage
+                return stage.status() != {}
 
     def delete_local(self) -> None:
         """Delete local file and its metadata."""
@@ -130,7 +176,7 @@ class Snapshot:
         else:
             raise ValueError("Neither origin nor source is set")
         self.path.parent.mkdir(exist_ok=True, parents=True)
-        if download_url.startswith("s3://"):
+        if download_url.startswith("s3://") or download_url.startswith("r2://"):
             s3_utils.download(download_url, str(self.path))
         else:
             files.download(download_url, str(self.path))

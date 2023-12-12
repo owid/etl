@@ -11,8 +11,6 @@ from structlog import get_logger
 
 from etl.data_helpers import geo
 from etl.helpers import PathFinder
-from etl.paths import DATA_DIR
-from etl.snapshot import Snapshot
 
 log = get_logger()
 
@@ -26,7 +24,7 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load meadow dataset and relevant metadata conversions for units and dimensions
-    ds_meadow = Dataset((DATA_DIR / f"meadow/{paths.namespace}/{paths.version}/{paths.short_name}").as_posix())
+    ds_meadow = paths.load_dataset("un_sdg")
 
     # Read table from meadow dataset.
     tb_meadow = ds_meadow[paths.short_name]
@@ -87,14 +85,14 @@ def create_units(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def get_attributes_description() -> Dict:
-    units: Snapshot = paths.load_dependency(short_name="un_sdg_unit.csv", namespace="un")
+    units = paths.load_snapshot(short_name="un_sdg_unit.csv")
     df_units = pd.read_csv(units.path)
     dict_units = df_units.set_index("AttCode").to_dict()["AttValue"]
     return dict_units
 
 
 def get_dimension_description() -> dict[str, str]:
-    dimensions: Snapshot = paths.load_dependency(short_name="un_sdg_dimension.json", namespace="un")
+    dimensions = paths.load_snapshot(short_name="un_sdg_dimension.json")
     with open(dimensions.path) as json_file:
         dims: dict[str, str] = json.load(json_file)
     # underscore to match the df column names

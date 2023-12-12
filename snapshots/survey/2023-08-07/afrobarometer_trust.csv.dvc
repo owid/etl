@@ -1,0 +1,31 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/origin/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Trust questions in the Afrobarometer dataset
+    description: |-
+      Afrobarometer provides reliable, timely data on the views of ordinary Africans to inform development and policy decision making.
+
+      Afrobarometer is a pan-African, non-partisan survey research network that has been conducting public attitude surveys on democracy, governance, the economy, and society since 1999. On a two- to three-year cycle, their national partners in about 35 African countries carry out face-to-face interviews with nationally representative samples, then analyse the data and disseminate the findings.
+    date_published: 2023-03-09
+
+    # Citation
+    producer: Afrobarometer
+    citation_full: |-
+      Afrobarometer (2023). Merged Round 8 data (34 countries) (2022). Retrieved 07-08-2023 from https://www.afrobarometer.org/data/merged-data/
+
+    # Files
+    url_main: https://www.afrobarometer.org/
+    date_accessed: 2023-08-07
+
+    # License
+    license:
+      name: Data usage and access policy
+      url: https://www.afrobarometer.org/data/data-usage-and-access-policy/
+
+wdir: ../../../data/snapshots/survey/2023-08-07
+outs:
+- md5: 71e3faa88134ecfa97d3547a75ebe0fa
+  size: 774
+  path: afrobarometer_trust.csv
