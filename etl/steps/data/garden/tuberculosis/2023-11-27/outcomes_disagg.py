@@ -109,7 +109,7 @@ def add_region_sum_aggregates(tb: Table, ds_regions: Dataset, ds_income_groups: 
                 region=region,
                 countries_in_region=countries_in_region,
                 countries_that_must_have_data=[],
-                frac_allowed_nans_per_year=0.5,
+                frac_allowed_nans_per_year=0.3,
                 num_allowed_nans_per_year=None,
             )
             # Take only region values
