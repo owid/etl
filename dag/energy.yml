@@ -133,8 +133,8 @@ steps:
   #
   data://meadow/papers/2023-12-12/smil_2017:
     - snapshot://papers/2023-12-12/smil_2017.csv
-  # data://garden/papers/2023-12-12/smil_2017:
-  #   - data://meadow/papers/2023-12-12/smil_2017
+  data://garden/papers/2023-12-12/smil_2017:
+    - data://meadow/papers/2023-12-12/smil_2017
   #
   # Energy - Global primary energy (2023).
   #

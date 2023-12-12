@@ -14,26 +14,23 @@ def run(dest_dir: str) -> None:
     snap = paths.load_snapshot("smil_2017.csv")
 
     # Load data from snapshot.
-    tb = snap.read_csv(underscore=False)
+    tb = snap.read(underscore=False)
 
     #
     # Process data.
     #
     # Use the current names of the columns as the variable titles in the metadata.
-    for column in tb.columns:
-        tb[column].metadata.title = column
+    # for column in tb.drop(columns=["Country", "Year"]).columns:
+    #     tb[column].metadata.title = column
+    #     tb[column].metadata.unit = "TWh"
+    #     tb[column].metadata.description_short = "Measured in terawatt-hours."
 
-    # Ensure all columns are snake-case.
-    tb = tb.underscore()
-
-    # Set an appropriate index and sort conveniently.
-    tb = tb.set_index(["country", "year"], verify_integrity=True).sort_index().sort_index(axis=1)
+    # Ensure all columns are snake-case, set an appropriate index and sort conveniently.
+    tb = tb.underscore().set_index(["country", "year"], verify_integrity=True).sort_index().sort_index(axis=1)
 
     #
     # Save outputs.
     #
     # Create a new meadow dataset with the same metadata as the snapshot.
-    ds_meadow = create_dataset(dest_dir, tables=[tb], default_metadata=snap.metadata, check_variables_metadata=True)
-
-    # Save changes in the new garden dataset.
+    ds_meadow = create_dataset(dest_dir, tables=[tb], check_variables_metadata=True)
     ds_meadow.save()

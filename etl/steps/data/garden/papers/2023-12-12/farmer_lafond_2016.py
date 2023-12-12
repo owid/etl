@@ -2,8 +2,6 @@
 
 """
 
-from owid.catalog import Dataset
-
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current data step.
@@ -85,20 +83,18 @@ def run(dest_dir: str) -> None:
     # Load data.
     #
     # Load dataset from meadow and read its main table.
-    ds_meadow: Dataset = paths.load_dependency("farmer_lafond_2016")
+    ds_meadow = paths.load_dataset("farmer_lafond_2016")
     tb_meadow = ds_meadow["farmer_lafond_2016"]
 
     #
     # Process data.
     #
     # Rename technologies conveniently (both in column names and in metadata).
-    tb_garden = tb_meadow.rename(columns=COLUMNS, errors="raise")[COLUMNS.values()].copy()
+    tb = tb_meadow[list(COLUMNS)].rename(columns=COLUMNS, errors="raise")
 
     #
     # Save outputs.
     #
     # Create a new dataset with the same metadata as meadow
-    ds_garden = create_dataset(
-        dest_dir=dest_dir, tables=[tb_garden], default_metadata=ds_meadow.metadata, check_variables_metadata=True
-    )
+    ds_garden = create_dataset(dest_dir=dest_dir, tables=[tb], check_variables_metadata=True)
     ds_garden.save()
