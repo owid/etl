@@ -6,6 +6,7 @@ meta:
       The Energy Institute Statistical Review of World Energy analyses data on world energy markets from the prior year.
     producer: Energy Institute
     attribution: Energy Institute - Statistical Review of World Energy (2023)
+    attribution_short: Energy Institute
     citation_full: |-
       Energy Institute - Statistical Review of World Energy (2023).
     date_accessed: 2023-12-12
