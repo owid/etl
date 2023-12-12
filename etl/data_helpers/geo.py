@@ -903,7 +903,12 @@ def list_members_of_region(
 
 
 def detect_overlapping_regions(
-    df, index_columns, regions_and_members, country_col="country", year_col="year", ignore_overlaps_of_zeros=True
+    df: TableOrDataFrame,
+    index_columns: List[str],
+    regions_and_members: Dict[str, List[str]],
+    country_col: str = "country",
+    year_col: str = "year",
+    ignore_overlaps_of_zeros: bool = True,
 ):
     """Detect years on which the data for two regions overlap, e.g. a historical region and one of its successors.
 
@@ -943,7 +948,7 @@ def detect_overlapping_regions(
     # List all variables in data (ignoring index columns).
     variables = [column for column in df.columns if column not in index_columns]
     # List all country names found in data.
-    countries_in_data = df[country_col].unique().tolist()
+    countries_in_data = df[country_col].unique().tolist()  # type: ignore
     # List all regions found in data.
     regions = [country for country in list(regions_and_members) if country in countries_in_data]
     # Initialize a list that will store all overlaps found.
