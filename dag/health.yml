@@ -435,3 +435,12 @@ steps:
     - snapshot://tuberculosis/2023-11-27/data_dictionary.csv
   data://grapher/tuberculosis/2023-11-27/notifications:
     - data://garden/tuberculosis/2023-11-27/notifications
+
+  # Tuberculosis treatment UN High-Level Meeting commitments - WHO
+  data://meadow/tuberculosis/2023-12-12/unhlm_commitments:
+    - snapshot://tuberculosis/2023-12-12/unhlm_commitments.csv
+  data://garden/tuberculosis/2023-11-27/unhlm_commitments:
+    - data://meadow/tuberculosis/2023-12-12/unhlm_commitments
+    - snapshot://tuberculosis/2023-11-27/data_dictionary.csv
+  data://grapher/tuberculosis/2023-11-27/unhlm_commitments:
+    - data://garden/tuberculosis/2023-11-27/unhlm_commitments
