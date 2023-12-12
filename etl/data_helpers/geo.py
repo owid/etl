@@ -39,8 +39,8 @@ REGIONS = {
     # Other special regions.
     "European Union (27)": {},
     # TODO: Consider adding also the historical regions to EU (27) definition.
-      # That could be done in the regions dataset, or here, by defining:
-      # {"European Union (27)": {"additional_members": ["East Germany", "West Germany", "Czechoslovakia", ...]}}
+    # That could be done in the regions dataset, or here, by defining:
+    # {"European Union (27)": {"additional_members": ["East Germany", "West Germany", "Czechoslovakia", ...]}}
 }
 
 ########################################################################################################################
