@@ -111,6 +111,6 @@ def run(dest_dir: str) -> None:
     #
     # Save outputs.
     #
-    # Create a new meadow dataset with the same metadata as the snapshot.
+    # Create a new meadow dataset.
     ds_meadow = create_dataset(dest_dir, tables=[tb], check_variables_metadata=True)
     ds_meadow.save()
