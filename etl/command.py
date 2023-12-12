@@ -180,7 +180,7 @@ def main(
     only: bool = False,
     exclude: Optional[str] = None,
     dag_path: Path = paths.DEFAULT_DAG_FILE,
-    workers: int = config.DIRTY_STEPS_WORKERS,
+    workers: int = config.RUN_STEPS_WORKERS,
     strict: Optional[bool] = None,
 ) -> None:
     """
@@ -253,7 +253,7 @@ def run_dag(
     downstream: bool = False,
     only: bool = False,
     excludes: Optional[List[str]] = None,
-    workers: int = config.DIRTY_STEPS_WORKERS,
+    workers: int = config.RUN_STEPS_WORKERS,
     strict: Optional[bool] = None,
 ) -> None:
     """
