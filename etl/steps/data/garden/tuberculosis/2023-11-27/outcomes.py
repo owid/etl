@@ -1,6 +1,5 @@
 """Load a meadow dataset and create a garden dataset."""
-from owid.catalog import Table
-from shared import add_variable_description_from_producer
+from shared import add_variable_description_from_producer, removing_old_variables
 
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
@@ -24,10 +23,8 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
-    tb = geo.harmonize_countries(
-        df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
-    )
-    tb = removing_old_variables(tb, dd)
+    tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
+    tb = removing_old_variables(tb, dd, dataset_name="Outcomes")
     tb = add_variable_description_from_producer(tb, dd)
     tb = tb.set_index(["country", "year"], verify_integrity=True)
 
@@ -41,17 +38,3 @@ def run(dest_dir: str) -> None:
 
     # Save changes in the new garden dataset.
     ds_garden.save()
-
-
-def removing_old_variables(tb: Table, dd: Table) -> Table:
-    """
-    There are several variables in this dataset that are recorded as no longer being used after 2011.
-
-    We will remove these as they will be of limited use to us.
-    """
-    dd = dd[dd["dataset"] == "Outcomes"]
-    cols_to_drop = dd["variable_name"][dd["definition"].str.contains("not used after 2011")].to_list()
-
-    tb = tb.drop(columns=cols_to_drop)
-
-    return tb

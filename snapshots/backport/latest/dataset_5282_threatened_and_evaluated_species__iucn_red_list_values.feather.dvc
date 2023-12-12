@@ -2,7 +2,7 @@ meta:
   source:
     name: Our World in Data catalog backport
     url: https://owid.cloud/admin/datasets/5282
-    date_accessed: 2023-08-10 08:29:05.361965
+    date_accessed: 2023-12-12 11:20:39.869441
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Threatened and evaluated species (IUCN Red List)
@@ -10,6 +10,6 @@ meta:
   is_public: false
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 6549362291cddef4e13f8f5aae8a98fa
-  size: 8370
+- md5: cb39ea177de582cf0ee12aa87898cf35
+  size: 10074
   path: dataset_5282_threatened_and_evaluated_species__iucn_red_list_values.feather

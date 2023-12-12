@@ -1,0 +1,376 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Tuberculosis
+        - Causes of Death
+    display:
+      numDecimalPlaces: 0
+    processing_level: minor
+    unit: cases
+tables:
+  notifications:
+    variables:
+      new_su:
+        title: New pulmonary smear unknown cases
+      new_ep:
+        title: New extra-pulmonary cases
+        description_short: New extra-pulmonary cases that have been bacterially confirmed or clinically diagnosed.
+        description_key:
+          - As of 2013 this also includes extrapulmonary cases with unknown previous tuberculosis history.
+      ret_rel:
+        title: Relapse cases
+      ret_taf:
+        title: Treatment after failure cases
+      ret_tad:
+        title: Treatment after default cases
+      ret_oth:
+        title: Other re-treatment cases
+      newret_oth:
+        title: Cases not included in new and re-treatment cases
+      new_labconf:
+        title: New pulmonary bacteriologically confirmed tuberculosis cases
+        description_short: New pulmonary cases that have been bacteriologically confirmed. Cases confirmed with smear positive or culture positive or positive by WHO-recommended rapid diagnostics such as Xpert MTB/RIF.
+        description_key:
+          - As of 2013 this also includes pulmonary bacteriologically confirmed cases with unknown previous tuberculosis treatment history.
+      new_clindx:
+        title: New pulmonary clinically diagnosed tuberculosis cases
+        description_short: New pulmonary cases that have been clinically diagnosed. Cases diagnosed by a clinician or another medical practitioner who has decided to give the patient a full course of tuberculosis treatment.
+        description_key:
+          - As of 2013 this also includes pulmonary clinically diagnosed cases with unknown previous tuberculosis treatment history.
+      ret_rel_labconf:
+        title: Relapse pulmonary bacteriologically confirmed tuberculosis cases
+        description_short: Relapse pulmonary cases that have been bacteriologically confirmed. Cases confirmed with smear positive or culture positive or positive by WHO-recommended rapid diagnostics such as Xpert MTB/RIF.
+      ret_rel_clindx:
+        title: Relapse pulmonary clinically diagnosed tuberculosis cases
+        description_short: Relapse pulmonary cases that have been clinically diagnosed. Cases diagnosed by a clinician or another medical practitioner who has decided to give the patient a full course of tuberculosis treatment.
+      ret_rel_ep:
+        title: Relapse extra-pulmonary cases
+        description_short: Relapse extra-pulmonary cases that have been bacterially confirmed or clinically diagnosed.
+      ret_nrel:
+        title: Previously treated patients excluding relapse cases
+      notif_foreign:
+        title: New and re-treatment tuberculosis cases among foreign born individuals.
+      c_newinc:
+        title: Total of new and relapse cases and cases with unknown previous treatment history
+      rel_in_agesex_flg:
+        title: Are all relapse cases included with new cases in the disaggregations by age and sex?
+      agegroup_option:
+        title: Age-groups by which notifications have been disaggregated
+      newrel_m04:
+        title: New and relapse cases of males aged 0-4 years
+        description_key:
+          - Not all countries include relapse cases
+      newrel_m59:
+        title: New and relapse cases of males aged 5-9 years
+        description_key:
+          - Not all countries include relapse cases
+      newrel_m1014:
+        title: New and relapse cases of males aged 10-14 years
+        description_key:
+          - Not all countries include relapse cases
+      newrel_m514:
+        title: New and relapse cases of males aged 15-14 years
+        description_key:
+          - Not all countries include relapse cases
+      newrel_m014:
+        title: New and relapse cases of males aged 0-14 years
+        description_key:
+          - Not all countries include relapse cases
+      newrel_m1519:
+        title: New and relapse cases of males aged 15-19 years
+        description_key:
+          - Not all countries include relapse cases
+      newrel_m2024:
+        title: New and relapse cases of males aged 20-24 years
+        description_key:
+          - Not all countries include relapse cases
+      newrel_m1524:
+        title: New and relapse cases of males aged 15-24 years
+        description_key:
+          - Not all countries include relapse cases
+      newrel_m2534:
+        title: New and relapse cases of males aged 25-34 years
+        description_key:
+          - Not all countries include relapse cases
+      newrel_m3544:
+        title: New and relapse cases of males aged 35-44 years
+        description_key:
+          - Not all countries include relapse cases
+      newrel_m4554:
+        title: New and relapse cases of males aged 45-54 years
+        description_key:
+          - Not all countries include relapse cases
+      newrel_m5564:
+        title: New and relapse cases of males aged 55-64 years
+        description_key:
+          - Not all countries include relapse cases
+      newrel_m65:
+        title: New and relapse cases of males aged 65 years and older
+        description_key:
+          - Not all countries include relapse cases
+      newrel_m15plus:
+        title: New and relapse cases of males aged 15 years and older
+        description_key:
+          - Not all countries include relapse cases
+      newrel_mu:
+        title: New and relapse cases of males with unknown age
+        description_key:
+          - Not all countries include relapse cases
+      newrel_f04:
+        title: New and relapse cases of females aged 0-4 years
+        description_key:
+          - Not all countries include relapse cases
+      newrel_f59:
+        title: New and relapse cases of females aged 5-9 years
+        description_key:
+          - Not all countries include relapse cases
+      newrel_f1014:
+        title: New and relapse cases of females aged 10-14 years
+        description_key:
+          - Not all countries include relapse cases
+      newrel_f514:
+        title: New and relapse cases of females aged 5-14 years
+        description_key:
+          - Not all countries include relapse cases
+      newrel_f014:
+        title: New and relapse cases of females aged 0-14 years
+        description_key:
+          - Not all countries include relapse cases
+      newrel_f1519:
+        title: New and relapse cases of females aged 15-19 years
+        description_key:
+          - Not all countries include relapse cases
+      newrel_f2024:
+        title: New and relapse cases of females aged 20-24 years
+        description_key:
+          - Not all countries include relapse cases
+      newrel_f1524:
+        title: New and relapse cases of females aged 15-24 years
+        description_key:
+          - Not all countries include relapse cases
+      newrel_f2534:
+        title: New and relapse cases of females aged 25-34 years
+        description_key:
+          - Not all countries include relapse cases
+      newrel_f3544:
+        title: New and relapse cases of females aged 35-44 years
+        description_key:
+          - Not all countries include relapse cases
+      newrel_f4554:
+        title: New and relapse cases of females aged 45-54 years
+        description_key:
+          - Not all countries include relapse cases
+      newrel_f5564:
+        title: New and relapse cases of females aged 55-64 years
+        description_key:
+          - Not all countries include relapse cases
+      newrel_f65:
+        title: New and relapse cases of females aged 65 years and older
+        description_key:
+          - Not all countries include relapse cases
+      newrel_f15plus:
+        title: New and relapse cases of females aged 15 years and older
+        description_key:
+          - Not all countries include relapse cases
+      newrel_fu:
+        title: New and relapse cases of females with unknown age
+        description_key:
+          - Not all countries include relapse cases
+      newrel_sexunk04:
+        title: New and relapse cases of unknown sex aged 0-4 years
+        description_key:
+          - Not all countries include relapse cases
+      newrel_sexunk514:
+        title: New and relapse cases of unknown sex aged 5-14 years
+        description_key:
+          - Not all countries include relapse cases
+      newrel_sexunk014:
+        title: New and relapse cases of unknown sex aged 0-14 years
+        description_key:
+          - Not all countries include relapse cases
+      newrel_sexunk15plus:
+        title: New and relapse cases of unknown sex aged 15 years and older
+        description_key:
+          - Not all countries include relapse cases
+      newrel_sexunkageunk:
+        title: New and relapse cases of unknown sex and age
+        description_key:
+          - Not all countries include relapse cases
+      rdx_data_available:
+        title: Are data available on the the number of new and relapse cases tested using a WHO recommended rapid test?
+        unit: ""
+      nrr:
+        title: Number of TB cases with no evidence of rifampicin resistance
+        description_key:
+          - Includes either rifampicin susceptible or rifampicin resistance test not done
+      nrr_tx:
+        title: Number of TB cases with no evidence of rifampicin resistance started on rifampicin susceptible treatment
+        description_key:
+          - Includes either rifampicin susceptible or rifampicin resistance test not done
+      rdst_new:
+        title: Number of new cases tested for susceptibility to rifampicin
+        description_key:
+          - Tests include phenotypic DST or WHO-recommended rapid molecular tests such as Xpert MTB/RIF
+      rdst_ret:
+        title: Number of previously treated cases tested for susceptibility to rifampicin
+        description_key:
+          - Tests include phenotypic DST or WHO-recommended rapid molecular tests such as Xpert MTB/RIF
+      rdst_unk:
+        title: Number of cases with unknown previous treatment history tested for susceptibility to rifampicin
+        description_key:
+          - Tests include phenotypic DST or WHO-recommended rapid molecular tests such as Xpert MTB/RIF
+      conf_rrmdr:
+        title: Number of laboratory confirmed rifampicin resistant or multidrug-resistant tuberculosis cases identified
+      conf_mdr:
+        title: Number of laboratory confirmed multidrug-resistant tuberculosis cases identified
+      rr_sldst:
+        title: Number of laboratory-confirmedrifampicin resistant or multidrug-resistant tuberculosis cases tested for susceptibility to second-line drugs
+      all_conf_xdr:
+        title: Number of laboratory-confirmed extensively drug-resistant tuberculosis cases identified
+        description_key:
+          - Includes multidrug-resistant cases diagnosed in previous years
+      conf_rr_nfqr:
+        title: Number of laboratory-confirmed TB cases with rifampicin resistance and with no known resistance to any fluoroquinolones
+      conf_rr_fqr:
+        title: Number of laboratory-confirmed TB cases that are resistant to rifampicin and resistant to any fluoroquinolone
+      unconf_rrmdr_tx:
+        title: Number of patients (not laboratory-confirmed as having rifampicin-resistant (RR-TB) or multidrug-resistant TB (MDR-TB)) who started treatment for MDR-TB
+        unit: patients
+      conf_rrmdr_tx:
+        title: Number of laboratory-confirmed rifampicin-resistant (RR-TB) or multidrug-resistant TB (MDR-TB) patients who started treatment for MDR-TB
+        unit: patients
+      rrmdr_014_tx:
+        title: The number of children aged 0-14 years among patients who started treatment for multidrug-resistant tuberculosis
+        unit: patients
+      rr_nfqr_014_tx:
+        title: The number of children aged 0-14 years among patients who started treatment for multidrug resistant or rifampicin resistant tuberculosis
+        unit: patients
+      unconf_mdr_tx:
+        title: Number of multidrug-resistant tuberculosis (not laboratory-confirmed) patients who started treatment for multidrug-resistant tuberculosis
+        unit: patients
+      conf_mdr_tx:
+        title: Number of laboratory-confirmed multidrug-resistant tuberculosis patients who started treatment for multidrug-resistant tuberculosis
+        unit: patients
+      conf_xdr_tx:
+        title: Number of laboratory-confirmed extensively drug-resistant tuberculosis patients who started treatment for extensively drug-resistant tuberculosis
+        unit: patients
+      unconf_rr_nfqr_tx:
+        title: Number of patients (not laboratory-confirmed as having resistance to rifampicin and with no known resistance to any fluoroquinolones) who started treatment for multidrug-resistant tuberculosis
+        unit: patients
+        description_key:
+          - This does not include patients treated for pre-extensively drug-resistant tuberculosis or extensively drug-resistant tuberculosis
+      conf_rr_nfqr_tx:
+        title: Number of patients with laboratory-confirmed resistance to rifampicin and with no known resistance to any fluoroquinolones who started treatment for MDR-TB.
+        unit: patients
+      conf_rr_fqr_tx:
+        title: Number of patients with laboratory-confirmed resistance to rifampicin and resistance to any fluoroquinolone (i.e. with pre-XDR-TB or XDR-TB) who started treatment for pre-XDR-TB or XDR-TB.
+        unit: patients
+      nrr_hpmz_tx:
+        title: Number of patients started on the 4-month HPMZ regimen for the treatment of rifampicin-susceptible TB during the reporting year
+        unit: patients
+      mdrxdr_bpalm_tx:
+        title: Number of patients started on the all-oral BPaLM/BPaL regimen for the treatment of MDR/RR-TB or pre-XDR-TB during the reporting year
+        unit: patients
+      mdrxdr_bdq_tx:
+        title: Number of patients started on the all-oral BPaL/BPaLM regimen for the treatment of MDR/RR-TB or pre-XDR-TB during the reporting year
+        unit: patients
+      mdrxdr_alloral_tx:
+        title: Number of patients started on all oral longer multidrug-resistant tuberculosis treatment regimens during the reporting year
+        unit: patients
+      mdrxdr_dlm_tx:
+        title: Number of patients started on Delamanid during the reporting year
+        unit: patients
+      mdr_shortreg_tx:
+        title: Number of patients started on shorter multidrug-resistant tuberculosis treatment regiments during the reporting year
+        unit: patients
+      mdr_tx_adverse_events:
+        title: Number of patients on multidrug-resistant tuberculosis treatment who had adverse events registered in the reporting year
+        unit: patients
+      mdr_alloral_short_tx:
+        title: Number of patients started on all oral shorter multidrug-resistant tuberculosis treatment regimens during the reporting year
+        unit: patients
+      mdr_tx_adsm:
+        title: Number of patients who started treatment for MDR-TB/pre-XDR-TB/XDR-TB in the reporting year who are also being actively monitored for adverse events
+        unit: patients
+      newrel_tbhiv_flg:
+        title: Are data on HIV testing, HIV positivity and provision of antiretroviral therapy (ART) restricted to new and relapse TB cases only?
+        unit: ""
+      tbhiv_014_flg:
+        title: Are data on TB/HIV indicators available for new and relapse TB patients that are children aged 0-14 years?
+        unit: ""
+      newrel_hivtest_014:
+        title: Number of new and relapse TB patients aged 0-14 years tested for HIV at the time of TB diagnosis or with known HIV status at the time of TB diagnosis
+        unit: patients
+      newrel_hivpos_014:
+        title: Number of new and relapse TB patients aged 0-14 years recorded as HIV-positive
+        unit: patients
+      newrel_art_014:
+        title: Number of HIV-positive new and relapse TB patients aged 0-14 years who started or continued on antiretroviral therapy
+        unit: patients
+      hivtest:
+        title: Tuberculosis patients (new and re-treatment) with an HIV test result recorded in the TB register
+        unit: patients
+      hivtest_pos:
+        title: Tuberculosis patients (new and re-treatment) recorded as HIV-positive
+        unit: patients
+      hiv_cpt:
+        title: HIV-positive tuberculosis patients started or continued on co-trimoxazole preventive therapy (CPT)
+        unit: patients
+      hiv_art:
+        title: HIV-positive tuberculosis patients started or continued on antiretroviral therapy (ART)
+        unit: patients
+      hiv_tbscr:
+        title: Number of adults and children enrolled in HIV care who had their tuberculosis status assessed and recorded during their last visit
+        unit: people
+      hiv_reg:
+        title: Total number of people registered as HIV-positive regardless of year of diagnosis
+        unit: people
+        description_short: Total number of adults and children enrolled in HIV care; includes everyone in the HIV care and/or ART register.
+      hiv_ipt:
+        title: People living with HIV newly enrolled in HIV treatment who started treatment for latent TB infection
+        unit: people
+      hiv_reg_new:
+        title: Number of adults and children newly enrolled in HIV treatment during the reporting period
+        unit: people
+      hiv_ipt_reg_all:
+        title: People living with HIV currently enrolled in HIV treatment who started treatment for latent TB infection
+        unit: people
+      hiv_reg_all:
+        title: Number of adults and children currently enrolled in HIV treatment
+        unit: people
+      hiv_tbdetect:
+        title: Total number of adults and children newly enrolled in HIV treatment who are diagnosed as having active tuberculosis disease during the reporting period
+        unit: people
+      hiv_reg_new2:
+        title: Total number of adults and children newly enrolled in HIV treatment in the reporting year
+        unit: people
+      hiv_elig_all_tpt:
+        title: People who are on antiretroviral therapy and eligible for TB preventive treatment (TPT) who started TPT
+        unit: people
+      hiv_elig_all:
+        title: People who are on antiretroviral therapy and who are eligible for TB preventive treatment (TPT)
+        unit: people
+      hiv_elig_new_tpt:
+        title: People who started antiretroviral therapy in the last 12 months and eligible for TB preventive treatment (TPT) who started TPT
+      hiv_elig_new:
+        title: People who started antiretroviral therapy in the last 12 months and who are eligible for TB preventive treatment (TPT)
+        unit: people
+      hiv_all_tpt:
+        title: People who are on antiretroviral therapy and who started tuberculosis preventive treatment
+        unit: people
+      hiv_all:
+        title: People on antiretroviral therapy
+        unit: people
+      hiv_new_tpt:
+        title: People who started antiretroviral therapy in the last 12 months and who started tuberculosis preventive treatment
+        unit: people
+      hiv_new:
+        title: People who started antiretroviral therapy in the last 12 months
+        unit: people
+      hiv_all_tpt_completed:
+        title: People on antiretroviral therapy who completed tuberculosis preventive treatment (TPT) among those who initiated any course of TPT
+        unit: people
+      hiv_all_tpt_started:
+        title: People on antiretroviral therapy who initiated any course of tuberculosis preventive treatment
+        unit: people
