@@ -450,5 +450,7 @@ steps:
     - snapshot://tuberculosis/2023-12-12/outcomes_disagg.csv
   data://garden/tuberculosis/2023-11-27/outcomes_disagg:
     - data://meadow/tuberculosis/2023-12-12/outcomes_disagg
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2023-04-30/income_groups
   data://grapher/tuberculosis/2023-11-27/outcomes_disagg:
     - data://garden/tuberculosis/2023-11-27/outcomes_disagg

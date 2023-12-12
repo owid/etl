@@ -6,12 +6,12 @@ definitions:
         - Tuberculosis
     display:
       numDecimalPlaces: 0
-    processing_level: minor
+    processing_level: major
     unit: ""
   sex: |-
-    <% if sex == "a" %>males and females <% elif sex == "m" %>males <% elif sex == "f" %>females  <%- endif -%>
+    <% if sex == "a" %>males and females<% elif sex == "m" %>males<% elif sex == "f" %>females<%- endif -%>
   age_group: |-
-    <% if age_group == "0-14" %>aged 0-14 years<% elif age_group == "a" %><% endif -%>
+    <% if age_group == "0-14" %> aged 0-14 years <% elif age_group == "a" %><% endif -%>
   cohort_type: |-
     new and relapse drug-susceptible tuberculosis treatment
 dataset:
@@ -20,32 +20,51 @@ tables:
   outcomes_disagg:
     variables:
       coh:
-        title: Cohort size
+        title: The number of {definitions.sex} {definitions.age_group} receiving {definitions.cohort_type}.
         description_short: |-
           The number of {definitions.sex} {definitions.age_group} receiving {definitions.cohort_type}.
+        presentation:
+          title_public: The number of {definitions.sex} {definitions.age_group} receiving {definitions.cohort_type}.
       succ:
-        title: Number of individuals where the treatment succeeded
+        title: The number of {definitions.sex} {definitions.age_group} receiving {definitions.cohort_type} where the treatment succeeded.
         description_short: |-
           The number of {definitions.sex} {definitions.age_group} receiving {definitions.cohort_type} where the treatment succeeded.
+        presentation:
+          title_public: |-
+            The number of {definitions.sex} {definitions.age_group} receiving {definitions.cohort_type} where the treatment succeeded.
       fail:
-        title: Number of individuals where the treatment failed
+        title: The number of {definitions.sex} {definitions.age_group} receiving {definitions.cohort_type} where the treatment failed.
         description_short: |-
           The number of {definitions.sex} {definitions.age_group} receiving {definitions.cohort_type} where the treatment failed.
+        presentation:
+          title_public: |-
+            The number of {definitions.sex} {definitions.age_group} receiving {definitions.cohort_type} where the treatment failed.
       died:
-        title: Number of individuals that died
+        title: The number of {definitions.sex} {definitions.age_group} receiving {definitions.cohort_type} who died.
         description_short: |-
           The number of {definitions.sex} {definitions.age_group} receiving {definitions.cohort_type} who died.
+        presentation:
+          title_public: |-
+            The number of {definitions.sex} {definitions.age_group} receiving {definitions.cohort_type} who died.
       lost:
-        title: Number of individuals that were lost to follow-up
+        title: The number of {definitions.sex} {definitions.age_group} receiving {definitions.cohort_type} who were lost to follow up.
         description_short: |-
           The number of {definitions.sex} {definitions.age_group} receiving {definitions.cohort_type} who were lost to follow up.
+        presentation:
+          title_public: The number of {definitions.sex} {definitions.age_group} receiving {definitions.cohort_type} who were lost to follow up.
       neval:
-        title: Number of individuals where the treatement was not evaluated
+        title: The number of {definitions.sex} {definitions.age_group} receiving {definitions.cohort_type} where the treatment was not evaluated.
         description_short: |-
           The number of {definitions.sex} {definitions.age_group} receiving {definitions.cohort_type} where the treatment was not evaluated.
+        presentation:
+          title_public: |-
+            The number of {definitions.sex} {definitions.age_group} receiving {definitions.cohort_type} where the treatment was not evaluated.
       tsr:
-        title: Treatment success rate
+        title: The success rate of {definitions.cohort_type} for {definitions.sex} {definitions.age_group}.
         description_short: |-
           The success rate of {definitions.cohort_type} for {definitions.sex} {definitions.age_group}.
+        presentation:
+          title_public: |-
+            The success rate of {definitions.cohort_type} for {definitions.sex} {definitions.age_group}.
         unit: "%"
         short_unit: "%"
