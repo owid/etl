@@ -26,34 +26,34 @@ tables:
         presentation:
           title_public: The number of {definitions.sex} {definitions.age_group} receiving {definitions.cohort_type}.
       succ:
-        title: The number of {definitions.sex} {definitions.age_group} receiving {definitions.cohort_type} where the treatment succeeded.
+        title: The number of {definitions.sex}  {definitions.age_group} receiving {definitions.cohort_type} where the treatment succeeded.
         description_short: |-
           The number of {definitions.sex} {definitions.age_group} receiving {definitions.cohort_type} where the treatment succeeded.
         presentation:
           title_public: |-
             The number of {definitions.sex} {definitions.age_group} receiving {definitions.cohort_type} where the treatment succeeded.
       fail:
-        title: The number of {definitions.sex} {definitions.age_group} receiving {definitions.cohort_type} where the treatment failed.
+        title: The number of {definitions.sex}  {definitions.age_group} receiving {definitions.cohort_type} where the treatment failed.
         description_short: |-
           The number of {definitions.sex} {definitions.age_group} receiving {definitions.cohort_type} where the treatment failed.
         presentation:
           title_public: |-
             The number of {definitions.sex} {definitions.age_group} receiving {definitions.cohort_type} where the treatment failed.
       died:
-        title: The number of {definitions.sex} {definitions.age_group} receiving {definitions.cohort_type} who died.
+        title: The number of {definitions.sex}  {definitions.age_group} receiving {definitions.cohort_type} who died.
         description_short: |-
           The number of {definitions.sex} {definitions.age_group} receiving {definitions.cohort_type} who died.
         presentation:
           title_public: |-
             The number of {definitions.sex} {definitions.age_group} receiving {definitions.cohort_type} who died.
       lost:
-        title: The number of {definitions.sex} {definitions.age_group} receiving {definitions.cohort_type} who were lost to follow up.
+        title: The number of {definitions.sex}  {definitions.age_group} receiving {definitions.cohort_type} who were lost to follow up.
         description_short: |-
           The number of {definitions.sex} {definitions.age_group} receiving {definitions.cohort_type} who were lost to follow up.
         presentation:
           title_public: The number of {definitions.sex} {definitions.age_group} receiving {definitions.cohort_type} who were lost to follow up.
       neval:
-        title: The number of {definitions.sex} {definitions.age_group} receiving {definitions.cohort_type} where the treatment was not evaluated.
+        title: The number of {definitions.sex}  {definitions.age_group} receiving {definitions.cohort_type} where the treatment was not evaluated.
         description_short: |-
           The number of {definitions.sex} {definitions.age_group} receiving {definitions.cohort_type} where the treatment was not evaluated.
         presentation:
