@@ -13,7 +13,7 @@ meta:
   is_public: true
   description: |
 
-wdir: ../../../data/snapshots/eia/2023-07-10
+wdir: ../../../data/snapshots/eia/2023-12-12
 outs:
 - md5: 3ac7e0139ca27a589b46835ea44ffea5
   size: 21722525

@@ -41,7 +41,7 @@ meta:
     * Pumped storage is included under the "Hydropower" category but not in the "Total renewable energy". Generation from mixed plants is split between hydropower and pumped storage as appropriate.
 
     This data may be freely used, shared, copied, reproduced, printed and/or stored, provided that all such material is clearly attributed to IRENA and bears a notation of copyright (© IRENA) with the year of copyright. Unless otherwise stated, the data provided are the property of the International Renewable Energy Agency (IRENA) and are subject to copyright by IRENA. Data attributed to third parties may be subject to third-party copyright and separate terms of use and restrictions, including restrictions in relation to any commercial use.
-wdir: ../../../data/snapshots/irena/2023-06-26
+wdir: ../../../data/snapshots/irena/2023-12-12
 outs:
 - md5: bc4b45cda6fa828e2ad8d1773ad1d46d
   size: 2531832

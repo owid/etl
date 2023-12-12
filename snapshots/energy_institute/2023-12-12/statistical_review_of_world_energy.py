@@ -27,11 +27,8 @@ def main(upload: bool) -> None:
     for snapshot_file in SNAPSHOT_FILES:
         snap = Snapshot(f"energy_institute/{SNAPSHOT_VERSION}/{snapshot_file}")
 
-        # Download data from source.
-        snap.download_from_source()
-
-        # Add file to DVC and upload to S3.
-        snap.dvc_add(upload=upload)
+        # Download data from source and upload to S3.
+        snap.create_snapshot(upload=upload)
 
 
 if __name__ == "__main__":

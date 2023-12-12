@@ -16,7 +16,7 @@ meta:
   is_public: true
   description: |
     The European Electricity Review analyses full-year electricity generation and demand data for 2022 in all EU-27 countries to understand the region’s progress in transitioning from fossil fuels to clean electricity.
-wdir: ../../../data/snapshots/ember/2023-02-20
+wdir: ../../../data/snapshots/ember/2023-12-12
 outs:
 - md5: 22581f7212e14670a75fb149b9e3382a
   size: 1525895

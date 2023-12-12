@@ -14,7 +14,7 @@ meta:
   is_public: true
   description: |
 
-wdir: ../../../data/snapshots/irena/2023-06-26
+wdir: ../../../data/snapshots/irena/2023-12-12
 outs:
 - md5: 56e7a24b2e61da1fc5bc36262ff7a5bf
   size: 675885

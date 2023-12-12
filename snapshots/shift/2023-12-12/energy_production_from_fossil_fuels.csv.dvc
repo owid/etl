@@ -14,7 +14,7 @@ meta:
     The data on energy production from fossil fuels provided by The Shift Data Portal is based on the following sources:
     · For the period 1900-1980: Bouda Etemad and Jean Luciani, World Energy Production 1900 – 1985, ISBN 2-600-56007-6, Data digitalized and published with agreement of B. Etemad.
     · For the period 1980-2016: U.S. Energy Information Administration, Historical Statistics for 1980-2016, accessed on 2019-06-05.
-wdir: ../../../data/snapshots/shift/2023-07-10
+wdir: ../../../data/snapshots/shift/2023-12-12
 outs:
 - md5: e1b6c175c3a516d0fb0d0905b6baa258
   size: 839274
