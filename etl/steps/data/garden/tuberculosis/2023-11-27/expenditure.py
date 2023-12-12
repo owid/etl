@@ -61,7 +61,6 @@ def add_values_to_hospital_type(tb: Table) -> Table:
 def replace_zero_with_na(tb: Table) -> Table:
     """
     Replacing zeros with NAs for variables concerning average cost of drugs per patient
-
     """
 
     cols = ["exp_cpp_dstb", "exp_cpp_mdr", "exp_cpp_tpt", "exp_cpp_xdr"]
