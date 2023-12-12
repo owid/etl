@@ -1,9 +1,6 @@
 """Load a snapshot and create a meadow dataset."""
 
-from typing import cast
-
 import numpy as np
-import pandas as pd
 from owid.catalog import Table
 
 from etl.helpers import PathFinder, create_dataset
@@ -18,26 +15,26 @@ DATE_TIME_INTERVAL = "Annual"
 
 
 def extract_variable_from_raw_eia_data(
-    raw_data: pd.DataFrame,
+    data_raw: Table,
     variable_name: str,
     unit_name: str,
     data_time_interval: str = "Annual",
-) -> pd.DataFrame:
+) -> Table:
     """Extract data for a certain variable and unit from the raw EIA data (the International Energy Data obtained via
     bulk download).
 
-    The raw data is in a json format. After reading it with pandas (`pd.read_json(data_file, lines=True)`), the
-    dataframe has one row per variable-country, e.g. `Total energy consumption, Germany, Annual`, and the data for this
-    variable-country is given in the same row, but a different column. That cell with data is a list of lists, e.g.
-    `[[2000, 0.5], [2001, 0.6], ...]`. This dataframe seems to have some duplicated rows (which we will simply drop).
+    The raw data is in a json format. After reading it, the resulting table has one row per variable-country, e.g.
+    `Total energy consumption, Germany, Annual`, and the data for this variable-country is given in the same row, but a
+    different column. That cell with data is a list of lists, e.g.
+    `[[2000, 0.5], [2001, 0.6], ...]`. This data seems to have some duplicated rows (which we will simply drop).
 
-    This function extracts will extract that data and create a more convenient, long-format dataframe indexed by
-    country-year. It will also contain a column of 'members', which gives the country code of countries included in each
-    row. This may be useful to know how aggregate regions are defined by EIA.
+    This function extracts that data and creates a more convenient, long-format table indexed by country-year. It will
+    also add a column of 'members', which gives the country code of countries included in each row. This may be useful
+    to know how aggregate regions are defined by EIA.
 
     Parameters
     ----------
-    raw_data : pd.DataFrame
+    data_raw : Table
         Raw EIA data.
     variable_name : str
         Name of variable to extract, as given in the raw data file.
@@ -48,8 +45,8 @@ def extract_variable_from_raw_eia_data(
 
     Returns
     -------
-    data : pd.DataFrame
-        Extracted data for given variable and unit, as a dataframe indexed by country-year.
+    data : Table
+        Extracted data for given variable and unit, as a table indexed by country-year.
 
     """
 
@@ -59,8 +56,8 @@ def extract_variable_from_raw_eia_data(
         "data": "values",
     }
     # Keep only rows with data for the given variable and unit.
-    data = raw_data[
-        raw_data["name"].str.contains(variable_name, regex=False) & (raw_data["units"] == unit_name)
+    data = data_raw[
+        data_raw["name"].str.contains(variable_name, regex=False) & (data_raw["units"] == unit_name)
     ].reset_index(drop=True)
 
     # Select and rename columns.
@@ -88,7 +85,7 @@ def extract_variable_from_raw_eia_data(
     # Set index and sort appropriately.
     data = data.set_index(["country", "year"], verify_integrity=True).sort_index()
 
-    return cast(pd.DataFrame, data)
+    return data
 
 
 def run(dest_dir: str) -> None:
@@ -104,21 +101,16 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
-    df = extract_variable_from_raw_eia_data(
-        raw_data=data_raw, variable_name=VARIABLE_NAME, unit_name=UNIT_NAME, data_time_interval=DATE_TIME_INTERVAL
+    tb = extract_variable_from_raw_eia_data(
+        data_raw=data_raw, variable_name=VARIABLE_NAME, unit_name=UNIT_NAME, data_time_interval=DATE_TIME_INTERVAL
     )
 
-    # Create a table with metadata from snapshot (and update its short name).
-    tb = Table(df, metadata=snap.to_table_metadata(), underscore=True)
+    # Change the name of the main table.
     tb.metadata.short_name = paths.short_name
-
-    # Add sources and licenses to the main variable of the long-format table.
-    tb["values"].metadata.sources = [snap.metadata.source]
-    tb["values"].metadata.licenses = [snap.metadata.license]
 
     #
     # Save outputs.
     #
     # Create a new meadow dataset with the same metadata as the snapshot.
-    ds_meadow = create_dataset(dest_dir, tables=[tb], default_metadata=snap.metadata)
+    ds_meadow = create_dataset(dest_dir, tables=[tb], check_variables_metadata=True)
     ds_meadow.save()

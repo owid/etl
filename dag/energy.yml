@@ -94,8 +94,8 @@ steps:
   #
   # EIA - Energy consumption 2023.
   #
-  # data://meadow/eia/2023-12-12/energy_consumption:
-  #   - snapshot://eia/2023-12-12/international_energy_data.zip
+  data://meadow/eia/2023-12-12/energy_consumption:
+    - snapshot://eia/2023-12-12/international_energy_data.zip
   # data://garden/eia/2023-12-12/energy_consumption:
   #   - data://meadow/eia/2023-12-12/energy_consumption
   #   - data://garden/wb/2023-04-30/income_groups
