@@ -944,10 +944,6 @@ def estimate_metrics_locations(tb: Table, tb_maps: Table, tb_codes: Table, ds_po
     tb_maps: map data (borders and stuff)
     tb_codes: from gw codes. so that all countries have either a 1 or 0 (instead of missing data).
     ds_population: population data (for rates)
-
-    TODO:
-        - Fix number of countries being locations of conflicts by region. Currently there are duplicates for aggregate ctypes and regions.
-        -
     """
     tb_codes_ = tb_codes.reset_index().drop(columns=["id"]).copy()
     tb_codes_ = tb_codes_[tb_codes_["year"] >= 1989]
@@ -1085,142 +1081,73 @@ def estimate_metrics_locations(tb: Table, tb_maps: Table, tb_codes: Table, ds_po
     ###################
     paths.log.info("estimating number of locations with conflict...")
 
-    # Only count population only when country is location of conflict
-    # tb_locations_country["population"] = (
-    #     tb_locations_country["population"] * tb_locations_country["is_location_of_conflict"]
-    # )
-
-    # Regions
-    tbs_locations_regions = []
-    cols = ["region", "year", "conflict_type"]
-    ## Number of countries
-    tb_locations_regions = (
-        tb_locations.groupby(cols)
-        .agg(
-            {
-                "country_name_location": "nunique",
-            }
-        )
-        .reset_index()
-        .sort_values(cols)
-        .rename(
-            columns={
-                "country_name_location": "number_locations",
-                "region": "country",
-            }
-        )
-    )
-    tbs_locations_regions.append(tb_locations_regions)
-    ## TODO
-    ## Extra conflict type (aggregates)
-    for ctype_agg, ctypes in CTYPES_AGGREGATES.items():
-        tb_locations_ = tb_locations[tb_locations["conflict_type"].isin(ctypes)]
-        cols = ["region", "year"]
-        tb_locations_regions_ = (
-            tb_locations_.groupby(cols)
+    def _get_number_of_locations_with_conflict_regions(tb: Table, cols: List[str]) -> Table:
+        """Get number of locations with conflict."""
+        # For each group, get the number of unique locations
+        tb = (
+            tb.groupby(cols)
             .agg(
                 {
                     "country_name_location": "nunique",
                 }
             )
             .reset_index()
-            .sort_values(cols)
-            .rename(
-                columns={
-                    "country_name_location": "number_locations",
-                    "region": "country",
-                }
-            )
         )
-        tb_locations_regions_["conflict_type"] = ctype_agg
-        tbs_locations_regions.append(tb_locations_regions_)
-
-    ## Population
-    # tb_locations_regions_population = (
-    #     tb_locations_country.groupby(cols)
-    #     .agg(
-    #         {
-    #             "population": "sum",
-    #         }
-    #     )
-    #     .reset_index()
-    #     .sort_values(cols)
-    #     .rename(
-    #         columns={
-    #             "country_name_location": "number_locations",
-    #             "region": "country",
-    #         }
-    #     )
-    # )
-    # World
-    cols = ["year", "conflict_type"]
-    ## Number of countries
-    tb_locations_world = (
-        tb_locations.groupby(cols)
-        .agg(
-            {
-                "country_name_location": "nunique",
-            }
-        )
-        .reset_index()
-        .sort_values(cols)
-        .rename(
-            columns={
+        # Rename columns
+        if "region" in cols:
+            column_rename = {
                 "country_name_location": "number_locations",
                 "region": "country",
             }
-        )
+        else:
+            column_rename = {
+                "country_name_location": "number_locations",
+            }
+
+        tb = tb.rename(columns=column_rename)
+        return tb
+
+    # Regions
+    ## Number of countries (given ctypes)
+    tb_locations_regions = _get_number_of_locations_with_conflict_regions(
+        tb_locations, ["region", "year", "conflict_type"]
     )
-    tb_locations_world["country"] = "World"
-    ## Population
-    # tb_locations_world_pop = (
-    #     tb_locations_country.groupby(cols)
-    #     .agg(
-    #         {
-    #             "population": "sum",
-    #         }
-    #     )
-    #     .reset_index()
-    #     .sort_values(cols)
-    #     .rename(
-    #         columns={
-    #             "country_name_location": "number_locations",
-    #             "region": "country",
-    #         }
-    #     )
-    # )
-    # tb_locations_world_pop["country"] = "World"
+    tb_locations_regions_world = _get_number_of_locations_with_conflict_regions(tb_locations, ["year", "conflict_type"])
+    tb_locations_regions_world["country"] = "World"
+
+    tbs_locations_regions = [
+        tb_locations_regions,
+        tb_locations_regions_world,
+    ]
+
+    ## Extra conflict types (aggregates)
+    cols = ["region", "year"]
+    for ctype_agg, ctypes in CTYPES_AGGREGATES.items():
+        # Keep only children for this ctype aggregate
+        tb_locations_ = tb_locations[tb_locations["conflict_type"].isin(ctypes)]
+        # Get actual table, add ctype. (also for region 'World')
+        tb_locations_regions_agg = _get_number_of_locations_with_conflict_regions(tb_locations_, ["region", "year"])
+        tb_locations_regions_agg["conflict_type"] = ctype_agg
+        tb_locations_regions_agg_world = _get_number_of_locations_with_conflict_regions(tb_locations_, ["year"])
+        tb_locations_regions_agg_world["conflict_type"] = ctype_agg
+        tb_locations_regions_agg_world["country"] = "World"
+        tbs_locations_regions.extend([tb_locations_regions_agg, tb_locations_regions_agg_world])
+
     # Combine
     tb_locations_regions = pr.concat(
-        [
-            tb_locations_regions,
-            tb_locations_world,
-            # tb_locations_world_pop,
-        ],
+        tbs_locations_regions,
         ignore_index=True,
     )
-    # tb_locations_regions = pr.concat(
-
-    #         tbs_locations_regions + tbs_locations_world,
-    #         # tb_locations_world_pop,
-    #     ,
-    #     ignore_index=True,
-    # )
 
     # Add origins
     tb_locations_regions["number_locations"].m.origins = tb_locations["conflict_new_id"].origins
 
-    paths.log.info("adding conflict type aggregates...")
-    # Add aggregates of conflict types
-    for ctype_agg, ctypes in CTYPES_AGGREGATES.items():
-        tb_locations_regions = aggregate_conflict_types(
-            tb=tb_locations_regions,
-            parent_name=ctype_agg,
-            children_names=ctypes,
-            columns_to_aggregate=["number_locations"],
-            columns_to_aggregate_absolute=["number_locations"],
-            columns_to_groupby=["country", "year"],
-        )
+    # Fill with zeroes
+    tb_locations_regions = fill_gaps_with_zeroes(
+        tb=tb_locations_regions,
+        columns=["country", "year", "conflict_type"],
+        cols_use_range=["year"],
+    )
 
     ###################
     # COMBINE: Country flag + Regional counts
