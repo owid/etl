@@ -457,7 +457,7 @@
                       "Must be one short sentence (a few words)."
                     ],
                     [
-                      "For 'small datasets', this should be the publicly displayed title. For 'big datasets' (like FAOSTAT, with many dimensions), it can be less human-readable, optimized for internal searches (then, use `display.name` for the publicly displayed title)."
+                      "For 'small datasets', this should be the publicly displayed title. For 'big datasets' (like FAOSTAT, with many dimensions), it can be less human-readable, optimized for internal searches (then, use `presentation.title_public` for the public title)."
                     ],
                     [
                       "Should not mention other metadata fields like `producer` or `version`."
@@ -779,7 +779,7 @@
                   "properties": {
                     "title_public": {
                       "type": "string",
-                      "description": "Indicator title to be shown in data pages, that overrides the indicator's title.",
+                      "description": "Indicator title to be shown in public places like data pages, that overrides the indicator's title.",
                       "requirement_level": "optional",
                       "guidelines": [
                         [
@@ -798,7 +798,10 @@
                           "Should help OWID and expert users identify the indicator."
                         ],
                         [
-                          "For big datasets where constructing human-readable titles is hard (e.g. FAOSTAT), consider using other metadata fields to improve the public appearance of the title (namely `presentation.title_public` and `grapher_config.title`)."
+                          "For big datasets where constructing human-readable titles is hard (e.g. FAOSTAT), this field is mandatory, to improve the public appearance of the title."
+                        ],
+                        [
+                          "When `display.name` is defined (to edit the default title in the legend of a chart), `title_public` must also be defined (otherwise `display.name` will be used as a public title)."
                         ]
                       ]
                     },

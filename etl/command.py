@@ -180,7 +180,7 @@ def main(
     only: bool = False,
     exclude: Optional[str] = None,
     dag_path: Path = paths.DEFAULT_DAG_FILE,
-    workers: int = config.DIRTY_STEPS_WORKERS,
+    workers: int = config.RUN_STEPS_WORKERS,
     strict: Optional[bool] = None,
 ) -> None:
     """
@@ -253,7 +253,7 @@ def run_dag(
     downstream: bool = False,
     only: bool = False,
     excludes: Optional[List[str]] = None,
-    workers: int = config.DIRTY_STEPS_WORKERS,
+    workers: int = config.RUN_STEPS_WORKERS,
     strict: Optional[bool] = None,
 ) -> None:
     """
@@ -316,10 +316,25 @@ def exec_steps(steps: List[Step], strict: Optional[bool] = None) -> None:
             print()
 
 
+def _steps_sort_key(step: Step) -> int:
+    """Sort steps by channel, so that grapher steps are executed first, then garden, then meadow, then snapshots."""
+    str_step = str(step)
+    if "grapher://" in str_step:
+        return 0
+    elif "garden://" in str_step:
+        return 1
+    elif "meadow://" in str_step:
+        return 2
+    elif "snapshot://" in str_step:
+        return 3
+    else:
+        return 4
+
+
 def exec_steps_parallel(steps: List[Step], workers: int, dag: DAG, strict: Optional[bool] = None) -> None:
     # put grapher steps in front of the queue to process them as soon as possible and lessen
     # the load on MySQL
-    steps = sorted(steps, key=lambda x: "grapher://" not in str(x))
+    steps = sorted(steps, key=_steps_sort_key)
 
     # create execution graph from steps
     exec_graph = {}
