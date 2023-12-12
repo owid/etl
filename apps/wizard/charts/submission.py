@@ -62,7 +62,8 @@ def create_submission(variable_config: VariableConfig, schema_chart_config: Dict
 
     # If we managed to get the charts and updaters, show results.
     if submission.is_valid:
-        log.info(f"chart_revision: Submission is valid: {submission}")
+        # NOTE: turned off because it's too noisy
+        # log.info(f"chart_revision: Submission is valid: {submission}")
         # Display details
         num_charts = len(charts)  # type: ignore
         with st.container():
