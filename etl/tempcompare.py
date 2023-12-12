@@ -134,9 +134,10 @@ def series_equals(
 
     # first see if NaNs are in both series
     eq = s1.isnull() & s2.isnull()
-    # then compare the rest of the values (we cannot compare the entire series because pandas
+    # then compare the rest of non-nan values (we cannot compare the entire series because pandas
     # complains with `TypeError: boolean value of NA is ambiguous`)
-    eq[eq] |= s1[eq].eq(s2[eq])
+    ix = ~s1.isnull() & ~s2.isnull()
+    eq[ix] |= s1[ix].eq(s2[ix])
     return eq
 
 

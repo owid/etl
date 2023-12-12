@@ -71,4 +71,8 @@ def test_df_equals_exceptions():
 def test_series_equals_nans():
     s1 = pd.Series([1])
     s2 = pd.Series([pd.NA])
-    series_equals(s1, s2)
+    assert list(series_equals(s1, s2)) == [False]
+
+    s1 = pd.Series([1, np.nan])
+    s2 = pd.Series([1, pd.NA])
+    assert series_equals(s1, s2).all()
