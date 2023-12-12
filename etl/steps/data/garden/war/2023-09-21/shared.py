@@ -339,12 +339,14 @@ def aggregate_conflict_types(
         tb_agg = tb.copy()
     else:
         tb_agg = tb[tb[dim_name].isin(children_names)].copy()
-    tb_agg = tb_agg.groupby(columns_to_groupby, as_index=False).agg(
-        {
-            col: lambda x: min(x.sum(), 1) if col not in cast(List, columns_to_aggregate_absolute) else x.sum()
-            for col in columns_to_aggregate
-        }
-    )
+    # Obtain summations
+    tb_agg = tb_agg.groupby(columns_to_groupby, as_index=False).agg({col: sum for col in columns_to_aggregate})
+    # Threshold to 1 for binary columns
+    threshold_upper = 1
+    for col in columns_to_aggregate:
+        if col not in columns_to_aggregate_absolute:
+            tb_agg[col] = tb_agg[col].apply(lambda x: min(x, threshold_upper))
+    # Add conflict type
     tb_agg[dim_name] = parent_name
 
     # Combine
