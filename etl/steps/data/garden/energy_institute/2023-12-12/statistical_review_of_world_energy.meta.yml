@@ -31,7 +31,7 @@ tables:
       #   title: 'Biofuels Production - Kboed - Biodiesel'
       #   unit: 'thousand barrels of oil equivalent per day'
       #   short_unit: 'kBOED'
-      #   description_short: |
+      #   description_short: |-
       #     Biodiesel production includes biojet which is currently <1 kBOED globally but more than doubled relative to 2019.
       biodiesel_production_pj:
         title: 'Biofuels production (biodiesel) - PJ'
@@ -49,13 +49,13 @@ tables:
       #   title: 'Biofuels Consumption - Kboed - Total'
       #   unit: 'thousand barrels of oil equivalent per day'
       #   short_unit: 'kBOED'
-      #   description_short: |
+      #   description_short: |-
       #     Includes biogasoline (such as ethanol) and biodiesel. Volumes have been adjusted for energy content.
       biofuels_consumption_ej:
         title: 'Biofuels consumption - EJ'
         unit: 'exajoules'
         short_unit: 'EJ'
-        description_short: |
+        description_short: |-
           Includes biogasoline (such as ethanol) and biodiesel. Volumes have been adjusted for energy content.
         presentation:
           title_public: 'Biofuels consumption'
@@ -63,7 +63,7 @@ tables:
         title: 'Biofuels consumption - TWh'
         unit: 'terawatt-hours'
         short_unit: 'TWh'
-        description_short: |
+        description_short: |-
           Includes biogasoline (such as ethanol) and biodiesel. Volumes have been adjusted for energy content.
         display:
           name: Biofuels
@@ -73,13 +73,13 @@ tables:
       #   title: 'Biofuels Production - Kboed - Total'
       #   unit: 'thousand barrels of oil equivalent per day'
       #   short_unit: 'kBOED'
-      #   description_short: |
+      #   description_short: |-
       #     Includes biogasoline (such as ethanol), biodiesel and biojet. Volumes have been adjusted for energy content.
       biofuels_production_pj:
         title: 'Biofuels production - PJ'
         unit: 'petajoules'
         short_unit: 'PJ'
-        description_short: |
+        description_short: |-
           Includes biogasoline (such as ethanol) and biodiesel. Volumes have been adjusted for energy content.
         presentation:
           title_public: 'Biofuels production'
@@ -87,7 +87,7 @@ tables:
         title: 'Biofuels production - TWh'
         unit: 'terawatt-hours'
         short_unit: 'TWh'
-        description_short: |
+        description_short: |-
           Includes biogasoline (such as ethanol) and biodiesel. Volumes have been adjusted for energy content.
         display:
           name: Biofuels
@@ -97,7 +97,7 @@ tables:
         title: 'Other renewables (including geothermal and biomass) - EJ'
         unit: 'exajoules'
         short_unit: 'EJ'
-        description_short: |
+        description_short: |-
           Input-equivalent energy, in exajoules, is based on gross generation and does not account for cross-border electricity supply.
         presentation:
           title_public: 'Other renewables (including geothermal and biomass)'
@@ -105,7 +105,7 @@ tables:
         title: 'Other renewables (including geothermal and biomass) - TWh'
         unit: 'terawatt-hours'
         short_unit: 'TWh'
-        description_short: |
+        description_short: |-
           Input-equivalent energy, in terawatt-hours, is based on gross generation and does not account for cross-border electricity supply.
         display:
           name: Other renewables
@@ -115,7 +115,7 @@ tables:
         title: 'Other renewables (including geothermal and biomass) electricity generation - TWh'
         unit: 'terawatt-hours'
         short_unit: 'TWh'
-        description_short: |
+        description_short: |-
           Figures are based on gross generation and do not account for cross-border electricity supply.
         display:
           name: Other renewables
@@ -183,7 +183,7 @@ tables:
         title: 'Electricity generation - TWh'
         unit: 'terawatt-hours'
         short_unit: 'TWh'
-        description_short: |
+        description_short: |-
           Based on gross output.
         presentation:
           title_public: 'Electricity generation'
@@ -191,7 +191,7 @@ tables:
         title: 'Coal electricity generation - TWh'
         unit: 'terawatt-hours'
         short_unit: 'TWh'
-        description_short: |
+        description_short: |-
           Based on gross output.
         presentation:
           title_public: 'Coal electricity generation'
@@ -199,7 +199,7 @@ tables:
         title: 'Gas electricity generation - TWh'
         unit: 'terawatt-hours'
         short_unit: 'TWh'
-        description_short: |
+        description_short: |-
           Based on gross output.
         presentation:
           title_public: 'Gas electricity generation'
@@ -207,7 +207,7 @@ tables:
         title: 'Oil electricity generation - TWh'
         unit: 'terawatt-hours'
         short_unit: 'TWh'
-        description_short: |
+        description_short: |-
           Based on gross output.
         presentation:
           title_public: 'Oil electricity generation'
@@ -273,7 +273,7 @@ tables:
         title: 'Gas production - TWh'
         unit: 'terawatt-hours'
         short_unit: 'TWh'
-        description_short: |
+        description_short: |-
           Excludes gas flared or recycled. Includes natural gas produced for Gas-to-Liquids transformation.
         display:
           name: Gas production
@@ -303,7 +303,7 @@ tables:
         title: 'Hydro consumption - EJ'
         unit: 'exajoules'
         short_unit: 'EJ'
-        description_short: |
+        description_short: |-
           Input equivalent energy is based on gross generation and does not account for cross-border electricity supply.
         presentation:
           title_public: 'Hydropower consumption'
@@ -311,7 +311,7 @@ tables:
         title: 'Hydro consumption - TWh'
         unit: 'terawatt-hours'
         short_unit: 'TWh'
-        description_short: |
+        description_short: |-
           Input-equivalent energy is based on gross generation and does not account for cross-border electricity supply.
         display:
           name: Hydropower
@@ -321,7 +321,7 @@ tables:
         title: 'Hydro generation - TWh'
         unit: 'terawatt-hours'
         short_unit: 'TWh'
-        description_short: |
+        description_short: |-
           Figures are based on gross primary hydroelectric generation and do not account for cross-border electricity supply.
         display:
           name: Hydropower
@@ -349,7 +349,7 @@ tables:
         title: 'Nuclear consumption - EJ'
         unit: 'exajoules'
         short_unit: 'EJ'
-        description_short: |
+        description_short: |-
           Input-equivalent energy is based on gross generation and does not account for cross-border electricity supply.
         presentation:
           title_public: 'Nuclear consumption'
@@ -357,7 +357,7 @@ tables:
         title: 'Nuclear consumption - TWh'
         unit: 'terawatt-hours'
         short_unit: 'TWh'
-        description_short: |
+        description_short: |-
           Input-equivalent energy is based on gross generation and does not account for cross-border electricity supply.
         display:
           name: Nuclear
@@ -367,7 +367,7 @@ tables:
         title: 'Nuclear generation - TWh'
         unit: 'terawatt-hours'
         short_unit: 'TWh'
-        description_short: |
+        description_short: |-
           Figures are based on gross generation and do not account for cross-border electricity supply.
         display:
           name: Nuclear
@@ -449,7 +449,7 @@ tables:
       #   title: 'Oil production (NGLs) - kBD'
       #   unit: 'thousand barrels per day'
       #   short_unit: 'kBD'
-      #   description_short: |
+      #   description_short: |-
       #     Includes ethane, LPG and naphtha separated from the production of natural gas. Excludes condensates.
       oil_reserves_bbl:
         title: 'Oil proved reserves - BBL'
@@ -471,7 +471,7 @@ tables:
         title: 'Primary energy consumption - EJ'
         unit: 'exajoules'
         short_unit: 'EJ'
-        description_short: |
+        description_short: |-
           Comprises commercially-traded fuels, including modern renewables used to generate electricity. Energy from all sources of non-fossil power generation is accounted for on an input-equivalent basis.
         presentation:
           title_public: 'Primary energy consumption'
@@ -479,7 +479,7 @@ tables:
         title: 'Primary energy consumption - TWh'
         unit: 'terawatt-hours'
         short_unit: 'TWh'
-        description_short: |
+        description_short: |-
           Comprises commercially-traded fuels, including modern renewables used to generate electricity. Energy from all sources of non-fossil power generation is accounted for on an input-equivalent basis.
         display:
           name: Primary energy consumption
@@ -489,25 +489,25 @@ tables:
       #   title: 'Primary energy consumption per capita - GJ'
       #   unit: 'gigajoules per capita'
       #   short_unit: 'GJ'
-      #   description_short: |
+      #   description_short: |-
       #     Comprises commercially-traded fuels, including modern renewables used to generate electricity. Energy from all sources of non-fossil power generation is accounted for on an input-equivalent basis.
       # rareearths_kt:
       #   title: 'Rare Earth Production-Reserves'
       #   unit: 'thousand tonnes'
       #   short_unit: 'kt'
-      #   description_short: |
+      #   description_short: |-
       #     Figures are measured in terms of thousand tonnes of rare earth oxide equivalent.
       # refcap_kbd:
       #   title: 'Oil - Refining capacity'
       #   unit: 'thousand barrels per day'
       #   short_unit: 'kBD'
-      #   description_short: |
+      #   description_short: |-
       #     Atmospheric distillation capacity is measured at year end on a calendar-day basis.
       # refthru_kbd:
       #   title: 'Oil - Refinery throughput'
       #   unit: 'thousand barrels per day'
       #   short_unit: 'kBD'
-      #   description_short: |
+      #   description_short: |-
       #     Atmospheric distillation capacity is measured at year end on a calendar-day basis.
       # ren_power_ej:
       #   title: 'Renewables Power - EJ'
@@ -537,7 +537,7 @@ tables:
         title: 'Renewables electricity generation - TWh'
         unit: 'terawatt-hours'
         short_unit: 'TWh'
-        description_short: |
+        description_short: |-
           Renewable power is based on gross generation from renewable sources including wind, geothermal, solar, biomass and waste, and does not account for cross-border electricity supply.
         display:
           name: Renewables
@@ -547,7 +547,7 @@ tables:
         title: 'Solar consumption - EJ'
         unit: 'exajoules'
         short_unit: 'EJ'
-        description_short: |
+        description_short: |-
           Input-equivalent energy, in exajoules, is based on gross generation and does not account for cross-border electricity supply.
         presentation:
           title_public: 'Solar consumption'
@@ -555,7 +555,7 @@ tables:
         title: 'Solar consumption - TWh'
         unit: 'terawatt-hours'
         short_unit: 'TWh'
-        description_short: |
+        description_short: |-
           Input-equivalent energy, in terawatt-hours, is based on gross generation and does not account for cross-border electricity supply.
         display:
           name: Solar
@@ -565,7 +565,7 @@ tables:
         title: 'Solar generation - TWh'
         unit: 'terawatt-hours'
         short_unit: 'TWh'
-        description_short: |
+        description_short: |-
           Figures are based on gross generation and do not account for cross-border electricity supply.
         display:
           name: Solar
@@ -575,7 +575,7 @@ tables:
         title: 'Wind consumption - EJ'
         unit: 'exajoules'
         short_unit: 'EJ'
-        description_short: |
+        description_short: |-
           Input-equivalent energy, in exajoules, is based on gross generation and does not account for cross-border electricity supply.
         presentation:
           title_public: 'Wind consumption'
@@ -583,7 +583,7 @@ tables:
         title: 'Wind consumption - TWh'
         unit: 'terawatt-hours'
         short_unit: 'TWh'
-        description_short: |
+        description_short: |-
           Input-equivalent energy, in terawatt-hours, is based on gross generation and does not account for cross-border electricity supply.
         display:
           name: Wind
@@ -593,7 +593,7 @@ tables:
         title: 'Wind generation - TWh'
         unit: 'terawatt-hours'
         short_unit: 'TWh'
-        description_short: |
+        description_short: |-
           Figures are based on gross generation and do not account for cross-border electricity supply.
         display:
           name: Wind
@@ -629,7 +629,7 @@ tables:
         title: Thermal equivalent efficiency factors
         unit: ''
         short_unit: ''
-        description_short: |
+        description_short: |-
           Thermal equivalent efficiency factors used to convert non-fossil electricity in input-equivalent to direct primary energy.
         presentation:
           title_public: 'Thermal equivalent efficiency factors'
