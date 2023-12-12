@@ -28,3 +28,7 @@ steps:
     - data://garden/wb/2022-10-03/extreme_poverty_by_region
   data://garden/wb/2022-10-03/extreme_poverty_by_region:
     - snapshot://wb/2022-10-03/extreme_poverty_by_region.feather
+  data://grapher/iucn/2022-12-08/threatened_and_evaluated_species:
+    - data://garden/iucn/2022-12-08/threatened_and_evaluated_species
+  data://garden/iucn/2022-12-08/threatened_and_evaluated_species:
+    - snapshot://iucn/2022-12-08/threatened_and_evaluated_species.feather

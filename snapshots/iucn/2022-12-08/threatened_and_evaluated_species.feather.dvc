@@ -1,0 +1,45 @@
+meta:
+  source:
+    name: IUCN Red List (2022)
+    description: >-
+      The IUCN Red List has assessed only a small share of the total known species
+      in the world. This means the number of
+      species threatened with extinction is likely to be a significant underestimate
+      of the total number of species at risk.
+
+
+      This is particularly true for understudied groups such as insects, plants and
+      fungi.
+
+
+      The share of known species threatened with extinction is only available for
+      a few taxonomic groups where more than 80%
+      of species have been assessed.
+
+
+      'Threatened' species are those that are categorized as 'Critically endangered',
+      'Endangered' or 'Vulnerable' on the
+      IUCN Red List.
+
+
+      This dataset should be next updated by the source in December 2022. We will
+      update it on Our World in Data soon after
+      the new version is published. At the link above you can directly access the
+      source page and see the latest available
+      data.
+
+
+      The 'mushrooms' taxonomic group includes brackets, rusts, smuts and, jelly fungi.
+    url: https://www.iucnredlist.org/resources/summary-statistics; 
+      https://nc.iucnredlist.org/redlist/content/attachment_files/2021-3_RL_Stats_Table_1a_v2.pdf
+      ; 
+      https://nc.iucnredlist.org/redlist/content/attachment_files/2022-1_RL_Stats_Table_1a.pdf
+    date_accessed: 2022-12-08
+    published_by: IUCN Red List
+  name: Threatened and evaluated species (IUCN Red List)
+  description: Manually update spreadsheet
+wdir: ../../../data/snapshots/iucn/2022-12-08
+outs:
+- md5: 0172e60a8ed2a8d4f814c74b08a417c5
+  size: 7250
+  path: threatened_and_evaluated_species.feather

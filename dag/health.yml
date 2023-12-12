@@ -418,10 +418,39 @@ steps:
   data://grapher/tuberculosis/2023-11-27/outcomes:
     - data://garden/tuberculosis/2023-11-27/outcomes
 
-data://meadow/tuberculosis/2023-12-05/expenditure:
-  - snapshot://tuberculosis/2023-12-05/expenditure.csv
-data://garden/tuberculosis/2023-11-27/expenditure:
-  - data://meadow/tuberculosis/2023-12-05/expenditure
-  - snapshot://tuberculosis/2023-11-27/data_dictionary.csv
-data://grapher/tuberculosis/2023-11-27/expenditure:
-  - data://garden/tuberculosis/2023-11-27/expenditure
+  # Tuberculosis expenditure - WHO
+  data://meadow/tuberculosis/2023-12-05/expenditure:
+    - snapshot://tuberculosis/2023-12-05/expenditure.csv
+  data://garden/tuberculosis/2023-11-27/expenditure:
+    - data://meadow/tuberculosis/2023-12-05/expenditure
+    - snapshot://tuberculosis/2023-11-27/data_dictionary.csv
+  data://grapher/tuberculosis/2023-11-27/expenditure:
+    - data://garden/tuberculosis/2023-11-27/expenditure
+
+  # Tuberculosis notifications - WHO
+  data://meadow/tuberculosis/2023-12-11/notifications:
+    - snapshot://tuberculosis/2023-12-11/notifications.csv
+  data://garden/tuberculosis/2023-11-27/notifications:
+    - data://meadow/tuberculosis/2023-12-11/notifications
+    - snapshot://tuberculosis/2023-11-27/data_dictionary.csv
+  data://grapher/tuberculosis/2023-11-27/notifications:
+    - data://garden/tuberculosis/2023-11-27/notifications
+
+  # Tuberculosis treatment UN High-Level Meeting commitments - WHO
+  data://meadow/tuberculosis/2023-12-12/unhlm_commitments:
+    - snapshot://tuberculosis/2023-12-12/unhlm_commitments.csv
+  data://garden/tuberculosis/2023-11-27/unhlm_commitments:
+    - data://meadow/tuberculosis/2023-12-12/unhlm_commitments
+    - snapshot://tuberculosis/2023-11-27/data_dictionary.csv
+  data://grapher/tuberculosis/2023-11-27/unhlm_commitments:
+    - data://garden/tuberculosis/2023-11-27/unhlm_commitments
+
+  # Tuberculosis outcomes disaggregated - WHO
+  data://meadow/tuberculosis/2023-12-12/outcomes_disagg:
+    - snapshot://tuberculosis/2023-12-12/outcomes_disagg.csv
+  data://garden/tuberculosis/2023-11-27/outcomes_disagg:
+    - data://meadow/tuberculosis/2023-12-12/outcomes_disagg
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2023-04-30/income_groups
+  data://grapher/tuberculosis/2023-11-27/outcomes_disagg:
+    - data://garden/tuberculosis/2023-11-27/outcomes_disagg
