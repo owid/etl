@@ -27,6 +27,7 @@ def run(dest_dir: str) -> None:
     tb = add_variable_description_from_producer(tb, dd)
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
     tb = add_values_to_hospital_type(tb)
+    tb = replace_zero_with_na(tb)
     tb = tb.set_index(["country", "year"], verify_integrity=True)
 
     #
@@ -53,5 +54,17 @@ def add_values_to_hospital_type(tb: Table) -> Table:
     }
     tb["hosp_type_mdr"] = tb["hosp_type_mdr"].astype(object)
     tb["hosp_type_mdr"] = tb["hosp_type_mdr"].replace(hosp_dict)
+
+    return tb
+
+
+def replace_zero_with_na(tb: Table) -> Table:
+    """
+    Replacing zeros with NAs for variables concerning average cost of drugs per patient
+    """
+
+    cols = ["exp_cpp_dstb", "exp_cpp_mdr", "exp_cpp_tpt", "exp_cpp_xdr"]
+
+    tb[cols] = tb[cols].replace(0, np.nan)
 
     return tb
