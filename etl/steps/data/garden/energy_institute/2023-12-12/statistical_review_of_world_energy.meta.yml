@@ -75,12 +75,6 @@ tables:
         short_unit: 'TWh'
         description: |
           Figures are based on gross generation and do not account for cross-border electricity supply. "Input-equivalent" energy is the amount of fuel that would be required by thermal power stations to generate the reported electricity output.
-      other_renewables_consumption_direct_twh:  # Added by OWID.
-        title: 'Other renewables (including geothermal and biomass) (direct) - TWh'
-        unit: 'terawatt-hours'
-        short_unit: 'TWh'
-        description: |
-          Figures are based on gross generation and do not account for cross-border electricity supply.
       other_renewables_electricity_generation_twh:
         title: 'Other renewables (including geothermal and biomass) electricity generation - TWh'
         unit: 'terawatt-hours'
@@ -225,12 +219,6 @@ tables:
         short_unit: 'TWh'
         description: |
           Figures are based on gross generation and do not account for cross-border electricity supply. "Input-equivalent" energy is the amount of fuel that would be required by thermal power stations to generate the reported electricity output.
-      hydro_consumption_direct_twh:  # Added by OWID.
-        title: 'Hydro consumption (direct) - TWh'
-        unit: 'terawatt-hours'
-        short_unit: 'TWh'
-        description: |
-          Figures are based on gross generation and do not account for cross-border electricity supply.
       hydro_electricity_generation_twh:
         title: 'Hydro generation - TWh'
         unit: 'terawatt-hours'
@@ -263,12 +251,6 @@ tables:
         short_unit: 'TWh'
         description: |
           Figures are based on gross generation and do not account for cross-border electricity supply. "Input-equivalent" energy is the amount of fuel that would be required by thermal power stations to generate the reported electricity output.
-      nuclear_consumption_direct_twh:  # Added by OWID.
-        title: 'Nuclear consumption (direct) - TWh'
-        unit: 'terawatt-hours'
-        short_unit: 'TWh'
-        description: |
-          Figures are based on gross generation and do not account for cross-border electricity supply.
       nuclear_electricity_generation_twh:
         title: 'Nuclear generation - TWh'
         unit: 'terawatt-hours'
@@ -419,12 +401,6 @@ tables:
         short_unit: 'TWh'
         description: |
           Figures are based on gross generation and do not account for cross-border electricity supply. "Input-equivalent" energy is the amount of fuel that would be required by thermal power stations to generate the reported electricity output.
-      solar_consumption_direct_twh:  # Added by OWID.
-        title: 'Solar consumption (direct) - TWh'
-        unit: 'terawatt-hours'
-        short_unit: 'TWh'
-        description: |
-          Figures are based on gross generation and do not account for cross-border electricity supply.
       solar_electricity_generation_twh:
         title: 'Solar generation - TWh'
         unit: 'terawatt-hours'
@@ -443,12 +419,6 @@ tables:
         short_unit: 'TWh'
         description: |
           Figures are based on gross generation and do not account for cross-border electricity supply. "Input-equivalent" energy is the amount of fuel that would be required by thermal power stations to generate the reported electricity output.
-      wind_consumption_direct_twh:  # Added by OWID.
-        title: 'Wind consumption (direct) - TWh'
-        unit: 'terawatt-hours'
-        short_unit: 'TWh'
-        description: |
-          Figures are based on gross generation and do not account for cross-border electricity supply.
       wind_electricity_generation_twh:
         title: 'Wind generation - TWh'
         unit: 'terawatt-hours'

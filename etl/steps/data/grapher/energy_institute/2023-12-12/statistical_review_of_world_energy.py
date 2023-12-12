@@ -1,10 +1,8 @@
 """Load a garden dataset and create a grapher dataset."""
 
-from typing import cast
+from owid.catalog import Table
 
-from owid.catalog import Dataset, Table
-
-from etl.helpers import PathFinder, create_dataset, grapher_checks
+from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -46,7 +44,7 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load garden dataset and read its main table and the fossil fuel prices table.
-    ds_garden = cast(Dataset, paths.load_dependency("statistical_review_of_world_energy"))
+    ds_garden = paths.load_dataset("statistical_review_of_world_energy")
     tb = ds_garden["statistical_review_of_world_energy"]
     tb_prices = ds_garden["statistical_review_of_world_energy_fossil_fuel_prices"]
     tb_price_index = ds_garden["statistical_review_of_world_energy_fossil_fuel_price_index"]
@@ -84,11 +82,4 @@ def run(dest_dir: str) -> None:
         default_metadata=ds_garden.metadata,
         check_variables_metadata=True,
     )
-
-    #
-    # Checks.
-    #
-    grapher_checks(ds_grapher)
-
-    # Save changes in the new grapher dataset.
     ds_grapher.save()
