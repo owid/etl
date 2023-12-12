@@ -52,6 +52,19 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
+    # Remove variables that are not used in grapher.
+    tb = tb.drop(
+        columns=[column for column in tb.columns if column.endswith(("_ej", "_pj", "_bcfd", "_bcm", "_kbd", "_bbl"))],
+        errors="raise",
+    )
+
+    # Conveniently change units from TCM to cubic meters.
+    tb = tb.rename(columns={"gas_reserves_tcm": "gas_reserves_m3"}, errors="raise")
+    tb["gas_reserves_m3"] *= 1e12
+    tb["gas_reserves_m3"].metadata.title = "Gas proved reserves - m³"
+    tb["gas_reserves_m3"].metadata.unit = "cubic meters"
+    tb["gas_reserves_m3"].metadata.short_unit = "m³"
+
     # Prepare price tables.
     tb_coal_prices = prepare_item_prices_table(tb_prices=tb_prices, item_name="coal_price")
     tb_gas_prices = prepare_item_prices_table(tb_prices=tb_prices, item_name="gas_price")

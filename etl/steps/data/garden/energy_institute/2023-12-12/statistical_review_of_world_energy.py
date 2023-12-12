@@ -23,6 +23,8 @@ BARRELS_TO_CUBIC_METERS = 1 / 6.2898
 KBD_TO_CUBIC_METERS_PER_DAY = 1000 * BARRELS_TO_CUBIC_METERS
 # Million British thermal units to megawatt-hours.
 MILLION_BTU_TO_MWH = 1e3 / 3412
+# Billion barrels to tonnes.
+BBL_TO_TONNES = 0.1364 * 1e9
 
 # Reference year to use for table of price indexes.
 PRICE_INDEX_REFERENCE_YEAR = 2018
@@ -285,6 +287,9 @@ def create_additional_variables(tb: Table) -> Table:
         if column in ["oil_consumption_kbd"]:
             # Convert oil consumption given in thousand barrels per day to cubic meters per day.
             tb[column.replace("_kbd", "_m3d")] = tb[column] * KBD_TO_CUBIC_METERS_PER_DAY
+        if column in ["oil_reserves_bbl"]:
+            # Convert oil reserves given in billions of barrels to tonnes.
+            tb[column.replace("_bbl", "_t")] = tb[column] * BBL_TO_TONNES
 
     return tb
 

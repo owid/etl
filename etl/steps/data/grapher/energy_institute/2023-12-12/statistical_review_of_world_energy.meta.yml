@@ -2,6 +2,7 @@ tables:
   statistical_review_of_world_energy:
     variables:
       biofuels_consumption_twh:
+        # TODO: Add presentation.title_public
         display:
             name: Biofuels
       biofuels_production_twh:
