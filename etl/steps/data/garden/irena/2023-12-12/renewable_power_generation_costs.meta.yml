@@ -1,0 +1,44 @@
+dataset:
+  title: Renewable power generation costs (IRENA, 2023b)
+  description: |
+    Levelized cost of energy (LCOE) estimates the average cost per unit of energy generated across the lifetime of a new power plant. It is measured in 2021 US$ per kilowatt-hour.
+
+tables:
+  renewable_power_generation_costs:
+    variables:
+      bioenergy:
+        title: Bioenergy levelized cost of energy
+        short_unit: $/kWh
+        unit: 2021 US$ per kilowatt-hour
+      concentrated_solar_power:
+        title: Concentrated solar power levelized cost of energy
+        short_unit: $/kWh
+        unit: 2021 US$ per kilowatt-hour
+      geothermal:
+        title: Geothermal levelized cost of energy
+        short_unit: $/kWh
+        unit: 2021 US$ per kilowatt-hour
+      hydropower:
+        title: Hydropower levelized cost of energy
+        short_unit: $/kWh
+        unit: 2021 US$ per kilowatt-hour
+      offshore_wind:
+        title: Offshore wind levelized cost of energy
+        short_unit: $/kWh
+        unit: 2021 US$ per kilowatt-hour
+      onshore_wind:
+        title: Onshore wind levelized cost of energy
+        short_unit: $/kWh
+        unit: 2021 US$ per kilowatt-hour
+      solar_photovoltaic:
+        title: Solar photovoltaic levelized cost of energy
+        short_unit: $/kWh
+        unit: 2021 US$ per kilowatt-hour
+  solar_photovoltaic_module_prices:
+    variables:
+      cost:
+        title: Solar photovoltaic module prices
+        short_unit: "$/W"
+        unit: "2021 US$ per Watt"
+        description: |
+          Global average price of solar photovoltaic modules.

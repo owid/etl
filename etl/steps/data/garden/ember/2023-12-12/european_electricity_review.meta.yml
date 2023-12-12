@@ -1,0 +1,184 @@
+dataset:
+  namespace: ember
+  version: 2022-08-01
+  title: European Electricity Review (Ember, 2022)
+  short_name: european_electricity_review
+  sources:
+    -
+      name: Ember's European Electricity Review (2022)
+      published_by: Ember
+      publication_year: 2022
+      date_accessed: 2022-08-01
+      url: https://ember-climate.org/insights/research/european-electricity-review-2022/
+
+tables:
+  country_overview:
+    variables:
+      total_generation__twh:
+        title: Generation (TWh)
+        short_unit: terawatt-hours
+        unit: TWh
+        display:
+          name: Generation
+      net_imports__twh:
+        title: Net imports (TWh)
+        short_unit: terawatt-hours
+        unit: TWh
+        display:
+          name: Net imports
+      demand__twh:
+        title: Demand (TWh)
+        short_unit: terawatt-hours
+        unit: TWh
+        display:
+          name: Demand
+      demand_per_capita__kwh:
+        title: Demand per capita (kWh)
+        short_unit: kWh
+        unit: kilowatt-hours
+        display:
+          name: Demand per capita
+  emissions:
+    variables:
+      co2_intensity__gco2_kwh:
+        title: CO2 intensity (gCO2/kWh)
+        short_unit: gCO2/kWh
+        unit: grams of CO2 equivalent per kilowatt-hour
+        display:
+          name: CO2 intensity
+      total_emissions__mtco2:
+        title: Total emissions (mtCO2)
+        short_unit: mtCO2
+        unit: megatonnes of CO2 equivalent
+        display:
+          name: Total emissions
+  generation:
+    variables:
+      bioenergy__twh:
+        title: Bioenergy (TWh)
+        short_unit: terawatt-hours
+        unit: TWh
+        display:
+          name: Bioenergy
+      gas__twh:
+        title: Gas (TWh)
+        short_unit: terawatt-hours
+        unit: TWh
+        display:
+          name: Gas
+      hard_coal__twh:
+        title: Hard coal (TWh)
+        short_unit: terawatt-hours
+        unit: TWh
+        display:
+          name: Hard coal
+      hydro__twh:
+        title: Hydro (TWh)
+        short_unit: terawatt-hours
+        unit: TWh
+        display:
+          name: Hydro
+      lignite__twh:
+        title: Lignite (TWh)
+        short_unit: terawatt-hours
+        unit: TWh
+        display:
+          name: Lignite
+      nuclear__twh:
+        title: Nuclear (TWh)
+        short_unit: terawatt-hours
+        unit: TWh
+        display:
+          name: Nuclear
+      other_fossil__twh:
+        title: Other fossil (TWh)
+        short_unit: terawatt-hours
+        unit: TWh
+        display:
+          name: Other fossil
+      other_renewables__twh:
+        title: Other renewables (TWh)
+        short_unit: terawatt-hours
+        unit: TWh
+        display:
+          name: Other renewables
+      solar__twh:
+        title: Solar (TWh)
+        short_unit: terawatt-hours
+        unit: TWh
+        display:
+          name: Solar
+      wind__twh:
+        title: Wind (TWh)
+        short_unit: terawatt-hours
+        unit: TWh
+        display:
+          name: Wind
+      bioenergy__pct:
+        title: Bioenergy (%)
+        short_unit: "%"
+        unit: "%"
+        display:
+          name: Bioenergy
+      gas__pct:
+        title: Gas (%)
+        short_unit: "%"
+        unit: "%"
+        display:
+          name: Gas
+      hard_coal__pct:
+        title: Hard coal (%)
+        short_unit: "%"
+        unit: "%"
+        display:
+          name: Hard coal
+      hydro__pct:
+        title: Hydro (%)
+        short_unit: "%"
+        unit: "%"
+        display:
+          name: Hydro
+      lignite__pct:
+        title: Lignite (%)
+        short_unit: "%"
+        unit: "%"
+        display:
+          name: Lignite
+      nuclear__pct:
+        title: Nuclear (%)
+        short_unit: "%"
+        unit: "%"
+        display:
+          name: Nuclear
+      other_fossil__pct:
+        title: Other fossil (%)
+        short_unit: "%"
+        unit: "%"
+        display:
+          name: Other fossil
+      other_renewables__pct:
+        title: Other renewables (%)
+        short_unit: "%"
+        unit: "%"
+        display:
+          name: Other renewables
+      solar__pct:
+        title: Solar (%)
+        short_unit: "%"
+        unit: "%"
+        display:
+          name: Solar
+      wind__pct:
+        title: Wind (%)
+        short_unit: "%"
+        unit: "%"
+        display:
+          name: Wind
+  net_flows:
+    variables:
+      net_flow__twh:
+        title: Net flow (TWh)
+        short_unit: terawatt-hours
+        unit: TWh
+        display:
+          name: Net flow

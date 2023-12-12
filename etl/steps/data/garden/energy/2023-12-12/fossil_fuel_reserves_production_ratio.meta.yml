@@ -1,0 +1,45 @@
+dataset:
+  title: Fossil fuel reserves/production ratio (Energy Institute, 2023)
+  short_name: fossil_fuel_reserves_production_ratio
+  description: |
+    The Reserves-to-Production (R/P) Ratio measures the number of years of fuel supplies left based on current annual consumption rates. Note that this can change through time through the discovery of new fuel reserves, and increases in annual consumption.
+
+tables:
+  fossil_fuel_reserves_production_ratio:
+    variables:
+      coal_left:
+        title: Coal reserves/production ratio
+        short_unit: years
+        unit: years
+      coal_production:
+        title: Coal annual production
+        short_unit: t
+        unit: tonnes
+      coal_reserves:
+        title: Global reserves of coal
+        short_unit: t
+        unit: tonnes
+      gas_left:
+        title: Gas reserves/production ratio
+        short_unit: years
+        unit: years
+      gas_production:
+        title: Gas annual production
+        short_unit: cubic meters
+        unit: cubic meters
+      gas_reserves:
+        title: Global reserves of gas
+        short_unit: cubic meters
+        unit: cubic meters
+      oil_left:
+        title: Oil reserves/production ratio
+        short_unit: years
+        unit: years
+      oil_production:
+        title: Oil annual production
+        short_unit: t
+        unit: tonnes
+      oil_reserves:
+        title: Global reserves of oil
+        short_unit: t
+        unit: tonnes

@@ -1,0 +1,187 @@
+dataset:
+  title: Renewable energy patents
+  description: |
+    The data reports the annual number of new patents filed under the category of each renewable technology.
+
+    Note that the number of patents for the last few years may be subject to a time lag; processing times of patent applications vary and some patents submitted over this period may not yet be recorded in the statistics. These figures will be updated with time if additional patent applications are recorded.
+
+  sources:
+    -
+      name: International Renewable Energy Agency (IRENA) (2021)
+      published_by: International Renewable Energy Agency (IRENA) INSPIRE Platform based on EPO PATSTAT 2021 Autumn edition and on the Climate Change Mitigation Technologies (Y02) classification by EPO.
+      url: https://www.irena.org/Statistics/View-Data-by-Topic/Innovation-and-Technology/Patents-Evolution
+      date_accessed: 2022-10-25
+
+tables:
+  renewable_energy_patents:
+    variables:
+      patents:
+        title: Patents
+        unit: patent
+        description: Number of patents.
+        display:
+          numDecimalPlaces: 0
+  renewable_energy_patents_by_technology:
+    variables:
+      batteries:
+        title: Batteries
+        unit: patents
+        description: Number of patents in batteries.
+        display:
+          numDecimalPlaces: 0
+      bioenergy:
+        title: Bioenergy
+        unit: patents
+        description: Number of patents in bioenergy.
+        display:
+          numDecimalPlaces: 0
+      carbon_capture_and_storage:
+        title: Carbon capture and storage
+        unit: patents
+        description: Number of patents in carbon capture and storage.
+        display:
+          numDecimalPlaces: 0
+      cross_cutting_energy_tech:
+        title: Cross-cutting energy tech
+        unit: patents
+        description: Number of patents in cross-cutting energy technology.
+        display:
+          numDecimalPlaces: 0
+      ev_charging_stations:
+        title: EV charging stations
+        unit: patents
+        description: Number of patents in electric vehicle charging stations.
+        display:
+          numDecimalPlaces: 0
+      ev_management:
+        title: EV management
+        unit: patents
+        description: Number of patents in electric vehicle management.
+        display:
+          numDecimalPlaces: 0
+      ev_storage:
+        title: EV storage
+        unit: patents
+        description: Number of patents in electric vehicle storage.
+        display:
+          numDecimalPlaces: 0
+      ev_communication_tech:
+        title: EV communication tech
+        unit: patents
+        description: Number of patents in electric vehicle communication technology.
+        display:
+          numDecimalPlaces: 0
+      ev_machine_tech:
+        title: EV machine tech
+        unit: patents
+        description: Number of patents in electric vehicle machine technology.
+        display:
+          numDecimalPlaces: 0
+      efficiency:
+        title: Efficiency
+        unit: patents
+        description: Number of patents in efficiency.
+        display:
+          numDecimalPlaces: 0
+      storage__general:
+        title: Storage (general)
+        unit: patents
+        description: Number of patents in storage (general).
+        display:
+          numDecimalPlaces: 0
+      fuel_cells:
+        title: Fuel cells
+        unit: patents
+        description: Number of patents in fuel cells.
+        display:
+          numDecimalPlaces: 0
+      geothermal:
+        title: Geothermal
+        unit: patents
+        description: Number of patents in geothermal energy.
+        display:
+          numDecimalPlaces: 0
+      green_hydrogen:
+        title: Green hydrogen
+        unit: patents
+        description: Number of patents in green hydrogen energy.
+        display:
+          numDecimalPlaces: 0
+      hydrogen:
+        title: Hydrogen
+        unit: patents
+        description: Number of patents in hydrogen energy.
+        display:
+          numDecimalPlaces: 0
+      hydropower:
+        title: Hydropower
+        unit: patents
+        description: Number of patents in hydropower.
+        display:
+          numDecimalPlaces: 0
+      storage__excl__batteries:
+        title: Storage (excl. batteries)
+        unit: patents
+        description: Number of patents in storage (excluding batteries).
+        display:
+          numDecimalPlaces: 0
+      marine_and_tidal:
+        title: Marine and tidal
+        unit: patents
+        description: Number of patents in marine and tidal energy.
+        display:
+          numDecimalPlaces: 0
+      other:
+        title: Other
+        unit: patents
+        description: Number of patents in other technologies.
+        display:
+          numDecimalPlaces: 0
+      solar_pv:
+        title: Solar PV
+        unit: patents
+        description: Number of patents in solar photovoltaic technology.
+        display:
+          numDecimalPlaces: 0
+      solar_pv_thermal_hybrid:
+        title: Solar PV-thermal hybrid
+        unit: patents
+        description: Number of patents in solar photovoltaic and thermal hybrid technology.
+        display:
+          numDecimalPlaces: 0
+      smart_grids:
+        title: Smart grids
+        unit: patents
+        description: Number of patents in smart grids.
+        display:
+          numDecimalPlaces: 0
+      solar_thermal:
+        title: Solar thermal
+        unit: patents
+        description: Number of patents in solar thermal technology.
+        display:
+          numDecimalPlaces: 0
+      thermal_energy_storage:
+        title: Thermal energy storage
+        unit: patents
+        description: Number of patents in thermal energy storage.
+        display:
+          numDecimalPlaces: 0
+      ultracapacitors:
+        title: Ultracapacitors
+        unit: patents
+        description: Number of patents in ultracapacitors.
+        display:
+          numDecimalPlaces: 0
+      wind:
+        title: Wind
+        unit: patents
+        description: Number of patents in wind energy.
+        display:
+          numDecimalPlaces: 0
+      total_patents:
+        title: Total patents
+        unit: patents
+        description: Total number of patents in renewable energy technologies.
+        display:
+          numDecimalPlaces: 0

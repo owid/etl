@@ -1,0 +1,23 @@
+meta:
+  namespace: ember
+  short_name: european_electricity_review
+  name: European Electricity Review (Ember, 2023)
+  version: 2023-02-20
+  publication_year: 2023
+  publication_date: 2023-01-31
+  source_name: Ember's European Electricity Review
+  source_published_by: Ember's European Electricity Review
+  url: https://ember-climate.org/insights/research/european-electricity-review-2023/
+  source_data_url: https://ember-climate.org/app/uploads/2023/01/EER2023-Yearly-Data.xlsx
+  file_extension: xlsx
+  license_url: https://ember-climate.org/creative-commons/
+  license_name: Creative Commons ShareAlike Attribution Licence (CC BY-SA 4.0)
+  date_accessed: 2023-02-20
+  is_public: true
+  description: |
+    The European Electricity Review analyses full-year electricity generation and demand data for 2022 in all EU-27 countries to understand the region’s progress in transitioning from fossil fuels to clean electricity.
+wdir: ../../../data/snapshots/ember/2023-02-20
+outs:
+- md5: 22581f7212e14670a75fb149b9e3382a
+  size: 1525895
+  path: european_electricity_review.xlsx

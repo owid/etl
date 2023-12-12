@@ -1,0 +1,48 @@
+meta:
+  name: Renewable Electricity Capacity and Generation Statistics
+  publication_year: 2023
+
+  publication_date: '2023-03-01'
+  source_name: International Renewable Energy Agency (IRENA)
+  source_published_by: International Renewable Energy Agency © IRENA 2022
+  url: https://www.irena.org/Statistics/Download-query-tools
+  source_data_url:
+    https://www.irena.org/IRENADocuments/IRENA_RE_electricity_statistics_-_Query_tool.xlsm
+  license_url:
+    https://www.irena.org/-/media/Files/IRENA/Agency/Publication/2023/Mar/IRENA_RE_Capacity_Statistics_2023.pdf
+  license_name: Copyright © IRENA 2023
+  date_accessed: 2023-06-28
+  is_public: true
+  description: |
+    IRENA publishes detailed statistics on renewable energy capacity, power generation and renewable energy balances. This data is collected directly from members using the IRENA Renewable Energy Statistics questionnaire and is also supplemented by desk research where official statistics are not available.
+
+    Some technologies include others, following this schema:
+
+    Total renewable energy
+      1. Hydropower
+          1.1 Renewable hydropower
+          1.2 Pumped storage *
+      2. Marine
+      3. Wind
+          3.1 Onshore wind energy
+          3.2 Offshore wind energy
+      4. Solar
+          4.1 Solar photovoltaic
+          4.2 Concentrated solar power
+      5. Bioenergy
+          5.1 Solid biofuels
+              5.1.1 Bagasse
+              5.1.2 Renewable municipal waste
+              5.1.3 Other solid biofuels
+          5.2 Liquid biofuels
+          5.3 Biogas
+      6. Geothermal
+
+    * Pumped storage is included under the "Hydropower" category but not in the "Total renewable energy". Generation from mixed plants is split between hydropower and pumped storage as appropriate.
+
+    This data may be freely used, shared, copied, reproduced, printed and/or stored, provided that all such material is clearly attributed to IRENA and bears a notation of copyright (© IRENA) with the year of copyright. Unless otherwise stated, the data provided are the property of the International Renewable Energy Agency (IRENA) and are subject to copyright by IRENA. Data attributed to third parties may be subject to third-party copyright and separate terms of use and restrictions, including restrictions in relation to any commercial use.
+wdir: ../../../data/snapshots/irena/2023-06-26
+outs:
+- md5: bc4b45cda6fa828e2ad8d1773ad1d46d
+  size: 2531832
+  path: renewable_electricity_capacity_and_generation.xlsm
