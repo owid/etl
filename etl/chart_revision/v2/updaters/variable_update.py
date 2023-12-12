@@ -450,7 +450,18 @@ def find_charts_from_variable_ids(variable_ids: Set[int]) -> List[gm.Chart]:
             .all()
         )
         # Retrieve charts from a given list of chart IDs
-        return session.exec(select(gm.Chart).where(gm.Chart.id.in_(chart_ids))).all()  # type: ignore
+        charts = session.exec(select(gm.Chart).where(gm.Chart.id.in_(chart_ids))).all()  # type: ignore
+
+    # some charts don't have ID in config, fix that here (should be ideally fixed in the database)
+    for chart in charts:
+        if "id" not in chart.config:
+            log.warning(f"Chart {chart.id} does not have an ID in config.")
+            chart.config["id"] = chart.id
+        if "version" not in chart.config:
+            log.warning(f"Chart {chart.id} does not have a version in config.")
+            chart.config["version"] = 1
+
+    return charts
 
 
 def _get_time_ranges(
