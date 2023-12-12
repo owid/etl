@@ -38,6 +38,9 @@ REGIONS = {
     "High-income countries": {},
     # Other special regions.
     "European Union (27)": {},
+    # TODO: Consider adding also the historical regions to EU (27) definition.
+      # That could be done in the regions dataset, or here, by defining:
+      # {"European Union (27)": {"additional_members": ["East Germany", "West Germany", "Czechoslovakia", ...]}}
 }
 
 ########################################################################################################################
@@ -950,6 +953,8 @@ def detect_overlapping_regions(
     # List all country names found in data.
     countries_in_data = df[country_col].unique().tolist()  # type: ignore
     # List all regions found in data.
+    # TODO: Possible overlaps in custom regions are not considered here. I think it would be simple enough to include
+    #   here custom regions and check for overlaps.
     regions = [country for country in list(regions_and_members) if country in countries_in_data]
     # Initialize a list that will store all overlaps found.
     all_overlaps = []
