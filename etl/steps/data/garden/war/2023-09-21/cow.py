@@ -160,10 +160,10 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
     # Format individual tables
-    tb_extra = make_table_extra(tb_extra)
-    tb_nonstate = make_table_nonstate(tb_nonstate)
-    tb_inter = make_table_inter(tb_inter)
-    tb_intra = make_table_intra(tb_intra)
+    tb_extra = make_table_extra(tb_extra)  # finishes 2007
+    tb_nonstate = make_table_nonstate(tb_nonstate)  # finishes 2005
+    tb_inter = make_table_inter(tb_inter)  # finishes 2003
+    tb_intra = make_table_intra(tb_intra)  # finishes 2014
 
     # Get country-level stuff
     paths.log.info("getting country-level indicators")
@@ -1101,6 +1101,35 @@ def estimate_metrics_participants(tb_extra: Table, tb_intra: Table, tb_inter: Ta
         "state-based",
         [CTYPE_EXTRA, CTYPE_INTER, CTYPE_INTRA],
     )
+
+    # zero-fill
+    # see https://github.com/owid/owid-issues/issues/1304
+    ## Ddop column id
+    tb_country = tb_country.drop(columns=["id"])
+    ## Fill gaps with zeroes
+    tb_country = fill_gaps_with_zeroes(
+        tb_country,
+        columns=["country", "year", "conflict_type"],
+        cols_use_range=["year"],
+    )
+    ## Only keep data until 2007, except for conflict types 'intra-state'
+    tb_country = tb_country[
+        (tb_country["year"] <= END_YEAR_MAX_EXTRA)
+        | (
+            tb_country["conflict_type"].isin(
+                [
+                    CTYPE_INTRA,
+                    CTYPE_INTRA_INTL,
+                    CTYPE_INTRA_NINTL,
+                ]
+            )
+        )
+    ]
+    ## Add column id based on value from country
+    dix_codes = tb_codes.reset_index().drop(columns="year").drop_duplicates()
+    dix_codes = dix_codes.set_index("country", verify_integrity=True).squeeze().to_dict()
+    tb_country["id"] = tb_country["country"].map(dix_codes)
+    assert tb_country["id"].notna().all(), "NaN found! Couldn't match country to ID"
 
     ###################
     # Participated in #
