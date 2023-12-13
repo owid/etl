@@ -395,7 +395,11 @@ def add_region_aggregates(
     ).reset_index()
 
     # Create filter that detects rows where the most contributing countries are not present.
-    mask_countries_present = ~df_region[country_col]
+    if df_region[country_col].dtypes == "category":
+        # Doing df_region[country_col].any() fails if the country column is categorical.
+        mask_countries_present = ~(df_region[country_col].astype(str))
+    else:
+        mask_countries_present = ~df_region[country_col]
     if mask_countries_present.any():
         # Make nan all aggregates if the most contributing countries were not present.
         df_region.loc[mask_countries_present, variables] = np.nan
