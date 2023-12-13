@@ -14,7 +14,7 @@ NOTES:
 """
 
 import owid.catalog.processing as pr
-from owid.catalog import Dataset, Table, utils
+from owid.catalog import Dataset, Table, VariablePresentationMeta, utils
 from owid.datautils import dataframes
 
 from etl.helpers import PathFinder, create_dataset
@@ -127,6 +127,9 @@ def combine_yearly_electricity_data(ds_yed: Dataset) -> Table:
     # Set a convenient index and sort rows and columns conveniently.
     tb_combined = tb_combined.set_index(["country", "year"], verify_integrity=True).sort_index().sort_index(axis=1)
 
+    # Set an appropriate title for the table.
+    tb_combined.metadata.title = "Yearly Electricity Data"
+
     return tb_combined
 
 
@@ -155,14 +158,43 @@ def combine_european_electricity_review_data(ds_eer: Dataset) -> Table:
 
     # Create aggregates (defined in AGGREGATES) that are in yearly electricity but not in the european review.
     for aggregate in AGGREGATES:
+        title = aggregate.replace("__twh", "").replace("__", ", ").replace("_", " ").capitalize()
         generation[aggregate] = generation[AGGREGATES[aggregate]].sum(axis=1)
+        generation[aggregate].metadata.unit = "terawatt-hours"
+        generation[aggregate].metadata.short_unit = "TWh"
+        generation[aggregate].metadata.title = f"{title} - TWh"
+        generation[aggregate].metadata.description_short = "Measured in terawatt-hours."
+        generation[aggregate].metadata.display = {"name": title}
+        title = (
+            title.lower()
+            .replace("clean", "clean sources")
+            .replace("fossil", "fossil fuels")
+            .replace("hydro", "hydropower")
+            .replace("solar", "solar power")
+        )
+        generation[aggregate].metadata.presentation = VariablePresentationMeta(
+            title_public=f"Electricity generation from {title}"
+        )
 
     # Create a column for each of those new aggregates, giving percentage share of total generation.
     for aggregate in AGGREGATES:
         column = aggregate.replace("__twh", "__pct")
+        title = aggregate.replace("__twh", "").replace("__", ", ").replace("_", " ").capitalize()
         generation[column] = generation[aggregate] / generation["total_generation__twh"] * 100
         generation[column].metadata.unit = "%"
         generation[column].metadata.short_unit = "%"
+        generation[column].metadata.title = f"{title} - %"
+        generation[column].metadata.display = {"name": title}
+        title = (
+            title.lower()
+            .replace("clean", "clean sources")
+            .replace("fossil", "fossil fuels")
+            .replace("hydro", "hydropower")
+            .replace("solar", "solar power")
+        )
+        generation[column].metadata.presentation = VariablePresentationMeta(
+            title_public=f"Share of electricity generated from {title}"
+        )
 
     # Check that total generation adds up to 100%.
     error = "Total generation does not add up to 100%."
@@ -224,6 +256,9 @@ def combine_european_electricity_review_data(ds_eer: Dataset) -> Table:
     combined_european = (
         combined_european.set_index(index_columns, verify_integrity=True).sort_index().sort_index(axis=1)
     )
+
+    # Set an appropriate title for the table.
+    combined_european.metadata.title = "European Electricity Review"
 
     return combined_european
 
