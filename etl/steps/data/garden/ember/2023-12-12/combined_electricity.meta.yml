@@ -1,5 +1,6 @@
 dataset:
-  title: Combined Electricity Data (Ember, 2023c)
+  title: Combined Electricity Data
+  update_period_days: 365
 
 tables:
   european_electricity_review:

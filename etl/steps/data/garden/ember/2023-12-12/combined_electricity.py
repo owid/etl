@@ -161,6 +161,8 @@ def combine_european_electricity_review_data(ds_eer: Dataset) -> Table:
     for aggregate in AGGREGATES:
         column = aggregate.replace("__twh", "__pct")
         generation[column] = generation[aggregate] / generation["total_generation__twh"] * 100
+        generation[column].metadata.unit = "%"
+        generation[column].metadata.short_unit = "%"
 
     # Check that total generation adds up to 100%.
     error = "Total generation does not add up to 100%."
@@ -249,7 +251,7 @@ def combine_yearly_electricity_data_and_european_electricity_review(tb_yed: Tabl
         df1=tb_yed.reset_index(), df2=tb_eer.reset_index(), index_columns=index_columns
     )
 
-    # TODO: Remove the following block after table fillna propagates metadata.
+    # TODO: Remove the following block after Table.fillna operation properly propagates metadata.
     ####################################################################################################################
     # NOTE: The previous operation does not propagate metadata properly, so we do it manually.
     for column in combined.columns:

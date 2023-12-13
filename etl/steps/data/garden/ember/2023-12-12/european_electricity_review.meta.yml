@@ -19,8 +19,8 @@ tables:
     variables:
       total_generation__twh:
         title: Generation - TWh
-        short_unit: terawatt-hours
-        unit: TWh
+        unit: terawatt-hours
+        short_unit: TWh
         description_short: *description_short_twh
         display:
           name: Generation
@@ -28,8 +28,8 @@ tables:
           title_public: Total electricity generation
       net_imports__twh:
         title: Net imports - TWh
-        short_unit: terawatt-hours
-        unit: TWh
+        unit: terawatt-hours
+        short_unit: TWh
         description_short: *description_short_twh
         display:
           name: Net imports
@@ -37,8 +37,8 @@ tables:
           title_public: Net electricity imports
       demand__twh:
         title: Demand - TWh
-        short_unit: terawatt-hours
-        unit: TWh
+        unit: terawatt-hours
+        short_unit: TWh
         description_short: *description_short_twh
         display:
           name: Demand
@@ -46,8 +46,8 @@ tables:
           title_public: Total electricity demand
       demand_per_capita__kwh:
         title: Demand per capita - kWh
-        short_unit: kWh
         unit: kilowatt-hours
+        short_unit: kWh
         description_short: *description_short_kwh
         display:
           name: Demand per capita
@@ -56,18 +56,18 @@ tables:
   emissions:
     variables:
       co2_intensity__gco2_kwh:
-        title: CO₂ intensity - gCO₂/kWh
-        short_unit: gCO₂eq/kWh
+        title: CO2 intensity - gCO2eq/kWh
         unit: grams of CO₂ equivalents per kilowatt-hour
+        short_unit: gCO₂eq/kWh
         display:
-          name: CO₂ intensity
+          name: CO₂ intensity of electricity
         description_short: Measured in grams of CO₂ equivalents per kilowatt-hour.
         presentation:
           title_public: CO₂ intensity of electricity generation
       total_emissions__mtco2:
-        title: Total emissions - mtCO₂
-        short_unit: mtCO₂eq
+        title: Total emissions - mtCO2eq
         unit: megatonnes of CO₂ equivalents
+        short_unit: mtCO₂eq
         display:
           name: Total emissions
         description_short: Measured in megatonnes of CO₂ equivalents.
@@ -77,8 +77,8 @@ tables:
     variables:
       bioenergy__twh:
         title: Bioenergy - TWh
-        short_unit: terawatt-hours
-        unit: TWh
+        unit: terawatt-hours
+        short_unit: TWh
         description_short: *description_short_twh
         display:
           name: Bioenergy
@@ -86,8 +86,8 @@ tables:
           title_public: Electricity generation from bioenergy
       gas__twh:
         title: Gas - TWh
-        short_unit: terawatt-hours
-        unit: TWh
+        unit: terawatt-hours
+        short_unit: TWh
         description_short: *description_short_twh
         display:
           name: Gas
@@ -95,8 +95,8 @@ tables:
           title_public: Electricity generation from gas
       hard_coal__twh:
         title: Hard coal - TWh
-        short_unit: terawatt-hours
-        unit: TWh
+        unit: terawatt-hours
+        short_unit: TWh
         description_short: *description_short_twh
         display:
           name: Hard coal
@@ -104,8 +104,8 @@ tables:
           title_public: Electricity generation from hard coal
       hydro__twh:
         title: Hydro - TWh
-        short_unit: terawatt-hours
-        unit: TWh
+        unit: terawatt-hours
+        short_unit: TWh
         description_short: *description_short_twh
         display:
           name: Hydro
@@ -113,8 +113,8 @@ tables:
           title_public: Electricity generation from hydropower
       lignite__twh:
         title: Lignite - TWh
-        short_unit: terawatt-hours
-        unit: TWh
+        unit: terawatt-hours
+        short_unit: TWh
         description_short: *description_short_twh
         display:
           name: Lignite
@@ -122,8 +122,8 @@ tables:
           title_public: Electricity generation from lignite
       nuclear__twh:
         title: Nuclear - TWh
-        short_unit: terawatt-hours
-        unit: TWh
+        unit: terawatt-hours
+        short_unit: TWh
         description_short: *description_short_twh
         display:
           name: Nuclear
@@ -131,8 +131,8 @@ tables:
           title_public: Electricity generation from nuclear power
       other_fossil__twh:
         title: Other fossil - TWh
-        short_unit: terawatt-hours
-        unit: TWh
+        unit: terawatt-hours
+        short_unit: TWh
         description_short: *description_short_twh
         display:
           name: Other fossil
@@ -140,8 +140,8 @@ tables:
           title_public: Electricity generation from other fossil fuels
       other_renewables__twh:
         title: Other renewables - TWh
-        short_unit: terawatt-hours
-        unit: TWh
+        unit: terawatt-hours
+        short_unit: TWh
         description_short: *description_short_twh
         display:
           name: Other renewables
@@ -149,8 +149,8 @@ tables:
           title_public: Electricity generation from other renewables
       solar__twh:
         title: Solar - TWh
-        short_unit: terawatt-hours
-        unit: TWh
+        unit: terawatt-hours
+        short_unit: TWh
         description_short: *description_short_twh
         display:
           name: Solar
@@ -158,8 +158,8 @@ tables:
           title_public: Electricity generation from solar power
       wind__twh:
         title: Wind - TWh
-        short_unit: terawatt-hours
-        unit: TWh
+        unit: terawatt-hours
+        short_unit: TWh
         description_short: *description_short_twh
         display:
           name: Wind
@@ -167,8 +167,8 @@ tables:
           title_public: Electricity generation from wind power
       bioenergy__pct:
         title: Bioenergy - %
-        short_unit: "%"
         unit: "%"
+        short_unit: "%"
         display:
           name: Bioenergy
         description_short: *description_short_pct
@@ -176,8 +176,8 @@ tables:
           title_public: Share of electricity generated from bioenergy
       gas__pct:
         title: Gas - %
-        short_unit: "%"
         unit: "%"
+        short_unit: "%"
         display:
           name: Gas
         description_short: *description_short_pct
@@ -185,8 +185,8 @@ tables:
           title_public: Share of electricity generated from gas
       hard_coal__pct:
         title: Hard coal - %
-        short_unit: "%"
         unit: "%"
+        short_unit: "%"
         display:
           name: Hard coal
         description_short: *description_short_pct
@@ -194,8 +194,8 @@ tables:
           title_public: Share of electricity generated from hard coal
       hydro__pct:
         title: Hydro - %
-        short_unit: "%"
         unit: "%"
+        short_unit: "%"
         display:
           name: Hydro
         description_short: *description_short_pct
@@ -203,8 +203,8 @@ tables:
           title_public: Share of electricity generated from hydropower
       lignite__pct:
         title: Lignite - %
-        short_unit: "%"
         unit: "%"
+        short_unit: "%"
         display:
           name: Lignite
         description_short: *description_short_pct
@@ -212,8 +212,8 @@ tables:
           title_public: Share of electricity generated from lignite
       nuclear__pct:
         title: Nuclear - %
-        short_unit: "%"
         unit: "%"
+        short_unit: "%"
         display:
           name: Nuclear
         description_short: *description_short_pct
@@ -221,8 +221,8 @@ tables:
           title_public: Share of electricity generated from nuclear power
       other_fossil__pct:
         title: Other fossil - %
-        short_unit: "%"
         unit: "%"
+        short_unit: "%"
         display:
           name: Other fossil
         description_short: *description_short_pct
@@ -230,8 +230,8 @@ tables:
           title_public: Share of electricity generated from other fossil fuels
       other_renewables__pct:
         title: Other renewables - %
-        short_unit: "%"
         unit: "%"
+        short_unit: "%"
         display:
           name: Other renewables
         description_short: *description_short_pct
@@ -239,8 +239,8 @@ tables:
           title_public: Share of electricity generated from other renewables
       solar__pct:
         title: Solar - %
-        short_unit: "%"
         unit: "%"
+        short_unit: "%"
         display:
           name: Solar
         description_short: *description_short_pct
@@ -248,8 +248,8 @@ tables:
           title_public: Share of electricity generated from solar power
       wind__pct:
         title: Wind - %
-        short_unit: "%"
         unit: "%"
+        short_unit: "%"
         display:
           name: Wind
         description_short: *description_short_pct
@@ -259,8 +259,8 @@ tables:
     variables:
       net_flow__twh:
         title: Net flow - TWh
-        short_unit: terawatt-hours
-        unit: TWh
+        unit: terawatt-hours
+        short_unit: TWh
         description_short: *description_short_twh
         display:
           name: Net flow
