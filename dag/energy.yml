@@ -30,9 +30,9 @@ steps:
   # Ember - Combined electricity 2023.
   #
   # We still use EER 2022 for data from 1990-1999, which is not included in EER 2023.
-  # data://garden/ember/2023-12-12/combined_electricity:
-  #   - data://garden/ember/2022-12-12/european_electricity_review
-  #   - data://garden/ember/2023-12-12/yearly_electricity
+  data://garden/ember/2023-12-12/combined_electricity:
+    - data://garden/ember/2023-12-12/european_electricity_review
+    - data://garden/ember/2023-12-12/yearly_electricity
   #
   # IRENA - Renewable power generation costs (2022).
   #
