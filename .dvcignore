@@ -12,3 +12,4 @@ vendor/
 # this folder contains thousands of .dvc files which slows it down, when we work with backported snapshots, we
 # dynamically exclude it (see _unignore_backports)
 snapshots/backport/latest/*
+!snapshots/backport/latest/dataset_5282*
