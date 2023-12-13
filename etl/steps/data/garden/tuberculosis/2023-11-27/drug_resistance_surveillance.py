@@ -45,8 +45,14 @@ def run(dest_dir: str) -> None:
 
     # Remove variables `rr_fqr` and `rr_dr_fq` as it's not clear from their desecriptions how they differ from eachother.
     tb = tb.drop(columns=["rr_dr_fq", "rr_fqr"])
-    # Adding regional aggregates.
-    tb = add_regions_to_table(tb=tb, ds_regions=ds_regions, ds_income_groups=ds_income_groups, regions=REGIONS_TO_ADD)
+    # Adding regional aggregates, setting min_num_values_per_year so missing data isn't falsely given as 0.
+    tb = add_regions_to_table(
+        tb=tb,
+        ds_regions=ds_regions,
+        ds_income_groups=ds_income_groups,
+        regions=REGIONS_TO_ADD,
+        min_num_values_per_year=1,
+    )
     tb = add_variable_description_from_producer(tb, dd)
     tb = sum_hiv_status_for_rifampicin_susceptible(tb)
     tb = tb.set_index(["country", "year"], verify_integrity=True)
