@@ -2,12 +2,7 @@
 
 """
 
-import itertools
-from typing import Any, Dict, List, Tuple
-
-import numpy as np
 import owid.catalog.processing as pr
-import pandas as pd
 from owid.catalog import Dataset, Table
 from structlog import get_logger
 
@@ -19,155 +14,6 @@ log = get_logger()
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
-
-# Aggregate regions to add, following OWID definitions.
-# Regions and income groups to create by aggregating contributions from member countries.
-# In the following dictionary, if nothing is stated, the region is supposed to be a default continent/income group.
-# Otherwise, the dictionary can have "regions_included", "regions_excluded", "countries_included", and
-# "countries_excluded". The aggregates will be calculated on the resulting countries.
-REGIONS = {
-    # Default continents.
-    "Africa": {},
-    "Asia": {},
-    "Europe": {},
-    "European Union (27)": {},
-    "North America": {},
-    "Oceania": {},
-    "South America": {},
-    # Ember already has data for "World".
-    # "World": {},
-    # Income groups.
-    "Low-income countries": {},
-    "Upper-middle-income countries": {},
-    "Lower-middle-income countries": {},
-    "High-income countries": {},
-}
-
-# Corrections to the output tables.
-# They are all the same correction: Remove region aggregates for the latest year, given that many countries are not
-# informed, which causes the aggregates to be unreliable
-# (e.g. generation__total_generation__twh in Africa drops in 2022 because only a few countries are informed).
-AFFECTED_YEAR = 2022
-AMENDMENTS = {
-    "Capacity": [
-        (
-            {
-                "country": list(REGIONS),
-                "year": [AFFECTED_YEAR],
-            },
-            {
-                "Clean - GW": np.nan,
-                "Fossil - GW": np.nan,
-                "Gas and Other Fossil - GW": np.nan,
-                "Hydro, Bioenergy and Other Renewables - GW": np.nan,
-                "Renewables - GW": np.nan,
-                "Wind and Solar - GW": np.nan,
-                "Bioenergy - GW": np.nan,
-                "Coal - GW": np.nan,
-                "Gas - GW": np.nan,
-                "Hydro - GW": np.nan,
-                "Nuclear - GW": np.nan,
-                "Other Fossil - GW": np.nan,
-                "Other Renewables - GW": np.nan,
-                "Solar - GW": np.nan,
-                "Wind - GW": np.nan,
-            },
-        )
-    ],
-    "Electricity demand": [
-        (
-            {
-                "country": list(REGIONS),
-                "year": [AFFECTED_YEAR],
-            },
-            {
-                "Demand - TWh": np.nan,
-                "population": np.nan,
-                "Demand per capita - kWh": np.nan,
-            },
-        )
-    ],
-    "Electricity generation": [
-        (
-            {
-                "country": list(REGIONS),
-                "year": [AFFECTED_YEAR],
-            },
-            {
-                "Clean - %": np.nan,
-                "Fossil - %": np.nan,
-                "Gas and Other Fossil - %": np.nan,
-                "Hydro, Bioenergy and Other Renewables - %": np.nan,
-                "Renewables - %": np.nan,
-                "Wind and Solar - %": np.nan,
-                "Clean - TWh": np.nan,
-                "Fossil - TWh": np.nan,
-                "Gas and Other Fossil - TWh": np.nan,
-                "Hydro, Bioenergy and Other Renewables - TWh": np.nan,
-                "Renewables - TWh": np.nan,
-                "Wind and Solar - TWh": np.nan,
-                "Bioenergy - %": np.nan,
-                "Coal - %": np.nan,
-                "Gas - %": np.nan,
-                "Hydro - %": np.nan,
-                "Nuclear - %": np.nan,
-                "Other Fossil - %": np.nan,
-                "Other Renewables - %": np.nan,
-                "Solar - %": np.nan,
-                "Wind - %": np.nan,
-                "Bioenergy - TWh": np.nan,
-                "Coal - TWh": np.nan,
-                "Gas - TWh": np.nan,
-                "Hydro - TWh": np.nan,
-                "Nuclear - TWh": np.nan,
-                "Other Fossil - TWh": np.nan,
-                "Other Renewables - TWh": np.nan,
-                "Solar - TWh": np.nan,
-                "Wind - TWh": np.nan,
-                "Total Generation - TWh": np.nan,
-            },
-        ),
-    ],
-    "Electricity imports": [
-        (
-            {
-                "country": list(REGIONS),
-                "year": [AFFECTED_YEAR],
-            },
-            {
-                "Net Imports - TWh": np.nan,
-            },
-        ),
-    ],
-    "Power sector emissions": [
-        (
-            {
-                "country": list(REGIONS),
-                "year": [AFFECTED_YEAR],
-            },
-            {
-                "Clean - mtCO2": np.nan,
-                "Fossil - mtCO2": np.nan,
-                "Gas and Other Fossil - mtCO2": np.nan,
-                "Hydro, Bioenergy and Other Renewables - mtCO2": np.nan,
-                "Renewables - mtCO2": np.nan,
-                "Wind and Solar - mtCO2": np.nan,
-                "Bioenergy - mtCO2": np.nan,
-                "Coal - mtCO2": np.nan,
-                "Gas - mtCO2": np.nan,
-                "Hydro - mtCO2": np.nan,
-                "Nuclear - mtCO2": np.nan,
-                "Other Fossil - mtCO2": np.nan,
-                "Other Renewables - mtCO2": np.nan,
-                "Solar - mtCO2": np.nan,
-                "Wind - mtCO2": np.nan,
-                "Total emissions - mtCO2": np.nan,
-                "Total Generation - TWh": np.nan,
-                "CO2 intensity - gCO2/kWh": np.nan,
-            },
-        ),
-    ],
-}
 
 # Conversion factors.
 # Terawatt-hours to kilowatt-hours.
@@ -184,17 +30,6 @@ COLUMNS_YEARLY_ELECTRICITY = {
     "unit": "unit",
     "category": "category",
     "subcategory": "subcategory",
-}
-
-# Map units (short version) to unit name (long version).
-SHORT_UNIT_TO_UNIT = {
-    "TWh": "terawatt-hours",
-    "MWh": "megawatt-hours",
-    "kWh": "kilowatt-hours",
-    "mtCO2": "megatonnes of CO2 equivalent",
-    "gCO2/kWh": "grams of CO2 equivalent per kilowatt-hour",
-    "GW": "gigawatts",
-    "%": "%",
 }
 
 # Categories expected to exist in the data.
@@ -277,53 +112,6 @@ SUM_AGGREGATES = [
 ]
 
 
-def _expand_combinations_in_amendments(
-    amendments: List[Tuple[Dict[Any, Any], Dict[Any, Any]]]
-) -> List[Tuple[Dict[Any, Any], Dict[Any, Any]]]:
-    """When values in amendments are given as lists, explode them to have all possible combinations of values."""
-    amendments_expanded = []
-    for wrong_row, corrected_row in amendments:
-        field, values = zip(*wrong_row.items())
-        for amendment_single in [dict(zip(field, value)) for value in itertools.product(*values)]:
-            amendments_expanded.append((amendment_single, corrected_row))
-
-    return amendments_expanded
-
-
-def correct_data_points(tb: Table, corrections: List[Tuple[Dict[Any, Any], Dict[Any, Any]]]) -> Table:
-    """Make individual corrections to data points in a table.
-
-    Parameters
-    ----------
-    tb : Table
-        Data to be corrected.
-    corrections : List[Tuple[Dict[Any, Any], Dict[Any, Any]]]
-        Corrections.
-
-    Returns
-    -------
-    tb_corrected : Table
-        Corrected data.
-
-    """
-    tb_corrected = tb.copy()
-
-    corrections_expanded = _expand_combinations_in_amendments(amendments=corrections)
-    for wrong_row, corrected_row in corrections_expanded:
-        # Select the row in the table where the wrong data point is.
-        # The 'fillna(False)' is added because otherwise rows that do not fulfil the selection will create ambiguity.
-        selection = tb_corrected.loc[(tb_corrected[list(wrong_row)] == pd.Series(wrong_row)).fillna(False).all(axis=1)]
-        # Sanity check.
-        error = "Either raw data has been corrected, or dictionary selecting wrong row is ambiguous."
-        assert len(selection) == 1, error
-
-        # Replace wrong fields by the corrected ones.
-        # Note: Changes to categorical fields will not work.
-        tb_corrected.loc[selection.index, list(corrected_row)] = list(corrected_row.values())
-
-    return tb_corrected
-
-
 def make_wide_table(tb: Table, category: str, ds_regions: Dataset, ds_income_groups: Dataset) -> Table:
     """Convert data from long to wide format for a specific category.
 
@@ -398,7 +186,7 @@ def make_table_electricity_generation(tb: Table, ds_regions: Dataset, ds_income_
             if value_column not in table.columns:
                 raise ValueError(f"Column {value_column} not found.")
             # Select only regions.
-            select_regions = table["country"].isin(list(REGIONS))
+            select_regions = table["country"].isin(list(geo.REGIONS))
             table.loc[select_regions, column] = table[value_column] / table["Total Generation - TWh"] * 100
 
     return table
@@ -548,15 +336,29 @@ def run(dest_dir: str) -> None:
         ),
     }
 
-    # Apply amendments, and set an appropriate index and short name to each table an sort conveniently.
-    # TODO: Instead of this AMENDMENTS, simply assert that there is a significant decrease in region aggregates in the
-    #   last year, and remove points.
     for table_name in tables:
-        if table_name in AMENDMENTS:
-            log.info(f"Applying amendments to table: {table_name}")
-            tables[table_name] = correct_data_points(tb=tables[table_name], corrections=AMENDMENTS[table_name])
-        tables[table_name] = tables[table_name].set_index(["country", "year"], verify_integrity=True).sort_index()
+        # Set a table short name.
         tables[table_name].metadata.short_name = table_name
+        # Ensure all columns are snake-case, set an appropriate index and sort conveniently.
+        tables[table_name] = (
+            tables[table_name].underscore().set_index(["country", "year"], verify_integrity=True).sort_index()
+        )
+
+    ####################################################################################################################
+    # The data for many regions presents a big drop in the last year, simply because many countries are not informed.
+    # Assert that this drop exists, and remove the last data point for regions.
+    error = (
+        "Expected a big drop in the last data point for regions (because of limited data availability)."
+        "If that is no longer the case, remove this part of the code and keep the last data points for regions."
+    )
+    assert tables["capacity"].loc["Africa"]["renewables__gw"].diff().iloc[-1] < -30, error
+    for table_name in tables:
+        latest_year = tables[table_name].reset_index()["year"].max()
+        for column in tables[table_name].columns:
+            for region in geo.REGIONS:
+                # tables[table_name] = tables[table_name].copy()
+                tables[table_name].loc[(region, latest_year), column] = None
+    ####################################################################################################################
 
     #
     # Save outputs.
