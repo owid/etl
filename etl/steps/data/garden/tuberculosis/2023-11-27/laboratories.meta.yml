@@ -18,12 +18,16 @@ tables:
         description_short: Number of sites providing TB diagnostic services using molecular WHO-recommended rapid diagnostics at the end of the reporting year.
         unit: sites
       culture_rate:
-        title: Sites providing TB diagnostic services using culture per 100,000 population
-        unit: sites per 100,000 population
-        description_short: Number of sites providing TB diagnostic services using culture at the end of the reporting year per 100,000 population.
+        title: Sites providing TB diagnostic services using culture per million population
+        unit: sites per million population
+        description_short: Number of sites providing TB diagnostic services using culture at the end of the reporting year per million population.
         processing_level: major
+        display:
+          numDecimalPlaces: 2
       m_wrd_rate:
-        title: Sites providing TB diagnostic services using molecular WHO-recommended rapid diagnostics per 100,000 population
-        description_short: Number of sites providing TB diagnostic services using molecular WHO-recommended rapid diagnostics at the end of the reporting year per 100,000 population.
-        unit: sites per 100,000 population
+        title: Sites providing TB diagnostic services using molecular WHO-recommended rapid diagnostics per million population
+        description_short: Number of sites providing TB diagnostic services using molecular WHO-recommended rapid diagnostics at the end of the reporting year per million population.
+        unit: sites per million population
         processing_level: major
+        display:
+          numDecimalPlaces: 2
