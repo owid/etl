@@ -21,11 +21,11 @@ steps:
   #
   data://meadow/ember/2023-12-12/yearly_electricity:
     - snapshot://ember/2023-12-12/yearly_electricity.csv
-  # data://garden/ember/2023-12-12/yearly_electricity:
-  #   - data://meadow/ember/2023-12-12/yearly_electricity
-  #   - data://garden/demography/2023-03-31/population
-  #   - data://garden/wb/2023-04-30/income_groups
-  #   - data://garden/regions/2023-01-01/regions
+  data://garden/ember/2023-12-12/yearly_electricity:
+    - data://meadow/ember/2023-12-12/yearly_electricity
+    - data://garden/demography/2023-03-31/population
+    - data://garden/wb/2023-04-30/income_groups
+    - data://garden/regions/2023-01-01/regions
   #
   # Ember - Combined electricity 2023.
   #

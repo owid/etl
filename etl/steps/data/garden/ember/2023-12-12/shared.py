@@ -1,6 +1,5 @@
-import itertools
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Optional, Union
 
 import numpy as np
 import pandas as pd
@@ -295,50 +294,3 @@ def add_region_aggregates(
         data = pd.concat([data, region_df], ignore_index=True)
 
     return data
-
-
-def _expand_combinations_in_amendments(
-    amendments: List[Tuple[Dict[Any, Any], Dict[Any, Any]]]
-) -> List[Tuple[Dict[Any, Any], Dict[Any, Any]]]:
-    """When values in amendments are given as lists, explode them to have all possible combinations of values."""
-    amendments_expanded = []
-    for wrong_row, corrected_row in amendments:
-        field, values = zip(*wrong_row.items())
-        for amendment_single in [dict(zip(field, value)) for value in itertools.product(*values)]:
-            amendments_expanded.append((amendment_single, corrected_row))
-
-    return amendments_expanded
-
-
-def correct_data_points(df: pd.DataFrame, corrections: List[Tuple[Dict[Any, Any], Dict[Any, Any]]]) -> pd.DataFrame:
-    """Make individual corrections to data points in a dataframe.
-
-    Parameters
-    ----------
-    df : pd.DataFrame
-        Data to be corrected.
-    corrections : List[Tuple[Dict[Any, Any], Dict[Any, Any]]]
-        Corrections.
-
-    Returns
-    -------
-    corrected_df : pd.DataFrame
-        Corrected data.
-
-    """
-    corrected_df = df.copy()
-
-    corrections_expanded = _expand_combinations_in_amendments(amendments=corrections)
-    for wrong_row, corrected_row in corrections_expanded:
-        # Select the row in the dataframe where the wrong data point is.
-        # The 'fillna(False)' is added because otherwise rows that do not fulfil the selection will create ambiguity.
-        selection = corrected_df.loc[(corrected_df[list(wrong_row)] == pd.Series(wrong_row)).fillna(False).all(axis=1)]
-        # Sanity check.
-        error = "Either raw data has been corrected, or dictionary selecting wrong row is ambiguous."
-        assert len(selection) == 1, error
-
-        # Replace wrong fields by the corrected ones.
-        # Note: Changes to categorical fields will not work.
-        corrected_df.loc[selection.index, list(corrected_row)] = list(corrected_row.values())
-
-    return corrected_df
