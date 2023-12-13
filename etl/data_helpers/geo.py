@@ -546,6 +546,7 @@ def add_population_to_dataframe(
     show_full_warning: bool = True,
     interpolate_missing_population: bool = False,
     expected_countries_without_population: Optional[List[str]] = None,
+    _warn_deprecated: bool = True,
 ) -> TableOrDataFrame:
     """Add column of population to a dataframe.
 
@@ -583,7 +584,8 @@ def add_population_to_dataframe(
         Original dataframe after adding a column with population values.
 
     """
-    log.warning("This function is deprecated. Use add_population_to_table instead.")
+    if _warn_deprecated:
+        log.warning("This function is deprecated. Use add_population_to_table instead.")
 
     # Load population data.
     if ds_population is not None:
@@ -693,12 +695,17 @@ def add_population_to_table(
         show_full_warning=show_full_warning,
         interpolate_missing_population=interpolate_missing_population,
         expected_countries_without_population=expected_countries_without_population,
+        _warn_deprecated=False,
     )
 
     # Convert the dataframe into a table, with the metadata of the original table.
     tb_with_population = Table(df_with_population).copy_metadata(tb)
 
     # Add metadata to the new population column.
+    # TODO: Note that this is may only be necessary because description_processing is not properly propagated.
+    #  Once it is, check if
+    #  tb_with_population[population_col].m.to_dict() == ds_population["population"]["population"].m.to_dict()
+    #  is True. If so, the following line may not be necessary.
     tb_with_population[population_col] = tb_with_population[population_col].copy_metadata(
         ds_population["population"]["population"]
     )
