@@ -217,6 +217,10 @@ def create_chart_comparison(config_1: Dict[str, Any], config_2: Dict[str, Any]) 
     if config_1["id"] != config_2["id"]:
         raise ValueError("Configurations must be from the same chart.")
     chart_id = config_1["id"]
+
+    assert "version" in config_1, f"version of chart {chart_id} is missing from config!"
+    assert "version" in config_2, f"version of chart {chart_id} is missing from new config!"
+
     return gm.SuggestedChartRevisions(
         chartId=chart_id,
         createdBy=int(GRAPHER_USER_ID),  # type: ignore
