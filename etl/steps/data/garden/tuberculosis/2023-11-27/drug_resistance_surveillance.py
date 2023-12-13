@@ -1,4 +1,5 @@
 """Load a meadow dataset and create a garden dataset."""
+import numpy as np
 from owid.catalog import Table
 from shared import add_variable_description_from_producer
 
@@ -69,6 +70,8 @@ def sum_hiv_status_for_rifampicin_susceptible(tb: Table) -> Table:
     """
     cols_to_sum = ["nrr_hivneg", "nrr_hivpos", "nrr_hivunk"]
 
-    tb["nrr_hivall"] = tb[cols_to_sum].sum(axis=1)
+    # Summing the columns, treating NaNs as 0. Unless all values in a row are NaN, then the sum should be NaN.
+    tb["nrr_hivall"] = tb[cols_to_sum].sum(axis=1, skipna=True)
+    tb["nrr_hivall"] = tb["nrr_hivall"].where(tb[cols_to_sum].notna().any(axis=1), np.nan)
 
     return tb
