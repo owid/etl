@@ -365,6 +365,7 @@ steps:
   data://garden/tuberculosis/2023-11-27/budget:
     - data://meadow/tuberculosis/2023-12-01/budget
     - snapshot://tuberculosis/2023-11-27/data_dictionary.csv
+    - data://garden/tuberculosis/2023-11-27/expenditure
   data://grapher/tuberculosis/2023-11-27/budget:
     - data://garden/tuberculosis/2023-11-27/budget
 
