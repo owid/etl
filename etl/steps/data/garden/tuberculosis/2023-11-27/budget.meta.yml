@@ -23,7 +23,6 @@ tables:
         title: Number of patients expected to start MDR-TB treatment
         description_short: Number of patients expected to start multi-drug resistant tuberculosis treatment.
         unit: "patients"
-
       budget_cpp_mdr:
         title: Budget per patient for MDR-TB treatment
         description_short: Average cost of drugs budgeted per patient for multi-drug resistant tuberculosis treatment, excluding buffer stock.
@@ -192,3 +191,10 @@ tables:
         description_short: Total expected funding from all sources.
         unit: "constant 2022 US$"
         short_unit: "$"
+      budget_gap:
+        title: Budget gap
+        description_short: The gap between the total budget required and the total expected funding from all sources.
+        unit: "constant 2022 US$"
+        short_unit: "$"
+        processing_level: major
+        description_processing: Calculated as the difference between the total budget required and the total expected funding from all sources (USAID; Global Fund to Fight AIDS, Tuberculosis and Malaria; domestic sources and other sources).
