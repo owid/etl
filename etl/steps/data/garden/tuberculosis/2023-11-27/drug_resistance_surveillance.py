@@ -1,8 +1,8 @@
 """Load a meadow dataset and create a garden dataset."""
-from owid.catalog import Dataset, Table
+from owid.catalog import Table
 from shared import add_variable_description_from_producer
 
-from etl.data_helpers import geo
+from etl.data_helpers.geo import add_regions_to_table, harmonize_countries
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
@@ -40,12 +40,12 @@ def run(dest_dir: str) -> None:
     tb = ds_meadow["drug_resistance_surveillance"].reset_index()
     #
     # Process data.
-    tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
+    tb = harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
 
     # Remove variables `rr_fqr` and `rr_dr_fq` as it's not clear from their desecriptions how they differ from eachother.
     tb = tb.drop(columns=["rr_dr_fq", "rr_fqr"])
-    tb = add_region_sum_aggregates(tb, ds_regions=ds_regions, ds_income_groups=ds_income_groups)
-
+    # Adding regional aggregates.
+    tb = add_regions_to_table(tb=tb, ds_regions=ds_regions, ds_income_groups=ds_income_groups, regions=REGIONS_TO_ADD)
     tb = add_variable_description_from_producer(tb, dd)
 
     tb = tb.set_index(["country", "year"], verify_integrity=True)
@@ -62,24 +62,13 @@ def run(dest_dir: str) -> None:
     ds_garden.save()
 
 
-def add_region_sum_aggregates(tb: Table, ds_regions: Dataset, ds_income_groups: Dataset) -> Table:
-    tb = tb.copy()
-    for region in REGIONS_TO_ADD:
-        # List of countries in region.
-        countries_in_region = geo.list_members_of_region(
-            region=region,
-            ds_regions=ds_regions,
-            ds_income_groups=ds_income_groups,
-        )
+def sum_hiv_status_for_rifampicin_susceptible(tb: Table) -> Table:
+    """
+    There isn't currently a value for the total number of patients that have been tested for rifampicin susceptibility that are susceptible to rifampicin.
+    But this variable is available disggregated by HIV status, so we sum these.
+    """
+    cols_to_sum = ["nrr_hivneg", "nrr_hivpos", "nrr_hivunk"]
 
-        # Add region aggregates.
-        tb = geo.add_region_aggregates(
-            df=tb,
-            region=region,
-            countries_in_region=countries_in_region,
-            countries_that_must_have_data="auto",
-            frac_allowed_nans_per_year=0.5,
-            num_allowed_nans_per_year=None,
-        )
+    tb["nrr_hivall"] = tb[cols_to_sum].sum(axis=1)
 
     return tb
