@@ -255,6 +255,151 @@ tables:
         description_short: *description_short_pct
         presentation:
           title_public: Share of electricity generated from wind power
+      # Aggregates added by OWID.
+      coal__twh:
+        title: Coal - TWh
+        unit: terawatt-hours
+        short_unit: TWh
+        description_short: *description_short_twh
+        display:
+          name: Coal
+        presentation:
+          title_public: Electricity generation from coal
+      wind_and_solar__twh:
+        title: Wind and solar - TWh
+        unit: terawatt-hours
+        short_unit: TWh
+        description_short: *description_short_twh
+        display:
+          name: Wind and solar
+        presentation:
+          title_public: Electricity generation from wind and solar power
+      hydro__bioenergy_and_other_renewables__twh:
+        title: Hydro, bioenergy and other renewables - TWh
+        unit: terawatt-hours
+        short_unit: TWh
+        description_short: *description_short_twh
+        display:
+          name: Hydro, bioenergy and other renewables
+        presentation:
+          title_public: Electricity generation from hydro, bioenergy and other renewables
+      renewables__twh:
+        title: Renewables - TWh
+        unit: terawatt-hours
+        short_unit: TWh
+        description_short: *description_short_twh
+        display:
+          name: Renewables
+        presentation:
+          title_public: Electricity generation from renewables
+      gas_and_other_fossil__twh:
+        title: Gas and other fossil - TWh
+        unit: terawatt-hours
+        short_unit: TWh
+        description_short: *description_short_twh
+        display:
+          name: Gas and other fossil
+        presentation:
+          title_public: Electricity generation from gas and other fossil fuels
+      fossil__twh:
+        title: Fossil - TWh
+        unit: terawatt-hours
+        short_unit: TWh
+        description_short: *description_short_twh
+        display:
+          name: Fossil
+        presentation:
+          title_public: Electricity generation from fossil fuels
+      coal__pct:
+        title: Coal - %
+        unit: "%"
+        short_unit: "%"
+        display:
+          name: Coal
+        description_short: *description_short_pct
+        presentation:
+          title_public: Share of electricity generated from coal
+      wind_and_solar__pct:
+        title: Wind and solar - %
+        unit: "%"
+        short_unit: "%"
+        display:
+          name: Wind and solar
+        description_short: *description_short_pct
+        presentation:
+          title_public: Share of electricity generated from wind and solar power
+      hydro__bioenergy_and_other_renewables__pct:
+        title: Hydro, bioenergy and other renewables - %
+        unit: "%"
+        short_unit: "%"
+        display:
+          name: Hydro, bioenergy and other renewables
+        description_short: *description_short_pct
+        presentation:
+          title_public: Share of electricity generated from hydro, bioenergy and other renewables
+      renewables__pct:
+        title: Renewables - %
+        unit: "%"
+        short_unit: "%"
+        display:
+          name: Renewables
+        description_short: *description_short_pct
+        presentation:
+          title_public: Share of electricity generated from renewables
+      gas_and_other_fossil__pct:
+        title: Gas and other fossil - %
+        unit: "%"
+        short_unit: "%"
+        display:
+          name: Gas and other fossil
+        description_short: *description_short_pct
+        presentation:
+          title_public: Share of electricity generated from gas and other fossil fuels
+      fossil__pct:
+        title: Fossil - %
+        unit: "%"
+        short_unit: "%"
+        display:
+          name: Fossil
+        description_short: *description_short_pct
+        presentation:
+          title_public: Share of electricity generated from fossil fuels
+      clean__twh:
+        title: Clean - TWh
+        unit: terawatt-hours
+        short_unit: TWh
+        description_short: *description_short_twh
+        display:
+          name: Clean
+        presentation:
+          title_public: Electricity generation from clean sources
+      clean__pct:
+        title: Clean - %
+        unit: "%"
+        short_unit: "%"
+        display:
+          name: Clean
+        description_short: *description_short_pct
+        presentation:
+          title_public: Share of electricity generated from clean sources
+      total_generation__twh:
+        title: Generation - TWh
+        unit: terawatt-hours
+        short_unit: TWh
+        description_short: *description_short_twh
+        display:
+          name: Generation
+        presentation:
+          title_public: Total electricity generation
+      total_generation__pct:
+        title: Generation - %
+        unit: "%"
+        short_unit: "%"
+        display:
+          name: Generation
+        description_short: *description_short_pct
+        presentation:
+          title_public: Share of total electricity generation
   net_flows:
     variables:
       net_flow__twh:

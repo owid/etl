@@ -14,49 +14,13 @@ NOTES:
 """
 
 import owid.catalog.processing as pr
-from owid.catalog import Dataset, Table, VariablePresentationMeta, utils
+from owid.catalog import Dataset, Table, utils
 from owid.datautils import dataframes
 
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
-
-# Define aggregates, following their Ember-Electricity-Data-Methodology document:
-# https://ember-climate.org/app/uploads/2022/03/GER22-Methodology.pdf
-# The European review also has its own methodology document:
-# https://ember-climate.org/app/uploads/2022/02/EER-Methodology.pdf
-# but it does not explicitly define aggregates. We assume they are consistent with each other.
-# This will be also checked, along with other sanity checks, in a separate analysis.
-AGGREGATES = {
-    "coal__twh": [
-        "hard_coal__twh",
-        "lignite__twh",
-    ],
-    "wind_and_solar__twh": ["wind__twh", "solar__twh"],
-    "hydro__bioenergy_and_other_renewables__twh": [
-        "hydro__twh",
-        "bioenergy__twh",
-        "other_renewables__twh",
-    ],
-    "renewables__twh": [
-        "wind_and_solar__twh",
-        "hydro__bioenergy_and_other_renewables__twh",
-    ],
-    "clean__twh": [
-        "renewables__twh",
-        "nuclear__twh",
-    ],
-    "gas_and_other_fossil__twh": [
-        "gas__twh",
-        "other_fossil__twh",
-    ],
-    "fossil__twh": ["gas_and_other_fossil__twh", "coal__twh"],
-    "total_generation__twh": [
-        "clean__twh",
-        "fossil__twh",
-    ],
-}
 
 
 def combine_yearly_electricity_data(ds_yed: Dataset) -> Table:
@@ -155,50 +119,6 @@ def combine_european_electricity_review_data(ds_eer: Dataset) -> Table:
     country_overview = ds_eer["country_overview"].copy()
     generation = ds_eer["generation"].copy()
     emissions = ds_eer["emissions"].copy()
-
-    # Create aggregates (defined in AGGREGATES) that are in yearly electricity but not in the european review.
-    for aggregate in AGGREGATES:
-        title = aggregate.replace("__twh", "").replace("__", ", ").replace("_", " ").capitalize()
-        generation[aggregate] = generation[AGGREGATES[aggregate]].sum(axis=1)
-        generation[aggregate].metadata.unit = "terawatt-hours"
-        generation[aggregate].metadata.short_unit = "TWh"
-        generation[aggregate].metadata.title = f"{title} - TWh"
-        generation[aggregate].metadata.description_short = "Measured in terawatt-hours."
-        generation[aggregate].metadata.display = {"name": title}
-        title = (
-            title.lower()
-            .replace("clean", "clean sources")
-            .replace("fossil", "fossil fuels")
-            .replace("hydro", "hydropower")
-            .replace("solar", "solar power")
-        )
-        generation[aggregate].metadata.presentation = VariablePresentationMeta(
-            title_public=f"Electricity generation from {title}"
-        )
-
-    # Create a column for each of those new aggregates, giving percentage share of total generation.
-    for aggregate in AGGREGATES:
-        column = aggregate.replace("__twh", "__pct")
-        title = aggregate.replace("__twh", "").replace("__", ", ").replace("_", " ").capitalize()
-        generation[column] = generation[aggregate] / generation["total_generation__twh"] * 100
-        generation[column].metadata.unit = "%"
-        generation[column].metadata.short_unit = "%"
-        generation[column].metadata.title = f"{title} - %"
-        generation[column].metadata.display = {"name": title}
-        title = (
-            title.lower()
-            .replace("clean", "clean sources")
-            .replace("fossil", "fossil fuels")
-            .replace("hydro", "hydropower")
-            .replace("solar", "solar power")
-        )
-        generation[column].metadata.presentation = VariablePresentationMeta(
-            title_public=f"Share of electricity generated from {title}"
-        )
-
-    # Check that total generation adds up to 100%.
-    error = "Total generation does not add up to 100%."
-    assert set(generation["total_generation__pct"]) == {100}, error
 
     # Check that the constructed "total generation" column agrees with the one given in table "country_overview".
     columns = ["country", "year", "total_generation__twh"]

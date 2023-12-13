@@ -14,6 +14,42 @@ paths = PathFinder(__file__)
 # Convert from megawatt-hours to kilowatt-hours.
 MWH_TO_KWH = 1000
 
+# Define aggregates, following their Ember-Electricity-Data-Methodology document:
+# https://ember-climate.org/app/uploads/2022/03/GER22-Methodology.pdf
+# The European review also has its own methodology document:
+# https://ember-climate.org/app/uploads/2022/02/EER-Methodology.pdf
+# but it does not explicitly define aggregates. We assume they are consistent with each other.
+# This will be also checked, along with other sanity checks, in a separate analysis.
+AGGREGATES = {
+    "coal__twh": [
+        "hard_coal__twh",
+        "lignite__twh",
+    ],
+    "wind_and_solar__twh": ["wind__twh", "solar__twh"],
+    "hydro__bioenergy_and_other_renewables__twh": [
+        "hydro__twh",
+        "bioenergy__twh",
+        "other_renewables__twh",
+    ],
+    "renewables__twh": [
+        "wind_and_solar__twh",
+        "hydro__bioenergy_and_other_renewables__twh",
+    ],
+    "clean__twh": [
+        "renewables__twh",
+        "nuclear__twh",
+    ],
+    "gas_and_other_fossil__twh": [
+        "gas__twh",
+        "other_fossil__twh",
+    ],
+    "fossil__twh": ["gas_and_other_fossil__twh", "coal__twh"],
+    "total_generation__twh": [
+        "clean__twh",
+        "fossil__twh",
+    ],
+}
+
 
 def process_net_flows_data(table: Table, tb_regions: Table) -> Table:
     """Process net flows data, including country harmonization.
@@ -111,8 +147,55 @@ def process_generation_data(table: Table) -> Table:
         warn_on_missing_countries=True,
     )
 
-    # Ensure columns are snake-case, set an appropriate index, and sort conveniently.
-    tb = tb.underscore().set_index(["country", "year"], verify_integrity=True).sort_index()
+    # Ensure columns are snake-case.
+    tb = tb.underscore()
+
+    # Create aggregates (defined in AGGREGATES) that are in yearly electricity but not in the european review.
+    for aggregate in AGGREGATES:
+        tb[aggregate] = tb[AGGREGATES[aggregate]].sum(axis=1)
+        # title = aggregate.replace("__twh", "").replace("__", ", ").replace("_", " ").capitalize()
+        # tb[aggregate].metadata.unit = "terawatt-hours"
+        # tb[aggregate].metadata.short_unit = "TWh"
+        # tb[aggregate].metadata.title = f"{title} - TWh"
+        # tb[aggregate].metadata.description_short = "Measured in terawatt-hours."
+        # tb[aggregate].metadata.display = {"name": title}
+        # title = (
+        #     title.lower()
+        #     .replace("clean", "clean sources")
+        #     .replace("fossil", "fossil fuels")
+        #     .replace("hydro", "hydropower")
+        #     .replace("solar", "solar power")
+        # )
+        # tb[aggregate].metadata.presentation = VariablePresentationMeta(
+        #     title_public=f"Electricity generation from {title}"
+        # )
+
+    # Create a column for each of those new aggregates, giving percentage share of total generation.
+    for aggregate in AGGREGATES:
+        column = aggregate.replace("__twh", "__pct")
+        tb[column] = tb[aggregate] / tb["total_generation__twh"] * 100
+        # title = aggregate.replace("__twh", "").replace("__", ", ").replace("_", " ").capitalize()
+        # tb[column].metadata.unit = "%"
+        # tb[column].metadata.short_unit = "%"
+        # tb[column].metadata.title = f"{title} - %"
+        # tb[column].metadata.display = {"name": title}
+        # title = (
+        #     title.lower()
+        #     .replace("clean", "clean sources")
+        #     .replace("fossil", "fossil fuels")
+        #     .replace("hydro", "hydropower")
+        #     .replace("solar", "solar power")
+        # )
+        # tb[column].metadata.presentation = VariablePresentationMeta(
+        #     title_public=f"Share of electricity generated from {title}"
+        # )
+
+    # Check that total generation adds up to 100%.
+    error = "Total generation does not add up to 100%."
+    assert set(tb["total_generation__pct"]) == {100}, error
+
+    # Set an appropriate index, and sort conveniently.
+    tb = tb.set_index(["country", "year"], verify_integrity=True).sort_index()
 
     return tb
 
