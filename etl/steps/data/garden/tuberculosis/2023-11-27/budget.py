@@ -31,16 +31,13 @@ def run(dest_dir: str) -> None:
     #
     # Load meadow dataset.
     ds_meadow = paths.load_dataset("budget")
-
-    snap = paths.load_snapshot("data_dictionary.csv")
-    # Read table from meadow dataset.
-    tb = ds_meadow["budget"].reset_index()
-
-    dd = snap.read()
-    #
     ds_regions = paths.load_dependency("regions")
     # Load income groups dataset.
     ds_income_groups = paths.load_dependency("income_groups")
+    snap = paths.load_snapshot("data_dictionary.csv")
+    # Read table from meadow dataset.
+    tb = ds_meadow["budget"].reset_index()
+    dd = snap.read()
     # Process data.
     #
     tb = add_variable_description_from_producer(tb, dd)
