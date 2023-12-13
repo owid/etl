@@ -16,6 +16,20 @@ paths = PathFinder(__file__)
 # Logger
 log = get_logger()
 
+REGIONS_TO_ADD = [
+    "North America",
+    "South America",
+    "Europe",
+    "Africa",
+    "Asia",
+    "Oceania",
+    "Low-income countries",
+    "Upper-middle-income countries",
+    "Lower-middle-income countries",
+    "High-income countries",
+    "World",
+]
+
 
 def run(dest_dir: str) -> None:
     #
@@ -26,6 +40,12 @@ def run(dest_dir: str) -> None:
 
     # Load population dataset.
     ds_population = paths.load_dataset("population")
+
+    # Load regions dataset.
+    ds_regions = paths.load_dependency("regions")
+
+    # Load income groups dataset.
+    ds_income_groups = paths.load_dependency("income_groups")
 
     # Read tables from meadow datasets.
     tb = ds_meadow["unaids"].reset_index()
@@ -82,6 +102,9 @@ def run(dest_dir: str) -> None:
     log.info("health.unaids: add per_capita")
     tb = add_per_capita_variables(tb, ds_population)
 
+    # Add region aggregates for TB variables
+    log.info("health.unaids: add region aggregates for TB variables")
+    tb = add_regions_to_tuberculosis_vars(tb, ds_regions, ds_income_groups)
     # Set index
     log.info("health.unaids: set index")
     tb = tb.set_index(["country", "year", "disaggregation"], verify_integrity=True)
@@ -100,6 +123,24 @@ def run(dest_dir: str) -> None:
 
     # Save changes in the new garden dataset.
     ds_garden.save()
+
+
+def add_regions_to_tuberculosis_vars(tb: Table, ds_regions: Dataset, ds_income_groups: Dataset) -> Table:
+    """
+    Adding regional aggregates for all tuberculosis variables.
+    """
+    tb_cols = ["hiv_tb_patients_receiving_art", "tb_patients_tested_positive_hiv", "tb_related_deaths"]
+
+    tb_no_agg = tb[["country", "year"] + tb_cols]
+    tb_agg = tb.drop(columns=tb_cols)
+
+    tb_agg = geo.add_regions_to_table(
+        tb_agg, ds_regions, ds_income_groups, REGIONS_TO_ADD, min_num_values_per_year=1, frac_allowed_nans_per_year=0.3
+    )
+
+    tb = pr.merge(tb_agg, tb_no_agg, on=["country", "year"], how="left")
+
+    return tb
 
 
 def handle_nans(tb: Table) -> Table:
