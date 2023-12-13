@@ -133,6 +133,8 @@ def add_regions_to_tuberculosis_vars(tb: Table, ds_regions: Dataset, ds_income_g
 
     tb_no_agg = tb[["country", "year"] + tb_cols]
     tb_agg = tb.drop(columns=tb_cols)
+    # removing existing aggregates - just world
+    tb_agg = tb_agg[~tb_agg["country"].isin(REGIONS_TO_ADD)]
 
     tb_agg = geo.add_regions_to_table(
         tb_agg, ds_regions, ds_income_groups, REGIONS_TO_ADD, min_num_values_per_year=1, frac_allowed_nans_per_year=0.3
