@@ -2,11 +2,11 @@ steps:
   #
   # Ember - European electricity review 2022.
   #
-  # We still use this version for data from 1990-1999, which is not included in the 2023 version.
-  data://meadow/ember/2022-08-01/european_electricity_review:
-    - walden://ember/2022-02-01/european_electricity_review
-  data://garden/ember/2022-08-01/european_electricity_review:
-      - data://meadow/ember/2022-08-01/european_electricity_review
+  # We still use this 2022 version for data from 1990-1999, which is not included in the 2023 version.
+  data://meadow/ember/2023-12-12/european_electricity_review:
+    - snapshot://ember/2023-12-12/european_electricity_review.zip
+  data://garden/ember/2023-12-12/european_electricity_review:
+      - data://meadow/ember/2023-12-12/european_electricity_review
       - data://garden/regions/2023-01-01/regions
   #
   # Ember - European electricity review 2023.
@@ -235,5 +235,14 @@ steps:
     - snapshot://papers/2023-07-10/smil_2017.csv
   data://garden/papers/2023-07-10/smil_2017:
     - data://meadow/papers/2023-07-10/smil_2017
+  #
+  # Ember - European electricity review 2022.
+  #
+  # We still use this version for data from 1990-1999, which is not included in the 2023 version.
+  data://meadow/ember/2022-08-01/european_electricity_review:
+    - walden://ember/2022-02-01/european_electricity_review
+  data://garden/ember/2022-08-01/european_electricity_review:
+      - data://meadow/ember/2022-08-01/european_electricity_review
+      - data://garden/regions/2023-01-01/regions
 
   ######################################################################################################################

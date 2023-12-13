@@ -7,21 +7,16 @@ from tempfile import TemporaryDirectory
 from typing import Dict
 from zipfile import ZipFile
 
+import owid.catalog.processing as pr
 import pandas as pd
 from owid import catalog
-from owid.walden import Catalog as WaldenCatalog
-from shared import VERSION, log
 
-from etl.steps.data.converters import convert_walden_metadata
+from etl.helpers import PathFinder, create_dataset
+from etl.snapshot import Snapshot
 
-# Details of dataset to export.
-NAMESPACE = "ember"
-DATASET_SHORT_NAME = "european_electricity_review"
-# Details of walden dataset to import.
-WALDEN_VERSION = "2022-02-01"
-# Beginning of the names of csv files inside the raw zip file in walden, and their extension.
-FILES_NAME_START = "EER_2022_"
-FILES_EXTENSION = ".csv"
+# Get naming conventions.
+paths = PathFinder(__file__)
+
 
 TABLE_INDEXES = {
     "country_overview": ["country_name", "year"],
@@ -38,24 +33,30 @@ TABLE_NAMES = {
 }
 
 
-def load_dataframes_from_compressed_folder(
-    zip_file_path: str,
+def load_tables_from_compressed_folder(
+    snap: Snapshot,
 ) -> Dict[str, pd.DataFrame]:
-    # Initialise dictionary that will contain the dataframes.
-    dfs = {}
+    # Beginning of the names of csv files inside the raw zip file in walden, and their extension.
+    files_name_start = "EER_2022_"
+    files_extension = ".csv"
+
+    # Initialise dictionary that will contain the tables.
+    tables = {}
     with TemporaryDirectory() as _temp_folder:
-        with ZipFile(zip_file_path) as _zip_folder:
+        with ZipFile(snap.path) as _zip_folder:
             for file in _zip_folder.namelist():
                 temp_file = Path(_temp_folder) / file
                 # Check all files in the folder (there are some hidden mac files that start with "__"), and keep only
                 # files of the required extension.
-                if file.endswith(FILES_EXTENSION) and not file.startswith("__"):
-                    df_name = file.replace(FILES_EXTENSION, "").replace(FILES_NAME_START, "")
+                if file.endswith(files_extension) and not file.startswith("__"):
+                    table_name = file.replace(files_extension, "").replace(files_name_start, "")
                     # Extract file, read it as a dataframe, and store it in dictionary.
                     _zip_folder.extract(file, path=_temp_folder)
-                    dfs[df_name] = pd.read_csv(temp_file)
+                    new_table = pr.read_csv(temp_file, metadata=snap.to_table_metadata(), origin=snap.metadata.origin)
+                    new_table.metadata.short_name = table_name
+                    tables[table_name] = new_table
 
-    return dfs
+    return tables
 
 
 def create_tables(dfs: Dict[str, pd.DataFrame]) -> Dict[str, catalog.Table]:
@@ -69,34 +70,32 @@ def create_tables(dfs: Dict[str, pd.DataFrame]) -> Dict[str, catalog.Table]:
 
 
 def run(dest_dir: str) -> None:
-    log.info(f"{DATASET_SHORT_NAME}.start")
+    #
+    # Load inputs.
+    #
+    # Retrieve snapshot.
+    snap = paths.load_snapshot("european_electricity_review.zip")
+    tables = load_tables_from_compressed_folder(snap)
 
-    # Retrieve raw data from walden.
-    walden_ds = WaldenCatalog().find_one(namespace=NAMESPACE, short_name=DATASET_SHORT_NAME, version=WALDEN_VERSION)
-    local_file = walden_ds.ensure_downloaded()
-
-    # Original zip file contains various csv files.
-    # Create a dictionary that contains all dataframes.
-    dfs = load_dataframes_from_compressed_folder(zip_file_path=local_file)
-
-    # Convert each dataframe into a table, and ensure the indexes are consistent.
-    tables = create_tables(dfs)
-
-    # Create new dataset, reuse walden metadata, and update metadata.
-    ds = catalog.Dataset.create_empty(dest_dir)
-    ds.metadata = convert_walden_metadata(walden_ds)
-    ds.metadata.version = VERSION
-    ds.save()
-
-    # Create tables.
+    #
+    # Process data.
+    #
     for table_name in tables:
-        table = tables[table_name]
-        table.metadata.short_name = catalog.utils.underscore(table_name)
-        table.metadata.title = table_name
-        table.metadata.description = walden_ds.description
-        # Underscore all table columns.
-        table = catalog.utils.underscore_table(table)
-        # Add table to dataset.
-        ds.add(table)
+        # Add a title to each table.
+        tables[table_name].metadata.title = TABLE_NAMES[table_name]
+        # Set an appropriate index to each table and sort them conveniently.
+        tables[table_name] = (
+            tables[table_name]
+            .set_index(TABLE_INDEXES[table_name], verify_integrity=True)
+            .sort_index()
+            .sort_index(axis=1)
+        )
 
-    log.info(f"{DATASET_SHORT_NAME}.end")
+    #
+    # Save outputs.
+    #
+    # Create a new meadow dataset.
+    ds_meadow = create_dataset(
+        dest_dir, tables=tables.values(), default_metadata=snap.metadata, check_variables_metadata=True
+    )
+    ds_meadow.save()
