@@ -1,9 +1,8 @@
 """Ingest script for Ember's Yearly electricity data.
 
-This dataset seems to be more complete and regularly updated than Ember's Global Electricity Review.
-
-It is unclear whether it is as complete as Ember's European Electricity Review (if not, this data will be merged with
-European data).
+Ember's recommendation is to use the Yearly electricity data by default (which is more regularly updated than the Global
+Electricity Review). However, some data from the European Electricity Review is missing in the current Yearly
+electricity data. That is why we currently combine both in the combined_electricity step.
 
 """
 
