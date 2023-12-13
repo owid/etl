@@ -1,7 +1,5 @@
 """Load a meadow dataset and create a garden dataset."""
 
-import numpy as np
-import pandas as pd
 from owid.catalog import Dataset, Table
 from owid.catalog import processing as pr
 
@@ -33,13 +31,14 @@ def run(dest_dir: str) -> None:
     #
     # Load meadow dataset.
     ds_meadow = paths.load_dataset("outcomes_disagg")
-
     # Read table from meadow dataset.
     tb = ds_meadow["outcomes_disagg"].reset_index()
+
     # Load regions dataset.
     ds_regions = paths.load_dependency("regions")
     # Load income groups dataset.
     ds_income_groups = paths.load_dependency("income_groups")
+
     #
     # Process data.
     #
