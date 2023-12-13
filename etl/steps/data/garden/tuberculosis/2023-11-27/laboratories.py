@@ -50,7 +50,7 @@ def run(dest_dir: str) -> None:
 
 def add_population_and_rates(tb: Table, ds_pop: Table) -> Table:
     """
-    Adding the total population of each country-year to the table and then calculating the rates per 100,000 people.
+    Adding the total population of each country-year to the table and then calculating the rates per million people.
 
     """
     ds_pop = ds_pop[
@@ -62,8 +62,8 @@ def add_population_and_rates(tb: Table, ds_pop: Table) -> Table:
     ds_pop = ds_pop.rename(columns={"location": "country", "value": "population"})
 
     tb_pop = pr.merge(tb, ds_pop, on=["country", "year"], how="left")
-    tb_pop["culture_rate"] = tb_pop["culture"] / tb_pop["population"] * 100000
-    tb_pop["m_wrd_rate"] = tb_pop["m_wrd"] / tb_pop["population"] * 100000
+    tb_pop["culture_rate"] = (tb_pop["culture"] / tb_pop["population"]) * 1000000
+    tb_pop["m_wrd_rate"] = (tb_pop["m_wrd"] / tb_pop["population"]) * 1000000
     # Converting to float16 to reduce warnings
     tb_pop[["culture_rate", "m_wrd_rate"]] = tb_pop[["culture_rate", "m_wrd_rate"]].astype("float16")
     tb_pop = tb_pop[["country", "year", "culture", "culture_rate", "m_wrd", "m_wrd_rate"]]
