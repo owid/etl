@@ -47,7 +47,7 @@ def run(dest_dir: str) -> None:
     # Adding regional aggregates.
     tb = add_regions_to_table(tb=tb, ds_regions=ds_regions, ds_income_groups=ds_income_groups, regions=REGIONS_TO_ADD)
     tb = add_variable_description_from_producer(tb, dd)
-
+    tb = sum_hiv_status_for_rifampicin_susceptible(tb)
     tb = tb.set_index(["country", "year"], verify_integrity=True)
 
     #
