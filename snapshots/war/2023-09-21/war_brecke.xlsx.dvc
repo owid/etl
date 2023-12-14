@@ -17,10 +17,11 @@ meta:
       Brecke, P. (1999, October). Violent conflicts 1400 AD to the
       present in different regions of the world. In 1999 Meeting of the Peace Science
       Society.
+    attribution: Brecke - Conflicts Catalog (1999)
 
     # Files
     url_main: https://brecke.inta.gatech.edu/research/conflict/
-    url_download: 
+    url_download:
       https://brecke.inta.gatech.edu/wp-content/uploads/sites/19/2018/09/Conflict-Catalog-18-vars.xlsx
     date_accessed: 2023-09-21
 
