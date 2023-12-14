@@ -1,0 +1,68 @@
+definitions:
+  common:
+    processing_level: TBD - major or minor
+    presentation:
+      topic_tags:
+        - TBD - Indicator's topic tags
+dataset:
+  update_period_days: TBD - Number of days between OWID updates
+tables:
+  long_run_child_mortality_selected:
+    variables:
+      under_five_mortality_selected:
+        title: Under-five mortality rate (selected)
+        unit: deaths per 100 live births
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+        description_short: The estimated share of [newborns](#dod:newborn) who die before reaching the age of five.
+        description_key:
+          - TBD - List of key pieces of information about the indicator.
+        description_from_producer: TBD - Indicator's description given by the producer
+        description_processing: TBD - Indicator's processing description
+        presentation:
+          title_public: TBD - Indicator title to be shown in data pages, that overrides the indicator's title.
+          title_variant: TBD - Indicator's title variant
+          attribution_short: TBD - Indicator's attribution (shorter version)
+          faqs:
+            - fragment_id: TBD - Question identifier from FAQ GDoc
+              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+          grapher_config:
+            title: Child mortality rate
+            subtitle: The estimated share of [newborns](#dod:newborn) who die before reaching the age of five.
+            variantName: Long-run data; Gapminder & UN IGME
+            sourceDesc: UN IGME (2023); Gapminder (2015)
+            originUrl: https://ourworldindata.org/child-mortality
+            hasMapTab: true
+            yAxis:
+              max: 0
+              min: 0
+            minTime: 1800
+            map:
+              time: latest
+              colorScale:
+                baseColorScheme: YlOrRd
+                binningStrategy: manual
+                customNumericColors:
+                  - null
+                  - null
+                  - null
+                customNumericValues:
+                  - 0.3
+                  - 0.5
+                  - 1
+                  - 3
+                  - 5
+                  - 10
+                  - 30
+                  - 50
+                customNumericMinValue: 0
+              timeTolerance: 0
+            selectedEntityNames:
+              - United States
+              - United Kingdom
+              - Sweden
+              - France
+              - Brazil
+              - India
+            $schema: https://files.ourworldindata.org/schemas/grapher-schema.003.json
