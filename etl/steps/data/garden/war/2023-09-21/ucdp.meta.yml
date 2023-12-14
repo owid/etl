@@ -4,12 +4,6 @@ definitions:
       topic_tags:
         - War & Peace
   all:
-    selectedEntityNames: &selected_entities
-      - Africa
-      - Americas
-      - Asia and Oceania
-      - Europe
-      - Middle East
     deaths_included: |-
       Deaths of combatants and civilians due to fighting are included.
     conflict_type_ongoing: |-
@@ -263,6 +257,11 @@ tables:
 
 
   ucdp:
+    common:
+      presentation:
+        grapher_config:
+          selectedEntityNames:
+            - World
     variables:
       ##################
       # Ongoing deaths #
@@ -276,9 +275,6 @@ tables:
         description_key: *description_key_deaths
         display:
           numDecimalPlaces: 0
-        presentation:
-          grapher_config:
-            selectedEntityNames: *selected_entities
 
       number_deaths_ongoing_conflicts_high:
         title: Number of deaths in ongoing conflicts (high estimate)
@@ -289,9 +285,6 @@ tables:
         description_key: *description_key_deaths
         display:
           numDecimalPlaces: 0
-        presentation:
-          grapher_config:
-            selectedEntityNames: *selected_entities
 
       number_deaths_ongoing_conflicts_low:
         title: Number of deaths in ongoing conflicts (low estimate)
@@ -302,9 +295,6 @@ tables:
         description_key: *description_key_deaths
         display:
           numDecimalPlaces: 0
-        presentation:
-          grapher_config:
-            selectedEntityNames: *selected_entities
 
       number_deaths_ongoing_conflicts_per_capita:
         title: Number of deaths in ongoing conflicts (best estimate, per capita)
@@ -315,9 +305,6 @@ tables:
         description_key: *description_key_deaths
         display:
           numDecimalPlaces: 1
-        presentation:
-          grapher_config:
-            selectedEntityNames: *selected_entities
 
       number_deaths_ongoing_conflicts_high_per_capita:
         title: Number of deaths in ongoing conflicts (high estimate, per capita)
@@ -328,9 +315,6 @@ tables:
         description_key: *description_key_deaths
         display:
           numDecimalPlaces: 1
-        presentation:
-          grapher_config:
-            selectedEntityNames: *selected_entities
 
       number_deaths_ongoing_conflicts_low_per_capita:
         title: Number of deaths in ongoing conflicts (low estimate, per capita)
@@ -341,9 +325,6 @@ tables:
         description_key: *description_key_deaths
         display:
           numDecimalPlaces: 1
-        presentation:
-          grapher_config:
-            selectedEntityNames: *selected_entities
 
       #####################
       # Ongoing conflicts #
@@ -358,7 +339,8 @@ tables:
           numDecimalPlaces: 0
         presentation:
           grapher_config:
-            selectedEntityNames: *selected_entities
+            selectedEntityNames:
+              - World
 
       number_ongoing_conflicts_per_country:
         title: Number of ongoing conflicts per country
@@ -368,9 +350,6 @@ tables:
         description_key: *description_key_ongoing
         display:
           numDecimalPlaces: 3
-        presentation:
-          grapher_config:
-            selectedEntityNames: *selected_entities
 
       number_ongoing_conflicts_per_country_pair:
         title: Number of ongoing conflicts per country-pair
@@ -380,9 +359,6 @@ tables:
         description_key: *description_key_ongoing
         display:
           numDecimalPlaces: 5
-        presentation:
-          grapher_config:
-            selectedEntityNames: *selected_entities
 
       #################
       # New conflicts #
@@ -395,9 +371,6 @@ tables:
         description_key: *description_key_new
         display:
           numDecimalPlaces: 0
-        presentation:
-          grapher_config:
-            selectedEntityNames: *selected_entities
 
       number_new_conflicts_per_country:
         title: Number of new conflicts per country
@@ -407,9 +380,6 @@ tables:
         description_key: *description_key_new
         display:
           numDecimalPlaces: 3
-        presentation:
-          grapher_config:
-            selectedEntityNames: *selected_entities
 
       number_new_conflicts_per_country_pair:
         title: Number of new conflicts per country-pair
@@ -419,6 +389,3 @@ tables:
         description_key: *description_key_new
         display:
           numDecimalPlaces: 5
-        presentation:
-          grapher_config:
-            selectedEntityNames: *selected_entities
