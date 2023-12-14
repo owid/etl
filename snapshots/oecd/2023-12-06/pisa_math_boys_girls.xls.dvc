@@ -25,9 +25,8 @@ meta:
 
     # License
     license:
-      name: ©producer year
+      name: CC BY 4.0
       url: https://www.oecd.org/termsandconditions
-wdir: ../../../data/snapshots/oecd/2023-12-06
 outs:
 - md5: 476cd1cf8071890d63725c81f7e36751
   size: 104448

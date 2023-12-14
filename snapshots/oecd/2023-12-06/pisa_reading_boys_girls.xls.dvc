@@ -24,7 +24,7 @@ meta:
 
     # License
     license:
-      name: ©producer year
+      name: CC BY 4.0
       url: https://www.oecd.org/termsandconditions
 wdir: ../../../data/snapshots/oecd/2023-12-06
 outs:
