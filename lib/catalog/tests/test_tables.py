@@ -972,3 +972,67 @@ def test_groupby_levels(table_1) -> None:
 def test_set_columns(table_1) -> None:
     table_1.columns = ["country", "year", "new_a", "new_b"]
     assert table_1.new_a.m.title == "Title of Table 1 Variable a"
+
+
+def test_fillna_with_number(table_1) -> None:
+    # Make a copy of table_1 and introduce a nan in it.
+    table = table_1.copy()
+    table.loc[0, "a"] = None
+    # Now fill it up with a number.
+    table["a"] = table["a"].fillna(0)
+    # The metadata of "a" should be preserved.
+    assert table["a"].metadata == table_1["a"].metadata
+
+
+def test_fillna_with_another_variable(table_1, origins, licenses) -> None:
+    # Make a copy of table_1 and introduce a nan in it.
+    tb = table_1.copy()
+    tb.loc[0, "a"] = None
+    # Now, instead of filling the nan with a number, fill it with another variable from the same table.
+    tb["a"] = tb["a"].fillna(tb["b"])
+    # The origins of the resulting variable should combine the origins of "a" and "b".
+    assert tb["a"].metadata.origins == [origins[2], origins[1], origins[3]]
+    # Idem for licenses.
+    assert tb["a"].metadata.licenses == [licenses[1], licenses[2], licenses[3]]
+    # Column "country" should not be affected.
+    assert tb["country"].metadata == table_1["country"].metadata
+    # Column "year" should not be affected.
+    assert tb["year"].metadata == table_1["year"].metadata
+    # Columns "a" and "b" have different titles and descriptions, so the combination should have no title.
+    assert tb["a"].metadata.title is None
+    assert tb["a"].metadata.description is None
+    # Column "b" should keep its original metadata.
+    assert tb["b"].metadata == table_1["b"].metadata
+    # Now check the table metadata has not changed.
+    assert tb.metadata == table_1.metadata
+
+
+def test_fillna_with_another_table(table_1, origins, licenses) -> None:
+    # Make a copy of table_1 and introduce a nan in it.
+    tb = table_1.copy()
+    tb.loc[0, "a"] = None
+    # Make another copy of table_1 with different origins and licenses.
+    tb2 = table_1.copy()
+    tb2.loc[0, "a"] = 10
+    tb2["a"].metadata.description = "Some new description, different from table_1['a']"
+    tb2["a"].metadata.origins = [origins[4]]
+    tb2["a"].metadata.licenses = [licenses[4]]
+    # Now, instead of filling the nan with a number, fill it with another variable from another table.
+    tb = tb.fillna(tb2)
+    # The origins of the resulting variable should combine the origins of table_1["a"] and tb2["a"].
+    assert tb["a"].metadata.origins == [origins[2], origins[1], origins[4]]
+    # Idem for licenses.
+    assert tb["a"].metadata.licenses == [licenses[1], licenses[4]]
+    # Column "country" should not be affected.
+    assert tb["country"].metadata == table_1["country"].metadata
+    assert tb2["country"].metadata == table_1["country"].metadata
+    # Column "year" should not be affected.
+    assert tb["year"].metadata == table_1["year"].metadata
+    assert tb2["year"].metadata == table_1["year"].metadata
+    # Columns tb["a"] and tb2["a"] have the same titles but different descriptions, so the combination should have the
+    # same title but no description.
+    assert tb["a"].metadata.title == table_1["a"].metadata.title
+    assert tb["a"].metadata.description is None
+    # # Now check the table metadata has not changed.
+    assert tb.metadata == table_1.metadata
+    assert tb2.metadata == table_1.metadata

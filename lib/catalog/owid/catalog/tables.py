@@ -895,6 +895,20 @@ class Table(pd.DataFrame):
         tb = tb.set_index(column_idx_new)
         return tb
 
+    def fillna(self, value, **kwargs) -> "Table":
+        """Usual fillna, but, if the object given to fill values with is a table, transfer its metadata to the filled
+        table."""
+        tb = super().fillna(value, **kwargs)
+
+        if type(value) == type(self):
+            for column in tb.columns:
+                if column in value.columns:
+                    tb._fields[column] = variables.combine_variables_metadata(
+                        variables=[tb[column], value[column]], operation="fillna", name=column
+                    )
+
+        return tb
+
 
 def _create_table(df: pd.DataFrame, metadata: TableMeta, fields: Dict[str, VariableMeta]) -> Table:
     """Create a table with metadata."""
