@@ -60,10 +60,14 @@ def run(dest_dir: str) -> None:
     tb_agg = add_region_sum_aggregates(tb_agg, ds_regions=ds_regions, ds_income_groups=ds_income_groups).copy_metadata(
         tb
     )
+    # Calculate rates for region aggregates.
     tb_agg = calculate_region_rates(tb_agg, ds_population=ds_population)
-
     # Combine aggregated and original country-level tables.
     tb = pr.concat([tb, tb_agg], axis=0, ignore_index=True, copy=False)
+    # Calculate HIV incidence in TB for region aggregates.
+    tb = calculate_hiv_incidence_in_tb(tb)
+    # Calculate case fatality ratio for region aggregates.
+    tb = calculate_case_fatality_ratio_regions(tb)
     tb = tb.set_index(["country", "year"], verify_integrity=True)
 
     #
@@ -115,4 +119,29 @@ def calculate_region_rates(tb: Table, ds_population: Dataset) -> Table:
 
     tb = tb.drop(columns=["population"])
 
+    return tb
+
+
+def calculate_hiv_incidence_in_tb(tb: Table) -> Table:
+    """
+    Calculating the regional values e_tbhiv_prct by dividing the number of new cases of TB-HIV (e_inc_tbhiv_num) by the number of new cases of TB (e_inc_num).
+    """
+    tb_reg = tb[tb["country"].isin(REGIONS_TO_ADD)]
+    tb_no_reg = tb[~tb["country"].isin(REGIONS_TO_ADD)]
+    tb_reg["e_tbhiv_prct"] = tb_reg["e_inc_tbhiv_num"] / tb_reg["e_inc_num"] * 100
+
+    tb = pr.concat([tb_no_reg, tb_reg], axis=0, ignore_index=True, short_name=paths.short_name)
+    return tb
+
+
+def calculate_case_fatality_ratio_regions(tb: Table) -> Table:
+    """
+    Calculating the regional values e_tbhiv_prct by dividing the number of new cases of TB-HIV (e_inc_tbhiv_num) by the number of new cases of TB (e_inc_num).
+    """
+    tb_reg = tb[tb["country"].isin(REGIONS_TO_ADD)]
+    tb_no_reg = tb[~tb["country"].isin(REGIONS_TO_ADD)]
+    tb_reg["cfr"] = tb_reg["e_mort_num"] / tb_reg["e_inc_num"]
+    tb_reg["cfr_pct"] = (tb_reg["e_mort_num"] / tb_reg["e_inc_num"]) * 100
+
+    tb = pr.concat([tb_no_reg, tb_reg], axis=0, ignore_index=True, short_name=paths.short_name)
     return tb
