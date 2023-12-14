@@ -36,7 +36,7 @@ python = ">=3.10, <3.12"
 owid-catalog = {path = "lib/catalog", develop = true}
 walden = {path = "lib/walden", develop = true}
 click = ">=8.0.1"
-PyYAML = ">=5.4.1"
+PyYAML = ">=6.0.1"
 papermill = ">=2.3.3"
 jupyterlab = ">=3.1.13"
 # 2.2.0 was raising weird error, pin to 2.1.1 which is stable
