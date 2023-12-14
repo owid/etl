@@ -211,22 +211,6 @@ def combine_yearly_electricity_data_and_european_electricity_review(tb_yed: Tabl
         df1=tb_yed.reset_index(), df2=tb_eer.reset_index(), index_columns=index_columns
     )
 
-    # TODO: Remove the following block after Table.fillna operation properly propagates metadata.
-    ####################################################################################################################
-    # NOTE: The previous operation does not propagate metadata properly, so we do it manually.
-    for column in combined.columns:
-        origins = []
-        licenses = []
-        # Gather all origins and licenses for this column.
-        for table in [tb_yed, tb_eer]:
-            if column in table.columns:
-                origins.extend(table[column].metadata.origins)
-                licenses.extend(table[column].metadata.licenses)
-        # Assign the gathered origins and licenses to the new column.
-        combined[column].origins = origins
-        combined[column].licenses = licenses
-    ####################################################################################################################
-
     # TODO: Remove the following block once display and presentation propagate metadata field by field.
     ####################################################################################################################
     for column in combined.columns:
