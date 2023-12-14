@@ -442,11 +442,19 @@ def cleanup_ghost_sources(dataset_id: int, upserted_source_ids: List[int]) -> No
     :param upserted_source_ids: sources upserted in grapher step
     """
     with open_db() as db:
-        db.cursor.execute(
-            """
-            DELETE FROM sources WHERE datasetId=%(dataset_id)s AND id NOT IN %(source_ids)s
-        """,
-            {"dataset_id": dataset_id, "source_ids": upserted_source_ids},
-        )
+        if upserted_source_ids:
+            db.cursor.execute(
+                """
+                DELETE FROM sources WHERE datasetId=%(dataset_id)s AND id NOT IN %(source_ids)s
+            """,
+                {"dataset_id": dataset_id, "source_ids": upserted_source_ids},
+            )
+        else:
+            db.cursor.execute(
+                """
+                DELETE FROM sources WHERE datasetId=%(dataset_id)s
+            """,
+                {"dataset_id": dataset_id},
+            )
         if db.cursor.rowcount > 0:
             log.warning(f"Deleted {db.cursor.rowcount} ghost sources")
