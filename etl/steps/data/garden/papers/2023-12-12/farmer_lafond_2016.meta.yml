@@ -6,11 +6,11 @@ definitions:
         - Technological Change
 
 dataset:
-  title: Cost of different technologies
   update_period_days: 0
 
 tables:
   farmer_lafond_2016:
+    title: Cost of different technologies
     variables:
       acrylic_fiber:
         title: Cost of acrylic fiber
