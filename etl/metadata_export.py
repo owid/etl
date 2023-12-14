@@ -287,6 +287,7 @@ def reorder_fields(m: Dict[str, Any]) -> Dict[str, Any]:
         "yAxis",
         "colorScale",
         "minTime",
+        "maxTime",
         "timelineMaxTime",
         "selectedFacetStrategy",
         "hideAnnotationFieldsInTitle",
