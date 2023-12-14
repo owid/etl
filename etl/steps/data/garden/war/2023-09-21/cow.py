@@ -371,6 +371,23 @@ def combine_tables(tb_extra: Table, tb_nonstate: Table, tb_inter: Table, tb_intr
         not tb["number_deaths_ongoing_conflicts"].isna().any()
     ), "Some NaNs found in `number_deaths_ongoing_conflicts`!"
 
+    # Fill gaps with zeroes
+    paths.log.info("fill gaps with zeroes")
+    tb = fill_gaps_with_zeroes(
+        tb,
+        columns=["region", "year", "conflict_type"],
+        cols_use_range=["year"],
+    )
+    # Keep correct year coverage by conflict type
+    tb = tb[
+        # EXTRA, NON-STATE, ALL (2007)
+        ((tb["conflict_type"].isin([CTYPE_EXTRA, CTYPE_NONSTATE, "all"])) & (tb["year"] <= 2007))
+        # INTER, STATE-BASED (2010)
+        | ((tb["conflict_type"].isin([CTYPE_INTER, CTYPE_SBASED])) & (tb["year"] <= 2010))
+        # INTRA (2014)
+        | ((tb["conflict_type"].isin([CTYPE_INTRA, CTYPE_INTRA_INTL, CTYPE_INTRA_NINTL])) & (tb["year"] <= 2014))
+    ]
+
     # Set index
     log.info("war.cow: set index")
     tb = tb.set_index(["year", "region", "conflict_type"], verify_integrity=True)
@@ -1141,19 +1158,16 @@ def estimate_metrics_participants(tb_extra: Table, tb_intra: Table, tb_inter: Ta
     tb_num_participants = tb_num_participants[
         (
             # Extra
-            (
-                (tb_num_participants["conflict_type"] == CTYPE_EXTRA)
-                & (tb_num_participants["year"] <= 2007)
-            ) |
+            ((tb_num_participants["conflict_type"] == CTYPE_EXTRA) & (tb_num_participants["year"] <= 2007))
+            |
             # Inter, State-based
             (
                 (tb_num_participants["conflict_type"].isin([CTYPE_INTER, CTYPE_SBASED]))
                 & (tb_num_participants["year"] <= 2010)
-            ) |
-            # Intra
-            (
-                (tb_num_participants["conflict_type"].isin([CTYPE_INTRA, CTYPE_INTRA_INTL, CTYPE_INTRA_NINTL]))
             )
+            |
+            # Intra
+            (tb_num_participants["conflict_type"].isin([CTYPE_INTRA, CTYPE_INTRA_INTL, CTYPE_INTRA_NINTL]))
         )
     ]
 
@@ -1333,6 +1347,15 @@ def estimate_metrics_locations(tb_chupilkin: Table, tb_system: Table, tb_partici
         ignore_index=True,
         short_name="cow_locations",
     )
+
+    # Correct year coverage by conflict type
+    tb_locations = tb_locations[
+        ((tb_locations["conflict_type"].isin([CTYPE_INTER, CTYPE_SBASED])) & (tb_locations["year"] <= 2010))
+        | (
+            tb_locations["conflict_type"].isin([CTYPE_INTRA, CTYPE_INTRA_INTL, CTYPE_INTRA_NINTL])
+            & (tb_locations["year"] <= 2014)
+        )
+    ]
 
     # Set index
     tb_locations = tb_locations.set_index(["year", "country", "conflict_type"], verify_integrity=True).sort_index()
