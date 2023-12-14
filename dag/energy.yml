@@ -187,12 +187,12 @@ steps:
   #
   # Energy - Energy mix (2023).
   #
-  data://garden/energy/2023-07-10/energy_mix:
-    - data://garden/energy_institute/2023-06-26/statistical_review_of_world_energy
+  data://garden/energy/2023-12-12/energy_mix:
+    - data://garden/energy_institute/2023-12-12/statistical_review_of_world_energy
     - data://garden/demography/2023-03-31/population
     - data://garden/wb/2023-04-30/income_groups
-  data://grapher/energy/2023-07-10/energy_mix:
-    - data://garden/energy/2023-07-10/energy_mix
+  # data://grapher/energy/2023-12-12/energy_mix:
+  #   - data://garden/energy/2023-12-12/energy_mix
   #
   # Energy - OWID Energy dataset (2023).
   #
@@ -261,5 +261,14 @@ steps:
   data://garden/ember/2023-07-10/combined_electricity:
     - data://garden/ember/2022-08-01/european_electricity_review
     - data://garden/ember/2023-07-10/yearly_electricity
+  #
+  # Energy - Energy mix (2023).
+  #
+  data://garden/energy/2023-07-10/energy_mix:
+    - data://garden/energy_institute/2023-06-26/statistical_review_of_world_energy
+    - data://garden/demography/2023-03-31/population
+    - data://garden/wb/2023-04-30/income_groups
+  data://grapher/energy/2023-07-10/energy_mix:
+    - data://garden/energy/2023-07-10/energy_mix
 
   ######################################################################################################################
