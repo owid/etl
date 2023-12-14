@@ -2,7 +2,6 @@
 
 """
 
-from owid.catalog import Dataset
 
 from etl.grapher_helpers import add_columns_for_multiindicator_chart
 from etl.helpers import PathFinder, create_dataset
