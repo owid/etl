@@ -205,20 +205,20 @@ tables:
         presentation:
           title_public: Share of electricity generated from fossil fuels
       gas_and_other_fossil__pct:
-        title: Gas and Other Fossil - %
+        title: Gas and other fossil - %
         short_unit: "%"
         unit: "%"
         display:
-          name: Gas and Other Fossil
+          name: Gas and other fossil
         description_short: *description_short_pct
         presentation:
           title_public: Share of electricity generated from gas and other fossil fuels
       hydro__bioenergy_and_other_renewables__pct:
-        title: Hydro, Bioenergy and Other Renewables - %
+        title: Hydro, bioenergy and other renewables - %
         short_unit: "%"
         unit: "%"
         display:
-          name: Hydro, Bioenergy and Other Renewables
+          name: Hydro, bioenergy and other renewables
         description_short: *description_short_pct
         presentation:
           title_public: Share of electricity generated from hydropower, bioenergy and other renewables
@@ -232,11 +232,11 @@ tables:
         presentation:
           title_public: Share of electricity generated from renewables
       wind_and_solar__pct:
-        title: Wind and Solar - %
+        title: Wind and solar - %
         short_unit: "%"
         unit: "%"
         display:
-          name: Wind and Solar
+          name: Wind and solar
         description_short: *description_short_pct
         presentation:
           title_public: Share of electricity generated from wind and solar power
@@ -259,20 +259,20 @@ tables:
         presentation:
           title_public: Electricity generation from fossil fuels
       gas_and_other_fossil__twh:
-        title: Gas and Other Fossil - TWh
+        title: Gas and other fossil - TWh
         short_unit: TWh
         unit: terawatt-hours
         display:
-          name: Gas and Other Fossil
+          name: Gas and other fossil
         description_short: *description_short_twh
         presentation:
           title_public: Electricity generation from gas and other fossil fuels
       hydro__bioenergy_and_other_renewables__twh:
-        title: Hydro, Bioenergy and Other Renewables - TWh
+        title: Hydro, bioenergy and other renewables - TWh
         short_unit: TWh
         unit: terawatt-hours
         display:
-          name: Hydro, Bioenergy and Other Renewables
+          name: Hydro, bioenergy and other renewables
         description_short: *description_short_twh
         presentation:
           title_public: Electricity generation from hydropower, bioenergy and other renewables
@@ -286,11 +286,11 @@ tables:
         presentation:
           title_public: Electricity generation from renewables
       wind_and_solar__twh:
-        title: Wind and Solar - TWh
+        title: Wind and solar - TWh
         short_unit: TWh
         unit: terawatt-hours
         display:
-          name: Wind and Solar
+          name: Wind and solar
         description_short: *description_short_twh
         presentation:
           title_public: Electricity generation from wind and solar power
@@ -340,20 +340,20 @@ tables:
         presentation:
           title_public: Share of electricity generated from nuclear power
       other_fossil__pct:
-        title: Other Fossil - %
+        title: Other fossil - %
         short_unit: "%"
         unit: "%"
         display:
-          name: Other Fossil
+          name: Other fossil
         description_short: *description_short_pct
         presentation:
           title_public: Share of electricity generated from other fossil fuels
       other_renewables__pct:
-        title: Other Renewables - %
+        title: Other renewables - %
         short_unit: "%"
         unit: "%"
         display:
-          name: Other Renewables
+          name: Other renewables
         description_short: *description_short_pct
         presentation:
           title_public: Share of electricity generated from other renewables
@@ -421,20 +421,20 @@ tables:
         presentation:
           title_public: Electricity generation from nuclear power
       other_fossil__twh:
-        title: Other Fossil - TWh
+        title: Other fossil - TWh
         short_unit: TWh
         unit: terawatt-hours
         display:
-          name: Other Fossil
+          name: Other fossil
         description_short: *description_short_twh
         presentation:
           title_public: Electricity generation from other fossil fuels
       other_renewables__twh:
-        title: Other Renewables - TWh
+        title: Other renewables - TWh
         short_unit: TWh
         unit: terawatt-hours
         display:
-          name: Other Renewables
+          name: Other renewables
         description_short: *description_short_twh
         presentation:
           title_public: Electricity generation from other renewables
@@ -457,11 +457,11 @@ tables:
         presentation:
           title_public: Electricity generation from wind power
       total_generation__twh:
-        title: Total Generation - TWh
+        title: Total generation - TWh
         short_unit: TWh
         unit: terawatt-hours
         display:
-          name: Total Generation
+          name: Total generation
         description_short: *description_short_twh
         presentation:
           title_public: Total electricity generation
@@ -469,11 +469,11 @@ tables:
     title: "Electricity imports"
     variables:
       net_imports__twh:
-        title: Net Imports - TWh
+        title: Net imports - TWh
         short_unit: TWh
         unit: terawatt-hours
         display:
-          name: Net Imports
+          name: Net imports
         description_short: *description_short_twh
         presentation:
           title_public: Net electricity imports
@@ -499,20 +499,20 @@ tables:
         presentation:
           title_public: CO₂ emissions from electricity generation from fossil fuels
       gas_and_other_fossil__mtco2:
-        title: Gas and Other Fossil - mtCO2eq
+        title: Gas and other fossil - mtCO2eq
         short_unit: mtCO₂eq
         unit: megatonnes of CO₂ equivalents
         display:
-          name: Gas and Other Fossil
+          name: Gas and other fossil
         description_short: *description_short_mtco2
         presentation:
           title_public: CO₂ emissions from electricity generation from gas and other fossil fuels
       hydro__bioenergy_and_other_renewables__mtco2:
-        title: Hydro, Bioenergy and Other Renewables - mtCO2eq
+        title: Hydro, bioenergy and other renewables - mtCO2eq
         short_unit: mtCO₂eq
         unit: megatonnes of CO₂ equivalents
         display:
-          name: Hydro, Bioenergy and Other Renewables
+          name: Hydro, bioenergy and other renewables
         description_short: *description_short_mtco2
         presentation:
           title_public: CO₂ emissions from electricity generation from hydropower, bioenergy and other renewables
@@ -526,11 +526,11 @@ tables:
         presentation:
           title_public: CO₂ emissions from electricity generation from renewables
       wind_and_solar__mtco2:
-        title: Wind and Solar - mtCO2eq
+        title: Wind and solar - mtCO2eq
         short_unit: mtCO₂eq
         unit: megatonnes of CO₂ equivalents
         display:
-          name: Wind and Solar
+          name: Wind and solar
         description_short: *description_short_mtco2
         presentation:
           title_public: CO₂ emissions from electricity generation from wind and solar power
@@ -580,20 +580,20 @@ tables:
         presentation:
           title_public: CO₂ emissions from electricity generation from nuclear power
       other_fossil__mtco2:
-        title: Other Fossil - mtCO2eq
+        title: Other fossil - mtCO2eq
         short_unit: mtCO₂eq
         unit: megatonnes of CO₂ equivalents
         display:
-          name: Other Fossil
+          name: Other fossil
         description_short: *description_short_mtco2
         presentation:
           title_public: CO₂ emissions from electricity generation from other fossil fuels
       other_renewables__mtco2:
-        title: Other Renewables - mtCO2eq
+        title: Other renewables - mtCO2eq
         short_unit: mtCO₂eq
         unit: megatonnes of CO₂ equivalents
         display:
-          name: Other Renewables
+          name: Other renewables
         description_short: *description_short_mtco2
         presentation:
           title_public: CO₂ emissions from electricity generation from other renewables
@@ -625,16 +625,16 @@ tables:
         presentation:
           title_public: Total CO₂ emissions from electricity generation
       total_generation__twh:
-        title: Total Generation - TWh
+        title: Total generation - TWh
         short_unit: TWh
         unit: terawatt-hours
         display:
-          name: Total Generation
+          name: Total generation
         description_short: *description_short_twh
         presentation:
           title_public: Total electricity generation
       co2_intensity__gco2_kwh:
-        title: CO2 intensity - gCO₂eq/kWh
+        title: CO2 intensity - gCO2eq/kWh
         short_unit: gCO₂eq/kWh
         unit: grams of CO₂ equivalents per kilowatt-hour
         display:

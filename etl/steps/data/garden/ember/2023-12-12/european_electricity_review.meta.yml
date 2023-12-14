@@ -18,12 +18,12 @@ tables:
   country_overview:
     variables:
       total_generation__twh:
-        title: Generation - TWh
+        title: Total generation - TWh
         unit: terawatt-hours
         short_unit: TWh
         description_short: *description_short_twh
         display:
-          name: Generation
+          name: Total generation
         presentation:
           title_public: Total electricity generation
       net_imports__twh:
@@ -52,7 +52,7 @@ tables:
         display:
           name: Demand per capita
         presentation:
-          title_public: Electricity demand per capita
+          title_public: Total electricity demand per person
   emissions:
     variables:
       co2_intensity__gco2_kwh:
@@ -282,7 +282,7 @@ tables:
         display:
           name: Hydro, bioenergy and other renewables
         presentation:
-          title_public: Electricity generation from hydro, bioenergy and other renewables
+          title_public: Electricity generation from hydropower, bioenergy and other renewables
       renewables__twh:
         title: Renewables - TWh
         unit: terawatt-hours
@@ -336,7 +336,7 @@ tables:
           name: Hydro, bioenergy and other renewables
         description_short: *description_short_pct
         presentation:
-          title_public: Share of electricity generated from hydro, bioenergy and other renewables
+          title_public: Share of electricity generated from hydropower, bioenergy and other renewables
       renewables__pct:
         title: Renewables - %
         unit: "%"
@@ -383,20 +383,20 @@ tables:
         presentation:
           title_public: Share of electricity generated from clean sources
       total_generation__twh:
-        title: Generation - TWh
+        title: Total generation - TWh
         unit: terawatt-hours
         short_unit: TWh
         description_short: *description_short_twh
         display:
-          name: Generation
+          name: Total generation
         presentation:
           title_public: Total electricity generation
       total_generation__pct:
-        title: Generation - %
+        title: Total generation - %
         unit: "%"
         short_unit: "%"
         display:
-          name: Generation
+          name: Total generation
         description_short: *description_short_pct
         presentation:
           title_public: Share of total electricity generation

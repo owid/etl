@@ -14,10 +14,14 @@ NOTES:
 """
 
 import owid.catalog.processing as pr
-from owid.catalog import Dataset, Table, utils
+from owid.catalog import Dataset, Table, VariablePresentationMeta, utils
 from owid.datautils import dataframes
+from structlog import get_logger
 
 from etl.helpers import PathFinder, create_dataset
+
+# Initialize logger.
+log = get_logger()
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -200,6 +204,7 @@ def combine_yearly_electricity_data_and_european_electricity_review(tb_yed: Tabl
         Combined data.
 
     """
+
     # Combine yearly electricity data with European data, prioritizing the former.
     index_columns = ["country", "year"]
     combined = dataframes.combine_two_overlapping_dataframes(
@@ -221,12 +226,50 @@ def combine_yearly_electricity_data_and_european_electricity_review(tb_yed: Tabl
         combined[column].origins = origins
         combined[column].licenses = licenses
     ####################################################################################################################
+
+    # TODO: Remove the following block once display and presentation propagate metadata field by field.
+    ####################################################################################################################
+    for column in combined.columns:
+        if not hasattr(combined[column].metadata.presentation, "title_public"):
+            title_public_yed = None
+            title_public_eer = None
+            if column in tb_yed.columns:
+                title_public_yed = tb_yed[column].metadata.presentation.title_public
+            elif column in tb_eer.columns:
+                title_public_eer = tb_eer[column].metadata.presentation.title_public
+            warning = f"{column}'s title_public in Yearly electricity data differs from European Electricity Review."
+            if title_public_yed != title_public_eer:
+                log.warning(warning)
+            title_public = title_public_yed or title_public_eer
+            combined[column].metadata.presentation = VariablePresentationMeta(title_public=title_public)
+
+    ####################################################################################################################
+
     combined.metadata.short_name = paths.short_name
 
     # Set an appropriate index and sort conveniently.
     combined = combined.set_index(index_columns, verify_integrity=True).sort_index().sort_index(axis=1)
 
     return combined
+
+
+def check_all_variables_have_all_metadata_fields(table: Table) -> None:
+    """Check that all variables in a table have all relevant metadata fields."""
+    for column in table.columns:
+        for field in ["title", "unit", "short_unit", "title_public"]:
+            warning = (
+                f"Column {column} has no {field}. Ensure all variables have a consistent "
+                f"{field} in Yearly electricity data and European Electricity Review datasets."
+            )
+            if field == "title_public":
+                try:
+                    if getattr(table[column].metadata.presentation, field) is None:
+                        log.warning(warning)
+                except AttributeError:
+                    log.warning(warning)
+            else:
+                if not getattr(table[column].metadata, field) is not None:
+                    log.warning(warning)
 
 
 def run(dest_dir: str) -> None:
@@ -251,6 +294,10 @@ def run(dest_dir: str) -> None:
 
     # Create an additional table with the electricity net flows (only available in european review).
     net_flows = ds_eer["net_flows"].copy()
+
+    # Check that all variables have all metadata fields.
+    for table in [tb_yed, tb_eer, combined, net_flows]:
+        check_all_variables_have_all_metadata_fields(table)
 
     #
     # Save outputs.
