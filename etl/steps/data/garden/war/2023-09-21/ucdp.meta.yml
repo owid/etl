@@ -261,7 +261,11 @@ tables:
       presentation:
         grapher_config:
           selectedEntityNames:
-            - World
+            - Africa
+            - Americas
+            - Asia and Oceania
+            - Europe
+            - Middle East
     variables:
       ##################
       # Ongoing deaths #
