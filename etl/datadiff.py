@@ -325,10 +325,10 @@ def cli(
         ds_a = _match_dataset(path_to_ds_a, path)
         ds_b = _match_dataset(path_to_ds_b, path)
 
-        if ds_a and ds_b and ds_a.metadata.source_checksum == ds_b.metadata.source_checksum:
-            # skip if they have the same source checksum, note that we're not comparing checksum of actual data
-            # to improve performance. Source checksum should be enough
-            continue
+        # if ds_a and ds_b and ds_a.metadata.source_checksum == ds_b.metadata.source_checksum:
+        #     # skip if they have the same source checksum, note that we're not comparing checksum of actual data
+        #     # to improve performance. Source checksum should be enough
+        #     continue
 
         lines = []
 
@@ -389,8 +389,8 @@ def _index_equals(table_a: pd.DataFrame, table_b: pd.DataFrame, sample: int = 10
 
 def _dict_diff(dict_a: Dict[str, Any], dict_b: Dict[str, Any], tabs: int = 0, **kwargs) -> str:
     """Convert dictionaries into YAML and compare them using difflib. Return colored diff as a string."""
-    meta_a = yaml_dump(dict_a, **kwargs)
-    meta_b = yaml_dump(dict_b, **kwargs)
+    meta_a = yaml_dump(dict_a, sort_keys=True, **kwargs)
+    meta_b = yaml_dump(dict_b, sort_keys=True, **kwargs)
 
     lines = difflib.ndiff(meta_a.splitlines(keepends=True), meta_b.splitlines(keepends=True))  # type: ignore
     # do not print lines that are identical
