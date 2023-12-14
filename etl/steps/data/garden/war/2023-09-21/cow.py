@@ -129,6 +129,7 @@ CTYPE_INTRA_INTL = f"{CTYPE_INTRA} (internationalized)"
 CTYPE_INTRA_NINTL = f"{CTYPE_INTRA} (non-internationalized)"
 CTYPE_INTER = "inter-state"
 CTYPE_NONSTATE = "non-state"
+CTYPE_SBASED = "state-based"
 
 
 def run(dest_dir: str) -> None:
@@ -1112,17 +1113,15 @@ def estimate_metrics_participants(tb_extra: Table, tb_intra: Table, tb_inter: Ta
         columns=["country", "year", "conflict_type"],
         cols_use_range=["year"],
     )
-    ## Only keep data until 2007, except for conflict types 'intra-state'
+
+    ## Ensure correct year coverage
+    ## see: https://github.com/owid/owid-issues/issues/1304#issuecomment-1853658729
     tb_country = tb_country[
-        (tb_country["year"] <= END_YEAR_MAX_EXTRA)
+        (tb_country["conflict_type"].isin([CTYPE_EXTRA, CTYPE_NONSTATE]) & (tb_country["year"] <= 2007))
+        | ((tb_country["conflict_type"].isin([CTYPE_INTER, CTYPE_SBASED])) & (tb_country["year"] <= 2010))
         | (
-            tb_country["conflict_type"].isin(
-                [
-                    CTYPE_INTRA,
-                    CTYPE_INTRA_INTL,
-                    CTYPE_INTRA_NINTL,
-                ]
-            )
+            tb_country["conflict_type"].isin([CTYPE_INTRA, CTYPE_INTRA_INTL, CTYPE_INTRA_NINTL])
+            & (tb_country["year"] <= 2014)
         )
     ]
     ## Add column id based on value from country
@@ -1140,11 +1139,21 @@ def estimate_metrics_participants(tb_extra: Table, tb_intra: Table, tb_inter: Ta
 
     # Filter known undesired datapoints
     tb_num_participants = tb_num_participants[
-        ~(
-            (tb_num_participants["year"] > tb_extra_c["year"].max())
-            & (tb_num_participants["conflict_type"] == CTYPE_EXTRA)
-            | (tb_num_participants["year"] > tb_inter_c["year"].max())
-            & (tb_num_participants["conflict_type"] == CTYPE_INTER)
+        (
+            # Extra
+            (
+                (tb_num_participants["conflict_type"] == CTYPE_EXTRA)
+                & (tb_num_participants["year"] <= 2007)
+            ) |
+            # Inter, State-based
+            (
+                (tb_num_participants["conflict_type"].isin([CTYPE_INTER, CTYPE_SBASED]))
+                & (tb_num_participants["year"] <= 2010)
+            ) |
+            # Intra
+            (
+                (tb_num_participants["conflict_type"].isin([CTYPE_INTRA, CTYPE_INTRA_INTL, CTYPE_INTRA_NINTL]))
+            )
         )
     ]
 
