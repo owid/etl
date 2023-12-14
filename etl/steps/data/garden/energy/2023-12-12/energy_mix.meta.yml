@@ -49,11 +49,11 @@ definitions:
     Using the substitution method
 
 dataset:
-  title: Energy mix
   update_period_days: 365
 
 tables:
   energy_mix:
+    title: Energy mix
     variables:
       coal__twh:
         title: Coal (TWh)

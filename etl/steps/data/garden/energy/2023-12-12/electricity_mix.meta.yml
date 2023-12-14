@@ -14,11 +14,11 @@ definitions:
     Measured in kilowatt-hours per person.
 
 dataset:
-  title: Electricity mix
   update_period_days: 365
 
 tables:
   electricity_mix:
+    title: Electricity mix
     variables:
       bioenergy_generation__twh:
         title: Electricity from bioenergy - TWh
