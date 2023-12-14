@@ -58,7 +58,7 @@ def run(dest_dir: str) -> None:
 
     # Harmonize country names (main table)
     log.info("health.unaids: harmonize countries (main table)")
-    tb: Table = geo.harmonize_countries(
+    tb = geo.harmonize_countries(
         df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
     )
 
@@ -131,16 +131,29 @@ def add_regions_to_tuberculosis_vars(tb: Table, ds_regions: Dataset, ds_income_g
     """
     tb_cols = ["hiv_tb_patients_receiving_art", "tb_patients_tested_positive_hiv", "tb_related_deaths"]
 
-    tb_no_agg = tb[["country", "year"] + tb_cols]
-    tb_agg = tb.drop(columns=tb_cols)
+    tb_agg = tb[["country", "year", "disaggregation"] + tb_cols]
+    tb_no_agg = tb.drop(columns=tb_cols)
     # removing existing aggregates - just world
     tb_agg = tb_agg[~tb_agg["country"].isin(REGIONS_TO_ADD)]
+    tb_agg = tb_agg.dropna(subset=tb_cols, how="all")
 
-    tb_agg = geo.add_regions_to_table(
-        tb_agg, ds_regions, ds_income_groups, REGIONS_TO_ADD, min_num_values_per_year=1, frac_allowed_nans_per_year=0.3
-    )
+    tb_group = tb_agg.groupby("disaggregation")
 
-    tb = pr.merge(tb_agg, tb_no_agg, on=["country", "year"], how="left")
+    tb_all_group = Table()
+    for group, group_tb in tb_group:
+        tb_agg_group = group_tb.drop(columns="disaggregation")
+        tb_agg_group = geo.add_regions_to_table(
+            tb_agg_group,
+            ds_regions,
+            ds_income_groups,
+            REGIONS_TO_ADD,
+            min_num_values_per_year=1,
+            frac_allowed_nans_per_year=0.3,
+        )
+        tb_agg_group["disaggregation"] = group
+        tb_all_group = pr.concat([tb_all_group, tb_agg_group], ignore_index=True)
+
+    tb = pr.merge(tb_no_agg, tb_all_group, on=["country", "year", "disaggregation"], how="outer").reset_index(drop=True)
 
     return tb
 
