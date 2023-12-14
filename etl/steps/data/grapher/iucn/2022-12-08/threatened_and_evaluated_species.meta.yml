@@ -1,0 +1,93 @@
+definitions:
+  common:
+    processing_level: TBD - major or minor
+    presentation:
+      topic_tags:
+        - TBD - Indicator's topic tags
+    sources: []
+    origins:
+      - producer: IUCN Red List (2022)
+        title: Threatened and evaluated species (IUCN Red List)
+        description: >-
+          Manually update spreadsheet
+
+          The IUCN Red List has assessed only a small share of the total known species in the world. This means the number
+          of species threatened with extinction is likely to be a significant underestimate of the total number of species
+          at risk.
+
+
+          This is particularly true for understudied groups such as insects, plants and fungi.
+
+
+          The share of known species threatened with extinction is only available for a few taxonomic groups where more than
+          80% of species have been assessed.
+
+
+          'Threatened' species are those that are categorized as 'Critically endangered', 'Endangered' or 'Vulnerable' on
+          the IUCN Red List.
+
+
+          This dataset should be next updated by the source in December 2022. We will update it on Our World in Data soon
+          after the new version is published. At the link above you can directly access the source page and see the latest
+          available data.
+
+
+          The 'mushrooms' taxonomic group includes brackets, rusts, smuts and, jelly fungi.
+        citation_full: IUCN Red List
+        url_main: https://www.iucnredlist.org/resources/summary-statistics; https://nc.iucnredlist.org/redlist/content/attachment_files/2021-3_RL_Stats_Table_1a_v2.pdf
+          ; https://nc.iucnredlist.org/redlist/content/attachment_files/2022-1_RL_Stats_Table_1a.pdf
+        date_accessed: '2022-12-08'
+        date_published: '2022-12-08'
+dataset:
+  update_period_days: TBD - Number of days between OWID updates
+  sources: []
+tables:
+  threatened_and_evaluated_species:
+    variables:
+      number_of_described_species:
+        title: Number of described species
+        unit: species
+        display:
+          name: Number of described species
+          numDecimalPlaces: 0
+        description_short: The number of identified and named species in each [taxonomic group](#dod:taxonomic_group), as
+          of 2022. Since many species have not yet been described, this is a large underestimate of the total number of species
+          in the world.
+        description_key:
+          - TBD - List of key pieces of information about the indicator.
+        description_from_producer: TBD - Indicator's description given by the producer
+        description_processing: TBD - Indicator's processing description
+        description: The total number of known/described species. This does not mean these species have been assessed for
+          their extinction risk level.
+        presentation:
+          title_public: TBD - Indicator title to be shown in data pages, that overrides the indicator's title.
+          title_variant: TBD - Indicator's title variant
+          attribution_short: TBD - Indicator's attribution (shorter version)
+          faqs:
+            - fragment_id: TBD - Question identifier from FAQ GDoc
+              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+          grapher_config:
+            title: Number of described species
+            subtitle: The number of identified and named species in each [taxonomic group](#dod:taxonomic_group), as of 2022.
+              Since many species have not yet been described, this is a large underestimate of the total number of species
+              in the world.
+            originUrl: ourworldindata.org/biodiversity
+            minTime: latest
+            hideAnnotationFieldsInTitle:
+              time: true
+              entity: true
+              changeInPrefix: true
+            selectedEntityNames:
+              - Fishes
+              - Insects
+              - Reptiles
+              - Mammals
+              - Birds
+              - Amphibians
+              - Corals
+              - Molluscs
+              - Crustaceans
+              - Arachnids
+            entityType: taxonomic group
+            hideTimeline: true
+            baseColorScheme: owid-distinct
