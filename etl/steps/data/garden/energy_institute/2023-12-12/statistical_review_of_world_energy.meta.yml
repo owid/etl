@@ -186,7 +186,7 @@ tables:
         description_short: |-
           Based on gross output.
         presentation:
-          title_public: 'Electricity generation'
+          title_public: 'Total electricity generation'
       coal_electricity_generation_twh:
         title: 'Coal electricity generation - TWh'
         unit: 'terawatt-hours'
@@ -194,7 +194,7 @@ tables:
         description_short: |-
           Based on gross output.
         presentation:
-          title_public: 'Coal electricity generation'
+          title_public: 'Electricity generation from coal'
       gas_electricity_generation_twh:
         title: 'Gas electricity generation - TWh'
         unit: 'terawatt-hours'
@@ -202,7 +202,7 @@ tables:
         description_short: |-
           Based on gross output.
         presentation:
-          title_public: 'Gas electricity generation'
+          title_public: 'Electricity generation from gas'
       oil_electricity_generation_twh:
         title: 'Oil electricity generation - TWh'
         unit: 'terawatt-hours'
@@ -210,7 +210,7 @@ tables:
         description_short: |-
           Based on gross output.
         presentation:
-          title_public: 'Oil electricity generation'
+          title_public: 'Electricity generation from oil'
       gas_consumption_bcfd:
         title: 'Gas consumption - BCFD'
         unit: 'billion cubic feet per day'
@@ -326,7 +326,7 @@ tables:
         display:
           name: Hydropower
         presentation:
-          title_public: 'Hydropower generation'
+          title_public: 'Electricity generation from hydropower'
       # liqcons_kbd:
       #   title: 'Total liquids consumption - kBD'
       #   unit: 'thousand barrels per day'
@@ -372,7 +372,7 @@ tables:
         display:
           name: Nuclear
         presentation:
-          title_public: 'Nuclear generation'
+          title_public: 'Electricity generation from nuclear power'
       oil_consumption_ej:
         title: 'Oil consumption - EJ'
         unit: 'exajoules'
@@ -542,7 +542,7 @@ tables:
         display:
           name: Renewables
         presentation:
-          title_public: 'Renewables electricity generation'
+          title_public: 'Electricity generation from renewables'
       solar_consumption_equivalent_ej:
         title: 'Solar consumption - EJ'
         unit: 'exajoules'
@@ -570,7 +570,7 @@ tables:
         display:
           name: Solar
         presentation:
-          title_public: 'Solar generation'
+          title_public: 'Electricity generation from solar power'
       wind_consumption_equivalent_ej:
         title: 'Wind consumption - EJ'
         unit: 'exajoules'
@@ -598,7 +598,7 @@ tables:
         display:
           name: Wind
         presentation:
-          title_public: 'Wind generation'
+          title_public: 'Electricity generation from wind power'
       cobalt_reserves_kt:
         title: 'Cobalt reserves - kT'
         unit: 'thousand tonnes'

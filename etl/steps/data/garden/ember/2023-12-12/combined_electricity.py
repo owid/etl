@@ -219,7 +219,7 @@ def combine_yearly_electricity_data_and_european_electricity_review(tb_yed: Tabl
             title_public_eer = None
             if column in tb_yed.columns:
                 title_public_yed = tb_yed[column].metadata.presentation.title_public
-            elif column in tb_eer.columns:
+            if column in tb_eer.columns:
                 title_public_eer = tb_eer[column].metadata.presentation.title_public
             warning = f"{column}'s title_public in Yearly electricity data differs from European Electricity Review."
             if title_public_yed != title_public_eer:
