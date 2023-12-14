@@ -19,12 +19,6 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
-    # Use the current names of the columns as the variable titles in the metadata.
-    # for column in tb.drop(columns=["Country", "Year"]).columns:
-    #     tb[column].metadata.title = column
-    #     tb[column].metadata.unit = "TWh"
-    #     tb[column].metadata.description_short = "Measured in terawatt-hours."
-
     # Ensure all columns are snake-case, set an appropriate index and sort conveniently.
     tb = tb.underscore().set_index(["country", "year"], verify_integrity=True).sort_index().sort_index(axis=1)
 
