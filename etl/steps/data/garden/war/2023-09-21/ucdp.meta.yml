@@ -175,6 +175,8 @@ tables:
           numDecimalPlaces: 0
         description_short: |-
           Whether the country participated in a conflict (of a specific kind) in a given year.
+        presentation:
+          attribution: Uppsala Conflict Data Program and Peace Research Institute Oslo (2023)
 
       number_participants:
         title: Number of countries in conflict
@@ -183,6 +185,8 @@ tables:
           numDecimalPlaces: 0
         description_short: |-
           The number of countries that participated in a conflict (of a specific kind) in a given year and region.
+        presentation:
+          attribution: Uppsala Conflict Data Program and Peace Research Institute Oslo (2023)
 
   ucdp_locations:
     common:
@@ -309,6 +313,8 @@ tables:
         description_key: *description_key_deaths
         display:
           numDecimalPlaces: 1
+        presentation:
+          attribution: Uppsala Conflict Data Program and Peace Research Institute Oslo (2023)
 
       number_deaths_ongoing_conflicts_high_per_capita:
         title: Number of deaths in ongoing conflicts (high estimate, per capita)
@@ -345,6 +351,7 @@ tables:
           grapher_config:
             selectedEntityNames:
               - World
+          attribution: Uppsala Conflict Data Program and Peace Research Institute Oslo (2023)
 
       number_ongoing_conflicts_per_country:
         title: Number of ongoing conflicts per country
@@ -354,6 +361,8 @@ tables:
         description_key: *description_key_ongoing
         display:
           numDecimalPlaces: 3
+        presentation:
+          attribution: Uppsala Conflict Data Program and Peace Research Institute Oslo (2023)
 
       number_ongoing_conflicts_per_country_pair:
         title: Number of ongoing conflicts per country-pair
@@ -363,6 +372,8 @@ tables:
         description_key: *description_key_ongoing
         display:
           numDecimalPlaces: 5
+        presentation:
+          attribution: Uppsala Conflict Data Program and Peace Research Institute Oslo (2023)
 
       #################
       # New conflicts #
@@ -375,6 +386,8 @@ tables:
         description_key: *description_key_new
         display:
           numDecimalPlaces: 0
+        presentation: # TODO
+          attribution: Uppsala Conflict Data Program and Peace Research Institute Oslo (2023)
 
       number_new_conflicts_per_country:
         title: Number of new conflicts per country
@@ -384,6 +397,8 @@ tables:
         description_key: *description_key_new
         display:
           numDecimalPlaces: 3
+        presentation:
+          attribution: Uppsala Conflict Data Program and Peace Research Institute Oslo (2023)
 
       number_new_conflicts_per_country_pair:
         title: Number of new conflicts per country-pair
@@ -393,3 +408,5 @@ tables:
         description_key: *description_key_new
         display:
           numDecimalPlaces: 5
+        presentation:
+          attribution: Uppsala Conflict Data Program and Peace Research Institute Oslo (2023)

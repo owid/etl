@@ -1140,7 +1140,7 @@ def estimate_metrics_locations(tb: Table, tb_maps: Table, tb_codes: Table, ds_po
     )
 
     # Add origins
-    tb_locations_regions["number_locations"].m.origins = tb_locations["conflict_new_id"].origins
+    tb_locations_regions["number_locations"].m.origins = tb_locations_country["is_location_of_conflict"].origins
 
     # Fill with zeroes
     tb_locations_regions = fill_gaps_with_zeroes(
