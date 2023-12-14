@@ -153,42 +153,11 @@ def process_generation_data(table: Table) -> Table:
     # Create aggregates (defined in AGGREGATES) that are in yearly electricity but not in the european review.
     for aggregate in AGGREGATES:
         tb[aggregate] = tb[AGGREGATES[aggregate]].sum(axis=1)
-        # title = aggregate.replace("__twh", "").replace("__", ", ").replace("_", " ").capitalize()
-        # tb[aggregate].metadata.unit = "terawatt-hours"
-        # tb[aggregate].metadata.short_unit = "TWh"
-        # tb[aggregate].metadata.title = f"{title} - TWh"
-        # tb[aggregate].metadata.description_short = "Measured in terawatt-hours."
-        # tb[aggregate].metadata.display = {"name": title}
-        # title = (
-        #     title.lower()
-        #     .replace("clean", "clean sources")
-        #     .replace("fossil", "fossil fuels")
-        #     .replace("hydro", "hydropower")
-        #     .replace("solar", "solar power")
-        # )
-        # tb[aggregate].metadata.presentation = VariablePresentationMeta(
-        #     title_public=f"Electricity generation from {title}"
-        # )
 
     # Create a column for each of those new aggregates, giving percentage share of total generation.
     for aggregate in AGGREGATES:
         column = aggregate.replace("__twh", "__pct")
         tb[column] = tb[aggregate] / tb["total_generation__twh"] * 100
-        # title = aggregate.replace("__twh", "").replace("__", ", ").replace("_", " ").capitalize()
-        # tb[column].metadata.unit = "%"
-        # tb[column].metadata.short_unit = "%"
-        # tb[column].metadata.title = f"{title} - %"
-        # tb[column].metadata.display = {"name": title}
-        # title = (
-        #     title.lower()
-        #     .replace("clean", "clean sources")
-        #     .replace("fossil", "fossil fuels")
-        #     .replace("hydro", "hydropower")
-        #     .replace("solar", "solar power")
-        # )
-        # tb[column].metadata.presentation = VariablePresentationMeta(
-        #     title_public=f"Share of electricity generated from {title}"
-        # )
 
     # Check that total generation adds up to 100%.
     error = "Total generation does not add up to 100%."
