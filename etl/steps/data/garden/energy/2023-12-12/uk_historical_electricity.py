@@ -1,16 +1,10 @@
-# TODO: This file is a duplicate of the previous step. It is not yet used in the dag and should be updated soon.
-
 """Combine UK BEIS' historical electricity with our electricity mix dataset (by BP & Ember) to obtain a long-run
 electricity mix in the UK.
 
 """
 
 import numpy as np
-from owid.catalog import Dataset, Table
-from owid.catalog.tables import (
-    get_unique_licenses_from_tables,
-    get_unique_sources_from_tables,
-)
+from owid.catalog import Table
 from owid.datautils import dataframes
 
 from etl.helpers import PathFinder, create_dataset
@@ -52,7 +46,7 @@ def prepare_electricity_mix_data(tb_elec: Table) -> Table:
     }
 
     # Select necessary columns from electricity mix dataset.
-    tb_elec = tb_elec[list(elec_columns)].rename(columns=elec_columns)
+    tb_elec = tb_elec[list(elec_columns)].rename(columns=elec_columns, errors="raise")
 
     # Select UK data from Ember dataset.
     tb_elec = tb_elec[tb_elec["country"] == "United Kingdom"].reset_index(drop=True)
@@ -90,7 +84,7 @@ def prepare_beis_data(tb_beis: Table) -> Table:
         "implied_efficiency": "implied_efficiency",
         "wind_and_solar": "wind_and_solar_generation",
     }
-    tb_beis = tb_beis[list(beis_columns)].rename(columns=beis_columns)
+    tb_beis = tb_beis[list(beis_columns)].rename(columns=beis_columns, errors="raise")
 
     return tb_beis
 
@@ -124,7 +118,7 @@ def combine_beis_and_electricity_mix_data(tb_beis: Table, tb_elec: Table) -> Tab
     assert tb_beis[tb_beis["year"] < solar_or_wind_first_year]["wind_and_solar_generation"].fillna(0).max() == 0
     # Therefore, since wind and solar is always zero (prior to the beginning of the electricity mix data)
     # we can ignore this column from the BEIS dataset.
-    tb_beis = tb_beis.drop(columns=["wind_and_solar_generation"])
+    tb_beis = tb_beis.drop(columns=["wind_and_solar_generation"], errors="raise")
     # And create two columns of zeros for wind and solar.
     tb_beis["solar_generation"] = 0
     tb_beis["wind_generation"] = 0
@@ -148,22 +142,15 @@ def combine_beis_and_electricity_mix_data(tb_beis: Table, tb_elec: Table) -> Tab
         tb_beis[f"{source}_generation"] *= tb_beis["implied_efficiency"]
 
     # Drop other unnecessary columns.
-    tb_beis = tb_beis.drop(columns=["implied_efficiency"])
+    tb_beis = tb_beis.drop(columns=["implied_efficiency"], errors="raise")
 
     # Combine BEIS and electricity mix data.
     tb_combined = dataframes.combine_two_overlapping_dataframes(
         df1=tb_elec, df2=tb_beis, index_columns=["country", "year"]
     )
-    # NOTE: Currently, function combine_two_overlapping_dataframes does not properly propagate metadata.
-    #  For now, sources and licenses have to be combined manually.
-    sources = get_unique_sources_from_tables([tb_elec, tb_beis])
-    licenses = get_unique_licenses_from_tables([tb_elec, tb_beis])
-    for column in tb_combined.drop(columns=["country", "year"]).columns:
-        tb_combined[column].metadata.sources = sources
-        tb_combined[column].metadata.licenses = licenses
 
     # Add an index and sort conveniently.
-    tb_combined = tb_combined.set_index(["country", "year"]).sort_index().sort_index(axis=1)
+    tb_combined = tb_combined.set_index(["country", "year"], verify_integrity=True).sort_index().sort_index(axis=1)
 
     return tb_combined
 
@@ -173,11 +160,11 @@ def run(dest_dir: str) -> None:
     # Load data.
     #
     # Load BEIS dataset and read its main table.
-    ds_beis: Dataset = paths.load_dependency("uk_historical_electricity")
+    ds_beis = paths.load_dataset("uk_historical_electricity")
     tb_beis = ds_beis["uk_historical_electricity"].reset_index()
 
     # Load electricity mix dataset and read its main table.
-    ds_elec: Dataset = paths.load_dependency("electricity_mix")
+    ds_elec = paths.load_dataset("electricity_mix")
     tb_elec = ds_elec["electricity_mix"].reset_index()
 
     #
@@ -199,7 +186,5 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new garden dataset.
-    ds_garden = create_dataset(
-        dest_dir=dest_dir, tables=[tb_combined], default_metadata=ds_beis.metadata, check_variables_metadata=True
-    )
+    ds_garden = create_dataset(dest_dir=dest_dir, tables=[tb_combined], check_variables_metadata=True)
     ds_garden.save()
