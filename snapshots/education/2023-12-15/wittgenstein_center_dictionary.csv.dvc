@@ -17,11 +17,9 @@ meta:
 
       This snapshot contains a dictionary file which translates the codes into human-readable terms, that will be useful for accurately identify and understanding the demographic data contained in the dataset.
     # Citation
-    producer: KC, S., Moradhvaj, Potancokova, M., Adhikari, S., Yildiz, D., Mamolo,
-      M., Sobotka, T., Zeman, K., Abel, G., Goujon, A., & Lutz, W.
+    producer: Wittgenstein Center
     citation_full: |-
       KC, S., Moradhvaj, Potancokova, M., Adhikari, S., Yildiz, D., Mamolo, M., Sobotka, T., Zeman, K., Abel, G., Goujon, A., & Lutz, W. (2023). Wittgenstein Center (WIC) Population and Human Capital Projections - 2023 (WIC3.002 (Beta)) [Data set]. Zenodo. https://doi.org/10.5281/zenodo.7921989
-    attribution_short: Wittgenstein Center
 
     # Files
     url_main: https://zenodo.org/records/7921989

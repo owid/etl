@@ -19,6 +19,14 @@ def run(dest_dir: str) -> None:
     # Read table from meadow dataset.
     tb = ds_meadow["wittgenstein_center_data"].reset_index()
 
+    # Load garden historical OECD dataset.
+    ds_oecd = paths.load_dataset("oecd_education")
+    tb_oecd = ds_oecd["oecd_education"].reset_index()
+    tb_oecd_formal_ed = tb_oecd[["country", "year", "no_formal_education", "population_with_basic_education"]]
+
+    # Filter the for years above 2020 (New Wittgenstein Center data starts at 2020)
+    tb_below_2020 = tb_oecd_formal_ed[tb_oecd_formal_ed["year"] < 2020].reset_index(drop=True)
+
     #
     # Process data.
     #
@@ -57,14 +65,20 @@ def run(dest_dir: str) -> None:
 
     tb_combined = pr.concat([global_share_no_education, share_no_education])
     tb_combined["population_with_basic_education"] = 100 - tb_combined["no_formal_education"]
-    tb_combined = tb_combined.set_index(["country", "year"], verify_integrity=True)
-    tb_combined.metadata = tb.metadata
+    tb_combined_with_oecd = pr.merge(
+        tb_combined,
+        tb_below_2020,
+        on=["country", "year", "no_formal_education", "population_with_basic_education"],
+        how="outer",
+    )
+    tb_combined_with_oecd = tb_combined_with_oecd.set_index(["country", "year"], verify_integrity=True)
+    tb_combined_with_oecd.metadata = tb.metadata
 
     #
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = create_dataset(dest_dir, tables=[tb_combined], check_variables_metadata=True)
+    ds_garden = create_dataset(dest_dir, tables=[tb_combined_with_oecd], check_variables_metadata=True)
 
     # Save changes in the new garden dataset.
     ds_garden.save()
