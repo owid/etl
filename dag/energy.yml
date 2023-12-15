@@ -155,11 +155,11 @@ steps:
   #
   # Energy - Global primary energy (2023).
   #
-  data://garden/energy/2023-07-10/global_primary_energy:
-    - data://garden/papers/2023-07-10/smil_2017
-    - data://garden/energy_institute/2023-06-26/statistical_review_of_world_energy
-  data://grapher/energy/2023-07-10/global_primary_energy:
-    - data://garden/energy/2023-07-10/global_primary_energy
+  data://garden/energy/2023-12-12/global_primary_energy:
+    - data://garden/papers/2023-12-12/smil_2017
+    - data://garden/energy_institute/2023-12-12/statistical_review_of_world_energy
+  data://grapher/energy/2023-12-12/global_primary_energy:
+    - data://garden/energy/2023-12-12/global_primary_energy
   #
   # Energy - Electricity mix (EI & Ember, 2023).
   #
@@ -294,5 +294,13 @@ steps:
     - data://garden/energy/2023-07-10/electricity_mix
   data://grapher/energy/2023-07-10/uk_historical_electricity:
     - data://garden/energy/2023-07-10/uk_historical_electricity
+  #
+  # Energy - Global primary energy (2023).
+  #
+  data://garden/energy/2023-07-10/global_primary_energy:
+    - data://garden/papers/2023-07-10/smil_2017
+    - data://garden/energy_institute/2023-06-26/statistical_review_of_world_energy
+  data://grapher/energy/2023-07-10/global_primary_energy:
+    - data://garden/energy/2023-07-10/global_primary_energy
 
   ######################################################################################################################
