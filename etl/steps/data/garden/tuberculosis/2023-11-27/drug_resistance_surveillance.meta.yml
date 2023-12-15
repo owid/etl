@@ -242,3 +242,8 @@ tables:
         unit: patients
         description_short: Number of bacteriologically confirmed pulmonary tuberculosis patients with extensively drug-resistant tuberculosis.
         description_from_producer: "Among pulmonary multidrug-resistant tuberculosis patients with drug susceptibility test results for any fluoroquinolone (FQ) and any second-line injectable agent (2LI) (variable mdr_dst_rlt): number with any resistance to both FQ and 2LI (i.e. XDR-tuberculosis in pre-2020 definitions)"
+      rr_share:
+        title: Share of new tested bacteriologically confirmed pulmonary tuberculosis patients that have rifampicin resistance
+        unit: "%"
+        short_unit: "%"
+        description_short: Share of new tested bacteriologically confirmed pulmonary tuberculosis patients that have rifampicin resistance. Rifampicin is an antibiotic medication used primarily in the treatment of tuberculosis and other bacterial infections; it works by inhibiting the growth of bacteria.
