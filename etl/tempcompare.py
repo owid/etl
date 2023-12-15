@@ -137,7 +137,8 @@ def series_equals(
     # then compare the rest of non-nan values (we cannot compare the entire series because pandas
     # complains with `TypeError: boolean value of NA is ambiguous`)
     ix = ~s1.isnull() & ~s2.isnull()
-    eq[ix] |= s1[ix].eq(s2[ix])
+    eq.loc[ix] = eq.loc[ix] | s1.loc[ix].eq(s2.loc[ix])
+    assert eq.dtype == bool
     return eq
 
 
