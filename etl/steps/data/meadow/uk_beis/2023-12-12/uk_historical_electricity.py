@@ -14,7 +14,7 @@ warnings.filterwarnings("ignore", category=UserWarning, module="openpyxl")
 paths = PathFinder(__file__)
 
 
-def prepare_data(tb: Table, columns: Dict[int, str], table_name: str) -> Table:
+def prepare_data(tb: Table, columns: Dict[str, str], table_name: str) -> Table:
     """Prepare raw content of a specific sheet in the the BEIS excel file.
 
     It contains some sanity checks due to the poor formatting of the original file, and some basic processing (like
