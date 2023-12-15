@@ -10,9 +10,10 @@ meta:
     date_published: 2016-04-01
     date_accessed: 2023-12-12
     url_main: https://www.sciencedirect.com/science/article/pii/S0048733315001699
-  license:
-    name: CC BY 4.0
-    url: https://www.sciencedirect.com/science/article/pii/S0048733315001699
+    license:
+      name: CC BY 4.0
+      url: https://www.sciencedirect.com/science/article/pii/S0048733315001699
+
 wdir: ../../../data/snapshots/papers/2023-12-12
 outs:
 - md5: b2dd2d2d7bdf788da15bd2e7dba8aaa9

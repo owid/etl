@@ -9,9 +9,9 @@ meta:
     date_accessed: 2023-12-12
     url_main: https://pcdb.santafe.edu/graph.php?curve=158
     url_download: https://pcdb.santafe.edu/process_download.php?curve=158&typ=csv
-  license:
-    name: CC BY 3.0 DEED
-    url: https://pcdb.santafe.edu/graph.php?curve=158
+    license:
+      name: CC BY 3.0 DEED
+      url: https://pcdb.santafe.edu/graph.php?curve=158
 
 wdir: ../../../data/snapshots/papers/2023-12-12
 outs:

@@ -10,11 +10,9 @@ meta:
     url_main:
       https://vaclavsmil.com/2016/12/14/energy-transitions-global-and-national-perspectives-second-expanded-and-updated-edition/
     url_download: https://vaclavsmil.com/wp-content/uploads/2017/01/ET2_Appendix_A.pdf
-  license:
-    name: CC BY 4.0
-    url:
-      https://vaclavsmil.com/2016/12/14/energy-transitions-global-and-national-perspectives-second-expanded-and-updated-edition/
-  license_name: CC BY
+    license:
+      name: CC BY 4.0
+      url: https://vaclavsmil.com/2016/12/14/energy-transitions-global-and-national-perspectives-second-expanded-and-updated-edition/
 
 wdir: ../../../data/snapshots/papers/2023-12-12
 outs:

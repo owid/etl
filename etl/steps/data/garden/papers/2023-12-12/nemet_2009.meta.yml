@@ -15,10 +15,10 @@ tables:
     variables:
       cost:
         title: Cost of photovoltaic technology
-        units: 2004 USD/Watt
+        unit: 2004 USD/Watt
       yearly_capacity:
         title: Capacity of photovoltaic technology
-        units: MW
+        unit: MW
       previous_capacity:
         title: Previous capacity of photovoltaic technology
-        units: MW
+        unit: MW
