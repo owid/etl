@@ -10,11 +10,13 @@ meta:
       The Correlates of War (COW) Project has utilized a classification of wars that is based upon the status of territorial entities, in particular focusing on those that are classified as members of the inter-state system (referred to as “states”). This dataset encompasses wars that take place between or among the recognized states, or inter-state wars.
 
       You can find more notes at https://correlatesofwar.org/wp-content/uploads/Inter-StateWars_Codebook.pdf
+    version_producer: v4.0
 
     # Citation
     producer: Correlates of War
     citation_full: |-
       Sarkees, Meredith Reid and Frank Wayman (2010). Resort to War: 1816 – 2007. Washington DC: CQ Press.
+    attribution: Correlates of War - Wars (2020)
     attribution_short: COW
 
     # Files
