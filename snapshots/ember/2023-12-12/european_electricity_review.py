@@ -1,4 +1,4 @@
-"""Script to create a snapshot of dataset 'European Electricity Review (Ember, 2023)'."""
+"""Script to create a snapshot of dataset."""
 
 from pathlib import Path
 
@@ -11,21 +11,13 @@ SNAPSHOT_VERSION = Path(__file__).parent.name
 
 
 @click.command()
-@click.option(
-    "--upload/--skip-upload",
-    default=True,
-    type=bool,
-    help="Upload dataset to Snapshot",
-)
+@click.option("--upload/--skip-upload", default=True, type=bool, help="Upload dataset to Snapshot")
 def main(upload: bool) -> None:
     # Create a new snapshot.
-    snap = Snapshot(f"ember/{SNAPSHOT_VERSION}/european_electricity_review.xlsx")
+    snap = Snapshot(f"ember/{SNAPSHOT_VERSION}/european_electricity_review.zip")
 
-    # Download data from source.
-    snap.download_from_source()
-
-    # Add file to DVC and upload to S3.
-    snap.dvc_add(upload=upload)
+    # Copy local data file to snapshots data folder, add file to DVC and upload to S3.
+    snap.create_snapshot(upload=upload)
 
 
 if __name__ == "__main__":

@@ -1,14 +1,16 @@
 dataset:
-  title: Total energy consumption (EIA, 2023)
-  description: |
-    Total energy consumption, extracted from EIA's International Energy Data.
+  update_period_days: 365
 
 tables:
   energy_consumption:
     variables:
        energy_consumption:
-         title: Total energy consumption
-         short_unit: TWh
-         unit: terawatt-hours
-         display:
-           name: Total energy consumption
+        title: Total energy consumption
+        short_unit: TWh
+        unit: terawatt-hours
+        description_short: |-
+          Measured in terawatt-hours.
+        processing_level: major
+        presentation:
+          topic_tags:
+            - Energy

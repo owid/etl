@@ -1,43 +1,37 @@
+definitions:
+  common:
+    processing_level: minor
+    presentation:
+      topic_tags:
+        - Energy
+    unit: terawatt-hours
+    short_unit: TWh
+    description_short: Measured in terawatt-hours.
+
+dataset:
+  title: Global Primary Energy
+  update_period_days: 0
+
 tables:
   smil_2017:
     variables:
       biofuels__twh_direct_energy:
-        unit: terawatt-hours
-        short_unit: TWh
-        description: Direct energy from biofuels.
+        title: Direct energy from biofuels
       coal__twh_direct_energy:
-        unit: terawatt-hours
-        short_unit: TWh
-        description: Direct energy from coal.
+        title: Direct energy from coal
       gas__twh_direct_energy:
-        unit: terawatt-hours
-        short_unit: TWh
-        description: Direct energy from gas.
+        title: Direct energy from gas
       hydropower__twh_direct_energy:
-        unit: terawatt-hours
-        short_unit: TWh
-        description: Direct energy from hydropower.
+        title: Direct energy from hydropower
       nuclear__twh_direct_energy:
-        unit: terawatt-hours
-        short_unit: TWh
-        description: Direct energy from nuclear power.
+        title: Direct energy from nuclear power
       oil__twh_direct_energy:
-        unit: terawatt-hours
-        short_unit: TWh
-        description: Direct energy from oil.
+        title: Direct energy from oil
       other_renewables__twh_direct_energy:
-        unit: terawatt-hours
-        short_unit: TWh
-        description: Direct energy from other renewables.
+        title: Direct energy from other renewables
       solar__twh_direct_energy:
-        unit: terawatt-hours
-        short_unit: TWh
-        description: Direct energy from solar.
+        title: Direct energy from solar
       traditional_biomass__twh_direct_energy:
-        unit: terawatt-hours
-        short_unit: TWh
-        description: Direct energy from traditional biomass.
+        title: Direct energy from traditional biomass
       wind__twh_direct_energy:
-        unit: terawatt-hours
-        short_unit: TWh
-        description: Direct energy from wind.
+        title: Direct energy from wind

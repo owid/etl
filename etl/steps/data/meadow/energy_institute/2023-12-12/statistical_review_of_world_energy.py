@@ -15,11 +15,10 @@ from the main excel file.
 
 """
 
-import copy
 import re
 
 import owid.catalog.processing as pr
-from owid.catalog import License, Source, Table, VariableMeta
+from owid.catalog import License, Origin, Table, VariableMeta
 from owid.datautils.dataframes import map_series
 
 from etl.helpers import PathFinder, create_dataset
@@ -127,7 +126,7 @@ def parse_oil_reserves(data: pr.ExcelFile) -> Table:
     # For consistency with all other tables, rename some countries to their most common names in the dataset.
     # Their names will be properly harmonized in the garden step.
     country_mapping = {
-        "European Union #": "Total EU",
+        "European Union#": "Total EU",
         "Non-OECD": "Total Non-OECD",
         "Non-OPEC": "Total Non-OPEC",
         "OECD": "Total OECD",
@@ -335,21 +334,14 @@ def create_table_of_fossil_fuel_prices(
     tb_oil_crude_prices: Table,
     tb_gas_prices: Table,
     tb_coal_prices: Table,
-    prices_data_source: Source,
-    prices_data_license: License,
 ) -> Table:
     # Combine additional tables of fossil fuel prices.
     tb_prices = tb_oil_spot_crude_prices.copy()
     for tb_additional in [tb_oil_crude_prices, tb_gas_prices, tb_coal_prices]:
         # Add current table to combined table.
-        tb_prices = tb_prices.merge(tb_additional, how="outer", on=["year"]).copy_metadata(from_table=tb_prices)
+        tb_prices = tb_prices.merge(tb_additional, how="outer", on=["year"])
     # Rename table appropriately.
     tb_prices.metadata.short_name += "_fossil_fuel_prices"
-
-    # Add sources and licenses to prices variables.
-    for column in tb_prices.columns:
-        tb_prices[column].metadata.sources = [prices_data_source]
-        tb_prices[column].metadata.licenses = [prices_data_license]
 
     # Set an appropriate index and sort conveniently.
     tb_prices = tb_prices.set_index(["year"], verify_integrity=True).sort_index().sort_index(axis=1)
@@ -357,7 +349,7 @@ def create_table_of_fossil_fuel_prices(
     return tb_prices
 
 
-def parse_thermal_equivalent_efficiency(data: pr.ExcelFile, source: Source, license: License) -> Table:
+def parse_thermal_equivalent_efficiency(data: pr.ExcelFile, origin: Origin, license: License) -> Table:
     sheet_name = "Approximate conversion factors"
     # Unfortunately, using header=[...] doesn't work, so the header must be extracted in a different way.
     tb = data.parse(sheet_name, skiprows=1, na_values=["-"])
@@ -415,7 +407,7 @@ def parse_thermal_equivalent_efficiency(data: pr.ExcelFile, source: Source, lice
     efficiency["efficiency_factor"].metadata = VariableMeta(
         title="Thermal equivalent efficiency factors",
         description="Thermal equivalent efficiency factors used to convert non-fossil electricity to primary energy.",
-        sources=[source],
+        origins=[origin],
         licenses=[license],
     )
 
@@ -431,7 +423,7 @@ def run(dest_dir: str) -> None:
     snap_additional = paths.load_snapshot("statistical_review_of_world_energy.xlsx")
 
     # Most data comes from the wide-format csv file, and some additional variables from the excel file.
-    tb = snap.read_csv(underscore=True)
+    tb = snap.read(underscore=True)
     data_additional = snap_additional.ExcelFile()
 
     #
@@ -440,10 +432,10 @@ def run(dest_dir: str) -> None:
     # Parse coal reserves sheet.
     tb_coal_reserves = parse_coal_reserves(data=data_additional)
 
-    # Parse gas reserves sheeet.
+    # Parse gas reserves sheet.
     tb_gas_reserves = parse_gas_reserves(data=data_additional)
 
-    # Parse oil reserves sheeet.
+    # Parse oil reserves sheet.
     tb_oil_reserves = parse_oil_reserves(data=data_additional)
 
     # Parse oil spot crude prices.
@@ -460,7 +452,7 @@ def run(dest_dir: str) -> None:
 
     # Parse thermal equivalent efficiency factors.
     tb_efficiency_factors = parse_thermal_equivalent_efficiency(
-        data=data_additional, source=snap_additional.m.source, license=snap_additional.m.license
+        data=data_additional, origin=snap_additional.metadata.origin, license=snap_additional.metadata.license
     )
 
     # Combine main table and coal, gas, and oil reserves.
@@ -470,25 +462,24 @@ def run(dest_dir: str) -> None:
     # Set an appropriate index and sort conveniently.
     tb = tb.set_index(["country", "year"], verify_integrity=True).sort_index().sort_index(axis=1)
 
-    # Adapt source and license for prices data, which is based on S&P Global Platts.
-    prices_data_license = copy.deepcopy(snap.metadata.license)
-    prices_data_license.name = "© S&P Global Inc. 2023"  # type: ignore
-    assert snap.metadata.source
-    prices_data_source = copy.deepcopy(snap.metadata.source)
-    prices_data_source.name = "Energy Institute Statistical Review of World Energy based on S&P Global Platts (2023)"
-    prices_data_source.published_by = (
-        "Energy Institute Statistical Review of World Energy based on S&P Global Platts (2023)"
-    )
-
     # Create combined table of fossil fuel prices.
     tb_prices = create_table_of_fossil_fuel_prices(
         tb_oil_spot_crude_prices=tb_oil_spot_crude_prices,
         tb_oil_crude_prices=tb_oil_crude_prices,
         tb_gas_prices=tb_gas_prices,
         tb_coal_prices=tb_coal_prices,
-        prices_data_source=prices_data_source,
-        prices_data_license=prices_data_license,
     )
+
+    # Prices variables need to cite S&P Global Platts, and include their license.
+    for column in tb_prices.columns:
+        assert len(tb_prices[column].metadata.origins) == 1, f"Unexpected origins in column {column}"
+        tb_prices[column].metadata.origins[
+            0
+        ].attribution = "Energy Institute based on S&P Global Platts - Statistical Review of World Energy (2023)"
+        tb_prices[column].metadata.origins[
+            0
+        ].citation_full = "Energy Institute based on S&P Global Platts - Statistical Review of World Energy (2023)"
+        tb_prices[column].metadata.licenses.append(License(name="© S&P Global Inc. 2023"))
 
     #
     # Save outputs.

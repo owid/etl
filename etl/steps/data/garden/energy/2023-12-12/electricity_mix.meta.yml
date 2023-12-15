@@ -1,352 +1,503 @@
+definitions:
+  common:
+    processing_level: major
+    presentation:
+      topic_tags:
+        - "Energy"
+    description_processing: |-
+      We rely on Ember as the primary source of electricity consumption data. While the Energy Institute (EI) provides primary energy (not just electricity) consumption data and it provides a longer time-series (dating back to 1965) than Ember (which only dates back to 1990), EI does not provide data for all countries or for all sources of electricity (for example, only Ember provides data on electricity from bioenergy). So, where data from Ember is available for a given country and year, we rely on it as the primary source. We then supplement this with data from EI where data from Ember is not available.
+  description_short_twh: &description_short_twh |-
+    Measured in terawatt-hours.
+  description_short_pct: &description_short_pct |-
+    Measured as a percentage of total electricity.
+  description_short_per_capita: &description_short_per_capita |-
+    Measured in kilowatt-hours per person.
+
 dataset:
-  title: Electricity mix (EI & Ember, 2023)
-  description: |
-    Data is compiled by Our World in Data based on three main sources:
-    - [The Energy Institute (EI) Statistical Review of World Energy](https://www.energyinst.org/statistical-review).
-    - [Ember Yearly Electricity Data](https://ember-climate.org/data-catalogue/yearly-electricity-data/).
-    - [Ember European Electricity Review](https://ember-climate.org/insights/research/european-electricity-review-2022/).
+  update_period_days: 365
 
-    Ember compile their global dataset from various sources including:
-    - Eurostat: Annual European generation and import data, and monthly data in some cases where better sources are not available.
-    - ENTSO-E: Monthly European generation and import data.
-    - EIA: Annual global generation and import data.
-    - UN: Monthly global generation data in some cases.
-    - GEM: Annual global coal and gas capacity data.
-    - IRENA: Annual global capacity data for all non-fossil fuel types, and for Other Fossil where available.
-    - WRI: Annual global capacity data for Other Fossil where other sources are not available.
-    - European carbon intensities rely on data from the European Environment Agency (EEA).
-    - A complete list of data sources for each individual country in Ember's Yearly Electricity Data can be found [here](https://ember-climate.org/app/uploads/2022/07/Ember-Electricity-Data-Methodology.pdf).
-    - A complete list of data sources for each individual country in Ember's European Electricity Review can be found [here](https://ember-climate.org/app/uploads/2022/02/EER-Methodology.pdf).
-
-    We rely on Ember as the primary source of electricity consumption data. While EI provides primary energy (not just electricity) consumption data and it provides a longer time-series (dating back to 1965) than Ember (which only dates back to 1990), EI does not provide data for all countries or for all sources of electricity (for example, only Ember provides data on electricity from bioenergy). So, where data from Ember is available for a given country and year, we rely on it as the primary source. We then supplement this with data from EI where data from Ember is not available.
 tables:
   electricity_mix:
+    title: Electricity mix
     variables:
       bioenergy_generation__twh:
-        title: Electricity from bioenergy (TWh)
+        title: Electricity from bioenergy - TWh
         short_unit: TWh
         unit: terawatt-hours
+        description_short: *description_short_twh
         display:
           name: Bioenergy
+        presentation:
+          title_public: Electricity generation from bioenergy
       bioenergy_share_of_electricity__pct:
-        title: Bioenergy (% electricity)
+        title: Bioenergy - % electricity
         short_unit: '%'
         unit: '%'
+        description_short: *description_short_pct
         display:
           name: Bioenergy
+        presentation:
+          title_public: Share of electricity that comes from bioenergy
       co2_intensity__gco2_kwh:
-        title: Carbon intensity of electricity (gCO2/kWh)
+        title: Carbon intensity of electricity - gCO2/kWh
         short_unit: gCO₂
-        unit: grams of CO₂ equivalent per kilowatt-hour
+        unit: grams of CO₂ equivalents per kilowatt-hour
+        description_short: Measured in grams of CO₂ equivalents per kilowatt-hour.
         display:
-          name: Carbon intensity of electricity per kilowatt-hour
+          name: Carbon intensity
+        presentation:
+          title_public: Carbon intensity of electricity per kilowatt-hour
       coal_generation__twh:
-        title: Electricity from coal (TWh)
+        title: Electricity from coal - TWh
         short_unit: TWh
         unit: terawatt-hours
+        description_short: *description_short_twh
         display:
           name: Coal
+        presentation:
+          title_public: Electricity generation from coal
       coal_share_of_electricity__pct:
-        title: Coal (% electricity)
+        title: Coal - % electricity
         short_unit: '%'
         unit: '%'
+        description_short: *description_short_pct
         display:
           name: Coal
+        presentation:
+          title_public: Share of electricity that comes from coal
       fossil_generation__twh:
-        title: Electricity from fossil fuels (TWh)
+        title: Electricity from fossil fuels - TWh
         short_unit: TWh
         unit: terawatt-hours
+        description_short: *description_short_twh
         display:
           name: Fossil fuels
+        presentation:
+          title_public: Electricity generation from fossil fuels
       fossil_share_of_electricity__pct:
-        title: Fossil fuels (% electricity)
+        title: Fossil fuels - % electricity
         short_unit: '%'
         unit: '%'
+        description_short: *description_short_pct
         display:
           name: Fossil fuels
+        presentation:
+          title_public: Share of electricity that comes from fossil fuels
       gas_generation__twh:
-        title: Electricity from gas (TWh)
+        title: Electricity from gas - TWh
         short_unit: TWh
         unit: terawatt-hours
+        description_short: *description_short_twh
         display:
           name: Gas
+        presentation:
+          title_public: Electricity generation from gas
       gas_share_of_electricity__pct:
-        title: Gas (% electricity)
+        title: Gas - % electricity
         short_unit: '%'
         unit: '%'
+        description_short: *description_short_pct
         display:
           name: Gas
+        presentation:
+          title_public: Share of electricity that comes from gas
       hydro_generation__twh:
-        title: Electricity from hydro (TWh)
+        title: Electricity from hydro - TWh
         short_unit: TWh
         unit: terawatt-hours
+        description_short: *description_short_twh
         display:
           name: Hydropower
+        presentation:
+          title_public: Electricity generation from hydropower
       hydro_share_of_electricity__pct:
-        title: Hydro (% electricity)
+        title: Hydro - % electricity
         short_unit: '%'
         unit: '%'
+        description_short: *description_short_pct
         display:
           name: Hydropower
+        presentation:
+          title_public: Share of electricity that comes from hydropower
       low_carbon_generation__twh:
-        title: Low-carbon electricity (TWh)
+        title: Low-carbon electricity - TWh
         short_unit: TWh
         unit: terawatt-hours
+        description_short: *description_short_twh
         display:
-          name: Low-carbon electricity
+          name: Low-carbon
+        presentation:
+          title_public: Electricity generation from low-carbon sources
       low_carbon_share_of_electricity__pct:
-        title: Low-carbon electricity (% electricity)
+        title: Low-carbon electricity - % electricity
         short_unit: '%'
         unit: '%'
+        description_short: *description_short_pct
         display:
-          name: Share of electricity from low-carbon sources
+          name: Low-carbon
+        presentation:
+          title_public: Share of electricity that comes from low-carbon sources
       net_imports_share_of_demand__pct:
-        title: Net electricity imports as a share of demand (%)
+        title: Net electricity imports as a share of demand - %
         short_unit: '%'
         unit: '%'
-        display:
-          name: Net electricity imports as a share of demand
+        description_short: Measured as a percentage of total electricity demand.
+        presentation:
+          title_public: Net electricity imports as a share of demand
       nuclear_generation__twh:
-        title: Electricity from nuclear (TWh)
+        title: Electricity from nuclear - TWh
         short_unit: TWh
         unit: terawatt-hours
+        description_short: *description_short_twh
         display:
           name: Nuclear
+        presentation:
+          title_public: Electricity generation from nuclear
       nuclear_share_of_electricity__pct:
-        title: Nuclear (% electricity)
+        title: Nuclear - % electricity
         short_unit: '%'
         unit: '%'
+        description_short: *description_short_pct
         display:
           name: Nuclear
+        presentation:
+          title_public: Share of electricity that comes from nuclear
       oil_generation__twh:
-        title: Electricity from oil (TWh)
+        title: Electricity from oil - TWh
         short_unit: TWh
         unit: terawatt-hours
+        description_short: *description_short_twh
         display:
           name: Oil
+        presentation:
+          title_public: Electricity generation from oil
       oil_share_of_electricity__pct:
-        title: Oil (% electricity)
+        title: Oil - % electricity
         short_unit: '%'
         unit: '%'
+        description_short: *description_short_pct
         display:
           name: Oil
+        presentation:
+          title_public: Share of electricity that comes from oil
       other_renewables_excluding_bioenergy_generation__twh:
-        title: Other renewables excluding bioenergy (TWh)
+        title: Other renewables excluding bioenergy - TWh
         short_unit: TWh
         unit: terawatt-hours
+        description_short: *description_short_twh
         display:
-          name: Other renewables, excluding bioenergy
+          name: Other renewables excluding bioenergy
+        presentation:
+          title_public: Electricity generation from other renewables, excluding bioenergy
       other_renewables_excluding_bioenergy_share_of_electricity__pct:
-        title: Other renewables excluding bioenergy (% electricity)
+        title: Other renewables excluding bioenergy - % electricity
         short_unit: '%'
         unit: '%'
+        description_short: *description_short_pct
         display:
-          name: Other renewables, excluding bioenergy
+          name: Other renewables excluding bioenergy
+        presentation:
+          title_public: Share of electricity that comes from other renewables, excluding bioenergy
       other_renewables_including_bioenergy_generation__twh:
-        title: Other renewables including bioenergy (TWh)
+        title: Other renewables including bioenergy - TWh
         short_unit: TWh
         unit: terawatt-hours
+        description_short: *description_short_twh
         display:
-          name: Other renewables, including bioenergy
+          name: Other renewables including bioenergy
+        presentation:
+          title_public: Electricity generation from other renewables, including bioenergy
       other_renewables_including_bioenergy_share_of_electricity__pct:
-        title: Other renewables including bioenergy (% electricity)
+        title: Other renewables including bioenergy - % electricity
         short_unit: '%'
         unit: '%'
+        description_short: *description_short_pct
         display:
-          name: Other renewables, including bioenergy
+          name: Other renewables including bioenergy
+        presentation:
+          title_public: Share of electricity that comes from other renewables, including bioenergy
       per_capita_bioenergy_generation__kwh:
-        title: Bioenergy electricity per capita (kWh)
+        title: Bioenergy electricity per capita - kWh
         short_unit: kWh
         unit: kilowatt-hours
+        description_short: *description_short_per_capita
         display:
-          name: Bioenergy electricity per capita
+          name: Bioenergy
           numDecimalPlaces: 0
+        presentation:
+          title_public: Electricity generation from bioenergy per person
       per_capita_coal_generation__kwh:
-        title: Coal electricity per capita (kWh)
+        title: Coal electricity per capita - kWh
         short_unit: kWh
         unit: kilowatt-hours
+        description_short: *description_short_per_capita
         display:
-          name: Coal electricity per capita
+          name: Coal
           numDecimalPlaces: 0
+        presentation:
+          title_public: Electricity generation from coal per person
       per_capita_fossil_generation__kwh:
-        title: Fossil fuel electricity per capita (kWh)
+        title: Fossil fuel electricity per capita - kWh
         short_unit: kWh
         unit: kilowatt-hours
+        description_short: *description_short_per_capita
         display:
-          name: Fossil fuel electricity per capita
+          name: Fossil fuels
           numDecimalPlaces: 0
+        presentation:
+          title_public: Electricity generation from fossil fuels per person
       per_capita_gas_generation__kwh:
-        title: Gas electricity per capita (kWh)
+        title: Gas electricity per capita - kWh
         short_unit: kWh
         unit: kilowatt-hours
+        description_short: *description_short_per_capita
         display:
-          name: Gas electricity per capita
+          name: Gas
           numDecimalPlaces: 0
+        presentation:
+          title_public: Electricity generation from gas per person
       per_capita_hydro_generation__kwh:
-        title: Hydro electricity per capita (kWh)
+        title: Hydro electricity per capita - kWh
         short_unit: kWh
         unit: kilowatt-hours
+        description_short: *description_short_per_capita
         display:
-          name: Hydro electricity per capita
+          name: Hydro
           numDecimalPlaces: 0
+        presentation:
+          title_public: Electricity generation from hydropower per person
       per_capita_low_carbon_generation__kwh:
-        title: Low-carbon electricity per capita (kWh)
+        title: Low-carbon electricity per capita - kWh
         short_unit: kWh
         unit: kilowatt-hours
+        description_short: *description_short_per_capita
         display:
-          name: Low-carbon electricity per capita
+          name: Low-carbon
           numDecimalPlaces: 0
+        presentation:
+          title_public: Electricity generation from low-carbon sources per person
       per_capita_nuclear_generation__kwh:
-        title: Nuclear electricity per capita (kWh)
+        title: Nuclear electricity per capita - kWh
         short_unit: kWh
         unit: kilowatt-hours
+        description_short: *description_short_per_capita
         display:
-          name: Nuclear electricity per capita
+          name: Nuclear
           numDecimalPlaces: 0
+        presentation:
+          title_public: Electricity generation from nuclear power per person
       per_capita_oil_generation__kwh:
-        title: Oil electricity per capita (kWh)
+        title: Oil electricity per capita - kWh
         short_unit: kWh
         unit: kilowatt-hours
+        description_short: *description_short_per_capita
         display:
-          name: Oil electricity per capita
+          name: Oil
           numDecimalPlaces: 0
+        presentation:
+          title_public: Electricity generation from oil per person
       per_capita_other_renewables_excluding_bioenergy_generation__kwh:
-        title: Other renewable electricity excluding bioenergy per capita (kWh)
+        title: Other renewable electricity excluding bioenergy per capita - kWh
         short_unit: kWh
         unit: kilowatt-hours
+        description_short: *description_short_per_capita
         display:
-          name: Other renewable electricity excluding bioenergy per capita
+          name: Other renewables excluding bioenergy
           numDecimalPlaces: 0
+        presentation:
+          title_public: Electricity generation from other renewables, excluding bioenergy, per person
       per_capita_other_renewables_including_bioenergy_generation__kwh:
-        title: Other renewable electricity including bioenergy per capita (kWh)
+        title: Other renewable electricity including bioenergy per capita - kWh
         short_unit: kWh
         unit: kilowatt-hours
+        description_short: *description_short_per_capita
         display:
-          name: Other renewable electricity including bioenergy per capita
+          name: Other renewables including bioenergy
           numDecimalPlaces: 0
+        presentation:
+          title_public: Electricity generation from other renewables, including bioenergy, per person
       per_capita_renewable_generation__kwh:
-        title: Renewable electricity per capita (kWh)
+        title: Renewable electricity per capita - kWh
         short_unit: kWh
         unit: kilowatt-hours
+        description_short: *description_short_per_capita
         display:
-          name: Renewable electricity per capita
+          name: Renewables
           numDecimalPlaces: 0
+        presentation:
+          title_public: Electricity generation from renewables per person
       per_capita_solar_generation__kwh:
-        title: Solar electricity per capita (kWh)
+        title: Solar electricity per capita - kWh
         short_unit: kWh
         unit: kilowatt-hours
+        description_short: *description_short_per_capita
         display:
-          name: Solar electricity per capita
+          name: Solar
           numDecimalPlaces: 0
+        presentation:
+          title_public: Electricity generation from solar power per person
       per_capita_solar_and_wind_generation__kwh:
-        title: Solar and wind electricity per capita (kWh)
+        title: Solar and wind electricity per capita - kWh
         short_unit: kWh
         unit: kilowatt-hours
+        description_short: *description_short_per_capita
         display:
-          name: Solar and wind electricity per capita
+          name: Solar and wind
           numDecimalPlaces: 0
+        presentation:
+          title_public: Electricity generation from solar and wind power per person
       per_capita_total_generation__kwh:
-        title: Per capita electricity (kWh)
+        title: Per capita electricity - kWh
         short_unit: kWh
         unit: kilowatt-hours
+        description_short: *description_short_per_capita
         display:
-          name: Per capita electricity use
+          name: Total electricity
           numDecimalPlaces: 0
+        presentation:
+          title_public: Total electricity generation per person
       per_capita_wind_generation__kwh:
-        title: Wind electricity per capita (kWh)
+        title: Wind electricity per capita - kWh
         short_unit: kWh
         unit: kilowatt-hours
+        description_short: *description_short_per_capita
         display:
-          name: Wind electricity per capita
+          name: Wind
           numDecimalPlaces: 0
+        presentation:
+          title_public: Electricity generation from wind power per person
       population:
         title: Population
         short_unit: people
         unit: people
         display:
           name: Population
+        presentation:
+          title_public: Population
       primary_energy_consumption__twh:
-        title: Electricity from primary energy consumption (twh) (TWh)
+        title: Electricity from primary energy consumption - TWh
         short_unit: TWh
         unit: terawatt-hours
+        description_short: *description_short_twh
         display:
           name: Primary energy consumption
+        presentation:
+          title_public: Primary energy consumption
       renewable_generation__twh:
-        title: Electricity from renewables (TWh)
+        title: Electricity from renewables - TWh
         short_unit: TWh
         unit: terawatt-hours
+        description_short: *description_short_twh
         display:
           name: Renewables
+        presentation:
+          title_public: Electricity generation from renewables
       renewable_share_of_electricity__pct:
-        title: Renewables (% electricity)
+        title: Renewables - % electricity
         short_unit: '%'
         unit: '%'
+        description_short: *description_short_pct
         display:
           name: Renewables
           numDecimalPlaces: 2
+        presentation:
+          title_public: Share of electricity that comes from renewables
       solar_generation__twh:
-        title: Electricity from solar (TWh)
+        title: Electricity from solar - TWh
         short_unit: TWh
         unit: terawatt-hours
+        description_short: *description_short_twh
         display:
           name: Solar
+        presentation:
+          title_public: Electricity generation from solar power
       solar_and_wind_generation__twh:
-        title: Electricity from solar and wind (TWh)
+        title: Electricity from solar and wind - TWh
         short_unit: TWh
         unit: terawatt-hours
+        description_short: *description_short_twh
         display:
           name: Solar and wind
+        presentation:
+          title_public: Electricity generation from solar and wind power
       solar_share_of_electricity__pct:
-        title: Solar (% electricity)
+        title: Solar - % electricity
         short_unit: '%'
         unit: '%'
+        description_short: *description_short_pct
         display:
           name: Solar
+        presentation:
+          title_public: Share of electricity that comes from solar power
       solar_and_wind_share_of_electricity__pct:
-        title: Solar and wind (% electricity)
+        title: Solar and wind - % electricity
         short_unit: '%'
         unit: '%'
+        description_short: *description_short_pct
         display:
           name: Solar and wind
+        presentation:
+          title_public: Share of electricity that comes from solar and wind power
       total_demand__twh:
-        title: Electricity demand (TWh)
+        title: Electricity demand - TWh
         short_unit: TWh
         unit: terawatt-hours
+        description_short: *description_short_twh
         display:
           name: Electricity demand
+        presentation:
+          title_public: Electricity demand
       total_electricity_share_of_primary_energy__pct:
-        title: Electricity as share of primary energy (%)
+        title: Electricity as share of primary energy - %
         short_unit: '%'
         unit: '%'
+        description_short: Measured as a percentage of total primary energy consumption.
         display:
-          name: Electricity as share of primary energy
+          name: Electricity
+        presentation:
+          title_public: Total electricity as share of primary energy
       total_emissions__mtco2:
-        title: Emissions (MtCO2)
-        short_unit: million t
-        unit: million tonnes CO2 equivalent
+        title: Emissions - MtCO2
+        short_unit: Mt
+        unit: million tonnes CO₂ equivalents
+        description_short: Measured in megatonnes of CO₂ equivalents.
         display:
           name: Emissions
+        presentation:
+          title_public: Emissions from electricity generation
       total_generation__twh:
-        title: Electricity generation (TWh)
+        title: Electricity generation - TWh
         short_unit: TWh
         unit: terawatt-hours
+        description_short: *description_short_twh
         display:
-          name: Electricity generation
+          name: Total electricity
+        presentation:
+          title_public: Total electricity generation
       total_net_imports__twh:
-        title: Net imports (TWh)
+        title: Net imports - TWh
         short_unit: TWh
         unit: terawatt-hours
+        description_short: *description_short_twh
         display:
           name: Net imports
+        presentation:
+          title_public: Net electricity imports
       wind_generation__twh:
-        title: Electricity from wind (TWh)
+        title: Electricity from wind - TWh
         short_unit: TWh
         unit: terawatt-hours
+        description_short: *description_short_twh
         display:
           name: Wind
+        presentation:
+          title_public: Electricity generation from wind power
       wind_share_of_electricity__pct:
-        title: Wind (% electricity)
+        title: Wind - % electricity
         short_unit: '%'
         unit: '%'
+        description_short: *description_short_pct
         display:
           name: Wind
+        presentation:
+          title_public: Share of electricity that comes from wind power

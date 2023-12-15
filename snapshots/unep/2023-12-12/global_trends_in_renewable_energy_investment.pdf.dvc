@@ -16,7 +16,7 @@ meta:
     Frankfurt School-UNEP Centre/BNEF.
     Global Trends in Renewable Energy Investment 2019, http://www.fs-unep-centre.org (Frankfurt am Main)
 
-wdir: ../../../data/snapshots/unep/2023-01-03
+wdir: ../../../data/snapshots/unep/2023-12-12
 outs:
 - md5: 3d49228221c895b823f97f3464a1fd83
   size: 9855562

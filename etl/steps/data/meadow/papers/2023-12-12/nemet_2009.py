@@ -22,12 +22,12 @@ def run(dest_dir: str) -> None:
     #
     # Load snapshot.
     snap = paths.load_snapshot("nemet_2009.csv")
-    tb = snap.read_csv()
+    tb = snap.read()
 
     #
     # Process data.
     #
-    tb = tb.rename(columns=COLUMNS, errors="raise")[COLUMNS.values()]
+    tb = tb[list(COLUMNS)].rename(columns=COLUMNS, errors="raise")
 
     # Set an appropriate index and sort conveniently.
     tb = tb.set_index(["year"], verify_integrity=True).sort_index()
@@ -36,5 +36,5 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new meadow dataset and reuse snapshot metadata.
-    ds = create_dataset(dest_dir=dest_dir, tables=[tb], default_metadata=snap.metadata)
+    ds = create_dataset(dest_dir=dest_dir, tables=[tb], check_variables_metadata=True)
     ds.save()

@@ -1,20 +1,22 @@
 meta:
-  name: International Energy Data
-  publication_year: 2023
+  origin:
+    title: International Energy Data
+    producer: U.S. Energy Information Administration
+    # description: |-
+    # attribution:
+    attribution_short: EIA
+    citation_full: |-
+      U.S. Energy Information Administration (EIA) - International Energy Data (2023).
+    date_accessed: 2023-12-12
+    date_published: 2023-08-01
+    url_main: https://www.eia.gov/opendata/bulkfiles.php
+    url_download: https://api.eia.gov/bulk/INTL.zip
+    license:
+      name: Public domain
+      url: https://www.eia.gov/about/copyrights_reuse.php
 
-  publication_date: '2023-06-27'
-  source_name: U.S. Energy Information Administration (EIA)
-  source_published_by: U.S. Energy Information Administration (EIA)
-  url: https://www.eia.gov/opendata/bulkfiles.php
-  source_data_url: https://api.eia.gov/bulk/INTL.zip
-  license_url: https://www.eia.gov/about/copyrights_reuse.php
-  license_name: Public domain
-  date_accessed: 2023-07-10
-  is_public: true
-  description: |
-
-wdir: ../../../data/snapshots/eia/2023-07-10
+wdir: ../../../data/snapshots/eia/2023-12-12
 outs:
-- md5: 3ac7e0139ca27a589b46835ea44ffea5
-  size: 21722525
+- md5: 463051a13588ddd894cd5b3acffcd469
+  size: 22922325
   path: international_energy_data.zip

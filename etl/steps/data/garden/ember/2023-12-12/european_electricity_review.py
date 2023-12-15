@@ -2,51 +2,75 @@
 
 """
 
-from typing import cast
-
-import pandas as pd
-from owid import catalog
+from owid.catalog import Table
 from owid.datautils import dataframes
-from shared import CURRENT_DIR
 
 from etl.data_helpers import geo
-from etl.helpers import PathFinder
-from etl.paths import DATA_DIR
+from etl.helpers import PathFinder, create_dataset
 
+# Get naming conventions.
 paths = PathFinder(__file__)
-
-# Details for dataset to export.
-DATASET_SHORT_NAME = "european_electricity_review"
-# Details for dataset to import.
-MEADOW_DATASET_PATH = DATA_DIR / f"meadow/ember/2022-08-01/{DATASET_SHORT_NAME}"
-
-COUNTRY_MAPPING_PATH = CURRENT_DIR / f"{DATASET_SHORT_NAME}.countries.json"
-METADATA_PATH = CURRENT_DIR / f"{DATASET_SHORT_NAME}.meta.yml"
 
 # Convert from megawatt-hours to kilowatt-hours.
 MWH_TO_KWH = 1000
 
+# Define aggregates, following their Ember-Electricity-Data-Methodology document:
+# https://ember-climate.org/app/uploads/2022/03/GER22-Methodology.pdf
+# The European review also has its own methodology document:
+# https://ember-climate.org/app/uploads/2022/02/EER-Methodology.pdf
+# but it does not explicitly define aggregates. We assume they are consistent with each other.
+# This will be also checked, along with other sanity checks, in a separate analysis.
+AGGREGATES = {
+    "coal__twh": [
+        "hard_coal__twh",
+        "lignite__twh",
+    ],
+    "wind_and_solar__twh": ["wind__twh", "solar__twh"],
+    "hydro__bioenergy_and_other_renewables__twh": [
+        "hydro__twh",
+        "bioenergy__twh",
+        "other_renewables__twh",
+    ],
+    "renewables__twh": [
+        "wind_and_solar__twh",
+        "hydro__bioenergy_and_other_renewables__twh",
+    ],
+    "clean__twh": [
+        "renewables__twh",
+        "nuclear__twh",
+    ],
+    "gas_and_other_fossil__twh": [
+        "gas__twh",
+        "other_fossil__twh",
+    ],
+    "fossil__twh": ["gas_and_other_fossil__twh", "coal__twh"],
+    "total_generation__twh": [
+        "clean__twh",
+        "fossil__twh",
+    ],
+}
 
-def process_net_flows_data(table: catalog.Table, countries_regions: catalog.Table) -> catalog.Table:
+
+def process_net_flows_data(table: Table, tb_regions: Table) -> Table:
     """Process net flows data, including country harmonization.
 
     Parameters
     ----------
-    table : catalog.Table
+    table : Table
         Table from the meadow dataset on net flows.
-    countries_regions : catalog.Table
+    tb_regions : Table
         Table from the owid countries-regions dataset.
 
     Returns
     -------
-    table: catalog.Table
+    table: Table
         Processed table.
 
     """
-    df = pd.DataFrame(table).reset_index()
+    tb = table.reset_index()
 
     # Create dictionary mapping country codes to harmonized country names.
-    country_code_to_name = countries_regions[["name"]].to_dict()["name"]
+    country_code_to_name = tb_regions[["name"]].to_dict()["name"]
     # Add Kosovo, which is missing in countries-regions.
     if "XKX" not in country_code_to_name:
         country_code_to_name["XKX"] = "Kosovo"
@@ -57,43 +81,42 @@ def process_net_flows_data(table: catalog.Table, countries_regions: catalog.Tabl
         "year": "year",
         "net_flow_twh": "net_flow__twh",
     }
-    df = df[list(columns)].rename(columns=columns)
+    tb = tb[list(columns)].rename(columns=columns, errors="raise")
     # Change country codes to harmonized country names in both columns.
     for column in ["source_country", "target_country"]:
-        df[column] = dataframes.map_series(
-            series=df[column],
+        tb[column] = dataframes.map_series(
+            series=tb[column],
             mapping=country_code_to_name,
             warn_on_missing_mappings=True,
             show_full_warning=True,
         )
 
-    table = (
-        catalog.Table(df).set_index(["source_country", "target_country", "year"], verify_integrity=True).sort_index()
-    )
+    # Set an appropriate index, and sort conveniently.
+    tb = tb.set_index(["source_country", "target_country", "year"], verify_integrity=True).sort_index()
 
-    return table
+    return tb
 
 
-def process_generation_data(table: catalog.Table) -> catalog.Table:
+def process_generation_data(table: Table) -> Table:
     """Process electricity generation data, including country harmonization.
 
     Parameters
     ----------
-    table : catalog.Table
+    table : Table
         Table from the meadow dataset on electricity generation.
 
     Returns
     -------
-    table: catalog.Table
+    table: Table
         Processed table.
 
     """
-    df = pd.DataFrame(table).reset_index()
+    tb = table.reset_index()
 
     # Sanity checks.
     error = "Columns fuel_code and fuel_desc have inconsistencies."
-    assert df.groupby("fuel_code").agg({"fuel_desc": "nunique"})["fuel_desc"].max() == 1, error
-    assert df.groupby("fuel_desc").agg({"fuel_code": "nunique"})["fuel_code"].max() == 1, error
+    assert tb.groupby("fuel_code").agg({"fuel_desc": "nunique"})["fuel_desc"].max() == 1, error
+    assert tb.groupby("fuel_desc").agg({"fuel_code": "nunique"})["fuel_code"].max() == 1, error
 
     # Select useful columns and rename them conveniently.
     columns = {
@@ -103,38 +126,60 @@ def process_generation_data(table: catalog.Table) -> catalog.Table:
         "generation_twh": "TWh",
         "share_of_generation_pct": "%",
     }
-    # Convert from long to wide format dataframe.
-    df = df[list(columns)].rename(columns=columns).pivot(index=["country", "year"], columns=["fuel_desc"])
+    tb = tb[list(columns)].rename(columns=columns, errors="raise")
 
-    # Collapse the two column levels into one, with the naming "variable (unit)" (except for country and year, that
-    # have no units).
-    df.columns = [f"{variable} ({unit})" for unit, variable in df.columns]
+    # Convert from long to wide format table.
+    tb = tb.pivot(index=["country", "year"], columns=["fuel_desc"], join_column_levels_with="__")
+
+    # Invert the energy source and unit in the column names.
+    tb = tb.rename(
+        columns={
+            column: f"{column.split('__')[1]}__{column.split('__')[0]}" for column in tb.columns if "__" in column
+        },
+        errors="raise",
+    )
 
     # Harmonize country names.
-    df = geo.harmonize_countries(
-        df=df.reset_index(),
-        countries_file=str(COUNTRY_MAPPING_PATH),
+    tb = geo.harmonize_countries(
+        df=tb,
+        countries_file=paths.country_mapping_path,
         warn_on_unused_countries=False,
         warn_on_missing_countries=True,
     )
 
-    # Create a table with a well-constructed index.
-    table = catalog.Table(df).set_index(["country", "year"], verify_integrity=True).sort_index()
+    # Ensure columns are snake-case.
+    tb = tb.underscore()
 
-    return table
+    # Create aggregates (defined in AGGREGATES) that are in yearly electricity but not in the european review.
+    for aggregate in AGGREGATES:
+        tb[aggregate] = tb[AGGREGATES[aggregate]].sum(axis=1)
+
+    # Create a column for each of those new aggregates, giving percentage share of total generation.
+    for aggregate in AGGREGATES:
+        column = aggregate.replace("__twh", "__pct")
+        tb[column] = tb[aggregate] / tb["total_generation__twh"] * 100
+
+    # Check that total generation adds up to 100%.
+    error = "Total generation does not add up to 100%."
+    assert set(tb["total_generation__pct"]) == {100}, error
+
+    # Set an appropriate index, and sort conveniently.
+    tb = tb.set_index(["country", "year"], verify_integrity=True).sort_index()
+
+    return tb
 
 
-def process_country_overview_data(table: catalog.Table) -> catalog.Table:
+def process_country_overview_data(table: Table) -> Table:
     """Process country overview data, including country harmonization.
 
     Parameters
     ----------
-    table : catalog.Table
+    table : Table
         Table from the meadow dataset.
 
     Returns
     -------
-    table: catalog.Table
+    table: Table
         Processed table.
 
     """
@@ -147,35 +192,35 @@ def process_country_overview_data(table: catalog.Table) -> catalog.Table:
         "demand_twh": "demand__twh",
         "demand_mwh_per_capita": "demand_per_capita__kwh",
     }
-    df = pd.DataFrame(table).reset_index()[list(columns)].rename(columns=columns)
+    tb = table.reset_index()[list(columns)].rename(columns=columns, errors="raise")
     # Harmonize country names.
-    df = geo.harmonize_countries(
-        df=df,
-        countries_file=str(COUNTRY_MAPPING_PATH),
+    tb = geo.harmonize_countries(
+        df=tb,
+        countries_file=paths.country_mapping_path,
         warn_on_unused_countries=False,
         warn_on_missing_countries=True,
     )
 
     # Convert units of demand per capita.
-    df["demand_per_capita__kwh"] = df["demand_per_capita__kwh"] * MWH_TO_KWH
+    tb["demand_per_capita__kwh"] *= MWH_TO_KWH
 
-    # Create a table with a well-constructed index.
-    table = catalog.Table(df).set_index(["country", "year"], verify_integrity=True).sort_index()
+    # Set an appropriate index, and sort conveniently.
+    tb = tb.set_index(["country", "year"], verify_integrity=True).sort_index()
 
-    return table
+    return tb
 
 
-def process_emissions_data(table: catalog.Table) -> catalog.Table:
+def process_emissions_data(table: Table) -> Table:
     """Process emissions data, including country harmonization.
 
     Parameters
     ----------
-    table : catalog.Table
+    table : Table
         Table from the meadow dataset on emissions.
 
     Returns
     -------
-    table: catalog.Table
+    table: Table
         Processed table.
 
     """
@@ -186,60 +231,52 @@ def process_emissions_data(table: catalog.Table) -> catalog.Table:
         "emissions_intensity_gco2_kwh": "co2_intensity__gco2_kwh",
         "emissions_mtc02e": "total_emissions__mtco2",
     }
-    df = pd.DataFrame(table).reset_index()[list(columns)].rename(columns=columns)
+    tb = table.reset_index()[list(columns)].rename(columns=columns, errors="raise")
     # Harmonize country names.
-    df = geo.harmonize_countries(
-        df=df,
-        countries_file=str(COUNTRY_MAPPING_PATH),
+    tb = geo.harmonize_countries(
+        df=tb,
+        countries_file=paths.country_mapping_path,
         warn_on_unused_countries=False,
         warn_on_missing_countries=True,
     )
 
-    # Create a table with a well-constructed index.
-    table = catalog.Table(df).set_index(["country", "year"], verify_integrity=True).sort_index()
+    # Set an appropriate index, and sort conveniently.
+    tb = tb.set_index(["country", "year"], verify_integrity=True).sort_index()
 
-    return table
+    return tb
 
 
 def run(dest_dir: str) -> None:
     #
     # Load data.
     #
-    # Read dataset from meadow.
-    ds_meadow = catalog.Dataset(MEADOW_DATASET_PATH)
+    # Load dataset from meadow and read its tables.
+    ds_meadow = paths.load_dataset("european_electricity_review")
+    tb_country_overview = ds_meadow["country_overview"]
+    tb_emissions = ds_meadow["emissions"]
+    tb_generation = ds_meadow["generation"]
+    tb_net_flows = ds_meadow["net_flows"]
 
-    # Load countries-regions table (required to convert country codes to country names in net flows table).
-    countries_regions = cast(catalog.Dataset, paths.load_dependency("regions"))["regions"]
+    # Load regions dataset and read its main table (to convert country codes to country names in net flows table).
+    ds_regions = paths.load_dataset("regions")
+    tb_regions = ds_regions["regions"]
 
     #
     # Process data.
     #
     # Process each individual table.
     tables = {
-        "Country overview": process_country_overview_data(table=ds_meadow["country_overview"]),
-        "Emissions": process_emissions_data(table=ds_meadow["emissions"]),
-        "Generation": process_generation_data(table=ds_meadow["generation"]),
-        "Net flows": process_net_flows_data(table=ds_meadow["net_flows"], countries_regions=countries_regions),
+        "Country overview": process_country_overview_data(table=tb_country_overview),
+        "Emissions": process_emissions_data(table=tb_emissions),
+        "Generation": process_generation_data(table=tb_generation),
+        "Net flows": process_net_flows_data(table=tb_net_flows, tb_regions=tb_regions),
     }
 
     #
     # Save outputs.
     #
-    ds_garden = catalog.Dataset.create_empty(dest_dir)
-    # Import metadata from meadow dataset and update attributes using the metadata yaml file.
-    ds_garden.metadata = ds_meadow.metadata
-    ds_garden.metadata.update_from_yaml(METADATA_PATH, if_source_exists="replace")
-    # Create dataset.
+    # Create a new garden dataset.
+    ds_garden = create_dataset(
+        dest_dir, tables=tables.values(), default_metadata=ds_meadow.metadata, check_variables_metadata=True
+    )
     ds_garden.save()
-
-    # Add all tables to dataset.
-    for table_name in list(tables):
-        table = tables[table_name]
-        # Make column names snake lower case.
-        table = catalog.utils.underscore_table(table)
-        # Import metadata from meadow and update attributes that have changed.
-        table.update_metadata_from_yaml(METADATA_PATH, catalog.utils.underscore(table_name))
-        table.metadata.title = table_name
-        table.metadata.short_name = catalog.utils.underscore(table_name)
-        # Add table to dataset.
-        ds_garden.add(table)

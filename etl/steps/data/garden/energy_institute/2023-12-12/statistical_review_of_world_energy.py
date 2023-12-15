@@ -1,6 +1,6 @@
 """Load a meadow dataset and create a garden dataset."""
 
-from owid.catalog import Dataset, Table
+from owid.catalog import Table
 
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
@@ -23,9 +23,28 @@ BARRELS_TO_CUBIC_METERS = 1 / 6.2898
 KBD_TO_CUBIC_METERS_PER_DAY = 1000 * BARRELS_TO_CUBIC_METERS
 # Million British thermal units to megawatt-hours.
 MILLION_BTU_TO_MWH = 1e3 / 3412
+# Billion barrels to tonnes.
+BBL_TO_TONNES = 0.1364 * 1e9
 
 # Reference year to use for table of price indexes.
 PRICE_INDEX_REFERENCE_YEAR = 2018
+
+# There is overlapping data for gas_reserves_tcm from USSR and Russia between 1991 and 1996.
+# By looking at the original file, this overlap seems to be intentional, so we keep the overlapping data when creating
+# aggregates. To justify this choice, note that: (1) The numbers for USSR are significantly smaller than for Russia in
+# that period (so there is probably no double-counting with Russia), (2) When the data for USSR ends, the data for
+# Azerbaijan, Kazakhstan, Turkmenistan, Uzbekistan and Other CIS start (so there is no double-counting with those
+# countries either).
+KNOWN_OVERLAPS = [
+    {
+        1991: {"Russia", "USSR"},
+        1992: {"Russia", "USSR"},
+        1993: {"Russia", "USSR"},
+        1994: {"Russia", "USSR"},
+        1995: {"Russia", "USSR"},
+        1996: {"Russia", "USSR"},
+    }
+]
 
 # Columns to use from the main data file, and how to rename them.
 COLUMNS = {
@@ -251,38 +270,6 @@ REGIONS = {
 }
 
 
-def add_region_aggregates(tb: Table, ds_regions: Dataset, ds_income_groups: Dataset) -> Table:
-    tb_regions = tb.copy()
-
-    # Create region aggregates for all columns (with a simple sum) except for the column of efficiency factors.
-    aggregations = {
-        column: "sum" for column in tb_regions.columns if column not in ["country", "year", "efficiency_factor"]
-    }
-
-    # Add region aggregates.
-    for region in REGIONS:
-        members = geo.list_members_of_region(
-            region=region,
-            ds_regions=ds_regions,
-            ds_income_groups=ds_income_groups,
-            additional_members=REGIONS[region].get("additional_members"),
-            include_historical_regions_in_income_groups=True,
-        )
-        tb_regions = geo.add_region_aggregates(
-            df=tb_regions,
-            region=region,
-            aggregations=aggregations,
-            countries_in_region=members,
-            countries_that_must_have_data=[],
-            num_allowed_nans_per_year=None,
-            frac_allowed_nans_per_year=0.9999,
-        )
-    # Copy metadata of original table.
-    tb_regions = tb_regions.copy_metadata(from_table=tb)
-
-    return tb_regions
-
-
 def create_additional_variables(tb: Table) -> Table:
     tb = tb.copy()
 
@@ -300,12 +287,9 @@ def create_additional_variables(tb: Table) -> Table:
         if column in ["oil_consumption_kbd"]:
             # Convert oil consumption given in thousand barrels per day to cubic meters per day.
             tb[column.replace("_kbd", "_m3d")] = tb[column] * KBD_TO_CUBIC_METERS_PER_DAY
-
-    for column in tb.columns:
-        if ("_equivalent_twh" in column) and ("primary_energy" not in column):
-            # Add direct consumption (for columns of non-fossil sources, which were given in input-equivalents).
-            # Skip primary energy, since this has a mix of both fossil and non-fossil sources.
-            tb[column.replace("_equivalent_twh", "_direct_twh")] = tb[column] * tb["efficiency_factor"]
+        if column in ["oil_reserves_bbl"]:
+            # Convert oil reserves given in billions of barrels to tonnes.
+            tb[column.replace("_bbl", "_t")] = tb[column] * BBL_TO_TONNES
 
     return tb
 
@@ -581,12 +565,9 @@ def run(dest_dir: str) -> None:
     tb = tb_meadow[list(COLUMNS)].rename(columns=COLUMNS, errors="raise")
 
     # Harmonize country names.
-    tb: Table = geo.harmonize_countries(
+    tb = geo.harmonize_countries(
         df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
     )
-
-    # Add column for thermal equivalent efficiency factors.
-    tb = tb.merge(tb_efficiency, how="left", on="year")
 
     # Fill spurious nans in nuclear energy data with zeros.
     tb = fix_missing_nuclear_energy_data(tb=tb)
@@ -595,7 +576,18 @@ def run(dest_dir: str) -> None:
     tb = create_additional_variables(tb=tb)
 
     # Add region aggregates.
-    tb = add_region_aggregates(tb=tb, ds_regions=ds_regions, ds_income_groups=ds_income_groups)
+    tb = geo.add_regions_to_table(
+        tb,
+        regions=REGIONS,
+        ds_regions=ds_regions,
+        ds_income_groups=ds_income_groups,
+        min_num_values_per_year=1,
+        ignore_overlaps_of_zeros=True,
+        accepted_overlaps=KNOWN_OVERLAPS,
+    )
+
+    # Add column for thermal equivalent efficiency factors.
+    tb = tb.merge(tb_efficiency, how="left", on="year")
 
     # Remove "Other *" regions, since they mean different set of countries for different variables.
     # NOTE: They have to be removed *after* creating region aggregates, otherwise those regions would be underestimated.

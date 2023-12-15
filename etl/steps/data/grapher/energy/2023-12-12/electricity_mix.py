@@ -2,7 +2,6 @@
 
 """
 
-from owid.catalog import Dataset
 
 from etl.grapher_helpers import add_columns_for_multiindicator_chart
 from etl.helpers import PathFinder, create_dataset
@@ -16,14 +15,14 @@ def run(dest_dir: str) -> None:
     # Load data.
     #
     # Load garden dataset and read its main table.
-    ds_garden: Dataset = paths.load_dependency("electricity_mix")
+    ds_garden = paths.load_dataset("electricity_mix")
     tb_garden = ds_garden["electricity_mix"]
 
     #
     # Process data.
     #
     # Drop unnecessary columns.
-    tb = tb_garden.drop(columns=["population"])
+    tb = tb_garden.drop(columns=["population"], errors="raise")
 
     # Create columns for specific multi-indicator charts, to handle issues with missing data.
     # Add columns for chart with slug "electricity-prod-source-stacked".
@@ -112,7 +111,5 @@ def run(dest_dir: str) -> None:
     #
     # Save outputs.
     #
-    ds_grapher = create_dataset(
-        dest_dir=dest_dir, tables=[tb], default_metadata=ds_garden.metadata, check_variables_metadata=True
-    )
+    ds_grapher = create_dataset(dest_dir=dest_dir, tables=[tb], check_variables_metadata=True)
     ds_grapher.save()

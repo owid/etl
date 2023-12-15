@@ -52,7 +52,8 @@ def get_statistical_review_data(tb_review: Table) -> Table:
 
     # Convert table (snake case) column names to human readable names.
     tb_review = tb_review.rename(
-        columns={column: tb_review[column].metadata.title for column in tb_review.columns if column != "country_code"}
+        columns={column: tb_review[column].metadata.title for column in tb_review.columns if column != "country_code"},
+        errors="raise",
     )
 
     # Rename human-readable columns (and select only the ones that will be used).
@@ -186,7 +187,7 @@ def calculate_equivalent_primary_energy(primary_energy: Table) -> Table:
     # input-equivalent primary energy.
     _check_that_substitution_method_is_well_calculated(primary_energy)
     # Remove original primary energy column.
-    primary_energy = primary_energy.drop(columns=["Primary energy (TWh - equivalent) - original"])
+    primary_energy = primary_energy.drop(columns=["Primary energy (TWh - equivalent) - original"], errors="raise")
 
     return primary_energy
 
@@ -288,9 +289,6 @@ def calculate_primary_energy_annual_change(
     for source in ONLY_DIRECT_ENERGY:
         # Create column for source percentage growth as a function of direct primary energy.
         primary_energy[f"{source} (% growth)"] = primary_energy.groupby("country")[f"{source} (TWh)"].pct_change() * 100
-        # NOTE: The previous operations do not propagate metadata properly, hence do it manually.
-        primary_energy[f"{source} (% growth)"].metadata.sources = primary_energy[f"{source} (TWh)"].metadata.sources
-        primary_energy[f"{source} (% growth)"].metadata.licenses = primary_energy[f"{source} (TWh)"].metadata.licenses
 
         # Create column for source absolute growth as a function of direct primary energy.
         primary_energy[f"{source} (TWh growth)"] = primary_energy.groupby("country")[f"{source} (TWh)"].diff()
@@ -301,13 +299,6 @@ def calculate_primary_energy_annual_change(
         primary_energy[f"{source} (% growth)"] = (
             primary_energy.groupby("country")[f"{source} (TWh - direct)"].pct_change() * 100
         )
-        # NOTE: The previous operations do not propagate metadata properly, hence do it manually.
-        primary_energy[f"{source} (% growth)"].metadata.sources = primary_energy[
-            f"{source} (TWh - direct)"
-        ].metadata.sources
-        primary_energy[f"{source} (% growth)"].metadata.licenses = primary_energy[
-            f"{source} (TWh - direct)"
-        ].metadata.licenses
 
         # Create column for source absolute growth as a function of direct primary energy.
         primary_energy[f"{source} (TWh growth - direct)"] = primary_energy.groupby("country")[
@@ -357,7 +348,7 @@ def add_per_capita_variables(primary_energy: Table, ds_population: Dataset) -> T
         )
 
     # Drop unnecessary column.
-    primary_energy = primary_energy.drop(columns=["population"])
+    primary_energy = primary_energy.drop(columns=["population"], errors="raise")
 
     return primary_energy
 
@@ -382,44 +373,11 @@ def prepare_output_table(primary_energy: Table) -> Table:
     # Replace spurious inf values by nan.
     table = primary_energy.replace([np.inf, -np.inf], np.nan)
 
-    # Sort conveniently and add an index.
-    table = (
-        table.sort_values(["country", "year"])
-        .reset_index(drop=True)
-        .set_index(["country", "year"], verify_integrity=True)
-        # .astype({"Country code": "category"})
-    )
-
-    # Add metadata (e.g. unit) to each column.
-    # Define unit names (these are the long and short unit names that will be shown in grapher).
-    # The keys of the dictionary should correspond to units expected to be found in each of the variable names in table.
-    short_unit_to_unit = {
-        "TWh": "terawatt-hours",
-        "kWh": "kilowatt-hours",
-        "%": "%",
-    }
-    # Define number of decimal places to show (only relevant for grapher, not for the data).
-    short_unit_to_num_decimals = {
-        "TWh": 0,
-        "kWh": 0,
-    }
-    for column in table.columns:
-        table[column].metadata.title = column
-        for short_unit in ["TWh", "kWh", "%"]:
-            if short_unit in column:
-                table[column].metadata.short_unit = short_unit
-                table[column].metadata.unit = short_unit_to_unit[short_unit]
-                table[column].metadata.display = {}
-                if short_unit in short_unit_to_num_decimals:
-                    table[column].metadata.display["numDecimalPlaces"] = short_unit_to_num_decimals[short_unit]
-                # Add the variable name without unit (only relevant for grapher).
-                table[column].metadata.display["name"] = column.split(" (")[0]
+    # Ensure all columns are snake-case, set an appropriate index and sort conveniently.
+    table = table.underscore().set_index(["country", "year"], verify_integrity=True).sort_index()
 
     # Set a new table short name.
     table.metadata.short_name = paths.short_name
-
-    # Underescore table.
-    table = table.underscore()
 
     return table
 
@@ -429,11 +387,11 @@ def run(dest_dir: str) -> None:
     # Load data.
     #
     # Load the Statistical Review dataset and read its main table.
-    ds_review: Dataset = paths.load_dependency("statistical_review_of_world_energy")
+    ds_review = paths.load_dataset("statistical_review_of_world_energy")
     tb_review = ds_review["statistical_review_of_world_energy"]
 
     # Load the population dataset.
-    ds_population: Dataset = paths.load_dependency("population")
+    ds_population = paths.load_dataset("population")
 
     #
     # Process data.
@@ -461,7 +419,5 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new garden dataset.
-    ds_garden = create_dataset(
-        dest_dir=dest_dir, tables=[table], default_metadata=ds_review.metadata, check_variables_metadata=True
-    )
+    ds_garden = create_dataset(dest_dir=dest_dir, tables=[table], check_variables_metadata=True)
     ds_garden.save()

@@ -9,74 +9,36 @@ Therefore, to gather as much data as possible, we combine both datasets, priorit
 This way, we'll have data from 1990-1999 from EER 2022, and data from 2000-2022 from YED.
 
 NOTES:
-* This step used to combine Ember's Global Electricity Review and the EER, but now we have replaced the former by
-  the YED. However, there may be instances in the code where "global" refers to the YED.
 * We don't use the latest EER 2023 because it does not contain data prior to 2000.
 
 """
 
 import owid.catalog.processing as pr
-from owid.catalog import Dataset, Table, utils
-from owid.catalog.tables import (
-    get_unique_licenses_from_tables,
-    get_unique_sources_from_tables,
-)
+from owid.catalog import Dataset, Table, VariablePresentationMeta, utils
 from owid.datautils import dataframes
+from structlog import get_logger
 
 from etl.helpers import PathFinder, create_dataset
+
+# Initialize logger.
+log = get_logger()
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
-# Define aggregates, following their Ember-Electricity-Data-Methodology document:
-# https://ember-climate.org/app/uploads/2022/03/GER22-Methodology.pdf
-# The European review also has its own methodology document:
-# https://ember-climate.org/app/uploads/2022/02/EER-Methodology.pdf
-# but it does not explicitly define aggregates. We assume they are consistent with each other.
-# This will be also checked, along with other sanity checks, in a separate analysis.
-AGGREGATES = {
-    "coal__twh": [
-        "hard_coal__twh",
-        "lignite__twh",
-    ],
-    "wind_and_solar__twh": ["wind__twh", "solar__twh"],
-    "hydro__bioenergy_and_other_renewables__twh": [
-        "hydro__twh",
-        "bioenergy__twh",
-        "other_renewables__twh",
-    ],
-    "renewables__twh": [
-        "wind_and_solar__twh",
-        "hydro__bioenergy_and_other_renewables__twh",
-    ],
-    "clean__twh": [
-        "renewables__twh",
-        "nuclear__twh",
-    ],
-    "gas_and_other_fossil__twh": [
-        "gas__twh",
-        "other_fossil__twh",
-    ],
-    "fossil__twh": ["gas_and_other_fossil__twh", "coal__twh"],
-    "total_generation__twh": [
-        "clean__twh",
-        "fossil__twh",
-    ],
-}
 
-
-def combine_yearly_electricity_data(ds_global: Dataset) -> Table:
+def combine_yearly_electricity_data(ds_yed: Dataset) -> Table:
     """Combine all tables in Ember's Yearly Electricity Data into one table.
 
     Parameters
     ----------
-    ds_global : Dataset
+    ds_yed : Dataset
         Yearly Electricity dataset (containing tables for capacity, electricity demand, generation, imports and
         emissions).
 
     Returns
     -------
-    combined_global : Table
+    tb_combined : Table
         Combined table containing all data in the Yearly Electricity dataset.
 
     """
@@ -88,29 +50,28 @@ def combine_yearly_electricity_data(ds_global: Dataset) -> Table:
         "power_sector_emissions": "Emissions - ",
     }
     error = "Tables in yearly electricity dataset have changed"
-    assert set(category_renaming) == set(ds_global.table_names), error
+    assert set(category_renaming) == set(ds_yed.table_names), error
     index_columns = ["country", "year"]
     tables = []
     for category in category_renaming:
-        table = ds_global[category].copy()
+        table = ds_yed[category].reset_index()
         table = table.rename(
             columns={
                 column: utils.underscore(category_renaming[category] + column)
                 for column in table.columns
                 if column not in index_columns
-            }
+            },
+            errors="raise",
         )
-        table = table.reset_index()
         tables.append(table)
 
     # Merge all tables into one, with an appropriate short name.
-    combined_global = tables[0]
+    tb_combined = tables[0]
     for table in tables[1:]:
-        combined_global = pr.merge(combined_global, table, on=index_columns, how="outer")
-    combined_global.metadata.short_name = "yearly_electricity"
+        tb_combined = pr.merge(tb_combined, table, on=index_columns, how="outer", short_name="yearly_electricity")
 
     # Rename certain columns for consistency.
-    combined_global = combined_global.rename(
+    tb_combined = tb_combined.rename(
         columns={
             "net_imports__twh": "imports__total_net_imports__twh",
             "demand__twh": "demand__total_demand__twh",
@@ -122,22 +83,25 @@ def combine_yearly_electricity_data(ds_global: Dataset) -> Table:
     # Sanity check.
     error = "Total generation column in emissions and generation tables are not identical."
     assert all(
-        combined_global["emissions__total_generation__twh"].fillna(-1)
-        == combined_global["generation__total_generation__twh"].fillna(-1)
+        tb_combined["emissions__total_generation__twh"].fillna(-1)
+        == tb_combined["generation__total_generation__twh"].fillna(-1)
     ), error
 
     # Remove unnecessary columns and any possible rows with no data.
-    combined_global = combined_global.drop(columns=["population", "emissions__total_generation__twh"]).dropna(how="all")
-
-    # Set a convenient index and sort rows and columns conveniently.
-    combined_global = (
-        combined_global.set_index(["country", "year"], verify_integrity=True).sort_index().sort_index(axis=1)
+    tb_combined = tb_combined.drop(columns=["population", "emissions__total_generation__twh"], errors="raise").dropna(
+        how="all"
     )
 
-    return combined_global
+    # Set a convenient index and sort rows and columns conveniently.
+    tb_combined = tb_combined.set_index(["country", "year"], verify_integrity=True).sort_index().sort_index(axis=1)
+
+    # Set an appropriate title for the table.
+    tb_combined.metadata.title = "Yearly Electricity Data"
+
+    return tb_combined
 
 
-def combine_european_electricity_review_data(ds_european: Dataset) -> Table:
+def combine_european_electricity_review_data(ds_eer: Dataset) -> Table:
     """Combine tables in Ember's European Electricity Review dataset into one table.
 
     The tables to be combined are 'country_overview', 'generation', and 'emissions'. The remaining table on net flows
@@ -145,7 +109,7 @@ def combine_european_electricity_review_data(ds_european: Dataset) -> Table:
 
     Parameters
     ----------
-    ds_european : Dataset
+    ds_eer : Dataset
         European Electricity Review dataset.
 
     Returns
@@ -156,37 +120,14 @@ def combine_european_electricity_review_data(ds_european: Dataset) -> Table:
     """
     index_columns = ["country", "year"]
     # Extract the necessary tables from the dataset.
-    country_overview = ds_european["country_overview"].copy()
-    generation = ds_european["generation"].copy()
-    emissions = ds_european["emissions"].copy()
-
-    # NOTE: These tables currently do not have metadata at the variable level (and there is no point updating the step
-    # since it is an old version). Therefore, for now, manually add sources and licenses to each variable in the tables.
-    for table in [country_overview, generation, emissions]:
-        for column in table.columns:
-            table[column].metadata.sources = table.metadata.dataset.sources
-            table[column].metadata.licenses = table.metadata.dataset.licenses
-
-    # Create aggregates (defined in AGGREGATES) that are in yearly electricity but not in the european review.
-    for aggregate in AGGREGATES:
-        generation[aggregate] = generation[AGGREGATES[aggregate]].sum(axis=1)
-        # Given that the previous operation currently does not properly propagate metadata, do it manually.
-        generation[aggregate].metadata.sources = get_unique_sources_from_tables([generation[AGGREGATES[aggregate]]])
-        generation[aggregate].metadata.licenses = get_unique_licenses_from_tables([generation[AGGREGATES[aggregate]]])
-
-    # Create a column for each of those new aggregates, giving percentage share of total generation.
-    for aggregate in AGGREGATES:
-        column = aggregate.replace("__twh", "__pct")
-        generation[column] = generation[aggregate] / generation["total_generation__twh"] * 100
-
-    # Check that total generation adds up to 100%.
-    error = "Total generation does not add up to 100%."
-    assert set(generation["total_generation__pct"]) == {100}, error
+    country_overview = ds_eer["country_overview"].copy()
+    generation = ds_eer["generation"].copy()
+    emissions = ds_eer["emissions"].copy()
 
     # Check that the constructed "total generation" column agrees with the one given in table "country_overview".
     columns = ["country", "year", "total_generation__twh"]
     check = pr.merge(
-        ds_european["country_overview"].reset_index()[columns],
+        ds_eer["country_overview"].reset_index()[columns],
         generation.reset_index()[columns],
         on=index_columns,
     )
@@ -198,11 +139,15 @@ def combine_european_electricity_review_data(ds_european: Dataset) -> Table:
     ), error
 
     # Remove unnecessary columns.
-    generation = generation.drop(columns=["total_generation__pct", "total_generation__twh"])
+    generation = generation.drop(columns=["total_generation__pct", "total_generation__twh"], errors="raise")
 
     # Rename all column names to start with the category, before combining all categories.
-    generation = generation.rename(columns={column: "generation__" + column for column in generation.columns})
-    emissions = emissions.rename(columns={column: "emissions__" + column for column in emissions.columns})
+    generation = generation.rename(
+        columns={column: "generation__" + column for column in generation.columns}, errors="raise"
+    )
+    emissions = emissions.rename(
+        columns={column: "emissions__" + column for column in emissions.columns}, errors="raise"
+    )
     country_overview = country_overview.rename(
         columns={
             "total_generation__twh": "generation__total_generation__twh",
@@ -213,10 +158,15 @@ def combine_european_electricity_review_data(ds_european: Dataset) -> Table:
         errors="raise",
     )
 
-    # Combine tables into one dataframe.
+    # Combine tables into one.
     combined_european = pr.merge(country_overview.reset_index(), emissions.reset_index(), on=index_columns, how="outer")
-    combined_european = pr.merge(combined_european, generation.reset_index(), on=index_columns, how="outer")
-    combined_european.metadata.short_name = "european_electricity_review"
+    combined_european = pr.merge(
+        combined_european,
+        generation.reset_index(),
+        on=index_columns,
+        how="outer",
+        short_name="european_electricity_review",
+    )
 
     # If any column was repeated in the merge, it will have a "_x" at the end of the name.
     # Check that no other columns were repeated.
@@ -231,20 +181,21 @@ def combine_european_electricity_review_data(ds_european: Dataset) -> Table:
         combined_european.set_index(index_columns, verify_integrity=True).sort_index().sort_index(axis=1)
     )
 
+    # Set an appropriate title for the table.
+    combined_european.metadata.title = "European Electricity Review"
+
     return combined_european
 
 
-def combine_yearly_electricity_data_and_european_electricity_review(
-    combined_global: Table, combined_european: Table
-) -> Table:
+def combine_yearly_electricity_data_and_european_electricity_review(tb_yed: Table, tb_eer: Table) -> Table:
     """Combine the combined table of the Yearly Electricity Data with the combined table of the European Electricity
     Review.
 
     Parameters
     ----------
-    combined_global : Table
+    tb_yed : Table
         Table that combines all tables of the Yearly Electricity Data.
-    combined_european : Table
+    combined_eer : Table
         Table that combines all tables of the European Electricity Review (except net flows).
 
     Returns
@@ -253,25 +204,31 @@ def combine_yearly_electricity_data_and_european_electricity_review(
         Combined data.
 
     """
-    # Combine (global) yearly electricity data with European data, prioritizing the former.
+
+    # Combine yearly electricity data with European data, prioritizing the former.
     index_columns = ["country", "year"]
     combined = dataframes.combine_two_overlapping_dataframes(
-        df1=combined_global.reset_index(), df2=combined_european.reset_index(), index_columns=index_columns
+        df1=tb_yed.reset_index(), df2=tb_eer.reset_index(), index_columns=index_columns
     )
+
+    # TODO: Remove the following block once display and presentation propagate metadata field by field.
     ####################################################################################################################
-    # NOTE: The previous operation does not propagate metadata properly, so we do it manually.
     for column in combined.columns:
-        sources = []
-        licenses = []
-        # Gather all sources and licenses for this column.
-        for table in [combined_global, combined_european]:
-            if column in table.columns:
-                sources.extend(table[column].metadata.sources)
-                licenses.extend(table[column].metadata.licenses)
-        # Assign the gathered sources and licenses to the new column.
-        combined[column].sources = sources
-        combined[column].licenses = licenses
+        if not hasattr(combined[column].metadata.presentation, "title_public"):
+            title_public_yed = None
+            title_public_eer = None
+            if column in tb_yed.columns:
+                title_public_yed = tb_yed[column].metadata.presentation.title_public
+            if column in tb_eer.columns:
+                title_public_eer = tb_eer[column].metadata.presentation.title_public
+            warning = f"{column}'s title_public in Yearly electricity data differs from European Electricity Review."
+            if title_public_yed != title_public_eer:
+                log.warning(warning)
+            title_public = title_public_yed or title_public_eer
+            combined[column].metadata.presentation = VariablePresentationMeta(title_public=title_public)
+
     ####################################################################################################################
+
     combined.metadata.short_name = paths.short_name
 
     # Set an appropriate index and sort conveniently.
@@ -280,35 +237,51 @@ def combine_yearly_electricity_data_and_european_electricity_review(
     return combined
 
 
+def check_all_variables_have_all_metadata_fields(table: Table) -> None:
+    """Check that all variables in a table have all relevant metadata fields."""
+    for column in table.columns:
+        for field in ["title", "unit", "short_unit", "title_public"]:
+            warning = (
+                f"Column {column} has no {field}. Ensure all variables have a consistent "
+                f"{field} in Yearly electricity data and European Electricity Review datasets."
+            )
+            if field == "title_public":
+                try:
+                    if getattr(table[column].metadata.presentation, field) is None:
+                        log.warning(warning)
+                except AttributeError:
+                    log.warning(warning)
+            else:
+                if not getattr(table[column].metadata, field) is not None:
+                    log.warning(warning)
+
+
 def run(dest_dir: str) -> None:
     #
     # Load data.
     #
     # Read yearly electricity data and european electricity review datasets from garden.
-    ds_global: Dataset = paths.load_dependency("yearly_electricity")
-    ds_european: Dataset = paths.load_dependency("european_electricity_review")
+    ds_yed = paths.load_dataset("yearly_electricity")
+    ds_eer = paths.load_dataset("european_electricity_review")
 
     #
     # Process data.
     #
     # Combine all tables of the yearly electricity data into one.
-    combined_global = combine_yearly_electricity_data(ds_global=ds_global)
+    tb_yed = combine_yearly_electricity_data(ds_yed=ds_yed)
 
     # Combine all tables of the european electricity review into one.
-    combined_european = combine_european_electricity_review_data(ds_european=ds_european)
+    tb_eer = combine_european_electricity_review_data(ds_eer=ds_eer)
 
     # Combine yearly electricity and european reviews.
-    combined = combine_yearly_electricity_data_and_european_electricity_review(
-        combined_global=combined_global, combined_european=combined_european
-    )
+    combined = combine_yearly_electricity_data_and_european_electricity_review(tb_yed=tb_yed, tb_eer=tb_eer)
 
     # Create an additional table with the electricity net flows (only available in european review).
-    net_flows = ds_european["net_flows"].copy()
-    # NOTE: This table currently does not have metadata at the variable level (and there is no point updating the step
-    # since it is an old version). Therefore, for now, manually add sources and licenses to each variable in the table.
-    for column in net_flows.columns:
-        net_flows[column].metadata.sources = net_flows.metadata.dataset.sources
-        net_flows[column].metadata.licenses = net_flows.metadata.dataset.licenses
+    net_flows = ds_eer["net_flows"].copy()
+
+    # Check that all variables have all metadata fields.
+    for table in [tb_yed, tb_eer, combined, net_flows]:
+        check_all_variables_have_all_metadata_fields(table)
 
     #
     # Save outputs.
@@ -316,7 +289,8 @@ def run(dest_dir: str) -> None:
     # Create new garden dataset.
     ds_garden = create_dataset(
         dest_dir=dest_dir,
-        tables=[combined_global, combined_european, combined, net_flows],
-        default_metadata=ds_global.metadata,
+        tables=[tb_yed, tb_eer, combined, net_flows],
+        default_metadata=ds_yed.metadata,
+        check_variables_metadata=True,
     )
     ds_garden.save()
