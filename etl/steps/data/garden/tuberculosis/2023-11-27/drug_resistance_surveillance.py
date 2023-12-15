@@ -88,6 +88,8 @@ def calculate_rr_resistance_share(tb: Table) -> Table:
     """
     Calculating the share of rifampicin resistance among all tested patients.
     """
+    tb["rr_new"] = tb["rr_new"].astype(float)
+    tb["r_rlt_new"] = tb["r_rlt_new"].astype(float)
     tb["rr_share"] = (tb["rr_new"] / tb["r_rlt_new"]) * 100
 
     return tb
