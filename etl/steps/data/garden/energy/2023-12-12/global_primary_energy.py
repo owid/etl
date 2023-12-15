@@ -4,11 +4,7 @@ World Energy.
 """
 
 import numpy as np
-from owid.catalog import Dataset, Table
-from owid.catalog.tables import (
-    get_unique_licenses_from_tables,
-    get_unique_sources_from_tables,
-)
+from owid.catalog import Table
 from owid.datautils.dataframes import combine_two_overlapping_dataframes
 
 from etl.helpers import PathFinder, create_dataset
@@ -111,9 +107,9 @@ def combine_statistical_review_and_smil_data(tb_review: Table, tb_smil: Table) -
     tb_review["data_source"] = "EI"
     tb_smil["data_source"] = "Smil"
     # Combine both tables, prioritizing the Statistical Review's data on overlapping rows.
-    combined = combine_two_overlapping_dataframes(df1=tb_review, df2=tb_smil, index_columns=["country", "year"]).sort_values(
-        ["year"]
-    )
+    combined = combine_two_overlapping_dataframes(
+        df1=tb_review, df2=tb_smil, index_columns=["country", "year"]
+    ).sort_values(["year"])
     # To avoid warnings, add metadata to the new data_source column
     combined["data_source"] = combined["data_source"].copy_metadata(combined[combined.columns[-1]])
 
