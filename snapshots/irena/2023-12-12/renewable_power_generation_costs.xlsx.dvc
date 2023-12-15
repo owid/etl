@@ -1,0 +1,23 @@
+# TODO: This file is a duplicate of the previous step. It is not yet used in the dag and should be updated soon.
+
+meta:
+  name: Renewable Power Generation Costs
+  publication_year: 2022
+  publication_date: '2022-07-01'
+  source_name: International Renewable Energy Agency (IRENA)
+  source_published_by: International Renewable Energy Agency © IRENA 2022
+  url: https://irena.org/publications/2022/Jul/Renewable-Power-Generation-Costs-in-2021
+  source_data_url:
+    https://www.irena.org/-/media/Files/IRENA/Agency/Publication/2022/Jul/IRENA-Datafile-RenPwrGenCosts-in-2021-v1-0.xlsx
+  license_url:
+    https://irena.org/-/media/Files/IRENA/Agency/Publication/2022/Jul/IRENA_Renewable_Power_Generation_Costs_2021.pdf
+  license_name: Copyright IRENA 2021
+  date_accessed: 2023-07-19
+  is_public: true
+  description: |
+
+wdir: ../../../data/snapshots/irena/2023-12-12
+outs:
+- md5: 56e7a24b2e61da1fc5bc36262ff7a5bf
+  size: 675885
+  path: renewable_power_generation_costs.xlsx

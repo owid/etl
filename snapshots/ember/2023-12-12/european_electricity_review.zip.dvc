@@ -1,0 +1,30 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/origin/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: European Electricity Review
+    date_published: 2022-02-01
+
+    # Citation
+    producer: Ember
+    citation_full: |-
+      Ember - European Electricity Review (2022).
+    attribution: Ember - European Electricity Review (2022)
+    attribution_short: Ember
+
+    # Files
+    url_main: https://ember-climate.org/insights/research/european-electricity-review-2022/
+    url_download: https://ember-climate.org/app/uploads/2022/02/EER_2022_raw_data.zip
+    date_accessed: 2023-12-12
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://ember-climate.org/creative-commons/
+
+wdir: ../../../data/snapshots/ember/2023-12-12
+outs:
+- md5: b2df1ca9a513a7aed5e06e716d471ee3
+  size: 133757
+  path: european_electricity_review.zip
