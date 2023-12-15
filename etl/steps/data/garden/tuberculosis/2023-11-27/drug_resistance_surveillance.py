@@ -55,6 +55,7 @@ def run(dest_dir: str) -> None:
     )
     tb = add_variable_description_from_producer(tb, dd)
     tb = sum_hiv_status_for_rifampicin_susceptible(tb)
+    tb = calculate_rr_resistance_share(tb)
     tb = tb.set_index(["country", "year"], verify_integrity=True)
 
     #
