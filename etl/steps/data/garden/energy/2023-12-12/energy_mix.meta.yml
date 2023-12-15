@@ -3,7 +3,7 @@ definitions:
     processing_level: major
     presentation:
       topic_tags:
-      - "Energy"
+      - Energy
   # Short description for fossil fuels.
   description_short_twh: &description_short_twh |-
     Measured in terawatt-hours.
