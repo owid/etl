@@ -21,11 +21,11 @@ def run(dest_dir: str) -> None:
     #
     # Replace snake-case names by the original technology names.
     tb_garden = tb_garden.rename(
-        columns={column: tb_garden[column].metadata.title for column in tb_garden.columns}, errors="raise"
+        columns={column: (tb_garden[column].metadata.display["name"]) for column in tb_garden.columns}, errors="raise"
     )
 
     # For better visualization, divide the costs of DNA sequencing by 1000, as done in the original paper by Farmer & Lafond (2016).
-    tb_garden["Cost of DNA sequencing"] /= 1000
+    tb_garden["DNA sequencing"] /= 1000
 
     # Remove units from each of the columns (that will be all put together in the same column).
     for column in tb_garden.columns:
