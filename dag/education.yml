@@ -95,3 +95,7 @@ steps:
   data://meadow/education/2023-12-15/wittgenstein_center:
     - snapshot://education/2023-12-15/wittgenstein_center_data.csv
     - snapshot://education/2023-12-15/wittgenstein_center_dictionary.csv
+  data://garden/education/2023-12-15/wittgenstein_center:
+    - data://meadow/education/2023-12-15/wittgenstein_center
+  data://grapher/education/2023-12-15/wittgenstein_center:
+    - data://garden/education/2023-12-15/wittgenstein_center

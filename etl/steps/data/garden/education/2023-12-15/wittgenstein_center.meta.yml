@@ -1,0 +1,50 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Global Education
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
+dataset:
+  update_period_days: 365
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
+  title: Wittgenstein Center Population and Human Capital Projections
+tables:
+  wittgenstein_center_data:
+    # Learn more about the available fields:
+    # http://docs.owid.io/projects/etl/architecture/metadata/reference/indicator/
+    variables:
+      no_formal_education:
+        title: Share of population with no education
+        unit: '%'
+        short_unit: '%'
+        description_processing: >
+          For each country and year, the share of the population aged 15 and older with no formal education was calculated. This involved summing up the population with no formal education and dividing it by the total population aged 15 and older for each country and year, then converting this ratio into a percentage.
+
+
+          A global estimate was calculated for each year by summing the total population aged 15 and older across all countries and the total population within this age group with no formal education. The share of the global population aged 15+ with no formal education was then computed for each year.
+        description_from_producer: Recent data from 2020 onwards is based on the Wittgenstein Centre for Demography and Global Human Capita.
+        processing_level: major
+        display:
+          numDecimalPlaces: 1
+      population_with_basic_education:
+        title: Share of population with at least some basic education
+        unit: '%'
+        short_unit: '%'
+        description_processing: >
+          For each country and year, the share of the population aged 15 and older with no formal education was calculated. This involved summing up the population with no formal education and dividing it by the total population aged 15 and older for each country and year, then converting this ratio into a percentage.
+
+          A global estimate was calculated for each year by summing the total population aged 15 and older across all countries and the total population within this age group with no formal education. The share of the global population aged 15+ with no formal education was then computed for each year.
+
+          To calculate the share of the population with at least some basic education, the share of the population with no formal education was subtracted from 100%.
+
+        description_from_producer: Recent data from 2020 onwards is based on the Wittgenstein Centre for Demography and Global Human Capita.
+        processing_level: major
+        display:
+          numDecimalPlaces: 1
