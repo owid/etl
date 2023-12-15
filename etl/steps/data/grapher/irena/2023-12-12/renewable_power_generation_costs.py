@@ -1,3 +1,5 @@
+# TODO: This file is a duplicate of the previous step. It is not yet used in the dag and should be updated soon.
+
 """Load a garden dataset and create a grapher dataset."""
 
 from typing import cast

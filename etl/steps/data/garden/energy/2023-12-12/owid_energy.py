@@ -1,3 +1,5 @@
+# TODO: This file is a duplicate of the previous step. It is not yet used in the dag and should be updated soon.
+
 """Garden step that combines various datasets related to energy and produces the OWID Energy dataset.
 
 Datasets combined:

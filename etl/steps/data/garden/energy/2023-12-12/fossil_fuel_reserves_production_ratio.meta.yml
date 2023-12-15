@@ -1,3 +1,5 @@
+# TODO: This file is a duplicate of the previous step. It is not yet used in the dag and should be updated soon.
+
 dataset:
   title: Fossil fuel reserves/production ratio (Energy Institute, 2023)
   short_name: fossil_fuel_reserves_production_ratio

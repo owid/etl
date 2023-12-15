@@ -1,3 +1,5 @@
+# TODO: This file is a duplicate of the previous step. It is not yet used in the dag and should be updated soon.
+
 """Extract global (as well as at the country level for some countries) weighted-average levelized cost of electricity
 (LCOE) for all energy sources from IRENA's Renewable Power Generation Costs 2022 dataset.
 

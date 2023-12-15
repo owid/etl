@@ -1,3 +1,5 @@
+# TODO: This file is a duplicate of the previous step. It is not yet used in the dag and should be updated soon.
+
 meta:
   name: UK's historical electricity data
   publication_year: 2017

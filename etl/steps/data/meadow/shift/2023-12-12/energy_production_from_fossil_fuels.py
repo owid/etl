@@ -1,3 +1,5 @@
+# TODO: This file is a duplicate of the previous step. It is not yet used in the dag and should be updated soon.
+
 """Load a snapshot and create a meadow dataset."""
 
 from etl.helpers import PathFinder, create_dataset

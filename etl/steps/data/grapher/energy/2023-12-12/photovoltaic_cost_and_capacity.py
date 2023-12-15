@@ -1,3 +1,5 @@
+# TODO: This file is a duplicate of the previous step. It is not yet used in the dag and should be updated soon.
+
 """Load garden dataset of photovoltaic cost and capacity and create a grapher dataset.
 
 """

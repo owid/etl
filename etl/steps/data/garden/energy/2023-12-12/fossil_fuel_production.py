@@ -1,3 +1,5 @@
+# TODO: This file is a duplicate of the previous step. It is not yet used in the dag and should be updated soon.
+
 """Garden step for Fossil fuel production dataset (part of the OWID Energy dataset), based on a combination of BP's
 Statistical Review dataset and Shift data on fossil fuel production.
 

@@ -1,3 +1,5 @@
+# TODO: This file is a duplicate of the previous step. It is not yet used in the dag and should be updated soon.
+
 """Extract data from UNEP's Global trends in renewable energy investment.
 
 Since the data is given as an image of a table (not suitable for OCR) the data has been manually copied into a file,

@@ -1,3 +1,5 @@
+# TODO: This file is a duplicate of the previous step. It is not yet used in the dag and should be updated soon.
+
 """Combine UK BEIS' historical electricity with our electricity mix dataset (by BP & Ember) to obtain a long-run
 electricity mix in the UK.
 
