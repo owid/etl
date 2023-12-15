@@ -23,7 +23,7 @@ definitions:
       <% endif %>
     interstate_conflicts: |-
       <% if (conflict_type == "interstate" or conflict_type == "internal") %>
-      We identify interstate conflicts in the Conflict Catalog using the approach by Seshat (while correcting any mistakes for the 200 deadliest conflicts): https://seshatdatabank.info/cleaning-history-data-the-conflict-catalogue/
+      We identify interstate conflicts in the Conflict Catalog using the approach by Seshat (while correcting any mistakes for the 200 deadliest conflicts): https://web.archive.org/web/20230606184656/https://seshatdatabank.info/cleaning-history-data-the-conflict-catalogue/
       <% endif %>
 
   number_deaths:
