@@ -1,16 +1,10 @@
-# TODO: This file is a duplicate of the previous step. It is not yet used in the dag and should be updated soon.
-
 """Garden step that combines Vaclav Smil's data on global primary energy with the Energy Institute Statistical Review of
 World Energy.
 
 """
 
 import numpy as np
-from owid.catalog import Dataset, Table
-from owid.catalog.tables import (
-    get_unique_licenses_from_tables,
-    get_unique_sources_from_tables,
-)
+from owid.catalog import Table
 from owid.datautils.dataframes import combine_two_overlapping_dataframes
 
 from etl.helpers import PathFinder, create_dataset
@@ -75,7 +69,7 @@ def prepare_statistical_review_data(tb_review: Table) -> Table:
     # For completeness, create columns of substituted energy for fossil sources (even if they would coincide with
     # direct energy).
     for fossil_source in ["biofuels", "coal", "gas", "oil"]:
-        tb_review[f"{fossil_source}__twh_substituted_energy"] = tb_review[f"{fossil_source}__twh_direct_energy"]
+        tb_review[f"{fossil_source}__twh_substituted_energy"] = tb_review[f"{fossil_source}__twh_direct_energy"].copy()
 
     # Select only data for the World (which is the only region informed in Smil's data).
     tb_review = tb_review[tb_review["country"] == "World"].reset_index(drop=True)
@@ -100,7 +94,7 @@ def prepare_smil_data(tb_smil: Table) -> Table:
         tb_smil[f"{source}__twh_substituted_energy"] = tb_smil[f"{source}__twh_direct_energy"] / EFFICIENCY_FACTOR
     # For fossil sources (including biofuels and traditional biomass), direct and substituted energy are the same.
     for source in ["biofuels", "coal", "gas", "oil", "traditional_biomass"]:
-        tb_smil[f"{source}__twh_substituted_energy"] = tb_smil[f"{source}__twh_direct_energy"]
+        tb_smil[f"{source}__twh_substituted_energy"] = tb_smil[f"{source}__twh_direct_energy"].copy()
 
     return tb_smil
 
@@ -113,18 +107,11 @@ def combine_statistical_review_and_smil_data(tb_review: Table, tb_smil: Table) -
     tb_review["data_source"] = "EI"
     tb_smil["data_source"] = "Smil"
     # Combine both tables, prioritizing the Statistical Review's data on overlapping rows.
-    # NOTE: Currently, function combine_two_overlapping_dataframes does not properly propagate metadata.
-    #  For now, sources and licenses have to be combined manually.
-    index_columns = ["country", "year"]
-    combined = combine_two_overlapping_dataframes(df1=tb_review, df2=tb_smil, index_columns=index_columns).sort_values(
-        ["year"]
-    )
-    # Combine metadata of the two tables.
-    sources = get_unique_sources_from_tables([tb_review, tb_smil])
-    licenses = get_unique_licenses_from_tables([tb_review, tb_smil])
-    for column in combined.drop(columns=index_columns).columns:
-        combined[column].metadata.sources = sources
-        combined[column].metadata.licenses = licenses
+    combined = combine_two_overlapping_dataframes(
+        df1=tb_review, df2=tb_smil, index_columns=["country", "year"]
+    ).sort_values(["year"])
+    # To avoid warnings, add metadata to the new data_source column
+    combined["data_source"] = combined["data_source"].copy_metadata(combined[combined.columns[-1]])
 
     # Update the name of the new combined table.
     combined.metadata.short_name = paths.short_name
@@ -156,19 +143,6 @@ def add_total_consumption_and_percentages(combined: Table) -> Table:
     # Create a column with the total substituted energy (ensuring there is at least one non-nan value).
     equivalent_energy_columns = [column for column in combined.columns if "substituted_energy" in column]
     combined["total_consumption__twh_substituted_energy"] = combined[equivalent_energy_columns].sum(axis=1, min_count=1)
-    # The previous operations do not propagate metadata; do it manually.
-    combined["total_consumption__twh_direct_energy"].metadata.sources = get_unique_sources_from_tables(
-        [combined[direct_energy_columns]]
-    )
-    combined["total_consumption__twh_direct_energy"].metadata.licenses = get_unique_licenses_from_tables(
-        [combined[direct_energy_columns]]
-    )
-    combined["total_consumption__twh_substituted_energy"].metadata.sources = get_unique_sources_from_tables(
-        [combined[equivalent_energy_columns]]
-    )
-    combined["total_consumption__twh_substituted_energy"].metadata.licenses = get_unique_licenses_from_tables(
-        [combined[equivalent_energy_columns]]
-    )
 
     # Add share variables.
     sources = [
@@ -201,11 +175,11 @@ def run(dest_dir: str) -> None:
     # Load data.
     #
     # Load Statistical Review dataset and read its main table.
-    ds_review: Dataset = paths.load_dependency("statistical_review_of_world_energy")
+    ds_review = paths.load_dataset("statistical_review_of_world_energy")
     tb_review = ds_review["statistical_review_of_world_energy"]
 
     # Load Smil dataset and read its main table.
-    ds_smil: Dataset = paths.load_dependency("smil_2017")
+    ds_smil = paths.load_dataset("smil_2017")
     tb_smil = ds_smil["smil_2017"]
 
     #
@@ -227,7 +201,5 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Save garden dataset.
-    ds_garden = create_dataset(
-        dest_dir=dest_dir, tables=[combined], default_metadata=ds_review.metadata, check_variables_metadata=True
-    )
+    ds_garden = create_dataset(dest_dir=dest_dir, tables=[combined], check_variables_metadata=True)
     ds_garden.save()
