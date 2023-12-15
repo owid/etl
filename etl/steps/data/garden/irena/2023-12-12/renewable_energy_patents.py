@@ -85,12 +85,15 @@ def regroup_sub_technologies(tb: Table) -> Table:
     tb["sub_technology"] = tb["sub_technology"].fillna("Others")
 
     # Rename sub-technologies conveniently.
-    tb["sub_technology"] = Variable(dataframes.map_series(
-        series=tb["sub_technology"],
-        mapping=SUB_TECHNOLOGY_RENAMING,
-        warn_on_missing_mappings=True,
-        warn_on_unused_mappings=True,
-    ), name="sub_technology").copy_metadata(tb["sub_technology"])
+    tb["sub_technology"] = Variable(
+        dataframes.map_series(
+            series=tb["sub_technology"],
+            mapping=SUB_TECHNOLOGY_RENAMING,
+            warn_on_missing_mappings=True,
+            warn_on_unused_mappings=True,
+        ),
+        name="sub_technology",
+    ).copy_metadata(tb["sub_technology"])
 
     # After renaming, some sub-technologies have been combined (e.g. Biofuels and Fuel from waste are now both Bioenergy).
     # Re-calculate numbers of patents with the new sub-technology groupings.
@@ -117,7 +120,9 @@ def add_region_aggregates(tb: Table, ds_regions: Dataset, ds_income_groups: Data
             ]
         else:
             # List countries in region.
-            countries_in_region = geo.list_members_of_region(region=region, ds_regions=ds_regions, ds_income_groups=ds_income_groups)
+            countries_in_region = geo.list_members_of_region(
+                region=region, ds_regions=ds_regions, ds_income_groups=ds_income_groups
+            )
         region_data = (
             tb[tb["country"].isin(countries_in_region)]
             .groupby(["year", "sector", "technology", "sub_technology"], observed=True)
