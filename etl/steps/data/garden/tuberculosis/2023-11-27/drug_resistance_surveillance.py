@@ -81,3 +81,12 @@ def sum_hiv_status_for_rifampicin_susceptible(tb: Table) -> Table:
     tb["nrr_hivall"] = tb["nrr_hivall"].where(tb[cols_to_sum].notna().any(axis=1), np.nan)
 
     return tb
+
+
+def calculate_rr_resistance_share(tb: Table) -> Table:
+    """
+    Calculating the share of rifampicin resistance among all tested patients.
+    """
+    tb["rr_share"] = (tb["rr_new"] / tb["rr_rlt_new"]) * 100
+
+    return tb
