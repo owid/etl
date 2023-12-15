@@ -348,10 +348,10 @@ def _get_metadata_value_from_variables_if_all_identical(
         combined_value = unique_values.pop()
     else:
         combined_value = None
-        if (len(unique_values) > 1) and (operation != "/") and warn_if_different:
-            # There is no need to warn if units are different when doing a division.
+        if (len(unique_values) > 1) and (operation not in ["/", "*"]) and warn_if_different:
+            # There is no need to warn if units are different when doing a multiplication or a division.
             # In most cases, units will be different, and that is fine, as long as the resulting variable has no units.
-            # Note that the same reasoning could be applied to multiplication, so we may need to generalize this logic.
+            # Note that the same reasoning can be applied to other operations, so we may need to generalize this logic.
             log.warning(f"Different values of '{field}' detected among variables: {unique_values}")
 
     return combined_value
