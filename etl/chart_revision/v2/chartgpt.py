@@ -5,8 +5,8 @@ The modified titles and subtitles are generated using the following a specific s
 import json
 from typing import Any, Dict, List
 
-import openai
 import rich_click as click
+from openai import OpenAI
 from sqlmodel import Session, select
 from structlog import get_logger
 
@@ -209,7 +209,8 @@ def ask_gpt(question: str, system_prompt: str = "", model: str = "gpt-4", num_re
 
     More on its API can be found at https://platform.openai.com/docs/api-reference.
     """
-    response = openai.ChatCompletion.create(
+    client = OpenAI()
+    response = client.chat.completions.create(
         model=model,
         messages=[
             {"role": "system", "content": system_prompt},
