@@ -2,7 +2,7 @@ meta:
   source:
     name: Our World in Data catalog backport
     url: https://owid.cloud/admin/datasets/393
-    date_accessed: 2023-08-10 07:51:10.903473
+    date_accessed: 2023-12-18 08:51:10.041539
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Grapher metadata for 
@@ -10,7 +10,7 @@ meta:
   description: ''
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: fec4d98fd5ca13082abafc76b86a26aa
-  size: 2307
+- md5: 576d8edddb47c338949704b1195f9ab8
+  size: 2320
   path: 
     dataset_393_world_gdp_in_2011_int_dollar__owid_based_on_world_bank_plus_maddison__2017_config.json

@@ -56,20 +56,16 @@ steps:
   data://grapher/irena/2023-06-26/renewable_electricity_capacity:
     - data://garden/irena/2023-06-26/renewable_electricity_capacity
   #
-  # IRENA - Renewable energy patents (2021).
+  # IRENA - Renewable energy patents (2022).
   #
-  data://meadow/irena/2022-10-25/renewable_energy_patents:
-    - walden://irena/2022-10-25/renewable_energy_patents
-  # The garden dataset will have two tables with number of patents:
-  # * 'renewable_energy_patents': Long format, indexed by country, year, sector, technology, sub-technology.
-  # * 'renewable_energy_patents_by_technology': Wide format, indexed by country, year.
-  data://garden/irena/2022-10-25/renewable_energy_patents:
-    - data://meadow/irena/2022-10-25/renewable_energy_patents
-    - data://garden/wb/2021-07-01/wb_income
+  data://meadow/irena/2023-12-12/renewable_energy_patents:
+    - snapshot://irena/2023-12-12/renewable_energy_patents.xlsx
+  data://garden/irena/2023-12-12/renewable_energy_patents:
+    - data://meadow/irena/2023-12-12/renewable_energy_patents
+    - data://garden/wb/2023-04-30/income_groups
     - data://garden/regions/2023-01-01/regions
-  # The grapher dataset uses only the wide table from the garden dataset.
-  data://grapher/irena/2022-10-25/renewable_energy_patents:
-    - data://garden/irena/2022-10-25/renewable_energy_patents
+  data://grapher/irena/2023-12-12/renewable_energy_patents:
+    - data://garden/irena/2023-12-12/renewable_energy_patents
   #
   # UNEP - Global trends in renewable energy investment (2019).
   #
@@ -302,5 +298,20 @@ steps:
     - data://garden/energy_institute/2023-06-26/statistical_review_of_world_energy
   data://grapher/energy/2023-07-10/global_primary_energy:
     - data://garden/energy/2023-07-10/global_primary_energy
+  #
+  # IRENA - Renewable energy patents (2021).
+  #
+  data://meadow/irena/2022-10-25/renewable_energy_patents:
+    - walden://irena/2022-10-25/renewable_energy_patents
+  # The garden dataset will have two tables with number of patents:
+  # * 'renewable_energy_patents': Long format, indexed by country, year, sector, technology, sub-technology.
+  # * 'renewable_energy_patents_by_technology': Wide format, indexed by country, year.
+  data://garden/irena/2022-10-25/renewable_energy_patents:
+    - data://meadow/irena/2022-10-25/renewable_energy_patents
+    - data://garden/wb/2021-07-01/wb_income
+    - data://garden/regions/2023-01-01/regions
+  # The grapher dataset uses only the wide table from the garden dataset.
+  data://grapher/irena/2022-10-25/renewable_energy_patents:
+    - data://garden/irena/2022-10-25/renewable_energy_patents
 
   ######################################################################################################################
