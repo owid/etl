@@ -54,6 +54,7 @@ def run(dest_dir: str) -> None:
     # Add metadata.
     for column in tb.columns:
         subject = ""
+        description_short = ""
         if "math" in column:
             subject = "mathematics"
             description_short = "Assessed through the PISA mathematics scale, which measures how well someone can use math to solve everyday problems and understand the role of math in the real world."
