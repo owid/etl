@@ -1,4 +1,4 @@
-"""Script to create a snapshot of dataset 'Conflicts Catalog - Brecke (1999)'."""
+"""Script to create a snapshot of dataset 'Conflict Catalog - Brecke (1999)'."""
 
 from pathlib import Path
 

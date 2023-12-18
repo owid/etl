@@ -12,7 +12,10 @@ meta:
     # Citation
     producer: Uppsala Conflict Data Program
     citation_full: |-
+      Davies, Shawn, Therese Pettersson & Magnus Öberg (2023). Organized violence 1989-2022 and the return of conflicts between states?. Journal of Peace Research 60(4).
+
       Sundberg, Ralph, and Erik Melander, 2013, “Introducing the UCDP Georeferenced Event Dataset”, Journal of Peace Research, vol.50, no.4, 523-532
+
     attribution_short: UCDP
 
     # Files
