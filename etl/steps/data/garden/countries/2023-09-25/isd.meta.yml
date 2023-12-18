@@ -5,6 +5,7 @@ definitions:
       topic_tags:
         - State Capacity
 
+
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
 dataset:
@@ -17,51 +18,39 @@ dataset:
 tables:
   isd_regions:
     title: States in regions (ISD)
+    common:
+      processing_level: minor
+      description_processing: |-
+        We assign each sovereign state to a region based on the mapping (using ISD/COW codes):
+
+          - Americas: 2-165
+          - Europe: 200-395, 2558, 3375
+          - Africa: 400-626, 4044-6257
+          - Middle East: 630-698, 6821-6845
+          - Asia and Oceania: 700-990, 7003-9210
+
+        We also provide the following extra regions (note that this overlap with 'Africa' and 'Middle East'). These regions are used in Project Mars dataset.
+
+          - North Africa and the Middle East: 435-436, 483, 600-698, 4352-4354, 4763, 4832, 6251-6845
+          - Sub-Saharan Africa: 402-434, 437-482, 484-591, 4044-4343, 4362-4761, 4765-4831, 4841-5814
+      description_key:
+        - |-
+          Butcher and Griffiths consider a country a sovereign state if it has a population of at least 10,000 people, has internal control over much of its territory, and is externally recognized by its peers and controls its foreign relations.
+      display:
+        numDecimalPlaces: 0
+
     variables:
       number_countries:
         title: Number of states in a region
         description_short: |-
           Number of sovereign states in each region.
         unit: countries
-        processing_level: minor
-        description_processing: |-
-          We assign each sovereign state to a region based on the mapping (using ISD/COW codes):
-
-            - Americas: 2-165
-            - Europe: 200-395, 2558, 3375
-            - Africa: 400-626, 4044-6257
-            - Middle East: 630-698, 6821-6845
-            - Asia and Oceania: 700-990, 7003-9210
-
-          We also provide the following extra regions (note that this overlap with 'Africa' and 'Middle East'). These regions are used in Project Mars dataset.
-
-            - North Africa and the Middle East: 435-436, 483, 600-698, 4352-4354, 4763, 4832, 6251-6845
-            - Sub-Saharan Africa: 402-434, 437-482, 484-591, 4044-4343, 4362-4761, 4765-4831, 4841-5814
-
-        display:
-          numDecimalPlaces: 0
 
       population:
         title: Population in region
         description_short: |-
           Population in the region, using borders from 2022.
-        unit: countries
-        processing_level: minor
-        description_processing: |-
-          We assign each sovereign state to a region based on the mapping (using ISD/COW codes):
-
-            - Americas: 2-165
-            - Europe: 200-395, 2558, 3375
-            - Africa: 400-626, 4044-6257
-            - Middle East: 630-698, 6821-6845
-            - Asia and Oceania: 700-990, 7003-9210
-
-          We also provide the following extra regions (note that this overlap with 'Africa' and 'Middle East'). These regions are used in Project Mars dataset.
-
-            - North Africa and the Middle East: 435-436, 483, 600-698, 4352-4354, 4763, 4832, 6251-6845
-            - Sub-Saharan Africa: 402-434, 437-482, 484-591, 4044-4343, 4362-4761, 4765-4831, 4841-5814
-        display:
-          numDecimalPlaces: 0
+        unit: people
 
   isd:
     variables:

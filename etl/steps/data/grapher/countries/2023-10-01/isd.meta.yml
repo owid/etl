@@ -3,5 +3,5 @@ tables:
     variables:
       is_present:
         title: Sovereign state
-        description_short: Whether the country is present in the ISD countries dataset.
+        description_short: The country or state is recognized by the ISD dataset.
         unit: ""
