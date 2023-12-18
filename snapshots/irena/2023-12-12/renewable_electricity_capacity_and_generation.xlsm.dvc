@@ -33,22 +33,19 @@ meta:
     # Citation
     producer: International Renewable Energy Agency
     citation_full: |-
-      International Renewable Energy Agency (IRENA) - Renewable Electricity Capacity and Generation Statistics (2023).
-      This data is collected directly from members using the IRENA Renewable Energy Statistics questionnaire and is also supplemented by desk research where official statistics are not available.
-
-      This data may be freely used, shared, copied, reproduced, printed and/or stored, provided that all such material is clearly attributed to IRENA and bears a notation of copyright (© IRENA) with the year of copyright. Unless otherwise stated, the data provided are the property of the International Renewable Energy Agency (IRENA) and are subject to copyright by IRENA. Data attributed to third parties may be subject to third-party copyright and separate terms of use and restrictions, including restrictions in relation to any commercial use.
+      IRENA (2023), Renewable power generation costs in 2022, International Renewable Energy Agency, Abu Dhabi.
     attribution_short: IRENA
 
     # Files
     url_main: https://www.irena.org/Data/Downloads/IRENASTAT
-    url_download: 
+    url_download:
       https://www.irena.org/IRENADocuments/IRENA_RE_electricity_statistics_-_Query_tool.xlsm
     date_accessed: 2023-12-12
 
     # License
     license:
       name: ©IRENA 2023
-      url: 
+      url:
         https://www.irena.org/-/media/Files/IRENA/Agency/Publication/2023/Mar/IRENA_RE_Capacity_Statistics_2023.pdf
 wdir: ../../../data/snapshots/irena/2023-12-12
 outs:

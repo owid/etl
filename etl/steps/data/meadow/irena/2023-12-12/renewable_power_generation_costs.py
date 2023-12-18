@@ -69,6 +69,10 @@ def prepare_solar_pv_module_prices(data: pr.ExcelFile) -> Table:
     # Remove unnecessary column and add column for region.
     pv_prices = pv_prices.drop(columns="technology", errors="raise").assign(**{"country": "World"})
 
+    # Sanity check.
+    error = "Incomplete years (with less than 12 months of data) were expected to be either the first or the last."
+    assert pv_prices[pv_prices["n_months"] != 12].index.isin([0, len(pv_prices) - 1]).all(), error
+
     # Ignore years for which we don't have 12 months.
     pv_prices = pv_prices[pv_prices["n_months"] == 12].drop(columns=["n_months"], errors="raise").reset_index(drop=True)
 
@@ -209,10 +213,20 @@ def extract_country_cost_from_excel_file(data: pr.ExcelFile) -> Table:
     # Change to long format.
     onshore_wind = onshore_wind.melt(id_vars="country", var_name="year", value_name="cost")
 
+    # There is data for some additional countries in a separate sheet for smaller markets.
+    onshore_wind_extra = (
+        data.parse("Fig 2.13", skiprows=6)
+        .dropna(how="all", axis=1)
+        .rename(columns={"Country": "country", "Year": "year", "Weighted average": "cost"}, errors="raise")
+    )
+
+    # Combine onshore wind data.
+    onshore_wind_combined = pr.concat([onshore_wind, onshore_wind_extra], ignore_index=True)
+
     # Add a technology column and concatenate different technologies.
     solar_pv["technology"] = "Solar photovoltaic"
-    onshore_wind["technology"] = "Onshore wind"
-    combined = pr.concat([solar_pv, onshore_wind], ignore_index=True)
+    onshore_wind_combined["technology"] = "Onshore wind"
+    combined = pr.concat([solar_pv, onshore_wind_combined], ignore_index=True)
 
     return combined
 
