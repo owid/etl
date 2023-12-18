@@ -24,5 +24,6 @@ def main(upload: bool) -> None:
     # Download data from source, add file to DVC and upload to S3.
     snap.create_snapshot(upload=upload)
 
+
 if __name__ == "__main__":
     main()
