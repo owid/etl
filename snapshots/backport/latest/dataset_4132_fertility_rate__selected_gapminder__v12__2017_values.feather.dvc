@@ -2,13 +2,13 @@ meta:
   source:
     name: Our World in Data catalog backport
     url: https://owid.cloud/admin/datasets/4132
-    date_accessed: 2023-08-10 07:51:58.704001
+    date_accessed: 2023-12-18 08:46:47.411987
     publication_date: latest
     published_by: Our World in Data catalog backport
   name: Fertility Rate (Selected Gapminder, v12) (2017)
   description: ''
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 67300677b53c79834d38e4d057b06577
-  size: 121386
+- md5: aaf0381967e890beadbdbc736bd783f7
+  size: 271458
   path: dataset_4132_fertility_rate__selected_gapminder__v12__2017_values.feather
