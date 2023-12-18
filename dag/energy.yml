@@ -126,10 +126,10 @@ steps:
   #
   # Shift - Energy production from fossil fuels 2023.
   #
-  data://meadow/shift/2023-07-10/energy_production_from_fossil_fuels:
-    - snapshot://shift/2023-07-10/energy_production_from_fossil_fuels.csv
-  data://garden/shift/2023-07-10/energy_production_from_fossil_fuels:
-    - data://meadow/shift/2023-07-10/energy_production_from_fossil_fuels
+  data://meadow/shift/2023-12-12/energy_production_from_fossil_fuels:
+    - snapshot://shift/2023-12-12/energy_production_from_fossil_fuels.csv
+  data://garden/shift/2023-12-12/energy_production_from_fossil_fuels:
+    - data://meadow/shift/2023-12-12/energy_production_from_fossil_fuels
     - data://garden/wb/2023-04-30/income_groups
     - data://garden/regions/2023-01-01/regions
   #
@@ -335,5 +335,14 @@ steps:
     - data://garden/irena/2023-06-26/renewable_electricity_capacity
   data://grapher/irena/2023-06-26/renewable_electricity_capacity:
     - data://garden/irena/2023-06-26/renewable_electricity_capacity
+  #
+  # Shift - Energy production from fossil fuels 2023.
+  #
+  data://meadow/shift/2023-07-10/energy_production_from_fossil_fuels:
+    - snapshot://shift/2023-07-10/energy_production_from_fossil_fuels.csv
+  data://garden/shift/2023-07-10/energy_production_from_fossil_fuels:
+    - data://meadow/shift/2023-07-10/energy_production_from_fossil_fuels
+    - data://garden/wb/2023-04-30/income_groups
+    - data://garden/regions/2023-01-01/regions
 
   ######################################################################################################################

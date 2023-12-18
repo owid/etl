@@ -1,21 +1,28 @@
-# TODO: This file is a duplicate of the previous step. It is not yet used in the dag and should be updated soon.
-
 meta:
-  name: Energy production from fossil fuels
-  publication_year: 2019
-  publication_date: '2019-06-05'
-  source_name: The Shift Data Portal
-  source_published_by: The Shift Data Portal
-  url: https://www.theshiftdataportal.org/
-  source_data_url:
-  license_url: https://www.theshiftdataportal.org/legal-notice
-  license_name: Creative Commons BY-SA 3.0
-  date_accessed: 2023-07-10
-  is_public: true
-  description: |
-    The data on energy production from fossil fuels provided by The Shift Data Portal is based on the following sources:
-    · For the period 1900-1980: Bouda Etemad and Jean Luciani, World Energy Production 1900 – 1985, ISBN 2-600-56007-6, Data digitalized and published with agreement of B. Etemad.
-    · For the period 1980-2016: U.S. Energy Information Administration, Historical Statistics for 1980-2016, accessed on 2019-06-05.
+  origin:
+    # Data product / Snapshot
+    title: Energy production from fossil fuels
+    date_published: 2019-06-05
+    description: |-
+      The data on energy production from fossil fuels provided by The Shift Data Portal is based on the following sources:
+      - For the period 1900-1980: Bouda Etemad and Jean Luciani, World Energy Production 1900 - 1985, ISBN 2-600-56007-6, Data digitalized and published with agreement of B. Etemad.
+      - For the period 1980-2016: U.S. Energy Information Administration, Historical Statistics for 1980-2016, accessed on 2019-06-05.
+
+    # Citation
+    producer: The Shift Data Portal
+    citation_full: |-
+      The Shift Data Portal - Energy production from fossil fuels (2023).
+    attribution_short: Shift
+
+    # Files
+    url_main: https://www.theshiftdataportal.org/
+    date_accessed: 2023-12-12
+
+    # License
+    license:
+      name: CC BY-SA 3.0
+      url: https://www.theshiftdataportal.org/legal-notice
+
 wdir: ../../../data/snapshots/shift/2023-12-12
 outs:
 - md5: e1b6c175c3a516d0fb0d0905b6baa258
