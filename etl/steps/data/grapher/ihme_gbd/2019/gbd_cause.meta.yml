@@ -1,13 +1,15 @@
 definitions:
   common:
-    processing_level: TBD - major or minor
+    processing_level: minor
     presentation:
       topic_tags:
-        - TBD - Indicator's topic tags
+        - Diarrheal Diseases
+        - Causes of Death
 
   gbd_origin: &gbd_origin
     producer: IHME, Global Burden of Disease Study (2019)
-    title: Institute for Health Metrics and Evaluation - Global Burden of Disease (2019) - Deaths and DALYs - Deaths and
+    title:
+      Institute for Health Metrics and Evaluation - Global Burden of Disease (2019) - Deaths and DALYs - Deaths and
       DALYs
     description: >-
       The Global Burden of Disease (GBD) provides a comprehensive picture of mortality and disability across countries,
@@ -22,12 +24,12 @@ definitions:
       url: https://www.healthdata.org/data-tools-practices/data-practices/terms-and-conditions
 
 dataset:
-  update_period_days: TBD - Number of days between OWID updates
+  update_period_days: 1095
 tables:
   diarrheal_diseases__both_sexes__age_standardized:
     variables:
-      deaths_that_are_from_diarrheal_diseases_per_100_000_people__in_both_sexes_aged_age_standardized:
-        sources: []
+      ? deaths_that_are_from_diarrheal_diseases_per_100_000_people__in_both_sexes_aged_age_standardized
+      : sources: []
         origins:
           - *gbd_origin
         title: Deaths that are from diarrheal diseases per 100,000 people, in both sexes aged age-standardized
@@ -35,7 +37,8 @@ tables:
         display:
           name: Deaths that are from diarrheal diseases per 100,000 people, in both sexes aged age-standardized
           numDecimalPlaces: 1
-        description_short: Estimated annual number of deaths from [diarrheal diseases](#dod:diarrheal-diseases) per 100,000
+        description_short:
+          Estimated annual number of deaths from [diarrheal diseases](#dod:diarrheal-diseases) per 100,000
           people.
         description_key:
           - TBD - List of key pieces of information about the indicator.
