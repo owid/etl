@@ -34,7 +34,7 @@ tables:
           title_public: World GDP
           attribution_short: World Bank & Maddison
           faqs:
-            - fragment_id: What are international-$ and why are they used to measure incomes?
+            - fragment_id: poverty-international-dollars
               gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
           grapher_config:
             title: World GDP over the last two millennia
