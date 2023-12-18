@@ -244,7 +244,7 @@ with form_widget.form("garden"):
         help="Expected number of days between consecutive updates of this dataset by OWID, typically `30`, `90` or `365`.",
         key="update_period_days",
         step=1,
-        min_value=1,
+        min_value=0,
         default_last=365,
     )
 
