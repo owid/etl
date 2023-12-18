@@ -1,9 +1,9 @@
 definitions:
   common:
-    processing_level: TBD - major or minor
+    processing_level: minor
     presentation:
       topic_tags:
-        - TBD - Indicator's topic tags
+        - Clean Water & Sanitation
 
   un_origin: &un_origin
     producer: United Nations (2023)
@@ -16,13 +16,13 @@ definitions:
     citation_full: SDG Indicators Database, United Nations, Department of Economic and Social Affairs (2023)
     url_main: https://unstats.un.org/sdgs/dataportal/database
     url_download: https://unstats.un.org/sdgapi
-    date_accessed: '2023-08-16'
-    date_published: '2023-08-16'
+    date_accessed: "2023-08-16"
+    date_published: "2023-08-16"
     license:
       url: https://www.un.org/en/about-us/terms-of-use
 
 dataset:
-  update_period_days: TBD - Number of days between OWID updates
+  update_period_days: 365
 
 tables:
   _6_2_1__sh_san_safe__all_areas:
@@ -32,22 +32,18 @@ tables:
         origins:
           - *un_origin
         title: 6.2.1 - Proportion of population using safely managed sanitation services, by urban/rural (%) - SH_SAN_SAFE - All areas
-        unit: '%'
-        short_unit: '%'
-        description_short: Safely managed sanitation is improved facilities which are not shared with other households and where excreta are safely disposed in situ or transported and treated off-site.
+        unit: "%"
+        short_unit: "%"
+        description_short: Proportion of population using safely managed sanitation services
         description_key:
-          - TBD - List of key pieces of information about the indicator.
+          - Safely managed sanitation is improved facilities which are not shared with other households and where excreta are safely disposed in situ or transported and treated off-site.
+          - "Further information available at: https://unstats.un.org/sdgs/metadata/files/Metadata-06-02-01a.pdf and https://unstats.un.org/sdgs/metadata/files/Metadata-06-02-01b.pdf"
         description_from_producer: TBD - Indicator's description given by the producer
         description_processing: TBD - Indicator's processing description
-        description: >-
-          Proportion of population using safely managed sanitation services, by urban/rural (%)
-
-
-          Further information available at: https://unstats.un.org/sdgs/metadata/files/Metadata-06-02-01a.pdf and https://unstats.un.org/sdgs/metadata/files/Metadata-06-02-01b.pdf
         presentation:
-          title_public: TBD - Indicator title to be shown in data pages, that overrides the indicator's title.
-          title_variant: TBD - Indicator's title variant
-          attribution_short: TBD - Indicator's attribution (shorter version)
+          title_public: Share of the population using safely managed sanitation facilities
+          title_variant: All areas
+          attribution_short: WHO/UNICEF JMP
           faqs:
             - fragment_id: TBD - Question identifier from FAQ GDoc
               gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
@@ -59,7 +55,7 @@ tables:
             hasMapTab: true
             tab: map
             yAxis:
-              max: 0
+              max: 100
               min: 0
             hideAnnotationFieldsInTitle:
               time: true
@@ -88,10 +84,14 @@ tables:
                   - 100
                 customNumericMinValue: 0
             selectedEntityNames:
-              - Uganda
-              - Hong Kong
-              - Armenia
-              - Switzerland
+              - Northern Africa (UN)
+              - Sub-Saharan Africa (UN)
+              - Central and Southern Asia (UN)
+              - Latin America and the Caribbean (UN)
+              - World
+              - Oceania (UN)
+              - Europe and Northern America (UN)
+              - Eastern and South-Eastern Asia (UN)
             $schema: https://files.ourworldindata.org/schemas/grapher-schema.003.json
   _6_1_1__sh_h2o_safe__all_areas:
     variables:
@@ -100,8 +100,8 @@ tables:
         origins:
           - *un_origin
         title: 6.1.1 - Proportion of population using safely managed drinking water services, by urban/rural (%) - SH_H2O_SAFE - All areas
-        unit: '%'
-        short_unit: '%'
+        unit: "%"
+        short_unit: "%"
         description_short: A safely managed drinking water service is defined as one located on premises, available when needed and free from contamination.
         description_key:
           - TBD - List of key pieces of information about the indicator.
