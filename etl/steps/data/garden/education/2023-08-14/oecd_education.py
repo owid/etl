@@ -44,7 +44,7 @@ def run(dest_dir: str) -> None:
     # Extract literacy and formal education indicators from World Bank Education Dataset post-2005
     tb_above_2005 = extract_related_world_bank_data(tb_wb)
 
-    # Fileter the dataset for years below 2010 (World Bank dataset starts in 2010)
+    # Filter the dataset for years below 2010 (World Bank dataset starts in 2010)
     tb = tb[tb["year"] < 2010].reset_index(drop=True)
 
     # Concat data with World Bank literacy and education data
@@ -101,7 +101,7 @@ def extract_related_world_bank_data(tb_wb):
 
     tb_wb = tb_wb.rename(columns=dictionary_to_rename_and_combine)
 
-    # filter the DataFrame for years above 2005 (Wittiengstein projection starts in 2010)
+    # Filter the table for years above 2005 (Wittiengstein projection starts in 2010)
     tb_above_2005 = tb_wb[tb_wb["year"] > 2005].reset_index(drop=True)
     tb_above_2005["population_with_basic_education"] = 100 - tb_above_2005["no_formal_education"]
 
