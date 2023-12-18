@@ -55,11 +55,16 @@ def run(dest_dir: str) -> None:
     for column in tb.columns:
         subject = ""
         if "math" in column:
-            subject = "math"
+            subject = "mathematics"
+            description_short = "Assessed through the PISA mathematics scale, which measures how well someone can use math to solve everyday problems and understand the role of math in the real world."
+
         elif "reading" in column:
             subject = "reading"
+            description_short = "Assessed through the PISA reading scale, which measures how well someone can understand and use written information to learn new things and be a part of society."
+
         elif "science" in column:
             subject = "science"
+            description_short = "Assessed through the PISA science scale, which assesses how comfortable and knowledgeable someone is with science topics, focusing on their ability to discuss and think about scientific issues in everyday life."
 
         sex = ""
         if "all" in column:
@@ -71,20 +76,13 @@ def run(dest_dir: str) -> None:
 
         tb[column].metadata.display = {}
         tb[column].metadata.display["numDecimalPlaces"] = 0
-        tb[column].metadata.description_short = (
-            f"Assessed through the PISA {subject} scale, which is based on an OECD country mean of 500 points "
-            "and a standard deviation of 100 points."
-        )
+        tb[column].metadata.description_short = description_short
         if "bound" not in column:
             # Regular column metadata
             tb[column].metadata.unit = "score"
-            tb[column].metadata.description_from_producer = (
-                f"Average score of 15-year-old {sex} on the PISA {subject} scale. "
-                f"The metric for the overall {subject} scale is based on a mean for OECD countries "
-                "of 500 points and a standard deviation of 100 points. Data reflects country performance "
-                "in the stated year according to PISA reports, but may not be comparable across years or countries. "
-                "Consult the PISA website for more detailed information: http://www.oecd.org/pisa/"
-            )
+            tb[
+                column
+            ].metadata.description_from_producer = f"Average score of 15-year-old {sex} on the PISA {subject} scale.Initially, the average PISA score across subjects and all OECD countries was at 500 with a standard deviation of 100, so that most students scored between 400 and 600. Scores in later cycles were calibrated to remain comparable to this baseline."
             tb[column].metadata.title = f"Average performance of 15-year-old {sex} on the {subject} scale"
             tb[column].metadata.display["name"] = f"Mean {subject} score"
             tb[column].metadata.processing_level = "minor"
@@ -93,13 +91,9 @@ def run(dest_dir: str) -> None:
             # Bound column metadata
             bound_type = "upper" if "upper" in column else "lower"
             tb[column].metadata.unit = "score"
-            tb[column].metadata.description_from_producer = (
-                f"This represents the {bound_type} bound of the average {subject} score for 15-year-old {sex} on the PISA scale. "
-                f"The metric for the overall {subject} scale is based on a mean for OECD countries "
-                "of 500 points and a standard deviation of 100 points. Data reflects country performance "
-                "in the stated year according to PISA reports, but may not be comparable across years or countries. "
-                "Consult the PISA website for more detailed information: http://www.oecd.org/pisa/"
-            )
+            tb[
+                column
+            ].metadata.description_from_producer = f"Represents the {bound_type} bound of the average {subject} score for 15-year-old {sex} on the PISA scale. Initially, the average PISA score across subjects and all OECD countries was at 500 with a standard deviation of 100, so that most students scored between 400 and 600. Scores in later cycles were calibrated to remain comparable to this baseline."
             tb[
                 column
             ].metadata.title = (
