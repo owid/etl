@@ -119,15 +119,6 @@ with st.sidebar:
 form_widget = st.empty()
 with form_widget.form("grapher"):
     # Namespace
-    # namespace = APP_STATE.st_widget(
-    #     st_widget=st.text_input,
-    #     label="Namespace",
-    #     help="Institution or topic name",
-    #     placeholder="Example: 'emdat', 'health'",
-    #     key="namespace",
-    #     value=dummy_values["namespace"] if APP_STATE.args.dummy_data else None,
-    # )
-    # Namespace
     namespace_field = [st.empty(), st.container()]
     # Grapher version
     version_grapher = APP_STATE.st_widget(
@@ -196,7 +187,7 @@ utils.render_responsive_field_in_form(
     custom_label="Custom namespace...",
     help_text="Institution or topic name",
     app_state=APP_STATE,
-    default_value=dummy_values["namespace"] if APP_STATE.args.dummy_data else OPTIONS_NAMESPACES[0],
+    default_value=dummy_values["namespace"] if APP_STATE.args.dummy_data else "Custom namespace...",
 )
 
 
