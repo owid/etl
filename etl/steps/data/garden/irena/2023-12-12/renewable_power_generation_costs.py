@@ -1,7 +1,5 @@
 """Load a meadow dataset and create a garden dataset."""
 
-from owid.catalog import Table
-
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
 
@@ -31,5 +29,7 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = create_dataset(dest_dir, tables=[tb, tb_solar_pv], default_metadata=ds_meadow.metadata, check_variables_metadata=True)
+    ds_garden = create_dataset(
+        dest_dir, tables=[tb, tb_solar_pv], default_metadata=ds_meadow.metadata, check_variables_metadata=True
+    )
     ds_garden.save()
