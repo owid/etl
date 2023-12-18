@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from etl.tempcompare import df_equals
+from etl.tempcompare import df_equals, series_equals
 
 
 def test_df_equals():
@@ -66,3 +66,13 @@ def test_df_equals_exceptions():
     df2 = pd.DataFrame({"col1": [1, 2, 3]}, index=[4, 5, 6])
     with pytest.raises(AssertionError):
         df_equals(df1, df2)
+
+
+def test_series_equals_nans():
+    s1 = pd.Series([1])
+    s2 = pd.Series([pd.NA])
+    assert list(series_equals(s1, s2)) == [False]
+
+    s1 = pd.Series([1, np.nan])
+    s2 = pd.Series([1, pd.NA])
+    assert series_equals(s1, s2).all()

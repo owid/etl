@@ -1,0 +1,542 @@
+definitions:
+  common:
+    processing_level: minor
+    presentation:
+      topic_tags:
+        - Technological Change
+
+dataset:
+  update_period_days: 0
+
+tables:
+  farmer_lafond_2016:
+    title: Cost of different technologies
+    variables:
+      acrylic_fiber:
+        title: Cost of acrylic fiber
+        description_short: Measured in 1966 USD/lbs.
+        unit: 1966 USD/lbs
+        display:
+          name: Acrylic fiber
+        presentation:
+          title_public: Cost of acrylic fiber
+      acrylonitrile:
+        title: Cost of acrylonitrile
+        description_short: Measured in 1966 USD/lbs.
+        unit: 1966 USD/lbs
+        display:
+          name: Acrylonitrile
+        presentation:
+          title_public: Cost of acrylonitrile
+      aluminum:
+        title: Cost of aluminum
+        description_short: Measured in 1966 USD/lbs.
+        unit: 1966 USD/lbs
+        display:
+          name: Aluminum
+        presentation:
+          title_public: Cost of aluminum
+      ammonia:
+        title: Cost of ammonia
+        description_short: Measured in 1966 USD/lbs.
+        unit: 1966 USD/lbs
+        display:
+          name: Ammonia
+        presentation:
+          title_public: Cost of ammonia
+      aniline:
+        title: Cost of aniline
+        description_short: Measured in 1966 USD/lbs.
+        unit: 1966 USD/lbs
+        display:
+          name: Aniline
+        presentation:
+          title_public: Cost of aniline
+      automotive_us:
+        title: Cost of automotive (US)
+        description_short: Measured in Gallons/Mile.
+        unit: gallons/mile
+        display:
+          name: Automotive (US)
+        presentation:
+          title_public: Cost of automotive (US)
+      beer_japan:
+        title: Cost of beer (Japan)
+        description_short: Measured in 1955 Yen.
+        unit: 1955 Yen
+        display:
+          name: Beer (Japan)
+        presentation:
+          title_public: Cost of beer (Japan)
+      benzene:
+        title: Cost of benzene
+        description_short: Measured in 1958 USD.
+        unit: 1958 USD
+        display:
+          name: Benzene
+        presentation:
+          title_public: Cost of benzene
+      bisphenol_a:
+        title: Cost of bisphenol A
+        description_short: Measured in 1966 USD/lbs.
+        unit: 1966 USD/lbs
+        display:
+          name: Bisphenol A
+        presentation:
+          title_public: Cost of bisphenol A
+      caprolactam:
+        title: Cost of caprolactam
+        description_short: Measured in 1966 USD/lbs.
+        unit: 1966 USD/lbs
+        display:
+          name: Caprolactam
+        presentation:
+          title_public: Cost of caprolactam
+      carbon_black:
+        title: Cost of carbon black
+        description_short: Measured in 1966 USD/lbs.
+        unit: 1966 USD/lbs
+        display:
+          name: Carbon black
+        presentation:
+          title_public: Cost of carbon black
+      carbon_disulfide:
+        title: Cost of carbon disulfide
+        description_short: Measured in 1966 USD/lbs.
+        unit: 1966 USD/lbs
+        display:
+          name: Carbon disulfide
+        presentation:
+          title_public: Cost of carbon disulfide
+      ccgt_power:
+        title: Cost of CCGT power
+        description_short: Measured in 1990 USD/kW.
+        unit: 1990 USD/kW
+        display:
+          name: CCGT power
+        presentation:
+          title_public: Cost of CCGT power
+      concentrating_solar:
+        title: Cost of concentrating solar
+        description_short: Measured in US cents/kWh.
+        unit: US cents/kWh
+        display:
+          name: Concentrating solar
+        presentation:
+          title_public: Cost of concentrating solar
+      corn_us:
+        title: Cost of corn (US)
+        description_short: Measured in acres/1000 bushels.
+        unit: acres/1000 bushels
+        display:
+          name: Corn (US)
+        presentation:
+          title_public: Cost of corn (US)
+      crude_oil:
+        title: Cost of crude oil
+        description_short: Measured in 1958 USD.
+        unit: 1958 USD
+        display:
+          name: Crude oil
+        presentation:
+          title_public: Cost of crude oil
+      cyclohexane:
+        title: Cost of cyclohexane
+        description_short: Measured in 1966 USD/lbs.
+        unit: 1966 USD/lbs
+        display:
+          name: Cyclohexane
+        presentation:
+          title_public: Cost of cyclohexane
+      dna_sequencing:
+        title: Cost of DNA sequencing
+        description_short: Measured in 2013 USD/human-size genome.
+        unit: 2013 USD/human-size genome
+        display:
+          name: DNA sequencing
+        presentation:
+          title_public: Cost of DNA sequencing
+      dram:
+        title: Cost of DRAM
+        description_short: Measured in 2005 USD/thousand bits.
+        unit: 2005 USD/thousand bits
+        display:
+          name: DRAM
+        presentation:
+          title_public: Cost of DRAM
+      electric_range:
+        title: Cost of electric range
+        description_short: Measured in 1958 USD.
+        unit: 1958 USD
+        display:
+          name: Electric range
+        presentation:
+          title_public: Cost of electric range
+      ethanol_brazil:
+        title: Cost of ethanol (Brazil)
+        description_short: Measured in 2002 USD/GJ.
+        unit: 2002 USD/GJ
+        display:
+          name: Ethanol (Brazil)
+        presentation:
+          title_public: Cost of ethanol (Brazil)
+      ethanolamine:
+        title: Cost of ethanolamine
+        description_short: Measured in 1966 USD/lbs.
+        unit: 1966 USD/lbs
+        display:
+          name: Ethanolamine
+        presentation:
+          title_public: Cost of ethanolamine
+      ethylene:
+        title: Cost of ethylene
+        description_short: Measured in 1966 USD/lbs.
+        unit: 1966 USD/lbs
+        display:
+          name: Ethylene
+        presentation:
+          title_public: Cost of ethylene
+      formaldehyde:
+        title: Cost of formaldehyde
+        description_short: Measured in 1966 USD/lbs.
+        unit: 1966 USD/lbs
+        display:
+          name: Formaldehyde
+        presentation:
+          title_public: Cost of formaldehyde
+      free_standing_gas_range:
+        title: Cost of free standing gas range
+        description_short: Measured in 1958 USD.
+        unit: 1958 USD
+        display:
+          name: Free standing gas range
+        presentation:
+          title_public: Cost of free standing gas range
+      geothermal_electricity:
+        title: Cost of geothermal electricity
+        description_short: Measured in 2005 US cents/kWh.
+        unit: 2005 US cents/kWh
+        display:
+          name: Geothermal electricity
+        presentation:
+          title_public: Cost of geothermal electricity
+      hard_disk_drive:
+        title: Cost of hard disk drive
+        description_short: Measured in 2005 USD/megabyte.
+        unit: 2005 USD/megabyte
+        display:
+          name: Hard disk drive
+        presentation:
+          title_public: Cost of hard disk drive
+      hydrofluoric_acid:
+        title: Cost of hydrofluoric acid
+        description_short: Measured in 1966 USD/lbs.
+        unit: 1966 USD/lbs
+        display:
+          name: Hydrofluoric acid
+        presentation:
+          title_public: Cost of hydrofluoric acid
+      isopropyl_alcohol:
+        title: Cost of isopropyl alcohol
+        description_short: Measured in 1966 USD/lbs.
+        unit: 1966 USD/lbs
+        display:
+          name: Isopropyl alcohol
+        presentation:
+          title_public: Cost of isopropyl alcohol
+      laser_diode:
+        title: Cost of laser diode
+        description_short: Measured in Yen.
+        unit: Yen
+        display:
+          name: Laser diode
+        presentation:
+          title_public: Cost of laser diode
+      low_density_polyethylene:
+        title: Cost of low-density polyethylene
+        description_short: Measured in 1958 USD/pound.
+        unit: 1958 USD/pound
+        display:
+          name: Low-density polyethylene
+        presentation:
+          title_public: Cost of low-density polyethylene
+      magnesium:
+        title: Cost of magnesium
+        description_short: Measured in 1966 USD/lbs.
+        unit: 1966 USD/lbs
+        display:
+          name: Magnesium
+        presentation:
+          title_public: Cost of magnesium
+      maleic_anhydride:
+        title: Cost of maleic anhydride
+        description_short: Measured in 1966 USD/lbs.
+        unit: 1966 USD/lbs
+        display:
+          name: Maleic anhydride
+        presentation:
+          title_public: Cost of maleic anhydride
+      methanol:
+        title: Cost of methanol
+        description_short: Measured in 1966 USD/lbs.
+        unit: 1966 USD/lbs
+        display:
+          name: Methanol
+        presentation:
+          title_public: Cost of methanol
+      milk_us:
+        title: Cost of milk (US)
+        description_short: Measured in Heads/Mil.lbs.
+        unit: Heads/Mil.lbs
+        display:
+          name: Milk (US)
+        presentation:
+          title_public: Cost of milk (US)
+      monochrome_television:
+        title: Cost of monochrome television
+        description_short: Measured in 1958 USD per unit.
+        unit: 1958 USD per unit
+        display:
+          name: Monochrome television
+        presentation:
+          title_public: Cost of monochrome television
+      motor_gasoline:
+        title: Cost of motor gasoline
+        description_short: Measured in 1958 USD/Gallon.
+        unit: 1958 USD/Gallon
+        display:
+          name: Motor gasoline
+        presentation:
+          title_public: Cost of motor gasoline
+      neoprene_rubber:
+        title: Cost of neoprene rubber
+        description_short: Measured in 1966 USD/lbs.
+        unit: 1966 USD/lbs
+        display:
+          name: Neoprene rubber
+        presentation:
+          title_public: Cost of neoprene rubber
+      nuclear_electricity:
+        title: Cost of nuclear electricity
+        description_short: Measured in 2004 USD/Watt.
+        unit: 2004 USD/Watt
+        display:
+          name: Nuclear electricity
+        presentation:
+          title_public: Cost of nuclear electricity
+      onshore_gas_pipeline:
+        title: Cost of onshore gas pipeline
+        description_short: Measured in dollar/mile-inch.
+        unit: dollar/mile-inch
+        display:
+          name: Onshore gas pipeline
+        presentation:
+          title_public: Cost of onshore gas pipeline
+      paraxylene:
+        title: Cost of paraxylene
+        description_short: Measured in 1958 USD.
+        unit: 1958 USD
+        display:
+          name: Paraxylene
+        presentation:
+          title_public: Cost of paraxylene
+      pentaerythritol:
+        title: Cost of pentaerythritol
+        description_short: Measured in 1966 USD/lbs.
+        unit: 1966 USD/lbs
+        display:
+          name: Pentaerythritol
+        presentation:
+          title_public: Cost of pentaerythritol
+      phenol:
+        title: Cost of phenol
+        description_short: Measured in 1966 USD/lbs.
+        unit: 1966 USD/lbs
+        display:
+          name: Phenol
+        presentation:
+          title_public: Cost of phenol
+      photovoltaics:
+        title: Cost of photovoltaics
+        description_short: Measured in 2013 USD/Wp.
+        unit: 2013 USD/Wp
+        display:
+          name: Photovoltaics
+        presentation:
+          title_public: Cost of photovoltaics
+      phthalic_anhydride:
+        title: Cost of phthalic anhydride
+        description_short: Measured in 1966 USD/lbs.
+        unit: 1966 USD/lbs
+        display:
+          name: Phthalic anhydride
+        presentation:
+          title_public: Cost of phthalic anhydride
+      polyester_fiber:
+        title: Cost of polyester fiber
+        description_short: Measured in 1966 USD/lbs.
+        unit: 1966 USD/lbs
+        display:
+          name: Polyester fiber
+        presentation:
+          title_public: Cost of polyester fiber
+      polyethylene_hd:
+        title: Cost of polyethylene HD
+        description_short: Measured in 1966 USD/lbs.
+        unit: 1966 USD/lbs
+        display:
+          name: Polyethylene HD
+        presentation:
+          title_public: Cost of polyethylene HD
+      polyethylene_ld:
+        title: Cost of polyethylene LD
+        description_short: Measured in 1966 USD/lbs.
+        unit: 1966 USD/lbs
+        display:
+          name: Polyethylene LD
+        presentation:
+          title_public: Cost of polyethylene LD
+      polypropylene:
+        title: Cost of polypropylene
+        description_short: Measured in 1958 USD/pound.
+        unit: 1958 USD/pound
+        display:
+          name: Polypropylene
+        presentation:
+          title_public: Cost of polypropylene
+      polystyrene:
+        title: Cost of polystyrene
+        description_short: Measured in 1958 USD/pound.
+        unit: 1958 USD/pound
+        display:
+          name: Polystyrene
+        presentation:
+          title_public: Cost of polystyrene
+      polyvinylchloride:
+        title: Cost of polyvinylchloride
+        description_short: Measured in 1958 USD/pound.
+        unit: 1958 USD/pound
+        display:
+          name: Polyvinylchloride
+        presentation:
+          title_public: Cost of polyvinylchloride
+      primary_aluminum:
+        title: Cost of primary aluminum
+        description_short: Measured in 1958 USD/pound.
+        unit: 1958 USD/pound
+        display:
+          name: Primary aluminum
+        presentation:
+          title_public: Cost of primary aluminum
+      primary_magnesium:
+        title: Cost of primary magnesium
+        description_short: Measured in 1958 USD/pound.
+        unit: 1958 USD/pound
+        display:
+          name: Primary magnesium
+        presentation:
+          title_public: Cost of primary magnesium
+      refined_cane_sugar:
+        title: Cost of refined cane sugar
+        description_short: Measured in 1958 USD.
+        unit: 1958 USD
+        display:
+          name: Refined cane sugar
+        presentation:
+          title_public: Cost of refined cane sugar
+      sodium:
+        title: Cost of sodium
+        description_short: Measured in 1966 USD/lbs.
+        unit: 1966 USD/lbs
+        display:
+          name: Sodium
+        presentation:
+          title_public: Cost of sodium
+      sodium_chlorate:
+        title: Cost of sodium chlorate
+        description_short: Measured in 1966 USD/lbs.
+        unit: 1966 USD/lbs
+        display:
+          name: Sodium chlorate
+        presentation:
+          title_public: Cost of sodium chlorate
+      sodium_hydrosulfite:
+        title: Cost of sodium hydrosulfite
+        description_short: Measured in 1966 USD/lbs.
+        unit: 1966 USD/lbs
+        display:
+          name: Sodium hydrosulfite
+        presentation:
+          title_public: Cost of sodium hydrosulfite
+      sorbitol:
+        title: Cost of sorbitol
+        description_short: Measured in 1966 USD/lbs.
+        unit: 1966 USD/lbs
+        display:
+          name: Sorbitol
+        presentation:
+          title_public: Cost of sorbitol
+      styrene:
+        title: Cost of styrene
+        description_short: Measured in 1966 USD/lbs.
+        unit: 1966 USD/lbs
+        display:
+          name: Styrene
+        presentation:
+          title_public: Cost of styrene
+      titanium_sponge:
+        title: Cost of titanium sponge
+        description_short: Measured in 1958 USD/lbs.
+        unit: 1958 USD/lbs
+        display:
+          name: Titanium sponge
+        presentation:
+          title_public: Cost of titanium sponge
+      titanium_dioxide:
+        title: Cost of titanium dioxide
+        description_short: Measured in 1966 USD/lbs.
+        unit: 1966 USD/lbs
+        display:
+          name: Titanium dioxide
+        presentation:
+          title_public: Cost of titanium dioxide
+      transistor:
+        title: Cost of transistor
+        description_short: Measured in 2005 USD.
+        unit: 2005 USD
+        display:
+          name: Transistor
+        presentation:
+          title_public: Cost of transistor
+      urea:
+        title: Cost of urea
+        description_short: Measured in 1966 USD/lbs.
+        unit: 1966 USD/lbs
+        display:
+          name: Urea
+        presentation:
+          title_public: Cost of urea
+      vinyl_acetate:
+        title: Cost of vinyl acetate
+        description_short: Measured in 1966 USD/lbs.
+        unit: 1966 USD/lbs
+        display:
+          name: Vinyl acetate
+        presentation:
+          title_public: Cost of vinyl acetate
+      vinyl_chloride:
+        title: Cost of vinyl chloride
+        description_short: Measured in 1966 USD/lbs.
+        unit: 1966 USD/lbs
+        display:
+          name: Vinyl chloride
+        presentation:
+          title_public: Cost of vinyl chloride
+      wind_turbine_denmark:
+        title: Cost of wind turbine (Denmark)
+        description_short: Measured in DKK/kW.
+        unit: DKK/kW
+        display:
+          name: Wind turbine (Denmark)
+        presentation:
+          title_public: Cost of wind turbine (Denmark)

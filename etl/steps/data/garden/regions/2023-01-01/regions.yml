@@ -93,6 +93,7 @@
   aliases:
     - "\u00c3\u0081EEland Islands"
     - "Åland Islands"
+    - "Åland"
 
 - code: "ALB"
   name: "Albania"
@@ -1366,6 +1367,8 @@
 
 - code: "SSD"
   name: "South Sudan"
+  aliases:
+    - "S. Sudan"
 
 - code: "ESP"
   name: "Spain"

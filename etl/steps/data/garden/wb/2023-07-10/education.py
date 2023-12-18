@@ -1,10 +1,8 @@
 """Load a meadow dataset and create a garden dataset."""
 
-from typing import cast
-
 import owid.catalog.processing as pr
 import pandas as pd
-from owid.catalog import Dataset, Table
+from owid.catalog import Table
 from owid.catalog.utils import underscore
 from tqdm import tqdm
 
@@ -24,13 +22,17 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
 
-    # Load meadow dataset.
-    ds_meadow = cast(Dataset, paths.load_dependency("education"))
-
-    # Read table from meadow dataset.
+    # Load meadow datasets.
+    ds_meadow = paths.load_dataset("education")
     tb = ds_meadow["education"]
-    # Save metadata for later use
-    metadata = tb.metadata
+
+    # Load historical literacy
+    ds_literacy = paths.load_dataset("literacy_rates")
+    tb_literacy = ds_literacy["literacy_rates"]
+
+    # Load historical literacy expenditure data
+    ds_expenditure = paths.load_dataset("public_expenditure")
+    tb_expenditure = ds_expenditure["public_expenditure"]
 
     #
     # Process data.
@@ -73,21 +75,18 @@ def run(dest_dir: str) -> None:
     tb["normalized_hci"] = tb["HD.HCI.HLOS"] / max_value
 
     # Combine recent literacy estimates and expenditure data with historical estimates from a migrated dataset
-    tb, combined_literacy_description, combined_expenditure_description = combine_historical_literacy_expenditure(tb)
+    tb = combine_historical_literacy_expenditure(tb, tb_literacy, tb_expenditure)
 
-    # Compare two columnst that seem to have identical indicies (if values are the same then remove)
-    if tb["SE.XPD.TOTL.GD.ZS"].equals(tb["SE.XPD.TOTL.GD.ZS."]):
-        # If they are the same, drop one of the columns
-        tb.drop("SE.XPD.TOTL.GD.ZS.", axis=1, inplace=True)
-    else:
-        print("The columns are not the same.")
+    # Assert that the two columns are identical
+    assert tb["SE.XPD.TOTL.GD.ZS"].equals(tb["SE.XPD.TOTL.GD.ZS."]), "The columns are not the same."
+
+    # If the assertion passes (the columns are identical), drop one of the columns
+    tb.drop(columns="SE.XPD.TOTL.GD.ZS.", inplace=True)
+
     # Set an appropriate index and sort.
     tb = tb.underscore().set_index(["country", "year"], verify_integrity=True).sort_index().sort_index(axis=1)
-
-    # Add the metadata back to the table
-    tb.metadata = metadata
     # Add metadata by finding the descriptions and sources using the indicator codes.
-    tb = add_metadata(tb, metadata_tb, combined_literacy_description, combined_expenditure_description)
+    tb = add_metadata(tb, metadata_tb)
     #
     # Save outputs.
     #
@@ -100,22 +99,34 @@ def run(dest_dir: str) -> None:
     ds_garden.save()
 
 
-def combine_historical_literacy_expenditure(tb):
+def combine_historical_literacy_expenditure(tb, tb_literacy, tb_expenditure):
     """
-    Combines historical and recent literacy and expenditure data into a single DataFrame.
+    Merge historical and recent literacy and expenditure data into a single Table.
 
-    This function loads historical literacy and expenditure data, merges them with the recent data in
-    the input DataFrame 'tb' based on 'year' and 'country' columns. It then creates two new columns:
-    'combined_literacy' and 'combined_expenditure', which hold the respective values, preferring recent
-    data when available.
+    This function integrates data from two separate Tables containing historical literacy rates and
+    public expenditure on education with a primary Table. It merges these datasets based on common
+    'year' and 'country' columns. The resulting Table includes two new columns, 'combined_literacy'
+    and 'combined_expenditure', which contain the respective literacy and expenditure data. The function
+    prioritizes recent data over historical data when both are available.
+
+    Parameters:
+    - tb (Table): The primary Table containing recent literacy and expenditure data.
+    - tb_literacy (Table): A Table containing historical literacy data with columns
+      ['year', 'country', 'literacy_rates__world_bank__cia_world_factbook__and_other_sources'].
+    - tb_expenditure (Table): A Table containing historical expenditure data with columns
+      ['year', 'country', 'public_expenditure_on_education__tanzi__and__schuktnecht__2000'].
+
+    The function handles missing data by favoring recent World Bank data; if this is not available,
+    it falls back to historical data, which could also be missing (NaN).
+
+    Returns:
+    Table: The merged Table with new columns 'combined_literacy' and 'combined_expenditure',
+    and metadata about data origins added to these columns.
+
+    This function assumes that the input Tables share a common structure in terms of the 'year' and
+    'country' columns, and that these columns are used as keys for merging the datasets.
+    The function adds metadata to the new columns, indicating the origin of the data.
     """
-    # Load historical literacy
-    ds_literacy = cast(Dataset, paths.load_dependency("literacy_rates"))
-    tb_literacy = ds_literacy["literacy_rates"]
-
-    # Load historical literacy expenditure data
-    ds_expenditure = cast(Dataset, paths.load_dependency("public_expenditure"))
-    tb_expenditure = ds_expenditure["public_expenditure"]
 
     historic_literacy = (
         tb_literacy[["literacy_rates__world_bank__cia_world_factbook__and_other_sources"]].reset_index().copy()
@@ -136,36 +147,21 @@ def combine_historical_literacy_expenditure(tb):
         on=["year", "country"],
         how="outer",
         suffixes=("_historic_lit", "_recent_lit"),
-    ).copy_metadata(from_table=recent_literacy)
+    )
 
     # Merge the historic expenditure with newly created literacy table based on 'year' and 'country'
-    combined_df = pr.merge(combined_df, historic_expenditure, on=["year", "country"], how="outer").copy_metadata(
-        from_table=combined_df
-    )
+    combined_df = pr.merge(combined_df, historic_expenditure, on=["year", "country"], how="outer")
 
     # Merge the recent expenditure with newly created literacy and historic expenditure table based on 'year' and 'country'
     combined_df = pr.merge(
         combined_df, recent_expenditure, on=["year", "country"], how="outer", suffixes=("_historic_exp", "_recent_exp")
-    ).copy_metadata(from_table=combined_df)
-
-    # Define the functions to decide which value to keep (prefer more recent World Bank data; if NaN pick the historic ones (which could also be NaN))
-    def decide_literacy(row):
-        return (
-            row["SE.ADT.LITR.ZS"]
-            if pd.notna(row["SE.ADT.LITR.ZS"])
-            else row["literacy_rates__world_bank__cia_world_factbook__and_other_sources"]
-        )
-
-    def decide_expenditure(row):
-        return (
-            row["SE.XPD.TOTL.GD.ZS"]
-            if pd.notna(row["SE.XPD.TOTL.GD.ZS"])
-            else row["public_expenditure_on_education__tanzi__and__schuktnecht__2000"]
-        )
-
-    # Apply the functions to prioritise more recent datat and create new columns
-    combined_df["combined_literacy"] = combined_df.apply(decide_literacy, axis=1)
-    combined_df["combined_expenditure"] = combined_df.apply(decide_expenditure, axis=1)
+    )
+    combined_df["combined_literacy"] = combined_df["SE.ADT.LITR.ZS"].fillna(
+        combined_df["literacy_rates__world_bank__cia_world_factbook__and_other_sources"]
+    )
+    combined_df["combined_expenditure"] = combined_df["SE.XPD.TOTL.GD.ZS"].fillna(
+        combined_df["public_expenditure_on_education__tanzi__and__schuktnecht__2000"]
+    )
 
     # Now, merge the relevant columns in newly created table that includes both historic and more recent data back into the original tb based on 'year' and 'country'
     tb = pr.merge(
@@ -173,18 +169,12 @@ def combine_historical_literacy_expenditure(tb):
         combined_df[["year", "country", "combined_literacy", "combined_expenditure"]],
         on=["year", "country"],
         how="outer",
-    ).copy_metadata(from_table=tb)
+    )
 
-    # Keep descriptions from the original historic datasets
-    combined_literacy_description = ds_literacy.metadata.sources[0].description
-    combined_expenditure_description = ds_expenditure.metadata.sources[0].description
-
-    return tb, combined_literacy_description, combined_expenditure_description
+    return tb
 
 
-def add_metadata(
-    tb: Table, metadata_tb: Table, combined_literacy_description, combined_expenditure_description
-) -> None:
+def add_metadata(tb: Table, metadata_tb: Table) -> None:
     """
     Adds metadata by fetching details from the table with descriptions and sources originally retrieved in snapshot using the World Bank API.
 
@@ -201,9 +191,8 @@ def add_metadata(
         "combined_literacy",
         "combined_expenditure",
     ]
-    # Loop through the DataFrame columns
+    # Loop through the Table columns
     for column in tqdm(tb.columns, desc="Processing metadata for indicators"):
-        origin = metadata_tb[metadata_tb.columns[0]].metadata.origins[0]
         if column not in custom_cols:
             # Extract the title from the default metadata to find the corresponding World Bank indicator
             indicator_to_find = tb[column].metadata.title
@@ -276,7 +265,6 @@ def add_metadata(
             tb[new_column_name].metadata.description_from_producer = description_string
             tb[new_column_name].metadata.title = name
             tb[new_column_name].metadata.processing = "minor"
-            tb[new_column_name].metadata.origins = [origin]
 
             # Conver Witthgenstein projections to %
             if "wittgenstein_projection__percentage" in new_column_name:
@@ -337,36 +325,34 @@ def add_metadata(
                 update_metadata(tb, new_column_name, 0, " ", " ")
 
         elif column == "normalized_hci":
-            tb[column].metadata.origins = [origin]
             tb[column].metadata.title = "Normalised harmonized learning score"
             tb[column].metadata.display = {}
             tb[column].metadata.display["numDecimalPlaces"] = 1
             tb[column].metadata.unit = "score"
             tb[column].metadata.short_unit = ""
+
         elif column == "combined_literacy":
-            tb[column].metadata.origins = [origin]
             tb[column].metadata.title = "Historical and more recent literacy estimates"
             tb[column].metadata.description_from_producer = (
-                "**Historical literacy data:**\n\n"
-                + combined_literacy_description
-                + "\n\n"
-                + "**Recent estimates:**\n\n"
+                "**Recent estimates:**\n\n"
                 + "Percentage of the population between age 25 and age 64 who can, with understanding, read and write a short, simple statement on their everyday life. Generally, ‘literacy’ also encompasses ‘numeracy’, the ability to make simple arithmetic calculations. This indicator is calculated by dividing the number of literates aged 25-64 years by the corresponding age group population and multiplying the result by 100."
                 + "\n\n"
                 + "World Bank variable id: UIS.LR.AG25T64"
                 + "\n\n"
                 + "Original source: UNESCO Institute for Statistics"
+                + "\n\n"
+                "**Historical literacy data:**\n\n"
+                + """The historical estimates in this long-run cross-country dataset were derived from a blend of diverse sources, each contributing to different time periods. For data before 1800, the dataset relies on the work of Buringh and Van Zanden (2009), which offers insights into literacy through the lens of manuscript and book production in Europe from the sixth to the eighteenth centuries. For the years 1820 and 1870 (excluding the United States), it incorporates data from Broadberry and O'Rourke's "The Cambridge Economic History of Modern Europe." The United States data comes from the National Center for Education Statistics. Additionally, global estimates for the period 1820-2000 are drawn from van Zanden and colleagues’ "How Was Life?: Global Well-being since 1820," an OECD publication. For historical estimates specific to Latin America, the dataset uses the Oxford Latin American Economic History Database (OxLAD). Each source follows a consistent conceptual definition of literacy, although discrepancies among sources are acknowledged, necessitating cautious interpretation of year-to-year changes. The dataset also includes instances where specific sources were preferred, such as opting for OxLAD data over the World Bank for Paraguay in 1982 due to significant differences in literacy rate estimates."""
             )
             tb[column].metadata.display = {}
             tb[column].metadata.display["numDecimalPlaces"] = 2
             tb[column].metadata.unit = "%"
             tb[column].metadata.short_unit = "%"
         elif column == "combined_expenditure":
-            tb[column].metadata.origins = [origin]
             tb[column].metadata.title = "Historical and more recent expenditure estimates"
             tb[column].metadata.description_from_producer = (
                 "**Historical expenditure data:**\n\n"
-                + combined_expenditure_description
+                + "Historical data in this dataset is based on a wide array of sources, reflecting a comprehensive approach to data collection across different time periods and regions. However, the diverse nature of these sources leads to inconsistencies, as methodologies and data quality vary between sources. For instance, older sources like the League of Nations Statistical Yearbook or Mitchell's 1962 data may use different metrics or collection methods compared to more modern sources like the OECD Education reports or UN surveys. This variance in source material and methodology means that direct comparisons across different years or countries might be challenging, necessitating careful interpretation and cross-reference for accuracy. The dataset serves as a rich historical repository but also underscores the complexities and challenges inherent in compiling and harmonizing historical data from multiple, diverse sources."
                 + "\n\n"
                 + "**Recent estimates:**\n\n"
                 + "General government expenditure on education (current, capital, and transfers) is expressed as a percentage of GDP. It includes expenditure funded by transfers from international sources to government. General government usually refers to local, regional and central governments."

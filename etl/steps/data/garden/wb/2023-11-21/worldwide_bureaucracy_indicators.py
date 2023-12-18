@@ -84,6 +84,7 @@ def add_metadata_from_dict(tb: Table, indicator_dict: dict) -> Table:
     """
     Add metadata to the table from a dictionary.
     The dictionary comes from the previous function, extracted from indicator_code and indicator_name.
+    With the the title avalable, we can multiple shares by 100 to have them in percentages.
     """
 
     for col in indicator_dict:
@@ -94,6 +95,9 @@ def add_metadata_from_dict(tb: Table, indicator_dict: dict) -> Table:
         if "share" in meta_title.lower() or "percentage" in meta_title.lower():
             tb[col].metadata.unit = "%"
             tb[col].metadata.short_unit = "%"
+
+            # Multiply values by 100 to have them in percentages
+            tb[col] *= 100
 
         elif "number" in meta_title.lower():
             tb[col].metadata.unit = "employees"

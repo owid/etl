@@ -85,8 +85,10 @@ from owid.catalog import Dataset, Table
 from pandas.api.types import is_integer_dtype  # type: ignore
 from shared import (
     add_indicators_extra,
+    add_region_from_code,
     aggregate_conflict_types,
     expand_observations,
+    fill_gaps_with_zeroes,
     get_number_of_countries_in_conflict_by_region,
 )
 from structlog import get_logger
@@ -127,6 +129,7 @@ CTYPE_INTRA_INTL = f"{CTYPE_INTRA} (internationalized)"
 CTYPE_INTRA_NINTL = f"{CTYPE_INTRA} (non-internationalized)"
 CTYPE_INTER = "inter-state"
 CTYPE_NONSTATE = "non-state"
+CTYPE_SBASED = "state-based"
 
 
 def run(dest_dir: str) -> None:
@@ -144,6 +147,11 @@ def run(dest_dir: str) -> None:
     ds_cow_ssm = paths.load_dataset("cow_ssm")
     tb_regions = ds_cow_ssm["cow_ssm_regions"].reset_index()
     tb_codes = ds_cow_ssm["cow_ssm_countries"]
+    tb_system = ds_cow_ssm["cow_ssm_system"].reset_index()
+
+    # Read supplementary table (for locations)
+    ds_chupilkin = paths.load_dataset("chupilkin_koczan")
+    tb_chupilkin = ds_chupilkin["chupilkin_koczan"].reset_index()
 
     # Check that there are no overlapping warnums between tables
     log.info("war.cow: check overlapping warnum in tables")
@@ -153,14 +161,14 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
     # Format individual tables
-    tb_extra = make_table_extra(tb_extra)
-    tb_nonstate = make_table_nonstate(tb_nonstate)
-    tb_inter = make_table_inter(tb_inter)
-    tb_intra = make_table_intra(tb_intra)
+    tb_extra = make_table_extra(tb_extra)  # finishes 2007
+    tb_nonstate = make_table_nonstate(tb_nonstate)  # finishes 2005
+    tb_inter = make_table_inter(tb_inter)  # finishes 2003
+    tb_intra = make_table_intra(tb_intra)  # finishes 2014
 
     # Get country-level stuff
     paths.log.info("getting country-level indicators")
-    tb_country = estimate_metrics_country_level(
+    tb_participants = estimate_metrics_participants(
         tb_extra=tb_extra, tb_intra=tb_intra, tb_inter=tb_inter, tb_codes=tb_codes
     )
 
@@ -171,6 +179,11 @@ def run(dest_dir: str) -> None:
     tb_inter = aggregate_rows_by_periods_inter(tb_inter)
     log.info("war.cow.inter: split region composites")
     tb_inter = split_regions_composites(tb_inter)
+
+    # Locations data
+    ## Get conflict type into the chupilkin table
+    paths.log.info("estimate locations of conflicts")
+    tb_locations = estimate_metrics_locations(tb_chupilkin, tb_system, tb_participants)
 
     # Combine data
     tb = combine_tables(
@@ -189,7 +202,8 @@ def run(dest_dir: str) -> None:
     #
     tables = [
         tb,
-        tb_country,
+        tb_participants,
+        tb_locations,
     ]
     # Create a new garden dataset with the same metadata as the meadow dataset.
     ds_garden = create_dataset(
@@ -356,6 +370,23 @@ def combine_tables(tb_extra: Table, tb_nonstate: Table, tb_inter: Table, tb_intr
     assert (
         not tb["number_deaths_ongoing_conflicts"].isna().any()
     ), "Some NaNs found in `number_deaths_ongoing_conflicts`!"
+
+    # Fill gaps with zeroes
+    paths.log.info("fill gaps with zeroes")
+    tb = fill_gaps_with_zeroes(
+        tb,
+        columns=["region", "year", "conflict_type"],
+        cols_use_range=["year"],
+    )
+    # Keep correct year coverage by conflict type
+    tb = tb[
+        # EXTRA, NON-STATE, ALL (2007)
+        ((tb["conflict_type"].isin([CTYPE_EXTRA, CTYPE_NONSTATE, "all"])) & (tb["year"] <= 2007))
+        # INTER, STATE-BASED (2010)
+        | ((tb["conflict_type"].isin([CTYPE_INTER, CTYPE_SBASED])) & (tb["year"] <= 2010))
+        # INTRA (2014)
+        | ((tb["conflict_type"].isin([CTYPE_INTRA, CTYPE_INTRA_INTL, CTYPE_INTRA_NINTL])) & (tb["year"] <= 2014))
+    ]
 
     # Set index
     log.info("war.cow: set index")
@@ -998,7 +1029,7 @@ def replace_missing_data_with_zeros(tb: Table) -> Table:
 ########################################################################
 ## COUNTRY-LEVEL########################################################
 ########################################################################
-def _estimate_metrics_country_level(tb: Table, tb_codes: Table, codes: List[str], conflict_type: str) -> Table:
+def _estimate_metrics_participants(tb: Table, tb_codes: Table, codes: List[str], conflict_type: str) -> Table:
     tb_country = pr.concat([tb[["year_start", "year_end", code]].rename(columns={code: "id"}).copy() for code in codes])
 
     # Remove NaNs
@@ -1053,7 +1084,7 @@ def _estimate_metrics_country_level(tb: Table, tb_codes: Table, codes: List[str]
     return tb_country
 
 
-def estimate_metrics_country_level(tb_extra: Table, tb_intra: Table, tb_inter: Table, tb_codes: Table) -> Table:
+def estimate_metrics_participants(tb_extra: Table, tb_intra: Table, tb_inter: Table, tb_codes: Table) -> Table:
     """Add country-level indicators."""
     ###################
     # Participated in #
@@ -1061,12 +1092,12 @@ def estimate_metrics_country_level(tb_extra: Table, tb_intra: Table, tb_inter: T
     # FLAG YES/NO (country-level)
 
     # Get participations for each conflict type
-    tb_extra_c = _estimate_metrics_country_level(tb_extra, tb_codes, ["ccode1", "ccode2"], CTYPE_EXTRA)
-    tb_inter_c = _estimate_metrics_country_level(tb_inter, tb_codes, ["ccode"], CTYPE_INTER)
-    tb_intra_i_c = _estimate_metrics_country_level(
+    tb_extra_c = _estimate_metrics_participants(tb_extra, tb_codes, ["ccode1", "ccode2"], CTYPE_EXTRA)
+    tb_inter_c = _estimate_metrics_participants(tb_inter, tb_codes, ["ccode"], CTYPE_INTER)
+    tb_intra_i_c = _estimate_metrics_participants(
         tb_intra[tb_intra["intnl"] == 1], tb_codes, ["ccodea"], CTYPE_INTRA_INTL
     )
-    tb_intra_ni_c = _estimate_metrics_country_level(
+    tb_intra_ni_c = _estimate_metrics_participants(
         tb_intra[tb_intra["intnl"] != 1], tb_codes, ["ccodea"], CTYPE_INTRA_NINTL
     )
 
@@ -1089,6 +1120,33 @@ def estimate_metrics_country_level(tb_extra: Table, tb_intra: Table, tb_inter: T
         [CTYPE_EXTRA, CTYPE_INTER, CTYPE_INTRA],
     )
 
+    # zero-fill
+    # see https://github.com/owid/owid-issues/issues/1304
+    ## Ddop column id
+    tb_country = tb_country.drop(columns=["id"])
+    ## Fill gaps with zeroes
+    tb_country = fill_gaps_with_zeroes(
+        tb_country,
+        columns=["country", "year", "conflict_type"],
+        cols_use_range=["year"],
+    )
+
+    ## Ensure correct year coverage
+    ## see: https://github.com/owid/owid-issues/issues/1304#issuecomment-1853658729
+    tb_country = tb_country[
+        (tb_country["conflict_type"].isin([CTYPE_EXTRA, CTYPE_NONSTATE]) & (tb_country["year"] <= 2007))
+        | ((tb_country["conflict_type"].isin([CTYPE_INTER, CTYPE_SBASED])) & (tb_country["year"] <= 2010))
+        | (
+            tb_country["conflict_type"].isin([CTYPE_INTRA, CTYPE_INTRA_INTL, CTYPE_INTRA_NINTL])
+            & (tb_country["year"] <= 2014)
+        )
+    ]
+    ## Add column id based on value from country
+    dix_codes = tb_codes.reset_index().drop(columns="year").drop_duplicates()
+    dix_codes = dix_codes.set_index("country", verify_integrity=True).squeeze().to_dict()
+    tb_country["id"] = tb_country["country"].map(dix_codes)
+    assert tb_country["id"].notna().all(), "NaN found! Couldn't match country to ID"
+
     ###################
     # Participated in #
     ###################
@@ -1098,11 +1156,18 @@ def estimate_metrics_country_level(tb_extra: Table, tb_intra: Table, tb_inter: T
 
     # Filter known undesired datapoints
     tb_num_participants = tb_num_participants[
-        ~(
-            (tb_num_participants["year"] > tb_extra_c["year"].max())
-            & (tb_num_participants["conflict_type"] == CTYPE_EXTRA)
-            | (tb_num_participants["year"] > tb_inter_c["year"].max())
-            & (tb_num_participants["conflict_type"] == CTYPE_INTER)
+        (
+            # Extra
+            ((tb_num_participants["conflict_type"] == CTYPE_EXTRA) & (tb_num_participants["year"] <= 2007))
+            |
+            # Inter, State-based
+            (
+                (tb_num_participants["conflict_type"].isin([CTYPE_INTER, CTYPE_SBASED]))
+                & (tb_num_participants["year"] <= 2010)
+            )
+            |
+            # Intra
+            (tb_num_participants["conflict_type"].isin([CTYPE_INTRA, CTYPE_INTRA_INTL, CTYPE_INTRA_NINTL]))
         )
     ]
 
@@ -1122,3 +1187,177 @@ def estimate_metrics_country_level(tb_extra: Table, tb_intra: Table, tb_inter: T
     tb_country = tb_country.set_index(["year", "country", "conflict_type"], verify_integrity=True)
 
     return tb_country
+
+
+def estimate_metrics_locations(tb_chupilkin: Table, tb_system: Table, tb_participants: Table) -> Table:
+    """Estimate locations metrics.
+
+    tb_chupilkin: contains locations of inter-state conflicts.
+    tb_system: contains 'lifetime' of states.
+    tb_participants: contains countries that participated in a conflict. Useful for locations in intra-states, since location = participant in there.
+    """
+    tb_system = tb_system.rename(columns={"statenme": "country"})
+
+    ########################################
+    # 1) INTER-STATE ####
+    # Get locations for inter-state wars: ccode, year, country, is_location_of_conflict
+    # Sanity check
+    assert (
+        tb_chupilkin["warnum"] <= 227
+    ).all(), "Unexpected value for `warnum`! All warnum values should be lower than 227, since Chupilkin only should contain inter-state conflicts."
+    # Merge with COW SSM
+    tb_locations_inter = tb_chupilkin[["country", "year", "is_location_of_conflict"]].drop_duplicates()
+    tb_locations_inter = tb_system.merge(tb_locations_inter, on=["country", "year"], how="left")
+    tb_locations_inter["is_location_of_conflict"] = tb_locations_inter["is_location_of_conflict"].fillna(0)
+    # Filter irrelevant entries
+    tb_locations_inter = tb_locations_inter[tb_locations_inter["year"] <= tb_chupilkin["year"].max()]
+    # Reduce
+    tb_locations_inter = tb_locations_inter.groupby(["year", "country"], as_index=False).agg(
+        {"is_location_of_conflict": lambda x: min(1, x.sum())}
+    )
+    # Relevant columns
+    tb_locations_inter = tb_locations_inter[["year", "country", "is_location_of_conflict"]]
+    # Add conflict type
+    tb_locations_inter["conflict_type"] = CTYPE_INTER
+
+    ########################################
+    # 2) INTRA-STATE ####
+    # Get locations for intra-state wars: ccode, year, country, is_location_of_conflict
+    # INTRA-STATE ####
+    tb_system_ = tb_system.drop(columns=["stateabb", "version"])
+
+    tb_locations_intra = tb_participants.reset_index().copy()
+    tb_locations_intra = tb_locations_intra[
+        tb_locations_intra["conflict_type"].isin([CTYPE_INTRA, CTYPE_INTRA_INTL, CTYPE_INTRA_NINTL])
+    ]
+    tb_locations_intra = (
+        tb_locations_intra.rename(
+            columns={
+                "participated_in_conflict": "is_location_of_conflict",
+            }
+        )
+        .drop(columns=["number_participants"])
+        .dropna()
+    )
+    # Merge with COW SSM (for each conflict_type)
+    tbs = []
+    for ctype in [CTYPE_INTRA_INTL, CTYPE_INTRA_NINTL, CTYPE_INTRA]:
+        tb_ = tb_locations_intra[tb_locations_intra["conflict_type"] == ctype].copy()
+        year_max = tb_["year"].max()
+        tb_ = tb_system_.merge(tb_, on=["country", "year"], how="left")
+        tb_["conflict_type"] = ctype
+        tb_ = tb_[tb_["year"] <= year_max]
+        tbs.append(tb_)
+    tb_locations_intra_countries = pr.concat(tbs, ignore_index=True)
+    # Fill NaNs
+    tb_locations_intra_countries["is_location_of_conflict"] = tb_locations_intra_countries[
+        "is_location_of_conflict"
+    ].fillna(0)
+
+    # Replace Yugoslavia -> Serbia
+    # tb_locations_intra_countries["country"] = tb_locations_intra_countries["country"].rename({"Yugoslavia": "Serbia"})
+
+    # Drop ccode
+    tb_locations_intra_countries = tb_locations_intra_countries.drop(columns=["ccode"])
+
+    ########################################
+    # 3) COMBINE INTRA + INTER ####
+
+    # COMBINE INTER + INTRA
+    tb_locations = pr.concat([tb_locations_inter, tb_locations_intra_countries], ignore_index=True)
+
+    # Add state-based
+    tb_locations = aggregate_conflict_types(
+        tb=tb_locations,
+        parent_name="state-based",
+        children_names=[CTYPE_INTRA, CTYPE_INTER],
+        columns_to_aggregate=["is_location_of_conflict"],
+        columns_to_groupby=["country", "year"],
+    )
+
+    ###########################################
+    # 4) ADD REGIONS AND WORLD DATA
+    # Add region
+    ## Quick fix (1/2): Serbia -> Yugoslavia
+    tb_locations["country"] = tb_locations["country"].replace({"Serbia": "Yugoslavia"})
+    ## Get country code
+    tb_c2c = tb_system[["country", "ccode"]].drop_duplicates()
+    tb_locations = tb_locations.merge(tb_c2c, how="left", on=["country"])
+    assert tb_locations["ccode"].notna().all(), "Some countries were not found!"
+    ## Add region name
+    tb_locations = add_region_from_code(tb_locations, "cow", col_code="ccode")
+    assert tb_locations.isna().sum().sum() == 0, "Some NaNs were found!"
+    ## Quick fix (2/2): Yugoslavia -> Serbia
+    tb_locations["country"] = tb_locations["country"].rename({"Yugoslavia": "Serbia"})
+
+    # Get only entries with flag '1'
+    tb_locations_active = tb_locations[tb_locations["is_location_of_conflict"] == 1].copy()
+
+    # Get number of locations
+    tb_locations_regions = tb_locations_active.groupby(
+        ["year", "region", "conflict_type"], as_index=False, observed=True
+    )["ccode"].nunique()
+    tb_locations_world = tb_locations_active.groupby(["year", "conflict_type"], as_index=False, observed=True)[
+        "ccode"
+    ].nunique()
+    tb_locations_world["country"] = "World"
+
+    # Fix column names
+    tb_locations_regions = tb_locations_regions.rename(
+        columns={
+            "ccode": "number_locations",
+            "region": "country",
+        }
+    )
+    tb_locations_world = tb_locations_world.rename(
+        columns={
+            "ccode": "number_locations",
+        }
+    )
+
+    # Concat World with regions
+    tb_locations_regions = pr.concat(
+        [
+            tb_locations_regions,
+            tb_locations_world,
+        ],
+        ignore_index=True,
+    )
+
+    # Fill empty time periods with zero
+    tb_locations_regions = fill_gaps_with_zeroes(
+        tb=tb_locations_regions,
+        columns=["country", "year", "conflict_type"],
+        cols_use_range=["year"],
+    )
+
+    ###########################################
+    # 5) FINAL CONCAT, INDEX
+    columns_idx = ["year", "country", "conflict_type"]
+
+    # Drop ccode
+    tb_locations = tb_locations.drop(columns=["ccode"])
+
+    # Merge countries and regions
+    tb_locations = pr.concat(
+        [
+            tb_locations[columns_idx + ["is_location_of_conflict"]],
+            tb_locations_regions[columns_idx + ["number_locations"]],
+        ],
+        ignore_index=True,
+        short_name="cow_locations",
+    )
+
+    # Correct year coverage by conflict type
+    tb_locations = tb_locations[
+        ((tb_locations["conflict_type"].isin([CTYPE_INTER, CTYPE_SBASED])) & (tb_locations["year"] <= 2010))
+        | (
+            tb_locations["conflict_type"].isin([CTYPE_INTRA, CTYPE_INTRA_INTL, CTYPE_INTRA_NINTL])
+            & (tb_locations["year"] <= 2014)
+        )
+    ]
+
+    # Set index
+    tb_locations = tb_locations.set_index(["year", "country", "conflict_type"], verify_integrity=True).sort_index()
+
+    return tb_locations

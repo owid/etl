@@ -22,21 +22,17 @@ definitions:
         <% endif %>
       point_2: |-
         <% if type == "period" %>
-
         <% if age == '0' %>
         For a given year, it represents the average lifespan for a hypothetical group of people, if they experienced the same age-specific death rates throughout their whole lives as the age-specific death rates seen in that particular year.
         <% else %>
         For a given year, it represents the remaining average lifespan for a hypothetical group of people, if they experienced the same age-specific death rates throughout the rest of their lives as the age-specific death rates seen in that particular year.
         <% endif %>
-
         <% else %>
-
         <% if age == '0' %>
         It is calculated by tracking individuals from that cohort throughout their lives until death, and calculating their average lifespan.
         <% else %>
         It is calculated by tracking individuals from that cohort throughout the rest of their lives until death, and calculating their average remaining lifespan.
         <% endif %>
-
         <% endif %>
 
 
@@ -65,10 +61,14 @@ tables:
       central_death_rate:
         title: Central death rate
         description_short: |-
-          For a given population or cohort, the central death rate during a given 12 month interval is calculated as the number of deaths during the interval, divided by the number of person-years lived during that interval.
+          The death rate, calculated as the number of deaths divided by the average number of people alive during the interval.
         description_key:
           - |-
-            Person-years refers to the combined total time that a group of people has lived. For example, if 10 people each live for 2 years, they collectively contribute 20 person-years. This makes the value very slightly different from the 'probability of death' during the interval, because the 'probability of death' metric uses a different denominator: the number of people alive at that age at the start of the interval.
+            The death rate is measured using the number of person-years lived during the interval.
+          - |-
+            Person-years refers to the combined total time that a group of people has lived. For example, if 10 people each live for 2 years, they collectively contribute 20 person-years.
+          - |-
+            The death rate is slightly different from the 'probability of death' during the interval, because the 'probability of death' metric uses a different denominator: the number of people alive at that age at the start of the interval, while this indicator uses the average number of people alive during the interval.
         unit: deaths per 1,000 people
         processing_level: minor
         description_processing: |-
@@ -192,17 +192,17 @@ tables:
         unit: years
         description_short: |-
           <% if age == '0' %>
-            <% if sex == 'both' %>
-              The << type >> life expectancy at birth, in a given year.
-            <% else %>
-              The << type >> life expectancy at birth among << sex + 's' >>, in a given year.
-            <% endif %>
+          <% if sex == 'both' %>
+          The << type >> life expectancy at birth, in a given year.
           <% else %>
-            <% if sex == 'both' %>
-              The remaining << type >> life expectancy at age << age >>, in a given year.
-            <% else %>
-              The remaining << type >> life expectancy at age << age >> among << sex + 's' >>, in a given year.
-            <% endif %>
+          The << type >> life expectancy at birth among << sex + 's' >>, in a given year.
+          <% endif %>
+          <% else %>
+          <% if sex == 'both' %>
+          The remaining << type >> life expectancy at age << age >>, in a given year.
+          <% else %>
+          The remaining << type >> life expectancy at age << age >> among << sex + 's' >>, in a given year.
+          <% endif %>
           <% endif %>
         description_key:
           - |-
@@ -211,13 +211,11 @@ tables:
             {definitions.global.life_expectancy.point_2}
           - |-
             <% if age != '0' %>
-
             <% if type == "period" %>
             This shows the remaining period life expectancy among people who have already reached the age << age >>, using death rates from their age group and older age groups.
             <% else %>
             This shows the remaining cohort life expectancy of people who have reached the age << age >>.
             <% endif %>
-
             <% endif %>
         display:
           numDecimalPlaces: 1

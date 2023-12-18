@@ -3,12 +3,6 @@ meta:
     # Data product / Snapshot
     title: Militarized Interstate Events
     date_published: 2023-07-17
-
-    # Citation
-    producer: Gibler and Miller
-    citation_full: |-
-      D. M. Gibler and S. V. Miller, "The Militarized Interstate Events (MIE) Dataset,
-      1816-2014." Conflict Management and Peace Science. Forthcoming.
     description: |-
 
       The MIE data includes daily events data that correspond to the Jones, Bremer, and Singer (1997) coding rules, with some additional coding changes as described in the codebook.
@@ -18,6 +12,13 @@ meta:
       coding rules made by CoW in the years since. Nevertheless, we also do make several coding rule changes to remove ambiguities in the rules and to provide additional information for researchers.
 
       The changes we make and rationale for them are described well in the manuscript. Of particular note, though, is that we have added an action code labeled "war battle" that describes sustained fights between opposing, organized armed forces. We no longer code "beginning a war" or "join ongoing war" as a militarized action; we only code threats, displays, or uses of force. We code fatality ranges for each event, discarding CoW's use of ordinal fatality scales and the fatality precision variable. This produces minimum and maximum estimated fatalities for each MIE, with no missing values, which can aggregate to meaningful ranges for confrontation-level, confrontation-participant-level, and dyad-year summaries.
+
+    # Citation
+    producer: Gibler and Miller
+    citation_full: |-
+      D. M. Gibler and S. V. Miller, "The Militarized Interstate Events (MIE) Dataset,
+      1816-2014." Conflict Management and Peace Science. Forthcoming.
+    attribution: Gibler and Miller - Militarized Interstate Events (2023)
 
     # Files
     url_main: https://internationalconflict.ua.edu/data-download/

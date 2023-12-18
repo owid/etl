@@ -1,0 +1,14 @@
+dataset:
+  title: DRAFT OWID Donations
+  description: ''
+  licenses:
+    - {}
+tables:
+  owid_donations:
+    variables:
+      donations:
+        title: Donations
+        unit: ''
+      cumulative_donations:
+        title: Cumulative Donations
+        unit: ''

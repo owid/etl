@@ -31,9 +31,9 @@ from pathlib import Path
 from typing import Any, Dict, List, cast
 
 import requests
-import ruamel.yaml
 from dateutil import parser
 
+from etl.files import ruamel_dump
 from etl.paths import SNAPSHOTS_DIR
 from etl.scripts.faostat.shared import (
     API_BASE_URL,
@@ -61,7 +61,7 @@ def create_snapshot_metadata_file(metadata: Dict[str, Any]) -> None:
 
     # Create metadata file for current domain dataset.
     with open(snapshot_file_path, "w") as f:
-        ruamel.yaml.dump({"meta": metadata}, f, Dumper=ruamel.yaml.RoundTripDumper)
+        f.write(ruamel_dump({"meta": metadata}))
 
 
 class FAODataset:

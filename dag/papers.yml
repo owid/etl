@@ -2,19 +2,19 @@ steps:
   #
   # Farmer & Lafond (2016).
   #
-  data://meadow/papers/2023-07-10/farmer_lafond_2016:
-    - snapshot://papers/2023-01-04/farmer_lafond_2016.csv
-  data://garden/papers/2023-07-10/farmer_lafond_2016:
-    - data://meadow/papers/2023-07-10/farmer_lafond_2016
-  data://grapher/papers/2023-07-10/farmer_lafond_2016:
-    - data://garden/papers/2023-07-10/farmer_lafond_2016
+  data://meadow/papers/2023-12-12/farmer_lafond_2016:
+    - snapshot://papers/2023-12-12/farmer_lafond_2016.csv
+  data://garden/papers/2023-12-12/farmer_lafond_2016:
+    - data://meadow/papers/2023-12-12/farmer_lafond_2016
+  data://grapher/papers/2023-12-12/farmer_lafond_2016:
+    - data://garden/papers/2023-12-12/farmer_lafond_2016
   #
   # Nemet (2009).
   #
-  data://meadow/papers/2023-07-10/nemet_2009:
-    - snapshot://papers/2023-01-04/nemet_2009.csv
-  data://garden/papers/2023-07-10/nemet_2009:
-    - data://meadow/papers/2023-07-10/nemet_2009
+  data://meadow/papers/2023-12-12/nemet_2009:
+    - snapshot://papers/2023-12-12/nemet_2009.csv
+  data://garden/papers/2023-12-12/nemet_2009:
+    - data://meadow/papers/2023-12-12/nemet_2009
   #
   # Bayliss-Smith & Wanmali (1984). Data on long-term wheat yields.
   #
@@ -73,5 +73,21 @@ steps:
 
   ######################################################################################################################
   # Older versions to be archived once they are not used by any other steps.
+  #
+  # Farmer & Lafond (2016).
+  #
+  data://meadow/papers/2023-07-10/farmer_lafond_2016:
+    - snapshot://papers/2023-01-04/farmer_lafond_2016.csv
+  data://garden/papers/2023-07-10/farmer_lafond_2016:
+    - data://meadow/papers/2023-07-10/farmer_lafond_2016
+  data://grapher/papers/2023-07-10/farmer_lafond_2016:
+    - data://garden/papers/2023-07-10/farmer_lafond_2016
+  #
+  # Nemet (2009).
+  #
+  data://meadow/papers/2023-07-10/nemet_2009:
+    - snapshot://papers/2023-01-04/nemet_2009.csv
+  data://garden/papers/2023-07-10/nemet_2009:
+    - data://meadow/papers/2023-07-10/nemet_2009
 
   ######################################################################################################################

@@ -24,18 +24,20 @@ etl-match-variables = 'etl.match_variables:main_cli'
 etl-translate-varmap = 'etl.variable_mapping_translate:main_cli'
 etl-chart-suggester = 'etl.chart_revision.cli:main_cli'
 etl-metadata-export = 'etl.metadata_export:cli'
+etl-metadata-migrate = 'apps.metadata_migrate.cli:cli'
 etl-datadiff = 'etl.datadiff:cli'
 etl-chartgpt = 'etl.chart_revision.v2.chartgpt:cli'
 etl-metaplay = 'apps.metadata_playground.cli:cli'
 etl-wizard = 'apps.wizard.cli:cli'
 etl-staging-sync = 'apps.staging_sync.cli:cli'
+etl-metagpt = 'apps.metagpt.cli:main'
 
 [tool.poetry.dependencies]
 python = ">=3.10, <3.12"
 owid-catalog = {path = "lib/catalog", develop = true}
 walden = {path = "lib/walden", develop = true}
 click = ">=8.0.1"
-PyYAML = ">=5.4.1"
+PyYAML = ">=6.0.1"
 papermill = ">=2.3.3"
 jupyterlab = ">=3.1.13"
 # 2.2.0 was raising weird error, pin to 2.1.1 which is stable
@@ -72,7 +74,7 @@ gitpython = "^3.1.30"
 rapidfuzz = "^2.13.7"
 # pinned because of frictionless, remove this pin when frictionless is updated
 fsspec = "2022.11.0"
-openai = "^0.27.7"
+openai = "^1.3.6"
 pdfplumber = "^0.9.0"
 pyhumps = "^3.8.0"
 wbgapi = "^1.0.12"
@@ -86,6 +88,9 @@ streamlit-extras = "^0.3.0"
 typing-extensions = "^4.7.1"
 scipy = "^1.11.2"
 selenium = "^4.15.1"
+geopandas = "^0.14.1"
+shapely = "^2.0.2"
+fasteners = "^0.19"
 
 [tool.poetry.group.dev.dependencies]
 pytest = ">=7.1.2"

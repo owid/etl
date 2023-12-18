@@ -34,3 +34,29 @@ c:
       - line
 """
     )
+
+
+def test_checksum_file_regions(tmp_path):
+    s = """
+- code: "FOO"
+- code: "BAR"
+  aliases:
+    - "BAR"
+    """.strip()
+    (tmp_path / "regions.yml").write_text(s)
+
+    checksum1 = files.checksum_file(tmp_path / "regions.yml")
+
+    # add alias
+    s = """
+- code: "FOO"
+- code: "BAR"
+  aliases:
+    - "BAR"
+    - "BAZ"
+    """.strip()
+    (tmp_path / "regions.yml").write_text(s)
+
+    checksum2 = files.checksum_file(tmp_path / "regions.yml")
+
+    assert checksum1 == checksum2

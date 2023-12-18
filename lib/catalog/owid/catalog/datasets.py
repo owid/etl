@@ -11,11 +11,12 @@ from glob import glob
 from os import environ
 from os.path import join
 from pathlib import Path
-from typing import Any, Iterator, List, Literal, Optional, Union
+from typing import Iterator, List, Literal, Optional, Union
 
 import numpy as np
 import pandas as pd
 import yaml
+from _hashlib import HASH
 
 from . import tables, utils
 from .meta import SOURCE_EXISTS_OPTIONS, DatasetMeta, TableMeta
@@ -63,6 +64,11 @@ class Dataset:
             self.path = path
 
         self.metadata = DatasetMeta.load(self._index_file)
+
+    @property
+    def m(self) -> DatasetMeta:
+        """Metadata alias to save typing."""
+        return self.metadata
 
     @classmethod
     def create_empty(cls, path: Union[str, Path], metadata: Optional["DatasetMeta"] = None) -> "Dataset":
@@ -302,7 +308,7 @@ for k in DatasetMeta.__dataclass_fields__:
     setattr(Dataset, k, metadata_property(k))
 
 
-def checksum_file(filename: str) -> Any:
+def checksum_file(filename: str) -> HASH:
     "Return the MD5 checksum of a given file."
     chunk_size = 2**20  # 1MB
     checksum = hashlib.md5()

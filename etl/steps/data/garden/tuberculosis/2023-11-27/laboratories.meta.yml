@@ -1,0 +1,33 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Tuberculosis
+    display:
+      numDecimalPlaces: 0
+    processing_level: minor
+tables:
+  laboratories:
+    variables:
+      culture:
+        title: Sites providing TB diagnostic services using culture
+        unit: sites
+        description_short: Number of sites providing TB diagnostic services using culture at the end of the reporting year.
+      m_wrd:
+        title: Sites providing TB diagnostic services using molecular WHO-recommended rapid diagnostics
+        description_short: Number of sites providing TB diagnostic services using molecular WHO-recommended rapid diagnostics at the end of the reporting year.
+        unit: sites
+      culture_rate:
+        title: Sites providing TB diagnostic services using culture per million population
+        unit: sites per million population
+        description_short: Number of sites providing TB diagnostic services using culture at the end of the reporting year per million population.
+        processing_level: major
+        display:
+          numDecimalPlaces: 2
+      m_wrd_rate:
+        title: Sites providing TB diagnostic services using molecular WHO-recommended rapid diagnostics per million population
+        description_short: Number of sites providing TB diagnostic services using molecular WHO-recommended rapid diagnostics at the end of the reporting year per million population.
+        unit: sites per million population
+        processing_level: major
+        display:
+          numDecimalPlaces: 2

@@ -200,7 +200,13 @@ def add_regional_aggregations(df: pd.DataFrame) -> pd.DataFrame:
     # Add regional aggregates, by summing up the variables in `aggregations`
     for region in regions:
         df = geo.add_region_aggregates(
-            df, region=region, aggregations=aggregations, countries_that_must_have_data=[], population=df
+            df,
+            region=region,
+            aggregations=aggregations,
+            countries_that_must_have_data=[],
+            population=df,
+            num_allowed_nans_per_year=None,
+            frac_allowed_nans_per_year=0.2,
         )
 
     # Filter dataset by regions to make additional calculations and drop regions in df

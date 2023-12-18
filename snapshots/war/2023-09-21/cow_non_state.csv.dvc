@@ -10,11 +10,13 @@ meta:
       Previously, the Correlates of War (COW) Project has examined only wars that involved the government of a member of the interstate system (a state) in one form or another. The inclusion of non-state wars in the data presented here represents an attempt to broaden our understanding of war by including wars between or among non-state entities. Such entities include governments of other types of geopolitical units (GPUs), such as dependencies or non-state autonomous entities, that do not meet the criteria of system membership. They also might involve nonterritorial entities (NTEs) or non-state armed groups (NSAs) that have no defined territorial base.
 
       You can find more notes at https://correlatesofwar.org/wp-content/uploads/Non-StateWars_Codebook.pdf
+    version_producer: v4.0
 
     # Citation
     producer: Correlates of War
     citation_full: |-
       Sarkees, Meredith Reid and Frank Wayman (2010). Resort to War: 1816 – 2007. Washington DC: CQ Press.
+    attribution: Correlates of War - Wars (2020)
     attribution_short: COW
 
     # Files

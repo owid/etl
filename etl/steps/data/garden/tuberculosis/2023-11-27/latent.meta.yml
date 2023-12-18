@@ -1,0 +1,15 @@
+tables:
+  latent:
+    variables:
+      e_prevtx_hh_contacts_pct:
+        title: Share of household contacts of people newly diagnosed with confirmed tuberculosis who were provided with preventive treatment
+        description_short: Estimated share of household contacts of people newly diagnosed with bacteriologically confirmed pulmonary tuberculosis disease who were provided with tuberculosis preventive treatment.
+        unit: "%"
+        short_unit: "%"
+        description_from_producer: |-
+          Estimated % of household contacts of people newly diagnosed with bacteriologically confirmed pulmonary TB disease who were provided with TB preventive treatment
+        display:
+          numDecimalPlaces: 1
+        presentation:
+          topic_tags:
+            - Tuberculosis

@@ -77,3 +77,16 @@ steps:
   - data://meadow/ilostat/2023-09-19/average_work_hours
   data://grapher/ilostat/2023-09-19/average_work_hours:
   - data://garden/ilostat/2023-09-19/average_work_hours
+
+  # OECD PISA data on educational attainment in mathematics, science, and reading
+  data://meadow/oecd/2023-12-06/pisa:
+  - snapshot://oecd/2023-12-06/pisa_math_all.xls
+  - snapshot://oecd/2023-12-06/pisa_science_all.xls
+  - snapshot://oecd/2023-12-06/pisa_reading_all.xls
+  - snapshot://oecd/2023-12-06/pisa_math_boys_girls.xls
+  - snapshot://oecd/2023-12-06/pisa_science_boys_girls.xls
+  - snapshot://oecd/2023-12-06/pisa_reading_boys_girls.xls
+  data://garden/oecd/2023-12-06/pisa:
+  - data://meadow/oecd/2023-12-06/pisa
+  data://grapher/oecd/2023-12-06/pisa:
+  - data://garden/oecd/2023-12-06/pisa

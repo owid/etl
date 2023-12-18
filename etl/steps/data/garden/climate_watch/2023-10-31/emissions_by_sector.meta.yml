@@ -9,6 +9,7 @@ definitions:
     presentation:
       topic_tags:
       - CO2 & Greenhouse Gas Emissions
+    processing_level: major
   # Short description for per capita indicators, except on CO2 emissions.
   description_short_per_capita: &description-short-per-capita Emissions are measured in tonnes of [carbon dioxide-equivalents](#dod:carbondioxideequivalents) per person.
   # Short description for indicators of CO2 emissions, except per capita indicators.

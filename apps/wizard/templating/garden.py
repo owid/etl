@@ -3,7 +3,6 @@ import os
 from pathlib import Path
 from typing import List, cast
 
-import ruamel.yaml
 import streamlit as st
 from owid.catalog import Dataset
 from st_pages import add_indentation
@@ -12,6 +11,7 @@ from typing_extensions import Self
 import etl.grapher_model as gm
 from apps.wizard import utils
 from etl.db import get_session
+from etl.files import ruamel_dump, ruamel_load
 from etl.paths import BASE_DIR, DAG_DIR, DATA_DIR, GARDEN_DIR
 
 #########################################################
@@ -132,7 +132,7 @@ def _fill_dummy_metadata_yaml(metadata_path: Path) -> None:
     Only useful when `--dummy-data` is used. We need this to avoid errors in `etl-wizard grapher --dummy-data`.
     """
     with open(metadata_path, "r") as f:
-        doc = ruamel.yaml.load(f, Loader=ruamel.yaml.RoundTripLoader)
+        doc = ruamel_load(f)
 
     # add all available metadata fields to dummy variable
     variable_meta = {
@@ -182,7 +182,7 @@ def _fill_dummy_metadata_yaml(metadata_path: Path) -> None:
     doc["tables"]["dummy"]["variables"] = {"dummy_variable": variable_meta}
 
     with open(metadata_path, "w") as f:
-        ruamel.yaml.dump(doc, f, Dumper=ruamel.yaml.RoundTripDumper)
+        f.write(ruamel_dump(doc))
 
 
 #########################################################

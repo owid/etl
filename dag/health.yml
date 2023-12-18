@@ -237,9 +237,9 @@ steps:
 
   # UN Comtrade
   data://meadow/un/2023-08-02/comtrade_pandemics:
-    - snapshot://un/2023-08-02/comtrade_pandemics.1987_1998.csv
-    - snapshot://un/2023-08-02/comtrade_pandemics.1999_2010.csv
-    - snapshot://un/2023-08-02/comtrade_pandemics.2011_2022.csv
+    - snapshot://un/2023-08-02/comtrade_pandemics_1987_1998.csv
+    - snapshot://un/2023-08-02/comtrade_pandemics_1999_2010.csv
+    - snapshot://un/2023-08-02/comtrade_pandemics_2011_2022.csv
   data://garden/un/2023-08-02/comtrade_pandemics:
     - data://meadow/un/2023-08-02/comtrade_pandemics
     - data://garden/regions/2023-01-01/regions
@@ -334,10 +334,10 @@ steps:
     - data://garden/who/2023-10-13/medical_devices_atlas
 
   # WHO Cardiovascular diseases deaths
-  data://garden/cardiovascular_diseases/2023-11-01/deaths_from_cardiovascular_diseases_vs_other:
-    - data://garden/who/2023-08-01/mortality_database
-  data://grapher/cardiovascular_diseases/2023-11-01/deaths_from_cardiovascular_diseases_vs_other:
-    - data://garden/cardiovascular_diseases/2023-11-01/deaths_from_cardiovascular_diseases_vs_other
+  ? data://garden/cardiovascular_diseases/2023-11-01/deaths_from_cardiovascular_diseases_vs_other
+  : - data://garden/who/2023-08-01/mortality_database
+  ? data://grapher/cardiovascular_diseases/2023-11-01/deaths_from_cardiovascular_diseases_vs_other
+  : - data://garden/cardiovascular_diseases/2023-11-01/deaths_from_cardiovascular_diseases_vs_other
 
   # WHO Medical Devices Atlas
   data://meadow/who/2023-11-01/who_statins:
@@ -346,3 +346,118 @@ steps:
     - data://meadow/who/2023-11-01/who_statins
   data://grapher/who/2023-11-01/who_statins:
     - data://garden/who/2023-11-01/who_statins
+
+  # Tuberculosis burden estimates - WHO
+  data://meadow/tuberculosis/2023-11-27/burden_estimates:
+    - snapshot://tuberculosis/2023-11-27/burden_estimates.csv
+  data://garden/tuberculosis/2023-11-27/burden_estimates:
+    - data://meadow/tuberculosis/2023-11-27/burden_estimates
+    - snapshot://tuberculosis/2023-11-27/data_dictionary.csv
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2023-04-30/income_groups
+    - data://garden/demography/2023-03-31/population
+  data://grapher/tuberculosis/2023-11-27/burden_estimates:
+    - data://garden/tuberculosis/2023-11-27/burden_estimates
+
+  # Tuberculosis budget - WHO
+  data://meadow/tuberculosis/2023-12-01/budget:
+    - snapshot://tuberculosis/2023-12-01/budget.csv
+  data://garden/tuberculosis/2023-11-27/budget:
+    - data://meadow/tuberculosis/2023-12-01/budget
+    - snapshot://tuberculosis/2023-11-27/data_dictionary.csv
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2023-04-30/income_groups
+  data://grapher/tuberculosis/2023-11-27/budget:
+    - data://garden/tuberculosis/2023-11-27/budget
+
+  # Tuberculosis burden disaggregated - WHO
+  data://meadow/tuberculosis/2023-12-04/burden_disaggregated:
+    - snapshot://tuberculosis/2023-12-04/burden_disaggregated.csv
+  data://garden/tuberculosis/2023-11-27/burden_disaggregated:
+    - data://meadow/tuberculosis/2023-12-04/burden_disaggregated
+    - snapshot://tuberculosis/2023-11-27/data_dictionary.csv
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2023-04-30/income_groups
+    - data://garden/demography/2023-03-31/population
+    - data://garden/un/2022-07-11/un_wpp
+  data://grapher/tuberculosis/2023-11-27/burden_disaggregated:
+    - data://garden/tuberculosis/2023-11-27/burden_disaggregated
+
+  # Tuberculosis laboratories - WHO
+  data://meadow/tuberculosis/2023-12-06/laboratories:
+    - snapshot://tuberculosis/2023-12-06/laboratories.csv
+  data://garden/tuberculosis/2023-11-27/laboratories:
+    - data://meadow/tuberculosis/2023-12-06/laboratories
+    - snapshot://tuberculosis/2023-11-27/data_dictionary.csv
+    - data://garden/un/2022-07-11/un_wpp
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2023-04-30/income_groups
+  data://grapher/tuberculosis/2023-11-27/laboratories:
+    - data://garden/tuberculosis/2023-11-27/laboratories
+
+  # Tuberculosis latent - WHO
+  data://meadow/tuberculosis/2023-12-06/latent:
+    - snapshot://tuberculosis/2023-12-06/latent.csv
+  data://garden/tuberculosis/2023-11-27/latent:
+    - data://meadow/tuberculosis/2023-12-06/latent
+  data://grapher/tuberculosis/2023-11-27/latent:
+    - data://garden/tuberculosis/2023-11-27/latent
+
+  # Tuberculosis resistance surveillance - WHO
+  data://meadow/tuberculosis/2023-12-04/drug_resistance_surveillance:
+    - snapshot://tuberculosis/2023-12-04/drug_resistance_surveillance.csv
+  data://garden/tuberculosis/2023-11-27/drug_resistance_surveillance:
+    - data://meadow/tuberculosis/2023-12-04/drug_resistance_surveillance
+    - snapshot://tuberculosis/2023-11-27/data_dictionary.csv
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2023-04-30/income_groups
+  data://grapher/tuberculosis/2023-11-27/drug_resistance_surveillance:
+    - data://garden/tuberculosis/2023-11-27/drug_resistance_surveillance
+
+  # Tuberculosis outcomes - WHO
+  data://meadow/tuberculosis/2023-12-11/outcomes:
+    - snapshot://tuberculosis/2023-12-11/outcomes.csv
+  data://garden/tuberculosis/2023-11-27/outcomes:
+    - data://meadow/tuberculosis/2023-12-11/outcomes
+    - snapshot://tuberculosis/2023-11-27/data_dictionary.csv
+  data://grapher/tuberculosis/2023-11-27/outcomes:
+    - data://garden/tuberculosis/2023-11-27/outcomes
+
+  # Tuberculosis expenditure - WHO
+  data://meadow/tuberculosis/2023-12-05/expenditure:
+    - snapshot://tuberculosis/2023-12-05/expenditure.csv
+  data://garden/tuberculosis/2023-11-27/expenditure:
+    - data://meadow/tuberculosis/2023-12-05/expenditure
+    - snapshot://tuberculosis/2023-11-27/data_dictionary.csv
+  data://grapher/tuberculosis/2023-11-27/expenditure:
+    - data://garden/tuberculosis/2023-11-27/expenditure
+
+  # Tuberculosis notifications - WHO
+  data://meadow/tuberculosis/2023-12-11/notifications:
+    - snapshot://tuberculosis/2023-12-11/notifications.csv
+  data://garden/tuberculosis/2023-11-27/notifications:
+    - data://meadow/tuberculosis/2023-12-11/notifications
+    - snapshot://tuberculosis/2023-11-27/data_dictionary.csv
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2023-04-30/income_groups
+  data://grapher/tuberculosis/2023-11-27/notifications:
+    - data://garden/tuberculosis/2023-11-27/notifications
+
+  # Tuberculosis treatment UN High-Level Meeting commitments - WHO
+  data://meadow/tuberculosis/2023-12-12/unhlm_commitments:
+    - snapshot://tuberculosis/2023-12-12/unhlm_commitments.csv
+  data://garden/tuberculosis/2023-11-27/unhlm_commitments:
+    - data://meadow/tuberculosis/2023-12-12/unhlm_commitments
+    - snapshot://tuberculosis/2023-11-27/data_dictionary.csv
+  data://grapher/tuberculosis/2023-11-27/unhlm_commitments:
+    - data://garden/tuberculosis/2023-11-27/unhlm_commitments
+
+  # Tuberculosis outcomes disaggregated - WHO
+  data://meadow/tuberculosis/2023-12-12/outcomes_disagg:
+    - snapshot://tuberculosis/2023-12-12/outcomes_disagg.csv
+  data://garden/tuberculosis/2023-11-27/outcomes_disagg:
+    - data://meadow/tuberculosis/2023-12-12/outcomes_disagg
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2023-04-30/income_groups
+  data://grapher/tuberculosis/2023-11-27/outcomes_disagg:
+    - data://garden/tuberculosis/2023-11-27/outcomes_disagg

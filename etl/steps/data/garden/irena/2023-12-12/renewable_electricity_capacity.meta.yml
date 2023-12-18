@@ -1,0 +1,59 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Energy
+    short_unit: MW
+    unit: megawatts
+    display:
+      numDecimalPlaces: 0
+    description_short: |-
+      Measured in megawatts.
+
+dataset:
+  update_period_days: 365
+
+tables:
+  renewable_electricity_capacity:
+    title: Renewable electricity capacity
+    variables:
+      bagasse:
+        title: Bagasse capacity
+        description_key:
+        - Bagasse is a byproduct from the process of sugar cane refining, often used as a biofuel for the production of heat, energy, and electricity.
+      bioenergy:
+        title: Bioenergy capacity
+      biogas:
+        title: Biogas capacity
+      concentrated_solar_power:
+        title: Concentrated solar power capacity
+      geothermal_energy:
+        title: Geothermal energy capacity
+      hydropower:
+        title: Hydropower capacity
+      liquid_biofuels:
+        title: Liquid biofuels capacity
+      marine_energy:
+        title: Marine energy capacity
+      offshore_wind_energy:
+        title: Offshore wind energy capacity
+      onshore_wind_energy:
+        title: Onshore wind energy capacity
+      other_solid_biofuels:
+        title: Other solid biofuels capacity
+      pure_pumped_storage:
+        title: Pure pumped storage capacity
+      renewable_hydropower_including_mixed_plants:
+        title: Renewable hydropower including mixed plants capacity
+      renewable_municipal_waste:
+        title: Renewable municipal waste capacity
+      solar_energy:
+        title: Solar energy capacity
+      solar_photovoltaic:
+        title: Solar photovoltaic capacity
+      solid_biofuels_and_renewable_waste:
+        title: Solid biofuels and renewable waste capacity
+      total_renewable_energy:
+        title: Total renewable energy capacity
+      wind_energy:
+        title: Wind energy capacity

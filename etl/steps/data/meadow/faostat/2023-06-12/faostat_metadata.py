@@ -10,11 +10,14 @@ from pathlib import Path
 from typing import Any, Dict, List
 
 import pandas as pd
+import structlog
 from owid.catalog import Table
 from owid.datautils.io import load_json
 from shared import CURRENT_DIR, NAMESPACE
 
 from etl.helpers import PathFinder, create_dataset
+
+log = structlog.get_logger()
 
 # Name for new meadow dataset.
 DATASET_SHORT_NAME = f"{NAMESPACE}_metadata"
@@ -139,6 +142,7 @@ def create_tables_for_all_domain_records(additional_metadata: Dict[str, Any]) ->
     """
     # Create a new table for each domain-category (e.g. 'faostat_qcl_item').
     tables = []
+    used_short_names = set()
     for domain in additional_metadata:
         for category in list(additional_metadata[domain]):
             json_data = additional_metadata[domain][category]["data"]
@@ -150,6 +154,13 @@ def create_tables_for_all_domain_records(additional_metadata: Dict[str, Any]) ->
                     inplace=True,
                 )
                 table_short_name = f'{NAMESPACE}_{domain.lower()}_{category_structure[category]["short_name"]}'
+
+                # there might be duplicates coming from `itemsgroup` and `itemgroup`
+                if table_short_name in used_short_names:
+                    log.warning("faostat_metadata.duplicate_short_name", short_name=table_short_name)
+                    continue
+                used_short_names.add(table_short_name)
+
                 table = Table(df, short_name=table_short_name)
                 tables.append(table)
 

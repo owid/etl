@@ -29,7 +29,7 @@ CMD_CODE_TO_METRIC_NAME = {
     621600: "import_cif_gloves_mittens_mitts_not_knitted_croacheted",
 }
 # The following commodities are grouped into 'All handwear' category
-COMODITIES_HANDWEAR = [
+COMMODITIES_HANDWEAR = [
     "import_cif_gloves_mittens_mitts_knitted_croacheted",
     "import_cif_gloves_mittens_mitts_not_knitted_croacheted",
     "import_cif_non_surgical_gloves",
@@ -167,7 +167,7 @@ def _sanity_checks(tb: Table):
 
 def add_total_handwear(tb: Table) -> Table:
     """Add total aggregate to the table."""
-    tb["import_cif_total_handwear"] = tb[COMODITIES_HANDWEAR].sum(axis=1)
+    tb["import_cif_total_handwear"] = tb[COMMODITIES_HANDWEAR].sum(axis=1)
     return tb
 
 
@@ -192,7 +192,14 @@ def add_regions(tb: Table, ds_regions: Dataset) -> Table:
             region=region,
             ds_regions=ds_regions,
         )
-        tb_region = geo.add_region_aggregates(tb, region, countries_in_region=countries_in_region)
+        tb_region = geo.add_region_aggregates(
+            tb,
+            region,
+            countries_in_region=countries_in_region,
+            countries_that_must_have_data="auto",
+            num_allowed_nans_per_year=None,
+            frac_allowed_nans_per_year=0.2,
+        )
         tb = pr.concat(
             [
                 tb[tb["country"] != region],
@@ -208,7 +215,7 @@ def add_regions(tb: Table, ds_regions: Dataset) -> Table:
 
 def add_world(tb: Table) -> Table:
     """Add world aggregate to the table."""
-    columns = list(CMD_CODE_TO_METRIC_NAME.values())
+    columns = list(CMD_CODE_TO_METRIC_NAME.values()) + ["import_cif_total_handwear", "import_cif_total_pandemics"]
     tb_world = tb.groupby("year", as_index=False)[columns].sum()
     tb_world["country"] = "World"
 
