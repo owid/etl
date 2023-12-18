@@ -51,7 +51,9 @@ def run(dest_dir: str) -> None:
     tb = tb.rename(columns={column: column.replace("(", "").replace(")", "") for column in tb.columns}, errors="raise")
 
     # Add region aggregates.
-    tb = geo.add_regions_to_table(tb, regions=REGIONS, ds_regions=ds_regions, ds_income_groups=ds_income_groups, min_num_values_per_year=1)
+    tb = geo.add_regions_to_table(
+        tb, regions=REGIONS, ds_regions=ds_regions, ds_income_groups=ds_income_groups, min_num_values_per_year=1
+    )
 
     # Set an appropriate index and sort conveniently.
     tb = tb.set_index(["country", "year"], verify_integrity=True).sort_index().sort_index(axis=1)
