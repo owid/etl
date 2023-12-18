@@ -1,16 +1,16 @@
-# TODO: This file is a duplicate of the previous step. It is not yet used in the dag and should be updated soon.
-
 """Extract data from UNEP's Global trends in renewable energy investment.
 
 Since the data is given as an image of a table (not suitable for OCR) the data has been manually copied into a file,
 next to this script.
+
+The data is copied from "FIGURE 42. GLOBAL TRENDS IN RENEWABLE ENERGY INVESTMENT 2020 DATA TABLE, $BN" (Page 62).
 """
 
-import pandas as pd
+import owid.catalog.processing as pr
 from owid.catalog import Dataset, Table
 
-from etl.helpers import PathFinder
-from etl.steps.data.converters import convert_snapshot_metadata
+from etl.helpers import PathFinder, create_dataset
+
 
 # naming conventions
 paths = PathFinder(__file__)
@@ -23,33 +23,30 @@ def run(dest_dir: str) -> None:
     # Load data.
     #
     # Load snapshot.
-    snap = paths.load_dependency("global_trends_in_renewable_energy_investment.pdf")
+    snap = paths.load_snapshot("global_trends_in_renewable_energy_investment.pdf")
 
     # Load file with manually extracted data.
-    df = pd.read_csv(EXTRACTED_DATA_FILE)
+    tb = pr.read_csv(EXTRACTED_DATA_FILE, metadata=snap.to_table_metadata(), origin=snap.metadata.origin)
 
     #
     # Prepare data.
     #
     # Transpose data to have a column per energy source.
-    df = df.set_index("sector").transpose().rename_axis("year").reset_index()
+    tb = tb.melt(id_vars="sector", var_name="year", value_name="investment").pivot(index="year", columns=["sector"], join_column_levels_with="_")
+    tb = tb.rename(columns={column: column.replace("investment_", "") for column in tb.columns}, errors="raise")
+
     # Add column for region.
-    df = df.assign(**{"country": "World"})
+    tb = tb.assign(**{"country": "World"})
 
     # Set an appropriate index and sort conveniently.
-    df = df.set_index(["country", "year"], verify_integrity=True).sort_index()
+    tb = tb.set_index(["country", "year"], verify_integrity=True).sort_index()
+
+    # Update table short name.
+    tb.metadata.short_name = paths.short_name
 
     #
     # Save outputs.
     #
-    # Create a new meadow dataset and reuse snapshot metadata.
-    ds = Dataset.create_empty(dest_dir, metadata=convert_snapshot_metadata(snap.metadata))
-    ds.metadata.version = paths.version
-    ds.metadata.short_name = paths.short_name
-
-    # Create a new table with metadata and underscore all columns.
-    tb = Table(df, short_name=paths.short_name, underscore=True)
-
-    # Add table to dataset and save dataset.
-    ds.add(tb)
-    ds.save()
+    # Create a new meadow dataset.
+    ds_meadow = create_dataset(dest_dir, tables=[tb], check_variables_metadata=True)
+    ds_meadow.save()
