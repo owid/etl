@@ -299,7 +299,7 @@
         "update_period_days": {
           "type": "integer",
           "title": "Number of days between OWID updates",
-          "description": "Expected number of days between consecutive updates of this dataset by OWID, typically `30`, `90` or `365`.",
+          "description": "Expected number of days between consecutive updates of this dataset by OWID, typically `30`, `90` or `365`. Set to `0` if we do not have the intention to update it.",
           "guidelines": [
             [
               "Must be defined in the garden step."

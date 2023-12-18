@@ -1,4 +1,5 @@
 """Snapshot phase."""
+import os
 import subprocess
 import traceback
 from datetime import datetime as dt
@@ -37,6 +38,8 @@ FIELD_TYPES_SELECT = ["origin.license.name"]
 CURRENT_DIR = Path(__file__).parent
 # Accepted schema categories
 ACCEPTED_CATEGORIES = ["dataset", "citation", "files", "license"]
+# Available namespaces
+OPTIONS_NAMESPACES = sorted(os.listdir(SNAPSHOTS_DIR))
 # FIELDS FROM OTHER STEPS
 st.session_state["step_name"] = "snapshot"
 APP_STATE = utils.AppState()
@@ -104,6 +107,10 @@ class SnapshotForm(utils.StepForm):
         data["license_url"] = data["origin.license.url"]
         data["origin_version"] = data["origin.version_producer"]
         data["dataset_manual_import"] = data["local_import"]
+
+        # Handle custom namespace
+        if "namespace_custom" in data:
+            data["namespace"] = str(data["namespace_custom"])
 
         # Handle custom license
         if "origin.license.name_custom" in data:
@@ -278,8 +285,10 @@ def create_description(field: Dict[str, Any]) -> str:
     return description
 
 
-def render_fields_init() -> None:
+def render_fields_init() -> List[str]:
     """Render fields to create directories and all."""
+    form = []
+
     # Text inputs
     fields = [
         {
@@ -306,35 +315,43 @@ def render_fields_init() -> None:
     ]
     for field in fields:
         key = field["title"].replace(" ", "_").lower()
-        args = {
-            "st_widget": st.text_input,
-            "label": create_display_name_init_section(field["title"]),
-            "help": field["description"],
-            "placeholder": f"Example: {field['placeholder']}",
-            "key": key,
-            "default_last": field.get("value", ""),
-        }
-        if APP_STATE.args.dummy_data:
-            args["value"] = dummy_values[key]
+        if key == "namespace":
+            field = ["namespace", st.empty(), st.container()]
+        else:
+            args = {
+                "st_widget": st.text_input,
+                "label": create_display_name_init_section(field["title"]),
+                "help": field["description"],
+                "placeholder": f"Example: {field['placeholder']}",
+                "key": key,
+                "default_last": field.get("value", ""),
+            }
+            if APP_STATE.args.dummy_data:
+                args["value"] = dummy_values[key]
 
-        APP_STATE.st_widget(**args)
+            field = APP_STATE.st_widget(**args)
+        form.append(field)
 
     # Private dataset?
-    APP_STATE.st_widget(
+    field = APP_STATE.st_widget(
         st.toggle,
         label="Make dataset private",
         help="Check if you want to make the dataset private.",
         key="is_private",
         default_last=False,
     )
+    form.append(field)
     # Import local file?
-    APP_STATE.st_widget(
+    field = APP_STATE.st_widget(
         st.toggle,
         label="Import dataset from local file",
         help="Check if you want to import the snapshot from a local file.",
         key="local_import",
         default_last=False,
     )
+    form.append(field)
+
+    return form
 
 
 def render_fields_from_schema(
@@ -488,7 +505,7 @@ def render_license_field(form: List[Any]) -> List[str]:
                 license_field = APP_STATE.st_widget(
                     st.selectbox,
                     label=display_name,
-                    options=["Custom license..."] + options,
+                    options=[CUSTOM_OPTION] + options,
                     help=help_text,
                     key=prop_uri,
                     default_last=options[0],
@@ -515,7 +532,7 @@ def render_license_field(form: List[Any]) -> List[str]:
 def render_attribution_field(form: List[Any]) -> List[str]:
     """Render the attribution field within the form.
 
-    We want the attribution field to be a selectbox, but with the option to add a custom license.
+    We want the attribution field to be a selectbox, but with the option to add a custom attribution.
 
     This is a workaround to have repsonsive behaviour within a form.
 
@@ -591,7 +608,7 @@ Only in rare occasions you will need to define a custom attribution.
                         st.text_input,
                         label="↳ *Use custom attribution*",
                         placeholder="",
-                        help="Enter custom license. Make sure to add the explicit attribution and not its format (as in the dropdown options)!",
+                        help="Enter custom attribution. Make sure to add the explicit attribution and not its format (as in the dropdown options)!",
                         key=f"{prop_uri}_custom",
                     )
 
@@ -600,6 +617,73 @@ Only in rare occasions you will need to define a custom attribution.
 
     # Add license field
     form.append(attribution_field)  # type: ignore
+
+    return form
+
+
+def render_namespace_field(form: List[Any]) -> List[str]:
+    """Render the namespace field within the form.
+
+    We want the namespace field to be a selectbox, but with the option to add a custom namespace.
+
+    This is a workaround to have repsonsive behaviour within a form.
+
+    Source: https://discuss.streamlit.io/t/can-i-add-to-a-selectbox-an-other-option-where-the-user-can-add-his-own-answer/28525/5
+    """
+    # Assert there is only one element of type list
+    assert (
+        len([field for field in form if isinstance(field, list)]) == 1
+    ), "Only one element in the form is allowed to be of type list!"
+
+    # Get relevant values from schema
+    prop_uri = "namespace"
+    display_name = create_display_name_init_section("Namespace")
+
+    # Main decription
+    help_text = "## Description\n\nInstitution or topic name"
+
+    # Options
+    DEFAULT_OPTION = OPTIONS_NAMESPACES[0]
+
+    # Default option in select box for custom license
+    CUSTOM_OPTION = "Custom namespace..."
+    # Render and get element depending on selection in selectbox
+    for field in form:
+        if isinstance(field, list) and field[0] == "namespace":
+            with field[1]:
+                if APP_STATE.args.dummy_data:
+                    namespace_field = APP_STATE.st_widget(
+                        st.selectbox,
+                        label=display_name,
+                        options=[CUSTOM_OPTION] + OPTIONS_NAMESPACES,
+                        help=help_text,
+                        key=prop_uri,
+                        default_last=dummy_values[prop_uri],
+                    )
+                else:
+                    namespace_field = APP_STATE.st_widget(
+                        st.selectbox,
+                        label=display_name,
+                        options=[CUSTOM_OPTION] + OPTIONS_NAMESPACES,
+                        help=help_text,
+                        key=prop_uri,
+                        default_last=DEFAULT_OPTION,
+                    )
+            with field[2]:
+                if namespace_field == CUSTOM_OPTION:
+                    namespace_field = APP_STATE.st_widget(
+                        st.text_input,
+                        label="↳ *Use custom namespace*",
+                        placeholder="",
+                        help="Enter custom namespace.",
+                        key=f"{prop_uri}_custom",
+                    )
+
+    # Remove list from form (former license st.empty tuple)
+    form = [f for f in form if not isinstance(f, list)]
+
+    # Add license field
+    form.append(namespace_field)  # type: ignore
 
     return form
 
@@ -627,7 +711,7 @@ st.title("Wizard **:gray[Snapshot]**")
 
 # SIDEBAR
 with st.sidebar:
-    utils.warning_metadata_unstable()
+    # utils.warning_metadata_unstable()
 
     # INSTRUCTIONS
     with st.expander("**Instructions**", expanded=True):
@@ -642,7 +726,7 @@ if st.session_state["show_form"]:
         # 1) Show fields for initial configuration (create directories, etc.)
         # st.header("Config")
         st.markdown("Note that sometimes some fields might not be available (even if they are labelled as required)")
-        render_fields_init()
+        form_init = render_fields_init()
 
         # 2) Show fields for metadata fields
         # st.header("Metadata")
@@ -664,6 +748,9 @@ if st.session_state["show_form"]:
 
         # 3) Submit
         submitted = st.form_submit_button("Submit", type="primary", use_container_width=True, on_click=update_state)
+
+    # 2.1) Create fields for namespace (responsive within form)
+    form = render_namespace_field(form_init)
 
     # 2.1) Create fields for attribution (responsive within form)
     form = render_attribution_field(form_metadata)
