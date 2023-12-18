@@ -23,14 +23,14 @@ test-default: check-formatting lint check-typing unittest
 	touch .venv
 
 check-default:
-	@echo '==> Format & Lint & Typecheck changed files'
+	@echo '==> Lint & Format & Typecheck changed files'
 	@git fetch -q origin master
 	@RELATIVE_PATH=$$(pwd | sed "s|^$$(git rev-parse --show-toplevel)/||"); \
-	CHANGED_PY_FILES=$$(git diff --name-only origin/master HEAD -- . && git ls-files --others --exclude-standard | grep '\.py'); \
+	CHANGED_PY_FILES=$$(git diff --name-only origin/master HEAD -- . && git diff --name-only && git ls-files --others --exclude-standard | grep '\.py'); \
 	CHANGED_PY_FILES=$$(echo "$$CHANGED_PY_FILES" | sed "s|^$$RELATIVE_PATH/||" | grep '\.py' | xargs -I {} sh -c 'test -f {} && echo {}'); \
 	if [ -n "$$CHANGED_PY_FILES" ]; then \
-		echo "$$CHANGED_PY_FILES" | xargs ruff format; \
 		echo "$$CHANGED_PY_FILES" | xargs ruff check --fix; \
+		echo "$$CHANGED_PY_FILES" | xargs ruff format; \
 		echo "$$CHANGED_PY_FILES" | xargs pyright; \
 	fi
 
