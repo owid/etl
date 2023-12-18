@@ -39,10 +39,10 @@ tables:
         description_short: Estimated annual number of deaths from [diarrheal diseases](#dod:diarrheal-diseases) per 100,000
           people.
         description_key:
-          - Deaths from diarrheal disease are more common in [poorer countries](https://ourworldindata.org/grapher/diarrheal-death-rates-children-vs-gdp-per-capita).
-          - >-
-            This metric is age-standardized to allow comparisons between countries and over time. Age-standardization
-            adjusts for differences in the age structure of populations.
+          - These estimates come from the Global Burden of Disease study published by the Institute for Health Metrics (IHME). This is currently one of the few sources that produces global-level estimates across most countries on the prevalence and disease burden of diarrheal diseases.
+          - Estimates of diarrheal deaths are based on vital registration and verbal autopsy data and a range of hospital and community samples where pathogens were identified using cell culture, immunoassay, and RT-PCR techniques.
+          - This data was then used to estimate a single underlying cause of death for all deaths in the Global Burden of Disease study.
+          - There are large differences in the quality and availability of data across the world. While high-quality data in richer countries often exists, data on deaths from diarrheal diseases in many poorer countries is often limited. The IHME Global Burden of Disease attempts to fill these gaps, but these estimates come with a level of uncertainty.
           - A summary of the indicator by the Institute for Health Metrics and Evaluation (IHME) is available [here](https://www.healthdata.org/results/gbd_summaries/2019/diarrheal-diseases-level-3-cause).
         description_from_producer: "This aggregate cause incorporates death and disability resulting from diarrhoeal diseases for 13 different aetiologies.  Diarrhoeal disease episodes were defined as three or more loose stools in a 24-hour period. Included are ICD-9: 001–009.9; ICD-10: A00–A09, R19.7."
         presentation:
