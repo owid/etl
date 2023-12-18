@@ -8,46 +8,47 @@ definitions:
 
   gbd_origin: &gbd_origin
     producer: IHME, Global Burden of Disease Study (2019)
-    title:
-      Institute for Health Metrics and Evaluation - Global Burden of Disease (2019) - Deaths and DALYs - Deaths and
-      DALYs
+    title: Institute for Health Metrics and Evaluation - Global Burden of Disease (2019) - Deaths and DALYs
     description: >-
       The Global Burden of Disease (GBD) provides a comprehensive picture of mortality and disability across countries,
       time, age, and sex. It quantifies health loss from hundreds of diseases, injuries, and risk factors, so that health
       systems can be improved and disparities eliminated.
 
-
       GBD research incorporates both the prevalence of a given disease or risk factor and the relative harm it causes.
       With these tools, decision-makers can compare different health issues and their effects.
-    citation_full: Institute of Health Metrics and Evaluation
+    citation_full: "Global Burden of Disease Collaborative Network. Global Burden of Disease Study 2019 (GBD 2019). Seattle, United States: Institute for Health Metrics and Evaluation (IHME), 2020."
+    url_main: https://www.healthdata.org/research-analysis/about-gbd
+    date_published: 2020-10-17
+    date_accessed: 2021-12-01
     license:
       url: https://www.healthdata.org/data-tools-practices/data-practices/terms-and-conditions
-
 dataset:
   update_period_days: 1095
 tables:
   diarrheal_diseases__both_sexes__age_standardized:
     variables:
-      ? deaths_that_are_from_diarrheal_diseases_per_100_000_people__in_both_sexes_aged_age_standardized
-      : sources: []
+      deaths_that_are_from_diarrheal_diseases_per_100_000_people__in_both_sexes_aged_age_standardized:
+        sources: []
         origins:
           - *gbd_origin
         title: Deaths that are from diarrheal diseases per 100,000 people, in both sexes aged age-standardized
         unit: deaths per 100,000 people
         display:
-          name: Deaths that are from diarrheal diseases per 100,000 people, in both sexes aged age-standardized
+          name: Diarrheal diseases
           numDecimalPlaces: 1
-        description_short:
-          Estimated annual number of deaths from [diarrheal diseases](#dod:diarrheal-diseases) per 100,000
+        description_short: Estimated annual number of deaths from [diarrheal diseases](#dod:diarrheal-diseases) per 100,000
           people.
         description_key:
-          - TBD - List of key pieces of information about the indicator.
-        description_from_producer: TBD - Indicator's description given by the producer
-        description_processing: TBD - Indicator's processing description
+          - Deaths from diarrheal disease are more common in [poorer countries](https://ourworldindata.org/grapher/diarrheal-death-rates-children-vs-gdp-per-capita).
+          - >-
+            This metric is age-standardized to allow comparisons between countries and over time. Age-standardization
+            adjusts for differences in the age structure of populations.
+          - A summary of the indicator by the Institute for Health Metrics and Evaluation (IHME) is available [here](https://www.healthdata.org/results/gbd_summaries/2019/diarrheal-diseases-level-3-cause).
+        description_from_producer: "This aggregate cause incorporates death and disability resulting from diarrhoeal diseases for 13 different aetiologies.  Diarrhoeal disease episodes were defined as three or more loose stools in a 24-hour period. Included are ICD-9: 001–009.9; ICD-10: A00–A09, R19.7."
         presentation:
-          title_public: TBD - Indicator title to be shown in data pages, that overrides the indicator's title.
-          title_variant: TBD - Indicator's title variant
-          attribution_short: TBD - Indicator's attribution (shorter version)
+          title_public: Diarrheal diseases death rate
+          title_variant: Age-standardized
+          attribution_short: IHME GBD
           faqs:
             - fragment_id: TBD - Question identifier from FAQ GDoc
               gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
