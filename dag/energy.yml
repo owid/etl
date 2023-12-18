@@ -36,25 +36,25 @@ steps:
   #
   # IRENA - Renewable power generation costs (2022).
   #
-  data://meadow/irena/2023-06-26/renewable_power_generation_costs:
-    - snapshot://irena/2023-06-26/renewable_power_generation_costs.xlsx
-  data://garden/irena/2023-06-26/renewable_power_generation_costs:
-    - data://meadow/irena/2023-06-26/renewable_power_generation_costs
-  data://grapher/irena/2023-06-26/renewable_power_generation_costs:
-    - data://garden/irena/2023-06-26/renewable_power_generation_costs
+  data://meadow/irena/2023-12-12/renewable_power_generation_costs:
+    - snapshot://irena/2023-12-12/renewable_power_generation_costs.xlsx
+  data://garden/irena/2023-12-12/renewable_power_generation_costs:
+    - data://meadow/irena/2023-12-12/renewable_power_generation_costs
+  data://grapher/irena/2023-12-12/renewable_power_generation_costs:
+    - data://garden/irena/2023-12-12/renewable_power_generation_costs
   #
   # IRENA - Renewable electricity capacity (2023).
   #
-  data://meadow/irena/2023-06-26/renewable_electricity_capacity:
-    - snapshot://irena/2023-06-26/renewable_electricity_capacity_and_generation.xlsm
-  data://garden/irena/2023-06-26/renewable_electricity_capacity:
-    - data://meadow/irena/2023-06-26/renewable_electricity_capacity
+  data://meadow/irena/2023-12-12/renewable_electricity_capacity:
+    - snapshot://irena/2023-12-12/renewable_electricity_capacity_and_generation.xlsm
+  data://garden/irena/2023-12-12/renewable_electricity_capacity:
+    - data://meadow/irena/2023-12-12/renewable_electricity_capacity
     - data://garden/regions/2023-01-01/regions
     - data://garden/wb/2023-04-30/income_groups
-  data://grapher/irena/2023-06-26/renewable_electricity_capacity_by_technology:
-    - data://garden/irena/2023-06-26/renewable_electricity_capacity
-  data://grapher/irena/2023-06-26/renewable_electricity_capacity:
-    - data://garden/irena/2023-06-26/renewable_electricity_capacity
+  data://grapher/irena/2023-12-12/renewable_electricity_capacity_by_technology:
+    - data://garden/irena/2023-12-12/renewable_electricity_capacity
+  data://grapher/irena/2023-12-12/renewable_electricity_capacity:
+    - data://garden/irena/2023-12-12/renewable_electricity_capacity
   #
   # IRENA - Renewable energy patents (2022).
   #
@@ -313,5 +313,27 @@ steps:
   # The grapher dataset uses only the wide table from the garden dataset.
   data://grapher/irena/2022-10-25/renewable_energy_patents:
     - data://garden/irena/2022-10-25/renewable_energy_patents
+  #
+  # IRENA - Renewable power generation costs (2022).
+  #
+  data://meadow/irena/2023-06-26/renewable_power_generation_costs:
+    - snapshot://irena/2023-06-26/renewable_power_generation_costs.xlsx
+  data://garden/irena/2023-06-26/renewable_power_generation_costs:
+    - data://meadow/irena/2023-06-26/renewable_power_generation_costs
+  data://grapher/irena/2023-06-26/renewable_power_generation_costs:
+    - data://garden/irena/2023-06-26/renewable_power_generation_costs
+  #
+  # IRENA - Renewable electricity capacity (2023).
+  #
+  data://meadow/irena/2023-06-26/renewable_electricity_capacity:
+    - snapshot://irena/2023-06-26/renewable_electricity_capacity_and_generation.xlsm
+  data://garden/irena/2023-06-26/renewable_electricity_capacity:
+    - data://meadow/irena/2023-06-26/renewable_electricity_capacity
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2023-04-30/income_groups
+  data://grapher/irena/2023-06-26/renewable_electricity_capacity_by_technology:
+    - data://garden/irena/2023-06-26/renewable_electricity_capacity
+  data://grapher/irena/2023-06-26/renewable_electricity_capacity:
+    - data://garden/irena/2023-06-26/renewable_electricity_capacity
 
   ######################################################################################################################

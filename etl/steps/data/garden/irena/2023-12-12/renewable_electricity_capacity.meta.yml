@@ -1,121 +1,59 @@
-# TODO: This file is a duplicate of the previous step. It is not yet used in the dag and should be updated soon.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Energy
+    short_unit: MW
+    unit: megawatts
+    display:
+      numDecimalPlaces: 0
+    description_short: |-
+      Measured in megawatts.
+
+dataset:
+  update_period_days: 365
 
 tables:
   renewable_electricity_capacity:
+    title: Renewable electricity capacity
     variables:
       bagasse:
         title: Bagasse capacity
-        short_unit: MW
-        unit: megawatts
-        description: |
-          Bagasse is a byproduct from the process of sugar cane refining, often used as a biofuel for the production of heat, energy, and electricity.
-        display:
-          numDecimalPlaces: 0
+        description_key:
+        - Bagasse is a byproduct from the process of sugar cane refining, often used as a biofuel for the production of heat, energy, and electricity.
       bioenergy:
         title: Bioenergy capacity
-        short_unit: MW
-        unit: megawatts
-        display:
-          numDecimalPlaces: 0
       biogas:
         title: Biogas capacity
-        short_unit: MW
-        unit: megawatts
-        display:
-          numDecimalPlaces: 0
       concentrated_solar_power:
         title: Concentrated solar power capacity
-        short_unit: MW
-        unit: megawatts
-        display:
-          numDecimalPlaces: 0
       geothermal_energy:
         title: Geothermal energy capacity
-        short_unit: MW
-        unit: megawatts
-        display:
-          numDecimalPlaces: 0
       hydropower:
         title: Hydropower capacity
-        short_unit: MW
-        unit: megawatts
-        display:
-          numDecimalPlaces: 0
       liquid_biofuels:
         title: Liquid biofuels capacity
-        short_unit: MW
-        unit: megawatts
-        display:
-          numDecimalPlaces: 0
       marine_energy:
         title: Marine energy capacity
-        short_unit: MW
-        unit: megawatts
-        display:
-          numDecimalPlaces: 0
       offshore_wind_energy:
         title: Offshore wind energy capacity
-        short_unit: MW
-        unit: megawatts
-        display:
-          numDecimalPlaces: 0
       onshore_wind_energy:
         title: Onshore wind energy capacity
-        short_unit: MW
-        unit: megawatts
-        display:
-          numDecimalPlaces: 0
       other_solid_biofuels:
         title: Other solid biofuels capacity
-        short_unit: MW
-        unit: megawatts
-        display:
-          numDecimalPlaces: 0
       pure_pumped_storage:
         title: Pure pumped storage capacity
-        short_unit: MW
-        unit: megawatts
-        display:
-          numDecimalPlaces: 0
       renewable_hydropower_including_mixed_plants:
         title: Renewable hydropower including mixed plants capacity
-        short_unit: MW
-        unit: megawatts
-        display:
-          numDecimalPlaces: 0
       renewable_municipal_waste:
         title: Renewable municipal waste capacity
-        short_unit: MW
-        unit: megawatts
-        display:
-          numDecimalPlaces: 0
       solar_energy:
         title: Solar energy capacity
-        short_unit: MW
-        unit: megawatts
-        display:
-          numDecimalPlaces: 0
       solar_photovoltaic:
         title: Solar photovoltaic capacity
-        short_unit: MW
-        unit: megawatts
-        display:
-          numDecimalPlaces: 0
       solid_biofuels_and_renewable_waste:
         title: Solid biofuels and renewable waste capacity
-        short_unit: MW
-        unit: megawatts
-        display:
-          numDecimalPlaces: 0
       total_renewable_energy:
         title: Total renewable energy capacity
-        short_unit: MW
-        unit: megawatts
-        display:
-          numDecimalPlaces: 0
       wind_energy:
         title: Wind energy capacity
-        short_unit: MW
-        unit: megawatts
-        display:
-          numDecimalPlaces: 0

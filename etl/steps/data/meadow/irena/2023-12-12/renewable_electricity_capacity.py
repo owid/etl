@@ -1,5 +1,3 @@
-# TODO: This file is a duplicate of the previous step. It is not yet used in the dag and should be updated soon.
-
 """Load a snapshot and create a meadow dataset."""
 
 import owid.catalog.processing as pr
@@ -105,5 +103,5 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new meadow dataset with the same metadata as the snapshot.
-    ds_meadow = create_dataset(dest_dir, tables=[tb], default_metadata=snap.metadata)
+    ds_meadow = create_dataset(dest_dir, tables=[tb], check_variables_metadata=True)
     ds_meadow.save()

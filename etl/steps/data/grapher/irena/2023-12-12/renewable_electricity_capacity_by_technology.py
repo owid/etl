@@ -1,7 +1,3 @@
-# TODO: This file is a duplicate of the previous step. It is not yet used in the dag and should be updated soon.
-
-from owid import catalog
-
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
@@ -13,7 +9,7 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load dataset from Garden and read its main table.
-    ds_garden: catalog.Dataset = paths.load_dependency("renewable_electricity_capacity")
+    ds_garden = paths.load_dataset("renewable_electricity_capacity")
     tb = ds_garden["renewable_electricity_capacity"]
 
     #
@@ -37,12 +33,13 @@ def run(dest_dir: str) -> None:
     # Set an appropriate index and sort conveniently.
     tb = tb.set_index(["country", "year"], verify_integrity=True).sort_index()
 
+    # Update table's metadata.
+    tb.metadata.short_name = paths.short_name
+    tb.metadata.title = "Renewable electricity capacity by technology"
+
     #
     # Save outputs.
     #
     # Create new dataset.
-    ds_grapher = create_dataset(dest_dir=dest_dir, tables=[tb], default_metadata=None)
-    ds_grapher.metadata.title = f"Renewable electricity capacity by technology (IRENA, {paths.version})"
-    # Gather all sources in variables and assign them to the dataset.
-    ds_grapher.metadata.sources = catalog.tables.get_unique_sources_from_tables([tb])
+    ds_grapher = create_dataset(dest_dir=dest_dir, tables=[tb], check_variables_metadata=True)
     ds_grapher.save()
