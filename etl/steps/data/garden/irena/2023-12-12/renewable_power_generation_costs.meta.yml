@@ -1,46 +1,47 @@
-# TODO: This file is a duplicate of the previous step. It is not yet used in the dag and should be updated soon.
+definitions:
+  common:
+    processing_level: minor
+    presentation:
+      topic_tags:
+      - Energy
+    short_unit: $/kWh
+    unit: 2022 US$ per kilowatt-hour
+    description_short: |-
+      Measured in 2022 US$ per kilowatt-hour.
+
+  description_key_lcoe: &description_key_lcoe
+  - Levelized cost of energy (LCOE) estimates the average cost per unit of energy generated across the lifetime of a new power plant. It is measured in US$ per kilowatt-hour.
 
 dataset:
-  title: Renewable power generation costs (IRENA, 2023b)
-  description: |
-    Levelized cost of energy (LCOE) estimates the average cost per unit of energy generated across the lifetime of a new power plant. It is measured in 2021 US$ per kilowatt-hour.
+  update_period_days: 365
 
 tables:
   renewable_power_generation_costs:
+    title: Renewable power generation costs
     variables:
       bioenergy:
         title: Bioenergy levelized cost of energy
-        short_unit: $/kWh
-        unit: 2021 US$ per kilowatt-hour
+        description_key: *description_key_lcoe
       concentrated_solar_power:
         title: Concentrated solar power levelized cost of energy
-        short_unit: $/kWh
-        unit: 2021 US$ per kilowatt-hour
+        description_key: *description_key_lcoe
       geothermal:
         title: Geothermal levelized cost of energy
-        short_unit: $/kWh
-        unit: 2021 US$ per kilowatt-hour
+        description_key: *description_key_lcoe
       hydropower:
         title: Hydropower levelized cost of energy
-        short_unit: $/kWh
-        unit: 2021 US$ per kilowatt-hour
+        description_key: *description_key_lcoe
       offshore_wind:
         title: Offshore wind levelized cost of energy
-        short_unit: $/kWh
-        unit: 2021 US$ per kilowatt-hour
+        description_key: *description_key_lcoe
       onshore_wind:
         title: Onshore wind levelized cost of energy
-        short_unit: $/kWh
-        unit: 2021 US$ per kilowatt-hour
+        description_key: *description_key_lcoe
       solar_photovoltaic:
         title: Solar photovoltaic levelized cost of energy
-        short_unit: $/kWh
-        unit: 2021 US$ per kilowatt-hour
+        description_key: *description_key_lcoe
   solar_photovoltaic_module_prices:
+    title: Solar photovoltaic module prices
     variables:
       cost:
         title: Solar photovoltaic module prices
-        short_unit: "$/W"
-        unit: "2021 US$ per Watt"
-        description: |
-          Global average price of solar photovoltaic modules.
