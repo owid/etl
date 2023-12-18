@@ -7,10 +7,8 @@ The data is copied from "FIGURE 42. GLOBAL TRENDS IN RENEWABLE ENERGY INVESTMENT
 """
 
 import owid.catalog.processing as pr
-from owid.catalog import Dataset, Table
 
 from etl.helpers import PathFinder, create_dataset
-
 
 # naming conventions
 paths = PathFinder(__file__)
@@ -32,7 +30,9 @@ def run(dest_dir: str) -> None:
     # Prepare data.
     #
     # Transpose data to have a column per energy source.
-    tb = tb.melt(id_vars="sector", var_name="year", value_name="investment").pivot(index="year", columns=["sector"], join_column_levels_with="_")
+    tb = tb.melt(id_vars="sector", var_name="year", value_name="investment").pivot(
+        index="year", columns=["sector"], join_column_levels_with="_"
+    )
     tb = tb.rename(columns={column: column.replace("investment_", "") for column in tb.columns}, errors="raise")
 
     # Add column for region.
