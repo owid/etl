@@ -1,0 +1,13 @@
+dataset:
+  title: Fertility Rate (Selected Gapminder, v12) (2017)
+tables:
+  fertility_rate:
+    variables:
+      fertility_rate__select_gapminder__v12__2017:
+        title: Fertility rate (Select Gapminder, v12) (2017)
+        unit: children per woman
+        display:
+          name: Fertility rate
+        description: Total fertility rate represents the number of children that would be born to a woman if she were to live
+          to the end of her childbearing years and bear children in accordance with age-specific fertility rates of the specified
+          year.
