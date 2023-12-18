@@ -100,10 +100,10 @@ steps:
   #
   # Energy - Fossil fuel reserves/production ratio (2023).
   #
-  data://garden/energy/2023-07-10/fossil_fuel_reserves_production_ratio:
-    - data://garden/energy_institute/2023-06-26/statistical_review_of_world_energy
-  data://grapher/energy/2023-07-10/fossil_fuel_reserves_production_ratio:
-    - data://garden/energy/2023-07-10/fossil_fuel_reserves_production_ratio
+  data://garden/energy/2023-12-12/fossil_fuel_reserves_production_ratio:
+    - data://garden/energy_institute/2023-12-12/statistical_review_of_world_energy
+  data://grapher/energy/2023-12-12/fossil_fuel_reserves_production_ratio:
+    - data://garden/energy/2023-12-12/fossil_fuel_reserves_production_ratio
   #
   # EIA - Energy consumption 2023.
   #
@@ -126,21 +126,21 @@ steps:
   #
   # Shift - Energy production from fossil fuels 2023.
   #
-  data://meadow/shift/2023-07-10/energy_production_from_fossil_fuels:
-    - snapshot://shift/2023-07-10/energy_production_from_fossil_fuels.csv
-  data://garden/shift/2023-07-10/energy_production_from_fossil_fuels:
-    - data://meadow/shift/2023-07-10/energy_production_from_fossil_fuels
+  data://meadow/shift/2023-12-12/energy_production_from_fossil_fuels:
+    - snapshot://shift/2023-12-12/energy_production_from_fossil_fuels.csv
+  data://garden/shift/2023-12-12/energy_production_from_fossil_fuels:
+    - data://meadow/shift/2023-12-12/energy_production_from_fossil_fuels
     - data://garden/wb/2023-04-30/income_groups
     - data://garden/regions/2023-01-01/regions
   #
   # Energy - Fossil Fuel Production 2023.
   #
-  data://garden/energy/2023-07-10/fossil_fuel_production:
-    - data://garden/energy_institute/2023-06-26/statistical_review_of_world_energy
-    - data://garden/shift/2023-07-10/energy_production_from_fossil_fuels
+  data://garden/energy/2023-12-12/fossil_fuel_production:
+    - data://garden/energy_institute/2023-12-12/statistical_review_of_world_energy
+    - data://garden/shift/2023-12-12/energy_production_from_fossil_fuels
     - data://garden/demography/2023-03-31/population
-  data://grapher/energy/2023-07-10/fossil_fuel_production:
-    - data://garden/energy/2023-07-10/fossil_fuel_production
+  data://grapher/energy/2023-12-12/fossil_fuel_production:
+    - data://garden/energy/2023-12-12/fossil_fuel_production
   #
   # Smil - Global primary energy (2017).
   #
@@ -335,5 +335,30 @@ steps:
     - data://garden/irena/2023-06-26/renewable_electricity_capacity
   data://grapher/irena/2023-06-26/renewable_electricity_capacity:
     - data://garden/irena/2023-06-26/renewable_electricity_capacity
+  #
+  # Shift - Energy production from fossil fuels 2023.
+  #
+  data://meadow/shift/2023-07-10/energy_production_from_fossil_fuels:
+    - snapshot://shift/2023-07-10/energy_production_from_fossil_fuels.csv
+  data://garden/shift/2023-07-10/energy_production_from_fossil_fuels:
+    - data://meadow/shift/2023-07-10/energy_production_from_fossil_fuels
+    - data://garden/wb/2023-04-30/income_groups
+    - data://garden/regions/2023-01-01/regions
+  #
+  # Energy - Fossil Fuel Production 2023.
+  #
+  data://garden/energy/2023-07-10/fossil_fuel_production:
+    - data://garden/energy_institute/2023-06-26/statistical_review_of_world_energy
+    - data://garden/shift/2023-07-10/energy_production_from_fossil_fuels
+    - data://garden/demography/2023-03-31/population
+  data://grapher/energy/2023-07-10/fossil_fuel_production:
+    - data://garden/energy/2023-07-10/fossil_fuel_production
+  #
+  # Energy - Fossil fuel reserves/production ratio (2023).
+  #
+  data://garden/energy/2023-07-10/fossil_fuel_reserves_production_ratio:
+    - data://garden/energy_institute/2023-06-26/statistical_review_of_world_energy
+  data://grapher/energy/2023-07-10/fossil_fuel_reserves_production_ratio:
+    - data://garden/energy/2023-07-10/fossil_fuel_reserves_production_ratio
 
   ######################################################################################################################

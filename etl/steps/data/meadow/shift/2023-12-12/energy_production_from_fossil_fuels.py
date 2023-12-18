@@ -1,5 +1,3 @@
-# TODO: This file is a duplicate of the previous step. It is not yet used in the dag and should be updated soon.
-
 """Load a snapshot and create a meadow dataset."""
 
 from etl.helpers import PathFinder, create_dataset
@@ -16,7 +14,7 @@ def run(dest_dir: str) -> None:
     snap = paths.load_snapshot("energy_production_from_fossil_fuels.csv")
 
     # Load data from snapshot.
-    tb = snap.read_csv(underscore=True)
+    tb = snap.read(underscore=True)
 
     #
     # Process data.
@@ -28,5 +26,5 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new meadow dataset with the same metadata as the snapshot.
-    ds_meadow = create_dataset(dest_dir, tables=[tb], default_metadata=snap.metadata, check_variables_metadata=True)
+    ds_meadow = create_dataset(dest_dir, tables=[tb], check_variables_metadata=True)
     ds_meadow.save()
