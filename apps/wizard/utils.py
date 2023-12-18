@@ -634,10 +634,12 @@ def render_responsive_field_in_form(
         )
     with field_2:
         if field == custom_label:
+            default_value = app_state.default_value(key)
             field = app_state.st_widget(
                 st.text_input,
                 label="↳ *Use custom value*",
                 placeholder="",
                 help="Enter custom value.",
                 key=f"{key}_custom",
+                default_last=default_value,
             )
