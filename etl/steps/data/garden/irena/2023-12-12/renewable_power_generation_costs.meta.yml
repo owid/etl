@@ -3,7 +3,7 @@ definitions:
     processing_level: minor
     presentation:
       topic_tags:
-      - Energy
+        - Energy
     short_unit: $/kWh
     unit: 2022 US$ per kilowatt-hour
     description_short: |-

@@ -45,16 +45,16 @@ steps:
   #
   # IRENA - Renewable electricity capacity (2023).
   #
-  # data://meadow/irena/2023-12-12/renewable_electricity_capacity:
-  #   - snapshot://irena/2023-12-12/renewable_electricity_capacity_and_generation.xlsm
-  # data://garden/irena/2023-12-12/renewable_electricity_capacity:
-  #   - data://meadow/irena/2023-12-12/renewable_electricity_capacity
-  #   - data://garden/regions/2023-01-01/regions
-  #   - data://garden/wb/2023-04-30/income_groups
-  # data://grapher/irena/2023-12-12/renewable_electricity_capacity_by_technology:
-  #   - data://garden/irena/2023-12-12/renewable_electricity_capacity
-  # data://grapher/irena/2023-12-12/renewable_electricity_capacity:
-  #   - data://garden/irena/2023-12-12/renewable_electricity_capacity
+  data://meadow/irena/2023-12-12/renewable_electricity_capacity:
+    - snapshot://irena/2023-12-12/renewable_electricity_capacity_and_generation.xlsm
+  data://garden/irena/2023-12-12/renewable_electricity_capacity:
+    - data://meadow/irena/2023-12-12/renewable_electricity_capacity
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2023-04-30/income_groups
+  data://grapher/irena/2023-12-12/renewable_electricity_capacity_by_technology:
+    - data://garden/irena/2023-12-12/renewable_electricity_capacity
+  data://grapher/irena/2023-12-12/renewable_electricity_capacity:
+    - data://garden/irena/2023-12-12/renewable_electricity_capacity
   #
   # IRENA - Renewable energy patents (2022).
   #
