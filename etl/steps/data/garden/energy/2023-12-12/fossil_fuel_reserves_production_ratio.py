@@ -1,10 +1,8 @@
-# TODO: This file is a duplicate of the previous step. It is not yet used in the dag and should be updated soon.
-
 """Load Statistical Review of World Energy and create variables of reserves-to-production ratios of fossil fuels.
 
 """
 
-from owid.catalog import Dataset, Table
+from owid.catalog import Table
 
 from etl.helpers import PathFinder, create_dataset
 
@@ -27,8 +25,8 @@ def prepare_statistical_review_data(tb_review: Table) -> Table:
     assert tb_review["coal_production_mt"].metadata.unit == "million tonnes"
     assert tb_review["oil_reserves_bbl"].metadata.unit == "billion barrels"
     assert tb_review["oil_production_mt"].metadata.unit == "million tonnes"
-    assert tb_review["gas_reserves_tcm"].metadata.unit == "trillion cubic metres"
-    assert tb_review["gas_production_bcm"].metadata.unit == "billion cubic metres"
+    assert tb_review["gas_reserves_tcm"].metadata.unit == "trillion cubic meters"
+    assert tb_review["gas_production_bcm"].metadata.unit == "billion cubic meters"
 
     # Prepare Statistical Review data.
     columns = {
@@ -78,20 +76,18 @@ def run(dest_dir: str) -> None:
     # Load data.
     #
     # Load Statistical Review dataset and read its main table.
-    ds_review: Dataset = paths.load_dependency("statistical_review_of_world_energy")
+    ds_review = paths.load_dataset("statistical_review_of_world_energy")
     tb_review = ds_review["statistical_review_of_world_energy"].reset_index()
 
     #
     # Process data.
     #
-    # Prepare BP data.
+    # Prepare Statistical Review data.
     tb = prepare_statistical_review_data(tb_review=tb_review)
 
     #
     # Save outputs.
     #
     # Create a new garden dataset.
-    ds_garden = create_dataset(
-        dest_dir=dest_dir, tables=[tb], default_metadata=ds_review.metadata, check_variables_metadata=True
-    )
+    ds_garden = create_dataset(dest_dir=dest_dir, tables=[tb], check_variables_metadata=True)
     ds_garden.save()

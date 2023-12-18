@@ -100,10 +100,10 @@ steps:
   #
   # Energy - Fossil fuel reserves/production ratio (2023).
   #
-  data://garden/energy/2023-07-10/fossil_fuel_reserves_production_ratio:
-    - data://garden/energy_institute/2023-06-26/statistical_review_of_world_energy
-  data://grapher/energy/2023-07-10/fossil_fuel_reserves_production_ratio:
-    - data://garden/energy/2023-07-10/fossil_fuel_reserves_production_ratio
+  data://garden/energy/2023-12-12/fossil_fuel_reserves_production_ratio:
+    - data://garden/energy_institute/2023-12-12/statistical_review_of_world_energy
+  data://grapher/energy/2023-12-12/fossil_fuel_reserves_production_ratio:
+    - data://garden/energy/2023-12-12/fossil_fuel_reserves_production_ratio
   #
   # EIA - Energy consumption 2023.
   #
@@ -353,5 +353,12 @@ steps:
     - data://garden/demography/2023-03-31/population
   data://grapher/energy/2023-07-10/fossil_fuel_production:
     - data://garden/energy/2023-07-10/fossil_fuel_production
+  #
+  # Energy - Fossil fuel reserves/production ratio (2023).
+  #
+  data://garden/energy/2023-07-10/fossil_fuel_reserves_production_ratio:
+    - data://garden/energy_institute/2023-06-26/statistical_review_of_world_energy
+  data://grapher/energy/2023-07-10/fossil_fuel_reserves_production_ratio:
+    - data://garden/energy/2023-07-10/fossil_fuel_reserves_production_ratio
 
   ######################################################################################################################
