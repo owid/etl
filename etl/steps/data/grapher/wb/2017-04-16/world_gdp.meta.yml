@@ -1,46 +1,40 @@
 definitions:
   common:
-    processing_level: TBD - major or minor
+    processing_level: major
     presentation:
       topic_tags:
-        - TBD - Indicator's topic tags
-    sources: []
-    origins:
-      - producer: Our World In Data based on World Bank & Maddison (2017)
-        title: World GDP in 2011 int $ - OWID based on World Bank + Maddison (2017)
-        description: 'The data presented here from 1990 onwards is from the World Bank. It is total global GDP in 2011 international-$
-          as published here: http://data.worldbank.org/indicator/NY.GDP.MKTP.PP.KD (accessed on April 16, 2017). Data earlier
-          than 1990 is backwards extended from the World Bank observation for 1990 based on the growth rates implied by Maddison
-          data. The Maddison data is published here: http://www.ggdc.net/maddison/oriindex.htm'
-        citation_full: New Maddison Project Database and World Bank
-        url_main: Please see additional information for links
-        date_accessed: '2017-04-16'
-        date_published: '2017-04-16'
+        - Economic Growth
+
+
 dataset:
-  update_period_days: TBD - Number of days between OWID updates
+  update_period_days: 0
   sources: []
+  title: World GDP (World Bank & Maddison, 2017)
+
 tables:
   world_gdp:
     variables:
       world_gdp_in_2011_int_dollar__owid_based_on_world_bank__and__maddison__2017:
-        title: World GDP in 2011 Int.$ (OWID based on World Bank & Maddison (2017))
-        unit: int.-$
+        title: World GDP (World Bank & Maddison, 2017)
+        unit: international-$ in 2011 prices
         short_unit: $
         display:
           numDecimalPlaces: 0
           unit: international-$ in 2011 prices
         description_short: Total output of the world economy. This data is adjusted for inflation and differences in the cost
           of living between countries.
-        description_key:
-          - TBD - List of key pieces of information about the indicator.
-        description_from_producer: TBD - Indicator's description given by the producer
-        description_processing: TBD - Indicator's processing description
+        description_from_producer: |-
+          PPP GDP is gross domestic product converted to international dollars using purchasing power parity rates. An international dollar has the same purchasing power over GDP as the U.S. dollar has in the United States. GDP is the sum of gross value added by all resident producers in the country plus any product taxes and minus any subsidies not included in the value of the products. It is calculated without making deductions for depreciation of fabricated assets or for depletion and degradation of natural resources. Data are in constant 2017 international dollars.
+
+        description_processing: |-
+          The data presented here from 1990 onwards is from the World Bank.
+
+          It is total global GDP in 2011 international-$ as published here: http://data.worldbank.org/indicator/NY.GDP.MKTP.PP.KD (accessed on April 16, 2017). Data earlier than 1990 is backwards extended from the World Bank observation for 1990 based on the growth rates implied by Maddison data. The Maddison data is published here: http://www.ggdc.net/maddison/oriindex.htm.
         presentation:
-          title_public: TBD - Indicator title to be shown in data pages, that overrides the indicator's title.
-          title_variant: TBD - Indicator's title variant
-          attribution_short: TBD - Indicator's attribution (shorter version)
+          title_public: World GDP
+          attribution_short: World Bank & Maddison
           faqs:
-            - fragment_id: TBD - Question identifier from FAQ GDoc
+            - fragment_id: What are international-$ and why are they used to measure incomes?
               gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
           grapher_config:
             title: World GDP over the last two millennia
