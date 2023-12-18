@@ -1,16 +1,10 @@
-# TODO: This file is a duplicate of the previous step. It is not yet used in the dag and should be updated soon.
-
-"""Garden step for Fossil fuel production dataset (part of the OWID Energy dataset), based on a combination of BP's
-Statistical Review dataset and Shift data on fossil fuel production.
+"""Garden step for Fossil fuel production dataset (part of the OWID Energy dataset), based on a combination of the
+Energy Institute Statistical Review dataset and Shift data on fossil fuel production.
 
 """
 
 import numpy as np
 from owid.catalog import Dataset, Table
-from owid.catalog.tables import (
-    get_unique_licenses_from_tables,
-    get_unique_sources_from_tables,
-)
 from owid.datautils import dataframes
 
 from etl.data_helpers.geo import add_population_to_table
@@ -47,7 +41,7 @@ def prepare_statistical_review_data(tb_review: Table) -> Table:
         "gas_production_twh": "Gas production (TWh)",
         "oil_production_twh": "Oil production (TWh)",
     }
-    tb_review = tb_review[list(columns)].rename(columns=columns)
+    tb_review = tb_review[list(columns)].rename(columns=columns, errors="raise")
 
     return tb_review
 
@@ -75,7 +69,7 @@ def prepare_shift_data(tb_shift: Table) -> Table:
         "gas": "Gas production (TWh)",
         "oil": "Oil production (TWh)",
     }
-    tb_shift = tb_shift[list(columns)].rename(columns=columns)
+    tb_shift = tb_shift[list(columns)].rename(columns=columns, errors="raise")
 
     return tb_shift
 
@@ -101,17 +95,9 @@ def combine_statistical_review_and_shift_data(tb_review: Table, tb_shift: Table)
     assert tb_shift[tb_shift.duplicated(subset=["country", "year"])].empty, "Duplicated rows in Shift data."
 
     # Combine Shift data (which goes further back in the past) with Statistical Review data (which is more up-to-date).
-    # On coincident rows, prioritise Statistical Review data.
-    # NOTE: Currently, function combine_two_overlapping_dataframes does not properly propagate metadata.
-    #  For now, sources and licenses have to be combined manually.
+    # On coincident rows, prioritize Statistical Review data.
     index_columns = ["country", "year"]
     combined = dataframes.combine_two_overlapping_dataframes(df1=tb_review, df2=tb_shift, index_columns=index_columns)
-    # Combine metadata of the two tables.
-    sources = get_unique_sources_from_tables([tb_review, tb_shift])
-    licenses = get_unique_licenses_from_tables([tb_review, tb_shift])
-    for column in combined.drop(columns=index_columns).columns:
-        combined[column].metadata.sources = sources
-        combined[column].metadata.licenses = licenses
 
     # Update the name of the new combined table.
     combined.metadata.short_name = paths.short_name
@@ -144,10 +130,9 @@ def add_annual_change(tb: Table) -> Table:
     # Calculate annual change.
     combined = combined.sort_values(["country", "year"]).reset_index(drop=True)
     for cat in ("Coal", "Oil", "Gas"):
-        # NOTE: Currently, groupby pct_change doesn't propagate metadata properly. This has to be done manually.
         combined[f"Annual change in {cat.lower()} production (%)"] = (
             combined.groupby("country")[f"{cat} production (TWh)"].pct_change() * 100
-        ).copy_metadata(combined[f"{cat} production (TWh)"])
+        )
         combined[f"Annual change in {cat.lower()} production (TWh)"] = combined.groupby("country")[
             f"{cat} production (TWh)"
         ].diff()
@@ -227,15 +212,15 @@ def run(dest_dir: str) -> None:
     # Load data.
     #
     # Load Statistical Review dataset and read its main table.
-    ds_review: Dataset = paths.load_dependency("statistical_review_of_world_energy")
+    ds_review = paths.load_dataset("statistical_review_of_world_energy")
     tb_review = ds_review["statistical_review_of_world_energy"]
 
     # Load Shift dataset and read its main table.
-    ds_shift: Dataset = paths.load_dependency("energy_production_from_fossil_fuels")
+    ds_shift = paths.load_dataset("energy_production_from_fossil_fuels")
     tb_shift = ds_shift["energy_production_from_fossil_fuels"]
 
     # Load population dataset.
-    ds_population: Dataset = paths.load_dependency("population")
+    ds_population = paths.load_dataset("population")
 
     #
     # Process data.
@@ -246,7 +231,7 @@ def run(dest_dir: str) -> None:
     # Prepare Shift data on fossil fuel production.
     tb_shift = prepare_shift_data(tb_shift=tb_shift)
 
-    # Combine BP and Shift data.
+    # Combine Statistical Review and Shift data.
     tb = combine_statistical_review_and_shift_data(tb_review=tb_review, tb_shift=tb_shift)
 
     # Add annual change.
@@ -265,7 +250,5 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new garden dataset.
-    ds_garden = create_dataset(
-        dest_dir=dest_dir, tables=[tb], default_metadata=ds_review.metadata, check_variables_metadata=True
-    )
+    ds_garden = create_dataset(dest_dir=dest_dir, tables=[tb], check_variables_metadata=True)
     ds_garden.save()

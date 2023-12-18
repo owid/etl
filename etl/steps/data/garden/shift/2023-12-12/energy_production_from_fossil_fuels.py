@@ -129,7 +129,13 @@ def run(dest_dir: str) -> None:
     tb = correct_historical_regions(data=tb)
 
     # Create aggregate regions.
-    tb = geo.add_regions_to_table(tb, ds_regions=ds_regions, ds_income_groups=ds_income_groups, min_num_values_per_year=1, ignore_overlaps_of_zeros=True)
+    tb = geo.add_regions_to_table(
+        tb,
+        ds_regions=ds_regions,
+        ds_income_groups=ds_income_groups,
+        min_num_values_per_year=1,
+        ignore_overlaps_of_zeros=True,
+    )
 
     # Prepare output data.
     tb = tb.set_index(["country", "year"], verify_integrity=True).sort_index()
