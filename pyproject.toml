@@ -30,6 +30,7 @@ etl-chartgpt = 'etl.chart_revision.v2.chartgpt:cli'
 etl-metaplay = 'apps.metadata_playground.cli:cli'
 etl-wizard = 'apps.wizard.cli:cli'
 etl-staging-sync = 'apps.staging_sync.cli:cli'
+etl-metagpt = 'apps.metagpt.cli:main'
 
 [tool.poetry.dependencies]
 python = ">=3.10, <3.12"
@@ -73,7 +74,7 @@ gitpython = "^3.1.30"
 rapidfuzz = "^2.13.7"
 # pinned because of frictionless, remove this pin when frictionless is updated
 fsspec = "2022.11.0"
-openai = "^0.27.7"
+openai = "^1.3.6"
 pdfplumber = "^0.9.0"
 pyhumps = "^3.8.0"
 wbgapi = "^1.0.12"
