@@ -40,6 +40,7 @@ Other helpfull tools in the ETL ecosystem.
 )
 pages = [
     "Charts",
+    "MetaGPT",
 ]
 for page in pages:
     go_to_page = st.button(f"➡️  {page}")
