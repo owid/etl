@@ -1,28 +1,37 @@
-# Metadata Update Tool
+# ETL-MetaGPT Tool
 
-This Python script is used to update metadata files using OpenAI's GPT model. The script is designed to work with two types of metadata files: 'snap' and 'grapher'.
+This tool, accessible via the command `etl-metagpt`, is designed to update metadata files using OpenAI's GPT model. It currently supports two types of metadata files: 'snapshot' and 'grapher'.
 
 ## Main Functionality
 
-The main function `main()` is set up as a command-line interface (CLI) using the `click` library. It takes three arguments:
+The main function is set up as a command-line interface (CLI). It takes three arguments:
 
 - `path-to-file`: The path to the metadata file that needs to be updated.
 - `output-dir`: The directory where the updated metadata file should be saved. If not provided, the updated file will be saved in the same directory as the original file.
 - `overwrite`: A flag that, if set to True, overwrites the original file with the updated metadata.
 
-## Helper Functions
+## Snapshot vs Grapher Metadata Files
 
-The script includes several helper functions:
+The `etl-metagpt` tool handles 'snapshot' and 'grapher' metadata files differently:
 
-- `read_metadata_file()`: Reads a metadata file and returns its content.
-- `process_chat_completion()`: Processes the chat completion response from the GPT model.
-- `generate_metadata_update()`: Generates the updated metadata using the GPT model. This function handles different types of metadata files ('snap' and 'grapher') differently.
-- `create_system_prompt()`: Creates the system prompt for the GPT model based on the type of metadata file.
-- `check_gpt_response_format()`: Checks if the GPT model's response is in the correct format.
+### Snapshot Updates
+
+- The GPT model is used to read a metadata file and generate a new metadata file that is compatible with the datapages.
+- The new metadata file is structured identically to a hardcoded example file (`NEW_METADATA_EXAMPLE`).
+- The GPT model is given a system prompt that includes the old metadata file, the new metadata format, and additional instructions for formatting the response.
+
+
+### Grapher Updates
+
+- Grapher updates are for metadata files related to the grapher step.
+- The GPT model is used to fill out specific fields for each variable in the metadata file.
+- The fields include 'description_from_producer', 'description_key', and 'description_short'.
+- The GPT model is given a system prompt that includes the old metadata and instructions for filling out the fields.
 
 ## Usage
 
-To use this script, run it from the command line with the required arguments. For example:
+To use this tool, run it from the command line with the required arguments. For example:
 
 ```bash
-python cli.py --path-to-file /path/to/metadata/file --output-dir /path/to/output/directory --overwrite
+etl-metagpt --path-to-file /path/to/metadata/file --output-dir /path/to/output/directory --overwrite
+```
