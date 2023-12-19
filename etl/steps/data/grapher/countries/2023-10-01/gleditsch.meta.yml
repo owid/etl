@@ -3,5 +3,5 @@ tables:
     variables:
       is_present:
         title: Sovereign state
-        description_short: The country or state is recognized by Gleditsch and Ward dataset.
+        description_short: The country is identified as a sovereign state by Gleditsch and Ward dataset.
         unit: ""

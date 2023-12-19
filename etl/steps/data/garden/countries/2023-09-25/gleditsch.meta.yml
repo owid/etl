@@ -4,6 +4,7 @@ definitions:
     presentation:
       topic_tags:
         - State Capacity
+        - War & Peace
     processing_level: minor
     description_processing: |-
       We use the list of independent states and microstates from Gleditsch and Ward. We assign each country to a region based on the mapping (using GW codes):
