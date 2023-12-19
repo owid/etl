@@ -3,5 +3,5 @@ tables:
     variables:
       is_present:
         title: Sovereign state
-        description_short: Whether the country is present in the COW SSM dataset.
+        description_short: The country is identified as a sovereign state by Correlates of War - State System Membership dataset.
         unit: ""
