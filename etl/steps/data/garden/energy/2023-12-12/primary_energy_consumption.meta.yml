@@ -62,7 +62,7 @@ tables:
         title: Primary energy consumption per capita (kWh/person)
         short_unit: kWh
         unit: kilowatt-hours per capita
-        description_short: Measured in kilowatt-hours per person per year.
+        description_short: Measured in kilowatt-hours per person.
         display:
           name: Per capita energy consumption
           numDecimalPlaces: 0
