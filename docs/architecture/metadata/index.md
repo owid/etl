@@ -54,3 +54,11 @@ We automatically create data pages from an indicator using its metadata fields. 
 
 ### Other uses
 Users can consume the metadata programmatically using the [`owid-catalog`](https://github.com/owid/etl/tree/master/lib/catalog).
+
+## Updating metadata using ChatGPT
+
+We have developed a tool, `etl-metagpt`, that uses OpenAI's GPT model to help us update metadata files. This tool supports two types of metadata files: 'snapshot' and 'grapher'. It reads the metadata file, generates an updated version, and saves it either in the specified output directory or overwrites the original file.
+
+!!! info "Learn more"
+
+    - [Learn about how to use the `etl-metagpt` tool :octicons-arrow-right-24:](metadata_chatgpt_update.md)
