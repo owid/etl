@@ -110,7 +110,8 @@ Metadata Field Guidelines:
 def main(path_to_file: str, output_dir: str, overwrite: bool) -> None:
     """Process and update metadata using GPT-based tool.
 
-    If `path-to-file` must either be a 'snapshot' or a 'grapher' metadata file. To learn more about the behaviour of this tool, please refer to https://docs.owid.io/projects/etl/architecture/metadata/.
+    If `path-to-file` must either be a 'snapshot' or a 'grapher' metadata file.
+    To learn more about the behaviour of this tool, please refer to https://docs.owid.io/projects/etl/architecture/metadata/.
     """
     log.info("Starting metadata update process.")
 
@@ -125,7 +126,9 @@ def main(path_to_file: str, output_dir: str, overwrite: bool) -> None:
     try:
         # Start tool (initialise gpt client)
         gpt_updater = MetadataGPTUpdater(path_to_file)
+        # Run update
         gpt_updater.run()
+        # Save updated metadata
         gpt_updater.save_updated_metadata(output_file_path)
     except Exception as e:
         log.error("Metadata update process failed.", error=str(e))
@@ -152,7 +155,7 @@ class MetadataGPTUpdater:
         It is susceptible to errors:
             - What if the path contains more than one of the keywords? e.g. 'grapher/un_snapshots/2023-12-01/file.yaml'
         """
-        if "snapshot/" in self.path_to_file:
+        if "snapshots/" in self.path_to_file:
             return Channels.SNAPSHOT
         elif "garden/" in self.path_to_file:
             return Channels.GARDEN
