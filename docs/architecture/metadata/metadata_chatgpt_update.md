@@ -2,6 +2,9 @@
 
 This tool, accessible via the command `etl-metagpt`, is designed to update metadata files using OpenAI's GPT model. It currently supports two types of metadata files: 'snapshot' and 'grapher'.
 
+For 'grapher' metadata files, the tool completes the `description_from_producer`, `description_key`, and `description_short` fields, thereby enriching the metadata with more detailed information.
+
+For 'snapshot' metadata files, the tool updates old, out-of-date files to a new format that is compatible with datapages.
 
 ## Usage
 The main function is set up as a command-line interface (CLI). It takes three arguments:
