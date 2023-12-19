@@ -558,10 +558,15 @@ class DataStep(Step):
 
     def _run_notebook(self) -> None:
         "Run a parameterised Jupyter notebook."
-        # smother deprecation warnings by papermill
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore")
-            import papermill as pm
+        # don't import it again if it's already imported to avoid
+        # ImportError: PyO3 modules may only be initialized once per interpreter process
+        if "papermill" not in sys.modules:
+            # smother deprecation warnings by papermill
+            with warnings.catch_warnings():
+                warnings.simplefilter("ignore")
+                import papermill as pm
+        else:
+            pm = sys.modules["papermill"]
 
         notebook_path = self._search_path.with_suffix(".ipynb")
         with tempfile.TemporaryDirectory() as tmp_dir:

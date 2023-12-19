@@ -1325,6 +1325,18 @@ def estimate_metrics_locations(tb_chupilkin: Table, tb_system: Table, tb_partici
     )
 
     # Fill empty time periods with zero
+    ## Hack to get all years since 1816
+    assert tb_locations_regions["year"].min() == 1818
+    tb_first = Table(
+        {
+            "year": [1816],
+            "country": ["World"],
+            "conflict_type": ["intra-state"],
+            "number_locations": [0],
+        }
+    )
+    tb_locations_regions = pr.concat([tb_first, tb_locations_regions], ignore_index=True)
+    ## Actuall filling gaps
     tb_locations_regions = fill_gaps_with_zeroes(
         tb=tb_locations_regions,
         columns=["country", "year", "conflict_type"],
@@ -1356,6 +1368,10 @@ def estimate_metrics_locations(tb_chupilkin: Table, tb_system: Table, tb_partici
             & (tb_locations["year"] <= 2014)
         )
     ]
+
+    # Fix metadata
+    ## The metadata for `number_locations` should be the same as for `number_ongoing_conflicts`
+    tb_locations["number_locations"].metadata = tb_locations["is_location_of_conflict"].metadata
 
     # Set index
     tb_locations = tb_locations.set_index(["year", "country", "conflict_type"], verify_integrity=True).sort_index()
