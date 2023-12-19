@@ -184,15 +184,14 @@ steps:
   #
   # Energy - OWID Energy dataset (2023).
   #
-  # TODO: UPDATE:
-  # data://garden/energy/2023-12-12/owid_energy:
-  #   - data://garden/energy/2023-12-12/energy_mix
-  #   - data://garden/energy/2023-12-12/fossil_fuel_production
-  #   - data://garden/energy/2023-12-12/primary_energy_consumption
-  #   - data://garden/energy/2023-12-12/electricity_mix
-  #   - data://garden/demography/2023-03-31/population
-  #   - data://garden/ggdc/2020-10-01/ggdc_maddison
-  #   - data://garden/regions/2023-01-01/regions
+  data://garden/energy/2023-12-12/owid_energy:
+    - data://garden/energy/2023-12-12/energy_mix
+    - data://garden/energy/2023-12-12/fossil_fuel_production
+    - data://garden/energy/2023-12-12/primary_energy_consumption
+    - data://garden/energy/2023-12-12/electricity_mix
+    - data://garden/demography/2023-03-31/population
+    - data://garden/ggdc/2020-10-01/ggdc_maddison
+    - data://garden/regions/2023-01-01/regions
 
   ######################################################################################################################
   # Older versions to be archived once they are not used by any other steps.
