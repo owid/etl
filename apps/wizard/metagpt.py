@@ -1,7 +1,7 @@
 import os
 import tempfile
 from pathlib import Path
-from typing import List
+from typing import List, cast
 
 import streamlit as st
 import yaml
@@ -100,7 +100,7 @@ with col11:
 col21, col22 = st.columns(2)
 with col21:
     # Load file
-    filepath = get_actual_path(metadata_file)
+    filepath = get_actual_path(cast(str, metadata_file))
     with open(filepath, "r") as f:
         file_content = f.read()
     # Show file to the user
