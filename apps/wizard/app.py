@@ -26,6 +26,7 @@ show_pages(
         Page(str(CURRENT_DIR / "templating/grapher.py"), "Grapher", icon="4️⃣"),
         Section("Other tools"),
         Page(str(CURRENT_DIR / "charts/__main__.py"), "Charts", icon="📊"),
+        Page(str(CURRENT_DIR / "metagpt.py"), "MetaGPT", icon="🤖"),
     ]
 )
 
