@@ -13,6 +13,9 @@ from typing_extensions import Self
 
 from etl.paths import BASE_DIR
 
+# GPT Model
+GPT_MODEL = "gpt-3.5-turbo"
+
 # Initialize logger
 log = structlog.get_logger()
 
@@ -194,7 +197,7 @@ class MetadataGPTUpdater:
         # Update metadata
         match self.channel:
             case Channels.SNAPSHOT:
-                message_content = get_message_content(self.client, messages=messages, model="gpt-4", temperature=0)  # type: ignore
+                message_content = get_message_content(self.client, messages=messages, model=GPT_MODEL, temperature=0)  # type: ignore
                 if message_content:
                     new_yaml_content = yaml.safe_load(message_content)
                     if new_yaml_content:
@@ -202,7 +205,7 @@ class MetadataGPTUpdater:
             case Channels.GRAPHER:
                 for attempt in range(5):  # MAX_ATTEMPTS
                     message_content = get_message_content(
-                        self.client, messages=messages, model="gpt-4", temperature=0
+                        self.client, messages=messages, model=GPT_MODEL, temperature=0
                     )  #
                     if message_content:
                         try:
