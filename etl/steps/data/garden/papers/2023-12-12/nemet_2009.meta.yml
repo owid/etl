@@ -18,7 +18,9 @@ tables:
         unit: 2004 USD/Watt
       yearly_capacity:
         title: Capacity of photovoltaic technology
-        unit: MW
+        unit: megawatts
+        short_unit: MW
       previous_capacity:
         title: Previous capacity of photovoltaic technology
-        unit: MW
+        unit: megawatts
+        short_unit: MW
