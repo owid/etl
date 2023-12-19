@@ -1,11 +1,13 @@
 import json
 import os
 import re
+from typing import Any
 
 import click
 import structlog
 import yaml
 from openai import OpenAI
+from rich_click.rich_command import RichCommand
 
 from etl.paths import BASE_DIR
 
@@ -94,7 +96,7 @@ Metadata Field Guidelines:
 
 
 # Main CLI command setup with Click
-@click.command()
+@click.command(cls=RichCommand)
 @click.option("--path-to-file", prompt=True, type=str, help="Path to the metadata file.")
 @click.option("--output-dir", default=None, type=str, help="Path to save the new metadata file.")
 @click.option(
@@ -103,8 +105,11 @@ Metadata Field Guidelines:
     is_flag=True,
     help="Overwrite input file if set to True. Otherwise, save the new file in the output directory.",
 )
-def main(path_to_file, output_dir: str, overwrite: bool):
-    """Process and update metadata using GPT-based tool."""
+def main(path_to_file: str, output_dir: str, overwrite: bool) -> None:
+    """Process and update metadata using GPT-based tool.
+
+    If `path-to-file` must either be a 'snapshot' or a 'grapher' metadata file. To learn more about the behaviour of this tool, please refer to https://docs.owid.io/projects/etl/architecture/metadata/.
+    """
     log.info("Starting metadata update process.")
 
     # Determine the output file path
@@ -122,13 +127,13 @@ def main(path_to_file, output_dir: str, overwrite: bool):
         log.error("Metadata update process failed.", error=str(e))
 
 
-def read_metadata_file(path_to_file):
+def read_metadata_file(path_to_file) -> str:
     """Reads a metadata file and returns its content."""
     with open(path_to_file, "r") as file:
         return file.read()
 
 
-def process_chat_completion(chat_completion):
+def process_chat_completion(chat_completion) -> Any | None:
     """Processes the chat completion response."""
     if chat_completion is not None:
         chat_completion_tokens = chat_completion.usage.total_tokens
@@ -138,7 +143,7 @@ def process_chat_completion(chat_completion):
     return None
 
 
-def generate_metadata_update(path_to_file: str, metadata: str, output_file_path: str):
+def generate_metadata_update(path_to_file: str, metadata: str, output_file_path: str) -> None:
     """Generates updated metadata using OpenAI GPT."""
     client = OpenAI()
     messages = create_system_prompt(path_to_file, metadata)
