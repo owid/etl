@@ -108,14 +108,13 @@ steps:
   #
   # Energy - Primary energy consumption (2023).
   #
-  # TODO: UPDATE:
-  # data://garden/energy/2023-12-12/primary_energy_consumption:
-  #   - data://garden/energy_institute/2023-12-12/statistical_review_of_world_energy
-  #   - data://garden/eia/2023-12-12/energy_consumption
-  #   - data://garden/ggdc/2020-10-01/ggdc_maddison
-  #   - data://garden/demography/2023-03-31/population
-  # data://grapher/energy/2023-12-12/primary_energy_consumption:
-  #   - data://garden/energy/2023-12-12/primary_energy_consumption
+  data://garden/energy/2023-12-12/primary_energy_consumption:
+    - data://garden/energy_institute/2023-12-12/statistical_review_of_world_energy
+    - data://garden/eia/2023-12-12/energy_consumption
+    - data://garden/ggdc/2020-10-01/ggdc_maddison
+    - data://garden/demography/2023-03-31/population
+  data://grapher/energy/2023-12-12/primary_energy_consumption:
+    - data://garden/energy/2023-12-12/primary_energy_consumption
   #
   # Shift - Energy production from fossil fuels 2023.
   #
