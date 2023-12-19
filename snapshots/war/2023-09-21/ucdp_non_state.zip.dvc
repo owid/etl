@@ -28,7 +28,7 @@ meta:
       name: CC BY 4.0
       url: https://creativecommons.org/licenses/by/4.0/
 
-wdir: ../../../data/snapshots/war/2023-09-21≈
+wdir: ../../../data/snapshots/war/2023-09-21
 outs:
 - md5: b16f2501a63396c7d3604853d695297d
   size: 71904
