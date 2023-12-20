@@ -80,10 +80,12 @@ def combine_tables_data_and_metadata(
         Origin(
             producer="International Organization for Standardization",
             title="Regions",
+            date_published=ds_regions.version,
         )
     ]
     tb_combined["iso_alpha3"].metadata.title = "ISO code"
     tb_combined["iso_alpha3"].metadata.description_short = "ISO 3166-1 alpha-3 three-letter country codes."
+    tb_combined["iso_alpha3"].metadata.unit = ""
 
     # Add population and gdp of countries (except for dataset-specific regions e.g. those ending in "(EI)").
     tb_combined = add_population_to_table(tb=tb_combined, ds_population=ds_population, warn_on_missing_countries=False)
