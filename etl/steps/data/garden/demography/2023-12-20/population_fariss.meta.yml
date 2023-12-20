@@ -1,0 +1,57 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Population Growth
+      attribution_short: Fariss et al.
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
+dataset:
+  update_period_days: 0
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
+tables:
+  population_fariss:
+    # Learn more about the available fields:
+    # http://docs.owid.io/projects/etl/architecture/metadata/reference/indicator/
+    variables:
+      population:
+        title: Population (mean estimate)
+        unit: people
+        description_short: The total number of people living in a country.
+        description_processing: |-
+          See complete methodology in https://doi.org/10.1177/00220027211054432.
+        processing_level: minor
+
+      population_high:
+        title: Population (high estimate)
+        unit: people
+        description_short: High estimate on the total number of people living in a country.
+        description_processing: |-
+          See complete methodology in https://doi.org/10.1177/00220027211054432.
+
+          The high estimate is calculated by adding the standard deviation to the mean estimate.
+        processing_level: minor
+
+      population_low:
+        title: Population (low estimate)
+        unit: people
+        description_short: Low estimate on the total number of people living in a country.
+        description_processing: |-
+          See complete methodology in https://doi.org/10.1177/00220027211054432.
+
+          The low estimate is calculated by subtracting the standard deviation from the mean estimate.
+        processing_level: minor
+
+      population_sd:
+        title: Population (standard deviation)
+        unit: people
+        description_short: Bias of the population estimate.
+        description_processing: |-
+          See complete methodology in https://doi.org/10.1177/00220027211054432.
+        processing_level: minor
