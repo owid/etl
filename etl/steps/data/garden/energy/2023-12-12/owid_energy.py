@@ -1,5 +1,3 @@
-# TODO: This file is a duplicate of the previous step. It is not yet used in the dag and should be updated soon.
-
 """Garden step that combines various datasets related to energy and produces the OWID Energy dataset.
 
 Datasets combined:
@@ -13,24 +11,18 @@ Auxiliary datasets:
 * Population (OWID based on various sources).
 * GDP (GGDC Maddison).
 
-
 NOTE: Currently we define all metadata in the companion file owid_energy_variable_mapping.csv.
 In the future we may want to avoid it, and use the propagated metadata, without having to manually overwrite it.
 
 """
 
-from typing import Dict, cast
+from typing import Dict
 
 import numpy as np
 import owid.catalog.processing as pr
-from owid.catalog import Dataset, Table
-from owid.catalog.meta import Source
-from owid.catalog.tables import (
-    get_unique_licenses_from_tables,
-    get_unique_sources_from_tables,
-)
+from owid.catalog import Dataset, Origin, Table
 
-from etl.data_helpers.geo import add_population_to_table
+from etl.data_helpers.geo import add_gdp_to_table, add_population_to_table
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
@@ -43,8 +35,8 @@ VARIABLE_MAPPING_FILE = paths.directory / "owid_energy_variable_mapping.csv"
 def combine_tables_data_and_metadata(
     tables: Dict[str, Table],
     ds_population: Dataset,
-    tb_regions: Table,
-    tb_gdp: Table,
+    ds_regions: Dataset,
+    ds_gdp: Dataset,
     variable_mapping: Table,
 ) -> Table:
     """Combine data and metadata of a list of tables, map variable names and add variables metadata.
@@ -80,11 +72,24 @@ def combine_tables_data_and_metadata(
         )
 
     # Add ISO codes for countries (regions that are not in countries-regions dataset will have nan iso_code).
-    tb_combined = pr.merge(tb_combined, tb_regions, left_on="country", right_on="name", how="left")
+    tb_combined = pr.merge(
+        tb_combined, ds_regions["regions"].reset_index(), left_on="country", right_on="name", how="left"
+    )
+    # Add metadata to the ISO column (loaded from the regions dataset).
+    tb_combined["iso_alpha3"].m.origins = [
+        Origin(
+            producer="International Organization for Standardization",
+            title="Regions",
+            date_published=ds_regions.version,
+        )
+    ]
+    tb_combined["iso_alpha3"].metadata.title = "ISO code"
+    tb_combined["iso_alpha3"].metadata.description_short = "ISO 3166-1 alpha-3 three-letter country codes."
+    tb_combined["iso_alpha3"].metadata.unit = ""
 
-    # Add population and gdp of countries (except for dataset-specific regions e.g. those ending in (BP) or (Shift)).
+    # Add population and gdp of countries (except for dataset-specific regions e.g. those ending in "(EI)").
     tb_combined = add_population_to_table(tb=tb_combined, ds_population=ds_population, warn_on_missing_countries=False)
-    tb_combined = pr.merge(tb_combined, tb_gdp, on=["country", "year"], how="left")
+    tb_combined = add_gdp_to_table(tb=tb_combined, ds_gdp=ds_gdp)
 
     # Check that there were no repetition in column names.
     error = "Repeated columns in combined data."
@@ -93,26 +98,26 @@ def combine_tables_data_and_metadata(
     # List the names of the variables described in the variable mapping file.
     source_variables = variable_mapping.index.get_level_values(0).tolist()
 
-    # Gather original metadata for each variable, add the descriptions and sources from the variable mapping file.
-    for source_variable in source_variables:
-        variable_metadata = variable_mapping.loc[source_variable]
-        source_dataset = variable_metadata["source_dataset"]
-        # Check that the variable indeed exists in the original dataset that the variable mapping says.
-        # Ignore columns "country", "year" (assigned to a dummy dataset "various_datasets"), "population" (that comes
-        # from the "population" dataset) and "iso_alpha3" (that comes from the "regions" dataset).
-        if source_dataset not in [
-            "various_datasets",
-            "regions",
-            "population",
-            "maddison_gdp",
-        ]:
-            error = f"Variable {source_variable} not found in any of the original datasets."
-            assert source_variable in tables[source_dataset].columns, error
-            tb_combined[source_variable].metadata = tables[source_dataset][source_variable].metadata
+    # # Gather original metadata for each variable, add the descriptions and sources from the variable mapping file.
+    # for source_variable in source_variables:
+    #     variable_metadata = variable_mapping.loc[source_variable]
+    #     source_dataset = variable_metadata["source_dataset"]
+    #     # Check that the variable indeed exists in the original dataset that the variable mapping says.
+    #     # Ignore columns "country", "year" (assigned to a dummy dataset "various_datasets"), "population" (that comes
+    #     # from the "population" dataset) and "iso_alpha3" (that comes from the "regions" dataset).
+    #     if source_dataset not in [
+    #         "various_datasets",
+    #         "regions",
+    #         "population",
+    #         "maddison_gdp",
+    #     ]:
+    #         error = f"Variable {source_variable} not found in any of the original datasets."
+    #         assert source_variable in tables[source_dataset].columns, error
+    #         tb_combined[source_variable].metadata = tables[source_dataset][source_variable].metadata
 
-        # Update metadata with the content of the variable mapping file.
-        tb_combined[source_variable].metadata.description = variable_metadata["description"]
-        tb_combined[source_variable].metadata.sources = [Source(name=variable_metadata["source"])]
+    #     # Update metadata with the content of the variable mapping file.
+    #     tb_combined[source_variable].metadata.description = variable_metadata["description"]
+    #     tb_combined[source_variable].metadata.sources = [Source(name=variable_metadata["source"])]
 
     # Select only variables in the mapping file, and rename variables according to the mapping.
     tb_combined = tb_combined[source_variables].rename(columns=variable_mapping.to_dict()["variable"], errors="raise")
@@ -130,7 +135,7 @@ def combine_tables_data_and_metadata(
     # Set index and sort conveniently.
     tb_combined = tb_combined.set_index(["country", "year"], verify_integrity=True).sort_index()
 
-    return cast(Table, tb_combined)
+    return tb_combined
 
 
 def run(dest_dir: str) -> None:
@@ -138,21 +143,26 @@ def run(dest_dir: str) -> None:
     # Load data.
     #
     # Read all required datasets.
-    ds_energy_mix: Dataset = paths.load_dependency("energy_mix")
-    ds_fossil_fuels: Dataset = paths.load_dependency("fossil_fuel_production")
-    ds_primary_energy: Dataset = paths.load_dependency("primary_energy_consumption")
-    ds_electricity_mix: Dataset = paths.load_dependency("electricity_mix")
-    ds_population: Dataset = paths.load_dependency("population")
-    ds_gdp: Dataset = paths.load_dependency("ggdc_maddison")
-    ds_regions: Dataset = paths.load_dependency("regions")
+    ds_energy_mix = paths.load_dataset("energy_mix")
+    ds_fossil_fuels = paths.load_dataset("fossil_fuel_production")
+    ds_primary_energy = paths.load_dataset("primary_energy_consumption")
+    ds_electricity_mix = paths.load_dataset("electricity_mix")
+    ds_population = paths.load_dataset("population")
+    ds_gdp = paths.load_dataset("ggdc_maddison")
+    ds_regions = paths.load_dataset("regions")
 
     # Gather all required tables from all datasets.
     tb_energy_mix = ds_energy_mix["energy_mix"].reset_index()
     tb_fossil_fuels = ds_fossil_fuels["fossil_fuel_production"].reset_index()
     tb_primary_energy = ds_primary_energy["primary_energy_consumption"].reset_index()
     tb_electricity_mix = ds_electricity_mix["electricity_mix"].reset_index()
-    tb_regions = ds_regions["regions"].reset_index()[["name", "iso_alpha3"]].dropna().reset_index(drop=True)
-    tb_gdp = ds_gdp["maddison_gdp"].reset_index()[["country", "year", "gdp"]].dropna().reset_index(drop=True)
+    # tb_regions = ds_regions["regions"].reset_index()[["name", "iso_alpha3"]].dropna().reset_index(drop=True)
+    # tb_gdp = ds_gdp["maddison_gdp"].reset_index()[["country", "year", "gdp"]].dropna().reset_index(drop=True)
+
+    ####################################################################################################################
+    # TODO: If propagation of origins worked well, the owid_energy_variable_mapping.csv file may not be needed.
+    #  If so, refactor and simplify this step.
+    ####################################################################################################################
 
     # Load mapping from variable names in the component dataset to the final variable name in the output dataset.
     variable_mapping = pr.read_csv(VARIABLE_MAPPING_FILE).set_index(["source_variable"])
@@ -172,19 +182,14 @@ def run(dest_dir: str) -> None:
     tb_combined = combine_tables_data_and_metadata(
         tables=tables,
         ds_population=ds_population,
-        tb_regions=tb_regions,
-        tb_gdp=tb_gdp,
+        ds_regions=ds_regions,
+        ds_gdp=ds_gdp,
         variable_mapping=variable_mapping,
     )
 
     #
     # Save outputs.
     #
-    # Gather metadata sources from all tables' original dataset sources.
-    ds_garden = Dataset.create_empty(dest_dir)
-    ds_garden.metadata.sources = get_unique_sources_from_tables(tables=tables.values())
-    ds_garden.metadata.licenses = get_unique_licenses_from_tables(tables=tables.values())
-
     # Create a new garden dataset.
-    ds_garden = create_dataset(dest_dir, tables=[tb_combined], default_metadata=ds_garden.metadata)
+    ds_garden = create_dataset(dest_dir, tables=[tb_combined], check_variables_metadata=True)
     ds_garden.save()
