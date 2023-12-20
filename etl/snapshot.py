@@ -228,6 +228,8 @@ class Snapshot:
             return self.read_json(*args, **kwargs)
         elif self.metadata.file_extension == "dta":
             return self.read_stata(*args, **kwargs)
+        elif self.metadata.file_extension == "rds":
+            return self.read_rds(*args, **kwargs)
         else:
             raise ValueError(f"Unknown extension {self.metadata.file_extension}")
 
@@ -252,6 +254,10 @@ class Snapshot:
     def read_stata(self, *args, **kwargs) -> Table:
         """Read Stata file into a Table and populate it with metadata."""
         return pr.read_stata(self.path, *args, metadata=self.to_table_metadata(), origin=self.metadata.origin, **kwargs)
+
+    def read_rds(self, *args, **kwargs) -> Table:
+        """Read Stata file into a Table and populate it with metadata."""
+        return pr.read_rds(self.path, *args, metadata=self.to_table_metadata(), origin=self.metadata.origin, **kwargs)
 
     def read_from_records(self, *args, **kwargs) -> Table:
         """Read records into a Table and populate it with metadata."""
