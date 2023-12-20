@@ -1,13 +1,13 @@
 """Snapshot of UNEP's report called Global trends in renewable energy investment."""
 
-import pathlib
+from pathlib import Path
 
 import click
 
 from etl.snapshot import Snapshot
 
-CURRENT_DIR = pathlib.Path(__file__).parent
-SNAPSHOT_VERSION = CURRENT_DIR.name
+# Version for current snapshot dataset.
+SNAPSHOT_VERSION = Path(__file__).parent.name
 
 
 @click.command()
@@ -19,8 +19,7 @@ SNAPSHOT_VERSION = CURRENT_DIR.name
 )
 def main(upload: bool) -> None:
     snap = Snapshot(f"unep/{SNAPSHOT_VERSION}/global_trends_in_renewable_energy_investment.pdf")
-    snap.download_from_source()
-    snap.dvc_add(upload=upload)
+    snap.create_snapshot(upload=upload)
 
 
 if __name__ == "__main__":

@@ -2,6 +2,8 @@
 
 Since the data is given as an image of a table (not suitable for OCR) the data has been manually copied into a file,
 next to this script.
+
+The data is copied from "FIGURE 21. GLOBAL TRENDS IN RENEWABLE ENERGY INVESTMENT 2018 DATA TABLE, $BN" (Page 33).
 """
 
 import pandas as pd

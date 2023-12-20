@@ -31,3 +31,19 @@ tables:
         processing_level: major
         display:
           numDecimalPlaces: 2
+      m_wrd_tests_performed:
+        title: Number of molecular WHO-recommended rapid diagnostic tests performed
+        unit: tests
+        display:
+          numDecimalPlaces: 0
+      m_wrd_tests_positive:
+        title: Number of positive results among the diagnostic tests performed using molecular WHO-recommended rapid diagnostics
+        unit: positive tests
+        display:
+          numDecimalPlaces: 0
+      m_wrd_tests_positive_rate:
+        title: Share of positive results among the diagnostic tests performed using molecular WHO-recommended rapid diagnostics
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1

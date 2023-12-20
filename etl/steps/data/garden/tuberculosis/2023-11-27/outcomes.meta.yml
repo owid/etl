@@ -37,7 +37,8 @@ tables:
         title: Treatment success rate for new and relapse cases
         description_short: Treatment success rate among new and relapse cases.
         description_key:
-          - Relapse cases may not consistently be included in this variable
+          - This definition of treatment success doesn’t necessarily require bacterial evidence that the tuberculosis bacteria are completely gone from their body, which is partly because these tests are less accurate for some demographics, such as children and people with HIV/AIDS, who respond differently to the disease
+          - Relapse cases may not consistently be included by all countries
         unit: "%"
         short_unit: "%"
         display:

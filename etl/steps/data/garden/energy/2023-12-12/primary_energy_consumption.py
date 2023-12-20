@@ -1,11 +1,8 @@
-# TODO: This file is a duplicate of the previous step. It is not yet used in the dag and should be updated soon.
-
 """Garden step for Primary energy consumption dataset (part of the OWID Energy dataset), based on a combination of the
 Energy Institute's Statistical Review of World Energy dataset and EIA data on energy consumption.
 
 """
 
-from typing import cast
 
 import numpy as np
 import owid.catalog.processing as pr
@@ -46,12 +43,12 @@ def prepare_statistical_review_data(tb_review: Table) -> Table:
         "year": "year",
         "primary_energy_consumption_equivalent_twh": "Primary energy consumption (TWh)",
     }
-    tb_review = tb_review[list(columns)].rename(columns=columns)
+    tb_review = tb_review[list(columns)].rename(columns=columns, errors="raise")
 
     # Drop rows with missing values.
     tb_review = tb_review.dropna(how="any").reset_index(drop=True)
 
-    return cast(Table, tb_review)
+    return tb_review
 
 
 def prepare_eia_data(tb_eia: Table) -> Table:
@@ -75,12 +72,12 @@ def prepare_eia_data(tb_eia: Table) -> Table:
         "year": "year",
         "energy_consumption": "Primary energy consumption (TWh)",
     }
-    tb_eia = tb_eia[list(eia_columns)].rename(columns=eia_columns)
+    tb_eia = tb_eia[list(eia_columns)].rename(columns=eia_columns, errors="raise")
 
     # Drop rows with missing values.
     tb_eia = tb_eia.dropna(how="any").reset_index(drop=True)
 
-    return cast(Table, tb_eia)
+    return tb_eia
 
 
 def combine_statistical_review_and_eia_data(tb_review: Table, tb_eia: Table) -> Table:
@@ -114,9 +111,8 @@ def combine_statistical_review_and_eia_data(tb_review: Table, tb_eia: Table) -> 
         subset=index_columns, keep="last"
     )
 
-    # Add metadata to the new "source" column.
-    combined["source"].metadata.sources = combined["Primary energy consumption (TWh)"].metadata.sources
-    combined["source"].metadata.licenses = combined["Primary energy consumption (TWh)"].metadata.licenses
+    # Add origins to the new "source" column.
+    combined["source"].metadata.origins = combined["Primary energy consumption (TWh)"].metadata.origins
 
     # Sort conveniently.
     combined = combined.sort_values(index_columns).reset_index(drop=True)
@@ -142,10 +138,9 @@ def add_annual_change(tb: Table) -> Table:
 
     # Calculate annual change.
     combined = combined.sort_values(["country", "year"]).reset_index(drop=True)
-    # NOTE: Currently, groupby pct_change doesn't propagate metadata properly. This has to be done manually.
     combined["Annual change in primary energy consumption (%)"] = (
         combined.groupby("country")["Primary energy consumption (TWh)"].pct_change() * 100
-    ).copy_metadata(combined["Primary energy consumption (TWh)"])
+    )
     combined["Annual change in primary energy consumption (TWh)"] = combined.groupby("country")[
         "Primary energy consumption (TWh)"
     ].diff()
@@ -246,18 +241,18 @@ def run(dest_dir: str) -> None:
     # Load data.
     #
     # Load Statistical Review dataset and read its main table.
-    ds_review: Dataset = paths.load_dependency("statistical_review_of_world_energy")
+    ds_review = paths.load_dataset("statistical_review_of_world_energy")
     tb_review = ds_review["statistical_review_of_world_energy"]
 
     # Load EIA dataset on energy consumption and read its main table.
-    ds_eia: Dataset = paths.load_dependency("energy_consumption")
+    ds_eia = paths.load_dataset("energy_consumption")
     tb_eia = ds_eia["energy_consumption"]
 
     # Load GDP dataset.
-    ds_gdp: Dataset = paths.load_dependency("ggdc_maddison")
+    ds_gdp = paths.load_dataset("ggdc_maddison")
 
     # Load population dataset.
-    ds_population: Dataset = paths.load_dependency("population")
+    ds_population = paths.load_dataset("population")
 
     #
     # Process data.
@@ -290,7 +285,5 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new garden dataset.
-    ds_garden = create_dataset(
-        dest_dir, tables=[tb], default_metadata=ds_review.metadata, check_variables_metadata=True
-    )
+    ds_garden = create_dataset(dest_dir, tables=[tb], check_variables_metadata=True)
     ds_garden.save()
