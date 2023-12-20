@@ -46,7 +46,7 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
     tb = harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
-    tb = tb[["country", "year", "culture", "m_wrd"]]
+    tb = tb[["country", "year", "culture", "m_wrd", "m_wrd_tests_performed", "m_wrd_tests_positive"]]
     tb = add_variable_description_from_producer(tb, dd)
     tb = tb.dropna(subset=["culture", "m_wrd"], how="all")
     tb = add_regions_to_table(
@@ -56,6 +56,7 @@ def run(dest_dir: str) -> None:
         regions=REGIONS_TO_ADD,
         min_num_values_per_year=1,
     )
+    tb = calculate_positive_test_rate(tb)
     tb = add_population_and_rates(tb, ds_pop)
     tb = tb.set_index(["country", "year"], verify_integrity=True)
 
@@ -83,12 +84,24 @@ def add_population_and_rates(tb: Table, ds_pop: Table) -> Table:
         & (ds_pop["metric"] == "population")
     ]
     ds_pop = ds_pop.rename(columns={"location": "country", "value": "population"})
+    ds_pop = ds_pop[["country", "year", "population"]]
 
     tb_pop = pr.merge(tb, ds_pop, on=["country", "year"], how="left")
     tb_pop["culture_rate"] = (tb_pop["culture"] / tb_pop["population"]) * 1000000
     tb_pop["m_wrd_rate"] = (tb_pop["m_wrd"] / tb_pop["population"]) * 1000000
     # Converting to float16 to reduce warnings
     tb_pop[["culture_rate", "m_wrd_rate"]] = tb_pop[["culture_rate", "m_wrd_rate"]].astype("float16")
-    tb_pop = tb_pop[["country", "year", "culture", "culture_rate", "m_wrd", "m_wrd_rate"]]
+    tb_pop = tb_pop.drop(columns=["population"])
 
     return tb_pop
+
+
+def calculate_positive_test_rate(tb: Table) -> Table:
+    """
+    Calculating the positive test rate for each country-year.
+
+    We divide the number of positive rapid WHO recommended tests by the total number of tests performed.
+    """
+    tb["m_wrd_tests_positive_rate"] = (tb["m_wrd_tests_positive"] / tb["m_wrd_tests_performed"]) * 100
+    tb["m_wrd_tests_positive_rate"] = tb["m_wrd_tests_positive_rate"].astype(float)
+    return tb
