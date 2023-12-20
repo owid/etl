@@ -1,4 +1,4 @@
-from typing import List, Literal, Optional, Type, cast
+from typing import List, Literal, Optional, Type
 
 import numpy as np
 import owid.catalog.processing as pr
