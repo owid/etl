@@ -11,7 +11,6 @@ from st_pages import add_indentation
 from streamlit_agraph import Config, ConfigBuilder, Edge, Node, agraph
 
 from etl.steps import extract_step_attributes, filter_to_subgraph, load_dag
-from etl.to_graphviz import _to_graphviz
 
 # CONFIG
 st.set_page_config(
