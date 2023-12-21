@@ -7,7 +7,7 @@ from typing import Any, Dict, List, cast
 
 import streamlit as st
 from st_pages import add_indentation
-from streamlit_agraph import Config, Edge, Node, agraph
+from streamlit_agraph import Config, ConfigBuilder, Edge, Node, agraph
 
 from etl.steps import extract_step_attributes, filter_to_subgraph, load_dag
 
@@ -133,32 +133,37 @@ def generate_graph(
             edge = Edge(
                 source=child,
                 target=parent,
-                width=2,
+                width=5,
             )
             edges.append(edge)
 
-    # config_builder = ConfigBuilder(nodes)
-    # config = config_builder.build()
+    config_builder = ConfigBuilder(nodes)
+    config = config_builder.build()
 
     node_config = {
         "labelProperty": "label",
         "renderLabel": "true",
     }
-    config = Config(
-        width=2000,
-        height=1000,
-        nodeHighlightBehavior=True,
-        highlightColor="#F7A7A6",
-        collapsible=True,
-        node=node_config,
-        directed=True,
-        physics=True,
-        minVelocity=20,
-        maxVelocity=100,
-        # hierarchical=True,
-        # nodeSpacing=200,
-        # **kwargs
-    )
+
+    # config.layout["hierarchical"]["enabled"] = True
+    # config = Config(
+    #     width=2000,
+    #     height=1000,
+    #     nodeHighlightBehavior=True,
+    #     # highlightColor="#F7A7A6",
+    #     # collapsible=True,
+    #     node=node_config,
+    #     directed=True,
+    #     physics=True,
+    #     minVelocity=20,
+    #     maxVelocity=1000,
+    #     # nodeSpacing=10000,
+    #     stabilization=False,
+    #     fit=False,
+    #     # hierarchical=True,
+    #     # nodeSpacing=200,
+    #     # **kwargs
+    # )
 
     # config.physics["barnesHut"] = {"springConstant": 0, "avoidOverlap": 0.1}
 
@@ -177,15 +182,16 @@ with st.form("form"):
         "Collapse snapshot/walden", value=True, help=help_template.format(channel="snapshot/walden")
     )
     collapse_meadow = st.toggle("Collapse meadow", value=False, help=help_template.format(channel="meadow"))
+    downstream = st.toggle("Show downstream", value=False, help="Show nodes that depend on the selected node.")
     # Form submit button
     st.form_submit_button("Explore", on_click=activate)
 
 
 if st.session_state.get("show_gpt"):
     with st.spinner(f"Generating DOT file for {option}..."):
-        dag = filter_to_subgraph(dag, includes=[cast(str, option)])
+        dag = filter_to_subgraph(dag, downstream=downstream, includes=[cast(str, option)])
 
-        with st.expander("DAG"):
+        with st.expander("Show raw DAG"):
             st.write(dag)
         if option is None:
             option = options[0]
