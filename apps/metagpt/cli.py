@@ -209,12 +209,7 @@ class MetadataGPTUpdater:
                     )  #
                     if message_content:
                         try:
-                            # Fix the single quotes
-                            try:
-                                parsed_dict = json.loads(message_content)
-                            except json.JSONDecodeError as e:
-                                log.error(f"JSON decoding failed: {e}")
-                                log.error(f"Faulty JSON data: {parsed_dict}")
+                            parsed_dict = json.loads(message_content)
 
                             if check_gpt_response_format(parsed_dict):
                                 log.info("GPT response is in the correct format.")
