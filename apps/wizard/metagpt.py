@@ -9,6 +9,7 @@ from st_pages import add_indentation
 from streamlit_ace import st_ace
 
 from apps.metagpt.cli import MetadataGPTUpdater
+from etl.paths import SNAPSHOTS_DIR, STEP_DIR
 
 
 ##################################################
@@ -59,8 +60,8 @@ ACE_DEFAULT = {
 
 # Paths config
 ## Paths to snapshot/grapher metadata directories
-PATH_SNAPSHOT = "/home/lucas/repos/etl/snapshots/"
-PATH_GRAPHER = "/home/lucas/repos/etl/etl/steps/data/grapher/"
+PATH_SNAPSHOT = str(SNAPSHOTS_DIR)
+PATH_GRAPHER = f"{STEP_DIR}/data/grapher/"
 PREFIX_SNAPSHOT = "SNAPSHOT :: "
 PREFIX_GRAPHER = "GRAPHER :: "
 
