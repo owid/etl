@@ -3,6 +3,9 @@ from etl.helpers import PathFinder, create_dataset
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
+# Convert megawatts to gigawatts.
+MW_TO_GW = 1e-3
+
 
 def run(dest_dir: str) -> None:
     #
@@ -29,6 +32,17 @@ def run(dest_dir: str) -> None:
     # Set appropriate metadata.
     tb["capacity"].metadata.title = "Capacity"
     tb["capacity"].metadata.display = {"numDecimalPlaces": 0}
+
+    # Convert units from megawatts to gigawatts.
+    tb["capacity"] *= MW_TO_GW
+    tb["country"] = tb["country"].str.replace(" - MW", "")
+    # Update metadata fields.
+    for field in ["title", "unit", "short_unit", "description_short"]:
+        setattr(
+            tb["capacity"].metadata,
+            field,
+            getattr(tb["capacity"].metadata, field).replace("mega", "giga").replace("MW", "GW"),
+        )
 
     # Set an appropriate index and sort conveniently.
     tb = tb.set_index(["country", "year"], verify_integrity=True).sort_index()
