@@ -3,7 +3,7 @@
 - [ ] See its dependencies
 - [ ] Preview its metadata
 """
-from typing import Any, Dict, cast
+from typing import Any, Dict, List, cast
 
 import streamlit as st
 from st_pages import add_indentation
@@ -23,7 +23,7 @@ add_indentation()
 
 COLORS = {
     "snapshot": "#FC9090",
-    # "walden": "#D66868",
+    "walden": "#FC9090",
     "meadow": "#F5DB49",
     "garden": "#87E752",
     "grapher": "#67AAE1",
@@ -36,7 +36,13 @@ def activate():
     st.session_state["show_gpt"] = True
 
 
-def generate_graph(dag: Dict[str, Any], uri_main: str):
+def generate_graph(
+    dag: Dict[str, Any],
+    uri_main: str,
+    collapse_snapshot: bool = True,
+    collapse_others: bool = True,
+    collapse_meadow: bool = True,
+) -> Any:
     def _friendly_label(attributes: Dict[str, str], length_limit: int = 32) -> str:
         label_1 = f"{attributes['namespace']}/{attributes['name']}"
         if len(label_1) > length_limit:
@@ -44,15 +50,24 @@ def generate_graph(dag: Dict[str, Any], uri_main: str):
         label = f"{label_1}\n{attributes['version']}"
         return label
 
-    def _friendly_title(attributes, children):
+    def _friendly_title(attributes: Dict[str, str], children: List[str]) -> str:
         deps = "\n- ".join(children)
         title = f"""{attributes['identifier'].upper()}
         version {attributes['version']} ({attributes['kind']})
-
-        dependencies:
-        - {deps}
         """
+        title = attributes["step"].upper()
+        if deps:
+            title = title + "\n\ndependencies:\n- " + deps
         return title
+
+    def _collapse_node(attributes: Dict[str, str]) -> bool:
+        if collapse_snapshot and (attributes["channel"] in ["snapshot", "walden"]):
+            return True
+        if collapse_meadow and (attributes["channel"] in ["meadow"]):
+            return True
+        if collapse_others and (attributes["channel"] not in ["snapshot", "walden", "meadow", "garden", "grapher"]):
+            return True
+        return False
 
     # Create edges
     edges = []
@@ -74,23 +89,44 @@ def generate_graph(dag: Dict[str, Any], uri_main: str):
                 "mass": 2,
             }
         else:
-            kwargs = {
-                "color": COLORS.get(attributes["channel"], COLOR_OTHER),
-                "label": _friendly_label(attributes),
-                "title": _friendly_title(attributes, children),
-                "shape": "box",
-                "borderWidth": 1,
-                "chosen": {
-                    "label": _friendly_label(attributes, 100),
-                },
-                "font": {
-                    "size": 20,
-                    "face": "courier",
-                    "align": "left",
-                },
-                "mass": 1,
-                "opacity": 0.9,
-            }
+            print(1, attributes["channel"], collapse_snapshot)
+            print(2, _collapse_node(attributes))
+            if _collapse_node(attributes):
+                kwargs = {
+                    "color": COLORS.get(attributes["channel"], COLOR_OTHER),
+                    # "label": _friendly_label(attributes),
+                    "title": _friendly_title(attributes, children),
+                    "shape": "dot",
+                    "borderWidth": 1,
+                    "chosen": {
+                        "label": _friendly_label(attributes, 100),
+                    },
+                    "font": {
+                        "size": 20,
+                        "face": "courier",
+                        "align": "left",
+                    },
+                    "mass": 1,
+                    "opacity": 0.9,
+                }
+            else:
+                kwargs = {
+                    "color": COLORS.get(attributes["channel"], COLOR_OTHER),
+                    "label": _friendly_label(attributes),
+                    "title": _friendly_title(attributes, children),
+                    "shape": "box",
+                    "borderWidth": 1,
+                    "chosen": {
+                        "label": _friendly_label(attributes, 100),
+                    },
+                    "font": {
+                        "size": 20,
+                        "face": "courier",
+                        "align": "left",
+                    },
+                    "mass": 1,
+                    "opacity": 0.9,
+                }
         node = Node(
             id=parent,
             borderWidthSelected=5,
@@ -109,9 +145,17 @@ def generate_graph(dag: Dict[str, Any], uri_main: str):
     # config_builder = ConfigBuilder(nodes)
     # config = config_builder.build()
 
+    node_config = {
+        "labelProperty": "label",
+        "renderLabel": "true",
+    }
     config = Config(
-        width=1920,
-        height=1080,
+        width=2000,
+        height=1000,
+        nodeHighlightBehavior=True,
+        highlightColor="#F7A7A6",
+        collapsible=True,
+        node=node_config,
         directed=True,
         physics=True,
         minVelocity=20,
@@ -131,6 +175,14 @@ with st.form("form"):
     options = sorted(list(dag.keys()))
     option = st.selectbox("Select a dataset", options)
 
+    # Add toggles
+    help_template = "Show nodes of type '{channel}' as dots, without text. This can make the visualisation cleaner.The step URI will still be visible on hover."
+    collapse_others = st.toggle("Collapse others", value=True, help=help_template.format(channel="other"))
+    collapse_snapshot = st.toggle(
+        "Collapse snapshot/walden", value=True, help=help_template.format(channel="snapshot/walden")
+    )
+    collapse_meadow = st.toggle("Collapse meadow", value=False, help=help_template.format(channel="meadow"))
+    # Form submit button
     st.form_submit_button("Explore", on_click=activate)
 
 
@@ -142,7 +194,6 @@ if st.session_state.get("show_gpt"):
             st.write(dag)
         if option is None:
             option = options[0]
-        graph = generate_graph(dag, option)
-
+        graph = generate_graph(dag, option, collapse_snapshot, collapse_others, collapse_meadow)
     # Set back to False
     # st.session_state["show_gpt"] = False
