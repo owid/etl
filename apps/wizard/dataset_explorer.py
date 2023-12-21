@@ -89,8 +89,6 @@ def generate_graph(
                 "mass": 2,
             }
         else:
-            print(1, attributes["channel"], collapse_snapshot)
-            print(2, _collapse_node(attributes))
             if _collapse_node(attributes):
                 kwargs = {
                     "color": COLORS.get(attributes["channel"], COLOR_OTHER),
@@ -127,6 +125,7 @@ def generate_graph(
                     "mass": 1,
                     "opacity": 0.9,
                 }
+
         node = Node(
             id=parent,
             borderWidthSelected=5,

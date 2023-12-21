@@ -18,8 +18,6 @@ steps:
     - snapshot-private://fasttrack/latest/child_mortality_future_projections.csv
   data-private://grapher/fasttrack/latest/literate_population:
     - snapshot-private://fasttrack/latest/literate_population.csv
-  data-private://grapher/fasttrack/latest/test_electricity_projections:
-    - snapshot-private://fasttrack/latest/test_electricity_projections.csv
   data-private://grapher/fasttrack/latest/battery_costs_per_kwh__ziegler_et_al__and_bnef:
     - snapshot-private://fasttrack/latest/battery_costs_per_kwh__ziegler_et_al__and_bnef.csv
   data-private://grapher/fasttrack/latest/biosafety_level_4_facilities:

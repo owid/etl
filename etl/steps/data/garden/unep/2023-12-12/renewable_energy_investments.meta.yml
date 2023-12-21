@@ -6,6 +6,8 @@ definitions:
     presentation:
       topic_tags:
         - Energy
+    display:
+      numDecimalPlaces: 0
 
 dataset:
   update_period_days: 365

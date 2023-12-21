@@ -209,10 +209,10 @@ class MetadataGPTUpdater:
                     )  #
                     if message_content:
                         try:
-                            # Fix the single quotes
-                            json_string_fixed = re.sub(r"(\W)'|'(\W)", r'\1"\2', message_content)
-                            parsed_dict = json.loads(json_string_fixed)
+                            parsed_dict = json.loads(message_content)
+
                             if check_gpt_response_format(parsed_dict):
+                                log.info("GPT response is in the correct format.")
                                 with open(self.path_to_file, "r") as file:
                                     original_yaml_content = yaml.safe_load(file)
                                     if original_yaml_content:
@@ -232,6 +232,7 @@ class MetadataGPTUpdater:
                                                         variable
                                                     ].update(variable_updates)
                                     self.__metadata_new = original_yaml_content
+                                    return
                         except json.JSONDecodeError as e:
                             log.error(f"JSON decoding failed on attempt {attempt + 1}: {e}")
                 raise Exception("Unable to parse GPT response after multiple attempts.")
@@ -255,6 +256,8 @@ class MetadataGPTUpdater:
 
                 Please output it in the same format (yaml).License" is a part of "origin", not a separate dictionary. Don't include any additional responses/notes in your response beyond the existing field as this will be saved directly as a file.
 
+                In any of the fields please avoid using ":" anywhere - e.g., instead of "Country Activity Tracker: Artificial Intelligence" use "Country Activity Tracker - Artificial Intelligence".
+
                 """
                 messages = [
                     {"role": "system", "content": system_prompt},
@@ -269,12 +272,12 @@ class MetadataGPTUpdater:
                     - description_key - based on a web search and if description exists come up with some key bullet points (in a sentence format) that would help someone interpret the indicator. Can you make sure that these are going to be useful for the public to understand the indicator? Expand on any acronyms or any terms that a layperson might not be familiar with. Each bullet point can be more than one sentence if necessary but don't make it too long.
                     - if description_short is not filled out, use the description_key and a web search to come up with one sentence to describe the indicator. It should be very brief and to the point.
 
-                    The output should always have these fields but as a python dictionary. This format is mandatory, don't miss fields and don't include any irrelevant information but make it JSON readable.:
+                    The output should always have these fields only but as a python dictionary. This format is mandatory, don't miss fields and don't include any irrelevant information but make it JSON readable.:
 
-                    {'tables': {'maddison_gdp': {'variables': {'gdp_per_capita': {'description_short': '...', 'description_from_producer': '...', 'description_key': ['...', '...']}}}}}
+                    {"tables": {"maddison_gdp": {"variables": {"gdp_per_capita": {"description_short": "...", "description_from_producer": "...", "description_key": ["...", "..."]}}}}}
 
 
-                    Don't include any other fields. This is mandatory.
+                    Don't include any other fields. This is mandatory. Can you ensure that the output can be read as JSON?
 
                     Now, can you try to infer the above based on the other information in the metadata file and by browsing the web?
 
@@ -287,7 +290,8 @@ class MetadataGPTUpdater:
 
                     'description_key' should be a list of bullet points. Each bullet point should be a string. e.g. ['bullet point 1', 'bullet point 2']
 
-                    If information is already filled out, just try to improve it. .
+                    If information is already filled out, just try to improve it.
+
                     """
 
                 messages = [
