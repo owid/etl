@@ -41,6 +41,7 @@ Other helpfull tools in the ETL ecosystem.
 pages = [
     "Charts",
     "MetaGPT",
+    "Dataset Explorer",
 ]
 for page in pages:
     go_to_page = st.button(f"➡️  {page}")
