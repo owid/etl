@@ -3,12 +3,11 @@
 - [ ] See its dependencies
 - [ ] Preview its metadata
 """
-import tempfile
 from typing import Any, Dict, cast
 
 import streamlit as st
 from st_pages import add_indentation
-from streamlit_agraph import Config, ConfigBuilder, Edge, Node, agraph
+from streamlit_agraph import Config, Edge, Node, agraph
 
 from etl.steps import extract_step_attributes, filter_to_subgraph, load_dag
 
@@ -129,7 +128,7 @@ def generate_graph(dag: Dict[str, Any], uri_main: str):
 
 with st.form("form"):
     dag = load_dag()
-    options = list(dag.keys())
+    options = sorted(list(dag.keys()))
     option = st.selectbox("Select a dataset", options)
 
     st.form_submit_button("Explore", on_click=activate)
@@ -141,7 +140,8 @@ if st.session_state.get("show_gpt"):
 
         with st.expander("DAG"):
             st.write(dag)
-
+        if option is None:
+            option = options[0]
         graph = generate_graph(dag, option)
 
     # Set back to False
