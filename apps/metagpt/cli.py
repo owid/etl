@@ -203,6 +203,7 @@ class MetadataGPTUpdater:
                     if new_yaml_content:
                         self.__metadata_new = new_yaml_content
             case Channels.GRAPHER:
+                for attempt in range(5):  # MAX_ATTEMPTS
                     message_content = get_message_content(
                         self.client, messages=messages, model=GPT_MODEL, temperature=0
                     )  #
