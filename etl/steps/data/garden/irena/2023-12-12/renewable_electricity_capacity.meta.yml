@@ -18,42 +18,118 @@ tables:
     title: Renewable electricity capacity
     variables:
       bagasse:
-        title: Bagasse capacity
+        title: Bagasse capacity - MW
         description_key:
         - Bagasse is a byproduct from the process of sugar cane refining, often used as a biofuel for the production of heat, energy, and electricity.
+        display:
+          name: Bagasse
+        presentation:
+          title_public: Bagasse capacity
       bioenergy:
-        title: Bioenergy capacity
+        title: Bioenergy capacity - MW
+        display:
+          name: Bioenergy
+        presentation:
+          title_public: Bioenergy capacity
       biogas:
-        title: Biogas capacity
+        title: Biogas capacity - MW
+        display:
+          name: Biogas
+        presentation:
+          title_public: Biogas capacity
       concentrated_solar_power:
-        title: Concentrated solar power capacity
+        title: Concentrated solar power capacity - MW
+        display:
+          name: Concentrated solar power
+        presentation:
+          title_public: Concentrated solar power capacity
       geothermal_energy:
-        title: Geothermal energy capacity
+        title: Geothermal energy capacity - MW
+        display:
+          name: Geothermal energy
+        presentation:
+          title_public: Geothermal energy capacity
       hydropower:
-        title: Hydropower capacity
+        title: Hydropower capacity - MW
+        display:
+          name: Hydropower
+        presentation:
+          title_public: Hydropower capacity
       liquid_biofuels:
-        title: Liquid biofuels capacity
+        title: Liquid biofuels capacity - MW
+        display:
+          name: Liquid biofuels
+        presentation:
+          title_public: Liquid biofuels capacity
       marine_energy:
-        title: Marine energy capacity
+        title: Marine energy capacity - MW
+        display:
+          name: Marine energy
+        presentation:
+          title_public: Marine energy capacity
       offshore_wind_energy:
-        title: Offshore wind energy capacity
+        title: Offshore wind energy capacity - MW
+        display:
+          name: Offshore wind energy
+        presentation:
+          title_public: Offshore wind energy capacity
       onshore_wind_energy:
-        title: Onshore wind energy capacity
+        title: Onshore wind energy capacity - MW
+        display:
+          name: Onshore wind energy
+        presentation:
+          title_public: Onshore wind energy capacity
       other_solid_biofuels:
-        title: Other solid biofuels capacity
+        title: Other solid biofuels capacity - MW
+        display:
+          name: Other solid biofuels
+        presentation:
+          title_public: Other solid biofuels capacity
       pure_pumped_storage:
-        title: Pure pumped storage capacity
+        title: Pure pumped storage capacity - MW
+        display:
+          name: Pure pumped storage
+        presentation:
+          title_public: Pure pumped storage capacity
       renewable_hydropower_including_mixed_plants:
-        title: Renewable hydropower including mixed plants capacity
+        title: Renewable hydropower including mixed plants capacity - MW
+        display:
+          name: Renewable hydropower including mixed plants
+        presentation:
+          title_public: Renewable hydropower including mixed plants capacity
       renewable_municipal_waste:
-        title: Renewable municipal waste capacity
+        title: Renewable municipal waste capacity - MW
+        display:
+          name: Renewable municipal waste
+        presentation:
+          title_public: Renewable municipal waste capacity
       solar_energy:
-        title: Solar energy capacity
+        title: Solar energy capacity - MW
+        display:
+          name: Solar energy
+        presentation:
+          title_public: Solar energy capacity
       solar_photovoltaic:
-        title: Solar photovoltaic capacity
+        title: Solar photovoltaic capacity - MW
+        display:
+          name: Solar photovoltaic
+        presentation:
+          title_public: Solar photovoltaic capacity
       solid_biofuels_and_renewable_waste:
-        title: Solid biofuels and renewable waste capacity
+        title: Solid biofuels and renewable waste capacity - MW
+        display:
+          name: Solid biofuels and renewable waste
+        presentation:
+          title_public: Solid biofuels and renewable waste capacity
       total_renewable_energy:
-        title: Total renewable energy capacity
+        title: Total renewable energy capacity - MW
+        display:
+          name: Total renewable energy
+        presentation:
+          title_public: Total renewable energy capacity
       wind_energy:
-        title: Wind energy capacity
+        title: Wind energy capacity - MW
+        display:
+          name: Wind energy
+        presentation:
+          title_public: Wind energy capacity
