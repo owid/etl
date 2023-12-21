@@ -27,6 +27,7 @@ show_pages(
         Section("Other tools"),
         Page(str(CURRENT_DIR / "charts/__main__.py"), "Charts", icon="📊"),
         Page(str(CURRENT_DIR / "metagpt.py"), "MetaGPT", icon="🤖"),
+        Page(str(CURRENT_DIR / "dataset_explorer.py"), "Dataset Explorer", icon="🕵️"),
     ]
 )
 
