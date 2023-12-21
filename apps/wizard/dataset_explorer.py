@@ -74,13 +74,13 @@ def generate_graph(
     nodes = []
     for parent, children in dag.items():
         attributes = extract_step_attributes(parent)
+
+        # Main node
         if parent == uri_main:
             kwargs = {
                 "color": COLORS.get(attributes["channel"], COLOR_OTHER),
                 "label": f"{attributes['namespace'].upper()}/{attributes['name'].upper()}\n{attributes['version']}",
                 "title": _friendly_title(attributes, children),
-                "shape": "box",
-                "borderWidth": 2,
                 "font": {
                     "size": 40,
                     "face": "courier",
@@ -88,48 +88,44 @@ def generate_graph(
                 },
                 "mass": 2,
             }
+        # Oth nod (dependencies)
         else:
+            # Nodes that will not show label within them (user chose to hide them)
+            kwargs = {
+                "color": COLORS.get(attributes["channel"], COLOR_OTHER),
+                "mass": 1,
+                "opacity": 0.9,
+            }
             if _collapse_node(attributes):
                 kwargs = {
-                    "color": COLORS.get(attributes["channel"], COLOR_OTHER),
-                    # "label": _friendly_label(attributes),
+                    **kwargs,
                     "title": _friendly_title(attributes, children),
-                    "shape": "dot",
-                    "borderWidth": 1,
-                    "chosen": {
-                        "label": _friendly_label(attributes, 100),
-                    },
-                    "font": {
-                        "size": 20,
-                        "face": "courier",
-                        "align": "left",
-                    },
                     "mass": 1,
                     "opacity": 0.9,
                 }
+            # Nodes that will show label within them
             else:
                 kwargs = {
-                    "color": COLORS.get(attributes["channel"], COLOR_OTHER),
+                    **kwargs,
                     "label": _friendly_label(attributes),
                     "title": _friendly_title(attributes, children),
-                    "shape": "box",
-                    "borderWidth": 1,
-                    "chosen": {
-                        "label": _friendly_label(attributes, 100),
-                    },
                     "font": {
                         "size": 20,
                         "face": "courier",
                         "align": "left",
                     },
-                    "mass": 1,
-                    "opacity": 0.9,
                 }
+
+        # Change if step is private
+        if attributes["kind"] == "private":
+            kwargs["label"] = "🔒 " + kwargs.get("label", "")
 
         node = Node(
             id=parent,
             borderWidthSelected=5,
             margin=10,
+            shape="box",
+            borderWidth=5,
             **kwargs,
         )
         nodes.append(node)
