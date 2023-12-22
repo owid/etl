@@ -299,6 +299,8 @@ class Dataset:
     def _propagate_checksums(self) -> None:
         "Maintain a Merkel tree of the whole catalog."
         folder = Path(self.path)
+        assert folder.is_dir()
+        assert folder.parent.parent.parent.parent.name == "data"
         checksum = self.checksum()
         self._update_folder_checksum(folder, checksum)
 
