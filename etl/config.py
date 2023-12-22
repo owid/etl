@@ -118,7 +118,7 @@ GRAPHER_FILTER = env.get("GRAPHER_FILTER", None)
 MAX_VIRTUAL_MEMORY_LINUX = 32 * 2**30  # 32 GB
 
 # increment this to force a full rebuild of all datasets
-ETL_EPOCH = 3
+ETL_EPOCH = 4
 
 # any garden or grapher dataset after this date will have strict mode enabled
 STRICT_AFTER = "2023-06-25"
