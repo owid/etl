@@ -192,6 +192,8 @@ class Dataset:
             table.metadata.dataset = self.metadata
             table._save_metadata(join(self.path, table.metadata.checked_name + ".meta.json"))
 
+        self._propagate_checksums()
+
     def update_metadata(
         self,
         metadata_path: Path,
@@ -299,6 +301,32 @@ class Dataset:
             _hash.update(checksum_file(metadata_file).digest())
 
         return _hash.hexdigest()
+
+    def _propagate_checksums(self) -> None:
+        "Maintain a Merkel tree of the whole catalog."
+        folder = Path(self.path)
+        checksum = self.checksum()
+        self._update_folder_checksum(folder, checksum)
+
+        # propagate checksums up the tree to version, namespace, channel, root
+        for i in range(4):
+            folder = folder.parent
+            self._update_folder_checksum(folder, checksum)
+
+    @staticmethod
+    def _update_folder_checksum(folder: Path, checksum: Optional[str] = None) -> None:
+        if not checksum:
+            # if we don't have a checksum, try to compute it from the .md5 files of child folders
+            checksums = []
+            for child in sorted(folder.iterdir()):
+                if child.is_dir():
+                    md5_file = child / ".md5"
+                    if md5_file.exists():
+                        checksums.append(md5_file.read_text().strip())
+
+            checksum = hashlib.md5("".join(checksums).encode("utf-8")).hexdigest()
+
+        (folder / ".md5").write_text(checksum)
 
 
 for k in DatasetMeta.__dataclass_fields__:
