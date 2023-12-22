@@ -309,6 +309,9 @@ class Dataset:
 
     @staticmethod
     def _update_folder_checksum(folder: Path, checksum: Optional[str] = None) -> None:
+        if (folder / ".git").exists():
+            raise Exception("Merkel tree update has visited too many parents")
+
         if not checksum:
             # if we don't have a checksum, try to compute it from the .md5 files of child folders
             checksums = []
