@@ -41,6 +41,7 @@ DAG = Dict[str, Any]
 
 
 ipynb_lock = fasteners.InterProcessLock(paths.BASE_DIR / ".dvc/tmp/ipynb_lock")
+merkel_lock = fasteners.InterProcessLock(paths.BASE_DIR / ".dvc/tmp/merkel_lock")
 
 
 def compile_steps(
@@ -416,7 +417,9 @@ class DataStep(Step):
         # modify the dataset to remember what inputs were used to build it
         dataset = self._output_dataset
         dataset.metadata.source_checksum = self.checksum_input()
-        dataset.save()
+
+        with merkel_lock:
+            dataset.save()
 
         self.after_run()
 
