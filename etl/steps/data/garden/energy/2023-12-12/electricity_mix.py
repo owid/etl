@@ -274,6 +274,30 @@ def run(dest_dir: str) -> None:
     tb_review = process_statistical_review_data(tb_review=tb_review)
     tb_ember = process_ember_data(tb_ember=tb_ember)
 
+    ####################################################################################################################
+    # There is a big discrepancy between Oceania's oil generation from the Energy Institute and Ember.
+    # Ember's oil generation is significantly larger. The reason seems to be that the Energy Institute's Statistical
+    # Review has no data for Papua New Guinea and New Caledonia (except the zeros on nuclear generation that were
+    # manually imputed in the Statistical Review garden step), while Ember does have data for both.
+    # Therefore, to avoid spurious jumps in the intersection between EI and Ember data, we remove Oceania data from EI
+    # before combining both tables.
+    # Specifically, the columns where the discrepancy between EI and Ember is notorious are oil and gas generation (and
+    # therefore fossil generation).
+
+    # First check that indeed there is no data for Papua New Guinea in EI.
+    error = (
+        "Expected no oil or gas generation data for Papua New Guinea and New Caledonia in the Statistical Review. "
+        "This is no longer the case. Check if now EI and Ember Oceania data are consistent and if so, remove this code."
+    )
+    affected_columns = ["oil_generation__twh", "gas_generation__twh", "fossil_generation__twh"]
+    assert (
+        tb_review[tb_review["country"].isin(["Papua New Guinea", "New Caledonia"])][affected_columns]
+        .dropna(how="all")
+        .empty
+    ), error
+    tb_review.loc[tb_review["country"] == "Oceania", affected_columns] = None
+    ####################################################################################################################
+
     # Combine both tables, giving priority to Ember data (on overlapping values).
     combined = combine_two_overlapping_dataframes(df1=tb_ember, df2=tb_review, index_columns=["country", "year"])
 
