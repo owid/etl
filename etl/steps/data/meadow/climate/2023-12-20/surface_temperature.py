@@ -1,12 +1,9 @@
 """Load a snapshot and create a meadow dataset."""
-import datetime
 import zipfile
 
 import geopandas as gpd
 import numpy as np
 import pandas as pd
-import rasterio
-import rioxarray
 import xarray as xr
 from owid.catalog import Table
 from shapely.geometry import mapping
@@ -48,19 +45,14 @@ def run(dest_dir: str) -> None:
     shapefile_name = "WB_countries_Admin0_10m/WB_countries_Admin0_10m.shp"
 
     # Check if the shapefile exists in the ZIP archive
-    with zipfile.ZipFile(snap_geo.path, "r") as z:
-        if shapefile_name in z.namelist():
-            # Construct the correct path for Geopandas
-            file_path = f"zip://{snap_geo.path}!/{shapefile_name}"
+    with zipfile.ZipFile(snap_geo.path, "r"):
+        # Construct the correct path for Geopandas
+        file_path = f"zip://{snap_geo.path}!/{shapefile_name}"
 
-            # Read the shapefile directly from the ZIP archive
-            shapefile = gpd.read_file(file_path)
-            shapefile = shapefile[["geometry", "WB_NAME"]]
-            # Continue processing the data as needed
-        else:
-            log.info(
-                f"Shapefile using World Bank coordinates with '{shapefile_name}' name not found in the ZIP archive."
-            )
+        # Read the shapefile directly from the ZIP archive
+        shapefile = gpd.read_file(file_path)
+        shapefile = shapefile[["geometry", "WB_NAME"]]
+        # Continue processing the data as needed
 
     temp_country = {}
     small_countries = []
