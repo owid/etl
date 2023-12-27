@@ -284,7 +284,7 @@ def run(dest_dir: str) -> None:
     # Specifically, the columns where the discrepancy between EI and Ember is notorious are oil and gas generation (and
     # therefore fossil generation).
 
-    # First check that indeed there is no data for Papua New Guinea in EI.
+    # First check that indeed there is no data for Papua New Guinea and New Caledonia in EI.
     error = (
         "Expected no oil or gas generation data for Papua New Guinea and New Caledonia in the Statistical Review. "
         "This is no longer the case. Check if now EI and Ember Oceania data are consistent and if so, remove this code."
