@@ -1,0 +1,49 @@
+definitions:
+  common:
+    unit: °C
+    short_unit: °C
+    presentation:
+      topic_tags:
+      - Climate Change
+    processing_level: major
+
+dataset:
+  title: Monthly surface temperature since 1950
+
+tables:
+  surface_temperature:
+    variables:
+      temperature_2m:
+        title: Average surface temperature
+        description_short: |-
+          Temperature of air at 2 meters above the surface of land, sea or in-land waters.
+        description_from_producer:
+         Temperature of air at 2m above the surface of land, sea or in-land waters. 2m temperature is calculated by interpolating between the lowest model level and the Earth's surface, taking account of the atmospheric conditions. Temperature measured in kelvin can be converted to degrees Celsius (°C) by subtracting 273.15.
+        description_processing:
+         Temperature measured in kelvin was converted to degrees Celsius (°C) by subtracting 273.15.
+
+      temperature_anomaly:
+        title: Temperature anomaly
+        description_short: |-
+          Difference between the average surface temperature and the average surface temperature between 1950 and 2024.
+        description_processing:
+          Temperature anomaly was calculated by subtracting the average surface temperature between 1950 and 2024 from the average surface temperature.
+
+      anomaly_below_0:
+        title: Anomaly below 0
+        description_short: |-
+          Difference between the average surface temperature and the average surface temperature between 1950 and 2024.
+        description_processing:
+          Temperature anomaly was calculated by subtracting the average surface temperature between 1950 and 2024 from the average surface temperature.
+
+      anomaly_above_0:
+        title: Anomaly above 0
+        description_short: |-
+          Difference between the average surface temperature and the average surface temperature between 1950 and 2024.
+        description_processing:
+          Temperature anomaly was calculated by subtracting the average surface temperature between 1950 and 2024 from the average surface temperature.
+      month:
+        title: Month
+        description_short: |-
+          Month of the year.
+        unit: month

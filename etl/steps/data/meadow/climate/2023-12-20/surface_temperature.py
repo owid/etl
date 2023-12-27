@@ -77,22 +77,30 @@ def run(dest_dir: str) -> None:
         except:
             small_countries.append(shapefile.iloc[i]["WB_NAME"])
 
-    log.info(f"It wasn't possible to extract data for {len(small_countries)} small countries")
-    start_time = datetime.datetime(1950, 1, 1, 0, 0, 0)
-    end_time = datetime.datetime(2023, 12, 1, 0, 0, 0)
-    idx = pd.date_range(start_time, end_time, freq="1M")
+    log.info(
+        f"It wasn't possible to extract temperature data for {len(small_countries)} small countries as they are too small for the resolution of the Copernicus data."
+    )
+    # Define the start and end dates
+    start_time = "1950-01-01"
+    end_time = "2023-11-01"
+
+    # Generate a date range from start_time to end_time with monthly frequency
+    month_starts = pd.date_range(start=start_time, end=end_time, freq="MS")
+
+    # month_starts is a DateTimeIndex object; you can convert it to a list if needed
+    month_starts_list = month_starts.tolist()
 
     # df of temperatures for each country
     df_temp = pd.DataFrame(temp_country)
-    df_temp["time"] = idx
+    df_temp["time"] = month_starts_list
 
-    # # df of temperatures for each country
-    df_temp = pd.DataFrame(temp_country)
-    melted_df = df_temp.melt(id_vars=["time"], var_name="country", value_name="2m_temperature")
+    melted_df = df_temp.melt(id_vars=["time"], var_name="country", value_name="temperature_2m")
 
     # Create a new table and ensure all columns are snake-case and add relevant metadata.
     tb = Table(melted_df, short_name=paths.short_name, underscore=True)
-    tb["2m_temperature"].metadata.origins = [snap.metadata.origin]
+    tb = tb.set_index(["time", "country"])
+
+    tb["temperature_2m"].metadata.origins = [snap.metadata.origin]
     #
     # Save outputs.
     #
