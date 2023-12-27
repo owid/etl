@@ -7,7 +7,7 @@ from typing import Any, Dict, List, cast
 
 import streamlit as st
 from st_pages import add_indentation
-from streamlit_agraph import Config, ConfigBuilder, Edge, Node, agraph
+from streamlit_agraph import ConfigBuilder, Edge, Node, agraph
 
 from etl.steps import extract_step_attributes, filter_to_subgraph, load_dag
 
@@ -140,10 +140,10 @@ def generate_graph(
     config_builder = ConfigBuilder(nodes)
     config = config_builder.build()
 
-    node_config = {
-        "labelProperty": "label",
-        "renderLabel": "true",
-    }
+    # node_config = {
+    #     "labelProperty": "label",
+    #     "renderLabel": "true",
+    # }
 
     # config.layout["hierarchical"]["enabled"] = True
     # config = Config(
