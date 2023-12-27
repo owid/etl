@@ -229,7 +229,13 @@ def compare_tables(
     compared = pd.concat([df1, df2], ignore_index=True)
 
     # Ensure all common columns have the same numeric type.
-    compared = compared.astype({column: float for column in columns})
+    for column in columns:
+        try:
+            compared[column] = compared[column].astype(float)
+        except ValueError:
+            print(f"Skipping column {column}, which can't be converted into float.")
+            compared = compared.drop(columns=column, errors="raise")
+            columns.remove(column)
 
     # Initialize a list with all plots.
     figures = []
