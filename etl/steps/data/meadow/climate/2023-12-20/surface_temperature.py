@@ -8,6 +8,7 @@ import xarray as xr
 from owid.catalog import Table
 from shapely.geometry import mapping
 from structlog import get_logger
+from tqdm import tqdm
 
 from etl.helpers import PathFinder, create_dataset
 
@@ -52,30 +53,21 @@ def run(dest_dir: str) -> None:
         # Read the shapefile directly from the ZIP archive
         shapefile = gpd.read_file(file_path)
         shapefile = shapefile[["geometry", "WB_NAME"]]
-        # Continue processing the data as needed
 
     temp_country = {}
     small_countries = []
-    for i in range(shapefile.shape[0]):
+    for i in tqdm(range(shapefile.shape[0])):
         data = shapefile[shapefile.index == i]
         da_degc.rio.write_crs("epsg:4326", inplace=True)
-
-        # Check if the geometry is valid and non-empty
-        if not data.geometry.is_empty.any() and data.geometry.is_valid.all():
+        try:
             clip = da_degc.rio.clip(data.geometry.apply(mapping), data.crs)
-
-            # Check if the clip operation was successful
-            if not clip.isnull().all():
-                weights = np.cos(np.deg2rad(clip.latitude))
-                weights.name = "weights"
-                clim_month_weighted = clip.weighted(weights)
-                country_weighted_mean = clim_month_weighted.mean(dim=["longitude", "latitude"]).values
-                temp_country[shapefile.iloc[i]["WB_NAME"]] = country_weighted_mean
-            else:
-                small_countries.append(shapefile.iloc[i]["WB_NAME"])
-        else:
+            weights = np.cos(np.deg2rad(clip.latitude))
+            weights.name = "weights"
+            clim_month_weighted = clip.weighted(weights)
+            country_weighted_mean = clim_month_weighted.mean(dim=["longitude", "latitude"]).values
+            temp_country[shapefile.iloc[i]["WB_NAME"]] = country_weighted_mean
+        except Exception:
             small_countries.append(shapefile.iloc[i]["WB_NAME"])
-
     log.info(
         f"It wasn't possible to extract temperature data for {len(small_countries)} small countries as they are too small for the resolution of the Copernicus data."
     )
