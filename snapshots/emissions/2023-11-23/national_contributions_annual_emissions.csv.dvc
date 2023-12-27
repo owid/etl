@@ -23,9 +23,9 @@ meta:
     url_download: https://zenodo.org/record/7636699/files/EMISSIONS_ANNUAL_1830-2021.csv
     date_accessed: 2023-11-23
     date_published: 2023-02-13
-  license:
-    name: CC BY 4.0
-    url: https://zenodo.org/record/7636699#.ZFCy4exBweZ
+    license:
+      name: CC BY 4.0
+      url: https://zenodo.org/record/7636699#.ZFCy4exBweZ
 wdir: ../../../data/snapshots/emissions/2023-11-23
 outs:
 - md5: dce07a206256931a5a23589ef76bcd3e
