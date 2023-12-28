@@ -195,36 +195,5 @@ steps:
 
   ######################################################################################################################
   # Older versions to be archived once they are not used by any other steps.
-  #
-  # Energy Institute - Statistical Review of World Energy (2023).
-  #
-  data://meadow/energy_institute/2023-06-26/statistical_review_of_world_energy:
-    - snapshot://energy_institute/2023-06-26/statistical_review_of_world_energy.csv
-    - snapshot://energy_institute/2023-06-26/statistical_review_of_world_energy.xlsx
-  data://garden/energy_institute/2023-06-26/statistical_review_of_world_energy:
-    - data://meadow/energy_institute/2023-06-26/statistical_review_of_world_energy
-    - data://garden/regions/2023-01-01/regions
-    - data://garden/wb/2023-04-30/income_groups
-  data://grapher/energy_institute/2023-06-26/statistical_review_of_world_energy:
-    - data://garden/energy_institute/2023-06-26/statistical_review_of_world_energy
-  #
-  # EIA - Energy consumption 2023.
-  #
-  data://meadow/eia/2023-07-10/energy_consumption:
-    - snapshot://eia/2023-07-10/international_energy_data.zip
-  data://garden/eia/2023-07-10/energy_consumption:
-    - data://meadow/eia/2023-07-10/energy_consumption
-    - data://garden/wb/2023-04-30/income_groups
-    - data://garden/regions/2023-01-01/regions
-  #
-  # Energy - Primary energy consumption 2023.
-  #
-  data://garden/energy/2023-07-10/primary_energy_consumption:
-    - data://garden/energy_institute/2023-06-26/statistical_review_of_world_energy
-    - data://garden/eia/2023-07-10/energy_consumption
-    - data://garden/ggdc/2020-10-01/ggdc_maddison
-    - data://garden/demography/2023-03-31/population
-  data://grapher/energy/2023-07-10/primary_energy_consumption:
-    - data://garden/energy/2023-07-10/primary_energy_consumption
 
   ######################################################################################################################

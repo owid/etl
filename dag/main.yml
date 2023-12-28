@@ -209,7 +209,7 @@ steps:
     - data://garden/demography/2023-10-09/life_expectancy
     - data://garden/owid/latest/key_indicators
     - data://garden/regions/2023-01-01/regions
-    - data://garden/gcp/2023-12-05/global_carbon_budget
+    - data://garden/gcp/2023-12-12/global_carbon_budget
     - data://garden/democracy/2023-03-02/vdem
     - data://garden/energy/2023-12-12/energy_mix
     - data://garden/worldbank_wdi/2022-05-26/wdi
