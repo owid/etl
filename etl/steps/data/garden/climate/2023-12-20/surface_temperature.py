@@ -12,6 +12,7 @@ paths = PathFinder(__file__)
 
 # Regions for which aggregates will be created.
 REGIONS = ["North America", "South America", "Europe", "Africa", "Asia", "Oceania", "World"]
+LATEST_DATE = "2024-01-01"
 
 
 def run(dest_dir: str) -> None:
@@ -55,7 +56,7 @@ def run(dest_dir: str) -> None:
     tb["month"] = tb.index.month
 
     # Filter data for the 1991-2020 period
-    reference_period = tb["1950-01-01":"2024-01-01"]
+    reference_period = tb["1950-01-01":LATEST_DATE]
 
     # Calculate mean temperature for each month in the reference period
     monthly_climatology = reference_period.groupby(["country", "month"])["temperature_2m"].mean()
@@ -69,6 +70,7 @@ def run(dest_dir: str) -> None:
     # Calculate the anomalies
     merged_df["temperature_anomaly"] = merged_df["temperature_2m"] - merged_df["mean_temp"]
     merged_df = merged_df.drop(columns=["mean_temp"])
+
     # Initialize the new columns with default values (you can choose NaN, 0, or any other placeholder)
     merged_df["anomaly_below_0"] = np.NaN
     merged_df["anomaly_above_0"] = np.NaN

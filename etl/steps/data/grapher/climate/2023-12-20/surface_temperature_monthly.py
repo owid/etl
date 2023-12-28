@@ -30,7 +30,11 @@ def run(dest_dir: str) -> None:
     # Add metadata.
     for column in df_pivot.columns:
         df_pivot[column].metadata.origins = tb["temperature_2m"].metadata.origins
+
         df_pivot[column].metadata.description_short = tb["temperature_2m"].metadata.description_short
+        df_pivot[column].metadata.description_from_producer = tb["temperature_2m"].metadata.description_from_producer
+        df_pivot[column].metadata.description_processing = tb["temperature_2m"].metadata.description_processing
+
         df_pivot[column].metadata.unit = "°C"
         df_pivot[column].metadata.short_unit = "°C"
         df_pivot[column].metadata.display = {}
