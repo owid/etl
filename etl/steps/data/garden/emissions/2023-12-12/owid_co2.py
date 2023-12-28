@@ -138,7 +138,7 @@ GDP_COLUMNS = {
     "gdp": "gdp",
 }
 
-UNITS = {"tonnes": {"conversion": TONNES_TO_MILLION_TONNES, "new_unit": "million tonnes"}}
+UNITS = {"tonnes": {"conversion": TONNES_TO_MILLION_TONNES, "new_unit": "million tonnes", "new_short_unit": "Mt"}}
 
 
 def convert_units(table: Table) -> Table:
@@ -159,14 +159,13 @@ def convert_units(table: Table) -> Table:
     # Check units and convert to more convenient ones.
     for column in table.columns:
         unit = table[column].metadata.unit
-        short_unit = table[column].metadata.short_unit
         title = table[column].metadata.title
         description_short = table[column].metadata.description or table[column].metadata.description_short
         if unit in list(UNITS):
             table[column] *= UNITS[unit]["conversion"]
-            table[column].metadata.unit = unit
-            table[column].metadata.short_unit = short_unit
-            table[column].metadata.title = title
+            table[column].metadata.unit = UNITS[unit]["new_unit"]
+            table[column].metadata.short_unit = UNITS[unit]["new_short_unit"]
+            table[column].metadata.title = title.replace(unit, UNITS[unit]["new_unit"])
             table[column].metadata.description_short = description_short.replace(unit, UNITS[unit]["new_unit"])
 
     return table
