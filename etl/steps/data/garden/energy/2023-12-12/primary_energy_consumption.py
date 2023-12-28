@@ -3,7 +3,6 @@ Energy Institute's Statistical Review of World Energy dataset and EIA data on en
 
 """
 
-
 import numpy as np
 import owid.catalog.processing as pr
 from owid.catalog import Dataset, Table
