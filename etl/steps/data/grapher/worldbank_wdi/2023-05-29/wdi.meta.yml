@@ -301,65 +301,22 @@ tables:
         title: Access to clean fuels and technologies for cooking (% of population)
         unit: '% of population'
         short_unit: '%'
-        display:
-          name: Access to clean fuels and technologies for cooking
-        description_short: Access to [clean fuels or technologies](#dod:clean-cooking-fuels) such as natural gas, electricity, and clean cookstoves reduce exposure to indoor air pollutants, a leading cause of death in low-income households.
-        description_key:
-          - TBD - List of key pieces of information about the indicator.
-        description_from_producer: TBD - Indicator's description given by the producer
-        description_processing: TBD - Indicator's processing description
-        description: "Access to clean fuels and technologies for cooking is the proportion of total population primarily using clean cooking fuels and technologies for cooking. Under WHO guidelines, kerosene is excluded from clean cooking fuels.\n\nStatistical concept and methodology: Data for access to clean fuels and technologies for cooking are based on the World Health Organization’s (WHO) Global Household Energy Database. They are collected among different sources: only data from nationally representative household surveys (including national censuses) were used. Survey sources include Demographic and Health Surveys (DHS) and Living Standards Measurement Surveys (LSMS), Multi-Indicator Cluster Surveys (MICS), the World Health Survey (WHS), other nationally developed and implemented surveys, and various government agencies (for example, ministries of energy and utilities). Trends in the proportion of the population using each fuel type are estimated using a single multivariate hierarchical model, with urban and rural disaggregation. Estimates for overall ‘polluting’ fuels (unprocessed biomass, charcoal, coal, and kerosene) and ‘clean’ fuels (gaseous fuels, electricity, as well as an aggregation of any other clean fuels like alcohol) are produced by aggregating estimates of relevant fuel types. The model was used to derive clean fuel use estimates for 191 countries (ref. Stoner, O., Shaddick, G., Economou, T., Gumy, S., Lewis, J., Lucio, I., Ruggeri, G. and Adair-Rohani, H. (2020), Global household energy model: a multivariate hierarchical approach to estimating trends in the use of polluting and clean fuels for cooking. J. R. Stat. Soc. C, 69: 815-839). Countries classified by the World Bank as high income (57 countries) in the 2022 fiscal year are assumed to have universal access to clean fuels and technologies for cooking."
+        description_short: |-
+          Access to [clean fuels or technologies](#dod:clean-cooking-fuels) such as natural gas, electricity, and clean cookstoves reduces exposure to indoor air pollutants, a leading cause of death in low-income households.
+        description_from_producer: |-
+          Access to clean fuels and technologies for cooking is the proportion of total population primarily using clean cooking fuels and technologies for cooking. Under WHO guidelines, kerosene is excluded from clean cooking fuels.
+
+          Statistical concept and methodology: Data for access to clean fuels and technologies for cooking are based on the World Health Organization's (WHO) Global Household Energy Database. They are collected among different sources: only data from nationally representative household surveys (including national censuses) were used. Survey sources include Demographic and Health Surveys (DHS) and Living Standards Measurement Surveys (LSMS), Multi-Indicator Cluster Surveys (MICS), the World Health Survey (WHS), other nationally developed and implemented surveys, and various government agencies (for example, ministries of energy and utilities).
+
+          Trends in the proportion of the population using each fuel type are estimated using a single multivariate hierarchical model, with urban and rural disaggregation. Estimates for overall "polluting" fuels (unprocessed biomass, charcoal, coal, and kerosene) and "clean" fuels (gaseous fuels, electricity, as well as an aggregation of any other clean fuels like alcohol) are produced by aggregating estimates of relevant fuel types. The model was used to derive clean fuel use estimates for 191 countries (ref. Stoner, O., Shaddick, G., Economou, T., Gumy, S., Lewis, J., Lucio, I., Ruggeri, G. and Adair-Rohani, H. (2020), Global household energy model: a multivariate hierarchical approach to estimating trends in the use of polluting and clean fuels for cooking. J. R. Stat. Soc. C, 69: 815-839). Countries classified by the World Bank as high income (57 countries) in the 2022 fiscal year are assumed to have universal access to clean fuels and technologies for cooking.
         presentation:
-          title_public: TBD - Indicator title to be shown in data pages, that overrides the indicator's title.
-          title_variant: TBD - Indicator's title variant
-          attribution_short: TBD - Indicator's attribution (shorter version)
-          faqs:
-            - fragment_id: TBD - Question identifier from FAQ GDoc
-              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
-          grapher_config:
-            title: Share of the population with access to clean fuels for cooking
-            subtitle: Access to [clean fuels or technologies](#dod:clean-cooking-fuels) such as natural gas, electricity, and clean cookstoves reduce exposure to indoor air pollutants, a leading cause of death in low-income households.
-            originUrl: https://ourworldindata.org/energy
-            hasMapTab: true
-            tab: map
-            yAxis:
-              max: 0
-              min: 0
-            colorScale:
-              binningStrategy: equalInterval
-            hideAnnotationFieldsInTitle:
-              time: true
-              entity: true
-              changeInPrefix: true
-            map:
-              time: 2020
-              colorScale:
-                baseColorScheme: YlGn
-                binningStrategy: manual
-                customNumericColors:
-                  -
-                  -
-                  -
-                  -
-                  -
-                  -
-                customNumericValues:
-                  - 10
-                  - 20
-                  - 30
-                  - 40
-                  - 50
-                  - 60
-                  - 70
-                  - 80
-                  - 90
-                  - 100
-                customNumericMinValue: 0
-            selectedEntityNames:
-              - Togo
-              - World
-              - Sri Lanka
-            $schema: https://files.ourworldindata.org/schemas/grapher-schema.003.json
+          title_public: Share of the population with access to clean fuels for cooking
+          attribution: World Health Organization (via World Bank)
+          attribution_short: World Bank
+          topic_tags:
+            - Access to Energy
+            - Energy
+        processing_level: minor
       eg_elc_accs_zs:
         sources: []
         origins:
@@ -376,6 +333,7 @@ tables:
           To develop the historical evolution and starting point of electrification rates, a simple modeling approach was adopted to fill in the missing data points - around 1990, around 2000, and around 2010. Therefore, a country can have a continuum of zero to three data points. There are 42 countries with zero data point and the weighted regional average was used as an estimate for electrification in each of the data periods. 170 countries have between one and three data points and missing data are estimated by using a model with region, country, and time variables. The model keeps the original observation if data is available for any of the time periods. This modeling approach allowed the estimation of electrification rates for 212 countries over these three time periods (Indicated as \"Estimate\"). Notation \"Assumption\" refers to the assumption of universal access in countries classified as developed by the United Nations. Data begins from the year in which the first survey data is available for each country.
         presentation:
           title_public: Share of the population with access to electricity
+          attribution: Data compiled from multiple sources by World Bank
           attribution_short: World Bank
           topic_tags:
             - Access to Energy
