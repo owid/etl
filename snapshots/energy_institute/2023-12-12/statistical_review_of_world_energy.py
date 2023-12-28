@@ -1,4 +1,17 @@
-"""Script to create a snapshot of dataset 'Energy Institute Statistical Review of World Energy (2023)'."""
+"""Script to create a snapshot of dataset 'Energy Institute Statistical Review of World Energy (2023)'
+
+NOTE: On next update, check if the Energy Institute has fixed the following issue:
+(from https://github.com/owid/owid-issues/issues/1267)
+Many zeros in the main (excel) file of the Statistical Review are missing in the "Consolidated dataset".
+For example, the gas consumption in EJ in Norway between 1965 and 1976 is missing in their "Consolidated Dataset"
+(and without gas, other derived indicators are also missing).
+However, those years are informed (and zero) in their key report excel file.
+The same issue happens to many other countries and indicators.
+We use the consolidated dataset because it has a much more convenient format, but maybe we should use the key report
+excel file and deal with its very inconvenient format.
+We contacted the Energy Institute about this issue and are waiting for a response.
+
+"""
 
 from pathlib import Path
 

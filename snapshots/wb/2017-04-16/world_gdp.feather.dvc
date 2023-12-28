@@ -16,7 +16,7 @@ meta:
 
       Data before 1990: World Bank observation from 1990 expanded with
       "Maddison Project Database, version 2013. Bolt, J. and J. L. van Zanden (2014). The Maddison Project: collaborative research on historical national accounts. The Economic History Review, 67 (3): 627–651, working paper"
-
+    attribution: World Bank and Maddison (2017)
 
     # Files
     url_main: http://data.worldbank.org/indicator/NY.GDP.MKTP.PP.KD

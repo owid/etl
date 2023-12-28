@@ -1,5 +1,6 @@
 import copy
 import datetime as dt
+import re
 import subprocess
 from pathlib import Path
 from typing import Any, Dict, Optional, Set
@@ -276,6 +277,22 @@ def _is_env(env: Path) -> bool:
     return env.exists()
 
 
+def _normalise_branch(branch_name):
+    return re.sub(r"[\/\._]", "-", branch_name)
+
+
+def _get_container_name(branch_name):
+    normalized_branch = _normalise_branch(branch_name)
+
+    # Strip staging-site- prefix to add it back later
+    normalized_branch = normalized_branch.replace("staging-site-", "")
+
+    # Ensure the container name is less than 63 characters
+    container_name = f"staging-site-{normalized_branch[:50]}"
+    # Remove trailing hyphens
+    return container_name.rstrip("-")
+
+
 def _get_engine_for_env(env: Path) -> Engine:
     # env exists as a path
     if _is_env(env):
@@ -294,7 +311,7 @@ def _get_engine_for_env(env: Path) -> Engine:
             "DB_NAME": "owid",
             "DB_PASS": "",
             "DB_PORT": "3306",
-            "DB_HOST": staging_name,
+            "DB_HOST": _get_container_name(staging_name),
         }
 
     return get_engine(config)
@@ -359,7 +376,39 @@ def _modified_chart_ids_by_admin(session: Session) -> Set[int]:
     return set(pd.read_sql(q, session.bind).chartId.tolist())
 
 
-def _get_git_branch_creation_date(branch_name, base_branch="master") -> dt.datetime:
+def _branch_exists_locally(branch_name: str) -> bool:
+    try:
+        # Run the git branch command with the specific branch name
+        result = subprocess.run(["git", "branch", "--list", branch_name], stdout=subprocess.PIPE, text=True, check=True)
+
+        # Check if the branch name is in the command output
+        return branch_name in result.stdout
+    except subprocess.CalledProcessError:
+        # Handle errors (e.g., not a git repository)
+        return False
+
+
+def _branch_exists_in_origin(branch_name: str) -> bool:
+    try:
+        # Run the git ls-remote command for the 'origin' remote and the specific branch
+        result = subprocess.run(
+            ["git", "ls-remote", "--heads", "origin", branch_name], stdout=subprocess.PIPE, text=True, check=True
+        )
+
+        # Check if the output contains the branch name
+        return branch_name in result.stdout
+    except subprocess.CalledProcessError:
+        # Handle errors (e.g., remote not found)
+        return False
+
+
+def _get_git_branch_creation_date(branch_name: str, base_branch="master") -> dt.datetime:
+    if not _branch_exists_locally(branch_name):
+        if not _branch_exists_in_origin(branch_name):
+            raise ValueError(f"Could not find branch {branch_name}, use --staging-created-at to specify it manually")
+        else:
+            branch_name = f"origin/{branch_name}"
+
     # Define the git command
     git_command = f"git log --format=%cI {base_branch}..{branch_name} --reverse | head -1"
 

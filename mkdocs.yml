@@ -62,10 +62,11 @@ nav:
           - Dataset: "architecture/metadata/reference/dataset.md"
         - Structuring YAML file: "architecture/metadata/structuring-yaml.md"
         - Data Pages Workflow: "architecture/metadata/data_pages_workflow.md"
-        - FAQs: "architecture/metadata/faqs.md"
+        - ETL MetaGPT Tool: "architecture/metadata/metadata_chatgpt_update.md"
         - Propagation of metadata: "architecture/metadata/propagation.md"
         - Using metadata: "architecture/metadata/using.md"
         - Processing log: "architecture/metadata/processing_log.md"
+        - FAQs: "architecture/metadata/faqs.md"
       - Our journey: "architecture/our-journey.md"
   - API and catalog:
     - API: "api/index.md"

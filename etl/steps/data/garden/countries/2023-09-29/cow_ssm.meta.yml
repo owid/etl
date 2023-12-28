@@ -4,6 +4,21 @@ definitions:
     presentation:
       topic_tags:
         - State Capacity
+        - War & Peace
+    processing_level: minor
+    description_processing: |-
+      We use the state system membership from Correlates of War. We assign each country to a region based on the mapping (using COW codes):
+
+        - Americas: 2-165
+        - Europe: 200-399
+        - Africa: 402-626
+        - Middle East: 630-698
+        - Asia and Oceania: 700-999
+    display:
+      numDecimalPlaces: 0
+    description_key:
+      - For the years until 1919, Correlates of War considers a country a sovereign state if it has a population of at least 500,000 people, and is diplomatically recognized by France and the United Kingdom.
+      - For the years after 1919, a country is considered a sovereign state if it either at any point was a member of the League of Nations or the United Nations, or had a population of at least 500,000 people and was diplomatically recognized by at least two major powers.
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
@@ -23,31 +38,9 @@ tables:
         description_short: |-
           Number of states listed in the state system membership list for a given region.
         unit: countries
-        processing_level: minor
-        description_processing: |-
-          We use the state system membership from Correlates of War. We assign each country to a region based on the mapping (using COW codes):
-
-            - Americas: 2-165
-            - Europe: 200-399
-            - Africa: 402-626
-            - Middle East: 630-698
-            - Asia and Oceania: 700-999
-        display:
-          numDecimalPlaces: 0
 
       population:
         title: Population in region
         description_short: |-
           Population in the region, using borders from 2022.
-        unit: countries
-        processing_level: minor
-        description_processing: |-
-          We use the state system membership from Correlates of War. We assign each country to a region based on the mapping (using COW codes):
-
-            - Americas: 2-165
-            - Europe: 200-399
-            - Africa: 402-626
-            - Middle East: 630-698
-            - Asia and Oceania: 700-999
-        display:
-          numDecimalPlaces: 0
+        unit: people

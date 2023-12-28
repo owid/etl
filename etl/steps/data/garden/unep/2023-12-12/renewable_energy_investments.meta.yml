@@ -1,56 +1,50 @@
+definitions:
+  common:
+    processing_level: minor
+    unit: 'billion US dollars'
+    short_unit: 'billion $'
+    presentation:
+      topic_tags:
+        - Energy
+    display:
+      numDecimalPlaces: 0
+
 dataset:
-  title: Investment in renewable energy by technology (UNEP, 2019)
+  update_period_days: 365
   description: |
-    Renewable energy investments, extracted from Fig. 21 of the Global Trends in Renewable Energy Investment 2019 report, by UN Environment, Frankfurt School-UNEP Centre, BNEF.
+    Renewable energy investments, extracted from Fig. 42 of the Global Trends in Renewable Energy Investment 2020 report, by UN Environment, Frankfurt School-UNEP Centre, BNEF.
 
     Investment adjusts for re-invested equity, and includes estimates for undisclosed deals. Figures excludes investments in large hydropower schemes.
-  licenses:
-  - name: Copyright © Frankfurt School of Finance & Management gGmbH 2019
-    url: https://wedocs.unep.org/bitstream/handle/20.500.11822/29752/GTR2019.pdf
-  sources:
-  - name: UN Environment, Frankfurt School-UNEP Centre, BNEF
-    url: https://www.unep.org/resources/report/global-trends-renewable-energy-investment-2019
-    source_data_url: https://wedocs.unep.org/bitstream/handle/20.500.11822/29752/GTR2019.pdf
-    date_accessed: '2023-01-03'
-    publication_date: '2019-09-11'
-    publication_year: 2019
-    published_by: |
-      UN Environment, Frankfurt School-UNEP Centre, BNEF. Copyright © Frankfurt School of Finance & Management gGmbH 2019
+
 tables:
   renewable_energy_investments:
+    title: Investment in renewable energy by technology
     variables:
       wind:
         title: Wind energy
-        description: Investment in wind energy technology.
-        short_unit: 'billion $'
-        unit: 'billion US dollars'
+        presentation:
+          title_public: Investment in wind energy technology
       solar:
         title: Solar energy
-        description: Investment in solar energy technology.
-        short_unit: 'billion $'
-        unit: 'billion US dollars'
+        presentation:
+          title_public: Investment in solar energy technology
       biofuels:
         title: Biofuels
-        description: Investment in biofuels technology.
-        short_unit: 'billion $'
-        unit: 'billion US dollars'
+        presentation:
+          title_public: Investment in biofuels technology
       biomass_and_waste:
         title: Biomass and waste-to-energy
-        description: Investment in biomass and waste-to-energy technology.
-        short_unit: 'billion $'
-        unit: 'billion US dollars'
+        presentation:
+          title_public: Investment in biomass and waste-to-energy technology
       small_hydro:
         title: Small hydropower
-        description: Investment in small hydropower technology.
-        short_unit: 'billion $'
-        unit: 'billion US dollars'
+        presentation:
+          title_public: Investment in small hydropower technology
       geothermal:
         title: Geothermal energy
-        description: Investment in geothermal energy technology.
-        short_unit: 'billion $'
-        unit: 'billion US dollars'
+        presentation:
+          title_public: Investment in geothermal energy technology
       marine:
         title: Marine energy
-        description: Investment in marine energy technology.
-        short_unit: 'billion $'
-        unit: 'billion US dollars'
+        presentation:
+          title_public: Investment in marine energy technology

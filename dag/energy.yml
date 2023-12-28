@@ -9,14 +9,6 @@ steps:
       - data://meadow/ember/2023-12-12/european_electricity_review
       - data://garden/regions/2023-01-01/regions
   #
-  # Ember - European electricity review 2023.
-  #
-  # Currently these steps are not used.
-  data://meadow/ember/2023-02-20/european_electricity_review:
-    - snapshot://ember/2023-02-20/european_electricity_review.xlsx
-  data://garden/ember/2023-02-20/european_electricity_review:
-    - data://meadow/ember/2023-02-20/european_electricity_review
-  #
   # Ember - Yearly electricity data 2023.
   #
   data://meadow/ember/2023-12-12/yearly_electricity:
@@ -69,22 +61,22 @@ steps:
   #
   # UNEP - Global trends in renewable energy investment (2019).
   #
-  data://meadow/unep/2023-01-03/renewable_energy_investments:
-    - snapshot://unep/2023-01-03/global_trends_in_renewable_energy_investment.pdf
-  data://garden/unep/2023-01-03/renewable_energy_investments:
-    - data://meadow/unep/2023-01-03/renewable_energy_investments
-  data://grapher/unep/2023-01-03/renewable_energy_investments:
-    - data://garden/unep/2023-01-03/renewable_energy_investments
+  data://meadow/unep/2023-12-12/renewable_energy_investments:
+    - snapshot://unep/2023-12-12/global_trends_in_renewable_energy_investment.pdf
+  data://garden/unep/2023-12-12/renewable_energy_investments:
+    - data://meadow/unep/2023-12-12/renewable_energy_investments
+  data://grapher/unep/2023-12-12/renewable_energy_investments:
+    - data://garden/unep/2023-12-12/renewable_energy_investments
   #
   # Energy - Photovoltaic cost and capacity.
   #
-  data://garden/energy/2023-07-10/photovoltaic_cost_and_capacity:
-    - data://garden/papers/2023-07-10/nemet_2009
-    - data://garden/papers/2023-07-10/farmer_lafond_2016
-    - data://garden/irena/2023-06-26/renewable_electricity_capacity
-    - data://garden/irena/2023-06-26/renewable_power_generation_costs
-  data://grapher/energy/2023-07-10/photovoltaic_cost_and_capacity:
-    - data://garden/energy/2023-07-10/photovoltaic_cost_and_capacity
+  data://garden/energy/2023-12-12/photovoltaic_cost_and_capacity:
+    - data://garden/papers/2023-12-12/nemet_2009
+    - data://garden/papers/2023-12-12/farmer_lafond_2016
+    - data://garden/irena/2023-12-12/renewable_electricity_capacity
+    - data://garden/irena/2023-12-12/renewable_power_generation_costs
+  data://grapher/energy/2023-12-12/photovoltaic_cost_and_capacity:
+    - data://garden/energy/2023-12-12/photovoltaic_cost_and_capacity
   #
   # Energy Institute - Statistical Review of World Energy (2023).
   #
@@ -105,7 +97,7 @@ steps:
   data://grapher/energy/2023-12-12/fossil_fuel_reserves_production_ratio:
     - data://garden/energy/2023-12-12/fossil_fuel_reserves_production_ratio
   #
-  # EIA - Energy consumption 2023.
+  # EIA - Energy consumption (2023).
   #
   data://meadow/eia/2023-12-12/energy_consumption:
     - snapshot://eia/2023-12-12/international_energy_data.zip
@@ -114,15 +106,15 @@ steps:
     - data://garden/wb/2023-04-30/income_groups
     - data://garden/regions/2023-01-01/regions
   #
-  # Energy - Primary energy consumption 2023.
+  # Energy - Primary energy consumption (2023).
   #
-  data://garden/energy/2023-07-10/primary_energy_consumption:
-    - data://garden/energy_institute/2023-06-26/statistical_review_of_world_energy
-    - data://garden/eia/2023-07-10/energy_consumption
+  data://garden/energy/2023-12-12/primary_energy_consumption:
+    - data://garden/energy_institute/2023-12-12/statistical_review_of_world_energy
+    - data://garden/eia/2023-12-12/energy_consumption
     - data://garden/ggdc/2020-10-01/ggdc_maddison
     - data://garden/demography/2023-03-31/population
-  data://grapher/energy/2023-07-10/primary_energy_consumption:
-    - data://garden/energy/2023-07-10/primary_energy_consumption
+  data://grapher/energy/2023-12-12/primary_energy_consumption:
+    - data://garden/energy/2023-12-12/primary_energy_consumption
   #
   # Shift - Energy production from fossil fuels 2023.
   #
@@ -192,173 +184,16 @@ steps:
   #
   # Energy - OWID Energy dataset (2023).
   #
-  data://garden/energy/2023-07-10/owid_energy:
-    - data://garden/energy/2023-07-10/energy_mix
-    - data://garden/energy/2023-07-10/fossil_fuel_production
-    - data://garden/energy/2023-07-10/primary_energy_consumption
-    - data://garden/energy/2023-07-10/electricity_mix
+  data://garden/energy/2023-12-12/owid_energy:
+    - data://garden/energy/2023-12-12/energy_mix
+    - data://garden/energy/2023-12-12/fossil_fuel_production
+    - data://garden/energy/2023-12-12/primary_energy_consumption
+    - data://garden/energy/2023-12-12/electricity_mix
     - data://garden/demography/2023-03-31/population
     - data://garden/ggdc/2020-10-01/ggdc_maddison
     - data://garden/regions/2023-01-01/regions
 
   ######################################################################################################################
   # Older versions to be archived once they are not used by any other steps.
-  #
-  # Energy Institute - Statistical Review of World Energy (2023).
-  #
-  data://meadow/energy_institute/2023-06-26/statistical_review_of_world_energy:
-    - snapshot://energy_institute/2023-06-26/statistical_review_of_world_energy.csv
-    - snapshot://energy_institute/2023-06-26/statistical_review_of_world_energy.xlsx
-  data://garden/energy_institute/2023-06-26/statistical_review_of_world_energy:
-    - data://meadow/energy_institute/2023-06-26/statistical_review_of_world_energy
-    - data://garden/regions/2023-01-01/regions
-    - data://garden/wb/2023-04-30/income_groups
-  data://grapher/energy_institute/2023-06-26/statistical_review_of_world_energy:
-    - data://garden/energy_institute/2023-06-26/statistical_review_of_world_energy
-  #
-  # EIA - Energy consumption 2023.
-  #
-  data://meadow/eia/2023-07-10/energy_consumption:
-    - snapshot://eia/2023-07-10/international_energy_data.zip
-  data://garden/eia/2023-07-10/energy_consumption:
-    - data://meadow/eia/2023-07-10/energy_consumption
-    - data://garden/wb/2023-04-30/income_groups
-    - data://garden/regions/2023-01-01/regions
-  #
-  # Smil - Global primary energy (2017).
-  #
-  data://meadow/papers/2023-07-10/smil_2017:
-    - snapshot://papers/2023-07-10/smil_2017.csv
-  data://garden/papers/2023-07-10/smil_2017:
-    - data://meadow/papers/2023-07-10/smil_2017
-  #
-  # Ember - European electricity review 2022.
-  #
-  # We still use this version for data from 1990-1999, which is not included in the 2023 version.
-  data://meadow/ember/2022-08-01/european_electricity_review:
-    - walden://ember/2022-02-01/european_electricity_review
-  data://garden/ember/2022-08-01/european_electricity_review:
-      - data://meadow/ember/2022-08-01/european_electricity_review
-      - data://garden/regions/2023-01-01/regions
-  #
-  # Ember - Yearly electricity data 2023.
-  #
-  data://meadow/ember/2023-07-10/yearly_electricity:
-    - snapshot://ember/2023-07-10/yearly_electricity.csv
-  data://garden/ember/2023-07-10/yearly_electricity:
-    - data://meadow/ember/2023-07-10/yearly_electricity
-    - data://garden/demography/2023-03-31/population
-    - data://garden/wb/2023-04-30/income_groups
-    - data://garden/regions/2023-01-01/regions
-  #
-  # Ember - Combined electricity 2023.
-  #
-  # We still use EER 2022 for data from 1990-1999, which is not included in EER 2023.
-  data://garden/ember/2023-07-10/combined_electricity:
-    - data://garden/ember/2022-08-01/european_electricity_review
-    - data://garden/ember/2023-07-10/yearly_electricity
-  #
-  # Energy - Energy mix (2023).
-  #
-  data://garden/energy/2023-07-10/energy_mix:
-    - data://garden/energy_institute/2023-06-26/statistical_review_of_world_energy
-    - data://garden/demography/2023-03-31/population
-    - data://garden/wb/2023-04-30/income_groups
-  data://grapher/energy/2023-07-10/energy_mix:
-    - data://garden/energy/2023-07-10/energy_mix
-  #
-  # Energy - Electricity mix (EI & Ember, 2023).
-  #
-  data://garden/energy/2023-07-10/electricity_mix:
-    - data://garden/energy_institute/2023-06-26/statistical_review_of_world_energy
-    - data://garden/ember/2023-07-10/combined_electricity
-    - data://garden/demography/2023-03-31/population
-  data://grapher/energy/2023-07-10/electricity_mix:
-    - data://garden/energy/2023-07-10/electricity_mix
-  #
-  # UK BEIS - UK historical electricity (2023).
-  #
-  data://meadow/uk_beis/2023-07-10/uk_historical_electricity:
-    - snapshot://uk_beis/2023-07-10/uk_historical_electricity.xls
-  data://garden/uk_beis/2023-07-10/uk_historical_electricity:
-    - data://meadow/uk_beis/2023-07-10/uk_historical_electricity
-  #
-  # Energy - UK historical electricity (2023).
-  #
-  data://garden/energy/2023-07-10/uk_historical_electricity:
-    - data://garden/uk_beis/2023-07-10/uk_historical_electricity
-    - data://garden/energy/2023-07-10/electricity_mix
-  data://grapher/energy/2023-07-10/uk_historical_electricity:
-    - data://garden/energy/2023-07-10/uk_historical_electricity
-  #
-  # Energy - Global primary energy (2023).
-  #
-  data://garden/energy/2023-07-10/global_primary_energy:
-    - data://garden/papers/2023-07-10/smil_2017
-    - data://garden/energy_institute/2023-06-26/statistical_review_of_world_energy
-  data://grapher/energy/2023-07-10/global_primary_energy:
-    - data://garden/energy/2023-07-10/global_primary_energy
-  #
-  # IRENA - Renewable energy patents (2021).
-  #
-  data://meadow/irena/2022-10-25/renewable_energy_patents:
-    - walden://irena/2022-10-25/renewable_energy_patents
-  # The garden dataset will have two tables with number of patents:
-  # * 'renewable_energy_patents': Long format, indexed by country, year, sector, technology, sub-technology.
-  # * 'renewable_energy_patents_by_technology': Wide format, indexed by country, year.
-  data://garden/irena/2022-10-25/renewable_energy_patents:
-    - data://meadow/irena/2022-10-25/renewable_energy_patents
-    - data://garden/wb/2021-07-01/wb_income
-    - data://garden/regions/2023-01-01/regions
-  # The grapher dataset uses only the wide table from the garden dataset.
-  data://grapher/irena/2022-10-25/renewable_energy_patents:
-    - data://garden/irena/2022-10-25/renewable_energy_patents
-  #
-  # IRENA - Renewable power generation costs (2022).
-  #
-  data://meadow/irena/2023-06-26/renewable_power_generation_costs:
-    - snapshot://irena/2023-06-26/renewable_power_generation_costs.xlsx
-  data://garden/irena/2023-06-26/renewable_power_generation_costs:
-    - data://meadow/irena/2023-06-26/renewable_power_generation_costs
-  data://grapher/irena/2023-06-26/renewable_power_generation_costs:
-    - data://garden/irena/2023-06-26/renewable_power_generation_costs
-  #
-  # IRENA - Renewable electricity capacity (2023).
-  #
-  data://meadow/irena/2023-06-26/renewable_electricity_capacity:
-    - snapshot://irena/2023-06-26/renewable_electricity_capacity_and_generation.xlsm
-  data://garden/irena/2023-06-26/renewable_electricity_capacity:
-    - data://meadow/irena/2023-06-26/renewable_electricity_capacity
-    - data://garden/regions/2023-01-01/regions
-    - data://garden/wb/2023-04-30/income_groups
-  data://grapher/irena/2023-06-26/renewable_electricity_capacity_by_technology:
-    - data://garden/irena/2023-06-26/renewable_electricity_capacity
-  data://grapher/irena/2023-06-26/renewable_electricity_capacity:
-    - data://garden/irena/2023-06-26/renewable_electricity_capacity
-  #
-  # Shift - Energy production from fossil fuels 2023.
-  #
-  data://meadow/shift/2023-07-10/energy_production_from_fossil_fuels:
-    - snapshot://shift/2023-07-10/energy_production_from_fossil_fuels.csv
-  data://garden/shift/2023-07-10/energy_production_from_fossil_fuels:
-    - data://meadow/shift/2023-07-10/energy_production_from_fossil_fuels
-    - data://garden/wb/2023-04-30/income_groups
-    - data://garden/regions/2023-01-01/regions
-  #
-  # Energy - Fossil Fuel Production 2023.
-  #
-  data://garden/energy/2023-07-10/fossil_fuel_production:
-    - data://garden/energy_institute/2023-06-26/statistical_review_of_world_energy
-    - data://garden/shift/2023-07-10/energy_production_from_fossil_fuels
-    - data://garden/demography/2023-03-31/population
-  data://grapher/energy/2023-07-10/fossil_fuel_production:
-    - data://garden/energy/2023-07-10/fossil_fuel_production
-  #
-  # Energy - Fossil fuel reserves/production ratio (2023).
-  #
-  data://garden/energy/2023-07-10/fossil_fuel_reserves_production_ratio:
-    - data://garden/energy_institute/2023-06-26/statistical_review_of_world_energy
-  data://grapher/energy/2023-07-10/fossil_fuel_reserves_production_ratio:
-    - data://garden/energy/2023-07-10/fossil_fuel_reserves_production_ratio
 
   ######################################################################################################################
