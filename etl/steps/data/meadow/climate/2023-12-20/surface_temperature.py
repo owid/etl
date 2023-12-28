@@ -4,6 +4,7 @@ import zipfile
 import geopandas as gpd
 import numpy as np
 import pandas as pd
+import rioxarray
 import xarray as xr
 from owid.catalog import Table
 from shapely.geometry import mapping
