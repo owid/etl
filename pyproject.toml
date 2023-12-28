@@ -93,6 +93,7 @@ shapely = "^2.0.2"
 fasteners = "^0.19"
 streamlit-agraph = "^0.0.45"
 cdsapi = "^0.6.1"
+rioxarray = "^0.15.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = ">=7.1.2"
