@@ -251,9 +251,7 @@ class MetadataGPTUpdater:
                 parts[-1] = parts[-1].split(".")[0]
                 path_to_dataset = "/".join(parts)
                 ds = Dataset(path_to_dataset)
-                ds_meta = ds.metadata.to_dict()
-                ds_meta_description = ds_meta["description"]
-
+                ds_meta_description = ds.metadata.to_dict()
                 # Open the file with descriptions of metadata fields from our docs
                 with open(DOCS, "r") as f:
                     docs = json.load(f)
