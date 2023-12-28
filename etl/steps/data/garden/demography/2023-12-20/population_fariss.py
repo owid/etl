@@ -19,9 +19,6 @@ def run(dest_dir: str) -> None:
     ds_gw = paths.load_dataset("gleditsch")
     tb_gw = ds_gw["gleditsch_countries"].reset_index()
 
-    #
-    # Process data.
-    #
     # Get code to country table
     tb_gw = get_code_to_country(tb_gw)
 
@@ -38,9 +35,10 @@ def run(dest_dir: str) -> None:
     tb = tb[["country", "year", "mean", "sd"]]
 
     # Rename columns
-    tb = tb.rename(columns={"mean": "population", "sd": "population_sd"})
+    tb = tb.rename(columns={"mean": "population", "sd": "population_sd"}, errors="raise")
 
     # Scale population (1e4)
+    ## For some unknown reason, the source data is scaled by 1e4.
     columns = ["population", "population_sd"]
     tb[columns] *= 1e4
 
@@ -65,12 +63,13 @@ def run(dest_dir: str) -> None:
 
 def get_code_to_country(tb_gw):
     """Get code to country table."""
-    # Sanity check
+    # Sanity check: no duplicate country codes
+    ## We expect only two codes to have multiple country names assigned: 260 and 580.
     x = tb_gw.groupby("id")["country"].nunique()
     codes = set(x[x > 1].index)
     assert codes == {260, 580}, "Unexpected duplicate country codes!"
 
-    # Fix
+    # Fix: Although there were different namings in the past for countries with codes 260 and 580, we want these to have the modern name.
     tb_gw["country"] = tb_gw["country"].replace(
         {
             "Madagascar (Malagasy)": "Madagascar",
