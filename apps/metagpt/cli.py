@@ -7,6 +7,7 @@ import click
 import structlog
 import yaml
 from openai import OpenAI
+from owid.catalog import Dataset
 from rich_click.rich_command import RichCommand
 from typing_extensions import Self
 
@@ -22,6 +23,9 @@ log = structlog.get_logger()
 NEW_METADATA_EXAMPLE = (
     BASE_DIR / "snapshots" / "emissions" / "2023-11-23" / "national_contributions_annual_emissions.csv.dvc"
 )
+# Docs for garden metadata fields
+DOCS = BASE_DIR / "schemas" / "dataset-schema.json"
+
 
 # Additional instructions or configurations
 ADDITIONAL_INSTRUCTIONS = """
@@ -191,11 +195,12 @@ class MetadataGPTUpdater:
 
     def run(self: Self) -> str | None:
         """Update metadata using OpenAI GPT."""
-        # Create system prompt
-        messages = self.create_system_prompt()
+
         # Update metadata
         match self.channel:
             case Channels.SNAPSHOT:
+                # Create system prompt
+                messages = self.create_system_prompt()
                 message_content = get_message_content(self.client, messages=messages, model=GPT_MODEL, temperature=0)  # type: ignore
                 if message_content:
                     new_yaml_content = yaml.safe_load(message_content)
@@ -203,6 +208,8 @@ class MetadataGPTUpdater:
                         self.__metadata_new = new_yaml_content
             case Channels.GRAPHER:
                 for attempt in range(5):  # MAX_ATTEMPTS
+                    # Create system prompt
+                    messages = self.create_system_prompt()
                     message_content = get_message_content(
                         self.client, messages=messages, model=GPT_MODEL, temperature=0
                     )  #
@@ -235,6 +242,60 @@ class MetadataGPTUpdater:
                         except json.JSONDecodeError as e:
                             log.error(f"JSON decoding failed on attempt {attempt + 1}: {e}")
                 raise Exception("Unable to parse GPT response after multiple attempts.")
+
+            case Channels.GARDEN:
+                # Load the actual dataset file to extract description of the dataset
+                # Amend path to be compatiable to work with Dataset class
+                parts = self.path_to_file.split("/")
+                parts.remove("steps")
+                parts.remove("etl")
+                parts[-1] = parts[-1].split(".")[0]
+                path_to_dataset = "/".join(parts)
+                ds = Dataset(path_to_dataset)
+                ds_meta = ds.metadata.to_dict()
+                ds_meta_description = ds_meta["description"]
+
+                # Open the file with descriptions of metadata fields from our docs
+                with open(DOCS, "r") as f:
+                    docs = json.load(f)
+
+                metadata_indicator_docs = docs["properties"]["tables"]["additionalProperties"]["properties"][
+                    "variables"
+                ]["additionalProperties"]["properties"]
+                fields_to_fill_out = [
+                    "description_short",
+                    "description_key",
+                    "description_from_producer",
+                ]
+
+                all_variables = {}
+                with open(self.path_to_file, "r") as file:
+                    original_yaml_content = yaml.safe_load(file)
+
+                for table_name, table_data in original_yaml_content["tables"].items():
+                    for variable_name, variable_data in table_data["variables"].items():
+                        variable_title = variable_data["title"]
+                        indicator_metadata = []
+                        for metadata_field in fields_to_fill_out:
+                            metadata_instructions = metadata_indicator_docs[metadata_field]
+                            messages = self.create_system_prompt_garden(
+                                variable_title, metadata_field, metadata_instructions, ds_meta_description
+                            )
+                            message_content = get_message_content(
+                                self.client, messages=messages, model=GPT_MODEL, temperature=0
+                            )
+
+                            indicator_metadata.append(message_content)
+                        all_variables[variable_name] = indicator_metadata
+                for table_name, table_data in original_yaml_content["tables"].items():
+                    for variable_name, variable_data in table_data["variables"].items():
+                        variable_updates = all_variables[variable_name]
+                        variable_updates_dict = convert_list_to_dict(variable_updates)
+                        original_yaml_content["tables"][table_name]["variables"][variable_name].update(
+                            variable_updates_dict
+                        )
+                self.__metadata_new = original_yaml_content
+                return
 
     def create_system_prompt(self: Self) -> List[Dict[str, str]] | None:
         """Create the system prompt for the GPT model based on file path."""
@@ -298,10 +359,44 @@ class MetadataGPTUpdater:
                     {"role": "user", "content": self.metadata_old_str},
                 ]
                 return messages
-            case Channels.GARDEN:
-                log.error("Prompt for editing metadata in the garden step is not available yet.")
             case _:
                 log.error(f"Invalid channel {self.channel}")
+
+    def create_system_prompt_garden(
+        self, variable_title: str, metadata_field: str, metadata_instructions: str, ds_meta_description: str
+    ) -> List[Dict[str, str]] | None:
+        """
+        Generates a system prompt for a gardening application.
+
+        Parameters:
+        variable_title (str): The title of the variable in the dataset.
+        metadata_field (str): The metadata field related to the variable.
+        metadata_instructions (str): Instructions for filling out the metadata field.
+        ds_meta_description (str): Description of the dataset.
+
+        Returns:
+        Optional[List[Dict[str, str]]]: A list of dictionaries containing the system prompt, or None.
+        """
+        base_template_instructions = (
+            "You are given a description of the dataset here:\n"
+            f"'{ds_meta_description}'\n\n"
+            f"We have a variable called '{variable_title}' in this dataset.\n"
+            "By using the information you already have in the dataset description, and browsing the web, can you "
+            f"infer what this metadata field '{metadata_field}' might be for this specific indicator?\n\n"
+            f"Here are the instructions on how to fill out the field - '{metadata_instructions}'.\n"
+            "Depending on which field you are filling out take into account these extra instructions:\n"
+            " - description_from_producer - do a web search based on other information in the metadata file to find a description of the variable.\n"
+            " - description_key - based on a web search and your knowledge come up with some key bullet points (in a sentence format) that would help someone interpret the indicator. Can you make sure that these are going to be useful for the public to understand the indicator? Expand on any acronyms or any terms that a layperson might not be familiar with. Each bullet point can be more than one sentence if necessary but don't make it too long.\n"
+            " - description_short use the description_key and a web search to come up with one sentence to describe the indicator. It should be very brief and to the point.\n"
+        )
+
+        base_template_prompt = (
+            "Output the filled out field in the following format. Make sure your responses make sense:\n"
+            f"'{metadata_field}': Your suggestion for how it should be filled out."
+        )
+
+        messages = [{"role": "system", "content": base_template_instructions + base_template_prompt}]
+        return messages
 
 
 def _read_metadata_file(path_to_file: str | Path) -> str:
@@ -365,6 +460,18 @@ def check_gpt_response_format(message_content) -> bool:
                 return False
 
     return True
+
+
+def convert_list_to_dict(data_list):
+    """
+    Function to convert a list of string elements in the format "'key': 'value'" into a dictionary.
+    """
+    data_dict = {}
+    for item in data_list:
+        # Removing leading and trailing single quotes, then splitting the string by ':'
+        key, value = item.strip("'").split(": ", 1)
+        data_dict[key.strip("'")] = value.strip("'\"")
+    return data_dict
 
 
 class Channels:
