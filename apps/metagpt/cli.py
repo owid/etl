@@ -116,7 +116,6 @@ Metadata Field Guidelines:
 def main(path_to_file: str, output_dir: str, overwrite: bool) -> None:
     """Process and update metadata using GPT-based tool.
 
-    If `path-to-file` must either be a 'snapshot' or a 'grapher' metadata file.
     To learn more about the behaviour of this tool, please refer to https://docs.owid.io/projects/etl/architecture/metadata/.
     """
     log.info("Starting metadata update process.")
