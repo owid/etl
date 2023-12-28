@@ -11,10 +11,9 @@ GDP are included.
 
 """
 
-from typing import List
 
 import numpy as np
-from owid.catalog import Dataset, Origin, Source, Table
+from owid.catalog import Dataset, Origin, Table
 
 from etl.helpers import PathFinder, create_dataset
 
@@ -142,40 +141,6 @@ GDP_COLUMNS = {
 UNITS = {"tonnes": {"conversion": TONNES_TO_MILLION_TONNES, "new_unit": "million tonnes"}}
 
 
-def unique_sources_from_datasets(
-    datasets: List[Dataset],
-) -> List[Source]:
-    """Gather unique sources from datasets.
-
-    Note: To check if a source is already listed, only the name of the source is considered (not the description or any
-    other field in the source).
-
-    Parameters
-    ----------
-    datasets : list
-        List of datasets with metadata.
-
-    Returns
-    -------
-    known_sources : list
-        List of unique sources from all datasets.
-
-    """
-    # Initialise list that will gather all unique metadata sources from the tables.
-    known_sources: List[Source] = []
-    for ds in datasets:
-        # Get list of sources of the dataset of current table.
-        table_sources = ds.metadata.sources
-        # Go source by source of current table, and check if its name is not already in the list of known_sources.
-        for source in table_sources:
-            # Check if this source's name is different to all known_sources.
-            if all([source.name != known_source.name for known_source in known_sources]):
-                # Add the new source to the list.
-                known_sources.append(source)
-
-    return known_sources
-
-
 def convert_units(table: Table) -> Table:
     """Convert units of table.
 
@@ -196,13 +161,13 @@ def convert_units(table: Table) -> Table:
         unit = table[column].metadata.unit
         short_unit = table[column].metadata.short_unit
         title = table[column].metadata.title
-        description = table[column].metadata.description or table[column].metadata.description_short
+        description_short = table[column].metadata.description or table[column].metadata.description_short
         if unit in list(UNITS):
             table[column] *= UNITS[unit]["conversion"]
             table[column].metadata.unit = unit
             table[column].metadata.short_unit = short_unit
             table[column].metadata.title = title
-            table[column].metadata.description = description.replace(unit, UNITS[unit]["new_unit"])
+            table[column].metadata.description_short = description_short.replace(unit, UNITS[unit]["new_unit"])
 
     return table
 
