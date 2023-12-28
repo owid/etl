@@ -1,233 +1,58 @@
-definitions:
-  common:
-    processing_level: TBD - major or minor
-    presentation:
-      topic_tags:
-        - TBD - Indicator's topic tags
-    sources: []
-    origins:
-      - producer: Food and Agriculture Organization of the United Nations
-        title: 'Production: Crops and livestock products (FAO, 2023-06-12)'
-        description: >-
-          Production: Crops and livestock products
-
-
-          Original dataset description by FAOSTAT:
-
-          Crop and livestock statistics are recorded for 278 products, covering the following categories: 1) CROPS PRIMARY:
-          Cereals, Citrus Fruit, Fibre Crops, Fruit, Oil Crops, Oil Crops and Cakes in Oil Equivalent, Pulses, Roots and Tubers,
-          Sugar Crops, Treenuts and Vegetables. Data are expressed in terms of area harvested, production quantity and yield.
-          Cereals: Area and production data on cereals relate to crops harvested for dry grain only. Cereal crops harvested
-          for hay or harvested green for food, feed or silage or used for grazing are therefore excluded. 2) CROPS PROCESSED:
-          Beer of barley; Cotton lint; Cottonseed; Margarine, short; Molasses; Oil, coconut (copra); Oil, cottonseed; Oil,
-          groundnut; Oil, linseed; Oil, maize; Oil, olive, virgin; Oil, palm; Oil, palm kernel; Oil, rapeseed; Oil, safflower;
-          Oil, sesame; Oil, soybean; Oil, sunflower; Palm kernels; Sugar Raw Centrifugal; Wine. 3) LIVE ANIMALS: Animals live
-          n.e.s.; Asses; Beehives; Buffaloes; Camelids, other; Camels; Cattle; Chickens; Ducks; Geese and guinea fowls; Goats;
-          Horses; Mules; Pigeons, other birds; Pigs; Rabbits and hares; Rodents, other; Sheep; Turkeys. 4) LIVESTOCK PRIMARY:
-          Beeswax; Eggs (various types);  Hides buffalo, fresh; Hides, cattle, fresh; Honey, natural; Meat (ass, bird nes,
-          buffalo, camel, cattle, chicken, duck,  game, goat, goose and guinea fowl, horse, mule, Meat nes, meat other camelids,
-          Meat other rodents, pig, rabbit, sheep, turkey); Milk (buffalo, camel, cow, goat, sheep); Offals, nes; Silk-worm
-          cocoons, reelable; Skins (goat, sheep); Snails, not sea; Wool, greasy. 5) LIVESTOCK PROCESSED: Butter (of milk from
-          sheep, goat, buffalo, cow); Cheese (of milk from goat, buffalo, sheep, cow milk); Cheese of skimmed cow milk; Cream
-          fresh; Ghee (cow and buffalo milk); Lard; Milk (dry buttermilk,  skimmed condensed, skimmed cow, skimmed dried,
-          skimmed evaporated, whole condensed, whole dried, whole evaporated); Silk raw; Tallow; Whey (condensed and dry);
-          Yoghurt
-
-
-          Processing of possible data anomalies by Our World in Data:
-
-
-          +The area harvested of spinach for China (which refers to mainland) in 1984 is missing. This causes that other regions
-          that are aggregates which include China mainland have a spurious reduction in area harvested of spinach in that
-          year, and a spurious increase in yield. Therefore, we remove those spurious aggregate values.
-
-
-          +The amount of eggs produced per bird for Northern Europe (FAO) is unreasonably high before 1973, with values between
-          50kg and 115kg, while from 1973 on it has more reasonable values, below 20kg. Therefore, we remove all values for
-          Northern Europe (FAO) between 1961 and 1972.
-
-
-          +Tea production in FAO data increased dramatically from 1990 to 1991 for many different countries (including some
-          of the main producers, like China and India). However, data from 1991 was flagged as 'Estimated value' (while data
-          prior to 1991 is flagged as 'Official figure'). This potentially anomalous increase was not present in the previous
-          version of the data. Therefore, we removed tea production data (as well as per-capita production and yield) from
-          1991 onwards.
-
-
-          +Yields are unreasonably high (possibly by a factor of 1000) for some items, countries and years. For example, the
-          yield of item 'Fruit Primary' in Denmark prior to 1985 is larger than 6000 tonnes/ha. Similar issues happen to Antigua
-          and Barbuda and Burkina Faso. For Netherlands, a similar anomaly is found but prior to 1984 (which will be considered
-          separately). Therefore, we remove these possibly spurious values.
-
-
-          +Yields are unreasonably high (possibly by a factor of 1000) for some items, countries and years. This happens to
-          item 'Fruit Primary' in Netherlands prior to 1984. Therefore, we remove these possibly spurious values.
-
-
-          +Yields are unreasonably high (possibly by a factor of 1000) for some items, countries and years. This happens to
-          item 'Locust beans (carobs)' for region 'Net Food Importing Developing Countries (FAO)'. Therefore, we remove these
-          possibly spurious values.
-
-
-          +Yields are unreasonably high (possibly by a factor of 1000) for some items, countries and years. This happens to
-          item 'Walnuts, in shell' for region 'Eastern Asia (FAO)'. Therefore, we remove these possibly spurious values.
-
-
-          +Yields are unreasonably high (possibly by a factor of 1000) for some items, countries and years. This happens to
-          item 'Other tropical fruits, n.e.c.' for region 'Northern Africa (FAO)'. Therefore, we remove these possibly spurious
-          values.
-
-
-          +Yields are unreasonably high (possibly by a factor of 1000) for some items, countries and years. This happens to
-          item 'Other tropical fruits, n.e.c.' for South America. Therefore, we remove these possibly spurious values.
-
-
-          FAO does not provide data for the total number of slaughtered animals to produce meat. We calculate this metric
-          by adding up the number of slaughtered animals of all meat groups. However, when data for slaughtered poultry (which
-          usually outnumbers other meat groups) is not provided, we do not calculate the total (to avoid spurious dips in
-          the data).
-
-          Production: Crops and livestock products
-
-
-          Original dataset description by FAOSTAT:
-
-          Crop and livestock statistics are recorded for 278 products, covering the following categories: 1) CROPS PRIMARY:
-          Cereals, Citrus Fruit, Fibre Crops, Fruit, Oil Crops, Oil Crops and Cakes in Oil Equivalent, Pulses, Roots and Tubers,
-          Sugar Crops, Treenuts and Vegetables. Data are expressed in terms of area harvested, production quantity and yield.
-          Cereals: Area and production data on cereals relate to crops harvested for dry grain only. Cereal crops harvested
-          for hay or harvested green for food, feed or silage or used for grazing are therefore excluded. 2) CROPS PROCESSED:
-          Beer of barley; Cotton lint; Cottonseed; Margarine, short; Molasses; Oil, coconut (copra); Oil, cottonseed; Oil,
-          groundnut; Oil, linseed; Oil, maize; Oil, olive, virgin; Oil, palm; Oil, palm kernel; Oil, rapeseed; Oil, safflower;
-          Oil, sesame; Oil, soybean; Oil, sunflower; Palm kernels; Sugar Raw Centrifugal; Wine. 3) LIVE ANIMALS: Animals live
-          n.e.s.; Asses; Beehives; Buffaloes; Camelids, other; Camels; Cattle; Chickens; Ducks; Geese and guinea fowls; Goats;
-          Horses; Mules; Pigeons, other birds; Pigs; Rabbits and hares; Rodents, other; Sheep; Turkeys. 4) LIVESTOCK PRIMARY:
-          Beeswax; Eggs (various types);  Hides buffalo, fresh; Hides, cattle, fresh; Honey, natural; Meat (ass, bird nes,
-          buffalo, camel, cattle, chicken, duck,  game, goat, goose and guinea fowl, horse, mule, Meat nes, meat other camelids,
-          Meat other rodents, pig, rabbit, sheep, turkey); Milk (buffalo, camel, cow, goat, sheep); Offals, nes; Silk-worm
-          cocoons, reelable; Skins (goat, sheep); Snails, not sea; Wool, greasy. 5) LIVESTOCK PROCESSED: Butter (of milk from
-          sheep, goat, buffalo, cow); Cheese (of milk from goat, buffalo, sheep, cow milk); Cheese of skimmed cow milk; Cream
-          fresh; Ghee (cow and buffalo milk); Lard; Milk (dry buttermilk,  skimmed condensed, skimmed cow, skimmed dried,
-          skimmed evaporated, whole condensed, whole dried, whole evaporated); Silk raw; Tallow; Whey (condensed and dry);
-          Yoghurt
-
-
-          Processing of possible data anomalies by Our World in Data:
-
-
-          +The area harvested of spinach for China (which refers to mainland) in 1984 is missing. This causes that other regions
-          that are aggregates which include China mainland have a spurious reduction in area harvested of spinach in that
-          year, and a spurious increase in yield. Therefore, we remove those spurious aggregate values.
-
-
-          +The amount of eggs produced per bird for Northern Europe (FAO) is unreasonably high before 1973, with values between
-          50kg and 115kg, while from 1973 on it has more reasonable values, below 20kg. Therefore, we remove all values for
-          Northern Europe (FAO) between 1961 and 1972.
-
-
-          +Tea production in FAO data increased dramatically from 1990 to 1991 for many different countries (including some
-          of the main producers, like China and India). However, data from 1991 was flagged as 'Estimated value' (while data
-          prior to 1991 is flagged as 'Official figure'). This potentially anomalous increase was not present in the previous
-          version of the data. Therefore, we removed tea production data (as well as per-capita production and yield) from
-          1991 onwards.
-
-
-          +Yields are unreasonably high (possibly by a factor of 1000) for some items, countries and years. For example, the
-          yield of item 'Fruit Primary' in Denmark prior to 1985 is larger than 6000 tonnes/ha. Similar issues happen to Antigua
-          and Barbuda and Burkina Faso. For Netherlands, a similar anomaly is found but prior to 1984 (which will be considered
-          separately). Therefore, we remove these possibly spurious values.
-
-
-          +Yields are unreasonably high (possibly by a factor of 1000) for some items, countries and years. This happens to
-          item 'Fruit Primary' in Netherlands prior to 1984. Therefore, we remove these possibly spurious values.
-
-
-          +Yields are unreasonably high (possibly by a factor of 1000) for some items, countries and years. This happens to
-          item 'Locust beans (carobs)' for region 'Net Food Importing Developing Countries (FAO)'. Therefore, we remove these
-          possibly spurious values.
-
-
-          +Yields are unreasonably high (possibly by a factor of 1000) for some items, countries and years. This happens to
-          item 'Walnuts, in shell' for region 'Eastern Asia (FAO)'. Therefore, we remove these possibly spurious values.
-
-
-          +Yields are unreasonably high (possibly by a factor of 1000) for some items, countries and years. This happens to
-          item 'Other tropical fruits, n.e.c.' for region 'Northern Africa (FAO)'. Therefore, we remove these possibly spurious
-          values.
-
-
-          +Yields are unreasonably high (possibly by a factor of 1000) for some items, countries and years. This happens to
-          item 'Other tropical fruits, n.e.c.' for South America. Therefore, we remove these possibly spurious values.
-
-
-          FAO does not provide data for the total number of slaughtered animals to produce meat. We calculate this metric
-          by adding up the number of slaughtered animals of all meat groups. However, when data for slaughtered poultry (which
-          usually outnumbers other meat groups) is not provided, we do not calculate the total (to avoid spurious dips in
-          the data).
-        citation_full: Food and Agriculture Organization of the United Nations
-        url_main: http://www.fao.org/faostat/en/#data/QCL
-        url_download: https://fenixservices.fao.org/faostat/static/bulkdownloads/Production_Crops_Livestock_E_All_Data_(Normalized).zip
-        date_accessed: '2023-06-12'
-        date_published: '2023-03-22'
-        license:
-          name: CC BY-NC-SA 3.0 IGO
-          url: http://www.fao.org/contact-us/terms/db-terms-of-use/en
 dataset:
-  update_period_days: TBD - Number of days between OWID updates
-  sources: []
+  update_period_days: 365
+
 tables:
   faostat_qcl_flat:
     variables:
       cereals__00001717__yield__005419__tonnes_per_hectare:
+        sources: []
+        origins:
+          - producer: Food and Agriculture Organization of the United Nations
+            title: 'Production: Crops and livestock products'
+            description: |-
+              Crop and livestock statistics are recorded for 278 products, covering the following categories:
+
+              1) CROPS PRIMARY: Cereals, Citrus Fruit, Fibre Crops, Fruit, Oil Crops, Oil Crops and Cakes in Oil Equivalent, Pulses, Roots and Tubers, Sugar Crops, Treenuts and Vegetables. Data are expressed in terms of area harvested, production quantity and yield. Cereals: Area and production data on cereals relate to crops harvested for dry grain only. Cereal crops harvested for hay or harvested green for food, feed or silage or used for grazing are therefore excluded.
+
+              2) CROPS PROCESSED: Beer of barley; Cotton lint; Cottonseed; Margarine, short; Molasses; Oil, coconut (copra); Oil, cottonseed; Oil, groundnut; Oil, linseed; Oil, maize; Oil, olive, virgin; Oil, palm; Oil, palm kernel; Oil, rapeseed; Oil, safflower; Oil, sesame; Oil, soybean; Oil, sunflower; Palm kernels; Sugar Raw Centrifugal; Wine.
+
+              3) LIVE ANIMALS: Animals live n.e.s.; Asses; Beehives; Buffaloes; Camelids, other; Camels; Cattle; Chickens; Ducks; Geese and guinea fowls; Goats; Horses; Mules; Pigeons, other birds; Pigs; Rabbits and hares; Rodents, other; Sheep; Turkeys.
+
+              4) LIVESTOCK PRIMARY: Beeswax; Eggs (various types);  Hides buffalo, fresh; Hides, cattle, fresh; Honey, natural; Meat (ass, bird nes, buffalo, camel, cattle, chicken, duck,  game, goat, goose and guinea fowl, horse, mule, Meat nes, meat other camelids, Meat other rodents, pig, rabbit, sheep, turkey); Milk (buffalo, camel, cow, goat, sheep); Offals, nes; Silk-worm cocoons, reelable; Skins (goat, sheep); Snails, not sea; Wool, greasy.
+
+              5) LIVESTOCK PROCESSED: Butter (of milk from sheep, goat, buffalo, cow); Cheese (of milk from goat, buffalo, sheep, cow milk); Cheese of skimmed cow milk; Cream fresh; Ghee (cow and buffalo milk); Lard; Milk (dry buttermilk,  skimmed condensed, skimmed cow, skimmed dried, skimmed evaporated, whole condensed, whole dried, whole evaporated); Silk raw; Tallow; Whey (condensed and dry); Yoghurt.
+            citation_full: Food and Agriculture Organization of the United Nations.
+            url_main: http://www.fao.org/faostat/en/#data/QCL
+            url_download: https://fenixservices.fao.org/faostat/static/bulkdownloads/Production_Crops_Livestock_E_All_Data_(Normalized).zip
+            date_accessed: '2023-06-12'
+            date_published: '2023-03-22'
+            license:
+              name: CC BY-NC-SA 3.0 IGO
+              url: http://www.fao.org/contact-us/terms/db-terms-of-use/en
+        processing_level: major
         title: Cereals | 00001717 || Yield | 005419 || tonnes per hectare
         unit: tonnes per hectare
         short_unit: t/ha
-        display:
-          name: Cereals - Yield (tonnes per hectare)
-        description_short: Yields are measured in tonnes per hectare. Cereals include wheat, rice, maize, barley, oats, rye,
-          millet, sorghum, buckwheat, and mixed grains.
+        description_short: Measured in tonnes per hectare.
         description_key:
-          - TBD - List of key pieces of information about the indicator.
-        description_from_producer: TBD - Indicator's description given by the producer
-        description_processing: TBD - Indicator's processing description
-        description: >-
-          Item: Cereals
+          - Cereals include wheat, rice, maize, barley, oats, rye, millet, sorghum, buckwheat, and mixed grains.
+        description_from_producer: |
+          Cereals are generally of the gramineous family and, in the FAO concept, refer to crops harvested for dry grain only. Crops harvested green for forage, silage or grazingare classified as fodder crops. Also excluded are industrial crops, e.g. broom sorghum (Crude organic materials nes) and sweet sorghum when grown for syrup (Sugar crops nes). For international trade classifications, fresh cereals (other than sweet corn), whether or not suitable for use as fresh vegetables, are classified as cereals.
 
-          Description: Cereals are generally of the gramineous family and, in the FAO concept, refer to crops harvested for
-          dry grain only. Crops harvested green for forage, silage or grazingare classified as fodder crops. Also excluded
-          are industrial crops, e.g. broom sorghum (Crude organic materials nes) and sweet sorghum when grown for syrup (Sugar
-          crops nes). For international trade classifications, fresh cereals (other than sweet corn), whether or not suitable
-          for use as fresh vegetables, are classified as cereals. Cereals are identified according to their genus. However,
-          when two or more genera are sown and harvested as a mixture they should be classified and reported as "mixed grains".
-          Production data are reported in terms of clean, dry weight of grains (12-14 percent moisture) in the form usually
-          marketed. Rice, however, is reported in terms of paddy. Apart from moisture content and inedible substances such
-          as cellulose, cereal grains contain, along with traces of minerals and vitamins, carbohydrates - mainly starches
-          - (comprising 65-75 percent of their total weight), as well as proteins (6-12 percent) and fat (1-5 percent). The
-          FAO definitions cover 17 primary cereals, of which one - white maize - is a component of maize. Each definition
-          is listed along with its code, botanical name or names, and a short description. Cereal products derive either from
-          the processing of grain through one or more mechanical or chemical operations, or from the processing of flour,
-          meal or starch. Each cereal product is listed after the cereal from which it is derived.
+          Cereals are identified according to their genus. However, when two or more genera are sown and harvested as a mixture they should be classified and reported as "mixed grains". Production data are reported in terms of clean, dry weight of grains (12-14 percent moisture) in the form usually marketed. Rice, however, is reported in terms of paddy. Apart from moisture content and inedible substances such as cellulose, cereal grains contain, along with traces of minerals and vitamins, carbohydrates - mainly starches - (comprising 65-75 percent of their total weight), as well as proteins (6-12 percent) and fat (1-5 percent).
 
+          The FAO definitions cover 17 primary cereals, of which one - white maize - is a component of maize. Each definition is listed along with its code, botanical name or names, and a short description. Cereal products derive either from the processing of grain through one or more mechanical or chemical operations, or from the processing of flour, meal or starch. Each cereal product is listed after the cereal from which it is derived.
 
-          Metric: Yield
-
-          Description: Harvested production per unit of harvested area for crop products. In most of the cases yield data
-          are not recorded but obtained by dividing the production data by the data on area harvested. Data on yields of permanent
-          crops are not as reliable as those for temporary crops either because most of the area information may correspond
-          to planted area, as for grapes, or because of the scarcity and unreliability of the area figures reported by the
-          countries, as for example for cocoa and coffee. Source: FAO Statistics Division
+          Yield: Harvested production per unit of harvested area for crop products. In most of the cases yield data are not recorded but obtained by dividing the production data by the data on area harvested. Data on yields of permanent crops are not as reliable as those for temporary crops either because most of the area information may correspond to planted area, as for grapes, or because of the scarcity and unreliability of the area figures reported by the countries, as for example for cocoa and coffee. Source: FAO Statistics Division.
         presentation:
-          title_public: TBD - Indicator title to be shown in data pages, that overrides the indicator's title.
-          title_variant: TBD - Indicator's title variant
-          attribution_short: TBD - Indicator's attribution (shorter version)
-          faqs:
-            - fragment_id: TBD - Question identifier from FAQ GDoc
-              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+          topic_tags:
+            - Crop Yields
+          title_public: Cereal yields
+          attribution_short: FAO
           grapher_config:
             title: Cereal yields
-            subtitle: Yields are measured in tonnes per hectare. Cereals include wheat, rice, maize, barley, oats, rye, millet,
-              sorghum, buckwheat, and mixed grains.
-            sourceDesc: Food and Agriculture Organization of the United Nations
+            subtitle: |-
+              Yields are measured in tonnes per hectare. Cereals include wheat, rice, maize, barley, oats, rye, millet, sorghum, buckwheat, and mixed grains.
             originUrl: https://ourworldindata.org/crop-yields
             hasMapTab: true
             tab: map
@@ -239,30 +64,6 @@ tables:
               time: true
               entity: true
               changeInPrefix: true
-            map:
-              colorScale:
-                baseColorScheme: YlGn
-                binningStrategy: manual
-                colorSchemeInvert: false
-                legendDescription: ''
-                customNumericLabels:
-                  - ''
-                  - ''
-                  - ''
-                  - ''
-                  - ''
-                  - ''
-                  - ''
-                customNumericValues:
-                  - 1
-                  - 2
-                  - 3
-                  - 4
-                  - 5
-                  - 6
-                  - 7
-                customNumericMinValue: 0
-              timeTolerance: 1
             selectedEntityNames:
               - World
               - Asia
