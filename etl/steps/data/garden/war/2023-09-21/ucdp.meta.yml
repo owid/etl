@@ -41,7 +41,7 @@ definitions:
 
       In some instances, the event's coordinates fall within the borders of a country. Other times, the event's coordinates fall outside the borders of a country. In the latter case, we have mapped the event to the country that is closest to the event's coordinates.
 
-      Conflict event with id "53238" and relid "PAK-2003-1-345-88" was assigned to "Siachen Glacier" by Natural Earth. We have mapped it to "Pakistan" following the text in the where_description field in the source data. This says "Giang sector in Siachen, Pakistani Kashmir".
+      Conflict event with id "53238" and relid "PAK-2003-1-345-88" was assigned to "Siachen Glacier" by Natural Earth. We have mapped it to "Pakistan" following the text in the `where_description` field from the Natural Earth data, which refers to "Giang sector in Siachen, Pakistani Kashmir".
 
   # Fields used for number of deaths indicators
   number_deaths:
