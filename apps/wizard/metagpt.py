@@ -61,8 +61,10 @@ ACE_DEFAULT = {
 # Paths config
 ## Paths to snapshot/grapher metadata directories
 PATH_SNAPSHOT = str(SNAPSHOTS_DIR)
+PATH_GARDEN = f"{STEP_DIR}/data/garden/"
 PATH_GRAPHER = f"{STEP_DIR}/data/grapher/"
 PREFIX_SNAPSHOT = "SNAPSHOT :: "
+PREFIX_GARDEN = "GARDEN :: "
 PREFIX_GRAPHER = "GRAPHER :: "
 
 
@@ -73,16 +75,22 @@ def get_paths(directory: str, extension: str) -> List[str]:
 
 
 paths_snapshot = get_paths(PATH_SNAPSHOT, "dvc")
+paths_garden = get_paths(PATH_GARDEN, "yml")
 paths_grapher = get_paths(PATH_GRAPHER, "yml")
 paths_snapshot = [path.replace(PATH_SNAPSHOT, PREFIX_SNAPSHOT) for path in paths_snapshot]
+paths_garden = [path.replace(PATH_GARDEN, PREFIX_GARDEN) for path in paths_garden]
 paths_grapher = [path.replace(PATH_GRAPHER, PREFIX_GRAPHER) for path in paths_grapher]
-paths = paths_snapshot + paths_grapher
+paths = paths_snapshot + paths_garden + paths_grapher
 
 
 # Function to convert displayed path to actual path
 def get_actual_path(path: str) -> str:  # -> Any:
     """Display to actual path."""
-    return path.replace(PREFIX_SNAPSHOT, PATH_SNAPSHOT).replace(PREFIX_GRAPHER, PATH_GRAPHER)
+    return (
+        path.replace(PREFIX_SNAPSHOT, PATH_SNAPSHOT)
+        .replace(PREFIX_GRAPHER, PATH_GRAPHER)
+        .replace(PREFIX_GARDEN, PATH_GARDEN)
+    )
 
 
 ##################################################
