@@ -74,6 +74,8 @@ definitions:
         {definitions.others.conflict_type}
     description_processing: |-
       Data prior to 1989 is sourced from PRIO. Data since 1989 is sourced from UCDP.
+    display:
+      numDecimalPlaces: 0
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
@@ -97,8 +99,6 @@ tables:
         description_short: |-
           <% set estimate = "best" %>
           {definitions.others.description_short}
-        display:
-          numDecimalPlaces: 0
 
       number_deaths_ongoing_conflicts_high:
         title: Deaths in ongoing conflicts (high estimate)
@@ -106,8 +106,6 @@ tables:
         description_short: |-
           <% set estimate = "high" %>
           {definitions.others.description_short}
-        display:
-          numDecimalPlaces: 0
 
       number_deaths_ongoing_conflicts_low:
         title: Deaths in ongoing conflicts (low estimate)
@@ -115,8 +113,6 @@ tables:
         description_short: |-
           <% set estimate = "low" %>
           {definitions.others.description_short}
-        display:
-          numDecimalPlaces: 0
 
       number_deaths_ongoing_conflicts_per_capita:
         title: Death rate in ongoing conflicts (best estimate, per capita)
