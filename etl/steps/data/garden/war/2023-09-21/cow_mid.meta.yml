@@ -4,12 +4,6 @@ definitions:
       topic_tags:
         - War & Peace
   all:
-    selectedEntityNames: &selected_entities
-      - Africa
-      - Americas
-      - Asia and Oceania
-      - Europe
-      - Middle East
     interstate_conflict: &interstate_conflict |-
       An interstate conflict is a disagreement between states where force is threatened, displayed, or used.
   number_new_disputes:
@@ -47,7 +41,7 @@ definitions:
       - *interstate_conflict
       - We count a conflict as ongoing in a region even if the conflict is also ongoing in other regions. The sum across all regions can therefore be higher than the total number of ongoing conflict.
       - The hostility level for a conflict overall is the highest level across all world regions.
-      - sDeaths of combatants due to fighting are included.
+      - Deaths of combatants due to fighting are included.
   number_ongoing_disputes:
     description_short: |-
       <%- if hostility == "all" -%>
@@ -66,6 +60,119 @@ definitions:
       - We only count a conflict as new when the conflict overall started that year, not if it restarted or changed its hostility level (i.e. escalated or deescalated).
       - We count a conflict as new in a region even if the conflict started at the same time in another region. The sum across all regions can therefore be higher than the total number of new conflicts.
       - The hostility level for a conflict overall is the highest level across all world regions.
+
+
+tables:
+
+  # COUNTRY-LEVEL
+  cow_mid_country:
+    variables:
+      participated_in_conflict:
+        title: State involved in war
+        unit: ""
+        display:
+          numDecimalPlaces: 0
+        description_short: |-
+          Whether the country participated in a conflict (of a specific kind) in a given year.
+        description_key:
+          - |-
+            '1' indicates that the state participated in a conflict. '0' indicates that the state did not participate in a conflict.
+
+      number_participants:
+        title: Number of states in conflict
+        unit: "states"
+        display:
+          numDecimalPlaces: 0
+        description_short: |-
+          The number of countries that participated in a conflict (of a specific kind) in a given year and region.
+
+  cow_mid:
+    description: >-
+      Data on the number of disputes and deaths from militarized disputes.
+
+      A militarized dispute (MID) is based on a sequence of related militarized incidents, each of which (except the first)
+      is an outgrowth of or a response to one or more previous incidents. To ensure that each MID is a unified and recognized
+      episode of militarized incidents, particular attention should be given to continuity of location and issue, as well as
+      the interpretations of observers.
+
+      For more details please refer to the source's codebook.
+    common:
+      presentation:
+        grapher_config:
+          selectedEntityNames:
+            - Africa
+            - Americas
+            - Asia and Oceania
+            - Europe
+            - Middle East
+
+    variables:
+      ####################
+      # Ongoing disputes #
+      ####################
+      number_ongoing_disputes:
+        title: Number of ongoing conflicts
+        unit: disputes
+        description_short: |-
+          {definitions.number_ongoing_disputes.description_short}.
+        description_key: *description_key_ongoing
+        processing_level: major
+        display:
+          numDecimalPlaces: 0
+
+      number_ongoing_disputes_per_country:
+        title: Number of ongoing conflicts per state
+        unit: disputes per state
+        description_short: |-
+          {definitions.number_ongoing_disputes.description_short}, divided by the number of countries in the region.
+        description_key: *description_key_ongoing
+        processing_level: major
+        display:
+          numDecimalPlaces: 3
+
+      number_ongoing_disputes_per_country_pair:
+        title: Number of ongoing conflicts per state-pair
+        unit: disputes per state-pair
+        description_short: |-
+          {definitions.number_ongoing_disputes.description_short}, divided by the number of country-pairs in the region.
+        description_key: *description_key_ongoing
+        processing_level: major
+        display:
+          numDecimalPlaces: 5
+
+      ################
+      # New disputes #
+      ################
+      number_new_disputes:
+        title: Number of new conflicts
+        unit: disputes
+        description_short: |-
+          {definitions.number_new_disputes.description_short}.
+        description_key: *description_key_new
+        processing_level: major
+        display:
+          numDecimalPlaces: 0
+
+      number_new_disputes_per_country:
+        title: Number of new conflicts per state
+        unit: disputes per state
+        description_short: |-
+          {definitions.number_new_disputes.description_short}, divided by the number of countries in the region.
+        description_key: *description_key_new
+        processing_level: major
+        display:
+          numDecimalPlaces: 3
+
+      number_new_disputes_per_country_pair:
+        title: Number of new conflicts per state-pair
+        unit: disputes per state-pair
+        description_short: |-
+          {definitions.number_new_disputes.description_short}, divided by the number of country-pairs in the region.
+        description_key: *description_key_new
+        processing_level: major
+        display:
+          numDecimalPlaces: 5
+
 
 dataset:
   title: History of war (COW MID, 2020)
@@ -90,120 +197,3 @@ dataset:
         • Asia and Oceania: 700-999
 
       You can find more information about the data in our article: [To be published]
-
-
-tables:
-
-  # COUNTRY-LEVEL
-  cow_mid_country:
-    variables:
-      participated_in_conflict:
-        title: Participated in conflict
-        unit: ""
-        display:
-          numDecimalPlaces: 0
-        description_short: |-
-          Whether the country participated in a conflict (of a specific kind) in a given year.
-
-      number_participants:
-        title: Number of countries in conflict
-        unit: "countries"
-        display:
-          numDecimalPlaces: 0
-        description_short: |-
-          The number of countries that participated in a conflict (of a specific kind) in a given year and region.
-
-  cow_mid:
-    description: >-
-      Data on the number of disputes and deaths from militarized disputes.
-
-      A militarized dispute (MID) is based on a sequence of related militarized incidents, each of which (except the first)
-      is an outgrowth of or a response to one or more previous incidents. To ensure that each MID is a unified and recognized
-      episode of militarized incidents, particular attention should be given to continuity of location and issue, as well as
-      the interpretations of observers.
-
-      For more details please refer to the source's codebook.
-    variables:
-      ####################
-      # Ongoing disputes #
-      ####################
-      number_ongoing_disputes:
-        title: Number of ongoing disputes
-        unit: disputes
-        description_short: |-
-          {definitions.number_ongoing_disputes.description_short}.
-        description_key: *description_key_ongoing
-        processing_level: major
-        display:
-          numDecimalPlaces: 0
-        presentation:
-          grapher_config:
-            selectedEntityNames: *selected_entities
-
-      number_ongoing_disputes_per_country:
-        title: Number of ongoing disputes per country
-        unit: disputes per country
-        description_short: |-
-          {definitions.number_ongoing_disputes.description_short}, divided by the number of countries in the region.
-        description_key: *description_key_ongoing
-        processing_level: major
-        display:
-          numDecimalPlaces: 3
-        presentation:
-          grapher_config:
-            selectedEntityNames: *selected_entities
-
-      number_ongoing_disputes_per_country_pair:
-        title: Number of ongoing disputes per country-pair
-        unit: disputes per country-pair
-        description_short: |-
-          {definitions.number_ongoing_disputes.description_short}, divided by the number of country-pairs in the region.
-        description_key: *description_key_ongoing
-        processing_level: major
-        display:
-          numDecimalPlaces: 5
-        presentation:
-          grapher_config:
-            selectedEntityNames: *selected_entities
-
-      ################
-      # New disputes #
-      ################
-      number_new_disputes:
-        title: Number of new disputes
-        unit: disputes
-        description_short: |-
-          {definitions.number_new_disputes.description_short}.
-        description_key: *description_key_new
-        processing_level: major
-        display:
-          numDecimalPlaces: 0
-        presentation:
-          grapher_config:
-            selectedEntityNames: *selected_entities
-
-      number_new_disputes_per_country:
-        title: Number of new disputes per country
-        unit: disputes per country
-        description_short: |-
-          {definitions.number_new_disputes.description_short}, divided by the number of countries in the region.
-        description_key: *description_key_new
-        processing_level: major
-        display:
-          numDecimalPlaces: 3
-        presentation:
-          grapher_config:
-            selectedEntityNames: *selected_entities
-
-      number_new_disputes_per_country_pair:
-        title: Number of new disputes per country-pair
-        unit: disputes per country-pair
-        description_short: |-
-          {definitions.number_new_disputes.description_short}, divided by the number of country-pairs in the region.
-        description_key: *description_key_new
-        processing_level: major
-        display:
-          numDecimalPlaces: 5
-        presentation:
-          grapher_config:
-            selectedEntityNames: *selected_entities

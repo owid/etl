@@ -1,6 +1,6 @@
 # NOTE: To learn more about the fields, hover over their names.
 definitions:
-  others:
+  all:
     description_short: |-
       <%- if conflict_type == "all" -%>
       The << estimate >> estimate of the number of deaths of combatants and civilians due to fighting in interstate, intrastate, extrasystemic, non-state conflicts, and one-sided violence that were ongoing that year<< per_capita >>.
@@ -26,8 +26,9 @@ definitions:
       <%- endif -%>
     description_short_per_capita:
       <% set per_capita = ", per 100,000 people" %>
-      {definitions.number_deaths.description_short}
-
+      {definitions.all.description_short}
+    conflict_type_base: |-
+      This includes combatant and civilian deaths due to fighting
     conflict_type: |-
       <%- if conflict_type == "all" -%>
       An armed conflict is a disagreement between organized groups, or between one organized group and civilians, that causes at least 25 deaths during a year. {definitions.all.conflict_type_base}.
@@ -48,7 +49,7 @@ definitions:
       An non-internationalized intrastate conflict is a conflict between a state and a non-state armed group, without involvement of a foreign state, that causes at least 25 deaths during a year. {definitions.all.conflict_type_base}.
 
       <%- elif conflict_type == "extrasystemic" -%>
-      A conflict between a state and a non-state armed group outside its territory that causes at least 25 deaths during a year. {definitions.all.conflict_type_base}.
+      An extrasystemic conflict is a conflict between a state and a non-state armed group outside its territory that causes at least 25 deaths during a year. {definitions.all.conflict_type_base}.
 
       <%- elif conflict_type == "non-state conflict" -%>
       A non-state conflict is a conflict between non-state armed groups, such as rebel groups, criminal organizations, or ethnic groups, that causes at least 25 deaths during a year. {definitions.all.conflict_type_base}.
@@ -71,7 +72,7 @@ definitions:
           - Middle East
     description_key:
       - |-
-        {definitions.others.conflict_type}
+        {definitions.all.conflict_type}
     description_processing: |-
       Data prior to 1989 is sourced from PRIO. Data since 1989 is sourced from UCDP.
     display:
@@ -98,45 +99,45 @@ tables:
         unit: deaths
         description_short: |-
           <% set estimate = "best" %>
-          {definitions.others.description_short}
+          {definitions.all.description_short}
 
       number_deaths_ongoing_conflicts_high:
         title: Deaths in ongoing conflicts (high estimate)
         unit: deaths
         description_short: |-
           <% set estimate = "high" %>
-          {definitions.others.description_short}
+          {definitions.all.description_short}
 
       number_deaths_ongoing_conflicts_low:
         title: Deaths in ongoing conflicts (low estimate)
         unit: deaths
         description_short: |-
           <% set estimate = "low" %>
-          {definitions.others.description_short}
+          {definitions.all.description_short}
 
       number_deaths_ongoing_conflicts_per_capita:
-        title: Death rate in ongoing conflicts (best estimate, per capita)
+        title: Death rate in ongoing conflicts (best estimate)
         unit: deaths per 100,000 people
         description_short: |-
           <% set estimate = "best" %>
-          {definitions.others.description_short_per_capita}
+          {definitions.all.description_short_per_capita}
         display:
           numDecimalPlaces: 1
 
       number_deaths_ongoing_conflicts_high_per_capita:
-        title: Death rate in ongoing conflicts (high estimate, per capita)
+        title: Death rate in ongoing conflicts (high estimate)
         unit: deaths per 100,000 people
         description_short: |-
           <% set estimate = "high" %>
-          {definitions.others.description_short_per_capita}
+          {definitions.all.description_short_per_capita}
         display:
           numDecimalPlaces: 1
 
       number_deaths_ongoing_conflicts_low_per_capita:
-        title: Death rate in ongoing conflicts (low estimate, per capita)
+        title: Death rate in ongoing conflicts (low estimate)
         unit: deaths per 100,000 people
         description_short: |-
           <% set estimate = "low" %>
-          {definitions.others.description_short_per_capita}
+          {definitions.all.description_short_per_capita}
         display:
           numDecimalPlaces: 1

@@ -30,7 +30,7 @@ definitions:
       An non-internationalized intrastate conflict is a conflict between a state and a non-state armed group, without involvement of a foreign state, that causes at least 25 deaths during a year. {definitions.all.conflict_type_base}.
 
       <%- elif conflict_type == "extrasystemic" -%>
-      A conflict between a state and a non-state armed group outside its territory that causes at least 25 deaths during a year. {definitions.all.conflict_type_base}.
+      An extrasystemic conflict is a conflict between a state and a non-state armed group outside its territory that causes at least 25 deaths during a year. {definitions.all.conflict_type_base}.
 
       <%- elif conflict_type == "non-state conflict" -%>
       A non-state conflict is a conflict between non-state armed groups, such as rebel groups, criminal organizations, or ethnic groups, that causes at least 25 deaths during a year. {definitions.all.conflict_type_base}.
@@ -141,6 +141,9 @@ tables:
           State was a primary participants in at least one << conflict_type >> conflict that year.
 
           <%- endif -%>
+        description_key:
+          - |-
+            '1' indicates that the state participated in a conflict. '0' indicates that the state did not participate in a conflict.
 
       number_participants:
         title: Number of states involved in conflicts
@@ -164,7 +167,7 @@ tables:
       # Ongoing deaths #
       ##################
       number_deaths_ongoing_conflicts_battle_high:
-        title: Number of battle deaths in ongoing conflicts (high estimate)
+        title: Deaths in ongoing conflicts (high estimate)
         unit: deaths
         description_short: |-
           <% set estimate = "high" %>
@@ -172,7 +175,7 @@ tables:
         description_key: *description_key_deaths
 
       number_deaths_ongoing_conflicts_battle_low:
-        title: Number of battle deaths in ongoing conflicts (low estimate)
+        title: Deaths in ongoing conflicts (low estimate)
         unit: deaths
         description_short: |-
           <% set estimate = "low" %>
@@ -180,7 +183,7 @@ tables:
         description_key: *description_key_deaths
 
       number_deaths_ongoing_conflicts_battle:
-        title: Number of battle deaths in ongoing conflicts (best estimate)
+        title: Deaths in ongoing conflicts (best estimate)
         unit: deaths
         description_short: |-
           <% set estimate = "best" %>
@@ -188,7 +191,7 @@ tables:
         description_key: *description_key_deaths
 
       number_deaths_ongoing_conflicts_battle_high_per_capita:
-        title: Number of battle deaths in ongoing conflicts (high estimate, per capita)
+        title: Death rate in ongoing conflicts (high estimate)
         unit: deaths per 100,000 people
         description_short: |-
           <% set estimate = "high" %>
@@ -198,7 +201,7 @@ tables:
           numDecimalPlaces: 1
 
       number_deaths_ongoing_conflicts_battle_low_per_capita:
-        title: Number of battle deaths in ongoing conflicts (low estimate, per capita)
+        title: Death rate in ongoing conflicts (low estimate)
         unit: deaths per 100,000 people
         description_short: |-
           <% set estimate = "low" %>
@@ -208,7 +211,7 @@ tables:
           numDecimalPlaces: 1
 
       number_deaths_ongoing_conflicts_battle_per_capita:
-        title: Number of battle deaths in ongoing conflicts (best estimate, per capita)
+        title: Death rate in ongoing conflicts (best estimate)
         unit: deaths per 100,000 people
         description_short: |-
           <% set estimate = "best" %>

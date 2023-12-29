@@ -30,7 +30,7 @@ definitions:
       An non-internationalized intrastate conflict is a conflict between a state and a non-state armed group, without involvement of a foreign state, that causes at least 25 deaths during a year. {definitions.all.conflict_type_base}.
 
       <%- elif conflict_type == "extrasystemic" -%>
-      A conflict between a state and a non-state armed group outside its territory that causes at least 25 deaths during a year. {definitions.all.conflict_type_base}.
+      An extrasystemic conflict is a conflict between a state and a non-state armed group outside its territory that causes at least 25 deaths during a year. {definitions.all.conflict_type_base}.
 
       <%- elif conflict_type == "non-state conflict" -%>
       A non-state conflict is a conflict between non-state armed groups, such as rebel groups, criminal organizations, or ethnic groups, that causes at least 25 deaths during a year. {definitions.all.conflict_type_base}.
@@ -151,7 +151,9 @@ tables:
           State was a primary participants in at least one << conflict_type >> conflict that year.
 
           <%- endif -%>
-
+        description_key:
+          - |-
+            '1' indicates that the state participated in a conflict. '0' indicates that the state did not participate in a conflict.
 
       number_participants:
         title: Number of states involved in conflicts
