@@ -117,7 +117,7 @@ definitions:
 
 
 tables:
-  # COUNTRY-LEVEL
+  # PARTICIPANTS
   cow_country:
     common:
       description_key:
@@ -163,6 +163,7 @@ tables:
 
           <%- endif -%>
 
+  # LOCATIONS
   cow_locations:
     common:
       description_processing: |-

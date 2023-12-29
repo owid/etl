@@ -6,57 +6,82 @@ definitions:
   all:
     interstate_conflict: &interstate_conflict |-
       An interstate conflict is a disagreement between states where force is threatened, displayed, or used.
+    force_usage: &force_usage |-
+      A threat of force can be unspecified, or entail threatening to declare war or to occupy territory; a display of force can entail shows of force or border violations; a use of force can entail attacks, clashes, or battles.
+
   number_new_disputes:
     description_short: |-
       <%- if hostility == "all" -%>
+
       <%- if fatality == "all" -%>
-      The number of all ongoing interstate conflicts in each year
+      The number of all ongoing interstate conflicts in each year.
+
       <%- elif fatality == "No deaths" -%>
-      The number of ongoing interstate conflicts in each year in which ultimately no combatant dies
+      The number of ongoing interstate conflicts in each year in which ultimately no combatant dies.
+
       <%- elif fatality == "1-25 deaths" -%>
-      The number of ongoing interstate conflicts in each year in which ultimately 1-25 combatants dies
+      The number of ongoing interstate conflicts in each year in which ultimately 1-25 combatants dies.
+
       <%- elif fatality == "26-100 deaths" -%>
-      The number of ongoing interstate conflicts in each year in which ultimately 26-100 combatants dies
+      The number of ongoing interstate conflicts in each year in which ultimately 26-100 combatants dies.
+
       <%- elif fatality == "101-250 deaths" -%>
-      The number of ongoing interstate conflicts in each year in which ultimately 101-250 combatants dies
+      The number of ongoing interstate conflicts in each year in which ultimately 101-250 combatants dies.
+
       <%- elif fatality == "251-500 deaths" -%>
-      The number of ongoing interstate conflicts in each year in which ultimately 251-500 combatants dies
+      The number of ongoing interstate conflicts in each year in which ultimately 251-500 combatants dies.
+
       <%- elif fatality == "501-999 deaths" -%>
-      The number of ongoing interstate conflicts in each year in which ultimately 501-999 combatants dies
+      The number of ongoing interstate conflicts in each year in which ultimately 501-999 combatants dies.
+
       <%- elif fatality == "> 999 deaths" -%>
-      The number of ongoing interstate conflicts in each year in which ultimately at least 1,000 combatants dies
+      The number of ongoing interstate conflicts in each year in which ultimately at least 1,000 combatants dies.
+
       <%- elif fatality == "Unknown" -%>
-      The number of ongoing interstate conflicts in each year for which there was no ultimate number of deaths given
+      The number of ongoing interstate conflicts in each year for which there was no ultimate number of deaths given.
       <%- endif -%>
+
       <%- elif hostility == "Threat to use force" -%>
-      The number of interstate conflicts in each year where at most the use of force is threatened over the conflict's duration
+      The number of interstate conflicts in each year where, at most, the use of force is threatened over the conflict's duration.
+
       <%- elif hostility == "Display of force" -%>
-      The number of interstate conflicts in each year where at most force is displayed over the conflict's duration
+      The number of interstate conflicts in each year where, at most, force is displayed over the conflict's duration.
+
       <%- elif hostility == "Use of force" -%>
-      The number of interstate conflicts in each year where force is used, but causes fewer than 1,000 combatant deaths due to fighting over the conflict's duration
+      The number of interstate conflicts in each year where force is used, but causes fewer than 1,000 combatant deaths due to fighting over the conflict's duration.
+
       <%- elif hostility == "War" -%>
-      The number of interstate conflicts in each year where the use of force causes at least 1,000 combatant deaths due to fighting over the conflict's duration
+      The number of interstate conflicts in each year where the use of force causes at least 1,000 combatant deaths due to fighting over the conflict's duration.
+
       <%- endif -%>
     description_key: &description_key_ongoing
       - *interstate_conflict
+      - *force_usage
       - We count a conflict as ongoing in a region even if the conflict is also ongoing in other regions. The sum across all regions can therefore be higher than the total number of ongoing conflict.
       - The hostility level for a conflict overall is the highest level across all world regions.
       - Deaths of combatants due to fighting are included.
+
   number_ongoing_disputes:
     description_short: |-
       <%- if hostility == "all" -%>
-      The number of all new interstate conflicts in each year
+      The number of all new interstate conflicts in each year.
+
       <%- elif hostility == "Threat to use force" -%>
-      The number of new interstate conflicts in each year where at most the use of force is threatened over the conflict's duration
+      The number of new interstate conflicts in each year where at most the use of force is threatened over the conflict's duration.
+
       <%- elif hostility == "Display of force" -%>
-      The number of new interstate conflicts in each year where at most force is displayed over the conflict's duration
+      The number of new interstate conflicts in each year where at most force is displayed over the conflict's duration.
+
       <%- elif hostility == "Use of force" -%>
-      The number of new interstate conflicts in each year where force is used, but causes fewer than 1,000 combatant deaths due to fighting over the conflict's duration
+      The number of new interstate conflicts in each year where force is used, but causes fewer than 1,000 combatant deaths due to fighting over the conflict's duration.
+
       <%- elif hostility == "War" -%>
-      The number of new interstate conflicts in each year where the use of force causes at least 1,000 combatant deaths due to fighting over the conflict's duration
+      The number of new interstate conflicts in each year where the use of force causes at least 1,000 combatant deaths due to fighting over the conflict's duration.
+
       <%- endif -%>
     description_key: &description_key_new
       - *interstate_conflict
+      - *force_usage
       - We only count a conflict as new when the conflict overall started that year, not if it restarted or changed its hostility level (i.e. escalated or deescalated).
       - We count a conflict as new in a region even if the conflict started at the same time in another region. The sum across all regions can therefore be higher than the total number of new conflicts.
       - The hostility level for a conflict overall is the highest level across all world regions.
@@ -64,16 +89,16 @@ definitions:
 
 tables:
 
-  # COUNTRY-LEVEL
+  # PARTICIPANTS
   cow_mid_country:
     variables:
       participated_in_conflict:
-        title: State involved in war
+        title: State involved in conflict
         unit: ""
         display:
           numDecimalPlaces: 0
         description_short: |-
-          Whether the country participated in a conflict (of a specific kind) in a given year.
+          State participated in at least one conflict with another state where force was threatened, displayed, or used that year.
         description_key:
           - |-
             '1' indicates that the state participated in a conflict. '0' indicates that the state did not participate in a conflict.
@@ -84,7 +109,7 @@ tables:
         display:
           numDecimalPlaces: 0
         description_short: |-
-          The number of countries that participated in a conflict (of a specific kind) in a given year and region.
+          Included are states that participated in at least one conflict with another state where force was threatened, displayed, or used that year.
 
   cow_mid:
     description: >-
@@ -114,7 +139,7 @@ tables:
         title: Number of ongoing conflicts
         unit: disputes
         description_short: |-
-          {definitions.number_ongoing_disputes.description_short}.
+          {definitions.number_ongoing_disputes.description_short}
         description_key: *description_key_ongoing
         processing_level: major
         display:
@@ -124,7 +149,7 @@ tables:
         title: Number of ongoing conflicts per state
         unit: disputes per state
         description_short: |-
-          {definitions.number_ongoing_disputes.description_short}, divided by the number of countries in the region.
+          The number of wars divided by the number of all states. This accounts for the changing number of states over time. {definitions.number_ongoing_disputes.description_short}
         description_key: *description_key_ongoing
         processing_level: major
         display:
@@ -134,7 +159,7 @@ tables:
         title: Number of ongoing conflicts per state-pair
         unit: disputes per state-pair
         description_short: |-
-          {definitions.number_ongoing_disputes.description_short}, divided by the number of country-pairs in the region.
+          The number of wars divided by the number of all state-pairs. This accounts for the changing number of states over time. {definitions.number_ongoing_disputes.description_short}
         description_key: *description_key_ongoing
         processing_level: major
         display:
@@ -147,7 +172,7 @@ tables:
         title: Number of new conflicts
         unit: disputes
         description_short: |-
-          {definitions.number_new_disputes.description_short}.
+          {definitions.number_new_disputes.description_short}
         description_key: *description_key_new
         processing_level: major
         display:
@@ -157,7 +182,7 @@ tables:
         title: Number of new conflicts per state
         unit: disputes per state
         description_short: |-
-          {definitions.number_new_disputes.description_short}, divided by the number of countries in the region.
+          The number of wars divided by the number of all states. This accounts for the changing number of states over time. {definitions.number_new_conflicts.description_short}
         description_key: *description_key_new
         processing_level: major
         display:
@@ -167,7 +192,7 @@ tables:
         title: Number of new conflicts per state-pair
         unit: disputes per state-pair
         description_short: |-
-          {definitions.number_new_disputes.description_short}, divided by the number of country-pairs in the region.
+          The number of wars divided by the number of all state-pairs. This accounts for the changing number of states over time. {definitions.number_new_conflicts.description_short}
         description_key: *description_key_new
         processing_level: major
         display:
