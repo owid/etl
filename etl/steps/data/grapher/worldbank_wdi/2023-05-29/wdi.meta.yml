@@ -355,6 +355,8 @@ tables:
           Limitations and exceptions: From a policy and program standpoint, this measure has its limits. First, food insecurity exists even where food availability is not a problem because of inadequate access of poor households to food. Second, food insecurity is an individual or household phenomenon, and the average food available to each person, even corrected for possible effects of low income, is not a good predictor of food insecurity among the population. And third, nutrition security is determined not only by food security but also by the quality of care of mothers and children and the quality of the household's health environment (Smith and Haddad 2000).
 
           Statistical concept and methodology: Data on undernourishment are from the Food and Agriculture Organization (FAO) of the United Nations and measure food deprivation based on average food available for human consumption per person, the level of inequality in access to food, and the minimum calories required for an average person.
+        display:
+          numDecimalPlaces: 1
         presentation:
           title_public: Share of the population that is undernourished
           attribution: Food and Agriculture Organization of the United Nations (via World Bank)
