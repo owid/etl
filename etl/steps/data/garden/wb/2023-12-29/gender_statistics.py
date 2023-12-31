@@ -121,7 +121,7 @@ def run(dest_dir: str) -> None:
     ds_garden.save()
 
 
-def add_metadata(tb: Table, metadata_tb: Table) -> None:
+def add_metadata(tb: Table, metadata_tb: Table):
     """
     Adds metadata by fetching details from the table with descriptions and sources originally retrieved in snapshot using the World Bank API.
 
