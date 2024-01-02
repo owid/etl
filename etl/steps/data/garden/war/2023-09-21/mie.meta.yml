@@ -162,7 +162,7 @@ tables:
       # Deaths in ongoing conflicts #
       ###############################
       number_deaths_ongoing_conflicts_low:
-        title: Number of deaths in ongoing conflicts (low estimate)
+        title: Deaths in ongoing conflicts (low estimate)
         unit: deaths
         description_short: |-
           <% set estimate = "low" %>
@@ -170,7 +170,7 @@ tables:
         description_key: *description_key_deaths
 
       number_deaths_ongoing_conflicts_high:
-        title: Number of deaths in ongoing conflicts (high estimate)
+        title: Deaths in ongoing conflicts (high estimate)
         unit: deaths
         description_short: |-
           <% set estimate = "high" %>
@@ -178,7 +178,7 @@ tables:
         description_key: *description_key_deaths
 
       number_deaths_ongoing_conflicts_low_per_capita:
-        title: Number of deaths in ongoing conflicts (low estimate, per capita)
+        title: Death rate in ongoing conflicts (low estimate)
         unit: deaths per 100,000 people
         description_short: |-
           <% set estimate = "low" %>
@@ -188,7 +188,7 @@ tables:
           numDecimalPlaces: 1
 
       number_deaths_ongoing_conflicts_high_per_capita:
-        title: Number of deaths in ongoing conflicts (high estimate, per capita)
+        title: Death rate in ongoing conflicts (high estimate)
         unit: deaths per 100,000 people
         description_short: |-
           <% set estimate = "high" %>
