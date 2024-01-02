@@ -15,6 +15,7 @@ from etl.paths import BASE_DIR
 
 # GPT Model
 GPT_MODEL = "gpt-3.5-turbo"
+RATE_PER_1000_TOKENS = 0.0015  # Approximate average cost per 1000 tokens
 
 # Initialize logger
 log = structlog.get_logger()
@@ -275,6 +276,9 @@ class MetadataGPTUpdater:
                 with open(self.path_to_file, "r") as file:
                     original_yaml_content = yaml.safe_load(file)
                 final_cost = 0
+
+                # Calculate the total estimated cost
+                total_estimated_cost = 0
                 for table_name, table_data in original_yaml_content["tables"].items():
                     for variable_name, variable_data in table_data["variables"].items():
                         variable_title = variable_data["title"]
@@ -284,13 +288,32 @@ class MetadataGPTUpdater:
                             messages = self.create_system_prompt_garden(
                                 variable_title, metadata_field, metadata_instructions, ds_meta_description
                             )
-                            message_content, cost = get_message_content(
-                                self.client, messages=messages, model=GPT_MODEL, temperature=0
-                            )
-                            final_cost += cost
+                            char_count = len(messages[0]["content"])
+                            est_cost = calculate_gpt_cost(char_count)
+                            total_estimated_cost += len(original_yaml_content["tables"].items()) * est_cost
 
-                            indicator_metadata.append(message_content)
-                        all_variables[variable_name] = indicator_metadata
+                # Ask the user if they want to proceed
+                proceed = input(
+                    f"The total estimated cost is ${total_estimated_cost:.3f}. Do you want to proceed? (yes/no): "
+                )
+
+                if proceed.lower() == "yes":
+                    for table_name, table_data in original_yaml_content["tables"].items():
+                        for variable_name, variable_data in table_data["variables"].items():
+                            variable_title = variable_data["title"]
+                            indicator_metadata = []
+                            for metadata_field in fields_to_fill_out:
+                                metadata_instructions = metadata_indicator_docs[metadata_field]
+                                messages = self.create_system_prompt_garden(
+                                    variable_title, metadata_field, metadata_instructions, ds_meta_description
+                                )
+                                message_content, cost = get_message_content(
+                                    self.client, messages=messages, model=GPT_MODEL, temperature=0
+                                )
+                                final_cost += cost
+
+                                indicator_metadata.append(message_content)
+                            all_variables[variable_name] = indicator_metadata
                 log.info(f"Cost GPT4: ${final_cost:.2f}")
 
                 for table_name, table_data in original_yaml_content["tables"].items():
@@ -422,8 +445,7 @@ def process_chat_completion(chat_completion) -> Any | None:
     """Process the chat completion response."""
     if chat_completion is not None:
         chat_completion_tokens = chat_completion.usage.total_tokens
-
-        cost = chat_completion_tokens / 1000 * 0.03
+        cost = (chat_completion_tokens / 1000) * RATE_PER_1000_TOKENS
         message_content = chat_completion.choices[0].message.content
         return message_content, cost
     return None
@@ -479,6 +501,26 @@ def convert_list_to_dict(data_list):
         key, value = item.strip("'").split(": ", 1)
         data_dict[key.strip("'")] = value.strip("'\"")
     return data_dict
+
+
+def calculate_gpt_cost(char_count):
+    """
+    Calculate the cost of using GPT based on the number of characters.
+
+    This function estimates the cost of using GPT by converting the number of characters into tokens,
+    rounding up to the nearest thousand tokens, and then multiplying by the rate per thousand tokens.
+
+    Args:
+        char_count (int): The number of characters in the text to be processed by GPT.
+
+    Returns:
+        float: The estimated cost of using GPT for the given number of characters.
+    """
+
+    tokens = char_count / 4  # Average size of a token is 4 characters
+    tokens_rounded_up = -(-tokens // 1000) * 1000  # Round up to the nearest 1000 tokens
+    estimated_cost = (tokens_rounded_up / 1000) * RATE_PER_1000_TOKENS
+    return estimated_cost
 
 
 class Channels:
