@@ -3,56 +3,200 @@ definitions:
     presentation:
       topic_tags:
         - War & Peace
+    display:
+      numDecimalPlaces: 0
+    processing_level: major
+
   all:
-    selectedEntityNames: &selected_entities
-      - Africa
-      - Americas
-      - Asia and Oceania
-      - Europe
-      - Middle East
     interstate_conflict: &interstate_conflict |-
       An interstate conflict is a disagreement between states where force is threatened, displayed, or used.
+    force_usage: &force_usage |-
+      A threat of force can be unspecified, or entail threatening to declare war or to occupy territory; a display of force can entail shows of force or border violations; a use of force can entail attacks, clashes, or battles.
+    conflict_type:
+      <%- if hostility == "all" -%>
+      Included are conflicts between states where force was threatened, displayed, used, or escalated to a war that year
+
+      <%- elif hostility == "Threat to use force" -%>
+      Included are conflicts between states where, at most, use of force was threatened that year
+
+      <%- elif hostility == "Display of force" -%>
+      Included are conflicts between states where, at most, force was displayed that year
+
+      <%- elif hostility == "Use of force" -%>
+      Included are conflicts between states where, at most, force was used that year, but there were fewer than 1,000 combatant deaths
+
+      <%- elif hostility == "War" -%>
+      Included are interstate wars that were ongoing that year
+
+      <%- endif -%>
 
   number_ongoing_conflicts:
     description_short: |-
-      <%- if hostility_level == "all" -%>
-      The number of all ongoing interstate conflicts in each year
-      <%- elif hostility_level == "Threat to use force" -%>
-      The number of interstate conflicts where at most the use of force is threatened in each year
-      <%- elif hostility_level == "Display of force" -%>
-      The number of interstate conflicts where at most force is displayed in each year
-      <%- elif hostility_level == "Use of force" -%>
-      The number of interstate conflicts where force is used, but causes fewer than 1,000 combatant deaths due to fighting, in each year
-      <%- elif hostility_level == "War" -%>
-      The number of interstate conflicts where the use of force causes at least 1,000 combatant deaths due to fighting during the year
-      <%- endif -%>
+      {definitions.all.conflict_type}.
     description_key: &description_key_ongoing
       - *interstate_conflict
+      - *force_usage
       - We count a conflict as ongoing in a region even if the conflict is also ongoing in other regions. The sum across all regions can therefore be higher than the total number of ongoing conflicts.
       - The hostility level for a conflict overall is the highest level across all world regions.
 
   number_new_conflicts:
     description_short: |-
-      <%- if hostility_level == "all" -%>
-      The number of all new interstate conflicts in each year
-      <%- elif hostility_level == "Threat to use force" -%>
-      The number of new interstate conflicts where at most the use of force is threatened in each year
-      <%- elif hostility_level == "Display of force" -%>
-      The number of new interstate conflicts where at most force is displayed in each year
-      <%- elif hostility_level == "Use of force" -%>
-      The number of new interstate conflicts where force is used, but causes fewer at least 1,000 combatant deaths due to fighting, in each year
-      <%- elif hostility_level == "War" -%>
-      The number of new interstate conflicts where the use of force causes at least 1,000 combatant deaths due to fighting during the year
+      <%- if hostility == "Use of force" -%>
+      Included are conflicts between states where, at most, force was used that year for the first time, but there were fewer than 1,000 combatant deaths.
+
+      <%- elif hostility == "War" -%>
+      Included are interstate wars that started that year.
+
+      <% else %>
+      {definitions.all.conflict_type} for the first time.
+
       <%- endif -%>
     description_key: &description_key_new
       - *interstate_conflict
+      - *force_usage
       - We only count a conflict as new when the conflict overall started that year, not if it restarted or changed its hostility level (i.e. escalated or deescalated).
       - We count a conflict as new in a region even if the conflict started earlier or at the same time in another region. The sum across all regions can therefore be higher than the total number of new conflicts.
       - The hostility level for a conflict overall is the highest level across all world regions.
 
   number_deaths:
+    description_short: |-
+      The << estimate >> estimate of the number of deaths of combatants due to fighting between states that year<< per_capita >>.
+    description_short_per_capita:
+      <% set per_capita = ", per 100,000 people" %>
+      {definitions.number_deaths.description_short}
     description_key: &description_key_deaths
+      - "{definitions.all.conflict_type}"
+      - *interstate_conflict
+      - *force_usage
       - Deaths of combatants due to fighting are included.
+
+tables:
+  # PARTICIPANTS
+  mie_country:
+    variables:
+      participated_in_conflict:
+        title: State involved in conflict
+        unit: ""
+        description_short: |-
+          State participated in at least one conflict with another state where force was threatened, displayed, or used that year.
+        description_key:
+          - |-
+            '1' indicates that the state participated in a conflict. '0' indicates that the state did not participate in a conflict.
+
+      number_participants:
+        title: Number of states in conflict
+        unit: "states"
+        description_short: |-
+          Included are states that participated in at least one conflict with another state where force was threatened, displayed, or used that year.
+
+  # MAIN
+  mie:
+    common:
+      presentation:
+        grapher_config:
+          selectedEntityNames:
+            - Africa
+            - Americas
+            - Asia and Oceania
+            - Europe
+            - Middle East
+
+    variables:
+      #####################
+      # Ongoing conflicts #
+      #####################
+      number_ongoing_conflicts:
+        title: Number of ongoing conflicts
+        unit: conflicts
+        description_short: |-
+          {definitions.number_ongoing_conflicts.description_short}
+        description_key: *description_key_ongoing
+
+      number_ongoing_conflicts_per_country:
+        title: Number of ongoing conflicts per state
+        unit: conflicts per state
+        description_short: |-
+          The number of wars divided by the number of all states. This accounts for the changing number of states over time. {definitions.number_ongoing_conflicts.description_short}
+        description_key: *description_key_ongoing
+        display:
+          numDecimalPlaces: 3
+
+      number_ongoing_conflicts_per_country_pair:
+        title: Number of ongoing conflicts per state-pair
+        unit: conflicts per state-pair
+        description_short: |-
+          The number of wars divided by the number of all state-pairs. This accounts for the changing number of states over time. {definitions.number_ongoing_conflicts.description_short}
+        description_key: *description_key_ongoing
+        display:
+          numDecimalPlaces: 5
+
+      #################
+      # New conflicts #
+      #################
+      number_new_conflicts:
+        title: Number of new conflicts
+        unit: conflicts
+        description_short: |-
+          {definitions.number_new_conflicts.description_short}
+        description_key: *description_key_new
+
+      number_new_conflicts_per_country:
+        title: Number of new conflicts per state
+        unit: conflicts per state
+        description_short: |-
+          The number of wars divided by the number of all states. This accounts for the changing number of states over time. {definitions.number_new_conflicts.description_short}
+        description_key: *description_key_new
+        display:
+          numDecimalPlaces: 3
+
+      number_new_conflicts_per_country_pair:
+        title: Number of new conflicts per state-pair
+        unit: conflicts per state-pair
+        description_short: |-
+            {definitions.number_new_conflicts.description_short}, divided by the number of country-pairs in the region.
+        description_key: *description_key_new
+        display:
+          numDecimalPlaces: 5
+
+      ###############################
+      # Deaths in ongoing conflicts #
+      ###############################
+      number_deaths_ongoing_conflicts_low:
+        title: Number of deaths in ongoing conflicts (low estimate)
+        unit: deaths
+        description_short: |-
+          <% set estimate = "low" %>
+          {definitions.number_deaths.description_short}
+        description_key: *description_key_deaths
+
+      number_deaths_ongoing_conflicts_high:
+        title: Number of deaths in ongoing conflicts (high estimate)
+        unit: deaths
+        description_short: |-
+          <% set estimate = "high" %>
+          {definitions.number_deaths.description_short}
+        description_key: *description_key_deaths
+
+      number_deaths_ongoing_conflicts_low_per_capita:
+        title: Number of deaths in ongoing conflicts (low estimate, per capita)
+        unit: deaths per 100,000 people
+        description_short: |-
+          <% set estimate = "low" %>
+          {definitions.number_deaths.description_short_per_capita}
+        description_key: *description_key_deaths
+        display:
+          numDecimalPlaces: 1
+
+      number_deaths_ongoing_conflicts_high_per_capita:
+        title: Number of deaths in ongoing conflicts (high estimate, per capita)
+        unit: deaths per 100,000 people
+        description_short: |-
+          <% set estimate = "high" %>
+          {definitions.number_deaths.description_short_per_capita}
+        description_key: *description_key_deaths
+        display:
+          numDecimalPlaces: 1
+
 
 dataset:
   title: History of war (Gibler and Miller, 2020)
@@ -77,164 +221,3 @@ dataset:
         • Asia and Oceania: 700-999
 
       You can find more information about the data in our article: [To be published]
-
-tables:
-  # COUNTRY-LEVEL
-  mie_country:
-    variables:
-      participated_in_conflict:
-        title: Participated in conflict
-        unit: ""
-        display:
-          numDecimalPlaces: 0
-        description_short: |-
-          Whether the country participated in a conflict (of a specific kind) in a given year.
-
-      number_participants:
-        title: Number of countries in conflict
-        unit: "countries"
-        display:
-          numDecimalPlaces: 0
-        description_short: |-
-          The number of countries that participated in a conflict (of a specific kind) in a given year and region.
-
-  mie:
-    variables:
-      #####################
-      # Ongoing conflicts #
-      #####################
-      number_ongoing_conflicts:
-        title: Number of ongoing conflicts
-        unit: conflicts
-        description_short: |-
-          {definitions.number_ongoing_conflicts.description_short}.
-        description_key: *description_key_ongoing
-        processing_level: major
-        display:
-          numDecimalPlaces: 0
-        presentation:
-          grapher_config:
-            selectedEntityNames: *selected_entities
-
-      number_ongoing_conflicts_per_country:
-        title: Number of ongoing conflicts per country
-        unit: conflicts per country
-        description_short: |-
-          {definitions.number_ongoing_conflicts.description_short}, divided by the number of countries in the region.
-        description_key: *description_key_ongoing
-        processing_level: major
-        display:
-          numDecimalPlaces: 3
-        presentation:
-          grapher_config:
-            selectedEntityNames: *selected_entities
-
-      number_ongoing_conflicts_per_country_pair:
-        title: Number of ongoing conflicts per country-pair
-        unit: conflicts per country-pair
-        description_short: |-
-          {definitions.number_ongoing_conflicts.description_short}, divided by the number of country-pairs in the region.
-        description_key: *description_key_ongoing
-        processing_level: major
-        display:
-          numDecimalPlaces: 5
-        presentation:
-          grapher_config:
-            selectedEntityNames: *selected_entities
-
-      #################
-      # New conflicts #
-      #################
-      number_new_conflicts:
-        title: Number of new conflicts
-        unit: conflicts
-        description_short: |-
-          {definitions.number_new_conflicts.description_short}.
-        description_key: *description_key_new
-        processing_level: major
-        display:
-          numDecimalPlaces: 0
-        presentation:
-          grapher_config:
-            selectedEntityNames: *selected_entities
-
-      number_new_conflicts_per_country:
-        title: Number of new conflicts per country
-        unit: conflicts per country
-        description_short: |-
-          {definitions.number_new_conflicts.description_short}, divided by the number of countries in the region.
-        description_key: *description_key_new
-        processing_level: major
-        display:
-          numDecimalPlaces: 3
-        presentation:
-          grapher_config:
-            selectedEntityNames: *selected_entities
-
-      number_new_conflicts_per_country_pair:
-        title: Number of new conflicts per country-pair
-        unit: conflicts per country-pair
-        description_short: |-
-            {definitions.number_new_conflicts.description_short}, divided by the number of country-pairs in the region.
-        description_key: *description_key_new
-        processing_level: major
-        display:
-          numDecimalPlaces: 5
-        presentation:
-          grapher_config:
-            selectedEntityNames: *selected_entities
-
-      ###############################
-      # Deaths in ongoing conflicts #
-      ###############################
-      number_deaths_ongoing_conflicts_low:
-        title: Number of deaths in ongoing conflicts (low estimate)
-        unit: deaths
-        description_short: |-
-          The low estimate of the number of deaths in all ongoing interstate conflicts in each year.
-        description_key: *description_key_deaths
-        processing_level: major
-        display:
-          numDecimalPlaces: 0
-        presentation:
-          grapher_config:
-            selectedEntityNames: *selected_entities
-
-      number_deaths_ongoing_conflicts_high:
-        title: Number of deaths in ongoing conflicts (high estimate)
-        unit: deaths
-        description_short: |-
-          The high estimate of the number of deaths in all ongoing interstate conflicts in each year.
-        description_key: *description_key_deaths
-        processing_level: major
-        display:
-          numDecimalPlaces: 0
-        presentation:
-          grapher_config:
-            selectedEntityNames: *selected_entities
-
-      number_deaths_ongoing_conflicts_low_per_capita:
-        title: Number of deaths in ongoing conflicts (low estimate, per capita)
-        unit: deaths per 100,000 people
-        description_short: |-
-          The low estimate of the number of deaths in all ongoing interstate conflicts in each year.
-        description_key: *description_key_deaths
-        processing_level: major
-        display:
-          numDecimalPlaces: 1
-        presentation:
-          grapher_config:
-            selectedEntityNames: *selected_entities
-
-      number_deaths_ongoing_conflicts_high_per_capita:
-        title: Number of deaths in ongoing conflicts (high estimate, per capita)
-        unit: deaths per 100,000 people
-        description_short: |-
-          The high estimate of the number of deaths in all ongoing interstate conflicts in each year.
-        description_key: *description_key_deaths
-        processing_level: major
-        display:
-          numDecimalPlaces: 1
-        presentation:
-          grapher_config:
-            selectedEntityNames: *selected_entities
