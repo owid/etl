@@ -8,12 +8,12 @@ meta:
     version_producer: v4
     url_main: https://data.giss.nasa.gov/gistemp/
     url_download: https://data.giss.nasa.gov/gistemp/tabledata_v4/SH.Ts+dSST.csv
-    date_accessed: '2023-12-04'
-    date_published: '2023-12-04'
+    date_accessed: '2024-01-02'
+    date_published: '2024-01-02'
     license:
       name: CC BY 4.0
-wdir: ../../../data/snapshots/climate/2023-12-04
+wdir: ../../../data/snapshots/climate/2024-01-02
 outs:
-- md5: 791a1370c7ccb420e54827b6dd08fd75
-  size: 12636
+- md5: 940052f0bf85e64ba5e23caba568120d
+  size: 12627
   path: surface_temperature_analysis_southern_hemisphere.csv

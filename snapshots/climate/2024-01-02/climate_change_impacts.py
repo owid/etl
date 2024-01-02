@@ -12,7 +12,7 @@ SNAPSHOT_VERSION = Path(__file__).parent.name
 # Year of current snapshot version.
 CURRENT_YEAR = SNAPSHOT_VERSION.split("-")[0]
 
-# Names of data files from GISS NASA.
+# Names of data files.
 FILES = [
     "surface_temperature_analysis_world.csv",
     "surface_temperature_analysis_northern_hemisphere.csv",
@@ -24,6 +24,9 @@ FILES = [
 # For simplicity, also assume that the publication date is the same as the access date.
 DATE_ACCESSED = SNAPSHOT_VERSION
 DATE_PUBLISHED = SNAPSHOT_VERSION
+# NOTE: For sea_ice_index, the date_published can be found on:
+# https://noaadata.apps.nsidc.org/NOAA/G02135/seaice_analysis/
+# Next to the file name (Sea_Ice_Index_Monthly_Data_by_Year_G02135_v3.0.xlsx).
 
 
 @click.command()
