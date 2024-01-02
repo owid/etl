@@ -121,7 +121,6 @@ definitions:
 
 
 tables:
-
   # PARTICIPANT INDICATORS
   ucdp_country:
     common:

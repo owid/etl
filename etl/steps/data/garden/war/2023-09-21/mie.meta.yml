@@ -199,6 +199,134 @@ tables:
           numDecimalPlaces: 1
 
 
+tables:
+  # PARTICIPANTS
+  mie_country:
+    variables:
+      participated_in_conflict:
+        title: State involved in conflict
+        unit: ""
+        description_short: |-
+          State participated in at least one conflict with another state where force was threatened, displayed, or used that year.
+        description_key:
+          - |-
+            '1' indicates that the state participated in a conflict. '0' indicates that the state did not participate in a conflict.
+
+      number_participants:
+        title: Number of states in conflict
+        unit: "states"
+        description_short: |-
+          Included are states that participated in at least one conflict with another state where force was threatened, displayed, or used that year.
+
+  # MAIN
+  mie:
+    common:
+      presentation:
+        grapher_config:
+          selectedEntityNames:
+            - Africa
+            - Americas
+            - Asia and Oceania
+            - Europe
+            - Middle East
+
+    variables:
+      #####################
+      # Ongoing conflicts #
+      #####################
+      number_ongoing_conflicts:
+        title: Number of ongoing conflicts
+        unit: conflicts
+        description_short: |-
+          {definitions.number_ongoing_conflicts.description_short}
+        description_key: *description_key_ongoing
+
+      number_ongoing_conflicts_per_country:
+        title: Number of ongoing conflicts per state
+        unit: conflicts per state
+        description_short: |-
+          The number of wars divided by the number of all states. This accounts for the changing number of states over time. {definitions.number_ongoing_conflicts.description_short}
+        description_key: *description_key_ongoing
+        display:
+          numDecimalPlaces: 3
+
+      number_ongoing_conflicts_per_country_pair:
+        title: Number of ongoing conflicts per state-pair
+        unit: conflicts per state-pair
+        description_short: |-
+          The number of wars divided by the number of all state-pairs. This accounts for the changing number of states over time. {definitions.number_ongoing_conflicts.description_short}
+        description_key: *description_key_ongoing
+        display:
+          numDecimalPlaces: 5
+
+      #################
+      # New conflicts #
+      #################
+      number_new_conflicts:
+        title: Number of new conflicts
+        unit: conflicts
+        description_short: |-
+          {definitions.number_new_conflicts.description_short}
+        description_key: *description_key_new
+
+      number_new_conflicts_per_country:
+        title: Number of new conflicts per state
+        unit: conflicts per state
+        description_short: |-
+          The number of wars divided by the number of all states. This accounts for the changing number of states over time. {definitions.number_new_conflicts.description_short}
+        description_key: *description_key_new
+        display:
+          numDecimalPlaces: 3
+
+      number_new_conflicts_per_country_pair:
+        title: Number of new conflicts per state-pair
+        unit: conflicts per state-pair
+        description_short: |-
+            {definitions.number_new_conflicts.description_short}, divided by the number of country-pairs in the region.
+        description_key: *description_key_new
+        display:
+          numDecimalPlaces: 5
+
+      ###############################
+      # Deaths in ongoing conflicts #
+      ###############################
+      number_deaths_ongoing_conflicts_low:
+        title: Deaths in ongoing conflicts (low estimate)
+        unit: deaths
+        description_short: |-
+          <% set estimate = "low" %>
+          {definitions.number_deaths.description_short}
+        description_key: *description_key_deaths
+
+      number_deaths_ongoing_conflicts_high:
+        title: Deaths in ongoing conflicts (high estimate)
+        unit: deaths
+        description_short: |-
+          <% set estimate = "high" %>
+          {definitions.number_deaths.description_short}
+        description_key: *description_key_deaths
+
+      number_deaths_ongoing_conflicts_low_per_capita:
+        title: Death rate in ongoing conflicts (low estimate)
+        unit: deaths per 100,000 people
+        description_short: |-
+          <% set estimate = "low" %>
+          {definitions.number_deaths.description_short_per_capita}
+        description_key: *description_key_deaths
+        display:
+          numDecimalPlaces: 1
+
+      number_deaths_ongoing_conflicts_high_per_capita:
+        title: Death rate in ongoing conflicts (high estimate)
+        unit: deaths per 100,000 people
+        description_short: |-
+          <% set estimate = "high" %>
+          {definitions.number_deaths.description_short_per_capita}
+        description_key: *description_key_deaths
+        display:
+          numDecimalPlaces: 1
+
+
 dataset:
   title: History of war (Gibler and Miller, 2020)
   description: |-

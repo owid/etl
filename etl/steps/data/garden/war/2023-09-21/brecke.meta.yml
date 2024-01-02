@@ -52,6 +52,7 @@ definitions:
       - For conflicts without any deaths estimate, we conservatively coded the Conflict Catalog's lower bound for including a conflict, 32 deaths each year.
       - If a conflict lasted more than one year, we distributed its deaths evenly across years.
 
+
   number_ongoing_conflicts:
     description_short: |-
       <%- if conflict_type == "all" -%>
