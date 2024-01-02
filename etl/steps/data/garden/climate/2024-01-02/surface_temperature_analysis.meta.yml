@@ -12,7 +12,8 @@ tables:
     variables:
       temperature_anomaly:
         title: "Global warming: monthly temperature anomaly"
-        description_short: Combined land-surface air and sea-surface water temperature anomaly, given as the deviation from the 1951-1980 mean, in degree Celsius.
+        description_short: |-
+          Combined land-surface air and sea-surface water temperature anomaly, given as the deviation from the 1951-1980 mean, in degrees Celsius.
         unit: °C
         short_unit: °C
         processing_level: minor

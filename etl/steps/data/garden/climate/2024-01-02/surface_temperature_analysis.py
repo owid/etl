@@ -13,10 +13,8 @@ def run(dest_dir: str) -> None:
     #
     # Load inputs.
     #
-    # Load meadow dataset.
+    # Load meadow dataset and read its main table.
     ds_meadow = paths.load_dataset("surface_temperature_analysis")
-
-    # Read table from meadow dataset.
     tb = ds_meadow["surface_temperature_analysis_world"]
 
     #
@@ -28,7 +26,7 @@ def run(dest_dir: str) -> None:
         # Read table.
         tb = ds_meadow[table_name].reset_index()
         # Get location from table name.
-        location = " ".join(table_name.split("_")[4:]).capitalize()
+        location = table_name.split("surface_temperature_analysis_")[-1].replace("_", " ").title()
         # Add column for location.
         tb["location"] = location
         # Convert table to long format.

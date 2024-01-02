@@ -2,6 +2,7 @@ steps:
   #
   # Met Office Hadley Centre - Near surface temperature anomaly (2023-10-18).
   #
+  # TODO: Consider moving these steps to the "climate" namespace.
   data://meadow/met_office_hadley_centre/2023-10-18/near_surface_temperature:
     - snapshot://met_office_hadley_centre/2023-10-18/near_surface_temperature_global.csv
     - snapshot://met_office_hadley_centre/2023-10-18/near_surface_temperature_northern_hemisphere.csv
@@ -10,6 +11,15 @@ steps:
     - data://meadow/met_office_hadley_centre/2023-10-18/near_surface_temperature
   data://grapher/met_office_hadley_centre/2023-10-18/near_surface_temperature:
     - data://garden/met_office_hadley_centre/2023-10-18/near_surface_temperature
+  #
+  # Met Office Hadley Centre - Sea surface temperature.
+  #
+  data://meadow/climate/2024-01-02/sea_surface_temperature:
+    - snapshot://climate/2024-01-02/sea_surface_temperature_world.csv
+    - snapshot://climate/2024-01-02/sea_surface_temperature_northern_hemisphere.csv
+    - snapshot://climate/2024-01-02/sea_surface_temperature_southern_hemisphere.csv
+  data://garden/climate/2024-01-02/sea_surface_temperature:
+    - data://meadow/climate/2024-01-02/sea_surface_temperature
   #
   # GISS - Surface temperature analysis.
   #
@@ -34,6 +44,7 @@ steps:
   data://explorers/climate/latest/climate_change_impacts:
     - data://garden/climate/2024-01-02/surface_temperature_analysis
     - data://garden/climate/2024-01-02/sea_ice_index
+    - data://garden/climate/2024-01-02/sea_surface_temperature
 
   ######################################################################################################################
   # Older versions to be archived once they are not used by any other steps.

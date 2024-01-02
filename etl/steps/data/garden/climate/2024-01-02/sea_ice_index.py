@@ -30,9 +30,6 @@ def run(dest_dir: str) -> None:
     # Create column of date, assuming each measurement is taken mid month.
     tb["date"] = pd.to_datetime(tb["year"].astype(str) + tb["month"].str[0:3] + "15", format="%Y%b%d")
 
-    # Copy metadata from any other previous column.
-    tb["date"] = tb["date"].copy_metadata(tb["year"])
-
     # Drop empty rows and unnecessary columns.
     tb = tb.dropna().drop(columns=["year", "month"])
 

@@ -5,14 +5,14 @@ definitions:
       - Climate Change
 
 dataset:
-  title: GISS surface temperature analysis
+  title: Sea Ice Index
 
 tables:
   sea_ice_index:
     variables:
-      temperature_anomaly:
-        title: "Global warming: monthly temperature anomaly"
-        description_short: Combined land-surface air and sea-surface water temperature anomaly, given as the deviation from the 1951-1980 mean, in degree Celsius.
-        unit: °C
-        short_unit: °C
+      sea_ice_extent:
+        title: Sea ice extent
+        # description_short: TODO
+        unit: million square kilometers
+        short_unit: million km²
         processing_level: minor

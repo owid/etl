@@ -9,24 +9,19 @@ from etl.snapshot import Snapshot
 # Version for current snapshot dataset.
 SNAPSHOT_VERSION = Path(__file__).parent.name
 
-# Year of current snapshot version.
-CURRENT_YEAR = SNAPSHOT_VERSION.split("-")[0]
-
 # Names of data files.
 FILES = [
+    # NASA Goddard Institute for Space Studies - GISS Surface Temperature Analysis.
     "surface_temperature_analysis_world.csv",
     "surface_temperature_analysis_northern_hemisphere.csv",
     "surface_temperature_analysis_southern_hemisphere.csv",
+    # National Snow and Ice Data Center - Sea Ice Index.
     "sea_ice_index.xlsx",
+    # Met Office Hadley Centre - HadSST.
+    "sea_surface_temperature_world.csv",
+    "sea_surface_temperature_northern_hemisphere.csv",
+    "sea_surface_temperature_southern_hemisphere.csv",
 ]
-
-# To ease the recurrent task of updating these files, fetch the access date from the version, and write it to files.
-# For simplicity, also assume that the publication date is the same as the access date.
-DATE_ACCESSED = SNAPSHOT_VERSION
-DATE_PUBLISHED = SNAPSHOT_VERSION
-# NOTE: For sea_ice_index, the date_published can be found on:
-# https://noaadata.apps.nsidc.org/NOAA/G02135/seaice_analysis/
-# Next to the file name (Sea_Ice_Index_Monthly_Data_by_Year_G02135_v3.0.xlsx).
 
 
 @click.command()
@@ -36,12 +31,24 @@ def main(upload: bool) -> None:
     for file_name in FILES:
         snap = Snapshot(f"climate/{SNAPSHOT_VERSION}/{file_name}")
 
-        # Replace the full citation and description in the metadata.
-        snap.metadata.origin.date_accessed = DATE_ACCESSED  # type: ignore
-        snap.metadata.origin.date_published = DATE_PUBLISHED  # type: ignore
+        # To ease the recurrent task update, fetch the access date from the version, and write it to the dvc files.
+        # For simplicity, also assume that the publication date is the same as the access date.
+        snap.metadata.origin.date_accessed = SNAPSHOT_VERSION  # type: ignore
+        snap.metadata.origin.date_published = SNAPSHOT_VERSION  # type: ignore
+        # NOTE: Date published can in principle be extracted for some of the sources:
+        # * For sea_ice_index, the date_published can be found on:
+        #   https://noaadata.apps.nsidc.org/NOAA/G02135/seaice_analysis/
+        #   Next to the file name (Sea_Ice_Index_Monthly_Data_by_Year_G02135_v3.0.xlsx).
+        # * For sea_surface_temperature_* the date_published can be found on:
+        #   https://www.metoffice.gov.uk/hadobs/hadsst4/data/download.html
+        #   At the very bottom of the page, where it says "Last updated:".
 
-        if file_name == "sea_ice_index.xlsx":
-            snap.metadata.origin.attribution = f"National Snow and Ice Data Center - Sea Ice Index ({CURRENT_YEAR})"  # type: ignore
+        # Extract publication year from date_published.
+        year_published = snap.metadata.origin.date_published.split("-")[0]  # type: ignore
+
+        snap.metadata.origin.attribution = (  # type: ignore
+            f"{snap.metadata.origin.producer} - {snap.metadata.origin.title} ({year_published})"  # type: ignore
+        )
 
         # Rewrite metadata to dvc file.
         snap.metadata_path.write_text(snap.metadata.to_yaml())
