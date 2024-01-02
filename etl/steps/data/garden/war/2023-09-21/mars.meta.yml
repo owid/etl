@@ -99,18 +99,19 @@ definitions:
 
 
 tables:
-  # COUNTRY-LEVEL
+
+  # PARTICIPANT INDICATORS
   mars_country:
     common:
       description_key:
-        - A country is considered to be a major participant in a conflict if they suffered at least 1% of deaths in the conflict overall, or deploys at least 5% of its total combatants.
+        - A country is considered to be a major participant in a war if they suffered at least 1% of deaths in the war overall, or deploys at least 5% of its total combatants.
         - "{definitions.all.conflict_type}"
         - "{definitions.all.conflict_type_noncivil}"
         - "{definitions.all.conflict_types_additional}"
 
     variables:
       participated_in_conflict:
-        title: State involved in conflict
+        title: State involved in war
         unit: ""
         description_short: |-
           <% if conflict_type == "all" %>
@@ -125,10 +126,10 @@ tables:
           <% endif %>
         description_key:
           - |-
-            '1' indicates that the state participated in a conflict. '0' indicates that the state did not participate in a conflict.
+            '1' indicates that the state participated in a war. '0' indicates that the state did not participate in a war.
 
       number_participants:
-        title: Number of states in conflict
+        title: Number of states involved in war
         unit: "states"
         description_short: |-
           <% if conflict_type == "all" %>
@@ -142,6 +143,7 @@ tables:
 
           <% endif %>
 
+  # MAIN INDICATORS
   mars:
     common:
       presentation:
@@ -158,7 +160,7 @@ tables:
       # Ongoing deaths #
       ##################
       number_deaths_ongoing_conflicts_high:
-        title: Deaths in ongoing conflicts (high estimate)
+        title: Deaths in ongoing wars (high estimate)
         unit: deaths
         description_short: |-
           <% set estimate = "high" %>
@@ -166,7 +168,7 @@ tables:
         description_key: *description_key_deaths
 
       number_deaths_ongoing_conflicts_low:
-        title: Deaths in ongoing conflicts (low estimate)
+        title: Deaths in ongoing wars (low estimate)
         unit: deaths
         description_short: |-
           <% set estimate = "low" %>
@@ -174,7 +176,7 @@ tables:
         description_key: *description_key_deaths
 
       number_deaths_ongoing_conflicts_high_per_capita:
-        title: Death rate in ongoing conflicts (high estimate)
+        title: Death rate in ongoing wars (high estimate)
         unit: deaths per 100,000 people
         description_short: |-
           <% set estimate = "high" %>
@@ -184,7 +186,7 @@ tables:
           numDecimalPlaces: 1
 
       number_deaths_ongoing_conflicts_low_per_capita:
-        title: Death rate in ongoing conflicts (low estimate)
+        title: Death rate in ongoing wars (low estimate)
         unit: deaths per 100,000 people
         description_short: |-
           <% set estimate = "low" %>
@@ -197,7 +199,7 @@ tables:
       # Ongoing conflicts #
       #####################
       number_ongoing_conflicts:
-        title: Number of ongoing conflicts
+        title: Number of ongoing wars
         unit: conflicts
         description_short: |-
           <% set estimate = "low" %>
@@ -205,19 +207,19 @@ tables:
         description_key: *description_key_ongoing
 
       number_ongoing_conflicts_per_country:
-        title: Number of ongoing conflicts per state
-        unit: conflicts per state
+        title: Number of ongoing wars per state
+        unit: wars per state
         description_short: |-
-          The number of conflicts divided by the number of all states. This accounts for the changing number of states over time. {definitions.number_ongoing_conflicts.description_short}
+          The number of wars divided by the number of all states. This accounts for the changing number of states over time. {definitions.number_ongoing_conflicts.description_short}
         description_key: *description_key_ongoing
         display:
           numDecimalPlaces: 3
 
       number_ongoing_conflicts_per_country_pair:
-        title: Number of ongoing conflicts per state-pair
-        unit: conflicts per state-pair
+        title: Number of ongoing wars per state-pair
+        unit: wars per state-pair
         description_short: |-
-          The number of conflicts divided by the number of all state-pairs. This accounts for the changing number of states over time. {definitions.number_ongoing_conflicts.description_short}
+          The number of wars divided by the number of all state-pairs. This accounts for the changing number of states over time. {definitions.number_ongoing_conflicts.description_short}
         description_key: *description_key_ongoing
         display:
           numDecimalPlaces: 5
@@ -226,15 +228,15 @@ tables:
       # New conflicts #
       #################
       number_new_conflicts:
-        title: Number of new conflicts
-        unit: conflicts
+        title: Number of new wars
+        unit: wars
         description_short: |-
           {definitions.number_new_conflicts.description_short}
         description_key: *description_key_new
 
       number_new_conflicts_per_country:
-        title: Number of new conflicts per state
-        unit: conflicts per state
+        title: Number of new wars per state
+        unit: wars per state
         description_short: |-
           {definitions.number_new_conflicts.description_short}, divided by the number of countries in the region.
         description_key: *description_key_new
@@ -242,8 +244,8 @@ tables:
           numDecimalPlaces: 3
 
       number_new_conflicts_per_country_pair:
-        title: Number of new conflicts per state-pair
-        unit: conflicts per state-pair
+        title: Number of new wars per state-pair
+        unit: wars per state-pair
         description_short: |-
             {definitions.number_new_conflicts.description_short}, divided by the number of country-pairs in the region.
         description_key: *description_key_new

@@ -50,6 +50,7 @@ definitions:
       - "{definitions.all.interstate_conflicts}"
       - Deaths of combatants and civilians due to fighting, disease, and starvation are included.
       - For conflicts without any deaths estimate, we conservatively coded the Conflict Catalog's lower bound for including a conflict, 32 deaths each year.
+      - If a conflict lasted more than one year, we distributed its deaths evenly across years.
 
 
   number_ongoing_conflicts:
@@ -80,6 +81,8 @@ definitions:
 
 
 tables:
+
+  # MAIN INDICATORS
   brecke:
     variables:
       ##################
@@ -177,10 +180,10 @@ dataset:
 
     We change the world regions in the data. The list belows lists these, along with the codes of the countries in them. Find the complete list of country codes at https://correlatesofwar.org/wp-content/uploads/states2016.csv.
 
-    - Africa (from East & South Africa, North Africa, and West & Central Africa): 402-626
-    - Americas (from North America, Central America, and the Caribbean and South America): 2-165
-    - Asia and Oceania (from Central Asia, East Asia, South Asia, and Southeast Asia): 700-990
-    - Europe (from Eastern Europe and Western Europe): 200-395, 640
-    - Middle East (from Arabian Peninsula and Iran west to Syria): 630, 645-698
+      - Africa (from East & South Africa, North Africa, and West & Central Africa): 402-626
+      - Americas (from North America, Central America, and the Caribbean and South America): 2-165
+      - Asia and Oceania (from Central Asia, East Asia, South Asia, and Southeast Asia): 700-990
+      - Europe (from Eastern Europe and Western Europe): 200-395, 640
+      - Middle East (from Arabian Peninsula and Iran west to Syria): 630, 645-698
 
     You can find more information about the data in our article: [To be published]

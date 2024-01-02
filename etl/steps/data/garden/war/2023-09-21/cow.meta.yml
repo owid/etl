@@ -114,10 +114,12 @@ definitions:
         If a war was ongoing in more than one world region, we distributed its deaths across the regions of the participants.
         <% endif %>
       - "{definitions.all.time_filling_processing}"
+      - If a war lasted more than one year, we distributed its deaths evenly across years.
 
 
 tables:
-  # PARTICIPANTS
+
+  # PARTICIPANT INDICATORS
   cow_country:
     common:
       description_key:
@@ -146,7 +148,7 @@ tables:
             '1' indicates that the state participated in a war. '0' indicates that the state did not participate in a war.
 
       number_participants:
-        title: Number of states in war
+        title: Number of states involved in war
         unit: "states"
         description_short: |-
           <%- if conflict_type == "state-based" -%>
@@ -159,11 +161,11 @@ tables:
           Included are states that were primary participants in at least one non-internationalized intrastate war that year.
 
           <% else -%>
-          Included are states that were primary participants in at least one << conflict_type >> conflict that year.
+          Included are states that were primary participants in at least one << conflict_type >> war that year.
 
           <%- endif -%>
 
-  # LOCATIONS
+  # LOCATION INDICATORS
   cow_locations:
     common:
       description_processing: |-
@@ -173,7 +175,7 @@ tables:
 
     variables:
       is_location_of_conflict:
-        title: Location of war
+        title: Country where war took place
         unit: ""
         description_short: |-
           <%- if conflict_type == "state-based" -%>
@@ -193,8 +195,9 @@ tables:
           - |-
             '1' indicates that there was a war event in the given country. '0' indicates that there was no war event in the given country.
           - "{definitions.all.conflict_type}"
+
       number_locations:
-        title: Number of countries being locations of wars
+        title: Number of countries where war took place
         unit: "countries"
         description_short: |-
           <%- if conflict_type == "all" -%>
@@ -214,6 +217,7 @@ tables:
 
           <%- endif -%>
 
+  # MAIN INDICATORS
   cow:
     common:
       presentation:

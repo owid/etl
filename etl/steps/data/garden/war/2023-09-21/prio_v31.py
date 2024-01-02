@@ -3,7 +3,7 @@
 In PRIO 3.1 dataset, each row is a year-observation of a certain conflict. That is, for a certain year, we have the number of fatalities that occured in a certain
 conflict. There are a total of approx 1900 observations.
 
-Death estimates are given in low, best and high estimates. While values for high and low estimates are always present, best estimates are sometimes missing (~800 observaionts).
+Death estimates are given in low, best and high estimates. While values for high and low estimates are always present, best estimates are sometimes missing (~800 observations).
 
 Also, a conflict (i.e. one specific `id`) can have multiple campaigns. Take `id=1`, where we have three entries separated in time (i.e. three campaigns):
 

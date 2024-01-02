@@ -72,7 +72,7 @@ definitions:
 
 tables:
 
-  # PARTICIPANTS
+  # PARTICIPANT INDICATORS
   cow_mid_country:
     variables:
       participated_in_conflict:
@@ -85,11 +85,12 @@ tables:
             '1' indicates that the state participated in a conflict. '0' indicates that the state did not participate in a conflict.
 
       number_participants:
-        title: Number of states in conflict
+        title: Number of states involved in conflict
         unit: "states"
         description_short: |-
           Included are states that participated in at least one conflict with another state where force was threatened, displayed, or used that year.
 
+  # MAIN INDICATORS
   cow_mid:
     description: >-
       Data on the number of disputes and deaths from militarized disputes.
