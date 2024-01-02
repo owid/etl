@@ -3,13 +3,10 @@ definitions:
     presentation:
       topic_tags:
         - War & Peace
+    display:
+      numDecimalPlaces: 0
+
   all:
-    selectedEntityNames: &selected_entities
-      - Africa
-      - Americas
-      - Asia and Oceania
-      - Europe
-      - Middle East
     conflict_type_ongoing: |-
       <% if conflict_type == "all" %>
       An ongoing conventional war is a conflict between combatants with differentiated militaries and clear frontlines that causes at least 500 deaths over its duration.
@@ -37,12 +34,9 @@ definitions:
       The << estimate >> estimate of the number of deaths in ongoing conventional civil wars in each year
       <%- endif -%>
     description_key: &description_key_deaths
-      - |
-        {definitions.all.conflict_type_ongoing}
-      - |
-        {definitions.all.other_conflicts}
-      - |
-        {definitions.all.conflict_types_additional}
+      - "{definitions.all.conflict_type_ongoing}"
+      - "{definitions.all.other_conflicts}"
+      - "{definitions.all.conflict_types_additional}"
       - Deaths of combatants due to fighting are included.
       - |-
         <% if conflict_type == "civil war" %>
@@ -61,12 +55,9 @@ definitions:
       The number of ongoing conventional civil wars in each year
       <%- endif -%>
     description_key: &description_key_ongoing
-      - |
-        {definitions.all.conflict_type_ongoing}
-      - |
-        {definitions.all.other_conflicts}
-      - |
-        {definitions.all.conflict_types_additional}
+      - "{definitions.all.conflict_type_ongoing}"
+      - "{definitions.all.other_conflicts}"
+      - "{definitions.all.conflict_types_additional}"
       - We count a war as ongoing in a region even if the war is also ongoing in other regions. The sum across all regions can therefore be higher than the total number of ongoing wars.
 
   number_new_conflicts:
@@ -123,54 +114,53 @@ tables:
   mars_country:
     variables:
       participated_in_conflict:
-        title: Participated in conflict
+        title: State involved in conflict
         unit: ""
-        display:
-          numDecimalPlaces: 0
         description_short: |-
           Whether the country participated in a conflict (of a specific kind) in a given year.
+        description_key:
+          - |-
+            '1' indicates that the state participated in a conflict. '0' indicates that the state did not participate in a conflict.
 
       number_participants:
-        title: Number of countries in conflict
-        unit: "countries"
-        display:
-          numDecimalPlaces: 0
+        title: Number of states in conflict
+        unit: "states"
         description_short: |-
           The number of countries that participated in a conflict (of a specific kind) in a given year and region.
 
   mars:
+    common:
+      presentation:
+        grapher_config:
+          selectedEntityNames:
+            - Africa
+            - Americas
+            - Asia and Oceania
+            - Europe
+            - Middle East
+
     variables:
       ##################
       # Ongoing deaths #
       ##################
       number_deaths_ongoing_conflicts_high:
-        title: Number of soldier deaths in ongoing conflicts (high estimate)
+        title: Deaths in ongoing conflicts (high estimate)
         unit: deaths
         description_short: |-
           <% set estimate = "high" %>
           {definitions.number_deaths.description_short}.
         description_key: *description_key_deaths
-        display:
-          numDecimalPlaces: 0
-        presentation:
-          grapher_config:
-            selectedEntityNames: *selected_entities
 
       number_deaths_ongoing_conflicts_low:
-        title: Number of soldier deaths in ongoing conflicts (low estimate)
+        title: Deaths in ongoing conflicts (low estimate)
         unit: deaths
         description_short: |-
           <% set estimate = "low" %>
           {definitions.number_deaths.description_short}.
         description_key: *description_key_deaths
-        display:
-          numDecimalPlaces: 0
-        presentation:
-          grapher_config:
-            selectedEntityNames: *selected_entities
 
       number_deaths_ongoing_conflicts_high_per_capita:
-        title: Number of soldier deaths in ongoing conflicts (high estimate, per capita)
+        title: Death rate in ongoing conflicts (high estimate)
         unit: deaths per 100,000 people
         description_short: |-
           <% set estimate = "high" %>
@@ -178,12 +168,9 @@ tables:
         description_key: *description_key_deaths
         display:
           numDecimalPlaces: 1
-        presentation:
-          grapher_config:
-            selectedEntityNames: *selected_entities
 
       number_deaths_ongoing_conflicts_low_per_capita:
-        title: Number of soldier deaths in ongoing conflicts (low estimate, per capita)
+        title: Death rate in ongoing conflicts (low estimate)
         unit: deaths per 100,000 people
         description_short: |-
           <% set estimate = "low" %>
@@ -191,9 +178,6 @@ tables:
         description_key: *description_key_deaths
         display:
           numDecimalPlaces: 1
-        presentation:
-          grapher_config:
-            selectedEntityNames: *selected_entities
 
       #####################
       # Ongoing conflicts #
@@ -205,11 +189,6 @@ tables:
           <% set estimate = "low" %>
           {definitions.number_ongoing_conflicts.description_short}.
         description_key: *description_key_ongoing
-        display:
-          numDecimalPlaces: 0
-        presentation:
-          grapher_config:
-            selectedEntityNames: *selected_entities
 
       number_ongoing_conflicts_per_country:
         title: Number of ongoing conflicts per country
@@ -220,9 +199,6 @@ tables:
         processing_level: major
         display:
           numDecimalPlaces: 3
-        presentation:
-          grapher_config:
-            selectedEntityNames: *selected_entities
 
       number_ongoing_conflicts_per_country_pair:
         title: Number of ongoing conflicts per country-pair
@@ -233,9 +209,6 @@ tables:
         processing_level: major
         display:
           numDecimalPlaces: 5
-        presentation:
-          grapher_config:
-            selectedEntityNames: *selected_entities
 
       #################
       # New conflicts #
@@ -246,11 +219,6 @@ tables:
         description_short: |-
           {definitions.number_new_conflicts.description_short}.
         description_key: *description_key_new
-        display:
-          numDecimalPlaces: 0
-        presentation:
-          grapher_config:
-            selectedEntityNames: *selected_entities
 
       number_new_conflicts_per_country:
         title: Number of new conflicts per country
@@ -261,9 +229,6 @@ tables:
         processing_level: major
         display:
           numDecimalPlaces: 3
-        presentation:
-          grapher_config:
-            selectedEntityNames: *selected_entities
 
       number_new_conflicts_per_country_pair:
         title: Number of new conflicts per country-pair
@@ -274,6 +239,3 @@ tables:
         processing_level: major
         display:
           numDecimalPlaces: 5
-        presentation:
-          grapher_config:
-            selectedEntityNames: *selected_entities
