@@ -131,6 +131,10 @@ tb = {_snippet_dataset(ds_b, table_name)}
             if len(table_a) != len(table_b) or not _index_equals(table_a, table_b):
                 index_diff = True
                 table_a, table_b, eq_index = _align_tables(table_a, table_b)
+
+                # if only index order has changed, don't report it
+                if eq_index.all():
+                    index_diff = False
             else:
                 index_diff = False
                 eq_index = pd.Series(True, index=table_a.index)
@@ -332,7 +336,7 @@ def cli(
             continue
         except Exception as e:
             # soft fail and continue with another dataset
-            log.error(e)
+            log.error(e, exc_info=True)
             any_error = True
             continue
 
@@ -413,8 +417,8 @@ def _data_diff(
 
     # changes in values
     if table_a[col].dtype in ("category", "object", "string") or _is_datetime(table_a[col].dtype):
-        vals_a = set(table_a.loc[~eq, col].dropna())
-        vals_b = set(table_b.loc[~eq, col].dropna())
+        vals_a = set(table_a.loc[~eq, col].dropna().astype(str))
+        vals_b = set(table_b.loc[~eq, col].dropna().astype(str))
         if vals_a - vals_b:
             lines.append(f"- Removed values: {', '.join(vals_a - vals_b)}")
         if vals_b - vals_a:
@@ -540,7 +544,7 @@ def _dataset_metadata_dict(ds: Dataset) -> Dict[str, Any]:
 
     # sort sources by name
     if "sources" in d:
-        d["sources"] = sorted(d["sources"], key=lambda x: x["name"] or "")
+        d["sources"] = sorted(d["sources"], key=lambda x: x.get("name") or "")
 
     d.pop("source_checksum", None)
     return d
@@ -596,7 +600,10 @@ def _remote_catalog_datasets(channels: Iterable[CHANNEL], include: str, exclude:
     mapping = {}
     for path in ds_paths:
         uri = f"{OWID_CATALOG_URI}{path}/index.json"
-        ds_meta = DatasetMeta(**requests.get(uri).json())
+        js = requests.get(uri).json()
+        # drop origins for backward compatibility
+        js.pop("origins", None)
+        ds_meta = DatasetMeta(**js)
         # TODO: channel should be in DatasetMeta by default
         ds_meta.channel = path.split("/")[0]  # type: ignore
         table_names = frame.loc[frame["ds_paths"] == path, "table"].tolist()

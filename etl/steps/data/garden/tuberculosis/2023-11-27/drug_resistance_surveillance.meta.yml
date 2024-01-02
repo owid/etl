@@ -126,6 +126,12 @@ tables:
         unit: patients
         description_short: Number of bacteriologically confirmed pulmonary tuberculosis patients with rifampicin susceptibility whose HIV status is unknown. Rifampicin is an antibiotic medication used primarily in the treatment of tuberculosis and other bacterial infections; it works by inhibiting the growth of bacteria.
         description_from_producer: Among new and previously treated patients that have confirmed pulmonary tuberculosis cases with results for rifampicin testing, number susceptible to rifampicin and whose HIV status is unknown.
+      nrr_hivall:
+        title: Bacteriologically confirmed pulmonary tuberculosis patients with rifampicin susceptibility
+        unit: patients
+        description_short: Number of bacteriologically confirmed pulmonary tuberculosis patients with rifampicin susceptibility. Rifampicin is an antibiotic medication used primarily in the treatment of tuberculosis and other bacterial infections; it works by inhibiting the growth of bacteria.
+        description_processing: |-
+          This variable is calculated as the sum of the following variables: Bacteriologically confirmed pulmonary tuberculosis patients with rifampicin susceptibility who are HIV-positive, HIV-negative and whose HIV status is unknown.
       rr_014:
         title: Bacteriologically confirmed pulmonary tuberculosis patients with rifampicin resistance who are aged 0-14 years
         unit: patients
@@ -236,3 +242,8 @@ tables:
         unit: patients
         description_short: Number of bacteriologically confirmed pulmonary tuberculosis patients with extensively drug-resistant tuberculosis.
         description_from_producer: "Among pulmonary multidrug-resistant tuberculosis patients with drug susceptibility test results for any fluoroquinolone (FQ) and any second-line injectable agent (2LI) (variable mdr_dst_rlt): number with any resistance to both FQ and 2LI (i.e. XDR-tuberculosis in pre-2020 definitions)"
+      rr_share:
+        title: Share of new tested bacteriologically confirmed pulmonary tuberculosis patients that have rifampicin resistance
+        unit: "%"
+        short_unit: "%"
+        description_short: Share of new tested bacteriologically confirmed pulmonary tuberculosis patients that have rifampicin resistance. Rifampicin is an antibiotic medication used primarily in the treatment of tuberculosis and other bacterial infections; it works by inhibiting the growth of bacteria.

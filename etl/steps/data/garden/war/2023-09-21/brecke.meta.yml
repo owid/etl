@@ -3,14 +3,16 @@ definitions:
     presentation:
       topic_tags:
         - War & Peace
+      grapher_config:
+        selectedEntityNames:
+          - Africa
+          - Americas
+          - Asia and Oceania
+          - Europe
+          - Middle East
+
 
   all:
-    selectedEntityNames: &selected_entities
-      - Africa
-      - Americas
-      - Asia and Oceania
-      - Europe
-      - Middle East
     conflict_type_ongoing: |-
       <% if conflict_type == "all" %>
       An ongoing armed conflict is a disagreement between organized groups, or between an organized group and civilians, that causes at least 32 deaths during a year.
@@ -21,7 +23,7 @@ definitions:
       <% endif %>
     interstate_conflicts: |-
       <% if (conflict_type == "interstate" or conflict_type == "internal") %>
-      We identify interstate conflicts in the Conflict Catalog using the approach by Seshat (while correcting any mistakes for the 200 deadliest conflicts): https://seshatdatabank.info/cleaning-history-data-the-conflict-catalogue/
+      We identify interstate conflicts in the Conflict Catalog using the approach by Seshat (while correcting any mistakes for the 200 deadliest conflicts): https://web.archive.org/web/20230606184656/https://seshatdatabank.info/cleaning-history-data-the-conflict-catalogue/
       <% endif %>
 
   number_deaths:
@@ -119,7 +121,9 @@ tables:
           numDecimalPlaces: 0
         presentation:
           grapher_config:
-            selectedEntityNames: *selected_entities
+            selectedEntityNames:
+              - World
+
 
       number_deaths_ongoing_conflicts_per_capita:
         title: Number of deaths in ongoing conflicts (per capita)
@@ -131,7 +135,8 @@ tables:
           numDecimalPlaces: 1
         presentation:
           grapher_config:
-            selectedEntityNames: *selected_entities
+            selectedEntityNames:
+              - World
 
       #####################
       # Ongoing conflicts #
@@ -144,9 +149,6 @@ tables:
         description_key: *description_key_ongoing
         display:
           numDecimalPlaces: 0
-        presentation:
-          grapher_config:
-            selectedEntityNames: *selected_entities
 
       number_ongoing_conflicts_per_country:
         title: Number of ongoing conflicts per country
@@ -157,9 +159,6 @@ tables:
         processing_level: major
         display:
           numDecimalPlaces: 3
-        presentation:
-          grapher_config:
-            selectedEntityNames: *selected_entities
 
       number_ongoing_conflicts_per_country_pair:
         title: Number of ongoing conflicts per country-pair
@@ -170,9 +169,6 @@ tables:
         processing_level: major
         display:
           numDecimalPlaces: 5
-        presentation:
-          grapher_config:
-            selectedEntityNames: *selected_entities
 
       #################
       # New conflicts #
@@ -185,9 +181,6 @@ tables:
         description_key: *description_key_new
         display:
           numDecimalPlaces: 0
-        presentation:
-          grapher_config:
-            selectedEntityNames: *selected_entities
 
       number_new_conflicts_per_country:
         title: Number of new conflicts per country
@@ -198,9 +191,6 @@ tables:
         processing_level: major
         display:
           numDecimalPlaces: 3
-        presentation:
-          grapher_config:
-            selectedEntityNames: *selected_entities
 
       number_new_conflicts_per_country_pair:
         title: Number of new conflicts per country-pair
@@ -211,6 +201,3 @@ tables:
         processing_level: major
         display:
           numDecimalPlaces: 5
-        presentation:
-          grapher_config:
-            selectedEntityNames: *selected_entities

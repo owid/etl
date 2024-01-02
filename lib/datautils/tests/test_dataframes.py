@@ -215,6 +215,9 @@ class TestAreDataFramesEqual:
 
 
 class TestGroupbyAggregate:
+    # NOTE: Sometimes, groupby_agg applied to a bool column changes its type to object.
+    # But this is something that also happens to a normal groupby().agg().
+
     def test_default_aggregate_single_groupby_column_as_string(self):
         df_in = pd.DataFrame(
             {
@@ -345,9 +348,9 @@ class TestGroupbyAggregate:
                 "year": [2001, 2002, 2003],
                 "value_01": [np.nan, np.nan, 15.0],
                 "value_02": [np.nan, np.nan, "def"],
+                "value_03": [np.nan, False, np.nan],
             }
         ).set_index("year")
-        df_out["value_03"] = pd.Series([np.nan, 0, np.nan], index=[2001, 2002, 2003], dtype=object)
         assert dataframes.are_equal(
             df1=dataframes.groupby_agg(
                 df_in,
@@ -373,9 +376,9 @@ class TestGroupbyAggregate:
                 "year": [2001, 2002, 2003],
                 "value_01": [0.0, 2.0, 15.0],
                 "value_02": [0, "b", "def"],
+                "value_03": [False, False, np.nan],
             }
         ).set_index("year")
-        df_out["value_03"] = pd.Series([0, 0, np.nan], index=[2001, 2002, 2003], dtype=object)
         assert dataframes.are_equal(
             df1=dataframes.groupby_agg(
                 df_in,
@@ -401,9 +404,9 @@ class TestGroupbyAggregate:
                 "year": [2001, 2002, 2003],
                 "value_01": [0.0, 2.0, 15.0],
                 "value_02": [0, "b", "def"],
+                "value_03": [0, 0, True],
             }
         ).set_index("year")
-        df_out["value_03"] = pd.Series([0, 0, 1], index=[2001, 2002, 2003], dtype=object)
         assert dataframes.are_equal(
             df1=dataframes.groupby_agg(
                 df_in,
@@ -429,9 +432,9 @@ class TestGroupbyAggregate:
                 "year": [2001, 2002, 2004],
                 "value_01": [0.0, 2.0, 22.0],
                 "value_02": [0, "b", "defg"],
+                "value_03": [0, 0, True],
             }
         ).set_index("year")
-        df_out["value_03"] = pd.Series([0, 0, 1], index=[2001, 2002, 2004], dtype=object)
         assert dataframes.are_equal(
             df1=dataframes.groupby_agg(
                 df_in,
@@ -457,9 +460,9 @@ class TestGroupbyAggregate:
                 "year": [2001, 2002, 2003],
                 "value_01": [np.nan, np.nan, 15.0],
                 "value_02": [np.nan, np.nan, "def"],
+                "value_03": [np.nan, False, np.nan],
             }
         ).set_index("year")
-        df_out["value_03"] = pd.Series([np.nan, 0, np.nan], index=[2001, 2002, 2003], dtype=object)
         assert dataframes.are_equal(
             df1=dataframes.groupby_agg(
                 df_in,
@@ -485,9 +488,9 @@ class TestGroupbyAggregate:
                 "year": [2001, 2002, 2003],
                 "value_01": [np.nan, 2.0, 15.0],
                 "value_02": [np.nan, "b", "def"],
+                "value_03": [np.nan, False, np.nan],
             }
         ).set_index("year")
-        df_out["value_03"] = pd.Series([np.nan, 0, np.nan], index=[2001, 2002, 2003], dtype=object)
         assert dataframes.are_equal(
             df1=dataframes.groupby_agg(
                 df_in,
@@ -513,9 +516,11 @@ class TestGroupbyAggregate:
                 "year": [2001, 2002, 2003],
                 "value_01": [np.nan, 2.0, 15.0],
                 "value_02": [np.nan, "b", "def"],
+                # NOTE: The bool type of column "value_03" is not respected, the result is type object.
+                # But this is something that also happens to a normal groupby().agg().
+                "value_03": [np.nan, 0, True],
             }
         ).set_index("year")
-        df_out["value_03"] = pd.Series([np.nan, 0, 1], index=[2001, 2002, 2003], dtype=object)
         assert dataframes.are_equal(
             df1=dataframes.groupby_agg(
                 df_in,
@@ -552,9 +557,9 @@ class TestGroupbyAggregate:
                 "year": [2001, 2002, 2003, 2004],
                 "value_01": [0, 2.0, 15.0, 7],
                 "value_02": [0, "b", "def", "ghij"],
+                "value_03": [0, 0, True, True],
             }
         ).set_index("year")
-        df_out["value_03"] = pd.Series([0, 0, 1, 1], index=[2001, 2002, 2003, 2004], dtype=object)
         assert dataframes.are_equal(
             df1=dataframes.groupby_agg(
                 df_in,
@@ -591,9 +596,9 @@ class TestGroupbyAggregate:
                 "year": [2001, 2002, 2003, 2004],
                 "value_01": [np.nan, 2.0, 15.0, np.nan],
                 "value_02": [np.nan, "b", "def", "ghij"],
+                "value_03": [np.nan, False, np.nan, np.nan],
             }
         ).set_index("year")
-        df_out["value_03"] = pd.Series([np.nan, 0, np.nan, np.nan], index=[2001, 2002, 2003, 2004], dtype=object)
         assert dataframes.are_equal(
             df1=dataframes.groupby_agg(
                 df_in,
@@ -693,6 +698,134 @@ class TestGroupbyAggregate:
             df1=df_exp,
             df2=df_out,
             verbose=True,
+        )[0]
+
+    def test_default_aggregate_with_min_num_values_0(self):
+        # Having min_num_values = 0 should yield the same result as None: All nans are treated as zeros.
+        df_in = pd.DataFrame(
+            {
+                "year": [2001, 2002, 2002, 2003, 2003, 2003, 2004, 2004, 2004, 2004],
+                "value_01": [np.nan, 2, np.nan, 4, 5, 6, 7, np.nan, np.nan, np.nan],
+                "value_02": [np.nan, "b", np.nan, "d", np.nan, np.nan, "g", "h", "i", "j"],
+                "value_03": [
+                    np.nan,
+                    False,
+                    False,
+                    True,
+                    np.nan,
+                    np.nan,
+                    np.nan,
+                    np.nan,
+                    np.nan,
+                    True,
+                ],
+            }
+        )
+        df_out = pd.DataFrame(
+            {
+                "year": [2001, 2002, 2003, 2004],
+                "value_01": [0, 2.0, 15.0, 7.0],
+                "value_02": [0, "b", "d", "ghij"],
+                "value_03": [0, False, True, True],
+            }
+        ).set_index("year")
+        assert dataframes.are_equal(
+            df1=dataframes.groupby_agg(
+                df_in,
+                ["year"],
+                aggregations=None,
+                num_allowed_nans=None,
+                frac_allowed_nans=None,
+                min_num_values=0,
+            ),
+            df2=df_out,
+        )[0]
+
+    def test_default_aggregate_with_min_num_values_1(self):
+        df_in = pd.DataFrame(
+            {
+                "year": [2001, 2002, 2002, 2003, 2003, 2003, 2004, 2004, 2004, 2004],
+                "value_01": [np.nan, 2, np.nan, 4, 5, 6, 7, np.nan, np.nan, np.nan],
+                "value_02": [np.nan, "b", np.nan, "d", np.nan, np.nan, "g", "h", "i", "j"],
+                "value_03": [
+                    np.nan,
+                    False,
+                    False,
+                    True,
+                    np.nan,
+                    np.nan,
+                    np.nan,
+                    np.nan,
+                    np.nan,
+                    True,
+                ],
+            }
+        )
+        df_out = pd.DataFrame(
+            {
+                "year": [2001, 2002, 2003, 2004],
+                "value_01": [np.nan, 2.0, 15.0, 7.0],
+                "value_02": [np.nan, "b", "d", "ghij"],
+                "value_03": [np.nan, False, True, True],
+            }
+        ).set_index("year")
+        assert dataframes.are_equal(
+            df1=dataframes.groupby_agg(
+                df_in,
+                ["year"],
+                aggregations=None,
+                num_allowed_nans=None,
+                frac_allowed_nans=None,
+                min_num_values=1,
+            ),
+            df2=df_out,
+        )[0]
+
+    def test_default_aggregate_with_min_num_values_2(self):
+        df_in = pd.DataFrame(
+            {
+                "year": [2001, 2002, 2002, 2003, 2003, 2003, 2004, 2004, 2004, 2004],
+                "value_01": [1, 2, np.nan, 4, 5, 6, 7, 8, np.nan, np.nan],
+                "value_02": [np.nan, "b", "c", "d", np.nan, np.nan, "g", "h", "i", "j"],
+                "value_03": [
+                    np.nan,
+                    False,
+                    False,
+                    True,
+                    np.nan,
+                    np.nan,
+                    np.nan,
+                    np.nan,
+                    np.nan,
+                    True,
+                ],
+            }
+        )
+        df_out = pd.DataFrame(
+            {
+                "year": [2001, 2002, 2003, 2004],
+                # Now min_num_values=2, therefore:
+                # 2001 "value_01" has one real value. This is smaller than min_num_values=2, however, the aggregate
+                # should still be a valid number, since we impose that, if there are no nans, the aggregate should
+                # exist, regardless of the number of elements in the group.
+                # 2001 "value_02" has only one value, and it's a nan, so the aggregate should be nan.
+                # 2002 "value_01" has two elements, but only one is nan, hence the aggregate should be nan.
+                # Idem for 2003 "value_02", and 2003 "value_03".
+                "value_01": [1, np.nan, 15.0, 15],
+                "value_02": [np.nan, "bc", np.nan, "ghij"],
+                "value_03": [np.nan, False, np.nan, np.nan],
+            }
+        ).set_index("year")
+        assert dataframes.are_equal(
+            df1=dataframes.groupby_agg(
+                df_in,
+                ["year"],
+                aggregations=None,
+                num_allowed_nans=None,
+                frac_allowed_nans=None,
+                min_num_values=2,
+            ),
+            df2=df_out,
         )[0]
 
 

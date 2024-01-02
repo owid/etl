@@ -15,5 +15,5 @@ def run(dest_dir: str) -> None:
     tb = catalog.Table(data, short_name=P.short_name)
 
     # add table, update metadata from *.meta.yml and save
-    ds = create_dataset(dest_dir, tables=[tb])
+    ds = create_dataset(dest_dir, tables=[tb.set_index(["country", "year"])])
     ds.save()

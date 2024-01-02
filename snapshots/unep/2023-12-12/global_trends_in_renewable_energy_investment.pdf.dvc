@@ -1,0 +1,28 @@
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Global trends in renewable energy investment
+    date_published: 2020-06-11
+
+    # Citation
+    producer: Frankfurt School-UNEP Centre/BNEF
+    citation_full: |-
+      Frankfurt School-UNEP Centre/BNEF. 2020.
+      Global Trends in Renewable Energy Investment 2020, http://www.fs-unep-centre.org (Frankfurt am Main).
+    attribution_short: FS-UNEP
+
+    # Files
+    url_main: https://wedocs.unep.org/handle/20.500.11822/32700
+    url_download: https://sdghelpdesk.unescap.org/sites/default/files/2020-09/GTR20.pdf
+    date_accessed: 2023-12-12
+
+    # License
+    license:
+      name: ©Frankfurt School of Finance & Management gGmbH 2020
+      url: https://sdghelpdesk.unescap.org/sites/default/files/2020-09/GTR20.pdf
+
+wdir: ../../../data/snapshots/unep/2023-12-12
+outs:
+- md5: 9c2b121bef8bb635650d1a224aa7a09e
+  size: 4683701
+  path: global_trends_in_renewable_energy_investment.pdf

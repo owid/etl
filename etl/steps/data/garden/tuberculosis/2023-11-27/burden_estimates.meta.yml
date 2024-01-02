@@ -211,39 +211,39 @@ tables:
           numDecimalPlaces: 0
       cfr:
         title: Case fatality ratio
-        description_short: The proportion of people diagnosed with [tuberculosis](#dod:tuberculosis), who end up dying of it.
+        description_short: The estimated proportion of people diagnosed with [tuberculosis](#dod:tuberculosis), who end up dying of it.
         unit: "deaths per individual diagnosed with tuberculosis"
         display:
           numDecimalPlaces: 2
       cfr_lo:
         title: Case fatality ratio (low bound)
-        description_short: The proportion of people diagnosed with [tuberculosis](#dod:tuberculosis), who end up dying of it.
+        description_short: The estimated proportion of people diagnosed with [tuberculosis](#dod:tuberculosis), who end up dying of it.
         unit: "deaths per individual diagnosed with tuberculosis"
         display:
           numDecimalPlaces: 2
       cfr_hi:
         title: Case fatality ratio (high bound)
-        description_short: The proportion of people diagnosed with [tuberculosis](#dod:tuberculosis), who end up dying of it.
+        description_short: The estimated proportion of people diagnosed with [tuberculosis](#dod:tuberculosis), who end up dying of it.
         unit: "deaths per individual diagnosed with tuberculosis"
         display:
           numDecimalPlaces: 2
       cfr_pct:
         title: Case fatality ratio (percentage)
-        description_short: The percentage of people diagnosed with [tuberculosis](#dod:tuberculosis), who end up dying of it.
+        description_short: The estimated percentage of people diagnosed with [tuberculosis](#dod:tuberculosis), who end up dying of it.
         unit: "%"
         short_unit: "%"
         display:
           numDecimalPlaces: 1
       cfr_pct_lo:
         title: Case fatality ratio (percentage; low bound)
-        description_short: The percentage of people diagnosed with [tuberculosis](#dod:tuberculosis), who end up dying of it.
+        description_short: The estimated percentage of people diagnosed with [tuberculosis](#dod:tuberculosis), who end up dying of it.
         unit: "%"
         short_unit: "%"
         display:
           numDecimalPlaces: 1
       cfr_pct_hi:
         title: Case fatality ratio (percentage; high bound)
-        description_short: The percentage of people diagnosed with [tuberculosis](#dod:tuberculosis), who end up dying of it.
+        description_short: The estimated percentage of people diagnosed with [tuberculosis](#dod:tuberculosis), who end up dying of it.
         unit: "%"
         short_unit: "%"
         display:

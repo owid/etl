@@ -98,6 +98,22 @@ def grapher_checks(ds: catalog.Dataset) -> None:
                 tab[col].m.origins or tab[col].m.sources or ds.metadata.sources
             ), f"Column `{col}` must have either sources or origins"
 
+            # Data Page title uses the following fallback
+            # [title_public > grapher_config.title > display.name > title] - [attribution_short] - [title_variant]
+            # the Table tab
+            # [title_public > display.name > title] - [title_variant] - [attribution_short]
+            # and chart heading
+            # [grapher_config.title > title_public > display.name > title] - [grapher_config.subtitle > description_short]
+            #
+            # Warn if display.name (which is used for legend) exists and there's no title_public set. This
+            # would override the indicator title in the Data Page.
+            display_name = (tab[col].m.display or {}).get("name")
+            title_public = getattr(tab[col].m.presentation, "title_public", None)
+            if display_name and not title_public:
+                log.warning(
+                    f"Column {col} uses display.name but no presentation.title_public. Ensure the latter is also defined, otherwise display.name will be used as the indicator's title.",
+                )
+
 
 def create_dataset(
     dest_dir: Union[str, Path],

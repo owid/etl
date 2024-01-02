@@ -657,18 +657,14 @@
       },
       "name": {
         "type": "string",
-        "description": "Title to display for the indicator, to replace the indicator's `title`. NOTE: Currently, `grapher_config.title` will be used only in charts, whereas `display.name` will be used in other places, like the table tab.",
+        "description": "Indicator's title to display in the legend of a chart. NOTE: For backwards compatibility, `display.name` also replaces the indicator's title in other public places. Therefore, whenever `display.name` is defined, `title_public` should also be defined.",
         "examples": [
-          "Number of neutron star mergers in the Milky Way",
-          "Share of neutron star mergers that happen in the Milky Way",
-          "Area harvested of barley"
+          "Agriculture",
+          "Area harvested"
         ],
         "examples_bad": [
           [
-            "Number of neutron stars (NASA)"
-          ],
-          [
-            "Share of neutron star mergers that happen in the Milky Way (2023)"
+            "Nitrous oxide emissions from agriculture"
           ],
           [
             "Barley | 00000044 || Area harvested | 005312 || hectares"
@@ -677,16 +673,10 @@
         "requirement_level": "required",
         "guidelines": [
           [
-            "Must be suitable to be publicly displayed, even for 'big datasets' with many dimensions."
-          ],
-          [
-            "Must start with a capital letter."
+            "Must be very short, to fit the legend of a chart."
           ],
           [
             "Must not end with a period."
-          ],
-          [
-            "Must be one short sentence (a few words)."
           ],
           [
             "Should not mention other metadata fields like `producer` or `version`."

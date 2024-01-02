@@ -710,7 +710,7 @@ class Table(pd.DataFrame):
         parents: Optional[List[Any]] = None,
         variable_names: Optional[List[str]] = None,
         comment: Optional[str] = None,
-    ) -> None:
+    ) -> "Table":
         # Append a new entry to the processing log of the required variables.
         if variable_names is None:
             # If no variable is specified, assume all (including index columns).
@@ -725,26 +725,26 @@ class Table(pd.DataFrame):
                 operation=operation,
                 comment=comment,
             )
+        return self
 
-    # TODO: make this work with plog
-    # def amend_log(
-    #     self,
-    #     operation: str,
-    #     parents: Optional[List[Any]] = None,
-    #     variable_names: Optional[List[str]] = None,
-    #     comment: Optional[str] = None,
-    #     entry_num: Optional[int] = -1,
-    #     inplace: bool = False,
-    # ) -> Optional["Table"]:
-    #     return amend_log(
-    #         table=self,
-    #         operation=operation,
-    #         parents=parents,
-    #         variable_names=variable_names,
-    #         comment=comment,
-    #         entry_num=entry_num,
-    #         inplace=inplace,
-    #     )
+    def amend_log(
+        self,
+        variable_names: Optional[List[str]] = None,
+        comment: Optional[str] = None,
+        operation: Optional[str] = None,
+    ) -> "Table":
+        """Amend operation or comment of the latest processing log entry."""
+        # Append a new entry to the processing log of the required variables.
+        if variable_names is None:
+            # If no variable is specified, assume all (including index columns).
+            variable_names = list(self.all_columns)
+        for column in variable_names:
+            # Update (in place) the processing log of current variable.
+            self._fields[column].processing_log.amend_entry(
+                operation=operation,
+                comment=comment,
+            )
+        return self
 
     def sort_values(self, by: str, *args, **kwargs) -> "Table":
         tb = super().sort_values(by=by, *args, **kwargs).copy()
@@ -893,6 +893,20 @@ class Table(pd.DataFrame):
         column_idx_new = [renames.get(col, col) for col in column_idx]
         tb = self.reset_index().rename(columns=renames)
         tb = tb.set_index(column_idx_new)
+        return tb
+
+    def fillna(self, value, **kwargs) -> "Table":
+        """Usual fillna, but, if the object given to fill values with is a table, transfer its metadata to the filled
+        table."""
+        tb = super().fillna(value, **kwargs)
+
+        if type(value) == type(self):
+            for column in tb.columns:
+                if column in value.columns:
+                    tb._fields[column] = variables.combine_variables_metadata(
+                        variables=[tb[column], value[column]], operation="fillna", name=column
+                    )
+
         return tb
 
 
@@ -1417,6 +1431,20 @@ def read_rda(
     return cast(Table, table)
 
 
+def read_rds(
+    filepath_or_buffer: Union[str, Path, IO[AnyStr]],
+    metadata: Optional[TableMeta] = None,
+    origin: Optional[Origin] = None,
+    underscore: bool = False,
+) -> Table:
+    parsed = rdata.parser.parse_file(filepath_or_buffer, extension="rds")  # type: ignore
+    converted = rdata.conversion.convert(parsed)
+
+    table = Table(converted, underscore=underscore)
+    table = _add_table_and_variables_metadata_to_table(table=table, metadata=metadata, origin=origin)
+    return cast(Table, table)
+
+
 class ExcelFile(pd.ExcelFile):
     def __init__(self, *args, metadata: Optional[TableMeta] = None, origin: Optional[Origin] = None, **kwargs):
         super().__init__(*args, **kwargs)
@@ -1507,40 +1535,6 @@ def copy_metadata(from_table: Table, to_table: Table, deep=False) -> Table:
 
     tab._fields = new_fields
     return tab
-
-
-# TODO: make this work
-# def amend_log(
-#     table: Table,
-#     operation: str,
-#     parents: Optional[List[Any]] = None,
-#     variable_names: Optional[List[str]] = None,
-#     comment: Optional[str] = None,
-#     entry_num: Optional[int] = -1,
-#     inplace: bool = False,
-# ) -> Optional[Table]:
-#     if not inplace:
-#         table = table.copy()
-
-#     # Append a new entry to the processing log of the required variables.
-#     if variable_names is None:
-#         # If no variable is specified, assume all (including index columns).
-#         variable_names = list(table.all_columns)
-#     for column in variable_names:
-#         # If parents is not defined, assume the parents are simply the current variable.
-#         _parents = parents or [column]
-#         # Update (in place) the processing log of current variable.
-#         table._fields[column].processing_log = variables.amend_entry_in_processing_log(
-#             processing_log=table._fields[column].processing_log,
-#             variable_name=column,
-#             parents=_parents,
-#             operation=operation,
-#             comment=comment,
-#             entry_num=entry_num,
-#         )
-
-#     if not inplace:
-#         return table
 
 
 def get_unique_sources_from_tables(tables: List[Table]) -> List[Source]:

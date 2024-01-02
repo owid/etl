@@ -159,6 +159,9 @@ def run(dest_dir: str) -> None:
     msk = tb["region"] != "World"
     tb.loc[msk, "region"] = tb.loc[msk, "region"] + " (Brecke)"
 
+    # HOTFIX: Remove datapoints related to death count (and rates) for regions other than 'World'
+    tb.loc[msk, ["number_deaths_ongoing_conflicts", "number_deaths_ongoing_conflicts_per_capita"]] = np.nan
+
     # Set index
     log.info("war.brecke: set index")
     tb = tb.set_index(["year", "region", "conflict_type"], verify_integrity=True)

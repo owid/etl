@@ -2,8 +2,8 @@ definitions:
   # NOTE: we'd like to move this to snapshot, but it's impractical because there are
   # tons of other downstream datasets that still use sources
   wdi_origin: &wdi_origin
-    producer: World Bank World Development Indicators
-    title: UNICEF; World Health Organization; World Bank
+    producer: World Bank
+    title: World Bank World Development Indicators
     description: |-
       The World Development Indicators (WDI) is the World Bank's primary collection of development indicators, compiled from officially-recognized international sources. It presents the most current and accurate global development data available and includes national, regional, and global estimates.
 
@@ -69,10 +69,8 @@ tables:
           numDecimalPlaces: 1
           tolerance: 5
         description_key:
-          - An Internet user is defined by the International Telecommunication Union as anyone
-            who has accessed the Internet from any location in the last three months.
-          - This can be from any type of device, including a computer, mobile phone, personal digital
-            assistant, games machine, digital TV, and other technological devices.
+          - An Internet user is defined by the International Telecommunication Union as anyone who has accessed the Internet from any location in the last three months.
+          - This can be from any type of device, including a computer, mobile phone, personal digital assistant, games machine, digital TV, and other technological devices.
         processing_level: minor
         presentation:
           title_public: Share of the population using the Internet
@@ -80,9 +78,9 @@ tables:
           title_variant: International Telecommunication Union
           # attribution: # defaults to origin[*].producer so does not have to be set here
           topic_tags:
-          - Internet
-          - Technological Change
-          - Loneliness & Social Connections
+            - Internet
+            - Technological Change
+            - Loneliness & Social Connections
           faqs: []
           grapher_config:
             title: Share of the population using the Internet
@@ -101,33 +99,33 @@ tables:
             map:
               timeTolerance: 5
               colorScale:
-                  baseColorScheme: Blues
-                  colorSchemeInvert: false
-                  binningStrategy: manual
-                  customNumericMinValue: 0
-                  customNumericValues:
-                    - 10
-                    - 20
-                    - 30
-                    - 40
-                    - 50
-                    - 60
-                    - 70
-                    - 80
-                    - 90
-                    - 100
-                  customNumericLabels:
-                    - ''
-                    - ''
-                    - ''
-                    - ''
-                    - ''
-                    - ''
-                    - ''
-                    - ''
-                    - ''
-                    - ''
-                  legendDescription: Individuals using the Internet (% of population)
+                baseColorScheme: Blues
+                colorSchemeInvert: false
+                binningStrategy: manual
+                customNumericMinValue: 0
+                customNumericValues:
+                  - 10
+                  - 20
+                  - 30
+                  - 40
+                  - 50
+                  - 60
+                  - 70
+                  - 80
+                  - 90
+                  - 100
+                customNumericLabels:
+                  - ''
+                  - ''
+                  - ''
+                  - ''
+                  - ''
+                  - ''
+                  - ''
+                  - ''
+                  - ''
+                  - ''
+                legendDescription: Individuals using the Internet (% of population)
             selectedEntityNames:
               - South Asia (WB)
               - North America (WB)
@@ -141,16 +139,11 @@ tables:
         sources: []
         origins:
           - *wdi_origin
-        # title: Prevalence of stunting, height for age (% of children under 5)
         title: Share of children who are stunted
         unit: '% of children under 5'
         short_unit: '%'
         description_short: |-
           The share of children younger than five years old whose growth is stunted.
-        # description: Prevalence of stunting is the percentage of children under age 5 whose height for age is more than two
-        #   standard deviations below the median for the international reference population ages 0-59 months. For children up
-        #   to two years old height is measured by recumbent length. For older children height is measured by stature while
-        #   standing. The data are based on the WHO's new child growth standards released in 2006.
         description_key:
           - Stunting is when a child is significantly shorter than the average for their age.
           - Stunted growth is a consequence of poor nutrition and/or repeated infection.
@@ -175,7 +168,6 @@ tables:
             - fragment_id: stunting-causes
               gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
           grapher_config:
-            slug: share-of-children-younger-than-5-who-suffer-from-stunting
             title: 'Malnutrition: Share of children who are stunted'
             subtitle: >-
               The share of children younger than five years old that are defined as stunted.
@@ -193,9 +185,7 @@ tables:
             originUrl: https://ourworldindata.org/hunger-and-undernourishment
             yAxis:
               min: 0
-              max: 0
             map:
-              columnSlug: '735978'
               timeTolerance: 5
               colorScale:
                 baseColorScheme: YlOrRd
@@ -237,3 +227,140 @@ tables:
                   https://ourworldindata.org/grapher/share-of-children-younger-than-5-who-suffer-from-stunting#faqs
                 text: FAQs on this data
             $schema: https://files.ourworldindata.org/schemas/grapher-schema.003.json
+      ny_gdp_pcap_pp_kd:
+        sources: []
+        origins:
+          - *wdi_origin
+        title: GDP per capita, PPP (constant 2017 international $)
+        unit: international-$ in 2017 prices
+        short_unit: $
+        display:
+          name: GDP per capita
+          numDecimalPlaces: 0
+          tolerance: 5
+        description_short: This data is adjusted for inflation and for differences in the cost of living between countries.
+        description_key:
+          - This GDP per capita indicator provides information on economic growth and income levels from 1990.
+          - This data is adjusted for inflation and for differences in the cost of living between countries.
+          - This data is expressed in international-$ at 2017 prices.
+          - For GDP per capita estimates in the very long run, see the [Maddison Project Database's indicator](https://ourworldindata.org/grapher/gdp-per-capita-maddison).
+        description_from_producer: |
+          GDP per capita based on purchasing power parity (PPP). PPP GDP is gross domestic product converted to international dollars using purchasing power parity rates. An international dollar has the same purchasing power over GDP as the U.S. dollar has in the United States. GDP at purchaser's prices is the sum of gross value added by all resident producers in the country plus any product taxes and minus any subsidies not included in the value of the products. It is calculated without making deductions for depreciation of fabricated assets or for depletion and degradation of natural resources. Data are in constant 2017 international dollars.
+
+          For the concept and methodology of 2017 PPP, please refer to the [International Comparison Program (ICP)’s website](https://www.worldbank.org/en/programs/icp).
+        processing_level: minor
+        presentation:
+          title_public: GDP per capita
+          attribution_short: World Bank
+          faqs:
+            - fragment_id: poverty-international-dollars
+              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+          grapher_config:
+            title: GDP per capita
+            subtitle: This data is adjusted for inflation and for differences in the cost of living between countries.
+            variantName: World Bank, constant international-$
+            originUrl: https://ourworldindata.org/economic-growth
+            hasMapTab: true
+            tab: map
+            yAxis:
+              min: 0
+              canChangeScaleType: true
+            hideAnnotationFieldsInTitle:
+              time: true
+              entity: true
+              changeInPrefix: true
+            hideRelativeToggle: false
+            map:
+              colorScale:
+                baseColorScheme: GnBu
+                binningStrategy: manual
+                customNumericValues:
+                  - 1000
+                  - 2000
+                  - 5000
+                  - 10000
+                  - 20000
+                  - 50000
+                  - 100000
+                customNumericMinValue: 0
+            selectedEntityNames:
+              - United States
+              - Germany
+              - United Kingdom
+              - France
+              - South Korea
+              - Japan
+              - China
+              - India
+            note: This data is expressed in [international-$](#dod:int_dollar_abbreviation) at 2017 prices.
+            $schema: https://files.ourworldindata.org/schemas/grapher-schema.003.json
+      eg_cft_accs_zs:
+        sources: []
+        origins:
+          - *wdi_origin
+        title: Access to clean fuels and technologies for cooking (% of population)
+        unit: '% of population'
+        short_unit: '%'
+        description_short: |-
+          Access to [clean fuels or technologies](#dod:clean-cooking-fuels) such as natural gas, electricity, and clean cookstoves reduces exposure to indoor air pollutants, a leading cause of death in low-income households.
+        description_from_producer: |-
+          Access to clean fuels and technologies for cooking is the proportion of total population primarily using clean cooking fuels and technologies for cooking. Under WHO guidelines, kerosene is excluded from clean cooking fuels.
+
+          Statistical concept and methodology: Data for access to clean fuels and technologies for cooking are based on the World Health Organization's (WHO) Global Household Energy Database. They are collected among different sources: only data from nationally representative household surveys (including national censuses) were used. Survey sources include Demographic and Health Surveys (DHS) and Living Standards Measurement Surveys (LSMS), Multi-Indicator Cluster Surveys (MICS), the World Health Survey (WHS), other nationally developed and implemented surveys, and various government agencies (for example, ministries of energy and utilities).
+
+          Trends in the proportion of the population using each fuel type are estimated using a single multivariate hierarchical model, with urban and rural disaggregation. Estimates for overall "polluting" fuels (unprocessed biomass, charcoal, coal, and kerosene) and "clean" fuels (gaseous fuels, electricity, as well as an aggregation of any other clean fuels like alcohol) are produced by aggregating estimates of relevant fuel types. The model was used to derive clean fuel use estimates for 191 countries (ref. Stoner, O., Shaddick, G., Economou, T., Gumy, S., Lewis, J., Lucio, I., Ruggeri, G. and Adair-Rohani, H. (2020), Global household energy model: a multivariate hierarchical approach to estimating trends in the use of polluting and clean fuels for cooking. J. R. Stat. Soc. C, 69: 815-839). Countries classified by the World Bank as high income (57 countries) in the 2022 fiscal year are assumed to have universal access to clean fuels and technologies for cooking.
+        presentation:
+          title_public: Share of the population with access to clean fuels for cooking
+          attribution: World Health Organization (via World Bank)
+          attribution_short: World Bank
+          topic_tags:
+            - Access to Energy
+            - Energy
+        processing_level: minor
+      eg_elc_accs_zs:
+        sources: []
+        origins:
+          - *wdi_origin
+        title: Access to electricity (% of population)
+        unit: '% of population'
+        short_unit: '%'
+        description_short: Having access to electricity is defined in international statistics as having an electricity source that can provide very basic lighting, and charge a phone or power a radio for 4 hours per day.
+        description_from_producer: |-
+          Electrification data are collected from industry, national surveys and international sources.
+
+          Statistical concept and methodology: Data for access to electricity are collected among different sources: mostly data from nationally representative household surveys (including national censuses) were used. Survey sources include Demographic and Health Surveys (DHS) and Living Standards Measurement Surveys (LSMS), Multi-Indicator Cluster Surveys (MICS), the World Health Survey (WHS), other nationally developed and implemented surveys, and various government agencies (for example, ministries of energy and utilities). Given the low frequency and the regional distribution of some surveys, a number of countries have gaps in available data.
+
+          To develop the historical evolution and starting point of electrification rates, a simple modeling approach was adopted to fill in the missing data points - around 1990, around 2000, and around 2010. Therefore, a country can have a continuum of zero to three data points. There are 42 countries with zero data point and the weighted regional average was used as an estimate for electrification in each of the data periods. 170 countries have between one and three data points and missing data are estimated by using a model with region, country, and time variables. The model keeps the original observation if data is available for any of the time periods. This modeling approach allowed the estimation of electrification rates for 212 countries over these three time periods (Indicated as \"Estimate\"). Notation \"Assumption\" refers to the assumption of universal access in countries classified as developed by the United Nations. Data begins from the year in which the first survey data is available for each country.
+        presentation:
+          title_public: Share of the population with access to electricity
+          attribution: Data compiled from multiple sources by World Bank
+          attribution_short: World Bank
+          topic_tags:
+            - Access to Energy
+            - Energy
+        processing_level: minor
+      sn_itk_defc_zs:
+        sources: []
+        origins:
+          - *wdi_origin
+        title: Prevalence of undernourishment (% of population)
+        unit: '% of population'
+        short_unit: '%'
+        description_short: Share of individuals that have a daily food intake that is insufficient to provide the amount of dietary energy required to maintain a normal, active, and healthy life.
+        description_key:
+          - Countries and regions with rates below 2.5% are coded as "2.5%" in the data.
+        description_from_producer: |-
+          Prevalence of undernourishments is the percentage of the population whose habitual food consumption is insufficient to provide the dietary energy levels that are required to maintain a normal active and healthy life. Data showing as 2.5 may signify a prevalence of undernourishment below 2.5%.
+
+          Limitations and exceptions: From a policy and program standpoint, this measure has its limits. First, food insecurity exists even where food availability is not a problem because of inadequate access of poor households to food. Second, food insecurity is an individual or household phenomenon, and the average food available to each person, even corrected for possible effects of low income, is not a good predictor of food insecurity among the population. And third, nutrition security is determined not only by food security but also by the quality of care of mothers and children and the quality of the household's health environment (Smith and Haddad 2000).
+
+          Statistical concept and methodology: Data on undernourishment are from the Food and Agriculture Organization (FAO) of the United Nations and measure food deprivation based on average food available for human consumption per person, the level of inequality in access to food, and the minimum calories required for an average person.
+        display:
+          numDecimalPlaces: 1
+        presentation:
+          title_public: Share of the population that is undernourished
+          attribution: Food and Agriculture Organization of the United Nations (via World Bank)
+          attribution_short: World Bank
+          topic_tags:
+            - Hunger & Undernourishment
+        processing_level: minor

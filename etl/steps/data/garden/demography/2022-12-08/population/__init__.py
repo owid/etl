@@ -163,13 +163,22 @@ def add_regions(df: pd.DataFrame) -> pd.DataFrame:
     df = df.loc[~df["country"].isin(regions)]
 
     # keep sources per countries, remove from df
-    # remove from df: otherwsie geo.add_region_aggregates will add this column too
+    # remove from df: otherwise geo.add_region_aggregates will add this column too
     sources = df[["country", "year", "source"]].copy()
     df = df.drop(columns=["source"])
 
     # re-estimate region aggregates
     for region in regions:
-        df = geo.add_region_aggregates(df=df, region=region, population=df)
+        # TODO: Check if keeping the default countries_that_must_have_data, num_allowed_nans_per_year, and
+        #   frac_allowed_nans_per_year makes makes no difference. In that case, keep default.
+        df = geo.add_region_aggregates(
+            df=df,
+            region=region,
+            population=df,
+            countries_that_must_have_data="auto",
+            num_allowed_nans_per_year=None,
+            frac_allowed_nans_per_year=0.2,
+        )
 
     # add sources back
     # these are only added to countries, not aggregates

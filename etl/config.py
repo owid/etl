@@ -97,8 +97,17 @@ def variable_metadata_url(variable_id):
 # run ETL steps with debugger on exception
 IPDB_ENABLED = False
 
-# number of workers for grapher inserts
-GRAPHER_INSERT_WORKERS = int(env.get("GRAPHER_WORKERS", 40))
+# number of workers for checking dirty steps, we need to parallelize this
+# because we're making a lot of HTTP requests
+DIRTY_STEPS_WORKERS = int(env.get("DIRTY_STEPS_WORKERS", 5))
+
+# default number of processes for running steps if not using --workers
+# it is 1 by default because we usually can't run multiple steps in parallel in dev
+RUN_STEPS_WORKERS = int(env.get("RUN_STEPS_WORKERS", 1))
+
+# number of workers for grapher inserts to DB
+# NOTE: make sure the product of run processes and grapher workers is constant
+GRAPHER_INSERT_WORKERS = int(env.get("GRAPHER_WORKERS", max(10, int(40 / RUN_STEPS_WORKERS))))
 
 # only upsert indicators matching this filter, this is useful for fast development
 # of data pages for a single indicator

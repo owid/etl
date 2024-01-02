@@ -4,12 +4,6 @@ definitions:
       topic_tags:
         - War & Peace
   all:
-    selectedEntityNames: &selected_entities
-      - Africa
-      - Americas
-      - Asia and Oceania
-      - Europe
-      - Middle East
     deaths_included: |-
       Deaths of combatants and civilians due to fighting are included.
     conflict_type_ongoing: |-
@@ -31,7 +25,7 @@ definitions:
       A state-based conflict is a conflict between two armed groups, at least one of which is a state, that causes at least 25 deaths during a year.
       <%- endif -%>
     location_conflicts_method: |-
-      UCDP provides geographical coordinates of each conflict event. We have mapped this coordinates to countries by means of the Natural Earth dataset.
+      UCDP provides geographical coordinates of each conflict event. We have mapped these coordinates to countries by means of the Natural Earth dataset.
 
       In some instances, the event's coordinates fall within the borders of a country. Other times, the event's coordinates fall outside the borders of a country. In the latter case, we have mapped the event to the country that is closest to the event's coordinates.
 
@@ -181,6 +175,8 @@ tables:
           numDecimalPlaces: 0
         description_short: |-
           Whether the country participated in a conflict (of a specific kind) in a given year.
+        presentation:
+          attribution: Uppsala Conflict Data Program and Peace Research Institute Oslo (2023)
 
       number_participants:
         title: Number of countries in conflict
@@ -189,6 +185,8 @@ tables:
           numDecimalPlaces: 0
         description_short: |-
           The number of countries that participated in a conflict (of a specific kind) in a given year and region.
+        presentation:
+          attribution: Uppsala Conflict Data Program and Peace Research Institute Oslo (2023)
 
   ucdp_locations:
     common:
@@ -263,6 +261,15 @@ tables:
 
 
   ucdp:
+    common:
+      presentation:
+        grapher_config:
+          selectedEntityNames:
+            - Africa
+            - Americas
+            - Asia and Oceania
+            - Europe
+            - Middle East
     variables:
       ##################
       # Ongoing deaths #
@@ -276,9 +283,6 @@ tables:
         description_key: *description_key_deaths
         display:
           numDecimalPlaces: 0
-        presentation:
-          grapher_config:
-            selectedEntityNames: *selected_entities
 
       number_deaths_ongoing_conflicts_high:
         title: Number of deaths in ongoing conflicts (high estimate)
@@ -289,9 +293,6 @@ tables:
         description_key: *description_key_deaths
         display:
           numDecimalPlaces: 0
-        presentation:
-          grapher_config:
-            selectedEntityNames: *selected_entities
 
       number_deaths_ongoing_conflicts_low:
         title: Number of deaths in ongoing conflicts (low estimate)
@@ -302,9 +303,6 @@ tables:
         description_key: *description_key_deaths
         display:
           numDecimalPlaces: 0
-        presentation:
-          grapher_config:
-            selectedEntityNames: *selected_entities
 
       number_deaths_ongoing_conflicts_per_capita:
         title: Number of deaths in ongoing conflicts (best estimate, per capita)
@@ -316,8 +314,7 @@ tables:
         display:
           numDecimalPlaces: 1
         presentation:
-          grapher_config:
-            selectedEntityNames: *selected_entities
+          attribution: Uppsala Conflict Data Program and Peace Research Institute Oslo (2023)
 
       number_deaths_ongoing_conflicts_high_per_capita:
         title: Number of deaths in ongoing conflicts (high estimate, per capita)
@@ -328,9 +325,6 @@ tables:
         description_key: *description_key_deaths
         display:
           numDecimalPlaces: 1
-        presentation:
-          grapher_config:
-            selectedEntityNames: *selected_entities
 
       number_deaths_ongoing_conflicts_low_per_capita:
         title: Number of deaths in ongoing conflicts (low estimate, per capita)
@@ -341,9 +335,6 @@ tables:
         description_key: *description_key_deaths
         display:
           numDecimalPlaces: 1
-        presentation:
-          grapher_config:
-            selectedEntityNames: *selected_entities
 
       #####################
       # Ongoing conflicts #
@@ -358,7 +349,9 @@ tables:
           numDecimalPlaces: 0
         presentation:
           grapher_config:
-            selectedEntityNames: *selected_entities
+            selectedEntityNames:
+              - World
+          attribution: Uppsala Conflict Data Program and Peace Research Institute Oslo (2023)
 
       number_ongoing_conflicts_per_country:
         title: Number of ongoing conflicts per country
@@ -369,8 +362,7 @@ tables:
         display:
           numDecimalPlaces: 3
         presentation:
-          grapher_config:
-            selectedEntityNames: *selected_entities
+          attribution: Uppsala Conflict Data Program and Peace Research Institute Oslo (2023)
 
       number_ongoing_conflicts_per_country_pair:
         title: Number of ongoing conflicts per country-pair
@@ -381,8 +373,7 @@ tables:
         display:
           numDecimalPlaces: 5
         presentation:
-          grapher_config:
-            selectedEntityNames: *selected_entities
+          attribution: Uppsala Conflict Data Program and Peace Research Institute Oslo (2023)
 
       #################
       # New conflicts #
@@ -395,9 +386,8 @@ tables:
         description_key: *description_key_new
         display:
           numDecimalPlaces: 0
-        presentation:
-          grapher_config:
-            selectedEntityNames: *selected_entities
+        presentation: # TODO
+          attribution: Uppsala Conflict Data Program and Peace Research Institute Oslo (2023)
 
       number_new_conflicts_per_country:
         title: Number of new conflicts per country
@@ -408,8 +398,7 @@ tables:
         display:
           numDecimalPlaces: 3
         presentation:
-          grapher_config:
-            selectedEntityNames: *selected_entities
+          attribution: Uppsala Conflict Data Program and Peace Research Institute Oslo (2023)
 
       number_new_conflicts_per_country_pair:
         title: Number of new conflicts per country-pair
@@ -420,5 +409,4 @@ tables:
         display:
           numDecimalPlaces: 5
         presentation:
-          grapher_config:
-            selectedEntityNames: *selected_entities
+          attribution: Uppsala Conflict Data Program and Peace Research Institute Oslo (2023)

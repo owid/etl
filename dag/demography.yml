@@ -147,3 +147,12 @@ steps:
     - data://meadow/demography/2023-11-08/modal_age_death
   data://grapher/demography/2023-11-08/modal_age_death:
     - data://garden/demography/2023-11-08/modal_age_death
+
+  # Population (Fariss et al.)
+  data://meadow/demography/2023-12-20/population_fariss:
+    - snapshot://demography/2023-12-20/population_fariss.rds
+  data://garden/demography/2023-12-20/population_fariss:
+    - data://meadow/demography/2023-12-20/population_fariss
+    - data://garden/countries/2023-09-25/gleditsch
+  data://grapher/demography/2023-12-20/population_fariss:
+    - data://garden/demography/2023-12-20/population_fariss
