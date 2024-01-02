@@ -21,6 +21,11 @@ FILES = [
     "sea_surface_temperature_world.csv",
     "sea_surface_temperature_northern_hemisphere.csv",
     "sea_surface_temperature_southern_hemisphere.csv",
+    # NOAA National Centers for Environmental Information - Ocean Heat Content.
+    "ocean_heat_content_monthly_world_700m.csv",
+    "ocean_heat_content_monthly_world_2000m.csv",
+    "ocean_heat_content_annual_world_700m.csv",
+    "ocean_heat_content_annual_world_2000m.csv",
 ]
 
 

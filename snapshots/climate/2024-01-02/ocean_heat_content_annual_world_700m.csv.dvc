@@ -1,0 +1,46 @@
+meta:
+  origin:
+    producer: NOAA National Centers for Environmental Information
+    title: Heat Content Basin Time Series
+    description: >-
+      The time series of yearly heat content are presented for the 0-700 and 0-2000
+      meters layers.
+
+
+      The yearly data for each of four major oceanic basins - the World Ocean, the
+      Pacific Ocean, the Atlantic Ocean (which
+      includes the entire Arctic Ocean), and the Indian Ocean - can be accessed on
+      [this page](https://www.ncei.noaa.gov/access/global-ocean-heat-content/basin_heat_data.html).
+    title_snapshot: Heat Content Basin Time Series - World 0 to 700 meters
+    citation_full: >-
+      National Oceanic and Atmospheric Administration (NOAA) National Centers for
+      Environmental Information (NCEI) - Heat
+      Content Monthly Basin Time Series.
+
+
+      Levitus, Sydney; Antonov, John I.; Boyer, Tim P.; Baranova, Olga K.; García,
+      Hernán E.; Locarnini, Ricardo A.; Mishonov,
+      Alexey V.; Reagan, James R.; Seidov, Dan; Yarosh, Evgeney; Zweng, Melissa M.
+      (2017). NCEI ocean heat content, temperature
+      anomalies, salinity anomalies, thermosteric sea level anomalies, halosteric
+      sea level anomalies, and total steric sea
+      level anomalies from 1955 to present calculated from in situ oceanographic subsurface
+      profile data (NCEI Accession 0164586).
+      https://doi.org/10.7289/v53f4mvp.
+    attribution: NOAA National Centers for Environmental Information - Heat Content
+      Basin Time Series (2024)
+    attribution_short: NOAA/NCEI
+    url_main: https://www.ncei.noaa.gov/products/ocean-heat-salt-sea-level
+    url_download: 
+      https://www.ncei.noaa.gov/data/oceans/woa/DATA_ANALYSIS/3M_HEAT_CONTENT/DATA/basin/3month/ohc_levitus_climdash_seasonal.csv
+    date_accessed: '2024-01-02'
+    date_published: '2024-01-02'
+    license:
+      name: CC BY 4.0
+      url: 
+        https://www.ncei.noaa.gov/sites/g/files/anmtlf171/files/2023-12/NCEI%20PD-10-2-02%20-%20Open%20Data%20Policy%20Signed.pdf
+wdir: ../../../data/snapshots/climate/2024-01-02
+outs:
+- md5: 5548a8682a8b174783b6cbd9cb0eb916
+  size: 4649
+  path: ocean_heat_content_annual_world_700m.csv

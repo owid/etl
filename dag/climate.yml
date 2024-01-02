@@ -39,12 +39,23 @@ steps:
   data://garden/climate/2024-01-02/sea_ice_index:
     - data://meadow/climate/2024-01-02/sea_ice_index
   #
+  # NOAA National Centers for Environmental Information - Ocean Heat Content.
+  #
+  data://meadow/climate/2024-01-02/ocean_heat_content:
+    - snapshot://climate/2024-01-02/ocean_heat_content_monthly_world_700m.csv
+    - snapshot://climate/2024-01-02/ocean_heat_content_monthly_world_2000m.csv
+    - snapshot://climate/2024-01-02/ocean_heat_content_annual_world_700m.csv
+    - snapshot://climate/2024-01-02/ocean_heat_content_annual_world_2000m.csv
+  # data://garden/climate/2024-01-02/ocean_heat_content:
+  #   - data://meadow/climate/2024-01-02/ocean_heat_content
+  #
   # Climate change impacts data explorer.
   #
   data://explorers/climate/latest/climate_change_impacts:
     - data://garden/climate/2024-01-02/surface_temperature_analysis
     - data://garden/climate/2024-01-02/sea_ice_index
     - data://garden/climate/2024-01-02/sea_surface_temperature
+    # - data://garden/climate/2024-01-02/ocean_heat_content
 
   ######################################################################################################################
   # Older versions to be archived once they are not used by any other steps.
