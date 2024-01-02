@@ -1,0 +1,21 @@
+# NOTE: To learn more about the fields, hover over their names.
+
+definitions:
+  common:
+    processing_level: major
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
+dataset:
+  update_period_days: 365
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
+tables:
+  moatsos_historical_poverty:
+    variables: {}
+
+
+
