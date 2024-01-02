@@ -128,7 +128,7 @@ tables:
         attribution: Uppsala Conflict Data Program and Peace Research Institute Oslo (2023)
       description_key:
         - "{definitions.all.conflict_type}"
-        - A country is considered to have participated in a conflict if they were a primary participant, which refers to those participants that have the main disagreement of the conflict.
+        - A country is considered to participate in a conflict if they were a primary participant, which refers to those participants that have the main disagreement of the conflict.
 
     variables:
       participated_in_conflict:
