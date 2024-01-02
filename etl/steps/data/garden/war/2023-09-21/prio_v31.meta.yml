@@ -113,7 +113,8 @@ definitions:
 
 
 tables:
-  # COUNTRY-LEVEL
+
+  # PARTICIPANT INDICATORS
   prio_v31_country:
     common:
       description_key:
@@ -151,6 +152,7 @@ tables:
         description_short: |-
           The number of countries that participated in a conflict (of a specific kind) in a given year and region.
 
+  # MAIN INDICATORS
   prio_v31:
     common:
       presentation:

@@ -69,9 +69,10 @@ definitions:
       - *interstate_conflict
       - *force_usage
       - Deaths of combatants due to fighting are included.
+      - If a conflict lasted more than one year, we distributed its deaths evenly across years.
 
 tables:
-  # PARTICIPANTS
+  # PARTICIPANT INDICATORS
   mie_country:
     variables:
       participated_in_conflict:
@@ -84,12 +85,12 @@ tables:
             '1' indicates that the state participated in a conflict. '0' indicates that the state did not participate in a conflict.
 
       number_participants:
-        title: Number of states in conflict
+        title: Number of states involved in conflict
         unit: "states"
         description_short: |-
           Included are states that participated in at least one conflict with another state where force was threatened, displayed, or used that year.
 
-  # MAIN
+  # MAIN INDICATORS
   mie:
     common:
       presentation:
