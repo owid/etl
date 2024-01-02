@@ -31,7 +31,7 @@ DATE_PUBLISHED = SNAPSHOT_VERSION
 def main(upload: bool) -> None:
     # Create a new snapshot for each of the data files.
     for file_name in FILES:
-        snap = Snapshot(f"climate_change/{SNAPSHOT_VERSION}/{file_name}")
+        snap = Snapshot(f"climate/{SNAPSHOT_VERSION}/{file_name}")
 
         # Replace the full citation and description in the metadata.
         snap.metadata.origin.date_accessed = DATE_ACCESSED  # type: ignore

@@ -12,7 +12,7 @@ meta:
     date_published: '2023-12-04'
     license:
       name: CC BY 4.0
-wdir: ../../../data/snapshots/climate_change/2023-12-04
+wdir: ../../../data/snapshots/climate/2023-12-04
 outs:
 - md5: 725ef181276e20e5fe27f8d6f3df8cf3
   size: 12602
