@@ -9,7 +9,7 @@ estimating the global number of ongoing (or new) conflicts by broken down by hos
     most hostile category at global level.
 
 - Each entry in this dataset describes a conflict (its participants and period). Therefore we need to "explode" it to add observations
-for each year, participand of the conflict.
+for each year, participant of the conflict.
     - One entry provides deaths for side 1 (ccode1) and side 2 (ccode2).
 
 - The number of deaths is not estimated for each hostile level, but rather only the aggregate is obtained.
