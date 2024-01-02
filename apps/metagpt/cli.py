@@ -288,7 +288,7 @@ class MetadataGPTUpdater:
                             messages = self.create_system_prompt_garden(
                                 variable_title, metadata_field, metadata_instructions, ds_meta_description
                             )
-                            char_count = len(messages[0]["content"])
+                            char_count = len(messages[0]["content"])  # type: ignore
                             est_cost = calculate_gpt_cost(char_count)
                             total_estimated_cost += len(original_yaml_content["tables"].items()) * est_cost
 
@@ -437,7 +437,7 @@ def _read_metadata_file(path_to_file: str | Path) -> str:
 def get_message_content(client, **kwargs):
     """Get message content from the chat completion."""
     chat_completion = client.chat.completions.create(**kwargs)  # type: ignore
-    message_content, cost = process_chat_completion(chat_completion)
+    message_content, cost = process_chat_completion(chat_completion)  # type: ignore
     return message_content, cost
 
 
@@ -448,7 +448,7 @@ def process_chat_completion(chat_completion) -> Any | None:
         cost = (chat_completion_tokens / 1000) * RATE_PER_1000_TOKENS
         message_content = chat_completion.choices[0].message.content
         return message_content, cost
-    return None
+    return None, None
 
 
 def check_gpt_response_format(message_content) -> bool:
