@@ -4,12 +4,48 @@ The output csv file will feed our Climate Change Impacts data explorer:
 https://ourworldindata.org/explorers/climate-change
 """
 
+from owid.catalog import Table
 from owid.datautils.dataframes import combine_two_overlapping_dataframes
 
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
+
+
+def prepare_sea_ice_extent(tb_nsidc: Table) -> Table:
+    # Create a table with the minimum and maximum Arctic sea ice extent, and another for the Antarctic sea ice extent.
+    # Assume minimum and maximum occur in February and September every year.
+    tb_nsidc["month"] = tb_nsidc["date"].astype(str).str[5:7]
+    tb_nsidc["year"] = tb_nsidc["date"].astype(str).str[0:4].astype(int)
+    arctic_sea_ice_extent = (
+        tb_nsidc[(tb_nsidc["location"] == "Northern Hemisphere") & (tb_nsidc["month"].isin(["02", "09"]))]
+        .pivot(index=["location", "year"], columns=["month"], values="sea_ice_extent", join_column_levels_with=" ")
+        .rename(columns={"02": "arctic_sea_ice_extent_max", "09": "arctic_sea_ice_extent_min"}, errors="raise")
+    )
+    antarctic_sea_ice_extent = (
+        tb_nsidc[(tb_nsidc["location"] == "Southern Hemisphere") & (tb_nsidc["month"].isin(["02", "09"]))]
+        .pivot(index=["location", "year"], columns=["month"], values="sea_ice_extent", join_column_levels_with=" ")
+        .rename(columns={"02": "antarctic_sea_ice_extent_min", "09": "antarctic_sea_ice_extent_max"}, errors="raise")
+    )
+    return arctic_sea_ice_extent, antarctic_sea_ice_extent
+
+
+def prepare_ocean_heat_content(tb_ocean_heat_annual: Table, tb_ocean_heat_annual_epa: Table) -> Table:
+    # Combine NOAA's annual data on ocean heat content (which is more up-to-date) with the analogous EPA's data based on
+    # NOAA (which, for some reason, spans a longer time range for 2000m). Prioritize NOAA's data on common years.
+    tb_ocean_heat_annual = combine_two_overlapping_dataframes(
+        tb_ocean_heat_annual.rename(
+            columns={
+                "ocean_heat_content_700m": "ocean_heat_content_noaa_700m",
+                "ocean_heat_content_2000m": "ocean_heat_content_noaa_2000m",
+            },
+            errors="raise",
+        ),
+        tb_ocean_heat_annual_epa,
+        index_columns=["location", "year"],
+    )
+    return tb_ocean_heat_annual
 
 
 def run(dest_dir: str) -> None:
@@ -40,6 +76,14 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
+    # Prepare sea ice extent data.
+    arctic_sea_ice_extent, antarctic_sea_ice_extent = prepare_sea_ice_extent(tb_nsidc=tb_nsidc)
+
+    # Prepare ocean heat content data.
+    tb_ocean_heat_annual = prepare_ocean_heat_content(
+        tb_ocean_heat_annual=tb_ocean_heat_annual, tb_ocean_heat_annual_epa=tb_ocean_heat_annual_epa
+    )
+
     # Gather monthly data from different tables.
     tb_monthly = tb_giss.astype({"date": str}).copy()
     for table in [tb_nsidc, tb_met_office, tb_ocean_heat_monthly]:
@@ -51,22 +95,16 @@ def run(dest_dir: str) -> None:
             short_name="climate_change_impacts_monthly",
         )
 
-    # Combine NOAA's annual data on ocean heat content (which is more up-to-date) with the analogous EPA's data based on
-    # NOAA (which, for some reason, spans a longer time range for 2000m). Prioritize NOAA's data on common years.
-    tb_ocean_heat_annual = combine_two_overlapping_dataframes(
-        tb_ocean_heat_annual.rename(
-            columns={
-                "ocean_heat_content_700m": "ocean_heat_content_noaa_700m",
-                "ocean_heat_content_2000m": "ocean_heat_content_noaa_2000m",
-            },
-            errors="raise",
-        ),
-        tb_ocean_heat_annual_epa,
-        index_columns=["location", "year"],
-    )
-
     # Gather annual data from different tables.
     tb_annual = tb_ocean_heat_annual.copy()
+    for table in [arctic_sea_ice_extent, antarctic_sea_ice_extent]:
+        tb_annual = tb_annual.merge(
+            table,
+            how="outer",
+            on=["location", "year"],
+            validate="one_to_one",
+            short_name="climate_change_impacts_annual",
+        )
     tb_annual.metadata.short_name = "climate_change_impacts_annual"
 
     # Set an appropriate index to monthly and annual tables, and sort conveniently.
