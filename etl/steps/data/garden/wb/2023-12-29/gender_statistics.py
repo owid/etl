@@ -77,7 +77,7 @@ def run(dest_dir: str) -> None:
         + tb["sh_mmr_leve"].metadata.title
         + ". The revelavant description from World Bank of this indicator is:\n\n"
         + tb["sh_mmr_leve"].metadata.description_from_producer
-        + "\n\nThe first indicator is called "
+        + "\n\nThe second indicator is called "
         + tb["sh_par_leve_fe"].metadata.title
         + ". The revelavant description from World Bank of this indicator is:\n\n"
         + tb["sh_par_leve_fe"].metadata.description_from_producer
