@@ -1,0 +1,32 @@
+# NOTE: To learn more about the fields, hover over their names.
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
+dataset:
+  update_period_days: 365
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
+tables:
+  gender_statistics:
+    # Learn more about the available fields:
+    # http://docs.owid.io/projects/etl/architecture/metadata/reference/indicator/
+    variables:
+      total_maternity_leave:
+        title: Total days of leave available for the mother
+        unit: days
+        short_unit: ''
+        description_processing: The total days of leave available for the mother indicator was created by OWID by combining maternity leave and parental leave mother quota indicators. For more details on each indicator see the section on **How producer describes this data**.
+        processing_level: major
+        display:
+          numDecimalPlaces: 0
+
+      total_paternity_leave:
+        title: Total days of leave available for the father
+        unit: days
+        short_unit: ''
+        description_processing: The total days of leave available for the father indicator was created by OWID by combining paternity leave and parental leave father quota indicators. For more details on each indicator see **How producer describes this data**."
+        processing_level: major
+        display:
+          numDecimalPlaces: 0

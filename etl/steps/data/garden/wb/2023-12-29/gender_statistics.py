@@ -95,21 +95,6 @@ def run(dest_dir: str) -> None:
         + tb["sh_ptr_leve"].metadata.description_from_producer
     )
 
-    tb["total_paternity_leave"].metadata.title = "Total days of leave available for the father"
-    tb["total_maternity_leave"].metadata.title = "Total days of leave available for the mother"
-
-    tb[
-        "total_maternity_leave"
-    ].metadata.description_processing = "The total days of leave available for the mother indicator was created by OWID by combining maternity leave and parental leave mother quota indicators. For more details on each indicator see the section on **How producer describes this data**."
-    tb[
-        "total_paternity_leave"
-    ].metadata.description_processing = "The total days of leave available for the father indicator was created by OWID by combining paternity leave and parental leave father quota indicators. For more details on each indicator see **How producer describes this data**."
-
-    for leave_col in ["total_paternity_leave", "total_maternity_leave"]:
-        tb[leave_col].metadata.display["numDecimalPlaces"] = 0
-        tb[leave_col].metadata.unit = "days"
-        tb[leave_col].metadata.short_unit = ""
-
     #
     # Save outputs.
     #
@@ -169,51 +154,52 @@ def add_metadata(tb: Table, metadata_tb: Table):
             description_string = "\n\n".join(filter(None, components))
             if not description_string:
                 description_string = "No detailed metadata available from World Bank."
-            tb[column].metadata.description_from_producer = description_string
-            tb[column].metadata.title = name
-            tb[column].metadata.processing = "minor"
-            tb[column].metadata.display = {}
 
-            #
-            # Update metadata units, short_units and number of decimal places to display depending on what keywords the variable name contains
-            #
-
-            def update_metadata(table, column, display_decimals, unit, short_unit):
-                """
-                Update metadata attributes of a specified column in the given table.
-
-                Args:
-                table (obj): The table object containing the column.
-                column (str): Name of the column whose metadata is to be updated.
-                display_decimals (int): Number of decimal places to display.
-                unit (str): The full name of the unit of measurement for the column data.
-                short_unit (str, optional): The abbreviated form of the unit. Defaults to an empty space.
-
-                Returns:
-                None: The function updates the table in-place.
-                """
-                table[column].metadata.display["numDecimalPlaces"] = display_decimals
-                table[column].metadata.unit = unit
-                table[column].metadata.short_unit = short_unit
+            meta = tb[column].metadata
+            meta.description_from_producer = description_string
+            meta.title = name
+            meta.processing = "minor"
+            meta.display = {}
 
             # Convert the 'name' variable to lowercase to make text matching easier
             name_lower = tb[column].title.lower()
 
+            #
+            # Update metadata units, short_units and number of decimal places to display depending on what keywords the variable name contains
+            #
             # Fill out units and decimal places
             if "%" in name_lower:
-                update_metadata(tb, column, 1, unit="%", short_unit="%")
+                update_metadata(meta, display_decimals=1, unit="%", short_unit="%")
             elif "(days)" in name_lower:
-                update_metadata(tb, column, 1, unit="days", short_unit="")
+                update_metadata(meta, display_decimals=1, unit="days", short_unit="")
             elif "index" in name_lower:
-                update_metadata(tb, column, 1, unit="index", short_unit="")
+                update_metadata(meta, display_decimals=1, unit="index", short_unit="")
             elif "index" in name_lower:
-                update_metadata(tb, column, 1, unit="index", short_unit="")
+                update_metadata(meta, display_decimals=1, unit="index", short_unit="")
             elif "(current us$)" in name_lower:
-                update_metadata(tb, column, 1, unit="current US$", short_unit="current $")
+                update_metadata(meta, display_decimals=1, unit="current US$", short_unit="current $")
             elif "number" in name_lower:
-                update_metadata(tb, column, 0, unit="number", short_unit="")
+                update_metadata(meta, display_decimals=0, unit="number", short_unit="")
 
             else:
                 # Default metadata update when no other conditions are met.
-                update_metadata(tb, column, 0, " ", " ")
+                update_metadata(meta, 0, " ", " ")
     return tb
+
+
+def update_metadata(meta, display_decimals, unit, short_unit):
+    """
+    Update metadata attributes of a specified column in the given table.
+
+    Args:
+    meta (obj): Metadata object of the column to update.
+    display_decimals (int): Number of decimal places to display.
+    unit (str): The full name of the unit of measurement for the column data.
+    short_unit (str, optional): The abbreviated form of the unit. Defaults to an empty space.
+
+    Returns:
+    None: The function updates the table in-place.
+    """
+    meta.display["numDecimalPlaces"] = display_decimals
+    meta.unit = unit
+    meta.short_unit = short_unit

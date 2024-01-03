@@ -732,7 +732,7 @@ steps:
 
   # World Bank GenderStats
   data://meadow/wb/2023-12-29/gender_statistics:
-    - snapshot://wb/2023-12-29/gender_statistics.csv
+    - snapshot://wb/2023-12-29/gender_statistics.feather
   data://garden/wb/2023-12-29/gender_statistics:
     - data://meadow/wb/2023-12-29/gender_statistics
   data://grapher/wb/2023-12-29/gender_statistics:

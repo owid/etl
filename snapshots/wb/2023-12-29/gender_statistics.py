@@ -7,6 +7,7 @@ import click
 import pandas as pd
 import world_bank_data as wb
 from owid.datautils.io import df_to_file
+from owid.repack import repack_frame
 from tqdm import tqdm
 
 from etl.db import get_engine
@@ -37,7 +38,7 @@ def main(path_to_file: str, upload: bool) -> None:
     """
 
     # Create a new snapshot.
-    snap = Snapshot(f"wb/{SNAPSHOT_VERSION}/gender_statistics.csv")
+    snap = Snapshot(f"wb/{SNAPSHOT_VERSION}/gender_statistics.feather")
 
     # Ensure destination folder exists.
     snap.path.parent.mkdir(exist_ok=True, parents=True)
@@ -73,8 +74,11 @@ def main(path_to_file: str, upload: bool) -> None:
     # Merge the input DataFrame with the metadata DataFrame
     enriched_df = pd.merge(wb_df, metadata_df, on="wb_seriescode", how="left")
 
+    # Try to reduce the size of the dataframe
+    enriched_df = repack_frame(enriched_df)
+
     # Write DataFrame to file.
-    df_to_file(enriched_df, file_path=snap.path)
+    enriched_df.reset_index().to_feather(snap.path)
 
     # Add file to DVC and upload to S3.
     snap.dvc_add(upload=upload)

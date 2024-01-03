@@ -5,10 +5,10 @@ paths = PathFinder(__file__)
 
 
 def run(dest_dir: str) -> None:
-    snap = paths.load_snapshot("gender_statistics.csv")
+    snap = paths.load_snapshot("gender_statistics.feather")
 
     # Load data from snapshot.
-    tb = snap.read_csv(low_memory=False)
+    tb = snap.read_feather()
     tb = tb.underscore().set_index(["country", "year", "wb_seriescode"], verify_integrity=True)
 
     # Drop indicator_name column series column as it should be roughgly the same as indicator_name column (long definition of the indicator)
