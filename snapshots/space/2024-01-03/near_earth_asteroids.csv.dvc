@@ -1,0 +1,30 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/origin/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Near-Earth Asteroids
+    description: |-
+      The NASA Center for Near-Earth Objects Studies (CNEOS) maintains a catalog of all Near-Earth Asteroids known to date. A near-Earth asteroid is an asteroid whose orbit brings it into proximity with Earth. By convention, a Solar System body is considered "near Earth" if its closest approach to the Sun is less than 1.3 astronomical units (AU).
+    date_published: 2024-01-01
+
+    # Citation
+    producer: NASA Center for Near-Earth Object Studies
+    citation_full: |-
+      NASA Center for Near-Earth Object Studies
+    attribution_short: NASA CNEOS
+
+    # Files
+    url_main: https://cneos.jpl.nasa.gov/stats/totals.html
+    date_accessed: 2024-01-03
+
+    # License
+    license:
+      name: CC0
+      url: https://science.data.nasa.gov/license/
+
+wdir: ../../../data/snapshots/space/2024-01-03
+outs:
+- md5: a9722bafad7350ddd0ffa5c491c9587c
+  size: 16190
+  path: near_earth_asteroids.csv
