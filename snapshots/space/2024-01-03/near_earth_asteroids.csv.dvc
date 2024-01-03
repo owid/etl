@@ -10,7 +10,8 @@ meta:
 
     # Citation
     producer: NASA Center for Near-Earth Object Studies
-    citation_full: CNEOS. (2024). Discovery Statistics: Cumulative Totals of Near-Earth Asteroids (NEAs). Center for Near-Earth Object Studies. Jet Propulsion Laboratory, NASA. Retrieved from https://cneos.jpl.nasa.gov/stats/totals.html
+    citation_full: |-
+      CNEOS. (2024). Discovery Statistics: Cumulative Totals of Near-Earth Asteroids (NEAs). Center for Near-Earth Object Studies. Jet Propulsion Laboratory, NASA. Retrieved from https://cneos.jpl.nasa.gov/stats/totals.html
     attribution_short: NASA CNEOS
 
     # Files
