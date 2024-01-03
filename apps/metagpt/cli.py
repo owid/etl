@@ -15,7 +15,7 @@ from etl.paths import BASE_DIR
 
 # GPT Model
 GPT_MODEL = "gpt-3.5-turbo"
-RATE_PER_1000_TOKENS = 0.0015  # Approximate average cost per 1000 tokens
+RATE_PER_1000_TOKENS = 0.0015  # Approximate average cost per 1000 tokens from here - https://openai.com/pricing
 
 # Initialize logger
 log = structlog.get_logger()
@@ -272,11 +272,7 @@ class MetadataGPTUpdater:
                 metadata_indicator_docs = docs["properties"]["tables"]["additionalProperties"]["properties"][
                     "variables"
                 ]["additionalProperties"]["properties"]
-                fields_to_fill_out = [
-                    "description_short",
-                    "description_key",
-                    "description_from_producer",
-                ]
+                fields_to_fill_out = ["title", "unit", "short_unit", "description_short", "description_key"]
 
                 all_variables = {}
                 with open(self.path_to_file, "r") as file:
@@ -320,7 +316,7 @@ class MetadataGPTUpdater:
 
                                 indicator_metadata.append(message_content)
                             all_variables[variable_name] = indicator_metadata
-                log.info(f"Cost GPT4: ${final_cost:.2f}")
+                log.info(f"Cost GPT4: ${final_cost:.3f}")
 
                 for table_name, table_data in original_yaml_content["tables"].items():
                     for variable_name, variable_data in table_data["variables"].items():
@@ -363,13 +359,12 @@ class MetadataGPTUpdater:
                 system_prompt = """
                     You are given a metadata file. Could you help us fill out the following for each variable:
 
-                    - description_from_producer - do a web search based on other information and URLs in the metadata file to find a description of the variable.
                     - description_key - based on a web search and if description exists come up with some key bullet points (in a sentence format) that would help someone interpret the indicator. Can you make sure that these are going to be useful for the public to understand the indicator? Expand on any acronyms or any terms that a layperson might not be familiar with. Each bullet point can be more than one sentence if necessary but don't make it too long.
                     - if description_short is not filled out, use the description_key and a web search to come up with one sentence to describe the indicator. It should be very brief and to the point.
 
                     The output should always have these fields only but as a python dictionary. This format is mandatory, don't miss fields and don't include any irrelevant information but make it JSON readable.:
 
-                    {"tables": {"maddison_gdp": {"variables": {"gdp_per_capita": {"description_short": "...", "description_from_producer": "...", "description_key": ["...", "..."]}}}}}
+                    {"tables": {"maddison_gdp": {"variables": {"gdp_per_capita": {"description_short": "...", "description_key": ["...", "..."]}}}}}
 
 
                     Don't include any other fields. This is mandatory. Can you ensure that the output can be read as JSON?
@@ -418,11 +413,10 @@ class MetadataGPTUpdater:
             f"We have a variable called '{variable_title}' in this dataset.\n"
             "By using the information you already have in the dataset description, and browsing the web, can you "
             f"infer what this metadata field '{metadata_field}' might be for this specific indicator?\n\n"
-            f"Here are the instructions on how to fill out the field - '{metadata_instructions}'.\n"
             "Depending on which field you are filling out take into account these extra instructions:\n"
-            " - description_from_producer - do a web search based on other information in the metadata file to find a description of the variable.\n"
             " - description_key - based on a web search and your knowledge come up with some key bullet points (in a sentence format) that would help someone interpret the indicator. Can you make sure that these are going to be useful for the public to understand the indicator? Expand on any acronyms or any terms that a layperson might not be familiar with. Each bullet point can be more than one sentence if necessary but don't make it too long.\n"
             " - description_short use the description_key and a web search to come up with one sentence to describe the indicator. It should be very brief and to the point.\n"
+            f"Here are the instructions on how to fill out the field - '{metadata_instructions}'.\n"
             "Now, can you try to infer the above based on the other information in the metadata file and by browsing the web? You can use any links in the metadata file to help you."
         )
 
