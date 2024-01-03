@@ -46,8 +46,8 @@ steps:
     - snapshot://climate/2024-01-02/ocean_heat_content_monthly_world_2000m.csv
     - snapshot://climate/2024-01-02/ocean_heat_content_annual_world_700m.csv
     - snapshot://climate/2024-01-02/ocean_heat_content_annual_world_2000m.csv
-  # data://garden/climate/2024-01-02/ocean_heat_content:
-  #   - data://meadow/climate/2024-01-02/ocean_heat_content
+  data://garden/climate/2024-01-02/ocean_heat_content:
+    - data://meadow/climate/2024-01-02/ocean_heat_content
   #
   # Climate change impacts data explorer.
   #
@@ -55,7 +55,7 @@ steps:
     - data://garden/climate/2024-01-02/surface_temperature_analysis
     - data://garden/climate/2024-01-02/sea_ice_index
     - data://garden/climate/2024-01-02/sea_surface_temperature
-    # - data://garden/climate/2024-01-02/ocean_heat_content
+    - data://garden/climate/2024-01-02/ocean_heat_content
 
   ######################################################################################################################
   # Older versions to be archived once they are not used by any other steps.

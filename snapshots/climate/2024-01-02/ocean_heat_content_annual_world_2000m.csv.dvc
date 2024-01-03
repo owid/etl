@@ -32,7 +32,7 @@ meta:
     attribution_short: NOAA/NCEI
     url_main: https://www.ncei.noaa.gov/products/ocean-heat-salt-sea-level
     url_download: 
-      https://www.ncei.noaa.gov/data/oceans/woa/DATA_ANALYSIS/3M_HEAT_CONTENT/DATA/basin/3month/ohc2000m_levitus_climdash_seasonal.csv
+      https://www.ncei.noaa.gov/data/oceans/woa/DATA_ANALYSIS/3M_HEAT_CONTENT/DATA/basin/yearly/h22-w0-2000m.dat
     date_accessed: '2024-01-02'
     date_published: '2024-01-02'
     license:
@@ -41,6 +41,6 @@ meta:
         https://www.ncei.noaa.gov/sites/g/files/anmtlf171/files/2023-12/NCEI%20PD-10-2-02%20-%20Open%20Data%20Policy%20Signed.pdf
 wdir: ../../../data/snapshots/climate/2024-01-02
 outs:
-- md5: a51bf3887f39470ea3e4196f5d34efe3
-  size: 1290
+- md5: c0f8bb6383151ece32447154d8c42e58
+  size: 1083
   path: ocean_heat_content_annual_world_2000m.csv

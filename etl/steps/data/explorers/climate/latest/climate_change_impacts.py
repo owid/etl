@@ -27,12 +27,17 @@ def run(dest_dir: str) -> None:
     ds_met_office = paths.load_dataset("sea_surface_temperature")
     tb_met_office = ds_met_office["sea_surface_temperature"].reset_index()
 
+    # Load NOAA/NCIE dataset on ocean heat content.
+    ds_ocean_heat = paths.load_dataset("ocean_heat_content")
+    tb_ocean_heat_monthly = ds_ocean_heat["ocean_heat_content_monthly"].reset_index()
+    tb_ocean_heat_annual = ds_ocean_heat["ocean_heat_content_annual"].reset_index()
+
     #
     # Process data.
     #
     # Gather monthly data from different tables.
     tb_monthly = tb_giss.astype({"date": str}).copy()
-    for table in [tb_nsidc, tb_met_office]:
+    for table in [tb_nsidc, tb_met_office, tb_ocean_heat_monthly]:
         tb_monthly = tb_monthly.merge(
             table.astype({"date": str}),
             how="outer",
@@ -42,9 +47,7 @@ def run(dest_dir: str) -> None:
         )
 
     # Gather annual data from different tables.
-    # TODO: For now (that no annual indicators exist) temporarily copy the monthly table.
-    tb_annual = tb_monthly.copy()
-    tb_annual = tb_annual.rename(columns={"date": "year"}, errors="raise")
+    tb_annual = tb_ocean_heat_annual.copy()
     tb_annual.metadata.short_name = "climate_change_impacts_annual"
 
     # Set an appropriate index to monthly and annual tables, and sort conveniently.

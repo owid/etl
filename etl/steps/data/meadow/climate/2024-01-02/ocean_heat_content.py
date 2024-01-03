@@ -15,38 +15,65 @@ FILES = [
     "ocean_heat_content_annual_world_2000m",
 ]
 
+# Columns to select from annual data, and how to rename them.
+COLUMNS_ANNUAL = {
+    "YEAR": "date",
+    "WO": "ocean_heat_content",
+}
+
 
 def run(dest_dir: str) -> None:
     #
     # Load inputs.
     #
-    # TODO: Add column for depth, and process monthly and annual separately.
-
-    # Load data from each of the snapshots, and add a column with the region name.
-    tables = [
-        paths.load_snapshot(f"{file_name}.csv")
-        .read(names=["date", "ocean_heat_content"])
-        .assign(**{"location": "World"})
-        for file_name in FILES
-    ]
+    # Load data from snapshots.
+    tables_monthly = []
+    tables_annual = []
+    for file_name in FILES:
+        # Extract depth and location from file name.
+        depth = int(file_name.split("_")[-1].replace("m", ""))
+        location = file_name.split("_")[-2].title()
+        if "monthly" in file_name:
+            # Read data.
+            new_table = paths.load_snapshot(f"{file_name}.csv").read(names=["date", "ocean_heat_content"])
+            # Add columns for location and depth.
+            new_table = new_table.assign(**{"depth": depth, "location": location})
+            # Add monthly table to list.
+            tables_monthly.append(new_table)
+        elif "annual" in file_name:
+            # Read data, select and rename columns.
+            new_table = (
+                paths.load_snapshot(f"{file_name}.csv")
+                .read_fwf()[list(COLUMNS_ANNUAL)]
+                .rename(columns=COLUMNS_ANNUAL, errors="raise")
+            )
+            # Add columns for location and depth.
+            new_table = new_table.assign(**{"depth": depth, "location": location})
+            # Add annual table to list.
+            tables_annual.append(new_table)
+        else:
+            raise ValueError(f"Unexpected file name: {file_name}")
 
     #
     # Process data.
     #
-    # Concatenate all tables.
-    tb = pr.concat(tables)
+    # Combine monthly data and add a column for location.
+    tb_monthly = pr.concat(tables_monthly)
+
+    # Combine annual data.
+    tb_annual = pr.concat(tables_annual)
 
     # Set an appropriate index and sort conveniently.
-    tb = tb.set_index(["location", "year", "month"], verify_integrity=True).sort_index().sort_index(axis=1)
+    tb_monthly = tb_monthly.set_index(["location", "depth", "date"], verify_integrity=True).sort_index()
+    tb_annual = tb_annual.set_index(["location", "depth", "date"], verify_integrity=True).sort_index()
 
-    # Rename table.
-    tb.metadata.short_name = paths.short_name
+    # Rename tables.
+    tb_monthly.metadata.short_name = "ocean_heat_content_monthly"
+    tb_annual.metadata.short_name = "ocean_heat_content_annual"
 
     #
     # Save outputs.
     #
-    # Create a new meadow dataset with the same metadata as the snapshot.
-    ds_meadow = create_dataset(dest_dir, tables=[tb], check_variables_metadata=True)
-
-    # Save changes in the new meadow dataset.
+    # Create a new meadow dataset.
+    ds_meadow = create_dataset(dest_dir, tables=[tb_annual, tb_monthly], check_variables_metadata=True)
     ds_meadow.save()
