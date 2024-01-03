@@ -801,3 +801,4 @@ include:
   - dag/animal_welfare.yml
   - dag/plastic_use.yml
   - dag/statins.yml
+  - dag/climate.yml
