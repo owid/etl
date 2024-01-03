@@ -26,6 +26,8 @@ FILES = [
     "ocean_heat_content_monthly_world_2000m.csv",
     "ocean_heat_content_annual_world_700m.csv",
     "ocean_heat_content_annual_world_2000m.csv",
+    # School of Ocean and Earth Science and Technology - Hawaii Ocean Time-series.
+    "hawaii_ocean_time_series.csv",
 ]
 
 # Other possible datasets to include:
@@ -52,6 +54,8 @@ def main(upload: bool) -> None:
         # * For sea_surface_temperature_* the date_published can be found on:
         #   https://www.metoffice.gov.uk/hadobs/hadsst4/data/download.html
         #   At the very bottom of the page, where it says "Last updated:".
+        # * For the Hawaii Ocean Time-Series, the date_published can be found written on the header of the data itself:
+        #   https://hahana.soest.hawaii.edu/hot/hotco2/HOT_surface_CO2.txt
 
         # Extract publication year from date_published.
         year_published = snap.metadata.origin.date_published.split("-")[0]  # type: ignore
