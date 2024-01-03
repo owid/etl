@@ -141,6 +141,7 @@ class Snapshot:
     def is_dirty(self) -> bool:
         """Return True if snapshot exists and is in DVC."""
         from dvc.dvcfile import load_file
+        from dvc.rwlock import RWLockFileCorruptedError
 
         if not self.path.exists():
             return True
@@ -156,7 +157,14 @@ class Snapshot:
             with repo.lock:
                 # DVC returns empty dictionary if file is up to date
                 stage = dvc_file.stage
-                return stage.status() != {}
+                try:
+                    return stage.status() != {}
+                except RWLockFileCorruptedError:
+                    rwlock_path = paths.BASE_DIR / ".dvc/tmp/rwlock"
+                    # If the lock file is corrupted, we need to delete it and try again
+                    if rwlock_path.exists():
+                        rwlock_path.unlink()
+                    return stage.status() != {}
 
     def delete_local(self) -> None:
         """Delete local file and its metadata."""
