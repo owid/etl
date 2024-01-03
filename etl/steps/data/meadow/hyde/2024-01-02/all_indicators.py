@@ -4,9 +4,6 @@ import os
 from pathlib import Path
 
 import owid.catalog.processing as pr
-import pandas as pd
-from owid.catalog import Table
-from owid.datautils.dataframes import multi_merge
 
 from etl.helpers import PathFinder, create_dataset
 
