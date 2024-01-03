@@ -1,0 +1,28 @@
+meta:
+  origin:
+    producer: United States Environmental Protection Agency
+    title: "Climate Change Indicators: Ocean Heat"
+    title_snapshot: "Climate Change Indicators: Ocean Heat - World 0 to 700 meters"
+    citation_full: |-
+      United States Environmental Protection Agency (EPA) - Climate Change Indicators: Ocean Heat (2021)
+
+      Data for this indicator were collected by the National Oceanic and Atmospheric Administration (NOAA) and other organizations around the world. The data were analyzed independently by researchers at NOAA, Australia's Commonwealth Scientific and Industrial Research Organisation (CSIRO), China's Institute of Atmospheric Physics (IAP), and the Japan Meteorological Agency's Meteorological Research Institute (MRI/JMA).
+
+      Full citation of the original sources:
+      * NOAA (National Oceanic and Atmospheric Administration). 2021. Global ocean heat and salt content. Accessed February 2021. www.nodc.noaa.gov/OC5/3M_HEAT_CONTENT . Based on:
+        * Levitus, S., J.I. Antonov, T.P. Boyer, O.K. Baranova, H.E. Garcia, R.A. Locarnini, A.V. Mishonov, J.R. Reagan, D. Seidov, E.S. Yarosh, and M.M. Zweng. 2012. World ocean heat content and thermosteric sea level change (0-2000 m), 1955-2010. Geophys. Res. Lett. 39:L10603. https://www.ncei.noaa.gov/data/oceans/woa/PUBLICATIONS/grlheat12.pdf
+      * CSIRO (Commonwealth Scientific and Industrial Research Organisation). 2016 update to data originally published in: Domingues, C.M., J.A. Church, N.J. White, P.J. Gleckler, S.E. Wijffels, P.M. Barker, and J.R. Dunn. 2008. Improved estimates of upper-ocean warming and multi-decadal sea-level rise. Nature 453:1090-1094. www.cmar.csiro.au/sealevel/thermal_expansion_ocean_heat_timeseries.html
+      * IAP (Institute of Atmospheric Physics). 2021 update to data originally published in: Cheng, L., K.E. Trenberth, J. Fasullo, T. Boyer, J. Abraham, and J. Zhu. 2017. Improved estimates of ocean heat content from 1960 to 2015. Science Advances 3(3):e1601545.
+      * MRI/JMA (Meteorological Research Institute/Japan Meteorological Agency). 2021. Global ocean heat content. Accessed February 2021. www.data.jma.go.jp/gmd/kaiyou/english/ohc/ohc_global_en.html.
+
+      More details can be found on [their technical documentation](https://www.epa.gov/sites/default/files/2021-04/documents/ocean-heat_td.pdf).
+    attribution: EPA based on various sources (2021)
+    attribution_short: EPA
+    url_main: https://www.epa.gov/climate-indicators/climate-change-indicators-ocean-heat
+    url_download: https://www.epa.gov/sites/default/files/2021-04/ocean-heat_fig-1.csv
+    date_accessed: '2024-01-02'
+    date_published: '2021-04-01'
+    license:
+      name: Public domain
+      url: https://edg.epa.gov/epa_data_license.html
+wdir: ../../../data/snapshots/epa/2024-01-02

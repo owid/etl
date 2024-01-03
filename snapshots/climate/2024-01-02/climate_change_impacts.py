@@ -28,6 +28,11 @@ FILES = [
     "ocean_heat_content_annual_world_2000m.csv",
 ]
 
+# Other possible datasets to include:
+# Ocean heat content data from MRI/JMA. We have this data as part of the EPA ocean heat content compilation.
+# But in the following link, they claim the data is updated every year, so it could be added to our yearly data.
+# https://www.data.jma.go.jp/gmd/kaiyou/english/ohc/ohc_global_en.html
+
 
 @click.command()
 @click.option("--upload/--skip-upload", default=True, type=bool, help="Upload dataset to Snapshot")
