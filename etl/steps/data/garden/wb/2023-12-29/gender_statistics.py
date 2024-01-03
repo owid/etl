@@ -151,7 +151,7 @@ def add_metadata(tb: Table, metadata_tb: Table):
             for field in metadata_fields:
                 value = metadata[field]
                 if value:
-                    component = f"**{field.replace('_', ' ').title()} from World Bank:** {value}"
+                    component = f"**{field.replace('_', ' ').capitalize()} from World Bank:** {value}"
                     components.append(component)
             components.append(f"**World Bank variable id:** {column}")
 
