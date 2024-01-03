@@ -4,6 +4,7 @@ The output csv file will feed our Climate Change Impacts data explorer:
 https://ourworldindata.org/explorers/climate-change
 """
 
+from owid.datautils.dataframes import combine_two_overlapping_dataframes
 
 from etl.helpers import PathFinder, create_dataset
 
@@ -28,9 +29,13 @@ def run(dest_dir: str) -> None:
     tb_met_office = ds_met_office["sea_surface_temperature"].reset_index()
 
     # Load NOAA/NCIE dataset on ocean heat content.
-    ds_ocean_heat = paths.load_dataset("ocean_heat_content")
+    ds_ocean_heat = paths.load_dataset("ocean_heat_content", namespace="climate")
     tb_ocean_heat_monthly = ds_ocean_heat["ocean_heat_content_monthly"].reset_index()
     tb_ocean_heat_annual = ds_ocean_heat["ocean_heat_content_annual"].reset_index()
+
+    # Load EPA's compilation of data on ocean heat content.
+    ds_epa = paths.load_dataset("ocean_heat_content", namespace="epa")
+    tb_ocean_heat_annual_epa = ds_epa["ocean_heat_content"].reset_index()
 
     #
     # Process data.
@@ -45,6 +50,20 @@ def run(dest_dir: str) -> None:
             validate="one_to_one",
             short_name="climate_change_impacts_monthly",
         )
+
+    # Combine NOAA's annual data on ocean heat content (which is more up-to-date) with the analogous EPA's data based on
+    # NOAA (which, for some reason, spans a longer time range for 2000m). Prioritize NOAA's data on common years.
+    tb_ocean_heat_annual = combine_two_overlapping_dataframes(
+        tb_ocean_heat_annual.rename(
+            columns={
+                "ocean_heat_content_700m": "ocean_heat_content_noaa_700m",
+                "ocean_heat_content_2000m": "ocean_heat_content_noaa_2000m",
+            },
+            errors="raise",
+        ),
+        tb_ocean_heat_annual_epa,
+        index_columns=["location", "year"],
+    )
 
     # Gather annual data from different tables.
     tb_annual = tb_ocean_heat_annual.copy()
