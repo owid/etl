@@ -80,7 +80,9 @@ def download(url: str, filename: str, expected_md5: Optional[str] = None, quiet:
     tmp_filename = filename + ".tmp"
     # Add a header to the request, to avoid a "requests.exceptions.HTTPError: 403 Client Error: Forbidden for url: ..."
     # error when accessing data files in certain URLs.
-    headers={'User-Agent': 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.9.0.7) Gecko/2009021910 Firefox/3.0.7'}
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.9.0.7) Gecko/2009021910 Firefox/3.0.7"
+    }
     with open(tmp_filename, "wb") as f, requests.get(url, stream=True, headers=headers) as r:
         r.raise_for_status()
 
