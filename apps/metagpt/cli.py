@@ -257,8 +257,14 @@ class MetadataGPTUpdater:
                 parts.remove("etl")
                 parts[-1] = parts[-1].split(".")[0]
                 path_to_dataset = "/".join(parts)
-                ds = Dataset(path_to_dataset)
-                ds_meta_description = ds.metadata.to_dict()
+                # Check if the garden step file exists
+                if os.path.isfile(path_to_dataset + "/index.json"):
+                    ds = Dataset(path_to_dataset)
+                    ds_meta_description = ds.metadata.to_dict()
+                else:
+                    log.error(f"Required garden dataset {path_to_dataset} does not exist. Run the garden step first.")
+                    raise Exception("Required garden dataset does not exist. Run the garden step first.")
+
                 # Open the file with descriptions of metadata fields from our docs
                 with open(DOCS, "r") as f:
                     docs = json.load(f)
