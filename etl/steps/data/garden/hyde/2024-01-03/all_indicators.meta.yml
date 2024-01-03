@@ -1,0 +1,111 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Population Growth
+        - Land Use
+        - Urbanization
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
+dataset:
+  update_period_days: 2000
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
+  title: History Database of the Global Environment
+tables:
+  all_indicators:
+    # Learn more about the available fields:
+    # http://docs.owid.io/projects/etl/architecture/metadata/reference/indicator/
+    title: History Database of the Global Environment
+    description: |-
+      This database presents an update and expansion of the History Database of the Global Environment (HYDE, v 3.3) and replaces former HYDE 3.2 version from 2017. HYDE is and internally consistent combination of updated historical population estimates and land use. Categories include cropland, with a new distinction into irrigated and rain fed crops (other than rice) and irrigated and rain fed rice. Also grazing lands are provided, divided into more intensively used pasture, converted rangeland and non-converted natural (less intensively used) rangeland. Population is represented by maps of total, urban, rural population and population density as well as built-up area. The period covered is 10 000 BCE to 2023 CE. Spatial resolution is 5 arc minutes (approx. 85 km2 at the equator), the files are in ESRI ASCII grid format.
+    variables:
+      popc_c:
+        title: TODO
+        description_short: total population per country over time, in 1000
+        unit: ''
+      popd_c:
+        title: TODO
+        description_short: population density, in inhabitants/km2
+        unit: ''
+      urbc_c:
+        title: TODO
+        description_short: Total urban population per country over time, in 1000
+        unit: ''
+      rurc_c:
+        title: TODO
+        description_short: Total rural population per country over time, in 1000
+        unit: ''
+      uopp_c:
+        title: TODO
+        description_short: total built-up area per country over time, in km2 per grid cell
+        unit: ''
+      cropland_c:
+        title: TODO
+        description_short: total cropland area for each seperate country over time
+        unit: ''
+      rf_rice_c:
+        title: TODO
+        description_short: total rainfed rice for each country over time, in km2
+        unit: ''
+      rf_norice_c:
+        title: TODO
+        description_short: total rainfed other crops (no rice)for each country over time, in km2
+        unit: ''
+      ir_rice_c:
+        title: TODO
+        description_short: total irrigated rice for each country over time, in km2
+        unit: ''
+      ir_norice_c:
+        title: TODO
+        description_short: total irrigated other crops (no rice)for each country over time, in km2
+        unit: ''
+      tot_irri_c:
+        title: TODO
+        description_short: total irrigated area for each country over time, in km2
+        unit: ''
+      tot_rice_c:
+        title: TODO
+        description_short: total rice area for each country over time, in km2
+        unit: ''
+      tot_rainfed_c:
+        title: TODO
+        description_short: total rainfed area for each country over time, in km2
+        unit: ''
+      grazing_c:
+        title: TODO
+        description_short: total grazingland area for each seperate country over time, in km2
+        unit: ''
+      pasture_c:
+        title: TODO
+        description_short: total pasture area for each country over time, in km2
+        unit: ''
+      conv_rangeland_c:
+        title: TODO
+        description_short: total converted rangeland for each seperate country over time, in km2
+        unit: ''
+      rangeland_c:
+        title: TODO
+        description_short: total rangeland for each seperate country over time, in km2
+        unit: ''
+
+
+      shifting_c:
+        title: TODO
+        description_short: TODO
+        unit: ''
+
+
+
+
+
+
+
+
+
+
