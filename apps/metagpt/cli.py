@@ -204,7 +204,7 @@ class MetadataGPTUpdater:
                 message_content, cost = get_message_content(
                     self.client, messages=messages, model=GPT_MODEL, temperature=0
                 )  # type: ignore
-                log.info(f"Cost GPT4: ${cost:.2f}")
+                log.info(f"Cost GPT4: ${cost:.3f}")
 
                 if message_content:
                     new_yaml_content = yaml.safe_load(message_content)
@@ -217,7 +217,7 @@ class MetadataGPTUpdater:
                     message_content, cost = get_message_content(
                         self.client, messages=messages, model=GPT_MODEL, temperature=0
                     )  #
-                    log.info(f"Cost GPT4: ${cost:.2f}")
+                    log.info(f"Cost GPT4: ${cost:.3f}")
 
                     if message_content:
                         try:
@@ -423,6 +423,7 @@ class MetadataGPTUpdater:
             " - description_from_producer - do a web search based on other information in the metadata file to find a description of the variable.\n"
             " - description_key - based on a web search and your knowledge come up with some key bullet points (in a sentence format) that would help someone interpret the indicator. Can you make sure that these are going to be useful for the public to understand the indicator? Expand on any acronyms or any terms that a layperson might not be familiar with. Each bullet point can be more than one sentence if necessary but don't make it too long.\n"
             " - description_short use the description_key and a web search to come up with one sentence to describe the indicator. It should be very brief and to the point.\n"
+            "Now, can you try to infer the above based on the other information in the metadata file and by browsing the web? You can use any links in the metadata file to help you."
         )
 
         base_template_prompt = (
