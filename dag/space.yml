@@ -19,3 +19,5 @@ steps:
   #  NASA Center for Near-Earth Object Studies - Near-Earth Asteroids
   data://meadow/space/2024-01-03/near_earth_asteroids:
     - snapshot://space/2024-01-03/near_earth_asteroids.csv
+  data://garden/space/2024-01-03/near_earth_asteroids:
+    - data://meadow/space/2024-01-03/near_earth_asteroids
