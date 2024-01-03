@@ -146,9 +146,14 @@ def add_metadata(tb: Table, metadata_tb: Table):
                 metadata["long_definition"] = name
                 metadata["source"] = ""
 
-            # Construct the components list
-            components = [f"{metadata[field]}" if metadata[field] else "" for field in metadata_fields]
-            components.append(f"World Bank variable id: {column}")
+            # Construct the components list with field names
+            components = []
+            for field in metadata_fields:
+                value = metadata[field]
+                if value:
+                    component = f"**The {field.replace('_', ' ')} from World Bank is:** {value}"
+                    components.append(component)
+            components.append(f"**The World Bank variable id is:** {column}")
 
             # Create the metadata description from producer string
             description_string = "\n\n".join(filter(None, components))
