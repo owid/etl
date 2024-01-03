@@ -730,31 +730,6 @@ steps:
   data://grapher/moatsos/2023-10-09/moatsos_historical_poverty:
     - data://garden/moatsos/2023-10-09/moatsos_historical_poverty
 
-
-  # Copernicus Climate Change Service - Surface temperature
-  data://meadow/climate/2023-12-20/surface_temperature:
-  - snapshot://climate/2023-12-20/surface_temperature.nc
-  - snapshot://countries/2023-12-27/world_bank.zip
-
-  data://garden/climate/2023-12-20/surface_temperature:
-  - data://meadow/climate/2023-12-20/surface_temperature
-  - data://garden/wb/2023-04-30/income_groups
-  - data://garden/regions/2023-01-01/regions
-  data://grapher/climate/2023-12-20/surface_temperature_anomalies:
-  - data://garden/climate/2023-12-20/surface_temperature
-  data://grapher/climate/2023-12-20/surface_temperature_monthly:
-  - data://garden/climate/2023-12-20/surface_temperature
-  data://grapher/climate/2023-12-20/surface_global_monthly_anomaly:
-  - data://garden/climate/2023-12-20/surface_temperature
-
-  # World Bank GenderStats
-  data://meadow/wb/2023-12-29/gender_statistics:
-    - snapshot://wb/2023-12-29/gender_statistics.feather
-  data://garden/wb/2023-12-29/gender_statistics:
-    - data://meadow/wb/2023-12-29/gender_statistics
-  data://grapher/wb/2023-12-29/gender_statistics:
-    - data://garden/wb/2023-12-29/gender_statistics
-
   ######################################################################################################################
   # Older versions to be archived once they are not used by any other steps.
 
