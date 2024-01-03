@@ -6,6 +6,7 @@ definitions:
 
 dataset:
   title: Sea Ice Index
+  update_period_days: 60
 
 tables:
   sea_ice_index:

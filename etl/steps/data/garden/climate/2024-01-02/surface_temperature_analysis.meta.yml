@@ -6,6 +6,7 @@ definitions:
 
 dataset:
   title: GISS surface temperature analysis
+  update_period_days: 60
 
 tables:
   surface_temperature_analysis:
