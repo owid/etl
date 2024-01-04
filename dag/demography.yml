@@ -158,16 +158,10 @@ steps:
     - data://garden/demography/2023-12-20/population_fariss
 
   # HYDE 3.3
-  data://meadow/hyde/2024-01-03/general_files:
-    - snapshot://hyde/2024-01-02/general_files.zip
-  data://garden/hyde/2024-01-03/general_files:
-    - data://meadow/hyde/2024-01-03/general_files
-
   data://meadow/hyde/2024-01-02/all_indicators:
     - snapshot://hyde/2024-01-02/all_indicators.zip
     - snapshot://hyde/2024-01-02/general_files.zip
-  data://garden/hyde/2024-01-03/all_indicators:
+  data://garden/hyde/2024-01-02/all_indicators:
     - data://meadow/hyde/2024-01-02/all_indicators
-    - data://garden/hyde/2024-01-03/general_files
-  data://grapher/hyde/2024-01-04/all_indicators:
-    - data://garden/hyde/2024-01-03/all_indicators
+  data://grapher/hyde/2024-01-02/all_indicators:
+    - data://garden/hyde/2024-01-02/all_indicators
