@@ -1,3 +1,7 @@
 steps:
   data://meadow/wash/2024-01-04/nutrients:
     - snapshot://wash/2024-01-04/nutrients.zip
+  data://garden/wash/2024-01-04/nutrients:
+    - data://meadow/wash/2024-01-04/nutrients
+  data://grapher/wash/2024-01-04/nutrients:
+    - data://garden/wash/2024-01-04/nutrients

@@ -1,0 +1,115 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Clean Water
+        - Environmental Impacts of Food Production
+      title_public: |-
+        {definitions.indicator.title_public}
+      grapher_config:
+        title: |-
+          {definitions.indicator.title_public}
+    display:
+      numDecimalPlaces: 2
+      name: |-
+        {definitions.indicator.title_public}
+    unit: |-
+      {definitions.unit.unit}
+    short_unit: |-
+      {definitions.unit.short_unit}
+    description_short: |-
+      {definitions.indicator.description_short}
+  unit:
+    unit: |-
+      <% if unit == "mg/L" %>milligrams per litre<% elif unit == "ug/L" %>micrograms per litre<% elif unit == "m" %>metres<%- endif -%>
+    short_unit: |-
+      <% if unit == "mg/L" %>mg/L<% elif unit == "ug/L" %>ug/L<% elif unit == "m" %>m<%- endif -%>
+  water_body_category: |-
+    water_body_category
+
+  indicator:
+    title_public: |-
+      <% if indicator == "Ammonium" %>
+      Ammonium concentation in {definitions.water_body_category}
+      <% elif indicator == "BOD5" %>
+      Biological oxygen demand over five days in {definitions.water_body_category}
+      <% elif indicator == "Nitrate" %>
+      Nitrate concentration in {definitions.water_body_category}
+      <% elif indicator == "Nitrite" %>
+      Nitrite concentration in {definitions.water_body_category}
+      <% elif indicator == "Phosphate" %>
+      Phosphate concentration in {definitions.water_body_category}
+      <% elif indicator == "Total phosphorus" %>
+      Total phosphorus concentration in {definitions.water_body_category}
+      <% elif indicator == 'Secchi depth' %>
+      Secchi depth in {definitions.water_body_category}
+      <% elif indicator == 'Chlorophyll a' %>
+      Chlorophyll a concentration in {definitions.water_body_category}
+      <% elif indicator == 'Total organic carbon (TOC)' %>
+      Total organic carbon concentration in {definitions.water_body_category}
+      <% elif indicator == 'Dissolved organic carbon (DOC)' %>
+      Dissolved organic carbon concentration in {definitions.water_body_category}
+      <% elif indicator == 'Total phytoplankton biomass' %>
+      Total phytoplankton biomass in {definitions.water_body_category}
+      <% elif indicator == 'Cyanobacteria biomass' %>
+      Cyanobacteria biomass in {definitions.water_body_category}
+      <%- endif -%>
+    description_short: |-
+      <% if indicator == "Ammonium" %>
+      Average of annual mean concentrations of ammonium in {definitions.water_body_category}.
+      <% elif indicator == "BOD5" %>
+      Average of annual Biochemical Oxygen Demand over five days (BOD5) in {definitions.water_body_category}. High levels of BOD indicate a large amount of organic pollution. When BOD5 values are high, it means that there are more organic materials in the water that need to be broken down by microorganisms.
+      <% elif indicator == "Nitrate" %>
+      Average of annual mean concentrations of nitrate in {definitions.water_body_category}.
+      <% elif indicator == "Nitrite" %>
+      Average of annual mean concentrations of nitrite in {definitions.water_body_category}.
+      <% elif indicator == "Phosphate" %>
+      Average of annual mean concentrations of phosphate in {definitions.water_body_category}.
+      <% elif indicator == "Total phosphorus" %>
+      Average of annual mean concentrations of total phosphorus in {definitions.water_body_category}.
+      <% elif indicator == 'Secchi depth' %>
+      Average of annual mean Secchi depth in {definitions.water_body_category}. Secchi depth is a measure of water transparency. It is measured by lowering a Secchi disk into the water until it is no longer visible. The depth at which the disk is no longer visible is the Secchi depth. The Secchi depth is an indicator of the amount of algae in the water. The more algae there is, the less light can penetrate the water and the shallower the Secchi depth will be.
+      <% elif indicator == 'Chlorophyll a' %>
+      Average of annual mean concentrations of chlorophyll a in {definitions.water_body_category}. Chlorophyll a is a measure of the amount of algae in the water. The more algae there is, the higher the value for chlorophyll a there will be.
+      <% elif indicator == 'Total organic carbon (TOC)' %>
+      Average of annual mean concentrations of total organic carbon in {definitions.water_body_category}.
+      <% elif indicator == 'Dissolved organic carbon (DOC)' %>
+      Average of annual mean concentrations of dissolved organic carbon in {definitions.water_body_category}.
+      <% elif indicator == 'Total phytoplankton biomass' %>
+      Average of annual mean concentrations of total phytoplankton biomass in {definitions.water_body_category}.
+      <% elif indicator == 'Cyanobacteria biomass' %>
+      Average of annual mean concentrations of cyanobacteria biomass in {definitions.water_body_category}.
+      <%- endif -%>
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
+dataset:
+  update_period_days: 365
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
+tables:
+  nutrients:
+    # Learn more about the available fields:
+    # http://docs.owid.io/projects/etl/architecture/metadata/reference/indicator/
+    variables:
+      meanvalue:
+        title: Mean value
+      stdevvalue:
+        title: Standard deviation
+      minvalue:
+        title: Minimum value
+      maxvalue:
+        title: Maximum value
+      numberofsites:
+        title: Number of sites
+        unit: |-
+          sites
+        short_unit: |-
+          sites
+      numberofreportedsites:
+        title: Number of reported sites
+        unit: |-
+          sites
+        short_unit: |-
+          sites

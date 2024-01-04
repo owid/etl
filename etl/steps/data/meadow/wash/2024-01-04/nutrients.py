@@ -1,14 +1,10 @@
 """Load a snapshot and create a meadow dataset."""
 
-import os
-import tempfile
 import zipfile
 
-from owid.catalog import Table
 from owid.catalog import processing as pr
 
 from etl.helpers import PathFinder, create_dataset
-from etl.snapshot import Snapshot
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -21,7 +17,12 @@ def run(dest_dir: str) -> None:
     # Retrieve snapshot.
     snap = paths.load_snapshot("nutrients.zip")
     # Load data from snapshot.
-    tb = read_tb_from_snapshot_zip(snap)
+    # Load data from snapshot.
+    with zipfile.ZipFile(snap.path) as z:
+        # open the csv file in the dataset
+        with z.open("aggregateddata_country.csv") as f:
+            # read the dataset
+            tb = pr.read_csv(f, metadata=snap.to_table_metadata(), origin=snap.m.origin, delimiter=";")
     tb = tb.rename(columns={"countryName": "country", "phenomenonTimeReferenceYear": "year"})
     #
     # Process data.
@@ -41,13 +42,3 @@ def run(dest_dir: str) -> None:
 
     # Save changes in the new meadow dataset.
     ds_meadow.save()
-
-
-def read_tb_from_snapshot_zip(snap: Snapshot) -> Table:
-    """Build dataframe from zipped csvs in snapshot."""
-    with tempfile.TemporaryDirectory() as temp_dir:
-        z = zipfile.ZipFile(snap.path)
-        z.extractall(temp_dir)
-        tb = pr.read_csv(os.path.join(temp_dir, "aggregateddata_country.csv"), delimiter=";")
-        tb.metadata.short_name = snap.metadata.short_name
-    return tb
