@@ -169,3 +169,5 @@ steps:
   data://garden/hyde/2024-01-03/all_indicators:
     - data://meadow/hyde/2024-01-02/all_indicators
     - data://garden/hyde/2024-01-03/general_files
+  data://grapher/hyde/2024-01-04/all_indicators:
+    - data://garden/hyde/2024-01-03/all_indicators
