@@ -1,0 +1,3 @@
+steps:
+  data://meadow/wash/2024-01-04/nutrients:
+    - snapshot://wash/2024-01-04/nutrients.zip
