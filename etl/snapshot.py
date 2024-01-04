@@ -1,6 +1,7 @@
 import datetime as dt
 import json
 import re
+import tempfile
 from contextlib import contextmanager
 from dataclasses import dataclass
 from multiprocessing import Lock
@@ -291,6 +292,14 @@ class Snapshot:
 
     def extract(self, output_dir: Path | str):
         decompress_file(self.path, output_dir)
+
+    def extract_to_tempdir(self) -> Any:
+        # Create temporary directory
+        temp_dir = tempfile.TemporaryDirectory()
+        # Extract file to temporary directory
+        self.extract(temp_dir.name)
+        # Return temporary directory
+        return temp_dir
 
 
 @pruned_json
