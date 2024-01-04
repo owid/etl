@@ -29,3 +29,5 @@ steps:
     - snapshot://space/2024-01-04/object_launches.csv
   data://garden/space/2024-01-04/object_launches:
     - data://meadow/space/2024-01-04/object_launches
+  data://grapher/space/2024-01-04/object_launches:
+    - data://garden/space/2024-01-04/object_launches
