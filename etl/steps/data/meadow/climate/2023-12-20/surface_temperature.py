@@ -5,7 +5,6 @@ import zipfile
 import geopandas as gpd
 import numpy as np
 import pandas as pd
-import rioxarray
 import xarray as xr
 from owid.catalog import Table
 from shapely.geometry import mapping
@@ -27,8 +26,8 @@ def run(dest_dir: str) -> None:
     # Retrieve snapshot.
     snap = paths.load_snapshot("surface_temperature.gz")
     # Load data from snapshot.
-    with gzip.open(snap.path) as _file:
-        ds = xr.open_dataset(_file.read())
+    with gzip.open(snap.path, "r") as _file:
+        ds = xr.open_dataset(_file)
 
     #
     # Process data.
