@@ -27,3 +27,5 @@ steps:
   # Online Index of Objects Launched into Outer Space
   data://meadow/space/2024-01-04/object_launches:
     - snapshot://space/2024-01-04/object_launches.csv
+  data://garden/space/2024-01-04/object_launches:
+    - data://meadow/space/2024-01-04/object_launches
