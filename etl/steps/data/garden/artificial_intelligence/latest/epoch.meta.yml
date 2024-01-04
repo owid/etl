@@ -84,7 +84,7 @@ tables:
       training_computation_petaflop:
         title: Training computation (petaFLOP)
         unit: 'petaFLOP'
-        description_short: A measure of the computational effort used to train an AI model, expressed in petaFLOPs. One petaFLOP represents a quadrillion floating-point operations per second, indicating the processing power employed during training.
+        description_short: Computation is measured in total petaFLOP, which is 10¹⁵ [floating-point operations](#dod:flop) estimated from AI literature, albeit with some uncertainty.
         description_key:
           - In the context of artificial intelligence (AI), training computation is predominantly measured using floating-point operations or “FLOP” . Each FLOP corresponds to fundamental arithmetic operations, such as addition or multiplication, executed on two decimal numbers. To adapt to the vast computational demands of AI systems, the measurement unit of petaFLOP is commonly used. One petaFLOP stands as a staggering one quadrillion FLOPs, underscoring the magnitude of computational operations within AI.
 
