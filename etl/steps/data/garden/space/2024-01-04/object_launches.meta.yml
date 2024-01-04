@@ -3,7 +3,7 @@ definitions:
     presentation:
       topic_tags:
         - Space Exploration & Satellites
-    processing_level: minor
+    processing_level: major
 
 dataset:
   update_period_days: 365
