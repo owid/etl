@@ -26,7 +26,10 @@ def run(dest_dir: str) -> None:
         }
     )
     tb["year"] = tb.year.str.slice(0, 4)
+
+    # Add the number of launches for each country and year (and add metadata to the new column).
     tb = tb.groupby(["country", "year"], as_index=False).size().rename(columns={"size": "annual_launches"})
+    tb["annual_launches"] = tb["annual_launches"].copy_metadata(tb["country"])
 
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
     tb = tb.underscore().set_index(["country", "year"], verify_integrity=True).sort_index()
