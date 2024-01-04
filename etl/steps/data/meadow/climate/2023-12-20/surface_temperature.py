@@ -29,9 +29,6 @@ def run(dest_dir: str) -> None:
     with gzip.open(snap.path, "r") as _file:
         ds = xr.open_dataset(_file)
 
-    #
-    # Process data.
-    #
     # The latest 3 months in this dataset are made available through ERA5T, which is slightly different to ERA5. In the downloaded file, an extra dimenions ‘expver’ indicates which data is ERA5 (expver = 1) and which is ERA5T (expver = 5).
     # If a value is missing in the first dataset, it is filled with the value from the second dataset.
     ERA5_combine = ds.sel(expver=1).combine_first(ds.sel(expver=5))
@@ -40,7 +37,7 @@ def run(dest_dir: str) -> None:
     da = ERA5_combine["t2m"]
 
     # Convert the temperature values from Kelvin to Celsius by subtracting 273.15.
-    da_degc = da - 273.15
+    da = da - 273.15
 
     # Read the shapefile to extract country informaiton
     snap_geo = paths.load_snapshot("world_bank.zip")
@@ -55,6 +52,10 @@ def run(dest_dir: str) -> None:
         shapefile = gpd.read_file(file_path)
         shapefile = shapefile[["geometry", "WB_NAME"]]
 
+    #
+    # Process data.
+    #
+
     # Initialize an empty dictionary to store the country-wise average temperature.
     temp_country = {}
 
@@ -67,11 +68,11 @@ def run(dest_dir: str) -> None:
         data = shapefile[shapefile.index == i]
 
         # Set the coordinate reference system for the temperature data to EPSG 4326.
-        da_degc.rio.write_crs("epsg:4326", inplace=True)
+        da.rio.write_crs("epsg:4326", inplace=True)
 
         try:
             # Clip the temperature data to the current country's shape.
-            clip = da_degc.rio.clip(data.geometry.apply(mapping), data.crs)
+            clip = da.rio.clip(data.geometry.apply(mapping), data.crs)
 
             # Calculate weights based on latitude to account for area distortion in latitude-longitude grids.
             weights = np.cos(np.deg2rad(clip.latitude))
@@ -95,8 +96,8 @@ def run(dest_dir: str) -> None:
         f"It wasn't possible to extract temperature data for {len(small_countries)} small countries as they are too small for the resolution of the Copernicus data."
     )
     # Define the start and end dates
-    start_time = "1950-01-01"
-    end_time = "2023-11-01"
+    start_time = da["time"].min().dt.date.astype(str).item()
+    end_time = da["time"].max().dt.date.astype(str).item()
 
     # Generate a date range from start_time to end_time with monthly frequency
     month_starts = pd.date_range(start=start_time, end=end_time, freq="MS")
@@ -112,7 +113,7 @@ def run(dest_dir: str) -> None:
 
     # Create a new table and ensure all columns are snake-case and add relevant metadata.
     tb = Table(melted_df, short_name=paths.short_name, underscore=True)
-    tb = tb.set_index(["time", "country"])
+    tb = tb.set_index(["time", "country"], verify_integrity=True)
 
     tb["temperature_2m"].metadata.origins = [snap.metadata.origin]
     #

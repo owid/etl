@@ -31,109 +31,28 @@ def main(upload: bool) -> None:
     # Save data as a compressed temporary file.
     with tempfile.TemporaryDirectory() as temp_dir:
         c = cdsapi.Client()
+        output_file = Path(temp_dir) / "era5_monthly_t2m_eur.nc"
+
         c.retrieve(
             "reanalysis-era5-single-levels-monthly-means",
             {
                 "product_type": "monthly_averaged_reanalysis",
                 "variable": "2m_temperature",
-                "year": [
-                    "1950",
-                    "1951",
-                    "1952",
-                    "1953",
-                    "1954",
-                    "1955",
-                    "1956",
-                    "1957",
-                    "1958",
-                    "1959",
-                    "1960",
-                    "1961",
-                    "1962",
-                    "1963",
-                    "1964",
-                    "1965",
-                    "1966",
-                    "1967",
-                    "1968",
-                    "1969",
-                    "1970",
-                    "1971",
-                    "1972",
-                    "1973",
-                    "1974",
-                    "1975",
-                    "1976",
-                    "1977",
-                    "1978",
-                    "1979",
-                    "1980",
-                    "1981",
-                    "1982",
-                    "1983",
-                    "1984",
-                    "1985",
-                    "1986",
-                    "1987",
-                    "1988",
-                    "1989",
-                    "1990",
-                    "1991",
-                    "1992",
-                    "1993",
-                    "1994",
-                    "1995",
-                    "1996",
-                    "1997",
-                    "1998",
-                    "1999",
-                    "2000",
-                    "2001",
-                    "2002",
-                    "2003",
-                    "2004",
-                    "2005",
-                    "2006",
-                    "2007",
-                    "2008",
-                    "2009",
-                    "2010",
-                    "2011",
-                    "2012",
-                    "2013",
-                    "2014",
-                    "2015",
-                    "2016",
-                    "2017",
-                    "2018",
-                    "2019",
-                    "2020",
-                    "2021",
-                    "2022",
-                    "2023",
-                ],
+                "year": [str(year) for year in range(1950, 2024)],
                 "month": ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"],
                 "time": "00:00",
-                "area": [
-                    90,
-                    -180,
-                    -90,
-                    180,
-                ],
+                "area": [90, -180, -90, 180],
                 "format": "netcdf",
             },
-            Path(temp_dir) / "era5_monthly_t2m_eur.nc",
+            output_file,
         )
-
-        output_file = Path(temp_dir) / "era5_monthly_t2m_eur.nc"
         # Compress the file
         with open(output_file, "rb") as f_in:
             with gzip.open(str(output_file) + ".gz", "wb") as f_out:
                 shutil.copyfileobj(f_in, f_out)
 
         gzip_file = str(output_file) + ".gz"
-        print(gzip_file)
-
+        # Upload snapshot.
         snap.create_snapshot(filename=gzip_file, upload=upload)
 
 
