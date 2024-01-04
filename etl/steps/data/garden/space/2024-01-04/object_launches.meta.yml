@@ -1,0 +1,49 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Space Exploration & Satellites
+    processing_level: minor
+
+dataset:
+  update_period_days: 365
+
+tables:
+  object_launches:
+    variables:
+      annual_launches:
+        title: Annual number of objects launched into outer space
+        unit: objects
+        short_unit: ""
+        description_short: "Annual number of satellites, probes, landers, crewed spacecrafts, and space station flight elements, launched into Earth orbit or beyond."
+        description_key:
+          - "Objects are defined here as satellites, probes, landers, crewed spacecrafts, and space station flight elements launched into Earth orbit or beyond."
+          - "This data is based on national registers of launches submitted to the UN by participating nations. According to UN estimates, the data captures around 88% of all objects launched."
+          - "When an object is marked by the source as launched by a country on behalf of another one, the launch is attributed to the latter country."
+          - "When a launch is made jointly by several countries, it is recorded in each of these countries' time series but only once in the 'World' series."
+        description_processing: |-
+          - We scrape the data from the source by iterating through all objects in the online index.
+          - We harmonize the names of countries. When an object is marked by the source as launched by a country on behalf of another one, we attribute the launch to the latter country.
+          - We aggregate launches by country and year. When a launch is made jointly by several countries, it is recorded in each of these countries' time series.
+          - We calculate the total number of launches globally. This is available as 'World' in the data. When a launch is made jointly by several countries, it is only recorded once in the 'World' series.
+          - We also calculate the cumulative number of launches over time.
+        display:
+          numDecimalPlaces: 0
+      cumulative_launches:
+        title: Cumulative number of objects launched into outer space
+        unit: objects
+        short_unit: ""
+        description_short: "Cumulative number of satellites, probes, landers, crewed spacecrafts, and space station flight elements, launched into Earth orbit or beyond."
+        description_key:
+          - "Objects are defined here as satellites, probes, landers, crewed spacecrafts, and space station flight elements launched into Earth orbit or beyond."
+          - "This data is based on national registers of launches submitted to the UN by participating nations. According to UN estimates, the data captures around 88% of all objects launched."
+          - "When an object is marked by the source as launched by a country on behalf of another one, the launch is attributed to the latter country."
+          - "When a launch is made jointly by several countries, it is recorded in each of these countries' time series but only once in the 'World' series."
+        description_processing: |-
+          - We scrape the data from the source by iterating through all objects in the online index.
+          - We harmonize the names of countries. When an object is marked by the source as launched by a country on behalf of another one, we attribute the launch to the latter country.
+          - We aggregate launches by country and year. When a launch is made jointly by several countries, it is recorded in each of these countries' time series.
+          - We calculate the total number of launches globally. This is available as 'World' in the data. When a launch is made jointly by several countries, it is only recorded once in the 'World' series.
+          - We also calculate the cumulative number of launches over time.
+        display:
+          numDecimalPlaces: 0
