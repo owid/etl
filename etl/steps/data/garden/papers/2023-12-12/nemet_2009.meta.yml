@@ -1,0 +1,26 @@
+definitions:
+  common:
+    processing_level: minor
+    presentation:
+      topic_tags:
+        - Energy
+        - Technological Change
+
+dataset:
+  title: Cost and capacity of photovoltaic technology
+  update_period_days: 0
+
+tables:
+  nemet_2009:
+    variables:
+      cost:
+        title: Cost of photovoltaic technology
+        unit: 2004 USD/Watt
+      yearly_capacity:
+        title: Capacity of photovoltaic technology
+        unit: megawatts
+        short_unit: MW
+      previous_capacity:
+        title: Previous capacity of photovoltaic technology
+        unit: megawatts
+        short_unit: MW

@@ -1,0 +1,36 @@
+definitions:
+  latest_year: 2022
+  common:
+    processing_level: major
+    presentation:
+      topic_tags:
+        - Energy
+    description_processing: |
+      - Photovoltaic cost and capacity data between 1975 and 2003 has been taken from Nemet (2009). Prices from Nemet (2009) have been converted to {definitions.latest_year} US$ using: https://www.usinflationcalculator.com/
+      - Photovoltaic cost data between 2004 and 2009 has been taken from Farmer & Lafond (2016). Prices from Farmer & Lafond (2016) have been converted to {definitions.latest_year} US$ using: https://www.usinflationcalculator.com/
+      - Photovoltaic capacity data between 2004 and {definitions.latest_year} has been taken from IRENA.
+      - Photovoltaic cost data between 2010 and {definitions.latest_year} has been taken from IRENA.
+
+dataset:
+  update_period_days: 365
+
+tables:
+  photovoltaic_cost_and_capacity:
+    title: Solar photovoltaic cost and capacity
+    variables:
+      cost:
+        title: Solar photovoltaic module price
+        short_unit: $/W
+        unit: 2021 US$ per Watt
+        description_key:
+          - IRENA presents solar PV module price series for a number of different module technologies. Here we use the series for thin film a-Si/u-Si or Global Index (from Q4 2013).
+      cost_source:
+        title: Source for each value of cost data
+        unit: ''
+      cumulative_capacity:
+        title: Solar photovoltaic cumulative capacity
+        short_unit: MW
+        unit: megawatts
+      cumulative_capacity_source:
+        title: Source for each value of cumulative capacity data
+        unit: ''

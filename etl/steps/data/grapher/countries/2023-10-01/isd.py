@@ -25,7 +25,7 @@ def run(dest_dir: str) -> None:
     tb_regions = tb_regions.rename_index_names({"region": "country"})
     tb_countries = tb_countries.reset_index().rename(columns={"id": "is_present"})
     tb_countries["is_present"] = 1
-    tb_countries["is_present"].m.origins = tb_regions["number_countries"].m.origins
+    tb_countries["is_present"].metadata = tb_regions["number_countries"].m
 
     # Fill zeroes
     column_index = ["year", "country"]

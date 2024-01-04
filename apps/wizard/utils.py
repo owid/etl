@@ -598,3 +598,48 @@ def update_wizard_config(form: StepForm) -> None:
     # Export config
     with open(WIZARD_CONFIG, "w") as f:
         json.dump(config, f)
+
+
+def render_responsive_field_in_form(
+    key: str,
+    display_name: str,
+    field_1: Any,
+    field_2: Any,
+    options: List[str],
+    custom_label: str,
+    help_text: str,
+    app_state: Any,
+    default_value: str,
+) -> None:
+    """Render the namespace field within the form.
+
+    We want the namespace field to be a selectbox, but with the option to add a custom namespace.
+
+    This is a workaround to have repsonsive behaviour within a form.
+
+    Source: https://discuss.streamlit.io/t/can-i-add-to-a-selectbox-an-other-option-where-the-user-can-add-his-own-answer/28525/5
+    """
+    # Main decription
+    help_text = "## Description\n\nInstitution or topic name"
+
+    # Render and get element depending on selection in selectbox
+    with field_1:
+        field = app_state.st_widget(
+            st.selectbox,
+            label=display_name,
+            options=[custom_label] + options,
+            help=help_text,
+            key=key,
+            default_last=default_value,  # dummy_values[prop_uri],
+        )
+    with field_2:
+        if field == custom_label:
+            default_value = app_state.default_value(key)
+            field = app_state.st_widget(
+                st.text_input,
+                label="↳ *Use custom value*",
+                placeholder="",
+                help="Enter custom value.",
+                key=f"{key}_custom",
+                default_last=default_value,
+            )

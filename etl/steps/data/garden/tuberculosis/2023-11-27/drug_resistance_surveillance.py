@@ -55,6 +55,7 @@ def run(dest_dir: str) -> None:
     )
     tb = add_variable_description_from_producer(tb, dd)
     tb = sum_hiv_status_for_rifampicin_susceptible(tb)
+    tb = calculate_rr_resistance_share(tb)
     tb = tb.set_index(["country", "year"], verify_integrity=True)
 
     #
@@ -79,5 +80,16 @@ def sum_hiv_status_for_rifampicin_susceptible(tb: Table) -> Table:
     # Summing the columns, treating NaNs as 0. Unless all values in a row are NaN, then the sum should be NaN.
     tb["nrr_hivall"] = tb[cols_to_sum].sum(axis=1, skipna=True)
     tb["nrr_hivall"] = tb["nrr_hivall"].where(tb[cols_to_sum].notna().any(axis=1), np.nan)
+
+    return tb
+
+
+def calculate_rr_resistance_share(tb: Table) -> Table:
+    """
+    Calculating the share of rifampicin resistance among all tested patients.
+    """
+    tb["rr_new"] = tb["rr_new"].astype(float)
+    tb["r_rlt_new"] = tb["r_rlt_new"].astype(float)
+    tb["rr_share"] = (tb["rr_new"] / tb["r_rlt_new"]) * 100
 
     return tb

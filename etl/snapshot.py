@@ -141,6 +141,7 @@ class Snapshot:
     def is_dirty(self) -> bool:
         """Return True if snapshot exists and is in DVC."""
         from dvc.dvcfile import load_file
+        from dvc.rwlock import RWLockFileCorruptedError
 
         if not self.path.exists():
             return True
@@ -156,7 +157,14 @@ class Snapshot:
             with repo.lock:
                 # DVC returns empty dictionary if file is up to date
                 stage = dvc_file.stage
-                return stage.status() != {}
+                try:
+                    return stage.status() != {}
+                except RWLockFileCorruptedError:
+                    rwlock_path = paths.BASE_DIR / ".dvc/tmp/rwlock"
+                    # If the lock file is corrupted, we need to delete it and try again
+                    if rwlock_path.exists():
+                        rwlock_path.unlink()
+                    return stage.status() != {}
 
     def delete_local(self) -> None:
         """Delete local file and its metadata."""
@@ -228,6 +236,10 @@ class Snapshot:
             return self.read_json(*args, **kwargs)
         elif self.metadata.file_extension == "dta":
             return self.read_stata(*args, **kwargs)
+        elif self.metadata.file_extension == "rds":
+            return self.read_rds(*args, **kwargs)
+        elif self.metadata.file_extension == "rda":
+            return self.read_rda(*args, **kwargs)
         else:
             raise ValueError(f"Unknown extension {self.metadata.file_extension}")
 
@@ -252,6 +264,14 @@ class Snapshot:
     def read_stata(self, *args, **kwargs) -> Table:
         """Read Stata file into a Table and populate it with metadata."""
         return pr.read_stata(self.path, *args, metadata=self.to_table_metadata(), origin=self.metadata.origin, **kwargs)
+
+    def read_rds(self, *args, **kwargs) -> Table:
+        """Read R data .rds file into a Table and populate it with metadata."""
+        return pr.read_rds(self.path, *args, metadata=self.to_table_metadata(), origin=self.metadata.origin, **kwargs)
+
+    def read_rda(self, *args, **kwargs) -> Table:
+        """Read R data .rda file into a Table and populate it with metadata."""
+        return pr.read_rda(self.path, *args, metadata=self.to_table_metadata(), origin=self.metadata.origin, **kwargs)
 
     def read_from_records(self, *args, **kwargs) -> Table:
         """Read records into a Table and populate it with metadata."""

@@ -895,6 +895,20 @@ class Table(pd.DataFrame):
         tb = tb.set_index(column_idx_new)
         return tb
 
+    def fillna(self, value, **kwargs) -> "Table":
+        """Usual fillna, but, if the object given to fill values with is a table, transfer its metadata to the filled
+        table."""
+        tb = super().fillna(value, **kwargs)
+
+        if type(value) == type(self):
+            for column in tb.columns:
+                if column in value.columns:
+                    tb._fields[column] = variables.combine_variables_metadata(
+                        variables=[tb[column], value[column]], operation="fillna", name=column
+                    )
+
+        return tb
+
 
 def _create_table(df: pd.DataFrame, metadata: TableMeta, fields: Dict[str, VariableMeta]) -> Table:
     """Create a table with metadata."""
@@ -1413,6 +1427,20 @@ def read_rda(
     if table_name not in converted:
         raise ValueError(f"Table {table_name} not found in RDA file.")
     table = Table(converted[table_name], underscore=underscore)
+    table = _add_table_and_variables_metadata_to_table(table=table, metadata=metadata, origin=origin)
+    return cast(Table, table)
+
+
+def read_rds(
+    filepath_or_buffer: Union[str, Path, IO[AnyStr]],
+    metadata: Optional[TableMeta] = None,
+    origin: Optional[Origin] = None,
+    underscore: bool = False,
+) -> Table:
+    parsed = rdata.parser.parse_file(filepath_or_buffer, extension="rds")  # type: ignore
+    converted = rdata.conversion.convert(parsed)
+
+    table = Table(converted, underscore=underscore)
     table = _add_table_and_variables_metadata_to_table(table=table, metadata=metadata, origin=origin)
     return cast(Table, table)
 

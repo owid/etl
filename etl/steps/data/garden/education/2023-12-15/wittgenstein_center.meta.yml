@@ -1,0 +1,60 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    processing_level: major
+    presentation:
+      topic_tags:
+        - Global Education
+    display:
+      numDecimalPlaces: 1
+    short_unit: '%'
+    unit: '%'
+    description_key:
+          - Historical data for educational attainment between 1870 to 2005 comes from van Zanden, J. et al. (2014).
+          - Data for 2010 and 2015 is sourced via World Bank and is based on the Wittgenstein Centre for Demography and Global Human Capita. These projections are based on collected census and survey data for the base year 2010 and the Medium Shared Socioeconomic Pathways (SSP2) projection model. The SSP2 is a middle-of-the-road scenario that combines medium fertility with medium mortality, medium migration, and the Global Education Trend (GET) education scenario. For more information and other projection models, consult the Wittgenstein Centre for Demography and Global Human Capital's website - http://www.oeaw.ac.at/vid/dataexplorer/.
+          - Data for 2020 onwards is also based on the Medium Shared Socioeconomic Pathways (SSP2) Wittgenstein Centre for Demography and Global Human Capita projections. However, these have been updated to reflect recent global demographic changes, including COVID-19 impacts, changes in mortality, fertility, and migration trends, while maintaining the original long-term assumptions. For more information, see https://zenodo.org/records/7921989.
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
+dataset:
+  update_period_days: 365
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
+  title: Wittgenstein Center Population and Human Capital Projections
+tables:
+  wittgenstein_center_data:
+    # Learn more about the available fields:
+    # http://docs.owid.io/projects/etl/architecture/metadata/reference/indicator/
+    variables:
+      no_formal_education:
+        title: Share of population with no education
+        description_short: Share of people  aged 15 or older who have not received some kind of formal [primary](#dod:primary-education), [secondary](#dod:secondary-education), or [tertiary](#dod:tertiary-education) education.
+        description_processing: >
+          For each country and year, the share of the population aged 15 and older with no formal education was calculated. This involved summing up the population with no formal education and dividing it by the total population aged 15 and older for each country and year, then converting this ratio into a percentage.
+
+
+
+          A global estimate was calculated for each year by summing the total population aged 15 and older across all countries and the total population within this age group with no formal education. The share of the global population aged 15+ with no formal education was then computed for each year.
+
+
+
+          Historical data from van Zanden, J. et al. (2014) with estimates from 1870 to 2005 was combined with educational attainment estimates from Wittgenstein Centre for Demography and Global Human Capita.
+      population_with_basic_education:
+        title: Share of population with at least some basic education
+        description_short: Share of people  aged 15 or older who have received at least some kind of formal [primary](#dod:primary-education), [secondary](#dod:secondary-education), or [tertiary](#dod:tertiary-education) education.
+        description_processing: >
+          For each country and year, the share of the population aged 15 and older with no formal education was calculated. This involved summing up the population with no formal education and dividing it by the total population aged 15 and older for each country and year, then converting this ratio into a percentage.
+
+
+
+          A global estimate was calculated for each year by summing the total population aged 15 and older across all countries and the total population within this age group with no formal education. The share of the global population aged 15+ with no formal education was then computed for each year.
+
+
+
+          Historical data from van Zanden, J. et al. (2014) with estimates from 1870 to 2005 was combined with educational attainment estimates from Wittgenstein Centre for Demography and Global Human Capita.
+
+
+
+          To calculate the share of the population with at least some basic education, the share of the population with no formal education was subtracted from 100%.

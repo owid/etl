@@ -32,3 +32,11 @@ steps:
     - data://garden/iucn/2022-12-08/threatened_and_evaluated_species
   data://garden/iucn/2022-12-08/threatened_and_evaluated_species:
     - snapshot://iucn/2022-12-08/threatened_and_evaluated_species.feather
+  data://grapher/gapminder/2019-05-25/fertility_rate:
+    - data://garden/gapminder/2019-05-25/fertility_rate
+  data://garden/gapminder/2019-05-25/fertility_rate:
+    - snapshot://gapminder/2019-05-25/fertility_rate.feather
+  data://grapher/wb/2017-04-16/world_gdp:
+    - data://garden/wb/2017-04-16/world_gdp
+  data://garden/wb/2017-04-16/world_gdp:
+    - snapshot://wb/2017-04-16/world_gdp.feather

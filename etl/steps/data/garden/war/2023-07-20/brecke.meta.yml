@@ -37,7 +37,7 @@ tables:
 
           An ongoing interstate conflict is a conflict between states that causes at least 32 deaths during a year.
 
-          We identify interstate conflicts in the Conflict Catalog using the approach by Seshat (while correcting any mistakes for the 200 deadliest conflicts): https://seshatdatabank.info/cleaning-history-data-the-conflict-catalogue/
+          We identify interstate conflicts in the Conflict Catalog using the approach by Seshat (while correcting any mistakes for the 200 deadliest conflicts): https://web.archive.org/web/20230606184656/https://seshatdatabank.info/cleaning-history-data-the-conflict-catalogue/
 
           Deaths of combatants and civilians due to fighting, disease, and starvation are included.
 
@@ -47,7 +47,7 @@ tables:
 
           An ongoing internal conflict is a conflict between a state and a non-state armed groups, between non-state armed groups, or between an armed group and civilians, that causes at least 32 deaths during a year.
 
-          We identify interstate conflicts in the Conflict Catalog using the approach by Seshat (while correcting any mistakes for the 200 deadliest conflicts): https://seshatdatabank.info/cleaning-history-data-the-conflict-catalogue/
+          We identify interstate conflicts in the Conflict Catalog using the approach by Seshat (while correcting any mistakes for the 200 deadliest conflicts): https://web.archive.org/web/20230606184656/https://seshatdatabank.info/cleaning-history-data-the-conflict-catalogue/
 
           Deaths of combatants and civilians due to fighting, disease, and starvation are included.
 
@@ -78,13 +78,13 @@ tables:
 
           An ongoing interstate conflict is a conflict between states that causes at least 32 deaths during a year.
 
-          We identify interstate conflicts in the Conflict Catalog using the approach by Seshat (while correcting any mistakes for the 200 deadliest conflicts): https://seshatdatabank.info/cleaning-history-data-the-conflict-catalogue/
+          We identify interstate conflicts in the Conflict Catalog using the approach by Seshat (while correcting any mistakes for the 200 deadliest conflicts): https://web.archive.org/web/20230606184656/https://seshatdatabank.info/cleaning-history-data-the-conflict-catalogue/
           <% elif conflict_type == "internal" %>
           The number of ongoing internal conflicts in each year.
 
           An ongoing internal conflict is a conflict between a state and a non-state armed groups, between non-state armed groups, or between an armed group and civilians, that causes at least 32 deaths during a year.
 
-          We identify interstate conflicts in the Conflict Catalog using the approach by Seshat (while correcting any mistakes for the 200 deadliest conflicts): https://seshatdatabank.info/cleaning-history-data-the-conflict-catalogue/
+          We identify interstate conflicts in the Conflict Catalog using the approach by Seshat (while correcting any mistakes for the 200 deadliest conflicts): https://web.archive.org/web/20230606184656/https://seshatdatabank.info/cleaning-history-data-the-conflict-catalogue/
           <% endif %>
 
           We count a conflict as ongoing in a region even if the conflict is also ongoing in other regions. The sum across all regions can therefore be higher than the total number of ongoing conflicts.
@@ -113,7 +113,7 @@ tables:
 
           A new interstate conflict is a conflict between states that causes at least 32 deaths during a year for the first time.
 
-          We identify interstate conflicts in the Conflict Catalog using the approach by Seshat (while correcting any mistakes for the 200 deadliest conflicts): https://seshatdatabank.info/cleaning-history-data-the-conflict-catalogue/
+          We identify interstate conflicts in the Conflict Catalog using the approach by Seshat (while correcting any mistakes for the 200 deadliest conflicts): https://web.archive.org/web/20230606184656/https://seshatdatabank.info/cleaning-history-data-the-conflict-catalogue/
 
           We count a conflict as new in a region even if the conflict started at the same time in another region. The sum across all regions can therefore be higher than the total number of new conflicts.
           <% elif conflict_type == "internal" %>
@@ -121,7 +121,7 @@ tables:
 
           A new internal conflict is a conflict between a state and a non-state armed groups, between non-state armed groups, or between an armed group and civilians, that causes at least 32 deaths during a year for the first time.
 
-          We identify interstate conflicts in the Conflict Catalog using the approach by Seshat (while correcting any mistakes for the 200 deadliest conflicts): https://seshatdatabank.info/cleaning-history-data-the-conflict-catalogue/
+          We identify interstate conflicts in the Conflict Catalog using the approach by Seshat (while correcting any mistakes for the 200 deadliest conflicts): https://web.archive.org/web/20230606184656/https://seshatdatabank.info/cleaning-history-data-the-conflict-catalogue/
 
           We count a conflict as new in a region even if the conflict started at the same time in another region. The sum across all regions can therefore be higher than the total number of new conflicts.
           <% endif %>

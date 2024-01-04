@@ -1,7 +1,7 @@
 meta:
   origin:
     # Data product / Snapshot
-    title: Conflicts Catalog
+    title: Conflict Catalog
     date_published: 1999-10-08
     description: |-
       The Conflict Catalog is a dataset by Dr Peter Brecke. Brecke says that "the Conflict Catalog within that Excel file is an unfinished product." and that considering the data that he has "that is not yet in the Conflict Catalog, [he] can easily believe the catalog growing by 20% or more."
@@ -17,10 +17,11 @@ meta:
       Brecke, P. (1999, October). Violent conflicts 1400 AD to the
       present in different regions of the world. In 1999 Meeting of the Peace Science
       Society.
+    attribution: Brecke - Conflict Catalog (1999)
 
     # Files
     url_main: https://brecke.inta.gatech.edu/research/conflict/
-    url_download: 
+    url_download:
       https://brecke.inta.gatech.edu/wp-content/uploads/sites/19/2018/09/Conflict-Catalog-18-vars.xlsx
     date_accessed: 2023-09-21
 
