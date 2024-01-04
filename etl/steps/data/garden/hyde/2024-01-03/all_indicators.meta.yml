@@ -26,79 +26,79 @@ tables:
       This database presents an update and expansion of the History Database of the Global Environment (HYDE, v 3.3) and replaces former HYDE 3.2 version from 2017. HYDE is and internally consistent combination of updated historical population estimates and land use. Categories include cropland, with a new distinction into irrigated and rain fed crops (other than rice) and irrigated and rain fed rice. Also grazing lands are provided, divided into more intensively used pasture, converted rangeland and non-converted natural (less intensively used) rangeland. Population is represented by maps of total, urban, rural population and population density as well as built-up area. The period covered is 10 000 BCE to 2023 CE. Spatial resolution is 5 arc minutes (approx. 85 km2 at the equator), the files are in ESRI ASCII grid format.
     variables:
       popc_c:
-        title: TODO
-        description_short: total population per country over time, in 1000
-        unit: ''
+        title: Population
+        description_short: Total population per country over time
+        unit: people
       popd_c:
-        title: TODO
-        description_short: population density, in inhabitants/km2
-        unit: ''
+        title: Population density
+        description_short: Population density
+        unit: people per km²
       urbc_c:
-        title: TODO
-        description_short: Total urban population per country over time, in 1000
-        unit: ''
+        title: Urban population
+        description_short: Total urban population per country over time
+        unit: people
       rurc_c:
-        title: TODO
-        description_short: Total rural population per country over time, in 1000
-        unit: ''
+        title: Rural population
+        description_short: Total rural population per country over time
+        unit: people
       uopp_c:
-        title: TODO
-        description_short: total built-up area per country over time, in km2 per grid cell
-        unit: ''
+        title: Built-up area
+        description_short: Total built-up area per country over time
+        unit: km² per grid cell
       cropland_c:
         title: TODO
-        description_short: total cropland area for each seperate country over time
-        unit: ''
+        description_short: Total cropland area for each seperate country over time
+        unit: ""
       rf_rice_c:
-        title: TODO
-        description_short: total rainfed rice for each country over time, in km2
-        unit: ''
+        title: Rainfed rice
+        description_short: Total rainfed rice for each country over time
+        unit: km²
       rf_norice_c:
         title: TODO
-        description_short: total rainfed other crops (no rice)for each country over time, in km2
-        unit: ''
+        description_short: Total rainfed other crops (no rice) for each country over time
+        unit: km²
       ir_rice_c:
-        title: TODO
-        description_short: total irrigated rice for each country over time, in km2
-        unit: ''
+        title: Irrigated rice
+        description_short: Total irrigated rice for each country over time
+        unit: km²
       ir_norice_c:
-        title: TODO
-        description_short: total irrigated other crops (no rice)for each country over time, in km2
-        unit: ''
+        title: Irrigated other crops (no rice)
+        description_short: Total irrigated other crops (no rice) for each country over time
+        unit: km²
       tot_irri_c:
-        title: TODO
-        description_short: total irrigated area for each country over time, in km2
-        unit: ''
+        title: Irrigated area
+        description_short: Total irrigated area for each country over time
+        unit: km²
       tot_rice_c:
-        title: TODO
-        description_short: total rice area for each country over time, in km2
-        unit: ''
+        title: Rice area
+        description_short: Total rice area for each country over time
+        unit: km²
       tot_rainfed_c:
-        title: TODO
-        description_short: total rainfed area for each country over time, in km2
-        unit: ''
+        title: Rainfed area
+        description_short: Total rainfed area for each country over time
+        unit: km²
       grazing_c:
-        title: TODO
-        description_short: total grazingland area for each seperate country over time, in km2
-        unit: ''
+        title: Grazingland area
+        description_short: Total grazingland area for each seperate country over time, in km2
+        unit: km²
       pasture_c:
-        title: TODO
-        description_short: total pasture area for each country over time, in km2
-        unit: ''
+        title: Pasture area
+        description_short: Total pasture area for each country over time, in km2
+        unit: km²
       conv_rangeland_c:
-        title: TODO
-        description_short: total converted rangeland for each seperate country over time, in km2
-        unit: ''
+        title: Converted rangeland area
+        description_short: Total converted rangeland for each seperate country over time, in km2
+        unit: km²
       rangeland_c:
-        title: TODO
-        description_short: total rangeland for each seperate country over time, in km2
-        unit: ''
+        title: Rangeland area
+        description_short: Total rangeland for each seperate country over time
+        unit: km²
 
 
       shifting_c:
-        title: TODO
-        description_short: TODO
-        unit: ''
+        title: Shifting
+        description_short: ""
+        unit: ""
 
 
 

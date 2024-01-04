@@ -31,6 +31,15 @@ def run(dest_dir: str) -> None:
     # Drop columns
     tb = tb.drop(columns=["iso_code"])
 
+    # Scale indicators
+    ## Some indicators are given in 1,000.
+    columns_1000 = [
+        "popc_c",
+        "urbc_c",
+        "rurc_c",
+    ]
+    tb[columns_1000] *= 1000
+
     # Set index
     tb = tb.set_index(["country", "year"], verify_integrity=True).sort_index()
 
