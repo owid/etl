@@ -129,31 +129,35 @@ def add_regions_to_tuberculosis_vars(tb: Table, ds_regions: Dataset, ds_income_g
     """
     Adding regional aggregates for all tuberculosis variables.
     """
-    tb_cols = ["hiv_tb_patients_receiving_art", "tb_patients_tested_positive_hiv", "tb_related_deaths"]
+    cols = ["hiv_tb_patients_receiving_art", "tb_patients_tested_positive_hiv", "tb_related_deaths"]
 
-    tb_agg = tb[["country", "year", "disaggregation"] + tb_cols]
-    tb_no_agg = tb.drop(columns=tb_cols)
-    # removing existing aggregates - just world
+    # Split table into 'agg' and 'no_agg'
+    tb_agg = tb[["country", "year", "disaggregation"] + cols]
+    tb_no_agg = tb.drop(columns=cols)
+    # Removing existing aggregates
     tb_agg = tb_agg[~tb_agg["country"].isin(REGIONS_TO_ADD)]
-    tb_agg = tb_agg.dropna(subset=tb_cols, how="all")
+    tb_agg = tb_agg.dropna(subset=cols, how="all")
+    # Group tb_agg by disaggregation to allow us to add regions for each disaggregation value
+    tb_agg_groups = tb_agg.groupby("disaggregation")
 
-    tb_group = tb_agg.groupby("disaggregation")
-
-    tb_all_group = Table()
-    for group, group_tb in tb_group:
-        tb_agg_group = group_tb.drop(columns="disaggregation")
-        tb_agg_group = geo.add_regions_to_table(
-            tb_agg_group,
+    # Create a table for each disaggregation value
+    tbs = []
+    for group_name, tb_agg_group in tb_agg_groups:
+        tb_agg_group_with_regions = geo.add_regions_to_table(
+            tb_agg_group.drop(columns="disaggregation"),
             ds_regions,
             ds_income_groups,
             REGIONS_TO_ADD,
             min_num_values_per_year=1,
             frac_allowed_nans_per_year=0.3,
         )
-        tb_agg_group["disaggregation"] = group
-        tb_all_group = pr.concat([tb_all_group, tb_agg_group], ignore_index=True)
+        tb_agg_group_with_regions["disaggregation"] = group_name
+        tbs.append(tb_agg_group_with_regions)
 
-    tb = pr.merge(tb_no_agg, tb_all_group, on=["country", "year", "disaggregation"], how="outer").reset_index(drop=True)
+    # Combine all 'agg' tables
+    tb_agg = pr.concat(tbs, ignore_index=True)
+    # Merge with table without aggregates
+    tb = pr.merge(tb_no_agg, tb_agg, on=["country", "year", "disaggregation"], how="outer").reset_index(drop=True)
 
     return tb
 
