@@ -79,6 +79,5 @@ def run(dest_dir: str) -> None:
         default_metadata=ds_meadow.metadata,
     )
 
-    print(ds_garden["all_indicators"])
     # Save changes in the new garden dataset.
     ds_garden.save()
