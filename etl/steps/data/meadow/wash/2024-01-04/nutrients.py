@@ -20,7 +20,6 @@ def run(dest_dir: str) -> None:
     #
     # Retrieve snapshot.
     snap = paths.load_snapshot("nutrients.zip")
-
     # Load data from snapshot.
     tb = read_tb_from_snapshot_zip(snap)
     tb = tb.rename(columns={"countryName": "country", "phenomenonTimeReferenceYear": "year"})
@@ -28,7 +27,11 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
-    tb = tb.underscore().set_index(["country", "year", "waterbodycategory"], verify_integrity=True).sort_index()
+    tb = (
+        tb.underscore()
+        .set_index(["country", "year", "waterbodycategory", "eeaindicator"], verify_integrity=True)
+        .sort_index()
+    )
 
     #
     # Save outputs.
@@ -46,4 +49,5 @@ def read_tb_from_snapshot_zip(snap: Snapshot) -> Table:
         z = zipfile.ZipFile(snap.path)
         z.extractall(temp_dir)
         tb = pr.read_csv(os.path.join(temp_dir, "aggregateddata_country.csv"), delimiter=";")
+        tb.metadata.short_name = snap.metadata.short_name
     return tb
