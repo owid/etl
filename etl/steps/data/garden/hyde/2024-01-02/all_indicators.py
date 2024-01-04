@@ -38,14 +38,14 @@ def run(dest_dir: str) -> None:
     tb = tb.drop(columns=["iso_code"], errors="raise")
 
     # Scale indicators
-    ## Population indicators are given in 1,000
-    tb[
-        [
-            "popc_c",
-            "urbc_c",
-            "rurc_c",
-        ]
-    ] *= 1000
+    ## Population indicators are given in 1,000 (actually not!, reported to the source)
+    # tb[
+    #     [
+    #         "popc_c",
+    #         "urbc_c",
+    #         "rurc_c",
+    #     ]
+    # ] *= 1000
     ## Land use indicators are given in km2, but we want ha: 1km2 = 100ha
     tb[
         [
