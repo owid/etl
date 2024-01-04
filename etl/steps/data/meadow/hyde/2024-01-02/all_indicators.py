@@ -34,7 +34,7 @@ def run(dest_dir: str) -> None:
     #
     paths.log.info("Processing main table...")
     # Rename
-    tb = tb.rename({"region": "country"}, axis=1)
+    tb = tb.rename(columns={"region": "country"}, errors="raise")
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
     tb = tb.underscore().set_index(["country", "year"], verify_integrity=True).sort_index()
 
@@ -44,11 +44,16 @@ def run(dest_dir: str) -> None:
     paths.log.info("Processing country codes table...")
     # Keep good columns
     tb_codes = tb_codes[["ISO-CODE", "Country"]]
-    # Filter spurious entries
-    mask = (tb_codes["ISO-CODE"] == 826) & (tb_codes["Country"] != "United Kingdom  ")
-    tb_codes = tb_codes[~mask]
     # Strip country names
     tb_codes["Country"] = tb_codes["Country"].str.strip()
+    # Assert
+    assert (tb_codes["ISO-CODE"] == 826).sum() == 3, "There should be three countries with ISO code 826!"
+    assert "United Kingdom" in set(
+        tb_codes[tb_codes["ISO-CODE"] == 826]["Country"]
+    ), "United Kingdom should be in the list of countries with ISO code 826!"
+    # Filter spurious entries
+    mask = (tb_codes["ISO-CODE"] == 826) & (tb_codes["Country"] != "United Kingdom")
+    tb_codes = tb_codes[~mask]
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
     tb_codes = tb_codes.underscore().set_index(["iso_code"], verify_integrity=True).sort_index()
 
