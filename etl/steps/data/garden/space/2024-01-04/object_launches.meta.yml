@@ -3,6 +3,7 @@ definitions:
     presentation:
       topic_tags:
         - Space Exploration & Satellites
+      attribution_short: UNOOSA
     processing_level: major
 
 dataset:
