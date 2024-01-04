@@ -282,6 +282,8 @@ steps:
     - data://meadow/health/2023-08-22/unaids_gap_art
     - data://meadow/health/2023-08-22/unaids_deaths_averted_art
     - data://garden/demography/2023-03-31/population
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2023-04-30/income_groups
 
   data://grapher/health/2023-08-09/unaids:
     - data://garden/health/2023-08-09/unaids

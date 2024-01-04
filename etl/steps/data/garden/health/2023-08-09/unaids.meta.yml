@@ -114,6 +114,8 @@ tables:
         description_from_producer: |-
           The number of patients with tuberculosis living with HIV that are receiving ART.
         processing_level: minor
+        display:
+          numDecimalPlaces: 0
 
       infections_averted_pmtct:
         title: New HIV Infections averted due to PMTCT
@@ -191,6 +193,8 @@ tables:
         description_short: |-
           Number of tuberculosis patients that tested positive for HIV.
         processing_level: minor
+        display:
+          numDecimalPlaces: 0
 
       tb_related_deaths:
         title: Estimated TB-related deaths among people living with HIV
@@ -199,6 +203,8 @@ tables:
         description_short: |-
           Number of deaths from people living with HIV that are related to tuberculosis.
         processing_level: minor
+        display:
+          numDecimalPlaces: 0
 
       new_infections:
         title: New HIV Infections
@@ -229,4 +235,3 @@ tables:
         display:
           name: Estimated resource needs to meet HIV targets
           numDecimalPlaces: 0
-
