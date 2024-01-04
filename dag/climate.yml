@@ -61,8 +61,8 @@ steps:
   #
   data://meadow/climate/2024-01-02/hawaii_ocean_time_series:
     - snapshot://climate/2024-01-02/hawaii_ocean_time_series.csv
-  # data://garden/climate/2024-01-02/hawaii_ocean_time_series:
-  #   - data://meadow/climate/2024-01-02/hawaii_ocean_time_series
+  data://garden/climate/2024-01-02/ocean_ph_levels:
+    - data://meadow/climate/2024-01-02/hawaii_ocean_time_series
   #
   # Climate change impacts data explorer.
   #
@@ -72,6 +72,7 @@ steps:
     - data://garden/climate/2024-01-02/sea_surface_temperature
     - data://garden/climate/2024-01-02/ocean_heat_content
     - data://garden/epa/2024-01-02/ocean_heat_content
+    - data://garden/climate/2024-01-02/ocean_ph_levels
 
   ######################################################################################################################
   # Older versions to be archived once they are not used by any other steps.

@@ -18,7 +18,7 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load snapshot and read its data.
-    tb = paths.load_snapshot("hawaii_ocean_time_series.csv").read(skiprows=8, sep="\t")
+    tb = paths.load_snapshot("hawaii_ocean_time_series.csv").read(skiprows=8, sep="\t", na_values=[-999])
 
     #
     # Process data.

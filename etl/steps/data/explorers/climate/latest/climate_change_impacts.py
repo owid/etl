@@ -73,6 +73,10 @@ def run(dest_dir: str) -> None:
     ds_epa = paths.load_dataset("ocean_heat_content", namespace="epa")
     tb_ocean_heat_annual_epa = ds_epa["ocean_heat_content"].reset_index()
 
+    # Load ocean pH data from the School of Ocean and Earth Science and Technology.
+    ds_ocean_ph = paths.load_dataset("ocean_ph_levels")
+    tb_ocean_ph = ds_ocean_ph["ocean_ph_levels"].reset_index()
+
     #
     # Process data.
     #
@@ -86,7 +90,10 @@ def run(dest_dir: str) -> None:
 
     # Gather monthly data from different tables.
     tb_monthly = tb_giss.astype({"date": str}).copy()
-    for table in [tb_nsidc, tb_met_office, tb_ocean_heat_monthly]:
+    # NOTE: The values in tb_ocean_ph are monthly, but the dates are not consistently on the middle of the month.
+    #  Instead, they are on different days of the month. When merging with other tables, this will create many nans.
+    #  We could reindex linearly, but it's not a big deal.
+    for table in [tb_nsidc, tb_met_office, tb_ocean_heat_monthly, tb_ocean_ph]:
         tb_monthly = tb_monthly.merge(
             table.astype({"date": str}),
             how="outer",
