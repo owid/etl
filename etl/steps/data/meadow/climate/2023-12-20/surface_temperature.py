@@ -1,4 +1,5 @@
 """Load a snapshot and create a meadow dataset."""
+import gzip
 import zipfile
 
 import geopandas as gpd
@@ -24,10 +25,11 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Retrieve snapshot.
-    snap = paths.load_snapshot("surface_temperature.nc")
-
+    snap = paths.load_snapshot("surface_temperature.gz")
     # Load data from snapshot.
-    ds = xr.open_dataset(snap.path)
+    with gzip.open(snap.path) as _file:
+        ds = xr.open_dataset(_file.read())
+
     #
     # Process data.
     #

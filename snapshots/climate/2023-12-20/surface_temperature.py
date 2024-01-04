@@ -8,6 +8,8 @@
    The data is downloaded as a NetCDF file. Tutorials for using the Copernicus API are here and work with the NETCDF format are here: https://ecmwf-projects.github.io/copernicus-training-c3s/cds-tutorial.html
    """
 
+import gzip
+import shutil
 import tempfile
 from pathlib import Path
 
@@ -25,7 +27,7 @@ SNAPSHOT_VERSION = Path(__file__).parent.name
 @click.option("--upload/--skip-upload", default=True, type=bool, help="Upload dataset to Snapshot")
 def main(upload: bool) -> None:
     # Create a new snapshot.
-    snap = Snapshot(f"climate/{SNAPSHOT_VERSION}/surface_temperature.nc")
+    snap = Snapshot(f"climate/{SNAPSHOT_VERSION}/surface_temperature.gz")
     # Save data as a compressed temporary file.
     with tempfile.TemporaryDirectory() as temp_dir:
         c = cdsapi.Client()
@@ -124,9 +126,15 @@ def main(upload: bool) -> None:
         )
 
         output_file = Path(temp_dir) / "era5_monthly_t2m_eur.nc"
+        # Compress the file
+        with open(output_file, "rb") as f_in:
+            with gzip.open(str(output_file) + ".gz", "wb") as f_out:
+                shutil.copyfileobj(f_in, f_out)
 
-        # Add file to DVC and upload to S3.
-        snap.create_snapshot(filename=output_file, upload=upload)
+        gzip_file = str(output_file) + ".gz"
+        print(gzip_file)
+
+        snap.create_snapshot(filename=gzip_file, upload=upload)
 
 
 if __name__ == "__main__":
