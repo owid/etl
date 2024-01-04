@@ -6,6 +6,7 @@ definitions:
         - Population Growth
         - Land Use
         - Urbanization
+    processing_level: minor
   land_use_allocation: |-
     The order of allocation is as follows: first, we allocate cropland, then rice, then irrigation and finally grazing land.
 
@@ -29,27 +30,27 @@ tables:
       # Population and population density
       popc_c:
         title: Population
-        description_short: Total population per country over time.
+        description_short: Total population of a country over time.
         unit: people
       popd_c:
         title: Population density
-        description_short: Population density per country over time.
+        description_short: Population density of a country over time.
         unit: people per km²
       urbc_c:
         title: Population (urban)
-        description_short: Total urban population per country over time.
+        description_short: Total urban population of a country over time.
         unit: people
       rurc_c:
         title: Population (rural)
-        description_short: Total rural population per country over time.
+        description_short: Total rural population of a country over time.
         unit: people
 
       # Land use
       uopp_c:
         title: "Land use: Built-up area"
-        description_short: Total built-up area per country over time.
+        description_short: Total built-up area of a country over time.
         description_key:
-          - Built-up areas are computed by dividing total urban population in a country at time t by average urban densities in a country at time t.
+          - Built-up areas are computed by dividing total urban population in a country at a given year by the average urban densities in a country at that year.
           - "{definitions.land_use_allocation}"
         unit: hectares per grid cell
         short_unit: "ha"
@@ -65,12 +66,12 @@ tables:
         title: "Land use: Grazingland"
         description_short: Total grazingland area for each seperate country over time.
         description_key:
-          - "'Grazingland' is equivalent to the FAO category of 'permanent mead- ows and pastures'."
+          - "'Grazingland' is equivalent to the FAO category of 'permanent meadows and pastures'."
           - "{definitions.land_use_allocation}"
         unit: "hectares"
         short_unit: "ha"
 
-      # Landuse for different crops (rainfed / irrigated)
+      # Land use for different crops (rainfed / irrigated)
       tot_rice_c:
         title: "Land use: Rice"
         description_short: Total rice area for each country over time
@@ -121,8 +122,7 @@ tables:
         unit: "hectares"
         short_unit: "ha"
 
-      # Land use of other stuff
-
+      # Land use for other purposes
       pasture_c:
         title: "Land use: Pasture"
         description_short: Total pasture area for each country over time.
@@ -150,13 +150,3 @@ tables:
         title: Shifting
         description_short: ""
         unit: ""
-
-
-
-
-
-
-
-
-
-

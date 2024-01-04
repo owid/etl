@@ -11,12 +11,13 @@ def run(dest_dir: str) -> None:
     #
     # Load inputs.
     #
-    # Load meadow dataset.
+    # Load 'meadow dataset.'
     ds_meadow = paths.load_dataset("all_indicators")
-    # Read table from meadow dataset.
+
+    # Read 'all_indicators' table, which contains the actual indicators
     tb = ds_meadow["all_indicators"].reset_index()
 
-    # Load meadow dataset.
+    # Read 'general_files' table, which contains the country codes (used to map country codes to country names)
     tb_codes = ds_meadow["general_files"].reset_index()
 
     #
@@ -29,12 +30,12 @@ def run(dest_dir: str) -> None:
     )
 
     # Add country name to main table
-    tb = tb.rename(columns={"country": "iso_code"}).astype({"iso_code": "str"})
+    tb = tb.rename(columns={"country": "iso_code"}, errors="raise").astype({"iso_code": "str"})
     tb_codes = tb_codes.astype("str")
     tb = tb.merge(tb_codes, on="iso_code", how="left")
     tb.loc[tb["iso_code"] == "Total", "country"] = "World"
     # Drop columns
-    tb = tb.drop(columns=["iso_code"])
+    tb = tb.drop(columns=["iso_code"], errors="raise")
 
     # Scale indicators
     ## Population indicators are given in 1,000
