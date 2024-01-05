@@ -64,17 +64,14 @@ def calculate_share_of_land_type(tb: Table, land_areas: Table) -> Table:
 
 
 def calculate_area_of_each_land_type(tb: Table) -> Table:
-    tb_global = tb.groupby(["name", "value"])["land_ar"].sum()
+    tb_global = tb.groupby(["year", "value"])["land_ar"].sum()
     tb_global = tb_global.reset_index()
     tb_global["regn_nm"] = "World"
 
-    tb_regional = tb.groupby(["name", "value", "regn_nm"])["land_ar"].sum()
+    tb_regional = tb.groupby(["year", "value", "regn_nm"])["land_ar"].sum()
     tb_regional = tb_regional.reset_index()
 
     tb_combined = pr.concat([tb_global, tb_regional], ignore_index=True)
-    # Convert year string
-
-    tb_combined = tb_combined.drop(columns=["name"])
 
     return tb_combined
 
