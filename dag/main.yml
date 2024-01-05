@@ -758,6 +758,8 @@ steps:
   data://garden/papers/2023-10-20/anthromes:
     - data://meadow/papers/2023-10-20/anthromes
     - data://meadow/papers/2023-10-20/anthromes_input
+  data://grapher/papers/2024-01-05/anthromes:
+    - data://garden/papers/2023-10-20/anthromes
   ######################################################################################################################
   # Map (Natural Earth)
   data://meadow/geography/2023-11-28/nat_earth_110:
@@ -767,8 +769,6 @@ steps:
 
   ######################################################################################################################
 
-  data://grapher/papers/2024-01-05/anthromes:
-    - data://garden/papers/2023-10-20/anthromes
 include:
   - dag/open_numbers.yml
   - dag/faostat.yml
