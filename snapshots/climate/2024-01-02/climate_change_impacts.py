@@ -28,12 +28,18 @@ FILES = [
     "ocean_heat_content_annual_world_2000m.csv",
     # School of Ocean and Earth Science and Technology - Hawaii Ocean Time-series.
     "hawaii_ocean_time_series.csv",
+    # Rutgers University Global Snow Lab - Snow Cover Extent.
+    "snow_cover_extent_north_america.csv",
+    "snow_cover_extent_northern_hemisphere.csv",
 ]
 
 # Other possible datasets to include:
 # Ocean heat content data from MRI/JMA. We have this data as part of the EPA ocean heat content compilation.
 # But in the following link, they claim the data is updated every year, so it could be added to our yearly data.
 # https://www.data.jma.go.jp/gmd/kaiyou/english/ohc/ohc_global_en.html
+# Rutgers University Global Snow Lab also includes snow cover extent for:
+# * Eurasia: https://climate.rutgers.edu/snowcover/files/moncov.eurasia.txt
+# * North America (excluding Greenland): https://climate.rutgers.edu/snowcover/files/moncov.nam.txt
 
 
 @click.command()

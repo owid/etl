@@ -85,6 +85,10 @@ def run(dest_dir: str) -> None:
     ds_ocean_ph = paths.load_dataset("ocean_ph_levels")
     tb_ocean_ph = ds_ocean_ph["ocean_ph_levels"].reset_index()
 
+    # Load snow cover extent from Rutgers University Global Snow Lab.
+    ds_snow = paths.load_dataset("snow_cover_extent")
+    tb_snow = ds_snow["snow_cover_extent"].reset_index()
+
     #
     # Process data.
     #
@@ -101,7 +105,7 @@ def run(dest_dir: str) -> None:
     # NOTE: The values in tb_ocean_ph are monthly, but the dates are not consistently on the middle of the month.
     #  Instead, they are on different days of the month. When merging with other tables, this will create many nans.
     #  We could reindex linearly, but it's not a big deal.
-    for table in [tb_nsidc, tb_met_office, tb_ocean_heat_monthly, tb_ocean_ph]:
+    for table in [tb_nsidc, tb_met_office, tb_ocean_heat_monthly, tb_ocean_ph, tb_snow]:
         tb_monthly = tb_monthly.merge(
             table.astype({"date": str}),
             how="outer",

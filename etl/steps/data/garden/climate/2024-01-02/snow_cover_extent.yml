@@ -1,0 +1,21 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+      - Climate Change
+    unit: "square kilometers"
+    short_unit: "km²"
+    description_short: Measured in square kilometers.
+
+dataset:
+  title: Snow Cover Extent
+  update_period_days: 60
+
+tables:
+  snow_cover_extent:
+    title: Snow Cover Extent
+    variables:
+      snow_cover_extent:
+        title: Monthly measurement of the area covered by snow
+      ocean_ph_yearly_average:
+        title: Rolling yearly average of the area covered by snow

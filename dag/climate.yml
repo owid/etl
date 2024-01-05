@@ -64,6 +64,14 @@ steps:
   data://garden/climate/2024-01-02/ocean_ph_levels:
     - data://meadow/climate/2024-01-02/hawaii_ocean_time_series
   #
+  # Rutgers University Global Snow Lab - Snow Cover Extent.
+  #
+  data://meadow/climate/2024-01-02/snow_cover_extent:
+    - snapshot://climate/2024-01-02/snow_cover_extent_north_america.csv
+    - snapshot://climate/2024-01-02/snow_cover_extent_northern_hemisphere.csv
+  data://garden/climate/2024-01-02/snow_cover_extent:
+    - data://meadow/climate/2024-01-02/snow_cover_extent
+  #
   # Climate change impacts data explorer.
   #
   data://explorers/climate/latest/climate_change_impacts:
@@ -73,6 +81,7 @@ steps:
     - data://garden/climate/2024-01-02/ocean_heat_content
     - data://garden/epa/2024-01-02/ocean_heat_content
     - data://garden/climate/2024-01-02/ocean_ph_levels
+    - data://garden/climate/2024-01-02/snow_cover_extent
 
   ######################################################################################################################
   # Older versions to be archived once they are not used by any other steps.
