@@ -1,145 +1,143 @@
-dataset:
-  title: Anthromes
 tables:
   anthromes:
-    title: Anthromes
-    description: >-
-      Ellis et al. (2021). "People have shaped most of terrestrial nature for at least 12,000 years". Proceedings of the National
-      Academy of Sciences doi: 10.1073/pnas.2023483118.
-
-      This repository contains the full Anthromes-12k-DGG dataset in .csv format for all three uncertainty levels (baseline,
-      lower and upper), as well as the an12_dgg_inputs shapefile containing the discrete global grid polygons and supplemental
-      data which can be joined to the .csv files for mapping. See the included README file for details of the included datasets.
-
-      Please refer to the associated R analysis code and research compendium at doi:10.7910/DVN/6FWPZ9 for the associated
-      anthrome class names and example code for working with these data in R.
-
-
-      Related publication:
-
-
-      Erle C. Ellis, Nicolas Gauthier, Kees Klein Goldewijk, Rebecca Bliege Bird, Nicole Boivin, Sandra Díaz, Dorian Q. Fuller,
-      Jacquelyn L. Gill, Jed O. Kaplan, Naomi Kingston, Harvey Locke, Crystal N. H. McMichael, Darren Ranco, Torben C. Rick,
-      M. Rebecca Shaw, Lucas Stephens, Jens-Christian Svenning, and James E.M. Watson, (2021). "People have shaped most of
-      terrestrial nature for at least 12,000 years". Proceedings of the National Academy of Sciences. doi: 10.1073/pnas.2023483118
     variables:
       land_ar_ice__uninhabited:
         title: Area of uninhabited ice
         unit: ""
       land_ar_inhabited_treeless_and_barren_lands:
-        title: land_ar Inhabited treeless and barren lands
+        title: Area of inhabited treeless and barren lands
         unit: ""
       land_ar_irrigated_villages:
-        title: land_ar Irrigated villages
+        title: Area of irrigated villages
         unit: ""
       land_ar_mixed_settlements:
-        title: land_ar Mixed settlements
+        title: Area of mixed settlements
         unit: ""
       land_ar_pastoral_villages:
-        title: land_ar Pastoral villages
+        title: Area of pastoral villages
         unit: ""
       land_ar_populated_croplands:
-        title: land_ar Populated croplands
+        title: Area of populated croplands
         unit: ""
       land_ar_populated_rangelands:
-        title: land_ar Populated rangelands
+        title: Area of populated rangelands
         unit: ""
       land_ar_populated_woodlands:
-        title: land_ar Populated woodlands
+        title: Area of populated woodlands
         unit: ""
       land_ar_rainfed_villages:
-        title: land_ar Rainfed villages
+        title: Area of rainfed villages
         unit: ""
       land_ar_remote_croplands:
-        title: land_ar Remote croplands
+        title: Area of remote croplands
         unit: ""
       land_ar_remote_rangelands:
-        title: land_ar Remote rangelands
+        title: Area of remote rangelands
         unit: ""
       land_ar_remote_woodlands:
-        title: land_ar Remote woodlands
+        title: Area of remote woodlands
         unit: ""
       land_ar_residential_irrigated_croplands:
-        title: land_ar Residential irrigated croplands
+        title: Area of residential irrigated croplands
         unit: ""
       land_ar_residential_rainfed_croplands:
-        title: land_ar Residential rainfed croplands
+        title: Area of residential rainfed croplands
         unit: ""
       land_ar_residential_rangelands:
-        title: land_ar Residential rangelands
+        title: Area of residential rangelands
         unit: ""
       land_ar_residential_woodlands:
-        title: land_ar Residential woodlands
+        title: Area of residential woodlands
         unit: ""
       land_ar_rice_villages:
-        title: land_ar Rice villages
+        title: Area of rice villages
         unit: ""
       land_ar_urban:
-        title: land_ar Urban
+        title: Area of urban
         unit: ""
       land_ar_wild_treeless_and_barren_lands:
-        title: land_ar Wild treeless and barren lands
+        title: Area of wild treeless and barren lands
         unit: ""
       land_ar_wild_woodlands:
-        title: land_ar Wild woodlands
+        title: Area of wild woodlands
         unit: ""
       share_of_land_type_ice__uninhabited:
-        title: share_of_land_type Ice, uninhabited
-        unit: ""
+        title: Share of land that is uninhabited ice
+        unit: "%"
+        short_unit: "%"
       share_of_land_type_inhabited_treeless_and_barren_lands:
-        title: share_of_land_type Inhabited treeless and barren lands
-        unit: ""
+        title: Share of land that is inhabited treeless and barren lands
+        unit: "%"
+        short_unit: "%"
       share_of_land_type_irrigated_villages:
-        title: share_of_land_type Irrigated villages
-        unit: ""
+        title: Share of land that is irrigated villages
+        unit: "%"
+        short_unit: "%"
       share_of_land_type_mixed_settlements:
-        title: share_of_land_type Mixed settlements
-        unit: ""
+        title: Share of land that is mixed settlements
+        unit: "%"
+        short_unit: "%"
       share_of_land_type_pastoral_villages:
-        title: share_of_land_type Pastoral villages
-        unit: ""
+        title: Share of land that is pastoral villages
+        unit: "%"
+        short_unit: "%"
       share_of_land_type_populated_croplands:
-        title: share_of_land_type Populated croplands
-        unit: ""
+        title: Share of land that is populated croplands
+        unit: "%"
+        short_unit: "%"
       share_of_land_type_populated_rangelands:
-        title: share_of_land_type Populated rangelands
-        unit: ""
+        title: Share of land that is populated rangelands
+        unit: "%"
+        short_unit: "%"
       share_of_land_type_populated_woodlands:
-        title: share_of_land_type Populated woodlands
-        unit: ""
+        title: Share of land that is populated woodlands
+        unit: "%"
+        short_unit: "%"
       share_of_land_type_rainfed_villages:
-        title: share_of_land_type Rainfed villages
-        unit: ""
+        title: Share of land that is rainfed villages
+        unit: "%"
+        short_unit: "%"
       share_of_land_type_remote_croplands:
-        title: share_of_land_type Remote croplands
-        unit: ""
+        title: Share of land that is remote croplands
+        unit: "%"
+        short_unit: "%"
       share_of_land_type_remote_rangelands:
-        title: share_of_land_type Remote rangelands
-        unit: ""
+        title: Share of land that is remote rangelands
+        unit: "%"
+        short_unit: "%"
       share_of_land_type_remote_woodlands:
-        title: share_of_land_type Remote woodlands
-        unit: ""
+        title: Share of land that is remote woodlands
+        unit: "%"
+        short_unit: "%"
       share_of_land_type_residential_irrigated_croplands:
-        title: share_of_land_type Residential irrigated croplands
-        unit: ""
+        title: Share of land that is residential irrigated croplands
+        unit: "%"
+        short_unit: "%"
       share_of_land_type_residential_rainfed_croplands:
-        title: share_of_land_type Residential rainfed croplands
-        unit: ""
+        title: Share of land that is residential rainfed croplands
+        unit: "%"
+        short_unit: "%"
       share_of_land_type_residential_rangelands:
-        title: share_of_land_type Residential rangelands
-        unit: ""
+        title: Share of land that is residential rangelands
+        unit: "%"
+        short_unit: "%"
       share_of_land_type_residential_woodlands:
-        title: share_of_land_type Residential woodlands
-        unit: ""
+        title: Share of land that is residential woodlands
+        unit: "%"
+        short_unit: "%"
       share_of_land_type_rice_villages:
-        title: share_of_land_type Rice villages
-        unit: ""
+        title: Share of land that is rice villages
+        unit: "%"
+        short_unit: "%"
       share_of_land_type_urban:
-        title: share_of_land_type Urban
-        unit: ""
+        title: Share of land that is urban
+        unit: "%"
+        short_unit: "%"
       share_of_land_type_wild_treeless_and_barren_lands:
-        title: share_of_land_type Wild treeless and barren lands
-        unit: ""
+        title: Share of land that is wild treeless and barren lands
+        unit: "%"
+        short_unit: "%"
       share_of_land_type_wild_woodlands:
-        title: share_of_land_type Wild woodlands
-        unit: ""
+        title: Share of land that is wild woodlands
+        unit: "%"
+        short_unit: "%"

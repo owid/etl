@@ -22,42 +22,25 @@ def run(dest_dir: str) -> None:
     # Read table from meadow dataset.
     tb = ds_meadow["anthromes"].reset_index()
     tb_input = ds_meadow_input["anthromes_input"].reset_index().drop(columns=["pot_veg", "pot_vll"])
+    # Bit of a hack as the metadata for tb_input is not passed though when opening the shapefile
+    tb_input.metadata = tb.metadata
+    land_areas = calculate_regional_land_areas(tb_input)
 
-    # Calculate total land areas
-    land_areas = tb_input.groupby("regn_nm").sum().drop(columns="id").reset_index()
-    # Add a row for 'world' with the sum of 'land_ar'
-    world_row = pd.DataFrame({"regn_nm": ["World"], "land_ar": [land_areas["land_ar"].sum()]})
-    # Concatenate the 'world_row' DataFrame with the original DataFrame
-    land_areas = pd.concat([land_areas, world_row], ignore_index=True)
-    land_areas = land_areas.rename(columns={"land_ar": "total_region_area"})
-    land_areas = Table(land_areas, metadata=tb_input.metadata)
-    # Make the tb long
+    # Combine the land type of each cell with the area of each cell
     tb_long = pr.melt(tb, id_vars="id", var_name="name", value_name="value")
-    tb_merge = tb_long.merge(tb_input, on="id", how="left")
-    # Add categories to the value column and figure out how to sum the area values
-    tb_global = tb_merge.groupby(["name", "value"])["land_ar"].sum()
-    tb_global = tb_global.reset_index()
-    tb_global["regn_nm"] = "World"
+    tb_merge = pr.merge(tb_long, tb_input, on="id", how="left")
 
-    tb_regional = tb_merge.groupby(["name", "value", "regn_nm"])["land_ar"].sum()
-    tb_regional = tb_regional.reset_index()
-
-    tb_combined = pr.concat([tb_global, tb_regional], ignore_index=True)
-    # Convert year string
-
-    tb_combined["year"] = tb_combined["name"].apply(convert_years_to_number)
-    tb_combined = tb_combined.drop(columns=["name"])
+    # Calculated global and regional total of each land type, each year
+    tb_combined = calculate_area_of_each_land_type(tb_merge)
 
     # Assign land use categories more meaningful names
     tb_combined = assign_land_use_types(tb_combined)
-    # Calculate share of each  land type
 
-    tb_combined = tb_combined.merge(land_areas, on="regn_nm")
-    tb_combined["share_of_land_type"] = (tb_combined["land_ar"] / tb_combined["total_region_area"]) * 100
-    tb_combined = tb_combined.drop(columns=["total_region_area"])
-    tb_combined = tb_combined.pivot(index=["regn_nm", "year"], columns="value")
-    tb_combined.columns = [" ".join(col).strip() for col in tb_combined.columns.values]
+    # Calculate share of each land type
+    tb_combined = calculate_share_of_land_type(tb_combined, land_areas)
+
     tb_combined.metadata = tb.metadata
+
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
@@ -67,6 +50,50 @@ def run(dest_dir: str) -> None:
 
     # Save changes in the new garden dataset.
     ds_garden.save()
+
+
+def calculate_share_of_land_type(tb: Table, land_areas: Table) -> Table:
+    tb = tb.merge(land_areas, on="regn_nm")
+    tb["share_of_land_type"] = (tb["land_ar"] / tb["total_region_area"]) * 100
+    tb = tb.drop(columns=["total_region_area"])
+    tb = tb.rename(columns={"regn_nm": "country"})
+    tb = tb.pivot(index=["country", "year"], columns="value")
+    tb.columns = [" ".join(col).strip() for col in tb.columns.values]
+
+    return tb
+
+
+def calculate_area_of_each_land_type(tb: Table) -> Table:
+    tb_global = tb.groupby(["name", "value"])["land_ar"].sum()
+    tb_global = tb_global.reset_index()
+    tb_global["regn_nm"] = "World"
+
+    tb_regional = tb.groupby(["name", "value", "regn_nm"])["land_ar"].sum()
+    tb_regional = tb_regional.reset_index()
+
+    tb_combined = pr.concat([tb_global, tb_regional], ignore_index=True)
+    # Convert year string
+
+    tb_combined["year"] = tb_combined["name"].apply(convert_years_to_number)
+    tb_combined = tb_combined.drop(columns=["name"])
+
+    return tb_combined
+
+
+def calculate_regional_land_areas(tb: Table) -> Table:
+    """
+    Calculating the total land area for each region
+
+    """
+    # Calculate land area for each region
+    land_areas = tb.groupby("regn_nm").sum().drop(columns="id").reset_index()
+    # Add a row for 'world' with the sum of 'land_ar'
+    world_row = Table({"regn_nm": ["World"], "land_ar": [land_areas["land_ar"].sum()]})
+    # Concatenate the 'world_row' DataFrame with the original DataFrame
+    land_areas = pr.concat([land_areas, world_row], ignore_index=True)
+    land_areas = land_areas.rename(columns={"land_ar": "total_region_area"})
+
+    return land_areas
 
 
 def convert_years_to_number(year: str) -> str:

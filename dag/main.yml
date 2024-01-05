@@ -767,6 +767,8 @@ steps:
 
   ######################################################################################################################
 
+  data://grapher/papers/2024-01-05/anthromes:
+    - data://garden/papers/2023-10-20/anthromes
 include:
   - dag/open_numbers.yml
   - dag/faostat.yml

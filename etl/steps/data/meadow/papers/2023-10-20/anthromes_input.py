@@ -25,6 +25,7 @@ def run(dest_dir: str) -> None:
 
     # Process data.
     #
+    tb.metadata = snap.to_table_metadata()
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
     tb = tb.underscore().set_index(["id", "regn_nm"], verify_integrity=True).sort_index()
 
@@ -38,7 +39,7 @@ def run(dest_dir: str) -> None:
     ds_meadow.save()
 
 
-def get_table_from_shp_file(snap: Snapshot):
+def get_table_from_shp_file(snap: Snapshot) -> Table:
     with tempfile.TemporaryDirectory() as temp_dir:
         with zipfile.ZipFile(snap.path, "r") as zip_ref:
             zip_ref.extractall(temp_dir)
@@ -47,14 +48,12 @@ def get_table_from_shp_file(snap: Snapshot):
         extracted_dir = os.listdir(temp_dir)
         extracted_files = os.listdir(os.path.join(temp_dir, extracted_dir[0]))
 
-        # Keep only the DBF file (assuming it has a .dbf extension)
+        # Keep only the .shp file and read it into a GeoDataFrame
         shp_file = None
         for file_name in extracted_files:
             if file_name.endswith(".shp"):
                 shp_file = os.path.join(temp_dir, extracted_dir[0], file_name)
         gdf = gpd.read_file(shp_file)
         gdf = gdf.drop(columns=["geometry"])
-
         gdf = Table(gdf)
-        gdf.metadata = snap.to_table_metadata()
         return gdf
