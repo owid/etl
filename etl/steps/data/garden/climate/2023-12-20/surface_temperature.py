@@ -61,10 +61,10 @@ def run(dest_dir: str) -> None:
     merged_df = merged_df.drop(columns=["mean_temp"])
 
     merged_df["anomaly_below_0"] = merged_df["temperature_anomaly"].copy()
-    merged_df.loc[merged_df["anomaly_below_0"] <= 0, "anomaly_below_0"] = None
+    merged_df.loc[merged_df["anomaly_below_0"] >= 0, "anomaly_below_0"] = None
 
     merged_df["anomaly_above_0"] = merged_df["temperature_anomaly"].copy()
-    merged_df.loc[merged_df["anomaly_above_0"] >= 0, "anomaly_above_0"] = None
+    merged_df.loc[merged_df["anomaly_above_0"] <= 0, "anomaly_above_0"] = None
     merged_df = merged_df.drop(columns=["month", "year"])
     merged_df = merged_df.set_index(["country", "time"], verify_integrity=True)
 
