@@ -1,3 +1,10 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Artificial Intelligence
+
+
 dataset:
   title: Private Investment in AI by Focus Area (AI Index, 2023)
   description: >-

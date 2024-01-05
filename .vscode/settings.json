@@ -11,18 +11,15 @@
   "[python]": {
     "editor.formatOnSave": true,
     "editor.codeActionsOnSave": {
-      "source.organizeImports": true
+      "source.organizeImports": "explicit"
     },
-    "editor.formatOnType": true,
-    "editor.defaultFormatter": "ms-python.black-formatter"
+    "editor.defaultFormatter": "charliermarsh.ruff"
   },
-  "isort.args": ["--profile", "black"],
-  "python.linting.flake8Enabled": true,
-  "python.linting.enabled": true,
-  "python.linting.ignorePatterns": [
-    "**/site-packages/**/*.py",
-    ".vscode/*.py",
-    "**/*.ipynb"
+  "flake8.ignorePatterns": [
+    "**/*"
+  ],
+  "pylint.ignorePatterns": [
+    "**/*"
   ],
   "grammarly.files.include": [
       "**/README.md",
@@ -83,5 +80,5 @@
   "search.exclude": {
       "etl/steps/archive": true,
       "snapshots/archive": true
-  }
+  },
 }

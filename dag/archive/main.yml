@@ -107,9 +107,26 @@ steps:
   data://explorers/emdat/2022-12-07/natural_disasters:
     - data://garden/emdat/2022-11-24/natural_disasters
 
+  # International Monetary Fund, World Economic Outlook
+  data://meadow/imf/2023-05-02/world_economic_outlook:
+    - snapshot://imf/2023-05-02/world_economic_outlook.xls
+  data://garden/imf/2023-05-02/world_economic_outlook:
+    - data://meadow/imf/2023-05-02/world_economic_outlook
+  data://grapher/imf/2023-05-02/world_economic_outlook:
+    - data://garden/imf/2023-05-02/world_economic_outlook
+
+  # Trust questions in World Values Survey
+  data://meadow/wvs/2023-03-08/wvs_trust:
+    - snapshot://wvs/2023-03-08/wvs_trust.csv
+  data://garden/wvs/2023-03-08/wvs_trust:
+    - data://meadow/wvs/2023-03-08/wvs_trust
+  data://grapher/wvs/2023-03-08/wvs_trust:
+    - data://garden/wvs/2023-03-08/wvs_trust
+
 # Include all active steps plus all archive steps.
 include:
   - dag/main.yml
+  - dag/archive/animal_welfare.yml
   - dag/archive/agriculture.yml
   # - dag/archive/open_numbers.yml
   - dag/archive/faostat.yml

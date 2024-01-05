@@ -61,8 +61,10 @@ def run(dest_dir: str) -> None:
     tb_flu_monthly = create_monthly_aggregates(df=tb_flu, days_held_back=DAYS_HELD_BACK)
 
     # Create Tables
-    tb_flu = Table(tb_flu, short_name="flu")
-    tb_flu_monthly = Table(tb_flu_monthly, short_name="flu_monthly")
+    tb_flu = Table(tb_flu, short_name="flu").set_index(["country", "date"], verify_integrity=True)
+    tb_flu_monthly = Table(tb_flu_monthly, short_name="flu_monthly").set_index(
+        ["country", "month_date"], verify_integrity=True
+    )
     # Create explorer dataset, with garden table and metadata in csv format
     ds_explorer = create_dataset(
         dest_dir, tables=[tb_flu, tb_flu_monthly], default_metadata=flunet_garden.metadata, formats=["csv"]
@@ -276,7 +278,6 @@ def calculate_percent_positive_aggregate(df: pd.DataFrame, surveillance_cols: li
     Remove rows where the percent = 100 but all available denominators are 0.
     """
     for col in surveillance_cols:
-
         df.loc[
             (df["inf_negative" + col] == 0)
             & (df["inf_negative" + col] + df["inf_all" + col] != df["spec_processed_nb" + col]),

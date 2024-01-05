@@ -1,5 +1,8 @@
 # Definitions that can be used in metadata to avoid repetition.
 definitions:
+  common:
+    topic_tags:
+    - Uncategorized
   # Random long text to be used in different places of the metadata.
   long_text: &long_text |-
     Long text in first paragraph. Long text in first paragraph. Long text in first paragraph. Long text in first paragraph. Long text in first paragraph. Long text in first paragraph. Long text in first paragraph. Long text in first paragraph. Long text in first paragraph. Long text in first paragraph. Long text in first paragraph. Long text in first paragraph. Long text in first paragraph. Long text in first paragraph. Long text in first paragraph. Long text in first paragraph. Long text in first paragraph. Long text in first paragraph. Long text in first paragraph.

@@ -35,7 +35,7 @@ from etl import grapher_model as gm
 from etl.command import main as etl_main
 from etl.compare import diff_print
 from etl.db import get_engine
-from etl.files import apply_black_formatter_to_files, yaml_dump
+from etl.files import apply_ruff_formatter_to_files, yaml_dump
 from etl.metadata_export import metadata_export
 from etl.paths import (
     BASE_DIR,
@@ -135,14 +135,12 @@ class FasttrackImport:
         # since sheets url is accessible with link, we have to encrypt it when storing in metadata
         sheets_url = _encrypt(self.sheets_url) if not self.meta.is_public else self.sheets_url
 
-        source_name = "Google Sheet" if self.sheets_url != "local_csv" else "Local CSV"
-
         if len(self.meta.sources) == 1:
             dataset_source = self.meta.sources[0]
             source = Source(
                 url=dataset_source.url,
-                name=source_name,
-                published_by=source_name,
+                name=dataset_source.name,
+                published_by=dataset_source.published_by,
                 source_data_url=sheets_url,
                 date_accessed=str(dt.date.today()),
                 publication_year=dataset_source.publication_year
@@ -157,7 +155,7 @@ class FasttrackImport:
             origin.date_accessed = str(dt.date.today())
 
             # Misuse the version field and url_download fields to store info about the spreadsheet
-            origin.version_producer = source_name
+            origin.version_producer = "Google Sheet" if self.sheets_url != "local_csv" else "Local CSV"
             origin.url_download = sheets_url
             license = self.meta.licenses[0]
         else:
@@ -185,7 +183,10 @@ class FasttrackImport:
 
     def dataset_yaml(self) -> str:
         """Generate dataset YAML file."""
-        return yaml_dump(metadata_export(self.dataset))  # type: ignore
+        yml = metadata_export(self.dataset)
+        # source is already in the snapshot and is propagated
+        yml["dataset"].pop("sources")
+        return yaml_dump(yml)  # type: ignore
 
     def save_metadata(self) -> None:
         with open(self.metadata_path, "w") as f:
@@ -534,7 +535,10 @@ def _load_data_and_meta(dummies: dict[str, str]) -> Tuple[Dataset, Optional[Orig
 def _dataset_id(ds_meta: DatasetMeta) -> int:
     with Session(get_engine()) as session:
         ds = gm.Dataset.load_with_path(
-            session, namespace=ds_meta.namespace, short_name=ds_meta.short_name, version=str(ds_meta.version)  # type: ignore
+            session,
+            namespace=ds_meta.namespace,
+            short_name=ds_meta.short_name,
+            version=str(ds_meta.version),  # type: ignore
         )
         assert ds.id
         return ds.id
@@ -656,7 +660,16 @@ def _harmonize_countries(df: pd.DataFrame) -> Tuple[pd.DataFrame, List[str]]:
     po.put_markdown("""## Harmonizing countries...""")
 
     # Read the main table of the regions dataset.
-    tb_regions = Dataset(LATEST_REGIONS_DATASET_PATH)["regions"][["name", "aliases"]]
+    tb_regions = Dataset(LATEST_REGIONS_DATASET_PATH)["regions"][["name", "aliases", "iso_alpha2", "iso_alpha3"]]
+
+    # First convert ISO2 and ISO3 country codes.
+    df = df.reset_index()
+    for iso_col in ["iso_alpha2", "iso_alpha3"]:
+        df["country"] = df["country"].replace(tb_regions.set_index(iso_col)["name"])
+        # lowercase
+        df["country"] = df["country"].replace(
+            tb_regions.assign(**{iso_col: tb_regions.iso_alpha2.str.lower()}).set_index(iso_col)["name"]
+        )
 
     # Convert strings of lists of aliases into lists of aliases.
     tb_regions["aliases"] = [json.loads(alias) if pd.notnull(alias) else [] for alias in tb_regions["aliases"]]
@@ -666,8 +679,6 @@ def _harmonize_countries(df: pd.DataFrame) -> Tuple[pd.DataFrame, List[str]]:
 
     # Create a series that maps aliases to country names.
     alias_to_country = tb_regions.rename(columns={"aliases": "alias"}).set_index("alias")["name"]
-
-    df = df.reset_index()
 
     unknown_countries = []
 
@@ -769,7 +780,7 @@ def _metadata_diff(fast_import: FasttrackImport) -> bool:
 
 def _commit_and_push(fast_import: FasttrackImport, snapshot_path: Path) -> str:
     """Format generated files, commit them and push to GitHub."""
-    apply_black_formatter_to_files([fast_import.step_path])
+    apply_ruff_formatter_to_files([fast_import.step_path])
 
     repo = Repo(BASE_DIR)
     repo.index.add(

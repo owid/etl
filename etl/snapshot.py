@@ -1,17 +1,19 @@
 import datetime as dt
 import json
 import re
+import tempfile
 from contextlib import contextmanager
 from dataclasses import dataclass
+from multiprocessing import Lock
 from pathlib import Path
-from threading import Lock
-from typing import Any, Dict, Iterator, Optional, Union
+from typing import TYPE_CHECKING, Any, Dict, Iterator, Optional, Union
 
+import fasteners
 import owid.catalog.processing as pr
 import pandas as pd
 import yaml
 from dataclasses_json import dataclass_json
-from owid.catalog import Table
+from owid.catalog import Table, s3_utils
 from owid.catalog.meta import (
     DatasetMeta,
     License,
@@ -21,28 +23,53 @@ from owid.catalog.meta import (
     pruned_json,
 )
 from owid.datautils import dataframes
+from owid.datautils.io import decompress_file
 from owid.walden import files
 from tenacity import Retrying
 from tenacity.retry import retry_if_exception_type
 from tenacity.stop import stop_after_attempt
 
-from etl import paths
-from etl.files import yaml_dump
+if TYPE_CHECKING:
+    from dvc.repo import Repo
 
-dvc = None
+from etl import config, paths
+from etl.files import RuntimeCache, yaml_dump
 
 # DVC is not thread-safe, so we need to lock it
 dvc_lock = Lock()
 unignore_backports_lock = Lock()
+dvc_pull_lock = fasteners.InterProcessLock(paths.BASE_DIR / ".dvc/tmp/dvc_pull_lock")
+
+DVC_REPO_CACHE = RuntimeCache()
 
 
-def get_dvc():
+def get_dvc(use_cache: bool = True) -> "Repo":
+    """Return DVC repo. If `use_cache` is True, the repo is cached in memory. Cache is thread-safe."""
     from dvc.repo import Repo
 
-    global dvc
+    key = str(paths.BASE_DIR)
+    cache = DVC_REPO_CACHE
+    if not use_cache or key not in cache:
+        if config.R2_ACCESS_KEY and config.R2_SECRET_KEY:
+            remote_config = {
+                "access_key_id": config.R2_ACCESS_KEY,
+                "secret_access_key": config.R2_SECRET_KEY,
+                "region": "auto",
+            }
+            dvc_config = {"remote": {"public": remote_config, "private": remote_config}}
+        else:
+            dvc_config = None
 
-    if dvc is None:
-        dvc = Repo(paths.BASE_DIR)
+        dvc = Repo(
+            paths.BASE_DIR,
+            config=dvc_config,
+        )
+
+        # Store repo in cache.
+        if use_cache:
+            cache.add(key, dvc)
+    else:
+        dvc = cache[key]
 
     return dvc
 
@@ -82,11 +109,63 @@ class Snapshot:
         else:
             return Path(f"{paths.SNAPSHOTS_DIR / self.uri}.dvc")
 
+    def _cached_dvc_repo(self) -> Any:
+        """Return DVC repo and cache it. Backported steps do not use cached repository."""
+        if "backport" in str(self.metadata_path):
+            # The repo has to be created again to pick unignored files
+            return get_dvc(use_cache=False)
+        else:
+            return get_dvc(use_cache=True)
+
     def pull(self, force=True) -> None:
         """Pull file from S3."""
-        with _unignore_backports(self.path):
-            dvc = get_dvc()
-            dvc.pull(str(self.path), remote="public-read" if self.metadata.is_public else "private", force=force)
+        if not force and not self.is_dirty():
+            return
+
+        from dvc.exceptions import CheckoutError
+
+        # DVC locking is terrible. It'd fail if we didn't use our own file locks.
+        # This is pretty limiting as it allows us to only pull
+        # one snapshot at a time. One option is to pre-pull all snapshot steps or
+        # we could just download the file directly.
+        # The combination of different kinds of locks is kinda magical and waiting
+        # to be refactored soon.
+        with dvc_pull_lock, _unignore_backports(self.path):
+            try:
+                repo = self._cached_dvc_repo()
+                repo.pull(str(self.path), remote="public-read" if self.metadata.is_public else "private", force=force)
+            except CheckoutError as e:
+                raise Exception(
+                    "File not found in DVC. Have you run the snapshot script? Make sure you're not using `is_public: false`."
+                ) from e
+
+    def is_dirty(self) -> bool:
+        """Return True if snapshot exists and is in DVC."""
+        from dvc.dvcfile import load_file
+        from dvc.rwlock import RWLockFileCorruptedError
+
+        if not self.path.exists():
+            return True
+
+        with open(self.metadata_path) as istream:
+            if "outs:\n" not in istream.read():
+                raise Exception(f"File {self.metadata_path} has not been added to DVC. Run snapshot script to add it.")
+
+        # See notes about locking in `pull` method.
+        with dvc_lock, _unignore_backports(self.metadata_path):
+            repo = self._cached_dvc_repo()
+            dvc_file = load_file(repo, self.metadata_path.as_posix())
+            with repo.lock:
+                # DVC returns empty dictionary if file is up to date
+                stage = dvc_file.stage
+                try:
+                    return stage.status() != {}
+                except RWLockFileCorruptedError:
+                    rwlock_path = paths.BASE_DIR / ".dvc/tmp/rwlock"
+                    # If the lock file is corrupted, we need to delete it and try again
+                    if rwlock_path.exists():
+                        rwlock_path.unlink()
+                    return stage.status() != {}
 
     def delete_local(self) -> None:
         """Delete local file and its metadata."""
@@ -106,7 +185,10 @@ class Snapshot:
         else:
             raise ValueError("Neither origin nor source is set")
         self.path.parent.mkdir(exist_ok=True, parents=True)
-        files.download(download_url, str(self.path))
+        if download_url.startswith("s3://") or download_url.startswith("r2://"):
+            s3_utils.download(download_url, str(self.path))
+        else:
+            files.download(download_url, str(self.path))
 
     def dvc_add(self, upload: bool) -> None:
         """Add file to DVC and upload to S3."""
@@ -153,6 +235,12 @@ class Snapshot:
             return self.read_excel(*args, **kwargs)
         elif self.metadata.file_extension == "json":
             return self.read_json(*args, **kwargs)
+        elif self.metadata.file_extension == "dta":
+            return self.read_stata(*args, **kwargs)
+        elif self.metadata.file_extension == "rds":
+            return self.read_rds(*args, **kwargs)
+        elif self.metadata.file_extension == "rda":
+            return self.read_rda(*args, **kwargs)
         else:
             raise ValueError(f"Unknown extension {self.metadata.file_extension}")
 
@@ -174,9 +262,25 @@ class Snapshot:
         """Read JSON file into a Table and populate it with metadata."""
         return pr.read_json(self.path, *args, metadata=self.to_table_metadata(), origin=self.metadata.origin, **kwargs)
 
+    def read_stata(self, *args, **kwargs) -> Table:
+        """Read Stata file into a Table and populate it with metadata."""
+        return pr.read_stata(self.path, *args, metadata=self.to_table_metadata(), origin=self.metadata.origin, **kwargs)
+
+    def read_rds(self, *args, **kwargs) -> Table:
+        """Read R data .rds file into a Table and populate it with metadata."""
+        return pr.read_rds(self.path, *args, metadata=self.to_table_metadata(), origin=self.metadata.origin, **kwargs)
+
+    def read_rda(self, *args, **kwargs) -> Table:
+        """Read R data .rda file into a Table and populate it with metadata."""
+        return pr.read_rda(self.path, *args, metadata=self.to_table_metadata(), origin=self.metadata.origin, **kwargs)
+
     def read_from_records(self, *args, **kwargs) -> Table:
         """Read records into a Table and populate it with metadata."""
         return pr.read_from_records(*args, metadata=self.to_table_metadata(), origin=self.metadata.origin, **kwargs)
+
+    def read_from_dict(self, *args, **kwargs) -> Table:
+        """Read data from a dictionary into a Table and populate it with metadata."""
+        return pr.read_from_dict(*args, metadata=self.to_table_metadata(), origin=self.metadata.origin, **kwargs)
 
     def read_fwf(self, *args, **kwargs) -> Table:
         """Read a table of fixed-width formatted lines with metadata."""
@@ -185,6 +289,17 @@ class Snapshot:
     def ExcelFile(self, *args, **kwargs) -> pr.ExcelFile:
         """Return an Excel file object ready for parsing."""
         return pr.ExcelFile(self.path, *args, metadata=self.to_table_metadata(), origin=self.metadata.origin, **kwargs)
+
+    def extract(self, output_dir: Path | str):
+        decompress_file(self.path, output_dir)
+
+    def extract_to_tempdir(self) -> Any:
+        # Create temporary directory
+        temp_dir = tempfile.TemporaryDirectory()
+        # Extract file to temporary directory
+        self.extract(temp_dir.name)
+        # Return temporary directory
+        return temp_dir
 
 
 @pruned_json

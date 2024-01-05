@@ -91,6 +91,13 @@ def run(dest_dir: str) -> None:
         tb_only_proj[col].origins = origins_un
 
     tb_with_proj = tb
+    # Only preserve ages that have projections (i.e. data after YEAR_ESTIMATE_LAST)
+    columns_index = tb_with_proj.index.names
+    tb_with_proj = tb_with_proj.reset_index()
+    ages = set(tb_with_proj.loc[tb_with_proj["year"] > YEAR_ESTIMATE_LAST, "age"])
+    tb_with_proj = tb_with_proj.loc[tb_with_proj["age"].isin(ages)]
+    tb_with_proj = tb_with_proj.set_index(columns_index)
+    # Add metadata
     tb_with_proj.m.short_name = paths.short_name + "_with_proj"
     tb_with_proj.columns = [f"{col}_with_proj" for col in tb_with_proj.columns]
 
@@ -227,9 +234,7 @@ def process_ri(tb: Table) -> Table:
     # Filter
     ## dimension values: metric=life_expectancy, variant=medium, year >= YEAR_ESTIMATE_LAST
     ## columns: location, year, value, sex, age
-    tb = tb.loc[
-        (tb["year"] < 1950),
-    ]
+    tb = tb.loc[(tb["year"] < 1950),]
 
     # Rename column names
     tb = tb.rename(columns={"entity": "location"})
@@ -291,9 +296,7 @@ def add_americas(tb: Table, ds_population: Dataset) -> Table:
     """
     # filter only member countries of the region
     AMERICAS_MEMBERS = ["Northern America", "Latin America and the Caribbean"]
-    tb_am = tb.loc[
-        (tb["country"].isin(AMERICAS_MEMBERS)) & (tb["sex"] == "all") & (tb["age"] == 0),
-    ].copy()
+    tb_am = tb.loc[(tb["country"].isin(AMERICAS_MEMBERS)) & (tb["sex"] == "all") & (tb["age"] == 0),].copy()
 
     # sanity check
     assert (

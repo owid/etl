@@ -1,12 +1,8 @@
 """Load a snapshot and create a meadow dataset."""
 
 import owid.catalog.processing as pr
-from structlog import get_logger
 
 from etl.helpers import PathFinder, create_dataset
-
-# Initialize logger.
-log = get_logger()
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)

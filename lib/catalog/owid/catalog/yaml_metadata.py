@@ -17,14 +17,14 @@ def update_metadata_from_yaml(
 ) -> None:
     """Update metadata of table and variables from a YAML file.
 
-    The logic is as follows:
+    Metadata in `common` overwrites each other as follows:
 
-    - Whatever you write in the definitions.common section of the yaml file always replaces
+    - Metadata from `definitions.common` always overwrites
       the metadata that was on the table already.
-    - Whatever you write in the tables section of the yaml file always replaces what was
-      written in the definitions.common section of the yaml file.
-
-    See more details [here](https://github.com/owid/etl/pull/1737#issuecomment-1750245399)
+    - Metadata from `tables.<table_name>.common` always overwrites the metadata
+      on the table and the metadata from `definitions.common`.
+    - Metadata from `tables.<table_name>.variables.<variable_name>` always overwrites
+      any metadata that was on the variable already.
 
     :param path: Path to YAML file.
     :param table_name: Name of table, also updates this in the metadata.
@@ -44,6 +44,7 @@ def update_metadata_from_yaml(
         _validate_variables(t_annot, tb)
 
     common_dict = annot.get("definitions", {}).get("common", {})
+    table_common_dict = t_annot.get("common", {})
 
     # update variables
     for v_short_name in tb.columns:
@@ -52,8 +53,13 @@ def update_metadata_from_yaml(
         # first overwrite table metadata with definitions.common
         meta_dict = _merge_variable_metadata(meta_dict, common_dict, if_origins_exist=if_origins_exist, overwrite=True)
 
+        # then overwrite with table specific common
+        meta_dict = _merge_variable_metadata(
+            meta_dict, table_common_dict, if_origins_exist=if_origins_exist, overwrite=True
+        )
+
         # then overwrite with table specific metadata
-        variable_dict = t_annot.get("variables", {}).get(v_short_name, {})
+        variable_dict = (t_annot.get("variables") or {}).get(v_short_name, {})
         meta_dict = _merge_variable_metadata(
             meta_dict, variable_dict, if_origins_exist=if_origins_exist, overwrite=True
         )
@@ -115,7 +121,7 @@ def _merge_table_metadata(meta: dict, new: dict) -> dict:
 
 
 def _validate_variables(t_annot: dict, tb: Table) -> None:
-    yaml_variable_names = t_annot.get("variables", {}).keys()
+    yaml_variable_names = (t_annot.get("variables") or {}).keys()
     table_variable_names = tb.columns
     extra_variable_names = yaml_variable_names - table_variable_names
     if extra_variable_names:

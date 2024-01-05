@@ -1,4 +1,24 @@
 # NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - State Capacity
+        - War & Peace
+    processing_level: minor
+    description_processing: |-
+      We use the list of independent states and microstates from Gleditsch and Ward. We assign each country to a region based on the mapping (using GW codes):
+
+        - Americas: 2-199
+        - Europe: 200-399
+        - Africa: 400-626
+        - Middle East: 630-699
+        - Asia and Oceania: 700-999
+    display:
+      numDecimalPlaces: 0
+    description_key:
+      - |-
+        Gleditsch and Ward consider a country a sovereign state if its administration of a territory is relatively autonomous and it is considered independent by local actors and other states. They discuss many cases here: http://ksgleditsch.com/data/iisyst_casedesc.pdf
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
@@ -18,31 +38,9 @@ tables:
         description_short: |-
           Number of states (and microstates) in each region.
         unit: countries
-        processing_level: minor
-        description_processing: |-
-          We use the list of independent states and microstates from Gleditsch and Ward. We assign each country to a region based on the mapping (using GW codes):
-
-            - Americas: 2-199
-            - Europe: 200-399
-            - Africa: 400-626
-            - Middle East: 630-699
-            - Asia and Oceania: 700-999
-        display:
-          numDecimalPlaces: 0
 
       population:
         title: Population in region
         description_short: |-
           Population in the region, using borders from 2022.
-        unit: countries
-        processing_level: minor
-        description_processing: |-
-          We use the list of independent states and microstates from Gleditsch and Ward. We assign each country to a region based on the mapping (using GW codes):
-
-            - Americas: 2-199
-            - Europe: 200-399
-            - Africa: 400-626
-            - Middle East: 630-699
-            - Asia and Oceania: 700-999
-        display:
-          numDecimalPlaces: 0
+        unit: people

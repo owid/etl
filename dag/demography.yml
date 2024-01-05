@@ -124,3 +124,44 @@ steps:
     - data://meadow/oecd/2023-10-11/life_expectancy_birth
   data://grapher/oecd/2023-10-11/life_expectancy_birth:
     - data://garden/oecd/2023-10-11/life_expectancy_birth
+
+  # Broken limits of Life Expectancy
+  data://garden/demography/2023-10-20/broken_limits_le:
+    - data://garden/demography/2023-10-03/life_tables
+    - data://garden/hmd/2023-09-19/hmd
+  data://grapher/demography/2023-10-20/broken_limits_le:
+    - data://garden/demography/2023-10-20/broken_limits_le
+
+  # Contribution to sex gap in Life Expectancy
+  data://meadow/demography/2023-11-08/le_sex_gap_age_contribution:
+    - snapshot://demography/2023-11-08/le_sex_gap_age_contribution.zip
+  data://garden/demography/2023-11-08/le_sex_gap_age_contribution:
+    - data://meadow/demography/2023-11-08/le_sex_gap_age_contribution
+  data://grapher/demography/2023-11-08/le_sex_gap_age_contribution:
+    - data://garden/demography/2023-11-08/le_sex_gap_age_contribution
+
+  # Modal age at death
+  data://meadow/demography/2023-11-08/modal_age_death:
+    - snapshot://demography/2023-11-08/modal_age_death.xlsx
+  data://garden/demography/2023-11-08/modal_age_death:
+    - data://meadow/demography/2023-11-08/modal_age_death
+  data://grapher/demography/2023-11-08/modal_age_death:
+    - data://garden/demography/2023-11-08/modal_age_death
+
+  # Population (Fariss et al.)
+  data://meadow/demography/2023-12-20/population_fariss:
+    - snapshot://demography/2023-12-20/population_fariss.rds
+  data://garden/demography/2023-12-20/population_fariss:
+    - data://meadow/demography/2023-12-20/population_fariss
+    - data://garden/countries/2023-09-25/gleditsch
+  data://grapher/demography/2023-12-20/population_fariss:
+    - data://garden/demography/2023-12-20/population_fariss
+
+  # HYDE 3.3
+  data://meadow/hyde/2024-01-02/all_indicators:
+    - snapshot://hyde/2024-01-02/all_indicators.zip
+    - snapshot://hyde/2024-01-02/general_files.zip
+  data://garden/hyde/2024-01-02/all_indicators:
+    - data://meadow/hyde/2024-01-02/all_indicators
+  data://grapher/hyde/2024-01-02/all_indicators:
+    - data://garden/hyde/2024-01-02/all_indicators

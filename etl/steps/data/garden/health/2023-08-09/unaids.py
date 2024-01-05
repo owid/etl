@@ -16,16 +16,36 @@ paths = PathFinder(__file__)
 # Logger
 log = get_logger()
 
+REGIONS_TO_ADD = [
+    "North America",
+    "South America",
+    "Europe",
+    "Africa",
+    "Asia",
+    "Oceania",
+    "Low-income countries",
+    "Upper-middle-income countries",
+    "Lower-middle-income countries",
+    "High-income countries",
+    "World",
+]
+
 
 def run(dest_dir: str) -> None:
     #
     # Load inputs.
     #
     # Load meadow dataset.
-    ds_meadow = cast(Dataset, paths.load_dependency("unaids"))
+    ds_meadow = paths.load_dataset("unaids")
 
     # Load population dataset.
-    ds_population: Dataset = paths.load_dependency("population")
+    ds_population = paths.load_dataset("population")
+
+    # Load regions dataset.
+    ds_regions = paths.load_dependency("regions")
+
+    # Load income groups dataset.
+    ds_income_groups = paths.load_dependency("income_groups")
 
     # Read tables from meadow datasets.
     tb = ds_meadow["unaids"].reset_index()
@@ -38,7 +58,7 @@ def run(dest_dir: str) -> None:
 
     # Harmonize country names (main table)
     log.info("health.unaids: harmonize countries (main table)")
-    tb: Table = geo.harmonize_countries(
+    tb = geo.harmonize_countries(
         df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
     )
 
@@ -82,6 +102,9 @@ def run(dest_dir: str) -> None:
     log.info("health.unaids: add per_capita")
     tb = add_per_capita_variables(tb, ds_population)
 
+    # Add region aggregates for TB variables
+    log.info("health.unaids: add region aggregates for TB variables")
+    tb = add_regions_to_tuberculosis_vars(tb, ds_regions, ds_income_groups)
     # Set index
     log.info("health.unaids: set index")
     tb = tb.set_index(["country", "year", "disaggregation"], verify_integrity=True)
@@ -100,6 +123,43 @@ def run(dest_dir: str) -> None:
 
     # Save changes in the new garden dataset.
     ds_garden.save()
+
+
+def add_regions_to_tuberculosis_vars(tb: Table, ds_regions: Dataset, ds_income_groups: Dataset) -> Table:
+    """
+    Adding regional aggregates for all tuberculosis variables.
+    """
+    cols = ["hiv_tb_patients_receiving_art", "tb_patients_tested_positive_hiv", "tb_related_deaths"]
+
+    # Split table into 'agg' and 'no_agg'
+    tb_agg = tb[["country", "year", "disaggregation"] + cols]
+    tb_no_agg = tb.drop(columns=cols)
+    # Removing existing aggregates
+    tb_agg = tb_agg[~tb_agg["country"].isin(REGIONS_TO_ADD)]
+    tb_agg = tb_agg.dropna(subset=cols, how="all")
+    # Group tb_agg by disaggregation to allow us to add regions for each disaggregation value
+    tb_agg_groups = tb_agg.groupby("disaggregation")
+
+    # Create a table for each disaggregation value
+    tbs = []
+    for group_name, tb_agg_group in tb_agg_groups:
+        tb_agg_group_with_regions = geo.add_regions_to_table(
+            tb_agg_group.drop(columns="disaggregation"),
+            ds_regions,
+            ds_income_groups,
+            REGIONS_TO_ADD,
+            min_num_values_per_year=1,
+            frac_allowed_nans_per_year=0.3,
+        )
+        tb_agg_group_with_regions["disaggregation"] = group_name
+        tbs.append(tb_agg_group_with_regions)
+
+    # Combine all 'agg' tables
+    tb_agg = pr.concat(tbs, ignore_index=True)
+    # Merge with table without aggregates
+    tb = pr.merge(tb_no_agg, tb_agg, on=["country", "year", "disaggregation"], how="outer").reset_index(drop=True)
+
+    return tb
 
 
 def handle_nans(tb: Table) -> Table:

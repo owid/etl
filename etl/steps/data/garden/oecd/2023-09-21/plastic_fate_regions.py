@@ -18,15 +18,46 @@ def run(dest_dir: str) -> None:
 
     # Read table from meadow dataset.
     tb = ds_meadow["plastic_fate_regions"].reset_index()
-    # Convert million to actual number
-    tb["value"] = tb["value"] * 1e6
     #
     # Process data.
     #
+    # Convert million to actual number
+    tb["value"] = tb["value"] * 1e6
     country_mapping_path = paths.directory / "plastic_pollution.countries.json"
     tb = geo.harmonize_countries(df=tb, countries_file=country_mapping_path)
+    # Save metadata for later use
+    metadata = tb.metadata
+    # Create a dictionary to map the original countries/regions to the desired regions
+    region_mapping = {
+        "Canada": "Americas (excl. USA)",
+        "China": "China",
+        "India": "India",
+        "Latin America": "Americas (excl. USA)",
+        "Middle East & North Africa": "Middle East & North Africa",
+        "OECD Asia": "Asia (excl. China and India)",
+        "OECD European Union": "Europe",
+        "OECD Oceania": "Oceania",
+        "OECD non-EU": "Europe",
+        "Other Africa": "Sub-Saharan Africa",
+        "Other EU": "Europe",
+        "Other Eurasia": "Asia (excl. China and India)",
+        "Other OECD America": "Americas (excl. USA)",
+        "Other non-OECD Asia": "Asia (excl. China and India)",
+        "United States": "United States",
+    }
+    # Map the 'country' column to the desired regions using the dictionary
+    tb["region"] = tb["country"].map(region_mapping)
 
-    total_df = tb.groupby(["year", "plastic_fate"])["value"].sum().reset_index()
+    # Drop the 'country' column if it's no longer needed
+    tb = tb.drop(columns=["country"])
+    tb = tb.rename(columns={"region": "country"})
+    # Ensure the regions with the same country name are summed
+    tb = tb.groupby(["year", "plastic_fate", "country"])["value"].sum().reset_index()
+    # Add the metadata back to the table
+    tb.metadata = metadata
+    # Calculate the global totals
+    total_df = tb.groupby(["year", "plastic_fate"])["value"].sum()
+    total_df = total_df.reset_index()
 
     total_df["country"] = "World"
     combined_df = pr.merge(total_df, tb, on=["country", "year", "plastic_fate", "value"], how="outer").copy_metadata(
@@ -53,6 +84,9 @@ def run(dest_dir: str) -> None:
     tb = tb.underscore().sort_index()
     tb = tb.drop(["share_total", "value_total_share"], axis=1)  # Remove the total from total column
 
+    # Create a category that combines littered and mismanaged
+    tb["littered_mismanaged_combined"] = tb["value_littered"] + tb["value_mismanaged"]
+    tb["littered_mismanaged_combined_share"] = tb["value_littered_share"] + tb["value_mismanaged_share"]
     #
     # Save outputs.
     #

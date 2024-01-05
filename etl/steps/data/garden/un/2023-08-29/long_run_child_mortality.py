@@ -17,16 +17,17 @@ def run(dest_dir: str) -> None:
     ds_gapminder_v11: Dataset = paths.load_dependency("under_five_mortality", version="2023-09-21")
     ds_gapminder_v7: Dataset = paths.load_dependency("under_five_mortality", version="2023-09-18")
 
-    # Read table from meadow dataset.
+    # Read table from meadow dataset and filter out the main indicator, under five mortality, central estimate, both sexes, all wealth quintiles.
     tb_igme = ds_igme["igme"].reset_index()
-
+    tb_igme = tb_igme[
+        (tb_igme["indicator"] == "Under-five mortality rate")
+        & (tb_igme["sex"] == "Both sexes")
+        & (tb_igme["wealth_quintile"] == "All wealth quintiles")
+    ]
+    tb_igme = tb_igme.rename(columns={"obs_value": "under_five_mortality"}).drop(
+        columns=["lower_bound", "upper_bound", "sex", "wealth_quintile", "indicator", "unit_of_measure"]
+    )
     # Select out columns of interest.
-    columns = {
-        "country": "country",
-        "year": "year",
-        "observation_value_deaths_per_1_000_live_births_under_five_mortality_rate_both_sexes_all_wealth_quintiles": "under_five_mortality",
-    }
-    tb_igme = tb_igme[list(columns)].rename(columns=columns, errors="raise")
     tb_igme["source"] = "igme"
 
     # Load full Gapminder data v11, v11 includes projections, so we need to remove years beyond the last year of IGME data
@@ -36,12 +37,14 @@ def run(dest_dir: str) -> None:
     tb_gap_full = tb_gap_full[tb_gap_full["year"] <= max_year].reset_index(drop=True)
     tb_gap_full = tb_gap_full.rename(columns={"child_mortality": "under_five_mortality"})
     tb_gap_full["source"] = "gapminder"
-
+    tb_gap_full["under_five_mortality"] = tb_gap_full["under_five_mortality"].div(10)
     # Load Gapminder data v7
     tb_gap_sel = ds_gapminder_v7["under_five_mortality_selected"].reset_index()
     tb_gap_sel["source"] = "gapminder"
+    tb_gap_sel["under_five_mortality"] = tb_gap_sel["under_five_mortality"].div(10)
 
-    # Combine IGME and Gapminder data
+    # Combine IGME and Gapminder data with two versions
+
     tb_combined_full = combine_datasets(tb_igme, tb_gap_full, "long_run_child_mortality")
     tb_combined_sel = combine_datasets(tb_igme, tb_gap_sel, "long_run_child_mortality_selected")
 
@@ -104,8 +107,8 @@ def calculate_share_surviving_first_five_years(tb_combined: Table) -> Table:
 
     # Add global labels and calculate the share of children surviving/dying in their first five years
 
-    tb_world["share_dying_first_five_years"] = tb_world["under_five_mortality"] / 10
-    tb_world["share_surviving_first_five_years"] = 100 - (tb_world["under_five_mortality"] / 10)
+    tb_world["share_dying_first_five_years"] = tb_world["under_five_mortality"]
+    tb_world["share_surviving_first_five_years"] = 100 - (tb_world["under_five_mortality"])
 
     tb_world = tb_world.drop(columns=["under_five_mortality"])
 

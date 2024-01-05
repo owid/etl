@@ -1,6 +1,7 @@
 """Load a garden dataset and create a grapher dataset."""
 import json
 import os
+import re
 from functools import cache
 from typing import Any, Dict, cast
 
@@ -11,11 +12,18 @@ from owid.catalog.utils import underscore
 from structlog import getLogger
 
 from etl import grapher_helpers as gh
-from etl.helpers import PathFinder
+from etl.helpers import PathFinder, create_dataset
 
 log = getLogger()
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
+
+
+# only include tables containing INCLUDE string, this is useful for debugging
+# but should be None before merging to master!!
+# TODO: set this to None before merging to master
+# INCLUDE = "_6_1_1|_6_2_1"
+INCLUDE = None
 
 
 def run(dest_dir: str) -> None:
@@ -23,15 +31,20 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load garden dataset.
-    ds_garden: Dataset = paths.load_dependency("un_sdg")
-
-    # Create a new grapher dataset with the same metadata as the garden dataset.
-    ds_grapher = Dataset.create_empty(dest_dir, ds_garden.metadata)
+    ds_garden = paths.load_dataset("un_sdg")
+    assert len(ds_garden.m.sources) == 1, "Expected only one source"
 
     # Add table of processed data to the new dataset.
     # add tables to dataset
     clean_source_map = load_clean_source_mapping()
+
+    all_tables = []
+
     for var in ds_garden.table_names:
+        if INCLUDE and not re.search(INCLUDE, var):
+            log.warning("un_sdg.skip", var=var)
+            continue
+
         var_df = create_dataframe_with_variable_name(ds_garden, var)
         var_df["source"] = clean_source_name(var_df["source"], clean_source_map)
         var_gr = var_df.groupby("variable_name")
@@ -50,9 +63,14 @@ def run(dest_dir: str) -> None:
                 # table is generated for every column, use it as a table name
                 # shorten it under 255 characteres as this is the limit for file name
                 wide_table.metadata.short_name = wide_table.columns[0][:245]
-                ds_grapher.add(wide_table)
 
-    # Save changes in the new grapher dataset.
+                # ds_grapher.add(wide_table)
+                all_tables.append(wide_table)
+
+    #
+    # Save outputs.
+    #
+    ds_grapher = create_dataset(dest_dir, tables=all_tables, default_metadata=ds_garden.metadata)
     ds_grapher.save()
 
 
@@ -85,7 +103,10 @@ def create_metadata_desc(indicator: str, series_code: str, source_desc: dict, se
         source_desc_out = source_desc[series_code]
     else:
         source_url = get_metadata_link(indicator)
-        source_desc_out = series_description + "\n\nFurther information available at: %s" % (source_url)
+        if source_url == "no metadata found":
+            source_desc_out = series_description
+        else:
+            source_desc_out = series_description + "\n\nFurther information available at: %s" % (source_url)
 
     return source_desc_out
 
@@ -216,25 +237,24 @@ def get_metadata_link(indicator: str) -> str:
     url = os.path.join("https://unstats.un.org/sdgs/metadata/files/", "Metadata-%s.pdf") % "-".join(
         [part.rjust(2, "0") for part in indicator.split(".")]
     )
+    url_a = os.path.join("https://unstats.un.org/sdgs/metadata/files/", "Metadata-%sa.pdf") % "-".join(
+        [part.rjust(2, "0") for part in indicator.split(".")]
+    )
+    url_b = os.path.join("https://unstats.un.org/sdgs/metadata/files/", "Metadata-%sb.pdf") % "-".join(
+        [part.rjust(2, "0") for part in indicator.split(".")]
+    )
     r = requests.head(url)
-    ctype = r.headers["Content-Type"]
-    if ctype == "application/pdf":
+    if r.status_code == 200:
         url_out = url
-    elif ctype == "text/html":
-        url_a = os.path.join("https://unstats.un.org/sdgs/metadata/files/", "Metadata-%sa.pdf") % "-".join(
-            [part.rjust(2, "0") for part in indicator.split(".")]
-        )
-        url_b = os.path.join("https://unstats.un.org/sdgs/metadata/files/", "Metadata-%sb.pdf") % "-".join(
-            [part.rjust(2, "0") for part in indicator.split(".")]
-        )
-        url_out = url_a + " and " + url_b
-        url_check = requests.head(url_a)
-        ctype_a = url_check.headers["Content-Type"]
-        assert ctype_a == "application/pdf", url_a + "does not link to a pdf"
+        return url_out
     else:
-        raise NotImplementedError()
-
-    return url_out
+        url_check_a = requests.head(url_a)
+        url_check_b = requests.head(url_b)
+        if url_check_a.status_code == 200 and url_check_b.status_code == 200:
+            url_out = url_a + " and " + url_b
+            return url_out
+        else:
+            return "no metadata found"
 
 
 def value_convert(value: Any) -> Any:

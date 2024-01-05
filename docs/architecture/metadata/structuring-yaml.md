@@ -16,8 +16,10 @@ tables:
 To generate a metadata YAML file with pre-populated variable names for an existing garden dataset, execute:
 
 ```
-poetry run etl-metadata-export data/garden/my_namespace/my_version/my_dataset -o etl/steps/data/garden/my_namespace/my_version/my_dataset.meta.yml
+poetry run etl-metadata-export data/garden/my_namespace/my_version/my_dataset
 ```
+
+Check `poetry run etl-metadata-export --help` for more options.
 
 ## Handling Multi-line Strings and Whitespace
 
@@ -95,13 +97,13 @@ Note that the case of `description_key` is a bit special: You can use anchor/ali
 
 ## Common fields for all indicators
 
-!!! warning "In progress."
-
-To avoid repetition for all indicators, you can use a special section called `common:` under `definitions:`. This section sets the default metadata for indicator if there's no specific metadata defined in `tables:`. Using this saves you from repeating the same aliases in indicators. Note that it doesn't merge metadata, but overwrites. If you look for merge, check out `<<:` override operator.
+To avoid repetition for all indicators, you can use a special section called `common:` under `definitions:`. This section sets the default metadata for indicator if there's **no specific metadata defined** in `tables:`. Using this saves you from repeating the same aliases in indicators. Note that it doesn't merge metadata, but overwrites. If you look for merge, check out `<<:` override operator.
 
 ```yaml
 definitions:
   common:
+    display:
+      numDecimalPlaces: 1
     description_key:
       - First line.
       - Second line.
@@ -120,6 +122,9 @@ tables:
         # Description will be Third line
         description_key:
           - Third line.
+        # Display won't be inherited from common!
+        display:
+          name: My var
         presentation:
           # Tag will be Internet
           topic_tags:
@@ -127,7 +132,38 @@ tables:
       my_var_2:
         # Description will be First line, Second line
         # Tag will be Energy
+        # Display will be inherited from common
 ```
+
+Specific metadata in `variables` overrides the common metadata. If you want to merge it, you can use `<<:` override operator.
+
+```yaml
+definitions:
+  display: &common-display
+    numDecimalPlaces: 1
+
+tables:
+  my_table:
+    variables:
+      my_var_1:
+        display:
+          name: My var
+          <<: *common-display
+```
+
+You can also specify `common` for individual tables that would overwrite the `common` section under `definitions`.
+
+```yaml
+tables:
+  my_table:
+    common:
+      display:
+        numDecimalPlaces: 1
+
+    variables:
+      ...
+```
+
 
 ## Dynamic YAML
 

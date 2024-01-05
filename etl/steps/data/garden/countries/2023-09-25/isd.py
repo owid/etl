@@ -3,8 +3,10 @@
 import owid.catalog.processing as pr
 from owid.catalog import Table
 from shared import (
+    LAST_YEAR,
     add_latest_years_with_constant_num_countries,
     add_population_to_table,
+    fill_timeseries,
     init_table_countries_in_region,
 )
 from structlog import get_logger
@@ -60,10 +62,14 @@ def run(dest_dir: str) -> None:
     # Combine tables
     tb_regions = tb_regions.merge(tb_pop, how="left", on=["region", "year"])
 
+    # Get table with id, year, country (whenever that country was present)
+    tb_countries = create_table_country_years(tb_formatted)
+
     # Add to tables list
     tables = [
         tb.set_index(["cownum", "start", "end"], verify_integrity=True).sort_index(),
         tb_regions.set_index(["region", "year"], verify_integrity=True).sort_index(),
+        tb_countries.set_index(["id", "year"], verify_integrity=True).sort_index(),
     ]
 
     # tb = tb.set_index(["country", "year"], verify_integrity=True)
@@ -237,3 +243,38 @@ def code_to_region_alt(cow_code: int) -> str:
             return "North Africa and the Middle East"
         case _:
             return "Rest"
+
+
+def create_table_country_years(tb: Table) -> Table:
+    """Create table with each country present in a year."""
+    tb_countries = (
+        tb[["cownum", "year", "statename"]]
+        .copy()
+        .rename(
+            columns={
+                "cownum": "id",
+                "statename": "country",
+            }
+        )
+    )
+
+    # define mask for last year
+    mask = tb_countries["year"] == EXPECTED_LAST_YEAR
+
+    tb_last = fill_timeseries(
+        tb_countries[mask].drop(columns="year"),
+        EXPECTED_LAST_YEAR + 1,
+        LAST_YEAR,
+    )
+
+    tb = pr.concat([tb_countries, tb_last], ignore_index=True, short_name="isd_countries")
+
+    # Fix country names
+    ## Serbia and Montenegro, Serbia
+    tb["country"] = tb["country"].astype(str)
+    # tb.loc[(tb["id"] == 345) & (tb["year"] >= 1992) & (tb["year"] < 2006), "country"] = "Serbia and Montenegro"
+    # tb.loc[(tb["id"] == 345) & (tb["year"] >= 2006), "country"] = "Serbia"
+    ## Replace Yugoslavia -> Serbia
+    tb["country"] = tb["country"].replace({"Yugoslavia": "Serbia"})
+
+    return tb

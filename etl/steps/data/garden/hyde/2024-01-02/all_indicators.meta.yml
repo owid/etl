@@ -1,0 +1,152 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Population Growth
+        - Land Use
+        - Urbanization
+    processing_level: minor
+  land_use_allocation: |-
+    The order of allocation is as follows: first, we allocate cropland, then rice, then irrigation and finally grazing land.
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
+dataset:
+  update_period_days: 2000
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
+  title: History Database of the Global Environment
+tables:
+  all_indicators:
+    # Learn more about the available fields:
+    # http://docs.owid.io/projects/etl/architecture/metadata/reference/indicator/
+    title: History Database of the Global Environment
+    description: |-
+      This database presents an update and expansion of the History Database of the Global Environment (HYDE, v 3.3) and replaces former HYDE 3.2 version from 2017. HYDE is and internally consistent combination of updated historical population estimates and land use. Categories include cropland, with a new distinction into irrigated and rain fed crops (other than rice) and irrigated and rain fed rice. Also grazing lands are provided, divided into more intensively used pasture, converted rangeland and non-converted natural (less intensively used) rangeland. Population is represented by maps of total, urban, rural population and population density as well as built-up area. The period covered is 10 000 BCE to 2023 CE. Spatial resolution is 5 arc minutes (approx. 85 km2 at the equator), the files are in ESRI ASCII grid format.
+    variables:
+      # Population and population density
+      popc_c:
+        title: Population
+        description_short: Total population of a country over time.
+        unit: people
+      popd_c:
+        title: Population density
+        description_short: Population density of a country over time.
+        unit: people per km²
+      urbc_c:
+        title: Population (urban)
+        description_short: Total urban population of a country over time.
+        unit: people
+      rurc_c:
+        title: Population (rural)
+        description_short: Total rural population of a country over time.
+        unit: people
+
+      # Land use
+      uopp_c:
+        title: "Land use: Built-up area"
+        description_short: Total built-up area of a country over time.
+        description_key:
+          - Built-up areas are computed by dividing total urban population in a country at a given year by the average urban densities in a country at that year.
+          - "{definitions.land_use_allocation}"
+        unit: hectares per grid cell
+        short_unit: "ha"
+      cropland_c:
+        title: "Land use: Cropland"
+        description_short: Total cropland area for each seperate country over time.
+        description_key:
+          - "'Cropland' here is equivalent to the FAO category of 'arable land and permanent crops'."
+          - "{definitions.land_use_allocation}"
+        unit: "hectares"
+        short_unit: "ha"
+      grazing_c:
+        title: "Land use: Grazingland"
+        description_short: Total grazingland area for each seperate country over time.
+        description_key:
+          - "'Grazingland' is equivalent to the FAO category of 'permanent meadows and pastures'."
+          - "{definitions.land_use_allocation}"
+        unit: "hectares"
+        short_unit: "ha"
+
+      # Land use for different crops (rainfed / irrigated)
+      tot_rice_c:
+        title: "Land use: Rice"
+        description_short: Total rice area for each country over time
+        description_key:
+          - "{definitions.land_use_allocation}"
+        unit: "hectares"
+        short_unit: "ha"
+      tot_rainfed_c:
+        title: "Land use: Rainfed"
+        description_key:
+          - "{definitions.land_use_allocation}"
+        description_short: Total rainfed area for each country over time
+        unit: "hectares"
+        short_unit: "ha"
+      rf_rice_c:
+        title: "Land use: Rainfed rice"
+        description_short: Total rainfed rice for each country over time.
+        description_key:
+          - "{definitions.land_use_allocation}"
+        unit: "hectares"
+        short_unit: "ha"
+      rf_norice_c:
+        title: "Land use: Rainfed non-rice crops"
+        description_short: Total rainfed other crops (no rice) for each country over time.
+        description_key:
+          - "{definitions.land_use_allocation}"
+        unit: "hectares"
+        short_unit: "ha"
+      tot_irri_c:
+        title: "Land use: Irrigated"
+        description_short: Total irrigated area for each country over time.
+        description_key:
+          - "{definitions.land_use_allocation}"
+        unit: "hectares"
+        short_unit: "ha"
+      ir_rice_c:
+        title: "Land use: Irrigated rice"
+        description_short: Total irrigated rice for each country over time.
+        description_key:
+          - "{definitions.land_use_allocation}"
+        unit: "hectares"
+        short_unit: "ha"
+      ir_norice_c:
+        title: "Land use: Irrigated non-rice crops"
+        description_short: Total irrigated other crops (no rice) for each country over time.
+        description_key:
+          - "{definitions.land_use_allocation}"
+        unit: "hectares"
+        short_unit: "ha"
+
+      # Land use for other purposes
+      pasture_c:
+        title: "Land use: Pasture"
+        description_short: Total pasture area for each country over time.
+        description_key:
+          - "{definitions.land_use_allocation}"
+        unit: "hectares"
+        short_unit: "ha"
+      rangeland_c:
+        title: "Land use: Rangeland"
+        description_short: Total rangeland for each seperate country over time.
+        description_key:
+          - "{definitions.land_use_allocation}"
+        unit: "hectares"
+        short_unit: "ha"
+      conv_rangeland_c:
+        title: "Land use: Converted rangeland"
+        description_short: Total converted rangeland for each seperate country over time.
+        description_key:
+          - "{definitions.land_use_allocation}"
+        unit: "hectares"
+        short_unit: "ha"
+
+      # Unknown indicator, leaving it here until we get more info from the author (reached out to them)
+      shifting_c:
+        title: Shifting
+        description_short: ""
+        unit: ""

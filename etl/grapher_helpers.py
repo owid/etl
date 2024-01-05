@@ -184,7 +184,7 @@ def _uses_jinja(text: Optional[str]):
 
 
 def _expand_jinja_text(text: str, dim_dict: Dict[str, str]) -> str:
-    if not _uses_jinja(text) or not dim_dict:
+    if not _uses_jinja(text):
         return text
 
     try:
@@ -205,7 +205,7 @@ def _expand_jinja(obj: Any, dim_dict: Dict[str, str]) -> Any:
             setattr(obj, k, _expand_jinja(v, dim_dict))
         return obj
     elif isinstance(obj, list):
-        return [_expand_jinja(v, dim_dict) for v in obj]
+        return type(obj)([_expand_jinja(v, dim_dict) for v in obj])
     elif isinstance(obj, dict):
         return {k: _expand_jinja(v, dim_dict) for k, v in obj.items()}
     else:
@@ -587,3 +587,94 @@ def sanitize_numpy(obj: Any) -> Any:
     elif isinstance(obj, np.ndarray):
         return obj.tolist()
     return obj
+
+
+def add_columns_for_multiindicator_chart(
+    table: catalog.Table,
+    columns_in_chart: List[str],
+    chart_slug: str,
+    suffix_for_titles: Optional[str] = None,
+    columns_to_fill_with_zeros: Optional[List[str]] = None,
+) -> catalog.Table:
+    """Add columns that will be used in a specific multi-indicator (e.g. a stacked area) chart handling issues with
+    missing data.
+
+    There are two common data issues that affect multi-indicator charts:
+    1. Some indicators have missing data that should be zeros. This is a common bad practice done by data producers.
+      For example, in the Statistical Review of World Energy, nuclear power for Australia before 2000 is missing, and
+      Kazakhstan has no data on nuclear energy after 2000. In both cases, those missing values should be zero (since
+      there was no nuclear power for those years in those countries).
+    2. Different indicators have missing data for different years. This makes sense: Some indicators are better informed
+      than others.
+      For example, in the Electricity Mix dataset, Algeria in 2022 has data for renewables but not for fossil fuels.
+      In stacked area charts showing renewable and fossil electricity, Algeria appears as 100% renewable in 2022,
+      which is clearly wrong.
+
+    This function can be used to create columns for all indicators used in a specific multi-indicator chart.
+    It will:
+    * Optionally, fill missing data for some of the new columns with zeros.
+      In the example of issue 1, nuclear power could be filled with zeros.
+    * Make nan rows in the new columns if any indicator used in the chart is nan.
+      In the example of issue 2, Algeria's renewable electricity in 2022 would be nan.
+
+    NOTES:
+    * This function assumes a wide-format table.
+    * In the grapher admin, ensure you select "Hide entities with missing data" in the corresponding chart.
+    * This function creates new columns and does not affect already existing ones.
+
+    Parameters
+    ----------
+    table : Table
+        Original table.
+    columns_in_chart : List[str]
+        Column names in the relevant multi-indicator chart.
+    chart_slug : str
+        URL slug of the chart, which will be added to the name of the new columns.
+        By convention, the suffix added to columns will be "_chart_" followed by the chart's slug in snake case format.
+    suffix_for_titles: Optional[str]
+        Suffix to be added to the new columns' titles, to avoid having multiple indicators with the same title.
+    columns_to_fill_with_zeros : Optional[List[str]]
+        Subset of columns_in_chart whose nans should be filled with zeros.
+        Note: The original columns will not be affected, only the newly created ones.
+
+    Returns
+    -------
+    table: Table
+        Original table with new columns.
+
+    """
+    table = table.copy()
+
+    def _rename_column(old_column_name: str, chart_slug: str) -> str:
+        # Generate a name for a new column based on the old column name and the chart slug.
+        return f"{old_column_name}_chart_{underscore(chart_slug)}"
+
+    # Create new columns.
+    new_columns = [_rename_column(old_column_name=column, chart_slug=chart_slug) for column in columns_in_chart]
+    table[new_columns] = table[columns_in_chart].copy()
+
+    # Optionally fill some of the new columns with zeros.
+    if columns_to_fill_with_zeros is not None:
+        # Sanity check.
+        error = "columns_to_fill_with_zeros should be a subset of columns_in_chart."
+        assert set(columns_to_fill_with_zeros) <= set(columns_in_chart), error
+        # Fill nans with zeros (in new columns).
+        new_columns_to_fill_with_zeros = [
+            _rename_column(old_column_name=column, chart_slug=chart_slug) for column in columns_to_fill_with_zeros
+        ]
+        table[new_columns_to_fill_with_zeros] = table[new_columns_to_fill_with_zeros].fillna(0)
+
+    # For each row, if any of the columns in the chart is nan, fill other columns in the same row with nan.
+    table.loc[table[new_columns].isnull().any(axis=1), new_columns] = np.nan
+
+    # Handle metadata.
+    for column in new_columns:
+        # If the indicator did not have any display name, use the original title.
+        if ("name" not in table[column].display) or (table[column].metadata.display["name"] is None):
+            table[column].metadata.display["name"] = table[column].metadata.title
+        # To avoid having multiple indicators with the same title, add a suffix to the title.
+        if suffix_for_titles is None:
+            suffix_for_titles = f" (adapted for visualization of chart {chart_slug})"
+        table[column].metadata.title += suffix_for_titles
+
+    return table

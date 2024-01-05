@@ -7,13 +7,6 @@ dataset:
     A multi-generation and cohort perspective of sibling and offspring loss. https://doi.org/10.31235/osf.io/xvbkj'
   licenses:
     - {}
-  sources:
-    - name: Smith-Greenaway et al. (2023)
-      url: https://osf.io/preprints/socarxiv/xvbkj/
-      date_accessed: '2023-09-13'
-      publication_year: '2023'
-      published_by: 'Under-five mortality exposure in low- and middle-income countries: A multi-generation and cohort perspective
-        of sibling and offspring loss. Emily Smith-Greenaway, Abigail Weitzman, Yingyi Lin, Katarina Huss.'
 tables:
   under_five_mortality_lmics:
     variables:

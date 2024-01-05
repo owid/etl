@@ -171,17 +171,22 @@ def _add_or_update_origins(session: Session, origins: list[catalog.Origin]) -> l
     return out
 
 
-def _update_variables_display(table: catalog.Table) -> None:
-    """Grapher uses units from field `display` instead of fields `unit` and `short_unit`
-    before we fix grapher data model, copy them to `display`.
-    """
+def _update_variables_metadata(table: catalog.Table) -> None:
+    """Update variables metadata."""
     for col in table.columns:
         meta = table[col].metadata
+
+        # Grapher uses units from field `display` instead of fields `unit` and `short_unit`
+        # before we fix grapher data model, copy them to `display`.
         meta.display = meta.display or {}
         if meta.short_unit:
             meta.display.setdefault("shortUnit", meta.short_unit)
         if meta.unit:
             meta.display.setdefault("unit", meta.unit)
+
+        # Prune empty fields from description_key
+        if meta.description_key:
+            meta.description_key = [k for k in meta.description_key if k.strip()]
 
 
 def upsert_table(
@@ -190,6 +195,7 @@ def upsert_table(
     dataset_upsert_result: DatasetUpsertResult,
     catalog_path: Optional[str] = None,
     dimensions: Optional[gm.Dimensions] = None,
+    verbose: bool = True,
 ) -> VariableUpsertResult:
     """This function is used to put one ready to go formatted Table (i.e.
     in the format (year, entityId, value)) into mysql. The metadata
@@ -228,7 +234,7 @@ def upsert_table(
 
     assert not gh.contains_inf(table.iloc[:, 0]), f"Column `{table.columns[0]}` has inf values"
 
-    _update_variables_display(table)
+    _update_variables_metadata(table)
 
     with Session(engine) as session:
         # For easy retrieveal of the value series we store the name
@@ -296,10 +302,11 @@ def upsert_table(
 
         # upload them to R2
         with ThreadPoolExecutor() as executor:
-            executor.submit(upload_gzip_dict, var_data, db_variable.s3_data_path(), r2=True)
-            executor.submit(upload_gzip_dict, var_metadata, db_variable.s3_metadata_path(), r2=True)
+            executor.submit(upload_gzip_dict, var_data, db_variable.s3_data_path())
+            executor.submit(upload_gzip_dict, var_metadata, db_variable.s3_metadata_path())
 
-        log.info("upsert_table.uploaded_to_s3", size=len(table), variable_id=db_variable_id)
+        if verbose:
+            log.info("upsert_table.uploaded_to_s3", size=len(table), variable_id=db_variable_id)
 
         return VariableUpsertResult(db_variable_id, source_id)  # type: ignore
 
@@ -385,10 +392,22 @@ def cleanup_ghost_variables(dataset_id: int, upserted_variable_ids: List[int]) -
             {"variable_ids": variable_ids_to_delete},
         )
 
-        # delete relationships to origins
+        # delete relationships
         db.cursor.execute(
             """
             DELETE FROM origins_variables WHERE variableId IN %(variable_ids)s
+        """,
+            {"variable_ids": variable_ids_to_delete},
+        )
+        db.cursor.execute(
+            """
+            DELETE FROM tags_variables_topic_tags WHERE variableId IN %(variable_ids)s
+        """,
+            {"variable_ids": variable_ids_to_delete},
+        )
+        db.cursor.execute(
+            """
+            DELETE FROM posts_gdocs_variables_faqs WHERE variableId IN %(variable_ids)s
         """,
             {"variable_ids": variable_ids_to_delete},
         )
@@ -423,11 +442,19 @@ def cleanup_ghost_sources(dataset_id: int, upserted_source_ids: List[int]) -> No
     :param upserted_source_ids: sources upserted in grapher step
     """
     with open_db() as db:
-        db.cursor.execute(
-            """
-            DELETE FROM sources WHERE datasetId=%(dataset_id)s AND id NOT IN %(source_ids)s
-        """,
-            {"dataset_id": dataset_id, "source_ids": upserted_source_ids},
-        )
+        if upserted_source_ids:
+            db.cursor.execute(
+                """
+                DELETE FROM sources WHERE datasetId=%(dataset_id)s AND id NOT IN %(source_ids)s
+            """,
+                {"dataset_id": dataset_id, "source_ids": upserted_source_ids},
+            )
+        else:
+            db.cursor.execute(
+                """
+                DELETE FROM sources WHERE datasetId=%(dataset_id)s
+            """,
+                {"dataset_id": dataset_id},
+            )
         if db.cursor.rowcount > 0:
             log.warning(f"Deleted {db.cursor.rowcount} ghost sources")

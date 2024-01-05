@@ -19,6 +19,8 @@ meta:
     UN IGME’s independent Technical Advisory Group (TAG), comprised of leading academic scholars and independent experts in demography and biostatistics, provides guidance on estimation methods, technical issues, and strategies for data analysis and data quality assessment.
 
     UN IGME updates its child mortality estimates annually after reviewing newly available data and assessing data quality. The web portal contains the latest UN IGME estimates of child mortality at the country, regional and global levels, and the data used to derive them.
+
+    Details on the methods used to estimate child mortality are available here: https://childmortality.org/methods.
 wdir: ../../../data/snapshots/un/2023-08-16
 outs:
   - md5: ef59edbab7791b7a16b2551248e835c9

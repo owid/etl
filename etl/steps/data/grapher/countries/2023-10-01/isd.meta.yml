@@ -1,0 +1,7 @@
+tables:
+  isd_countries:
+    variables:
+      is_present:
+        title: Sovereign state
+        description_short: The country is identified as a sovereign state by the ISD dataset.
+        unit: ""

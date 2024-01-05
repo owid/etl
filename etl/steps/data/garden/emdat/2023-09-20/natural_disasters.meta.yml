@@ -1,3 +1,46 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+      - Natural Disasters
+    description_key:
+      - "EM-DAT defines the following variables:
+
+        - Affected: People requiring immediate assistance during a period of emergency, i.e. requiring basic survival needs such as food, water, shelter, sanitation and immediate medical assistance.
+
+        - Injured: People suffering from physical injuries, trauma or an illness requiring immediate medical assistance as a direct result of a disaster.
+
+        - Homeless: Number of people whose house is destroyed or heavily damaged and therefore need shelter after an event.
+
+        - Total affected: In EM-DAT, it is the sum of the injured, affected and left homeless after a disaster.
+
+        - Estimated economic damage: The amount of damage to property, crops, and livestock. In EM-DAT estimated damage are given in US$ ('000). For each disaster, the registered figure corresponds to the damage value at the moment of the event, i.e. the figures are shown true to the year of the event.
+
+        - Total deaths: In EM-DAT, it is the sum of deaths and missing."
+      - "EM-DAT defines the following types of disasters:
+
+        - Drought: An extended period of unusually low precipitation that produces a shortage of water for people, animals and plants. Drought is different from most other hazards in that it develops slowly, sometimes even over years, and its onset is generally difficult to detect. Drought is not solely a physical phenomenon because its impacts can be exacerbated by human activities and water supply demands. Drought is therefore often defined both conceptually and operationally. Operational definitions of drought, meaning the degree of precipitation reduction that constitutes a drought, vary by locality, climate and environmental sector.
+
+        - Earthquake: Sudden movement of a block of the Earth's crust along a geological fault and associated ground shaking.
+
+        - Extreme temperature: A general term for temperature variations above (extreme heat) or below (extreme cold) normal conditions.
+
+        - Flood: A general term for the overflow of water from a stream channel onto normally dry land in the floodplain (riverine flooding), higher-than-normal levels along the coast and in lakes or reservoirs (coastal flooding) as well as ponding of water at or near the point where the rain fell (flash floods).
+
+        - Fog: Water droplets that are suspended in the air near the Earth's surface. Fog is simply a cloud that is in contact with the ground.
+
+        - Glacial lake outburst: A flood that occurs when water dammed by a glacier or moraine is suddenly released. Glacial lakes can be at the front of the glacier (marginal lake) or below the ice sheet (sub-glacial lake).
+
+        - Landslide: Any kind of moderate to rapid soil movement incl. lahar, mudslide, debris flow. A landslide is the movement of soil or rock controlled by gravity and the speed of the movement usually ranges between slow and rapid, but not very slow. It can be superficial or deep, but the materials have to make up a mass that is a portion of the slope or the slope itself. The movement has to be downward and outward with a free face.
+
+        - Mass movement: Any type of downslope movement of earth materials.
+
+        - Extreme weather: Storm.
+
+        - Volcanic activity: A type of volcanic event near an opening/vent in the Earth's surface including volcanic eruptions of lava, ash, hot vapour, gas, and pyroclastic material.
+
+        - Wildfire: Any uncontrolled and non-prescribed combustion or burning of plants in a natural setting such as a forest, grassland, brush land or tundra, which consumes the natural fuels and spreads based on environmental conditions (e.g., wind, topography). Wildfires can be triggered by lightning or human actions."
+
 dataset:
   title: Natural disasters
 
@@ -55,26 +98,29 @@ tables:
       population:
         title: Population
         unit: 'people'
+        presentation:
+          topic_tags:
+            - Uncategorized
       total_dead_per_100k_people:
         title: Total number of deaths per 100,000 people
-        unit: 'cases per 100k people'
+        unit: 'deaths per 100k people'
         description_processing: &description-processing-100k |
-          Disaster-related impacts from EM-DAT have been normalized by Our World in Data to provide data in terms of cases per 100,000 people.
+          Disaster-related impacts from EM-DAT have been normalized by Our World in Data to provide data in terms of occurrences per 100,000 people.
       injured_per_100k_people:
         title: Number of injured persons per 100,000 people
-        unit: 'cases per 100k people'
+        unit: 'injured per 100k people'
         description_processing: *description-processing-100k
       affected_per_100k_people:
         title: Number of affected persons per 100,000 people
-        unit: 'cases per 100k people'
+        unit: 'affected per 100k people'
         description_processing: *description-processing-100k
       homeless_per_100k_people:
         title: Number of homeless persons per 100,000 people
-        unit: 'cases per 100k people'
+        unit: 'homeless per 100k people'
         description_processing: *description-processing-100k
       total_affected_per_100k_people:
         title: Total number of affected persons per 100,000 people
-        unit: 'cases per 100k people'
+        unit: 'affected per 100k people'
         description_processing: *description-processing-100k
       n_events_per_100k_people:
         title: Number of events per 100,000 people
@@ -86,6 +132,9 @@ tables:
         short_unit: "$"
         description_processing: &description-processing-gdp |
           Our World in Data has calculated economic damage metrics adjusted for gross domestic product (GDP).
+        presentation:
+          topic_tags:
+            - Uncategorized
       reconstruction_costs_per_gdp:
         title: "Reconstruction costs from natural disasters as a share of GDP"
         unit: "%"

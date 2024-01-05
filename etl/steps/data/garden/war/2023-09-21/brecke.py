@@ -6,39 +6,40 @@ Drawback of this dataset is that the field `name` encodes the conflict name and 
 
 Conflicts in this dataset always occur in the same region, and have the same conflict type. Conflict type can either be "inter-state" or "intra-state".
 
+Each entry in the dataset describes a conflict during all the years it lasted. For instance, if a conflict lasted 3 years, it reports the total number of fatalities during this year in a single row.
+
 On regions:
+    - This dataset provides more granularity in terms of regions. For instance, it includes "Eastern Europe" and "Western Europe".
 
-- This dataset provides more granularity in terms of regions. For instance, it includes "Eastern Europe" and "Western Europe".
+    - We map these regions to more standardised regions (those used in other datasets, e.g. COW or UCDP). E.g. we map "Eastern Europe" to "Europe".
+        For more details, see variable `REGIONS_RENAME`.
 
-- We map these regions to more standardised regions (those used in other datasets, e.g. COW or UCDP). E.g. we map "Eastern Europe" to "Europe".
-    For more details, see variable `REGIONS_RENAME`.
+    - It is not evident which region accounts for data from countries in Oceania.
 
-- It is not evident which region accounts for data from countries in Oceania.
+    - It is unclear from the source which countries are included in each region. Some details can be inferred from page 10 in Brecke's 1999 paper "Violent Conflicts 1400 A.D. to the Present in Different Regions of the World" (https://bpb-us-w2.wpmucdn.com/sites.gatech.edu/dist/1/19/files/2018/09/Brecke-PSS-1999-paper-Violent-Conflicts-1400-AD-to-the-Present.pdf).
 
-- It is unclear from the source which countries are included in each region. Some details can be inferred from page 10 in Brecke's 1999 paper "Violent Conflicts 1400 A.D. to the Present in Different Regions of the World" (https://bpb-us-w2.wpmucdn.com/sites.gatech.edu/dist/1/19/files/2018/09/Brecke-PSS-1999-paper-Violent-Conflicts-1400-AD-to-the-Present.pdf).
+        We have manually inferred the mappings using COW codes. Our current estimate for the original regions is as follows:
 
-    We have manually inferred the mappings using COW codes. Our current estimate for the original regions is as follows:
+        1. North America, Central America, and the Caribbean: 2-95 (US-Panama)
+        2. South America: 100-165 (Colombia-Uruguay)
+        3. Western Europe: 200-280 (UK-Mecklenburg Schwerin), 305 (Autria), 325-338 (Italy-Malta), 380-395 (Sweden-Iceland)
+        4. Eastern Europe: 290-300 (Poland - Austria-Hungary), 310-317 (Hungary-Slovakia), 339-375 (Albania-Finland), 640 (Turkey)
+        5. Middle East: 630 (Iran), 645-698 (Iraq-Oman)
+        6. North Africa: 600-626 (Morocco-South Sudan) 432 (Mali), 435-436 (Mauritania-Niger), 483 (Niger), 651 (Egypt)
+        7. West & Central Africa: 402-420 (Cape Verde, Gambia), 433-434 (Senegal-Benin), 437-482 (Ivory Coast-Central African Republic), 484-490 (Congo-Democratic Republic of the Congo)
+        8. East & South Africa: 500-591 (Uganda-Seychelles)
+        9. Central Asia: 700-705 (Afghanistan-Kazakhstan)
+        10. South Asia: 750-771 (India-Bangladesh), 780-790 (Sri Lanka-Nepal)
+        11. Southeast Asia: 800-990 (Thailand-Samoa)
+        12. East Asia: 710-740 (Taiwan-Japan)
 
-    1. North America, Central America, and the Caribbean: 2-95 (US-Panama)
-    2. South America: 100-165 (Colombia-Uruguay)
-    3. Western Europe: 200-280 (UK-Mecklenburg Schwerin), 305 (Autria), 325-338 (Italy-Malta), 380-395 (Sweden-Iceland)
-    4. Eastern Europe: 290-300 (Poland - Austria-Hungary), 310-317 (Hungary-Slovakia), 339-375 (Albania-Finland), 640 (Turkey)
-    5. Middle East: 630 (Iran), 645-698 (Iraq-Oman)
-    6. North Africa: 600-626 (Morocco-South Sudan) 432 (Mali), 435-436 (Mauritania-Niger), 483 (Niger), 651 (Egypt)
-    7. West & Central Africa: 402-420 (Cape Verde, Gambia), 433-434 (Senegal-Benin), 437-482 (Ivory Coast-Central African Republic), 484-490 (Congo-Democratic Republic of the Congo)
-    8. East & South Africa: 500-591 (Uganda-Seychelles)
-    9. Central Asia: 700-705 (Afghanistan-Kazakhstan)
-    10. South Asia: 750-771 (India-Bangladesh), 780-790 (Sri Lanka-Nepal)
-    11. Southeast Asia: 800-990 (Thailand-Samoa)
-    12. East Asia: 710-740 (Taiwan-Japan)
+        With the mapping done with `REGIONS_RENAME`, we have:
 
-    With the mapping done with `REGIONS_RENAME`, we have:
-
-    - Americas (1, 2): 2-165
-    - Europe (3, 4): 200-395 (UK-Iceland)
-    - Middle East (5): 630-698 (Iran-Oman), includes Turkey
-    - Africa (6, 7, 8): 402-626 (Cape Verde-South Sudan),
-    - Asia and Oceania (9, 10, 11, 12): 700-990 (Afghanistan-Samoa)
+        - Americas (1, 2): 2-165
+        - Europe (3, 4): 200-395 (UK-Iceland)
+        - Middle East (5): 630-698 (Iran-Oman), includes Turkey
+        - Africa (6, 7, 8): 402-626 (Cape Verde-South Sudan),
+        - Asia and Oceania (9, 10, 11, 12): 700-990 (Afghanistan-Samoa)
 """
 
 import numpy as np
@@ -159,6 +160,9 @@ def run(dest_dir: str) -> None:
     msk = tb["region"] != "World"
     tb.loc[msk, "region"] = tb.loc[msk, "region"] + " (Brecke)"
 
+    # HOTFIX: Remove datapoints related to death count (and rates) for regions other than 'World'
+    tb.loc[msk, ["number_deaths_ongoing_conflicts", "number_deaths_ongoing_conflicts_per_capita"]] = np.nan
+
     # Set index
     log.info("war.brecke: set index")
     tb = tb.set_index(["year", "region", "conflict_type"], verify_integrity=True)
@@ -235,8 +239,8 @@ def add_conflict_type(tb: Table) -> Table:
         "Vietnam, 1964-75",
     ]
     mask_custom = tb["name"].isin(wars_interstate)
-    assert mask_custom.sum() == len(
-        wars_interstate
+    assert (
+        mask_custom.sum() == len(wars_interstate)
     ), "Some corrections can't be made, because some war names specified in `wars_interstate` are not found in the data!"
     ## Build final mask
     mask = name_wo_year.str.contains("-") | mask_custom
@@ -319,7 +323,9 @@ def _add_ongoing_metrics(tb: Table) -> Table:
     tb_ongoing_world_all_conf["conflict_type"] = "all"
 
     ## Add region=World
-    tb_ongoing = pr.concat([tb_ongoing, tb_ongoing_all_conf, tb_ongoing_world, tb_ongoing_world_all_conf], ignore_index=True).sort_values(  # type: ignore
+    tb_ongoing = pr.concat(
+        [tb_ongoing, tb_ongoing_all_conf, tb_ongoing_world, tb_ongoing_world_all_conf], ignore_index=True
+    ).sort_values(  # type: ignore
         by=["year", "region", "conflict_type"]
     )
 

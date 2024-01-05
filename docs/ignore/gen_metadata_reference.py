@@ -31,12 +31,12 @@ def render_prop_doc(prop: Dict[str, Any], prop_name: str, level: int = 1, top_le
         return f"""
 {prop_title}
 
-{prop["description"]}
+{prop.get("description", "")}
 """
     # Prepare requirement_level
     requirement_level = ""
     if "requirement_level" in prop:
-        if "required" in prop['requirement_level']:
+        if "required" in prop["requirement_level"]:
             requirement_level = f" | {{=={prop['requirement_level']}==}}"
         else:
             requirement_level = f" | {prop['requirement_level']}"
@@ -64,25 +64,34 @@ def render_prop_doc(prop: Dict[str, Any], prop_name: str, level: int = 1, top_le
     if "type" not in prop:
         if "oneOf" not in prop:
             raise ValueError(f"Property {prop_name} has no type!")
-        type_ = ', '.join([f"`{p['type']}`" for p in prop["oneOf"]])
+        type_ = ", ".join([f"`{p['type']}`" for p in prop["oneOf"]])
     else:
         if isinstance(prop["type"], list):
-            type_ = ', '.join([f"`{p}`" for p in prop["type"]])
+            type_ = ", ".join([f"`{p}`" for p in prop["type"]])
         else:
             type_ = f"`{prop['type']}`"
-    prop_docs = TEMPLATE_PROPERTY.format(**{
-        "name": prop_title,
-        "type": type_,
-        "description": prop["description"],
-        "requirement_level": requirement_level,
-        "guidelines": guidelines,
-        "examples": examples,
-        "faqs": faqs,
-    })
+    prop_docs = TEMPLATE_PROPERTY.format(
+        **{
+            "name": prop_title,
+            "type": type_,
+            "description": prop["description"],
+            "requirement_level": requirement_level,
+            "guidelines": guidelines,
+            "examples": examples,
+            "faqs": faqs,
+        }
+    )
     return prop_docs
 
 
-def render_props_recursive(prop: Dict[str, Any], prop_name: str, level: int, text: str, ignore_fields: Optional[List[str]] = None, render_top_as_scalar: bool = True) -> str:
+def render_props_recursive(
+    prop: Dict[str, Any],
+    prop_name: str,
+    level: int,
+    text: str,
+    ignore_fields: Optional[List[str]] = None,
+    render_top_as_scalar: bool = True,
+) -> str:
     """Render all properties."""
     if ignore_fields is None:
         ignore_fields = []
@@ -104,7 +113,13 @@ def render_props_recursive(prop: Dict[str, Any], prop_name: str, level: int, tex
             return text
         props_children_sorted = dict(sorted(props_children.items()))
         for prop_name_child, prop_child in props_children_sorted.items():
-            text += render_props_recursive(prop_child, prop_name=f"{prop_name}.{prop_name_child}", level=level + 1, text="", ignore_fields=ignore_fields)
+            text += render_props_recursive(
+                prop_child,
+                prop_name=f"{prop_name}.{prop_name_child}",
+                level=level + 1,
+                text="",
+                ignore_fields=ignore_fields,
+            )
     else:
         text += render_prop_doc(prop, prop_name=prop_name, level=level)
     return text
@@ -142,7 +157,9 @@ def render_indicator() -> str:
     # Rendering of 'snapshot' is only meta.origin and meta.license
     ## Origin
     variables = DATASET_SCHEMA["properties"]["tables"]["additionalProperties"]["properties"]["variables"]
-    documentation = render_props_recursive(variables, "variable", 1, "", ignore_fields=["variable.presentation.grapher_config"])
+    documentation = render_props_recursive(
+        variables, "variable", 1, "", ignore_fields=["variable.presentation.grapher_config"]
+    )
     return documentation
 
 
@@ -165,7 +182,6 @@ with mkdocs_gen_files.open("architecture/metadata/reference/tables.md", "w") as 
 with mkdocs_gen_files.open("architecture/metadata/reference/indicator.md", "w") as f:
     text_tables = render_indicator()
     print(text_tables, file=f)
-
 
 
 # with open("docs/architecture/metadata/reference2.md", "w") as f:

@@ -11,14 +11,16 @@ from glob import glob
 from os import environ
 from os.path import join
 from pathlib import Path
-from typing import Any, Iterator, List, Literal, Optional, Union
+from typing import Iterator, List, Literal, Optional, Union
 
 import numpy as np
 import pandas as pd
 import yaml
+from _hashlib import HASH
 
 from . import tables, utils
 from .meta import SOURCE_EXISTS_OPTIONS, DatasetMeta, TableMeta
+from .processing_log import disable_processing_log
 from .properties import metadata_property
 
 FileFormat = Literal["csv", "feather", "parquet"]
@@ -62,6 +64,11 @@ class Dataset:
             self.path = path
 
         self.metadata = DatasetMeta.load(self._index_file)
+
+    @property
+    def m(self) -> DatasetMeta:
+        """Metadata alias to save typing."""
+        return self.metadata
 
     @classmethod
     def create_empty(cls, path: Union[str, Path], metadata: Optional["DatasetMeta"] = None) -> "Dataset":
@@ -178,8 +185,10 @@ class Dataset:
         self.metadata.save(self._index_file)
 
         # Update the copy of this datasets metadata in every table in the set.
+        # TODO: this entire part should go away and we should make t.metadata.dataset read only
         for table_name in self.table_names:
-            table = self[table_name]
+            with disable_processing_log():
+                table = self[table_name]
             table.metadata.dataset = self.metadata
             table._save_metadata(join(self.path, table.metadata.checked_name + ".meta.json"))
 
@@ -208,7 +217,8 @@ class Dataset:
         with open(metadata_path) as istream:
             metadata = yaml.safe_load(istream)
             for table_name in metadata.get("tables", {}).keys():
-                table = self[table_name]
+                with disable_processing_log():
+                    table = self[table_name]
                 table.update_metadata_from_yaml(metadata_path, table_name, if_origins_exist=if_origins_exist)
                 table._save_metadata(join(self.path, table.metadata.checked_name + ".meta.json"))
 
@@ -298,7 +308,7 @@ for k in DatasetMeta.__dataclass_fields__:
     setattr(Dataset, k, metadata_property(k))
 
 
-def checksum_file(filename: str) -> Any:
+def checksum_file(filename: str) -> HASH:
     "Return the MD5 checksum of a given file."
     chunk_size = 2**20  # 1MB
     checksum = hashlib.md5()

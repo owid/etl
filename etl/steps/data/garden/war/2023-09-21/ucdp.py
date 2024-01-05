@@ -19,15 +19,24 @@ Notes:
             5 = Americas (GWNo: 2-199)
 """
 
+from typing import List, Optional
+
+import geopandas as gpd
 import numpy as np
 import pandas as pd
 from owid.catalog import Dataset, Table
 from owid.catalog import processing as pr
+from shapely import wkt
+from shared import (
+    add_indicators_extra,
+    aggregate_conflict_types,
+    fill_gaps_with_zeroes,
+    get_number_of_countries_in_conflict_by_region,
+)
 from structlog import get_logger
 
+from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
-
-from .shared import add_indicators_extra
 
 log = get_logger()
 
@@ -58,7 +67,7 @@ REGIONS_EXPECTED = set(REGIONS_MAPPING.values())
 
 
 def run(dest_dir: str) -> None:
-    log.info("war_ucdp.start")
+    paths.log.info("war_ucdp.start")
 
     #
     # Load inputs.
@@ -66,14 +75,23 @@ def run(dest_dir: str) -> None:
     # Load meadow dataset.
     ds_meadow = paths.load_dataset("ucdp")
 
-    # Read table from COW codes
-    ds_cow_ssm = paths.load_dataset("gleditsch")
-    tb_regions = ds_cow_ssm["gleditsch_regions"].reset_index()
+    # Read table from GW codes
+    ds_gw = paths.load_dataset("gleditsch")
+    tb_regions = ds_gw["gleditsch_regions"].reset_index()
+    tb_codes = ds_gw["gleditsch_countries"]
+
+    # Load maps table
+    short_name = "nat_earth_110"
+    ds_maps = paths.load_dataset(short_name)
+    tb_maps = ds_maps[short_name].reset_index()
+
+    # Load population
+    ds_population = paths.load_dataset("population")
 
     #
     # Process data.
     #
-    log.info("war.ucdp: sanity checks")
+    paths.log.info("sanity checks")
     _sanity_checks(ds_meadow)
 
     # Load relevant tables
@@ -82,15 +100,20 @@ def run(dest_dir: str) -> None:
     tb_prio = ds_meadow["ucdp_prio_armed_conflict"].reset_index()
 
     # Keep only active conflicts
-    log.info("war.ucdp: keep active conflicts")
+    paths.log.info("keep active conflicts")
     tb_geo = tb_geo[tb_geo["active_year"] == 1]
 
     # Change region named "Asia" to "Asia and Oceania" (in GED)
     tb_geo["region"] = tb_geo["region"].replace(to_replace={"Asia": "Asia and Oceania"})
 
     # Create `conflict_type` column
-    log.info("war.ucdp: add field `conflict_type`")
+    paths.log.info("add field `conflict_type`")
     tb = add_conflict_type(tb_geo, tb_conflict)
+
+    # Get country-level stuff
+    paths.log.info("getting country-level indicators")
+    tb_participants = estimate_metrics_participants(tb, tb_prio, tb_codes)
+    tb_locations = estimate_metrics_locations(tb, tb_maps, tb_codes, ds_population)
 
     # Sanity check conflict_type transitions
     ## Only consider transitions between intrastate and intl intrastate. If other transitions are detected, raise error.
@@ -98,32 +121,35 @@ def run(dest_dir: str) -> None:
     _sanity_check_prio_conflict_types(tb_prio)
 
     # Add number of new conflicts and ongoing conflicts (also adds data for the World)
-    log.info("war.ucdp: get metrics for main dataset (also estimate values for 'World')")
+    paths.log.info("get metrics for main dataset (also estimate values for 'World')")
     tb = estimate_metrics(tb)
 
     # Add table from UCDP/PRIO
-    log.info("war.ucdp: prepare data from ucdp/prio table (also estimate values for 'World')")
+    paths.log.info("prepare data from ucdp/prio table (also estimate values for 'World')")
     tb_prio = prepare_prio_data(tb_prio)
 
     # Fill NaNs
-    log.info("war.ucdp: replace missing data with zeros (where applicable)")
+    paths.log.info("replace missing data with zeros (where applicable)")
     tb_prio = replace_missing_data_with_zeros(tb_prio)
     tb = replace_missing_data_with_zeros(tb)
 
     # Combine main dataset with PRIO/UCDP
-    log.info("war.ucdp: add data from ucdp/prio table")
+    paths.log.info("add data from ucdp/prio table")
     tb = combine_tables(tb, tb_prio)
 
     # Add extra-systemic after 1989
-    log.info("war.ucdp: fix extra-systemic nulls")
+    paths.log.info("fix extra-systemic nulls")
     tb = fix_extrasystemic_entries(tb)
 
     # Add data for "all conflicts" conflict type
-    log.info("war.ucdp: add data for 'all conflicts'")
+    paths.log.info("add data for 'all conflicts'")
     tb = add_conflict_all(tb)
 
     # Add data for "all intrastate" conflict types
     tb = add_conflict_all_intrastate(tb)
+
+    # Add data for "state-based" conflict types
+    tb = add_conflict_all_statebased(tb)
 
     # Force types
     # tb = tb.astype({"conflict_type": "category", "region": "category"})
@@ -145,23 +171,34 @@ def run(dest_dir: str) -> None:
 
     # Set index, sort rows
     tb = tb.set_index(["year", "region", "conflict_type"], verify_integrity=True).sort_index()
+    tb_participants = tb_participants.set_index(
+        ["year", "country", "conflict_type"], verify_integrity=True
+    ).sort_index()
+    tb_locations = tb_locations.set_index(["year", "country", "conflict_type"], verify_integrity=True).sort_index()
 
     # Add short_name to table
-    log.info("war.ucdp: add shortname to table")
+    paths.log.info("add shortname to table")
     tb.metadata.short_name = paths.short_name
+
+    # Tables
+    tables = [
+        tb,
+        tb_participants,
+        tb_locations,
+    ]
 
     #
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
     ds_garden = create_dataset(
-        dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=ds_meadow.metadata
+        dest_dir, tables=tables, check_variables_metadata=True, default_metadata=ds_meadow.metadata
     )
 
     # Save changes in the new garden dataset.
     ds_garden.save()
 
-    log.info("ucdp.end")
+    paths.log.info("ucdp.end")
 
 
 def _sanity_checks(ds: Dataset) -> None:
@@ -340,7 +377,7 @@ def _sanity_check_prio_conflict_types(tb: Table) -> Table:
     assert not transitions_unk, f"Unknown transitions found: {transitions_unk}"
 
 
-def replace_missing_data_with_zeros(tb: Table) -> Table:
+def replace_missing_data_with_zeros(tb: Table, columns: Optional[List[str]] = None) -> Table:
     """Replace missing data with zeros.
 
     In some instances (e.g. extrasystemic conflicts after ~1964) there is missing data. Instead, we'd like this to be zero-valued.
@@ -355,13 +392,14 @@ def replace_missing_data_with_zeros(tb: Table) -> Table:
     # ADD HERE IF YOU WANT TO REPLACE MISSING DATA WITH ZEROS
     ## Change NaNs for 0 for specific rows
     ## For columns "number_ongoing_conflicts", "number_new_conflicts", and "number_deaths_ongoing_conflict*"
-    columns = [
-        "number_ongoing_conflicts",
-        "number_new_conflicts",
-        "number_deaths_ongoing_conflicts",
-        "number_deaths_ongoing_conflicts_low",
-        "number_deaths_ongoing_conflicts_high",
-    ]
+    if columns is None:
+        columns = [
+            "number_ongoing_conflicts",
+            "number_new_conflicts",
+            "number_deaths_ongoing_conflicts",
+            "number_deaths_ongoing_conflicts_low",
+            "number_deaths_ongoing_conflicts_high",
+        ]
     for col in columns:
         if col in tb.columns:
             tb.loc[:, col] = tb.loc[:, col].fillna(0)
@@ -377,14 +415,14 @@ def estimate_metrics(tb: Table) -> Table:
     we need to access the actual conflict_id field to find the number of unique values. This can only be done here.
     """
     # Get number of ongoing conflicts, and deaths in ongoing conflicts
-    log.info("war.ucdp: get number of ongoing conflicts and deaths in ongoing conflicts")
+    paths.log.info("get number of ongoing conflicts and deaths in ongoing conflicts")
     tb_ongoing = _get_ongoing_metrics(tb)
 
     # Get number of new conflicts every year
-    log.info("war.ucdp: get number of new conflicts every year")
+    paths.log.info("get number of new conflicts every year")
     tb_new = _get_new_metrics(tb)
     # Combine and build single table
-    log.info("war.ucdp: combine and build single table")
+    paths.log.info("combine and build single table")
     tb = tb_ongoing.merge(
         tb_new,
         left_on=["year", "region", "conflict_type"],
@@ -544,10 +582,21 @@ def fix_extrasystemic_entries(tb: Table) -> Table:
     tb_extra = tb_extra.set_index(["year", "region"]).reindex(new_idx).reset_index()
     tb_extra["conflict_type"] = "extrasystemic"
 
-    # Replace nulls with zeroes
-    tb_extra[["number_ongoing_conflicts", "number_new_conflicts"]] = tb_extra[
-        ["number_ongoing_conflicts", "number_new_conflicts"]
-    ].fillna(0)
+    # Replace nulls with zeroes (all time series)
+    columns = [
+        "number_ongoing_conflicts",
+        "number_new_conflicts",
+    ]
+    tb_extra[columns] = tb_extra[columns].fillna(0)
+
+    # Replace nulls with zeroes (only post 1989 time series)
+    columns = [
+        "number_deaths_ongoing_conflicts",
+        "number_deaths_ongoing_conflicts_high",
+        "number_deaths_ongoing_conflicts_low",
+    ]
+    mask_1989 = tb_extra["year"] >= 1989
+    tb_extra.loc[mask_1989, columns] = tb_extra.loc[mask_1989, columns].fillna(0)
 
     # Add to main table
     tb = pr.concat([tb[-mask], tb_extra])
@@ -678,6 +727,15 @@ def add_conflict_all_intrastate(tb: Table) -> Table:
     return tb
 
 
+def add_conflict_all_statebased(tb: Table) -> Table:
+    """Add metrics for conflict_type = 'state-based'."""
+    tb_state = tb[tb["conflict_type"].isin(TYPE_OF_CONFLICT_MAPPING.values())].copy()
+    tb_state = tb_state.groupby(["year", "region"], as_index=False).sum(numeric_only=True, min_count=1)
+    tb_state["conflict_type"] = "state-based"
+    tb = pr.concat([tb, tb_state], ignore_index=True)
+    return tb
+
+
 def adapt_region_names(tb: Table) -> Table:
     assert not tb["region"].isna().any(), "There were some NaN values found for field `region`. This is not expected!"
     # Get regions in table
@@ -689,4 +747,491 @@ def adapt_region_names(tb: Table) -> Table:
     # Add suffix with source name
     msk = tb["region"] != "World"
     tb.loc[msk, "region"] = tb.loc[msk, "region"] + " (UCDP)"
+    return tb
+
+
+def estimate_metrics_participants(tb: Table, tb_prio: Table, tb_codes: Table) -> Table:
+    """Add participant information at country-level."""
+    ###################
+    # Participated in #
+    ###################
+    # FLAG YES/NO (country-level)
+
+    # Get table with [year, conflict_type, code]
+    codes = ["gwnoa", "gwnob"]
+    tb_country = pr.concat([tb[["year", "conflict_type", code]].rename(columns={code: "id"}).copy() for code in codes])
+
+    # Drop rows with code = NaN
+    tb_country = tb_country.dropna(subset=["id"])
+    # Drop duplicates
+    tb_country = tb_country.drop_duplicates()
+
+    # Explode where multiple codes
+    tb_country["id"] = tb_country["id"].astype(str).str.split(";")
+    tb_country = tb_country.explode("id")
+    # Drop duplicates (may appear duplicates after exploding)
+    tb_country = tb_country.drop_duplicates()
+    # Ensure numeric type
+    tb_country["id"] = tb_country["id"].astype(int)
+
+    # Sanity check
+    assert not tb_country.isna().any(axis=None), "There are some NaNs!"
+
+    # Add country name
+    tb_country["country"] = tb_country.apply(lambda x: tb_codes.loc[(x["id"], x["year"])], axis=1)
+    assert tb_country["country"].notna().all(), "Some countries were not found! NaN was set"
+
+    # Add flag
+    tb_country["participated_in_conflict"] = 1
+    tb_country["participated_in_conflict"].m.origins = tb["gwnoa"].m.origins
+
+    # Prepare GW table
+    ctypes_all = list(set(tb_country["conflict_type"]))
+    tb_alltypes = Table(pd.DataFrame({"conflict_type": ctypes_all}))
+    tb_codes_ = tb_codes.reset_index().merge(tb_alltypes, how="cross")
+    tb_codes_["country"] = tb_codes_["country"].astype(str)
+
+    # Combine all GW entries with UCDP
+    columns_idx = ["year", "country", "id", "conflict_type"]
+    tb_country = tb_codes_.merge(tb_country, on=columns_idx, how="outer")
+    tb_country["participated_in_conflict"] = tb_country["participated_in_conflict"].fillna(0)
+    tb_country = tb_country[columns_idx + ["participated_in_conflict"]]
+
+    # Add intrastate (all)
+    tb_country = aggregate_conflict_types(
+        tb_country, "intrastate", ["intrastate (non-internationalized)", "intrastate (internationalized)"]
+    )
+    # Add state-based
+    tb_country = aggregate_conflict_types(tb_country, "state-based", list(TYPE_OF_CONFLICT_MAPPING.values()))
+
+    # Only preserve years that make sense
+    tb_country = tb_country[(tb_country["year"] >= tb["year"].min()) & (tb_country["year"] <= tb["year"].max())]
+
+    ###################
+    # Participated in #
+    ###################
+    # NUMBER COUNTRIES
+
+    tb_num_participants = get_number_of_countries_in_conflict_by_region(tb_country, "conflict_type", "gw")
+
+    # Combine tables
+    tb_country = pr.concat([tb_country, tb_num_participants], ignore_index=True)
+
+    # Drop column `id`
+    tb_country = tb_country.drop(columns=["id"])
+
+    ############
+    # Add PRIO #
+    ############
+    tb_country_prio = estimate_metrics_participants_prio(tb_prio, tb_codes)
+
+    tb_country = pr.concat([tb_country, tb_country_prio], ignore_index=True)
+
+    ###############
+    # Final steps #
+    ###############
+
+    # Set short name
+    tb_country.metadata.short_name = f"{paths.short_name}_country"
+
+    return tb_country
+
+
+def estimate_metrics_participants_prio(tb_prio: Table, tb_codes: Table) -> Table:
+    """Add participant information at country-level.
+
+    Only works for UCDP/PRIO data.
+    """
+    ###################
+    # Participated in #
+    ###################
+    # FLAG YES/NO (country-level)
+
+    # Get table with [year, conflict_type, code]
+    codes = ["gwno_a", "gwno_a_2nd", "gwno_b", "gwno_b_2nd"]
+    tb_country = pr.concat(
+        [tb_prio[["year", "type_of_conflict", code]].rename(columns={code: "id"}).copy() for code in codes]
+    )
+
+    # Drop rows with code = NaN
+    tb_country = tb_country.dropna(subset=["id"])
+    # Drop duplicates
+    tb_country = tb_country.drop_duplicates()
+
+    # Explode where multiple codes
+    tb_country["id"] = tb_country["id"].astype(str).str.split(",")
+    tb_country = tb_country.explode("id")
+    # Ensure numeric type
+    tb_country["id"] = tb_country["id"].astype(int)
+    # Drop duplicates (may appear duplicates after exploding)
+    tb_country = tb_country.drop_duplicates()
+
+    # Sanity check
+    assert not tb_country.isna().any(axis=None), "There are some NaNs!"
+
+    # Correct codes
+    ## 751 'Government of Hyderabad' -> 750 'India'
+    tb_country.loc[tb_country["id"] == 751, "id"] = 750
+    ## 817 'Republic of Vietnam' in 1975 -> 816 'Vietnam'
+    tb_country.loc[(tb_country["id"] == 817) & (tb_country["year"] == 1975), "id"] = 816
+    ## 345 'Yugoslavia' after 2005 -> 340 'Serbia'
+    tb_country.loc[(tb_country["id"] == 345) & (tb_country["year"] > 2005), "id"] = 340
+    # Add country name
+    tb_country["country"] = tb_country.apply(lambda x: tb_codes.loc[(x["id"], x["year"])], axis=1)
+    assert tb_country["country"].notna().all(), "Some countries were not found! NaN was set"
+    ## Remove duplicates after correcting codes
+    tb_country = tb_country.drop_duplicates()
+
+    # Add flag
+    tb_country["participated_in_conflict"] = 1
+    tb_country["participated_in_conflict"].m.origins = tb_prio["gwno_a"].m.origins
+
+    # Format conflict tyep
+    tb_country["conflict_type"] = tb_country["type_of_conflict"].replace(TYPE_OF_CONFLICT_MAPPING)
+    tb_country = tb_country.drop(columns=["type_of_conflict"])
+
+    # Prepare GW table
+    tb_alltypes = Table(pd.DataFrame({"conflict_type": tb_country["conflict_type"].unique()}))
+    tb_codes = tb_codes.reset_index().merge(tb_alltypes, how="cross")
+    tb_codes["country"] = tb_codes["country"].astype(str)
+
+    # Combine all GW entries with UCDP/PRIO
+    columns_idx = ["year", "country", "id", "conflict_type"]
+    tb_country = tb_codes.merge(tb_country, on=columns_idx, how="outer")
+    tb_country["participated_in_conflict"] = tb_country["participated_in_conflict"].fillna(0)
+    tb_country = tb_country[columns_idx + ["participated_in_conflict"]]
+
+    # Add intrastate (all)
+    tb_country = aggregate_conflict_types(
+        tb_country, "intrastate", ["intrastate (non-internationalized)", "intrastate (internationalized)"]
+    )
+    # Add state-based
+    tb_country = aggregate_conflict_types(tb_country, "state-based", list(TYPE_OF_CONFLICT_MAPPING.values()))
+
+    # Only preserve years that make sense
+    tb_country = tb_country[
+        (tb_country["year"] >= tb_prio["year"].min()) & (tb_country["year"] <= tb_prio["year"].max())
+    ]
+
+    ###################
+    # Participated in #
+    ###################
+    # NUMBER COUNTRIES
+
+    tb_num_participants = get_number_of_countries_in_conflict_by_region(tb_country, "conflict_type", "gw")
+
+    # Combine tables
+    tb_country = pr.concat([tb_country, tb_num_participants], ignore_index=True)
+
+    # Drop column `id`
+    tb_country = tb_country.drop(columns=["id"])
+
+    ###############
+    # Final steps #
+    ###############
+
+    # Keep only years not covered by UCDP (except for 'extrasystemic')
+    tb_country = tb_country[(tb_country["year"] < 1989) | (tb_country["conflict_type"] == "extrasystemic")]
+    return tb_country
+
+
+def estimate_metrics_locations(tb: Table, tb_maps: Table, tb_codes: Table, ds_population: Dataset) -> Table:
+    """Add participant information at country-level.
+
+    reference: https://github.com/owid/notebooks/blob/main/JoeHasell/UCDP%20and%20PRIO/UCDP_georeferenced/ucdp_country_extract.ipynb
+
+    tb: actual data
+    tb_maps: map data (borders and stuff)
+    tb_codes: from gw codes. so that all countries have either a 1 or 0 (instead of missing data).
+    ds_population: population data (for rates)
+    """
+    tb_codes_ = tb_codes.reset_index().drop(columns=["id"]).copy()
+    tb_codes_ = tb_codes_[tb_codes_["year"] >= 1989]
+
+    # Add country name using geometry
+    paths.log.info("adding location name of conflict event...")
+    tb_locations = _get_location_of_conflict_in_ucdp_ged(tb, tb_maps).copy()
+
+    # There are some countries not in GW (remove, replace?). We keep Palestine and Western Sahara since
+    # these are mappable in OWID maps.
+    # We map entry with id "53238" and relid "PAK-2003-1-345-88" from "Siachen Glacier" to "Pakistan" based on
+    # the text in `where_description` field, which says: "Giang sector in Siachen, Pakistani Kashmir"
+    tb_locations.loc[tb_locations["country_name_location"] == "Siachen Glacier", "country_name_location"] = "Pakistan"
+
+    ###################
+    # COUNTRY-LEVEL: Country in conflict or not (1 or 0)
+    ###################
+    paths.log.info("estimating country flag 'is_location_of_conflict'...")
+
+    # tb_locations = tb_locations.merge(
+    #     tb_codes.reset_index(), left_on="country_name_location", right_on="country", how="left"
+    # )
+
+    # Estimate if a conflict occured in a country, and the number of deaths in it
+    tb_locations_country = (
+        tb_locations.groupby(["country_name_location", "year", "conflict_type"], as_index=False)
+        .agg(
+            {
+                "conflict_new_id": "nunique",
+                "best": "sum",
+                "low": "sum",
+                "high": "sum",
+            }
+        )
+        .rename(
+            columns={
+                "conflict_new_id": "is_location_of_conflict",
+                "country_name_location": "country",
+                "best": "number_deaths",
+                "low": "number_deaths_low",
+                "high": "number_deaths_high",
+            }
+        )
+    )
+    assert tb_locations_country["is_location_of_conflict"].notna().all(), "Missing values in `is_location_of_conflict`!"
+    cols_num_deaths = ["number_deaths", "number_deaths_low", "number_deaths_high"]
+    for col in cols_num_deaths:
+        assert tb_locations_country[col].notna().all(), f"Missing values in `{col}`!"
+    # Convert into a binary indicator: 1 (if more than one conflict), 0 (otherwise)
+    tb_locations_country["is_location_of_conflict"] = tb_locations_country["is_location_of_conflict"].apply(
+        lambda x: 1 if x > 0 else 0
+    )
+
+    # Add missing countries using tb_codes as reference
+    tb_locations_country = tb_codes_.merge(
+        tb_locations_country,
+        on=["country", "year"],
+        how="outer",
+    )
+    # Add Greenland
+    assert (
+        "Greenland" not in set(tb_locations_country.country)
+    ), "Greenland is not expected to be there! That's why we force it to zero. If it appears, just remove the following code line"
+    tb_green = Table(pd.DataFrame({"country": ["Greenland"], "year": [2022]}))
+    tb_locations_country = pr.concat([tb_locations_country, tb_green], ignore_index=True)
+
+    # NaNs of numeric indicators to zero
+    cols_indicators = ["is_location_of_conflict"] + cols_num_deaths
+    tb_locations_country[cols_indicators] = tb_locations_country[cols_indicators].fillna(0)
+    # NaN in conflict_type to arbitrary (since missing ones are filled from the next operation with fill_gaps_with_zeroes)
+    mask = tb_locations_country["conflict_type"].isna()
+    assert (
+        tb_locations_country.loc[mask, cols_indicators].sum().sum() == 0
+    ), "There are some non-NaNs for NaN-valued conflict types!"
+    tb_locations_country["conflict_type"] = tb_locations_country["conflict_type"].fillna("one-sided violence")
+
+    # Fill with zeroes
+    tb_locations_country = fill_gaps_with_zeroes(
+        tb=tb_locations_country,
+        columns=["country", "year", "conflict_type"],
+        cols_use_range=["year"],
+    )
+
+    # Add origins from Natural Earth
+    cols = ["is_location_of_conflict"] + cols_num_deaths
+    for col in cols:
+        tb_locations_country[col].origins += tb_maps["name"].m.origins
+
+    ###################
+    # Add conflict type aggregates
+    ###################
+    paths.log.info("adding conflict type aggregates...")
+
+    # Add missing conflict types
+    CTYPES_AGGREGATES = {
+        "intrastate": ["intrastate (non-internationalized)", "intrastate (internationalized)"],
+        "state-based": list(TYPE_OF_CONFLICT_MAPPING.values()),
+        "all": list(TYPE_OF_VIOLENCE_MAPPING.values()) + list(TYPE_OF_CONFLICT_MAPPING.values()),
+    }
+    for ctype_agg, ctypes in CTYPES_AGGREGATES.items():
+        tb_locations_country = aggregate_conflict_types(
+            tb=tb_locations_country,
+            parent_name=ctype_agg,
+            children_names=ctypes,
+            columns_to_aggregate=["is_location_of_conflict"] + cols_num_deaths,
+            columns_to_aggregate_absolute=cols_num_deaths,
+            columns_to_groupby=["country", "year"],
+        )
+
+    ###################
+    # Add rates
+    ###################
+    # Add population column
+    tb_locations_country = geo.add_population_to_table(
+        tb=tb_locations_country,
+        ds_population=ds_population,
+    )
+    # Divide and obtain rates
+    factor = 100_000
+    tb_locations_country["death_rate"] = (
+        factor * tb_locations_country["number_deaths"] / tb_locations_country["population"]
+    )
+    tb_locations_country["death_rate_low"] = factor * (
+        tb_locations_country["number_deaths_low"] / tb_locations_country["population"]
+    )
+    tb_locations_country["death_rate_high"] = factor * (
+        tb_locations_country["number_deaths_high"] / tb_locations_country["population"]
+    )
+
+    # Drop population column
+    tb_locations_country = tb_locations_country.drop(columns=["population"])
+
+    ###################
+    # REGION-LEVEL: Number of locations with conflict
+    ###################
+    paths.log.info("estimating number of locations with conflict...")
+
+    def _get_number_of_locations_with_conflict_regions(tb: Table, cols: List[str]) -> Table:
+        """Get number of locations with conflict."""
+        # For each group, get the number of unique locations
+        tb = (
+            tb.groupby(cols)
+            .agg(
+                {
+                    "country_name_location": "nunique",
+                }
+            )
+            .reset_index()
+        )
+        # Rename columns
+        if "region" in cols:
+            column_rename = {
+                "country_name_location": "number_locations",
+                "region": "country",
+            }
+        else:
+            column_rename = {
+                "country_name_location": "number_locations",
+            }
+
+        tb = tb.rename(columns=column_rename)
+        return tb
+
+    # Regions
+    ## Number of countries (given ctypes)
+    tb_locations_regions = _get_number_of_locations_with_conflict_regions(
+        tb_locations, ["region", "year", "conflict_type"]
+    )
+    tb_locations_regions_world = _get_number_of_locations_with_conflict_regions(tb_locations, ["year", "conflict_type"])
+    tb_locations_regions_world["country"] = "World"
+
+    tbs_locations_regions = [
+        tb_locations_regions,
+        tb_locations_regions_world,
+    ]
+
+    ## Extra conflict types (aggregates)
+    cols = ["region", "year"]
+    for ctype_agg, ctypes in CTYPES_AGGREGATES.items():
+        # Keep only children for this ctype aggregate
+        tb_locations_ = tb_locations[tb_locations["conflict_type"].isin(ctypes)]
+        # Get actual table, add ctype. (also for region 'World')
+        tb_locations_regions_agg = _get_number_of_locations_with_conflict_regions(tb_locations_, ["region", "year"])
+        tb_locations_regions_agg["conflict_type"] = ctype_agg
+        tb_locations_regions_agg_world = _get_number_of_locations_with_conflict_regions(tb_locations_, ["year"])
+        tb_locations_regions_agg_world["conflict_type"] = ctype_agg
+        tb_locations_regions_agg_world["country"] = "World"
+        tbs_locations_regions.extend([tb_locations_regions_agg, tb_locations_regions_agg_world])
+
+    # Combine
+    tb_locations_regions = pr.concat(
+        tbs_locations_regions,
+        ignore_index=True,
+    )
+
+    # Add origins
+    tb_locations_regions["number_locations"].m.origins = tb_locations_country["is_location_of_conflict"].origins
+
+    # Fill with zeroes
+    tb_locations_regions = fill_gaps_with_zeroes(
+        tb=tb_locations_regions,
+        columns=["country", "year", "conflict_type"],
+        cols_use_range=["year"],
+    )
+
+    ###################
+    # COMBINE: Country flag + Regional counts
+    ###################
+    paths.log.info("combining country flag and regional counts...")
+    tb_locations = pr.concat(
+        [tb_locations_country, tb_locations_regions], short_name=f"{paths.short_name}_locations", ignore_index=True
+    )
+    return tb_locations
+
+
+def _get_location_of_conflict_in_ucdp_ged(tb: Table, tb_maps: Table) -> Table:
+    """Add column with country name of the conflict."""
+    # Convert the UCDP data to a GeoDataFrame (so it can be mapped and used in spatial analysis).
+    # The 'wkt.loads' function takes the coordinates in the 'geometry' column and ensures geopandas will use it to map the data.
+    gdf = tb[["relid", "geom_wkt"]]
+    gdf.rename(columns={"geom_wkt": "geometry"}, inplace=True)
+    gdf["geometry"] = gdf["geometry"].apply(wkt.loads)
+    gdf = gpd.GeoDataFrame(gdf, crs="epsg:4326")
+
+    # Format the map to be a GeoDataFrame with a gemoetry column
+    gdf_maps = gpd.GeoDataFrame(tb_maps)
+    gdf_maps["geometry"] = gdf_maps["geometry"].apply(wkt.loads)
+    gdf_maps = gdf_maps.set_geometry("geometry")
+    gdf_maps.crs = "epsg:4326"
+
+    # Use the overlay function to extract data from the world map that each point sits on top of.
+    gdf_match = gpd.overlay(gdf, gdf_maps, how="intersection")
+    # Events not assigned to any country
+    # There are 1618 points that are missed - likely because they are in the sea perhaps due to the conflict either happening at sea or at the coast and the coordinates are slightly inaccurate.
+    assert gdf.shape[0] - gdf_match.shape[0] == 1618, "Unexpected number of events without exact coordinate match!"
+
+    # Get missing entries
+    ids_missing = set(gdf["relid"]) - set(gdf_match["relid"])
+    gdf_missing = gdf[gdf["relid"].isin(ids_missing)]
+
+    # Reprojecting the points and the world into the World Equidistant Cylindrical Sphere projection.
+    wec_crs = "+proj=eqc +lat_ts=0 +lat_0=0 +lon_0=0 +x_0=0 +y_0=0 +a=6371007 +b=6371007 +units=m +no_defs"
+    gdf_missing_wec = gdf_missing.to_crs(wec_crs)
+    gdf_maps_wec = gdf_maps.to_crs(wec_crs)
+    # For these points we can find the nearest country using the distance function
+    polygon_near = []
+    for _, row in gdf_missing_wec.iterrows():
+        polygon_index = gdf_maps_wec.distance(row["geometry"]).sort_values().index[0]
+        ne_country_name = gdf_maps_wec["name"][polygon_index]
+        polygon_near.append(ne_country_name)
+    # Assign
+    gdf_missing["name"] = polygon_near
+
+    # Combining and adding name to original table
+    COLUMN_COUNTRY_NAME = "country_name_location"
+    gdf_country_names = pr.concat([Table(gdf_match[["relid", "name"]]), Table(gdf_missing[["relid", "name"]])])
+    tb = tb.merge(gdf_country_names, on="relid", how="left", validate="one_to_one").rename(
+        columns={"name": COLUMN_COUNTRY_NAME}
+    )
+    assert tb[COLUMN_COUNTRY_NAME].notna().all(), "Some missing values found in `COLUMN_COUNTRY_NAME`"
+
+    # SOME CORRECTIONS #
+    # To align with OWID borders we will rename the conflicts in Somaliland to Somalia and the conflicts in Morocco that were below 27.66727 latitude to Western Sahara.
+    ## Somaliland -> Somalia
+    mask = tb[COLUMN_COUNTRY_NAME] == "Somaliland"
+    paths.log.info(f"{len(tb.loc[mask, COLUMN_COUNTRY_NAME])} datapoints in Somaliland")
+    tb.loc[mask, COLUMN_COUNTRY_NAME] = "Somalia"
+    ## Morocco -> Western Sahara
+    mask = (tb[COLUMN_COUNTRY_NAME] == "Morocco") & (tb["latitude"] < 27.66727)
+    paths.log.info(f"{len(tb.loc[mask, COLUMN_COUNTRY_NAME])} datapoints in land contested by Morocco/W.Sahara")
+    tb.loc[mask, COLUMN_COUNTRY_NAME] = "Western Sahara"
+
+    # Add a flag column for points likely to have inccorect corrdinates:
+    # a) points where coordiantes are (0 0), or points where latitude and longitude are exactly the same
+    tb["flag"] = ""
+    # Items are (mask, flag_message)
+    errors = [
+        (
+            tb["geom_wkt"] == "POINT (0 0)",
+            "coordinates (0 0)",
+        ),
+        (tb["latitude"] == tb["longitude"], "latitude = longitude"),
+    ]
+    for error in errors:
+        tb.loc[error[0], "flag"] = error[1]
+        tb.loc[mask, COLUMN_COUNTRY_NAME] = np.nan
+
+    assert tb["country_name_location"].isna().sum() == 4, "4 missing values were expected! Found a different amount!"
+    tb = tb.dropna(subset=["country_name_location"])
+
     return tb

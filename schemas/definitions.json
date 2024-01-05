@@ -11,7 +11,7 @@
       "name": {
         "type": "string",
         "title": "License name",
-        "description": "Name of the license.",
+        "description": "Name of the license. Find more details on licensing at https://creativecommons.org/share-your-work/cclicenses/.",
         "requirement_level": "required",
         "examples": [
           "Public domain",
@@ -22,17 +22,14 @@
           "© GISAID 2023"
         ],
         "options": [
-          "Public domain",
           "CC0",
-          "PDM",
           "CC BY 4.0",
           "CC BY-SA 4.0",
           "CC BY-ND 4.0",
           "CC BY-NC 4.0",
           "CC BY-NC-SA 4.0",
           "CC BY-NC-ND 4.0",
-          "©producer year",
-          "custom license"
+          "MIT License"
         ],
         "examples_bad": [],
         "guidelines": [
@@ -383,6 +380,9 @@
             "Must end with a period."
           ],
           [
+            "Must include (wherever is appropriate) the year of publication, i.e. the year given in `date_published`."
+          ],
+          [
             "If the producer specified how to cite them, this field should be identical to the producer's text, except for some formatting changes, typo corrections, or other appropriate minor edits.",
             {
               "type": "list",
@@ -512,7 +512,7 @@
         "requirement_level": "required (if existing)",
         "guidelines": [
           [
-            "Must be a complete URL, i.e. `http...`."
+            "Must be a complete URL or S3 URI, i.e. `http...`."
           ],
           [
             "Must be a direct download link.",
@@ -525,7 +525,8 @@
           ]
         ],
         "examples": [
-          "https://data.some_institution.com/dataset_12/data.csv"
+          "https://data.some_institution.com/dataset_12/data.csv",
+          "s3://owid-private/data.csv"
         ],
         "examples_bad": [],
         "category": "files"
@@ -656,18 +657,14 @@
       },
       "name": {
         "type": "string",
-        "description": "Title to display for the indicator, to replace the indicator's `title`. NOTE: Currently, `grapher_config.title` will be used only in charts, whereas `display.name` will be used in other places, like the table tab.",
+        "description": "Indicator's title to display in the legend of a chart. NOTE: For backwards compatibility, `display.name` also replaces the indicator's title in other public places. Therefore, whenever `display.name` is defined, `title_public` should also be defined.",
         "examples": [
-          "Number of neutron star mergers in the Milky Way",
-          "Share of neutron star mergers that happen in the Milky Way",
-          "Area harvested of barley"
+          "Agriculture",
+          "Area harvested"
         ],
         "examples_bad": [
           [
-            "Number of neutron stars (NASA)"
-          ],
-          [
-            "Share of neutron star mergers that happen in the Milky Way (2023)"
+            "Nitrous oxide emissions from agriculture"
           ],
           [
             "Barley | 00000044 || Area harvested | 005312 || hectares"
@@ -676,16 +673,10 @@
         "requirement_level": "required",
         "guidelines": [
           [
-            "Must be suitable to be publicly displayed, even for 'big datasets' with many dimensions."
-          ],
-          [
-            "Must start with a capital letter."
+            "Must be very short, to fit the legend of a chart."
           ],
           [
             "Must not end with a period."
-          ],
-          [
-            "Must be one short sentence (a few words)."
           ],
           [
             "Should not mention other metadata fields like `producer` or `version`."

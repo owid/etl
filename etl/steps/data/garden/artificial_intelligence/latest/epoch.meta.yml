@@ -1,0 +1,125 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    processing_level: minor
+    presentation:
+      topic_tags:
+        - Artificial Intelligence
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
+dataset:
+  update_period_days: 31
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
+tables:
+  epoch:
+    variables:
+      domain:
+        title: Domain
+        unit: ''
+        short_unit: ''
+        description_short: Refers to the specific area, application, or field in which an AI system is designed to operate.
+        description_processing: >
+          To streamline the categorization of domains, domain categories with less than a total of five notable AI systems since 1950 were grouped under the "Other" label.
+          The following domains were re-categorized under "Other":
+            - 3D reconstruction, Driving, Video, Text-to-Video, Search, Audio, Robotics
+
+          The aforementioned changes were implemented to make visualizations more coherent and concise.
+        display:
+          zeroDay: '1949-01-01'
+          yearIsDay: true
+      organization_categorization:
+        title: Researcher affiliation
+        unit: ''
+        short_unit: ''
+        description_short: Describes the sector (Industry, Academia, or Collaboration) where the authors of an AI system have their primary affiliations.
+        description_from_producer: >
+            Systems are classified as "Industry" when their authors have ties to private sector entities, "Academia" when the authors come from universities or scholarly institutions, and "Industry - Academia Collaboration" if a minimum of 30% of the authors represent each sector.
+        description_processing: >
+          To streamline the categorization of researcher affiliations, the original data underwent the following transformations:
+
+
+          **Consolidating Collaborations**:
+            - All variations of "Industry - Academia Collaboration" entries, regardless of their capitalization or leaning (towards academia or industry), were unified into a single "Collaboration" category.
+
+          **Grouping Other Affiliations**:
+            - Affiliations explicitly labeled as "Research Collective" or "research collective", as well as those under "Government" and "Non-profit", were re-categorized under the "Other" label.
+
+          The aforementioned changes were implemented to make visualizations more coherent and concise.
+      parameters:
+        title: Number of parameters
+        unit: ''
+        description_short: Total number of learnable variables or weights that the model contains. Parameters are adjusted during the training process to optimize the model's performance.
+        description_key:
+            - Parameters are internal variables that machine learning models adjust during their training process to improve their ability to make accurate predictions. They act as the model's "knobs" that are fine-tuned based on the provided data. In deep learning, a subset of artificial intelligence (AI), parameters primarily consist of the weights assigned to the connections between the small processing units called neurons. Picture a vast network of interconnected neurons where the strength of each connection represents a parameter.
+
+            - The total number of parameters in a model is influenced by various factors. The model's structure and the number of “layers” of neurons play a significant role. Generally, more complex models with additional layers tend to have a higher number of parameters. Special components of specific deep learning architectures can further contribute to the overall parameter count.
+
+            - Understanding the number of parameters in a model is crucial to design effective models. More parameters can help the model understand complex data patterns, potentially leading to higher accuracy. However, there's a fine balance to strike. If a model has too many parameters, it risks memorizing the specific examples in its training data rather than learning their underlying patterns. Consequently, it may perform poorly when presented with new, unseen data. Achieving the right balance of parameters is a critical consideration in model development.
+
+            - In recent times, the AI community has witnessed the emergence of what are often referred to as "giant models." These models boast an astounding number of parameters, reaching into the billions or even trillions. While these huge models have achieved remarkable performance, they have a significant computational cost. Effectively managing and training such large-scale models has become a prominent and active area of research and discussion within the AI field.
+
+        display:
+          numDecimalPlaces: 0
+          zeroDay: '1949-01-01'
+          yearIsDay: true
+
+      training_dataset_size__datapoints:
+        title: Training dataset size
+        unit: 'datapoints'
+        description_short: The number of examples provided to train an AI model. Typically, more data results in a more comprehensive understanding by the model.
+        description_key:
+          - Training data size refers to the volume of data employed to train an artificial intelligence (AI) model effectively. It's a representation of the number of examples that the model learns from during its training process. It is a fundamental measure of the scope of the data used in the model's learning phase.
+
+          - To grasp the concept of training data size, imagine teaching a friend the art of distinguishing different types of birds. In this analogy, each bird picture presented to your friend corresponds to an individual piece of training data. If you showed them 100 unique bird photos, then the training data size in this scenario would be quantified as 100.
+
+          - Training data size is an essential indicator in AI and machine learning. First and foremost, it directly impacts the depth of learning achieved by the model. The more extensive the dataset, the more profound and comprehensive the model's understanding of the subject matter becomes. Additionally, a large training data size contributes significantly to improved recognition capabilities. By exposing the model to a diverse array of examples, it becomes adept at identifying subtle nuances, much like how it becomes skilled at distinguishing various bird species through exposure to a large variety of bird images.
+
+        display:
+          numDecimalPlaces: 0
+          zeroDay: '1949-01-01'
+          yearIsDay: true
+
+      training_computation_petaflop:
+        title: Training computation (petaFLOP)
+        unit: 'petaFLOP'
+        description_short: Computation is measured in total petaFLOP, which is 10¹⁵ [floating-point operations](#dod:flop) estimated from AI literature, albeit with some uncertainty.
+        description_key:
+          - In the context of artificial intelligence (AI), training computation is predominantly measured using floating-point operations or “FLOP” . Each FLOP corresponds to fundamental arithmetic operations, such as addition or multiplication, executed on two decimal numbers. To adapt to the vast computational demands of AI systems, the measurement unit of petaFLOP is commonly used. One petaFLOP stands as a staggering one quadrillion FLOPs, underscoring the magnitude of computational operations within AI.
+
+          - Modern AI systems are rooted in machine learning and deep learning techniques. These methodologies are notorious for their computational intensity, involving complex mathematical processes and algorithms. During the training phase, AI models process large volumes of data, while continuously adapting and refining their parameters to optimize performance, rendering the training process computationally intensive.
+
+          - Many factors influence the magnitude of training computation within AI systems. Notably, the size of the dataset employed for training significantly impacts the computational load. Larger datasets necessitate more processing power. The complexity of the model's architecture also plays a pivotal role; more intricate models lead to more computations. Parallel processing, involving the simultaneous use of multiple processors, also has a substantial effect. Beyond these factors, specific design choices and other variables further contribute to the complexity and scale of training computation within AI.
+
+        description_processing: Training computation was converted from its original measurement in FLOPs (floating-point operations) to a more manageable unit known as petaFLOPs. This conversion is performed by dividing the original training compute value by 1e15, which represents one quadrillion (10^15). The purpose of this conversion is to provide a more human-readable and practical representation of the immense computational efforts involved in training AI systems. By expressing the training computation in petaFLOPs, it becomes easier to grasp the scale and magnitude of the computational resources required for training these systems, especially when dealing with large datasets and complex architectures.
+        display:
+          numDecimalPlaces: 0
+          zeroDay: '1949-01-01'
+          yearIsDay: true
+        presentation:
+          grapher_config:
+            title: Training computation
+
+      approach:
+          title: Approach
+          unit: ''
+          description_short: The type of machine learning technique used to train an AI system.
+          description_key:
+            - Self-supervised learning is a machine learning technique where the model learns from the data itself without requiring external labels or annotations. It leverages inherent structures or relationships within the data to create meaningful representations. Self-supervised learning is commonly used in natural language processing and computer vision tasks, where models learn to understand context and semantics from large unlabeled datasets.
+            - Unsupervised learning is a machine learning paradigm where the AI system explores patterns and structures within data without the presence of labeled examples. It aims to discover hidden relationships or groupings in the data. Unsupervised learning is applied in clustering, dimensionality reduction, and anomaly detection tasks. It's used when there are no predefined labels for the data.
+            - Reinforcement learning is a type of machine learning where an agent learns to make decisions by interacting with an environment. It receives feedback in the form of rewards or penalties for its actions and aims to maximize the cumulative reward over time. Reinforcement learning is commonly used in robotics, game playing (e.g., AlphaGo), and autonomous systems where agents must learn to make sequential decisions.
+            - Supervised learning  is a machine learning approach where the AI system is trained on a labeled dataset, meaning each input data point is associated with a known output or target. The model learns to map inputs to outputs based on this labeled data. Supervised learning is widely used in tasks such as image classification, sentiment analysis, and regression, where the goal is to make predictions or classifications based on labeled training data.
+          display:
+            numDecimalPlaces: 0
+            zeroDay: '1949-01-01'
+            yearIsDay: true
+
+      publication_date:
+          title: Publication date
+          unit: ''
+          description_short: The date when the AI system was first published.
+          description_from_producer:  The publication, announcement, or release date of the model, in YYYY-MM-DD format. If the year and month are known but the day is unknown, the day is filled in as YYYY-MM-15. If the year is known but the month and day are unknown, the month and day are filled in as YYYY-07-01.
+
+
+

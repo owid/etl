@@ -17,44 +17,54 @@ definitions:
         - Europe
         - Oceania
         - World
-    title_base: Life expectancy (period)
+    title_base: Period life expectancy
     title_public: Life expectancy
-    title_public_0: Life expectancy at birth
     data_used: |-
       <% if (age == 0) and (sex == 'all') %>
       Prior to 1950, we use HMD (2023) data combined with Zijdeman (2015). From 1950 onwards, we use UN WPP (2022) data. For old regional data, we use Riley (2005) estimates.
       <% else %>
       Prior to 1950, we use HMD (2023) data. From 1950 onwards, we use UN WPP (2022) data.
       <% endif %>
+    point_1: |-
+      Period life expectancy is a metric that summarizes death rates across all age groups in one particular year.
+    point_2: |-
+      <% if age == '0' %>
+      For a given year, it represents the average lifespan for a hypothetical group of people, if they experienced the same age-specific death rates throughout their whole lives as the age-specific death rates seen in that particular year.
+      <% else %>
+      For a given year, it represents the remaining average lifespan for a hypothetical group of people, if they experienced the same age-specific death rates throughout the rest of their lives as the age-specific death rates seen in that particular year.
+      <% endif %>
 
   common:
     description_short: |-
-      <% if (age == 0) %>
-      <% if (sex == 'female') %>
-      The total number of years a newborn is expected to live (among females).
-      <% elif (sex == 'male') %>
-      The total number of years a newborn is expected to live (among males).
-      <% elif (sex == 'all') %>
-      The total number of years a newborn is expected to live.
+      <% if age == 0 %>
+      <% if sex == 'all' %>
+      The period life expectancy at birth, in a given year.
+      <% else %>
+      The period life expectancy at birth among << sex + 's' >>, in a given year.
       <% endif %>
       <% else %>
-      <% if (sex == 'female') %>
-      The total number of years a person is expected to live, among females who have already reached << age >> years of age.
-      <% elif (sex == 'male') %>
-      The total number of years a person is expected to live, among males who have already reached << age >> years of age.
-      <% elif (sex == 'all') %>
-      The total number of years a person is expected to live, among people who have already reached << age >> years of age.
+      <% if sex == 'all' %>
+      The total period life expectancy at age << age >>, in a given year.
+      <% else %>
+      The total period life expectancy at age << age >> among << sex + 's' >>, in a given year.
       <% endif %>
       <% endif %>
     description_key:
-      - &period_lt_def Period life expectancy assumes that current mortality trends will continue for the rest of a subject's life.
+      - |-
+        {definitions.global.point_1}
+      - |-
+        {definitions.global.point_2}
       - |-
         {definitions.global.data_used}
     presentation:
+      title_public: |-
+        {definitions.global.title_public} at << age if age != 0 else 'birth'>>
+      attribution_short: HMD, UN WPP
       topic_tags:
         - Life Expectancy
       grapher_config:
         hasMapTab: true
+        selectedEntityNames: *sel_entities
     display:
       numDecimalPlaces: 1
     unit: years
@@ -76,29 +86,25 @@ tables:
   life_expectancy:
     variables:
 
+      # {definitions.global.title_base}
       life_expectancy:
         title: |-
           {definitions.global.title_base}
+        display: &display_hist
+          numDecimalPlaces: 1
+          name: |-
+            {definitions.global.title_public} at << 'birth' if (age == 0) else age >><< ', ' + sex + 's' if (sex != 'all') >>
         presentation:
-          title_variant: &title_variant_hist Historical data, period life tables
-          attribution_short: &attr_hist Various sources
-          grapher_config:
-            selectedEntityNames: *sel_entities
+          title_variant: &title_variant_hist << sex + 's, ' if sex != 'all' >>period tables
 
       life_expectancy_0:
         title: |-
           {definitions.global.title_base} at birth
-        display:
-          name: |-
-            {definitions.global.title_public_0}
+        display: *display_hist
         presentation:
-          title_public: |-
-            {definitions.global.title_public_0}
-          attribution_short: *attr_hist
+          attribution_short: Various sources
           title_variant: *title_variant_hist
           grapher_config:
-            title: |-
-              {definitions.global.title_public_0}
             selectedEntityNames: *sel_entities_americas
           attribution: |-
             UN WPP (2022); HMD (2023); Zijdeman et al. (2015); Riley (2005)
@@ -111,26 +117,21 @@ tables:
       life_expectancy_with_proj:
         title: |-
           {definitions.global.title_base} (with projections)
+        display: &display_w_proj
+          numDecimalPlaces: 1
+          name: |-
+            {definitions.global.title_public} at << 'birth' if (age == 0) else age >><< ', ' + sex + 's' if (sex != 'all') >>, with UN medium projections
         presentation:
-          title_variant: &title_variant_w_proj With UN medium Projections, period life tables
-          attribution_short: &attr_w_proj Various sources
-          grapher_config:
-            selectedEntityNames: *sel_entities
+          title_variant: &title_variant_w_proj << sex + 's, ' if sex != 'all' >>period tables, with UN medium projections
 
       life_expectancy_0_with_proj:
         title: |-
           {definitions.global.title_base} at birth (with projections)
-        display:
-          name: |-
-            {definitions.global.title_public_0}
+        display: *display_w_proj
         presentation:
-          title_public: |-
-            {definitions.global.title_public_0}
-          attribution_short: *attr_w_proj
+          attribution_short: Various sources
           title_variant: *title_variant_w_proj
           grapher_config:
-            title: |-
-              {definitions.global.title_public_0}
             selectedEntityNames: *sel_entities_americas
           attribution: |-
             UN WPP (2022); HMD (2023); Zijdeman et al. (2015); Riley (2005)
@@ -144,27 +145,29 @@ tables:
         title: |-
           {definitions.global.title_base} (only projections)
         description_key:
-          - *period_lt_def
+          - |-
+            {definitions.global.point_1}
+          - |-
+            {definitions.global.point_2}
+        display: &display_o_proj
+          numDecimalPlaces: 1
+          name: |-
+            {definitions.global.title_public} at << 'birth' if (age == 0) else age >><< ', ' + sex + 's' if (sex != 'all') >>, medium projection
         presentation:
           attribution_short: &attr_o_proj UN WPP
-          title_variant: &title_variant_o_proj Medium projection, period life tables
-          grapher_config:
-            selectedEntityNames: *sel_entities
+          title_variant: &title_variant_o_proj << sex + 's, ' if sex != 'all' >>period tables, medium projection
 
       life_expectancy_0_only_proj:
         title: |-
           {definitions.global.title_base} at birth (only projections)
         description_key:
-          - *period_lt_def
-        display:
-          name: |-
-            {definitions.global.title_public_0}
+          - |-
+            {definitions.global.point_1}
+          - |-
+            {definitions.global.point_2}
+        display: *display_o_proj
         presentation:
-          title_public: |-
-            {definitions.global.title_public_0}
           attribution_short: *attr_o_proj
           title_variant: *title_variant_o_proj
           grapher_config:
-            title: |-
-              {definitions.global.title_public_0}
             selectedEntityNames: *sel_entities_americas

@@ -261,7 +261,6 @@ def create_variable_metadata(variable: Variable, cause: str, age: str, sex: str,
         short_unit=var_name_dict[variable.name]["short_unit"],
     )
     new_variable.metadata.display = {
-        "name": var_name_dict[variable.name]["title"],
         "numDecimalPlaces": var_name_dict[variable.name]["num_decimal_places"],
     }
 

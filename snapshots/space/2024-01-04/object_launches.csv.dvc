@@ -1,0 +1,31 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/origin/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Online Index of Objects Launched into Outer Space
+    description: |-
+      This data is compiled from the Online Index of Objects Launched into Outer Space, maintained by the United Nations Office for Outer Space Affairs since 1962.
+    date_published: 2024-01-04
+    title_snapshot: United Nations - Online Index of Objects Launched into Outer Space
+
+    # Citation
+    producer: United Nations Office for Outer Space Affairs
+    citation_full: |-
+      United Nations Office for Outer Space Affairs (UNOOSA). (2024). Online Index of Objects Launched into Outer Space. Retrieved from https://www.unoosa.org/oosa/osoindex/search-ng.jspx
+    attribution_short: UN
+
+    # Files
+    url_main: https://www.unoosa.org/oosa/osoindex/search-ng.jspx
+    date_accessed: 2024-01-04
+
+    # License
+    license:
+      name: UN Terms and Conditions of use
+      url: https://data.un.org/Host.aspx?Content=UNdataUse
+
+wdir: ../../../data/snapshots/space/2024-01-04
+outs:
+- md5: d14a93f4e651287b66d0c74ca9e8101f
+  size: 5247812
+  path: object_launches.csv

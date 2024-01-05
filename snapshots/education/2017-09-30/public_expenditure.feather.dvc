@@ -1,7 +1,11 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/origin/
 meta:
-  source:
-    name: Tanzi & Schuknecht (2000)
-    description: 'The underlying sources for Tanzi & Schuknecht (2000) include: League
+  origin:
+    # Data product / Snapshot
+    title: Public Expenditure on Education OECD
+    description: >
+      The underlying sources include: League
       of Nations Statistical Yearbook (various years), Mitchell (1962), OECD Education
       at a Glance (1996), UNESCO World Education Report (1993), UNDP Human Development
       Report (1996), UN World Economics Survey (various years). To the extent that
@@ -9,14 +13,18 @@ meta:
       it is not possible for us to reliably extend the time series with newer data.
       For instance, the OECD Education at a Glance report (1998), which presents estimates
       for the years 1990 and 1995, suggests discrepancies with the values reported
-      by Tanzi & Schuknecht (2000) for 1993.'
-    url: https://link.springer.com/article/10.1023%2FA%3A1017578302202?LI=true
+      by Tanzi & Schuknecht (2000) for 1993.
+    date_published: '2000'
+    # Citation
+    producer: Tanzi & Schuknecht
+    citation_full: 'Tanzi, Vito, and Ludger Schuknecht. Public Spending in the 20th
+      Century: A Global Perspective. 2000.'
+    # Files
+    url_main: https://link.springer.com/article/10.1023%2FA%3A1017578302202?LI=true
     date_accessed: 2017-09-30
-    published_by: Vito and Schuknecht (2000) Public Spending in the 20th Century A
-      Global Perspective
-  name: Public Expenditure on Education OECD - Tanzi & Schuknecht (2000)
+
 wdir: ../../../data/snapshots/education/2017-09-30
 outs:
-- md5: 5ecb8cb6411e3a4f47d5f32a79ef9bdf
+- md5: 70215292759c49a6bdb664321f757c15
   size: 3666
   path: public_expenditure.feather

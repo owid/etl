@@ -24,3 +24,19 @@ steps:
     - data://garden/wb/2022-10-03/world_bank_pip
   data://garden/wb/2022-10-03/world_bank_pip:
     - snapshot://wb/2022-10-03/world_bank_pip.feather
+  data://grapher/wb/2022-10-03/extreme_poverty_by_region:
+    - data://garden/wb/2022-10-03/extreme_poverty_by_region
+  data://garden/wb/2022-10-03/extreme_poverty_by_region:
+    - snapshot://wb/2022-10-03/extreme_poverty_by_region.feather
+  data://grapher/iucn/2022-12-08/threatened_and_evaluated_species:
+    - data://garden/iucn/2022-12-08/threatened_and_evaluated_species
+  data://garden/iucn/2022-12-08/threatened_and_evaluated_species:
+    - snapshot://iucn/2022-12-08/threatened_and_evaluated_species.feather
+  data://grapher/gapminder/2019-05-25/fertility_rate:
+    - data://garden/gapminder/2019-05-25/fertility_rate
+  data://garden/gapminder/2019-05-25/fertility_rate:
+    - snapshot://gapminder/2019-05-25/fertility_rate.feather
+  data://grapher/wb/2017-04-16/world_gdp:
+    - data://garden/wb/2017-04-16/world_gdp
+  data://garden/wb/2017-04-16/world_gdp:
+    - snapshot://wb/2017-04-16/world_gdp.feather

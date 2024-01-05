@@ -10,13 +10,11 @@ import re
 import shutil
 import tempfile
 from copy import deepcopy
-from io import StringIO
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Literal, Optional, Type, cast
 
 import jsonref
 import jsonschema
-import ruamel.yaml
 import streamlit as st
 from cookiecutter.main import cookiecutter
 from MySQLdb import OperationalError
@@ -25,7 +23,7 @@ from typing_extensions import Self
 
 from etl import config
 from etl.db import get_connection
-from etl.files import apply_black_formatter_to_files
+from etl.files import apply_ruff_formatter_to_files, ruamel_dump, ruamel_load
 from etl.paths import (
     APPS_DIR,
     BASE_DIR,
@@ -91,33 +89,26 @@ DUMMY_DATA = {
 def add_to_dag(dag: DAG, dag_path: Path = DAG_WIZARD_PATH) -> str:
     """Add dag to dag_path file."""
     with open(dag_path, "r") as f:
-        doc = ruamel.yaml.load(f, Loader=ruamel.yaml.RoundTripLoader)
+        doc = ruamel_load(f)
 
     doc["steps"].update(dag)
 
     with open(dag_path, "w") as f:
-        # Add new step to DAG
-        yml = ruamel.yaml.YAML()
-        yml.indent(mapping=2, sequence=4, offset=2)
-        yml.dump(doc, stream=f)
-        # Get subdag as string
-        with StringIO() as string_stream:
-            yml.dump({"steps": dag}, stream=string_stream)
-            output_str = string_stream.getvalue()
-    return output_str
+        f.write(ruamel_dump(doc))
+
+    # Get subdag as string
+    return ruamel_dump({"steps": dag})
 
 
 def remove_from_dag(step: str, dag_path: Path = DAG_WIZARD_PATH) -> None:
     with open(dag_path, "r") as f:
-        doc = ruamel.yaml.load(f, Loader=ruamel.yaml.RoundTripLoader)
+        doc = ruamel_load(f)
 
     doc["steps"].pop(step, None)
 
     with open(dag_path, "w") as f:
         # Add new step to DAG
-        yml = ruamel.yaml.YAML()
-        yml.indent(mapping=2, sequence=4, offset=2)
-        yml.dump(doc, f)
+        f.write(ruamel_dump(doc))
 
 
 def generate_step(cookiecutter_path: Path, data: Dict[str, Any], target_dir: Path) -> None:
@@ -138,7 +129,7 @@ def generate_step(cookiecutter_path: Path, data: Dict[str, Any], target_dir: Pat
             config_path.unlink()
 
         # Apply black formatter to generated files.
-        apply_black_formatter_to_files(file_paths=list(Path(temp_dir).glob("**/*.py")))
+        apply_ruff_formatter_to_files(file_paths=list(Path(temp_dir).glob("**/*.py")))
 
         shutil.copytree(
             Path(temp_dir),
@@ -302,15 +293,18 @@ class AppState:
         default_value = self.default_value(key, default_last=default_last)
         # Change key name, to be stored it in general st.session_state
         kwargs["key"] = f"{self.step}.{key}"
-        # Default value for selectbox (and other widgets with selectbox-like behavior)
-        if "options" in kwargs:
-            options = cast(List[str], kwargs["options"])
-            index = options.index(default_value) if default_value in options else 0
-            kwargs["index"] = index
-        # Default value for other widgets (if none is given)
-        elif ("value" not in kwargs) or ("value" in kwargs and kwargs.get("value") is None):
-            kwargs["value"] = default_value
-
+        # Special behaviour for multiselect
+        if "multiselect" not in str(st_widget):
+            # Default value for selectbox (and other widgets with selectbox-like behavior)
+            if "options" in kwargs:
+                options = cast(List[str], kwargs["options"])
+                index = options.index(default_value) if default_value in options else 0
+                kwargs["index"] = index
+            # Default value for other widgets (if none is given)
+            elif ("value" not in kwargs) or ("value" in kwargs and kwargs.get("value") is None):
+                kwargs["value"] = default_value
+        elif "default" not in kwargs:
+            kwargs["default"] = default_value
         # Create widget
         widget = st_widget(**kwargs)
         # Show error message
@@ -368,7 +362,8 @@ class StepForm(BaseModel):
     def to_yaml(self: Self, path: Path) -> None:
         """Export form (metadata) to yaml file."""
         with open(path, "w") as f:
-            ruamel.yaml.dump(self.metadata, f, Dumper=ruamel.yaml.RoundTripDumper)
+            assert self.metadata
+            f.write(ruamel_dump(self.metadata))
 
     def validate_schema(self: Self, schema: Dict[str, Any], ignore_keywords: Optional[List[str]] = None) -> None:
         """Validate form fields against schema.
@@ -443,7 +438,8 @@ class StepForm(BaseModel):
         """Check that all fields in `fields_names` are not empty."""
         for field_name in fields_names:
             attr = getattr(self, field_name)
-            if attr == "":
+            print(field_name, attr)
+            if attr in ["", []]:
                 self.errors[field_name] = f"`{field_name}` is a required property"
 
     def check_snake(self: Self, fields_names: List[str]) -> None:
@@ -602,3 +598,48 @@ def update_wizard_config(form: StepForm) -> None:
     # Export config
     with open(WIZARD_CONFIG, "w") as f:
         json.dump(config, f)
+
+
+def render_responsive_field_in_form(
+    key: str,
+    display_name: str,
+    field_1: Any,
+    field_2: Any,
+    options: List[str],
+    custom_label: str,
+    help_text: str,
+    app_state: Any,
+    default_value: str,
+) -> None:
+    """Render the namespace field within the form.
+
+    We want the namespace field to be a selectbox, but with the option to add a custom namespace.
+
+    This is a workaround to have repsonsive behaviour within a form.
+
+    Source: https://discuss.streamlit.io/t/can-i-add-to-a-selectbox-an-other-option-where-the-user-can-add-his-own-answer/28525/5
+    """
+    # Main decription
+    help_text = "## Description\n\nInstitution or topic name"
+
+    # Render and get element depending on selection in selectbox
+    with field_1:
+        field = app_state.st_widget(
+            st.selectbox,
+            label=display_name,
+            options=[custom_label] + options,
+            help=help_text,
+            key=key,
+            default_last=default_value,  # dummy_values[prop_uri],
+        )
+    with field_2:
+        if field == custom_label:
+            default_value = app_state.default_value(key)
+            field = app_state.st_widget(
+                st.text_input,
+                label="↳ *Use custom value*",
+                placeholder="",
+                help="Enter custom value.",
+                key=f"{key}_custom",
+                default_last=default_value,
+            )

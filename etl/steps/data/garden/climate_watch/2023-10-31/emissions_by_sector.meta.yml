@@ -1,0 +1,522 @@
+definitions:
+  common:
+    # Short description for all indicators except per capita indicators (which are measured in tonnes per person), and
+    # indicators on CO2 emissions (for which we do not need to mention CO2 equivalents).
+    description_short: Emissions are measured in million tonnes of [carbon dioxide-equivalents](#dod:carbondioxideequivalents).
+    # Units of all except per capita indicators.
+    unit: million tonnes
+    short_unit: Mt
+    presentation:
+      topic_tags:
+      - CO2 & Greenhouse Gas Emissions
+    processing_level: major
+  # Short description for per capita indicators, except on CO2 emissions.
+  description_short_per_capita: &description-short-per-capita Emissions are measured in tonnes of [carbon dioxide-equivalents](#dod:carbondioxideequivalents) per person.
+  # Short description for indicators of CO2 emissions, except per capita indicators.
+  description_short_co2: &description-short-co2 Emissions are measured in million tonnes.
+  # Short description for per capita indicators of CO2 emissions.
+  description_short_co2_per_capita: &description-short-co2-per-capita Emissions are measured in tonnes per person.
+  # Unit and short unit for per capita indicators.
+  unit_per_capita: &unit-per-capita tonnes per person
+  short_unit_per_capita: &short-unit-per-capita t/person
+  # For convenience, in charts, show a simplified unit.
+  display_per_capita: &display-per-capita
+    unit: tonnes
+    shortUnit: t
+  # To avoid the previous common definitions to affect population, explicitly define population's metadata.
+  metadata_population: &metadata-population
+    title: Population
+    description_short: Population by country and year.
+    unit: people
+    short_unit: ""
+
+dataset:
+  title: Greenhouse gas emissions by sector
+
+tables:
+  greenhouse_gas_emissions_by_sector:
+    variables:
+      agriculture_ghg_emissions:
+        title: Greenhouse gas emissions from agriculture
+      agriculture_ghg_emissions_per_capita:
+        title: Per capita greenhouse gas emissions from agriculture
+        description_short: *description-short-per-capita
+        unit: *unit-per-capita
+        short_unit: *short-unit-per-capita
+        display: *display-per-capita
+      aviation_and_shipping_ghg_emissions:
+        title: Greenhouse gas emissions from bunker fuels
+      aviation_and_shipping_ghg_emissions_per_capita:
+        title: Per capita greenhouse gas emissions from bunker fuels
+        description_short: *description-short-per-capita
+        unit: *unit-per-capita
+        short_unit: *short-unit-per-capita
+        display: *display-per-capita
+      buildings_ghg_emissions:
+        title: Greenhouse gas emissions from buildings
+      buildings_ghg_emissions_per_capita:
+        title: Per capita greenhouse gas emissions from buildings
+        description_short: *description-short-per-capita
+        unit: *unit-per-capita
+        short_unit: *short-unit-per-capita
+        display: *display-per-capita
+      electricity_and_heat_ghg_emissions:
+        title: Greenhouse gas emissions from electricity and heat
+      electricity_and_heat_ghg_emissions_per_capita:
+        title: Per capita greenhouse gas emissions from electricity and heat
+        description_short: *description-short-per-capita
+        unit: *unit-per-capita
+        short_unit: *short-unit-per-capita
+        display: *display-per-capita
+      energy_ghg_emissions:
+        title: Greenhouse gas emissions from energy
+      energy_ghg_emissions_per_capita:
+        title: Per capita greenhouse gas emissions from energy
+        description_short: *description-short-per-capita
+        unit: *unit-per-capita
+        short_unit: *short-unit-per-capita
+        display: *display-per-capita
+      fugitive_ghg_emissions:
+        title: Fugitive emissions of greenhouse gases from energy production
+      fugitive_ghg_emissions_per_capita:
+        title: Per capita fugitive emissions of greenhouse gases from energy production
+        description_short: *description-short-per-capita
+        unit: *unit-per-capita
+        short_unit: *short-unit-per-capita
+        display: *display-per-capita
+      industry_ghg_emissions:
+        title: Greenhouse gas emissions from industry
+      industry_ghg_emissions_per_capita:
+        title: Per capita greenhouse gas emissions from industry
+        description_short: *description-short-per-capita
+        unit: *unit-per-capita
+        short_unit: *short-unit-per-capita
+        display: *display-per-capita
+      land_use_change_and_forestry_ghg_emissions:
+        title: Greenhouse gas emissions from land use change and forestry
+      land_use_change_and_forestry_ghg_emissions_per_capita:
+        title: Per capita greenhouse gas emissions from land use change and forestry
+        description_short: *description-short-per-capita
+        unit: *unit-per-capita
+        short_unit: *short-unit-per-capita
+        display: *display-per-capita
+      manufacturing_and_construction_ghg_emissions:
+        title: Greenhouse gas emissions from manufacturing and construction
+      manufacturing_and_construction_ghg_emissions_per_capita:
+        title: Per capita greenhouse gas emissions from manufacturing and construction
+        description_short: *description-short-per-capita
+        unit: *unit-per-capita
+        short_unit: *short-unit-per-capita
+        display: *display-per-capita
+      other_fuel_combustion_ghg_emissions:
+        title: Greenhouse gas emissions from other fuel combustion
+      other_fuel_combustion_ghg_emissions_per_capita:
+        title: Per capita greenhouse gas emissions from other fuel combustion
+        description_short: *description-short-per-capita
+        unit: *unit-per-capita
+        short_unit: *short-unit-per-capita
+        display: *display-per-capita
+      total_ghg_emissions_excluding_lucf:
+        title: Total greenhouse gas emissions excluding land-use change and forestry
+      total_ghg_emissions_excluding_lucf_per_capita:
+        title: Total greenhouse gas emissions per capita excluding land-use change and forestry
+        description_short: *description-short-per-capita
+        unit: *unit-per-capita
+        short_unit: *short-unit-per-capita
+        display: *display-per-capita
+      total_ghg_emissions_including_lucf:
+        title: Total greenhouse gas emissions including land-use change and forestry
+      total_ghg_emissions_including_lucf_per_capita:
+        title: Total greenhouse gas emissions per capita including land-use change and forestry
+        description_short: *description-short-per-capita
+        unit: *unit-per-capita
+        short_unit: *short-unit-per-capita
+        display: *display-per-capita
+      transport_ghg_emissions:
+        title: Greenhouse gas emissions from transport
+      transport_ghg_emissions_per_capita:
+        title: Per capita greenhouse gas emissions from transport
+        description_short: *description-short-per-capita
+        unit: *unit-per-capita
+        short_unit: *short-unit-per-capita
+        display: *display-per-capita
+      waste_ghg_emissions:
+        title: Greenhouse gas emissions from waste
+      waste_ghg_emissions_per_capita:
+        title: Per capita greenhouse gas emissions from waste
+        description_short: *description-short-per-capita
+        unit: *unit-per-capita
+        short_unit: *short-unit-per-capita
+        display: *display-per-capita
+      population: *metadata-population
+  carbon_dioxide_emissions_by_sector:
+    variables:
+      aviation_and_shipping_co2_emissions:
+        title: Carbon dioxide emissions from bunker fuels
+        description_short: *description-short-co2
+      aviation_and_shipping_co2_emissions_per_capita:
+        title: Per capita carbon dioxide emissions from bunker fuels
+        description_short: *description-short-co2-per-capita
+        unit: *unit-per-capita
+        short_unit: *short-unit-per-capita
+        display: *display-per-capita
+      buildings_co2_emissions:
+        title: Carbon dioxide emissions from buildings
+        description_short: *description-short-co2
+      buildings_co2_emissions_per_capita:
+        title: Per capita carbon dioxide emissions from buildings
+        description_short: *description-short-co2-per-capita
+        unit: *unit-per-capita
+        short_unit: *short-unit-per-capita
+        display: *display-per-capita
+      electricity_and_heat_co2_emissions:
+        title: Carbon dioxide emissions from electricity and heat
+        description_short: *description-short-co2
+      electricity_and_heat_co2_emissions_per_capita:
+        title: Per capita carbon dioxide emissions from electricity and heat
+        description_short: *description-short-co2-per-capita
+        unit: *unit-per-capita
+        short_unit: *short-unit-per-capita
+        display: *display-per-capita
+      energy_co2_emissions:
+        title: Carbon dioxide emissions from energy
+        description_short: *description-short-co2
+      energy_co2_emissions_per_capita:
+        title: Per capita carbon dioxide emissions from energy
+        description_short: *description-short-co2-per-capita
+        unit: *unit-per-capita
+        short_unit: *short-unit-per-capita
+        display: *display-per-capita
+      fugitive_co2_emissions:
+        title: Fugitive emissions of carbon dioxide from energy production
+        description_short: *description-short-co2
+      fugitive_co2_emissions_per_capita:
+        title: Per capita fugitive emissions of carbon dioxide from energy production
+        description_short: *description-short-co2-per-capita
+        unit: *unit-per-capita
+        short_unit: *short-unit-per-capita
+        display: *display-per-capita
+      industry_co2_emissions:
+        title: Carbon dioxide emissions from industry
+        description_short: *description-short-co2
+      industry_co2_emissions_per_capita:
+        title: Per capita carbon dioxide emissions from industry
+        description_short: *description-short-co2-per-capita
+        unit: *unit-per-capita
+        short_unit: *short-unit-per-capita
+        display: *display-per-capita
+      land_use_change_and_forestry_co2_emissions:
+        title: Carbon dioxide emissions from land use change and forestry
+        description_short: *description-short-co2
+      land_use_change_and_forestry_co2_emissions_per_capita:
+        title: Per capita carbon dioxide emissions from land use change and forestry
+        description_short: *description-short-co2-per-capita
+        unit: *unit-per-capita
+        short_unit: *short-unit-per-capita
+        display: *display-per-capita
+      manufacturing_and_construction_co2_emissions:
+        title: Carbon dioxide emissions from manufacturing and construction
+        description_short: *description-short-co2
+      manufacturing_and_construction_co2_emissions_per_capita:
+        title: Per capita carbon dioxide emissions from manufacturing and construction
+        description_short: *description-short-co2-per-capita
+        unit: *unit-per-capita
+        short_unit: *short-unit-per-capita
+        display: *display-per-capita
+      other_fuel_combustion_co2_emissions:
+        title: Carbon dioxide emissions from other fuel combustion
+        description_short: *description-short-co2
+      other_fuel_combustion_co2_emissions_per_capita:
+        title: Per capita carbon dioxide emissions from other fuel combustion
+        description_short: *description-short-co2-per-capita
+        unit: *unit-per-capita
+        short_unit: *short-unit-per-capita
+        display: *display-per-capita
+      total_co2_emissions_excluding_lucf:
+        title: Total carbon dioxide emissions excluding land-use change and forestry
+        description_short: *description-short-co2
+      total_co2_emissions_excluding_lucf_per_capita:
+        title: Total carbon dioxide emissions per capita excluding land-use change and forestry
+        description_short: *description-short-co2-per-capita
+        unit: *unit-per-capita
+        short_unit: *short-unit-per-capita
+        display: *display-per-capita
+      total_co2_emissions_including_lucf:
+        title: Total carbon dioxide emissions including land-use change and forestry
+        description_short: *description-short-co2
+      total_co2_emissions_including_lucf_per_capita:
+        title: Total carbon dioxide emissions per capita including land-use change and forestry
+        description_short: *description-short-co2-per-capita
+        unit: *unit-per-capita
+        short_unit: *short-unit-per-capita
+        display: *display-per-capita
+      transport_co2_emissions:
+        title: Carbon dioxide emissions from transport
+        description_short: *description-short-co2
+      transport_co2_emissions_per_capita:
+        title: Per capita carbon dioxide emissions from transport
+        description_short: *description-short-co2-per-capita
+        unit: *unit-per-capita
+        short_unit: *short-unit-per-capita
+        display: *display-per-capita
+      population: *metadata-population
+  methane_emissions_by_sector:
+    variables:
+      agriculture_ch4_emissions:
+        title: Methane emissions from agriculture
+      agriculture_ch4_emissions_per_capita:
+        title: Per capita methane emissions from agriculture
+        description_short: *description-short-per-capita
+        unit: *unit-per-capita
+        short_unit: *short-unit-per-capita
+        display: *display-per-capita
+      aviation_and_shipping_ch4_emissions:
+        title: Methane emissions from bunker fuels
+      aviation_and_shipping_ch4_emissions_per_capita:
+        title: Per capita methane emissions from bunker fuels
+        description_short: *description-short-per-capita
+        unit: *unit-per-capita
+        short_unit: *short-unit-per-capita
+        display: *display-per-capita
+      buildings_ch4_emissions:
+        title: Methane emissions from buildings
+      buildings_ch4_emissions_per_capita:
+        title: Per capita methane emissions from buildings
+        description_short: *description-short-per-capita
+        unit: *unit-per-capita
+        short_unit: *short-unit-per-capita
+        display: *display-per-capita
+      electricity_and_heat_ch4_emissions:
+        title: Methane emissions from electricity and heat
+      electricity_and_heat_ch4_emissions_per_capita:
+        title: Per capita methane emissions from electricity and heat
+        description_short: *description-short-per-capita
+        unit: *unit-per-capita
+        short_unit: *short-unit-per-capita
+        display: *display-per-capita
+      energy_ch4_emissions:
+        title: Methane emissions from energy
+      energy_ch4_emissions_per_capita:
+        title: Per capita methane emissions from energy
+        description_short: *description-short-per-capita
+        unit: *unit-per-capita
+        short_unit: *short-unit-per-capita
+        display: *display-per-capita
+      fugitive_ch4_emissions:
+        title: Fugitive emissions of methane from energy production
+      fugitive_ch4_emissions_per_capita:
+        title: Per capita fugitive emissions of methane from energy production
+        description_short: *description-short-per-capita
+        unit: *unit-per-capita
+        short_unit: *short-unit-per-capita
+        display: *display-per-capita
+      industry_ch4_emissions:
+        title: Methane emissions from industry
+      industry_ch4_emissions_per_capita:
+        title: Per capita methane emissions from industry
+        description_short: *description-short-per-capita
+        unit: *unit-per-capita
+        short_unit: *short-unit-per-capita
+        display: *display-per-capita
+      land_use_change_and_forestry_ch4_emissions:
+        title: Methane emissions from land use change and forestry
+      land_use_change_and_forestry_ch4_emissions_per_capita:
+        title: Per capita methane emissions from land use change and forestry
+        description_short: *description-short-per-capita
+        unit: *unit-per-capita
+        short_unit: *short-unit-per-capita
+        display: *display-per-capita
+      manufacturing_and_construction_ch4_emissions:
+        title: Methane emissions from manufacturing and construction
+      manufacturing_and_construction_ch4_emissions_per_capita:
+        title: Per capita methane emissions from manufacturing and construction
+        description_short: *description-short-per-capita
+        unit: *unit-per-capita
+        short_unit: *short-unit-per-capita
+        display: *display-per-capita
+      other_fuel_combustion_ch4_emissions:
+        title: Methane emissions from other fuel combustion
+      other_fuel_combustion_ch4_emissions_per_capita:
+        title: Per capita methane emissions from other fuel combustion
+        description_short: *description-short-per-capita
+        unit: *unit-per-capita
+        short_unit: *short-unit-per-capita
+        display: *display-per-capita
+      total_ch4_emissions_excluding_lucf:
+        title: Total methane emissions excluding land-use change and forestry
+      total_ch4_emissions_excluding_lucf_per_capita:
+        title: Total methane emissions per capita excluding land-use change and forestry
+        description_short: *description-short-per-capita
+        unit: *unit-per-capita
+        short_unit: *short-unit-per-capita
+        display: *display-per-capita
+      total_ch4_emissions_including_lucf:
+        title: Total methane emissions including land-use change and forestry
+      total_ch4_emissions_including_lucf_per_capita:
+        title: Total methane emissions per capita including land-use change and forestry
+        description_short: *description-short-per-capita
+        unit: *unit-per-capita
+        short_unit: *short-unit-per-capita
+        display: *display-per-capita
+      transport_ch4_emissions:
+        title: Methane emissions from transport
+      transport_ch4_emissions_per_capita:
+        title: Per capita methane emissions from transport
+        description_short: *description-short-per-capita
+        unit: *unit-per-capita
+        short_unit: *short-unit-per-capita
+        display: *display-per-capita
+      waste_ch4_emissions:
+        title: Methane emissions from waste
+      waste_ch4_emissions_per_capita:
+        title: Per capita methane emissions from waste
+        description_short: *description-short-per-capita
+        unit: *unit-per-capita
+        short_unit: *short-unit-per-capita
+        display: *display-per-capita
+      population: *metadata-population
+  nitrous_oxide_emissions_by_sector:
+    variables:
+      agriculture_n2o_emissions:
+        title: Nitrous oxide emissions from agriculture
+      agriculture_n2o_emissions_per_capita:
+        title: Per capita nitrous oxide emissions from agriculture
+        description_short: *description-short-per-capita
+        unit: *unit-per-capita
+        short_unit: *short-unit-per-capita
+        display: *display-per-capita
+        grapher_config:
+          display:
+            name: Agriculture
+      aviation_and_shipping_n2o_emissions:
+        title: Nitrous oxide emissions from bunker fuels
+      aviation_and_shipping_n2o_emissions_per_capita:
+        title: Per capita nitrous oxide emissions from bunker fuels
+        description_short: *description-short-per-capita
+        unit: *unit-per-capita
+        short_unit: *short-unit-per-capita
+        display: *display-per-capita
+      buildings_n2o_emissions:
+        title: Nitrous oxide emissions from buildings
+      buildings_n2o_emissions_per_capita:
+        title: Per capita nitrous oxide emissions from buildings
+        description_short: *description-short-per-capita
+        unit: *unit-per-capita
+        short_unit: *short-unit-per-capita
+        display: *display-per-capita
+      electricity_and_heat_n2o_emissions:
+        title: Nitrous oxide emissions from electricity and heat
+      electricity_and_heat_n2o_emissions_per_capita:
+        title: Per capita nitrous oxide emissions from electricity and heat
+        description_short: *description-short-per-capita
+        unit: *unit-per-capita
+        short_unit: *short-unit-per-capita
+        display: *display-per-capita
+      energy_n2o_emissions:
+        title: Nitrous oxide emissions from energy
+      energy_n2o_emissions_per_capita:
+        title: Per capita nitrous oxide emissions from energy
+        description_short: *description-short-per-capita
+        unit: *unit-per-capita
+        short_unit: *short-unit-per-capita
+        display: *display-per-capita
+      fugitive_n2o_emissions:
+        title: Fugitive emissions of nitrous oxide from energy production
+      fugitive_n2o_emissions_per_capita:
+        title: Per capita fugitive emissions of nitrous oxide from energy production
+        description_short: *description-short-per-capita
+        unit: *unit-per-capita
+        short_unit: *short-unit-per-capita
+        display: *display-per-capita
+      industry_n2o_emissions:
+        title: Nitrous oxide emissions from industry
+      industry_n2o_emissions_per_capita:
+        title: Per capita nitrous oxide emissions from industry
+        description_short: *description-short-per-capita
+        unit: *unit-per-capita
+        short_unit: *short-unit-per-capita
+        display: *display-per-capita
+      land_use_change_and_forestry_n2o_emissions:
+        title: Nitrous oxide emissions from land use change and forestry
+      land_use_change_and_forestry_n2o_emissions_per_capita:
+        title: Per capita nitrous oxide emissions from land use change and forestry
+        description_short: *description-short-per-capita
+        unit: *unit-per-capita
+        short_unit: *short-unit-per-capita
+        display: *display-per-capita
+      manufacturing_and_construction_n2o_emissions:
+        title: Nitrous oxide emissions from manufacturing and construction
+      manufacturing_and_construction_n2o_emissions_per_capita:
+        title: Per capita nitrous oxide emissions from manufacturing and construction
+        description_short: *description-short-per-capita
+        unit: *unit-per-capita
+        short_unit: *short-unit-per-capita
+        display: *display-per-capita
+      other_fuel_combustion_n2o_emissions:
+        title: Nitrous oxide emissions from other fuel combustion
+      other_fuel_combustion_n2o_emissions_per_capita:
+        title: Per capita nitrous oxide emissions from other fuel combustion
+        description_short: *description-short-per-capita
+        unit: *unit-per-capita
+        short_unit: *short-unit-per-capita
+        display: *display-per-capita
+      total_n2o_emissions_excluding_lucf:
+        title: Total nitrous oxide emissions excluding land-use change and forestry
+      total_n2o_emissions_excluding_lucf_per_capita:
+        title: Total nitrous oxide emissions per capita excluding land-use change and forestry
+        description_short: *description-short-per-capita
+        unit: *unit-per-capita
+        short_unit: *short-unit-per-capita
+        display: *display-per-capita
+      total_n2o_emissions_including_lucf:
+        title: Total nitrous oxide emissions including land-use change and forestry
+      total_n2o_emissions_including_lucf_per_capita:
+        title: Total nitrous oxide emissions per capita including land-use change and forestry
+        description_short: *description-short-per-capita
+        unit: *unit-per-capita
+        short_unit: *short-unit-per-capita
+        display: *display-per-capita
+      transport_n2o_emissions:
+        title: Nitrous oxide emissions from transport
+      transport_n2o_emissions_per_capita:
+        title: Per capita nitrous oxide emissions from transport
+        description_short: *description-short-per-capita
+        unit: *unit-per-capita
+        short_unit: *short-unit-per-capita
+        display: *display-per-capita
+      waste_n2o_emissions:
+        title: Nitrous oxide emissions from waste
+      waste_n2o_emissions_per_capita:
+        title: Per capita nitrous oxide emissions from waste
+        description_short: *description-short-per-capita
+        unit: *unit-per-capita
+        short_unit: *short-unit-per-capita
+        display: *display-per-capita
+      population: *metadata-population
+  fluorinated_gas_emissions_by_sector:
+    variables:
+      industry_fgas_emissions:
+        title: Fluorinated gas emissions from industry
+      industry_fgas_emissions_per_capita:
+        title: Per capita fluorinated gas emissions from industry
+        description_short: *description-short-per-capita
+        unit: *unit-per-capita
+        short_unit: *short-unit-per-capita
+        display: *display-per-capita
+      total_fgas_emissions_excluding_lucf:
+        title: Total fluorinated gas emissions excluding land-use change and forestry
+      total_fgas_emissions_excluding_lucf_per_capita:
+        title: Total fluorinated gas emissions per capita excluding land-use change and forestry
+        description_short: *description-short-per-capita
+        unit: *unit-per-capita
+        short_unit: *short-unit-per-capita
+        display: *display-per-capita
+      total_fgas_emissions_including_lucf:
+        title: Total fluorinated gas emissions including land-use change and forestry
+      total_fgas_emissions_including_lucf_per_capita:
+        title: Total fluorinated gas emissions per capita including land-use change and forestry
+        description_short: *description-short-per-capita
+        unit: *unit-per-capita
+        short_unit: *short-unit-per-capita
+        display: *display-per-capita
+      population: *metadata-population

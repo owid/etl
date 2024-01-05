@@ -45,6 +45,7 @@ import numpy as np
 import owid.catalog.processing as pr
 import pandas as pd
 from owid.catalog import Table
+from owid.catalog import processing_log as pl
 from structlog import get_logger
 
 from etl.helpers import PathFinder, create_dataset
@@ -210,8 +211,8 @@ def add_conflict_type(tb: Table) -> Table:
         "Vietnam, 1964-75",
     ]
     mask_custom = tb["name"].isin(wars_interstate)
-    assert mask_custom.sum() == len(
-        wars_interstate
+    assert (
+        mask_custom.sum() == len(wars_interstate)
     ), "Some corrections can't be made, because some war names specified in `wars_interstate` are not found in the data!"
     ## Build final mask
     mask = name_wo_year.str.contains("-") | mask_custom
@@ -235,6 +236,7 @@ def add_lower_bound_deaths(tb: Table) -> Table:
     return tb
 
 
+@pl.wrap("expand_observations")
 def expand_observations(tb: Table) -> Table:
     """Expand to have a row per (year, conflict).
 
@@ -263,6 +265,7 @@ def expand_observations(tb: Table) -> Table:
     return tb
 
 
+@pl.wrap("estimate_metrics", parents=["totalfatalities"])
 def estimate_metrics(tb: Table) -> Table:
     """Remix table to have the desired metrics.
 

@@ -333,8 +333,18 @@ def add_no_relationship(tb: Table, tb_regions: Table) -> Table:
     tb_no_rel = Table(tb_no_rel).rename(columns={None: "number_country_pairs"})
     tb_no_rel["region"] = "Inter-continental"
     tb_regions = pr.concat([tb_regions, tb_no_rel]).rename(columns={"region": "country"})
+
     ## Merge with main table
-    tb = tb.merge(tb_regions, on=["year", "country"])
+    ## Note that we merge with `outer` mode. This is because `tb` sometimes is missing year entries
+    ## that `tb_regions` does have. We need to perform a subtraction later, hence we need all columns!
+    tb = tb.merge(tb_regions, on=["year", "country"], how="outer")
+
+    ## Sanity check
+    assert not tb["number_country_pairs"].isna().any(), "Some NaNs detected in `number_country_pairs` column!"
+
+    ## Fill NaNs
+    tb[columns_indicators] = tb[columns_indicators].fillna(0)
+
     ## Estimate no-relationship
     tb[column_new] = tb["number_country_pairs"] - tb[columns_indicators].sum(axis=1)
 

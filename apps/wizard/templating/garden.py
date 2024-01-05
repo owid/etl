@@ -1,16 +1,18 @@
 """Garden phase."""
 import os
 from pathlib import Path
-from typing import cast
+from typing import List, cast
 
-import ruamel.yaml
 import streamlit as st
 from owid.catalog import Dataset
 from st_pages import add_indentation
 from typing_extensions import Self
 
+import etl.grapher_model as gm
 from apps.wizard import utils
-from etl.paths import BASE_DIR, DAG_DIR, DATA_DIR
+from etl.db import get_session
+from etl.files import ruamel_dump, ruamel_load
+from etl.paths import BASE_DIR, DAG_DIR, DATA_DIR, GARDEN_DIR
 
 #########################################################
 # CONSTANTS #############################################
@@ -18,6 +20,11 @@ from etl.paths import BASE_DIR, DAG_DIR, DATA_DIR
 # Page config
 st.set_page_config(page_title="Wizard (garden)", page_icon="🪄")
 add_indentation()
+
+# Available namespaces
+OPTIONS_NAMESPACES = sorted(os.listdir(GARDEN_DIR))
+
+
 # Get current directory
 CURRENT_DIR = Path(__file__).parent
 # FIELDS FROM OTHER STEPS
@@ -32,6 +39,10 @@ dummy_values = {
     "short_name": "dummy",
     "meadow_version": utils.DATE_TODAY,
 }
+# Get list of available tags from DB (only those used as topic pages)
+with get_session() as session:
+    tag_list = gm.Tag.load_tags(session)
+tag_list = ["Uncategorized"] + sorted([tag.name for tag in tag_list])
 
 
 #########################################################
@@ -59,10 +70,16 @@ class GardenForm(utils.StepForm):
     generate_notebook: bool
     is_private: bool
     update_period_days: int
+    topic_tags: List[str]
 
     def __init__(self: Self, **data: str | bool) -> None:
         """Construct class."""
         data["add_to_dag"] = data["dag_file"] != utils.ADD_DAG_OPTIONS[0]
+
+        # Handle custom namespace
+        if "namespace_custom" in data:
+            data["namespace"] = str(data["namespace_custom"])
+
         super().__init__(**data)
 
     def validate(self: Self) -> None:
@@ -72,13 +89,17 @@ class GardenForm(utils.StepForm):
         - Return True if all fields are valid, False otherwise.
         """
         # Check other fields (non meta)
-        fields_required = ["namespace", "version", "short_name", "meadow_version"]
+        fields_required = ["namespace", "version", "short_name", "meadow_version", "topic_tags"]
         fields_snake = ["namespace", "short_name"]
         fields_version = ["version", "meadow_version"]
 
         self.check_required(fields_required)
         self.check_snake(fields_snake)
         self.check_is_version(fields_version)
+
+        # Check tags
+        if (len(self.topic_tags) > 1) and ("Uncategorized" in self.topic_tags):
+            self.errors["topic_tags"] = "If you choose multiple tags, you cannot choose `Uncategorized`."
 
 
 def update_state() -> None:
@@ -111,7 +132,7 @@ def _fill_dummy_metadata_yaml(metadata_path: Path) -> None:
     Only useful when `--dummy-data` is used. We need this to avoid errors in `etl-wizard grapher --dummy-data`.
     """
     with open(metadata_path, "r") as f:
-        doc = ruamel.yaml.load(f, Loader=ruamel.yaml.RoundTripLoader)
+        doc = ruamel_load(f)
 
     # add all available metadata fields to dummy variable
     variable_meta = {
@@ -129,6 +150,11 @@ def _fill_dummy_metadata_yaml(metadata_path: Path) -> None:
             "entityAnnotationsMap": "Germany: dummy annotation",
             "includeInTable": True,
         },
+        "description_processing": "This is some description of the dummy indicator processing.",
+        "description_key": [
+            "Key information 1",
+            "Key information 2",
+        ],
         "description_short": "Short description of the dummy indicator.",
         "description_from_producer": "The description of the dummy indicator by the producer, shown separately on a data page.",
         "processing_level": "major",
@@ -156,7 +182,7 @@ def _fill_dummy_metadata_yaml(metadata_path: Path) -> None:
     doc["tables"]["dummy"]["variables"] = {"dummy_variable": variable_meta}
 
     with open(metadata_path, "w") as f:
-        ruamel.yaml.dump(doc, f, Dumper=ruamel.yaml.RoundTripDumper)
+        f.write(ruamel_dump(doc))
 
 
 #########################################################
@@ -167,7 +193,7 @@ st.title("Wizard  **:gray[Garden]**")
 
 # SIDEBAR
 with st.sidebar:
-    utils.warning_metadata_unstable()
+    # utils.warning_metadata_unstable()
     with st.expander("**Instructions**", expanded=True):
         text = load_instructions()
         st.markdown(text)
@@ -180,14 +206,17 @@ with form_widget.form("garden"):
         default_version = APP_STATE.default_value("version", default_last=utils.DATE_TODAY)
 
     # Namespace
-    APP_STATE.st_widget(
-        st_widget=st.text_input,
-        label="Namespace",
-        help="Institution or topic name",
-        placeholder="Example: 'emdat', 'health'",
-        key="namespace",
-        value=dummy_values["namespace"] if APP_STATE.args.dummy_data else None,
-    )
+    # APP_STATE.st_widget(
+    #     st_widget=st.text_input,
+    #     label="Namespace",
+    #     help="Institution or topic name",
+    #     placeholder="Example: 'emdat', 'health'",
+    #     key="namespace",
+    #     value=dummy_values["namespace"] if APP_STATE.args.dummy_data else None,
+    # )
+    # Namespace
+    namespace_field = [st.empty(), st.container()]
+
     # Garden version
     APP_STATE.st_widget(
         st_widget=st.text_input,
@@ -215,8 +244,26 @@ with form_widget.form("garden"):
         help="Expected number of days between consecutive updates of this dataset by OWID, typically `30`, `90` or `365`.",
         key="update_period_days",
         step=1,
-        min_value=1,
+        min_value=0,
         default_last=365,
+    )
+
+    APP_STATE.st_widget(
+        st_widget=st.multiselect,
+        label="Indicators tag",
+        help=(
+            """
+            This tag will be propagated to all dataset's indicators (it will not be assigned to the dataset).
+
+            If you want to use a different tag for a specific indicator you can do it by editing its metadata field `variable.presentation.topic_tags`.
+
+            Exceptionally, and if unsure what to choose, choose tag `Uncategorized`.
+            """
+        ),
+        key="topic_tags",
+        options=tag_list,
+        placeholder="Choose a tag (or multiple)",
+        default=None,
     )
 
     st.markdown("#### Dependencies")
@@ -267,6 +314,20 @@ with form_widget.form("garden"):
     )
 
 
+# Render responsive namespace field
+utils.render_responsive_field_in_form(
+    key="namespace",
+    display_name="Namespace",
+    field_1=namespace_field[0],
+    field_2=namespace_field[1],
+    options=OPTIONS_NAMESPACES,
+    custom_label="Custom namespace...",
+    help_text="Institution or topic name",
+    app_state=APP_STATE,
+    default_value=dummy_values["namespace"] if APP_STATE.args.dummy_data else OPTIONS_NAMESPACES[0],
+)
+
+
 #########################################################
 # SUBMISSION ############################################
 #########################################################
@@ -297,8 +358,17 @@ if submitted:
             dag_content = ""
 
         # Create necessary files
+        ## HOTFIX 1: filter topic_tags if empty
+        form_dict = form.dict()
+        if form_dict.get("topic_tags") is None or form_dict.get("topic_tags") == []:
+            form_dict["topic_tags"] = ""
+        ## HOTFIX 2: For some reason, when using cookiecutter only the first element in the list is taken?
+        ## Hence we need to convert the list to an actual string
+        else:
+            form_dict["topic_tags"] = "- " + "\n- ".join(form_dict["topic_tags"])
+
         DATASET_DIR = utils.generate_step_to_channel(
-            cookiecutter_path=utils.COOKIE_GARDEN, data=dict(**form.dict(), channel="garden")
+            cookiecutter_path=utils.COOKIE_GARDEN, data=dict(**form_dict, channel="garden")
         )
 
         step_path = DATASET_DIR / (form.short_name + ".py")
@@ -345,11 +415,21 @@ if submitted:
 
         2. (Optional) Generated notebook `{notebook_path.relative_to(BASE_DIR)}` can be used to examine the dataset output interactively.
 
-        3. (Optional) You can manually move steps from `dag/walkthrough.yml` to some other `dag/*.yml` if you feel like it belongs there. After you are happy with your code, run `make test` to find any issues.
+        3. (Optional) Generate metadata file `{form.short_name}.meta.yml` from your dataset with
+            ```
+            poetry run etl-metadata-export data/garden/{form.namespace}/{form.version}/{form.short_name}
+            ```
+            then manual edit it and rerun the step again with
+            ```
+            poetry run etl data{private_suffix}://garden/{form.namespace}/{form.version}/{form.short_name} {"--private" if form.is_private else ""}
+            ```
+            Note that origins are inherited from previous step (snapshot) and you don't have to repeat them.
 
-        4. Create a pull request in [ETL](https://github.com/owid/etl), get it reviewed and merged.
+        4. (Optional) You can manually move steps from `dag/walkthrough.yml` to some other `dag/*.yml` if you feel like it belongs there. After you are happy with your code, run `make test` to find any issues.
 
-        5. (Optional) Once your changes are merged, your steps will be run automatically by our server and published to the OWID catalog. Then it can be loaded by anyone using:
+        5. Create a pull request in [ETL](https://github.com/owid/etl), get it reviewed and merged.
+
+        6. (Optional) Once your changes are merged, your steps will be run automatically by our server and published to the OWID catalog. Then it can be loaded by anyone using:
 
             ```python
             from owid.catalog import find_one
@@ -358,7 +438,7 @@ if submitted:
             print(tab.head())
             ```
 
-        6. If you are an internal OWID member and want to push data to our Grapher DB, continue to the grapher step or to explorers step.
+        7. If you are an internal OWID member and want to push data to our Grapher DB, continue to the grapher step or to explorers step.
         """
             )
 

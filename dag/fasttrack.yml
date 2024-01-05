@@ -18,8 +18,6 @@ steps:
     - snapshot-private://fasttrack/latest/child_mortality_future_projections.csv
   data-private://grapher/fasttrack/latest/literate_population:
     - snapshot-private://fasttrack/latest/literate_population.csv
-  data-private://grapher/fasttrack/latest/test_electricity_projections:
-    - snapshot-private://fasttrack/latest/test_electricity_projections.csv
   data-private://grapher/fasttrack/latest/battery_costs_per_kwh__ziegler_et_al__and_bnef:
     - snapshot-private://fasttrack/latest/battery_costs_per_kwh__ziegler_et_al__and_bnef.csv
   data-private://grapher/fasttrack/latest/biosafety_level_4_facilities:
@@ -96,8 +94,6 @@ steps:
     - snapshot-private://fasttrack/latest/welfare_broiler_chickens.csv
   data-private://grapher/fasttrack/2023-08-14/gbif_animal_presence:
     - snapshot-private://fasttrack/2023-08-14/gbif_animal_presence.csv
-  data://grapher/fasttrack/latest/net_zero_tracker:
-    - snapshot://fasttrack/latest/net_zero_tracker.csv
   data://grapher/fasttrack/2023-08-21/survey_livestock_oklahoma:
     - snapshot://fasttrack/2023-08-21/survey_livestock_oklahoma.csv
   data://grapher/fasttrack/latest/sentience_institute:
@@ -124,3 +120,7 @@ steps:
     - snapshot://fasttrack/2023-09-29/un_space_objects.csv
   data://grapher/fasttrack/2023-10-05/great_pacific_garbage_lebreton:
     - snapshot://fasttrack/2023-10-05/great_pacific_garbage_lebreton.csv
+  data-private://grapher/fasttrack/latest/war_deaths_by_war_mars:
+    - snapshot-private://fasttrack/latest/war_deaths_by_war_mars.csv
+  data-private://grapher/fasttrack/latest/owid_donations:
+    - snapshot-private://fasttrack/latest/owid_donations.csv

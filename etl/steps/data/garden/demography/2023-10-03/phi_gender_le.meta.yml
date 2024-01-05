@@ -1,4 +1,9 @@
 # NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Life Expectancy
 
 
 # Learn more about the available fields:

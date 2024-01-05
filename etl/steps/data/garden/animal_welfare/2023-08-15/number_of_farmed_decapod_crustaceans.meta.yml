@@ -3,6 +3,9 @@ definitions:
   description_key:
     - &description_decapods "Decapods are an order of crustaceans that includes crabs, lobsters, crayfish, shrimp and prawns."
     - &description_method "This indicator is estimated using data on aquaculture production tonnages and mean weights from crustaceans size data. For species categories where no estimated mean weight was obtained, a generic mean weight was used."
+  presentation:
+    topic_tags:
+    - Animal Welfare
 
 tables:
   number_of_farmed_decapod_crustaceans:

@@ -225,6 +225,8 @@ def add_slaughtered_animals_to_meat_total(data: pd.DataFrame) -> pd.DataFrame:
             "value": "sum",
             "flag": lambda x: x if len(x) == 1 else FLAG_MULTIPLE_FLAGS,
         },
+        # TODO: Consider relaxing this assumption, and letting it be None (and impose min_num_values=1).
+        num_allowed_nans=0,
     ).reset_index()
 
     # Get element description for selected element code (so far it's always been an empty string).

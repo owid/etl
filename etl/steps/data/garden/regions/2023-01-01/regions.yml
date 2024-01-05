@@ -93,6 +93,7 @@
   aliases:
     - "\u00c3\u0081EEland Islands"
     - "Åland Islands"
+    - "Åland"
 
 - code: "ALB"
   name: "Albania"
@@ -1140,6 +1141,7 @@
     - "Palestinian Territories"
     - "State of Palestine"
     - "West Bank and Gaza"
+    - "WBG"
   related:
     - "PS_GZA"
 
@@ -1365,6 +1367,8 @@
 
 - code: "SSD"
   name: "South Sudan"
+  aliases:
+    - "S. Sudan"
 
 - code: "ESP"
   name: "Spain"

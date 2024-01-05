@@ -13,6 +13,7 @@ INDICATORS_RELEVANT = [
     "life_expectancy",
     "life_expectancy_fm_diff",
     "life_expectancy_fm_ratio",
+    "central_death_rate_mf_ratio",
     "probability_of_death",
 ]
 # Single-age groups to preserve

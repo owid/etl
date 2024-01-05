@@ -1,0 +1,25 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Energy
+    short_unit: "TWh"
+    unit: "terawatt-hours"
+    description_short: |-
+      Measured in terawatt-hours.
+    display:
+      numDecimalPlaces: 0
+
+dataset:
+  update_period_days: 365
+
+tables:
+  energy_production_from_fossil_fuels:
+    title: Fossil fuel production
+    variables:
+      coal:
+        title: "Coal production"
+      gas:
+        title: "Gas production"
+      oil:
+        title: "Oil production"

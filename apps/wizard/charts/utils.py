@@ -49,6 +49,10 @@ def get_variables_from_datasets(dataset_id_1: int, dataset_id_2: int) -> Tuple[p
         old_variables = get_variables_in_dataset(db_conn=db_conn, dataset_id=dataset_id_1, only_used_in_charts=True)
         # Get all variables from new dataset.
         new_variables = get_variables_in_dataset(db_conn=db_conn, dataset_id=dataset_id_2, only_used_in_charts=False)
+        # Remove new variables that are in the old dataset. This can happen if we're matching a dataset to itself
+        # in case of renaming variables.
+        new_variables = new_variables[~new_variables["id"].isin(old_variables["id"])]
+
     return old_variables, new_variables
 
 
@@ -102,7 +106,7 @@ def _check_env_and_environment() -> None:
             _show_environment()
 
 
-OWIDEnvType = Literal["live", "staging", "local", "unknown"]
+OWIDEnvType = Literal["live", "staging", "local", "remote-staging", "unknown"]
 
 
 class OWIDEnv:
@@ -130,12 +134,15 @@ class OWIDEnv:
         # local
         elif config.DB_NAME == "grapher" and config.DB_USER == "grapher":
             return "local"
+        # other
+        elif config.DB_NAME == "owid" and config.DB_USER == "owid":
+            return "remote-staging"
         return "unknown"
 
     @property
     def admin_url(
         self: Self,
-    ) -> Literal["https://owid.cloud/admin", "https://staging.owid.cloud/admin", "http://localhost:3030/admin"] | None:
+    ) -> str | None:
         """Get admin url."""
         if self.env_type_id == "live":
             return "https://owid.cloud/admin"
@@ -143,6 +150,8 @@ class OWIDEnv:
             return "https://staging.owid.cloud/admin"
         elif self.env_type_id == "local":
             return "http://localhost:3030/admin"
+        elif self.env_type_id == "remote-staging":
+            return f"http://{config.DB_HOST}/admin"
         return None
 
     @property

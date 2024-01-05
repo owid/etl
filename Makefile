@@ -6,7 +6,7 @@
 
 include default.mk
 
-SRC = etl snapshots apps tests
+SRC = etl snapshots apps tests docs
 PYTHON_PLATFORM = $(shell python -c "import sys; print(sys.platform)")
 LIBS = lib/*
 
@@ -66,6 +66,8 @@ watch: .venv
 		exit 1; \
 	fi
 	touch .sanity-check
+
+test: check-formatting lint check-typing unittest version-tracker
 
 .venv: .sanity-check pyproject.toml poetry.toml poetry.lock
 	@echo '==> Installing packages'

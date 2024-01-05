@@ -1,7 +1,6 @@
 from unittest import mock
 
 import pandas as pd
-from gsheets import Sheets
 
 from owid.datautils.google.sheets import GSheetsApi
 

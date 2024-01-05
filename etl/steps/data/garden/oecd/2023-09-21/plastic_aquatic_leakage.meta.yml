@@ -1,30 +1,10 @@
-dataset:
-  description: >-
-    The regional definitions in this dataset according to OECD are:
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Plastic Pollution
 
-      **Other OECD America**: Chile, Colombia, Costa Rica, Mexico
 
-      **OECD EU countries** : Austria, Belgium, Czech Republic, Denmark, Estonia, Finland, France, Germany Greece, Hungary, Ireland, Italy, Latvia, Lithuania, Luxembourg, Netherlands, Poland, Portugal, Slovak Republic, Slovenia, Spain, Sweden
-
-      **OECD Non-EU countries**: Iceland, Israel,1 Norway, Switzerland, Turkey, United Kingdom
-
-      **OECD Oceania**: Australia, New Zealand
-
-      **OECD Asia**: Japan, Korea
-
-      **Latin America**: Non-OECD Latin American and Caribbean countries
-
-      **Other EU**: Bulgaria, Croatia, Cyprus, Malta, Romania
-
-      **Other Eurasia**: Non-OECD European and Caspian countries, including Russian Federation
-
-      **Middle East & North Africa**: Algeria, Bahrain, Egypt, Iraq, Islamic Rep. of Iran, Kuwait, Lebanon, Libya, Morocco, Oman, Qatar, Saudi Arabia, Tunisia, United Arab Emirates, Syrian Arab Rep., Western Sahara, Yemen
-
-      **Other Africa**: Sub-Saharan Africa
-
-      **China**: People’s Republic of China, Hong Kong (China)
-
-      **Other non-OECD Asia**: Other non-OECD Asian and Pacific countries
 tables:
   plastic_aquatic_leakage:
     variables:

@@ -1,31 +1,11 @@
+definitions:
+  common:
+    display:
+      numDecimalPlaces: 0
+    presentation:
+      topic_tags:
+        - Plastic Pollution
 
-dataset:
-  description: >-
-    The regional definitions in this dataset according to OECD are:
-
-      **Other OECD America**: Chile, Colombia, Costa Rica, Mexico
-
-      **OECD EU countries** : Austria, Belgium, Czech Republic, Denmark, Estonia, Finland, France, Germany Greece, Hungary, Ireland, Italy, Latvia, Lithuania, Luxembourg, Netherlands, Poland, Portugal, Slovak Republic, Slovenia, Spain, Sweden
-
-      **OECD Non-EU countries**: Iceland, Israel,1 Norway, Switzerland, Turkey, United Kingdom
-
-      **OECD Oceania**: Australia, New Zealand
-
-      **OECD Asia**: Japan, Korea
-
-      **Latin America**: Non-OECD Latin American and Caribbean countries
-
-      **Other EU**: Bulgaria, Croatia, Cyprus, Malta, Romania
-
-      **Other Eurasia**: Non-OECD European and Caspian countries, including Russian Federation
-
-      **Middle East & North Africa**: Algeria, Bahrain, Egypt, Iraq, Islamic Rep. of Iran, Kuwait, Lebanon, Libya, Morocco, Oman, Qatar, Saudi Arabia, Tunisia, United Arab Emirates, Syrian Arab Rep., Western Sahara, Yemen
-
-      **Other Africa**: Sub-Saharan Africa
-
-      **China**: People’s Republic of China, Hong Kong (China)
-
-      **Other non-OECD Asia**: Other non-OECD Asian and Pacific countries
 tables:
   plastic_fate_regions:
     variables:
@@ -33,80 +13,67 @@ tables:
         title: Incinerated
         unit: 'tonnes'
         short_unit: 't'
-        display:
-          numDecimalPlaces: 0
+
       value_landfilled:
         title: Landfilled
         unit: 'tonnes'
         short_unit: 't'
-        display:
-          numDecimalPlaces: 0
+
       value_littered:
         title: Littered
         unit: 'tonnes'
         short_unit: 't'
-        display:
-          numDecimalPlaces: 0
+
       value_mismanaged:
         title: Mismanaged
         unit: 'tonnes'
         short_unit: 't'
-        display:
-          numDecimalPlaces: 0
+
       value_recycled:
         title: Recycled
         unit: 'tonnes'
         short_unit: 't'
-        display:
-          numDecimalPlaces: 0
+
       value_total:
         title: Total waste
         unit: 'tonnes'
         short_unit: 't'
-        display:
-          numDecimalPlaces: 0
+
       share_incinerated:
         title: Share of waste incinerated from global total
         unit: '%'
         short_unit: '%'
-        display:
-          numDecimalPlaces: 0
+
       share_landfilled:
         title: Share of waste landfilled from global total
         unit: '%'
         short_unit: '%'
-        display:
-          numDecimalPlaces: 0
+
       share_littered:
         title: Share of waste littered from global total
         unit: '%'
         short_unit: '%'
-        display:
-          numDecimalPlaces: 0
+
       share_mismanaged:
         title: Share of waste mismanaged from global total
         unit: '%'
         short_unit: '%'
-        display:
-          numDecimalPlaces: 0
+
       share_recycled:
         title: Share of waste recycled from global total
         unit: '%'
         short_unit: '%'
-        display:
-          numDecimalPlaces: 0
+
       value_incinerated_share:
         title: Share of waste incinerated from total regional waste
         unit: '%'
         short_unit: '%'
-        display:
-          numDecimalPlaces: 0
+
       value_landfilled_share:
         title: Share of waste landfilled from total regional waste
         unit: '%'
         short_unit: '%'
-        display:
-          numDecimalPlaces: 0
+
       value_littered_share:
         title: Share of waste littered from total regional waste
         unit: '%'
@@ -117,11 +84,18 @@ tables:
         title: Share of waste mismanaged from total regional waste
         unit: '%'
         short_unit: '%'
-        display:
-          numDecimalPlaces: 0
+
       value_recycled_share:
         title: Share of waste recycled from total regional waste
         unit: '%'
         short_unit: '%'
-        display:
-          numDecimalPlaces: 0
+
+      littered_mismanaged_combined:
+        title: Littered and mismanaged
+        unit: 'tonnes'
+        short_unit: 't'
+
+      littered_mismanaged_combined_share:
+        title: Share of littered and mismanaged from total regional waste
+        unit: '%'
+        short_unit: '%'

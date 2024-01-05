@@ -100,7 +100,13 @@ def add_regions(df: pd.DataFrame) -> pd.DataFrame:
     # Add continent data
     regions = ["Asia", "Africa", "North America", "South America", "Oceania"]
     for region in regions:
-        df_pivot = add_region_aggregates(df_pivot, region=region)
+        df_pivot = add_region_aggregates(
+            df_pivot,
+            region=region,
+            countries_that_must_have_data="auto",
+            frac_allowed_nans_per_year=0.2,
+            num_allowed_nans_per_year=None,
+        )
     # Unpivot back
     df = df_pivot.melt(id_vars=id_vars, var_name=var_name, value_name=value_name).dropna(subset=[value_name])
     # Add EU28 data

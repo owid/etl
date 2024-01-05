@@ -18,11 +18,12 @@ meta:
     producer: Correlates of War
     citation_full: |-
       Palmer, Glenn, Roseanne W. McManus, Vito D’Orazio, Michael R. Kenwick, Mikaela Karstens, Chase Bloch, Nick Dietrich, Kayla Kahn, Kellan Ritter, Michael J. Soules. 2020. “The MID5 Dataset, 2011-2014: Procedures, Coding Rules, and Description.” Conflict Management and Peace Science, 39(4): 470-482. DOI: https://journals.sagepub.com/doi/full/10.1177/0738894221995743
+    attribution: Correlates of War - Militarized Interstate Disputes (2020)
     attribution_short: COW
 
     # Files
     url_main: https://correlatesofwar.org/data-sets/mids/
-    url_download: 
+    url_download:
       https://correlatesofwar.org/wp-content/uploads/MID-5-Data-and-Supporting-Materials.zip
     date_accessed: 2023-09-21
 

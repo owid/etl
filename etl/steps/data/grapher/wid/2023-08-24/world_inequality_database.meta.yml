@@ -38,12 +38,11 @@ tables:
           - **Monetary values were converted to international-$ in 2022 prices.** To account for inflation and differences in the cost of living between countries, we transform the data using WID’s `xlcusp` dataset in Stata.
           - **We calculate additional metrics.** We make transformations of the data to derive some additional metrics that are not available directly from the original World Inequality Database, as percentile and share ratios, derived from income thresholds and shares, respectively.
         presentation:
-          title_variant: World Inequality Database - Before tax
+          title_variant: Before tax
           attribution_short: World Inequality Database
           topic_tags:
             - Economic Inequality
           grapher_config:
-            slug: income-share-top-1-before-tax-wid
             title: Income share of the richest 1% (before tax)
             subtitle: >-
               The share of income received by the richest 1% of the population. Income here is measured before taxes and benefits.

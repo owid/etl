@@ -1,0 +1,274 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    processing_level: minor
+    presentation:
+      topic_tags:
+        - Tuberculosis
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
+tables:
+  burden_estimates:
+    variables:
+      e_inc_100k:
+        title: Estimated incidence of all forms of tuberculosis
+        description_short: The number of new cases of [tuberculosis](#dod:tuberculosis) per 100,000 people.
+        unit: cases per 100,000 people
+        description_processing: Regional aggregates were calculated by Our World in Data.
+        display:
+          numDecimalPlaces: 1
+      e_inc_100k_lo:
+        title: Estimated incidence of all forms of tuberculosis (low bound)
+        description_short: The number of new cases of [tuberculosis](#dod:tuberculosis) per 100,000 people.
+        unit: cases per 100,000 people
+        description_processing: Regional aggregates were calculated by Our World in Data.
+        display:
+          numDecimalPlaces: 1
+      e_inc_100k_hi:
+        title: Estimated incidence of all forms of tuberculosis (high bound)
+        description_short: The number of new cases of [tuberculosis](#dod:tuberculosis) per 100,000 people.
+        unit: cases per 100,000 people
+        description_processing: Regional aggregates were calculated by Our World in Data.
+        display:
+          numDecimalPlaces: 1
+      e_inc_num:
+        title: Estimated number of new cases of all forms of tuberculosis
+        unit: cases
+        description_processing: Regional aggregates were calculated by Our World in Data.
+        display:
+          numDecimalPlaces: 0
+      e_inc_num_lo:
+        title: Estimated number of new cases of all forms of tuberculosis (low bound)
+        unit: cases
+        description_processing: Regional aggregates were calculated by Our World in Data.
+        display:
+          numDecimalPlaces: 0
+      e_inc_num_hi:
+        title: Estimated number of new cases of all forms of tuberculosis (high bound)
+        unit: cases
+        description_processing: Regional aggregates were calculated by Our World in Data.
+        display:
+          numDecimalPlaces: 0
+      e_tbhiv_prct:
+        title: Estimated HIV in incident tuberculosis
+        unit: "%"
+        display:
+          numDecimalPlaces: 1
+      e_tbhiv_prct_lo:
+        title: Estimated HIV in incident tuberculosis (low bound)
+        unit: "%"
+        display:
+          numDecimalPlaces: 1
+      e_tbhiv_prct_hi:
+        title: Estimated HIV in incident tuberculosis (high bound)
+        unit: "%"
+        display:
+          numDecimalPlaces: 1
+      e_inc_tbhiv_100k:
+        title: Estimated incidence of tuberculosis cases who are HIV-positive per 100 000 population
+        unit: "per 100,000 individuals who are HIV-positive"
+        description_processing: Regional aggregates were calculated by Our World in Data.
+        display:
+          numDecimalPlaces: 1
+      e_inc_tbhiv_100k_lo:
+        title: Estimated incidence of tuberculosis cases who are HIV-positive per 100,000 population (low bound)
+        unit: "per 100,000 individuals who are HIV-positive"
+        description_processing: Regional aggregates were calculated by Our World in Data.
+        display:
+          numDecimalPlaces: 1
+      e_inc_tbhiv_100k_hi:
+        title: Estimated incidence of tuberculosis cases who are HIV-positive per 100,000 population (high bound)
+        unit: "per 100,000 individuals who are HIV-positive"
+        description_processing: Regional aggregates were calculated by Our World in Data.
+        display:
+          numDecimalPlaces: 1
+      e_inc_tbhiv_num:
+        title: Estimated number of incident tuberculosis cases who are HIV-positive
+        unit: "cases"
+        description_processing: Regional aggregates were calculated by Our World in Data.
+        display:
+          numDecimalPlaces: 0
+      e_inc_tbhiv_num_lo:
+        title: Estimated number of incident tuberculosis cases who are HIV-positive (low bound)
+        unit: "cases"
+        description_processing: Regional aggregates were calculated by Our World in Data.
+        display:
+          numDecimalPlaces: 0
+      e_inc_tbhiv_num_hi:
+        title: Estimated number of incident tuberculosis cases who are HIV-positive (high bound)
+        unit: "cases"
+        description_processing: Regional aggregates were calculated by Our World in Data.
+        display:
+          numDecimalPlaces: 0
+      e_mort_exc_tbhiv_100k:
+        title: Estimated mortality from all forms of tuberculosis excluding HIV-positive cases per 100,000 population
+        unit: "deaths per 100,000 people"
+        description_processing: Regional aggregates were calculated by Our World in Data.
+        display:
+          numDecimalPlaces: 1
+      e_mort_exc_tbhiv_100k_lo:
+        title: Estimated mortality from all forms of tuberculosis excluding HIV-positive cases per 100,000 population (low bound)
+        unit: "deaths per 100,000 people"
+        description_processing: Regional aggregates were calculated by Our World in Data.
+        display:
+          numDecimalPlaces: 1
+      e_mort_exc_tbhiv_100k_hi:
+        title: Estimated mortality from all forms of tuberculosis excluding HIV-positive cases per 100,000 population (high bound)
+        unit: "deaths per 100,000 people"
+        description_processing: Regional aggregates were calculated by Our World in Data.
+        display:
+          numDecimalPlaces: 1
+      e_mort_exc_tbhiv_num:
+        title: Estimated number of deaths from all forms of tuberculosis excluding HIV-positive cases
+        unit: "deaths"
+        description_processing: Regional aggregates were calculated by Our World in Data.
+        display:
+          numDecimalPlaces: 0
+      e_mort_exc_tbhiv_num_lo:
+        title: Estimated number of deaths from all forms of tuberculosis excluding HIV-positive cases (low bound)
+        unit: "deaths"
+        description_processing: Regional aggregates were calculated by Our World in Data.
+        display:
+          numDecimalPlaces: 0
+      e_mort_exc_tbhiv_num_hi:
+        title: Estimated number of deaths from all forms of tuberculosis excluding HIV-positive cases (high bound)
+        unit: "deaths"
+        description_processing: Regional aggregates were calculated by Our World in Data.
+        display:
+          numDecimalPlaces: 0
+      e_mort_tbhiv_100k:
+        title: Estimated mortality from tuberculosis cases who are HIV-positive per 100,000 population
+        unit: "deaths per 100,000 people"
+        description_processing: Regional aggregates were calculated by Our World in Data.
+        display:
+          numDecimalPlaces: 2
+      e_mort_tbhiv_100k_lo:
+        title: Estimated mortality from tuberculosis cases who are HIV-positive per 100,000 population (low bound)
+        unit: "deaths per 100,000 people"
+        description_processing: Regional aggregates were calculated by Our World in Data.
+        display:
+          numDecimalPlaces: 2
+      e_mort_tbhiv_100k_hi:
+        title: Estimated mortality from tuberculosis cases who are HIV-positive per 100,000 population (high bound)
+        unit: "deaths per 100,000 people"
+        description_processing: Regional aggregates were calculated by Our World in Data.
+        display:
+          numDecimalPlaces: 2
+      e_mort_tbhiv_num:
+        title: Estimated number of deaths from TB in people who are HIV-positive
+        unit: "deaths"
+        description_processing: Regional aggregates were calculated by Our World in Data.
+        display:
+          numDecimalPlaces: 0
+      e_mort_tbhiv_num_lo:
+        title: Estimated number of deaths from TB in people who are HIV-positive (low bound)
+        unit: "deaths"
+        description_processing: Regional aggregates were calculated by Our World in Data.
+        display:
+          numDecimalPlaces: 0
+      e_mort_tbhiv_num_hi:
+        title: Estimated number of deaths from TB in people who are HIV-positive (high bound)
+        unit: "deaths"
+        description_processing: Regional aggregates were calculated by Our World in Data.
+        display:
+          numDecimalPlaces: 0
+      e_mort_100k:
+        title: Estimated mortality from all forms of tuberculosis per 100,000 population
+        unit: "deaths per 100,000 people"
+        description_processing: Regional aggregates were calculated by Our World in Data.
+        display:
+          numDecimalPlaces: 1
+      e_mort_100k_lo:
+        title: Estimated mortality from all forms of tuberculosis per 100,000 population (low bound)
+        unit: "deaths per 100,000 people"
+        description_processing: Regional aggregates were calculated by Our World in Data.
+        display:
+          numDecimalPlaces: 1
+      e_mort_100k_hi:
+        title: Estimated mortality from all forms of tuberculosis per 100,000 population (high bound)
+        unit: "deaths per 100,000 people"
+        description_processing: Regional aggregates were calculated by Our World in Data.
+        display:
+          numDecimalPlaces: 1
+      e_mort_num:
+        title: Estimated number of deaths from all forms of tuberculosis
+        unit: "deaths"
+        description_processing: Regional aggregates were calculated by Our World in Data.
+        display:
+          numDecimalPlaces: 0
+      e_mort_num_lo:
+        title: Estimated number of deaths from all forms of tuberculosis (low bound)
+        unit: "deaths"
+        description_processing: Regional aggregates were calculated by Our World in Data.
+        display:
+          numDecimalPlaces: 0
+      e_mort_num_hi:
+        title: Estimated number of deaths from all forms of tuberculosis (high bound)
+        unit: "deaths"
+        description_processing: Regional aggregates were calculated by Our World in Data.
+        display:
+          numDecimalPlaces: 0
+      cfr:
+        title: Case fatality ratio
+        description_short: The estimated proportion of people diagnosed with [tuberculosis](#dod:tuberculosis), who end up dying of it.
+        unit: "deaths per individual diagnosed with tuberculosis"
+        display:
+          numDecimalPlaces: 2
+      cfr_lo:
+        title: Case fatality ratio (low bound)
+        description_short: The estimated proportion of people diagnosed with [tuberculosis](#dod:tuberculosis), who end up dying of it.
+        unit: "deaths per individual diagnosed with tuberculosis"
+        display:
+          numDecimalPlaces: 2
+      cfr_hi:
+        title: Case fatality ratio (high bound)
+        description_short: The estimated proportion of people diagnosed with [tuberculosis](#dod:tuberculosis), who end up dying of it.
+        unit: "deaths per individual diagnosed with tuberculosis"
+        display:
+          numDecimalPlaces: 2
+      cfr_pct:
+        title: Case fatality ratio (percentage)
+        description_short: The estimated percentage of people diagnosed with [tuberculosis](#dod:tuberculosis), who end up dying of it.
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+      cfr_pct_lo:
+        title: Case fatality ratio (percentage; low bound)
+        description_short: The estimated percentage of people diagnosed with [tuberculosis](#dod:tuberculosis), who end up dying of it.
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+      cfr_pct_hi:
+        title: Case fatality ratio (percentage; high bound)
+        description_short: The estimated percentage of people diagnosed with [tuberculosis](#dod:tuberculosis), who end up dying of it.
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+      c_newinc_100k:
+        title: Case notification rate
+        description_short: The total of new and relapse [tuberculosis](#dod:tuberculosis) cases and cases with unknown previous tuberculosis treatment history per 100,000 population
+        unit: "new and relapse cases per 100,000 people"
+        display:
+          numDecimalPlaces: 1
+      c_cdr:
+        title: Case detection rate (all forms)
+        description_short: The number of new and relapse [tuberculosis](#dod:tuberculosis) cases diagnosed and treated in national TB control  programmes and notified to WHO, divided by WHO's estimate of the number of incident TB cases for the same year.
+        unit: "%"
+        display:
+          numDecimalPlaces: 1
+      c_cdr_lo:
+        title: Case detection rate (all forms; low bound)
+        description_short: The number of new and relapse [tuberculosis](#dod:tuberculosis) cases diagnosed and treated in national TB control  programmes and notified to WHO, divided by WHO's estimate of the number of incident TB cases for the same year.
+        unit: "%"
+        display:
+          numDecimalPlaces: 1
+      c_cdr_hi:
+        title: Case detection rate (all forms; high bound)
+        description_short: The number of new and relapse [tuberculosis](#dod:tuberculosis) cases diagnosed and treated in national TB control  programmes and notified to WHO, divided by WHO's estimate of the number of incident TB cases for the same year.
+        unit: "%"
+        display:
+          numDecimalPlaces: 1

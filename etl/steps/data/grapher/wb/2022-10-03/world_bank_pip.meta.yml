@@ -11,16 +11,21 @@ definitions:
         version_producer: '20220909_2017_01_02_PROD'
         description: |-
           The Poverty and Inequality Platform (PIP) is an interactive computational tool that offers users quick access to the World Bank’s estimates of poverty, inequality, and shared prosperity. PIP provides a comprehensive view of global, regional, and country-level trends for more than 160 economies around the world.
-        citation_full: World Bank Poverty and Inequality Platform
+        citation_full: World Bank. (2022). Poverty and Inequality Platform (version 20220909_2017_01_02_PROD) [Data set]. World Bank Group. https://pip.worldbank.org/. Accessed 2022-10-03.
         url_main: https://pip.worldbank.org/
         date_accessed: '2022-10-03'
-        date_published: '2022-10-03'
+        date_published: '2022-09-09'
+    display:
+      numDecimalPlaces: 1
+      tolerance: 5
+
+    processing_level: major
 
     presentation:
-      title_variant: World Bank, PIP
       attribution_short: World Bank
       grapher_config:
         originUrl: https://ourworldindata.org/poverty
+        $schema: https://files.ourworldindata.org/schemas/grapher-schema.003.json
 
   income_consumption_pc: Depending on the country and year, the data relates to income measured after taxes and benefits, or to consumption, per capita. 'Per capita' means that the incomes of each household are attributed equally to each member of the household (including children).
   non_market_income: Non-market sources of income, including food grown by subsistence farmers for their own consumption, are taken into account.
@@ -53,11 +58,6 @@ tables:
             - Economic Growth
             - Economic Inequality
           faqs:
-            # NOTE: there's an image, but I'm getting an error
-            # Image error
-            # Image with filename "Five-income-distributions-national-poverty-and-IPL-2.png" not found. This block will not render when the page is baked.
-            #
-            # perhaps this will be rendered correctly in production?
             - fragment_id: poverty-international-poverty-line
               gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
             - fragment_id: poverty-international-dollars
@@ -67,7 +67,6 @@ tables:
             - fragment_id: poverty-regional-estimates
               gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
           grapher_config:
-            slug: share-of-population-in-extreme-poverty
             title: Share of population living in extreme poverty
             subtitle: >-
               Extreme poverty is defined as living below the International Poverty Line of
@@ -84,7 +83,6 @@ tables:
               min: 0
             map:
               time: 2019
-              timeTolerance: 5
               colorScale:
                 baseColorScheme: OrRd
                 binningStrategy: manual
@@ -107,7 +105,67 @@ tables:
               - India
               - China
               - Ethiopia
-            $schema: https://files.ourworldindata.org/schemas/grapher-schema.003.json
+
+      dollar30_a_day__share_of_population_below_poverty_line:
+        title: $30 a day - share of population below poverty line
+        unit: '%'
+        short_unit: '%'
+        description_short: "% of population living in households with an income or consumption per person below $30 a day."
+        description_key:
+          - A poverty line of $30 a day represents definitions of national poverty lines in high-income countries.
+          - The data is measured in international-$ at 2017 prices – this adjusts for inflation and for differences in the cost of living between countries.
+          - "{definitions.income_consumption_pc}"
+          - "{definitions.non_market_income}"
+        description_processing: |-
+          {definitions.processing_notes}
+        presentation:
+          title_public: Share of population living on less than $30 a day
+          topic_tags:
+            - Poverty
+            - Economic Growth
+            - Economic Inequality
+          faqs:
+            - fragment_id: poverty-international-dollars
+              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+            - fragment_id: poverty-comparability
+              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+            - fragment_id: poverty-regional-estimates
+              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+          grapher_config:
+            title: "Poverty: Share of population living on less than $30 a day"
+            subtitle: >-
+              This data is adjusted for inflation and for differences in the cost of living between countries.
+            note: >-
+              This data is expressed in [international-$](#dod:int_dollar_abbreviation) at 2017 prices. Depending on the country and year, it relates to income measured after taxes and benefits, or to consumption, [per capita](#dod:per-capita).
+            hasMapTab: true
+            tab: map
+            variantName: Line chart
+            yAxis:
+              min: 0
+            map:
+              time: 2019
+              colorScale:
+                baseColorScheme: OrRd
+                binningStrategy: manual
+                customNumericValues:
+                  - 10
+                  - 20
+                  - 30
+                  - 40
+                  - 50
+                  - 60
+                  - 70
+                  - 80
+                  - 90
+                  - 100
+            selectedEntityNames:
+              - Bangladesh
+              - Bolivia
+              - Madagascar
+              - India
+              - China
+              - Ethiopia
+
       _60pct_of_median__share_of_population_below_poverty_line:
         title: 60% of median - share of population below poverty line
         unit: '%'
@@ -130,7 +188,6 @@ tables:
             - fragment_id: poverty-comparability
               gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
           grapher_config:
-            slug: relative-poverty-share-of-people-below-60-of-the-median
             title: 'Relative poverty: Share of people below 60% of median income'
             subtitle: >-
               Relative poverty is measured in terms of a poverty line that rises and falls
@@ -143,7 +200,7 @@ tables:
             yAxis:
               min: 0
             colorScale:
-              baseColorScheme: YlGn
+              baseColorScheme: OwidDistinctLines
             map:
               time: 2019
               colorScale:
@@ -164,12 +221,13 @@ tables:
               - India
               - China
               - Ethiopia
-            $schema: https://files.ourworldindata.org/schemas/grapher-schema.003.json
+
       gini_coefficient:
         title: Gini coefficient
         description_short: The Gini coefficient measures inequality on a scale from 0 to 1. Higher values indicate higher inequality.
         display:
           numDecimalPlaces: 2
+          tolerance: 5
         description_key:
           - "{definitions.income_consumption_pc}"
           - "{definitions.non_market_income}"
@@ -184,7 +242,6 @@ tables:
             - fragment_id: poverty-comparability
               gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
           grapher_config:
-            slug: economic-inequality-gini-index
             title: 'Income inequality: Gini coefficient'
             subtitle: >-
               The [Gini coefficient](#dod:gini) measures inequality on a scale from 0 to 1.
@@ -221,4 +278,59 @@ tables:
               - United States
               - France
               - China
-            $schema: https://files.ourworldindata.org/schemas/grapher-schema.003.json
+
+      _50pct_of_median__share_of_population_below_poverty_line:
+        title: 50% of median - share of population below poverty line
+        unit: '%'
+        short_unit: '%'
+        description_short: "The share of population with income or consumption below 50% of the median."
+        description_key:
+          - This is a measure of _relative_ poverty – it captures the share of people whose income is low by the standards typical in their own country.
+          - "{definitions.income_consumption_pc}"
+          - "{definitions.non_market_income}"
+        description_processing: |-
+          Measures of relative poverty are not directly available in the World Bank PIP data. To calculate this metric we take the median income or consumption for the country and year, calculate a relative poverty line – in this case 50% of the median – and then run a specific query on the PIP API to return the share of population below that line.
+
+          {definitions.processing_notes}
+        presentation:
+          title_public: Share of population below 50% of median income or consumption
+          topic_tags:
+            - Poverty
+            - Economic Inequality
+          faqs:
+            - fragment_id: poverty-comparability
+              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+          grapher_config:
+            title: 'Relative poverty: Share of people below 50% of median income'
+            subtitle: Relative poverty is measured in terms of a poverty line that rises and falls over time with average incomes – in this case set at 50% of median income.
+            note: >-
+              Depending on the country and year, the data relates to income measured after
+              taxes and benefits, or to consumption, [per capita](#dod:per-capita).
+            hasMapTab: true
+            tab: map
+            yAxis:
+              min: 0
+            colorScale:
+              baseColorScheme: OwidDistinctLines
+            map:
+              time: 2019
+              colorScale:
+                baseColorScheme: YlOrBr
+                binningStrategy: manual
+                customNumericValues:
+                  - 3
+                  - 6
+                  - 9
+                  - 12
+                  - 15
+                  - 18
+                  - 21
+                  - 24
+                  - 27
+            selectedEntityNames:
+              - Bangladesh
+              - Bolivia
+              - Madagascar
+              - India
+              - China
+              - Ethiopia

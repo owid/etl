@@ -1,30 +1,23 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - HIV/AIDS
+
 tables:
   unaids:
     variables:
       aids_deaths:
         title: AIDS-related deaths
         unit: deaths
-        description_from_producer: >-
-          The number of people dying from AIDS-related causes can be obtained using a variety of measures,
-          including through a vital registration system adjusted for misreporting, as part of a facility- or
-          population-based survey that may include verbal autopsy and through mathematical modelling using such tools as Spectrum.
-          Modelling tools typically use demographic data, HIV prevalence from survey and surveillance, the number of people
-          receiving antiretroviral therapy, HIV incidence and assumptions around survival patterns to estimate the number of people dying.
-          In some instances, data from vital reporting systems and estimates of underreporting and misclassification also may be
-          incorporated into these models to derive estimates of the number of AIDS-related deaths.
+        description_from_producer: |-
+          The number of people dying from AIDS-related causes can be obtained using a variety of measures, including through a vital registration system adjusted for misreporting, as part of a facility- or population-based survey that may include verbal autopsy and through mathematical modelling using such tools as Spectrum. Modelling tools typically use demographic data, HIV prevalence from survey and surveillance, the number of people receiving antiretroviral therapy, HIV incidence and assumptions around survival patterns to estimate the number of people dying. In some instances, data from vital reporting systems and estimates of underreporting and misclassification also may be incorporated into these models to derive estimates of the number of AIDS-related deaths.
 
-          The source of the estimate is requested. Countries providing the number of people dying from AIDS-related causes derived from
-          a source other than Spectrum should provide any accompanying estimates of uncertainty around this number and upload an
-          electronic copy of the report describing how the number was calculated.
+          The source of the estimate is requested. Countries providing the number of people dying from AIDS-related causes derived from a source other than Spectrum should provide any accompanying estimates of uncertainty around this number and upload an electronic copy of the report describing how the number was calculated.
 
-          Countries should preferably report a modelled estimate rather than one derived from their vital registration
-          system unless this system has been recently evaluated as one of high quality. Users can now opt to use their
-          Spectrum estimate or enter nationally representative population-level data. If Spectrum estimates are chosen,
-          the values will be pulled directly from the software once the national file is finalized.
-
-        description: >-
+          Countries should preferably report a modelled estimate rather than one derived from their vital registration system unless this system has been recently evaluated as one of high quality. Users can now opt to use their Spectrum estimate or enter nationally representative population-level data. If Spectrum estimates are chosen, the values will be pulled directly from the software once the national file is finalized.
+        description_short: |-
           Number of people dying from AIDS-related causes. This is measured annually and is disaggregated by sex, and age group.
-
         processing_level: minor
         display:
           numDecimalPlaces: 0
@@ -32,9 +25,8 @@ tables:
       deaths_averted_art:
         title: Deaths averted due to antiretroviral therapy
         unit: deaths
-        description: >-
+        description_short: |-
           Deaths that were prevented thanks to the usage of antiretroviral therapy (ART).
-
         processing_level: minor
         display:
           numDecimalPlaces: 0
@@ -43,50 +35,36 @@ tables:
         title: Country-reported HIV expenditure by funding source
         unit: US$
         short_unit: $
-        description: >-
+        description_short: |-
           HIV expenditure by funding source.
+        description_from_producer: |-
+          The indicator to be reported is total and subtotal HIV expenditures by services or programme categories and by financing sources. There are eight core sub-indicators that map to this reporting. These are outlined under Annex 3.
 
-        description_from_producer: >-
-          The indicator to be reported is total and subtotal HIV expenditures by services or programme categories and by financing sources.
-          There are eight core sub-indicators that map to this reporting. These are outlined under Annex 3.
-
-          The calculation of each service/programme or sub-indicator may have individual characteristics to ensure proper accounting
-          of all components (e.g., direct and shared costs of service provision) and to avoid double-counting; these calculations may
-          be different by each financing source and service delivery modality (or even by service provider). Further guidance is
-          available in the respective guidelines and manuals listed at the end of this section.
-
+          The calculation of each service/programme or sub-indicator may have individual characteristics to ensure proper accounting of all components (e.g., direct and shared costs of service provision) and to avoid double-counting; these calculations may be different by each financing source and service delivery modality (or even by service provider). Further guidance is available in the respective guidelines and manuals listed at the end of this section.
         processing_level: minor
 
       domestic_spending_fund_source_per_capita:
         title: Country-reported HIV expenditure by funding source (per capita)
         unit: US$ per capita
-        description: >-
+        description_short: |-
           HIV expenditure by funding source per capita.
+        description_from_producer: |-
+          The indicator to be reported is total and subtotal HIV expenditures by services or programme categories and by financing sources. There are eight core sub-indicators that map to this reporting. These are outlined under Annex 3.
 
-        description_from_producer: >-
-          The indicator to be reported is total and subtotal HIV expenditures by services or programme categories and by financing sources.
-          There are eight core sub-indicators that map to this reporting. These are outlined under Annex 3.
-
-          The calculation of each service/programme or sub-indicator may have individual characteristics to ensure proper accounting
-          of all components (e.g., direct and shared costs of service provision) and to avoid double-counting; these calculations may
-          be different by each financing source and service delivery modality (or even by service provider). Further guidance is
-          available in the respective guidelines and manuals listed at the end of this section.
+          The calculation of each service/programme or sub-indicator may have individual characteristics to ensure proper accounting of all components (e.g., direct and shared costs of service provision) and to avoid double-counting; these calculations may be different by each financing source and service delivery modality (or even by service provider). Further guidance is available in the respective guidelines and manuals listed at the end of this section.
 
       hiv_prevalence:
         title: HIV Prevalence
         unit: "%"
         short_unit: "%"
-        description: >-
+        description_short: |-
           Percentage of people in a specific key population who test positive for HIV.
-
-
-          Additionally, upper and lower estimates are provided.
         processing_level: minor
 
       aids_orphans:
         title: Children orphaned due to AIDS deaths
         unit: "orphans"
-        description: >-
+        description_short: |-
           Number of children, aged 17 and under, orphaned by the death of one or both parents from AIDS.
         processing_level: minor
 
@@ -94,30 +72,27 @@ tables:
         title: Condom use at last high-risk sex
         short_unit: "%"
         unit: "%"
-        description: >-
-          Share of people in a population, who reported the use of a condom the last time they had sexual intercourse with a non-marital,
-          non-cohabiting sexual partner.
+        description_short: |-
+          Share of people in a population, who reported the use of a condom the last time they had sexual intercourse with a non-marital, non-cohabiting sexual partner.
         processing_level: minor
 
       discriminatory_attitudes:
         title: Discriminatory attitudes towards people living with HIV
         short_unit: "%"
         unit: "%"
-        description: >-
-          Percentage of people in a population who report discriminatory attitudes towards people living with HIV, countries with
-          available data, 2018–2022.
+        description_short: |-
+          Percentage of people in a population who report discriminatory attitudes towards people living with HIV, countries with available data, 2018–2022.
 
-
-          Discriminatory attitudes are measured through “No” responses to either of two questions: (1) Would you buy fresh vegetables
-          from a shopkeeper or vendor if you knew this person had HIV?; and (2) Do you think children living with HIV should be able
-          to attend school with children who are HIV-negative?
+        description_key:
+          - |-
+            Discriminatory attitudes are measured through “No” responses to either of two questions: (1) Would you buy fresh vegetables from a shopkeeper or vendor if you knew this person had HIV?; and (2) Do you think children living with HIV should be able to attend school with children who are HIV-negative?
         processing_level: minor
 
       gap_on_art:
         title: Gap to reaching the target percent of people receiving ART
         short_unit: "%"
         unit: "%"
-        description: >-
+        description_short: |-
           Coverage gap in ensuring target percentage of people living with HIV receiving antiretroviral therapy (ART).
         processing_level: minor
 
@@ -125,32 +100,28 @@ tables:
         title: HIV Incidence per 1000 population
         short_unit: ""
         unit: "infections per 1000 uninfected population"
-        description_from_producer: >-
-          Number of new HIV infections per 1000 uninfected population. The incidence rate is the number of new cases per population
-          at risk in a given time period. Numerator: Number of new HIV infections. Denominator: Uninfected population (which is
-          the total population minus people living with HIV).
-
-          Diaggregation: Age groups (0−14, 15−24, 15−49, 50+ years), General population, Key populations
-          (men who have sex with men,sex workers,People who inject drugs,transgender people, prisoners, Key
-          populations (less than 25 years, 25+ years), Mode of transmission for children (including
-          mother-to-child transmission), Geographic location, Sex.
-
+        description_from_producer: |-
+          Number of new HIV infections per 1000 uninfected population. The incidence rate is the number of new cases per populationat risk in a given time period. Numerator: Number of new HIV infections. Denominator: Uninfected population (which isthe total population minus people living with HIV).
+        description_key:
+          - |-
+            The indicator is disaggregated by age groups (0−14, 15−24, 15−49, 50+ years, less than 25 years, 25+ years), general population, key populations (men who have sex with men,sex workers, people who inject drugs, transgender people, prisoners, mode of transmission for children (includingmother-to-child transmission), geographic location, sex.
         processing_level: minor
 
       hiv_tb_patients_receiving_art:
         title: Tuberculosis patients living with HIV receiving ART
         short_unit: ""
         unit: "patients"
-        description_from_producer: >-
+        description_from_producer: |-
           The number of patients with tuberculosis living with HIV that are receiving ART.
-
         processing_level: minor
+        display:
+          numDecimalPlaces: 0
 
       infections_averted_pmtct:
         title: New HIV Infections averted due to PMTCT
         short_unit: ""
         unit: "infections"
-        description: >-
+        description_short: |-
           New HIV infections averted from prevention of mother-to-child transmission.
         processing_level: minor
 
@@ -158,20 +129,14 @@ tables:
         title: Knowledge about HIV prevention in young people
         short_unit: "%"
         unit: "%"
-        description_from_producer: >-
-          HIV epidemics are perpetuated primarily through the sexual transmission of infection to successive generations
-          of young people. Sound knowledge about HIV and AIDS is necessary (although often insufficient) for adopting
-          behaviour that reduces the risk of HIV transmission.
-
+        description_from_producer: |-
+          HIV epidemics are perpetuated primarily through the sexual transmission of infection to successive generations of young people. Sound knowledge about HIV and AIDS is necessary (although often insufficient) for adopting behaviour that reduces the risk of HIV transmission.
 
           Method of measurement:
 
-          Population-based surveys (Demographic and Health Survey, AIDS Indicator Survey, Multiple Indicator Cluster Survey or other
-          representative survey)
+          Population-based surveys (Demographic and Health Survey, AIDS Indicator Survey, Multiple Indicator Cluster Survey or other representative survey)
 
-          This indicator is constructed from responses to the following set of prompted questions. In particular, as the percentage of
-          respondents 15–24 years old who correctly answered all five questions.
-
+          This indicator is constructed from responses to the following set of prompted questions. In particular, as the percentage of respondents 15–24 years old who correctly answered all five questions.
 
             1. Can the risk of HIV transmission be reduced by having sex with only one uninfected partner who has no other partners?
 
@@ -184,55 +149,40 @@ tables:
             5. Can a person get HIV by sharing food with someone who is infected?
 
 
-          The first three questions should not be altered. Questions 4 and 5 ask about local misconceptions and may be replaced by the most
-          common misconceptions in your country. Examples include: “Can a person get HIV by hugging or shaking hands with a person who is
-          infected?” and “Can a person get HIV through supernatural means?”
+          The first three questions should not be altered. Questions 4 and 5 ask about local misconceptions and may be replaced by the most common misconceptions in your country. Examples include: “Can a person get HIV by hugging or shaking hands with a person who is infected?” and “Can a person get HIV through supernatural means?”
 
-          Those who have never heard of HIV and AIDS should be excluded from the numerator but included in the denominator. An answer of
-          “don’t know” should be recorded as an incorrect answer.
+          Those who have never heard of HIV and AIDS should be excluded from the numerator but included in the denominator. An answer of “don't know” should be recorded as an incorrect answer.
 
-          Scores for each of the individual questions (based on the same denominator) are required as well as the score for the composite
-          indicator.
+          Scores for each of the individual questions (based on the same denominator) are required as well as the score for the composite indicator.
 
           Disaggregation:
 
-            • Age (15–19 and 20–24 years)
-
-            • Gender (male, female)
+          - Age (15–19 and 20–24 years)
+          - Gender (male, female)
         processing_level: minor
 
       msm_condom_use:
         title: Condom use among men who have sex with men
         short_unit: "%"
         unit: "%"
-        description_from_producer: >-
-          Condoms can substantially reduce the risk of sexually transmitting HIV. Consistently and correctly using condoms is therefore
-          important for men who have sex with men because of the high risk of HIV transmission during unprotected anal sex. In addition,
-          men who have anal sex with other men may also have female partners, who could become infected as well. Condom use with the
-          most recent male partner is considered a reliable indicator of longer-term behaviour.
+        description_from_producer: |-
+          Condoms can substantially reduce the risk of sexually transmitting HIV. Consistently and correctly using condoms is therefore important for men who have sex with men because of the high risk of HIV transmission during unprotected anal sex. In addition, men who have anal sex with other men may also have female partners, who could become infected as well. Condom use with the most recent male partner is considered a reliable indicator of longer-term behaviour.
 
-
-          Note: countries with generalized epidemics may also have a concentrated subepidemic among gay men and other men
-          who have sex with men. If so, calculating and reporting on this indicator for this population would be valuable.
-
+          Note: countries with generalized epidemics may also have a concentrated subepidemic among gay men and other men who have sex with men. If so, calculating and reporting on this indicator for this population would be valuable.
 
           Method of measurement:
 
           Behavioural surveillance or other special surveys
 
-          In a behavioural survey of a sample of gay men and other men who have sex with men, respondents are asked about sexual
-          partnerships in the past six months, about anal sex within these partnerships and about condom use when they last had anal
-          sex. Condom use applies whether the respondent is the receptive and insertive partner.
+          In a behavioural survey of a sample of gay men and other men who have sex with men, respondents are asked about sexual partnerships in the past six months, about anal sex within these partnerships and about condom use when they last had anal sex. Condom use applies whether the respondent is the receptive and insertive partner.
 
-          Whenever possible, data for gay men and other men who have sex with men should be collected with civil society
-          organizations that have worked closely with this population in the field.
+          Whenever possible, data for gay men and other men who have sex with men should be collected with civil society organizations that have worked closely with this population in the field.
 
           Access to gay men and other men who have sex with men and the data collected from them must remain confidential and secure.
 
-
           Disaggregation:
 
-            • Age (<25 and 25+ years)
+          - Age (<25 and 25+ years)
 
         processing_level: minor
 
@@ -240,23 +190,27 @@ tables:
         title: Tuberculosis patients tested positive for HIV
         short_unit: ""
         unit: "patients"
-        description: >-
+        description_short: |-
           Number of tuberculosis patients that tested positive for HIV.
         processing_level: minor
+        display:
+          numDecimalPlaces: 0
 
       tb_related_deaths:
         title: Estimated TB-related deaths among people living with HIV
         short_unit: ""
         unit: "deaths"
-        description: >-
+        description_short: |-
           Number of deaths from people living with HIV that are related to tuberculosis.
         processing_level: minor
+        display:
+          numDecimalPlaces: 0
 
       new_infections:
         title: New HIV Infections
         short_unit: ""
         unit: "infections"
-        description: >-
+        description_short: |-
           Number of newly HIV infected people in a year.
         processing_level: minor
 
@@ -264,7 +218,7 @@ tables:
         title: "Estimated HIV resource availability for low- and middle-income countries in constant 2019 USD"
         short_unit: "$"
         unit: "constant 2019 US$"
-        description: >-
+        description_short: |-
           Availability of resources for HIV in low- and middle-income countries in constant 2019 USD.
         processing_level: minor
         display:
@@ -275,10 +229,9 @@ tables:
         title: "Estimated resource needs"
         short_unit: "$"
         unit: "constant 2019 US$"
-        description: >-
+        description_short: |-
           Estimated resource needs for HIV in low- and middle-income countries in constant 2019 USD.
         processing_level: minor
         display:
           name: Estimated resource needs to meet HIV targets
           numDecimalPlaces: 0
-

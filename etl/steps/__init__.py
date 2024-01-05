@@ -2,7 +2,6 @@
 #  __init__.py
 #  steps
 #
-import concurrent.futures
 import graphlib
 import hashlib
 import os
@@ -10,16 +9,18 @@ import re
 import subprocess
 import sys
 import tempfile
+import time
 import warnings
 from collections import defaultdict
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import dataclass, field
 from glob import glob
 from importlib import import_module
 from pathlib import Path
-from threading import Lock
 from typing import Any, Dict, Iterable, List, Optional, Protocol, Set, Union, cast
 from urllib.parse import urlparse
 
+import fasteners
 import pandas as pd
 import requests
 import structlog
@@ -28,18 +29,18 @@ from owid import catalog
 from owid.walden import CATALOG as WALDEN_CATALOG
 from owid.walden import Dataset as WaldenDataset
 
-from etl import config, files, git
+from etl import config, files, git, paths
 from etl import grapher_helpers as gh
-from etl import paths
 from etl.db import get_engine
-from etl.snapshot import _unignore_backports
+from etl.snapshot import Snapshot
 
 log = structlog.get_logger()
 
 Graph = Dict[str, Set[str]]
 DAG = Dict[str, Any]
 
-dvc_lock = Lock()
+
+ipynb_lock = fasteners.InterProcessLock(paths.BASE_DIR / ".dvc/tmp/ipynb_lock")
 
 
 def compile_steps(
@@ -99,7 +100,7 @@ def filter_to_subgraph(graph: Graph, includes: Iterable[str], downstream: bool =
 
     if only:
         # Only include explicitly selected nodes
-        return {step: graph[step] & included for step in included}
+        return {step: graph.get(step, set()) & included for step in included}
 
     if downstream:
         # Reverse the graph to find all nodes dependent on included nodes (forward deps)
@@ -320,8 +321,9 @@ class Step(Protocol):
     path: str
     is_public: bool = True
     version: str
+    dependencies: List["Step"]
 
-    def run(self, strict: bool = False) -> None:
+    def run(self) -> None:
         ...
 
     def is_dirty(self) -> bool:
@@ -329,6 +331,9 @@ class Step(Protocol):
 
     def checksum_output(self) -> str:
         ...
+
+    def __str__(self) -> str:
+        raise NotImplementedError()
 
 
 @dataclass
@@ -393,8 +398,11 @@ class DataStep(Step):
             else:
                 self._run_py()
 
+        # We lock this to prevent the following error
+        # ImportError: PyO3 modules may only be initialized once per interpreter process
         elif sp.with_suffix(".ipynb").exists():
-            self._run_notebook()
+            with ipynb_lock:
+                self._run_notebook()
 
         else:
             raise Exception(f"have no idea how to run step: {self.path}")
@@ -550,10 +558,15 @@ class DataStep(Step):
 
     def _run_notebook(self) -> None:
         "Run a parameterised Jupyter notebook."
-        # smother deprecation warnings by papermill
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore")
-            import papermill as pm
+        # don't import it again if it's already imported to avoid
+        # ImportError: PyO3 modules may only be initialized once per interpreter process
+        if "papermill" not in sys.modules:
+            # smother deprecation warnings by papermill
+            with warnings.catch_warnings():
+                warnings.simplefilter("ignore")
+                import papermill as pm
+        else:
+            pm = sys.modules["papermill"]
 
         notebook_path = self._search_path.with_suffix(".ipynb")
         with tempfile.TemporaryDirectory() as tmp_dir:
@@ -574,6 +587,7 @@ class DataStep(Step):
 @dataclass
 class WaldenStep(Step):
     path: str
+    dependencies = []
 
     def __init__(self, path: str) -> None:
         self.path = path
@@ -636,6 +650,7 @@ class WaldenStep(Step):
 @dataclass
 class SnapshotStep(Step):
     path: str
+    dependencies = []
 
     def __init__(self, path: str) -> None:
         self.path = path
@@ -644,37 +659,22 @@ class SnapshotStep(Step):
         return f"snapshot://{self.path}"
 
     def run(self) -> None:
-        from dvc.exceptions import CheckoutError
-        from dvc.repo import Repo
-
-        with _unignore_backports(Path(self._path)):
-            try:
-                Repo(paths.BASE_DIR).pull(self._path, remote="public-read", force=True)
-            except CheckoutError as e:
-                raise Exception(
-                    "File not found in DVC. Have you run the snapshot script? Make sure you're not using `is_public: false`."
-                ) from e
+        snap = Snapshot(self.path)
+        snap.pull(force=True)
 
     def is_dirty(self) -> bool:
-        # check if the snapshot has been added to DVC
-        from dvc.dvcfile import load_file
-        from dvc.repo import Repo
-
-        with open(self._dvc_path) as istream:
-            if "outs:\n" not in istream.read():
-                raise Exception(f"File {self._dvc_path} has not been added to DVC. Run snapshot script to add it.")
-
-        with _unignore_backports(Path(self._dvc_path)), dvc_lock:
-            repo = Repo(paths.BASE_DIR)
-            dvc_file = load_file(repo, self._dvc_path)
-            with repo.lock:
-                # DVC returns empty dictionary if file is up to date
-                return dvc_file.stage.status() != {}
+        snap = Snapshot(self.path)
+        return snap.is_dirty()
 
     def has_existing_data(self) -> bool:
         return True
 
     def checksum_output(self) -> str:
+        # NOTE: we could use the checksum from `_dvc_path` to
+        # speed this up. Test the performance on
+        # time poetry run etl garden --dry-run
+        # Make sure that the checksum below is the same as DVC checksum! It
+        # looks like it might be different for some reason
         return files.checksum_file(self._dvc_path)
 
     @property
@@ -696,16 +696,9 @@ class SnapshotStepPrivate(SnapshotStep):
         return f"snapshot-private://{self.path}"
 
     def run(self) -> None:
-        from dvc.exceptions import CheckoutError
-        from dvc.repo import Repo
-
-        with _unignore_backports(Path(self._path)):
-            try:
-                Repo(paths.BASE_DIR).pull(self._path, remote="private", force=True)
-            except CheckoutError as e:
-                raise Exception(
-                    "File not found in DVC. Have you run the snapshot script with `is_public: false`?"
-                ) from e
+        snap = Snapshot(self.path)
+        assert snap.metadata.is_public is False
+        snap.pull(force=True)
 
 
 class GrapherStep(Step):
@@ -718,12 +711,14 @@ class GrapherStep(Step):
 
     path: str
     data_step: DataStep
+    dependencies: List[Step]
 
     def __init__(self, path: str, dependencies: List[Step]) -> None:
         # GrapherStep should have exactly one DataStep dependency
         assert len(dependencies) == 1
         assert path == dependencies[0].path
         assert isinstance(dependencies[0], DataStep)
+        self.dependencies = dependencies
         self.path = path
         self.data_step = dependencies[0]
 
@@ -771,42 +766,57 @@ class GrapherStep(Step):
             dataset.metadata.sources,
         )
 
-        with concurrent.futures.ThreadPoolExecutor(max_workers=config.GRAPHER_INSERT_WORKERS) as thread_pool:
+        with ThreadPoolExecutor(max_workers=config.GRAPHER_INSERT_WORKERS) as thread_pool:
             futures = []
+            verbose = True
+            i = 0
 
             # NOTE: multiple tables will be saved under a single dataset, this could cause problems if someone
             # is fetching the whole dataset from data-api as they would receive all tables merged in a single
             # table. This won't be a problem after we introduce the concept of "tables"
             for table in dataset:
+                assert not table.empty, f"table {table.metadata.short_name} is empty"
+
                 # if GRAPHER_FILTER is set, only upsert matching columns
                 if config.GRAPHER_FILTER:
                     cols = table.filter(regex=config.GRAPHER_FILTER).columns.tolist()
                     cols += [c for c in table.columns if c in {"year", "country"} and c not in cols]
                     table = table.loc[:, cols]
 
-                catalog_path = f"{self.path}/{table.metadata.short_name}"
-
                 table = gh._adapt_table_for_grapher(table)
 
-                # generate table with entity_id, year and value for every column
-                upsert = lambda t: gi.upsert_table(  # noqa: E731
-                    engine,
-                    t,
-                    dataset_upsert_results,
-                    catalog_path=catalog_path,
-                    dimensions=(t.iloc[:, 0].metadata.additional_info or {}).get("dimensions"),
-                )
-
                 for t in gh._yield_wide_table(table, na_action="drop"):
-                    futures.append(thread_pool.submit(upsert, t))
+                    i += 1
+                    assert len(t.columns) == 1
+                    catalog_path = f"{self.path}/{table.metadata.short_name}#{t.columns[0]}"
 
-            variable_upsert_results = [future.result() for future in concurrent.futures.as_completed(futures)]
+                    # stop logging to stop cluttering logs
+                    if i > 20 and verbose:
+                        verbose = False
+                        thread_pool.submit(
+                            lambda: (time.sleep(10), log.info("upsert_dataset.continue_without_logging"))
+                        )
+
+                    # generate table with entity_id, year and value for every column
+                    futures.append(
+                        thread_pool.submit(
+                            gi.upsert_table,
+                            engine,
+                            t,
+                            dataset_upsert_results,
+                            catalog_path=catalog_path,
+                            dimensions=(t.iloc[:, 0].metadata.additional_info or {}).get("dimensions"),
+                            verbose=verbose,
+                        )
+                    )
+
+            variable_upsert_results = [future.result() for future in as_completed(futures)]
 
         if not config.GRAPHER_FILTER:
             self._cleanup_ghost_resources(dataset_upsert_results, variable_upsert_results)
 
-        # set checksum and updatedAt timestamps after all data got inserted
-        gi.set_dataset_checksum_and_editedAt(dataset_upsert_results.dataset_id, self.data_step.checksum_input())
+            # set checksum and updatedAt timestamps after all data got inserted
+            gi.set_dataset_checksum_and_editedAt(dataset_upsert_results.dataset_id, self.data_step.checksum_input())
 
     def checksum_output(self) -> str:
         raise NotImplementedError("GrapherStep should not be used as an input")
@@ -828,6 +838,7 @@ class GrapherStep(Step):
         upserted_source_ids = list(dataset_upsert_results.source_ids.values()) + [
             r.source_id for r in variable_upsert_results
         ]
+        upserted_source_ids = [source_id for source_id in upserted_source_ids if source_id is not None]
         # Try to cleanup ghost variables, but make sure to raise an error if they are used
         # in any chart
         gi.cleanup_ghost_variables(
@@ -848,6 +859,7 @@ class GithubStep(Step):
     path: str
     gh_repo: git.GithubRepo = field(repr=False)
     version: str = "latest"
+    dependencies = []
 
     def __init__(self, path: str) -> None:
         self.path = path
@@ -886,9 +898,13 @@ class ETagStep(Step):
 
     path: str
     version: str = "latest"
+    dependencies = []
 
     def __init__(self, path: str) -> None:
         self.path = path
+
+    def __str__(self) -> str:
+        return f"etag://{self.path}"
 
     def is_dirty(self) -> bool:
         return False
@@ -902,6 +918,8 @@ class ETagStep(Step):
 
 
 class BackportStep(DataStep):
+    dependencies = []
+
     def __str__(self) -> str:
         return f"backport://{self.path}"
 
@@ -944,6 +962,7 @@ class DataStepPrivate(PrivateMixin, DataStep):
 
 class WaldenStepPrivate(WaldenStep):
     is_public = False
+    dependencies = []
 
     def __str__(self) -> str:
         return f"walden-private://{self.path}"
@@ -956,7 +975,7 @@ class BackportStepPrivate(PrivateMixin, BackportStep):
         return f"backport-private://{self.path}"
 
 
-def select_dirty_steps(steps: List[Step], max_workers: int) -> List[Step]:
+def select_dirty_steps(steps: List[Step], workers: int = 1) -> List[Step]:
     """Select dirty steps using threadpool."""
     # dynamically add cached version of `is_dirty` to all steps to avoid re-computing
     # this is a bit hacky, but it's the easiest way to only cache it here without
@@ -965,13 +984,17 @@ def select_dirty_steps(steps: List[Step], max_workers: int) -> List[Step]:
     for s in steps:
         _add_is_dirty_cached(s, cache_is_dirty)
 
-    with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
-        steps_dirty = executor.map(lambda s: s.is_dirty(), steps)  # type: ignore
+    with ThreadPoolExecutor(max_workers=workers) as executor:
+        steps_dirty = executor.map(_step_is_dirty, steps)  # type: ignore
         steps = [s for s, is_dirty in zip(steps, steps_dirty) if is_dirty]
 
     cache_is_dirty.clear()
 
     return steps
+
+
+def _step_is_dirty(s: Step) -> bool:
+    return s.is_dirty()
 
 
 def _cached_is_dirty(self: Step, cache: files.RuntimeCache) -> bool:

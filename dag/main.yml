@@ -209,9 +209,9 @@ steps:
     - data://garden/demography/2023-10-09/life_expectancy
     - data://garden/owid/latest/key_indicators
     - data://garden/regions/2023-01-01/regions
-    - data://garden/gcp/2023-09-28/global_carbon_budget
+    - data://garden/gcp/2023-12-12/global_carbon_budget
     - data://garden/democracy/2023-03-02/vdem
-    - data://garden/energy/2023-07-10/energy_mix
+    - data://garden/energy/2023-12-12/energy_mix
     - data://garden/worldbank_wdi/2022-05-26/wdi
 
   # Global GDP in the long run
@@ -325,14 +325,6 @@ steps:
     - data://meadow/technology/2023-03-08/microprocessor_trend
   data://grapher/technology/2023-03-09/microprocessor_trend:
     - data://garden/technology/2023-03-08/microprocessor_trend
-
-  # Trust questions in World Values Survey
-  data://meadow/wvs/2023-03-08/wvs_trust:
-    - snapshot://wvs/2023-03-08/wvs_trust.csv
-  data://garden/wvs/2023-03-08/wvs_trust:
-    - data://meadow/wvs/2023-03-08/wvs_trust
-  data://grapher/wvs/2023-03-08/wvs_trust:
-    - data://garden/wvs/2023-03-08/wvs_trust
 
   # Terrorism questions in World Values Survey (longitudinal)
   data://meadow/wvs/2023-06-25/longitudinal_wvs:
@@ -478,12 +470,12 @@ steps:
     - data://garden/wb/2023-04-30/income_groups
 
   # International Monetary Fund, World Economic Outlook
-  data://meadow/imf/2023-05-02/world_economic_outlook:
-    - snapshot://imf/2023-05-02/world_economic_outlook.xls
-  data://garden/imf/2023-05-02/world_economic_outlook:
-    - data://meadow/imf/2023-05-02/world_economic_outlook
-  data://grapher/imf/2023-05-02/world_economic_outlook:
-    - data://garden/imf/2023-05-02/world_economic_outlook
+  data://meadow/imf/2023-11-02/world_economic_outlook:
+    - snapshot://imf/2023-11-02/world_economic_outlook.xls
+  data://garden/imf/2023-11-02/world_economic_outlook:
+    - data://meadow/imf/2023-11-02/world_economic_outlook
+  data://grapher/imf/2023-11-02/world_economic_outlook:
+    - data://garden/imf/2023-11-02/world_economic_outlook
 
   # Patents & journal articles (World Bank, United Nations)
   data://garden/research_development/2023-05-05/patents_articles:
@@ -556,6 +548,7 @@ steps:
     - data://meadow/harvard/2023-09-18/colonial_dates_dataset
     - data://garden/wb/2021-07-01/wb_income
     - data://garden/regions/2023-01-01/regions
+    - data://garden/demography/2023-03-31/population
   data://grapher/harvard/2023-09-18/colonial_dates_dataset:
     - data://garden/harvard/2023-09-18/colonial_dates_dataset
 
@@ -630,6 +623,121 @@ steps:
   data://grapher/gapminder/2023-09-22/total_fertility_rate:
     - data://garden/gapminder/2023-09-22/total_fertility_rate
 
+  # State Capacity Dataset
+  data://meadow/state_capacity/2023-10-19/state_capacity_dataset:
+    - snapshot://state_capacity/2023-10-19/state_capacity_dataset.dta
+  data://garden/state_capacity/2023-10-19/state_capacity_dataset:
+    - data://meadow/state_capacity/2023-10-19/state_capacity_dataset
+    - data://garden/wb/2021-07-01/wb_income
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/demography/2023-03-31/population
+  data://grapher/state_capacity/2023-10-19/state_capacity_dataset:
+    - data://garden/state_capacity/2023-10-19/state_capacity_dataset
+
+  # United Nations members
+  data://meadow/un/2023-10-30/un_members:
+    - snapshot://un/2023-10-30/un_members.csv
+  data://garden/un/2023-10-30/un_members:
+    - data://meadow/un/2023-10-30/un_members
+    - data://garden/wb/2021-07-01/wb_income
+    - data://garden/regions/2023-01-01/regions
+    - data://grapher/regions/latest/regions
+    - data://garden/demography/2023-03-31/population
+  data://grapher/un/2023-10-30/un_members:
+    - data://garden/un/2023-10-30/un_members
+
+  # UNU-WIDER Government Revenue Dataset
+  data://meadow/unu_wider/2023-11-01/government_revenue_dataset:
+    - snapshot://unu_wider/2023-11-01/government_revenue_dataset.dta
+  data://garden/unu_wider/2023-11-01/government_revenue_dataset:
+    - data://meadow/unu_wider/2023-11-01/government_revenue_dataset
+  data://grapher/unu_wider/2023-11-01/government_revenue_dataset:
+    - data://garden/unu_wider/2023-11-01/government_revenue_dataset
+
+  # World Bank - Worldwide Bureaucracy Indicators
+  data://meadow/wb/2023-11-21/worldwide_bureaucracy_indicators:
+    - snapshot://wb/2023-11-21/worldwide_bureaucracy_indicators.csv
+  data://garden/wb/2023-11-21/worldwide_bureaucracy_indicators:
+    - data://meadow/wb/2023-11-21/worldwide_bureaucracy_indicators
+  data://grapher/wb/2023-11-21/worldwide_bureaucracy_indicators:
+    - data://garden/wb/2023-11-21/worldwide_bureaucracy_indicators
+
+  # Information Capacity Dataset
+  data://meadow/state_capacity/2023-11-10/information_capacity_dataset:
+    - snapshot://state_capacity/2023-11-10/information_capacity_dataset.dta
+  data://garden/state_capacity/2023-11-10/information_capacity_dataset:
+    - data://meadow/state_capacity/2023-11-10/information_capacity_dataset
+    - data://garden/wb/2021-07-01/wb_income
+    - data://garden/regions/2023-01-01/regions
+  data://grapher/state_capacity/2023-11-20/information_capacity_dataset:
+    - data://garden/state_capacity/2023-11-10/information_capacity_dataset
+
+  # Integrated Values Survey
+  data://meadow/ivs/2023-11-27/integrated_values_survey:
+    - snapshot://ivs/2023-11-27/integrated_values_survey.csv
+  data://garden/ivs/2023-11-27/integrated_values_survey:
+    - data://meadow/ivs/2023-11-27/integrated_values_survey
+  data://grapher/ivs/2023-11-27/integrated_values_survey:
+    - data://garden/ivs/2023-11-27/integrated_values_survey
+
+  # National Human Genome Research Institute - DNA Sequencing Costs
+  data://meadow/technology/2023-11-28/dna_sequencing:
+    - snapshot://technology/2023-11-28/dna_sequencing.xls
+  data://garden/technology/2023-11-28/dna_sequencing:
+    - data://meadow/technology/2023-11-28/dna_sequencing
+  data://grapher/technology/2023-11-28/dna_sequencing:
+    - data://garden/technology/2023-11-28/dna_sequencing
+
+  # European Social Survey - Trust questions
+  data://meadow/ess/2023-08-02/ess_trust:
+    - snapshot://ess/2023-08-02/ess_trust.csv
+    - data://garden/regions/2023-01-01/regions
+  data://garden/ess/2023-08-02/ess_trust:
+    - data://meadow/ess/2023-08-02/ess_trust
+  data://grapher/ess/2023-08-02/ess_trust:
+    - data://garden/ess/2023-08-02/ess_trust
+
+  # Latinobarómetro survey - Trust
+  data://meadow/survey/2023-08-04/latinobarometro_trust:
+    - snapshot://survey/2023-08-04/latinobarometro_trust.csv
+  data://garden/survey/2023-08-04/latinobarometro_trust:
+    - data://meadow/survey/2023-08-04/latinobarometro_trust
+
+  # Afrobarometer survey - Trust
+  data://meadow/survey/2023-08-07/afrobarometer_trust:
+    - snapshot://survey/2023-08-07/afrobarometer_trust.csv
+  data://garden/survey/2023-08-07/afrobarometer_trust:
+    - data://meadow/survey/2023-08-07/afrobarometer_trust
+
+  # Trust surveys
+  data://garden/survey/2023-08-04/trust_surveys:
+    - data://garden/survey/2023-08-04/latinobarometro_trust
+    - data://garden/survey/2023-08-07/afrobarometer_trust
+    - data://garden/ess/2023-08-02/ess_trust
+  data://grapher/survey/2023-08-04/trust_surveys:
+    - data://garden/survey/2023-08-04/trust_surveys
+
+  # Historical poverty data - Moatsos (2021)
+  data://meadow/moatsos/2023-10-09/moatsos_historical_poverty:
+    - snapshot://moatsos/2023-10-09/moatsos_historical_poverty_oecd.csv
+    - snapshot://moatsos/2023-10-09/moatsos_historical_poverty_oecd_countries_share.xlsx
+    - snapshot://moatsos/2023-10-09/moatsos_historical_poverty_oecd_regions_number.xlsx
+    - snapshot://moatsos/2023-10-09/moatsos_historical_poverty_5.csv
+    - snapshot://moatsos/2023-10-09/moatsos_historical_poverty_10.csv
+    - snapshot://moatsos/2023-10-09/moatsos_historical_poverty_30.csv
+  data://garden/moatsos/2023-10-09/moatsos_historical_poverty:
+    - data://meadow/moatsos/2023-10-09/moatsos_historical_poverty
+  data://grapher/moatsos/2023-10-09/moatsos_historical_poverty:
+    - data://garden/moatsos/2023-10-09/moatsos_historical_poverty
+
+  # World Bank GenderStats
+  data://meadow/wb/2023-12-29/gender_statistics:
+    - snapshot://wb/2023-12-29/gender_statistics.feather
+  data://garden/wb/2023-12-29/gender_statistics:
+    - data://meadow/wb/2023-12-29/gender_statistics
+  data://grapher/wb/2023-12-29/gender_statistics:
+    - data://garden/wb/2023-12-29/gender_statistics
+
   ######################################################################################################################
   # Older versions to be archived once they are not used by any other steps.
 
@@ -650,6 +758,13 @@ steps:
   data://garden/papers/2023-10-20/anthromes:
     - data://meadow/papers/2023-10-20/anthromes
     - data://meadow/papers/2023-10-20/anthromes_input
+  ######################################################################################################################
+  # Map (Natural Earth)
+  data://meadow/geography/2023-11-28/nat_earth_110:
+    - snapshot://geography/2023-11-28/nat_earth_110.zip
+  data://garden/geography/2023-11-28/nat_earth_110:
+    - data://meadow/geography/2023-11-28/nat_earth_110
+
   ######################################################################################################################
 
 include:

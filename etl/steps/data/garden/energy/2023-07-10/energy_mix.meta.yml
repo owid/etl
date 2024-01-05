@@ -1,3 +1,9 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+      - Energy mix
+
 dataset:
   title: Energy mix (Energy Institute, 2023)
   description: |

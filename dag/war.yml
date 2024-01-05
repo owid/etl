@@ -42,6 +42,8 @@ steps:
   data://garden/war/2023-09-21/ucdp:
     - data://meadow/war/2023-09-21/ucdp
     - data://garden/countries/2023-09-25/gleditsch
+    - data://garden/geography/2023-11-28/nat_earth_110
+    - data://garden/demography/2023-03-31/population
   data://grapher/war/2023-09-21/ucdp:
     - data://garden/war/2023-09-21/ucdp
 
@@ -64,6 +66,7 @@ steps:
   data://garden/war/2023-09-21/cow:
     - data://meadow/war/2023-09-21/cow
     - data://garden/countries/2023-09-29/cow_ssm
+    - data://garden/war/2023-11-29/chupilkin_koczan
   data://grapher/war/2023-09-21/cow:
     - data://garden/war/2023-09-21/cow
 
@@ -111,3 +114,17 @@ steps:
     - data://garden/countries/2023-09-29/cow_ssm
   data://grapher/war/2023-09-27/peace_diehl:
     - data://garden/war/2023-09-27/peace_diehl
+
+  # UCDP/PRIO
+  data://garden/war/2023-09-21/ucdp_prio:
+    - data://garden/war/2023-09-21/ucdp
+    - data://garden/war/2023-09-21/prio_v31
+    - data://garden/countries/2023-09-25/gleditsch
+  data://grapher/war/2023-10-24/ucdp_prio:
+    - data://garden/war/2023-09-21/ucdp_prio
+
+  # Chupilkin and Koczan (Supplementary dataset to CoW)
+  data://meadow/war/2023-11-29/chupilkin_koczan:
+    - snapshot://war/2023-11-29/chupilkin_koczan.dta
+  data://garden/war/2023-11-29/chupilkin_koczan:
+    - data://meadow/war/2023-11-29/chupilkin_koczan

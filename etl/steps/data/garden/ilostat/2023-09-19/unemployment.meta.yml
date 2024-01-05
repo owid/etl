@@ -1,3 +1,9 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Labor Supply & Employment
+
 
 dataset:
   title: "Unemployment rates, by age and education level (ILOSTAT)"

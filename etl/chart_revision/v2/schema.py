@@ -135,8 +135,9 @@ def validate_chart_config_and_remove_defaults(
 
         def _set_defaults(validator, properties, instance, schema):  # type: ignore
             for property, subschema in properties.items():
+                is_required = property in (schema or {}).get("required", [])
                 if "default" in subschema:
-                    if subschema["default"] == instance[property]:
+                    if not is_required and subschema["default"] == instance[property]:
                         del instance[property]
 
             for error in validate_properties(

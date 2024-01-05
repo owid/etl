@@ -11,6 +11,7 @@ import jsonschema
 import numpy as np
 import pandas as pd
 import pytest
+
 from owid.catalog import tables
 from owid.catalog.datasets import FileFormat
 from owid.catalog.meta import TableMeta, VariableMeta
@@ -20,7 +21,7 @@ from owid.catalog.tables import (
     get_unique_licenses_from_tables,
     get_unique_sources_from_tables,
 )
-from owid.catalog.variables import PROCESSING_LOG, Variable
+from owid.catalog.variables import Variable
 
 from .mocking import mock
 
@@ -209,9 +210,7 @@ def test_field_access_can_be_typecast():
 
 def test_tables_can_drop_duplicates():
     # https://github.com/owid/owid-catalog-py/issues/11
-    t: Table = Table({"gdp": [100, 100, 102, 104], "country": ["AU", "AU", "SE", "CH"]}).set_index(
-        "country"
-    )  # type: ignore
+    t: Table = Table({"gdp": [100, 100, 102, 104], "country": ["AU", "AU", "SE", "CH"]}).set_index("country")  # type: ignore
     t.metadata = mock(TableMeta)
 
     # in the bug, the dtype of t.duplicated() became object
@@ -307,37 +306,6 @@ def test_copy_metadata() -> None:
     # make sure it doesn't affect the original table
     t2.gdp.metadata.title = "new GDP"
     assert t.gdp.metadata.title == "GDP"
-
-
-def test_addition_without_metadata() -> None:
-    t: Table = Table({"a": [1, 2], "b": [3, 4]})
-    t["c"] = t["a"] + t["b"]
-    if PROCESSING_LOG:
-        expected_metadata = VariableMeta(processing_log=[{"variable": "c", "parents": ["a", "b"], "operation": "+"}])
-    else:
-        expected_metadata = VariableMeta()
-    assert t.c.metadata == expected_metadata
-
-
-def test_addition_with_metadata() -> None:
-    t: Table = Table({"a": [1, 2], "b": [3, 4]})
-    t.a.metadata.title = "A"
-    t.b.metadata.title = "B"
-
-    t["c"] = t["a"] + t["b"]
-
-    if PROCESSING_LOG:
-        expected_metadata = VariableMeta(processing_log=[{"variable": "c", "parents": ["a", "b"], "operation": "+"}])
-    else:
-        expected_metadata = VariableMeta()
-    assert t.c.metadata == expected_metadata
-
-    t.c.metadata.title = "C"
-
-    # addition shouldn't change the metadata of the original columns
-    assert t.a.metadata.title == "A"
-    assert t.b.metadata.title == "B"
-    assert t.c.metadata.title == "C"
 
 
 def test_addition_same_variable() -> None:
@@ -1004,3 +972,67 @@ def test_groupby_levels(table_1) -> None:
 def test_set_columns(table_1) -> None:
     table_1.columns = ["country", "year", "new_a", "new_b"]
     assert table_1.new_a.m.title == "Title of Table 1 Variable a"
+
+
+def test_fillna_with_number(table_1) -> None:
+    # Make a copy of table_1 and introduce a nan in it.
+    table = table_1.copy()
+    table.loc[0, "a"] = None
+    # Now fill it up with a number.
+    table["a"] = table["a"].fillna(0)
+    # The metadata of "a" should be preserved.
+    assert table["a"].metadata == table_1["a"].metadata
+
+
+def test_fillna_with_another_variable(table_1, origins, licenses) -> None:
+    # Make a copy of table_1 and introduce a nan in it.
+    tb = table_1.copy()
+    tb.loc[0, "a"] = None
+    # Now, instead of filling the nan with a number, fill it with another variable from the same table.
+    tb["a"] = tb["a"].fillna(tb["b"])
+    # The origins of the resulting variable should combine the origins of "a" and "b".
+    assert tb["a"].metadata.origins == [origins[2], origins[1], origins[3]]
+    # Idem for licenses.
+    assert tb["a"].metadata.licenses == [licenses[1], licenses[2], licenses[3]]
+    # Column "country" should not be affected.
+    assert tb["country"].metadata == table_1["country"].metadata
+    # Column "year" should not be affected.
+    assert tb["year"].metadata == table_1["year"].metadata
+    # Columns "a" and "b" have different titles and descriptions, so the combination should have no title.
+    assert tb["a"].metadata.title is None
+    assert tb["a"].metadata.description is None
+    # Column "b" should keep its original metadata.
+    assert tb["b"].metadata == table_1["b"].metadata
+    # Now check the table metadata has not changed.
+    assert tb.metadata == table_1.metadata
+
+
+def test_fillna_with_another_table(table_1, origins, licenses) -> None:
+    # Make a copy of table_1 and introduce a nan in it.
+    tb = table_1.copy()
+    tb.loc[0, "a"] = None
+    # Make another copy of table_1 with different origins and licenses.
+    tb2 = table_1.copy()
+    tb2.loc[0, "a"] = 10
+    tb2["a"].metadata.description = "Some new description, different from table_1['a']"
+    tb2["a"].metadata.origins = [origins[4]]
+    tb2["a"].metadata.licenses = [licenses[4]]
+    # Now, instead of filling the nan with a number, fill it with another variable from another table.
+    tb = tb.fillna(tb2)
+    # The origins of the resulting variable should combine the origins of table_1["a"] and tb2["a"].
+    assert tb["a"].metadata.origins == [origins[2], origins[1], origins[4]]
+    # Idem for licenses.
+    assert tb["a"].metadata.licenses == [licenses[1], licenses[4]]
+    # Column "country" should not be affected.
+    assert tb["country"].metadata == table_1["country"].metadata
+    assert tb2["country"].metadata == table_1["country"].metadata
+    # Column "year" should not be affected.
+    assert tb["year"].metadata == table_1["year"].metadata
+    assert tb2["year"].metadata == table_1["year"].metadata
+    # Columns tb["a"] and tb2["a"] have the same titles but different descriptions, so the combination should have the
+    # same title but no description.
+    assert tb["a"].metadata.title == table_1["a"].metadata.title
+    assert tb["a"].metadata.description is None
+    # # Now check the table metadata has not changed.
+    assert tb.metadata == table_1.metadata
+    assert tb2.metadata == table_1.metadata

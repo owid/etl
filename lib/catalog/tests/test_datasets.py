@@ -18,6 +18,7 @@ from unittest.mock import patch
 import pandas as pd
 import pytest
 import yaml
+
 from owid.catalog import Dataset, DatasetMeta, Table
 from owid.catalog.datasets import NonUniqueIndex, PrimaryKeyMissing
 
