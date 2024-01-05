@@ -1,0 +1,20 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+      - Climate Change
+    unit: ""
+    short_unit: ""
+
+dataset:
+  title: Ocean pH Levels
+  update_period_days: 60
+
+tables:
+  ocean_ph_levels:
+    title: Ocean pH levels
+    variables:
+      ocean_ph:
+        title: Monthly measurement of ocean pH levels
+      ocean_ph_yearly_average:
+        title: Rolling yearly average of ocean pH levels
