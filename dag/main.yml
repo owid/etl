@@ -743,6 +743,9 @@ steps:
     - snapshot://growth/2024-01-05/fariss_et_al_gdp.rds
     - snapshot://growth/2024-01-05/fariss_et_al_gdp_pc.rds
     - snapshot://growth/2024-01-05/fariss_et_al_pop.rds
+  data://garden/growth/2024-01-05/fariss_et_al:
+    - data://meadow/growth/2024-01-05/fariss_et_al
+    - data://garden/countries/2023-09-25/gleditsch
 
   ######################################################################################################################
   # Older versions to be archived once they are not used by any other steps.
