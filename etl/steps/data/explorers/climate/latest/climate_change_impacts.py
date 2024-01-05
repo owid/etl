@@ -14,8 +14,8 @@ paths = PathFinder(__file__)
 
 
 def prepare_sea_ice_extent(tb_nsidc: Table) -> Table:
-    # Create a table with the minimum and maximum Arctic sea ice extent, and another for the Antarctic sea ice extent.
-    # Assume minimum and maximum occur in February and September every year.
+    # Create a table with the minimum and maximum Arctic sea ice extent.
+    # Assume minimum and maximum occur in September and February every year.
     tb_nsidc["month"] = tb_nsidc["date"].astype(str).str[5:7]
     tb_nsidc["year"] = tb_nsidc["date"].astype(str).str[0:4].astype(int)
     arctic_sea_ice_extent = (
@@ -23,11 +23,19 @@ def prepare_sea_ice_extent(tb_nsidc: Table) -> Table:
         .pivot(index=["location", "year"], columns=["month"], values="sea_ice_extent", join_column_levels_with=" ")
         .rename(columns={"02": "arctic_sea_ice_extent_max", "09": "arctic_sea_ice_extent_min"}, errors="raise")
     )
+    # Instead of calling the location a generic "Northern Hemisphere", call it "Arctic Ocean".
+    arctic_sea_ice_extent["location"] = "Arctic Ocean"
+
+    # Idem for the Antarctic sea ice extent.
+    # Assume maximum and minimum occur in September and February every year.
     antarctic_sea_ice_extent = (
         tb_nsidc[(tb_nsidc["location"] == "Southern Hemisphere") & (tb_nsidc["month"].isin(["02", "09"]))]
         .pivot(index=["location", "year"], columns=["month"], values="sea_ice_extent", join_column_levels_with=" ")
         .rename(columns={"02": "antarctic_sea_ice_extent_min", "09": "antarctic_sea_ice_extent_max"}, errors="raise")
     )
+    # Instead of calling the location a generic "Southern Hemisphere", call it "Antarctica".
+    antarctic_sea_ice_extent["location"] = "Antarctica"
+
     return arctic_sea_ice_extent, antarctic_sea_ice_extent
 
 
