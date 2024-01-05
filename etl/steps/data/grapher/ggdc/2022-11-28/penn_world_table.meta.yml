@@ -7,6 +7,7 @@ definitions:
     sources: []
     origins:
       - producer: Feenstra et al. (2015), Penn World Table (2021)
+        attribution: Feenstra et al. (2015), Penn World Table (2021)
         title: Penn World Table
         description: >-
           Penn World Table is a database with information on GDP and its composition, employment, productivity and trade,
@@ -59,7 +60,6 @@ tables:
             title: GDP per capita
             subtitle: This data is adjusted for inflation and for differences in the cost of living between countries.
             variantName: Penn World Table, constant international-$
-            sourceDesc: Feenstra et al. (2015), Penn World Table (2021)
             originUrl: https://ourworldindata.org/economic-growth
             hasMapTab: true
             tab: map
