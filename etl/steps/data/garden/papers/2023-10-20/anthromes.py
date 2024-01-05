@@ -43,7 +43,7 @@ def run(dest_dir: str) -> None:
     tb_combined = underscore_table(tb_combined)
     tb_combined = add_aggregate_land_types(tb_combined)
     # Save outputs.
-
+    tb_combined.metadata = tb_input.metadata
     tb_combined = tb_combined.set_index(["country", "year"], verify_integrity=True).sort_index()
     # Create a new garden dataset with the same metadata as the meadow dataset.
     ds_garden = create_dataset(

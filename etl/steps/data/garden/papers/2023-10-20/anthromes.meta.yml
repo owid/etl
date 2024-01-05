@@ -93,6 +93,12 @@ tables:
         short_unit: "km²"
         description_processing: |-
           Villages are the sum of the area covered by irrigated villages, rice villages, pastoral villages and rainfed villages.
+      land_ar_croplands:
+        title: Area of croplands
+        unit: "square kilometers"
+        short_unit: "km²"
+        description_processing: |-
+          Croplands are the sum of the area covered by residential irrigated croplands, residential rainfed croplands, populated croplands and remote croplands.
       land_ar_rangelands:
         title: Area of rangelands
         unit: "square kilometers"
