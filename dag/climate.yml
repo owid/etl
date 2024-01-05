@@ -8,6 +8,14 @@ steps:
   data://garden/epa/2024-01-02/ocean_heat_content:
     - data://meadow/epa/2024-01-02/ocean_heat_content
   #
+  # IMBIE - Ice sheet mass balance.
+  #
+  data://meadow/imbie/2024-01-02/ice_sheet_mass_balance:
+    - snapshot://imbie/2024-01-02/ice_sheet_mass_balance_antarctica.csv
+    - snapshot://imbie/2024-01-02/ice_sheet_mass_balance_greenland.csv
+  data://garden/imbie/2024-01-02/ice_sheet_mass_balance:
+    - data://meadow/imbie/2024-01-02/ice_sheet_mass_balance
+  #
   # Met Office Hadley Centre - Near surface temperature anomaly (2023-10-18).
   #
   # TODO: Consider moving these steps to the "climate" namespace.
@@ -82,6 +90,7 @@ steps:
     - data://garden/epa/2024-01-02/ocean_heat_content
     - data://garden/climate/2024-01-02/ocean_ph_levels
     - data://garden/climate/2024-01-02/snow_cover_extent
+    - data://garden/imbie/2024-01-02/ice_sheet_mass_balance
 
   ######################################################################################################################
   # Older versions to be archived once they are not used by any other steps.

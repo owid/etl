@@ -89,6 +89,10 @@ def run(dest_dir: str) -> None:
     ds_snow = paths.load_dataset("snow_cover_extent")
     tb_snow = ds_snow["snow_cover_extent"].reset_index()
 
+    # Load ice sheet mass balance data from IMBIE.
+    ds_imbie = paths.load_dataset("ice_sheet_mass_balance")
+    tb_imbie = ds_imbie["ice_sheet_mass_balance"].reset_index()
+
     #
     # Process data.
     #
@@ -105,7 +109,7 @@ def run(dest_dir: str) -> None:
     # NOTE: The values in tb_ocean_ph are monthly, but the dates are not consistently on the middle of the month.
     #  Instead, they are on different days of the month. When merging with other tables, this will create many nans.
     #  We could reindex linearly, but it's not a big deal.
-    for table in [tb_nsidc, tb_met_office, tb_ocean_heat_monthly, tb_ocean_ph, tb_snow]:
+    for table in [tb_nsidc, tb_met_office, tb_ocean_heat_monthly, tb_ocean_ph, tb_snow, tb_imbie]:
         tb_monthly = tb_monthly.merge(
             table.astype({"date": str}),
             how="outer",
