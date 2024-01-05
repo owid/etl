@@ -3,64 +3,84 @@ tables:
     variables:
       land_ar_ice__uninhabited:
         title: Area of uninhabited ice
-        unit: ""
+        unit: "square kilometers"
+        short_unit: "km²"
       land_ar_inhabited_treeless_and_barren_lands:
         title: Area of inhabited treeless and barren lands
-        unit: ""
+        unit: "square kilometers"
+        short_unit: "km²"
       land_ar_irrigated_villages:
         title: Area of irrigated villages
-        unit: ""
+        unit: "square kilometers"
+        short_unit: "km²"
       land_ar_mixed_settlements:
         title: Area of mixed settlements
-        unit: ""
+        unit: "square kilometers"
+        short_unit: "km²"
       land_ar_pastoral_villages:
         title: Area of pastoral villages
-        unit: ""
+        unit: "square kilometers"
+        short_unit: "km²"
       land_ar_populated_croplands:
         title: Area of populated croplands
-        unit: ""
+        unit: "square kilometers"
+        short_unit: "km²"
       land_ar_populated_rangelands:
         title: Area of populated rangelands
-        unit: ""
+        unit: "square kilometers"
+        short_unit: "km²"
       land_ar_populated_woodlands:
         title: Area of populated woodlands
-        unit: ""
+        unit: "square kilometers"
+        short_unit: "km²"
       land_ar_rainfed_villages:
         title: Area of rainfed villages
-        unit: ""
+        unit: "square kilometers"
+        short_unit: "km²"
       land_ar_remote_croplands:
         title: Area of remote croplands
-        unit: ""
+        unit: "square kilometers"
+        short_unit: "km²"
       land_ar_remote_rangelands:
         title: Area of remote rangelands
-        unit: ""
+        unit: "square kilometers"
+        short_unit: "km²"
       land_ar_remote_woodlands:
         title: Area of remote woodlands
-        unit: ""
+        unit: "square kilometers"
+        short_unit: "km²"
       land_ar_residential_irrigated_croplands:
         title: Area of residential irrigated croplands
-        unit: ""
+        unit: "square kilometers"
+        short_unit: "km²"
       land_ar_residential_rainfed_croplands:
         title: Area of residential rainfed croplands
-        unit: ""
+        unit: "square kilometers"
+        short_unit: "km²"
       land_ar_residential_rangelands:
         title: Area of residential rangelands
-        unit: ""
+        unit: "square kilometers"
+        short_unit: "km²"
       land_ar_residential_woodlands:
         title: Area of residential woodlands
-        unit: ""
+        unit: "square kilometers"
+        short_unit: "km²"
       land_ar_rice_villages:
         title: Area of rice villages
-        unit: ""
+        unit: "square kilometers"
+        short_unit: "km²"
       land_ar_urban:
         title: Area of urban
-        unit: ""
+        unit: "square kilometers"
+        short_unit: "km²"
       land_ar_wild_treeless_and_barren_lands:
         title: Area of wild treeless and barren lands
-        unit: ""
+        unit: "square kilometers"
+        short_unit: "km²"
       land_ar_wild_woodlands:
         title: Area of wild woodlands
-        unit: ""
+        unit: "square kilometers"
+        short_unit: "km²"
       share_of_land_type_ice__uninhabited:
         title: Share of land that is uninhabited ice
         unit: "%"
