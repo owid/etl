@@ -16,5 +16,7 @@ tables:
     variables:
       ocean_ph:
         title: Monthly measurement of ocean pH levels
+        processing_level: minor
       ocean_ph_yearly_average:
         title: Rolling yearly average of ocean pH levels
+        processing_level: major

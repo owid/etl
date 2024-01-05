@@ -33,13 +33,24 @@ FILES = [
     "snow_cover_extent_northern_hemisphere.csv",
 ]
 
+########################################################################################################################
 # Other possible datasets to include:
-# Ocean heat content data from MRI/JMA. We have this data as part of the EPA ocean heat content compilation.
-# But in the following link, they claim the data is updated every year, so it could be added to our yearly data.
-# https://www.data.jma.go.jp/gmd/kaiyou/english/ohc/ohc_global_en.html
-# Rutgers University Global Snow Lab also includes snow cover extent for:
-# * Eurasia: https://climate.rutgers.edu/snowcover/files/moncov.eurasia.txt
-# * North America (excluding Greenland): https://climate.rutgers.edu/snowcover/files/moncov.nam.txt
+# * Ocean heat content data from MRI/JMA. We have this data as part of the EPA ocean heat content compilation.
+#   But in the following link, they claim the data is updated every year, so it could be added to our yearly data.
+#   https://www.data.jma.go.jp/gmd/kaiyou/english/ohc/ohc_global_en.html
+# * Rutgers University Global Snow Lab also includes snow cover extent for:
+#   * Eurasia: https://climate.rutgers.edu/snowcover/files/moncov.eurasia.txt
+#   * North America (excluding Greenland): https://climate.rutgers.edu/snowcover/files/moncov.nam.txt
+# * Ice sheet mass balance from NASA EarthData. This is regularly updated, but to access it one has to manually log in.
+#   The data can be manually accessed from:
+#   https://climate.nasa.gov/vital-signs/ice-sheets/
+#   By clicking on the HTTP link. This leads to a manual log in page.
+#   Once logged in, the data is accessible via the following link:
+#   https://archive.podaac.earthdata.nasa.gov/podaac-ops-cumulus-protected/ANTARCTICA_MASS_TELLUS_MASCON_CRI_TIME_SERIES_RL06.1_V3/antarctica_mass_200204_202310.txt
+#   So, one could use this link, trying with different dates (e.g. ..._202401.txt, ..._202312.txt, ..._202311.txt),
+#   until the most recent file is downloaded.
+#   I contacted EarthData to ask if there is any way to access the latest data programmatically.
+########################################################################################################################
 
 
 @click.command()

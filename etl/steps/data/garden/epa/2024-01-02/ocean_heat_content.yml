@@ -7,7 +7,7 @@ definitions:
 
 dataset:
   title: Ocean Heat Content
-  update_period_days: 60
+  update_period_days: 0
 
 tables:
   ocean_heat_content_monthly:
