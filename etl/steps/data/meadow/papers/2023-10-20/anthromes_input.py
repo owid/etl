@@ -5,6 +5,7 @@ import tempfile
 import zipfile
 
 import geopandas as gpd
+import owid.catalog.processing as pr
 from owid.catalog import Table
 
 from etl.helpers import PathFinder, create_dataset
@@ -25,9 +26,8 @@ def run(dest_dir: str) -> None:
 
     # Process data.
     #
-    tb.metadata = snap.to_table_metadata()
-    # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
-    tb = tb.underscore().set_index(["id", "regn_nm"], verify_integrity=True).sort_index()
+    # Set an appropriate index and sort conveniently.
+    tb = tb.set_index(["id", "regn_nm"], verify_integrity=True).sort_index()
 
     #
     # Save outputs.
@@ -55,5 +55,5 @@ def get_table_from_shp_file(snap: Snapshot) -> Table:
                 shp_file = os.path.join(temp_dir, extracted_dir[0], file_name)
         gdf = gpd.read_file(shp_file)
         gdf = gdf.drop(columns=["geometry"])
-        gdf = Table(gdf)
+        gdf = pr.read_df(gdf, metadata=snap.to_table_metadata(), origin=snap.metadata.origin)
         return gdf
