@@ -1,8 +1,10 @@
 """Load a meadow dataset and create a garden dataset."""
 
 
+import numpy as np
 import owid.catalog.processing as pr
 from owid.catalog import Table
+from owid.catalog.utils import underscore_table
 
 from etl.helpers import PathFinder, create_dataset
 
@@ -38,11 +40,11 @@ def run(dest_dir: str) -> None:
 
     # Calculate share of each land type
     tb_combined = calculate_share_of_land_type(tb_combined, land_areas)
-
-    tb_combined.metadata = tb.metadata
-
+    tb_combined = underscore_table(tb_combined)
+    tb_combined = add_aggregate_land_types(tb_combined)
     # Save outputs.
-    #
+
+    tb_combined = tb_combined.set_index(["country", "year"], verify_integrity=True).sort_index()
     # Create a new garden dataset with the same metadata as the meadow dataset.
     ds_garden = create_dataset(
         dest_dir, tables=[tb_combined], check_variables_metadata=True, default_metadata=ds_meadow.metadata
@@ -52,13 +54,113 @@ def run(dest_dir: str) -> None:
     ds_garden.save()
 
 
+def add_aggregate_land_types(tb: Table) -> Table:
+    """
+    Aggregating the groups to broader levels, shown in Ellis et al. (2020)
+    """
+
+    aggregate_dict = {
+        "land_ar_dense_settlements": ["land_ar_mixed_settlements", "land_ar_urban"],
+        "land_ar_villages": [
+            "land_ar_rice_villages",
+            "land_ar_irrigated_villages",
+            "land_ar_rainfed_villages",
+            "land_ar_pastoral_villages",
+        ],
+        "land_ar_croplands": [
+            "land_ar_residential_irrigated_croplands",
+            "land_ar_residential_rainfed_croplands",
+            "land_ar_populated_croplands",
+            "land_ar_remote_croplands",
+        ],
+        "land_ar_rangelands": [
+            "land_ar_residential_rangelands",
+            "land_ar_populated_rangelands",
+            "land_ar_remote_rangelands",
+        ],
+        "land_ar_seminatural_lands": [
+            "land_ar_residential_woodlands",
+            "land_ar_populated_woodlands",
+            "land_ar_remote_woodlands",
+            "land_ar_inhabited_treeless_and_barren_lands",
+        ],
+        "land_ar_wild_lands": ["land_ar_wild_woodlands", "land_ar_wild_treeless_and_barren_lands"],
+        "land_ar_used_lands": [
+            "land_ar_mixed_settlements",
+            "land_ar_urban",
+            "land_ar_rice_villages",
+            "land_ar_irrigated_villages",
+            "land_ar_rainfed_villages",
+            "land_ar_pastoral_villages",
+            "land_ar_residential_irrigated_croplands",
+            "land_ar_residential_rainfed_croplands",
+            "land_ar_populated_croplands",
+            "land_ar_remote_croplands",
+            "land_ar_residential_rangelands",
+            "land_ar_populated_rangelands",
+            "land_ar_remote_rangelands",
+        ],
+        "share_of_land_type_dense_settlements": ["share_of_land_type_mixed_settlements", "share_of_land_type_urban"],
+        "share_of_land_type_villages": [
+            "share_of_land_type_rice_villages",
+            "share_of_land_type_irrigated_villages",
+            "share_of_land_type_rainfed_villages",
+            "share_of_land_type_pastoral_villages",
+        ],
+        "share_of_land_type_croplands": [
+            "share_of_land_type_residential_irrigated_croplands",
+            "share_of_land_type_residential_rainfed_croplands",
+            "share_of_land_type_populated_croplands",
+            "share_of_land_type_remote_croplands",
+        ],
+        "share_of_land_type_rangelands": [
+            "share_of_land_type_residential_rangelands",
+            "share_of_land_type_populated_rangelands",
+            "share_of_land_type_remote_rangelands",
+        ],
+        "share_of_land_type_seminatural_lands": [
+            "share_of_land_type_residential_woodlands",
+            "share_of_land_type_populated_woodlands",
+            "share_of_land_type_remote_woodlands",
+            "share_of_land_type_inhabited_treeless_and_barren_lands",
+        ],
+        "share_of_land_type_wild_lands": [
+            "share_of_land_type_wild_woodlands",
+            "share_of_land_type_wild_treeless_and_barren_lands",
+        ],
+        "share_of_land_type_used_lands": [
+            "share_of_land_type_mixed_settlements",
+            "share_of_land_type_urban",
+            "share_of_land_type_rice_villages",
+            "share_of_land_type_irrigated_villages",
+            "share_of_land_type_rainfed_villages",
+            "share_of_land_type_pastoral_villages",
+            "share_of_land_type_residential_irrigated_croplands",
+            "share_of_land_type_residential_rainfed_croplands",
+            "share_of_land_type_populated_croplands",
+            "share_of_land_type_remote_croplands",
+            "share_of_land_type_residential_rangelands",
+            "share_of_land_type_populated_rangelands",
+            "share_of_land_type_remote_rangelands",
+        ],
+    }
+
+    for new_col, cols_to_sum in aggregate_dict.items():
+        assert all(
+            col in tb.columns for col in cols_to_sum
+        ), f"One or more columns from {cols_to_sum} are not in the table"
+        tb[new_col] = tb[cols_to_sum].sum(axis=1)
+
+    return tb
+
+
 def calculate_share_of_land_type(tb: Table, land_areas: Table) -> Table:
     tb = tb.merge(land_areas, on="regn_nm")
     tb["share_of_land_type"] = (tb["land_ar"] / tb["total_region_area"]) * 100
     tb = tb.drop(columns=["total_region_area"])
     tb = tb.rename(columns={"regn_nm": "country"})
-    tb = tb.pivot(index=["country", "year"], columns="value")
-    tb.columns = [" ".join(col).strip() for col in tb.columns.values]
+    tb = tb.pivot(index=["country", "year"], columns="value", join_column_levels_with="_")
+    tb = tb.reset_index(drop=True)
 
     return tb
 
@@ -67,9 +169,11 @@ def calculate_area_of_each_land_type(tb: Table) -> Table:
     tb_global = tb.groupby(["year", "value"])["land_ar"].sum()
     tb_global = tb_global.reset_index()
     tb_global["regn_nm"] = "World"
+    tb_global["land_ar"] = tb_global["land_ar"].replace(np.nan, 0)
 
     tb_regional = tb.groupby(["year", "value", "regn_nm"])["land_ar"].sum()
     tb_regional = tb_regional.reset_index()
+    tb_regional["land_ar"] = tb_regional["land_ar"].replace(np.nan, 0)
 
     tb_combined = pr.concat([tb_global, tb_regional], ignore_index=True)
 

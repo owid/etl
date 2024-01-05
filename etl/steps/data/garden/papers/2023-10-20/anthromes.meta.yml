@@ -81,6 +81,42 @@ tables:
         title: Area of wild woodlands
         unit: "square kilometers"
         short_unit: "km²"
+      land_ar_dense_settlements:
+        title: Area of dense settlements
+        unit: "square kilometers"
+        short_unit: "km²"
+        description_processing: |-
+          Dense settlements are the sum of the area covered by mixed settlements and urban areas.
+      land_ar_villages:
+        title: Area of villages
+        unit: "square kilometers"
+        short_unit: "km²"
+        description_processing: |-
+          Villages are the sum of the area covered by irrigated villages, rice villages, pastoral villages and rainfed villages.
+      land_ar_rangelands:
+        title: Area of rangelands
+        unit: "square kilometers"
+        short_unit: "km²"
+        description_processing: |-
+          Rangelands are the sum of the area covered by populated rangelands, remote rangelands and residential rangelands.
+      land_ar_seminatural_lands:
+        title: Area of seminatural lands
+        unit: "square kilometers"
+        short_unit: "km²"
+        description_processing: |-
+          Seminatural lands are the sum of the area covered by inhabited treeless and barren lands, residential woodlands, populated woodlans and remote woodlands.
+      land_ar_wild_lands:
+        title: Area of wild lands
+        unit: "square kilometers"
+        short_unit: "km²"
+        description_processing: |-
+          Wild lands are the sum of the area covered by wild treeless and barren lands, wild woodlands.
+      land_ar_used_lands:
+        title: Area of used lands
+        unit: "square kilometers"
+        short_unit: "km²"
+        description_processing: |-
+          Used lands are the sum of the area covered by mixed settlements, urban areas, rice villages, irrigated villages, rainfed villages, pastoral villages, residential irrigated croplands, residential rainfed croplands, populated croplands, remote croplands, residential rangelands, populated rangelands and remote rangelands.
       share_of_land_type_ice__uninhabited:
         title: Share of land that is uninhabited ice
         unit: "%"
@@ -161,3 +197,45 @@ tables:
         title: Share of land that is wild woodlands
         unit: "%"
         short_unit: "%"
+      share_of_land_type_dense_settlements:
+        title: Share of land that is dense settlements
+        unit: "%"
+        short_unit: "%"
+        description_processing: |-
+          Dense settlements are the sum of the area covered by mixed settlements and urban areas.
+      share_of_land_type_villages:
+        title: Share of land that is villages
+        unit: "%"
+        short_unit: "%"
+        description_processing: |-
+          Villages are the sum of the area covered by irrigated villages, rice villages, pastoral villages and rainfed villages.
+      share_of_land_type_croplands:
+        title: Share of land that is croplands
+        unit: "%"
+        short_unit: "%"
+        description_processing: |-
+          Croplands are the sum of the area covered by residential irrigated croplands, residential rainfed croplands, populated croplands and remote croplands.
+      share_of_land_type_rangelands:
+        title: Share of land that is rangelands
+        unit: "%"
+        short_unit: "%"
+        description_processing: |-
+          Rangelands are the sum of the area covered by populated rangelands, remote rangelands and residential rangelands.
+      share_of_land_type_seminatural_lands:
+        title: Share of land that is seminatural lands
+        unit: "%"
+        short_unit: "%"
+        description_processing: |-
+          Seminatural lands are the sum of the area covered by inhabited treeless and barren lands, residential woodlands, populated woodlans and remote woodlands.
+      share_of_land_type_wild_lands:
+        title: Share of land that is wild lands
+        unit: "%"
+        short_unit: "%"
+        description_processing: |-
+          Wild lands are the sum of the area covered by wild treeless and barren lands, wild woodlands.
+      share_of_land_type_used_lands:
+        title: Share of land that is used lands
+        unit: "%"
+        short_unit: "%"
+        description_processing: |-
+          Used lands are the sum of the area covered by mixed settlements, urban areas, rice villages, irrigated villages, rainfed villages, pastoral villages, residential irrigated croplands, residential rainfed croplands, populated croplands, remote croplands, residential rangelands, populated rangelands and remote rangelands.
