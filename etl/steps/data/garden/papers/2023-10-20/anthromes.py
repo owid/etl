@@ -1,9 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
 
-import re
 
 import owid.catalog.processing as pr
-import pandas as pd
 from owid.catalog import Table
 
 from etl.helpers import PathFinder, create_dataset
@@ -24,12 +22,14 @@ def run(dest_dir: str) -> None:
     tb_input = ds_meadow_input["anthromes_input"].reset_index().drop(columns=["pot_veg", "pot_vll"])
     # Bit of a hack as the metadata for tb_input is not passed though when opening the shapefile
     tb_input.metadata = tb.metadata
+
     land_areas = calculate_regional_land_areas(tb_input)
 
     # Combine the land type of each cell with the area of each cell
     tb_long = pr.melt(tb, id_vars="id", var_name="name", value_name="value")
     tb_merge = pr.merge(tb_long, tb_input, on="id", how="left")
 
+    tb_merge = convert_years_to_number(tb_merge)
     # Calculated global and regional total of each land type, each year
     tb_combined = calculate_area_of_each_land_type(tb_merge)
 
@@ -74,7 +74,6 @@ def calculate_area_of_each_land_type(tb: Table) -> Table:
     tb_combined = pr.concat([tb_global, tb_regional], ignore_index=True)
     # Convert year string
 
-    tb_combined["year"] = tb_combined["name"].apply(convert_years_to_number)
     tb_combined = tb_combined.drop(columns=["name"])
 
     return tb_combined
@@ -96,23 +95,23 @@ def calculate_regional_land_areas(tb: Table) -> Table:
     return land_areas
 
 
-def convert_years_to_number(year: str) -> str:
+def convert_years_to_number(tb: Table) -> Table:
     """
     Converting the given year string to a number
 
     """
-    match = re.match(r"^_(\d+)(bc|ad)$", year)
+    unique_years = tb["name"].unique()
+    year_mapping = {year: convert_year(year) for year in unique_years}
+    tb["year"] = tb["name"].map(year_mapping)
+    tb = tb.drop(columns=["name"])
+    return tb
 
-    if match:
-        year, era = match.groups()
-        year = int(year)
 
-        if era == "bc":
-            year = -year
-
-        return year
-    else:
-        return None
+def convert_year(year_str: str) -> int:
+    is_bc = "bc" in year_str.lower()
+    cleaned_year = "".join(filter(str.isdigit, year_str))
+    year_int = int(cleaned_year)
+    return -year_int if is_bc else year_int
 
 
 def assign_land_use_types(tb: Table) -> Table:
