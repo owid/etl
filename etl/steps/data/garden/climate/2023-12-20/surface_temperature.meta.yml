@@ -35,7 +35,7 @@ tables:
         description_short: |-
           The deviation of a specific month's average surface temperature from the historical average surface temperature spanning from 1950 to the most recent data.
         description_processing: |-
-            - The temperature anomaly is determined by comparing the average surface temperature of a given month with the average from 1950 to the most recent data, highlighting climate variations.      anomaly_below_0:
+            - The temperature anomaly is determined by comparing the average surface temperature of a given month with the average from 1950 to the most recent data, highlighting climate variations.
 
             - Temperature measured in kelvin was converted to degrees Celsius (°C) by subtracting 273.15.
 
