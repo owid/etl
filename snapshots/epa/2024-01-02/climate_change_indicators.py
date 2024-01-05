@@ -14,9 +14,11 @@ SNAPSHOT_VERSION = Path(__file__).parent.name
 
 # Names of data files.
 FILES = [
-    # Ocean Heat Content.
+    # Ocean heat content.
     "ocean_heat_content_annual_world_700m.csv",
     "ocean_heat_content_annual_world_2000m.csv",
+    # Ice sheet mass balance.
+    "ice_sheet_mass_balance.csv",
 ]
 
 

@@ -7,6 +7,10 @@ steps:
     - snapshot://epa/2024-01-02/ocean_heat_content_annual_world_2000m.csv
   data://garden/epa/2024-01-02/ocean_heat_content:
     - data://meadow/epa/2024-01-02/ocean_heat_content
+  data://meadow/epa/2024-01-02/ice_sheet_mass_balance:
+    - snapshot://epa/2024-01-02/ice_sheet_mass_balance.csv
+  data://garden/epa/2024-01-02/ice_sheet_mass_balance:
+    - data://meadow/epa/2024-01-02/ice_sheet_mass_balance
   #
   # IMBIE - Ice sheet mass balance.
   #
@@ -90,7 +94,8 @@ steps:
     - data://garden/epa/2024-01-02/ocean_heat_content
     - data://garden/climate/2024-01-02/ocean_ph_levels
     - data://garden/climate/2024-01-02/snow_cover_extent
-    - data://garden/imbie/2024-01-02/ice_sheet_mass_balance
+    # - data://garden/imbie/2024-01-02/ice_sheet_mass_balance
+    - data://garden/epa/2024-01-02/ice_sheet_mass_balance
 
   ######################################################################################################################
   # Older versions to be archived once they are not used by any other steps.

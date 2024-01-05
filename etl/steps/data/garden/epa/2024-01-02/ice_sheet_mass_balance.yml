@@ -1,0 +1,29 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+      - Climate Change
+    processing_level: major
+    unit: billion tonnes
+    short_unit: billion t
+    description_key:
+    - Values are centered at zero in 2002 to provide a consistent point of reference.
+    - A downward slope indicates a net loss of ice and snow.
+    - For reference, 1,000 billion metric tons is enough to raise sea level by about 3 millimeters.
+
+dataset:
+  title: Ice Sheet Mass Balance
+  update_period_days: 0
+
+tables:
+  ice_sheet_mass_balance:
+    title: Ice Sheet Mass Balance
+    variables:
+      cumulative_ice_mass_change_imbie:
+        title: Cumulative change in mass in the ice sheets
+        title_variant: IMBIE
+        description_short: Measured in billion tonnes. Based on more than 20 different studies that have been combined for each region.
+      land_ice_mass_nasa:
+        title: Cumulative change in mass in the ice sheets
+        title_variant: NASA/JPL
+        description_short: Measured in billion tonnes.
