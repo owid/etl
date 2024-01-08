@@ -3,9 +3,8 @@ import streamlit as st
 from st_pages import add_indentation
 from streamlit_card import card
 
-# from streamlit_extras import load_key_css
-from streamlit_extras.keyboard_text import key, load_key_css
-from streamlit_extras.keyboard_url import keyboard_to_url
+# from streamlit_extras.keyboard_text import key, load_key_css
+# from streamlit_extras.keyboard_url import keyboard_to_url
 from streamlit_extras.switch_page_button import switch_page
 
 add_indentation()
@@ -46,13 +45,14 @@ pages = [
     },
 ]
 columns = st.columns(len(pages))
-load_key_css()
+# load_key_css()
 for i, page in enumerate(pages):
     # go_to_page = st.button(f"➡️  {page}")
     with columns[i]:
         go_to_page = card(
             **page,
-            text=f"Press {i + 1}",
+            text="",
+            # text=f"Press {i + 1}",
             styles={
                 "card": {
                     "width": "150",
@@ -64,7 +64,7 @@ for i, page in enumerate(pages):
             },
             on_click=lambda: None,
         )
-        keyboard_to_url(key=str(i + 1), url=page["title"])
+        # keyboard_to_url(key=str(i + 1), url=page["title"])
     if go_to_page:
         switch_page(page["title"])
 
@@ -101,7 +101,8 @@ for i, page in enumerate(pages):
     with columns[i]:
         go_to_page = card(
             **page,
-            text=f"Press {k}",
+            text="",
+            # text=f"Press {k}",
             styles={
                 "card": {
                     "width": "150",
@@ -113,6 +114,6 @@ for i, page in enumerate(pages):
             },
             on_click=lambda: None,
         )
-    keyboard_to_url(key=str(k), url=page["title"])
+    # keyboard_to_url(key=str(k), url=page["title"])
     if go_to_page:
         switch_page(page["title"])
