@@ -1,57 +1,74 @@
-# NOTE: To learn more about the fields, hover over their names.
 definitions:
   common:
     presentation:
       topic_tags:
         - Population Growth
+    processing_level: major
+    description_processing: |-
+      The population time series is constructed by combining data from multiple sources:
+
+      - 10,000 BCE - 1959: Historical estimates by HYDE (v3.3).
+
+      - 1950-2021: Population records by the UN World Population Prospects (2022 revision).
+
+      - 2022-2100: Projections based on Medium variant by the UN World Population Prospects (2022 revision).
+
+  origins_combined: &origins-combined
+    - producer: Various sources
+      title: Population
+      attribution: Population based on various sources (2023)
+      attribution_short: Population
+      citation_full: |-
+        The long-run data on population is based on various sources, described on this page: https://ourworldindata.org/population-sources
+      url_main: https://ourworldindata.org/population-sources
+      date_accessed: 2023-03-31
+      date_published: 2023-03-31
+      description: &dataset-description |-
+        Our World in Data builds and maintains a long-run dataset on population by country, region, and for the world, based on various sources.
+
+        You can find more information on these sources and how our time series is constructed on this page: https://ourworldindata.org/population-sources
+      license:
+        name: CC BY 4.0
 
 
-# Learn more about the available fields:
-# http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
-dataset:
-  update_period_days: 365
-
-
-# Learn more about the available fields:
-# http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
 tables:
+  # Original table, with complete origins
   population:
-    # Learn more about the available fields:
-    # http://docs.owid.io/projects/etl/architecture/metadata/reference/indicator/
+    title: Population
+    description: &population-description |-
+      Population by country, available from 10,000 BCE to 2100, based on data and estimates from different sources.
     variables:
-      # testing_variable:
-      #   title: Testing variable title
-      #   unit: arbitrary units
-      #   short_unit: au
-      #   description_short: Short description of testing variable.
-      #   description_processing: Description of processing of testing variable.
-      #   description_key: List of key points about the indicator.
-      #   description_from_producer: Description of testing variable from producer.
-      #   processing_level: minor
-      #   presentation:
-      #     attribution:
-      #     attribution_short:
-      #     faqs:
-      #     grapher_config:
-      #     title_public:
-      #     title_variant:
-      #     topic_tags:
-      #   display:
-      #     color:
-      #     conversionFactor: 1
-      #     description:
-      #     entityAnnotationsMap: Test annotation
-      #     includeInTable:
-      #     isProjection: false
-      #     name: Testing variable
-      #     numDecimalPlaces: 0
-      #     shortUnit: au
-      #     tableDisplay:
-      #       hideAbsoluteChange:
-      #       hideRelativeChange:
-      #     tolerance: 0
-      #     unit: arbitrary units
-      #     yearIsDay: false
-      #     zeroDay:
-      {}
+      population:
+        title: Population
+        description_short: &population-share-description |-
+          Share of the world's population by country, available from 10,000 BCE to 2100, based on data and estimates from different sources.
+        unit: people
+        display:
+          numDecimalPlaces: 0
+
+  # Table to be used by dependency datasets, so that the attribution of the population is reduced and more conside (looks better on chart footers).
+  population_as_auxiliary_indicator:
+    common:
+      origins: *origins-combined
+    title: Population
+    description: *dataset-description
+    variables:
+      population:
+        title: Population
+        description_short: *population-description
+        unit: people
+        display:
+          numDecimalPlaces: 0
+
+      # world_pop_share:
+      #   title: Share of world population
+      #   description_short: *population-share-description
+      #   unit: "%"
+      #   short_unit: "%"
+
+
+dataset:
+  title: Population
+  update_period_days: 365
+  description: *dataset-description
 
