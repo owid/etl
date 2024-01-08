@@ -22,8 +22,6 @@ dataset:
   title: WHO/UNICEF Joint Monitoring Programme for Water Supply, Sanitation and Hygiene
 tables:
   hygiene:
-    title: WHO/UNICEF Joint Monitoring Programme for Water Supply, Sanitation and Hygiene
-    description: The WHO/UNICEF Joint Monitoring Programme for Water Supply, Sanitation and Hygiene (JMP) has reported country, regional and global estimates of progress on drinking water, sanitation and hygiene (WASH) since 1990.
     variables:
       population__thousands:
         title: Population (thousands)
@@ -86,67 +84,52 @@ tables:
         title: Annual rate of change in the share of the population with basic hygiene facilities
         unit: "percentage points"
   menstrual_health:
-    title: WHO/UNICEF Joint Monitoring Programme for Water Supply, Sanitation and Hygiene
-    description: The WHO/UNICEF Joint Monitoring Programme for Water Supply, Sanitation and Hygiene (JMP) has reported country, regional and global estimates of progress on drinking water, sanitation and hygiene (WASH) since 1990.
     variables:
       year_survey_name:
         title: Year_Survey name
         unit: ""
-
       population_of_women_and_girls_age_15_49__thousands:
         title: Population of women and girls age 15-49 (thousands)
         unit: ""
-        display:
-          numDecimalPlaces: 3
-
       pct_urban__of_total_population:
-        title: "% urban (of total population)"
-        unit: ""
-        display:
-          numDecimalPlaces: 3
-
+        title: Share of the population that lives in urban areas
+        unit: "%"
+        short_unit: "%"
       rural_proportion_of_women_and_girls_age_15_49_who_have_menstruated_in_the_previous_year_awareness_of_menstruation_before_menarche:
-        title: RURAL_Proportion of women and girls age 15-49 who have menstruated in the previous year_Awareness of menstruation before menarche
-        unit: ""
-        display:
-          numDecimalPlaces: 3
-
+        title: Share of rural women aged 15-49 who were aware of menstruation before their first period
+        description_short: Share of rural women aged 15-49 who have menstruated in the previous year who were aware of menstruation before their first period.
+        unit: "%"
+        short_unit: "%"
       rural_proportion_of_women_and_girls_age_15_49_who_have_menstruated_in_the_previous_year_private_place_to_wash_and_change:
-        title: RURAL_Proportion of women and girls age 15-49 who have menstruated in the previous year_Private place to wash and change
-        unit: ""
-        display:
-          numDecimalPlaces: 3
-
+        title: Share of rural women aged 15-49 who have access to a private place to wash and change
+        description_short: Share of rural women aged 15-49 who have menstruated in the previous year who have access to a private place to wash and change while at home.
+        unit: "%"
+        short_unit: "%"
       rural_proportion_of_women_and_girls_age_15_49_who_have_menstruated_in_the_previous_year_participation_in_activities_during_menstruation:
-        title: RURAL_Proportion of women and girls age 15-49 who have menstruated in the previous year_Participation in activities during menstruation
-        unit: ""
-        display:
-          numDecimalPlaces: 3
-
+        title: Share of rural women aged 15-49 who participate in activities during menstruation
+        description_short: Share of rural women aged 15-49 who have menstruated in the previous year who participate in activities during menstruation.
+        unit: "%"
+        short_unit: "%"
       rural_proportion_of_women_and_girls_age_15_49_who_have_menstruated_in_the_previous_year_use_of_menstrual_materials:
-        title: RURAL_Proportion of women and girls age 15-49 who have menstruated in the previous year_Use of menstrual materials
-        unit: ""
-        display:
-          numDecimalPlaces: 3
-
+        title: Share of rural women aged 15-49 who use menstrual materials
+        description_short: Share of rural women aged 15-49 who have menstruated in the previous year who use menstrual materials to capture and contain menstrual blood, such as sanitary pads, cloth, tampons, or cups.
+        unit: "%"
+        short_unit: "%"
       rural_proportion_of_women_and_girls_age_15_49_who_have_menstruated_in_the_previous_year_use_of_reusable_materials:
-        title: RURAL_Proportion of women and girls age 15-49 who have menstruated in the previous year_Use of reusable materials
-        unit: ""
-        display:
-          numDecimalPlaces: 3
-
+        title: Share of rural women aged 15-49 who use reusable menstrual materials
+        description_short: Share of women aged 15-49 who have menstruated in the previous year who use reusable menstrual materials to capture and contain menstrual blood.
+        unit: "%"
+        short_unit: "%"
       rural_proportion_of_women_and_girls_age_15_49_who_have_menstruated_in_the_previous_year_use_of_single_use_materials:
-        title: RURAL_Proportion of women and girls age 15-49 who have menstruated in the previous year_Use of single-use materials
-        unit: ""
-        display:
-          numDecimalPlaces: 3
-
+        title: Share of rural women aged 15-49 who use single-use menstrual materials
+        description_short: Share of women aged 15-49 who have menstruated in the previous year who use single-use menstrual materials to capture and contain menstrual blood.
+        unit: "%"
+        short_unit: "%"
       urban_proportion_of_women_and_girls_age_15_49_who_have_menstruated_in_the_previous_year_awareness_of_menstruation_before_menarche:
-        title: URBAN_Proportion of women and girls age 15-49 who have menstruated in the previous year_Awareness of menstruation before menarche
-        unit: ""
-        display:
-          numDecimalPlaces: 3
-
+        title: Share of urban women aged 15-49 who were aware of menstruation before their first period
+        description_short: Share of urban women aged 15-49 who have menstruated in the previous year who were aware of menstruation before their first period.
+        unit: "%"
+        short_unit: "%"
       urban_proportion_of_women_and_girls_age_15_49_who_have_menstruated_in_the_previous_year_private_place_to_wash_and_change:
         title: URBAN_Proportion of women and girls age 15-49 who have menstruated in the previous year_Private place to wash and change
         unit: ""
