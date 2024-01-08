@@ -9,11 +9,10 @@ from streamlit_extras.switch_page_button import switch_page
 
 add_indentation()
 
+st.title("Wizard 🪄")
 st.markdown(
     """
-Wizard is a fundamental tool in the workflow of data scientists at OWID. It is used to easily create ETL steps, which are then run by the ETL pipeline to generate datasets in Grapher.
-
-Additionally, it also builds on top of ETL tools to make them more accessible.
+Wizard is a fundamental tool for data scientists at OWID to easily create ETL steps. Additionally, wizard provides a set of tools to explore and improve these steps.
 """
 )
 
