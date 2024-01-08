@@ -46,6 +46,12 @@ tables:
         display:
           numDecimalPlaces: 0
 
+      world_pop_share:
+        title: Share of world population
+        description_short: *population-share-description
+        unit: "%"
+        short_unit: "%"
+
   # Table to be used by dependency datasets, so that the attribution of the population is reduced and more conside (looks better on chart footers).
   population_as_auxiliary_indicator:
     common:
@@ -60,11 +66,11 @@ tables:
         display:
           numDecimalPlaces: 0
 
-      # world_pop_share:
-      #   title: Share of world population
-      #   description_short: *population-share-description
-      #   unit: "%"
-      #   short_unit: "%"
+      world_pop_share:
+        title: Share of world population
+        description_short: *population-share-description
+        unit: "%"
+        short_unit: "%"
 
 
 dataset:
