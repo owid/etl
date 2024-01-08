@@ -152,7 +152,7 @@ tables:
         description_short: Share of urban women and girls aged 15-49 who have menstruated in the previous year who use menstrual materials to capture and contain menstrual blood, such as sanitary pads, cloth, tampons, or cups.
         unit: "%"
       urban_proportion_of_women_and_girls_age_15_49_who_have_menstruated_in_the_previous_year_use_of_reusable_materials:
-        title: Share of women aged 15-49 who use reusable menstrual materials
+        title: Share of urban women aged 15-49 who use reusable menstrual materials
         description_short: Share of women aged 15-49 who have menstruated in the previous year who use reusable menstrual materials to capture and contain menstrual blood.
         unit: "%"
         short_unit: "%"
