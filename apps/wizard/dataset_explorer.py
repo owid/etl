@@ -212,7 +212,7 @@ if st.session_state.get("show"):
                 _ = generate_graph(dag, option, collapse_snapshot, collapse_others, collapse_meadow)
 
     # Get dataset attributes, check we want to display it
-    attributes = extract_step_attributes(option)
+    attributes = extract_step_attributes(cast(str, option))
     show_d_details = attributes["channel"] in ["garden", "grapher"]
 
     if show_d_details:
@@ -223,7 +223,7 @@ if st.session_state.get("show"):
 
         # Show dataset details
         ## Load dataset
-        attributes = extract_step_attributes(option)
+        attributes = extract_step_attributes(cast(str, option))
         dataset_path = (
             DATA_DIR / f"{attributes['channel']}/{attributes['namespace']}/{attributes['version']}/{attributes['name']}"
         )
