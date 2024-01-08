@@ -747,6 +747,14 @@ steps:
     - data://meadow/growth/2024-01-05/fariss_et_al
     - data://garden/countries/2023-09-25/gleditsch
 
+  # Historical estimates of GDP by Roodman (2020)
+  data://meadow/growth/2024-01-08/roodman:
+    - snapshot://growth/2024-01-08/roodman.csv
+  data://garden/growth/2024-01-08/roodman:
+    - data://meadow/growth/2024-01-08/roodman
+  data://grapher/growth/2024-01-08/roodman:
+    - data://garden/growth/2024-01-08/roodman
+
   ######################################################################################################################
   # Older versions to be archived once they are not used by any other steps.
 

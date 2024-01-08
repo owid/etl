@@ -1,0 +1,44 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Economic Growth
+
+    processing_level: minor
+    display:
+      numDecimalPlaces: 0
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
+dataset:
+  update_period_days: 0
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
+tables:
+  roodman:
+    # Learn more about the available fields:
+    # http://docs.owid.io/projects/etl/architecture/metadata/reference/indicator/
+    variables:
+      gdp:
+        title: Gross domestic product (GDP)
+        unit: international-$ in 1990 prices
+        short_unit: $
+        description_from_producer: |
+          GWP/capita figures: through 10,000 BCE set to $400, the subsistence estimate of Angus Maddison (The World Economy. A Millennial Perspective (2001), p. 260); for 1 CE, 1000 CE, and 1500–2010 from Maddison Database (2010), incorporating revisions for Western Europe in Maddison Project Database (2013); for other years before 1500 geometrically interpolated with respect to population; and for 2011–18 extrapolated forward using growth rates from IMF (2020, series NGDP_RPCH). Money values in Geary-Kharnis dollars of 1990.
+      gdp_pc:
+        title: GDP per capita
+        unit: international-$ in 1990 prices
+        short_unit: $
+        description_from_producer: |
+          GWP/capita figures: through 10,000 BCE set to $400, the subsistence estimate of Angus Maddison (The World Economy. A Millennial Perspective. 2001, p. 260); for 1 CE, 1000 CE, and 1500–2010 from Maddison Database (2010), incorporating revisions for Western Europe in Maddison Project Database (2013); for other years before 1500 geometrically interpolated with respect to population; and for 2011–18 extrapolated forward using growth rates from IMF (2020, series NGDP_RPCH). Money values in Geary-Kharnis dollars of 1990.
+      population:
+        title: Population
+        unit: ""
+        short_unit: ""
+        description_from_producer: |
+          Population figures: for before 10,000 BCE from Edward S. Deevey Jr. (The Human Population, 1960); for 10,000 BCE–1400 CE from McEvedy and Jones (Atlas of World Population History, 1978); for 1500–2010 from Maddison Database (2010); and for 2011–18 from UN (2019, file POP/1-1).
+

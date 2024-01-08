@@ -1,0 +1,28 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/origin/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Estimates of population and gross world product, 1 million BCE–2019 CE
+    date_published: 2020-11-21
+
+    # Citation
+    producer: David Roodman
+    citation_full: |-
+      Roodman, D. (2020). On the probability distribution of long-term changes in the
+      growth rate of the global economy: An outside view. Retrieved from https://www.openphilanthropy.org/wp-content/uploads/Modeling-the-human-trajectory-2.pdf
+
+    # Files
+    url_main: https://www.openphilanthropy.org/research/modeling-the-human-trajectory/
+    date_accessed: 2024-01-08
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://www.openphilanthropy.org/research/modeling-the-human-trajectory/
+
+wdir: ../../../data/snapshots/growth/2024-01-08
+outs:
+- md5: a8bdafa67838710c4c719491545ad3e5
+  size: 2662
+  path: roodman.csv
