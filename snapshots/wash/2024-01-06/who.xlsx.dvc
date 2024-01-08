@@ -22,10 +22,9 @@ meta:
     citation_full: |-
       TBA
     attribution_short: WHO/UNICEF JMP
-
     # Files
     url_main: https://washdata.org/data/household#!/
-    url_download: https://washdata.org/data/downloads/#WLD
+    url_download: https://washdata.org/data/country/WLD/household/download
     date_accessed: 2024-01-06
 
     # License
@@ -34,6 +33,6 @@ meta:
 
 wdir: ../../../data/snapshots/wash/2024-01-06
 outs:
-- md5: d11aaace2411888bda21e646d615f072
-  size: 280780
+- md5: 85aa98815762572a18f6cc37ed9bc615
+  size: 18531969
   path: who.xlsx

@@ -1,0 +1,3 @@
+steps:
+  data://meadow/wash/2024-01-06/who:
+    - snapshot://wash/2024-01-06/who.xlsx
