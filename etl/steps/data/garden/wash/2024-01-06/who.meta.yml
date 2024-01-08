@@ -12,7 +12,14 @@ definitions:
     Share of the population with a handwashing facility lacking soap and/or water at home.
   hygiene_no_facility_description_short: &hygiene_no_facility_desc_short |
     Share of the population with no handwashing facility at home.
-
+  sanitation_basic_description_short: &sanitation_basic_desc_short |
+    Share of the population using improved sanitation facilities that are not shared with other households. Improved sanitation facilities are those designed to hygienically separate excreta from human contact, and include: flush/pour flush toilets connected to piped sewer systems, septic tanks or pit latrines; pit latrines with slabs (including ventilated pit latrines), and composting toilets.
+  sanitation_limited_description_short: &sanitation_limited_desc_short |
+    Share of the population using improved sanitation facilities that are shared between two or more households. Improved sanitation facilities are those designed to hygienically separate excreta from human contact, and include: flush/pour flush toilets connected to piped sewer systems, septic tanks or pit latrines; pit latrines with slabs (including ventilated pit latrines), and composting toilets.
+  sanitation_unimproved_description_short: &sanitation_unimproved_desc_short |
+    Share of the population using unimproved sanitation facilities. Unimproved sanitation facilities include pit latrines without a slab or platform, hanging latrines or bucket latrines.
+  sanitation_open_defecation_description_short: &sanitation_open_defecation_desc_short |
+    Share of the population practicing open defecation. Open defecation refers to the practice of defecating in fields, forests, bushes, bodies of water or other open spaces.
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
 dataset:
@@ -131,154 +138,145 @@ tables:
         unit: "%"
         short_unit: "%"
       urban_proportion_of_women_and_girls_age_15_49_who_have_menstruated_in_the_previous_year_private_place_to_wash_and_change:
-        title: URBAN_Proportion of women and girls age 15-49 who have menstruated in the previous year_Private place to wash and change
-        unit: ""
-        display:
-          numDecimalPlaces: 3
-
+        title: Share of urban women aged 15-49 who have access to a private place to wash and change
+        description_short: Share of urban women aged 15-49 who have menstruated in the previous year who have access to a private place to wash and change while at home.
+        unit: "%"
+        short_unit: "%"
       urban_proportion_of_women_and_girls_age_15_49_who_have_menstruated_in_the_previous_year_participation_in_activities_during_menstruation:
-        title: URBAN_Proportion of women and girls age 15-49 who have menstruated in the previous year_Participation in activities during menstruation
-        unit: ""
-        display:
-          numDecimalPlaces: 3
-
+        title: Share of urban women aged 15-49 who participate in activities during menstruation
+        description_short: Share of urban women aged 15-49 who have menstruated in the previous year who participate in activities during menstruation.
+        unit: "%"
+        short_unit: "%"
       urban_proportion_of_women_and_girls_age_15_49_who_have_menstruated_in_the_previous_year_use_of_menstrual_materials:
-        title: URBAN_Proportion of women and girls age 15-49 who have menstruated in the previous year_Use of menstrual materials
-        unit: ""
-        display:
-          numDecimalPlaces: 3
-
+        title: Share of urban women aged 15-49 who use menstrual materials
+        description_short: Share of urban women and girls aged 15-49 who have menstruated in the previous year who use menstrual materials to capture and contain menstrual blood, such as sanitary pads, cloth, tampons, or cups.
+        unit: "%"
       urban_proportion_of_women_and_girls_age_15_49_who_have_menstruated_in_the_previous_year_use_of_reusable_materials:
-        title: URBAN_Proportion of women and girls age 15-49 who have menstruated in the previous year_Use of reusable materials
-        unit: ""
-        display:
-          numDecimalPlaces: 3
-
+        title: Share of women aged 15-49 who use reusable menstrual materials
+        description_short: Share of women aged 15-49 who have menstruated in the previous year who use reusable menstrual materials to capture and contain menstrual blood.
+        unit: "%"
+        short_unit: "%"
       urban_proportion_of_women_and_girls_age_15_49_who_have_menstruated_in_the_previous_year_use_of_single_use_materials:
-        title: URBAN_Proportion of women and girls age 15-49 who have menstruated in the previous year_Use of single-use materials
-        unit: ""
-        display:
-          numDecimalPlaces: 3
-
+        title: Share of urban women aged 15-49 who use single-use menstrual materials
+        description_short: Share of urban women aged 15-49 who have menstruated in the previous year who use single-use menstrual materials to capture and contain menstrual blood.
+        unit: "%"
+        short_unit: "%"
       total_proportion_of_women_and_girls_age_15_49_who_have_menstruated_in_the_previous_year_awareness_of_menstruation_before_menarche:
-        title: TOTAL_Proportion of women and girls age 15-49 who have menstruated in the previous year_Awareness of menstruation before menarche
-        unit: ""
-        display:
-          numDecimalPlaces: 3
-
+        title: Share of women aged 15-49 who were aware of menstruation before their first period
+        description_short: Share of women aged 15-49 who have menstruated in the previous year who were aware of menstruation before their first period.
+        unit: "%"
+        short_unit: "%"
       total_proportion_of_women_and_girls_age_15_49_who_have_menstruated_in_the_previous_year_private_place_to_wash_and_change:
-        title: TOTAL_Proportion of women and girls age 15-49 who have menstruated in the previous year_Private place to wash and change
-        unit: ""
-        display:
-          numDecimalPlaces: 3
-
+        title: Share of women aged 15-49 who have access to a private place to wash and change
+        description_short: Share of women aged 15-49 who have menstruated in the previous year who have access to a private place to wash and change while at home.
+        unit: "%"
+        short_unit: "%"
       total_proportion_of_women_and_girls_age_15_49_who_have_menstruated_in_the_previous_year_participation_in_activities_during_menstruation:
-        title: TOTAL_Proportion of women and girls age 15-49 who have menstruated in the previous year_Participation in activities during menstruation
-        unit: ""
-        display:
-          numDecimalPlaces: 3
-
+        title: Share of women aged 15-49 who participate in activities during menstruation
+        description_short: Share of women aged 15-49 who have menstruated in the previous year who participate in activities during menstruation.
+        unit: "%"
+        short_unit: "%"
       total_proportion_of_women_and_girls_age_15_49_who_have_menstruated_in_the_previous_year_use_of_menstrual_materials:
-        title: TOTAL_Proportion of women and girls age 15-49 who have menstruated in the previous year_Use of menstrual materials
-        unit: ""
-        display:
-          numDecimalPlaces: 3
-
+        title: Share of women aged 15-49 who use menstrual materials
+        description_short: Share of women aged 15-49 who have menstruated in the previous year who use menstrual materials to capture and contain menstrual blood, such as sanitary pads, cloth, tampons, or cups.
+        unit: "%"
+        short_unit: "%"
       total_proportion_of_women_and_girls_age_15_49_who_have_menstruated_in_the_previous_year_use_of_reusable_materials:
-        title: TOTAL_Proportion of women and girls age 15-49 who have menstruated in the previous year_Use of reusable materials
-        unit: ""
-        display:
-          numDecimalPlaces: 3
-
+        title: Share of women aged 15-49 who use reusable menstrual materials
+        description_short: Share of women aged 15-49 who have menstruated in the previous year who use reusable menstrual materials to capture and contain menstrual blood.
+        unit: "%"
+        short_unit: "%"
       total_proportion_of_women_and_girls_age_15_49_who_have_menstruated_in_the_previous_year_use_of_single_use_materials:
-        title: TOTAL_Proportion of women and girls age 15-49 who have menstruated in the previous year_Use of single-use materials
-        unit: ""
-        display:
-          numDecimalPlaces: 3
+        title: Share of women aged 15-49 who use single-use menstrual materials
+        description_short: Share of women aged 15-49 who have menstruated in the previous year who use single-use menstrual materials to capture and contain menstrual blood.
+        unit: "%"
+        short_unit: "%"
   sanitation:
-    title: WHO/UNICEF Joint Monitoring Programme for Water Supply, Sanitation and Hygiene
-    description: The WHO/UNICEF Joint Monitoring Programme for Water Supply, Sanitation and Hygiene (JMP) has reported country, regional and global estimates of progress on drinking water, sanitation and hygiene (WASH) since 1990.
     variables:
       population__thousands:
         title: Population  (thousands)
         unit: ""
-
       pct_urban:
-        title: "% urban"
-        unit: ""
-
+        title: Share of the population that lives in urban areas
+        unit: "%"
+        short_unit: "%"
       rural_at_least_basic:
-        title: RURAL_At least basic
-        unit: ""
-
+        title: Share of the rural population with at least basic sanitation facilities
+        description_short: *sanitation_basic_desc_short
+        unit: "%"
+        short_unit: "%"
       rural_limited__shared:
-        title: RURAL_Limited (shared)
-        unit: ""
-
+        title: Share of the rural population with limited sanitation facilities
+        description_short: *sanitation_limited_desc_short
+        unit: "%"
+        short_unit: "%"
       rural_unimproved:
-        title: RURAL_Unimproved
-        unit: ""
-
+        title: Share of the rural population with unimproved sanitation facilities
+        description_short: *sanitation_unimproved_desc_short
+        unit: "%"
       rural_open_defecation:
-        title: RURAL_Open defecation
-        unit: ""
-
+        title: Share of the rural population practicing open defecation
+        description_short: *sanitation_open_defecation_desc_short
+        unit: "%"
+        short_unit: "%"
       rural_annual_rate_of_change_in__at_least_basic:
-        title: RURAL_Annual rate of change in  at least basic
-        unit: ""
-
+        title: Annual rate of change in the share of the rural population with at least basic sanitation facilities
+        unit: "percentage points"
       rural_annual_rate_of_change_in_open_defecation:
-        title: RURAL_Annual rate of change in open defecation
-        unit: ""
-
+        title: Annual rate of change in the share of the rural population practicing open defecation
+        unit: "percentage points"
       urban_at_least_basic:
-        title: URBAN_At least basic
-        unit: ""
-
+        title: Share of the urban population with at least basic sanitation facilities
+        description_short: *sanitation_basic_desc_short
+        unit: "%"
+        short_unit: "%"
       urban_limited__shared:
-        title: URBAN_Limited (shared)
-        unit: ""
-
+        title: Share of the urban population with limited sanitation facilities
+        description_short: *sanitation_limited_desc_short
+        unit: "%"
+        short_unit: "%"
       urban_unimproved:
-        title: URBAN_Unimproved
-        unit: ""
-
+        title: Share of the urban population with unimproved sanitation facilities
+        description_short: *sanitation_unimproved_desc_short
+        unit: "%"
+        short_unit: "%"
       urban_open_defecation:
-        title: URBAN_Open defecation
-        unit: ""
-
+        title: Share of the urban population practicing open defecation
+        description_short: *sanitation_open_defecation_desc_short
+        unit: "%"
+        short_unit: "%"
       urban_annual_rate_of_change_in__at_least_basic:
-        title: URBAN_Annual rate of change in  at least basic
-        unit: ""
-
+        title: Annual rate of change in the share of the urban population with at least basic sanitation facilities
+        unit: "percentage points"
       urban_annual_rate_of_change_in_open_defecation:
-        title: URBAN_Annual rate of change in open defecation
-        unit: ""
-
+        title: Annual rate of change in the share of the urban population practicing open defecation
+        unit: "percentage points"
       total_at_least_basic:
-        title: TOTAL_At least basic
-        unit: ""
-
+        title: Share of the population with at least basic sanitation facilities
+        description_short: *sanitation_basic_desc_short
+        unit: "%"
+        short_unit: "%"
       total_limited__shared:
-        title: TOTAL_Limited (shared)
-        unit: ""
-
+        title: Share of the population with limited sanitation facilities
+        description_short: *sanitation_limited_desc_short
+        unit: "%"
+        short_unit: "%"
       total_unimproved:
-        title: TOTAL_Unimproved
-        unit: ""
-
+        title: Share of the population with unimproved sanitation facilities
+        description_short: *sanitation_unimproved_desc_short
+        unit: "%"
+        short_unit: "%"
       total_open_defecation:
-        title: TOTAL_Open defecation
-        unit: ""
-
+        title: Share of the population practicing open defecation
+        description_short: *sanitation_open_defecation_desc_short
+        unit: "%"
+        short_unit: "%"
       total_annual_rate_of_change_in__at_least_basic:
-        title: TOTAL_Annual rate of change in  at least basic
-        unit: ""
-
+        title: Annual rate of change in the share of the population with at least basic sanitation facilities
+        unit: "percentage points"
       total_annual_rate_of_change_in_open_defecation:
-        title: TOTAL_Annual rate of change in open defecation
-        unit: ""
-
+        title: Annual rate of change in the share of the population practicing open defecation
+        unit: "percentage points"
       rural_proportion_of_population_using_improved__sanitation_facilities__excluding_shared__safely_managed:
         title: RURAL_Proportion of population using improved  sanitation facilities  (excluding shared)_Safely managed
         unit: ""
