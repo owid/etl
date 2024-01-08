@@ -12,6 +12,7 @@ steps:
     - data://open_numbers/open_numbers/latest/gapminder__systema_globalis
   data://grapher/demography/2023-03-30/population:
     - data://garden/demography/2022-12-08/population
+
   data://garden/demography/2023-03-31/population:
     - data://garden/hyde/2017/baseline
     - data://garden/gapminder/2023-03-31/population
@@ -21,6 +22,30 @@ steps:
     - data://garden/wb/2021-07-01/wb_income
   data://grapher/demography/2023-03-31/population:
     - data://garden/demography/2023-03-31/population
+
+
+  data://garden/demography/2024-01-05/population:
+    - data://garden/un/2022-07-11/un_wpp
+    - data://garden/hyde/2024-01-02/all_indicators
+
+  # Population (Fariss et al.)
+  data://meadow/demography/2023-12-20/population_fariss:
+    - snapshot://demography/2023-12-20/population_fariss.rds
+  data://garden/demography/2023-12-20/population_fariss:
+    - data://meadow/demography/2023-12-20/population_fariss
+    - data://garden/countries/2023-09-25/gleditsch
+  data://grapher/demography/2023-12-20/population_fariss:
+    - data://garden/demography/2023-12-20/population_fariss
+
+  # HYDE 3.3
+  data://meadow/hyde/2024-01-02/all_indicators:
+    - snapshot://hyde/2024-01-02/all_indicators.zip
+    - snapshot://hyde/2024-01-02/general_files.zip
+  data://garden/hyde/2024-01-02/all_indicators:
+    - data://meadow/hyde/2024-01-02/all_indicators
+  data://grapher/hyde/2024-01-02/all_indicators:
+    - data://garden/hyde/2024-01-02/all_indicators
+
   ## Population by education group (Wittgenstein centre)
   data://meadow/demography/2023-04-07/population_education_wittgenstein:
     - snapshot://demography/2023-04-07/population_education_wittgenstein.csv
@@ -147,21 +172,3 @@ steps:
     - data://meadow/demography/2023-11-08/modal_age_death
   data://grapher/demography/2023-11-08/modal_age_death:
     - data://garden/demography/2023-11-08/modal_age_death
-
-  # Population (Fariss et al.)
-  data://meadow/demography/2023-12-20/population_fariss:
-    - snapshot://demography/2023-12-20/population_fariss.rds
-  data://garden/demography/2023-12-20/population_fariss:
-    - data://meadow/demography/2023-12-20/population_fariss
-    - data://garden/countries/2023-09-25/gleditsch
-  data://grapher/demography/2023-12-20/population_fariss:
-    - data://garden/demography/2023-12-20/population_fariss
-
-  # HYDE 3.3
-  data://meadow/hyde/2024-01-02/all_indicators:
-    - snapshot://hyde/2024-01-02/all_indicators.zip
-    - snapshot://hyde/2024-01-02/general_files.zip
-  data://garden/hyde/2024-01-02/all_indicators:
-    - data://meadow/hyde/2024-01-02/all_indicators
-  data://grapher/hyde/2024-01-02/all_indicators:
-    - data://garden/hyde/2024-01-02/all_indicators
