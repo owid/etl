@@ -1,0 +1,38 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Nuclear Weapons
+        - War & Peace
+    processing_level: major
+
+dataset:
+  update_period_days: 0
+
+tables:
+  strategic_nuclear_forces:
+    variables:
+      nuclear_warheads_owned:
+        title: Nuclear warheads possessed by a country
+        unit: warheads
+        short_unit: ""
+        display:
+          numDecimalPlaces: 0
+      nuclear_warheads_deliverable:
+        title: Nuclear warheads deliverable on a first strike
+        unit: warheads
+        short_unit: ""
+        display:
+          numDecimalPlaces: 0
+      nuclear_warheads_yield:
+        title: Nuclear warheads yield
+        unit: megatons
+        short_unit: mt
+        description_short: Equivalent megatonnage.
+        display:
+          numDecimalPlaces: 0
+      nuclear_warheads_area:
+        title: Nuclear warheads area that could be destroyed on a first strike
+        unit: square kilometers
+        short_unit: km²
+        description_short: Measured in square kilometers.

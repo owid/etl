@@ -1,0 +1,14 @@
+steps:
+  #
+  # The Strategic Nuclear Forces Dataset (Suh).
+  #
+  data://meadow/nuclear_weapons/2024-01-08/strategic_nuclear_forces:
+    - snapshot://nuclear_weapons/2024-01-08/strategic_nuclear_forces.xlsx
+  data://garden/nuclear_weapons/2024-01-08/strategic_nuclear_forces:
+    - data://meadow/nuclear_weapons/2024-01-08/strategic_nuclear_forces
+  data://grapher/nuclear_weapons/2024-01-08/strategic_nuclear_forces:
+    - data://garden/nuclear_weapons/2024-01-08/strategic_nuclear_forces
+  ######################################################################################################################
+  # Older versions to be archived once they are not used by any other steps.
+
+  ######################################################################################################################
