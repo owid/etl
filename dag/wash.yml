@@ -3,3 +3,5 @@ steps:
     - snapshot://wash/2024-01-06/who.xlsx
   data://garden/wash/2024-01-06/who:
     - data://meadow/wash/2024-01-06/who
+  data://grapher/wash/2024-01-06/who:
+    - data://garden/wash/2024-01-06/who
