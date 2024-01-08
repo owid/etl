@@ -4,6 +4,7 @@ definitions:
     presentation:
       topic_tags:
         - Economic Growth
+    processing_level: minor
 
 
 # Learn more about the available fields:
@@ -19,39 +20,34 @@ tables:
     # Learn more about the available fields:
     # http://docs.owid.io/projects/etl/architecture/metadata/reference/indicator/
     variables:
-      # testing_variable:
-      #   title: Testing variable title
-      #   unit: arbitrary units
-      #   short_unit: au
-      #   description_short: Short description of testing variable.
-      #   description_processing: Description of processing of testing variable.
-      #   description_key: List of key points about the indicator.
-      #   description_from_producer: Description of testing variable from producer.
-      #   processing_level: minor
-      #   presentation:
-      #     attribution:
-      #     attribution_short:
-      #     faqs:
-      #     grapher_config:
-      #     title_public:
-      #     title_variant:
-      #     topic_tags:
-      #   display:
-      #     color:
-      #     conversionFactor: 1
-      #     description:
-      #     entityAnnotationsMap: Test annotation
-      #     includeInTable:
-      #     isProjection: false
-      #     name: Testing variable
-      #     numDecimalPlaces: 0
-      #     shortUnit: au
-      #     tableDisplay:
-      #       hideAbsoluteChange:
-      #       hideRelativeChange:
-      #     tolerance: 0
-      #     unit: arbitrary units
-      #     yearIsDay: false
-      #     zeroDay:
-      {}
+      mean_gdp:
+        title: Mean estimation of GDP
+        unit:
+        short_unit: $
+        description_short: Short description of testing variable.
+        description_processing: Description of processing of testing variable.
+        description_key: List of key points about the indicator.
+        description_from_producer: Description of testing variable from producer.
+        display:
+          color:
+          conversionFactor: 1
+          description:
+          entityAnnotationsMap: Test annotation
+          includeInTable:
+          isProjection: false
+          name: Testing variable
+          numDecimalPlaces: 0
+          shortUnit: au
+          tableDisplay:
+            hideAbsoluteChange:
+            hideRelativeChange:
+          tolerance: 0
+          unit: arbitrary units
+          yearIsDay: false
+          zeroDay:
+      sd_gdp:
+      mean_gdp_pc:
+      sd_gdp_pc:
+      mean_pop:
+      sd_pop:
 
