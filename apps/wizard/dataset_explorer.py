@@ -7,7 +7,7 @@ from typing import Any, Dict, List, cast
 
 import streamlit as st
 from st_pages import add_indentation
-from streamlit_agraph import ConfigBuilder, Edge, Node, agraph
+from streamlit_agraph import Config, ConfigBuilder, Edge, Node, agraph
 
 from etl.steps import extract_step_attributes, filter_to_subgraph, load_dag
 
@@ -146,24 +146,24 @@ def generate_graph(
     # }
 
     # config.layout["hierarchical"]["enabled"] = True
-    # config = Config(
-    #     width=2000,
-    #     height=1000,
-    #     nodeHighlightBehavior=True,
-    #     # highlightColor="#F7A7A6",
-    #     # collapsible=True,
-    #     node=node_config,
-    #     directed=True,
-    #     physics=True,
-    #     minVelocity=20,
-    #     maxVelocity=1000,
-    #     # nodeSpacing=10000,
-    #     stabilization=False,
-    #     fit=False,
-    #     # hierarchical=True,
-    #     # nodeSpacing=200,
-    #     # **kwargs
-    # )
+    config = Config(
+        width=2000,
+        height=1000,
+        nodeHighlightBehavior=True,
+        # highlightColor="#F7A7A6",
+        # collapsible=True,
+        # node=node_config,
+        directed=True,
+        physics=False,
+        minVelocity=20,
+        maxVelocity=1000,
+        # nodeSpacing=10000,
+        stabilization=False,
+        fit=False,
+        hierarchical=True,
+        # nodeSpacing=200,
+        # **kwargs
+    )
 
     # config.physics["barnesHut"] = {"springConstant": 0, "avoidOverlap": 0.1}
 
