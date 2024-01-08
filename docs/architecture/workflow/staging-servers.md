@@ -2,6 +2,10 @@
 
 Dedicated staging servers are automatically created from every ETL pull request. That gives data manager the ability to share and test their changes before they are merged into the live site.
 
+!!! note "PR staging servers URLs"
+
+    You can visit your PR staging server at `http://staging-site-<branch-name>`. Note that `<branch-name>` might differ from the exact branch name, for example `feature/123` will be `feature-123` (all symbols are changed to dashes).
+
 Once the PR is ready, data manager should merge it into master, wait for deploy process to run ETL with their updates and then migrate all charts to the live site. This has to be done within 24 hours after the PR is merged, then the staging server will be destroyed.
 
 ```mermaid
