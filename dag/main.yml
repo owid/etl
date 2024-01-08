@@ -784,4 +784,3 @@ include:
   - dag/animal_welfare.yml
   - dag/plastic_use.yml
   - dag/statins.yml
-  - dag/nuclear_weapons.yml

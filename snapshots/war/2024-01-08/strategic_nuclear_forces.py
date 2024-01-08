@@ -14,7 +14,7 @@ SNAPSHOT_VERSION = Path(__file__).parent.name
 @click.option("--upload/--skip-upload", default=True, type=bool, help="Upload dataset to Snapshot")
 def main(upload: bool) -> None:
     # Create a new snapshot.
-    snap = Snapshot(f"nuclear_weapons/{SNAPSHOT_VERSION}/strategic_nuclear_forces.xlsx")
+    snap = Snapshot(f"war/{SNAPSHOT_VERSION}/strategic_nuclear_forces.xlsx")
 
     # Download data from source, add file to DVC and upload to S3.
     snap.create_snapshot(upload=upload)

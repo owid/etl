@@ -128,3 +128,11 @@ steps:
     - snapshot://war/2023-11-29/chupilkin_koczan.dta
   data://garden/war/2023-11-29/chupilkin_koczan:
     - data://meadow/war/2023-11-29/chupilkin_koczan
+
+  # The Strategic Nuclear Forces Dataset (Suh).
+  data://meadow/war/2024-01-08/strategic_nuclear_forces:
+    - snapshot://war/2024-01-08/strategic_nuclear_forces.xlsx
+  data://garden/war/2024-01-08/strategic_nuclear_forces:
+    - data://meadow/war/2024-01-08/strategic_nuclear_forces
+  data://grapher/war/2024-01-08/strategic_nuclear_forces:
+    - data://garden/war/2024-01-08/strategic_nuclear_forces

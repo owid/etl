@@ -1,5 +1,3 @@
-# Learn more at:
-# http://docs.owid.io/projects/etl/architecture/metadata/reference/origin/
 meta:
   origin:
     # Data product / Snapshot
@@ -27,7 +25,8 @@ meta:
     license:
       name: CC BY 4.0
 
-wdir: ../../../data/snapshots/nuclear_weapons/2024-01-08
+wdir: ../../../data/snapshots/war/2024-01-08
+
 outs:
 - md5: ea6b9a96e6068a98ae315a42a57073f6
   size: 156328
