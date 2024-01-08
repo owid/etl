@@ -60,7 +60,7 @@ def restructure_table_and_adjust_numbers(tb: Table) -> Table:
     )
 
     # Adjust numbers
-    tb["population"] *= 1e-6
-    tb["gdp"] *= 1e-9
+    tb["population"] *= 1e6
+    tb["gdp"] *= 1e9
 
     return tb
