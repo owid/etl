@@ -33,7 +33,7 @@ steps:
     - snapshot://demography/2023-12-20/population_fariss.rds
   data://garden/demography/2023-12-20/population_fariss:
     - data://meadow/demography/2023-12-20/population_fariss
-    - data://garden/countries/2023-09-25/gleditsch
+    - data://garden/countries/2024-01-08/gleditsch_no_population
   data://grapher/demography/2023-12-20/population_fariss:
     - data://garden/demography/2023-12-20/population_fariss
 
