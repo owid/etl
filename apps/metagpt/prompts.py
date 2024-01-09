@@ -1,8 +1,12 @@
-"""Prompts for chat GPT."""
+"""Prompts for chat GPT.
+
+Contains instructions to correctly query chat GPT for the different use cases (snapshot, garden, grapher, etc.). This includes details on what each metadata field means.
+"""
 import json
 from typing import Any, Dict, List
 
-from apps.metagpt.utils import _read_metadata_file
+from apps.metagpt.gpt import GPTQuery
+from apps.metagpt.utils import read_metadata_file
 from etl.paths import BASE_DIR
 
 # Example of new metadata format
@@ -97,7 +101,7 @@ DOCS_METADATA_INDICATORS = docs["properties"]["tables"]["additionalProperties"][
 def create_system_prompt_snapshot(metadata_old_str: str) -> List[Dict[str, str]] | None:
     """Create the system prompt for the GPT model based on file path."""
     # Load example of new metadata format
-    new_metadata_file = _read_metadata_file(NEW_METADATA_EXAMPLE)
+    new_metadata_file = read_metadata_file(NEW_METADATA_EXAMPLE)
     system_prompt = f"""
     You are given an old metadata file with information about the sources of the data in the old format. Now, we've transitioned to a new format.
 
@@ -119,6 +123,18 @@ def create_system_prompt_snapshot(metadata_old_str: str) -> List[Dict[str, str]]
         {"role": "user", "content": metadata_old_str},
     ]
     return messages
+
+
+def create_query_snapshot(metadata_old_str: str) -> GPTQuery:
+    """Build GPT query."""
+    messages = create_system_prompt_snapshot(metadata_old_str)
+    # Build query for GPT
+    query = GPTQuery(
+        messages=messages,
+        temperature=0,
+    )
+
+    return query
 
 
 def create_system_prompt_data_step(
@@ -157,3 +173,19 @@ def create_system_prompt_data_step(
 
     messages = [{"role": "system", "content": base_template_instructions + base_template_prompt}]
     return messages
+
+
+def create_query_data_step(variable_title: str, metadata_field: str, ds_meta_description: Dict[str, Any]) -> GPTQuery:
+    """Build GPT query."""
+    messages = create_system_prompt_data_step(
+        variable_title,
+        metadata_field,
+        ds_meta_description,
+    )
+    # Build query for GPT
+    query = GPTQuery(
+        messages=messages,
+        temperature=0,
+    )
+
+    return query

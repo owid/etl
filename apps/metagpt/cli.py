@@ -1,3 +1,4 @@
+"""Clientn module."""
 import os
 from typing import Any, Dict, Literal
 
@@ -8,11 +9,9 @@ from owid.catalog import Dataset
 from rich_click.rich_command import RichCommand
 from typing_extensions import Self
 
-from apps.metagpt.prompts import create_system_prompt_data_step, create_system_prompt_snapshot
-from apps.metagpt.utils import Channels, OpenAIWrapper, _read_metadata_file
-
-# GPT Model
-RATE_PER_1000_TOKENS = 0.0015  # Approximate average cost per 1000 tokens from here - https://openai.com/pricing
+from apps.metagpt.gpt import OpenAIWrapper
+from apps.metagpt.prompts import create_query_data_step, create_query_snapshot
+from apps.metagpt.utils import Channels, convert_list_to_dict, read_metadata_file
 
 # Fields to ask GPT for (garden, grapher)
 FIELDS_TO_FILL_OUT = [
@@ -108,7 +107,7 @@ class MetadataGPTUpdater:
     def metadata_old_str(self: Self) -> str:
         """Read a metadata file and returns its content."""
         if self.__metadata_old is None:
-            self.__metadata_old = _read_metadata_file(self.path_to_file)
+            self.__metadata_old = read_metadata_file(self.path_to_file)
         return self.__metadata_old
 
     @property
@@ -149,7 +148,6 @@ class MetadataGPTUpdater:
 
     def run(self: Self) -> str | None:
         """Update metadata using OpenAI GPT."""
-
         # Update metadata
         match self.channel:
             case Channels.SNAPSHOT:
@@ -157,128 +155,87 @@ class MetadataGPTUpdater:
             case Channels.GARDEN | Channels.GRAPHER:
                 self.run_data_step()
                 return
+            case _:
+                raise Exception(
+                    f"Invalid channel. Should either be '{Channels.SNAPSHOT}', '{Channels.GARDEN}' or '{Channels.GRAPHER}'."
+                )
 
-    def run_snapshot(self: Self):
+    def run_snapshot(self: Self) -> None:
         """Run main code for snapshot."""
         # Create system prompt
-        messages = create_system_prompt_snapshot(self.metadata_old_str)
-        gpt_result = self.client.query_gpt(
-            messages=messages,
-            temperature=0,
-        )
+        query = create_query_snapshot(self.metadata_old_str)
+        response = self.client.query_gpt(query=query)
 
-        if gpt_result:
-            new_yaml_content = yaml.safe_load(gpt_result.message_content)
-            if new_yaml_content:
-                self.__metadata_new = new_yaml_content
+        if response:
+            self.__metadata_new = response.message_content_as_dict
 
-    def run_data_step(self):
-        """Run main code for a data  (garden or grapher) step."""
+    def run_data_step(self: Self) -> None:
+        """Run main code for a data (garden or grapher) step."""
+        # Calculate the total estimated cost
+        cost_estimated = self._run_data_step(lazy=True)
 
-        # Load stuff
+        # Ask the user if they want to proceed
+        proceed = input(f"The total estimated cost is ${cost_estimated:.3f}. Do you want to proceed? (yes/no): ")
+
+        if proceed.lower() == "yes":
+            final_cost = self._run_data_step()
+            log.info(f"Cost GPT4: ${final_cost:.3f}")
+
+    def _run_data_step(self: Self, lazy: bool = False) -> float:
+        """Actually run the data step.
+
+        1. Load necessary data: dataset metadata, YAML metadata.
+        2. iterate over all tables, indicators and indicators' fields.
+        3. for each (table, indicator, field), build a GPT query and
+            a. if lazy mode, just estimate the cost of the overall query.
+            b. otherwise, query GPT, update the metadata and get the real cost (a posteriori).
+
+        Returns:
+            float: the cost of the query. if lazy mode is on, the cost is estimated (no query has been performed). otherwise, the cost is real (query has been performed).
+        """
         ## Load dataset
         ds = self.load_dataset()
         ds_meta_description = ds.metadata.to_dict()
+
         ## Load metadata yaml file
         original_yaml_content = self.load_yaml_metadata()
 
-        # Calculate the total estimated cost
-        total_estimated_cost = self.estimate_cost(
-            original_yaml_content,
-            FIELDS_TO_FILL_OUT,
-            ds_meta_description,
-        )
-
-        # Ask the user if they want to proceed
-        proceed = input(f"The total estimated cost is ${total_estimated_cost:.3f}. Do you want to proceed? (yes/no): ")
-
-        final_cost = 0
-        if proceed.lower() == "yes":
-            for table_name, table_data in original_yaml_content["tables"].items():
-                for variable_name, variable_data in table_data["variables"].items():
-                    variable_title = variable_data["title"]
-                    indicator_metadata = []
-                    for metadata_field in FIELDS_TO_FILL_OUT:
-                        messages = create_system_prompt_data_step(
-                            variable_title,
-                            metadata_field,
-                            ds_meta_description,
-                        )
-                        gpt_result = self.client.query_gpt(
-                            messages=messages,
-                            temperature=0,
-                        )
-                        # Act based on reply (only if valid)
-                        if gpt_result is not None:
-                            final_cost += gpt_result.cost
-                            indicator_metadata.append(gpt_result.message_content)
-
-                    print(indicator_metadata)
-                    indicator_metadata_dict = convert_list_to_dict(indicator_metadata)
-                    # if "description_key" in indicator_metadata:
-                    #     indicator_metadata["description_key"] = [
-                    #         f"{item}" for item in indicator_metadata["description_key"]
-                    #     ]
-                    original_yaml_content["tables"][table_name]["variables"][variable_name].update(
-                        indicator_metadata_dict
-                    )
-        log.info(f"Cost GPT4: ${final_cost:.3f}")
-
-        # Update metadata
-        self.__metadata_new = original_yaml_content
-
-    def estimate_cost(self: Self, original_yaml_content, fields_to_fill_out, ds_meta_description) -> float:
-        """Estimate cost of GPT query."""
-        # Sanity check
-        if self.channel not in [Channels.GARDEN, Channels.GRAPHER]:
-            raise Exception(
-                f"Invalid channel. Cost estimation is only implemented for '{Channels.GARDEN}' and '{Channels.GRAPHER}'."
-            )
-        # Estimate cost
-        total_estimated_cost = 0
-        for _, table_data in original_yaml_content["tables"].items():
-            for _, variable_data in table_data["variables"].items():
+        cost = 0
+        # Iterate over all tables
+        for table_name, table_data in original_yaml_content["tables"].items():
+            # Iterate over all indicators
+            for variable_name, variable_data in table_data["variables"].items():
                 variable_title = variable_data["title"]
-                for metadata_field in fields_to_fill_out:
-                    messages = create_system_prompt_data_step(
+                indicator_metadata = []
+                # Iterate over all indicator fields
+                for metadata_field in FIELDS_TO_FILL_OUT:
+                    # Build query for GPT
+                    query = create_query_data_step(
                         variable_title,
                         metadata_field,
                         ds_meta_description,
                     )
-                    char_count = len(messages[0]["content"])  # type: ignore
-                    est_cost = calculate_gpt_cost(char_count)
-                    total_estimated_cost += len(original_yaml_content["tables"].items()) * est_cost
-        return total_estimated_cost
-
-
-def convert_list_to_dict(data_list):
-    """Convert a list of string elements in the format "'key': 'value'" into a dictionary."""
-    data_dict = {}
-    for item in data_list:
-        # Removing leading and trailing single quotes, then splitting the string by ':'
-        key, value = item.strip("'").split(": ", 1)
-        data_dict[key.strip("'")] = value.strip("'\"")
-    return data_dict
-
-
-def calculate_gpt_cost(char_count):
-    """
-    Calculate the cost of using GPT based on the number of characters.
-
-    This function estimates the cost of using GPT by converting the number of characters into tokens,
-    rounding up to the nearest thousand tokens, and then multiplying by the rate per thousand tokens.
-
-    Args:
-        char_count (int): The number of characters in the text to be processed by GPT.
-
-    Returns:
-        float: The estimated cost of using GPT for the given number of characters.
-    """
-
-    tokens = char_count / 4  # Average size of a token is 4 characters
-    tokens_rounded_up = -(-tokens // 1000) * 1000  # Round up to the nearest 1000 tokens
-    estimated_cost = (tokens_rounded_up / 1000) * RATE_PER_1000_TOKENS
-    return estimated_cost
+                    # Query GPT (or just estimate cost if lazy mode is on)
+                    if lazy:
+                        est_cost = query.estimated_cost
+                        cost += len(original_yaml_content["tables"].items()) * est_cost
+                    else:
+                        result = self.client.query_gpt(query=query)
+                        # Act based on reply (only if valid)
+                        if result:
+                            cost += result.cost
+                            indicator_metadata.append(result.message_content)
+                # Update indicator metadata (when lazy mode is OFF)
+                if not lazy:
+                    indicator_metadata_dict = convert_list_to_dict(indicator_metadata)
+                    original_yaml_content["tables"][table_name]["variables"][variable_name].update(
+                        indicator_metadata_dict
+                    )
+        # Update metadata (when lazy mode is OFF)
+        if not lazy:
+            # Update metadata
+            self.__metadata_new = original_yaml_content
+        return cost
 
 
 if __name__ == "__main__":
