@@ -20,13 +20,30 @@ definitions:
     Share of the population using unimproved sanitation facilities. Unimproved sanitation facilities include pit latrines without a slab or platform, hanging latrines or bucket latrines.
   sanitation_open_defecation_description_short: &sanitation_open_defecation_desc_short |
     Share of the population practicing open defecation. Open defecation refers to the practice of defecating in fields, forests, bushes, bodies of water or other open spaces.
+  water_safely_managed_description_short: &water_safely_managed_desc_short |
+    Share of the population using safely managed drinking water services. Safely managed drinking water services are defined as an improved drinking water source that is located on premises, available when needed and free from faecal and priority chemical contamination.
+  water_basic_description_short: &water_basic_desc_short |
+    Share of the population using at least basic drinking water services. Basic drinking water services are defined as an improved drinking water source,provided collection time is not more than 30 minutes for a roundtrip including queuing.
+  water_limited_description_short: &water_limited_desc_short |
+    Share of the population using limited drinking water services. Limited drinking water services are defined as drinking water from an improved source for which collection time exceeds 30 minutes for a roundtrip including queuing.
+  water_unimproved_description_short: &water_unimproved_desc_short |
+    Share of the population using unimproved drinking water services. Unimproved drinking water services are defined as drinking water from an unprotected dug well or unprotected spring.
+  water_surface_description_short: &water_surface_desc_short |
+    Share of the population using surface water as a primary source of drinking water. Surface water includes rivers, streams, ponds, lakes, dams, canals and irrigation channels.
+  water_accessible_on_premises_description_short: &water_accessible_on_premises_desc_short |
+    Share of the population using improved drinking water services that are accessible on premises. Improved drinking water sources are those that have the potential to deliver safe water by nature of their design and construction, and include: piped water, boreholes or tubewells, protected dug wells, protected springs, rainwater, and packaged or delivered water.
+  water_available_when_needed_description_short: &water_available_when_needed_desc_short |
+    Share of the population using improved drinking water services that are available when needed. Improved drinking water sources are those that have the potential to deliver safe water by nature of their design and construction, and include: piped water, boreholes or tubewells, protected dug wells, protected springs, rainwater, and packaged or delivered water.
+  water_free_from_contamination_description_short: &water_free_from_contamination_desc_short |
+    Share of the population using improved drinking water services that are free from faecal and priority chemical contamination. Improved drinking water sources are those that have the potential to deliver safe water by nature of their design and construction, and include: piped water, boreholes or tubewells, protected dug wells, protected springs, rainwater, and packaged or delivered water.
+  water_piped_description_short: &water_piped_desc_short |
+    Share of the population using improved drinking water services that are piped. Improved drinking water sources are those that have the potential to deliver safe water by nature of their design and construction, and include: piped water, boreholes or tubewells, protected dug wells, protected springs, rainwater, and packaged or delivered water.
+  water_non_piped_description_short: &water_non_piped_desc_short |
+    Share of the population using improved drinking water services that are not piped. Improved drinking water sources are those that have the potential to deliver safe water by nature of their design and construction, and include: piped water, boreholes or tubewells, protected dug wells, protected springs, rainwater, and packaged or delivered water.
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
 dataset:
-  update_period_days: 365
-  # Learn more about the available fields:
-  # http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
-  title: WHO/UNICEF Joint Monitoring Programme for Water Supply, Sanitation and Hygiene
+  update_period_days: 730
 tables:
   hygiene:
     variables:
@@ -86,16 +103,6 @@ tables:
         unit: "percentage points"
   menstrual_health:
     variables:
-      year_survey_name:
-        title: Year_Survey name
-        unit: ""
-      population_of_women_and_girls_age_15_49__thousands:
-        title: Population of women and girls age 15-49 (thousands)
-        unit: ""
-      pct_urban__of_total_population:
-        title: Share of the population that lives in urban areas
-        unit: "%"
-        short_unit: "%"
       rural_proportion_of_women_and_girls_age_15_49_who_have_menstruated_in_the_previous_year_awareness_of_menstruation_before_menarche:
         title: Share of rural women aged 15-49 who were aware of menstruation before their first period
         description_short: Share of rural women aged 15-49 who have menstruated in the previous year who were aware of menstruation before their first period.
@@ -267,7 +274,6 @@ tables:
       rural_proportion_of_population_using_improved__sanitation_facilities__excluding_shared__safely_managed:
         title: RURAL_Proportion of population using improved  sanitation facilities  (excluding shared)_Safely managed
         unit: ""
-
       rural_proportion_of_population_using_improved__sanitation_facilities__excluding_shared__disposed_in_situ:
         title: RURAL_Proportion of population using improved  sanitation facilities  (excluding shared)_Disposed in situ
         unit: ""
@@ -359,162 +365,173 @@ tables:
       total_proportion_of_population_using_improved__sanitation_facilities__including_shared__sewer_connections:
         title: TOTAL_Proportion of population using improved  sanitation facilities  (including shared)_Sewer connections
         unit: ""
-
-      total_proportion_of_population_using_improved__sanitation_facilities__including_shared__sl:
-        title: TOTAL_Proportion of population using improved  sanitation facilities  (including shared)_Sl
-        unit: ""
-        display:
-          numDecimalPlaces: 0
   water:
-    title: WHO/UNICEF Joint Monitoring Programme for Water Supply, Sanitation and Hygiene
-    description: The WHO/UNICEF Joint Monitoring Programme for Water Supply, Sanitation and Hygiene (JMP) has reported country, regional and global estimates of progress on drinking water, sanitation and hygiene (WASH) since 1990.
     variables:
       rural_at_least_basic:
-        title: RURAL_At least basic
-        unit: ""
-
+        title: Share of the rural population with at least basic drinking water services
+        description_short: *water_basic_desc_short
+        unit: "%"
+        short_unit: "%"
       rural_limited__more_than_30_mins:
-        title: RURAL_Limited (more than 30 mins)
-        unit: ""
-
+        title: Share of the rural population with limited drinking water services
+        description_short: *water_limited_desc_short
+        unit: "%"
+        short_unit: "%"
       rural_unimproved:
-        title: RURAL_Unimproved
-        unit: ""
-
+        title: Share of the rural population with unimproved drinking water services
+        description_short: *water_unimproved_desc_short
+        unit: "%"
+        short_unit: "%"
       rural_surface_water:
-        title: RURAL_Surface water
-        unit: ""
-
+        title: Share of the rural population using surface water as a primary source of drinking water
+        description_short: *water_surface_desc_short
+        unit: "%"
+        short_unit: "%"
       rural_annual_rate_of_change_in__at_least_basic:
-        title: RURAL_Annual rate of change in  at least basic
-        unit: ""
-
+        title: Annual rate of change in the share of the rural population with at least basic drinking water services
+        unit: "percentage points"
       urban_at_least_basic:
-        title: URBAN_At least basic
-        unit: ""
-
+        title: Share of the urban population with at least basic drinking water services
+        description_short: *water_basic_desc_short
+        unit: "%"
+        short_unit: "%"
       urban_limited__more_than_30_mins:
-        title: URBAN_Limited (more than 30 mins)
-        unit: ""
-
+        title: Share of the urban population with limited drinking water services
+        description_short: *water_limited_desc_short
+        unit: "%"
+        short_unit: "%"
       urban_unimproved:
-        title: URBAN_Unimproved
-        unit: ""
-
+        title: Share of the urban population with unimproved drinking water services
+        description_short: *water_unimproved_desc_short
+        unit: "%"
+        short_unit: "%"
       urban_surface_water:
-        title: URBAN_Surface water
-        unit: ""
-
+        title: Share of the urban population using surface water as a primary source of drinking water
+        description_short: *water_surface_desc_short
+        unit: "%"
+        short_unit: "%"
       urban_annual_rate_of_change_in__at_least_basic:
-        title: URBAN_Annual rate of change in  at least basic
-        unit: ""
-
+        title: Annual rate of change in the share of the urban population with at least basic drinking water services
+        unit: "percentage points"
       total_at_least_basic:
-        title: TOTAL_At least basic
-        unit: ""
-
+        title: Share of the population with at least basic drinking water services
+        description_short: *water_basic_desc_short
+        unit: "%"
+        short_unit: "%"
       total_limited__more_than_30_mins:
-        title: TOTAL_Limited (more than 30 mins)
-        unit: ""
-
+        title: Share of the population with limited drinking water services
+        description_short: *water_limited_desc_short
+        unit: "%"
+        short_unit: "%"
       total_unimproved:
-        title: TOTAL_Unimproved
-        unit: ""
-
+        title: Share of the population with unimproved drinking water services
+        description_short: *water_unimproved_desc_short
+        unit: "%"
+        short_unit: "%"
       total_surface_water:
-        title: TOTAL_Surface water
-        unit: ""
-
+        title: Share of the population using surface water as a primary source of drinking water
+        description_short: *water_surface_desc_short
+        unit: "%"
+        short_unit: "%"
       total_annual_rate_of_change_in__at_least_basic:
-        title: TOTAL_Annual rate of change in  at least basic
-        unit: ""
-
+        title: Annual rate of change in the share of the population with at least basic drinking water services
+        unit: "percentage points"
       rural_proportion_of_population_using__improved_water_supplies_safely_managed:
-        title: RURAL_Proportion of population using  improved water supplies_Safely managed
-        unit: ""
-
+        title: Share of the rural population using improved water supplies that are safely managed
+        description_short: *water_safely_managed_desc_short
+        unit: "%"
+        short_unit: "%"
       rural_proportion_of_population_using__improved_water_supplies_accessible_on_premises:
-        title: RURAL_Proportion of population using  improved water supplies_Accessible on premises
-        unit: ""
-
+        title: Share of the rural population using improved water supplies that are accessible on premises
+        description_short: *water_accessible_on_premises_desc_short
+        unit: "%"
+        short_unit: "%"
       rural_proportion_of_population_using__improved_water_supplies_available_when_needed:
-        title: RURAL_Proportion of population using  improved water supplies_Available when needed
-        unit: ""
-
+        title: Share of the rural population using improved water supplies that are available when needed
+        description_short: *water_available_when_needed_desc_short
+        unit: "%"
+        short_unit: "%"
       rural_proportion_of_population_using__improved_water_supplies_free_from_contamination:
-        title: RURAL_Proportion of population using  improved water supplies_Free from contamination
-        unit: ""
-
+        title: Share of the rural population using improved water supplies that are free from contamination
+        description_short: *water_free_from_contamination_desc_short
+        unit: "%"
+        short_unit: "%"
       rural_proportion_of_population_using__improved_water_supplies_annual_rate_of_change_in_safely_managed:
-        title: RURAL_Proportion of population using  improved water supplies_Annual rate of change in safely managed
-        unit: ""
-
+        title: Annual rate of change in the share of the rural population using improved water supplies that are safely managed
+        unit: "percentage points"
       rural_proportion_of_population_using__improved_water_supplies_piped:
-        title: RURAL_Proportion of population using  improved water supplies_Piped
-        unit: ""
-
+        title: Share of the rural population using improved water supplies that are piped
+        description_short: *water_piped_desc_short
+        unit: "%"
+        short_unit: "%"
       rural_proportion_of_population_using__improved_water_supplies_non_piped:
-        title: RURAL_Proportion of population using  improved water supplies_Non-piped
-        unit: ""
-
+        title: Share of the rural population using improved water supplies that are not piped
+        description_short: *water_non_piped_desc_short
+        unit: "%"
+        short_unit: "%"
       urban_proportion_of_population_using__improved_water_supplies_safely_managed:
-        title: URBAN_Proportion of population using  improved water supplies_Safely managed
-        unit: ""
-
+        title: Share of the urban population using improved water supplies that are safely managed
+        description_short: *water_safely_managed_desc_short
+        unit: "%"
+        short_unit: "%"
       urban_proportion_of_population_using__improved_water_supplies_accessible_on_premises:
-        title: URBAN_Proportion of population using  improved water supplies_Accessible on premises
-        unit: ""
-
+        title: Share of the urban population using improved water supplies that are accessible on premises
+        description_short: *water_accessible_on_premises_desc_short
+        unit: "%"
+        short_unit: "%"
       urban_proportion_of_population_using__improved_water_supplies_available_when_needed:
-        title: URBAN_Proportion of population using  improved water supplies_Available when needed
-        unit: ""
-
+        title: Share of the urban population using improved water supplies that are available when needed
+        description_short: *water_available_when_needed_desc_short
+        unit: "%"
+        short_unit: "%"
       urban_proportion_of_population_using__improved_water_supplies_free_from_contamination:
-        title: URBAN_Proportion of population using  improved water supplies_Free from contamination
-        unit: ""
-
+        title: Share of the urban population using improved water supplies that are free from contamination
+        description_short: *water_free_from_contamination_desc_short
+        unit: "%"
+        short_unit: "%"
       urban_proportion_of_population_using__improved_water_supplies_annual_rate_of_change_in_safely_managed:
-        title: URBAN_Proportion of population using  improved water supplies_Annual rate of change in safely managed
-        unit: ""
-
+        title: Annual rate of change in the share of the urban population using improved water supplies that are safely managed
+        unit: "percentage points"
       urban_proportion_of_population_using__improved_water_supplies_piped:
-        title: URBAN_Proportion of population using  improved water supplies_Piped
-        unit: ""
-
+        title: Share of the urban population using improved water supplies that are piped
+        description_short: *water_piped_desc_short
+        unit: "%"
+        short_unit: "%"
       urban_proportion_of_population_using__improved_water_supplies_non_piped:
-        title: URBAN_Proportion of population using  improved water supplies_Non-piped
-        unit: ""
-
+        title: Share of the urban population using improved water supplies that are not piped
+        description_short: *water_non_piped_desc_short
+        unit: "%"
+        short_unit: "%"
       total_proportion_of_population_using__improved_water_supplies_safely_managed:
-        title: TOTAL_Proportion of population using  improved water supplies_Safely managed
-        unit: ""
-
+        title: Share of the population using improved water supplies that are safely managed
+        description_short: *water_safely_managed_desc_short
+        unit: "%"
+        short_unit: "%"
       total_proportion_of_population_using__improved_water_supplies_accessible_on_premises:
-        title: TOTAL_Proportion of population using  improved water supplies_Accessible on premises
-        unit: ""
-
+        title: Share of the population using improved water supplies that are accessible on premises
+        description_short: *water_accessible_on_premises_desc_short
+        unit: "%"
+        short_unit: "%"
       total_proportion_of_population_using__improved_water_supplies_available_when_needed:
-        title: TOTAL_Proportion of population using  improved water supplies_Available when needed
-        unit: ""
-
+        title: Share of the population using improved water supplies that are available when needed
+        description_short: *water_available_when_needed_desc_short
+        unit: "%"
+        short_unit: "%"
       total_proportion_of_population_using__improved_water_supplies_free_from_contamination:
-        title: TOTAL_Proportion of population using  improved water supplies_Free from contamination
-        unit: ""
-
+        title: Share of the population using improved water supplies that are free from contamination
+        description_short: *water_free_from_contamination_desc_short
+        unit: "%"
+        short_unit: "%"
       total_proportion_of_population_using__improved_water_supplies_annual_rate_of_change_in_safely_managed:
-        title: TOTAL_Proportion of population using  improved water supplies_Annual rate of change in safely managed
-        unit: ""
-
+        title: Annual rate of change in the share of the population using improved water supplies that are safely managed
+        unit: "percentage points"
       total_proportion_of_population_using__improved_water_supplies_piped:
-        title: TOTAL_Proportion of population using  improved water supplies_Piped
-        unit: ""
-
+        title: Share of the population using improved water supplies that are piped
+        description_short: *water_piped_desc_short
+        unit: "%"
+        short_unit: "%"
       total_proportion_of_population_using__improved_water_supplies_non_piped:
-        title: TOTAL_Proportion of population using  improved water supplies_Non-piped
-        unit: ""
-
-      total_proportion_of_population_using__improved_water_supplies_sl:
-        title: TOTAL_Proportion of population using  improved water supplies_Sl
-        unit: ""
-        display:
-          numDecimalPlaces: 0
+        title: Share of the population using improved water supplies that are not piped
+        description_short: *water_non_piped_desc_short
+        unit: "%"
+        short_unit: "%"

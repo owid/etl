@@ -60,6 +60,20 @@ def clean_values(tb: Table) -> Table:
     # Remove < and > from strings.
     tb = tb.applymap(lambda x: re.sub(r"[<>]", "", x) if isinstance(x, str) else x)
 
+    # There is a strange column at the end of each table that is just the row number. We can drop this.
+
+    tb = tb.drop(
+        columns=[
+            "year_survey_name",
+            "pct_urban__of_total_population",
+            "total_sl",
+            "total_proportion_of_population_using__improved_water_supplies_sl",
+            "total_proportion_of_population_using_improved__sanitation_facilities__including_shared__sl",
+        ],
+        axis=1,
+        errors="ignore",  # not all tables have these columns
+    )
+
     return tb
 
 
