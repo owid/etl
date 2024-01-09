@@ -28,6 +28,9 @@ def run(dest_dir: str) -> None:
     # Rename columns.
     tb = tb.rename(columns=COLUMNS, errors="raise")
 
+    # Looking at the original dashboards, it seems that missing values are shown as zeros.
+    tb = tb.fillna(0)
+
     # Harmonize country names.
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
 
