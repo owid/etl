@@ -3,22 +3,23 @@ definitions:
     presentation:
       topic_tags:
         - War & Peace
+    display:
+      numDecimalPlaces: 0
+    processing_level: major
+
   all:
-    selectedEntityNames: &selected_entities
-      - Africa
-      - Americas
-      - Asia and Oceania
-      - Europe
-      - Middle East
-    conflict_type_ongoing: |-
+    conflict_type: |-
       <% if conflict_type == "all" %>
-      An ongoing conventional war is a conflict between combatants with differentiated militaries and clear frontlines that causes at least 500 deaths over its duration.
+      A conventional war is a conflict between combatants with differentiated militaries and clear frontlines that causes at least 500 deaths over its duration.
+
       <% elif conflict_type == "others (non-civil)" %>
-      An ongoing conventional interstate war is a conflict between combatants that are part of different political authorities, that involves differentiated militaries and clear frontlines, and that causes at least 500 deaths over its duration.
+      A conventional interstate war is a conflict between states with differentiated militaries and clear frontlines that causes at least 500 deaths over its duration.
+
       <% elif conflict_type == "civil war" %>
-      An ongoing conventional civil war is a conflict between combatants that were previously part of the same political authority, where now at least one seeks control or secession, that involves differentiated militaries and clear frontlines, and that causes at least 500 deaths over its duration.
+      A civil war is a conflict between combatants that were previously part of the same state, but now at least one seeks control or secession. It is fought with differentiated militaries and clear frontlines and causes at least 500 deaths over its duration.
+
       <% endif %>
-    other_conflicts: |-
+    conflict_type_noncivil: |-
       <% if conflict_type == "others (non-civil)" %>
       We identify conventional interstate wars as those wars that are not coded civil wars by Project Mars.
       <% endif %>
@@ -26,78 +27,231 @@ definitions:
       <% if (conflict_type == "others (non-civil)" or conflict_type == "civil war") %>
       For the two wars that had campaigns within it that were a civil war and an interstate war, we coded them as interstate wars.
       <% endif %>
+    conflicts_description: |-
+      <%- if conflict_type == "all" -%>
+      Included are conventional wars that were ongoing that year
+
+      <%- elif conflict_type == "others (non-civil)" -%>
+      Included are conventional interstate wars that were ongoing that year
+
+      <%- elif conflict_type == "civil war" -%>
+      Included are civil wars that were ongoing that year
+
+      <%- endif -%>
 
   number_deaths:
     description_short: |-
       <%- if conflict_type == "all" -%>
-      The << estimate >> estimate of the number of deaths in all ongoing conventional wars in each year
+      The << estimate >> estimate of the number of deaths<< per_capita >> in all ongoing conventional wars that year.
+
       <%- elif conflict_type == "others (non-civil)" -%>
-      The << estimate >> estimate of the number of deaths in ongoing conventional interstate wars in each year
+      The << estimate >> estimate of the number of deaths<< per_capita >> in ongoing conventional interstate wars that year.
+
       <%- elif conflict_type == "civil war" -%>
-      The << estimate >> estimate of the number of deaths in ongoing conventional civil wars in each year
+      The << estimate >> estimate of the number of deaths<< per_capita >> in ongoing conventional civil wars that year.
+
       <%- endif -%>
+    description_short_per_capita:
+      <% set per_capita = " per 100,000 people" %>
+      {definitions.number_deaths.description_short}
     description_key: &description_key_deaths
-      - |
-        {definitions.all.conflict_type_ongoing}
-      - |
-        {definitions.all.other_conflicts}
-      - |
-        {definitions.all.conflict_types_additional}
+      - "{definitions.all.conflict_type}"
+      - "{definitions.all.conflict_type_noncivil}"
+      - "{definitions.all.conflict_types_additional}"
       - Deaths of combatants due to fighting are included.
       - |-
         <% if conflict_type == "civil war" %>
         If a war lasted more than one year, we distributed its deaths evenly across years.
+
         <% else %>
-        If a war lasted more than one year, we distributed its deaths evenly across years. If a war was ongoing in more than one world region, we distributed its deaths across the regions of the participants.
+        If a war lasted more than one year, we distributed its deaths evenly across years. If a war was ongoing in more than one world region, we also evenly distributed its deaths across the regions of the participants.
+
         <% endif %>
 
   number_ongoing_conflicts:
     description_short: |-
-      <%- if conflict_type == "all" -%>
-      The number of ongoing conventional wars in each year
-      <%- elif conflict_type == "others (non-civil)" -%>
-      The number of ongoing conventional interstate wars in each year
-      <%- elif conflict_type == "civil war" -%>
-      The number of ongoing conventional civil wars in each year
-      <%- endif -%>
+      {definitions.all.conflicts_description}.
     description_key: &description_key_ongoing
-      - |
-        {definitions.all.conflict_type_ongoing}
-      - |
-        {definitions.all.other_conflicts}
-      - |
-        {definitions.all.conflict_types_additional}
+      - "{definitions.all.conflict_type}"
+      - "{definitions.all.conflict_type_noncivil}"
+      - "{definitions.all.conflict_types_additional}"
       - We count a war as ongoing in a region even if the war is also ongoing in other regions. The sum across all regions can therefore be higher than the total number of ongoing wars.
 
   number_new_conflicts:
     description_short: |-
-      <%- if conflict_type == "all" -%>
-      The number of new conventional wars in each year
-      <%- elif conflict_type == "others (non-civil)" -%>
-      The number of new conventional interstate wars in each year
-      <%- elif conflict_type == "civil war" -%>
-      The number of ongoing conventional civil wars in each year
-      <%- endif -%>
+      {definitions.all.conflicts_description} for the first time.
     description_key:  &description_key_new
-      - |-
-        <% if conflict_type == "all" %>
-        A conventional war is a conflict between combatants with differentiated militaries and clear frontlines that causes at least 500 deaths over its duration. We consider it new in its start year.
-        <% elif conflict_type == "others (non-civil)" %>
-        A conventional interstate war is a conflict between combatants that are part of different political authorities, that involves differentiated militaries and clear frontlines, and that causes at least 500 deaths over its duration. We consider it new in its start year.
-        <% elif conflict_type == "civil war" %>
-        A conventional civil war is a conflict between combatants that were previously part of the same political authority, where now at least one seeks control or secession, that involves differentiated militaries and clear frontlines, and that causes at least 500 deaths over its duration. We consider it new in its start year.
-        <% endif %>
-      - |
-        {definitions.all.other_conflicts}
+      - "{definitions.all.conflict_type}"
+      - "{definitions.all.conflict_type_noncivil}"
+      - "{definitions.all.conflict_types_additional}"
       - |-
         <% if conflict_type == "all" %>
         We only count a war as new when the war overall started that year, not if it restarted or a new campaign within it begins.
+
         <% elif conflict_type == "others (non-civil)" %>
-        We only count an interstate war as new when the war overall started that year, not if a civil war became internationalized.
+        We only count a conventional interstate war as new when the war overall started that year, not if a civil war became internationalized.
+
         <% elif conflict_type == "civil war" %>
-        We only count a civil war as new when the war overall started that year, not if it became a civil war.
+        We only count a civil war as new when the war overall started that year, not if the war became a civil war.
+
         <% endif %>
       - We count a war as new in a region even if the war started earlier or at the same time in another region. The sum across all regions can therefore be higher than the total number of new wars.
+
+
+tables:
+
+  # PARTICIPANT INDICATORS
+  mars_country:
+    common:
+      description_key:
+        - A country is considered to be a major participant in a war if they suffered at least 1% of deaths in the war overall, or deploys at least 5% of its total combatants.
+        - "{definitions.all.conflict_type}"
+        - "{definitions.all.conflict_type_noncivil}"
+        - "{definitions.all.conflict_types_additional}"
+
+    variables:
+      participated_in_conflict:
+        title: State involved in war
+        unit: ""
+        description_short: |-
+          <% if conflict_type == "all" %>
+          State was a major participant in at least one conventional war that year.
+
+          <% elif conflict_type == "others (non-civil)" %>
+          State was a major participant in at least one conventional interstate war that year.
+
+          <% elif conflict_type == "civil war" %>
+          State was a major participant in at least one conventional civil war that year.
+
+          <% endif %>
+        description_key:
+          - |-
+            '1' indicates that the state participated in a war. '0' indicates that the state did not participate in a war.
+
+      number_participants:
+        title: Number of states involved in war
+        unit: "states"
+        description_short: |-
+          <% if conflict_type == "all" %>
+          Included are states that were major participants in at least one conventional war that year.
+
+          <% elif conflict_type == "others (non-civil)" %>
+          Included are states that were major participants in at least one conventional interstate war that year.
+
+          <% elif conflict_type == "civil war" %>
+          Included are states that were major participants in at least one conventional civil war that year.
+
+          <% endif %>
+
+  # MAIN INDICATORS
+  mars:
+    common:
+      presentation:
+        grapher_config:
+          selectedEntityNames:
+            - Africa
+            - Americas
+            - Asia and Oceania
+            - Europe
+            - Middle East
+
+    variables:
+      ##################
+      # Ongoing deaths #
+      ##################
+      number_deaths_ongoing_conflicts_high:
+        title: Deaths in ongoing wars (high estimate)
+        unit: deaths
+        description_short: |-
+          <% set estimate = "high" %>
+          {definitions.number_deaths.description_short}.
+        description_key: *description_key_deaths
+
+      number_deaths_ongoing_conflicts_low:
+        title: Deaths in ongoing wars (low estimate)
+        unit: deaths
+        description_short: |-
+          <% set estimate = "low" %>
+          {definitions.number_deaths.description_short}.
+        description_key: *description_key_deaths
+
+      number_deaths_ongoing_conflicts_high_per_capita:
+        title: Death rate in ongoing wars (high estimate)
+        unit: deaths per 100,000 people
+        description_short: |-
+          <% set estimate = "high" %>
+          {definitions.number_deaths.description_short_per_capita}.
+        description_key: *description_key_deaths
+        display:
+          numDecimalPlaces: 1
+
+      number_deaths_ongoing_conflicts_low_per_capita:
+        title: Death rate in ongoing wars (low estimate)
+        unit: deaths per 100,000 people
+        description_short: |-
+          <% set estimate = "low" %>
+          {definitions.number_deaths.description_short_per_capita}.
+        description_key: *description_key_deaths
+        display:
+          numDecimalPlaces: 1
+
+      #####################
+      # Ongoing conflicts #
+      #####################
+      number_ongoing_conflicts:
+        title: Number of ongoing wars
+        unit: conflicts
+        description_short: |-
+          <% set estimate = "low" %>
+          {definitions.number_ongoing_conflicts.description_short}
+        description_key: *description_key_ongoing
+
+      number_ongoing_conflicts_per_country:
+        title: Number of ongoing wars per state
+        unit: wars per state
+        description_short: |-
+          The number of wars divided by the number of all states. This accounts for the changing number of states over time. {definitions.number_ongoing_conflicts.description_short}
+        description_key: *description_key_ongoing
+        display:
+          numDecimalPlaces: 3
+
+      number_ongoing_conflicts_per_country_pair:
+        title: Number of ongoing wars per state-pair
+        unit: wars per state-pair
+        description_short: |-
+          The number of wars divided by the number of all state-pairs. This accounts for the changing number of states over time. {definitions.number_ongoing_conflicts.description_short}
+        description_key: *description_key_ongoing
+        display:
+          numDecimalPlaces: 5
+
+      #################
+      # New conflicts #
+      #################
+      number_new_conflicts:
+        title: Number of new wars
+        unit: wars
+        description_short: |-
+          {definitions.number_new_conflicts.description_short}
+        description_key: *description_key_new
+
+      number_new_conflicts_per_country:
+        title: Number of new wars per state
+        unit: wars per state
+        description_short: |-
+          {definitions.number_new_conflicts.description_short}, divided by the number of countries in the region.
+        description_key: *description_key_new
+        display:
+          numDecimalPlaces: 3
+
+      number_new_conflicts_per_country_pair:
+        title: Number of new wars per state-pair
+        unit: wars per state-pair
+        description_short: |-
+            {definitions.number_new_conflicts.description_short}, divided by the number of country-pairs in the region.
+        description_key: *description_key_new
+        display:
+          numDecimalPlaces: 5
+
 
 dataset:
   title: History of war (Project Mars, 2020)
@@ -117,163 +271,3 @@ dataset:
     - Asia and Oceania: 700-990
 
     You can find more information about the data in our article: [To be published]
-
-tables:
-  # COUNTRY-LEVEL
-  mars_country:
-    variables:
-      participated_in_conflict:
-        title: Participated in conflict
-        unit: ""
-        display:
-          numDecimalPlaces: 0
-        description_short: |-
-          Whether the country participated in a conflict (of a specific kind) in a given year.
-
-      number_participants:
-        title: Number of countries in conflict
-        unit: "countries"
-        display:
-          numDecimalPlaces: 0
-        description_short: |-
-          The number of countries that participated in a conflict (of a specific kind) in a given year and region.
-
-  mars:
-    variables:
-      ##################
-      # Ongoing deaths #
-      ##################
-      number_deaths_ongoing_conflicts_high:
-        title: Number of soldier deaths in ongoing conflicts (high estimate)
-        unit: deaths
-        description_short: |-
-          <% set estimate = "high" %>
-          {definitions.number_deaths.description_short}.
-        description_key: *description_key_deaths
-        display:
-          numDecimalPlaces: 0
-        presentation:
-          grapher_config:
-            selectedEntityNames: *selected_entities
-
-      number_deaths_ongoing_conflicts_low:
-        title: Number of soldier deaths in ongoing conflicts (low estimate)
-        unit: deaths
-        description_short: |-
-          <% set estimate = "low" %>
-          {definitions.number_deaths.description_short}.
-        description_key: *description_key_deaths
-        display:
-          numDecimalPlaces: 0
-        presentation:
-          grapher_config:
-            selectedEntityNames: *selected_entities
-
-      number_deaths_ongoing_conflicts_high_per_capita:
-        title: Number of soldier deaths in ongoing conflicts (high estimate, per capita)
-        unit: deaths per 100,000 people
-        description_short: |-
-          <% set estimate = "high" %>
-          {definitions.number_deaths.description_short}.
-        description_key: *description_key_deaths
-        display:
-          numDecimalPlaces: 1
-        presentation:
-          grapher_config:
-            selectedEntityNames: *selected_entities
-
-      number_deaths_ongoing_conflicts_low_per_capita:
-        title: Number of soldier deaths in ongoing conflicts (low estimate, per capita)
-        unit: deaths per 100,000 people
-        description_short: |-
-          <% set estimate = "low" %>
-          {definitions.number_deaths.description_short}.
-        description_key: *description_key_deaths
-        display:
-          numDecimalPlaces: 1
-        presentation:
-          grapher_config:
-            selectedEntityNames: *selected_entities
-
-      #####################
-      # Ongoing conflicts #
-      #####################
-      number_ongoing_conflicts:
-        title: Number of ongoing conflicts
-        unit: conflicts
-        description_short: |-
-          <% set estimate = "low" %>
-          {definitions.number_ongoing_conflicts.description_short}.
-        description_key: *description_key_ongoing
-        display:
-          numDecimalPlaces: 0
-        presentation:
-          grapher_config:
-            selectedEntityNames: *selected_entities
-
-      number_ongoing_conflicts_per_country:
-        title: Number of ongoing conflicts per country
-        unit: conflicts per country
-        description_short: |-
-          {definitions.number_ongoing_conflicts.description_short}, divided by the number of countries in the region.
-        description_key: *description_key_ongoing
-        processing_level: major
-        display:
-          numDecimalPlaces: 3
-        presentation:
-          grapher_config:
-            selectedEntityNames: *selected_entities
-
-      number_ongoing_conflicts_per_country_pair:
-        title: Number of ongoing conflicts per country-pair
-        unit: conflicts per country-pair
-        description_short: |-
-          {definitions.number_ongoing_conflicts.description_short}, divided by the number of country-pairs in the region.
-        description_key: *description_key_ongoing
-        processing_level: major
-        display:
-          numDecimalPlaces: 5
-        presentation:
-          grapher_config:
-            selectedEntityNames: *selected_entities
-
-      #################
-      # New conflicts #
-      #################
-      number_new_conflicts:
-        title: Number of new conflicts
-        unit: conflicts
-        description_short: |-
-          {definitions.number_new_conflicts.description_short}.
-        description_key: *description_key_new
-        display:
-          numDecimalPlaces: 0
-        presentation:
-          grapher_config:
-            selectedEntityNames: *selected_entities
-
-      number_new_conflicts_per_country:
-        title: Number of new conflicts per country
-        unit: conflicts per country
-        description_short: |-
-          {definitions.number_new_conflicts.description_short}, divided by the number of countries in the region.
-        description_key: *description_key_new
-        processing_level: major
-        display:
-          numDecimalPlaces: 3
-        presentation:
-          grapher_config:
-            selectedEntityNames: *selected_entities
-
-      number_new_conflicts_per_country_pair:
-        title: Number of new conflicts per country-pair
-        unit: conflicts per country-pair
-        description_short: |-
-            {definitions.number_new_conflicts.description_short}, divided by the number of country-pairs in the region.
-        description_key: *description_key_new
-        processing_level: major
-        display:
-          numDecimalPlaces: 5
-        presentation:
-          grapher_config:
-            selectedEntityNames: *selected_entities

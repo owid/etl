@@ -690,32 +690,53 @@ steps:
 
   # European Social Survey - Trust questions
   data://meadow/ess/2023-08-02/ess_trust:
-  - snapshot://ess/2023-08-02/ess_trust.csv
-  - data://garden/regions/2023-01-01/regions
+    - snapshot://ess/2023-08-02/ess_trust.csv
+    - data://garden/regions/2023-01-01/regions
   data://garden/ess/2023-08-02/ess_trust:
-  - data://meadow/ess/2023-08-02/ess_trust
+    - data://meadow/ess/2023-08-02/ess_trust
   data://grapher/ess/2023-08-02/ess_trust:
-  - data://garden/ess/2023-08-02/ess_trust
+    - data://garden/ess/2023-08-02/ess_trust
 
   # Latinobarómetro survey - Trust
   data://meadow/survey/2023-08-04/latinobarometro_trust:
-  - snapshot://survey/2023-08-04/latinobarometro_trust.csv
+    - snapshot://survey/2023-08-04/latinobarometro_trust.csv
   data://garden/survey/2023-08-04/latinobarometro_trust:
-  - data://meadow/survey/2023-08-04/latinobarometro_trust
+    - data://meadow/survey/2023-08-04/latinobarometro_trust
 
   # Afrobarometer survey - Trust
   data://meadow/survey/2023-08-07/afrobarometer_trust:
-  - snapshot://survey/2023-08-07/afrobarometer_trust.csv
+    - snapshot://survey/2023-08-07/afrobarometer_trust.csv
   data://garden/survey/2023-08-07/afrobarometer_trust:
-  - data://meadow/survey/2023-08-07/afrobarometer_trust
+    - data://meadow/survey/2023-08-07/afrobarometer_trust
 
   # Trust surveys
   data://garden/survey/2023-08-04/trust_surveys:
-  - data://garden/survey/2023-08-04/latinobarometro_trust
-  - data://garden/survey/2023-08-07/afrobarometer_trust
-  - data://garden/ess/2023-08-02/ess_trust
+    - data://garden/survey/2023-08-04/latinobarometro_trust
+    - data://garden/survey/2023-08-07/afrobarometer_trust
+    - data://garden/ess/2023-08-02/ess_trust
   data://grapher/survey/2023-08-04/trust_surveys:
-  - data://garden/survey/2023-08-04/trust_surveys
+    - data://garden/survey/2023-08-04/trust_surveys
+
+  # Historical poverty data - Moatsos (2021)
+  data://meadow/moatsos/2023-10-09/moatsos_historical_poverty:
+    - snapshot://moatsos/2023-10-09/moatsos_historical_poverty_oecd.csv
+    - snapshot://moatsos/2023-10-09/moatsos_historical_poverty_oecd_countries_share.xlsx
+    - snapshot://moatsos/2023-10-09/moatsos_historical_poverty_oecd_regions_number.xlsx
+    - snapshot://moatsos/2023-10-09/moatsos_historical_poverty_5.csv
+    - snapshot://moatsos/2023-10-09/moatsos_historical_poverty_10.csv
+    - snapshot://moatsos/2023-10-09/moatsos_historical_poverty_30.csv
+  data://garden/moatsos/2023-10-09/moatsos_historical_poverty:
+    - data://meadow/moatsos/2023-10-09/moatsos_historical_poverty
+  data://grapher/moatsos/2023-10-09/moatsos_historical_poverty:
+    - data://garden/moatsos/2023-10-09/moatsos_historical_poverty
+
+  # World Bank GenderStats
+  data://meadow/wb/2023-12-29/gender_statistics:
+    - snapshot://wb/2023-12-29/gender_statistics.feather
+  data://garden/wb/2023-12-29/gender_statistics:
+    - data://meadow/wb/2023-12-29/gender_statistics
+  data://grapher/wb/2023-12-29/gender_statistics:
+    - data://garden/wb/2023-12-29/gender_statistics
 
   ######################################################################################################################
   # Older versions to be archived once they are not used by any other steps.
