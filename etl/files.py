@@ -11,7 +11,7 @@ import time
 from collections import OrderedDict
 from pathlib import Path
 from threading import Lock
-from typing import Any, Dict, Generator, List, Literal, Optional, Set, TextIO, Union
+from typing import Any, Dict, Generator, List, Optional, Set, TextIO, Union
 
 import ruamel.yaml
 import yaml
@@ -50,8 +50,6 @@ class RuntimeCache:
 
 CACHE_CHECKSUM_FILE = RuntimeCache()
 
-HASH_TYPES = Literal["md5sum", "dvc"]
-
 TEXT_CHARS = bytes(range(32, 127)) + b"\n\r\t\f\b"
 DEFAULT_CHUNK_SIZE = 512
 
@@ -75,24 +73,20 @@ def istextblock(block: bytes) -> bool:
     return float(len(nontext)) / len(block) <= 0.30
 
 
-def checksum_str(s: str, typ: HASH_TYPES = "md5sum") -> str:
+def checksum_str(s: str) -> str:
     "Return the md5 hex digest of the string."
-    buf = s.encode()
-    if typ == "dvc":
-        buf = dos2unix(buf)
-    return hashlib.md5(buf).hexdigest()
+    return hashlib.md5(dos2unix(s.encode())).hexdigest()
 
 
-def checksum_file_nocache(filename: Union[str, Path], typ: HASH_TYPES = "md5sum") -> str:
+def checksum_file_nocache(filename: Union[str, Path]) -> str:
     "Return the md5 hex digest of the file without using cache."
     chunk_size = 2**20
     _hash = hashlib.md5()
     with open(filename, "rb") as istream:
         chunk = istream.read(chunk_size)
         while chunk:
-            if typ == "dvc":
-                if istextblock(chunk[:DEFAULT_CHUNK_SIZE]):
-                    chunk = dos2unix(chunk)
+            if istextblock(chunk[:DEFAULT_CHUNK_SIZE]):
+                chunk = dos2unix(chunk)
 
             _hash.update(chunk)
             chunk = istream.read(chunk_size)
@@ -100,13 +94,13 @@ def checksum_file_nocache(filename: Union[str, Path], typ: HASH_TYPES = "md5sum"
     return _hash.hexdigest()
 
 
-def checksum_file(filename: Union[str, Path], typ: HASH_TYPES = "md5sum") -> str:
+def checksum_file(filename: Union[str, Path]) -> str:
     "Return the md5 hex digest of the file contents."
     if isinstance(filename, Path):
         filename = filename.as_posix()
 
     mtime = os.path.getmtime(filename)
-    key = f"{filename}-{mtime}-{typ}"
+    key = f"{filename}-{mtime}"
 
     if filename not in CACHE_CHECKSUM_FILE:
         # Special case for regions.yml, we want to ignore the 'aliases' key
@@ -118,9 +112,9 @@ def checksum_file(filename: Union[str, Path], typ: HASH_TYPES = "md5sum") -> str
             regex_pattern = r"  aliases:\n(\s+-[^\n]*\n?)*"
             s = re.sub(regex_pattern, "", s)
 
-            checksum = checksum_str(s.strip(), typ=typ)
+            checksum = checksum_str(s.strip())
         else:
-            checksum = checksum_file_nocache(filename, typ=typ)
+            checksum = checksum_file_nocache(filename)
         CACHE_CHECKSUM_FILE.add(key, checksum)
 
     return CACHE_CHECKSUM_FILE[key]

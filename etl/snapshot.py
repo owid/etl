@@ -33,7 +33,7 @@ if TYPE_CHECKING:
     from dvc.repo import Repo
 
 from etl import config, paths
-from etl.files import RuntimeCache, checksum_file, ruamel_dump, ruamel_load, yaml_dump
+from etl.files import RuntimeCache, checksum_file, yaml_dump
 
 # DVC is not thread-safe, so we need to lock it
 dvc_lock = Lock()
@@ -141,17 +141,6 @@ class Snapshot:
 
         self._download_dvc_file(md5)
 
-        # update metadata
-        with open(self.metadata_path, "r") as f:
-            m = ruamel_load(f)
-
-        m["outs"][0]["md5"] = checksum_file(self.path)
-        m["outs"][0]["size"] = self.path.stat().st_size
-        m["outs"][0]["path"] = self.path.name
-
-        with open(self.metadata_path, "w") as f:
-            f.write(ruamel_dump(m))
-
     def is_dirty(self) -> bool:
         """Return True if snapshot exists and is in DVC."""
         if not self.path.exists():
@@ -167,8 +156,7 @@ class Snapshot:
         if file_size >= 10 * 2**20:  # 10MB
             return file_size != self.m.outs[0]["size"]
         else:
-            # NOTE: DVC uses different md5 checksum than md5sum
-            return checksum_file(self.path.as_posix(), typ="dvc") != self.m.outs[0]["md5"]
+            return checksum_file(self.path.as_posix()) != self.m.outs[0]["md5"]
 
     def delete_local(self) -> None:
         """Delete local file and its metadata."""
