@@ -1,4 +1,6 @@
-from typing import Dict, List
+"""Prompts for chat GPT."""
+import json
+from typing import Any, Dict, List
 
 from apps.metagpt.utils import _read_metadata_file
 from etl.paths import BASE_DIR
@@ -7,6 +9,7 @@ from etl.paths import BASE_DIR
 NEW_METADATA_EXAMPLE = (
     BASE_DIR / "snapshots" / "emissions" / "2023-11-23" / "national_contributions_annual_emissions.csv.dvc"
 )
+
 # Additional instructions or configurations
 ADDITIONAL_INSTRUCTIONS = """
 Metadata Field Guidelines:
@@ -82,6 +85,14 @@ Metadata Field Guidelines:
     - Use producer's version naming.
 """
 
+# Docs for garden metadata fields
+DOCS = BASE_DIR / "schemas" / "dataset-schema.json"
+with open(DOCS, "r") as f:
+    docs = json.load(f)
+DOCS_METADATA_INDICATORS = docs["properties"]["tables"]["additionalProperties"]["properties"]["variables"][
+    "additionalProperties"
+]["properties"]
+
 
 def create_system_prompt_snapshot(metadata_old_str: str) -> List[Dict[str, str]] | None:
     """Create the system prompt for the GPT model based on file path."""
@@ -111,7 +122,7 @@ def create_system_prompt_snapshot(metadata_old_str: str) -> List[Dict[str, str]]
 
 
 def create_system_prompt_data_step(
-    variable_title: str, metadata_field: str, metadata_instructions: str, ds_meta_description: str
+    variable_title: str, metadata_field: str, ds_meta_description: Dict[str, Any]
 ) -> List[Dict[str, str]] | None:
     """
     Generates a system prompt for a gardening application.
@@ -125,6 +136,7 @@ def create_system_prompt_data_step(
     Returns:
     Optional[List[Dict[str, str]]]: A list of dictionaries containing the system prompt, or None.
     """
+    metadata_instructions = DOCS_METADATA_INDICATORS[metadata_field]["description"]
     base_template_instructions = (
         "You are given a description of the dataset here:\n"
         f"'{ds_meta_description}'\n\n"
