@@ -19,15 +19,34 @@ FILL_GAPS = "true"
 MAX_WORKERS = 10
 TOLERANCE_PERCENTILES = 0.5
 
+# NOTE: Although the number of workers is set to MAX_WORKERS, the actual number of workers for regional queries is half of that, because the API (`pip-grp`) is less able to handle concurrent requests.
+
 # Select live (1) or internal (0) API
 LIVE_API = 0
-
-# NOTE: Although the number of workers is set to MAX_WORKERS, the actual number of workers for regional queries is half of that, because the API (`pip-grp`) is less able to handle concurrent requests.
 
 if LIVE_API == 1:
     API_ADDRESS = "https://api.worldbank.org/pip/v1"
 elif LIVE_API == 0:
     API_ADDRESS = "https://apiv2qa.worldbank.org/pip/v1"
+
+
+def run() -> None:
+    # Generate percentiles by extracting the raw files and processing them afterward
+    df_percentiles = generate_consolidated_percentiles(generate_percentiles_raw())
+
+    # Generate relative poverty indicators file
+    df_relative = generate_relative_poverty()
+
+    # Generate key indicators file and patch medians
+    df = generate_key_indicators()
+    df = median_patch(df)
+
+    # Add relative poverty indicators and decile thresholds to the key indicators file
+    df = add_relative_poverty_and_decile_threholds(df, df_relative, df_percentiles)
+
+
+############################################################################################################
+# FUNCTIONS
 
 
 def api_health():
@@ -1019,23 +1038,3 @@ def add_relative_poverty_and_decile_threholds(df, df_relative, df_percentiles):
     log.info("Relative poverty indicators and decile thresholds added. Key indicators file done :)")
 
     return df
-
-
-#############################################
-#                                           #
-#               MAIN FUNCTION               #
-#                                           #
-#############################################
-
-# Generate percentiles by extracting the raw files and processing them afterward
-df_percentiles = generate_consolidated_percentiles(generate_percentiles_raw())
-
-# Generate relative poverty indicators file
-df_relative = generate_relative_poverty()
-
-# Generate key indicators file and patch medians
-df = generate_key_indicators()
-df = median_patch(df)
-
-# Add relative poverty indicators and decile thresholds to the key indicators file
-df = add_relative_poverty_and_decile_threholds(df, df_relative, df_percentiles)
