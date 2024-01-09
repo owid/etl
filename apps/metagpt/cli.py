@@ -203,7 +203,7 @@ class MetadataGPTUpdater:
                     variable_title = variable_data["title"]
                     for metadata_field in fields_to_fill_out:
                         metadata_instructions = metadata_indicator_docs[metadata_field]
-                        messages = self.create_system_prompt_garden(
+                        messages = self.create_system_prompt_garden_grapher(
                             variable_title,
                             metadata_field,
                             metadata_instructions,
@@ -223,11 +223,9 @@ class MetadataGPTUpdater:
         match self.channel:
             case Channels.SNAPSHOT:
                 self.run_snapshot()
-            case Channels.GARDEN:
-                self.run_garden()
+            case Channels.GARDEN | Channels.GRAPHER:
+                self.run_garden_grapher()
                 return
-            case Channels.GRAPHER:
-                self.run_grapher()
 
     def run_snapshot(self: Self):
         # Create system prompt
@@ -240,7 +238,7 @@ class MetadataGPTUpdater:
             if new_yaml_content:
                 self.__metadata_new = new_yaml_content
 
-    def run_garden(self):
+    def run_garden_grapher(self):
         # Load the actual dataset file to extract description of the dataset
         # Amend path to be compatiable to work with Dataset class
         parts = self.path_to_file.split("/")
@@ -294,7 +292,7 @@ class MetadataGPTUpdater:
                     indicator_metadata = []
                     for metadata_field in fields_to_fill_out:
                         metadata_instructions = metadata_indicator_docs[metadata_field]
-                        messages = self.create_system_prompt_garden(
+                        messages = self.create_system_prompt_garden_grapher(
                             variable_title,
                             metadata_field,
                             metadata_instructions,
@@ -313,47 +311,11 @@ class MetadataGPTUpdater:
             for variable_name, variable_data in table_data["variables"].items():
                 variable_updates = all_variables[variable_name]
                 variable_updates_dict = convert_list_to_dict(variable_updates)
+                if "description_key" in variable_updates:
+                    variable_updates["description_key"] = [f"{item}" for item in variable_updates["description_key"]]
                 original_yaml_content["tables"][table_name]["variables"][variable_name].update(variable_updates_dict)
+
         self.__metadata_new = original_yaml_content
-
-    def run_grapher(self):
-        for attempt in range(5):  # MAX_ATTEMPTS
-            # Create system prompt
-            messages = self.create_system_prompt()
-            message_content, cost = get_message_content(
-                self.client, messages=messages, model=GPT_MODEL, temperature=0
-            )  #
-            log.info(f"Cost GPT4: ${cost:.3f}")
-
-            if message_content:
-                try:
-                    parsed_dict = json.loads(message_content)
-
-                    if check_gpt_response_format(parsed_dict):
-                        log.info("GPT response is in the correct format.")
-                        with open(self.path_to_file, "r") as file:
-                            original_yaml_content = yaml.safe_load(file)
-                            if original_yaml_content:
-                                for table, table_data in parsed_dict["tables"].items():
-                                    for variable, variable_updates in table_data["variables"].items():
-                                        if (
-                                            table in original_yaml_content["tables"]
-                                            and variable in original_yaml_content["tables"][table]["variables"]
-                                        ):
-                                            # Formatting 'description_key' as bullet points
-                                            # If 'description_key' is in variable_updates, keep it as a list of strings
-                                            if "description_key" in variable_updates:
-                                                variable_updates["description_key"] = [
-                                                    f"{item}" for item in variable_updates["description_key"]
-                                                ]
-                                            original_yaml_content["tables"][table]["variables"][variable].update(
-                                                variable_updates
-                                            )
-                            self.__metadata_new = original_yaml_content
-                            return
-                except json.JSONDecodeError as e:
-                    log.error(f"JSON decoding failed on attempt {attempt + 1}: {e}")
-        raise Exception("Unable to parse GPT response after multiple attempts.")
 
     def create_system_prompt(self: Self) -> List[Dict[str, str]] | None:
         """Create the system prompt for the GPT model based on file path."""
@@ -382,44 +344,10 @@ class MetadataGPTUpdater:
                     {"role": "user", "content": self.metadata_old_str},
                 ]
                 return messages
-            case Channels.GRAPHER:
-                system_prompt = """
-                    You are given a metadata file. Could you help us fill out the following for each variable:
-
-                    - description_key - based on a web search and if description exists come up with some key bullet points (in a sentence format) that would help someone interpret the indicator. Can you make sure that these are going to be useful for the public to understand the indicator? Expand on any acronyms or any terms that a layperson might not be familiar with. Each bullet point can be more than one sentence if necessary but don't make it too long.
-                    - if description_short is not filled out, use the description_key and a web search to come up with one sentence to describe the indicator. It should be very brief and to the point.
-
-                    The output should always have these fields only but as a python dictionary. This format is mandatory, don't miss fields and don't include any irrelevant information but make it JSON readable.:
-
-                    {"tables": {"maddison_gdp": {"variables": {"gdp_per_capita": {"description_short": "...", "description_key": ["...", "..."]}}}}}
-
-
-                    Don't include any other fields. This is mandatory. Can you ensure that the output can be read as JSON?
-
-                    Now, can you try to infer the above based on the other information in the metadata file and by browsing the web?
-
-                    You can use any links in the metadata file to help you.
-
-
-                    Don't include any other information so that I can easily access these fields. If you can't fill these out for some indicators, please fill them out with 'ChatGPT could not infer'.
-
-                    e.g. never include a starting sentence like 'Based on the metadata file and a web search, here is the inferred information'. Don't include `json` or `yaml` at the start of your response. Just include the fields you've changed.
-
-                    'description_key' should be a list of bullet points. Each bullet point should be a string. e.g. ['bullet point 1', 'bullet point 2']
-
-                    If information is already filled out, just try to improve it.
-
-                    """
-
-                messages = [
-                    {"role": "system", "content": system_prompt},
-                    {"role": "user", "content": self.metadata_old_str},
-                ]
-                return messages
             case _:
                 log.error(f"Invalid channel {self.channel}")
 
-    def create_system_prompt_garden(
+    def create_system_prompt_garden_grapher(
         self, variable_title: str, metadata_field: str, metadata_instructions: str, ds_meta_description: str
     ) -> List[Dict[str, str]] | None:
         """
@@ -443,7 +371,7 @@ class MetadataGPTUpdater:
             "Depending on which field you are filling out take into account these extra instructions:\n"
             " - description_key - based on a web search and your knowledge come up with some key bullet points (in a sentence format) that would help someone interpret the indicator. Can you make sure that these are going to be useful for the public to understand the indicator? Expand on any acronyms or any terms that a layperson might not be familiar with. Each bullet point can be more than one sentence if necessary but don't make it too long.\n"
             " - description_short use the description_key and a web search to come up with one sentence to describe the indicator. It should be very brief and to the point.\n"
-            f"Here are the instructions on how to fill out the field - '{metadata_instructions}'.\n"
+            f"Here are more specific instructions on how to fill out the field - '{metadata_instructions}'.\n"
             "Now, can you try to infer the above based on the other information in the metadata file and by browsing the web? You can use any links in the metadata file to help you."
         )
 
@@ -477,46 +405,6 @@ def process_chat_completion(chat_completion) -> Any | None:
         message_content = chat_completion.choices[0].message.content
         return message_content, cost
     return None, None
-
-
-def check_gpt_response_format(message_content) -> bool:
-    """Process ChatGPT response and checks if it's in the correct format.
-
-    :param data: The data to be processed.
-    :return: A message indicating whether the data is correctly formatted.
-    """
-
-    # Check if the top-level structure is a dictionary with the key 'tables'
-    if not isinstance(message_content, dict) or "tables" not in message_content:
-        return False
-
-    tables = message_content["tables"]
-    if not isinstance(tables, dict):
-        return False
-
-    # Iterate over each table
-    for _, table_content in tables.items():
-        if not isinstance(table_content, dict) or "variables" not in table_content:
-            return False
-
-        variables = table_content["variables"]
-        if not isinstance(variables, dict):
-            return False
-
-        # Iterate over each variable in the table
-        for _, var_content in variables.items():
-            if not isinstance(var_content, dict):
-                return False
-
-            # Check for 'description_short' and 'description_key'
-            if "description_short" not in var_content or "description_key" not in var_content:
-                return False
-
-            # Check if 'description_key' is a list
-            if not isinstance(var_content["description_key"], list):
-                return False
-
-    return True
 
 
 def convert_list_to_dict(data_list):
