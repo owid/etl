@@ -28,6 +28,8 @@ def run(dest_dir: str) -> None:
         tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
         tb = clean_values(tb)
         tb = drop_region_columns(tb)
+        tb = convert_given_population_to_absolute(tb, table_name)
+        tb = calculate_population_with_each_category(tb, table_name)
         tb = tb.set_index(["country", "year"], verify_integrity=True).sort_index()
         tables.append(tb)
 
@@ -65,4 +67,77 @@ def drop_region_columns(tb: Table) -> Table:
     """
     columns_to_drop = [col for col in tb.columns if "region" in col.lower()]
     tb = tb.drop(columns_to_drop, axis=1)
+    return tb
+
+
+def convert_given_population_to_absolute(tb: Table, table_name: str) -> Table:
+    """
+    The population is given as 'population (thousands) and the percent of the population that is urban is given as a percent.
+
+    We should use these to create new columns with the actual total population, urban population and rural population.
+
+    For menstrual health we don't know the % urban of the 15-49 age group, just the total population so we won't try and estimate the urban/rural split.
+
+    """
+    if table_name in ["sanitation", "water", "hygiene"]:
+        # Create new columns.
+        tb["total_population"] = tb["population__thousands"].astype(float) * 1000
+        tb["urban_population"] = tb["pct_urban"].astype(float) * tb["total_population"] / 100
+        tb["rural_population"] = tb["total_population"] - tb["urban_population"]
+        # Drop old columns.
+        columns_to_drop = ["population__thousands", "pct_urban"]
+        tb = tb.drop(columns_to_drop, axis=1)
+    elif table_name == "menstrual_health":
+        tb["population_women_age_15_49"] = tb["population_of_women_and_girls_age_15_49__thousands"].astype(float) * 1000
+        tb = tb.drop(columns="population_of_women_and_girls_age_15_49__thousands", axis=1)
+    return tb
+
+
+def calculate_population_with_each_category(tb: Table, table_name: str) -> Table:
+    """
+    For water, hygiene and sanitation calculate the population living with each category and also by urban/rural.
+
+    For menstrual health we just calculate number of women (aged 15-49) in each category.
+
+    """
+
+    if table_name in ["sanitation", "water", "hygiene"]:
+        areas = ["urban", "rural", "total"]
+        categories_water = ["at_least_basic", "limited__more_than_30_mins", "unimproved", "surface_water"]
+        categories_hygiene = ["at_least_basic", "limited", "no_handwashing_facilities"]
+        categories_sanitation = ["at_least_basic", "limited", "unimproved", "open_defecation"]
+
+        # Determine the appropriate list of categories
+        if table_name == "water":
+            categories = categories_water
+        elif table_name == "hygiene":
+            categories = categories_hygiene
+        elif table_name == "sanitation":
+            categories = categories_sanitation
+        else:
+            raise ValueError("Invalid table name")
+
+        # Perform the calculation
+        for area in areas:
+            for category in categories:
+                tb[f"population_{area}_{category}"] = (tb[f"{area}_{category}"].astype(float) / 100) * tb[
+                    f"{area}_population"
+                ]
+    elif table_name == "menstrual_health":
+        categories_menstrual = [
+            "awareness_of_menstruation_before_menarche",
+            "private_place_to_wash_and_change",
+            "participation_in_activities_during_menstruation",
+            "use_of_menstrual_materials",
+            "use_of_reusable_materials",
+            "use_of_single_use_materials",
+        ]
+        for category in categories_menstrual:
+            tb[f"population_women_age_15_49_{category}"] = (
+                tb[
+                    f"total_proportion_of_women_and_girls_age_15_49_who_have_menstruated_in_the_previous_year_{category}"
+                ].astype(float)
+                / 100
+            ) * tb["population_women_age_15_49"]
+
     return tb
