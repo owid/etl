@@ -1,5 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
 
+import re
+
 import numpy as np
 from owid.catalog import Table
 
@@ -49,8 +51,10 @@ def clean_values(tb: Table) -> Table:
     """
     # Replace - with NaNs.
     tb = tb.replace("-", np.nan)
+
     # Remove < and > from strings.
-    # tb = tb.replace(r"[<>]", "", regex=True)
+    tb = tb.applymap(lambda x: re.sub(r"[<>]", "", x) if isinstance(x, str) else x)
+
     return tb
 
 
