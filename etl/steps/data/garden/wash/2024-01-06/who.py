@@ -123,6 +123,7 @@ def calculate_population_with_each_category(tb: Table, table_name: str) -> Table
                 tb[f"population_{area}_{category}"] = (tb[f"{area}_{category}"].astype(float) / 100) * tb[
                     f"{area}_population"
                 ]
+                tb = tb.drop(columns=f"{area}_population", axis=1)
     elif table_name == "menstrual_health":
         categories_menstrual = [
             "awareness_of_menstruation_before_menarche",
@@ -139,5 +140,5 @@ def calculate_population_with_each_category(tb: Table, table_name: str) -> Table
                 ].astype(float)
                 / 100
             ) * tb["population_women_age_15_49"]
-
+        tb = tb.drop(columns="population_women_age_15_49", axis=1)
     return tb
