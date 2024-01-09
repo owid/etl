@@ -11,6 +11,7 @@ from owid.catalog import Dataset
 from rich_click.rich_command import RichCommand
 from typing_extensions import Self
 
+from apps.metagpt.utils import ADDITIONAL_INSTRUCTIONS, Channels
 from etl.paths import BASE_DIR
 
 # GPT Model
@@ -26,82 +27,6 @@ NEW_METADATA_EXAMPLE = (
 )
 # Docs for garden metadata fields
 DOCS = BASE_DIR / "schemas" / "dataset-schema.json"
-
-
-# Additional instructions or configurations
-ADDITIONAL_INSTRUCTIONS = """
-Metadata Field Guidelines:
-
-1. attribution (string, optional)
-   - Capital letter start, except names like 'van Haasteren'.
-   - No ending period.
-   - Ends with year of date_published in parenthesis.
-   - No semicolons.
-
-2. attribution_short (string, recommended)
-   - Use if producer name is long; shorten the producer name in an informative way.
-   - Capital letter start, except names like 'van Haasteren'.
-   - No ending period.
-   - Refers to producer or well-known data product, not year.
-   - Use acronym if well-known.
-
-3. citation_full (string, required)
-   - Capital letter start.
-   - Ends with period.
-   - Includes year of publication.
-   - Match producer's format with minor edits.
-   - List multiple sources for compilations.
-
-4. date_accessed (string, required)
-   - Format: YYYY-MM-DD.
-   - Reflects access date of current version.
-
-5. date_published (string, required)
-   - Format: YYYY-MM-DD or YYYY.
-   - Reflects publication date of current version.
-
-6. description (string, recommended)
-   - Capital letter start and period end.
-   - Avoid other metadata fields unless crucial.
-   - Succinct description of data product.
-
-7. description_snapshot (string, recommended)
-   - Capital letter start and period end.
-   - Define if data product and snapshot differ.
-   - Describe snapshot specifically.
-
-8. license (string, required)
-   - Standard license names or producer's custom text.
-   - CC BY 4.0 if unspecified, pending confirmation.
-
-9. license.url (string, required if existing)
-   - Complete URL to license on producer's site.
-   - Avoid generic license pages.
-
-10. producer (string, required)
-    - Capital letter start, except names like 'van Haasteren'.
-    - No ending period, except 'et al.'.
-    - Exclude dates, semicolons, OWID references.
-
-11. title (string, required)
-    - Capital letter start.
-    - No ending period.
-    - Identify data product, not snapshot.
-
-12. title_snapshot (string, required if different)
-    - Capital letter start.
-    - No ending period.
-    - Use if snapshot differs from data product.
-
-13. url_download (string, required if existing)
-    - Direct download URL or S3 URI.
-
-14. url_main (string, required)
-    - URL to data product's main site.
-
-15. version_producer (string or number, recommended if existing)
-    - Use producer's version naming.
-"""
 
 
 # Main CLI command setup with Click
@@ -203,7 +128,7 @@ class MetadataGPTUpdater:
                     variable_title = variable_data["title"]
                     for metadata_field in fields_to_fill_out:
                         metadata_instructions = metadata_indicator_docs[metadata_field]
-                        messages = self.create_system_prompt_garden_grapher(
+                        messages = self.create_system_prompt_data_step(
                             variable_title,
                             metadata_field,
                             metadata_instructions,
@@ -224,7 +149,7 @@ class MetadataGPTUpdater:
             case Channels.SNAPSHOT:
                 self.run_snapshot()
             case Channels.GARDEN | Channels.GRAPHER:
-                self.run_garden_grapher()
+                self.run_data_step()
                 return
 
     def run_snapshot(self: Self):
@@ -238,7 +163,7 @@ class MetadataGPTUpdater:
             if new_yaml_content:
                 self.__metadata_new = new_yaml_content
 
-    def run_garden_grapher(self):
+    def run_data_step(self):
         # Load the actual dataset file to extract description of the dataset
         # Amend path to be compatiable to work with Dataset class
         parts = self.path_to_file.split("/")
@@ -292,7 +217,7 @@ class MetadataGPTUpdater:
                     indicator_metadata = []
                     for metadata_field in fields_to_fill_out:
                         metadata_instructions = metadata_indicator_docs[metadata_field]
-                        messages = self.create_system_prompt_garden_grapher(
+                        messages = self.create_system_prompt_data_step(
                             variable_title,
                             metadata_field,
                             metadata_instructions,
@@ -347,7 +272,7 @@ class MetadataGPTUpdater:
             case _:
                 log.error(f"Invalid channel {self.channel}")
 
-    def create_system_prompt_garden_grapher(
+    def create_system_prompt_data_step(
         self, variable_title: str, metadata_field: str, metadata_instructions: str, ds_meta_description: str
     ) -> List[Dict[str, str]] | None:
         """
@@ -437,16 +362,6 @@ def calculate_gpt_cost(char_count):
     tokens_rounded_up = -(-tokens // 1000) * 1000  # Round up to the nearest 1000 tokens
     estimated_cost = (tokens_rounded_up / 1000) * RATE_PER_1000_TOKENS
     return estimated_cost
-
-
-class Channels:
-    """Channels for metadata files.
-
-    Using this to avoid hardcoding strings."""
-
-    SNAPSHOT = "snapshot"
-    GRAPHER = "grapher"
-    GARDEN = "garden"
 
 
 if __name__ == "__main__":
