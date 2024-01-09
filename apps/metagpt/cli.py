@@ -16,6 +16,15 @@ from etl.paths import BASE_DIR
 # GPT Model
 RATE_PER_1000_TOKENS = 0.0015  # Approximate average cost per 1000 tokens from here - https://openai.com/pricing
 
+# Fields to ask GPT for (garden, grapher)
+FIELDS_TO_FILL_OUT = [
+    "title",
+    "unit",
+    "short_unit",
+    "description_short",
+    "description_key",
+]
+
 # Initialize logger
 log = structlog.get_logger()
 
@@ -107,6 +116,31 @@ class MetadataGPTUpdater:
             self.__metadata_old = _read_metadata_file(self.path_to_file)
         return self.__metadata_old
 
+    @property
+    def path_to_dataset(self: Self) -> str:
+        """Path to the dataset file based on the path to the metadata file."""
+        parts = self.path_to_file.split("/")
+        parts.remove("steps")
+        parts.remove("etl")
+        parts[-1] = parts[-1].split(".")[0]
+        return "/".join(parts)
+
+    def load_dataset(self: Self) -> Dataset:
+        """Load dataset.
+
+        Only works when channel is 'garden' or 'grapher'.
+        """
+        if self.channel not in [Channels.GARDEN, Channels.GRAPHER]:
+            raise Exception(f"Invalid channel. Should either be '{Channels.GARDEN}' or '{Channels.GRAPHER}'.")
+        # Check if the garden step file exists
+        if os.path.isfile(self.path_to_dataset + "/index.json"):
+            ds = Dataset(self.path_to_dataset)
+            # ds_meta_description = ds.metadata.to_dict()
+            return ds
+        else:
+            log.error(f"Required garden dataset {self.path_to_dataset} does not exist. Run the garden step first.")
+            raise Exception("Required garden dataset does not exist. Run the garden step first.")
+
     def save_updated_metadata(self: Self, output_file: str) -> None:
         """Save the metadata file and returns its content."""
         with open(output_file, "w") as file:
@@ -115,25 +149,29 @@ class MetadataGPTUpdater:
     def estimate_cost(
         self: Self, original_yaml_content, fields_to_fill_out, metadata_indicator_docs, ds_meta_description
     ) -> float:
-        if self.channel == Channels.GARDEN:
-            total_estimated_cost = 0
-            for _, table_data in original_yaml_content["tables"].items():
-                for _, variable_data in table_data["variables"].items():
-                    variable_title = variable_data["title"]
-                    for metadata_field in fields_to_fill_out:
-                        metadata_instructions = metadata_indicator_docs[metadata_field]
-                        messages = create_system_prompt_data_step(
-                            variable_title,
-                            metadata_field,
-                            metadata_instructions,
-                            ds_meta_description,
-                        )
-                        char_count = len(messages[0]["content"])  # type: ignore
-                        est_cost = calculate_gpt_cost(char_count)
-                        total_estimated_cost += len(original_yaml_content["tables"].items()) * est_cost
-            return total_estimated_cost
-        else:
-            raise Exception("Invalid channel")
+        """Estimate cost of GPT query."""
+        # Sanity check
+        if self.channel not in [Channels.GARDEN, Channels.GRAPHER]:
+            raise Exception(
+                f"Invalid channel. Cost estimation is only implemented for '{Channels.GARDEN}' and '{Channels.GRAPHER}'."
+            )
+        # Estimate cost
+        total_estimated_cost = 0
+        for _, table_data in original_yaml_content["tables"].items():
+            for _, variable_data in table_data["variables"].items():
+                variable_title = variable_data["title"]
+                for metadata_field in fields_to_fill_out:
+                    metadata_instructions = metadata_indicator_docs[metadata_field]
+                    messages = create_system_prompt_data_step(
+                        variable_title,
+                        metadata_field,
+                        metadata_instructions,
+                        ds_meta_description,
+                    )
+                    char_count = len(messages[0]["content"])  # type: ignore
+                    est_cost = calculate_gpt_cost(char_count)
+                    total_estimated_cost += len(original_yaml_content["tables"].items()) * est_cost
+        return total_estimated_cost
 
     def run(self: Self) -> str | None:
         """Update metadata using OpenAI GPT."""
@@ -160,20 +198,9 @@ class MetadataGPTUpdater:
                 self.__metadata_new = new_yaml_content
 
     def run_data_step(self):
-        # Load the actual dataset file to extract description of the dataset
-        # Amend path to be compatiable to work with Dataset class
-        parts = self.path_to_file.split("/")
-        parts.remove("steps")
-        parts.remove("etl")
-        parts[-1] = parts[-1].split(".")[0]
-        path_to_dataset = "/".join(parts)
-        # Check if the garden step file exists
-        if os.path.isfile(path_to_dataset + "/index.json"):
-            ds = Dataset(path_to_dataset)
-            ds_meta_description = ds.metadata.to_dict()
-        else:
-            log.error(f"Required garden dataset {path_to_dataset} does not exist. Run the garden step first.")
-            raise Exception("Required garden dataset does not exist. Run the garden step first.")
+        # Load dataset
+        ds = self.load_dataset()
+        ds_meta_description = ds.metadata.to_dict()
 
         # Open the file with descriptions of metadata fields from our docs
         with open(DOCS, "r") as f:
@@ -182,13 +209,6 @@ class MetadataGPTUpdater:
         metadata_indicator_docs = docs["properties"]["tables"]["additionalProperties"]["properties"]["variables"][
             "additionalProperties"
         ]["properties"]
-        fields_to_fill_out = [
-            "title",
-            "unit",
-            "short_unit",
-            "description_short",
-            "description_key",
-        ]
 
         with open(self.path_to_file, "r") as file:
             original_yaml_content = yaml.safe_load(file)
@@ -196,7 +216,7 @@ class MetadataGPTUpdater:
         # Calculate the total estimated cost
         total_estimated_cost = self.estimate_cost(
             original_yaml_content,
-            fields_to_fill_out,
+            FIELDS_TO_FILL_OUT,
             metadata_indicator_docs,
             ds_meta_description,
         )
@@ -204,16 +224,15 @@ class MetadataGPTUpdater:
         # Ask the user if they want to proceed
         proceed = input(f"The total estimated cost is ${total_estimated_cost:.3f}. Do you want to proceed? (yes/no): ")
 
-        all_variables = {}
         final_cost = 0
         if proceed.lower() == "yes":
             for table_name, table_data in original_yaml_content["tables"].items():
                 for variable_name, variable_data in table_data["variables"].items():
                     variable_title = variable_data["title"]
                     indicator_metadata = []
-                    for metadata_field in fields_to_fill_out:
+                    for metadata_field in FIELDS_TO_FILL_OUT:
                         metadata_instructions = metadata_indicator_docs[metadata_field]
-                        messages = self.create_system_prompt_data_step(
+                        messages = create_system_prompt_data_step(
                             variable_title,
                             metadata_field,
                             metadata_instructions,
@@ -227,24 +246,23 @@ class MetadataGPTUpdater:
                         if gpt_result is not None:
                             final_cost += gpt_result.cost
                             indicator_metadata.append(gpt_result.message_content)
-                    all_variables[variable_name] = indicator_metadata
+
+                    indicator_metadata_dict = convert_list_to_dict(indicator_metadata)
+                    if "description_key" in indicator_metadata:
+                        indicator_metadata["description_key"] = [
+                            f"{item}" for item in indicator_metadata["description_key"]
+                        ]
+                    original_yaml_content["tables"][table_name]["variables"][variable_name].update(
+                        indicator_metadata_dict
+                    )
         log.info(f"Cost GPT4: ${final_cost:.3f}")
 
-        for table_name, table_data in original_yaml_content["tables"].items():
-            for variable_name, variable_data in table_data["variables"].items():
-                variable_updates = all_variables[variable_name]
-                variable_updates_dict = convert_list_to_dict(variable_updates)
-                if "description_key" in variable_updates:
-                    variable_updates["description_key"] = [f"{item}" for item in variable_updates["description_key"]]
-                original_yaml_content["tables"][table_name]["variables"][variable_name].update(variable_updates_dict)
-
+        # Update metadata
         self.__metadata_new = original_yaml_content
 
 
 def convert_list_to_dict(data_list):
-    """
-    Function to convert a list of string elements in the format "'key': 'value'" into a dictionary.
-    """
+    """Convert a list of string elements in the format "'key': 'value'" into a dictionary."""
     data_dict = {}
     for item in data_list:
         # Removing leading and trailing single quotes, then splitting the string by ':'
