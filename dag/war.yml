@@ -128,3 +128,11 @@ steps:
     - snapshot://war/2023-11-29/chupilkin_koczan.dta
   data://garden/war/2023-11-29/chupilkin_koczan:
     - data://meadow/war/2023-11-29/chupilkin_koczan
+
+  # Federation of American Scientists - Estimated Global Nuclear Warhead Inventories.
+  data://meadow/war/2024-01-09/nuclear_weapons_inventories:
+    - snapshot://war/2024-01-09/nuclear_weapons_inventories.csv
+  data://garden/war/2024-01-09/nuclear_weapons_inventories:
+    - data://meadow/war/2024-01-09/nuclear_weapons_inventories
+  data://grapher/war/2024-01-09/nuclear_weapons_inventories:
+    - data://garden/war/2024-01-09/nuclear_weapons_inventories
