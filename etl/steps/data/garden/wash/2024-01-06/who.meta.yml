@@ -40,6 +40,41 @@ definitions:
     Share of the population using improved drinking water services that are piped. Improved drinking water sources are those that have the potential to deliver safe water by nature of their design and construction, and include: piped water, boreholes or tubewells, protected dug wells, protected springs, rainwater, and packaged or delivered water.
   water_non_piped_description_short: &water_non_piped_desc_short |
     Share of the population using improved drinking water services that are not piped. Improved drinking water sources are those that have the potential to deliver safe water by nature of their design and construction, and include: piped water, boreholes or tubewells, protected dug wells, protected springs, rainwater, and packaged or delivered water.
+  population_hygiene_basic_description_short: &pop_hygiene_basic_desc_short |
+    Population with a handwashing facility with soap and water at home.
+  population_hygiene_limited_description_short: &pop_hygiene_limited_desc_short |
+    Population with a handwashing facility lacking soap and/or water at home.
+  population_hygiene_no_facility_description_short: &pop_hygiene_no_facility_desc_short |
+    Population with no handwashing facility at home.
+  population_sanitation_basic_description_short: &pop_sanitation_basic_desc_short |
+    Population using improved sanitation facilities that are not shared with other households. Improved sanitation facilities are those designed to hygienically separate excreta from human contact, and include: flush/pour flush toilets connected to piped sewer systems, septic tanks or pit latrines; pit latrines with slabs (including ventilated pit latrines), and composting toilets.
+  population_sanitation_limited_description_short: &pop_sanitation_limited_desc_short |
+    Population using improved sanitation facilities that are shared between two or more households. Improved sanitation facilities are those designed to hygienically separate excreta from human contact, and include: flush/pour flush toilets connected to piped sewer systems, septic tanks or pit latrines; pit latrines with slabs (including ventilated pit latrines), and composting toilets.
+  population_sanitation_unimproved_description_short: &pop_sanitation_unimproved_desc_short |
+    Population using unimproved sanitation facilities. Unimproved sanitation facilities include pit latrines without a slab or platform, hanging latrines or bucket latrines.
+  population_sanitation_open_defecation_description_short: &pop_sanitation_open_defecation_desc_short |
+    Population practicing open defecation. Open defecation refers to the practice of defecating in fields, forests, bushes, bodies of water or other open spaces.
+  population_water_safely_managed_description_short: &pop_water_safely_managed_desc_short |
+    Population using safely managed drinking water services. Safely managed drinking water services are defined as an improved drinking water source that is located on premises, available when needed and free from faecal and priority chemical contamination.
+  population_water_basic_description_short: &pop_water_basic_desc_short |
+    Population using at least basic drinking water services. Basic drinking water services are defined as an improved drinking water source,provided collection time is not more than 30 minutes for a roundtrip including queuing.
+  population_water_limited_description_short: &pop_water_limited_desc_short |
+    Population using limited drinking water services. Limited drinking water services are defined as drinking water from an improved source for which collection time exceeds 30 minutes for a roundtrip including queuing.
+  population_water_unimproved_description_short: &pop_water_unimproved_desc_short |
+    Population using unimproved drinking water services. Unimproved drinking water services are defined as drinking water from an unprotected dug well or unprotected spring.
+  population_water_surface_description_short: &pop_water_surface_desc_short |
+    Population using surface water as a primary source of drinking water. Surface water includes rivers, streams, ponds, lakes, dams, canals and irrigation channels.
+  population_water_accessible_on_premises_description_short: &pop_water_accessible_on_premises_desc_short |
+    Population using improved drinking water services that are accessible on premises. Improved drinking water sources are those that have the potential to deliver safe water by nature of their design and construction, and include: piped water, boreholes or tubewells, protected dug wells, protected springs, rainwater, and packaged or delivered water.
+  population_water_available_when_needed_description_short: &pop_water_available_when_needed_desc_short |
+    Population using improved drinking water services that are available when needed. Improved drinking water sources are those that have the potential to deliver safe water by nature of their design and construction, and include: piped water, boreholes or tubewells, protected dug wells, protected springs, rainwater, and packaged or delivered water.
+  population_water_free_from_contamination_description_short: &pop_water_free_from_contamination_desc_short |
+    Population using improved drinking water services that are free from faecal and priority chemical contamination. Improved drinking water sources are those that have the potential to deliver safe water by nature of their design and construction, and include: piped water, boreholes or tubewells, protected dug wells, protected springs, rainwater, and packaged or delivered water.
+  population_water_piped_description_short: &pop_water_piped_desc_short |
+    Population using improved drinking water services that are piped. Improved drinking water sources are those that have the potential to deliver safe water by nature of their design and construction, and include: piped water, boreholes or tubewells, protected dug wells, protected springs, rainwater, and packaged or delivered water.
+  population_water_non_piped_description_short: &pop_water_non_piped_desc_short |
+    Population using improved drinking water services that are not piped. Improved drinking water sources are those that have the potential to deliver safe water by nature of their design and construction, and include: piped water, boreholes or tubewells, protected dug wells, protected springs, rainwater, and packaged or delivered water.
+
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
 dataset:
@@ -101,6 +136,42 @@ tables:
       total_annual_rate_of_change_in_basic:
         title: Annual rate of change in the share of the population with basic hygiene facilities
         unit: "percentage points"
+      population_urban_basic:
+        title: Urban population with basic hygiene facilities
+        description_short: *pop_hygiene_basic_desc_short
+        unit: "people"
+      population_urban_limited__without_water_or_soap:
+        title: Urban population with limited hygiene facilities
+        description_short: *pop_hygiene_limited_desc_short
+        unit: "people"
+      population_urban_no_facility:
+        title: Urban population with no hygiene facilities
+        description_short: *pop_hygiene_no_facility_desc_short
+        unit: "people"
+      population_rural_basic:
+        title: Rural population with basic hygiene facilities
+        description_short: *pop_hygiene_basic_desc_short
+        unit: "people"
+      population_rural_limited__without_water_or_soap:
+        title: Rural population with limited hygiene facilities
+        description_short: *pop_hygiene_limited_desc_short
+        unit: "people"
+      population_rural_no_facility:
+        title: Rural population with no hygiene facilities
+        description_short: *pop_hygiene_no_facility_desc_short
+        unit: "people"
+      population_total_basic:
+        title: Total population with basic hygiene facilities
+        description_short: *pop_hygiene_basic_desc_short
+        unit: "people"
+      population_total_limited__without_water_or_soap:
+        title: Total population with limited hygiene facilities
+        description_short: *pop_hygiene_limited_desc_short
+        unit: "people"
+      population_total_no_facility:
+        title: Total population with no hygiene facilities
+        description_short: *pop_hygiene_no_facility_desc_short
+        unit: "people"
   menstrual_health:
     variables:
       rural_proportion_of_women_and_girls_age_15_49_who_have_menstruated_in_the_previous_year_awareness_of_menstruation_before_menarche:
@@ -192,6 +263,30 @@ tables:
         description_short: Share of women aged 15-49 who have menstruated in the previous year who use single-use menstrual materials to capture and contain menstrual blood.
         unit: "%"
         short_unit: "%"
+      population_women_age_15_49_awareness_of_menstruation_before_menarche:
+        title: Population of women aged 15-49 who were aware of menstruation before their first period
+        description_short: Population of women aged 15-49 who have menstruated in the previous year who were aware of menstruation before their first period.
+        unit: women aged 15-49
+      population_women_age_15_49_private_place_to_wash_and_change:
+        title: Population of women aged 15-49 who have a private place to wash and change
+        description_short: Population of women aged 15-49 who have menstruated in the previous year who have access to a private place to wash and change while at home.
+        unit: women aged 15-49
+      population_women_age_15_49_participation_in_activities_during_menstruation:
+        title: Population of women aged 15-49 who participate in activities during menstruation
+        description_short: Population of women aged 15-49 who have menstruated in the previous year who participate in activities during menstruation.
+        unit: women aged 15-49
+      population_women_age_15_49_use_of_menstrual_materials:
+        title: Population of women aged 15-49 who use menstrual materials
+        description_short: Population of women aged 15-49 who have menstruated in the previous year who use menstrual materials to capture and contain menstrual blood, such as sanitary pads, cloth, tampons, or cups.
+        unit: women aged 15-49
+      population_women_age_15_49_use_of_reusable_materials:
+        title: Population of women aged 15-49 who use reusable menstrual materials
+        description_short: Population of women aged 15-49 who have menstruated in the previous year who use reusable menstrual materials to capture and contain menstrual blood.
+        unit: women aged 15-49
+      population_women_age_15_49_use_of_single_use_materials:
+        title: Population of women aged 15-49 who use single-use menstrual materials
+        description_short: Population of women aged 15-49 who have menstruated in the previous year who use single-use menstrual materials to capture and contain menstrual blood.
+        unit: women aged 15-49
   sanitation:
     variables:
       rural_at_least_basic:
@@ -365,6 +460,54 @@ tables:
       total_proportion_of_population_using_improved__sanitation_facilities__including_shared__sewer_connections:
         title: TOTAL_Proportion of population using improved  sanitation facilities  (including shared)_Sewer connections
         unit: ""
+      population_urban_at_least_basic:
+        title: Urban population with at least basic sanitation facilities
+        description_short: *pop_sanitation_basic_desc_short
+        unit: "people"
+      population_urban_limited__shared:
+        title: Urban population with limited sanitation facilities
+        description_short: *pop_sanitation_limited_desc_short
+        unit: "people"
+      population_urban_unimproved:
+        title: Urban population with unimproved sanitation facilities
+        description_short: *pop_sanitation_unimproved_desc_short
+        unit: "people"
+      population_urban_open_defecation:
+        title: Urban population practicing open defecation
+        description_short: *pop_sanitation_open_defecation_desc_short
+        unit: "people"
+      population_rural_at_least_basic:
+        title: Rural population with at least basic sanitation facilities
+        description_short: *pop_sanitation_basic_desc_short
+        unit: "people"
+      population_rural_limited__shared:
+        title: Rural population with limited sanitation facilities
+        description_short: *pop_sanitation_limited_desc_short
+        unit: "people"
+      population_rural_unimproved:
+        title: Rural population with unimproved sanitation facilities
+        description_short: *pop_sanitation_unimproved_desc_short
+        unit: "people"
+      population_rural_open_defecation:
+        title: Rural population practicing open defecation
+        description_short: *pop_sanitation_open_defecation_desc_short
+        unit: "people"
+      population_total_at_least_basic:
+        title: Total population with at least basic sanitation facilities
+        description_short: *pop_sanitation_basic_desc_short
+        unit: "people"
+      population_total_limited__shared:
+        title: Total population with limited sanitation facilities
+        description_short: *pop_sanitation_limited_desc_short
+        unit: "people"
+      population_total_unimproved:
+        title: Total population with unimproved sanitation facilities
+        description_short: *pop_sanitation_unimproved_desc_short
+        unit: "people"
+      population_total_open_defecation:
+        title: Total population practicing open defecation
+        description_short: *pop_sanitation_open_defecation_desc_short
+        unit: "people"
   water:
     variables:
       rural_at_least_basic:
@@ -535,3 +678,51 @@ tables:
         description_short: *water_non_piped_desc_short
         unit: "%"
         short_unit: "%"
+      population_urban_at_least_basic:
+        title: Urban population with at least basic drinking water services
+        description_short: *pop_water_basic_desc_short
+        unit: "people"
+      population_urban_limited__more_than_30_mins:
+        title: Urban population with limited drinking water services
+        description_short: *pop_water_limited_desc_short
+        unit: "people"
+      population_urban_unimproved:
+        title: Urban population with unimproved drinking water services
+        description_short: *pop_water_unimproved_desc_short
+        unit: "people"
+      population_urban_surface_water:
+        title: Urban population using surface water as a primary source of drinking water
+        description_short: *pop_water_surface_desc_short
+        unit: "people"
+      population_rural_at_least_basic:
+        title: Rural population with at least basic drinking water services
+        description_short: *pop_water_basic_desc_short
+        unit: "people"
+      population_rural_limited__more_than_30_mins:
+        title: Rural population with limited drinking water services
+        description_short: *pop_water_limited_desc_short
+        unit: "people"
+      population_rural_unimproved:
+        title: Rural population with unimproved drinking water services
+        description_short: *pop_water_unimproved_desc_short
+        unit: "people"
+      population_rural_surface_water:
+        title: Rural population using surface water as a primary source of drinking water
+        description_short: *pop_water_surface_desc_short
+        unit: "people"
+      population_total_at_least_basic:
+        title: Total population with at least basic drinking water services
+        description_short: *pop_water_basic_desc_short
+        unit: "people"
+      population_total_limited__more_than_30_mins:
+        title: Total population with limited drinking water services
+        description_short: *pop_water_limited_desc_short
+        unit: "people"
+      population_total_unimproved:
+        title: Total population with unimproved drinking water services
+        description_short: *pop_water_unimproved_desc_short
+        unit: "people"
+      population_total_surface_water:
+        title: Total population using surface water as a primary source of drinking water
+        description_short: *pop_water_surface_desc_short
+        unit: "people"
