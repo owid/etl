@@ -86,7 +86,7 @@ class Snapshot:
         self.uri = uri
 
         if not self.metadata_path.exists():
-            raise FileNotFoundError(f"Metadata file {self.metadata_path} not found")
+            raise FileNotFoundError(f"Metadata file {self.metadata_path} not found, but {uri} is in DAG.")
 
         self.metadata = SnapshotMeta.load_from_yaml(self.metadata_path)
 
