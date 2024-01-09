@@ -21,7 +21,7 @@ meta:
     producer: WHO/UNICEF Joint Monitoring Programme for Water Supply, Sanitation and
       Hygiene (JMP)
     citation_full: |-
-      TBA
+      World Health Organization/UNICEF Joint Monitoring Programme for Water Supply, Sanitation and Hygiene (JMP; 2023). Estimates for drinking water, sanitation and hygiene services by country (2000-2022) [dataset]. World Health Organization and UNICEF [original data]
     attribution_short: WHO/UNICEF JMP
     # Files
     url_main: https://washdata.org/data/household#!/
@@ -34,6 +34,6 @@ meta:
 
 wdir: ../../../data/snapshots/wash/2024-01-06
 outs:
-- md5: c74b2eff1abd34d9723eae4375519245
-  size: 1771345
-  path: who_regional.xlsx
+  - md5: c74b2eff1abd34d9723eae4375519245
+    size: 1771345
+    path: who_regional.xlsx

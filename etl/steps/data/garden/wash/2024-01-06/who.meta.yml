@@ -20,6 +20,20 @@ definitions:
     Share of the population using unimproved sanitation facilities. Unimproved sanitation facilities include pit latrines without a slab or platform, hanging latrines or bucket latrines.
   sanitation_open_defecation_description_short: &sanitation_open_defecation_desc_short |
     Share of the population practicing open defecation. Open defecation refers to the practice of defecating in fields, forests, bushes, bodies of water or other open spaces.
+  sanitation_safe_management_description_short: &sanitation_safe_management_desc_short |
+    Share of the population using improved sanitation facilities (excluding shared facilities) that are safely managed. Safely managed sanitation services are defined as improved sanitation facilities that are not shared with other households and where excreta are safely disposed in situ or transported and treated off-site.
+  sanitation_disposed_in_situ_description_short: &sanitation_disposed_in_situ_desc_short |
+    Share of the population using improved sanitation facilities (excluding shared facilities) that are disposed in situ. Improved sanitation facilities are those designed to hygienically separate excreta from human contact, and include: flush/pour flush toilets connected to piped sewer systems, septic tanks or pit latrines; pit latrines with slabs (including ventilated pit latrines), and composting toilets.
+  sanitation_emptied_and_treated_description_short: &sanitation_emptied_and_treated_desc_short |
+    Share of the population using improved sanitation facilities (excluding shared facilities) that are emptied and treated. Improved sanitation facilities are those designed to hygienically separate excreta from human contact, and include: flush/pour flush toilets connected to piped sewer systems, septic tanks or pit latrines; pit latrines with slabs (including ventilated pit latrines), and composting toilets.
+  sanitation_wastewater_treated: &sanitation_wastewater_treated |
+    Share of the population using improved sanitation facilities (excluding shared facilities) that are connected to sewer systems and where wastewater is treated. Improved sanitation facilities are those designed to hygienically separate excreta from human contact, and include: flush/pour flush toilets connected to piped sewer systems, septic tanks or pit latrines; pit latrines with slabs (including ventilated pit latrines), and composting toilets.
+  sanitation_latrines_description_short: &sanitation_latrines_desc_short |
+    Share of the population using improved sanitation facilities (including shared facilities) which are latrines. Improved sanitation facilities are those designed to hygienically separate excreta from human contact, and include: flush/pour flush toilets connected to piped sewer systems, septic tanks or pit latrines; pit latrines with slabs (including ventilated pit latrines), and composting toilets.
+  sanitation_septic_tanks_description_short: &sanitation_septic_tanks_desc_short |
+    Share of the population using improved sanitation facilities (including shared facilities) that have septic tanks. Improved sanitation facilities are those designed to hygienically separate excreta from human contact, and include: flush/pour flush toilets connected to piped sewer systems, septic tanks or pit latrines; pit latrines with slabs (including ventilated pit latrines), and composting toilets.
+  sanitation_sewer_systems_description_short: &sanitation_sewer_systems_desc_short |
+    Share of the population using improved sanitation facilities (including shared facilities) that have sewer connections. Improved sanitation facilities are those designed to hygienically separate excreta from human contact, and include: flush/pour flush toilets connected to piped sewer systems, septic tanks or pit latrines; pit latrines with slabs (including ventilated pit latrines), and composting toilets.
   water_safely_managed_description_short: &water_safely_managed_desc_short |
     Share of the population using safely managed drinking water services. Safely managed drinking water services are defined as an improved drinking water source that is located on premises, available when needed and free from faecal and priority chemical contamination.
   water_basic_description_short: &water_basic_desc_short |
@@ -367,99 +381,117 @@ tables:
         title: Annual rate of change in the share of the population practicing open defecation
         unit: "percentage points"
       rural_proportion_of_population_using_improved__sanitation_facilities__excluding_shared__safely_managed:
-        title: RURAL_Proportion of population using improved  sanitation facilities  (excluding shared)_Safely managed
-        unit: ""
+        title: Share of the rural population using improved sanitation facilities (excluding shared facilities) that are safely managed
+        description_short: *sanitation_safe_management_desc_short
+        unit: "%"
+        short_unit: "%"
       rural_proportion_of_population_using_improved__sanitation_facilities__excluding_shared__disposed_in_situ:
-        title: RURAL_Proportion of population using improved  sanitation facilities  (excluding shared)_Disposed in situ
-        unit: ""
-
+        title: Share of the rural population using improved sanitation facilities (excluding shared facilities) that are disposed in situ
+        description_short: *sanitation_disposed_in_situ_desc_short
+        unit: "%"
+        short_unit: "%"
       rural_proportion_of_population_using_improved__sanitation_facilities__excluding_shared__emptied_and_treated:
-        title: RURAL_Proportion of population using improved  sanitation facilities  (excluding shared)_Emptied and treated
-        unit: ""
-
+        title: Share of the rural population using improved sanitation facilities (excluding shared facilities) that are emptied and treated
+        description_short: *sanitation_emptied_and_treated_desc_short
+        unit: "%"
+        short_unit: "%"
       rural_proportion_of_population_using_improved__sanitation_facilities__excluding_shared__wastewater_treated:
-        title: RURAL_Proportion of population using improved  sanitation facilities  (excluding shared)_Wastewater treated
-        unit: ""
-
+        title: Share of the rural population using improved sanitation facilities (excluding shared facilities) that are connected to sewer systems and where wastewater is treated
+        description_short: *sanitation_wastewater_treated_desc_short
+        unit: "%"
+        short_unit: "%"
       rural_proportion_of_population_using_improved__sanitation_facilities__excluding_shared__annual_rate_of_change_in_safely_managed:
-        title: RURAL_Proportion of population using improved  sanitation facilities  (excluding shared)_Annual rate of change in safely managed
-        unit: ""
-
+        title: Annual rate of change in the share of the rural population using improved sanitation facilities (excluding shared facilities) that are safely managed
+        unit: "percentage points"
       rural_proportion_of_population_using_improved__sanitation_facilities__including_shared__latrines_and_other:
-        title: RURAL_Proportion of population using improved  sanitation facilities  (including shared)_Latrines and other
-        unit: ""
-
+        title: Share of the rural population using improved sanitation facilities (including shared facilities) that are latrines and other
+        description_short: *sanitation_latrines_desc_short
+        unit: "%"
+        short_unit: "%"
       rural_proportion_of_population_using_improved__sanitation_facilities__including_shared__septic_tanks:
-        title: RURAL_Proportion of population using improved  sanitation facilities  (including shared)_Septic tanks
-        unit: ""
-
+        title: Share of the rural population using improved sanitation facilities (including shared facilities) that are septic tanks
+        description_short: *sanitation_septic_tanks_desc_short
+        unit: "%"
+        short_unit: "%"
       rural_proportion_of_population_using_improved__sanitation_facilities__including_shared__sewer_connections:
-        title: RURAL_Proportion of population using improved  sanitation facilities  (including shared)_Sewer connections
-        unit: ""
-
+        title: Share of the rural population using improved sanitation facilities (including shared facilities) that are sewer connections
+        description_short: *sanitation_sewer_systems_desc_short
+        unit: "%"
+        short_unit: "%"
       urban_proportion_of_population_using_improved__sanitation_facilities__excluding_shared__safely_managed:
-        title: URBAN_Proportion of population using improved  sanitation facilities  (excluding shared)_Safely managed
-        unit: ""
-
+        title: Share of the urban population using improved sanitation facilities (excluding shared facilities) that are safely managed
+        description_short: *sanitation_safe_management_desc_short
+        unit: "%"
+        short_unit: "%"
       urban_proportion_of_population_using_improved__sanitation_facilities__excluding_shared__disposed_in_situ:
-        title: URBAN_Proportion of population using improved  sanitation facilities  (excluding shared)_Disposed in situ
-        unit: ""
-
+        title: Share of the urban population using improved sanitation facilities (excluding shared facilities) that are disposed in situ
+        description_short: *sanitation_disposed_in_situ_desc_short
+        unit: "%"
+        short_unit: "%"
       urban_proportion_of_population_using_improved__sanitation_facilities__excluding_shared__emptied_and_treated:
-        title: URBAN_Proportion of population using improved  sanitation facilities  (excluding shared)_Emptied and treated
-        unit: ""
-
+        title: Share of the urban population using improved sanitation facilities (excluding shared facilities) that are emptied and treated
+        description_short: *sanitation_emptied_and_treated_desc_short
+        unit: "%"
+        short_unit: "%"
       urban_proportion_of_population_using_improved__sanitation_facilities__excluding_shared__wastewater_treated:
-        title: URBAN_Proportion of population using improved  sanitation facilities  (excluding shared)_Wastewater treated
-        unit: ""
-
+        title: Share of the urban population using improved sanitation facilities (excluding shared facilities) that are connected to sewer systems and where wastewater is treated
+        description_short: *sanitation_wastewater_treated_desc_short
+        unit: "%"
+        short_unit: "%"
       urban_proportion_of_population_using_improved__sanitation_facilities__excluding_shared__annual_rate_of_change_in_safely_managed:
-        title: URBAN_Proportion of population using improved  sanitation facilities  (excluding shared)_Annual rate of change in safely managed
-        unit: ""
-
+        title: Annual rate of change in the share of the urban population using improved sanitation facilities (excluding shared facilities) that are safely managed
+        unit: "percentage points"
       urban_proportion_of_population_using_improved__sanitation_facilities__including_shared__latrines_and_other:
-        title: URBAN_Proportion of population using improved  sanitation facilities  (including shared)_Latrines and other
-        unit: ""
-
+        title: Share of the urban population using improved sanitation facilities (including shared facilities) that are latrines and other
+        description_short: *sanitation_latrines_desc_short
+        unit: "%"
+        short_unit: "%"
       urban_proportion_of_population_using_improved__sanitation_facilities__including_shared__septic_tanks:
-        title: URBAN_Proportion of population using improved  sanitation facilities  (including shared)_Septic tanks
-        unit: ""
-
+        title: Share of the urban population using improved sanitation facilities (including shared facilities) that are septic tanks
+        description_short: *sanitation_septic_tanks_desc_short
+        unit: "%"
+        short_unit: "%"
       urban_proportion_of_population_using_improved__sanitation_facilities__including_shared__sewer_connections:
-        title: URBAN_Proportion of population using improved  sanitation facilities  (including shared)_Sewer connections
-        unit: ""
-
+        title: Share of the urban population using improved sanitation facilities (including shared facilities) that are sewer connections
+        description_short: *sanitation_sewer_systems_desc_short
+        unit: "%"
+        short_unit: "%"
       total_proportion_of_population_using_improved__sanitation_facilities__excluding_shared__safely_managed:
-        title: TOTAL_Proportion of population using improved  sanitation facilities  (excluding shared)_Safely managed
-        unit: ""
-
+        title: Share of the population using improved sanitation facilities (excluding shared facilities) that are safely managed
+        description_short: *sanitation_safe_management_desc_short
+        unit: "%"
       total_proportion_of_population_using_improved__sanitation_facilities__excluding_shared__disposed_in_situ:
-        title: TOTAL_Proportion of population using improved  sanitation facilities  (excluding shared)_Disposed in situ
-        unit: ""
-
+        title: Share of the population using improved sanitation facilities (excluding shared facilities) that are disposed in situ
+        description_short: *sanitation_disposed_in_situ_desc_short
+        unit: "%"
       total_proportion_of_population_using_improved__sanitation_facilities__excluding_shared__emptied_and_treated:
-        title: TOTAL_Proportion of population using improved  sanitation facilities  (excluding shared)_Emptied and treated
-        unit: ""
-
+        title: Share of the population using improved sanitation facilities (excluding shared facilities) that are emptied and treated
+        description_short: *sanitation_emptied_and_treated_desc_short
+        unit: "%"
+        short_unit: "%"
       total_proportion_of_population_using_improved__sanitation_facilities__excluding_shared__wastewater_treated:
-        title: TOTAL_Proportion of population using improved  sanitation facilities  (excluding shared)_Wastewater treated
-        unit: ""
-
+        title: Share of the population using improved sanitation facilities (excluding shared facilities) that are connected to sewer systems and where wastewater is treated
+        description_short: *sanitation_wastewater_treated_desc_short
+        unit: "%"
+        short_unit: "%"
       total_proportion_of_population_using_improved__sanitation_facilities__excluding_shared__annual_rate_of_change_in_safely_managed:
-        title: TOTAL_Proportion of population using improved  sanitation facilities  (excluding shared)_Annual rate of change in safely managed
-        unit: ""
-
+        title: Annual rate of change in the share of the population using improved sanitation facilities (excluding shared facilities) that are safely managed
+        unit: "percentage points"
       total_proportion_of_population_using_improved__sanitation_facilities__including_shared__latrines_and_other:
-        title: TOTAL_Proportion of population using improved  sanitation facilities  (including shared)_Latrines and other
-        unit: ""
-
+        title: Share of the total population using improved sanitation facilities (including shared facilities) that are latrines and other
+        description_short: *sanitation_latrines_desc_short
+        unit: "%"
+        short_unit: "%"
       total_proportion_of_population_using_improved__sanitation_facilities__including_shared__septic_tanks:
-        title: TOTAL_Proportion of population using improved  sanitation facilities  (including shared)_Septic tanks
-        unit: ""
-
+        title: Share of the total population using improved sanitation facilities (including shared facilities) that are septic tanks
+        description_short: *sanitation_septic_tanks_desc_short
+        unit: "%"
+        short_unit: "%"
       total_proportion_of_population_using_improved__sanitation_facilities__including_shared__sewer_connections:
-        title: TOTAL_Proportion of population using improved  sanitation facilities  (including shared)_Sewer connections
-        unit: ""
+        title: Share of the total population using improved sanitation facilities (including shared facilities) that are sewer connections
+        description_short: *sanitation_sewer_systems_desc_short
+        unit: "%"
+        short_unit: "%"
       population_urban_at_least_basic:
         title: Urban population with at least basic sanitation facilities
         description_short: *pop_sanitation_basic_desc_short
