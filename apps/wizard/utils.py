@@ -52,7 +52,7 @@ DATE_TODAY = dt.date.today().strftime("%Y-%m-%d")
 CURRENT_DIR = Path(__file__).parent
 
 # Phases accepted
-PHASES = Literal["all", "snapshot", "meadow", "garden", "grapher", "charts"]
+PHASES = Literal["all", "snapshot", "meadow", "garden", "grapher", "charts", "metagpt", "dataexp"]
 
 # Paths to cookiecutter files
 COOKIE_SNAPSHOT = APPS_DIR / "wizard" / "templating" / "cookiecutter" / "snapshot"
