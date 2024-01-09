@@ -193,140 +193,167 @@ class MetadataGPTUpdater:
         with open(output_file, "w") as file:
             yaml.dump(self.metadata_new_str, file, default_flow_style=False, sort_keys=False, indent=4)
 
+    def estimate_cost(
+        self: Self, original_yaml_content, fields_to_fill_out, metadata_indicator_docs, ds_meta_description
+    ) -> float:
+        if self.channel == Channels.GARDEN:
+            total_estimated_cost = 0
+            for _, table_data in original_yaml_content["tables"].items():
+                for _, variable_data in table_data["variables"].items():
+                    variable_title = variable_data["title"]
+                    for metadata_field in fields_to_fill_out:
+                        metadata_instructions = metadata_indicator_docs[metadata_field]
+                        messages = self.create_system_prompt_garden(
+                            variable_title,
+                            metadata_field,
+                            metadata_instructions,
+                            ds_meta_description,
+                        )
+                        char_count = len(messages[0]["content"])  # type: ignore
+                        est_cost = calculate_gpt_cost(char_count)
+                        total_estimated_cost += len(original_yaml_content["tables"].items()) * est_cost
+            return total_estimated_cost
+        else:
+            raise Exception("Invalid channel")
+
     def run(self: Self) -> str | None:
         """Update metadata using OpenAI GPT."""
 
         # Update metadata
         match self.channel:
             case Channels.SNAPSHOT:
-                # Create system prompt
-                messages = self.create_system_prompt()
-                message_content, cost = get_message_content(
-                    self.client, messages=messages, model=GPT_MODEL, temperature=0
-                )  # type: ignore
-                log.info(f"Cost GPT4: ${cost:.3f}")
-
-                if message_content:
-                    new_yaml_content = yaml.safe_load(message_content)
-                    if new_yaml_content:
-                        self.__metadata_new = new_yaml_content
-            case Channels.GRAPHER:
-                for attempt in range(5):  # MAX_ATTEMPTS
-                    # Create system prompt
-                    messages = self.create_system_prompt()
-                    message_content, cost = get_message_content(
-                        self.client, messages=messages, model=GPT_MODEL, temperature=0
-                    )  #
-                    log.info(f"Cost GPT4: ${cost:.3f}")
-
-                    if message_content:
-                        try:
-                            parsed_dict = json.loads(message_content)
-
-                            if check_gpt_response_format(parsed_dict):
-                                log.info("GPT response is in the correct format.")
-                                with open(self.path_to_file, "r") as file:
-                                    original_yaml_content = yaml.safe_load(file)
-                                    if original_yaml_content:
-                                        for table, table_data in parsed_dict["tables"].items():
-                                            for variable, variable_updates in table_data["variables"].items():
-                                                if (
-                                                    table in original_yaml_content["tables"]
-                                                    and variable in original_yaml_content["tables"][table]["variables"]
-                                                ):
-                                                    # Formatting 'description_key' as bullet points
-                                                    # If 'description_key' is in variable_updates, keep it as a list of strings
-                                                    if "description_key" in variable_updates:
-                                                        variable_updates["description_key"] = [
-                                                            f"{item}" for item in variable_updates["description_key"]
-                                                        ]
-                                                    original_yaml_content["tables"][table]["variables"][
-                                                        variable
-                                                    ].update(variable_updates)
-                                    self.__metadata_new = original_yaml_content
-                                    return
-                        except json.JSONDecodeError as e:
-                            log.error(f"JSON decoding failed on attempt {attempt + 1}: {e}")
-                raise Exception("Unable to parse GPT response after multiple attempts.")
-
+                self.run_snapshot()
             case Channels.GARDEN:
-                # Load the actual dataset file to extract description of the dataset
-                # Amend path to be compatiable to work with Dataset class
-                parts = self.path_to_file.split("/")
-                parts.remove("steps")
-                parts.remove("etl")
-                parts[-1] = parts[-1].split(".")[0]
-                path_to_dataset = "/".join(parts)
-                # Check if the garden step file exists
-                if os.path.isfile(path_to_dataset + "/index.json"):
-                    ds = Dataset(path_to_dataset)
-                    ds_meta_description = ds.metadata.to_dict()
-                else:
-                    log.error(f"Required garden dataset {path_to_dataset} does not exist. Run the garden step first.")
-                    raise Exception("Required garden dataset does not exist. Run the garden step first.")
-
-                # Open the file with descriptions of metadata fields from our docs
-                with open(DOCS, "r") as f:
-                    docs = json.load(f)
-
-                metadata_indicator_docs = docs["properties"]["tables"]["additionalProperties"]["properties"][
-                    "variables"
-                ]["additionalProperties"]["properties"]
-                fields_to_fill_out = ["title", "unit", "short_unit", "description_short", "description_key",]
-
-                all_variables = {}
-                with open(self.path_to_file, "r") as file:
-                    original_yaml_content = yaml.safe_load(file)
-                final_cost = 0
-
-                # Calculate the total estimated cost
-                total_estimated_cost = 0
-                for table_name, table_data in original_yaml_content["tables"].items():
-                    for variable_name, variable_data in table_data["variables"].items():
-                        variable_title = variable_data["title"]
-                        indicator_metadata = []
-                        for metadata_field in fields_to_fill_out:
-                            metadata_instructions = metadata_indicator_docs[metadata_field]
-                            messages = self.create_system_prompt_garden(
-                                variable_title, metadata_field, metadata_instructions, ds_meta_description
-                            )
-                            char_count = len(messages[0]["content"])  # type: ignore
-                            est_cost = calculate_gpt_cost(char_count)
-                            total_estimated_cost += len(original_yaml_content["tables"].items()) * est_cost
-
-                # Ask the user if they want to proceed
-                proceed = input(
-                    f"The total estimated cost is ${total_estimated_cost:.3f}. Do you want to proceed? (yes/no): "
-                )
-
-                if proceed.lower() == "yes":
-                    for table_name, table_data in original_yaml_content["tables"].items():
-                        for variable_name, variable_data in table_data["variables"].items():
-                            variable_title = variable_data["title"]
-                            indicator_metadata = []
-                            for metadata_field in fields_to_fill_out:
-                                metadata_instructions = metadata_indicator_docs[metadata_field]
-                                messages = self.create_system_prompt_garden(
-                                    variable_title, metadata_field, metadata_instructions, ds_meta_description
-                                )
-                                message_content, cost = get_message_content(
-                                    self.client, messages=messages, model=GPT_MODEL, temperature=0
-                                )
-                                final_cost += cost
-
-                                indicator_metadata.append(message_content)
-                            all_variables[variable_name] = indicator_metadata
-                log.info(f"Cost GPT4: ${final_cost:.3f}")
-
-                for table_name, table_data in original_yaml_content["tables"].items():
-                    for variable_name, variable_data in table_data["variables"].items():
-                        variable_updates = all_variables[variable_name]
-                        variable_updates_dict = convert_list_to_dict(variable_updates)
-                        original_yaml_content["tables"][table_name]["variables"][variable_name].update(
-                            variable_updates_dict
-                        )
-                self.__metadata_new = original_yaml_content
+                self.run_garden()
                 return
+            case Channels.GRAPHER:
+                self.run_grapher()
+
+    def run_snapshot(self: Self):
+        # Create system prompt
+        messages = self.create_system_prompt()
+        message_content, cost = get_message_content(self.client, messages=messages, model=GPT_MODEL, temperature=0)  # type: ignore
+        log.info(f"Cost GPT4: ${cost:.3f}")
+
+        if message_content:
+            new_yaml_content = yaml.safe_load(message_content)
+            if new_yaml_content:
+                self.__metadata_new = new_yaml_content
+
+    def run_garden(self):
+        # Load the actual dataset file to extract description of the dataset
+        # Amend path to be compatiable to work with Dataset class
+        parts = self.path_to_file.split("/")
+        parts.remove("steps")
+        parts.remove("etl")
+        parts[-1] = parts[-1].split(".")[0]
+        path_to_dataset = "/".join(parts)
+        # Check if the garden step file exists
+        if os.path.isfile(path_to_dataset + "/index.json"):
+            ds = Dataset(path_to_dataset)
+            ds_meta_description = ds.metadata.to_dict()
+        else:
+            log.error(f"Required garden dataset {path_to_dataset} does not exist. Run the garden step first.")
+            raise Exception("Required garden dataset does not exist. Run the garden step first.")
+
+        # Open the file with descriptions of metadata fields from our docs
+        with open(DOCS, "r") as f:
+            docs = json.load(f)
+
+        metadata_indicator_docs = docs["properties"]["tables"]["additionalProperties"]["properties"]["variables"][
+            "additionalProperties"
+        ]["properties"]
+        fields_to_fill_out = [
+            "title",
+            "unit",
+            "short_unit",
+            "description_short",
+            "description_key",
+        ]
+
+        with open(self.path_to_file, "r") as file:
+            original_yaml_content = yaml.safe_load(file)
+
+        # Calculate the total estimated cost
+        total_estimated_cost = self.estimate_cost(
+            original_yaml_content,
+            fields_to_fill_out,
+            metadata_indicator_docs,
+            ds_meta_description,
+        )
+
+        # Ask the user if they want to proceed
+        proceed = input(f"The total estimated cost is ${total_estimated_cost:.3f}. Do you want to proceed? (yes/no): ")
+
+        all_variables = {}
+        final_cost = 0
+        if proceed.lower() == "yes":
+            for table_name, table_data in original_yaml_content["tables"].items():
+                for variable_name, variable_data in table_data["variables"].items():
+                    variable_title = variable_data["title"]
+                    indicator_metadata = []
+                    for metadata_field in fields_to_fill_out:
+                        metadata_instructions = metadata_indicator_docs[metadata_field]
+                        messages = self.create_system_prompt_garden(
+                            variable_title,
+                            metadata_field,
+                            metadata_instructions,
+                            ds_meta_description,
+                        )
+                        message_content, cost = get_message_content(
+                            self.client, messages=messages, model=GPT_MODEL, temperature=0
+                        )
+                        final_cost += cost
+
+                        indicator_metadata.append(message_content)
+                    all_variables[variable_name] = indicator_metadata
+        log.info(f"Cost GPT4: ${final_cost:.3f}")
+
+        for table_name, table_data in original_yaml_content["tables"].items():
+            for variable_name, variable_data in table_data["variables"].items():
+                variable_updates = all_variables[variable_name]
+                variable_updates_dict = convert_list_to_dict(variable_updates)
+                original_yaml_content["tables"][table_name]["variables"][variable_name].update(variable_updates_dict)
+        self.__metadata_new = original_yaml_content
+
+    def run_grapher(self):
+        for attempt in range(5):  # MAX_ATTEMPTS
+            # Create system prompt
+            messages = self.create_system_prompt()
+            message_content, cost = get_message_content(
+                self.client, messages=messages, model=GPT_MODEL, temperature=0
+            )  #
+            log.info(f"Cost GPT4: ${cost:.3f}")
+
+            if message_content:
+                try:
+                    parsed_dict = json.loads(message_content)
+
+                    if check_gpt_response_format(parsed_dict):
+                        log.info("GPT response is in the correct format.")
+                        with open(self.path_to_file, "r") as file:
+                            original_yaml_content = yaml.safe_load(file)
+                            if original_yaml_content:
+                                for table, table_data in parsed_dict["tables"].items():
+                                    for variable, variable_updates in table_data["variables"].items():
+                                        if (
+                                            table in original_yaml_content["tables"]
+                                            and variable in original_yaml_content["tables"][table]["variables"]
+                                        ):
+                                            # Formatting 'description_key' as bullet points
+                                            # If 'description_key' is in variable_updates, keep it as a list of strings
+                                            if "description_key" in variable_updates:
+                                                variable_updates["description_key"] = [
+                                                    f"{item}" for item in variable_updates["description_key"]
+                                                ]
+                                            original_yaml_content["tables"][table]["variables"][variable].update(
+                                                variable_updates
+                                            )
+                            self.__metadata_new = original_yaml_content
+                            return
+                except json.JSONDecodeError as e:
+                    log.error(f"JSON decoding failed on attempt {attempt + 1}: {e}")
+        raise Exception("Unable to parse GPT response after multiple attempts.")
 
     def create_system_prompt(self: Self) -> List[Dict[str, str]] | None:
         """Create the system prompt for the GPT model based on file path."""
