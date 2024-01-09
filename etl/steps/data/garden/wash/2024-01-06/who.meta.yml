@@ -30,12 +30,6 @@ dataset:
 tables:
   hygiene:
     variables:
-      population__thousands:
-        title: Population (thousands)
-        unit: ""
-      pct_urban:
-        title: Share of the population that lives in urban areas
-        unit: "%"
       rural_basic:
         title: Share of the rural population with basic hygiene facilities
         description_short: *hygiene_basic_desc_short
@@ -193,13 +187,6 @@ tables:
         short_unit: "%"
   sanitation:
     variables:
-      population__thousands:
-        title: Population  (thousands)
-        unit: ""
-      pct_urban:
-        title: Share of the population that lives in urban areas
-        unit: "%"
-        short_unit: "%"
       rural_at_least_basic:
         title: Share of the rural population with at least basic sanitation facilities
         description_short: *sanitation_basic_desc_short
@@ -382,14 +369,6 @@ tables:
     title: WHO/UNICEF Joint Monitoring Programme for Water Supply, Sanitation and Hygiene
     description: The WHO/UNICEF Joint Monitoring Programme for Water Supply, Sanitation and Hygiene (JMP) has reported country, regional and global estimates of progress on drinking water, sanitation and hygiene (WASH) since 1990.
     variables:
-      population__thousands:
-        title: Population  (thousands)
-        unit: ""
-
-      pct_urban:
-        title: "% urban"
-        unit: ""
-
       rural_at_least_basic:
         title: RURAL_At least basic
         unit: ""

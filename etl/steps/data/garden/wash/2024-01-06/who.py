@@ -4,12 +4,14 @@ import re
 
 import numpy as np
 from owid.catalog import Table
+from structlog import get_logger
 
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
+log = get_logger()
 
 
 def run(dest_dir: str) -> None:
@@ -22,6 +24,7 @@ def run(dest_dir: str) -> None:
     tables = []
     table_names = ds_meadow.table_names
     for table_name in table_names:
+        log.info(f"Loading table {table_name}...")
         # Read table from meadow dataset.
         tb = ds_meadow[table_name].reset_index()
         # Clean values.
@@ -100,13 +103,12 @@ def calculate_population_with_each_category(tb: Table, table_name: str) -> Table
     For menstrual health we just calculate number of women (aged 15-49) in each category.
 
     """
+    areas = ["urban", "rural", "total"]
+    categories_water = ["at_least_basic", "limited__more_than_30_mins", "unimproved", "surface_water"]
+    categories_hygiene = ["basic", "limited__without_water_or_soap", "no_facility"]
+    categories_sanitation = ["at_least_basic", "limited__shared", "unimproved", "open_defecation"]
 
     if table_name in ["sanitation", "water", "hygiene"]:
-        areas = ["urban", "rural", "total"]
-        categories_water = ["at_least_basic", "limited__more_than_30_mins", "unimproved", "surface_water"]
-        categories_hygiene = ["basic", "limited__without_water_or_soap", "no_facility"]
-        categories_sanitation = ["at_least_basic", "limited__shared", "unimproved", "open_defecation"]
-
         # Determine the appropriate list of categories
         if table_name == "water":
             categories = categories_water
@@ -123,7 +125,7 @@ def calculate_population_with_each_category(tb: Table, table_name: str) -> Table
                 tb[f"population_{area}_{category}"] = (tb[f"{area}_{category}"].astype(float) / 100) * tb[
                     f"{area}_population"
                 ]
-                tb = tb.drop(columns=f"{area}_population", axis=1)
+            tb = tb.drop(columns=f"{area}_population", axis=1)
     elif table_name == "menstrual_health":
         categories_menstrual = [
             "awareness_of_menstruation_before_menarche",
