@@ -1,7 +1,6 @@
 import json
 import os
-from pathlib import Path
-from typing import Dict, List, Literal
+from typing import Literal
 
 import click
 import structlog
@@ -10,20 +9,16 @@ from owid.catalog import Dataset
 from rich_click.rich_command import RichCommand
 from typing_extensions import Self
 
-from apps.metagpt.utils import ADDITIONAL_INSTRUCTIONS, Channels, OpenAIWrapper
+from apps.metagpt.prompts import create_system_prompt_data_step, create_system_prompt_snapshot
+from apps.metagpt.utils import Channels, OpenAIWrapper, _read_metadata_file
 from etl.paths import BASE_DIR
 
 # GPT Model
-GPT_MODEL = "gpt-3.5-turbo"
 RATE_PER_1000_TOKENS = 0.0015  # Approximate average cost per 1000 tokens from here - https://openai.com/pricing
 
 # Initialize logger
 log = structlog.get_logger()
 
-# Example of new metadata format
-NEW_METADATA_EXAMPLE = (
-    BASE_DIR / "snapshots" / "emissions" / "2023-11-23" / "national_contributions_annual_emissions.csv.dvc"
-)
 # Docs for garden metadata fields
 DOCS = BASE_DIR / "schemas" / "dataset-schema.json"
 
@@ -127,7 +122,7 @@ class MetadataGPTUpdater:
                     variable_title = variable_data["title"]
                     for metadata_field in fields_to_fill_out:
                         metadata_instructions = metadata_indicator_docs[metadata_field]
-                        messages = self.create_system_prompt_data_step(
+                        messages = create_system_prompt_data_step(
                             variable_title,
                             metadata_field,
                             metadata_instructions,
@@ -153,7 +148,7 @@ class MetadataGPTUpdater:
 
     def run_snapshot(self: Self):
         # Create system prompt
-        messages = self.create_system_prompt()
+        messages = create_system_prompt_snapshot(self.metadata_old_str)
         gpt_result = self.client.query_gpt(
             messages=messages,
             temperature=0,
@@ -244,78 +239,6 @@ class MetadataGPTUpdater:
                 original_yaml_content["tables"][table_name]["variables"][variable_name].update(variable_updates_dict)
 
         self.__metadata_new = original_yaml_content
-
-    def create_system_prompt(self: Self) -> List[Dict[str, str]] | None:
-        """Create the system prompt for the GPT model based on file path."""
-        match self.channel:
-            case Channels.SNAPSHOT:
-                # Load example of new metadata format
-                new_metadata_file = _read_metadata_file(NEW_METADATA_EXAMPLE)
-                system_prompt = f"""
-                You are given an old metadata file with information about the sources of the data in the old format. Now, we've transitioned to a new format.
-
-                The new metadata file needs to be structured in an identical way. Infer the fields and arrange them in the same order as in the new metadata file. Update the old metadata file to the new format based on this example.
-
-                Please format your responses (e.g., year shouldn't exist in producer field etc) and add any additional fields if possible/necessary based on these additional instructions:
-                {ADDITIONAL_INSTRUCTIONS}
-
-                The new metadata file is as follows. Structure your response in the same way:
-                {new_metadata_file}
-
-                Please output it in the same format (yaml).License" is a part of "origin", not a separate dictionary. Don't include any additional responses/notes in your response beyond the existing field as this will be saved directly as a file.
-
-                In any of the fields please avoid using ":" anywhere - e.g., instead of "Country Activity Tracker: Artificial Intelligence" use "Country Activity Tracker - Artificial Intelligence".
-
-                """
-                messages = [
-                    {"role": "system", "content": system_prompt},
-                    {"role": "user", "content": self.metadata_old_str},
-                ]
-                return messages
-            case _:
-                log.error(f"Invalid channel {self.channel}")
-
-    def create_system_prompt_data_step(
-        self, variable_title: str, metadata_field: str, metadata_instructions: str, ds_meta_description: str
-    ) -> List[Dict[str, str]] | None:
-        """
-        Generates a system prompt for a gardening application.
-
-        Parameters:
-        variable_title (str): The title of the variable in the dataset.
-        metadata_field (str): The metadata field related to the variable.
-        metadata_instructions (str): Instructions for filling out the metadata field.
-        ds_meta_description (str): Description of the dataset.
-
-        Returns:
-        Optional[List[Dict[str, str]]]: A list of dictionaries containing the system prompt, or None.
-        """
-        base_template_instructions = (
-            "You are given a description of the dataset here:\n"
-            f"'{ds_meta_description}'\n\n"
-            f"We have a variable called '{variable_title}' in this dataset.\n"
-            "By using the information you already have in the dataset description, and browsing the web, can you "
-            f"infer what this metadata field '{metadata_field}' might be for this specific indicator?\n\n"
-            "Depending on which field you are filling out take into account these extra instructions:\n"
-            " - description_key - based on a web search and your knowledge come up with some key bullet points (in a sentence format) that would help someone interpret the indicator. Can you make sure that these are going to be useful for the public to understand the indicator? Expand on any acronyms or any terms that a layperson might not be familiar with. Each bullet point can be more than one sentence if necessary but don't make it too long.\n"
-            " - description_short use the description_key and a web search to come up with one sentence to describe the indicator. It should be very brief and to the point.\n"
-            f"Here are more specific instructions on how to fill out the field - '{metadata_instructions}'.\n"
-            "Now, can you try to infer the above based on the other information in the metadata file and by browsing the web? You can use any links in the metadata file to help you."
-        )
-
-        base_template_prompt = (
-            "Output the filled out field in the following format. Make sure your responses make sense:\n"
-            f"'{metadata_field}': Your suggestion for how it should be filled out."
-        )
-
-        messages = [{"role": "system", "content": base_template_instructions + base_template_prompt}]
-        return messages
-
-
-def _read_metadata_file(path_to_file: str | Path) -> str:
-    """Read a metadata file and returns its content."""
-    with open(path_to_file, "r") as file:
-        return file.read()
 
 
 def convert_list_to_dict(data_list):
