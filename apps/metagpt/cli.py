@@ -1,17 +1,16 @@
 import json
 import os
 from pathlib import Path
-from typing import Any, Dict, List, Literal
+from typing import Dict, List, Literal
 
 import click
 import structlog
 import yaml
-from openai import OpenAI
 from owid.catalog import Dataset
 from rich_click.rich_command import RichCommand
 from typing_extensions import Self
 
-from apps.metagpt.utils import ADDITIONAL_INSTRUCTIONS, Channels
+from apps.metagpt.utils import ADDITIONAL_INSTRUCTIONS, Channels, OpenAIWrapper
 from etl.paths import BASE_DIR
 
 # GPT Model
@@ -77,7 +76,7 @@ class MetadataGPTUpdater:
         # Will contain the new metadata file content. Access to it via the property `metadata_new_str`
         self.__metadata_new: str | None = None
         # Initialize OpenAI client
-        self.client = OpenAI()
+        self.client = OpenAIWrapper()
 
     @property
     def channel(self: Self) -> Literal["snapshot", "grapher", "garden"]:
@@ -155,11 +154,13 @@ class MetadataGPTUpdater:
     def run_snapshot(self: Self):
         # Create system prompt
         messages = self.create_system_prompt()
-        message_content, cost = get_message_content(self.client, messages=messages, model=GPT_MODEL, temperature=0)  # type: ignore
-        log.info(f"Cost GPT4: ${cost:.3f}")
+        gpt_result = self.client.query_gpt(
+            messages=messages,
+            temperature=0,
+        )
 
-        if message_content:
-            new_yaml_content = yaml.safe_load(message_content)
+        if gpt_result:
+            new_yaml_content = yaml.safe_load(gpt_result.message_content)
             if new_yaml_content:
                 self.__metadata_new = new_yaml_content
 
@@ -223,12 +224,14 @@ class MetadataGPTUpdater:
                             metadata_instructions,
                             ds_meta_description,
                         )
-                        message_content, cost = get_message_content(
-                            self.client, messages=messages, model=GPT_MODEL, temperature=0
+                        gpt_result = self.client.query_gpt(
+                            messages=messages,
+                            temperature=0,
                         )
-                        final_cost += cost
-
-                        indicator_metadata.append(message_content)
+                        # Act based on reply (only if valid)
+                        if gpt_result is not None:
+                            final_cost += gpt_result.cost
+                            indicator_metadata.append(gpt_result.message_content)
                     all_variables[variable_name] = indicator_metadata
         log.info(f"Cost GPT4: ${final_cost:.3f}")
 
@@ -313,23 +316,6 @@ def _read_metadata_file(path_to_file: str | Path) -> str:
     """Read a metadata file and returns its content."""
     with open(path_to_file, "r") as file:
         return file.read()
-
-
-def get_message_content(client, **kwargs):
-    """Get message content from the chat completion."""
-    chat_completion = client.chat.completions.create(**kwargs)  # type: ignore
-    message_content, cost = process_chat_completion(chat_completion)  # type: ignore
-    return message_content, cost
-
-
-def process_chat_completion(chat_completion) -> Any | None:
-    """Process the chat completion response."""
-    if chat_completion is not None:
-        chat_completion_tokens = chat_completion.usage.total_tokens
-        cost = (chat_completion_tokens / 1000) * RATE_PER_1000_TOKENS
-        message_content = chat_completion.choices[0].message.content
-        return message_content, cost
-    return None, None
 
 
 def convert_list_to_dict(data_list):
