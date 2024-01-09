@@ -32,14 +32,14 @@ def run(dest_dir: str) -> None:
         tb = snap.read(sheet_name=sheet_name, engine="openpyxl", header=header)
         tb = prepare_data(tb, sheet_name)
 
-        # Menstrual health is only available at country level.
+        # Menstrual health is not available in regional data.
         if sheet_name != "Menstrual health":
             tb_regional = snap_regional.read(sheet_name=sheet_name, engine="openpyxl", header=header)
             tb_regional = prepare_data(tb_regional, sheet_name)
             if sheet_name == "Hygiene":
                 tb_regional.iloc[
                     0, 0
-                ] = "Australia and New Zealand"  # quick fix of missing value in regional data in first row
+                ] = "Australia and New Zealand"  # quick fix of missing value in regional data in first row of hygiene sheet
             tb = pr.concat([tb, tb_regional])
             assert all(tb["country"].notna())
         # Set index

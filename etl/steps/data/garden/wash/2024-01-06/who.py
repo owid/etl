@@ -28,7 +28,9 @@ def run(dest_dir: str) -> None:
         # Read table from meadow dataset.
         tb = ds_meadow[table_name].reset_index()
         # Clean values.
-        tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
+        tb = geo.harmonize_countries(
+            df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
+        )
         tb = clean_values(tb)
         tb = drop_region_columns(tb)
         tb = convert_given_population_to_absolute(tb, table_name)
