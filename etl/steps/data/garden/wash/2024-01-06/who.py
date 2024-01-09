@@ -104,8 +104,8 @@ def calculate_population_with_each_category(tb: Table, table_name: str) -> Table
     if table_name in ["sanitation", "water", "hygiene"]:
         areas = ["urban", "rural", "total"]
         categories_water = ["at_least_basic", "limited__more_than_30_mins", "unimproved", "surface_water"]
-        categories_hygiene = ["at_least_basic", "limited", "no_handwashing_facilities"]
-        categories_sanitation = ["at_least_basic", "limited", "unimproved", "open_defecation"]
+        categories_hygiene = ["basic", "limited__without_water_or_soap", "no_facility"]
+        categories_sanitation = ["at_least_basic", "limited__shared", "unimproved", "open_defecation"]
 
         # Determine the appropriate list of categories
         if table_name == "water":
