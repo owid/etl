@@ -54,8 +54,18 @@ def main(path_to_file: str, output_dir: str, overwrite: bool) -> None:
     try:
         # Start tool (initialise gpt client)
         gpt_updater = MetadataGPTUpdater(path_to_file)
-        # Run update
-        gpt_updater.run()
+        if gpt_updater.channel in [Channels.GARDEN, Channels.GRAPHER]:
+            # Calculate the total estimated cost
+            cost_estimated = gpt_updater.run(lazy=True)
+            # Ask the user if they want to proceed
+            proceed = input(f"The total estimated cost is ${cost_estimated:.3f}. Do you want to proceed? (yes/no): ")
+            if proceed.lower() == "yes":
+                # Actually run
+                final_cost = gpt_updater.run()
+                log.info(f"Cost GPT4: ${final_cost:.3f}")
+        else:
+            final_cost = gpt_updater.run()
+            log.info(f"Cost GPT4: ${final_cost:.3f}")
         # Save updated metadata
         gpt_updater.save_updated_metadata(output_file_path)
     except Exception as e:
@@ -146,21 +156,23 @@ class MetadataGPTUpdater:
         with open(output_file, "w") as file:
             yaml.dump(self.metadata_new_str, file, default_flow_style=False, sort_keys=False, indent=4)
 
-    def run(self: Self) -> str | None:
+    def run(self: Self, lazy: bool = False) -> float | None:
         """Update metadata using OpenAI GPT."""
         # Update metadata
         match self.channel:
             case Channels.SNAPSHOT:
-                self.run_snapshot()
+                if lazy:
+                    log.info("Running snapshot in lazy mode is not implemented. Nothing was executed.")
+                else:
+                    return self.run_snapshot()
             case Channels.GARDEN | Channels.GRAPHER:
-                self.run_data_step()
-                return
+                return self.run_data_step(lazy)
             case _:
                 raise Exception(
                     f"Invalid channel. Should either be '{Channels.SNAPSHOT}', '{Channels.GARDEN}' or '{Channels.GRAPHER}'."
                 )
 
-    def run_snapshot(self: Self) -> None:
+    def run_snapshot(self: Self) -> float | None:
         """Run main code for snapshot."""
         # Create system prompt
         query = create_query_snapshot(self.metadata_old_str)
@@ -168,20 +180,9 @@ class MetadataGPTUpdater:
 
         if response:
             self.__metadata_new = response.message_content_as_dict
+            return response.cost
 
-    def run_data_step(self: Self) -> None:
-        """Run main code for a data (garden or grapher) step."""
-        # Calculate the total estimated cost
-        cost_estimated = self._run_data_step(lazy=True)
-
-        # Ask the user if they want to proceed
-        proceed = input(f"The total estimated cost is ${cost_estimated:.3f}. Do you want to proceed? (yes/no): ")
-
-        if proceed.lower() == "yes":
-            final_cost = self._run_data_step()
-            log.info(f"Cost GPT4: ${final_cost:.3f}")
-
-    def _run_data_step(self: Self, lazy: bool = False) -> float:
+    def run_data_step(self: Self, lazy: bool = False) -> float:
         """Actually run the data step.
 
         1. Load necessary data: dataset metadata, YAML metadata.

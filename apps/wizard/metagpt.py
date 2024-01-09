@@ -121,8 +121,15 @@ if st.session_state["run_gpt"]:
         with st.spinner("Running GPT..."):
             # Start tool (initialise gpt client)
             gpt_updater = MetadataGPTUpdater(filepath)
-            # Run update
-            gpt_updater.run()
+            # Run in lazy mode to estimate the cost
+            cost = gpt_updater.run(lazy=True)
+            # Temporary
+            st.write(f"Estimate cost is {cost:.3f}. Please go to terminal to proceed.")
+            proceed = input(f"The total estimated cost is ${cost:.3f}. Do you want to proceed? (yes/no): ")
+            if proceed.lower() == "yes":
+                # Actually run
+                cost = gpt_updater.run(lazy=False)
+                st.write(f"Actual cost was {cost:.3f}.")
             # Get metadata
             st.session_state["metadata_new"] = gpt_updater.metadata_new_str
     except Exception as e:
