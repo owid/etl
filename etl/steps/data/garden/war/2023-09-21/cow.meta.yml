@@ -238,6 +238,10 @@ tables:
         description_short: |-
           {definitions.number_deaths.description_short}
         description_key: *description_key_deaths
+        presentation:
+          grapher_config:
+            selectedEntityNames:
+              - World
 
       number_deaths_ongoing_conflicts_per_capita:
         title: Death rate in ongoing wars
@@ -247,6 +251,10 @@ tables:
         description_key: *description_key_deaths
         display:
           numDecimalPlaces: 1
+        presentation:
+          grapher_config:
+            selectedEntityNames:
+              - World
 
       ####################
       # Ongoing disputes #
