@@ -155,7 +155,7 @@ class MetadataGPTUpdater:
     def save_updated_metadata(self: Self, output_file: str) -> None:
         """Save the metadata file and returns its content."""
         with open(output_file, "w") as file:
-            yaml_dump(self.metadata_new_str, file)
+            yaml_dump(self.metadata_new_str, file)  # type: ignore
         log.info(f"Metadata file saved to {output_file}")
 
     def run(self: Self, lazy: bool = False) -> float | None:
@@ -233,8 +233,7 @@ class MetadataGPTUpdater:
                     indicator_metadata_dict = convert_list_to_dict(indicator_metadata)
 
                     # Format description_key to be bullet points
-
-                    indicator_metadata_dict["description_key"] = [
+                    indicator_metadata_dict["description_key"] = [  # type: ignore
                         f"{item}" for item in indicator_metadata_dict["description_key"].split(". ")
                     ]
 
