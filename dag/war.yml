@@ -136,3 +136,11 @@ steps:
     - data://meadow/war/2024-01-09/nuclear_weapons_inventories
   data://grapher/war/2024-01-09/nuclear_weapons_inventories:
     - data://garden/war/2024-01-09/nuclear_weapons_inventories
+
+  # Federation of American Scientists - Status of World Nuclear Forces.
+  data://meadow/war/2024-01-09/status_of_world_nuclear_forces:
+    - snapshot://war/2024-01-09/status_of_world_nuclear_forces.csv
+  data://garden/war/2024-01-09/status_of_world_nuclear_forces:
+    - data://meadow/war/2024-01-09/status_of_world_nuclear_forces
+  data://grapher/war/2024-01-09/status_of_world_nuclear_forces:
+    - data://garden/war/2024-01-09/status_of_world_nuclear_forces
