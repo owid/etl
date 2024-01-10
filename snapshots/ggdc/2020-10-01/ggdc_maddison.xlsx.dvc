@@ -232,9 +232,9 @@ meta:
     date_published: 2020-10-01
     attribution: Maddison Project Database 2020 (Bolt and van Zanden, 2020)
     attribution_short: Maddison Project Database
-  license:
-    name: Creative Commons BY 4.0
-    url: https://www.rug.nl/ggdc/historicaldevelopment/maddison/releases/maddison-project-database-2020
+    license:
+      name: Creative Commons BY 4.0
+      url: https://www.rug.nl/ggdc/historicaldevelopment/maddison/releases/maddison-project-database-2020
 wdir: ../../../data/snapshots/ggdc/2020-10-01
 outs:
 - md5: 0fadb25212dd37be38cd098899873a35
