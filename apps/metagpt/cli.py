@@ -155,7 +155,7 @@ class MetadataGPTUpdater:
     def save_updated_metadata(self: Self, output_file: str) -> None:
         """Save the metadata file and returns its content."""
         with open(output_file, "w") as file:
-            yaml_dump(self.metadata_new_str, file, default_flow_style=False, sort_keys=False, indent=4)
+            yaml_dump(self.metadata_new_str, file)
         log.info(f"Metadata file saved to {output_file}")
 
     def run(self: Self, lazy: bool = False) -> float | None:
