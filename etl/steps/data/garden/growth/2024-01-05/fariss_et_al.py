@@ -8,6 +8,37 @@ paths = PathFinder(__file__)
 
 RELEVANT_VARS = ["gwno", "year", "mean", "sd"]
 
+GDP_VARS = [
+    "Bairoch_gdp_ppp_bc_1960",
+    "BroadberryKlein_gdp_ppp_bc_1990",
+    "PWT100_gdp_ppp_bc_2017",
+    "PWT100_gdp_ppp_bt_2017",
+    "PWT100_gdp_ppp_none_2017",
+    "WorldBank_gdp_ppp_bc_2017",
+    "latent_gdp",
+]
+
+GDP_PC_VARS = [
+    "Bairoch_gdppc_ppp_bc_1960",
+    "BroadberryKlein_gdppc_ppp_bc_1990",
+    "Broadberry_gdppc_ppp_bc_1990",
+    "Maddison2018_gdppc_ppp_bc_2011",
+    "Maddison2018_gdppc_ppp_bt_2011",
+    "Maddison2020_gdppc_ppp_bcbt",
+    "WorldBank_gdppc_ppp_bc_2017",
+    "latent_gdppc",
+]
+
+POP_VARS = [
+    "BroadberryKlein_pop",
+    "MW_pop",
+    "Maddison2020_pop",
+    "PWT100_pop",
+    "WorldBank_pop",
+    "deng_pop",
+    "latent_pop",
+]
+
 
 def run(dest_dir: str) -> None:
     #
