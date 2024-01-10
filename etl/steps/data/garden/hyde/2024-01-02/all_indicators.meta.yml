@@ -40,10 +40,18 @@ tables:
         title: Population (urban)
         description_short: Total urban population of a country over time.
         unit: people
+      urbc_c_share:
+        title: Population share in urban areas
+        description_short: Share of population living in urban areas in a country over time.
+        unit: "%"
       rurc_c:
         title: Population (rural)
         description_short: Total rural population of a country over time.
         unit: people
+      rurc_c_share:
+        title: Population share in rural areas
+        description_short: Share of population living in rural areas in a country over time.
+        unit: "%"
 
       # Land use
       uopp_c:
@@ -52,8 +60,8 @@ tables:
         description_key:
           - Built-up areas are computed by dividing total urban population in a country at a given year by the average urban densities in a country at that year.
           - "{definitions.land_use_allocation}"
-        unit: hectares per grid cell
-        short_unit: "ha"
+        unit: km² per grid cell
+        short_unit: "km²"
       cropland_c:
         title: "Land use: Cropland"
         description_short: Total cropland area for each seperate country over time.
