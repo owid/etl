@@ -105,14 +105,13 @@ definitions:
       {definitions.number_deaths.description_short}
     description_key: &description_key_deaths
       - "{definitions.all.conflict_type}"
-      - For wars without any deaths estimate, we conversatively coded Correlates of War's lower bound for including a war, 1,000 deaths each year.
-      - |-
-        If a war lasted more than one year, we distributed its deaths evenly across years.
-        <% if conflict_type == "all" %>
-        If a war was ongoing in more than one world region, we distributed its deaths across the regions of the participants.
-        <% elif conflict_type == "inter-state" %>
-        If a war was ongoing in more than one world region, we distributed its deaths across the regions of the participants.
-        <% endif %>
+      - For wars without any deaths estimate, we conservatively coded Correlates of War's lower bound for including a war, 1,000 deaths each year.
+      # - |-
+      #   <% if conflict_type == "all" %>
+      #   If a war was ongoing in more than one world region, we distributed its deaths across the regions of the participants.
+      #   <% elif conflict_type == "inter-state" %>
+      #   If a war was ongoing in more than one world region, we distributed its deaths across the regions of the participants.
+      #   <% endif %>
       - "{definitions.all.time_filling_processing}"
       - If a war lasted more than one year, we distributed its deaths evenly across years.
 
