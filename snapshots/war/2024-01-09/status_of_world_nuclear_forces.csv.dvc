@@ -5,7 +5,7 @@ meta:
     # Data product / Snapshot
     title: Status Of World Nuclear Forces
     description: |-
-      This dataset provides information on the number of nuclear warheads owned by the nuclear powers, as well as their status (e.g. retired, non-deployed, etc.).
+      This dataset provides information on the number of nuclear warheads owned by the nuclear powers, as well as their status (e.g. whether or not they are deployed, nondeployed, or retired).
     date_published: 2023-03-28
 
     # Citation
