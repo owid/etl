@@ -14,7 +14,7 @@ log = structlog.get_logger()
 
 # GPT
 GPT_MODEL = "gpt-3.5-turbo"
-RATE_PER_1000_TOKENS = 0.0015  # Approximate average cost per 1000 tokens from here - https://openai.com/pricing
+RATE_PER_1000_TOKENS = 0.0015  # Approximate average cost per 1000 tokens from here - https://openai.com/pricing (USD)
 
 
 # Interface with GPT
@@ -50,6 +50,8 @@ class GPTQuery:
 
         This function estimates the cost of using GPT by converting the number of characters into tokens,
         rounding up to the nearest thousand tokens, and then multiplying by the rate per thousand tokens.
+
+        The cost is given in USD.
 
         Returns:
             float: The estimated cost of using GPT for the given number of characters.

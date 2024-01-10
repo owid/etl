@@ -192,7 +192,7 @@ class MetadataGPTUpdater:
             b. otherwise, query GPT, update the metadata and get the real cost (a posteriori).
 
         Returns:
-            float: the cost of the query. if lazy mode is on, the cost is estimated (no query has been performed). otherwise, the cost is real (query has been performed).
+            float: the cost of the query (in usd). if lazy mode is on, the cost is estimated (no query has been performed). otherwise, the cost is real (query has been performed).
         """
         ## Load dataset
         ds = self.load_dataset()
