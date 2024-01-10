@@ -40,7 +40,7 @@ tables:
 
           If a war lasted more than one year, we distributed its deaths evenly across years. If a war was ongoing in more than one world region, we distributed its deaths across the regions of the participants.
 
-          For wars without any deaths estimate, we conversatively coded Correlates of War's lower bound for including a war, 1,000 deaths each year.
+          For wars without any deaths estimate, we conservatively coded Correlates of War's lower bound for including a war, 1,000 deaths each year.
           <% elif conflict_type == "inter-state" %>
           The estimated number of deaths in ongoing interstate wars in each year.
 
@@ -50,7 +50,7 @@ tables:
 
           If a war lasted more than one year, we distributed its deaths evenly across years. If a war was ongoing in more than one world region, we distributed its deaths across the regions of the participants.
 
-          For wars without any deaths estimate, we conversatively coded Correlates of War's lower bound for including a war, 1,000 deaths each year.
+          For wars without any deaths estimate, we conservatively coded Correlates of War's lower bound for including a war, 1,000 deaths each year.
 
           We extend the time-series to 2010, by drawing on Correlates of War's Directed Dyadic Interstate War Dataset (version 4.01), which identifies no wars for the years since 2003.
           <% elif conflict_type == "intra-state" %>
@@ -62,7 +62,7 @@ tables:
 
           If a war lasted more than one year, we distributed its deaths evenly across years.
 
-          For wars without any deaths estimate, we conversatively coded Correlates of War's lower bound for including a war, 1,000 deaths each year.
+          For wars without any deaths estimate, we conservatively coded Correlates of War's lower bound for including a war, 1,000 deaths each year.
           <% elif conflict_type == "intra-state (internationalized)" %>
           The estimated number of deaths in ongoing internationalized intrastate wars in each year.
 
@@ -72,7 +72,7 @@ tables:
 
           If a war lasted more than one year, we distributed its deaths evenly across years.
 
-          For wars without any deaths estimate, we conversatively coded Correlates of War's lower bound for including a war, 1,000 deaths each year.
+          For wars without any deaths estimate, we conservatively coded Correlates of War's lower bound for including a war, 1,000 deaths each year.
           <% elif conflict_type == "intra-state (non-internationalized)" %>
           The estimated number of deaths in ongoing non-internationalized intrastate wars in each year.
 
@@ -82,7 +82,7 @@ tables:
 
           If a war lasted more than one year, we distributed its deaths evenly across years.
 
-          For wars without any deaths estimate, we conversatively coded Correlates of War's lower bound for including a war, 1,000 deaths each year.
+          For wars without any deaths estimate, we conservatively coded Correlates of War's lower bound for including a war, 1,000 deaths each year.
           <% elif conflict_type == "extra-state" %>
           The estimated number of deaths in ongoing extrastate wars in each year.
 
@@ -92,7 +92,7 @@ tables:
 
           If a war lasted more than one year, we distributed its deaths evenly across years.
 
-          For wars without any deaths estimate, we conversatively coded Correlates of War's lower bound for including a war, 1,000 deaths each year.
+          For wars without any deaths estimate, we conservatively coded Correlates of War's lower bound for including a war, 1,000 deaths each year.
           <% elif conflict_type == "non-state" %>
           The estimated number of deaths in ongoing non-state wars in each year.
 
@@ -102,7 +102,7 @@ tables:
 
           If a war lasted more than one year, we distributed its deaths evenly across years.
 
-          For wars without any deaths estimate, we conversatively coded Correlates of War's lower bound for including a war, 1,000 deaths each year.
+          For wars without any deaths estimate, we conservatively coded Correlates of War's lower bound for including a war, 1,000 deaths each year.
           <% endif %>
 
         display:
