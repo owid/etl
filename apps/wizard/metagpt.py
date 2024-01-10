@@ -159,7 +159,7 @@ if st.session_state["run_gpt"]:
 
 
 # If approved by user, actually query OpenAI!
-if isinstance(st.session_state["gpt_updater"], MetadataGPTUpdater) and (
+if isinstance(st.session_state.gpt_updater, MetadataGPTUpdater) and (
     (st.session_state["run_gpt_confirmed"]) or (st.session_state["gpt_updater"].channel == "snapshot")
 ):
     # Update metadata using GPT

@@ -98,7 +98,7 @@ DOCS_METADATA_INDICATORS = docs["properties"]["tables"]["additionalProperties"][
 ]["properties"]
 
 
-def create_system_prompt_snapshot(metadata_old_str: str) -> List[Dict[str, str]] | None:
+def create_system_prompt_snapshot(metadata_old_str: str) -> List[Dict[str, str]]:
     """Create the system prompt for the GPT model based on file path."""
     # Load example of new metadata format
     new_metadata_file = read_metadata_file(NEW_METADATA_EXAMPLE)
@@ -139,7 +139,7 @@ def create_query_snapshot(metadata_old_str: str) -> GPTQuery:
 
 def create_system_prompt_data_step(
     variable_title: str, metadata_field: str, ds_meta_description: Dict[str, Any]
-) -> List[Dict[str, str]] | None:
+) -> List[Dict[str, str]]:
     """
     Generates a system prompt for a gardening application.
 

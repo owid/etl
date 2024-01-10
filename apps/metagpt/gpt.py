@@ -98,9 +98,12 @@ class OpenAIWrapper(OpenAI):
             # Log cost
             log.info(f"Chat completion {self.model} cost: {cost}")
             # Build return object
-            return GPTResponse(
-                message_content=message_content,
-                cost=cost,
-            )
+            if isinstance(message_content, str):
+                return GPTResponse(
+                    message_content=message_content,
+                    cost=cost,
+                )
+            else:
+                raise ValueError("Chat completion is not a ChatCompletion object.")
         else:
-            raise ValueError("Chat completion is not a ChatCompletion object.")
+            raise ValueError("message_content is expected to be a string!")

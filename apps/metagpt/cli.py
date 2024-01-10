@@ -9,7 +9,7 @@ from owid.catalog import Dataset
 from rich_click.rich_command import RichCommand
 from typing_extensions import Self
 
-from apps.metagpt.gpt import OpenAIWrapper
+from apps.metagpt.gpt import GPTResponse, OpenAIWrapper
 from apps.metagpt.prompts import create_query_data_step, create_query_snapshot
 from apps.metagpt.utils import Channels, convert_list_to_dict, read_metadata_file
 
@@ -178,8 +178,8 @@ class MetadataGPTUpdater:
         query = create_query_snapshot(self.metadata_old_str)
         response = self.client.query_gpt(query=query)
 
-        if response:
-            self.__metadata_new = response.message_content_as_dict
+        if isinstance(response, GPTResponse):
+            self.__metadata_new = response.message_content_as_dict  # type: ignore
             return response.cost
 
     def run_data_step(self: Self, lazy: bool = False) -> float:
@@ -235,7 +235,7 @@ class MetadataGPTUpdater:
         # Update metadata (when lazy mode is OFF)
         if not lazy:
             # Update metadata
-            self.__metadata_new = original_yaml_content
+            self.__metadata_new = original_yaml_content  # type: ignore
         return cost
 
 
