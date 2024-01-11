@@ -16,3 +16,5 @@ steps:
     - snapshot://biodiversity/2024-01-11/combine.csv
   data://garden/biodiversity/2024-01-11/combine:
     - data://meadow/biodiversity/2024-01-11/combine
+  data://grapher/biodiversity/2024-01-11/combine:
+    - data://garden/biodiversity/2024-01-11/combine
