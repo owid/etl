@@ -115,14 +115,7 @@ def cli(
     source_engine = _get_engine_for_env(source)
     target_engine = _get_engine_for_env(target)
 
-    if staging_created_at is None:
-        if not _is_env(source):
-            staging_created_at = _get_git_branch_creation_date(str(source).replace("staging-site-", ""))
-        else:
-            raise click.BadParameter("staging-created-at is required when source is not a staging server name")
-    else:
-        staging_created_at = pd.to_datetime(staging_created_at)
-        assert staging_created_at
+    staging_created_at = _get_staging_created_at(source, staging_created_at)  # type: ignore
 
     # go through Admin API as creating / updating chart has side effects like
     # adding entries to chart_dimensions. We can't directly update it in MySQL
@@ -185,9 +178,8 @@ def cli(
                         print(
                             f"[bold red]WARNING[/bold red]: [bright_cyan]Chart [bold]{target_chart.config['slug']}[/bold] has been modified in target[/bright_cyan]"
                         )
-                        print("[yellow]\tDifferences from source chart[/yellow]")
+                        print("[yellow]\tDifferences between SOURCE (-) and TARGET (+) chart[/yellow]")
                         print(_chart_config_diff(target_chart.config, existing_chart.config))
-                        print()
 
                     # if the chart has gone through a revision, update it directly
                     revs = gm.SuggestedChartRevisions.load_revisions(source_session, chart_id=chart_id)
@@ -272,6 +264,16 @@ def cli(
     print("\n[bold yellow]Follow-up instructions:[/bold yellow]")
     print("[green]1.[/green] New charts were created as drafts, don't forget to publish them")
     print("[green]2.[/green] Chart updates were added as chart revisions, you still have to manually approve them")
+
+
+def _get_staging_created_at(source: Path, staging_created_at: Optional[str]) -> dt.datetime:
+    if staging_created_at is None:
+        if not _is_env(source):
+            return _get_git_branch_creation_date(str(source).replace("staging-site-", ""))
+        else:
+            raise click.BadParameter("staging-created-at is required when source is not a staging server name")
+    else:
+        return pd.to_datetime(staging_created_at)
 
 
 def _is_env(env: Path) -> bool:
