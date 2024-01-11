@@ -1,0 +1,29 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/origin/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: 'COMBINE: a Coalesced Mammal Database of Intrinsic and extrinsic traits'
+    description: |-
+      COMBINE is a taxonomically integrated database of mammal traits obtained from published sources, in which we maximized trait number and coverage without compromising data quality. COMBINE contains information on 54 traits for 6,234 extant and recently extinct mammal species, including information on morphology, reproduction, diet, biogeography, life-habit, phenology, behavior, home range and density. Additionally, we calculated other relevant traits such as habitat and altitudinal breadths for all species and dispersal for terrestrial non-volant species. All data are compatible with the taxonomies of the IUCN Red List v. 2020-2 and PHYLACINE v. 1.2. Missing data were adequately flagged and imputed for non-biogeographical traits with 20% or more data available. We obtained full data sets for 21 traits such as female maturity, litter size, maximum longevity, trophic level and dispersal, providing imputation performance statistics for all. This data set will be especially useful for those interested in including species’ traits in large-scale ecological and conservation analyses.
+    date_published: 2021-04-23
+    # Citation
+    producer: Soria et al.
+    citation_full: |-
+      Soria, C. D., M. Pacifici, M. Di Marco, S. M. Stephen, and C. Rondinini. 2021. COMBINE: a coalesced mammal database of intrinsic and extrinsic traits. Ecology 102(6):e03344. 10.1002/ecy.3344
+
+    # Files
+    url_main: https://esajournals.onlinelibrary.wiley.com/doi/10.1002/ecy.3344
+    url_download: https://figshare.com/ndownloader/files/27703266
+    date_accessed: 2024-01-11
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: 
+        https://figshare.com/articles/dataset/COMBINE_a_Coalesced_Mammal_Database_of_Intrinsic_and_extrinsic_traits/13028255/4
+wdir: ../../../data/snapshots/biodiversity/2024-01-11
+outs:
+- md5: 5c0af319124163830a8e7fa89c0abda5
+  size: 1891897
+  path: combine.csv

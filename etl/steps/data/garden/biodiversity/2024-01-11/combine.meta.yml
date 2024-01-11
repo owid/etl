@@ -1,0 +1,519 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Biodiversity
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
+dataset:
+  update_period_days: 0
+
+  # Learn more about the available fields:
+  # http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
+  title: "COMBINE: a Coalesced Mammal Database of Intrinsic and extrinsic traits"
+tables:
+  combine:
+    # Learn more about the available fields:
+    # http://docs.owid.io/projects/etl/architecture/metadata/reference/indicator/
+    variables:
+      # testing_variable:
+      #   title: Testing variable title
+      #   unit: arbitrary units
+      #   short_unit: au
+      #   description_short: Short description of testing variable.
+      #   description_processing: Description of processing of testing variable.
+      #   description_key: List of key points about the indicator.
+      #   description_from_producer: Description of testing variable from producer.
+      #   processing_level: minor
+      #   presentation:
+      #     attribution:
+      #     attribution_short:
+      #     faqs:
+      #     grapher_config:
+      #     title_public:
+      #     title_variant:
+      #     topic_tags:
+      #   display:
+      #     color:
+      #     conversionFactor: 1
+      #     description:
+      #     entityAnnotationsMap: Test annotation
+      #     includeInTable:
+      #     isProjection: false
+      #     name: Testing variable
+      #     numDecimalPlaces: 0
+      #     shortUnit: au
+      #     tableDisplay:
+      #       hideAbsoluteChange:
+      #       hideRelativeChange:
+      #     tolerance: 0
+      #     unit: arbitrary units
+      #     yearIsDay: false
+      #     zeroDay:
+      adult_mass_g:
+        title: Adult mass
+        description_short: Body mass of an adult individual in grams.
+        unit: grams
+        short_unit: g
+        display:
+          numDecimalPlaces: 3
+        presentation:
+          topic_tags:
+            - Biodiversity
+      brain_mass_g:
+        title: Brain mass
+        description_short: Weight of the brain of an adult individual in grams.
+        unit: grams
+        short_unit: g
+        display:
+          numDecimalPlaces: 3
+        presentation:
+          topic_tags:
+            - Biodiversity
+      adult_body_length_mm:
+        title: Adult body length
+        description_short: Total length from tip of the nose to anus or base of the tail of an adult individual in millimeters
+        unit: millimeters
+        short_unit: mm
+        display:
+          numDecimalPlaces: 3
+        presentation:
+          topic_tags:
+            - Biodiversity
+      adult_forearm_length_mm:
+        title: Adult forearm length
+        description_short: Total length from elbow to wrist of an adult individual in millimeters, specific to order Chiroptera.
+        unit: millimeters
+        short_unit: mm
+        display:
+          numDecimalPlaces: 3
+        presentation:
+          topic_tags:
+            - Biodiversity
+      max_longevity_d:
+        title: Maximum longevity
+        description_short: Maximum reported age at death for the species in days.
+        unit: days
+        display:
+          numDecimalPlaces: 3
+        presentation:
+          topic_tags:
+            - Biodiversity
+      maturity_d:
+        title: Maturity
+        description_short: The amount of time needed to reach sexual maturity in days.
+        unit: days
+        display:
+          numDecimalPlaces: 3
+        presentation:
+          topic_tags:
+            - Biodiversity
+      female_maturity_d:
+        title: Female maturity
+        description_short: The amount of time needed for a female to reach sexual maturity in days.
+        unit: days
+        display:
+          numDecimalPlaces: 3
+        presentation:
+          topic_tags:
+            - Biodiversity
+      male_maturity_d:
+        title: Male maturity
+        description_short: The amount of time needed for a male to reach sexual maturity in days.
+        unit: days
+        display:
+          numDecimalPlaces: 3
+        presentation:
+          topic_tags:
+            - Biodiversity
+      age_first_reproduction_d:
+        title: Age at first reproduction
+        description_short: Age at which females give birth to their first litter or their young attach to teats in days.
+        unit: days
+        display:
+          numDecimalPlaces: 3
+        presentation:
+          topic_tags:
+            - Biodiversity
+      gestation_length_d:
+        title: Gestation length
+        description_short: Length of time of fetal growth in days.
+        unit: days
+        display:
+          numDecimalPlaces: 3
+        presentation:
+          topic_tags:
+            - Biodiversity
+      teat_number_n:
+        title: Teat number
+        description_short: Total number of teats present in an individual of the species.
+        unit: teats
+        display:
+          numDecimalPlaces: 0
+        presentation:
+          topic_tags:
+            - Biodiversity
+      litter_size_n:
+        title: Litter size
+        description_short: Number of offspring born per litter per female.
+        unit: offspring
+        display:
+          numDecimalPlaces: 0
+        presentation:
+          topic_tags:
+            - Biodiversity
+      litters_per_year_n:
+        title: Litters per year
+        description_short: Number of litters per female per year.
+        unit: "litters"
+        display:
+          numDecimalPlaces: 0
+        presentation:
+          topic_tags:
+            - Biodiversity
+      interbirth_interval_d:
+        title: Interbirth interval
+        description_short: Time between reproduction events in days.
+        unit: days
+        display:
+          numDecimalPlaces: 3
+        presentation:
+          topic_tags:
+            - Biodiversity
+      neonate_mass_g:
+        title: Neonate mass
+        description_short: Weight of an individual at birth in grams.
+        unit: grams
+        short_unit: g
+        display:
+          numDecimalPlaces: 3
+        presentation:
+          topic_tags:
+            - Biodiversity
+      weaning_age_d:
+        title: Weaning age
+        description_short: Age at which primary nutritional dependency on the mother ends and independent foraging begins in days.
+        unit: days
+        display:
+          numDecimalPlaces: 3
+        presentation:
+          topic_tags:
+            - Biodiversity
+      weaning_mass_g:
+        title: Weaning mass
+        description_short: Weight at weaning in grams.
+        unit: grams
+        display:
+          numDecimalPlaces: 3
+        presentation:
+          topic_tags:
+            - Biodiversity
+      generation_length_d:
+        title: Generation length
+        description_short: Average age of parents of the current cohort in days.
+        unit: days
+        display:
+          numDecimalPlaces: 3
+        presentation:
+          topic_tags:
+            - Biodiversity
+      dispersal_km:
+        title: Dispersal distance
+        description_short: The distance an animal travels between its place of birth to the place where it reproduces in kilometers.
+        unit: kilometers
+        short_unit: km
+        display:
+          numDecimalPlaces: 3
+        presentation:
+          topic_tags:
+            - Biodiversity
+      density_n_km2:
+        title: Density
+        description_short: Number of individuals of the species per squared kilometer.
+        unit: individuals per square kilometer
+        display:
+          numDecimalPlaces: 3
+        presentation:
+          topic_tags:
+            - Biodiversity
+      hibernation_torpor:
+        title: Hibernation/torpor
+        description_short: Individuals of the species go through hibernation or torpor.
+        unit: ""
+        display:
+          numDecimalPlaces: 0
+        presentation:
+          topic_tags:
+            - Biodiversity
+      fossoriality:
+        title: Fossoriality
+        description_short: The species is above ground dwelling or ground/fossorial dwelling.
+        description_key:
+          - "1: Fossorial and/or ground dwelling"
+          - "2: Above ground dwelling"
+        unit: ""
+        display:
+          numDecimalPlaces: 0
+        presentation:
+          topic_tags:
+            - Biodiversity
+      home_range_km2:
+        title: Home range
+        description_short: Size of the area within which everyday activities of individuals or groups of individuals are typically restricted in km2.
+        unit: square kilometers
+        display:
+          numDecimalPlaces: 3
+        presentation:
+          topic_tags:
+            - Biodiversity
+      social_group_n:
+        title: Social group size
+        description_short: Number of individuals in a group that spends most of their daily time together.
+        unit: individuals
+        display:
+          numDecimalPlaces: 2
+        presentation:
+          topic_tags:
+            - Biodiversity
+      dphy_invertebrate:
+        title: Diet share - invertebrates (phylacine)
+        description_short: Percentage of diet composed of invertebrates.
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+        presentation:
+          topic_tags:
+            - Biodiversity
+      dphy_vertebrate:
+        title: Diet share - vertebrates (phylacine)
+        description_short: Percentage of the diet composed of vertebrates.
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+        presentation:
+          topic_tags:
+            - Biodiversity
+      dphy_plant:
+        title: Diet share - plants (phylacine)
+        description_short: Percentage of the diet composed of plants.
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+        presentation:
+          topic_tags:
+            - Biodiversity
+      det_inv:
+        title: Diet share - invertebrates (eltontraits)
+        description_short: Percentage of the diet composed of invertebrates.
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+        presentation:
+          topic_tags:
+            - Biodiversity
+      det_vend:
+        title: Diet share - mammals, birds (eltontraits)
+        description_short: Percentage of the diet composed of mammals and birds.
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+        presentation:
+          topic_tags:
+            - Biodiversity
+      det_vect:
+        title: Diet share - reptiles, amphibians, snakes, salamanders (eltontraits)
+        description_short: Percentage of the diet composed of reptiles, amphibians, snakes, salamanders.
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 0
+        presentation:
+          topic_tags:
+            - Biodiversity
+      det_vfish:
+        title: Diet share - fish (eltontraits)
+        description_short: Percentage of the diet composed of fish.
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 0
+        presentation:
+          topic_tags:
+            - Biodiversity
+      det_vunk:
+        title: Diet share - unknown vertebrates (eltontraits)
+        description_short: Percentage of the diet composed of unknown vertebrates.
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 3
+        presentation:
+          topic_tags:
+            - Biodiversity
+      det_scav:
+        title: Diet share - scavenged (eltontraits)
+        description_short: Percentage of the diet composed of scavenge, garbage, offal, carcasses, trawlers, carrion.
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 0
+        presentation:
+          topic_tags:
+            - Biodiversity
+      det_fruit:
+        title: Diet share - fruit (eltontraits)
+        description_short: Percentage of the diet composed of fruit, drupes.
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 3
+        presentation:
+          topic_tags:
+            - Biodiversity
+      det_nect:
+        title: Diet share - nectar (eltontraits)
+        description_short: Percentage of the diet composed of nectar, pollen, plant exudates, gums.
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 0
+        presentation:
+          topic_tags:
+            - Biodiversity
+      det_seed:
+        unit: ""
+        display:
+          numDecimalPlaces: 3
+        presentation:
+          topic_tags:
+            - Biodiversity
+      det_plantother:
+        unit: ""
+        display:
+          numDecimalPlaces: 3
+        presentation:
+          topic_tags:
+            - Biodiversity
+      det_diet_breadth_n:
+        unit: ""
+        display:
+          numDecimalPlaces: 0
+        presentation:
+          topic_tags:
+            - Biodiversity
+      trophic_level:
+        unit: ""
+        display:
+          numDecimalPlaces: 0
+        presentation:
+          topic_tags:
+            - Biodiversity
+      foraging_stratum:
+        unit: ""
+        presentation:
+          topic_tags:
+            - Biodiversity
+      activity_cycle:
+        unit: ""
+        display:
+          numDecimalPlaces: 0
+        presentation:
+          topic_tags:
+            - Biodiversity
+      freshwater:
+        unit: ""
+        display:
+          numDecimalPlaces: 0
+        presentation:
+          topic_tags:
+            - Biodiversity
+      marine:
+        unit: ""
+        display:
+          numDecimalPlaces: 0
+        presentation:
+          topic_tags:
+            - Biodiversity
+      terrestrial_non_volant:
+        title: terrestrial_non-volant
+        unit: ""
+        display:
+          numDecimalPlaces: 0
+        presentation:
+          topic_tags:
+            - Biodiversity
+      terrestrial_volant:
+        unit: ""
+        display:
+          numDecimalPlaces: 0
+        presentation:
+          topic_tags:
+            - Biodiversity
+      upper_elevation_m:
+        unit: ""
+        display:
+          numDecimalPlaces: 2
+        presentation:
+          topic_tags:
+            - Biodiversity
+      lower_elevation_m:
+        unit: ""
+        display:
+          numDecimalPlaces: 2
+        presentation:
+          topic_tags:
+            - Biodiversity
+      altitude_breadth_m:
+        unit: ""
+        display:
+          numDecimalPlaces: 2
+        presentation:
+          topic_tags:
+            - Biodiversity
+      island_dwelling:
+        unit: ""
+        display:
+          numDecimalPlaces: 0
+        presentation:
+          topic_tags:
+            - Biodiversity
+      island_endemicity:
+        unit: ""
+        presentation:
+          topic_tags:
+            - Biodiversity
+      disected_by_mountains:
+        unit: ""
+        display:
+          numDecimalPlaces: 0
+        presentation:
+          topic_tags:
+            - Biodiversity
+      glaciation:
+        unit: ""
+        display:
+          numDecimalPlaces: 0
+        presentation:
+          topic_tags:
+            - Biodiversity
+      biogeographical_realm:
+        unit: ""
+        presentation:
+          topic_tags:
+            - Biodiversity
+      habitat_breadth_n:
+        unit: ""
+        display:
+          numDecimalPlaces: 0
+        presentation:
+          topic_tags:
+            - Biodiversity
+    title: "COMBINE: a Coalesced Mammal Database of Intrinsic and extrinsic traits"
+    description: COMBINE is a taxonomically integrated database of mammal traits obtained from published sources, in which we maximized trait number and coverage without compromising data quality. COMBINE contains information on 54 traits for 6,234 extant and recently extinct mammal species, including information on morphology, reproduction, diet, biogeography, life-habit, phenology, behavior, home range and density. Additionally, we calculated other relevant traits such as habitat and altitudinal breadths for all species and dispersal for terrestrial non-volant species. All data are compatible with the taxonomies of the IUCN Red List v. 2020-2 and PHYLACINE v. 1.2. Missing data were adequately flagged and imputed for non-biogeographical traits with 20% or more data available. We obtained full data sets for 21 traits such as female maturity, litter size, maximum longevity, trophic level and dispersal, providing imputation performance statistics for all. This data set will be especially useful for those interested in including species’ traits in large-scale ecological and conservation analyses.
