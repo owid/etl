@@ -67,8 +67,8 @@ def run(dest_dir: str) -> None:
     ] *= 100
 
     # Additional indicators
-    tb["urb_c_c_share"] = tb["urbc_c"] / tb["popc_c"]
-    tb["rur_c_c_share"] = tb["rurc_c"] / tb["popc_c"]
+    tb["urb_c_share"] = tb["urbc_c"] / tb["popc_c"]
+    tb["rur_c_share"] = tb["rurc_c"] / tb["popc_c"]
 
     # Set index
     tb = tb.set_index(["country", "year"], verify_integrity=True).sort_index()
