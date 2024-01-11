@@ -60,3 +60,16 @@ def test_checksum_file_regions(tmp_path):
     checksum2 = files.checksum_file(tmp_path / "regions.yml")
 
     assert checksum1 == checksum2
+
+
+def test_checksum_file_dvc(tmp_path):
+    f = tmp_path / "test.csv"
+    f.write_text("a,b,c\r\n1,2,3")
+
+    # Checksum replaces \r\n with \n
+    assert files.checksum_file(f) == "1a477f6d2f9c9fc827fa46b5ace1a145"
+
+
+def test_checksum_str_dvc():
+    # Checksum replaces \r\n with \n
+    assert files.checksum_str("a,b,c\r\n1,2,3") == files.checksum_str("a,b,c\n1,2,3")
