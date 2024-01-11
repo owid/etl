@@ -169,13 +169,13 @@ def create_estimations_from_growth(
         reference_value = tb.loc[tb["year"] == reference_year, f"{var}{reference_var_suffix}"].iloc[0]
 
         # The scalar is the previous value divided by the reference variable. This is the growth that will be applied retroactively to the variable to be adjusted.
-        tb[f"{var}_scalar"] = reference_value / tb[f"{var}{reference_var_suffix}"]
+        tb[f"{var}_scalar"] = tb[f"{var}{reference_var_suffix}"] / reference_value
 
         # Get value to be adjusted in the reference year
         to_adjust_value = tb.loc[tb["year"] == reference_year, f"{var}{to_adjust_var_suffix}"].iloc[0]
 
         # The estimated values are the division between the reference value and the scalars. This is the variable to be adjusted effectively adjusted by the growth of the reference variable.
-        tb[f"{var}_estimated"] = to_adjust_value / tb[f"{var}_scalar"]
+        tb[f"{var}_estimated"] = to_adjust_value * tb[f"{var}_scalar"]
 
         # Rename the estimated variables without the suffix
         tb[f"{var}"] = tb[f"{var}{to_adjust_var_suffix}"].fillna(tb[f"{var}_estimated"])

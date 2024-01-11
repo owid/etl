@@ -7,7 +7,7 @@ definitions:
     processing_level: major
 
     description_processing: |-
-      The data presented here from 1990 onwards is from the World Bank. Data before 1990 is constructed using the 1990 World Bank observation and applying the growth rates implied by the Maddison Project Database. Similarly, data before 1820 is built using the adjusted 1820 estimate calculated by the previous method and applying the growth rates implied by the Maddison Database.
+      The data presented here from 1990 onwards is from the World Bank. Data before 1990 is constructed using the 1990 World Bank observation and applying the growth rates implied by the Maddison Project Database. Similarly, data before 1820 is built using the adjusted 1820 estimate calculated by the previous method and applying the growth rates implied by the Maddison Database. These steps are necessary because World Bank data adjusted for inflation and the cost of living between countries is only available from 1990 onwards and also because the three datasets estimate GDP with different prices.
 
       The adjusted results before 1990 have been rounded to address uncertainty in the underlying data. GDP data is rounded to the nearest million, and GDP is rounded to the nearest hundred.
 
