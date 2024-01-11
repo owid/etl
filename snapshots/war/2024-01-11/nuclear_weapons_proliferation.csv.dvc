@@ -3,17 +3,9 @@
 meta:
   origin:
     # Data product / Snapshot
-    title: When Did (and Didn’t) States Proliferate?
+    title: Nuclear weapons proliferation
     description: |-
       This dataset provides information on nuclear weapons states.
-
-      The dataset distinguishes between countries not considering, considering, pursuing, and possessing nuclear weapons:
-      - A country is coded as not considering nuclear weapons if it neither considers, pursues, or possesses nuclear weapons.
-      - A country is coded as considering nuclear weapons if its leaders explore whether it is possible and desirable for them to attempt to acquire nuclear weapons, or they work to increase their nuclear weapons capabilities, but without launching a dedicated program.
-      - A country is coded as pursuing nuclear weapons if it has an active program to acquire nuclear weapons or to obtain the ability to construct them on short notice.
-      - A country is coded as possessing nuclear weapons if it has a nuclear-explosive device that it can deliver. Conducting an explosive nuclear test is therefore neither sufficient nor necessary.
-
-      Belarus, Kazakhstan, and Ukraine are not coded as possessing nuclear weapons because they never had operational control of the nuclear weapons left over from the Soviet Union.
 
       More details can be found in [the original document by Bleek (2017)](https://www.belfercenter.org/sites/default/files/files/publication/When%20Did%20%28and%20Didn%27t%29%20States%20Proliferate%3F_1.pdf).
     date_published: 2017-06-13
@@ -21,20 +13,20 @@ meta:
     # Citation
     producer: Bleek
     citation_full: |-
-      Philipp C. Bleek, "When Did (and Didn’t) States Proliferate? Chronicling the Spread of Nuclear Weapons", Discussion Paper (Cambridge, MA: Project on Managing the Atom, Belfer Center for Science and International Affairs, Harvard Kennedy School and the James Martin Center for Nonproliferation Studies, Middlebury Institute of International Studies, Monterey, CA., June 2017).
+      Philipp C. Bleek, "When Did (and Didn't) States Proliferate? Chronicling the Spread of Nuclear Weapons", Discussion Paper (Cambridge, MA: Project on Managing the Atom, Belfer Center for Science and International Affairs, Harvard Kennedy School and the James Martin Center for Nonproliferation Studies, Middlebury Institute of International Studies, Monterey, CA., June 2017).
     attribution_short: Bleek
 
     # Files
-    url_main: 
+    url_main:
       https://www.belfercenter.org/sites/default/files/files/publication/When%20Did%20%28and%20Didn%27t%29%20States%20Proliferate%3F_1.pdf
-    url_download: 
+    url_download:
       https://www.belfercenter.org/sites/default/files/files/publication/When%20Did%20%28and%20Didn%27t%29%20States%20Proliferate%3F_1.pdf
     date_accessed: 2024-01-11
 
     # License
     license:
       name: Copyright 2017, President and Fellows of Harvard College
-      url: 
+      url:
         https://www.belfercenter.org/sites/default/files/files/publication/When%20Did%20%28and%20Didn%27t%29%20States%20Proliferate%3F_1.pdf
 
 wdir: ../../../data/snapshots/war/2024-01-11
