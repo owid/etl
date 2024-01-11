@@ -9,49 +9,11 @@ definitions:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
 dataset:
   update_period_days: 0
-
-  # Learn more about the available fields:
-  # http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
-  title: "COMBINE: a Coalesced Mammal Database of Intrinsic and extrinsic traits"
 tables:
   combine:
     # Learn more about the available fields:
     # http://docs.owid.io/projects/etl/architecture/metadata/reference/indicator/
     variables:
-      # testing_variable:
-      #   title: Testing variable title
-      #   unit: arbitrary units
-      #   short_unit: au
-      #   description_short: Short description of testing variable.
-      #   description_processing: Description of processing of testing variable.
-      #   description_key: List of key points about the indicator.
-      #   description_from_producer: Description of testing variable from producer.
-      #   processing_level: minor
-      #   presentation:
-      #     attribution:
-      #     attribution_short:
-      #     faqs:
-      #     grapher_config:
-      #     title_public:
-      #     title_variant:
-      #     topic_tags:
-      #   display:
-      #     color:
-      #     conversionFactor: 1
-      #     description:
-      #     entityAnnotationsMap: Test annotation
-      #     includeInTable:
-      #     isProjection: false
-      #     name: Testing variable
-      #     numDecimalPlaces: 0
-      #     shortUnit: au
-      #     tableDisplay:
-      #       hideAbsoluteChange:
-      #       hideRelativeChange:
-      #     tolerance: 0
-      #     unit: arbitrary units
-      #     yearIsDay: false
-      #     zeroDay:
       adult_mass_g:
         title: Adult mass
         description_short: Body mass of an adult individual in grams.
@@ -388,27 +350,37 @@ tables:
           topic_tags:
             - Biodiversity
       det_seed:
-        unit: ""
+        title: Diet share - seeds (eltontraits)
+        description_short: Percentage of the diet composed of seed, maize, nuts, spores, wheat, grains.
+        unit: "%"
+        short_unit: "%"
         display:
           numDecimalPlaces: 3
         presentation:
           topic_tags:
             - Biodiversity
       det_plantother:
-        unit: ""
+        title: Diet share - other plants (eltontraits)
+        description_short: Percentage of the diet composed of other plant elements.
+        unit: "%"
+        short_unit: "%"
         display:
           numDecimalPlaces: 3
         presentation:
           topic_tags:
             - Biodiversity
       det_diet_breadth_n:
-        unit: ""
+        title: Diet breadth
+        description_short: Number of prevalent (≥ 20%) EltonTraits dietary categories consumed.
+        unit: "diets"
         display:
           numDecimalPlaces: 0
         presentation:
           topic_tags:
             - Biodiversity
       trophic_level:
+        title: Trophic level
+        description_short: Trophic level of the species, 1 = herbivore, 2 = omnivore, 3 = carnivore.
         unit: ""
         display:
           numDecimalPlaces: 0
@@ -416,11 +388,15 @@ tables:
           topic_tags:
             - Biodiversity
       foraging_stratum:
+        title: Foraging stratum
+        description_short: The height at which the species forages, M = marine, G = ground level, including aquatic foraging, S = scansorial, Ar = Arboreal, A = Aerial.
         unit: ""
         presentation:
           topic_tags:
             - Biodiversity
       activity_cycle:
+        title: Activity cycle
+        description_short: Activity cycle of each species. 1 = nocturnal only, 2 = nocturnal/crepuscular, cathemeral, crepuscular or diural/crepuscular. 3 = diurnal only.
         unit: ""
         display:
           numDecimalPlaces: 0
@@ -428,6 +404,8 @@ tables:
           topic_tags:
             - Biodiversity
       freshwater:
+        title: Freshwater
+        description_short: The species spends a significant amount of time in freshwater bodies, 0 = no, 1 = yes.
         unit: ""
         display:
           numDecimalPlaces: 0
@@ -435,6 +413,8 @@ tables:
           topic_tags:
             - Biodiversity
       marine:
+        title: Marine
+        description_short: The species spends a significant amount of time in oceans and/or seas, 0 = no, 1 = yes.
         unit: ""
         display:
           numDecimalPlaces: 0
@@ -442,7 +422,8 @@ tables:
           topic_tags:
             - Biodiversity
       terrestrial_non_volant:
-        title: terrestrial_non-volant
+        title: Terrestrial non-volant
+        description_short: The species spends a significant amount of time on land, 0 = no, 1 = yes.
         unit: ""
         display:
           numDecimalPlaces: 0
@@ -450,6 +431,8 @@ tables:
           topic_tags:
             - Biodiversity
       terrestrial_volant:
+        title: Terrestrial volant
+        description_short: The species is capable of powered flight and spends a significant amount of time flying in the air 0 = no, 1 = yes.
         unit: ""
         display:
           numDecimalPlaces: 0
@@ -457,6 +440,8 @@ tables:
           topic_tags:
             - Biodiversity
       upper_elevation_m:
+        title: Upper elevation
+        description_short: The upper elevation at which the species can be found.
         unit: ""
         display:
           numDecimalPlaces: 2
@@ -464,6 +449,8 @@ tables:
           topic_tags:
             - Biodiversity
       lower_elevation_m:
+        title: Lower elevation
+        description_short: The lower elevation at which the species can be found.
         unit: ""
         display:
           numDecimalPlaces: 2
@@ -471,6 +458,8 @@ tables:
           topic_tags:
             - Biodiversity
       altitude_breadth_m:
+        title: Altitude breadth
+        description_short: The difference between the upper and lower elevation limits of a species.
         unit: ""
         display:
           numDecimalPlaces: 2
@@ -478,6 +467,8 @@ tables:
           topic_tags:
             - Biodiversity
       island_dwelling:
+        title: Island dwelling
+        description_short: 20% or more of the species’ range is on an island, 0 = no, 1 = yes.
         unit: ""
         display:
           numDecimalPlaces: 0
@@ -485,11 +476,21 @@ tables:
           topic_tags:
             - Biodiversity
       island_endemicity:
+        title: Island endemicity
+        description_short: Score of island endemicity obtained from species’ ranges and historical and fossil occurrence records.
+        description_key:
+          - Exclusively marine
+          - Occurs on mainland
+          - "Occurs on large land bridge islands: the species occurs on islands greater than 1,000 km2 that are separated from the mainland by water no more than 110 m deep. The islands would have been part of the mainland during the last glacial maximum."
+          - "Occurs on small land bridge islands: the species occurs on islands smaller than 1,000 km2 that are separated from the mainland by water no more than 110 m deep. The islands would have been part of the mainland during the last glacial maximum."
+          - "Occurs only on isolated islands: the species occurs on islands separated from the mainland by water deeper than 110 m."
         unit: ""
         presentation:
           topic_tags:
             - Biodiversity
       disected_by_mountains:
+        title: Dissected by mountains
+        description_short: Range dissected by mountains (based on elevation gradients with slopes equal or higher than 5 degrees), 0 = no, 1 = yes.
         unit: ""
         display:
           numDecimalPlaces: 0
@@ -497,6 +498,8 @@ tables:
           topic_tags:
             - Biodiversity
       glaciation:
+        title: Glaciation
+        description_short: "Historical exposure to glaciation, considered as more than 20% range overlap with areas glaciated in the last 21000 years."
         unit: ""
         display:
           numDecimalPlaces: 0
@@ -504,16 +507,27 @@ tables:
           topic_tags:
             - Biodiversity
       biogeographical_realm:
+        title: Biogeographical realm
+        description_short: Biogeographical realm in which the species occurs.
+        description_key:
+          - Afrotropical
+          - Antarctic
+          - Australasian
+          - Indomalayan
+          - Nearctic
+          - Neotropical
+          - Oceanian
+          - Palearctic
         unit: ""
         presentation:
           topic_tags:
             - Biodiversity
       habitat_breadth_n:
+        title: Habitat breadth
+        description_short: Number of distinct suitable level 1 IUCN habitats
         unit: ""
         display:
           numDecimalPlaces: 0
         presentation:
           topic_tags:
             - Biodiversity
-    title: "COMBINE: a Coalesced Mammal Database of Intrinsic and extrinsic traits"
-    description: COMBINE is a taxonomically integrated database of mammal traits obtained from published sources, in which we maximized trait number and coverage without compromising data quality. COMBINE contains information on 54 traits for 6,234 extant and recently extinct mammal species, including information on morphology, reproduction, diet, biogeography, life-habit, phenology, behavior, home range and density. Additionally, we calculated other relevant traits such as habitat and altitudinal breadths for all species and dispersal for terrestrial non-volant species. All data are compatible with the taxonomies of the IUCN Red List v. 2020-2 and PHYLACINE v. 1.2. Missing data were adequately flagged and imputed for non-biogeographical traits with 20% or more data available. We obtained full data sets for 21 traits such as female maturity, litter size, maximum longevity, trophic level and dispersal, providing imputation performance statistics for all. This data set will be especially useful for those interested in including species’ traits in large-scale ecological and conservation analyses.
