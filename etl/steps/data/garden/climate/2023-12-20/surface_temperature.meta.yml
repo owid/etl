@@ -6,6 +6,8 @@ definitions:
     presentation:
       topic_tags:
       - Climate Change
+    display:
+      numDecimalPlaces: 1
     processing_level: major
   common_processing: |-
     - Temperature measured in kelvin was converted to degrees Celsius (°C) by subtracting 273.15.

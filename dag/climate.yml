@@ -13,3 +13,7 @@ steps:
   - data://garden/climate/2023-12-20/surface_temperature
   data://grapher/climate/2023-12-20/surface_global_monthly_anomaly:
   - data://garden/climate/2023-12-20/surface_temperature
+  data://grapher/climate/2023-12-20/surface_temperature:
+  - data://garden/climate/2023-12-20/surface_temperature
+  data://grapher/climate/2023-12-20/surface_temperature_annual_average:
+  - data://garden/climate/2023-12-20/surface_temperature
