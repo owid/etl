@@ -12,12 +12,17 @@ SNAPSHOT_VERSION = Path(__file__).parent.name
 
 @click.command()
 @click.option("--upload/--skip-upload", default=True, type=bool, help="Upload dataset to Snapshot")
-def main(upload: bool) -> None:
-    # Create a new snapshot.
+@click.option("--path-to-file", prompt=True, type=str, help="Path to local data file.")
+def main(path_to_file: str, upload: bool) -> None:
+    # Create a new snapshot for the dyadic dataset.
     snap = Snapshot(f"war/{SNAPSHOT_VERSION}/strategic_nuclear_forces.xlsx")
-
     # Download data from source, add file to DVC and upload to S3.
     snap.create_snapshot(upload=upload)
+
+    # Create a new snapshot for the monadic dataset (sent to us in a private communication).
+    snap = Snapshot(f"war/{SNAPSHOT_VERSION}/strategic_nuclear_forces_monadic.xlsx")
+    # Add local file to DVC and upload to S3.
+    snap.create_snapshot(upload=upload, filename=path_to_file)
 
 
 if __name__ == "__main__":

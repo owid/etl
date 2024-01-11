@@ -12,7 +12,7 @@ def run(dest_dir: str) -> None:
     #
     # Load garden dataset and read its main table.
     ds_garden = paths.load_dataset("strategic_nuclear_forces")
-    tb = ds_garden["strategic_nuclear_forces"]
+    tb = ds_garden["strategic_nuclear_forces_monadic"]
 
     #
     # Save outputs.

@@ -32,7 +32,7 @@ dataset:
   update_period_days: 0
 
 tables:
-  strategic_nuclear_forces:
+  strategic_nuclear_forces_dyadic: &all-variables-data
     variables:
       nuclear_warheads_owned:
         title: Nuclear warheads possessed by a country
@@ -93,3 +93,7 @@ tables:
           - "{definitions.world_area}"
         unit: square kilometers
         short_unit: km²
+        description_processing: |-
+          - The area that can be destroyed by nuclear weapons of a certain yield is calculated based on Richelson, Jeffrey. 1980. Evaluating the Strategic Balance. American Journal of Political Science 24(4): 782. We assume each equivalent megaton can destroy 20 square miles, which is equivalent to 51.8 square kilometers.
+  # For monadic data, simply repeat all the above metadata.
+  strategic_nuclear_forces_monadic: *all-variables-data
