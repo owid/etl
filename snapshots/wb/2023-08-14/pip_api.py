@@ -22,7 +22,7 @@ TOLERANCE_PERCENTILES = 0.5
 # NOTE: Although the number of workers is set to MAX_WORKERS, the actual number of workers for regional queries is half of that, because the API (`pip-grp`) is less able to handle concurrent requests.
 
 # Select live (1) or internal (0) API
-LIVE_API = 0
+LIVE_API = 1
 
 if LIVE_API == 1:
     API_ADDRESS = "https://api.worldbank.org/pip/v1"
@@ -1038,3 +1038,7 @@ def add_relative_poverty_and_decile_threholds(df, df_relative, df_percentiles):
     log.info("Relative poverty indicators and decile thresholds added. Key indicators file done :)")
 
     return df
+
+
+# RUN THE SCRIPT
+run()
