@@ -6,8 +6,8 @@ tables:
     variables:
       status:
         title: Nuclear weapons status
-        description_short: Whether a country considers, pursues, or possesses nuclear weapons.
-        processing_level: minor
+        description_short: Whether a country does not consider (0), considers (1), pursues (2), or possesses (3) nuclear weapons.
+        processing_level: major
         unit: ""
         short_unit: ""
         presentation:
