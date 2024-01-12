@@ -39,6 +39,26 @@ def extract_year_ranges(years_ranges):
     return years
 
 
+def correct_historical_regions(tb: Table) -> Table:
+    # Convert columns to string type, to avoid issues with categorical columns.
+    tb = tb.astype(str)
+
+    # Merge the years of nuclear weapons exploration of Germany and West Germany.
+    tb.loc[tb["country"] == "Germany", "explore"] = (
+        tb[tb["country"] == "Germany"]["explore"].astype(str).item()
+        + ","
+        + tb[tb["country"] == "West Germany"]["explore"].astype(str).item()
+    )
+    # Remove row for West Germany.
+    tb = tb[tb["country"] != "West Germany"].reset_index(drop=True)
+
+    # Assign the years of nuclear weapons exploration and pursuit of Yugoslavia to Serbia.
+    # To do that, simply rename the country.
+    tb.loc[tb["country"] == "Yugoslavia", "country"] = "Serbia"
+
+    return tb
+
+
 def add_all_non_nuclear_countries(tb: Table, tb_regions: Table) -> Table:
     tb = tb.copy()
     # Get the list of all other currently existing countries that are not included in the data.
@@ -113,6 +133,10 @@ def run(dest_dir: str) -> None:
     #
     # Harmonize country names.
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
+
+    # Trace back nuclear weapons status for current countries (Germany, Serbia), and remove historical regions
+    # (West Germany, Yugoslavia).
+    tb = correct_historical_regions(tb=tb)
 
     # Add rows for countries that are not in the data (i.e. countries that do not even consider nuclear weapons).
     tb = add_all_non_nuclear_countries(tb=tb, tb_regions=tb_regions)
