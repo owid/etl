@@ -1,0 +1,16 @@
+dataset:
+  update_period_days: 365
+
+tables:
+  nuclear_threat_initiative_overview:
+    variables:
+      status:
+        title: Nuclear weapons status
+        description_short: Whether a country considers, pursues, or possesses nuclear weapons.
+        processing_level: minor
+        unit: ""
+        short_unit: ""
+        presentation:
+          topic_tags:
+            - Nuclear Weapons
+            - War & Peace

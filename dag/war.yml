@@ -145,6 +145,12 @@ steps:
   data://grapher/war/2024-01-09/status_of_world_nuclear_forces:
     - data://garden/war/2024-01-09/status_of_world_nuclear_forces
 
+  # Nuclear Threat Initiative - Overview.
+  data://meadow/war/2024-01-11/nuclear_threat_initiative_overview:
+    - snapshot://war/2024-01-11/nuclear_threat_initiative_overview.csv
+  data://garden/war/2024-01-11/nuclear_threat_initiative_overview:
+    - data://meadow/war/2024-01-11/nuclear_threat_initiative_overview
+
   # Bleek - When Did (and Didn't) States Proliferate?
   data://meadow/war/2024-01-11/nuclear_weapons_proliferation:
     - snapshot://war/2024-01-11/nuclear_weapons_proliferation.csv

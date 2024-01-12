@@ -1,0 +1,31 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/origin/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Nuclear Threat Initiative Overview
+    description: |-
+      Overviews of national nuclear, chemical, biological, and missile programs and nonproliferation efforts.
+    date_published: 2024-01-11
+
+    # Citation
+    producer: Nuclear Threat Initiative
+    citation_full: |-
+      Nuclear Threat Initiative (NTI) - Overview (2024).
+
+      Material prepared for NTI by the James Martin Center for Nonproliferation Studies.
+    attribution_short: NTI
+
+    # Files
+    url_main: https://www.nti.org/countries/
+    date_accessed: 2024-01-11
+
+    # License
+    license:
+      name: CC BY 4.0
+
+wdir: ../../../data/snapshots/war/2024-01-11
+outs:
+- md5: bdeda2a7629420be19ac4b6a3c9b6f13
+  size: 2315
+  path: nuclear_threat_initiative_overview.csv
