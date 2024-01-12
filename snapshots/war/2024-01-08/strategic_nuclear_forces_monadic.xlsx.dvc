@@ -35,6 +35,6 @@ meta:
 
 wdir: ../../../data/snapshots/war/2024-01-08
 outs:
-- md5: 1ab94beaa2d6a9cbfabd2b8a5716058d
-  size: 25013
+- md5: 5628b7187e98995cb455a0db9a12ccf6
+  size: 22082
   path: strategic_nuclear_forces_monadic.xlsx
