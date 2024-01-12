@@ -1,5 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
 
+from owid.catalog import Table
+
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
 
@@ -37,24 +39,8 @@ def extract_year_ranges(years_ranges):
     return years
 
 
-def run(dest_dir: str) -> None:
-    #
-    # Load inputs.
-    #
-    # Load meadow dataset and read its main table.
-    ds_meadow = paths.load_dataset("nuclear_weapons_proliferation")
-    tb = ds_meadow["nuclear_weapons_proliferation"].reset_index()
-
-    # Load regions dataset and read its main table.
-    ds_regions = paths.load_dataset("regions")
-    tb_regions = ds_regions["regions"]
-
-    #
-    # Process data.
-    #
-    # Harmonize country names.
-    tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
-
+def add_all_non_nuclear_countries(tb: Table, tb_regions: Table) -> Table:
+    tb = tb.copy()
     # Get the list of all other currently existing countries that are not included in the data.
     countries_missing = sorted(
         set(tb_regions[(tb_regions["region_type"] == "country") & (~tb_regions["is_historical"])]["name"])
@@ -65,7 +51,12 @@ def run(dest_dir: str) -> None:
     for country in countries_missing:
         tb.loc[len(tb)] = {"country": country, "explore": "", "pursue": "", "acquire": ""}
 
-    # Expand years.
+    return tb
+
+
+def add_all_years(tb: Table) -> Table:
+    tb = tb.copy()
+    # Convert column where years are given as ranges into a list of years.
     for column in tb.drop(columns="country").columns:
         tb[column] = tb[column].astype(str).apply(extract_year_ranges)
 
@@ -77,7 +68,12 @@ def run(dest_dir: str) -> None:
     # Explode that column to create a row for each combination of country-year.
     tb = tb.explode("year").reset_index(drop=True)
 
-    # Create a column that contains the status of each country-year combination.
+    return tb
+
+
+def add_status_column(tb: Table) -> Table:
+    tb = tb.copy()
+
     tb["status"] = LABEL_DOES_NOT_CONSIDER
     for i, row in tb.iterrows():
         year = int(row["year"])
@@ -97,15 +93,73 @@ def run(dest_dir: str) -> None:
     # Add metadata to the new status column.
     tb["status"] = tb["status"].copy_metadata(tb["explore"])
 
+    return tb
+
+
+def run(dest_dir: str) -> None:
+    #
+    # Load inputs.
+    #
+    # Load meadow dataset and read its main table.
+    ds_meadow = paths.load_dataset("nuclear_weapons_proliferation")
+    tb = ds_meadow["nuclear_weapons_proliferation"].reset_index()
+
+    # Load regions dataset and read its main table.
+    ds_regions = paths.load_dataset("regions")
+    tb_regions = ds_regions["regions"]
+
+    #
+    # Process data.
+    #
+    # Harmonize country names.
+    tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
+
+    # Add rows for countries that are not in the data (i.e. countries that do not even consider nuclear weapons).
+    tb = add_all_non_nuclear_countries(tb=tb, tb_regions=tb_regions)
+
+    # Add rows for years (years were given as intervals, e.g. "1964-66,72-75,80-").
+    tb = add_all_years(tb=tb)
+
+    # Create a column that contains the status of each country-year combination.
+    tb = add_status_column(tb=tb)
+
     # Drop unnecessary columns.
     tb = tb.drop(columns=["explore", "pursue", "acquire"])
 
     # Set an appropriate index and sort conveniently.
     tb = tb.set_index(["country", "year"], verify_integrity=True).sort_index().sort_index(axis=1)
 
+    # Create a new table with the total count of countries in each status.
+    tb_counts = (
+        tb.reset_index()
+        .groupby(["status", "year"], as_index=False)
+        .count()
+        .pivot(index="year", columns="status", join_column_levels_with="_")
+    )
+
+    # Rename columns conveniently.
+    tb_counts = tb_counts.underscore().rename(
+        columns={
+            "country_does_not_consider": "n_countries_not_considering",
+            "country_considers": "n_countries_considering",
+            "country_pursues": "n_countries_pursuing",
+            "country_possesses": "n_countries_possessing",
+        },
+        errors="raise",
+    )
+
+    # Fill missing values with zeros and set an appropriate type.
+    tb_counts = tb_counts.fillna(0).astype(int)
+
+    # Set an appropriate index and sort conveniently.
+    tb_counts = tb_counts.set_index(["year"], verify_integrity=True).sort_index().sort_index(axis=1)
+
+    # Rename table conveniently.
+    tb_counts.metadata.short_name = "nuclear_weapons_proliferation_counts"
+
     #
     # Save outputs.
     #
     # Create a new garden dataset.
-    ds_garden = create_dataset(dest_dir, tables=[tb], check_variables_metadata=True)
+    ds_garden = create_dataset(dest_dir, tables=[tb, tb_counts], check_variables_metadata=True)
     ds_garden.save()
