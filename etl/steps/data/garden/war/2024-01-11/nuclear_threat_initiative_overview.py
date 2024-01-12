@@ -14,9 +14,6 @@ def run(dest_dir: str) -> None:
     ds_meadow = paths.load_dataset("nuclear_threat_initiative_overview")
     tb = ds_meadow["nuclear_threat_initiative_overview"]
 
-    # This table contains a "status" column, which corresponds to whether a country does not consider (0),
-    # considers (1), pursues (2), or possesses (3) nuclear weapons.
-
     #
     # Save outputs.
     #

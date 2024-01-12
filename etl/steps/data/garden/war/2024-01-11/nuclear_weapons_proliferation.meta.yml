@@ -25,7 +25,7 @@ tables:
     variables:
       status:
         title: Nuclear weapons status
-        description_short: Whether a country considers, pursues, or possesses nuclear weapons.
+        description_short: Whether a country does not consider (0), considers (1), pursues (2), or possesses (3) nuclear weapons.
   nuclear_weapons_proliferation_counts:
     variables:
       n_countries_not_considering:

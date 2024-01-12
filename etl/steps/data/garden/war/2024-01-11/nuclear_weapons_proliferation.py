@@ -11,34 +11,28 @@ from etl.helpers import PathFinder, create_dataset
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
-# Labels to be used on the status column.
-LABEL_DOES_NOT_CONSIDER = "Does not consider"
-LABEL_CONSIDERS = "Considers"
-LABEL_PURSUES = "Pursues"
-LABEL_POSSESSES = "Possesses"
-
-
 # Latest year to be assumed for the content of the data, when intervals are open, e.g. "2000-", or "1980-".
 LATEST_YEAR = 2017
 
-# Labels to be used on the status column.
-LABEL_DOES_NOT_CONSIDER = "Does not consider"
-LABEL_CONSIDERS = "Considers"
-LABEL_PURSUES = "Pursues"
-LABEL_POSSESSES = "Possesses"
 
-
-def add_all_non_nuclear_countries(tb: Table, tb_regions: Table) -> Table:
-    tb = tb.copy()
-    # Get the list of all other currently existing countries that are not included in the data.
-    countries_missing = sorted(
+def add_all_countries_and_years(tb: Table, tb_regions: Table) -> Table:
+    # List all years and countries (even those that do not even consider nuclear weapons).
+    all_years = sorted(set(tb["year"]))
+    all_countries = sorted(
         set(tb_regions[(tb_regions["region_type"] == "country") & (~tb_regions["is_historical"])]["name"])
-        - set(tb["country"])
     )
 
-    # Add rows for those countries, with empty values.
-    for country in countries_missing:
-        tb.loc[len(tb)] = {"country": country, "explore": "", "pursue": "", "acquire": ""}
+    # Create a DataFrame with all combinations of countries and years, and a common column of status 0.
+    tb_added = Table(
+        pd.DataFrame(list(itertools.product(all_countries, all_years)), columns=["country", "year"]).assign(
+            **{"status": 0}
+        )
+    )
+
+    # Combine the two tables, and remove repeated rows (keeping the values of the original table).
+    tb = pr.concat([tb.astype({"year": int}), tb_added], ignore_index=True).drop_duplicates(
+        subset=["country", "year"], keep="first"
+    )
 
     return tb
 
@@ -65,28 +59,8 @@ def run(dest_dir: str) -> None:
     # Combine the two tables.
     tb = pr.concat([tb, tb_nti], ignore_index=True)
 
-    # Add all years and countries (including those that do not even consider nuclear weapons).
-    all_years = sorted(set(tb["year"]))
-    all_countries = sorted(
-        set(tb_regions[(tb_regions["region_type"] == "country") & (~tb_regions["is_historical"])]["name"])
-    )
-
-    # Create a DataFrame with all combinations of countries and years, and a common column of status 0.
-    tb_added = Table(
-        pd.DataFrame(list(itertools.product(all_countries, all_years)), columns=["country", "year"]).assign(
-            **{"status": 0}
-        )
-    )
-
-    # Combine the two tables, and remove repeated rows (keeping the values of the original table).
-    tb = pr.concat([tb.astype({"year": int}), tb_added], ignore_index=True).drop_duplicates(
-        subset=["country", "year"], keep="first"
-    )
-
-    # Use labels for status, instead of numbers.
-    tb["status"] = tb["status"].replace(
-        {0: LABEL_DOES_NOT_CONSIDER, 1: LABEL_CONSIDERS, 2: LABEL_PURSUES, 3: LABEL_POSSESSES}
-    )
+    # Add rows for all countries and years (including countries that did not even consider nuclear weapons).
+    tb = add_all_countries_and_years(tb=tb, tb_regions=tb_regions)
 
     # Set an appropriate index and sort conveniently.
     tb = tb.set_index(["country", "year"], verify_integrity=True).sort_index().sort_index(axis=1)
@@ -105,10 +79,10 @@ def run(dest_dir: str) -> None:
     # Rename columns conveniently.
     tb_counts = tb_counts.underscore().rename(
         columns={
-            "country_does_not_consider": "n_countries_not_considering",
-            "country_considers": "n_countries_considering",
-            "country_pursues": "n_countries_pursuing",
-            "country_possesses": "n_countries_possessing",
+            "country_0": "n_countries_not_considering",
+            "country_1": "n_countries_considering",
+            "country_2": "n_countries_pursuing",
+            "country_3": "n_countries_possessing",
         },
         errors="raise",
     )
