@@ -34,6 +34,7 @@ TOLERANCE_PERCENTILES = 0.5
 # Select live (1) or internal (0) API
 LIVE_API = 1
 
+
 # Constants
 def poverty_lines():
     # Define poverty lines and their increase
@@ -638,9 +639,7 @@ def generate_consolidated_percentiles(df):
         .size()
         .min()
         == 99
-    ), log.warning(
-        "Some distributions don't have 99 percentiles!"
-    )
+    ), log.warning("Some distributions don't have 99 percentiles!")
 
     # Count the cases where distance_to_p is higher than TOLERANCE_PERCENTILES
     mask = df_percentiles["distance_to_p"] > TOLERANCE_PERCENTILES
@@ -1090,10 +1089,5 @@ def add_relative_poverty_and_decile_threholds(df, df_relative, df_percentiles):
     return df
 
 
-<<<<<<< HEAD
-# RUN THE SCRIPT
-run()
-=======
 if __name__ == "__main__":
     run()
->>>>>>> 7bfab7776 (improve caching)
