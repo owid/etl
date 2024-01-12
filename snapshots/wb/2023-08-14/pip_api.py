@@ -1,78 +1,199 @@
-import concurrent.futures
 import io
 import time
+from multiprocessing.pool import ThreadPool
 from pathlib import Path
 
+import click
 import numpy as np
 import pandas as pd
 import requests
+from botocore.exceptions import ClientError
+from joblib import Memory
 from structlog import get_logger
+
+from etl.files import checksum_str
+from etl.paths import CACHE_DIR
+from etl.publish import connect_s3_cached
 
 # Initialize logger.
 log = get_logger()
+
+memory = Memory(CACHE_DIR, verbose=0)
 
 # Basic parameters to use in the functions
 PARENT_DIR = Path(__file__).parent.absolute()
 MAX_REPEATS = 10
 TIMEOUT = 500
 FILL_GAPS = "false"
-MAX_WORKERS = 10
+# NOTE: Although the number of workers is set to MAX_WORKERS, the actual number of workers for regional queries is half of that, because the API (`pip-grp`) is less able to handle concurrent requests.
+# MAX_WORKERS = 10
+MAX_WORKERS = 2
 TOLERANCE_PERCENTILES = 0.5
 
-# NOTE: Although the number of workers is set to MAX_WORKERS, the actual number of workers for regional queries is half of that, because the API (`pip-grp`) is less able to handle concurrent requests.
 
 # Select live (1) or internal (0) API
 LIVE_API = 1
 
-if LIVE_API == 1:
-    API_ADDRESS = "https://api.worldbank.org/pip/v1"
-elif LIVE_API == 0:
-    API_ADDRESS = "https://apiv2qa.worldbank.org/pip/v1"
+# Constants
+def poverty_lines():
+    # Define poverty lines and their increase
+    under_5_dollars = list(range(1, 500, 1))
+    between_5_and_10_dollars = list(range(500, 1000, 1))
+    between_10_and_20_dollars = list(range(1000, 2000, 2))
+    between_20_and_30_dollars = list(range(2000, 3000, 2))
+    between_30_and_55_dollars = list(range(3000, 5500, 5))
+    between_55_and_80_dollars = list(range(5500, 8000, 5))
+    between_80_and_100_dollars = list(range(8000, 10000, 5))
+    between_100_and_150_dollars = list(range(10000, 15000, 10))
+    between_150_and_175_dollars = list(range(15000, 17500, 10))
+    between_175_and_250_dollars = list(range(17500, 25000, 20))
+    between_250_and_500_dollars = list(range(25000, 50000, 50))
+
+    # povlines is all these lists together
+    povlines = (
+        under_5_dollars
+        + between_5_and_10_dollars
+        + between_10_and_20_dollars
+        + between_20_and_30_dollars
+        + between_30_and_55_dollars
+        + between_55_and_80_dollars
+        + between_80_and_100_dollars
+        + between_100_and_150_dollars
+        + between_150_and_175_dollars
+        + between_175_and_250_dollars
+        + between_250_and_500_dollars
+    )
+
+    return povlines
 
 
-def run() -> None:
+PPP_VERSIONS = [2011, 2017]
+POV_LINES = poverty_lines()
+
+# DEBUGGING
+PPP_VERSIONS = [2011]
+POV_LINES = [1, 1000, 25000, 50000]
+
+
+@click.command()
+@click.option(
+    "--live-api/--internal-api",
+    default=True,
+    type=bool,
+    help="Select live (1) or internal (0) API",
+)
+# @click.option("--path-to-file", prompt=True, type=str, help="Path to local data file.")
+def run(live_api: bool) -> None:
+    if live_api:
+        wb_api = WB_API("https://api.worldbank.org/pip/v1")
+    else:
+        wb_api = WB_API("https://apiv2qa.worldbank.org/pip/v1")
+
     # Generate percentiles by extracting the raw files and processing them afterward
-    df_percentiles = generate_consolidated_percentiles(generate_percentiles_raw())
+    df_percentiles = generate_consolidated_percentiles(generate_percentiles_raw(wb_api))
 
     # Generate relative poverty indicators file
-    df_relative = generate_relative_poverty()
+    df_relative = generate_relative_poverty(wb_api)
 
     # Generate key indicators file and patch medians
-    df = generate_key_indicators()
+    df = generate_key_indicators(wb_api)
     df = median_patch(df)
 
     # Add relative poverty indicators and decile thresholds to the key indicators file
     df = add_relative_poverty_and_decile_threholds(df, df_relative, df_percentiles)
 
 
+class WB_API:
+    def __init__(self, api_address, check_health=False):
+        self.api_address = api_address
+        self.check_health = check_health
+
+    def health_check(self):
+        return pd.read_json(f"{self.api_address}/health-check")[0][0]
+
+    def api_health(self):
+        """
+        Check if the API is running.
+        """
+        if not self.check_health:
+            return
+
+        # Initialize repeat counter
+        repeat = 0
+
+        # health comes from a json containing the status
+        health = self.health_check()
+
+        # If the status is different to "PIP API is running", repeat the request until MAX_REPEATS
+        while health != "PIP API is running" and repeat < MAX_REPEATS:
+            repeat += 1
+
+        if repeat >= MAX_REPEATS:
+            # If the status is different to "PIP API is running" after MAX_REPEATS, log fatal error
+            raise AssertionError(f"Health check: {health} (repeated {repeat} times)")
+
+    def versions(self):
+        return memory.cache(pd.read_csv)(f"{self.api_address}/versions?format=csv")
+
+    def get_table(self, table):
+        return pd.read_csv(f"{self.api_address}/aux?table={table}&long_format=false&format=csv")
+
+    def fetch_csv(self, url):
+        return _fetch_csv(f"{self.api_address}{url}")
+
+
+@memory.cache
+def _fetch_csv(url: str) -> pd.DataFrame:
+    r2 = connect_s3_cached(r2=True)
+    r2_bucket = "owid-private"
+    r2_key = "cache/pip_api/" + checksum_str(url)
+
+    # try to get it from cache
+    try:
+        log.info("fetch_csv.try_cache", url=url)
+        obj = r2.get_object(Bucket=r2_bucket, Key=r2_key)
+        df = pd.read_csv(io.StringIO(obj["Body"].read().decode("utf-8")))
+        log.info("fetch_csv.success", url=url)
+        return df
+    except ClientError:
+        log.info("fetch_csv.cache_miss", url=url)
+
+    log.info("fetch_csv.start", url=url)
+
+    # Repeat request until status is 200 or until MAX_REPEATS
+    repeat = 0
+    while repeat < MAX_REPEATS:
+        response = requests.get(url, timeout=TIMEOUT)
+        if response.status_code != 200:
+            log.info("fetch_csv.retry", url=url)
+            repeat += 1
+            continue
+        else:
+            log.info("fetch_csv.success", url=url, t=response.elapsed.total_seconds())
+
+            # save the result to R2 cache
+            r2.put_object(
+                Body=response.content,
+                Bucket=r2_bucket,
+                Key=r2_key,
+            )
+
+            df = pd.read_csv(io.StringIO(response.content.decode("utf-8")))
+            return df
+
+    raise AssertionError(f"Repeated {repeat} times, can't extract data for url {url}")
+
+
 ############################################################################################################
 # FUNCTIONS
 
 
-def api_health():
-    """
-    Check if the API is running.
-    """
-    # Initialize repeat counter
-    repeat = 0
-
-    # health comes from a json containing the status
-    health = pd.read_json(f"{API_ADDRESS}/health-check")[0][0]
-
-    # If the status is different to "PIP API is running", repeat the request until MAX_REPEATS
-    while health != "PIP API is running" and repeat < MAX_REPEATS:
-        repeat += 1
-
-    # If the status is different to "PIP API is running" after MAX_REPEATS, log fatal error
-    assert repeat < MAX_REPEATS, log.fatal(f"Health check: {health} (repeated {repeat} times)")
-
-
-def pip_aux_tables(table="all") -> pd.DataFrame:
+def pip_aux_tables(wb_api: WB_API, table="all"):
     """
     Download aux tables if the API is running.
     """
 
-    api_health()
+    wb_api.api_health()
 
     if table == "all":
         aux_tables_list = [
@@ -105,13 +226,13 @@ def pip_aux_tables(table="all") -> pd.DataFrame:
 
         # Download each table and append it to the list
         for tab in aux_tables_list:
-            df = pd.read_csv(f"{API_ADDRESS}/aux?table={tab}&long_format=false&format=csv")
+            df = wb_api.get_table(tab)
 
             # Add table to df_dict
             df_dict[tab] = df
 
     else:
-        df = pd.read_csv(f"{API_ADDRESS}/aux?table={table}&long_format=false&format=csv")
+        df = wb_api.get_table(table)
 
         # Add table to df_dict
         df_dict = {table: df}
@@ -121,14 +242,14 @@ def pip_aux_tables(table="all") -> pd.DataFrame:
     return df_dict
 
 
-def pip_versions() -> dict:
+def pip_versions(wb_api) -> dict:
     """
     Download latest PIP data versions if the API is running.
     """
 
-    api_health()
+    wb_api.api_health()
 
-    df = pd.read_csv(f"{API_ADDRESS}/versions?format=csv")
+    df = wb_api.versions()
     df = df[["ppp_version", "release_version", "version"]]
 
     # Obtain the max release_version
@@ -149,6 +270,7 @@ def pip_versions() -> dict:
 
 
 def pip_query_country(
+    wb_api: WB_API,
     popshare_or_povline,
     value,
     versions,
@@ -165,7 +287,7 @@ def pip_query_country(
     """
 
     # Test health of the API
-    api_health()
+    wb_api.api_health()
 
     # Round povline (popshare) to 2 decimals to work with cents as the minimum unit
     value = round(value, 2)
@@ -175,23 +297,9 @@ def pip_query_country(
     release_version = versions[ppp_version]["release_version"]
 
     # Build query
-    request_url = f"{API_ADDRESS}/pip?{popshare_or_povline}={value}&country={country_code}&year={year}&fill_gaps={fill_gaps}&welfare_type={welfare_type}&reporting_level={reporting_level}&ppp_version={ppp_version}&version={version}&release_version={release_version}&format=csv"
-    status = 0
-    repeat = 0
-
-    # Repeat request until status is 200 or until MAX_REPEATS
-    while status != 200 and repeat < MAX_REPEATS:
-        response = requests.get(request_url, timeout=TIMEOUT)
-        content = response.content
-        status = response.status_code
-        repeat += 1
-
-    # After MAX_REPEATS, log fatal error
-    assert repeat < MAX_REPEATS, log.fatal(
-        f"Repeated {repeat} times, can't extract data ({popshare_or_povline} = {value}, {ppp_version} PPPs)"
+    df = wb_api.fetch_csv(
+        f"/pip?{popshare_or_povline}={value}&country={country_code}&year={year}&fill_gaps={fill_gaps}&welfare_type={welfare_type}&reporting_level={reporting_level}&ppp_version={ppp_version}&version={version}&release_version={release_version}&format=csv"
     )
-
-    df = pd.read_csv(io.StringIO(content.decode("utf-8")))
 
     # Add PPP version as column
     df["ppp_version"] = ppp_version
@@ -224,6 +332,7 @@ def pip_query_country(
 
 
 def pip_query_region(
+    wb_api: WB_API,
     popshare_or_povline,
     value,
     versions,
@@ -239,7 +348,7 @@ def pip_query_region(
     """
 
     # Test health of the API
-    api_health()
+    wb_api.api_health()
 
     # Round povline (popshare) to 2 decimals to work with cents as the minimum unit
     value = round(value, 2)
@@ -249,23 +358,9 @@ def pip_query_region(
     release_version = versions[ppp_version]["release_version"]
 
     # Build query
-    request_url = f"{API_ADDRESS}/pip-grp?{popshare_or_povline}={value}&country={country_code}&year={year}&welfare_type={welfare_type}&reporting_level={reporting_level}&ppp_version={ppp_version}&version={version}&release_version={release_version}&format=csv"
-    status = 0
-    repeat = 0
-
-    # Repeat request until status is 200 or until MAX_REPEATS
-    while status != 200 and repeat < MAX_REPEATS:
-        response = requests.get(request_url, timeout=TIMEOUT)
-        content = response.content
-        status = response.status_code
-        repeat += 1
-
-    # After MAX_REPEATS, log fatal error
-    assert repeat < MAX_REPEATS, log.fatal(
-        f"Repeated {repeat} times, can't extract data ({popshare_or_povline} = {value}, {ppp_version} PPPs)"
+    df = wb_api.fetch_csv(
+        f"/pip-grp?{popshare_or_povline}={value}&country={country_code}&year={year}&welfare_type={welfare_type}&reporting_level={reporting_level}&ppp_version={ppp_version}&version={version}&release_version={release_version}&format=csv"
     )
-
-    df = pd.read_csv(io.StringIO(content.decode("utf-8")))
 
     # Add PPP version as column
     df["ppp_version"] = ppp_version
@@ -300,44 +395,21 @@ def pip_query_region(
 # This is data not given directly by the query, but we can get it by querying a huge set of poverty lines and assign percentiles according to headcount ratio results.
 
 
-def generate_percentiles_raw():
+def generate_percentiles_raw(wb_api: WB_API):
     """
     Generates percentiles data from query results. This is the raw data to get the percentiles.
     Uses concurrent.futures to speed up the process.
     """
     start_time = time.time()
 
-    # Define poverty lines and their increase
-
-    under_5_dollars = list(range(1, 500, 1))
-    between_5_and_10_dollars = list(range(500, 1000, 1))
-    between_10_and_20_dollars = list(range(1000, 2000, 2))
-    between_20_and_30_dollars = list(range(2000, 3000, 2))
-    between_30_and_55_dollars = list(range(3000, 5500, 5))
-    between_55_and_80_dollars = list(range(5500, 8000, 5))
-    between_80_and_100_dollars = list(range(8000, 10000, 5))
-    between_100_and_150_dollars = list(range(10000, 15000, 10))
-    between_150_and_175_dollars = list(range(15000, 17500, 10))
-    between_175_and_250_dollars = list(range(17500, 25000, 20))
-    between_250_and_500_dollars = list(range(25000, 50000, 50))
-
-    # povlines is all these lists together
-    povlines = (
-        under_5_dollars
-        + between_5_and_10_dollars
-        + between_10_and_20_dollars
-        + between_20_and_30_dollars
-        + between_30_and_55_dollars
-        + between_55_and_80_dollars
-        + between_80_and_100_dollars
-        + between_100_and_150_dollars
-        + between_150_and_175_dollars
-        + between_175_and_250_dollars
-        + between_250_and_500_dollars
-    )
-
     def get_percentiles_data(povline, versions, ppp_version):
+        if Path(
+            f"{PARENT_DIR}/pip_country_data/pip_country_all_year_all_povline_{povline}_welfare_all_rep_all_fillgaps_{FILL_GAPS}_ppp_{ppp_version}.csv"
+        ).is_file():
+            return
+
         return pip_query_country(
+            wb_api,
             popshare_or_povline="povline",
             value=povline / 100,
             versions=versions,
@@ -353,18 +425,18 @@ def generate_percentiles_raw():
     def concurrent_percentiles_function():
         # Make sure the directory exists. If not, create it
         Path(f"{PARENT_DIR}/pip_country_data").mkdir(parents=True, exist_ok=True)
-        with concurrent.futures.ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
-            for ppp_version in [2011, 2017]:
-                for povline in povlines:
-                    if Path(
-                        f"{PARENT_DIR}/pip_country_data/pip_country_all_year_all_povline_{povline}_welfare_all_rep_all_fillgaps_{FILL_GAPS}_ppp_{ppp_version}.csv"
-                    ).is_file():
-                        continue
-                    else:
-                        executor.submit(get_percentiles_data, povline, versions, ppp_version)
+
+        with ThreadPool(MAX_WORKERS) as pool:
+            tasks = [(povline, versions, ppp_version) for ppp_version in PPP_VERSIONS for povline in POV_LINES]
+            pool.starmap(get_percentiles_data, tasks)
 
     def get_percentiles_data_region(povline, versions, ppp_version):
+        if Path(
+            f"{PARENT_DIR}/pip_region_data/pip_region_all_year_all_povline_{povline}_ppp_{ppp_version}.csv"
+        ).is_file():
+            return
         return pip_query_region(
+            wb_api,
             popshare_or_povline="povline",
             value=povline / 100,
             versions=versions,
@@ -379,15 +451,9 @@ def generate_percentiles_raw():
     def concurrent_percentiles_region_function():
         # Make sure the directory exists. If not, create it
         Path(f"{PARENT_DIR}/pip_region_data").mkdir(parents=True, exist_ok=True)
-        with concurrent.futures.ThreadPoolExecutor(max_workers=int(round(MAX_WORKERS / 2))) as executor:
-            for ppp_version in [2011, 2017]:
-                for povline in povlines:
-                    if Path(
-                        f"{PARENT_DIR}/pip_region_data/pip_region_all_year_all_povline_{povline}_ppp_{ppp_version}.csv"
-                    ).is_file():
-                        continue
-                    else:
-                        executor.submit(get_percentiles_data_region, povline, versions, ppp_version)
+        with ThreadPool(MAX_WORKERS) as pool:
+            tasks = [(povline, versions, ppp_version) for ppp_version in PPP_VERSIONS for povline in POV_LINES]
+            pool.starmap(get_percentiles_data_region, tasks)
 
     def get_query_country(povline, ppp_version):
         # Here I check if the file exists even after the original extraction. If it does, I read it. If not, I start the queries again.
@@ -424,7 +490,7 @@ def generate_percentiles_raw():
 
     else:
         # Obtain latest versions of the PIP dataset
-        versions = pip_versions()
+        versions = pip_versions(wb_api)
 
         # Run the main function
         concurrent_percentiles_function()
@@ -434,31 +500,17 @@ def generate_percentiles_raw():
 
         log.info("Now we are concatenating the files")
 
-        # Concatenate country and region files
-        df_country = pd.DataFrame()
-        df_region = pd.DataFrame()
+        with ThreadPool(MAX_WORKERS) as pool:
+            tasks = [(povline, ppp_version) for ppp_version in PPP_VERSIONS for povline in POV_LINES]
+            dfs = pool.starmap(get_query_country, tasks)
 
-        futures_country = []
-        with concurrent.futures.ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
-            for ppp_version in [2011, 2017]:
-                for povline in povlines:
-                    future_country = executor.submit(get_query_country, povline, ppp_version)
-                    futures_country.append(future_country)
-
-        # now that all futures have been started, wait for them all
-        dfs = [f.result() for f in futures_country]
         df_country = pd.concat(dfs, ignore_index=True)
         log.info("Country files concatenated")
 
-        futures_region = []
-        with concurrent.futures.ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
-            for ppp_version in [2011, 2017]:
-                for povline in povlines:
-                    future_region = executor.submit(get_query_region, povline, ppp_version)
-                    futures_region.append(future_region)
+        with ThreadPool(MAX_WORKERS) as pool:
+            tasks = [(povline, ppp_version) for ppp_version in PPP_VERSIONS for povline in POV_LINES]
+            dfs = pool.starmap(get_query_region, tasks)
 
-        # now that all futures have been started, wait for them all
-        dfs = [f.result() for f in futures_region]
         df_region = pd.concat(dfs, ignore_index=True)
         log.info("Region files concatenated")
 
@@ -469,10 +521,10 @@ def generate_percentiles_raw():
         log.info("Checking if all the poverty lines are in the concatenated files")
 
         # Check if all the poverty lines are in the df in country and region df
-        assert set(df_country["poverty_line_cents"].unique()) == set(povlines), log.fatal(
+        assert set(df_country["poverty_line_cents"].unique()) == set(POV_LINES), log.fatal(
             "Not all poverty lines are in the country file!"
         )
-        assert set(df_region["poverty_line_cents"].unique()) == set(povlines), log.fatal(
+        assert set(df_region["poverty_line_cents"].unique()) == set(POV_LINES), log.fatal(
             "Not all poverty lines are in the region file!"
         )
 
@@ -483,13 +535,13 @@ def generate_percentiles_raw():
         log.info("Checking if the set of countries and regions is the same as in PIP")
 
         # I check if the set of countries is the same in the df and in the aux table (list of countries)
-        aux_dict = pip_aux_tables(table="countries")
+        aux_dict = pip_aux_tables(wb_api, table="countries")
         assert set(df_country["country"].unique()) == set(aux_dict["countries"]["country_name"].unique()), log.fatal(
             "List of countries is not the same as the one defined in PIP!"
         )
 
         # I check if the set of regions is the same in the df and in the aux table (list of regions)
-        aux_dict = pip_aux_tables(table="regions")
+        aux_dict = pip_aux_tables(wb_api, table="regions")
         assert set(df_region["country"].unique()) == set(aux_dict["regions"]["region"].unique()), log.fatal(
             "List of regions is not the same as the one defined in PIP!"
         )
@@ -559,19 +611,13 @@ def generate_consolidated_percentiles(df):
         percentiles = range(1, 100, 1)
         df_percentiles = pd.DataFrame()
 
-        # Estimate percentiles using concurrency
-        futures = []
-        with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:
-            for p in percentiles:
-                future = executor.submit(calculate_percentile, p, df)
-                futures.append(future)
+        # Estimate percentiles
+        dfs = [calculate_percentile(p, df) for p in percentiles]
 
-        # now that all futures have been started, wait for them all
-        dfs = [f.result() for f in futures]
         df_percentiles = pd.concat(dfs, ignore_index=True)
 
         # Rename headcount to estimated_percentile and poverty_line to thr
-        df_percentiles = df_percentiles.rename(columns={"headcount": "estimated_percentile", "poverty_line": "thr"})
+        df_percentiles = df_percentiles.rename(columns={"headcount": "estimated_percentile", "poverty_line": "thr"})  # type: ignore
 
         # Sort by ppp_version, country, year, reporting_level, welfare_type and target_percentile
         df_percentiles = df_percentiles.sort_values(
@@ -617,7 +663,7 @@ def generate_consolidated_percentiles(df):
 # NOTE: Medians need to be patched first in order to get data for all country-years (there are several missing values)
 
 
-def generate_relative_poverty():
+def generate_relative_poverty(wb_api: WB_API):
     """
     Generates relative poverty indicators from query results. Uses concurrent.futures to speed up the process.
     """
@@ -628,8 +674,13 @@ def generate_relative_poverty():
         This function is structured in a way to make it work with concurrent.futures.
         It processes country data.
         """
+        if Path(
+            f"{PARENT_DIR}/pip_country_data/pip_country_{df_row['country_code']}_year_{df_row['year']}_povline_{int(round(df_row['median'] * pct))}_welfare_{df_row['welfare_type']}_rep_{df_row['reporting_level']}_fillgaps_{FILL_GAPS}_ppp_2017.csv"
+        ).is_file():
+            return
         if ~np.isnan(df_row["median"]):
             return pip_query_country(
+                wb_api,
                 popshare_or_povline="povline",
                 value=df_row["median"] * pct / 100,
                 versions=versions,
@@ -642,29 +693,28 @@ def generate_relative_poverty():
                 download="true",
             )
 
-    def concurrent_relative_function():
+    def concurrent_relative_function(df):
         """
         This is the main function to make concurrency work for country data.
         """
         # Make sure the directory exists. If not, create it
         Path(f"{PARENT_DIR}/pip_country_data").mkdir(parents=True, exist_ok=True)
-        with concurrent.futures.ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
-            for pct in [40, 50, 60]:
-                for i in range(len(df)):
-                    if Path(
-                        f"{PARENT_DIR}/pip_country_data/pip_country_{df.iloc[i]['country_code']}_year_{df.iloc[i]['year']}_povline_{int(round(df.iloc[i]['median']*pct))}_welfare_{df.iloc[i]['welfare_type']}_rep_{df.iloc[i]['reporting_level']}_fillgaps_{FILL_GAPS}_ppp_2017.csv"
-                    ).is_file():
-                        continue
-                    else:
-                        executor.submit(get_relative_data, df.iloc[i], pct, versions)
+        with ThreadPool(MAX_WORKERS) as pool:
+            tasks = [(df.iloc[i], pct, versions) for pct in [40, 50, 60] for i in range(len(df))]
+            pool.starmap(get_relative_data, tasks)
 
     def get_relative_data_region(df_row, pct, versions):
         """
         This function is structured in a way to make it work with concurrent.futures.
         It processes regional data.
         """
+        if Path(
+            f"{PARENT_DIR}/pip_region_data/pip_region_{df_row['country_code']}_year_{df_row['year']}_povline_{int(round(df_row['median']*pct))}_ppp_2017.csv"
+        ).is_file():
+            return
         if ~np.isnan(df_row["median"]):
             return pip_query_region(
+                wb_api,
                 popshare_or_povline="povline",
                 value=df_row["median"] * pct / 100,
                 versions=versions,
@@ -682,15 +732,9 @@ def generate_relative_poverty():
         """
         # Make sure the directory exists. If not, create it
         Path(f"{PARENT_DIR}/pip_region_data").mkdir(parents=True, exist_ok=True)
-        with concurrent.futures.ThreadPoolExecutor(max_workers=int(round(MAX_WORKERS / 2))) as executor:
-            for pct in [40, 50, 60]:
-                for i in range(len(df)):
-                    if Path(
-                        f"{PARENT_DIR}/pip_region_data/pip_region_{df.iloc[i]['country_code']}_year_{df.iloc[i]['year']}_povline_{int(round(df.iloc[i]['median']*pct))}_ppp_2017.csv"
-                    ).is_file():
-                        continue
-                    else:
-                        executor.submit(get_relative_data_region, df.iloc[i], pct, versions)
+        with ThreadPool(int(round(MAX_WORKERS / 2))) as pool:
+            tasks = [(df.iloc[i], pct, versions) for pct in [40, 50, 60] for i in range(len(df))]
+            pool.starmap(get_relative_data_region, tasks)
 
     def add_relative_indicators(df, country_or_region):
         """
@@ -723,6 +767,8 @@ def generate_relative_poverty():
                             # Run the main function to get the data
                             get_relative_data_region(df.iloc[i], pct, versions)
                             results = pd.read_csv(file_path)
+                    else:
+                        raise ValueError("country_or_region must be 'country' or 'region'")
 
                     headcount_ratio_value = results["headcount"].iloc[0]
                     headcount_ratio_list.append(headcount_ratio_value)
@@ -751,11 +797,12 @@ def generate_relative_poverty():
         return df
 
     # Obtain versions
-    versions = pip_versions()
+    versions = pip_versions(wb_api)
 
     # FOR COUNTRIES
     # Get data from the most common query
     df_country = pip_query_country(
+        wb_api,
         popshare_or_povline="povline",
         value=2.15,
         versions=versions,
@@ -771,7 +818,7 @@ def generate_relative_poverty():
     df_country = median_patch(df_country)
 
     # Run the main function to get the data
-    concurrent_relative_function()
+    concurrent_relative_function(df_country)
 
     # Add relative indicators from the results above
     df_country = add_relative_indicators(df=df_country, country_or_region="country")
@@ -779,6 +826,7 @@ def generate_relative_poverty():
     # FOR REGIONS
     # Get data from the most common query
     df_region = pip_query_region(
+        wb_api,
         popshare_or_povline="povline",
         value=2.15,
         versions=versions,
@@ -814,7 +862,7 @@ def generate_relative_poverty():
 # GENERATE MAIN INDICATORS FILE
 
 
-def generate_key_indicators():
+def generate_key_indicators(wb_api: WB_API):
     """
     Generate the main indicators file, from a set of poverty lines and PPP versions. Uses concurrent.futures to speed up the process.
     """
@@ -832,6 +880,7 @@ def generate_key_indicators():
         For country data.
         """
         return pip_query_country(
+            wb_api,
             popshare_or_povline="povline",
             value=povline / 100,
             versions=versions,
@@ -850,6 +899,7 @@ def generate_key_indicators():
         For regional data.
         """
         return pip_query_region(
+            wb_api,
             popshare_or_povline="povline",
             value=povline / 100,
             versions=versions,
@@ -865,14 +915,14 @@ def generate_key_indicators():
         """
         This function makes concurrency work for country data.
         """
-        with concurrent.futures.ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
-            tasks = []
-            for ppp_version, povlines in povlines_dict.items():
-                for povline in povlines:
-                    task = executor.submit(get_country_data, povline, ppp_version, versions)
-                    tasks.append(task)
+        with ThreadPool(MAX_WORKERS) as pool:
+            tasks = [
+                (povline, ppp_version, versions)
+                for ppp_version, povlines in povlines_dict.items()
+                for povline in povlines
+            ]
+            results = pool.starmap(get_country_data, tasks)
 
-        results = [task.result() for task in tasks]
         # Concatenate list of dataframes
         results = pd.concat(results, ignore_index=True)
 
@@ -882,34 +932,34 @@ def generate_key_indicators():
         """
         This function makes concurrency work for regional data.
         """
-        with concurrent.futures.ThreadPoolExecutor(max_workers=int(round(MAX_WORKERS / 2))) as executor:
-            tasks = []
-            for ppp_version, povlines in povlines_dict.items():
-                for povline in povlines:
-                    task = executor.submit(get_region_data, povline, ppp_version, versions)
-                    tasks.append(task)
+        with ThreadPool(int(round(MAX_WORKERS / 2))) as pool:
+            tasks = [
+                (povline, ppp_version, versions)
+                for ppp_version, povlines in povlines_dict.items()
+                for povline in povlines
+            ]
+            results = pool.starmap(get_region_data, tasks)
 
-        results = [task.result() for task in tasks]
         # Concatenate list of dataframes
         results = pd.concat(results, ignore_index=True)
 
         return results
 
     # Obtain latest versions of the PIP dataset
-    versions = pip_versions()
+    versions = pip_versions(wb_api)
 
     # Run the main function
     results = concurrent_function()
     results_region = concurrent_region_function()
 
     # I check if the set of countries is the same in the df and in the aux table (list of countries)
-    aux_dict = pip_aux_tables(table="countries")
+    aux_dict = pip_aux_tables(wb_api, table="countries")
     assert set(results["country"].unique()) == set(aux_dict["countries"]["country_name"].unique()), log.fatal(
         "List of countries is not the same!"
     )
 
     # I check if the set of regions is the same in the df and in the aux table (list of regions)
-    aux_dict = pip_aux_tables(table="regions")
+    aux_dict = pip_aux_tables(wb_api, table="regions")
     assert set(results_region["country"].unique()) == set(aux_dict["regions"]["region"].unique()), log.fatal(
         "List of regions is not the same!"
     )
@@ -918,7 +968,7 @@ def generate_key_indicators():
     df = pd.concat([results, results_region], ignore_index=True)
 
     # Sort ppp_version, country, year and poverty_line
-    df = df.sort_values(by=["ppp_version", "country", "year", "poverty_line"])
+    df = df.sort_values(by=["ppp_version", "country", "year", "poverty_line"])  # type: ignore
 
     # Save to csv
     df.to_csv(f"{PARENT_DIR}/pip_raw.csv", index=False)
@@ -1040,5 +1090,10 @@ def add_relative_poverty_and_decile_threholds(df, df_relative, df_percentiles):
     return df
 
 
+<<<<<<< HEAD
 # RUN THE SCRIPT
 run()
+=======
+if __name__ == "__main__":
+    run()
+>>>>>>> 7bfab7776 (improve caching)
