@@ -15,7 +15,7 @@ log = get_logger()
 PARENT_DIR = Path(__file__).parent.absolute()
 MAX_REPEATS = 10
 TIMEOUT = 500
-FILL_GAPS = "true"
+FILL_GAPS = "false"
 MAX_WORKERS = 10
 TOLERANCE_PERCENTILES = 0.5
 
