@@ -788,9 +788,6 @@ include:
   - dag/education.yml
   - dag/covid.yml
   - dag/animal_welfare.yml
-<<<<<<< HEAD
   - dag/plastic_use.yml
   - dag/statins.yml
-=======
   - dag/poverty_inequality.yml
->>>>>>> eeb220988 (feat: create dedicated dag)
