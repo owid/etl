@@ -18,7 +18,7 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load garden dataset and read its tables.
-    ds_garden = paths.load_dataset("nuclear_weapons_proliferation")
+    ds_garden = paths.load_dataset("combined")
     tb = ds_garden["nuclear_weapons_proliferation"]
     tb_counts = ds_garden["nuclear_weapons_proliferation_counts"]
 
@@ -48,5 +48,7 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new grapher dataset.
-    ds_grapher = create_dataset(dest_dir, tables=[tb, tb_counts], check_variables_metadata=True)
+    ds_grapher = create_dataset(
+        dest_dir, tables=[tb, tb_counts], check_variables_metadata=True, default_metadata=ds_garden.metadata
+    )
     ds_grapher.save()

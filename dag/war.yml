@@ -156,6 +156,11 @@ steps:
     - snapshot://war/2024-01-11/nuclear_weapons_proliferation.csv
   data://garden/war/2024-01-11/nuclear_weapons_proliferation:
     - data://meadow/war/2024-01-11/nuclear_weapons_proliferation
-    - data://garden/regions/2023-01-01/regions
-  data://grapher/war/2024-01-11/nuclear_weapons_proliferation:
+
+  # Bleek and NTI - Nuclear Weapons Proliferation.
+  data://garden/war/2024-01-11/combined:
     - data://garden/war/2024-01-11/nuclear_weapons_proliferation
+    - data://garden/war/2024-01-11/nuclear_threat_initiative_overview
+    - data://garden/regions/2023-01-01/regions
+  data://grapher/war/2024-01-11/combined:
+    - data://garden/war/2024-01-11/combined

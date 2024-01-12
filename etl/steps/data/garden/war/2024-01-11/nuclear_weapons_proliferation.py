@@ -11,12 +11,6 @@ paths = PathFinder(__file__)
 # Latest year to be assumed for the content of the data, when intervals are open, e.g. "2000-", or "1980-".
 LATEST_YEAR = 2017
 
-# Labels to be used on the status column.
-LABEL_DOES_NOT_CONSIDER = "Does not consider"
-LABEL_CONSIDERS = "Considers"
-LABEL_PURSUES = "Pursues"
-LABEL_POSSESSES = "Possesses"
-
 
 def extract_year_ranges(years_ranges):
     # Extract years from a string that contains a list of years and year ranges.
@@ -94,19 +88,19 @@ def add_all_years(tb: Table) -> Table:
 def add_status_column(tb: Table) -> Table:
     tb = tb.copy()
 
-    tb["status"] = LABEL_DOES_NOT_CONSIDER
+    tb["status"] = 0
     for i, row in tb.iterrows():
         year = int(row["year"])
         if year in row["acquire"]:
-            tb.loc[i, "status"] = LABEL_POSSESSES
+            tb.loc[i, "status"] = 3
             # A country that possesses nuclear weapons must be coded as pursuing and exploring nuclear weapons.
             assert (year in row["pursue"]) and (year in row["explore"])
         elif year in row["pursue"]:
-            tb.loc[i, "status"] = LABEL_PURSUES
+            tb.loc[i, "status"] = 2
             # A country that pursues nuclear weapons must be coded as exploring nuclear weapons, but not possessing.
             assert (year in row["explore"]) and (year not in row["acquire"])
         elif year in row["explore"]:
-            tb.loc[i, "status"] = LABEL_CONSIDERS
+            tb.loc[i, "status"] = 1
             # A country that considers nuclear weapons must not be coded as possessing or pursuing nuclear weapons.
             assert (year not in row["pursue"]) and (year not in row["acquire"])
 
@@ -124,10 +118,6 @@ def run(dest_dir: str) -> None:
     ds_meadow = paths.load_dataset("nuclear_weapons_proliferation")
     tb = ds_meadow["nuclear_weapons_proliferation"].reset_index()
 
-    # Load regions dataset and read its main table.
-    ds_regions = paths.load_dataset("regions")
-    tb_regions = ds_regions["regions"]
-
     #
     # Process data.
     #
@@ -137,9 +127,6 @@ def run(dest_dir: str) -> None:
     # Trace back nuclear weapons status for current countries (Germany, Serbia), and remove historical regions
     # (West Germany, Yugoslavia).
     tb = correct_historical_regions(tb=tb)
-
-    # Add rows for countries that are not in the data (i.e. countries that do not even consider nuclear weapons).
-    tb = add_all_non_nuclear_countries(tb=tb, tb_regions=tb_regions)
 
     # Add rows for years (years were given as intervals, e.g. "1964-66,72-75,80-").
     tb = add_all_years(tb=tb)
@@ -153,37 +140,9 @@ def run(dest_dir: str) -> None:
     # Set an appropriate index and sort conveniently.
     tb = tb.set_index(["country", "year"], verify_integrity=True).sort_index().sort_index(axis=1)
 
-    # Create a new table with the total count of countries in each status.
-    tb_counts = (
-        tb.reset_index()
-        .groupby(["status", "year"], as_index=False)
-        .count()
-        .pivot(index="year", columns="status", join_column_levels_with="_")
-    )
-
-    # Rename columns conveniently.
-    tb_counts = tb_counts.underscore().rename(
-        columns={
-            "country_does_not_consider": "n_countries_not_considering",
-            "country_considers": "n_countries_considering",
-            "country_pursues": "n_countries_pursuing",
-            "country_possesses": "n_countries_possessing",
-        },
-        errors="raise",
-    )
-
-    # Fill missing values with zeros and set an appropriate type.
-    tb_counts = tb_counts.fillna(0).astype(int)
-
-    # Set an appropriate index and sort conveniently.
-    tb_counts = tb_counts.set_index(["year"], verify_integrity=True).sort_index().sort_index(axis=1)
-
-    # Rename table conveniently.
-    tb_counts.metadata.short_name = "nuclear_weapons_proliferation_counts"
-
     #
     # Save outputs.
     #
     # Create a new garden dataset.
-    ds_garden = create_dataset(dest_dir, tables=[tb, tb_counts], check_variables_metadata=True)
+    ds_garden = create_dataset(dest_dir, tables=[tb], check_variables_metadata=True)
     ds_garden.save()
