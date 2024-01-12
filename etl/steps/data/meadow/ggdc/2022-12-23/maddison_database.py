@@ -1,74 +1,63 @@
-"""
-This is the code to integrate three sheets of the Maddison Database (GDP, GDP pc and population) into one dataset on meadow.
-This dataset is only used to estimate growth of global GDP before 1820, so only global values are kept.
+"""Load a snapshot and create a meadow dataset."""
 
-"""
+from etl.helpers import PathFinder, create_dataset
 
-import pandas as pd
-from owid.catalog import Dataset, Table
-from structlog import get_logger
-
-from etl.helpers import PathFinder
-from etl.snapshot import Snapshot
-from etl.steps.data.converters import convert_snapshot_metadata
-
-SNAPSHOT_VERSION = "2022-12-23"
-MEADOW_VERSION = SNAPSHOT_VERSION
-
-log = get_logger()
-
-# naming conventions
-N = PathFinder(__file__)
+# Get paths and naming conventions for current step.
+paths = PathFinder(__file__)
 
 
 def run(dest_dir: str) -> None:
-    log.info("maddison_database.start")
+    #
+    # Load inputs.
+    #
+    # Retrieve snapshot.
+    snap = paths.load_snapshot("maddison_database.xlsx")
 
-    # retrieve snapshot
-    snap = Snapshot(f"ggdc/{SNAPSHOT_VERSION}/maddison_database.xlsx")
-    df_pop = pd.read_excel(snap.path, sheet_name="Population", skiprows=2)
-    df_gdp = pd.read_excel(snap.path, sheet_name="GDP", skiprows=2)
-    df_gdppc = pd.read_excel(snap.path, sheet_name="PerCapita GDP", skiprows=2)
+    # Load data from snapshot.
+    tb_pop = snap.read(sheet_name="Population", skiprows=2)
+    tb_gdp = snap.read(sheet_name="GDP", skiprows=2)
+    tb_gdppc = snap.read(sheet_name="PerCapita GDP", skiprows=2)
+
+    #
+    # Process data.
 
     # As this is a bespoke dataset I am only keeping the World data for now
     # Population sheet
-    df_pop = df_pop.rename(columns={"Unnamed: 0": "year", "World Total": "population"})
-    df_pop = df_pop[["year", "population"]]
-    df_pop = df_pop.dropna().reset_index(drop=True)
-    df_pop["year"] = df_pop["year"].astype(int)
+    tb_pop = tb_pop.rename(columns={"Unnamed: 0": "year", "World Total": "population"})
+    tb_pop = tb_pop[["year", "population"]]
+    tb_pop = tb_pop.dropna().reset_index(drop=True)
+    tb_pop["year"] = tb_pop["year"].astype(int)
 
     # GDP sheet
-    df_gdp = df_gdp.rename(columns={"Unnamed: 0": "year", "World Total": "gdp"})
-    df_gdp = df_gdp[["year", "gdp"]]
-    df_gdp = df_gdp.dropna().reset_index(drop=True)
-    df_gdp["year"] = df_gdp["year"].astype(int)
+    tb_gdp = tb_gdp.rename(columns={"Unnamed: 0": "year", "World Total": "gdp"})
+    tb_gdp = tb_gdp[["year", "gdp"]]
+    tb_gdp = tb_gdp.dropna().reset_index(drop=True)
+    tb_gdp["year"] = tb_gdp["year"].astype(int)
 
     # GDP per capita sheet
-    df_gdppc = df_gdppc.rename(columns={"Unnamed: 0": "year", "World Total": "gdp_per_capita"})
-    df_gdppc = df_gdppc[["year", "gdp_per_capita"]]
-    df_gdppc = df_gdppc.dropna().reset_index(drop=True)
-    df_gdppc["year"] = df_gdppc["year"].astype(int)
+    tb_gdppc = tb_gdppc.rename(columns={"Unnamed: 0": "year", "World Total": "gdp_per_capita"})
+    tb_gdppc = tb_gdppc[["year", "gdp_per_capita"]]
+    tb_gdppc = tb_gdppc.dropna().reset_index(drop=True)
+    tb_gdppc["year"] = tb_gdppc["year"].astype(int)
 
-    # Merge all these sheets
-    df = pd.merge(df_gdp, df_gdppc, on="year", how="outer", sort=True)
-    df = pd.merge(df, df_pop, on="year", how="outer", sort=True)
+    # Merge all these tables
+    tb = tb_gdp.merge(tb_gdppc, on="year", how="outer", sort=True)
+    tb = tb.merge(tb_pop, on="year", how="outer", sort=True)
 
     # Adjust country and population columns and reorder
-    df["country"] = "World"
-    df["population"] = df["population"].astype(int)
-    df = df[["year", "country", "gdp", "gdp_per_capita", "population"]]
+    tb["country"] = "World"
+    tb["population"] = tb["population"].astype(int)
+    tb = tb[["year", "country", "gdp", "gdp_per_capita", "population"]]
 
-    # create new dataset and reuse walden metadata
-    ds = Dataset.create_empty(dest_dir, metadata=convert_snapshot_metadata(snap.metadata))
-    ds.metadata.version = MEADOW_VERSION
+    #
+    # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
+    tb = tb.underscore().set_index(["country", "year"], verify_integrity=True).sort_index()
 
-    # # create table with metadata from dataframe and underscore all columns
-    tb = Table(df, short_name=snap.metadata.short_name, underscore=True)
+    #
+    # Save outputs.
+    #
+    # Create a new meadow dataset with the same metadata as the snapshot.
+    ds_meadow = create_dataset(dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=snap.metadata)
 
-    # add table to a dataset
-    ds.add(tb)
-
-    # finally save the dataset
-    ds.save()
-
-    log.info("maddison_database.end")
+    # Save changes in the new meadow dataset.
+    ds_meadow.save()
