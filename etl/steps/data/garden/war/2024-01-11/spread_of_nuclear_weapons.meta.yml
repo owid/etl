@@ -18,21 +18,10 @@ definitions:
 
 dataset:
   update_period_days: 365
-  title: Nuclear Weapons Proliferation
 
 tables:
-  nuclear_weapons_proliferation:
+  spread_of_nuclear_weapons:
     variables:
       status:
         title: Nuclear weapons status
         description_short: Whether a country considers, pursues, or possesses nuclear weapons.
-  nuclear_weapons_proliferation_counts:
-    variables:
-      n_countries_not_considering:
-        title: Number of countries not considering nuclear weapons
-      n_countries_considering:
-        title: Number of countries considering nuclear weapons
-      n_countries_pursuing:
-        title: Number of countries pursuing nuclear weapons
-      n_countries_possessing:
-        title: Number of countries possessing nuclear weapons

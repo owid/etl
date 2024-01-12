@@ -151,16 +151,16 @@ steps:
   data://garden/war/2024-01-11/nuclear_threat_initiative_overview:
     - data://meadow/war/2024-01-11/nuclear_threat_initiative_overview
 
-  # Bleek - When Did (and Didn't) States Proliferate?
-  data://meadow/war/2024-01-11/nuclear_weapons_proliferation:
-    - snapshot://war/2024-01-11/nuclear_weapons_proliferation.csv
-  data://garden/war/2024-01-11/nuclear_weapons_proliferation:
-    - data://meadow/war/2024-01-11/nuclear_weapons_proliferation
+  # Bleek - Spread of Nuclear Weapons.
+  data://meadow/war/2024-01-11/spread_of_nuclear_weapons:
+    - snapshot://war/2024-01-11/spread_of_nuclear_weapons.csv
+  data://garden/war/2024-01-11/spread_of_nuclear_weapons:
+    - data://meadow/war/2024-01-11/spread_of_nuclear_weapons
 
-  # Bleek and NTI - Nuclear Weapons Proliferation.
-  data://garden/war/2024-01-11/combined:
-    - data://garden/war/2024-01-11/nuclear_weapons_proliferation
+  # Bleek and Nuclear Threat Initiative - Nuclear Weapons Proliferation.
+  data://garden/war/2024-01-11/nuclear_weapons_proliferation:
+    - data://garden/war/2024-01-11/spread_of_nuclear_weapons
     - data://garden/war/2024-01-11/nuclear_threat_initiative_overview
     - data://garden/regions/2023-01-01/regions
-  data://grapher/war/2024-01-11/combined:
-    - data://garden/war/2024-01-11/combined
+  data://grapher/war/2024-01-11/nuclear_weapons_proliferation:
+    - data://garden/war/2024-01-11/nuclear_weapons_proliferation

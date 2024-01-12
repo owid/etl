@@ -18,7 +18,7 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load garden dataset and read its tables.
-    ds_garden = paths.load_dataset("combined")
+    ds_garden = paths.load_dataset("nuclear_weapons_proliferation")
     tb = ds_garden["nuclear_weapons_proliferation"]
     tb_counts = ds_garden["nuclear_weapons_proliferation_counts"]
 
