@@ -21,7 +21,6 @@ log = get_logger()
 memory = Memory(CACHE_DIR, verbose=0)
 
 # Basic parameters to use in the functions
-PARENT_DIR = Path(__file__).parent.absolute()
 MAX_REPEATS = 10
 TIMEOUT = 500
 FILL_GAPS = "false"
@@ -151,13 +150,12 @@ def _fetch_csv(url: str) -> pd.DataFrame:
 
     # try to get it from cache
     try:
-        log.info("fetch_csv.try_cache", url=url)
         obj = r2.get_object(Bucket=r2_bucket, Key=r2_key)
         df = pd.read_csv(io.StringIO(obj["Body"].read().decode("utf-8")))
-        log.info("fetch_csv.success", url=url)
+        log.info("fetch_csv.cache_hit", url=url)
         return df
     except ClientError:
-        log.info("fetch_csv.cache_miss", url=url)
+        pass
 
     log.info("fetch_csv.start", url=url)
 
@@ -315,10 +313,10 @@ def pip_query_country(
 
     if download == "true":
         # make sure the directory exists. If not, create it
-        Path(f"{PARENT_DIR}/pip_country_data").mkdir(parents=True, exist_ok=True)
+        Path(f"{CACHE_DIR}/pip_country_data").mkdir(parents=True, exist_ok=True)
         # Save to csv
         df.to_csv(
-            f"{PARENT_DIR}/pip_country_data/pip_country_{country_code}_year_{year}_{popshare_or_povline}_{int(round(value*100))}_welfare_{welfare_type}_rep_{reporting_level}_fillgaps_{fill_gaps}_ppp_{ppp_version}.csv",
+            f"{CACHE_DIR}/pip_country_data/pip_country_{country_code}_year_{year}_{popshare_or_povline}_{int(round(value*100))}_welfare_{welfare_type}_rep_{reporting_level}_fillgaps_{fill_gaps}_ppp_{ppp_version}.csv",
             index=False,
         )
 
@@ -375,10 +373,10 @@ def pip_query_region(
 
     if download == "true":
         # make sure the directory exists. If not, create it
-        Path(f"{PARENT_DIR}/pip_region_data").mkdir(parents=True, exist_ok=True)
+        Path(f"{CACHE_DIR}/pip_region_data").mkdir(parents=True, exist_ok=True)
         # Save to csv
         df.to_csv(
-            f"{PARENT_DIR}/pip_region_data/pip_region_{country_code}_year_{year}_{popshare_or_povline}_{int(round(value*100))}_ppp_{ppp_version}.csv",
+            f"{CACHE_DIR}/pip_region_data/pip_region_{country_code}_year_{year}_{popshare_or_povline}_{int(round(value*100))}_ppp_{ppp_version}.csv",
             index=False,
         )
 
@@ -405,7 +403,7 @@ def generate_percentiles_raw(wb_api: WB_API):
 
     def get_percentiles_data(povline, versions, ppp_version):
         if Path(
-            f"{PARENT_DIR}/pip_country_data/pip_country_all_year_all_povline_{povline}_welfare_all_rep_all_fillgaps_{FILL_GAPS}_ppp_{ppp_version}.csv"
+            f"{CACHE_DIR}/pip_country_data/pip_country_all_year_all_povline_{povline}_welfare_all_rep_all_fillgaps_{FILL_GAPS}_ppp_{ppp_version}.csv"
         ).is_file():
             return
 
@@ -425,7 +423,7 @@ def generate_percentiles_raw(wb_api: WB_API):
 
     def concurrent_percentiles_function():
         # Make sure the directory exists. If not, create it
-        Path(f"{PARENT_DIR}/pip_country_data").mkdir(parents=True, exist_ok=True)
+        Path(f"{CACHE_DIR}/pip_country_data").mkdir(parents=True, exist_ok=True)
 
         with ThreadPool(MAX_WORKERS) as pool:
             tasks = [(povline, versions, ppp_version) for ppp_version in PPP_VERSIONS for povline in POV_LINES]
@@ -433,7 +431,7 @@ def generate_percentiles_raw(wb_api: WB_API):
 
     def get_percentiles_data_region(povline, versions, ppp_version):
         if Path(
-            f"{PARENT_DIR}/pip_region_data/pip_region_all_year_all_povline_{povline}_ppp_{ppp_version}.csv"
+            f"{CACHE_DIR}/pip_region_data/pip_region_all_year_all_povline_{povline}_ppp_{ppp_version}.csv"
         ).is_file():
             return
         return pip_query_region(
@@ -451,14 +449,14 @@ def generate_percentiles_raw(wb_api: WB_API):
 
     def concurrent_percentiles_region_function():
         # Make sure the directory exists. If not, create it
-        Path(f"{PARENT_DIR}/pip_region_data").mkdir(parents=True, exist_ok=True)
+        Path(f"{CACHE_DIR}/pip_region_data").mkdir(parents=True, exist_ok=True)
         with ThreadPool(MAX_WORKERS) as pool:
             tasks = [(povline, versions, ppp_version) for ppp_version in PPP_VERSIONS for povline in POV_LINES]
             pool.starmap(get_percentiles_data_region, tasks)
 
     def get_query_country(povline, ppp_version):
         # Here I check if the file exists even after the original extraction. If it does, I read it. If not, I start the queries again.
-        file_path_country = f"{PARENT_DIR}/pip_country_data/pip_country_all_year_all_povline_{povline}_welfare_all_rep_all_fillgaps_{FILL_GAPS}_ppp_{ppp_version}.csv"
+        file_path_country = f"{CACHE_DIR}/pip_country_data/pip_country_all_year_all_povline_{povline}_welfare_all_rep_all_fillgaps_{FILL_GAPS}_ppp_{ppp_version}.csv"
         if Path(file_path_country).is_file():
             df_query_country = pd.read_csv(file_path_country)
         else:
@@ -472,7 +470,7 @@ def generate_percentiles_raw(wb_api: WB_API):
     def get_query_region(povline, ppp_version):
         # Here I check if the file exists even after the original extraction. If it does, I read it. If not, I start the queries again.
         file_path_region = (
-            f"{PARENT_DIR}/pip_region_data/pip_region_all_year_all_povline_{povline}_ppp_{ppp_version}.csv"
+            f"{CACHE_DIR}/pip_region_data/pip_region_all_year_all_povline_{povline}_ppp_{ppp_version}.csv"
         )
         if Path(file_path_region).is_file():
             df_query_region = pd.read_csv(file_path_region)
@@ -484,7 +482,7 @@ def generate_percentiles_raw(wb_api: WB_API):
 
         return df_query_region
 
-    file_path_percentiles = f"{PARENT_DIR}/pip_percentiles.csv"
+    file_path_percentiles = f"{CACHE_DIR}/pip_percentiles.csv"
     if Path(file_path_percentiles).is_file():
         log.info("Percentiles file already exists. No need to create raw files.")
         return pd.read_csv(file_path_percentiles)
@@ -600,7 +598,7 @@ def generate_consolidated_percentiles(df):
     """
     start_time = time.time()
 
-    path_file_percentiles = f"{PARENT_DIR}/pip_percentiles.csv"
+    path_file_percentiles = f"{CACHE_DIR}/pip_percentiles.csv"
 
     if Path(path_file_percentiles).is_file():
         log.info("Percentiles file already exists. No need to consolidate.")
@@ -626,7 +624,7 @@ def generate_consolidated_percentiles(df):
         )
 
         # Save to csv
-        df_percentiles.to_csv(f"{PARENT_DIR}/pip_percentiles.csv", index=False)
+        df_percentiles.to_csv(f"{CACHE_DIR}/pip_percentiles.csv", index=False)
 
     # Check if every country, year, reporting level, welfare type and ppp version has each percentiles from 1 to 99
     assert (
@@ -674,7 +672,7 @@ def generate_relative_poverty(wb_api: WB_API):
         It processes country data.
         """
         if Path(
-            f"{PARENT_DIR}/pip_country_data/pip_country_{df_row['country_code']}_year_{df_row['year']}_povline_{int(round(df_row['median'] * pct))}_welfare_{df_row['welfare_type']}_rep_{df_row['reporting_level']}_fillgaps_{FILL_GAPS}_ppp_2017.csv"
+            f"{CACHE_DIR}/pip_country_data/pip_country_{df_row['country_code']}_year_{df_row['year']}_povline_{int(round(df_row['median'] * pct))}_welfare_{df_row['welfare_type']}_rep_{df_row['reporting_level']}_fillgaps_{FILL_GAPS}_ppp_2017.csv"
         ).is_file():
             return
         if ~np.isnan(df_row["median"]):
@@ -697,7 +695,7 @@ def generate_relative_poverty(wb_api: WB_API):
         This is the main function to make concurrency work for country data.
         """
         # Make sure the directory exists. If not, create it
-        Path(f"{PARENT_DIR}/pip_country_data").mkdir(parents=True, exist_ok=True)
+        Path(f"{CACHE_DIR}/pip_country_data").mkdir(parents=True, exist_ok=True)
         with ThreadPool(MAX_WORKERS) as pool:
             tasks = [(df.iloc[i], pct, versions) for pct in [40, 50, 60] for i in range(len(df))]
             pool.starmap(get_relative_data, tasks)
@@ -708,7 +706,7 @@ def generate_relative_poverty(wb_api: WB_API):
         It processes regional data.
         """
         if Path(
-            f"{PARENT_DIR}/pip_region_data/pip_region_{df_row['country_code']}_year_{df_row['year']}_povline_{int(round(df_row['median']*pct))}_ppp_2017.csv"
+            f"{CACHE_DIR}/pip_region_data/pip_region_{df_row['country_code']}_year_{df_row['year']}_povline_{int(round(df_row['median']*pct))}_ppp_2017.csv"
         ).is_file():
             return
         if ~np.isnan(df_row["median"]):
@@ -730,7 +728,7 @@ def generate_relative_poverty(wb_api: WB_API):
         This is the main function to make concurrency work for regional data.
         """
         # Make sure the directory exists. If not, create it
-        Path(f"{PARENT_DIR}/pip_region_data").mkdir(parents=True, exist_ok=True)
+        Path(f"{CACHE_DIR}/pip_region_data").mkdir(parents=True, exist_ok=True)
         with ThreadPool(int(round(MAX_WORKERS / 2))) as pool:
             tasks = [(df.iloc[i], pct, versions) for pct in [40, 50, 60] for i in range(len(df))]
             pool.starmap(get_relative_data_region, tasks)
@@ -749,7 +747,7 @@ def generate_relative_poverty(wb_api: WB_API):
                 if ~np.isnan(df["median"].iloc[i]):
                     if country_or_region == "country":
                         # Here I check if the file exists even after the original extraction. If it does, I read it. If not, I start the queries again.
-                        file_path = f"{PARENT_DIR}/pip_country_data/pip_country_{df.iloc[i]['country_code']}_year_{df.iloc[i]['year']}_povline_{int(round(df.iloc[i]['median']*pct))}_welfare_{df.iloc[i]['welfare_type']}_rep_{df.iloc[i]['reporting_level']}_fillgaps_{FILL_GAPS}_ppp_2017.csv"
+                        file_path = f"{CACHE_DIR}/pip_country_data/pip_country_{df.iloc[i]['country_code']}_year_{df.iloc[i]['year']}_povline_{int(round(df.iloc[i]['median']*pct))}_welfare_{df.iloc[i]['welfare_type']}_rep_{df.iloc[i]['reporting_level']}_fillgaps_{FILL_GAPS}_ppp_2017.csv"
                         if Path(file_path).is_file():
                             results = pd.read_csv(file_path)
                         else:
@@ -759,7 +757,7 @@ def generate_relative_poverty(wb_api: WB_API):
 
                     elif country_or_region == "region":
                         # Here I check if the file exists even after the original extraction. If it does, I read it. If not, I start the queries again.
-                        file_path = f"{PARENT_DIR}/pip_region_data/pip_region_{df.iloc[i]['country_code']}_year_{df.iloc[i]['year']}_povline_{int(round(df.iloc[i]['median']*pct))}_ppp_2017.csv"
+                        file_path = f"{CACHE_DIR}/pip_region_data/pip_region_{df.iloc[i]['country_code']}_year_{df.iloc[i]['year']}_povline_{int(round(df.iloc[i]['median']*pct))}_ppp_2017.csv"
                         if Path(file_path).is_file():
                             results = pd.read_csv(file_path)
                         else:
@@ -849,7 +847,7 @@ def generate_relative_poverty(wb_api: WB_API):
     df = pd.concat([df_country, df_region], ignore_index=True)
 
     # Save to csv
-    df.to_csv(f"{PARENT_DIR}/pip_relative.csv", index=False)
+    df.to_csv(f"{CACHE_DIR}/pip_relative.csv", index=False)
 
     end_time = time.time()
     elapsed_time = round(end_time - start_time, 2)
@@ -970,7 +968,7 @@ def generate_key_indicators(wb_api: WB_API):
     df = df.sort_values(by=["ppp_version", "country", "year", "poverty_line"])  # type: ignore
 
     # Save to csv
-    df.to_csv(f"{PARENT_DIR}/pip_raw.csv", index=False)
+    df.to_csv(f"{CACHE_DIR}/pip_raw.csv", index=False)
 
     end_time = time.time()
     elapsed_time = round(end_time - start_time, 2)
@@ -986,7 +984,7 @@ def median_patch(df):
     """
 
     # Read percentile file
-    df_percentiles = pd.read_csv(f"{PARENT_DIR}/pip_percentiles.csv")
+    df_percentiles = pd.read_csv(f"{CACHE_DIR}/pip_percentiles.csv")
 
     # In df_percentiles, keep only the rows with target_percentile = 50
     df_percentiles = df_percentiles[df_percentiles["target_percentile"] == 50].reset_index()
@@ -1082,7 +1080,7 @@ def add_relative_poverty_and_decile_threholds(df, df_relative, df_percentiles):
     )
 
     # Save key indicators file
-    df.to_csv(f"{PARENT_DIR}/world_bank_pip.csv", index=False)
+    df.to_csv(f"{CACHE_DIR}/world_bank_pip.csv", index=False)
 
     log.info("Relative poverty indicators and decile thresholds added. Key indicators file done :)")
 

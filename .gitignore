@@ -46,6 +46,3 @@ site/
 .sanity-check
 
 .wizard
-
-# PIP specific files
-snapshots/wb/2023-08-14/pip_country_data/
