@@ -145,7 +145,7 @@ class WB_API:
 
 @memory.cache
 def _fetch_csv(url: str) -> pd.DataFrame:
-    r2 = connect_s3_cached(r2=True)
+    r2 = connect_s3_cached()
     r2_bucket = "owid-private"
     r2_key = "cache/pip_api/" + checksum_str(url)
 

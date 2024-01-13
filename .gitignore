@@ -26,6 +26,7 @@ pyrightconfig.json
 ign.*
 .idea
 examples/data/*
+.cache
 
 playground*
 playground.ipynb
@@ -45,3 +46,6 @@ site/
 .sanity-check
 
 .wizard
+
+# PIP specific files
+snapshots/wb/2023-08-14/pip_country_data/
