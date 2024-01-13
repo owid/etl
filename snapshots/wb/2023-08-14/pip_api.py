@@ -71,8 +71,10 @@ PPP_VERSIONS = [2011, 2017]
 POV_LINES = poverty_lines()
 
 # DEBUGGING
-PPP_VERSIONS = [2011]
-POV_LINES = [1, 1000, 25000, 50000]
+# PPP_VERSIONS = [2011]
+# POV_LINES = [1, 1000, 25000, 50000]
+PPP_VERSIONS = [2017]
+POV_LINES = poverty_lines()
 
 
 @click.command()
