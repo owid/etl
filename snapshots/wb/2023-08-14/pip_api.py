@@ -221,6 +221,18 @@ def _fetch_csv(url: str) -> pd.DataFrame:
     raise AssertionError(f"Repeated {repeat} times, can't extract data for url {url}")
 
 
+@memory.cache
+def _fetch_percentiles(version: int) -> pd.DataFrame:
+    # These URLs were copied from https://datacatalog.worldbank.org/search/dataset/0063646/_poverty_and_inequality_platform_pip_percentiles
+    if version == 2011:
+        url = "https://datacatalogfiles.worldbank.org/ddh-published/0063646/DR0090357/world_100bin.csv"
+    elif version == 2017:
+        url = "https://datacatalogfiles.worldbank.org/ddh-published/0063646/DR0090251/world_100bin.csv"
+    else:
+        raise ValueError(f"Version {version} is not supported")
+    return pd.read_csv(url)
+
+
 ############################################################################################################
 # FUNCTIONS
 
