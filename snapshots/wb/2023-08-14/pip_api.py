@@ -35,23 +35,54 @@ LIVE_API = 1
 
 
 # Constants
-def poverty_lines():
+def poverty_lines_countries():
     # Define poverty lines and their increase
-    under_5_dollars = list(range(1, 500, 1))
-    between_5_and_10_dollars = list(range(500, 1000, 1))
-    between_10_and_20_dollars = list(range(1000, 2000, 2))
-    between_20_and_30_dollars = list(range(2000, 3000, 2))
-    between_30_and_55_dollars = list(range(3000, 5500, 5))
-    between_55_and_80_dollars = list(range(5500, 8000, 5))
-    between_80_and_100_dollars = list(range(8000, 10000, 5))
-    between_100_and_150_dollars = list(range(10000, 15000, 10))
-    between_150_and_175_dollars = list(range(15000, 17500, 10))
-    between_175_and_250_dollars = list(range(17500, 25000, 20))
-    between_250_and_500_dollars = list(range(25000, 50000, 50))
+
+    under_2_dollars = list(range(0, 200, 1))
+    between_2_and_5_dollars = list(range(200, 500, 2))
+    between_5_and_10_dollars = list(range(500, 1000, 5))
+    between_10_and_20_dollars = list(range(1000, 2000, 10))
+    between_20_and_30_dollars = list(range(2000, 3000, 10))
+    between_30_and_55_dollars = list(range(3000, 5500, 10))
+    between_55_and_80_dollars = list(range(5500, 8000, 10))
 
     # povlines is all these lists together
     povlines = (
-        under_5_dollars
+        under_2_dollars
+        + between_2_and_5_dollars
+        + between_5_and_10_dollars
+        + between_10_and_20_dollars
+        + between_20_and_30_dollars
+        + between_30_and_55_dollars
+        + between_55_and_80_dollars
+    )
+
+    # Remove 0 from the list
+    povlines.remove(0)
+
+    return povlines
+
+
+def poverty_lines_regions():
+    # Define poverty lines and their increase
+
+    under_2_dollars = list(range(0, 200, 1))
+    between_2_and_5_dollars = list(range(200, 500, 2))
+    between_5_and_10_dollars = list(range(500, 1000, 5))
+    between_10_and_20_dollars = list(range(1000, 2000, 10))
+    between_20_and_30_dollars = list(range(2000, 3000, 10))
+    between_30_and_55_dollars = list(range(3000, 5500, 10))
+    between_55_and_80_dollars = list(range(5500, 8000, 10))
+    between_80_and_100_dollars = list(range(8000, 10000, 10))
+    between_100_and_150_dollars = list(range(10000, 15000, 10))
+    between_150_and_175_dollars = list(range(15000, 17500, 10))
+    between_175_and_250_dollars = list(range(17500, 25000, 20))
+    between_250_and_300_dollars = list(range(25000, 30000, 50))
+
+    # povlines is all these lists together
+    povlines = (
+        under_2_dollars
+        + between_2_and_5_dollars
         + between_5_and_10_dollars
         + between_10_and_20_dollars
         + between_20_and_30_dollars
@@ -61,20 +92,25 @@ def poverty_lines():
         + between_100_and_150_dollars
         + between_150_and_175_dollars
         + between_175_and_250_dollars
-        + between_250_and_500_dollars
+        + between_250_and_300_dollars
     )
+
+    # Remove 0 from the list
+    povlines.remove(0)
 
     return povlines
 
 
 PPP_VERSIONS = [2011, 2017]
-POV_LINES = poverty_lines()
+POV_LINES_COUNTRIES = poverty_lines_countries()
+POV_LINES_REGIONS = poverty_lines_regions()
 
 # DEBUGGING
 # PPP_VERSIONS = [2011]
 # POV_LINES = [1, 1000, 25000, 50000]
 PPP_VERSIONS = [2017]
-POV_LINES = poverty_lines()
+POV_LINES_COUNTRIES = poverty_lines_countries()
+POV_LINES_REGIONS = poverty_lines_regions()
 
 
 @click.command()
@@ -428,7 +464,9 @@ def generate_percentiles_raw(wb_api: WB_API):
         Path(f"{CACHE_DIR}/pip_country_data").mkdir(parents=True, exist_ok=True)
 
         with ThreadPool(MAX_WORKERS) as pool:
-            tasks = [(povline, versions, ppp_version) for ppp_version in PPP_VERSIONS for povline in POV_LINES]
+            tasks = [
+                (povline, versions, ppp_version) for ppp_version in PPP_VERSIONS for povline in POV_LINES_COUNTRIES
+            ]
             pool.starmap(get_percentiles_data, tasks)
 
     def get_percentiles_data_region(povline, versions, ppp_version):
@@ -453,7 +491,7 @@ def generate_percentiles_raw(wb_api: WB_API):
         # Make sure the directory exists. If not, create it
         Path(f"{CACHE_DIR}/pip_region_data").mkdir(parents=True, exist_ok=True)
         with ThreadPool(MAX_WORKERS) as pool:
-            tasks = [(povline, versions, ppp_version) for ppp_version in PPP_VERSIONS for povline in POV_LINES]
+            tasks = [(povline, versions, ppp_version) for ppp_version in PPP_VERSIONS for povline in POV_LINES_REGIONS]
             pool.starmap(get_percentiles_data_region, tasks)
 
     def get_query_country(povline, ppp_version):
@@ -502,14 +540,14 @@ def generate_percentiles_raw(wb_api: WB_API):
         log.info("Now we are concatenating the files")
 
         with ThreadPool(MAX_WORKERS) as pool:
-            tasks = [(povline, ppp_version) for ppp_version in PPP_VERSIONS for povline in POV_LINES]
+            tasks = [(povline, ppp_version) for ppp_version in PPP_VERSIONS for povline in POV_LINES_COUNTRIES]
             dfs = pool.starmap(get_query_country, tasks)
 
         df_country = pd.concat(dfs, ignore_index=True)
         log.info("Country files concatenated")
 
         with ThreadPool(MAX_WORKERS) as pool:
-            tasks = [(povline, ppp_version) for ppp_version in PPP_VERSIONS for povline in POV_LINES]
+            tasks = [(povline, ppp_version) for ppp_version in PPP_VERSIONS for povline in POV_LINES_REGIONS]
             dfs = pool.starmap(get_query_region, tasks)
 
         df_region = pd.concat(dfs, ignore_index=True)
@@ -522,10 +560,10 @@ def generate_percentiles_raw(wb_api: WB_API):
         log.info("Checking if all the poverty lines are in the concatenated files")
 
         # Check if all the poverty lines are in the df in country and region df
-        assert set(df_country["poverty_line_cents"].unique()) == set(POV_LINES), log.fatal(
+        assert set(df_country["poverty_line_cents"].unique()) == set(POV_LINES_COUNTRIES), log.fatal(
             "Not all poverty lines are in the country file!"
         )
-        assert set(df_region["poverty_line_cents"].unique()) == set(POV_LINES), log.fatal(
+        assert set(df_region["poverty_line_cents"].unique()) == set(POV_LINES_REGIONS), log.fatal(
             "Not all poverty lines are in the region file!"
         )
 
