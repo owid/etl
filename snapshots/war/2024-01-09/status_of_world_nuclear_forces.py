@@ -1,6 +1,6 @@
 """Script to create a snapshot of dataset.
 
-The data needs to be manually extracted from the website.
+The data is directly extracted from the website.
 
 """
 
