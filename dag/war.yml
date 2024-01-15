@@ -154,6 +154,26 @@ steps:
   data://grapher/war/2024-01-09/status_of_world_nuclear_forces:
     - data://garden/war/2024-01-09/status_of_world_nuclear_forces
 
+  # Nuclear Threat Initiative - Overview.
+  data://meadow/war/2024-01-11/nuclear_threat_initiative_overview:
+    - snapshot://war/2024-01-11/nuclear_threat_initiative_overview.csv
+  data://garden/war/2024-01-11/nuclear_threat_initiative_overview:
+    - data://meadow/war/2024-01-11/nuclear_threat_initiative_overview
+
+  # Bleek - Spread of Nuclear Weapons.
+  data://meadow/war/2024-01-11/spread_of_nuclear_weapons:
+    - snapshot://war/2024-01-11/spread_of_nuclear_weapons.pdf
+  data://garden/war/2024-01-11/spread_of_nuclear_weapons:
+    - data://meadow/war/2024-01-11/spread_of_nuclear_weapons
+
+  # Bleek and Nuclear Threat Initiative - Nuclear Weapons Proliferation.
+  data://garden/war/2024-01-11/nuclear_weapons_proliferation:
+    - data://garden/war/2024-01-11/spread_of_nuclear_weapons
+    - data://garden/war/2024-01-11/nuclear_threat_initiative_overview
+    - data://garden/regions/2023-01-01/regions
+  data://grapher/war/2024-01-11/nuclear_weapons_proliferation:
+    - data://garden/war/2024-01-11/nuclear_weapons_proliferation
+
   # Arms Control Association - Nuclear Weapons Tests.
   data://meadow/war/2024-01-15/nuclear_weapons_tests:
     - snapshot://war/2024-01-15/nuclear_weapons_tests.csv
