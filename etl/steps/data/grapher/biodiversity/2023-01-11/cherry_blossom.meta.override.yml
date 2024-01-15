@@ -1,0 +1,5 @@
+tables:
+  cherry_blossom:
+    variables:
+      full_flowering_date:
+        title: ZZZ
