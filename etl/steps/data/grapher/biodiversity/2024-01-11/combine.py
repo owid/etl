@@ -18,7 +18,9 @@ def run(dest_dir: str) -> None:
     tb = tb.drop(columns=["order", "family", "genus", "species", "phylacine_binomial"])
     tb = tb.rename(columns={"iucn2020_binomial": "country"})
     tb["year"] = 2021
+    # removing species with duplicated/complicated names
     tb = tb[~tb["country"].duplicated(keep=False)]
+
     tb = tb.set_index(["country", "year"], verify_integrity=True).sort_index()
     #
     # Save outputs.
