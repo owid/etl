@@ -9,7 +9,45 @@ from etl.helpers import PathFinder, create_dataset
 paths = PathFinder(__file__)
 
 # Latest year to be assumed for the content of the data, when intervals are open, e.g. "2000-", or "1980-".
-LATEST_YEAR = 2017
+LATEST_YEAR = 2016
+
+
+def run(dest_dir: str) -> None:
+    #
+    # Load inputs.
+    #
+    # Load meadow dataset and read its main table.
+    ds_meadow = paths.load_dataset("spread_of_nuclear_weapons")
+    tb = ds_meadow["spread_of_nuclear_weapons"].reset_index()
+
+    #
+    # Process data.
+    #
+    # Harmonize country names.
+    tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
+
+    # Trace back nuclear weapons status for current countries (Germany, Serbia), and remove historical regions
+    # (West Germany, Yugoslavia).
+    tb = correct_historical_regions(tb=tb)
+
+    # Add rows for years (years were given as intervals, e.g. "1964-66,72-75,80-").
+    tb = add_all_years(tb=tb)
+
+    # Create a column that contains the status of each country-year combination.
+    tb = add_status_column(tb=tb)
+
+    # Drop unnecessary columns.
+    tb = tb.drop(columns=["explore", "pursue", "acquire"])
+
+    # Set an appropriate index and sort conveniently.
+    tb = tb.set_index(["country", "year"], verify_integrity=True).sort_index().sort_index(axis=1)
+
+    #
+    # Save outputs.
+    #
+    # Create a new garden dataset.
+    ds_garden = create_dataset(dest_dir, tables=[tb], check_variables_metadata=True)
+    ds_garden.save()
 
 
 def extract_year_ranges(years_ranges):
@@ -93,41 +131,3 @@ def add_status_column(tb: Table) -> Table:
     tb["status"] = tb["status"].copy_metadata(tb["explore"])
 
     return tb
-
-
-def run(dest_dir: str) -> None:
-    #
-    # Load inputs.
-    #
-    # Load meadow dataset and read its main table.
-    ds_meadow = paths.load_dataset("spread_of_nuclear_weapons")
-    tb = ds_meadow["spread_of_nuclear_weapons"].reset_index()
-
-    #
-    # Process data.
-    #
-    # Harmonize country names.
-    tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
-
-    # Trace back nuclear weapons status for current countries (Germany, Serbia), and remove historical regions
-    # (West Germany, Yugoslavia).
-    tb = correct_historical_regions(tb=tb)
-
-    # Add rows for years (years were given as intervals, e.g. "1964-66,72-75,80-").
-    tb = add_all_years(tb=tb)
-
-    # Create a column that contains the status of each country-year combination.
-    tb = add_status_column(tb=tb)
-
-    # Drop unnecessary columns.
-    tb = tb.drop(columns=["explore", "pursue", "acquire"])
-
-    # Set an appropriate index and sort conveniently.
-    tb = tb.set_index(["country", "year"], verify_integrity=True).sort_index().sort_index(axis=1)
-
-    #
-    # Save outputs.
-    #
-    # Create a new garden dataset.
-    ds_garden = create_dataset(dest_dir, tables=[tb], check_variables_metadata=True)
-    ds_garden.save()

@@ -7,6 +7,8 @@ tables:
       status:
         title: Nuclear weapons status
         description_short: Whether a country does not consider (0), considers (1), pursues (2), or possesses (3) nuclear weapons.
+        description_processing: |-
+          - The values of this indicator have been manually created based on the information provided by the Nuclear Threat Initiative on their website.
         processing_level: major
         unit: ""
         short_unit: ""

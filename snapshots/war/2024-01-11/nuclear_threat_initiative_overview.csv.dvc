@@ -26,6 +26,6 @@ meta:
 
 wdir: ../../../data/snapshots/war/2024-01-11
 outs:
-- md5: bdeda2a7629420be19ac4b6a3c9b6f13
-  size: 2315
+- md5: 25a99d6303319baf2c5038d0be59ed36
+  size: 3233
   path: nuclear_threat_initiative_overview.csv

@@ -162,7 +162,7 @@ steps:
 
   # Bleek - Spread of Nuclear Weapons.
   data://meadow/war/2024-01-11/spread_of_nuclear_weapons:
-    - snapshot://war/2024-01-11/spread_of_nuclear_weapons.csv
+    - snapshot://war/2024-01-11/spread_of_nuclear_weapons.pdf
   data://garden/war/2024-01-11/spread_of_nuclear_weapons:
     - data://meadow/war/2024-01-11/spread_of_nuclear_weapons
 

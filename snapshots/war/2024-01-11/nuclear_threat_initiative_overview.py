@@ -17,8 +17,8 @@ from etl.snapshot import Snapshot
 # Version for current snapshot dataset.
 SNAPSHOT_VERSION = Path(__file__).parent.name
 
-# Latest year for which we have assume NTI has data.
-LATEST_YEAR = 2022
+# Latest year for which NTI has data.
+LATEST_YEAR = 2023
 
 
 @click.command()
@@ -29,43 +29,43 @@ def main(upload: bool) -> None:
 
     # Manually create a table of countries' status on nuclear weapons from 2017 onwards, which should be considered as
     # a continuation of Bleek (2017).
-    # NOTE: Currently, no country has changed its status since 2017.
+    # NOTE: Currently, no country has changed its status since 2016.
     data = [
-        ("Algeria", 2018, 0),
-        ("Argentina", 2018, 0),
-        ("Australia", 2018, 0),
-        ("Brazil", 2018, 0),
-        ("China", 2018, 3),
-        ("Egypt", 2018, 0),
-        ("France", 2018, 3),
-        ("Germany", 2018, 0),
-        ("India", 2018, 3),
-        ("Indonesia", 2018, 0),
-        ("Iran", 2018, 2),
-        ("Iraq", 2018, 0),
-        ("Israel", 2018, 3),
-        ("Italy", 2018, 0),
-        ("Japan", 2018, 0),
-        ("North Korea", 2018, 3),
-        ("Libya", 2018, 0),
-        ("Norway", 2018, 0),
-        ("Pakistan", 2018, 3),
-        ("Romania", 2018, 0),
-        ("Russia", 2018, 3),
-        ("South Africa", 2018, 0),
-        ("South Korea", 2018, 0),
-        ("Sweden", 2018, 0),
-        ("Switzerland", 2018, 0),
-        ("Syria", 2018, 1),
-        ("Taiwan", 2018, 0),
-        ("United Kingdom", 2018, 3),
-        ("United States", 2018, 3),
-        ("Serbia", 2018, 0),
+        ("Algeria", 2017, 0),
+        ("Argentina", 2017, 0),
+        ("Australia", 2017, 0),
+        ("Brazil", 2017, 0),
+        ("China", 2017, 3),
+        ("Egypt", 2017, 0),
+        ("France", 2017, 3),
+        ("Germany", 2017, 0),
+        ("India", 2017, 3),
+        ("Indonesia", 2017, 0),
+        ("Iran", 2017, 2),
+        ("Iraq", 2017, 0),
+        ("Israel", 2017, 3),
+        ("Italy", 2017, 0),
+        ("Japan", 2017, 0),
+        ("North Korea", 2017, 3),
+        ("Libya", 2017, 0),
+        ("Norway", 2017, 0),
+        ("Pakistan", 2017, 3),
+        ("Romania", 2017, 0),
+        ("Russia", 2017, 3),
+        ("South Africa", 2017, 0),
+        ("South Korea", 2017, 0),
+        ("Sweden", 2017, 0),
+        ("Switzerland", 2017, 0),
+        ("Syria", 2017, 1),
+        ("Taiwan", 2017, 0),
+        ("United Kingdom", 2017, 3),
+        ("United States", 2017, 3),
+        ("Serbia", 2017, 0),
     ]
     df_latest = pd.DataFrame.from_records((data), columns=["country", "year", "status"])
     # Since nothing has changed, repeat data for every year.
     df = df_latest.copy()
-    for year in range(2019, LATEST_YEAR + 1):
+    for year in range(2018, LATEST_YEAR + 1):
         df = pd.concat([df, df_latest.assign(**{"year": year})], ignore_index=True)
 
     # Download data from source, add file to DVC and upload to S3.

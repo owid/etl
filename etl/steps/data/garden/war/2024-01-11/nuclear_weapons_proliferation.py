@@ -15,28 +15,6 @@ paths = PathFinder(__file__)
 LATEST_YEAR = 2017
 
 
-def add_all_countries_and_years(tb: Table, tb_regions: Table) -> Table:
-    # List all years and countries (even those that do not even consider nuclear weapons).
-    all_years = sorted(set(tb["year"]))
-    all_countries = sorted(
-        set(tb_regions[(tb_regions["region_type"] == "country") & (~tb_regions["is_historical"])]["name"])
-    )
-
-    # Create a DataFrame with all combinations of countries and years, and a common column of status 0.
-    tb_added = Table(
-        pd.DataFrame(list(itertools.product(all_countries, all_years)), columns=["country", "year"]).assign(
-            **{"status": 0}
-        )
-    )
-
-    # Combine the two tables, and remove repeated rows (keeping the values of the original table).
-    tb = pr.concat([tb.astype({"year": int}), tb_added], ignore_index=True).drop_duplicates(
-        subset=["country", "year"], keep="first"
-    )
-
-    return tb
-
-
 def run(dest_dir: str) -> None:
     #
     # Load inputs.
@@ -102,3 +80,25 @@ def run(dest_dir: str) -> None:
     # Create a new garden dataset.
     ds_garden = create_dataset(dest_dir, tables=[tb, tb_counts], check_variables_metadata=True)
     ds_garden.save()
+
+
+def add_all_countries_and_years(tb: Table, tb_regions: Table) -> Table:
+    # List all years and countries (even those that do not even consider nuclear weapons).
+    all_years = sorted(set(tb["year"]))
+    all_countries = sorted(
+        set(tb_regions[(tb_regions["region_type"] == "country") & (~tb_regions["is_historical"])]["name"])
+    )
+
+    # Create a DataFrame with all combinations of countries and years, and a common column of status 0.
+    tb_added = Table(
+        pd.DataFrame(list(itertools.product(all_countries, all_years)), columns=["country", "year"]).assign(
+            **{"status": 0}
+        )
+    )
+
+    # Combine the two tables, and remove repeated rows (keeping the values of the original table).
+    tb = pr.concat([tb.astype({"year": int}), tb_added], ignore_index=True).drop_duplicates(
+        subset=["country", "year"], keep="first"
+    )
+
+    return tb

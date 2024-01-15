@@ -11,7 +11,7 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Retrieve snapshot.
-    snap = paths.load_snapshot("spread_of_nuclear_weapons.csv")
+    snap = paths.load_snapshot("spread_of_nuclear_weapons.pdf")
 
     #
     # Process data.

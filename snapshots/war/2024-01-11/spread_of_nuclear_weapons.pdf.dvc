@@ -33,4 +33,4 @@ wdir: ../../../data/snapshots/war/2024-01-11
 outs:
 - md5: dfcb04001bf2161d794d9964af627dd4
   size: 728103
-  path: spread_of_nuclear_weapons.csv
+  path: spread_of_nuclear_weapons.pdf
