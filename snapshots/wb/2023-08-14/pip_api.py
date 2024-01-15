@@ -374,7 +374,7 @@ def pip_query_country(
         log.info(f"Country data extracted for {popshare_or_povline} = {value} ({ppp_version} PPPs)")
     else:
         log.info(
-            f"Country data extracted for {popshare_or_povline} = {value} ({ppp_version} PPPs) in {country_code} {year}"
+            f"Country data extracted for {popshare_or_povline} = {value} ({ppp_version} PPPs) in {country_code} (year = {year})"
         )
 
     return df
@@ -434,7 +434,7 @@ def pip_query_region(
         log.info(f"Regional data extracted for {popshare_or_povline} = {value} ({ppp_version} PPPs)")
     else:
         log.info(
-            f"Regional data extracted for {popshare_or_povline} = {value} ({ppp_version} PPPs) in {country_code} {year}"
+            f"Regional data extracted for {popshare_or_povline} = {value} ({ppp_version} PPPs) in {country_code} (year = {year})"
         )
 
     return df
@@ -566,8 +566,7 @@ def generate_percentiles_raw(wb_api: WB_API):
         df_merge = pd.merge(
             df_reference,
             df_percentiles_pub,
-            left_on=["country_code", "reporting_year", "reporting_level", "welfare_type"],
-            right_on=["country_code", "year", "reporting_level", "welfare_type"],
+            on=["country_code", "year", "reporting_level", "welfare_type"],
             how="outer",
             indicator=True,
         )
@@ -694,7 +693,7 @@ def calculate_percentile(p, df):
     return df_closest
 
 
-def format_official_percentiles(year):
+def format_official_percentiles(year, wb_api: WB_API):
     """
     Download percentiles from the World Bank Databank and format them to the same format as the constructed percentiles
     """
