@@ -451,7 +451,7 @@ def generate_percentiles_raw(wb_api: WB_API):
     """
     start_time = time.time()
 
-    def get_percentiles_data(povline, versions, ppp_version):
+    def get_percentiles_data(povline, versions, ppp_version, country_code):
         if Path(
             f"{CACHE_DIR}/pip_country_data/pip_country_all_year_all_povline_{povline}_welfare_all_rep_all_fillgaps_{FILL_GAPS}_ppp_{ppp_version}.csv"
         ).is_file():
@@ -462,7 +462,7 @@ def generate_percentiles_raw(wb_api: WB_API):
             popshare_or_povline="povline",
             value=povline / 100,
             versions=versions,
-            country_code="all",
+            country_code=country_code,
             year="all",
             fill_gaps=FILL_GAPS,
             welfare_type="all",
@@ -471,13 +471,15 @@ def generate_percentiles_raw(wb_api: WB_API):
             download="true",
         )
 
-    def concurrent_percentiles_function():
+    def concurrent_percentiles_function(country_code):
         # Make sure the directory exists. If not, create it
         Path(f"{CACHE_DIR}/pip_country_data").mkdir(parents=True, exist_ok=True)
 
         with ThreadPool(MAX_WORKERS) as pool:
             tasks = [
-                (povline, versions, ppp_version) for ppp_version in PPP_VERSIONS for povline in POV_LINES_COUNTRIES
+                (povline, versions, ppp_version, country_code)
+                for ppp_version in PPP_VERSIONS
+                for povline in POV_LINES_COUNTRIES
             ]
             pool.starmap(get_percentiles_data, tasks)
 
@@ -534,6 +536,50 @@ def generate_percentiles_raw(wb_api: WB_API):
 
         return df_query_region
 
+    def get_list_of_missing_countries():
+        # Obtain the percentile files the World Bank publishes in their Databank
+
+        df_percentiles_published_2017 = _fetch_percentiles(2017)
+
+        # FOR COUNTRIES
+        # Get data from the most common query
+        df_reference = pip_query_country(
+            wb_api,
+            popshare_or_povline="povline",
+            value=2.15,
+            versions=versions,
+            country_code="all",
+            year="all",
+            fill_gaps=FILL_GAPS,
+            welfare_type="all",
+            reporting_level="all",
+            ppp_version=2017,
+        )
+
+        # Edit percentile file to get the list of different countries
+        df_percentiles_pub = df_percentiles_published_2017.copy()
+        df_percentiles_pub = df_percentiles_pub.drop(
+            columns=["percentile", "avg_welfare", "pop_share", "welfare_share", "quantile"]
+        ).drop_duplicates()
+
+        # Merge the two files
+        df_merge = pd.merge(
+            df_reference,
+            df_percentiles_pub,
+            left_on=["country_code", "reporting_year", "reporting_level", "welfare_type"],
+            right_on=["country_code", "year", "reporting_level", "welfare_type"],
+            how="outer",
+            indicator=True,
+        )
+
+        # Obtain the list of countries that are in the reference file but not in the percentile file
+        list_missing_countries = df_merge[df_merge["_merge"] == "left_only"]["country_code"].unique().tolist()
+
+        # Generate a string with all the elements of the list, in the format for querying multiple countries in the API
+        missing_countries = "&country=".join(list_missing_countries)
+
+        return missing_countries, list_missing_countries
+
     file_path_percentiles = f"{CACHE_DIR}/pip_percentiles.csv"
     if Path(file_path_percentiles).is_file():
         log.info("Percentiles file already exists. No need to create raw files.")
@@ -544,7 +590,12 @@ def generate_percentiles_raw(wb_api: WB_API):
         versions = pip_versions(wb_api)
 
         # Run the main function
-        concurrent_percentiles_function()
+        missing_countries, list_missing_countries = get_list_of_missing_countries()
+        log.info(
+            f"These countries are available in a common query but not in the percentile file: {list_missing_countries}"
+        )
+
+        concurrent_percentiles_function(country_code=missing_countries)
         log.info("Country files downloaded")
         concurrent_percentiles_region_function()
         log.info("Region files downloaded")
@@ -585,10 +636,9 @@ def generate_percentiles_raw(wb_api: WB_API):
 
         log.info("Checking if the set of countries and regions is the same as in PIP")
 
-        # I check if the set of countries is the same in the df and in the aux table (list of countries)
-        aux_dict = pip_aux_tables(wb_api, table="countries")
-        assert set(df_country["country"].unique()) == set(aux_dict["countries"]["country_name"].unique()), log.fatal(
-            "List of countries is not the same as the one defined in PIP!"
+        # I check if the set of countries is the same in the df and in the list of missing countries
+        assert set(df_country["country_code"].unique()) == set(list_missing_countries), log.fatal(
+            f"List of countries is different from the one we needed to extract! ({list_missing_countries})"
         )
 
         # I check if the set of regions is the same in the df and in the aux table (list of regions)
@@ -644,6 +694,41 @@ def calculate_percentile(p, df):
     return df_closest
 
 
+def format_official_percentiles(year):
+    """
+    Download percentiles from the World Bank Databank and format them to the same format as the constructed percentiles
+    """
+    # Load percentile files from the World Bank Databank
+    df_percentiles_published = _fetch_percentiles(year)
+
+    # Obtain country names from the aux table
+    aux_dict = pip_aux_tables(wb_api, table="countries")
+    df_countries = aux_dict["countries"]
+
+    # Merge the two files
+    df_percentiles_published = pd.merge(
+        df_percentiles_published,
+        df_countries[["country_code", "country"]],
+        on="country_code",
+        how="left",
+    )
+
+    # Rename columns
+    df_percentiles_published = df_percentiles_published.rename(
+        columns={
+            "percentile": "target_percentile",
+            "avg_welfare": "avg",
+            "welfare_share": "share",
+            "quantile": "estimated_percentile",
+        }
+    )
+
+    # Add ppp_version column
+    df_percentiles_published["ppp_version"] = year
+
+    return df_percentiles_published
+
+
 def generate_consolidated_percentiles(df):
     """
     Generates percentiles from the raw data. This is the final file with percentiles.
@@ -667,8 +752,18 @@ def generate_consolidated_percentiles(df):
 
         df_percentiles = pd.concat(dfs, ignore_index=True)
 
+        log.info("Percentiles calculated and consolidated")
+
         # Rename headcount to estimated_percentile and poverty_line to thr
         df_percentiles = df_percentiles.rename(columns={"headcount": "estimated_percentile", "poverty_line": "thr"})  # type: ignore
+
+        # Add official percentiles from the World Bank Databank
+        df_percentiles_published_2011 = format_official_percentiles(2011)
+        df_percentiles_published_2017 = format_official_percentiles(2017)
+
+        df_percentiles = pd.concat(
+            [df_percentiles, df_percentiles_published_2011, df_percentiles_published_2017], ignore_index=True
+        )
 
         # Sort by ppp_version, country, year, reporting_level, welfare_type and target_percentile
         df_percentiles = df_percentiles.sort_values(
