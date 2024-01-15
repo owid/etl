@@ -32,9 +32,25 @@ tables:
     variables:
       n_countries_not_considering:
         title: Number of countries not considering nuclear weapons
+        display:
+          name: Not considering
+        presentation:
+          title_public: Number of countries not considering nuclear weapons
       n_countries_considering:
         title: Number of countries considering nuclear weapons
+        display:
+          name: Considering
+        presentation:
+          title_public: Number of countries considering nuclear weapons
       n_countries_pursuing:
         title: Number of countries pursuing nuclear weapons
+        display:
+          name: Pursuing
+        presentation:
+          title_public: Number of countries pursuing nuclear weapons
       n_countries_possessing:
         title: Number of countries possessing nuclear weapons
+        display:
+          name: Possessing
+        presentation:
+          title_public: Number of countries possessing nuclear weapons
