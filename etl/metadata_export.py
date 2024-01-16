@@ -82,14 +82,14 @@ def merge_or_create_yaml(meta_dict: Dict[str, Any], output_path: Path) -> str:
     # if output_path exists, update its values, but keep YAML structure intact
     if output_path.exists():
         with open(output_path, "r") as f:
-            doc = ruamel_load(f)
+            doc = ruamel_load(f) or {}
 
         if "dataset" not in doc:
             doc["dataset"] = {}
         if "tables" not in doc:
             doc["tables"] = {}
 
-        for k, v in meta_dict["dataset"].items():
+        for k, v in meta_dict.get("dataset", {}).items():
             doc["dataset"].setdefault(k, v)
         for tab_name, tab_dict in meta_dict.get("tables", {}).items():
             variables = tab_dict.pop("variables", {})
@@ -99,6 +99,9 @@ def merge_or_create_yaml(meta_dict: Dict[str, Any], output_path: Path) -> str:
             if "variables" not in doc["tables"][tab_name]:
                 doc["tables"][tab_name]["variables"] = {}
             doc["tables"][tab_name]["variables"].update(variables)
+
+        if doc["dataset"] == {}:
+            del doc["dataset"]
 
         return ruamel_dump(doc)
     else:

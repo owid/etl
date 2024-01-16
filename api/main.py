@@ -1,150 +1,108 @@
-from pathlib import Path
-from typing import Any, Dict, Optional, Tuple
+import json
 
-import requests
+import bugsnag
 import structlog
-from fastapi import FastAPI, HTTPException
+from bugsnag.asgi import BugsnagMiddleware
+from fastapi import FastAPI, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
-from sqlmodel import Session
+from slack_sdk import WebClient
 
-from apps.backport.datasync.datasync import upload_gzip_dict
-from etl import config, paths
-from etl import grapher_model as gm
-from etl.command import main as etl_main
+from api.v1 import v1
+from etl import config
 from etl.db import get_engine
-from etl.metadata_export import merge_or_create_yaml, reorder_fields
+from etl.helpers import read_json_schema
+from etl.paths import SCHEMAS_DIR
 
 log = structlog.get_logger()
 
-engine = get_engine()
-
-
-class Indicator(BaseModel):
-    name: Optional[str] = None
-    # description: str | None = None
-    # price: float
-    # tax: float | None = None
-
-
-class UpdateIndicatorRequest(BaseModel):
-    indicator: Indicator
-    dataApiUrl: str
-    dryRun: bool = False
-    triggerETL: bool = False
-
-
-app = FastAPI()
-
-# Configure CORS
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],  # Allows all origins
-    allow_credentials=True,
-    allow_methods=["*"],  # Allows all methods
-    allow_headers=["*"],  # Allows all headers
+bugsnag.configure(
+    api_key=config.BUGSNAG_API_KEY,
 )
 
+engine = get_engine()
 
-@app.get("/")
-def read_root():
-    return {"Hello": "World"}
+slack_client = WebClient(token=config.SLACK_API_TOKEN)
+
+DATASET_SCHEMA = read_json_schema(path=SCHEMAS_DIR / "dataset-schema.json")
 
 
-@app.put("/api/indicators/{indicator_id}")
-def update_indicator(indicator_id: int, update_request: UpdateIndicatorRequest):
-    if not update_request.dryRun:
-        _update_indicator_in_r2(update_request.dataApiUrl, indicator_id, update_request.indicator.dict())
+def get_application():
+    _app = FastAPI(title="ETL API")
 
-    # update YAML file
-    with Session(engine) as session:
-        indicator = gm.Variable.load_variable(session, indicator_id)
-
-    override_yml_path, table_name, indicator_short_name = _parse_catalog_path(str(indicator.catalogPath))
-
-    if override_yml_path.exists():
-        raise NotImplementedError()
-
-    # TODO: implement translation from JSON to YAML
-
-    meta_dict = {"tables": {table_name: {"variables": {indicator_short_name: {"title": "ZZZ"}}}}}
-
-    # reorder fields to have consistent YAML
-    meta_dict = reorder_fields(meta_dict)
-
-    yaml_str = merge_or_create_yaml(
-        meta_dict,
-        override_yml_path,
+    _app.add_middleware(
+        CORSMiddleware,
+        # allow_origins=[str(origin) for origin in settings.BACKEND_CORS_ORIGINS],
+        allow_origins=["*"],
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
     )
 
-    if not update_request.dryRun:
-        with open(override_yml_path, "w") as f:
-            f.write(yaml_str)
+    _app.add_middleware(
+        BugsnagMiddleware,
+    )
 
-    if update_request.triggerETL:
-        config.GRAPHER_FILTER = f"^{indicator_short_name}$"
-        etl_main(
-            steps=[str(indicator.catalogPath).rsplit("/")[0]],
-            grapher=True,
-            workers=1,
-            force=True,
-        )
-
-    return {"yaml": yaml_str}
+    return _app
 
 
-def _parse_catalog_path(catalog_path: str) -> Tuple[Path, str, str]:
-    catalog_path, indicator_short_name = catalog_path.split("#")
-    _path, table_name = catalog_path.rsplit("/", 1)
+app = get_application()
 
-    base_path = paths.STEP_DIR / "data" / _path
-    step_path = base_path.with_suffix(".py")
-    override_yml_path = base_path.with_suffix(".meta.override.yml")
-
-    if not step_path.exists():
-        print("Bad luck")
-
-    with open(step_path, "r") as f:
-        step_contents = f.read()
-        if "create_dataset" not in step_contents:
-            print("Bad luck")
-
-    return override_yml_path, table_name, indicator_short_name
+# mount subapplications as versions
+app.mount("/v1", v1)
 
 
-def _get_baked_variables_path(data_api_url: str) -> str:
-    if data_api_url.startswith("https://api-staging.owid.io"):
-        data_api_env = data_api_url.split("/")[3]
-        return f"s3://owid-api-staging/{data_api_env}/v1/indicators"
-    elif data_api_url == "https://api.ourworldindata.org/v1/indicators":
-        data_api_env = "production"
-        return "s3://owid-api/v1/indicators"
-    else:
-        raise HTTPException(status_code=400, detail="Invalid dataApiUrl")
+def send_slack_message(message: str) -> None:
+    if config.SLACK_API_TOKEN:
+        slack_client.chat_postMessage(channel="@Mojmir", text=message)
 
 
-def _update_indicator_in_r2(data_api_url: str, indicator_id: int, indicator_update: dict) -> None:
-    baked_variables_path = _get_baked_variables_path(data_api_url)
+def format_slack_message(method, url, req_body, res_body):
+    try:
+        res_body = json.dumps(json.loads(res_body), indent=2)
+    except json.decoder.JSONDecodeError:
+        pass
 
-    # download JSON file and update it
-    indicator_dict = requests.get(f"{data_api_url}/{indicator_id}.metadata.json").json()
+    try:
+        req_body = json.dumps(json.loads(req_body), indent=2)
+    except json.decoder.JSONDecodeError:
+        pass
 
-    _deep_update(indicator_dict, indicator_update)
-
-    # update JSON file in Data API
-    log.info("upload_to_r2", path=f"{baked_variables_path}/{indicator_id}.metadata.json")
-    upload_gzip_dict(indicator_dict, f"{baked_variables_path}/{indicator_id}.metadata.json")
-
-
-def _deep_update(original: Dict[Any, Any], update: Dict[Any, Any]) -> None:
+    return f"""
+:information_source: *{method}* {url}
+Request
+```
+{req_body}
+```
+Response
+```
+{res_body}
+```
     """
-    Recursively update a dict with nested dicts.
 
-    :param original: The original dictionary to be updated.
-    :param update: The dictionary containing updates.
-    """
-    for key, value in update.items():
-        if isinstance(value, dict) and key in original:
-            _deep_update(original[key], value)
-        else:
-            original[key] = value
+
+@app.middleware("http")
+async def slack_middleware(request: Request, call_next):
+    req_body = await request.body()
+
+    log.info("request", method=request.method, url=str(request.url), body=req_body)
+
+    response = await call_next(request)
+
+    res_body = b""
+    async for chunk in response.body_iterator:
+        res_body += chunk
+
+    log.info("response", method=request.method, url=str(request.url), body=res_body)
+
+    send_slack_message(format_slack_message(request.method, request.url, req_body.decode(), res_body.decode()))
+
+    return Response(
+        content=res_body,
+        status_code=response.status_code,
+        headers=dict(response.headers),
+    )
+
+
+@app.get("/health")
+def health() -> dict:
+    return {"status": "ok"}

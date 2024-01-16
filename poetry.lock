@@ -7065,6 +7065,17 @@ files = [
 ]
 
 [[package]]
+name = "slack-sdk"
+version = "3.26.2"
+description = "The Slack API Platform SDK for Python"
+optional = false
+python-versions = ">=3.6"
+files = [
+    {file = "slack_sdk-3.26.2-py2.py3-none-any.whl", hash = "sha256:a10e8ee69ca17d274989d0c2bbecb875f19898da3052d8d57de0898a00b1ab52"},
+    {file = "slack_sdk-3.26.2.tar.gz", hash = "sha256:bcdac5e688fa50e9357ecd00b803b6a8bad766aa614d35d8dc0636f40adc48bf"},
+]
+
+[[package]]
 name = "smmap"
 version = "5.0.1"
 description = "A pure Python implementation of a sliding window memory map manager"
@@ -8734,4 +8745,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.10, <3.12"
-content-hash = "4a002ddbbd7a6f2d10d63ddf2614102f6b03e2025555e61bc1808c03201e0db1"
+content-hash = "b4e24f8f2b6f556f062b7378a20b50b3083d6416e31327d6c9669d1c6186a64f"
