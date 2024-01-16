@@ -10,7 +10,7 @@ dataset:
   update_period_days: 60
 
 tables:
-  sea_ice_index:
+  sea_surface_temperature:
     variables:
       sea_temperature_anomaly:
         title: "Monthly sea surface temperature anomaly"

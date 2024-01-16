@@ -18,6 +18,6 @@ tables:
       snow_cover_extent:
         title: Monthly measurement of the area covered by snow
         processing_level: minor
-      ocean_ph_yearly_average:
+      snow_cover_extent_yearly_average:
         title: Rolling yearly average of the area covered by snow
         processing_level: major
