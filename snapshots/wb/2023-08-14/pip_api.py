@@ -911,8 +911,8 @@ def generate_relative_poverty(wb_api: WB_API):
                 versions=versions,
                 country_code=df_row["country_code"],
                 year=df_row["year"],
-                welfare_type=df_row["welfare_type"],
-                reporting_level=df_row["reporting_level"],
+                welfare_type="all",
+                reporting_level="all",
                 ppp_version=2017,
                 download="true",
             )
