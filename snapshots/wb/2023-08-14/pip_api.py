@@ -150,7 +150,7 @@ def run(live_api: bool) -> None:
 
     # Generate key indicators file and patch medians
     df = generate_key_indicators(wb_api)
-    df = median_patch(df)
+    df = median_patch(df, country_or_region="country")
 
     # Add relative poverty indicators and decile thresholds to the key indicators file
     df = add_relative_poverty_and_decile_threholds(df, df_relative, df_percentiles)
@@ -1006,7 +1006,7 @@ def generate_relative_poverty(wb_api: WB_API):
     )
 
     # Patch medians
-    df_country = median_patch(df_country)
+    df_country = median_patch(df_country, country_or_region="country")
 
     # Run the main function to get the data
     concurrent_relative_function(df_country)
@@ -1029,7 +1029,7 @@ def generate_relative_poverty(wb_api: WB_API):
     )
 
     # Patch medians
-    df_region = median_patch(df_region)
+    df_region = median_patch(df_region, country_or_region="region")
 
     # Run the main function to get the data
     concurrent_relative_region_function()
@@ -1165,7 +1165,7 @@ def generate_key_indicators(wb_api: WB_API):
     return df
 
 
-def median_patch(df):
+def median_patch(df, country_or_region):
     """
     Patch missing values in the median column.
     PIP queries do not return all the medians, so they are patched with the results of the percentile file.
@@ -1177,13 +1177,27 @@ def median_patch(df):
     # In df_percentiles, keep only the rows with target_percentile = 50
     df_percentiles = df_percentiles[df_percentiles["target_percentile"] == 50].reset_index()
 
-    # Merge df and df_percentiles
-    df = pd.merge(
-        df,
-        df_percentiles[["ppp_version", "country", "year", "reporting_level", "welfare_type", "thr"]],
-        on=["ppp_version", "country", "year", "reporting_level", "welfare_type"],
-        how="left",
-    )
+    # If I want to patch the median for regions, I need to drop reporting_level and welfare_type columns
+    if country_or_region == "country":
+        # Merge df and df_percentiles
+        df = pd.merge(
+            df,
+            df_percentiles[["ppp_version", "country", "year", "reporting_level", "welfare_type", "thr"]],
+            on=["ppp_version", "country", "year", "reporting_level", "welfare_type"],
+            how="left",
+        )
+
+    elif country_or_region == "region":
+        # Merge df and df_percentiles
+        df = pd.merge(
+            df,
+            df_percentiles[["ppp_version", "country", "year", "thr"]],
+            on=["ppp_version", "country", "year"],
+            how="left",
+        )
+
+    else:
+        raise ValueError("country_or_region must be 'country' or 'region'")
 
     # Replace missing values in median with thr
     df["median"] = df["median"].fillna(df["thr"])
