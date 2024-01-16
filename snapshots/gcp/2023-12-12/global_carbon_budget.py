@@ -54,7 +54,7 @@ def main(upload: bool) -> None:
 
         # Replace the full citation and description in the metadata.
         snap.metadata.origin.attribution = ATTRIBUTION  # type: ignore
-        snap.metadata.origin.attribution_short = ATTRIBUTION_SHORT # type: ignore
+        snap.metadata.origin.attribution_short = ATTRIBUTION_SHORT  # type: ignore
         snap.metadata.origin.citation_full = CITATION_FULL  # type: ignore
         snap.metadata.origin.description = DESCRIPTION  # type: ignore
 
