@@ -619,11 +619,6 @@ def generate_percentiles_raw(wb_api: WB_API):
 
         return missing_countries, list_missing_countries
 
-    # file_path_percentiles = f"{CACHE_DIR}/pip_percentiles.csv"
-    # if Path(file_path_percentiles).is_file():
-    #     log.info("Percentiles file already exists. No need to create raw files.")
-    #     return pd.read_csv(file_path_percentiles)
-
     # Obtain latest versions of the PIP dataset
     versions = pip_versions(wb_api)
 
@@ -775,50 +770,50 @@ def generate_consolidated_percentiles(df):
     """
     start_time = time.time()
 
-    # path_file_percentiles = f"{CACHE_DIR}/pip_percentiles.csv"
+    path_file_percentiles = f"{CACHE_DIR}/pip_percentiles.csv"
 
-    # if Path(path_file_percentiles).is_file():
-    #     log.info("Percentiles file already exists. No need to consolidate.")
-    #     df_percentiles = pd.read_csv(path_file_percentiles)
-    #     return pd.read_csv(file_path_percentiles)
+    if Path(path_file_percentiles).is_file():
+        log.info("Percentiles file already exists. No need to consolidate.")
+        df_percentiles = pd.read_csv(path_file_percentiles)
 
-    log.info("Consolidating percentiles")
+    else:
+        log.info("Consolidating percentiles")
 
-    # Define percentiles, from 1 to 99
-    percentiles = range(1, 100, 1)
-    df_percentiles = pd.DataFrame()
+        # Define percentiles, from 1 to 99
+        percentiles = range(1, 100, 1)
+        df_percentiles = pd.DataFrame()
 
-    # Estimate percentiles
-    dfs = [calculate_percentile(p, df) for p in percentiles]
+        # Estimate percentiles
+        dfs = [calculate_percentile(p, df) for p in percentiles]
 
-    df_percentiles = pd.concat(dfs, ignore_index=True)
+        df_percentiles = pd.concat(dfs, ignore_index=True)
 
-    log.info("Percentiles calculated and consolidated")
+        log.info("Percentiles calculated and consolidated")
 
-    # Rename headcount to estimated_percentile and poverty_line to thr
-    df_percentiles = df_percentiles.rename(columns={"headcount": "estimated_percentile", "poverty_line": "thr"})  # type: ignore
+        # Rename headcount to estimated_percentile and poverty_line to thr
+        df_percentiles = df_percentiles.rename(columns={"headcount": "estimated_percentile", "poverty_line": "thr"})  # type: ignore
 
-    # Add official percentiles from the World Bank Databank
-    df_percentiles_published_2011 = format_official_percentiles(2011)
-    df_percentiles_published_2017 = format_official_percentiles(2017)
+        # Add official percentiles from the World Bank Databank
+        df_percentiles_published_2011 = format_official_percentiles(2011)
+        df_percentiles_published_2017 = format_official_percentiles(2017)
 
-    df_percentiles = pd.concat(
-        [df_percentiles, df_percentiles_published_2011, df_percentiles_published_2017], ignore_index=True
-    )
+        df_percentiles = pd.concat(
+            [df_percentiles, df_percentiles_published_2011, df_percentiles_published_2017], ignore_index=True
+        )
 
-    # Drop duplicates. Keep the second one (the official one)
-    df_percentiles = df_percentiles.drop_duplicates(
-        subset=["ppp_version", "country", "year", "reporting_level", "welfare_type", "target_percentile"],
-        keep="last",
-    )
+        # Drop duplicates. Keep the second one (the official one)
+        df_percentiles = df_percentiles.drop_duplicates(
+            subset=["ppp_version", "country", "year", "reporting_level", "welfare_type", "target_percentile"],
+            keep="last",
+        )
 
-    # Sort by ppp_version, country, year, reporting_level, welfare_type and target_percentile
-    df_percentiles = df_percentiles.sort_values(
-        by=["ppp_version", "country", "year", "reporting_level", "welfare_type", "target_percentile"]
-    )
+        # Sort by ppp_version, country, year, reporting_level, welfare_type and target_percentile
+        df_percentiles = df_percentiles.sort_values(
+            by=["ppp_version", "country", "year", "reporting_level", "welfare_type", "target_percentile"]
+        )
 
-    # Save to csv
-    df_percentiles.to_csv(f"{CACHE_DIR}/pip_percentiles.csv", index=False)
+        # Save to csv
+        df_percentiles.to_csv(f"{CACHE_DIR}/pip_percentiles.csv", index=False)
 
     # Check if every country, year, reporting level, welfare type and ppp version has each percentiles from 1 to 99
     assert (
