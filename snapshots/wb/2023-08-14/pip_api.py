@@ -475,19 +475,20 @@ def generate_percentiles_raw(wb_api: WB_API):
         ).is_file():
             return
 
-        return pip_query_country(
-            wb_api,
-            popshare_or_povline="povline",
-            value=povline / 100,
-            versions=versions,
-            country_code=country_code,
-            year="all",
-            fill_gaps=FILL_GAPS,
-            welfare_type="all",
-            reporting_level="all",
-            ppp_version=ppp_version,
-            download="true",
-        )
+        else:
+            return pip_query_country(
+                wb_api,
+                popshare_or_povline="povline",
+                value=povline / 100,
+                versions=versions,
+                country_code=country_code,
+                year="all",
+                fill_gaps=FILL_GAPS,
+                welfare_type="all",
+                reporting_level="all",
+                ppp_version=ppp_version,
+                download="true",
+            )
 
     def concurrent_percentiles_function(country_code):
         """
@@ -512,18 +513,19 @@ def generate_percentiles_raw(wb_api: WB_API):
             f"{CACHE_DIR}/pip_region_data/pip_region_all_year_all_povline_{povline}_ppp_{ppp_version}.csv"
         ).is_file():
             return
-        return pip_query_region(
-            wb_api,
-            popshare_or_povline="povline",
-            value=povline / 100,
-            versions=versions,
-            country_code="all",
-            year="all",
-            welfare_type="all",
-            reporting_level="all",
-            ppp_version=ppp_version,
-            download="true",
-        )
+        else:
+            return pip_query_region(
+                wb_api,
+                popshare_or_povline="povline",
+                value=povline / 100,
+                versions=versions,
+                country_code="all",
+                year="all",
+                welfare_type="all",
+                reporting_level="all",
+                ppp_version=ppp_version,
+                download="true",
+            )
 
     def concurrent_percentiles_region_function():
         """
@@ -869,7 +871,7 @@ def generate_relative_poverty(wb_api: WB_API):
             f"{CACHE_DIR}/pip_country_data/pip_country_{df_row['country_code']}_year_{df_row['year']}_povline_{int(round(df_row['median'] * pct))}_welfare_{df_row['welfare_type']}_rep_{df_row['reporting_level']}_fillgaps_{FILL_GAPS}_ppp_2017.csv"
         ).is_file():
             return
-        if ~np.isnan(df_row["median"]):
+        elif ~np.isnan(df_row["median"]):
             return pip_query_country(
                 wb_api,
                 popshare_or_povline="povline",
@@ -903,7 +905,7 @@ def generate_relative_poverty(wb_api: WB_API):
             f"{CACHE_DIR}/pip_region_data/pip_region_{df_row['country_code']}_year_{df_row['year']}_povline_{int(round(df_row['median']*pct))}_ppp_2017.csv"
         ).is_file():
             return
-        if ~np.isnan(df_row["median"]):
+        elif ~np.isnan(df_row["median"]):
             return pip_query_region(
                 wb_api,
                 popshare_or_povline="povline",
