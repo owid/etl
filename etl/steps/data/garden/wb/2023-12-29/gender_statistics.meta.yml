@@ -23,9 +23,12 @@ tables:
           - The first component, the length of paid maternity leave, focuses on the leave specifically designated for mothers around the time of childbirth. This includes the days taken just before, during, and immediately after giving birth. The primary focus of this leave is on the mother's recovery and the essential bonding time with the newborn. It's a critical period that supports the mother's health and wellbeing, as well as the initial development of the child.
           - The second component, the length of paid parental leave for mother, includes days of parental leave that are specifically reserved for mothers. These are often defined by "use-it-or-lose-it" policies or mothers’ quotas. This part of the indicator represents additional support provided to mothers, extending beyond the traditional maternity leave period. It ensures that mothers have dedicated time for child-rearing and recovery, which cannot be transferred to fathers. This acknowledges the unique needs of mothers in the postnatal period and supports their role in early childcare.
           - The sum of these components reflects the total days of leave available specifically for the mother, emphasizing the support for maternal health and well-being.
+          - This indicator uses standardized assumptions, like the woman having one child and residing in the largest business city, to ensure comparability, though this approach may not capture variations in laws affecting women in different states, rural areas, or minority groups
+
         processing_level: major
         display:
           numDecimalPlaces: 0
+
 
       total_paternity_leave_to:
         title: Total days of leave available to the father
@@ -37,6 +40,8 @@ tables:
           - The first component, the length of paid paternity leave, focuses on the leave specifically designated for fathers at the time of childbirth. This includes the days available exclusively to fathers to support them in bonding with the newborn and assisting in early childcare. This leave plays a crucial role in supporting the father's engagement during the early stages of a child's life.
           - The second component, the length of paid parental leave for father, includes days of parental leave that are specifically reserved for fathers. These are often defined by "use-it-or-lose-it" policies or fathers’ quotas. This part of the indicator represents additional support provided to fathers, extending beyond the traditional paternity leave period. It ensures that fathers have dedicated time for child-rearing, promoting their active involvement in early childcare and supporting gender equality in parental responsibilities.
           - The sum of these components reflects the total days of leave available specifically for the father, highlighting the support for paternal involvement and gender equality in parenting.
+          - This indicator uses standardized assumptions, like the woman having one child and residing in the largest business city, to ensure comparability, though this approach may not capture variations in laws affecting women in different states, rural areas, or minority groups
+
         processing_level: major
         display:
           numDecimalPlaces: 0
@@ -51,6 +56,8 @@ tables:
           - The second component, the length of paid parental leave for mother, includes days of parental leave that are specifically reserved for mothers. These are often defined by policies that support gender equality in parental responsibilities. This part of the indicator represents additional support provided to mothers, extending beyond the traditional maternity leave period.
           - The third component, the length of shared parental leave, represents the portion of leave that can be shared between parents. This flexibility allows for a more equitable distribution of childcare responsibilities and supports gender equality.
           - By integrating these components, the indicator provides a total count of the calendar days of leave available to mothers.
+          - This indicator uses standardized assumptions, like the woman having one child and residing in the largest business city, to ensure comparability, though this approach may not capture variations in laws affecting women in different states, rural areas, or minority groups
+
         processing_level: major
         display:
           numDecimalPlaces: 0
@@ -66,6 +73,8 @@ tables:
           - The second component, the length of paid parental leave for father, includes days of parental leave that are specifically reserved for fathers. These are often defined by "use-it-or-lose-it" policies or fathers’ quotas.
           - The third component, the length of shared parental leave, represents the portion of leave that can be shared between parents. This flexibility allows for a more equitable distribution of childcare responsibilities and supports gender equality.
           - By integrating these components, the indicator provides a total count of the calendar days of leave available for fathers.
+          - This indicator uses standardized assumptions, like the woman having one child and residing in the largest business city, to ensure comparability, though this approach may not capture variations in laws affecting women in different states, rural areas, or minority groups
+
         processing_level: major
         display:
           numDecimalPlaces: 0
