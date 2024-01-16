@@ -1032,7 +1032,7 @@ def generate_relative_poverty(wb_api: WB_API):
     df_region = median_patch(df_region, country_or_region="region")
 
     # Run the main function to get the data
-    concurrent_relative_region_function()
+    concurrent_relative_region_function(df_region)
 
     # Add relative indicators from the results above
     df_region = add_relative_indicators(df=df_region, country_or_region="region")
