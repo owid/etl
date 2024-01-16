@@ -619,89 +619,86 @@ def generate_percentiles_raw(wb_api: WB_API):
 
         return missing_countries, list_missing_countries
 
-    file_path_percentiles = f"{CACHE_DIR}/pip_percentiles.csv"
-    if Path(file_path_percentiles).is_file():
-        log.info("Percentiles file already exists. No need to create raw files.")
-        return pd.read_csv(file_path_percentiles)
+    # file_path_percentiles = f"{CACHE_DIR}/pip_percentiles.csv"
+    # if Path(file_path_percentiles).is_file():
+    #     log.info("Percentiles file already exists. No need to create raw files.")
+    #     return pd.read_csv(file_path_percentiles)
 
-    else:
-        # Obtain latest versions of the PIP dataset
-        versions = pip_versions(wb_api)
+    # Obtain latest versions of the PIP dataset
+    versions = pip_versions(wb_api)
 
-        # Run the main function
-        missing_countries, list_missing_countries = get_list_of_missing_countries()
-        log.info(
-            f"These countries are available in a common query but not in the percentile file: {list_missing_countries}"
-        )
+    # Run the main function
+    missing_countries, list_missing_countries = get_list_of_missing_countries()
+    log.info(
+        f"These countries are available in a common query but not in the percentile file: {list_missing_countries}"
+    )
 
-        concurrent_percentiles_function(country_code=missing_countries)
-        log.info("Country files downloaded")
-        concurrent_percentiles_region_function()
-        log.info("Region files downloaded")
+    concurrent_percentiles_function(country_code=missing_countries)
+    log.info("Country files downloaded")
+    concurrent_percentiles_region_function()
+    log.info("Region files downloaded")
 
-        log.info("Now we are concatenating the files")
+    log.info("Now we are concatenating the files")
 
-        with ThreadPool(MAX_WORKERS) as pool:
-            tasks = [
-                (povline, ppp_version, missing_countries)
-                for ppp_version in PPP_VERSIONS
-                for povline in POV_LINES_COUNTRIES
-            ]
-            dfs = pool.starmap(get_query_country, tasks)
+    with ThreadPool(MAX_WORKERS) as pool:
+        tasks = [
+            (povline, ppp_version, missing_countries) for ppp_version in PPP_VERSIONS for povline in POV_LINES_COUNTRIES
+        ]
+        dfs = pool.starmap(get_query_country, tasks)
 
-        df_country = pd.concat(dfs, ignore_index=True)
-        log.info("Country files concatenated")
+    df_country = pd.concat(dfs, ignore_index=True)
+    log.info("Country files concatenated")
 
-        with ThreadPool(MAX_WORKERS) as pool:
-            tasks = [(povline, ppp_version) for ppp_version in PPP_VERSIONS for povline in POV_LINES_REGIONS]
-            dfs = pool.starmap(get_query_region, tasks)
+    with ThreadPool(MAX_WORKERS) as pool:
+        tasks = [(povline, ppp_version) for ppp_version in PPP_VERSIONS for povline in POV_LINES_REGIONS]
+        dfs = pool.starmap(get_query_region, tasks)
 
-        df_region = pd.concat(dfs, ignore_index=True)
-        log.info("Region files concatenated")
+    df_region = pd.concat(dfs, ignore_index=True)
+    log.info("Region files concatenated")
 
-        # Create poverty_line_cents column, multiplying by 100, rounding and making it an integer
-        df_country["poverty_line_cents"] = round(df_country["poverty_line"] * 100).astype(int)
-        df_region["poverty_line_cents"] = round(df_region["poverty_line"] * 100).astype(int)
+    # Create poverty_line_cents column, multiplying by 100, rounding and making it an integer
+    df_country["poverty_line_cents"] = round(df_country["poverty_line"] * 100).astype(int)
+    df_region["poverty_line_cents"] = round(df_region["poverty_line"] * 100).astype(int)
 
-        log.info("Checking if all the poverty lines are in the concatenated files")
+    log.info("Checking if all the poverty lines are in the concatenated files")
 
-        # Check if all the poverty lines are in the df in country and region df
-        assert set(df_country["poverty_line_cents"].unique()) == set(POV_LINES_COUNTRIES), log.fatal(
-            "Not all poverty lines are in the country file!"
-        )
-        assert set(df_region["poverty_line_cents"].unique()) == set(POV_LINES_REGIONS), log.fatal(
-            "Not all poverty lines are in the region file!"
-        )
+    # Check if all the poverty lines are in the df in country and region df
+    assert set(df_country["poverty_line_cents"].unique()) == set(POV_LINES_COUNTRIES), log.fatal(
+        "Not all poverty lines are in the country file!"
+    )
+    assert set(df_region["poverty_line_cents"].unique()) == set(POV_LINES_REGIONS), log.fatal(
+        "Not all poverty lines are in the region file!"
+    )
 
-        # Drop poverty_line_cents column
-        df_country = df_country.drop(columns=["poverty_line_cents"])
-        df_region = df_region.drop(columns=["poverty_line_cents"])
+    # Drop poverty_line_cents column
+    df_country = df_country.drop(columns=["poverty_line_cents"])
+    df_region = df_region.drop(columns=["poverty_line_cents"])
 
-        log.info("Checking if the set of countries and regions is the same as in PIP")
+    log.info("Checking if the set of countries and regions is the same as in PIP")
 
-        # I check if the set of countries is the same in the df and in the list of missing countries
-        assert set(df_country["country_code"].unique()) == set(list_missing_countries), log.fatal(
-            f"List of countries is different from the one we needed to extract! ({list_missing_countries})"
-        )
+    # I check if the set of countries is the same in the df and in the list of missing countries
+    assert set(df_country["country_code"].unique()) == set(list_missing_countries), log.fatal(
+        f"List of countries is different from the one we needed to extract! ({list_missing_countries})"
+    )
 
-        # I check if the set of regions is the same in the df and in the aux table (list of regions)
-        aux_dict = pip_aux_tables(wb_api, table="regions")
-        assert set(df_region["country"].unique()) == set(aux_dict["regions"]["region"].unique()), log.fatal(
-            "List of regions is not the same as the one defined in PIP!"
-        )
+    # I check if the set of regions is the same in the df and in the aux table (list of regions)
+    aux_dict = pip_aux_tables(wb_api, table="regions")
+    assert set(df_region["country"].unique()) == set(aux_dict["regions"]["region"].unique()), log.fatal(
+        "List of regions is not the same as the one defined in PIP!"
+    )
 
-        log.info("Concatenating the raw percentile data for countries and regions")
+    log.info("Concatenating the raw percentile data for countries and regions")
 
-        # Concatenate df_country and df_region
-        df = pd.concat([df_country, df_region], ignore_index=True)
+    # Concatenate df_country and df_region
+    df = pd.concat([df_country, df_region], ignore_index=True)
 
-        end_time = time.time()
-        elapsed_time = round(end_time - start_time, 2)
-        log.info(
-            f"Concatenation of raw percentile data for countries and regions completed. Execution time: {elapsed_time} seconds"
-        )
+    end_time = time.time()
+    elapsed_time = round(end_time - start_time, 2)
+    log.info(
+        f"Concatenation of raw percentile data for countries and regions completed. Execution time: {elapsed_time} seconds"
+    )
 
-        return df
+    return df
 
 
 def calculate_percentile(p, df):
@@ -778,49 +775,50 @@ def generate_consolidated_percentiles(df):
     """
     start_time = time.time()
 
-    path_file_percentiles = f"{CACHE_DIR}/pip_percentiles.csv"
+    # path_file_percentiles = f"{CACHE_DIR}/pip_percentiles.csv"
 
-    if Path(path_file_percentiles).is_file():
-        log.info("Percentiles file already exists. No need to consolidate.")
-        df_percentiles = pd.read_csv(path_file_percentiles)
-    else:
-        log.info("Consolidating percentiles")
+    # if Path(path_file_percentiles).is_file():
+    #     log.info("Percentiles file already exists. No need to consolidate.")
+    #     df_percentiles = pd.read_csv(path_file_percentiles)
+    #     return pd.read_csv(file_path_percentiles)
 
-        # Define percentiles, from 1 to 99
-        percentiles = range(1, 100, 1)
-        df_percentiles = pd.DataFrame()
+    log.info("Consolidating percentiles")
 
-        # Estimate percentiles
-        dfs = [calculate_percentile(p, df) for p in percentiles]
+    # Define percentiles, from 1 to 99
+    percentiles = range(1, 100, 1)
+    df_percentiles = pd.DataFrame()
 
-        df_percentiles = pd.concat(dfs, ignore_index=True)
+    # Estimate percentiles
+    dfs = [calculate_percentile(p, df) for p in percentiles]
 
-        log.info("Percentiles calculated and consolidated")
+    df_percentiles = pd.concat(dfs, ignore_index=True)
 
-        # Rename headcount to estimated_percentile and poverty_line to thr
-        df_percentiles = df_percentiles.rename(columns={"headcount": "estimated_percentile", "poverty_line": "thr"})  # type: ignore
+    log.info("Percentiles calculated and consolidated")
 
-        # Add official percentiles from the World Bank Databank
-        df_percentiles_published_2011 = format_official_percentiles(2011)
-        df_percentiles_published_2017 = format_official_percentiles(2017)
+    # Rename headcount to estimated_percentile and poverty_line to thr
+    df_percentiles = df_percentiles.rename(columns={"headcount": "estimated_percentile", "poverty_line": "thr"})  # type: ignore
 
-        df_percentiles = pd.concat(
-            [df_percentiles, df_percentiles_published_2011, df_percentiles_published_2017], ignore_index=True
-        )
+    # Add official percentiles from the World Bank Databank
+    df_percentiles_published_2011 = format_official_percentiles(2011)
+    df_percentiles_published_2017 = format_official_percentiles(2017)
 
-        # Drop duplicates. Keep the second one (the official one)
-        df_percentiles = df_percentiles.drop_duplicates(
-            subset=["ppp_version", "country", "year", "reporting_level", "welfare_type", "target_percentile"],
-            keep="last",
-        )
+    df_percentiles = pd.concat(
+        [df_percentiles, df_percentiles_published_2011, df_percentiles_published_2017], ignore_index=True
+    )
 
-        # Sort by ppp_version, country, year, reporting_level, welfare_type and target_percentile
-        df_percentiles = df_percentiles.sort_values(
-            by=["ppp_version", "country", "year", "reporting_level", "welfare_type", "target_percentile"]
-        )
+    # Drop duplicates. Keep the second one (the official one)
+    df_percentiles = df_percentiles.drop_duplicates(
+        subset=["ppp_version", "country", "year", "reporting_level", "welfare_type", "target_percentile"],
+        keep="last",
+    )
 
-        # Save to csv
-        df_percentiles.to_csv(f"{CACHE_DIR}/pip_percentiles.csv", index=False)
+    # Sort by ppp_version, country, year, reporting_level, welfare_type and target_percentile
+    df_percentiles = df_percentiles.sort_values(
+        by=["ppp_version", "country", "year", "reporting_level", "welfare_type", "target_percentile"]
+    )
+
+    # Save to csv
+    df_percentiles.to_csv(f"{CACHE_DIR}/pip_percentiles.csv", index=False)
 
     # Check if every country, year, reporting level, welfare type and ppp version has each percentiles from 1 to 99
     assert (
