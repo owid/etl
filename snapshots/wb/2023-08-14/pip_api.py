@@ -812,9 +812,6 @@ def generate_consolidated_percentiles(df):
             keep="last",
         )
 
-        # Drop target_percentile = 100
-        df_percentiles = df_percentiles[df_percentiles["target_percentile"] != 100].reset_index(drop=True)
-
         # Sort by ppp_version, country, year, reporting_level, welfare_type and target_percentile
         df_percentiles = df_percentiles.sort_values(
             by=["ppp_version", "country", "year", "reporting_level", "welfare_type", "target_percentile"]
