@@ -1187,6 +1187,12 @@ def median_patch(df, country_or_region):
             how="left",
         )
 
+        # Replace missing values in median with thr
+        df["median"] = df["median"].fillna(df["thr"])
+
+        # Drop thr column
+        df = df.drop(columns=["thr"])
+
     elif country_or_region == "region":
         # Merge df and df_percentiles
         df = pd.merge(
@@ -1196,14 +1202,11 @@ def median_patch(df, country_or_region):
             how="left",
         )
 
+        # Rename thr to median
+        df = df.rename(columns={"thr": "median"})
+
     else:
         raise ValueError("country_or_region must be 'country' or 'region'")
-
-    # Replace missing values in median with thr
-    df["median"] = df["median"].fillna(df["thr"])
-
-    # Drop thr column
-    df = df.drop(columns=["thr"])
 
     log.info("Medians patched!")
 
