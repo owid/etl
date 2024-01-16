@@ -58,6 +58,7 @@ meta:
       2023, Earth Syst. Sci. Data, 15, 5301-5369, https://doi.org/10.5194/essd-15-5301-2023,
       2023.
     attribution: Global Carbon Budget (2023)
+    attribution_short: GCB
     url_main: https://globalcarbonbudget.org/
     url_download: https://zenodo.org/records/10177738/files/GCB2023v36_MtCO2_flat.csv
     date_accessed: '2023-12-12'

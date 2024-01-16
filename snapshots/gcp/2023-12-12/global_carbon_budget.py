@@ -27,6 +27,7 @@ DATA_FILES = [
 
 # Define common metadata fields (to be written to dvc files).
 ATTRIBUTION = "Global Carbon Budget (2023)"
+ATTRIBUTION_SHORT = "GCB"
 CITATION_FULL = """Andrew, R. M., & Peters, G. P. (2023). The Global Carbon Project's fossil CO2 emissions dataset (2023v36) [Data set]. Zenodo. https://doi.org/10.5281/zenodo.10177738
 
 The data files of the Global Carbon Budget can be found at: https://globalcarbonbudget.org/carbonbudget/
@@ -53,6 +54,7 @@ def main(upload: bool) -> None:
 
         # Replace the full citation and description in the metadata.
         snap.metadata.origin.attribution = ATTRIBUTION  # type: ignore
+        snap.metadata.origin.attribution_short = ATTRIBUTION_SHORT # type: ignore
         snap.metadata.origin.citation_full = CITATION_FULL  # type: ignore
         snap.metadata.origin.description = DESCRIPTION  # type: ignore
 
