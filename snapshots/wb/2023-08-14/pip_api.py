@@ -1205,6 +1205,7 @@ def add_relative_poverty_and_decile_threholds(df, df_relative, df_percentiles):
     """
 
     # Add relative poverty indicators
+    # They don't change with the PPP version, so we can use the 2017 version I estimated before.
     df = pd.merge(
         df,
         df_relative[
