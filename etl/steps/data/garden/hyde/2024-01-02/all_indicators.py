@@ -49,7 +49,7 @@ def run(dest_dir: str) -> None:
     ## Land use indicators are given in km2, but we want ha: 1km2 = 100ha
     tb[
         [
-            "uopp_c",
+            # "uopp_c",
             "cropland_c",
             "tot_rice_c",
             "tot_rainfed_c",
@@ -65,6 +65,10 @@ def run(dest_dir: str) -> None:
             "shifting_c",
         ]
     ] *= 100
+
+    # Additional indicators
+    tb["urbc_c_share"] = tb["urbc_c"] / tb["popc_c"]
+    tb["rurc_c_share"] = tb["rurc_c"] / tb["popc_c"]
 
     # Set index
     tb = tb.set_index(["country", "year"], verify_integrity=True).sort_index()

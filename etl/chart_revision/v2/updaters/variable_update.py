@@ -134,6 +134,7 @@ class ChartVariableUpdater(ChartUpdater):
         """
         # Get metadata of variables from S3 (try twice)
         log.info(f"_get_variable_metadata: trying to get variable metadata from S3. Variables IDs: {variable_ids}")
+        assert len(variable_ids) > 0, "No variables to get metadata from!"
         df = variable_data_df_from_s3(get_engine(), variable_ids=[int(v) for v in variable_ids], workers=10)
 
         # Reshape metadata, we want a dictionary!

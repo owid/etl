@@ -194,6 +194,18 @@ def run(dest_dir: str) -> None:
         tb_regions=tb_regions,
     )
 
+    # TEMPORARY
+    # I was asked to remove all the data on death indicators from regions.
+    # I decided not to remove the prior code estimating these bc it was very time consuming
+    # Hence, if we decide to go back and incorporate these, we just need to comment the lines below.
+    index_names = list(tb.index.names)
+    tb = tb.reset_index()
+    assert len(set(tb["region"])) == 6, "Number of regions (including 'World') is not 6!"
+    tb.loc[
+        tb["region"] != "World", ["number_deaths_ongoing_conflicts", "number_deaths_ongoing_conflicts_per_capita"]
+    ] = np.nan
+    tb = tb.set_index(index_names, verify_integrity=True)
+
     # Set new short_name
     tb.m.short_name = "cow"
 

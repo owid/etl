@@ -8,6 +8,7 @@ from typing import Any, Dict, Optional, Set
 import click
 import pandas as pd
 import pytz
+import requests
 import structlog
 from dotenv import dotenv_values
 from rich import print
@@ -402,24 +403,11 @@ def _branch_exists_in_origin(branch_name: str) -> bool:
         return False
 
 
-def _get_git_branch_creation_date(branch_name: str, base_branch="master") -> dt.datetime:
-    if not _branch_exists_locally(branch_name):
-        if not _branch_exists_in_origin(branch_name):
-            raise ValueError(f"Could not find branch {branch_name}, use --staging-created-at to specify it manually")
-        else:
-            branch_name = f"origin/{branch_name}"
+def _get_git_branch_creation_date(branch_name: str) -> dt.datetime:
+    js = requests.get(f"https://api.github.com/repos/owid/etl/pulls?state=all&head=owid:{branch_name}").json()
+    assert len(js) == 1
 
-    # Define the git command
-    git_command = f"git log --format=%cI {base_branch}..{branch_name} --reverse | head -1"
-
-    # Execute the git command
-    result = subprocess.run(git_command, shell=True, check=True, stdout=subprocess.PIPE, text=True)
-
-    # Get the output and strip any whitespace
-    creation_date = result.stdout.strip()
-
-    # Parse the timestamp
-    return dt.datetime.fromisoformat(creation_date).astimezone(pytz.utc).replace(tzinfo=None)
+    return dt.datetime.fromisoformat(js[0]["created_at"].rstrip("Z")).astimezone(pytz.utc).replace(tzinfo=None)
 
 
 if __name__ == "__main__":

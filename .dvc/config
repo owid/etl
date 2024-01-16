@@ -1,14 +1,14 @@
 [core]
     remote = public
     autostage = true
-['remote "public"']
+[remote "public"]
     url = s3://owid-snapshots
     endpointurl = https://078fcdfed9955087315dd86792e71a7e.r2.cloudflarestorage.com
     acl = public-read
     # Increase this if you are seeing requests timing out
     connect_timeout = 600
-['remote "public-read"']
+[remote "public-read"]
     url = https://snapshots.owid.io
-['remote "private"']
+[remote "private"]
     url = s3://owid-snapshots-private
     endpointurl = https://078fcdfed9955087315dd86792e71a7e.r2.cloudflarestorage.com
