@@ -105,6 +105,7 @@ steps:
     - data://garden/climate/2024-01-02/snow_cover_extent
     # - data://garden/imbie/2024-01-02/ice_sheet_mass_balance
     - data://garden/epa/2024-01-02/ice_sheet_mass_balance
+    - data://garden/climate/2024-01-02/ghg_concentration
 
   ######################################################################################################################
   # Older versions to be archived once they are not used by any other steps.
