@@ -25,7 +25,6 @@ MAX_REPEATS = 10
 TIMEOUT = 500
 FILL_GAPS = "false"
 # NOTE: Although the number of workers is set to MAX_WORKERS, the actual number of workers for regional queries is half of that, because the API (`pip-grp`) is less able to handle concurrent requests.
-# MAX_WORKERS = 10
 MAX_WORKERS = 2
 TOLERANCE_PERCENTILES = 0.5
 
@@ -36,6 +35,11 @@ LIVE_API = 1
 
 # Constants
 def poverty_lines_countries():
+    """
+    These poverty lines are used to calculate percentiles for countries that are not in the percentile file.
+    # We only extract to $80 because the highest P99 not available is China, with $64.5
+    # NOTE: In future updates, check if these poverty lines are enough for the extraction
+    """
     # Define poverty lines and their increase
 
     under_2_dollars = list(range(0, 200, 1))
@@ -64,6 +68,11 @@ def poverty_lines_countries():
 
 
 def poverty_lines_regions():
+    """
+    These poverty lines are used to calculate percentiles for regions. None of them are in the percentile file.
+    # We only extract to $300 because the highest P99 not available is Other High Income Countries, with $280
+    # NOTE: In future updates, check if these poverty lines are enough for the extraction
+    """
     # Define poverty lines and their increase
 
     under_2_dollars = list(range(0, 200, 1))
@@ -101,16 +110,22 @@ def poverty_lines_regions():
     return povlines
 
 
+# Define poverty lines for key indicators, depending on the PPP version.
+# It includes the international poverty line, lower and upper-middle income lines, and some other lines.
+POVLINES_DICT = {
+    2011: [100, 190, 320, 550, 1000, 2000, 3000, 4000],
+    2017: [100, 215, 365, 685, 1000, 2000, 3000, 4000],
+}
+
+
 PPP_VERSIONS = [2011, 2017]
 POV_LINES_COUNTRIES = poverty_lines_countries()
 POV_LINES_REGIONS = poverty_lines_regions()
 
-# DEBUGGING
-# PPP_VERSIONS = [2011]
-# POV_LINES = [1, 1000, 25000, 50000]
-PPP_VERSIONS = [2017]
-POV_LINES_COUNTRIES = poverty_lines_countries()
-POV_LINES_REGIONS = poverty_lines_regions()
+# # DEBUGGING
+# PPP_VERSIONS = [2017]
+# POV_LINES_COUNTRIES = [1, 1000, 25000, 50000]
+# POV_LINES_REGIONS = [1, 1000, 25000, 50000]
 
 
 @click.command()
@@ -452,8 +467,11 @@ def generate_percentiles_raw(wb_api: WB_API):
     start_time = time.time()
 
     def get_percentiles_data(povline, versions, ppp_version, country_code):
+        """
+        Check if country percentiles data exists. If not, run the query.
+        """
         if Path(
-            f"{CACHE_DIR}/pip_country_data/pip_country_all_year_all_povline_{povline}_welfare_all_rep_all_fillgaps_{FILL_GAPS}_ppp_{ppp_version}.csv"
+            f"{CACHE_DIR}/pip_country_data/pip_country_{country_code}_year_all_povline_{povline}_welfare_all_rep_all_fillgaps_{FILL_GAPS}_ppp_{ppp_version}.csv"
         ).is_file():
             return
 
@@ -472,6 +490,9 @@ def generate_percentiles_raw(wb_api: WB_API):
         )
 
     def concurrent_percentiles_function(country_code):
+        """
+        Executes get_percentiles_data concurrently.
+        """
         # Make sure the directory exists. If not, create it
         Path(f"{CACHE_DIR}/pip_country_data").mkdir(parents=True, exist_ok=True)
 
@@ -484,6 +505,9 @@ def generate_percentiles_raw(wb_api: WB_API):
             pool.starmap(get_percentiles_data, tasks)
 
     def get_percentiles_data_region(povline, versions, ppp_version):
+        """
+        Check if region percentiles data exists. If not, run the query.
+        """
         if Path(
             f"{CACHE_DIR}/pip_region_data/pip_region_all_year_all_povline_{povline}_ppp_{ppp_version}.csv"
         ).is_file():
@@ -502,27 +526,36 @@ def generate_percentiles_raw(wb_api: WB_API):
         )
 
     def concurrent_percentiles_region_function():
+        """
+        Executes get_percentiles_data_region concurrently.
+        """
         # Make sure the directory exists. If not, create it
         Path(f"{CACHE_DIR}/pip_region_data").mkdir(parents=True, exist_ok=True)
         with ThreadPool(MAX_WORKERS) as pool:
             tasks = [(povline, versions, ppp_version) for ppp_version in PPP_VERSIONS for povline in POV_LINES_REGIONS]
             pool.starmap(get_percentiles_data_region, tasks)
 
-    def get_query_country(povline, ppp_version):
-        # Here I check if the file exists even after the original extraction. If it does, I read it. If not, I start the queries again.
-        file_path_country = f"{CACHE_DIR}/pip_country_data/pip_country_all_year_all_povline_{povline}_welfare_all_rep_all_fillgaps_{FILL_GAPS}_ppp_{ppp_version}.csv"
+    def get_query_country(povline, ppp_version, country_code):
+        """
+        Here I check if the country file exists even after the original extraction. If it does, I read it. If not, I start the queries again.
+        """
+        file_path_country = f"{CACHE_DIR}/pip_country_data/pip_country_{country_code}_year_all_povline_{povline}_welfare_all_rep_all_fillgaps_{FILL_GAPS}_ppp_{ppp_version}.csv"
         if Path(file_path_country).is_file():
             df_query_country = pd.read_csv(file_path_country)
         else:
             # Run the main function to get the data
-            log.warning(f"We need to come back to the extraction! countries, {povline}, {ppp_version} PPPs)")
-            get_percentiles_data(povline, versions, ppp_version)
+            log.warning(
+                f"We need to come back to the extraction! countries = {country_code}, {povline}, {ppp_version} PPPs)"
+            )
+            get_percentiles_data(povline, versions, ppp_version, country_code)
             df_query_country = pd.read_csv(file_path_country)
 
         return df_query_country
 
     def get_query_region(povline, ppp_version):
-        # Here I check if the file exists even after the original extraction. If it does, I read it. If not, I start the queries again.
+        """
+        Here I check if the regional file exists even after the original extraction. If it does, I read it. If not, I start the queries again.
+        """
         file_path_region = (
             f"{CACHE_DIR}/pip_region_data/pip_region_all_year_all_povline_{povline}_ppp_{ppp_version}.csv"
         )
@@ -537,6 +570,11 @@ def generate_percentiles_raw(wb_api: WB_API):
         return df_query_region
 
     def get_list_of_missing_countries():
+        """
+        Compare the list of countries in a common query (reference file) and the list of countries in the percentile file.
+        It generates missing_countries, which is a string with all the elements of the list, in the format for querying multiple countries in the API.
+        And also missing_countries_list, which is a list of the countries.
+        """
         # Obtain the percentile files the World Bank publishes in their Databank
 
         df_percentiles_published_2017 = _fetch_percentiles(2017)
@@ -602,7 +640,11 @@ def generate_percentiles_raw(wb_api: WB_API):
         log.info("Now we are concatenating the files")
 
         with ThreadPool(MAX_WORKERS) as pool:
-            tasks = [(povline, ppp_version) for ppp_version in PPP_VERSIONS for povline in POV_LINES_COUNTRIES]
+            tasks = [
+                (povline, ppp_version, missing_countries)
+                for ppp_version in PPP_VERSIONS
+                for povline in POV_LINES_COUNTRIES
+            ]
             dfs = pool.starmap(get_query_country, tasks)
 
         df_country = pd.concat(dfs, ignore_index=True)
@@ -764,6 +806,15 @@ def generate_consolidated_percentiles(df):
             [df_percentiles, df_percentiles_published_2011, df_percentiles_published_2017], ignore_index=True
         )
 
+        # Drop duplicates. Keep the second one (the official one)
+        df_percentiles = df_percentiles.drop_duplicates(
+            subset=["ppp_version", "country", "year", "reporting_level", "welfare_type", "target_percentile"],
+            keep="last",
+        )
+
+        # Drop target_percentile = 100
+        df_percentiles = df_percentiles[df_percentiles["target_percentile"] != 100].reset_index(drop=True)
+
         # Sort by ppp_version, country, year, reporting_level, welfare_type and target_percentile
         df_percentiles = df_percentiles.sort_values(
             by=["ppp_version", "country", "year", "reporting_level", "welfare_type", "target_percentile"]
@@ -815,7 +866,7 @@ def generate_relative_poverty(wb_api: WB_API):
     def get_relative_data(df_row, pct, versions):
         """
         This function is structured in a way to make it work with concurrent.futures.
-        It processes country data.
+        It checks if the country file related to the row exists. If not, it runs the query.
         """
         if Path(
             f"{CACHE_DIR}/pip_country_data/pip_country_{df_row['country_code']}_year_{df_row['year']}_povline_{int(round(df_row['median'] * pct))}_welfare_{df_row['welfare_type']}_rep_{df_row['reporting_level']}_fillgaps_{FILL_GAPS}_ppp_2017.csv"
@@ -849,7 +900,7 @@ def generate_relative_poverty(wb_api: WB_API):
     def get_relative_data_region(df_row, pct, versions):
         """
         This function is structured in a way to make it work with concurrent.futures.
-        It processes regional data.
+        It checks if the regional file related to the row exists. If not, it runs the query.
         """
         if Path(
             f"{CACHE_DIR}/pip_region_data/pip_region_{df_row['country_code']}_year_{df_row['year']}_povline_{int(round(df_row['median']*pct))}_ppp_2017.csv"
@@ -1011,12 +1062,6 @@ def generate_key_indicators(wb_api: WB_API):
     """
     start_time = time.time()
 
-    # Define poverty lines, depending on the PPP version. It includes the international poverty line, lower and upper-middle income lines, and some other lines.
-    povlines_dict = {
-        2011: [100, 190, 320, 550, 1000, 2000, 3000, 4000],
-        2017: [100, 215, 365, 685, 1000, 2000, 3000, 4000],
-    }
-
     def get_country_data(povline, ppp_version, versions):
         """
         This function is defined inside the main function because it needs to be called by concurrent.futures.
@@ -1061,7 +1106,7 @@ def generate_key_indicators(wb_api: WB_API):
         with ThreadPool(MAX_WORKERS) as pool:
             tasks = [
                 (povline, ppp_version, versions)
-                for ppp_version, povlines in povlines_dict.items()
+                for ppp_version, povlines in POVLINES_DICT.items()
                 for povline in povlines
             ]
             results = pool.starmap(get_country_data, tasks)
@@ -1078,7 +1123,7 @@ def generate_key_indicators(wb_api: WB_API):
         with ThreadPool(int(round(MAX_WORKERS / 2))) as pool:
             tasks = [
                 (povline, ppp_version, versions)
-                for ppp_version, povlines in povlines_dict.items()
+                for ppp_version, povlines in POVLINES_DICT.items()
                 for povline in povlines
             ]
             results = pool.starmap(get_region_data, tasks)
@@ -1149,7 +1194,7 @@ def median_patch(df):
     # Drop thr column
     df = df.drop(columns=["thr"])
 
-    log.info("Medians patched")
+    log.info("Medians patched!")
 
     return df
 
