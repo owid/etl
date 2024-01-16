@@ -4,7 +4,6 @@ The data is directly extracted from the website.
 
 """
 
-import re
 from pathlib import Path
 
 import click
@@ -22,7 +21,7 @@ SNAPSHOT_VERSION = Path(__file__).parent.name
 @click.option("--upload/--skip-upload", default=True, type=bool, help="Upload dataset to Snapshot")
 def main(upload: bool) -> None:
     # Create a new snapshot.
-    snap = Snapshot(f"war/{SNAPSHOT_VERSION}/status_of_world_nuclear_forces.csv")
+    snap = Snapshot(f"war/{SNAPSHOT_VERSION}/nuclear_weapons_tests.csv")
 
     # Request HTML content from website.
     response = requests.get(snap.metadata.origin.url_main)  # type: ignore
@@ -31,13 +30,10 @@ def main(upload: bool) -> None:
     soup = BeautifulSoup(response.text, "html.parser")
 
     # Extract the title of the table.
-    title = soup.find("div", class_="data-embed__title").get_text(strip=True)  # type: ignore
+    tables = soup.find_all("table")
 
-    # Extract the year from the title.
-    year = int(re.findall("\d{4}", title)[0])  # type: ignore
-
-    # Find the relevant table by its class.
-    table = soup.find("div", class_="data-embed__embed data-embed__embed--scroll")
+    # The table we are interested in is the second one, containing the number of tests for each country-year.
+    table = tables[1]
 
     # Initialize a list to hold all rows of data.
     table_data = []
@@ -47,24 +43,17 @@ def main(upload: bool) -> None:
         # Add the row data to the table data list
         table_data.append(row_data)
 
+    # The zeroth element fetched is the left column text, which we don't need.
+    # The first element is the name of the columns.
+    # The last element are the notes, which we will rephrase in the metadata.
+    columns = table_data[1]
+    table_data = table_data[2:-1]
+
     # Create a dataframe with the extracted data.
-    df = pd.DataFrame(
-        table_data,
-        columns=[
-            "COUNTRY",
-            "DEPLOYED STRATEGIC",
-            "DEPLOYED NONSTRATEGIC",
-            "RESERVE/NONDEPLOYED",
-            "MILITARY STOCKPILE(A)",
-            "TOTAL INV",
-        ],
-    )
+    df = pd.DataFrame(table_data, columns=columns)
 
     # Remove empty rows.
     df = df.dropna().reset_index(drop=True)
-
-    # Add year to table.
-    df["year"] = year
 
     # Copy data to snapshots data folder, add file to DVC and upload to S3.
     snap.create_snapshot(data=df, upload=upload)

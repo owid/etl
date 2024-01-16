@@ -173,3 +173,11 @@ steps:
     - data://garden/regions/2023-01-01/regions
   data://grapher/war/2024-01-11/nuclear_weapons_proliferation:
     - data://garden/war/2024-01-11/nuclear_weapons_proliferation
+
+  # Arms Control Association - Nuclear Weapons Tests.
+  data://meadow/war/2024-01-15/nuclear_weapons_tests:
+    - snapshot://war/2024-01-15/nuclear_weapons_tests.csv
+  data://garden/war/2024-01-15/nuclear_weapons_tests:
+    - data://meadow/war/2024-01-15/nuclear_weapons_tests
+  data://grapher/war/2024-01-15/nuclear_weapons_tests:
+    - data://garden/war/2024-01-15/nuclear_weapons_tests
