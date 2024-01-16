@@ -917,7 +917,7 @@ def generate_relative_poverty(wb_api: WB_API):
                 download="true",
             )
 
-    def concurrent_relative_region_function():
+    def concurrent_relative_region_function(df):
         """
         This is the main function to make concurrency work for regional data.
         """
