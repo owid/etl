@@ -1,0 +1,16 @@
+dataset:
+  update_period_days: 60
+
+tables:
+  ghg_concentration:
+    title: Monthly greenhouse gas concentration
+    variables:
+      concentration:
+        title: Monthly average ocean heat content for the 0-700 meters layer
+        description_short: Measured in part per million.
+        unit: part per million
+        short_unit: ppm
+        presentation:
+          topic_tags:
+          - Climate Change
+        processing_level: minor

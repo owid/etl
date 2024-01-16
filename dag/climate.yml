@@ -84,6 +84,15 @@ steps:
   data://garden/climate/2024-01-02/snow_cover_extent:
     - data://meadow/climate/2024-01-02/snow_cover_extent
   #
+  # NOAA Global Monitoring Laboratory - GHG concentration.
+  #
+  data://meadow/climate/2024-01-02/ghg_concentration:
+    - snapshot://climate/2024-01-02/co2_concentration_monthly.csv
+    - snapshot://climate/2024-01-02/ch4_concentration_monthly.csv
+    - snapshot://climate/2024-01-02/n2o_concentration_monthly.csv
+  data://garden/climate/2024-01-02/ghg_concentration:
+    - data://meadow/climate/2024-01-02/ghg_concentration
+  #
   # Climate change impacts data explorer.
   #
   data://explorers/climate/latest/climate_change_impacts:

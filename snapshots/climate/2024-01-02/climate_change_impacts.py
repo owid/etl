@@ -31,6 +31,10 @@ FILES = [
     # Rutgers University Global Snow Lab - Snow Cover Extent.
     "snow_cover_extent_north_america.csv",
     "snow_cover_extent_northern_hemisphere.csv",
+    # NOAA Global Monitoring Laboratory.
+    "co2_concentration_monthly.csv",
+    "ch4_concentration_monthly.csv",
+    "n2o_concentration_monthly.csv",
 ]
 
 ########################################################################################################################
@@ -73,6 +77,7 @@ def main(upload: bool) -> None:
         #   At the very bottom of the page, where it says "Last updated:".
         # * For the Hawaii Ocean Time-Series, the date_published can be found written on the header of the data itself:
         #   https://hahana.soest.hawaii.edu/hot/hotco2/HOT_surface_CO2.txt
+        # * For NOAA GML concentration data, the date_published can be found in the header of each data file.
 
         # Extract publication year from date_published.
         year_published = snap.metadata.origin.date_published.split("-")[0]  # type: ignore
