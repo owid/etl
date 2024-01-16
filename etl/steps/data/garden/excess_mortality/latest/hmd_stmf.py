@@ -18,7 +18,7 @@ paths = PathFinder(__file__)
 THIS_YEAR = date.today().year
 # Minimum and maximum years expected in data
 YEAR_MIN_EXPECTED = 1990
-YEAR_MAX_EXPECTED = 2023
+YEAR_MAX_EXPECTED = 2024
 # Year range to be used (rest is filtered out)
 YEAR_MIN = 2010
 YEAR_MAX = 3000  # (No actual limit)
@@ -75,7 +75,9 @@ def process(df: pd.DataFrame) -> pd.DataFrame:
     df_api_check(df)
     # Harmonize country names
     log.info("\thmd_stmf: harmonizing country names")
-    df = harmonize_countries(df, "countrycode", paths.country_mapping_path, paths.excluded_countries_path)
+    df = harmonize_countries(
+        df, "countrycode", paths.country_mapping_path, paths.excluded_countries_path
+    )
     # Filter some rows
     log.info("\thmd_stmf: filtering entries")
     df = filter_entries(df)
@@ -95,7 +97,9 @@ def process(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def df_api_check(df: pd.DataFrame) -> None:
-    check_values_in_column(df, "year", list(range(YEAR_MIN_EXPECTED, YEAR_MAX_EXPECTED + 1)))
+    check_values_in_column(
+        df, "year", list(range(YEAR_MIN_EXPECTED, YEAR_MAX_EXPECTED + 1))
+    )
     check_values_in_column(df, "week", list(range(1, 54)))
     check_values_in_column(df, "sex", ["m", "f", "b"])
 
@@ -135,9 +139,13 @@ def add_uk(df: pd.DataFrame):
     By default, the dataset only contains data for England & Wales, Scotland and Northern Ireland.
     """
     # Get UK Nations
-    df_uk = df[df["entity"].isin(["England & Wales", "Scotland", "Northern Ireland"])].copy()
+    df_uk = df[
+        df["entity"].isin(["England & Wales", "Scotland", "Northern Ireland"])
+    ].copy()
     # Years to consider (starting from 2015
-    column_years = list(filter(lambda x: x >= 2015, df_uk.filter(regex=r"20\d\d").columns))
+    column_years = list(
+        filter(lambda x: x >= 2015, df_uk.filter(regex=r"20\d\d").columns)
+    )
     # Sanity check
     # NOTE: this used to be
     #     df_uk[[col for col in column_years if col != THIS_YEAR]].isna().sum() < 20
@@ -146,7 +154,9 @@ def add_uk(df: pd.DataFrame):
         df_uk[[col for col in column_years if col <= 2022]].isna().sum() < 20
     ).all(), "Too many missing values. Check values in year columns!"
     # Group by and get sum
-    df_uk = df_uk.groupby(["week", "age"], as_index=False)[column_years].sum(min_count=3)
+    df_uk = df_uk.groupby(["week", "age"], as_index=False)[column_years].sum(
+        min_count=3
+    )
     # Assign Entity name
     df_uk["entity"] = "United Kingdom"
     # Add UK to main dataset
