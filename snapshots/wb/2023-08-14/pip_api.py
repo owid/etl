@@ -1,3 +1,24 @@
+"""
+DATA EXTRACTION FOR THE WORLD BANK POVERTY AND INEQUALITY PLATFORM (PIP) API
+
+This code generates key indicators and percentiles from the World Bank PIP API.
+This is done by combining the results of several queries to the API:
+    - A set of poverty lines (8) to obtain key indicators per PPP year (2011, 2017) and for countries and regions.
+    - 2298 poverty lines to construct percentiles for a group of countries.
+    - 5148 poverty lines to construct percentiles for all the regions.
+    - 8217 of poverty lines to construct estimates of relative poverty.
+
+Percentiles are partially constructed because the data officially published by the World Bank is missing some countries and all the regions.
+
+To run this code from scratch,
+    - Delete the files in the cache folder:
+        rm -rf .cache/pip*
+    - Run the code. There are two options, in the terminal or in the background:
+        python snapshots/wb/2023-08-14/pip_api.py
+        nohup poetry run python snapshots/wb/2023-08-14/pip_api.py > output.log 2>&1 &
+"""
+
+
 import io
 import time
 from multiprocessing.pool import ThreadPool
