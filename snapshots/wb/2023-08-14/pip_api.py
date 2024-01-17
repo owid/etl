@@ -241,7 +241,7 @@ def _fetch_csv(url: str) -> pd.DataFrame:
             response = requests.get(url, timeout=TIMEOUT)
             if response.status_code != 200:
                 log.info("fetch_csv.retry", url=url)
-                continue
+                raise Exception("API timed out")
             else:
                 log.info("fetch_csv.success", url=url, t=response.elapsed.total_seconds())
 
