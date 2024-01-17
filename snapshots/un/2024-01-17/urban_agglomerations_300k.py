@@ -34,7 +34,7 @@ def main(upload: bool) -> None:
         },
         {
             "file_name": "WUP2018-F14-Growth_Rate_Cities.xls",
-            "description": "Average Annual Rate of Change of Urban Agglomerations with 300,000 Inhabitants or More in 2018, by country, 1950-2035 (per cent)",
+            "description": "Average Annual Rate of Change of Urban Agglomerations with 300,000 Inhabitants or More in 2018, by country, 1950-2035 (percent)",
         },
         {
             "file_name": "WUP2018-F15-Percentage_Urban_in_Cities.xls",
@@ -90,6 +90,9 @@ def main(upload: bool) -> None:
                 on=["Country or area", "Urban Agglomeration", "year"],
                 how="outer",
             )
+            merged_df["year"] = merged_df["year"].astype(str)
+            # Extract values after the dash in the "year" column (e.g. 1950-1955 becomes 1955 for rate of change data)
+            merged_df["year"] = merged_df["year"].str.split("-").str[-1]
 
     # Save the final DataFrame to a file
     df_to_file(merged_df, file_path=snap.path)

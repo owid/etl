@@ -11,17 +11,20 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Retrieve snapshot.
-    snap = paths.load_snapshot("urbanization_urban_rural.csv")
+    snap = paths.load_snapshot("urban_agglomerations_size_class.csv")
 
     # Load data from snapshot.
     tb = snap.read()
     #
     # Process data.
     #
-    tb = tb.rename(columns={"Region, subregion, country or area": "country"})
+    tb = tb.rename(columns={"Region, subregion, country or area *": "country"})
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
-    tb = tb.underscore().set_index(["country", "year"], verify_integrity=True).sort_index()
-
+    tb = (
+        tb.underscore()
+        .set_index(["country", "year", "size_class_of_urban_settlement", "type_of_data"], verify_integrity=True)
+        .sort_index()
+    )
     #
     # Save outputs.
     #

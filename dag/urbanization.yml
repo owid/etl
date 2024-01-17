@@ -4,3 +4,12 @@ steps:
   #
   data://meadow/un/2024-01-17/urbanization_urban_rural:
     - snapshot://un/2024-01-17/urbanization_urban_rural.csv
+
+  data://meadow/un/2024-01-17/urban_agglomerations_300k:
+    - snapshot://un/2024-01-17/urban_agglomerations_300k.csv
+
+  data://meadow/un/2024-01-17/urban_agglomerations_size_class:
+    - snapshot://un/2024-01-17/urban_agglomerations_size_class.csv
+
+  data://meadow/un/2024-01-17/urban_agglomerations_largest_cities:
+    - snapshot://un/2024-01-17/urban_agglomerations_largest_cities.csv

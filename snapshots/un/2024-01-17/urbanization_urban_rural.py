@@ -34,7 +34,7 @@ def main(upload: bool) -> None:
         },
         {
             "file_name": "WUP2018-F02-Proportion_Urban.xls",
-            "description": "Percentage of Population at Mid-Year Residing in Urban Areas by region, subregion and country, 1950-2050",
+            "description": "Percentage of population at Mid-Year Residing in Urban Areas by region, subregion and country, 1950-2050",
         },
         {
             "file_name": "WUP2018-F03-Urban_Population.xls",
@@ -50,23 +50,23 @@ def main(upload: bool) -> None:
         },
         {
             "file_name": "WUP2018-F06-Urban_Growth_Rate.xls",
-            "description": "Average Annual Rate of Change of the Urban Population by region, subregion and country, 1950-2050 (per cent)",
+            "description": "Average Annual Rate of Change of the Urban Population by region, subregion and country, 1950-2050 (percent)",
         },
         {
             "file_name": "WUP2018-F07-Rural_Growth_Rate.xls",
-            "description": "Average Annual Rate of Change of the Rural Population by region, subregion and country, 1950-2050 (per cent)",
+            "description": "Average Annual Rate of Change of the Rural Population by region, subregion and country, 1950-2050 (percent)",
         },
         {
             "file_name": "WUP2018-F08-Total_Growth_Rate.xls",
-            "description": "Average Annual Rate of Change of the Total Population by region, subregion and country, 1950-2050 (per cent)",
+            "description": "Average Annual Rate of Change of the Total Population by region, subregion and country, 1950-2050 (percent)",
         },
         {
             "file_name": "WUP2018-F09-Urbanization_Rate.xls",
-            "description": "Average Annual Rate of Change of the Percentage Urban by region, subregion and country, 1950-2050 (per cent)",
+            "description": "Average Annual Rate of Change of the Percentage Urban by region, subregion and country, 1950-2050 (percent)",
         },
         {
             "file_name": "WUP2018-F10-Rate_Proportion_Rural.xls",
-            "description": "Average Annual Rate of Change of the Percentage Rural by region, subregion and country, 1950-2050 (per cent)",
+            "description": "Average Annual Rate of Change of the Percentage Rural by region, subregion and country, 1950-2050 (percent)",
         },
         {
             "file_name": "WUP2018-F18-Total_Population_Annual.xls",

@@ -68,10 +68,12 @@ def main(upload: bool) -> None:
             "Index",
             "Note",
             "Country\ncode",
-            "Country code" "Country Code",
+            "Country code",
+            "Country Code",
             "City code",
             "Latitude",
             "Longitude",
+            "Capital Type",
         ]
 
         # Create a list of columns to keep

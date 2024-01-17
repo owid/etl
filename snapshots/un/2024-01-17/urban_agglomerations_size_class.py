@@ -67,7 +67,7 @@ def main(upload: bool) -> None:
             df_add = pd.read_excel(file_path, skiprows=header_row_index)
 
         # Exclude specified columns from the dataframe if they exist
-        columns_to_exclude = ["Index", "Note", "Country Code", "Size class code", "Type of data"]
+        columns_to_exclude = ["Index", "Note", "Country Code", "Size class code"]
 
         # Create a list of columns to keep
         columns_to_keep = [col for col in df_add.columns if col not in columns_to_exclude]
@@ -75,11 +75,10 @@ def main(upload: bool) -> None:
 
         # Melt the DataFrame to transform it so that columns other than 'Region, subregion, country or area' become one column
         df_melted = df_add.melt(
-            id_vars=["Region, subregion, country or area *", "Size class of urban settlement"],
+            id_vars=["Region, subregion, country or area *", "Size class of urban settlement", "Type of data"],
             var_name="year",
             value_name=file["description"],
         )
-
         # If this is the first file, assign the melted DataFrame to merged_df
         if merged_df.empty:
             merged_df = df_melted
@@ -88,7 +87,7 @@ def main(upload: bool) -> None:
             merged_df = pd.merge(
                 merged_df,
                 df_melted,
-                on=["Region, subregion, country or area *", "Size class of urban settlement", "year"],
+                on=["Region, subregion, country or area *", "Size class of urban settlement", "year", "Type of data"],
                 how="outer",
             )
 
