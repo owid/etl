@@ -13,30 +13,68 @@ tables:
     # Learn more about the available fields:
     # http://docs.owid.io/projects/etl/architecture/metadata/reference/indicator/
     variables:
-      total_maternity_leave:
-        title: Total days of leave available for the mother
+      total_maternity_leave_to:
+        title: Total days of leave available to the mother
         unit: days
         short_unit: ''
-        description_processing: The total days of leave available for the mother indicator was created by OWID by combining maternity leave and parental leave mother quota indicators. For more details on each indicator see the section on **How producer describes this data**.
+        description_processing: This indicator was created by Our World in Data by combining maternity leave and parental leave mother quota indicators. For more details on each indicator see the section on **How producer describes this data**.
         description_key:
           - This indicator is created by combining two specific types of parental leave. These components, together, provide a detailed understanding of the total leave available to mothers in relation to childbirth and early childcare.
           - The first component, the length of paid maternity leave, focuses on the leave specifically designated for mothers around the time of childbirth. This includes the days taken just before, during, and immediately after giving birth. The primary focus of this leave is on the mother's recovery and the essential bonding time with the newborn. It's a critical period that supports the mother's health and wellbeing, as well as the initial development of the child.
           - The second component, the length of paid parental leave for mother, includes days of parental leave that are specifically reserved for mothers. These are often defined by "use-it-or-lose-it" policies or mothers’ quotas. This part of the indicator represents additional support provided to mothers, extending beyond the traditional maternity leave period. It ensures that mothers have dedicated time for child-rearing and recovery, which cannot be transferred to fathers. This acknowledges the unique needs of mothers in the postnatal period and supports their role in early childcare.
-          - By integrating these two elements, the indicator provides a total count of the calendar days of leave available to mothers. It reflects a country's legislative approach to supporting mothers in the workforce. This integration highlights the legal and policy frameworks in place to ensure maternal well-being and support in early child-rearing. This measure is crucial for assessing how different countries prioritize maternal health, postnatal care, and gender equality in parental leave policies.
+          - The sum of these components reflects the total days of leave available specifically for the mother, emphasizing the support for maternal health and well-being.
+          - This indicator uses standardized assumptions, like the woman having one child and residing in the largest business city, to ensure comparability, though this approach may not capture variations in laws affecting women in different states, rural areas, or minority groups
+
         processing_level: major
         display:
           numDecimalPlaces: 0
 
-      total_paternity_leave:
-        title: Total days of leave available for the father
+
+      total_paternity_leave_to:
+        title: Total days of leave available to the father
         unit: days
         short_unit: ''
-        description_processing: The total days of leave available for the father indicator was created by OWID by combining paternity leave and parental leave father quota indicators. For more details on each indicator see **How producer describes this data**."
+        description_processing: This indicator was created by Our World in Data by combining paternity leave and parental leave father quota indicators. For more details on each indicator see **How producer describes this data**."
         description_key:
           - This indicator is created by combining two specific types of parental leave. These components, together, provide a detailed understanding of the total leave available to fathers in relation to childbirth and early childcare.
           - The first component, the length of paid paternity leave, focuses on the leave specifically designated for fathers at the time of childbirth. This includes the days available exclusively to fathers to support them in bonding with the newborn and assisting in early childcare. This leave plays a crucial role in supporting the father's engagement during the early stages of a child's life.
           - The second component, the length of paid parental leave for father, includes days of parental leave that are specifically reserved for fathers. These are often defined by "use-it-or-lose-it" policies or fathers’ quotas. This part of the indicator represents additional support provided to fathers, extending beyond the traditional paternity leave period. It ensures that fathers have dedicated time for child-rearing, promoting their active involvement in early childcare and supporting gender equality in parental responsibilities.
-          - By integrating these two elements, the indicator provides a total count of the calendar days of leave available to fathers. It reflects a country's legislative approach to supporting fathers in the workforce and their role in early childcare. This integration highlights the legal and policy frameworks in place to ensure paternal involvement and support in early child-rearing. This measure is crucial for assessing how different countries prioritize paternal involvement, postnatal care, and gender equality in parental leave policies.
+          - The sum of these components reflects the total days of leave available specifically for the father, highlighting the support for paternal involvement and gender equality in parenting.
+          - This indicator uses standardized assumptions, like the woman having one child and residing in the largest business city, to ensure comparability, though this approach may not capture variations in laws affecting women in different states, rural areas, or minority groups
+
+        processing_level: major
+        display:
+          numDecimalPlaces: 0
+      total_maternity_leave_for:
+        title: Total days of leave available for the mother
+        unit: days
+        short_unit: ''
+        description_processing: This indicator was created by Our World in Data by combining maternity leave, parental leave mother quota and shared parental leave indicators. For more details on each indicator see **How producer describes this data**.
+        description_key:
+          - This indicator is created by combining three specific types of parental leave. These components, together, provide a detailed understanding of the total leave available to mothers in relation to childbirth and early childcare.
+          - The first component, the length of paid maternity leave, focuses on the leave specifically designated for mothers at the time of childbirth. This includes the days available exclusively to mothers to support them in bonding with the newborn and assisting in early childcare. This leave plays a crucial role in supporting the mother's engagement during the early stages of a child's life.
+          - The second component, the length of paid parental leave for mother, includes days of parental leave that are specifically reserved for mothers. These are often defined by policies that support gender equality in parental responsibilities. This part of the indicator represents additional support provided to mothers, extending beyond the traditional maternity leave period.
+          - The third component, the length of shared parental leave, represents the portion of leave that can be shared between parents. This flexibility allows for a more equitable distribution of childcare responsibilities and supports gender equality.
+          - By integrating these components, the indicator provides a total count of the calendar days of leave available to mothers.
+          - This indicator uses standardized assumptions, like the woman having one child and residing in the largest business city, to ensure comparability, though this approach may not capture variations in laws affecting women in different states, rural areas, or minority groups
+
+        processing_level: major
+        display:
+          numDecimalPlaces: 0
+
+      total_paternity_leave_for:
+        title: Total days of leave available for the father
+        unit: days
+        short_unit: ''
+        description_processing: This indicator was created by Our World in Data by combining paternity leave, parental leave father quota and shared parental leave indicators. For more details on each indicator see **How producer describes this data**.
+        description_key:
+          - This indicator is created by combining three specific types of parental leave. These components, together, provide a detailed understanding of the total leave available for the fathers in relation to childbirth and early childcare.
+          - The first component, the length of paid paternity leave, focuses on the leave specifically designated for fathers at the time of childbirth. This includes the days available exclusively to fathers to support them in bonding with the newborn and assisting in early childcare.
+          - The second component, the length of paid parental leave for father, includes days of parental leave that are specifically reserved for fathers. These are often defined by "use-it-or-lose-it" policies or fathers’ quotas.
+          - The third component, the length of shared parental leave, represents the portion of leave that can be shared between parents. This flexibility allows for a more equitable distribution of childcare responsibilities and supports gender equality.
+          - By integrating these components, the indicator provides a total count of the calendar days of leave available for fathers.
+          - This indicator uses standardized assumptions, like the woman having one child and residing in the largest business city, to ensure comparability, though this approach may not capture variations in laws affecting women in different states, rural areas, or minority groups
+
         processing_level: major
         display:
           numDecimalPlaces: 0
