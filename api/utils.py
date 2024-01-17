@@ -17,7 +17,7 @@ def send_slack_message(message: str) -> None:
         slack_client.chat_postMessage(channel="@Mojmir", text=message)
 
 
-def format_slack_message(method, url, req_body, res_body):
+def format_slack_message(method, url, status_code, req_body, res_body):
     try:
         res_body = json.dumps(json.loads(res_body), indent=2)
     except json.decoder.JSONDecodeError:
@@ -28,8 +28,13 @@ def format_slack_message(method, url, req_body, res_body):
     except json.decoder.JSONDecodeError:
         pass
 
+    if status_code == 200:
+        emoji = ":information_source:"
+    else:
+        emoji = ":warning:"
+
     return f"""
-:information_source: *{method}* {url}
+{emoji} *{method}* {url}
 Request
 ```
 {req_body}

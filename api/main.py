@@ -60,10 +60,12 @@ async def slack_middleware(request: Request, call_next):
     async for chunk in response.body_iterator:
         res_body += chunk
 
-    log.info("response", method=request.method, url=str(request.url), body=res_body)
+    log.info("response", method=request.method, url=str(request.url), status_code=response.status_code, body=res_body)
 
     utils.send_slack_message(
-        utils.format_slack_message(request.method, request.url, req_body.decode(), res_body.decode())
+        utils.format_slack_message(
+            request.method, request.url, response.status_code, req_body.decode(), res_body.decode()
+        )
     )
 
     return Response(
@@ -75,5 +77,4 @@ async def slack_middleware(request: Request, call_next):
 
 @app.get("/health")
 def health() -> dict:
-    raise NotImplementedError()
     return {"status": "ok"}

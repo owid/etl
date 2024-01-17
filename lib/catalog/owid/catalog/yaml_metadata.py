@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Any, List, Literal, Union
+from typing import Any, List, Literal, Optional, Union
 
 from owid.catalog.meta import SOURCE_EXISTS_OPTIONS
 
@@ -76,14 +76,27 @@ def update_metadata_from_yaml(
     tb.metadata = TableMeta.from_dict(tb_meta_dict)
 
 
-def _merge_variable_metadata(md: dict, new: dict, if_origins_exist: SOURCE_EXISTS_OPTIONS, overwrite: bool) -> dict:
+def _merge_variable_metadata(
+    md: dict,
+    new: dict,
+    if_origins_exist: SOURCE_EXISTS_OPTIONS,
+    overwrite: bool,
+    overwrite_display: Optional[bool] = None,
+) -> dict:
     """Merge VariableMeta in a dictionary with another dictionary. It modifies the original object."""
+    # fallback to general overwrite value
+    if overwrite_display is None:
+        overwrite_display = overwrite
+
     # NOTE: when this gets stable, consider removing flags `if_origins_exist` and `overwrite` if they are not used
     for k, v in new.items():
         # special cases
         if k in ("presentation", "grapher_config"):
             # merge fields
             md[k] = _merge_variable_metadata(md.get(k, {}), v, if_origins_exist, overwrite)
+        # merge display
+        elif k == "display":
+            md[k] = _merge_variable_metadata(md.get(k, {}), v, if_origins_exist, overwrite=overwrite_display)
         # origins have their special flag to decide what to do
         elif k == "origins":
             if if_origins_exist == "fail" and md["origins"]:

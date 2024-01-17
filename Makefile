@@ -136,4 +136,4 @@ version-tracker: .venv
 
 api: .venv
 	@echo '==> Starting ETL API'
-	poetry run uvicorn api.main:app --reload
+	poetry run uvicorn api.main:app --reload --port 8000 --host 0.0.0.0

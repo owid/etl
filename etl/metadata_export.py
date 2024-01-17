@@ -78,7 +78,7 @@ def cli(
             f.write(yaml_str)  # type: ignore
 
 
-def merge_or_create_yaml(meta_dict: Dict[str, Any], output_path: Path) -> str:
+def merge_or_create_yaml(meta_dict: Dict[str, Any], output_path: Path, delete_empty: bool = True) -> str:
     """Merge metadata with existing YAML file or create a new one and return it as string."""
     # if output_path exists, update its values, but keep YAML structure intact
     if output_path.exists():
@@ -108,8 +108,16 @@ def merge_or_create_yaml(meta_dict: Dict[str, Any], output_path: Path) -> str:
 
             for var_name, var_meta in variables.items():
                 orig_variables[var_name] = _merge_variable_metadata(
-                    orig_variables[var_name], var_meta, if_origins_exist="replace", overwrite=True
+                    orig_variables[var_name],
+                    var_meta,
+                    if_origins_exist="replace",
+                    overwrite=True,
+                    overwrite_display=False,
                 )
+
+                if delete_empty:
+                    if orig_variables[var_name].get("processing_level") == "":
+                        del orig_variables[var_name]["processing_level"]
 
         if doc["dataset"] == {}:
             del doc["dataset"]

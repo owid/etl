@@ -6,7 +6,7 @@ It has been slightly modified since then.
 """
 import json
 from datetime import date, datetime
-from typing import Annotated, Any, Dict, List, Optional, TypedDict, Union
+from typing import Annotated, Any, Dict, List, Literal, Optional, TypedDict, Union
 from urllib.parse import quote
 
 import humps
@@ -56,6 +56,7 @@ log = structlog.get_logger()
 SelectOfScalar.inherit_cache = True  # type: ignore
 Select.inherit_cache = True  # type: ignore
 
+S3_PATH_TYP = Literal["s3", "http"]
 
 metadata = SQLModel.metadata
 
@@ -1227,15 +1228,25 @@ class Variable(SQLModel, table=True):
 
         TagsVariablesTopicTagsLink.link_with_variable(session, self.id, [tag.id for tag in tags])  # type: ignore
 
-    def s3_data_path(self) -> str:
+    def s3_data_path(self, typ: S3_PATH_TYP = "s3") -> str:
         """Path to S3 with data in JSON format for Grapher. Typically
         s3://owid-api/v1/indicators/123.data.json."""
-        return f"{config.BAKED_VARIABLES_PATH}/{self.id}.data.json"
+        if typ == "s3":
+            return f"{config.BAKED_VARIABLES_PATH}/{self.id}.data.json"
+        elif typ == "http":
+            return f"{config.DATA_API_URL}/{self.id}.data.json"
+        else:
+            raise NotImplementedError()
 
-    def s3_metadata_path(self) -> str:
+    def s3_metadata_path(self, typ: S3_PATH_TYP = "s3") -> str:
         """Path to S3 with metadata in JSON format for Grapher. Typically
         s3://owid-api/v1/indicators/123.metadata.json."""
-        return f"{config.BAKED_VARIABLES_PATH}/{self.id}.metadata.json"
+        if typ == "s3":
+            return f"{config.BAKED_VARIABLES_PATH}/{self.id}.metadata.json"
+        elif typ == "http":
+            return f"{config.DATA_API_URL}/{self.id}.metadata.json"
+        else:
+            raise NotImplementedError()
 
 
 class ChartDimensions(SQLModel, table=True):

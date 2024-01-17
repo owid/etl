@@ -1,9 +1,0 @@
-tables:
-  cherry_blossom:
-    variables:
-      full_flowering_date:
-        description_key:
-          - ABC
-          - BCA - nope
-        presentation:
-          title_public: 'what the hell'
