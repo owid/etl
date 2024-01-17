@@ -29,14 +29,11 @@ engine = get_engine()
 DATASET_SCHEMA = read_json_schema(path=SCHEMAS_DIR / "dataset-schema.json")
 
 
-v1 = FastAPI()
-api_router = APIRouter()
+v1 = APIRouter()
 
 
-@api_router.put("/indicators/{indicator_id}")
+@v1.put("/v1/indicators/{indicator_id}")
 def update_indicator(indicator_id: int, update_request: UpdateIndicatorRequest):
-    print(update_request.dict())
-    raise NotImplementedError()
     # update YAML file
     with Session(engine) as session:
         indicator = gm.Variable.load_variable(session, indicator_id)
@@ -74,16 +71,6 @@ def update_indicator(indicator_id: int, update_request: UpdateIndicatorRequest):
         )
 
     return {"yaml": yaml_str}
-
-
-async def log_json(request: Request):
-    body_json = await _read_body(request)
-
-    log.info("request", method=request.method, url=str(request.url), body=body_json)
-
-
-# v1.include_router(api_router, dependencies=[Depends(log_json)])
-v1.include_router(api_router)
 
 
 def _parse_catalog_path(catalog_path: str) -> Tuple[Path, str, str]:

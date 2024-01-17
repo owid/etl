@@ -1,17 +1,14 @@
-import json
-
 import bugsnag
 import structlog
 from bugsnag.asgi import BugsnagMiddleware
 from fastapi import FastAPI, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
-from slack_sdk import WebClient
 
 from api.v1 import v1
 from etl import config
 from etl.db import get_engine
-from etl.helpers import read_json_schema
-from etl.paths import SCHEMAS_DIR
+
+from . import utils
 
 log = structlog.get_logger()
 
@@ -20,10 +17,6 @@ bugsnag.configure(
 )
 
 engine = get_engine()
-
-slack_client = WebClient(token=config.SLACK_API_TOKEN)
-
-DATASET_SCHEMA = read_json_schema(path=SCHEMAS_DIR / "dataset-schema.json")
 
 
 def get_application():
@@ -47,41 +40,16 @@ def get_application():
 
 app = get_application()
 
-# mount subapplications as versions
-app.mount("/v1", v1)
-
-
-def send_slack_message(message: str) -> None:
-    if config.SLACK_API_TOKEN:
-        slack_client.chat_postMessage(channel="@Mojmir", text=message)
-
-
-def format_slack_message(method, url, req_body, res_body):
-    try:
-        res_body = json.dumps(json.loads(res_body), indent=2)
-    except json.decoder.JSONDecodeError:
-        pass
-
-    try:
-        req_body = json.dumps(json.loads(req_body), indent=2)
-    except json.decoder.JSONDecodeError:
-        pass
-
-    return f"""
-:information_source: *{method}* {url}
-Request
-```
-{req_body}
-```
-Response
-```
-{res_body}
-```
-    """
+# NOTE: I tried using subapplications, but they don't propagate errors to middleware
+# see https://github.com/tiangolo/fastapi/discussions/8577 (even the latest versions didn't help)
+app.include_router(v1)
 
 
 @app.middleware("http")
 async def slack_middleware(request: Request, call_next):
+    if request.method == "OPTIONS":
+        return await call_next(request)
+
     req_body = await request.body()
 
     log.info("request", method=request.method, url=str(request.url), body=req_body)
@@ -94,7 +62,9 @@ async def slack_middleware(request: Request, call_next):
 
     log.info("response", method=request.method, url=str(request.url), body=res_body)
 
-    send_slack_message(format_slack_message(request.method, request.url, req_body.decode(), res_body.decode()))
+    utils.send_slack_message(
+        utils.format_slack_message(request.method, request.url, req_body.decode(), res_body.decode())
+    )
 
     return Response(
         content=res_body,
@@ -105,4 +75,5 @@ async def slack_middleware(request: Request, call_next):
 
 @app.get("/health")
 def health() -> dict:
+    raise NotImplementedError()
     return {"status": "ok"}

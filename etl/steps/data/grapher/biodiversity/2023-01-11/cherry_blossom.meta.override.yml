@@ -4,4 +4,6 @@ tables:
       full_flowering_date:
         description_key:
           - ABC
-          - "BCA - and it feels like this\non the other hand, there's no other way how to do it."
+          - BCA - nope
+        presentation:
+          title_public: 'what the hell'
