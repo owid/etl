@@ -17,7 +17,7 @@ tables:
         title: Total days of leave available to the mother
         unit: days
         short_unit: ''
-        description_processing: This indicator was created by OWID by combining maternity leave and parental leave mother quota indicators. For more details on each indicator see the section on **How producer describes this data**.
+        description_processing: This indicator was created by Our World in Data by combining maternity leave and parental leave mother quota indicators. For more details on each indicator see the section on **How producer describes this data**.
         description_key:
           - This indicator is created by combining two specific types of parental leave. These components, together, provide a detailed understanding of the total leave available to mothers in relation to childbirth and early childcare.
           - The first component, the length of paid maternity leave, focuses on the leave specifically designated for mothers around the time of childbirth. This includes the days taken just before, during, and immediately after giving birth. The primary focus of this leave is on the mother's recovery and the essential bonding time with the newborn. It's a critical period that supports the mother's health and wellbeing, as well as the initial development of the child.
@@ -34,7 +34,7 @@ tables:
         title: Total days of leave available to the father
         unit: days
         short_unit: ''
-        description_processing: This indicator was created by OWID by combining paternity leave and parental leave father quota indicators. For more details on each indicator see **How producer describes this data**."
+        description_processing: This indicator was created by Our World in Data by combining paternity leave and parental leave father quota indicators. For more details on each indicator see **How producer describes this data**."
         description_key:
           - This indicator is created by combining two specific types of parental leave. These components, together, provide a detailed understanding of the total leave available to fathers in relation to childbirth and early childcare.
           - The first component, the length of paid paternity leave, focuses on the leave specifically designated for fathers at the time of childbirth. This includes the days available exclusively to fathers to support them in bonding with the newborn and assisting in early childcare. This leave plays a crucial role in supporting the father's engagement during the early stages of a child's life.
@@ -49,7 +49,7 @@ tables:
         title: Total days of leave available for the mother
         unit: days
         short_unit: ''
-        description_processing: This indicator was created by OWID by combining maternity leave and parental leave mother quota indicators. For more details on each indicator see **How producer describes this data**.
+        description_processing: This indicator was created by Our World in Data by combining maternity leave, parental leave mother quota and shared parental leave indicators. For more details on each indicator see **How producer describes this data**.
         description_key:
           - This indicator is created by combining three specific types of parental leave. These components, together, provide a detailed understanding of the total leave available to mothers in relation to childbirth and early childcare.
           - The first component, the length of paid maternity leave, focuses on the leave specifically designated for mothers at the time of childbirth. This includes the days available exclusively to mothers to support them in bonding with the newborn and assisting in early childcare. This leave plays a crucial role in supporting the mother's engagement during the early stages of a child's life.
@@ -66,7 +66,7 @@ tables:
         title: Total days of leave available for the father
         unit: days
         short_unit: ''
-        description_processing: This indicator was created by OWID by combining paternity leave and parental leave father quota indicators. For more details on each indicator see **How producer describes this data**.
+        description_processing: This indicator was created by Our World in Data by combining paternity leave, parental leave father quota and shared parental leave indicators. For more details on each indicator see **How producer describes this data**.
         description_key:
           - This indicator is created by combining three specific types of parental leave. These components, together, provide a detailed understanding of the total leave available for the fathers in relation to childbirth and early childcare.
           - The first component, the length of paid paternity leave, focuses on the leave specifically designated for fathers at the time of childbirth. This includes the days available exclusively to fathers to support them in bonding with the newborn and assisting in early childcare.
