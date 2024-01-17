@@ -31,6 +31,9 @@ import requests
 from botocore.exceptions import ClientError
 from joblib import Memory
 from structlog import get_logger
+from tenacity import Retrying
+from tenacity.stop import stop_after_attempt
+from tenacity.wait import wait_random_exponential
 
 from etl.files import checksum_str
 from etl.paths import CACHE_DIR
@@ -233,28 +236,26 @@ def _fetch_csv(url: str) -> pd.DataFrame:
 
     log.info("fetch_csv.start", url=url)
 
-    # Repeat request until status is 200 or until MAX_REPEATS
-    repeat = 0
-    while repeat < MAX_REPEATS:
-        response = requests.get(url, timeout=TIMEOUT)
-        if response.status_code != 200:
-            log.info("fetch_csv.retry", url=url)
-            repeat += 1
-            continue
-        else:
-            log.info("fetch_csv.success", url=url, t=response.elapsed.total_seconds())
+    for attempt in Retrying(wait=wait_random_exponential(multiplier=1), stop=stop_after_attempt(MAX_REPEATS)):
+        with attempt:
+            response = requests.get(url, timeout=TIMEOUT)
+            if response.status_code != 200:
+                log.info("fetch_csv.retry", url=url)
+                continue
+            else:
+                log.info("fetch_csv.success", url=url, t=response.elapsed.total_seconds())
 
-            # save the result to R2 cache
-            r2.put_object(
-                Body=response.content,
-                Bucket=r2_bucket,
-                Key=r2_key,
-            )
+                # save the result to R2 cache
+                r2.put_object(
+                    Body=response.content,
+                    Bucket=r2_bucket,
+                    Key=r2_key,
+                )
 
-            df = pd.read_csv(io.StringIO(response.content.decode("utf-8")))
-            return df
+                df = pd.read_csv(io.StringIO(response.content.decode("utf-8")))
+                return df
 
-    raise AssertionError(f"Repeated {repeat} times, can't extract data for url {url}")
+    raise AssertionError(f"Repeated {MAX_REPEATS} times, can't extract data for url {url}")
 
 
 @memory.cache
