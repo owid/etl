@@ -85,8 +85,8 @@ def main(upload: bool) -> None:
             "description": "Annual Percentage of Population at Mid-Year Residing in Urban Areas by region, subregion and country, 1950-2050",
         },
     ]
-    df_list = []  # List to store dataframes for each file
-
+    # Initialize an empty DataFrame to store the merged data
+    merged_df = pd.DataFrame()
     # Fetch data from the website and store in a list of DataFrames
     for i, file in enumerate(file_details):
         file_path = common_path + file["file_name"]
@@ -111,18 +111,37 @@ def main(upload: bool) -> None:
         columns_to_keep = [col for col in df_add.columns if col not in columns_to_exclude]
         df_add = df_add[columns_to_keep]
 
-        # Melt the DataFrame to transform it so that columns other than 'Region, subregion, country or area' become one column
-        df_melted = df_add.melt(
-            id_vars=["Region, subregion, country or area"], var_name="year", value_name=file["description"]
-        )
+        if (
+            file["description"]
+            == "Population of Urban and Rural Areas at Mid-Year (thousands) and Percentage Urban, 2018"
+        ):
+            df_add["year"] = "2018"
+            df_add = df_add.rename(
+                columns={
+                    "Urban": "urban_population",
+                    "Rural": "rural_population",
+                    "Total": "total_population",
+                    "Percentage urban": "percentage_urban",
+                }
+            )
+        else:
+            # Melt the DataFrame to transform it so that columns other than 'Region, subregion, country or area' become one column
+            df_add = df_add.melt(
+                id_vars=["Region, subregion, country or area"], var_name="year", value_name=file["description"]
+            )
+            df_add["year"] = df_add["year"].astype(str)
+            # Extract values after the dash in the "year" column (e.g. 1950-1955 becomes 1955 for rate of change data)
+            df_add["year"] = df_add["year"].str.split("-").str[-1]
 
-        df_list.append(df_melted)
-
-    # Concatenate the DataFrames from the list
-    all_dfs = pd.concat(df_list)
+        # If this is the first file, assign the melted DataFrame to merged_df
+        if merged_df.empty:
+            merged_df = df_add
+        else:
+            # Otherwise, merge the melted DataFrame with the existing merged_df
+            merged_df = pd.merge(merged_df, df_add, on=["Region, subregion, country or area", "year"], how="outer")
 
     # Save the final DataFrame to a file
-    df_to_file(all_dfs, file_path=snap.path)
+    df_to_file(merged_df, file_path=snap.path)
 
     # Add file to DVC and upload to S3.
     snap.dvc_add(upload=upload)

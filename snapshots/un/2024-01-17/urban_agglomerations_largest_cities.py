@@ -1,6 +1,7 @@
 from pathlib import Path
 
 import click
+import numpy as np
 import pandas as pd
 from owid.datautils.io import df_to_file
 
@@ -43,7 +44,8 @@ def main(upload: bool) -> None:
         },
     ]
 
-    df_list = []  # List to store dataframes for each file
+    # Initialize an empty DataFrame to store the merged data
+    merged_df = pd.DataFrame()
     # Fetch data from the website and store in a list of DataFrames
     for i, file in enumerate(file_details):
         file_path = common_path + file["file_name"]
@@ -62,23 +64,52 @@ def main(upload: bool) -> None:
             df_add = pd.read_excel(file_path, skiprows=header_row_index)
 
         # Exclude specified columns from the dataframe if they exist
-        columns_to_exclude = ["Index", "Note", "Country\ncode", "Country Code", "City code", "Latitude", "Longitude"]
+        columns_to_exclude = [
+            "Index",
+            "Note",
+            "Country\ncode",
+            "Country code" "Country Code",
+            "City code",
+            "Latitude",
+            "Longitude",
+        ]
 
         # Create a list of columns to keep
         columns_to_keep = [col for col in df_add.columns if col not in columns_to_exclude]
         df_add = df_add[columns_to_keep]
 
         if "Population (millions)" in df_add.columns:
-            df_add = df_add.rename(columns={"Population (millions)": file["description"]})
+            df_add = df_add.rename(
+                columns={
+                    "Population (millions)": file["description"],
+                    "Country or Area": "country",
+                    "Urban Agglomeration": "urban_agglomeration",
+                    "Year": "year",
+                    "Rank\nOrder": "rank_order",
+                }
+            )
 
             df_add = df_add.rename(columns={"Population (thousands)": file["description"]})
-        df_list.append(df_add)
 
-    # Concatenate the DataFrames from the list
-    all_dfs = pd.concat(df_list)
+        if file["description"] == "Population of Capital Cities in 2018 (thousands)":
+            df_add = df_add.rename(columns={"Capital City": "urban_agglomeration", "Country or area": "country"})
+            df_add["year"] = 2018
+            df_add["rank_order"] = np.NaN
+
+        # If this is the first file, assign the melted DataFrame to merged_df
+        if merged_df.empty:
+            merged_df = df_add
+        else:
+            # Otherwise, merge the melted DataFrame with the existing merged_df
+            merged_df = pd.merge(
+                merged_df,
+                df_add,
+                on=["year", "rank_order", "country", "urban_agglomeration"],
+                how="outer",
+            )
 
     # Save the final DataFrame to a file
-    df_to_file(all_dfs, file_path=snap.path)
+    df_to_file(merged_df, file_path=snap.path)
 
     # Add file to DVC and upload to S3.
     snap.dvc_add(upload=upload)

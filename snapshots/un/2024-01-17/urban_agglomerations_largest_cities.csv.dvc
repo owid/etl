@@ -26,6 +26,6 @@ meta:
       url: https://www.un.org/en/about-us/terms-of-use
 wdir: ../../../data/snapshots/un/2024-01-17
 outs:
-- md5: c9b942d72054998246c71dc2969de939
-  size: 69485
+- md5: efa76d8e1dc14221501d2f31905ced91
+  size: 55311
   path: urban_agglomerations_largest_cities.csv

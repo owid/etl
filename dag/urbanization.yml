@@ -1,0 +1,6 @@
+steps:
+  #
+  # UN urbanization dataset.
+  #
+  data://meadow/un/2024-01-17/urbanization_urban_rural:
+    - snapshot://un/2024-01-17/urbanization_urban_rural.csv

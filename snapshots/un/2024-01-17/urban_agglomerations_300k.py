@@ -49,7 +49,8 @@ def main(upload: bool) -> None:
             "description": "Annual Population of Urban Agglomerations with 300,000 Inhabitants or More in 2018, by country, 1950-2035 (thousands)",
         },
     ]
-    df_list = []  # List to store dataframes for each file
+    # Initialize an empty DataFrame to store the merged data
+    merged_df = pd.DataFrame()
     # Fetch data from the website and store in a list of DataFrames
     for i, file in enumerate(file_details):
         file_path = common_path + file["file_name"]
@@ -78,13 +79,20 @@ def main(upload: bool) -> None:
         df_melted = df_add.melt(
             id_vars=["Country or area", "Urban Agglomeration"], var_name="year", value_name=file["description"]
         )
-        df_list.append(df_melted)
-
-    # Concatenate the DataFrames from the list
-    all_dfs = pd.concat(df_list)
+        # If this is the first file, assign the melted DataFrame to merged_df
+        if merged_df.empty:
+            merged_df = df_melted
+        else:
+            # Otherwise, merge the melted DataFrame with the existing merged_df
+            merged_df = pd.merge(
+                merged_df,
+                df_melted,
+                on=["Country or area", "Urban Agglomeration", "year"],
+                how="outer",
+            )
 
     # Save the final DataFrame to a file
-    df_to_file(all_dfs, file_path=snap.path)
+    df_to_file(merged_df, file_path=snap.path)
 
     # Add file to DVC and upload to S3.
     snap.dvc_add(upload=upload)
