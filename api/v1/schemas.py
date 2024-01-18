@@ -55,9 +55,6 @@ class Indicator(BaseModel):
         }
         d = utils.prune_none(d)
 
-        # if d["processing_level"] == "":
-        #     del d["processing_level"]
-
         return d
 
 

@@ -5,7 +5,7 @@ import requests
 import structlog
 import yaml
 from fastapi import APIRouter, BackgroundTasks, HTTPException
-from git import Repo
+from git.repo import Repo
 from jsonschema import validate
 from jsonschema.exceptions import ValidationError
 from sqlmodel import Session

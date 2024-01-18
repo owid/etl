@@ -12,9 +12,9 @@ def prune_none(d: Dict[str, Any]) -> Dict[str, Any]:
     return {k: v for k, v in d.items() if v is not None}
 
 
-def send_slack_message(message: str) -> None:
+def send_slack_message(channel: str, message: str) -> None:
     if config.SLACK_API_TOKEN:
-        slack_client.chat_postMessage(channel="@Mojmir", text=message)
+        slack_client.chat_postMessage(channel=channel, text=message)
 
 
 def format_slack_message(method, url, status_code, req_body, res_body):

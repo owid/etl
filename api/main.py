@@ -63,9 +63,10 @@ async def slack_middleware(request: Request, call_next):
     log.info("response", method=request.method, url=str(request.url), status_code=response.status_code, body=res_body)
 
     utils.send_slack_message(
+        "@metadata-updates",
         utils.format_slack_message(
             request.method, request.url, response.status_code, req_body.decode(), res_body.decode()
-        )
+        ),
     )
 
     return Response(
