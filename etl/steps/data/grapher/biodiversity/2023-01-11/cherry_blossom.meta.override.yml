@@ -1,0 +1,6 @@
+tables:
+  cherry_blossom:
+    variables:
+      full_flowering_date:
+        display:
+          conversionFactor: 2
