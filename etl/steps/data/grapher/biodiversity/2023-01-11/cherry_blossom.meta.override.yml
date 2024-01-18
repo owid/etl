@@ -3,4 +3,4 @@ tables:
     variables:
       full_flowering_date:
         display:
-          conversionFactor: 2
+          conversionFactor: 3
