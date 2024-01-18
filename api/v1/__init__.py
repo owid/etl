@@ -5,6 +5,7 @@ import requests
 import structlog
 import yaml
 from fastapi import APIRouter, BackgroundTasks, HTTPException
+from git import Repo
 from jsonschema import validate
 from jsonschema.exceptions import ValidationError
 from sqlmodel import Session
@@ -76,10 +77,23 @@ def update_indicator(indicator_id: int, update_request: UpdateIndicatorRequest, 
     if not update_request.dryRun:
         _update_indicator_in_r2(db_indicator, update_request.indicator)
 
+    if update_request.commit:
+        background_tasks.add_task(_commit_and_push, override_yml_path, ":robot: Metadata update by Admin")
+
     if update_request.triggerETL:
         background_tasks.add_task(_trigger_etl, indicator_short_name, db_indicator, update_request.dryRun)
 
     return {"yaml": yaml_str}
+
+
+def _commit_and_push(file_path: Path, commit_message: str) -> None:
+    repo = Repo(paths.BASE_DIR)
+    repo.git.add(file_path)
+    repo.index.commit(commit_message)
+    log.info("git.commit", file_path=file_path)
+    origin = repo.remote(name="origin")
+    origin.push("master")
+    log.info("git.push", msg=commit_message)
 
 
 def _trigger_etl(indicator_short_name: str, db_indicator: gm.Variable, dry_run: bool):
