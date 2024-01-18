@@ -1,10 +1,8 @@
 """Load a meadow dataset and create a garden dataset."""
 # NOTE: Eliminate all notes once I have all the data
 
-from typing import cast
-
 import owid.catalog.processing as pr
-from owid.catalog import Dataset, Table
+from owid.catalog import Table
 from structlog import get_logger
 
 from etl.data_helpers import geo
@@ -22,6 +20,107 @@ povlines_dict = {
     2011: [100, 190, 320, 550, 1000, 2000, 3000, 4000],
     2017: [100, 215, 365, 685, 1000, 2000, 3000, 4000],
 }
+
+
+def run(dest_dir: str) -> None:
+    #
+    # Load inputs.
+    #
+    # Load meadow dataset.
+    ds_meadow = paths.load_dataset("world_bank_pip")
+
+    # Read table from meadow dataset.
+    tb = ds_meadow["world_bank_pip"].reset_index()
+
+    # Process data
+    # Make table wide and change column names
+    tb = process_data(tb)
+
+    # Calculate inequality measures
+    tb = calculate_inequality(tb)
+
+    # Harmonize country names
+    tb: Table = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
+
+    # Amend the entity to reflect if data refers to urban or rural only
+    tb = identify_rural_urban(tb)
+
+    # Separate out ppp and filled data from the main dataset
+    tb_2011, tb_2017 = separate_ppp_data(tb)
+
+    # Create stacked variables from headcount and headcount_ratio
+    tb_2011, col_stacked_n_2011, col_stacked_pct_2011 = create_stacked_variables(
+        tb_2011, povlines_dict, ppp_version=2011
+    )
+    tb_2017, col_stacked_n_2017, col_stacked_pct_2017 = create_stacked_variables(
+        tb_2017, povlines_dict, ppp_version=2017
+    )
+
+    # Sanity checks
+    tb_2011 = sanity_checks(
+        tb_2011, povlines_dict, ppp_version=2011, col_stacked_n=col_stacked_n_2011, col_stacked_pct=col_stacked_pct_2011
+    )
+    tb_2017 = sanity_checks(
+        tb_2017, povlines_dict, ppp_version=2017, col_stacked_n=col_stacked_n_2017, col_stacked_pct=col_stacked_pct_2017
+    )
+
+    # Separate out filled data from the main dataset
+    tb_2011_non_filled = separate_filled_data(tb_2011)
+    tb_2017_non_filled = separate_filled_data(tb_2017)
+
+    # Separate out consumption-only, income-only. Also, create a table with both income and consumption
+    tb_inc_2011, tb_cons_2011, tb_inc_or_cons_2011 = inc_or_cons_data(tb_2011)
+    tb_inc_2017, tb_cons_2017, tb_inc_or_cons_2017 = inc_or_cons_data(tb_2017)
+    tb_inc_2011_non_filled, tb_cons_2011_non_filled, tb_inc_or_cons_2011_non_filled = inc_or_cons_data(
+        tb_2011_non_filled
+    )
+    tb_inc_2017_non_filled, tb_cons_2017_non_filled, tb_inc_or_cons_2017_non_filled = inc_or_cons_data(
+        tb_2017_non_filled
+    )
+
+    # Create regional headcount dataset, by patching missing values with the difference between world and regional headcount
+    tb_regions = regional_headcount(tb_inc_or_cons_2017_non_filled)
+
+    # Create survey count dataset, by counting the number of surveys available for each country in the past decade
+    tb_survey_count = survey_count(tb_inc_or_cons_2017_non_filled)
+
+    # Define tables to upload
+    # The ones we need in Grapher admin would be tb_inc_or_cons_2011_non_filled, tb_inc_or_cons_2017_non_filled, tb_regions and tb_survey_count
+    tables = [
+        tb_inc_2011,
+        tb_cons_2011,
+        tb_inc_or_cons_2011,
+        tb_inc_2017,
+        tb_cons_2017,
+        tb_inc_or_cons_2017,
+        tb_2011_non_filled,
+        tb_2017_non_filled,
+        tb_inc_2011_non_filled,
+        tb_cons_2011_non_filled,
+        tb_inc_or_cons_2011_non_filled,
+        tb_inc_2017_non_filled,
+        tb_cons_2017_non_filled,
+        tb_inc_or_cons_2017_non_filled,
+        tb_regions,
+        tb_survey_count,
+    ]
+
+    # Set index and sort
+    for tb in tables:
+        tb = tb.set_index(["country", "year"], verify_integrity=True).sort_index()
+
+    #
+    # Save outputs.
+    #
+    # Create a new garden dataset with the same metadata as the meadow dataset.
+    ds_garden = create_dataset(
+        dest_dir,
+        tables=[tables],
+        default_metadata=ds_meadow.metadata,
+    )
+
+    # Save changes in the new garden dataset.
+    ds_garden.save()
 
 
 def process_data(tb: Table) -> Table:
@@ -673,104 +772,3 @@ def survey_count(tb: Table) -> Table:
     tb = tb[["country", "year", "surveys_past_decade"]]
 
     return tb
-
-
-def run(dest_dir: str) -> None:
-    #
-    # Load inputs.
-    #
-    # Load meadow dataset.
-    ds_meadow = cast(Dataset, paths.load_dependency("world_bank_pip"))
-
-    # Read table from meadow dataset.
-    tb = ds_meadow["world_bank_pip"].reset_index()
-
-    # Process data
-    # Make table wide and change column names
-    tb = process_data(tb)
-
-    # Calculate inequality measures
-    tb = calculate_inequality(tb)
-
-    # Harmonize country names
-    tb: Table = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
-
-    # Amend the entity to reflect if data refers to urban or rural only
-    tb = identify_rural_urban(tb)
-
-    # Separate out ppp and filled data from the main dataset
-    tb_2011, tb_2017 = separate_ppp_data(tb)
-
-    # Create stacked variables from headcount and headcount_ratio
-    tb_2011, col_stacked_n_2011, col_stacked_pct_2011 = create_stacked_variables(
-        tb_2011, povlines_dict, ppp_version=2011
-    )
-    tb_2017, col_stacked_n_2017, col_stacked_pct_2017 = create_stacked_variables(
-        tb_2017, povlines_dict, ppp_version=2017
-    )
-
-    # Sanity checks
-    tb_2011 = sanity_checks(
-        tb_2011, povlines_dict, ppp_version=2011, col_stacked_n=col_stacked_n_2011, col_stacked_pct=col_stacked_pct_2011
-    )
-    tb_2017 = sanity_checks(
-        tb_2017, povlines_dict, ppp_version=2017, col_stacked_n=col_stacked_n_2017, col_stacked_pct=col_stacked_pct_2017
-    )
-
-    # Separate out filled data from the main dataset
-    tb_2011_non_filled = separate_filled_data(tb_2011)
-    tb_2017_non_filled = separate_filled_data(tb_2017)
-
-    # Separate out consumption-only, income-only. Also, create a table with both income and consumption
-    tb_inc_2011, tb_cons_2011, tb_inc_or_cons_2011 = inc_or_cons_data(tb_2011)
-    tb_inc_2017, tb_cons_2017, tb_inc_or_cons_2017 = inc_or_cons_data(tb_2017)
-    tb_inc_2011_non_filled, tb_cons_2011_non_filled, tb_inc_or_cons_2011_non_filled = inc_or_cons_data(
-        tb_2011_non_filled
-    )
-    tb_inc_2017_non_filled, tb_cons_2017_non_filled, tb_inc_or_cons_2017_non_filled = inc_or_cons_data(
-        tb_2017_non_filled
-    )
-
-    # Create regional headcount dataset, by patching missing values with the difference between world and regional headcount
-    tb_regions = regional_headcount(tb_inc_or_cons_2017_non_filled)
-
-    # Create survey count dataset, by counting the number of surveys available for each country in the past decade
-    tb_survey_count = survey_count(tb_inc_or_cons_2017_non_filled)
-
-    # Define tables to upload
-    # The ones we need in Grapher admin would be tb_inc_or_cons_2011_non_filled, tb_inc_or_cons_2017_non_filled, tb_regions and tb_survey_count
-    tables = [
-        tb_inc_2011,
-        tb_cons_2011,
-        tb_inc_or_cons_2011,
-        tb_inc_2017,
-        tb_cons_2017,
-        tb_inc_or_cons_2017,
-        tb_2011_non_filled,
-        tb_2017_non_filled,
-        tb_inc_2011_non_filled,
-        tb_cons_2011_non_filled,
-        tb_inc_or_cons_2011_non_filled,
-        tb_inc_2017_non_filled,
-        tb_cons_2017_non_filled,
-        tb_inc_or_cons_2017_non_filled,
-        tb_regions,
-        tb_survey_count,
-    ]
-
-    # Set index and sort
-    for tb in tables:
-        tb = tb.set_index(["country", "year"], verify_integrity=True).sort_index()
-
-    #
-    # Save outputs.
-    #
-    # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = create_dataset(
-        dest_dir,
-        tables=[tables],
-        default_metadata=ds_meadow.metadata,
-    )
-
-    # Save changes in the new garden dataset.
-    ds_garden.save()
