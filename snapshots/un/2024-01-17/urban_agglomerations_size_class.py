@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 
 import click
@@ -51,7 +52,7 @@ def main(upload: bool) -> None:
     merged_df = pd.DataFrame()
     # Fetch data from the website and store in a list of DataFrames
     for i, file in enumerate(file_details):
-        file_path = common_path + file["file_name"]
+        file_path = os.path.join(common_path, file["file_name"])
         df_add = pd.read_excel(file_path)
 
         # Find the header row
