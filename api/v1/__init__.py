@@ -77,7 +77,7 @@ def update_indicator(indicator_id: int, update_request: UpdateIndicatorRequest, 
     if not update_request.dryRun:
         _update_indicator_in_r2(db_indicator, update_request.indicator)
 
-    if update_request.commit:
+    if config.ETL_API_COMMIT:
         background_tasks.add_task(_commit_and_push, override_yml_path, ":robot: Metadata update by Admin")
 
     if update_request.triggerETL:
@@ -92,7 +92,7 @@ def _commit_and_push(file_path: Path, commit_message: str) -> None:
     repo.index.commit(commit_message)
     log.info("git.commit", file_path=file_path)
     origin = repo.remote(name="origin")
-    origin.push("master")
+    origin.push()
     log.info("git.push", msg=commit_message)
 
 

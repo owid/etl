@@ -66,7 +66,6 @@ class UpdateIndicatorRequest(BaseModel):
     dataApiUrl: str
     dryRun: bool = False
     triggerETL: bool = False
-    commit: bool = False
 
     class Config:
         extra = Extra.forbid
