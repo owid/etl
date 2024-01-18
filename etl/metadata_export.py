@@ -111,8 +111,8 @@ def merge_or_create_yaml(meta_dict: Dict[str, Any], output_path: Path, delete_em
                     orig_variables[var_name],
                     var_meta,
                     if_origins_exist="replace",
-                    overwrite=True,
-                    overwrite_display=False,
+                    # we merge display too
+                    merge_fields=["presentation", "grapher_config", "display"],
                 )
 
                 if delete_empty:

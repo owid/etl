@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Any, List, Literal, Optional, Union
+from typing import Any, List, Literal, Union
 
 from owid.catalog.meta import SOURCE_EXISTS_OPTIONS
 
@@ -51,18 +51,14 @@ def update_metadata_from_yaml(
         meta_dict = tb[v_short_name].m.to_dict()
 
         # first overwrite table metadata with definitions.common
-        meta_dict = _merge_variable_metadata(meta_dict, common_dict, if_origins_exist=if_origins_exist, overwrite=True)
+        meta_dict = _merge_variable_metadata(meta_dict, common_dict, if_origins_exist=if_origins_exist)
 
         # then overwrite with table specific common
-        meta_dict = _merge_variable_metadata(
-            meta_dict, table_common_dict, if_origins_exist=if_origins_exist, overwrite=True
-        )
+        meta_dict = _merge_variable_metadata(meta_dict, table_common_dict, if_origins_exist=if_origins_exist)
 
         # then overwrite with table specific metadata
         variable_dict = (t_annot.get("variables") or {}).get(v_short_name, {})
-        meta_dict = _merge_variable_metadata(
-            meta_dict, variable_dict, if_origins_exist=if_origins_exist, overwrite=True
-        )
+        meta_dict = _merge_variable_metadata(meta_dict, variable_dict, if_origins_exist=if_origins_exist)
 
         # we allow `- *descriptions` which needs to be flattened
         if "description_key" in meta_dict:
@@ -80,23 +76,14 @@ def _merge_variable_metadata(
     md: dict,
     new: dict,
     if_origins_exist: SOURCE_EXISTS_OPTIONS,
-    overwrite: bool,
-    overwrite_display: Optional[bool] = None,
+    merge_fields: List[str] = ["presentation", "grapher_config"],
 ) -> dict:
     """Merge VariableMeta in a dictionary with another dictionary. It modifies the original object."""
-    # fallback to general overwrite value
-    if overwrite_display is None:
-        overwrite_display = overwrite
-
-    # NOTE: when this gets stable, consider removing flags `if_origins_exist` and `overwrite` if they are not used
+    # NOTE: when this gets stable, consider removing flag `if_origins_exist`
     for k, v in new.items():
-        # special cases
-        if k in ("presentation", "grapher_config"):
-            # merge fields
-            md[k] = _merge_variable_metadata(md.get(k, {}), v, if_origins_exist, overwrite)
-        # merge display
-        elif k == "display":
-            md[k] = _merge_variable_metadata(md.get(k, {}), v, if_origins_exist, overwrite=overwrite_display)
+        # fields that will be merged
+        if k in merge_fields:
+            md[k] = _merge_variable_metadata(md.get(k, {}), v, if_origins_exist)
         # origins have their special flag to decide what to do
         elif k == "origins":
             if if_origins_exist == "fail" and md["origins"]:
@@ -110,15 +97,10 @@ def _merge_variable_metadata(
             md[k] = []
         # append or overwrite list (could be origins, sources or others)
         elif isinstance(v, list):
-            if overwrite:
-                md[k] = v
-            else:
-                md[k] = md.get(k, []) + v
+            md[k] = v
         # key is already defined in metadata
         elif k in md:
-            # should we overwrite it?
-            if overwrite:
-                md[k] = v
+            md[k] = v
         # otherwise just define it
         else:
             md[k] = v
