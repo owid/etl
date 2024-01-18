@@ -52,6 +52,8 @@ def process_statistical_review_data(tb_review: Table) -> Table:
         "oil_electricity_generation_twh": "oil_generation__twh",
         "coal_electricity_generation_twh": "coal_generation__twh",
         "gas_electricity_generation_twh": "gas_generation__twh",
+        # Load efficiency factor to be able to convert from electricity generation into input-equivalent primary energy.
+        "efficiency_factor": "efficiency_factor",
     }
     tb_review = tb_review[list(columns)].rename(columns=columns, errors="raise")
     # New columns to be created by summing other columns.
@@ -232,9 +234,46 @@ def add_share_variables(combined: Table) -> Table:
         new_column = variable.replace("_generation__twh", "_share_of_electricity__pct")
         combined[new_column] = 100 * combined[variable] / combined["total_generation__twh"]
 
-    # Calculate the percentage of electricity as a share of primary energy.
+    # Calculate the share of input-equivalent primary energy consumption that comes from electricity.
+    # One could think that it is enough to divide total electricity generation by primary energy consumption.
+    # However, electricity generation is measured in direct outputs, while primary energy consumption (from the
+    # statistical review) includes input-equivalent electricity generation of non-fossil sources (i.e. electricity
+    # generation divided by the thermal efficiency).
+    # Therefore, to properly calculate the share of electricity in primary energy, we calculate the
+    # input-equivalent primary energy consumption of non-fossil electricity sources (nuclear, hydro, solar, wind and
+    # other renewables, as well as bioenergy), add them up, and add them to the electricity generation from fossil fuels
+    # (coal, gas and oil).
+    # Then we divide the result by the total input-equivalent primary energy consumption.
+    # Note that, as explained in the statistical review methodology,
+    #   "Traditionally, in the Statistical Review of World Energy, the primary energy of non-fossil based electricity
+    #   (nuclear, hydro, wind, solar, geothermal, biomass in power and other renewables sources) has been calculated on
+    #   an input-equivalent basis – i.e. based on the equivalent amount of fossil fuel input required to generate that
+    #   amount of electricity in a standard thermal power plant.
+    #   In this year's Statistical Review, we use the updated thermal equivalent efficiency factor to convert
+    #   electricity generation from biomass to primary energy equivalent. Prior to 2022, the same factor was used for
+    #   biomass as for all non-fossil electricity. From 2022 onwards, we assume a constant efficiency of 32% for biomass
+    #   power to better reflect the actual efficiency of biomass power plants."
+    # NOTE: Given that some sources are less often informed, fill some of their missing values with zeros.
+    # Otherwise a lot of valuable data is lost for a small percentage of missing data.
+    # This is mostly due to the statistical review data file having many missing values instead of zeros (which has been
+    # manually corrected in the statistical review garden step for nuclear, but not for other sources).
     combined["total_electricity_share_of_primary_energy__pct"] = (
-        100 * combined["total_generation__twh"] / combined["primary_energy_consumption__twh"]
+        (
+            (
+                (
+                    combined["nuclear_generation__twh"]
+                    + combined["hydro_generation__twh"].fillna(0)
+                    + combined["wind_generation__twh"].fillna(0)
+                    + combined["solar_generation__twh"].fillna(0)
+                    + combined["other_renewables_excluding_bioenergy_generation__twh"].fillna(0)
+                )
+                / combined["efficiency_factor"]
+            )
+            + (combined["bioenergy_generation__twh"].fillna(0) / 0.32)
+            + (combined["fossil_generation__twh"])
+        )
+        / combined["primary_energy_consumption__twh"]
+        * 100
     )
 
     # Calculate the percentage of electricity demand that is imported.
