@@ -95,6 +95,7 @@ class OpenAIWrapper(OpenAI):
             chat_completion_tokens = chat_completion.usage.total_tokens
             cost = (chat_completion_tokens / 1000) * RATE_PER_1000_TOKENS
             message_content = chat_completion.choices[0].message.content
+
             # Log cost
             log.info(f"Chat completion {self.model} cost: {cost}")
             # Build return object

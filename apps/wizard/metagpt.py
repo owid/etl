@@ -4,11 +4,11 @@ from pathlib import Path
 from typing import List, cast
 
 import streamlit as st
-import yaml
 from st_pages import add_indentation
 from streamlit_ace import st_ace
 
 from apps.metagpt.cli import MetadataGPTUpdater
+from etl.files import yaml_dump
 from etl.paths import SNAPSHOTS_DIR, STEP_DIR
 
 
@@ -16,19 +16,36 @@ from etl.paths import SNAPSHOTS_DIR, STEP_DIR
 # CONFIGURATION
 ##################################################
 # Generic functions
-def export_metadata_file(metadata_new, overwrite, output_dir, filepath) -> None:
-    """Export file."""
-    # Get output path
-    if overwrite:
-        output_file_path = filepath
+def export_metadata_file() -> None:
+    """Export file.
+
+    metadata_new: new metadata
+    overwrite: whether to overwrite the original file
+    output_path: custom path to export the new metadata file
+    filepath_original: original file path
+
+    If overwrite is True, it replaces the original file (which should be `filepath`)
+    Otherwise, it saves it under the
+    """
+    # Get output path of new metadata file
+
+    ## Overwrite existing yaml file
+    if st.session_state["overwrite"]:
+        # output_file_path = filepath_original
+        st.session_state["output_path"] = st.session_state["filepath_metadata"]
+    ## Save new yaml file
     else:
-        if output_dir in [None, ""]:
-            output_dir = os.path.dirname(filepath)
-        output_file_path = os.path.join(output_dir, "gpt_" + os.path.basename(filepath))
+        ## If no custom output path is provided, save it under the same directory as the original file, with prefix "gpt_"
+        if st.session_state["output_path"] in [None, ""]:
+            st.session_state["output_path"] = os.path.join(
+                os.path.dirname(st.session_state["filepath_metadata"]),
+                "gpt_" + os.path.basename(st.session_state["filepath_metadata"]),
+            )
     # Save updated metadata
-    print(f"Exporting shit to {output_file_path}")
-    with open(output_file_path, "w") as file:
-        file.write(metadata_new)
+    print(f"Exporting new metadata to {st.session_state['output_path']}")
+    with open(st.session_state["output_path"], mode="w") as file:
+        # s = yaml_dump(st.session_state["metadata_new_updated"], width=float("inf"))
+        file.write(st.session_state["metadata_new_updated"])
 
 
 # Session state
@@ -130,8 +147,8 @@ col21, col22 = st.columns(2)
 ## Second row, first column: show metadata file
 with col21:
     # Load file
-    filepath = get_actual_path(cast(str, metadata_file))
-    with open(filepath, "r") as f:
+    st.session_state["filepath_metadata"] = get_actual_path(cast(str, metadata_file))
+    with open(st.session_state["filepath_metadata"], "r") as f:
         file_content = f.read()
     # Show file to the user
     st_ace(file_content, **ACE_DEFAULT)
@@ -140,7 +157,7 @@ with col21:
 # If user clicks on 'Run', we estimate the cost of the query and ask user to confirm again.
 # Only exception is if it is a snapshot file, where we just don't need user's approval.
 if st.session_state["run_gpt"]:
-    st.session_state.gpt_updater = MetadataGPTUpdater(filepath)
+    st.session_state.gpt_updater = MetadataGPTUpdater(st.session_state["filepath_metadata"])
     # Run in lazy mode to estimate the cost
     cost = st.session_state.gpt_updater.run(lazy=True)
     if cost:
@@ -184,29 +201,35 @@ if st.session_state.get("show_gpt"):
         # Temporary export
         tf = tempfile.NamedTemporaryFile()
         with open(file=tf.name, mode="w") as f:
-            yaml.dump(st.session_state["metadata_new"], f, default_flow_style=False, sort_keys=False, indent=4)
-        # Show file to the user
+            f.write(yaml_dump(st.session_state["metadata_new"], strip_lines=True, width=float("inf")))
+        ## Show file to the user
         with open(tf.name, "r") as f:
             file_content = f.read()
-        metadata_new_updated = st_ace(file_content, **ACE_DEFAULT, key="modified")  # gpt_updater.metadata_new_str
+        # file_content = yaml_dump(st.session_state["metadata_new"], strip_lines=True, width=float("inf"))
+        st.session_state["metadata_new_updated"] = st_ace(
+            file_content, **ACE_DEFAULT, key="modified"
+        )  # gpt_updater.metadata_new_str
     with col12:
         with st.expander("Export metadata file", expanded=False):
             # Form to export
             with st.form("form_export"):
-                overwrite = st.toggle(
+                st.session_state["overwrite"] = st.toggle(
                     "Overwrite", value=False, help="Check to overwrite the original metadata file with the new content."
                 )
-                output_dir = st.text_input(
+                st.session_state["output_path"] = st.text_input(
                     "Output path",
                     label_visibility="collapsed",
                     placeholder="path/to/file.yml",
                     help="Custom path to save the new metadata file.",
                 )
-                st.form_submit_button(
+                submit = st.form_submit_button(
                     "Export new file",
-                    on_click=export_metadata_file,
-                    args=(metadata_new_updated, overwrite, output_dir, filepath),
+                    # on_click=export_metadata_file,
                 )
+
+            if submit:
+                export_metadata_file()
+
         with st.expander("Cost details", expanded=False):
             st.success(f"GPT cost was of ${st.session_state.cost:.3f} USD.", icon="💰")
 
