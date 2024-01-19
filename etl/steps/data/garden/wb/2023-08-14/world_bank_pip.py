@@ -64,28 +64,18 @@ def run(dest_dir: str) -> None:
         tb_2017, povlines_dict, ppp_version=2017, col_stacked_n=col_stacked_n_2017, col_stacked_pct=col_stacked_pct_2017
     )
 
-    # Separate out filled data from the main dataset
-    tb_2011_non_filled = separate_filled_data(tb_2011)
-    tb_2017_non_filled = separate_filled_data(tb_2017)
-
     # Separate out consumption-only, income-only. Also, create a table with both income and consumption
     tb_inc_2011, tb_cons_2011, tb_inc_or_cons_2011 = inc_or_cons_data(tb_2011)
     tb_inc_2017, tb_cons_2017, tb_inc_or_cons_2017 = inc_or_cons_data(tb_2017)
-    tb_inc_2011_non_filled, tb_cons_2011_non_filled, tb_inc_or_cons_2011_non_filled = inc_or_cons_data(
-        tb_2011_non_filled
-    )
-    tb_inc_2017_non_filled, tb_cons_2017_non_filled, tb_inc_or_cons_2017_non_filled = inc_or_cons_data(
-        tb_2017_non_filled
-    )
 
     # Create regional headcount dataset, by patching missing values with the difference between world and regional headcount
-    tb_regions = regional_headcount(tb_inc_or_cons_2017_non_filled)
+    tb_regions = regional_headcount(tb_inc_or_cons_2017)
 
     # Create survey count dataset, by counting the number of surveys available for each country in the past decade
-    tb_survey_count = survey_count(tb_inc_or_cons_2017_non_filled)
+    tb_survey_count = survey_count(tb_inc_or_cons_2017)
 
     # Define tables to upload
-    # The ones we need in Grapher admin would be tb_inc_or_cons_2011_non_filled, tb_inc_or_cons_2017_non_filled, tb_regions and tb_survey_count
+    # The ones we need in Grapher admin would be tb_inc_or_cons_2011, tb_inc_or_cons_2017, tb_regions and tb_survey_count
     tables = [
         tb_inc_2011,
         tb_cons_2011,
@@ -93,14 +83,6 @@ def run(dest_dir: str) -> None:
         tb_inc_2017,
         tb_cons_2017,
         tb_inc_or_cons_2017,
-        tb_2011_non_filled,
-        tb_2017_non_filled,
-        tb_inc_2011_non_filled,
-        tb_cons_2011_non_filled,
-        tb_inc_or_cons_2011_non_filled,
-        tb_inc_2017_non_filled,
-        tb_cons_2017_non_filled,
-        tb_inc_or_cons_2017_non_filled,
         tb_regions,
         tb_survey_count,
     ]
@@ -285,24 +267,19 @@ def create_stacked_variables(tb: Table, povlines_dict: dict, ppp_version: int) -
     for i in range(len(povlines)):
         # if it's the first value only get people below this poverty line (and percentage)
         if i == 0:
-            varname_n = f"headcount_stacked_below_{povlines[i]}"
-            varname_pct = f"headcount_ratio_stacked_below_{povlines[i]}"
-            tb[varname_n] = tb[f"headcount_{povlines[i]}"]
-            tb[varname_pct] = tb[varname_n] / tb["reporting_pop"]
-            col_stacked_n.append(varname_n)
-            col_stacked_pct.append(varname_pct)
+            continue
 
         # If it's the last value calculate the people between this value and the previous
         # and also the people over this poverty line (and percentages)
         elif i == len(povlines) - 1:
-            varname_n = f"headcount_stacked_below_{povlines[i]}"
-            varname_pct = f"headcount_ratio_stacked_below_{povlines[i]}"
+            varname_n = f"headcount_between_{povlines[i-1]}_{povlines[i]}"
+            varname_pct = f"headcount_ratio_between_{povlines[i-1]}_{povlines[i]}"
             tb[varname_n] = tb[f"headcount_{povlines[i]}"] - tb[f"headcount_{povlines[i-1]}"]
             tb[varname_pct] = tb[varname_n] / tb["reporting_pop"]
             col_stacked_n.append(varname_n)
             col_stacked_pct.append(varname_pct)
-            varname_n = f"headcount_stacked_above_{povlines[i]}"
-            varname_pct = f"headcount_ratio_stacked_above_{povlines[i]}"
+            varname_n = f"headcount_above_{povlines[i]}"
+            varname_pct = f"headcount_ratio_above_{povlines[i]}"
             tb[varname_n] = tb["reporting_pop"] - tb[f"headcount_{povlines[i]}"]
             tb[varname_pct] = tb[varname_n] / tb["reporting_pop"]
             col_stacked_n.append(varname_n)
@@ -310,8 +287,8 @@ def create_stacked_variables(tb: Table, povlines_dict: dict, ppp_version: int) -
 
         # If it's any value between the first and the last calculate the people between this value and the previous (and percentage)
         else:
-            varname_n = f"headcount_stacked_below_{povlines[i]}"
-            varname_pct = f"headcount_ratio_stacked_below_{povlines[i]}"
+            varname_n = f"headcount_between_{povlines[i-1]}_{povlines[i]}"
+            varname_pct = f"headcount_ratio_between_{povlines[i-1]}_{povlines[i]}"
             tb[varname_n] = tb[f"headcount_{povlines[i]}"] - tb[f"headcount_{povlines[i-1]}"]
             tb[varname_pct] = tb[varname_n] / tb["reporting_pop"]
             col_stacked_n.append(varname_n)
@@ -321,17 +298,17 @@ def create_stacked_variables(tb: Table, povlines_dict: dict, ppp_version: int) -
 
     # Calculate stacked variables which "jump" the original order
 
-    tb[f"headcount_stacked_between_{povlines[1]}_{povlines[4]}"] = (
+    tb[f"headcount_between_{povlines[1]}_{povlines[4]}"] = (
         tb[f"headcount_{povlines[4]}"] - tb[f"headcount_{povlines[1]}"]
     )
-    tb[f"headcount_stacked_between_{povlines[4]}_{povlines[6]}"] = (
+    tb[f"headcount_between_{povlines[4]}_{povlines[6]}"] = (
         tb[f"headcount_{povlines[6]}"] - tb[f"headcount_{povlines[4]}"]
     )
 
-    tb[f"headcount_ratio_stacked_between_{povlines[1]}_{povlines[4]}"] = (
+    tb[f"headcount_ratio_between_{povlines[1]}_{povlines[4]}"] = (
         tb[f"headcount_ratio_{povlines[4]}"] - tb[f"headcount_ratio_{povlines[1]}"]
     )
-    tb[f"headcount_ratio_stacked_between_{povlines[4]}_{povlines[6]}"] = (
+    tb[f"headcount_ratio_between_{povlines[4]}_{povlines[6]}"] = (
         tb[f"headcount_ratio_{povlines[6]}"] - tb[f"headcount_ratio_{povlines[4]}"]
     )
 
@@ -636,17 +613,6 @@ def separate_ppp_data(tb: Table) -> tuple([Table, Table]):
     tb_2017 = tb[tb["ppp_version"] == 2017].dropna(axis=1, how="all").reset_index(drop=True)
 
     return tb_2011, tb_2017
-
-
-def separate_filled_data(tb: Table) -> Table:
-    """
-    Separate out filled data from the main dataset
-    """
-    # Regions are not marked as interpolated: we keep them in the dataset anyway, by including nulls
-
-    tb = tb[(tb["is_interpolated"] == 0) | (tb["is_interpolated"].isnull())].reset_index(drop=True)
-
-    return tb
 
 
 def inc_or_cons_data(tb: Table) -> tuple([Table, Table, Table]):

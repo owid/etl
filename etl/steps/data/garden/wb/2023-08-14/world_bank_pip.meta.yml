@@ -6,6 +6,11 @@ definitions:
         - Poverty
         - Economic Inequality
         - Economic Growth
+      attribution_short: World Bank
+      grapher_config:
+        originUrl: https://ourworldindata.org/poverty
+        $schema: https://files.ourworldindata.org/schemas/grapher-schema.003.json
+    processing_level: major
 
 
 # Learn more about the available fields:
@@ -21,39 +26,380 @@ tables:
     # Learn more about the available fields:
     # http://docs.owid.io/projects/etl/architecture/metadata/reference/indicator/
     variables:
-      # testing_variable:
-      #   title: Testing variable title
-      #   unit: arbitrary units
-      #   short_unit: au
-      #   description_short: Short description of testing variable.
-      #   description_processing: Description of processing of testing variable.
-      #   description_key: List of key points about the indicator.
-      #   description_from_producer: Description of testing variable from producer.
-      #   processing_level: minor
-      #   presentation:
-      #     attribution:
-      #     attribution_short:
-      #     faqs:
-      #     grapher_config:
-      #     title_public:
-      #     title_variant:
-      #     topic_tags:
-      #   display:
-      #     color:
-      #     conversionFactor: 1
-      #     description:
-      #     entityAnnotationsMap: Test annotation
-      #     includeInTable:
-      #     isProjection: false
-      #     name: Testing variable
-      #     numDecimalPlaces: 0
-      #     shortUnit: au
-      #     tableDisplay:
-      #       hideAbsoluteChange:
-      #       hideRelativeChange:
-      #     tolerance: 0
-      #     unit: arbitrary units
-      #     yearIsDay: false
-      #     zeroDay:
-      {}
+      headcount_ratio_215:
+        presentation:
+          title_public: Share of population living in extreme poverty
+          faqs:
+            - fragment_id: poverty-international-poverty-line
+              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+            - fragment_id: poverty-international-dollars
+              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+            - fragment_id: poverty-comparability
+              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+            - fragment_id: poverty-regional-estimates
+              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+          grapher_config:
+            title: Share of population living in extreme poverty
+            subtitle: >-
+              Extreme poverty is defined as living below the International Poverty Line of
+              $2.15 per day. This data is adjusted for inflation and for differences in the
+              cost of living between countries.
+            note: >-
+              This data is expressed in [international-$](#dod:int_dollar_abbreviation) at
+              2017 prices. Depending on the country and year, it relates to income measured
+              after taxes and benefits, or to consumption, [per capita](#dod:per-capita).
+            hasMapTab: true
+            tab: map
+            variantName: Line chart
+            yAxis:
+              min: 0
+            map:
+              time: 2019
+              colorScale:
+                baseColorScheme: OrRd
+                binningStrategy: manual
+                customNumericValues:
+                  - 3
+                  - 10
+                  - 20
+                  - 30
+                  - 40
+                  - 50
+                  - 60
+                  - 70
+                  - 80
+                  - 90
+                  - 100
+            selectedEntityNames:
+              - Bangladesh
+              - Bolivia
+              - Madagascar
+              - India
+              - China
+              - Ethiopia
+
+      headcount_ratio_365:
+        presentation:
+          title_public: "Poverty: Share of population living on less than $3.65 a day"
+          faqs:
+            - fragment_id: poverty-international-poverty-line
+              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+            - fragment_id: poverty-international-dollars
+              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+            - fragment_id: poverty-comparability
+              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+            - fragment_id: poverty-regional-estimates
+              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+          grapher_config:
+            title: "Poverty: Share of population living on less than $3.65 a day"
+            subtitle: >-
+              The poverty line of $3.65 per day is set by the World Bank to be representative of the definitions of poverty adopted in lower-middle-income countries. This data is adjusted for inflation and for differences in the cost of living between countries.
+            note: >-
+              This data is expressed in [international-$](#dod:int_dollar_abbreviation) at
+              2017 prices. Depending on the country and year, it relates to income measured
+              after taxes and benefits, or to consumption, [per capita](#dod:per-capita).
+            hasMapTab: true
+            tab: map
+            variantName: Line chart
+            yAxis:
+              min: 0
+            map:
+              time: 2019
+              colorScale:
+                baseColorScheme: OrRd
+                binningStrategy: manual
+                customNumericValues:
+                  - 10
+                  - 20
+                  - 30
+                  - 40
+                  - 50
+                  - 60
+                  - 70
+                  - 80
+                  - 90
+                  - 100
+            selectedEntityNames:
+              - Bangladesh
+              - Bolivia
+              - Madagascar
+              - India
+              - China
+              - Ethiopia
+
+      headcount_ratio_685:
+        presentation:
+          title_public: "Poverty: Share of population living on less than $6.85 a day"
+          faqs:
+            - fragment_id: poverty-international-poverty-line
+              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+            - fragment_id: poverty-international-dollars
+              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+            - fragment_id: poverty-comparability
+              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+            - fragment_id: poverty-regional-estimates
+              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+          grapher_config:
+            title: "Poverty: Share of population living on less than $6.85 a day"
+            subtitle: >-
+              The poverty line of $6.85 per day is set by the World Bank to be representative of the definitions of poverty adopted in upper-middle-income countries. This data is adjusted for inflation and for differences in the cost of living between countries.
+            note: >-
+              This data is expressed in [international-$](#dod:int_dollar_abbreviation) at
+              2017 prices. Depending on the country and year, it relates to income measured
+              after taxes and benefits, or to consumption, [per capita](#dod:per-capita).
+            hasMapTab: true
+            tab: map
+            variantName: Line chart
+            yAxis:
+              min: 0
+            map:
+              time: 2019
+              colorScale:
+                baseColorScheme: OrRd
+                binningStrategy: manual
+                customNumericValues:
+                  - 10
+                  - 20
+                  - 30
+                  - 40
+                  - 50
+                  - 60
+                  - 70
+                  - 80
+                  - 90
+                  - 100
+            selectedEntityNames:
+              - Bangladesh
+              - Bolivia
+              - Madagascar
+              - India
+              - China
+              - Ethiopia
+
+
+      headcount_ratio_3000:
+        presentation:
+          title_public: Share of population living on less than $30 a day
+          faqs:
+            - fragment_id: poverty-international-dollars
+              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+            - fragment_id: poverty-comparability
+              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+            - fragment_id: poverty-regional-estimates
+              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+          grapher_config:
+            title: "Poverty: Share of population living on less than $30 a day"
+            subtitle: >-
+              This data is adjusted for inflation and for differences in the cost of living between countries.
+            note: >-
+              This data is expressed in [international-$](#dod:int_dollar_abbreviation) at 2017 prices. Depending on the country and year, it relates to income measured after taxes and benefits, or to consumption, [per capita](#dod:per-capita).
+            hasMapTab: true
+            tab: map
+            variantName: Line chart
+            yAxis:
+              min: 0
+            map:
+              time: 2019
+              colorScale:
+                baseColorScheme: OrRd
+                binningStrategy: manual
+                customNumericValues:
+                  - 10
+                  - 20
+                  - 30
+                  - 40
+                  - 50
+                  - 60
+                  - 70
+                  - 80
+                  - 90
+                  - 100
+            selectedEntityNames:
+              - Bangladesh
+              - Bolivia
+              - Madagascar
+              - India
+              - China
+              - Ethiopia
+
+      headcount_ratio_60_median:
+        presentation:
+          title_public: Share of population below 60% of median income or consumption
+          topic_tags:
+            - Poverty
+            - Economic Inequality
+          faqs:
+            - fragment_id: poverty-comparability
+              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+          grapher_config:
+            title: 'Relative poverty: Share of people below 60% of median income'
+            subtitle: >-
+              Relative poverty is measured in terms of a poverty line that rises and falls
+              over time with average incomes — in this case set at 60% of median income.
+            note: >-
+              Depending on the country and year, the data relates to income measured after
+              taxes and benefits, or to consumption, [per capita](#dod:per-capita).
+            hasMapTab: true
+            tab: map
+            yAxis:
+              min: 0
+            colorScale:
+              baseColorScheme: OwidDistinctLines
+            map:
+              time: 2019
+              colorScale:
+                baseColorScheme: YlOrBr
+                binningStrategy: manual
+                customNumericValues:
+                  - 5
+                  - 10
+                  - 15
+                  - 20
+                  - 25
+                  - 30
+                  - 35
+            selectedEntityNames:
+              - Bangladesh
+              - Bolivia
+              - Madagascar
+              - India
+              - China
+              - Ethiopia
+
+      headcount_ratio_50_median:
+        presentation:
+          title_public: Share of population below 50% of median income or consumption
+          topic_tags:
+            - Poverty
+            - Economic Inequality
+          faqs:
+            - fragment_id: poverty-comparability
+              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+          grapher_config:
+            title: 'Relative poverty: Share of people below 50% of median income'
+            subtitle: Relative poverty is measured in terms of a poverty line that rises and falls over time with average incomes – in this case set at 50% of median income.
+            note: >-
+              Depending on the country and year, the data relates to income measured after
+              taxes and benefits, or to consumption, [per capita](#dod:per-capita).
+            hasMapTab: true
+            tab: map
+            yAxis:
+              min: 0
+            colorScale:
+              baseColorScheme: OwidDistinctLines
+            map:
+              time: 2019
+              colorScale:
+                baseColorScheme: YlOrBr
+                binningStrategy: manual
+                customNumericValues:
+                  - 3
+                  - 6
+                  - 9
+                  - 12
+                  - 15
+                  - 18
+                  - 21
+                  - 24
+                  - 27
+            selectedEntityNames:
+              - Bangladesh
+              - Bolivia
+              - Madagascar
+              - India
+              - China
+              - Ethiopia
+
+      headcount_ratio_40_median:
+        presentation:
+          title_public: Share of population below 40% of median income or consumption
+          topic_tags:
+            - Poverty
+            - Economic Inequality
+          faqs:
+            - fragment_id: poverty-comparability
+              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+          grapher_config:
+            title: 'Relative poverty: Share of people below 40% of median income'
+            subtitle: Relative poverty is measured in terms of a poverty line that rises and falls over time with average incomes – in this case set at 40% of median income.
+            note: >-
+              Depending on the country and year, the data relates to income measured after
+              taxes and benefits, or to consumption, [per capita](#dod:per-capita).
+            hasMapTab: true
+            tab: map
+            yAxis:
+              min: 0
+            colorScale:
+              baseColorScheme: OwidDistinctLines
+            map:
+              time: 2019
+              colorScale:
+                baseColorScheme: YlOrBr
+                binningStrategy: manual
+                customNumericValues:
+                  - 2
+                  - 4
+                  - 6
+                  - 8
+                  - 10
+                  - 12
+                  - 14
+                  - 16
+                  - 18
+                  - 20
+            selectedEntityNames:
+              - Bangladesh
+              - Bolivia
+              - Madagascar
+              - India
+              - China
+              - Ethiopia
+
+      gini:
+        presentation:
+          title_public: Gini Coefficient
+          topic_tags:
+            - Poverty
+            - Economic Inequality
+          faqs:
+            - fragment_id: poverty-comparability
+              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+          grapher_config:
+            title: 'Income inequality: Gini coefficient'
+            subtitle: >-
+              The [Gini coefficient](#dod:gini) measures inequality on a scale from 0 to 1.
+              Higher values indicate higher inequality. Depending on the country and year,
+              the data relates to income measured after taxes and benefits, or to
+              consumption, [per capita](#dod:per-capita).
+            note: >-
+              Income and consumption estimates are available separately in this [Data
+              Explorer](https://ourworldindata.org/explorers/pip-inequality-explorer).
+            hasMapTab: true
+            tab: map
+            variantName: World Bank
+            originUrl: https://ourworldindata.org/economic-inequality
+            yAxis:
+              min: 0
+            map:
+              time: 2019
+              colorScale:
+                baseColorScheme: Oranges
+                binningStrategy: manual
+                customNumericMinValue: 1
+                customNumericValues:
+                  - 0.3
+                  - 0.35
+                  - 0.4
+                  - 0.45
+                  - 0.5
+                  - 0.55
+                  - 0.6
+            selectedEntityNames:
+              - Chile
+              - Brazil
+              - South Africa
+              - United States
+              - France
+              - China
+
 
