@@ -180,14 +180,14 @@ var_dict = {
         "short_unit": "$",
         "numDecimalPlaces": 0,
     },
-    "share_bottom50": {
+    "bottom50_share": {
         "title": "Share of the bottom 50%",
         "description": "The share of {inc_cons_dict[wel]['name_distribution']} {inc_cons_dict[wel]['verb']} by the poorest 50%.",
         "unit": "%",
         "short_unit": "%",
         "numDecimalPlaces": 1,
     },
-    "share_middle40": {
+    "middle40_share": {
         "title": "Share of the middle 40%",
         "description": "The share of {inc_cons_dict[wel]['name_distribution']} {inc_cons_dict[wel]['verb']} by the middle 40%. The middle 40% is the share of the population whose {inc_cons_dict[wel]['name']} lies between the poorest 50% and the richest 10%.",
         "unit": "%",
@@ -224,23 +224,80 @@ rel_dict = {40: "40% of the median", 50: "50% of the median", 60: "60% of the me
 # Details for each absolute poverty line
 abs_dict = {
     2011: {
-        100: {"title": "$1 a day", "title_between": "$1"},
-        190: {"title": "$1.90 a day", "title_between": "$1.90"},
-        320: {"title": "$3.20 a day", "title_between": "$3.20"},
-        550: {"title": "$5.50 a day", "title_between": "$5.50"},
-        1000: {"title": "$10 a day", "title_between": "$10"},
-        2000: {"title": "$20 a day", "title_between": "$20"},
-        3000: {"title": "$30 a day", "title_between": "$30"},
+        100: {"title": "$1 a day", "title_between": "$1", "description_key": ""},
+        190: {
+            "title": "$1.90 a day",
+            "title_between": "$1.90",
+            "description_key": "Extreme poverty here is defined as living below the International Poverty Line of $1.90 per day.",
+        },
+        320: {
+            "title": "$3.20 a day",
+            "title_between": "$3.20",
+            "description_key": "A poverty line of $3.20 a day represents definitions of national poverty lines in lower-middle-income countries.",
+        },
+        550: {
+            "title": "$5.50 a day",
+            "title_between": "$5.50",
+            "description_key": "A poverty line of $5.50 a day represents definitions of national poverty lines in upper-middle-income countries.",
+        },
+        1000: {
+            "title": "$10 a day",
+            "title_between": "$10",
+            "description_key": "",
+        },
+        2000: {
+            "title": "$20 a day",
+            "title_between": "$20",
+            "description_key": "",
+        },
+        3000: {
+            "title": "$30 a day",
+            "title_between": "$30",
+            "description_key": "A poverty line of $30 a day represents definitions of national poverty lines in high-income countries.",
+        },
+        4000: {
+            "title": "$40 a day",
+            "title_between": "$40",
+            "description_key": "",
+        },
     },
     2017: {
-        100: {"title": "$1 a day", "title_between": "$1"},
-        215: {"title": "$2.15 a day", "title_between": "$2.15"},
-        365: {"title": "$3.65 a day", "title_between": "$3.65"},
-        685: {"title": "$6.85 a day", "title_between": "$6.85"},
-        1000: {"title": "$10 a day", "title_between": "$10"},
-        2000: {"title": "$20 a day", "title_between": "$20"},
-        3000: {"title": "$30 a day", "title_between": "$30"},
-        4000: {"title": "$40 a day", "title_between": "$40"},
+        100: {"title": "$1 a day", "title_between": "$1", "description_key": ""},
+        215: {
+            "title": "$2.15 a day",
+            "title_between": "$2.15",
+            "description_key": "Extreme poverty here is defined as living below the International Poverty Line of $2.15 per day.",
+        },
+        365: {
+            "title": "$3.65 a day",
+            "title_between": "$3.65",
+            "description_key": "A poverty line of $3.65 a day represents definitions of national poverty lines in lower-middle-income countries.",
+        },
+        685: {
+            "title": "$6.85 a day",
+            "title_between": "$6.85",
+            "description_key": "A poverty line of $6.85 a day represents definitions of national poverty lines in upper-middle-income countries.",
+        },
+        1000: {
+            "title": "$10 a day",
+            "title_between": "$10",
+            "description_key": "",
+        },
+        2000: {
+            "title": "$20 a day",
+            "title_between": "$20",
+            "description_key": "",
+        },
+        3000: {
+            "title": "$30 a day",
+            "title_between": "$30",
+            "description_key": "A poverty line of $30 a day represents definitions of national poverty lines in high-income countries.",
+        },
+        4000: {
+            "title": "$40 a day",
+            "title_between": "$40",
+            "description_key": "",
+        },
     },
 }
 
@@ -279,22 +336,45 @@ def add_metadata_vars(tb_garden: Table, ppp_version: int, welfare_type: str) -> 
             origins = tb_garden[col_name].metadata.origins
 
             # Create metadata for these variables
-            tb_garden[col_name].metadata = var_metadata_inequality_mean_median(var, origins, ppp_version, welfare_type)
-        for povline in abs_dict:
-            # For variables that have "dollar a day" poverty lines
-            col_name = f"{var}_{povline}{smooth}"
+            tb_garden[col_name].metadata = var_metadata_inequality_mean_median(var, origins, welfare_type)
+
+            # Replace placeholders
+            tb_garden[col_name].metadata.description_short = (
+                tb_garden[col_name]
+                .metadata.description_short.replace("{inc_cons_dict[wel]['name']}", inc_cons_dict[welfare_type]["name"])
+                .replace("{inc_cons_dict[wel]['name_distribution']}", inc_cons_dict[welfare_type]["name_distribution"])
+                .replace("{inc_cons_dict[wel]['verb']}", inc_cons_dict[welfare_type]["verb"])
+            )
+
+            tb_garden[col_name].metadata.description_key = [
+                ppp.replace("{ppp}", str(ppp_version)) for ppp in tb_garden[col_name].metadata.description_key
+            ]
+
+            tb_garden[col_name].metadata.unit = tb_garden[col_name].metadata.unit.replace("{ppp}", str(ppp_version))
+
+        for povline in povline_list:
+            # For variables that use absolute poverty lines
+            col_name = f"{var}_{povline}"
 
             if col_name in cols:
                 # Get the origins of the variable
                 origins = tb_garden[col_name].metadata.origins
 
                 # Create metadata for these variables
-                tb_garden[col_name].metadata = var_metadata_absolute(var, povline, origins, smooth)
+                tb_garden[col_name].metadata = var_metadata_absolute_povlines(var, povline, origins, welfare_type)
 
-                # Replace the {povline} placeholder in the description
-                tb_garden[col_name].metadata.description_short = tb_garden[col_name].metadata.description_short.replace(
-                    "{povline}", str(povline_dict[povline]["description"])
+                # Replace placeholders
+                tb_garden[col_name].metadata.description_short = (
+                    tb_garden[col_name]
+                    .metadata.description_short.replace("{povline}", abs_dict[povline]["title"])
+                    .replace("{inc_cons_dict[wel]['name']}", inc_cons_dict[welfare_type]["name"])
                 )
+
+                tb_garden[col_name].metadata.description_key = [
+                    ppp.replace("{ppp}", str(ppp_version)) for ppp in tb_garden[col_name].metadata.description_key
+                ]
+
+                tb_garden[col_name].metadata.unit = tb_garden[col_name].metadata.unit.replace("{ppp}", str(ppp_version))
 
             # For variables above poverty lines
             col_name = f"{var}_above_{povline}{smooth}"
@@ -394,10 +474,11 @@ def add_metadata_vars(tb_garden: Table, ppp_version: int, welfare_type: str) -> 
 
 
 # Metadata functions to show a clearer main code
-def var_metadata_inequality_mean_median(var, origins, ppp_version, welfare_type) -> VariableMeta:
+def var_metadata_inequality_mean_median(var, origins, welfare_type) -> VariableMeta:
     """
     Create metadata for defined uniquely by their name
     """
+    # For monetary variables I include PPP description
     if var in ["mean", "median"]:
         meta = VariableMeta(
             title=f"{var_dict[var]['title']} {inc_cons_dict[welfare_type]['name']}",
@@ -452,17 +533,27 @@ def var_metadata_inequality_mean_median(var, origins, ppp_version, welfare_type)
     return meta
 
 
-def var_metadata_absolute(var, povline, origins, smooth) -> VariableMeta:
+def var_metadata_absolute_povlines(var, povline, origins, welfare_type) -> VariableMeta:
     """
     Create metadata for variables with absolute poverty lines
     """
+    # Define the list of description_key, to then remove the empty ones
+    description_key_list = [
+        abs_dict[povline]["description_key"],
+        ppp_description,
+        inc_cons_dict[welfare_type]["description"],
+        non_market_income_description,
+    ]
+
+    # Remove empty strings from the list
+    description_key_list = list(filter(None, description_key_list))
+
     meta = VariableMeta(
-        title=f"{povline_dict[povline]['title']} - {var_dict[var]['title']} ({smooth_dict[smooth]['title']})",
+        title=f"{abs_dict[povline]['title']} - {var_dict[var]['title']}",
         description_short=var_dict[var]["description"],
-        description_key=[ppp_description, dod_description],
+        description_key=description_key_list,
         description_processing=f"""
-        {processing_description}
-{smooth_dict[smooth]['description']}""",
+        {processing_description}""",
         unit=var_dict[var]["unit"],
         short_unit=var_dict[var]["short_unit"],
         origins=origins,
@@ -470,11 +561,11 @@ def var_metadata_absolute(var, povline, origins, smooth) -> VariableMeta:
     meta.display = {
         "name": meta.title,
         "numDecimalPlaces": var_dict[var]["numDecimalPlaces"],
-        "entityAnnotationsMap": "Western offshoots (Moatsos): United States, Canada, Australia and New Zealand",
+        "tolerance": TOLERANCE,
     }
 
     meta.presentation = {
-        "title_public": f"{povline_dict[povline]['title']} - {var_dict[var]['title']}",
+        "title_public": meta.title,
     }
 
     return meta
