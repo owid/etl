@@ -31,7 +31,7 @@ import requests
 from botocore.exceptions import ClientError
 from joblib import Memory
 from structlog import get_logger
-from tenacity import Retrying
+from tenacity import retry
 from tenacity.stop import stop_after_attempt
 from tenacity.wait import wait_random_exponential
 
@@ -219,6 +219,24 @@ class WB_API:
         return _fetch_csv(f"{self.api_address}{url}")
 
 
+@retry(wait=wait_random_exponential(multiplier=1), stop=stop_after_attempt(MAX_REPEATS))
+def _get_request(url: str) -> requests.Response:
+    response = requests.get(url, timeout=TIMEOUT)
+    if response.status_code != 200:
+        log.info("fetch_csv.retry", url=url)
+        raise Exception("API timed out")
+
+    response = requests.get(url, timeout=TIMEOUT)
+    if response.status_code != 200:
+        log.info("fetch_csv.retry", url=url)
+        raise Exception("API timed out")
+
+    if b"Server Error" in response.content:
+        raise Exception("API returned server error")
+
+    return response
+
+
 @memory.cache
 def _fetch_csv(url: str) -> pd.DataFrame:
     r2 = connect_s3_cached()
@@ -228,34 +246,30 @@ def _fetch_csv(url: str) -> pd.DataFrame:
     # try to get it from cache
     try:
         obj = r2.get_object(Bucket=r2_bucket, Key=r2_key)
-        df = pd.read_csv(io.StringIO(obj["Body"].read().decode("utf-8")))
-        log.info("fetch_csv.cache_hit", url=url)
-        return df
+        s = obj["Body"].read().decode("utf-8")
+        # we might have cached invalid responses, in that case fetch it again
+        if "Server Error" not in s:
+            df = pd.read_csv(io.StringIO(s))
+            log.info("fetch_csv.cache_hit", url=url)
+            return df
+        else:
+            log.info("fetch_csv.cache_with_error", url=url)
     except ClientError:
         pass
 
     log.info("fetch_csv.start", url=url)
+    response = _get_request(url)
+    log.info("fetch_csv.success", url=url, t=response.elapsed.total_seconds())
 
-    for attempt in Retrying(wait=wait_random_exponential(multiplier=1), stop=stop_after_attempt(MAX_REPEATS)):
-        with attempt:
-            response = requests.get(url, timeout=TIMEOUT)
-            if response.status_code != 200:
-                log.info("fetch_csv.retry", url=url)
-                raise Exception("API timed out")
-            else:
-                log.info("fetch_csv.success", url=url, t=response.elapsed.total_seconds())
+    # save the result to R2 cache
+    r2.put_object(
+        Body=response.content,
+        Bucket=r2_bucket,
+        Key=r2_key,
+    )
 
-                # save the result to R2 cache
-                r2.put_object(
-                    Body=response.content,
-                    Bucket=r2_bucket,
-                    Key=r2_key,
-                )
-
-                df = pd.read_csv(io.StringIO(response.content.decode("utf-8")))
-                return df
-
-    raise AssertionError(f"Repeated {MAX_REPEATS} times, can't extract data for url {url}")
+    df = pd.read_csv(io.StringIO(response.content.decode("utf-8")))
+    return df
 
 
 @memory.cache
