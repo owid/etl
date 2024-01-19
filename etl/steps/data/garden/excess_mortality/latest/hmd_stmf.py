@@ -18,7 +18,7 @@ paths = PathFinder(__file__)
 THIS_YEAR = date.today().year
 # Minimum and maximum years expected in data
 YEAR_MIN_EXPECTED = 1990
-YEAR_MAX_EXPECTED = 2023
+YEAR_MAX_EXPECTED = 2024
 # Year range to be used (rest is filtered out)
 YEAR_MIN = 2010
 YEAR_MAX = 3000  # (No actual limit)

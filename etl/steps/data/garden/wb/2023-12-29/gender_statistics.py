@@ -1,9 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
 
-import owid.catalog.processing as pr
 import pandas as pd
 from owid.catalog import Table
-from owid.catalog.utils import underscore
 from tqdm import tqdm
 
 from etl.data_helpers import geo
@@ -66,34 +64,20 @@ def run(dest_dir: str) -> None:
     # Set an appropriate index and sort.
     tb = tb.underscore().set_index(["country", "year"], verify_integrity=True).sort_index().sort_index(axis=1)
 
-    # Combine maternity and paternity leave indicators as described in the issue here: https://github.com/owid/owid-issues/issues/1274
-    tb["total_maternity_leave"] = tb["sh_mmr_leve"] + tb["sh_par_leve_fe"]
-    tb["total_paternity_leave"] = tb["sh_par_leve_ma"] + tb["sh_ptr_leve"]
+    # Combine maternity and paternity leave indicators (time only available TO each parent)
+    tb["total_maternity_leave_to"] = tb["sh_mmr_leve"] + tb["sh_par_leve_fe"]
+    tb["total_paternity_leave_to"] = tb["sh_par_leve_ma"] + tb["sh_ptr_leve"]
+
+    # Combine maternity and paternity leave indicators (time available days FOR each parent)
+    tb["total_maternity_leave_for"] = tb["sh_mmr_leve"] + tb["sh_par_leve_fe"] + tb["sh_par_leve"]
+    tb["total_paternity_leave_for"] = tb["sh_par_leve_ma"] + tb["sh_ptr_leve"] + tb["sh_par_leve"]
 
     # Add relevant metadata to the newly created columns
-    tb["total_maternity_leave"].metadata.description_from_producer = (
-        "**This indicator is a sum of two different maternity leave indicators provided by World Bank:**"
-        + "\n\nThe first indicator is called "
-        + tb["sh_mmr_leve"].metadata.title
-        + ". The revelavant description from World Bank of this indicator is:\n\n"
-        + tb["sh_mmr_leve"].metadata.description_from_producer
-        + "\n\nThe second indicator is called "
-        + tb["sh_par_leve_fe"].metadata.title
-        + ". The revelavant description from World Bank of this indicator is:\n\n"
-        + tb["sh_par_leve_fe"].metadata.description_from_producer
-    )
+    add_metadata_description(tb, "total_maternity_leave_for", ["sh_mmr_leve", "sh_par_leve_fe", "sh_par_leve"])
+    add_metadata_description(tb, "total_paternity_leave_for", ["sh_par_leve_ma", "sh_ptr_leve", "sh_par_leve"])
 
-    tb["total_paternity_leave"].metadata.description_from_producer = (
-        "**This indicator is a sum of two different paternity leave indicators provided by World Bank:**"
-        + "\n\nThe first indicator is called "
-        + tb["sh_par_leve_ma"].metadata.title
-        + ". The revelavant description from World Bank of this indicator is:\n\n"
-        + tb["sh_par_leve_ma"].metadata.description_from_producer
-        + "\n\nThe second indicator is called "
-        + tb["sh_ptr_leve"].metadata.title
-        + ". The revelavant description from World Bank of this indicator is:\n\n"
-        + tb["sh_ptr_leve"].metadata.description_from_producer
-    )
+    add_metadata_description(tb, "total_maternity_leave_to", ["sh_mmr_leve", "sh_par_leve_fe"])
+    add_metadata_description(tb, "total_paternity_leave_to", ["sh_par_leve_ma", "sh_ptr_leve"])
 
     #
     # Save outputs.
@@ -208,3 +192,17 @@ def update_metadata(meta, display_decimals, unit, short_unit):
     meta.display["numDecimalPlaces"] = display_decimals
     meta.unit = unit
     meta.short_unit = short_unit
+
+
+def add_metadata_description(tb, column_name, indicators):
+    """Adds metadata description to a given column in tb."""
+    description = (
+        f"**This indicator is a sum of {len(indicators)} different leave indicators provided by World Bank:**\n\n"
+    )
+    for indicator in indicators:
+        if indicator in tb and hasattr(tb[indicator], "metadata"):
+            description += (
+                f"The indicator '{tb[indicator].metadata.title}' is described by World Bank as:\n\n"
+                f"{tb[indicator].metadata.description_from_producer}\n\n"
+            )
+    tb[column_name].metadata.description_from_producer = description
