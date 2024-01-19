@@ -215,12 +215,12 @@ steps:
     - data://garden/worldbank_wdi/2022-05-26/wdi
 
   # Global GDP in the long run
-  data://garden/growth/2022-12-19/gdp_historical:
-    - data://garden/ggdc/2020-10-01/ggdc_maddison
-    - data://garden/worldbank_wdi/2022-05-26/wdi
+  data://garden/growth/2024-01-04/gdp_historical:
+    - data://grapher/worldbank_wdi/2023-05-29/wdi
+    - data://grapher/ggdc/2020-10-01/ggdc_maddison
     - data://garden/ggdc/2022-12-23/maddison_database
-  data://grapher/growth/2022-12-19/gdp_historical:
-    - data://garden/growth/2022-12-19/gdp_historical
+  data://grapher/growth/2024-01-04/gdp_historical:
+    - data://garden/growth/2024-01-04/gdp_historical
   data://meadow/ggdc/2022-12-23/maddison_database:
     - snapshot://ggdc/2022-12-23/maddison_database.xlsx
   data://garden/ggdc/2022-12-23/maddison_database:

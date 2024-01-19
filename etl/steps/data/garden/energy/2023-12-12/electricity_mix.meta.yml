@@ -46,7 +46,7 @@ tables:
         display:
           name: Carbon intensity
         presentation:
-          title_public: Carbon intensity of electricity per kilowatt-hour
+          title_public: Carbon intensity of electricity generation
       coal_generation__twh:
         title: Electricity from coal - TWh
         short_unit: TWh

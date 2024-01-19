@@ -1,18 +1,33 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/origin/
 meta:
-  namespace: ggdc
-  short_name: maddison_database
-  name: Maddison Database (GGDC, 2009)
-  source_name: Maddison Database (Maddison, 2009)
-  publication_year: 2009
-  url: https://www.rug.nl/ggdc/historicaldevelopment/maddison/releases/maddison-database-2010
-  source_data_url: https://www.rug.nl/ggdc/historicaldevelopment/maddison/data/md2010_vertical.xlsx
-  file_extension: xlsx
-  license_url:
-  license_name:
-  date_accessed: 2022-12-23
-  is_public: true
-  description: |
-    The final database version provided by Angus Maddison, covering world population, GDP and per capita GDP from 1-2008 AD.
+  origin:
+    # Data product / Snapshot
+    title: Maddison Database
+    description: |-
+      The final database version provided by Angus Maddison, covering world population, GDP and per capita GDP from 1-2008 AD.
+    date_published: '2009'
+    version_producer: 2010
+    attribution: Maddison Database 2010 (Maddison, 2009)
+    attribution_short: Maddison Database
+
+    # Citation
+    producer: Angus Maddison
+    citation_full: |-
+      Maddison, A. (2009). Maddison Database 2010. Retrieved from https://www.rug.nl/ggdc/historicaldevelopment/maddison/releases/maddison-database-2010
+
+    # Files
+    url_main:
+      https://www.rug.nl/ggdc/historicaldevelopment/maddison/releases/maddison-database-2010
+    url_download: https://www.rug.nl/ggdc/historicaldevelopment/maddison/data/md2010_vertical.xlsx
+    date_accessed: 2022-12-23
+
+    # License
+    license:
+      name: CC BY 4.0
+      url:
+        https://www.rug.nl/ggdc/historicaldevelopment/maddison/releases/maddison-database-2010
+
 wdir: ../../../data/snapshots/ggdc/2022-12-23
 outs:
 - md5: eb0473efe87c45f5a1e8c8e612fbe12b

@@ -1,0 +1,128 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Economic Growth
+    processing_level: major
+
+    description_processing: |-
+      The data presented here from 1990 onwards is from the World Bank. Data before 1990 is constructed using the 1990 World Bank observation and applying the growth rates implied by the Maddison Project Database. Similarly, data before 1820 is built using the adjusted 1820 estimate calculated by the previous method and applying the growth rates implied by the Maddison Database. These steps are necessary because World Bank data adjusted for inflation and the cost of living between countries is only available from 1990 onwards and also because the three datasets estimate GDP with different prices.
+
+      The adjusted results before 1990 have been rounded to address uncertainty in the underlying data. GDP data is rounded to the nearest million, and GDP is rounded to the nearest hundred.
+
+  description_adjustment: This data is adjusted for inflation and for differences in the cost of living between countries.
+  description_unit_merge: This data is expressed in [international-$](#dod:int_dollar_abbreviation) at 2017 prices, merging data from the World Bank, backwards extended with growth rates from Maddison Project Database and Maddison Database.
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
+dataset:
+  update_period_days: 0
+  title: Global economic growth in the last two millennia
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
+tables:
+  gdp_historical:
+    # Learn more about the available fields:
+    # http://docs.owid.io/projects/etl/architecture/metadata/reference/indicator/
+    variables:
+      gdp:
+        title: GDP
+        unit: international-$ in 2017 prices
+        short_unit: $
+        display:
+          name: GDP
+          numDecimalPlaces: 0
+        description_short: Total output of the world economy. This data is adjusted for inflation and differences in the cost
+          of living between countries.
+        description_key:
+          - This GDP indicator provides information on global economic growth and income levels in the very long run. Estimates are available as far back as 1 CE.
+          - "{definitions.description_adjustment}"
+          - "{definitions.description_unit_merge}"
+        description_from_producer: |
+          _From the World Bank:_
+
+          PPP GDP is gross domestic product converted to international dollars using purchasing power parity rates. An international dollar has the same purchasing power over GDP as the U.S. dollar has in the United States. GDP is the sum of gross value added by all resident producers in the country plus any product taxes and minus any subsidies not included in the value of the products. It is calculated without making deductions for depreciation of fabricated assets or for depletion and degradation of natural resources. Data are in constant 2017 international dollars.
+
+          For the concept and methodology of 2017 PPP, please refer to the [International Comparison Program (ICP)’s website](https://www.worldbank.org/en/programs/icp).
+
+          _From Maddison Database:_
+
+          GDP (1990 Int. GK$)
+        presentation:
+          title_public: Global Gross Domestic Product (GDP)
+          title_variant: Historical data
+          attribution_short: World Bank, Maddison Project Database
+          faqs:
+            - fragment_id: poverty-international-dollars
+              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+          grapher_config:
+            title: World GDP over the last two millennia
+            subtitle: Total output of the world economy. This data is adjusted for inflation and differences in the cost of
+              living between countries.
+            originUrl: https://ourworldindata.org/economic-growth
+            yAxis:
+              min: 0
+              canChangeScaleType: true
+            hideAnnotationFieldsInTitle:
+              time: true
+              entity: true
+              changeInPrefix: true
+            hideRelativeToggle: false
+            selectedEntityNames:
+              - World
+            note: This data is expressed in [international-$](#dod:int_dollar_abbreviation) at 2017 prices.
+            hideLegend: true
+      gdp_per_capita:
+        title: GDP per capita
+        unit: international-$ in 2017 prices
+        short_unit: $
+        display:
+          name: GDP per capita
+          numDecimalPlaces: 0
+        description_short: This data is adjusted for inflation and differences in the cost of living between countries.
+        description_key:
+          - This GDP per capita indicator provides information on global economic growth and income levels in the very long run. Estimates are available as far back as 1 CE.
+          - "{definitions.description_adjustment}"
+          - "{definitions.description_unit_merge}"
+        description_from_producer: |
+          _From the World Bank:_
+
+          GDP per capita based on purchasing power parity (PPP). PPP GDP is gross domestic product converted to international dollars using purchasing power parity rates. An international dollar has the same purchasing power over GDP as the U.S. dollar has in the United States. GDP at purchaser's prices is the sum of gross value added by all resident producers in the country plus any product taxes and minus any subsidies not included in the value of the products. It is calculated without making deductions for depreciation of fabricated assets or for depletion and degradation of natural resources. Data are in constant 2017 international dollars.
+
+          For the concept and methodology of 2017 PPP, please refer to the [International Comparison Program (ICP)’s website](https://www.worldbank.org/en/programs/icp).
+
+          _From Maddison Project Database:_
+
+          Real GDP per capita in 2011$
+
+          _From Maddison Database:_
+
+          GDP per capita (1990 Int. GK$)
+        presentation:
+          title_public: Global GDP per capita
+          title_variant: Historical data
+          attribution_short: World Bank, Maddison Project Database
+          faqs:
+            - fragment_id: poverty-international-dollars
+              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+          grapher_config:
+            title: World GDP per capita over the last two millennia
+            subtitle: This data is adjusted for inflation and differences in the cost of living between countries.
+            originUrl: https://ourworldindata.org/economic-growth
+            yAxis:
+              min: 0
+              canChangeScaleType: true
+            hideAnnotationFieldsInTitle:
+              time: true
+              entity: true
+              changeInPrefix: true
+            hideRelativeToggle: false
+            selectedEntityNames:
+              - World
+            note: This data is expressed in [international-$](#dod:int_dollar_abbreviation) at 2017 prices.
+            hideLegend: true
+
