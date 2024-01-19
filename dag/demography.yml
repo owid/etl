@@ -174,3 +174,7 @@ steps:
     - data://garden/demography/2023-11-08/modal_age_death
   data://grapher/demography/2024-01-05/population:
     - data://garden/demography/2024-01-05/population
+
+  # Maddison working paper (2022)
+  data://meadow/ggdc/2024-01-19/maddison_federico_paper:
+    - snapshot://ggdc/2024-01-19/maddison_federico_paper.xlsx
