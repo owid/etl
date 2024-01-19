@@ -9,12 +9,6 @@ from owid.catalog import Table, VariableMeta
 
 non_market_income_description = "Non-market sources of income, including food grown by subsistence farmers for their own consumption, are taken into account."
 
-processing_description = """
-For a small number of country-year observations, the World Bank PIP data contains two estimates: one based on income data and one based on consumption data. In these cases we keep only the consumption estimate in order to obtain a single series for each country.
-
-You can find the data with all available income and consumption data points, including these overlapping estimates, in our [complete dataset](https://github.com/owid/poverty-data#a-global-dataset-of-poverty-and-inequality-measures-prepared-by-our-world-in-data-from-the-world-banks-poverty-and-inequality-platform-pip-database) of the World Bank PIP data.
-"""
-
 processing_description_relative_poverty = """
 Measures of relative poverty are not directly available in the World Bank PIP data. To calculate this metric we take the median income or consumption for the country and year, calculate a relative poverty line – in this case {povline} of the median – and then run a specific query on the PIP API to return the share of population below that line.
 """
@@ -211,18 +205,33 @@ inc_cons_dict = {
         "name_distribution": "after tax income",
         "verb": "received",
         "description": "The data relates to income measured after taxes and benefits per capita. 'Per capita' means that the income of each household is attributed equally to each member of the household (including children).",
+        "processing_description": """
+To construct a global dataset, the World Bank combines estimates based on income data and estimates based on consumption data. Here we only include the estimates based on income data.
+
+You can find the data with all available income and consumption data points in our [complete dataset](https://github.com/owid/poverty-data#a-global-dataset-of-poverty-and-inequality-measures-prepared-by-our-world-in-data-from-the-world-banks-poverty-and-inequality-platform-pip-database) of the World Bank PIP data.
+""",
     },
     "consumption": {
         "name": "consumption",
         "name_distribution": "consumption",
         "verb": "spent",
         "description": "The data relates to consumption per capita. 'Per capita' means that the consumption of each household is attributed equally to each member of the household (including children).",
+        "processing_description": """
+To construct a global dataset, the World Bank combines estimates based on income data and estimates based on consumption data. Here we only include the estimates based on consumption data.
+
+You can find the data with all available income and consumption data points in our [complete dataset](https://github.com/owid/poverty-data#a-global-dataset-of-poverty-and-inequality-measures-prepared-by-our-world-in-data-from-the-world-banks-poverty-and-inequality-platform-pip-database) of the World Bank PIP data.
+""",
     },
     "income_consumption": {
         "name": "income or consumption",
         "name_distribution": "after tax income or consumption",
         "verb": "received",
         "description": "Depending on the country and year, the data relates to income measured after taxes and benefits, or to consumption, per capita. 'Per capita' means that the income of each household is attributed equally to each member of the household (including children).",
+        "processing_description": """
+For a small number of country-year observations, the World Bank PIP data contains two estimates: one based on income data and one based on consumption data. In these cases we keep only the consumption estimate in order to obtain a single series for each country.
+
+You can find the data with all available income and consumption data points, including these overlapping estimates, in our [complete dataset](https://github.com/owid/poverty-data#a-global-dataset-of-poverty-and-inequality-measures-prepared-by-our-world-in-data-from-the-world-banks-poverty-and-inequality-platform-pip-database) of the World Bank PIP data.
+""",
     },
 }
 
@@ -525,7 +534,7 @@ def var_metadata_inequality_mean_median(var, origins, welfare_type) -> VariableM
                 non_market_income_description,
             ],
             description_processing=f"""
-            {processing_description}
+            {inc_cons_dict[welfare_type]['processing_description']}
             """,
             unit=var_dict[var]["unit"],
             short_unit=var_dict[var]["short_unit"],
@@ -550,7 +559,7 @@ def var_metadata_inequality_mean_median(var, origins, welfare_type) -> VariableM
                 non_market_income_description,
             ],
             description_processing=f"""
-            {processing_description}
+            {inc_cons_dict[welfare_type]['processing_description']}
             """,
             unit=var_dict[var]["unit"],
             short_unit=var_dict[var]["short_unit"],
@@ -589,7 +598,7 @@ def var_metadata_absolute_povlines(var, povline, origins, ppp_version, welfare_t
         description_short=var_dict[var]["description"],
         description_key=description_key_list,
         description_processing=f"""
-        {processing_description}""",
+        {inc_cons_dict[welfare_type]['processing_description']}""",
         unit=var_dict[var]["unit"],
         short_unit=var_dict[var]["short_unit"],
         origins=origins,
@@ -621,7 +630,7 @@ def var_metadata_between_absolute_povlines(var, povline1, povline2, origins, ppp
             non_market_income_description,
         ],
         description_processing=f"""
-        {processing_description}""",
+        {inc_cons_dict[welfare_type]['processing_description']}""",
         unit=var_dict[var]["unit"].replace("{ppp}", str(ppp_version)),
         short_unit=var_dict[var]["short_unit"],
         origins=origins,
@@ -664,7 +673,7 @@ def var_metadata_relative_povlines(var, rel, origins, welfare_type) -> VariableM
         description_processing=f"""
 {processing_description_relative_poverty}
 
-{processing_description}""",
+{inc_cons_dict[welfare_type]['processing_description']}""",
         unit=var_dict[var]["unit"],
         short_unit=var_dict[var]["short_unit"],
         origins=origins,
@@ -699,7 +708,7 @@ def var_metadata_percentiles(var, pct, origins, ppp_version, welfare_type) -> Va
             description_processing=f"""
 {processing_description_thr}
 
-{processing_description}
+{inc_cons_dict[welfare_type]['processing_description']}
 """,
             unit=var_dict[var]["unit"],
             short_unit=var_dict[var]["short_unit"],
@@ -718,7 +727,7 @@ def var_metadata_percentiles(var, pct, origins, ppp_version, welfare_type) -> Va
             description_processing=f"""
 {processing_description_avg}
 
-{processing_description}
+{inc_cons_dict[welfare_type]['processing_description']}
 """,
             unit=var_dict[var]["unit"],
             short_unit=var_dict[var]["short_unit"],
@@ -735,7 +744,7 @@ def var_metadata_percentiles(var, pct, origins, ppp_version, welfare_type) -> Va
                 non_market_income_description,
             ],
             description_processing=f"""
-{processing_description}
+{inc_cons_dict[welfare_type]['processing_description']}
 """,
             unit=var_dict[var]["unit"],
             short_unit=var_dict[var]["short_unit"],

@@ -3,6 +3,7 @@
 
 import owid.catalog.processing as pr
 from owid.catalog import Table
+from shared import add_metadata_vars
 from structlog import get_logger
 
 from etl.data_helpers import geo
@@ -67,6 +68,19 @@ def run(dest_dir: str) -> None:
     # Separate out consumption-only, income-only. Also, create a table with both income and consumption
     tb_inc_2011, tb_cons_2011, tb_inc_or_cons_2011 = inc_or_cons_data(tb_2011)
     tb_inc_2017, tb_cons_2017, tb_inc_or_cons_2017 = inc_or_cons_data(tb_2017)
+
+    # Add metadata by code
+    tb_inc_2011 = add_metadata_vars(tb_garden=tb_inc_2011, ppp_version=2011, welfare_type="income")
+    tb_cons_2011 = add_metadata_vars(tb_garden=tb_cons_2011, ppp_version=2011, welfare_type="consumption")
+    tb_inc_or_cons_2011 = add_metadata_vars(
+        tb_garden=tb_inc_or_cons_2011, ppp_version=2011, welfare_type="income_consumption"
+    )
+
+    tb_inc_2017 = add_metadata_vars(tb_garden=tb_inc_2017, ppp_version=2017, welfare_type="income")
+    tb_cons_2017 = add_metadata_vars(tb_garden=tb_cons_2017, ppp_version=2017, welfare_type="consumption")
+    tb_inc_or_cons_2017 = add_metadata_vars(
+        tb_garden=tb_inc_or_cons_2017, ppp_version=2017, welfare_type="income_consumption"
+    )
 
     # Create regional headcount dataset, by patching missing values with the difference between world and regional headcount
     tb_regions = regional_headcount(tb_inc_or_cons_2017)
