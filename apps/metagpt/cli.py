@@ -12,6 +12,7 @@ from typing_extensions import Self
 from apps.metagpt.gpt import GPTResponse, OpenAIWrapper
 from apps.metagpt.prompts import create_query_data_step, create_query_snapshot
 from apps.metagpt.utils import Channels, convert_list_to_dict, read_metadata_file
+from etl.files import yaml_dump
 
 # Fields to ask GPT for (garden, grapher)
 FIELDS_TO_FILL_OUT = [
@@ -154,7 +155,8 @@ class MetadataGPTUpdater:
     def save_updated_metadata(self: Self, output_file: str) -> None:
         """Save the metadata file and returns its content."""
         with open(output_file, "w") as file:
-            yaml.dump(self.metadata_new_str, file, default_flow_style=False, sort_keys=False, indent=4)
+            yaml_dump(self.metadata_new_str, file)  # type: ignore
+        log.info(f"Metadata file saved to {output_file}")
 
     def run(self: Self, lazy: bool = False) -> float | None:
         """Update metadata using OpenAI GPT."""
@@ -229,6 +231,12 @@ class MetadataGPTUpdater:
                 # Update indicator metadata (when lazy mode is OFF)
                 if not lazy:
                     indicator_metadata_dict = convert_list_to_dict(indicator_metadata)
+
+                    # Format description_key to be bullet points
+                    indicator_metadata_dict["description_key"] = [  # type: ignore
+                        f"{item}" for item in indicator_metadata_dict["description_key"].split(". ")
+                    ]
+
                     original_yaml_content["tables"][table_name]["variables"][variable_name].update(
                         indicator_metadata_dict
                     )
