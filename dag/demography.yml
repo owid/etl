@@ -178,3 +178,5 @@ steps:
   # Maddison working paper (2022)
   data://meadow/ggdc/2024-01-19/maddison_federico_paper:
     - snapshot://ggdc/2024-01-19/maddison_federico_paper.xlsx
+  data://garden/ggdc/2024-01-19/maddison_federico_paper:
+    - data://meadow/ggdc/2024-01-19/maddison_federico_paper
