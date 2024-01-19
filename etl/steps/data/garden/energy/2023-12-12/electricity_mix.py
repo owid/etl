@@ -24,6 +24,10 @@ TWH_TO_KWH = 1e9
 # Megatonnes to grams.
 MT_TO_G = 1e12
 
+# Constant efficiency factor assumed by the Energy Institute Statistical Review, used to transform electricity
+# generation into input-equivalent primary energy consumption.
+BIOMASS_EFFICIENCY_FACTOR = 0.32
+
 
 def process_statistical_review_data(tb_review: Table) -> Table:
     """Load necessary columns from EI's Statistical Review dataset, and create some new variables (e.g. electricity
@@ -269,7 +273,7 @@ def add_share_variables(combined: Table) -> Table:
                 )
                 / combined["efficiency_factor"]
             )
-            + (combined["bioenergy_generation__twh"].fillna(0) / 0.32)
+            + (combined["bioenergy_generation__twh"].fillna(0) / BIOMASS_EFFICIENCY_FACTOR)
             + (combined["fossil_generation__twh"])
         )
         / combined["primary_energy_consumption__twh"]
