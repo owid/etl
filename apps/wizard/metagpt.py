@@ -201,7 +201,7 @@ if st.session_state.get("show_gpt"):
         # Temporary export
         tf = tempfile.NamedTemporaryFile()
         with open(file=tf.name, mode="w") as f:
-            f.write(yaml_dump(st.session_state["metadata_new"], strip_lines=True, width=float("inf")))
+            f.write(yaml_dump(st.session_state["metadata_new"], strip_lines=True, width=float("inf")))  # type: ignore
         ## Show file to the user
         with open(tf.name, "r") as f:
             file_content = f.read()
