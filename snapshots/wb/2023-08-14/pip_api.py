@@ -45,7 +45,7 @@ log = get_logger()
 memory = Memory(CACHE_DIR, verbose=0)
 
 # Basic parameters to use in the functions
-MAX_REPEATS = 10
+MAX_REPEATS = 15
 TIMEOUT = 500
 FILL_GAPS = "false"
 # NOTE: Although the number of workers is set to MAX_WORKERS, the actual number of workers for regional queries is half of that, because the API (`pip-grp`) is less able to handle concurrent requests.
