@@ -70,6 +70,8 @@ def update_indicator(indicator_id: int, update_request: UpdateIndicatorRequest, 
     except ValidationError as e:
         raise HTTPException(status_code=422, detail=e.message)
 
+    # NOTE: the order of all updating "tracks" is random, we can rethink it if we find
+    # ourselves running into race conditions.
     if not update_request.dryRun:
         with open(override_yml_path, "w") as f:
             f.write(yaml_str)
