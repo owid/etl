@@ -105,7 +105,10 @@ def create_metadata_desc(indicator: str, series_code: str, source_desc: dict, se
         source_desc_out = source_desc[series_code]
     else:
         source_url = get_metadata_link(indicator)
-        source_desc_out = series_description + "\n\nFurther information available at: %s" % (source_url)
+        if source_url == "no metadata found":
+            source_desc_out = series_description
+        else:
+            source_desc_out = series_description + "\n\nFurther information available at: %s" % (source_url)
 
     return source_desc_out
 
@@ -231,25 +234,24 @@ def get_metadata_link(indicator: str) -> str:
     url = os.path.join("https://unstats.un.org/sdgs/metadata/files/", "Metadata-%s.pdf") % "-".join(
         [part.rjust(2, "0") for part in indicator.split(".")]
     )
+    url_a = os.path.join("https://unstats.un.org/sdgs/metadata/files/", "Metadata-%sa.pdf") % "-".join(
+        [part.rjust(2, "0") for part in indicator.split(".")]
+    )
+    url_b = os.path.join("https://unstats.un.org/sdgs/metadata/files/", "Metadata-%sb.pdf") % "-".join(
+        [part.rjust(2, "0") for part in indicator.split(".")]
+    )
     r = requests.head(url)
-    ctype = r.headers["Content-Type"]
-    if ctype == "application/pdf":
+    if r.status_code == 200:
         url_out = url
-    elif ctype == "text/html":
-        url_a = os.path.join("https://unstats.un.org/sdgs/metadata/files/", "Metadata-%sa.pdf") % "-".join(
-            [part.rjust(2, "0") for part in indicator.split(".")]
-        )
-        url_b = os.path.join("https://unstats.un.org/sdgs/metadata/files/", "Metadata-%sb.pdf") % "-".join(
-            [part.rjust(2, "0") for part in indicator.split(".")]
-        )
-        url_out = url_a + " and " + url_b
-        url_check = requests.head(url_a)
-        ctype_a = url_check.headers["Content-Type"]
-        assert ctype_a == "application/pdf", url_a + "does not link to a pdf"
+        return url_out
     else:
-        raise NotImplementedError()
-
-    return url_out
+        url_check_a = requests.head(url_a)
+        url_check_b = requests.head(url_b)
+        if url_check_a.status_code == 200 and url_check_b.status_code == 200:
+            url_out = url_a + " and " + url_b
+            return url_out
+        else:
+            return "no metadata found"
 
 
 def value_convert(value: Any) -> Any:

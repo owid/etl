@@ -1,16 +1,32 @@
 meta:
-  source:
-    name: Our World In Data based on World Bank & Maddison (2017)
-    description: 'The data presented here from 1990 onwards is from the World Bank.
-      It is total global GDP in 2011 international-$ as published here: http://data.worldbank.org/indicator/NY.GDP.MKTP.PP.KD
-      (accessed on April 16, 2017). Data earlier than 1990 is backwards extended from
-      the World Bank observation for 1990 based on the growth rates implied by Maddison
-      data. The Maddison data is published here: http://www.ggdc.net/maddison/oriindex.htm'
-    url: Please see additional information for links
+  origin:
+  # Data product / Snapshot
+    title: World GDP
+    description: |-
+      The data presented here from 1990 onwards is from the World Bank.
+
+      It is total global GDP in 2011 international-$ as published here: http://data.worldbank.org/indicator/NY.GDP.MKTP.PP.KD (accessed on April 16, 2017). Data earlier than 1990 is backwards extended from the World Bank observation for 1990 based on the growth rates implied by Maddison data. The Maddison data is published here: http://www.ggdc.net/maddison/oriindex.htm
+    date_published: 2017-04-16
+
+    # Citation
+    producer: World Bank
+    citation_full: |-
+      Data since 1990:
+      "International Comparison Program, World Bank | World Development Indicators database, World Bank | Eurostat-OECD PPP Programme."
+
+      Data before 1990: World Bank observation from 1990 expanded with
+      "Maddison Project Database, version 2013. Bolt, J. and J. L. van Zanden (2014). The Maddison Project: collaborative research on historical national accounts. The Economic History Review, 67 (3): 627–651, working paper"
+    attribution: World Bank and Maddison (2017)
+
+    # Files
+    url_main: http://data.worldbank.org/indicator/NY.GDP.MKTP.PP.KD
     date_accessed: 2017-04-16
-    published_by: New Maddison Project Database and World Bank
-  name: World GDP in 2011 int $ – OWID based on World Bank + Maddison (2017)
-  description: ''
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://datacatalog.worldbank.org/public-licenses#cc-by
+
 wdir: ../../../data/snapshots/wb/2017-04-16
 outs:
 - md5: 8987b0657951b975b5bfc9d71306078d

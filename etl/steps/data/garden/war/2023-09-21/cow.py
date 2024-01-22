@@ -194,6 +194,18 @@ def run(dest_dir: str) -> None:
         tb_regions=tb_regions,
     )
 
+    # TEMPORARY
+    # I was asked to remove all the data on death indicators from regions.
+    # I decided not to remove the prior code estimating these bc it was very time consuming
+    # Hence, if we decide to go back and incorporate these, we just need to comment the lines below.
+    index_names = list(tb.index.names)
+    tb = tb.reset_index()
+    assert len(set(tb["region"])) == 6, "Number of regions (including 'World') is not 6!"
+    tb.loc[
+        tb["region"] != "World", ["number_deaths_ongoing_conflicts", "number_deaths_ongoing_conflicts_per_capita"]
+    ] = np.nan
+    tb = tb.set_index(index_names, verify_integrity=True)
+
     # Set new short_name
     tb.m.short_name = "cow"
 
@@ -1325,6 +1337,18 @@ def estimate_metrics_locations(tb_chupilkin: Table, tb_system: Table, tb_partici
     )
 
     # Fill empty time periods with zero
+    ## Hack to get all years since 1816
+    assert tb_locations_regions["year"].min() == 1818
+    tb_first = Table(
+        {
+            "year": [1816],
+            "country": ["World"],
+            "conflict_type": ["intra-state"],
+            "number_locations": [0],
+        }
+    )
+    tb_locations_regions = pr.concat([tb_first, tb_locations_regions], ignore_index=True)
+    ## Actuall filling gaps
     tb_locations_regions = fill_gaps_with_zeroes(
         tb=tb_locations_regions,
         columns=["country", "year", "conflict_type"],
@@ -1356,6 +1380,10 @@ def estimate_metrics_locations(tb_chupilkin: Table, tb_system: Table, tb_partici
             & (tb_locations["year"] <= 2014)
         )
     ]
+
+    # Fix metadata
+    ## The metadata for `number_locations` should be the same as for `number_ongoing_conflicts`
+    tb_locations["number_locations"].metadata = tb_locations["is_location_of_conflict"].metadata
 
     # Set index
     tb_locations = tb_locations.set_index(["year", "country", "conflict_type"], verify_integrity=True).sort_index()

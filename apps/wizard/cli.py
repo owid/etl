@@ -64,7 +64,6 @@ def cli(phase: Iterable[PHASES], run_checks: bool, dummy_data: bool, port: int) 
     if dummy_data:
         args.append("--dummy-data")
     sys.argv = args
-    print(args)
 
     # Call
     sys.exit(stcli.main())

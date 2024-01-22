@@ -1,15 +1,7 @@
-# TODO: This file is a duplicate of the previous step. It is not yet used in the dag and should be updated soon.
-
 """Load renewable energy investments data from garden and create a grapher dataset.
 
 """
-
-from owid import catalog
-
-from etl.helpers import PathFinder
-
-# Convert billion dollars to dollars.
-BILLION_DOLLARS_TO_DOLLARS = 1e9
+from etl.helpers import PathFinder, create_dataset
 
 # Load paths and naming conventions.
 paths = PathFinder(__file__)
@@ -19,28 +11,22 @@ def run(dest_dir: str) -> None:
     #
     # Load data.
     #
-    # Load dataset from garden.
-    table = paths.garden_dataset["renewable_energy_investments"]
+    # Load dataset from garden and read its main table.
+    ds_garden = paths.load_dataset("renewable_energy_investments")
+    tb = ds_garden["renewable_energy_investments"]
 
     #
     # Prepare data.
     #
     # Convert billion dollars to dollars, and adapt metadata units accordingly.
-    for column in table.columns:
-        old_title = table[column].metadata.title
-        old_description = table[column].metadata.description
-        table[column] *= BILLION_DOLLARS_TO_DOLLARS
-        table[column].metadata.title = old_title
-        table[column].metadata.description = old_description
-        table[column].metadata.unit = "US dollars"
-        table[column].metadata.short_unit = "$"
+    for column in tb.columns:
+        tb[column] *= 1e9
+        tb[column].metadata.unit = "US dollars"
+        tb[column].metadata.short_unit = "$"
 
     #
     # Save outputs.
     #
-    # Create a new grapher dataset with the metadata from garden.
-    dataset = catalog.Dataset.create_empty(dest_dir, paths.garden_dataset.metadata)
-
-    # Add new table to dataset and save dataset.
-    dataset.add(table)
-    dataset.save()
+    # Create a new garden dataset.
+    ds_grapher = create_dataset(dest_dir, tables=[tb], check_variables_metadata=True)
+    ds_grapher.save()

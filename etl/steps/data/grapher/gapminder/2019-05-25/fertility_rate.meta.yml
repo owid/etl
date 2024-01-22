@@ -1,0 +1,66 @@
+definitions:
+  common:
+    processing_level: minor
+    presentation:
+      topic_tags:
+        - Fertility Rate
+
+dataset:
+  update_period_days: 0
+  sources: []
+
+tables:
+  fertility_rate:
+    variables:
+      fertility_rate__select_gapminder__v12__2017:
+        title: Fertility rate (Gapminder, v12, 2017)
+        unit: children per woman
+        display:
+          name: Fertility rate
+        description_short: |-
+          The number of children that would be born to a woman if she were to live to the end of her child-bearing years and give birth to children at the current age-specific fertility rates.
+        presentation:
+          title_public: "Fertility rate: children per woman"
+          attribution_short: Gapminder
+          grapher_config:
+            title: 'Fertility rate: children per woman'
+            subtitle: ''
+            originUrl: https://ourworldindata.org/fertility-rate
+            hasMapTab: true
+            tab: map
+            yAxis:
+              max: 0
+              min: 0
+            timelineMaxTime: 2022
+            map:
+              colorScale:
+                baseColorScheme: OrRd
+                binningStrategy: manual
+                legendDescription: Children per woman
+                customNumericColors:
+                  - null
+                  - null
+                  - null
+                  - null
+                  - null
+                  - null
+                  - null
+                  - null
+                customNumericValues:
+                  - 1
+                  - 2
+                  - 3
+                  - 4
+                  - 5
+                  - 6
+                  - 7
+                  - 8
+                customNumericMinValue: 0
+              timeTolerance: 5
+            selectedEntityNames:
+              - Norway
+              - Luxembourg
+              - United Kingdom
+              - Sweden
+            note: |-
+              The total fertility rate is the number of children that would be born to a woman if she were to live to the end of her child-bearing years and give birth to children at the current age-specific fertility rates.

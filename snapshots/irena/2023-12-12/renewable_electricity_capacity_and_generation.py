@@ -21,11 +21,8 @@ def main(upload: bool) -> None:
     # Create a new snapshot.
     snap = Snapshot(f"irena/{SNAPSHOT_VERSION}/renewable_electricity_capacity_and_generation.xlsm")
 
-    # Download data from source.
-    snap.download_from_source()
-
-    # Add file to DVC and upload to S3.
-    snap.dvc_add(upload=upload)
+    # Download data from source, add file to DVC and upload to S3.
+    snap.create_snapshot(upload=upload)
 
 
 if __name__ == "__main__":

@@ -84,44 +84,6 @@ def add_origins_to_wdi(tb_wdi: Table) -> Table:
     return tb_wdi
 
 
-def add_origins_to_energy_table(tb_energy: Table) -> Table:
-    tb_energy = tb_energy.copy()
-
-    # List all non-index columns.
-    data_columns = [column for column in tb_energy.columns if column not in ["country", "year"]]
-
-    # For each indicator, add an origin and remove sources.
-    for column in data_columns:
-        tb_energy[column].metadata.sources = []
-        tb_energy[column].metadata.origins = [
-            Origin(
-                producer="Energy Institute",
-                title="Statistical Review of World Energy",
-                attribution="Energy Institute - Statistical Review of World Energy (2023)",
-                url_main="https://www.energyinst.org/statistical-review/",
-                url_download="https://www.energyinst.org/__data/assets/file/0007/1055761/Consolidated-Dataset-Panel-format-CSV.csv",
-                date_published="2023-06-26",
-                date_accessed="2023-06-27",
-                description="The Energy Institute Statistical Review of World Energy analyses data on world energy markets from the prior year.",
-                license=License(
-                    name="©Energy Institute 2023",
-                    url="https://www.energyinst.org/__data/assets/file/0007/1055761/Consolidated-Dataset-Panel-format-CSV.csv",
-                ),
-            ),
-            Origin(
-                producer="U.S. Energy Information Administration",
-                title="International Energy Data",
-                url_main="https://www.eia.gov/opendata/bulkfiles.php",
-                url_download="https://api.eia.gov/bulk/INTL.zip",
-                date_published="2023-06-27",
-                date_accessed="2023-07-10",
-                license=License(name="Public domain", url="https://www.eia.gov/about/copyrights_reuse.php"),
-            ),
-        ]
-
-    return tb_energy
-
-
 ########################################################################################################################
 # TODO: Remote this temporary function once WDI has origins.
 def add_origins_to_mortality_database(tb_who: Table) -> Table:
@@ -229,7 +191,13 @@ def compare_tables(
     compared = pd.concat([df1, df2], ignore_index=True)
 
     # Ensure all common columns have the same numeric type.
-    compared = compared.astype({column: float for column in columns})
+    for column in columns:
+        try:
+            compared[column] = compared[column].astype(float)
+        except ValueError:
+            print(f"Skipping column {column}, which can't be converted into float.")
+            compared = compared.drop(columns=column, errors="raise")
+            columns.remove(column)
 
     # Initialize a list with all plots.
     figures = []

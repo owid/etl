@@ -1,13 +1,14 @@
+import configparser
 import datetime as dt
 import json
 import re
+import tempfile
 from contextlib import contextmanager
 from dataclasses import dataclass
 from multiprocessing import Lock
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Dict, Iterator, Optional, Union
 
-import fasteners
 import owid.catalog.processing as pr
 import pandas as pd
 import yaml
@@ -32,14 +33,16 @@ if TYPE_CHECKING:
     from dvc.repo import Repo
 
 from etl import config, paths
-from etl.files import RuntimeCache, yaml_dump
+from etl.files import RuntimeCache, checksum_file, yaml_dump
 
 # DVC is not thread-safe, so we need to lock it
 dvc_lock = Lock()
 unignore_backports_lock = Lock()
-dvc_pull_lock = fasteners.InterProcessLock(paths.BASE_DIR / ".dvc/tmp/dvc_pull_lock")
 
 DVC_REPO_CACHE = RuntimeCache()
+
+DVC_CONFIG = configparser.ConfigParser()
+DVC_CONFIG.read(paths.BASE_DIR / ".dvc/config")
 
 
 def get_dvc(use_cache: bool = True) -> "Repo":
@@ -85,7 +88,7 @@ class Snapshot:
         self.uri = uri
 
         if not self.metadata_path.exists():
-            raise FileNotFoundError(f"Metadata file {self.metadata_path} not found")
+            raise FileNotFoundError(f"Metadata file {self.metadata_path} not found, but {uri} is in DAG.")
 
         self.metadata = SnapshotMeta.load_from_yaml(self.metadata_path)
 
@@ -116,47 +119,44 @@ class Snapshot:
         else:
             return get_dvc(use_cache=True)
 
+    def _download_dvc_file(self, md5: str) -> None:
+        """Download file from DVC remote to self.path."""
+        self.path.parent.mkdir(exist_ok=True, parents=True)
+        if self.metadata.is_public:
+            https_url = DVC_CONFIG['remote "public-read"']["url"]
+            download_url = f"{https_url}/{md5[:2]}/{md5[2:]}"
+            files.download(download_url, str(self.path), progress_bar_min_bytes=2**100)
+        else:
+            s3_url = DVC_CONFIG['remote "private"']["url"]
+            download_url = f"{s3_url}/{md5[:2]}/{md5[2:]}"
+            s3_utils.download(download_url, str(self.path))
+
     def pull(self, force=True) -> None:
         """Pull file from S3."""
         if not force and not self.is_dirty():
             return
 
-        from dvc.exceptions import CheckoutError
+        assert len(self.metadata.outs) == 1
+        md5 = self.metadata.outs[0]["md5"]
 
-        # DVC locking is terrible. It'd fail if we didn't use our own file locks.
-        # This is pretty limiting as it allows us to only pull
-        # one snapshot at a time. One option is to pre-pull all snapshot steps or
-        # we could just download the file directly.
-        # The combination of different kinds of locks is kinda magical and waiting
-        # to be refactored soon.
-        with dvc_pull_lock, _unignore_backports(self.path):
-            try:
-                repo = self._cached_dvc_repo()
-                repo.pull(str(self.path), remote="public-read" if self.metadata.is_public else "private", force=force)
-            except CheckoutError as e:
-                raise Exception(
-                    "File not found in DVC. Have you run the snapshot script? Make sure you're not using `is_public: false`."
-                ) from e
+        self._download_dvc_file(md5)
 
     def is_dirty(self) -> bool:
         """Return True if snapshot exists and is in DVC."""
-        from dvc.dvcfile import load_file
-
         if not self.path.exists():
             return True
 
-        with open(self.metadata_path) as istream:
-            if "outs:\n" not in istream.read():
-                raise Exception(f"File {self.metadata_path} has not been added to DVC. Run snapshot script to add it.")
+        if self.metadata.outs is None:
+            raise Exception(f"File {self.metadata_path} has not been added to DVC. Run snapshot script to add it.")
 
-        # See notes about locking in `pull` method.
-        with dvc_lock, _unignore_backports(self.metadata_path):
-            repo = self._cached_dvc_repo()
-            dvc_file = load_file(repo, self.metadata_path.as_posix())
-            with repo.lock:
-                # DVC returns empty dictionary if file is up to date
-                stage = dvc_file.stage
-                return stage.status() != {}
+        assert len(self.metadata.outs) == 1
+        file_size = self.path.stat().st_size
+        # Compare file size if it's larger than 10MB, otherwise compare md5
+        # This should be pretty safe and speeds up the process significantly
+        if file_size >= 10 * 2**20:  # 10MB
+            return file_size != self.m.outs[0]["size"]
+        else:
+            return checksum_file(self.path.as_posix()) != self.m.outs[0]["md5"]
 
     def delete_local(self) -> None:
         """Delete local file and its metadata."""
@@ -228,6 +228,10 @@ class Snapshot:
             return self.read_json(*args, **kwargs)
         elif self.metadata.file_extension == "dta":
             return self.read_stata(*args, **kwargs)
+        elif self.metadata.file_extension == "rds":
+            return self.read_rds(*args, **kwargs)
+        elif self.metadata.file_extension == "rda":
+            return self.read_rda(*args, **kwargs)
         else:
             raise ValueError(f"Unknown extension {self.metadata.file_extension}")
 
@@ -253,6 +257,14 @@ class Snapshot:
         """Read Stata file into a Table and populate it with metadata."""
         return pr.read_stata(self.path, *args, metadata=self.to_table_metadata(), origin=self.metadata.origin, **kwargs)
 
+    def read_rds(self, *args, **kwargs) -> Table:
+        """Read R data .rds file into a Table and populate it with metadata."""
+        return pr.read_rds(self.path, *args, metadata=self.to_table_metadata(), origin=self.metadata.origin, **kwargs)
+
+    def read_rda(self, *args, **kwargs) -> Table:
+        """Read R data .rda file into a Table and populate it with metadata."""
+        return pr.read_rda(self.path, *args, metadata=self.to_table_metadata(), origin=self.metadata.origin, **kwargs)
+
     def read_from_records(self, *args, **kwargs) -> Table:
         """Read records into a Table and populate it with metadata."""
         return pr.read_from_records(*args, metadata=self.to_table_metadata(), origin=self.metadata.origin, **kwargs)
@@ -271,6 +283,14 @@ class Snapshot:
 
     def extract(self, output_dir: Path | str):
         decompress_file(self.path, output_dir)
+
+    def extract_to_tempdir(self) -> Any:
+        # Create temporary directory
+        temp_dir = tempfile.TemporaryDirectory()
+        # Extract file to temporary directory
+        self.extract(temp_dir.name)
+        # Return temporary directory
+        return temp_dir
 
 
 @pruned_json

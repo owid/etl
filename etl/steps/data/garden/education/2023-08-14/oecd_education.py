@@ -41,16 +41,17 @@ def run(dest_dir: str) -> None:
 
     # Create an indicator with historical estimates of share of population with no education
     tb["no_formal_education"] = 100 - tb["population_with_basic_education"]
+    # Extract literacy and formal education indicators from World Bank Education Dataset post-2005
+    tb_above_2005 = extract_related_world_bank_data(tb_wb)
 
-    # Extract literacy and formal education indicators from World Bank Education Dataset post-2010
-    tb_above_2010 = extract_related_world_bank_data(tb_wb)
+    # Filter the dataset for years below 2010 (World Bank dataset starts in 2010)
+    tb = tb[tb["year"] < 2010].reset_index(drop=True)
 
     # Concat data with World Bank literacy and education data
-    merged_wb = pr.concat([tb, tb_above_2010])
+    merged_wb = pr.concat([tb, tb_above_2005])
     merged_wb["illiterate"] = 100 - merged_wb["literacy"]
 
     merged_wb = merged_wb.set_index(["country", "year"], verify_integrity=True)
-
     merged_wb = merged_wb[
         [
             "illiterate",
@@ -97,10 +98,11 @@ def extract_related_world_bank_data(tb_wb):
 
     # Select and rename columns
     tb_wb = tb_wb[["country", "year"] + select_wb_cols]
-    tb_wb.rename(columns=dictionary_to_rename_and_combine, inplace=True)
 
-    # Filter the DataFrame for years above 2010 (OECD dataset stops in 2010)
-    tb_above_2010 = tb_wb[tb_wb["year"] > 2010]
-    tb_above_2010["population_with_basic_education"] = 100 - tb_above_2010["no_formal_education"]
+    tb_wb = tb_wb.rename(columns=dictionary_to_rename_and_combine)
 
-    return tb_above_2010
+    # Filter the table for years above 2005 (Wittiengstein projection starts in 2010)
+    tb_above_2005 = tb_wb[tb_wb["year"] > 2005].reset_index(drop=True)
+    tb_above_2005["population_with_basic_education"] = 100 - tb_above_2005["no_formal_education"]
+
+    return tb_above_2005

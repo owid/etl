@@ -1,5 +1,6 @@
 import copy
 import datetime as dt
+import re
 import subprocess
 from pathlib import Path
 from typing import Any, Dict, Optional, Set
@@ -7,6 +8,7 @@ from typing import Any, Dict, Optional, Set
 import click
 import pandas as pd
 import pytz
+import requests
 import structlog
 from dotenv import dotenv_values
 from rich import print
@@ -276,6 +278,22 @@ def _is_env(env: Path) -> bool:
     return env.exists()
 
 
+def _normalise_branch(branch_name):
+    return re.sub(r"[\/\._]", "-", branch_name)
+
+
+def _get_container_name(branch_name):
+    normalized_branch = _normalise_branch(branch_name)
+
+    # Strip staging-site- prefix to add it back later
+    normalized_branch = normalized_branch.replace("staging-site-", "")
+
+    # Ensure the container name is less than 63 characters
+    container_name = f"staging-site-{normalized_branch[:50]}"
+    # Remove trailing hyphens
+    return container_name.rstrip("-")
+
+
 def _get_engine_for_env(env: Path) -> Engine:
     # env exists as a path
     if _is_env(env):
@@ -294,7 +312,7 @@ def _get_engine_for_env(env: Path) -> Engine:
             "DB_NAME": "owid",
             "DB_PASS": "",
             "DB_PORT": "3306",
-            "DB_HOST": staging_name,
+            "DB_HOST": _get_container_name(staging_name),
         }
 
     return get_engine(config)
@@ -359,18 +377,37 @@ def _modified_chart_ids_by_admin(session: Session) -> Set[int]:
     return set(pd.read_sql(q, session.bind).chartId.tolist())
 
 
-def _get_git_branch_creation_date(branch_name, base_branch="master") -> dt.datetime:
-    # Define the git command
-    git_command = f"git log --format=%cI {base_branch}..{branch_name} --reverse | head -1"
+def _branch_exists_locally(branch_name: str) -> bool:
+    try:
+        # Run the git branch command with the specific branch name
+        result = subprocess.run(["git", "branch", "--list", branch_name], stdout=subprocess.PIPE, text=True, check=True)
 
-    # Execute the git command
-    result = subprocess.run(git_command, shell=True, check=True, stdout=subprocess.PIPE, text=True)
+        # Check if the branch name is in the command output
+        return branch_name in result.stdout
+    except subprocess.CalledProcessError:
+        # Handle errors (e.g., not a git repository)
+        return False
 
-    # Get the output and strip any whitespace
-    creation_date = result.stdout.strip()
 
-    # Parse the timestamp
-    return dt.datetime.fromisoformat(creation_date).astimezone(pytz.utc).replace(tzinfo=None)
+def _branch_exists_in_origin(branch_name: str) -> bool:
+    try:
+        # Run the git ls-remote command for the 'origin' remote and the specific branch
+        result = subprocess.run(
+            ["git", "ls-remote", "--heads", "origin", branch_name], stdout=subprocess.PIPE, text=True, check=True
+        )
+
+        # Check if the output contains the branch name
+        return branch_name in result.stdout
+    except subprocess.CalledProcessError:
+        # Handle errors (e.g., remote not found)
+        return False
+
+
+def _get_git_branch_creation_date(branch_name: str) -> dt.datetime:
+    js = requests.get(f"https://api.github.com/repos/owid/etl/pulls?state=all&head=owid:{branch_name}").json()
+    assert len(js) == 1
+
+    return dt.datetime.fromisoformat(js[0]["created_at"].rstrip("Z")).astimezone(pytz.utc).replace(tzinfo=None)
 
 
 if __name__ == "__main__":

@@ -209,18 +209,18 @@ steps:
     - data://garden/demography/2023-10-09/life_expectancy
     - data://garden/owid/latest/key_indicators
     - data://garden/regions/2023-01-01/regions
-    - data://garden/gcp/2023-12-05/global_carbon_budget
+    - data://garden/gcp/2023-12-12/global_carbon_budget
     - data://garden/democracy/2023-03-02/vdem
-    - data://garden/energy/2023-07-10/energy_mix
+    - data://garden/energy/2023-12-12/energy_mix
     - data://garden/worldbank_wdi/2022-05-26/wdi
 
   # Global GDP in the long run
-  data://garden/growth/2022-12-19/gdp_historical:
-    - data://garden/ggdc/2020-10-01/ggdc_maddison
-    - data://garden/worldbank_wdi/2022-05-26/wdi
+  data://garden/growth/2024-01-04/gdp_historical:
+    - data://grapher/worldbank_wdi/2023-05-29/wdi
+    - data://grapher/ggdc/2020-10-01/ggdc_maddison
     - data://garden/ggdc/2022-12-23/maddison_database
-  data://grapher/growth/2022-12-19/gdp_historical:
-    - data://garden/growth/2022-12-19/gdp_historical
+  data://grapher/growth/2024-01-04/gdp_historical:
+    - data://garden/growth/2024-01-04/gdp_historical
   data://meadow/ggdc/2022-12-23/maddison_database:
     - snapshot://ggdc/2022-12-23/maddison_database.xlsx
   data://garden/ggdc/2022-12-23/maddison_database:
@@ -690,32 +690,53 @@ steps:
 
   # European Social Survey - Trust questions
   data://meadow/ess/2023-08-02/ess_trust:
-  - snapshot://ess/2023-08-02/ess_trust.csv
-  - data://garden/regions/2023-01-01/regions
+    - snapshot://ess/2023-08-02/ess_trust.csv
+    - data://garden/regions/2023-01-01/regions
   data://garden/ess/2023-08-02/ess_trust:
-  - data://meadow/ess/2023-08-02/ess_trust
+    - data://meadow/ess/2023-08-02/ess_trust
   data://grapher/ess/2023-08-02/ess_trust:
-  - data://garden/ess/2023-08-02/ess_trust
+    - data://garden/ess/2023-08-02/ess_trust
 
   # Latinobarómetro survey - Trust
   data://meadow/survey/2023-08-04/latinobarometro_trust:
-  - snapshot://survey/2023-08-04/latinobarometro_trust.csv
+    - snapshot://survey/2023-08-04/latinobarometro_trust.csv
   data://garden/survey/2023-08-04/latinobarometro_trust:
-  - data://meadow/survey/2023-08-04/latinobarometro_trust
+    - data://meadow/survey/2023-08-04/latinobarometro_trust
 
   # Afrobarometer survey - Trust
   data://meadow/survey/2023-08-07/afrobarometer_trust:
-  - snapshot://survey/2023-08-07/afrobarometer_trust.csv
+    - snapshot://survey/2023-08-07/afrobarometer_trust.csv
   data://garden/survey/2023-08-07/afrobarometer_trust:
-  - data://meadow/survey/2023-08-07/afrobarometer_trust
+    - data://meadow/survey/2023-08-07/afrobarometer_trust
 
   # Trust surveys
   data://garden/survey/2023-08-04/trust_surveys:
-  - data://garden/survey/2023-08-04/latinobarometro_trust
-  - data://garden/survey/2023-08-07/afrobarometer_trust
-  - data://garden/ess/2023-08-02/ess_trust
+    - data://garden/survey/2023-08-04/latinobarometro_trust
+    - data://garden/survey/2023-08-07/afrobarometer_trust
+    - data://garden/ess/2023-08-02/ess_trust
   data://grapher/survey/2023-08-04/trust_surveys:
-  - data://garden/survey/2023-08-04/trust_surveys
+    - data://garden/survey/2023-08-04/trust_surveys
+
+  # Historical poverty data - Moatsos (2021)
+  data://meadow/moatsos/2023-10-09/moatsos_historical_poverty:
+    - snapshot://moatsos/2023-10-09/moatsos_historical_poverty_oecd.csv
+    - snapshot://moatsos/2023-10-09/moatsos_historical_poverty_oecd_countries_share.xlsx
+    - snapshot://moatsos/2023-10-09/moatsos_historical_poverty_oecd_regions_number.xlsx
+    - snapshot://moatsos/2023-10-09/moatsos_historical_poverty_5.csv
+    - snapshot://moatsos/2023-10-09/moatsos_historical_poverty_10.csv
+    - snapshot://moatsos/2023-10-09/moatsos_historical_poverty_30.csv
+  data://garden/moatsos/2023-10-09/moatsos_historical_poverty:
+    - data://meadow/moatsos/2023-10-09/moatsos_historical_poverty
+  data://grapher/moatsos/2023-10-09/moatsos_historical_poverty:
+    - data://garden/moatsos/2023-10-09/moatsos_historical_poverty
+
+  # World Bank GenderStats
+  data://meadow/wb/2023-12-29/gender_statistics:
+    - snapshot://wb/2023-12-29/gender_statistics.feather
+  data://garden/wb/2023-12-29/gender_statistics:
+    - data://meadow/wb/2023-12-29/gender_statistics
+  data://grapher/wb/2023-12-29/gender_statistics:
+    - data://garden/wb/2023-12-29/gender_statistics
 
   ######################################################################################################################
   # Older versions to be archived once they are not used by any other steps.
@@ -763,3 +784,4 @@ include:
   - dag/animal_welfare.yml
   - dag/plastic_use.yml
   - dag/statins.yml
+  - dag/climate.yml

@@ -8,7 +8,7 @@ from st_pages import add_indentation
 from typing_extensions import Self
 
 from apps.wizard import utils
-from etl.paths import BASE_DIR, DAG_DIR
+from etl.paths import BASE_DIR, DAG_DIR, MEADOW_DIR
 
 #########################################################
 # CONSTANTS #############################################
@@ -17,6 +17,9 @@ from etl.paths import BASE_DIR, DAG_DIR
 # Page config
 st.set_page_config(page_title="Wizard (meadow)", page_icon="🪄")
 add_indentation()
+
+# Available namespaces
+OPTIONS_NAMESPACES = sorted(os.listdir(MEADOW_DIR))
 
 # Get current directory
 CURRENT_DIR = Path(__file__).parent
@@ -63,6 +66,11 @@ class MeadowForm(utils.StepForm):
     def __init__(self: Self, **data: str | bool) -> None:
         """Construct class."""
         data["add_to_dag"] = data["dag_file"] != utils.ADD_DAG_OPTIONS[0]
+
+        # Handle custom namespace
+        if "namespace_custom" in data:
+            data["namespace"] = str(data["namespace_custom"])
+
         super().__init__(**data)
 
     def validate(self: "MeadowForm") -> None:
@@ -97,7 +105,7 @@ st.title("Wizard  **:gray[Meadow]**")
 
 # SIDEBAR
 with st.sidebar:
-    utils.warning_metadata_unstable()
+    # utils.warning_metadata_unstable()
     with st.expander("**Instructions**", expanded=True):
         text = load_instructions()
         st.markdown(text)
@@ -106,14 +114,7 @@ with st.sidebar:
 form_widget = st.empty()
 with form_widget.form("meadow"):
     # Namespace
-    APP_STATE.st_widget(
-        st.text_input,
-        label="Namespace",
-        help="Institution or topic name",
-        placeholder="Example: 'emdat', 'health'",
-        key="namespace",
-        value=dummy_values["namespace"] if APP_STATE.args.dummy_data else None,
-    )
+    namespace_field = [st.empty(), st.container()]
     # Meadow version
     if (default_version := APP_STATE.default_value("version")) == "":
         default_version = APP_STATE.default_value("snapshot_version")
@@ -186,6 +187,19 @@ with form_widget.form("meadow"):
         on_click=update_state,
     )
 
+
+# Render responsive namespace field
+utils.render_responsive_field_in_form(
+    key="namespace",
+    display_name="Namespace",
+    field_1=namespace_field[0],
+    field_2=namespace_field[1],
+    options=OPTIONS_NAMESPACES,
+    custom_label="Custom namespace...",
+    help_text="Institution or topic name",
+    app_state=APP_STATE,
+    default_value=dummy_values["namespace"] if APP_STATE.args.dummy_data else OPTIONS_NAMESPACES[0],
+)
 
 #########################################################
 # SUBMISSION ############################################

@@ -51,11 +51,15 @@ def run(dest_dir: str) -> None:
     tb = tb[cols]
     # Replace empty strings with NaN values
     tb.replace("", np.nan, inplace=True)
+    # Remove rows where all values are NaN
+    tb = tb.dropna(how="all")
+
     # Convert the training compute column to float
     tb["Training compute (FLOP)"] = tb["Training compute (FLOP)"].astype(float)
 
     # Replace the missing values in the system column with the organization column
     tb.loc[tb["System"].isna(), "System"] = tb.loc[tb["System"].isna(), "Organization"]
+
     # Check that there are no NaN values in the system column
     assert not tb["System"].isna().any(), "NaN values found in 'System' column after processing."
     #

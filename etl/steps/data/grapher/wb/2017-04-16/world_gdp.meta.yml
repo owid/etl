@@ -1,0 +1,57 @@
+definitions:
+  common:
+    processing_level: major
+    presentation:
+      topic_tags:
+        - Economic Growth
+
+
+dataset:
+  update_period_days: 0
+  sources: []
+  title: World GDP (World Bank & Maddison, 2017)
+
+tables:
+  world_gdp:
+    variables:
+      world_gdp_in_2011_int_dollar__owid_based_on_world_bank__and__maddison__2017:
+        title: World GDP (World Bank & Maddison, 2017)
+        unit: international-$ in 2011 prices
+        short_unit: $
+        display:
+          numDecimalPlaces: 0
+        description_short: Total output of the world economy. This data is adjusted for inflation and differences in the cost
+          of living between countries.
+        description_key:
+          - This GDP indicator provides information on global economic growth and income levels in the very long run. Estimates are available as far back as 1 CE.
+          - This data is adjusted for inflation and for differences in the cost of living between countries.
+          - This data is expressed in international-$ at 2011 prices, merging data from the World Bank, backwards extended with growth rates from Maddison Database.
+        description_from_producer: |-
+          PPP GDP is gross domestic product converted to international dollars using purchasing power parity rates. An international dollar has the same purchasing power over GDP as the U.S. dollar has in the United States. GDP is the sum of gross value added by all resident producers in the country plus any product taxes and minus any subsidies not included in the value of the products. It is calculated without making deductions for depreciation of fabricated assets or for depletion and degradation of natural resources. Data are in constant 2011 international dollars.
+
+        description_processing: |-
+          The data presented here from 1990 onwards is from the World Bank. Data earlier than 1990 is backwards extended from the World Bank observation for 1990 based on the growth rates implied by the Maddison Project Database.
+        presentation:
+          title_public: Global Gross Domestic Product (GDP)
+          title_variant: Historical data
+          attribution_short: World Bank, Maddison Project Database
+          faqs:
+            - fragment_id: poverty-international-dollars
+              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+          grapher_config:
+            title: World GDP over the last two millennia
+            subtitle: Total output of the world economy. This data is adjusted for inflation and differences in the cost of
+              living between countries.
+            originUrl: https://ourworldindata.org/economic-growth
+            yAxis:
+              min: 0
+              canChangeScaleType: true
+            hideAnnotationFieldsInTitle:
+              time: true
+              entity: true
+              changeInPrefix: true
+            hideRelativeToggle: false
+            selectedEntityNames:
+              - World
+            note: This data is expressed in [international-$](#dod:int_dollar_abbreviation) at 2011 prices.
+            hideLegend: true
