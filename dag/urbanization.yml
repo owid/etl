@@ -6,6 +6,8 @@ steps:
     - snapshot://un/2024-01-17/urbanization_urban_rural.csv
   data://garden/un/2024-01-17/urbanization_urban_rural:
     - data://meadow/un/2024-01-17/urbanization_urban_rural
+  data://grapher/un/2024-01-17/urbanization_urban_rural:
+    - data://garden/un/2024-01-17/urbanization_urban_rural
 
   data://meadow/un/2024-01-17/urban_agglomerations_300k:
     - snapshot://un/2024-01-17/urban_agglomerations_300k.csv
@@ -15,3 +17,4 @@ steps:
 
   data://meadow/un/2024-01-17/urban_agglomerations_largest_cities:
     - snapshot://un/2024-01-17/urban_agglomerations_largest_cities.csv
+

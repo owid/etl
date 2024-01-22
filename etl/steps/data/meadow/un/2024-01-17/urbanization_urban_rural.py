@@ -19,6 +19,7 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
     tb = tb.rename(columns={"Region, subregion, country or area": "country"})
+
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
     tb = tb.underscore().set_index(["country", "year"], verify_integrity=True).sort_index()
 

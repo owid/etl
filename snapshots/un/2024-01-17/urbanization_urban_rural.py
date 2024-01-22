@@ -30,26 +30,6 @@ def main(upload: bool) -> None:
     # Each dictionary in the list contains the file name and a description of the data it contains.
     file_details = [
         {
-            "file_name": "WUP2018-F01-Total_Urban_Rural.xls",
-            "description": "Population of Urban and Rural Areas at Mid-Year (thousands) and Percentage Urban, 2018",
-        },
-        {
-            "file_name": "WUP2018-F02-Proportion_Urban.xls",
-            "description": "Percentage of population at Mid-Year Residing in Urban Areas by region, subregion and country, 1950-2050",
-        },
-        {
-            "file_name": "WUP2018-F03-Urban_Population.xls",
-            "description": "Urban Population at Mid-Year by region, subregion and country, 1950-2050 (thousands)",
-        },
-        {
-            "file_name": "WUP2018-F04-Rural_Population.xls",
-            "description": "Rural Population at Mid-Year by region, subregion and country, 1950-2050 (thousands)",
-        },
-        {
-            "file_name": "WUP2018-F05-Total_Population.xls",
-            "description": "Total Population at Mid-Year by region, subregion and country, 1950-2050 (thousands)",
-        },
-        {
             "file_name": "WUP2018-F06-Urban_Growth_Rate.xls",
             "description": "Average Annual Rate of Change of the Urban Population by region, subregion and country, 1950-2050 (percent)",
         },
@@ -68,10 +48,6 @@ def main(upload: bool) -> None:
         {
             "file_name": "WUP2018-F10-Rate_Proportion_Rural.xls",
             "description": "Average Annual Rate of Change of the Percentage Rural by region, subregion and country, 1950-2050 (percent)",
-        },
-        {
-            "file_name": "WUP2018-F18-Total_Population_Annual.xls",
-            "description": "Annual Total Population at Mid-Year by region, subregion and country, 1950-2050 (thousands)",
         },
         {
             "file_name": "WUP2018-F19-Urban_Population_Annual.xls",
