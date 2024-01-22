@@ -738,6 +738,12 @@ steps:
   data://grapher/wb/2023-12-29/gender_statistics:
     - data://garden/wb/2023-12-29/gender_statistics
 
+  # 1000 Binned Global Distribution (Mahler, Yonzan and Lakner 2022)
+  data://meadow/wb/2024-01-22/thousand_bins_distribution:
+    - snapshot://wb/2024-01-22/thousand_bins_distribution.dta
+  data://garden/wb/2024-01-22/thousand_bins_distribution:
+    - data://meadow/wb/2024-01-22/thousand_bins_distribution
+
   ######################################################################################################################
   # Older versions to be archived once they are not used by any other steps.
 
@@ -760,11 +766,6 @@ steps:
 
   ######################################################################################################################
 
-  # 1000 Binned Global Distribution (Mahler, Yonzan and Lakner 2022)
-  data://meadow/wb/2024-01-22/thousand_bins_distribution:
-    - snapshot://wb/2024-01-22/thousand_bins_distribution.dta
-  data://garden/wb/2024-01-22/thousand_bins_distribution:
-    - data://meadow/wb/2024-01-22/thousand_bins_distribution
 include:
   - dag/open_numbers.yml
   - dag/faostat.yml
