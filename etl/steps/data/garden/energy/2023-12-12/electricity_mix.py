@@ -54,6 +54,8 @@ def process_statistical_review_data(tb_review: Table) -> Table:
         "gas_electricity_generation_twh": "gas_generation__twh",
         # Load primary energy consumption from fossil fuels and biofuels, to be able to calculate direct primary energy.
         # Direct primary energy consumption is needed to calculate the share of electricity in primary energy.
+        # Once direct primary energy consumption and the share of electricity in primary energy are calculated, these
+        # columns will be dropped.
         "oil_consumption_twh": "oil_consumption__twh",
         "coal_consumption_twh": "coal_consumption__twh",
         "gas_consumption_twh": "gas_consumption__twh",
