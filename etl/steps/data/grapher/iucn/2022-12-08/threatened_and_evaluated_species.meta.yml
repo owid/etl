@@ -23,9 +23,7 @@ definitions:
 
           'Threatened' species are those that are categorized as 'Critically endangered', 'Endangered' or 'Vulnerable' on
           the IUCN Red List.
-
-          The 'mushrooms' taxonomic group includes brackets, rusts, smuts and, jelly fungi.
-        citation_full: IUCN Red List
+        citation_full: IUCN. 2023. The IUCN Red List of Threatened Species. https://www.iucnredlist.org.
         url_main: https://www.iucnredlist.org/resources/summary-statistics
         date_accessed: "2022-12-08"
         date_published: "2022-12-08"
@@ -39,24 +37,23 @@ tables:
         title: Number of described species
         unit: species
         display:
-          name: Number of described species
+          name: Estimated number of described species
           numDecimalPlaces: 0
-        description_short: The number of identified and named species in each [taxonomic group](#dod:taxonomic_group). Since many species have not yet been described, this is a large underestimate of the total number of species
-          in the world.
+        description_short: The number of formally identified, described and named species in each [taxonomic group](#dod:taxonomic_group).
         description_key:
-          - The total number of described species. This does not mean these species have been assessed for their extinction risk level.
-          - https://nc.iucnredlist.org/redlist/content/attachment_files/2021-3_RL_Stats_Table_1a_v2.pdf
-          - https://nc.iucnredlist.org/redlist/content/attachment_files/2022-1_RL_Stats_Table_1a.pdf
-        description_from_producer: TBD - Indicator's description given by the producer
+          - Since many species have not yet been described, this is a large underestimate of the total number of species in the world.
+          - For a species to be formally described, it's description must be published in a scientific journal or book.
+          - Species descriptions should fulfill several criteria specified by the relevant nomencalture code, including the selection of a type specimen,  a particular specimen formally associated with scientific name and description.
+          - The values of the numbers of described species should be used with caution as these are not always be up to date for all taxonomic groups.
+          - The source for each taxonomic group can be found in the [IUCN Red List summary statistics, Table 1a](https://nc.iucnredlist.org/redlist/content/attachment_files/2023-1_RL_Table_1a.pdf).
+          - The 'mushrooms' taxonomic group includes brackets, rusts, smuts and, jelly fungi.
         presentation:
           title_public: Number of described species
           attribution_short: IUCN
-          faqs:
-            - fragment_id: TBD - Question identifier from FAQ GDoc
-              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
           grapher_config:
             title: Number of described species
-            subtitle: The number of identified and named species in each [taxonomic group](#dod:taxonomic_group), as of 2022.
+            subtitle:
+              The number of identified and named species in each [taxonomic group](#dod:taxonomic_group), as of 2022.
               Since many species have not yet been described, this is a large underestimate of the total number of species
               in the world.
             originUrl: ourworldindata.org/biodiversity
