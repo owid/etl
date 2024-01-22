@@ -1,0 +1,28 @@
+meta:
+  origin:
+    title_snapshot: ERA5-Land monthly averaged data from 1950 to present - Monthly
+      Averages of 2m Surface Temperature
+    title: ERA5-Land monthly averaged data from 1950 to present
+    description: |-
+      ERA5-Land is a reanalysis dataset offering a consistent view of land variables over several decades with enhanced resolution. It's produced by replaying the land component of the ECMWF ERA5 climate reanalysis, combining model data with global observations.
+
+      ERA5-Land focuses on water and energy cycles at surface level. It contains detailed records from 1950 onwards with a 1-hour temporal resolution. The native spatial resolution is 9km on a reduced Gaussian grid (TCo1279), regridded to a regular lat-lon grid of 0.1x0.1 degrees for the CDS.
+
+      This dataset presents a post-processed subset of ERA5-Land, featuring monthly-mean averages of 2m temperature. It covers the entire globe, with data available from January 1950 to present. The temperature is measured in kelvin, with conversions to Celsius available.
+    producer: Copernicus Climate Change Service
+    version_producer: 2
+    citation_full: |-
+      Muñoz Sabater, J. (2019): ERA5-Land monthly averaged data from 1950 to present. Copernicus Climate Change Service (C3S) Climate Data Store (CDS). DOI: 10.24381/cds.68d2bb30 (Accessed on 26-Dec-2023)
+    url_main: 
+      https://cds.climate.copernicus.eu/cdsapp#!/dataset/reanalysis-era5-land-monthly-means?tab=overview
+    date_accessed: 2023-12-26
+    date_published: 2023-12-26
+    license:
+      name: Copernicus License
+      url: 
+        https://cds.climate.copernicus.eu/api/v2/terms/static/licence-to-use-copernicus-products.pdf
+wdir: ../../../data/snapshots/climate/2023-12-20
+outs:
+- md5: 82d19416c569459ecb164ae66c18d528
+  size: 1495360207
+  path: surface_temperature.gz
