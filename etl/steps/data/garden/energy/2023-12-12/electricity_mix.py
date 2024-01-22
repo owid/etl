@@ -52,6 +52,16 @@ def process_statistical_review_data(tb_review: Table) -> Table:
         "oil_electricity_generation_twh": "oil_generation__twh",
         "coal_electricity_generation_twh": "coal_generation__twh",
         "gas_electricity_generation_twh": "gas_generation__twh",
+        # Load primary energy consumption from fossil fuels and biofuels, to be able to calculate direct primary energy.
+        # Direct primary energy consumption is needed to calculate the share of electricity in primary energy.
+        "oil_consumption_twh": "oil_consumption__twh",
+        "coal_consumption_twh": "coal_consumption__twh",
+        "gas_consumption_twh": "gas_consumption__twh",
+        "biofuels_consumption_twh": "biofuels_consumption__twh",
+        # Load efficiency factor to be able to convert from electricity generation into input-equivalent primary energy.
+        # Currently it is not used, since we do the calculation of the share of electricity in primary energy in terms
+        # of direct primary energy consumption.
+        # "efficiency_factor": "efficiency_factor",
     }
     tb_review = tb_review[list(columns)].rename(columns=columns, errors="raise")
     # New columns to be created by summing other columns.
@@ -232,10 +242,75 @@ def add_share_variables(combined: Table) -> Table:
         new_column = variable.replace("_generation__twh", "_share_of_electricity__pct")
         combined[new_column] = 100 * combined[variable] / combined["total_generation__twh"]
 
-    # Calculate the percentage of electricity as a share of primary energy.
+    # Calculate the share of primary energy consumption that comes from electricity.
+    # One could think that it is enough to divide total electricity generation by primary energy consumption.
+    # However, electricity generation is measured in direct outputs, while primary energy consumption (from the
+    # statistical review) includes thermal losses from fossil fuels (which is reasonable) plus the thermal losses of
+    # non-fossil sources, as if they were as inefficient as fossil fuels.
+    # Therefore, to properly calculate the share of electricity in primary energy, we have two options:
+    # (A) Share of electricity in direct primary energy consumption.
+    # (B) Share of electricity in input-equivalent primary energy consumption (but properly calculated).
+    # We decided to use (A) instead of (B), but just in case we change our mind in the future (or decide to have both),
+    # below is also the code to achieve (B).
+
+    # (A) Share of electricity in direct primary energy consumption:
+    #    100 * total generation / direct primary energy consumption
+    #    Here, since the Statistical Review does not provide data for direct primary energy consumption, we can estimate
+    #    it as the sum primary energy consumption from fossil fuels and biofuels plus electricity generation from
+    #    non-fossil sources (nuclear, hydro, solar, wind and other).
+    # NOTE: We impose that at least 3 out of 5 sources in the denominator need to be informed. This would not be
+    # necessary once the spurious zeros in the Statistical Review are corrected.
+    combined["direct_primary_energy_consumption__twh"] = combined[
+        [
+            "low_carbon_generation__twh",
+            "coal_consumption__twh",
+            "oil_consumption__twh",
+            "gas_consumption__twh",
+            "biofuels_consumption__twh",
+        ]
+    ].sum(axis=1, min_count=3)
     combined["total_electricity_share_of_primary_energy__pct"] = (
-        100 * combined["total_generation__twh"] / combined["primary_energy_consumption__twh"]
+        100 * combined["total_generation__twh"] / combined["direct_primary_energy_consumption__twh"]
     )
+    # Drop unnecessary columns.
+    combined = combined.drop(
+        columns=["coal_consumption__twh", "oil_consumption__twh", "gas_consumption__twh", "biofuels_consumption__twh"],
+        errors="raise",
+    )
+
+    # (B) Share of electricity in input-equivalent primary energy consumption:
+    #    100 * (total generation / efficiency factor) / input-equivalent primary energy consumption
+    #    In other words, we assume that all electricity is produced in the same inefficient way as fossil fuel
+    #    electricity, and divide by input-equivalent primary energy consumption.
+    #    NOTE:
+    #      * Here we should not only divide renewables and nuclear by the efficiency factor. If we did that, we
+    #    would have in the numerator losses from renewables and nuclear, but not from fossil fuels (while in the
+    #    denominator we would be accounting for the losses of all three).
+    #      * As explained in the statistical review methodology, "From 2022 onwards, we assume a constant
+    #    efficiency of 32% for biomass power to better reflect the actual efficiency of biomass power plants."
+    #      * Given that some sources are less often informed, fill some of their missing values with zeros.
+    #    Otherwise a lot of valuable data is lost for a small percentage of missing data. This is mostly due to the
+    #    statistical review data file having many missing values instead of zeros (which has been manually corrected in
+    #    the statistical review garden step for nuclear, but not for other sources).
+    # BIOMASS_EFFICIENCY_FACTOR = 0.32
+    # combined["total_electricity_share_of_primary_energy__pct"] = (
+    #     (
+    #         (
+    #             (
+    #                 combined["nuclear_generation__twh"]
+    #                 + combined["hydro_generation__twh"].fillna(0)
+    #                 + combined["wind_generation__twh"].fillna(0)
+    #                 + combined["solar_generation__twh"].fillna(0)
+    #                 + combined["other_renewables_excluding_bioenergy_generation__twh"].fillna(0)
+    #                 + (combined["fossil_generation__twh"])
+    #             )
+    #             / combined["efficiency_factor"]
+    #         )
+    #         + (combined["bioenergy_generation__twh"].fillna(0) / BIOMASS_EFFICIENCY_FACTOR)
+    #     )
+    #     / combined["primary_energy_consumption__twh"]
+    #     * 100
+    # )
 
     # Calculate the percentage of electricity demand that is imported.
     combined["net_imports_share_of_demand__pct"] = (
