@@ -41,7 +41,7 @@ def test_create_empty():
         assert exists(join(dirname, "index.json"))
         with open(join(dirname, "index.json")) as istream:
             doc = json.load(istream)
-        assert doc == {"is_public": True}
+        assert doc == {"is_public": True, "non_redistributable": False}
 
         assert len(ds.index()) == 0
 
@@ -70,7 +70,13 @@ def test_create_overwrites_entire_folder():
     # this should have been deleted
     assert not exists(join(dirname, "hallo-thar.txt"))
 
-    assert open(d._index_file).read().strip() == '{\n  "is_public": true\n}'
+    assert (
+        open(d._index_file).read().strip()
+        == """{
+  "is_public": true,
+  "non_redistributable": false
+}"""
+    )
 
 
 def test_add_table():
