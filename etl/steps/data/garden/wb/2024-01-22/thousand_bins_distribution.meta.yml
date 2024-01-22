@@ -1,0 +1,43 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Poverty
+        - Economic Inequality
+        - Economic Growth
+    processing_level: minor
+    display:
+      numDecimalPlaces: 0
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
+dataset:
+  update_period_days: 365
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
+tables:
+  thousand_bins_distribution:
+    # Learn more about the available fields:
+    # http://docs.owid.io/projects/etl/architecture/metadata/reference/indicator/
+    variables:
+      avg:
+        title: Average income or consumption
+        unit: international-$ in 2017 prices
+        short_unit: $
+        description_short: The mean after tax income or consumption per year within each of the 1000 bins of the distribution.
+        description_key:
+          - The data is measured in international-$ at 2017 prices – this adjusts for inflation and for differences in the cost of living between countries.
+          - Depending on the country and year, the data relates to income measured after taxes and benefits, or to consumption, per capita. 'Per capita' means that the income of each household is attributed equally to each member of the household (including children).
+          - Non-market sources of income, including food grown by subsistence farmers for their own consumption, are taken into account.
+        description_from_producer: |
+          Average daily household per capita welfare values of each bin in 2017 PPP USD. Values are based on [lineup methodology](https://datanalytics.worldbank.org/PIP-Methodology/lineupestimates.html) in PIP.
+
+      pop:
+        title: Population
+        unit: people
+        short_unit: ""
+        description_short: The number of people in each of the 1000 bins of the distribution. It should correspond to roughly 1/1000 of the total population of the country in the given year.
