@@ -88,27 +88,13 @@ def main(upload: bool) -> None:
         columns_to_keep = [col for col in df_add.columns if col not in columns_to_exclude]
         df_add = df_add[columns_to_keep]
 
-        if (
-            file["description"]
-            == "Population of Urban and Rural Areas at Mid-Year (thousands) and Percentage Urban, 2018"
-        ):
-            df_add["year"] = "2018"
-            df_add = df_add.rename(
-                columns={
-                    "Urban": "urban_population",
-                    "Rural": "rural_population",
-                    "Total": "total_population",
-                    "Percentage urban": "percentage_urban",
-                }
-            )
-        else:
-            # Melt the DataFrame to transform it so that columns other than 'Region, subregion, country or area' become one column
-            df_add = df_add.melt(
-                id_vars=["Region, subregion, country or area"], var_name="year", value_name=file["description"]
-            )
-            df_add["year"] = df_add["year"].astype(str)
-            # Extract values after the dash in the "year" column (e.g. 1950-1955 becomes 1955 for rate of change data)
-            df_add["year"] = df_add["year"].str.split("-").str[-1]
+        # Melt the DataFrame to transform it so that columns other than 'Region, subregion, country or area' become one column
+        df_add = df_add.melt(
+            id_vars=["Region, subregion, country or area"], var_name="year", value_name=file["description"]
+        )
+        df_add["year"] = df_add["year"].astype(str)
+        # Extract values after the dash in the "year" column (e.g. 1950-1955 becomes 1955 for rate of change data)
+        df_add["year"] = df_add["year"].str.split("-").str[-1]
 
         # If this is the first file, assign the melted DataFrame to merged_df
         if merged_df.empty:

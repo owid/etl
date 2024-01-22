@@ -30,10 +30,6 @@ def main(upload: bool) -> None:
     # Each dictionary in the list contains the file name and a description of the data it contains.
     file_details = [
         {
-            "file_name": "WUP2018-F12-Cities_Over_300K.xls",
-            "description": "Population of Urban Agglomerations with 300,000 Inhabitants or More in 2018, by country, 1950-2035 (thousands)",
-        },
-        {
             "file_name": "WUP2018-F14-Growth_Rate_Cities.xls",
             "description": "Average Annual Rate of Change of Urban Agglomerations with 300,000 Inhabitants or More in 2018, by country, 1950-2035 (percent)",
         },
@@ -47,7 +43,7 @@ def main(upload: bool) -> None:
         },
         {
             "file_name": "WUP2018-F22-Cities_Over_300K_Annual.xls",
-            "description": "Annual Population of Urban Agglomerations with 300,000 Inhabitants or More in 2018, by country, 1950-2035 (thousands)",
+            "description": "Annual Population of Urban Agglomerations with 300,000 Inhabitants or More, by country, 1950-2035 (thousands)",
         },
     ]
     # Initialize an empty DataFrame to store the merged data
@@ -70,7 +66,7 @@ def main(upload: bool) -> None:
             df_add = pd.read_excel(file_path, skiprows=header_row_index)
 
         # Exclude specified columns from the dataframe if they exist
-        columns_to_exclude = ["Index", "Note", "Country Code", "City Code", "Latitude", "Longitude"]
+        columns_to_exclude = ["Index", "Note", "Country Code", "City Code", "Longitude"]
 
         # Create a list of columns to keep
         columns_to_keep = [col for col in df_add.columns if col not in columns_to_exclude]
@@ -78,8 +74,15 @@ def main(upload: bool) -> None:
 
         # Melt the DataFrame to transform it so that columns other than 'Region, subregion, country or area' become one column
         df_melted = df_add.melt(
-            id_vars=["Country or area", "Urban Agglomeration"], var_name="year", value_name=file["description"]
+            id_vars=["Country or area", "Urban Agglomeration", "Latitude"],
+            var_name="year",
+            value_name=file["description"],
         )
+
+        df_melted["year"] = df_melted["year"].astype(str)
+        # Extract values after the dash in the "year" column (e.g. 1950-1955 becomes 1955 for rate of change data)
+        df_melted["year"] = df_melted["year"].str.split("-").str[-1]
+
         # If this is the first file, assign the melted DataFrame to merged_df
         if merged_df.empty:
             merged_df = df_melted
@@ -88,12 +91,9 @@ def main(upload: bool) -> None:
             merged_df = pd.merge(
                 merged_df,
                 df_melted,
-                on=["Country or area", "Urban Agglomeration", "year"],
+                on=["Country or area", "Urban Agglomeration", "Latitude", "year"],
                 how="outer",
             )
-            merged_df["year"] = merged_df["year"].astype(str)
-            # Extract values after the dash in the "year" column (e.g. 1950-1955 becomes 1955 for rate of change data)
-            merged_df["year"] = merged_df["year"].str.split("-").str[-1]
 
     # Save the final DataFrame to a file
     df_to_file(merged_df, file_path=snap.path)
