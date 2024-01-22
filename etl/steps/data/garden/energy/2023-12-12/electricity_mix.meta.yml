@@ -12,10 +12,6 @@ definitions:
     Measured as a percentage of total electricity.
   description_short_per_capita: &description_short_per_capita |-
     Measured in kilowatt-hours per person.
-  description_short_primary_energy: &description_short_primary_energy |-
-    Measured in terawatt-hours, using the substitution method.
-  description_short_direct_primary_energy: &description_short_direct_primary_energy |-
-    Measured in terawatt-hours.
   description_processing_direct_primary_energy: |-
     - The Statistical Review of World Energy only provides data on input-equivalent primary energy consumption, not on direct primary energy consumption. We estimate the direct primary energy consumption as the sum of the primary energy consumption from coal, oil, gas, and biofuels, together with the electricity generation from low-carbon sources (nuclear, hydro, wind, solar, bioenergy and other renewables). Finally, the share of electricity in direct primary energy consumption is calculated as the ratio of total electricity generation to direct primary energy consumption (multiplied by 100).
 
@@ -384,7 +380,7 @@ tables:
         title: Primary energy consumption - TWh
         short_unit: TWh
         unit: terawatt-hours
-        description_short: *description_short_primary_energy
+        description_short: Measured in terawatt-hours, using the substitution method.
         display:
           name: Primary energy consumption
         presentation:
@@ -393,7 +389,7 @@ tables:
         title: Direct primary energy consumption - TWh
         short_unit: TWh
         unit: terawatt-hours
-        description_short: *description_short_direct_primary_energy
+        description_short: Measured in terawatt-hours.
         description_processing: |-
           {definitions.common.description_processing}
           {definitions.description_processing_direct_primary_energy}
