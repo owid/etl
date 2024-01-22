@@ -25,8 +25,12 @@ steps:
 
 
   data://garden/demography/2024-01-05/population:
-    - data://garden/un/2022-07-11/un_wpp
     - data://garden/hyde/2024-01-02/all_indicators
+    - data://garden/gapminder/2023-03-31/population
+    - data://garden/un/2022-07-11/un_wpp
+    - data://open_numbers/open_numbers/latest/gapminder__systema_globalis
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2021-07-01/wb_income
 
   # Population (Fariss et al.)
   data://meadow/demography/2023-12-20/population_fariss:
