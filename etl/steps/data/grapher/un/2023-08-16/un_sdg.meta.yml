@@ -22,8 +22,7 @@ definitions:
       url: https://www.un.org/en/about-us/terms-of-use
 
 dataset:
-  update_period_days: 365
-
+  update_period_days: 730
 tables:
   _6_2_1__sh_san_safe__all_areas:
     variables:
@@ -149,7 +148,12 @@ tables:
                 customNumericMinValue: 0
               timeTolerance: 3
             selectedEntityNames:
-              - Afghanistan
-              - Cyprus
-              - Colombia
+              - Northern Africa (UN)
+              - Sub-Saharan Africa (UN)
+              - Central and Southern Asia (UN)
+              - Latin America and the Caribbean (UN)
+              - World
+              - Oceania (UN)
+              - Europe and Northern America (UN)
+              - Eastern and South-Eastern Asia (UN)
             $schema: https://files.ourworldindata.org/schemas/grapher-schema.003.json
