@@ -27,8 +27,8 @@ dataset:
 tables:
   diarrheal_diseases__both_sexes__age_standardized:
     variables:
-      deaths_that_are_from_diarrheal_diseases_per_100_000_people__in_both_sexes_aged_age_standardized:
-        sources: []
+      ? deaths_that_are_from_diarrheal_diseases_per_100_000_people__in_both_sexes_aged_age_standardized
+      : sources: []
         origins:
           - *gbd_origin
         title: Deaths that are from diarrheal diseases per 100,000 people, in both sexes aged age-standardized
@@ -36,7 +36,8 @@ tables:
         display:
           name: Diarrheal diseases
           numDecimalPlaces: 1
-        description_short: Estimated annual number of deaths from [diarrheal diseases](#dod:diarrheal-diseases) per 100,000
+        description_short:
+          Estimated annual number of deaths from [diarrheal diseases](#dod:diarrheal-diseases) per 100,000
           people.
         description_key:
           - These estimates come from the Global Burden of Disease study published by the Institute for Health Metrics (IHME). This is currently one of the few sources that produces global-level estimates across most countries on the prevalence and disease burden of diarrheal diseases.
@@ -49,9 +50,6 @@ tables:
           title_public: Diarrheal diseases death rate
           title_variant: Age-standardized
           attribution_short: IHME GBD
-          faqs:
-            - fragment_id: TBD - Question identifier from FAQ GDoc
-              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
           grapher_config:
             title: Diarrheal diseases death rate
             subtitle: Estimated annual number of deaths from [diarrheal diseases](#dod:diarrheal-diseases) per 100,000 people.

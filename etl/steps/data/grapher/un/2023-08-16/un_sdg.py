@@ -22,8 +22,8 @@ paths = PathFinder(__file__)
 # only include tables containing INCLUDE string, this is useful for debugging
 # but should be None before merging to master!!
 # TODO: set this to None before merging to master
-INCLUDE = "_6_1_1|_6_2_1"
-# INCLUDE = None
+# INCLUDE = "_6_1_1|_6_2_1"
+INCLUDE = None
 
 
 def run(dest_dir: str) -> None:
