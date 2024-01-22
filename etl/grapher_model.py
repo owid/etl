@@ -480,6 +480,7 @@ class Dataset(SQLModel, table=True):
             ds.createdByUserId = self.createdByUserId
             ds.isPrivate = self.isPrivate
             ds.updatePeriodDays = self.updatePeriodDays
+            ds.nonRedistributable = self.nonRedistributable
             ds.updatedAt = datetime.utcnow()
             ds.metadataEditedAt = datetime.utcnow()
             ds.dataEditedAt = datetime.utcnow()
@@ -511,6 +512,7 @@ class Dataset(SQLModel, table=True):
             description=metadata.description or "",
             isPrivate=not metadata.is_public,
             updatePeriodDays=metadata.update_period_days,
+            nonRedistributable=metadata.non_redistributable,
         )
 
     @classmethod

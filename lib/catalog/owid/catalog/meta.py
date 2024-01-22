@@ -326,6 +326,8 @@ class DatasetMeta:
     version: Optional[str] = None
     # update period in days
     update_period_days: Optional[str] = None
+    # prohibit redistribution (disable chart download)
+    non_redistributable: bool = False
 
     # an md5 checksum of the ingredients used to make this dataset
     source_checksum: Optional[str] = None
