@@ -465,14 +465,14 @@ tables:
         title: Electricity as share of direct primary energy consumption - %
         short_unit: '%'
         unit: '%'
-        # description_short: Measured as a percentage of total direct primary energy consumption.
+        description_short: Measured as a percentage of total, direct primary energy consumption.
         description_processing: |-
           {definitions.common.description_processing}
           {definitions.description_processing_direct_primary_energy}
         display:
           name: Electricity
         presentation:
-          title_public: Total electricity generation as share of direct primary energy consumption
+          title_public: Total electricity generation as share of primary energy
       total_emissions__mtco2:
         title: Emissions - MtCO2
         short_unit: Mt
