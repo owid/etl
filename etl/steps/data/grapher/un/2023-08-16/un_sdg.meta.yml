@@ -34,19 +34,22 @@ tables:
         title: 6.2.1 - Proportion of population using safely managed sanitation services, by urban/rural (%) - SH_SAN_SAFE - All areas
         unit: "%"
         short_unit: "%"
-        description_short: Proportion of population using safely managed sanitation services
+        description_short: Proportion of the total population using safely managed sanitation services
         description_key:
           - Safely managed sanitation is improved facilities which are not shared with other households and where excreta are safely disposed in situ or transported and treated off-site.
           - "Further information available at: https://unstats.un.org/sdgs/metadata/files/Metadata-06-02-01a.pdf and https://unstats.un.org/sdgs/metadata/files/Metadata-06-02-01b.pdf"
-        description_from_producer: TBD - Indicator's description given by the producer
-        description_processing: TBD - Indicator's processing description
+        description_from_producer: |-
+          Indicator 6.2.1a tracks the proportion of population that is using an improved sanitation facility, which is not shared with other households, and where the excreta produced is either:
+
+            - treated and disposed in situ;
+            - stored temporarily and then emptied and transported to treatment off-site;
+            - or transported through a sewer with wastewater and then treated off-site.
+
+          Improved sanitation facilities include flush/pour flush to piped sewer system, septic tanks or pit latrines; ventilated improved pit latrines, composting toilets or pit latrines with slabs.
         presentation:
           title_public: Share of the population using safely managed sanitation facilities
           title_variant: All areas
           attribution_short: WHO/UNICEF JMP
-          faqs:
-            - fragment_id: TBD - Question identifier from FAQ GDoc
-              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
           grapher_config:
             title: Share of the population using safely managed sanitation facilities
             subtitle: Safely managed sanitation is improved facilities which are not shared with other households and where excreta are safely disposed in situ or transported and treated off-site.
@@ -103,18 +106,11 @@ tables:
         unit: "%"
         short_unit: "%"
         description_short: A safely managed drinking water service is defined as one located on premises, available when needed and free from contamination.
-        description_key:
-          - TBD - List of key pieces of information about the indicator.
-        description_from_producer: TBD - Indicator's description given by the producer
-        description_processing: TBD - Indicator's processing description
-        description: "Proportion of population using safely managed drinking water services, by urban/rural (%)\n\nFurther information available at: https://unstats.un.org/sdgs/metadata/files/Metadata-06-01-01.pdf"
+        description_from_producer: |-
+          "The proportion of the population using safely managed drinking water services is defined as the proportion of population using an improved drinking water source which is accessible on premises, available when needed and free from faecal and priority chemical contamination. ‘Improved’ drinking water sources include: piped supplies, boreholes and tubewells, protected dug wells, protected springs, rainwater, water kiosks, and packaged and delivered water."
         presentation:
-          title_public: TBD - Indicator title to be shown in data pages, that overrides the indicator's title.
-          title_variant: TBD - Indicator's title variant
-          attribution_short: TBD - Indicator's attribution (shorter version)
-          faqs:
-            - fragment_id: TBD - Question identifier from FAQ GDoc
-              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+          title_public: Share of the population using safely managed drinking water
+          attribution_short: WHO/UNICEF JMP
           grapher_config:
             title: Share of the population using safely managed drinking water
             subtitle: A safely managed drinking water service is defined as one located on premises, available when needed and free from contamination.
