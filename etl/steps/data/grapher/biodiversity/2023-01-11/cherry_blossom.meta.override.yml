@@ -1,0 +1,15 @@
+tables:
+  cherry_blossom:
+    variables:
+      average_20_years:
+        title: Twenty-year average day of the year with peak cherry blossom TEST mojmir TEST
+        display:
+          name: My display name
+          shortUnit: xx
+          conversionFactor: 2
+          numDecimalPlaces: 3
+        description_key:
+          - Nice
+        description_from_producer: Oh my god...
+        presentation:
+          title_public: XXX
