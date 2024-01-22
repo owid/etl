@@ -319,6 +319,16 @@ def find_mapping_suggestions(
     """
     # get similarity function
     matching_function = get_similarity_function(similarity_name)
+
+    def _get_score(old_name, new_name) -> float:
+        """Get similarity score for a row.
+
+        Uses matching_function, but on top of that ensures that score is maximum if names of old and new variables are identical.
+        """
+        if old_name == new_name:
+            return 9999
+        return matching_function(old_name, new_name)
+
     # Iterate over old variables, and find the right match among new variables.
     suggestions = []
     for _, row in missing_old.iterrows():
@@ -326,8 +336,9 @@ def find_mapping_suggestions(
         old_name = row["name_old"]
 
         # Sort new variables from most to least similar to current variable.
-        missing_new["similarity"] = [matching_function(old_name, new_name) for new_name in missing_new["name_new"]]
+        missing_new["similarity"] = [_get_score(old_name, new_name) for new_name in missing_new["name_new"]]
         missing_new = missing_new.sort_values("similarity", ascending=False)
+        missing_new["similarity"] = missing_new["similarity"].apply(lambda x: min(x, 100))
 
         # Add results to suggestions list.
         suggestions.append(
