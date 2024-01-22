@@ -1,32 +1,34 @@
 definitions:
   common:
-    processing_level: TBD - major or minor
+    processing_level: major
     presentation:
       topic_tags:
-        - TBD - Indicator's topic tags
+        - Child & Infant Mortality
 dataset:
-  update_period_days: TBD - Number of days between OWID updates
+  update_period_days: 365
 tables:
   long_run_child_mortality_selected:
     variables:
       under_five_mortality_selected:
-        title: Under-five mortality rate (selected)
+        title: Under-five mortality rate
         unit: deaths per 100 live births
-        short_unit: '%'
+        short_unit: "%"
         display:
           numDecimalPlaces: 1
-        description_short: The estimated share of [newborns](#dod:newborn) who die before reaching the age of five.
+        description_short: The long-run estimated share of [newborns](#dod:newborn) who die before reaching the age of five.
         description_key:
-          - TBD - List of key pieces of information about the indicator.
-        description_from_producer: TBD - Indicator's description given by the producer
-        description_processing: TBD - Indicator's processing description
+          - This long-run indicator is a combination of two data sources, Gapminder and the UN Inter-agency Group for Child Mortality Estimation (UN IGME).
+          - The historical data is compiled by Gapminder, the full range of sources used can be found in the [Gapminder documentation](https://www.gapminder.org/data/documentation/gd005/).
+        description_processing: >-
+          This indicator is a combination of data from two sources:
+            - The UN Inter-agency Group for Child Mortality Estimation (UN IGME) provides estimates of child mortality rates, which is available for some countries from 1932.
+            - Gapminder provides estimates of child mortality rates for the years 1800 to 2015.
+
+          We combine the two datasets, for years where both are available, we have a preference for the UN IGME data.
         presentation:
-          title_public: TBD - Indicator title to be shown in data pages, that overrides the indicator's title.
-          title_variant: TBD - Indicator's title variant
-          attribution_short: TBD - Indicator's attribution (shorter version)
-          faqs:
-            - fragment_id: TBD - Question identifier from FAQ GDoc
-              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+          title_public: Under-five mortality rate
+          title_variant: Long-run data; Gapminder & UN IGME
+          attribution_short: UN IGME; Gapminder
           grapher_config:
             title: Child mortality rate
             subtitle: The estimated share of [newborns](#dod:newborn) who die before reaching the age of five.

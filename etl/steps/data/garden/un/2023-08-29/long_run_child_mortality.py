@@ -38,7 +38,8 @@ def run(dest_dir: str) -> None:
     tb_gap_full = tb_gap_full.rename(columns={"child_mortality": "under_five_mortality"})
     tb_gap_full["source"] = "gapminder"
     tb_gap_full["under_five_mortality"] = tb_gap_full["under_five_mortality"].div(10)
-    # Load Gapminder data v7
+    # Load Gapminder data v7 - has the source of the data (unlike v11)
+    # We've removed some years from the v7 data, for years where the source was 'Guesstimate' or 'Model based on Life Expectancy'
     tb_gap_sel = ds_gapminder_v7["under_five_mortality_selected"].reset_index()
     tb_gap_sel["source"] = "gapminder"
     tb_gap_sel["under_five_mortality"] = tb_gap_sel["under_five_mortality"].div(10)
