@@ -42,17 +42,20 @@ def get_schema() -> Dict[str, Any]:
             return schema
 
 
-def get_variables_from_datasets(dataset_id_1: int, dataset_id_2: int) -> Tuple[pd.DataFrame, pd.DataFrame]:
+def get_variables_from_datasets(
+    dataset_id_1: int, dataset_id_2: int, show_new_not_in_old: int = False
+) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """Get variables from two datasets."""
     with get_connection() as db_conn:
         # Get variables from old dataset that have been used in at least one chart.
         old_variables = get_variables_in_dataset(db_conn=db_conn, dataset_id=dataset_id_1, only_used_in_charts=True)
         # Get all variables from new dataset.
         new_variables = get_variables_in_dataset(db_conn=db_conn, dataset_id=dataset_id_2, only_used_in_charts=False)
-        # Remove new variables that are in the old dataset. This can happen if we're matching a dataset to itself
-        # in case of renaming variables.
-        new_variables = new_variables[~new_variables["id"].isin(old_variables["id"])]
-
+        if show_new_not_in_old:
+            # Unsure why this was done, but it seems to be wrong.
+            # Remove variables in the new dataset that are not in the old dataset.
+            # This can happen if we are matching a dataset to itself in case of renaming variables.
+            new_variables = new_variables[~new_variables["id"].isin(old_variables["id"])]
     return old_variables, new_variables
 
 
