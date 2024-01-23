@@ -88,6 +88,15 @@ def run(dest_dir: str) -> None:
     # Create survey count dataset, by counting the number of surveys available for each country in the past decade
     tb_inc_or_cons_2017 = survey_count(tb_inc_or_cons_2017)
 
+    # Add short name and drop columns not needed. Also, set index and sort
+    tb_inc_2011 = add_short_name_and_drop_cols(tb=tb_inc_2011, short_name="inc_2011")
+    tb_cons_2011 = add_short_name_and_drop_cols(tb=tb_cons_2011, short_name="cons_2011")
+    tb_inc_or_cons_2011 = add_short_name_and_drop_cols(tb=tb_inc_or_cons_2011, short_name="inc_or_cons_2011")
+
+    tb_inc_2017 = add_short_name_and_drop_cols(tb=tb_inc_2017, short_name="inc_2017")
+    tb_cons_2017 = add_short_name_and_drop_cols(tb=tb_cons_2017, short_name="cons_2017")
+    tb_inc_or_cons_2017 = add_short_name_and_drop_cols(tb=tb_inc_or_cons_2017, short_name="inc_or_cons_2017")
+
     # Define tables to upload
     # The ones we need in Grapher admin would be tb_inc_or_cons_2011, tb_inc_or_cons_2017, tb_regions and tb_survey_count
     tables = [
@@ -99,17 +108,14 @@ def run(dest_dir: str) -> None:
         tb_inc_or_cons_2017,
     ]
 
-    # Set index and sort
-    for tb in tables:
-        tb = tb.set_index(["country", "year"], verify_integrity=True).sort_index()
-
     #
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
     ds_garden = create_dataset(
         dest_dir,
-        tables=[tables],
+        tables=tables,
+        check_variables_metadata=True,
         default_metadata=ds_meadow.metadata,
     )
 
@@ -277,7 +283,7 @@ def create_stacked_variables(tb: Table, povlines_dict: dict, ppp_version: int) -
     col_stacked_pct = []
 
     for i in range(len(povlines)):
-        # if it's the first value only get people below this poverty line (and percentage)
+        # if it's the first value only continue
         if i == 0:
             continue
 
@@ -307,6 +313,10 @@ def create_stacked_variables(tb: Table, povlines_dict: dict, ppp_version: int) -
             col_stacked_pct.append(varname_pct)
 
     tb.loc[:, col_stacked_pct] = tb[col_stacked_pct] * 100
+
+    # Add variables below first poverty line to the stacked variables
+    col_stacked_n.append(f"headcount_{povlines[0]}")
+    col_stacked_pct.append(f"headcount_ratio_{povlines[0]}")
 
     # Calculate stacked variables which "jump" the original order
 
@@ -400,6 +410,7 @@ def sanity_checks(
     povlines = povlines_dict[ppp_version]
     povlines.sort()
 
+    # Save the number of observations before the checks
     obs_before_checks = len(tb)
 
     # Create lists of variables to check
@@ -445,7 +456,7 @@ def sanity_checks(
     )
     tb_error = tb[mask].reset_index(drop=True)
 
-    if len(tb_error) > 0:
+    if not tb_error.empty:
         log.fatal(
             f"""There are {len(tb_error)} observations with negative values!
             {tb_error[['country', 'year', 'reporting_level', 'welfare_type']]}"""
@@ -459,7 +470,7 @@ def sanity_checks(
     mask = (tb["sum_pct"] >= 100.1) | (tb["sum_pct"] <= 99.9)
     tb_error = tb[mask].reset_index(drop=True)
 
-    if len(tb_error) > 0:
+    if not tb_error.empty:
         log.warning(
             f"""{len(tb_error)} observations of stacked values are not adding up to 100% and will be deleted:
             {tb_error[['country', 'year', 'reporting_level', 'welfare_type', 'sum_pct']]}"""
@@ -474,7 +485,7 @@ def sanity_checks(
     mask = tb[cols_to_check].isna().any(axis=1)
     tb_error = tb[mask].reset_index(drop=True)
 
-    if len(tb_error) > 0:
+    if not tb_error.empty:
         log.warning(
             f"""There are {len(tb_error)} observations with missing poverty values and will be deleted:
             {tb_error[['country', 'year', 'reporting_level', 'welfare_type'] + col_headcount]}"""
@@ -486,7 +497,7 @@ def sanity_checks(
     mask = tb["median"].isna()
     tb_error = tb[mask].reset_index(drop=True)
 
-    if len(tb_error) > 0:
+    if not tb_error.empty:
         log.warning(f"""There are {len(tb_error)} observations with missing median. They will be not deleted.""")
 
     ############################
@@ -494,7 +505,7 @@ def sanity_checks(
     mask = tb["mean"].isna()
     tb_error = tb[mask].reset_index(drop=True)
 
-    if len(tb_error) > 0:
+    if not tb_error.empty:
         log.warning(f"""There are {len(tb_error)} observations with missing mean. They will be not deleted.""")
 
     ############################
@@ -502,7 +513,7 @@ def sanity_checks(
     mask = tb["gini"].isna()
     tb_error = tb[mask].reset_index(drop=True)
 
-    if len(tb_error) > 0:
+    if not tb_error.empty:
         log.warning(f"""There are {len(tb_error)} observations with missing gini. They will be not deleted.""")
 
     ############################
@@ -510,7 +521,7 @@ def sanity_checks(
     mask = tb[col_decile_share].isna().any(axis=1)
     tb_error = tb[mask].reset_index(drop=True)
 
-    if len(tb_error) > 0:
+    if not tb_error.empty:
         log.warning(f"""There are {len(tb_error)} observations with missing decile shares. They will be not deleted.""")
 
     ############################
@@ -518,7 +529,7 @@ def sanity_checks(
     mask = tb[col_decile_thr].isna().any(axis=1)
     tb_error = tb[mask].reset_index(drop=True)
 
-    if len(tb_error) > 0:
+    if not tb_error.empty:
         log.warning(
             f"""There are {len(tb_error)} observations with missing decile thresholds. They will be not deleted."""
         )
@@ -535,7 +546,7 @@ def sanity_checks(
 
     tb_error = tb[~tb["check_total"]].reset_index(drop=True)
 
-    if len(tb_error) > 0:
+    if not tb_error.empty:
         log.warning(
             f"""There are {len(tb_error)} observations with headcount not monotonically increasing and will be deleted:
             {tb_error[['country', 'year', 'reporting_level', 'welfare_type'] + col_headcount]}"""
@@ -559,7 +570,7 @@ def sanity_checks(
 
     tb_error = tb[mask].reset_index(drop=True)
 
-    if len(tb_error) > 0:
+    if not tb_error.empty:
         log.warning(
             f"""There are {len(tb_error)} observations with thresholds not monotonically increasing and will be deleted:
             {tb_error[['country', 'year', 'reporting_level', 'welfare_type']]}"""
@@ -581,7 +592,7 @@ def sanity_checks(
     mask = (~tb["check_total"]) & (tb[col_decile_share].notnull().any(axis=1))
     tb_error = tb[mask].reset_index(drop=True)
 
-    if len(tb_error) > 0:
+    if not tb_error.empty:
         log.warning(
             f"""There are {len(tb_error)} observations with shares not monotonically increasing and will be deleted:
             {tb_error[['country', 'year', 'reporting_level', 'welfare_type'] + col_decile_share]}"""
@@ -597,7 +608,7 @@ def sanity_checks(
     mask = (tb["sum_pct"] >= 100.1) | (tb["sum_pct"] <= 99.9) & (tb[col_decile_share].notnull().any(axis=1))
     tb_error = tb[mask].reset_index(drop=True)
 
-    if len(tb_error) > 0:
+    if not tb_error.empty:
         log.warning(
             f"""{len(tb_error)} observations of shares are not adding up to 100% and will be deleted:
             {tb_error[['country', 'year', 'reporting_level', 'welfare_type', 'sum_pct']]}"""
@@ -606,7 +617,7 @@ def sanity_checks(
 
     ############################
     # delete columns created for the checks
-    tb = tb.drop(columns=m_check_vars + ["check_total", "sum_pct"])
+    tb = tb.drop(columns=m_check_vars + ["m_check_1", "check_total", "sum_pct"])
 
     obs_after_checks = len(tb)
     log.info(f"Sanity checks deleted {obs_before_checks - obs_after_checks} observations for {ppp_version} PPPs.")
@@ -663,10 +674,9 @@ def regional_headcount(tb: Table) -> Table:
     """
     Create regional headcount dataset, by patching missing values with the difference between world and regional headcount
     """
-    # Select on
 
-    # Keep only regional data: for regions, reporting_level is null
-    tb_regions = tb[tb["reporting_level"].isnull()].reset_index(drop=True)
+    # Keep only regional data: for regions, these are the reporting_level rows not in ['national', 'urban', 'rural']
+    tb_regions = tb[~tb["reporting_level"].isin(["national", "urban", "rural"])].reset_index(drop=True)
 
     tb_regions = tb_regions[["country", "year", "headcount_215"]]
 
@@ -725,17 +735,17 @@ def regional_headcount(tb: Table) -> Table:
 
 def survey_count(tb: Table) -> Table:
     """
-    Create survey count dataset, by counting the number of surveys available for each country in the past decade
+    Create survey count indicator, by counting the number of surveys available for each country in the past decade
     """
     # Remove regions from the table
-    tb_survey = tb[~tb["reporting_level"].isnull()].reset_index(drop=True)
+    tb_survey = tb[tb["reporting_level"].isnull()].reset_index(drop=True)
 
     min_year = int(tb_survey["year"].min())
     max_year = int(tb_survey["year"].max())
     year_list = list(range(min_year, max_year + 1))
     country_list = list(tb_survey["country"].unique())
 
-    # Create two dataframes with all the years and entities
+    # Create two tables with all the years and entities
     year_tb_survey = Table(year_list)
     entity_tb_survey = Table(country_list)
 
@@ -759,9 +769,37 @@ def survey_count(tb: Table) -> Table:
         .sum()
         .values
     )
+
     tb_survey = tb_survey[["country", "year", "surveys_past_decade"]]
 
     # Merge with original table
     tb = pr.merge(tb, tb_survey, on=["country", "year"], how="left")
+
+    return tb
+
+
+def add_short_name_and_drop_cols(tb: Table, short_name: str) -> Table:
+    """
+    Add short name and drop columns not needed. Also, add index and sort
+    """
+
+    # Add short name
+    tb.metadata.short_name = short_name
+
+    # Remove columns
+    tb = tb.drop(
+        columns=[
+            "ppp_version",
+            "reporting_level",
+            "welfare_type",
+            "reporting_pop",
+            "is_interpolated",
+            "distribution_type",
+            "estimation_type",
+        ]
+    )
+
+    # Add index and sort
+    tb = tb.set_index(["country", "year"], verify_integrity=True).sort_index()
 
     return tb

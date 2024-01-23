@@ -22,7 +22,7 @@ dataset:
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
 tables:
-  world_bank_pip:
+  inc_or_cons_2017:
     # Learn more about the available fields:
     # http://docs.owid.io/projects/etl/architecture/metadata/reference/indicator/
     variables:
@@ -222,138 +222,138 @@ tables:
               - China
               - Ethiopia
 
-      headcount_ratio_60_median:
-        presentation:
-          title_public: Share of population below 60% of median income or consumption
-          topic_tags:
-            - Poverty
-            - Economic Inequality
-          faqs:
-            - fragment_id: poverty-comparability
-              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
-          grapher_config:
-            title: 'Relative poverty: Share of people below 60% of median income'
-            subtitle: >-
-              Relative poverty is measured in terms of a poverty line that rises and falls
-              over time with average incomes — in this case set at 60% of median income.
-            note: >-
-              Depending on the country and year, the data relates to income measured after
-              taxes and benefits, or to consumption, [per capita](#dod:per-capita).
-            hasMapTab: true
-            tab: map
-            yAxis:
-              min: 0
-            colorScale:
-              baseColorScheme: OwidDistinctLines
-            map:
-              time: 2019
-              colorScale:
-                baseColorScheme: YlOrBr
-                binningStrategy: manual
-                customNumericValues:
-                  - 5
-                  - 10
-                  - 15
-                  - 20
-                  - 25
-                  - 30
-                  - 35
-            selectedEntityNames:
-              - Bangladesh
-              - Bolivia
-              - Madagascar
-              - India
-              - China
-              - Ethiopia
+      # headcount_ratio_60_median:
+      #   presentation:
+      #     title_public: Share of population below 60% of median income or consumption
+      #     topic_tags:
+      #       - Poverty
+      #       - Economic Inequality
+      #     faqs:
+      #       - fragment_id: poverty-comparability
+      #         gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+      #     grapher_config:
+      #       title: 'Relative poverty: Share of people below 60% of median income'
+      #       subtitle: >-
+      #         Relative poverty is measured in terms of a poverty line that rises and falls
+      #         over time with average incomes — in this case set at 60% of median income.
+      #       note: >-
+      #         Depending on the country and year, the data relates to income measured after
+      #         taxes and benefits, or to consumption, [per capita](#dod:per-capita).
+      #       hasMapTab: true
+      #       tab: map
+      #       yAxis:
+      #         min: 0
+      #       colorScale:
+      #         baseColorScheme: OwidDistinctLines
+      #       map:
+      #         time: 2019
+      #         colorScale:
+      #           baseColorScheme: YlOrBr
+      #           binningStrategy: manual
+      #           customNumericValues:
+      #             - 5
+      #             - 10
+      #             - 15
+      #             - 20
+      #             - 25
+      #             - 30
+      #             - 35
+      #       selectedEntityNames:
+      #         - Bangladesh
+      #         - Bolivia
+      #         - Madagascar
+      #         - India
+      #         - China
+      #         - Ethiopia
 
-      headcount_ratio_50_median:
-        presentation:
-          title_public: Share of population below 50% of median income or consumption
-          topic_tags:
-            - Poverty
-            - Economic Inequality
-          faqs:
-            - fragment_id: poverty-comparability
-              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
-          grapher_config:
-            title: 'Relative poverty: Share of people below 50% of median income'
-            subtitle: Relative poverty is measured in terms of a poverty line that rises and falls over time with average incomes – in this case set at 50% of median income.
-            note: >-
-              Depending on the country and year, the data relates to income measured after
-              taxes and benefits, or to consumption, [per capita](#dod:per-capita).
-            hasMapTab: true
-            tab: map
-            yAxis:
-              min: 0
-            colorScale:
-              baseColorScheme: OwidDistinctLines
-            map:
-              time: 2019
-              colorScale:
-                baseColorScheme: YlOrBr
-                binningStrategy: manual
-                customNumericValues:
-                  - 3
-                  - 6
-                  - 9
-                  - 12
-                  - 15
-                  - 18
-                  - 21
-                  - 24
-                  - 27
-            selectedEntityNames:
-              - Bangladesh
-              - Bolivia
-              - Madagascar
-              - India
-              - China
-              - Ethiopia
+      # headcount_ratio_50_median:
+      #   presentation:
+      #     title_public: Share of population below 50% of median income or consumption
+      #     topic_tags:
+      #       - Poverty
+      #       - Economic Inequality
+      #     faqs:
+      #       - fragment_id: poverty-comparability
+      #         gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+      #     grapher_config:
+      #       title: 'Relative poverty: Share of people below 50% of median income'
+      #       subtitle: Relative poverty is measured in terms of a poverty line that rises and falls over time with average incomes – in this case set at 50% of median income.
+      #       note: >-
+      #         Depending on the country and year, the data relates to income measured after
+      #         taxes and benefits, or to consumption, [per capita](#dod:per-capita).
+      #       hasMapTab: true
+      #       tab: map
+      #       yAxis:
+      #         min: 0
+      #       colorScale:
+      #         baseColorScheme: OwidDistinctLines
+      #       map:
+      #         time: 2019
+      #         colorScale:
+      #           baseColorScheme: YlOrBr
+      #           binningStrategy: manual
+      #           customNumericValues:
+      #             - 3
+      #             - 6
+      #             - 9
+      #             - 12
+      #             - 15
+      #             - 18
+      #             - 21
+      #             - 24
+      #             - 27
+      #       selectedEntityNames:
+      #         - Bangladesh
+      #         - Bolivia
+      #         - Madagascar
+      #         - India
+      #         - China
+      #         - Ethiopia
 
-      headcount_ratio_40_median:
-        presentation:
-          title_public: Share of population below 40% of median income or consumption
-          topic_tags:
-            - Poverty
-            - Economic Inequality
-          faqs:
-            - fragment_id: poverty-comparability
-              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
-          grapher_config:
-            title: 'Relative poverty: Share of people below 40% of median income'
-            subtitle: Relative poverty is measured in terms of a poverty line that rises and falls over time with average incomes – in this case set at 40% of median income.
-            note: >-
-              Depending on the country and year, the data relates to income measured after
-              taxes and benefits, or to consumption, [per capita](#dod:per-capita).
-            hasMapTab: true
-            tab: map
-            yAxis:
-              min: 0
-            colorScale:
-              baseColorScheme: OwidDistinctLines
-            map:
-              time: 2019
-              colorScale:
-                baseColorScheme: YlOrBr
-                binningStrategy: manual
-                customNumericValues:
-                  - 2
-                  - 4
-                  - 6
-                  - 8
-                  - 10
-                  - 12
-                  - 14
-                  - 16
-                  - 18
-                  - 20
-            selectedEntityNames:
-              - Bangladesh
-              - Bolivia
-              - Madagascar
-              - India
-              - China
-              - Ethiopia
+      # headcount_ratio_40_median:
+      #   presentation:
+      #     title_public: Share of population below 40% of median income or consumption
+      #     topic_tags:
+      #       - Poverty
+      #       - Economic Inequality
+      #     faqs:
+      #       - fragment_id: poverty-comparability
+      #         gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+      #     grapher_config:
+      #       title: 'Relative poverty: Share of people below 40% of median income'
+      #       subtitle: Relative poverty is measured in terms of a poverty line that rises and falls over time with average incomes – in this case set at 40% of median income.
+      #       note: >-
+      #         Depending on the country and year, the data relates to income measured after
+      #         taxes and benefits, or to consumption, [per capita](#dod:per-capita).
+      #       hasMapTab: true
+      #       tab: map
+      #       yAxis:
+      #         min: 0
+      #       colorScale:
+      #         baseColorScheme: OwidDistinctLines
+      #       map:
+      #         time: 2019
+      #         colorScale:
+      #           baseColorScheme: YlOrBr
+      #           binningStrategy: manual
+      #           customNumericValues:
+      #             - 2
+      #             - 4
+      #             - 6
+      #             - 8
+      #             - 10
+      #             - 12
+      #             - 14
+      #             - 16
+      #             - 18
+      #             - 20
+      #       selectedEntityNames:
+      #         - Bangladesh
+      #         - Bolivia
+      #         - Madagascar
+      #         - India
+      #         - China
+      #         - Ethiopia
 
       gini:
         presentation:
@@ -471,3 +471,9 @@ tables:
           For a small number of country-year observations, the World Bank PIP data contains two estimates: one based on income data and one based on consumption data. In these cases we keep only the consumption estimate in order to obtain a single series for each country. This means the indicator is estimating the number of years at least one survey was conducted in the past decade, rather than the number of surveys.
         display:
           numDecimalPlaces: 0
+
+  inc_or_cons_2011: {}
+  inc_2017: {}
+  inc_2011: {}
+  cons_2017: {}
+  cons_2011: {}

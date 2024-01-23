@@ -1,6 +1,8 @@
 steps:
   # World Bank Poverty and Inequality Platform
   data://meadow/wb/2023-08-14/world_bank_pip:
-  - snapshot://wb/2023-08-14/world_bank_pip.csv
+    - snapshot://wb/2023-08-14/world_bank_pip.csv
   data://garden/wb/2023-08-14/world_bank_pip:
-  - data://meadow/wb/2023-08-14/world_bank_pip
+    - data://meadow/wb/2023-08-14/world_bank_pip
+  data://grapher/wb/2023-08-14/world_bank_pip:
+    - data://garden/wb/2023-08-14/world_bank_pip
