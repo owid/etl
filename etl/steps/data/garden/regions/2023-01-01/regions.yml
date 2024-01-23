@@ -348,6 +348,8 @@
   members:
     - "GGY"
     - "JEY"
+  aliases:
+    - "CHI"
 
 - code: "CHL"
   name: "Chile"
