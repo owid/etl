@@ -24,6 +24,8 @@ class Presentation(BaseModel):
 
 
 class Indicator(BaseModel):
+    """JSON schema for indicator metadata from Data API (R2)."""
+
     name: Optional[str] = None
     unit: Optional[str] = None
     shortUnit: Optional[str] = None
@@ -59,6 +61,9 @@ class Indicator(BaseModel):
 
 
 class UpdateIndicatorRequest(BaseModel):
+    """JSON schema for request to update indicator metadata."""
+
+    catalogPath: str
     indicator: Indicator
     dataApiUrl: str
     dryRun: bool = False

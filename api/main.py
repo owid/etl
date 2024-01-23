@@ -24,7 +24,6 @@ def get_application():
 
     _app.add_middleware(
         CORSMiddleware,
-        # allow_origins=[str(origin) for origin in settings.BACKEND_CORS_ORIGINS],
         allow_origins=["*"],
         allow_credentials=True,
         allow_methods=["*"],
@@ -47,6 +46,7 @@ app.include_router(v1)
 
 @app.middleware("http")
 async def slack_middleware(request: Request, call_next):
+    # don't log OPTIONS requests
     if request.method == "OPTIONS":
         return await call_next(request)
 

@@ -34,18 +34,18 @@ DATASET_SCHEMA = read_json_schema(path=SCHEMAS_DIR / "dataset-schema.json")
 v1 = APIRouter()
 
 
-@v1.get("/v1/health")
+@v1.get("/api/v1/health")
 def health() -> dict:
     return {"status": "ok"}
 
 
-@v1.put("/v1/indicators/{indicator_id}")
-def update_indicator(indicator_id: int, update_request: UpdateIndicatorRequest, background_tasks: BackgroundTasks):
+@v1.put("/api/v1/indicators")
+def update_indicator(update_request: UpdateIndicatorRequest, background_tasks: BackgroundTasks):
     _validate_data_api_url(update_request.dataApiUrl)
 
     # update YAML file
     with Session(engine) as session:
-        db_indicator = gm.Variable.load_variable(session, indicator_id)
+        db_indicator = gm.Variable.load_from_catalog_path(session, update_request.catalogPath)
 
     if db_indicator.catalogPath is None:
         raise HTTPException(403, "Only indicators from the ETL can be edited. Contact us if you really need this.")
@@ -76,12 +76,14 @@ def update_indicator(indicator_id: int, update_request: UpdateIndicatorRequest, 
         with open(override_yml_path, "w") as f:
             f.write(yaml_str)
 
+    # try to commit and push before overwriting file in R2
+    if config.ETL_API_COMMIT:
+        _commit_and_push(override_yml_path, ":robot: Metadata update by Admin")
+
     if not update_request.dryRun:
         _update_indicator_in_r2(db_indicator, update_request.indicator)
 
-    if config.ETL_API_COMMIT:
-        background_tasks.add_task(_commit_and_push, override_yml_path, ":robot: Metadata update by Admin")
-
+    # trigger ETL in the background (this is usually fast, but for some datasets this could take a while)
     if update_request.triggerETL:
         background_tasks.add_task(_trigger_etl, indicator_short_name, db_indicator, update_request.dryRun)
 

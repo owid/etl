@@ -24,11 +24,12 @@ If env `SLACK_API_TOKEN` is set, it'll send all requests & responses to a slack 
 
 ## Sample request
 
-The following request edits indicator with id `540251`. It sets decimal places, changes its title and
+The following request edits indicator with path `grapher/biodiversity/2023-01-11/cherry_blossom/cherry_blossom#full_flowering_date`(and id `540251`). It sets decimal places, changes its title and
 triggers ETL rebuild (without committing the code).
 
 ```
 echo '{
+  "catalogPath": "grapher/biodiversity/2023-01-11/cherry_blossom/cherry_blossom#full_flowering_date",
   "indicator": {
     "name": "My new name",
     "display": {
@@ -38,7 +39,7 @@ echo '{
   "dataApiUrl": "https://api-staging.owid.io/mojmir/v1/indicators/",
   "triggerETL": true,
   "dryRun": false
-}' | http PUT http://127.0.0.1:8000/v1/indicators/540251
+}' | http PUT http://127.0.0.1:8000/v1/indicators
 
 ```
 
