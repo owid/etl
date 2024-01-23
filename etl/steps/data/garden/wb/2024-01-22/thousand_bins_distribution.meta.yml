@@ -29,12 +29,15 @@ tables:
         unit: international-$ in 2017 prices
         short_unit: $
         description_short: The mean after tax income or consumption per year within each of the 1000 bins of the distribution.
+        processing_level: major
         description_key:
           - The data is measured in international-$ at 2017 prices – this adjusts for inflation and for differences in the cost of living between countries.
           - Depending on the country and year, the data relates to income measured after taxes and benefits, or to consumption, per capita. 'Per capita' means that the income of each household is attributed equally to each member of the household (including children).
           - Non-market sources of income, including food grown by subsistence farmers for their own consumption, are taken into account.
         description_from_producer: |
           Average daily household per capita welfare values of each bin in 2017 PPP USD. Values are based on [lineup methodology](https://datanalytics.worldbank.org/PIP-Methodology/lineupestimates.html) in PIP.
+        description_processing: |
+          The distributions are bottom-coded, which means that the negative average values are transformed to zero.
 
       pop:
         title: Population
