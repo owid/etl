@@ -40,7 +40,7 @@ def run(dest_dir: str) -> None:
     ds_gapminder = paths.load_dataset("population", namespace="gapminder")
     tb_gapminder = ds_gapminder["population"].reset_index()
     # Load Gapminder SG dataset
-    ds_gapminder_sg = paths.load_dataset("gapminder__systema_globalis")
+    ds_gapminder_sg = paths.load_dataset(short_name="gapminder__systema_globalis", channel="open_numbers")
     tb_gapminder_sg = ds_gapminder_sg["total_population_with_projections"].reset_index()
     # Load regions table
     ds_regions = paths.load_dataset("regions")
@@ -56,42 +56,32 @@ def run(dest_dir: str) -> None:
     tb_gapminder_sg, tb_gapminder_sg_former = format_gapminder_sg(tb_gapminder_sg)
 
     # Concat tables
-    tb = pr.concat([tb_hyde, tb_gapminder, tb_un, tb_gapminder_sg], ignore_index=True)
-
-    # Apply source-selection logic
-    tb = select_source(tb)
-
-    # Dtypes
-    tb = tb.astype(
-        {
-            "year": int,
-            "population": "uint64",
-        }
+    tb = pr.concat(
+        [tb_hyde, tb_gapminder, tb_un, tb_gapminder_sg], ignore_index=True, short_name=f"{paths.short_name}_original"
     )
 
-    # Add regions
-    tb = add_regions(tb)
-
-    # Add world
-    tb = add_world(tb)
-
-    # Add historical regions
-    tb = add_historical_regions(tb, tb_gapminder_sg_former, tb_regions)
-
-    tb_un_estimates = tb_un[tb_un["variant"] == "estimates"].drop(columns=["variant"])
-    tb_un_projections = tb_un[tb_un["variant"] == "medium"].drop(columns=["variant"])
-    columns_un_rename = {
-        "location": "country",
-        "value": "population",
-    }
-    tb_un_estimates = tb_un_estimates.rename(columns=columns_un_rename, errors="raise")
-    tb_un_projections = tb_un_projections.rename(columns=columns_un_rename, errors="raise")
-
-    # Combine tables
-    tb = combine_sources(tb_un_estimates, tb_un_projections, tb_hyde)
-
-    # Get world population share
-    tb = add_world_population_share(tb)
+    # Make table
+    tb = (
+        tb.pipe(select_source)
+        .astype(
+            {
+                "year": int,
+                "population": "uint64",
+            }
+        )
+        .pipe(add_regions)
+        .pipe(add_world)
+        .pipe(add_historical_regions, tb_gapminder_sg_former, tb_regions)
+        .pipe(fix_anomalies)
+        .astype(
+            {
+                "year": "int64",
+                "population": "uint64",
+                "source": "category",
+            }
+        )
+        .pipe(add_world_population_share)
+    )
 
     # Set index
     tb = tb.set_index(["country", "year"], verify_integrity=True)
@@ -218,7 +208,7 @@ def format_wpp(tb: Table) -> Table:
         "Lower-middle-income countries",
         "Upper-middle-income countries",
     ]
-    tb.loc[~tb.country.isin(countries_exclude)]
+    tb = tb.loc[~tb.country.isin(countries_exclude)]
 
     # Sanity checks OUT
     assert tb.groupby(["country", "year"])["population"].count().max() == 1
@@ -260,7 +250,7 @@ def format_gapminder_sg(tb: Table) -> Tuple[Table, Table]:
 
     ## filter years: only keep former countries until they disappear
     for _, data in GAPMINDER_SG_COUNTRIES_FORMER.items():
-        tb = tb[~((tb["country"] == data["name"]) & (tb["year"] > data["end"]))]
+        tb_former = tb_former[~((tb_former["country"] == data["name"]) & (tb_former["year"] > data["end"]))]
 
     # Complement
     ## filter countries
@@ -276,7 +266,7 @@ def format_gapminder_sg(tb: Table) -> Tuple[Table, Table]:
 
 
 #############################################################################################
-# Combine data ##############################################################################
+# Combine and process data ##################################################################
 #############################################################################################
 
 
@@ -305,7 +295,7 @@ def select_source(tb: Table) -> Table:
             (tb["country"].isin(has_gapminder_data))
             & (tb["year"] > YEAR_HYDE_END)
             & (tb["year"] < YEAR_WPP_START)
-            & (tb["source"] != "gapminder_v7")
+            & (tb["source"] != "gapminder")
         )
     ]
 
@@ -313,7 +303,7 @@ def select_source(tb: Table) -> Table:
     _ = tb.set_index(["country", "year"], verify_integrity=True)
 
     # # map to source full names
-    # tb["source"] = tb["source"].map(SOURCES_NAMES)
+    tb["source"] = tb["source"].map(SOURCES_NAMES)
     return tb
 
 
@@ -383,23 +373,22 @@ def add_world(tb: Table) -> Table:
 
     # Sanity checks
     ## Min year of 'World' for source UN WPP
-    year_min_un = tb.loc[(tb["country"] == "World") & (tb["source"] == "unwpp"), "year"].min()
-    year_max_un = tb.loc[(tb["country"] == "World") & (tb["source"] == "unwpp"), "year"].max()
+    year_min_un = tb.loc[(tb["country"] == "World") & (tb["source"] == SOURCES_NAMES["unwpp"]), "year"].min()
+    year_max_un = tb.loc[(tb["country"] == "World") & (tb["source"] == SOURCES_NAMES["unwpp"]), "year"].max()
     assert (
         (year_min_un == YEAR_WPP_START) & (year_max_un == YEAR_WPP_END)  # This is the year that the UN data starts.
     ), "World data found in UN WPP outside of [1950, 2100]!"
     ## Min year of 'World' for source HYDE
-    year_min_hyde = tb.loc[(tb["country"] == "World") & (tb["source"] == "hyde"), "year"].min()
-    year_max_hyde = tb.loc[(tb["country"] == "World") & (tb["source"] == "hyde"), "year"].min()
+    year_min_hyde = tb.loc[(tb["country"] == "World") & (tb["source"] == SOURCES_NAMES["hyde"]), "year"].min()
+    year_max_hyde = tb.loc[(tb["country"] == "World") & (tb["source"] == SOURCES_NAMES["hyde"]), "year"].max()
     assert (
-        (year_min_hyde == -YEAR_HYDE_START) & (year_max_hyde == 1940)  # This is the year that the UN data starts.
+        (year_min_hyde == YEAR_HYDE_START) & (year_max_hyde == 1940)  # This is the year that the UN data starts.
     ), "World data found in HYDE outside of [-10000, 1940]!"
 
     # Filter 'World' in HYDE for period [1800, 1950]
-    tb = tb.loc[(tb["country"] == "World") & (tb["year"] > YEAR_HYDE_START) & (tb["year"] < YEAR_HYDE_END)]
+    tb_world = tb.loc[(tb["country"] == "World") & (tb["year"] > YEAR_HYDE_START) & (tb["year"] < YEAR_HYDE_END)].copy()
 
-    #
-    tb_world = tb.copy()
+    # Estimate World using reigons
     continents = [
         "Europe",
         "Asia",
@@ -439,6 +428,7 @@ def add_historical_regions(tb: Table, tb_gm: Table, tb_regions: Table) -> Table:
     # 1. Add from Systema Globalis
     paths.log.info("loading data (Gapminder Systema Globalis)")
     # Add to main table
+    tb_gm["source"] = SOURCES_NAMES["gapminder_sg"]
     tb = pr.concat([tb, tb_gm], ignore_index=True)
 
     # 2. Add historical regions by grouping and summing current countries.
@@ -477,9 +467,22 @@ def fix_anomalies(tb: Table) -> Table:
     """
     paths.log.info("filter rows...")
     # remove datapoints with population = 0
-    tb = tb[tb["population"] > 0].copy()
+    tb = tb.loc[tb["population"] > 0].copy()
     # remove datapoints for the Netherland Antilles after 2010 (it was dissolved then)
-    tb = tb[~((tb["country"] == "Netherlands Antilles") & (tb["year"] > 2010))]
+    tb = tb.loc[~((tb["country"] == "Netherlands Antilles") & (tb["year"] > 2010))]
+    # remove datapoints for the Netherland Antilles after 2010 (it was dissolved then)
+    tb = tb.loc[~((tb["country"] == "Serbia and Montenegro") & (tb["year"] > 2006))]
+    return tb
+
+
+def add_world_population_share(tb: Table) -> Table:
+    """Obtain world's population share for each country/region and year."""
+    paths.log.info("adding world population share...")
+    # Add a metric "% of world population"
+    tb_world = tb.loc[tb["country"] == "World", ["year", "population"]].rename(columns={"population": "world_pop"})
+    tb = tb.merge(tb_world, on="year", how="left")
+    tb["world_pop_share"] = 100 * tb["population"].div(tb["world_pop"])
+    tb = tb.drop(columns="world_pop")
     return tb
 
 
@@ -488,7 +491,7 @@ def generate_auxiliary_table(tb: Table) -> Table:
 
     This is to be able to show a simpler attribution in charts where population is used as a secondary indicator, and hence there is very little relevance in showing the full attribution.
     """
-    tb_auxiliary = tb.copy().update_metadata(short_name="population_as_auxiliary_indicator")
+    tb_auxiliary = tb.copy().update_metadata(short_name="population")
 
     # Origins from original table
     origins_raw = tb["population"].metadata.origins
@@ -517,39 +520,3 @@ def generate_auxiliary_table(tb: Table) -> Table:
         tb_auxiliary[col].origins = origins
 
     return tb_auxiliary
-
-
-def combine_sources(tb_wpp_estimates: Table, tb_wpp_projections: Table, tb_hyde: Table) -> Table:
-    """Combine all sources."""
-    # Sanity check: years
-    assert tb_hyde["year"].min() == YEAR_HYDE_START, "Unexpected start year for HYDE"
-    assert tb_wpp_estimates["year"].min() == YEAR_WPP_START, "Unexpected start year for WPP estimates"
-    assert tb_wpp_projections["year"].min() == YEAR_WPP_PROJECTIONS_START, "Unexpected start year for WPP projections"
-    assert tb_wpp_projections["year"].max() == YEAR_WPP_END, "Unexpected end year for WPP projections"
-
-    # Filter HYDE data (upper range)
-    tb_hyde = tb_hyde[tb_hyde["year"] < YEAR_WPP_START]
-
-    # Combine tables
-    tb = pr.concat(
-        [
-            tb_hyde,
-            tb_wpp_estimates,
-            tb_wpp_projections,
-        ],
-        ignore_index=True,
-        short_name=paths.short_name,
-    )
-
-    return tb
-
-
-def add_world_population_share(tb: Table) -> Table:
-    """Obtain world's population share for each country/region and year."""
-    paths.log.info("adding world population share...")
-    # Add a metric "% of world population"
-    tb_world = tb.loc[tb["country"] == "World", ["year", "population"]].rename(columns={"population": "world_pop"})
-    tb = tb.merge(tb_world, on="year", how="left")
-    tb["world_pop_share"] = 100 * tb["population"].div(tb["world_pop"])
-    tb = tb.drop(columns="world_pop")
-    return tb

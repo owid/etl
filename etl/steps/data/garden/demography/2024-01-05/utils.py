@@ -2,7 +2,7 @@ from owid.catalog import License, Origin
 
 # Year boundaries
 YEAR_HYDE_START = -10000
-YEAR_HYDE_END = 1800
+YEAR_HYDE_END = 1799
 YEAR_WPP_START = 1950
 YEAR_WPP_PROJECTIONS_START = 2022
 YEAR_WPP_END = 2100
@@ -63,10 +63,10 @@ GAPMINDER_SG_COUNTRIES_FORMER = {
         "name": "Ethiopia (former)",
         "end": 1993,
     },
-    "scg": {
-        "name": "Serbia and Montenegro",
-        "end": 2006,
-    },
+    # "scg": {
+    #     "name": "Serbia and Montenegro",
+    #     "end": 2006,
+    # },
     # "ussr": {
     #     "name": "USSR",
     #     "end": 1991,
