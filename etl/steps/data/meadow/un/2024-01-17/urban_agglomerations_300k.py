@@ -18,7 +18,6 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
-
     tb = tb.rename(columns={"Country or area": "country"})
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
     tb = (
@@ -26,7 +25,6 @@ def run(dest_dir: str) -> None:
         .set_index(["country", "year", "urban_agglomeration", "latitude"], verify_integrity=True)
         .sort_index()
     )
-
     #
     # Save outputs.
     #

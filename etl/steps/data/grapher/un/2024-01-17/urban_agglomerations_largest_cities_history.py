@@ -11,10 +11,20 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load garden dataset.
-    ds_garden = paths.load_dataset("urban_agglomerations_300k")
+    ds_garden = paths.load_dataset("urban_agglomerations_largest_cities_history")
 
     # Read table from garden dataset.
-    tb = ds_garden["urban_agglomerations_300k"]
+    tb = ds_garden["urban_agglomerations_largest_cities_history"]
+    #
+    # Process data.
+    #
+    tb = tb.reset_index()
+    tb = tb.drop(columns=["country"])
+    # Rename urban_agglomeration to country for the grapher.
+    tb = tb.rename(columns={"urban_agglomeration": "country"})
+    tb = tb.drop(columns=["rank"])
+
+    tb = tb.set_index(["country", "year"], verify_integrity=True)
     #
     # Save outputs.
     #

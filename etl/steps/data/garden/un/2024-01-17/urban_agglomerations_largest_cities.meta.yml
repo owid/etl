@@ -1,0 +1,35 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Urbanization
+    processing_level: minor
+
+dataset:
+  title: World Urbanization Prospects Dataset - Largest Cities in 2018 and Capitals
+
+tables:
+  urban_agglomerations_largest_cities:
+    # Learn more about the available fields:
+    # http://docs.owid.io/projects/etl/architecture/metadata/reference/indicator/
+    variables:
+      time_series_of_the_population_of_the_30_largest_urban_agglomerations_in_2018_ranked_by_population_size:
+        title: Population of the top 30 largest urban agglomerations in 2018
+        unit: 'people'
+        short_unit: ''
+        description_key:
+          - Provides the population figures for the 30 largest urban agglomerations in 2018, ranked by their population size.
+          - Useful for understanding urbanization trends, city planning, and demographic studies of major urban centers.
+        display:
+          numDecimalPlaces: 0
+
+      population_capital:
+        title: Population of the capital city
+        unit: 'people'
+        short_unit: ''
+        description_key:
+          - Indicates the total population living in the nation's capital city.
+          - Useful for urban planning, resource management, and understanding the demographic importance of the capital.
+        display:
+          numDecimalPlaces: 0

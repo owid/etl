@@ -14,7 +14,7 @@ meta:
     producer: United Nations, Department of Economic and Social Affairs, Population
       Division
     citation_full: |-
-      United Nations, Department of Economic and Social Affairs, Population Division (2024). World Urbanization Prospects Dataset. Accessed on 2024-01-17, from https://population.un.org/wup/Download/
+      United Nations, Department of Economic and Social Affairs, Population Division (2018). World Urbanization Prospects: The 2018 Revision, Online Edition.
 
     # Files
     url_main: https://population.un.org/wup/Download/
@@ -22,8 +22,9 @@ meta:
 
     # License
     license:
-      name: Terms and conditions of use of United Nations websites
-      url: https://www.un.org/en/about-us/terms-of-use
+      name: CC BY 3.0 IGO
+      url: http://creativecommons.org/licenses/by/3.0/igo/
+
 wdir: ../../../data/snapshots/un/2024-01-17
 outs:
 - md5: bcc78ee065c0115e9130dfe26c45f39a

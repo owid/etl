@@ -11,10 +11,10 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load garden dataset.
-    ds_garden = paths.load_dataset("urban_agglomerations_300k")
+    ds_garden = paths.load_dataset("urban_agglomerations_size_class")
 
     # Read table from garden dataset.
-    tb = ds_garden["urban_agglomerations_300k"]
+    tb = ds_garden["urban_agglomerations_size_class"]
     #
     # Save outputs.
     #

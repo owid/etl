@@ -15,7 +15,6 @@ def run(dest_dir: str) -> None:
 
     # Load data from snapshot.
     tb = snap.read()
-
     #
     # Process data.
     #
@@ -25,7 +24,6 @@ def run(dest_dir: str) -> None:
         .set_index(["country", "year", "urban_agglomeration", "rank_order"], verify_integrity=True)
         .sort_index()
     )
-
     #
     # Save outputs.
     #

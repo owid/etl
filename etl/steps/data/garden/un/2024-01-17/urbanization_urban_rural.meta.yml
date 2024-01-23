@@ -7,7 +7,7 @@ definitions:
     processing_level: minor
 
 dataset:
-  title: World urbanization prospects dataset - urban and rural population by region, subregion and country
+  title: World Urbanization Prospects Dataset - Urban and Rural Population
 
 tables:
   urbanization_urban_rural:

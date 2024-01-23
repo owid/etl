@@ -4,7 +4,8 @@ meta:
   origin:
     # Data product / Snapshot
     title: World Urbanization Prospects Dataset
-    title_snapshot: World Urbanization Prospects Dataset - Size Class of Urban Settlement
+    title_snapshot: World Urbanization Prospects Dataset - The 30 Largest Urban Agglomerations
+      Ranked by Population Size at Each Point in Time
 
     description: |-
       This dataset is derived from the World Urbanization Prospects, providing comprehensive data on global urbanization trends, including population figures, urban and rural population distributions, and projections for future urban growth.
@@ -14,18 +15,19 @@ meta:
     producer: United Nations, Department of Economic and Social Affairs, Population
       Division
     citation_full: |-
-      United Nations, Department of Economic and Social Affairs, Population Division (2024). World Urbanization Prospects Dataset. Accessed on 2024-01-17, from https://population.un.org/wup/Download/
+      United Nations, Department of Economic and Social Affairs, Population Division (2018). World Urbanization Prospects: The 2018 Revision, Online Edition.
 
     # Files
     url_main: https://population.un.org/wup/Download/
     date_accessed: 2024-01-17  # Replace with the actual date of access
+    url_download: https://population.un.org/wup/Download/Files/WUP2018-F11a-30_Largest_Cities.xls
 
     # License
     license:
-      name: Terms and conditions of use of United Nations websites
-      url: https://www.un.org/en/about-us/terms-of-use
+      name: CC BY 3.0 IGO
+      url: http://creativecommons.org/licenses/by/3.0/igo/
 wdir: ../../../data/snapshots/un/2024-01-17
 outs:
-- md5: 882e00b6cb018966f0809ff76531c4cb
-  size: 5473540
-  path: urban_agglomerations_size_class.csv
+- md5: f67e4249ccd35b2596c3d03aa8a6a112
+  size: 155136
+  path: urban_agglomerations_largest_cities_history.xls

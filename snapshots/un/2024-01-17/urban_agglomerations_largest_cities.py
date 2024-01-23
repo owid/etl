@@ -32,12 +32,8 @@ def main(upload: bool) -> None:
 
     file_details = [
         {
-            "file_name": "WUP2018-F11a-30_Largest_Cities.xls",
-            "description": "The 30 Largest Urban Agglomerations Ranked by Population Size at Each Point in Time, 1950-2035",
-        },
-        {
             "file_name": "WUP2018-F11b-30_Largest_Cities_in_2018_by_time.xls",
-            "description": "Time Series of the Population of the 30 Largest Urban Agglomerations in 2018 Ranked by Population Size, 1950-2035",
+            "description": "Time Series of the Population of the 30 Largest Urban Agglomerations in 2018 Ranked by Population Size",
         },
         {
             "file_name": "WUP2018-F13-Capital_Cities.xls",
@@ -97,8 +93,8 @@ def main(upload: bool) -> None:
         if file["description"] == "Population of Capital Cities in 2018 (thousands)":
             df_add = df_add.rename(columns={"Capital City": "urban_agglomeration", "Country or area": "country"})
             df_add["year"] = 2018
-            df_add["rank_order"] = np.NaN
-
+            df_add["rank_order"] = "Capital"
+        df_add["rank_order"] = df_add["rank_order"].astype(str)
         # If this is the first file, assign the melted DataFrame to merged_df
         if merged_df.empty:
             merged_df = df_add
