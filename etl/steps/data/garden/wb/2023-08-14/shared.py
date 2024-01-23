@@ -36,7 +36,7 @@ var_dict = {
     "headcount": {
         "title": "Number in poverty",
         "description": "Number of people in households with an {inc_cons_dict[wel]['name']} per person below {povline}",
-        "unit": "",
+        "unit": "people",
         "short_unit": "",
         "numDecimalPlaces": 0,
     },
