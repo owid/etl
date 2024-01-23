@@ -35,6 +35,9 @@ def run(dest_dir: str) -> None:
     # Rename columns, regions and multiply pop by 1,000,000.
     tb = rename_columns_regions_and_multiply_pop(tb, REGIONS_MAPPING)
 
+    # Assert that there are no negative values for avg and that avg data is monotonically increasing by each quantile.
+    tb = sanity_checks(tb)
+
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
 
     # Set an appropriate index and sort conveniently.
@@ -63,5 +66,31 @@ def rename_columns_regions_and_multiply_pop(tb: Table, regions_mapping: dict) ->
 
     # Multiply pop by 1,000,000
     tb["pop"] *= 1e6
+
+    return tb
+
+
+def sanity_checks(tb: Table) -> Table:
+    """
+    Check that there are no negative values for avg.
+    Check that data is monotonically increasing in quantile.
+    """
+    # Check that there are no negative values for avg.
+
+    mask = tb["avg"] < 0
+    if not tb[mask].empty:
+        paths.log.info(f"There are {len(tb[mask])} negative values for avg and will be transformed to zero.")
+        tb["avg"] = tb["avg"].clip(lower=0)
+
+    # Check that data is monotonically increasing in avg by country, year and quantile.
+    tb = tb.sort_values(by=["country", "year", "quantile"]).reset_index(drop=True)
+
+    mask = tb.groupby(["country", "year"])["avg"].diff() < 0
+
+    if not tb[mask].empty:
+        paths.log.info(f"There are {len(tb[mask])} values for avg that are not monotonically increasing.")
+        paths.log.info("These values will be transformed to the previous value.")
+
+        tb.loc[mask, "avg"] = tb.loc[mask, "avg"].shift(1)
 
     return tb
