@@ -82,11 +82,11 @@ def run(dest_dir: str) -> None:
         tb_garden=tb_inc_or_cons_2017, ppp_version=2017, welfare_type="income_consumption"
     )
 
-    # Create regional headcount dataset, by patching missing values with the difference between world and regional headcount
-    tb_regions = regional_headcount(tb_inc_or_cons_2017)
+    # Create regional headcount variable, by patching missing values with the difference between world and regional headcount
+    tb_inc_or_cons_2017 = regional_headcount(tb_inc_or_cons_2017)
 
     # Create survey count dataset, by counting the number of surveys available for each country in the past decade
-    tb_survey_count = survey_count(tb_inc_or_cons_2017)
+    tb_inc_or_cons_2017 = survey_count(tb_inc_or_cons_2017)
 
     # Define tables to upload
     # The ones we need in Grapher admin would be tb_inc_or_cons_2011, tb_inc_or_cons_2017, tb_regions and tb_survey_count
@@ -97,8 +97,6 @@ def run(dest_dir: str) -> None:
         tb_inc_2017,
         tb_cons_2017,
         tb_inc_or_cons_2017,
-        tb_regions,
-        tb_survey_count,
     ]
 
     # Set index and sort
@@ -668,7 +666,7 @@ def regional_headcount(tb: Table) -> Table:
     # Select on
 
     # Keep only regional data: for regions, reporting_level is null
-    tb_regions = tb[tb["reporting_level"] == "nan"].reset_index(drop=True)
+    tb_regions = tb[tb["reporting_level"].isnull()].reset_index(drop=True)
 
     tb_regions = tb_regions[["country", "year", "headcount_215"]]
 
@@ -681,7 +679,7 @@ def regional_headcount(tb: Table) -> Table:
     tb_out = tb_regions[mask].reset_index()
     if len(tb_out) > 0:
         log.warning(
-            f"""There are {len(tb_out)} years with more than one null region and will be deleted:
+            f"""There are {len(tb_out)} years with more than one null region value and will be deleted:
             {list(tb_out.year.unique())}"""
         )
         tb_regions = tb_regions[~mask].reset_index()
@@ -716,7 +714,13 @@ def regional_headcount(tb: Table) -> Table:
     tb_regions = pr.melt(tb_regions, id_vars=["year"], var_name="country", value_name="headcount_215")
     tb_regions = tb_regions[["country", "year", "headcount_215"]]
 
-    return tb_regions
+    # Rename headcount_215 to headcount_215_region, to distinguish it from the original headcount_215 when merging
+    tb_regions = tb_regions.rename(columns={"headcount_215": "headcount_215_regions"})
+
+    # Merge with original table
+    tb = pr.merge(tb, tb_regions, on=["country", "year"], how="outer")
+
+    return tb
 
 
 def survey_count(tb: Table) -> Table:
@@ -724,31 +728,40 @@ def survey_count(tb: Table) -> Table:
     Create survey count dataset, by counting the number of surveys available for each country in the past decade
     """
     # Remove regions from the table
-    tb = tb[~tb["reporting_level"].isnull()].reset_index(drop=True)
+    tb_survey = tb[~tb["reporting_level"].isnull()].reset_index(drop=True)
 
-    min_year = int(tb["year"].min())
-    max_year = int(tb["year"].max())
+    min_year = int(tb_survey["year"].min())
+    max_year = int(tb_survey["year"].max())
     year_list = list(range(min_year, max_year + 1))
-    country_list = list(tb["country"].unique())
+    country_list = list(tb_survey["country"].unique())
 
     # Create two dataframes with all the years and entities
-    year_tb = Table(year_list)
-    entity_tb = Table(country_list)
+    year_tb_survey = Table(year_list)
+    entity_tb_survey = Table(country_list)
 
     # Make a cartesian product of both dataframes: join all the combinations between all the entities and all the years
-    cross = pr.merge(entity_tb, year_tb, how="cross")
+    cross = pr.merge(entity_tb_survey, year_tb_survey, how="cross")
     cross = cross.rename(columns={"0_x": "country", "0_y": "year"})
 
     # Merge cross and df_country, to include all the possible rows in the dataset
-    tb = pr.merge(cross, tb[["country", "year", "reporting_level"]], on=["country", "year"], how="left", indicator=True)
+    tb_survey = pr.merge(
+        cross, tb_survey[["country", "year", "reporting_level"]], on=["country", "year"], how="left", indicator=True
+    )
 
     # Mark with 1 if there are surveys available, 0 if not (this is done by checking if the row is in both datasets)
-    tb.loc[tb["_merge"] == "both", "survey_available"] = 1
+    tb_survey.loc[tb_survey["_merge"] == "both", "survey_available"] = 1
 
     # Sum for each entity the surveys available for the previous 9 years and the current year
-    tb["surveys_past_decade"] = (
-        tb["survey_available"].groupby(tb["country"], sort=False).rolling(min_periods=1, window=10).sum().values
+    tb_survey["surveys_past_decade"] = (
+        tb_survey["survey_available"]
+        .groupby(tb_survey["country"], sort=False)
+        .rolling(min_periods=1, window=10)
+        .sum()
+        .values
     )
-    tb = tb[["country", "year", "surveys_past_decade"]]
+    tb_survey = tb_survey[["country", "year", "surveys_past_decade"]]
+
+    # Merge with original table
+    tb = pr.merge(tb, tb_survey, on=["country", "year"], how="left")
 
     return tb
