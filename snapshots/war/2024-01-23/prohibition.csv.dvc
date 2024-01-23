@@ -1,0 +1,32 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/origin/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Treaties Database
+    description: |-
+      Since 1978, the United Nations has been publishing the status of multilateral Arms Regulation and Disarmament Agreements, presenting data on signatories, parties of relevant agreements and the texts of the agreements themselves.
+    title_snapshot: Treaties Database - Treaty on the Prohibition of Nuclear Weapons
+    description_snapshot: |-
+      This dataset contains the list of countries that have participated in the Treaty on the Prohibition of Nuclear Weapons.
+    date_published: 2023-01-23
+
+    # Citation
+    producer: United Nations Office for Disarmament Affairs
+    citation_full: |-
+      United Nations Office for Disarmament Affairs - Treaties Database (2024).
+    attribution_short: UNODA
+
+    # Files
+    url_main: https://treaties.unoda.org/t/tpnw
+    date_accessed: 2024-01-23
+
+    # License
+    license:
+      name: CC BY 4.0
+
+wdir: ../../../data/snapshots/war/2024-01-23
+outs:
+- md5: 1489652a92d697ca8725ae66085f87e9
+  size: 7957
+  path: prohibition.csv
