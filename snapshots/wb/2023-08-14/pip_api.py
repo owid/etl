@@ -13,7 +13,7 @@ Percentiles are partially constructed because the data officially published by t
 To run this code from scratch,
     - Delete the files in the cache folder:
         rm -rf .cache/pip*
-    - Run the code. There are two options, in the terminal or in the background:
+    - Run the code. You have two options to see the output, in the terminal or in the background:
         python snapshots/wb/2023-08-14/pip_api.py
         nohup poetry run python snapshots/wb/2023-08-14/pip_api.py > output.log 2>&1 &
 """

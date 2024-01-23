@@ -403,6 +403,62 @@ tables:
               - China
 
       headcount_215_regions:
+        title: $2.15 a day - Number in poverty (Regional aggregates)
+        unit: ""
+        short_unit: ""
+        description_short: Number of people in households with an income or consumption per person below $2.15 a day.
+        description_key:
+          - Extreme poverty here is defined as living below the International Poverty Line of $2.15 per day.
+          - The data is measured in international-$ at 2017 prices – this adjusts for inflation and for differences in the cost of living between countries.
+          - Depending on the country and year, the data relates to income measured after taxes and benefits, or to consumption, per capita. 'Per capita' means that the income of each household is attributed equally to each member of the household (including children).
+          - Non-market sources of income, including food grown by subsistence farmers for their own consumption, are taken into account.
+        description_processing: |-
+          PIP provides regional aggregate figures for the number of people living below the International Poverty Line. Unfortunately, for certain regions and years the data survey coverage is too low and the results are suppressed. From 1990 onwards, it is only for South Asia and Sub-Saharan Africa (on different years) that regional estimates are sometimes missing.
+
+          For these years we calculate the number of poor in the region as the difference between the estimated total number of poor across the world and the sum of the number of poor across all other regions.
+
+          Prior to 1990 estimates for more than one region are missing, precluding this method.
+        presentation:
+          title_public: Total of population living in extreme poverty by world region
+          topic_tags:
+            - Poverty
+            - Economic Growth
+            - Economic Inequality
+          faqs:
+            - fragment_id: poverty-international-poverty-line
+              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+            - fragment_id: poverty-international-dollars
+              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+            - fragment_id: poverty-comparability
+              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+            - fragment_id: poverty-regional-estimates
+              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+          grapher_config:
+            title: Total population living in extreme poverty by world region
+            subtitle: >-
+              Extreme poverty is defined as living below the International Poverty Line of
+              $2.15 per day. This data is adjusted for inflation and for differences in the
+              cost of living between countries.
+            note: >-
+              This data is expressed in [international-$](#dod:int_dollar_abbreviation) at
+              2017 prices. Depending on the country and year, it relates to income measured
+              after taxes and benefits, or to consumption, [per capita](#dod:per-capita).
+            type: StackedArea
+            addCountryMode: disabled
+            hideRelativeToggle: false
+            originUrl: https://ourworldindata.org/poverty
+            baseColorScheme: OwidCategoricalC
+            invertColorScheme: true
+            yAxis:
+              min: 0
+            selectedEntityNames:
+              - Other high income countries (PIP)
+              - Latin America and the Caribbean (PIP)
+              - East Asia and Pacific (PIP)
+              - South Asia (PIP)
+              - Middle East and North Africa (PIP)
+              - Europe and Central Asia (PIP)
+              - Sub-Saharan Africa (PIP)
 
       surveys_past_decade:
 

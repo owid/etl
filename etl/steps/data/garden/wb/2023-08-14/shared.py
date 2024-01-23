@@ -35,14 +35,14 @@ var_dict = {
     # POVERTY
     "headcount": {
         "title": "Number in poverty",
-        "description": "Percentage of population living in households with an {inc_cons_dict[wel]['name']} per person below {povline}",
+        "description": "Number of people in households with an {inc_cons_dict[wel]['name']} per person below {povline}",
         "unit": "",
         "short_unit": "",
         "numDecimalPlaces": 0,
     },
     "headcount_ratio": {
         "title": "Share of population in poverty",
-        "description": "Number of people in households with an {inc_cons_dict[wel]['name']} per person below {povline}",
+        "description": "Percentage of population living in households with an {inc_cons_dict[wel]['name']} per person below {povline}",
         "unit": "%",
         "short_unit": "%",
         "numDecimalPlaces": 1,
