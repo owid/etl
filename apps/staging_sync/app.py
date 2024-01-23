@@ -1,27 +1,28 @@
-import os
-import re
 import subprocess
 import sys
 from pathlib import Path
 
 import streamlit as st
-import streamlit.components.v1 as components
 from git.exc import GitCommandError
 from git.repo import Repo
-from rich.ansi import AnsiDecoder
-from rich.console import Console
-from rich.terminal_theme import MONOKAI
 
+from apps.utils import run_command
 from etl.paths import BASE_DIR
 
 CURRENT_DIR = Path(__file__).resolve().parent
 
 
 def main():
-    st.title("etl-staging-sync")
+    st.title("🔄 etl-staging-sync")
     st.markdown(
         """
-    Sync charts and revisions from staging server to production.
+    Synchronize charts and revisions from the source server to the target server. Typically, the source is a
+    **staging server** and the target is **live**. However, syncing charts between staging servers is also possible.
+
+    Previously, the process required merging your branch first, then waiting for the ETL to build the dataset
+    before creating charts in the live environment. In some cases, it was even necessary to push your dataset
+    directly to live. This tool allows you to first create charts on the staging server and then synchronize
+    them to the live environment after merging.
     """
     )
 
@@ -34,7 +35,7 @@ def main():
     source = st.text_input(
         "Source",
         placeholder="my-branch",
-        help="Name of the branch to sync from (with existing `staging-site-mybranch` server).",
+        help="Branch name of PR that created the staging server (with existing `staging-site-mybranch` server) or the name of staging server.",
     )
     target = st.text_input("Target", value="live", help="Using `live` uses DB from local `.env` file as target.")
     publish = st.checkbox(
@@ -74,7 +75,7 @@ def main():
         if approve_revisions:
             cmd.append("--approve-revisions")
 
-        _run_command(cmd)
+        run_command(cmd)
 
 
 def _is_valid_config(source: str, target: str) -> bool:
@@ -85,43 +86,6 @@ def _is_valid_config(source: str, target: str) -> bool:
         st.warning("Please enter a valid target.")
         return False
     return True
-
-
-def _run_command(cmd: list[str]):
-    console = Console(record=True)
-
-    # Run bash command
-    my_env = os.environ.copy()
-    my_env["FORCE_COLOR"] = "1"
-    result = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=my_env)
-    stdout, stderr = result.communicate()
-
-    stdout = stdout.decode()
-    stderr = stderr.decode()
-
-    if stderr:
-        st.markdown("### Error")
-        st.error(stderr)
-
-    stdout = _strip_log_timestamps(stdout)
-
-    decoder = AnsiDecoder()
-
-    n_lines = 0
-    for line in decoder.decode(stdout):
-        n_lines += 1
-        console.print(line, soft_wrap=True)
-
-    html = console.export_html(inline_styles=True, theme=MONOKAI)
-
-    st.markdown("### Output")
-    # st.markdown(f"`{' '.join(cmd)}`")
-    components.html(html, scrolling=True, height=n_lines * 21)
-
-
-def _strip_log_timestamps(stdout: str) -> str:
-    pattern = r"\x1b\[\dm\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\x1b\[0m "
-    return re.sub(pattern, "", stdout)
 
 
 def cli():
