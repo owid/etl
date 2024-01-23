@@ -1,7 +1,22 @@
 """Load a meadow dataset and create a garden dataset."""
 
+import json
+from typing import Dict, Tuple
+
 import owid.catalog.processing as pr
 from owid.catalog import License, Origin, Table
+from utils import (
+    COUNTRIES_FORMER_EQUIVALENTS,
+    GAPMINDER_SG_COUNTRIES,
+    GAPMINDER_SG_COUNTRIES_FORMER,
+    GAPMINDER_SG_ORIGINS,
+    SOURCES_NAMES,
+    YEAR_HYDE_END,
+    YEAR_HYDE_START,
+    YEAR_WPP_END,
+    YEAR_WPP_PROJECTIONS_START,
+    YEAR_WPP_START,
+)
 
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
@@ -9,67 +24,9 @@ from etl.helpers import PathFinder, create_dataset
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
-# Year boundaries
-YEAR_HYDE_START = -10000
-YEAR_HYDE_END = 1800
-YEAR_WPP_START = 1950
-YEAR_WPP_PROJECTIONS_START = 2022
-YEAR_WPP_END = 2100
-
-# sources names
-# this dictionary maps source short names to complete source names
-SOURCES_NAMES = {
-    "unwpp": "United Nations - World Population Prospects (2022) (https://population.un.org/wpp/Download/Standard/Population/)",
-    "gapminder_v7": "Gapminder v7 (2022) (https://www.gapminder.org/data/documentation/gd003/)",
-    "gapminder_sg": "Gapminder - Systema Globalis (2023) (https://github.com/open-numbers/ddf--gapminder--systema_globalis)",
-    "hyde": "HYDE v3.3 (2023) (https://public.yoda.uu.nl/geo/UU01/AEZZIT.html)",
-}
-
-# Gapminder Systema Globalis contains data on the following countries which can
-# complement the other sources. That is, contains older data which other sources don't have.
-GAPMINDER_SG_COUNTRIES = {
-    "akr_a_dhe": "Akrotiri and Dhekelia",
-    "bmu": "Bermuda",
-    "vgb": "British Virgin Islands",
-    "cym": "Cayman Islands",
-    "cok": "Cook Islands",
-    "nld_curacao": "Curacao",
-    "pyf": "French Polynesia",
-    "gib": "Gibraltar",
-    "gum": "Guam",
-    "gbg": "Guernsey",
-    "gbm": "Isle of Man",
-    "jey": "Jersey",
-    "kos": "Kosovo",
-    "mac": "Macao",
-    "mnp": "Northern Mariana Islands",
-    "stbar": "Saint Barthelemy",
-    "shn": "Saint Helena",
-    "stmar": "Saint Martin (French part)",
-    "sxm": "Sint Maarten (Dutch part)",
-    "tkl": "Tokelau",
-    "wlf": "Wallis and Futuna",
-    "ssd": "South Sudan",
-}
-GAPMINDER_SG_ORIGINS = [
-    Origin(
-        producer="Gapminder",
-        title="Systema Globalis",
-        citation_full="Gapminder - Systema Globalis (2023).",
-        url_main="https://github.com/open-numbers/ddf--gapminder--systema_globalis",
-        attribution="Gapminder - Systema Globalis (2022)",
-        attribution_short="Gapminder",
-        date_accessed="2023-03-31",
-        date_published="2023-02-21",  # type: ignore
-        license=License(
-            name="CC BY 4.0",
-            url="https://github.com/open-numbers/ddf--gapminder--systema_globalis",
-        ),
-    )
-]
-
 
 def run(dest_dir: str) -> None:
+    """Run main code."""
     #
     # Load inputs.
     #
@@ -85,6 +42,9 @@ def run(dest_dir: str) -> None:
     # Load Gapminder SG dataset
     ds_gapminder_sg = paths.load_dataset("gapminder__systema_globalis")
     tb_gapminder_sg = ds_gapminder_sg["total_population_with_projections"].reset_index()
+    # Load regions table
+    ds_regions = paths.load_dataset("regions")
+    tb_regions = ds_regions["regions"]
 
     #
     # Process data.
@@ -93,7 +53,7 @@ def run(dest_dir: str) -> None:
     tb_hyde = format_hyde(tb=tb_hyde)
     tb_gapminder = format_gapminder(tb_gapminder)
     tb_un = format_wpp(tb_un)
-    tb_gapminder_sg = format_gapminder_sg(tb_gapminder_sg)
+    tb_gapminder_sg, tb_gapminder_sg_former = format_gapminder_sg(tb_gapminder_sg)
 
     # Concat tables
     tb = pr.concat([tb_hyde, tb_gapminder, tb_un, tb_gapminder_sg], ignore_index=True)
@@ -113,6 +73,10 @@ def run(dest_dir: str) -> None:
     tb = add_regions(tb)
 
     # Add world
+    tb = add_world(tb)
+
+    # Add historical regions
+    tb = add_historical_regions(tb, tb_gapminder_sg_former, tb_regions)
 
     tb_un_estimates = tb_un[tb_un["variant"] == "estimates"].drop(columns=["variant"])
     tb_un_projections = tb_un[tb_un["variant"] == "medium"].drop(columns=["variant"])
@@ -265,29 +229,50 @@ def format_wpp(tb: Table) -> Table:
 ######################
 # Gapminder SG #######
 ######################
-def format_gapminder_sg(tb: Table) -> Table:
+def format_gapminder_sg(tb: Table) -> Tuple[Table, Table]:
     """Format Gapminder SG table."""
-    # filter countries
-    msk = tb["geo"].isin(GAPMINDER_SG_COUNTRIES)
-    tb = tb.loc[msk]
-
-    # rename countries
-    tb["country"] = tb["geo"].map(GAPMINDER_SG_COUNTRIES)
-
-    # columns
     columns_rename = {
         "country": "country",
         "time": "year",
         "total_population_with_projections": "population",
     }
-    tb = tb.rename(columns=columns_rename, errors="raise")[columns_rename.values()]
 
-    # Set source identifier
-    tb["source"] = "gapminder_sg"
+    def _core_formatting(tb: Table, country_rename: Dict[str, str]) -> Table:
+        ## rename countries
+        tb["country"] = tb["geo"].map(country_rename)
+        ## rename columns
+        tb = tb.rename(columns=columns_rename, errors="raise")[columns_rename.values()]
+        # Set source identifier
+        tb["source"] = "gapminder_sg"
+        # add origins
+        tb["population"].metadata.origins = GAPMINDER_SG_ORIGINS
+        return tb
 
-    # add origins
-    tb.population.metadata.origins = GAPMINDER_SG_ORIGINS
-    return tb
+    # Data on former countries
+    ## only keep former country data
+    tb_former = tb.loc[tb["geo"].isin(GAPMINDER_SG_COUNTRIES_FORMER)].copy()
+
+    # core formatting: column and country rename, add source, metadata
+    tb_former = _core_formatting(
+        tb=tb_former,
+        country_rename={code: data["name"] for code, data in GAPMINDER_SG_COUNTRIES_FORMER.items()},
+    )
+
+    ## filter years: only keep former countries until they disappear
+    for _, data in GAPMINDER_SG_COUNTRIES_FORMER.items():
+        tb = tb[~((tb["country"] == data["name"]) & (tb["year"] > data["end"]))]
+
+    # Complement
+    ## filter countries
+    tb = tb.loc[tb["geo"].isin(GAPMINDER_SG_COUNTRIES)]
+
+    # core formatting: column and country rename, add source, metadata
+    tb = _core_formatting(
+        tb=tb,
+        country_rename=GAPMINDER_SG_COUNTRIES,
+    )
+
+    return tb, tb_former
 
 
 #############################################################################################
@@ -441,7 +426,61 @@ def add_world(tb: Table) -> Table:
     return tb
 
 
-## OTHERS
+## Add historical regions
+def add_historical_regions(tb: Table, tb_gm: Table, tb_regions: Table) -> Table:
+    """Add historical regions.
+
+    Historical regions are added using different techniques:
+
+    1. Systema Globalis from Gapminder contains historical regions. We add them to the data. These include
+    Yugoslavia, USSR, etc. Note that this is added after regions and world regions have been obtained, to avoid double counting.
+    2. Add historical regions by grouping and summing current countries.
+    """
+    # 1. Add from Systema Globalis
+    paths.log.info("loading data (Gapminder Systema Globalis)")
+    # Add to main table
+    tb = pr.concat([tb, tb_gm], ignore_index=True)
+
+    # 2. Add historical regions by grouping and summing current countries.
+    for code in COUNTRIES_FORMER_EQUIVALENTS:
+        # Get former country name and end year (dissolution)
+        former_country_name = tb_regions.loc[code, "name"]
+        end_year = tb_regions.loc[code, "end_year"]
+        # Sanity check: former country not already in table! remember that we are creating it now
+        assert former_country_name not in set(
+            tb["country"]
+        ), f"{former_country_name} already in table (either import it via Systema Globalis or manual aggregation)!"
+        # Get list of country successors (equivalent of former state with nowadays' countries) and end year (dissolution of former state)
+        codes_successors = json.loads(tb_regions.loc[code, "successors"])
+        countries_successors = tb_regions.loc[codes_successors, "name"].tolist()
+        # Filter table accordingly
+        tb_suc = tb[(tb["year"] <= end_year) & (tb["country"].isin(countries_successors))]
+        # Filter rows (only preserve years where all countries have data)
+        year_filter = tb_suc.groupby("year")["country"].nunique() == len(countries_successors)
+        year_filter = year_filter[year_filter].index.tolist()
+        tb_suc = tb_suc[tb_suc["year"].isin(year_filter)]
+        # Perform operations
+        tb_suc = tb_suc.groupby("year", as_index=False, observed=True).agg(
+            {"population": sum, "source": lambda x: "; ".join(sorted(set(x)))}
+        )
+        tb_suc["country"] = former_country_name
+        # Add to main table
+        tb = pr.concat([tb, tb_suc], ignore_index=True)
+    return tb
+
+
+def fix_anomalies(tb: Table) -> Table:
+    """Make sure that all rows make sense.
+
+    - Remove rows with population = 0.
+    - Remove datapoints for the Netherland Antilles after 2010 (it was dissolved then), as HYDE has data after that year.
+    """
+    paths.log.info("filter rows...")
+    # remove datapoints with population = 0
+    tb = tb[tb["population"] > 0].copy()
+    # remove datapoints for the Netherland Antilles after 2010 (it was dissolved then)
+    tb = tb[~((tb["country"] == "Netherlands Antilles") & (tb["year"] > 2010))]
+    return tb
 
 
 def generate_auxiliary_table(tb: Table) -> Table:
