@@ -738,7 +738,7 @@ def survey_count(tb: Table) -> Table:
     Create survey count indicator, by counting the number of surveys available for each country in the past decade
     """
     # Remove regions from the table
-    tb_survey = tb[tb["reporting_level"].isnull()].reset_index(drop=True)
+    tb_survey = tb[~tb["reporting_level"].isnull()].reset_index(drop=True)
 
     min_year = int(tb_survey["year"].min())
     max_year = int(tb_survey["year"].max())
@@ -759,6 +759,7 @@ def survey_count(tb: Table) -> Table:
     )
 
     # Mark with 1 if there are surveys available, 0 if not (this is done by checking if the row is in both datasets)
+    tb_survey["survey_available"] = 0
     tb_survey.loc[tb_survey["_merge"] == "both", "survey_available"] = 1
 
     # Sum for each entity the surveys available for the previous 9 years and the current year
@@ -769,6 +770,9 @@ def survey_count(tb: Table) -> Table:
         .sum()
         .values
     )
+
+    # Copy metadata
+    tb_survey["surveys_past_decade"] = tb_survey["surveys_past_decade"].copy_metadata(tb["reporting_level"])
 
     tb_survey = tb_survey[["country", "year", "surveys_past_decade"]]
 

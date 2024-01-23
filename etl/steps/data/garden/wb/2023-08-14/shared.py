@@ -69,7 +69,7 @@ var_dict = {
         "numDecimalPlaces": 1,
     },
     "poverty_gap_index": {
-        "title": "Poverty Gap Index",
+        "title": "Poverty gap index",
         "description": "The poverty gap index is a poverty measure that reflects both the prevalence and the depth of poverty. It is calculated as the share of population in poverty multiplied by the average shortfall from the poverty line (expressed as a % of the poverty line).",
         "unit": "%",
         "short_unit": "%",
