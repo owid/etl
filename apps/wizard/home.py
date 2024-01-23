@@ -92,6 +92,11 @@ pages = [
         "image": "https://cdn.pixabay.com/photo/2017/08/30/01/05/milky-way-2695569_1280.jpg",
         "key": "D",
     },
+    {
+        "title": "Staging Sync",
+        "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e7/Font_Awesome_5_solid_sync-alt.svg/640px-Font_Awesome_5_solid_sync-alt.svg.png",
+        "key": "S",
+    },
 ]
 columns = st.columns(len(pages))
 # keys = "qwertasdfgzxcvb".upper()
