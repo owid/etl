@@ -1,0 +1,16 @@
+dataset:
+  update_period_days: 365
+
+tables:
+  nuclear_weapons_treaties:
+    title: "Nuclear Weapons Treaties"
+    variables:
+      status:
+        title: Status on a specific treaty
+        unit: ""
+        short_unit: ""
+        processing_level: major
+        presentation:
+          topic_tags:
+            - Nuclear Weapons
+            - War & Peace
