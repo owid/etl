@@ -1,13 +1,9 @@
 import subprocess
-import sys
 from pathlib import Path
 
 import streamlit as st
-from git.exc import GitCommandError
-from git.repo import Repo
 
 from apps.utils import run_command
-from etl.paths import BASE_DIR
 
 CURRENT_DIR = Path(__file__).resolve().parent
 
@@ -56,16 +52,6 @@ def main():
     if st.button("Sync charts", help="This can take a while."):
         if not _is_valid_config(source, target):
             return
-
-        # Open the local repository
-        repo = Repo(BASE_DIR)
-
-        # Fetch the specific branch from the remote
-        try:
-            repo.git.fetch("origin", source)
-        except GitCommandError:
-            st.error(f"Branch {source} not found in owid/etl repository.")
-            sys.exit(1)
 
         cmd = ["poetry", "run", "etl-staging-sync", source, "master"]
         if dry_run:

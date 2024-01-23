@@ -4,9 +4,12 @@ import subprocess
 
 import streamlit as st
 import streamlit.components.v1 as components
+import structlog
 from rich.ansi import AnsiDecoder
 from rich.console import Console
 from rich.terminal_theme import MONOKAI
+
+log = structlog.get_logger()
 
 
 def run_command(cmd: list[str]):
@@ -16,6 +19,7 @@ def run_command(cmd: list[str]):
     # Run bash command
     my_env = os.environ.copy()
     my_env["FORCE_COLOR"] = "1"
+    log.info("run_command", cmd=cmd)
     result = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=my_env)
     stdout, stderr = result.communicate()
 

@@ -1,7 +1,6 @@
 import copy
 import datetime as dt
 import re
-import subprocess
 from pathlib import Path
 from typing import Any, Dict, Optional, Set
 
@@ -377,32 +376,6 @@ def _modified_chart_ids_by_admin(session: Session) -> Set[int]:
     where updatedBy = 1 and status = 'approved'
     """
     return set(pd.read_sql(q, session.bind).chartId.tolist())
-
-
-def _branch_exists_locally(branch_name: str) -> bool:
-    try:
-        # Run the git branch command with the specific branch name
-        result = subprocess.run(["git", "branch", "--list", branch_name], stdout=subprocess.PIPE, text=True, check=True)
-
-        # Check if the branch name is in the command output
-        return branch_name in result.stdout
-    except subprocess.CalledProcessError:
-        # Handle errors (e.g., not a git repository)
-        return False
-
-
-def _branch_exists_in_origin(branch_name: str) -> bool:
-    try:
-        # Run the git ls-remote command for the 'origin' remote and the specific branch
-        result = subprocess.run(
-            ["git", "ls-remote", "--heads", "origin", branch_name], stdout=subprocess.PIPE, text=True, check=True
-        )
-
-        # Check if the output contains the branch name
-        return branch_name in result.stdout
-    except subprocess.CalledProcessError:
-        # Handle errors (e.g., remote not found)
-        return False
 
 
 def _get_git_branch_creation_date(branch_name: str) -> dt.datetime:
