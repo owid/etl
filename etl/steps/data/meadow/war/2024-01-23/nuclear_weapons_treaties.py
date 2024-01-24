@@ -24,7 +24,7 @@ def run(dest_dir: str) -> None:
     for treaty in TREATIES:
         # Retrieve snapshot and read its data.
         snap = paths.load_snapshot(f"{treaty}.csv")
-        tb = snap.read().assign(**{"treaty": treaty})
+        tb = snap.read().assign(**{"treaty": TREATIES[treaty]})
         data.append(tb)
 
     #

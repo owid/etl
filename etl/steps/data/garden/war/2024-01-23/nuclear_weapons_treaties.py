@@ -1,5 +1,9 @@
 """Load a meadow dataset and create a garden dataset."""
 
+import owid.catalog.processing as pr
+import pandas as pd
+from owid.catalog import Table
+
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
 
@@ -27,47 +31,14 @@ LABEL_AGREED = "Agreed"
 LABEL_COMMITTED = "Committed"
 # Label for the exceptional status "Withdrawal", which denotes a country that has withdrawn from the legal commitment.
 LABEL_WITHDRAWN = "Withdrawn"
-
+# Label for all countries-years that are not posterior to either an agreement or a commitment.
+LABEL_NOT_CONSIDERED = "Not participating"
 
 # List of known withdrawals of any treaty.
-WITHDRAWALS = [{"treaty": "comprehensive_test_ban", "country": "Russia", "date": "2023-11-03"}]
+WITHDRAWALS = [{"treaty": "Comprehensive Nuclear-Test-Ban Treaty", "country": "Russia", "date": "2023-11-03"}]
 
 
-def prioritize_status(statuses):
-    """Prioritize the status of a country."""
-    if LABEL_WITHDRAWN in statuses:
-        # I assume that a country does not withdraw from a treaty in the same year that it joins, and that it
-        # doesn't rejoin the treaty in the same year.
-        assert set(statuses) == {LABEL_WITHDRAWN}
-        return LABEL_WITHDRAWN
-
-    if LABEL_COMMITTED in statuses:
-        # If a country commits, that should be the final status (unless there is a withdrawal).
-        return LABEL_COMMITTED
-    else:
-        # If not withdrawn or committed, the only possible status should be agreed. Check that.
-        assert set(statuses) == {LABEL_AGREED}
-        return LABEL_AGREED
-
-
-def run(dest_dir: str) -> None:
-    #
-    # Load inputs.
-    #
-    # Load meadow dataset and read its main table.
-    ds_meadow = paths.load_dataset("nuclear_weapons_treaties")
-    tb = ds_meadow["nuclear_weapons_treaties"].reset_index()
-
-    #
-    # Process data.
-    #
-    # Select and rename columns; and ensure all columns are string (to avoid issues with categorical columns).
-    tb = tb[COLUMNS.keys()].rename(columns=COLUMNS, errors="raise").astype(str)
-
-    # Harmonize country names (of states and depositaries).
-    tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
-
-    # Sanity checks.
+def run_sanity_checks(tb: Table) -> None:
     for treaty in set(tb["treaty"]):
         _tb = tb[tb["treaty"] == treaty].reset_index(drop=True)
         # Check that countries that have the status "Succession" did not previously have only the status "Signatory".
@@ -88,6 +59,68 @@ def run(dest_dir: str) -> None:
         WITHDRAWALS  # type: ignore
     ), error
 
+
+def prioritize_status(statuses):
+    # Prioritize the status of a country.
+    if LABEL_WITHDRAWN in statuses:
+        # I assume that a country does not withdraw from a treaty in the same year that it joins, and that it
+        # doesn't rejoin the treaty in the same year.
+        assert set(statuses) == {LABEL_WITHDRAWN}
+        return LABEL_WITHDRAWN
+
+    if LABEL_COMMITTED in statuses:
+        # If a country commits, that should be the final status (unless there is a withdrawal).
+        return LABEL_COMMITTED
+    else:
+        # If not withdrawn or committed, the only possible status should be agreed. Check that.
+        assert set(statuses) == {LABEL_AGREED}
+        return LABEL_AGREED
+
+
+def expand_data_to_all_years(tb: Table) -> Table:
+    tb = tb.copy()
+    # Extract the maximum year from the publication date of the data.
+    year_max = int(tb["status"].metadata.origins[0].date_published.split("-")[0])
+
+    # For each treaty, find the minimum year (which should be the year when it was signed for the first time)
+    # and find all combinations of countries and years.
+    # Then concatenate those combinations for all treaties.
+    all_combinations = pr.concat(
+        [
+            Table(
+                pd.MultiIndex.from_product(
+                    [[treaty], tb["country"].unique(), range(tb[tb["treaty"] == treaty]["year"].min(), year_max)],
+                    names=["treaty", "country", "year"],
+                ).to_frame(index=False)
+            )
+            for treaty in tb["treaty"].unique()
+        ]
+    )
+    tb = tb.merge(all_combinations, on=["treaty", "country", "year"], how="right")
+
+    return tb
+
+
+def run(dest_dir: str) -> None:
+    #
+    # Load inputs.
+    #
+    # Load meadow dataset and read its main table.
+    ds_meadow = paths.load_dataset("nuclear_weapons_treaties")
+    tb = ds_meadow["nuclear_weapons_treaties"].reset_index()
+
+    #
+    # Process data.
+    #
+    # Select and rename columns; and ensure all columns are string (to avoid issues with categorical columns).
+    tb = tb[list(COLUMNS)].rename(columns=COLUMNS, errors="raise").astype(str)
+
+    # Harmonize country names.
+    tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
+
+    # Run sanity checks.
+    run_sanity_checks(tb)
+
     # For simplicity, rename the status of a country to simpler terms.
     tb.loc[tb["status"] == "Signatory", "status"] = LABEL_AGREED
     tb.loc[tb["status"].isin(["Succession", "Accession", "Ratification"]), "status"] = LABEL_COMMITTED
@@ -101,8 +134,19 @@ def run(dest_dir: str) -> None:
         {"status": lambda x: prioritize_status(x.values)}
     )
 
-    # Set an appropriate index and sort conveniently.
-    tb = tb.set_index(["treaty", "country", "year"], verify_integrity=True).sort_index()
+    # Add a row for each treaty and country-year (with an empty status).
+    tb = expand_data_to_all_years(tb=tb)
+
+    # Forward fill the status of each country-year, and for the years before the first event in a country, fill with a
+    # generic status.
+    tb["status"] = tb.groupby(["treaty", "country"])["status"].ffill()
+    tb["status"] = tb["status"].fillna(LABEL_NOT_CONSIDERED)
+
+    # Transpose the table to have a column for the status of each treaty.
+    tb = tb.pivot(index=["country", "year"], columns="treaty", values="status", join_column_levels_with=" ")
+
+    # Make columns snake-case, set an appropriate index and sort conveniently.
+    tb = tb.underscore().set_index(["country", "year"], verify_integrity=True).sort_index()
 
     #
     # Save outputs.
