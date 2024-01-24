@@ -33,14 +33,11 @@ def format_slack_message(method, url, status_code, req_body, res_body):
     else:
         emoji = ":warning:"
 
-    return f"""
-{emoji} *{method}* {url}
-Request
-```
-{req_body}
-```
-Response
-```
-{res_body}
-```
-    """
+    message = f"{emoji} *{method}* {url}\n"
+
+    if req_body:
+        message += f"Request\n```\n{req_body}\n```\n"
+
+    message += f"Response\n```\n{res_body}\n```\n"
+
+    return message

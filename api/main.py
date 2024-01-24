@@ -50,6 +50,10 @@ async def slack_middleware(request: Request, call_next):
     if request.method == "OPTIONS":
         return await call_next(request)
 
+    # don't log favicon requests
+    if "favicon.ico" in request.url.path:
+        return await call_next(request)
+
     req_body = await request.body()
 
     log.info("request", method=request.method, url=str(request.url), body=req_body)
