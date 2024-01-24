@@ -88,25 +88,60 @@ def run(dest_dir: str) -> None:
     # Create survey count dataset, by counting the number of surveys available for each country in the past decade
     tb_inc_or_cons_2017 = survey_count(tb_inc_or_cons_2017)
 
-    # Add short name and drop columns not needed. Also, set index and sort
-    tb_inc_2011 = add_short_name_and_drop_cols(tb=tb_inc_2011, short_name="inc_2011")
-    tb_cons_2011 = add_short_name_and_drop_cols(tb=tb_cons_2011, short_name="cons_2011")
-    tb_inc_or_cons_2011 = add_short_name_and_drop_cols(tb=tb_inc_or_cons_2011, short_name="inc_or_cons_2011")
+    # Add short name. Also, set index and sort
+    tb_inc_2011 = add_short_name_and_dataset_title(tb=tb_inc_2011, short_name="inc_2011", ppp_version=2011)
+    tb_cons_2011 = add_short_name_and_dataset_title(tb=tb_cons_2011, short_name="cons_2011", ppp_version=2011)
+    tb_inc_or_cons_2011 = add_short_name_and_dataset_title(
+        tb=tb_inc_or_cons_2011, short_name="inc_or_cons_2011", ppp_version=2011
+    )
 
-    tb_inc_2017 = add_short_name_and_drop_cols(tb=tb_inc_2017, short_name="inc_2017")
-    tb_cons_2017 = add_short_name_and_drop_cols(tb=tb_cons_2017, short_name="cons_2017")
-    tb_inc_or_cons_2017 = add_short_name_and_drop_cols(tb=tb_inc_or_cons_2017, short_name="inc_or_cons_2017")
+    tb_inc_2017 = add_short_name_and_dataset_title(tb=tb_inc_2017, short_name="inc_2017", ppp_version=2017)
+    tb_cons_2017 = add_short_name_and_dataset_title(tb=tb_cons_2017, short_name="cons_2017", ppp_version=2017)
+    tb_inc_or_cons_2017 = add_short_name_and_dataset_title(
+        tb=tb_inc_or_cons_2017, short_name="inc_or_cons_2017", ppp_version=2017
+    )
+
+    # Create spell tables to separate different survey spells in the explorers
+    spell_tables_inc = create_survey_spells(tb=tb_inc_2017)
+    spell_tables_cons = create_survey_spells(tb=tb_cons_2017)
+    spell_tables_inc_or_cons = create_survey_spells(tb=tb_inc_or_cons_2017)
+
+    # Drop columns not needed
+    tb_inc_2011 = drop_columns(tb_inc_2011)
+    tb_cons_2011 = drop_columns(tb_cons_2011)
+    tb_inc_or_cons_2011 = drop_columns(tb_inc_or_cons_2011)
+
+    tb_inc_2017 = drop_columns(tb_inc_2017)
+    tb_cons_2017 = drop_columns(tb_cons_2017)
+    tb_inc_or_cons_2017 = drop_columns(tb_inc_or_cons_2017)
+
+    # Merge tables for PPP comparison explorer
+    tb_inc_2011_2017 = combine_tables_2011_2017(tb_2011=tb_inc_2011, tb_2017=tb_inc_2017, short_name="inc_2011_2017")
+    tb_cons_2011_2017 = combine_tables_2011_2017(
+        tb_2011=tb_cons_2011, tb_2017=tb_cons_2017, short_name="cons_2011_2017"
+    )
+    tb_inc_or_cons_2011_2017 = combine_tables_2011_2017(
+        tb_2011=tb_inc_or_cons_2011, tb_2017=tb_inc_or_cons_2017, short_name="inc_or_cons_2011_2017"
+    )
 
     # Define tables to upload
-    # The ones we need in Grapher admin would be tb_inc_or_cons_2011, tb_inc_or_cons_2017, tb_regions and tb_survey_count
-    tables = [
-        tb_inc_2011,
-        tb_cons_2011,
-        tb_inc_or_cons_2011,
-        tb_inc_2017,
-        tb_cons_2017,
-        tb_inc_or_cons_2017,
-    ]
+    # The ones we need in Grapher admin would be tb_inc_or_cons_2011, tb_inc_or_cons_2017
+    tables = (
+        [
+            tb_inc_2011,
+            tb_cons_2011,
+            tb_inc_or_cons_2011,
+            tb_inc_2017,
+            tb_cons_2017,
+            tb_inc_or_cons_2017,
+            tb_inc_2011_2017,
+            tb_cons_2011_2017,
+            tb_inc_or_cons_2011_2017,
+        ]
+        + spell_tables_inc
+        + spell_tables_cons
+        + spell_tables_inc_or_cons
+    )
 
     #
     # Save outputs.
@@ -678,8 +713,13 @@ def regional_headcount(tb: Table) -> Table:
     # Keep only regional data: for regions, these are the reporting_level rows not in ['national', 'urban', 'rural']
     tb_regions = tb[~tb["reporting_level"].isin(["national", "urban", "rural"])].reset_index(drop=True)
 
-    tb_regions = tb_regions[["country", "year", "headcount_215"]]
+    # Remove Western and Central and Eastern and Southern Africa. It's redundant with Sub-Saharan Africa (PIP)
+    tb_regions = tb_regions[
+        ~tb_regions["country"].isin(["Western and Central Africa (PIP)", "Eastern and Southern Africa (PIP)"])
+    ].reset_index(drop=True)
 
+    # Select needed columns and pivot
+    tb_regions = tb_regions[["country", "year", "headcount_215"]]
     tb_regions = tb_regions.pivot(index="year", columns="country", values="headcount_215")
 
     # Drop rows with more than one region with null headcount
@@ -706,20 +746,23 @@ def regional_headcount(tb: Table) -> Table:
     tb_regions.loc[:, cols_to_sum] = tb_regions[cols_to_sum].fillna(col_dictionary)
     tb_regions = tb_regions.drop(columns=["World", "sum_regions", "diff_world_regions"])
 
-    # Get headcount values for China and India
-    df_chn_ind = tb[(tb["country"].isin(["China", "India"])) & (tb["reporting_level"] == "national")].reset_index(
-        drop=True
-    )
-    df_chn_ind = df_chn_ind[["country", "year", "headcount_215"]]
+    # NOTE: I am not extracting data for China and India at least for now, because we are only extracting non filled data
+    # The data originally came from filled data to plot properly.
 
-    # Make table wide and merge with regional data
-    df_chn_ind = df_chn_ind.pivot(index="year", columns="country", values="headcount_215").reset_index()
-    tb_regions = pr.merge(tb_regions, df_chn_ind, on="year", how="left")
+    # # Get headcount values for China and India
+    # df_chn_ind = tb[(tb["country"].isin(["China", "India"])) & (tb["reporting_level"] == "national")].reset_index(
+    #     drop=True
+    # )
+    # df_chn_ind = df_chn_ind[["country", "year", "headcount_215"]]
 
-    tb_regions["East Asia and Pacific excluding China"] = (
-        tb_regions["East Asia and Pacific (PIP)"] - tb_regions["China"]
-    )
-    tb_regions["South Asia excluding India"] = tb_regions["South Asia (PIP)"] - tb_regions["India"]
+    # # Make table wide and merge with regional data
+    # df_chn_ind = df_chn_ind.pivot(index="year", columns="country", values="headcount_215").reset_index()
+    # tb_regions = pr.merge(tb_regions, df_chn_ind, on="year", how="left")
+
+    # tb_regions["East Asia and Pacific excluding China"] = (
+    #     tb_regions["East Asia and Pacific (PIP)"] - tb_regions["China"]
+    # )
+    # tb_regions["South Asia excluding India"] = tb_regions["South Asia (PIP)"] - tb_regions["India"]
 
     tb_regions = pr.melt(tb_regions, id_vars=["year"], var_name="country", value_name="headcount_215")
     tb_regions = tb_regions[["country", "year", "headcount_215"]]
@@ -782,13 +825,27 @@ def survey_count(tb: Table) -> Table:
     return tb
 
 
-def add_short_name_and_drop_cols(tb: Table, short_name: str) -> Table:
+def add_short_name_and_dataset_title(tb: Table, short_name: str, ppp_version: int) -> Table:
     """
-    Add short name and drop columns not needed. Also, add index and sort
+    Add short name. Also, add index and sort
     """
 
     # Add short name
     tb.metadata.short_name = short_name
+
+    # Update dataset name
+    tb.metadata.title = f"{tb.metadata.title} ({ppp_version})"
+
+    # Add index and sort
+    tb = tb.set_index(["country", "year"], verify_integrity=True).sort_index()
+
+    return tb
+
+
+def drop_columns(tb: Table) -> Table:
+    """
+    Drop columns not needed
+    """
 
     # Remove columns
     tb = tb.drop(
@@ -800,10 +857,129 @@ def add_short_name_and_drop_cols(tb: Table, short_name: str) -> Table:
             "is_interpolated",
             "distribution_type",
             "estimation_type",
+            "survey_comparability",
+            "comparable_spell",
         ]
     )
 
+    return tb
+
+
+def create_survey_spells(tb: Table) -> list:
+    """
+    Create tables for each indicator and survey spells, to be able to graph them in explorers.
+    """
+
+    tb = tb.copy()
+
+    # drop rows where survey coverage = nan (This is just regions)
+    tb = tb[tb["survey_comparability"].notna()].reset_index()
+
+    # Add 1 to make comparability var run from 1, not from 0
+    tb["survey_comparability"] += 1
+
+    # Note the welfare type in the comparability spell
+    tb["survey_comparability"] = (
+        tb["welfare_type"].astype(str) + "_spell_" + tb["survey_comparability"].astype(int).astype(str)
+    )
+
+    vars = [
+        i
+        for i in tb.columns
+        if i
+        not in [
+            "country",
+            "year",
+            "ppp_version",
+            "reporting_level",
+            "welfare_type",
+            "reporting_pop",
+            "is_interpolated",
+            "distribution_type",
+            "estimation_type",
+            "survey_comparability",
+            "comparable_spell",
+        ]
+    ]
+
+    # Define spell table list
+    spell_tables = []
+
+    # Loop over the variables in the main dataset
+    for select_var in vars:
+        tb_var = tb[["country", "year", select_var, "survey_comparability"]]
+
+        # convert to wide
+        tb_var = pr.pivot(
+            tb_var,
+            index=["country", "year"],
+            columns=["survey_comparability"],
+            values=select_var,
+        )
+
+        tb_var.metadata.short_name = f"{tb_var.metadata.short_name}_{select_var}"
+
+        spell_tables.append(tb_var)
+
+    return spell_tables
+
+
+def combine_tables_2011_2017(tb_2011: Table, tb_2017: Table, short_name: str) -> Table:
+    """
+    Combine income and consumption tables from 2011 and 2017 PPPs.
+    We will use this table for the Poverty Data Explorer: World Bank data - 2011 vs. 2017 prices.
+    """
+
+    # Identify columns to use (ID + indicators)
+    id_cols = ["country", "year"]
+
+    tb_2011 = define_columns_for_ppp_comparison(tb=tb_2011, id_cols=id_cols, ppp_version=2011)
+    tb_2017 = define_columns_for_ppp_comparison(tb=tb_2017, id_cols=id_cols, ppp_version=2017)
+
+    # Rename all the non-id columns with the suffix _ppp(year)
+    # (the suffix option in merge only adds suffix when columns coincide)
+    tb_2011 = tb_2011.rename(columns={c: c + "_ppp2011" for c in tb_2011.columns if c not in id_cols})
+    tb_2017 = tb_2017.rename(columns={c: c + "_ppp2017" for c in tb_2017.columns if c not in id_cols})
+
+    # Merge the two files and save
+    tb_2011_2017 = pr.merge(tb_2011, tb_2017, on=id_cols, validate="one_to_one", short_name=short_name)
+
     # Add index and sort
-    tb = tb.set_index(["country", "year"], verify_integrity=True).sort_index()
+    tb_2011_2017 = tb_2011_2017.set_index(["country", "year"], verify_integrity=True).sort_index()
+
+    return tb_2011_2017
+
+
+def define_columns_for_ppp_comparison(tb: Table, id_cols: list, ppp_version: int) -> Table:
+    """
+    Define columns to use for the comparison of 2011 and 2017 PPPs
+    """
+
+    tb = tb.copy().reset_index()
+    # Define poverty lines
+    povlines_list = povlines_dict[ppp_version]
+
+    # Define groups of columns
+    headcount_absolute_cols = [f"headcount_{p}" for p in povlines_list]
+    headcount_ratio_absolute_cols = [f"headcount_ratio_{p}" for p in povlines_list]
+
+    headcount_relative_cols = [f"headcount_{str(rel)}_median" for rel in [40, 50, 60]]
+    headcount_ratio_relative_cols = [f"headcount_ratio_{str(rel)}_median" for rel in [40, 50, 60]]
+
+    # Define all the columns to filter
+    cols_list = id_cols + headcount_absolute_cols + headcount_ratio_absolute_cols + ["mean", "median"]
+
+    # # NOTE: Use this list of columns when the definitive file is ready
+    # cols_list = (
+    #     id_cols
+    #     + headcount_absolute_cols
+    #     + headcount_ratio_absolute_cols
+    #     + headcount_relative_cols
+    #     + headcount_ratio_relative_cols
+    #     + ["mean", "median", "decile1_thr", "decile9_thr"],
+    # )
+
+    # Filter columns
+    tb = tb[cols_list]
 
     return tb

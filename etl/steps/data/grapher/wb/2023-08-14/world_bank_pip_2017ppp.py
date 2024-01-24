@@ -14,8 +14,7 @@ def run(dest_dir: str) -> None:
     ds_garden = paths.load_dataset("world_bank_pip")
 
     # Read tables from garden dataset.
-    tb_2011 = ds_garden["inc_or_cons_2011"]
-    tb_2017 = ds_garden["inc_or_cons_2017"]
+    tb = ds_garden["inc_or_cons_2017"]
 
     #
     # Process data.
@@ -26,7 +25,7 @@ def run(dest_dir: str) -> None:
     #
     # Create a new grapher dataset with the same metadata as the garden dataset.
     ds_grapher = create_dataset(
-        dest_dir, tables=[tb_2011, tb_2017], check_variables_metadata=True, default_metadata=ds_garden.metadata
+        dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=ds_garden.metadata
     )
 
     # Save changes in the new grapher dataset.
