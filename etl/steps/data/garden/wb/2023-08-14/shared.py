@@ -152,21 +152,21 @@ var_dict = {
         "description": "Mean {inc_cons_dict[wel]['name']}.",
         "unit": "international-$ in {ppp} prices",
         "short_unit": "$",
-        "numDecimalPlaces": 0,
+        "numDecimalPlaces": 2,
     },
     "median": {
         "title": "Median",
         "description": "Median {inc_cons_dict[wel]['name']}.",
         "unit": "international-$ in {ppp} prices",
         "short_unit": "$",
-        "numDecimalPlaces": 0,
+        "numDecimalPlaces": 2,
     },
     "avg": {
         "title": "Average",
         "description": "The mean {inc_cons_dict[wel]['name_distribution']} per year within the {pct_dict[pct]['decile10']} (tenth of the population).",
         "unit": "international-$ in {ppp} prices",
         "short_unit": "$",
-        "numDecimalPlaces": 0,
+        "numDecimalPlaces": 2,
     },
     "share": {
         "title": "Share",
@@ -180,7 +180,7 @@ var_dict = {
         "description": "The level of {inc_cons_dict[wel]['name_distribution']} per year below which {str(pct)}% of the population falls.",
         "unit": "international-$ in {ppp} prices",
         "short_unit": "$",
-        "numDecimalPlaces": 0,
+        "numDecimalPlaces": 2,
     },
     "bottom50_share": {
         "title": "Share of the bottom 50%",
