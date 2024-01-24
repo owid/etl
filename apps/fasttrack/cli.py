@@ -64,11 +64,6 @@ with open("apps/fasttrack/styles.css", "r") as f:
 
 @click.command()
 @click.option(
-    "--commit",
-    is_flag=True,
-    help="Commit changes to git repository",
-)
-@click.option(
     "--dummy-data",
     is_flag=True,
     help="Prefill form with dummy data, useful for development",
@@ -84,11 +79,11 @@ with open("apps/fasttrack/styles.css", "r") as f:
     default=DEFAULT_FASTTRACK_PORT,
     help="Port to run the server on",
 )
-def cli(commit: bool, dummy_data: bool, auto_open: bool, port: int) -> None:
+def cli(dummy_data: bool, auto_open: bool, port: int) -> None:
     print(f"Fasttrack has been opened at http://localhost:{port}/")
 
     start_server(
-        lambda: app(dummy_data=dummy_data, commit=commit),
+        lambda: app(dummy_data=dummy_data),
         port=port,
         debug=True,
         auto_open_webbrowser=auto_open,
@@ -219,7 +214,7 @@ def catch_exceptions(func):
 
 
 @catch_exceptions
-def app(dummy_data: bool, commit: bool) -> None:
+def app(dummy_data: bool) -> None:
     dummies = DUMMY_DATA if dummy_data else {}
     with open(CURRENT_DIR / "intro.md", "r") as f:
         po.put_markdown(f.read())
@@ -292,7 +287,7 @@ def app(dummy_data: bool, commit: bool) -> None:
     )
     po.put_success("Import to MySQL successful!")
 
-    if commit:
+    if config.FASTTRACK_COMMIT:
         po.put_markdown("""## Commiting and pushing to Github...""")
         github_link = _commit_and_push(fast_import, snapshot_path)
         po.put_success("Changes commited and pushed successfully!")
