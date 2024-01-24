@@ -797,9 +797,7 @@ def survey_count(tb: Table) -> Table:
     cross = cross.rename(columns={"0_x": "country", "0_y": "year"})
 
     # Merge cross and df_country, to include all the possible rows in the dataset
-    tb_survey = pr.merge(
-        cross, tb_survey[["country", "year", "reporting_level"]], on=["country", "year"], how="left", indicator=True
-    )
+    tb_survey = pr.merge(cross, tb_survey[["country", "year"]], on=["country", "year"], how="left", indicator=True)
 
     # Mark with 1 if there are surveys available, 0 if not (this is done by checking if the row is in both datasets)
     tb_survey["survey_available"] = 0
@@ -817,10 +815,11 @@ def survey_count(tb: Table) -> Table:
     # Copy metadata
     tb_survey["surveys_past_decade"] = tb_survey["surveys_past_decade"].copy_metadata(tb["reporting_level"])
 
+    # Keep columns needed
     tb_survey = tb_survey[["country", "year", "surveys_past_decade"]]
 
     # Merge with original table
-    tb = pr.merge(tb, tb_survey, on=["country", "year"], how="left")
+    tb = pr.merge(tb_survey, tb, on=["country", "year"], how="left")
 
     return tb
 
