@@ -193,3 +193,5 @@ steps:
     - data://meadow/war/2024-01-23/nuclear_weapons_treaties
   data://grapher/war/2024-01-23/nuclear_weapons_treaties:
     - data://garden/war/2024-01-23/nuclear_weapons_treaties
+  data://grapher/war/2024-01-23/nuclear_weapons_treaties_country_counts:
+    - data://garden/war/2024-01-23/nuclear_weapons_treaties

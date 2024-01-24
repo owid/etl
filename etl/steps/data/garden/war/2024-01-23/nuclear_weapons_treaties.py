@@ -142,15 +142,29 @@ def run(dest_dir: str) -> None:
     tb["status"] = tb.groupby(["treaty", "country"])["status"].ffill()
     tb["status"] = tb["status"].fillna(LABEL_NOT_CONSIDERED)
 
-    # Transpose the table to have a column for the status of each treaty.
+    # Create a table with the number of countries that have each status for each treaty and year.
+    tb_counts = tb.groupby(["treaty", "year", "status"]).count().reset_index().rename(columns={"country": "countries"})
+
+    # Transpose the main table to have a column for the status of each treaty.
     tb = tb.pivot(index=["country", "year"], columns="treaty", values="status", join_column_levels_with=" ")
+
+    # Transpose the counts table to have a column for the number of countries of each treaty.
+    tb_counts = tb_counts.pivot(
+        index=["year", "status"], columns=["treaty"], values="countries", join_column_levels_with=" - "
+    )
+
+    # Rename counts table.
+    tb_counts.metadata.short_name = "nuclear_weapons_treaties_country_counts"
 
     # Make columns snake-case, set an appropriate index and sort conveniently.
     tb = tb.underscore().set_index(["country", "year"], verify_integrity=True).sort_index()
+    tb_counts = tb_counts.underscore().set_index(["year", "status"], verify_integrity=True).sort_index()
 
     #
     # Save outputs.
     #
     # Create a new garden dataset.
-    ds_garden = create_dataset(dest_dir, tables=[tb], check_variables_metadata=True)
+    ds_garden = create_dataset(
+        dest_dir, tables=[tb, tb_counts], check_variables_metadata=True, default_metadata=ds_meadow.metadata
+    )
     ds_garden.save()
