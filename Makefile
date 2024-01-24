@@ -2,11 +2,11 @@
 #  Makefile
 #
 
-.PHONY: etl docs full lab test-default publish grapher dot watch clean clobber deploy
+.PHONY: etl docs full lab test-default publish grapher dot watch clean clobber deploy api
 
 include default.mk
 
-SRC = etl snapshots apps tests docs
+SRC = etl snapshots apps api tests docs
 PYTHON_PLATFORM = $(shell python -c "import sys; print(sys.platform)")
 LIBS = lib/*
 
@@ -25,6 +25,7 @@ help:
 	@echo '  make grapher   	Publish supported datasets to Grapher'
 	@echo '  make lab       	Start a Jupyter Lab server'
 	@echo '  make publish   	Publish the generated catalog to S3'
+	@echo '  make api   		Start the ETL API on port 8000'
 	@echo '  make test      	Run all linting and unit tests'
 	@echo '  make test-all  	Run all linting and unit tests (including for modules in lib/)'
 	@echo '  make watch     	Run all tests, watching for changes'
@@ -133,3 +134,7 @@ deploy:
 version-tracker: .venv
 	@echo '==> Check that no archive dataset is used by an active dataset, and that all active datasets are used'
 	poetry run version_tracker
+
+api: .venv
+	@echo '==> Starting ETL API'
+	poetry run uvicorn api.main:app --reload --port 8000 --host 0.0.0.0

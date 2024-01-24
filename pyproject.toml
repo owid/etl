@@ -96,6 +96,11 @@ streamlit-agraph = "^0.0.45"
 cdsapi = "^0.6.1"
 rioxarray = "^0.15.0"
 
+[tool.poetry.group.api.dependencies]
+fastapi = "^0.109.0"
+uvicorn = {extras = ["standard"], version = "^0.25.0"}
+slack-sdk = "^3.26.2"
+
 [tool.poetry.group.dev.dependencies]
 pytest = ">=7.1.2"
 watchdog = ">=2.1.5"
