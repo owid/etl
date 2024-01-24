@@ -6,6 +6,7 @@ It has been slightly modified since then.
 """
 import json
 from datetime import date, datetime
+from pathlib import Path
 from typing import Annotated, Any, Dict, List, Literal, Optional, TypedDict, Union
 from urllib.parse import quote
 
@@ -47,7 +48,7 @@ from sqlmodel import (
 )
 from sqlmodel.sql.expression import Select, SelectOfScalar
 
-from etl import config
+from etl import config, paths
 from etl.config import GRAPHER_USER_ID
 
 log = structlog.get_logger()
@@ -1247,6 +1248,23 @@ class Variable(SQLModel, table=True):
             return f"{config.DATA_API_URL}/{self.id}.metadata.json"
         else:
             raise NotImplementedError()
+
+    @property
+    def table_name(self) -> str:
+        assert self.catalogPath
+        return self.catalogPath.split("#")[0].rsplit("/", 1)[1]
+
+    @property
+    def step_path(self) -> Path:
+        """Return path to indicator step file."""
+        assert self.catalogPath
+        base_path = paths.STEP_DIR / "data" / self.catalogPath.split("#")[0].rsplit("/", 1)[0]
+        return base_path.with_suffix(".py")
+
+    @property
+    def override_yaml_path(self) -> Path:
+        """Return path to indicator YAML file."""
+        return self.step_path.with_suffix(".meta.override.yml")
 
 
 class ChartDimensions(SQLModel, table=True):

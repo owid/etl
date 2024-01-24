@@ -25,6 +25,7 @@ help:
 	@echo '  make grapher   	Publish supported datasets to Grapher'
 	@echo '  make lab       	Start a Jupyter Lab server'
 	@echo '  make publish   	Publish the generated catalog to S3'
+	@echo '  make api   		Start the ETL API on port 8000'
 	@echo '  make test      	Run all linting and unit tests'
 	@echo '  make test-all  	Run all linting and unit tests (including for modules in lib/)'
 	@echo '  make watch     	Run all tests, watching for changes'
