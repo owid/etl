@@ -73,37 +73,47 @@ def run(dest_dir: str) -> None:
     tb_inc_2011, tb_cons_2011, tb_inc_or_cons_2011 = inc_or_cons_data(tb_2011)
     tb_inc_2017, tb_cons_2017, tb_inc_or_cons_2017 = inc_or_cons_data(tb_2017)
 
-    # Add metadata by code
-    tb_inc_2011 = add_metadata_vars(tb_garden=tb_inc_2011, ppp_version=2011, welfare_type="income")
-    tb_cons_2011 = add_metadata_vars(tb_garden=tb_cons_2011, ppp_version=2011, welfare_type="consumption")
-    tb_inc_or_cons_2011 = add_metadata_vars(
-        tb_garden=tb_inc_or_cons_2011, ppp_version=2011, welfare_type="income_consumption"
-    )
-
-    tb_inc_2017 = add_metadata_vars(tb_garden=tb_inc_2017, ppp_version=2017, welfare_type="income")
-    tb_cons_2017 = add_metadata_vars(tb_garden=tb_cons_2017, ppp_version=2017, welfare_type="consumption")
-    tb_inc_or_cons_2017 = add_metadata_vars(
-        tb_garden=tb_inc_or_cons_2017, ppp_version=2017, welfare_type="income_consumption"
-    )
-
     # Create regional headcount variable, by patching missing values with the difference between world and regional headcount
     tb_inc_or_cons_2017 = regional_headcount(tb_inc_or_cons_2017)
 
     # Create survey count dataset, by counting the number of surveys available for each country in the past decade
     tb_inc_or_cons_2017 = survey_count(tb_inc_or_cons_2017)
 
-    # Add short name. Also, set index and sort
-    tb_inc_2011 = add_short_name_and_dataset_title(tb=tb_inc_2011, short_name="inc_2011", ppp_version=2011)
-    tb_cons_2011 = add_short_name_and_dataset_title(tb=tb_cons_2011, short_name="cons_2011", ppp_version=2011)
-    tb_inc_or_cons_2011 = add_short_name_and_dataset_title(
-        tb=tb_inc_or_cons_2011, short_name="inc_or_cons_2011", ppp_version=2011
+    # Add metadata by code
+    tb_inc_2011 = add_metadata_vars(
+        tb_garden=tb_inc_2011, short_name="inc_2011", ppp_version=2011, welfare_type="income"
+    )
+    tb_cons_2011 = add_metadata_vars(
+        tb_garden=tb_cons_2011, short_name="cons_2011", ppp_version=2011, welfare_type="consumption"
+    )
+    tb_inc_or_cons_2011 = add_metadata_vars(
+        tb_garden=tb_inc_or_cons_2011,
+        short_name="inc_or_cons_2011",
+        ppp_version=2011,
+        welfare_type="income_consumption",
     )
 
-    tb_inc_2017 = add_short_name_and_dataset_title(tb=tb_inc_2017, short_name="inc_2017", ppp_version=2017)
-    tb_cons_2017 = add_short_name_and_dataset_title(tb=tb_cons_2017, short_name="cons_2017", ppp_version=2017)
-    tb_inc_or_cons_2017 = add_short_name_and_dataset_title(
-        tb=tb_inc_or_cons_2017, short_name="inc_or_cons_2017", ppp_version=2017
+    tb_inc_2017 = add_metadata_vars(
+        tb_garden=tb_inc_2017, short_name="inc_2017", ppp_version=2017, welfare_type="income"
     )
+    tb_cons_2017 = add_metadata_vars(
+        tb_garden=tb_cons_2017, short_name="cons_2017", ppp_version=2017, welfare_type="consumption"
+    )
+    tb_inc_or_cons_2017 = add_metadata_vars(
+        tb_garden=tb_inc_or_cons_2017,
+        short_name="inc_or_cons_2017",
+        ppp_version=2017,
+        welfare_type="income_consumption",
+    )
+
+    # Set index and sort
+    tb_inc_2011 = set_index_and_sort(tb=tb_inc_2011)
+    tb_cons_2011 = set_index_and_sort(tb=tb_cons_2011)
+    tb_inc_or_cons_2011 = set_index_and_sort(tb=tb_inc_or_cons_2011)
+
+    tb_inc_2017 = set_index_and_sort(tb=tb_inc_2017)
+    tb_cons_2017 = set_index_and_sort(tb=tb_cons_2017)
+    tb_inc_or_cons_2017 = set_index_and_sort(tb=tb_inc_or_cons_2017)
 
     # Create spell tables to separate different survey spells in the explorers
     spell_tables_inc = create_survey_spells(tb=tb_inc_2017)
@@ -828,18 +838,11 @@ def survey_count(tb: Table) -> Table:
     return tb
 
 
-def add_short_name_and_dataset_title(tb: Table, short_name: str, ppp_version: int) -> Table:
+def set_index_and_sort(tb: Table) -> Table:
     """
-    Add short name. Also, add index and sort
+    Add index and sort
     """
 
-    # Add short name
-    tb.metadata.short_name = short_name
-
-    # Update dataset name
-    tb.metadata.title = f"{tb.metadata.title} ({ppp_version})"
-
-    # Add index and sort
     tb = tb.set_index(["country", "year"], verify_integrity=True).sort_index()
 
     return tb
