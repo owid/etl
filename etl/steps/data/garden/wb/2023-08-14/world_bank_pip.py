@@ -5,6 +5,7 @@ import owid.catalog.processing as pr
 from owid.catalog import Table
 from shared import add_metadata_vars
 from structlog import get_logger
+from tabulate import tabulate
 
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
@@ -21,6 +22,9 @@ povlines_dict = {
     2011: [100, 190, 320, 550, 1000, 2000, 3000, 4000],
     2017: [100, 215, 365, 685, 1000, 2000, 3000, 4000],
 }
+
+# Set table format when printing
+TABLEFMT = "pretty"
 
 
 def run(dest_dir: str) -> None:
@@ -493,8 +497,8 @@ def sanity_checks(
 
     if not tb_error.empty:
         log.fatal(
-            f"""There are {len(tb_error)} observations with negative values!
-            {tb_error[['country', 'year', 'reporting_level', 'welfare_type']]}"""
+            f"""There are {len(tb_error)} observations with negative values! In
+            {tabulate(tb_error[['country', 'year', 'reporting_level', 'welfare_type']], headers = 'keys', tablefmt = TABLEFMT)}"""
         )
         # NOTE: Check if we want to delete these observations
         # tb = tb[~mask].reset_index(drop=True)
@@ -508,7 +512,7 @@ def sanity_checks(
     if not tb_error.empty:
         log.warning(
             f"""{len(tb_error)} observations of stacked values are not adding up to 100% and will be deleted:
-            {tb_error[['country', 'year', 'reporting_level', 'welfare_type', 'sum_pct']]}"""
+            {tabulate(tb_error[['country', 'year', 'reporting_level', 'welfare_type', 'sum_pct']], headers = 'keys', tablefmt = TABLEFMT, floatfmt=".1f")}"""
         )
         tb = tb[~mask].reset_index(drop=True)
 
@@ -523,7 +527,7 @@ def sanity_checks(
     if not tb_error.empty:
         log.warning(
             f"""There are {len(tb_error)} observations with missing poverty values and will be deleted:
-            {tb_error[['country', 'year', 'reporting_level', 'welfare_type'] + col_headcount]}"""
+            {tabulate(tb_error[['country', 'year', 'reporting_level', 'welfare_type'] + col_headcount], headers = 'keys', tablefmt = TABLEFMT)}"""
         )
         tb = tb[~mask].reset_index(drop=True)
 
@@ -533,7 +537,7 @@ def sanity_checks(
     tb_error = tb[mask].reset_index(drop=True)
 
     if not tb_error.empty:
-        log.warning(f"""There are {len(tb_error)} observations with missing median. They will be not deleted.""")
+        log.info(f"""There are {len(tb_error)} observations with missing median. They will be not deleted.""")
 
     ############################
     # Missing mean
@@ -541,7 +545,7 @@ def sanity_checks(
     tb_error = tb[mask].reset_index(drop=True)
 
     if not tb_error.empty:
-        log.warning(f"""There are {len(tb_error)} observations with missing mean. They will be not deleted.""")
+        log.info(f"""There are {len(tb_error)} observations with missing mean. They will be not deleted.""")
 
     ############################
     # Missing gini
@@ -549,7 +553,7 @@ def sanity_checks(
     tb_error = tb[mask].reset_index(drop=True)
 
     if not tb_error.empty:
-        log.warning(f"""There are {len(tb_error)} observations with missing gini. They will be not deleted.""")
+        log.info(f"""There are {len(tb_error)} observations with missing gini. They will be not deleted.""")
 
     ############################
     # Missing decile shares
@@ -557,7 +561,7 @@ def sanity_checks(
     tb_error = tb[mask].reset_index(drop=True)
 
     if not tb_error.empty:
-        log.warning(f"""There are {len(tb_error)} observations with missing decile shares. They will be not deleted.""")
+        log.info(f"""There are {len(tb_error)} observations with missing decile shares. They will be not deleted.""")
 
     ############################
     # Missing decile thresholds
@@ -565,7 +569,7 @@ def sanity_checks(
     tb_error = tb[mask].reset_index(drop=True)
 
     if not tb_error.empty:
-        log.warning(
+        log.info(
             f"""There are {len(tb_error)} observations with missing decile thresholds. They will be not deleted."""
         )
 
@@ -584,7 +588,7 @@ def sanity_checks(
     if not tb_error.empty:
         log.warning(
             f"""There are {len(tb_error)} observations with headcount not monotonically increasing and will be deleted:
-            {tb_error[['country', 'year', 'reporting_level', 'welfare_type'] + col_headcount]}"""
+            {tabulate(tb_error[['country', 'year', 'reporting_level', 'welfare_type'] + col_headcount], headers = 'keys', tablefmt = TABLEFMT, floatfmt="0.0f")}"""
         )
         tb = tb[tb["check_total"]].reset_index(drop=True)
 
@@ -608,7 +612,7 @@ def sanity_checks(
     if not tb_error.empty:
         log.warning(
             f"""There are {len(tb_error)} observations with thresholds not monotonically increasing and will be deleted:
-            {tb_error[['country', 'year', 'reporting_level', 'welfare_type']]}"""
+            {tabulate(tb_error[['country', 'year', 'reporting_level', 'welfare_type']], headers = 'keys', tablefmt = TABLEFMT)}"""
         )
         tb = tb[~mask].reset_index(drop=True)
 
@@ -630,7 +634,7 @@ def sanity_checks(
     if not tb_error.empty:
         log.warning(
             f"""There are {len(tb_error)} observations with shares not monotonically increasing and will be deleted:
-            {tb_error[['country', 'year', 'reporting_level', 'welfare_type'] + col_decile_share]}"""
+            {tabulate(tb_error[['country', 'year', 'reporting_level', 'welfare_type'] + col_decile_share], headers = 'keys', tablefmt = TABLEFMT, floatfmt=".1f")}"""
         )
         tb = tb[~mask].reset_index(drop=True)
 
@@ -646,7 +650,7 @@ def sanity_checks(
     if not tb_error.empty:
         log.warning(
             f"""{len(tb_error)} observations of shares are not adding up to 100% and will be deleted:
-            {tb_error[['country', 'year', 'reporting_level', 'welfare_type', 'sum_pct']]}"""
+            {tabulate(tb_error[['country', 'year', 'reporting_level', 'welfare_type', 'sum_pct']], headers = 'keys', tablefmt = TABLEFMT, floatfmt=".1f")}"""
         )
         tb = tb[~mask].reset_index(drop=True)
 
@@ -728,7 +732,7 @@ def regional_headcount(tb: Table) -> Table:
 
     tb_out = tb_regions[mask].reset_index()
     if len(tb_out) > 0:
-        log.warning(
+        log.info(
             f"""There are {len(tb_out)} years with more than one null region value and will be deleted:
             {list(tb_out.year.unique())}"""
         )
