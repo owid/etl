@@ -30,9 +30,3 @@ steps:
   data://grapher/un/2024-01-17/urban_agglomerations_largest_cities:
     - data://garden/un/2024-01-17/urban_agglomerations_largest_cities
 
-  data://meadow/un/2024-01-17/urban_agglomerations_largest_cities_history:
-    - snapshot://un/2024-01-17/urban_agglomerations_largest_cities_history.xls
-  data://garden/un/2024-01-17/urban_agglomerations_largest_cities_history:
-    - data://meadow/un/2024-01-17/urban_agglomerations_largest_cities_history
-  data://grapher/un/2024-01-17/urban_agglomerations_largest_cities_history:
-    - data://garden/un/2024-01-17/urban_agglomerations_largest_cities_history
