@@ -5,6 +5,23 @@ definitions:
       topic_tags:
         - Urbanization
     processing_level: minor
+  rate_of_change_urban_short: &rate_of_change_urban_short Refers to the average yearly percentage change in urban populations calculated over the five years prior to the given data point.
+  rate_of_change_rural_short: &rate_of_change_rural_short Refers to the average annual percentage change in rural populations calculated over the five years prior to the given data point.
+  rate_of_change_ubran_prop: &rate_of_change_urban_prop Refers to the yearly average change in the proportion of the urban population to the total population calculated over the five years prior to the given data point.
+  rate_of_change_rural_prop: &rate_of_change_rural_prop Refers to the yearly average change in the proportion of the rural population to the total population calculated over the five years prior to the given data point.
+  rate_of_change_pop: &rate_of_change_pop  Refers to the population's growth or decline rate calculated over the five years prior to the given data point.
+  urban_pop: &urban_pop Urban population at mid-year based on the most recent censuses and official population estimates.
+  rural_pop: &rural_pop Rural population at mid-year based on the most recent censuses and official population estimates.
+  urban_prop: &urban_prop Annual share of the population living in urban areas at mid-year.
+
+  projections_key: &projections_key
+    - The projection method for urban population in the World Urbanization Prospects involves a two-step process using an established extrapolation method based on urban-rural ratios.
+    - Initially, the average annual rate of change in the urban-rural ratio is calculated using data from the last two censuses, which informs the rate of change in urban and rural populations.
+    - This rate is then extrapolated, assuming a logistic path of urban proportion growth.
+    - Subsequently, a "world norm" is applied, estimated from empirical urban-rural growth differences in two groups of countries categorized by population size.
+    - This norm uses a regression equation to establish a hypothetical urban-rural growth difference for different levels of initial urban percentage.
+    - The country-specific urban-rural growth difference is then converged with this hypothetical difference over 25 years, allowing the urbanization process of a country to align with a global urbanization pattern.
+    - This method ensures that urban-rural growth differences evolve towards a worldwide trend rather than remaining constant.
 
 dataset:
   title: World Urbanization Prospects Dataset - Urban and Rural Population
@@ -12,15 +29,14 @@ dataset:
 tables:
   urbanization_urban_rural:
     variables:
-
+      #
+      #  Rate of change indicators for urban and rural populations (estimates and projections)
+      #
       average_annual_rate_of_change_of_the_urban_population_by_region__subregion_and_country__percent_estimates:
         title: Average annual rate of change of the urban population (estimates)
         unit: "%"
         short_unit: "%"
-        description_key:
-          - Measures the average yearly percentage change in urban populations, reflecting growth or decline.
-          - Provides insights into urbanization trends and the dynamics of urban expansion or contraction.
-          - Useful for analyzing impacts on infrastructure, environment, and social services, and for urban planning.
+        description_short: *rate_of_change_urban_short
         display:
           numDecimalPlaces: 1
         presentation:
@@ -30,10 +46,7 @@ tables:
         title: Average annual rate of change of the rural population (estimates)
         unit: "%"
         short_unit: "%"
-        description_key:
-          - Quantifies the average annual percentage change in rural populations, indicating growth or decline.
-          - Sheds light on rural demographic changes and the impacts of urbanization on rural communities.
-          - Essential for understanding rural population dynamics and for rural development policy planning.
+        description_short: *rate_of_change_rural_short
         display:
           numDecimalPlaces: 1
         presentation:
@@ -43,10 +56,7 @@ tables:
         title: Average annual rate of change of the urban population share (estimates)
         unit: "%"
         short_unit: "%"
-        description_key:
-          - Tracks the yearly average change in the proportion of the urban population to the total population.
-          - Key for understanding urbanization pace and its demographic implications.
-          - Includes projections for future urban growth, aiding urban-rural population distribution analysis.
+        description_short: *rate_of_change_ubran_prop
         display:
           numDecimalPlaces: 1
         presentation:
@@ -56,10 +66,7 @@ tables:
         title: Average annual rate of change of the rural population share (estimates)
         unit: "%"
         short_unit: "%"
-        description_key:
-          - Measures the yearly average change in the rural population's proportion to the total population.
-          - Provides insights into rural demographic changes in the context of urbanization.
-          - Important for assessing rural-urban population balance and rural development planning.
+        description_short: *rate_of_change_rural_prop
         display:
           numDecimalPlaces: 1
         presentation:
@@ -69,62 +76,18 @@ tables:
         title: Average annual rate of change of the total population (estimates)
         unit: "%"
         short_unit: "%"
-        description_key:
-          - Indicates the average yearly percentage change in the total population, reflecting overall population growth or decline.
-          - Useful for demographic studies and understanding population dynamics on a regional, subregional, and country level.
-          - Helps in policy planning for social services, healthcare, and infrastructure.
+        description_short: *rate_of_change_pop
         display:
           numDecimalPlaces: 1
         presentation:
           title_public: Average annual rate of change of the total population
 
-      annual_urban_population_at_mid_year_by_region__subregion_and_country_estimates:
-        title: Annual urban population at mid-year (estimates)
-        unit: "people"
-        short_unit: ""
-        description_key:
-          - Provides annual mid-year estimates of the urban population across various regions, subregions, and countries.
-          - Essential for analyzing urban growth, planning urban infrastructure, and understanding urban demographic trends.
-          - Aids in comparing urban population changes over time and across different geographical areas.
-        display:
-          numDecimalPlaces: 0
-        presentation:
-          title_public: Annual urban population at mid-year
-
-      annual_rural_population_at_mid_year_by_region__subregion_and_country_estimates:
-        title: Annual rural population at mid-year (estimates)
-        unit: "people"
-        short_unit: ""
-        description_key:
-          - Offers annual mid-year estimates of the rural population in different regions, subregions, and countries.
-          - Crucial for understanding rural demographic trends, planning rural development, and analyzing rural-urban migration.
-          - Helps compare rural population changes over time and across various geographical contexts.
-        display:
-          numDecimalPlaces: 0
-        presentation:
-          title_public: Annual rural population at mid-year
-
-      annual_percentage_of_population_at_mid_year_residing_in_urban_areas_by_region__subregion_and_country_estimates:
-        title: Annual share of population residing in urban areas at mid-year (estimates)
-        unit: "people"
-        short_unit: ""
-        description_key:
-          - Provides the annual percentage of the total population residing in urban areas at mid-year.
-          - Key to understanding urbanization's impact on population distribution and urban planning.
-          - Useful for tracking urban growth and planning for urban services and infrastructure.
-        display:
-          numDecimalPlaces: 0
-        presentation:
-          title_public: Annual share of population residing in urban areas at mid-year
-
       average_annual_rate_of_change_of_the_urban_population_by_region__subregion_and_country__percent_projections:
         title: Average annual rate of change of the urban population (projections)
         unit: "%"
         short_unit: "%"
-        description_key:
-          - Projects the average yearly increase or decrease in the urban population over time.
-          - Essential for anticipating future urbanization trends and planning for urban growth or decline.
-          - Helps in understanding the potential future impacts on urban infrastructure, environment, and services.
+        description_short: *rate_of_change_urban_short
+        description_key: *projections_key
         display:
           numDecimalPlaces: 1
           isProjection: true
@@ -135,10 +98,8 @@ tables:
         title: Average annual rate of change of the rural population (projections)
         unit: "%"
         short_unit: "%"
-        description_key:
-          - Projects the average yearly increase or decrease in the rural population, indicating potential trends.
-          - Useful for forecasting rural demographic changes and planning for rural development and services.
-          - Important for policy-making in the context of rural-urban dynamics and rural population management.
+        description_short: *rate_of_change_rural_short
+        description_key: *projections_key
         display:
           numDecimalPlaces: 1
           isProjection: true
@@ -149,10 +110,8 @@ tables:
         title: Average annual rate of change of the urban population share (projections)
         unit: "%"
         short_unit: "%"
-        description_key:
-          - Forecasts the yearly average change in the urban population's proportion to the total population.
-          - Essential for anticipating future urbanization patterns and their demographic effects.
-          - Useful for urban planning, infrastructure development, and understanding urban growth trends.
+        description_short: *rate_of_change_ubran_prop
+        description_key: *projections_key
         display:
           numDecimalPlaces: 1
           isProjection: true
@@ -163,10 +122,8 @@ tables:
         title: Average annual rate of change of the rural population share (projections)
         unit: "%"
         short_unit: "%"
-        description_key:
-          - Forecasts the yearly average change in the rural population's proportion to the total population.
-          - Key for predicting rural demographic trends and planning for rural development and services.
-          - Important for understanding future rural-urban population balance and policy implications.
+        description_short: *rate_of_change_rural_prop
+        description_key: *projections_key
         display:
           numDecimalPlaces: 1
           isProjection: true
@@ -177,24 +134,54 @@ tables:
         title: Average annual rate of change of the total population (projections)
         unit: "%"
         short_unit: "%"
-        description_key:
-          - Forecasts the average yearly percentage change in the total population, indicating growth or decline.
-          - Crucial for demographic forecasting and understanding future population dynamics.
-          - Aids in planning for healthcare, social services, and infrastructure on a regional and national scale.
+        description_short: *rate_of_change_pop
+        description_key: *projections_key
         display:
           numDecimalPlaces: 1
           isProjection: true
         presentation:
           title_public: Average annual rate of change of the total population
 
+      #
+      #  Annual population/proportion indicators for urban and rural populations (estimates and projections)
+      #
+
+      annual_urban_population_at_mid_year_by_region__subregion_and_country_estimates:
+        title: Annual urban population at mid-year (estimates)
+        unit: "people"
+        short_unit: ""
+        description_short: *urban_pop
+        display:
+          numDecimalPlaces: 0
+        presentation:
+          title_public: Annual urban population at mid-year
+
+      annual_rural_population_at_mid_year_by_region__subregion_and_country_estimates:
+        title: Annual rural population at mid-year (estimates)
+        unit: "people"
+        short_unit: ""
+        description_short: *rural_pop
+        display:
+          numDecimalPlaces: 0
+        presentation:
+          title_public: Annual rural population at mid-year
+
+      annual_percentage_of_population_at_mid_year_residing_in_urban_areas_by_region__subregion_and_country_estimates:
+        title: Annual share of population residing in urban areas at mid-year (estimates)
+        unit: "people"
+        short_unit: ""
+        description_short: *urban_prop
+        display:
+          numDecimalPlaces: 0
+        presentation:
+          title_public: Annual share of population residing in urban areas at mid-year
+
       annual_urban_population_at_mid_year_by_region__subregion_and_country_projections:
         title: Annual urban population at mid-year (projections)
         unit: "people"
         short_unit: ""
-        description_key:
-          - Projects annual mid-year urban population figures for various regions, subregions, and countries.
-          - Essential for forecasting urban growth and planning urban infrastructure and services.
-          - Helps in understanding future urban demographic trends and comparing urban growth across regions.
+        description_short: *urban_pop
+        description_key: *projections_key
         display:
           numDecimalPlaces: 0
           isProjection: true
@@ -205,10 +192,8 @@ tables:
         title: Annual rural population at mid-year (projections)
         unit: "people"
         short_unit: ""
-        description_key:
-          - Projects annual mid-year rural population figures for different regions, subregions, and countries.
-          - Crucial for forecasting rural demographic trends and planning for rural development.
-          - Aids in understanding future rural population dynamics and rural-urban migration patterns.
+        description_short: *rural_pop
+        description_key: *projections_key
         display:
           numDecimalPlaces: 0
           isProjection: true
@@ -219,10 +204,8 @@ tables:
         title: Annual share of population residing in urban areas at mid-year (projections)
         unit: "people"
         short_unit: ""
-        description_key:
-          - Forecasts the annual percentage of the total population residing in urban areas at mid-year.
-          - Key for anticipating urbanization impact on population distribution and planning urban development.
-          - Useful for tracking future urban growth trends and planning urban infrastructure and services.
+        description_short: *urban_prop
+        description_key: *projections_key
         display:
           numDecimalPlaces: 1
           isProjection: true
