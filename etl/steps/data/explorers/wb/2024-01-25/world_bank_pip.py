@@ -1,6 +1,6 @@
-"""World Inequality Database explorer data step.
+"""World Bank PIP explorer data step.
 
-Loads the latest PIP data from garden and stores a table (as a csv file).
+Loads the latest PIP data from garden and stores multiple tables as csv diles.
 
 """
 
