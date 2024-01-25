@@ -25,8 +25,6 @@ tables:
               min: 70
             selectedEntityNames:
               - Japan
-        license:
-          url: http://atmenv.envi.osakafu-u.ac.jp/aono/kyophenotemp4/
 
       average_20_years:
         title: Twenty-year average day of the year with peak cherry blossom
