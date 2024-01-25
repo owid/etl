@@ -105,7 +105,7 @@ tables:
         title: Share of the total population residing in cities with 300,000 inhabitants or more (projections)
         unit: "%"
         short_unit: "%"
-        description_short: *share_rural
+        description_short: *share_urban_from_tot
         description_key: *projections_key
         description_from_producer: *descr_producer
         display:
