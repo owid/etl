@@ -27,7 +27,6 @@ meta:
     license:
       name: CC BY 3.0 IGO
       url: http://creativecommons.org/licenses/by/3.0/igo/
-
 wdir: ../../../data/snapshots/un/2024-01-17
 outs:
 - md5: 044de1fad5279107eeb8611a17df8855
