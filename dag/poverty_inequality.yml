@@ -1,4 +1,9 @@
 steps:
+  # Poverty and inequality dataset for comparison explorers
+  data://explorers/poverty_inequality/2023-08-24/poverty_inequality:
+    - data://explorers/wid/2023-08-24/world_inequality_database
+    - data://explorers/lis/2023-08-30/luxembourg_income_study
+
   # World Bank Poverty and Inequality Platform
   data://meadow/wb/2024-01-25/world_bank_pip:
     - snapshot://wb/2024-01-25/world_bank_pip.csv
@@ -10,3 +15,64 @@ steps:
     - data://garden/wb/2024-01-25/world_bank_pip
   data://explorers/wb/2024-01-25/world_bank_pip:
     - data://garden/wb/2024-01-25/world_bank_pip
+
+  # World Inequality Database
+  data://meadow/wid/2023-08-24/world_inequality_database:
+    - data://garden/regions/2023-01-01/regions
+    - snapshot://wid/2023-08-24/world_inequality_database.csv
+    - snapshot://wid/2023-08-24/world_inequality_database_with_extrapolations.csv
+    - snapshot://wid/2023-08-24/world_inequality_database_distribution.csv
+    - snapshot://wid/2023-08-24/world_inequality_database_distribution_with_extrapolations.csv
+  data://garden/wid/2023-08-24/world_inequality_database:
+    - data://meadow/wid/2023-08-24/world_inequality_database
+  data://grapher/wid/2023-08-24/world_inequality_database:
+    - data://garden/wid/2023-08-24/world_inequality_database
+  data://explorers/wid/2023-08-24/world_inequality_database:
+    - data://garden/wid/2023-08-24/world_inequality_database
+
+  # Luxembourg Income Study
+  data://meadow/lis/2023-08-30/luxembourg_income_study:
+    - snapshot://lis/2023-08-30/lis_keyvars.csv
+    - snapshot://lis/2023-08-30/lis_abs_poverty.csv
+    - snapshot://lis/2023-08-30/lis_distribution.csv
+    - snapshot://lis/2023-08-30/lis_keyvars_adults.csv
+    - snapshot://lis/2023-08-30/lis_abs_poverty_adults.csv
+    - snapshot://lis/2023-08-30/lis_distribution_adults.csv
+    - snapshot://lis/2023-08-30/lis_percentiles.csv
+    - snapshot://lis/2023-08-30/lis_percentiles_adults.csv
+    - data://garden/regions/2023-01-01/regions
+  data://garden/lis/2023-08-30/luxembourg_income_study:
+    - data://meadow/lis/2023-08-30/luxembourg_income_study
+  data://grapher/lis/2023-08-30/luxembourg_income_study:
+    - data://garden/lis/2023-08-30/luxembourg_income_study
+  data://explorers/lis/2023-08-30/luxembourg_income_study:
+    - data://garden/lis/2023-08-30/luxembourg_income_study
+
+  # Multidimensional Poverty Index
+  data://meadow/ophi/2023-07-05/multidimensional_poverty_index:
+    - snapshot://ophi/2023-07-05/multidimensional_poverty_index.csv
+  data://garden/ophi/2023-07-05/multidimensional_poverty_index:
+    - data://meadow/ophi/2023-07-05/multidimensional_poverty_index
+  data://grapher/ophi/2023-07-05/multidimensional_poverty_index:
+    - data://garden/ophi/2023-07-05/multidimensional_poverty_index
+
+  # OECD Income Distribution Database
+  data://meadow/oecd/2023-06-06/income_distribution_database:
+    - snapshot://oecd/2023-06-06/income_distribution_database.csv
+  data://garden/oecd/2023-06-06/income_distribution_database:
+    - data://meadow/oecd/2023-06-06/income_distribution_database
+  data://grapher/oecd/2023-06-06/income_distribution_database:
+    - data://garden/oecd/2023-06-06/income_distribution_database
+
+  # Historical poverty data - Moatsos (2021)
+  data://meadow/moatsos/2023-10-09/moatsos_historical_poverty:
+    - snapshot://moatsos/2023-10-09/moatsos_historical_poverty_oecd.csv
+    - snapshot://moatsos/2023-10-09/moatsos_historical_poverty_oecd_countries_share.xlsx
+    - snapshot://moatsos/2023-10-09/moatsos_historical_poverty_oecd_regions_number.xlsx
+    - snapshot://moatsos/2023-10-09/moatsos_historical_poverty_5.csv
+    - snapshot://moatsos/2023-10-09/moatsos_historical_poverty_10.csv
+    - snapshot://moatsos/2023-10-09/moatsos_historical_poverty_30.csv
+  data://garden/moatsos/2023-10-09/moatsos_historical_poverty:
+    - data://meadow/moatsos/2023-10-09/moatsos_historical_poverty
+  data://grapher/moatsos/2023-10-09/moatsos_historical_poverty:
+    - data://garden/moatsos/2023-10-09/moatsos_historical_poverty
