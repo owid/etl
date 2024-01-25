@@ -1,0 +1,32 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/origin/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Treaties Database
+    description: |-
+      Since 1978, the United Nations has been publishing the status of multilateral Arms Regulation and Disarmament Agreements, presenting data on signatories, parties of relevant agreements and the texts of the agreements themselves.
+    title_snapshot: Treaties Database - Geneva Protocol
+    description_snapshot: |-
+      This dataset contains the list of countries that have participated in the Protocol for the Prohibition of the Use in War of Asphyxiating, Poisonous or Other Gases, and of Bacteriological Methods of Warfare (Geneva Protocol).
+    date_published: 2024-01-23
+
+    # Citation
+    producer: United Nations Office for Disarmament Affairs
+    citation_full: |-
+      United Nations Office for Disarmament Affairs - Treaties Database (2024).
+    attribution_short: UNODA
+
+    # Files
+    url_main: https://treaties.unoda.org/t/1925
+    date_accessed: 2024-01-23
+
+    # License
+    license:
+      name: CC BY 4.0
+
+wdir: ../../../data/snapshots/war/2024-01-23
+outs:
+- md5: aa83b1ea4790c3eb7b91af6185c32532
+  size: 7341
+  path: geneva_protocol.csv
