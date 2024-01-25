@@ -19,7 +19,8 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
-    tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
+    country_mapping_path = paths.directory / "urban_agglomerations_shared.countries.json"
+    tb = geo.harmonize_countries(df=tb, countries_file=country_mapping_path)
     tb["population__thousands"] = tb["population__thousands"] * 1000
     tb["time_series_of_the_population_of_the_30_largest_urban_agglomerations_in_2018_ranked_by_population_size"] = (
         tb["time_series_of_the_population_of_the_30_largest_urban_agglomerations_in_2018_ranked_by_population_size"]

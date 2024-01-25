@@ -22,7 +22,6 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
-
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
     columns_to_average = [
         "average_annual_rate_of_change_of_urban_agglomerations_with_300_000_inhabitants_or_more_in_2018__by_country__1950_2035__percent",

@@ -23,6 +23,7 @@ def run(dest_dir: str) -> None:
     tb = geo.harmonize_countries(
         df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
     )
+
     # Pivot table to have one column per size class of urban settlement
     tb_pivot = tb.pivot(
         index=["country", "year"], columns=["size_class_of_urban_settlement", "type_of_data"], values="value"
