@@ -7,7 +7,7 @@ definitions:
     processing_level: minor
   rate_of_change_urban_short: &rate_of_change_urban_short Refers to the average yearly percentage change in urban populations calculated over the five years prior to the given data point.
   rate_of_change_rural_short: &rate_of_change_rural_short Refers to the average annual percentage change in rural populations calculated over the five years prior to the given data point.
-  rate_of_change_ubran_prop: &rate_of_change_urban_prop Refers to the yearly average change in the proportion of the urban population to the total population calculated over the five years prior to the given data point.
+  rate_of_change_ubran_prop: &rate_of_change_ubran_prop Refers to the yearly average change in the proportion of the urban population to the total population calculated over the five years prior to the given data point.
   rate_of_change_rural_prop: &rate_of_change_rural_prop Refers to the yearly average change in the proportion of the rural population to the total population calculated over the five years prior to the given data point.
   rate_of_change_pop: &rate_of_change_pop  Refers to the population's growth or decline rate calculated over the five years prior to the given data point.
   urban_pop: &urban_pop Urban population at mid-year based on the most recent censuses and official population estimates.
