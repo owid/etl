@@ -334,13 +334,13 @@ pct_dict = {
 
 
 # This function creates the metadata for each variable in the dataset, from the dictionaries defined above
-def add_metadata_vars(tb_garden: Table, short_name: str, ppp_version: int, welfare_type: str) -> Table:
+def add_metadata_vars(tb_garden: Table, ppp_version: int, welfare_type: str) -> Table:
     """
     Add metadata for each variable in the dataset, using the dictionaries above and the functions below
     """
 
     # Add short name
-    tb_garden.metadata.short_name = short_name
+    tb_garden.metadata.short_name = f"{welfare_type}_{ppp_version}"
 
     # Create a list from abs_dict
     povline_list = list(abs_dict[ppp_version].keys())

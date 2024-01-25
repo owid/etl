@@ -80,28 +80,18 @@ def run(dest_dir: str) -> None:
     tb_inc_or_cons_2017 = survey_count(tb_inc_or_cons_2017)
 
     # Add metadata by code
-    tb_inc_2011 = add_metadata_vars(
-        tb_garden=tb_inc_2011, short_name="inc_2011", ppp_version=2011, welfare_type="income"
-    )
-    tb_cons_2011 = add_metadata_vars(
-        tb_garden=tb_cons_2011, short_name="cons_2011", ppp_version=2011, welfare_type="consumption"
-    )
+    tb_inc_2011 = add_metadata_vars(tb_garden=tb_inc_2011, ppp_version=2011, welfare_type="income")
+    tb_cons_2011 = add_metadata_vars(tb_garden=tb_cons_2011, ppp_version=2011, welfare_type="consumption")
     tb_inc_or_cons_2011 = add_metadata_vars(
         tb_garden=tb_inc_or_cons_2011,
-        short_name="inc_or_cons_2011",
         ppp_version=2011,
         welfare_type="income_consumption",
     )
 
-    tb_inc_2017 = add_metadata_vars(
-        tb_garden=tb_inc_2017, short_name="inc_2017", ppp_version=2017, welfare_type="income"
-    )
-    tb_cons_2017 = add_metadata_vars(
-        tb_garden=tb_cons_2017, short_name="cons_2017", ppp_version=2017, welfare_type="consumption"
-    )
+    tb_inc_2017 = add_metadata_vars(tb_garden=tb_inc_2017, ppp_version=2017, welfare_type="income")
+    tb_cons_2017 = add_metadata_vars(tb_garden=tb_cons_2017, ppp_version=2017, welfare_type="consumption")
     tb_inc_or_cons_2017 = add_metadata_vars(
         tb_garden=tb_inc_or_cons_2017,
-        short_name="inc_or_cons_2017",
         ppp_version=2017,
         welfare_type="income_consumption",
     )
@@ -130,12 +120,12 @@ def run(dest_dir: str) -> None:
     tb_inc_or_cons_2017 = drop_columns(tb_inc_or_cons_2017)
 
     # Merge tables for PPP comparison explorer
-    tb_inc_2011_2017 = combine_tables_2011_2017(tb_2011=tb_inc_2011, tb_2017=tb_inc_2017, short_name="inc_2011_2017")
+    tb_inc_2011_2017 = combine_tables_2011_2017(tb_2011=tb_inc_2011, tb_2017=tb_inc_2017, short_name="income_2011_2017")
     tb_cons_2011_2017 = combine_tables_2011_2017(
-        tb_2011=tb_cons_2011, tb_2017=tb_cons_2017, short_name="cons_2011_2017"
+        tb_2011=tb_cons_2011, tb_2017=tb_cons_2017, short_name="consumption_2011_2017"
     )
     tb_inc_or_cons_2011_2017 = combine_tables_2011_2017(
-        tb_2011=tb_inc_or_cons_2011, tb_2017=tb_inc_or_cons_2017, short_name="inc_or_cons_2011_2017"
+        tb_2011=tb_inc_or_cons_2011, tb_2017=tb_inc_or_cons_2017, short_name="income_consumption_2011_2017"
     )
 
     # Define tables to upload

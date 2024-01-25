@@ -22,7 +22,7 @@ dataset:
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
 tables:
-  inc_or_cons_2017:
+  income_consumption_2017:
     # Learn more about the available fields:
     # http://docs.owid.io/projects/etl/architecture/metadata/reference/indicator/
     variables:
@@ -471,9 +471,3 @@ tables:
           For a small number of country-year observations, the World Bank PIP data contains two estimates: one based on income data and one based on consumption data. In these cases we keep only the consumption estimate in order to obtain a single series for each country. This means the indicator is estimating the number of years at least one survey was conducted in the past decade, rather than the number of surveys.
         display:
           numDecimalPlaces: 0
-
-  inc_or_cons_2011: {}
-  inc_2017: {}
-  inc_2011: {}
-  cons_2017: {}
-  cons_2011: {}

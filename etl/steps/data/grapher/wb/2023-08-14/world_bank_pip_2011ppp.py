@@ -14,7 +14,7 @@ def run(dest_dir: str) -> None:
     ds_garden = paths.load_dataset("world_bank_pip")
 
     # Read tables from garden dataset.
-    tb = ds_garden["inc_or_cons_2011"]
+    tb = ds_garden["income_consumption_2011"]
 
     #
     # Process data.
