@@ -1,8 +1,9 @@
 steps:
-  # Poverty and inequality dataset for comparison explorers
-  data://explorers/poverty_inequality/2023-08-24/poverty_inequality:
-    - data://explorers/wid/2023-08-24/world_inequality_database
-    - data://explorers/lis/2023-08-30/luxembourg_income_study
+  # Poverty and inequality dataset for comparison explorers (check steps for updating tables)
+  data://explorers/poverty_inequality/latest/poverty_inequality:
+    - data://explorers/wb/latest/world_bank_pip
+    - data://explorers/wid/latest/world_inequality_database
+    - data://explorers/lis/latest/luxembourg_income_study
 
   # World Bank Poverty and Inequality Platform
   data://meadow/wb/2024-01-25/world_bank_pip:
@@ -13,7 +14,7 @@ steps:
     - data://garden/wb/2024-01-25/world_bank_pip
   data://grapher/wb/2024-01-25/world_bank_pip_2017ppp:
     - data://garden/wb/2024-01-25/world_bank_pip
-  data://explorers/wb/2024-01-25/world_bank_pip:
+  data://explorers/wb/latest/world_bank_pip:
     - data://garden/wb/2024-01-25/world_bank_pip
 
   # World Inequality Database
@@ -27,7 +28,7 @@ steps:
     - data://meadow/wid/2023-08-24/world_inequality_database
   data://grapher/wid/2023-08-24/world_inequality_database:
     - data://garden/wid/2023-08-24/world_inequality_database
-  data://explorers/wid/2023-08-24/world_inequality_database:
+  data://explorers/wid/latest/world_inequality_database:
     - data://garden/wid/2023-08-24/world_inequality_database
 
   # Luxembourg Income Study
@@ -45,7 +46,7 @@ steps:
     - data://meadow/lis/2023-08-30/luxembourg_income_study
   data://grapher/lis/2023-08-30/luxembourg_income_study:
     - data://garden/lis/2023-08-30/luxembourg_income_study
-  data://explorers/lis/2023-08-30/luxembourg_income_study:
+  data://explorers/lis/latest/luxembourg_income_study:
     - data://garden/lis/2023-08-30/luxembourg_income_study
 
   # Multidimensional Poverty Index
