@@ -2,7 +2,7 @@ definitions:
   definition_status_signed: |-
     The status "Signed" means that a country accepts a treaty without a legal commitment.
   definition_status_committed: |-
-    The status "Approved" means that the country has legally committed to a treaty. This status comprises the actions "Ratification", "Accession", and "Succession", as defined by UNODA.
+    The status "Approved" means that the country has legally committed to a treaty.
   definition_status_not_signed: |-
     The status "Not signed" means that the country has neither signed nor committed to a treaty.
   definition_status_withdrawn: |-
@@ -81,37 +81,37 @@ tables:
     title: Nuclear Weapons Treaties - Country Counts
     variables:
       comprehensive_nuclear_test_ban_treaty:
-        title: Number of countries in the same status regarding the Comprehensive Nuclear-Test-Ban Treaty
+        title: Number of countries with a given status on the Comprehensive Nuclear-Test-Ban Treaty
         display:
           name: Comprehensive Test Ban
           numDecimalPlaces: 0
         presentation:
-          title_public: Number of countries in the same status regarding the Comprehensive Nuclear-Test-Ban Treaty
+          title_public: Number of countries with a given status on the Comprehensive Nuclear-Test-Ban Treaty
       geneva_protocol:
-        title: Number of countries in the same status regarding the Geneva Protocol
+        title: Number of countries with a given status on the Geneva Protocol
         display:
           name: Geneva Protocol
           numDecimalPlaces: 0
         presentation:
-          title_public: Number of countries in the same status regarding the Geneva Protocol
+          title_public: Number of countries with a given status on the Geneva Protocol
       nuclear_non_proliferation_treaty:
-        title: Number of countries in the same status regarding the Nuclear Non-Proliferation Treaty
+        title: Number of countries with a given status on the Nuclear Non-Proliferation Treaty
         display:
           name: Non-Proliferation Treaty
           numDecimalPlaces: 0
         presentation:
-          title_public: Number of countries in the same status regarding the Nuclear Non-Proliferation Treaty
+          title_public: Number of countries with a given status on the Nuclear Non-Proliferation Treaty
       partial_test_ban_treaty:
-        title: Number of countries in the same status regarding the Partial Test Ban Treaty
+        title: Number of countries with a given status on the Partial Test Ban Treaty
         display:
           name: Partial Test Ban
           numDecimalPlaces: 0
         presentation:
-          title_public: Number of countries in the same status regarding the Partial Test Ban Treaty
+          title_public: Number of countries with a given status on the Partial Test Ban Treaty
       treaty_on_the_prohibition_of_nuclear_weapons:
-        title: Number of countries in the same status regarding the Treaty on the Prohibition of Nuclear Weapons
+        title: Number of countries with a given status on the Treaty on the Prohibition of Nuclear Weapons
         display:
           name: Prohibition
           numDecimalPlaces: 0
         presentation:
-          title_public: Number of countries in the same status regarding the Treaty on the Prohibition of Nuclear Weapons
+          title_public: Number of countries with a given status on the Treaty on the Prohibition of Nuclear Weapons
