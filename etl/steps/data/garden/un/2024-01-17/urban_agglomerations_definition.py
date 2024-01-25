@@ -33,6 +33,7 @@ def run(dest_dir: str) -> None:
     tb["minimum_inhabitants"] = tb["definition"].copy()
     # Apply the accurate function to the 'definition' column
     tb["minimum_inhabitants"] = tb["definition"].apply(extract_min_inhabitants_accurate)
+
     # Drop unnecessary columns
     tb = tb.drop(columns=["definition", "sources"])
 
