@@ -7,10 +7,8 @@
     acl = public-read
     # Increase this if you are seeing requests timing out
     connect_timeout = 600
-    profile = r2
 [remote "public-read"]
     url = https://snapshots.owid.io
 [remote "private"]
     url = s3://owid-snapshots-private
     endpointurl = https://078fcdfed9955087315dd86792e71a7e.r2.cloudflarestorage.com
-    profile = r2

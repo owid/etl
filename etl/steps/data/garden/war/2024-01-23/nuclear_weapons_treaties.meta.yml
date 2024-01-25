@@ -1,4 +1,16 @@
 definitions:
+  definition_status_signed: |-
+    The status "Signed" means that a country accepts a treaty without a legal commitment.
+  definition_status_committed: |-
+    The status "Approved" means that the country has legally committed to a treaty.
+  definition_status_not_signed: |-
+    The status "Not signed" means that the country has neither signed nor committed to a treaty.
+  definition_status_withdrawn: |-
+    The status "Withdrawn" means that the country has withdrawn from its legal commitment to a treaty.
+  definition_all_statuses_excluding_withdrawal: |-
+    A country's position on a treaty can be ["Not signed"](#dod:treaty-status-not-signed), ["Signed"](#dod:treaty-status-signed), or ["Approved"](#dod:treaty-status-committed).
+  definition_all_statuses_including_withdrawal: |-
+    A country's position on a treaty can be ["Not signed"](#dod:treaty-status-not-signed), ["Signed"](#dod:treaty-status-signed), ["Approved"](#dod:treaty-status-committed), or ["Withdrawn"](#dod:treaty-status-withdrawn).
   common:
     unit: ""
     short_unit: ""
@@ -7,6 +19,16 @@ definitions:
       topic_tags:
         - Nuclear Weapons
         - War & Peace
+    description_processing: |-
+      - Countries are classified as "Approved" if they have either a "Ratification", "Accession", or "Succession" action (as defined by UNODA).
+      - Countries are classified as "Signed" if they only have a "Signatory" action  (as defined by UNODA).
+      - Countries are classified as "Withdrawn" if they have a "Withdrawal" action (as defined by UNODA).
+      - Countries are classified as "Not signed" if they have none of the previous actions.
+    description_key:
+      - "{definitions.definition_status_signed}"
+      - "{definitions.definition_status_committed}"
+      - "{definitions.definition_status_not_signed}"
+      - "{definitions.definition_status_withdrawn}"
 
 dataset:
   update_period_days: 365
@@ -18,7 +40,7 @@ tables:
       comprehensive_nuclear_test_ban_treaty:
         title: Comprehensive Nuclear-Test-Ban Treaty
         description_short: |-
-          The treaty's objective is to stop nuclear weapons tests in the atmosphere, in outer space, under water, and underground.
+          The treaty's objective is to stop nuclear weapons tests in the atmosphere, in outer space, under water, and underground. {definitions.definition_all_statuses_including_withdrawal}
         display:
           name: Comprehensive Test Ban
         presentation:
@@ -26,7 +48,7 @@ tables:
       geneva_protocol:
         title: Geneva Protocol
         description_short: |-
-          The goal of the Geneva Protocol is to prohibit the use of chemical and biological weapons in international armed conflicts.
+          The goal of the Geneva Protocol is to prohibit the use of chemical and biological weapons in international armed conflicts. {definitions.definition_all_statuses_excluding_withdrawal}
         display:
           name: Geneva Protocol
         presentation:
@@ -34,7 +56,7 @@ tables:
       nuclear_non_proliferation_treaty:
         title: Nuclear Non-Proliferation Treaty
         description_short: |-
-          The treaty's objective is to prevent the spread of nuclear weapons, to promote cooperation in the peaceful uses of nuclear energy, and to pursue nuclear and general disarmament.
+          The treaty's objective is to prevent the spread of nuclear weapons, to promote cooperation in the peaceful uses of nuclear energy, and to pursue nuclear and general disarmament. {definitions.definition_all_statuses_excluding_withdrawal}
         display:
           name: Non-Proliferation Treaty
         presentation:
@@ -42,7 +64,7 @@ tables:
       partial_test_ban_treaty:
         title: Partial Test Ban Treaty
         description_short: |-
-          The treaty's objective is to stop nuclear weapons tests in the atmosphere, in outer space, and under water.
+          The treaty's objective is to stop nuclear weapons tests in the atmosphere, in outer space, and under water. {definitions.definition_all_statuses_excluding_withdrawal}
         display:
           name: Partial Test Ban
         presentation:
@@ -50,7 +72,7 @@ tables:
       treaty_on_the_prohibition_of_nuclear_weapons:
         title: Treaty on the Prohibition of Nuclear Weapons
         description_short: |-
-          The treaty's objective is to stop developing, testing, producing, acquiring, possessing, stockpiling, deploying, using, and threatening nuclear weapons, as well as assisting other countries in these actions.
+          The treaty's objective is to stop developing, testing, producing, acquiring, possessing, stockpiling, deploying, using, and threatening nuclear weapons, as well as assisting other countries in these actions. {definitions.definition_all_statuses_excluding_withdrawal}
         display:
           name: Prohibition
         presentation:
@@ -59,37 +81,37 @@ tables:
     title: Nuclear Weapons Treaties - Country Counts
     variables:
       comprehensive_nuclear_test_ban_treaty:
-        title: Number of countries in the same status regarding the Comprehensive Nuclear-Test-Ban Treaty
+        title: Number of countries with a given status on the Comprehensive Nuclear-Test-Ban Treaty
         display:
           name: Comprehensive Test Ban
           numDecimalPlaces: 0
         presentation:
-          title_public: Number of countries in the same status regarding the Comprehensive Nuclear-Test-Ban Treaty
+          title_public: Number of countries with a given status on the Comprehensive Nuclear-Test-Ban Treaty
       geneva_protocol:
-        title: Number of countries in the same status regarding the Geneva Protocol
+        title: Number of countries with a given status on the Geneva Protocol
         display:
           name: Geneva Protocol
           numDecimalPlaces: 0
         presentation:
-          title_public: Number of countries in the same status regarding the Geneva Protocol
+          title_public: Number of countries with a given status on the Geneva Protocol
       nuclear_non_proliferation_treaty:
-        title: Number of countries in the same status regarding the Nuclear Non-Proliferation Treaty
+        title: Number of countries with a given status on the Nuclear Non-Proliferation Treaty
         display:
           name: Non-Proliferation Treaty
           numDecimalPlaces: 0
         presentation:
-          title_public: Number of countries in the same status regarding the Nuclear Non-Proliferation Treaty
+          title_public: Number of countries with a given status on the Nuclear Non-Proliferation Treaty
       partial_test_ban_treaty:
-        title: Number of countries in the same status regarding the Partial Test Ban Treaty
+        title: Number of countries with a given status on the Partial Test Ban Treaty
         display:
           name: Partial Test Ban
           numDecimalPlaces: 0
         presentation:
-          title_public: Number of countries in the same status regarding the Partial Test Ban Treaty
+          title_public: Number of countries with a given status on the Partial Test Ban Treaty
       treaty_on_the_prohibition_of_nuclear_weapons:
-        title: Number of countries in the same status regarding the Treaty on the Prohibition of Nuclear Weapons
+        title: Number of countries with a given status on the Treaty on the Prohibition of Nuclear Weapons
         display:
           name: Prohibition
           numDecimalPlaces: 0
         presentation:
-          title_public: Number of countries in the same status regarding the Treaty on the Prohibition of Nuclear Weapons
+          title_public: Number of countries with a given status on the Treaty on the Prohibition of Nuclear Weapons
