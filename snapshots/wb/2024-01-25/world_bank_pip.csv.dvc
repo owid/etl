@@ -17,14 +17,14 @@ meta:
 
     # Files
     url_main: https://pip.worldbank.org
-    date_accessed: 2024-01-17
+    date_accessed: 2024-01-25
 
     # License
     license:
       name: CC0
       url: https://datacatalog.worldbank.org/search/dataset/0063646
 
-wdir: ../../../data/snapshots/wb/2023-08-14
+wdir: ../../../data/snapshots/wb/2024-01-25
 outs:
 - md5: 901050ce49c480626adc440b5dbe364e
   size: 19105070
