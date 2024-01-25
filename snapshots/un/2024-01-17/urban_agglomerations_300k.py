@@ -1,3 +1,9 @@
+"""
+This script is designed to create a snapshot of the 'World Urbanization Prospects Dataset - Urban Agglomerations with 300,000 Inhabitants or more' from the United Nations.
+The script downloads four Excel files from the UN website. Each file contains different data related to urban agglomerations with 300,000 inhabitants or more, including the average annual rate of change, the percentage of the urban population, the percentage of the total population, and the annual population.
+Each file is processed by cleaning the data, excluding certain columns, and reshaping the data into a format that is easier to analyze.
+The data from each file is merged into a single DataFrame. This is done by merging on the country, urban agglomeration, latitude, and year.
+"""
 import os
 from pathlib import Path
 
@@ -19,10 +25,6 @@ SNAPSHOT_VERSION = Path(__file__).parent.name
     help="Upload dataset to Snapshot",
 )
 def main(upload: bool) -> None:
-    """
-    Main function to download, process and upload the dataset.
-    """
-    # Create a new snapshot.
     snap = Snapshot(f"un/{SNAPSHOT_VERSION}/urban_agglomerations_300k.csv")
     common_path = "https://population.un.org/wup/Download/Files/"
 

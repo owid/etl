@@ -5,7 +5,7 @@ meta:
     # Data product / Snapshot
     title: World Urbanization Prospects Dataset
     title_snapshot: World Urbanization Prospects Dataset - Urban Agglomerations with
-      300,000 Inhabitants
+      300,000 Inhabitants or more
 
     description: |-
       This dataset is derived from the World Urbanization Prospects, providing comprehensive data on global urbanization trends, including population figures, urban and rural population distributions, and projections for future urban growth.
@@ -16,6 +16,7 @@ meta:
       Division
     citation_full: |-
       United Nations, Department of Economic and Social Affairs, Population Division (2018). World Urbanization Prospects: The 2018 Revision, Online Edition.
+    attribution_short: United Nations
 
     # Files
     url_main: https://population.un.org/wup/Download/

@@ -1,3 +1,8 @@
+"""
+This script is designed to create a snapshot of the 'World Urbanization Prospects Dataset - Urban and Rural Population' from the United Nations.
+The script downloads several Excel files from the UN website. Each file contains data on urban and rural population growth rates, total growth rates, and annual population numbers for different regions, subregions, and countries from 1950 to 2050. The data from each file is cleaned, reshaped, and merged into a single DataFrame.
+"""
+
 import os
 from pathlib import Path
 
@@ -19,10 +24,6 @@ SNAPSHOT_VERSION = Path(__file__).parent.name
     help="Upload dataset to Snapshot",
 )
 def main(upload: bool) -> None:
-    """
-    Main function to download, process and upload the dataset.
-    """
-    # Create a new snapshot.
     snap = Snapshot(f"un/{SNAPSHOT_VERSION}/urbanization_urban_rural.csv")
     common_path = "https://population.un.org/wup/Download/Files/"
 

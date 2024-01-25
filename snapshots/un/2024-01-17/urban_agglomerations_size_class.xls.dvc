@@ -15,6 +15,7 @@ meta:
       Division
     citation_full: |-
       United Nations, Department of Economic and Social Affairs, Population Division (2018). World Urbanization Prospects: The 2018 Revision, Online Edition.
+    attribution_short: United Nations
 
     # Files
     url_main: https://population.un.org/wup/Download/
