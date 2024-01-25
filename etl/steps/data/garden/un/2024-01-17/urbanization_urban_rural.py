@@ -46,7 +46,7 @@ def run(dest_dir: str) -> None:
     past_estimates = tb[tb["year"] < 2019].copy()
     future_projections = tb[tb["year"] >= 2019].copy()
 
-    # Now, for each column in the original dataframe, split it into two
+    # Now, for each column in the original dataframe, split it into two (projections and estimates)
     for col in tb.columns:
         if col not in ["country", "year"]:
             past_estimates[f"{col}_estimates"] = tb.loc[tb["year"] < 2019, col]

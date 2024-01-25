@@ -20,7 +20,6 @@ tables:
         short_unit: ''
         description_key:
           - Provides the population figures for the 30 largest urban agglomerations in 2018, ranked by their population size.
-          - Useful for understanding urbanization trends, city planning, and demographic studies of major urban centers.
         display:
           numDecimalPlaces: 0
 
@@ -30,6 +29,5 @@ tables:
         short_unit: ''
         description_key:
           - Indicates the total population living in the nation's capital city.
-          - Useful for urban planning, resource management, and understanding the demographic importance of the capital.
         display:
           numDecimalPlaces: 0

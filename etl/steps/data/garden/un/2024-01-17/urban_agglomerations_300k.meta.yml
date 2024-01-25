@@ -5,6 +5,21 @@ definitions:
       topic_tags:
         - Urbanization
     processing_level: minor
+  rate_of_change: &rate_of_change Measures the average annual percentage change in urban populations for agglomerations with 300,000 inhabitants or more.
+  share_urban: &share_urban Indicates the proportion of the urban population residing in urban agglomerations with 300,000 inhabitants or more.
+  share_urban_from_tot: &share_urban_from_tot Measures the percentage of a country's total population living in urban agglomerations with 300,000 inhabitants or more.
+  urban_pop: &urban_pop Refers to the annual population figures for urban agglomerations with 300,000 inhabitants or more.
+
+  projections_key: &projections_key
+    - The projection method for urban population in the World Urbanization Prospects involves a two-step process using an established extrapolation method based on urban-rural ratios.
+    - Initially, the average annual rate of change in the urban-rural ratio is calculated using data from the last two censuses, which informs the rate of change in urban and rural populations.
+    - This rate is then extrapolated, assuming a logistic path of urban proportion growth.
+    - Subsequently, a "world norm" is applied, estimated from empirical urban-rural growth differences in two groups of countries categorized by population size.
+    - This norm uses a regression equation to establish a hypothetical urban-rural growth difference for different levels of initial urban percentage.
+    - The country-specific urban-rural growth difference is then converged with this hypothetical difference over 25 years, allowing the urbanization process of a country to align with a global urbanization pattern.
+    - This method ensures that urban-rural growth differences evolve towards a worldwide trend rather than remaining constant.
+  descr_producer: &descr_producer The term “urban agglomeration” refers to the population contained within the contours of a contiguous territory inhabited at urban density levels without regard to administrative boundaries. It usually incorporates the population in a city or town plus that in the suburban areas lying outside of, but being adjacent to, the city boundaries. Whenever possible, data classified according to the concept of urban agglomeration are used. However, some countries do not produce data according to the concept of urban agglomeration but use instead that of metropolitan area or city proper. If possible, such data are adjusted to conform to the concept urban agglomeration. When sufficient information is not available to permit such an adjustment, data based on the concept of city proper or metropolitan area are used.
+
 
 dataset:
   title: World Urbanization Prospects Dataset - Urban Agglomerations with 300,000 or More Inhabitants
@@ -12,15 +27,15 @@ dataset:
 tables:
   urban_agglomerations_300k:
     variables:
-
+      #
+      #  Estimates
+      #
       average_annual_rate_of_change_of_urban_agglomerations_with_300_000_inhabitants_or_more_in_2018__by_country__percent_estimates:
         title: Average annual rate of change cities with 300,000 inhabitants or more (estimates)
         unit: "%"
         short_unit: "%"
-        description_key:
-          - Measures the average annual percentage change in urban populations for agglomerations with 300,000 inhabitants or more.
-          - Reflects urban growth or decline trends within countries, aiding in urban planning and policy-making.
-          - Useful for analyzing impacts on infrastructure, environment, and social services.
+        description_short: *rate_of_change
+        description_from_producer: *descr_producer
         display:
           numDecimalPlaces: 1
         presentation:
@@ -31,10 +46,8 @@ tables:
         title: Share of the urban population residing in cities with 300,000 inhabitants or more (estimates)
         unit: "%"
         short_unit: "%"
-        description_key:
-          - Indicates the proportion of the urban population residing in urban agglomerations with 300,000 inhabitants or more.
-          - Offers insights into urban density and the distribution of populations within urban areas.
-          - Critical for urban planning, resource allocation, and understanding urban living conditions.
+        description_short: *share_urban
+        description_from_producer: *descr_producer
         display:
           numDecimalPlaces: 1
         presentation:
@@ -44,10 +57,8 @@ tables:
         title: Share of the total population residing in cities with 300,000 inhabitants or more (estimates)
         unit: "%"
         short_unit: "%"
-        description_key:
-          - Measures the percentage of a country's total population living in urban agglomerations with 300,000 inhabitants or more.
-          - Useful for understanding the scale of urbanization in relation to the overall population.
-          - Aids in assessing the impact of urban growth on national demographics and infrastructure needs.
+        description_short: *share_urban_from_tot
+        description_from_producer: *descr_producer
         display:
           numDecimalPlaces: 1
         presentation:
@@ -57,23 +68,22 @@ tables:
         title: Annual population of urban agglomerations with 300,000 inhabitants or more (estimates)
         unit: "people"
         short_unit: ""
-        description_key:
-          - Provides annual population figures for urban agglomerations with 300,000 inhabitants or more.
-          - Essential for analyzing urban growth trends, demographic changes, and planning urban infrastructure.
-          - Aids in comparing urban population sizes across countries and over time.
+        description_short: *urban_pop
+        description_from_producer: *descr_producer
         display:
           numDecimalPlaces: 0
         presentation:
           title_public: Annual population of urban agglomerations with 300,000 inhabitants or more
-
+      #
+      #  Projections
+      #
       average_annual_rate_of_change_of_urban_agglomerations_with_300_000_inhabitants_or_more_in_2018__by_country__percent_projections:
         title: Average annual rate of change cities with 300,000 inhabitants or more (projections)
         unit: "%"
         short_unit: "%"
-        description_key:
-          - Projects the future annual percentage change in urban agglomerations with 300,000 inhabitants or more.
-          - Crucial for anticipating urbanization trends and planning for urban growth or decline.
-          - Helps policymakers and urban planners prepare for future urban development challenges.
+        description_short: *rate_of_change
+        description_key: *projections_key
+        description_from_producer: *descr_producer
         display:
           numDecimalPlaces: 1
         presentation:
@@ -83,10 +93,9 @@ tables:
         title: Share of the urban population residing in cities with 300,000 inhabitants or more (projections)
         unit: "%"
         short_unit: "%"
-        description_key:
-          - Forecasts the proportion of the urban population living in agglomerations with 300,000 inhabitants or more.
-          - Useful for predicting future urban density and population distribution within cities.
-          - Aids in long-term urban planning and resource allocation strategies.
+        description_short: *share_urban
+        description_key: *projections_key
+        description_from_producer: *descr_producer
         display:
           numDecimalPlaces: 1
         presentation:
@@ -96,10 +105,9 @@ tables:
         title: Share of the total population residing in cities with 300,000 inhabitants or more (projections)
         unit: "%"
         short_unit: "%"
-        description_key:
-          - Projects the percentage of a country's total population that will live in urban agglomerations with 300,000 inhabitants or more.
-          - Indicates the expected scale of urbanization in relation to the overall population.
-          - Essential for future urban development and national demographic planning.
+        description_short: *share_rural
+        description_key: *projections_key
+        description_from_producer: *descr_producer
         display:
           numDecimalPlaces: 1
         presentation:
@@ -109,10 +117,9 @@ tables:
         title: Annual population of urban agglomerations with 300,000 inhabitants or more (projections)
         unit: "people"
         short_unit: ""
-        description_key:
-          - Forecasts annual population figures for urban agglomerations with 300,000 inhabitants or more.
-          - Key for predicting urban population growth and demographic trends.
-          - Useful for strategic urban planning, infrastructure development, and resource management.
+        description_short: *urban_pop
+        description_key: *projections_key
+        description_from_producer: *descr_producer
         display:
           numDecimalPlaces: 0
         presentation:
