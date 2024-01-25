@@ -8,3 +8,5 @@ steps:
     - data://garden/wb/2023-08-14/world_bank_pip
   data://grapher/wb/2023-08-14/world_bank_pip_2017ppp:
     - data://garden/wb/2023-08-14/world_bank_pip
+  data://explorers/wb/2023-08-14/world_bank_pip:
+    - data://garden/wb/2023-08-14/world_bank_pip

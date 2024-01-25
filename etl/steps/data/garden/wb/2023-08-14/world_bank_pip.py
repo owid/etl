@@ -937,7 +937,7 @@ def combine_tables_2011_2017(tb_2011: Table, tb_2017: Table, short_name: str) ->
     tb_2011 = tb_2011.rename(columns={c: c + "_ppp2011" for c in tb_2011.columns if c not in id_cols})
     tb_2017 = tb_2017.rename(columns={c: c + "_ppp2017" for c in tb_2017.columns if c not in id_cols})
 
-    # Merge the two files and save
+    # Merge the two files (it's OK to have an inneer join, because we want to keep country-year pairs that are in both files)
     tb_2011_2017 = pr.merge(tb_2011, tb_2017, on=id_cols, validate="one_to_one", short_name=short_name)
 
     # Add index and sort
