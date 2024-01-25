@@ -13,20 +13,50 @@ dataset:
 
 tables:
   nuclear_weapons_treaties:
-    title: "Nuclear Weapons Treaties"
+    title: Nuclear Weapons Treaties
     variables:
       comprehensive_nuclear_test_ban_treaty:
-        title: "Comprehensive Nuclear-Test-Ban Treaty"
+        title: Comprehensive Nuclear-Test-Ban Treaty
+        description_short: |-
+          The treaty's objective is to stop nuclear weapons tests in the atmosphere, in outer space, under water, and underground.
+        display:
+          name: Comprehensive Test Ban
+        presentation:
+          title_public: Status of countries regarding the Comprehensive Nuclear-Test-Ban Treaty
       geneva_protocol:
-        title: "Geneva Protocol"
+        title: Geneva Protocol
+        description_short: |-
+          The goal of the Geneva Protocol is to prohibit the use of chemical and biological weapons in international armed conflicts.
+        display:
+          name: Geneva Protocol
+        presentation:
+          title_public: Status of countries regarding the Geneva Protocol
       nuclear_non_proliferation_treaty:
-        title: "Nuclear Non-Proliferation Treaty"
+        title: Nuclear Non-Proliferation Treaty
+        description_short: |-
+          The treaty's objective is to prevent the spread of nuclear weapons, to promote cooperation in the peaceful uses of nuclear energy, and to pursue nuclear and general disarmament.
+        display:
+          name: Non-Proliferation Treaty
+        presentation:
+          title_public: Status of countries regarding the Nuclear Non-Proliferation Treaty
       partial_test_ban_treaty:
-        title: "Partial Test Ban Treaty"
+        title: Partial Test Ban Treaty
+        description_short: |-
+          The treaty's objective is to stop nuclear weapons tests in the atmosphere, in outer space, and under water.
+        display:
+          name: Partial Test Ban
+        presentation:
+          title_public: Status of countries regarding the Partial Test Ban Treaty
       treaty_on_the_prohibition_of_nuclear_weapons:
-        title: "Treaty on the Prohibition of Nuclear Weapons"
+        title: Treaty on the Prohibition of Nuclear Weapons
+        description_short: |-
+          The treaty's objective is to stop developing, testing, producing, acquiring, possessing, stockpiling, deploying, using, and threatening nuclear weapons, as well as assisting other countries in these actions.
+        display:
+          name: Prohibition
+        presentation:
+          title_public: Status of countries regarding the Treaty on the Prohibition of Nuclear Weapons
   nuclear_weapons_treaties_country_counts:
-    title: "Nuclear Weapons Treaties - Country Counts"
+    title: Nuclear Weapons Treaties - Country Counts
     variables:
       comprehensive_nuclear_test_ban_treaty:
         title: Number of countries in the same status regarding the Comprehensive Nuclear-Test-Ban Treaty

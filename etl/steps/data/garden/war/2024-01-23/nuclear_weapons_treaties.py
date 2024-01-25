@@ -21,18 +21,18 @@ COLUMNS = {
 # New label to use for the status of a country.
 # NOTE: The following explanations are simplifications of the legal terms used in the treaties (and may be inaccurate).
 # Label for the status "Signatory", which denotes a country that endorses the treaty but does not legally commit to it.
-LABEL_AGREED = "Agreed"
+LABEL_AGREED = "Signed"
 # Label for the status "Ratification", "Accession" and "Succession", used for countries that legally commit to a treaty.
 # "Ratification" denotes a country that has ratified the treaty after signing it.
 # "Accession" denotes a country that has ratified the treaty without having signed it first.
 # "Succession" denotes a country that has inherited the status of a predecessor that has ratified the treaty.
 # NOTE: A priori it may be possible that a country inherits the status "Signatory" from a predecessor, but later on I
 # check that this is never the case.
-LABEL_COMMITTED = "Committed"
+LABEL_COMMITTED = "Ratified"
 # Label for the exceptional status "Withdrawal", which denotes a country that has withdrawn from the legal commitment.
 LABEL_WITHDRAWN = "Withdrawn"
 # Label for all countries-years that are not posterior to either an agreement or a commitment.
-LABEL_NOT_CONSIDERED = "Not participating"
+LABEL_NOT_CONSIDERED = "Not signed"
 
 # List of known withdrawals of any treaty.
 WITHDRAWALS = [{"treaty": "Comprehensive Nuclear-Test-Ban Treaty", "country": "Russia", "date": "2023-11-03"}]
