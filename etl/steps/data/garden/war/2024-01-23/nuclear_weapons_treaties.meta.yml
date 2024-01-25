@@ -60,11 +60,36 @@ tables:
     variables:
       comprehensive_nuclear_test_ban_treaty:
         title: Number of countries in the same status regarding the Comprehensive Nuclear-Test-Ban Treaty
+        display:
+          name: Comprehensive Test Ban
+          numDecimalPlaces: 0
+        presentation:
+          title_public: Number of countries in the same status regarding the Comprehensive Nuclear-Test-Ban Treaty
       geneva_protocol:
         title: Number of countries in the same status regarding the Geneva Protocol
+        display:
+          name: Geneva Protocol
+          numDecimalPlaces: 0
+        presentation:
+          title_public: Number of countries in the same status regarding the Geneva Protocol
       nuclear_non_proliferation_treaty:
         title: Number of countries in the same status regarding the Nuclear Non-Proliferation Treaty
+        display:
+          name: Non-Proliferation Treaty
+          numDecimalPlaces: 0
+        presentation:
+          title_public: Number of countries in the same status regarding the Nuclear Non-Proliferation Treaty
       partial_test_ban_treaty:
         title: Number of countries in the same status regarding the Partial Test Ban Treaty
+        display:
+          name: Partial Test Ban
+          numDecimalPlaces: 0
+        presentation:
+          title_public: Number of countries in the same status regarding the Partial Test Ban Treaty
       treaty_on_the_prohibition_of_nuclear_weapons:
         title: Number of countries in the same status regarding the Treaty on the Prohibition of Nuclear Weapons
+        display:
+          name: Prohibition
+          numDecimalPlaces: 0
+        presentation:
+          title_public: Number of countries in the same status regarding the Treaty on the Prohibition of Nuclear Weapons
