@@ -24,3 +24,8 @@ meta:
       name: CC0
       url: https://datacatalog.worldbank.org/search/dataset/0063646
 
+wdir: ../../../data/snapshots/wb/2024-01-25
+outs:
+- md5: 901050ce49c480626adc440b5dbe364e
+  size: 19105070
+  path: world_bank_pip.csv

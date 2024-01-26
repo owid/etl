@@ -776,7 +776,7 @@ def format_official_percentiles(year, wb_api: WB_API):
     aux_dict = pip_aux_tables(wb_api, table="countries")
     df_countries = aux_dict["countries"]
 
-    # Merge the two files
+    # Merge the two files to get country names
     df_percentiles_published = pd.merge(
         df_percentiles_published,
         df_countries[["country_code", "country"]],
@@ -790,9 +790,12 @@ def format_official_percentiles(year, wb_api: WB_API):
             "percentile": "target_percentile",
             "avg_welfare": "avg",
             "welfare_share": "share",
-            "quantile": "estimated_percentile",
+            "quantile": "thr",
         }
     )
+
+    # Drop pop_share
+    df_percentiles_published = df_percentiles_published.drop(columns=["pop_share"])
 
     # Add ppp_version column
     df_percentiles_published["ppp_version"] = year

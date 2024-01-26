@@ -221,7 +221,7 @@ tables:
               - India
               - China
               - Ethiopia
-
+      # NOTE: Uncomment when I have the data.
       # headcount_ratio_60_median:
       #   presentation:
       #     title_public: Share of population below 60% of median income or consumption
