@@ -1,0 +1,31 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/origin/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Antarctic Ice Cores Revised 800KYr CO2 Data
+    date_published: 2015-02-04
+
+    # Citation
+    producer: NOAA National Centers for Environmental Information
+    citation_full: |-
+      NOAA National Centers for Environmental Information - Antarctic Ice Cores Revised 800KYr CO2 Data (2015).
+
+      Bereiter, B., S. Eggleston, J. Schmitt, C. Nehrbass-Ahles, T. F. Stocker, H. Fischer, S. Kipfstuhl, J. Chappellaz. 2015. Revision of the EPICA Dome C CO2 record from 800 to 600 kyr before present. Geophysical Research Letters, 42(2), 542-549. doi: 10.1002/2014GL061957
+    attribution_short: NOAA/NCEI
+
+    # Files
+    url_main: https://www.ncei.noaa.gov/access/paleo-search/study/17975
+    url_download: 
+      https://www.ncei.noaa.gov/pub/data/paleo/icecore/antarctica/antarctica2015co2.xls
+    date_accessed: 2024-01-26
+
+    # License
+    license:
+      name: CC BY 4.0
+
+wdir: ../../../data/snapshots/climate/2024-01-26
+outs:
+- md5: f848f71eee15e6e8b7cf6a5aabce3f69
+  size: 588800
+  path: long_run_co2_concentration.xls

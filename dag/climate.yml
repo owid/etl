@@ -106,6 +106,13 @@ steps:
     # - data://garden/imbie/2024-01-02/ice_sheet_mass_balance
     - data://garden/epa/2024-01-02/ice_sheet_mass_balance
     - data://garden/climate/2024-01-02/ghg_concentration
+  #
+  # NOAA National Centers for Environmental Information - Long-run CO2 concentration.
+  #
+  data://meadow/climate/2024-01-26/long_run_co2_concentration:
+    - snapshot://climate/2024-01-26/long_run_co2_concentration.xls
+  data://garden/climate/2024-01-26/long_run_co2_concentration:
+    - data://meadow/climate/2024-01-26/long_run_co2_concentration
 
   # Copernicus Climate Change Service - Surface temperature
   data://meadow/climate/2023-12-20/surface_temperature:
