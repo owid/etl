@@ -11,7 +11,7 @@ definitions:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
 dataset:
   update_period_days: 365
-  title: Population
+  title: Population (Experimental - removing Gapminder)
 
 
 # Learn more about the available fields:

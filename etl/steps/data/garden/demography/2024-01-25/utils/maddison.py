@@ -156,10 +156,10 @@ def format_maddison(tb: Table, tb_reference: Table) -> Table:
 def estimate_population_1_to_M(tb: Table, tb_reference: Table) -> Table:
     """Add population estimates from 1:M country equivalents."""
     for country_former, countries_new in country_equivalents_1M.items():
-        tb_new = tb.loc[tb["country"] == country_former].copy()
         population_former = tb_reference.loc[countries_new, "population"].sum()
         for country_new in countries_new:
             ratio = tb_reference.loc[country_new, "population"] / population_former
+            tb_new = tb.loc[tb["country"] == country_former].copy()
             tb_new.loc[:, "country"] = country_new
             tb_new.loc[:, "population"] = tb_new["population"] * ratio
             tb = pr.concat([tb, tb_new])
