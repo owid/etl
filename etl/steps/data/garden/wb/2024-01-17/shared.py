@@ -19,6 +19,9 @@ relative_poverty_description = "This is a measure of _relative_ poverty – it c
 
 ppp_description = "The data is measured in international-$ at {ppp} prices – this adjusts for inflation and for differences in the cost of living between countries."
 
+processing_description_thr_percentiles = "Missing country values and regional aggregations of the threshold indicator are calculated by running multiple queries on the API to obtain the closest poverty line to each threshold. This data is merged with the percentile files [provided by the World Bank](https://datacatalog.worldbank.org/search/dataset/0063646/_poverty_and_inequality_platform_pip_percentiles)."
+
+
 # Define default tolerance for each variable
 TOLERANCE = 5
 
@@ -319,7 +322,6 @@ pct_dict = {
 }
 
 
-# This function creates the metadata for each variable in the dataset, from the dictionaries defined above
 def add_metadata_vars(tb_garden: Table, ppp_version: int, welfare_type: str) -> Table:
     """
     Add metadata for each variable in the dataset, using the dictionaries above and the functions below
@@ -502,6 +504,9 @@ def add_metadata_vars(tb_garden: Table, ppp_version: int, welfare_type: str) -> 
                     .replace("{pct_dict[pct]['decile10']}", pct_dict[pct]["decile10"].lower())
                 )
 
+                tb_garden[col_name].metadata.description_key = [
+                    ppp.replace("{ppp}", str(ppp_version)) for ppp in tb_garden[col_name].metadata.description_key
+                ]
                 tb_garden[col_name].metadata.unit = tb_garden[col_name].metadata.unit.replace("{ppp}", str(ppp_version))
 
     return tb_garden
@@ -722,6 +727,116 @@ def var_metadata_percentiles(var, pct, origins, ppp_version, welfare_type) -> Va
                 non_market_income_description,
             ],
             description_processing=f"""{inc_cons_dict[welfare_type]['processing_description']}""",
+            unit=var_dict[var]["unit"],
+            short_unit=var_dict[var]["short_unit"],
+            origins=origins,
+        )
+
+    meta.display = {
+        "name": meta.title,
+        "numDecimalPlaces": var_dict[var]["numDecimalPlaces"],
+        "tolerance": TOLERANCE,
+    }
+
+    meta.presentation = {
+        "title_public": meta.title,
+    }
+
+    return meta
+
+
+# FOR PERCENTILES
+def add_metadata_vars_percentiles(tb_garden: Table, ppp_version: int, welfare_type: str) -> Table:
+    """
+    Add metadata for each variable in the dataset, using the dictionaries above and the functions below
+    This is done for the percentile tables
+    """
+
+    # Add short name
+    tb_garden.metadata.short_name = f"percentiles_{welfare_type}_{ppp_version}"
+
+    # Get a list of all the variables available
+    cols = list(tb_garden.columns)
+
+    for var in var_dict:
+        # For variables uniquely defined for each country-year-welfare type-reporting level (mostly inequality indicators + mean and median)
+        col_name = f"{var}"
+
+        if col_name in cols:
+            # Get the origins of the variable
+            origins = tb_garden[col_name].metadata.origins
+
+            # Create metadata for these variables
+            tb_garden[col_name].metadata = var_metadata_percentile_table(var, origins, welfare_type)
+
+            # Replace placeholders
+            tb_garden[col_name].metadata.description_short = (
+                tb_garden[col_name]
+                .metadata.description_short.replace("{str(pct)}", "each 1")
+                .replace(
+                    "{inc_cons_dict[wel]['name_distribution']}",
+                    inc_cons_dict[welfare_type]["name_distribution"],
+                )
+                .replace("{inc_cons_dict[wel]['verb']}", inc_cons_dict[welfare_type]["verb"])
+                .replace(
+                    "the {pct_dict[pct]['decile10']} (tenth of the population)",
+                    "each percentile (hundredth of the population)",
+                )
+            )
+            tb_garden[col_name].metadata.description_key = [
+                ppp.replace("{ppp}", str(ppp_version)) for ppp in tb_garden[col_name].metadata.description_key
+            ]
+
+            tb_garden[col_name].metadata.unit = tb_garden[col_name].metadata.unit.replace("{ppp}", str(ppp_version))
+
+    return tb_garden
+
+
+def var_metadata_percentile_table(var, origins, welfare_type) -> VariableMeta:
+    """
+    Create metadata for variables with percentiles
+    """
+
+    if var == "thr":
+        meta = VariableMeta(
+            title=f"{inc_cons_dict[welfare_type]['name'].capitalize()} {var_dict[var]['title'].lower()}",
+            description_short=var_dict[var]["description"],
+            description_key=[
+                ppp_description,
+                inc_cons_dict[welfare_type]["description"],
+                non_market_income_description,
+            ],
+            description_processing=f"""{processing_description_thr_percentiles}""",
+            unit=var_dict[var]["unit"],
+            short_unit=var_dict[var]["short_unit"],
+            origins=origins,
+        )
+
+    elif var == "avg":
+        meta = VariableMeta(
+            title=f"{inc_cons_dict[welfare_type]['name'].capitalize()} {var_dict[var]['title'].lower()}",
+            description_short=var_dict[var]["description"],
+            description_key=[
+                ppp_description,
+                inc_cons_dict[welfare_type]["description"],
+                non_market_income_description,
+            ],
+            description_processing="",
+            unit=var_dict[var]["unit"],
+            short_unit=var_dict[var]["short_unit"],
+            origins=origins,
+        )
+
+    # For shares
+    else:
+        meta = VariableMeta(
+            title=f"{inc_cons_dict[welfare_type]['name'].capitalize()} {var_dict[var]['title'].lower()}",
+            description_short=var_dict[var]["description"],
+            description_key=[
+                inc_cons_dict[welfare_type]["description"],
+                non_market_income_description,
+            ],
+            description_processing="",
             unit=var_dict[var]["unit"],
             short_unit=var_dict[var]["short_unit"],
             origins=origins,

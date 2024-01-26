@@ -3,7 +3,7 @@
 
 import owid.catalog.processing as pr
 from owid.catalog import Table
-from shared import add_metadata_vars
+from shared import add_metadata_vars, add_metadata_vars_percentiles
 from structlog import get_logger
 from tabulate import tabulate
 
@@ -34,24 +34,33 @@ def run(dest_dir: str) -> None:
     # Load meadow dataset.
     ds_meadow = paths.load_dataset("world_bank_pip")
 
-    # Read table from meadow dataset.
+    # Read tables from meadow dataset.
+    # Key indicators
     tb = ds_meadow["world_bank_pip"].reset_index()
+
+    # Percentiles
+    tb_percentiles = ds_meadow["world_bank_pip_percentiles"].reset_index()
 
     # Process data
     # Make table wide and change column names
     tb = process_data(tb)
+
+    # For percentiles, remove columns and rename
+    tb_percentiles = drop_columns_and_rename_percentiles(tb=tb_percentiles)
 
     # Calculate inequality measures
     tb = calculate_inequality(tb)
 
     # Harmonize country names
     tb: Table = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
+    tb_percentiles: Table = geo.harmonize_countries(df=tb_percentiles, countries_file=paths.country_mapping_path)
 
     # Amend the entity to reflect if data refers to urban or rural only
     tb = identify_rural_urban(tb)
 
     # Separate out ppp and filled data from the main dataset
     tb_2011, tb_2017 = separate_ppp_data(tb)
+    tb_percentiles_2011, tb_percentiles_2017 = separate_ppp_data(tb_percentiles)
 
     # Create stacked variables from headcount and headcount_ratio
     tb_2011, col_stacked_n_2011, col_stacked_pct_2011 = create_stacked_variables(
@@ -96,14 +105,31 @@ def run(dest_dir: str) -> None:
         welfare_type="income_consumption",
     )
 
-    # Set index and sort
-    tb_inc_2011 = set_index_and_sort(tb=tb_inc_2011)
-    tb_cons_2011 = set_index_and_sort(tb=tb_cons_2011)
-    tb_inc_or_cons_2011 = set_index_and_sort(tb=tb_inc_or_cons_2011)
+    tb_percentiles_2011 = add_metadata_vars_percentiles(
+        tb_garden=tb_percentiles_2011,
+        ppp_version=2011,
+        welfare_type="income_consumption",
+    )
+    tb_percentiles_2017 = add_metadata_vars_percentiles(
+        tb_garden=tb_percentiles_2017,
+        ppp_version=2017,
+        welfare_type="income_consumption",
+    )
 
-    tb_inc_2017 = set_index_and_sort(tb=tb_inc_2017)
-    tb_cons_2017 = set_index_and_sort(tb=tb_cons_2017)
-    tb_inc_or_cons_2017 = set_index_and_sort(tb=tb_inc_or_cons_2017)
+    # Set index and sort
+    # Define index cols
+    index_cols = ["country", "year"]
+    index_cols_percentiles = ["country", "year", "reporting_level", "welfare_type", "percentile"]
+    tb_inc_2011 = set_index_and_sort(tb=tb_inc_2011, index_cols=index_cols)
+    tb_cons_2011 = set_index_and_sort(tb=tb_cons_2011, index_cols=index_cols)
+    tb_inc_or_cons_2011 = set_index_and_sort(tb=tb_inc_or_cons_2011, index_cols=index_cols)
+
+    tb_inc_2017 = set_index_and_sort(tb=tb_inc_2017, index_cols=index_cols)
+    tb_cons_2017 = set_index_and_sort(tb=tb_cons_2017, index_cols=index_cols)
+    tb_inc_or_cons_2017 = set_index_and_sort(tb=tb_inc_or_cons_2017, index_cols=index_cols)
+
+    tb_percentiles_2011 = set_index_and_sort(tb=tb_percentiles_2011, index_cols=index_cols_percentiles)
+    tb_percentiles_2017 = set_index_and_sort(tb=tb_percentiles_2017, index_cols=index_cols_percentiles)
 
     # Create spell tables to separate different survey spells in the explorers
     spell_tables_inc = create_survey_spells(tb=tb_inc_2017)
@@ -141,6 +167,8 @@ def run(dest_dir: str) -> None:
             tb_inc_2011_2017,
             tb_cons_2011_2017,
             tb_inc_or_cons_2011_2017,
+            tb_percentiles_2011,
+            tb_percentiles_2017,
         ]
         + spell_tables_inc
         + spell_tables_cons
@@ -828,12 +856,12 @@ def survey_count(tb: Table) -> Table:
     return tb
 
 
-def set_index_and_sort(tb: Table) -> Table:
+def set_index_and_sort(tb: Table, index_cols=list) -> Table:
     """
     Add index and sort
     """
 
-    tb = tb.set_index(["country", "year"], verify_integrity=True).sort_index()
+    tb = tb.set_index(index_cols, verify_integrity=True).sort_index()
 
     return tb
 
@@ -977,5 +1005,19 @@ def define_columns_for_ppp_comparison(tb: Table, id_cols: list, ppp_version: int
 
     # Filter columns
     tb = tb[cols_list]
+
+    return tb
+
+
+def drop_columns_and_rename_percentiles(tb: Table) -> Table:
+    """
+    Drop columns not needed in percentile file. Also rename the column "target_percentile" to "percentile"
+    """
+
+    # Remove columns
+    tb = tb.drop(columns=["estimated_percentile", "distance_to_p"])
+
+    # Rename column
+    tb = tb.rename(columns={"target_percentile": "percentile"})
 
     return tb

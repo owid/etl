@@ -18,18 +18,18 @@ meta:
       - World Bank (2023). Poverty and Inequality Platform (version 20230919_2017 and 20230919_2011) [Data set]. World Bank Group. https://pip.worldbank.org/. Accessed January 17, 2024.
 
     # Files
-    url_main:
+    url_main: 
       https://datacatalog.worldbank.org/search/dataset/0063646/_poverty_and_inequality_platform_pip_percentiles
     date_accessed: 2024-01-17
 
     # License
     license:
       name: CC0
-      url:
+      url: 
         https://datacatalog.worldbank.org/search/dataset/0063646/_poverty_and_inequality_platform_pip_percentiles
 
 wdir: ../../../data/snapshots/wb/2024-01-17
 outs:
-- md5: 4a39acc7d62854dd84b1929b7d7cf2d7
+- md5: 8e89c181b188c0a2314ae50d41d8287d
   size: 16929851
   path: world_bank_pip_percentiles.csv
