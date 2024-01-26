@@ -11,7 +11,6 @@ tables:
   diarrheal_diseases__both_sexes__age_standardized:
     variables:
       deaths_that_are_from_diarrheal_diseases_per_100_000_people__in_both_sexes_aged_age_standardized:
-        sources: []
         title: Deaths that are from diarrheal diseases per 100,000 people, in both sexes aged age-standardized
         unit: deaths per 100,000 people
         display:
