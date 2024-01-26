@@ -77,10 +77,16 @@ def prioritize_status(statuses):
         return LABEL_AGREED
 
 
-def expand_data_to_all_years(tb: Table) -> Table:
+def expand_data_to_all_countries_and_years(tb: Table, tb_members: Table) -> Table:
     tb = tb.copy()
     # Extract the maximum year from the publication date of the data.
     year_max = int(tb["status"].metadata.origins[0].date_published.split("-")[0])
+
+    # List all countries (by selecting non-historical countries from our regions dataset).
+    # NOTE: Some states that are not independent member states of the UN do participate in the treaties.
+    # This is specifically the case of Cook Islands, Niue, Palestine, and Vatican.
+    # So, we need to include all UN members, but also all countries currently in the treaties data.
+    countries = sorted(set(tb_members[(tb_members["membership_status"] == "Member")]["country"]) | set(tb["country"]))
 
     # For each treaty, find the minimum year (which should be the year when it was signed for the first time)
     # and find all combinations of countries and years.
@@ -89,7 +95,7 @@ def expand_data_to_all_years(tb: Table) -> Table:
         [
             Table(
                 pd.MultiIndex.from_product(
-                    [[treaty], tb["country"].unique(), range(tb[tb["treaty"] == treaty]["year"].min(), year_max)],
+                    [[treaty], countries, range(tb[tb["treaty"] == treaty]["year"].min(), year_max)],
                     names=["treaty", "country", "year"],
                 ).to_frame(index=False)
             )
@@ -109,10 +115,19 @@ def run(dest_dir: str) -> None:
     ds_meadow = paths.load_dataset("nuclear_weapons_treaties")
     tb = ds_meadow["nuclear_weapons_treaties"].reset_index()
 
+    # Load dataset of UN members and read its main table.
+    # NOTE: We do not load the regions dataset because regions like Greenland or French Guiana would appear as countries
+    # that do not sign the treaties. In reality, they are not independent members of the UN, but they are part of other
+    # countries that are members (in these cases, Denmark and France, respectively).
+    # So we load the list of independent UN members, and countries like Greenland and French Guiana will simply appear
+    # as having no data.
+    ds_members = paths.load_dataset("un_members")
+    tb_members = ds_members["un_members"].reset_index()
+
     #
     # Process data.
     #
-    # Select and rename columns; and ensure all columns are string (to avoid issues with categorical columns).
+    # Select and rename columns, and ensure all columns are string (to avoid issues with categorical columns).
     tb = tb[list(COLUMNS)].rename(columns=COLUMNS, errors="raise").astype(str)
 
     # Harmonize country names.
@@ -135,7 +150,7 @@ def run(dest_dir: str) -> None:
     )
 
     # Add a row for each treaty and country-year (with an empty status).
-    tb = expand_data_to_all_years(tb=tb)
+    tb = expand_data_to_all_countries_and_years(tb=tb, tb_members=tb_members)
 
     # Forward fill the status of each country-year, and for the years before the first event in a country, fill with a
     # generic status.
