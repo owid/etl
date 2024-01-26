@@ -1,0 +1,24 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Urbanization
+    processing_level: major
+
+dataset:
+  title: World Urbanization Prospects Dataset - Number of Inhabitants to Define Urban Agglomerations
+
+tables:
+  urban_agglomerations_definition:
+    variables:
+      minimum_inhabitants:
+        title: Urban area threshold
+        unit: 'people'
+        short_unit: ''
+        description_short: The concept of an 'urban area' lacks a universal definition, with national variations based on minimum population thresholds or other metrics like population density, infrastructure, and pre-defined cities.
+        description_key:
+          - There is no consistent definition of what constitutes an 'urban area'. This is highly variable across countries. This data presents a given country's minimum threshold of inhabitants needed for it to be defined an 'urban area'. For many countries, there is no defined threshold based on inhabitants; other metrics such as population density, infrastructure, or even pre-defined cities may be used.
+          - Note that some countries with minimum inhabitant thresholds noted here also include additional qualities (such as population density) to be met.
+        display:
+          numDecimalPlaces: 0
