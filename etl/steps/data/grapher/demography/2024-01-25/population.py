@@ -19,29 +19,54 @@ YEAR_THRESHOLD = 2022
 
 def run(dest_dir: str) -> None:
     #
-    # Load inputs.
+    # Load inputs
     #
+    # 2024-01-05 version: HYDE + GAPMINDER + WPP
     # Load garden dataset.
-    ds_garden = paths.load_dataset("population")
-
+    ds_garden = paths.load_dataset("population", version="2024-01-05")
     # Read table from garden dataset.
-    tb_garden = ds_garden["population_original"].update_metadata(short_name="population")
-
+    tb_1 = ds_garden["population_original"].update_metadata(short_name="population")
     # Set origins on `source`
-    tb_garden.source.m.origins = tb_garden.population.m.origins
+    tb_1.source.m.origins = tb_1.population.m.origins
+
+    # 2024-01-25 version: HYDE + MADDISON + WPP
+    # Load garden dataset.
+    ds_garden = paths.load_dataset("population", version="2024-01-25")
+    # Read table from garden dataset.
+    tb_2 = ds_garden["population_original"].update_metadata(short_name="population_exp")
+    # Set origins on `source`
+    tb_2.source.m.origins = tb_2.population.m.origins
+
+    # Fix column names
+    tb_2 = tb_2.rename(
+        columns={
+            "population": "population_exp",
+            "source": "source_exp",
+        }
+    )
+    tb_2["population_exp"].metadata.title = "Population (experimental)"
+    tb_2["source_exp"].metadata.title = "Source (experimental)"
 
     #
     # Process data.
     #
-    tb_grapher = tb_garden
-    # tb_grapher = process(tb_garden)
+    tb_1 = process(tb_1)
+
+    # Tables
+    tables = [
+        tb_1,
+        tb_2,
+    ]
 
     #
     # Save outputs.
     #
+
     # Create a new grapher dataset with the same metadata as the garden dataset.
     ds_grapher = create_dataset(
-        dest_dir, tables=[tb_grapher], check_variables_metadata=True, default_metadata=ds_garden.metadata
+        dest_dir,
+        tables=tables,
+        check_variables_metadata=True,
     )
 
     # Save changes in the new grapher dataset.

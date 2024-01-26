@@ -23,6 +23,7 @@ steps:
   data://grapher/demography/2023-03-31/population:
     - data://garden/demography/2023-03-31/population
 
+  # Population (new versions, experimental)
   # Population OMM 2024-01-05: HYDE 3.3 + Gapminder + UN WPP 2022
   data://garden/demography/2024-01-05/population:
     - data://garden/hyde/2024-01-02/all_indicators
@@ -31,8 +32,6 @@ steps:
     - data://open_numbers/open_numbers/latest/gapminder__systema_globalis
     - data://garden/regions/2023-01-01/regions
     - data://garden/wb/2021-07-01/wb_income
-  data://grapher/demography/2024-01-05/population:
-    - data://garden/demography/2024-01-05/population
 
   # Population OMM 2024-01-25: HYDE 3.3 + Maddison + UN WPP 2022
   data://garden/demography/2024-01-25/population:
@@ -45,8 +44,11 @@ steps:
     # Auxiliary files
     - data://garden/regions/2023-01-01/regions
     - data://garden/wb/2021-07-01/wb_income
+
+  # Combine population in grapher
   data://grapher/demography/2024-01-25/population:
     - data://garden/demography/2024-01-25/population
+    - data://garden/demography/2024-01-05/population
 
   # Population (Fariss et al.)
   data://meadow/demography/2023-12-20/population_fariss:
