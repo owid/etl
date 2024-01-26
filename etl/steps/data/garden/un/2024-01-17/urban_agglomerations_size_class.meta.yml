@@ -1,0 +1,166 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Urbanization
+    processing_level: minor
+    description_from_producer: The term “urban agglomeration” refers to the population contained within the contours of a contiguous territory inhabited at urban density levels without regard to administrative boundaries. It usually incorporates the population in a city or town plus that in the suburban areas lying outside of, but being adjacent to, the city boundaries. Whenever possible, data classified according to the concept of urban agglomeration are used. However, some countries do not produce data according to the concept of urban agglomeration but use instead that of metropolitan area or city proper. If possible, such data are adjusted to conform to the concept urban agglomeration. When sufficient information is not available to permit such an adjustment, data based on the concept of city proper or metropolitan area are used.
+
+dataset:
+  title: World Urbanization Prospects Dataset - Urban Agglomerations by Size Class
+
+tables:
+  urban_agglomerations_size_class:
+    variables:
+      _1_to_5_million_number_of_agglomerations:
+        title: Number of agglomerations with 1 to 5 million population
+        unit: 'agglomerations'
+        short_unit: ''
+        description_key:
+          - Counts the number of urban agglomerations with a population between 1 and 5 million.
+        display:
+          numDecimalPlaces: 0
+
+      _1_to_5_million_percentage_of_urban_population:
+        title: Percentage of urban population in agglomerations with 1 to 5 million population
+        unit: '%'
+        short_unit: '%'
+        description_key:
+          - Indicates the percentage of the total urban population residing in agglomerations with a population between 1 and 5 million.
+        display:
+          numDecimalPlaces: 1
+
+      _1_to_5_million_population:
+        title: Population in agglomerations with 1 to 5 million
+        unit: 'people'
+        short_unit: ''
+        description_key:
+          - Reflects the total population residing in urban agglomerations with a population between 1 and 5 million.
+        display:
+          numDecimalPlaces: 0
+
+      _10_million_or_more_number_of_agglomerations:
+        title: Number of agglomerations with 10 million or more population
+        unit: 'agglomerations'
+        short_unit: ''
+        description_key:
+          - Counts the number of urban agglomerations with a population of 10 million or more.
+        display:
+          numDecimalPlaces: 0
+
+      _10_million_or_more_percentage_of_urban_population:
+        title: Percentage of urban population in agglomerations with 10 million or more population
+        unit: '%'
+        short_unit: '%'
+        description_key:
+          - Indicates the percentage of the total urban population residing in agglomerations with a population of 10 million or more.
+        display:
+          numDecimalPlaces: 1
+
+      _10_million_or_more_population:
+        title: Population in agglomerations with 10 million or more
+        unit: 'people'
+        short_unit: ''
+        description_key:
+          - Reflects the total population residing in urban agglomerations with a population of 10 million or more.
+        display:
+          numDecimalPlaces: 0
+
+      _300_000_to_500_000_number_of_agglomerations:
+        title: Number of agglomerations with 300,000 to 500,000 population
+        unit: 'agglomerations'
+        short_unit: ''
+        description_key:
+          - Counts the number of urban agglomerations with a population between 300,000 and 500,000.
+        display:
+          numDecimalPlaces: 0
+
+      _300_000_to_500_000_percentage_of_urban_population:
+        title: Percentage of urban population in agglomerations with 300,000 to 500,000 population
+        unit: '%'
+        short_unit: '%'
+        description_key:
+          - Indicates the percentage of the total urban population residing in agglomerations with a population between 300,000 and 500,000.
+        display:
+          numDecimalPlaces: 1
+
+      _300_000_to_500_000_population:
+        title: Population in agglomerations with 300,000 to 500,000
+        unit: 'people'
+        short_unit: ''
+        description_key:
+          - Reflects the total population residing in urban agglomerations with a population between 300,000 and 500,000.
+        display:
+          numDecimalPlaces: 0
+
+      _5_to_10_million_number_of_agglomerations:
+        title: Number of agglomerations with 5 to 10 million population
+        unit: 'agglomerations'
+        short_unit: ''
+        description_key:
+          - Counts the number of urban agglomerations with a population between 5 and 10 million.
+        display:
+          numDecimalPlaces: 0
+
+      _5_to_10_million_percentage_of_urban_population:
+        title: Percentage of urban population in agglomerations with 5 to 10 million population
+        unit: '%'
+        description_key:
+          - Indicates the percentage of the total urban population residing in agglomerations with a population between 5 and 10 million.
+        display:
+          numDecimalPlaces: 1
+
+      _5_to_10_million_population:
+        title: Population in agglomerations with 5 to 10 million
+        unit: 'people'
+        short_unit: ''
+        description_key:
+          - Reflects the total population residing in urban agglomerations with a population between 5 and 10 million.
+        display:
+          numDecimalPlaces: 0
+
+      _500_000_to_1_million_number_of_agglomerations:
+        title: Number of agglomerations with 500,000 to 1 million population
+        unit: 'agglomerations'
+        short_unit: ''
+        description_key:
+          - Counts the number of urban agglomerations with a population between 500,000 and 1 million.
+        display:
+          numDecimalPlaces: 0
+
+      _500_000_to_1_million_percentage_of_urban_population:
+        title: Percentage of urban population in agglomerations with 500,000 to 1 million population
+        unit: '%'
+        short_unit: '%'
+        description_key:
+          - Indicates the percentage of the total urban population residing in agglomerations with a population between 500,000 and 1 million.
+        display:
+          numDecimalPlaces: 1
+
+      _500_000_to_1_million_population:
+        title: Population in agglomerations with 500,000 to 1 million
+        unit: 'people'
+        short_unit: ''
+        description_key:
+          - Reflects the total population residing in urban agglomerations with a population between 500,000 and 1 million.
+        display:
+          numDecimalPlaces: 0
+
+      fewer_than_300_000_percentage_of_urban_population:
+        title: Percentage of urban population in agglomerations with fewer than 300,000 population
+        unit: '%'
+        short_unit: '%'
+        description_key:
+          - Indicates the percentage of the total urban population residing in agglomerations with a population of fewer than 300,000.
+        display:
+          numDecimalPlaces: 1
+
+      fewer_than_300_000_population:
+        title: Population in agglomerations with fewer than 300,000
+        unit: 'people'
+        short_unit: ''
+        description_key:
+          - Reflects the total population residing in urban agglomerations with a population of fewer than 300,000.
+        display:
+          numDecimalPlaces: 0

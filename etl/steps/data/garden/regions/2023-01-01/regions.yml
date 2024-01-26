@@ -348,6 +348,8 @@
   members:
     - "GGY"
     - "JEY"
+  aliases:
+    - "CHI"
 
 - code: "CHL"
   name: "Chile"
@@ -810,6 +812,8 @@
 
 - code: "OWID_KOS"
   name: "Kosovo"
+  aliases:
+    - "XKX"
 
 - code: "KWT"
   name: "Kuwait"

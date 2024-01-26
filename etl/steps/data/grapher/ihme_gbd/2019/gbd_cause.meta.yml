@@ -1,0 +1,93 @@
+definitions:
+  common:
+    processing_level: minor
+    presentation:
+      topic_tags:
+        - Diarrheal Diseases
+        - Causes of Death
+
+  gbd_origin: &gbd_origin
+    producer: IHME, Global Burden of Disease Study (2019)
+    title: Institute for Health Metrics and Evaluation - Global Burden of Disease (2019) - Deaths and DALYs
+    description: >-
+      The Global Burden of Disease (GBD) provides a comprehensive picture of mortality and disability across countries,
+      time, age, and sex. It quantifies health loss from hundreds of diseases, injuries, and risk factors, so that health
+      systems can be improved and disparities eliminated.
+
+      GBD research incorporates both the prevalence of a given disease or risk factor and the relative harm it causes.
+      With these tools, decision-makers can compare different health issues and their effects.
+    citation_full: "Global Burden of Disease Collaborative Network. Global Burden of Disease Study 2019 (GBD 2019). Seattle, United States: Institute for Health Metrics and Evaluation (IHME), 2020."
+    url_main: https://www.healthdata.org/research-analysis/about-gbd
+    date_published: 2020-10-17
+    date_accessed: 2021-12-01
+    license:
+      url: https://www.healthdata.org/data-tools-practices/data-practices/terms-and-conditions
+dataset:
+  update_period_days: 1095
+tables:
+  diarrheal_diseases__both_sexes__age_standardized:
+    variables:
+      ? deaths_that_are_from_diarrheal_diseases_per_100_000_people__in_both_sexes_aged_age_standardized
+      : sources: []
+        origins:
+          - *gbd_origin
+        title: Deaths that are from diarrheal diseases per 100,000 people, in both sexes aged age-standardized
+        unit: deaths per 100,000 people
+        display:
+          name: Diarrheal diseases
+          numDecimalPlaces: 1
+        description_short:
+          Estimated annual number of deaths from [diarrheal diseases](#dod:diarrheal-diseases) per 100,000
+          people.
+        description_key:
+          - These estimates come from the Global Burden of Disease study published by the Institute for Health Metrics (IHME). This is currently one of the few sources that produces global-level estimates across most countries on the prevalence and disease burden of diarrheal diseases.
+          - Estimates of diarrheal deaths are based on vital registration and verbal autopsy data and a range of hospital and community samples where pathogens were identified using cell culture, immunoassay, and RT-PCR techniques.
+          - This data was then used to estimate a single underlying cause of death for all deaths in the Global Burden of Disease study.
+          - There are large differences in the quality and availability of data across the world. While high-quality data in richer countries often exists, data on deaths from diarrheal diseases in many poorer countries is often limited. The IHME Global Burden of Disease attempts to fill these gaps, but these estimates come with a level of uncertainty.
+          - A summary of the indicator by the Institute for Health Metrics and Evaluation (IHME) is available [here](https://www.healthdata.org/results/gbd_summaries/2019/diarrheal-diseases-level-3-cause).
+        description_from_producer: "This aggregate cause incorporates death and disability resulting from diarrhoeal diseases for 13 different aetiologies.  Diarrhoeal disease episodes were defined as three or more loose stools in a 24-hour period. Included are ICD-9: 001–009.9; ICD-10: A00–A09, R19.7."
+        presentation:
+          title_public: Diarrheal diseases death rate
+          title_variant: Age-standardized
+          attribution_short: IHME GBD
+          grapher_config:
+            title: Diarrheal diseases death rate
+            subtitle: Estimated annual number of deaths from [diarrheal diseases](#dod:diarrheal-diseases) per 100,000 people.
+            variantName: IHME, age-standardized
+            sourceDesc: IHME, Global Burden of Disease (2019)
+            originUrl: https://ourworldindata.org/diarrheal-diseases
+            hasMapTab: true
+            tab: map
+            yAxis:
+              max: 0
+              min: 0
+            minTime: 1990
+            maxTime: 2019
+            map:
+              colorScale:
+                baseColorScheme: OrRd
+                binningStrategy: manual
+                legendDescription: Age-standardized death rates from diarrheal diseases (per 100,000)
+                customNumericColors:
+                  - null
+                  - null
+                customNumericValues:
+                  - 1
+                  - 2
+                  - 5
+                  - 10
+                  - 20
+                  - 50
+                  - 100
+                  - 200
+                  - 500
+                customNumericMinValue: 0
+            selectedEntityNames:
+              - Ethiopia
+              - Kenya
+              - World
+              - Equatorial Guinea
+              - Niger
+              - Chad
+            note: To allow comparisons between countries and over time this metric is [age-standardized](#dod:age_standardized).
+            $schema: https://files.ourworldindata.org/schemas/grapher-schema.003.json

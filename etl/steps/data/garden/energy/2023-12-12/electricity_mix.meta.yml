@@ -5,13 +5,15 @@ definitions:
       topic_tags:
         - "Energy"
     description_processing: |-
-      We rely on Ember as the primary source of electricity consumption data. While the Energy Institute (EI) provides primary energy (not just electricity) consumption data and it provides a longer time-series (dating back to 1965) than Ember (which only dates back to 1990), EI does not provide data for all countries or for all sources of electricity (for example, only Ember provides data on electricity from bioenergy). So, where data from Ember is available for a given country and year, we rely on it as the primary source. We then supplement this with data from EI where data from Ember is not available.
+      - We rely on Ember as the primary source of electricity consumption data. While the Energy Institute (EI) provides primary energy (not just electricity) consumption data and it provides a longer time-series (dating back to 1965) than Ember (which only dates back to 1990), EI does not provide data for all countries or for all sources of electricity (for example, only Ember provides data on electricity from bioenergy). So, where data from Ember is available for a given country and year, we rely on it as the primary source. We then supplement this with data from EI where data from Ember is not available.
   description_short_twh: &description_short_twh |-
     Measured in terawatt-hours.
   description_short_pct: &description_short_pct |-
     Measured as a percentage of total electricity.
   description_short_per_capita: &description_short_per_capita |-
     Measured in kilowatt-hours per person.
+  description_processing_direct_primary_energy: |-
+    - The Statistical Review of World Energy only provides data on input-equivalent primary energy consumption, not on direct primary energy consumption. We estimate the direct primary energy consumption as the sum of the primary energy consumption from coal, oil, gas, and biofuels, plus the electricity generation from low-carbon sources (nuclear, hydro, wind, solar, bioenergy and other renewables). Finally, the share of electricity in direct primary energy consumption is calculated as the ratio of total electricity generation to direct primary energy consumption (multiplied by 100).
 
 dataset:
   update_period_days: 365
@@ -375,14 +377,26 @@ tables:
         presentation:
           title_public: Population
       primary_energy_consumption__twh:
-        title: Electricity from primary energy consumption - TWh
+        title: Primary energy consumption - TWh
         short_unit: TWh
         unit: terawatt-hours
-        description_short: *description_short_twh
+        description_short: Measured in terawatt-hours, using the substitution method.
         display:
           name: Primary energy consumption
         presentation:
           title_public: Primary energy consumption
+      direct_primary_energy_consumption__twh:
+        title: Direct primary energy consumption - TWh
+        short_unit: TWh
+        unit: terawatt-hours
+        description_short: Measured in terawatt-hours.
+        description_processing: |-
+          {definitions.common.description_processing}
+          {definitions.description_processing_direct_primary_energy}
+        display:
+          name: Direct primary energy consumption
+        presentation:
+          title_public: Direct primary energy consumption
       renewable_generation__twh:
         title: Electricity from renewables - TWh
         short_unit: TWh
@@ -448,14 +462,17 @@ tables:
         presentation:
           title_public: Electricity demand
       total_electricity_share_of_primary_energy__pct:
-        title: Electricity as share of primary energy - %
+        title: Electricity as share of direct primary energy consumption - %
         short_unit: '%'
         unit: '%'
-        description_short: Measured as a percentage of total primary energy consumption.
+        description_short: Measured as a percentage of total, direct primary energy consumption.
+        description_processing: |-
+          {definitions.common.description_processing}
+          {definitions.description_processing_direct_primary_energy}
         display:
           name: Electricity
         presentation:
-          title_public: Total electricity as share of primary energy
+          title_public: Total electricity generation as share of primary energy
       total_emissions__mtco2:
         title: Emissions - MtCO2
         short_unit: Mt

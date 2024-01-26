@@ -30,6 +30,7 @@ etl-chartgpt = 'etl.chart_revision.v2.chartgpt:cli'
 etl-metaplay = 'apps.metadata_playground.cli:cli'
 etl-wizard = 'apps.wizard.cli:cli'
 etl-staging-sync = 'apps.staging_sync.cli:cli'
+etl-staging-sync-app = 'apps.staging_sync.app:cli'
 etl-metagpt = 'apps.metagpt.cli:main'
 
 [tool.poetry.dependencies]
@@ -92,6 +93,13 @@ geopandas = "^0.14.1"
 shapely = "^2.0.2"
 fasteners = "^0.19"
 streamlit-agraph = "^0.0.45"
+cdsapi = "^0.6.1"
+rioxarray = "^0.15.0"
+
+[tool.poetry.group.api.dependencies]
+fastapi = "^0.109.0"
+uvicorn = {extras = ["standard"], version = "^0.25.0"}
+slack-sdk = "^3.26.2"
 
 [tool.poetry.group.dev.dependencies]
 pytest = ">=7.1.2"

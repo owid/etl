@@ -333,6 +333,10 @@
           ],
           "requirement_level": "required"
         },
+        "non_redistributable": {
+          "type": "boolean",
+          "title": "Redistribution is prohibited (disable chart download)"
+        },
         "licenses": {
           "type": "array",
           "description": "List of all licenses that have been involved in the processing history of the indicators in this dataset.",

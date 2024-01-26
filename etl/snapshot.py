@@ -331,7 +331,7 @@ class SnapshotMeta:
         # exclude `outs` with md5, we reset it when saving new metadata
         d.pop("outs", None)
 
-        # remove is_public if it's True
+        # remove default values
         if d["is_public"]:
             del d["is_public"]
 

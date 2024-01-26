@@ -175,9 +175,38 @@ steps:
     - data://garden/war/2024-01-11/nuclear_weapons_proliferation
 
   # Arms Control Association - Nuclear Weapons Tests.
+  data://meadow/war/2024-01-25/nuclear_weapons_tests:
+    - snapshot://war/2024-01-25/nuclear_weapons_tests.csv
+  data://garden/war/2024-01-25/nuclear_weapons_tests:
+    - data://meadow/war/2024-01-25/nuclear_weapons_tests
+  data://grapher/war/2024-01-25/nuclear_weapons_tests:
+    - data://garden/war/2024-01-25/nuclear_weapons_tests
+
+  # UNODA - Treaties Database.
+  data://meadow/war/2024-01-23/nuclear_weapons_treaties:
+    - snapshot://war/2024-01-23/geneva_protocol.csv
+    - snapshot://war/2024-01-23/partial_test_ban.csv
+    - snapshot://war/2024-01-23/comprehensive_test_ban.csv
+    - snapshot://war/2024-01-23/non_proliferation.csv
+    - snapshot://war/2024-01-23/prohibition.csv
+  data://garden/war/2024-01-23/nuclear_weapons_treaties:
+    - data://meadow/war/2024-01-23/nuclear_weapons_treaties
+  data://grapher/war/2024-01-23/nuclear_weapons_treaties:
+    - data://garden/war/2024-01-23/nuclear_weapons_treaties
+  data://grapher/war/2024-01-23/nuclear_weapons_treaties_country_counts:
+    - data://garden/war/2024-01-23/nuclear_weapons_treaties
+
+  ######################################################################################################################
+  # Older versions to be archived once they are not used by any other steps.
+  # Arms Control Association - Nuclear Weapons Tests.
   data://meadow/war/2024-01-15/nuclear_weapons_tests:
     - snapshot://war/2024-01-15/nuclear_weapons_tests.csv
   data://garden/war/2024-01-15/nuclear_weapons_tests:
     - data://meadow/war/2024-01-15/nuclear_weapons_tests
   data://grapher/war/2024-01-15/nuclear_weapons_tests:
     - data://garden/war/2024-01-15/nuclear_weapons_tests
+
+  ######################################################################################################################
+
+
+

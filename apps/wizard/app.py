@@ -28,6 +28,7 @@ show_pages(
         Page(str(CURRENT_DIR / "charts/__main__.py"), "Charts", icon="📊"),
         Page(str(CURRENT_DIR / "metagpt.py"), "MetaGPT", icon="🤖"),
         Page(str(CURRENT_DIR / "dataset_explorer.py"), "Dataset Explorer", icon="🕵️"),
+        Page(str(CURRENT_DIR / "../staging_sync/app.py"), "Staging sync", icon="🔄"),
     ]
 )
 

@@ -123,9 +123,15 @@ ETL_EPOCH = 3
 # any garden or grapher dataset after this date will have strict mode enabled
 STRICT_AFTER = "2023-06-25"
 
+SLACK_API_TOKEN = env.get("SLACK_API_TOKEN")
+
+# if True, commit and push updates to YAML files coming from admin
+ETL_API_COMMIT = env.get("ETL_API_COMMIT") in ("True", "true", "1")
+
+BUGSNAG_API_KEY = env.get("BUGSNAG_API_KEY")
+
 
 def enable_bugsnag() -> None:
-    BUGSNAG_API_KEY = env.get("BUGSNAG_API_KEY")
     if BUGSNAG_API_KEY:
         bugsnag.configure(
             api_key=BUGSNAG_API_KEY,
