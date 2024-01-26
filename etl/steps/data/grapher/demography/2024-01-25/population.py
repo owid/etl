@@ -54,8 +54,8 @@ def run(dest_dir: str) -> None:
 
     # Tables
     tables = [
-        tb_1,
-        tb_2,
+        tb_1[["population", "source"]],
+        tb_2[["population_exp", "source_exp"]],
     ]
 
     #
