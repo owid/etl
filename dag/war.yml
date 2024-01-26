@@ -191,6 +191,7 @@ steps:
     - snapshot://war/2024-01-23/prohibition.csv
   data://garden/war/2024-01-23/nuclear_weapons_treaties:
     - data://meadow/war/2024-01-23/nuclear_weapons_treaties
+    - data://garden/un/2023-10-30/un_members
   data://grapher/war/2024-01-23/nuclear_weapons_treaties:
     - data://garden/war/2024-01-23/nuclear_weapons_treaties
   data://grapher/war/2024-01-23/nuclear_weapons_treaties_country_counts:
