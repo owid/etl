@@ -160,6 +160,10 @@ def metadata_export(
     if "sources" in ds_meta:
         ds_meta["sources"] = ds_meta.pop("sources", [])
 
+    # default values
+    if not ds_meta.get("non_redistributable", False):
+        del ds_meta["non_redistributable"]
+
     # transform tables metadata
     tb_meta = {}
     for tab in ds:

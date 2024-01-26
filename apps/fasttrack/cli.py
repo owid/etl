@@ -185,7 +185,7 @@ class FasttrackImport:
         """Generate dataset YAML file."""
         yml = metadata_export(self.dataset)
         # source is already in the snapshot and is propagated
-        yml["dataset"].pop("sources")
+        yml["dataset"].pop("sources", None)
         return yaml_dump(yml)  # type: ignore
 
     def save_metadata(self) -> None:
