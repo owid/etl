@@ -198,13 +198,6 @@ steps:
 
   ######################################################################################################################
   # Older versions to be archived once they are not used by any other steps.
-  # Arms Control Association - Nuclear Weapons Tests.
-  data://meadow/war/2024-01-15/nuclear_weapons_tests:
-    - snapshot://war/2024-01-15/nuclear_weapons_tests.csv
-  data://garden/war/2024-01-15/nuclear_weapons_tests:
-    - data://meadow/war/2024-01-15/nuclear_weapons_tests
-  data://grapher/war/2024-01-15/nuclear_weapons_tests:
-    - data://garden/war/2024-01-15/nuclear_weapons_tests
 
   ######################################################################################################################
 
