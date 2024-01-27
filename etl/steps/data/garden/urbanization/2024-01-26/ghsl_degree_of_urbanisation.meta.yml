@@ -1,0 +1,208 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Urbanization
+    processing_level: minor
+tables:
+  ghsl_degree_of_urbanisation:
+    variables:
+      average_area_km2:
+        title: Average size of units comprising the territory at selected GADM level
+        unit: km²
+        short_unit: km²
+        display:
+          numDecimalPlaces: 0
+
+      degurba_l1_population_city:
+        title: City Population in DEGURBA Level 1
+        unit: people
+        short_unit: ''
+        description_key:
+          - Evaluates population in urban centers with high-density clusters under DEGURBA Level 1.
+          - Focuses on grid cells with at least 1,500 inhabitants per km² in combined urban centers with a minimum of 50,000 inhabitants.
+          - Data includes neighboring cells and accounts for industrial, commercial, and green spaces within urban centers.
+        display:
+          numDecimalPlaces: 0
+
+      degurba_l1_population_rural_area:
+        title: Rural Area Population in DEGURBA Level 1
+        unit: people
+        short_unit: ''
+        description_key:
+          - Categorizes rural grid cells not identified as urban centers or clusters.
+          - Focuses on areas predominantly with less than 300 inhabitants per km².
+          - Includes higher density rural areas not forming significant urban clusters.
+        display:
+          numDecimalPlaces: 0
+
+      degurba_l1_population_town__and__suburbs:
+        title: Town and Suburban Population in DEGURBA Level 1
+        unit: people
+        short_unit: ''
+        description_key:
+          - Analyzes population in moderate density clusters including towns and suburbs.
+          - Covers areas with less than 50% population in high-density urban centers and up to 50% in rural grid cells.
+          - Reflects intermediate density areas combining urban and rural characteristics.
+        display:
+          numDecimalPlaces: 0
+
+      degurba_l1_units_city:
+        title: City Unit Count in DEGURBA Level 1
+        unit: cities
+        short_unit: ''
+        description_key:
+          - Quantifies urban centers classified as cities based on high population density.
+          - Focuses on the aggregation of urban grid cells forming significant population clusters.
+          - Data reflects the urban structure and scale of cities as per DEGURBA criteria.
+        display:
+          numDecimalPlaces: 0
+
+      degurba_l1_units_rural_area:
+        title: Rural Unit Count in DEGURBA Level 1
+        unit: rural areas
+        short_unit: ''
+        description_key:
+          - Enumerates rural areas with predominantly low-density population distributions.
+          - Identifies units outside high and moderate density urban clusters.
+          - Reflects rural landscape and demographic patterns under DEGURBA classification.
+        display:
+          numDecimalPlaces: 0
+
+      degurba_l1_units_town__and__suburbs:
+        title: Town and Suburb Unit Count in DEGURBA Level 1
+        unit: towns and suburbs
+        short_unit: ''
+        description_key:
+          - Assesses the number of administrative or statistical units in intermediate density areas.
+          - Covers towns and suburbs with mixed urban-rural population characteristics.
+          - Reflects the spatial extent and demographic distribution in suburban areas.
+        display:
+          numDecimalPlaces: 0
+
+      degurba_l2_population_city:
+        title: Population living in cities in DEGURBA Level 2
+        unit: people
+        short_unit: ''
+        display:
+          numDecimalPlaces: 0
+
+      degurba_l2_population_dense_town:
+        title: Population in dense towns
+        unit: people
+        short_unit: ''
+        display:
+          numDecimalPlaces: 0
+
+      degurba_l2_population_mostly_uninhabited_area:
+        title: Population in mostly uninhabited areas
+        unit: people
+        short_unit: ''
+        display:
+          numDecimalPlaces: 3
+
+      degurba_l2_population_rural_dispersed_area:
+        title: Population in rural dispersed areas
+        unit: people
+        short_unit: ''
+        display:
+          numDecimalPlaces: 0
+
+      degurba_l2_population_semi_dense_town:
+        title: Population of semi-dense towns
+        unit: people
+        short_unit: ''
+        display:
+          numDecimalPlaces: 0
+
+      degurba_l2_population_suburbs_or_peri_urban_area:
+        title: Population in suburbs or peri-urban areas
+        unit: people
+        short_unit: ''
+        display:
+          numDecimalPlaces: 0
+
+      degurba_l2_population_village:
+        title: Population of villages
+        unit: people
+        short_unit: ''
+        display:
+          numDecimalPlaces: 0
+
+      degurba_l2_units_city:
+        title: Number of cities classified in L2
+        unit: cities
+        short_unit: ''
+        display:
+          numDecimalPlaces: 0
+
+      degurba_l2_units_dense_town:
+        title: Number of dense towns
+        unit: dense towns
+        short_unit: ''
+        display:
+          numDecimalPlaces: 0
+
+      degurba_l2_units_mostly_uninhabited_area:
+        title: Number of mostly uninhabited areas
+        unit: uninhabited areas
+        short_unit: ''
+        display:
+          numDecimalPlaces: 0
+
+      degurba_l2_units_rural_dispersed_area:
+        title: Number of rural dispersed areas
+        unit: dispersed areas
+        short_unit: ''
+        display:
+          numDecimalPlaces: 0
+
+      degurba_l2_units_semi_dense_town:
+        title: Number of sem-dense towns
+        unit: towns
+        short_unit: ''
+        display:
+          numDecimalPlaces: 0
+
+      degurba_l2_units_suburbs_or_peri_urban_area:
+        title: Number of suburbs or peri-urban areas
+        unit: suburbs or peri-urban areas
+        short_unit: ''
+        display:
+          numDecimalPlaces: 0
+
+      degurba_l2_units_village:
+        title: Number of villages
+        unit: 'villages'
+        short_unit: ''
+        display:
+          numDecimalPlaces: 0
+
+
+      share_of_urban_population:
+        title: Share of total population in administrative units classified as Urban (Cities, Towns and Suburbs)
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 0
+
+      total_area_km2:
+        title: Total area of GADM units comprising the territory, in square kilometres
+        unit: km²
+        short_unit: km²
+        display:
+          numDecimalPlaces: 0
+
+      total_pop:
+        title: Total population
+        unit: people
+        short_unit: ''
+        display:
+          numDecimalPlaces: 0
+
+      total_units:
+        title: Total number of units in selected GADM level
+        unit: 'units'
+        short_unit: ''
+        display:
+          numDecimalPlaces: 0
