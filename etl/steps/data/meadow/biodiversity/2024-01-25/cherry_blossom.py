@@ -25,12 +25,12 @@ def run(dest_dir: str) -> None:
     tb = clean_data(tb)
     tb = add_data_for_recent_years(tb)
     tb = convert_date(tb)
-
+    tb = tb.set_index(["country", "year"], verify_integrity=True)
     #
     # Save outputs.
     #
     # Create a new grapher dataset with the same metadata as the garden dataset.
-    ds = create_dataset(dest_dir, tables=[tb.set_index(["country", "year"])], default_metadata=snap.metadata)
+    ds = create_dataset(dest_dir, tables=[tb], default_metadata=snap.metadata)
 
     # finally save the dataset
     ds.save()
@@ -54,14 +54,14 @@ def convert_date(tb: Table) -> Table:
      - Combine these year and the full-flowering date so 1st April 812 would look like 08120401
      - Convert this into a date format and extract the Julian day (day of the year)
     """
-    tb["year"] = tb["year"].astype("str")
-    tb["year"] = tb["year"].str.zfill(4)
+    tb["year_zpad"] = tb["year"].astype("str")
+    tb["year_zpad"] = tb["year_zpad"].str.zfill(4)
     tb["Full-flowering date"] = tb["Full-flowering date"].astype(float).astype("Int64").astype("str").str.zfill(4)
-    tb["date_combine"] = tb["year"] + tb["Full-flowering date"]
+    tb["date_combine"] = tb["year_zpad"] + tb["Full-flowering date"]
 
     tb["Full-flowering date"] = tb["date_combine"].apply(lambda x: datetime.strptime(x, "%Y%m%d").strftime("%j"))
 
-    tb = tb.drop(columns=["Full-flowering date (DOY)", "date_combine"])
+    tb = tb.drop(columns=["Full-flowering date (DOY)", "date_combine", "year_zpad"])
 
     return tb
 
@@ -72,13 +72,15 @@ def add_data_for_recent_years(tb: Table) -> Table:
     Adding data for the years 2016-21, from here:
 
     http://atmenv.envi.osakafu-u.ac.jp/aono/kyophenotemp4/
+
+    The values for 2022 and 2023 were from personal communication with the author of the paper (Aono).
     """
 
     tb_new = Table(
         {
             "country": ["Japan", "Japan", "Japan", "Japan", "Japan", "Japan", "Japan", "Japan"],
             "year": ["2016", "2017", "2018", "2019", "2020", "2021", "2022", "2023"],
-            "Full-flowering date": ["404", "409", "330", "405", "401", "326", "330", "324"],
+            "Full-flowering date": ["404", "409", "330", "405", "401", "326", "401", "325"],
         }
     )
 
