@@ -102,6 +102,10 @@ def run(dest_dir: str) -> None:
     tb_ghg = ds_ghg["long_run_ghg_concentration"].reset_index()
 
     # Load global sea level.
+    # NOTE: This data is likely to never be updated again.
+    # We could get more up-to-date data on sea levels from https://sealevel.jpl.nasa.gov/
+    # but we would need to use a special library with credentials to fetch the data (and the baseline and format would
+    # probably be different).
     ds_sea_level = paths.load_dataset("global_sea_level")
     tb_sea_level = ds_sea_level["global_sea_level"].reset_index()
 
