@@ -50,7 +50,7 @@ definitions:
       - "{definitions.all.interstate_conflicts}"
       - His data seeks to include combatant and civilian deaths, counting both direct deaths, due to fighting, and indirect deaths due to disease and starvation.
       - The value of this data lies in giving us some insight into conflicts over the very long-run. But there are important limitations. The historical studies on which this data relies vary greatly in terms of how deaths are counted and the reliability of the estimates. Moreover, as Brecke makes clear, the data he has been able to collect provides an incomplete record – particularly for the distant past and outside of Europe.
-    description_processing: &description_short_deaths |-
+    description_processing: &description_proc_deaths |-
       Brecke's catalog provides data per conflict. In order to create an annual time series, we sum the deaths recorded in each year across all conflicts, distributing deaths evenly across the duration of conflicts lasting more than one year.
 
       The catalog includes many conflicts for which Brecke was unable to find a deaths estimate. Given Brecke's stated definition of a conflict – political disagreements between organized groups, or between an organized group and civilians, that cause at least 32 deaths during a year – we assign such conflicts 32 deaths when creating the time series.
@@ -97,6 +97,7 @@ tables:
         description_short: |-
           {definitions.number_deaths.description_short}
         description_key: *description_key_deaths
+        description_processing: *description_proc_deaths
         presentation:
           grapher_config:
             selectedEntityNames:
@@ -108,6 +109,7 @@ tables:
         description_short: |-
           {definitions.number_deaths.description_short_per_capita}
         description_key: *description_key_deaths
+        description_processing: *description_proc_deaths
         display:
           numDecimalPlaces: 1
         presentation:
