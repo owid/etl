@@ -5,6 +5,7 @@ tables:
     variables:
       full_flowering_date:
         title: Day of the year with peak cherry blossom
+        description_short: The day of the year with the peak cherry blossom of the Prunus jamasakura species of cherry tree in Kyoto, Japan.
         unit: day of the year
         short_unit: ""
         display:
@@ -28,7 +29,7 @@ tables:
 
       average_20_years:
         title: Twenty-year average day of the year with peak cherry blossom
-        description_short: A twenty year moving average of the day of the year with peak cherry blossom. To be calculated at least five years within the 20 year period must have data.
+        description_short: A twenty year moving average of the day of the year with peak cherry blossom (Prunus jamasakura species). To be calculated at least five years within the 20 year period must have data.
         unit: day of the year
         short_unit: ""
         display:

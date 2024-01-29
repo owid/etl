@@ -7,13 +7,6 @@ meta:
     description: |-
       A historical time series of peak cherry blossom bloom data from Kyoto, Japan. The timing of peak cherry blossom is linked to weather and climate factors. Warmer weather, due to climate change, is pulling peak cherry blossom earlier in the year.
 
-      The main body of the dataset, data from 812-2020 has been compiled by Yasuyuki Aono from multiple sources.
-
-      More recent data points are taken from the Japan Meteorological Agency.
-    date_published: 2021-03-06
-    # Citation
-    producer: Yasuyuki Aono
-    citation_full: |-
       Yasuyuki Aono compiled this data based on multiple sources:
 
             - Taguchi,T. (1939) Climatic change in historical time in Japan J. Mar. Meteorol. Soc. 19 217–27
@@ -26,9 +19,16 @@ meta:
 
             - Aono,Y. and Saito,S. (2010) Clarifying springtime temperature reconstructions of the medieval period by gap-filling the cherry blossom phenological data series at Kyoto, Japan Int. J. Biometeorol. 54 211–9
 
-            Data for 812-2020 is available here - http://atmenv.envi.osakafu-u.ac.jp/aono/kyophenotemp4/
+            Data for 812-2021 is available here - http://atmenv.envi.osakafu-u.ac.jp/aono/kyophenotemp4/
 
-            Data for 2022 & 2023 full blossom is gathered from personal communicaition with Yasuyuki Aono.
+            Data for 2022 & 2023 full blossom is gathered from personal communication with Yasuyuki Aono.
+
+    date_published: 2021-03-06
+    # Citation
+    producer: Yasuyuki Aono
+    citation_full: |-
+      - Aono and Kazui (2008) International Journal of Climatology, 28, 905-914
+      - Aono and Saito (2010) International Journal of Biometeorology, 54, 211-219
     attribution_short: Aono
     # Files
     url_main: http://atmenv.envi.osakafu-u.ac.jp/aono/kyophenotemp4/
