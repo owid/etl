@@ -44,6 +44,8 @@ tables:
         title: Population share in urban areas
         description_short: Share of population living in urban areas in a country over time.
         unit: "%"
+        display:
+          numDecimalPlaces: 1
       rurc_c:
         title: Population (rural)
         description_short: Total rural population of a country over time.
@@ -52,6 +54,8 @@ tables:
         title: Population share in rural areas
         description_short: Share of population living in rural areas in a country over time.
         unit: "%"
+        display:
+          numDecimalPlaces: 1
 
       # Land use
       uopp_c:
