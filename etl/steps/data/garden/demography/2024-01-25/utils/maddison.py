@@ -146,7 +146,7 @@ def format_maddison(tb: Table, tb_reference: Table) -> Table:
         .reset_index(drop=True)
     )
     # Add population estimates from 1:M country equivalents.
-    tb = estimate_population_1_to_M(tb, tb_reference)
+    # tb = estimate_population_1_to_M(tb, tb_reference)
 
     # Add suffix to entity 'Netherlands Antilles'
     tb.loc[tb["country"] == "Netherlands Antilles", "country"] = "Netherlands Antilles (maddison)"
