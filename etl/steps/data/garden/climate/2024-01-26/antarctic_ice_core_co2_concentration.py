@@ -41,8 +41,8 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load meadow dataset and read its main table.
-    ds_meadow = paths.load_dataset("long_run_co2_concentration")
-    tb = ds_meadow["long_run_co2_concentration"].reset_index()
+    ds_meadow = paths.load_dataset("antarctic_ice_core_co2_concentration")
+    tb = ds_meadow["antarctic_ice_core_co2_concentration"].reset_index()
 
     #
     # Process data.
