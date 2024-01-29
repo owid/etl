@@ -16,8 +16,9 @@ from etl.db import get_engine
 
 # ChatGPT model name
 # details: https://platform.openai.com/docs/models
-MODELS_AVAILABLE = ["gpt-3.5-turbo", "gpt-4"]
-MODEL_DEFAULT = "gpt-3.5-turbo"
+MODELS_AVAILABLE = {"gpt-3.5": "gpt-3.5-turbo", "gpt-4": "gpt-4-1106-preview"}
+
+MODEL_DEFAULT = "gpt-3.5"
 GPT_SAMPLE_SIZE = 3
 
 # Prompt for chatGPT
@@ -113,7 +114,7 @@ click.rich_click.OPTION_GROUPS = {
 @click.option(
     "-n",
     "--model-name",
-    type=click.Choice(MODELS_AVAILABLE),
+    type=click.Choice(MODELS_AVAILABLE.keys()),
     default=MODEL_DEFAULT,
     help="Choose chart_revision backend version to use. By default uses latest version.",
 )
@@ -134,6 +135,7 @@ def cli(
     system_prompt: str,
 ) -> None:
     """Add suggestions by chatGPT to pending revisions."""
+    real_model_name = MODELS_AVAILABLE[model_name]
     if system_prompt:
         with open(system_prompt, "r") as f:
             system_prompt = f.read()
@@ -141,7 +143,7 @@ def cli(
         system_prompt = SYSTEM_PROMPT_TEXT
     with Session(get_engine()) as session:
         # Get pending revisions
-        log.info(f"Using {model_name}, sampling {sample_size} suggestions...")
+        log.info(f"Using {real_model_name}, sampling {sample_size} suggestions...")
         if only_mine:
             if GRAPHER_USER_ID is None:
                 raise ValueError(
@@ -188,7 +190,7 @@ def cli(
             for revision in revisions:
                 log.info(f"Getting new configurations from chatGPT for revision #{revision.id}...")
                 new_configs = suggest_new_config_fields(
-                    revision.suggestedConfig, system_prompt, num_suggestions, model_name
+                    revision.suggestedConfig, system_prompt, num_suggestions, real_model_name
                 )
 
                 # Add suggestions to object
@@ -196,7 +198,7 @@ def cli(
 
                 revision.experimental = {
                     "gpt": {
-                        "model": model_name,
+                        "model": real_model_name,
                         "suggestions": new_configs,
                     },
                 }
@@ -210,8 +212,9 @@ def ask_gpt(question: str, system_prompt: str = "", model: str = "gpt-4", num_re
     More on its API can be found at https://platform.openai.com/docs/api-reference.
     """
     client = OpenAI()
+    real_model = MODELS_AVAILABLE[model]
     response = client.chat.completions.create(
-        model=model,
+        model=real_model,
         messages=[
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": question},

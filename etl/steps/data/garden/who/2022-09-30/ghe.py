@@ -19,7 +19,7 @@ log = get_logger()
 paths = PathFinder(__file__)
 AGE_GROUPS_RANGES = {
     "ALLAges": [0, None],
-    "YEARS0-1": [0, 1],
+    "YEARS0-1": [0, 0],
     "YEARS1-4": [1, 4],
     "YEARS5-9": [5, 9],
     "YEARS10-14": [10, 14],

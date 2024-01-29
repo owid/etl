@@ -5,6 +5,7 @@ from typing import Any, Dict, List, Literal, Optional, Tuple, Union
 import pandas as pd
 import rich_click as click
 from owid.catalog import Dataset, utils
+from owid.catalog.yaml_metadata import _merge_variable_metadata
 from rich.console import Console
 from rich.syntax import Syntax
 
@@ -77,28 +78,49 @@ def cli(
             f.write(yaml_str)  # type: ignore
 
 
-def merge_or_create_yaml(meta_dict: Dict[str, Any], output_path: Path) -> str:
+def merge_or_create_yaml(meta_dict: Dict[str, Any], output_path: Path, delete_empty: bool = True) -> str:
     """Merge metadata with existing YAML file or create a new one and return it as string."""
     # if output_path exists, update its values, but keep YAML structure intact
     if output_path.exists():
         with open(output_path, "r") as f:
-            doc = ruamel_load(f)
+            doc = ruamel_load(f) or {}
 
         if "dataset" not in doc:
             doc["dataset"] = {}
         if "tables" not in doc:
             doc["tables"] = {}
 
-        for k, v in meta_dict["dataset"].items():
+        for k, v in meta_dict.get("dataset", {}).items():
             doc["dataset"].setdefault(k, v)
+
         for tab_name, tab_dict in meta_dict.get("tables", {}).items():
             variables = tab_dict.pop("variables", {})
+
+            # update table
             if tab_name not in doc["tables"]:
                 doc["tables"][tab_name] = {}
             doc["tables"][tab_name].update(tab_dict)
+
+            # update variables
             if "variables" not in doc["tables"][tab_name]:
                 doc["tables"][tab_name]["variables"] = {}
-            doc["tables"][tab_name]["variables"].update(variables)
+            orig_variables = doc["tables"][tab_name]["variables"]
+
+            for var_name, var_meta in variables.items():
+                orig_variables[var_name] = _merge_variable_metadata(
+                    orig_variables[var_name],
+                    var_meta,
+                    if_origins_exist="replace",
+                    # we merge display too
+                    merge_fields=["presentation", "grapher_config", "display"],
+                )
+
+                if delete_empty:
+                    if orig_variables[var_name].get("processing_level") == "":
+                        del orig_variables[var_name]["processing_level"]
+
+        if doc["dataset"] == {}:
+            del doc["dataset"]
 
         return ruamel_dump(doc)
     else:
@@ -137,6 +159,10 @@ def metadata_export(
     # move sources at the end
     if "sources" in ds_meta:
         ds_meta["sources"] = ds_meta.pop("sources", [])
+
+    # default values
+    if not ds_meta.get("non_redistributable", False):
+        del ds_meta["non_redistributable"]
 
     # transform tables metadata
     tb_meta = {}
@@ -287,6 +313,7 @@ def reorder_fields(m: Dict[str, Any]) -> Dict[str, Any]:
         "yAxis",
         "colorScale",
         "minTime",
+        "maxTime",
         "timelineMaxTime",
         "selectedFacetStrategy",
         "hideAnnotationFieldsInTitle",
