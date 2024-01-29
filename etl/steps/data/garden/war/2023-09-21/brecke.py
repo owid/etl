@@ -40,6 +40,8 @@ On regions:
         - Middle East (5): 630-698 (Iran-Oman), includes Turkey
         - Africa (6, 7, 8): 402-626 (Cape Verde-South Sudan),
         - Asia and Oceania (9, 10, 11, 12): 700-990 (Afghanistan-Samoa)
+
+Although we estimate the indicators for internal and inter-state conflicts, in admin we only use/plot indicators for 'all' conflicts.
 """
 
 import numpy as np
