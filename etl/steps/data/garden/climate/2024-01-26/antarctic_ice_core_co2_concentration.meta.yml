@@ -9,7 +9,7 @@ dataset:
   update_period_days: 0
 
 tables:
-  long_run_co2_concentration:
+  antarctic_ice_core_co2_concentration:
     variables:
       co2_concentration:
         title: Long-run CO₂ concentration

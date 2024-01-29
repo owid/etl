@@ -101,6 +101,10 @@ def run(dest_dir: str) -> None:
     ds_ghg = paths.load_dataset("long_run_ghg_concentration")
     tb_ghg = ds_ghg["long_run_ghg_concentration"].reset_index()
 
+    # Load global sea level.
+    ds_sea_level = paths.load_dataset("global_sea_level")
+    tb_sea_level = ds_sea_level["global_sea_level"].reset_index()
+
     #
     # Process data.
     #
@@ -125,6 +129,7 @@ def run(dest_dir: str) -> None:
         tb_snow,
         tb_imbie,
         tb_gml,
+        tb_sea_level,
     ]:
         tb_monthly = tb_monthly.merge(
             table.astype({"date": str}),

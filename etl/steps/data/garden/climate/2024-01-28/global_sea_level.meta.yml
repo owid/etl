@@ -1,0 +1,21 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Climate Change
+        - CO2 & Greenhouse Gas Emissions
+    unit: millimeters
+    short_unit: mm
+
+dataset:
+  update_period_days: 0
+
+tables:
+  global_sea_level:
+    variables:
+      sea_level__church_and_white_2011:
+        title: Global sea level according to Church and White (2011)
+      sea_level__uhslc:
+        title: Global sea level according to UHSLC
+      sea_level__average:
+        title: Global sea level as an average of Church and White (2011) and UHSLC data

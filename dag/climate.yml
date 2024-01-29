@@ -112,6 +112,13 @@ steps:
     - data://garden/epa/2024-01-29/ghg_concentration
     - data://garden/climate/2024-01-02/ghg_concentration
   #
+  # NOAA Climate.gov - Global sea level.
+  #
+  data://meadow/climate/2024-01-28/global_sea_level:
+    - snapshot://climate/2024-01-28/global_sea_level.csv
+  data://garden/climate/2024-01-28/global_sea_level:
+    - data://meadow/climate/2024-01-28/global_sea_level
+  #
   # Climate change impacts data explorer.
   #
   data://explorers/climate/latest/climate_change_impacts:
@@ -126,6 +133,9 @@ steps:
     - data://garden/epa/2024-01-29/ice_sheet_mass_balance
     - data://garden/climate/2024-01-02/ghg_concentration
     - data://garden/climate/2024-01-29/long_run_ghg_concentration
+    # Indicators that will not be updated.
+    - data://garden/climate/2024-01-28/global_sea_level
+
 
   # Copernicus Climate Change Service - Surface temperature
   data://meadow/climate/2023-12-20/surface_temperature:
