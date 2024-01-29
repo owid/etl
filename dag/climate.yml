@@ -109,7 +109,7 @@ steps:
   # Various sources - Long-run greenhouse gas concentration.
   #
   data://garden/climate/2024-01-29/long_run_ghg_concentration:
-    - data://garden/climate/2024-01-26/antarctic_ice_core_co2_concentration
+    - data://garden/epa/2024-01-29/ghg_concentration
     - data://garden/climate/2024-01-02/ghg_concentration
   #
   # Climate change impacts data explorer.
@@ -125,6 +125,7 @@ steps:
     # - data://garden/imbie/2024-01-02/ice_sheet_mass_balance
     - data://garden/epa/2024-01-29/ice_sheet_mass_balance
     - data://garden/climate/2024-01-02/ghg_concentration
+    - data://garden/climate/2024-01-29/long_run_ghg_concentration
 
   # Copernicus Climate Change Service - Surface temperature
   data://meadow/climate/2023-12-20/surface_temperature:

@@ -2,7 +2,6 @@
 
 from typing import List
 
-import owid.catalog.processing as pr
 import pandas as pd
 from owid.catalog import Table
 
@@ -70,6 +69,43 @@ def add_rolling_average(tb: Table, original_column_names: List[str]) -> Table:
     return tb_with_average
 
 
+def prepare_gas_data(tb: Table) -> Table:
+    tb = tb.copy()
+
+    # Extract gas name from table's short name.
+    gas = tb.metadata.short_name.split("_")[0]
+
+    # Columns to select from the data, and how to rename them.
+    columns = {
+        "year": "year",
+        "month": "month",
+        "average": f"{gas}_concentration",
+        # The following column is loaded only to perform a sanity check.
+        "decimal": "decimal",
+    }
+
+    # Select necessary columns and rename them.
+    tb = tb[list(columns)].rename(columns=columns, errors="raise")
+
+    # There is a "decimal" column for the year as a decimal number, that only has 12 possible values, corresponding to
+    # the middle of each month, so we will assume the 15th of each month.
+    error = "Date format has changed."
+    assert len(set(tb["decimal"].astype(str).str.split(".").str[1])) == 12, error
+    assert set(tb["month"]) == set(range(1, 13)), error
+    tb["date"] = pd.to_datetime(tb[["year", "month"]].assign(day=15))
+
+    # Remove unnecessary columns.
+    tb = tb.drop(columns=["year", "month", "decimal"], errors="raise")
+
+    # Add a location column.
+    tb["location"] = "World"
+
+    # Add a column with a rolling average for each gas.
+    tb = add_rolling_average(tb=tb, original_column_names=[f"{gas}_concentration"])
+
+    return tb
+
+
 def run(dest_dir: str) -> None:
     #
     # Load inputs.
@@ -83,42 +119,14 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
-    # Add a column for the gas name, and concatenate all tables.
-    tb = pr.concat(
-        [tb_co2.assign(gas="co2"), tb_ch4.assign(gas="ch4"), tb_n2o.assign(gas="n2O")],
-        ignore_index=True,
-        short_name=paths.short_name,
-    )
+    # Prepare data for each gas.
+    tb_co2 = prepare_gas_data(tb=tb_co2)
+    tb_ch4 = prepare_gas_data(tb=tb_ch4)
+    tb_n2o = prepare_gas_data(tb=tb_n2o)
 
-    # Select necessary columns and rename them.
-    tb = tb[list(COLUMNS) + ["gas"]].rename(columns=COLUMNS, errors="raise")
-
-    # There is a "decimal" column for the year as a decimal number, that only has 12 possible values, corresponding to
-    # the middle of each month, so we will assume the 15th of each month.
-    error = "Date format has changed."
-    assert len(set(tb["decimal"].astype(str).str.split(".").str[1])) == 12, error
-    assert set(tb["month"]) == set(range(1, 13)), error
-    tb["date"] = pd.to_datetime(tb[["year", "month"]].assign(day=15))
-
-    # Add a location column.
-    tb["location"] = "World"
-
-    # Remove unnecessary columns.
-    tb = tb.drop(columns=["year", "month", "decimal"])
-
-    # Pivot table to have a column for each gas.
-    tb = tb.pivot(index=["location", "date"], columns=["gas"], join_column_levels_with="_").rename(
-        columns={
-            "concentration_ch4": "ch4_concentration",
-            "concentration_co2": "co2_concentration",
-            "concentration_n2O": "n2o_concentration",
-        },
-        errors="raise",
-    )
-
-    # Add a column with a rolling average for each gas.
-    tb = add_rolling_average(
-        tb=tb, original_column_names=["co2_concentration", "ch4_concentration", "n2o_concentration"]
+    # Combine data for different gases.
+    tb = tb_co2.merge(tb_ch4, how="outer", on=["location", "date"]).merge(
+        tb_n2o, how="outer", on=["location", "date"], short_name=paths.short_name
     )
 
     # Set an appropriate index and sort conveniently.

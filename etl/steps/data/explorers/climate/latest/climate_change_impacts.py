@@ -93,9 +93,13 @@ def run(dest_dir: str) -> None:
     ds_imbie = paths.load_dataset("ice_sheet_mass_balance")
     tb_imbie = ds_imbie["ice_sheet_mass_balance"].reset_index()
 
-    # Load greenhouse gas concentration data from NOAA/GML.
+    # Load monthly greenhouse gas concentration data from NOAA/GML.
     ds_gml = paths.load_dataset("ghg_concentration")
     tb_gml = ds_gml["ghg_concentration"].reset_index()
+
+    # Load long-run yearly greenhouse gas concentration data.
+    ds_ghg = paths.load_dataset("long_run_ghg_concentration")
+    tb_ghg = ds_ghg["long_run_ghg_concentration"].reset_index()
 
     #
     # Process data.
@@ -132,7 +136,7 @@ def run(dest_dir: str) -> None:
 
     # Gather annual data from different tables.
     tb_annual = tb_ocean_heat_annual.copy()
-    for table in [arctic_sea_ice_extent, antarctic_sea_ice_extent]:
+    for table in [arctic_sea_ice_extent, antarctic_sea_ice_extent, tb_ghg]:
         tb_annual = tb_annual.merge(
             table,
             how="outer",
