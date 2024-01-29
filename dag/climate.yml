@@ -18,6 +18,12 @@ steps:
     - snapshot://epa/2024-01-29/ice_sheet_mass_balance.csv
   data://garden/epa/2024-01-29/ice_sheet_mass_balance:
     - data://meadow/epa/2024-01-29/ice_sheet_mass_balance
+  data://meadow/epa/2024-01-29/ghg_concentration:
+    - snapshot://epa/2024-01-29/co2_concentration.csv
+    - snapshot://epa/2024-01-29/ch4_concentration.csv
+    - snapshot://epa/2024-01-29/n2o_concentration.csv
+  data://garden/epa/2024-01-29/ghg_concentration:
+    - data://meadow/epa/2024-01-29/ghg_concentration
   #
   # IMBIE - Ice sheet mass balance.
   #

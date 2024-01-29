@@ -1,0 +1,26 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+      - Climate Change
+    processing_level: major
+
+dataset:
+  update_period_days: 0
+
+tables:
+  ice_sheet_mass_balance:
+    title: Global Atmospheric Concentrations of Greenhouse Gases
+    variables:
+      co2_concentration:
+        title: Global atmospheric concentration of carbon dioxide
+        unit: parts per million
+        short_unit: ppm
+      ch4_concentration:
+        title: Global atmospheric concentration of methane
+        unit: parts per billion
+        short_unit: ppb
+      n2o_concentration:
+        title: Global atmospheric concentration of nitrous oxide
+        unit: parts per billion
+        short_unit: ppb
