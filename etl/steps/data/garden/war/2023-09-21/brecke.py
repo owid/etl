@@ -49,6 +49,7 @@ from owid.catalog import Table
 from shared import add_indicators_extra, expand_observations
 from structlog import get_logger
 
+from etl.data_helpers.geo import add_population_to_table
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
@@ -86,6 +87,9 @@ def run(dest_dir: str) -> None:
     # Read table from COW codes
     ds_isd = paths.load_dataset("isd")
     tb_regions = ds_isd["isd_regions"].reset_index()
+
+    # Read population table
+    ds_pop = paths.load_dataset("population")
 
     #
     # Process data.
@@ -155,6 +159,19 @@ def run(dest_dir: str) -> None:
         columns_conflict_rate=["number_ongoing_conflicts", "number_new_conflicts"],
         columns_conflict_mortality=["number_deaths_ongoing_conflicts"],
     )
+
+    # Add rates
+    tb = add_population_to_table(
+        tb,
+        ds_pop,
+        country_col="region",
+        interpolate_missing_population=True,
+    )
+    msk = tb["region"] == "World"
+    tb.loc[msk, "number_deaths_ongoing_conflicts_per_capita"] = (
+        100000 * tb.loc[msk, "number_deaths_ongoing_conflicts"] / tb.loc[msk, "population"]
+    )
+    tb = tb.drop(columns=["population"])
 
     # Add suffix with source name
     msk = tb["region"] != "World"
