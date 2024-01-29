@@ -1,16 +1,23 @@
 steps:
   #
+  # NOAA National Centers for Environmental Information - Long-run CO2 concentration.
+  #
+  data://meadow/climate/2024-01-26/antarctic_ice_core_co2_concentration:
+    - snapshot://climate/2024-01-26/antarctic_ice_core_co2_concentration.xls
+  data://garden/climate/2024-01-26/antarctic_ice_core_co2_concentration:
+    - data://meadow/climate/2024-01-26/antarctic_ice_core_co2_concentration
+  #
   # EPA - Climate change indicators.
   #
-  data://meadow/epa/2024-01-02/ocean_heat_content:
-    - snapshot://epa/2024-01-02/ocean_heat_content_annual_world_700m.csv
-    - snapshot://epa/2024-01-02/ocean_heat_content_annual_world_2000m.csv
-  data://garden/epa/2024-01-02/ocean_heat_content:
-    - data://meadow/epa/2024-01-02/ocean_heat_content
-  data://meadow/epa/2024-01-02/ice_sheet_mass_balance:
-    - snapshot://epa/2024-01-02/ice_sheet_mass_balance.csv
-  data://garden/epa/2024-01-02/ice_sheet_mass_balance:
-    - data://meadow/epa/2024-01-02/ice_sheet_mass_balance
+  data://meadow/epa/2024-01-29/ocean_heat_content:
+    - snapshot://epa/2024-01-29/ocean_heat_content_annual_world_700m.csv
+    - snapshot://epa/2024-01-29/ocean_heat_content_annual_world_2000m.csv
+  data://garden/epa/2024-01-29/ocean_heat_content:
+    - data://meadow/epa/2024-01-29/ocean_heat_content
+  data://meadow/epa/2024-01-29/ice_sheet_mass_balance:
+    - snapshot://epa/2024-01-29/ice_sheet_mass_balance.csv
+  data://garden/epa/2024-01-29/ice_sheet_mass_balance:
+    - data://meadow/epa/2024-01-29/ice_sheet_mass_balance
   #
   # IMBIE - Ice sheet mass balance.
   #
@@ -93,6 +100,12 @@ steps:
   data://garden/climate/2024-01-02/ghg_concentration:
     - data://meadow/climate/2024-01-02/ghg_concentration
   #
+  # Various sources - Long-run greenhouse gas concentration.
+  #
+  data://garden/climate/2024-01-29/long_run_ghg_concentration:
+    - data://garden/climate/2024-01-26/antarctic_ice_core_co2_concentration
+    - data://garden/climate/2024-01-02/ghg_concentration
+  #
   # Climate change impacts data explorer.
   #
   data://explorers/climate/latest/climate_change_impacts:
@@ -100,19 +113,12 @@ steps:
     - data://garden/climate/2024-01-02/sea_ice_index
     - data://garden/climate/2024-01-02/sea_surface_temperature
     - data://garden/climate/2024-01-02/ocean_heat_content
-    - data://garden/epa/2024-01-02/ocean_heat_content
+    - data://garden/epa/2024-01-29/ocean_heat_content
     - data://garden/climate/2024-01-02/ocean_ph_levels
     - data://garden/climate/2024-01-02/snow_cover_extent
     # - data://garden/imbie/2024-01-02/ice_sheet_mass_balance
-    - data://garden/epa/2024-01-02/ice_sheet_mass_balance
+    - data://garden/epa/2024-01-29/ice_sheet_mass_balance
     - data://garden/climate/2024-01-02/ghg_concentration
-  #
-  # NOAA National Centers for Environmental Information - Long-run CO2 concentration.
-  #
-  data://meadow/climate/2024-01-26/antarctic_ice_core_co2_concentration:
-    - snapshot://climate/2024-01-26/antarctic_ice_core_co2_concentration.xls
-  data://garden/climate/2024-01-26/antarctic_ice_core_co2_concentration:
-    - data://meadow/climate/2024-01-26/antarctic_ice_core_co2_concentration
 
   # Copernicus Climate Change Service - Surface temperature
   data://meadow/climate/2023-12-20/surface_temperature:

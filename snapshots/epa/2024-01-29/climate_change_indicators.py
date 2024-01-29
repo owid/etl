@@ -19,6 +19,10 @@ FILES = [
     "ocean_heat_content_annual_world_2000m.csv",
     # Ice sheet mass balance.
     "ice_sheet_mass_balance.csv",
+    # Greenhouse gas concentration.
+    "co2_concentration.csv",
+    "ch4_concentration.csv",
+    "n2o_concentration.csv",
 ]
 
 
