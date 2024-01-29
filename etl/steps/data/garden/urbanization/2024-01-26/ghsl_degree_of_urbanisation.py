@@ -26,7 +26,10 @@ def run(dest_dir: str) -> None:
 
     # Pivot the table to each indicator as a column.
     tb = tb.pivot(index=["country", "year"], columns="indicator", values="value")
+
     tb = tb.underscore().reset_index()
+    # Convert share of urban population to percentage.
+    tb["share_of_urban_population"] = tb["share_of_urban_population"] * 100
     tb = tb.set_index(["country", "year"], verify_integrity=True)
 
     #

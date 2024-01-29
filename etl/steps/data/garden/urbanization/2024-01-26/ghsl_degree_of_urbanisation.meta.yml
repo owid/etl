@@ -6,7 +6,7 @@ definitions:
     processing_level: minor
     description_key:
     - |-
-      The Degree of Urbanisation (DEGURBA) is a  method designed for capturing the urban-rural continuum and facilitating international comparisons. Developed by six international organizations and endorsed by the UN Statistical Commission, it employs a two-level classification system.
+      **The Degree of Urbanisation (DEGURBA)** is a  method designed for capturing the urban-rural continuum and facilitating international comparisons. Developed by six international organizations and endorsed by the UN Statistical Commission, it employs a two-level classification system.
 
       The first level categorizes territories into three classes: 1) cities, 2) towns and suburbs, and 3) rural areas. This classification helps distinguish urban areas (cities plus towns and suburbs) from rural areas, emphasizing the distinct differences between towns, semi-dense areas, cities, and rural regions.
 
@@ -16,9 +16,17 @@ definitions:
 
       This method is used with a residential population grid derived from household point locations, typically from geo-coded censuses or registers. Over 30 countries have published such data, and others are collecting it. If point data is unavailable, a disaggregation grid is used, with accuracy dependent on the spatial unit size.
 
+      For future predictions (2025 and 2030), a special method is used to estimate how built-up areas (like cities and towns) have grown or changed. This method involves two main steps:
+
+      **Static Component:** It looks at how certain features of the land (like hills, height above sea level, and water bodies) are related to where people build settlements. This is done by studying data from satellites and seeing where people tend to live in relation to these land features.
+
+      **Dynamic Component:** This part examines how the built-up areas have been changing over the years, based on past satellite images. It identifies which areas have grown, which have shrunk, and which have stayed the same.
+
+      By combining these two approaches, the researchers can make educated guesses about how built-up areas might develop over time, even for the years when there’s no direct satellite data
+
       Key benefits of the method include defining cities based on population characteristics rather than administrative borders, aligning with the UN's recommendation. It also considers factors beyond population size, recognizing the complexity of urbanization across various fields. For instance, a small, service-rich settlement may be deemed urban, while a larger, agriculture-focused one could be rural.
 
-      Challenges include inconsistencies in defining cities using people or buildings, with the Degree of Urbanisation addressing some limitations of building-based definitions. However, variations in built-up land per capita present difficulties. The method uses fixed population size and density thresholds for consistency and simplicity, though this may not always accurately reflect local urban characteristics.
+      The method uses fixed population size and density thresholds for consistency and simplicity, though this may not always accurately reflect local urban characteristics.
 
 tables:
   ghsl_degree_of_urbanisation:
@@ -174,7 +182,7 @@ tables:
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
 
       total_area_km2:
         title: Total area of spatial units comprising the territory
