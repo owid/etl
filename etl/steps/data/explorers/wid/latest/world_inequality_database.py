@@ -25,6 +25,9 @@ def run(dest_dir: str) -> None:
     for var in drop_list:
         tb_garden = tb_garden[tb_garden.columns.drop(list(tb_garden.filter(like=var)))]
 
+    # Drop null rows in all columns except country and year
+    tb_garden = tb_garden.dropna(how="all", subset=[x for x in tb_garden.columns if x not in ["country", "year"]])
+
     # Create explorer dataset, with garden table and metadata in csv format
     ds_explorer = create_dataset(dest_dir, tables=[tb_garden], default_metadata=ds_garden.metadata, formats=["csv"])
     ds_explorer.save()
