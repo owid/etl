@@ -25,7 +25,7 @@ meta:
     attribution_short: EPA
     url_main: https://www.epa.gov/climate-indicators/climate-change-indicators-ice-sheets
     url_download: https://www.epa.gov/sites/default/files/2021-04/ice_sheets_fig-1.csv
-    date_accessed: '2024-01-02'
+    date_accessed: '2024-01-29'
     date_published: '2021-04-01'
     license:
       name: Public domain

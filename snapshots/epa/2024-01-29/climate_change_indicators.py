@@ -23,6 +23,8 @@ FILES = [
     "co2_concentration.csv",
     "ch4_concentration.csv",
     "n2o_concentration.csv",
+    # Cumulative mass balance of US glaciers.
+    "mass_balance_us_glaciers.csv",
 ]
 
 
