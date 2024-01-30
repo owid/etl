@@ -8,7 +8,6 @@ import os
 from pathlib import Path
 
 import click
-import numpy as np
 import pandas as pd
 from owid.datautils.io import df_to_file
 

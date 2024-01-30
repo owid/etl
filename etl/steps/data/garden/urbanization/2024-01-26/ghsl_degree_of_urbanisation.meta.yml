@@ -1,0 +1,474 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Urbanization
+    processing_level: minor
+    description_key:
+    - |-
+      **The Degree of Urbanisation (DEGURBA)** is a  method designed for capturing the urban-rural continuum and facilitating international comparisons. Developed by six international organizations and endorsed by the UN Statistical Commission, it employs a two-level classification system.
+
+      The first level categorizes territories into three classes: 1) cities, 2) towns and suburbs, and 3) rural areas. This classification helps distinguish urban areas (cities plus towns and suburbs) from rural areas, emphasizing the distinct differences between towns, semi-dense areas, cities, and rural regions.
+
+      The second level adds granularity by further dividing towns and semi-dense areas into towns and suburban or peri-urban areas, and splitting rural areas into villages, dispersed rural areas, and mostly uninhabited areas.
+
+      The classification process involves two steps. Initially, all 1 km² grid cells are categorized into one of three types: urban centers (contiguous grid cells with a density of at least 1500 inhabitants per km² and a total population of 50,000 or more, defining a city), urban clusters (contiguous grid cells with a density of at least 300 inhabitants per km² and a total population of 5,000 or more, defining a town and suburb), and rural grid cells (defining rural areas). These grid cell types are then used to classify smaller administrative or statistical spatial units.
+
+      This method is used with a residential population grid derived from household point locations, typically from geo-coded censuses or registers. Over 30 countries have published such data, and others are collecting it. When this precise household location data (point data) is not available, an alternative approach called a disaggregation grid is used. This method involves dividing a larger area into smaller sections to estimate where people might live within that area. The effectiveness and accuracy of this disaggregation grid depend greatly on the size of these sections or spatial units. Smaller units typically lead to more accurate population estimates, while larger units might result in less precise estimates.
+
+      For future predictions (2025 and 2030), a special method is used to estimate how built-up areas (like cities and towns) have grown or changed. This method involves two main steps:
+
+      **Static Component:** It looks at how certain features of the land (like hills, height above sea level, and water bodies) are related to where people build settlements. This is done by studying data from satellites and seeing where people tend to live in relation to these land features.
+
+      **Dynamic Component:** This part examines how the built-up areas have been changing over the years, based on past satellite images. It identifies which areas have grown, which have shrunk, and which have stayed the same.
+
+      By combining these two approaches, the researchers can make educated guesses about how built-up areas might develop over time, even for the years when there’s no direct satellite data
+
+      Key benefits of the method include defining cities based on population characteristics rather than administrative borders, aligning with the UN's recommendation. It also considers factors beyond population size, recognizing the complexity of urbanization across various fields. For instance, a small, service-rich settlement may be deemed urban, while a larger, agriculture-focused one could be rural.
+
+      The method uses fixed population size and density thresholds for consistency and simplicity, though this may not always accurately reflect local urban characteristics.
+
+tables:
+  ghsl_degree_of_urbanisation:
+    variables:
+      average_area_km2_estimates:
+        title: Average size of spatial units comprising the territory
+        unit: km²
+        description_short: Refers to all the geographic divisions, including cities, towns, semi-dense areas, and rural regions, as categorized according to the Degree of Urbanisation criteria.
+        display:
+          numDecimalPlaces: 0
+
+      degurba_l1_population_city_estimates:
+        title: Population of cities (DEGURBA Level 1)
+        unit: people
+        description_from_producer: Population of spatial units classified as Cities in Degree of Urbanisation level 1.
+        display:
+          numDecimalPlaces: 0
+
+      degurba_l1_population_rural_area_estimates:
+        title: Population of rural area (DEGURBA Level 1)
+        unit: people
+        description_from_producer: Population of spatial units classified as Rural Areas in Degree of Urbanisation level 1.
+        display:
+          numDecimalPlaces: 0
+
+      degurba_l1_population_town__and__suburbs_estimates:
+        title: Population of town and suburban(DEGURBA Level 1)
+        unit: people
+        description_from_producer: Population of spatial units classified as Town & Suburbs in Degree of Urbanisation level 1
+        display:
+          numDecimalPlaces: 0
+
+      degurba_l1_units_city_estimates:
+        title: Number of cities (DEGURBA Level 1)
+        unit: cities
+        description_from_producer: Number of spatial units classified as Cities in Degree of Urbanisation level 1.
+        display:
+          numDecimalPlaces: 0
+
+      degurba_l1_units_rural_area_estimates:
+        title: Number of rural areas (DEGURBA Level 1)
+        unit: rural areas
+        description_from_producer: Number of spatial units classified as Rural Areas in Degree of Urbanisation level 1.
+        display:
+          numDecimalPlaces: 0
+
+      degurba_l1_units_town__and__suburbs_estimates:
+        title: Number of towns and suburbs (DEGURBA Level 1)
+        description_from_producer: Number of spatial units classified as Town & Suburbs in Degree of Urbanisation level 1.
+        unit: towns and suburbs
+        display:
+          numDecimalPlaces: 0
+
+      degurba_l2_population_city_estimates:
+        title: Population of cities (DEGURBA Level 2)
+        unit: people
+        description_from_producer: Population of spatial units classified as Cities in Degree of Urbanisation level 2.
+        display:
+          numDecimalPlaces: 0
+
+      degurba_l2_population_dense_town_estimates:
+        title: Population of dense towns (DEGURBA Level 2)
+        unit: people
+        description_from_producer: Population of spatial units classified as Dense Towns in Degree of Urbanisation level 2.
+        display:
+          numDecimalPlaces: 0
+
+      degurba_l2_population_mostly_uninhabited_area_estimates:
+        title: Population of mostly uninhabited areas (DEGURBA Level 2)
+        unit: people
+        description_from_producer: Population of spatial units classified as Mostly Uninhabited Areas in Degree of Urbanisation level 2.
+        display:
+          numDecimalPlaces: 0
+
+      degurba_l2_population_rural_dispersed_area_estimates:
+        title: Population of rural dispersed areas (DEGURBA Level 2)
+        unit: people
+        description_from_producer: Population of spatial units classified as Rural Dispersed Areas in Degree of Urbanisation level 2.
+        display:
+          numDecimalPlaces: 0
+
+      degurba_l2_population_semi_dense_town_estimates:
+        title: Population of semi-dense towns (DEGURBA Level 2)
+        unit: people
+        description_from_producer: Population of spatial units classified as Semi-Dense Towns in Degree of Urbanisation level 2.
+        display:
+          numDecimalPlaces: 0
+
+      degurba_l2_population_suburbs_or_peri_urban_area_estimates:
+        title: Population in suburbs or peri-urban areas (DEGURBA Level 2)
+        unit: people
+        display:
+          numDecimalPlaces: 0
+
+      degurba_l2_population_village_estimates:
+        title: Population of villages (DEGURBA Level 2)
+        unit: people
+        description_from_producer: Population of spatial units classified as Villages in Degree of Urbanisation level 2.
+        display:
+          numDecimalPlaces: 0
+
+      degurba_l2_units_city_estimates:
+        title: Number of cities (DEGURBA Level 2)
+        unit: cities
+        description_from_producer: Number of spatial units classified as Cities in Degree of Urbanisation level 2.
+        display:
+          numDecimalPlaces: 0
+
+      degurba_l2_units_dense_town_estimates:
+        title: Number of dense towns (DEGURBA Level 2)
+        unit: dense towns
+        description_from_producer: Number of spatial units classified as Dense Towns in Degree of Urbanisation level 2.
+        display:
+          numDecimalPlaces: 0
+
+      degurba_l2_units_mostly_uninhabited_area_estimates:
+        title: Number of mostly uninhabited areas (DEGURBA Level 2)
+        unit: uninhabited areas
+        description_from_producer: Number of spatial units classified as Mostly Uninhabited Areas in Degree of Urbanisation level 2.
+        display:
+          numDecimalPlaces: 0
+
+      degurba_l2_units_rural_dispersed_area_estimates:
+        title: Number of rural dispersed areas (DEGURBA Level 2)
+        unit: dispersed areas
+        description_from_producer: Number of spatial units classified as Rural Dispersed Areas in Degree of Urbanisation level 2.
+        display:
+          numDecimalPlaces: 0
+
+      degurba_l2_units_semi_dense_town_estimates:
+        title: Number of semi-dense towns (DEGURBA Level 2)
+        unit: towns
+        description_from_producer: Number of spatial units classified as Semi-Dense Towns in Degree of Urbanisation level 2.
+        display:
+          numDecimalPlaces: 0
+
+      degurba_l2_units_suburbs_or_peri_urban_area_estimates:
+        title: Number of suburbs or peri-urban areas (DEGURBA Level 2)
+        unit: suburbs or peri-urban areas
+        description_from_producer: Number of spatial units classified as Suburbs or Peri-Urban Areas in Degree of Urbanisation level 2.
+        display:
+          numDecimalPlaces: 0
+
+      degurba_l2_units_village_estimates:
+        title: Number of villages (DEGURBA Level 2)
+        unit: 'villages'
+        description_from_producer: Number of spatial units classified as Villages in Degree of Urbanisation level 2.
+        display:
+          numDecimalPlaces: 0
+
+      share_of_urban_population_estimates:
+        title: Share of urban population
+        unit: '%'
+        short_unit: '%'
+        description_short: Share of total population in administrative units classified as cities, towns and suburbs.
+        display:
+          numDecimalPlaces: 1
+
+      total_area_km2_estimates:
+        title: Total area of the country
+        unit: km²
+        short_unit: km²
+        display:
+          numDecimalPlaces: 0
+
+      total_pop_estimates:
+        title: Total population
+        unit: people
+        short_unit: ''
+        display:
+          numDecimalPlaces: 0
+
+      total_units_estimates:
+        title: Total number of spatial units comprising the territory
+        unit: 'units'
+        short_unit: ''
+        display:
+          numDecimalPlaces: 0
+      #
+      #  Projections
+      #
+      average_area_km2_projections:
+        title: Average size of spatial units comprising the territory (projections)
+        unit: km²
+        description_short: Refers to all the geographic divisions, including cities, towns, semi-dense areas, and rural regions, as categorized according to the Degree of Urbanisation criteria.
+        presentation:
+          title_public: Average size of spatial units comprising the territory
+        display:
+          numDecimalPlaces: 0
+          name: Average size of spatial units comprising the territory
+          isProjection: true
+
+      degurba_l1_population_city_projections:
+        title: Population of cities (DEGURBA Level 1) (projections)
+        unit: people
+        presentation:
+          title_public: Population of cities (DEGURBA Level 1)
+        description_from_producer: Population of spatial units classified as Cities in Degree of Urbanisation level 1.
+        display:
+          numDecimalPlaces: 0
+          name: Population of cities (DEGURBA Level 1)
+          isProjection: true
+
+      degurba_l1_population_rural_area_projections:
+        title: Population of rural area (DEGURBA Level 1) (projections)
+        unit: people
+        presentation:
+          title_public: Population of rural area (DEGURBA Level 1)
+        description_from_producer: Population of spatial units classified as Rural Areas in Degree of Urbanisation level 1.
+        display:
+          numDecimalPlaces: 0
+          name: Population of rural area (DEGURBA Level 1)
+          isProjection: true
+
+      degurba_l1_population_town__and__suburbs_projections:
+        title: Population of town and suburban(DEGURBA Level 1) (projections)
+        unit: people
+        presentation:
+          title_public: Population of town and suburban(DEGURBA Level 1)
+        description_from_producer: Population of spatial units classified as Town & Suburbs in Degree of Urbanisation level 1
+        display:
+          numDecimalPlaces: 0
+          name: Population of town and suburban(DEGURBA Level 1)
+          isProjection: true
+
+      degurba_l1_units_city_projections:
+        title: Number of cities (DEGURBA Level 1) (projections)
+        unit: cities
+        presentation:
+          title_public: Number of cities (DEGURBA Level 1)
+        description_from_producer: Number of spatial units classified as Cities in Degree of Urbanisation level 1.
+        display:
+          numDecimalPlaces: 0
+          name: Number of cities (DEGURBA Level 1)
+          isProjection: true
+
+      degurba_l1_units_rural_area_projections:
+        title: Number of rural areas (DEGURBA Level 1) (projections)
+        unit: rural areas
+        presentation:
+          title_public: Number of rural areas (DEGURBA Level 1)
+        description_from_producer: Number of spatial units classified as Rural Areas in Degree of Urbanisation level 1.
+        display:
+          numDecimalPlaces: 0
+          name: Number of rural areas (DEGURBA Level 1)
+          isProjection: true
+
+      degurba_l1_units_town__and__suburbs_projections:
+        title: Number of towns and suburbs (DEGURBA Level 1) (projections)
+        presentation:
+          title_public: Number of towns and suburbs (DEGURBA Level 1)
+        description_from_producer: Number of spatial units classified as Town & Suburbs in Degree of Urbanisation level 1.
+        unit: towns and suburbs
+        display:
+          numDecimalPlaces: 0
+          name: Number of towns and suburbs (DEGURBA Level 1)
+          isProjection: true
+
+      degurba_l2_population_city_projections:
+        title: Population of cities (DEGURBA Level 2) (projections)
+        unit: people
+        presentation:
+          title_public: Population of cities (DEGURBA Level 2)
+        description_from_producer: Population of spatial units classified as Cities in Degree of Urbanisation level 2.
+        display:
+          numDecimalPlaces: 0
+          name: Population of cities (DEGURBA Level 2)
+          isProjection: true
+
+      degurba_l2_population_dense_town_projections:
+        title: Population of dense towns (DEGURBA Level 2) (projections)
+        unit: people
+        presentation:
+          title_public: Population of dense towns (DEGURBA Level 2)
+        description_from_producer: Population of spatial units classified as Dense Towns in Degree of Urbanisation level 2.
+        display:
+          numDecimalPlaces: 0
+          name: Population of dense towns (DEGURBA Level 2)
+          isProjection: true
+
+      degurba_l2_population_mostly_uninhabited_area_projections:
+        title: Population of mostly uninhabited areas (DEGURBA Level 2) (projections)
+        unit: people
+        presentation:
+          title_public: Population of mostly uninhabited areas (DEGURBA Level 2)
+        description_from_producer: Population of spatial units classified as Mostly Uninhabited Areas in Degree of Urbanisation level 2.
+        display:
+          numDecimalPlaces: 0
+          name: Population of mostly uninhabited areas (DEGURBA Level 2)
+          isProjection: true
+
+      degurba_l2_population_rural_dispersed_area_projections:
+        title: Population of rural dispersed areas (DEGURBA Level 2) (projections)
+        unit: people
+        presentation:
+          title_public: Population of rural dispersed areas (DEGURBA Level 2)
+        description_from_producer: Population of spatial units classified as Rural Dispersed Areas in Degree of Urbanisation level 2.
+        display:
+          numDecimalPlaces: 0
+          name: Population of rural dispersed areas (DEGURBA Level 2)
+          isProjection: true
+
+      degurba_l2_population_semi_dense_town_projections:
+        title: Population of semi-dense towns (DEGURBA Level 2) (projections)
+        unit: people
+        presentation:
+          title_public: Population of semi-dense towns (DEGURBA Level 2)
+        description_from_producer: Population of spatial units classified as Semi-Dense Towns in Degree of Urbanisation level 2.
+        display:
+          numDecimalPlaces: 0
+          name: Population of semi-dense towns (DEGURBA Level 2)
+          isProjection: true
+
+      degurba_l2_population_suburbs_or_peri_urban_area_projections:
+        title: Population in suburbs or peri-urban areas (DEGURBA Level 2) (projections)
+        unit: people
+        presentation:
+          title_public: Population in suburbs or peri-urban areas (DEGURBA Level 2)
+        display:
+          numDecimalPlaces: 0
+          name: Population in suburbs or peri-urban areas (DEGURBA Level 2)
+          isProjection: true
+
+      degurba_l2_population_village_projections:
+        title: Population of villages (DEGURBA Level 2) (projections)
+        unit: people
+        presentation:
+          title_public: Population of villages (DEGURBA Level 2)
+        description_from_producer: Population of spatial units classified as Villages in Degree of Urbanisation level 2.
+        display:
+          numDecimalPlaces: 0
+          name: Population of villages (DEGURBA Level 2)
+          isProjection: true
+
+      degurba_l2_units_city_projections:
+        title: Number of cities (DEGURBA Level 2) (projections)
+        unit: cities
+        presentation:
+          title_public: Number of cities (DEGURBA Level 2)
+        description_from_producer: Number of spatial units classified as Cities in Degree of Urbanisation level 2.
+        display:
+          numDecimalPlaces: 0
+          name: Number of cities (DEGURBA Level 2)
+          isProjection: true
+
+      degurba_l2_units_dense_town_projections:
+        title: Number of dense towns (DEGURBA Level 2) (projections)
+        unit: dense towns
+        presentation:
+          title_public: Number of dense towns (DEGURBA Level 2)
+        description_from_producer: Number of spatial units classified as Dense Towns in Degree of Urbanisation level 2.
+        display:
+          numDecimalPlaces: 0
+          name: Number of dense towns (DEGURBA Level 2)
+          isProjection: true
+
+      degurba_l2_units_mostly_uninhabited_area_projections:
+        title: Number of mostly uninhabited areas (DEGURBA Level 2) (projections)
+        unit: uninhabited areas
+        presentation:
+          title_public: Number of mostly uninhabited areas (DEGURBA Level 2)
+        description_from_producer: Number of spatial units classified as Mostly Uninhabited Areas in Degree of Urbanisation level 2.
+        display:
+          numDecimalPlaces: 0
+          name: Number of mostly uninhabited areas (DEGURBA Level 2)
+          isProjection: true
+
+      degurba_l2_units_rural_dispersed_area_projections:
+        title: Number of rural dispersed areas (DEGURBA Level 2) (projections)
+        unit: dispersed areas
+        presentation:
+          title_public: Number of rural dispersed areas (DEGURBA Level 2)
+        description_from_producer: Number of spatial units classified as Rural Dispersed Areas in Degree of Urbanisation level 2.
+        display:
+          numDecimalPlaces: 0
+          name: Number of rural dispersed areas (DEGURBA Level 2)
+          isProjection: true
+
+      degurba_l2_units_semi_dense_town_projections:
+        title: Number of semi-dense towns (DEGURBA Level 2) (projections)
+        unit: towns
+        presentation:
+          title_public: Number of semi-dense towns (DEGURBA Level 2)
+        description_from_producer: Number of spatial units classified as Semi-Dense Towns in Degree of Urbanisation level 2.
+        display:
+          numDecimalPlaces: 0
+          name: Number of semi-dense towns (DEGURBA Level 2)
+          isProjection: true
+
+      degurba_l2_units_suburbs_or_peri_urban_area_projections:
+        title: Number of suburbs or peri-urban areas (DEGURBA Level 2) (projections)
+        unit: suburbs or peri-urban areas
+        presentation:
+          title_public: Number of suburbs or peri-urban areas (DEGURBA Level 2)
+        description_from_producer: Number of spatial units classified as Suburbs or Peri-Urban Areas in Degree of Urbanisation level 2.
+        display:
+          numDecimalPlaces: 0
+          name: Number of suburbs or peri-urban areas (DEGURBA Level 2)
+          isProjection: true
+
+      degurba_l2_units_village_projections:
+        title: Number of villages (DEGURBA Level 2) (projections)
+        unit: 'villages'
+        presentation:
+          title_public: Number of villages (DEGURBA Level 2)
+        description_from_producer: Number of spatial units classified as Villages in Degree of Urbanisation level 2.
+        display:
+          numDecimalPlaces: 0
+          name: Number of villages (DEGURBA Level 2)
+          isProjection: true
+
+      share_of_urban_population_projections:
+        title: Share of urban population (projections)
+        unit: '%'
+        short_unit: '%'
+        description_short: Share of total population in administrative units classified as cities, towns and suburbs.
+        presentation:
+          title_public: Share of urban population
+        display:
+          numDecimalPlaces: 1
+          isProjection: true
+
+      total_area_km2_projections:
+        title: Total area of the country (projections)
+        unit: km²
+        short_unit: km²
+        display:
+          numDecimalPlaces: 0
+          isProjection: true
+
+      total_pop_projections:
+        title: Total population (projections)
+        unit: people
+        short_unit: ''
+        display:
+          numDecimalPlaces: 0
+          isProjection: true
+
+      total_units_projections:
+        title: Total number of spatial units comprising the territory (projections)
+        unit: 'units'
+        short_unit: ''
+        display:
+          numDecimalPlaces: 0
+          isProjection: true
