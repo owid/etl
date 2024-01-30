@@ -1,24 +1,21 @@
 meta:
-  namespace: artificial_intelligence
-  short_name: yougov_job_automation
-  name: How worried are Americans about being automated out of a job? (YouGov, 2023)
-  version: '2023-06-08'
-  publication_year: 2023
-
-  publication_date: '2023-01-12'
-  source_name: YouGov
-  source_published_by: YouGov
-  url: https://today.yougov.com/topics/politics/trackers/worry-about-automation
-  source_data_url: https://today.yougov.com/_pubapis/v5/us/trackers/worry-about-automation/download
-  file_extension: xlsx
-  license_url:
-  license_name: Public Data
-  date_accessed: 2023-06-08
-  is_public: true
-  description: |-
-    Biannual tracking of Americans' level of concern regarding job automation replacing their employment. Next update is in July.
+  origin:
+    title: How worried are Americans about being automated out of a job?
+    description: Biannual tracking of Americans' level of concern regarding job automation
+      replacing their employment.
+    producer: YouGov
+    citation_full: YouGov. (2023). How worried are Americans about being automated
+      out of a job?
+    url_main: https://today.yougov.com/topics/politics/trackers/worry-about-automation
+    url_download: https://today.yougov.com/_pubapis/v5/us/trackers/worry-about-automation/download
+    date_accessed: 2024-01-30
+    date_published: 2023-01-12
+    license:
+      name: Public Data
+      url: https://today.yougov.com/about/terms
+    version_producer: '2024-01-11'
 wdir: ../../../data/snapshots/artificial_intelligence/2023-06-08
 outs:
-- md5: 97e9f9506f600f8710cd442920f72483
-  size: 26582
+- md5: affa7ae852508559d6d5592da839d2a5
+  size: 28677
   path: yougov_job_automation.xlsx
