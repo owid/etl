@@ -648,7 +648,7 @@ def generate_percentiles_raw(wb_api: WB_API):
         )
 
         # Obtain the list of countries that are in the reference file but not in the percentile file
-        list_missing_countries = df_merge[df_merge["_merge"] == "left_only"]["country_code"].unique().tolist()
+        list_missing_countries = df_merge.loc[df_merge["_merge"] == "left_only", "country_code"].unique().tolist()
 
         # Generate a string with all the elements of the list, in the format for querying multiple countries in the API
         missing_countries = "&country=".join(list_missing_countries)

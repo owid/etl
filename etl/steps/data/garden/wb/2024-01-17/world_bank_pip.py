@@ -877,7 +877,7 @@ def survey_count(tb: Table) -> Table:
     return tb
 
 
-def set_index_and_sort(tb: Table, index_cols=list) -> Table:
+def set_index_and_sort(tb: Table, index_cols: list) -> Table:
     """
     Add index and sort
     """
