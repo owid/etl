@@ -24,6 +24,10 @@ steps:
     - snapshot://epa/2024-01-29/n2o_concentration.csv
   data://garden/epa/2024-01-29/ghg_concentration:
     - data://meadow/epa/2024-01-29/ghg_concentration
+  data://meadow/epa/2024-01-29/mass_balance_us_glaciers:
+    - snapshot://epa/2024-01-29/mass_balance_us_glaciers.csv
+  data://garden/epa/2024-01-29/mass_balance_us_glaciers:
+    - data://meadow/epa/2024-01-29/mass_balance_us_glaciers
   #
   # IMBIE - Ice sheet mass balance.
   #
@@ -126,16 +130,16 @@ steps:
     - data://garden/climate/2024-01-02/sea_ice_index
     - data://garden/climate/2024-01-02/sea_surface_temperature
     - data://garden/climate/2024-01-02/ocean_heat_content
-    - data://garden/epa/2024-01-29/ocean_heat_content
     - data://garden/climate/2024-01-02/ocean_ph_levels
     - data://garden/climate/2024-01-02/snow_cover_extent
-    # - data://garden/imbie/2024-01-02/ice_sheet_mass_balance
-    - data://garden/epa/2024-01-29/ice_sheet_mass_balance
     - data://garden/climate/2024-01-02/ghg_concentration
     - data://garden/climate/2024-01-29/long_run_ghg_concentration
     # Indicators that will not be updated.
     - data://garden/climate/2024-01-28/global_sea_level
-
+    - data://garden/epa/2024-01-29/ocean_heat_content
+    # - data://garden/imbie/2024-01-02/ice_sheet_mass_balance
+    - data://garden/epa/2024-01-29/ice_sheet_mass_balance
+    - data://garden/epa/2024-01-29/mass_balance_us_glaciers
 
   # Copernicus Climate Change Service - Surface temperature
   data://meadow/climate/2023-12-20/surface_temperature:
