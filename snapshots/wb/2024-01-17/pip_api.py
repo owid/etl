@@ -77,7 +77,7 @@ def poverty_lines_countries():
     """
     # Define poverty lines and their increase
 
-    under_2_dollars = list(range(0, 200, 1))
+    under_2_dollars = list(range(1, 200, 1))
     between_2_and_5_dollars = list(range(200, 500, 2))
     between_5_and_10_dollars = list(range(500, 1000, 5))
     between_10_and_20_dollars = list(range(1000, 2000, 10))
@@ -96,9 +96,6 @@ def poverty_lines_countries():
         + between_55_and_80_dollars
     )
 
-    # Remove 0 from the list
-    povlines.remove(0)
-
     return povlines
 
 
@@ -110,7 +107,7 @@ def poverty_lines_regions():
     """
     # Define poverty lines and their increase
 
-    under_2_dollars = list(range(0, 200, 1))
+    under_2_dollars = list(range(1, 200, 1))
     between_2_and_5_dollars = list(range(200, 500, 2))
     between_5_and_10_dollars = list(range(500, 1000, 5))
     between_10_and_20_dollars = list(range(1000, 2000, 10))
@@ -138,9 +135,6 @@ def poverty_lines_regions():
         + between_175_and_250_dollars
         + between_250_and_300_dollars
     )
-
-    # Remove 0 from the list
-    povlines.remove(0)
 
     return povlines
 
@@ -232,11 +226,6 @@ class WB_API:
 
 @retry(wait=wait_random_exponential(multiplier=1), stop=stop_after_attempt(MAX_REPEATS))
 def _get_request(url: str) -> requests.Response:
-    response = requests.get(url, timeout=TIMEOUT)
-    if response.status_code != 200:
-        log.info("fetch_csv.retry", url=url)
-        raise Exception("API timed out")
-
     response = requests.get(url, timeout=TIMEOUT)
     if response.status_code != 200:
         log.info("fetch_csv.retry", url=url)

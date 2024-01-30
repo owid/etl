@@ -1,5 +1,6 @@
 """Load a meadow dataset and create a garden dataset."""
-# NOTE: Eliminate all notes once I have all the data
+
+from typing import Tuple
 
 import numpy as np
 import owid.catalog.processing as pr
@@ -86,7 +87,7 @@ def run(dest_dir: str) -> None:
         tb_2017, povlines_dict, ppp_version=2017
     )
 
-    # Sanity checks
+    # Sanity checks. I don't run for percentile tables because that process was done in the extraction
     tb_2011 = sanity_checks(
         tb_2011, povlines_dict, ppp_version=2011, col_stacked_n=col_stacked_n_2011, col_stacked_pct=col_stacked_pct_2011
     )
@@ -345,7 +346,7 @@ def process_data(tb: Table) -> Table:
     return tb
 
 
-def create_stacked_variables(tb: Table, povlines_dict: dict, ppp_version: int) -> tuple([Table, list, list]):
+def create_stacked_variables(tb: Table, povlines_dict: dict, ppp_version: int) -> Tuple[Table, list, list]:
     """
     Create stacked variables from the indicators to plot them as stacked area/bar charts
     """
@@ -482,13 +483,8 @@ def identify_rural_urban(tb: Table) -> Table:
     # Make country and reporting_level columns into strings
     tb["country"] = tb["country"].astype(str)
     tb["reporting_level"] = tb["reporting_level"].astype(str)
-
-    tb.loc[(tb["reporting_level"].isin(["urban", "rural"])), "country"] = (
-        tb.loc[(tb["reporting_level"].isin(["urban", "rural"])), "country"]
-        + " ("
-        + tb.loc[(tb["reporting_level"].isin(["urban", "rural"])), "reporting_level"]
-        + ")"
-    )
+    ix = tb["reporting_level"].isin(["urban", "rural"])
+    tb.loc[(ix), "country"] = tb.loc[(ix), "country"] + " (" + tb.loc[(ix), "reporting_level"] + ")"
 
     return tb
 
@@ -717,7 +713,7 @@ def sanity_checks(
     return tb
 
 
-def separate_ppp_data(tb: Table) -> tuple([Table, Table]):
+def separate_ppp_data(tb: Table) -> Tuple[Table, Table]:
     """
     Separate out ppp data from the main dataset
     """
@@ -730,7 +726,7 @@ def separate_ppp_data(tb: Table) -> tuple([Table, Table]):
     return tb_2011, tb_2017
 
 
-def inc_or_cons_data(tb: Table) -> tuple([Table, Table, Table]):
+def inc_or_cons_data(tb: Table) -> Tuple[Table, Table, Table]:
     """
     Separate income and consumption data
     """

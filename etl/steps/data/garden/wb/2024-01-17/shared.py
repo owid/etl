@@ -3,7 +3,7 @@ This file includes functions to get variables metadata in the `world_bank_pip` g
 If new poverty lines or indicators are included, they need to be addressed here
 """
 
-from owid.catalog import Table, VariableMeta
+from owid.catalog import Table, VariableMeta, VariablePresentationMeta
 
 # This is text to include in description_key and description_processing fields
 
@@ -424,7 +424,9 @@ def add_metadata_vars(tb_garden: Table, ppp_version: int, welfare_type: str) -> 
 
                 # Replicate the title in the display name and title_public
                 tb_garden[col_name].metadata.display["name"] = tb_garden[col_name].metadata.title
-                tb_garden[col_name].metadata.presentation["title_public"] = tb_garden[col_name].metadata.title
+                tb_garden[col_name].metadata.presentation = VariablePresentationMeta(
+                    title_public=tb_garden[col_name].metadata.title
+                )
 
         for i in range(len(povline_list)):
             if i != 0:
@@ -538,9 +540,7 @@ def var_metadata_inequality_mean_median(var, origins, welfare_type) -> VariableM
             "tolerance": TOLERANCE,
         }
 
-        meta.presentation = {
-            "title_public": meta.title,
-        }
+        meta.presentation = VariablePresentationMeta(title_public=meta.title)
 
     else:
         meta = VariableMeta(
@@ -561,9 +561,7 @@ def var_metadata_inequality_mean_median(var, origins, welfare_type) -> VariableM
             "tolerance": TOLERANCE,
         }
 
-        meta.presentation = {
-            "title_public": meta.title,
-        }
+        meta.presentation = VariablePresentationMeta(title_public=meta.title)
 
     return meta
 
@@ -598,9 +596,7 @@ def var_metadata_absolute_povlines(var, povline, origins, ppp_version, welfare_t
         "tolerance": TOLERANCE,
     }
 
-    meta.presentation = {
-        "title_public": meta.title,
-    }
+    meta.presentation = VariablePresentationMeta(title_public=meta.title)
 
     return meta
 
@@ -629,9 +625,7 @@ def var_metadata_between_absolute_povlines(var, povline1, povline2, origins, ppp
         "tolerance": TOLERANCE,
     }
 
-    meta.presentation = {
-        "title_public": meta.title,
-    }
+    meta.presentation = VariablePresentationMeta(title_public=meta.title)
 
     meta.description_short = meta.description_short.replace(
         "{povline}",
@@ -671,9 +665,7 @@ def var_metadata_relative_povlines(var, rel, origins, welfare_type) -> VariableM
         "tolerance": TOLERANCE,
     }
 
-    meta.presentation = {
-        "title_public": meta.title,
-    }
+    meta.presentation = VariablePresentationMeta(title_public=meta.title)
 
     return meta
 
@@ -738,9 +730,7 @@ def var_metadata_percentiles(var, pct, origins, ppp_version, welfare_type) -> Va
         "tolerance": TOLERANCE,
     }
 
-    meta.presentation = {
-        "title_public": meta.title,
-    }
+    meta.presentation = VariablePresentationMeta(title_public=meta.title)
 
     return meta
 
@@ -848,8 +838,6 @@ def var_metadata_percentile_table(var, origins, welfare_type) -> VariableMeta:
         "tolerance": TOLERANCE,
     }
 
-    meta.presentation = {
-        "title_public": meta.title,
-    }
+    meta.presentation = VariablePresentationMeta(title_public=meta.title)
 
     return meta
