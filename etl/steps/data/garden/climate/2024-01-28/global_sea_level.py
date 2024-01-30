@@ -18,8 +18,8 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
     # Add column with average values between Church & White and UHSLC.
-    tb["sea_level__average"] = tb[["sea_level__church_and_white_2011", "sea_level__uhslc"]].mean(axis=1)
-    tb["sea_level__average"] = tb["sea_level__average"].copy_metadata(tb["sea_level__church_and_white_2011"])
+    tb["sea_level_average"] = tb[["sea_level_church_and_white_2011", "sea_level_uhslc"]].mean(axis=1)
+    tb["sea_level_average"] = tb["sea_level_average"].copy_metadata(tb["sea_level_church_and_white_2011"])
 
     # Add location column.
     tb["location"] = "World"

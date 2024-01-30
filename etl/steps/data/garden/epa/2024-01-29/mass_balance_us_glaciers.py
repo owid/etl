@@ -17,8 +17,16 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
-    # Add a location column.
-    tb["location"] = "United States"
+    # Change column names to human-readable names.
+    tb = tb.rename(
+        columns={column: column.replace("_", " ").title() for column in tb.columns if column != "year"}, errors="raise"
+    )
+
+    # Transpose table to have location as a column.
+    tb = tb.melt(id_vars=["year"], var_name="location", value_name="mass_balance_us_glaciers")
+
+    # Remove empty rows.
+    tb = tb.dropna().reset_index(drop=True)
 
     # Set an appropriate index to each table and sort conveniently.
     tb = tb.set_index(["location", "year"], verify_integrity=True).sort_index().sort_index(axis=1)

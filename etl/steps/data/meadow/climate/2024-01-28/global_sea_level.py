@@ -9,7 +9,7 @@ from etl.helpers import PathFinder, create_dataset
 paths = PathFinder(__file__)
 
 # Columns to use from the data, and how to rename them.
-COLUMNS = {"Date": "date", "CW_2011": "sea_level__church_and_white_2011", "UHSLC_FD": "sea_level__uhslc"}
+COLUMNS = {"Date": "date", "CW_2011": "sea_level_church_and_white_2011", "UHSLC_FD": "sea_level_uhslc"}
 
 
 def fix_date_column(tb: Table) -> Table:
