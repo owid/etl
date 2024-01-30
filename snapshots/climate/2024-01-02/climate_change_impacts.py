@@ -54,6 +54,10 @@ FILES = [
 #   So, one could use this link, trying with different dates (e.g. ..._202401.txt, ..._202312.txt, ..._202311.txt),
 #   until the most recent file is downloaded.
 #   I contacted EarthData to ask if there is any way to access the latest data programmatically.
+# * Global sea level from NASA.
+#   We could get more up-to-date data on sea levels from https://sealevel.jpl.nasa.gov/
+#   but we would need to use a special library with credentials to fetch the data (and the baseline and format would
+#   probably be different).
 ########################################################################################################################
 
 
