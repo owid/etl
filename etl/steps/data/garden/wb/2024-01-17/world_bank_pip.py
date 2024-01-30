@@ -928,6 +928,11 @@ def create_survey_spells(tb: Table) -> list:
         tb["welfare_type"].astype(str) + "_spell_" + tb["survey_comparability"].astype(int).astype(str)
     )
 
+    # Remove columns not needed: stacked, above, etc
+    drop_list = ["above", "between", "poverty_severity", "watts"]
+    for var in drop_list:
+        tb = tb[tb.columns.drop(list(tb.filter(like=var)))]
+
     vars = [
         i
         for i in tb.columns
@@ -944,6 +949,8 @@ def create_survey_spells(tb: Table) -> list:
             "estimation_type",
             "survey_comparability",
             "comparable_spell",
+            "headcount_215_regions",
+            "surveys_past_decade",
         ]
     ]
 
