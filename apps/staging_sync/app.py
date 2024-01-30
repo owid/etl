@@ -53,7 +53,7 @@ def main():
         if not _is_valid_config(source, target):
             return
 
-        cmd = ["poetry", "run", "etl-staging-sync", source, "master"]
+        cmd = ["poetry", "run", "etl-staging-sync", source, target]
         if dry_run:
             cmd.append("--dry-run")
         if publish:
