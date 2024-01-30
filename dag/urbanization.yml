@@ -37,3 +37,9 @@ steps:
   data://grapher/un/2024-01-17/urban_agglomerations_definition:
     - data://garden/un/2024-01-17/urban_agglomerations_definition
 
+  data://meadow/urbanization/2024-01-26/ghsl_degree_of_urbanisation:
+    - snapshot://urbanization/2024-01-26/ghsl_degree_of_urbanisation.zip
+  data://garden/urbanization/2024-01-26/ghsl_degree_of_urbanisation:
+    - data://meadow/urbanization/2024-01-26/ghsl_degree_of_urbanisation
+  data://grapher/urbanization/2024-01-26/ghsl_degree_of_urbanisation:
+    - data://garden/urbanization/2024-01-26/ghsl_degree_of_urbanisation
