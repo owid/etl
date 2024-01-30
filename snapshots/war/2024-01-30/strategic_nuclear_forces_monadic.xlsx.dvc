@@ -6,11 +6,11 @@ meta:
       This dataset describes times-series-cross-sectional information on all nuclear-armed states' strategic nuclear forces, and provides three indicators: the deliverable strategic warhead count, the equivalent megatonnage (EMT) index, and the counter military potential (CMP) index.
     title_snapshot: The Strategic Nuclear Forces Dataset - Monadic data
     description_snapshot: |-
-      This dataset (sent to Our World in Data by K. Suh in a private communication) is in monadic format.
+      The original data exists in two different formats:
+      1. In the dyadic format, each row in the data corresponds to a pair of states, and the nuclear capabilities of a state depends on the distance to the other state. For example, a country may have a certain number of warheads, but not all of them could be delivered to a very distant country.
+      2. In the monadic format, each row corresponds to just one country. This data shows the nuclear capabilities of a state, regardless of what country they could be used against.
 
-      The original dataset is in dyadic format. This means that each row in the data corresponds to a pair of states, and the nuclear capabilities of a state depends on the distance to the other state. For example, a country may have a certain number of warheads, but not all of them could be delivered to a very distant country.
-
-      On the other hand, each row in the monadic data corresponds to just one country. This data shows the nuclear capabilities of a state, regardless of what country they could be used against.
+      The current dataset is presented in monadic format.
     date_published: 2023-09-15
     version_producer: v2.0
 
@@ -19,22 +19,21 @@ meta:
     citation_full: |-
       Kyungwon Suh - The Strategic Nuclear Forces Dataset, monadic data (2023).
 
-      This monadic dataset was sent to Our World in Data by K. Suh in a private communication. The underlying data is based on the following publication (where data is presented in a dyadic format):
-
       Suh, Kyungwon. 2022. “Nuclear Balance and the Initiation of Nuclear Crises: Does Superiority Matter?” Journal of Peace Research, Vol. 60, No. 2 (March): 337-351. Doi:10.1177/00223433211067899.
     attribution: Suh - The Strategic Nuclear Forces Dataset v2.0 (2023)
     attribution_short: Suh
 
     # Files
     url_main: https://kyungwonsuh.weebly.com/datasets.html
-    date_accessed: 2024-01-08
+    url_download: https://kyungwonsuh.weebly.com/uploads/1/4/6/1/146191116/snforce2_monad.xlsx
+    date_accessed: 2024-01-30
 
     # License
     license:
       name: CC BY 4.0
 
-wdir: ../../../data/snapshots/war/2024-01-08
+wdir: ../../../data/snapshots/war/2024-01-30
 outs:
-- md5: 5628b7187e98995cb455a0db9a12ccf6
-  size: 22082
+- md5: 545881108e83cdafda366038370d4ef5
+  size: 22516
   path: strategic_nuclear_forces_monadic.xlsx

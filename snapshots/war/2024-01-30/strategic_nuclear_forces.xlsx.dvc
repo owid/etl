@@ -4,6 +4,13 @@ meta:
     title: The Strategic Nuclear Forces Dataset
     description: |-
       This dataset describes times-series-cross-sectional information on all nuclear-armed states' strategic nuclear forces, and provides three indicators: the deliverable strategic warhead count, the equivalent megatonnage (EMT) index, and the counter military potential (CMP) index.
+    title_snapshot: The Strategic Nuclear Forces Dataset - Dyadic data
+    description_snapshot: |-
+      The original data exists in two different formats:
+      1. In the dyadic format, each row in the data corresponds to a pair of states, and the nuclear capabilities of a state depends on the distance to the other state. For example, a country may have a certain number of warheads, but not all of them could be delivered to a very distant country.
+      2. In the monadic format, each row corresponds to just one country. This data shows the nuclear capabilities of a state, regardless of what country they could be used against.
+
+      The current dataset is presented in dyadic format.
     date_published: 2023-09-15
     version_producer: v2.0
 
@@ -19,14 +26,13 @@ meta:
     # Files
     url_main: https://kyungwonsuh.weebly.com/datasets.html
     url_download: https://kyungwonsuh.weebly.com/uploads/1/4/6/1/146191116/snforce2_ndy.xlsx
-    date_accessed: 2024-01-08
+    date_accessed: 2024-01-30
 
     # License
     license:
       name: CC BY 4.0
 
-wdir: ../../../data/snapshots/war/2024-01-08
-
+wdir: ../../../data/snapshots/war/2024-01-30
 outs:
 - md5: ea6b9a96e6068a98ae315a42a57073f6
   size: 156328
