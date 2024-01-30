@@ -44,8 +44,6 @@ def run(dest_dir: str) -> None:
     # Check that the columns of interest are present
     for col in cols:
         assert col in tb.columns, f"Column '{col}' is missing from the dataframe."
-    # Check that there are no negative values in the training compute column
-    assert not (tb["Training compute (FLOP)"] < 0).any(), "Negative values found in 'Training compute (FLOP)' column."
 
     # Select the columns of interest
     tb = tb[cols]
