@@ -27,7 +27,7 @@ tables:
           We combine the two datasets, for years where both are available, we have a preference for the UN IGME data.
         presentation:
           title_public: Under-five mortality rate
-          title_variant: Long-run data; Gapminder & UN IGME
+          title_variant: Long-run data
           attribution_short: UN IGME; Gapminder
           grapher_config:
             title: Child mortality rate

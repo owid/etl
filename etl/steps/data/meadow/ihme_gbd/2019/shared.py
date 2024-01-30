@@ -7,6 +7,7 @@ from owid.catalog.utils import underscore_table
 from owid.walden import Catalog as WaldenCatalog
 from pyarrow import feather
 
+from etl.data_helpers.misc import add_origins_to_global_burden_of_disease
 from etl.steps.data.converters import convert_walden_metadata
 
 
@@ -106,7 +107,9 @@ def run_wrapper(dataset: str, metadata_path: str, namespace: str, version: str, 
 
     ds.metadata.update_from_yaml(metadata_path, if_source_exists="replace")
     # tb.update_metadata_from_yaml(metadata_path, f"{dataset}")
-    tb.reset_index(drop=True, inplace=True)
+    tb = tb.reset_index(drop=True)
+    tb = add_origins_to_global_burden_of_disease(tb)
+
     # add table to a dataset
     ds.add(tb)
 
