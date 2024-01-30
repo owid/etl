@@ -4,7 +4,7 @@ meta:
   origin:
     # Data product / Snapshot
     title: Parameter, Compute and Data Trends in Machine Learning
-    date_published: 2023-12-01
+    date_published: 2023-01-30
     description_snapshot: |
       We update this chart with the latest available data from our source every month.
 
