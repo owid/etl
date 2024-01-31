@@ -34,10 +34,16 @@ def run(dest_dir: str) -> None:
 
 
 def calculate_multiple_year_average(tb: Table) -> Table:
+    """
+        Calculate moving averages over multiple years for the cherry blossom dataset.
+    Args:
+        tb (Table): The input table containing cherry blossom data.
+    Returns:
+        Table: The modified table with additional columns for moving averages.
+    """
     tb = tb.set_index("year").sort_values("year").reset_index()
     tb["country"] = "Japan"
 
     tb["average_20_years"] = tb["full_flowering_date"].rolling(20, min_periods=5).mean()
-    tb["average_20_years"].metadata = tb["full_flowering_date"].metadata
 
     return tb

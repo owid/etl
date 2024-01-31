@@ -39,6 +39,7 @@ def run(dest_dir: str) -> None:
 
 
 def clean_data(tb: Table) -> Table:
+    """Removes rows with missing flowering dates and renames relevant columns."""
     tb = tb.dropna(subset=["Full-flowering date (DOY)"])
     tb["country"] = "Japan"
     tb = tb.rename(columns={"AD": "year"}).drop(columns=["Source code", "Data type code", "Reference Name"])
@@ -47,12 +48,14 @@ def clean_data(tb: Table) -> Table:
 
 def convert_date(tb: Table) -> Table:
     """
-    The full flowering date is formated like MDD, we should change this to day of the year for better biological meaning. For example the 4th April is shown as 404.
-    In this function we:
-     - Zero pad the year so it is 4 digits long - the data starts in 812
-     - Zero pad the full-flowering date so it is 4 digits long
-     - Combine these year and the full-flowering date so 1st April 812 would look like 08120401
-     - Convert this into a date format and extract the Julian day (day of the year)
+    Convert full flowering dates from MDD format to day of the year.
+    This function transforms the full flowering date format from MDD (e.g., 404 for April 4th) to the Julian day format.
+    It ensures the year is four digits long and combines it with the zero-padded full-flowering date to create a date object,
+    from which the Julian day is extracted.
+    Args:
+        tb (Table): The input table with the full-flowering date in MDD format.
+    Returns:
+        Table: The table with the full-flowering date converted to Julian day format.
     """
     tb["year_zpad"] = tb["year"].astype("str")
     tb["year_zpad"] = tb["year_zpad"].str.zfill(4)
@@ -68,12 +71,13 @@ def convert_date(tb: Table) -> Table:
 
 def add_data_for_recent_years(tb: Table) -> Table:
     """
-    Not sure if this is the best way to do this...
-    Adding data for the years 2016-21, from here:
-
-    http://atmenv.envi.osakafu-u.ac.jp/aono/kyophenotemp4/
-
-    The values for 2022 and 2023 were from personal communication with the author of the paper (Aono).
+    Add cherry blossom full flowering dates for recent years not covered in the original dataset.
+    This function manually adds data for the years 2016 to 2023. The data for 2016 to 2021 is sourced from the official dataset website,
+    while the data for 2022 and 2023 comes from personal communication with the dataset author.
+    Args:
+        tb (Table): The input table containing cherry blossom data.
+    Returns:
+        Table: The table with added data for recent years.
     """
 
     tb_new = Table(

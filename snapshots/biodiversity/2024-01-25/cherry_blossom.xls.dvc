@@ -38,6 +38,7 @@ meta:
     # License
     license:
       name: CC BY 4.0
+      url: https://creativecommons.org/licenses/by/4.0/
 
 wdir: ../../../data/snapshots/biodiversity/2024-01-25
 outs:
