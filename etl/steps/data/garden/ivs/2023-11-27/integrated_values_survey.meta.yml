@@ -11,6 +11,7 @@ definitions:
       The indicators are processed from microdata of the Integrated Values Surveys (IVS) using Stata. Weights are applied for each country.
     display: &common-display
       numDecimalPlaces: 1
+      tolerance: 5
     unit: "%"
     short_unit: "%"
 
