@@ -46,5 +46,6 @@ def calculate_multiple_year_average(tb: Table) -> Table:
     tb["country"] = "Japan"
 
     tb["average_20_years"] = tb["full_flowering_date"].rolling(20, min_periods=5).mean()
-
+    # This step seems to fail, stating that average_20_years doesn't have an origin or source, unless I do this:
+    tb["average_20_years"].metadata = tb["full_flowering_date"].metadata
     return tb
