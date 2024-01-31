@@ -24,8 +24,9 @@ def run(dest_dir: str) -> None:
     #
     # Save outputs.
     #
+    tb = tb.set_index(["country", "year"], verify_integrity=True)
     # Create a new grapher dataset with the same metadata as the garden dataset.
-    ds = create_dataset(dest_dir, tables=[tb.set_index(["country", "year"])], default_metadata=ds_meadow.metadata)
+    ds = create_dataset(dest_dir, tables=[tb], default_metadata=ds_meadow.metadata)
 
     # finally save the dataset
     ds.save()
@@ -41,7 +42,7 @@ def calculate_multiple_year_average(tb: Table) -> Table:
     Returns:
         Table: The modified table with additional columns for moving averages.
     """
-    tb = tb.set_index("year").sort_values("year").reset_index()
+    tb = tb.sort_values("year")
     tb["country"] = "Japan"
 
     tb["average_20_years"] = tb["full_flowering_date"].rolling(20, min_periods=5).mean()
