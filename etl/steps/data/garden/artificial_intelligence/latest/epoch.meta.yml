@@ -22,8 +22,6 @@ tables:
         description_short: Refers to the specific area, application, or field in which an AI system is designed to operate.
         description_processing: >
           To streamline the categorization of domains, domain categories with less than a total of five notable AI systems since 1950 were grouped under the "Other" label.
-          The following domains were re-categorized under "Other":
-            - 3D reconstruction, Driving, Video, Text-to-Video, Search, Audio, Robotics
 
           The aforementioned changes were implemented to make visualizations more coherent and concise.
         display:
