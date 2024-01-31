@@ -53,7 +53,7 @@ tables:
           numDecimalPlaces: 0
 
       degurba_l1_population_town__and__suburbs_estimates:
-        title: Population of town and suburban(DEGURBA Level 1)
+        title: Population of towns and suburbs (DEGURBA Level 1)
         unit: people
         description_from_producer: Population of spatial units classified as Town & Suburbs in Degree of Urbanisation level 1
         display:
@@ -242,14 +242,14 @@ tables:
           isProjection: true
 
       degurba_l1_population_town__and__suburbs_projections:
-        title: Population of town and suburban(DEGURBA Level 1) (projections)
+        title: Population of towns and suburbs (DEGURBA Level 1) (projections)
         unit: people
         presentation:
-          title_public: Population of town and suburban(DEGURBA Level 1)
+          title_public: Population of towns and suburbs (DEGURBA Level 1)
         description_from_producer: Population of spatial units classified as Town & Suburbs in Degree of Urbanisation level 1
         display:
           numDecimalPlaces: 0
-          name: Population of town and suburban(DEGURBA Level 1)
+          name: Population of towns and suburbs (DEGURBA Level 1)
           isProjection: true
 
       degurba_l1_units_city_projections:
