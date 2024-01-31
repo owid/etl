@@ -2,6 +2,7 @@ from datetime import datetime
 from typing import cast
 
 from owid.catalog import Table
+from owid.catalog import processing as pr
 from structlog import get_logger
 
 from etl.helpers import PathFinder, create_dataset
@@ -20,10 +21,11 @@ def run(dest_dir: str) -> None:
     snap = cast(Snapshot, paths.load_dependency("cherry_blossom.xls", version="2024-01-25"))
     tb = snap.read(skiprows=25)
     # retrieve snapshot of more recent years
-    snap_recent = cast(Snapshot, paths.load_dependency("cherry_blossom", version="2024-01-31"))
-
+    snap_recent = cast(Snapshot, paths.load_dependency("cherry_blossom.csv", version="2024-01-31"))
+    tb_recent = snap_recent.read()
     # clean and transform data
     tb = clean_data(tb)
+    tb = pr.concat([tb, tb_recent], ignore_index=True)
     tb = convert_date(tb)
     tb = tb.set_index(["country", "year"], verify_integrity=True)
     #

@@ -31,6 +31,6 @@ meta:
 
 wdir: ../../../data/snapshots/biodiversity/2024-01-31
 outs:
-- md5: 81a1c141517ad6e6a8efe5b3d3c5435d
-  size: 170
-  path: cherry_blossom.xls
+- md5: da54c6291792791e6f2384f3d5bc3d0f
+  size: 153
+  path: cherry_blossom.csv

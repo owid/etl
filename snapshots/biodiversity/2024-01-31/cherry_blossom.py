@@ -19,7 +19,7 @@ def main(upload: bool) -> None:
     # Create a new snapshot.
 
     df = create_table_for_recent_years()
-    snap = Snapshot(f"biodiversity/{SNAPSHOT_VERSION}/cherry_blossom.xls")
+    snap = Snapshot(f"biodiversity/{SNAPSHOT_VERSION}/cherry_blossom.csv")
 
     with tempfile.TemporaryDirectory() as temp_dir:
         output_file = Path(temp_dir) / "cherry_blossom.csv"
@@ -49,6 +49,7 @@ def create_table_for_recent_years() -> pd.DataFrame:
             "Full-flowering date": ["404", "409", "330", "405", "401", "326", "401", "325"],
         }
     )
+    df = df.set_index(["country", "year"])
 
     return df
 
