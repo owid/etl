@@ -1,9 +1,7 @@
 /*
-COMMANDS TO EXTRACT TRUST QUESTIONS FROM THE INTEGRATED VALUES SURVEY
+COMMANDS TO EXTRACT QUESTIONS FROM THE INTEGRATED VALUES SURVEY
 
 This code collapses microdata from the Integrated Values Survey (World Values Survey + European Values Survey) and generates a csv file.
-
-NOTE: For now I am extracting data on trust, but this will be expanded in 2024 to include other variables.
 
 INSTRUCTIONS
 
@@ -14,7 +12,7 @@ INSTRUCTIONS
 	4.	Add snapshot. Currently the command is
  			python snapshots/ivs/{date}/integrated_values_survey.py --path-to-file snapshots/ivs/{date}/ivs.csv
 	5.	Delete csv file
-	6.	Run `etl wvs_trust`
+	6.	Run `etl integrated_values_survey`
 
 */
 
@@ -31,9 +29,21 @@ global other_trust_questions D001_B G007_18_B G007_35_B G007_36_B
 * Join confidence and other trust questions
 global additional_questions $confidence_questions $other_trust_questions
 
+* List of questions about things important in life
+global important_in_life_questions A001 A002 A003 A004 A005 A006
+
+* list of questions about politics
+global politics_questions E023 E025 E026 E027 E028
+
+* protecting the environment vs. economic growth
+global environment_vs_econ_questions B008
+
+* income equality
+global income_equality_questions E035
+
 * List of questions to work with
 * NOTE: A168 is not available in IVS
-global questions A165 A168 G007_33_B G007_34_B $additional_questions
+global questions A165 A168 G007_33_B G007_34_B $additional_questions $important_in_life_questions $politics_questions $environment_vs_econ_questions $income_equality_questions
 
  * Keep wave ID, country, weight and the list of questions
 keep S002VS S002EVS S003 S017 $questions
@@ -160,6 +170,113 @@ foreach var in $additional_questions {
 	preserve
 }
 
+* Processing "important in life" questions
+
+foreach var in $important_in_life_questions {
+	keep if `var' >= 1
+
+	gen important_in_life_`var' = 0
+	replace important_in_life_`var' = 1 if `var' == 1 | `var' == 2
+	
+	gen not_important_in_life_`var' = 0
+	replace not_important_in_life_`var' = 1 if `var' == 3 | `var' == 4
+
+	collapse (mean) important_in_life_`var' not_important_in_life_`var' [w=S017], by (year country)
+	tempfile important_in_life_`var'_file
+	save "`important_in_life_`var'_file'"
+
+	restore
+	preserve
+}
+
+* Processing "politics" questions
+
+* E023 (interest in politics) has a different structure
+keep if E023 >= 1
+
+gen interested_politics = 0
+replace interested_politics = 1 if E023 == 1 | E023 == 2
+
+gen not_interested_politics = 0
+replace not_interested_politics = 1 if E023 == 3 | E023 == 4
+
+collapse (mean) interested_politics not_interested_politics [w=S017], by (year country)
+tempfile interest_politics_file
+save "`interest_politics_file'"
+
+restore
+preserve
+
+global interest_politics E023
+global rest_politics_questions : list global(politics_questions) - global(interest_politics)
+
+foreach var of varlist $rest_politics_questions {
+	
+	keep if `var' >= 1
+
+	gen political_action_have_done_`var' = 0
+	replace political_action_have_done_`var' = 1 if `var' == 1
+	
+	gen political_action_might_do_`var' = 0
+	replace political_action_might_do_`var' = 1 if `var' == 2
+	
+	gen political_action_never_`var' = 0
+	replace political_action_never_`var' = 1 if `var' == 3
+
+	collapse (mean) political_action_have_done_`var' political_action_might_do_`var' political_action_never_`var' [w=S017], by (year country)
+	tempfile politics_`var'_file
+	save "`politics_`var'_file'"
+	
+	restore
+	preserve
+}
+
+* Processing environment vs. economic growth questions
+
+* Keep only answers
+keep if B008 >= 1
+
+*Generate variables
+gen environment = 0
+replace environment = 1 if B008 == 1
+
+gen economic_growth = 0
+replace economic_growth = 1 if B008 == 2
+
+gen other_answer_env_ec = 0
+replace other_answer_env_ec = 1 if B008 == 3
+
+* Make dataset of the mean trust (which ends up being the % of people saying "most people can be trusted") by wave and country (CHECK WEIGHTS)
+collapse (mean) environment economic_growth other_answer_env_ec [w=S017], by (year country)
+tempfile environment_vs_econ_file
+save "`environment_vs_econ_file'"
+
+restore
+preserve
+
+* Processing income equality questions
+
+* Keep only answers
+keep if E035 >= 1
+
+*Generate variables
+gen income_equality = 0
+replace income_equality = 1 if E035 <= 4
+
+gen neutral_about_equality = 0
+replace neutral_about_equality = 1 if E035 == 5
+
+gen income_inequality = 0
+replace income_inequality = 1 if E035 >= 6
+
+* Make dataset of the mean trust (which ends up being the % of people saying "most people can be trusted") by wave and country (CHECK WEIGHTS)
+collapse (mean) income_equality neutral_about_equality income_inequality [w=S017], by (year country)
+tempfile income_equality_file
+save "`income_equality_file'"
+
+restore
+preserve
+
 
 
 * Combine all the saved datasets
@@ -172,6 +289,21 @@ merge 1:1 year country using "`take_advantage_file'", nogenerate // keep(master 
 foreach var in $additional_questions {
 	merge 1:1 year country using "`confidence_`var'_file'", nogenerate // keep(master match)
 }
+
+foreach var in $important_in_life_questions {
+	merge 1:1 year country using "`important_in_life_`var'_file'", nogenerate // keep(master match)
+}
+
+merge 1:1 year country using "`interest_politics_file'", nogenerate // keep(master match)
+
+foreach var in $rest_politics_questions {
+	merge 1:1 year country using "`politics_`var'_file'", nogenerate // keep(master match)
+}
+
+merge 1:1 year country using "`environment_vs_econ_file'", nogenerate // keep(master match)
+
+merge 1:1 year country using "`income_equality_file'", nogenerate // keep(master match)
+
 
 * Get a list of variables excluding country and year
 ds country year, not
