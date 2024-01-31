@@ -75,6 +75,8 @@ steps:
   - data://garden/climate/2023-12-20/surface_temperature
   data://grapher/climate/2023-12-20/surface_temperature_annual_average:
   - data://garden/climate/2023-12-20/surface_temperature
+  ######################################################################################################################
+  # Steps to be updated together for the climate change impacts explorer.
   #
   # Met Office Hadley Centre - Sea surface temperature.
   #
@@ -159,7 +161,7 @@ steps:
     - data://garden/epa/2024-01-29/ocean_heat_content
     - data://garden/epa/2024-01-29/ice_sheet_mass_balance
     - data://garden/epa/2024-01-29/mass_balance_us_glaciers
-
+  ######################################################################################################################
 
   ######################################################################################################################
   # Older versions to be archived once they are not used by any other steps.
