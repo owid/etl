@@ -15,6 +15,7 @@ ETL_DIR = BASE_DIR / "etl"
 STEP_DIR = ETL_DIR / "steps"
 APPS_DIR = BASE_DIR / "apps"
 SCHEMAS_DIR = BASE_DIR / "schemas"
+CACHE_DIR = BASE_DIR / ".cache"
 
 # Regions paths
 LATEST_REGIONS_VERSION = sorted((STEP_DIR / "data/garden/regions/").glob("*/regions.yml"))[-1].parts[-2]

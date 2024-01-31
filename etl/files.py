@@ -140,12 +140,11 @@ class _MyDumper(Dumper):
 
 def _str_presenter(dumper: Any, data: Any) -> Any:
     lines = data.splitlines()
-    if len(lines) > 1:  # check for multiline string
-        max_line_length = max([len(line) for line in lines])
-        if max_line_length > 120:
-            return dumper.represent_scalar("tag:yaml.org,2002:str", data, style=">")
-        else:
-            return dumper.represent_scalar("tag:yaml.org,2002:str", data, style="|")
+    # If there are multiple lines, or there is a line that is longer than 120 characters, use the literal style.
+    # NOTE: Here the 120 is a bit arbitrary. This is the default length of our lines in the code, but once written
+    # to YAML, the lines will be longer because of the indentation. So, we could use a smaller number here.
+    if (len(lines) > 1) or (max([len(line) for line in lines]) > 120):
+        return dumper.represent_scalar("tag:yaml.org,2002:str", data, style="|")
     else:
         return dumper.represent_scalar("tag:yaml.org,2002:str", data)
 
