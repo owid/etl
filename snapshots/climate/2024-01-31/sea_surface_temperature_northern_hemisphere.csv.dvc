@@ -13,13 +13,13 @@ meta:
     url_main: https://www.metoffice.gov.uk/hadobs/hadsst4/
     url_download: 
       https://www.metoffice.gov.uk/hadobs/hadsst4/data/csv/HadSST.4.0.1.0_monthly_NHEM.csv
-    date_accessed: '2024-01-02'
-    date_published: '2024-01-02'
+    date_accessed: '2024-01-31'
+    date_published: '2024-01-09'
     license:
       name: Open Government Licence v3
       url: https://www.metoffice.gov.uk/hadobs/hadsst4/data/download.html
-wdir: ../../../data/snapshots/climate/2024-01-02
+wdir: ../../../data/snapshots/climate/2024-01-31
 outs:
-- md5: f4ae38b4d9aa34e9e6841504654c2a03
-  size: 152534
+- md5: 22f9a7d4d02d1b9d695c07477f7cc819
+  size: 152606
   path: sea_surface_temperature_northern_hemisphere.csv

@@ -168,7 +168,7 @@ def find_date_published(snap: Snapshot) -> Optional[str]:
 @click.command()
 @click.option("--upload/--skip-upload", default=True, type=bool, help="Upload dataset to Snapshot")
 def main(upload: bool) -> None:
-    # Create a new snapshot for each of the data files.
+    # Create a new snapshot metadata dvc files for each of the data files.
     for file_name in FILES:
         snap = Snapshot(f"climate/{SNAPSHOT_VERSION}/{file_name}")
 
@@ -189,7 +189,12 @@ def main(upload: bool) -> None:
         # Rewrite metadata to dvc file.
         snap.metadata_path.write_text(snap.metadata.to_yaml())
 
-        # Copy local data file to snapshots data folder, add file to DVC and upload to S3.
+    # Create the actual snapshots, download the data and upload them to S3.
+    # NOTE: This cannot be done as part of the previous loop because, if the folder of dvc files has been manually
+    # duplicated (without manually removing the "outs" section), `create_snapshot` will fail because there are multiple
+    # files with the same "outs". Therefore, we first clean the dvc files, and then run `create_snapshot`.
+    for file_name in FILES:
+        snap = Snapshot(f"climate/{SNAPSHOT_VERSION}/{file_name}")
         snap.create_snapshot(upload=upload)
 
 

@@ -13,13 +13,13 @@ meta:
     url_main: https://www.metoffice.gov.uk/hadobs/hadsst4/
     url_download: 
       https://www.metoffice.gov.uk/hadobs/hadsst4/data/csv/HadSST.4.0.1.0_monthly_SHEM.csv
-    date_accessed: '2024-01-02'
-    date_published: '2024-01-02'
+    date_accessed: '2024-01-31'
+    date_published: '2024-01-09'
     license:
       name: Open Government Licence v3
       url: https://www.metoffice.gov.uk/hadobs/hadsst4/data/download.html
-wdir: ../../../data/snapshots/climate/2024-01-02
+wdir: ../../../data/snapshots/climate/2024-01-31
 outs:
-- md5: 86fab74c93148436adbaa56c0618e627
-  size: 153130
+- md5: 85dfcb783289280a5f708852a16d9916
+  size: 153202
   path: sea_surface_temperature_southern_hemisphere.csv

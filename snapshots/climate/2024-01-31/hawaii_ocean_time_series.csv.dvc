@@ -2,24 +2,33 @@ meta:
   origin:
     producer: School of Ocean & Earth Science & Technology
     title: Hawaii Ocean Time-series
-    citation_full: |-
-      School of Ocean and Earth Science and Technology at the University of Hawai'i at Manoa - Hawaii Ocean Time-series (HOT).
+    citation_full: >-
+      School of Ocean and Earth Science and Technology at the University of Hawai'i
+      at Manoa - Hawaii Ocean Time-series (HOT).
 
-      Dore, J.E., R. Lukas, D.W. Sadler, M.J. Church, and D.M. Karl. 2009. Physical and biogeochemical modulation of ocean acidification in the central North Pacific. Proc Natl Acad Sci USA 106:12235-12240.
 
-      HOT observations are supported by the U.S. National Science Foundation under Award #1756517.
+      Dore, J.E., R. Lukas, D.W. Sadler, M.J. Church, and D.M. Karl. 2009. Physical
+      and biogeochemical modulation of ocean
+      acidification in the central North Pacific. Proc Natl Acad Sci USA 106:12235-12240.
 
-      More details can be found at [the HOT Carbon Dioxide page](https://hahana.soest.hawaii.edu/hot/hotco2/hotco2.html), specifically in [this technical document](https://hahana.soest.hawaii.edu/hot/hotco2/HOT_surface_CO2_readme.pdf).
-    attribution: School of Ocean & Earth Science & Technology - Hawaii Ocean Time-series (2024)
+
+      HOT observations are supported by the U.S. National Science Foundation under
+      Award #1756517.
+
+
+      More details can be found at [the HOT Carbon Dioxide page](https://hahana.soest.hawaii.edu/hot/hotco2/hotco2.html),
+      specifically in [this technical document](https://hahana.soest.hawaii.edu/hot/hotco2/HOT_surface_CO2_readme.pdf).
+    attribution: School of Ocean & Earth Science & Technology - Hawaii Ocean Time-series
+      (2023)
     attribution_short: SOEST/Hawaii
     url_main: https://hahana.soest.hawaii.edu/hot/
     url_download: https://hahana.soest.hawaii.edu/hot/hotco2/HOT_surface_CO2.txt
-    date_accessed: '2024-01-02'
-    date_published: '2024-01-02'
+    date_accessed: '2024-01-31'
+    date_published: '2023-12-11'
     license:
       name: Public domain
       url: https://hahana.soest.hawaii.edu/hot/dataaccess.html
-wdir: ../../../data/snapshots/climate/2024-01-02
+wdir: ../../../data/snapshots/climate/2024-01-31
 outs:
 - md5: 74e636539b06abae72a4cba91df12f51
   size: 44820

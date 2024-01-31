@@ -10,12 +10,12 @@ meta:
     version_producer: v4
     url_main: https://data.giss.nasa.gov/gistemp/
     url_download: https://data.giss.nasa.gov/gistemp/tabledata_v4/NH.Ts+dSST.csv
-    date_accessed: '2024-01-02'
-    date_published: '2024-01-02'
+    date_accessed: '2024-01-31'
+    date_published: '2024-01-31'
     license:
       name: CC BY 4.0
-wdir: ../../../data/snapshots/climate/2024-01-02
+wdir: ../../../data/snapshots/climate/2024-01-31
 outs:
-- md5: 2d20316921bdb616018604c54293b1fc
-  size: 12646
+- md5: a2694708104263646dbe3a1785ffe5a5
+  size: 12649
   path: surface_temperature_analysis_northern_hemisphere.csv

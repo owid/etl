@@ -13,13 +13,13 @@ meta:
     url_main: https://www.metoffice.gov.uk/hadobs/hadsst4/
     url_download: 
       https://www.metoffice.gov.uk/hadobs/hadsst4/data/csv/HadSST.4.0.1.0_monthly_GLOBE.csv
-    date_accessed: '2024-01-02'
-    date_published: '2024-01-02'
+    date_accessed: '2024-01-31'
+    date_published: '2024-01-09'
     license:
       name: Open Government Licence v3
       url: https://www.metoffice.gov.uk/hadobs/hadsst4/data/download.html
-wdir: ../../../data/snapshots/climate/2024-01-02
+wdir: ../../../data/snapshots/climate/2024-01-31
 outs:
-- md5: 0ebf033734a5552fa3dfc7c4c5955624
-  size: 153023
+- md5: 9644768042e48eb354937cc113fd5b66
+  size: 153095
   path: sea_surface_temperature_world.csv

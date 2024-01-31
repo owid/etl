@@ -16,11 +16,11 @@ meta:
     version_producer: Version 1
     url_main: https://climate.rutgers.edu/snowcover/table_area.php?ui_set=1&ui_sort=0
     url_download: https://climate.rutgers.edu/snowcover/files/moncov.nhland.txt
-    date_accessed: '2024-01-02'
-    date_published: '2024-01-02'
+    date_accessed: '2024-01-31'
+    date_published: '2024-01-31'
     license:
       name: CC BY 4.0
-wdir: ../../../data/snapshots/climate/2024-01-02
+wdir: ../../../data/snapshots/climate/2024-01-31
 outs:
 - md5: 40762ac88de7a8cc33008f1b2044d2ab
   size: 12664
