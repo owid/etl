@@ -472,3 +472,24 @@ tables:
         display:
           numDecimalPlaces: 0
           isProjection: true
+
+      share_of_urban_population_owid_projections:
+        title: Share of urban population (OWID projections)
+        unit: '%'
+        short_unit: '%'
+        description_short: Share of total population in administrative units classified as cities, towns and suburbs.
+        presentation:
+          title_public: Share of urban population
+        display:
+          numDecimalPlaces: 1
+          isProjection: true
+
+      share_of_urban_population_owid_estimates:
+        title: Share of urban population (OWID estimates)
+        unit: '%'
+        short_unit: '%'
+        description_short: Share of total population in administrative units classified as cities, towns and suburbs.
+        presentation:
+          title_public: Share of urban population
+        display:
+          numDecimalPlaces: 1
