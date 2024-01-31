@@ -1,6 +1,5 @@
 """Script to create a snapshot of dataset."""
 
-import os
 import tempfile
 from pathlib import Path
 
@@ -27,9 +26,6 @@ def main(upload: bool) -> None:
 
         # Download data from source, add file to DVC and upload to S3.
         snap.create_snapshot(upload=upload, filename=output_file)
-
-        # Remove the file in the temporary directory.
-        os.remove(output_file)
 
 
 def create_table_for_recent_years() -> pd.DataFrame:
