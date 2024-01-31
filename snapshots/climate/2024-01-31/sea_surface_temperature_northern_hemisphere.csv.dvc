@@ -1,0 +1,25 @@
+meta:
+  origin:
+    producer: Met Office Hadley Centre
+    title: HadSST
+    title_snapshot: HadSST - Northern hemisphere
+    citation_full: 'Kennedy, J. J., Rayner, N. A., Atkinson, C. P., & Killick, R.
+      E. (2019). An ensemble data set of sea-surface temperature change from 1850:
+      the Met Office Hadley Centre HadSST.4.0.0.0 data set. Journal of Geophysical
+      Research: Atmospheres, 124. https://doi.org/10.1029/2018JD029867'
+    attribution: Met Office Hadley Centre - HadSST (2024)
+    attribution_short: Met Office
+    version_producer: 4.0.1.0
+    url_main: https://www.metoffice.gov.uk/hadobs/hadsst4/
+    url_download: 
+      https://www.metoffice.gov.uk/hadobs/hadsst4/data/csv/HadSST.4.0.1.0_monthly_NHEM.csv
+    date_accessed: '2024-01-02'
+    date_published: '2024-01-02'
+    license:
+      name: Open Government Licence v3
+      url: https://www.metoffice.gov.uk/hadobs/hadsst4/data/download.html
+wdir: ../../../data/snapshots/climate/2024-01-02
+outs:
+- md5: f4ae38b4d9aa34e9e6841504654c2a03
+  size: 152534
+  path: sea_surface_temperature_northern_hemisphere.csv

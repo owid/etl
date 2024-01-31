@@ -1,0 +1,28 @@
+meta:
+  origin:
+    producer: NOAA Global Monitoring Laboratory
+    title: Trends in Atmospheric Carbon Dioxide
+    description: The Carbon Cycle Greenhouse Gases (CCGG) research area operates the
+      Global Greenhouse Gas Reference Network, measuring the atmospheric distribution
+      and trends of the three main long-term drivers of climate change, carbon dioxide
+      (CO2), methane (CH4), and nitrous oxide (N2O), as well as carbon monoxide (CO)
+      which is an important indicator of air pollution.
+    citation_full: |-
+      National Oceanic and Atmospheric Administration (NOAA) Global Monitoring Laboratory, Boulder, Colorado, USA (https://gml.noaa.gov) - Trends in Atmospheric Carbon Dioxide.
+
+      Lan, X., Tans, P. and K.W. Thoning: Trends in globally-averaged CO2 determined from NOAA Global Monitoring Laboratory measurements. https://doi.org/10.15138/9N0H-ZH07
+    attribution: NOAA Global Monitoring Laboratory - Trends in Atmospheric Carbon
+      Dioxide (2024)
+    attribution_short: NOAA/GML
+    url_main: https://gml.noaa.gov/ccgg/trends/gl_data.html
+    url_download: https://gml.noaa.gov/webdata/ccgg/trends/co2/co2_mm_gl.csv
+    date_accessed: '2024-01-02'
+    date_published: '2024-01-02'
+    license:
+      name: CC BY 4.0
+      url: https://gml.noaa.gov/about/disclaimer.html
+wdir: ../../../data/snapshots/climate/2024-01-02
+outs:
+- md5: ac38fe55da0f77ffeaa02c31c1987c16
+  size: 23435
+  path: co2_concentration_monthly.csv

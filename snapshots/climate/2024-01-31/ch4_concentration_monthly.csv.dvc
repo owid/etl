@@ -1,0 +1,19 @@
+meta:
+  origin:
+    producer: NOAA Global Monitoring Laboratory
+    title: Trends in Atmospheric Methane
+    description: |-
+      The Carbon Cycle Greenhouse Gases (CCGG) research area operates the Global Greenhouse Gas Reference Network, measuring the atmospheric distribution and trends of the three main long-term drivers of climate change, carbon dioxide (CO2), methane (CH4), and nitrous oxide (N2O), as well as carbon monoxide (CO) which is an important indicator of air pollution.
+    citation_full: |-
+      National Oceanic and Atmospheric Administration (NOAA) Global Monitoring Laboratory, Boulder, Colorado, USA (https://gml.noaa.gov) - Trends in Atmospheric Methane.
+
+      Lan, X., K.W. Thoning, and E.J. Dlugokencky: Trends in globally-averaged CH4, N2O, and SF6 determined from NOAA Global Monitoring Laboratory measurements. https://doi.org/10.15138/P8XG-AA10
+    attribution: NOAA Global Monitoring Laboratory - Trends in Atmospheric Methane (2024)
+    attribution_short: NOAA/GML
+    url_main: https://gml.noaa.gov/ccgg/trends_ch4/
+    url_download: https://gml.noaa.gov/webdata/ccgg/trends/ch4/ch4_mm_gl.csv
+    date_accessed: '2024-01-31'
+    date_published: '2024-01-31'
+    license:
+      name: CC BY 4.0
+      url: https://gml.noaa.gov/about/disclaimer.html
