@@ -208,3 +208,43 @@ tables:
           isProjection: true
         presentation:
           title_public: Annual share of population residing in urban areas at mid-year
+      urbc_c:
+        title: Urban population (HYDE estimates and UN projections)
+        unit: "people"
+        short_unit: ""
+        description_key: *projections_key
+        display:
+          numDecimalPlaces: 0
+          isProjection: true
+        presentation:
+          title_public: Population residing in urban areas
+      rurc_c:
+        title: Rural population (HYDE estimates and UN projections)
+        unit: "people"
+        short_unit: ""
+        description_key: *projections_key
+        display:
+          numDecimalPlaces: 0
+          isProjection: true
+        presentation:
+          title_public: Population residing in rural areas
+
+      urbc_c_share:
+        title: Share of population residing in urban areas (HYDE estimates and UN projections)
+        unit: "%"
+        short_unit: "%"
+        description_key: *projections_key
+        display:
+          numDecimalPlaces: 1
+        presentation:
+          title_public: Share of population residing in urban areas
+
+      rurc_c_share:
+        title: Share of population residing in rural areas (HYDE estimates and UN projections)
+        unit: "%"
+        short_unit: "%"
+        description_key: *projections_key
+        display:
+          numDecimalPlaces: 1
+        presentation:
+          title_public: Share of population residing in rural areas
