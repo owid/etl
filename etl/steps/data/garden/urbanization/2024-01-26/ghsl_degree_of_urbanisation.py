@@ -1,5 +1,6 @@
 """Load a meadow dataset and create a garden dataset."""
 
+import numpy as np
 import owid.catalog.processing as pr
 
 from etl.data_helpers import geo
@@ -93,6 +94,37 @@ def run(dest_dir: str) -> None:
     tb["share_of_urban_population_owid"] = (
         (tb["degurba_l1_population_city"] + tb["degurba_l1_population_town__and__suburbs"]) / tb["total_pop"]
     ) * 100
+
+    exceptions = ["World (GHSL)"] + REGIONS
+    non_exception_entities = tb[~tb["country"].isin(exceptions)]
+
+    #  Check that the values in the share_of_urban_population and share_of_urban_population_owid columns are the same for all non-exception entities
+    is_equal = np.isclose(
+        non_exception_entities["share_of_urban_population"].values,
+        non_exception_entities["share_of_urban_population_owid"].values,
+        atol=0.01,
+        equal_nan=True,
+    )
+
+    assert is_equal.all(), "Values in 'share_of_urban_population' (provided by GHSL) and 'share_of_urban_population_owid' (calculated) are not the same for all non-exception entities"
+    # Check that our calculation for "World" corresponds to "World (GHSL)"
+    world_values = tb["share_of_urban_population_owid"][tb["country"] == "World"]
+    world_ghsl_values = tb["share_of_urban_population"][tb["country"] == "World (GHSL)"]
+
+    # Check that the values in the share_of_urban_population and share_of_urban_population_owid columns are the same for "World" and "World (GHSL)"
+    is_equal_world = np.isclose(
+        world_values.values,
+        world_ghsl_values.values,
+        atol=0.01,
+        equal_nan=True,
+    )
+
+    assert is_equal_world.all(), "Values for 'World' and 'World (GHSL)' are not the same in 'share_of_urban_population' and 'share_of_urban_population_owid'"
+    # Remove 'share_of_urban_population' column (we will use 'share_of_urban_population_owid' instead)
+    tb = tb.drop(columns=["share_of_urban_population"])
+
+    # Remove rows with 'World (GHSL)'; we'll use our OWID generated 'World' instead
+    tb = tb[tb["country"] != "World (GHSL)"]
 
     # Create two new dataframes to separate data into estimates and projections (pre-2025 and post-2025 (five year intervals)))
     past_estimates = tb[tb["year"] < 2025].copy()
