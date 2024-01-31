@@ -18,10 +18,7 @@ tables:
           grapher_config:
             title: Day of the year with peak cherry tree blossom in Kyoto, Japan
             subtitle: >
-              The vertical axis shows the date of peak blossom, expressed as the number
-              of days since 1st January. The timing of the peak cherry blossom is influenced by
-              spring temperatures. Higher temperatures due to climate change have caused the peak
-              blossom to gradually move earlier in the year since the early 20th century.
+              The vertical axis shows the date of peak blossom, expressed as the number of days since 1st January. The timing of the peak cherry blossom is influenced by spring temperatures. Higher temperatures due to climate change have caused the peak blossom to gradually move earlier in the year since the early 20th century.
             yAxis:
               min: 70
             selectedEntityNames:
@@ -42,10 +39,7 @@ tables:
           grapher_config:
             title: Day of the year with peak cherry tree blossom in Kyoto, Japan
             subtitle: >
-              The vertical axis shows the date of peak blossom, expressed as the number
-              of days since 1st January. The timing of the peak cherry blossom is influenced by
-              spring temperatures. Higher temperatures due to climate change have caused the peak
-              blossom to gradually move earlier in the year since the early 20th century.
+              The vertical axis shows the date of peak blossom, expressed as the number of days since 1st January. The timing of the peak cherry blossom is influenced by spring temperatures. Higher temperatures due to climate change have caused the peak blossom to gradually move earlier in the year since the early 20th century.
             yAxis:
               min: 70
             selectedEntityNames:
