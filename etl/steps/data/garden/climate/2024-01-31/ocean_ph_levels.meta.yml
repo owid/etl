@@ -3,8 +3,8 @@ definitions:
     presentation:
       topic_tags:
       - Climate Change
-    unit: ""
-    short_unit: ""
+    unit: pH
+    short_unit: pH
 
 dataset:
   title: Ocean pH Levels

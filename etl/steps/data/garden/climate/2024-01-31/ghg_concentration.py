@@ -23,8 +23,15 @@ COLUMNS = {
 def add_rolling_average(tb: Table, original_column_names: List[str]) -> Table:
     tb_with_average = tb.copy()
 
-    # Create a date range.
-    date_range = pd.date_range(start=tb_with_average["date"].min(), end=tb_with_average["date"].max(), freq="1D")
+    # Create a date range of each month (on the 15th).
+    # NOTE: The minimum date in the data is "2001-01-15", however, when passing this date to pd.date_range with
+    # freq="MS", the first point is dismissed because it is not the start of a month. For that reason, we shift the
+    # first point to be at the beginning of the month.
+    date_range = pd.date_range(
+        start=tb_with_average["date"].min() - pd.tseries.offsets.MonthBegin(1),
+        end=tb_with_average["date"].max(),
+        freq="MS",
+    ) + pd.DateOffset(days=14)
 
     # Get unique locations.
     unique_locations = tb_with_average["location"].unique()
@@ -40,23 +47,19 @@ def add_rolling_average(tb: Table, original_column_names: List[str]) -> Table:
 
     for original_column_name in original_column_names:
         # Create a rolling average with a window of one year, linearly interpolating missing values.
+        # NOTE: Currently no interpolation is needed, as no data points are missing (and in fact date_range is identical
+        # to the dates in the data). However, we need to interpolate in case there are missing points. Otherwise all
+        # points after the missing one will be nan.
         tb_with_average[f"{original_column_name}_yearly_average"] = (
             tb_with_average[original_column_name]
-            .interpolate(method="linear")
-            .rolling(365)
+            .interpolate("linear")
+            .rolling(12)
             .mean()
             .copy_metadata(tb_with_average[original_column_name])
         )
 
     # Drop empty rows.
     tb_with_average = tb_with_average.dropna(subset=original_column_names, how="all").reset_index()
-
-    # Remove rolling average for the first year, given that it is based on incomplete data.
-    for original_column_name in original_column_names:
-        tb_with_average.loc[
-            tb_with_average["date"] < tb_with_average["date"].min() + pd.Timedelta(days=365),
-            f"{original_column_name}_yearly_average",
-        ] = None
 
     # Sort conveniently.
     tb_with_average = tb_with_average.sort_values(["location", "date"]).reset_index(drop=True)

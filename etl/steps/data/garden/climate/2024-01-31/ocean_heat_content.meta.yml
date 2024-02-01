@@ -17,7 +17,7 @@ tables:
         title: Monthly average ocean heat content for the 0-700 meters layer
         description_short: Measured in 10²² Joules.
         unit: 10²² Joules
-        short_unit: 10²² Joules
+        short_unit: 10²² J
       ocean_heat_content_2000m:
         title: Monthly average ocean heat content for the 0-2000 meters layer
         description_short: Measured in 10²² Joules.
