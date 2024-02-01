@@ -280,7 +280,7 @@ def run_dag(
         # If no steps are found, the most likely case is that the step passed as argument was misspelled.
         # Print a short error message, show a list of the closest matches, and exit.
         includes_str = " ".join(includes or [])
-        print(f"No steps matched `{includes_str}`. Closes matches:")
+        print(f"No steps matched `{includes_str}`. Closest matches:")
         # NOTE: We could use a better edit distance to find the closest matches.
         for match in difflib.get_close_matches(includes_str, list(dag), n=5, cutoff=0.0):
             print(match)
