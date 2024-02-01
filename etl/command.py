@@ -3,6 +3,7 @@
 #  etl.py
 #
 
+import difflib
 import itertools
 import re
 import resource
@@ -276,9 +277,14 @@ def run_dag(
     steps = compile_steps(dag, includes, excludes, downstream=downstream, only=only)
 
     if not steps:
-        raise ValueError(
-            f"No steps matched the given input `{' '.join(includes or [])}`. Check spelling or consult `etl --help` for more options"
-        )
+        # If no steps are found, the most likely case is that the step passed as argument was misspelled.
+        # Print a short error message, show a list of the closest matches, and exit.
+        includes_str = " ".join(includes or [])
+        print(f"No steps matched `{includes_str}`. Closes matches:")
+        # NOTE: We could use a better edit distance to find the closest matches.
+        for match in difflib.get_close_matches(includes_str, list(dag), n=5, cutoff=0.0):
+            print(match)
+        sys.exit(1)
 
     # do not run dependencies if `only` is set by setting them to non-dirty
     if only:
