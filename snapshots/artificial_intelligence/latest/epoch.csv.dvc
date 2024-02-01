@@ -28,7 +28,7 @@ meta:
     # Files
     url_main: https://epochai.org/mlinputs/visualization
     url_download: https://epochai.org/data/epochdb/all_systems.csv
-    date_accessed: 2023-12-01
+    date_accessed: 2024-02-01
     # License
     license:
       name: Public domain
