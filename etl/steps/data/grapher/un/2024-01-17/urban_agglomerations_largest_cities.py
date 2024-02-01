@@ -21,7 +21,7 @@ def run(dest_dir: str) -> None:
     tb = tb.reset_index()
     # Rename urban_agglomeration to country for the grapher.
     tb = tb.rename(columns={"urban_agglomeration": "country", "country": "country_code"})
-    tb = tb.drop(columns=["rank_order"])
+    tb = tb.drop(columns=["rank_order", "population_capital"])
     tb["country_code"].metadata.unit = ""
     tb["country_code"].metadata.title = "Country color code"
 
@@ -33,6 +33,7 @@ def run(dest_dir: str) -> None:
     ds_grapher = create_dataset(
         dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=ds_garden.metadata
     )
+    ds_grapher.metadata.title = "World Urbanization Prospects Dataset - Population of the 30 largest cities"
 
     # Save changes in the new grapher dataset.
     ds_grapher.save()
