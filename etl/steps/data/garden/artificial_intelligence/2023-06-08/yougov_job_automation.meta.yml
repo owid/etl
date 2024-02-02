@@ -9,12 +9,6 @@ definitions:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
 dataset:
   update_period_days: 180
-  title: How worried are Americans about being automated out of a job? (YouGov, June 2023)
-  description: >
-    Biannual tracking of Americans' level of concern regarding job automation replacing their employment. The provided results are weighted to ensure they are representative of the United States population across various demographic factors.
-
-
-    The weighting is based on factors such as age, gender, race, education, region, political party affiliation, and income level. This weighting process helps to account for the diversity within the population and ensures that the results reflect a broader representation of the United States as a whole. Next update in January. Each wave comprises responses from 460 to 495 working US adults.
 tables:
   yougov_job_automation:
     variables:

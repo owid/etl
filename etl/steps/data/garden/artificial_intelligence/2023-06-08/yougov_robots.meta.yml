@@ -10,32 +10,6 @@ definitions:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
 dataset:
   update_period_days: 180
-  title: Robot intelligence survey (YouGov, June 2023)
-  description: >
-    Biannual tracker of Americans' concerns regarding robotic intelligence. Next update is in January. The provided results are
-    weighted to ensure they are representative of the United States population across various demographic factors. The weighting
-    is based on factors such as age, gender, race, education, region, political party affiliation, and income level. This
-    weighting process helps to account for the diversity within the population and ensures that the results reflect a broader
-    representation of the United States as a whole. Each wave comprises responses from 1004 - 1085 US Adults.
-
-
-    Respondents were asked, "Which ONE, if any, of the following statements do you MOST agree with
-
-
-
-    - Most robots have already developed higher levels of intelligence than humans
-
-
-    - None of these
-
-
-    - Robots will be able to develop higher levels of intelligence than humans in the future
-
-
-    - Robots will never be able to develop higher levels of intelligence than humans
-
-
-    - Don't know
 
 tables:
   yougov_robots:
