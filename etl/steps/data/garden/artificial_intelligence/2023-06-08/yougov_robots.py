@@ -21,26 +21,27 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load meadow dataset.
-    ds_meadow = paths.load_dataset("yougov_robots")
+    ds_meadow = cast(Dataset, paths.load_dependency("yougov_robots"))
 
     # Read table from meadow dataset.
-    tb = ds_meadow["yougov_robots"].reset_index()
+    tb = ds_meadow["yougov_robots"]
+    df = pd.DataFrame(tb)
     #
     # Process data.
     #
     # Create a date column (counting days since 2021-01-01)
-    tb["days_since_2021"] = (
-        pd.to_datetime(tb["date"].astype(str), format="%Y-%m-%d") - pd.to_datetime("2021-01-01")
+    df["days_since_2021"] = (
+        pd.to_datetime(df["date"].astype(str), format="%Y-%m-%d") - pd.to_datetime("2021-01-01")
     ).dt.days
-    tb = tb.drop("date", axis=1)
+    df = df.drop("date", axis=1)
 
     # Create a pivot table for each demographic group
-    pivot_tb = tb.pivot(
+    pivot_df = df.pivot(
         index=["group", "days_since_2021"],
         columns="which_one__if_any__of_the_following_statements_do_you_most_agree_with",
         values="value",
     ).reset_index()
-    pivot_tb = pivot_tb.rename_axis(None, axis=1)
+    pivot_df = pivot_df.rename_axis(None, axis=1)
     rename_entries = {
         "18-29": "18-29 years",
         "2-year": "2-year post-secondary education",
@@ -52,17 +53,18 @@ def run(dest_dir: str) -> None:
         "No HS": "No high school education",
         "Post-grad": "Post-graduate education",
     }
-    pivot_tb["group"] = pivot_tb["group"].replace(rename_entries)
+    pivot_df["group"] = pivot_df["group"].replace(rename_entries)
 
-    pivot_tb = pivot_tb.underscore().set_index(["group", "days_since_2021"], verify_integrity=True)
+    tb = Table(pivot_df, short_name="yougov_robots", underscore=True)
+
+    tb.set_index(["group", "days_since_2021"], inplace=True)
 
     #
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = create_dataset(
-        dest_dir, tables=[pivot_tb], check_variables_metadata=True, default_metadata=ds_meadow.metadata
-    )
+    ds_garden = create_dataset(dest_dir, tables=[tb], default_metadata=ds_meadow.metadata)
+
     # Save changes in the new garden dataset.
     ds_garden.save()
 

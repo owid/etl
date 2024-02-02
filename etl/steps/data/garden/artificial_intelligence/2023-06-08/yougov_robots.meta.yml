@@ -1,16 +1,41 @@
-
-# NOTE: To learn more about the fields, hover over their names.
-definitions:
-  common:
-    processing_level: minor
-    presentation:
-      topic_tags:
-        - Artificial Intelligence
-# Learn more about the available fields:
-# http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
 dataset:
-  update_period_days: 180
+  title: Robot intelligence survey (YouGov, June 2023)
+  description: &desc >
+    Biannual tracker of Americans' concerns regarding robotic intelligence. Next update is in January. The provided results are
+    weighted to ensure they are representative of the United States population across various demographic factors. The weighting
+    is based on factors such as age, gender, race, education, region, political party affiliation, and income level. This
+    weighting process helps to account for the diversity within the population and ensures that the results reflect a broader
+    representation of the United States as a whole. Each wave comprises responses from 1004 - 1085 US Adults.
 
+
+    Respondents were asked, "Which ONE, if any, of the following statements do you MOST agree with
+
+
+
+    - Most robots have already developed higher levels of intelligence than humans
+
+
+    - None of these
+
+
+    - Robots will be able to develop higher levels of intelligence than humans in the future
+
+
+    - Robots will never be able to develop higher levels of intelligence than humans
+
+
+    - Don't know
+  licenses:
+  - name: Public Data
+  sources:
+  - name: YouGov
+    description: *desc
+    url: https://today.yougov.com/topics/politics/trackers/robot-intelligence
+    source_data_url: https://today.yougov.com/_pubapis/v5/us/trackers/robot-intelligence/download
+    date_accessed: '2023-06-07'
+    publication_date: '2023-01-05'
+    publication_year: 2023
+    published_by: YouGov (2023)
 tables:
   yougov_robots:
     variables:
@@ -27,8 +52,6 @@ tables:
         title: Most robots have already developed higher levels of intelligence than humans
         unit: '%'
         short_unit: '%'
-        presentation:
-          title_public: "Robots smarter than humans now"
         display:
           numDecimalPlaces: 1
           zeroDay: '2021-01-01'
@@ -48,8 +71,6 @@ tables:
         title: Robots will be able to develop higher levels of intelligence than humans in the future
         unit: '%'
         short_unit: '%'
-        presentation:
-          title_public: "Robots will surpass human intelligence in the future"
         display:
           numDecimalPlaces: 1
           zeroDay: '2021-01-01'
@@ -60,8 +81,6 @@ tables:
         title: Robots will never be able to develop higher levels of intelligence than humans
         unit: '%'
         short_unit: '%'
-        presentation:
-          title_public: "Robots will never surpass human intelligence"
         display:
           numDecimalPlaces: 1
           zeroDay: '2021-01-01'

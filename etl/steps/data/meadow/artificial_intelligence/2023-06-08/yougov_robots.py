@@ -18,29 +18,27 @@ paths = PathFinder(__file__)
 
 def run(dest_dir: str) -> None:
     log.info("yougov_robots.start")
+
     #
     # Load inputs.
     #
     # Retrieve snapshot.
-    snap = paths.load_snapshot("yougov_robots.xlsx")
+    snap = cast(Snapshot, paths.load_dependency("yougov_robots.xlsx"))
+
+    excel_object = shared.load_data(snap)
+    df_all_sheets = shared.process_data(excel_object)
 
     #
     # Process data.
     #
-    tb_all_sheets = shared.process_data(snap)
+    # Create a new table and ensure all columns are snake-case.
+    tb = Table(df_all_sheets, short_name=paths.short_name, underscore=True)
 
-    tb_all_sheets = tb_all_sheets.underscore()
-    tb_all_sheets = tb_all_sheets.set_index(
-        ["which_one__if_any__of_the_following_statements_do_you_most_agree_with", "date", "group"],
-        verify_integrity=True,
-    ).sort_index()
     #
     # Save outputs.
     #
     # Create a new meadow dataset with the same metadata as the snapshot.
-    ds_meadow = create_dataset(
-        dest_dir, tables=[tb_all_sheets], check_variables_metadata=True, default_metadata=snap.metadata
-    )
+    ds_meadow = create_dataset(dest_dir, tables=[tb], default_metadata=snap.metadata)
 
     # Save changes in the new garden dataset.
     ds_meadow.save()
