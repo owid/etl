@@ -1,4 +1,7 @@
-"""Load a garden dataset and create a grapher dataset."""
+"""Load a garden dataset and create a grapher dataset.
+
+This dataset is a work in progress. We have layed down the foundations for the step, but are waiting until new data is available (both from Maddison and from 2024 WPP).
+"""
 import re
 from copy import deepcopy
 from typing import Any, List
@@ -76,8 +79,12 @@ def run(dest_dir: str) -> None:
 def process(table: Table) -> Table:
     """Adapt table for Grapher.
 
-    - Add historical and projection versions of population and world_pop_share metrics (i.e. +4 columns).
-    - Drop `source` column.
+    - Add historical and projection versions of population and world_pop_share metrics (i.e. +4 columns). This is done so that we can plot projections in Grapher using dashed lines.
+        - Historical: data from 10,000 BCE until YEAR_THRESHOLD - 1.
+        - Projection: data from YEAR_THRESHOLD until 2100.
+    - Drop `source` column: Not needed in Grapher.
+
+    NOTE: At the moment, the indicators created by this function are being discarded in a later step. However, we plan on re-incorporating these in the future. This is because this dataset is a work in progress.
 
     Parameters
     ----------
