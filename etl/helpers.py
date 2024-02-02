@@ -464,7 +464,7 @@ class PathFinder:
         # Suffix to add to, e.g. "data" if step is private.
         is_private_suffix = "-private" if is_private else ""
 
-        if channel in ["meadow", "garden", "grapher", "explorers", "examples"]:
+        if channel in ["meadow", "garden", "grapher", "explorers", "examples", "open_numbers"]:
             step_name = f"data{is_private_suffix}://{channel}/{namespace}/{version}/{short_name}"
         elif channel == "snapshot":
             # match also on snapshot short_names without extension
@@ -607,9 +607,20 @@ class PathFinder:
         assert isinstance(snap, Snapshot)
         return snap
 
-    def load_dataset(self, short_name: Optional[str] = None) -> catalog.Dataset:
+    def load_dataset(
+        self,
+        short_name: Optional[str] = None,
+        channel: Optional[str] = None,
+        namespace: Optional[str] = None,
+        version: Optional[str] = None,
+    ) -> catalog.Dataset:
         """Load dataset dependency. short_name defaults to the current step's short_name."""
-        dataset = self.load_dependency(short_name=short_name or self.short_name)
+        dataset = self.load_dependency(
+            short_name=short_name or self.short_name,
+            channel=channel,
+            namespace=namespace,
+            version=version,
+        )
         assert isinstance(dataset, catalog.Dataset)
         return dataset
 

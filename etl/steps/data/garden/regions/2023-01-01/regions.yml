@@ -458,6 +458,8 @@
 
 - code: "DJI"
   name: "Djibouti"
+  aliases:
+    - "French Somalia"
 
 - code: "DMA"
   name: "Dominica"
@@ -708,6 +710,8 @@
 
 - code: "GRD"
   name: "Grenada"
+  aliases:
+    - "Granada (Winward Island)"
 
 - code: "GLP"
   name: "Guadeloupe"
@@ -958,6 +962,8 @@
 
 - code: "NAM"
   name: "Namibia"
+  aliases:
+    - "German South West Africa"
 
 - code: "NRU"
   name: "Nauru"
@@ -1230,6 +1236,7 @@
   aliases:
     - "St Barth"
     - "Saint Barthélemy"
+    - "St. Barthelemy (Norvegian Colonies)"
 
 - code: "SHN"
   name: "Saint Helena"
@@ -1258,6 +1265,7 @@
   name: "Saint Pierre and Miquelon"
   aliases:
     - "St.Pierre & Miq."
+    - "St.Pierre e Michelon"
 
 - code: "VCT"
   name: "Saint Vincent and the Grenadines"
@@ -1276,6 +1284,7 @@
   name: "Sao Tome and Principe"
   aliases:
     - "Sao Tome & Pr."
+    - "S.Tome e Principe (Portuguess Africa)"
 
 - code: "SAU"
   name: "Saudi Arabia"
@@ -1435,6 +1444,7 @@
     - "U.R. Tanzania"
     - "U.R. of Tanzania: Mainland"
     - "United Republic of Tanzania"
+    - "Tanganyka (German East Africa)"
   related:
     - "OWID_ZAN"
 
@@ -1476,6 +1486,7 @@
   aliases:
     - "Turks & Caicos"
     - "Turks and Caicos Islands (the)"
+    - "Turk Island"
 
 - code: "TUV"
   name: "Tuvalu"
@@ -1620,6 +1631,8 @@
 
 - code: "ESH"
   name: "Western Sahara"
+  aliases:
+    - "Spanish Sahara"
 
 - code: "OWID_WRL"
   name: "World"
