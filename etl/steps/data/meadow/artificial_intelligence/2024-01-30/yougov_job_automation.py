@@ -1,13 +1,10 @@
 """Load a snapshot and create a meadow dataset."""
 
-from typing import cast
 
 import shared
-from owid.catalog import Table
 from structlog import get_logger
 
 from etl.helpers import PathFinder, create_dataset
-from etl.snapshot import Snapshot
 
 # Initialize logger.
 log = get_logger()
