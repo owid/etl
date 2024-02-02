@@ -54,6 +54,11 @@ countries_post_1938 = {
     "Uruguay",
     "Venezuela",
 }
+# We may have to extract data from former countries
+## To do so, we need to establish the mappings between former and current countries. To do so, we define two equivalence types:
+## - 1:M: one former country is equivalent to multiple current countries.
+## - M:1: multiple former countries are equivalent to one current country.
+
 # 1:M coutry equivalents
 country_equivalents_1M = {
     "Kenya and Uganda (former)": ["Kenya", "Uganda"],  # OK

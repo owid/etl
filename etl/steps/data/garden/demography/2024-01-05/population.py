@@ -1,4 +1,9 @@
-"""Load a meadow dataset and create a garden dataset."""
+"""Load a meadow dataset and create a garden dataset.
+
+Notes:
+
+    - "Gapminder SG" stands for "Gapminder Systema Globalis"
+"""
 
 import json
 from typing import Dict, Tuple
@@ -220,7 +225,7 @@ def format_wpp(tb: Table) -> Table:
 # Gapminder SG #######
 ######################
 def format_gapminder_sg(tb: Table) -> Tuple[Table, Table]:
-    """Format Gapminder SG table."""
+    """Format Gapminder Systema Globalis table."""
     columns_rename = {
         "country": "country",
         "time": "year",

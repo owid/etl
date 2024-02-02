@@ -69,13 +69,11 @@ def add_latest_years_with_constant_num_countries(
 
 
 def expand_observations(tb: Table, col_year_start: str, col_year_end: str) -> Table:
-    """Expand to have a row per (year, conflict).
+    """Expanding the observations to have one row per year.
 
     See function in /home/lucas/repos/etl/etl/steps/data/garden/war/2023-09-21/shared.py for complete docstring info.
-
-    Difference in this one is that upper inequality is strict!
     """
-    # Add missing years for each triplet ("warcode", "campcode", "ccode")
+    # Add missing years
     YEAR_MIN = tb[col_year_start].min()
     YEAR_MAX = tb[col_year_end].max()
     if "year" in tb.columns:
