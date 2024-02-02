@@ -235,7 +235,7 @@ tables:
         short_unit: "%"
         description_key: *projections_key
         display:
-          numDecimalPlaces: 1
+          numDecimalPlaces: 2
         presentation:
           title_public: Share of population residing in urban areas
 
@@ -245,6 +245,6 @@ tables:
         short_unit: "%"
         description_key: *projections_key
         display:
-          numDecimalPlaces: 1
+          numDecimalPlaces: 2
         presentation:
           title_public: Share of population residing in rural areas

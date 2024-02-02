@@ -28,13 +28,14 @@ definitions:
 
       The method uses fixed population size and density thresholds for consistency and simplicity, though this may not always accurately reflect local urban characteristics.
 
+    description_short: The European Commission combines satellite imagery with national census data to derive urban and rural populations based on its own standardized definitions. Note that this result differs from UN figures which are based on nationally-defined urban definitions.
+
 tables:
   ghsl_degree_of_urbanisation:
     variables:
       average_area_km2_estimates:
         title: Average size of spatial units comprising the territory
         unit: km²
-        description_short: Refers to all the geographic divisions, including cities, towns, semi-dense areas, and rural regions, as categorized according to the Degree of Urbanisation criteria.
         display:
           numDecimalPlaces: 0
 
@@ -181,9 +182,8 @@ tables:
         title: Share of urban population (estimates)
         unit: '%'
         short_unit: '%'
-        description_short: Share of total population in administrative units classified as cities, towns and suburbs.
         presentation:
-          title_public: Share of urban population
+          title_public: Share of population living in cities, towns and suburbs
         display:
           numDecimalPlaces: 1
 
@@ -213,7 +213,6 @@ tables:
       average_area_km2_projections:
         title: Average size of spatial units comprising the territory (future projections)
         unit: km²
-        description_short: Refers to all the geographic divisions, including cities, towns, semi-dense areas, and rural regions, as categorized according to the Degree of Urbanisation criteria.
         presentation:
           title_public: Average size of spatial units comprising the territory
         display:
@@ -444,9 +443,8 @@ tables:
         title: Share of urban population (future projections)
         unit: '%'
         short_unit: '%'
-        description_short: Share of total population in administrative units classified as cities, towns and suburbs.
         presentation:
-          title_public: Share of urban population
+          title_public:  Share population living in cities, towns and suburbs
         display:
           numDecimalPlaces: 1
           isProjection: true
