@@ -200,19 +200,19 @@ steps:
   - data://garden/artificial_intelligence/2023-06-07/monmouth_poll
 
   # YouGov AI surveys
-  data://meadow/artificial_intelligence/2023-06-08/yougov_robots:
-  - snapshot://artificial_intelligence/2023-06-08/yougov_robots.xlsx
-  data://garden/artificial_intelligence/2023-06-08/yougov_robots:
-  - data://meadow/artificial_intelligence/2023-06-08/yougov_robots
-  data://grapher/artificial_intelligence/2023-06-08/yougov_robots:
-  - data://garden/artificial_intelligence/2023-06-08/yougov_robots
+  data://meadow/artificial_intelligence/2024-01-30/yougov_robots:
+  - snapshot://artificial_intelligence/2024-01-30/yougov_robots.xlsx
+  data://garden/artificial_intelligence/2024-01-30/yougov_robots:
+  - data://meadow/artificial_intelligence/2024-01-30/yougov_robots
+  data://grapher/artificial_intelligence/2024-01-30/yougov_robots:
+  - data://garden/artificial_intelligence/2024-01-30/yougov_robots
 
-  data://meadow/artificial_intelligence/2023-06-08/yougov_job_automation:
-  - snapshot://artificial_intelligence/2023-06-08/yougov_job_automation.xlsx
-  data://garden/artificial_intelligence/2023-06-08/yougov_job_automation:
-  - data://meadow/artificial_intelligence/2023-06-08/yougov_job_automation
-  data://grapher/artificial_intelligence/2023-06-08/yougov_job_automation:
-  - data://garden/artificial_intelligence/2023-06-08/yougov_job_automation
+  data://meadow/artificial_intelligence/2024-01-30/yougov_job_automation:
+  - snapshot://artificial_intelligence/2024-01-30/yougov_job_automation.xlsx
+  data://garden/artificial_intelligence/2024-01-30/yougov_job_automation:
+  - data://meadow/artificial_intelligence/2024-01-30/yougov_job_automation
+  data://grapher/artificial_intelligence/2024-01-30/yougov_job_automation:
+  - data://garden/artificial_intelligence/2024-01-30/yougov_job_automation
 
   data://meadow/artificial_intelligence/2023-06-08/yougov_jobs:
   - snapshot://artificial_intelligence/2023-06-08/yougov_jobs.pdf
