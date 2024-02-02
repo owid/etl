@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2512
+    date_accessed: 2023-08-16 08:12:52.089170
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2512_top_income_shares__world_wealth_and_income_database__2018
+    (archived)
+  description: ''
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 5ddaa6ca7da7bbdefc299e02d1e6b60d
+  size: 1621
+  path: 
+    dataset_2512_top_income_shares__world_wealth_and_income_database__2018_config.json

@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4467
+    date_accessed: 2023-08-16 09:34:38.008934
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Return on assets (%)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 3cc00dd1e8178348aa98347098f0d3e8
+  size: 21866
+  path: dataset_4467_return_on_assets__pct_values.feather

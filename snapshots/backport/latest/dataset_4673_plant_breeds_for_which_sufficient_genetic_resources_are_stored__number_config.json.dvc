@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4673
+    date_accessed: 2023-08-16 08:50:17.011062
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_4673_plant_breeds_for_which_sufficient_genetic_resources_are_stored__number
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: c967260feed57a32b7d02f27516cee7a
+  size: 24442
+  path: 
+    dataset_4673_plant_breeds_for_which_sufficient_genetic_resources_are_stored__number_config.json

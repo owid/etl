@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2634
+    date_accessed: 2023-08-14 15:18:13.134447
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Education and Training - Profile of graduates and new entrants
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: f35a5d30bc3eedb3d39842c738841882
+  size: 26890
+  path: 
+    dataset_2634_education_and_training__profile_of_graduates_and_new_entrants_values.feather

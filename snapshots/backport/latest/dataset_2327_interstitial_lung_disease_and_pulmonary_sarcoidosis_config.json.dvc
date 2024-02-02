@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2327
+    date_accessed: 2023-08-16 10:46:47.963900
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2327_interstitial_lung_disease_and_pulmonary_sarcoidosis
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 0e51869d2139147ea3a05813a9d2625c
+  size: 34006
+  path: dataset_2327_interstitial_lung_disease_and_pulmonary_sarcoidosis_config.json

@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4466
+    date_accessed: 2023-08-16 09:29:09.318571
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Non-performing loans to total gross loans (%)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 0565b7080ca8d625a96fa5a170e7cd19
+  size: 21826
+  path: dataset_4466_non_performing_loans_to_total_gross_loans__pct_values.feather

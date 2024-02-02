@@ -1,0 +1,72 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Tuberculosis
+    display:
+      numDecimalPlaces: 0
+    unit: ""
+dataset:
+  update_period_days: 365
+tables:
+  unhlm_commitments:
+    variables:
+      annual_report_published:
+        title: Does the National TB Programme (or equivalent) produce a publicly available annual report about the status of the TB epidemic and progress in response efforts?
+      ms_review:
+        title: Is there a national multi-sectoral and multi-stakeholder accountability and review mechanism under high-level leadership to monitor and review progress towards ending TB?
+      ms_review_civil_soc:
+        title: Do representatives of civil society and affected communities participate in the multi-sectoral accountability and review mechanism?
+      min_agg_collab:
+        title: How is the ministry of agriculture or its equivalent engaged in the national TB response?
+      min_def_collab:
+        title: How is the ministry of defence or its equivalent engaged in the national TB response?
+      min_edu_collab:
+        title: How is the ministry of education or its equivalent engaged in the national TB response?
+      min_fin_collab:
+        title: How is the ministry of finance or its equivalent engaged in the national TB response?
+      min_jus_collab:
+        title: How is the ministry of justice or its equivalent engaged in the national TB response?
+      min_lab_collab:
+        title: How is the ministry of labour or its equivalent engaged in the national TB response?
+      min_dev_collab:
+        title: How is the ministry of social development or its equivalent engaged in the national TB response?
+      min_tra_collab:
+        title: How is the ministry of transport or its equivalent engaged in the national TB response?
+      social_protn:
+        title: Is there a national policy to specifically provide social protection services to TB-affected individuals?
+      free_access_tbdx:
+        title: Is there free access to TB diagnostic testing (including all WHO-recommended rapid diagnostics  chest x-rays  culture or smear microscopy) for people with signs or symptoms presumptive of TB?
+        description_key:
+          - This variable is only relevant if there is a national policy to specifically provide social protection services to TB-affected individuals
+      free_access_tbtx:
+        title: Is there free access to TB treatment and related medical services?
+        description_key:
+          - This variable is only relevant if there is a national policy to specifically provide social protection services to TB-affected individuals
+      enable_tx_adherence:
+        title: Are there enablers to adhere to TB treatment?
+        description_key:
+          - This variable is only relevant if there is a national policy to specifically provide social protection services to TB-affected individuals
+      cash_trans:
+        title: Are there conditional and/or unconditional cash-transfers?
+        description_key:
+          - This variable is only relevant if there is a national policy to specifically provide social protection services to TB-affected individuals
+      food_security:
+        title: Are there measures to ensure food security?
+        description_key:
+          - This variable is only relevant if there is a national policy to specifically provide social protection services to TB-affected individuals
+      protect_employment:
+        title: Is employment for people with TB protected from stigma and discrimination through national laws and regulations?
+        description_short: Regulations prohibit individuals losing their job because of a tuberculosis diagnosis.
+      protect_housing:
+        title: Is housing for people with TB protected from stigma and discrimination through national laws and regulations?
+        description_short: Regulations prohibit individuals losing their housing because of a tuberculosis diagnosis.
+      protect_parenting:
+        title: Are parental rights for people with TB protected from stigma and discrimination through national laws and regulations?
+        description_short: Regulations prohibit individuals losing their parental rights because of a tuberculosis diagnosis.
+      protect_movement:
+        title: Is freedom of movement for people with TB protected from stigma and discrimination through national laws and regulations?
+        description_short: Regulations prohibit individuals losing their freedom of movement because of a tuberculosis diagnosis.
+      protect_association:
+        title: Is freedom of association for people with TB protected from stigma and discrimination through national laws and regulations?
+        description_short: Regulations prohibit compulsory isolation because of a tuberculosis diagnosis.

@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4421
+    date_accessed: 2023-08-16 07:15:14.966607
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_4421_ilo__proportion_of_population_with_severe_disabilities_receiving_disability_cash_benefit__by_sex__pct
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 737cf7d093ccaa0a0cd4cdb3c0bef5a5
+  size: 3655
+  path: 
+    dataset_4421_ilo__proportion_of_population_with_severe_disabilities_receiving_disability_cash_benefit__by_sex__pct_config.json

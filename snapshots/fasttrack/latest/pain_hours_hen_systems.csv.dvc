@@ -1,0 +1,23 @@
+meta:
+  name: Pain hours of hen systems (Welfare Footprint)
+  description: ''
+  source:
+    name: Google Sheet
+    description:
+    url: https://welfarefootprint.org/research-projects/laying-hens/
+    source_data_url: 
+      gAAAAABkwT3GHig9-hHZr_XHHeWuAsK5PHjtz55H-Tvu_KCW-XytOuBUvNMnrv3hZ593VSyU95XV8hLYTSto8khid8slVfs4OA7joXQ4qzAsufp7A3vltFcf9o3BbCJseT64F2CYUUgMkJ9ptK0YjR0E2VhxNWylRc5G8OCv19srGHlFBGjG7_isIrTbJimw3L_c4hmRMlUNEZMMoo9OyTNjNRKb6Ta_4bkYL4xn6hBHt-89D_6xF58zl2ZQFdtjZn69vnwBW58p
+    owid_data_url:
+    date_accessed: '2023-07-26'
+    publication_date:
+    publication_year: 2021
+    published_by: Google Sheet
+  license:
+    name:
+    url:
+  is_public: false
+wdir: ../../../data/snapshots/fasttrack/latest
+outs:
+- md5: 73b70fa53e689c7115055f982d9b17b5
+  size: 228
+  path: pain_hours_hen_systems.csv

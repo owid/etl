@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2054
+    date_accessed: 2023-08-14 15:45:24.752755
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_2054_proportion_and_number_of_children_aged_5_17_years_engaged_in_child_labour__by_sex_and_age
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 72daca91ad41eb59313a8b04087c672a
+  size: 63398
+  path: 
+    dataset_2054_proportion_and_number_of_children_aged_5_17_years_engaged_in_child_labour__by_sex_and_age_config.json

@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2529
+    date_accessed: 2023-08-16 10:14:18.378594
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Industry and Services - Key tourism indicators
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 4dda9a6818da20e48e0215e6c006c5d6
+  size: 11442
+  path: dataset_2529_industry_and_services__key_tourism_indicators_values.feather

@@ -1,0 +1,102 @@
+definitions:
+  common:
+    processing_level: major
+tables:
+  total:
+    variables:
+      rate_per_100_000_population_both_sexes_all_ages:
+        processing_level: minor
+        title: Homicide rate per 100,000 population - Both sexes - All ages
+        unit: homicides per 100,000 people
+        display:
+          numDecimalPlaces: 2
+        description_short: The homicide rate per 100,000 population recorded in a year.
+        description_key:
+          - "The UN Office on Drugs and Crime collates homicide data from two main resources: 1) primarily data from national law enforcement and criminal justice authorities, 2) civil registry data from WHO-MD and national authorities"
+        presentation:
+          title_public: Homcide rate
+          attribution_short: UNODC
+          grapher_config:
+            title: Homicide rate
+            subtitle: Annual number of deaths from [homicide](#dod:homicide) per 100,000 people.
+            variantName: UNODC
+            sourceDesc: United Nations Office on Drugs and Crime (2023)
+            originUrl: https://ourworldindata.org/homicides
+            hasMapTab: true
+            yAxis:
+              max: 0
+              min: 0
+            map:
+              time: latest
+              colorScale:
+                baseColorScheme: YlOrRd
+                binningStrategy: manual
+                customNumericColors:
+                  - null
+                  - null
+                  - null
+                customNumericValues:
+                  - 1
+                  - 2
+                  - 5
+                  - 10
+                  - 20
+                  - 50
+                  - 100
+                  - 200
+                customNumericMinValue: 0
+              timeTolerance: 0
+            selectedEntityNames:
+              - Americas (UN)
+              - Africa (UN)
+              - World
+              - Oceania (UN)
+              - Asia (UN)
+              - Europe (UN)
+  share:
+    variables:
+      share_of_homicides_of_both_sexes_where_the_perpertrator_is_an_intimate_partner:
+        title: Share of total homicides where the perpertrator is an intimate partner
+        unit: "%"
+        display:
+          numDecimalPlaces: 2
+      share_of_homicides_of_both_sexes_where_the_perpertrator_is_a_family_member:
+        title: Share of total homicides where the perpertrator is a family member
+        unit: "%"
+        display:
+          numDecimalPlaces: 2
+      share_of_homicides_of_both_sexes_where_the_perpertrator_is_unknown:
+        title: Share of total homicides where the perpertrator is unknown
+        unit: "%"
+        display:
+          numDecimalPlaces: 2
+      share_of_homicides_of_female_where_the_perpertrator_is_an_intimate_partner:
+        title: Share of homicides where the victim is female and the perpertrator is an intimate partner
+        unit: "%"
+        display:
+          numDecimalPlaces: 2
+      share_of_homicides_of_female_where_the_perpertrator_is_a_family_member:
+        title: Share of homicides where the victim is female and the perpertrator is a family member
+        unit: "%"
+        display:
+          numDecimalPlaces: 2
+      share_of_homicides_of_female_where_the_perpertrator_is_unknown:
+        title: Share of homicides where the victim is female and perpertrator is unknown
+        unit: "%"
+        display:
+          numDecimalPlaces: 2
+      share_of_homicides_of_male_where_the_perpertrator_is_an_intimate_partner:
+        title: Share of homicides where the victim is male and the perpertrator is an intimate partner
+        unit: "%"
+        display:
+          numDecimalPlaces: 2
+      share_of_homicides_of_male_where_the_perpertrator_is_a_family_member:
+        title: Share of homicides where the victim is male and the perpertrator is a family member
+        unit: "%"
+        display:
+          numDecimalPlaces: 2
+      share_of_homicides_of_male_where_the_perpertrator_is_unknown:
+        title: Share of homicides where the victim is male and perpertrator is unknown
+        unit: "%"
+        display:
+          numDecimalPlaces: 2

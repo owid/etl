@@ -1,18 +1,17 @@
 meta:
-  namespace: backport
-  short_name: dataset_132_food_prices_expressed_in_hourly_wages__u_s__bureau_of_labor_statistics__2015_config
-  file_extension: json
-  date_accessed: 2023-02-24 07:54:16.369618
-  name: Grapher metadata for dataset_132_food_prices_expressed_in_hourly_wages__u_s__bureau_of_labor_statistics__2015
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/132
+    date_accessed: 2023-08-14 15:38:34.374627
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_132_food_prices_expressed_in_hourly_wages__u_s__bureau_of_labor_statistics__2015
+    (archived)
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/132
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: a39f47762679ca6ed97390015803ad3e
-  size: 1813
-  path: dataset_132_food_prices_expressed_in_hourly_wages__u_s__bureau_of_labor_statistics__2015_config.json
+- md5: 0465ae77e389e33cd513deb3c275bd6f
+  size: 1970
+  path: 
+    dataset_132_food_prices_expressed_in_hourly_wages__u_s__bureau_of_labor_statistics__2015_config.json

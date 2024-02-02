@@ -41,7 +41,7 @@ def test_create_empty():
         assert exists(join(dirname, "index.json"))
         with open(join(dirname, "index.json")) as istream:
             doc = json.load(istream)
-        assert doc == {"is_public": True}
+        assert doc == {"is_public": True, "non_redistributable": False}
 
         assert len(ds.index()) == 0
 
@@ -70,7 +70,13 @@ def test_create_overwrites_entire_folder():
     # this should have been deleted
     assert not exists(join(dirname, "hallo-thar.txt"))
 
-    assert open(d._index_file).read().strip() == '{\n  "is_public": true\n}'
+    assert (
+        open(d._index_file).read().strip()
+        == """{
+  "is_public": true,
+  "non_redistributable": false
+}"""
+    )
 
 
 def test_add_table():
@@ -226,7 +232,6 @@ def test_dataset_hash_changes_with_data_changes():
 def test_dataset_hash_invariant_to_copying():
     # make a mock dataset
     with mock_dataset() as d1:
-
         # make a copy of it
         with temp_dataset_dir() as dirname:
             d2 = Dataset.create_empty(dirname)
@@ -328,6 +333,7 @@ def temp_dataset_dir(create: bool = False) -> Iterator[str]:
 def create_temp_dataset(dirname: Union[Path, str], n_tables: Optional[int] = None) -> Dataset:
     d = Dataset.create_empty(dirname)
     d.metadata = mock(DatasetMeta)
+    d.metadata.version = random.choice(["latest", "2023-01-01"])
     d.metadata.short_name = Path(dirname).name
     d.metadata.is_public = True
     d.save()

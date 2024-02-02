@@ -1,0 +1,42 @@
+dataset:
+  title: Global maternal offspring loss - Smith-Greenaway et al. 2021
+  description: This dataset shows survey data and estimates of maternal offspring loss across countries. This includes mothers
+    who have lost an infant, child under 5 years old, or offspring. These are given as a rate per 1000 women in the age group.
+    Underlying data comes from large-scale surveys (such as the Demographic and Health Surveys and Multiple Indicator Cluster
+    Surveys) conducted in many low- and middle-income countries. For countries lacking data, these are estimated using an
+    indirect approach that combines formal kinship models and life-table methods in an additional 81 countries.
+  licenses:
+  - {}
+  sources:
+  - name: Smith-Greenaway et al. (2021)
+    url: https://gh.bmj.com/content/6/4/e004837.abstract
+    date_accessed: '2023-09-05'
+    publication_year: '2021'
+    published_by: 'Global burden of maternal bereavement: indicators of the cumulative prevalence of child loss. (2021) Emily
+      Smith-Greenaway, Diego Alburez-Gutierrez, Jenny Trinitapoli, Emilio Zagheni.'
+tables:
+  global_maternal_offspring_loss:
+    variables:
+      survey_source:
+        title: Survey source
+        description: The survey used for underlying data – either the Demographic and Health Surveys (DHS) or Multiple Indicator
+          Cluster Surveys (MICS). Data was estimated for countries without a survey source, using formal kinship-models and
+          life tables.
+        unit: ''
+      cumulative_maternal_infant_mortality_among_mothers_aged_20_44_as_a_rate_per_1000_mothers_in_the_age_group:
+        title: Cumulative maternal infant mortality among mothers aged 20-44 as a rate per 1000 mothers in the age group
+        unit: per 1000 mothers
+      cumulative_maternal_infant_mortality_among_mothers_aged_45_49_as_a_rate_per_1000_mothers_in_the_age_group:
+        title: Cumulative maternal infant mortality among mothers aged 45-49 as a rate per 1000 mothers in the age group
+        unit: per 1000 mothers
+      cumulative_maternal_under_five_offspring_mortality_among_mothers_aged_20_44_as_a_rate_per_1000_mothers_in_the_age_group:
+        title: Cumulative maternal under-five offspring mortality among mothers aged 20-44 as a rate per 1000 mothers in the
+          age group
+        unit: per 1000 mothers
+      cumulative_maternal_under_five_offspring_mortality_among_mothers_aged_45_49_as_a_rate_per_1000_mothers_in_the_age_group:
+        title: Cumulative maternal under-five offspring mortality among mothers aged 45-49 as a rate per 1000 mothers in the
+          age group
+        unit: per 1000 mothers
+      cumulative_maternal_offspring_mortality_among_mothers_aged_45_49_as_a_rate_per_1000_mothers_in_the_age_group:
+        title: Cumulative maternal offspring mortality among mothers aged 45-49 as a rate per 1000 mothers in the age group
+        unit: per 1000 mothers

@@ -1,0 +1,46 @@
+dataset:
+  title: Plastic ocean waste and pollution (Meijer et al. 2021)
+  description: ''
+  licenses:
+    - {}
+  sources:
+    - name: Plastic ocean waste and pollution (Meijer et al. 2021)
+      url: https://www.science.org/doi/10.1126/sciadv.aaz5803
+      publication_year: '2021'
+      published_by: Meijer, L. J., Van Emmerik, T., Van Der Ent, R., Schmidt, C., & Lebreton, L. (2021). More than 1000 rivers
+        account for 80% of global riverine plastic emissions into the ocean. Science Advances, 7(18), eaaz5803.
+tables:
+  plastic_waste_meijer_2021:
+    variables:
+      probability_plastic_emitted_ocean:
+        title: Probability that plastic waste is emitted to the ocean
+        unit: '%'
+        short_unit: '%'
+      mismanaged_plastic_waste_tonnes:
+        title: Mismanaged plastic waste
+        unit: tonnes
+        short_unit: t
+      plastic_emitted_to_ocean:
+        title: Plastic emitted to the ocean
+        unit: tonnes
+        short_unit: t
+      share_mismanaged_plastic_emitted_ocean:
+        title: Share of mismanaged plastic waste that's emitted to the ocean
+        unit: '%'
+        short_unit: '%'
+      share_global_mismanaged_plastic:
+        title: Share of global mismanaged plastic waste
+        unit: '%'
+        short_unit: '%'
+      share_global_plastic_emitted_ocean:
+        title: Share of global plastic emitted to the ocean
+        unit: '%'
+        short_unit: '%'
+      mismanaged_plastic_per_person:
+        title: Mismanaged plastic waste per person
+        unit: kilograms
+        short_unit: kg
+      plastic_emitted_ocean_per_person:
+        title: Plastic waste emitted to the ocean per person
+        unit: kilograms
+        short_unit: kg

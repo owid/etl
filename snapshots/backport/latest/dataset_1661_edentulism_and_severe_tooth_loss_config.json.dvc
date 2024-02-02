@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1661
+    date_accessed: 2023-08-14 15:21:52.208541
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1661_edentulism_and_severe_tooth_loss (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 3f4ffee4f14c5264a0cebcceb89ff4f5
+  size: 16880
+  path: dataset_1661_edentulism_and_severe_tooth_loss_config.json

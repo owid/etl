@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2168
+    date_accessed: 2023-08-10 14:31:39.096372
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Acute myeloid leukemia
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 3e30e320bed016f530ee032160883970
+  size: 2116402
+  path: dataset_2168_acute_myeloid_leukemia_values.feather

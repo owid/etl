@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2609
+    date_accessed: 2023-08-16 08:05:05.147572
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Labour - Collective bargaining coverage
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 4d7b2a2a09d1b9eba8058758c1f07580
+  size: 9474
+  path: dataset_2609_labour__collective_bargaining_coverage_values.feather

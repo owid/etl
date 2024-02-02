@@ -1,14 +1,14 @@
 tables:
   xm_karlinsky_kobak:
     variables:
-      entity:
-        description: "Country, nation or region name."
-      time:
-        description: "Number of the month or week."
-      time_unit:
-        description: "Time unit can be either 'monthly' or 'weekly', depending on the country."
-      age:
-        description: "Age group. This is always 'all_ages' for this dataset."
+      # entity:
+      #   description: "Country, nation or region name."
+      # time:
+      #   description: "Number of the month or week."
+      # time_unit:
+      #   description: "Time unit can be either 'monthly' or 'weekly', depending on the country."
+      # age:
+      #   description: "Age group. This is always 'all_ages' for this dataset."
       baseline_proj:
         description: "Projected number of weekly or monthly deaths from all causes for all ages for 2020."
       baseline_proj_21:
@@ -17,14 +17,14 @@ tables:
         description: "Projected number of weekly or monthly deaths from all causes for all ages for 2022."
   xm_karlinsky_kobak_by_age:
     variables:
-      entity:
-        description: "Country, nation or region name."
-      time:
-        description: "Number of the month or week."
-      time_unit:
-        description: "Time unit can be either 'monthly' or 'weekly', depending on the country."
-      age:
-        description: "Age group."
+      # entity:
+      #   description: "Country, nation or region name."
+      # time:
+      #   description: "Number of the month or week."
+      # time_unit:
+      #   description: "Time unit can be either 'monthly' or 'weekly', depending on the country."
+      # age:
+      #   description: "Age group."
       baseline_proj:
         description: "Projected number of weekly or monthly deaths from all causes for all ages for 2020."
       baseline_proj_21:

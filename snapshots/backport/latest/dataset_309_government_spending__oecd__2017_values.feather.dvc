@@ -1,18 +1,14 @@
 meta:
-  namespace: backport
-  short_name: dataset_309_government_spending__oecd__2017_values
-  file_extension: feather
-  date_accessed: 2023-02-23 18:11:52.005363
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/309
+    date_accessed: 2023-08-10 09:45:13.897744
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Government spending – OECD (2017)
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/309
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: a881f0e237ae55efbd5ba84a91da0e3c
+- md5: 6a975b54b8f2bc8f6cae45fe6e5cf878
   size: 15930
   path: dataset_309_government_spending__oecd__2017_values.feather

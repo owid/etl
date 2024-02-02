@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4557
+    date_accessed: 2023-08-16 10:04:39.604514
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_4557_degree_of_application_of_a_legal_regulatory_policy_institutional_framework_which_recognizes_and_protects_access_rights_for_small_scale_fisheries__level_of_implementation__1_lowest_to_5_highest
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 513fce01a975b553b36ad692af7df726
+  size: 15990
+  path: 
+    dataset_4557_degree_of_application_of_a_legal_regulatory_policy_institutional_framework_which_recognizes_and_protects_access_rights_for_small_scale_fisheries__level_of_implementation__1_lowest_to_5_highest_config.json

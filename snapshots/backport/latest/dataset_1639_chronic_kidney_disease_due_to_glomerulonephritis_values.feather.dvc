@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1639
+    date_accessed: 2023-08-14 15:05:08.973051
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Chronic kidney disease due to glomerulonephritis
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: d341fb0345e1a9fce78119a75b3949cb
+  size: 2012074
+  path: dataset_1639_chronic_kidney_disease_due_to_glomerulonephritis_values.feather

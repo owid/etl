@@ -1,18 +1,14 @@
 meta:
-  namespace: backport
-  short_name: dataset_27_human_height__university_of_tuebingen__2015_config
-  file_extension: json
-  date_accessed: 2023-02-23 16:43:59.238446
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/27
+    date_accessed: 2023-08-10 08:51:14.549528
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_27_human_height__university_of_tuebingen__2015
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/27
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 188b4533281604b258793380037f8152
-  size: 1934
+- md5: ce5ea5c173842cdef17e910f357509d5
+  size: 2093
   path: dataset_27_human_height__university_of_tuebingen__2015_config.json

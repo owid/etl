@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/3904
+    date_accessed: 2023-08-14 14:52:06.680814
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Diabetes mellitus type 2
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 1e6da3e4f80e79b74ef1fe6e8f6deb88
+  size: 1543234
+  path: dataset_3904_diabetes_mellitus_type_2_values.feather

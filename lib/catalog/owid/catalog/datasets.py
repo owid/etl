@@ -8,17 +8,19 @@ import shutil
 import warnings
 from dataclasses import dataclass
 from glob import glob
-from os import environ, mkdir
+from os import environ
 from os.path import join
 from pathlib import Path
-from typing import Any, Iterator, List, Literal, Optional, Union
+from typing import Iterator, List, Literal, Optional, Union
 
 import numpy as np
 import pandas as pd
 import yaml
+from _hashlib import HASH
 
 from . import tables, utils
 from .meta import SOURCE_EXISTS_OPTIONS, DatasetMeta, TableMeta
+from .processing_log import disable_processing_log
 from .properties import metadata_property
 
 FileFormat = Literal["csv", "feather", "parquet"]
@@ -63,6 +65,11 @@ class Dataset:
 
         self.metadata = DatasetMeta.load(self._index_file)
 
+    @property
+    def m(self) -> DatasetMeta:
+        """Metadata alias to save typing."""
+        return self.metadata
+
     @classmethod
     def create_empty(cls, path: Union[str, Path], metadata: Optional["DatasetMeta"] = None) -> "Dataset":
         path = Path(path)
@@ -72,7 +79,7 @@ class Dataset:
                 raise Exception(f"refuse to overwrite non-dataset dir at: {path}")
             shutil.rmtree(path)
 
-        mkdir(path)
+        path.mkdir(parents=True, exist_ok=True)
 
         metadata = metadata or DatasetMeta()
 
@@ -100,14 +107,6 @@ class Dataset:
         for col in list(table.columns) + list(table.index.names):
             utils.validate_underscore(col, "Variable's name")
 
-        # non-unique index might be causing problems down the line and is typically a mistake
-        if not table.index.is_unique:
-            # regions are the only exception where this is acceptable (though not ideal)
-            if "garden/regions/2023-01-01/regions" not in self.path:
-                warnings.warn(
-                    f"Table `{table.metadata.short_name}` from dataset `{self.metadata.short_name}` has non-unique index"
-                )
-
         if not table.primary_key:
             if "OWID_STRICT" in environ:
                 raise PrimaryKeyMissing(
@@ -126,6 +125,7 @@ class Dataset:
             )
 
         # check Float64 and Int64 columns for np.nan
+        # see: https://github.com/owid/etl/issues/1334
         for col, dtype in table.dtypes.items():
             if dtype in NULLABLE_DTYPES:
                 # pandas nullable types like Float64 have their own pd.NA instead of np.nan
@@ -150,7 +150,10 @@ class Dataset:
         for format in SUPPORTED_FORMATS:
             path = stem.with_suffix(f".{format}")
             if path.exists():
-                return tables.Table.read(path)
+                t = tables.Table.read(path)
+                # dataset metadata might have been updated, refresh it
+                t.metadata.dataset = self.metadata
+                return t
 
         raise KeyError(f"Table `{name}` not found, available tables: {', '.join(self.table_names)}")
 
@@ -176,12 +179,19 @@ class Dataset:
         self.metadata.save(self._index_file)
 
         # Update the copy of this datasets metadata in every table in the set.
+        # TODO: this entire part should go away and we should make t.metadata.dataset read only
         for table_name in self.table_names:
-            table = self[table_name]
+            with disable_processing_log():
+                table = self[table_name]
             table.metadata.dataset = self.metadata
             table._save_metadata(join(self.path, table.metadata.checked_name + ".meta.json"))
 
-    def update_metadata(self, metadata_path: Path, if_source_exists: SOURCE_EXISTS_OPTIONS = "replace") -> None:
+    def update_metadata(
+        self,
+        metadata_path: Path,
+        if_source_exists: SOURCE_EXISTS_OPTIONS = "replace",
+        if_origins_exist: SOURCE_EXISTS_OPTIONS = "replace",
+    ) -> None:
         """
         Load YAML file with metadata from given path and update metadata of dataset and its tables.
 
@@ -191,14 +201,19 @@ class Dataset:
             - "replace" (default): replace existing source with new one
             - "append": append new source to existing ones
             - "fail": raise an exception if source already exists
+        :param if_origins_exist: What to do if origin already exists in metadata. Possible values:
+            - "replace" (default): replace existing origin with new one
+            - "append": append new origin to existing ones
+            - "fail": raise an exception if origin already exists
         """
         self.metadata.update_from_yaml(metadata_path, if_source_exists=if_source_exists)
 
         with open(metadata_path) as istream:
             metadata = yaml.safe_load(istream)
             for table_name in metadata.get("tables", {}).keys():
-                table = self[table_name]
-                table.update_metadata_from_yaml(metadata_path, table_name)
+                with disable_processing_log():
+                    table = self[table_name]
+                table.update_metadata_from_yaml(metadata_path, table_name, if_origins_exist=if_origins_exist)
                 table._save_metadata(join(self.path, table.metadata.checked_name + ".meta.json"))
 
     def index(self, catalog_path: Path = Path("/")) -> pd.DataFrame:
@@ -287,7 +302,7 @@ for k in DatasetMeta.__dataclass_fields__:
     setattr(Dataset, k, metadata_property(k))
 
 
-def checksum_file(filename: str) -> Any:
+def checksum_file(filename: str) -> HASH:
     "Return the MD5 checksum of a given file."
     chunk_size = 2**20  # 1MB
     checksum = hashlib.md5()

@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2096
+    date_accessed: 2023-08-10 14:50:37.964720
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Syphilis
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 2c6ac2544d6a15409e089d87be426909
+  size: 1653162
+  path: dataset_2096_syphilis_values.feather

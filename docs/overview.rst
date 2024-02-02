@@ -1,9 +1,9 @@
 Overview
 ========
 
-At Our World In Data we ingest, transform and curate data from many different sources. We call this process the Our World in Data ETL (ETL is short for Extract, Transform & Load). The `ETL github repository <https://github.com/owid/etl>`_  is a crucial part of this process. It is set up in a way that allows anyone to rebuild and inspect all steps in our data processing on their own computers so that all of curation choices can be understood, alternatives investigated and problems fixed if there are any.
+At Our World in Data we ingest, transform and curate data from many different sources. We call this process the Our World in Data ETL (ETL is short for Extract, Transform & Load). The `ETL github repository <https://github.com/owid/etl>`_  is a crucial part of this process. It is set up in a way that allows anyone to rebuild and inspect all steps in our data processing on their own computers so that all of curation choices can be understood, alternatives investigated and problems fixed if there are any.
 
-If you only care about the final curated dataset files for your own analysis then you should head over to `owid-catalog-py <https://github.com/owid/owid-catalog-py>`__. This is our python library that can access the OWID data catalog which is our curated catalog of all the data we have collected. You can think of the OWID data catalog of the result of running the code that is collected in the ETL repository.
+If you only care about the final curated dataset files for your own analysis then you should head over to `owid-catalog-py <https://github.com/owid/etl/lib/catalog>`__. This is our python library that can access the OWID data catalog which is our curated catalog of all the data we have collected. You can think of the OWID data catalog of the result of running the code that is collected in the ETL repository.
 
 If you want to rerun our steps to build a dataset, be it to reproduce what we did or to investigate an issue, then the  `ETL github repository`_ is what you are looking for.
 
@@ -118,7 +118,7 @@ Our visualization tool Grapher is optimized for time series display of country l
 
 .. admonition:: Key point
 
-    All data visualised on the Our World In Data site is represented internally as a four-tuple:
+    All data visualised on the Our World in Data site is represented internally as a four-tuple:
 
     ``(time, entity, variable, value)``
 
@@ -154,10 +154,10 @@ In general data analysis, the line between what should be interpreted as ``varia
 Harmonization tables
 --------------------
 
-For important and common index columns, notably countries/regions, there exists a regions dataset that enumerates the set of commonly understood entities. In this dataframe all countries and geographic regions are listed with their *unique code* used at Our World In Data, as well as additional information like contained smaller units, additional third party identifiers, etc.
+For important and common index columns, notably countries/regions, there exists a regions dataset that enumerates the set of commonly understood entities. In this dataframe all countries and geographic regions are listed with their *unique code* used at Our World in Data, as well as additional information like contained smaller units, additional third party identifiers, etc.
 
 
-.. admonition:: Unique code used at Our World In Data
+.. admonition:: Unique code used at Our World in Data
 
     At Our World in Data we use an "enriched" ISO code for ocuntries. In the case of country/region we use ISO Alpha 3 country codes as a base, but we add additional ones for entities that we need that do not have such a code assigned (e.g. historic entities, continents, subnational regions, etc.).
 

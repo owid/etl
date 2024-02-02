@@ -1,0 +1,250 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Urbanization
+    processing_level: minor
+  rate_of_change_urban_short: &rate_of_change_urban_short Refers to the average yearly percentage change in urban populations calculated over the five years prior to the given data point.
+  rate_of_change_rural_short: &rate_of_change_rural_short Refers to the average annual percentage change in rural populations calculated over the five years prior to the given data point.
+  rate_of_change_ubran_prop: &rate_of_change_ubran_prop Refers to the yearly average change in the proportion of the urban population to the total population calculated over the five years prior to the given data point.
+  rate_of_change_rural_prop: &rate_of_change_rural_prop Refers to the yearly average change in the proportion of the rural population to the total population calculated over the five years prior to the given data point.
+  rate_of_change_pop: &rate_of_change_pop  Refers to the population's growth or decline rate calculated over the five years prior to the given data point.
+  urban_pop: &urban_pop Urban population at mid-year based on the most recent censuses and official population estimates.
+  rural_pop: &rural_pop Rural population at mid-year based on the most recent censuses and official population estimates.
+  urban_prop: &urban_prop Annual share of the population living in urban areas at mid-year.
+
+  projections_key: &projections_key
+    - |-
+      The projection method for urban population in the World Urbanization Prospects involves a two-step process using an established extrapolation method based on urban-rural ratios. Initially, the average annual rate of change in the urban-rural ratio is calculated using data from the last two censuses, which informs the rate of change in urban and rural populations. This rate is then extrapolated, assuming a logistic path of urban proportion growth. Subsequently, a "world norm" is applied, estimated from empirical urban-rural growth differences in two groups of countries categorized by population size. This norm uses a regression equation to establish a hypothetical urban-rural growth difference for different levels of initial urban percentage.
+
+      The country-specific urban-rural growth difference is then converged with this hypothetical difference over 25 years, allowing the urbanization process of a country to align with a global urbanization pattern. This method ensures that urban-rural growth differences evolve towards a worldwide trend rather than remaining constant.
+
+dataset:
+  title: World Urbanization Prospects Dataset - Urban and Rural Population
+
+tables:
+  urbanization_urban_rural:
+    variables:
+      #
+      #  Rate of change indicators for urban and rural populations (estimates and projections)
+      #
+      average_annual_rate_of_change_of_the_urban_population_by_region__subregion_and_country__percent_estimates:
+        title: Average annual rate of change of the urban population (estimates)
+        unit: "%"
+        short_unit: "%"
+        description_short: *rate_of_change_urban_short
+        display:
+          numDecimalPlaces: 1
+        presentation:
+          title_public: Average annual rate of change of the urban population
+
+      average_annual_rate_of_change_of_the_rural_population_by_region__subregion_and_country__percent_estimates:
+        title: Average annual rate of change of the rural population (estimates)
+        unit: "%"
+        short_unit: "%"
+        description_short: *rate_of_change_rural_short
+        display:
+          numDecimalPlaces: 1
+        presentation:
+          title_public: Average annual rate of change of the rural population
+
+      average_annual_rate_of_change_of_the_percentage_urban_by_region__subregion_and_country__percent_estimates:
+        title: Average annual rate of change of the urban population share (estimates)
+        unit: "%"
+        short_unit: "%"
+        description_short: *rate_of_change_ubran_prop
+        display:
+          numDecimalPlaces: 1
+        presentation:
+          title_public: Average annual rate of change of the urban population share
+
+      average_annual_rate_of_change_of_the_percentage_rural_by_region__subregion_and_country__percent_estimates:
+        title: Average annual rate of change of the rural population share (estimates)
+        unit: "%"
+        short_unit: "%"
+        description_short: *rate_of_change_rural_prop
+        display:
+          numDecimalPlaces: 1
+        presentation:
+          title_public: Average annual rate of change of the rural population share
+
+      average_annual_rate_of_change_of_the_total_population_by_region__subregion_and_country__percent_estimates:
+        title: Average annual rate of change of the total population (estimates)
+        unit: "%"
+        short_unit: "%"
+        description_short: *rate_of_change_pop
+        display:
+          numDecimalPlaces: 1
+        presentation:
+          title_public: Average annual rate of change of the total population
+
+      average_annual_rate_of_change_of_the_urban_population_by_region__subregion_and_country__percent_projections:
+        title: Average annual rate of change of the urban population (projections)
+        unit: "%"
+        short_unit: "%"
+        description_short: *rate_of_change_urban_short
+        description_key: *projections_key
+        display:
+          numDecimalPlaces: 1
+          isProjection: true
+        presentation:
+          title_public: Average annual rate of change of the urban population
+
+      average_annual_rate_of_change_of_the_rural_population_by_region__subregion_and_country__percent_projections:
+        title: Average annual rate of change of the rural population (projections)
+        unit: "%"
+        short_unit: "%"
+        description_short: *rate_of_change_rural_short
+        description_key: *projections_key
+        display:
+          numDecimalPlaces: 1
+          isProjection: true
+        presentation:
+          title_public: Average annual rate of change of the rural population
+
+      average_annual_rate_of_change_of_the_percentage_urban_by_region__subregion_and_country__percent_projections:
+        title: Average annual rate of change of the urban population share (projections)
+        unit: "%"
+        short_unit: "%"
+        description_short: *rate_of_change_ubran_prop
+        description_key: *projections_key
+        display:
+          numDecimalPlaces: 1
+          isProjection: true
+        presentation:
+          title_public: Average annual rate of change of the urban population share
+
+      average_annual_rate_of_change_of_the_percentage_rural_by_region__subregion_and_country__percent_projections:
+        title: Average annual rate of change of the rural population share (projections)
+        unit: "%"
+        short_unit: "%"
+        description_short: *rate_of_change_rural_prop
+        description_key: *projections_key
+        display:
+          numDecimalPlaces: 1
+          isProjection: true
+        presentation:
+          title_public: Average annual rate of change of the rural population share
+
+      average_annual_rate_of_change_of_the_total_population_by_region__subregion_and_country__percent_projections:
+        title: Average annual rate of change of the total population (projections)
+        unit: "%"
+        short_unit: "%"
+        description_short: *rate_of_change_pop
+        description_key: *projections_key
+        display:
+          numDecimalPlaces: 1
+          isProjection: true
+        presentation:
+          title_public: Average annual rate of change of the total population
+
+      #
+      #  Annual population/proportion indicators for urban and rural populations (estimates and projections)
+      #
+
+      annual_urban_population_at_mid_year_by_region__subregion_and_country_estimates:
+        title: Annual urban population at mid-year (estimates)
+        unit: "people"
+        short_unit: ""
+        description_short: *urban_pop
+        display:
+          numDecimalPlaces: 0
+        presentation:
+          title_public: Annual urban population at mid-year
+
+      annual_rural_population_at_mid_year_by_region__subregion_and_country_estimates:
+        title: Annual rural population at mid-year (estimates)
+        unit: "people"
+        short_unit: ""
+        description_short: *rural_pop
+        display:
+          numDecimalPlaces: 0
+        presentation:
+          title_public: Annual rural population at mid-year
+
+      annual_percentage_of_population_at_mid_year_residing_in_urban_areas_by_region__subregion_and_country_estimates:
+        title: Annual share of population residing in urban areas at mid-year (estimates)
+        unit: "people"
+        short_unit: ""
+        description_short: *urban_prop
+        display:
+          numDecimalPlaces: 0
+        presentation:
+          title_public: Annual share of population residing in urban areas at mid-year
+
+      annual_urban_population_at_mid_year_by_region__subregion_and_country_projections:
+        title: Annual urban population at mid-year (projections)
+        unit: "people"
+        short_unit: ""
+        description_short: *urban_pop
+        description_key: *projections_key
+        display:
+          numDecimalPlaces: 0
+          isProjection: true
+        presentation:
+          title_public: Annual urban population at mid-year
+
+      annual_rural_population_at_mid_year_by_region__subregion_and_country_projections:
+        title: Annual rural population at mid-year (projections)
+        unit: "people"
+        short_unit: ""
+        description_short: *rural_pop
+        description_key: *projections_key
+        display:
+          numDecimalPlaces: 0
+          isProjection: true
+        presentation:
+          title_public: Annual rural population at mid-year
+
+      annual_percentage_of_population_at_mid_year_residing_in_urban_areas_by_region__subregion_and_country_projections:
+        title: Annual share of population residing in urban areas at mid-year (projections)
+        unit: "people"
+        short_unit: ""
+        description_short: *urban_prop
+        description_key: *projections_key
+        display:
+          numDecimalPlaces: 1
+          isProjection: true
+        presentation:
+          title_public: Annual share of population residing in urban areas at mid-year
+      urbc_c:
+        title: Urban population (HYDE estimates and UN projections)
+        unit: "people"
+        short_unit: ""
+        description_key: *projections_key
+        display:
+          numDecimalPlaces: 0
+          isProjection: true
+        presentation:
+          title_public: Population residing in urban areas
+      rurc_c:
+        title: Rural population (HYDE estimates and UN projections)
+        unit: "people"
+        short_unit: ""
+        description_key: *projections_key
+        display:
+          numDecimalPlaces: 0
+          isProjection: true
+        presentation:
+          title_public: Population residing in rural areas
+
+      urbc_c_share:
+        title: Share of population residing in urban areas (HYDE estimates and UN projections)
+        unit: "%"
+        short_unit: "%"
+        description_key: *projections_key
+        display:
+          numDecimalPlaces: 1
+        presentation:
+          title_public: Share of population residing in urban areas
+
+      rurc_c_share:
+        title: Share of population residing in rural areas (HYDE estimates and UN projections)
+        unit: "%"
+        short_unit: "%"
+        description_key: *projections_key
+        display:
+          numDecimalPlaces: 1
+        presentation:
+          title_public: Share of population residing in rural areas

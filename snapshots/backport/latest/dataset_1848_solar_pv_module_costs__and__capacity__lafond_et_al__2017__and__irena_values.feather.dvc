@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1848
+    date_accessed: 2023-08-16 10:50:42.366263
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Solar PV Module Costs & Capacity - Lafond et al. (2017) & IRENA
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: d1a9112b7a7913e72b4de7844e74650f
+  size: 7002
+  path: 
+    dataset_1848_solar_pv_module_costs__and__capacity__lafond_et_al__2017__and__irena_values.feather

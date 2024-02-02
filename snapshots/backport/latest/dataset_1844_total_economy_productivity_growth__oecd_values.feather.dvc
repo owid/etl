@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1844
+    date_accessed: 2023-08-14 14:36:48.019057
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Total Economy Productivity Growth - OECD
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 81026c0451b0df94d2b2c8c3bac8d8c0
+  size: 19930
+  path: dataset_1844_total_economy_productivity_growth__oecd_values.feather

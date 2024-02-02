@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1555
+    date_accessed: 2023-08-14 15:59:21.142056
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1555_digestive_diseases (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 0c55cb9e94239dc779ea38ed85484d7d
+  size: 31735
+  path: dataset_1555_digestive_diseases_config.json

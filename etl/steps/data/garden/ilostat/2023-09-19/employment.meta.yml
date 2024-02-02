@@ -1,0 +1,21 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Labor Supply & Employment
+
+
+dataset:
+  title: "Employment rates, by age and education level (ILOSTAT)"
+tables:
+  employment:
+    variables:
+      employment_rate:
+        title: Employment-to-population ratio
+        unit: '%'
+        short_unit:  '%'
+        description_short: 'Number of people who are employed as a percent of the total of working-age population'
+        display:
+           numDecimalPlaces: 1
+
+

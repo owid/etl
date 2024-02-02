@@ -1,18 +1,23 @@
 import pandas as pd
 import pytest
 
-from owid.catalog import Table
-from owid.catalog.utils import underscore, underscore_table
+from owid.catalog import Origin, Table, VariableMeta, VariablePresentationMeta
+from owid.catalog.utils import underscore
 
 
 def test_underscore():
+    assert (
+        underscore(
+            "Proportion of young women and men aged 18‑29 years who experienced sexual violence by age 18",
+        )
+        == "proportion_of_young_women_and_men_aged_18_29_years_who_experienced_sexual_violence_by_age_18"
+    )
     assert (
         underscore(
             "`17.11.1 - Developing countries’ and least developed countries’ share of global merchandise exports (%) - TX_EXP_GBMRCH`"
         )
         == "_17_11_1__developing_countries_and_least_developed_countries_share_of_global_merchandise_exports__pct__tx_exp_gbmrch"
     )
-
     assert underscore("Urban population") == "urban_population"
     assert underscore("Urban population (% of total population)") == "urban_population__pct_of_total_population"
     assert (
@@ -94,17 +99,24 @@ def test_underscore():
 
 
 def test_underscore_table():
-    df = pd.DataFrame({"A": [1, 2, 3]})
+    df = pd.DataFrame({"A": [1, 2, 3], "b": [1, 2, 3]})
     df.index.names = ["I"]
 
     t = Table(df)
     t["A"].metadata.description = "column A"
+    t["b"].metadata.description = "column B"
 
-    tt = underscore_table(t)
-    assert tt.columns == ["a"]
+    tt = t.underscore()
+    assert list(tt.columns) == ["a", "b"]
     assert tt.index.names == ["i"]
+
+    # original column name is moved to title if we underscored it
     assert tt["a"].metadata.description == "column A"
     assert tt["a"].metadata.title == "A"
+
+    # title is None if underscoring didn't change the name
+    assert tt["b"].metadata.description == "column B"
+    assert tt["b"].metadata.title is None
 
 
 def test_underscore_table_collision():
@@ -116,13 +128,24 @@ def test_underscore_table_collision():
 
     # raise error by default
     with pytest.raises(NameError):
-        underscore_table(t)
+        t.underscore()
 
     # add suffix
-    tt = underscore_table(t, collision="rename")
+    tt = t.underscore(collision="rename")
     assert list(tt.columns) == ["a__x_1", "b", "a__x_2"]
 
     # make sure we retain metadata
     assert tt["a__x_1"].metadata.description == "desc1"
     assert tt["b"].metadata.description == "desc2"
     assert tt["a__x_2"].metadata.description == "desc3"
+
+
+def test_pruned_json():
+    meta = VariableMeta(
+        origins=[Origin(title="Title", producer="Producer")],
+        presentation=VariablePresentationMeta(title_public="Title public"),
+    )
+    assert meta.to_dict() == {
+        "origins": [{"producer": "Producer", "title": "Title"}],
+        "presentation": {"title_public": "Title public"},
+    }

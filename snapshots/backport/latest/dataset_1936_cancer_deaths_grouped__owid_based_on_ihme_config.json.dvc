@@ -1,18 +1,14 @@
 meta:
-  namespace: backport
-  short_name: dataset_1936_cancer_deaths_grouped__owid_based_on_ihme_config
-  file_extension: json
-  date_accessed: 2023-06-01 12:47:20.118717
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1936
+    date_accessed: 2023-08-10 08:28:31.395837
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_1936_cancer_deaths_grouped__owid_based_on_ihme
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/1936
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: c63d69741444b7d7adf0d0603f7d382d
-  size: 13749
+- md5: 5fc2f79103c3989ef4c700439a3c1a67
+  size: 16315
   path: dataset_1936_cancer_deaths_grouped__owid_based_on_ihme_config.json

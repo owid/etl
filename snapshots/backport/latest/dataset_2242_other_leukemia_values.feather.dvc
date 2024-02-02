@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2242
+    date_accessed: 2023-08-14 11:03:19.279233
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Other leukemia
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: c0d1b4da6f4934736756983fd73ad7cc
+  size: 2116394
+  path: dataset_2242_other_leukemia_values.feather

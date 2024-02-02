@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4470
+    date_accessed: 2023-08-16 10:20:19.709773
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Regulatory Tier 1 capital to risk-weighted assets (%)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 867c0db8129c324208c074a9ea8bbee7
+  size: 21778
+  path: 
+    dataset_4470_regulatory_tier_1_capital_to_risk_weighted_assets__pct_values.feather

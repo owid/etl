@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2244
+    date_accessed: 2023-08-14 14:32:21.339989
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Gallbladder and biliary tract cancer
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: d309cea6a04019f2205d1262d43ad296
+  size: 1499306
+  path: dataset_2244_gallbladder_and_biliary_tract_cancer_values.feather

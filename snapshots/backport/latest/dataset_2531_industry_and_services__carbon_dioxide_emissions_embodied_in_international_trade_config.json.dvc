@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2531
+    date_accessed: 2023-08-14 15:17:04.537262
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_2531_industry_and_services__carbon_dioxide_emissions_embodied_in_international_trade
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 330709fdc3496027607cd0fa0c440502
+  size: 18062
+  path: 
+    dataset_2531_industry_and_services__carbon_dioxide_emissions_embodied_in_international_trade_config.json

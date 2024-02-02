@@ -1,18 +1,15 @@
 meta:
-  namespace: backport
-  short_name: dataset_2824_cfc_11_expected_and_measured_rate_of_change__montzka_et_al__2018_values
-  file_extension: feather
-  date_accessed: 2023-03-23 17:25:09.433596
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2824
+    date_accessed: 2023-08-10 08:52:40.705067
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: CFC-11 expected and measured rate of change (Montzka et al., 2018)
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/2824
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 630d2311e658ba6a4b09370d0f15909f
+- md5: 7f195c16182f4ad150a62edcda448fff
   size: 6578
-  path: dataset_2824_cfc_11_expected_and_measured_rate_of_change__montzka_et_al__2018_values.feather
+  path: 
+    dataset_2824_cfc_11_expected_and_measured_rate_of_change__montzka_et_al__2018_values.feather

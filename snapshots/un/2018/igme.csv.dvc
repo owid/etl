@@ -1,0 +1,32 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/en/latest/architecture/metadata/reference/origin/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Child Mortality Estimates
+    description: |-
+      The 2018 vintages of UN IGME's child mortality estimates. This has greater temporal coverage of many of the variables, including 5-14 years mortality rate which is necessary for calculating the under-fifteen mortality rate.
+    date_published: '2018'
+    version_producer: '2018'
+
+    # Citation
+    producer: UN Inter-agency Group for Child Mortality Estimation
+    citation_full: 'United Nations Inter-agency Group for Child Mortality Estimation
+      (UN IGME), Levels & Trends in Child Mortality: Report 2018, Estimates developed
+      by the United Nations Inter-agency Group for Child Mortality Estimation, United
+      Nations Children’s Fund, New York, 2018.'
+    attribution_short: UN IGME
+
+    # Files
+    url_main: https://childmortality.org/
+    date_accessed: 2022-06-30
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://www.unicef.org/legal#copyright
+wdir: ../../../data/snapshots/un/2018
+outs:
+- md5: 16fc4f6a083467848e58093d85636eed
+  size: 62755821
+  path: igme.csv

@@ -1,18 +1,14 @@
 meta:
-  namespace: backport
-  short_name: dataset_1861_earnings_and_labour_cost_config
-  file_extension: json
-  date_accessed: 2023-02-23 18:38:21.961525
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1861
+    date_accessed: 2023-08-09 14:53:27.668358
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_1861_earnings_and_labour_cost
   description: This is a dataset imported by the automated fetcher
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/1861
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: f0651e52ef34640eb3837bfb6223c79f
-  size: 30588
+- md5: 59f0a8d9ec8e47a806576330cccd569e
+  size: 33220
   path: dataset_1861_earnings_and_labour_cost_config.json

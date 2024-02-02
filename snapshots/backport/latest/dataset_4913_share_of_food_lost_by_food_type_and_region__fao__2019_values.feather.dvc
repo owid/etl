@@ -1,18 +1,15 @@
 meta:
-  namespace: backport
-  short_name: dataset_4913_share_of_food_lost_by_food_type_and_region__fao__2019_values
-  file_extension: feather
-  date_accessed: 2023-02-23 18:16:03.427928
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4913
+    date_accessed: 2023-08-10 08:34:54.312610
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Share of food lost by food type and region (FAO, 2019)
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/4913
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 027bdff89ed984176f6ab22bc52e2be3
+- md5: 83d03b383aae7343fa9daeff81628fb9
   size: 6754
-  path: dataset_4913_share_of_food_lost_by_food_type_and_region__fao__2019_values.feather
+  path: 
+    dataset_4913_share_of_food_lost_by_food_type_and_region__fao__2019_values.feather

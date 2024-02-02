@@ -1,0 +1,23 @@
+tables:
+  under_five_mortality:
+    title: Child Mortality Rate (Gapminder)
+    variables:
+      under_five_mortality:
+        title: Under five mortality
+        unit: deaths per 1,000 live births
+  under_five_mortality_selected:
+    title: Child Mortality Rate (Gapminder)
+    description: |
+      "This data has been compiled by Klara Johansson and Mattias Lindgren (Gapminder) from a selection of sources:
+        * Human Mortality Database
+        * Child Mortality Estimates from the UN Inter-agency Group for Child Mortality Estimation.
+        * Gapminder model based on infant mortality ratio (version 2) https://www.gapminder.org/data/documentation/gd002/
+
+        We do not include rows marked by Gapminder as 'Guesstimates' which are extrapolations, or rows marked as 'Model based on Life Expectancy'."
+    variables:
+      under_five_mortality:
+        title: Under five mortality (selected)
+        unit: deaths per 1,000 live births
+      source:
+        title: Source
+        unit: ""

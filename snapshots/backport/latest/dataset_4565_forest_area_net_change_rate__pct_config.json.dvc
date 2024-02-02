@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4565
+    date_accessed: 2023-08-14 08:50:00.913590
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_4565_forest_area_net_change_rate__pct (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: a036e4e00813de485ca89b2a651f8818
+  size: 28763
+  path: dataset_4565_forest_area_net_change_rate__pct_config.json

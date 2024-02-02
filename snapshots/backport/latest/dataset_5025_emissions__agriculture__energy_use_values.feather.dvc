@@ -1,0 +1,27 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5025
+    date_accessed: 2023-08-14 10:59:28.441091
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: 'Emissions - Agriculture: Energy Use'
+  description: Greenhouse gas (GHG) emissions from direct energy use consist of carbon
+    dioxide, methane and nitrous oxide gases associated with fuel burning and generation
+    of electricity used in agriculture (including fisheries). The FAOSTAT emissions
+    database is computed following Tier 1 IPCC 2006 Guidelines for National GHG Inventories,
+    vol. 2, ch. 2 and 3 (http://www.ipcc-nggip.iges.or.jp/public/2006gl/vol2.html).
+    GHG emissions are provided by country, regions and special groups, with global
+    coverage, relative to the period 1970-present (with annual updates), expressed
+    both as Gg CH4, Gg N2O, Gg CO2, Gg CO2eq and Gg CO2eq from both CH4 and N2O, by
+    motor gasoline (gas-diesel oils, gasoline, natural gas, liquefied petroleum gas,
+    residual fuel oil, hard coal, electricity, gas-diesel oils in fisheries, residual
+    fuel oil in fisheries and energy for power irrigation) and by aggregates (total
+    energy, transport fuel consumed in agriculture excluding fishery, energy consumed
+    in fishery). Implied emission factors for N2O, CH4 and CO2  as well activity data
+    (consumption of gasoline's in agriculture) are also provided.
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 1ff282a11c970cf2585b8e6c9c3d4ea7
+  size: 1371738
+  path: dataset_5025_emissions__agriculture__energy_use_values.feather

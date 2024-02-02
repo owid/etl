@@ -4,6 +4,7 @@ to be extended, but slowly replaced by etl/grapher_model.py"""
 from typing import Any, Dict, Iterable, List, Optional, Tuple, cast
 
 import structlog
+from MySQLdb import IntegrityError
 from MySQLdb.cursors import Cursor
 from unidecode import unidecode
 
@@ -15,7 +16,7 @@ UPDATE = 2
 
 
 def normalize_entity_name(entity_name: str) -> str:
-    return unidecode(entity_name.lower().strip())
+    return unidecode(entity_name.strip())
 
 
 class NotOne(ValueError):
@@ -93,15 +94,21 @@ class DBUtils:
             return entity_id
         # If still not in cache, it's a new entity and we have to insert it
         else:
-            self.upsert_one(
-                """
-                INSERT INTO entities
-                    (name, displayName, validated, createdAt, updatedAt)
-                VALUES
-                    (%s, '', FALSE, NOW(), NOW())
-            """,
-                [name],
-            )
+            try:
+                self.upsert_one(
+                    """
+                    INSERT INTO entities
+                        (name, displayName, validated, createdAt, updatedAt)
+                    VALUES
+                        (%s, '', FALSE, NOW(), NOW())
+                """,
+                    [name],
+                )
+            except IntegrityError:
+                # If another process inserted the same entity before us, we can
+                # safely ignore the error and fetch the ID
+                pass
+
             (entity_id,) = self.fetch_one(
                 """
                 SELECT id FROM entities
@@ -117,11 +124,11 @@ class DBUtils:
         rows = self.fetch_many(
             """
             SELECT
-                LOWER(entities.name),
+                name,
                 id
             FROM entities
             WHERE
-                LOWER(entities.name) IN %(country_names)s
+                entities.name IN %(country_names)s
             ORDER BY entities.id ASC
         """,
             {"country_names": [normalize_entity_name(x) for x in names]},

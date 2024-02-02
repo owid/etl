@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/785
+    date_accessed: 2023-08-16 10:26:27.286667
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_785_emissions__agriculture__agriculture_total__fao__2017
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 6b4cc65214e670c13cd37a50fe35c431
+  size: 57868
+  path: dataset_785_emissions__agriculture__agriculture_total__fao__2017_config.json

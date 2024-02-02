@@ -1,0 +1,36 @@
+meta:
+  origin:
+    # Data product / Snapshot
+    title: War Data
+    date_published: 2020-04-06
+    description: |-
+      The COW Project introduced COW Wars v4.0, 1816-2007 in 2010. The paper [“The COW Typology of War: Defining and Categorizing Wars (Version 4 of the Data)](https://correlatesofwar.org/wp-content/uploads/COW-Website-Typology-of-war-v4.pdf)” by Meredith Reid Sarkees gives an overview of the COW war typology, the descriptions of the basic variables, coding rules and some of the changes since “Resort to Arms.” In March 2010, the New COW War List was released. On June 30, 2010, the Non-State War Data (v4.0) became available. On October 28, 2010, the Intra-State War Data (v4.0) was released and on April 6, 2020 the Intra-State War Data (v5.1) became available online. On March 1, 2011, the Inter-State War Data (v4.0) became available online. Finally, we released the Extra-State War Data (v4.0) on December 8, 2011.
+    title_snapshot: War data - Inter-State Wars
+    description_snapshot: |-
+      The Correlates of War (COW) Project has utilized a classification of wars that is based upon the status of territorial entities, in particular focusing on those that are classified as members of the inter-state system (referred to as “states”). This dataset encompasses wars that take place between or among the recognized states, or inter-state wars.
+
+      You can find more notes at https://correlatesofwar.org/wp-content/uploads/Inter-StateWars_Codebook.pdf
+    version_producer: v4.0
+
+    # Citation
+    producer: Correlates of War
+    citation_full: |-
+      Sarkees, Meredith Reid and Frank Wayman (2010). Resort to War: 1816 – 2007. Washington DC: CQ Press.
+    attribution: Correlates of War - Wars (2020)
+    attribution_short: COW
+
+    # Files
+    url_main: https://correlatesofwar.org/data-sets/cow-war/
+    url_download: https://correlatesofwar.org/wp-content/uploads/Inter-StateWarData_v4.0.csv
+    date_accessed: 2023-09-21
+
+    # License
+    license:
+      name: Correlates of War terms
+      url: https://correlatesofwar.org/data-sets/
+
+wdir: ../../../data/snapshots/war/2023-09-21
+outs:
+- md5: 1bfbb9c8b30d90b63d9d5948a9f5e24c
+  size: 31698
+  path: cow_inter_state.csv

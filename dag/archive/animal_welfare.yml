@@ -1,0 +1,10 @@
+steps:
+  #
+  # Fur laws (Fur Free Alliance, 2023).
+  #
+  data://meadow/animal_welfare/2023-09-08/fur_laws:
+    - snapshot://animal_welfare/2023-09-08/fur_laws.pdf
+  data://garden/animal_welfare/2023-09-08/fur_laws:
+    - data://meadow/animal_welfare/2023-09-08/fur_laws
+  data://grapher/animal_welfare/2023-09-08/fur_laws:
+    - data://garden/animal_welfare/2023-09-08/fur_laws

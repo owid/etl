@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/3911
+    date_accessed: 2023-08-14 05:36:54.373733
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_3911_maternal_abortion_and_miscarriage (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: e6e3f4147871e590b36afa1e665aa54b
+  size: 27394
+  path: dataset_3911_maternal_abortion_and_miscarriage_config.json

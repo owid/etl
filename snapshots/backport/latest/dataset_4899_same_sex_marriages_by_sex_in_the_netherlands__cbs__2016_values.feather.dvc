@@ -1,18 +1,16 @@
 meta:
-  namespace: backport
-  short_name: dataset_4899_same_sex_marriages_by_sex_in_the_netherlands__cbs__2016_values
-  file_extension: feather
-  date_accessed: 2023-02-23 18:06:00.593580
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4899
+    date_accessed: 2023-08-16 08:16:21.506512
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Same-sex marriages by sex in the Netherlands – CBS (2016)
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/4899
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
+  is_public: false
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 3e7515c001a126222e5d031d5a16df6c
+- md5: 050a70620f59f7d0729214a338f6b73f
   size: 6466
-  path: dataset_4899_same_sex_marriages_by_sex_in_the_netherlands__cbs__2016_values.feather
+  path: 
+    dataset_4899_same_sex_marriages_by_sex_in_the_netherlands__cbs__2016_values.feather

@@ -1,18 +1,16 @@
 meta:
-  namespace: backport
-  short_name: dataset_5539_state_based_conflict_deaths_since_1946__by_region_and_conflict_type__prio__ucdp_2022_config
-  file_extension: json
-  date_accessed: 2023-02-23 17:24:29.350883
-  name: Grapher metadata for dataset_5539_state_based_conflict_deaths_since_1946__by_region_and_conflict_type__prio__ucdp_2022
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5539
+    date_accessed: 2023-08-09 13:21:46.812164
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_5539_state_based_conflict_deaths_since_1946__by_region_and_conflict_type__prio__ucdp_2022
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/5539
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 1f798225a19ac659ef5ab9bec24874db
-  size: 9667
-  path: dataset_5539_state_based_conflict_deaths_since_1946__by_region_and_conflict_type__prio__ucdp_2022_config.json
+- md5: b866e01224dd8457d8a76f33f03857e8
+  size: 10943
+  path: 
+    dataset_5539_state_based_conflict_deaths_since_1946__by_region_and_conflict_type__prio__ucdp_2022_config.json

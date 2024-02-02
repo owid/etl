@@ -1,18 +1,16 @@
 meta:
-  namespace: backport
-  short_name: dataset_998_unadjusted_female_male_hourly_wage_ratios_by_percentile__blau__kahn__2017_config
-  file_extension: json
-  date_accessed: 2023-02-23 19:00:21.245420
-  name: Grapher metadata for dataset_998_unadjusted_female_male_hourly_wage_ratios_by_percentile__blau__kahn__2017
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/998
+    date_accessed: 2023-08-10 09:15:56.714710
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_998_unadjusted_female_male_hourly_wage_ratios_by_percentile__blau__kahn__2017
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/998
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: f8e4efd088c8f729620a9c395fa62a14
-  size: 3150
-  path: dataset_998_unadjusted_female_male_hourly_wage_ratios_by_percentile__blau__kahn__2017_config.json
+- md5: 72af93b07afa92dd79fa3c1a207f9d89
+  size: 3557
+  path: 
+    dataset_998_unadjusted_female_male_hourly_wage_ratios_by_percentile__blau__kahn__2017_config.json

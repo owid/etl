@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2618
+    date_accessed: 2023-08-14 15:26:59.713950
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2618_education_and_training__intergenerational_mobility_in_education
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 3981301f807a1801225fa9def263991e
+  size: 23560
+  path: 
+    dataset_2618_education_and_training__intergenerational_mobility_in_education_config.json

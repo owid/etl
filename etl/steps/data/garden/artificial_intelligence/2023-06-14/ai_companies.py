@@ -23,11 +23,16 @@ def run(dest_dir: str) -> None:
     #
     # Load snapshots
     snap = cast(Snapshot, paths.load_dependency("ai_companies.csv"))
+    snap_total = cast(Snapshot, paths.load_dependency("ai_companies_total.csv"))
+    df_total = pd.read_csv(snap_total.path)
     df = pd.read_csv(snap.path)
 
     df.rename(columns={"Label": "country"}, inplace=True)
+    df_total["country"] = "World"
 
-    tb = Table(df, short_name="ai_companies", underscore=True)
+    df_merged = pd.concat([df, df_total])
+    df_merged.reset_index(inplace=True, drop=True)
+    tb = Table(df_merged, short_name=paths.short_name, underscore=True)
     #
     # Save outputs.
     #

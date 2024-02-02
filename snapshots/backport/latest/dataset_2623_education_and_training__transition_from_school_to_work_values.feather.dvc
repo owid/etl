@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2623
+    date_accessed: 2023-08-16 08:28:00.789515
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Education and Training - Transition from school to work
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: a4a08a66d56034e3afd08041158623b4
+  size: 46114
+  path: 
+    dataset_2623_education_and_training__transition_from_school_to_work_values.feather

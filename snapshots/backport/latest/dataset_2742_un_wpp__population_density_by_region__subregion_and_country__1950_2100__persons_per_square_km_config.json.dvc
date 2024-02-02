@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2742
+    date_accessed: 2023-08-16 09:31:00.015396
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_2742_un_wpp__population_density_by_region__subregion_and_country__1950_2100__persons_per_square_km
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: fed9910d8340649ce9ef712d930db3b9
+  size: 9661
+  path: 
+    dataset_2742_un_wpp__population_density_by_region__subregion_and_country__1950_2100__persons_per_square_km_config.json

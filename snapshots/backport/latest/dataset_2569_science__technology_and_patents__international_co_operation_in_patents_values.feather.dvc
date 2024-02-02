@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2569
+    date_accessed: 2023-08-16 08:40:19.824850
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Science, Technology and Patents - International co-operation in patents
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: eb3fb68385cd22a1e32b8f610bc85176
+  size: 95978
+  path: 
+    dataset_2569_science__technology_and_patents__international_co_operation_in_patents_values.feather

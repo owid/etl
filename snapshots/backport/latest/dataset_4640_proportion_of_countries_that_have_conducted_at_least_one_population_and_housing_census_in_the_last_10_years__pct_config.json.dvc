@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4640
+    date_accessed: 2023-08-16 07:29:49.837444
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_4640_proportion_of_countries_that_have_conducted_at_least_one_population_and_housing_census_in_the_last_10_years__pct
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: e785f66b55a451e82680fa2531fc070e
+  size: 1981
+  path: 
+    dataset_4640_proportion_of_countries_that_have_conducted_at_least_one_population_and_housing_census_in_the_last_10_years__pct_config.json

@@ -26,7 +26,7 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load meadow dataset.
-    ds_meadow = paths.load_dataset_dependency()
+    ds_meadow = paths.load_dataset()
 
     #
     # Process data.
@@ -38,9 +38,7 @@ def run(dest_dir: str) -> None:
         df=df,
         countries_file=paths.country_mapping_path,
         excluded_countries_file=paths.excluded_countries_path,
-    ).set_index(
-        ["country", "year"], verify_integrity=True
-    )  # type: ignore
+    ).set_index(["country", "year"], verify_integrity=True)  # type: ignore
 
     df_cust = mk_custom_entities(df)
     assert all([col in df.columns for col in df_cust.columns])
@@ -62,6 +60,31 @@ def run(dest_dir: str) -> None:
     # validate that all columns have title
     for col in tb_garden.columns:
         assert tb_garden[col].metadata.title is not None, 'Variable "{}" has no title'.format(col)
+
+    ####################################################################################################################
+    # Fix issue with Papua New Guinea's electricity access.
+    # The current version of the data reports around 60% electricity access, but the newer version reports around 20%.
+    # The new version can be found here:
+    # https://data.worldbank.org/indicator/EG.ELC.ACCS.ZS?locations=PG
+    # A similar issue happens with the electricity access as a percentage of rural or urban population.
+    # The issue is known, so, for now, and before we update the data, simply remove that data for Papua New Guinea.
+    # Therefore, rows for Papua New Guinea for the following columns will be made nan:
+    # * 'eg_elc_accs_ru_zs' - 'Access to electricity, rural (% of rural population)'.
+    # * 'eg_elc_accs_ur_zs' - 'Access to electricity, urban (% of urban population)'.
+    # * 'eg_elc_accs_zs' - 'Access to electricity (% of population)'.
+
+    # First check that the data is as expected (so that we remember to remove this code when we update the data).
+    error = (
+        "Papua New Guinea electricity access was mistakenly high and was removed from the data. But it seems that"
+        "data has changed (hopefully fixing the issue), so this piece of code can now safely be removed."
+    )
+    assert tb_garden.loc["Papua New Guinea"].loc[2020]["eg_elc_accs_ru_zs"] > 50, error
+    assert tb_garden.loc["Papua New Guinea"].loc[2020]["eg_elc_accs_zs"] > 50, error
+    assert tb_garden.loc["Papua New Guinea"].loc[2020]["eg_elc_accs_ur_zs"] > 80, error
+    # Make nan all those rows.
+    for column in ["eg_elc_accs_zs", "eg_elc_accs_ur_zs", "eg_elc_accs_ru_zs"]:
+        tb_garden.loc["Papua New Guinea", column] = None
+    ####################################################################################################################
 
     #
     # Save outputs.
@@ -339,7 +362,7 @@ def mk_custom_entities(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def load_variable_metadata() -> pd.DataFrame:
-    snap = paths.load_snapshot_dependency()
+    snap = paths.load_snapshot()
     zf = zipfile.ZipFile(snap.path)
     df_vars = pd.read_csv(zf.open("WDISeries.csv"))
 

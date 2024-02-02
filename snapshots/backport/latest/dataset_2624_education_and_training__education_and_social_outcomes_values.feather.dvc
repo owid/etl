@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2624
+    date_accessed: 2023-08-16 09:43:32.491600
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Education and Training - Education and social outcomes
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: b3fc9630f2dd6ae2bb6b3a8d666b9595
+  size: 29442
+  path: 
+    dataset_2624_education_and_training__education_and_social_outcomes_values.feather

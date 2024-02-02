@@ -1,0 +1,200 @@
+definitions:
+  common:
+    processing_level: minor
+    presentation:
+      topic_tags:
+        - Tuberculosis
+        - Causes of Death
+    display:
+      numDecimalPlaces: 0
+tables:
+  budget:
+    variables:
+      tx_dstb:
+        title: Number of patients expected to start drug-susceptible TB treatment
+        description_short: Number of patients expected to start drug-susceptible tuberculosis treatment.
+        unit: "patients"
+      budget_cpp_dstb:
+        title: Budget per patient for drug-susceptible TB treatment
+        description_short: Average cost of drugs budgeted per patient for drug-susceptible TB treatment, excluding buffer stock.
+        unit: constant 2022 US$
+        short_unit: $
+      tx_mdr:
+        title: Number of patients expected to start MDR-TB treatment
+        description_short: Number of patients expected to start multi-drug resistant tuberculosis treatment.
+        unit: "patients"
+      budget_cpp_mdr:
+        title: Budget per patient for MDR-TB treatment
+        description_short: Average cost of drugs budgeted per patient for multi-drug resistant tuberculosis treatment, excluding buffer stock.
+        unit: constant 2022 US$
+        short_unit: $
+      tx_xdr:
+        title: Number of patients expected to start XDR-TB treatment
+        description_short: Number of patients expected to start extensively drug resistant tuberculosis treatment.
+        unit: "patients"
+      budget_cpp_xdr:
+        title: Budget per patient for XDR-TB treatment
+        description_short: Average cost of drugs budgeted per patient for extensively drug resistant tuberculosis treatment, excluding buffer stock.
+        unit: "constant 2022 US$"
+        short_unit: $
+      tx_tpt:
+        title: Number of patients expected to start TB preventive treatment
+        description_short: Number of patients expected to start tuberculosis preventive treatment.
+        unit: "patients"
+      budget_cpp_tpt:
+        title: Budget per patient for TB preventive treatment
+        description_short: Average cost of drugs budgeted per patient for tuberculosis preventive treatment, excluding buffer stock.
+        unit: "constant 2022 US$"
+        short_unit: $
+      budget_lab:
+        title: Budget for laboratory services
+        description_short: Budget required for laboratory infrastructure, equipment and supplies.
+        unit: "constant 2022 US$"
+        short_unit: $
+      cf_lab:
+        title: Expected funding for laboratory services
+        description_short: Expected funding for laboratory infrastructure, equipment and supplies.
+        unit: "constant 2022 US$"
+        short_unit: $
+      budget_staff:
+        title: Budget for staff
+        description_short: Budget required for National TB Programme staff (central unit staff and subnational TB staff).
+        unit: "constant 2022 US$"
+        short_unit: $
+      cf_staff:
+        title: Expected funding for staff
+        description_short: Expected funding for National TB Programme staff (central unit staff and subnational TB staff).
+        unit: "constant 2022 US$"
+        short_unit: $
+      budget_fld:
+        title: Budget for drugs to treat drug-susceptible TB
+        description_short: Budget required for treating drug-susceptible tuberculosis.
+        unit: "constant 2022 US$"
+        short_unit: $
+      cf_fld:
+        title: Expected funding for drugs to treat drug-susceptible TB
+        description_short: Expected funding for treating drug-susceptible tuberculosis.
+        unit: "constant 2022 US$"
+        short_unit: $
+      budget_prog:
+        title: Budget required for programme costs to treat drug-susceptible TB
+        description_short: Budget required for programme costs to treat drug-susceptible tuberculosis.
+        unit: "constant 2022 US$"
+        short_unit: "$"
+      cf_prog:
+        title: Expected funding for programme costs to treat drug-susceptible TB
+        description_short: Expected funding for programme costs to treat drug-susceptible tuberculosis.
+        unit: "constant 2022 US$"
+        short_unit: "$"
+      budget_sld:
+        title: Budget required for drugs to treat drug-resistant TB
+        description_short: Budget required for treating drug-resistant tuberculosis.
+        unit: "constant 2022 US$"
+        short_unit: "$"
+      cf_sld:
+        title: Expected funding for drugs to treat drug-resistant TB
+        description_short: Expected funding for treating drug-resistant tuberculosis.
+        unit: "constant 2022 US$"
+        short_unit: "$"
+      budget_mdrmgt:
+        title: Budget required for programme costs to treat drug-resistant TB
+        description_short: Budget required for programme costs to treat drug-resistant tuberculosis.
+        unit: "constant 2022 US$"
+        short_unit: "$"
+      cf_mdrmgt:
+        title: Expected funding for programme costs to treat drug-resistant TB
+        description_short: Expected funding for programme costs to treat drug-resistant tuberculosis.
+        unit: "constant 2022 US$"
+        short_unit: "$"
+      budget_tpt:
+        title: Budget required for TB preventive treatment
+        description_short: Budget required for tuberculosis preventive treatment.
+        unit: "constant 2022 US$"
+        short_unit: "$"
+      cf_tpt:
+        title: Expected funding for TB preventive treatment
+        description_short: Expected funding for tuberculosis preventive treatment.
+        unit: "constant 2022 US$"
+        short_unit: "$"
+      budget_tbhiv:
+        title: Budget required for TB/HIV collaborative activities
+        description_short: Budget required for tuberculosis/HIV collaborative activities.
+        unit: "constant 2022 US$"
+        short_unit: "$"
+      cf_tbhiv:
+        title: Expected funding for TB/HIV collaborative activities
+        description_short: Expected funding for tuberculosis/HIV collaborative activities.
+        unit: "constant 2022 US$"
+        short_unit: "$"
+      budget_patsup:
+        title: Budget required for patient support
+        description_short: Budget required for patient support.
+        unit: "constant 2022 US$"
+        short_unit: "$"
+      cf_patsup:
+        title: Expected funding for patient support
+        description_short: Expected funding for patient support.
+        unit: "constant 2022 US$"
+        short_unit: "$"
+      budget_orsrvy:
+        title: Budget required for operational research and surveys
+        description_short: Budget required for operational research and surveys.
+        unit: "constant 2022 US$"
+        short_unit: "$"
+      cf_orsrvy:
+        title: Expected funding for operational research and surveys
+        description_short: Expected funding for operational research and surveys.
+        unit: "constant 2022 US$"
+        short_unit: "$"
+      budget_oth:
+        title: Budget required for other costs
+        description_short: Budget required for all other budget line items.
+        unit: "constant 2022 US$"
+        short_unit: "$"
+      cf_oth:
+        title: Expected funding for other costs
+        description_short: Expected funding for all other budget line items.
+        unit: "constant 2022 US$"
+        short_unit: "$"
+      budget_tot:
+        title: Total budget required
+        description_short: Total budget required for tuberculosis.
+        unit: "constant 2022 US$"
+        short_unit: "$"
+      cf_tot:
+        title: Total expected funding
+        description_short: Total expected funding for all budget line items.
+        unit: "constant 2022 US$"
+        short_unit: ""
+      cf_tot_domestic:
+        title: Total expected domestic funding
+        description_short: Expected funding from domestic sources, including loans.
+        unit: "constant 2022 US$"
+        short_unit: "$"
+      cf_tot_gf:
+        title: Expected funding from the Global Fund to Fight AIDS, Tuberculosis and Malaria
+        description_short: Expected funding from the Global Fund to Fight AIDS, Tuberculosis and Malaria.
+        unit: "constant 2022 US$"
+        short_unit: "$"
+      cf_tot_usaid:
+        title: Expected funding from USAID
+        description_short: Expected funding from the United States Agency for International Development.
+        unit: "constant 2022 US$"
+        short_unit: "$"
+      cf_tot_grnt:
+        title: Expected funding from other grants
+        description_short: Expected funding from other grants.
+        unit: "constant 2022 US$"
+        short_unit: "$"
+      cf_tot_sources:
+        title: Total expected funding from all sources
+        description_short: Total expected funding from all sources.
+        unit: "constant 2022 US$"
+        short_unit: "$"
+      budget_gap:
+        title: Budget gap
+        description_short: The gap between the total budget required and the total expected funding from all sources.
+        unit: "constant 2022 US$"
+        short_unit: "$"
+        processing_level: major
+        description_processing: Calculated as the difference between the total budget required and the total expected funding from all sources (USAID; Global Fund to Fight AIDS, Tuberculosis and Malaria; domestic sources and other sources).

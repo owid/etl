@@ -1,21 +1,29 @@
 meta:
-  namespace: backport
-  short_name: dataset_497_share_of_landowners_who_are_female__fao__2017_values
-  file_extension: feather
-  date_accessed: 2023-04-11 12:06:40.304851
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/497
+    date_accessed: 2023-08-10 08:27:30.270384
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Share of landowners who are female - FAO (2017)
-  description: |-
+  description: >-
     Share of agricultural landowners who are female (%).
 
-    I thought the data came from the FAOSTAT WCAD dataset. But from what I've read [here](https://www.fao.org/3/i4862e/i4862e.pdf), WCAD informs about land management and not landownership. So we can't update this dataset with FAOSTAT data. I think the data comes from [this page](https://www.fao.org/gender-landrights-database/data-map/statistics/en/), where they claim "The data is shown in the interactive map and are also available in graph and table formats." but I haven't found any way to access the data but to copy or scrape the page. In any case the data has not changed. Last time I checked (2023-04-11) the data doesn't seem to have changed with respect to this dataset, so there's no need to update it.
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/497
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
+
+    I thought the data came from the FAOSTAT WCAD dataset. But from what I've read
+    [here](https://www.fao.org/3/i4862e/i4862e.pdf),
+    WCAD informs about land management and not landownership. So we can't update this
+    dataset with FAOSTAT data. I think the
+    data comes from [this page](https://www.fao.org/gender-landrights-database/data-map/statistics/en/),
+    where they claim
+    "The data is shown in the interactive map and are also available in graph and
+    table formats." but I haven't found any
+    way to access the data but to copy or scrape the page. In any case the data has
+    not changed. Last time I checked (2023-04-11)
+    the data doesn't seem to have changed with respect to this dataset, so there's
+    no need to update it.
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 8dfeec8b9be5c70cf38c61d093d8d232
+- md5: 0660998029e63c076bd694df73dbd4a9
   size: 9618
   path: dataset_497_share_of_landowners_who_are_female__fao__2017_values.feather

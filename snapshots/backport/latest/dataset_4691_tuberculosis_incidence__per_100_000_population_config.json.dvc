@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4691
+    date_accessed: 2023-08-14 15:55:38.957556
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_4691_tuberculosis_incidence__per_100_000_population
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 6c5ab608ddd7095207f94df40c90845a
+  size: 9655
+  path: dataset_4691_tuberculosis_incidence__per_100_000_population_config.json

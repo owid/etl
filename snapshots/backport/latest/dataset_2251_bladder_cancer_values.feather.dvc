@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2251
+    date_accessed: 2023-08-10 14:30:25.230032
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Bladder cancer
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: ba23a507bb4226e4f1c73545263762cf
+  size: 1499282
+  path: dataset_2251_bladder_cancer_values.feather

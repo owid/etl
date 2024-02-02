@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1679
+    date_accessed: 2023-08-14 15:38:47.129009
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_1679_forces_of_nature__conflict_and_terrorism__and_executions_and_police_conflict
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 91b9541a019825273d9644d8788ce41d
+  size: 33818
+  path: 
+    dataset_1679_forces_of_nature__conflict_and_terrorism__and_executions_and_police_conflict_config.json

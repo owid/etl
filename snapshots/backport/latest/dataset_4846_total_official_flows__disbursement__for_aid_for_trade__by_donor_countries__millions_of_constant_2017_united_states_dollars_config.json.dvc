@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4846
+    date_accessed: 2023-08-16 09:22:58.126369
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_4846_total_official_flows__disbursement__for_aid_for_trade__by_donor_countries__millions_of_constant_2017_united_states_dollars
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: f704a5ddcc3ec8f52568f306b4273351
+  size: 2019
+  path: 
+    dataset_4846_total_official_flows__disbursement__for_aid_for_trade__by_donor_countries__millions_of_constant_2017_united_states_dollars_config.json

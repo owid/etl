@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2049
+    date_accessed: 2023-08-14 08:47:17.742578
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Number of parties to international multilateral environmental agreements on
+    hazardous waste, and other chemicals that meet their commitments and obligations
+    in transmitting information as required by each relevant agreement
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: a1cc3f40db6fe1aa5183fa4defcec218
+  size: 15266
+  path: 
+    dataset_2049_number_of_parties_to_international_multilateral_environmental_agreements_on_hazardous_waste__and_other_chemicals_that_meet_their_commitments_and_obligations_in_transmitting_information_as_required_by_each_relevant_agreement_values.feather

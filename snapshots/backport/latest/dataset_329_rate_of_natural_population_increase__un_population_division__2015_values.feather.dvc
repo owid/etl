@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/329
+    date_accessed: 2023-08-14 15:31:49.768204
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Rate of Natural Population Increase – UN Population Division (2015)
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: caecd12a97cacf82252847fb4e729ae4
+  size: 31690
+  path: 
+    dataset_329_rate_of_natural_population_increase__un_population_division__2015_values.feather

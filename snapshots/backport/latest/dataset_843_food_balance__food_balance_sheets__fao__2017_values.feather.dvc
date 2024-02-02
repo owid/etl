@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/843
+    date_accessed: 2023-08-16 10:38:52.680392
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: 'Food Balance: Food Balance Sheets - FAO (2017)'
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 204fa1df2cb996679c63a19dced910e5
+  size: 24225290
+  path: dataset_843_food_balance__food_balance_sheets__fao__2017_values.feather

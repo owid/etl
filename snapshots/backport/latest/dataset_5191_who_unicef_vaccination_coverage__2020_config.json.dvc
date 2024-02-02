@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5191
+    date_accessed: 2023-08-11 07:38:33.975593
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_5191_who_unicef_vaccination_coverage__2020
+  description: ''
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: dd8d4f5e4de3428d8133baa037c73c54
+  size: 29672
+  path: dataset_5191_who_unicef_vaccination_coverage__2020_config.json

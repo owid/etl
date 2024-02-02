@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4799
+    date_accessed: 2023-08-16 10:18:56.486907
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_4799_nationally_derived_proportion_of_water_bodies_with_good_quality__pct
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 97d3f32d6324e7edab3ca0df7dae7982
+  size: 1848
+  path: 
+    dataset_4799_nationally_derived_proportion_of_water_bodies_with_good_quality__pct_config.json

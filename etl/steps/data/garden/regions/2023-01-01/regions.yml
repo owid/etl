@@ -93,6 +93,7 @@
   aliases:
     - "\u00c3\u0081EEland Islands"
     - "Åland Islands"
+    - "Åland"
 
 - code: "ALB"
   name: "Albania"
@@ -336,6 +337,7 @@
   aliases:
     - "Central African Rep."
     - "Central African Republic (the)"
+    - "CAR"
 
 - code: "TCD"
   name: "Chad"
@@ -346,6 +348,8 @@
   members:
     - "GGY"
     - "JEY"
+  aliases:
+    - "CHI"
 
 - code: "CHL"
   name: "Chile"
@@ -454,6 +458,8 @@
 
 - code: "DJI"
   name: "Djibouti"
+  aliases:
+    - "French Somalia"
 
 - code: "DMA"
   name: "Dominica"
@@ -469,6 +475,7 @@
   is_historical: True
   aliases:
     - "Germany, East"
+    - "German Democratic Republic"
   end_year: 1990
   successors:
     - "DEU"
@@ -703,6 +710,8 @@
 
 - code: "GRD"
   name: "Grenada"
+  aliases:
+    - "Granada (Winward Island)"
 
 - code: "GLP"
   name: "Guadeloupe"
@@ -807,6 +816,8 @@
 
 - code: "OWID_KOS"
   name: "Kosovo"
+  aliases:
+    - "XKX"
 
 - code: "KWT"
   name: "Kuwait"
@@ -951,6 +962,8 @@
 
 - code: "NAM"
   name: "Namibia"
+  aliases:
+    - "German South West Africa"
 
 - code: "NRU"
   name: "Nauru"
@@ -1138,6 +1151,7 @@
     - "Palestinian Territories"
     - "State of Palestine"
     - "West Bank and Gaza"
+    - "WBG"
   related:
     - "PS_GZA"
 
@@ -1194,6 +1208,8 @@
   name: "Republic of Vietnam"
   is_historical: True
   end_year: 1975
+  aliases:
+    - "South Vietnam"
   successors:
     - "VNM"
 
@@ -1220,6 +1236,7 @@
   aliases:
     - "St Barth"
     - "Saint Barthélemy"
+    - "St. Barthelemy (Norvegian Colonies)"
 
 - code: "SHN"
   name: "Saint Helena"
@@ -1248,6 +1265,7 @@
   name: "Saint Pierre and Miquelon"
   aliases:
     - "St.Pierre & Miq."
+    - "St.Pierre e Michelon"
 
 - code: "VCT"
   name: "Saint Vincent and the Grenadines"
@@ -1266,6 +1284,7 @@
   name: "Sao Tome and Principe"
   aliases:
     - "Sao Tome & Pr."
+    - "S.Tome e Principe (Portuguess Africa)"
 
 - code: "SAU"
   name: "Saudi Arabia"
@@ -1361,6 +1380,8 @@
 
 - code: "SSD"
   name: "South Sudan"
+  aliases:
+    - "S. Sudan"
 
 - code: "ESP"
   name: "Spain"
@@ -1423,6 +1444,7 @@
     - "U.R. Tanzania"
     - "U.R. of Tanzania: Mainland"
     - "United Republic of Tanzania"
+    - "Tanganyka (German East Africa)"
   related:
     - "OWID_ZAN"
 
@@ -1453,6 +1475,8 @@
 
 - code: "TUR"
   name: "Turkey"
+  aliases:
+    - "The Republic of Türkiye"
 
 - code: "TKM"
   name: "Turkmenistan"
@@ -1462,6 +1486,7 @@
   aliases:
     - "Turks & Caicos"
     - "Turks and Caicos Islands (the)"
+    - "Turk Island"
 
 - code: "TUV"
   name: "Tuvalu"
@@ -1599,12 +1624,15 @@
   is_historical: True
   aliases:
     - "Germany, West"
+    - "German Federal Republic"
   end_year: 1990
   successors:
     - "DEU"
 
 - code: "ESH"
   name: "Western Sahara"
+  aliases:
+    - "Spanish Sahara"
 
 - code: "OWID_WRL"
   name: "World"
@@ -1635,6 +1663,8 @@
   name: "Yemen People's Republic"
   is_historical: True
   end_year: 1990
+  aliases:
+    - "South Yemen"
   successors:
     - "YEM"
 

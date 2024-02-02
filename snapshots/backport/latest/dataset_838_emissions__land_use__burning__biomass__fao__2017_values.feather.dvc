@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/838
+    date_accessed: 2023-08-14 16:03:23.592387
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: 'Emissions - Land Use: Burning - Biomass - FAO (2017)'
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 2dcfa8d5d8184240f5426eb127fb4ca4
+  size: 646290
+  path: dataset_838_emissions__land_use__burning__biomass__fao__2017_values.feather

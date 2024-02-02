@@ -1,20 +1,20 @@
 meta:
-  name: Dummy dataset
-  publication_date: '2020-01-01'
-  source_name: Dummy short source citation
-  source_published_by: Dummy full source citation
-  url: https://www.url-dummy.com/
-  source_data_url: https://raw.githubusercontent.com/owid/etl/master/walkthrough/dummy_data.csv
-  license_url:
-  license_name: ''
-  date_accessed: 2023-06-29
-  is_public: true
-  description: |
-    This
-    is
-    a
-    dummy
-    dataset
+  origin:
+    title: Dummy OWID dataset title
+    description: |-
+      This
+      is
+      a
+      dummy
+      dataset
+    producer: Dummy producer
+    citation_full: Dummy producer citation
+    url_main: https://www.url-dummy.com/
+    url_download: https://raw.githubusercontent.com/owid/etl/master/apps/wizard/dummy_data.csv
+    date_published: 2020-01-01
+    date_accessed: 2023-08-22
+  license:
+    name: MIT dummy license
 wdir: ../../../data/snapshots/dummy/2020-01-01
 outs:
 - md5: becb9bc64792f7372580683b384e5411

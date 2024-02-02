@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2551
+    date_accessed: 2023-08-14 15:45:57.271921
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Public Sector, Taxation and Market Regulation - Table I.1. Central government
+    personal income tax rates and thresholds
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 4b286e0580ae2f28bf3f39c074e8ce80
+  size: 25010
+  path: 
+    dataset_2551_public_sector__taxation_and_market_regulation__table_i_1__central_government_personal_income_tax_rates_and_thresholds_values.feather

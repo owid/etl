@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/903
+    date_accessed: 2023-08-16 10:35:06.433142
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_903_world_bank_edstats__expenditures (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 7b48d71ece3c659c8cdc5ab4c724f2b7
+  size: 191857
+  path: dataset_903_world_bank_edstats__expenditures_config.json

@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4623
+    date_accessed: 2023-08-10 15:03:33.272045
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Proportion of new development interventions drawn from country-led result
+    frameworks - data by provider (%)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: a8f7c434b328db935c857817b7fa2854
+  size: 7170
+  path: 
+    dataset_4623_proportion_of_new_development_interventions_drawn_from_country_led_result_frameworks__data_by_provider__pct_values.feather

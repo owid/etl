@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/3530
+    date_accessed: 2023-08-14 15:52:40.289258
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_3530_atopic_dermatitis (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: afb4e52edd89e9b01fa32cf370cfe3c7
+  size: 32680
+  path: dataset_3530_atopic_dermatitis_config.json

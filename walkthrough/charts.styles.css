@@ -1,8 +1,0 @@
-.table-variable-container {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    color: rgb(59, 58, 58);
-    border: 1px;
-    font-size: .75rem;
-}

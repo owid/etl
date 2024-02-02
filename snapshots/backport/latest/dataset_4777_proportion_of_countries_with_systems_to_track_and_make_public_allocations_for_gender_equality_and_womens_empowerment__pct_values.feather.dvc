@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4777
+    date_accessed: 2023-08-14 14:36:42.324416
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Proportion of countries with systems to track and make public allocations
+    for gender equality and women's empowerment (%)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 34aeab6a1997082d593af1940ab8d43b
+  size: 8570
+  path: 
+    dataset_4777_proportion_of_countries_with_systems_to_track_and_make_public_allocations_for_gender_equality_and_womens_empowerment__pct_values.feather

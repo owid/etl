@@ -20,7 +20,7 @@ dataset:
     date_accessed: '2023-06-19'
     publication_date: '2023-03-20'
     publication_year: 2023
-    published_by: International Federation of Robotics (IFR) via the AI Index 2023 Annual Report,” AI Index Steering Committee,
+    published_by: International Federation of Robotics (IFR) via the AI Index 2023 Annual Report, AI Index Steering Committee,
       Institute for Human-Centered AI, Stanford University, Stanford, CA, April 2023
 tables:
   ai_robots:
@@ -31,6 +31,8 @@ tables:
         description: "Industrial robots are defined as “automatically controlled, reprogrammable, multipurpose manipulator, programmable in three or more axes, which can be either fixed in place or mobile for use in industrial automation applications."
         display:
           name: Assembling
+          display:
+          numDecimalPlaces: 0
 
       cleanroom:
         title: Cleanroom Application
@@ -38,6 +40,8 @@ tables:
         description: "Industrial robots are defined as “automatically controlled, reprogrammable, multipurpose manipulator, programmable in three or more axes, which can be either fixed in place or mobile for use in industrial automation applications."
         display:
           name: Cleanroom
+          display:
+          numDecimalPlaces: 0
 
       dispensing:
         title: Dispensing Application
@@ -45,6 +49,7 @@ tables:
         description: "Industrial robots are defined as “automatically controlled, reprogrammable, multipurpose manipulator, programmable in three or more axes, which can be either fixed in place or mobile for use in industrial automation applications."
         display:
           name: Dispensing
+          numDecimalPlaces: 0
 
       handling:
         title: Handling Application
@@ -52,6 +57,7 @@ tables:
         description: "Industrial robots are defined as “automatically controlled, reprogrammable, multipurpose manipulator, programmable in three or more axes, which can be either fixed in place or mobile for use in industrial automation applications."
         display:
           name: Handling
+          numDecimalPlaces: 0
 
       processing:
         title: Processing Application
@@ -59,6 +65,7 @@ tables:
         description: "Industrial robots are defined as “automatically controlled, reprogrammable, multipurpose manipulator, programmable in three or more axes, which can be either fixed in place or mobile for use in industrial automation applications."
         display:
             name: Processing
+            numDecimalPlaces: 0
 
       unspecified_application:
         title: Unspecified Application
@@ -66,6 +73,7 @@ tables:
         description: "Industrial robots are defined as “automatically controlled, reprogrammable, multipurpose manipulator, programmable in three or more axes, which can be either fixed in place or mobile for use in industrial automation applications."
         display:
             name: Unspecified
+            numDecimalPlaces: 0
 
       welding:
         title: Welding Application
@@ -73,13 +81,15 @@ tables:
         description: "Industrial robots are defined as “automatically controlled, reprogrammable, multipurpose manipulator, programmable in three or more axes, which can be either fixed in place or mobile for use in industrial automation applications."
         display:
             name: Welding
+            numDecimalPlaces: 0
 
       all_others:
         title: All Others Sector
         unit: 'robots'
         description: "Industrial robots are defined as “automatically controlled, reprogrammable, multipurpose manipulator, programmable in three or more axes, which can be either fixed in place or mobile for use in industrial automation applications."
         display:
-            name: All Others
+            name: All others
+            numDecimalPlaces: 0
 
       automotive:
         title: Automotive Sector
@@ -87,6 +97,7 @@ tables:
         description: "Industrial robots are defined as “automatically controlled, reprogrammable, multipurpose manipulator, programmable in three or more axes, which can be either fixed in place or mobile for use in industrial automation applications."
         display:
             name: Automotive
+            numDecimalPlaces: 0
 
       electrical_electronics:
         title: Electrical/Electronics Sector
@@ -94,26 +105,31 @@ tables:
         description: "Industrial robots are defined as “automatically controlled, reprogrammable, multipurpose manipulator, programmable in three or more axes, which can be either fixed in place or mobile for use in industrial automation applications."
         display:
             name: Electronics
+            numDecimalPlaces: 0
+
       food:
         title: Food Sector
         unit: 'robots'
         description: "Industrial robots are defined as “automatically controlled, reprogrammable, multipurpose manipulator, programmable in three or more axes, which can be either fixed in place or mobile for use in industrial automation applications."
         display:
             name: Food
+            numDecimalPlaces: 0
 
       metal_and_machinery:
         title: Metal and Machinery Sector
         unit: 'robots'
         description: "Industrial robots are defined as “automatically controlled, reprogrammable, multipurpose manipulator, programmable in three or more axes, which can be either fixed in place or mobile for use in industrial automation applications."
         display:
-            name: Metal and Machinery
+            name: Metal and machinery
+            numDecimalPlaces: 0
 
       plastic_and_chemical_products:
         title: Plastic and Chemical Products Sector
         unit: 'robots'
         description: "Industrial robots are defined as “automatically controlled, reprogrammable, multipurpose manipulator, programmable in three or more axes, which can be either fixed in place or mobile for use in industrial automation applications."
         display:
-            name: Plastic and Chemical
+            name: Plastic and chemical
+            numDecimalPlaces: 0
 
       unspecified_sector:
         title: Unspecified Sector
@@ -121,6 +137,7 @@ tables:
         description: "Industrial robots are defined as “automatically controlled, reprogrammable, multipurpose manipulator, programmable in three or more axes, which can be either fixed in place or mobile for use in industrial automation applications."
         display:
             name: Unspecified
+            numDecimalPlaces: 0
 
       agriculture:
         title: Agriculture Application (Service)
@@ -128,6 +145,7 @@ tables:
         description: Robots that belong to the service class are defined by the ISO as robots 'that perform useful tasks for humans or equipment excluding industrial automation applications.
         display:
             name: Agriculture
+            numDecimalPlaces: 0
 
       hospitality:
         title: Hospitality Application (Service)
@@ -135,43 +153,67 @@ tables:
         description: Robots that belong to the service class are defined by the ISO as robots 'that perform useful tasks for humans or equipment excluding industrial automation applications.
         display:
             name: Hospitality
+            numDecimalPlaces: 0
 
       medical_robotics:
         title: Medical Robotics Application (Service)
         unit: 'robots'
         description: Robots that belong to the service class are defined by the ISO as robots 'that perform useful tasks for humans or equipment excluding industrial automation applications.
         display:
-            name: Medical Robotics
+            name: Medical robotics
+            numDecimalPlaces: 0
 
       professional_cleaning:
         title: Professional Cleaning Application (Service)
         unit: 'robots'
         description: Robots that belong to the service class are defined by the ISO as robots 'that perform useful tasks for humans or equipment excluding industrial automation applications.
         display:
-            name: Professional Cleaning
+            name: Professional cleaning
+            numDecimalPlaces: 0
 
       transportation_and_logistics:
         title: Transportation and Logistics Application (Service)
         unit: 'robots'
         description: Robots that belong to the service class are defined by the ISO as robots 'that perform useful tasks for humans or equipment excluding industrial automation applications.
         display:
-            name: Transportation and Logistics
+            name: Transportation and logistics
+            numDecimalPlaces: 0
 
       cumulative_operational__number_of_industrial_robots:
         title: Operational stock of industrial robots
         unit: 'robots'
         description: "Industrial robots are defined as “automatically controlled, reprogrammable, multipurpose manipulator, programmable in three or more axes, which can be either fixed in place or mobile for use in industrial automation applications."
+        display:
+            name: Total industrial robots in operation
+            numDecimalPlaces: 0
 
       number_of_industrial_robots_installed_2021:
-        title: Number of industrial robots installed by country
+        title: Total number of industrial robots installed by contry, 2021
         unit: 'robots'
         description: "Industrial robots are defined as “automatically controlled, reprogrammable, multipurpose manipulator, programmable in three or more axes, which can be either fixed in place or mobile for use in industrial automation applications."
         display:
-          name: Number of industrial robots installed
+          name: Total of industrial robots installed
+          numDecimalPlaces: 0
 
-      combined_robots_installed:
-        title: Number of industrial robots installed in top five countries
+      annual_count__number_of_industrial_robots_installed:
+        title: Annual number of industrial robots installed in the world 2011-2021
+        unit: 'robots'
+        description: "Industrial robots are defined as “automatically controlled, reprogrammable, multipurpose manipulator, programmable in three or more axes, which can be either fixed in place or mobile for use in industrial automation applications."
+        display:
+          name: Annual industrial robots installed
+          numDecimalPlaces: 0
+
+      new_robots_installed__number_of_industrial_robots_installed:
+        title: Total number of industrial robots installed in top five countries 2011-2021
         unit: 'robots'
         description: "Industrial robots are defined as “automatically controlled, reprogrammable, multipurpose manipulator, programmable in three or more axes, which can be either fixed in place or mobile for use in industrial automation applications."
         display:
           name: Number of industrial robots installed
+          numDecimalPlaces: 0
+      unspecified_others:
+        title: Unspecified or Other Sector
+        unit: 'robots'
+        description: "Industrial robots are defined as “automatically controlled, reprogrammable, multipurpose manipulator, programmable in three or more axes, which can be either fixed in place or mobile for use in industrial automation applications."
+        display:
+          name: Unspecified or other
+          numDecimalPlaces: 0

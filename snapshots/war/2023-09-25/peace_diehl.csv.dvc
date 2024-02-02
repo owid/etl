@@ -1,0 +1,33 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/origin/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Peace data
+    description: |-
+      This data article reviews the revised “peace data,” describing the motivations behind them and offering a general description of the different peace scale levels—severe rivalry, lesser rivalry, negative peace, warm peace, and security community respectively. A brief overview of the evolution of peace and rivalry for the 1900–2015 period is presented. Peace in the international system has increased over time, with a decline in rivalries and an increase in security communities being the most notable findings. The article concludes with a discussion of how the peace data might be used to address new questions in international relations research or reconfigure existing ones.
+    date_published: 2019-09-15
+    version_producer: v2.01
+
+    # Citation
+    producer: Diehl et al.
+    citation_full: |-
+      Diehl, P. F., Goertz, G., & Gallegos, Y. (2021). Peace data: Concept, measurement, patterns, and research agenda. Conflict Management and Peace Science, 38(5), 605–624. https://doi.org/10.1177/0738894219870288
+
+    # Files
+    url_main: https://journals.sagepub.com/doi/abs/10.1177/0738894219870288
+    url_download:
+      https://journals.sagepub.com/doi/suppl/10.1177/0738894219870288/suppl_file/peacedatav2.01.csv
+    date_accessed: 2023-09-25
+
+    # License
+    license:
+      name: Copyright © 2021, © SAGE Publications
+      url:
+        https://s100.copyright.com/AppDispatchServlet?publisherName=sageuk&publication=l026&title=Peace+data%3A+Concept%2C+measurement%2C+patterns%2C+and+research+agenda&publicationDate=2021-09-01&author=Paul+F+Diehl%2C+Gary+Goertz%2C+Yahve+Gallegos&contentID=10.1177%2F0738894219870288&volumeNum=38&issueNum=5&startPage=605&endPage=624&orderBeanReset=true
+
+wdir: ../../../data/snapshots/war/2023-09-25
+outs:
+- md5: 530c968850f631aca6f27f13651fbbcb
+  size: 100304
+  path: peace_diehl.csv

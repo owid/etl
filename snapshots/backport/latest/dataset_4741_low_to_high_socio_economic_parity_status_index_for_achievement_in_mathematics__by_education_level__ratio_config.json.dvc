@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4741
+    date_accessed: 2023-08-16 07:14:30.039545
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_4741_low_to_high_socio_economic_parity_status_index_for_achievement_in_mathematics__by_education_level__ratio
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 95e8dcca503c6d29121a1bd5a4b3415b
+  size: 7132
+  path: 
+    dataset_4741_low_to_high_socio_economic_parity_status_index_for_achievement_in_mathematics__by_education_level__ratio_config.json

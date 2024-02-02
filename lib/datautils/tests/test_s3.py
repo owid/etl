@@ -1,5 +1,6 @@
 # type: ignore
 from unittest import mock
+
 import boto3
 
 from owid.datautils import s3
@@ -38,7 +39,7 @@ def test_list_files_in_folder(connect_mock):
     connect_mock.return_value.list_objects_v2.return_value = {
         "KeyCount": 0,
         "MaxKeys": "1000",
-        "Contents": [{"Key": "test.csv", "Key": "test_2.csv"}],
+        "Contents": [{"Key": "test.csv"}, {"Key": "test_2.csv"}],
     }
     obj_list = S3.list_files_in_folder(url)
     assert obj_list == []
@@ -72,10 +73,10 @@ def test_connect(check_mocker, session_mocker_1, session_mocker_2):
 @mock.patch.object(s3.S3, "connect")
 def test_upload_to_s3(connect_mock):
     connect_mock.return_value.upload_file.return_value = None
-    url = "https://walden.nyc3.digitaloceanspaces.com/a/test.csv"
+    url = "s3://owid-walden/a/test.csv"
     S3 = s3.S3()
     s3_path = S3.upload_to_s3(s3_path=url, local_path="test.csv", public=True)
-    assert url == s3_path
+    assert s3_path == "https://walden.owid.io/a/test.csv"
 
     s3_path = S3.upload_to_s3(s3_path=url, local_path="test.csv", public=False)
-    assert url.replace("https", "s3") == s3_path
+    assert s3_path == "s3://owid-walden/a/test.csv"

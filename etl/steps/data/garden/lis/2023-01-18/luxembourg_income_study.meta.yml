@@ -9,44 +9,42 @@ dataset:
 
     Harmonized into a common framework, LIS datasets contain household- and person-level data on labor income, capital income, pensions, public social benefits (excl. pensions) and private transfers, as well as taxes and contributions, demography, employment, and expenditures.
 
-    <b>Income variables</b>
+    **Income variables**
 
     This dataset contains poverty, inequality and distributional statistics for four different types of income or consumption:
 
-    <ul>
-      <li><b>Disposable household income</b>, which is total income minus taxes and social security contributions (available as `dhi` in the LIS dataset). Total income comprises income from labor, capital, pensions, public social benefits and private income.</li>
-      <li><b>Disposable household cash income</b>, which is disposable household income minus the total value of goods and services (fringe benefits, home production, in-kind benefits and transfers) (available as `dhci` in the LIS dataset).</li>
-      <li><b>Market income</b>, the sum of factor income (labor plus capital income), private income (private cash transfers and in-kind goods and services, not involving goverment) and private pensions (constructed in LIS as `hifactor + hiprivate + hi33`).</li>
-      <li><b>Total consumption</b>, including that stemming from goods and services that have been purchased by the household, and goods ans services that have not been purchased, but either given to the household from somebody else, or self-produced (available as `hcexp` in the LIS dataset).</li>
-    </ul>
+    * **Disposable household income**, which is total income minus taxes and social security contributions (available as \`dhi\` in the LIS dataset). Total income comprises income from labor, capital, pensions, public social benefits and private income.
+    * **Disposable household cash income**, which is disposable household income minus the total value of goods and services (fringe benefits, home production, in-kind benefits and transfers) (available as \`dhci\` in the LIS dataset).
+    * **Market income**, the sum of factor income (labor plus capital income), private income (private cash transfers and in-kind goods and services, not involving goverment) and private pensions (constructed in LIS as \`hifactor + hiprivate + hi33\`).
+    * **Total consumption**, including that stemming from goods and services that have been purchased by the household, and goods ans services that have not been purchased, but either given to the household from somebody else, or self-produced (available as \`hcexp\` in the LIS dataset).
 
     All households where any of these income/consumption variables is missing are excluded, except when data is not available for this variable in the entire survey (this happens for example with total consumption in several countries).
 
-    <b>Gross and market income</b>
+    **Gross and market income**
 
     LIS datasets are classified into either gross, net or mixed income datasets depending on the extent to which taxes and social security contributions is captured in the original data. This is essential for estimating market income, our LIS measure of income before tax. Consequently, market income is only estimated when taxes and contributions are fully captured, collected or imputed (codes 100, 110 and 120 for the `grossnet` variable).
 
-    <b>Current income</b>
+    **Current income**
 
     Income data from LIS is based on current income, which consists of cash and non-cash payments received by the household or by individual household members at periodic intervals. These include cash and in-kind income from labor, income from capital, pensions, cash payments from social security transfers (excluding pensions), and non-cash social assistance transfers, as well as cash and in-kind private transfers. Two types of income are excluded from this definition: non-cash incomes from capital (imputed value of items such as dwellings and cars) and in-kind universal transfers from the government (housing, care, education, health).
 
-    <b>Consumption data in LIS </b>
+    **Consumption data in LIS **
 
     LIS records total consumption, including that stemming from expenditures (i.e. if the household has purchased the good or service consumed) and that stemming from own-production, transfers, or gifts (goods and values consumed and not purchased, but either given to the household from somebody else or self-produced). Data on total consumption has a lower coverage compared to income.
 
-    <b>Equivalence scales</b>
+    **Equivalence scales**
 
     For each of these types of income or consumption, equivalized and per capita measures are available. 'Equivalized' means that household income or consumption is divided by the LIS equivalence scale (squared root of the number of household members) to address for economies of scale in the household. 'Per capita' means that income or consumption is divided by the total number of household members. In both cases all members of a given household have the same equivalent income, regardless of age, gender, or relationship to the household head.
 
-    <b>Top and bottom-coding</b>
+    **Top and bottom-coding**
 
     Data is also top and bottom-coded. Before equivalization, top and bottom coding is applied by setting boundaries for extreme values of log transformed income or consumption variable: at the top Q3 plus 3 times the interquartile range (Q3-Q1), and at the bottom Q1 minus 3 times the interquartile range.
 
-    <b>Adjustments to total population</b>
+    **Adjustments to total population**
 
     Person-level adjusted weights are used when generating income indicators for the total population. This means that survey data is adjusted to the population by multiplying the household weight by the number of household members (HWGT*NHHMEM).
 
-    <b>Purchasing power parities</b>
+    **Purchasing power parities**
 
     All LIS income and consumption variables are originally reported in annual amounts and in units of the national currency in use today. In Our World in Data, we use international-$ in 2017 prices to account for inflation and for differences in the cost of living between countries. LIS provides conversion tables in its platform.
   version: "2023-01-18"

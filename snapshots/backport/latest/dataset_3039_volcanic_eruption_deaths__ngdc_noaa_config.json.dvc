@@ -1,18 +1,14 @@
 meta:
-  namespace: backport
-  short_name: dataset_3039_volcanic_eruption_deaths__ngdc_noaa_config
-  file_extension: json
-  date_accessed: 2023-02-23 16:42:06.939372
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/3039
+    date_accessed: 2023-08-10 09:38:17.941654
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_3039_volcanic_eruption_deaths__ngdc_noaa
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/3039
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 135b25e2b380a4acd9d84a134947a96a
-  size: 2627
+- md5: 11d58aa225ee658be7c29c24715f0da2
+  size: 2780
   path: dataset_3039_volcanic_eruption_deaths__ngdc_noaa_config.json

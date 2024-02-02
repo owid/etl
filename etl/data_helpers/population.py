@@ -3,14 +3,19 @@ from typing import Any, Dict, Optional
 
 import pandas as pd
 from owid.catalog import Dataset
+from structlog import get_logger
 
 from etl.paths import DATA_DIR
+
+# Initialize logger.
+log = get_logger()
 
 
 def add_population(
     df: pd.DataFrame,
     country_col: str,
     year_col: str,
+    ds_un_wpp: Optional[Dataset] = None,
     sex_col: Optional[str] = None,
     sex_group_all: Optional[str] = None,
     sex_group_female: Optional[str] = None,
@@ -18,7 +23,6 @@ def add_population(
     age_col: Optional[str] = None,
     age_group_mapping: Optional[Dict[str, Optional[Any]]] = None,
 ) -> pd.DataFrame:
-
     """Add population to dataframe.
 
     Currently uses population from UN WPP 2022, as this dataset contains dissagregated data by age and sex groups.
@@ -33,6 +37,9 @@ def add_population(
         Name of column with country names.
     year_col : str
         Name of column with years.
+    ds_un_wpp : Dataset, optional
+        Population dataset from UN WPP. It should always be provided. But, for compatibility with old steps, if not
+        provided, it will be silently loaded.
     sex_col: str, optional
         Name of the column with sex group dimension.
     sex_group_all: str, optional
@@ -58,9 +65,12 @@ def add_population(
     pd.DataFrame
         Dataframe with extra column `population`.
     """
-    # Load granular population dataset
-    ds = Dataset(DATA_DIR / "garden" / "un" / "2022-07-11" / "un_wpp")
-    pop = ds["population_granular"]
+    if ds_un_wpp is None:
+        ds_un_wpp_path = DATA_DIR / "garden/un/2022-07-11/un_wpp"
+        log.warning(f"Dataset {ds_un_wpp_path} is silently being loaded.")
+        # Load granular population dataset
+        ds_un_wpp = Dataset(ds_un_wpp_path)
+    pop = ds_un_wpp["population_granular"].reset_index()  # type: ignore
     # Keep only variant='medium'
     pop = pop[pop["variant"] == "medium"].drop(columns=["variant"])
     # Keep only metric='population'
@@ -122,7 +132,7 @@ def add_population(
             df_pop.append(pop_g)
         df_pop = pd.concat(df_pop, ignore_index=True)
     else:
-        df_pop = pop.groupby(["location", "year", "sex"], as_index=False).sum().drop(columns=["age"])
+        df_pop = pop.groupby(["location", "year", "sex"], as_index=False).sum().drop(columns=["age"], errors="ignore")
 
     # Merge
     columns_input = list(df.columns)

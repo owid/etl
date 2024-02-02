@@ -1,0 +1,469 @@
+dataset:
+  title: COVID-2019 - ECDC (2020)
+  description: >-
+    Raw data on confirmed cases and deaths for all countries is sourced from the [European Centre for Disease Prevention and
+    Control (ECDC)](https://www.ecdc.europa.eu/en/publications-data/download-todays-data-geographic-distribution-covid-19-cases-worldwide).
+
+
+    Our complete COVID-19 dataset is a collection of the COVID-19 data maintained by *Our World in Data*. **It is updated
+    daily** and includes data on confirmed cases, deaths, and testing.
+
+
+    We have created a new description of all our data sources. You find it at our GitHub repository **[here](https://github.com/owid/covid-19-data/tree/master/public/data/)**.
+    There you can download all of our data.
+  sources:
+  - name: European CDC – Situation Update Worldwide – Last updated {TODAY}
+    url: https://www.ecdc.europa.eu/en/publications-data/download-todays-data-geographic-distribution-covid-19-cases-worldwide
+    published_by: European Centre for Disease Prevention and Control (ECDC)
+tables:
+  ecdc:
+    variables:
+      biweekly_case_growth__pct:
+        title: Biweekly case growth (%)
+        unit: '%'
+        display:
+          entityAnnotationsMap: 'Mexico: Oct 9: probable/earlier cases added'
+          includeInTable: true
+          name: Biweekly growth in cases
+          yearIsDay: true
+          zeroDay: '2020-01-21'
+        short_unit: '%'
+      biweekly_cases:
+        title: Biweekly cases
+        unit: cases
+        display:
+          entityAnnotationsMap: 'Mexico: Oct 9: probable/earlier cases added'
+          includeInTable: true
+          name: Biweekly cases
+          numDecimalPlaces: 0
+          yearIsDay: true
+          zeroDay: '2020-01-21'
+      biweekly_cases_per_million_people:
+        title: Biweekly cases per million people
+        unit: ''
+        display:
+          entityAnnotationsMap: 'Mexico: Oct 9: probable/earlier cases added'
+          includeInTable: true
+          yearIsDay: true
+      biweekly_death_growth__pct:
+        title: Biweekly death growth (%)
+        unit: '%'
+        display:
+          entityAnnotationsMap: |-
+            Sweden: recent days may undercount deaths
+            Spain: Nov 4: earlier deaths added
+          includeInTable: true
+          name: Biweekly growth in deaths
+          yearIsDay: true
+          zeroDay: '2020-01-21'
+        short_unit: '%'
+      biweekly_deaths:
+        title: Biweekly deaths
+        unit: deaths
+        display:
+          entityAnnotationsMap: |-
+            Sweden: recent days may undercount deaths
+            Spain: Nov 4: earlier deaths added
+          includeInTable: true
+          name: Biweekly deaths
+          numDecimalPlaces: 0
+          yearIsDay: true
+          zeroDay: '2020-01-21'
+      biweekly_deaths_per_million_people:
+        title: Biweekly deaths per million people
+        unit: ''
+        display:
+          entityAnnotationsMap: |-
+            Sweden: recent days may undercount deaths
+            Spain: Nov 4: earlier deaths added
+          includeInTable: true
+          yearIsDay: true
+      case_fatality_rate_of_covid_19__pct:
+        title: Case fatality rate of COVID-19 (%)
+        unit: '%'
+        display:
+          entityAnnotationsMap: |-
+            Sweden: recent days may undercount deaths
+            Spain: Nov 4: earlier deaths added
+          includeInTable: true
+          name: Case fatality rate
+          tolerance: 2
+          yearIsDay: true
+          zeroDay: '2020-01-21'
+      case_fatality_rate_of_covid_19__pct__only_observations_with__gte_100_cases:
+        title: "Case fatality rate of COVID-19 (%) (Only observations with ≥100 cases)"
+        unit: '%'
+        display:
+          entityAnnotationsMap: |-
+            Sweden: recent days may undercount deaths
+            Spain: Nov 4: earlier deaths added
+          includeInTable: true
+          numDecimalPlaces: 1
+          yearIsDay: true
+          zeroDay: '2020-01-21'
+        short_unit: '%'
+      case_fatality_rate_of_covid_19__pct__short_term:
+        title: Case fatality rate of COVID-19 (%) (Short-term)
+        unit: ''
+        display:
+          entityAnnotationsMap: |-
+            Sweden: recent days may undercount deaths
+            Spain: Nov 4: earlier deaths added
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2020-01-21'
+      daily_new_confirmed_cases_due_to_covid_19__rolling_7_day_average__right_aligned:
+        title: Daily new confirmed cases due to COVID-19 (rolling 7-day average, right-aligned)
+        unit: ''
+        display:
+          entityAnnotationsMap: 'Mexico: Oct 9: probable/earlier cases added'
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2020-01-21'
+      daily_new_confirmed_cases_of_covid_19:
+        title: Daily new confirmed cases of COVID-19
+        unit: cases
+        display:
+          entityAnnotationsMap: 'Mexico: Oct 9: probable/earlier cases added'
+          includeInTable: true
+          name: Daily confirmed cases
+          numDecimalPlaces: 0
+          yearIsDay: true
+          zeroDay: '2020-01-21'
+      daily_new_confirmed_cases_of_covid_19__rolling_3_day_average__right_aligned:
+        title: Daily new confirmed cases of COVID-19 (rolling 3-day average, right-aligned)
+        unit: ''
+        display:
+          entityAnnotationsMap: 'Mexico: Oct 9: probable/earlier cases added'
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2020-01-21'
+      daily_new_confirmed_cases_of_covid_19_per_million_people:
+        title: Daily new confirmed cases of COVID-19 per million people
+        unit: cases
+        display:
+          entityAnnotationsMap: 'Mexico: Oct 9: probable/earlier cases added'
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2020-01-21'
+      daily_new_confirmed_cases_of_covid_19_per_million_people__rolling_3_day_average__right_aligned:
+        title: Daily new confirmed cases of COVID-19 per million people (rolling 3-day average, right-aligned)
+        unit: ''
+        display:
+          entityAnnotationsMap: 'Mexico: Oct 9: probable/earlier cases added'
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2020-01-21'
+      daily_new_confirmed_cases_of_covid_19_per_million_people__rolling_7_day_average__right_aligned:
+        title: Daily new confirmed cases of COVID-19 per million people (rolling 7-day average, right-aligned)
+        unit: ''
+        display:
+          entityAnnotationsMap: 'Mexico: Oct 9: probable/earlier cases added'
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2020-01-21'
+      daily_new_confirmed_deaths_due_to_covid_19:
+        title: Daily new confirmed deaths due to COVID-19
+        unit: deaths
+        display:
+          entityAnnotationsMap: |-
+            Sweden: recent days may undercount deaths
+            Spain: Nov 4: earlier deaths added
+          includeInTable: true
+          name: Daily confirmed deaths
+          numDecimalPlaces: 0
+          yearIsDay: true
+          zeroDay: '2020-01-21'
+      daily_new_confirmed_deaths_due_to_covid_19__rolling_3_day_average__right_aligned:
+        title: Daily new confirmed deaths due to COVID-19 (rolling 3-day average, right-aligned)
+        unit: ''
+        display:
+          entityAnnotationsMap: |-
+            Sweden: recent days may undercount deaths
+            Spain: Nov 4: earlier deaths added
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2020-01-21'
+      daily_new_confirmed_deaths_due_to_covid_19__rolling_7_day_average__right_aligned:
+        title: Daily new confirmed deaths due to COVID-19 (rolling 7-day average, right-aligned)
+        unit: ''
+        display:
+          entityAnnotationsMap: |-
+            Sweden: recent days may undercount deaths
+            Spain: Nov 4: earlier deaths added
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2020-01-21'
+      daily_new_confirmed_deaths_due_to_covid_19_per_million_people:
+        title: Daily new confirmed deaths due to COVID-19 per million people
+        unit: deaths per million
+        display:
+          entityAnnotationsMap: |-
+            Sweden: recent days may undercount deaths
+            Spain: Nov 4: earlier deaths added
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2020-01-21'
+      daily_new_confirmed_deaths_due_to_covid_19_per_million_people__rolling_3_day_average__right_aligned:
+        title: Daily new confirmed deaths due to COVID-19 per million people (rolling 3-day average, right-aligned)
+        unit: ''
+        display:
+          entityAnnotationsMap: |-
+            Sweden: recent days may undercount deaths
+            Spain: Nov 4: earlier deaths added
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2020-01-21'
+      daily_new_confirmed_deaths_due_to_covid_19_per_million_people__rolling_7_day_average__right_aligned:
+        title: Daily new confirmed deaths due to COVID-19 per million people (rolling 7-day average, right-aligned)
+        unit: ''
+        display:
+          entityAnnotationsMap: |-
+            Sweden: recent days may undercount deaths
+            Spain: Nov 4: earlier deaths added
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2020-01-21'
+      days_since_10_daily_new_confirmed_deaths_recorded:
+        title: Days since 10 daily new confirmed deaths recorded
+        unit: ''
+        display:
+          includeInTable: false
+          yearIsDay: true
+          zeroDay: '2020-01-21'
+      days_since_3_daily_new_confirmed_deaths_recorded:
+        title: Days since 3 daily new confirmed deaths recorded
+        unit: ''
+        display:
+          includeInTable: false
+          yearIsDay: true
+          zeroDay: '2020-01-21'
+      days_since_30_daily_new_confirmed_cases_recorded:
+        title: Days since 30 daily new confirmed cases recorded
+        unit: ''
+        display:
+          includeInTable: false
+          yearIsDay: true
+          zeroDay: '2020-01-21'
+      days_since_5_daily_new_confirmed_deaths_recorded:
+        title: Days since 5 daily new confirmed deaths recorded
+        unit: ''
+        display:
+          includeInTable: false
+          yearIsDay: true
+          zeroDay: '2020-01-21'
+      days_since_50_daily_new_confirmed_cases_recorded:
+        title: Days since 50 daily new confirmed cases recorded
+        unit: ''
+        display:
+          includeInTable: false
+          yearIsDay: true
+          zeroDay: '2020-01-21'
+      days_since_daily_new_confirmed_cases_of_covid_19__rolling_7_day_average__right_aligned__reached_30:
+        title: Days since daily new confirmed cases of COVID-19 (rolling 7-day average, right-aligned) reached 30
+        unit: ''
+        display:
+          includeInTable: false
+          yearIsDay: true
+          zeroDay: '2020-01-21'
+      days_since_daily_new_confirmed_cases_of_covid_19_per_million_people__rolling_7_day_average__right_aligned__reached_1:
+        title: Days since daily new confirmed cases of COVID-19 per million people (rolling 7-day average, right-aligned)
+          reached 1
+        unit: ''
+        display:
+          includeInTable: false
+          yearIsDay: true
+          zeroDay: '2020-01-21'
+      days_since_daily_new_confirmed_deaths_due_to_covid_19__rolling_7_day_average__right_aligned__reached_5:
+        title: Days since daily new confirmed deaths due to COVID-19 (rolling 7-day average, right-aligned) reached 5
+        unit: ''
+        display:
+          includeInTable: false
+          yearIsDay: true
+          zeroDay: '2020-01-21'
+      ? days_since_daily_new_confirmed_deaths_due_to_covid_19_per_million_people__rolling_7_day_average__right_aligned__reached_0_01
+      : title: Days since daily new confirmed deaths due to COVID-19 per million people (rolling 7-day average, right-aligned)
+          reached 0.01
+        unit: ''
+        display:
+          includeInTable: false
+          yearIsDay: true
+          zeroDay: '2020-01-21'
+      ? days_since_daily_new_confirmed_deaths_due_to_covid_19_per_million_people__rolling_7_day_average__right_aligned__reached_0_1
+      : title: Days since daily new confirmed deaths due to COVID-19 per million people (rolling 7-day average, right-aligned)
+          reached 0.1
+        unit: ''
+        display:
+          includeInTable: false
+          yearIsDay: true
+          zeroDay: '2020-01-21'
+      days_since_the_total_confirmed_cases_of_covid_19_per_million_people_reached_1:
+        title: Days since the total confirmed cases of COVID-19 per million people reached 1
+        unit: days
+        display:
+          includeInTable: false
+          name: Days since the total confirmed cases per million people reached 1
+          yearIsDay: true
+          zeroDay: '2020-01-21'
+      days_since_the_total_confirmed_cases_of_covid_19_reached_100:
+        title: Days since the total confirmed cases of COVID-19 reached 100
+        unit: ''
+        display:
+          includeInTable: false
+          yearIsDay: true
+          zeroDay: '2020-01-21'
+      days_since_the_total_confirmed_cases_of_covid_19_reached_100__with_population__gte__5m:
+        title: "Days since the total confirmed cases of COVID-19 reached 100 (with population ≥ 5M)"
+        unit: ''
+        display:
+          includeInTable: false
+          yearIsDay: true
+          zeroDay: '2020-01-21'
+      days_since_the_total_confirmed_deaths_of_covid_19_per_million_people_reached_0_1:
+        title: Days since the total confirmed deaths of COVID-19 per million people reached 0.1
+        unit: ''
+        display:
+          includeInTable: false
+          yearIsDay: true
+          zeroDay: '2020-01-21'
+      days_since_the_total_confirmed_deaths_of_covid_19_reached_5:
+        title: Days since the total confirmed deaths of COVID-19 reached 5
+        unit: ''
+        display:
+          includeInTable: false
+          yearIsDay: true
+          zeroDay: '2020-01-21'
+      doubling_days_of_total_confirmed_cases__3_day_period:
+        title: Doubling days of total confirmed cases (3 day period)
+        unit: ''
+        display:
+          entityAnnotationsMap: 'Mexico: Oct 9: probable/earlier cases added'
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2020-01-21'
+      doubling_days_of_total_confirmed_cases__7_day_period:
+        title: Doubling days of total confirmed cases (7 day period)
+        unit: ''
+        display:
+          entityAnnotationsMap: 'Mexico: Oct 9: probable/earlier cases added'
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2020-01-21'
+      doubling_days_of_total_confirmed_deaths__3_day_period:
+        title: Doubling days of total confirmed deaths (3 day period)
+        unit: ''
+        display:
+          entityAnnotationsMap: |-
+            Sweden: recent days may undercount deaths
+            Spain: Nov 4: earlier deaths added
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2020-01-21'
+      doubling_days_of_total_confirmed_deaths__7_day_period:
+        title: Doubling days of total confirmed deaths (7 day period)
+        unit: ''
+        display:
+          entityAnnotationsMap: |-
+            Sweden: recent days may undercount deaths
+            Spain: Nov 4: earlier deaths added
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2020-01-21'
+      has_population__gte__5m_and_had__gte_100_cases__gte_21_days_ago_and_has_testing_data:
+        title: "Has population ≥ 5M AND had ≥100 cases ≥21 days ago AND has testing data"
+        unit: ''
+        display:
+          yearIsDay: true
+          zeroDay: '2020-01-21'
+      total_confirmed_cases_of_covid_19:
+        title: Total confirmed cases of COVID-19
+        unit: cases
+        display:
+          entityAnnotationsMap: 'Mexico: Oct 9: probable/earlier cases added'
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2020-01-21'
+      total_confirmed_cases_of_covid_19_per_million_people:
+        title: Total confirmed cases of COVID-19 per million people
+        unit: cases per million
+        display:
+          entityAnnotationsMap: 'Mexico: Oct 9: probable/earlier cases added'
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2020-01-21'
+      total_confirmed_deaths_due_to_covid_19:
+        title: Total confirmed deaths due to COVID-19
+        unit: deaths
+        display:
+          entityAnnotationsMap: |-
+            Sweden: recent days may undercount deaths
+            Spain: Nov 4: earlier deaths added
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2020-01-21'
+      total_confirmed_deaths_due_to_covid_19_per_million_people:
+        title: Total confirmed deaths due to COVID-19 per million people
+        unit: deaths per million
+        display:
+          entityAnnotationsMap: |-
+            Sweden: recent days may undercount deaths
+            Spain: Nov 4: earlier deaths added
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2020-01-21'
+      weekly_case_growth__pct:
+        title: Weekly case growth (%)
+        unit: '%'
+        display:
+          entityAnnotationsMap: 'Mexico: Oct 9: probable/earlier cases added'
+          includeInTable: true
+          numDecimalPlaces: 1
+          yearIsDay: true
+          zeroDay: '2020-01-21'
+        short_unit: '%'
+      weekly_cases:
+        title: Weekly cases
+        unit: ''
+        display:
+          entityAnnotationsMap: 'Mexico: Oct 9: probable/earlier cases added'
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2020-01-21'
+      weekly_cases_per_million_people:
+        title: Weekly cases per million people
+        unit: ''
+        display:
+          entityAnnotationsMap: 'Mexico: Oct 9: probable/earlier cases added'
+          includeInTable: true
+          yearIsDay: true
+      weekly_death_growth__pct:
+        title: Weekly death growth (%)
+        unit: '%'
+        display:
+          entityAnnotationsMap: |-
+            Sweden: recent days may undercount deaths
+            Spain: Nov 4: earlier deaths added
+          includeInTable: true
+          numDecimalPlaces: 1
+          yearIsDay: true
+          zeroDay: '2020-01-21'
+        short_unit: '%'
+      weekly_deaths:
+        title: Weekly deaths
+        unit: ''
+        display:
+          entityAnnotationsMap: |-
+            Sweden: recent days may undercount deaths
+            Spain: Nov 4: earlier deaths added
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2020-01-21'
+      weekly_deaths_per_million_people:
+        title: Weekly deaths per million people
+        unit: ''
+        display:
+          entityAnnotationsMap: |-
+            Sweden: recent days may undercount deaths
+            Spain: Nov 4: earlier deaths added
+          includeInTable: true
+          yearIsDay: true

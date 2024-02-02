@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2647
+    date_accessed: 2023-08-16 09:58:50.247845
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_2647_health__expenditure_by_disease__age_and_gender_under_the_system_of_health_accounts__sha__framework
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: d57d9560517242af51c116bca1b15eba
+  size: 24315
+  path: 
+    dataset_2647_health__expenditure_by_disease__age_and_gender_under_the_system_of_health_accounts__sha__framework_config.json

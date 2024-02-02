@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1445
+    date_accessed: 2023-08-14 05:47:08.794867
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1445_skin_and_subcutaneous_diseases (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 8a24971d9f89553bdf0fc33f407394a7
+  size: 31975
+  path: dataset_1445_skin_and_subcutaneous_diseases_config.json

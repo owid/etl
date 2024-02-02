@@ -1,18 +1,14 @@
 meta:
-  namespace: backport
-  short_name: dataset_5327_uk_butterfly_populations__uk_ons_config
-  file_extension: json
-  date_accessed: 2023-02-23 16:50:56.582405
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5327
+    date_accessed: 2023-08-09 13:37:17.459500
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_5327_uk_butterfly_populations__uk_ons
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/5327
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 8d1e4dd784d78c8029cb3c8ea30e53c8
-  size: 8355
+- md5: da084357ade360f53820ebcbb20ed89e
+  size: 9381
   path: dataset_5327_uk_butterfly_populations__uk_ons_config.json

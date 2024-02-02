@@ -1,18 +1,16 @@
 meta:
-  namespace: backport
-  short_name: dataset_5573_polio_reported_and_estimated_cases_values
-  file_extension: feather
-  date_accessed: 2023-04-23 08:06:20.450040
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5573
+    date_accessed: 2023-08-10 08:04:39.735139
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Polio reported and estimated cases
-  description: https://github.com/owid/notebooks/blob/main/FionaSpooner/polio_cases/combine_polio_data.ipynb
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/5573
-  source_published_by: Our World in Data catalog backport
+  description: 
+    https://github.com/owid/notebooks/blob/main/FionaSpooner/polio_cases/combine_polio_data.ipynb
   is_public: false
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 26e2287c46bfa95889b681fb6297ffbd
-  size: 459466
+- md5: 6ad2eb9e985da89bea42355f932d614e
+  size: 459138
   path: dataset_5573_polio_reported_and_estimated_cases_values.feather

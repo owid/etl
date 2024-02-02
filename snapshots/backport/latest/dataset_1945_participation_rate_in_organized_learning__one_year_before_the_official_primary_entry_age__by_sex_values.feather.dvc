@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1945
+    date_accessed: 2023-08-16 10:21:06.478766
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Participation rate in organized learning (one year before the official primary
+    entry age), by sex
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 7aa53eb5f4b5131018f5b0efa05c6efe
+  size: 37106
+  path: 
+    dataset_1945_participation_rate_in_organized_learning__one_year_before_the_official_primary_entry_age__by_sex_values.feather

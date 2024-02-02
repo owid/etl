@@ -26,12 +26,12 @@ tables:
           Describes the legislation status of homosexual activity, consensual sexual activity between individuals of the same sex.
 
           These statuses are possible:
-            <ol type = "1"><li>Legal</li>
-            <li>Varies by region</li>
-            <li>Ambiguous</li>
-            <li>Male illegal, female legal or uncertain</li>
-            <li>Illegal, prison or other penalty</li>
-            <li>Illegal (death penalty as punishment)</li></ol>
+            1. Legal
+            2. Varies by region
+            3. Ambiguous
+            4. Male illegal, female legal or uncertain
+            5. Illegal, prison or other penalty
+            6. Illegal (death penalty as punishment)
         sources:
           - *source-equaldex
         display:
@@ -44,11 +44,11 @@ tables:
           Describes the legislation status of the right to change legal gender. This is the legal recognition of sex reassignment by permitting a change of legal gender on an individual's birth certificate.
 
           These statuses are possible:
-            <ol type = "1"><li>Legal, surgery not required</li>
-            <li>Legal, but requires surgery</li>
-            <li>Varies by region</li>
-            <li>Ambiguous</li>
-            <li>Illegal</li></ol>
+            1. Legal, surgery not required
+            2. Legal, but requires surgery
+            3. Varies by region
+            4. Ambiguous
+            5. Illegal
         sources:
           - *source-equaldex
         display:
@@ -61,15 +61,15 @@ tables:
           Describes the legislation status of same-sex marriage. This is marriage and marriage recognition between two people of the same biological sex and/or gender identity.
 
           These statuses are possible:
-            <ol type = "1"><li>Legal</li>
-            <li>Civil union or other partnership</li>
-            <li>Foreign same-sex marriages recognized only</li>
-            <li>Unregistered cohabitation</li>
-            <li>Varies by region</li>
-            <li>Ambiguous</li>
-            <li>Unrecognized</li>
-            <li>Unrecognized, same-sex marriage and civil unions banned</li>
-            <li>Not legal</li></ol>
+            1. Legal
+            2. Civil union or other partnership
+            3. Foreign same-sex marriages recognized only
+            4. Unregistered cohabitation
+            5. Varies by region
+            6. Ambiguous
+            7. Unrecognized
+            8. Unrecognized, same-sex marriage and civil unions banned
+            9. Not legal
         sources:
           - *source-equaldex
         display:
@@ -82,12 +82,12 @@ tables:
           Describes the legislation status of same-sex adoption. This is the ability for same-sex couples to legally adopt a child.
 
           These statuses are possible:
-            <ol type = "1"><li>Legal</li>
-            <li>Married couples only</li>
-            <li>Step-child adoption only</li>
-            <li>Single only</li>
-            <li>Ambiguous</li>
-            <li>Illegal</li></ol>
+            1.  Legal
+            2.  Married couples only
+            3.  Step-child adoption only
+            4.  Single only
+            5.  Ambiguous
+            6.  Illegal
         sources:
           - *source-equaldex
         display:
@@ -100,10 +100,10 @@ tables:
           Describes the difference between legal age of consent for homosexual sex and heterosexual sex.
 
           These statuses are possible:
-            <ol type = "1"><li>Equal</li>
-            <li>Varies by region</li>
-            <li>Ambiguous</li>
-            <li>Unequal</li></ol>
+            1.  Equal
+            2.  Varies by region
+            3.  Ambiguous
+            4.  Unequal
         sources:
           - *source-equaldex
         display:
@@ -116,14 +116,14 @@ tables:
           Describes the ability for MSMs (men who have sex with men) to donate blood or tissue for organ transplants. A deferral period refers to a waiting time before a man can donate after having sex.
 
           These statuses are possible:
-            <ol type = "1"><li>Legal</li>
-            <li>Varies by region</li>
-            <li>Ambiguous</li>
-            <li>Banned (3-month deferral)</li>
-            <li>Banned (6-month deferral)</li>
-            <li>Banned (1-year deferral)</li>
-            <li>Banned (5-year deferral)</li>
-            <li>Banned (indefinite deferral)</li></ol>
+            1.  Legal
+            2.  Varies by region
+            3.  Ambiguous
+            4.  Banned (3-month deferral)
+            5.  Banned (6-month deferral)
+            6.  Banned (1-year deferral)
+            7.  Banned (5-year deferral)
+            8.  Banned (indefinite deferral)
         sources:
           - *source-equaldex
         display:
@@ -136,13 +136,13 @@ tables:
           Describes censorship or prohibition of discussing, promoting, or teaching LGBTQ+ topics in media, schools, and in the general public.
 
           These statuses are possible:
-            <ol type = "1"><li>No censorship</li>
-            <li>Varies by region</li>
-            <li>Ambiguous</li>
-            <li>Other punishment</li>
-            <li>Fine as punishment</li>
-            <li>State-enforced</li>
-            <li>Imprisonment as punishment</li></ol>
+            1.  No censorship
+            2.  Varies by region
+            3.  Ambiguous
+            4.  Other punishment
+            5.  Fine as punishment
+            6.  State-enforced
+            7.  Imprisonment as punishment
         sources:
           - *source-equaldex
         display:
@@ -155,10 +155,10 @@ tables:
           Describes the legal status of conducting sexual orientation changing therapy.
 
           These statuses are possible:
-            <ol type = "1"><li>Banned</li>
-            <li>Varies by region</li>
-            <li>Ambiguous</li>
-            <li>Not banned</li></ol>
+            1.  Banned
+            2.  Varies by region
+            3.  Ambiguous
+            4.  Not banned
         sources:
           - *source-equaldex
         display:
@@ -171,10 +171,10 @@ tables:
           Describes the prohibition of discrimination based on sexual orientation and/or gender identity.
 
           These statuses are possible:
-            <ol type = "1"><li>Illegal</li>
-            <li>Illegal in some contexts</li>
-            <li>Varies by region</li>
-            <li>No protections</li></ol>
+            1.  Illegal
+            2.  Illegal in some contexts
+            3.  Varies by region
+            4.  No protections
         sources:
           - *source-equaldex
         display:
@@ -187,11 +187,11 @@ tables:
           Describes the prohibition of discrimination based on sexual orientation and/or gender identity in employment, including hiring, promotion, termination, harassment, etc.
 
           These statuses are possible:
-            <ol type = "1"><li>Sexual orientation and gender identity</li>
-            <li>Sexual orientation only</li>
-            <li>Varies by region</li>
-            <li>Ambiguous</li>
-            <li>No protections</li></ol>
+            1.  Sexual orientation and gender identity
+            2.  Sexual orientation only
+            3.  Varies by region
+            4.  Ambiguous
+            5.  No protections
         sources:
           - *source-equaldex
         display:
@@ -204,11 +204,11 @@ tables:
           Describes the prohibition of discrimination based on sexual orientation and/or gender identity when applying for housing or discrimination by landlords / property owners.
 
           These statuses are possible:
-            <ol type = "1"><li>Sexual orientation and gender identity</li>
-            <li>Sexual orientation only</li>
-            <li>Varies by region</li>
-            <li>Ambiguous</li>
-            <li>No protections</li></ol>
+            1.  Sexual orientation and gender identity
+            2.  Sexual orientation only
+            3.  Varies by region
+            4.  Ambiguous
+            5.  No protections
         sources:
           - *source-equaldex
         display:
@@ -221,11 +221,11 @@ tables:
           Describes the ability for homosexuals to serve in the military and be open about their sexuality.
 
           These statuses are possible:
-            <ol type = "1"><li>Legal</li>
-            <li>"Don't Ask, Don't Tell"</li>
-            <li>Lesbians, gays, bisexuals permitted, transgender people banned</li>
-            <li>Ambiguous</li>
-            <li>Illegal</li></ol>
+            1.  Legal
+            2.  "Don't Ask, Don't Tell"
+            3.  Lesbians, gays, bisexuals permitted, transgender people banned
+            4.  Ambiguous
+            5.  Illegal
         sources:
           - *source-equaldex
         display:
@@ -238,11 +238,11 @@ tables:
           Describes the legal recognition of non-binary, genderqueer, or third gender identities.
 
           These statuses are possible:
-            <ol type = "1"><li>Recognized</li>
-            <li>Intersex only</li>
-            <li>Varies by region</li>
-            <li>Ambiguous</li>
-            <li>Not legally recognized</li></ol>
+            1.  Recognized
+            2.  Intersex only
+            3.  Varies by region
+            4.  Ambiguous
+            5.  Not legally recognized
         sources:
           - *source-equaldex
         display:
@@ -255,12 +255,12 @@ tables:
           Describes the legislation status of homosexual activity, consensual sexual activity between individuals of the same sex.
 
           These statuses are possible:
-            <ol type = "1"><li>Legal</li>
-            <li>Varies by region</li>
-            <li>Ambiguous</li>
-            <li>Male illegal, female legal or uncertain</li>
-            <li>Illegal, prison or other penalty</li>
-            <li>Illegal (death penalty as punishment)</li></ol>
+            1.  Legal
+            2.  Varies by region
+            3.  Ambiguous
+            4.  Male illegal, female legal or uncertain
+            5.  Illegal, prison or other penalty
+            6.  Illegal (death penalty as punishment)
         sources:
           - *source-equaldex
         display:
@@ -273,11 +273,11 @@ tables:
           Describes the legislation status of the right to change legal gender. This is the legal recognition of sex reassignment by permitting a change of legal gender on an individual's birth certificate.
 
           These statuses are possible:
-            <ol type = "1"><li>Legal, surgery not required</li>
-            <li>Legal, but requires surgery</li>
-            <li>Varies by region</li>
-            <li>Ambiguous</li>
-            <li>Illegal</li></ol>
+            1.  Legal, surgery not required
+            2.  Legal, but requires surgery
+            3.  Varies by region
+            4.  Ambiguous
+            5.  Illegal
         sources:
           - *source-equaldex
         display:
@@ -290,15 +290,15 @@ tables:
           Describes the legislation status of same-sex marriage. This is marriage and marriage recognition between two people of the same biological sex and/or gender identity.
 
           These statuses are possible:
-            <ol type = "1"><li>Legal</li>
-            <li>Civil union or other partnership</li>
-            <li>Foreign same-sex marriages recognized only</li>
-            <li>Unregistered cohabitation</li>
-            <li>Varies by region</li>
-            <li>Ambiguous</li>
-            <li>Unrecognized</li>
-            <li>Unrecognized, same-sex marriage and civil unions banned</li>
-            <li>Not legal</li></ol>
+            1.  Legal
+            2.  Civil union or other partnership
+            3.  Foreign same-sex marriages recognized only
+            4.  Unregistered cohabitation
+            5.  Varies by region
+            6.  Ambiguous
+            7.  Unrecognized
+            8.  Unrecognized, same-sex marriage and civil unions banned
+            9.  Not legal
         sources:
           - *source-equaldex
         display:
@@ -311,12 +311,12 @@ tables:
           Describes the legislation status of same-sex adoption. This is the ability for same-sex couples to legally adopt a child.
 
           These statuses are possible:
-            <ol type = "1"><li>Legal</li>
-            <li>Married couples only</li>
-            <li>Step-child adoption only</li>
-            <li>Single only</li>
-            <li>Ambiguous</li>
-            <li>Illegal</li></ol>
+            1.  Legal
+            2.  Married couples only
+            3.  Step-child adoption only
+            4.  Single only
+            5.  Ambiguous
+            6.  Illegal
         sources:
           - *source-equaldex
         display:
@@ -329,10 +329,10 @@ tables:
           Describes the difference between legal age of consent for homosexual sex and heterosexual sex.
 
           These statuses are possible:
-            <ol type = "1"><li>Equal</li>
-            <li>Varies by region</li>
-            <li>Ambiguous</li>
-            <li>Unequal</li></ol>
+            1.  Equal
+            2.  Varies by region
+            3.  Ambiguous
+            4.  Unequal
         sources:
           - *source-equaldex
         display:
@@ -345,14 +345,14 @@ tables:
           Describes the ability for MSMs (men who have sex with men) to donate blood or tissue for organ transplants. A deferral period refers to a waiting time before a man can donate after having sex.
 
           These statuses are possible:
-            <ol type = "1"><li>Legal</li>
-            <li>Varies by region</li>
-            <li>Ambiguous</li>
-            <li>Banned (3-month deferral)</li>
-            <li>Banned (6-month deferral)</li>
-            <li>Banned (1-year deferral)</li>
-            <li>Banned (5-year deferral)</li>
-            <li>Banned (indefinite deferral)</li></ol>
+            1.  Legal
+            2.  Varies by region
+            3.  Ambiguous
+            4.  Banned (3-month deferral)
+            5.  Banned (6-month deferral)
+            6.  Banned (1-year deferral)
+            7.  Banned (5-year deferral)
+            8.  Banned (indefinite deferral)
         sources:
           - *source-equaldex
         display:
@@ -365,13 +365,13 @@ tables:
           Describes censorship or prohibition of discussing, promoting, or teaching LGBTQ+ topics in media, schools, and in the general public.
 
           These statuses are possible:
-            <ol type = "1"><li>No censorship</li>
-            <li>Varies by region</li>
-            <li>Ambiguous</li>
-            <li>Other punishment</li>
-            <li>Fine as punishment</li>
-            <li>State-enforced</li>
-            <li>Imprisonment as punishment</li></ol>
+            1.  No censorship
+            2.  Varies by region
+            3.  Ambiguous
+            4.  Other punishment
+            5.  Fine as punishment
+            6.  State-enforced
+            7.  Imprisonment as punishment
         sources:
           - *source-equaldex
         display:
@@ -384,10 +384,10 @@ tables:
           Describes the legal status of conducting sexual orientation changing therapy.
 
           These statuses are possible:
-            <ol type = "1"><li>Banned</li>
-            <li>Varies by region</li>
-            <li>Ambiguous</li>
-            <li>Not banned</li></ol>
+            1.  Banned
+            2.  Varies by region
+            3.  Ambiguous
+            4.  Not banned
         sources:
           - *source-equaldex
         display:
@@ -400,10 +400,10 @@ tables:
           Describes the prohibition of discrimination based on sexual orientation and/or gender identity.
 
           These statuses are possible:
-            <ol type = "1"><li>Illegal</li>
-            <li>Illegal in some contexts</li>
-            <li>Varies by region</li>
-            <li>No protections</li></ol>
+            1.  Illegal
+            2.  Illegal in some contexts
+            3.  Varies by region
+            4.  No protections
         sources:
           - *source-equaldex
         display:
@@ -416,11 +416,11 @@ tables:
           Describes the prohibition of discrimination based on sexual orientation and/or gender identity in employment, including hiring, promotion, termination, harassment, etc.
 
           These statuses are possible:
-            <ol type = "1"><li>Sexual orientation and gender identity</li>
-            <li>Sexual orientation only</li>
-            <li>Varies by region</li>
-            <li>Ambiguous</li>
-            <li>No protections</li></ol>
+            1.  Sexual orientation and gender identity
+            2.  Sexual orientation only
+            3.  Varies by region
+            4.  Ambiguous
+            5.  No protections
         sources:
           - *source-equaldex
         display:
@@ -433,11 +433,11 @@ tables:
           Describes the prohibition of discrimination based on sexual orientation and/or gender identity when applying for housing or discrimination by landlords / property owners.
 
           These statuses are possible:
-            <ol type = "1"><li>Sexual orientation and gender identity</li>
-            <li>Sexual orientation only</li>
-            <li>Varies by region</li>
-            <li>Ambiguous</li>
-            <li>No protections</li></ol>
+            1.  Sexual orientation and gender identity
+            2.  Sexual orientation only
+            3.  Varies by region
+            4.  Ambiguous
+            5.  No protections
         sources:
           - *source-equaldex
         display:
@@ -450,11 +450,11 @@ tables:
           Describes the ability for homosexuals to serve in the military and be open about their sexuality.
 
           These statuses are possible:
-            <ol type = "1"><li>Legal</li>
-            <li>"Don't Ask, Don't Tell"</li>
-            <li>Lesbians, gays, bisexuals permitted, transgender people banned</li>
-            <li>Ambiguous</li>
-            <li>Illegal</li></ol>
+            1.  Legal
+            2.  "Don't Ask, Don't Tell"
+            3.  Lesbians, gays, bisexuals permitted, transgender people banned
+            4.  Ambiguous
+            5.  Illegal
         sources:
           - *source-equaldex
         display:
@@ -467,11 +467,11 @@ tables:
           Describes the legal recognition of non-binary, genderqueer, or third gender identities.
 
           These statuses are possible:
-            <ol type = "1"><li>Recognized</li>
-            <li>Intersex only</li>
-            <li>Varies by region</li>
-            <li>Ambiguous</li>
-            <li>Not legally recognized</li></ol>
+            1.  Recognized
+            2.  Intersex only
+            3.  Varies by region
+            4.  Ambiguous
+            5.  Not legally recognized
         sources:
           - *source-equaldex
         display:

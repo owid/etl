@@ -1,18 +1,15 @@
 meta:
-  namespace: backport
-  short_name: dataset_5883_covid_19_cases_and_deaths__who_config
-  file_extension: json
-  date_accessed: 2023-06-01 13:01:20.134677
-  name: Grapher metadata for dataset_5883_covid_19_cases_and_deaths__who
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5883
+    date_accessed: 2023-08-16 10:49:01.373272
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_5883_covid_19_cases_and_deaths__who (archived)
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/5883
-  source_published_by: Our World in Data catalog backport
   is_public: false
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: af5346a987df9dfdc8114b8018b5e024
-  size: 24726
+- md5: dc5481681e5edb820de5c619989a23ff
+  size: 28875
   path: dataset_5883_covid_19_cases_and_deaths__who_config.json

@@ -1,18 +1,15 @@
 meta:
-  namespace: backport
-  short_name: dataset_5344_climate_impact_on_crop_yields__ray_et_al__2019_values
-  file_extension: feather
-  date_accessed: 2023-02-23 17:40:58.004045
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5344
+    date_accessed: 2023-08-10 14:30:38.079890
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Climate impact on crop yields (Ray et al. 2019)
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/5344
-  source_published_by: Our World in Data catalog backport
   is_public: false
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 5aa18487ef16995f3640f7bc738b6dbb
+- md5: b8a64560c1da8e36449cea341a0e2c84
   size: 25770
   path: dataset_5344_climate_impact_on_crop_yields__ray_et_al__2019_values.feather

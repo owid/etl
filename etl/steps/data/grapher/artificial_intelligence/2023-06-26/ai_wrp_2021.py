@@ -19,12 +19,25 @@ def run(dest_dir: str) -> None:
 
     # Read table from garden dataset.
     tb = ds_garden["ai_wrp_2021"]
-    # Drop rows with missing values in the 'country' column (used for other ways of grouping things - gender, socio-economic status etc)
 
     #
     # Process data.
     #
+    column_list_to_plot = [
+        "other_yes_no",
+        "other_help_harm",
+        "neither",
+        "mostly_harm",
+        "no__would_not_feel_safe",
+        "mostly_help",
+        "yes__would_feel_safe",
+        "dk_no_op",
+        "refused__help_harm",
+        "dk__cars",
+        "refused__cars",
+    ]
 
+    tb = tb[column_list_to_plot]
     #
     # Save outputs.
     #

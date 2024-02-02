@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2091
+    date_accessed: 2023-08-14 16:07:13.641631
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2091_hemorrhagic_stroke (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 87bfe3354a975076ee479bc4fba2d6fe
+  size: 32623
+  path: dataset_2091_hemorrhagic_stroke_config.json

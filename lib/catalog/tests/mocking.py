@@ -4,7 +4,7 @@
 
 import datetime as dt
 import random
-from typing import Any, Union
+from typing import Any, Literal, Union
 
 _MOCK_STRINGS = [
     "alpha",
@@ -50,7 +50,7 @@ def mock(_type: type) -> Any:
         return 10 * random.random() / random.random()
 
     elif _type == dt.date:
-        return dt.date.fromordinal(dt.date.today().toordinal() - random.randint(0, 1000))
+        return _random_date()
 
     elif _type == str:
         # some strings in the frictionless standard must be lowercase with no spaces
@@ -69,7 +69,20 @@ def mock(_type: type) -> Any:
         # all dataclasses
         return _type(**{f.name: mock(f.type) for f in _type.__dataclass_fields__.values()})  # type: ignore
 
+    elif getattr(_type, "__name__", None) == "ProcessingLog":
+        return _type([])
+
     elif _type == Any:
         return mock(random.choice([str, int, float]))
 
+    elif getattr(_type, "__name__", None) == "YearDateLatest":
+        return str(_random_date())
+
+    elif getattr(_type, "__origin__", None) == Literal:
+        return random.choice(_type.__args__)  # type: ignore
+
     raise ValueError(f"don't know how to mock type: {_type}")
+
+
+def _random_date() -> dt.date:
+    return dt.date.fromordinal(dt.date.today().toordinal() - random.randint(0, 1000))

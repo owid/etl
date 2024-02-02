@@ -1,13 +1,15 @@
 """Test functions in owid.datautils.io.local module.
 
 """
-from owid.datautils.io.df import from_file, to_file
-from pathlib import Path
 import tempfile
+from pathlib import Path
 from typing import Any
+
+import numpy as np
 import pandas as pd
 from pytest import raises
-import numpy as np
+
+from owid.datautils.io.df import from_file, to_file
 
 
 class TestLoadDf:
@@ -99,9 +101,7 @@ def _create_csv_file(file: Any) -> Any:
     file.write_text(content, encoding="utf-8")
 
 
-def _store_dataframe_in_temp_file_and_read_it(
-    df: pd.DataFrame, file_path: Path, **kwargs: Any
-) -> pd.DataFrame:
+def _store_dataframe_in_temp_file_and_read_it(df: pd.DataFrame, file_path: Path, **kwargs: Any) -> pd.DataFrame:
     with tempfile.TemporaryDirectory() as temp_dir:
         # Save dataframe in a temporary file.
         temp_file = Path(temp_dir) / file_path
@@ -115,9 +115,7 @@ def _store_dataframe_in_temp_file_and_read_it(
 class TestToFile:
     def test_save_csv_file_with_dummy_index(self):
         df = pd.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6]})
-        recovered_df = _store_dataframe_in_temp_file_and_read_it(
-            df=df, file_path=Path("temp.csv")
-        )
+        recovered_df = _store_dataframe_in_temp_file_and_read_it(df=df, file_path=Path("temp.csv"))
         assert recovered_df.equals(df)
 
     def test_save_csv_file_with_dummy_index_and_overwrite(self):
@@ -145,73 +143,47 @@ class TestToFile:
     def test_save_csv_file_within_subfolders(self):
         df = pd.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6]})
         # Save dataframe in a temporary file, ensuring all required subfolders are created.
-        recovered_df = _store_dataframe_in_temp_file_and_read_it(
-            df=df, file_path=Path("dir_1/dir_2/temp.csv")
-        )
+        recovered_df = _store_dataframe_in_temp_file_and_read_it(df=df, file_path=Path("dir_1/dir_2/temp.csv"))
         assert recovered_df.equals(df)
 
     def test_save_csv_file_with_single_column_and_single_index(self):
         df = pd.DataFrame({"a": [1, 2, 3]}).set_index("a")
-        recovered_df = _store_dataframe_in_temp_file_and_read_it(
-            df=df, file_path=Path("temp.csv")
-        )
+        recovered_df = _store_dataframe_in_temp_file_and_read_it(df=df, file_path=Path("temp.csv"))
         assert recovered_df.equals(df.reset_index())
 
     def test_save_csv_file_with_multiple_columns_and_single_index(self):
-        df = pd.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6], "c": [7, 8, 9]}).set_index(
-            "a"
-        )
-        recovered_df = _store_dataframe_in_temp_file_and_read_it(
-            df=df, file_path=Path("temp.csv")
-        )
+        df = pd.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6], "c": [7, 8, 9]}).set_index("a")
+        recovered_df = _store_dataframe_in_temp_file_and_read_it(df=df, file_path=Path("temp.csv"))
         assert recovered_df.equals(df.reset_index())
 
     def test_save_csv_file_with_multiple_columns_and_single_index_as_a_list(self):
-        df = pd.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6], "c": [7, 8, 9]}).set_index(
-            ["a"]
-        )
-        recovered_df = _store_dataframe_in_temp_file_and_read_it(
-            df=df, file_path=Path("temp.csv")
-        )
+        df = pd.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6], "c": [7, 8, 9]}).set_index(["a"])
+        recovered_df = _store_dataframe_in_temp_file_and_read_it(df=df, file_path=Path("temp.csv"))
         assert recovered_df.equals(df.reset_index())
 
     def test_save_csv_file_with_multiple_columns_and_multiple_indexes(self):
-        df = pd.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6], "c": [7, 8, 9]}).set_index(
-            ["a", "b"]
-        )
-        recovered_df = _store_dataframe_in_temp_file_and_read_it(
-            df=df, file_path=Path("temp.csv")
-        )
+        df = pd.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6], "c": [7, 8, 9]}).set_index(["a", "b"])
+        recovered_df = _store_dataframe_in_temp_file_and_read_it(df=df, file_path=Path("temp.csv"))
         assert recovered_df.equals(df.reset_index())
 
     def test_save_csv_file_with_multiple_columns_and_multiple_indexes_ignoring_indexes(
         self,
     ):
         # Now the dataframe will be stored ignoring the index (so it will only have column "c").
-        df = pd.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6], "c": [7, 8, 9]}).set_index(
-            ["a", "b"]
-        )
-        recovered_df = _store_dataframe_in_temp_file_and_read_it(
-            df=df, file_path=Path("temp.csv"), index=False
-        )
+        df = pd.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6], "c": [7, 8, 9]}).set_index(["a", "b"])
+        recovered_df = _store_dataframe_in_temp_file_and_read_it(df=df, file_path=Path("temp.csv"), index=False)
         assert recovered_df.equals(df.reset_index(drop=True))
 
     def test_save_csv_file_with_multiple_columns_and_multiple_indexes_and_additional_kwarg(
         self,
     ):
         # We will impose that nans must be replaced by a certain number (by using keyword argument 'na_rep').
-        df = pd.DataFrame(
-            {"a": [1, 2, 3], "b": [4, 5, 6], "c": [7, np.nan, 9]}
-        ).set_index(["a", "b"])
-        recovered_df = _store_dataframe_in_temp_file_and_read_it(
-            df=df, file_path=Path("temp.csv"), na_rep=80
-        )
+        df = pd.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6], "c": [7, np.nan, 9]}).set_index(["a", "b"])
+        recovered_df = _store_dataframe_in_temp_file_and_read_it(df=df, file_path=Path("temp.csv"), na_rep=80)
         assert recovered_df.equals(df.reset_index().replace({np.nan: 80}))
 
     def test_save_parquet_file_keeping_multiindex(self):
-        df = pd.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6], "c": [7, 8, 9]}).set_index(
-            ["a", "b"]
-        )
+        df = pd.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6], "c": [7, 8, 9]}).set_index(["a", "b"])
         with tempfile.TemporaryDirectory() as temp_dir:
             # Save dataframe in a temporary file.
             temp_file = Path(temp_dir) / "test.parquet"
@@ -221,9 +193,7 @@ class TestToFile:
         assert recovered_df.equals(df)
 
     def test_save_parquet_file_resetting_multiindex(self):
-        df = pd.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6], "c": [7, 8, 9]}).set_index(
-            ["a", "b"]
-        )
+        df = pd.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6], "c": [7, 8, 9]}).set_index(["a", "b"])
         with tempfile.TemporaryDirectory() as temp_dir:
             # Save dataframe in a temporary file.
             temp_file = Path(temp_dir) / "test.parquet"
@@ -252,3 +222,8 @@ class TestToFile:
             temp_file = Path(temp_dir) / "test.made_up_extension"
             with raises(ValueError):
                 to_file(df, file_path=temp_file)
+
+    def test_dataframe_save_csv_file(self):
+        df = pd.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6]})
+        recovered_df = _store_dataframe_in_temp_file_and_read_it(df=df, file_path=Path("temp.csv"))
+        assert recovered_df.equals(df)

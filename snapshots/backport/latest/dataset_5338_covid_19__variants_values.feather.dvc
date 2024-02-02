@@ -1,18 +1,15 @@
 meta:
-  namespace: backport
-  short_name: dataset_5338_covid_19__variants_values
-  file_extension: feather
-  date_accessed: 2023-06-01 15:30:31.871471
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5338
+    date_accessed: 2023-08-16 08:52:39.770297
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: COVID-19 - Variants
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/5338
-  source_published_by: Our World in Data catalog backport
   is_public: false
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: cd30ebe8a173efade47c3f1328ee6aac
-  size: 375986
+- md5: 6848aa27396c09080f22b6a8306dabd2
+  size: 395098
   path: dataset_5338_covid_19__variants_values.feather

@@ -1,0 +1,33 @@
+meta:
+  namespace: artificial_intelligence
+  short_name: ai_national_strategy
+  name: AI Policy (AI Index, 2023)
+  version: '2023-06-14'
+  publication_year: 2023
+  publication_date: '2023-03-20'
+  source_name: AI Index (2023)
+  source_published_by: AI Index 2023 Annual Report, AI Index Steering Committee,
+    Institute for Human-Centered AI, Stanford University, Stanford, CA, April 2023
+  url: https://drive.google.com/drive/folders/1ma9WZJzKreS8f2It1rMy_KkkbX6XwDOK
+  source_data_url: https://drive.google.com/uc?export=download&id=11ReYSMwl460b1DXkG5e4hscXlC8XhvXU
+  file_extension: csv
+  license_url:
+    https://aiindex.stanford.edu/wp-content/uploads/2023/04/HAI_AI-Index-Report_2023.pdf
+  license_name: Public domain
+  date_accessed: 2023-06-19
+  is_public: true
+  description: >-
+    Data on AI strategies—policy plans developed by a country’s government to steer
+    the development and deployment of AI technologies within its borders. Tracking
+    trends in national strategies can be an important way of
+    gauging the degree to which countries are prioritizing the management and regulation
+    of AI technologies. Sources include websites of
+    national or regional governments, the OECD AI Policy Observatory (OECD.AI), and
+    news coverage. “AI strategy” is defined as a policy
+    document that communicates the objective of supporting the development of AI while
+    also maximizing the benefits of AI for society.
+wdir: ../../../data/snapshots/artificial_intelligence/2023-06-14
+outs:
+- md5: c293437993f1bce209bc2b13505c1a01
+  size: 1331
+  path: ai_national_strategy.csv

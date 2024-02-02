@@ -1,18 +1,14 @@
 meta:
-  namespace: backport
-  short_name: dataset_1857_employment_config
-  file_extension: json
-  date_accessed: 2023-06-01 13:20:16.408475
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1857
+    date_accessed: 2023-08-10 09:25:39.240993
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_1857_employment
   description: This is a dataset imported by the automated fetcher
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/1857
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 83186018b0e513b0a9dbbadac1bf2754
-  size: 54071
+- md5: 1ee572b7ab92f269a38182d709a70e44
+  size: 58923
   path: dataset_1857_employment_config.json

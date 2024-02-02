@@ -1,18 +1,14 @@
 meta:
-  namespace: backport
-  short_name: dataset_5759_ocean_waste_by_item_values
-  file_extension: feather
-  date_accessed: 2023-02-23 19:04:58.808432
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5759
+    date_accessed: 2023-08-10 08:38:29.259200
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: ocean_waste_by_item
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/5759
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 9b153c88bbe3c715449415db3c6307eb
+- md5: 0bbee39d071de777defdaeb2c36adb42
   size: 7106
   path: dataset_5759_ocean_waste_by_item_values.feather

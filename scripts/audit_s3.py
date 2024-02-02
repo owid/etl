@@ -7,7 +7,7 @@ import pandas as pd
 import rich_click as click
 import structlog
 
-from backport.datasync.datasync import upload_gzip_dict
+from apps.backport.datasync.datasync import upload_gzip_dict
 from etl.db import get_engine
 from etl.publish import connect_s3
 
@@ -24,11 +24,19 @@ RENAME_MAP = {
 
 
 def update_file(s3, bucket, key, dry_run):
-    response = s3.get_object(Bucket=bucket, Key=key)
+    try:
+        response = s3.get_object(Bucket=bucket, Key=key)
+    except s3.exceptions.NoSuchKey:
+        log.warning("update_file.missing_file", key=key)
+        return
+
     content = response["Body"].read()
 
-    with gzip.open(BytesIO(content), "rb") as f:
-        decompressed_content = f.read()
+    if content.startswith(b"{"):
+        decompressed_content = content
+    else:
+        with gzip.open(BytesIO(content), "rb") as f:
+            decompressed_content = f.read()
 
     data = json.loads(decompressed_content)
 
@@ -55,16 +63,18 @@ def list_files(s3, bucket, prefix):
 
 def list_files_from_variable_ids(variable_ids, prefix):
     for var_id in variable_ids:
-        yield f"{prefix}{var_id}.json"
+        yield f"{prefix}{var_id}.metadata.json"
 
 
-def load_variable_ids() -> list[int]:
-    q = """
+def load_variable_ids(limit) -> list[int]:
+    q = f"""
     select
         v.id
     from variables as v
     join datasets as d on v.datasetId = d.id
-    where d.isArchived = 0;
+    where d.isArchived = 0
+    order by rand()
+    limit {limit}
     """
     df = pd.read_sql(q, get_engine())
     return list(df["id"])
@@ -93,20 +103,30 @@ def load_variable_ids() -> list[int]:
     help="Thread workers to parallelize",
     default=1,
 )
+@click.option(
+    "--limit",
+    type=int,
+    help="Max number of variables to check",
+    default=1000000,
+)
 def cli(
     bucket: str,
     prefix: str,
     dry_run: bool,
     workers: int,
+    limit: int,
 ) -> None:
     """
     Iterate over all files in s3://BUCKET/PREFIX and rename entities in the entities dimension.
+
+    Example:
+        ENV=.env.prod python scripts/audit_s3.py owid-api v1/indicators/ --dry-run --workers 10 --limit 1000
     """
     assert dry_run, "Only --dry-run is supported at the moment, we don't want to modify files on S3"
 
     s3 = connect_s3()
 
-    variable_ids = load_variable_ids()
+    variable_ids = load_variable_ids(limit)
 
     keys = list(list_files_from_variable_ids(variable_ids, prefix))
 

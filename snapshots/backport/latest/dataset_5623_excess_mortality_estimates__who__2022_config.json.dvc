@@ -1,18 +1,15 @@
 meta:
-  namespace: backport
-  short_name: dataset_5623_excess_mortality_estimates__who__2022_config
-  file_extension: json
-  date_accessed: 2023-06-01 12:35:18.159549
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5623
+    date_accessed: 2023-08-09 15:10:05.387980
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_5623_excess_mortality_estimates__who__2022
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/5623
-  source_published_by: Our World in Data catalog backport
   is_public: false
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: fbd1796eadf5e449ca5b9ca055bc4498
-  size: 6783
+- md5: 4c73435345e6b618efff7efb0f0fc4c2
+  size: 7684
   path: dataset_5623_excess_mortality_estimates__who__2022_config.json

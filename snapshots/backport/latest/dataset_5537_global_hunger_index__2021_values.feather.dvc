@@ -1,18 +1,14 @@
 meta:
-  namespace: backport
-  short_name: dataset_5537_global_hunger_index__2021_values
-  file_extension: feather
-  date_accessed: 2023-06-01 13:15:15.403783
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5537
+    date_accessed: 2023-08-10 09:16:49.439291
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Global Hunger Index (2021)
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/5537
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 4be429747177d2f77e7071104e5d8ae6
+- md5: 4ad564dd83f9c687ca15e9616a69a27a
   size: 12466
   path: dataset_5537_global_hunger_index__2021_values.feather

@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2616
+    date_accessed: 2023-08-11 07:41:08.069812
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_2616_prices_and_purchasing_power_parities__harmonised_indices_of_consumer_prices__hicps__by_coicop_divisions
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 272ef85c0ac7cf0e55ebf7c3afeaed99
+  size: 23324
+  path: 
+    dataset_2616_prices_and_purchasing_power_parities__harmonised_indices_of_consumer_prices__hicps__by_coicop_divisions_config.json

@@ -1,0 +1,23 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5027
+    date_accessed: 2023-08-10 15:02:25.647139
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: 'Emissions - Agriculture: Rice Cultivation'
+  description: Greenhouse gas (GHG) emissions from rice cultivation consist of methane
+    gas from the anaerobic decomposition of organic matter in paddy fields. The FAOSTAT
+    emissions database is computed following Tier 1 IPCC 2006 Guidelines for National
+    GHG Inventories (http://www.ipcc-nggip.iges.or.jp/public/2006gl/vol4.html) and
+    the IPCC 2000 Good Practice Guidance and Uncertainty Management in National GHG
+    Inventories (http://www.ipcc-nggip.iges.or.jp/public/gp/english/). GHG emissions
+    are provided by country, regions and special groups, with global coverage, relative
+    to the period 1961-present (with annual updates) and with projections for 2030
+    and 2050, expressed both as Gg CH4 and Gg CO2eq. Implied emission factor for CH4
+    and activity data are also provided.
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 553efd2e9c0b22a18117c68e09814e1f
+  size: 163874
+  path: dataset_5027_emissions__agriculture__rice_cultivation_values.feather

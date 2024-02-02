@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/811
+    date_accessed: 2023-08-16 09:20:31.081294
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_811_investment__development_flows_to_agriculture__fao__2017
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: eeaeb35d4186870b0ef877f4b02ee9a3
+  size: 1345829
+  path: dataset_811_investment__development_flows_to_agriculture__fao__2017_config.json

@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/959
+    date_accessed: 2023-08-16 10:29:03.642961
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_959_gistemp_temperature_anomaly (archived)
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 0695b8444f7758f241df59646c72b091
+  size: 4120
+  path: dataset_959_gistemp_temperature_anomaly_config.json

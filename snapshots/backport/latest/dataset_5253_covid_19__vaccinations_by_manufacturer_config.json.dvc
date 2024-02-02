@@ -1,18 +1,15 @@
 meta:
-  namespace: backport
-  short_name: dataset_5253_covid_19__vaccinations_by_manufacturer_config
-  file_extension: json
-  date_accessed: 2023-06-01 12:46:00.516925
-  name: Grapher metadata for dataset_5253_covid_19__vaccinations_by_manufacturer
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5253
+    date_accessed: 2023-08-16 07:22:27.040495
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_5253_covid_19__vaccinations_by_manufacturer (archived)
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/5253
-  source_published_by: Our World in Data catalog backport
   is_public: false
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: c5440c0d29fcd7c4292dd51dbeb158cc
-  size: 10844
+- md5: b2455c69dc64d403e69c67818588b534
+  size: 12745
   path: dataset_5253_covid_19__vaccinations_by_manufacturer_config.json

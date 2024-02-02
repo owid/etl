@@ -1,9 +1,10 @@
 dataset:
   title: Air Transport CO2 Emissions
-  description: The OECD Air Transport CO2 Emissions database includes annual, quarterly, and monthly information on
-    CO2 emissions related to commercial passenger, freight, and general aviation flights,
-    on both a territory and a residence basis, for 186 countries. These CO2 emissions
+  description: The OECD Air Transport CO₂ Emissions database includes annual, quarterly, and monthly information on
+    CO₂ emissions related to commercial passenger, freight, and general aviation flights,
+    on both a territory and a residence basis, for 186 countries. These CO₂ emissions
     are estimated by the OECD, based on a consistent methodology across countries.
+
 
     OECD database is updated by the end of the first month of each quarter with new data from the previous quarter.
   licenses:
@@ -11,7 +12,7 @@ dataset:
     url: https://www.oecd.org/termsandconditions/#:~:text=You%20must%20give%20appropriate%20credit,(accessed%20on%20(date)).
   sources:
   - name: Clarke et al. (2022) via OECD (2023)
-    published_by: "Clarke, D., et al. (2022), CO2 Emissions from air transport: A near-real-time global database for policy analysis, OECD Statistics Working Papers, No. 2022/04, OECD Publishing, Paris, https://doi.org/10.1787/ecc9f16b-en."
+    published_by: "Clarke, D., et al. (2022), CO₂ Emissions from air transport: A near-real-time global database for policy analysis, OECD Statistics Working Papers, No. 2022/04, OECD Publishing, Paris, https://doi.org/10.1787/ecc9f16b-en."
     url: https://stats.oecd.org/Index.aspx?DataSetCode=AIRTRANS_CO2#
     date_accessed: '2023-05-18'
     publication_date: January 2023
@@ -19,205 +20,99 @@ dataset:
 tables:
   co2_air_transport:
     variables:
-      africa:
-        title: Africa
-        description: Total CO2 emissions from international aviation
-        unit: tonnes
-        short_unit: t
-        display:
-          numDecimalPlaces: 0
-      asia:
-        title: Asia
-        description: Total CO2 emissions from international aviation
-        unit: tonnes
-        short_unit: t
-        display:
-          numDecimalPlaces: 0
-      europe:
-        title: Europe
-        description: Total CO2 emissions from international aviation
-        unit: tonnes
-        short_unit: t
-        display:
-          numDecimalPlaces: 0
-      north_america:
-        title: North America
-        description: Total CO2 emissions from international aviation
-        unit: tonnes
-        short_unit: t
-        display:
-          numDecimalPlaces: 0
-      oceania:
-        title: Oceania
-        description: Total CO2 emissions from international aviation
-        unit: tonnes
-        short_unit: t
-        display:
-          numDecimalPlaces: 0
-      south_america:
-        title: South America
-        description: Total CO2 emissions from international aviation.
-        unit: tonnes
-        short_unit: t
-        display:
-          numDecimalPlaces: 0
-      world:
-        title: World
-        description: Total CO2 emissions from international aviation
-        unit: tonnes
-        short_unit: t
-        display:
-          numDecimalPlaces: 0
       ter_dom_a:
-        title: Annual CO2 emissions from domestic aviation
-        description: Domestic aviation represents flights which depart and arrive within the same country.
+        title: Annual CO₂ emissions from domestic aviation
+        description: Domestic aviation represents flights which depart and arrive within the same country. CO₂ emissions from commercial passenger flights only.
         unit: tonnes
         short_unit: t
         display:
           numDecimalPlaces: 0
       ter_int_a:
-        title: Annual CO2 emissions from international aviation
+        title: Annual CO₂ emissions from international aviation
+        description: International aviation emissions are assigned to the country of departure.  CO₂ emissions from commercial passenger flights only.
         unit: tonnes
         short_unit: t
         display:
           numDecimalPlaces: 0
       per_capita_ter_dom_a:
-        title: Per capita CO2 emissions from domestic aviation
+        title: Per capita CO₂ emissions from domestic aviation
         unit: kilograms
-        description: Domestic aviation represents flights which depart and arrive within the same country.  The term "per capita" indicates that the emissions are calculated on a per-person basis, taking into account the total population of the country. By using this measurement, we can understand the average amount of CO2 emissions attributed to each individual as a result of domestic air travel.
+        description: >
+          Domestic aviation represents flights which depart and arrive within the same country.  The term "per capita" indicates that the emissions are calculated on a per-person basis, taking into account the total population of the country. By using this measurement, we can understand the average amount of CO₂ emissions attributed to each individual as a result of domestic air travel.
+
+
+          CO₂ emissions from commercial passenger flights only.
         short_unit: kg
         display:
           numDecimalPlaces: 0
       per_capita_ter_int_a:
-        title: Per capita CO2 emissions from international aviation.
-        descripton: International aviation emissions are assigned to the country of departure. The term "per capita" indicates that the emissions are calculated on a per-person basis, taking into account the total population of the country. By using this measurement, we can understand the average amount of CO2 emissions attributed to each individual as a result of domestic air travel.
+        title: Per capita CO₂ emissions from international aviation.
+        descripton: >
+          International aviation emissions are assigned to the country of departure. The term "per capita" indicates that the emissions are calculated on a per-person basis, taking into account the total population of the country. By using this measurement, we can understand the average amount of CO₂ emissions attributed to each individual as a result of domestic air travel.
+
+
+          CO₂ emissions from commercial passenger flights only.
         unit: kilograms
         short_unit: kg
         display:
           numDecimalPlaces: 0
       int_inb_out_per_capita:
-        title: Per capita CO2 emissions from international flights, international tourism-adjusted
+        title: Per capita CO₂ emissions from international flights, international tourism-adjusted.
         source:  Clarke et al. (2022) via OECD (2023);  United Nations World Tourism Organization (UNWTO, 2023)
         description: >
-          International aviation emissions are assigned to the country of departure. The term "per capita" indicates that the emissions are calculated on a per-person basis, taking into account the total population of the country. By using this measurement, we can understand the average amount of CO2 emissions attributed to each individual as a result of domestic air travel.
+          International aviation emissions are assigned to the country of departure. The term "per capita" indicates that the emissions are calculated on a per-person basis, taking into account the total population of the country. By using this measurement, we can understand the average amount of CO₂ emissions attributed to each individual as a result of domestic air travel.
 
-          Data on carbon dioxide emissions from aviation are sourced from the OECD Air Transport CO2 Emissions database.
+
+          Data on carbon dioxide emissions from aviation are sourced from the OECD Air Transport CO₂ Emissions database.
+
 
           Our World in Data has calculated per capita aviation emissions by dividing these values by population figures for each country.
 
-          These per capita footprints do not necessarily reflect the amount of travel by locals in a given location. This is especially true if a country has high tourist volumes: much of the departures will result from travellers rather than local residents. We have therefore also calculated 'adjusted' aviation footprints by multiplying per capita international CO2 emissions by an adjustment factor.
-          This adjustment factor is taken as the ratio between outbound and inbound tourist trips sourced from United Nations World Tourism Organization (UNWTO, 2023).  A high ratio of outbound-to-inbound tourist trips indicates that a country receives less visitors than its residents travel abroad. This results in a relatively lower burden of emissions from international flights being allocated to the country whose residents don't travel internationally as frequently.
+
+          These per capita footprints do not necessarily reflect the amount of travel by locals in a given location. This is especially true if a country has high tourist volumes: much of the departures will result from travellers rather than local residents. We have therefore also calculated 'adjusted' aviation footprints by multiplying per capita international CO₂ emissions by an adjustment factor. This adjustment factor is taken as the ratio between outbound and inbound tourist trips sourced from United Nations World Tourism Organization (UNWTO, 2023).  A high ratio of outbound-to-inbound tourist trips indicates that a country receives less visitors than its residents travel abroad. This results in a relatively lower burden of emissions from international flights being allocated to the country whose residents don't travel internationally as frequently.
+
 
           Note that when an individual visits/leaves a country multiple times within a year, each visit is counted as a separate trip.
+
+
+          CO₂ emissions from commercial passenger flights only.
         unit: kilograms
         short_unit: kg
         display:
           numDecimalPlaces: 0
       int_inb_out_tot:
-        title: CO2 emissions from international flights, international tourism-adjusted
+        title: CO₂ emissions from international flights, international tourism-adjusted
         unit: kilograms
         short_unit: kg
         display:
           numDecimalPlaces: 0
       ter_dom_m:
-        title: Monthly CO2 emissions from domestic aviation
-        description: Domestic aviation represents flights which depart and arrive within the same country.
+        title: Monthly CO₂ emissions from domestic aviation
+        description: Domestic aviation represents flights which depart and arrive within the same country. CO₂ emissions from commercial passenger flights only.
         unit: tonnes
         short_unit: t
         display:
           numDecimalPlaces: 0
           zeroDay: '2019-01-01'
           yearIsDay: true
-      january:
-        title: January
-        description: Total CO2 emissions from international aviation
-        unit: tonnes
-        short_unit: t
-        display:
-          numDecimalPlaces: 0
-      february:
-        title: February
-        description: Total CO2 emissions from international aviation
-        unit: tonnes
-        short_unit: t
-        display:
-          numDecimalPlaces: 0
-      march:
-        title: March
-        description: Total CO2 emissions from international aviation
-        unit: tonnes
-        short_unit: t
-        display:
-          numDecimalPlaces: 0
-      april:
-        title: April
-        description: Total CO2 emissions from international aviation
-        unit: tonnes
-        short_unit: t
-        display:
-          numDecimalPlaces: 0
-      may:
-        title: May
-        unit: tonnes
-        short_unit: t
-        display:
-          numDecimalPlaces: 0
-      june:
-        title: June
-        description: Total CO2 emissions from international aviation
-        unit: tonnes
-        short_unit: t
-        display:
-          numDecimalPlaces: 0
-      july:
-        title: July
-        description: Total CO2 emissions from international aviation
-        unit: tonnes
-        short_unit: t
-        display:
-          numDecimalPlaces: 0
-      august:
-        title: August
-        description: Total CO2 emissions from international aviation
-        unit: tonnes
-        short_unit: t
-        display:
-          numDecimalPlaces: 0
-      september:
-        title: September
-        description: Total CO2 emissions from international aviation
-        unit: tonnes
-        short_unit: t
-        display:
-          numDecimalPlaces: 0
-      october:
-        title: October
-        description: Total CO2 emissions from international aviation
-        unit: tonnes
-        short_unit: t
-        display:
-          numDecimalPlaces: 0
-      november:
-        title: November
-        description: Total CO2 emissions from international aviation
-        unit: tonnes
-        short_unit: t
-        display:
-          numDecimalPlaces: 0
-      december:
-        title: December
-        description: Total CO2 emissions from international aviation
-        unit: tonnes
-        short_unit: t
-        display:
-          numDecimalPlaces: 0
       ter_int_m:
-        title: Monthly CO2 emissions from international aviation
+        title: Monthly CO₂ emissions from international aviation
         unit: tonnes
         short_unit: t
-        description: International aviation emissions are assigned to the country of departure.
+        description: International aviation emissions are assigned to the country of departure. CO₂ emissions from commercial passenger flights only.
         display:
           numDecimalPlaces: 0
           zeroDay: '2019-01-01'
           yearIsDay: true
+
+      total_monthly_emissions:
+        title: Monthly CO₂ total emissions from aviation
+        unit: tonnes
+        short_unit: t
+        description:  Includes emissions from both domestic and international aviation. International aviation emissions are assigned to the country of departure. CO₂ emissions from commercial passenger flights only.
+        display:
+          numDecimalPlaces: 0
+          zeroDay: '2019-01-01'
+          yearIsDay: true
+
 

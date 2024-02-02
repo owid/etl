@@ -1,7 +1,10 @@
 dataset:
-  title: How worried are Americans about being automated out of a job? (YouGov, 2023)
-  description: &description-yougov_job_automation |
-      Biannual tracking of Americans' level of concern regarding job automation replacing their employment. The provided results are weighted to ensure they are representative of the United States population across various demographic factors. The weighting is based on factors such as age, gender, race, education, region, political party affiliation, and income level. This weighting process helps to account for the diversity within the population and ensures that the results reflect a broader representation of the United States as a whole. Next update in July. Each wave comprises responses from 460 to 495 working US adults.
+  title: How worried are Americans about being automated out of a job? (YouGov, June 2023)
+  description: &description-yougov_job_automation >
+    Biannual tracking of Americans' level of concern regarding job automation replacing their employment. The provided results are weighted to ensure they are representative of the United States population across various demographic factors.
+
+
+    The weighting is based on factors such as age, gender, race, education, region, political party affiliation, and income level. This weighting process helps to account for the diversity within the population and ensures that the results reflect a broader representation of the United States as a whole. Next update in January. Each wave comprises responses from 460 to 495 working US adults.
   licenses:
   - name: Public Data
   sources:
@@ -16,200 +19,43 @@ dataset:
 tables:
   yougov_job_automation:
     variables:
-      question:
-        title: How worried are you, if at all, that your type of work could be automated within your lifetime?
-      days_since_2021:
-        title: Number of days since 2021-01-01
-        unit: days
-      answers_age_18_29:
-        title: 18-29 years old
+      dont_know:
+        title: Don't know
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
           zeroDay: '2021-01-01'
           yearIsDay: true
-      education_2_year:
-        title:  2-years of post-secondary education
+      fairly_worried:
+        title: Fairly worried
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
           zeroDay: '2021-01-01'
           yearIsDay: true
-      answers_age_30_44:
-        title: 30-44 years old
+      not_very_worried:
+        title: Not very worried
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
           zeroDay: '2021-01-01'
           yearIsDay: true
-      education_4_year:
-        title: 4-years of post-secondary education
+      not_worried_at_all:
+        title: Not worried at all
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
           zeroDay: '2021-01-01'
           yearIsDay: true
-      answers_age_45_64:
-        title: 45-64 years old
+      very_worried:
+        title: Very worried
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
-          zeroDay: '2021-01-01'
-          yearIsDay: true
-      answers_age_65plus:
-        title: 65+ years old
-        unit: '%'
-        short_unit: '%'
-        display:
-          numDecimalPlaces: 0
-          zeroDay: '2021-01-01'
-          yearIsDay: true
-      all_adults:
-        title: All adults
-        unit: '%'
-        short_unit: '%'
-        display:
-          numDecimalPlaces: 0
-          zeroDay: '2021-01-01'
-          yearIsDay: true
-      asian:
-        title: Asian
-        unit: '%'
-        short_unit: '%'
-        display:
-          numDecimalPlaces: 0
-          zeroDay: '2021-01-01'
-          yearIsDay: true
-      black:
-        title: Black
-        unit: '%'
-        short_unit: '%'
-        display:
-          numDecimalPlaces: 0
-          zeroDay: '2021-01-01'
-          yearIsDay: true
-      democrat:
-        title: Democrat
-        unit: '%'
-        short_unit: '%'
-        display:
-          numDecimalPlaces: 0
-          zeroDay: '2021-01-01'
-          yearIsDay: true
-      female:
-        title: Female
-        unit: '%'
-        short_unit: '%'
-        display:
-          numDecimalPlaces: 0
-          zeroDay: '2021-01-01'
-          yearIsDay: true
-      high_school_graduate:
-        title: High school graduates
-        unit: '%'
-        short_unit: '%'
-        display:
-          numDecimalPlaces: 0
-          zeroDay: '2021-01-01'
-          yearIsDay: true
-      hispanic:
-        title: Hispanic
-        unit: '%'
-        short_unit: '%'
-        display:
-          numDecimalPlaces: 0
-          zeroDay: '2021-01-01'
-          yearIsDay: true
-      independent:
-        title: Independent
-        unit: '%'
-        short_unit: '%'
-        display:
-          numDecimalPlaces: 0
-          zeroDay: '2021-01-01'
-          yearIsDay: true
-      male:
-        title: Male
-        unit: '%'
-        short_unit: '%'
-        display:
-          numDecimalPlaces: 0
-          zeroDay: '2021-01-01'
-          yearIsDay: true
-      middle_eastern:
-        title: Middle Eastern
-        unit: '%'
-        short_unit: '%'
-        display:
-          numDecimalPlaces: 0
-          zeroDay: '2021-01-01'
-          yearIsDay: true
-      native_american:
-        title: Native American
-        unit: '%'
-        short_unit: '%'
-        display:
-          numDecimalPlaces: 0
-          zeroDay: '2021-01-01'
-          yearIsDay: true
-      no_hs:
-        title: No high school education
-        unit: '%'
-        short_unit: '%'
-        display:
-          numDecimalPlaces: 0
-          zeroDay: '2021-01-01'
-          yearIsDay: true
-      other:
-        title: Other
-        unit: '%'
-        short_unit: '%'
-        display:
-          numDecimalPlaces: 0
-          zeroDay: '2021-01-01'
-          yearIsDay: true
-      post_grad:
-        title: Post-grad education
-        unit: '%'
-        short_unit: '%'
-        display:
-          numDecimalPlaces: 0
-          zeroDay: '2021-01-01'
-          yearIsDay: true
-      republican:
-        title: Republican
-        unit: '%'
-        short_unit: '%'
-        display:
-          numDecimalPlaces: 0
-          zeroDay: '2021-01-01'
-          yearIsDay: true
-      some_college:
-        title: Some college
-        unit: '%'
-        short_unit: '%'
-        display:
-          numDecimalPlaces: 0
-          zeroDay: '2021-01-01'
-          yearIsDay: true
-      two_or_more_races:
-        title: Two or more races
-        unit: '%'
-        short_unit: '%'
-        display:
-          numDecimalPlaces: 0
-          zeroDay: '2021-01-01'
-          yearIsDay: true
-      white:
-        title: White
-        unit: '%'
-        short_unit: '%'
-        display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
           zeroDay: '2021-01-01'
           yearIsDay: true

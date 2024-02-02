@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2296
+    date_accessed: 2023-08-14 05:44:40.204648
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2296_trichuriasis (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 30718abae7c73ca63a2daf8a7cc22588
+  size: 32419
+  path: dataset_2296_trichuriasis_config.json

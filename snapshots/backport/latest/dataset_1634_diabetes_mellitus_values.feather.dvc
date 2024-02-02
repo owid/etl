@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1634
+    date_accessed: 2023-08-16 08:14:53.298524
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Diabetes mellitus
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: d053741f5966f778dd76a9869faafd2c
+  size: 2012042
+  path: dataset_1634_diabetes_mellitus_values.feather

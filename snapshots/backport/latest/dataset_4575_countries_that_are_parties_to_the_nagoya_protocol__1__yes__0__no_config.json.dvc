@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4575
+    date_accessed: 2023-08-14 15:42:21.151355
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_4575_countries_that_are_parties_to_the_nagoya_protocol__1__yes__0__no
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 86e096d7bf450d10dd51e923e8e6d376
+  size: 14709
+  path: 
+    dataset_4575_countries_that_are_parties_to_the_nagoya_protocol__1__yes__0__no_config.json

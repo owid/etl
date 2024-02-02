@@ -27,9 +27,31 @@ def test_dict_mixin():
     assert Dog(age=10).to_dict() == {"age": 10}
 
 
+def test_dict_mixin_nested():
+    @meta.pruned_json
+    @dataclass_json
+    @dataclass
+    class Cat:
+        name: Optional[str] = None
+        age: Optional[int] = None
+
+    @meta.pruned_json
+    @dataclass_json
+    @dataclass
+    class Dog:
+        name: Optional[str] = None
+        age: Optional[int] = None
+        cat: Optional[Cat] = None
+
+        def to_dict(self) -> Dict[str, Any]:
+            ...
+
+    assert Dog(name="fred", cat=Cat(name="cred")).to_dict() == {"name": "fred", "cat": {"name": "cred"}}
+
+
 def test_empty_dataset_metadata():
     d1 = meta.DatasetMeta()
-    assert d1.to_dict() == {"is_public": True}
+    assert d1.to_dict() == {"is_public": True, "non_redistributable": False}
 
 
 def test_dataset_version():
@@ -77,3 +99,11 @@ def test_load_license_from_dict():
     }
     license = meta.License.from_dict(d)
     assert license.url == d["url"]
+
+
+def test_Origin_date_published():
+    assert meta.Origin(producer="p", title="a", date_published="2020-01-01").date_published == "2020-01-01"  # type: ignore
+    assert meta.Origin(producer="p", title="a", date_published="2020").date_published == "2020"  # type: ignore
+    assert meta.Origin(producer="p", title="a", date_published="latest").date_published == "latest"  # type: ignore
+    with pytest.raises(ValueError):
+        assert meta.Origin(producer="p", title="a", date_published="nope")  # type: ignore

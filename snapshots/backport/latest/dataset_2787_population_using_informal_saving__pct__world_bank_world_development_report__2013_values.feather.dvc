@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2787
+    date_accessed: 2023-08-16 08:16:01.706871
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Population using informal saving (%) - World Bank World Development Report
+    (2013)
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: a211e2d06b303d1c648e829f06146f9e
+  size: 10450
+  path: 
+    dataset_2787_population_using_informal_saving__pct__world_bank_world_development_report__2013_values.feather

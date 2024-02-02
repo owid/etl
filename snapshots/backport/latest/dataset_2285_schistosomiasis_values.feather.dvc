@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2285
+    date_accessed: 2023-08-16 10:06:51.859539
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Schistosomiasis
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: d0714d1c3255eb56fd37a0af85b662a5
+  size: 432418
+  path: dataset_2285_schistosomiasis_values.feather

@@ -8,8 +8,18 @@ dataset:
     url: https://creativecommons.org/licenses/by-sa/4.0/
   sources:
   - name: Papers With Code (2023)
-    description: The goal of Papers With Code website is to compile a comprehensive collection of ML papers, code implementations,
-      datasets, methods, and evaluation tables, all made freely available.
+    description: >
+            The goal of Papers With Code website is to compile a comprehensive collection of ML papers, code implementations, datasets, methods, and evaluation tables, all made freely available.
+
+
+            The comparisons to human performance are very approximate and based on small samples of people — they are only meant to give a rough comparison. You can read more details in the papers that describe the benchmarks:
+
+
+            -Hendrycks et al (2021) Measuring Massive Multitask Language Understanding (MMLU) (page 3): https://arxiv.org/pdf/2009.03300.pdf
+
+
+            -Hendrycks et al (2021) Measuring Mathematical Problem Solving With the MATH Dataset (page 5): https://arxiv.org/pdf/2103.03874v2.pdf
+
     url: https://paperswithcode.com/
     source_data_url: https://paperswithcode.com/
     date_accessed: '2023-06-14'
@@ -27,10 +37,11 @@ tables:
 
           The coding tasks included in this benchmark are sourced from open-access coding websites such as Codeforces and Kattis. These tasks span a range of difficulty levels, from introductory to collegiate competition level. The benchmark evaluates the accuracy of models in solving programming tasks specifically designed for coding competitions.
         display:
-          name: Coding - competitions
-          numDecimalPlaces: 0
+          name: Coding competitions
+          numDecimalPlaces: 1
           zeroDay: '2019-01-01'
           yearIsDay: true
+
       performance_code_any_interview_state_of_the_art:
         title: Coding performance on interviews - state of the art
         description: >
@@ -40,8 +51,8 @@ tables:
         unit: '%'
         short_unit: '%'
         display:
-          name: Coding - interviews
-          numDecimalPlaces: 0
+          name: Coding interviews
+          numDecimalPlaces: 1
           zeroDay: '2019-01-01'
           yearIsDay: true
 
@@ -55,7 +66,7 @@ tables:
         short_unit: '%'
         display:
           name: Humanities
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
           zeroDay: '2019-01-01'
           yearIsDay: true
 
@@ -68,8 +79,8 @@ tables:
         unit: '%'
         short_unit: '%'
         display:
-          name: Average
-          numDecimalPlaces: 0
+          name: All knowledge tests
+          numDecimalPlaces: 1
           zeroDay: '2019-01-01'
           yearIsDay: true
 
@@ -83,7 +94,7 @@ tables:
         short_unit: '%'
         display:
           name: Math
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
           zeroDay: '2019-01-01'
           yearIsDay: true
 
@@ -96,8 +107,8 @@ tables:
         unit: '%'
         short_unit: '%'
         display:
-          name: Other
-          numDecimalPlaces: 0
+          name: Other subjects
+          numDecimalPlaces: 1
           zeroDay: '2019-01-01'
           yearIsDay: true
 
@@ -111,7 +122,7 @@ tables:
         short_unit: '%'
         display:
           name: Social Sciences
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
           zeroDay: '2019-01-01'
           yearIsDay: true
 
@@ -125,7 +136,7 @@ tables:
         short_unit: '%'
         display:
           name: STEM
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
           zeroDay: '2019-01-01'
           yearIsDay: true
 
@@ -143,8 +154,8 @@ tables:
         unit: '%'
         short_unit: '%'
         display:
-          name: Top-1
-          numDecimalPlaces: 0
+          name: Top-1 accuracy
+          numDecimalPlaces: 1
           zeroDay: '2019-01-01'
           yearIsDay: true
 
@@ -172,9 +183,9 @@ tables:
         unit: '%'
         short_unit: '%'
         display:
-          name: Top-5
+          name: Top-5 accuracy
 
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
           zeroDay: '2019-01-01'
           yearIsDay: true
 
@@ -184,8 +195,8 @@ tables:
         unit: '%'
         short_unit: '%'
         display:
-          name: Atari
-          numDecimalPlaces: 0
+          name: Average score relative to humans (100%)
+          numDecimalPlaces: 1
           zeroDay: '2019-01-01'
           yearIsDay: true
 

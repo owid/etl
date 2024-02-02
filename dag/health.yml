@@ -2,14 +2,14 @@ steps:
   # Health
   data://garden/owid/latest/covid:
     - etag://raw.githubusercontent.com/owid/covid-19-data/master/public/data/owid-covid-data.csv
-  # Death completion (Karlinsky,2021)
-  data://meadow/health/2022-12-28/deaths_karlinsky:
-    - snapshot://health/2022-12-28/deaths_karlinsky.csv
-  data://garden/health/2022-12-28/deaths_karlinsky:
-    - data://meadow/health/2022-12-28/deaths_karlinsky
-    - data://garden/owid/latest/key_indicators
-  data://grapher/health/2022-12-28/deaths_karlinsky:
-    - data://garden/health/2022-12-28/deaths_karlinsky
+  # Death completion (Karlinsky,2023)
+  data://meadow/health/2023-08-16/deaths_karlinsky:
+    - snapshot://health/2023-08-16/deaths_karlinsky.csv
+  data://garden/health/2023-08-16/deaths_karlinsky:
+    - data://meadow/health/2023-08-16/deaths_karlinsky
+    - data://garden/demography/2023-03-31/population
+  data://grapher/health/2023-08-16/deaths_karlinsky:
+    - data://garden/health/2023-08-16/deaths_karlinsky
 
   # WHO Vaccination data
   data://meadow/who/2022-07-17/who_vaccination:
@@ -32,6 +32,7 @@ steps:
     - data://meadow/who/2022-09-30/ghe
     - data://garden/un/2022-07-11/un_wpp
     - data://garden/regions/2023-01-01/regions
+    - snapshot://who/2023-07-14/standard_age_distribution.csv
   data://grapher/who/2022-09-30/ghe:
     - data://garden/who/2022-09-30/ghe
 
@@ -46,59 +47,79 @@ steps:
   data://grapher/who/2023-03-09/gho_suicides:
     - data://garden/who/2023-03-09/gho_suicides
 
-  # IHME Global Burden of Disease
+  # IHME Global Burden of Disease - Child mortality long run
   data://meadow/ihme_gbd/2020-12-19/child_mortality:
     - walden://ihme_gbd/2020-12-19/child_mortality
   data://garden/ihme_gbd/2020-12-19/child_mortality:
     - data://meadow/ihme_gbd/2020-12-19/child_mortality
   data://grapher/ihme_gbd/2020-12-19/child_mortality:
     - data://garden/ihme_gbd/2020-12-19/child_mortality
+
+  # IHME Global Burden of Disease - Deaths and DALYs
   data://meadow/ihme_gbd/2019/gbd_cause:
     - walden://ihme_gbd/2019/gbd_cause
-  data://meadow/ihme_gbd/2019/gbd_child_mortality:
-    - walden://ihme_gbd/2019/gbd_child_mortality
-  data://meadow/ihme_gbd/2019/gbd_mental_health:
-    - walden://ihme_gbd/2019/gbd_mental_health
-  data://meadow/ihme_gbd/2019/gbd_risk:
-    - walden://ihme_gbd/2019/gbd_risk
-  data://meadow/ihme_gbd/2019/gbd_prevalence:
-    - walden://ihme_gbd/2019/gbd_prevalence
   data://garden/ihme_gbd/2019/gbd_cause:
     - data://meadow/ihme_gbd/2019/gbd_cause
-  data://garden/ihme_gbd/2019/gbd_risk:
-    - data://meadow/ihme_gbd/2019/gbd_risk
-  data://garden/ihme_gbd/2019/gbd_child_mortality:
-    - data://meadow/ihme_gbd/2019/gbd_child_mortality
-  data://garden/ihme_gbd/2019/gbd_mental_health:
-    - data://meadow/ihme_gbd/2019/gbd_mental_health
-  data://garden/ihme_gbd/2019/gbd_prevalence:
-    - data://meadow/ihme_gbd/2019/gbd_prevalence
   data://grapher/ihme_gbd/2019/gbd_cause:
     - data://garden/ihme_gbd/2019/gbd_cause
-  data://grapher/ihme_gbd/2019/gbd_prevalence:
-    - data://garden/ihme_gbd/2019/gbd_prevalence
+
+  # IHME Global Burden of Disease - Child mortality
+  data://meadow/ihme_gbd/2019/gbd_child_mortality:
+    - walden://ihme_gbd/2019/gbd_child_mortality
+  data://garden/ihme_gbd/2019/gbd_child_mortality:
+    - data://meadow/ihme_gbd/2019/gbd_child_mortality
   data://grapher/ihme_gbd/2019/gbd_child_mortality:
     - data://garden/ihme_gbd/2019/gbd_child_mortality
+
+  # IHME Global Burden of Disease - Mental health
+  data://meadow/ihme_gbd/2019/gbd_mental_health:
+    - walden://ihme_gbd/2019/gbd_mental_health
+  data://garden/ihme_gbd/2019/gbd_mental_health:
+    - data://meadow/ihme_gbd/2019/gbd_mental_health
+  data://grapher/ihme_gbd/2019/gbd_mental_health:
+    - data://garden/ihme_gbd/2019/gbd_mental_health
+
+  # IHME Global Burden of Disease - Risk factors
+  data://meadow/ihme_gbd/2019/gbd_risk:
+    - walden://ihme_gbd/2019/gbd_risk
+  data://garden/ihme_gbd/2019/gbd_risk:
+    - data://meadow/ihme_gbd/2019/gbd_risk
+  data://grapher/ihme_gbd/2019/gbd_risk:
+    - data://garden/ihme_gbd/2019/gbd_risk
+
+  # IHME Global Burden of Disease - Prevalence and incidence
+  data://meadow/ihme_gbd/2019/gbd_prevalence:
+    - walden://ihme_gbd/2019/gbd_prevalence
+  data://garden/ihme_gbd/2019/gbd_prevalence:
+    - data://meadow/ihme_gbd/2019/gbd_prevalence
+  data://grapher/ihme_gbd/2019/gbd_prevalence:
+    - data://garden/ihme_gbd/2019/gbd_prevalence
+
+  # IHME GBD Mental Health Prevalence
   data://meadow/ihme_gbd/2023-05-15/gbd_mental_health_prevalence_rate:
     - snapshot://ihme_gbd/2023-05-15/gbd_mental_health_prevalence_rate.zip
   data://garden/ihme_gbd/2023-05-15/gbd_mental_health_prevalence_rate:
     - data://meadow/ihme_gbd/2023-05-15/gbd_mental_health_prevalence_rate
   data://grapher/ihme_gbd/2023-05-15/gbd_mental_health_prevalence_rate:
     - data://garden/ihme_gbd/2023-05-15/gbd_mental_health_prevalence_rate
-  # DALYs vs Prevalence
+
+  # IHME GBD Mental Health DALYs vs Prevalence
   data://garden/ihme_gbd/2023-06-14/prevalence_dalys_world:
     - data://garden/ihme_gbd/2023-05-15/gbd_mental_health_prevalence_rate
     - data://garden/ihme_gbd/2019/gbd_cause
   data://grapher/ihme_gbd/2023-06-14/prevalence_dalys_world:
     - data://garden/ihme_gbd/2023-06-14/prevalence_dalys_world
 
-  # Temporary additional to add Drug Disorders to grapher
-  data-private://meadow/ihme_gbd/2023-03-29/gbd_drug_disorders:
-    - snapshot-private://ihme_gbd/2023-03-29/gbd_drug_disorders.csv
-  data-private://garden/ihme_gbd/2023-03-29/gbd_drug_disorders:
-    - data-private://meadow/ihme_gbd/2023-03-29/gbd_drug_disorders
-  data-private://grapher/ihme_gbd/2023-03-29/gbd_drug_disorders:
-    - data-private://garden/ihme_gbd/2023-03-29/gbd_drug_disorders
+  # IHME GBD Leading cause of child deaths
+  data://garden/ihme_gbd/2023-10-04/leading_causes_child_deaths:
+    - data://garden/ihme_gbd/2019/gbd_cause
+    - data://meadow/ihme_gbd/2023-10-04/cause_hierarchy
+  data://grapher/ihme_gbd/2023-10-04/leading_causes_child_deaths:
+    - data://garden/ihme_gbd/2023-10-04/leading_causes_child_deaths
+
+  # IHME GBD Cause hierarchy
+  data://meadow/ihme_gbd/2023-10-04/cause_hierarchy:
+    - snapshot://ihme_gbd/2023-10-04/cause_hierarchy.csv
 
   # Postnatal care coverage - World Bank (2022)
   data://meadow/postnatal_care/2022-09-19/postnatal_care:
@@ -196,11 +217,249 @@ steps:
   data://grapher/unicef/2023-06-16/diarrhea:
     - data://garden/unicef/2023-06-16/diarrhea
 
-# Guinea worm
+  # Guinea worm
   data://meadow/who/2023-06-29/guinea_worm:
-  - snapshot://who/2023-06-29/guinea_worm.csv
+    - snapshot://who/2023-06-29/guinea_worm.csv
   data://garden/who/2023-06-29/guinea_worm:
-  - data://meadow/who/2023-06-29/guinea_worm
-  - data://grapher/fasttrack/2023-06-28/guinea_worm
+    - data://meadow/who/2023-06-29/guinea_worm
+    - data://grapher/fasttrack/2023-06-28/guinea_worm
   data://grapher/who/2023-06-30/guinea_worm:
-  - data://garden/who/2023-06-29/guinea_worm
+    - data://garden/who/2023-06-29/guinea_worm
+
+  # Autopsies WHO-Europe
+  data://meadow/who/2023-07-13/autopsy:
+    - snapshot://who/2022-09-01/autopsy.csv
+  data://garden/who/2023-07-13/autopsy:
+    - data://meadow/who/2023-07-13/autopsy
+  data://grapher/who/2023-07-13/autopsy:
+    - data://garden/who/2023-07-13/autopsy
+    - snapshot://fasttrack/2023-04-30/paratz.csv
+
+  # UN Comtrade
+  data://meadow/un/2023-08-02/comtrade_pandemics:
+    - snapshot://un/2023-08-02/comtrade_pandemics_1987_1998.csv
+    - snapshot://un/2023-08-02/comtrade_pandemics_1999_2010.csv
+    - snapshot://un/2023-08-02/comtrade_pandemics_2011_2022.csv
+  data://garden/un/2023-08-02/comtrade_pandemics:
+    - data://meadow/un/2023-08-02/comtrade_pandemics
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/demography/2023-03-31/population
+  data://grapher/un/2023-08-10/comtrade_pandemics:
+    - data://garden/un/2023-08-02/comtrade_pandemics
+
+  # WHO Mortality Database - 1st level causes
+  data://meadow/who/2023-08-01/mortality_database:
+    - snapshot://who/2023-08-01/mortality_database.csv
+  data://garden/who/2023-08-01/mortality_database:
+    - data://meadow/who/2023-08-01/mortality_database
+  data://grapher/who/2023-08-01/mortality_database:
+    - data://garden/who/2023-08-01/mortality_database
+
+  # WHO Mortality DB - ICD Codes
+  data://meadow/who/2023-08-04/icd_codes:
+    - snapshot://who/2023-08-04/icd_codes.zip
+  data://garden/who/2023-08-04/icd_codes:
+    - data://meadow/who/2023-08-04/icd_codes
+  data://grapher/who/2023-08-04/icd_codes:
+    - data://garden/who/2023-08-04/icd_codes
+
+  # UNAIDS
+  data://meadow/health/2023-08-09/unaids:
+    - snapshot://health/2023-08-09/unaids.csv
+  data://meadow/health/2023-08-11/unaids_hiv_children:
+    - snapshot://health/2023-08-11/unaids_hiv_children.xlsx
+  data://meadow/health/2023-08-22/unaids_deaths_averted_art:
+    - snapshot://health/2023-08-22/unaids_deaths_averted_art.xlsx
+  data://meadow/health/2023-08-22/unaids_gap_art:
+    - snapshot://health/2023-08-22/unaids_gap_art.xlsx
+  data://meadow/health/2023-08-22/unaids_condom_msm:
+    - snapshot://health/2023-08-22/unaids_condom_msm.xlsx
+
+  data://garden/health/2023-08-09/unaids:
+    - data://meadow/health/2023-08-09/unaids
+    - data://meadow/health/2023-08-11/unaids_hiv_children
+    - data://meadow/health/2023-08-22/unaids_condom_msm
+    - data://meadow/health/2023-08-22/unaids_gap_art
+    - data://meadow/health/2023-08-22/unaids_deaths_averted_art
+    - data://garden/demography/2023-03-31/population
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2023-04-30/income_groups
+
+  data://grapher/health/2023-08-09/unaids:
+    - data://garden/health/2023-08-09/unaids
+
+  # OECD Road accidents
+  data://meadow/oecd/2023-08-11/road_accidents:
+    - snapshot://oecd/2023-08-11/road_accidents.csv
+  data://garden/oecd/2023-08-11/road_accidents:
+    - data://meadow/oecd/2023-08-11/road_accidents
+    - data://garden/oecd/2018-03-11/road_deaths_and_injuries
+  data://grapher/oecd/2023-08-11/road_accidents:
+    - data://garden/oecd/2023-08-11/road_accidents
+
+  # WHO Avian Influenza H5N1
+
+  data://meadow/who/2023-08-14/avian_influenza_ah5n1:
+    - snapshot://who/2023-08-14/avian_influenza_ah5n1.csv
+  data://garden/who/2023-08-14/avian_influenza_ah5n1:
+    - data://meadow/who/2023-08-14/avian_influenza_ah5n1
+    - data://garden/regions/2023-01-01/regions
+  data://grapher/who/2023-08-14/avian_influenza_ah5n1:
+    - data://garden/who/2023-08-14/avian_influenza_ah5n1
+
+  # Kucharski
+  data://meadow/health/2023-08-14/avian_influenza_h5n1_kucharski:
+    - snapshot://health/2023-08-14/avian_influenza_h5n1_kucharski.xlsx
+  data://garden/health/2023-08-14/avian_influenza_h5n1_kucharski:
+    - data://meadow/health/2023-08-14/avian_influenza_h5n1_kucharski
+    - data://garden/regions/2023-01-01/regions
+  data://grapher/health/2023-08-14/avian_influenza_h5n1_kucharski:
+    - data://garden/health/2023-08-14/avian_influenza_h5n1_kucharski
+
+  # European Society for Cardiology datasets
+  data://meadow/cardiovascular_diseases/2023-10-10/esc:
+    - snapshot://cardiovascular_diseases/2023-10-10/esc.csv
+  data://garden/cardiovascular_diseases/2023-10-10/esc:
+    - data://meadow/cardiovascular_diseases/2023-10-10/esc
+  data://grapher/cardiovascular_diseases/2023-10-10/esc:
+    - data://garden/cardiovascular_diseases/2023-10-10/esc
+
+  # WHO Medical Devices Atlas
+  data://meadow/who/2023-10-13/medical_devices_atlas:
+    - snapshot://who/2023-10-13/medical_devices_atlas_mri.csv
+    - snapshot://who/2023-10-13/medical_devices_atlas_ct.csv
+    - snapshot://who/2023-10-13/medical_devices_atlas_pet.csv
+    - snapshot://who/2023-10-13/medical_devices_atlas_gc_nm.csv
+  data://garden/who/2023-10-13/medical_devices_atlas:
+    - data://meadow/who/2023-10-13/medical_devices_atlas
+  data://grapher/who/2023-10-13/medical_devices_atlas:
+    - data://garden/who/2023-10-13/medical_devices_atlas
+
+  # WHO Cardiovascular diseases deaths
+  ? data://garden/cardiovascular_diseases/2023-11-01/deaths_from_cardiovascular_diseases_vs_other
+  : - data://garden/who/2023-08-01/mortality_database
+  ? data://grapher/cardiovascular_diseases/2023-11-01/deaths_from_cardiovascular_diseases_vs_other
+  : - data://garden/cardiovascular_diseases/2023-11-01/deaths_from_cardiovascular_diseases_vs_other
+
+  # WHO Medical Devices Atlas
+  data://meadow/who/2023-11-01/who_statins:
+    - snapshot://who/2023-11-01/who_statins.csv
+  data://garden/who/2023-11-01/who_statins:
+    - data://meadow/who/2023-11-01/who_statins
+  data://grapher/who/2023-11-01/who_statins:
+    - data://garden/who/2023-11-01/who_statins
+
+  # Tuberculosis burden estimates - WHO
+  data://meadow/tuberculosis/2023-11-27/burden_estimates:
+    - snapshot://tuberculosis/2023-11-27/burden_estimates.csv
+  data://garden/tuberculosis/2023-11-27/burden_estimates:
+    - data://meadow/tuberculosis/2023-11-27/burden_estimates
+    - snapshot://tuberculosis/2023-11-27/data_dictionary.csv
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2023-04-30/income_groups
+    - data://garden/demography/2023-03-31/population
+  data://grapher/tuberculosis/2023-11-27/burden_estimates:
+    - data://garden/tuberculosis/2023-11-27/burden_estimates
+
+  # Tuberculosis budget - WHO
+  data://meadow/tuberculosis/2023-12-01/budget:
+    - snapshot://tuberculosis/2023-12-01/budget.csv
+  data://garden/tuberculosis/2023-11-27/budget:
+    - data://meadow/tuberculosis/2023-12-01/budget
+    - snapshot://tuberculosis/2023-11-27/data_dictionary.csv
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2023-04-30/income_groups
+  data://grapher/tuberculosis/2023-11-27/budget:
+    - data://garden/tuberculosis/2023-11-27/budget
+
+  # Tuberculosis burden disaggregated - WHO
+  data://meadow/tuberculosis/2023-12-04/burden_disaggregated:
+    - snapshot://tuberculosis/2023-12-04/burden_disaggregated.csv
+  data://garden/tuberculosis/2023-11-27/burden_disaggregated:
+    - data://meadow/tuberculosis/2023-12-04/burden_disaggregated
+    - snapshot://tuberculosis/2023-11-27/data_dictionary.csv
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2023-04-30/income_groups
+    - data://garden/demography/2023-03-31/population
+    - data://garden/un/2022-07-11/un_wpp
+  data://grapher/tuberculosis/2023-11-27/burden_disaggregated:
+    - data://garden/tuberculosis/2023-11-27/burden_disaggregated
+
+  # Tuberculosis laboratories - WHO
+  data://meadow/tuberculosis/2023-12-06/laboratories:
+    - snapshot://tuberculosis/2023-12-06/laboratories.csv
+  data://garden/tuberculosis/2023-11-27/laboratories:
+    - data://meadow/tuberculosis/2023-12-06/laboratories
+    - snapshot://tuberculosis/2023-11-27/data_dictionary.csv
+    - data://garden/un/2022-07-11/un_wpp
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2023-04-30/income_groups
+  data://grapher/tuberculosis/2023-11-27/laboratories:
+    - data://garden/tuberculosis/2023-11-27/laboratories
+
+  # Tuberculosis latent - WHO
+  data://meadow/tuberculosis/2023-12-06/latent:
+    - snapshot://tuberculosis/2023-12-06/latent.csv
+  data://garden/tuberculosis/2023-11-27/latent:
+    - data://meadow/tuberculosis/2023-12-06/latent
+  data://grapher/tuberculosis/2023-11-27/latent:
+    - data://garden/tuberculosis/2023-11-27/latent
+
+  # Tuberculosis resistance surveillance - WHO
+  data://meadow/tuberculosis/2023-12-04/drug_resistance_surveillance:
+    - snapshot://tuberculosis/2023-12-04/drug_resistance_surveillance.csv
+  data://garden/tuberculosis/2023-11-27/drug_resistance_surveillance:
+    - data://meadow/tuberculosis/2023-12-04/drug_resistance_surveillance
+    - snapshot://tuberculosis/2023-11-27/data_dictionary.csv
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2023-04-30/income_groups
+  data://grapher/tuberculosis/2023-11-27/drug_resistance_surveillance:
+    - data://garden/tuberculosis/2023-11-27/drug_resistance_surveillance
+
+  # Tuberculosis outcomes - WHO
+  data://meadow/tuberculosis/2023-12-11/outcomes:
+    - snapshot://tuberculosis/2023-12-11/outcomes.csv
+  data://garden/tuberculosis/2023-11-27/outcomes:
+    - data://meadow/tuberculosis/2023-12-11/outcomes
+    - snapshot://tuberculosis/2023-11-27/data_dictionary.csv
+  data://grapher/tuberculosis/2023-11-27/outcomes:
+    - data://garden/tuberculosis/2023-11-27/outcomes
+
+  # Tuberculosis expenditure - WHO
+  data://meadow/tuberculosis/2023-12-05/expenditure:
+    - snapshot://tuberculosis/2023-12-05/expenditure.csv
+  data://garden/tuberculosis/2023-11-27/expenditure:
+    - data://meadow/tuberculosis/2023-12-05/expenditure
+    - snapshot://tuberculosis/2023-11-27/data_dictionary.csv
+  data://grapher/tuberculosis/2023-11-27/expenditure:
+    - data://garden/tuberculosis/2023-11-27/expenditure
+
+  # Tuberculosis notifications - WHO
+  data://meadow/tuberculosis/2023-12-11/notifications:
+    - snapshot://tuberculosis/2023-12-11/notifications.csv
+  data://garden/tuberculosis/2023-11-27/notifications:
+    - data://meadow/tuberculosis/2023-12-11/notifications
+    - snapshot://tuberculosis/2023-11-27/data_dictionary.csv
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2023-04-30/income_groups
+  data://grapher/tuberculosis/2023-11-27/notifications:
+    - data://garden/tuberculosis/2023-11-27/notifications
+
+  # Tuberculosis treatment UN High-Level Meeting commitments - WHO
+  data://meadow/tuberculosis/2023-12-12/unhlm_commitments:
+    - snapshot://tuberculosis/2023-12-12/unhlm_commitments.csv
+  data://garden/tuberculosis/2023-11-27/unhlm_commitments:
+    - data://meadow/tuberculosis/2023-12-12/unhlm_commitments
+    - snapshot://tuberculosis/2023-11-27/data_dictionary.csv
+  data://grapher/tuberculosis/2023-11-27/unhlm_commitments:
+    - data://garden/tuberculosis/2023-11-27/unhlm_commitments
+
+  # Tuberculosis outcomes disaggregated - WHO
+  data://meadow/tuberculosis/2023-12-12/outcomes_disagg:
+    - snapshot://tuberculosis/2023-12-12/outcomes_disagg.csv
+  data://garden/tuberculosis/2023-11-27/outcomes_disagg:
+    - data://meadow/tuberculosis/2023-12-12/outcomes_disagg
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2023-04-30/income_groups
+  data://grapher/tuberculosis/2023-11-27/outcomes_disagg:
+    - data://garden/tuberculosis/2023-11-27/outcomes_disagg

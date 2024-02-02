@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/350
+    date_accessed: 2023-08-16 09:56:25.083744
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_350_causes_of_child_mortality__ihme_global_burden_of_disease_study__2017
+    (archived)
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: ca469601fdacd3fe34b7780d6a18132b
+  size: 2037
+  path: 
+    dataset_350_causes_of_child_mortality__ihme_global_burden_of_disease_study__2017_config.json

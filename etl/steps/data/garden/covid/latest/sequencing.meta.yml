@@ -1,0 +1,64 @@
+dataset:
+  title: COVID-19 - Sequencing
+  description: >-
+    Enabled by data from [![](https://www.gisaid.org/fileadmin/gisaid/img/schild.png)](https://gisaid.org)
+
+
+    Our data on SARS-CoV-2 sequencing and variants is sourced from [GISAID](https://gisaid.org), a global science initiative
+    that provides open-access to genomic data of SARS-CoV-2. We recognize the work of the authors and laboratories responsible
+    for producing this data and sharing it via the GISAID initiative.
+
+
+    Khare, S., et al (2021) GISAID’s Role in Pandemic Response. China CDC Weekly, 3(49): 1049-1051. doi: 10.46234/ccdcw2021.255
+    PMCID: 8668406
+
+
+    Elbe, S. and Buckland-Merrett, G. (2017) Data, disease and diplomacy: GISAID’s innovative contribution to global health.
+    Global Challenges, 1:33-46. doi:10.1002/gch2.1018 PMCID: 31565258
+
+
+    Shu, Y. and McCauley, J. (2017) GISAID: from vision to reality. EuroSurveillance, 22(13) doi:10.2807/1560-7917.ES.2017.22.13.30494
+    PMCID: PMC5388101
+
+
+    We download aggregate-level data via [CoVariants.org](https://covariants.org).
+  sources:
+  - name: GISAID, via CoVariants.org – Last updated {TODAY}
+    url: https://www.gisaid.org/
+    published_by: GISAID, via CoVariants.org – Last updated 2 November 2022
+  non_redistributable: true
+tables:
+  sequencing:
+    variables:
+      num_sequences:
+        title: num_sequences
+        unit: ''
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2020-01-21'
+      num_sequences_cumulative:
+        title: num_sequences_cumulative
+        unit: ''
+        display:
+          yearIsDay: true
+          zeroDay: '2020-01-21'
+      num_sequences_cumulative_per_1m:
+        title: num_sequences_cumulative_per_1M
+        unit: ''
+        display:
+          yearIsDay: true
+          zeroDay: '2020-01-21'
+      num_sequences_per_1m:
+        title: num_sequences_per_1M
+        unit: ''
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2020-01-21'
+      variant_dominant:
+        title: variant_dominant
+        unit: ''
+        display:
+          yearIsDay: true
+          zeroDay: '2020-01-21'

@@ -1,20 +1,17 @@
 meta:
-  namespace: backport
-  short_name: dataset_496_access_to_financial_account_or_services__pct__world_bank__2014_values
-  file_extension: feather
-  date_accessed: 2023-02-23 18:07:46.980709
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/496
+    date_accessed: 2023-08-16 07:23:01.403956
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Access to financial account or services (%) - World Bank (2014)
   description: Proportion of the population with access to an account or financial
     service, either in the form of a financial institution or mobile money-service
     provider
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/496
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 0e0c501bb7356c4608123f32a4ce3535
+- md5: 5dac865520ce47652f22e9eb46a5c092
   size: 15082
-  path: dataset_496_access_to_financial_account_or_services__pct__world_bank__2014_values.feather
+  path: 
+    dataset_496_access_to_financial_account_or_services__pct__world_bank__2014_values.feather

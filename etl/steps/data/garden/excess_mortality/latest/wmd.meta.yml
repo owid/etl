@@ -1,14 +1,14 @@
 tables:
   wmd:
     variables:
-      entity:
-        description: "Country, nation or region name."
-      time:
-        description: "Number of the month or week."
-      time_unit:
-        description: "Time unit can be either 'monthly' or 'weekly', depending on the country."
-      age:
-        description: "Age group. This is always 'all_ages' for this dataset."
+      # entity:
+      #   description: "Country, nation or region name."
+      # time:
+      #   description: "Number of the month or week."
+      # time_unit:
+      #   description: "Time unit can be either 'monthly' or 'weekly', depending on the country."
+      # age:
+      #   description: "Age group. This is always 'all_ages' for this dataset."
       _2015:
         description: "The reported number of weekly deaths from all causes for all ages in 2015."
       _2016:

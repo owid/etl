@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1825
+    date_accessed: 2023-08-10 14:46:05.033264
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1825_short_gestation_for_birth_weight (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 8da57cad60a9220be079d368327b129a
+  size: 22248
+  path: dataset_1825_short_gestation_for_birth_weight_config.json

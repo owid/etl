@@ -1,0 +1,10 @@
+definitions:
+  common:
+    processing_level: major
+    presentation:
+      topic_tags:
+      - Energy
+
+dataset:
+  title: Combined Electricity Data
+  update_period_days: 365

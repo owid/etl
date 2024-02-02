@@ -1,12 +1,35 @@
 dataset:
-  title: Robot intelligence survey (YouGov, 2023)
-  description: &description-yougov_robots |
-     Biannual tracker of Americans' concerns regarding robotic intelligence. Next update is in July. The provided results are weighted to ensure they are representative of the United States population across various demographic factors. The weighting is based on factors such as age, gender, race, education, region, political party affiliation, and income level. This weighting process helps to account for the diversity within the population and ensures that the results reflect a broader representation of the United States as a whole. Each wave comprises responses from 1004 - 1085 US Adults.
+  title: Robot intelligence survey (YouGov, June 2023)
+  description: &desc >
+    Biannual tracker of Americans' concerns regarding robotic intelligence. Next update is in January. The provided results are
+    weighted to ensure they are representative of the United States population across various demographic factors. The weighting
+    is based on factors such as age, gender, race, education, region, political party affiliation, and income level. This
+    weighting process helps to account for the diversity within the population and ensures that the results reflect a broader
+    representation of the United States as a whole. Each wave comprises responses from 1004 - 1085 US Adults.
+
+
+    Respondents were asked, "Which ONE, if any, of the following statements do you MOST agree with
+
+
+
+    - Most robots have already developed higher levels of intelligence than humans
+
+
+    - None of these
+
+
+    - Robots will be able to develop higher levels of intelligence than humans in the future
+
+
+    - Robots will never be able to develop higher levels of intelligence than humans
+
+
+    - Don't know
   licenses:
   - name: Public Data
   sources:
   - name: YouGov
-    description: *description-yougov_robots
+    description: *desc
     url: https://today.yougov.com/topics/politics/trackers/robot-intelligence
     source_data_url: https://today.yougov.com/_pubapis/v5/us/trackers/robot-intelligence/download
     date_accessed: '2023-06-07'
@@ -16,200 +39,50 @@ dataset:
 tables:
   yougov_robots:
     variables:
-      question:
-        title: Which one, if any, of the following statements do you most agree with?
-      days_since_2021:
-        title: Number of days since 2021-01-01
-        unit: days
-      answers_age_18_29:
-        title: 18-29 years old
+      dont_know:
+        title: Don't know
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
           zeroDay: '2021-01-01'
           yearIsDay: true
-      education_2_year:
-        title: 2 years of post-secondary education
+
+      most_robots_have_already_developed_higher_levels_of_intelligence_than_humans:
+        title: Most robots have already developed higher levels of intelligence than humans
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
           zeroDay: '2021-01-01'
           yearIsDay: true
-      answers_age_30_44:
-        title: 30-44 years old
+          name: "Robots smarter than humans now"
+
+      none_of_these:
+        title: None of these
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
           zeroDay: '2021-01-01'
           yearIsDay: true
-      education_4_year:
-        title: 4 years of post-secondary education
+
+      robots_will_be_able_to_develop_higher_levels_of_intelligence_than_humans_in_the_future:
+        title: Robots will be able to develop higher levels of intelligence than humans in the future
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
           zeroDay: '2021-01-01'
           yearIsDay: true
-      answers_age_45_64:
-        title: 45-64 years old
+          name: "Robots will surpass human intelligence in the future"
+
+      robots_will_never_be_able_to_develop_higher_levels_of_intelligence_than_humans:
+        title: Robots will never be able to develop higher levels of intelligence than humans
         unit: '%'
         short_unit: '%'
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 1
           zeroDay: '2021-01-01'
           yearIsDay: true
-      answers_age_65plus:
-        title: 65+ years old
-        unit: '%'
-        short_unit: '%'
-        display:
-          numDecimalPlaces: 0
-          zeroDay: '2021-01-01'
-          yearIsDay: true
-      all_adults:
-        title: All adults
-        unit: '%'
-        short_unit: '%'
-        display:
-          numDecimalPlaces: 0
-          zeroDay: '2021-01-01'
-          yearIsDay: true
-      asian:
-        title: Asian
-        unit: '%'
-        short_unit: '%'
-        display:
-          numDecimalPlaces: 0
-          zeroDay: '2021-01-01'
-          yearIsDay: true
-      black:
-        title: Black
-        unit: '%'
-        short_unit: '%'
-        display:
-          numDecimalPlaces: 0
-          zeroDay: '2021-01-01'
-          yearIsDay: true
-      democrat:
-        title: Democrat
-        unit: '%'
-        short_unit: '%'
-        display:
-          numDecimalPlaces: 0
-          zeroDay: '2021-01-01'
-          yearIsDay: true
-      female:
-        title: Female
-        unit: '%'
-        short_unit: '%'
-        display:
-          numDecimalPlaces: 0
-          zeroDay: '2021-01-01'
-          yearIsDay: true
-      high_school_graduate:
-        title: High school graduates
-        unit: '%'
-        short_unit: '%'
-        display:
-          numDecimalPlaces: 0
-          zeroDay: '2021-01-01'
-          yearIsDay: true
-      hispanic:
-        title: Hispanic
-        unit: '%'
-        short_unit: '%'
-        display:
-          numDecimalPlaces: 0
-          zeroDay: '2021-01-01'
-          yearIsDay: true
-      independent:
-        title: Independent
-        unit: '%'
-        short_unit: '%'
-        display:
-          numDecimalPlaces: 0
-          zeroDay: '2021-01-01'
-          yearIsDay: true
-      male:
-        title: Male
-        unit: '%'
-        short_unit: '%'
-        display:
-          numDecimalPlaces: 0
-          zeroDay: '2021-01-01'
-          yearIsDay: true
-      middle_eastern:
-        title: Middle Eastern
-        unit: '%'
-        short_unit: '%'
-        display:
-          numDecimalPlaces: 0
-          zeroDay: '2021-01-01'
-          yearIsDay: true
-      native_american:
-        title: Native American
-        unit: '%'
-        short_unit: '%'
-        display:
-          numDecimalPlaces: 0
-          zeroDay: '2021-01-01'
-          yearIsDay: true
-      no_hs:
-        title: No high school education
-        unit: '%'
-        short_unit: '%'
-        display:
-          numDecimalPlaces: 0
-          zeroDay: '2021-01-01'
-          yearIsDay: true
-      other:
-        title: Other
-        unit: '%'
-        short_unit: '%'
-        display:
-          numDecimalPlaces: 0
-          zeroDay: '2021-01-01'
-          yearIsDay: true
-      post_grad:
-        title: Post-grad education
-        unit: '%'
-        short_unit: '%'
-        display:
-          numDecimalPlaces: 0
-          zeroDay: '2021-01-01'
-          yearIsDay: true
-      republican:
-        title: Republican
-        unit: '%'
-        short_unit: '%'
-        display:
-          numDecimalPlaces: 0
-          zeroDay: '2021-01-01'
-          yearIsDay: true
-      some_college:
-        title: Some college
-        unit: '%'
-        short_unit: '%'
-        display:
-          numDecimalPlaces: 0
-          zeroDay: '2021-01-01'
-          yearIsDay: true
-      two_or_more_races:
-        title: Two or more races
-        unit: '%'
-        short_unit: '%'
-        display:
-          numDecimalPlaces: 0
-          zeroDay: '2021-01-01'
-          yearIsDay: true
-      white:
-        title: White
-        unit: '%'
-        short_unit: '%'
-        display:
-          numDecimalPlaces: 0
-          zeroDay: '2021-01-01'
-          yearIsDay: true
+          name: "Robots will never surpass human intelligence"

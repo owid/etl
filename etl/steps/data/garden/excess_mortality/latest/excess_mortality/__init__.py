@@ -6,13 +6,12 @@ Both sources are updated weekly.
 This step merges the two datasets into one single dataset, combining metrics from both sources to obtain excess mortality metrics.
 
 """
-from owid.catalog import Dataset, Table
+from input import build_df
+from owid.catalog import Table
+from process import process_df
 from structlog import get_logger
 
 from etl.helpers import PathFinder, create_dataset
-
-from .input import build_df
-from .process import process_df
 
 log = get_logger()
 
@@ -27,9 +26,9 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load dependency datasets.
-    ds_hmd: Dataset = paths.load_dependency("hmd_stmf")
-    ds_wmd: Dataset = paths.load_dependency("wmd")
-    ds_kobak: Dataset = paths.load_dependency("xm_karlinsky_kobak")
+    ds_hmd = paths.load_dataset("hmd_stmf")
+    ds_wmd = paths.load_dataset("wmd")
+    ds_kobak = paths.load_dataset("xm_karlinsky_kobak")
 
     # Build initial dataframe
     df = build_df(ds_hmd, ds_wmd, ds_kobak)
@@ -37,13 +36,21 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
+
+    # HOTFIX: Remove age groups for countries Australia and Canada.
+    # See full extent of reasons for it in https://owid.slack.com/archives/CV5RY8F1B/p1706099289965929
+    # TL;DR: HMD is creating their standard age groups for these countries from an input data that has
+    # different age group binning (bigger bins). This results into unaccurate restimates.
+    df = df[~((df["entity"].isin(["Australia", "Canada"])) & (df["age"] != "all_ages"))]
+
+    # Actual processing
     log.info("excess_mortality: processing data")
     df = process_df(df)
     # Create a new table with the processed data.
     tb_garden = Table(df, short_name=paths.short_name)
 
     # Create dataset
-    ds_garden = create_dataset(dest_dir, tables=[tb_garden])
+    ds_garden = create_dataset(dest_dir, tables=[tb_garden.set_index(["entity", "date"])])
 
     # Add all sources from dependencies to dataset
     ds_garden.metadata.sources = ds_hmd.metadata.sources + ds_wmd.metadata.sources + ds_kobak.metadata.sources

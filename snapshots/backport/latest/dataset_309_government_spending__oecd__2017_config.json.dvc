@@ -1,18 +1,14 @@
 meta:
-  namespace: backport
-  short_name: dataset_309_government_spending__oecd__2017_config
-  file_extension: json
-  date_accessed: 2023-02-23 18:11:25.029971
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/309
+    date_accessed: 2023-08-10 09:44:41.218191
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_309_government_spending__oecd__2017
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/309
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: c80d7bc890eb144cae1804351f23345d
-  size: 3644
+- md5: cc75db81f4500aaa843ce510cdb39b16
+  size: 4381
   path: dataset_309_government_spending__oecd__2017_config.json

@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2907
+    date_accessed: 2023-08-16 08:38:25.421841
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Maternal mortality projection to 2030 (based on World Bank, 2018)
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 29bb61cbd4c6b63b68321142cf285bc1
+  size: 27874
+  path: 
+    dataset_2907_maternal_mortality_projection_to_2030__based_on_world_bank__2018_values.feather

@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1944
+    date_accessed: 2023-08-16 10:07:18.847947
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_1944_volume_of_official_development_assistance_flows_for_scholarships_by_sector_and_type_of_study
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 35e1db4bb73070d9177dbb0cc2d68521
+  size: 2451
+  path: 
+    dataset_1944_volume_of_official_development_assistance_flows_for_scholarships_by_sector_and_type_of_study_config.json

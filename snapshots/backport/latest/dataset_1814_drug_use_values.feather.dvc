@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1814
+    date_accessed: 2023-08-16 09:36:27.316205
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Drug use
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 784aeb9b28660c3c5a530dd48fd60943
+  size: 1183666
+  path: dataset_1814_drug_use_values.feather

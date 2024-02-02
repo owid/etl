@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2746
+    date_accessed: 2023-08-14 05:40:25.986049
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_2746_un_wpp__annual_total_population__both_sexes_combined__by_five_year_age_group__region__subregion_and_country__1950_2100__thousands
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 3b5041fc6dd709bd24e75a918b4e8637
+  size: 37725
+  path: 
+    dataset_2746_un_wpp__annual_total_population__both_sexes_combined__by_five_year_age_group__region__subregion_and_country__1950_2100__thousands_config.json

@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2153
+    date_accessed: 2023-08-16 09:21:38.040802
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2153_urolithiasis (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 7a9bd86498698281f18a550032eaffc4
+  size: 32368
+  path: dataset_2153_urolithiasis_config.json

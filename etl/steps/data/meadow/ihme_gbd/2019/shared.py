@@ -7,6 +7,7 @@ from owid.catalog.utils import underscore_table
 from owid.walden import Catalog as WaldenCatalog
 from pyarrow import feather
 
+from etl.data_helpers.misc import add_origins_to_global_burden_of_disease
 from etl.steps.data.converters import convert_walden_metadata
 
 
@@ -66,13 +67,27 @@ def read_and_clean_data(local_file: str) -> pd.DataFrame:
         return clean_data(arrow_table.to_pandas())
 
 
+def fix_percent(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    IHME doesn't seem to be consistent with how it stores percentages.
+    If the maximum percent value for any cause of death is less than or equal 1,
+    it indicates all values are 100x too small and we need to multiply values by 100
+    """
+    if "Percent" in df["metric"].unique():
+        if max(df["value"][df["metric"] == "Percent"]) <= 1:
+            subset_percent = df["metric"] == "Percent"
+            df.loc[subset_percent, "value"] *= 100
+            # df["value"][(df["metric"] == "Percent")] = df["value"][(df["metric"] == "Percent")] * 100
+    return df
+
+
 def run_wrapper(dataset: str, metadata_path: str, namespace: str, version: str, dest_dir: str) -> None:
     # retrieve raw data from walden
     walden_ds = WaldenCatalog().find_one(namespace=namespace, short_name=dataset, version=version)
     local_file = walden_ds.ensure_downloaded()
-
     tb = read_and_clean_data(local_file)
     tb = tb.drop_duplicates()
+    tb = fix_percent(tb)
     # create new dataset and reuse walden metadata
     ds = Dataset.create_empty(dest_dir)
     ds.metadata = convert_walden_metadata(walden_ds)
@@ -91,8 +106,10 @@ def run_wrapper(dataset: str, metadata_path: str, namespace: str, version: str, 
     tb = underscore_table(tb)
 
     ds.metadata.update_from_yaml(metadata_path, if_source_exists="replace")
-    tb.update_metadata_from_yaml(metadata_path, f"{dataset}")
-    tb.reset_index(drop=True, inplace=True)
+    # tb.update_metadata_from_yaml(metadata_path, f"{dataset}")
+    tb = tb.reset_index(drop=True)
+    tb = add_origins_to_global_burden_of_disease(tb)
+
     # add table to a dataset
     ds.add(tb)
 

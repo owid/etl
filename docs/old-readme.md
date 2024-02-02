@@ -180,7 +180,7 @@ The ETL is the place where several key steps can be done:
 The core formats used are the `Dataset` and `Table` formats from [owid-catalog-py](https://github.com/owid/owid-catalog-py).
 
 - Dataset: a folder full of data files (e.g. `my_dataset/`), with overall metadata in `index.json` (e.g. `my_dataset/index.json`)
-- Table: a CSV or Feather file (e.g. `my_table.feather`) with table and variable metadata in a `.meta.json` file (e.g. `my_table.meta.json`)
+- Table: a CSV or Feather file (e.g. `my_table.feather`) with table and indicator metadata in a `.meta.json` file (e.g. `my_table.meta.json`)
 
 Visit the `owid-catalog-py` project for more details on these formats or their Python API.
 
@@ -403,7 +403,7 @@ cd etl-staging
 
 _Internal OWID staff only_
 
-Grapher step writes metadata to mysql and stores data as parquet files in the grapher channel. Admin still uses two ways of loading data - from table `data_values` for manually uploaded datasets and now from bucket `owid-catalog` in S3 (proxied by https://owid-catalog.nyc3.digitaloceanspaces.com/) for ETL datasets.
+Grapher step writes metadata to mysql and stores data as parquet files in the grapher channel. Admin loads data from bucket `owid-catalog` in S3 (proxied by https://owid-catalog.nyc3.digitaloceanspaces.com/) for ETL datasets.
 
 During local development your data isn't yet in S3 catalog, but is stored in your local catalog. You have to add the following env variable to `owid-grapher/.env`
 

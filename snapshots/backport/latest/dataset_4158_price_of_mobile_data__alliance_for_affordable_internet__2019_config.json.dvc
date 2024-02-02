@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4158
+    date_accessed: 2023-08-14 14:45:52.541815
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_4158_price_of_mobile_data__alliance_for_affordable_internet__2019
+    (archived)
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: b9c46eb000a56c895bb5d774294e8aaa
+  size: 1729
+  path: 
+    dataset_4158_price_of_mobile_data__alliance_for_affordable_internet__2019_config.json

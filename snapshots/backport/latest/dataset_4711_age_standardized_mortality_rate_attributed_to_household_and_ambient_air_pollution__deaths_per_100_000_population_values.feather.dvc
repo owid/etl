@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4711
+    date_accessed: 2023-08-10 14:39:28.727499
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Age-standardized mortality rate attributed to household and ambient air pollution
+    (deaths per 100,000 population)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 9929dc975d35960513d4ae441138aace
+  size: 13026
+  path: 
+    dataset_4711_age_standardized_mortality_rate_attributed_to_household_and_ambient_air_pollution__deaths_per_100_000_population_values.feather

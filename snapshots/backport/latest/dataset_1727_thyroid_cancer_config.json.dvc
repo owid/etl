@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1727
+    date_accessed: 2023-08-16 07:25:34.419776
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1727_thyroid_cancer (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 7010219a65c525abf97064a87c178e6d
+  size: 29096
+  path: dataset_1727_thyroid_cancer_config.json

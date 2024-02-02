@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2340
+    date_accessed: 2023-08-10 15:07:12.229980
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Unintentional injuries
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 9bee162c0028eaaf6d1da1e9d451ad12
+  size: 2116410
+  path: dataset_2340_unintentional_injuries_values.feather

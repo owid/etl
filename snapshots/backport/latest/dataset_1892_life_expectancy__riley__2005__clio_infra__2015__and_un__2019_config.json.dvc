@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1892
+    date_accessed: 2023-08-16 09:32:15.678015
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1892_life_expectancy__riley__2005__clio_infra__2015__and_un__2019
+    (archived)
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 561c2a2444c8715cb2f60d76090eff3b
+  size: 4138
+  path: 
+    dataset_1892_life_expectancy__riley__2005__clio_infra__2015__and_un__2019_config.json

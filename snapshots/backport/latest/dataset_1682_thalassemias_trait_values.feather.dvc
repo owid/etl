@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1682
+    date_accessed: 2023-08-10 14:41:21.233051
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Thalassemias trait
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 8df98d379c5e8b017b4bda80aab1b4c3
+  size: 1011354
+  path: dataset_1682_thalassemias_trait_values.feather

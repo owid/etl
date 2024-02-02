@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4744
+    date_accessed: 2023-08-16 10:38:03.081129
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_4744_rural_to_urban_parity_index_for_achievement_in_reading__by_education_level__ratio
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 98f5c4fb7c5b2fb39f0d1038a3126a50
+  size: 7017
+  path: 
+    dataset_4744_rural_to_urban_parity_index_for_achievement_in_reading__by_education_level__ratio_config.json

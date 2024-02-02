@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/619
+    date_accessed: 2023-08-16 08:34:00.928125
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Conflict/Violence - Quality of Government (2017)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: ce346110ba3c22ee0a9f13efc760f781
+  size: 144282
+  path: dataset_619_conflict_violence__quality_of_government__2017_values.feather

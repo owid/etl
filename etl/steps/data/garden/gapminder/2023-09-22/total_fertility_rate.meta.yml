@@ -1,0 +1,30 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Child & Infant Mortality
+
+tables:
+  fertility_rate:
+    variables:
+      fertility_rate:
+        title: Babies per woman (total fertility rate)
+        unit: babies per woman
+        short_unit: ""
+        presentation:
+          topic_tags:
+            - Fertility Rate
+      children_dying_before_five_per_woman:
+        title: Children that died before five years age per woman
+        description_short: The fertility rate (average number of children per woman) multiplied by the under-five mortality rate (probability of dying before age five).
+        unit: under-five deaths per woman
+        short_unit: ""
+        display:
+          numDecimalPlaces: 1
+      children_surviving_past_five_per_woman:
+        title: Children that survived past five years age per woman
+        description_short: The fertility rate (average number of children per woman) multiplied by the inverse of the under-five mortality rate (probability of surviving to at least age five).
+        unit: children surviving past five years per woman
+        short_unit: ""
+        display:
+          numDecimalPlaces: 1

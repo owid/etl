@@ -1,4 +1,4 @@
-site_name: Data pipeline
+site_name: Data workflow
 
 repo_name: owid/etl
 repo_url: https://github.com/owid/etl
@@ -10,37 +10,11 @@ nav:
     - Working environment: "getting-started/working-environment.md"
     - Building datasets: "getting-started/building-datasets.md"
     - Consuming datasets: "getting-started/consuming-datasets.md"
-  - Architecture:
-      - Architecture: architecture/index.md
-      - Our journey: "architecture/our-journey.md"
-      - Design principles:
-        - Design principles: "architecture/design/index.md"
-        - Computational graph:
-          - Computational graph: "architecture/design/compute-graph/index.md"
-        - ETL model: "architecture/design/phases.md"
-        - Data model: "architecture/design/common-format.md"
-        - Features and constraints: "architecture/design/features-constraints.md"
-        - The DAG: "architecture/design/dag.md"
-        - The URI: "architecture/design/uri.md"
-      - ETL steps:
-        - ETL steps: "architecture/workflow/index.md"
-        - Snapshot: "architecture/workflow/snapshot.md"
-        - Meadow: "architecture/workflow/meadow.md"
-        - Garden: "architecture/workflow/garden.md"
-        - Grapher: "architecture/workflow/grapher.md"
-        - Special steps:
-          - Special steps: "architecture/workflow/other-steps/index.md"
-          - Explorers: "architecture/workflow/other-steps/explorers.md"
-          - Backport: "architecture/workflow/other-steps/backport.md"
-          - Open Numbers: "architecture/workflow/other-steps/open-numbers.md"
-          - ETag: "architecture/workflow/other-steps/etag.md"
-          - GitHub: "architecture/workflow/other-steps/github.md"
-          - Private steps: "architecture/workflow/other-steps/private.md"
   - Tutorials:
     - Tutorials: "tutorials/index.md"
     - Adding data:
       - Adding data: "tutorials/adding-data/index.md"
-      - Walkthrough: "tutorials/adding-data/walkthrough.md"
+      - Wizard: "tutorials/adding-data/wizard.md"
       - Manually add: "tutorials/adding-data/manual.md"
       - Fast-track: "tutorials/adding-data/fast-track.md"
     - Updating charts:
@@ -48,19 +22,65 @@ nav:
       - Reviewing chart revisions: "tutorials/charts/reviewing-charts.md"
       - Using chatGPT: "tutorials/charts/chatgpt.md"
     - Harmonize country names: "tutorials/harmonize-countries.md"
-    - Backporting Grapher datasets to ETL: "tutorials/backport.md"
-    - Importing a private dataset to ETL: "tutorials/private-import.md"
-  - Dataset catalog:
-    - Dataset catalog: "data/index.md"
-    - Faostat: "data/faostat.md"
-    - Regions: "data/regions.md"
-  - API:
+    - Metadata in data pages: "tutorials/metadata-play.md"
+    - Backport a dataset to ETL: "tutorials/backport.md"
+    - Import a private dataset to ETL: "tutorials/private-import.md"
+  - Architecture:
+      - Architecture: architecture/index.md
+      - Design principles:
+        - Computational graph:
+          - Computational graph: "architecture/design/compute-graph/index.md"
+        - ETL model: "architecture/design/phases.md"
+        - Data model: "architecture/design/common-format.md"
+        - Features and constraints: "architecture/design/features-constraints.md"
+        - The DAG: "architecture/design/dag.md"
+        - The URI: "architecture/design/uri.md"
+      - Workflow:
+        - Workflow: "architecture/workflow/index.md"
+        - Snapshot step: "architecture/workflow/snapshot.md"
+        - Meadow step: "architecture/workflow/meadow.md"
+        - Garden step: "architecture/workflow/garden.md"
+        - Grapher step: "architecture/workflow/grapher.md"
+        - Special steps:
+          # - Special steps: "architecture/workflow/other-steps/index.md"
+          - Explorers: "architecture/workflow/other-steps/explorers.md"
+          - Backport: "architecture/workflow/other-steps/backport.md"
+          - Open Numbers: "architecture/workflow/other-steps/open-numbers.md"
+          - ETag: "architecture/workflow/other-steps/etag.md"
+          - GitHub: "architecture/workflow/other-steps/github.md"
+          - Private steps: "architecture/workflow/other-steps/private.md"
+        - Staging servers: "architecture/workflow/staging-servers.md"
+      - Metadata:
+        - Metadata: "architecture/metadata/index.md"
+        # - Workflow with metadata: "architecture/metadata/workflow.md"
+        # - Reference:
+        - Reference:
+          - Reference: "architecture/metadata/reference/index.md"
+          - Origin: "architecture/metadata/reference/origin.md"
+          - Indicator: "architecture/metadata/reference/indicator.md"
+          - Table: "architecture/metadata/reference/tables.md"
+          - Dataset: "architecture/metadata/reference/dataset.md"
+        - Structuring YAML file: "architecture/metadata/structuring-yaml.md"
+        - Data Pages Workflow: "architecture/metadata/data_pages_workflow.md"
+        - ETL MetaGPT Tool: "architecture/metadata/metadata_chatgpt_update.md"
+        - Propagation of metadata: "architecture/metadata/propagation.md"
+        - Using metadata: "architecture/metadata/using.md"
+        - Processing log: "architecture/metadata/processing_log.md"
+        - FAQs: "architecture/metadata/faqs.md"
+      - Our journey: "architecture/our-journey.md"
+  - API and catalog:
     - API: "api/index.md"
     - Python: "api/python.ipynb"
-  - Development:
-    - Development: "dev/index.md"
-    - Documentation: "dev/docs.md"
-  - Contributing: "contributing.md"
+    - Dataset catalog:
+      - Dataset catalog: "data/index.md"
+      - Faostat: "data/faostat.md"
+      - Regions: "data/regions.md"
+  - Contributing:
+    - Contributing: "contributing.md"
+    - Maintenance:
+      - Maintenance: "dev/index.md"
+      - Documentation: "dev/docs.md"
+      - Catalog: "dev/update-catalog.md"
 
 theme:
   # logo: assets/logo.png
@@ -93,18 +113,24 @@ theme:
     - navigation.tabs.sticky
     - navigation.indexes
     - content.tooltips
-    - navigation.expand
+    # - navigation.expand
     # - navigation.sections
     # - toc.follow
     - navigation.top
+    - toc.follow
+    # - toc.integrate
   custom_dir: docs/overrides
 
 markdown_extensions:
+  - pymdownx.critic
+  - pymdownx.keys
   - admonition
   - abbr
   - attr_list
   - pymdownx.details
   - pymdownx.snippets
+  - pymdownx.superfences
+  - md_in_html
   - pymdownx.superfences:
       custom_fences:
         - name: mermaid
@@ -120,22 +146,28 @@ plugins:
   - mkdocs-jupyter:
       ignore_h1_titles: True
   - search
+  - exclude:
+      glob:
+        - ignore/
+  - gen-files:
+      scripts:
+        - docs/ignore/gen_metadata_reference.py  # or any other name or path
 
 extra_css:
   - css/extra.css
 
 extra:
   homepage: https://docs.owid.io/projects/etl
-  generator: false
+  generator: true
   social:
     # icons available listed: https://github.com/squidfunk/mkdocs-material/tree/master/material/.icons/fontawesome
     - icon: fontawesome/brands/github
       link: https://github.com/ourworldindata
     - icon: fontawesome/solid/globe
       link: https://ourworldindata.org
-    - icon: fontawesome/brands/twitter
-      link: https://twitter.com/ourworldindata
     - icon: fontawesome/brands/instagram
       link: https://instagram.com/ourworldindata
+    - icon: fontawesome/brands/x-twitter
+      link: https://twitter.com/ourworldindata
 
 copyright: Copyright &copy; 2023 Our World in Data

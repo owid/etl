@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/3655
+    date_accessed: 2023-08-16 07:19:04.376318
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Respiratory infections and tuberculosis
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 995173d774811e4811ef8de47598af6c
+  size: 2116418
+  path: dataset_3655_respiratory_infections_and_tuberculosis_values.feather

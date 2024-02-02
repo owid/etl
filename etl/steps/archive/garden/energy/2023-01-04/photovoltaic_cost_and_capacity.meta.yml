@@ -1,0 +1,90 @@
+all_sources:
+- nemet_2009: &source-nemet_2009
+    name: G. G. Nemet (2009)
+    published_by: |
+      Interim monitoring of cost dynamics for publicly supported energy technologies. Energy Policy 37(3): 825-835. by Nemet, G. F. (2009).
+    url: https://www.sciencedirect.com/science/article/abs/pii/S0301421508005910
+    date_accessed: '2023-01-04'
+    publication_date: '2009-03-01'
+    publication_year: 2009
+    description: |
+      Photovoltaic cost and capacity data between 1975 and 2003 has been taken from Nemet (2009).
+
+      Prices from Nemet (2009) have been converted to 2021 US$ using the US GDP deflator: https://www.multpl.com/gdp-deflator/table/by-year
+- farmer_lafond_2016: &source-farmer_lafond_2016
+    name: J. D. Farmer & F. Lafond (2016)
+    published_by: |
+      How predictable is technological progress? J. D. Farmer & F. Lafond, Research Policy Volume 45, Issue 3, April 2016, Pages 647-665.
+    url: https://www.sciencedirect.com/science/article/pii/S0048733315001699
+    date_accessed: '2023-01-04'
+    publication_date: '2016-04-01'
+    publication_year: 2016
+    description: |
+      Photovoltaic cost data between 2004 and 2009 has been taken from Farmer & Lafond (2016).
+
+      According to Farmer & Lafond (2016), the data are mostly taken from the Santa-Fe [Performance Curve Database](https://pcdb.santafe.edu/). The database has been constructed from personal communications and from [Colpier and Cornland (2002)](https://www.sciencedirect.com/science/article/pii/S0048733315001699#bib0095), [Goldemberg et al. (2004)](https://www.sciencedirect.com/science/article/pii/S0048733315001699#bib0130), [Lieberman (1984)](https://www.sciencedirect.com/science/article/pii/S0048733315001699#bib0180), [Lipman and Sperling (1999)](https://www.sciencedirect.com/science/article/pii/S0048733315001699#bib0190), [Zhao (1999)](https://www.sciencedirect.com/science/article/pii/S0048733315001699#bib0310), [McDonald and Schrattenholzer (2001)](https://www.sciencedirect.com/science/article/pii/S0048733315001699#bib0205), [Neij et al. (2003)](https://www.sciencedirect.com/science/article/pii/S0048733315001699#bib0235), [Moore (2006)](https://www.sciencedirect.com/science/article/pii/S0048733315001699#bib0215), [Nemet (2006)](https://www.sciencedirect.com/science/article/pii/S0048733315001699#bib0240), [Schilling and Esmundo (2009)](https://www.sciencedirect.com/science/article/pii/S0048733315001699#bib0265). The data on photovoltaic prices has been collected from public releases of Strategies Unlimited, Navigant and SPV Market Research. The data on nuclear energy is from [Koomey and Hultman (2007)](https://www.sciencedirect.com/science/article/pii/S0048733315001699#bib0165) and [Cooper (2009)](https://www.sciencedirect.com/science/article/pii/S0048733315001699#bib0100). The DNA sequencing data is from [Wetterstrand (2015)](https://www.sciencedirect.com/science/article/pii/S0048733315001699#bib0290) (cost per human-size genome), and for each year the last available month (September for 2001-2002 and October afterwards) was taken and corrected for inflation using the US GDP deflator.
+
+      Prices from Farmer & Lafond (2016) have been converted to 2021 US$ using the US GDP deflator: https://www.multpl.com/gdp-deflator/table/by-year
+- irena_capacity: &source-irena_capacity
+    name: International Renewable Energy Agency (IRENA)
+    published_by: "© 2022 by International Renewable Energy Agency (IRENA)"
+    url: https://www.irena.org/Statistics/Download-query-tools
+    date_accessed: '2022-10-20'
+    publication_date: '2022-07-01'
+    publication_year: 2022
+    description: |
+      Photovoltaic capacity data between 2004 and 2021 has been taken from IRENA.
+- irena_costs: &source-irena_costs
+    name: International Renewable Energy Agency (IRENA)
+    published_by: "International Renewable Energy Agency (IRENA) \xA9 2022 by IRENA"
+    url: https://irena.org/publications/2022/Jul/Renewable-Power-Generation-Costs-in-2021
+    date_accessed: '2022-10-20'
+    publication_year: 2022
+    description: |
+      Photovoltaic cost data between 2010 and 2021 has been taken from IRENA.
+dataset:
+  namespace: energy
+  short_name: photovoltaic_cost_and_capacity
+  title: Solar photovoltaic cost and capacity (Energy, 2023)
+  description: |
+    Prices from Nemet (2009) and from Farmer & LaFond (2016) have been
+    converted to 2021 US$ using the US GDP deflator: https://www.multpl.com/gdp-deflator/table/by-year
+  version: '2023-01-04'
+  sources:
+  - *source-nemet_2009
+  - *source-farmer_lafond_2016
+  - *source-irena_capacity
+  - *source-irena_costs
+
+tables:
+  photovoltaic_cost_and_capacity:
+    variables:
+      cost:
+        title: Solar photovoltaic module price
+        short_unit: $/W
+        unit: 2021 US$ per Watt
+        description: |
+          Global average price of solar photovoltaic modules.
+
+          IRENA presents solar PV module price series for a number of different module technologies. Here we have adopted the series for thin film a-Si/u-Si or Global Index (from Q4 2013).
+        sources:
+        - *source-nemet_2009
+        - *source-farmer_lafond_2016
+        - *source-irena_costs
+      cost_source:
+        title: Data source for cost data
+        unit: ''
+        description: Source for each value of cost data.
+      cumulative_capacity:
+        title: Solar photovoltaic cumulative capacity
+        description: |
+          Global cumulative capacity of solar photovoltaics.
+        short_unit: MW
+        unit: megawatts
+        sources:
+        - *source-nemet_2009
+        - *source-irena_capacity
+      cumulative_capacity_source:
+        title: Data source for cumulative capacity data
+        unit: ''
+        description: Source for each value of cumulative capacity data.

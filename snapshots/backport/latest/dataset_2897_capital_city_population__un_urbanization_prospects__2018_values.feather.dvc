@@ -1,19 +1,15 @@
 meta:
-  namespace: backport
-  short_name: dataset_2897_capital_city_population__un_urbanization_prospects__2018_values
-  file_extension: feather
-  date_accessed: 2023-06-01 12:40:04.539657
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2897
+    date_accessed: 2023-08-10 09:26:26.794033
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Capital city population - UN Urbanization Prospects (2018)
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/2897
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: d5d8cfca0fd738c339c67297db3c1c8e
+- md5: 536a36fd706402b92bc4881833b8edb7
   size: 14354
   path: 
     dataset_2897_capital_city_population__un_urbanization_prospects__2018_values.feather

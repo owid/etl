@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1721
+    date_accessed: 2023-08-14 05:46:25.522482
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1721_liver_cancer_due_to_alcohol_use (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: c72f816a10e8fc672a60206cc86ee70f
+  size: 27237
+  path: dataset_1721_liver_cancer_due_to_alcohol_use_config.json

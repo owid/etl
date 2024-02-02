@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4428
+    date_accessed: 2023-08-10 14:41:06.216759
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_4428_world_bank__poorest_quintile_covered_by_social_assistance_programs__pct
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: a9139d790d8091857c3dea3e667c5042
+  size: 1861
+  path: 
+    dataset_4428_world_bank__poorest_quintile_covered_by_social_assistance_programs__pct_config.json

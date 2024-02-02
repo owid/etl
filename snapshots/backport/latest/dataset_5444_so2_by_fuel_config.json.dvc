@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5444
+    date_accessed: 2023-08-11 07:57:01.838950
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_5444_so2_by_fuel (archived)
+  description: ''
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 92b3f7b0dab0dd99404d2f86b8726984
+  size: 1401
+  path: dataset_5444_so2_by_fuel_config.json

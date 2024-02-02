@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/3973
+    date_accessed: 2023-08-10 14:33:57.297521
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_3973_myelodysplastic__myeloproliferative__and_other_hematopoietic_neoplasms
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: c2f4082c8ea7c61f3241e9d52ab9f6c0
+  size: 33677
+  path: 
+    dataset_3973_myelodysplastic__myeloproliferative__and_other_hematopoietic_neoplasms_config.json

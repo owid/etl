@@ -1,18 +1,16 @@
 meta:
-  namespace: backport
-  short_name: dataset_3222_wheat_prices__long_run__in_england__makridakis_et_al__1997_config
-  file_extension: json
-  date_accessed: 2023-02-23 16:14:54.932793
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/3222
+    date_accessed: 2023-08-14 15:45:03.949073
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_3222_wheat_prices__long_run__in_england__makridakis_et_al__1997
+    (archived)
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/3222
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 6565327762cdb6ad4b8cba5b5e2de6a9
-  size: 2120
-  path: dataset_3222_wheat_prices__long_run__in_england__makridakis_et_al__1997_config.json
+- md5: 6c7249d435a14931fb050625eba185b7
+  size: 2273
+  path: 
+    dataset_3222_wheat_prices__long_run__in_england__makridakis_et_al__1997_config.json

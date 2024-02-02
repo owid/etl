@@ -107,6 +107,7 @@ def add_regions(df: pd.DataFrame, regions: Table) -> pd.DataFrame:
                 countries_in_region=countries_in_regions[continent] + ["Serbia and Montenegro (former)"],
                 countries_that_must_have_data=[],
                 num_allowed_nans_per_year=None,
+                frac_allowed_nans_per_year=0.2,
             )
         else:
             df_cont = geo.add_region_aggregates(

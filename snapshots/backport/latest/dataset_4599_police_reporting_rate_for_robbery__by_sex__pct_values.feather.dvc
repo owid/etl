@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4599
+    date_accessed: 2023-08-14 15:09:27.445904
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Police reporting rate for robbery, by sex (%)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 457ff0c1d4061d7fbb379a047d96c3f1
+  size: 8650
+  path: dataset_4599_police_reporting_rate_for_robbery__by_sex__pct_values.feather

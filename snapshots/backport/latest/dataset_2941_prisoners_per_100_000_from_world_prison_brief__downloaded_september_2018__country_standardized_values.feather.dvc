@@ -1,20 +1,15 @@
 meta:
-  namespace: backport
-  short_name: 
-    dataset_2941_prisoners_per_100_000_from_world_prison_brief__downloaded_september_2018__country_standardized_values
-  file_extension: feather
-  date_accessed: 2023-06-01 13:15:29.529467
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2941
+    date_accessed: 2023-08-10 09:22:11.079253
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Prisoners per 100 000 from World Prison Brief (downloaded September 2018)_country_standardized
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/2941
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: ad8f117dde94a8d602405087b5ec0a6c
+- md5: e2d8a2e77c033a6716b0f706087c73a2
   size: 13602
   path: 
     dataset_2941_prisoners_per_100_000_from_world_prison_brief__downloaded_september_2018__country_standardized_values.feather

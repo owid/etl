@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4468
+    date_accessed: 2023-08-16 07:59:21.991902
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Regulatory capital to assets (%)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 3f2adb68fe89a7c45ea6634878f00811
+  size: 21218
+  path: dataset_4468_regulatory_capital_to_assets__pct_values.feather

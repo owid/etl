@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1713
+    date_accessed: 2023-08-16 10:23:35.804192
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Hepatitis B
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 4d85580b27af8b1a08de0c2c590228e6
+  size: 2012034
+  path: dataset_1713_hepatitis_b_values.feather

@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1512
+    date_accessed: 2023-08-14 05:46:43.913479
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Foreign body
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 16135e079fe6ce7e9c3d3749936497fa
+  size: 2012034
+  path: dataset_1512_foreign_body_values.feather

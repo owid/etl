@@ -1,0 +1,40 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl//architecture/metadata/reference/origin/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: State System Membership
+    description: |-
+      This data set contains the list of states in the international system as updated and distributed by the Correlates of War Project. These data sets identify states, their standard Correlates of War “country code” or state number (used throughout the Correlates of War project data sets), state abbreviations, and dates of membership as states and major powers in the international system. Version 2016 extends the temporal domain of the collection through December 2016.
+
+      The Correlates of War project includes a state in the international system from 1816-2016 for the following criteria. Prior to 1920, the entity must have had a population greater than 500,000 and have had diplomatic missions at or above the rank of charge d’affaires with Britain and France. After 1920, the entity must be a member of the League of Nations or the United Nations, or have a population greater than 500,000 and receive diplomatic missions from two major powers.
+
+      Find more information in [their codebook](https://correlatesofwar.org/wp-content/uploads/State-System-Membership-Codebook-V2016.pdf)
+    date_published: 2017-02-20
+    version_producer: v2016
+    title_snapshot: State System Membership - System
+    description_snapshot: |-
+      Gives the composition of the state system year by year (providing a blank country-year dataset).
+
+    # Citation
+    producer: Correlates of War
+    citation_full: Correlates of War Project. 2017. “State System Membership List,
+      v2016.” Online, http://correlatesofwar.org
+    attribution: Correlates of War - State System Membership (2017)
+    attribution_short: COW
+
+    # Files
+    url_main: https://correlatesofwar.org/data-sets/state-system-membership/
+    url_download: https://correlatesofwar.org/wp-content/uploads/system2016.csv
+    date_accessed: 2023-09-22
+
+    # License
+    license:
+      name: Correlates of War terms
+      url: https://correlatesofwar.org/data-sets/
+
+wdir: ../../../data/snapshots/countries/2023-09-22
+outs:
+- md5: dbbb46252c2e3e93e7549b599d054ae4
+  size: 300836
+  path: cow_ssm_system.csv

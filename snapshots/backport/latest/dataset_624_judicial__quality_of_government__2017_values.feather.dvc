@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/624
+    date_accessed: 2023-08-14 15:28:42.389700
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Judicial - Quality of Government (2017)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 71260ae24dfc55a1c43c363302b0873a
+  size: 494194
+  path: dataset_624_judicial__quality_of_government__2017_values.feather

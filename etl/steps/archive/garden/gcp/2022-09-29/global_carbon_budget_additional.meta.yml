@@ -1,0 +1,78 @@
+dataset:
+  title: Global Carbon Budget (Global Carbon Project, v2021b)
+  sources:
+  - name: Global Carbon Project (2021)
+    published_by: Global Carbon Budget - Global Carbon Project (2021)
+    description: |
+      The Global Carbon Budget dataset is available [here](https://www.icos-cp.eu/science-and-impact/global-carbon-budget/2021) and [here](https://doi.org/10.5281/zenodo.5569235).
+
+      Variables include each country, region and World Bank income group's share of the global population; production-based (territorial); and consumption-based (trade-adjusted) carbon dioxide emissions.
+
+      This was calculated by Our World in Data based on CO₂ figures produced by the Global Carbon Project. This is given as production (territorial) emissions in addition to trade-adjusted consumption-based emissions. Consumption-based emissions are national or regional emissions which have been adjusted for trade (i.e. territorial/production emissions minus emissions embedded in exports, plus emissions embedded in imports). If a country's consumption-based emissions are higher than its production emissions it is a net importer of carbon dioxide.
+
+      Note that consumption-based emissions are not available for all countries; although those without complete data are a small fraction (3%) of the global total. Each country's share of world emissions are based on the share of the global total minus categories termed 'bunkers' and 'statistical differences' (which include cross-boundary emissions such as international travel and shipping.
+
+      Calculation of each country's share of the global population is calculated using our population dataset, based on [different sources](https://ourworldindata.org/population-sources)).
+
+      Data on global emissions has been converted by Our World in Data from tonnes of carbon to tonnes of carbon dioxide (CO₂) using a conversion factor of 3.664.
+
+      The full reference for the Carbon Budget 2021 is:
+      [Global Carbon Budget 2021](https://doi.org/10.5194/essd-14-1917-2022), by Pierre Friedlingstein, Matthew W. Jones, Michael O'Sullivan, Robbie M. Andrew, Dorothee C. E. Bakker, Judith Hauck, Corinne Le Quéré, Glen P. Peters, Wouter Peters, Julia Pongratz, Stephen Sitch, Josep G. Canadell, Philippe Ciais, Rob B. Jackson, Simone R. Alin, Peter Anthoni, Nicholas R. Bates, Meike Becker, Nicolas Bellouin, Laurent Bopp, Thi Tuyet Trang Chau, Frédéric Chevallier, Louise P. Chini, Margot Cronin, Kim I. Currie, Bertrand Decharme, Laique M. Djeutchouang, Xinyu Dou, Wiley Evans, Richard A. Feely, Liang Feng, Thomas Gasser, Dennis Gilfillan, Thanos Gkritzalis, Giacomo Grassi, Luke Gregor, Nicolas Gruber, Özgür Gürses, Ian Harris, Richard A. Houghton, George C. Hurtt, Yosuke Iida, Tatiana Ilyina, Ingrid T. Luijkx, Atul Jain, Steve D. Jones, Etsushi Kato, Daniel Kennedy, Kees Klein Goldewijk, Jürgen Knauer, Jan Ivar Korsbakken, Arne Körtzinger, Peter Landschützer, Siv K. Lauvset, Nathalie Lefèvre, Sebastian Lienert, Junjie Liu, Gregg Marland, Patrick C. McGuire, Joe R. Melton, David R. Munro, Julia E. M. S. Nabel, Shin-Ichiro Nakaoka, Yosuke Niwa, Tsuneo Ono, Denis Pierrot, Benjamin Poulter, Gregor Rehder, Laure Resplandy, Eddy Robertson, Christian Rödenbeck, Thais M. Rosan, Jörg Schwinger, Clemens Schwingshackl, Roland Séférian, Adrienne J. Sutton, Colm Sweeney, Toste Tanhua, Pieter P. Tans, Hanqin Tian, Bronte Tilbrook, Francesco Tubiello, Guido R. van der Werf, Nicolas Vuichard, Chisato Wada, Rik Wanninkhof, Andrew J. Watson, David Willis, Andrew J. Wiltshire, Wenping Yuan, Chao Yue, Xu Yue, Sönke Zaehle and Jiye Zeng (2022), Earth System Science Data, 14, 1917–2005, 2022, DOI: 10.5194/essd-14-1917-2022.
+tables:
+  global_carbon_budget_additional:
+    variables:
+      consumption_emissions:
+        title: "Consumption-based CO₂ emissions"
+        unit: tonnes
+        short_unit: t
+      consumption_emissions_as_share_of_global:
+        title: "Consumption-based CO₂ emissions (% of global total)"
+        unit: '%'
+        short_unit: '%'
+      consumption_emissions_per_capita:
+        title: "Consumption-based CO₂ per capita"
+        unit: tonnes of CO₂ per capita
+        short_unit: t
+      global_bunker_emissions:
+        title: Global bunker emissions
+        unit: tonnes
+        short_unit: t
+      global_fossil_emissions:
+        title: "CO₂ emissions from fossil fuels and industry"
+        unit: tonnes
+        short_unit: t
+        description: "Global CO₂ emissions from fossil fuels and industry (which includes coal, oil, gas, cement and flaring)."
+      global_fossil_and_land_use_change_emissions:
+        title: "CO₂ emissions from fossil fuels and land use change"
+        unit: tonnes
+        short_unit: t
+        description: "Global CO₂ emissions from fossil fuels and industry (which includes coal, oil, gas, cement and flaring) plus land-use change."
+      global_land_use_change_emissions:
+        title: "CO₂ emissions from land use change"
+        unit: tonnes
+        short_unit: t
+        description: "Global CO₂ emissions from land use change."
+      global_population:
+        title: Global population
+        unit: persons
+        short_unit: persons
+      population:
+        title: Population
+        unit: persons
+        short_unit: persons
+      population_as_share_of_global:
+        title: Share of global population
+        unit: '%'
+        short_unit: '%'
+      production_emissions:
+        title: "Production-based CO₂ emissions"
+        unit: tonnes
+        short_unit: t
+      production_emissions_as_share_of_global:
+        title: Production-based CO₂ emissions (% of global total)
+        unit: "%"
+        short_unit: "%"
+      production_emissions_per_capita:
+        title: "Production-based CO₂ per capita"
+        unit: tonnes of CO₂ per capita
+        short_unit: t

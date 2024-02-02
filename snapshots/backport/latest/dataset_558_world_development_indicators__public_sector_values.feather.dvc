@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/558
+    date_accessed: 2023-08-16 10:11:10.320388
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: World Development Indicators - Public Sector
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: ef3efc9f14f62760616f9e7b37baa835
+  size: 1902818
+  path: dataset_558_world_development_indicators__public_sector_values.feather

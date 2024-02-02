@@ -70,6 +70,9 @@ def long_to_wide(df: pd.DataFrame, prune: bool = True) -> pd.DataFrame:
             values="value",
         )
 
+    # remove `variable_name` label
+    df.columns.name = None
+
     # report compression ratio if the file is larger than >1MB
     # NOTE: memory usage can further drop later after repack_frame is called
     wide_mem_usage_mb = df.memory_usage().sum() / 1e6 if not df.empty else 0
@@ -95,8 +98,11 @@ def create_wide_table(values: pd.DataFrame, short_name: str, config: GrapherConf
     variable_dict = {v.name: v for v in config.variables}
     variable_source_dict = {s.id: s for s in config.sources}
 
-    for col in t.columns:
-        variable = variable_dict[col]
+    for col, variable in variable_dict.items():
+        if col not in t.columns:
+            log.warning("create_wide_table.no_values", variable_id=variable.id, variable_name=variable.name)
+            t[col] = np.nan
+
         t[col].metadata = convert_grapher_variable(variable, variable_source_dict[variable.sourceId])
 
     # NOTE: collision happens for dataset 5629 with column names

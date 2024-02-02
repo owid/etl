@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4476
+    date_accessed: 2023-08-16 10:29:58.012221
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_4476_total_resource_flows_for_development__by_recipient_and_donor_countries__millions_of_current_united_states_dollars
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: b8077c86433d96cf8e039f95e60d6b57
+  size: 1980
+  path: 
+    dataset_4476_total_resource_flows_for_development__by_recipient_and_donor_countries__millions_of_current_united_states_dollars_config.json

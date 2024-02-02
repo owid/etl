@@ -15,7 +15,7 @@ log = get_logger()
 paths = PathFinder(__file__)
 # Minimum and maximum years expected in data
 YEAR_MIN_EXPECTED = 2015
-YEAR_MAX_EXPECTED = 2023
+YEAR_MAX_EXPECTED = 2024
 
 
 def run(dest_dir: str) -> None:
@@ -28,7 +28,7 @@ def run(dest_dir: str) -> None:
     ds_meadow: Dataset = paths.load_dependency("wmd")
 
     # Read table from meadow dataset.
-    tb_meadow = ds_meadow["wmd"]
+    tb_meadow = ds_meadow["wmd"].reset_index()
 
     # Create a dataframe with data from the table.
     df = pd.DataFrame(tb_meadow)
@@ -41,6 +41,10 @@ def run(dest_dir: str) -> None:
 
     # Create a new table with the processed data.
     tb_garden = Table(df, short_name=tb_meadow.metadata.short_name)
+    print(tb_garden.head())
+
+    # Set index
+    tb_garden = tb_garden.set_index(["entity", "time", "time_unit", "age"], verify_integrity=True)
 
     #
     # Save outputs.
@@ -61,6 +65,9 @@ def run(dest_dir: str) -> None:
 
 
 def process(df: pd.DataFrame) -> pd.DataFrame:
+    # Clean dataframe
+    log.info("\thmd_stmf: cleaning bad values")
+    df = df_clean(df)
     # Check dataframe fields and values
     log.info("\thmd_stmf: initial dataframe API check")
     df_api_check(df)
@@ -76,6 +83,15 @@ def process(df: pd.DataFrame) -> pd.DataFrame:
     # Ensure columns match expected format
     log.info("\twmd: format columns in dataframe")
     df = format_columns(df)
+    return df
+
+
+def df_clean(df: pd.DataFrame) -> pd.DataFrame:
+    ix = df.year == 0
+    # NOTE: There are some values for FJI with year 0. Drop them as a hotfix.
+    if ix.any():
+        log.warning(f"\t\twmd: dropping {ix.sum()} rows with year==0")
+    df = df[~ix]
     return df
 
 

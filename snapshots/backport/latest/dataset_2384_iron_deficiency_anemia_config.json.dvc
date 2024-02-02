@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2384
+    date_accessed: 2023-08-16 10:00:18.327192
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2384_iron_deficiency_anemia (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: b9ec7865083b030a5dbc6e901f7a7395
+  size: 16948
+  path: dataset_2384_iron_deficiency_anemia_config.json

@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2385
+    date_accessed: 2023-08-16 10:48:55.288706
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Endocrine, metabolic, blood, and immune disorders
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 6c746023e669fc06cb1edfb7c1a92570
+  size: 1085794
+  path: dataset_2385_endocrine__metabolic__blood__and_immune_disorders_values.feather

@@ -5,28 +5,56 @@ If new variables are included in the dataset (from LISSY) the dictionaries feedi
 
 from owid.catalog import Table, VariableMeta
 
+# This is text common to all variables
+
+notes_title = "NOTES ON HOW WE PROCESSED THIS INDICATOR"
+
+processing_description = """
+        The Luxembourg Income Study data is created from standardized household survey microdata available in their [LISSY platform](https://www.lisdatacenter.org/data-access/lissy/). The estimations follow the methodology available in LIS, Key Figures and DART platform.
+
+        After tax income is obtained by using the disposable household income variable (`dhi`)
+
+        Before tax income is estimated by calculating the sum of income from labor and capital (variable `hifactor`), cash transfers and in-kind goods and services from privates (`hiprivate`) and private pensions (`hi33`). This is done only for surveys where tax and contributions are fully captured, collected or imputed.
+
+        After tax income (cash) is obtained using the disposable household cash income variable (`dhci`).
+
+        Consumption is obtained using the total consumption variable (`hcexp`).
+
+        Income data is converted from local currency into international-$ by dividing by the [LIS PPP factor](https://www.lisdatacenter.org/resources/ppp-deflators/), available as an additional database in the system.
+
+        Incomes are top and bottom-coded by replacing negative values with zeros and setting boundaries for extreme values of log income: at the top Q3 plus 3 times the interquartile range (Q3-Q1), and at the bottom Q1 minus 3 times the interquartile range.
+
+        Incomes are equivalized by dividing each household observation by the square root of the number of household members (`nhhmem`). Per capita estimates are calculated by dividing incomes by the number of household members.
+"""
+
+processing_poverty = "Poverty indicators are obtained by using [Stata’s povdeco function](https://ideas.repec.org/c/boc/bocode/s366004.html). Weights are set as the product between the number of household members (`nhhmem`) and the normalized household weight (`hwgt`). The function generates FGT(0) and FGT(1), headcount ratio and poverty gap index. After extraction, further data processing steps are done to estimate other poverty indicators using these values, population and poverty lines for absolute and relative poverty."
+processing_gini_mean_median = "Gini coefficients are obtained by using [Stata’s ineqdec0 function](https://ideas.repec.org/c/boc/bocode/s366007.html). Weights are set as the product between the number of household members (nhhmem) and the normalized household weight (hwgt). From this function, mean and median values are also calculated."
+processing_distribution = "Income shares and thresholds by decile are obtained by using [Stata’s sumdist function](https://ideas.repec.org/c/boc/bocode/s366005.html). The parameters set are again the weight (`nhhmem*hwgt`) and the number of quantile groups (10). Threshold ratios, share ratios and averages by decile are estimated after the use of LISSY with this data."
+
+ppp_description = "The data is measured in international-$ at 2017 prices – this adjusts for inflation and for differences in the cost of living between countries."
+
 # These are parameters specifically defined for each type of variable
 var_dict = {
     "avg": {
         "title": "Average",
-        "description": "This is the mean income or consumption per year within the {pct_dict[pct]['decile10']} (tenth of the population).",
+        "description": "The mean {inc_cons_dict[wel]['type']} per year within the {pct_dict[pct]['decile10']} (tenth of the population).",
         "unit": "international-$ in 2017 prices",
         "short_unit": "$",
-        "numDecimalPlaces": 2,
+        "numDecimalPlaces": 0,
     },
     "share": {
         "title": "Share",
-        "description": "This is the income or consumption of the {pct_dict[pct]['decile10']} (tenth of the population) as a share of total income or consumption.",
+        "description": "The share of {inc_cons_dict[wel]['type']} {inc_cons_dict[wel]['verb']} by the {pct_dict[pct]['decile10']} (tenth of the population).",
         "unit": "%",
         "short_unit": "%",
         "numDecimalPlaces": 1,
     },
     "thr": {
         "title": "Threshold",
-        "description": "This is the level of income or consumption per year below which {str(pct)}% of the population falls.",
+        "description": "The level of {inc_cons_dict[wel]['type']} per year below which {str(pct)}% of the population falls.",
         "unit": "international-$ in 2017 prices",
         "short_unit": "$",
-        "numDecimalPlaces": 2,
+        "numDecimalPlaces": 0,
     },
     "avg_shortfall": {
         "title": "Average shortfall ($)",
@@ -72,28 +100,28 @@ var_dict = {
     },
     "gini": {
         "title": "Gini coefficient",
-        "description": "The Gini coefficient is a measure of the inequality of the income distribution in a population. Higher values indicate a higher level of inequality.",
+        "description": "The Gini coefficient measures inequality on a scale from 0 to 1. Higher values indicate higher inequality.",
         "unit": "",
         "short_unit": "",
-        "numDecimalPlaces": 3,
+        "numDecimalPlaces": 2,
     },
     "mean": {
         "title": "Mean",
-        "description": "Mean income or consumption.",
+        "description": "Mean {inc_cons_dict[wel]['type']}.",
         "unit": "international-$ in 2017 prices",
         "short_unit": "$",
-        "numDecimalPlaces": 2,
+        "numDecimalPlaces": 0,
     },
     "median": {
         "title": "Median",
-        "description": "Median income or consumption.",
+        "description": "Median {inc_cons_dict[wel]['type']}.",
         "unit": "international-$ in 2017 prices",
         "short_unit": "$",
-        "numDecimalPlaces": 2,
+        "numDecimalPlaces": 0,
     },
     "palma_ratio": {
         "title": "Palma ratio",
-        "description": "The Palma ratio is the share of total income or consumption of the top 10% divided by the share of the bottom 40%.",
+        "description": "The Palma ratio is a measure of inequality that divides the share received by the richest 10% by the share of the poorest 40%. Higher values indicate higher inequality.",
         "unit": "",
         "short_unit": "",
         "numDecimalPlaces": 2,
@@ -128,14 +156,14 @@ var_dict = {
     },
     "share_bottom50": {
         "title": "Share of the bottom 50%",
-        "description": "This is the income or consumption of the poorest 50% as a share of total income or consumption.",
+        "description": "The share of {inc_cons_dict[wel]['type']} {inc_cons_dict[wel]['verb']} by the poorest 50%.",
         "unit": "%",
         "short_unit": "%",
         "numDecimalPlaces": 1,
     },
     "share_middle40": {
         "title": "Share of the middle 40%",
-        "description": "This is the income or consumption of the middle 40% as a share of total income or consumption. The middle 40% is the share of the population whose income or consumption lies between the poorest 50% and the richest 10%.",
+        "description": "The share of {inc_cons_dict[wel]['type']} {inc_cons_dict[wel]['verb']} by the middle 40%. The middle 40% is the share of the population whose income or consumption lies between the poorest 50% and the richest 10%.",
         "unit": "%",
         "short_unit": "%",
         "numDecimalPlaces": 1,
@@ -146,19 +174,27 @@ var_dict = {
 inc_cons_dict = {
     "dhi": {
         "name": "Disposable household income",
-        "description": "This measure is related to <b>disposable household income</b>, which is total income minus taxes and social security contributions (available as `dhi` in the LIS dataset).",
+        "type": "income",
+        "verb": "received",
+        "description": "Income is ‘post-tax’ — measured after taxes have been paid and most government benefits have been received.",
     },
     "dhci": {
         "name": "Disposable household cash income",
-        "description": "This measure is related to <b>disposable household cash income</b>, which is disposable household income minus the total value of goods and services (fringe benefits, home production, in-kind benefits and transfers) (available as `dhci` in the LIS dataset).",
+        "type": "income",
+        "verb": "received",
+        "description": "Income is ‘post-tax’ — measured after taxes have been paid and most government benefits have been received and excluding fringe benefits, home production, in-kind benefits and transfers",
     },
     "mi": {
         "name": "Market income",
-        "description": "This measure is related to <b>market income</b>, the sum of factor income (labor plus capital income), private income (private cash transfers and in-kind goods and services, not involving goverment) and private pensions (constructed in LIS as `hifactor + hiprivate + hi33`).",
+        "type": "income",
+        "verb": "received",
+        "description": "Income is ‘pre-tax’ — measured before taxes have been paid and most government benefits have been received.",
     },
     "hcexp": {
         "name": "Total consumption",
-        "description": "This measure is related to <b>total consumption</b>, including that stemming from goods and services that have been purchased by the household, and goods ans services that have not been purchased, but either given to the household from somebody else, or self-produced (available as `hcexp` in the LIS dataset).",
+        "type": "consumption",
+        "verb": "spent",
+        "description": "This measure is related to total consumption, including that stemming from goods and services that have been purchased by the household, and goods ans services that have not been purchased, but either given to the household from somebody else, or self-produced.",
     },
 }
 
@@ -166,11 +202,11 @@ inc_cons_dict = {
 equivalence_scales_dict = {
     "eq": {
         "name": "equivalized",
-        "description": "This measure of income or consumption is <b>equivalized</b>. 'Equivalized' in this case means that household income or consumption is divided by the LIS equivalence scale (squared root of the number of household members) to address for economies of scale in the household.",
+        "description": "Income has been equivalized – adjusted to account for the fact that people in the same household can share costs like rent and heating.",
     },
     "pc": {
         "name": "per capita",
-        "description": "This measure of income or consumption is <b>per capita</b>, which means that household income or consumption is divided by the total number of household members.",
+        "description": "Income is per capita, which means that household income is divided by the total number of household members.",
     },
 }
 
@@ -206,34 +242,35 @@ pct_dict = {
     100: {"decile10": "Richest decile", "decile9": ""},
 }
 
-# To avoid breaking f-strings, I need to add a line break like this
-new_line = "\n\n"
 
 # This function creates the metadata for each variable in the LIS dataset, from the dictionaries defined above
 def add_metadata_vars(tb_garden: Table):
-
     # Get a list of all the variables available
     cols = list(tb_garden.columns)
 
     for var in var_dict:
         for wel in inc_cons_dict:
             for e in equivalence_scales_dict:
-
                 # For variables that use income variable and equivalence scale
                 col_name = f"{var}_{wel}_{e}"
 
                 if col_name in cols:
-
                     # Create metadata for these variables
                     tb_garden[col_name].metadata = var_metadata_income_and_equivalence_scale(var, wel, e)
 
-                for rel in rel_dict:
+                    # Replace income/wealth words according to `wel`
+                    tb_garden[col_name].metadata.description = tb_garden[col_name].metadata.description.replace(
+                        "{inc_cons_dict[wel]['verb']}", str(inc_cons_dict[wel]["verb"])
+                    )
+                    tb_garden[col_name].metadata.description = tb_garden[col_name].metadata.description.replace(
+                        "{inc_cons_dict[wel]['type']}", str(inc_cons_dict[wel]["type"])
+                    )
 
+                for rel in rel_dict:
                     # For variables that use income variable, equivalence scale and relative poverty lines
                     col_name = f"{var}_{rel}_median_{wel}_{e}"
 
                     if col_name in cols:
-
                         # Create metadata for these variables
                         tb_garden[col_name].metadata = var_metadata_income_equivalence_scale_relative(var, wel, e, rel)
 
@@ -243,12 +280,10 @@ def add_metadata_vars(tb_garden: Table):
                         )
 
                 for abs in abs_dict:
-
                     # For variables that use income variable, equivalence scale and absolute poverty lines
                     col_name = f"{var}_{wel}_{e}_{abs}"
 
                     if col_name in cols:
-
                         # Create metadata for these variables
                         tb_garden[col_name].metadata = var_metadata_income_equivalence_scale_absolute(var, wel, e, abs)
 
@@ -258,12 +293,10 @@ def add_metadata_vars(tb_garden: Table):
                         )
 
                 for pct in pct_dict:
-
                     # For variables that use income variable, equivalence scale and percentiles (deciles)
                     col_name = f"{var}_p{pct}_{wel}_{e}"
 
                     if col_name in cols:
-
                         # Create metadata for these variables
                         tb_garden[col_name].metadata = var_metadata_income_equivalence_scale_percentiles(
                             var, wel, e, pct
@@ -271,39 +304,93 @@ def add_metadata_vars(tb_garden: Table):
 
                         # Replace values in description according to `pct`, depending on `var`
                         if var == "thr":
-
                             tb_garden[col_name].metadata.description = tb_garden[col_name].metadata.description.replace(
                                 "{str(pct)}", str(pct)
                             )
 
                         else:
-
                             tb_garden[col_name].metadata.description = tb_garden[col_name].metadata.description.replace(
                                 "{pct_dict[pct]['decile10']}", pct_dict[pct]["decile10"].lower()
                             )
+
+                        # Replace income/wealth words according to `wel`
+                        tb_garden[col_name].metadata.description = tb_garden[col_name].metadata.description.replace(
+                            "{inc_cons_dict[wel]['verb']}", str(inc_cons_dict[wel]["verb"])
+                        )
+                        tb_garden[col_name].metadata.description = tb_garden[col_name].metadata.description.replace(
+                            "{inc_cons_dict[wel]['type']}", str(inc_cons_dict[wel]["type"])
+                        )
 
     return tb_garden
 
 
 # Metadata functions to show a clearer main code
 def var_metadata_income_and_equivalence_scale(var, wel, e) -> VariableMeta:
-    meta = VariableMeta(
-        title=f"{var_dict[var]['title']} ({inc_cons_dict[wel]['name']}, {equivalence_scales_dict[e]['name']})",
-        description=f"{var_dict[var]['description']}{new_line}{inc_cons_dict[wel]['description']}{new_line}{equivalence_scales_dict[e]['description']}",
-        unit=var_dict[var]["unit"],
-        short_unit=var_dict[var]["short_unit"],
-    )
-    meta.display = {
-        "name": meta.title,
-        "numDecimalPlaces": var_dict[var]["numDecimalPlaces"],
-    }
+    # Add ppp description to monetary variables
+    if var == "mean" or var == "median":
+        meta = VariableMeta(
+            title=f"{var_dict[var]['title']} ({inc_cons_dict[wel]['name']}, {equivalence_scales_dict[e]['name']})",
+            description=f"""{var_dict[var]['description']}
+
+            {inc_cons_dict[wel]['description']}
+
+            {equivalence_scales_dict[e]['description']}
+
+            {ppp_description}
+
+            {notes_title}
+
+            {processing_description}
+
+            {processing_gini_mean_median}""",
+            unit=var_dict[var]["unit"],
+            short_unit=var_dict[var]["short_unit"],
+        )
+        meta.display = {
+            "name": meta.title,
+            "numDecimalPlaces": var_dict[var]["numDecimalPlaces"],
+        }
+    # For inequality vars we don't need to add ppp description
+    else:
+        meta = VariableMeta(
+            title=f"{var_dict[var]['title']} ({inc_cons_dict[wel]['name']}, {equivalence_scales_dict[e]['name']})",
+            description=f"""{var_dict[var]['description']}
+
+            {inc_cons_dict[wel]['description']}
+
+            {equivalence_scales_dict[e]['description']}
+
+            {notes_title}
+
+            {processing_description}
+
+            {processing_gini_mean_median}
+
+            {processing_distribution}""",
+            unit=var_dict[var]["unit"],
+            short_unit=var_dict[var]["short_unit"],
+        )
+        meta.display = {
+            "name": meta.title,
+            "numDecimalPlaces": var_dict[var]["numDecimalPlaces"],
+        }
     return meta
 
 
 def var_metadata_income_equivalence_scale_relative(var, wel, e, rel) -> VariableMeta:
     meta = VariableMeta(
         title=f"{rel_dict[rel]} - {var_dict[var]['title']} ({inc_cons_dict[wel]['name']}, {equivalence_scales_dict[e]['name']})",
-        description=f"{var_dict[var]['description']}{new_line}{inc_cons_dict[wel]['description']}{new_line}{equivalence_scales_dict[e]['description']}",
+        description=f"""{var_dict[var]['description']}
+
+        {inc_cons_dict[wel]['description']}
+
+        {equivalence_scales_dict[e]['description']}
+
+        {notes_title}
+
+        {processing_description}
+
+        {processing_poverty}""",
         unit=var_dict[var]["unit"],
         short_unit=var_dict[var]["short_unit"],
     )
@@ -317,7 +404,19 @@ def var_metadata_income_equivalence_scale_relative(var, wel, e, rel) -> Variable
 def var_metadata_income_equivalence_scale_absolute(var, wel, e, abs) -> VariableMeta:
     meta = VariableMeta(
         title=f"{abs_dict[abs]} - {var_dict[var]['title']} ({inc_cons_dict[wel]['name']}, {equivalence_scales_dict[e]['name']})",
-        description=f"{var_dict[var]['description']}{new_line}{inc_cons_dict[wel]['description']}{new_line}{equivalence_scales_dict[e]['description']}",
+        description=f"""{var_dict[var]['description']}
+
+        {inc_cons_dict[wel]['description']}
+
+        {equivalence_scales_dict[e]['description']}
+
+        {ppp_description}
+
+        {notes_title}
+
+        {processing_description}
+
+        {processing_poverty}""",
         unit=var_dict[var]["unit"],
         short_unit=var_dict[var]["short_unit"],
     )
@@ -330,10 +429,21 @@ def var_metadata_income_equivalence_scale_absolute(var, wel, e, abs) -> Variable
 
 def var_metadata_income_equivalence_scale_percentiles(var, wel, e, pct) -> VariableMeta:
     if var == "thr":
-
         meta = VariableMeta(
             title=f"{pct_dict[pct]['decile9']} - {var_dict[var]['title']} ({inc_cons_dict[wel]['name']}, {equivalence_scales_dict[e]['name']})",
-            description=f"{var_dict[var]['description']}{new_line}{inc_cons_dict[wel]['description']}{new_line}{equivalence_scales_dict[e]['description']}",
+            description=f"""{var_dict[var]['description']}
+
+            {inc_cons_dict[wel]['description']}
+
+            {equivalence_scales_dict[e]['description']}
+
+            {ppp_description}
+
+            {notes_title}
+
+            {processing_description}
+
+            {processing_distribution}""",
             unit=var_dict[var]["unit"],
             short_unit=var_dict[var]["short_unit"],
         )
@@ -342,10 +452,44 @@ def var_metadata_income_equivalence_scale_percentiles(var, wel, e, pct) -> Varia
             "numDecimalPlaces": var_dict[var]["numDecimalPlaces"],
         }
 
+    elif var == "avg":
+        meta = VariableMeta(
+            title=f"{pct_dict[pct]['decile10']} - {var_dict[var]['title']} ({inc_cons_dict[wel]['name']}, {equivalence_scales_dict[e]['name']})",
+            description=f"""{var_dict[var]['description']}
+
+            {inc_cons_dict[wel]['description']}
+
+            {equivalence_scales_dict[e]['description']}
+
+            {ppp_description}
+
+            {notes_title}
+
+            {processing_description}
+
+            {processing_distribution}""",
+            unit=var_dict[var]["unit"],
+            short_unit=var_dict[var]["short_unit"],
+        )
+        meta.display = {
+            "name": meta.title,
+            "numDecimalPlaces": var_dict[var]["numDecimalPlaces"],
+        }
+    # Shares do not show PPP description
     else:
         meta = VariableMeta(
             title=f"{pct_dict[pct]['decile10']} - {var_dict[var]['title']} ({inc_cons_dict[wel]['name']}, {equivalence_scales_dict[e]['name']})",
-            description=f"{var_dict[var]['description']}{new_line}{inc_cons_dict[wel]['description']}{new_line}{equivalence_scales_dict[e]['description']}",
+            description=f"""{var_dict[var]['description']}
+
+            {inc_cons_dict[wel]['description']}
+
+            {equivalence_scales_dict[e]['description']}
+
+            {notes_title}
+
+            {processing_description}
+
+            {processing_distribution}""",
             unit=var_dict[var]["unit"],
             short_unit=var_dict[var]["short_unit"],
         )

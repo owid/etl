@@ -1,18 +1,15 @@
 meta:
-  namespace: backport
-  short_name: dataset_5093_covid_19_model_estimates__icl__2022_config
-  file_extension: json
-  date_accessed: 2023-06-01 15:36:20.945486
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5093
+    date_accessed: 2023-08-10 08:38:05.211302
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_5093_covid_19_model_estimates__icl__2022
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/5093
-  source_published_by: Our World in Data catalog backport
   is_public: false
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 5c6ccbe6484846a04ef954cf93a5fddf
-  size: 3531
+- md5: 8ca1f109c94ff84a2a628e4156a1982b
+  size: 3932
   path: dataset_5093_covid_19_model_estimates__icl__2022_config.json

@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2074
+    date_accessed: 2023-08-10 14:39:38.915114
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Trade share with capital- and labor-intensive countries (OWID calculations
+    based on Fouquin and Hugot (CEPII 2016))
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 7cc59248e7be141bd6ddfccaed693310
+  size: 326290
+  path: 
+    dataset_2074_trade_share_with_capital__and_labor_intensive_countries__owid_calculations_based_on_fouquin_and_hugot__cepii_2016_values.feather

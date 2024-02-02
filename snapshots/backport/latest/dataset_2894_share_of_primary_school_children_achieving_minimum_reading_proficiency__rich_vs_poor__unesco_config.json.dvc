@@ -1,18 +1,16 @@
 meta:
-  namespace: backport
-  short_name: dataset_2894_share_of_primary_school_children_achieving_minimum_reading_proficiency__rich_vs_poor__unesco_config
-  file_extension: json
-  date_accessed: 2023-02-23 17:56:40.050506
-  name: Grapher metadata for dataset_2894_share_of_primary_school_children_achieving_minimum_reading_proficiency__rich_vs_poor__unesco
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2894
+    date_accessed: 2023-08-10 08:44:07.260484
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_2894_share_of_primary_school_children_achieving_minimum_reading_proficiency__rich_vs_poor__unesco
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/2894
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: b9f65542f83c78f9c38459d1b1316db1
-  size: 2615
-  path: dataset_2894_share_of_primary_school_children_achieving_minimum_reading_proficiency__rich_vs_poor__unesco_config.json
+- md5: ae684ebf1f46b2605eebb5e55535bf9e
+  size: 2895
+  path: 
+    dataset_2894_share_of_primary_school_children_achieving_minimum_reading_proficiency__rich_vs_poor__unesco_config.json

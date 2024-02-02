@@ -1,18 +1,14 @@
 meta:
-  namespace: backport
-  short_name: dataset_5075_covid_testing_time_series_data_values
-  file_extension: feather
-  date_accessed: 2023-02-23 17:07:27.620362
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5075
+    date_accessed: 2023-08-16 08:31:36.490037
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: COVID testing time series data
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/5075
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 52050d0e3640c35fcb0e8acfc3e81a46
-  size: 7647618
+- md5: 3250f8d8b395ba00634dd94e76452f3f
+  size: 7648338
   path: dataset_5075_covid_testing_time_series_data_values.feather

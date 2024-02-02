@@ -2,11 +2,11 @@
 #  Makefile
 #
 
-.PHONY: etl docs full lab test-default publish grapher dot watch clean clobber deploy
+.PHONY: etl docs full lab test-default publish grapher dot watch clean clobber deploy api
 
 include default.mk
 
-SRC = etl snapshots backport walkthrough fasttrack tests
+SRC = etl snapshots apps api tests docs
 PYTHON_PLATFORM = $(shell python -c "import sys; print(sys.platform)")
 LIBS = lib/*
 
@@ -25,10 +25,13 @@ help:
 	@echo '  make grapher   	Publish supported datasets to Grapher'
 	@echo '  make lab       	Start a Jupyter Lab server'
 	@echo '  make publish   	Publish the generated catalog to S3'
+	@echo '  make api   		Start the ETL API on port 8081'
+	@echo '  make fasttrack 	Start Fast-track on port 8082'
+	@echo '  make staging-sync 	Start Staging-sync on port 8083'
 	@echo '  make test      	Run all linting and unit tests'
-	@echo '  make test-all      Run all linting and unit tests (including for modules in lib/)'
+	@echo '  make test-all  	Run all linting and unit tests (including for modules in lib/)'
 	@echo '  make watch     	Run all tests, watching for changes'
-	@echo '  make watch-all     Run all tests, watching for changes (including for modules in lib/)'
+	@echo '  make watch-all 	Run all tests, watching for changes (including for modules in lib/)'
 	@echo
 
 docs: .venv
@@ -67,9 +70,11 @@ watch: .venv
 	fi
 	touch .sanity-check
 
+test: check-formatting lint check-typing unittest version-tracker
+
 .venv: .sanity-check pyproject.toml poetry.toml poetry.lock
 	@echo '==> Installing packages'
-	poetry install || poetry install
+	poetry install --no-ansi || poetry install --no-ansi
 	touch $@
 
 check-typing: .venv
@@ -131,3 +136,15 @@ deploy:
 version-tracker: .venv
 	@echo '==> Check that no archive dataset is used by an active dataset, and that all active datasets are used'
 	poetry run version_tracker
+
+api: .venv
+	@echo '==> Starting ETL API on http://localhost:8081/api/v1/indicators'
+	poetry run uvicorn api.main:app --reload --port 8081 --host 0.0.0.0
+
+fasttrack: .venv
+	@echo '==> Starting Fast-track on http://localhost:8082/'
+	poetry run fasttrack --skip-auto-open --port 8082
+
+staging-sync: .venv
+	@echo '==> Starting Staging-sync on http://localhost:8083/'
+	poetry run streamlit run apps/staging_sync/app.py --server.port 8083

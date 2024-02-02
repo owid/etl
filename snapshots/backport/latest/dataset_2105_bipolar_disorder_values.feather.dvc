@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2105
+    date_accessed: 2023-08-11 07:41:26.231712
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Bipolar disorder
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 0ca551da0956d9e132c3f50f3a64f5f9
+  size: 1807818
+  path: dataset_2105_bipolar_disorder_values.feather

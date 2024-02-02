@@ -1,0 +1,418 @@
+dataset:
+  title: COVID Government Response (OxBSG)
+  description: >-
+    OxCGRT collects publicly available information on indicators of government response.
+    These indicators take policies
+    such as school closures, travel bans, etc. and record them on an ordinal scale.
+    The remainder is financial indicators,
+    such as fiscal or monetary measures.
+
+
+    OxCGRT measures the variation in governments’ responses using its COVID-19 Government
+    Response Stringency Index. This
+    composite measure is a simple additive score of nine indicators measured on
+    an ordinal scale, rescaled to vary from
+    0 to 100. Please note that this measure is for comparative purposes only, and
+    should not be interpreted as a rating
+    of the appropriateness or effectiveness of a country's response.
+
+
+    It also includes a 'COVID-19 Containment and Health Response' index which is
+    based on the metrics used in the 'Stringency
+    Index' plus testing policy, contact tracing, face coverings and vaccine policy.
+
+
+    The specific policy and response categories are coded as follows:
+
+
+    School closures:
+
+    0 - No measures
+
+    1 - recommend closing
+
+    2 - Require closing (only some levels or categories,
+
+    e.g. just high school, or just public schools)
+
+    3 - Require closing all levels
+
+    No data - blank
+
+
+    Workplace closures:
+
+    0 - No measures
+
+    1 - recommend closing (or work from home)
+
+    2 - require closing (or work from home) for some
+
+    sectors or categories of workers
+
+    3 - require closing (or work from home) all but essential workplaces (e.g. grocery
+    stores, doctors)
+
+    No data - blank
+
+
+    Cancel public events:
+
+    0- No measures
+
+    1 - Recommend cancelling
+
+    2 - Require cancelling
+
+    No data - blank
+
+
+    Restrictions on gatherings:
+
+    0 - No restrictions
+
+    1 - Restrictions on very large gatherings (the limit is above 1,000 people)
+
+    2 - Restrictions on gatherings between 100-1,000 people
+
+    3 - Restrictions on gatherings between 10-100 people
+
+    4 - Restrictions on gatherings of less than 10 people
+
+    No data - blank
+
+
+    Close public transport:
+
+    0 - No measures
+
+    1 - Recommend closing (or significantly reduce volume/route/means of transport
+    available)
+
+    2 - Require closing (or prohibit most citizens from using it)
+
+
+    Public information campaigns:
+
+    0 -No COVID-19 public information campaign
+
+    1 - public officials urging caution about COVID-19
+
+    2 - coordinated public information campaign (e.g. across traditional and social
+    media)
+
+    No data - blank
+
+
+    Stay at home:
+
+    0 - No measures
+
+    1 - recommend not leaving house
+
+    2 - require not leaving house with exceptions for daily exercise, grocery shopping,
+    and ‘essential’ trips
+
+    3 - Require not leaving house with minimal exceptions (e.g. allowed to leave
+    only once every few days, or only one person
+    can leave at a time, etc.)
+
+    No data - blank
+
+
+    Restrictions on internal movement:
+
+    0 - No measures
+
+    1 - Recommend movement restriction
+
+    2 - Restrict movement
+
+
+    International travel controls:
+
+    0 - No measures
+
+    1 - Screening
+
+    2 - Quarantine arrivals from high-risk regions
+
+    3 - Ban on high-risk regions
+
+    4 - Total border closure
+
+    No data - blank
+
+
+    Testing policy
+
+    0 – No testing policy
+
+    1 – Only those who both (a) have symptoms AND (b) meet specific criteria (eg
+    key workers, admitted to hospital, came
+    into contact with a known case, returned from overseas)
+
+    2 – testing of anyone showing COVID-19 symptoms
+
+    3 – open public testing (e.g. “drive through” testing available to asymptomatic
+    people)
+
+    No data
+
+
+    Contract tracing
+
+    0 - No contact tracing
+
+    1 - Limited contact tracing - not done for all cases
+
+    2 - Comprehensive contact tracing - done for all cases
+
+    No data
+
+
+    Face coverings
+
+    0- No policy
+
+    1- Recommended
+
+    2- Required in some specified shared/public spaces outside the home with other
+    people present, or some situations when
+    social distancing not possible
+
+    3- Required in all shared/public spaces outside the home with other people present
+    or all situations when social distancing
+    not possible
+
+    4- Required outside the home at all times, regardless of location or presence
+    of other people
+
+
+    Vaccination policy
+
+    0 - No availability
+
+    1 - Availability for ONE of the following: key workers/ clinically vulnerable
+    groups / elderly groups
+
+    2 - Availability for TWO of the following: key workers/ clinically vulnerable
+    groups / elderly groups
+
+    3 - Availability for ALL the following: key workers/ clinically vulnerable groups
+    / elderly groups
+
+    4 - Availability for all three, plus partial additional availability (select
+    broad groups/ages)
+
+    5 - Universal availability
+  sources:
+  - name: Oxford COVID-19 Government Response Tracker, Blavatnik School of Government,
+      University of Oxford – Last updated {TODAY}
+    url: https://www.bsg.ox.ac.uk/research/research-projects/oxford-covid-19-government-response-tracker
+    published_by: Thomas Hale, Noam Angrist, Rafael Goldszmidt, Beatriz Kira, Anna
+      Petherick, Toby Phillips, Samuel Webster, Emily Cameron-Blake, Laura Hallas,
+      Saptarshi Majumdar, and Helen Tatlow. (2021). “A global panel database of pandemic
+      policies (Oxford COVID-19 Government Response Tracker).” Nature Human Behaviour.
+      https://doi.org/10.1038/s41562-021-01079-8
+tables:
+  government_response_oxbsg:
+    variables:
+      cancel_public_events:
+        title: cancel_public_events
+        unit: ''
+        display:
+          name: Cancel public events (OxBSG)
+          yearIsDay: true
+          zeroDay: '2020-01-01'
+      close_public_transport:
+        title: close_public_transport
+        unit: ''
+        display:
+          name: Close public transport (OxBSG)
+          yearIsDay: true
+          zeroDay: '2020-01-01'
+      contact_tracing:
+        title: contact_tracing
+        unit: ''
+        display:
+          name: Contact tracing (OxBSG)
+          yearIsDay: true
+          zeroDay: '2020-01-01'
+      containment_index:
+        title: containment_index
+        unit: (0 to 100, 100 = strictest)
+        display:
+          name: COVID-19 Containment and Health Index
+          yearIsDay: true
+          zeroDay: '2020-01-01'
+      debt_relief:
+        title: debt_relief
+        description: >-
+          This metric records if the Government is freezing financial obligations (e.g. stopping loan repayments, preventing
+          services like water from stopping, or banning evictions).
+
+
+          0 - No debt relief
+
+          1 - Narrow relief, specific to one kind of contract
+
+          2 - broad debt/contract relief
+        unit: ''
+        display:
+          name: Debt or contract relief
+          yearIsDay: true
+          zeroDay: '2020-01-01'
+      emergency_investment_healthcare:
+        title: emergency_investment_healthcare
+        unit: ''
+        display:
+          name: Emergency investment in health care (OxBSG)
+          yearIsDay: true
+          zeroDay: '2020-01-01'
+      facial_coverings:
+        title: facial_coverings
+        unit: ''
+        display:
+          name: Facial coverings (OxBSG)
+          yearIsDay: true
+          zeroDay: '2020-01-01'
+      fiscal_measures:
+        title: fiscal_measures
+        unit: ''
+        display:
+          name: Fiscal measures (OxBSG)
+          yearIsDay: true
+          zeroDay: '2020-01-01'
+      income_support:
+        title: income_support
+        description: >-
+          This metric captures if the government is covering the salaries or providing direct cash payments, universal basic
+          income, or similar, of people who lose their jobs or cannot work. (Includes payments to firms if explicitly linked
+          to payroll/ salaries).
+
+
+          0 - no income support
+
+          1 - government is replacing less than 50% of lost salary (or if a flat sum, it is less than 50% median salary)
+
+          2 - government is replacing 50% or more of lost salary (or if a flat sum, it is greater than 50% median salary)
+        unit: ''
+        display:
+          name: Income support
+          yearIsDay: true
+          zeroDay: '2020-01-01'
+      international_support:
+        title: international_support
+        unit: ''
+        display:
+          name: International support (OxBSG)
+          yearIsDay: true
+          zeroDay: '2020-01-01'
+      international_travel_controls:
+        title: international_travel_controls
+        unit: ''
+        display:
+          name: International travel controls (OxBSG)
+          yearIsDay: true
+          zeroDay: '2020-01-01'
+      investment_vaccines:
+        title: investment_vaccines
+        unit: $
+        display:
+          name: Investment in COVID-19 vaccines
+          yearIsDay: true
+          zeroDay: '2020-01-01'
+        short_unit: $
+      pregnant_vaccine_eligibility:
+        title: pregnant_vaccine_eligibility
+        unit: ''
+        display:
+          yearIsDay: true
+          zeroDay: '2020-01-01'
+      public_information_campaigns:
+        title: public_information_campaigns
+        unit: ''
+        display:
+          name: Public information campaigns (OxBSG)
+          yearIsDay: true
+          zeroDay: '2020-01-01'
+      restriction_gatherings:
+        title: restriction_gatherings
+        unit: ''
+        display:
+          name: Restrictions on gatherings (OxBSG)
+          yearIsDay: true
+          zeroDay: '2020-01-01'
+      restrictions_internal_movements:
+        title: restrictions_internal_movements
+        unit: ''
+        display:
+          name: Restrictions on internal movement (OxBSG)
+          yearIsDay: true
+          zeroDay: '2020-01-01'
+      school_closures:
+        title: school_closures
+        unit: ''
+        display:
+          name: School closures
+          yearIsDay: true
+          zeroDay: '2020-01-01'
+      stay_home_requirements:
+        title: stay_home_requirements
+        unit: ''
+        display:
+          name: Stay at home requirements (OxBSG)
+          yearIsDay: true
+          zeroDay: '2020-01-01'
+      stringency_index:
+        title: stringency_index
+        unit: (0 to 100, 100 = strictest)
+        display:
+          name: Government Response Stringency Index
+          yearIsDay: true
+          zeroDay: '2020-01-01'
+      testing_policy:
+        title: testing_policy
+        unit: ''
+        display:
+          name: Testing policy (OxBSG)
+          yearIsDay: true
+          zeroDay: '2020-01-01'
+      vaccination_policy:
+        title: vaccination_policy
+        unit: ''
+        display:
+          yearIsDay: true
+          zeroDay: '2020-01-01'
+      vaccine_availability:
+        title: vaccine_availability
+        unit: ''
+        display:
+          yearIsDay: true
+          zeroDay: '2020-01-01'
+      vaccine_eligibility:
+        title: vaccine_eligibility
+        unit: ''
+        display:
+          yearIsDay: true
+          zeroDay: '2020-01-01'
+      vaccine_eligibility_age:
+        title: vaccine_eligibility_age
+        unit: ''
+        display:
+          yearIsDay: true
+          zeroDay: '2020-01-01'
+      vaccine_eligibility_age_at_risk:
+        title: vaccine_eligibility_age_at_risk
+        unit: ''
+        display:
+          yearIsDay: true
+          zeroDay: '2020-01-01'
+      workplace_closures:
+        title: workplace_closures
+        unit: ''
+        display:
+          name: Workplace Closures (OxBSG)
+          yearIsDay: true
+          zeroDay: '2020-01-01'

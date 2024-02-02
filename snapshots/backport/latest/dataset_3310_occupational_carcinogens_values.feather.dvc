@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/3310
+    date_accessed: 2023-08-11 07:54:19.935215
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Occupational carcinogens
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 971c226f7bb6955216d2db38e8e3f180
+  size: 1070546
+  path: dataset_3310_occupational_carcinogens_values.feather

@@ -1,0 +1,194 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - War & Peace
+    display:
+      numDecimalPlaces: 0
+    processing_level: major
+
+  all:
+    interstate_conflict: &interstate_conflict |-
+      An interstate conflict is a disagreement between states where force is threatened, displayed, or used.
+    force_usage: &force_usage |-
+      A threat of force can be unspecified, or entail threatening to declare war or to occupy territory; a display of force can entail shows of force or border violations; a use of force can entail attacks, clashes, or battles.
+    conflict_type:
+      <%- if hostility == "all" -%>
+      <%- if fatality == "all" -%>
+      Included are conflicts between states where force was threatened, displayed, used, or escalated to a war that year
+      <%- elif fatality == "No deaths" -%>
+      Included are conflicts between states with no reported deaths that year
+      <%- elif fatality == "> 999 deaths" -%>
+      Included are conflicts between states in which more than 1,000 deaths were reported that year
+      <%- elif fatality == "Unknown" -%>
+      Included are conflicts between states with an unknown number of reported deaths that year
+      <%- else -%>
+      Included are conflicts between states in which << fatality >> were reported that year
+      <%- endif -%>
+
+      <%- elif hostility == "Threat to use force" -%>
+      Included are conflicts between states where, at most, use of force was threatened that year
+
+      <%- elif hostility == "Display of force" -%>
+      Included are conflicts between states where, at most, force was displayed that year
+
+      <%- elif hostility == "Use of force" -%>
+      Included are conflicts between states where, at most, force was used that year, but there were fewer than 1,000 combatant deaths
+
+      <%- elif hostility == "War" -%>
+      Included are interstate wars that were ongoing that year
+
+      <%- endif -%>
+
+  number_ongoing_disputes:
+    description_short: |-
+      {definitions.all.conflict_type}.
+    description_key: &description_key_ongoing
+      - *interstate_conflict
+      - *force_usage
+      - We count a conflict as ongoing in a region even if the conflict is also ongoing in other regions. The sum across all regions can therefore be higher than the total number of ongoing conflict.
+      - The hostility level for a conflict overall is the highest level across all world regions.
+      - Deaths of combatants due to fighting are included.
+
+  number_new_disputes:
+    description_short: |-
+      <%- if hostility == "Use of force" -%>
+      Included are conflicts between states where, at most, force was used that year for the first time, but there were fewer than 1,000 combatant deaths.
+
+      <%- elif hostility == "War" -%>
+      Included are interstate wars that started that year.
+
+      <% else %>
+      {definitions.all.conflict_type} for the first time.
+
+      <%- endif -%>
+    description_key: &description_key_new
+      - *interstate_conflict
+      - *force_usage
+      - We only count a conflict as new when the conflict overall started that year, not if it restarted or changed its hostility level (i.e. escalated or deescalated).
+      - We count a conflict as new in a region even if the conflict started at the same time in another region. The sum across all regions can therefore be higher than the total number of new conflicts.
+      - The hostility level for a conflict overall is the highest level across all world regions.
+
+
+tables:
+
+  # PARTICIPANT INDICATORS
+  cow_mid_country:
+    variables:
+      participated_in_conflict:
+        title: State involved in conflict
+        unit: ""
+        description_short: |-
+          State participated in at least one conflict with another state where force was threatened, displayed, or used that year.
+        description_key:
+          - |-
+            '1' indicates that the state participated in a conflict. '0' indicates that the state did not participate in a conflict.
+
+      number_participants:
+        title: Number of states involved in conflict
+        unit: "states"
+        description_short: |-
+          Included are states that participated in at least one conflict with another state where force was threatened, displayed, or used that year.
+
+  # MAIN INDICATORS
+  cow_mid:
+    description: >-
+      Data on the number of disputes and deaths from militarized disputes.
+
+      A militarized dispute (MID) is based on a sequence of related militarized incidents, each of which (except the first)
+      is an outgrowth of or a response to one or more previous incidents. To ensure that each MID is a unified and recognized
+      episode of militarized incidents, particular attention should be given to continuity of location and issue, as well as
+      the interpretations of observers.
+
+      For more details please refer to the source's codebook.
+    common:
+      presentation:
+        grapher_config:
+          selectedEntityNames:
+            - Africa
+            - Americas
+            - Asia and Oceania
+            - Europe
+            - Middle East
+
+    variables:
+      ####################
+      # Ongoing disputes #
+      ####################
+      number_ongoing_disputes:
+        title: Number of ongoing conflicts
+        unit: conflicts
+        description_short: |-
+          {definitions.number_ongoing_disputes.description_short}
+        description_key: *description_key_ongoing
+
+      number_ongoing_disputes_per_country:
+        title: Number of ongoing conflicts per state
+        unit: conflicts per state
+        description_short: |-
+          The number of wars divided by the number of all states. This accounts for the changing number of states over time. {definitions.number_ongoing_disputes.description_short}
+        description_key: *description_key_ongoing
+        display:
+          numDecimalPlaces: 3
+
+      number_ongoing_disputes_per_country_pair:
+        title: Number of ongoing conflicts per state-pair
+        unit: conflicts per state-pair
+        description_short: |-
+          The number of wars divided by the number of all state-pairs. This accounts for the changing number of states over time. {definitions.number_ongoing_disputes.description_short}
+        description_key: *description_key_ongoing
+        display:
+          numDecimalPlaces: 5
+
+      ################
+      # New disputes #
+      ################
+      number_new_disputes:
+        title: Number of new conflicts
+        unit: conflicts
+        description_short: |-
+          {definitions.number_new_disputes.description_short}
+        description_key: *description_key_new
+
+      number_new_disputes_per_country:
+        title: Number of new conflicts per state
+        unit: conflicts per state
+        description_short: |-
+          The number of wars divided by the number of all states. This accounts for the changing number of states over time. {definitions.number_new_disputes.description_short}
+        description_key: *description_key_new
+        display:
+          numDecimalPlaces: 3
+
+      number_new_disputes_per_country_pair:
+        title: Number of new conflicts per state-pair
+        unit: conflicts per state-pair
+        description_short: |-
+          The number of wars divided by the number of all state-pairs. This accounts for the changing number of states over time. {definitions.number_new_disputes.description_short}
+        description_key: *description_key_new
+        display:
+          numDecimalPlaces: 5
+
+
+dataset:
+  title: History of war (COW MID, 2020)
+  description: |-
+      This dataset provides information on militarized interstate disputes, using Correlates of War's Militarized Interstate Disputes dataset (version 5.0).
+
+      The dataset provides information on the number of ongoing and new interstate conflicts and the number of deaths in ongoing interstate conflicts.
+
+      Deaths of combatants due to fighting are included.
+
+      We use the world regions of the participants to code the conflicts' world region(s). The regions are defined based on Gleditsch and Ward codes. Find the complete mapping at
+      https://correlatesofwar.org/wp-content/uploads/states2016.csv:
+
+        • Americas: 2-165
+
+        • Europe: 200-395
+
+        • Africa: 402-626
+
+        • Middle East: 630-698
+
+        • Asia and Oceania: 700-999
+
+      You can find more information about the data in our article: [To be published]

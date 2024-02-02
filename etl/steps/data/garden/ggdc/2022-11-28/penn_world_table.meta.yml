@@ -14,6 +14,10 @@ dataset:
       date_accessed: 2022-11-28
       url: https://www.rug.nl/ggdc/productivity/pwt/
 
+info:
+  outliers: |-
+    Values considered outliers from the original dataset (`i_outlier = "Outlier"`) have been excluded from the dataset, due to implausible relative prices (PPPs divided by exchange rates).
+
 tables:
   penn_world_table:
     variables:
@@ -24,8 +28,10 @@ tables:
         description: |
           It measures living standards across countries and across years using prices for final goods that are constant across countries and over time.
           This variable uses ICP PPP benchmarks from multiple years to correct for changing prices over time.
+          {info.outliers}
         display:
            name: GDP
+           numDecimalPlaces: 0
       rgdpo:
         title: GDP (output, multiple price benchmarks)
         unit: international-$ in 2017 prices
@@ -33,8 +39,11 @@ tables:
         description: |
           It measures productive capacity across countries and across years using prices for final goods, exports and imports that are constant across countries and over time.
           This variable uses ICP PPP benchmarks from multiple years to correct for changing prices over time.
+          Values for Bermuda have been replaced by estimates on GDP (output, single price benchmark) due to the unusual changes on prices in this country.
+          {info.outliers}
         display:
             name: GDP
+            numDecimalPlaces: 0
       cgdpe:
         title: GDP (expenditure, single price benchmark)
         unit: international-$ in 2017 prices
@@ -42,8 +51,10 @@ tables:
         description: |
           It measures the standards of living across countries in each year by using prices for final goods that are constant across countries.
           This variable only uses the most recent ICP PPP benchmark.
+          {info.outliers}
         display:
            name: GDP
+           numDecimalPlaces: 0
       cgdpo:
         title: GDP (output, single price benchmark)
         unit: international-$ in 2017 prices
@@ -51,15 +62,20 @@ tables:
         description: |
           It measures the productive capacity across countries in each year by using prices for final goods, exports and imports that are constant across countries.
           This variable only uses the most recent ICP PPP benchmark.
+          {info.outliers}
         display:
            name: GDP
+           numDecimalPlaces: 0
       rgdpna:
         title: GDP (using national accounts growth rates)
         unit: international-$ in 2017 prices
         short_unit: $
-        description: The difference with the other GDP variables is this is computed based on the growth rate of real GDP from national accounts data for each country. For this reason, this variable is useful for comparing growth of GDP over time in each country.
+        description: |
+          The difference with the other GDP variables is this is computed based on the growth rate of real GDP from national accounts data for each country. For this reason, this variable is useful for comparing growth of GDP over time in each country.
+          {info.outliers}
         display:
            name: GDP
+           numDecimalPlaces: 0
       rgdpe_pc:
         title: GDP per capita (expenditure, multiple price benchmarks)
         unit: international-$ in 2017 prices
@@ -67,8 +83,10 @@ tables:
         description: |
           Estimated as the GDP (expenditure, multiple price benchmarks) divided by the population of each country.
           This variable uses ICP PPP benchmarks from multiple years to correct for changing prices over time.
+          {info.outliers}
         display:
            name: GDP per capita
+           numDecimalPlaces: 0
       rgdpo_pc:
         title: GDP per capita (output, multiple price benchmarks)
         unit: international-$ in 2017 prices
@@ -76,8 +94,11 @@ tables:
         description: |
           Estimated as the GDP (output, multiple price benchmarks) divided by the population of each country.
           This variable uses ICP PPP benchmarks from multiple years to correct for changing prices over time.
+          Values for Bermuda have been replaced by estimates on GDP per capita (output, single price benchmark) due to the unusual changes on prices in this country.
+          {info.outliers}
         display:
            name: GDP per capita
+           numDecimalPlaces: 0
       cgdpe_pc:
         title: GDP per capita (expenditure, single price benchmark)
         unit: international-$ in 2017 prices
@@ -85,8 +106,10 @@ tables:
         description: |
           Estimated as the GDP (expenditure, single price benchmark) divided by the population of each country.
           The GDP estimate in this variable only uses the most recent ICP PPP benchmark.
+          {info.outliers}
         display:
            name: GDP per capita
+           numDecimalPlaces: 0
       cgdpo_pc:
         title: GDP per capita (output, single price benchmark)
         unit: international-$ in 2017 prices
@@ -94,8 +117,10 @@ tables:
         description: |
           Estimated as the GDP (output, single price benchmark) divided by the population of each country.
           The GDP estimate in this variable only uses the most recent ICP PPP benchmark.
+          {info.outliers}
         display:
            name: GDP per capita
+           numDecimalPlaces: 0
       rgdpna_pc:
         title: GDP per capita (using national accounts growth rates)
         unit: international-$ in 2017 prices
@@ -103,8 +128,10 @@ tables:
         description: |
           Estimated as the GDP (using national accounts growth rates) divided by the population of each country.
           The GDP is computed based on the growth rate of real GDP from national accounts data for each country. For this reason, this variable is useful for comparing growth of GDP over time in each country.
+          {info.outliers}
         display:
            name: GDP per capita
+           numDecimalPlaces: 0
       pop:
         title: Population
         unit: people
@@ -115,7 +142,7 @@ tables:
         description: This is the number of people working in the country (employees and self-employed).
       avh:
         title: Annual working hours per worker
-        unit: Hours per worker
+        unit: hours per worker
         description: It is the average sum of hours worked by employees and self-employed people during each year in a country.
       hc:
         title: Human capital index, based on years of schooling and returns to education
@@ -125,21 +152,27 @@ tables:
         title: Consumption of households and government (single price benchmark)
         unit: international-$ in 2017 prices
         short_unit: $
-        description: It is the sum of real household and government consumption, used to measure and compare living standards across countries.
+        description: |
+          It is the sum of real household and government consumption, used to measure and compare living standards across countries.
+          {info.outliers}
         display:
            name: Consumption of households and government
       cda:
         title: Domestic absorption (consumption plus investment) (single price benchmark)
         unit: international-$ in 2017 prices
         short_unit: $
-        description: It is computed as real consumption plus real investment. The sum of domestic absorption and the real trade balance generates GDP (expenditure, multiple price benchmarks), the expenditure-side real GDP at chained PPPs.
+        description: |
+          It is computed as real consumption plus real investment. The sum of domestic absorption and the real trade balance generates GDP (expenditure, multiple price benchmarks), the expenditure-side real GDP at chained PPPs.
+          {info.outliers}
         display:
            name: Consumption plus investment
       cn:
         title: Capital stock (single price benchmark)
         unit: international-$ in 2017 prices
         short_unit: $
-        description: It is estimated from investment by asset in each country, as structures, transport equipment, machinery and also computers, communication equipment and software on selected countries. Prices for these assets are constant across countries each year.
+        description: |
+          It is estimated from investment by asset in each country, as structures, transport equipment, machinery and also computers, communication equipment and software on selected countries. Prices for these assets are constant across countries each year.
+          {info.outliers}
         display:
            name: Capital stock
       ck:
@@ -157,21 +190,27 @@ tables:
         title: Consumption of households and government (using national accounts)
         unit: international-$ in 2017 prices
         short_unit: $
-        description: Real household and government consumption at constant national prices. It is useful to compare growth of consumption over time in one country.
+        description: |
+          Real household and government consumption at constant national prices. It is useful to compare growth of consumption over time in one country.
+          {info.outliers}
         display:
            name: Consumption of households and government
       rdana:
         title: Domestic absorption (consumption plus investment) (using national accounts)
         unit: international-$ in 2017 prices
         short_unit: $
-        description: Real consumption plus real investment at constant national prices. It is useful for comparing the growth of the absorption over time in each country.
+        description: |
+          Real consumption plus real investment at constant national prices. It is useful for comparing the growth of the absorption over time in each country.
+          {info.outliers}
         display:
            name: Consumption plus investment
       rnna:
         title: Capital stock (using national accounts)
         unit: international-$ in 2017 prices
         short_unit: $
-        description: Capital stock at constant national prices, based on investment and prices of structures and equipment. Useful for comparing growth of this variable over time in each country.
+        description: |
+          Capital stock at constant national prices, based on investment and prices of structures and equipment. Useful for comparing growth of this variable over time in each country.
+          {info.outliers}
         display:
            name: Capital stock
       rkna:
@@ -227,10 +266,6 @@ tables:
         title: Type of estimation for the exchange rate
         unit:
         description: Market-based (0) or estimated (1)
-      i_outlier:
-        title: Is the observation on pl_gdpe or pl_gdpo an outlier?
-        unit:
-        description: Not an outlier (0) or an outlier (1)
       i_irr:
         title: Is the observation for irr an outlier?
         unit:
@@ -296,7 +331,12 @@ tables:
         title: "Productivity: output per hour worked"
         unit: international-$ in 2017 prices per hour
         short_unit: $/h
-        description: It is the GDP (output, multiple price benchmarks) divided by the Annual working hours per worker and the Number of people in work.
+        description: |
+          It is the GDP (output, multiple price benchmarks) divided by the Annual working hours per worker and the Number of people in work.
+          {info.outliers}
+        display:
+           name: Productivity
+           numDecimalPlaces: 1
       trade_openness:
         title: Trade openness (share of exports and imports in GDP)
         unit: "%"

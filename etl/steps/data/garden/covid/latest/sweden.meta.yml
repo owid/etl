@@ -1,0 +1,27 @@
+dataset:
+  title: COVID-19 - Swedish Public Health Agency
+  description: >-
+    This data on confirmed COVID-19 deaths is imported directly from the dataset published by the Swedish Public Health Agency
+    (Folkhälsomyndigheten).
+
+
+    More information on this dataset and the reporting method is available in [our dedicated blog post](https://ourworldindata.org/covid-sweden-death-reporting).
+  sources:
+  - name: Swedish Public Health Agency – Last updated {TODAY}
+    url: https://www.folkhalsomyndigheten.se/smittskydd-beredskap/utbrott/aktuella-utbrott/covid-19/statistik-och-analyser/bekraftade-fall-i-sverige/
+    published_by: Swedish Public Health Agency – Last updated 28 October 2022
+tables:
+  sweden:
+    variables:
+      deaths:
+        title: Deaths
+        unit: ''
+        display:
+          yearIsDay: true
+          zeroDay: '2020-01-01'
+      incomplete_deaths:
+        title: Incomplete deaths
+        unit: ''
+        display:
+          yearIsDay: true
+          zeroDay: '2020-01-01'

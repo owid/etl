@@ -9,16 +9,13 @@ import pandas as pd
 from owid.catalog import Dataset, Table
 from owid.catalog.meta import License, Source
 
-from etl.helpers import downloaded
-
 MEGAFILE_URL = "https://raw.githubusercontent.com/owid/covid-19-data/master/public/data/owid-covid-data.csv"
 
 
 def run(dest_dir: str) -> None:
     d = create_dataset(dest_dir)
 
-    with downloaded(MEGAFILE_URL) as filename:
-        df = pd.read_csv(filename)
+    df = pd.read_csv(MEGAFILE_URL)
 
     df["date"] = pd.to_datetime(df.date)
 

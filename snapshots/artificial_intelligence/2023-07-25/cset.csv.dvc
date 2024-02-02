@@ -1,0 +1,27 @@
+meta:
+  name: 'Country Activity Tracker: Artificial Intelligence (Center for Security and     Emerging
+    Technology, 2023)'
+  publication_year: 2023
+  source_name: Center for Security and Emerging Technology (2023)
+  source_published_by: Emerging Technology Observatory Country Activity Tracker, Artificial
+    Intelligence (Center for Security and Emerging Technology, 2023)
+  url: https://cat.eto.tech/
+  source_data_url:
+  license_url: https://eto.tech/tou/
+  license_name: Creative Commons BY 4.0
+  date_accessed: 2023-07-25
+  is_public: true
+  description: |
+    The research data in CAT (Country Attributes and Topics) is derived from ETO's Merged Academic Corpus (MAC), which contains detailed information on over 270 million scholarly articles worldwide. CAT uses only AI-related articles from the MAC. Articles are attributed to countries based on the author organizations listed in each article's metadata. An article is attributed to a country if it lists at least one author affiliated with an organization in that country.
+
+    The top ten authors for each country are identified based on the number of citations to articles they released while affiliated with institutions in that country. CAT classifies articles into AI subfields using subject assignment scores in the MAC. Articles are assigned to up to three subfields based on their scores.
+
+    CAT includes patent data from 1790 Analytics and Dimensions, and it counts AI-related patent families, including patent applications and granted patents. Patents are attributed to the country where they are filed, not necessarily the inventor's nationality. CAT also uses Crunchbase data to identify AI-related companies based on various criteria and includes investment metrics for these companies.
+
+    The data in CAT is updated at least once a quarter, with plans for more frequent updates in the future.
+
+wdir: ../../../data/snapshots/artificial_intelligence/2023-07-25
+outs:
+- md5: c972968655cecb5618d5857cbb9b9551
+  size: 2583211
+  path: cset.csv

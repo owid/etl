@@ -1,0 +1,462 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - War & Peace
+    display:
+      numDecimalPlaces: 0
+
+  all:
+    # Explanation of each conflict type
+    conflict_type_base: |-
+      This includes combatant and civilian deaths due to fighting
+    conflict_type: |-
+      <%- if conflict_type == "all" -%>
+      An armed conflict is a disagreement between organized groups, or between one organized group and civilians, that causes at least 25 deaths during a year. {definitions.all.conflict_type_base}.
+
+      <%- elif conflict_type == "state-based" -%>
+      A state-based conflict is a conflict between two armed groups, at least one of which is a state, that causes at least 25 deaths during a year. {definitions.all.conflict_type_base}.
+
+      <%- elif conflict_type == "interstate" -%>
+      An interstate conflict is a conflict between states that causes at least 25 deaths during a year. {definitions.all.conflict_type_base}.
+
+      <%- elif conflict_type == "intrastate" -%>
+      An intrastate conflict is a conflict between a state and a non-state armed group that causes at least 25 deaths during a year. {definitions.all.conflict_type_base}. If a foreign state is involved, it is called "internationalized", and "non-internationalized" otherwise.
+
+      <%- elif conflict_type == "intrastate (internationalized)" -%>
+      An internationalized intrastate conflict is a conflict between a state and a non-state armed group, with involvement of a foreign state, that causes at least 25 deaths during a year. {definitions.all.conflict_type_base}.
+
+      <%- elif conflict_type == "intrastate (non-internationalized)" -%>
+      An non-internationalized intrastate conflict is a conflict between a state and a non-state armed group, without involvement of a foreign state, that causes at least 25 deaths during a year. {definitions.all.conflict_type_base}.
+
+      <%- elif conflict_type == "extrasystemic" -%>
+      An extrasystemic conflict is a conflict between a state and a non-state armed group outside its territory that causes at least 25 deaths during a year. {definitions.all.conflict_type_base}.
+
+      <%- elif conflict_type == "non-state conflict" -%>
+      A non-state conflict is a conflict between non-state armed groups, such as rebel groups, criminal organizations, or ethnic groups, that causes at least 25 deaths during a year. {definitions.all.conflict_type_base}.
+
+      <%- elif conflict_type == "one-sided violence" -%>
+      One-sided violence is the use of armed force by a state or non-state armed group against civilians that causes at least 25 civilian deaths during a year.
+
+      <%- endif -%>
+    location_conflicts_method: |-
+      UCDP provides geographical coordinates of each conflict event. We have mapped these coordinates to countries by means of the Natural Earth dataset.
+
+      In some instances, the event's coordinates fall within the borders of a country. Other times, the event's coordinates fall outside the borders of a country. In the latter case, we have mapped the event to the country that is closest to the event's coordinates.
+
+      Conflict event with id "53238" and relid "PAK-2003-1-345-88" was assigned to "Siachen Glacier" by Natural Earth. We have mapped it to "Pakistan" following the text in the `where_description` field from the Natural Earth data, which refers to "Giang sector in Siachen, Pakistani Kashmir".
+
+  # Fields used for number of deaths indicators
+  number_deaths:
+    description_short: |-
+      <%- if conflict_type == "all" -%>
+      The << estimate >> estimate of the number of deaths of combatants and civilians due to fighting in interstate, intrastate, extrasystemic, non-state conflicts, and one-sided violence that were ongoing that year<< per_capita >>.
+
+      <%- elif conflict_type == "state-based" -%>
+      The << estimate >> estimate of the number of deaths of combatants and civilians due to fighting in interstate, intrastate, and extrasystemic conflicts that were ongoing that year<< per_capita >>.
+
+      <%- elif conflict_type == "intrastate (internationalized)" -%>
+      The << estimate >> estimate of the number of deaths of combatants and civilians due to fighting in internationalized intrastate conflicts that were ongoing that year<< per_capita >>.
+
+      <%- elif conflict_type == "intrastate (non-internationalized)" -%>
+      The << estimate >> estimate of the number of deaths of combatants and civilians due to fighting in non-internationalized intrastate conflicts that were ongoing that year<< per_capita >>.
+
+      <%- elif conflict_type == "one-sided violence" -%>
+      The << estimate >> estimate of the number of deaths of civilians from one-sided violence that was ongoing that year<< per_capita >>.
+
+      <%- elif conflict_type == "non-state conflict" -%>
+      The << estimate >> estimate of the number of deaths of combatants and civilians due to fighting in non-state conflicts that were ongoing that year<< per_capita >>.
+
+      <%- else -%>
+      The << estimate >> estimate of the number of deaths of combatants and civilians due to fighting in << conflict_type >> conflicts that were ongoing that year<< per_capita >>.
+
+      <%- endif -%>
+    description_short_per_capita:
+      <% set per_capita = ", per 100,000 people" %>
+      {definitions.number_deaths.description_short}
+    description_key: &description_key_deaths
+      - "{definitions.all.conflict_type}"
+
+  number_ongoing_conflicts:
+    description_short: |-
+      <%- if conflict_type == "all" -%>
+      Included are armed conflicts that were ongoing a year.
+
+      <%- elif conflict_type == "intrastate (internationalized)" -%>
+      Included are internationalized intrastate conflicts that were ongoing a year.
+
+      <%- elif conflict_type == "intrastate (non-internationalized)" -%>
+      Included are non-internationalized intrastate conflicts that were ongoing a year.
+
+      <%- elif conflict_type == "non-state conflict" -%>
+      Included are non-state conflicts that were ongoing that year.
+
+      <%- elif conflict_type == "one-sided violence" -%>
+      Included is one-sided violence that was ongoing that year.
+
+      <%- elif conflict_type == "state-based" -%>
+      Included are interstate, intrastate, and extrasystemic conflicts that were ongoing that year.
+
+      <%- else -%>
+      Included are << conflict_type >> conflicts that were ongoing a year.
+
+      <%- endif -%>
+    description_key: &description_key_ongoing
+      - "{definitions.all.conflict_type}"
+      - We count a conflict as ongoing in a region even if the conflict is also ongoing in other regions. The sum across all regions can therefore be higher than the total number of ongoing conflicts.
+
+  number_new_conflicts:
+    description_short: "{definitions.number_ongoing_conflicts.description_short}"
+    description_key: &description_key_new
+      - "{definitions.all.conflict_type}"
+      - We only count a conflict as new when the conflict overall started that year, not if it became active again.
+      - We count a conflict as new in a region even if the conflict started earlier or at the same time in another region. The sum across all regions can therefore be higher than the total number of new conflicts.
+      - |-
+        <%- if conflict_type == "intrastate (internationalized)" -%>
+        We count an internationalized intrastate conflict as new only if the conflict started that year, not if it became internationalized.
+
+        <%- elif conflict_type == "intrastate (non-internationalized)" -%>
+        We count a non-internationalized intrastate conflict as new only if the conflict started that year, not if it stopped being international.
+        <%- endif -%>
+
+
+tables:
+  # PARTICIPANT INDICATORS
+  ucdp_country:
+    common:
+      presentation:
+        attribution: Uppsala Conflict Data Program and Peace Research Institute Oslo (2023)
+      description_key:
+        - "{definitions.all.conflict_type}"
+        - A country is considered to participate in a conflict if they were a primary participant, which refers to those participants that have the main disagreement of the conflict.
+
+    variables:
+      participated_in_conflict:
+        title: State involved in conflict
+        unit: ""
+        description_short: |-
+          <%- if conflict_type == "state-based" -%>
+          State was a primary participant in at least one interstate, intrastate, or extrasystemic conflict that year.
+
+          <%- elif conflict_type == "intrastate (internationalized)" -%>
+          State was a primary participants in at least one internationalized intrastate conflict that year.
+
+          <%- elif conflict_type == "intrastate (non-internationalized)" -%>
+          State was a primary participants in at least one non-internationalized intrastate conflict that year.
+
+          <%- elif conflict_type == "one-sided violence" -%>
+          State was a primary participants in at least one instance of one-sided violence that year.
+
+          <% else -%>
+          State was a primary participants in at least one << conflict_type >> conflict that year.
+
+          <%- endif -%>
+        description_key:
+          - |-
+            '1' indicates that the state participated in a conflict. '0' indicates that the state did not participate in a conflict.
+
+      number_participants:
+        title: Number of states involved in conflicts
+        unit: "states"
+        description_short: |-
+          <%- if conflict_type == "state-based" -%>
+          Included are states that were primary participants in at least one interstate, intrastate, or extrasystemic conflict that year.
+
+          <%- elif conflict_type == "intrastate (internationalized)" -%>
+          Included are states that were primary participants in at least one internationalized intrastate conflict that year.
+
+          <%- elif conflict_type == "intrastate (non-internationalized)" -%>
+          Included are states that were primary participants in at least one non-internationalized intrastate conflict that year.
+
+          <%- elif conflict_type == "one-sided violence" -%>
+          Included are states that were primary participants in at least one instance of one-sided violence that year.
+
+          <% else -%>
+          Included are states that were primary participants in at least one << conflict_type >> conflict that year.
+
+          <%- endif -%>
+
+  # LOCATION INDICATORS
+  ucdp_locations:
+
+    common:
+      description_processing: |-
+        {definitions.all.location_conflicts_method}
+      description_key:
+        - "{definitions.all.conflict_type}"
+
+    variables:
+      is_location_of_conflict:
+        title: Country where conflict took place
+        unit: ""
+        description_short: |-
+          <%- if conflict_type == "state-based" -%>
+          At least one interstate, intrastate, or extrasystemic conflict event took place in this country in a given year.
+
+          <%- elif conflict_type == "intrastate (internationalized)" -%>
+          At least one internationalised intrastate conflict event took place in this country in a given year.
+
+          <%- elif conflict_type == "intrastate (non-internationalized)" -%>
+          At least one non-internationalized intrastate conflict event took place in this country in a given year.
+
+          <%- elif conflict_type == "one-sided violence" -%>
+          At least one conflict event took place in this country in a given year.
+
+          <% else -%>
+          At least one << conflict_type >> conflict event took place in this country in a given year.
+
+          <%- endif -%>
+        description_key:
+          - |-
+            '1' indicates that there was a conflict event in the given country. '0' indicates that there was no conflict event in the given country.
+          - "{definitions.all.conflict_type}"
+
+      number_locations:
+        title: Number of countries where conflict took place
+        unit: "countries"
+        description_short: |-
+          <%- if conflict_type == "all" -%>
+          Included are armed conflicts that caused at least one death in the country that year.
+
+          <%- elif conflict_type == "state-based" -%>
+          Included are interstate, intrastate, and extrasystemic conflicts that caused at least one death in the country that year.
+
+          <%- elif conflict_type == "intrastate (internationalized)" -%>
+          Included are internationalized conflicts that caused at least one death in the country that year.
+
+          <%- elif conflict_type == "intrastate (non-internationalized)" -%>
+          Included are non-internationalized conflicts that caused at least one death in the country that year.
+
+          <%- elif conflict_type == "one-sided violence" -%>
+          Included is one-sided violence that caused at least one death in the country that year.
+
+          <% else -%>
+          Included are << conflict_type >> conflicts that caused at least one death in the country that year.
+
+          <%- endif -%>
+
+      number_deaths:
+        title: Deaths in ongoing conflicts in a country (best estimate)
+        unit: "deaths"
+        description_short: |-
+          <% set estimate = "best" %>
+          {definitions.number_deaths.description_short}
+
+      number_deaths_low:
+        title: Deaths in ongoing conflicts in a country (low estimate)
+        unit: "deaths"
+        description_short: |-
+          <% set estimate = "low" %>
+          {definitions.number_deaths.description_short}
+
+      number_deaths_high:
+        title: Deaths in ongoing conflicts in a country (high estimate)
+        unit: "deaths"
+        description_short: |-
+          <% set estimate = "high" %>
+          {definitions.number_deaths.description_short}
+
+      death_rate:
+        title: Death rate in ongoing conflicts in a country (best estimate)
+        unit: "deaths per 100,000 people"
+        display:
+          numDecimalPlaces: 1
+        description_short: |-
+          <% set estimate = "best" %>
+          {definitions.number_deaths.description_short_per_capita}
+
+      death_rate_low:
+        title: Death rate in ongoing conflicts in a country (low estimate)
+        unit: "deaths per 100,000 people"
+        display:
+          numDecimalPlaces: 1
+        description_short: |-
+          <% set estimate = "low" %>
+          {definitions.number_deaths.description_short_per_capita}
+
+      death_rate_high:
+        title: Death rate in ongoing conflicts in a country (high estimate)
+        unit: "deaths per 100,000 people"
+        display:
+          numDecimalPlaces: 1
+        description_short: |-
+          <% set estimate = "high" %>
+          {definitions.number_deaths.description_short_per_capita}
+
+  # MAIN INDICATORS
+  ucdp:
+    common:
+      presentation:
+        grapher_config:
+          selectedEntityNames:
+            - Africa
+            - Americas
+            - Asia and Oceania
+            - Europe
+            - Middle East
+    variables:
+      ##################
+      # Ongoing deaths #
+      ##################
+      number_deaths_ongoing_conflicts:
+        title: Deaths in ongoing conflicts (best estimate)
+        unit: deaths
+        description_short: |-
+          <% set estimate = "best" %>
+          {definitions.number_deaths.description_short}
+        description_key: *description_key_deaths
+
+      number_deaths_ongoing_conflicts_high:
+        title: Deaths in ongoing conflicts (high estimate)
+        unit: deaths
+        description_short: |-
+          <% set estimate = "high" %>
+          {definitions.number_deaths.description_short}
+        description_key: *description_key_deaths
+
+      number_deaths_ongoing_conflicts_low:
+        title: Deaths in ongoing conflicts (low estimate)
+        unit: deaths
+        description_short: |-
+          <% set estimate = "low" %>
+          {definitions.number_deaths.description_short}
+        description_key: *description_key_deaths
+
+      number_deaths_ongoing_conflicts_per_capita:
+        title: Death rate in ongoing conflicts (best estimate)
+        unit: deaths per 100,000 people
+        description_short: |-
+          <% set estimate = "best" %>
+          {definitions.number_deaths.description_short_per_capita}
+        description_key: *description_key_deaths
+        display:
+          numDecimalPlaces: 1
+        presentation:
+          attribution: Uppsala Conflict Data Program and Peace Research Institute Oslo (2023)
+
+      number_deaths_ongoing_conflicts_high_per_capita:
+        title: Death rate in ongoing conflicts (high estimate)
+        unit: deaths per 100,000 people
+        description_short: |-
+          <% set estimate = "high" %>
+          {definitions.number_deaths.description_short_per_capita}
+        description_key: *description_key_deaths
+        display:
+          numDecimalPlaces: 1
+
+      number_deaths_ongoing_conflicts_low_per_capita:
+        title: Death rate in ongoing conflicts (low estimate)
+        unit: deaths per 100,000 people
+        description_short: |-
+          <% set estimate = "low" %>
+          {definitions.number_deaths.description_short_per_capita}
+        description_key: *description_key_deaths
+        display:
+          numDecimalPlaces: 1
+
+      #####################
+      # Ongoing conflicts #
+      #####################
+      number_ongoing_conflicts:
+        title: Number of ongoing conflicts
+        unit: conflicts
+        description_short: |-
+          {definitions.number_ongoing_conflicts.description_short}
+        description_key: *description_key_ongoing
+        presentation:
+          grapher_config:
+            selectedEntityNames:
+              - World
+          attribution: Uppsala Conflict Data Program and Peace Research Institute Oslo (2023)
+
+      number_ongoing_conflicts_per_country:
+        title: Number of ongoing conflicts per state
+        unit: conflicts per state
+        description_short: |-
+          The number of conflicts divided by the number of all states. This accounts for the changing number of states over time. {definitions.number_ongoing_conflicts.description_short}
+        description_key: *description_key_ongoing
+        display:
+          numDecimalPlaces: 3
+        presentation:
+          attribution: Uppsala Conflict Data Program and Peace Research Institute Oslo (2023)
+
+      number_ongoing_conflicts_per_country_pair:
+        title: Number of ongoing conflicts per state-pair
+        unit: conflicts per state-pair
+        description_short: |-
+          The number of conflicts divided by the number of all state-pairs. This accounts for the changing number of states over time. {definitions.number_ongoing_conflicts.description_short}
+        description_key: *description_key_ongoing
+        display:
+          numDecimalPlaces: 5
+        presentation:
+          attribution: Uppsala Conflict Data Program and Peace Research Institute Oslo (2023)
+
+      #################
+      # New conflicts #
+      #################
+      number_new_conflicts:
+        title: Number of new conflicts
+        unit: conflicts
+        description_short: |-
+          {definitions.number_new_conflicts.description_short}
+        description_key: *description_key_new
+        presentation: # TODO
+          attribution: Uppsala Conflict Data Program and Peace Research Institute Oslo (2023)
+
+      number_new_conflicts_per_country:
+        title: Number of new conflicts per state
+        unit: conflicts per state
+        description_short: |-
+          The number of conflicts divided by the number of all states. This accounts for the changing number of states over time. {definitions.number_new_conflicts.description_short}
+        description_key: *description_key_new
+        display:
+          numDecimalPlaces: 3
+        presentation:
+          attribution: Uppsala Conflict Data Program and Peace Research Institute Oslo (2023)
+
+      number_new_conflicts_per_country_pair:
+        title: Number of new conflicts per state-pair
+        unit: conflicts per state-pair
+        description_short: |-
+          The number of conflicts divided by the number of all state-pairs. This accounts for the changing number of states over time. {definitions.number_new_conflicts.description_short}
+        description_key: *description_key_new
+        display:
+          numDecimalPlaces: 5
+        presentation:
+          attribution: Uppsala Conflict Data Program and Peace Research Institute Oslo (2023)
+
+
+dataset:
+  title: History of war (UCDP, 2023)
+  description: |-
+    This dataset provides information on armed conflicts, using data from the UCDP Georeferenced Event Dataset (version 23.1), the UCDP/PRIO Armed Conflict Dataset (version 23.1), and the UCDP Battle-Related Deaths Dataset (version 23.1).
+
+    We aggregate the UCDP Georeferenced Event Dataset up to the year and world (region) to identify all conflict deaths, non-state conflicts, and one-sided violence.
+
+    We use the UCDP/PRIO Armed Conflict Dataset to identify state-based conflicts: interstate, intrastate (all, internationalized, and non-internationalized), and extrasystemic.
+
+    We use the UCDP Battle-Related Deaths Dataset to link deaths in the Georeferenced Event Dataset to types of state-based conflicts in the UCDP/PRIO Armed Conflict Dataset.
+
+    We combine these datasets to provide information on the number of ongoing and new conflicts, the number of ongoing and new conflict types, as well as the number of deaths in ongoing conflicts and conflict types.
+
+    Deaths of combatants and civilians due to fighting are included.
+
+    The Georeferenced Event Dataset has been extracted from the UCDP systems at a certain point in time. However, the UCDP team works with the data all year round, including revisions and updates. Therefore, their dashboard
+    might show slightly more up-to-date data, which sometimes result in minor discrepancies in the data.
+
+    We use the world regions as defined by UCDP/PRIO: Africa, Americas, Asia, Europe, and Middle East. These are defined based on Gleditsch and Ward codes. Find the complete mapping at
+    http://ksgleditsch.com/data/iisystem.dat (states) and http://ksgleditsch.com/data/microstatessystem.dat (micro-states):
+
+      • Americas: 2-199
+
+      • Europe: 200-399
+
+      • Africa: 400-626
+
+      • Middle East: 630-699
+
+      • Asia and Oceania: 700-999
+
+    You can find more information about the data in our article: [To be published]
+
+    This dataset contains information on armed conflicts - state, non-state and one-sided conflicts, in the period of 1989 and 2022.

@@ -1,18 +1,17 @@
 meta:
-  namespace: backport
-  short_name: dataset_5588_historical_cost_of_computer_memory_and_storage__john_c__mccallum__2022_config
-  file_extension: json
-  date_accessed: 2023-04-23 08:11:59.403319
-  name: Grapher metadata for dataset_5588_historical_cost_of_computer_memory_and_storage__john_c__mccallum__2022
-  description: https://github.com/owid/notebooks/tree/main/EdouardMathieu/computer_memory_prices
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/5588
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5588
+    date_accessed: 2023-08-10 07:50:00.895873
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_5588_historical_cost_of_computer_memory_and_storage__john_c__mccallum__2022
+  description: 
+    https://github.com/owid/notebooks/tree/main/EdouardMathieu/computer_memory_prices
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: dbb1b0f94af52ffd61fb1ed1da48302b
-  size: 4402
-  path: dataset_5588_historical_cost_of_computer_memory_and_storage__john_c__mccallum__2022_config.json
+- md5: 14f1264a4ffb4ae8e6d6a20cf0e523b9
+  size: 4928
+  path: 
+    dataset_5588_historical_cost_of_computer_memory_and_storage__john_c__mccallum__2022_config.json

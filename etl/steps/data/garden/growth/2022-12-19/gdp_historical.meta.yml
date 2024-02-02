@@ -28,11 +28,9 @@ dataset:
   short_name: gdp_historical
   description: |
     This dataset combines the Maddison Project Database, Maddison Database and World Bank's World Development Indicators current estimations to present the most up-to-date evolution of GDP and GDP per capita in the last millennia. As the global aggregation from the World Bank only starts from 1990, the global GDP data is separated into three parts:
-    <ul>
-      <li>From 1990 onward it is exactly the same value estimated by the World Bank (international-$ in 2017 prices).</li>
-      <li>Between 1820 and 1990 the World Bank data from 1990 is retroactively adjusted using the global aggregations by Maddison Project Database.</li>
-      <li>Between 1 and 1820 the 1820 estimation is retroactively adjusted using growth coming from the Maddison Database 2010</li>
-    </ul>
+      * From 1990 onward it is exactly the same value estimated by the World Bank (international-$ in 2017 prices).
+      * Between 1820 and 1990 the World Bank data from 1990 is retroactively adjusted using the global aggregations by Maddison Project Database.
+      * Between 1 and 1820 the 1820 estimation is retroactively adjusted using growth coming from the Maddison Database 2010
   sources:
     - *source_maddison_project
     - *source_maddison_database

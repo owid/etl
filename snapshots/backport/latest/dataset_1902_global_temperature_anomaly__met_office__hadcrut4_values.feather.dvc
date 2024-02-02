@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1902
+    date_accessed: 2023-08-14 16:06:18.338209
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Global temperature anomaly - Met Office (HadCRUT4)
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 4a09f166a9e3952830bffaf2ce80f634
+  size: 15394
+  path: dataset_1902_global_temperature_anomaly__met_office__hadcrut4_values.feather

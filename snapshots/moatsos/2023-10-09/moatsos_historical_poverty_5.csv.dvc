@@ -1,0 +1,33 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/origin/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Long Run Global Poverty using the Dollar-a-Day method
+    description: |-
+      This dataset contains estimates of global poverty in the long run at three different international poverty lines, at 5, 10, and 30 dollars per day (using 2011 PPP dollars), covering the period from 1820 until 2019. Detailed information about the assumptions, methods and data used can be found in chapter 6 and in the appendix of my PhD thesis: Moatsos, M. (2020). Global Absolute Poverty, Present and Past since 1820. Utrecht University. https://doi.org/10.33540/129 and on the OECD publication Moatsos, M. (2021). Global Absolute Poverty: Present and Past since 1820. In How Was Life? Volume II: New Perspectives on Well-being and Global Inequality since 1820 (1 ed., Vol. 2). OECD Publishing. https://www.oecd-ilibrary.org/sites/e20f2f1a-en/index.html?itemId=/content/component/e20f2f1a-en. This dataset expands the estimates of those publications in higher dollarized international poverty lines, namely at 5, 10, and 30 dollars per day (using 2011 PPP dollars).
+    date_published: 2022-09-24
+    title_snapshot: Long Run Global Poverty using the Dollar-a-Day method - $5 poverty
+      line
+
+    # Citation
+    producer: Michalis Moatsos
+    citation_full: |-
+      Moatsos, M. (2022) Long Run Global Poverty using the Dollar-a-Day method. Data publication platform of Utrecht University, retrieved from https://public.yoda.uu.nl/i-lab/UU01/UOJSYN.html
+
+    # Files
+    url_main: https://public.yoda.uu.nl/i-lab/UU01/UOJSYN.html
+    url_download:
+      https://i-lab.public.data.uu.nl/vault-moatsos/LongRunDollarADayAtMultipleLines%5B1663918437%5D/original/Global5.csv
+    date_accessed: 2023-10-09
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://public.yoda.uu.nl/i-lab/UU01/UOJSYN.html
+
+wdir: ../../../data/snapshots/moatsos/2023-10-09
+outs:
+- md5: 6578d3d9e7abd9e8b07831fcb300c456
+  size: 74861
+  path: moatsos_historical_poverty_5.csv

@@ -12,37 +12,30 @@ dataset:
     - Gapminder (Systema Globalis): Covers the period 1555-2008. It complements the dataset with former countries and other data points not present in the other sources.
 
     For a more detailed description, please refer to the field "source" in table "population".
-
-  version: "2022-12-08"
+  version: '2022-12-08'
   sources: &population-sources
-    - name: Gapminder (2019)
-      published_by: Gapminder (v6)
-      url: https://docs.google.com/spreadsheets/d/14_suWY8fCPEXV0MH7ZQMZ-KndzMVsSsA5HdR-7WqAC0/edit#gid=501532268
-      date_accessed: October 8, 2021
-    - name: UN (2022)
-      published_by: UN, World Population Prospects (2022)
-      url: https://population.un.org/wpp/Download/Standard/Population/
-      date_accessed: September 10, 2022
-    - name: HYDE (2017)
-      published_by: HYDE (v3.2)
-      url: https://dataportaal.pbl.nl/downloads/HYDE/
-      date_accessed: October 8, 2021
-      # the following source contains population for former countries
-      # after researching where this comes from, conclusion is that
-      # it comes from Gapminder v3 https://www.gapminder.org/data/documentation/gd003/
-      # and is downloadable via button labeled with text:
-      # "» Download Excel-file with data, including interpolations & detailed meta-data (xlsx)"
-    - name: Gapminder (Systema Globalis)
-      published_by: Gapminder (Systema Globalis)
-      url: https://github.com/open-numbers/ddf--gapminder--systema_globalis
-      date_accessed: December 12, 2022
+  - name: Gapminder (2019)
+    published_by: Gapminder (v6)
+    url: https://docs.google.com/spreadsheets/d/14_suWY8fCPEXV0MH7ZQMZ-KndzMVsSsA5HdR-7WqAC0/edit#gid=501532268
+    date_accessed: October 8, 2021
+  - name: UN (2022)
+    published_by: UN, World Population Prospects (2022)
+    url: https://population.un.org/wpp/Download/Standard/Population/
+    date_accessed: September 10, 2022
+  - name: HYDE (2017)
+    published_by: HYDE (v3.2)
+    url: https://dataportaal.pbl.nl/downloads/HYDE/
+    date_accessed: October 8, 2021
+  - name: Gapminder (Systema Globalis)
+    published_by: Gapminder (Systema Globalis)
+    url: https://github.com/open-numbers/ddf--gapminder--systema_globalis
+    date_accessed: December 12, 2022
 tables:
   population:
     title: Population (various sources)
     description: |
       Our World in Data builds and maintains a long-run dataset on population by country, region, and for the world, based on three key sources: HYDE, Gapminder, and the UN World Population Prospects.
-      You can find more information on these sources and how our time series is constructed on this page: <a href="https://ourworldindata.org/population-sources">What sources do we rely on for population estimates?</a>
-
+      You can find more information on these sources and how our time series is constructed on this page: [What sources do we rely on for population estimates?](https://ourworldindata.org/population-sources)
     variables:
       population:
         title: Population
@@ -67,8 +60,8 @@ tables:
           * 1800-1949: Historical estimates by Gapminder. Includes some datapoints from HYDE (v3.2) and Gapminder (Systema Globalis).
           * 1950-2021: Population records by the United Nations - Population Division (2022). Includes some datapoints from HYDE (v3.2), Gapminder (Systema Globalis) and Gapminder (v6).
           * 2022-2100: Projections based on Medium variant by the United Nations - Population Division (2022).
-        unit: "%"
-        short_unit: "%"
+        unit: '%'
+        short_unit: '%'
         display:
           name: Share of world population
           includeInTable: true
@@ -77,4 +70,4 @@ tables:
         title: Source
         description: |
           Name of the source for a specific data point. The name includes a short name for the source and a link.
-        unit: ""
+        unit: ''

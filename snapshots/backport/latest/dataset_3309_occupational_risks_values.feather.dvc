@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/3309
+    date_accessed: 2023-08-16 08:02:21.012374
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Occupational risks
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 9bac14fb28ba8f9b71c14571672762d5
+  size: 1070538
+  path: dataset_3309_occupational_risks_values.feather

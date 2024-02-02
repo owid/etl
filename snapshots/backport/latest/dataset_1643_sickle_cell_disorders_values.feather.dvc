@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1643
+    date_accessed: 2023-08-16 10:44:51.770247
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Sickle cell disorders
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: fcd1fc70084f54722e1905da30e2d4a5
+  size: 2012042
+  path: dataset_1643_sickle_cell_disorders_values.feather

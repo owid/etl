@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1609
+    date_accessed: 2023-08-10 14:49:10.395844
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Leishmaniasis
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: c971426538a82cee8c2303aa3c6b0623
+  size: 1110738
+  path: dataset_1609_leishmaniasis_values.feather

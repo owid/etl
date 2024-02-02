@@ -1,0 +1,84 @@
+dataset:
+  title: 'COVID-19: Decoupling of metrics (various sources)'
+  description: >-
+    By comparing the proportion of confirmed cases that result in hospital admissions, ICU admissions, and deaths, to previous
+    waves – when the population was not vaccinated – we can learn something about the protection that vaccination has provided
+    against severe outcomes.
+
+
+    This chart shows one way to do this. It visualizes the main COVID metrics relative to the peak of the last wave. The peak
+    of the last wave happened before the population was widely vaccinated. In this representation of the data, if confirmed
+    cases increase but hospitalizations and deaths increase to a lesser extent, it will mean that the many reported cases
+    are leading to fewer severe forms of the disease, and fewer deaths.
+
+
+    Differences between countries and between waves may arise from factors such as: the number of vaccine doses administered
+    per person; immunity from previous infections; the variants that are dominant within the population; the demographics
+    of the population; and the demographics of people who have been vaccinated. For example, countries where the elderly and
+    most vulnerable have been vaccinated at higher rates may have fewer severe outcomes.
+
+
+    Our sources for these charts are:
+
+    - Germany: [Robert Koch Institute](https://github.com/robert-koch-institut/)
+
+    - Israel: [Government of Israel](https://datadashboard.health.gov.il/COVID-19/general), automated via [dancarmoz on GitHub](https://github.com/dancarmoz/israel_moh_covid_dashboard_data/)
+
+    - Spain: [National Center for Epidemiology](https://cnecovid.isciii.es/covid19/)
+
+    - United States: [US CDC](https://covid.cdc.gov/covid-data-tracker/#trends_dailycases) and [Department of Health & Human
+    Services](https://healthdata.gov/Hospital/COVID-19-Reported-Patient-Impact-and-Hospital-Capa/g62h-syeh)
+  sources:
+  - name: Official data collated by Our World in Data
+    published_by: Official data collated by Our World in Data
+tables:
+  decoupling_metrics:
+    variables:
+      confirmed_cases:
+        title: confirmed_cases
+        unit: '%'
+        display:
+          numDecimalPlaces: 1
+          yearIsDay: true
+          zeroDay: '2020-01-01'
+        short_unit: '%'
+      confirmed_deaths:
+        title: confirmed_deaths
+        unit: '%'
+        display:
+          numDecimalPlaces: 1
+          yearIsDay: true
+          zeroDay: '2020-01-01'
+        short_unit: '%'
+      hospital_flow:
+        title: hospital_flow
+        unit: '%'
+        display:
+          numDecimalPlaces: 1
+          yearIsDay: true
+          zeroDay: '2020-01-01'
+        short_unit: '%'
+      hospital_stock:
+        title: hospital_stock
+        unit: '%'
+        display:
+          numDecimalPlaces: 1
+          yearIsDay: true
+          zeroDay: '2020-01-01'
+        short_unit: '%'
+      icu_flow:
+        title: icu_flow
+        unit: '%'
+        display:
+          numDecimalPlaces: 1
+          yearIsDay: true
+          zeroDay: '2020-01-01'
+        short_unit: '%'
+      icu_stock:
+        title: icu_stock
+        unit: '%'
+        display:
+          numDecimalPlaces: 1
+          yearIsDay: true
+          zeroDay: '2020-01-01'
+        short_unit: '%'

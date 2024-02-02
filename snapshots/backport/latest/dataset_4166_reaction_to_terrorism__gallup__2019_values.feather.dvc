@@ -1,18 +1,15 @@
 meta:
-  namespace: backport
-  short_name: dataset_4166_reaction_to_terrorism__gallup__2019_values
-  file_extension: feather
-  date_accessed: 2023-02-23 18:46:54.656780
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4166
+    date_accessed: 2023-08-10 10:32:01.787333
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Reaction to Terrorism - Gallup (2019)
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/4166
-  source_published_by: Our World in Data catalog backport
   is_public: false
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 0ff1217cade4fcf293d8a98cc0f25207
+- md5: 2aacec479ad80a6465598ebd107119ba
   size: 6458
   path: dataset_4166_reaction_to_terrorism__gallup__2019_values.feather

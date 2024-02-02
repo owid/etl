@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2194
+    date_accessed: 2023-08-10 14:47:44.048748
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2194_epilepsy (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: f0171968262da22ed4d76dbd2a54ded7
+  size: 32200
+  path: dataset_2194_epilepsy_config.json

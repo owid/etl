@@ -1,18 +1,16 @@
 meta:
-  namespace: backport
-  short_name: dataset_5315_food_emissions_by_life_cycle_stage__poore_and_nemecek__2018_values
-  file_extension: feather
-  date_accessed: 2023-02-23 19:38:50.948890
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5315
+    date_accessed: 2023-08-10 07:50:56.867967
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Food emissions by life-cycle stage (Poore and Nemecek, 2018)
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/5315
-  source_published_by: Our World in Data catalog backport
   is_public: false
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 7d947945f5f92ef15d3fb5061da72f58
+- md5: f1e34fa224ff1f02959de02fc375b49c
   size: 10306
-  path: dataset_5315_food_emissions_by_life_cycle_stage__poore_and_nemecek__2018_values.feather
+  path: 
+    dataset_5315_food_emissions_by_life_cycle_stage__poore_and_nemecek__2018_values.feather

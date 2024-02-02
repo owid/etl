@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/293
+    date_accessed: 2023-08-11 07:54:59.286379
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Number of observations in Povcal per decade - OWID (2017)
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 1d48f4245bd5973c8d90825514f36626
+  size: 12466
+  path: 
+    dataset_293_number_of_observations_in_povcal_per_decade__owid__2017_values.feather

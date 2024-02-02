@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/901
+    date_accessed: 2023-08-11 07:53:37.625144
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: World Bank EdStats - Early Childhood Education
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 837fa668ff05f07d84257da125a95df9
+  size: 319402
+  path: dataset_901_world_bank_edstats__early_childhood_education_values.feather

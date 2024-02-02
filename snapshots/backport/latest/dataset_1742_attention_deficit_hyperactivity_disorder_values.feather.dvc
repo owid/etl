@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1742
+    date_accessed: 2023-08-14 05:42:16.660118
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Attention-deficit/hyperactivity disorder
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 5e5f5f5008e024eb52f806ce3e110090
+  size: 1011370
+  path: dataset_1742_attention_deficit_hyperactivity_disorder_values.feather

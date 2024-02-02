@@ -1,18 +1,14 @@
 meta:
-  namespace: backport
-  short_name: dataset_3192_meat_consumption_in_eu28__oecd__2018_values
-  file_extension: feather
-  date_accessed: 2023-02-23 17:40:03.738660
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/3192
+    date_accessed: 2023-08-10 08:01:15.227428
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Meat consumption in EU28 (OECD, 2018)
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/3192
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: c73dc89adcdaa089281e1462018b745b
+- md5: 6e432a2b3719fe3b2544d2cc22bc01e2
   size: 8250
   path: dataset_3192_meat_consumption_in_eu28__oecd__2018_values.feather

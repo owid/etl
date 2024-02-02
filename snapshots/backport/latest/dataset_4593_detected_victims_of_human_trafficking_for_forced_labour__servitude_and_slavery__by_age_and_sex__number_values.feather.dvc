@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4593
+    date_accessed: 2023-08-11 07:42:47.083866
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Detected victims of human trafficking for forced labour, servitude and slavery,
+    by age and sex (number)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: f8c1d734c0f30c3a17cc6a3604b0be8b
+  size: 19842
+  path: 
+    dataset_4593_detected_victims_of_human_trafficking_for_forced_labour__servitude_and_slavery__by_age_and_sex__number_values.feather

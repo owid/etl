@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4803
+    date_accessed: 2023-08-16 08:45:20.115725
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Nationally derived total quantity (millions of cubic metres per annum)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 6de1673621d18b75bbb6f5f6a1299571
+  size: 6986
+  path: 
+    dataset_4803_nationally_derived_total_quantity__millions_of_cubic_metres_per_annum_values.feather

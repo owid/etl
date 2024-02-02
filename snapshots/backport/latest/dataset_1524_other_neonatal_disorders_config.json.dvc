@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1524
+    date_accessed: 2023-08-16 09:20:31.425745
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1524_other_neonatal_disorders (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: a11c551b696d16550f47d416b1e011ef
+  size: 22236
+  path: dataset_1524_other_neonatal_disorders_config.json

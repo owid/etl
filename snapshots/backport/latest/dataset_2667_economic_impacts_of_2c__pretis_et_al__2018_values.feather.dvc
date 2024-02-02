@@ -1,18 +1,14 @@
 meta:
-  namespace: backport
-  short_name: dataset_2667_economic_impacts_of_2c__pretis_et_al__2018_values
-  file_extension: feather
-  date_accessed: 2023-02-23 17:12:17.595483
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2667
+    date_accessed: 2023-08-10 08:55:30.753485
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Economic impacts of 2C - Pretis et al. (2018)
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/2667
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 877f0ada96ec76e3cd9cecddaac31f30
+- md5: 06bf916cf8309a0519006353177596ee
   size: 16602
   path: dataset_2667_economic_impacts_of_2c__pretis_et_al__2018_values.feather

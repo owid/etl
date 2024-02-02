@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1440
+    date_accessed: 2023-08-16 08:43:11.809236
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1440_other_chromosomal_abnormalities (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 1c56b21b034fd9050c9fa828ccbd541a
+  size: 29623
+  path: dataset_1440_other_chromosomal_abnormalities_config.json

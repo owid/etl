@@ -1,18 +1,14 @@
 meta:
-  namespace: backport
-  short_name: dataset_4120_human_height__ncd_risc__2017_values
-  file_extension: feather
-  date_accessed: 2023-06-01 15:18:36.848922
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4120
+    date_accessed: 2023-08-10 09:00:34.526117
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Human Height - NCD RisC (2017)
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/4120
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 2fcc4696eb08d3a1403cf0fd1d58c77d
+- md5: 229a02710f15ac2e871bffb69a0a9737
   size: 825882
   path: dataset_4120_human_height__ncd_risc__2017_values.feather

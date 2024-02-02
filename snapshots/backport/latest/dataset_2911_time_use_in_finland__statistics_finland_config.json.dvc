@@ -1,18 +1,15 @@
 meta:
-  namespace: backport
-  short_name: dataset_2911_time_use_in_finland__statistics_finland_config
-  file_extension: json
-  date_accessed: 2023-02-23 17:36:17.329294
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2911
+    date_accessed: 2023-08-10 08:30:37.832773
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_2911_time_use_in_finland__statistics_finland
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/2911
-  source_published_by: Our World in Data catalog backport
   is_public: false
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 5f8a751941c18a5c9d5bbc1680f236e2
-  size: 3744
+- md5: 6b90597bdc1cd7a7bb53c33412914d2d
+  size: 4151
   path: dataset_2911_time_use_in_finland__statistics_finland_config.json

@@ -113,9 +113,9 @@ def check_improvement(df, column_name):
                 previous_days_since = days_since
             else:
                 if with_without == "With extra data":
-                    df.at[i, column_name + "_improved"] = "Others (with extra data)"
+                    df.at[first_non_nan_index, column_name + "_improved"] = "Others (with extra data)"
                 else:
-                    df.at[i, column_name + "_improved"] = "Others (without extra data)"
+                    df.at[first_non_nan_index, column_name + "_improved"] = "Others (without extra data)"
 
         if df["training_data"].iloc[0] == "Without extra data":
             df.at[0, column_name + "_improved"] = "State of the art (without extra training data)"
@@ -133,6 +133,7 @@ def check_improvement(df, column_name):
             # Check if the value is NaN and assign the corresponding improvement status
             if pd.isnull(value):
                 df.at[i, column_name + "_improved"] = "Not applicable"
+
             elif pd.notnull(previous_value) and value > previous_value and days_since >= previous_days_since:
                 df.at[i, column_name + "_improved"] = "State of the art"
                 previous_value = value
@@ -141,6 +142,7 @@ def check_improvement(df, column_name):
                 df.at[i, column_name + "_improved"] = "Others"
 
         # Handle the case of the first value being NaN or set it as the initial improvement status
+        df.at[first_non_nan_index, column_name + "_improved"] = "State of the art"
 
         df[column_name + "_improved"] = df[column_name + "_improved"].astype(str)
 

@@ -1,18 +1,14 @@
 meta:
-  namespace: backport
-  short_name: dataset_1834_global_smallpox_cases_values
-  file_extension: feather
-  date_accessed: 2023-02-23 16:57:43.795584
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1834
+    date_accessed: 2023-08-10 09:45:56.485616
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Global Smallpox Cases
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/1834
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 68bed9ed004d159b2fcfd0ed0d6fa6ab
+- md5: 3d107f19c1a90797d2d6da4fe7211050
   size: 6954
   path: dataset_1834_global_smallpox_cases_values.feather

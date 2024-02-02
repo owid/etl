@@ -1,18 +1,15 @@
 meta:
-  namespace: backport
-  short_name: dataset_5133_te_14_1_gov_values
-  file_extension: feather
-  date_accessed: 2023-02-23 18:01:52.927328
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5133
+    date_accessed: 2023-08-10 08:10:22.782431
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: TE-14.1_gov
   description: core-econ.org
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/5133
-  source_published_by: Our World in Data catalog backport
   is_public: false
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: ed74a3ac924efd30f316bf1f79f57bae
+- md5: 1907ee56ba3a444e7da6d43b24b55c41
   size: 8874
   path: dataset_5133_te_14_1_gov_values.feather

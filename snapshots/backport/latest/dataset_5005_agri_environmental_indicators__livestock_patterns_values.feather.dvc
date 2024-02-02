@@ -1,0 +1,25 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5005
+    date_accessed: 2023-08-14 15:19:07.786016
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: 'Agri-Environmental Indicators: Livestock Patterns'
+  description: "The Livestock Patterns domain of the FAOSTAT Agri-Environmental Indicators
+    contains data on livestock numbers, shares of major livestock species and livestock
+    densities in the agricultural land area. Values are calculated using Livestock
+    Units (LSU), which facilitate aggregating information for different livestock
+    types. Data are available by country, with global coverage, for the period 1961\x96
+    2017. This methodology applies the LSU coefficients reported in the \"Guidelines
+    for the preparation of livestock sector reviews\" (FAO, 2011). From this publication,
+    LSU coefficients are computed by livestock type and by country. The reference
+    unit used for the calculation of livestock units (=1 LSU) is the grazing equivalent
+    of one adult dairy cow producing 3000 kg of milk annually, fed without additional
+    concentrated foodstuffs.   FAOSTAT agri-environmental indicators on livestock
+    patterns closely follow the structure of the indicators in EUROSTAT."
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 725ab22da3812744f88f7af63e8d7cf5
+  size: 1459770
+  path: dataset_5005_agri_environmental_indicators__livestock_patterns_values.feather

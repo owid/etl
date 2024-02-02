@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/3983
+    date_accessed: 2023-08-16 08:38:26.719911
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Enteric infections
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 5c895a99495275ae3cf6d63895da0e52
+  size: 2012034
+  path: dataset_3983_enteric_infections_values.feather

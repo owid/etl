@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5521
+    date_accessed: 2023-08-14 05:47:50.266326
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Number of children stunted (OWID based on WHO)
+  description: ''
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: babb029607fcd61b58d421eee74af4e3
+  size: 20570
+  path: dataset_5521_number_of_children_stunted__owid_based_on_who_values.feather

@@ -1,0 +1,124 @@
+meta:
+  origin:
+    producer: Various sources
+    title: Chick culling laws
+    description_snapshot: Male baby chicks are commonly killed in laying hens hatcheries
+      all around the world, as they provide no value for the egg production industry.
+      Only a minority of country has laws to ban this practice. This dataset is a
+      compilation of evidence (from official institutions and in some cases from the
+      news) of chick culling taking place in a country, and, in some cases, of existing
+      laws banning it.
+    citation_full: >-
+      Evidence of laws banning chick culling, and evidence of chick culling being
+      practiced without any ban, has been gathered
+      from various sources for different countries.
+
+      Some of those sources were extracted from [a report by the European Institute
+      for Animal Law & Policy](https://animallaweurope.com/wp-content/uploads/2023/01/Animal-Law-Europe-%E2%80%93-Chick-Killing-Report-2023.pdf):
+      "Chick and Duckling Killing: Achieving an EU-Wide Prohibition" (White paper,
+      January 2023) by Alice Di Concetto, Olivier
+      Morice, Matthias Corion, Simão Santos.
+
+      - Austria: Banned. Source: [Section 6(2), Animal Welfare Act.](https://www.ris.bka.gv.at/GeltendeFassung.wxe?Abfrage=Bundesnormen&Gesetzesnummer=20003541)
+      Date effective: 2022-07-18. The prohibition was adopted in July 2022 through
+      a law amending the Animal Welfare Act.
+      Scope excludes male chicks used as feed in zoos or for birds of prey. Destruction
+      of non-hatched is allowed up until
+      14 day of incubation.
+
+      - France: Banned. Source: [R 214-17 of the Rural Code.](https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000028969470)
+      Date effective: 2022-12-31. The prohibition was adopted on January 2022 through
+      a regulation. In ovo sexing technologies
+      benefit from a five-year nonobsolescence clause. Male chicks for animal food
+      production benefit from an exemption. Destruction
+      of non-hatched is allowed up until 15 day of incubation.
+
+      - Germany: Banned. Source: [Section 3 (4c), Animal Welfare Act.](https://www.gesetze-im-internet.de/tierschg/BJNR012770972.html)
+      Date effective: 2022-01-01. The prohibition was adopted on January 2022, through
+      a regulation which prohibits the culling
+      of one-day old chicks by 2022, and the culling of fertilized eggs passed the
+      6th day of incubation. Note: No derogation.
+
+      - Italy: Banned but not yet in effect. Source: [Article 18, European Delegation
+      Law (22G00136).](https://www.normattiva.it/uri-res/N2Ls?urn:nir:stato:legge:2022-08-04;127)
+      Date effective: 2026-12-31. The law prohibits the selective killing of male
+      chicks by December 31st, 2026 and provides
+      exemptions for animal protection purposes only. A decree will later specify
+      the ways in which the law should be implemented.
+      The law does not provide a rule regarding the destruction of non-hatched eggs
+      nor exemptions, other than exemptions
+      for animal health and protection purposes. A decree will likely specify these
+      two aspects.
+
+      - Luxembourg: Banned. Source: [Date effective: 2018-06-18. Animal protection
+      law on 6 June 2018, The Luxembourg Government.](https://gouvernement.lu/en/dossiers/2018/tierschutz.html)
+
+      - Switzerland: Partially banned. Source: [Swissinfo (2019-09-20).](https://www.swissinfo.ch/eng/society/animal-protection_-switzerland-bans-shredding-of-male-chicks-/45240798)
+      Grinding chicks was banned in 2019, but gassing is still legal.
+
+      - Australia: Not banned. Source: [Royal Society for the Prevention of Cruelty
+      to Animals (RSPCA) Australia (2021-09-22).](https://kb.rspca.org.au/knowledge-base/what-happens-with-male-chicks-in-the-egg-industry/)
+
+      - Canada: Not banned. Source: [Canadian Poultry Magazine (2016-12-19).](https://www.canadianpoultrymag.com/hypereye-a-game-changer-30033/)
+
+      - New Zealand: Not banned. Source: [Save Animals From Exploitation (SAFE) New
+      Zealand (2023).](https://safe.org.nz/our-work/animals-in-aotearoa/male-chicks/)
+
+      - United Kingdom: Not banned. Source: [The Humane League (2021-07-29).](https://thehumaneleague.org.uk/article/what-happens-to-male-chicks-in-the-egg-industry)
+
+      - United States: Not banned. Source: [Vox (2021-04-12).](https://www.vox.com/future-perfect/22374193/eggs-chickens-animal-welfare-culling)
+
+      - Belgium: Not banned. Source: [European Parliamentary Research Service (2022-12).](https://www.europarl.europa.eu/RegData/etudes/ATAG/2022/739246/EPRS_ATA(2022)739246_EN.pdf)
+
+      - Bulgaria: Not banned. Source: [European Parliamentary Research Service (2022-12).](https://www.europarl.europa.eu/RegData/etudes/ATAG/2022/739246/EPRS_ATA(2022)739246_EN.pdf)
+
+      - Croatia: Not banned. Source: [European Parliamentary Research Service (2022-12).](https://www.europarl.europa.eu/RegData/etudes/ATAG/2022/739246/EPRS_ATA(2022)739246_EN.pdf)
+
+      - Cyprus: Not banned. Source: [European Parliamentary Research Service (2022-12).](https://www.europarl.europa.eu/RegData/etudes/ATAG/2022/739246/EPRS_ATA(2022)739246_EN.pdf)
+
+      - Czechia: Not banned. Source: [European Parliamentary Research Service (2022-12).](https://www.europarl.europa.eu/RegData/etudes/ATAG/2022/739246/EPRS_ATA(2022)739246_EN.pdf)
+
+      - Denmark: Not banned. Source: [European Parliamentary Research Service (2022-12).](https://www.europarl.europa.eu/RegData/etudes/ATAG/2022/739246/EPRS_ATA(2022)739246_EN.pdf)
+
+      - Estonia: Not banned. Source: [European Parliamentary Research Service (2022-12).](https://www.europarl.europa.eu/RegData/etudes/ATAG/2022/739246/EPRS_ATA(2022)739246_EN.pdf)
+
+      - Finland: Not banned. Source: [European Parliamentary Research Service (2022-12).](https://www.europarl.europa.eu/RegData/etudes/ATAG/2022/739246/EPRS_ATA(2022)739246_EN.pdf)
+
+      - Greece: Not banned. Source: [European Parliamentary Research Service (2022-12).](https://www.europarl.europa.eu/RegData/etudes/ATAG/2022/739246/EPRS_ATA(2022)739246_EN.pdf)
+
+      - Hungary: Not banned. Source: [European Parliamentary Research Service (2022-12).](https://www.europarl.europa.eu/RegData/etudes/ATAG/2022/739246/EPRS_ATA(2022)739246_EN.pdf)
+
+      - Ireland: Not banned. Source: [European Parliamentary Research Service (2022-12).](https://www.europarl.europa.eu/RegData/etudes/ATAG/2022/739246/EPRS_ATA(2022)739246_EN.pdf)
+
+      - Latvia: Not banned. Source: [European Parliamentary Research Service (2022-12).](https://www.europarl.europa.eu/RegData/etudes/ATAG/2022/739246/EPRS_ATA(2022)739246_EN.pdf)
+
+      - Lithuania: Not banned. Source: [European Parliamentary Research Service (2022-12).](https://www.europarl.europa.eu/RegData/etudes/ATAG/2022/739246/EPRS_ATA(2022)739246_EN.pdf)
+
+      - Malta: Not banned. Source: [European Parliamentary Research Service (2022-12).](https://www.europarl.europa.eu/RegData/etudes/ATAG/2022/739246/EPRS_ATA(2022)739246_EN.pdf)
+
+      - Netherlands: Not banned. Source: [European Parliamentary Research Service
+      (2022-12).](https://www.europarl.europa.eu/RegData/etudes/ATAG/2022/739246/EPRS_ATA(2022)739246_EN.pdf)
+
+      - Poland: Not banned. Source: [European Parliamentary Research Service (2022-12).](https://www.europarl.europa.eu/RegData/etudes/ATAG/2022/739246/EPRS_ATA(2022)739246_EN.pdf)
+
+      - Portugal: Not banned. Source: [European Parliamentary Research Service (2022-12).](https://www.europarl.europa.eu/RegData/etudes/ATAG/2022/739246/EPRS_ATA(2022)739246_EN.pdf)
+
+      - Romania: Not banned. Source: [European Parliamentary Research Service (2022-12).](https://www.europarl.europa.eu/RegData/etudes/ATAG/2022/739246/EPRS_ATA(2022)739246_EN.pdf)
+
+      - Slovakia: Not banned. Source: [European Parliamentary Research Service (2022-12).](https://www.europarl.europa.eu/RegData/etudes/ATAG/2022/739246/EPRS_ATA(2022)739246_EN.pdf)
+
+      - Slovenia: Not banned. Source: [European Parliamentary Research Service (2022-12).](https://www.europarl.europa.eu/RegData/etudes/ATAG/2022/739246/EPRS_ATA(2022)739246_EN.pdf)
+
+      - Spain: Not banned. Source: [European Parliamentary Research Service (2022-12).](https://www.europarl.europa.eu/RegData/etudes/ATAG/2022/739246/EPRS_ATA(2022)739246_EN.pdf)
+
+      - Sweden: Not banned. Source: [European Parliamentary Research Service (2022-12).](https://www.europarl.europa.eu/RegData/etudes/ATAG/2022/739246/EPRS_ATA(2022)739246_EN.pdf)
+    url_main: https://animallaweurope.com/news/
+    date_accessed: '2023-09-01'
+    date_published: '2023-09-01'
+  license:
+    name: CC BY 4.0
+wdir: ../../../data/snapshots/animal_welfare/2023-09-01
+outs:
+- md5: 2afcdd6c0c3ade182cf69b24ab684db3
+  size: 6886
+  path: chick_culling_laws.csv

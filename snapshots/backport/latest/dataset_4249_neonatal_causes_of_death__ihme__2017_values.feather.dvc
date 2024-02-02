@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4249
+    date_accessed: 2023-08-16 09:53:10.487624
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Neonatal causes of death, IHME (2017)
+  description: ''
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 3f67cab7f75175fe4f0797b05e8008ba
+  size: 783762
+  path: dataset_4249_neonatal_causes_of_death__ihme__2017_values.feather

@@ -1,18 +1,14 @@
 meta:
-  namespace: backport
-  short_name: dataset_5175_living_planet_index__wwf__2022_values
-  file_extension: feather
-  date_accessed: 2023-02-23 18:48:49.411692
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5175
+    date_accessed: 2023-08-31 11:19:17.418574
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Living Planet Index – WWF (2022)
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/5175
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 8efea31d608ba6bb753315a1dd045d61
-  size: 15026
+- md5: e55b53f7143cd7918f0c713e0d6dd261
+  size: 19474
   path: dataset_5175_living_planet_index__wwf__2022_values.feather

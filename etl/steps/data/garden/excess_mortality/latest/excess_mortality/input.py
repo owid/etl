@@ -19,6 +19,7 @@ COLUMNS_YEAR_EXPECTED = [
     "_2021",
     "_2022",
     "_2023",
+    "_2024",
 ]
 COLUMNS_EXPECTED = [
     "entity",
@@ -57,9 +58,9 @@ def build_df(ds_hmd: Dataset, ds_wmd: Dataset, ds_kobak: Dataset) -> pd.DataFram
 
 def _build_estimates_df(ds_hmd: Dataset, ds_wmd: Dataset) -> pd.DataFrame:
     # Build dataframe
-    df_hmd = pd.DataFrame(ds_hmd["hmd_stmf"])
+    df_hmd = pd.DataFrame(ds_hmd["hmd_stmf"]).reset_index()
     df_hmd = df_hmd.rename(columns={"week": "time"}).assign(**{"time_unit": "weekly"})
-    df_wmd = pd.DataFrame(ds_wmd["wmd"])
+    df_wmd = pd.DataFrame(ds_wmd["wmd"]).reset_index()
     df_wmd = df_wmd[-df_wmd["entity"].isin(set(df_hmd["entity"]))]
     df_estimates = pd.concat([df_hmd, df_wmd], ignore_index=True)
     # Run checks
@@ -69,8 +70,8 @@ def _build_estimates_df(ds_hmd: Dataset, ds_wmd: Dataset) -> pd.DataFrame:
 
 
 def _build_projections_df(ds_kobak: Dataset) -> pd.DataFrame:
-    df_kobak = pd.DataFrame(ds_kobak["xm_karlinsky_kobak"])
-    df_kobak_age = pd.DataFrame(ds_kobak["xm_karlinsky_kobak_by_age"])
+    df_kobak = pd.DataFrame(ds_kobak["xm_karlinsky_kobak"]).reset_index()
+    df_kobak_age = pd.DataFrame(ds_kobak["xm_karlinsky_kobak_by_age"]).reset_index()
     df_proj = pd.concat([df_kobak, df_kobak_age], ignore_index=True)
     if (ds := df_proj[COLUMNS_IDX].value_counts()).max() > 1:
         raise ValueError(f"Unexpected duplicates {ds[ds>1]}")

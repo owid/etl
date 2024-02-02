@@ -11,6 +11,7 @@ Usage:
 
 import datetime
 import os
+from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
 from threading import Lock
 from typing import Dict, List, Optional, cast
@@ -22,12 +23,12 @@ from owid.catalog import utils
 from sqlalchemy.engine.base import Engine
 from sqlmodel import Session, select, update
 
-from backport.datasync.data_metadata import (
+from apps.backport.datasync.data_metadata import (
     add_entity_code_and_name,
     variable_data,
     variable_metadata,
 )
-from backport.datasync.datasync import upload_gzip_dict
+from apps.backport.datasync.datasync import upload_gzip_dict
 from etl import config
 from etl.db import open_db
 
@@ -38,6 +39,7 @@ log = structlog.get_logger()
 
 
 source_table_lock = Lock()
+origins_table_lock = Lock()
 
 
 CURRENT_DIR = os.path.dirname(__file__)
@@ -46,7 +48,7 @@ CURRENT_DIR = os.path.dirname(__file__)
 @dataclass
 class DatasetUpsertResult:
     dataset_id: int
-    source_ids: Dict[str, int]
+    source_ids: Dict[int, int]
 
 
 @dataclass
@@ -108,10 +110,10 @@ def upsert_dataset(
             id=ds.id,
         )
 
-        source_ids: Dict[str, int] = dict()
+        source_ids: Dict[int, int] = dict()
         for source in sources:
             assert source.name
-            source_ids[source.name] = _upsert_source_to_db(session, source, ds.id)
+            source_ids[hash(source)] = _upsert_source_to_db(session, source, ds.id)
 
         session.commit()
 
@@ -133,16 +135,58 @@ def _upsert_source_to_db(session: Session, source: catalog.Source, dataset_id: i
         return db_source.id
 
 
-def _update_variables_display(table: catalog.Table) -> None:
-    """Grapher uses units from field `display` instead of fields `unit` and `short_unit`
-    before we fix grapher data model, copy them to `display`.
-    """
+def _add_or_update_source(
+    session: Session, variable_meta: catalog.VariableMeta, column_name: str, dataset_upsert_result: DatasetUpsertResult
+) -> Optional[int]:
+    if not variable_meta.sources:
+        assert variable_meta.origins, "Variable must have either sources or origins"
+        return None
+
+    # Every variable must have exactly one source
+    if len(variable_meta.sources) != 1:
+        raise NotImplementedError(
+            f"Variable `{column_name}` must have exactly one source, see function"
+            " `adapt_table_for_grapher` that can do that for you"
+        )
+
+    source = variable_meta.sources[0]
+
+    # Does it already exist in the database?
+    assert source.name
+    source_id = dataset_upsert_result.source_ids.get(hash(source))
+    if not source_id:
+        # Not exists, upsert it
+        # NOTE: this could be quite inefficient as we upsert source for every variable
+        #   luckily we are moving away from sources towards origins
+        source_id = _upsert_source_to_db(session, source, dataset_upsert_result.dataset_id)
+
+    return source_id
+
+
+def _add_or_update_origins(session: Session, origins: list[catalog.Origin]) -> list[gm.Origin]:
+    out = []
+    assert len(origins) == len(set(origins)), "origins must be unique"
+    for origin in origins:
+        out.append(gm.Origin.from_origin(origin).upsert(session))
+    return out
+
+
+def _update_variables_metadata(table: catalog.Table) -> None:
+    """Update variables metadata."""
     for col in table.columns:
         meta = table[col].metadata
+
+        # Grapher uses units from field `display` instead of fields `unit` and `short_unit`
+        # before we fix grapher data model, copy them to `display`.
         meta.display = meta.display or {}
-        meta.display.setdefault("shortUnit", meta.short_unit)
+        if meta.short_unit:
+            meta.display.setdefault("shortUnit", meta.short_unit)
         if meta.unit:
             meta.display.setdefault("unit", meta.unit)
+
+        # Prune empty fields from description_key
+        if meta.description_key:
+            meta.description_key = [k for k in meta.description_key if k.strip()]
 
 
 def upsert_table(
@@ -151,6 +195,7 @@ def upsert_table(
     dataset_upsert_result: DatasetUpsertResult,
     catalog_path: Optional[str] = None,
     dimensions: Optional[gm.Dimensions] = None,
+    verbose: bool = True,
 ) -> VariableUpsertResult:
     """This function is used to put one ready to go formatted Table (i.e.
     in the format (year, entityId, value)) into mysql. The metadata
@@ -189,43 +234,36 @@ def upsert_table(
 
     assert not gh.contains_inf(table.iloc[:, 0]), f"Column `{table.columns[0]}` has inf values"
 
-    _update_variables_display(table)
+    _update_variables_metadata(table)
 
     with Session(engine) as session:
-        log.info("upsert_table.upsert_variable", variable=table.columns[0])
-
         # For easy retrieveal of the value series we store the name
         column_name = table.columns[0]
+        variable_meta: catalog.VariableMeta = table[column_name].metadata
 
-        years = table.index.unique(level="year").values
-        if len(years) == 0:
+        # Timespan does not work for yearIsDay variables
+        if (variable_meta.display or {}).get("yearIsDay"):
             timespan = ""
         else:
-            min_year = min(years)
-            max_year = max(years)
-            timespan = f"{min_year}-{max_year}"
+            years = table.index.unique(level="year").values
+            if len(years) == 0:
+                timespan = ""
+            else:
+                min_year = min(years)
+                max_year = max(years)
+                timespan = f"{min_year}-{max_year}"
 
         table.reset_index(inplace=True)
 
-        # Every variable must have exactly one source
-        if len(table[column_name].metadata.sources) != 1:
-            raise NotImplementedError(
-                f"Variable `{column_name}` must have exactly one source, see function"
-                " `adapt_table_for_grapher` that can do that for you"
-            )
+        source_id = _add_or_update_source(session, variable_meta, column_name, dataset_upsert_result)
 
-        source = table[column_name].metadata.sources[0]
+        with origins_table_lock:
+            db_origins = _add_or_update_origins(session, variable_meta.origins)
+            # commit within the lock to make sure other threads get the latest sources
+            session.commit()
 
-        # Does it already exist in the database?
-        source_id = dataset_upsert_result.source_ids.get(source.name)
-        if not source_id:
-            # Not exists, upsert it
-            # NOTE: this could be quite inefficient as we upsert source for every variable
-            #   optimize this if this turns out to be a bottleneck
-            source_id = _upsert_source_to_db(session, source, dataset_upsert_result.dataset_id)
-
-        variable = gm.Variable.from_variable_metadata(
-            table[column_name].metadata,
+        db_variable = gm.Variable.from_variable_metadata(
+            variable_meta,
             short_name=column_name,
             timespan=timespan,
             dataset_id=dataset_upsert_result.dataset_id,
@@ -233,8 +271,8 @@ def upsert_table(
             catalog_path=catalog_path,
             dimensions=dimensions,
         ).upsert(session)
-        variable_id = variable.id
-        assert variable_id
+        db_variable_id = db_variable.id
+        assert db_variable_id
 
         df = table.rename(columns={column_name: "value", "entity_id": "entityId"})
 
@@ -243,29 +281,34 @@ def upsert_table(
 
         # NOTE: we could prefetch all entities in advance, but it's not a bottleneck as it takes
         # less than 10ms per variable
-        df = add_entity_code_and_name(engine, df)
+        df = add_entity_code_and_name(session, df)
 
-        # process and upload data to S3
-        var_data = variable_data(df)
-        data_path = upload_gzip_dict(var_data, variable.s3_data_path(), r2=True)
+        # update links, we need to do it after we commit deleted relationships above
+        db_variable.update_links(
+            session,
+            db_origins,
+            faqs=variable_meta.presentation.faqs if variable_meta.presentation else [],
+            tag_names=variable_meta.presentation.topic_tags if variable_meta.presentation else [],
+        )
+        session.add(db_variable)
 
         # we need to commit changes because we use SQL command in `variable_metadata`. We wouldn't
         # have to if we used ORM instead
-        session.add(variable)
         session.commit()
 
-        # process and upload metadata to S3
-        var_metadata = variable_metadata(engine, variable_id, df)
-        metadata_path = upload_gzip_dict(var_metadata, variable.s3_metadata_path(), r2=True)
+        # process data and metadata
+        var_data = variable_data(df)
+        var_metadata = variable_metadata(session, db_variable_id, df)
 
-        variable.dataPath = data_path
-        variable.metadataPath = metadata_path
-        session.add(variable)
-        session.commit()
+        # upload them to R2
+        with ThreadPoolExecutor() as executor:
+            executor.submit(upload_gzip_dict, var_data, db_variable.s3_data_path())
+            executor.submit(upload_gzip_dict, var_metadata, db_variable.s3_metadata_path())
 
-        log.info("upsert_table.uploaded_to_s3", size=len(table), variable_id=variable_id)
+        if verbose:
+            log.info("upsert_table.uploaded_to_s3", size=len(table), variable_id=db_variable_id)
 
-        return VariableUpsertResult(variable_id, source_id)  # type: ignore
+        return VariableUpsertResult(db_variable_id, source_id)  # type: ignore
 
 
 def fetch_db_checksum(dataset: catalog.Dataset) -> Optional[str]:
@@ -302,7 +345,7 @@ def set_dataset_checksum_and_editedAt(dataset_id: int, checksum: str) -> None:
         session.commit()
 
 
-def cleanup_ghost_variables(dataset_id: int, upserted_variable_ids: List[int], workers: int = 1) -> None:
+def cleanup_ghost_variables(dataset_id: int, upserted_variable_ids: List[int]) -> None:
     """Remove all leftover variables that didn't get upserted into DB during grapher step.
     This could happen when you rename or delete a variable in ETL.
     Raise an error if we try to delete variable used by any chart.
@@ -341,14 +384,6 @@ def cleanup_ghost_variables(dataset_id: int, upserted_variable_ids: List[int], w
             rows = pd.DataFrame(rows, columns=["chartId", "variableId"])
             raise ValueError(f"Variables used in charts will not be deleted automatically:\n{rows}")
 
-        # there might still be some data_values for old variables
-        db.cursor.execute(
-            """
-            DELETE FROM data_values WHERE variableId IN %(variable_ids)s
-        """,
-            {"variable_ids": variable_ids_to_delete},
-        )
-
         # then variables themselves with related data in other tables
         db.cursor.execute(
             """
@@ -356,6 +391,36 @@ def cleanup_ghost_variables(dataset_id: int, upserted_variable_ids: List[int], w
         """,
             {"variable_ids": variable_ids_to_delete},
         )
+
+        # delete relationships
+        db.cursor.execute(
+            """
+            DELETE FROM origins_variables WHERE variableId IN %(variable_ids)s
+        """,
+            {"variable_ids": variable_ids_to_delete},
+        )
+        db.cursor.execute(
+            """
+            DELETE FROM tags_variables_topic_tags WHERE variableId IN %(variable_ids)s
+        """,
+            {"variable_ids": variable_ids_to_delete},
+        )
+        db.cursor.execute(
+            """
+            DELETE FROM posts_gdocs_variables_faqs WHERE variableId IN %(variable_ids)s
+        """,
+            {"variable_ids": variable_ids_to_delete},
+        )
+
+        # delete them from explorers
+        db.cursor.execute(
+            """
+            DELETE FROM explorer_variables WHERE variableId IN %(variable_ids)s
+        """,
+            {"variable_ids": variable_ids_to_delete},
+        )
+
+        # finally delete variables
         db.cursor.execute(
             """
             DELETE FROM variables WHERE datasetId=%(dataset_id)s AND id IN %(variable_ids)s
@@ -377,11 +442,19 @@ def cleanup_ghost_sources(dataset_id: int, upserted_source_ids: List[int]) -> No
     :param upserted_source_ids: sources upserted in grapher step
     """
     with open_db() as db:
-        db.cursor.execute(
-            """
-            DELETE FROM sources WHERE datasetId=%(dataset_id)s AND id NOT IN %(source_ids)s
-        """,
-            {"dataset_id": dataset_id, "source_ids": upserted_source_ids},
-        )
+        if upserted_source_ids:
+            db.cursor.execute(
+                """
+                DELETE FROM sources WHERE datasetId=%(dataset_id)s AND id NOT IN %(source_ids)s
+            """,
+                {"dataset_id": dataset_id, "source_ids": upserted_source_ids},
+            )
+        else:
+            db.cursor.execute(
+                """
+                DELETE FROM sources WHERE datasetId=%(dataset_id)s
+            """,
+                {"dataset_id": dataset_id},
+            )
         if db.cursor.rowcount > 0:
             log.warning(f"Deleted {db.cursor.rowcount} ghost sources")

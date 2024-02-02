@@ -1,0 +1,60 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5042
+    date_accessed: 2023-08-14 05:41:22.772081
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: 'Production: Crops'
+  description: "Crop statistics are recorded for 173 products, covering the following
+    categories: Crops Primary, Fibre Crops Primary, Cereals, Coarse Grain, Citrus
+    Fruit, Fruit, Jute  Jute-like Fibres, Oilcakes Equivalent, Oil crops Primary,
+    Pulses, Roots and Tubers, Treenuts and Vegetables and Melons. Data are expressed
+    in terms of area harvested, production quantity and yield. The objective is to
+    comprehensively cover production of all primary crops for all countries and regions
+    in the world.Cereals: Area and production data on cereals relate to crops harvested
+    for dry grain only. Cereal crops harvested for hay or harvested green for food,
+    feed or silage or used for grazing are therefore excluded. Area data relate to
+    harvested area. Some countries report sown or cultivated area only; however, in
+    these countries the sown or cultivated area does not differ significantly in normal
+    years from the area actually harvested, either because practically the whole area
+    sown is harvested or because the area surveys are conducted around the harvest
+    period.Vegetables, total (including melons): Data relate to vegetable crops grown
+    mainly for human consumption. Crops such as cabbages, pumpkins and carrots, when
+    explicitly cultivated for animal feed, are therefore excluded. Statistics on vegetables
+    are not available in many countries, and the coverage of the reported data differs
+    from country to country. In general, it appears that the data refer to crops grown
+    in field and market gardens mainly for sale, thus excluding crops cultivated in
+    kitchen gardens or small family gardens mainly for household consumption.Fruit,
+    total (excluding melons): Data refer to total production of fresh fruit, whether
+    finally used for direct consumption for food or feed, or processed into different
+    products: dry fruit, juice, jam, alcohol, etc. Generally, production data relate
+    to plantation crops or orchard crops grown mainly for sale. Data on production
+    from scattered trees used mainly for home consumption are not usually collected.
+    Production from wild plants, particularly berries, which is of some importance
+    in certain countries, is generally disregarded by national statistical services.
+    Therefore, the data for the various fruits and berries are rather incomplete.
+    Bananas and plantains: Figures on bananas refer, as far as possible, to all edible
+    fruit-bearing species of the genus Musa except Musa paradisiaca, commonly known
+    as plantain. Unfortunately, several countries make no distinction in their statistics
+    between bananas and plantains and publish only overall estimates. When this occurs
+    and there is some indication or assumption that the data reported refer mainly
+    to bananas, the data are included. The production data on bananas and plantains
+    reported by the various countries are also difficult to compare because a number
+    of countries report in terms of bunches, which generally means that the stalk
+    is included in the weight. Dates, plantains and total grapes are included in the
+    \x93total fruit\x94 aggregated figures, while olives are excluded.        Treenuts,
+    aggregated: Production of nuts (including chestnuts) relates to nuts in the shell
+    or in the husk. Statistics are very scanty and generally refer only to crops for
+    sale. In addition to the kind of nuts shown separately, production data include
+    all other treenuts mainly used as dessert or table nuts, such as pecan nuts, pili
+    nuts, sapucaia nuts and macadamia nuts. Nuts mainly used for flavouring beverages
+    are excludedas are masticatory and stimulant nuts and nuts used mainly for the
+    extraction of oil or butter, including areca/betel nuts, cola nuts, illipe nuts,
+    karate nuts, coconuts, tung nuts, oilpalm nuts etc."
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: a81d88a12e1c1193826168db7a000880
+  size: 10090882
+  path: dataset_5042_production__crops_values.feather

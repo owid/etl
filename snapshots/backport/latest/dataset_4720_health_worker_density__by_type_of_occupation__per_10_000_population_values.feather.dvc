@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4720
+    date_accessed: 2023-08-16 09:38:22.323967
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Health worker density, by type of occupation (per 10,000 population)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: aa50d91c4dd342d73e8e3294d857308a
+  size: 49602
+  path: 
+    dataset_4720_health_worker_density__by_type_of_occupation__per_10_000_population_values.feather

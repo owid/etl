@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1987
+    date_accessed: 2023-08-16 08:18:21.053383
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1987_proportion_of_individuals_using_the_internet
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 86d207e6b78d8d4e19f2a2fd28527c26
+  size: 2681
+  path: dataset_1987_proportion_of_individuals_using_the_internet_config.json

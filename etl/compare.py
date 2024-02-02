@@ -3,8 +3,7 @@
 #
 
 from pathlib import Path
-from typing import Any, Dict, Optional, Union, cast
-from urllib.parse import quote
+from typing import Any, Optional, Union, cast
 
 import click
 import pandas as pd
@@ -15,11 +14,10 @@ from owid.repack import repack_frame
 from rich import print
 from rich_click.rich_command import RichCommand
 from rich_click.rich_group import RichGroup
-from sqlalchemy import create_engine
-from sqlalchemy.engine import Engine
 
-from backport.datasync.data_metadata import variable_data_df_from_s3
+from apps.backport.datasync.data_metadata import variable_data_df_from_s3
 from etl import tempcompare
+from etl.db import get_engine
 
 
 @click.group(cls=RichGroup)
@@ -269,23 +267,17 @@ def grapher(
     )
 
     if values:
-        remote_data_values_df = read_values_from_s3(remote_env, namespace, version, dataset)
-        local_data_values_df = read_values_from_s3(local_env, namespace, version, dataset)
+        remote_values_df = read_values_from_s3(remote_env, namespace, version, dataset)
+        local_values_df = read_values_from_s3(local_env, namespace, version, dataset)
 
-        print("\n[magenta]=== Comparing data_values ===[/magenta]")
+        print("\n[magenta]=== Comparing values ===[/magenta]")
         diff_print(
-            remote_data_values_df,
-            local_data_values_df,
+            remote_values_df,
+            local_values_df,
             "remote",
             "local",
             **ctx.obj,
         )
-
-
-def get_engine(config: Dict[str, Any]) -> Engine:
-    return create_engine(
-        f'mysql://{config["DB_USER"]}:{quote(config["DB_PASS"])}@{config["DB_HOST"]}:{config["DB_PORT"]}/{config["DB_NAME"]}'
-    )
 
 
 def read_dataset_from_db(env_path: str, namespace: str, version: str, dataset: str) -> pd.DataFrame:
@@ -326,7 +318,7 @@ def read_variables_from_db(env_path: str, namespace: str, version: str, dataset:
     )
 
     # drop uninteresting columns
-    df = df.drop(["updatedAt", "createdAt", "dataPath", "metadataPath", "catalogPath"], axis=1)
+    df = df.drop(["updatedAt", "createdAt", "catalogPath"], axis=1)
 
     return cast(pd.DataFrame, df)
 
@@ -363,7 +355,6 @@ def read_values_from_s3(env_path: str, namespace: str, version: str, dataset: st
     q = """
     SELECT
         v.id as variableId,
-        v.dataPath,
         v.name as variable
     FROM variables as v
     JOIN datasets as d ON v.datasetId = d.id
@@ -376,7 +367,7 @@ def read_values_from_s3(env_path: str, namespace: str, version: str, dataset: st
     )
 
     # read them from S3
-    df = variable_data_df_from_s3(engine, vf.dataPath.tolist(), workers=10)
+    df = variable_data_df_from_s3(engine, variable_ids=vf.variableId.tolist(), workers=10)
 
     # add variable name
     df = df.merge(vf[["variableId", "variable"]], on="variableId")

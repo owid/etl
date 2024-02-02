@@ -1,0 +1,89 @@
+dataset:
+  title: COVID-2019 - Hospital & ICU
+  description: >-
+    Our hospital & ICU data is collected from official sources and collated by Our World in Data. The complete list of country-by-country
+    sources is available [on GitHub](https://github.com/owid/covid-19-data/blob/master/public/data/hospitalizations/locations.csv).
+
+
+    Our complete COVID-19 dataset is a collection of the COVID-19 data maintained by *Our World in Data*. **It is updated
+    daily** and includes data on confirmed cases, deaths, and testing.
+
+
+    We have created a new description of all our data sources. You find it at our GitHub repository **[here](https://github.com/owid/covid-19-data/tree/master/public/data/)**.
+    There you can download all of our data.
+  sources:
+  - name: Official data collated by Our World in Data – Last updated {TODAY}
+    url: https://github.com/owid/covid-19-data/tree/master/public/data/hospitalizations
+    published_by: Official data collated by Our World in Data
+tables:
+  hospital_and_icu:
+    variables:
+      daily_icu_occupancy:
+        title: Daily ICU occupancy
+        unit: patients in ICU
+        display:
+          entityAnnotationsMap: 'Hungary: patients on ventilator'
+          name: Current number of COVID-19 patients in ICU
+          numDecimalPlaces: 0
+          yearIsDay: true
+          zeroDay: '2020-01-21'
+      daily_icu_occupancy_per_million:
+        title: Daily ICU occupancy per million
+        unit: per million
+        display:
+          entityAnnotationsMap: 'Hungary: patients on ventilator'
+          name: Number of COVID-19 patients in ICU per million
+          numDecimalPlaces: 2
+          yearIsDay: true
+          zeroDay: '2020-01-21'
+      daily_hospital_occupancy:
+        title: Daily hospital occupancy
+        description: Daily hospital occupancy is the number of COVID-19 patients in hospital on a given day.
+        unit: patients
+        display:
+          name: Number of COVID-19 patients in hospital
+          numDecimalPlaces: 0
+          yearIsDay: true
+          zeroDay: '2020-01-21'
+      daily_hospital_occupancy_per_million:
+        title: Daily hospital occupancy per million
+        description: Daily hospital occupancy is the number of COVID-19 patients in hospital on a given day.
+        unit: per million
+        display:
+          name: Number of COVID-19 patients in hospital per million
+          numDecimalPlaces: 2
+          yearIsDay: true
+          zeroDay: '2020-01-21'
+      weekly_new_icu_admissions:
+        title: Weekly new ICU admissions
+        unit: ICU patients
+        display:
+          entityAnnotationsMap: 'Hungary: patients on ventilator'
+          name: Weekly new ICU admissions for COVID-19
+          numDecimalPlaces: 0
+          yearIsDay: true
+          zeroDay: '2020-01-21'
+      weekly_new_icu_admissions_per_million:
+        title: Weekly new ICU admissions per million
+        unit: per million
+        display:
+          name: Weekly new ICU admissions for COVID-19 per million
+          numDecimalPlaces: 2
+          yearIsDay: true
+          zeroDay: '2020-01-21'
+      weekly_new_hospital_admissions:
+        title: Weekly new hospital admissions
+        unit: patients
+        display:
+          name: Weekly new hospital admissions for COVID-19
+          numDecimalPlaces: 0
+          yearIsDay: true
+          zeroDay: '2020-01-21'
+      weekly_new_hospital_admissions_per_million:
+        title: Weekly new hospital admissions per million
+        unit: per million
+        display:
+          name: Weekly new hospital admissions for COVID-19 per million
+          numDecimalPlaces: 2
+          yearIsDay: true
+          zeroDay: '2020-01-21'

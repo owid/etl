@@ -1,0 +1,30 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Cardiovascular Diseases
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
+tables:
+  lancet_2022:
+    variables:
+      statin_use_secondary:
+        title: Statin use for secondary prevention amongst elibible individuals
+        unit: "%"
+        short_unit: "%"
+        description_short: Proportion of eligible individuals self-reporting use of statins for the secondary prevention of cardiovascular disease
+        description_from_producer: Eligibility for statin therapy for secondary prevention was defined among individuals with a history of self-reported cardiovascular disease.
+        processing_level: minor
+        display:
+          numDecimalPlaces: 1
+      statin_use_primary:
+        title: Statin use for primary prevention amongst elibible individuals
+        unit: "%"
+        short_unit: "%"
+        description_short: Proportion of eligible individuals self-reporting use of statins for the primary prevention of cardiovascular disease
+        description_from_producer: Eligibility for statin therapy for primary prevention was defined among individuals with a history of diagnosed diabetes or a 10-year cardiovascular disease risk of at least 20%.
+        processing_level: minor
+        display:
+          numDecimalPlaces: 1

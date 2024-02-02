@@ -1,18 +1,15 @@
 meta:
-  namespace: backport
-  short_name: dataset_5448_country_air_pollution_values
-  file_extension: feather
-  date_accessed: 2023-06-01 12:58:31.072701
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5448
+    date_accessed: 2023-08-10 09:42:06.004842
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: country_air_pollution
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/5448
-  source_published_by: Our World in Data catalog backport
   is_public: false
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 6928a93dd16b5c1d32dc831c58d8ec1d
+- md5: 5786eb8fe2038243ff0bb1623ea69bde
   size: 319674
   path: dataset_5448_country_air_pollution_values.feather

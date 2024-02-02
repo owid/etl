@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4662
+    date_accessed: 2023-08-16 08:02:46.684671
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_4662_prevalence_of_severe_food_insecurity_in_the_adult_population__pct
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 341b612e7e3488dd0c05132a213bb034
+  size: 32244
+  path: 
+    dataset_4662_prevalence_of_severe_food_insecurity_in_the_adult_population__pct_config.json

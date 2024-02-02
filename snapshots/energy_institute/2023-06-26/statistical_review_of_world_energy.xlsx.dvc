@@ -1,0 +1,22 @@
+meta:
+  name: Energy Institute Statistical Review of World Energy (2023)
+  publication_year: 2023
+  publication_date: '2023-06-26'
+  source_name: Energy Institute Statistical Review of World Energy (2023)
+  source_published_by: Energy Institute Statistical Review of World Energy (2023)
+  url: https://www.energyinst.org/statistical-review/
+  source_data_url: 
+    https://www.energyinst.org/__data/assets/excel_doc/0007/1055545/EI-stats-review-all-data.xlsx
+  license_url: 
+    https://web.archive.org/web/20230626200231/https://www.energyinst.org/__data/assets/pdf_file/0004/1055542/EI_Stat_Review_PDF_single-2.pdf
+  license_name: © Energy Institute 2023
+  date_accessed: 2023-06-28
+  is_public: true
+  description: |
+    The Energy Institute Statistical Review of World Energy analyses data on world energy markets from the prior year. Previously produced by BP, the Review has been providing timely, comprehensive and objective data to the energy community since 1952.
+
+wdir: ../../../data/snapshots/energy_institute/2023-06-26
+outs:
+- md5: 9c309c8a3e003e18a615124753c0d50c
+  size: 2113482
+  path: statistical_review_of_world_energy.xlsx

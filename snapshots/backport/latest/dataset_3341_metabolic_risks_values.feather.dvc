@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/3341
+    date_accessed: 2023-08-16 08:00:47.495309
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Metabolic risks
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 6ca68ee69fd67b6a951739209bd53ad2
+  size: 1381090
+  path: dataset_3341_metabolic_risks_values.feather

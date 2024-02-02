@@ -1,0 +1,24 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5030
+    date_accessed: 2023-08-16 10:20:30.489321
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_5030_emissions__agriculture__cultivation_of_organic_soils
+    (archived)
+  description: 'The domain Cultivation of Organic soils contains nitrous oxide (N2O)
+    gas emissions from organic soils under cropland (item: Cropland organic soils)
+    and grassland (item: Grassland organic soils).  The FAOSTAT emissions database
+    is computed following Tier 1 IPCC 2006 Guidelines for National GHG Inventories
+    (http://www.ipcc-nggip.iges.or.jp/public/2006gl/vol4.html) applied to geospatial
+    data. GHG emissions are provided by country, region and special groups, with global
+    coverage, relative to the period 1990-2016 (with annual updates) and with projections
+    for 2030 and 2050, expressed both as Gg N2O and Gg CO2eq, by cropland, grassland
+    and by their aggregation. Implied emission factor for N2O as well activity data
+    (areas) are also provided.'
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 7b47c20b65856a7c710c36b7afd5b082
+  size: 20429
+  path: dataset_5030_emissions__agriculture__cultivation_of_organic_soils_config.json

@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/894
+    date_accessed: 2023-08-16 07:30:52.476439
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: World Bank EdStats - Teachers (SABER)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 232b3f14a97614e7344725dac0615d5a
+  size: 12242
+  path: dataset_894_world_bank_edstats__teachers__saber_values.feather

@@ -3,6 +3,7 @@ meta:
   short_name: farmer_lafond_2016
   name: How predictable is technological progress?
   source_name: J. D. Farmer & F. Lafond (2016)
+  source_published_by: How predictable is technological progress? J. D. Farmer & F. Lafond, Research Policy Volume 45, Issue 3, April 2016, Pages 647-665
   publication_year: 2016
   publication_date: 2016-04-01
   url: https://www.sciencedirect.com/science/article/pii/S0048733315001699
@@ -12,7 +13,6 @@ meta:
   date_accessed: 2023-01-04
   is_public: true
   description: |
-    J. D. Farmer & F. Lafond, Research Policy Volume 45, Issue 3, April 2016, Pages 647-665.
 wdir: ../../../data/snapshots/papers/2023-01-04
 outs:
 - md5: b2dd2d2d7bdf788da15bd2e7dba8aaa9

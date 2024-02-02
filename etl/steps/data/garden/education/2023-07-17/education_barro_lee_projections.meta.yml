@@ -1,0 +1,143 @@
+
+definitions:
+  common:
+    processing_level: major
+    presentation:
+      topic_tags:
+        - Global Education
+  others:
+    description_processing: &description_processing >
+      Historical data up to the year 2010 has been sourced from 'Human Capital in the Long Run' by Lee and Lee (2016). This historical data was then combined with recent projections provided by Barro ane Lee (2015).
+
+
+      Regional aggregates were computed by Our World in Data through yearly population-weighted averages, where annual values are proportionally adjusted to emphasize the influence of larger populations.
+
+dataset:
+  title: Projections of Educational attainment (Barro and Lee 2015; Lee and Lee 2016)
+  description: >
+    This dataset is based on 'Human Capital in the Long Run' by Lee and Lee (2016) and Projections of Educational Attainment by Barro ane Lee (2015).
+    It includes indicators relating to historic data and more recent data on average years of education and educational attainment, specifically share of people with no education.
+
+
+tables:
+  education_barro_lee_projections:
+    variables:
+      mf_youth_and_adults__15_64_years__percentage_of_no_education:
+        title: Combined - percentage of youth and adults aged between 15 and 64 years with no education
+        description_processing: *description_processing
+        unit: '%'
+        short_unit: '%'
+        display:
+          name: Share of population with no education
+          numDecimalPlaces: 1
+
+      f_youth_and_adults__15_64_years__percentage_of_no_education:
+        title: Combined - percentage of female youth and adults aged between 15 and 64 years with no education
+        description_processing: *description_processing
+        unit: '%'
+        short_unit: '%'
+        display:
+          name: Share of women between 15 and 64 years old with no education
+          numDecimalPlaces: 1
+
+      f_adults__25_64_years__percentage_of_no_education:
+        title: Combined - percentage of female adults aged between 25 and 64 years with no education
+        description_processing: *description_processing
+        unit: '%'
+        short_unit: '%'
+        display:
+          name: Share of women between 25 and 64 years old with no education
+          numDecimalPlaces: 1
+
+      mf_adults__25_64_years__percentage_of_tertiary_education:
+        title: Combined - percentage of 25-64 years adults with incomplete tertiary education
+        description_processing: *description_processing
+        unit: '%'
+        display:
+          name: Share of population aged between 25 and 64 years old with tertiary education
+          numDecimalPlaces: 1
+
+      mf_youth_and_adults__15_64_years__average_years_of_education:
+        title: Combined - average years of education for 15-64 years male and female youth and adults
+        description_processing: *description_processing
+        description_short: Average years of formal education for individuals aged 15-64.
+        description_key:
+          - For the years leading up to 2015, the data are derived from historical estimates, providing a retrospective view of education levels. For the years 2015 and beyond, the projections are grounded in the historical data of 2010, which serve as the foundational benchmark. These forward-looking projections are then crafted by analyzing trends in school enrollment and changes in population structures. These trends are informed by forecasts from the United Nations, ensuring a global perspective and understanding of future educational developments.
+          - The method to estimate average years of schooling takes into account the age distribution in the population. This is important because access to education can vary significantly across generations. Older generations may have had fewer educational opportunities than younger ones, which affects the overall average education level.
+          - It also considers the typical duration required to complete each education level. For instance, primary education usually takes about 6 years, secondary education 4-6 years, and higher education may take even longer. Understanding the time investment required for different education levels is essential for accurate assessment.
+          - At its core, the method calculates the average years of schooling. This is achieved by determining the percentage of the population that has completed each education level and multiplying it by the duration of that level. The sum of these results gives a comprehensive view of both the extent of educational attainment and the time spent in education by the population.
+          - The method is dynamic, adapting to changes over time and across regions. For example, if a country increases the length of primary education, this change is included in subsequent calculations. This adaptability ensures that the average years of education remain relevant and accurate over time and across different educational systems.
+          - Note that the method does not take into account the quality of education. It only considers the number of years spent in education. This means that the average years of schooling may not reflect the actual skills and knowledge of the population.
+
+        unit: years
+        display:
+          name: Average years of schooling
+          numDecimalPlaces: 1
+
+      f_youth_and_adults__15_64_years__average_years_of_education:
+        title: Combined - average years of education for 15-64 years female youth and adults
+        description_processing: *description_processing
+        description_short: Average years of formal education for women aged 15-64.
+        description_key:
+          - For the years leading up to 2015, the data are derived from historical estimates, providing a retrospective view of education levels. For the years 2015 and beyond, the projections are grounded in the historical data of 2010, which serve as the foundational benchmark. These forward-looking projections are then crafted by analyzing trends in school enrollment and changes in population structures. These trends are informed by forecasts from the United Nations, ensuring a global perspective and understanding of future educational developments.
+          - The method to estimate average years of schooling takes into account the age distribution in the population. This is important because access to education can vary significantly across generations. Older generations may have had fewer educational opportunities than younger ones, which affects the overall average education level.
+          - It also considers the typical duration required to complete each education level. For instance, primary education usually takes about 6 years, secondary education 4-6 years, and higher education may take even longer. Understanding the time investment required for different education levels is essential for accurate assessment.
+          - At its core, the method calculates the average years of schooling. This is achieved by determining the percentage of the population that has completed each education level and multiplying it by the duration of that level. The sum of these results gives a comprehensive view of both the extent of educational attainment and the time spent in education by the population.
+          - The method is dynamic, adapting to changes over time and across regions. For example, if a country increases the length of primary education, this change is included in subsequent calculations. This adaptability ensures that the average years of education remain relevant and accurate over time and across different educational systems.
+          - Note that the method does not take into account the quality of education. It only considers the number of years spent in education. This means that the average years of schooling may not reflect the actual skills and knowledge of the population.
+        unit: years
+        display:
+          name: Average years of schooling for women
+          numDecimalPlaces: 1
+
+      female_over_male_average_years_of_schooling:
+        title: Average years of schooling gender ratio, 15-64 year olds
+        description_processing: *description_processing
+        unit: ratio
+        display:
+          name: Gender ratio of average years of schooling
+          numDecimalPlaces: 1
+
+      female_over_male_share_with_no_education:
+        title: Share of populaton with no education gender ratio, 15-64 year olds
+        description_processing: *description_processing
+        unit: ratio
+        display:
+          name: Gender ratio for relative share of population with no education
+          numDecimalPlaces: 1
+
+      female_over_male_share_some_formal_education:
+        title: Share of populaton with some formal education gender ratio, 15-64 year olds
+        description_processing: *description_processing
+        unit: ratio
+        display:
+          name: Gender ratio for relative share of population with some formal education
+          numDecimalPlaces: 1
+
+      some_formal_education_female:
+        title: Share of female population aged 15-64 years with some formal education
+        description_processing: *description_processing
+        unit: "%"
+        short_unit: "%"
+        display:
+          name: Share of female population with some formal education
+          numDecimalPlaces: 1
+
+      some_formal_education_male:
+        title: Share of male population aged 15-64 years with some formal education
+        description_processing: *description_processing
+        unit: "%"
+        short_unit: "%"
+        display:
+          name: Share of male population with some formal education
+          numDecimalPlaces: 1
+
+      some_formal_education_both_sexes:
+        title: Share of total population aged 15-64 years with some formal education
+        description_processing: *description_processing
+        unit: "%"
+        short_unit: "%"
+        display:
+          name: Share of population with some formal education
+          numDecimalPlaces: 1
+

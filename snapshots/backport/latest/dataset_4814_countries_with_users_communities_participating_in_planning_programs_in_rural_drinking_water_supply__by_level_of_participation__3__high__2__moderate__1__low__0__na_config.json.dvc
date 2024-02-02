@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4814
+    date_accessed: 2023-08-16 09:48:35.213305
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_4814_countries_with_users_communities_participating_in_planning_programs_in_rural_drinking_water_supply__by_level_of_participation__3__high__2__moderate__1__low__0__na
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 1db40234537ac77bd5230fa6ad4d5fd8
+  size: 2141
+  path: 
+    dataset_4814_countries_with_users_communities_participating_in_planning_programs_in_rural_drinking_water_supply__by_level_of_participation__3__high__2__moderate__1__low__0__na_config.json

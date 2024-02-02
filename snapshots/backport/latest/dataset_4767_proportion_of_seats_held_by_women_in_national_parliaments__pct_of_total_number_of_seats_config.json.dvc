@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4767
+    date_accessed: 2023-08-14 15:48:23.216761
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_4767_proportion_of_seats_held_by_women_in_national_parliaments__pct_of_total_number_of_seats
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 82f410676aedae548744beda279b9a8b
+  size: 1902
+  path: 
+    dataset_4767_proportion_of_seats_held_by_women_in_national_parliaments__pct_of_total_number_of_seats_config.json

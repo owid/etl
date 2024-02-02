@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/800
+    date_accessed: 2023-08-14 05:46:50.301578
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: 'Forestry: Forestry Trade Flows - FAO (2017)'
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 448df8c73fd0a7a6204166c065d41012
+  size: 1385994
+  path: dataset_800_forestry__forestry_trade_flows__fao__2017_values.feather

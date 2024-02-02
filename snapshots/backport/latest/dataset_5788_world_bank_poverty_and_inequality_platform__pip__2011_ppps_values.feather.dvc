@@ -1,21 +1,17 @@
 meta:
-  namespace: backport
-  short_name: dataset_5788_world_bank_poverty_and_inequality_platform__pip__2011_ppps_values
-  file_extension: feather
-  date_accessed: 2023-06-01 13:11:11.788414
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5788
+    date_accessed: 2023-08-10 08:33:19.245625
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: World Bank Poverty and Inequality Platform (PIP) - 2011 PPPs
   description: When creating new charts with PIP data, please be aware that the main
     dataset to use is the 2017 PPPs version. This is being used mainly to keep old
     posts alive before a complete transition to 2017 PPPs
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/5788
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 4887e8f3323e57ea4e1c4ae464215531
+- md5: a3d295a7018597581e7ebcd393ec7c5a
   size: 1557186
   path: 
     dataset_5788_world_bank_poverty_and_inequality_platform__pip__2011_ppps_values.feather

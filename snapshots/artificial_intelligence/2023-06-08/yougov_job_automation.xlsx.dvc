@@ -9,18 +9,16 @@ meta:
   source_name: YouGov
   source_published_by: YouGov
   url: https://today.yougov.com/topics/politics/trackers/worry-about-automation
-  source_data_url:
-    https://today.yougov.com/_pubapis/v5/us/trackers/worry-about-automation/download
+  source_data_url: https://today.yougov.com/_pubapis/v5/us/trackers/worry-about-automation/download
   file_extension: xlsx
   license_url:
   license_name: Public Data
   date_accessed: 2023-06-08
   is_public: true
-  description: |
+  description: |-
     Biannual tracking of Americans' level of concern regarding job automation replacing their employment. Next update is in July.
-
 wdir: ../../../data/snapshots/artificial_intelligence/2023-06-08
 outs:
-- md5: e12dff64cd06ae5b57b4c4430f9bab0d
-  size: 26581
+- md5: 97e9f9506f600f8710cd442920f72483
+  size: 26582
   path: yougov_job_automation.xlsx

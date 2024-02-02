@@ -1,18 +1,15 @@
 meta:
-  namespace: backport
-  short_name: dataset_4105_te_21_4_productivity_values
-  file_extension: feather
-  date_accessed: 2023-02-23 18:13:37.050953
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4105
+    date_accessed: 2023-08-10 09:13:28.125950
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: TE-21.4_productivity
   description: core-econ.org
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/4105
-  source_published_by: Our World in Data catalog backport
   is_public: false
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 59ed017404afd5e70151bbe46cbe79b1
+- md5: a6a0bd54f38ee719fb516f31770ae3ae
   size: 9194
   path: dataset_4105_te_21_4_productivity_values.feather

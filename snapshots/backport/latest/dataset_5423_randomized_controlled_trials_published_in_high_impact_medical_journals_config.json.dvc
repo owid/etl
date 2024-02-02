@@ -1,18 +1,17 @@
 meta:
-  namespace: backport
-  short_name: dataset_5423_randomized_controlled_trials_published_in_high_impact_medical_journals_config
-  file_extension: json
-  date_accessed: 2023-02-23 16:26:12.711911
-  name: Grapher metadata for dataset_5423_randomized_controlled_trials_published_in_high_impact_medical_journals
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5423
+    date_accessed: 2023-08-10 09:38:16.906561
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_5423_randomized_controlled_trials_published_in_high_impact_medical_journals
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/5423
-  source_published_by: Our World in Data catalog backport
   is_public: false
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 368aec4c27c3ccb925b30360feebf463
-  size: 2632
-  path: dataset_5423_randomized_controlled_trials_published_in_high_impact_medical_journals_config.json
+- md5: 208c24ae8adff92b80590d3fed05215d
+  size: 2783
+  path: 
+    dataset_5423_randomized_controlled_trials_published_in_high_impact_medical_journals_config.json

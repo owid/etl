@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/807
+    date_accessed: 2023-08-16 07:29:00.337623
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: 'Investment: Country Investment Statistics Profile - FAO (2017)'
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 7ea0751db5e7f6a4da89788ebfa32c1d
+  size: 213226
+  path: 
+    dataset_807_investment__country_investment_statistics_profile__fao__2017_values.feather

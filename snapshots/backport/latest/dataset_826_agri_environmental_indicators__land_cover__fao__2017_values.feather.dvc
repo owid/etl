@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/826
+    date_accessed: 2023-08-16 09:38:19.707890
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: 'Agri-Environmental Indicators: Land Cover - FAO (2017)'
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 7cf48a0ceb2820e910dc988152f8b79d
+  size: 506706
+  path: dataset_826_agri_environmental_indicators__land_cover__fao__2017_values.feather

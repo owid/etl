@@ -1,0 +1,131 @@
+dataset:
+  title: COVID-19 - Vaccinations
+  description: |-
+    Data on COVID-19 vaccinations. We only rely on figures that are verifiable based on public official sources.
+
+    You can download the full dataset here: https://github.com/owid/covid-19-data/tree/master/public/data/vaccinations
+  sources:
+  - name: Official data collated by Our World in Data – Last updated {TODAY}
+    published_by: For source details see https://github.com/owid/covid-19-data/tree/master/public/data/vaccinations/locations.csv
+tables:
+  vaccinations:
+    variables:
+      new_people_vaccinated_smoothed:
+        title: new_people_vaccinated_smoothed
+        unit: ''
+        display:
+          yearIsDay: true
+          zeroDay: '2020-01-21'
+      new_people_vaccinated_smoothed_per_hundred:
+        title: new_people_vaccinated_smoothed_per_hundred
+        unit: ''
+      new_vaccinations:
+        title: new_vaccinations
+        unit: ''
+        display:
+          yearIsDay: true
+          zeroDay: '2020-01-21'
+      new_vaccinations_smoothed:
+        title: new_vaccinations_smoothed
+        description: Not all countries report vaccination data on a daily basis. To generate this series we assume that vaccination
+          changed equally on a daily basis over any periods in which no data was reported. This produces a complete series
+          of daily figures, which is then averaged over a rolling 7-day window.
+        unit: ''
+        display:
+          includeInTable: true
+          yearIsDay: true
+      new_vaccinations_smoothed_per_million:
+        title: new_vaccinations_smoothed_per_million
+        description: Not all countries report vaccination data on a daily basis. To generate this series we assume that vaccination
+          changed equally on a daily basis over any periods in which no data was reported. This produces a complete series
+          of daily figures, which is then averaged over a rolling 7-day window.
+        unit: ''
+        display:
+          includeInTable: true
+          yearIsDay: true
+      people_fully_vaccinated:
+        title: people_fully_vaccinated
+        unit: ''
+        display:
+          entityAnnotationsMap: |-
+            World: Data for China reported at irregular intervals
+            Upper middle income: Data for China reported at irregular intervals
+            Asia: Data for China reported at irregular intervals
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2020-01-21'
+      people_fully_vaccinated_per_hundred:
+        title: people_fully_vaccinated_per_hundred
+        unit: ''
+        display:
+          entityAnnotationsMap: |-
+            World: Data for China reported at irregular intervals
+            Upper middle income: Data for China reported at irregular intervals
+            Asia: Data for China reported at irregular intervals
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2020-01-21'
+      people_unvaccinated:
+        title: people_unvaccinated
+        unit: ''
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2020-01-21'
+      people_vaccinated:
+        title: people_vaccinated
+        unit: ''
+        display:
+          entityAnnotationsMap: |-
+            World: Data for China reported at irregular intervals
+            Upper middle income: Data for China reported at irregular intervals
+            Asia: Data for China reported at irregular intervals
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2020-01-21'
+      people_vaccinated_per_hundred:
+        title: people_vaccinated_per_hundred
+        unit: ''
+        display:
+          entityAnnotationsMap: |-
+            Gibraltar: Exceeds 100% due to non-resident vaccinations
+            World: Data for China reported at irregular intervals
+            Upper middle income: Data for China reported at irregular intervals
+            Asia: Data for China reported at irregular intervals
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2020-01-21'
+      share_of_boosters:
+        title: share_of_boosters
+        unit: ''
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2020-01-21'
+      total_boosters:
+        title: total_boosters
+        unit: ''
+        display:
+          yearIsDay: true
+          zeroDay: '2020-01-21'
+      total_boosters_per_hundred:
+        title: total_boosters_per_hundred
+        unit: ''
+        display:
+          yearIsDay: true
+          zeroDay: '2020-01-21'
+      total_vaccinations:
+        title: total_vaccinations
+        unit: ''
+        display:
+          includeInTable: true
+          name: Cumulative COVID-19 vaccinations
+          numDecimalPlaces: 0
+          yearIsDay: true
+      total_vaccinations_per_hundred:
+        title: total_vaccinations_per_hundred
+        unit: ''
+        display:
+          includeInTable: true
+          name: Cumulative COVID-19 vaccinations per 100 people
+          yearIsDay: true

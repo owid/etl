@@ -1,18 +1,14 @@
 meta:
-  namespace: backport
-  short_name: dataset_920_fertility_rate__wc_iiasa__2017_values
-  file_extension: feather
-  date_accessed: 2023-02-23 17:27:43.630143
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/920
+    date_accessed: 2023-08-10 09:41:50.712464
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Fertility Rate - WC-IIASA (2017)
   description: Fertility rate by world region and education scenario.
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/920
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: e2cf4f1489465b30a79dd62dffe91bbc
+- md5: 1ae834d2fa12b3d9d967c1ee79df4176
   size: 8290
   path: dataset_920_fertility_rate__wc_iiasa__2017_values.feather

@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1481
+    date_accessed: 2023-08-14 15:58:16.294466
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Upper respiratory infections
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 009aad05a4f97d58750e129fcc6bd34b
+  size: 2012058
+  path: dataset_1481_upper_respiratory_infections_values.feather

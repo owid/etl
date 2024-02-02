@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/873
+    date_accessed: 2023-08-14 15:13:54.669799
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Clio-Infra - Environment - Klein Goldewijk (2015)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 4091f4e5733b5251c2453a3ad9e5f153
+  size: 202034
+  path: dataset_873_clio_infra__environment__klein_goldewijk__2015_values.feather

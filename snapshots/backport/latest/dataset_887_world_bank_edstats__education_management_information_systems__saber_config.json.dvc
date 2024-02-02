@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/887
+    date_accessed: 2023-08-10 13:06:47.556892
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_887_world_bank_edstats__education_management_information_systems__saber
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: cca28780ed8e2f4dbf370e6e6e9614f0
+  size: 35781
+  path: 
+    dataset_887_world_bank_edstats__education_management_information_systems__saber_config.json

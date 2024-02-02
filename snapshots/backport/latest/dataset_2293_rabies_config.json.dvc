@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2293
+    date_accessed: 2023-08-16 10:06:42.078860
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2293_rabies (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 072a620039f44f1e7336ed873aca73f6
+  size: 32116
+  path: dataset_2293_rabies_config.json

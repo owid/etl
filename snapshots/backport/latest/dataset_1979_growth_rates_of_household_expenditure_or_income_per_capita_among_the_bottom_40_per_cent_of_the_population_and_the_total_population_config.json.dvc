@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1979
+    date_accessed: 2023-08-14 05:56:56.241069
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_1979_growth_rates_of_household_expenditure_or_income_per_capita_among_the_bottom_40_per_cent_of_the_population_and_the_total_population
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 12c122c8ed955e00715b27e9c41369c3
+  size: 8449
+  path: 
+    dataset_1979_growth_rates_of_household_expenditure_or_income_per_capita_among_the_bottom_40_per_cent_of_the_population_and_the_total_population_config.json

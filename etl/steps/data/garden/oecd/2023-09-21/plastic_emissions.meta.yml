@@ -1,0 +1,34 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Plastic Pollution
+
+
+tables:
+  plastic_emissions:
+    variables:
+      all_greenhouse_gases:
+        title: All greenhouse gases
+        unit: 'tonnes of CO₂ equivalent'
+        short_unit: 't'
+        display:
+          numDecimalPlaces: 0
+      ch4:
+        title: Methane
+        unit: 'tonnes of CO₂ equivalent'
+        short_unit: 't'
+        display:
+          numDecimalPlaces: 0
+      co2:
+        title: Carbon dioxide
+        unit: 'tonnes of CO₂ equivalent'
+        short_unit: 't'
+        display:
+          numDecimalPlaces: 0
+      n2o:
+        title: Nitrous oxide
+        unit: 'tonnes of CO₂ equivalent'
+        short_unit: 't'
+        display:
+          numDecimalPlaces: 0

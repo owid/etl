@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4757
+    date_accessed: 2023-08-16 08:44:10.300527
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: 'Legal frameworks that promote, enforce and monitor gender equality (percentage
+    of achievement, 0 - 100) -- Area 4: marriage and family'
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: c1ad3ab1e93572f885e3b6b10e3b9ff0
+  size: 7898
+  path: 
+    dataset_4757_legal_frameworks_that_promote__enforce_and_monitor_gender_equality__percentage_of_achievement__0__100__area_4__marriage_and_family_values.feather

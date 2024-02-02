@@ -3,9 +3,11 @@ from typing import Any, Callable, Generator, Iterable, List, Optional, cast
 
 import numpy as np
 import pandas as pd
-from pandas.api.types import is_datetime64_any_dtype  # type: ignore
-from pandas.api.types import is_numeric_dtype  # type: ignore
-from pandas.api.types import union_categoricals
+from pandas.api.types import (
+    is_datetime64_any_dtype,  # type: ignore
+    is_numeric_dtype,  # type: ignore
+    union_categoricals,
+)
 
 # ######## Note - this file will be moved to owid-catalog-py before the branch is merged ##############
 
@@ -103,7 +105,7 @@ def series_equals(
     assert all(s1.index == s2.index), "Indices must be the same"
 
     # Union categories of categorical columns to enable comparison
-    if s1.dtype == "category":
+    if s1.dtype == "category" and s2.dtype == "category":
         s1, s2 = align_categoricals(s1, s2)
 
     # Eq above does not take tolerance into account so compare again with tolerance
@@ -130,7 +132,14 @@ def series_equals(
     else:
         raise ValueError(f"Unsupported dtype {s1.dtype} for column {s1.name}")
 
-    return s1.eq(s2) | (s1.isnull() & s2.isnull())
+    # first see if NaNs are in both series
+    eq = s1.isnull() & s2.isnull()
+    # then compare the rest of non-nan values (we cannot compare the entire series because pandas
+    # complains with `TypeError: boolean value of NA is ambiguous`)
+    ix = ~s1.isnull() & ~s2.isnull()
+    eq.loc[ix] = eq.loc[ix] | s1.loc[ix].eq(s2.loc[ix])
+    assert eq.dtype == bool
+    return eq
 
 
 def df_equals(df1: pd.DataFrame, df2: pd.DataFrame, **kwargs) -> pd.DataFrame:

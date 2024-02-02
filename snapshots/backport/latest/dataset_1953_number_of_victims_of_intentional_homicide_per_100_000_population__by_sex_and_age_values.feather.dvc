@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1953
+    date_accessed: 2023-08-16 08:17:37.939618
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Number of victims of intentional homicide per 100,000 population, by sex and
+    age
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: ee78b877aa91c6e3b393d27dcade2247
+  size: 21098
+  path: 
+    dataset_1953_number_of_victims_of_intentional_homicide_per_100_000_population__by_sex_and_age_values.feather

@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4852
+    date_accessed: 2023-08-16 10:24:17.085974
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_4852_manufacturing_employment_as_a_proportion_of_total_employment__pct
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 1bb35bba4b125178ebc093c5c0080993
+  size: 12224
+  path: 
+    dataset_4852_manufacturing_employment_as_a_proportion_of_total_employment__pct_config.json

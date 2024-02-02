@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2641
+    date_accessed: 2023-08-16 07:22:42.477727
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2641_health__gross_fixed_capital_formation_in_the_health_care_system
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 6408b76f17fdbf800c283d988d07240d
+  size: 2442
+  path: 
+    dataset_2641_health__gross_fixed_capital_formation_in_the_health_care_system_config.json

@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2756
+    date_accessed: 2023-08-16 10:39:34.875398
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2756_rate_of_internationally_observed_elections__susan_hyde__2011
+    (archived)
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: df2c869a65f8cdb6a1ba4ed7d4e43cf3
+  size: 3888
+  path: 
+    dataset_2756_rate_of_internationally_observed_elections__susan_hyde__2011_config.json

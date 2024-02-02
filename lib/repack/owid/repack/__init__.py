@@ -32,10 +32,7 @@ def repack_frame(
 
     # repack each column into the best dtype we can give it
     df = pd.concat(
-        [
-            repack_series(df[col]) if col not in dtypes else df[col]
-            for col in df.columns
-        ],
+        [repack_series(df[col]) if col not in dtypes else df[col] for col in df.columns],
         axis=1,
     )
 
@@ -51,7 +48,7 @@ def repack_frame(
 
     for col in df.columns:
         if df[col].dtype == "object":
-            raise ValueError(f"column {col} is still object")
+            raise ValueError(f"Column {col} is still object. Consider converting it to str.")
 
     # set the primary key back again
     if primary_key:
@@ -135,9 +132,7 @@ def to_category(s: pd.Series) -> pd.Series:
     return s.astype("category")
 
 
-def series_eq(
-    lhs: pd.Series, rhs: pd.Series, cast: Any, rtol: float = 1e-5, atol: float = 1e-8
-) -> bool:
+def series_eq(lhs: pd.Series, rhs: pd.Series, cast: Any, rtol: float = 1e-5, atol: float = 1e-8) -> bool:
     """
     Check that series are equal, but unlike normal floating point checks where
     NaN != NaN, we want missing or null values to be reported as equal to each
@@ -145,16 +140,14 @@ def series_eq(
     """
     # NOTE: this could be speeded up with numpy methods or smarter comparison,
     # but it's not bottleneck at the moment
-    if len(lhs) != len(rhs) or (lhs.isnull() != rhs.isnull()).any():
+    if len(lhs) != len(rhs):
         return False
 
     # improve performance by calling native astype method
     if cast == float:
         func = lambda s: s.astype(float)  # noqa: E731
     else:
+        # NOTE: this would be extremely slow in practice
         func = lambda s: s.apply(cast)  # noqa: E731
 
-    lhs_values = func(lhs.dropna())  # type: ignore
-    rhs_values = func(lhs.dropna())  # type: ignore
-
-    return np.allclose(lhs_values, rhs_values, rtol=rtol, atol=atol)
+    return np.allclose(func(lhs), func(rhs), rtol=rtol, atol=atol, equal_nan=True)

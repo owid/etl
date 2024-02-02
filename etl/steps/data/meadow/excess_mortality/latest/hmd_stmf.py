@@ -62,6 +62,9 @@ def run(dest_dir: str) -> None:
     #
     # Save outputs.
     #
+    # Set index
+    tb = tb.set_index(["countrycode", "year", "week", "sex"], verify_integrity=True)
+
     # Create a new meadow dataset with the same metadata as the snapshot.
     ds_meadow = Dataset.create_empty(dest_dir, metadata=convert_snapshot_metadata(snap.metadata))
 

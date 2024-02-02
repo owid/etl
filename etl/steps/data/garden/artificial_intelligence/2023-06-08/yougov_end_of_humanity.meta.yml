@@ -1,15 +1,13 @@
 dataset:
   title: AI and the End of Humanity (YouGov, 2023)
-  description: This poll was conducted online on April 7 - 11, 2023 among 1,000 U.S.
-    adult citizens. Respondents were selected from YouGov’s opt-in panel using sample
-    matching.
+  description: This poll was conducted online on April 7 - 11, 2023 among 1,000 U.S. adult citizens. Respondents were selected
+    from YouGov’s opt-in panel using sample matching.
   licenses:
   - name: Public domain
   sources:
   - name: YouGov
-    description: This poll was conducted online on April 7 - 11, 2023 among 1,000
-      U.S. adult citizens. Respondents were selected from YouGov’s opt-in panel using
-      sample matching.
+    description: This poll was conducted online on April 7 - 11, 2023 among 1,000 U.S. adult citizens. Respondents were selected
+      from YouGov’s opt-in panel using sample matching.
     url: https://today.yougov.com/topics/technology/articles-reports/2023/04/14/ai-nuclear-weapons-world-war-humanity-poll
     source_data_url: https://docs.cdn.yougov.com/bfoyxp7p28/results_AI%20and%20the%20End%20of%20Humanity.pdf
     date_accessed: '2023-06-08'
@@ -19,407 +17,65 @@ dataset:
 tables:
   yougov_end_of_humanity:
     variables:
-      options:
-        title: options
-        unit: ''
+      an_act_of_god:
+        title: Act of God
+        description: Respondents were asked "How concerned are you that an act of God would be the cause fot the end of the human race on Earth?"
+        unit: '%'
+        short_unit: '%'
+
+      alien_invasion:
+        title: Alien invasion
+        description: Respondents were asked "How concerned are you that an alien invasion would be the cause fot the end of the human race on Earth?"
+        unit: '%'
+        short_unit: '%'
+
+      artificial_intelligence:
+        title: Artificial intelligence
+        description: Respondents were asked "How concerned are you that artificial intelligence would be the cause fot the end of the human race on Earth?"
+        unit: '%'
+        short_unit: '%'
+
+      asteroid_impact:
+        title: Asteroid impact
+        description: Respondents were asked "How concerned are you that an asteroid impact would be the cause fot the end of the human race on Earth?"
+        unit: '%'
+        short_unit: '%'
+
+      climate_change:
+        title: Climate change
+        description: Respondents were asked "How concerned are you that climate would be the cause fot the end of the human race on Earth?"
+        unit: '%'
+        short_unit: '%'
+
+      global_inability_to_have_children:
+        title: Global inability to have children
+        description: Respondents were asked "How concerned are you that inability to have children would be the cause fot the end of the human race on Earth?"
+        unit: '%'
+        short_unit: '%'
+
+      nuclear_weapons:
+        title: Nuclear weapons
+        description: Respondents were asked "How concerned are you that nuclear weapons would be the cause fot the end of the human race on Earth?"
+        unit: '%'
+        short_unit: '%'
+
+      a_pandemic:
+        title: Pandemic
+        description: Respondents were asked "How concerned are you that a pandemic would be the cause fot the end of the human race on Earth?"
+        unit: '%'
+        short_unit: '%'
+
+      world_war:
+        title: World war
+        description: Respondents were asked "How concerned are you that a world war would be the cause fot the end of the human race on Earth?"
+        unit: '%'
+        short_unit: '%'
+
       concerned_are_you_about_the_possibility_of_the_end_of_the_human_race_on_earth:
-        title: How concerned, if at all, are you about the possibility of the end of the human race on Earth?
+        title: "Overall concern"
+        description: Respondents were asked "How concerned are you about the possibility of the end of the human race on Earth?"
         unit: '%'
         short_unit: '%'
-        display:
-          numDecimalPlaces: 0
-      likely_end_of_the_human_race_on_earth_artificial_intelligence:
-        title: How likely, if at all, do you think it is that artificial intelligence would
-          cause the end of the human race on Earth?
-        unit: '%'
-        short_unit: '%'
-        display:
-          name: Artificial intelligence
-          numDecimalPlaces: 0
-      likely_end_of_the_human_race_on_earth_nuclear_weapons:
-        title: How likely, if at all, do you think it is that nuclear weapons would
-          cause the end of the human race on Earth?
-        unit: '%'
-        short_unit: '%'
-        display:
-          name: Nuclear weapons
-          numDecimalPlaces: 0
-      likely_end_of_the_human_race_on_earth_a_pandemic:
-        title: How likely, if at all, do you think it is that a pandemic would
-          cause the end of the human race on Earth?
-        unit: '%'
-        short_unit: '%'
-        display:
-          name: A pandemic
-          numDecimalPlaces: 0
-      likely_end_of_the_human_race_on_earth_climate_change:
-        title: How likely, if at all, do you think it is that climate change would
-          cause the end of the human race on Earth?
-        unit: '%'
-        short_unit: '%'
-        display:
-          name: Climate change
-          numDecimalPlaces: 0
-      likely_end_of_the_human_race_on_earth_world_war:
-        title: How likely, if at all, do you think it is that the world war would
-          cause the end of the human race on Earth?
-        unit: '%'
-        short_unit: '%'
-        display:
-          name: World war
-          numDecimalPlaces: 0
-      likely_end_of_the_human_race_on_earth_asteroid_impact:
-        title: How likely, if at all, do you think it is that the asteroid impact would
-          cause the end of the human race on Earth?
-        unit: '%'
-        short_unit: '%'
-        display:
-          name: Asteroid impact
-          numDecimalPlaces: 0
-      likely_end_of_the_human_race_on_earth_alien_invasion:
-        title: How likely, if at all, do you think it is that alien invasion would
-          cause the end of the human race on Earth?
-        unit: '%'
-        short_unit: '%'
-        display:
-          name: Alien invasion
-          numDecimalPlaces: 0
-      likely_end_of_the_human_race_on_earth_an_act_of_god:
-        title: How likely, if at all, do you think it is that an act of God would
-          cause the end of the human race on Earth?
-        unit: '%'
-        short_unit: '%'
-        display:
-          name: An act of God
-          numDecimalPlaces: 0
-      likely_end_of_the_human_race_on_earth_global_inability_to_have_children:
-        title: How likely, if at all, do you think it is that global inability to have children would
-          cause the end of the human race on Earth?
-        unit: '%'
-        short_unit: '%'
-        display:
-          name: Global inability to have children
-          numDecimalPlaces: 0
-      concerned_end_of_the_human_race_on_earth_artificial_intelligence:
-        title: How concerned, if at all, are you about the possibility that the artificial intelligence
-          will cause the end of the human race on Earth?
-        unit: '%'
-        short_unit: '%'
-        display:
-          name: Artificial intelligence
-          numDecimalPlaces: 0
-      concerned_end_of_the_human_race_on_earth_nuclear_weapons:
-        title: How concerned, if at all, are you about the possibility that nuclear weapons
-          will cause the end of the human race on Earth?
-        unit: '%'
-        short_unit: '%'
-        display:
-          name: Nuclear weapons
-          numDecimalPlaces: 0
-      concerned_end_of_the_human_race_on_earth_a_pandemic:
-        title: How concerned, if at all, are you about the possibility that a pandemic
-          will cause the end of the human race on Earth?
-        unit: '%'
-        short_unit: '%'
-        display:
-          name: A pandemic
-          numDecimalPlaces: 0
-      concerned_end_of_the_human_race_on_earth_climate_change:
-        title: How concerned, if at all, are you about the possibility that climate change
-          will cause the end of the human race on Earth?
-        unit: '%'
-        short_unit: '%'
-        display:
-          name: Climate change
-          numDecimalPlaces: 0
-      concerned_end_of_the_human_race_on_earth_world_war:
-        title: How concerned, if at all, are you about the possibility that world war
-          will cause the end of the human race on Earth?
-        unit: '%'
-        short_unit: '%'
-        display:
-          name: World war
-          numDecimalPlaces: 0
-      concerned_end_of_the_human_race_on_earth_asteroid_impact:
-        title: How concerned, if at all, are you about the possibility that an asteroid impact
-          will cause the end of the human race on Earth?
-        unit: '%'
-        short_unit: '%'
-        display:
-          name: Asteroid impact
-          numDecimalPlaces: 0
-      concerned_end_of_the_human_race_on_earth_alien_invasion:
-        title: How concerned, if at all, are you about the possibility that alien invasion
-          will cause the end of the human race on Earth?
-        unit: '%'
-        short_unit: '%'
-        display:
-          name: Alien invasion
-          numDecimalPlaces: 0
-      concerned_end_of_the_human_race_on_earth_an_act_of_god:
-        title: How concerned, if at all, are you about the possibility that an act of God
-          will cause the end of the human race on Earth?
-        unit: '%'
-        short_unit: '%'
-        display:
-          name: An act of God
-          numDecimalPlaces: 0
-      concerned_end_of_the_human_race_on_earth_global_inability_to_have_children:
-        title: How concerned, if at all, are you about the possibility that global inability to have children
-          will cause the end of the human race on Earth?
-        unit: '%'
-        short_unit: '%'
-        display:
-          name: Global inability to have children
-          numDecimalPlaces: 0
-      answers_age_18_29_artificial_intelligence:
-        title: How concerned are 18-29 year olds that artificial intelligence would be the cause fot the end of the human race on Earth?
-        unit: '%'
-        short_unit: '%'
-        display:
-          name: 18-29 years old
-          numDecimalPlaces: 0
-      answers_age_30_44_artificial_intelligence:
-        title: How concerned are 30-44 year olds that artificial intelligence would be the cause fot the end of the human race on Earth?
-        unit: '%'
-        short_unit: '%'
-        display:
-          name: 30-44 years old
-          numDecimalPlaces: 0
-      answers_age_45_64_artificial_intelligence:
-        title: How concerned are 45-64 year olds that artificial intelligence would be the cause fot the end of the human race on Earth?
-        unit: '%'
-        short_unit: '%'
-        display:
-          name: 45-64 years old
-          numDecimalPlaces: 0
-      answers_age_65plus_artificial_intelligence:
-        title: How concerned are 65+ year olds that artificial intelligence would be the cause fot the end of the human race on Earth?
-        unit: '%'
-        short_unit: '%'
-        display:
-          name: 65+ years old
-          numDecimalPlaces: 0
-      answers_age_18_29_nuclear_weapons:
-        title: How concerned are 18-29 year olds that nuclear weapons would be the cause fot the end of the human race on Earth?
-        unit: '%'
-        short_unit: '%'
-        display:
-          name: 18-29 years old
-          numDecimalPlaces: 0
-      answers_age_30_44_nuclear_weapons:
-        title: How concerned are 30-44 year olds that nuclear weapons would be the cause fot the end of the human race on Earth?
-        unit: '%'
-        short_unit: '%'
-        display:
-          name: 30-44 years old
-          numDecimalPlaces: 0
-      answers_age_45_64_nuclear_weapons:
-        title: How concerned are 45-64 year olds that nuclear weapons would be the cause fot the end of the human race on Earth?
-        unit: '%'
-        short_unit: '%'
-        display:
-          name: 45-64 years old
-      answers_age_65plus_nuclear_weapons:
-        title: How concerned are 65+ year olds that nuclear weapons would be the cause fot the end of the human race on Earth?
-        unit: '%'
-        short_unit: '%'
-        display:
-          name: 65+ years old
-          numDecimalPlaces: 0
-      answers_age_18_29_a_pandemic:
-        title: How concerned are 18-29 year olds that a pandemic would be the cause fot the end of the human race on Earth?
-        unit: '%'
-        short_unit: '%'
-        display:
-          name: 18-29 years old
-          numDecimalPlaces: 0
-      answers_age_30_44_a_pandemic:
-        title: How concerned are 30-44 year olds that a pandemic would be the cause fot the end of the human race on Earth?
-        unit: '%'
-        short_unit: '%'
-        display:
-          name: 30-44 years old
-          numDecimalPlaces: 0
-      answers_age_45_64_a_pandemic:
-        title: How concerned are 45-64 year olds that a pandemic would be the cause fot the end of the human race on Earth?
-        unit: '%'
-        short_unit: '%'
-        display:
-          name: 45-64 years old
-          numDecimalPlaces: 0
-      answers_age_65plus_a_pandemic:
-        title: How concerned are 65+ year olds that a pandemic would be the cause fot the end of the human race on Earth?
-        unit: '%'
-        short_unit: '%'
-        display:
-          name: 65+ years old
-          numDecimalPlaces: 0
-      answers_age_18_29_climate_change:
-        title: How concerned are 18-29 year olds that climate change would be the cause fot the end of the human race on Earth?
-        unit: '%'
-        short_unit: '%'
-        display:
-          name: 18-29 years old
-          numDecimalPlaces: 0
-      answers_age_30_44_climate_change:
-        title: How concerned are 30-44 year olds that climate change would be the cause fot the end of the human race on Earth?
-        unit: '%'
-        short_unit: '%'
-        display:
-          name: 30-44 years old
-          numDecimalPlaces: 0
-      answers_age_45_64_climate_change:
-        title: How concerned are 45-64 year olds that climate change would be the cause fot the end of the human race on Earth?
-        unit: '%'
-        short_unit: '%'
-        display:
-          name: 45-64 years old
-          numDecimalPlaces: 0
-      answers_age_65plus_climate_change:
-        title: How concerned are 65+ year olds that climate change would be the cause fot the end of the human race on Earth?
-        unit: '%'
-        short_unit: '%'
-        display:
-          name: 65+ years old
-          numDecimalPlaces: 0
-      answers_age_18_29_world_war:
-        title: How concerned are 18-29 year olds that the world war would be the cause fot the end of the human race on Earth?
-        unit: '%'
-        short_unit: '%'
-        display:
-          name: 18-29 years old
-          numDecimalPlaces: 0
-      answers_age_30_44_world_war:
-        title: How concerned are 30-44 year olds that the world war would be the cause fot the end of the human race on Earth?
-        unit: '%'
-        short_unit: '%'
-        display:
-          name: 30-44 years old
-          numDecimalPlaces: 0
-      answers_age_45_64_world_war:
-        title: How concerned are 45-64 year olds that the world war would be the cause fot the end of the human race on Earth?
-        unit: '%'
-        short_unit: '%'
-        display:
-          name: 45-64 years old
-          numDecimalPlaces: 0
-      answers_age_65plus_world_war:
-        title: How concerned are 65+ year olds that the world war would be the cause fot the end of the human race on Earth?
-        unit: '%'
-        short_unit: '%'
-        display:
-          name: 65+ years old
-          numDecimalPlaces: 0
-      answers_age_18_29_asteroid_impact:
-        title: How concerned are 18-29 year olds that an asteroid impact would be the cause fot the end of the human race on Earth?
-        unit: '%'
-        short_unit: '%'
-        display:
-          name: 18-29 years old
-          numDecimalPlaces: 0
-      answers_age_30_44_asteroid_impact:
-        title: How concerned are 30-44 year olds that an asteroid impact would be the cause fot the end of the human race on Earth?
-        unit: '%'
-        short_unit: '%'
-        display:
-          name: 30-44 years old
-          numDecimalPlaces: 0
-      answers_age_45_64_asteroid_impact:
-        title: How concerned are 45-64 year olds that an asteroid impact would be the cause fot the end of the human race on Earth?
-        unit: '%'
-        short_unit: '%'
-        display:
-          name: 45-64 years old
-          numDecimalPlaces: 0
-      answers_age_65plus_asteroid_impact:
-        title: How concerned are 65+ year olds that an asteroid impact would be the cause fot the end of the human race on Earth?
-        unit: '%'
-        short_unit: '%'
-        display:
-          name: 65+ years old
-          numDecimalPlaces: 0
-      answers_age_18_29_alien_invasion:
-        title: How concerned are 18-29 year olds that an alien invasion would be the cause fot the end of the human race on Earth?
-        unit: '%'
-        short_unit: '%'
-        display:
-          name: 18-29 years old
-          numDecimalPlaces: 0
-      answers_age_30_44_alien_invasion:
-        title: How concerned are 30-44 year olds that an alien invasion would be the cause fot the end of the human race on Earth?
-        unit: '%'
-        short_unit: '%'
-        display:
-          name: 30-44 years old
-          numDecimalPlaces: 0
-      answers_age_45_64_alien_invasion:
-        title: How concerned are 45-64 year olds that an alien invasion would be the cause fot the end of the human race on Earth?
-        unit: '%'
-        short_unit: '%'
-        display:
-          name: 45-64 years old
-          numDecimalPlaces: 0
-      answers_age_65plus_alien_invasion:
-        title: How concerned are 65+ year olds that an alien invasion would be the cause fot the end of the human race on Earth?
-        unit: '%'
-        short_unit: '%'
-        display:
-          name: 65+ years old
-          numDecimalPlaces: 0
-      answers_age_18_29_an_act_of_god:
-        title: How concerned are 18-29 year olds that an act of God would be the cause fot the end of the human race on Earth?
-        unit: '%'
-        short_unit: '%'
-        display:
-          name: 18-29 years old
-          numDecimalPlaces: 0
-      answers_age_30_44_an_act_of_god:
-        title: How concerned are 30-44 year olds that an act of God would be the cause fot the end of the human race on Earth?
-        unit: '%'
-        short_unit: '%'
-        display:
-          name: 30-44 years old
-          numDecimalPlaces: 0
-      answers_age_45_64_an_act_of_god:
-        title: How concerned are 45-64 year olds that an act of God would be the cause fot the end of the human race on Earth?
-        unit: '%'
-        short_unit: '%'
-        display:
-          name: 45-64 years old
-          numDecimalPlaces: 0
-      answers_age_65plus_an_act_of_god:
-        title: How concerned are 65+ year olds that an act of God would be the cause fot the end of the human race on Earth?
-        unit: '%'
-        short_unit: '%'
-        display:
-          name: 65+ years old
-          numDecimalPlaces: 0
-      answers_age_18_29_global_inability_to_have_children:
-        title: How concerned are 18-29 year olds that global inability to have children would be the cause fot the end of the human race on Earth?
-        unit: '%'
-        short_unit: '%'
-        display:
-          name: 18-29 years old
-          numDecimalPlaces: 0
-      answers_age_30_44_global_inability_to_have_children:
-        title: How concerned are 30-44 year olds that global inability to have children would be the cause fot the end of the human race on Earth?
-        unit: '%'
-        short_unit: '%'
-        display:
-          name: 30-44 years old
-          numDecimalPlaces: 0
-      answers_age_45_64_global_inability_to_have_children:
-        title: How concerned are 45-64 year olds that global inability to have children would be the cause fot the end of the human race on Earth?
-        unit: '%'
-        short_unit: '%'
-        display:
-          name: 45-64 years old
-          numDecimalPlaces: 0
-      answers_age_65plus_global_inability_to_have_children:
-        title: How concerned are 65+ year olds that global inability to have children would be the cause fot the end of the human race on Earth?
-        unit: '%'
-        short_unit: '%'
-        display:
-          name: 65+ years old
-          numDecimalPlaces: 0
+
+
+

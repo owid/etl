@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2057
+    date_accessed: 2023-08-16 10:22:17.632070
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Total official flows (official development assistance plus other official
+    flows) to the agriculture sector
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 5d7ea92bc1ba4cd0fc1a195d5edee10c
+  size: 25010
+  path: 
+    dataset_2057_total_official_flows__official_development_assistance_plus_other_official_flows__to_the_agriculture_sector_values.feather

@@ -28,8 +28,8 @@ We secondly keep record all data dependencies in a directed graph or DAG (see YA
 
 We keep the ETL efficient to build by using a Merkle tree of MD5 checksums:
 
-- Snapshots have a checksum available in their metadata
-- Datasets have a checksum of their inputs available in their metadata (the `source_checksum` field)
+- Snapshots have a checksum available in their metadata.
+- Datasets have a checksum of their inputs available in their metadata (the `source_checksum` field).
 
 When we ask the ETL to build something by running `etl <query>`, it will only build things that are out of date. We can force a rebuild by passing the `--force` flag.
 

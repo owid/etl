@@ -1,43 +1,11 @@
-"""There's a significant overlap with https://github.com/owid/walden/blob/master/owid/walden/owid_cache.py
-It would make sense to move both into a shared module in the future or use some proper public library
-for working with S3 that is compatible with DigitalOcean's Spaces.
-"""
 import logging
-import os
-from os import path
+from os import environ as env
 from typing import Any, Tuple
 from urllib.parse import urlparse
 
 from botocore.exceptions import ClientError
 
-SPACES_ENDPOINT = "https://nyc3.digitaloceanspaces.com"
-S3_BASE = "s3://walden.nyc3.digitaloceanspaces.com"
-HTTPS_BASE = "https://walden.nyc3.digitaloceanspaces.com"
-AWS_PROFILE = os.environ.get("AWS_PROFILE", "default")
-
-
-def upload(filename: str, relative_path: str, public: bool = False) -> str:
-    """
-    Upload file to Walden.
-
-    Args:
-        local_path (str): Local path to file.
-        walden_path (str): Path where to store the file in Walden.
-        public (bool): Set to True to expose the file to the public (read only). Defaults to False.
-    """
-    dest_path = f"{S3_BASE}/{relative_path}"
-    extra_args = {"ACL": "public-read"} if public else {}
-
-    client = connect()
-    try:
-        client.upload_file(filename, "walden", relative_path, ExtraArgs=extra_args)
-    except ClientError as e:
-        logging.error(e)
-        raise UploadError(e)
-
-    logging.info("UPLOADED", f"{filename} -> {dest_path}")
-
-    return f"{HTTPS_BASE}/{relative_path}"
+R2_ENDPOINT = "https://078fcdfed9955087315dd86792e71a7e.r2.cloudflarestorage.com"
 
 
 def s3_bucket_key(url: str) -> Tuple[str, str]:
@@ -70,33 +38,23 @@ def download(s3_url: str, filename: str, quiet: bool = False) -> None:
 
 
 def connect() -> Any:
-    "Return a connection to Walden's DigitalOcean space."
+    "Return a connection to Cloudflare's R2."
     import boto3
 
-    check_for_default_profile()
+    R2_ACCESS_KEY = env.get("R2_ACCESS_KEY")
+    R2_SECRET_KEY = env.get("R2_SECRET_KEY")
 
-    session = boto3.Session(profile_name=AWS_PROFILE)
-    client = session.client(
+    assert R2_ACCESS_KEY and R2_SECRET_KEY, "Missing R2_ACCESS_KEY and R2_SECRET_KEY environment variables."
+
+    client = boto3.client(
         service_name="s3",
-        endpoint_url=SPACES_ENDPOINT,
+        endpoint_url=R2_ENDPOINT,
+        aws_access_key_id=R2_ACCESS_KEY,
+        aws_secret_access_key=R2_SECRET_KEY,
+        region_name="auto",
     )
+
     return client
-
-
-def check_for_default_profile() -> None:
-    filename = path.expanduser("~/.aws/config")
-    if not path.exists(filename) or f"[{AWS_PROFILE}]" not in open(filename).read():
-        raise MissingCredentialsError(
-            f"""you must set up a config file at ~/.aws/config
-
-it should look like:
-
-[{AWS_PROFILE}]
-aws_access_key_id = ...
-aws_secret_access_key = ...
-region = ...
-"""
-        )
 
 
 class MissingCredentialsError(Exception):

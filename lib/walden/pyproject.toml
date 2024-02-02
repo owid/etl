@@ -2,7 +2,7 @@
 name = "walden"
 version = "0.1.0"
 description = ""
-authors = ["Our World In Data <tech@ourworldindata.org>"]
+authors = ["Our World in Data <tech@ourworldindata.org>"]
 packages = [{ include = "owid" }]
 
 [tool.poetry.dependencies]
@@ -22,10 +22,10 @@ owid-datautils = {path = "../datautils", develop = true}
 pyrsistent = ">=0.19.1"
 owid-repack = ">=0.1.1"
 
-[tool.poetry.dev-dependencies]
+[tool.poetry.group.dev.dependencies]
 pytest = ">=6.2.4"
 watchdog = ">=2.1.3"
-PyYAML = ">=5.4.1"
+PyYAML = "^6.0.1"
 argh = ">=0.26.2"
 black = ">=22.3.0"
 flake8 = ">=3.9.2"

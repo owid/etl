@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1860
+    date_accessed: 2023-08-16 10:03:31.775242
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Youth
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 9af86184696734a3003559f83c4a5904
+  size: 186978
+  path: dataset_1860_youth_values.feather

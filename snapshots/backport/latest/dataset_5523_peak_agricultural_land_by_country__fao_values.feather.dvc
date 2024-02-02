@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5523
+    date_accessed: 2023-08-16 10:47:40.154449
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Peak agricultural land by country (FAO)
+  description: ''
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 85ea252f69573374ec6d7b0ed74174d1
+  size: 401714
+  path: dataset_5523_peak_agricultural_land_by_country__fao_values.feather

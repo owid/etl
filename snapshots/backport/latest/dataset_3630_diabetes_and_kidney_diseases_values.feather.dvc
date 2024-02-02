@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/3630
+    date_accessed: 2023-08-16 10:00:10.917910
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Diabetes and kidney diseases
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 219960262f7cb982fe69ce31148c1e36
+  size: 2116410
+  path: dataset_3630_diabetes_and_kidney_diseases_values.feather

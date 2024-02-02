@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/932
+    date_accessed: 2023-08-16 10:33:07.652046
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: World Bank Income Thresholds - World Bank (2017)
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: ed7d9f711f3b41a0ed5a68b5b535321c
+  size: 6930
+  path: dataset_932_world_bank_income_thresholds__world_bank__2017_values.feather

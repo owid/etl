@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/3012
+    date_accessed: 2023-08-16 10:46:52.618518
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Retail, 100% ground beef (US Bureau of Labor Statistics (2017)) (split)
+  description: ''
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: c5f84b405cc2f14ba17b6b521d1ea986
+  size: 6274
+  path: 
+    dataset_3012_retail__100pct_ground_beef__us_bureau_of_labor_statistics__2017__split_values.feather

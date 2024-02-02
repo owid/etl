@@ -1,21 +1,16 @@
 meta:
-  namespace: backport
-  short_name: 
-    dataset_2755_armed_forces_personnel_as_a_share_of_the_total_population__owid_based_on_world_bank_values
-  file_extension: feather
-  date_accessed: 2023-06-01 14:52:34.135314
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2755
+    date_accessed: 2023-08-10 08:31:01.273238
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Armed forces personnel as a share of the total population (OWID based on World
     Bank)
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/2755
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 0474d025d47a86e4ed47823f8f3d75e2
+- md5: 62a277d867149c41db1654088f881051
   size: 54290
   path: 
     dataset_2755_armed_forces_personnel_as_a_share_of_the_total_population__owid_based_on_world_bank_values.feather

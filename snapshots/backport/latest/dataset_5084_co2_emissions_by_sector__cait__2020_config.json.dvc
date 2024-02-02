@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5084
+    date_accessed: 2023-08-11 07:55:47.543935
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_5084_co2_emissions_by_sector__cait__2020 (archived)
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 3a65564d9351a72cf62d039c91593599
+  size: 20270
+  path: dataset_5084_co2_emissions_by_sector__cait__2020_config.json

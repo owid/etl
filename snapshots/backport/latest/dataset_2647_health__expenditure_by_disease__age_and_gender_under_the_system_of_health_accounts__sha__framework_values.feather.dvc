@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2647
+    date_accessed: 2023-08-16 09:59:38.027215
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Health - Expenditure by disease, age and gender under the System of Health
+    Accounts (SHA) Framework
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 3c0dea3824aa31e5c58e4759cc203c87
+  size: 9698
+  path: 
+    dataset_2647_health__expenditure_by_disease__age_and_gender_under_the_system_of_health_accounts__sha__framework_values.feather

@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2293
+    date_accessed: 2023-08-16 10:07:28.653537
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Rabies
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 382eb525638e459843e74883e2cf5cde
+  size: 2116386
+  path: dataset_2293_rabies_values.feather

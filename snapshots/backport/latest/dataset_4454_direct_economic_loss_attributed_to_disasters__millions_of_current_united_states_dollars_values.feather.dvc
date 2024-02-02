@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4454
+    date_accessed: 2023-08-14 14:37:21.005348
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Direct economic loss attributed to disasters (millions of current United States
+    dollars)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 49b69ba19fa0354894e13519ae17175b
+  size: 18794
+  path: 
+    dataset_4454_direct_economic_loss_attributed_to_disasters__millions_of_current_united_states_dollars_values.feather

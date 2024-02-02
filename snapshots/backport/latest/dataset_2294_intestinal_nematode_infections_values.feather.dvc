@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2294
+    date_accessed: 2023-08-16 07:17:34.556693
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Intestinal nematode infections
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 670213771f321f4d1e9fc772b24e6a6e
+  size: 787818
+  path: dataset_2294_intestinal_nematode_infections_values.feather

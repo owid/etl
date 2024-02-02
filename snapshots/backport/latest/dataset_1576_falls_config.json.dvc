@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1576
+    date_accessed: 2023-08-16 08:50:08.743857
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1576_falls (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 197f47fb71b1182c0db5e36d2a55d387
+  size: 30975
+  path: dataset_1576_falls_config.json

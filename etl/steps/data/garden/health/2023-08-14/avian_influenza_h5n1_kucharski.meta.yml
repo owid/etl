@@ -1,0 +1,40 @@
+tables:
+  avian_influenza_h5n1_kucharski:
+    variables:
+      avian_cases:
+        title: Human cases with avian influenza A/H5N1 (monthly)
+        unit: cases
+        description: >-
+          Monthly number of human cases with avian influenza A/H5N1.
+
+
+          Cases are those entries in the original dataset with outcome:
+
+            - Treatment
+            - Recovered
+            - Stable
+            - Mild
+            - Critical
+            - Recovering
+            - Critical condition
+
+        processing_level: minor
+        display:
+          numDecimalPlaces: 0
+          conversionFactor: 1
+      avian_deaths:
+        title: Human deaths from avian influenza A/H5N1 (monthly)
+        unit: deaths
+        description: >-
+          Monthly number of human deaths from avian influenza A/H5N1.
+
+
+          Cases are those entries in the original dataset with outcome:
+
+            - Died
+            - Fatal
+
+        processing_level: minor
+        display:
+          numDecimalPlaces: 0
+          conversionFactor: 1

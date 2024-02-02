@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/3981
+    date_accessed: 2023-08-10 14:32:26.937077
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_3981_hiv_aids_and_sexually_transmitted_infections
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 74b3ba78e1ff02225c0cc3e30cb85bc3
+  size: 32637
+  path: dataset_3981_hiv_aids_and_sexually_transmitted_infections_config.json

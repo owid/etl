@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1788
+    date_accessed: 2023-08-16 08:36:11.017789
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1788_diet_high_in_red_meat (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: de3c9431d07966614c5857436b2c1662
+  size: 21940
+  path: dataset_1788_diet_high_in_red_meat_config.json

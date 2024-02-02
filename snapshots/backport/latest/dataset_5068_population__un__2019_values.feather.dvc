@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5068
+    date_accessed: 2023-08-16 08:34:21.228198
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Population – UN (2019)
+  description: ''
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 7ae4421fc4f67ebb35b08388888d0666
+  size: 107346
+  path: dataset_5068_population__un__2019_values.feather

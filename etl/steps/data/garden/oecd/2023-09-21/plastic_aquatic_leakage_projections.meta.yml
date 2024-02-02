@@ -1,0 +1,23 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Plastic Pollution
+
+
+tables:
+  plastic_aquatic_leakage_projections:
+    variables:
+      value:
+        title: Plastic leakage accumulated - projections
+        unit: 'tonnes'
+        short_unit: 't'
+        display:
+          isProjection: true
+          numDecimalPlaces: 0
+      share:
+        title: Share of plastic leakage accumulated - projections
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 2

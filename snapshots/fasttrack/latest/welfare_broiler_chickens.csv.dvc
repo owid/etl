@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Google Sheet
+    url: https://welfarefootprint.org/broilers/
+    source_data_url: 
+      https://docs.google.com/spreadsheets/d/e/2PACX-1vTdcKM1J1ylX5h8COUP44843CA41bZu4M2I4YIiQ9yVSwrrlW0KcjBWCBH2NmGJtY_WMxa94sFzP5Nt/pub?output=csv
+    date_accessed: '2023-08-18'
+    publication_year: '2022'
+    published_by: Google Sheet
+  name: Welfare of broiler chickens (Welfare Footprint)
+  description: ''
+  license: {}
+  is_public: false
+wdir: ../../../data/snapshots/fasttrack/latest
+outs:
+- md5: 7ad7059a1c13a1c28ba06c3720b4e0e4
+  size: 155
+  path: welfare_broiler_chickens.csv

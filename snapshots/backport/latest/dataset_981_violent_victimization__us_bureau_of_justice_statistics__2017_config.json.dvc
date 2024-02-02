@@ -1,18 +1,15 @@
 meta:
-  namespace: backport
-  short_name: dataset_981_violent_victimization__us_bureau_of_justice_statistics__2017_config
-  file_extension: json
-  date_accessed: 2023-02-23 16:34:07.775278
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/981
+    date_accessed: 2023-08-10 08:46:32.594070
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_981_violent_victimization__us_bureau_of_justice_statistics__2017
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/981
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: edfdd8d31a7bd35969eb327f6b7e6d41
-  size: 1940
-  path: dataset_981_violent_victimization__us_bureau_of_justice_statistics__2017_config.json
+- md5: b7dc2375b9521dfd8bade3aa3e3dbe02
+  size: 2093
+  path: 
+    dataset_981_violent_victimization__us_bureau_of_justice_statistics__2017_config.json

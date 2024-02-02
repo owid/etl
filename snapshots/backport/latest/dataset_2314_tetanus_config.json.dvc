@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2314
+    date_accessed: 2023-08-16 08:18:25.280633
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2314_tetanus (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 503e9bc9405e08686f73a58034b00521
+  size: 32158
+  path: dataset_2314_tetanus_config.json

@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1523
+    date_accessed: 2023-08-16 07:20:54.988323
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Hemolytic disease and other neonatal jaundice
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 5a24db3f3643bb753f33b50c5fe66cef
+  size: 1381130
+  path: dataset_1523_hemolytic_disease_and_other_neonatal_jaundice_values.feather

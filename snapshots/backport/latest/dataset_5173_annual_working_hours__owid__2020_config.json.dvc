@@ -1,18 +1,15 @@
 meta:
-  namespace: backport
-  short_name: dataset_5173_annual_working_hours__owid__2020_config
-  file_extension: json
-  date_accessed: 2023-02-23 18:50:07.750073
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5173
+    date_accessed: 2023-08-10 09:26:09.410465
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_5173_annual_working_hours__owid__2020
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/5173
-  source_published_by: Our World in Data catalog backport
   is_public: false
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 53879e8aadc23cea8d3aa06f7062b74b
-  size: 3348
+- md5: 95ab178ea9f0fd6c38bc52e9f4082040
+  size: 3499
   path: dataset_5173_annual_working_hours__owid__2020_config.json

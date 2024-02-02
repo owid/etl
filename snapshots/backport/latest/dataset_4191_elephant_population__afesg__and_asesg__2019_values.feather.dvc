@@ -1,18 +1,14 @@
 meta:
-  namespace: backport
-  short_name: dataset_4191_elephant_population__afesg__and_asesg__2019_values
-  file_extension: feather
-  date_accessed: 2023-02-23 17:42:36.743460
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4191
+    date_accessed: 2023-08-10 09:49:05.864464
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Elephant population (AfESG &AsESG, 2019)
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/4191
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: d6bf1b27d09774268f0f7bbde975ce50
+- md5: 33803460c9a44b1a69af6bc8a020bb82
   size: 8786
   path: dataset_4191_elephant_population__afesg__and_asesg__2019_values.feather

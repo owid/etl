@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1608
+    date_accessed: 2023-08-14 15:24:00.580914
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1608_chagas_disease (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: a24c7edb50e6496151342b7824131f2e
+  size: 31335
+  path: dataset_1608_chagas_disease_config.json

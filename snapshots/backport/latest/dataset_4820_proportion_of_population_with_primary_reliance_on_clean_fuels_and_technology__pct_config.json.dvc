@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4820
+    date_accessed: 2023-08-16 09:59:00.650717
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_4820_proportion_of_population_with_primary_reliance_on_clean_fuels_and_technology__pct
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 6cac68b13ddbadb4c887f6ba4b7bc859
+  size: 17666
+  path: 
+    dataset_4820_proportion_of_population_with_primary_reliance_on_clean_fuels_and_technology__pct_config.json

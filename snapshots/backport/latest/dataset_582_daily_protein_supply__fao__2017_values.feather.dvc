@@ -1,18 +1,14 @@
 meta:
-  namespace: backport
-  short_name: dataset_582_daily_protein_supply__fao__2017_values
-  file_extension: feather
-  date_accessed: 2023-06-01 12:50:10.261349
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/582
+    date_accessed: 2023-08-10 09:40:01.118331
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Daily protein supply - FAO (2017)
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/582
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: e96507f81910f6af23ef07ada0758ee4
+- md5: 24a9ef569d4d4f8414d74927f55c95b7
   size: 131978
   path: dataset_582_daily_protein_supply__fao__2017_values.feather

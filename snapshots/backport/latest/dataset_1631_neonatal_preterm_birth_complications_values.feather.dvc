@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1631
+    date_accessed: 2023-08-14 05:44:50.150656
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Neonatal preterm birth complications
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 97f16d75915706b41f968001c6e60281
+  size: 1381122
+  path: dataset_1631_neonatal_preterm_birth_complications_values.feather

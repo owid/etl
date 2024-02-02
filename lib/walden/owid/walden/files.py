@@ -72,7 +72,7 @@ def _stream_to_file(
     return md5.hexdigest()
 
 
-def download(url: str, filename: str, expected_md5: Optional[str] = None, quiet: bool = False) -> None:
+def download(url: str, filename: str, expected_md5: Optional[str] = None, quiet: bool = False, **kwargs) -> None:
     "Download the file at the URL to the given local filename."
     # NOTE: we are not streaming to a NamedTemporaryFile because it was causing weird
     # issues one some systems, it's safer to stream directly to the file and remove it
@@ -81,7 +81,7 @@ def download(url: str, filename: str, expected_md5: Optional[str] = None, quiet:
     with open(tmp_filename, "wb") as f, requests.get(url, stream=True) as r:
         r.raise_for_status()
 
-        md5 = _stream_to_file(r, f)
+        md5 = _stream_to_file(r, f, **kwargs)
 
         if expected_md5 and md5 != expected_md5:
             if os.path.exists(filename):

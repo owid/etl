@@ -2,7 +2,9 @@
 from typing import Any, Dict, List, Optional, Tuple
 
 import numpy as np
+import owid.catalog.processing as pr
 import pandas as pd
+from owid.catalog import Table
 
 from .dtypes import optimize_dtypes
 
@@ -45,8 +47,7 @@ COLUMNS_ORDER: List[str] = [
 ]
 
 
-def process_base(df: pd.DataFrame, country_std: str) -> pd.DataFrame:
-    df = pd.DataFrame(df)
+def process_base(df: Table, country_std: str) -> Table:
     df = df.reset_index()
     df = df.assign(location=df.location.map(country_std).astype("category"))
     # Discard unmapped regions
@@ -74,7 +75,7 @@ def process_base(df: pd.DataFrame, country_std: str) -> pd.DataFrame:
     return df
 
 
-def process(df: pd.DataFrame, country_std: str) -> Tuple[pd.DataFrame, pd.DataFrame]:
+def process(df: Table, country_std: str) -> Tuple[Table, Table]:
     """Re-organizes age groups and complements some metrics."""
     df_base = process_base(df, country_std)
     # Add metrics
@@ -84,7 +85,7 @@ def process(df: pd.DataFrame, country_std: str) -> Tuple[pd.DataFrame, pd.DataFr
     return df_base, df
 
 
-def add_metrics(df: pd.DataFrame) -> pd.DataFrame:
+def add_metrics(df: Table) -> Table:
     # Build metrics (e.g. age groups)
     df_sr = _add_metric_sexratio(df)
     df_p_granular, df_p_broad = _add_metric_population(df)
@@ -97,14 +98,14 @@ def add_metrics(df: pd.DataFrame) -> pd.DataFrame:
     df_p_broad = optimize_dtypes(df_p_broad)
     df_p_diff = optimize_dtypes(df_p_diff)
     # Concatenate
-    df = pd.concat([df_sr, df_sr_all, df_p_granular, df_p_broad, df_p_diff], ignore_index=True)
+    df = pr.concat([df_sr, df_sr_all, df_p_granular, df_p_broad, df_p_diff], ignore_index=True)
     # Remove infs
     msk = np.isinf(df["value"])
     df.loc[msk, "value"] = np.nan
     return df
 
 
-def remove_outliers(df: pd.DataFrame) -> pd.DataFrame:
+def remove_outliers(df: Table) -> Table:
     """Remove outliers from the population table.
 
     So far, detected ones are:
@@ -120,8 +121,8 @@ def remove_outliers(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def _add_metric_sexratio(df: pd.DataFrame) -> pd.DataFrame:
-    df_sr: pd.DataFrame = df.loc[df.metric == "sex_ratio"]
+def _add_metric_sexratio(df: Table) -> Table:
+    df_sr = df.loc[df.metric == "sex_ratio"]
     df_sr = df_sr.loc[
         df_sr.age.isin(
             [
@@ -145,7 +146,7 @@ def _add_metric_sexratio(df: pd.DataFrame) -> pd.DataFrame:
     return df_sr
 
 
-def _add_metric_population(df: pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame]:
+def _add_metric_population(df: Table) -> Tuple[Table, Table]:
     df_p = df.loc[df.metric == "population"]
     # Basic age groups
     age_map = {
@@ -217,9 +218,9 @@ def _add_metric_population(df: pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame
     return df_p_granular, df_p_broad
 
 
-def _add_age_group(df: pd.DataFrame, age_min: int, age_max: int, age_group: Optional[str] = None) -> pd.DataFrame:
+def _add_age_group(df: Table, age_min: int, age_max: int, age_group: Optional[str] = None) -> Table:
     ages_accepted = [str(i) for i in range(age_min, age_max + 1)]
-    dfx: pd.DataFrame = df.loc[df.age.isin(ages_accepted)].drop(columns="age").copy()
+    dfx: Table = df.loc[df.age.isin(ages_accepted)].drop(columns="age").copy()
     dfx = dfx.groupby(
         ["location", "year", "metric", "sex", "variant"],
         as_index=False,
@@ -248,7 +249,7 @@ def map_broad_age(age: str) -> str:
         return "65+"
 
 
-def _add_metric_population_change(df_p_granular: pd.DataFrame) -> pd.DataFrame:
+def _add_metric_population_change(df_p_granular: Table) -> Table:
     pop_diff = (
         df_p_granular.sort_values("year")
         .groupby(["location", "sex", "age", "variant"])[["value"]]
@@ -266,13 +267,17 @@ def _add_metric_population_change(df_p_granular: pd.DataFrame) -> pd.DataFrame:
     return df_p_diff
 
 
-def _add_metric_sexratio_all(df_p_granular: pd.DataFrame) -> Any:
+def _add_metric_sexratio_all(df_p_granular: Table) -> Any:
     # print(df_p_granular.head())
     # Check
     (df_p_granular.metric.unique() == ["population"]).all()
     # Get M/F values
-    df_male = df_p_granular.loc[(df_p_granular.age == "all") & (df_p_granular.sex == "male")].rename(columns={"value": "value_male"})  # type: ignore
-    df_female = df_p_granular.loc[(df_p_granular.age == "all") & (df_p_granular.sex == "female")].rename(columns={"value": "value_female"})  # type: ignore
+    df_male = df_p_granular.loc[(df_p_granular.age == "all") & (df_p_granular.sex == "male")].rename(
+        columns={"value": "value_male"}
+    )  # type: ignore
+    df_female = df_p_granular.loc[(df_p_granular.age == "all") & (df_p_granular.sex == "female")].rename(
+        columns={"value": "value_female"}
+    )  # type: ignore
     # Check
     assert len(df_male) == len(df_female)
     # Build df

@@ -1,0 +1,13 @@
+dataset:
+  title: Cross-country literacy rates - World Bank, CIA World Factbook, and other sources
+tables:
+  literacy_rates:
+    variables:
+      literacy_rates__world_bank__cia_world_factbook__and_other_sources:
+        title: Literacy rates (World Bank, CIA World Factbook, and other sources)
+        description: Percentage of the population (aged 15 and above) who can read and write.
+        unit: '%'
+        display:
+          numDecimalPlaces: 1
+          unit: '%'
+        short_unit: '%'

@@ -1,18 +1,16 @@
 meta:
-  namespace: backport
-  short_name: dataset_5547_covid__hong_kong_vaccinations_by_age_group__and__manufacturer_values
-  file_extension: feather
-  date_accessed: 2023-02-23 18:36:01.966246
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5547
+    date_accessed: 2023-08-14 15:29:15.018329
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: COVID - Hong Kong vaccinations by age group & manufacturer
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/5547
-  source_published_by: Our World in Data catalog backport
   is_public: false
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 1119117851329d3d756a61c0cc19f745
+- md5: 3c9b8946226bee6c72fce715aac942e5
   size: 6338
-  path: dataset_5547_covid__hong_kong_vaccinations_by_age_group__and__manufacturer_values.feather
+  path: 
+    dataset_5547_covid__hong_kong_vaccinations_by_age_group__and__manufacturer_values.feather

@@ -1,0 +1,104 @@
+dataset:
+  title: Road accidents (OECD, 2023)
+  description: >
+    The majority of series data is sourced from the OECD Statistics.
+
+
+    For particular countries, historical data have been sourced from specific national records as referenced below.
+
+
+    Germany: Statistisches Bundesamt (https://www.destatis.de/EN/FactsFigures/EconomicSectors/TransportTraffic/TrafficAccidents/Tables_/RoadTrafficAccidents.html)
+
+
+    New Zealand: https://web.archive.org/web/20200116174845/https://www.transport.govt.nz/mot-resources/road-safety-resources/road-deaths/annual-number-of-road-deaths-historical-information/
+
+
+    Australia: https://web.archive.org/web/20220525052753/https://www.bitre.gov.au/publications/ongoing/road_deaths_australia_annual_summaries and https://web.archive.org/web/20210501075840/https://www.infrastructure.gov.au/roads/safety/publications/2008/pdf/Ann_Stats_2007.pdf
+
+
+    Scotland: https://www.transport.gov.scot/media/39307/sct05174402361.pdf
+
+
+    Northern Ireland: https://web.archive.org/web/20190801195213/https://www.psni.police.uk/inside-psni/Statistics/road-traffic-collision-statistics/
+
+
+    United States: https://www.bts.gov/content/transportation-fatalities-mode
+
+
+    Road accidents are measured in terms of the number of persons injured and deaths due to road accidents, whether
+    immediate or within 30 days of the accident, and excluding suicides involving the use of road motor vehicles. A road motor
+    vehicle is a road vehicle fitted with an engine as the sole means of propulsion and one that is normally used to carry
+    people or goods, or for towing, on the road. This includes buses, coaches, trolleys, tramways (streetcars) and road vehicles
+    used to transport goods and to transport passengers. Road motor vehicles are attributed to the countries where they are
+    registered, while deaths are attributed to the countries in which they occur. This indicator is measured in number of
+    accidents, number of persons, per million inhabitants and million vehicles.
+  licenses:
+  - url: https://www.oecd.org/termsandconditions/
+  sources:
+  - name: OECD (2023)
+    description: >
+      The majority of series data is sourced from the OECD Statistics.
+
+
+      For particular countries, historical data have been sourced from specific national records as referenced below.
+
+
+      Germany: Statistisches Bundesamt (https://www.destatis.de/EN/FactsFigures/EconomicSectors/TransportTraffic/TrafficAccidents/Tables_/RoadTrafficAccidents.html)
+
+
+      New Zealand: https://web.archive.org/web/20200116174845/https://www.transport.govt.nz/mot-resources/road-safety-resources/road-deaths/annual-number-of-road-deaths-historical-information/
+
+
+      Australia: https://web.archive.org/web/20220525052753/https://www.bitre.gov.au/publications/ongoing/road_deaths_australia_annual_summaries and https://web.archive.org/web/20210501075840/https://www.infrastructure.gov.au/roads/safety/publications/2008/pdf/Ann_Stats_2007.pdf
+
+
+      Scotland: https://www.transport.gov.scot/media/39307/sct05174402361.pdf
+
+
+      Northern Ireland: https://web.archive.org/web/20190801195213/https://www.psni.police.uk/inside-psni/Statistics/road-traffic-collision-statistics/
+
+
+      United States: https://www.bts.gov/content/transportation-fatalities-mode
+
+
+      Road accidents are measured in terms of the number of persons injured and deaths due to road accidents, whether
+      immediate or within 30 days of the accident, and excluding suicides involving the use of road motor vehicles. A road motor
+      vehicle is a road vehicle fitted with an engine as the sole means of propulsion and one that is normally used to carry
+      people or goods, or for towing, on the road. This includes buses, coaches, trolleys, tramways (streetcars) and road vehicles
+      used to transport goods and to transport passengers. Road motor vehicles are attributed to the countries where they are
+      registered, while deaths are attributed to the countries in which they occur. This indicator is measured in number of
+      accidents, number of persons, per million inhabitants and million vehicles.
+    url: https://data.oecd.org/transport/road-accidents.htm
+    source_data_url: https://stats.oecd.org/sdmx-json/data/DP_LIVE/.ROADACCID.../OECD?contentType=csv&detail=code&separator=comma&csv-lang=en
+    date_accessed: '2023-08-11'
+    publication_year: 2023
+    published_by: 'OECD (2023), Road accidents (indicator). doi: 10.1787/2fe1b899-en (Accessed on 11 August 2023)'
+tables:
+  road_accidents:
+    variables:
+      accidents_involving_casualties:
+        title: Road accidents involving casualties
+        unit: accidents
+        display:
+          numDecimalPlaces: 0
+      deaths_per_million_inhabitants:
+        title: Road accident fatalities per million inhabitants
+        unit: deaths
+        display:
+          numDecimalPlaces: 1
+      deaths__per_million_vehicles:
+        title: Road accident fatalities per million vehicles
+        unit: deaths
+        display:
+          numDecimalPlaces: 1
+      deaths:
+        title: Road accident deaths
+        unit: deaths
+        display:
+          numDecimalPlaces: 0
+      injuries:
+        title: Road accident injuries
+        unit: injuries
+        display:
+          numDecimalPlaces: 0
+

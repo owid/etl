@@ -1,18 +1,15 @@
 meta:
-  namespace: backport
-  short_name: dataset_562_world_development_indicators__gender_values
-  file_extension: feather
-  date_accessed: 2023-02-23 16:52:37.603060
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/562
+    date_accessed: 2023-08-14 15:37:25.784112
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: World Development Indicators - Gender
   description: This is a dataset imported by the automated fetcher
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/562
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
+  is_public: false
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 350c42580eebd767e7548ba0d50d95c1
+- md5: d02ec65de0a0a34304347a35c4c1d1d3
   size: 61434
   path: dataset_562_world_development_indicators__gender_values.feather

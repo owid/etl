@@ -1,18 +1,15 @@
 meta:
-  namespace: backport
-  short_name: dataset_2672_emissions_intensity__and__value_added_by_sector__linus_et_al_config
-  file_extension: json
-  date_accessed: 2023-02-23 17:55:14.133825
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2672
+    date_accessed: 2023-08-10 09:17:36.161047
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_2672_emissions_intensity__and__value_added_by_sector__linus_et_al
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/2672
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 2fa27fc56208bdbfaeddeee428f0e1f7
-  size: 8694
-  path: dataset_2672_emissions_intensity__and__value_added_by_sector__linus_et_al_config.json
+- md5: e671255bdcb6416d964953e60d114079
+  size: 10244
+  path: 
+    dataset_2672_emissions_intensity__and__value_added_by_sector__linus_et_al_config.json

@@ -1,0 +1,36 @@
+meta:
+  name: The Semiconductor Supply Chain Assessing National Competitiveness (CSET, 2022)
+  publication_year: 2021
+  source_name: CSET (2022)
+  source_published_by: >
+    "Emerging Technology Observatory Advanced Semiconductor Supply Chain Dataset (2022
+    release)"
+  url: https://chipexplorer.eto.tech/
+  source_data_url: 
+    https://raw.githubusercontent.com/georgetown-cset/eto-supply-chain/main/data/provision.csv
+  license_url: https://eto.tech/tou/
+  license_name: Creative Commons BY 4.0
+  date_accessed: 2023-07-07
+  is_public: true
+  description: >-
+    The Advanced Semiconductor Supply Chain Dataset includes manually compiled, high-level
+    information about the tools, materials, processes, countries, and firms involved
+    in the production of advanced logic chips. The current version of the dataset
+    reflects how researchers understood this supply chain in early 2021. It uses a
+    wide variety of sources, such as corporate websites and disclosures, specialized
+    market research, and industry group publications.
+
+
+    Most of the data is taken from the CSET report The Semiconductor Supply Chain:
+    Assessing National Competitiveness, published in 2021. In 2022, ETO researchers
+    augmented the company profiles in the data with information manually collected
+    from producer websites and the open internet.
+
+
+    The data can be accessed here: https://eto.tech/dataset-docs/chipexplorer/
+
+wdir: ../../../data/snapshots/artificial_intelligence/2023-07-07
+outs:
+- md5: 6f54d4db643ec96a2da82f5b6daeaf14
+  size: 29312
+  path: semiconductors_cset.csv

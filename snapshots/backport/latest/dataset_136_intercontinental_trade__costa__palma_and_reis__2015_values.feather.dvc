@@ -1,18 +1,14 @@
 meta:
-  namespace: backport
-  short_name: dataset_136_intercontinental_trade__costa__palma_and_reis__2015_values
-  file_extension: feather
-  date_accessed: 2023-02-23 16:53:08.967788
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/136
+    date_accessed: 2023-08-10 09:14:37.777808
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Intercontinental Trade - Costa, Palma and Reis (2015)
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/136
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 79ede9d46e98bdf4199f66102c97966f
+- md5: 92bc0dfef01f21fb18f94598849dae2d
   size: 6530
   path: dataset_136_intercontinental_trade__costa__palma_and_reis__2015_values.feather

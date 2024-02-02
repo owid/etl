@@ -1,18 +1,15 @@
 meta:
-  namespace: backport
-  short_name: dataset_3122_gini_index_in_1980__1990__and__2015__gcip__2018_config
-  file_extension: json
-  date_accessed: 2023-06-01 12:31:35.053666
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/3122
+    date_accessed: 2023-08-10 09:20:10.960048
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_3122_gini_index_in_1980__1990__and__2015__gcip__2018
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/3122
-  source_published_by: Our World in Data catalog backport
   is_public: false
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 6ad3a595ea875b93036a2d14daffdb55
-  size: 8145
+- md5: b0404f17ecd77f7ea79cd14447066310
+  size: 9568
   path: dataset_3122_gini_index_in_1980__1990__and__2015__gcip__2018_config.json

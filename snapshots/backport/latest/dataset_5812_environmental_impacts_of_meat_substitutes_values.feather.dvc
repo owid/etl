@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5812
+    date_accessed: 2023-08-16 10:12:58.437495
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Environmental impacts of meat substitutes
+  description: ''
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: c5a68c620bd8667eadf3165d0cf4151b
+  size: 8578
+  path: dataset_5812_environmental_impacts_of_meat_substitutes_values.feather

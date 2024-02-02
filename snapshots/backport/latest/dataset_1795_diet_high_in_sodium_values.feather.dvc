@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1795
+    date_accessed: 2023-08-14 16:08:14.359902
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Diet high in sodium
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 2c9913d8adddcac3e07eb37cf0992a37
+  size: 961138
+  path: dataset_1795_diet_high_in_sodium_values.feather

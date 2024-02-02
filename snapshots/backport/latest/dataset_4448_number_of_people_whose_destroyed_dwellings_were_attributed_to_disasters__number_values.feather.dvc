@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4448
+    date_accessed: 2023-08-14 15:10:00.839348
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Number of people whose destroyed dwellings were attributed to disasters (number)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 82a3989cdaa166891a7dea9f3e3bfe7d
+  size: 15602
+  path: 
+    dataset_4448_number_of_people_whose_destroyed_dwellings_were_attributed_to_disasters__number_values.feather

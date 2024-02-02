@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2014
+    date_accessed: 2023-08-14 05:56:12.611348
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Proportion of medium and high-tech industry value added in total value added
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 702b6f73e2b53c65cbdd52c30b06d717
+  size: 18922
+  path: 
+    dataset_2014_proportion_of_medium_and_high_tech_industry_value_added_in_total_value_added_values.feather

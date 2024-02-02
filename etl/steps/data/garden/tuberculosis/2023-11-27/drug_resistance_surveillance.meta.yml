@@ -1,0 +1,249 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Tuberculosis
+        - Causes of Death
+    display:
+      numDecimalPlaces: 0
+    processing_level: major
+tables:
+  drug_resistance_surveillance:
+    variables:
+      pulm_labconf_new:
+        title: New bacteriologically confirmed pulmonary tuberculosis cases
+        unit: confirmed cases
+        description_short: Number of new bacteriologically confirmed pulmonary tuberculosis cases.
+        description_from_producer: Number of new bacteriologically confirmed pulmonary tuberculosis cases.
+      pulm_labconf_ret:
+        title: Previously treated bacteriologically confirmed pulmonary tuberculosis cases.
+        description_short: Number of individuals previously treated for tuberculosis that have bacteriologically confirmed pulmonary tuberculosis.
+        unit: confirmed cases
+        description_from_producer: Number of previously treated bacteriologically confirmed pulmonary tuberculosis cases.
+      pulm_labconf_unk:
+        title: Bacteriologically confirmed pulmonary tuberculosis cases with unknown treatment history.
+        description_short: Number of individuals with unknown treatment history that have bacteriologically confirmed pulmonary tuberculosis.
+        unit: confirmed cases
+        description_from_producer: Number of bacteriologically confirmed pulmonary tuberculosis cases with unknown tuberculosis treatment history.
+      r_rlt_new:
+        title: New bacteriologically confirmed pulmonary tuberculosis cases tested for rifampicin resistance
+        description_short: Number of new bacteriologically confirmed pulmonary tuberculosis cases tested for rifampicin resistance. Rifampicin is an antibiotic medication used primarily in the treatment of tuberculosis and other bacterial infections; it works by inhibiting the growth of bacteria.
+        unit: confirmed cases tested for rifampicin resistance
+        description_from_producer: Number of new bacteriologically confirmed pulmonary tuberculosis patients with test results for rifampicin.
+      r_rlt_ret:
+        title: Previously treated bacteriologically confirmed pulmonary tuberculosis cases tested for rifampicin resistance.
+        unit: confirmed cases tested for rifampicin resistance
+        description_short: Number of previously treated bacteriologically confirmed pulmonary tuberculosis cases tested for rifampicin resistance. Rifampicin is an antibiotic medication used primarily in the treatment of tuberculosis and other bacterial infections; it works by inhibiting the growth of bacteria.
+        description_from_producer: Number of previously treated bacteriologically confirmed pulmonary tuberculosis patients with test results for rifampicin.
+      rr_new:
+        title: New bacteriologically confirmed pulmonary tuberculosis cases with rifampicin resistance
+        unit: new patients with rifampicin resistance
+        description_short: Number of new bacteriologically confirmed pulmonary tuberculosis cases with rifampicin resistance. Rifampicin is an antibiotic medication used primarily in the treatment of tuberculosis and other bacterial infections; it works by inhibiting the growth of bacteria.
+        description_from_producer: Number of new bacteriologically confirmed pulmonary tuberculosis patients with resistance to rifampicin (RR-tuberculosis).
+      rr_ret:
+        title: Previously treated bacteriologically confirmed pulmonary tuberculosis cases with rifampicin resistance
+        description_short: Number of previously treated bacteriologically confirmed pulmonary tuberculosis cases with rifampicin resistance. Rifampicin is an antibiotic medication used primarily in the treatment of tuberculosis and other bacterial infections; it works by inhibiting the growth of bacteria.
+        unit: previously treated patients with rifampicin resistance
+        description_from_producer: Number of previously treated bacteriologically confirmed pulmonary tuberculosis patients with resistance to rifampicin (RR-tuberculosis).
+      r_rlt_rel:
+        title: Bacteriologically confirmed pulmonary relapse tuberculosis cases tested for rifampicin resistance
+        description_short: Number of bacteriologically confirmed pulmonary relapse tuberculosis cases tested for rifampicin resistance. Rifampicin is an antibiotic medication used primarily in the treatment of tuberculosis and other bacterial infections; it works by inhibiting the growth of bacteria.
+        unit: relapse cases tested for rifampicin resistance
+        description_from_producer: Number of bacteriologically confirmed pulmonary relapse tuberculosis patients with test results for rifampicin.
+      rr_rel:
+        title: Bacteriologically confirmed pulmonary relapse tuberculosis cases with rifampicin resistance
+        description_short: Number of bacteriologically confirmed pulmonary relapse tuberculosis cases with rifampicin resistance. Rifampicin is an antibiotic medication used primarily in the treatment of tuberculosis and other bacterial infections; it works by inhibiting the growth of bacteria.
+        unit: relapse cases with rifampicin resistance
+        description_from_producer: Number of bacteriologically confirmed pulmonary relapse tuberculosis patients with resistance to rifampicin (RR-tuberculosis).
+      dst_rlt_new:
+        title: New bacteriologically confirmed pulmonary tuberculosis cases tested for isoniazid and rifampicin resistance
+        description_short: Number of new bacteriologically confirmed pulmonary tuberculosis cases tested for isoniazid and rifampicin resistance. Isoniazid and rifampicin are antibiotics used to treat tuberculosis.
+        unit: new cases tested for isoniazid and rifampicin resistance
+        description_from_producer: "Among new pulmonary tuberculosis patients with positive identification for M. Tuberculosis complex (confirmed by culture and/or line-probe assay): number of patients with available drug susceptibility testing results for isoniazid and rifampicine."
+      dst_rlt_ret:
+        title: Previously treated bacteriologically confirmed pulmonary tuberculosis cases tested for isoniazid and rifampicin resistance
+        description_short: Number of previously treated bacteriologically confirmed pulmonary tuberculosis cases tested for isoniazid and rifampicin resistance. Isoniazid and rifampicin are antibiotics used to treat tuberculosis.
+        unit: previously treated cases tested for isoniazid and rifampicin resistance
+        description_from_producer: "Among patients previously treated for tuberculosis with positive identification for M. Tuberculosis complex (confirmed by culture and/or line-probe assay): number of patients with available drug susceptibility testing results for isoniazid and rifampicin."
+      dst_rlt_hr_new:
+        title: New bacteriologically confirmed pulmonary tuberculosis cases with isoniazid resistance
+        description_short: Number of new bacteriologically confirmed pulmonary tuberculosis cases tested for isoniazid and rifampicin resistance with isoniazid resistance. Isoniazid and rifampicin are antibiotics used to treat tuberculosis.
+        unit: new cases with isoniazid resistance
+        description_from_producer: Number of new bacteriologically confirmed pulmonary tuberculosis patients with test results for rifampicin and isoniazid and with resistance to isoniazid (regardless of result for rifampicin).
+      dst_rlt_hr_ret:
+        title: Previously treated bacteriologically confirmed pulmonary tuberculosis cases with isoniazid resistance
+        description_short: Number of previously treated bacteriologically confirmed pulmonary tuberculosis cases tested for isoniazid and rifampicin resistance with isoniazid resistance. Isoniazid and rifampicin are antibiotics used to treat tuberculosis.
+        unit: previously treated cases with isoniazid resistance
+        description_from_producer: Number of previously treated bacteriologically confirmed pulmonary tuberculosis patients with test results for rifampicin and isoniazid and with resistance to isoniazid (regardless of result for rifampicin).
+      dst_rlt_rr_new:
+        title: New bacteriologically confirmed pulmonary tuberculosis cases tested for isoniazid and rifampicin resistance with rifampicin resistance
+        description_short: Number of new bacteriologically confirmed pulmonary tuberculosis cases tested for isoniazid and rifampicin resistance with rifampicin resistance. Isoniazid and rifampicin are antibiotics used to treat tuberculosis.
+        unit: new cases with rifampicin resistance
+        description_from_producer: Number of new bacteriologically confirmed pulmonary tuberculosis patients with test results for rifampicin and isoniazid and with resistance to rifampicin (regardless of result for isoniazid).
+      dst_rlt_rr_ret:
+        title: Previously treated bacteriologically confirmed pulmonary tuberculosis cases tested for isoniazid and rifampicin resistance with rifampicin resistance
+        description_short: Number of previously treated bacteriologically confirmed pulmonary tuberculosis cases tested for isoniazid and rifampicin resistance with rifampicin resistance. Isoniazid and rifampicin are antibiotics used to treat tuberculosis.
+        unit: previously treated cases with rifampicin resistance
+        description_from_producer: Number of previously treated bacteriologically confirmed pulmonary tuberculosis patients with test results for rifampicin and isoniazid and with resistance to rifampicin (regardless of result for isoniazid).
+      mdr_new:
+        title: New bacteriologically confirmed pulmonary tuberculosis cases with multidrug-resistant tuberculosis
+        description_short: Number of new bacteriologically confirmed pulmonary tuberculosis cases with multidrug-resistant tuberculosis. Multidrug-resistant tuberculosis is a form of tuberculosis infection caused by bacteria that are resistant to treatment with at least two of the most powerful first-line anti-TB medications (drugs), isoniazid and rifampicin.
+        unit: new cases with MDR-tuberculosis
+        description_from_producer: "Among new tuberculosis patients with available drug susceptibility testing results: number of patients with resistance to isoniazid and rifampicin  (MDR-tuberculosis)."
+      mdr_ret:
+        title: Previously treated bacteriologically confirmed pulmonary tuberculosis cases with multidrug-resistant tuberculosis
+        description_short: Number of previously treated bacteriologically confirmed pulmonary tuberculosis cases with multidrug-resistant tuberculosis. Multidrug-resistant tuberculosis is a form of tuberculosis infection caused by bacteria that are resistant to treatment with at least two of the most powerful first-line anti-TB medications (drugs), isoniazid and rifampicin.
+        unit: previously treated cases with MDR-tuberculosis
+        description_from_producer: "Among patients previously treated for tuberculosis with available drug susceptibility testing results:  number of patients with resistance to isoniazid and rifampicin (MDR-tuberculosis)."
+      rr_hivpos:
+        title: Bacteriologically confirmed pulmonary tuberculosis patients with rifampicin resistance who are HIV-positive
+        description_short: Number of bacteriologically confirmed pulmonary tuberculosis patients with rifampicin resistance who are HIV-positive. Rifampicin is an antibiotic medication used primarily in the treatment of tuberculosis and other bacterial infections; it works by inhibiting the growth of bacteria.
+        unit: patients
+        description_from_producer: Among new and previously treated patients that have confirmed pulmonary tuberculosis cases with results for rifampicin testing, the number resistant to rifampicin and who are HIV-positive.
+      rr_hivneg:
+        title: Bacteriologically confirmed pulmonary tuberculosis patients with rifampicin resistance who are HIV-negative
+        description_short: Number of bacteriologically confirmed pulmonary tuberculosis patients with rifampicin resistance who are HIV-negative. Rifampicin is an antibiotic medication used primarily in the treatment of tuberculosis and other bacterial infections; it works by inhibiting the growth of bacteria.
+        unit: patients
+        description_from_producer: Among new and previously treated patients that have confirmed pulmonary tuberculosis cases with results for rifampicin testing, the number resistant to rifampicin and who are HIV-negative.
+      rr_hivunk:
+        title: Bacteriologically confirmed pulmonary tuberculosis patients with rifampicin resistance whose HIV status is unknown
+        description_short: Number of bacteriologically confirmed pulmonary tuberculosis patients with rifampicin resistance whose HIV status is unknown. Rifampicin is an antibiotic medication used primarily in the treatment of tuberculosis and other bacterial infections; it works by inhibiting the growth of bacteria.
+        unit: patients
+        description_from_producer: Among new and previously treated patients that have confirmed pulmonary tuberculosis cases with results for rifampicin testing, the number resistant to rifampicin and whose HIV status is unknown.
+      nrr_hivpos:
+        title: Bacteriologically confirmed pulmonary tuberculosis patients with rifampicin susceptibility who are HIV-positive
+        description_short: Number of bacteriologically confirmed pulmonary tuberculosis patients with rifampicin susceptibility who are HIV-positive. Rifampicin is an antibiotic medication used primarily in the treatment of tuberculosis and other bacterial infections; it works by inhibiting the growth of bacteria.
+        unit: patients
+        description_from_producer: Among new and previously treated patients that have confirmed pulmonary tuberculosis cases with results for rifampicin testing, the number susceptible to rifampicin and who are HIV-positive.
+      nrr_hivneg:
+        title: Bacteriologically confirmed pulmonary tuberculosis patients with rifampicin susceptibility who are HIV-negative
+        description_short: Number of bacteriologically confirmed pulmonary tuberculosis patients with rifampicin susceptibility who are HIV-negative. Rifampicin is an antibiotic medication used primarily in the treatment of tuberculosis and other bacterial infections; it works by inhibiting the growth of bacteria.
+        unit: patients
+        description_from_producer: Among new and previously treated patients that have confirmed pulmonary tuberculosis cases with results for rifampicin testing, the number susceptible to rifampicin and who are HIV-negative.
+      nrr_hivunk:
+        title: Bacteriologically confirmed pulmonary tuberculosis patients with rifampicin susceptibility whose HIV status is unknown
+        unit: patients
+        description_short: Number of bacteriologically confirmed pulmonary tuberculosis patients with rifampicin susceptibility whose HIV status is unknown. Rifampicin is an antibiotic medication used primarily in the treatment of tuberculosis and other bacterial infections; it works by inhibiting the growth of bacteria.
+        description_from_producer: Among new and previously treated patients that have confirmed pulmonary tuberculosis cases with results for rifampicin testing, number susceptible to rifampicin and whose HIV status is unknown.
+      nrr_hivall:
+        title: Bacteriologically confirmed pulmonary tuberculosis patients with rifampicin susceptibility
+        unit: patients
+        description_short: Number of bacteriologically confirmed pulmonary tuberculosis patients with rifampicin susceptibility. Rifampicin is an antibiotic medication used primarily in the treatment of tuberculosis and other bacterial infections; it works by inhibiting the growth of bacteria.
+        description_processing: |-
+          This variable is calculated as the sum of the following variables: Bacteriologically confirmed pulmonary tuberculosis patients with rifampicin susceptibility who are HIV-positive, HIV-negative and whose HIV status is unknown.
+      rr_014:
+        title: Bacteriologically confirmed pulmonary tuberculosis patients with rifampicin resistance who are aged 0-14 years
+        unit: patients
+        description_short: Number of bacteriologically confirmed pulmonary tuberculosis patients with rifampicin resistance who are aged 0-14 years. Rifampicin is an antibiotic medication used primarily in the treatment of tuberculosis and other bacterial infections; it works by inhibiting the growth of bacteria.
+        description_from_producer: Among new and previously treated patients that have confirmed pulmonary tuberculosis cases with results for rifampicin testing, number resistant to rifampicin and who are aged 0-14 years.
+      rr_15plus:
+        title: Bacteriologically confirmed pulmonary tuberculosis patients with rifampicin resistance who are aged 15 years and over
+        unit: patients
+        description_short: Number of bacteriologically confirmed pulmonary tuberculosis patients with rifampicin resistance who are aged 15 years and over. Rifampicin is an antibiotic medication used primarily in the treatment of tuberculosis and other bacterial infections; it works by inhibiting the growth of bacteria.
+        description_from_producer: Among new and previously treated patients that have confirmed pulmonary tuberculosis cases with results for rifampicin testing, number resistant to rifampicin and who are aged 15 years and over.
+      rr_ageunk:
+        title: Bacteriologically confirmed pulmonary tuberculosis patients with rifampicin resistance whose age is unknown
+        unit: patients
+        description_short: Number of bacteriologically confirmed pulmonary tuberculosis patients with rifampicin resistance whose age is unknown. Rifampicin is an antibiotic medication used primarily in the treatment of tuberculosis and other bacterial infections; it works by inhibiting the growth of bacteria.
+        description_from_producer: Among new and previously treated patients that have confirmed pulmonary tuberculosis cases with results for rifampicin testing, number resistant to rifampicin and whose age is unknown
+      nrr_014:
+        title: Bacteriologically confirmed pulmonary tuberculosis patients with rifampicin susceptibility who are aged 0-14 years
+        unit: patients
+        description_short: Number of bacteriologically confirmed pulmonary tuberculosis patients with rifampicin susceptibility who are aged 0-14 years. Rifampicin is an antibiotic medication used primarily in the treatment of tuberculosis and other bacterial infections; it works by inhibiting the growth of bacteria.
+        description_from_producer: Among new and previously treated patients that have confirmed pulmonary tuberculosis cases with results for rifampicin testing, number susceptible to rifampicin and who are aged 0-14 years
+      nrr_15plus:
+        title: Bacteriologically confirmed pulmonary tuberculosis patients with rifampicin susceptibility who are aged 15 years and over
+        unit: patients
+        description_short: Number of bacteriologically confirmed pulmonary tuberculosis patients with rifampicin susceptibility who are aged 15 years and over. Rifampicin is an antibiotic medication used primarily in the treatment of tuberculosis and other bacterial infections; it works by inhibiting the growth of bacteria.
+        description_from_producer: Among new and previously treated patients that have confirmed pulmonary tuberculosis cases with results for rifampicin testing, number susceptible to rifampicin and who are aged 15 years and over
+      nrr_ageunk:
+        title: Bacteriologically confirmed pulmonary tuberculosis patients with rifampicin susceptibility whose age is unknown
+        unit: patients
+        description_short: Number of bacteriologically confirmed pulmonary tuberculosis patients with rifampicin susceptibility whose age is unknown. Rifampicin is an antibiotic medication used primarily in the treatment of tuberculosis and other bacterial infections; it works by inhibiting the growth of bacteria.
+        description_from_producer: Among new and previously treated patients that have confirmed pulmonary tuberculosis cases with results for rifampicin testing, number susceptible to rifampicin and whose age is unknown
+      rr_dst_rlt:
+        title: Bacteriologically confirmed pulmonary tuberculosis patients with rifampicin resistance tested for any fluoroquinolone and any second-line injectable agent
+        unit: patients
+        description_short: Number of bacteriologically confirmed pulmonary tuberculosis patients with rifampicin resistance tested for any fluoroquinolone and any second-line injectable agent. Rifampicin resistance is the ability of tuberculosis bacteria, to resist the effects of the antibiotic rifampicin due to genetic mutations, hindering the drug's ability to inhibit bacterial growth. Fluoroquinolones and other second-line injectable agents are antibiotics used to treat tuberculosis after first-line drugs such as rifampicin are no longer effective.
+        description_from_producer: Number of new or previously treated bacteriologically confirmed pulmonary tuberculosis patients with resistance to rifampicin and with test results for any fluoroquinolone and any second-line injectable agent
+      rr_ds_fq2li:
+        title: Bacteriologically confirmed pulmonary tuberculosis patients with rifampicin resistance and resistance to both fluoroquinolones and second-line injectable agents
+        unit: patients
+        description_short: Number of bacteriologically confirmed pulmonary tuberculosis patients with rifampicin resistance and resistance to both fluoroquinolones and second-line injectable agents. Rifampicin resistance is the ability of tuberculosis bacteria, to resist the effects of the antibiotic rifampicin due to genetic mutations, hindering the drug's ability to inhibit bacterial growth. Fluoroquinolones and other second-line injectable agents are antibiotics used to treat tuberculosis after first-line drugs such as rifampicin are no longer effective.
+        description_from_producer: Number of new or previously treated bacteriologically confirmed pulmonary tuberculosis patients with resistance to rifampicin and susceptible to both fluoroquinolones and second-line injectable agents
+      rr_dr_2li:
+        title: Bacteriologically confirmed pulmonary tuberculosis patients with rifampicin resistance and resistance to second-line injectable agents
+        unit: patients
+        description_short: Number of bacteriologically confirmed pulmonary tuberculosis patients with rifampicin resistance and resistance to second-line injectable agents. Rifampicin resistance is the ability of tuberculosis bacteria, to resist the effects of the antibiotic rifampicin due to genetic mutations, hindering the drug's ability to inhibit bacterial growth. Fluoroquinolones and other second-line injectable agents are antibiotics used to treat tuberculosis after first-line drugs such as rifampicin are no longer effective.
+        description_from_producer: Number of new or previously treated bacteriologically confirmed pulmonary tuberculosis patients with resistance to rifampicin and resistance to second-line injectable agents
+      rr_dr_fq_2li:
+        title: Bacteriologically confirmed pulmonary tuberculosis patients with rifampicin resistance and resistance to fluoroquinolones and second-line injectable agents
+        unit: patients
+        description_short: Number of bacteriologically confirmed pulmonary tuberculosis patients with rifampicin resistance and resistance to fluoroquinolones and second-line injectable agents. Rifampicin resistance is the ability of tuberculosis bacteria, to resist the effects of the antibiotic rifampicin due to genetic mutations, hindering the drug's ability to inhibit bacterial growth. Fluoroquinolones and other second-line injectable agents are antibiotics used to treat tuberculosis after first-line drugs such as rifampicin are no longer effective.
+        description_from_producer: Number of new or previously treated bacteriologically confirmed pulmonary tuberculosis patients with resistance to rifampicin and resistance to both fluoroquinolones and second-line injectable agents
+      rr_dst_rlt_fq:
+        title: Bacteriologically confirmed pulmonary tuberculosis patients with rifampicin resistance tested for any fluoroquinolone
+        unit: patients
+        description_short: Number of bacteriologically confirmed pulmonary tuberculosis patients with rifampicin resistance tested for any fluoroquinolone. Rifampicin resistance is the ability of tuberculosis bacteria, to resist the effects of the antibiotic rifampicin due to genetic mutations, hindering the drug's ability to inhibit bacterial growth. Fluoroquinolones and other second-line injectable agents are antibiotics used to treat tuberculosis after first-line drugs such as rifampicin are no longer effective.
+        description_from_producer: Number of new or previously treated bacteriologically confirmed pulmonary tuberculosis patients with resistance to rifampicin and with test results for any fluoroquinolone
+      rr_fqr_bdqr_lzdr:
+        title: Bacteriologically confirmed pulmonary tuberculosis patients with rifampicin resistance and resistance to fluoroquinolones, bedaquiline and linezolid
+        unit: patients
+        description_short: Number of bacteriologically confirmed pulmonary tuberculosis patients with rifampicin resistance and resistance to fluoroquinolones, bedaquiline and linezolid. Rifampicin resistance is the ability of tuberculosis bacteria, to resist the effects of the antibiotic rifampicin due to genetic mutations, hindering the drug's ability to inhibit bacterial growth. Fluoroquinolones, bedaquiline and linezolid are antibiotics used to treat tuberculosis after first-line drugs such as rifampicin are no longer effective.
+        description_from_producer: Number of new or previously treated bacteriologically confirmed pulmonary tuberculosis patients with resistance to rifampicin, fluoroquinolones, bedaquiline and linezolid.
+      rr_fqr_bdqr_lzds:
+        title: Bacteriologically confirmed pulmonary tuberculosis patients with rifampicin resistance and resistance to fluoroquinolones and bedaquiline, but susceptible to linezolid
+        unit: patients
+        description_short: Number of bacteriologically confirmed pulmonary tuberculosis patients with rifampicin resistance and resistance to fluoroquinolones and bedaquiline, but susceptible to linezolid. Rifampicin resistance is the ability of tuberculosis bacteria, to resist the effects of the antibiotic rifampicin due to genetic mutations, hindering the drug's ability to inhibit bacterial growth. Fluoroquinolones, bedaquiline and linezolid are antibiotics used to treat tuberculosis after first-line drugs such as rifampicin are no longer effective.
+        description_from_producer: Number of new or previously treated bacteriologically confirmed pulmonary tuberculosis patients with resistance to rifampicin, fluoroquinolones and bedaquiline but susceptible to linezolid.
+      rr_fqr_bdqr_lzdu:
+        title: Bacteriologically confirmed pulmonary tuberculosis patients with rifampicin resistance and resistance to fluoroquinolones and bedaquiline, but unknown resistance to linezolid
+        unit: patients
+        description_short: Number of bacteriologically confirmed pulmonary tuberculosis patients with rifampicin resistance and resistance to fluoroquinolones and bedaquiline, but unknown resistance to linezolid. Rifampicin resistance is the ability of tuberculosis bacteria, to resist the effects of the antibiotic rifampicin due to genetic mutations, hindering the drug's ability to inhibit bacterial growth. Fluoroquinolones, bedaquiline and linezolid are antibiotics used to treat tuberculosis after first-line drugs such as rifampicin are no longer effective.
+        description_from_producer: Number of new or previously treated bacteriologically confirmed pulmonary tuberculosis patients with resistance to rifampicin, fluoroquinolones and bedaquiline but unknown resistance to linezolid.
+      rr_fqr_bdqs_lzdr:
+        title: Bacteriologically confirmed pulmonary tuberculosis patients with rifampicin resistance and resistance to fluoroquinolones, bedaquiline and linezolid, but susceptible to second-line injectable agents
+        unit: patients
+        description_short: Number of bacteriologically confirmed pulmonary tuberculosis patients with rifampicin resistance and resistance to fluoroquinolones, bedaquiline and linezolid, but susceptible to second-line injectable agents. Rifampicin resistance is the ability of tuberculosis bacteria, to resist the effects of the antibiotic rifampicin due to genetic mutations, hindering the drug's ability to inhibit bacterial growth. Fluoroquinolones, bedaquiline and linezolid are antibiotics used to treat tuberculosis after first-line drugs such as rifampicin are no longer effective.
+        description_from_producer: Number of new or previously treated bacteriologically confirmed pulmonary tuberculosis patients with resistance to rifampicin, fluoroquinolones and linezolid, but susceptible to bedaquiline.
+      rr_fqr_bdqs_lzds:
+        title: Bacteriologically confirmed pulmonary tuberculosis patients with rifampicin resistance and resistance to fluoroquinolones, bedaquiline, but susceptible to linezolid and second-line injectable agents
+        unit: patients
+        description_short: Number of bacteriologically confirmed pulmonary tuberculosis patients with rifampicin resistance and resistance to fluoroquinolones, bedaquiline, but susceptible to linezolid and second-line injectable agents. Rifampicin resistance is the ability of tuberculosis bacteria, to resist the effects of the antibiotic rifampicin due to genetic mutations, hindering the drug's ability to inhibit bacterial growth. Fluoroquinolones, bedaquiline and linezolid are antibiotics used to treat tuberculosis after first-line drugs such as rifampicin are no longer effective.
+        description_from_producer: Number of new or previously treated bacteriologically confirmed pulmonary tuberculosis patients with resistance to rifampicin, fluoroquinolones but susceptible to bedaquiline and linezolid.
+      rr_fqr_bdqs_lzdu:
+        title: Bacteriologically confirmed pulmonary tuberculosis patients with rifampicin resistance and resistance to fluoroquinolones, bedaquiline, but unknown resistance to linezolid and second-line injectable agents
+        unit: patients
+        description_short: Number of bacteriologically confirmed pulmonary tuberculosis patients with rifampicin resistance and resistance to fluoroquinolones, bedaquiline, but unknown resistance to linezolid and second-line injectable agents. Rifampicin resistance is the ability of tuberculosis bacteria, to resist the effects of the antibiotic rifampicin due to genetic mutations, hindering the drug's ability to inhibit bacterial growth. Fluoroquinolones, bedaquiline and linezolid are antibiotics used to treat tuberculosis after first-line drugs such as rifampicin are no longer effective.
+        description_from_producer: Number of new or previously treated bacteriologically confirmed pulmonary tuberculosis patients with resistance to rifampicin and fluoroquinolones, but susceptible to bedaquiline and with unknown resistance to linezolid.
+      rr_fqr_bdqu_lzdr:
+        title: Bacteriologically confirmed pulmonary tuberculosis patients with rifampicin resistance and resistance to fluoroquinolones, but susceptible to bedaquiline, linezolid and second-line injectable agents
+        unit: patients
+        description_short: Number of bacteriologically confirmed pulmonary tuberculosis patients with rifampicin resistance and resistance to fluoroquinolones, but susceptible to bedaquiline, linezolid and second-line injectable agents. Rifampicin resistance is the ability of tuberculosis bacteria, to resist the effects of the antibiotic rifampicin due to genetic mutations, hindering the drug's ability to inhibit bacterial growth. Fluoroquinolones, bedaquiline and linezolid are antibiotics used to treat tuberculosis after first-line drugs such as rifampicin are no longer effective.
+        description_from_producer: Number of new or previously treated bacteriologically confirmed pulmonary tuberculosis patients with resistance to rifampicin, fluoroquinolones and linezolid, but unknown resistance to bedaquiline.
+      rr_fqr_bdqu_lzds:
+        title: Bacteriologically confirmed pulmonary tuberculosis patients with rifampicin resistance and resistance to fluoroquinolones, but susceptible to bedaquiline and linezolid
+        unit: patients
+        description_short: Number of bacteriologically confirmed pulmonary tuberculosis patients with rifampicin resistance and resistance to fluoroquinolones, but susceptible to bedaquiline and linezolid. Rifampicin resistance is the ability of tuberculosis bacteria, to resist the effects of the antibiotic rifampicin due to genetic mutations, hindering the drug's ability to inhibit bacterial growth. Fluoroquinolones, bedaquiline and linezolid are antibiotics used to treat tuberculosis after first-line drugs such as rifampicin are no longer effective.
+        description_from_producer: Number of new or previously treated bacteriologically confirmed pulmonary tuberculosis patients with resistance to rifampicin, fluoroquinolones but susceptible to linezolid and unknown resistance to bedaquiline.
+      rr_fqr_bdqu_lzdu:
+        title: Bacteriologically confirmed pulmonary tuberculosis patients with rifampicin resistance and resistance to fluoroquinolones, but unknown resistance to bedaquiline, linezolid and second-line injectable agents
+        unit: patients
+        description_short: Number of bacteriologically confirmed pulmonary tuberculosis patients with rifampicin resistance and resistance to fluoroquinolones, but unknown resistance to bedaquiline, linezolid and second-line injectable agents. Rifampicin resistance is the ability of tuberculosis bacteria, to resist the effects of the antibiotic rifampicin due to genetic mutations, hindering the drug's ability to inhibit bacterial growth. Fluoroquinolones, bedaquiline and linezolid are antibiotics used to treat tuberculosis after first-line drugs such as rifampicin are no longer effective.
+        description_from_producer: Number of new or previously treated bacteriologically confirmed pulmonary tuberculosis patients with resistance to rifampicin and fluoroquinolones, but with unknown resistance to bedaquiline and linezolid.
+      mdr_dst_rlt:
+        title: Bacteriologically confirmed pulmonary tuberculosis patients with multidrug-resistant tuberculosis tested for any fluoroquinolone and any second-line injectable agent
+        unit: patients
+        description_short: Number of bacteriologically confirmed pulmonary tuberculosis patients with multidrug-resistant tuberculosis tested for any fluoroquinolone and any second-line injectable agent. Rifampicin resistance is the ability of tuberculosis bacteria, to resist the effects of the antibiotic rifampicin due to genetic mutations, hindering the drug's ability to inhibit bacterial growth. Fluoroquinolones, bedaquiline and linezolid are antibiotics used to treat tuberculosis after first-line drugs such as rifampicin are no longer effective.
+        description_from_producer: Total number of pulmonary  multidrug-resistant tuberculosis patients with drug susceptibility test results for any fluoroquinolone and any second-line injectable agent
+      xdr:
+        title: Bacteriologically confirmed pulmonary tuberculosis patients with extensively drug-resistant tuberculosis
+        unit: patients
+        description_short: Number of bacteriologically confirmed pulmonary tuberculosis patients with extensively drug-resistant tuberculosis.
+        description_from_producer: "Among pulmonary multidrug-resistant tuberculosis patients with drug susceptibility test results for any fluoroquinolone (FQ) and any second-line injectable agent (2LI) (variable mdr_dst_rlt): number with any resistance to both FQ and 2LI (i.e. XDR-tuberculosis in pre-2020 definitions)"
+      rr_share:
+        title: Share of new tested bacteriologically confirmed pulmonary tuberculosis patients that have rifampicin resistance
+        unit: "%"
+        short_unit: "%"
+        description_short: Share of new tested bacteriologically confirmed pulmonary tuberculosis patients that have rifampicin resistance. Rifampicin is an antibiotic medication used primarily in the treatment of tuberculosis and other bacterial infections; it works by inhibiting the growth of bacteria.

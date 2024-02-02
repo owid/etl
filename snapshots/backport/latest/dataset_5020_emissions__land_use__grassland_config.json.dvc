@@ -1,0 +1,22 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5020
+    date_accessed: 2023-08-10 14:35:08.741122
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_5020_emissions__land_use__grassland (archived)
+  description: Greenhouse gas (GHG) emissions in the domain "Grassland" are currently
+    limited to the CO2 emissions from grassland organic soils. They are those associated
+    with carbon losses from drained histosols under grassland. The FAOSTAT emissions
+    database is computed following Tier 1 IPCC 2006 Guidelines for National GHG Inventories
+    (http://www.ipcc-nggip.iges.or.jp/public/2006gl/vol6.html)applied to geospatial
+    data.GHG emissions are provided by country, region and special groups, with global
+    coverage, relative to the period 1990-present (with annual updates), expressed
+    as net emissions/removal Gg CO2 and Gg CO2eq. Implied emission factor for C, net
+    stock change Gg C and activity data (area) are also provided.
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 4a1e3baf051fd46fc870c3811d3b2c10
+  size: 10138
+  path: dataset_5020_emissions__land_use__grassland_config.json

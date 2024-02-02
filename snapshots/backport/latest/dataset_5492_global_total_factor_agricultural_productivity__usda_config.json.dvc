@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5492
+    date_accessed: 2023-08-16 09:33:25.580838
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_5492_global_total_factor_agricultural_productivity__usda
+    (archived)
+  description: ''
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 367de533d3e56af65b89aa208d6d8c02
+  size: 5244
+  path: dataset_5492_global_total_factor_agricultural_productivity__usda_config.json

@@ -1,18 +1,14 @@
 meta:
-  namespace: backport
-  short_name: dataset_4890_births_outside_of_marriage_config
-  file_extension: json
-  date_accessed: 2023-02-23 19:37:25.941774
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4890
+    date_accessed: 2023-08-10 07:49:06.014069
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_4890_births_outside_of_marriage
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/4890
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 40a84d61464ea575206f6102e2e5ca27
-  size: 3025
+- md5: 0f35050e2cd2b82e66ce3fe63e6dd22a
+  size: 3176
   path: dataset_4890_births_outside_of_marriage_config.json

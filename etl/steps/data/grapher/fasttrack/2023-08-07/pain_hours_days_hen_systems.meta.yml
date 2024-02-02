@@ -1,0 +1,119 @@
+dataset:
+  sources:
+  - name: Welfare Footprint based on Schuck-Paim and Alonso (2021)
+    published_by: Welfare Footprint
+    publication_year: 2021
+    url: https://welfarefootprint.org/research-projects/laying-hens/
+tables:
+  pain_hours_days_hen_systems:
+    variables:
+      total_hours_in_pain:
+        title: total_hours_in_pain
+        short_unit: hours
+        unit: hours
+        description: The total number of hours an average hen will spend in pain, regardless of the intensity.
+        display:
+          numDecimalPlaces: 0.0
+        sources:
+        - name: Welfare Footprint based on Schuck-Paim and Alonso (2021)
+          published_by: Welfare Footprint
+          publication_year: 2021
+          url: https://welfarefootprint.org/research-projects/laying-hens/
+      excrutiating_hours_in_pain:
+        title: excrutiating_hours_in_pain
+        short_unit: hours
+        unit: hours
+        description: The number of hours an average hen will spend in excrutiating pain.
+        display:
+          numDecimalPlaces: 2.0
+        sources:
+        - name: Welfare Footprint based on Schuck-Paim and Alonso (2021)
+          published_by: Welfare Footprint
+          publication_year: 2021
+          url: https://welfarefootprint.org/research-projects/laying-hens/
+      disabling_pain_in_hours:
+        title: disabling_pain_in_hours
+        short_unit: hours
+        unit: hours
+        description: The number of hours an average hen will spend in disabling pain.
+        display:
+          numDecimalPlaces: 0.0
+        sources:
+        - name: Welfare Footprint based on Schuck-Paim and Alonso (2021)
+          published_by: Welfare Footprint
+          publication_year: 2021
+          url: https://welfarefootprint.org/research-projects/laying-hens/
+      hurtful_pain_in_hours:
+        title: hurtful_pain_in_hours
+        short_unit: hours
+        unit: hours
+        description: The number of hours an average hen will spend in hurtful pain.
+        display:
+          numDecimalPlaces: 0.0
+        sources:
+        - name: Welfare Footprint based on Schuck-Paim and Alonso (2021)
+          published_by: Welfare Footprint
+          publication_year: 2021
+          url: https://welfarefootprint.org/research-projects/laying-hens/
+      annoying_pain_in_hours:
+        title: annoying_pain_in_hours
+        short_unit: hours
+        unit: hours
+        description: The number of hours an average hen will spend in annoying pain.
+        display:
+          numDecimalPlaces: 0.0
+        sources:
+        - name: Welfare Footprint based on Schuck-Paim and Alonso (2021)
+          published_by: Welfare Footprint
+          publication_year: 2021
+          url: https://welfarefootprint.org/research-projects/laying-hens/
+      total_days_in_pain:
+        title: total_days_in_pain
+        short_unit: days
+        unit: days
+        description: The total number of days an average hen will spend in pain, regardless of the intensity.
+        sources:
+        - name: Welfare Footprint based on Schuck-Paim and Alonso (2021)
+          published_by: Welfare Footprint
+          publication_year: 2021
+          url: https://welfarefootprint.org/research-projects/laying-hens/
+      excrutating_pain_in_days:
+        title: excrutating_pain_in_days
+        short_unit: days
+        unit: days
+        description: The number of days an average hen will spend in excrutiating pain.
+        sources:
+        - name: Welfare Footprint based on Schuck-Paim and Alonso (2021)
+          published_by: Welfare Footprint
+          publication_year: 2021
+          url: https://welfarefootprint.org/research-projects/laying-hens/
+      disabling_pain_in_days:
+        title: disabling_pain_in_days
+        short_unit: days
+        unit: days
+        description: The number of days an average hen will spend in disabling pain.
+        sources:
+        - name: Welfare Footprint based on Schuck-Paim and Alonso (2021)
+          published_by: Welfare Footprint
+          publication_year: 2021
+          url: https://welfarefootprint.org/research-projects/laying-hens/
+      hurtful_pain_in_days:
+        title: hurtful_pain_in_days
+        short_unit: days
+        unit: days
+        description: The number of days an average hen will spend in hurtful pain.
+        sources:
+        - name: Welfare Footprint based on Schuck-Paim and Alonso (2021)
+          published_by: Welfare Footprint
+          publication_year: 2021
+          url: https://welfarefootprint.org/research-projects/laying-hens/
+      annoying_pain_in_days:
+        title: annoying_pain_in_days
+        short_unit: days
+        unit: days
+        description: The number of days an average hen will spend in annoying pain.
+        sources:
+        - name: Welfare Footprint based on Schuck-Paim and Alonso (2021)
+          published_by: Welfare Footprint
+          publication_year: 2021
+          url: https://welfarefootprint.org/research-projects/laying-hens/

@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1778
+    date_accessed: 2023-08-14 15:43:31.822719
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Diet low in calcium
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 6bc345f56ea4a04ff15192b6507efec5
+  size: 961138
+  path: dataset_1778_diet_low_in_calcium_values.feather

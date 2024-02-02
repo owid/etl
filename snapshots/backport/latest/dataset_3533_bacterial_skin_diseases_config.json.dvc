@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/3533
+    date_accessed: 2023-08-16 08:22:37.299398
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_3533_bacterial_skin_diseases (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 8ed7fc5870e328d77d74331489b47ede
+  size: 32932
+  path: dataset_3533_bacterial_skin_diseases_config.json

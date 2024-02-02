@@ -3,26 +3,42 @@
 #  etl.py
 #
 
+import difflib
+import itertools
 import re
 import resource
 import sys
 import time
+from concurrent.futures import FIRST_COMPLETED, Future, ProcessPoolExecutor, ThreadPoolExecutor, wait
 from contextlib import contextmanager
+from graphlib import TopologicalSorter
 from os import environ
 from pathlib import Path
-from typing import Any, Callable, Iterator, List, Optional, Set
+from typing import Any, Callable, Dict, Iterator, List, Optional, Set
 
 import click
+import structlog
 from ipdb import launch_ipdb_on_exception
 
-from etl import config, paths
+from etl import config, files, paths
 from etl.snapshot import snapshot_catalog
-from etl.steps import DAG, DataStep, Step, compile_steps, load_dag, select_dirty_steps
+from etl.steps import (
+    DAG,
+    DataStep,
+    GrapherStep,
+    Step,
+    compile_steps,
+    load_dag,
+    parse_step,
+    select_dirty_steps,
+)
 
 config.enable_bugsnag()
 
 # if the number of open files allowed is less than this, increase it
 LIMIT_NOFILE = 4096
+
+log = structlog.get_logger()
 
 
 @click.command()
@@ -68,14 +84,25 @@ LIMIT_NOFILE = 4096
 @click.option(
     "--workers",
     type=int,
-    help="Thread workers to parallelize which steps need rebuilding (steps execution is not parallelized)",
-    default=5,
+    help=f"Parallelize execution of steps. [{config.RUN_STEPS_WORKERS}]",
+    default=config.RUN_STEPS_WORKERS,
+)
+@click.option(
+    "--use-threads/--no-threads",
+    type=bool,
+    help="Use threads when checking dirty steps and upserting to MySQL. Turn off when debugging.",
+    default=True,
 )
 @click.option(
     "--strict/--no-strict",
     is_flag=True,
     help="Force strict or lax validation on DAG steps, e.g. checks for primary keys in data steps.",
     default=None,
+)
+@click.option(
+    "--watch",
+    is_flag=True,
+    help="Run ETL infinitely and update changed files.",
 )
 @click.argument("steps", nargs=-1)
 def main_cli(
@@ -91,13 +118,22 @@ def main_cli(
     only: bool = False,
     exclude: Optional[str] = None,
     dag_path: Path = paths.DEFAULT_DAG_FILE,
-    workers: int = 5,
+    workers: int = config.RUN_STEPS_WORKERS,
+    use_threads: bool = True,
     strict: Optional[bool] = None,
+    watch: bool = False,
 ) -> None:
     _update_open_file_limit()
 
     # enable grapher channel when called with --grapher
     grapher_channel = grapher_channel or grapher
+
+    # make everything single threaded, useful for debugging
+    if not use_threads:
+        config.GRAPHER_INSERT_WORKERS = 1
+        config.DIRTY_STEPS_WORKERS = 1
+        config.RUN_STEPS_WORKERS = 1
+        workers = 1
 
     kwargs = dict(
         steps=steps,
@@ -115,18 +151,22 @@ def main_cli(
         strict=strict,
     )
 
-    # propagate workers to grapher upserts
-    if workers == 1:
-        config.GRAPHER_INSERT_WORKERS = 1
-
-    if ipdb:
-        config.IPDB_ENABLED = True
-        config.GRAPHER_INSERT_WORKERS = 1
-        kwargs["workers"] = 1
-        with launch_ipdb_on_exception():
-            main(**kwargs)  # type: ignore
+    if watch:
+        runs = itertools.chain([None], files.watch_folder(paths.STEP_DIR))
     else:
-        main(**kwargs)  # type: ignore
+        runs = [None]
+
+    for _ in runs:
+        if ipdb:
+            config.IPDB_ENABLED = True
+            config.GRAPHER_INSERT_WORKERS = 1
+            config.DIRTY_STEPS_WORKERS = 1
+            config.RUN_STEPS_WORKERS = 1
+            kwargs["workers"] = 1
+            with launch_ipdb_on_exception():
+                main(**kwargs)  # type: ignore
+        else:
+            main(**kwargs)  # type: ignore
 
 
 def main(
@@ -141,7 +181,7 @@ def main(
     only: bool = False,
     exclude: Optional[str] = None,
     dag_path: Path = paths.DEFAULT_DAG_FILE,
-    workers: int = 5,
+    workers: int = config.RUN_STEPS_WORKERS,
     strict: Optional[bool] = None,
 ) -> None:
     """
@@ -214,7 +254,7 @@ def run_dag(
     downstream: bool = False,
     only: bool = False,
     excludes: Optional[List[str]] = None,
-    workers: int = 1,
+    workers: int = config.RUN_STEPS_WORKERS,
     strict: Optional[bool] = None,
 ) -> None:
     """
@@ -237,29 +277,141 @@ def run_dag(
     steps = compile_steps(dag, includes, excludes, downstream=downstream, only=only)
 
     if not steps:
-        raise ValueError(
-            f"No steps matched the given input `{' '.join(includes or [])}`. Check spelling or consult `etl --help` for more options"
-        )
+        # If no steps are found, the most likely case is that the step passed as argument was misspelled.
+        # Print a short error message, show a list of the closest matches, and exit.
+        includes_str = " ".join(includes or [])
+        print(f"No steps matched `{includes_str}`. Closest matches:")
+        # NOTE: We could use a better edit distance to find the closest matches.
+        for match in difflib.get_close_matches(includes_str, list(dag), n=5, cutoff=0.0):
+            print(match)
+        sys.exit(1)
+
+    # do not run dependencies if `only` is set by setting them to non-dirty
+    if only:
+        for step in steps:
+            _set_dependencies_to_nondirty(step)
 
     if not force:
-        print("Detecting which steps need rebuilding...")
+        print("--- Detecting which steps need rebuilding...")
         start_time = time.time()
-        steps = select_dirty_steps(steps, workers)
-        click.echo(f"{click.style('OK', fg='blue')} ({time.time() - start_time:.0f}s)")
+        steps = select_dirty_steps(steps, workers=config.DIRTY_STEPS_WORKERS)
+        click.echo(f"{click.style('OK', fg='blue')} ({time.time() - start_time:.1f}s)")
 
     if not steps:
-        print("All datasets up to date!")
+        print("--- All datasets up to date!")
         return
 
-    print(f"Running {len(steps)} steps:")
+    if dry_run:
+        print(f"--- Running {len(steps)} steps:")
+        return enumerate_steps(steps)
+    elif workers == 1:
+        print(f"--- Running {len(steps)} steps:")
+        return exec_steps(steps, strict=strict)
+    else:
+        print(f"--- Running {len(steps)} steps with {workers} processes:")
+        return exec_steps_parallel(steps, workers, dag=dag, strict=strict)
+
+
+def exec_steps(steps: List[Step], strict: Optional[bool] = None) -> None:
     for i, step in enumerate(steps, 1):
-        print(f"{i}. {step}...")
-        if not dry_run:
-            strict = _detect_strictness_level(step, strict)
-            with strictness_level(strict):
-                time_taken = timed_run(lambda: step.run())
-                click.echo(f"{click.style('OK', fg='blue')} ({time_taken:.0f}s)")
-                print()
+        print(f"--- {i}. {step}...")
+        strict = _detect_strictness_level(step, strict)
+        with strictness_level(strict):
+            time_taken = timed_run(lambda: step.run())
+            click.echo(f"{click.style('OK', fg='blue')} ({time_taken:.1f}s)")
+            print()
+
+
+def _steps_sort_key(step: Step) -> int:
+    """Sort steps by channel, so that grapher steps are executed first, then garden, then meadow, then snapshots."""
+    str_step = str(step)
+    if "grapher://" in str_step:
+        return 0
+    elif "garden://" in str_step:
+        return 1
+    elif "meadow://" in str_step:
+        return 2
+    elif "snapshot://" in str_step:
+        return 3
+    else:
+        return 4
+
+
+def exec_steps_parallel(steps: List[Step], workers: int, dag: DAG, strict: Optional[bool] = None) -> None:
+    # put grapher steps in front of the queue to process them as soon as possible and lessen
+    # the load on MySQL
+    steps = sorted(steps, key=_steps_sort_key)
+
+    # create execution graph from steps
+    exec_graph = {}
+    steps_str = {str(step) for step in steps}
+    for step in steps:
+        # only add dependencies that are in the list of steps (i.e. are dirty)
+        # NOTE: we have to compare their string versions, the actual objects might have
+        # different attributes
+        exec_graph[str(step)] = {str(dep) for dep in step.dependencies if str(dep) in steps_str}
+
+    exec_graph_parallel(exec_graph, _exec_step_job, workers, dag=dag, strict=strict)
+
+
+def exec_graph_parallel(
+    exec_graph: Dict[str, Any], func: Callable[[str], None], workers: int, use_threads=False, **kwargs
+) -> None:
+    """
+    Execute a graph of tasks in parallel using multiple workers. TopologicalSorter orders nodes in the
+    graph in a way that no node depends on a node that comes after it, i.e. all dependencies are
+    guaranteed to be completed.
+    :param exec_graph: A dictionary representing the execution graph of tasks.
+    :param func: The function to be executed for each task.
+    :param workers: The number of workers to use for parallel execution.
+    :param use_threads: Flag indicating whether to use threads instead of processes for parallel execution.
+    :param kwargs: Additional keyword arguments to be passed to the function.
+    """
+    topological_sorter = TopologicalSorter(exec_graph)
+    topological_sorter.prepare()
+
+    pool_factory = ThreadPoolExecutor if use_threads else ProcessPoolExecutor
+    with pool_factory(max_workers=workers) as executor:
+        # Dictionary to keep track of future tasks
+        future_to_task: Dict[Future, str] = {}
+
+        while topological_sorter.is_active():
+            # Submit tasks that are ready to the executor
+            for task in topological_sorter.get_ready():
+                future = executor.submit(func, task, **kwargs)
+                future_to_task[future] = task
+
+            # Wait for at least one future to complete
+            done, _ = wait(future_to_task.keys(), return_when=FIRST_COMPLETED)
+
+            # Mark completed tasks as done
+            for future in done:
+                task = future_to_task.pop(future)
+                future.result()
+                topological_sorter.done(task)
+
+
+def _exec_step_job(step_name: str, dag: Optional[DAG] = None, strict: Optional[bool] = None) -> None:
+    """
+    Executes a step.
+
+    :param step_name: The name of the step to execute.
+    :param dag: The original DAG used to create Step object. This must be the same DAG as given to ETL.
+    :param strict: The strictness level for the step execution.
+    """
+    print(f"--- Starting {step_name}", flush=True)
+    assert dag
+    step = parse_step(step_name, dag)
+    strict = _detect_strictness_level(step, strict)
+    with strictness_level(strict):
+        time_taken = timed_run(lambda: step.run())
+
+    print(f"--- Finished {step_name} ({time_taken:.0f}s)", flush=True)
+
+
+def enumerate_steps(steps: List[Step]) -> None:
+    for i, step in enumerate(steps, 1):
+        print(f"{i}. {step}")
 
 
 def _detect_strictness_level(step: Step, strict: Optional[bool] = None) -> bool:
@@ -324,14 +476,17 @@ def _backporting_steps(private: bool, filter_steps: Optional[Set[str]] = None) -
 
     # load all backported snapshots
     for snap in snapshot_catalog(match):
-
         # skip private backported steps
         if not private and not snap.metadata.is_public:
             continue
 
         # two files are generated for each dataset, skip one
-        if snap.metadata.short_name.endswith("_values"):
-            short_name = snap.metadata.short_name.removesuffix("_values")
+        if snap.metadata.short_name.endswith("_config"):
+            # skip archived backported datasets
+            if "(archived)" in snap.metadata.name:  # type: ignore
+                continue
+
+            short_name = snap.metadata.short_name.removesuffix("_config")
 
             private_suffix = "" if snap.metadata.is_public else "-private"
 
@@ -359,6 +514,16 @@ def _update_open_file_limit() -> None:
     soft_limit, hard_limit = resource.getrlimit(resource.RLIMIT_NOFILE)
     if soft_limit < LIMIT_NOFILE:
         resource.setrlimit(resource.RLIMIT_NOFILE, (min(LIMIT_NOFILE, hard_limit), hard_limit))
+
+
+def _set_dependencies_to_nondirty(step: Step) -> None:
+    """Set all dependencies of a step to non-dirty."""
+    if isinstance(step, DataStep):
+        for step_dep in step.dependencies:
+            step_dep.is_dirty = lambda: False
+    if isinstance(step, GrapherStep):
+        for step_dep in step.data_step.dependencies:
+            step.data_step.is_dirty = lambda: False
 
 
 if __name__ == "__main__":

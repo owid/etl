@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1806
+    date_accessed: 2023-08-16 07:23:39.538454
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1806_high_body_mass_index (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 92dc45257de4e2dec08c551144b4a44b
+  size: 22272
+  path: dataset_1806_high_body_mass_index_config.json

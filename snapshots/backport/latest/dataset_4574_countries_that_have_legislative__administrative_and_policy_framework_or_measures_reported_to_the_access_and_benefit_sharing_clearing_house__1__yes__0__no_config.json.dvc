@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4574
+    date_accessed: 2023-08-16 10:08:57.960462
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_4574_countries_that_have_legislative__administrative_and_policy_framework_or_measures_reported_to_the_access_and_benefit_sharing_clearing_house__1__yes__0__no
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: d74d54f16b12917d908ffd5346b765f7
+  size: 14978
+  path: 
+    dataset_4574_countries_that_have_legislative__administrative_and_policy_framework_or_measures_reported_to_the_access_and_benefit_sharing_clearing_house__1__yes__0__no_config.json

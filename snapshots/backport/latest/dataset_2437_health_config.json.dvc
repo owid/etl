@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2437
+    date_accessed: 2023-08-16 10:46:07.102611
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2437_health (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: fd6cb765b6fa4ed6db389a7e6bc2a0e8
+  size: 6297
+  path: dataset_2437_health_config.json

@@ -1,0 +1,30 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/origin/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Death rates at specific life stages mold the sex gap in life expectancy
+    description: |-
+      Why do women live longer than men? In this publication, authors mine rich lodes of demographic data to reveal that lower female mortality at particular ages is decisive—and that the important ages changed around 1950. Earlier, excess mortality among baby boys was crucial; afterward, the gap largely resulted from elevated mortality among men 60+. Young males bear modest responsibility for the sex gap in life expectancy: Depending on the country and time, their mortality accounts for less than a quarter and often less than a 10th of the gap. Understanding the impact on life expectancy of differences between male and female risks of death by age, over time, and across populations yields insights for research on how the lives of men and women differ.
+    date_published: 2021-05-10
+
+    # Citation
+    producer: Zarulli et al.
+    citation_full: |-
+      Virginia Zarulli, Ilya Kashnitsky and James W Vaupel (2021) ‘Age-specific contributions to sex gap in life expectancy’, Proceedings of the National Academy of Sciences. https://doi.org/10.1073/pnas.2010588118
+
+    # Files
+    url_main: https://github.com/CPop-SDU/sex-gap-e0-pnas/tree/v2.0
+    url_download: https://github.com/CPop-SDU/sex-gap-e0-pnas/archive/refs/tags/v2.0.zip
+    date_accessed: 2023-11-08
+
+    # License
+    license:
+      name: MIT License
+      url: https://github.com/CPop-SDU/sex-gap-e0-pnas/blob/main/LICENSE
+
+wdir: ../../../data/snapshots/demography/2023-11-08
+outs:
+- md5: c575d7d872d562594af51b3bc7067997
+  size: 61774695
+  path: le_sex_gap_age_contribution.zip

@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5041
+    date_accessed: 2023-08-14 14:50:56.071610
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: 'Production: Live Animals'
+  description: 'The dataset contains the following commodities and commodity aggregates
+    thereof : Animals live n.e.s.; Asses; Beehives; Buffaloes; Camelids, other; Camels;
+    Cattle; Chickens; Ducks; Geese and guinea fowls; Goats; Horses; Mules; Pigeons,
+    other birds; Pigs; Rabbits and hares; Rodents, other; Sheep; Turkeys.'
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 26b7bd94916f4de6b96620ca7361d320
+  size: 742842
+  path: dataset_5041_production__live_animals_values.feather

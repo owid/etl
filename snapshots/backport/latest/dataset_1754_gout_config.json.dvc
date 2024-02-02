@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1754
+    date_accessed: 2023-08-16 07:30:37.043778
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1754_gout (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: d5270384c3b2ad7c555c6aee77b1e4c1
+  size: 16292
+  path: dataset_1754_gout_config.json

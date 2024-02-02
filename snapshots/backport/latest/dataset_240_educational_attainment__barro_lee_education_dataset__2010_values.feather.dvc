@@ -1,18 +1,15 @@
 meta:
-  namespace: backport
-  short_name: dataset_240_educational_attainment__barro_lee_education_dataset__2010_values
-  file_extension: feather
-  date_accessed: 2023-02-23 17:07:56.314196
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/240
+    date_accessed: 2023-08-10 09:18:27.397879
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Educational Attainment - Barro Lee Education Dataset (2010)
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/240
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: daad32385c96530f70d06e55cbf3b72c
+- md5: 71cbd0d60d093d577cccc3c3d06beac3
   size: 18978
-  path: dataset_240_educational_attainment__barro_lee_education_dataset__2010_values.feather
+  path: 
+    dataset_240_educational_attainment__barro_lee_education_dataset__2010_values.feather

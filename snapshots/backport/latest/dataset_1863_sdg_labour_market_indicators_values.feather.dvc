@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1863
+    date_accessed: 2023-08-16 07:29:43.479986
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: SDG labour market indicators
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: eb85f2f771481bfad1be4e6459ad05b6
+  size: 370730
+  path: dataset_1863_sdg_labour_market_indicators_values.feather

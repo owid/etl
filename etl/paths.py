@@ -7,7 +7,15 @@ DAG_FILE = DAG_DIR / "main.yml"
 DAG_ARCHIVE_FILE = DAG_DIR / "archive" / "main.yml"
 DATA_DIR = BASE_DIR / "data"
 SNAPSHOTS_DIR = BASE_DIR / "snapshots"
-STEP_DIR = BASE_DIR / "etl" / "steps"
+SNAPSHOTS_DIR_ARCHIVE = BASE_DIR / "snapshots" / "archive"
+MEADOW_DIR = DATA_DIR / "meadow"
+GARDEN_DIR = DATA_DIR / "garden"
+GRAPHER_DIR = DATA_DIR / "grapher"
+ETL_DIR = BASE_DIR / "etl"
+STEP_DIR = ETL_DIR / "steps"
+APPS_DIR = BASE_DIR / "apps"
+SCHEMAS_DIR = BASE_DIR / "schemas"
+CACHE_DIR = BASE_DIR / ".cache"
 
 # Regions paths
 LATEST_REGIONS_VERSION = sorted((STEP_DIR / "data/garden/regions/").glob("*/regions.yml"))[-1].parts[-2]

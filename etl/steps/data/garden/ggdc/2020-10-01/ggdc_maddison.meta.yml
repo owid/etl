@@ -1,10 +1,3 @@
-dataset:
-  sources:
-    -
-      name: Maddison Project Database 2020 (Bolt and van Zanden, 2020)
-      published_by: Bolt, Jutta and Jan Luiten van Zanden (2020), “Maddison style estimates of the evolution of the world economy. A new 2020 update“.
-
-
 tables:
   maddison_gdp:
     variables:
@@ -12,14 +5,15 @@ tables:
         title: Population
         unit: people
         display:
-          entityAnnotationsMap: "Western Offshoots: United States, Canada, Australia and New Zealand"
+          entityAnnotationsMap: "Western offshoots (MPD): United States, Canada, Australia and New Zealand"
       gdp:
         title: GDP
         short_unit: $
         unit: international-$ in 2011 prices
-        description: Gross domestic product measured in international-$ using 2011 prices to adjust for price changes over time (inflation) and price differences between countries. Calculated by multiplying GDP per capita with population.
+        description: >-
+          Gross domestic product measured in international-$ using 2011 prices to adjust for price changes over time (inflation) and price differences between countries. Calculated by multiplying GDP per capita with population.
         display:
-          entityAnnotationsMap: "Western Offshoots: United States, Canada, Australia and New Zealand"
+          entityAnnotationsMap: "Western offshoots (MPD): United States, Canada, Australia and New Zealand"
           numDecimalPlaces: 0
 
       gdp_per_capita:
@@ -28,5 +22,44 @@ tables:
         unit: international-$ in 2011 prices
         description:
         display:
-          entityAnnotationsMap: "Western Offshoots: United States, Canada, Australia and New Zealand"
+          entityAnnotationsMap: "Western offshoots (MPD): United States, Canada, Australia and New Zealand"
           numDecimalPlaces: 0
+        presentation:
+          grapher_config:
+            title: GDP per ccapita
+            subtitle: This data is adjusted for inflation and for differences in the cost of living between countries.
+            note: 'This data is expressed in [international-$](#dod:int_dollar_abbreviation) at 2011 prices.'
+            hideRelativeToggle: false
+            hasMapTab: true
+            variantName: 'Maddison Project Database, constant international-$'
+            originUrl: 'https://ourworldindata.org/economic-growth'
+            isPublished: true
+            yAxis:
+                min: 0
+                canChangeScaleType: true
+            map:
+                time: latest
+                colorScale:
+                    baseColorScheme: GnBu
+                    binningStrategy: manual
+                    binningStrategyBinCount: 9
+                    customNumericValues:
+                        - 1000
+                        - 2000
+                        - 5000
+                        - 10000
+                        - 20000
+                        - 50000
+                        - 100000
+                variableId: 417485
+            selectedEntityNames:
+                - World
+                - South and South-East Asia (MPD)
+                - Sub-Saharan Africa (MPD)
+                - Western offshoots (MPD)
+                - Western Europe (MPD)
+                - Eastern Europe (MPD)
+                - Latin America (MPD)
+                - Middle East (MPD)
+                - East Asia (MPD)
+            $schema: 'https://files.ourworldindata.org/schemas/grapher-schema.003.json'

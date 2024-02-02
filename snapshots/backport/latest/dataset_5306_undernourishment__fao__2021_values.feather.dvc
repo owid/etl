@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5306
+    date_accessed: 2023-08-14 05:57:04.700440
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Undernourishment (FAO, 2021)
+  description: ''
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 956cb2b18d1b8bb0b6d90311bf060c62
+  size: 45690
+  path: dataset_5306_undernourishment__fao__2021_values.feather

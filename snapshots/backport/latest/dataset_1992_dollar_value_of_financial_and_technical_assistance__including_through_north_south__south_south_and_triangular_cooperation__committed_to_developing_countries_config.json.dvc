@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1992
+    date_accessed: 2023-08-16 08:32:02.418579
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_1992_dollar_value_of_financial_and_technical_assistance__including_through_north_south__south_south_and_triangular_cooperation__committed_to_developing_countries
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: ba4f28d7f1e75982adaa2e2fd2e4bfcf
+  size: 2549
+  path: 
+    dataset_1992_dollar_value_of_financial_and_technical_assistance__including_through_north_south__south_south_and_triangular_cooperation__committed_to_developing_countries_config.json

@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2109
+    date_accessed: 2023-08-16 09:56:40.810566
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Bulimia nervosa
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 875797f95b19a96aec56f7606dd6f5b3
+  size: 1190066
+  path: dataset_2109_bulimia_nervosa_values.feather

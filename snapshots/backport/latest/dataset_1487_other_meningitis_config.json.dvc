@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1487
+    date_accessed: 2023-08-14 15:27:55.185193
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1487_other_meningitis (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 789f5bd5f52f93a0bff8a5982269a2fa
+  size: 31415
+  path: dataset_1487_other_meningitis_config.json

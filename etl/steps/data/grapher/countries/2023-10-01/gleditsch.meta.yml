@@ -1,0 +1,7 @@
+tables:
+  gleditsch_countries:
+    variables:
+      is_present:
+        title: Sovereign state
+        description_short: The country is identified as a sovereign state by Gleditsch and Ward dataset.
+        unit: ""

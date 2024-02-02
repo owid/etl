@@ -1,0 +1,92 @@
+dataset:
+  update_period_days: 365
+  sources: []
+definitions:
+  common:
+    sources: []
+    origins:
+      - producer: Ariel Karlinksy
+        title: International Completeness of Death Registration 2015-2019
+        description: |-
+          The International Completeness of Death Registration 2015–2019 database (ICDR), produced by Ariel Karlinsky, represents the most comprehensive and up-to-date database on the completeness of death reporting globally.
+
+          The work and sources are documented in detail on GitHub: https://github.com/akarlinsky/death_registration.
+
+          You can read a detailed description of the ICDR in the medRxiv preprint "Karlinsky, A. (2021). International Completeness of Death Registration 2015–2019.": https://www.medrxiv.org/content/10.1101/2021.08.12.21261978v1.
+        citation_full: A. Karlinsky (2021). International Completeness of Death Registration 2015-2019. GitHub. https://github.com/akarlinsky/death_registration
+        url_main: https://github.com/akarlinsky/death_registration
+        url_download: https://raw.githubusercontent.com/akarlinsky/death_registration/main/death_reg_final.csv
+        date_accessed: "2023-08-16"
+        date_published: "2021-08-14"
+        license:
+          name: CC BY 4.0
+          url: https://creativecommons.org/licenses/by/4.0/
+tables:
+  deaths_karlinsky:
+    variables:
+      death_comp:
+        title: Share of deaths that are registered
+        unit: "%"
+        short_unit: "%"
+        description_short: |-
+          The number of deaths reported in a country's vital registration system as a share of total expected deaths. Expected deaths are taken as the average of estimates from three international sources: the UN, WHO, and IHME.
+        description_from_producer: |-
+          Death registration completeness, the share of deaths captured by countries’ vital registration systems, vary substantially across countries. Estimates of completeness, even recent ones, are outdated or contradictory for many countries. In this short paper, I utilize the annual amount of deaths registered in 139 vital registration systems around the world to provide the most up-to-date estimates of death-registration completeness from 2015 to 2019.
+
+          \[Text from [Karlinsky (2021)](https://www.medrxiv.org/content/10.1101/2021.08.12.21261978v1)\]
+        description_key:
+          - The most common way of knowing how many deaths occur in a country is to rely on death certificates registered in national Vital Registry systems. In many countries, however, a large share of deaths are not registered. This is due to factors such as a lack of doctors and nurses to fill in death certificates, or a poorly functioning Vital Registry system.
+          - This indicator estimates the extent of under-registering, given as the share of deaths that were registered, out of the total deaths expected for that year.
+          - "The number of expected deaths is estimated by taking the average number of deaths from three data sources: the UN's World Population Prospects, WHO's Global Health Estimates and IHME's Global Burden of Disease study. These three sources themselves estimate the number of deaths from models based on data from censuses and household surveys. For many countries, the estimates of the three sources are very similar. However, for others, where vital registration systems are lacking or not functional, they tend to differ."
+        display:
+          numDecimalPlaces: 1
+        presentation:
+          attribution_short: Ariel Karlinsky (2021)
+          topic_tags:
+            - Population Growth
+            - Causes of Death
+          faqs:
+            - fragment_id: deaths-estimation
+              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+          grapher_config:
+            slug: share-of-deaths-registered
+            title: Share of deaths that are registered
+            subtitle: >-
+              The number of deaths reported in a country's [vital registration
+              system](#dod:cvrs) as a share of total expected deaths. Expected deaths are
+              estimated by three international sources: UN, WHO, and IHME, using data from
+              household surveys and censuses.
+            sourceDesc: Karlinsky, A. (2021)
+            minTime: latest
+            hasMapTab: true
+            tab: map
+            originUrl: https://ourworldindata.org/causes-of-death
+            yAxis:
+              min: 0
+              max: 0
+            map:
+              columnSlug: "539877"
+              timeTolerance: 5
+              colorScale:
+                baseColorScheme: PuBu
+                binningStrategy: manual
+                customNumericValues:
+                  - 10
+                  - 20
+                  - 30
+                  - 40
+                  - 50
+                  - 60
+                  - 70
+                  - 80
+                  - 90
+                  - 100
+                customNumericColorsActive: true
+            selectedEntityNames:
+              - United States
+              - United Kingdom
+              - China
+              - Russia
+              - Indonesia
+              - Nigeria
+            $schema: https://files.ourworldindata.org/schemas/grapher-schema.003.json

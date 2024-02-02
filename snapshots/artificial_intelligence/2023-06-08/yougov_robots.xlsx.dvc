@@ -19,6 +19,6 @@ meta:
     Biannual tracker of Americans' concerns regarding robotic intelligence. Next update is in July. The provided results are weighted to ensure they are representative of the United States population across various demographic factors. The weighting is based on factors such as age, gender, race, education, region, political party affiliation, and income level. This weighting process helps to account for the diversity within the population and ensures that the results reflect a broader representation of the United States as a whole. Each wave comprises responses from 1004 - 1085 US Adults.
 wdir: ../../../data/snapshots/artificial_intelligence/2023-06-08
 outs:
-- md5: 26206855573cbc8227e0d73f87f67d8c
-  size: 28181
+- md5: 221383606f8a8f2f7c9da802b5e21df7
+  size: 29286
   path: yougov_robots.xlsx

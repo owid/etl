@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5249
+    date_accessed: 2023-08-11 07:42:51.120617
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Agricultural land use per capita (FAO, 2021)
+  description: ''
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: e01e959856668cf1d76da26ba1c813f2
+  size: 456874
+  path: dataset_5249_agricultural_land_use_per_capita__fao__2021_values.feather

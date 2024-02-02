@@ -1,18 +1,16 @@
 meta:
-  namespace: backport
-  short_name: dataset_5079_healthcare_capacity__oecd__eurostat__wb__and_other_sources_values
-  file_extension: feather
-  date_accessed: 2023-02-23 19:49:33.575093
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5079
+    date_accessed: 2023-08-10 07:41:45.301091
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Healthcare capacity (OECD, Eurostat, WB, and other sources)
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/5079
-  source_published_by: Our World in Data catalog backport
   is_public: false
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 2e6c2d099ff5d5e4a06f09d969361921
-  size: 66050
-  path: dataset_5079_healthcare_capacity__oecd__eurostat__wb__and_other_sources_values.feather
+- md5: b6cb1689f7ba2e370a9c87d23b9d11c9
+  size: 66058
+  path: 
+    dataset_5079_healthcare_capacity__oecd__eurostat__wb__and_other_sources_values.feather

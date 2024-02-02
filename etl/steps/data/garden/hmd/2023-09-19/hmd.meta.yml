@@ -1,0 +1,287 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      attribution_short: HMD
+      title_variant: << sex + 's, ' if sex != 'both' >><< type + ' tables'>>
+      topic_tags:
+        - Life Expectancy
+
+  others:
+    display_name_dim: |-
+      at << 'birth' if (age == '0') else age >><< ', ' + sex + 's' if (sex != 'both') >>, << type >>
+    title_public_dim: |-
+       at << age if age != '0' else 'birth'>>
+  global:
+    life_expectancy:
+      point_1: |-
+        <% if type == "period" %>
+        Period life expectancy is a metric that summarizes death rates across all age groups in one particular year.
+        <% else %>
+        Cohort life expectancy is the average lifespan of a group of people, usually a birth cohort – people born in the same year.
+        <% endif %>
+      point_2: |-
+        <% if type == "period" %>
+        <% if age == '0' %>
+        For a given year, it represents the average lifespan for a hypothetical group of people, if they experienced the same age-specific death rates throughout their whole lives as the age-specific death rates seen in that particular year.
+        <% else %>
+        For a given year, it represents the remaining average lifespan for a hypothetical group of people, if they experienced the same age-specific death rates throughout the rest of their lives as the age-specific death rates seen in that particular year.
+        <% endif %>
+        <% else %>
+        <% if age == '0' %>
+        It is calculated by tracking individuals from that cohort throughout their lives until death, and calculating their average lifespan.
+        <% else %>
+        It is calculated by tracking individuals from that cohort throughout the rest of their lives until death, and calculating their average remaining lifespan.
+        <% endif %>
+        <% endif %>
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
+dataset:
+  update_period_days: 365
+  description: |-
+    The Human Mortality Database (HMD) is a collaborative project sponsored by the University of California, Berkeley (in the United States of America) and the Max Planck Institute for Demographic Research (in Germany).
+
+    It provides researchers with comprehensive data on mortality from around 40 countries around the world, which have very high coverage and quality of data at the national level, through vital registration and potentially census data.
+
+    Data is given in terms of period or cohort estimates:
+
+      - **Period data** refers to a snapshot estimated with data at a particular interval. For period life expectancy at birth, this refers to the estimated life expectancy at birth based on a synthetic cohort created using mortality rates across age groups in a given year.
+      - **Cohort data** refers to estimates of a particular birth cohort. For cohort life expectancy at birth, this refers to the average number of years that people in the birth cohort survived. Cohort data may use birth cohorts that are ‘almost extinct’ rather than entirely extinct.
+
+    'Interval' refers to the specific age- and time- period of the estimate. An interval can be a one year period for a single-age group, or it can be wider. For example, the life expectancy of a 40 year old in 2019 corresponds to an interval of 1 single-age group in 1 year. The central death rate of 5–9 year olds in 2020 corresponds to an interval of a 5 year age group in 1 year.
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
+tables:
+  hmd:
+    variables:
+      central_death_rate:
+        title: Central death rate
+        description_short: |-
+          The death rate, calculated as the number of deaths divided by the average number of people alive during the interval.
+        description_key:
+          - |-
+            The death rate is measured using the number of person-years lived during the interval.
+          - |-
+            Person-years refers to the combined total time that a group of people has lived. For example, if 10 people each live for 2 years, they collectively contribute 20 person-years.
+          - |-
+            The death rate is slightly different from the 'probability of death' during the interval, because the 'probability of death' metric uses a different denominator: the number of people alive at that age at the start of the interval, while this indicator uses the average number of people alive during the interval.
+        unit: deaths per 1,000 people
+        processing_level: minor
+        description_processing: |-
+          The original metric is given as a fraction between 0 and 1 (i.e. per-capita). We multiply this by 1,000 to get a per-1,000 people rate.
+        display:
+          name: |-
+            {tables.hmd.variables.central_death_rate.title} {definitions.others.display_name_dim}
+        presentation:
+          title_public: |-
+            {tables.hmd.variables.central_death_rate.title} {definitions.others.title_public_dim}
+          topic_tags:
+            - Life Expectancy
+            - << 'Child & Infant Mortality' if age in ['0', '1-4'] else 'Causes of Death'>>
+
+      central_death_rate_mf_ratio:
+        title: Central death rate ratio (m/f)
+        unit: ""
+        description_short: |-
+          <% if type == "cohort" %>
+          The ratio of cohort central death rate (males/females) at a given age.
+          <% elif type == "period" %>
+          The ratio of period central death rate (males/females) at a given age.
+          <% endif %>
+        processing_level: major
+        display:
+          name: |-
+            Central death rate (male-to-female ratio) {definitions.others.display_name_dim}
+        presentation:
+          title_public: Central death rate {definitions.others.title_public_dim}
+          title_variant: |-
+            male-to-female ratio, << type + ' tables'>>
+          topic_tags:
+            - Life Expectancy
+            - Gender Ratio
+            - << 'Child & Infant Mortality' if age in ['0', '1-4'] else 'Causes of Death'>>
+
+      probability_of_death:
+        title: Probability of death
+        unit: "%"
+        description_short: |-
+          The probability of dying in a given interval, among people who survived to the start of that interval.
+        description_key:
+          - |-
+            For example, the probability of death for a 50 year old in a given year is found by: dividing the number of deaths in 50 year olds that year, by the number of people alive at the age of 50 at the start of the year.
+        processing_level: minor
+        description_processing: |-
+          The original metric is given as a fraction between 0 and 1 (i.e. per-capita). We multiply this by 100 to get a percentage.
+        display:
+          name: |-
+            {tables.hmd.variables.probability_of_death.title} {definitions.others.display_name_dim}
+        presentation:
+          title_public: |-
+            {tables.hmd.variables.probability_of_death.title} {definitions.others.title_public_dim}
+          topic_tags:
+            - Life Expectancy
+            - << 'Child & Infant Mortality' if age in ['0', '1-4'] else 'Causes of Death'>>
+
+      average_survival_length:
+        title: Average survival length
+        short_unit: years
+        unit: years
+        description_short: Average length of survival between ages x and x+n for persons dying in the interval.
+        display:
+          name: |-
+            {tables.hmd.variables.average_survival_length.title} {definitions.others.display_name_dim}
+        presentation:
+          title_public: |-
+            {tables.hmd.variables.average_survival_length.title} {definitions.others.title_public_dim}
+
+      number_survivors:
+        title: Number of survivors
+        unit: survivors
+        description_short: Number of survivors at a given age, assuming survivors at 0 years old is 100,000.
+        display:
+          name: |-
+            {tables.hmd.variables.number_survivors.title} {definitions.others.display_name_dim}
+        presentation:
+          title_public: |-
+            {tables.hmd.variables.number_survivors.title} {definitions.others.title_public_dim}
+
+      number_deaths:
+        title: Number of deaths
+        short_unit: deaths
+        unit: deaths
+        description_short: Number of deaths between ages x and x+n.
+        display:
+          name: |-
+            {tables.hmd.variables.number_deaths.title} {definitions.others.display_name_dim}
+        presentation:
+          title_public: |-
+            {tables.hmd.variables.number_deaths.title} {definitions.others.title_public_dim}
+          topic_tags:
+            - Life Expectancy
+            - << 'Child & Infant Mortality' if age in ['0', '1-4'] else 'Causes of Death'>>
+
+      number_person_years_lived:
+        title: Number of person-years lived
+        unit: person-years
+        description_short: Number of person-years lived between ages x and x+n.
+        display:
+          name: |-
+            {tables.hmd.variables.number_person_years_lived.title} {definitions.others.display_name_dim}
+        presentation:
+          title_public: |-
+            {tables.hmd.variables.number_person_years_lived.title} {definitions.others.title_public_dim}
+
+      number_person_years_remaining:
+        title: Number of person-years remaining
+        unit: person-years
+        description_short: Number of person-years remaining after a given age.
+        display:
+          name: |-
+            {tables.hmd.variables.number_person_years_remaining.title} {definitions.others.display_name_dim}
+        presentation:
+          title_public: |-
+            {tables.hmd.variables.number_person_years_remaining.title} {definitions.others.title_public_dim}
+
+      life_expectancy:
+        title: Life expectancy
+        short_unit: years
+        unit: years
+        description_short: |-
+          <% if age == '0' %>
+          <% if sex == 'both' %>
+          The << type >> life expectancy at birth, in a given year.
+          <% else %>
+          The << type >> life expectancy at birth among << sex + 's' >>, in a given year.
+          <% endif %>
+          <% else %>
+          <% if sex == 'both' %>
+          The remaining << type >> life expectancy at age << age >>, in a given year.
+          <% else %>
+          The remaining << type >> life expectancy at age << age >> among << sex + 's' >>, in a given year.
+          <% endif %>
+          <% endif %>
+        description_key:
+          - |-
+            {definitions.global.life_expectancy.point_1}
+          - |-
+            {definitions.global.life_expectancy.point_2}
+          - |-
+            <% if age != '0' %>
+            <% if type == "period" %>
+            This shows the remaining period life expectancy among people who have already reached the age << age >>, using death rates from their age group and older age groups.
+            <% else %>
+            This shows the remaining cohort life expectancy of people who have reached the age << age >>.
+            <% endif %>
+            <% endif %>
+        display:
+          numDecimalPlaces: 1
+          name: |-
+            {tables.hmd.variables.life_expectancy.title} {definitions.others.display_name_dim}
+        presentation:
+          title_public: |-
+            {tables.hmd.variables.life_expectancy.title} {definitions.others.title_public_dim}
+
+      life_expectancy_fm_diff:
+        title: Life expectancy difference (f-m)
+        short_unit: years
+        unit: years
+        description_short: |-
+          The difference in << type >> life expectancy (females - males) at a given age.
+        description_key:
+          - Higher values indicate longer life expectancy among females than males.
+          - |-
+            {definitions.global.life_expectancy.point_1}
+          - |-
+            {definitions.global.life_expectancy.point_2}
+        display:
+          numDecimalPlaces: 1
+          name: |-
+            Life expectancy (female-male difference) at << 'birth' if (age == '0') else age >>, << type >>
+        presentation:
+          title_public: Life expectancy at << age if age != '0' else 'birth'>>
+          title_variant: female-male difference, << type + ' tables'>>
+          topic_tags:
+            - Life Expectancy
+            - Gender Ratio
+
+      life_expectancy_fm_ratio:
+        title: Life expectancy ratio (f/m)
+        unit: ""
+        short_unit: ""
+        description_short: |-
+          The ratio of << type >> life expectancy (females/males) at a given age.
+        description_key:
+          - Higher values indicate longer life expectancy among females than males.
+          - |-
+            {definitions.global.life_expectancy.point_1}
+          - |-
+            {definitions.global.life_expectancy.point_2}
+        display:
+          numDecimalPlaces: 1
+          name: |-
+            Life expectancy (female-to-male ratio) at << 'birth' if (age == '0') else age >>, << type >>
+        presentation:
+          title_public: Life expectancy at << age if age != '0' else 'birth'>>
+          title_variant: female-to-male ratio, << type + ' tables'>>
+          topic_tags:
+            - Life Expectancy
+            - Gender Ratio
+
+      exposure:
+        title: Exposure-to-risk
+        unit: person-years
+        description_short: The total number of person-years lived within a given interval.
+        description_key:
+          - It is equivalent to the average number of people living in that age group during the period.
+        description_from_producer: |-
+          Estimates of the population exposed to the risk of death during some age-time interval are based on annual (January 1st) population estimates, with small corrections that reflect the timing of deaths during the interval. Period exposure estimations are based on assumptions of uniformity in the distribution of events except when historical monthly birth data are available.
+        display:
+          name: |-
+            {tables.hmd.variables.exposure.title} {definitions.others.display_name_dim}
+        presentation:
+          title_public: |-
+            {tables.hmd.variables.exposure.title} {definitions.others.title_public_dim}

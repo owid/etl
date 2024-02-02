@@ -1,18 +1,16 @@
 meta:
-  namespace: backport
-  short_name: dataset_3010_share_of_industry_in_gdp_at_constant_2005_prices__ggdc__split_values
-  file_extension: feather
-  date_accessed: 2023-02-23 17:02:14.738030
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/3010
+    date_accessed: 2023-08-10 08:51:55.651409
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Share of industry in GDP at constant 2005 prices (GGDC) (split)
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/3010
-  source_published_by: Our World in Data catalog backport
   is_public: false
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 3a490d9a7c48b2f99da568c9f0f2ccf5
+- md5: 3a22f7c8eb0e29b4806390ef441ce5e1
   size: 15970
-  path: dataset_3010_share_of_industry_in_gdp_at_constant_2005_prices__ggdc__split_values.feather
+  path: 
+    dataset_3010_share_of_industry_in_gdp_at_constant_2005_prices__ggdc__split_values.feather

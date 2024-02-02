@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5118
+    date_accessed: 2023-08-16 10:17:42.381538
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_5118_figure_13_5_unemployment
+  description: core-econ.org
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 837854fae0c0fa5bbd8d0191eaf6eadd
+  size: 2446
+  path: dataset_5118_figure_13_5_unemployment_config.json

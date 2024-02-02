@@ -1,0 +1,84 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+      - Animal Welfare
+      - Fish & Overfishing
+
+tables:
+  farmed_finfishes_used_for_food:
+    variables:
+      n_fish_low:
+        title: Estimated number of farmed finfish killed for food (lower bound)
+        unit: 'fish'
+        short_unit: ''
+        display:
+          numDecimalPlaces: 0
+        presentation:
+          grapher_config:
+            hasMapTab: false
+      n_fish:
+        title: Estimated number of farmed finfish killed for food
+        unit: 'fish'
+        short_unit: ''
+        description_short: Finfish refers to any fish with fins, as opposed to shellfish.
+        display:
+          numDecimalPlaces: 0
+        presentation:
+          grapher_config:
+            hasMapTab: false
+      n_fish_high:
+        title: Estimated number of farmed finfish killed for food (upper bound)
+        unit: 'fish'
+        short_unit: ''
+        display:
+          numDecimalPlaces: 0
+        presentation:
+          grapher_config:
+            hasMapTab: false
+      n_fish_low_per_capita:
+        title: Estimated number of farmed finfish killed for food per person (lower bound)
+        unit: 'fish per person'
+        short_unit: ''
+        display:
+          numDecimalPlaces: 2
+        presentation:
+          grapher_config:
+            hasMapTab: false
+      n_fish_per_capita:
+        title: Estimated number of farmed finfish killed for food per person
+        unit: 'fish per person'
+        short_unit: ''
+        description_short: Finfish refers to any fish with fins, as opposed to shellfish.
+        display:
+          numDecimalPlaces: 2
+        presentation:
+          grapher_config:
+            hasMapTab: false
+      n_fish_high_per_capita:
+        title: Estimated number of farmed finfish killed for food per person (upper bound)
+        unit: 'fish per person'
+        short_unit: ''
+        display:
+          numDecimalPlaces: 2
+        presentation:
+          grapher_config:
+            hasMapTab: false
+      production:
+        title: Production of farmed finfish
+        unit: 'tonnes'
+        short_unit: 't'
+        display:
+          numDecimalPlaces: 0
+      production_relative_to_1990:
+        title: Production of farmed finfish relative to 1990
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 0
+      n_fish_relative_to_1990:
+        title: Estimated number of farmed finfish relative to 1990
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 0

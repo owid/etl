@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1438
+    date_accessed: 2023-08-16 09:39:00.614494
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1438_turner_syndrome (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: ca30b6a85fc84817ed3b3b035a70b3b2
+  size: 16523
+  path: dataset_1438_turner_syndrome_config.json

@@ -1,18 +1,15 @@
 meta:
-  namespace: backport
-  short_name: dataset_3221_alcohol_consumption_by_type_since_1890__alexander__and__holmes__2017_values
-  file_extension: feather
-  date_accessed: 2023-02-23 17:38:31.812614
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/3221
+    date_accessed: 2023-08-10 09:11:34.255199
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Alcohol consumption by type since 1890 (Alexander & Holmes, 2017)
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/3221
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: ea558195fd3c5a6d2a51f017c7149b07
+- md5: e4d70f47e4d4dd1c24db90bd31d4accf
   size: 7682
-  path: dataset_3221_alcohol_consumption_by_type_since_1890__alexander__and__holmes__2017_values.feather
+  path: 
+    dataset_3221_alcohol_consumption_by_type_since_1890__alexander__and__holmes__2017_values.feather

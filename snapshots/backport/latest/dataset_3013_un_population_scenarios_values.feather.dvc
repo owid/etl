@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/3013
+    date_accessed: 2023-08-14 15:00:54.808657
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: UN population scenarios
+  description: ''
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 3ee16751541356b0e944a1e4e1fd5218
+  size: 9546
+  path: dataset_3013_un_population_scenarios_values.feather

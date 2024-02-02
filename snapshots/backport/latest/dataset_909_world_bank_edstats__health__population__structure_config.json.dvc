@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/909
+    date_accessed: 2023-08-11 07:36:45.078673
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_909_world_bank_edstats__health__population__structure
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 15cbb6e253ab27a437b86833e33b2dcd
+  size: 24037
+  path: dataset_909_world_bank_edstats__health__population__structure_config.json

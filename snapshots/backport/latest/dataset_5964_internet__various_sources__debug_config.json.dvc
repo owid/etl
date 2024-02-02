@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5964
+    date_accessed: 2023-08-16 08:12:47.411275
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_5964_internet__various_sources__debug
+  description: ''
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: bd750916f11c9b3ad58536b6d40784c1
+  size: 2177
+  path: dataset_5964_internet__various_sources__debug_config.json

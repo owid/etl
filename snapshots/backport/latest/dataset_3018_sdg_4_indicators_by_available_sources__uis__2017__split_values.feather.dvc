@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/3018
+    date_accessed: 2023-08-16 08:52:26.398211
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: SDG 4 indicators by available sources (UIS (2017)) (split)
+  description: ''
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 57f24a90e544cd89671fb81bcb23074c
+  size: 6306
+  path: 
+    dataset_3018_sdg_4_indicators_by_available_sources__uis__2017__split_values.feather

@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/654
+    date_accessed: 2023-08-16 07:17:23.956813
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Dietary macronutrient compositions - FAO (2017)
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 5839fbc812c0c247dedbcce4511d3118
+  size: 561074
+  path: dataset_654_dietary_macronutrient_compositions__fao__2017_values.feather

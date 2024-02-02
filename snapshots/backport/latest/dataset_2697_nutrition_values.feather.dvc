@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2697
+    date_accessed: 2023-08-16 10:25:52.241450
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Nutrition
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 8720fa8e882cd4dff2a9fcbb8372eb61
+  size: 13850
+  path: dataset_2697_nutrition_values.feather

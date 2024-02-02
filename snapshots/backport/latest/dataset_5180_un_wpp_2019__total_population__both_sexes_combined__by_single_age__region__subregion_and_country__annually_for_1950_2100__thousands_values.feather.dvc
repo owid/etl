@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5180
+    date_accessed: 2023-08-16 10:40:29.760975
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: UN WPP 2019 - Total population (both sexes combined) by single age, region,
+    subregion and country, annually for 1950-2100 (thousands)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 05cb872a669c8b15aed76f249eb33089
+  size: 19830994
+  path: 
+    dataset_5180_un_wpp_2019__total_population__both_sexes_combined__by_single_age__region__subregion_and_country__annually_for_1950_2100__thousands_values.feather

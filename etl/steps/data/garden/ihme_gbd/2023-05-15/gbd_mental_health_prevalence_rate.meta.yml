@@ -34,16 +34,19 @@ tables:
         description: >-
           Share of population with anxiety disorders. This is estimated as the total share of cases with anxiety disorders relative to the population of a country.
         unit: "%"
+        short_unit: "%"
       share_bipolar_disorders:
         title: Bipolar disorders (share of population)
         description: >-
           Share of population with a bipolar disorder. This is estimated as the total number of cases with bipolar disorder relative to the population of a country.
         unit: "%"
+        short_unit: "%"
       share_depressive_disorders:
         title: Depressive disorders (share of population)
         description: >-
           Share of population with depressive disorders. This is estimated as the total number of cases with depresive disorders relative to the population of a country.
         unit: "%"
+        short_unit: "%"
       share_eating_disorders:
         title: Eating disorders (share of population)
         description: >-
@@ -52,8 +55,10 @@ tables:
 
           This indicator only includes anorexia nervosa and bulimia nervosa (i.e. it does not include binge eating disorder and other specified feeding or eating disorder (OSFED)).
         unit: "%"
+        short_unit: "%"
       share_schizophrenia_disorders:
         title: Schizophrenia disorders (share of population)
         description: >-
           Share of population with schizophrenia. This is estimated as the total number of cases with schizophrenia relative to the population of a country.
         unit: "%"
+        short_unit: "%"

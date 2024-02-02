@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2640
+    date_accessed: 2023-08-16 08:19:32.248870
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2640_health__revenues_of_health_care_financing_schemes
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: ac43022d8ecf1f1a082042417580b459
+  size: 19169
+  path: dataset_2640_health__revenues_of_health_care_financing_schemes_config.json

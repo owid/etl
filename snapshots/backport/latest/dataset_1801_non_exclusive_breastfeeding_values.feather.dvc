@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1801
+    date_accessed: 2023-08-16 09:36:04.585619
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Non-exclusive breastfeeding
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 283b6fca0520813db78ce57ff12be01e
+  size: 541954
+  path: dataset_1801_non_exclusive_breastfeeding_values.feather

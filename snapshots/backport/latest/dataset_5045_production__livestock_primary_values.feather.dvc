@@ -1,0 +1,45 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5045
+    date_accessed: 2023-08-16 08:51:44.094213
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: 'Production: Livestock Primary'
+  description: 'The dataset contains the following commodities and commodity aggregates
+    thereof : Beeswax; Eggs (various types); Hair, horse; Hides buffalo, fresh; Hides,
+    cattle, fresh; Honey, natural; Meat indigenous (ass, bird nes, buffalo, camel,
+    cattle, chicken, duck, geese, goat, horse, mule, other camelids, pig, rabbit,
+    rodents, sheep, turkey); Meat (ass, bird nes, buffalo, camel, cattle, chicken,
+    duck, game, goat, goose and guinea fowl, horse, mule, Meat nes, meat other camelids,
+    Meat other rodents, pig, rabbit, sheep, turkey); Milk (buffalo, camel, cow, goat,
+    sheep); Offals, nes; Silk-worm cocoons, reelable; Skins, furs; Skins (goat, sheep);
+    Snails, not sea; Wool, greasy.Meat: Data relate to animals slaughtered within
+    national boundaries, irrespective of their origin. All data shown relate to total
+    meat production, that is, from both commercial and farm slaughter. Data are given
+    in terms of dressed carcass weight, excluding offal and slaughter fats. Production
+    of beef and buffalo meat includes veal; mutton and goat meat includes meat from
+    lambs and kids; pig meat includes bacon and ham in fresh equivalent. Poultry meat
+    includes meat from all domestic birds and refers, wherever possible, to ready-to-cook
+    weight. Data on poultry-meat production reported by national statistical offices
+    could be expressed in terms of either live weight, eviscerated weight, ready-to-cook
+    weight or dressed weight. Data for countries reporting in other than ready-to-cook
+    weight have been converted into the ready-to-cook equivalent.Milk: Data on milk
+    production relate to total production of whole fresh milk, excluding the milk
+    sucked by young animals but including amounts fed to livestock. Eggs: Some countries
+    have no statistics on egg production, and estimates had to be derived from such
+    related data as chicken or total poultry numbers and reported or assumed rates
+    of egg laying. Most of the countries that have statistics on egg production report
+    either the total weight of eggs or the numbers of eggs produced. Data generally
+    refer to total production, including eggs for hatching, in both agricultural and
+    non-agricultural sectors.Wool: Wool production statistics are generally given
+    for greasy wool, which contains from 30 to 65 percent impurities. In order to
+    make figures comparable, data are also given on a degreased (scoured) basis.Honey:
+    Production data should cover the amount sold by beekeepers plus other recorded
+    collection of honey. The data presented in the table are incomplete, particularly
+    with regard to African and Asian countries.'
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: c0c8b8b0f534a6227e3afca21d05d85d
+  size: 4927370
+  path: dataset_5045_production__livestock_primary_values.feather

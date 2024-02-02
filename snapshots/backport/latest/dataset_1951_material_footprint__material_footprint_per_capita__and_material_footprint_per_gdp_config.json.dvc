@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1951
+    date_accessed: 2023-08-16 07:22:15.651724
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_1951_material_footprint__material_footprint_per_capita__and_material_footprint_per_gdp
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: f9d418b14f8cfcd184cfe98eec5c2b62
+  size: 6405
+  path: 
+    dataset_1951_material_footprint__material_footprint_per_capita__and_material_footprint_per_gdp_config.json

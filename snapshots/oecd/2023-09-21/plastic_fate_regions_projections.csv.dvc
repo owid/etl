@@ -1,0 +1,34 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/origin/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Global Plastics Outlook - Plastics waste by region and end-of-life fate
+      - projections
+    description: |-
+      This dataset provides estimates of plastics waste for the 15 global regions of the OECD ENV-Linkages model, detailed in the Annex of the OECD Global Plastics Outlook.
+
+      This dataset provides estimates of plastics waste per end-of-life fate after accounting for recycling losses and collected littering.
+
+      Plastic waste is calculated as a function of plastics use (in volumes), following Geyer, Jambeck and Law (2017), using a methodology based on lifespan distributions. Plastic waste is divided into different waste management streams (end-of-life fates) by applying end-of-life shares that vary across countries and that account for account for recycling losses and collected litter. The methodology to derive the end-of-life shares is explained in the Annex to the OECD Global Plastics Outlook.
+    date_published: 2023-05-05
+    description_snapshot: |-
+      This dataset offers projections between 2019 and 2060 of plastic waste across 15 global regions separated by end-of-life fate. The calculations of plastic waste consider volumes of plastic use, accounting for losses through recycling and collected litter, based on the methodology by Geyer, Jambeck, and Law (2017). The waste is categorized into diverse management streams or end-of-life fates, factoring in variations in end-of-life shares across different countries.
+
+    # Citation
+    producer: OECD
+    citation_full: OECD (2022), Global Plastics Outlook, https://stats.oecd.org/viewhtml.aspx?datasetcode=PLASTIC_WASTE_V2_1&lang=en, accessed on 21 September 2023
+
+    # Files
+    url_main: https://stats.oecd.org/viewhtml.aspx?datasetcode=PLASTIC_WASTE_V2_1&lang=en
+    date_accessed: 2023-09-21
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://www.oecd.org/termsandconditions
+wdir: ../../../data/snapshots/oecd/2023-09-21
+outs:
+- md5: d6339dcf73247ad6def7ab8c3fed3677
+  size: 207117
+  path: plastic_fate_regions_projections.csv

@@ -1,0 +1,25 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5019
+    date_accessed: 2023-08-16 08:34:31.444985
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: 'Emissions - Land Use: Forest Land'
+  description: Annual net CO2 emission/removal from Forest Land consist of net carbon
+    stock gain/loss in the living biomass pool (aboveground and belowground biomass)
+    associated with Forest and Net Forest Conversion. The FAOSTAT emissions database
+    is computed following Tier 1 IPCC 2006 Guidelines for National GHG Inventories
+    (http://www.ipcc-nggip.iges.or.jp/public/2006gl/index.html) and using area and
+    carbon stocks data compiled by countries in the FAO Global Forest Resource Assessments
+    (http://www.fao.org/forestry/fra/en/). GHG emissions are provided by country,
+    regions and special groups, with global coverage, relative to the period 1990-present
+    (with annual updates), expressed as net stock change Gg C, net emissions/removals
+    Gg CO2 and CO2eq, by forest or net forest conversion and by aggregate (forest
+    land). Implied emission factor for CO2 as well as activity data (area, net area
+    difference, total forest area and carbon stock in living biomass) are also given.
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: bb454eb676a628b2f2e131bad3bb4b7c
+  size: 221210
+  path: dataset_5019_emissions__land_use__forest_land_values.feather

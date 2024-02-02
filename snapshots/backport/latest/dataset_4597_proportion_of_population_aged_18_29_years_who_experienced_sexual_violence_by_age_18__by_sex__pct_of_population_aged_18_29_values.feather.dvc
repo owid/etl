@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4597
+    date_accessed: 2023-08-14 15:26:17.488701
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Proportion of population aged 18-29 years who experienced sexual violence
+    by age 18, by sex (% of population aged 18-29)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 43fa562b3e523dbfcbc5ae0542b50936
+  size: 8362
+  path: 
+    dataset_4597_proportion_of_population_aged_18_29_years_who_experienced_sexual_violence_by_age_18__by_sex__pct_of_population_aged_18_29_values.feather

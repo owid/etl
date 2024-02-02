@@ -1,0 +1,26 @@
+dataset:
+  title: Population (Experimental)
+  description: |-
+    This dataset is an experimental version of the population dataset.
+
+    The current Population OMM combines HYDE 3.2, Gapminder v7, and UN WPP 2020. In this version, we are:
+      - Updating HYDE 3.2 with HYDE 3.3.
+      - Replacing Gapminder v7 with Maddison.
+
+    Additionally, UN WPP 2024 is expected to be released later this year.
+
+tables:
+  population:
+    variables:
+      population:
+        title: Population (HYDE 3.3, Gapminder v7, UN WPP)
+      source:
+        title: Source (HYDE 3.3, Gapminder v7, UN WPP)
+
+  population_exp:
+    title: Population (Experimental)
+    variables:
+      population_exp:
+        title: Population (HYDE 3.3, Maddison, UN WPP)
+      source_exp:
+        title: Source (HYDE 3.3, Maddison, UN WPP)

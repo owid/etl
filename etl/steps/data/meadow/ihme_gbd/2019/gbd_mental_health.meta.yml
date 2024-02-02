@@ -5,7 +5,7 @@ dataset:
     GBD research incorporates both the prevalence of a given disease or risk factor and the relative harm it causes. With these tools, decision-makers can compare different health issues and their effects.
   sources:
     -
-      name: Global Burden of Disease Study (2019) - Child mortality
+      name: IHME, Global Burden of Disease Study (2019)
       published_by: Institute of Health Metrics and Evaluation
 
 tables:

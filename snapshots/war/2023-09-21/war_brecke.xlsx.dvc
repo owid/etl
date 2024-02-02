@@ -1,0 +1,37 @@
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Conflict Catalog
+    date_published: 1999-10-08
+    description: |-
+      The Conflict Catalog is a dataset by Dr Peter Brecke. Brecke says that "the Conflict Catalog within that Excel file is an unfinished product." and that considering the data that he has "that is not yet in the Conflict Catalog, [he] can easily believe the catalog growing by 20% or more."
+
+      This dataset contains all violent conflicts at any location in the world since 1400 AD (Brecke 1999: 4). This year has been chosen because data earlier was even more flawed: “The 1400 AD temporal threshold corresponds to the one set by Luard (1987), lies between significant dates for Chinese (1366) and European and American (1492) populations, and demarcates a point before which the quality and extent of data about many parts of the world drop off precipitously (Brecke 1999: 4).
+
+
+      You can find more notes at https://bpb-us-w2.wpmucdn.com/sites.gatech.edu/dist/1/19/files/2018/09/Notes-about-Conflict-Catalog.pdf
+
+    # Citation
+    producer: Brecke
+    citation_full: |-
+      Brecke, P. (1999, October). Violent conflicts 1400 AD to the
+      present in different regions of the world. In 1999 Meeting of the Peace Science
+      Society.
+    attribution: Brecke - Conflict Catalog (1999)
+
+    # Files
+    url_main: https://brecke.inta.gatech.edu/research/conflict/
+    url_download:
+      https://brecke.inta.gatech.edu/wp-content/uploads/sites/19/2018/09/Conflict-Catalog-18-vars.xlsx
+    date_accessed: 2023-09-21
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://creativecommons.org/licenses/by/4.0/
+
+wdir: ../../../data/snapshots/war/2023-09-21
+outs:
+- md5: 9cde671ca772b63bc2acff936c4a8e9f
+  size: 308092
+  path: war_brecke.xlsx

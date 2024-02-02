@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2656
+    date_accessed: 2023-08-14 05:35:05.639981
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2656_social_protection_and_well_being__better_life_index__edition_2017
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: b74dd9777265ee954d31efae1523201f
+  size: 69921
+  path: 
+    dataset_2656_social_protection_and_well_being__better_life_index__edition_2017_config.json

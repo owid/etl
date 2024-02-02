@@ -1,18 +1,15 @@
 meta:
-  namespace: backport
-  short_name: dataset_5190_female_intimate_partner_violence__ihme__2017_config
-  file_extension: json
-  date_accessed: 2023-06-01 12:39:10.922249
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5190
+    date_accessed: 2023-08-10 08:26:10.404182
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_5190_female_intimate_partner_violence__ihme__2017
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/5190
-  source_published_by: Our World in Data catalog backport
   is_public: false
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 0ac6ce9f591e8724039ba02e816833e7
-  size: 1950
+- md5: 983d48f3af5fd53eb08862b9a16e2aa4
+  size: 2142
   path: dataset_5190_female_intimate_partner_violence__ihme__2017_config.json

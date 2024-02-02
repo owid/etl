@@ -1,19 +1,15 @@
 meta:
-  namespace: backport
-  short_name: dataset_305_corruption_perception_index__transparency_international__2018_values
-  file_extension: feather
-  date_accessed: 2023-06-01 14:56:35.358077
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/305
+    date_accessed: 2023-08-10 09:17:00.886100
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Corruption Perception Index - Transparency International (2018)
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/305
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 2c01824ef87f4999ab2ddbb5141e2758
+- md5: 8075feb0cddb85780bb1f6e0784e72b1
   size: 16050
   path: 
     dataset_305_corruption_perception_index__transparency_international__2018_values.feather

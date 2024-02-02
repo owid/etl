@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/798
+    date_accessed: 2023-08-14 14:39:49.610497
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: 'Prices: Producer Price Indices - Annual - FAO (2017)'
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: b7c42306ff043564eb2ecc4e4b212bb0
+  size: 1646146
+  path: dataset_798_prices__producer_price_indices__annual__fao__2017_values.feather

@@ -1,0 +1,36 @@
+meta:
+  origin:
+    # Data product / Snapshot
+    title: History Database of the Global Environment
+    description: |-
+      This database presents an update and expansion of the History Database of the Global Environment (HYDE, v 3.3) and replaces former HYDE 3.2 version from 2017. HYDE is and internally consistent combination of updated historical population estimates and land use. Categories include cropland, with a new distinction into irrigated and rain fed crops (other than rice) and irrigated and rain fed rice. Also grazing lands are provided, divided into more intensively used pasture, converted rangeland and non-converted natural (less intensively used) rangeland. Population is represented by maps of total, urban, rural population and population density as well as built-up area. The period covered is 10 000 BCE to 2023 CE. Spatial resolution is 5 arc minutes (approx. 85 km2 at the equator), the files are in ESRI ASCII grid format.
+    date_published: 2023-11-30
+    version_producer: 3.3
+    title_snapshot: History Database of the Global Environment - General files
+    description_snapshot: |-
+      This file contains multiple files, including one that maps country codes to country names.
+
+    # Citation
+    producer: PBL Netherlands Environmental Assessment Agency
+    citation_full: |-
+      Utrecht University/PBL Netherlands Environmental Assessment Agency - History Database of the Global Environment (HYDE v 3.3, 2023).
+      Klein Goldewijk, C.G.M., Beusen, A., Doelman, J., Stehfest, E., 2017, Anthropogenic land use estimates for the Holocene – HYDE 3.2, Earth Syst. Sci. Data, 9, 927–953
+    attribution: HYDE (2023)
+    attribution_short: HYDE
+
+    # Files
+    url_main: https://doi.org/10.24416/UU01-AEZZIT
+    url_download:
+      https://geo.public.data.uu.nl/vault-hyde/HYDE%203.3%5B1701183392%5D/original/general_files.zip
+    date_accessed: 2024-01-02
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://doi.org/10.24416/UU01-AEZZIT
+
+wdir: ../../../data/snapshots/hyde/2024-01-02
+outs:
+- md5: 796beac7d8bd258a010b373fe7d2152a
+  size: 3539246
+  path: general_files.zip

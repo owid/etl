@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4418
+    date_accessed: 2023-08-16 09:42:23.202196
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Proportion of population living below the national poverty line (%)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 8bcddfccfc8b87778fc5554c1b328380
+  size: 19522
+  path: 
+    dataset_4418_proportion_of_population_living_below_the_national_poverty_line__pct_values.feather

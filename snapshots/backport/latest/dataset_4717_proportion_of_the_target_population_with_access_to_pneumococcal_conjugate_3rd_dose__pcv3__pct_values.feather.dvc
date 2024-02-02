@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4717
+    date_accessed: 2023-08-10 14:58:30.105363
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Proportion of the target population with access to pneumococcal conjugate
+    3rd dose (PCV3) (%)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: b09eed5e24d6d3e72509ad6847e15d64
+  size: 16290
+  path: 
+    dataset_4717_proportion_of_the_target_population_with_access_to_pneumococcal_conjugate_3rd_dose__pcv3__pct_values.feather

@@ -1,7 +1,7 @@
 import json
 from pathlib import Path
 
-import pandas as pd
+from owid.catalog import Table
 from pandas.api.types import CategoricalDtype
 
 with open(Path(__file__).parent / "un_wpp.countries.json") as f:
@@ -61,17 +61,22 @@ dtypes = {
     "age": CategoricalDtype(categories=ages),
     "variant": CategoricalDtype(
         categories=[
-            "estimates",
-            "medium",
-            "high",
-            "low",
             "constant fertility",
-            "instant replacement",
-            "zero migration",
             "constant mortality",
-            "no change",
-            "momentum",
+            "estimates",
+            "high",
+            "instant replacement",
             "instant replacement zero migration",
+            "low",
+            "lower 80 pi",
+            "lower 95 pi",
+            "median pi",
+            "medium",
+            "momentum",
+            "no change",
+            "upper 80 pi",
+            "upper 95 pi",
+            "zero migration",
         ]
     ),
     "metric": CategoricalDtype(categories=metrics),
@@ -82,7 +87,7 @@ dtypes_simple = {
 }
 
 
-def optimize_dtypes(df: pd.DataFrame, simple: bool = False) -> pd.DataFrame:
+def optimize_dtypes(df: Table, simple: bool = False) -> Table:
     if simple:
         return df.astype(dtypes_simple)
     return df.astype(dtypes)

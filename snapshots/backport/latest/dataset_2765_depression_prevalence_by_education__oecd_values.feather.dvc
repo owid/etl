@@ -1,18 +1,14 @@
 meta:
-  namespace: backport
-  short_name: dataset_2765_depression_prevalence_by_education__oecd_values
-  file_extension: feather
-  date_accessed: 2023-02-23 17:28:43.800477
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2765
+    date_accessed: 2023-08-10 08:33:40.391299
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Depression prevalence by education - OECD
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/2765
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: d2c735ea5a095abc3b8138f669fff26a
+- md5: 13ffa33bac8c1d15f9c4c546ab45057b
   size: 8394
   path: dataset_2765_depression_prevalence_by_education__oecd_values.feather

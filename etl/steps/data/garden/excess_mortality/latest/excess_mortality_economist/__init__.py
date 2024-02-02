@@ -12,15 +12,23 @@ paths = PathFinder(__file__)
 
 
 def run(dest_dir: str) -> None:
-    ds_meadow = paths.load_dataset_dependency()
+    ds_meadow = paths.load_dataset()
 
-    tb = cast(Table, ds_meadow["excess_mortality_economist"].astype({"country": str}))
+    tb = ds_meadow["excess_mortality_economist"]
+
+    # Set index
+    tb = tb.reset_index()
+    # Set type
+    tb = tb.astype({"country": str})
 
     regions = cast(Dataset, paths.load_dependency("regions"))["regions"]
 
     tb = _harmonize_countries(tb, regions)
 
     tb = cast(Table, tb.drop(columns=["known_excess_deaths"]))
+
+    # Set index
+    tb = tb.set_index(["country", "date"], verify_integrity=True)
 
     #
     # Save outputs.

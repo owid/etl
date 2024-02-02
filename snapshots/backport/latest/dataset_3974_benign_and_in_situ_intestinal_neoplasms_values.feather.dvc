@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/3974
+    date_accessed: 2023-08-10 14:33:52.731703
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Benign and in situ intestinal neoplasms
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: fbafbac0757990d4cfe5ec64e05810d6
+  size: 32234
+  path: dataset_3974_benign_and_in_situ_intestinal_neoplasms_values.feather

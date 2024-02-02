@@ -1,0 +1,21 @@
+meta:
+  source:
+    name: CO2 emissions of transport modes (UK Government)
+    url: 
+      https://www.gov.uk/government/publications/greenhouse-gas-reporting-conversion-factors-2022
+    source_data_url: 
+      https://docs.google.com/spreadsheets/d/e/2PACX-1vQdPQzEhhLdpBGTqx1MV17TLlnjKuAvYRUy5q7lu55DlgIc815en-MqzEZ80QQutjr9OxALoQF-ryqf/pub?output=csv
+    date_accessed: '2023-12-06'
+    publication_year: '2022'
+    published_by: UK Government, Department for Energy Security and Net Zero
+  name: Transport CO2 emissions by mode (UK Government)
+  description: This provides the estimated greenhouse gas emissions factor for different
+    transport modes, as provided by the UK Government's Department for Energy Security
+    and Net Zero. It is based on average emissions of transport modes in the UK, based
+    on standard vehicle standards and the UK's electricity mix.
+  license: {}
+wdir: ../../../data/snapshots/fasttrack/latest
+outs:
+- md5: 5f5b4103dafa16ccf88b09852747cfaa
+  size: 483
+  path: transport_co2_emissions_modes.csv

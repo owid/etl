@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4816
+    date_accessed: 2023-08-16 08:32:32.377949
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Proportion of countries with high level of users/communities participating
+    in planning programs in water resources planning and management (%)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 7dced4ba448d8041e8ec1e10b202c4fc
+  size: 7010
+  path: 
+    dataset_4816_proportion_of_countries_with_high_level_of_users_communities_participating_in_planning_programs_in_water_resources_planning_and_management__pct_values.feather

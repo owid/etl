@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1564
+    date_accessed: 2023-08-10 14:30:33.379903
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Pancreatitis
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: f2c44dd93116fcb14c463ab810dea441
+  size: 2012042
+  path: dataset_1564_pancreatitis_values.feather

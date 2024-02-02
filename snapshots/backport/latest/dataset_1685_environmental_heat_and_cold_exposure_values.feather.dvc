@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1685
+    date_accessed: 2023-08-16 08:47:31.902750
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Environmental heat and cold exposure
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 67ce328e53656bd32b81b9264d1ad3e7
+  size: 2012058
+  path: dataset_1685_environmental_heat_and_cold_exposure_values.feather

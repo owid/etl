@@ -1,0 +1,24 @@
+meta:
+  origin:
+    title: How Was Life? Global Well-being since 1820 - Education
+    description: |-
+      The dataset contains two key indicators to describe global educational inequalities since 1820: literacy rates and years of schooling. These indicators are derived from merging two major datasets, primarily based on population census data. The dataset provides an extensive historical perspective on education and its evolution over time.
+    date_published: '2014'
+    version_producer: '2014'
+
+    producer: van Zanden, J. et al.
+    citation_full: |-
+      van Zanden, J., et al. (eds.) (2014), How Was Life?: Global Well-being since 1820, Education, OECD Publishing, Paris. Available at https://www.oecd-ilibrary.org/economics/how-was-life/education-since-1820_9789264214262-9-en. Accessed on 14th August 2023.
+
+    url_main:
+      https://www.oecd-ilibrary.org/economics/how-was-life/education-since-1820_9789264214262-9-en
+    date_accessed: 2023-08-14
+
+    license:
+      name: Creative Commons BY 4.0
+      url: https://www.oecd.org/termsandconditions/
+wdir: ../../../data/snapshots/education/2023-08-14
+outs:
+- md5: 645a3e3e3da92358028299524cbc5c85
+  size: 14413
+  path: oecd_education.csv

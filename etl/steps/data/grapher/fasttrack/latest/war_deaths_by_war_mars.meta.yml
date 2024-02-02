@@ -1,0 +1,31 @@
+dataset:
+  title: War Deaths by War — Project Mars
+  description: >-
+    This dataset records new data on 229 unique belligerents in 252 conventional wars fought between 1800 and 2011. Project
+    Mars introduces new data about these belligerents, including their level of prewar military inequality, and new measures
+    of battlefield performance, including desertion, defection, and fratricidal violence. The latest version is Version 1.1.
+    (2022-02-08).
+
+
+    You can find more details on the dataset in its notes at https://web.archive.org/web/20230717140532/https://dataverse.harvard.edu/file.xhtml?fileId=5857673&version=2.0
+  licenses:
+    - {}
+tables:
+  war_deaths_by_war_mars:
+    variables:
+      war_deaths_low:
+        title: War deaths (lower estimate)
+        unit: deaths
+        description: The low estimate of the number of deaths over the duration of this war. Deaths of combatants due to fighting
+          are included.
+      war_deaths_high:
+        title: War deaths (higher estimate)
+        unit: deaths
+        description: The high estimate of the number of deaths over the duration of this war. Deaths of combatants due to
+          fighting are included.
+      civil_war:
+        title: Civil war
+        unit: ''
+        description: The indicator distinguishes between civil and interstate wars. A civil war is a conflict between combatants
+          that were previously part of the same state, but now at least one seeks control or secession. An interstate war
+          is a conflict between states.

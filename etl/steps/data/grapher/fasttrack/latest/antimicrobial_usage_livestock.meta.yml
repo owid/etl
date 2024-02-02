@@ -1,0 +1,20 @@
+dataset:
+  sources:
+  - name: Mulchandani et al. (2023)
+    published_by: 'Mulchandani, R., Wang, Y., Gilbert, M., & Van Boeckel, T. P. (2023). Global trends in antimicrobial use
+      in food-producing animals: 2020 to 2030. PLOS Global Public Health, 3(2), e0001305. https://doi.org/10.1371/journal.pgph.0001305'
+    publication_year: 2023
+    date_accessed: 2023-07-25
+    url: https://journals.plos.org/globalpublichealth/article?id=10.1371/journal.pgph.0001305
+tables:
+  antimicrobial_usage_livestock:
+    variables:
+      livestock_antimicrobial_usage_tonnes:
+        title: Antimicrobial usage in livestock (tonnes)
+        unit: ''
+      livestock_antimicrobial_usage_pcu_kg:
+        title: Antimicrobial usage in livestock (population corrected units, kg)
+        unit: ''
+      livestock_antimicrobial_usage_mgpcu:
+        title: Antimicrobial usage in livestock (mg per population corrected units)
+        unit: ''

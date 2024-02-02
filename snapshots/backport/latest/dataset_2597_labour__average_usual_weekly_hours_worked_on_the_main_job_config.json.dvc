@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2597
+    date_accessed: 2023-08-16 10:06:04.240053
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2597_labour__average_usual_weekly_hours_worked_on_the_main_job
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 17e940513e5a6c70cfd3cd7bd6e4af36
+  size: 125638
+  path: 
+    dataset_2597_labour__average_usual_weekly_hours_worked_on_the_main_job_config.json

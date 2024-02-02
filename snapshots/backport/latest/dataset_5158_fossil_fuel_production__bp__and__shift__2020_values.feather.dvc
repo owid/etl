@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5158
+    date_accessed: 2023-08-16 08:00:32.666691
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Fossil fuel production (BP & Shift (2020))
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 469600a18369027f3990889b7771fdf7
+  size: 392586
+  path: dataset_5158_fossil_fuel_production__bp__and__shift__2020_values.feather

@@ -1,18 +1,15 @@
 meta:
-  namespace: backport
-  short_name: dataset_2972_te_7_1_config
-  file_extension: json
-  date_accessed: 2023-02-23 16:31:46.832089
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2972
+    date_accessed: 2023-08-10 07:52:18.798220
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_2972_te_7_1
   description: core-econ.org
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/2972
-  source_published_by: Our World in Data catalog backport
   is_public: false
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 9fc29f3279b206daa95e744cba41ec07
-  size: 1643
+- md5: 5ab2beaba3b8ae1bc02aeb3b273beb5d
+  size: 1796
   path: dataset_2972_te_7_1_config.json

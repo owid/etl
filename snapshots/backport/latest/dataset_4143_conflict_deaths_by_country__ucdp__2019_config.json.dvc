@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4143
+    date_accessed: 2023-08-16 07:15:51.091945
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_4143_conflict_deaths_by_country__ucdp__2019 (archived)
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: ff0d6ae435fe7942059092dc55123510
+  size: 2318
+  path: dataset_4143_conflict_deaths_by_country__ucdp__2019_config.json

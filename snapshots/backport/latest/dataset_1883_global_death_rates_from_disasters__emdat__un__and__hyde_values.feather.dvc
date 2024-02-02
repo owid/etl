@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1883
+    date_accessed: 2023-08-16 10:24:43.162270
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Global death rates from disasters (EMDAT; UN & HYDE)
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: d7e1dafd0e7e0120cd2a142dd5674cd1
+  size: 11506
+  path: 
+    dataset_1883_global_death_rates_from_disasters__emdat__un__and__hyde_values.feather

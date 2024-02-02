@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2606
+    date_accessed: 2023-08-10 13:06:58.124865
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Labour - Average annual wages
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: e7aff0f9b51b6dc11eac869dfc2c9106
+  size: 19642
+  path: dataset_2606_labour__average_annual_wages_values.feather

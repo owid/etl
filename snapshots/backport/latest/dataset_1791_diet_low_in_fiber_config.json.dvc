@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1791
+    date_accessed: 2023-08-14 15:22:09.381256
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1791_diet_low_in_fiber (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 235606a956a59aa64a8c6ac6bfa5c1d4
+  size: 21828
+  path: dataset_1791_diet_low_in_fiber_config.json

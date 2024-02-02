@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2006
+    date_accessed: 2023-08-16 10:13:54.366670
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_2006_coverage_by_protected_areas_of_important_sites_for_mountain_biodiversity
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 27cfe785c5f2b99ed61af08c401057a9
+  size: 8434
+  path: 
+    dataset_2006_coverage_by_protected_areas_of_important_sites_for_mountain_biodiversity_config.json

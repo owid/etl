@@ -1,0 +1,107 @@
+dataset:
+  update_period_days: 365
+  sources: []
+
+definitions:
+  common:
+    sources: []
+    origins:
+      - producer: Global Carbon Project
+        title: Global Carbon Budget
+        description: |
+          The Global Carbon Budget 2022 has over 105 contributors from 80 organizations and 18 countries. It was founded by the Global Carbon Project international science team to track the trends in global carbon emissions and sinks and is a key measure of progress towards the goals of the Paris Agreement. It's widely recognized as the most comprehensive report of its kind. The 2022 report was published at COP27 in Egypt on Friday 11th November.
+        citation_full: |
+          Friedlingstein, P., O'Sullivan, M., Jones, M. W., Andrew, R. M., Gregor, L., Hauck, J., Le Quéré, C., Luijkx, I. T., Olsen, A., Peters, G. P., Peters, W., Pongratz, J., Schwingshackl, C., Sitch, S., Canadell, J. G., Ciais, P., Jackson, R. B., Alin, S. R., Alkama, R., Arneth, A., Arora, V. K., Bates, N. R., Becker, M., Bellouin, N., Bittig, H. C., Bopp, L., Chevallier, F., Chini, L. P., Cronin, M., Evans, W., Falk, S., Feely, R. A., Gasser, T., Gehlen, M., Gkritzalis, T., Gloege, L., Grassi, G., Gruber, N., Gürses, Ö., Harris, I., Hefner, M., Houghton, R. A., Hurtt, G. C., Iida, Y., Ilyina, T., Jain, A. K., Jersild, A., Kadono, K., Kato, E., Kennedy, D., Klein Goldewijk, K., Knauer, J., Korsbakken, J. I., Landschützer, P., Lefèvre, N., Lindsay, K., Liu, J., Liu, Z., Marland, G., Mayot, N., McGrath, M. J., Metzl, N., Monacci, N. M., Munro, D. R., Nakaoka, S.-I., Niwa, Y., O'Brien, K., Ono, T., Palmer, P. I., Pan, N., Pierrot, D., Pocock, K., Poulter, B., Resplandy, L., Robertson, E., Rödenbeck, C., Rodriguez, C., Rosan, T. M.,
+          Schwinger, J., Séférian, R., Shutler, J. D., Skjelvan, I., Steinhoff, T., Sun, Q., Sutton, A. J., Sweeney, C., Takao, S., Tanhua, T., Tans, P. P., Tian, X., Tian, H., Tilbrook, B., Tsujino, H., Tubiello, F., van der Werf, G. R., Walker, A. P., Wanninkhof, R., Whitehead, C., Willstrand Wranne, A., Wright, R., Yuan, W., Yue, C., Yue, X., Zaehle, S., Zeng, J., and Zheng, B.: Global Carbon Budget 2022, Earth Syst. Sci. Data, 14, 4811-4900, https://doi.org/10.5194/essd-14-4811-2022,
+          2022.
+        url_main: https://globalcarbonbudget.org/
+        url_download: https://zenodo.org/record/7215364/files/GCB2022v27_MtCO2_flat.csv
+        date_accessed: '2023-04-28'
+        date_published: '2022-11-11'
+        license:
+          name: CC BY 4.0
+          url: https://zenodo.org/record/7215364
+
+tables:
+  global_carbon_budget:
+    variables:
+      consumption_emissions_per_capita:
+        unit: tonnes per person
+        short_unit: t/person
+        title: Per capita consumption-based CO₂ emissions
+        description_short: |
+          Annual consumption-based emissions of carbon dioxide (CO₂), measured in tonnes per person.
+        description_processing: |
+          Consumption-based CO₂ emissions have been converted by Our World in Data from tonnes of carbon to tonnes of CO₂ using a conversion factor of 3.664.
+        display:
+          shortUnit: t
+          numDecimalPlaces: 0
+        description_key:
+          - Consumption-based emissions attribute the emissions generated in the production of goods and services according to where they were _consumed_, rather than where they were _produced_.
+          - "The data is calculated by adjusting 'production-based' emissions (emissions produced domestically) for trade: Consumption-based emissions equals production-based emissions, _minus_ emissions embedded in exports, _plus_ emissions embedded in imports."
+          - If a country's consumption-based emissions are higher than its production emissions it is a net importer of carbon dioxide. If its consumption-based emissions are lower, then it is a net exporter.
+          - Per capita emissions represent the emissions of an average person in a country or region - they are total emissions divided by population.
+          - Consumption-based emissions are not available for all countries because not all countries have sufficient, high-quality trade data. But those without complete data are a small fraction (3%) of the global total.
+          - This data measures Carbon dioxide (CO₂) emissions from fossil fuels and industry and does not include emissions from land use change, deforestation, soils, or vegetation.
+          - Emissions from international aviation and shipping are not included in any country or region's emissions. They are only included in the global total emissions.
+        presentation:
+          title_public: Per capita consumption-based CO₂ emissions
+          attribution_short: Global Carbon Project
+          topic_tags:
+            - CO2 & Greenhouse Gas Emissions
+            - Climate Change
+            - Energy
+          faqs:
+            - fragment_id: emissions-from-aviation-and-shipping
+              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+            - fragment_id: missing-consumption-based-emissions
+              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+          grapher_config:
+            title: Per capita consumption-based CO₂ emissions
+            subtitle: >-
+              [Consumption-based emissions](#dod:consumptionbasedemissions) are national
+              emissions that have been adjusted for trade. It's production-based emissions
+              minus emissions embedded in exports, plus emissions embedded in imports.
+            hideAnnotationFieldsInTitle:
+              time: true
+              entity: true
+              changeInPrefix: true
+            minTime: 1990
+            hideRelativeToggle: false
+            hasMapTab: true
+            tab: map
+            originUrl: https://ourworldindata.org/co2-and-greenhouse-gas-emissions
+            yAxis:
+              min: 0
+              max: 0
+            colorScale:
+              binningStrategy: equalInterval
+            map:
+              colorScale:
+                baseColorScheme: Reds
+                binningStrategy: manual
+                # TODO: these intervals are not well chosen according to our map bracket guidelines
+                customNumericValues:
+                  - 1
+                  - 2.5
+                  - 5
+                  - 7.5
+                  - 10
+                  - 15
+                  - 20
+                  - 50
+                customNumericColors:
+                  - null
+                  - null
+            selectedEntityNames:
+              - United States
+              - United Kingdom
+              - European Union (27)
+              - China
+              - India
+              - Australia
+              - Brazil
+              - South Africa
+            relatedQuestions:
+              - url: https://ourworldindata.org/grapher/consumption-co2-per-capita#faqs
+                text: FAQs on this data

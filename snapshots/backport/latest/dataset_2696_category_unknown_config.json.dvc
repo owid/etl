@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2696
+    date_accessed: 2023-08-14 14:37:47.875162
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2696_category_unknown (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 51d930951ceccebb5e772f6928595962
+  size: 72410
+  path: dataset_2696_category_unknown_config.json

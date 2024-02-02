@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2745
+    date_accessed: 2023-08-14 05:39:19.356708
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: UN WPP - Interpolated male population by broad age group, region, subregion
+    and country, annually for 1950-2100 (thousands)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 64c18a9b045c6355ea7642ede9105ca4
+  size: 12019770
+  path: 
+    dataset_2745_un_wpp__interpolated_male_population_by_broad_age_group__region__subregion_and_country__annually_for_1950_2100__thousands_values.feather

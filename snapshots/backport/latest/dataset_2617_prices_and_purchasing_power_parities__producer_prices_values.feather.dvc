@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2617
+    date_accessed: 2023-08-16 07:24:33.234588
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Prices and Purchasing Power Parities - Producer Prices
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: f676f7e7ecfa44bda4a3d85315e58a7d
+  size: 24762
+  path: 
+    dataset_2617_prices_and_purchasing_power_parities__producer_prices_values.feather

@@ -1,0 +1,33 @@
+meta:
+  name: Antimicrobial usage in livestock
+  description: This dataset estimates the usage of antimicrobials in livestock (cattle,
+    sheep, chicken, and pigs) by country. Data on antimicrobials comes from government
+    reports, surveillance systems and national surveys. In addition, the authors estimate
+    the biomass of livestock in the country, to adjust for differences in antimicrobial
+    usage by animal size. Biomass data comes from the Food and Agriculture Organization
+    (FAO). 'The PCU represents the total number of animals in a country (alive or
+    slaughtered), multiplied by the average weight of the animal at the time of treatment.
+    Therefore, the PCU is a standardization metric that accounts for differences in
+    animal weight, and number of production cycles per year between countries.' Therefore,
+    mg/PCU refers to the usage of antimicrobials per animal population-corrected unit.
+  source:
+    name: Google Sheet
+    description:
+    url: 
+      https://journals.plos.org/globalpublichealth/article?id=10.1371/journal.pgph.0001305
+    source_data_url: 
+      gAAAAABkx3_ZrECpU1RI6tcJPiqDvqB2RKAZEsofB7GToYg6Vsw-LANlBdEgn1IxkrXt-La91vsraylCA313XJ_3HlggZ9aLs42krkNJwtDpi8I31JdQoiZg5lPB_m9w4Kx0dab4AgKjPhsnX8Y1-YoOw0-uSgkyigp2-gdc0mBZ6XknkcRp-53G1AZamnOn-9p8kKzkuzmqYv6ISc3tPI12oPqWZSBSM1UzFW1QRmM8VwTqtE1WqAGly3iX3yIPQUzV_E5tu2vI
+    owid_data_url:
+    date_accessed: '2023-07-31'
+    publication_date:
+    publication_year: 2023
+    published_by: Google Sheet
+  license:
+    name:
+    url:
+  is_public: false
+wdir: ../../../data/snapshots/fasttrack/latest
+outs:
+- md5: 2e79d5ae8ead88349c544d2e7b4b5ca2
+  size: 9186
+  path: antimicrobial_usage_livestock.csv

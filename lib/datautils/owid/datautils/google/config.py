@@ -14,9 +14,7 @@ SETTINGS_PATH = os.path.join(CONFIG_DIR, "google_settings.yaml")
 CREDENTIALS_PATH = os.path.join(CONFIG_DIR, "google_credentials.json")
 
 
-def google_config_init(
-    client_secrets_file: Union[str, Path], encoding: str = "utf8"
-) -> GoogleAuth:
+def google_config_init(client_secrets_file: Union[str, Path], encoding: str = "utf8") -> GoogleAuth:
     """Initialise Google configuration files.
 
     Uses `clients_secrets` to generate all the required Google configuration files: `SETTINGS_PATH`, `CREDENTIALS_PATH`.
@@ -51,10 +49,7 @@ def google_config_init(
     """
     # Check client_secrets
     if not os.path.isfile(client_secrets_file):
-        raise ValueError(
-            f"Credentials not found at {client_secrets_file}. Please provide a valid"
-            " path!"
-        )
+        raise ValueError(f"Credentials not found at {client_secrets_file}. Please provide a valid" " path!")
     # Check or create config directory
     if not os.path.isdir(CONFIG_DIR):
         os.makedirs(CONFIG_DIR, exist_ok=True)
@@ -99,15 +94,11 @@ def _check_google_config() -> None:
     """
     if not os.path.isdir(CONFIG_DIR):
         raise FileNotFoundError(
-            f"{CONFIG_DIR} folder is not created. Please check you have run"
-            " `google_config_init`!"
+            f"{CONFIG_DIR} folder is not created. Please check you have run" " `google_config_init`!"
         )
     for f in [CLIENT_SECRETS_PATH, CREDENTIALS_PATH, SETTINGS_PATH]:
         if not os.path.isfile(f):
-            raise FileNotFoundError(
-                f"{f} file was not found. Please check you have run"
-                " `google_config_init`!"
-            )
+            raise FileNotFoundError(f"{f} file was not found. Please check you have run" " `google_config_init`!")
 
 
 def is_google_config_init() -> bool:

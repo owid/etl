@@ -1,18 +1,14 @@
 meta:
-  namespace: backport
-  short_name: dataset_303_top_marginal_income_tax_rate__reynolds__2008_values
-  file_extension: feather
-  date_accessed: 2023-02-23 19:01:44.740655
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/303
+    date_accessed: 2023-08-10 07:42:22.912444
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Top marginal income tax rate – Reynolds (2008)
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/303
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 66ead56af6abf39e51feeb0c1f4fe303
+- md5: 9dcd9bbbae34065f0887e1cd71d50282
   size: 8218
   path: dataset_303_top_marginal_income_tax_rate__reynolds__2008_values.feather

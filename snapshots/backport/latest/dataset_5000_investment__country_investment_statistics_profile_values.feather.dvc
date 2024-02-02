@@ -1,0 +1,65 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5000
+    date_accessed: 2023-08-14 14:41:46.775127
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: 'Investment: Country Investment Statistics Profile'
+  description: The Country Investment Statistics Profile domain provides an overall
+    view of the information about investment in agriculture at country level. Data
+    are collected from other FAOSTAT domains, in particular from Investment and Macro
+    Indicators. The purpose is to give to the users a comprehensive dataset that allows
+    making comparison among the different flows to agriculture within each country.
+    The dataset consists of a time series of more than 200 countries, from 2001 onwards.
+    The information included regards the levels of central government expenditure
+    on agriculture, credit to agriculture, official development flows (commitment)
+    and foreign direct investment on agriculture. Besides the levels of investment
+    flows, the dataset also includes the information on agriculture value added and
+    agriculture gross fixed capital formation. Additional reported indicators are
+    -the share of total flow allocated to agriculture (for Government Expenditure
+    on Agriculture, Credit to Agriculture, Development Flows, Foreign direct Investment
+    to Agriculture), -the agriculture share of total GDP, -the agriculture share of
+    total gross fixed capital formation, -the agriculture orientation index (ratio
+    of the agriculture share of total flow, over the agriculture value added share
+    of total GDP) for Government Expenditure on Agriculture, Credit to Agriculture,
+    Development Flows to Agriculture, -the investment agriculture orientation index
+    (which is the ratio between the agriculture share of gross fixed capital formation
+    over the agriculture share of GDP), -the annual growth,-the investment ratio (ratio
+    between gross fixed capital formation over GDP),-the agriculture investment ratio
+    (ratio between agriculture gross fixed capital formation and agriculture value
+    added). Though the goal is to have complete and consistent coverage for all countries,
+    relatively low response rates for the different databases belonging to the investment
+    domain and country level differences in data collection and reporting creates
+    some challenges in providing a complete and consistent global dataset. The Country
+    Investment Statistics Profile domain provides an overall view of the information
+    about investment in agriculture at country level. Data are collected from other
+    FAOSTAT domains, in particular from Investment and Macro Indicators. The purpose
+    is to give to the users a comprehensive dataset that allows making comparison
+    among the different flows to agriculture within each country. The dataset consists
+    of a time series of more than 200 countries, from 2001 onwards. The information
+    included regards the levels of central government expenditure on agriculture,
+    credit to agriculture, official development flows (commitment) and foreign direct
+    investment on agriculture. Besides the levels of investment flows, the dataset
+    also includes the information on agriculture value added and agriculture gross
+    fixed capital formation. Additional reported indicators are -the share of total
+    flow allocated to agriculture (for Government Expenditure on Agriculture, Credit
+    to Agriculture, Development Flows, Foreign direct Investment to Agriculture),
+    -the agriculture share of total GDP, -the agriculture share of total gross fixed
+    capital formation, -the agriculture orientation index (ratio of the agriculture
+    share of total flow, over the agriculture value added share of total GDP) for
+    Government Expenditure on Agriculture, Credit to Agriculture, Development Flows
+    to Agriculture, -the investment agriculture orientation index (which is the ratio
+    between the agriculture share of gross fixed capital formation over the agriculture
+    share of GDP), -the annual growth,-the investment ratio (ratio between gross fixed
+    capital formation over GDP),-the agriculture investment ratio (ratio between agriculture
+    gross fixed capital formation and agriculture value added). Though the goal is
+    to have complete and consistent coverage for all countries, relatively low response
+    rates for the different databases belonging to the investment domain and country
+    level differences in data collection and reporting creates some challenges in
+    providing a complete and consistent global dataset.
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 0ed042e28bd68af69b551eba4c9d0e19
+  size: 347098
+  path: dataset_5000_investment__country_investment_statistics_profile_values.feather

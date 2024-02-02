@@ -1,18 +1,15 @@
 meta:
-  namespace: backport
-  short_name: dataset_5413_covid_19__deaths_by_vaccination_status__united_states_config
-  file_extension: json
-  date_accessed: 2023-05-02 13:02:47.399411
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5413
+    date_accessed: 2023-08-10 08:25:17.225827
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_5413_covid_19__deaths_by_vaccination_status__united_states
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/5413
-  source_published_by: Our World in Data catalog backport
   is_public: false
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 0b7f74fa254c05a7585a3e4bd039a642
-  size: 3331
+- md5: 5bdfa838ea434216a9f2c47cc5252435
+  size: 3732
   path: dataset_5413_covid_19__deaths_by_vaccination_status__united_states_config.json

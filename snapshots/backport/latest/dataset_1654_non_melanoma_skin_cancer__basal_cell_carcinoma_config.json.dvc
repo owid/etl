@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1654
+    date_accessed: 2023-08-16 10:29:43.101452
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1654_non_melanoma_skin_cancer__basal_cell_carcinoma
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 232e08d506294eeb3618894d50155e37
+  size: 17195
+  path: dataset_1654_non_melanoma_skin_cancer__basal_cell_carcinoma_config.json

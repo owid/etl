@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2605
+    date_accessed: 2023-08-16 09:35:05.183768
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Labour - Unemployment by duration
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: d89a99e15a70ff3c6aed8a4db5807885
+  size: 493074
+  path: dataset_2605_labour__unemployment_by_duration_values.feather

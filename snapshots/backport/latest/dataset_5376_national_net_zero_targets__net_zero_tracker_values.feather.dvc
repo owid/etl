@@ -1,18 +1,15 @@
 meta:
-  namespace: backport
-  short_name: dataset_5376_national_net_zero_targets__net_zero_tracker_values
-  file_extension: feather
-  date_accessed: 2023-06-01 14:54:18.377006
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5376
+    date_accessed: 2023-08-10 08:26:23.765539
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: National Net-Zero Targets (Net Zero Tracker)
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/5376
-  source_published_by: Our World in Data catalog backport
   is_public: false
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: abf53c418a562eb72090d94ec789f183
+- md5: 3bae896df08c38db6a4ec387655f02f5
   size: 12450
   path: dataset_5376_national_net_zero_targets__net_zero_tracker_values.feather

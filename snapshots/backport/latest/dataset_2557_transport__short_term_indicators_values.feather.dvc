@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2557
+    date_accessed: 2023-08-16 09:44:33.253641
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Transport - Short-term Indicators
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 0272347228be9392600f46f3eed25c57
+  size: 9050
+  path: dataset_2557_transport__short_term_indicators_values.feather

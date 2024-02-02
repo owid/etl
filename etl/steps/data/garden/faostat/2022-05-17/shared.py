@@ -1734,7 +1734,11 @@ def prepare_wide_table(data: pd.DataFrame) -> catalog.Table:
     # (which would cause issues when uploading to grapher).
     data["variable_name"] = dataframes.apply_on_categoricals(
         [data.item, data.item_code, data.element, data.element_code, data.unit],
-        lambda item, item_code, element, element_code, unit: f"{item} | {item_code} || {element} | {element_code} || {unit}",
+        lambda item,
+        item_code,
+        element,
+        element_code,
+        unit: f"{item} | {item_code} || {element} | {element_code} || {unit}",
     )
 
     # Construct a human-readable variable display name (which will be shown in grapher charts).
@@ -1924,7 +1928,6 @@ def run(dest_dir: str) -> None:
     data_table_long.metadata.title = dataset_garden_metadata.title
     data_table_long.metadata.description = dataset_garden_metadata.description
     data_table_long.metadata.primary_key = list(data_table_long.index.names)
-    data_table_long.metadata.dataset = dataset_garden_metadata
     # Add long table to the dataset (no need to repack, since columns already have optimal dtypes).
     dataset_garden.add(data_table_long, repack=False)
 

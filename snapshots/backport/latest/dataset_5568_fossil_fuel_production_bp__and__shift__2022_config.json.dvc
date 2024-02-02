@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5568
+    date_accessed: 2023-08-10 14:59:16.301082
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_5568_fossil_fuel_production_bp__and__shift__2022
+    (archived)
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 409b42b62e5966b98c5eb66997ce5ca2
+  size: 12229
+  path: dataset_5568_fossil_fuel_production_bp__and__shift__2022_config.json

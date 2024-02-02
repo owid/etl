@@ -1,0 +1,29 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5028
+    date_accessed: 2023-08-14 05:52:52.511011
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_5028_emissions__agriculture__agriculture_total
+    (archived)
+  description: Agriculture Total contains all the emissions produced in the different
+    agricultural emissions sub-domains (enteric fermentation, manure management, rice
+    cultivation, synthetic fertilizers, manure applied to soils, manure left on pastures,
+    crop residues, cultivation of organic soils,  burning of crop residues, burning
+    of savanna, energy use), providing a picture of the contribution to the total
+    amount of GHG emissions from agriculture. GHG emissions from agriculture consist
+    of non-CO2 gases, namely methane (CH4) and nitrous oxide (N2O), produced by crop
+    and livestock production and management activities.  The FAOSTAT emissions database
+    is computed following Tier 1 IPCC 2006 Guidelines for National GHG Inventories
+    (http://www.ipcc-nggip.iges.or.jp/public/2006gl/index.html). GHG emissions are
+    provided by country, regions and special groups, with global coverage, relative
+    to the period 1961-present (with annual updates) and with projections for 2030
+    and 2050, expressed as Gg CO2 and CO2eq (from CH4 and N2O), by underlying agricultural
+    emission sub-domain and by aggregate (agriculture total, agriculture total plus
+    energy, agricultural soils).
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 6ed84cfa7eb93bfc4de555627fc24206
+  size: 87729
+  path: dataset_5028_emissions__agriculture__agriculture_total_config.json

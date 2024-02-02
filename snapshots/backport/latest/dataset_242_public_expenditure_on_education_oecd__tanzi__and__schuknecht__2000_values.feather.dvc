@@ -1,18 +1,15 @@
 meta:
-  namespace: backport
-  short_name: dataset_242_public_expenditure_on_education_oecd__tanzi__and__schuknecht__2000_values
-  file_extension: feather
-  date_accessed: 2023-02-23 15:02:42.045959
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/242
+    date_accessed: 2023-09-27 06:57:25.915053
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Public Expenditure on Education OECD - Tanzi & Schuknecht (2000)
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/242
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 18fded7a6d1a9ff31698e527761adbd5
-  size: 7186
-  path: dataset_242_public_expenditure_on_education_oecd__tanzi__and__schuknecht__2000_values.feather
+- md5: ad263f4a8f71fd6e1d245497fb9e30d2
+  size: 7794
+  path: 
+    dataset_242_public_expenditure_on_education_oecd__tanzi__and__schuknecht__2000_values.feather

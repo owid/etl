@@ -25,11 +25,14 @@ dataset:
     publication_date: '2023-03-20'
     publication_year: 2023
     published_by: AIAAIC Repository (2022) via 2023 AI Index Reportvia the AI Index
-      2023 Annual Report,” AI Index Steering Committee, Institute for Human-Centered
+      2023 Annual Report, AI Index Steering Committee, Institute for Human-Centered
       AI, Stanford University, Stanford, CA, April 2023
 tables:
   ai_incidents:
     variables:
       number_of_ai_incidents_and_controversies:
-        title: Number of AI Incidents and Controversies (2012-2021)
+        title: Number of AI incidents and controversies
         unit: ''
+        display:
+          numDecimalPlaces: 0
+

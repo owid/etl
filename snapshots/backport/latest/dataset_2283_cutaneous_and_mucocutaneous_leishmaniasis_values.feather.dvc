@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2283
+    date_accessed: 2023-08-16 08:22:44.194885
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Cutaneous and mucocutaneous leishmaniasis
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 220317178b787e9125b58497f3d28330
+  size: 1066946
+  path: dataset_2283_cutaneous_and_mucocutaneous_leishmaniasis_values.feather

@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2054
+    date_accessed: 2023-08-14 15:45:44.748276
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Proportion and number of children aged 5‑17 years engaged in child labour,
+    by sex and age
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 2da70f0f3334b6ac0effa27a89160ed2
+  size: 25762
+  path: 
+    dataset_2054_proportion_and_number_of_children_aged_5_17_years_engaged_in_child_labour__by_sex_and_age_values.feather

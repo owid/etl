@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/3292
+    date_accessed: 2023-08-10 15:03:01.819172
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Other environmental risks
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: dc293d365dda42e57895f92f6918bfb7
+  size: 1173482
+  path: dataset_3292_other_environmental_risks_values.feather

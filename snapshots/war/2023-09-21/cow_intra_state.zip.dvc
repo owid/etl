@@ -1,0 +1,36 @@
+meta:
+  origin:
+    # Data product / Snapshot
+    title: War Data
+    date_published: 2020-04-06
+    description: |-
+      The COW Project introduced COW Wars v4.0, 1816-2007 in 2010. The paper [“The COW Typology of War: Defining and Categorizing Wars (Version 4 of the Data)](https://correlatesofwar.org/wp-content/uploads/COW-Website-Typology-of-war-v4.pdf)” by Meredith Reid Sarkees gives an overview of the COW war typology, the descriptions of the basic variables, coding rules and some of the changes since “Resort to Arms.” In March 2010, the New COW War List was released. On June 30, 2010, the Non-State War Data (v4.0) became available. On October 28, 2010, the Intra-State War Data (v4.0) was released and on April 6, 2020 the Intra-State War Data (v5.1) became available online. On March 1, 2011, the Inter-State War Data (v4.0) became available online. Finally, we released the Extra-State War Data (v4.0) on December 8, 2011.
+    title_snapshot: War data - Intra-State Wars
+    description_snapshot: |-
+      Version 5.1 of the Intra‐state war data represents an update of version 5.0 which was published as A GUIDE TO INTRA‐STATE WARS: An Examination of Civil, Regional, and Intercommunal Wars, 1816‐2014, by Jeffrey S. Dixon and Meredith Reid Sarkees. The primary attributes of Version 5.1 are that: it includes updated data on the intra-state wars from 1816-2014; and it includes wars that were omitted from the GUIDE due to publication errors. The dataset is composed of two files: Intra-state-Wars v.5.1.csv; and Intra‐state_state_participant_v5.1.csv. The first (Wars) provides summary information on each war, while the second file (state_participant) provides information on the war experience of each of the individual states involved.
+
+      You can find more notes at https://correlatesofwar.org/wp-content/uploads/Intra-StateWars_Codebook.pdf
+    version_producer: v5.1
+
+    # Citation
+    producer: Correlates of War
+    citation_full: |-
+      Sarkees, Meredith Reid and Frank Wayman (2010). Resort to War: 1816 – 2007. Washington DC: CQ Press.
+    attribution: Correlates of War - Wars (2020)
+    attribution_short: COW
+
+    # Files
+    url_main: https://correlatesofwar.org/data-sets/cow-war/
+    url_download: https://correlatesofwar.org/wp-content/uploads/Intra-State-Wars-v5.1.zip
+    date_accessed: 2023-09-21
+
+    # License
+    license:
+      name: Correlates of War terms
+      url: https://correlatesofwar.org/data-sets/
+
+wdir: ../../../data/snapshots/war/2023-09-21
+outs:
+- md5: 8e2911728de2e040b8e5c712f7fca7e5
+  size: 887487
+  path: cow_intra_state.zip

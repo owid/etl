@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5310
+    date_accessed: 2023-08-16 09:53:41.262952
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_5310_homeownership_rates__kohl_2017 (archived)
+  description: ''
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 9199c5bece754aae97830c8a0edc23af
+  size: 1807
+  path: dataset_5310_homeownership_rates__kohl_2017_config.json

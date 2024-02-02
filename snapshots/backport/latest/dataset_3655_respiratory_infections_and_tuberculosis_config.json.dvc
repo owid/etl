@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/3655
+    date_accessed: 2023-08-16 07:18:19.504518
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_3655_respiratory_infections_and_tuberculosis
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 081d4a2dece5861f4a812e771c2622b9
+  size: 33604
+  path: dataset_3655_respiratory_infections_and_tuberculosis_config.json

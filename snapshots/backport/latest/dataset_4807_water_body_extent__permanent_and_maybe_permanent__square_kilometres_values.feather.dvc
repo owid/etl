@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4807
+    date_accessed: 2023-08-16 10:32:59.897367
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Water body extent (permanent and maybe permanent) (square kilometres)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 5d5c9b3e68946cb40db43010dcf5330c
+  size: 40202
+  path: 
+    dataset_4807_water_body_extent__permanent_and_maybe_permanent__square_kilometres_values.feather

@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2037
+    date_accessed: 2023-08-11 07:57:31.148090
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Extent of use of country-owned results frameworks and planning tools by providers
+    of development cooperation
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: d95f0b1299923203f94013c5d3dc80a5
+  size: 11610
+  path: 
+    dataset_2037_extent_of_use_of_country_owned_results_frameworks_and_planning_tools_by_providers_of_development_cooperation_values.feather

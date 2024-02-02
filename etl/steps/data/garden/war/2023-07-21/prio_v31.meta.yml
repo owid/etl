@@ -1,0 +1,205 @@
+dataset:
+  title: History of war (PRIO v3.1, 2017)
+  description: |-
+    This dataset provides information on armed conflicts, using data from the PRIO Battledeaths Dataset (version 3.1).
+
+    We combine these datasets to provide information on the number of ongoing and new conflicts, the number of ongoing and new conflict types, as well as the number of deaths in ongoing conflicts and conflict types.
+
+    Deaths of combatants and civilians due to fighting are included.
+
+    We use the world regions as defined by PRIO: Africa, Americas, Asia, Europe, and Middle East. The regions are defined based on Gleditsch and Ward codes, as in "UCDP/PRIO Armed Conflict Dataset".
+    Find the complete mapping at http://ksgleditsch.com/data/iisystem.dat (states) and http://ksgleditsch.com/data/microstatessystem.dat (micro-states).
+
+      • Americas: 2-199
+
+      • Europe: 200-399
+
+      • Africa: 400-626
+
+      • Middle East: 630-699
+
+      • Asia and Oceania: 700-999
+
+    You can find more information about the data in our article: [To be published]
+
+definitions:
+  number_deaths_estimate: |-
+    <% if conflict_type == "all" %>
+    The << estimate >> estimate of the number of deaths in ongoing state-based conflicts in each year. This includes interstate, intrastate, and extrasystemic conflicts.
+
+    A state-based conflict is a conflict between states, or between a state and a non-state armed group, that causes at least 25 deaths during a year.
+    <% elif conflict_type == "interstate" %>
+    The << estimate >> estimate of the number of deaths in ongoing interstate conflicts in each year.
+
+    An interstate conflict is a conflict between states that causes at least 25 deaths during a year.
+    <% elif conflict_type == "intrastate" %>
+    The << estimate >> estimate of the number of deaths in ongoing intrastate conflicts in each year.
+
+    An intrastate conflict is a conflict between a state and a non-state armed group that causes at least 25 deaths during a year.
+    <% elif conflict_type == "intrastate (internationalized)" %>
+    The << estimate >> estimate of the number of deaths in ongoing internationalized intrastate conflicts in each year.
+
+    An internationalized intrastate conflict is a conflict between a state and a non-state armed group, with involvement of a foreign state, that causes at least 25 deaths during a year.
+    <% elif conflict_type == "intrastate (non-internationalized)" %>
+    The << estimate >> estimate of the number of deaths in ongoing non-internationalized intrastate conflicts in each year.
+
+    A non-internationalized intrastate conflict is a conflict between a state and a non-state armed group, without involvement of a foreign state, that causes at least 25 deaths during a year.
+    <% elif conflict_type == "extrasystemic" %>
+    The << estimate >> estimate of the number of deaths in ongoing extraystemic conflicts in each year.
+
+    An extrasystemic conflict is a conflict between a state and a non-state armed group outside its territory that causes at least 25 deaths during a year.
+    <% endif %>
+
+    Deaths of combatants and civilians due to fighting are included.
+    <% if estimate == "best" %>
+
+    For conflict years without a best deaths estimate, we conservatively coded the low estimate.
+    <% endif %>
+
+tables:
+  prio_v31:
+    variables:
+      number_deaths_ongoing_conflicts_battle_high:
+        title: Number of battle deaths in ongoing conflicts (high estimate)
+        unit: deaths
+        description: |-
+          <% set estimate = "high" %>
+          {definitions.number_deaths_estimate}
+        display:
+          numDecimalPlaces: 0
+        presentation:
+          grapher_config:
+            selectedEntityNames:
+              - Africa
+              - Americas
+              - Asia and Oceania
+              - Europe
+              - Middle East
+      number_deaths_ongoing_conflicts_battle_low:
+        title: Number of battle deaths in ongoing conflicts (low estimate)
+        unit: deaths
+        description: |-
+          <% set estimate = "low" %>
+          {definitions.number_deaths_estimate}
+        display:
+          numDecimalPlaces: 0
+        presentation:
+          grapher_config:
+            selectedEntityNames:
+              - Africa
+              - Americas
+              - Asia and Oceania
+              - Europe
+              - Middle East
+      number_deaths_ongoing_conflicts_battle:
+        title: Number of battle deaths in ongoing conflicts (best estimate)
+        unit: deaths
+        description: |-
+          <% set estimate = "best" %>
+          {definitions.number_deaths_estimate}
+        display:
+          numDecimalPlaces: 0
+        presentation:
+          grapher_config:
+            selectedEntityNames:
+              - Africa
+              - Americas
+              - Asia and Oceania
+              - Europe
+              - Middle East
+
+      number_ongoing_conflicts:
+        title: Number of ongoing conflicts
+        unit: conflicts
+        description: |-
+          <% if conflict_type == "all" %>
+          The number of all ongoing state-based conflicts in each year. This includes interstate, intrastate, and extrasystemic conflicts.
+
+          An ongoing state-based conflict is a conflict between states, or between a state and a non-state armed group, that causes at least 25 deaths during a year.
+          <% elif conflict_type == "interstate" %>
+          The number of ongoing interstate conflicts in each year.
+
+          An interstate conflict is a conflict between states that causes at least 25 deaths during a year.
+          <% elif conflict_type == "intrastate" %>
+          The number of ongoing intrastate conflicts in each year.
+
+          An intrastate conflict is a conflict between a state and a non-state armed group that causes at least 25 deaths during a year.
+          <% elif conflict_type == "intrastate (internationalized)" %>
+          The number of ongoing internationalized intrastate conflicts in each year.
+
+          An internationalized intrastate conflict is a conflict between a state and a non-state armed group, with involvement of a foreign state, that causes at least 25 deaths during a year.
+          <% elif conflict_type == "intrastate (non-internationalized)" %>
+          The number of ongoing non-internationalized intrastate conflicts in each year.
+
+          A non-internationalized intrastate conflict is a conflict between a state and a non-state armed group, without involvement of a foreign state, that causes at least 25 deaths during a year.
+          <% elif conflict_type == "extrasystemic" %>
+          The number of ongoing extrasystemic conflicts in each year.
+
+          An extrasystemic conflict is a conflict between a state and a non-state armed group outside its territory that causes at least 25 deaths during a year.
+          <% endif %>
+
+          We count a conflict as ongoing in a region even if the conflict is also ongoing in other regions. The sum across all regions can therefore be higher than the total number of ongoing conflicts.
+
+        display:
+          numDecimalPlaces: 0
+        presentation:
+          grapher_config:
+            selectedEntityNames:
+              - Africa
+              - Americas
+              - Asia and Oceania
+              - Europe
+              - Middle East
+      number_new_conflicts:
+        title: Number of new conflicts
+        unit: conflicts
+        description: |-
+          <% if conflict_type == "all" %>
+          The number of new state-based conflicts in each year. This includes interstate, intrastate, and extrasystemic conflicts.
+
+          A new state-based conflict is a conflict between states, or between a state and a non-state armed group, that causes at least 25 deaths during a year for the first time.
+
+          We only count a conflict as new when the conflict overall started that year, not if it became active again.
+          <% elif conflict_type == "interstate" %>
+          The number of new interstate conflicts in each year.
+
+          A new interstate conflict is a conflict between states that causes at least 25 deaths during a year for the first time.
+
+          We only count a conflict as new when the conflict overall started that year, not if it became active again.
+          <% elif conflict_type == "intrastate" %>
+          The number of new intrastate conflicts in each year.
+
+          A new intrastate conflict is a conflict between a state and a non-state armed group that causes at least 25 deaths during a year for the first time.
+
+          We only count a conflict as new when the conflict overall started that year, not if it became active again.
+          <% elif conflict_type == "intrastate (internationalized)" %>
+          The number of new internationalized intrastate conflicts in each year.
+
+          A new internationalized intrastate conflict is a conflict between a state and a non-state armed group, with involvement of a foreign state, that causes at least 25 deaths during a year for the first time.
+
+          We only count a conflict as new when the conflict overall started that year, not if it became active again. We also only count an internationalized intrastate conflict as new when the conflict overall started that year, not if it became internationalized.
+          <% elif conflict_type == "intrastate (non-internationalized)" %>
+          The number of new non-internationalized intrastate conflicts in each year.
+
+          A new non-internationalized intrastate conflict is a conflict between a state and a non-state armed group, without involvement of a foreign state, that causes at least 25 deaths during a year for the first time.
+
+          We only count a conflict as new when the conflict overall started that year, not if it became active again. We also only count a non-internationalized intrastate conflict as new when the conflict overall started that year, not if it stopped being internationalized.
+          <% elif conflict_type == "extrasystemic" %>
+          The number of new extrasystemic conflicts in each year.
+
+          A new extrasystemic conflict is a conflict between a state and a non-state armed group outside its territory that causes at least 25 deaths during a year for the first time.
+
+          We only count a conflict as new when the conflict overall started that year, not if it became active again.
+          <% endif %>
+
+          We count a conflict as new in a region even if the conflict started earlier or at the same time in another region. The sum across all regions can therefore be higher than the total number of new conflicts.
+        display:
+          numDecimalPlaces: 0
+        presentation:
+          grapher_config:
+            selectedEntityNames:
+              - Africa
+              - Americas
+              - Asia and Oceania
+              - Europe
+              - Middle East

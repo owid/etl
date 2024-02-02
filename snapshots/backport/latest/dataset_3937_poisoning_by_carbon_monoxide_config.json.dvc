@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/3937
+    date_accessed: 2023-08-16 09:30:59.104814
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_3937_poisoning_by_carbon_monoxide (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: c4ae70455239531f9b4da312ccd6baa9
+  size: 31997
+  path: dataset_3937_poisoning_by_carbon_monoxide_config.json

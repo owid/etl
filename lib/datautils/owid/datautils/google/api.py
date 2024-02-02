@@ -2,6 +2,10 @@
 from typing import Any, Optional
 
 import gdown
+from pydrive2.auth import GoogleAuth
+from pydrive2.drive import GoogleDrive
+from pydrive2.files import GoogleDriveFileList
+
 from owid.datautils.google.config import (
     CLIENT_SECRETS_PATH,
     CREDENTIALS_PATH,
@@ -10,9 +14,6 @@ from owid.datautils.google.config import (
     is_google_config_init,
 )
 from owid.datautils.google.sheets import GSheetsApi
-from pydrive2.auth import GoogleAuth
-from pydrive2.drive import GoogleDrive
-from pydrive2.files import GoogleDriveFileList
 
 
 class GoogleApi:
@@ -55,9 +56,7 @@ class GoogleApi:
         self.sheets = GSheetsApi(CLIENT_SECRETS_PATH, CREDENTIALS_PATH)
 
     @classmethod
-    def download_folder(
-        cls, url: str, output: str, quiet: bool = True, **kwargs: Any
-    ) -> None:
+    def download_folder(cls, url: str, output: str, quiet: bool = True, **kwargs: Any) -> None:
         """Download a folder from Google Drive.
 
         The folderm must be public, otherwise this function won't work.
@@ -71,9 +70,7 @@ class GoogleApi:
         quiet: bool, optional
             Suppress terminal output. Default is False.
         """
-        gdown.download_folder(
-            url, output=output, quiet=quiet, use_cookies=False, **kwargs
-        )
+        gdown.download_folder(url, output=output, quiet=quiet, use_cookies=False, **kwargs)
 
     @classmethod
     def download_file(

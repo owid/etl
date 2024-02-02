@@ -1,0 +1,90 @@
+dataset:
+  title: World Values Survey time-series data (1981-2022)
+  description: >
+    The WVS comprises survey data conducted across 64 countries and societies around the world and more than 80,000 respondents.This dataset includes survey responses comprises integrated survey responses for the 1981-2022 period to the following questions:
+
+
+    'Worries: a terrorist attack' corresponding to column 'H006_04'
+
+
+    'Effects of immigrants on the development of [your country]: Increase the risks of terrorism' corresponding to column 'G057'
+
+
+    'Justifiable: Terrorism as a political, ideological or religious mean' corresponding to column 'F114E'.
+
+  licenses:
+  - name: 'These data files are available without restrictions, provided: a) that
+      they are used for non-profit purposes; b) correct citations are provided and
+      sent to the World Values Survey Association for each publication of results
+      based in part or entirely on these data files; c) the data files themselves
+      are not redistributed; d) proper citation to the WVS data is included into the
+      references list of the publication (citation format available for downloading
+      in the Documentation section).'
+  sources:
+  - name: World Values Survey (1981-2022)
+    url: https://www.worldvaluessurvey.org/WVSDocumentationWVL.jsp
+    date_accessed: '2023-06-25'
+    publication_year: 2022
+    published_by: 'Inglehart, R., C. Haerpfer, A. Moreno, C. Welzel, K. Kizilova,
+      J. Diez-Medrano, M. Lagos, P. Norris, E. Ponarin & B. Puranen (eds.). 2022.
+      World Values Survey: All Rounds - Country-Pooled Datafile. Madrid, Spain & Vienna,
+      Austria: JD Systems Institute & WVSA Secretariat. Dataset Version 3.0.0. doi:10.14281/18241.17'
+tables:
+  longitudinal_wvs:
+    variables:
+      great_deal_or_very_much_not_at_all_or_not_much_ratio:
+        title:  Great deal or Very much/ Not much or Not at all
+        description: To what degree are you worried about a terrorist attack?
+        unit: ''
+        display:
+          numDecimalPlaces: 1
+
+      agree_disagree:
+        title: Agree/Disagree
+        description: "Effects of immigrants on the development of [your country]: Increase the risks of terrorism"
+        unit: ''
+        display:
+          numDecimalPlaces: 1
+
+      average_from_never_1_always_10:
+        title: Average (1 - never justifiable; 10 - always justifiable)
+        description: "Terrorism as a political, ideological or religious mean. Options range from 1 (never justifiable) to 10 (always justifiable)"
+        unit: ''
+        display:
+          numDecimalPlaces: 1
+
+      agree:
+        title: Agree (worries about terrorism)
+        description: "Effects of immigrants on the development of [your country]: Increase the risks of terrorism"
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 0
+
+      disagree:
+        title: Disagree (worries about terrorism)
+        description: "Effects of immigrants on the development of [your country]: Increase the risks of terrorism"
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 0
+
+      great_deal_or_very_much:
+        title:  Great deal or Very much
+        description: To what degree are you worried about a terrorist attack?
+        unit: "%"
+        short_unit: "%"
+        display:
+          name: Share of people worried about terrorism
+          numDecimalPlaces: 0
+
+      not_at_all_or_not_much:
+        title:  Not much or Not at all
+        description: To what degree are you worried about a terrorist attack?
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 0
+
+
+

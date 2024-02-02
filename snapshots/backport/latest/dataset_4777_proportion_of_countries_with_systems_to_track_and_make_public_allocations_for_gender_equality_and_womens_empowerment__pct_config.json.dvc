@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4777
+    date_accessed: 2023-08-14 14:36:19.795299
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_4777_proportion_of_countries_with_systems_to_track_and_make_public_allocations_for_gender_equality_and_womens_empowerment__pct
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 43e9e6f316e2ff39007435df47a6cc80
+  size: 27717
+  path: 
+    dataset_4777_proportion_of_countries_with_systems_to_track_and_make_public_allocations_for_gender_equality_and_womens_empowerment__pct_config.json

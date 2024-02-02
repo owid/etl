@@ -1,0 +1,1037 @@
+dataset:
+  title: COVID testing time series data
+  description: >-
+    Data on COVID-19 testing. Comparisons between countries are compromised for
+    several reasons.
+
+
+    You can download the full dataset, alongside detailed source descriptions here:
+    https://github.com/owid/covid-19-data/tree/master/public/data/
+  sources:
+  - name: Official data collated by Our World in Data – Last updated {TODAY}
+    url:
+      https://ourworldindata.org/coronavirus-testing#testing-for-covid-19-background-the-our-world-in-data-covid-19-testing-dataset
+    published_by: For source details see ourworldindata.org/coronavirus-testing#source-information-country-by-country
+tables:
+  testing_time_series:
+    variables:
+      annotation:
+        title: annotation
+        unit: ''
+      cumulative_positivity_rate:
+        title: cumulative_positivity_rate
+        description: The total number of confirmed cases to date divided by the total number of tests to date, expressed as
+          a percentage. Tests may refer to the number of tests performed or the number of people tested – depending on which
+          is reported by the particular country.
+        unit: '%'
+        display:
+          conversionFactor: 100
+          includeInTable: true
+          name: Cumulative positivity rate
+          yearIsDay: true
+        short_unit: '%'
+      cumulative_tests_per_case:
+        title: cumulative_tests_per_case
+        description: The total number of tests to date divided by the total number of confirmed cases. Tests may refer to
+          the number of tests performed or the number of people tested – depending on which is reported by the particular
+          country.
+        unit: tests per confirmed case
+        display:
+          includeInTable: true
+          name: Tests per confirmed case – total
+          yearIsDay: true
+          zeroDay: '2020-01-21'
+      new_tests:
+        title: new_tests
+        unit: ''
+        display:
+          entityAnnotationsMap: |-
+            Albania: tests performed
+            Andorra: people tested
+            Angola: tests performed
+            Antigua and Barbuda: tests performed
+            Argentina: tests performed
+            Armenia: tests performed
+            Australia: tests performed
+            Austria: tests performed
+            Azerbaijan: tests performed
+            Bahamas: tests performed
+            Bahrain: units unclear
+            Bangladesh: tests performed
+            Belarus: tests performed
+            Belgium: tests performed
+            Belize: tests performed
+            Benin: tests performed
+            Bhutan: samples tested
+            Bolivia: tests performed
+            Bosnia and Herzegovina: tests performed
+            Botswana: tests performed
+            Brazil: tests performed
+            Bulgaria: tests performed
+            Burkina Faso: tests performed
+            Burundi: tests performed
+            Cambodia: tests performed
+            Canada: tests performed
+            Cape Verde: tests performed
+            Central African Republic: tests performed
+            Chad: tests performed
+            Chile: tests performed
+            China: tests performed
+            Colombia: tests performed
+            Costa Rica: people tested
+            Cote d'Ivoire: tests performed
+            Croatia: people tested
+            Cuba: tests performed
+            Cyprus: tests performed
+            Czechia: tests performed
+            Democratic Republic of Congo: samples tested
+            Denmark: tests performed
+            Dominican Republic: samples tested
+            Ecuador: people tested
+            El Salvador: tests performed
+            Equatorial Guinea: tests performed
+            Estonia: tests performed
+            Ethiopia: tests performed
+            Faeroe Islands: people tested
+            Fiji: tests performed
+            Finland: tests performed
+            France: people tested
+            Gabon: tests performed
+            Gambia: tests performed
+            Georgia: tests performed
+            Germany: tests performed
+            Ghana: tests performed
+            Greece: samples tested
+            Guatemala: people tested
+            Guyana: tests performed
+            Haiti: tests performed
+            Hong Kong: tests performed
+            Hungary: tests performed
+            Iceland: tests performed
+            India: samples tested
+            Indonesia: people tested
+            Iran: tests performed
+            Iraq: samples tested
+            Ireland: tests performed
+            Israel: tests performed
+            Italy: tests performed
+            Jamaica: samples tested
+            Japan: people tested
+            Jordan: tests performed
+            Kazakhstan: tests performed
+            Kenya: tests performed
+            Kosovo: tests performed
+            Kuwait: tests performed
+            Laos: tests performed
+            Latvia: tests performed
+            Lebanon: tests performed
+            Libya: samples tested
+            Liechtenstein: tests performed
+            Lithuania: tests performed
+            Luxembourg: tests performed
+            Madagascar: tests performed
+            Malawi: tests performed
+            Malaysia: people tested
+            Maldives: samples tested
+            Malta: tests performed
+            Mauritania: tests performed
+            Mexico: people tested
+            Moldova: tests performed
+            Mongolia: samples tested
+            Morocco: people tested
+            Mozambique: tests performed
+            Myanmar: samples tested
+            Namibia: tests performed
+            Nepal: tests performed
+            Netherlands: tests performed
+            New Zealand: tests performed
+            Nigeria: samples tested
+            North Macedonia: tests performed
+            Norway: people tested
+            Oman: units unclear
+            Pakistan: tests performed
+            Palestine: tests performed
+            Panama: tests performed
+            Papua New Guinea: tests performed
+            Paraguay: tests performed
+            Peru: tests performed
+            Philippines: people tested
+            Poland: people tested
+            Portugal: tests performed
+            Qatar: people tested
+            Romania: tests performed
+            Russia: tests performed
+            Rwanda: samples tested
+            Saint Kitts and Nevis: people tested
+            Saint Vincent and the Grenadines: tests performed
+            Saudi Arabia: tests performed
+            Senegal: tests performed
+            Serbia: people tested
+            Singapore: samples tested
+            Slovakia: tests performed
+            Slovenia: tests performed
+            South Africa: people tested
+            South Korea: people tested
+            South Sudan: tests performed
+            Spain: tests performed
+            Sri Lanka: tests performed
+            Suriname: tests performed
+            Sweden: tests performed
+            Switzerland: tests performed
+            Taiwan: people tested
+            Thailand: tests performed
+            Timor: tests performed
+            Togo: tests performed
+            Trinidad and Tobago: people tested
+            Tunisia: people tested
+            Turkey: tests performed
+            Uganda: tests performed
+            Ukraine: tests performed
+            United Arab Emirates: tests performed
+            United Kingdom: tests performed
+            United States: tests performed
+            Uruguay: people tested
+            Vietnam: samples tested
+            Zambia: tests performed
+            Zimbabwe: tests performed
+          includeInTable: true
+          name: New tests
+          yearIsDay: true
+          zeroDay: '2020-01-21'
+      new_tests_7day_smoothed:
+        title: new_tests_7day_smoothed
+        description: >-
+          The series is smoothed by averaging daily figures over a rolling 7-day window.
+
+
+          Not all countries report testing data on a daily basis. To generate this series we assume that testing changed equally
+          on a daily basis over any periods in which no data was reported.
+
+
+          Tests may refer to the number of tests performed or the number of people tested – depending on which is reported
+          by the particular country.
+        unit: tests
+        display:
+          entityAnnotationsMap: |-
+            Albania: tests performed
+            Andorra: people tested
+            Angola: tests performed
+            Antigua and Barbuda: tests performed
+            Argentina: tests performed
+            Armenia: tests performed
+            Australia: tests performed
+            Austria: tests performed
+            Azerbaijan: tests performed
+            Bahamas: tests performed
+            Bahrain: units unclear
+            Bangladesh: tests performed
+            Belarus: tests performed
+            Belgium: tests performed
+            Belize: tests performed
+            Benin: tests performed
+            Bhutan: samples tested
+            Bolivia: tests performed
+            Bosnia and Herzegovina: tests performed
+            Botswana: tests performed
+            Brazil: tests performed
+            Bulgaria: tests performed
+            Burkina Faso: tests performed
+            Burundi: tests performed
+            Cambodia: tests performed
+            Canada: tests performed
+            Cape Verde: tests performed
+            Central African Republic: tests performed
+            Chad: tests performed
+            Chile: tests performed
+            China: tests performed
+            Colombia: tests performed
+            Costa Rica: people tested
+            Cote d'Ivoire: tests performed
+            Croatia: people tested
+            Cuba: tests performed
+            Cyprus: tests performed
+            Czechia: tests performed
+            Democratic Republic of Congo: samples tested
+            Denmark: tests performed
+            Dominican Republic: samples tested
+            Ecuador: people tested
+            El Salvador: tests performed
+            Equatorial Guinea: tests performed
+            Estonia: tests performed
+            Ethiopia: tests performed
+            Faeroe Islands: people tested
+            Fiji: tests performed
+            Finland: tests performed
+            France: people tested
+            Gabon: tests performed
+            Gambia: tests performed
+            Georgia: tests performed
+            Germany: tests performed
+            Ghana: tests performed
+            Greece: samples tested
+            Guatemala: people tested
+            Guyana: tests performed
+            Haiti: tests performed
+            Hong Kong: tests performed
+            Hungary: tests performed
+            Iceland: tests performed
+            India: samples tested
+            Indonesia: people tested
+            Iran: tests performed
+            Iraq: samples tested
+            Ireland: tests performed
+            Israel: tests performed
+            Italy: tests performed
+            Jamaica: samples tested
+            Japan: people tested
+            Jordan: tests performed
+            Kazakhstan: tests performed
+            Kenya: tests performed
+            Kosovo: tests performed
+            Kuwait: tests performed
+            Laos: tests performed
+            Latvia: tests performed
+            Lebanon: tests performed
+            Libya: samples tested
+            Liechtenstein: tests performed
+            Lithuania: tests performed
+            Luxembourg: tests performed
+            Madagascar: tests performed
+            Malawi: tests performed
+            Malaysia: people tested
+            Maldives: samples tested
+            Malta: tests performed
+            Mauritania: tests performed
+            Mexico: people tested
+            Moldova: tests performed
+            Mongolia: samples tested
+            Morocco: people tested
+            Mozambique: tests performed
+            Myanmar: samples tested
+            Namibia: tests performed
+            Nepal: tests performed
+            Netherlands: tests performed
+            New Zealand: tests performed
+            Nigeria: samples tested
+            North Macedonia: tests performed
+            Norway: people tested
+            Oman: units unclear
+            Pakistan: tests performed
+            Palestine: tests performed
+            Panama: tests performed
+            Papua New Guinea: tests performed
+            Paraguay: tests performed
+            Peru: tests performed
+            Philippines: people tested
+            Poland: people tested
+            Portugal: tests performed
+            Qatar: people tested
+            Romania: tests performed
+            Russia: tests performed
+            Rwanda: samples tested
+            Saint Kitts and Nevis: people tested
+            Saint Vincent and the Grenadines: tests performed
+            Saudi Arabia: tests performed
+            Senegal: tests performed
+            Serbia: people tested
+            Singapore: samples tested
+            Slovakia: tests performed
+            Slovenia: tests performed
+            South Africa: people tested
+            South Korea: people tested
+            South Sudan: tests performed
+            Spain: tests performed
+            Sri Lanka: tests performed
+            Suriname: tests performed
+            Sweden: tests performed
+            Switzerland: tests performed
+            Taiwan: people tested
+            Thailand: tests performed
+            Timor: tests performed
+            Togo: tests performed
+            Trinidad and Tobago: people tested
+            Tunisia: people tested
+            Turkey: tests performed
+            Uganda: tests performed
+            Ukraine: tests performed
+            United Arab Emirates: tests performed
+            United Kingdom: tests performed
+            United States: tests performed
+            Uruguay: people tested
+            Vietnam: samples tested
+            Zambia: tests performed
+            Zimbabwe: tests performed
+          includeInTable: true
+          name: Daily tests (7-day smoothed)
+          yearIsDay: true
+      new_tests_per_thousand:
+        title: new_tests_per_thousand
+        unit: ''
+        display:
+          entityAnnotationsMap: |-
+            Albania: tests performed
+            Andorra: people tested
+            Angola: tests performed
+            Antigua and Barbuda: tests performed
+            Argentina: tests performed
+            Armenia: tests performed
+            Australia: tests performed
+            Austria: tests performed
+            Azerbaijan: tests performed
+            Bahamas: tests performed
+            Bahrain: units unclear
+            Bangladesh: tests performed
+            Belarus: tests performed
+            Belgium: tests performed
+            Belize: tests performed
+            Benin: tests performed
+            Bhutan: samples tested
+            Bolivia: tests performed
+            Bosnia and Herzegovina: tests performed
+            Botswana: tests performed
+            Brazil: tests performed
+            Bulgaria: tests performed
+            Burkina Faso: tests performed
+            Burundi: tests performed
+            Cambodia: tests performed
+            Canada: tests performed
+            Cape Verde: tests performed
+            Central African Republic: tests performed
+            Chad: tests performed
+            Chile: tests performed
+            China: tests performed
+            Colombia: tests performed
+            Costa Rica: people tested
+            Cote d'Ivoire: tests performed
+            Croatia: people tested
+            Cuba: tests performed
+            Cyprus: tests performed
+            Czechia: tests performed
+            Democratic Republic of Congo: samples tested
+            Denmark: tests performed
+            Dominican Republic: samples tested
+            Ecuador: people tested
+            El Salvador: tests performed
+            Equatorial Guinea: tests performed
+            Estonia: tests performed
+            Ethiopia: tests performed
+            Faeroe Islands: people tested
+            Fiji: tests performed
+            Finland: tests performed
+            France: people tested
+            Gabon: tests performed
+            Gambia: tests performed
+            Georgia: tests performed
+            Germany: tests performed
+            Ghana: tests performed
+            Greece: samples tested
+            Guatemala: people tested
+            Guyana: tests performed
+            Haiti: tests performed
+            Hong Kong: tests performed
+            Hungary: tests performed
+            Iceland: tests performed
+            India: samples tested
+            Indonesia: people tested
+            Iran: tests performed
+            Iraq: samples tested
+            Ireland: tests performed
+            Israel: tests performed
+            Italy: tests performed
+            Jamaica: samples tested
+            Japan: people tested
+            Jordan: tests performed
+            Kazakhstan: tests performed
+            Kenya: tests performed
+            Kosovo: tests performed
+            Kuwait: tests performed
+            Laos: tests performed
+            Latvia: tests performed
+            Lebanon: tests performed
+            Libya: samples tested
+            Liechtenstein: tests performed
+            Lithuania: tests performed
+            Luxembourg: tests performed
+            Madagascar: tests performed
+            Malawi: tests performed
+            Malaysia: people tested
+            Maldives: samples tested
+            Malta: tests performed
+            Mauritania: tests performed
+            Mexico: people tested
+            Moldova: tests performed
+            Mongolia: samples tested
+            Morocco: people tested
+            Mozambique: tests performed
+            Myanmar: samples tested
+            Namibia: tests performed
+            Nepal: tests performed
+            Netherlands: tests performed
+            New Zealand: tests performed
+            Nigeria: samples tested
+            North Macedonia: tests performed
+            Norway: people tested
+            Oman: units unclear
+            Pakistan: tests performed
+            Palestine: tests performed
+            Panama: tests performed
+            Papua New Guinea: tests performed
+            Paraguay: tests performed
+            Peru: tests performed
+            Philippines: people tested
+            Poland: people tested
+            Portugal: tests performed
+            Qatar: people tested
+            Romania: tests performed
+            Russia: tests performed
+            Rwanda: samples tested
+            Saint Kitts and Nevis: people tested
+            Saint Vincent and the Grenadines: tests performed
+            Saudi Arabia: tests performed
+            Senegal: tests performed
+            Serbia: people tested
+            Singapore: samples tested
+            Slovakia: tests performed
+            Slovenia: tests performed
+            South Africa: people tested
+            South Korea: people tested
+            South Sudan: tests performed
+            Spain: tests performed
+            Sri Lanka: tests performed
+            Suriname: tests performed
+            Sweden: tests performed
+            Switzerland: tests performed
+            Taiwan: people tested
+            Thailand: tests performed
+            Timor: tests performed
+            Togo: tests performed
+            Trinidad and Tobago: people tested
+            Tunisia: people tested
+            Turkey: tests performed
+            Uganda: tests performed
+            Ukraine: tests performed
+            United Arab Emirates: tests performed
+            United Kingdom: tests performed
+            United States: tests performed
+            Uruguay: people tested
+            Vietnam: samples tested
+            Zambia: tests performed
+            Zimbabwe: tests performed
+          includeInTable: true
+          name: New tests per thousand
+          yearIsDay: true
+          zeroDay: '2020-01-21'
+      new_tests_per_thousand_7day_smoothed:
+        title: new_tests_per_thousand_7day_smoothed
+        description: >-
+          The series is smoothed by averaging daily figures over a rolling 7-day window.
+
+
+          Not all countries report testing data on a daily basis. To generate this series we assume that testing changed equally
+          on a daily basis over any periods in which no data was reported. This produces a complete series of daily figures,
+          which is then averaged over a rolling 7-day window.
+
+
+          Tests may refer to the number of tests performed or the number of people tested – depending on which is reported
+          by the particular country.
+        unit: tests per thousand
+        display:
+          entityAnnotationsMap: |-
+            Albania: tests performed
+            Andorra: people tested
+            Angola: tests performed
+            Antigua and Barbuda: tests performed
+            Argentina: tests performed
+            Armenia: tests performed
+            Australia: tests performed
+            Austria: tests performed
+            Azerbaijan: tests performed
+            Bahamas: tests performed
+            Bahrain: units unclear
+            Bangladesh: tests performed
+            Belarus: tests performed
+            Belgium: tests performed
+            Belize: tests performed
+            Benin: tests performed
+            Bhutan: samples tested
+            Bolivia: tests performed
+            Bosnia and Herzegovina: tests performed
+            Botswana: tests performed
+            Brazil: tests performed
+            Bulgaria: tests performed
+            Burkina Faso: tests performed
+            Burundi: tests performed
+            Cambodia: tests performed
+            Canada: tests performed
+            Cape Verde: tests performed
+            Central African Republic: tests performed
+            Chad: tests performed
+            Chile: tests performed
+            China: tests performed
+            Colombia: tests performed
+            Costa Rica: people tested
+            Cote d'Ivoire: tests performed
+            Croatia: people tested
+            Cuba: tests performed
+            Cyprus: tests performed
+            Czechia: tests performed
+            Democratic Republic of Congo: samples tested
+            Denmark: tests performed
+            Dominican Republic: samples tested
+            Ecuador: people tested
+            El Salvador: tests performed
+            Equatorial Guinea: tests performed
+            Estonia: tests performed
+            Ethiopia: tests performed
+            Faeroe Islands: people tested
+            Fiji: tests performed
+            Finland: tests performed
+            France: people tested
+            Gabon: tests performed
+            Gambia: tests performed
+            Georgia: tests performed
+            Germany: tests performed
+            Ghana: tests performed
+            Greece: samples tested
+            Guatemala: people tested
+            Guyana: tests performed
+            Haiti: tests performed
+            Hong Kong: tests performed
+            Hungary: tests performed
+            Iceland: tests performed
+            India: samples tested
+            Indonesia: people tested
+            Iran: tests performed
+            Iraq: samples tested
+            Ireland: tests performed
+            Israel: tests performed
+            Italy: tests performed
+            Jamaica: samples tested
+            Japan: people tested
+            Jordan: tests performed
+            Kazakhstan: tests performed
+            Kenya: tests performed
+            Kosovo: tests performed
+            Kuwait: tests performed
+            Laos: tests performed
+            Latvia: tests performed
+            Lebanon: tests performed
+            Libya: samples tested
+            Liechtenstein: tests performed
+            Lithuania: tests performed
+            Luxembourg: tests performed
+            Madagascar: tests performed
+            Malawi: tests performed
+            Malaysia: people tested
+            Maldives: samples tested
+            Malta: tests performed
+            Mauritania: tests performed
+            Mexico: people tested
+            Moldova: tests performed
+            Mongolia: samples tested
+            Morocco: people tested
+            Mozambique: tests performed
+            Myanmar: samples tested
+            Namibia: tests performed
+            Nepal: tests performed
+            Netherlands: tests performed
+            New Zealand: tests performed
+            Nigeria: samples tested
+            North Macedonia: tests performed
+            Norway: people tested
+            Oman: units unclear
+            Pakistan: tests performed
+            Palestine: tests performed
+            Panama: tests performed
+            Papua New Guinea: tests performed
+            Paraguay: tests performed
+            Peru: tests performed
+            Philippines: people tested
+            Poland: people tested
+            Portugal: tests performed
+            Qatar: people tested
+            Romania: tests performed
+            Russia: tests performed
+            Rwanda: samples tested
+            Saint Kitts and Nevis: people tested
+            Saint Vincent and the Grenadines: tests performed
+            Saudi Arabia: tests performed
+            Senegal: tests performed
+            Serbia: people tested
+            Singapore: samples tested
+            Slovakia: tests performed
+            Slovenia: tests performed
+            South Africa: people tested
+            South Korea: people tested
+            South Sudan: tests performed
+            Spain: tests performed
+            Sri Lanka: tests performed
+            Suriname: tests performed
+            Sweden: tests performed
+            Switzerland: tests performed
+            Taiwan: people tested
+            Thailand: tests performed
+            Timor: tests performed
+            Togo: tests performed
+            Trinidad and Tobago: people tested
+            Tunisia: people tested
+            Turkey: tests performed
+            Uganda: tests performed
+            Ukraine: tests performed
+            United Arab Emirates: tests performed
+            United Kingdom: tests performed
+            United States: tests performed
+            Uruguay: people tested
+            Vietnam: samples tested
+            Zambia: tests performed
+            Zimbabwe: tests performed
+          includeInTable: true
+          name: Daily tests per thousand people (7-day smoothed)
+          yearIsDay: true
+      short_term_positivity_rate:
+        title: short_term_positivity_rate
+        unit: '%'
+        display:
+          conversionFactor: 100
+          includeInTable: true
+          name: Short-term positivity rate
+          yearIsDay: true
+        short_unit: '%'
+      short_term_tests_per_case:
+        title: short_term_tests_per_case
+        description: >-
+          The number of tests each day divided by the number of confirmed cases each day.
+
+
+          The series is smoothed by averaging daily figures over a rolling 7-day window.
+
+
+          Not all countries report testing data on a daily basis. To generate this series we assume that testing changed equally
+          on a daily basis over any periods in which no data was reported.
+        unit: tests per confirmed case
+        display:
+          includeInTable: true
+          name: Tests per confirmed case – daily
+          yearIsDay: true
+      testing_observations:
+        title: testing_observations
+        description: Countries for which we attempted to find data are not included.
+        unit: ''
+        display:
+          name: Number of testing observations
+          yearIsDay: true
+      total_tests:
+        title: total_tests
+        unit: ''
+        display:
+          entityAnnotationsMap: |-
+            Albania: tests performed
+            Andorra: people tested
+            Angola: tests performed
+            Antigua and Barbuda: tests performed
+            Argentina: tests performed
+            Armenia: tests performed
+            Australia: tests performed
+            Austria: tests performed
+            Azerbaijan: tests performed
+            Bahamas: tests performed
+            Bahrain: units unclear
+            Bangladesh: tests performed
+            Belarus: tests performed
+            Belgium: tests performed
+            Belize: tests performed
+            Benin: tests performed
+            Bhutan: samples tested
+            Bolivia: tests performed
+            Bosnia and Herzegovina: tests performed
+            Botswana: tests performed
+            Brazil: tests performed
+            Bulgaria: tests performed
+            Burkina Faso: tests performed
+            Burundi: tests performed
+            Cambodia: tests performed
+            Canada: tests performed
+            Cape Verde: tests performed
+            Central African Republic: tests performed
+            Chad: tests performed
+            Chile: tests performed
+            China: tests performed
+            Colombia: tests performed
+            Costa Rica: people tested
+            Cote d'Ivoire: tests performed
+            Croatia: people tested
+            Cuba: tests performed
+            Cyprus: tests performed
+            Czechia: tests performed
+            Democratic Republic of Congo: samples tested
+            Denmark: tests performed
+            Dominican Republic: samples tested
+            Ecuador: people tested
+            El Salvador: tests performed
+            Equatorial Guinea: tests performed
+            Estonia: tests performed
+            Ethiopia: tests performed
+            Faeroe Islands: people tested
+            Fiji: tests performed
+            Finland: tests performed
+            France: people tested
+            Gabon: tests performed
+            Gambia: tests performed
+            Georgia: tests performed
+            Germany: tests performed
+            Ghana: tests performed
+            Greece: samples tested
+            Guatemala: people tested
+            Guyana: tests performed
+            Haiti: tests performed
+            Hong Kong: tests performed
+            Hungary: tests performed
+            Iceland: tests performed
+            India: samples tested
+            Indonesia: people tested
+            Iran: tests performed
+            Iraq: samples tested
+            Ireland: tests performed
+            Israel: tests performed
+            Italy: tests performed
+            Jamaica: samples tested
+            Japan: people tested
+            Jordan: tests performed
+            Kazakhstan: tests performed
+            Kenya: tests performed
+            Kosovo: tests performed
+            Kuwait: tests performed
+            Laos: tests performed
+            Latvia: tests performed
+            Lebanon: tests performed
+            Libya: samples tested
+            Liechtenstein: tests performed
+            Lithuania: tests performed
+            Luxembourg: tests performed
+            Madagascar: tests performed
+            Malawi: tests performed
+            Malaysia: people tested
+            Maldives: samples tested
+            Malta: tests performed
+            Mauritania: tests performed
+            Mexico: people tested
+            Moldova: tests performed
+            Mongolia: samples tested
+            Morocco: people tested
+            Mozambique: tests performed
+            Myanmar: samples tested
+            Namibia: tests performed
+            Nepal: tests performed
+            Netherlands: tests performed
+            New Zealand: tests performed
+            Nigeria: samples tested
+            North Macedonia: tests performed
+            Norway: people tested
+            Oman: units unclear
+            Pakistan: tests performed
+            Palestine: tests performed
+            Panama: tests performed
+            Papua New Guinea: tests performed
+            Paraguay: tests performed
+            Peru: tests performed
+            Philippines: people tested
+            Poland: people tested
+            Portugal: tests performed
+            Qatar: people tested
+            Romania: tests performed
+            Russia: tests performed
+            Rwanda: samples tested
+            Saint Kitts and Nevis: people tested
+            Saint Vincent and the Grenadines: tests performed
+            Saudi Arabia: tests performed
+            Senegal: tests performed
+            Serbia: people tested
+            Singapore: samples tested
+            Slovakia: tests performed
+            Slovenia: tests performed
+            South Africa: people tested
+            South Korea: people tested
+            South Sudan: tests performed
+            Spain: tests performed
+            Sri Lanka: tests performed
+            Suriname: tests performed
+            Sweden: tests performed
+            Switzerland: tests performed
+            Taiwan: people tested
+            Thailand: tests performed
+            Timor: tests performed
+            Togo: tests performed
+            Trinidad and Tobago: people tested
+            Tunisia: people tested
+            Turkey: tests performed
+            Uganda: tests performed
+            Ukraine: tests performed
+            United Arab Emirates: tests performed
+            United Kingdom: tests performed
+            United States: tests performed
+            Uruguay: people tested
+            Vietnam: samples tested
+            Zambia: tests performed
+            Zimbabwe: tests performed
+          includeInTable: true
+          name: Total tests
+          numDecimalPlaces: 0
+          yearIsDay: true
+          zeroDay: '2020-01-21'
+      total_tests_per_thousand:
+        title: total_tests_per_thousand
+        unit: ''
+        display:
+          entityAnnotationsMap: |-
+            Albania: tests performed
+            Andorra: people tested
+            Angola: tests performed
+            Antigua and Barbuda: tests performed
+            Argentina: tests performed
+            Armenia: tests performed
+            Australia: tests performed
+            Austria: tests performed
+            Azerbaijan: tests performed
+            Bahamas: tests performed
+            Bahrain: units unclear
+            Bangladesh: tests performed
+            Belarus: tests performed
+            Belgium: tests performed
+            Belize: tests performed
+            Benin: tests performed
+            Bhutan: samples tested
+            Bolivia: tests performed
+            Bosnia and Herzegovina: tests performed
+            Botswana: tests performed
+            Brazil: tests performed
+            Bulgaria: tests performed
+            Burkina Faso: tests performed
+            Burundi: tests performed
+            Cambodia: tests performed
+            Canada: tests performed
+            Cape Verde: tests performed
+            Central African Republic: tests performed
+            Chad: tests performed
+            Chile: tests performed
+            China: tests performed
+            Colombia: tests performed
+            Costa Rica: people tested
+            Cote d'Ivoire: tests performed
+            Croatia: people tested
+            Cuba: tests performed
+            Cyprus: tests performed
+            Czechia: tests performed
+            Democratic Republic of Congo: samples tested
+            Denmark: tests performed
+            Dominican Republic: samples tested
+            Ecuador: people tested
+            El Salvador: tests performed
+            Equatorial Guinea: tests performed
+            Estonia: tests performed
+            Ethiopia: tests performed
+            Faeroe Islands: people tested
+            Fiji: tests performed
+            Finland: tests performed
+            France: people tested
+            Gabon: tests performed
+            Gambia: tests performed
+            Georgia: tests performed
+            Germany: tests performed
+            Ghana: tests performed
+            Greece: samples tested
+            Guatemala: people tested
+            Guyana: tests performed
+            Haiti: tests performed
+            Hong Kong: tests performed
+            Hungary: tests performed
+            Iceland: tests performed
+            India: samples tested
+            Indonesia: people tested
+            Iran: tests performed
+            Iraq: samples tested
+            Ireland: tests performed
+            Israel: tests performed
+            Italy: tests performed
+            Jamaica: samples tested
+            Japan: people tested
+            Jordan: tests performed
+            Kazakhstan: tests performed
+            Kenya: tests performed
+            Kosovo: tests performed
+            Kuwait: tests performed
+            Laos: tests performed
+            Latvia: tests performed
+            Lebanon: tests performed
+            Libya: samples tested
+            Liechtenstein: tests performed
+            Lithuania: tests performed
+            Luxembourg: tests performed
+            Madagascar: tests performed
+            Malawi: tests performed
+            Malaysia: people tested
+            Maldives: samples tested
+            Malta: tests performed
+            Mauritania: tests performed
+            Mexico: people tested
+            Moldova: tests performed
+            Mongolia: samples tested
+            Morocco: people tested
+            Mozambique: tests performed
+            Myanmar: samples tested
+            Namibia: tests performed
+            Nepal: tests performed
+            Netherlands: tests performed
+            New Zealand: tests performed
+            Nigeria: samples tested
+            North Macedonia: tests performed
+            Norway: people tested
+            Oman: units unclear
+            Pakistan: tests performed
+            Palestine: tests performed
+            Panama: tests performed
+            Papua New Guinea: tests performed
+            Paraguay: tests performed
+            Peru: tests performed
+            Philippines: people tested
+            Poland: people tested
+            Portugal: tests performed
+            Qatar: people tested
+            Romania: tests performed
+            Russia: tests performed
+            Rwanda: samples tested
+            Saint Kitts and Nevis: people tested
+            Saint Vincent and the Grenadines: tests performed
+            Saudi Arabia: tests performed
+            Senegal: tests performed
+            Serbia: people tested
+            Singapore: samples tested
+            Slovakia: tests performed
+            Slovenia: tests performed
+            South Africa: people tested
+            South Korea: people tested
+            South Sudan: tests performed
+            Spain: tests performed
+            Sri Lanka: tests performed
+            Suriname: tests performed
+            Sweden: tests performed
+            Switzerland: tests performed
+            Taiwan: people tested
+            Thailand: tests performed
+            Timor: tests performed
+            Togo: tests performed
+            Trinidad and Tobago: people tested
+            Tunisia: people tested
+            Turkey: tests performed
+            Uganda: tests performed
+            Ukraine: tests performed
+            United Arab Emirates: tests performed
+            United Kingdom: tests performed
+            United States: tests performed
+            Uruguay: people tested
+            Vietnam: samples tested
+            Zambia: tests performed
+            Zimbabwe: tests performed
+          includeInTable: true
+          name: Total tests per thousand
+          yearIsDay: true
+          zeroDay: '2020-01-21'

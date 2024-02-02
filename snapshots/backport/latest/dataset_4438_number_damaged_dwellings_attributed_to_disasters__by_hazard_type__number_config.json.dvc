@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4438
+    date_accessed: 2023-08-16 07:57:44.619148
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_4438_number_damaged_dwellings_attributed_to_disasters__by_hazard_type__number
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: d641383232c62d76949b4753b1d7f3d4
+  size: 152902
+  path: 
+    dataset_4438_number_damaged_dwellings_attributed_to_disasters__by_hazard_type__number_config.json

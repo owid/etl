@@ -74,11 +74,8 @@ def run(dest_dir: str) -> None:
     pivot_outb = add_inbound_outbound_tour(pivot_table_ye, df_tr)
 
     # Process monthly data
-    pivot_df, pivot_table_mn = process_monthly_data(df, month_names)
-
-    concatenated_df = pd.merge(pivot_outb, pivot_table_mn, on=["year", "country"], how="outer")
-    merge_df = pd.merge(concatenated_df, pivot_df, on=["year", "country"], how="outer")
-
+    pivot_table_mn = process_monthly_data(df, month_names)
+    merge_df = pd.merge(pivot_outb, pivot_table_mn, on=["year", "country"], how="outer")
     regions_ = ["North America", "South America", "Europe", "Africa", "Asia", "Oceania", "World"]
 
     for region in regions_:
@@ -93,28 +90,12 @@ def run(dest_dir: str) -> None:
 
     merge_df["TER_INT_m"] = merge_df["TER_INT_m"].replace(0, np.nan)
     merge_df = merge_df[merge_df["year"] != 2023]
-
-    # Apply the function to each row using apply()
-    merge_df.loc[~merge_df.country.isin(regions_), month_names] = np.nan
-    merge_df.reset_index(inplace=True, drop=True)
-
-    # Melt the DataFrame to have months as rows
-    df_melted = merge_df.melt(id_vars=["country", "year"], value_vars=month_names, var_name="month", value_name="value")
-    filtered_df = df_melted.dropna(subset=["value"])
-
-    # Pivot the melted DataFrame to reshape it with countries as columns
-    df_pivoted = (
-        filtered_df.pivot_table(index=["month", "year"], columns="country", values="value")
-        .reset_index()
-        .rename(columns={"month": "country"})
-    )
-
-    merged_df = pd.merge(df_pivoted, merge_df, on=["country", "year"], how="outer")
-    merged_df = merged_df.drop(["population"], axis=1)
-    merged_df.set_index(["country", "year"], inplace=True)
+    merge_df = merge_df.drop(["population"], axis=1)
+    merge_df["total_monthly_emissions"] = merge_df["TER_INT_m"] + merge_df["TER_DOM_m"]
+    merge_df.set_index(["country", "year"], inplace=True)
 
     # Create a new table with the processed data.
-    tb_garden = Table(merged_df, short_name="co2_air_transport")
+    tb_garden = Table(merge_df, short_name="co2_air_transport")
     #
     # Save outputs.
     #
@@ -174,13 +155,6 @@ def process_monthly_data(df, month_names):
     df_mn["date"] = date_column
     df_mn["emission_source"] = df_mn["emission_source"].apply(lambda x: x + "_m")
 
-    # Split by month
-    pivot_df = pd.pivot_table(
-        df_mn[df_mn["emission_source"] == "TER_INT_m"], values="value", index=["country", "year"], columns="month"
-    )
-    pivot_df.reset_index(inplace=True)
-    pivot_df.columns = ["country", "year"] + month_names
-
     # Calculate the number of days since 2019
     df_mn["days_since_2019"] = (df_mn["date"] - pd.to_datetime("2019-01-01")).dt.days
     df_mn.drop(["month", "year", "date"], axis=1, inplace=True)
@@ -190,7 +164,7 @@ def process_monthly_data(df, month_names):
     pivot_table_mn = pd.pivot_table(df_mn, values="value", index=["country", "year"], columns=["emission_source"])
     pivot_table_mn.reset_index(inplace=True)
 
-    return pivot_df, pivot_table_mn
+    return pivot_table_mn
 
 
 def add_inbound_outbound_tour(df, df_tr):

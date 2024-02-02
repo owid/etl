@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1958
+    date_accessed: 2023-08-16 08:20:53.572326
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Progress towards sustainable forest management
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 37de048ce81873906ff124d49128266d
+  size: 27114
+  path: dataset_1958_progress_towards_sustainable_forest_management_values.feather

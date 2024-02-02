@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2568
+    date_accessed: 2023-08-16 09:31:42.862647
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2568_science__technology_and_patents__patents_by_technology
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 0902a7435df5898c09950872e09277e8
+  size: 266915
+  path: dataset_2568_science__technology_and_patents__patents_by_technology_config.json

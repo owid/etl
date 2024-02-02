@@ -1,18 +1,14 @@
 meta:
-  namespace: backport
-  short_name: dataset_5659_democratic_satisfaction__claassen_values
-  file_extension: feather
-  date_accessed: 2023-02-23 17:39:04.023361
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5659
+    date_accessed: 2023-08-10 07:49:27.228155
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Democratic satisfaction - Claassen
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/5659
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 49639a15e40c434679f8225b6e41d874
+- md5: eaffa51b7d1eb7c0dcd8bf21e6e71846
   size: 85474
   path: dataset_5659_democratic_satisfaction__claassen_values.feather

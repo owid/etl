@@ -1,18 +1,15 @@
 meta:
-  namespace: backport
-  short_name: dataset_204_health_insurance_coverage__us__us_current_population_survey__2014_values
-  file_extension: feather
-  date_accessed: 2023-02-23 19:36:26.797265
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/204
+    date_accessed: 2023-08-10 09:05:25.548171
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Health Insurance Coverage (US) - US Current Population Survey (2014)
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/204
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 2becbcb2319faade9227976d2c906399
+- md5: 5f6706ae50149277f598c33237a982a4
   size: 6826
-  path: dataset_204_health_insurance_coverage__us__us_current_population_survey__2014_values.feather
+  path: 
+    dataset_204_health_insurance_coverage__us__us_current_population_survey__2014_values.feather

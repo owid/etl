@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2015
+    date_accessed: 2023-08-16 09:42:30.271290
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2015_unsentenced_detainees_as_a_proportion_of_overall_prison_population
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 019392ed35c0c75dd097a478bd54a463
+  size: 2707
+  path: 
+    dataset_2015_unsentenced_detainees_as_a_proportion_of_overall_prison_population_config.json

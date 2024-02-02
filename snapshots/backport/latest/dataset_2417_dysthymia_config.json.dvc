@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2417
+    date_accessed: 2023-08-14 15:57:05.946505
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2417_dysthymia (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: fb0b30869f710f82211fc7251f6d6f66
+  size: 82936
+  path: dataset_2417_dysthymia_config.json

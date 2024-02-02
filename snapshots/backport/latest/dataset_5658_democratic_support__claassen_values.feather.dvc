@@ -1,18 +1,14 @@
 meta:
-  namespace: backport
-  short_name: dataset_5658_democratic_support__claassen_values
-  file_extension: feather
-  date_accessed: 2023-02-23 16:57:36.878321
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5658
+    date_accessed: 2023-08-10 08:35:41.045679
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Democratic support - Claassen
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/5658
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 4de88afb3994ae85969b4f1e1ea8edc2
+- md5: a9f5a947e3a09e1324612a8d5a1e8745
   size: 86322
   path: dataset_5658_democratic_support__claassen_values.feather

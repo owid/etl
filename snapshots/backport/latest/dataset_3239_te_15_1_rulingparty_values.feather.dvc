@@ -1,18 +1,15 @@
 meta:
-  namespace: backport
-  short_name: dataset_3239_te_15_1_rulingparty_values
-  file_extension: feather
-  date_accessed: 2023-02-23 17:04:17.133976
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/3239
+    date_accessed: 2023-08-10 08:31:17.249536
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: TE-15.1_RulingParty
   description: core-econ.org
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/3239
-  source_published_by: Our World in Data catalog backport
   is_public: false
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 7b6878f263841f6be1ba0b30310f338f
+- md5: c5dd9abd9ea8dd8414c706922e63ab06
   size: 6554
   path: dataset_3239_te_15_1_rulingparty_values.feather

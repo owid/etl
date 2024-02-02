@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2330
+    date_accessed: 2023-08-16 10:49:07.379835
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Low back and neck pain
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 6514629c65e5e1b5d9686d18ef557b74
+  size: 1721570
+  path: dataset_2330_low_back_and_neck_pain_values.feather

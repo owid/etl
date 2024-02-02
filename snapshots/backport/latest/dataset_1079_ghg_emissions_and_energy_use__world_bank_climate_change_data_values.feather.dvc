@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1079
+    date_accessed: 2023-08-16 09:47:21.039163
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: GHG emissions and energy use - World Bank Climate Change Data
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: f0c706e8323f9100cb7c131d58bfadb3
+  size: 176386
+  path: 
+    dataset_1079_ghg_emissions_and_energy_use__world_bank_climate_change_data_values.feather

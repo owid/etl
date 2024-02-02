@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4726
+    date_accessed: 2023-08-10 14:40:55.091898
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Participation rate in formal and non-formal education and training, by sex
+    (%)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 64ebb5585c48b1a78a7344c97cfe429d
+  size: 9426
+  path: 
+    dataset_4726_participation_rate_in_formal_and_non_formal_education_and_training__by_sex__pct_values.feather

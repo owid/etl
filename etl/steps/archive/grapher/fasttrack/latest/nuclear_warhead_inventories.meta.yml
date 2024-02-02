@@ -1,0 +1,58 @@
+dataset:
+  title: Nuclear warhead inventories – Federation of American Scientists
+  description: >-
+    This dataset provides information on the nuclear warhead inventories by the nuclear powers, using data from the Federation
+    of American Scientists, prepared by Hans M. Kristensen, Matt Korda, and Robert Norris.
+
+
+    You can download the code and complete dataset, including supplementary variables, from GitHub: https://github.com/owid/notebooks/tree/main/BastianHerre/nuclear_weapons
+
+    Publisher source: None
+  licenses:
+  - {}
+  sources:
+  - name: Federation of American Scientists (2023)
+    url: https://fas.org/issues/nuclear-weapons/status-world-nuclear-forces/
+    date_accessed: '2023-03-28'
+    publication_year: .nan
+    published_by: Hans M. Kristensen, Matt Korda, Eliana Reynolds, and Robert Norris.
+tables:
+  nuclear_warhead_inventories:
+    variables:
+      nuclear_weapons_depl_nonstrat:
+        title: nuclear_weapons_depl_nonstrat
+        description: |-
+          The variable denotes the estimated number of deployed nonstrategic nuclear warheads.
+
+          Deployed warheads are those on ballistic missiles or bomber bases.
+
+          Nonstrategic or tactical warheads are those for use on the battlefield.
+        unit: ''
+      nuclear_weapons_depl_strat:
+        title: nuclear_weapons_depl_strat
+        description: >-
+          The variable denotes the estimated number of deployed strategic nuclear warheads.
+
+
+          Deployed warheads are those on ballistic missiles or bomber bases.
+
+
+          Strategic warheads are those for use away from the battlefield, such as against military bases, arms industries,
+          or infrastructure.
+        unit: ''
+      nuclear_weapons_inventory:
+        title: nuclear_weapons_inventory
+        description: The variable denotes the estimated number of all nuclear warheads, be they deployed strategic, deployed
+          nonstrategic, nondeployed, or retired.
+        unit: ''
+      nuclear_weapons_reserve_nondepl:
+        title: nuclear_weapons_reserve_nondepl
+        description: |-
+          The variable denotes the estimated number of nondeployed nuclear warheads.
+
+          Nondeployed or reserve warheads are those not on ballistic missiles or bomber bases.
+        unit: ''
+      nuclear_weapons_retired:
+        title: nuclear_weapons_retired
+        description: The variable denotes the estimated number of retired nuclear warheads queued for dismantlement.
+        unit: ''

@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1632
+    date_accessed: 2023-08-14 05:48:38.320989
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Neonatal encephalopathy due to birth asphyxia and trauma
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: bf5da120987f8ca82e0a0c626d1f7b10
+  size: 1381146
+  path: 
+    dataset_1632_neonatal_encephalopathy_due_to_birth_asphyxia_and_trauma_values.feather

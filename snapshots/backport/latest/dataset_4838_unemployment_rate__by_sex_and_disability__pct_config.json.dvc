@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4838
+    date_accessed: 2023-08-14 14:40:44.417433
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_4838_unemployment_rate__by_sex_and_disability__pct
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: a6b7aa1fb86518bfbc8443a409b4f9a7
+  size: 21054
+  path: dataset_4838_unemployment_rate__by_sex_and_disability__pct_config.json

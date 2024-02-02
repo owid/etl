@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4628
+    date_accessed: 2023-08-16 10:34:03.030376
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_4628_proportion_of_results_indicators_which_will_be_monitored_using_government_sources_and_monitoring_systems__data_by_recipient__pct
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 430706433bb4f82f0ba901d4ac5b70b4
+  size: 16008
+  path: 
+    dataset_4628_proportion_of_results_indicators_which_will_be_monitored_using_government_sources_and_monitoring_systems__data_by_recipient__pct_config.json

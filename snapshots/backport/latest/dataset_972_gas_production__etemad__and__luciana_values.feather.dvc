@@ -1,18 +1,14 @@
 meta:
-  namespace: backport
-  short_name: dataset_972_gas_production__etemad__and__luciana_values
-  file_extension: feather
-  date_accessed: 2023-02-23 19:10:18.614841
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/972
+    date_accessed: 2023-08-10 09:38:37.375319
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Gas production - Etemad & Luciana
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/972
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 865300b8ce387f8b43f86488e7a6e2de
+- md5: 453a161902a1e49b9719f002cc49558e
   size: 46098
   path: dataset_972_gas_production__etemad__and__luciana_values.feather

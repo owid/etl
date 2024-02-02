@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4839
+    date_accessed: 2023-08-10 15:03:17.783114
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_4839_proportion_of_youth_not_in_education__employment_or_training__by_sex_and_age__pct
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 781868831adee173c650e32f4497ff57
+  size: 29771
+  path: 
+    dataset_4839_proportion_of_youth_not_in_education__employment_or_training__by_sex_and_age__pct_config.json

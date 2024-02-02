@@ -1,0 +1,759 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "license": {
+    "type": "object",
+    "title": "License of the dataset",
+    "description": "An origin's license is the license, assigned by a producer, of the data product from where we extracted the indicator's original data and metadata.",
+    "requirement_level": "required",
+    "category": "license",
+    "additionalProperties": false,
+    "properties": {
+      "name": {
+        "type": "string",
+        "title": "License name",
+        "description": "Name of the license. Find more details on licensing at https://creativecommons.org/share-your-work/cclicenses/.",
+        "requirement_level": "required",
+        "examples": [
+          "Public domain",
+          "CC0",
+          "PDM",
+          "CC BY 4.0",
+          "CC BY-SA 4.0",
+          "© GISAID 2023"
+        ],
+        "options": [
+          "CC0",
+          "CC BY 4.0",
+          "CC BY-SA 4.0",
+          "CC BY-ND 4.0",
+          "CC BY-NC 4.0",
+          "CC BY-NC-SA 4.0",
+          "CC BY-NC-ND 4.0",
+          "MIT License"
+        ],
+        "examples_bad": [],
+        "guidelines": [
+          [
+            "If it's a standard license, e.g. CC, it should be one of the acronyms in the examples below."
+          ],
+          [
+            "If the license is CC, but the version is not specified, assume 4.0."
+          ],
+          [
+            "If it's a custom license defined by the producer, it should follow the producer's text."
+          ],
+          [
+            "When the license of an external dataset is not specified, temporarily assume `CC BY 4.0`. Contact the producer before publishing.",
+            {
+              "type": "list",
+              "value": [
+                "If there is no response after a few days, ask Ed or Este and decide on a case-by-case basis."
+              ]
+            }
+          ]
+        ],
+        "category": "license"
+      },
+      "url": {
+        "type": "string",
+        "title": "License URL",
+        "description": "URL leading to the producer's website where the dataset license is specified.",
+        "pattern": "/(https:\/\/www\\.|http:\/\/www\\.|https:\/\/|http:\/\/)?[a-zA-Z]{2,}(\\.[a-zA-Z]{2,})(\\.[a-zA-Z]{2,})?\/[a-zA-Z0-9]{2,}|((https:\/\/www\\.|http:\/\/www\\.|https:\/\/|http:\/\/)?[a-zA-Z]{2,}(\\.[a-zA-Z]{2,})(\\.[a-zA-Z]{2,})?)|(https:\/\/www\\.|http:\/\/www\\.|https:\/\/|http:\/\/)?[a-zA-Z0-9]{2,}\\.[a-zA-Z0-9]{2,}\\.[a-zA-Z0-9]{2,}(\\.[a-zA-Z0-9]{2,})?/g;",
+        "errorMessage": "'license.url' must be a valid URL",
+        "requirement_level": "required (if existing)",
+        "examples": [],
+        "examples_bad": [],
+        "guidelines": [
+          [
+            "Must be a complete URL, i.e. `http...` ."
+          ],
+          [
+            "Must not lead to a Creative Commons website or any other generic page, but to the place where the producer specifies the license of the data."
+          ],
+          [
+            "If the license is specified inside, say, a PDF document, the URL should be the download link of that document."
+          ],
+          [
+            "When the license of an external dataset is not specified, leave `url` empty.",
+            {
+              "type": "list",
+              "value": [
+                "Do not use the URL of the main page of the dataset if the license is not mentioned anywhere."
+              ]
+            }
+          ]
+        ],
+        "category": "license"
+      }
+    }
+  },
+  "source": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "name": {
+        "type": "string"
+      },
+      "url": {
+        "type": "string"
+      },
+      "owid_data_url": {
+        "type": "string"
+      },
+      "source_data_url": {
+        "type": "string"
+      },
+      "date_accessed": {
+        "anyOf": [
+          {
+            "type": "string",
+            "format": "date"
+          },
+          {
+            "type": "string",
+            "pattern": "^\\{.*\\}$"
+          }
+        ]
+      },
+      "description": {
+        "type": "string"
+      },
+      "publication_year": {
+        "type": "integer"
+      },
+      "publication_date": {
+        "anyOf": [
+          {
+            "type": "string",
+            "format": "date"
+          },
+          {
+            "type": "string",
+            "pattern": "^\\{.*\\}$"
+          }
+        ]
+      },
+      "published_by": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "name"
+    ]
+  },
+  "origin": {
+    "type": "object",
+    "description": "An indicator's origin is the information about the snapshot where the indicator's data and metadata came from. A snapshot is a subset of data (a 'slice') taken on a specific day from a data product (often a public dataset, but sometimes a paper or a database). The producer of the data product is typically an institution or a set of authors.\n\nA snapshot often coincides with the data product (e.g. the dataset is a public csv file, and we download the entire file). But sometimes the data product is a bigger object (e.g. a set of files, a paper or a database) and the snapshot is just a particular subset of the data product (e.g. one of the files, or a table from a paper, or the result of a query). The origin fields are the attributes of the `Origin` object in ETL.",
+    "additionalProperties": false,
+    "required": [
+      "title",
+      "date_published",
+      "producer",
+      "citation_full",
+      "url_main",
+      "date_accessed"
+    ],
+    "properties": {
+      "title": {
+        "title": "Title of the original data product",
+        "type": "string",
+        "description": "Title of the original data product.",
+        "examples": [
+          "Global Carbon Budget"
+        ],
+        "examples_bad": [
+          [
+            "Global Carbon Budget (fossil fuels)"
+          ]
+        ],
+        "requirement_level": "required",
+        "guidelines": [
+          [
+            "Must start with a capital letter."
+          ],
+          [
+            "Must not end with a period."
+          ],
+          [
+            "Must not mention other metadata fields like `producer` or `version_producer`.",
+            {
+              "type": "exceptions",
+              "value": [
+                "The name of the origin is well known and includes other metadata fields."
+              ]
+            }
+          ],
+          [
+            "Should identify the data product, not the snapshot (i.e. the subset of data that we extract from the data product)."
+          ],
+          [
+            "If the producer's data product has a well-known name, use that name exactly (except for minor changes like typos)."
+          ],
+          [
+            "If the producer's data product does not have a well-known name, use a short sentence that describes its content."
+          ]
+        ],
+        "category": "dataset"
+      },
+      "description": {
+        "title": "Description of the data product",
+        "type": "string",
+        "description": "Description of the original data product.",
+        "examples": [],
+        "examples_bad": [],
+        "requirement_level": "recommended",
+        "guidelines": [
+          [
+            "Must start with a capital letter."
+          ],
+          [
+            "Must end with a period."
+          ],
+          [
+            "Must not mention other metadata fields like `producer` or `version_producer`.",
+            {
+              "type": "exceptions",
+              "value": [
+                "These other metadata fields are crucial in the description of the data product."
+              ]
+            }
+          ],
+          [
+            "Should describe the data product, not the snapshot (i.e. the subset of data we extract from the data product)."
+          ],
+          [
+            "Should ideally contain just one or a few paragraphs, that describe the data product succinctly."
+          ],
+          [
+            "If the producer provides a good description, use that, either exactly or conveniently rephrased."
+          ]
+        ],
+        "category": "dataset"
+      },
+      "date_published": {
+        "title": "Date of publication of the original data",
+        "type": "string",
+        "description": "Exact day (or year, if exact day is unknown) when the producer's data (in its current version) was published.",
+        "examples": [
+          "2023-09-07",
+          "2023"
+        ],
+        "examples_bad": [],
+        "requirement_level": "required",
+        "guidelines": [
+          [
+            "Must be a date with format `YYYY-MM-DD`, or, exceptionally, `YYYY`."
+          ],
+          [
+            "Must be the date when the current version of the dataset was published (not when the dataset was first released)."
+          ]
+        ],
+        "pattern": "(^\\d\\d\\d\\d\\-\\d\\d\\-\\d\\d$)|(^\\d{4}$)",
+        "errorMessage": "`date_published` must have format YYYY-MM-DD, YYYY or 'latest'",
+        "category": "dataset"
+      },
+      "version_producer": {
+        "type": ["string", "number"],
+        "title": "Version of the data product as given by the producer",
+        "description": "Producer's version of the data product.",
+        "requirement_level": "recommended (if existing)",
+        "examples": [],
+        "examples_bad": [],
+        "guidelines": [
+          [
+            "Should be used if the producer specifies the version of the data product."
+          ],
+          [
+            "Should follow the same naming as the producer, e.g. `v13`, `2023.a`, `version II`."
+          ]
+        ],
+        "category": "dataset"
+      },
+      "producer": {
+        "title": "Producer name",
+        "type": "string",
+        "description": "Name of the institution or the author(s) that produced the data product.",
+        "examples": [
+          "NASA",
+          "World Bank",
+          "Williams et al.",
+          "van Haasteren et al.",
+          "Williams and Jones"
+        ],
+        "examples_bad": [
+          [
+            "NASA (2023)",
+            "N.A.S.A.",
+            "N A S A",
+            "National Aeronautics and Space Administration",
+            "Our World in Data based on NASA"
+          ],
+          [
+            "WB"
+          ],
+          [
+            "Williams et al. (2023)",
+            "Williams et al",
+            "John Williams et al."
+          ],
+          [
+            "Van Haasteren et al."
+          ],
+          [
+            "Williams & Jones",
+            "John Williams and Indiana Jones"
+          ]
+        ],
+        "requirement_level": "required",
+        "guidelines": [
+          [
+            "Must start with a capital letter.",
+            {
+              "type": "exceptions",
+              "value": [
+                "The name of the institution or the author must be spelled with small letter, e.g. `van Haasteren`."
+              ]
+            }
+          ],
+          [
+            "Must not end with a period.",
+            {
+              "type": "exceptions",
+              "value": [
+                "When using `et al.` (for papers with multiple authors)."
+              ]
+            }
+          ],
+          [
+            "Must not include a date or year."
+          ],
+          [
+            "Must not mention `Our World in Data` or `OWID`."
+          ],
+          [
+            "Must not include any semicolon `;`."
+          ],
+          [
+            "Regarding authors:",
+            {
+              "type": "list",
+              "value": [
+                ["One author: `Williams`."],
+                ["Two authors: `Williams and Jones`."],
+                ["Three or more authors: `Williams et al.`."]
+              ]
+            }
+          ],
+          [
+            "Regarding acronyms:",
+            {
+              "type": "list",
+              "value": [
+                "If the acronym is more well known than the full name, use just the acronym, e.g. `NASA`.",
+                "If the acronym is not well known, use the full name, e.g. `Energy Institute`.",
+                "If the institution explicitly asks, follow their guidelines, e.g. `Food and Agriculture Organization of the United Nations` (instead of `FAO`)."
+              ]
+            }
+          ]
+        ],
+        "faqs": [
+          {
+            "question": "What should be the value if there are multiple producers?",
+            "answer": "We don't have a clear guideline for this at the moment, and depending on the case you might want to specify all the producers. However, a good option is to use 'Various sources'.",
+            "link": "https://github.com/owid/etl/discussions/1608"
+          }
+        ],
+        "category": "citation"
+      },
+      "citation_full": {
+        "title": "Full citation",
+        "type": "string",
+        "description": "Full citation of the data product. If the producer expressed how to cite them, we should follow their guidelines.",
+        "examples": [],
+        "examples_bad": [],
+        "requirement_level": "required",
+        "guidelines": [
+          [
+            "Must start with a capital letter."
+          ],
+          [
+            "Must end with a period."
+          ],
+          [
+            "Must include (wherever is appropriate) the year of publication, i.e. the year given in `date_published`."
+          ],
+          [
+            "If the producer specified how to cite them, this field should be identical to the producer's text, except for some formatting changes, typo corrections, or other appropriate minor edits.",
+            {
+              "type": "list",
+              "value": [
+                "**Note:** This field can be as long as necessary to follow the producer's guidelines."
+              ]
+            }
+          ],
+          [
+            "If the origin is the compilation of multiple sources, they can be added here as a list."
+          ]
+        ],
+        "category": "citation"
+      },
+      "attribution": {
+        "type": "string",
+        "title": "Attribution",
+        "description": "Citation of the data product to be used when the automatic format `producer (year)` needs to be overridden.",
+        "requirement_level": "optional",
+        "examples": [
+          "Energy Institute - Statistical Review of World Energy (2023)"
+        ],
+        "examples_bad": [
+          [
+            "Statistical Review of World Energy, Energy Institute (2023)",
+            "Statistical Review of World Energy (Energy Institute, 2023)"
+          ]
+        ],
+        "guidelines": [
+          [
+            "Must start with a capital letter.",
+            {
+              "type": "exceptions",
+              "value": [
+                "The name of the institution or the author must be spelled with small letter, e.g. `van Haasteren`."
+              ]
+            }
+          ],
+          [
+            "Must not end with a period."
+          ],
+          [
+            "Must end with the year of `date_published` in parenthesis."
+          ],
+          [
+            "Must not include any semicolon `;`."
+          ],
+          [
+            "Should only be used if the automatic attribution format `producer (year)` is considered uninformative. For example, when the title of the data product is well known and should be cited along with the producer, or when the original version of the data product should also be mentioned."
+          ],
+          [
+            "If this field is used to mention the data product, follow the preferred format `{producer} - {title} {version_producer} ({year})` (where `version_producer` may be omitted)."
+          ],
+          [
+            "If the producer explicitly asked for a specific short citation, follow their guidelines and ignore the above."
+          ]
+        ],
+        "category": "citation"
+      },
+      "attribution_short": {
+        "type": "string",
+        "title": "Attribution (shorter version)",
+        "description": "Shorter version of `attribution` (without the year), usually an acronym of the producer, to be used in public places that are short on space.",
+        "requirement_level": "recommended",
+        "examples": [
+          "FAO",
+          "World Bank"
+        ],
+        "examples_bad": [
+          [
+            "UN FAO",
+            "FAO (2023)"
+          ],
+          [
+            "WB"
+          ]
+        ],
+        "guidelines": [
+          [
+            "Must start with a capital letter.",
+            {
+              "type": "exceptions",
+              "value": [
+                "The name of the institution or the author must be spelled with small letter, e.g. `van Haasteren`."
+              ]
+            }
+          ],
+          [
+            "Must not end with a period."
+          ],
+          [
+            "Should refer to the producer or the data product (if well known), not the year or any other field."
+          ],
+          [
+            "Should be an acronym, if the acronym is well-known, otherwise a brief name."
+          ]
+        ],
+        "category": "citation"
+      },
+      "url_main": {
+        "title": "URL of the main website of the data product",
+        "type": "string",
+        "description": "Producer's URL leading to the main website of the original data product.",
+        "requirement_level": "required",
+        "guidelines": [
+          [
+            "Must be a complete URL, i.e. `http...`."
+          ],
+          [
+            "Should lead to a website where the data product is described."
+          ]
+        ],
+        "pattern": "/(https:\/\/www\\.|http:\/\/www\\.|https:\/\/|http:\/\/)?[a-zA-Z]{2,}(\\.[a-zA-Z]{2,})(\\.[a-zA-Z]{2,})?\/[a-zA-Z0-9]{2,}|((https:\/\/www\\.|http:\/\/www\\.|https:\/\/|http:\/\/)?[a-zA-Z]{2,}(\\.[a-zA-Z]{2,})(\\.[a-zA-Z]{2,})?)|(https:\/\/www\\.|http:\/\/www\\.|https:\/\/|http:\/\/)?[a-zA-Z0-9]{2,}\\.[a-zA-Z0-9]{2,}\\.[a-zA-Z0-9]{2,}(\\.[a-zA-Z0-9]{2,})?/g;",
+        "errorMessage": "'url_main' must be valid URL",
+        "examples": [
+          "https://data.some_institution.com/dataset_12"
+        ],
+        "examples_bad": [],
+        "category": "files"
+      },
+      "url_download": {
+        "title": "URL to download the producer's data",
+        "type": "string",
+        "description": "Producer's URL that directly downloads their data as a single file.",
+        "pattern": "/(https:\/\/www\\.|http:\/\/www\\.|https:\/\/|http:\/\/)?[a-zA-Z]{2,}(\\.[a-zA-Z]{2,})(\\.[a-zA-Z]{2,})?\/[a-zA-Z0-9]{2,}|((https:\/\/www\\.|http:\/\/www\\.|https:\/\/|http:\/\/)?[a-zA-Z]{2,}(\\.[a-zA-Z]{2,})(\\.[a-zA-Z]{2,})?)|(https:\/\/www\\.|http:\/\/www\\.|https:\/\/|http:\/\/)?[a-zA-Z0-9]{2,}\\.[a-zA-Z0-9]{2,}\\.[a-zA-Z0-9]{2,}(\\.[a-zA-Z0-9]{2,})?/g;",
+        "errorMessage": "'url_download' must be a valid URL",
+        "requirement_level": "required (if existing)",
+        "guidelines": [
+          [
+            "Must be a complete URL or S3 URI, i.e. `http...`."
+          ],
+          [
+            "Must be a direct download link.",
+            {
+              "type": "list",
+              "value": [
+                "The URL must not lead to a website that requires user input to download the dataset. If there is no direct download URL, this field should be empty."
+              ]
+            }
+          ]
+        ],
+        "examples": [
+          "https://data.some_institution.com/dataset_12/data.csv",
+          "s3://owid-private/data.csv"
+        ],
+        "examples_bad": [],
+        "category": "files"
+      },
+      "date_accessed": {
+        "title": "Date when we accessed the producer's original data",
+        "type": "string",
+        "format": "date",
+        "description": "Exact day when the producer's data (in its current version) was downloaded by OWID.",
+        "examples": [
+          "2023-09-07"
+        ],
+        "examples_bad": [],
+        "requirement_level": "required",
+        "guidelines": [
+          [
+            "Must be a date with format `YYYY-MM-DD`."
+          ],
+          [
+            "Must be the date when the current version of the producer's data was accessed (not any other previous version)."
+          ]
+        ],
+        "pattern": "^\\d\\d\\d\\d\\-\\d\\d\\-\\d\\d$",
+        "errorMessage": "`date_accessed` must have format YYYY-MM-DD",
+        "category": "files"
+      },
+      "title_snapshot": {
+        "title": "Title of the snapshot",
+        "type": "string",
+        "description": "Title of the snapshot (i.e. the subset of data that we extract from the data product).",
+        "examples": [
+          "Global Carbon Budget - Fossil fuels",
+          "Neutron star mergers"
+        ],
+        "examples_bad": [
+          [
+            "Global Carbon Budget"
+          ],
+          [
+            "Neutron star mergers (NASA, 2023)",
+            "Data on neutron star mergers",
+            "Neutron star mergers dataset"
+          ]
+        ],
+        "requirement_level": "required (if different from `title`)",
+        "guidelines": [
+          [
+            "Must start with a capital letter."
+          ],
+          [
+            "Must not end with a period."
+          ],
+          [
+            "Must not mention other metadata fields like `producer` or `version_producer`.",
+            {
+              "type": "exceptions",
+              "value": [
+                "The name of the origin is well known and includes other metadata fields.",
+                [
+                  "The producer's data product has a well-known name, and the snapshot is a specific slice of the data product. If so, use the format 'Data product - Specific slice'.",
+                  {
+                    "type": "list",
+                    "value": ["**Note:** This means that the title of the snapshot may contain the title of the data product."]}
+                ]
+              ]
+            }
+          ],
+          [
+            "Must not include any semicolon `;`."
+          ],
+          [
+            "Should only be used when the snapshot does not coincide with the entire data product."
+          ],
+          [
+            "Should not include words like `data`, `dataset` or `database`, unless that's part of a well-known name of the origin."
+          ],
+          [
+            "If the producer's data product does not have a well-known name, use a short sentence that describes the snapshot."
+          ]
+        ],
+        "category": "dataset"
+      },
+      "description_snapshot": {
+        "title": "Description of the snapshot",
+        "type": "string",
+        "description": "Additional information to append to the description of the data product, in order to describe the snapshot (i.e. the subset of data that we extract from the data product).",
+        "requirement_level": "recommended (if the data product and snapshot do not coincide)",
+        "guidelines": [
+          [
+            "Must start with a capital letter."
+          ],
+          [
+            "Must end with a period."
+          ],
+          [
+            "Should be defined only if the data product and the snapshot do not coincide."
+          ],
+          [
+            "Should not repeat information given in `description` (the description of the data product)."
+          ],
+          [
+            "Should not mention other metadata fields.",
+            {
+              "type": "list",
+              "value": [
+                "If fields like `producer` or `date_published` are mentioned, placeholders should be used."
+              ]
+            }
+          ]
+        ],
+        "examples": [],
+        "examples_bad": [],
+        "category": "dataset"
+      },
+      "license": {
+        "$ref": "#/license"
+      }
+    }
+  },
+  "display": {
+    "type": "object",
+    "description": "We keep display for the time being as the 'less powerful sibling' of grapher config.",
+    "properties": {
+      "isProjection": {
+        "type": "boolean",
+        "default": false,
+        "description": "Indicates if this time series is a forward projection (if so then this is rendered differently in e.g. line charts)."
+      },
+      "name": {
+        "type": "string",
+        "description": "Indicator's title to display in the legend of a chart. NOTE: For backwards compatibility, `display.name` also replaces the indicator's title in other public places. Therefore, whenever `display.name` is defined, `title_public` should also be defined.",
+        "examples": [
+          "Agriculture",
+          "Area harvested"
+        ],
+        "examples_bad": [
+          [
+            "Nitrous oxide emissions from agriculture"
+          ],
+          [
+            "Barley | 00000044 || Area harvested | 005312 || hectares"
+          ]
+        ],
+        "requirement_level": "required",
+        "guidelines": [
+          [
+            "Must be very short, to fit the legend of a chart."
+          ],
+          [
+            "Must not end with a period."
+          ],
+          [
+            "Should not mention other metadata fields like `producer` or `version`."
+          ]
+        ],
+        "category": "metadata"
+      },
+      "description": {
+        "type": "string",
+        "description": "Description to display for the indicator, to replace the indicator's `description`."
+      },
+      "tableDisplay": {
+        "type": "object",
+        "description": "Configuration for the table tab for this indicator, with options `hideAbsoluteChange` and `hideRelativeChange`.",
+        "properties": {
+          "hideAbsoluteChange": {
+            "type": "boolean",
+            "description": "Whether to hide the absolute change.",
+            "default": false
+          },
+          "hideRelativeChange": {
+            "type": "boolean",
+            "description": "Whether to hide the relative change.",
+            "default": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "tolerance": {
+        "type": "integer",
+        "default": 0,
+        "description": "Tolerance (in years or days) to use in charts. If data points are missing, the closest data point will be shown, if it lies within the specified tolerance.",
+        "minimum": 0
+      },
+      "entityAnnotationsMap": {
+        "type": "string",
+        "description": "Entity annotations"
+      },
+      "yearIsDay": {
+        "type": "boolean",
+        "default": false,
+        "description": "Switch to indicate if the number in the year column represents a day (since zeroDay) or a year."
+      },
+      "color": {
+        "type": "string",
+        "description": "Color to use for the indicator in e.g. line charts."
+      },
+      "includeInTable": {
+        "type": "boolean",
+        "default": true,
+        "description": "Whether to render this indicator in the table sheet."
+      },
+      "shortUnit": {
+        "type": "string",
+        "description": "Short unit to use in charts instead of the indicator's `short_unit`."
+      },
+      "conversionFactor": {
+        "type": "number",
+        "description": "Conversion factor to apply to indicator values.",
+        "guidelines": [
+          "**Note:** We should avoid using this, and instead convert data and units (and possibly other metadata fields where the units are mentioned) consistently in the ETL grapher step."
+        ]
+      },
+      "unit": {
+        "type": "string",
+        "description": "Unit to use in charts instead of the indicator's `unit`."
+      },
+      "numDecimalPlaces": {
+        "type": "integer",
+        "description": "Number of decimal places to show in charts (and in the table tab).",
+        "minimum": 0
+      },
+      "zeroDay": {
+        "type": "string",
+        "description": "ISO date day string for the starting date if `yearIsDay` is `True`."
+      }
+    },
+    "additionalProperties": false
+  }
+}

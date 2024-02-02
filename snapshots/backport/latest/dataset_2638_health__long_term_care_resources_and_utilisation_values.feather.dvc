@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2638
+    date_accessed: 2023-08-11 07:55:38.104367
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Health - Long-Term Care Resources and Utilisation
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 8836908431d8c8163d3ef5b6745db756
+  size: 20794
+  path: dataset_2638_health__long_term_care_resources_and_utilisation_values.feather

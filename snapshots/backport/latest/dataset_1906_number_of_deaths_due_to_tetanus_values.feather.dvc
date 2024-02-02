@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1906
+    date_accessed: 2023-08-16 09:50:04.733824
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Number of deaths due to tetanus
+  description: This is the GBD 2016 dataset with world regions added to the dataset
+    as entities.
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: e2088533c7b22ff9eba4e30d8819db03
+  size: 59570
+  path: dataset_1906_number_of_deaths_due_to_tetanus_values.feather

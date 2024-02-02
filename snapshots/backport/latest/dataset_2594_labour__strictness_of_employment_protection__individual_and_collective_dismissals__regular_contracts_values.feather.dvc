@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2594
+    date_accessed: 2023-08-16 10:07:07.277522
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Labour - Strictness of employment protection – individual and collective dismissals
+    (regular contracts)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 6affa094b96077131f7902eb01a60fae
+  size: 13250
+  path: 
+    dataset_2594_labour__strictness_of_employment_protection__individual_and_collective_dismissals__regular_contracts_values.feather

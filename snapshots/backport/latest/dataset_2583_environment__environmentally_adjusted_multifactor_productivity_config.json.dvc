@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2583
+    date_accessed: 2023-08-10 14:45:06.540661
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2583_environment__environmentally_adjusted_multifactor_productivity
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 70a4c8414619d29accd8e049122425ef
+  size: 7721
+  path: 
+    dataset_2583_environment__environmentally_adjusted_multifactor_productivity_config.json

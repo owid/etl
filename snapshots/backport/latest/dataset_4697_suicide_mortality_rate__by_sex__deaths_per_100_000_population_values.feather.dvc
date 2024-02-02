@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4697
+    date_accessed: 2023-08-16 10:45:10.161864
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Suicide mortality rate, by sex (deaths per 100,000 population)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: b05300ba9dea40862a570bac96eec3a6
+  size: 24042
+  path: 
+    dataset_4697_suicide_mortality_rate__by_sex__deaths_per_100_000_population_values.feather

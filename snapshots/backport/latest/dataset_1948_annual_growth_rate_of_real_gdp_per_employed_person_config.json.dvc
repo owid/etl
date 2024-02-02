@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1948
+    date_accessed: 2023-08-16 08:33:23.846608
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1948_annual_growth_rate_of_real_gdp_per_employed_person
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 2e7b1c0757d10e2e4a5728f6d9c16a5e
+  size: 3167
+  path: dataset_1948_annual_growth_rate_of_real_gdp_per_employed_person_config.json

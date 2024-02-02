@@ -1,0 +1,167 @@
+dataset:
+  title: uk_covid_data
+  sources:
+  - name: UK Government COVID-19 Dashboard – Last updated {TODAY}
+    url: https://coronavirus.data.gov.uk/details/download
+    published_by: Government of the United Kingdom
+tables:
+  uk_covid_data:
+    variables:
+      cumulative_cases:
+        title: cumulative_cases
+        unit: cases
+        display:
+          name: Cumulative confirmed COVID-19 cases
+          numDecimalPlaces: 0
+          yearIsDay: true
+          zeroDay: '2020-01-01'
+      cumulative_cases_rate:
+        title: cumulative_cases_rate
+        unit: deaths per 100,000
+        display:
+          name: Cumulative confirmed COVID-19 deaths per 100,000
+          numDecimalPlaces: 0
+          yearIsDay: true
+          zeroDay: '2020-01-01'
+      cumulative_deaths:
+        title: cumulative_deaths
+        unit: deaths
+        display:
+          name: Cumulative confirmed COVID-19 deaths
+          numDecimalPlaces: 0
+          yearIsDay: true
+          zeroDay: '2020-01-01'
+      cumulative_deaths_rate:
+        title: cumulative_deaths_rate
+        unit: deaths per 100,000
+        display:
+          name: Cumulative confirmed COVID-19 deaths per 100,000
+          yearIsDay: true
+          zeroDay: '2020-01-01'
+      daily_cases:
+        title: daily_cases
+        unit: ''
+        display:
+          name: Daily new confirmed COVID-19 cases
+          numDecimalPlaces: 0
+          yearIsDay: true
+          zeroDay: '2020-01-01'
+      daily_cases_rate_rolling_average:
+        title: daily_cases_rate_rolling_average
+        unit: ''
+        display:
+          name: Daily new confirmed COVID-19 cases, 7-day rolling average
+          yearIsDay: true
+          zeroDay: '2020-01-01'
+      daily_cases_rolling_average:
+        title: daily_cases_rolling_average
+        unit: ''
+        display:
+          yearIsDay: true
+          zeroDay: '2020-01-01'
+      daily_deaths:
+        title: daily_deaths
+        unit: ''
+        display:
+          name: Daily new confirmed COVID-19 deaths
+          numDecimalPlaces: 0
+          yearIsDay: true
+          zeroDay: '2020-01-01'
+      daily_deaths_rate_rolling_average:
+        title: daily_deaths_rate_rolling_average
+        unit: ''
+        display:
+          name: Daily new confirmed COVID-19 cases, 7-day rolling average
+      daily_deaths_rolling_average:
+        title: daily_deaths_rolling_average
+        unit: ''
+        display:
+          name: Daily new confirmed COVID-19 deaths
+          yearIsDay: true
+          zeroDay: '2020-01-01'
+      new_hospital_admissions:
+        title: new_hospital_admissions
+        unit: ''
+        display:
+          name: 'UK: Daily new hospital admissions for COVID-19'
+          numDecimalPlaces: 0
+          yearIsDay: true
+          zeroDay: '2020-01-01'
+      people_in_hospital:
+        title: people_in_hospital
+        unit: ''
+        display:
+          name: 'UK: Number of COVID-19 patients in hospital'
+          numDecimalPlaces: 0
+          yearIsDay: true
+          zeroDay: '2020-01-01'
+      people_in_hospital_normalized:
+        title: people_in_hospital_normalized
+        unit: '%'
+        display:
+          yearIsDay: true
+          zeroDay: '2020-01-01'
+        short_unit: '%'
+      people_ventilated:
+        title: people_ventilated
+        unit: ''
+      people_ventilated_normalized:
+        title: people_ventilated_normalized
+        unit: '%'
+        display:
+          yearIsDay: true
+          zeroDay: '2020-01-01'
+        short_unit: '%'
+      test_positivity_rate:
+        title: test_positivity_rate
+        unit: '%'
+        display:
+          name: Share of COVID-19 tests that are positive
+          yearIsDay: true
+          zeroDay: '2020-01-01'
+        short_unit: '%'
+      weekly_cases_rate:
+        title: weekly_cases_rate
+        unit: per 100,000
+        display:
+          name: Confirmed COVID-19 cases per 100k, weekly rolling average
+          yearIsDay: true
+          zeroDay: '2020-01-01'
+      weekly_cases_rolling:
+        title: weekly_cases_rolling
+        unit: ''
+        display:
+          name: Confirmed COVID-19 cases, weekly rolling average
+          yearIsDay: true
+          zeroDay: '2020-01-01'
+      weekly_cases_rolling_normalized:
+        title: weekly_cases_rolling_normalized
+        unit: '%'
+        display:
+          yearIsDay: true
+          zeroDay: '2020-01-01'
+        short_unit: '%'
+      weekly_deaths_rate:
+        title: weekly_deaths_rate
+        unit: per 100,000
+        display:
+          name: Confirmed COVID-19 deaths per 100k, weekly rolling average
+          yearIsDay: true
+          zeroDay: '2020-01-01'
+      weekly_deaths_rolling:
+        title: weekly_deaths_rolling
+        unit: ''
+        display:
+          name: Confirmed COVID-19 deaths, weekly rolling average
+          yearIsDay: true
+          zeroDay: '2020-01-01'
+      weekly_deaths_rolling_normalized:
+        title: weekly_deaths_rolling_normalized
+        unit: '%'
+        display:
+          yearIsDay: true
+          zeroDay: '2020-01-01'
+        short_unit: '%'
+      weekly_hospital_admissions:
+        title: weekly_hospital_admissions
+        unit: ''

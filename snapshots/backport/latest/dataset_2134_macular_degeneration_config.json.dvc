@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2134
+    date_accessed: 2023-08-16 08:16:42.965288
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2134_macular_degeneration (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 88410a13f608321d7060070d2d0d29b0
+  size: 16904
+  path: dataset_2134_macular_degeneration_config.json

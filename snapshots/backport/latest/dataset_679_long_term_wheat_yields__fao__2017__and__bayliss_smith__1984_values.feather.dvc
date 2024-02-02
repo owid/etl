@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/679
+    date_accessed: 2023-08-14 15:06:14.488969
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Long-term wheat yields - FAO (2017) & Bayliss-Smith (1984)
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: f17a6d55e24ebf018114ffd115bcf4f5
+  size: 45570
+  path: 
+    dataset_679_long_term_wheat_yields__fao__2017__and__bayliss_smith__1984_values.feather

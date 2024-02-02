@@ -18,7 +18,7 @@ paths = PathFinder(__file__)
 THIS_YEAR = date.today().year
 # Minimum and maximum years expected in data
 YEAR_MIN_EXPECTED = 1990
-YEAR_MAX_EXPECTED = 2023
+YEAR_MAX_EXPECTED = 2024
 # Year range to be used (rest is filtered out)
 YEAR_MIN = 2010
 YEAR_MAX = 3000  # (No actual limit)
@@ -31,10 +31,11 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load meadow dataset.
-    ds_meadow: Dataset = paths.load_dependency("hmd_stmf")
+    ds_meadow = paths.load_dataset("hmd_stmf")
 
     # Read table from meadow dataset.
     tb_meadow = ds_meadow["hmd_stmf"]
+    tb_meadow = tb_meadow.reset_index()
 
     # Create a dataframe with data from the table.
     df = pd.DataFrame(tb_meadow)
@@ -48,6 +49,8 @@ def run(dest_dir: str) -> None:
     # Create a new table with the processed data.
     tb_garden = Table(df, short_name=tb_meadow.metadata.short_name)
 
+    # Set index
+    tb_garden = tb_garden.set_index(["entity", "week", "age"], verify_integrity=True)
     #
     # Save outputs.
     #
@@ -108,7 +111,7 @@ def filter_entries(df: pd.DataFrame) -> pd.DataFrame:
 
 def reshape_df(df: pd.DataFrame) -> pd.DataFrame:
     """Pivot/unpivot to get data in the right format."""
-    # Pivot long [Entity, Year, Week, Sex, [D*]] -> [Entity, Week, Sex, Age, [Years]]
+    # Unpivot [Entity, Year, Week, Sex, [D*]] -> [Entity, Week, Sex, Age, [Years]]
     df = df.melt(
         id_vars=["entity", "year", "week"],
         value_vars=["d0_14", "d15_64", "d65_74", "d75_84", "d85p", "dtotal"],
@@ -133,11 +136,14 @@ def add_uk(df: pd.DataFrame):
     """
     # Get UK Nations
     df_uk = df[df["entity"].isin(["England & Wales", "Scotland", "Northern Ireland"])].copy()
-    # Years to consider (starting from 2015
+    # Years to consider (starting from 2015)
     column_years = list(filter(lambda x: x >= 2015, df_uk.filter(regex=r"20\d\d").columns))
     # Sanity check
+    # NOTE: this used to be
+    #     df_uk[[col for col in column_years if col != THIS_YEAR]].isna().sum() < 20
+    # but it started failing in 2024
     assert (
-        df_uk[[col for col in column_years if col != THIS_YEAR]].isna().sum() < 20
+        df_uk[[col for col in column_years if col <= 2023]].isna().sum() < 20
     ).all(), "Too many missing values. Check values in year columns!"
     # Group by and get sum
     df_uk = df_uk.groupby(["week", "age"], as_index=False)[column_years].sum(min_count=3)

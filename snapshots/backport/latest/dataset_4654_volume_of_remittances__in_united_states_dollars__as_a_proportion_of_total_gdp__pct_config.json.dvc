@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4654
+    date_accessed: 2023-08-16 08:21:31.892740
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_4654_volume_of_remittances__in_united_states_dollars__as_a_proportion_of_total_gdp__pct
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 2d76b9eb56a64b4dce81c219af340600
+  size: 7301
+  path: 
+    dataset_4654_volume_of_remittances__in_united_states_dollars__as_a_proportion_of_total_gdp__pct_config.json

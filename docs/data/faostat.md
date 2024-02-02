@@ -255,7 +255,7 @@ If no dataset requires an update, the workflow stops here.
     INSPECT_ANOMALIES=True etl garden/faostat/YYYY-MM-DD
     ```
     !!! note
-    
+
       If a new domain has been added to this version, you may need to manually add its meadow step as a dependency of garden/faostat/YYYY-MM-DD/faostat_metadata in the dag (this is a known bug).
 
 6. Inspect and update any possible changes of dataset/item/element/unit names and descriptions.

@@ -1,5 +1,5 @@
 dataset:
-  title: World Risk Poll (2021)
+  title: World Risk Poll - AI questions (2021)
   description: >-
     Spread across four themed reports, the 2021 World Risk Poll covers the biggest risks facing people and communities globally,
     ranging from road crashes, severe weather, climate change and disaster resilience, to work-related harm, violence and
@@ -14,605 +14,108 @@ dataset:
 
     2) Would you feel safe in a car driven by computer without a human driver?
   licenses:
-    - name: Lloyd’s Register Foundation 2018
-      url: https://wrp.lrfoundation.org.uk/terms-of-use/
+  - name: Lloyd's Register Foundation 2018
+    url: https://wrp.lrfoundation.org.uk/terms-of-use/
   sources:
-    - name: Lloyd’s Register Foundation (2022)
-      url: https://wrp.lrfoundation.org.uk/data-resources/
-      source_data_url: https://wrp.lrfoundation.org.uk/wp-content/uploads/2023/05/lrf_wrp_2021_full_data.zip
-      date_accessed: '2023-06-26'
-      publication_year: 2022
-      published_by: World Risk Poll 2021, Lloyd’s Register Foundation (2022)
+  - name: Lloyd's Register Foundation (2022)
+    url: https://wrp.lrfoundation.org.uk/data-resources/
+    source_data_url: https://wrp.lrfoundation.org.uk/wp-content/uploads/2023/05/lrf_wrp_2021_full_data.zip
+    date_accessed: '2023-06-26'
+    publication_year: 2022
+    published_by: World Risk Poll 2021, Lloyd's Register Foundation (2022)
 tables:
   ai_wrp_2021:
     variables:
-      yes_no_ratio:
-        title: Feel safe versus not safe ratio
-        description: World Risk Survey question - "Would you feel safe in car driven by computer without a human driver"
-        unit: ratio
-        display:
-           numDecimalPlaces: 1
-
-
-      help_harm_ratio:
-        title: Help versus harm ratio
-        description: World Risk Survey question - "Will Artificial Intelligence help or harm people in the next 20 years?"
-        unit: ratio
-        display:
-          numDecimalPlaces: 1
-
-      female_yes_no_ratio:
-        title:  Feel safe versus not safe ratio (Female)
-        description: World Risk Survey question - "Would you feel safe in car driven by computer without a human driver".  Answers by respondents who identified as Female.
-        unit: ratio
-        display:
-          name: Female
-          numDecimalPlaces: 1
-
-      male_yes_no_ratio:
-        title: Feel safe versus not safe ratio (Male)
-        description: World Risk Survey question - "Would you feel safe in car driven by computer without a human driver". Answers by respondents who identified as Male.
-        unit: ratio
-        display:
-          name: Male
-          numDecimalPlaces: 1
-
-      dk_refused_yes_no_ratio:
-        title: DK/Refused
-        description: World Risk Survey question - "Would you feel safe in car driven by computer without a human driver".
-        unit: ratio
-        display:
-          name: Refused
-          numDecimalPlaces: 1
-
-      primary__0_8_years__yes_no_ratio:
-        title: Feel safe versus not safe ratio (Primary Education, 0-8 years)
-        description: World Risk Survey question - "Would you feel safe in car driven by computer without a human driver".  Answers by respondents with Primary Education (0-8 years).
-        unit: ratio
-        display:
-          name: Primary Education
-          numDecimalPlaces: 1
-
-      secondary__9_15_years__yes_no_ratio:
-        title: Feel safe versus not safe ratio (Secondary Education, 9-15 years)
-        description: World Risk Survey question - "Would you feel safe in car driven by computer without a human driver". Answers by respondents with Secondary Education (9-15 years).
-        unit: ratio
-        display:
-          name: Secondary Education
-          numDecimalPlaces: 1
-
-      tertiary__16_years_or_more__yes_no_ratio:
-        title: Feel safe versus not safe ratio (Tertiary Education (16 years or more))
-        description: World Risk Survey question - "Would you feel safe in car driven by computer without a human driver". Answers by respondents with Tertiary Education (16 years or more).
-        unit: ratio
-        display:
-          name: Tertiary Education
-          numDecimalPlaces: 1
-
-
-      fourth_20pct_yes_no_ratio:
-        title: Feel safe versus not safe ratio (Income quantile (Fourth 20%))
-        description: World Risk Survey question - "Would you feel safe in car driven by computer without a human driver". Answers by respondents who are in fourth 20% income quantile.
-        unit: ratio
-        display:
-          name: Fourth 20% income quantile
-          numDecimalPlaces: 1
-
-      middle_20pct_yes_no_ratio:
-        title: Feel safe versus not safe ratio (Income quantile - Middle 20%)
-        description: World Risk Survey question - "Would you feel safe in car driven by computer without a human driver". Answers by respondents who are in the middle 20% income quantile.
-        unit: ratio
-        display:
-          name: Middle 20% income quantile
-          numDecimalPlaces: 1
-
-      poorest_20pct_yes_no_ratio:
-        title: Feel safe versus not safe ratio (Income quantile - Poorest 20%)
-        description: World Risk Survey question - "Would you feel safe in car driven by computer without a human driver". Answers by respondents who are in the poorest 20% income quantile.
-        unit: ratio
-        display:
-          name: Poorest 20% income quantile
-          numDecimalPlaces: 1
-
-      richest_20pct_yes_no_ratio:
-        title: Feel safe versus not safe ratio (Income quantile - Richest 20%)
-        description: World Risk Survey question - "Would you feel safe in car driven by computer without a human driver". Answers by respondents who are in the richest 20% income quantile.
-        unit:  ratio
-        display:
-          name: Richest 20% income quantile
-          numDecimalPlaces: 1
-
-      second_20pct_yes_no_ratio:
-        title: Feel safe versus not safe ratio (Income quantile - Second 20%)
-        description: World Risk Survey question - "Would you feel safe in car driven by computer without a human driver". Answers by respondents who are in the second 20% income quantile.
-        unit:  ratio
-        display:
-          name: Second 20% income quantile
-          numDecimalPlaces: 1
-
-      employed_full_time_for_an_employer_yes_no_ratio:
-        title: Feel safe versus not safe ratio (Employed Full Time for an Employer)
-        description: World Risk Survey question - "Would you feel safe in car driven by computer without a human driver". Answers by respondents who are employed full time for an employer.
-        unit:  ratio
-        display:
-          name: Employed Full Time for an Employer
-          numDecimalPlaces: 1
-
-      employed_full_time_for_self_yes_no_ratio:
-        title: Feel safe versus not safe ratio (Employed Full Time for Self)
-        description: World Risk Survey question - "Would you feel safe in car driven by computer without a human driver". Answers by respondents who are employed full time for themselves.
-        unit:  ratio
-        display:
-          name: Employed Full Time for Self
-          numDecimalPlaces: 1
-
-      employed_part_time_do_not_want_full_time_yes_no_ratio:
-        title: Feel safe versus not safe ratio (Employed Part Time, Do Not Want Full Time)
-        description: World Risk Survey question - "Would you feel safe in car driven by computer without a human driver". Answers by respondents who are employed part time and do not want full time employment.
-        unit:  ratio
-        display:
-          name: Employed Part Time, Do Not Want Full Time
-          numDecimalPlaces: 1
-
-      employed_part_time_want_full_time_yes_no_ratio:
-        title: Feel safe versus not safe ratio (Employed Part Time, Want Full Time)
-        description: World Risk Survey question - "Would you feel safe in car driven by computer without a human driver". Answers by respondents who are employed part time and want full time employment.
-        unit:  ratio
-        display:
-          name: Employed Part Time, Want Full Time
-          numDecimalPlaces: 1
-
-      out_of_workforce_yes_no_ratio:
-        title: Feel safe versus not safe ratio (Out of Workforce)
-        description: World Risk Survey question - "Would you feel safe in car driven by computer without a human driver". Answers by respondents who are currently out of the workforce.
-        unit:  ratio
-        display:
-          name: Out of Workforce
-          numDecimalPlaces: 1
-
-      unemployed_yes_no_ratio:
-        title: Feel safe versus not safe ratio (Unemployed)
-        description: World Risk Survey question - "Would you feel safe in car driven by computer without a human driver". Answers by respondents who are currently unemployed.
-        unit:  ratio
-        display:
-          name: Unemployed
-          numDecimalPlaces: 1
-
-      _15_29_yes_no_ratio:
-        title: Feel safe versus not safe ratio (Age 15-29)
-        description: World Risk Survey question - "Would you feel safe in car driven by computer without a human driver". Answers by respondents who are in the age group of 15-29.
-        unit:  ratio
-        display:
-          name: Age 15-29
-          numDecimalPlaces: 1
-
-      _30_49_yes_no_ratio:
-        title: Feel safe versus not safe ratio (Age 30-49)
-        description: World Risk Survey question - "Would you feel safe in car driven by computer without a human driver". Answers by respondents who are in the age group of 30-49.
-        unit:  ratio
-        display:
-          name: Age 30-49
-          numDecimalPlaces: 1
-
-      _50_64_yes_no_ratio:
-        title: Feel safe versus not safe ratio (Age 50-64)
-        description: World Risk Survey question - "Would you feel safe in car driven by computer without a human driver". Answers by respondents who are in the age group of 50-64.
-        unit:  ratio
-        display:
-          name: Age 50-64
-          numDecimalPlaces: 1
-
-      _65plus_yes_no_ratio:
-        title: Feel safe versus not safe ratio (Age 65+)
-        description: World Risk Survey question - "Would you feel safe in car driven by computer without a human driver". Answers by respondents who are 65 years old or older.
-        unit: ratio
-        display:
-          name: Age 65+
-          numDecimalPlaces: 1
-
-      australia_and_new_zealand_yes_no_ratio:
-        title: Feel safe versus not safe ratio (Australia and New Zealand)
-        description: World Risk Survey question - "Would you feel safe in car driven by computer without a human driver". Answers by respondents from Australia and New Zealand.
-        unit: ratio
-        display:
-          name: Australia and New Zealand
-          numDecimalPlaces: 1
-
-      central_asia_yes_no_ratio:
-        title: Feel safe versus not safe ratio (Central Asia)
-        description: World Risk Survey question - "Would you feel safe in car driven by computer without a human driver". Answers by respondents from Central Asia.
-        unit:  ratio
-        display:
-          name: Central Asia
-          numDecimalPlaces: 1
-
-      central_western_africa_yes_no_ratio:
-        title: Feel safe versus not safe ratio (Central/Western Africa)
-        description: World Risk Survey question - "Would you feel safe in car driven by computer without a human driver". Answers by respondents from Central/Western Africa.
-        unit:  ratio
-        display:
-          name: Central/Western Africa
-          numDecimalPlaces: 1
-
-      east_asia_yes_no_ratio:
-        title: Feel safe versus not safe ratio (East Asia)
-        description: World Risk Survey question - "Would you feel safe in car driven by computer without a human driver". Answers by respondents from East Asia.
-        unit:  ratio
-        display:
-          name: East Asia
-          numDecimalPlaces: 1
-
-      eastern_africa_yes_no_ratio:
-        title: Feel safe versus not safe ratio (Eastern Africa)
-        description: World Risk Survey question - "Would you feel safe in car driven by computer without a human driver". Answers by respondents from Eastern Africa.
-        unit:  ratio
-        display:
-          name: Eastern Africa
-          numDecimalPlaces: 1
-
-      eastern_europe_yes_no_ratio:
-        title: Feel safe versus not safe ratio (Eastern Europe)
-        description: World Risk Survey question - "Would you feel safe in car driven by computer without a human driver". Answers by respondents from Eastern Europe.
-        unit:  ratio
-        display:
-          name: Eastern Europe
-          numDecimalPlaces: 1
-
-      latin_america__and__caribbean_yes_no_ratio:
-        title: Feel safe versus not safe ratio (Latin America & Caribbean)
-        description: World Risk Survey question - "Would you feel safe in car driven by computer without a human driver". Answers by respondents from Latin America & Caribbean.
-        unit:  ratio
-        display:
-          name: Latin America & Caribbean
-          numDecimalPlaces: 1
-
-      middle_east_yes_no_ratio:
-        title: Feel safe versus not safe ratio (Middle East)
-        description: World Risk Survey question - "Would you feel safe in car driven by computer without a human driver". Answers by respondents from the Middle East.
-        unit:  ratio
-        display:
-          name: Middle East
-          numDecimalPlaces: 1
-
-      north_africa_yes_no_ratio:
-        title: Feel safe versus not safe ratio (North Africa)
-        description: World Risk Survey question - "Would you feel safe in car driven by computer without a human driver". Answers by respondents from North Africa.
-        unit:  ratio
-        display:
-          name: North Africa
-          numDecimalPlaces: 1
-
-      northern_america_yes_no_ratio:
-        title: Feel safe versus not safe ratio (Northern America)
-        description: World Risk Survey question - "Would you feel safe in car driven by computer without a human driver". Answers by respondents from Northern America.
-        unit:  ratio
-        display:
-          name: Northern America
-          numDecimalPlaces: 1
-
-      northern_western_europe_yes_no_ratio:
-        title: Feel safe versus not safe ratio (Northern/Western Europe)
-        description: World Risk Survey question - "Would you feel safe in car driven by computer without a human driver". Answers by respondents from Northern/Western Europe.
-        unit:  ratio
-        display:
-          name: Northern/Western Europe
-          numDecimalPlaces: 1
-
-      south_asia_yes_no_ratio:
-        title: Feel safe versus not safe ratio (South Asia)
-        description: World Risk Survey question - "Would you feel safe in car driven by computer without a human driver". Answers by respondents from South Asia.
-        unit:  ratio
-        display:
-          name: South Asia
-          numDecimalPlaces: 1
-
-      south_eastern_asia_yes_no_ratio:
-        title: Feel safe versus not safe ratio (South-eastern Asia)
-        description: World Risk Survey question - "Would you feel safe in car driven by computer without a human driver". Answers by respondents from South-eastern Asia.
-        unit:  ratio
-        display:
-          name: South-eastern Asia
-          numDecimalPlaces: 1
-
-      southern_africa_yes_no_ratio:
-        title: Feel safe versus not safe ratio (Southern Africa)
-        description: World Risk Survey question - "Would you feel safe in car driven by computer without a human driver". Answers by respondents from Southern Africa.
-        unit:  ratio
-        display:
-          name: Southern Africa
-          numDecimalPlaces: 1
-
-      southern_europe_yes_no_ratio:
-        title: Feel safe versus not safe ratio (Southern Europe)
-        description: World Risk Survey question - "Would you feel safe in car driven by computer without a human driver". Answers by respondents from Southern Europe.
-        unit: ratio
-        display:
-          name: Southern Europe
-          numDecimalPlaces: 1
-
-      female_help_harm_ratio:
-        title: Help versus harm ratio (Female)
-        description: World Risk Survey question - "Will Artificial Intelligence help or harm people in the next 20 years?", Answers by respondents who identified as Female.
-        unit:  ratio
-        display:
-          name: Female
-          numDecimalPlaces: 1
-
-      male_help_harm_ratio:
-        title: Help versus harm ratio (Male)
-        description: World Risk Survey question - "Will Artificial Intelligence help or harm people in the next 20 years?". Answers by respondents who identified as Male.
-        unit: ratio
-        display:
-          name: Male
-
-      dk_refused_help_harm_ratio:
-        title: Help versus harm ratio (DK/Refused)
-        description: World Risk Survey question - "Will Artificial Intelligence help or harm people in the next 20 years?"
-        unit:  ratio
-        display:
-          name: DK/Refused
-          numDecimalPlaces: 1
-
-      primary__0_8_years__help_harm_ratio:
-        title: Help versus harm ratio (Primary Education, 0-8 years)
-        description: World Risk Survey question - "Will Artificial Intelligence help or harm people in the next 20 years?" Answers by respondents with Primary Education (0-8 years).
-        unit:  ratio
-        display:
-          name: Primary Education
-          numDecimalPlaces: 1
-
-      secondary__9_15_years__help_harm_ratio:
-        title: Help versus harm ratio (Secondary Education, 9-15 years)
-        description: World Risk Survey question - "Will Artificial Intelligence help or harm people in the next 20 years?". Answers by respondents with Secondary Education (9-15 years).
-        unit:  ratio
-        display:
-          name: Secondary Education
-          numDecimalPlaces: 1
-
-      tertiary__16_years_or_more__help_harm_ratio:
-        title: Help versus harm ratio (Tertiary Education, 16 years or more)
-        description: World Risk Survey question - "Will Artificial Intelligence help or harm people in the next 20 years?". Answers by respondents with Tertiary Education (16 years or more).
-        unit:  ratio
-        display:
-          name: Tertiary Education
-          numDecimalPlaces: 1
-
-      fourth_20pct_help_harm_ratio:
-        title: Help versus harm ratio (Fourth 20%)
-        description: World Risk Survey question - "Will Artificial Intelligence help or harm people in the next 20 years?". Answers by respondents who are in the fourth 20% income quantile.
-        unit:  ratio
-        display:
-          name: Fourth 20%
-          numDecimalPlaces: 1
-
-      middle_20pct_help_harm_ratio:
-        title: Help versus harm ratio (Middle 20%)
-        description: World Risk Survey question - "Will Artificial Intelligence help or harm people in the next 20 years?". Answers by respondents who are in the middle 20% income quantile.
-        unit:  ratio
-        display:
-          name: Middle 20%
-          numDecimalPlaces: 1
-
-      poorest_20pct_help_harm_ratio:
-        title: Help versus harm ratio (Poorest 20%)
-        description: World Risk Survey question - "Will Artificial Intelligence help or harm people in the next 20 years?". Answers by respondents who are in the poorest 20% income quantile.
-        unit:  ratio
-        display:
-          name: Poorest 20%
-          numDecimalPlaces: 1
-
-      richest_20pct_help_harm_ratio:
-        title: Help versus harm ratio (Richest 20%)
-        description: World Risk Survey question - "Will Artificial Intelligence help or harm people in the next 20 years?" Answers by respondents who are in the richest 20% income quantile.
-        unit:  ratio
-        display:
-          name: Richest 20%
-          numDecimalPlaces: 1
-
-      second_20pct_help_harm_ratio:
-        title: Help versus harm ratio (Second 20%)
-        description: World Risk Survey question - "Will Artificial Intelligence help or harm people in the next 20 years?" Answers by respondents who are in the second 20% income quantile.
-        unit:  ratio
-        display:
-          name: Second 20%
-          numDecimalPlaces: 1
-
-      employed_full_time_for_an_employer_help_harm_ratio:
-        title: Help versus harm ratio (Employed Full Time for an Employer)
-        description: World Risk Survey question - "Will Artificial Intelligence help or harm people in the next 20 years?". Answers by respondents who are employed full time for an employer.
-        unit: ratio
-        display:
-          name: Employed Full Time for an Employer
-          numDecimalPlaces: 1
-
-      employed_full_time_for_self_help_harm_ratio:
-        title: Help versus harm ratio (Employed Full Time for Self)
-        description: World Risk Survey question - "Will Artificial Intelligence help or harm people in the next 20 years?". Answers by respondents who are employed full time for themselves.
-        unit:  ratio
-        display:
-          name: Employed Full Time for Self
-          numDecimalPlaces: 1
-
-      employed_part_time_do_not_want_full_time_help_harm_ratio:
-        title: Help versus harm ratio (Employed Part Time, Do Not Want Full Time)
-        description: World Risk Survey question - "Will Artificial Intelligence help or harm people in the next 20 years?". Answers by respondents who are employed part time and do not want full time employment.
-        unit:  ratio
-        display:
-          name: Employed Part Time, Do Not Want Full Time
-          numDecimalPlaces: 1
-
-      employed_part_time_want_full_time_help_harm_ratio:
-        title: Help versus harm ratio (Employed Part Time, Want Full Time)
-        description: World Risk Survey question - "Will Artificial Intelligence help or harm people in the next 20 years?". Answers by respondents who are employed part time and want full time employment.
-        unit:  ratio
-        display:
-          name: Employed Part Time, Want Full Time
-          numDecimalPlaces: 1
-
-      out_of_workforce_help_harm_ratio:
-        title: Help versus harm ratio (Out of Workforce)
-        description: World Risk Survey question - "Will Artificial Intelligence help or harm people in the next 20 years?". Answers by respondents who are currently out of the workforce.
-        unit:  ratio
-        display:
-          name: Out of Workforce
-          numDecimalPlaces: 1
-
-      unemployed_help_harm_ratio:
-        title: Help versus harm ratio (Unemployed)
-        description: World Risk Survey question - "Will Artificial Intelligence help or harm people in the next 20 years?". Answers by respondents who are currently unemployed.
-        unit:  ratio
-        display:
-          name: Unemployed
-          numDecimalPlaces: 1
-
-      _15_29_help_harm_ratio:
-        title: Help versus harm ratio (Age 15-29)
-        description: World Risk Survey question - "Will Artificial Intelligence help or harm people in the next 20 years?". Answers by respondents who are in the age group of 15-29.
-        unit:  ratio
-        display:
-          name: Age 15-29
-          numDecimalPlaces: 1
-
-      _30_49_help_harm_ratio:
-        title: Help versus harm ratio (Age 30-49)
-        description: World Risk Survey question - "Will Artificial Intelligence help or harm people in the next 20 years?". Answers by respondents who are in the age group of 30-49.
-        unit:  ratio
-        display:
-          name: Age 30-49
-          numDecimalPlaces: 1
-
-      _50_64_help_harm_ratio:
-        title: Help versus harm ratio (Age 50-64)
-        description: World Risk Survey question - "Will Artificial Intelligence help or harm people in the next 20 years?". Answers by respondents who are in the age group of 50-64.
-        unit:  ratio
-        display:
-          name: Age 50-64
-          numDecimalPlaces: 1
-
-      _65plus_help_harm_ratio:
-        title: Help versus harm ratio (Age 65+)
-        description: World Risk Survey question - "Will Artificial Intelligence help or harm people in the next 20 years?". Answers by respondents who are 65 years old or older.
-        unit:  ratio
-        display:
-          name: Age 65+
-          numDecimalPlaces: 1
-
-      australia_and_new_zealand_help_harm_ratio:
-        title: Help versus harm ratio (Australia and New Zealand)
-        description: World Risk Survey question - "Will Artificial Intelligence help or harm people in the next 20 years?". Answers by respondents from Australia and New Zealand.
-        unit:  ratio
-        display:
-          name: Australia and New Zealand
-          numDecimalPlaces: 1
-
-      central_asia_help_harm_ratio:
-        title: Help versus harm ratio (Central Asia)
-        description: World Risk Survey question - "Will Artificial Intelligence help or harm people in the next 20 years?". Answers by respondents from Central Asia.
-        unit: ratio
-        display:
-          name: Central Asia
-          numDecimalPlaces: 1
-
-      central_western_africa_help_harm_ratio:
-        title: Help versus harm ratio (Central/Western Africa)
-        description: World Risk Survey question - "Will Artificial Intelligence help or harm people in the next 20 years?". Answers by respondents from Central/Western Africa.
-        unit:  ratio
-        display:
-          name: Central/Western Africa
-          numDecimalPlaces: 1
-
-      east_asia_help_harm_ratio:
-        title: Help versus harm ratio (East Asia)
-        description: World Risk Survey question - "Will Artificial Intelligence help or harm people in the next 20 years?". Answers by respondents from East Asia.
-        unit:  ratio
-        display:
-          name: East Asia
-          numDecimalPlaces: 1
-
-      eastern_africa_help_harm_ratio:
-        title: Help versus harm ratio (Eastern Africa)
-        description: World Risk Survey question - "Will Artificial Intelligence help or harm people in the next 20 years?". Answers by respondents from Eastern Africa.
-        unit:  ratio
-        display:
-          name: Eastern Africa
-          numDecimalPlaces: 1
-
-      eastern_europe_help_harm_ratio:
-        title: Help versus harm ratio (Eastern Europe)
-        description: World Risk Survey question - "Will Artificial Intelligence help or harm people in the next 20 years?". Answers by respondents from Eastern Europe.
-        unit:  ratio
-        display:
-          name: Eastern Europe
-          numDecimalPlaces: 1
-
-      latin_america__and__caribbean_help_harm_ratio:
-        title: Help versus harm ratio (Latin America & Caribbean)
-        description: World Risk Survey question - "Will Artificial Intelligence help or harm people in the next 20 years?". Answers by respondents from Latin America & Caribbean.
-        unit:  ratio
-        display:
-          name: Latin America & Caribbean
-          numDecimalPlaces: 1
-
-      middle_east_help_harm_ratio:
-        title: Help versus harm ratio (Middle East)
-        description: World Risk Survey question - "Will Artificial Intelligence help or harm people in the next 20 years?". Answers by respondents from the Middle East.
-        unit:  ratio
-        display:
-          name: Middle East
-          numDecimalPlaces: 1
-
-      north_africa_help_harm_ratio:
-        title: Help versus harm ratio (North Africa)
-        description: World Risk Survey question - "Will Artificial Intelligence help or harm people in the next 20 years?". Answers by respondents from North Africa.
-        unit:  ratio
-        display:
-          name: North Africa
-          numDecimalPlaces: 1
-
-      northern_america_help_harm_ratio:
-        title: Help versus harm ratio (Northern America)
-        description: World Risk Survey question - "Will Artificial Intelligence help or harm people in the next 20 years?". Answers by respondents from Northern America.
-        unit:  ratio
-        display:
-          name: Northern America
-          numDecimalPlaces: 1
-
-      northern_western_europe_help_harm_ratio:
-        title: Help versus harm ratio (Northern/Western Europe)
-        description: World Risk Survey question - "Will Artificial Intelligence help or harm people in the next 20 years?". Answers by respondents from Northern/Western Europe.
-        unit:  ratio
-        display:
-          name: Northern/Western Europe
-          numDecimalPlaces: 1
-
-      south_asia_help_harm_ratio:
-        title: Help versus harm ratio (South Asia)
-        description: World Risk Survey question - "Will Artificial Intelligence help or harm people in the next 20 years?". Answers by respondents from South Asia.
-        unit:  ratio
-        display:
-          name: South Asia
-          numDecimalPlaces: 1
-
-      south_eastern_asia_help_harm_ratio:
-        title: Help versus harm ratio (South-eastern Asia)
-        description: World Risk Survey question - "Will Artificial Intelligence help or harm people in the next 20 years?". Answers by respondents from South-eastern Asia.
-        unit:  ratio
-        display:
-          name: South-eastern Asia
-          numDecimalPlaces: 1
-
-      southern_africa_help_harm_ratio:
-        title: Help versus harm ratio (Southern Africa)
-        description: World Risk Survey question - "Will Artificial Intelligence help or harm people in the next 20 years?". Answers by respondents from Southern Africa.
-        unit:  ratio
-        display:
-          name: Southern Africa
-          numDecimalPlaces: 1
-
-      southern_europe_help_harm_ratio:
-        title: Help versus harm ratio (Southern Europe)
-        description: World Risk Survey question - "Will Artificial Intelligence help or harm people in the next 20 years?". Answers by respondents from Southern Europe.
-        unit: ratio
-        display:
-          name: Southern Europe
-          numDecimalPlaces: 1
+      yes__would_feel_safe:
+        title: Yes, would feel safe
+        description: Share of respondents who responded "Yes, would feel safe" to the question "Will Artificial Intelligence help or harm people in the next 20 years?".
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 0
+
+      no__would_not_feel_safe:
+        title: No, would not feel safe
+        description: Share of respondents who responded "No, would not feel safe" to the question "Will Artificial Intelligence help or harm people in the next 20 years?".
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 0
+
+      mostly_help:
+        title: "Mostly help"
+        description: Share of respondents who responded "Mostly help" to the question "Will Artificial Intelligence help or harm people in the next 20 years?".
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 0
+
+      mostly_harm:
+        title: "Mostly harm"
+        description: Share of respondents who responded "Mostly harm" to the question "Will Artificial Intelligence help or harm people in the next 20 years?".
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 0
+
+      neither:
+        title: "Neither"
+        description: Share of respondents who responded "Neither" to the question "Will Artificial Intelligence help or harm people in the next 20 years?".
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 0
+
+      dk_no_op:
+        title: "Don't have an opinion, Don't know - help/harm question"
+        description: Share of respondents said "Don't have an opinion" or "Don't know" to the question "Will Artificial Intelligence help or harm people in the next 20 years?".
+        unit: '%'
+        short_unit: '%'
+        display:
+          name: "No opinion or don't know"
+          numDecimalPlaces: 0
+
+      other_help_harm:
+        title: "Don't have an opinion, Don't know, or Refused - help/harm question"
+        description: Share of respondents said "Don't have an opinion", "Don't know" or refused the question "Will Artificial Intelligence help or harm people in the next 20 years?".
+        unit: '%'
+        short_unit: '%'
+        display:
+          name: "Other"
+          numDecimalPlaces: 0
+
+      other_yes_no:
+        title: "Don't know or Refused - self-driving cars question"
+        description: Share of respondents who refused to answer the question or said "Don't know" to the question "Would you feel safe in a car driven by a computer without a human driver?".
+        unit: '%'
+        short_unit: '%'
+        display:
+          name: "Other"
+          numDecimalPlaces: 0
+
+      refused__help_harm:
+        title: "Refused - help/harm question"
+        description: Share of respondents who refused to answer the question "Will Artificial Intelligence help or harm people in the next 20 years?".
+        unit: '%'
+        short_unit: '%'
+        display:
+          name: "No response"
+          numDecimalPlaces: 0
+
+      dk__cars:
+        title: "Don't know - self-driving cars question"
+        description: Share of respondents who said  "Don't know" to the question "Would you feel safe in a car driven by a computer without a human driver?".
+        unit: '%'
+        short_unit: '%'
+        display:
+          name: "Don't know"
+          numDecimalPlaces: 0
+
+      refused__cars:
+        title: "Refused - self-driving cars question"
+        description: Share of respondents who refused to answer the question or said "Don't know" to the question "Would you feel safe in a car driven by a computer without a human driver?".
+        unit: '%'
+        short_unit: '%'
+        display:
+          name: "No response"
+          numDecimalPlaces: 0

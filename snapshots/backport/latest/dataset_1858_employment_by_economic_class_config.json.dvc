@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1858
+    date_accessed: 2023-08-16 09:27:34.136519
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1858_employment_by_economic_class (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 6a261f0abd435aa6c2486bece05a85c5
+  size: 11727
+  path: dataset_1858_employment_by_economic_class_config.json

@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1089
+    date_accessed: 2023-08-16 10:39:07.566256
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: 'World Bank The Atlas of Social Protection: Indicators of Resilience and Equity
+    - Expenditure and Program Size'
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 3504211c8060dab1c90691998430bc72
+  size: 31986
+  path: 
+    dataset_1089_world_bank_the_atlas_of_social_protection__indicators_of_resilience_and_equity__expenditure_and_program_size_values.feather

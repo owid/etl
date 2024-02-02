@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2272
+    date_accessed: 2023-08-14 15:19:49.289487
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2272_urogenital_congenital_anomalies (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 36a617995bc1172e7ae90299048f951e
+  size: 33217
+  path: dataset_2272_urogenital_congenital_anomalies_config.json

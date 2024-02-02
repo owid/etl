@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1075
+    date_accessed: 2023-08-16 09:21:01.876537
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Size of the economy - World Bank Climate Change Data
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: e48387a7e5eea4b6adb71415b1756f71
+  size: 138698
+  path: dataset_1075_size_of_the_economy__world_bank_climate_change_data_values.feather

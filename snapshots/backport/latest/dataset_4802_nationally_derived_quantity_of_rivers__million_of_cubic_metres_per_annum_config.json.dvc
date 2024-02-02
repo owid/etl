@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4802
+    date_accessed: 2023-08-16 07:54:48.118143
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_4802_nationally_derived_quantity_of_rivers__million_of_cubic_metres_per_annum
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 983b246f5b1bf05222b4f7edf5f80650
+  size: 1889
+  path: 
+    dataset_4802_nationally_derived_quantity_of_rivers__million_of_cubic_metres_per_annum_config.json

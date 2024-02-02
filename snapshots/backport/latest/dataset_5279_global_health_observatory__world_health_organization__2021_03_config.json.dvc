@@ -1,21 +1,17 @@
 meta:
-  namespace: backport
-  short_name: 
-    dataset_5279_global_health_observatory__world_health_organization__2021_03_config
-  file_extension: json
-  date_accessed: 2023-06-01 12:41:07.364644
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5279
+    date_accessed: 2023-08-10 09:10:47.174255
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_5279_global_health_observatory__world_health_organization__2021_03
   description: This is a temporary dataset until the automated bulk import script
     is run.
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/5279
-  source_published_by: Our World in Data catalog backport
   is_public: false
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: e8be3e16c564cfb9552c046bf4f2dce5
-  size: 49391
+- md5: a0bd84bb5c6b3fc2f45db58f38d47487
+  size: 50917
   path: 
     dataset_5279_global_health_observatory__world_health_organization__2021_03_config.json

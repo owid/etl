@@ -31,9 +31,9 @@ from pathlib import Path
 from typing import Any, Dict, List, cast
 
 import requests
-import ruamel.yaml
 from dateutil import parser
 
+from etl.files import ruamel_dump
 from etl.paths import SNAPSHOTS_DIR
 from etl.scripts.faostat.shared import (
     API_BASE_URL,
@@ -61,7 +61,7 @@ def create_snapshot_metadata_file(metadata: Dict[str, Any]) -> None:
 
     # Create metadata file for current domain dataset.
     with open(snapshot_file_path, "w") as f:
-        ruamel.yaml.dump({"meta": metadata}, f, Dumper=ruamel.yaml.RoundTripDumper)
+        f.write(ruamel_dump({"meta": metadata}))
 
 
 class FAODataset:
@@ -188,6 +188,7 @@ def is_dataset_already_up_to_date(
     """
     dataset_up_to_date = False
     for snapshot in existing_snapshots:
+        assert snapshot.metadata.source
         snapshot_source_data_url = snapshot.metadata.source.source_data_url
         snapshot_date_accessed = parser.parse(str(snapshot.metadata.source.date_accessed)).date()
         if (snapshot_source_data_url == source_data_url) and (snapshot_date_accessed > source_modification_date):
@@ -272,7 +273,7 @@ class FAOAdditionalMetadata:
 
 def main(read_only: bool = False) -> None:
     # Load list of existing snapshots related to current NAMESPACE.
-    existing_snapshots = snapshot_catalog(match=NAMESPACE)
+    existing_snapshots = list(snapshot_catalog(match=NAMESPACE))
 
     # Initialise a flag that will become true if any dataset needs to be updated.
     any_dataset_was_updated = False

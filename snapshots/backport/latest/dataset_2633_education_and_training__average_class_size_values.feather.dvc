@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2633
+    date_accessed: 2023-08-14 15:48:16.409113
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Education and Training - Average class size
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 4806350a742c2d5005b40986f94fb1f1
+  size: 35498
+  path: dataset_2633_education_and_training__average_class_size_values.feather

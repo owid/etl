@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2608
+    date_accessed: 2023-08-14 11:02:28.337509
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2608_labour__hourly_earnings__mei (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 8b9d7e3994dfcfe9d37ffe10713f3f14
+  size: 4309
+  path: dataset_2608_labour__hourly_earnings__mei_config.json

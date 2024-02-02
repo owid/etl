@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2556
+    date_accessed: 2023-08-16 10:12:55.539052
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Productivity - Unit labour costs and labour productivity (employment based),
+    Total economy
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 095be5bac8d36a0923d7f045c4e23f50
+  size: 4114
+  path: 
+    dataset_2556_productivity__unit_labour_costs_and_labour_productivity__employment_based__total_economy_values.feather

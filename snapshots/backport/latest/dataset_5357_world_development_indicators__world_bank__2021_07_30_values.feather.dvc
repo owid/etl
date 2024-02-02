@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5357
+    date_accessed: 2023-08-14 08:52:13.629841
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: World Development Indicators - World Bank (2021.07.30)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 83030e568714748d928605c9a6186c69
+  size: 54325986
+  path: dataset_5357_world_development_indicators__world_bank__2021_07_30_values.feather

@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/904
+    date_accessed: 2023-08-14 14:34:49.777535
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: 'World Bank EdStats - Health: Risk factors'
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: da0f27f77954e80bfb15b9e76a6631d3
+  size: 17698
+  path: dataset_904_world_bank_edstats__health__risk_factors_values.feather

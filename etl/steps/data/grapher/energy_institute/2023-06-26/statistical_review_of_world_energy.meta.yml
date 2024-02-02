@@ -1,0 +1,63 @@
+tables:
+  statistical_review_of_world_energy:
+    variables:
+      biofuels_consumption_twh:
+        display:
+            name: Biofuels
+      biofuels_production_twh:
+        display:
+            name: Biofuels
+      other_renewables_consumption_equivalent_twh:
+        display:
+            name: Other renewables
+      other_renewables_electricity_generation_twh:
+        display:
+            name: Other renewables
+      coal_consumption_twh:
+        display:
+          name: Coal
+      coal_production_twh:
+        display:
+            name: Coal production
+      gas_consumption_twh:
+        display:
+            name: Gas
+      gas_production_twh:
+        display:
+            name: Gas production
+      hydro_consumption_equivalent_twh:
+        display:
+            name: Hydropower
+      hydro_electricity_generation_twh:
+        display:
+            name: Hydropower
+      nuclear_consumption_equivalent_twh:
+        display:
+            name: Nuclear
+      nuclear_electricity_generation_twh:
+        display:
+            name: Nuclear
+      oil_consumption_twh:
+        display:
+            name: Oil
+      oil_production_twh:
+        display:
+            name: Oil production
+      primary_energy_consumption_equivalent_twh:
+        display:
+            name: Primary energy consumption
+      renewables_electricity_generation_twh:
+        display:
+            name: Renewables
+      solar_consumption_equivalent_twh:
+        display:
+            name: Solar
+      solar_electricity_generation_twh:
+        display:
+            name: Solar
+      wind_consumption_equivalent_twh:
+        display:
+            name: Wind
+      wind_electricity_generation_twh:
+        display:
+            name: Wind

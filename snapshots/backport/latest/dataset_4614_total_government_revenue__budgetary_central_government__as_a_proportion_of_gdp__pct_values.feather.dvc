@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4614
+    date_accessed: 2023-08-14 15:09:27.541529
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Total government revenue (budgetary central government) as a proportion of
+    GDP (%)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 76ca5635b625ae16694e5fdb99d616ff
+  size: 26202
+  path: 
+    dataset_4614_total_government_revenue__budgetary_central_government__as_a_proportion_of_gdp__pct_values.feather

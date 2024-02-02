@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1793
+    date_accessed: 2023-08-16 10:23:01.467422
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1793_diet_low_in_polyunsaturated_fatty_acids
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 4803cb32826117b581643b1c7fcd7f8c
+  size: 22444
+  path: dataset_1793_diet_low_in_polyunsaturated_fatty_acids_config.json

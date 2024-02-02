@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4647
+    date_accessed: 2023-08-16 10:22:41.246150
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Net official development assistance (ODA) to landlocked developing countries
+    as a percentage of OECD-DAC donors' GNI, by donor countries (%)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 6b3f6f96bbf530faa1ab0c8cb7ae34a7
+  size: 11218
+  path: 
+    dataset_4647_net_official_development_assistance__oda__to_landlocked_developing_countries_as_a_percentage_of_oecd_dac_donors_gni__by_donor_countries__pct_values.feather

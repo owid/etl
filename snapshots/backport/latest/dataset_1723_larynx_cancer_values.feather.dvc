@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1723
+    date_accessed: 2023-08-16 08:28:07.874002
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Larynx cancer
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 70d6a96e99c20e7d484ac83c31c63258
+  size: 1389906
+  path: dataset_1723_larynx_cancer_values.feather

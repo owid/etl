@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4420
+    date_accessed: 2023-08-16 08:45:13.029933
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_4420_ilo__proportion_of_children_households_receiving_child_family_cash_benefit__by_sex__pct
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 5e5d5930a0a165ebf12ea607be44c0f8
+  size: 3582
+  path: 
+    dataset_4420_ilo__proportion_of_children_households_receiving_child_family_cash_benefit__by_sex__pct_config.json

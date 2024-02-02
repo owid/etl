@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2159
+    date_accessed: 2023-08-14 15:00:19.948357
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Forces of nature, conflict and terrorism, and executions and police conflict
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 8c3d733243f07c0de66c58035552cdc9
+  size: 2015434
+  path: 
+    dataset_2159_forces_of_nature__conflict_and_terrorism__and_executions_and_police_conflict_values.feather

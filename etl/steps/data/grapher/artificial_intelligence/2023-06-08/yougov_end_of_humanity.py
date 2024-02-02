@@ -19,9 +19,18 @@ def run(dest_dir: str) -> None:
 
     # Read table from garden dataset.
     tb = ds_garden["yougov_end_of_humanity"]
-    tb["year"] = 2023
-    tb.rename(columns={"options": "country"}, inplace=True)
+    tb.reset_index(inplace=True)
 
+    # Select only rows with "Very concerned" responses
+    tb = tb[tb["options"] == "Very concerned"]
+    # Drop the options (where response categories are) column as it's not needed
+    tb.drop("options", axis=1, inplace=True)
+    # Set year and rename 'age_group' to 'country' for plotting in grapher
+    tb["year"] = 2023
+    tb.rename(columns={"age_group": "country"}, inplace=True)
+    tb.reset_index(drop=True, inplace=True)
+
+    tb.set_index(["country", "year"], inplace=True)
     #
     # Process data.
     #

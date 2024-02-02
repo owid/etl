@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5395
+    date_accessed: 2023-08-16 07:25:10.598265
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_5395_united_nations_sustainable_development_goals__united_nations__2021_10
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 82d24577c1ebcaff7bee29dd601f997f
+  size: 5552191
+  path: 
+    dataset_5395_united_nations_sustainable_development_goals__united_nations__2021_10_config.json

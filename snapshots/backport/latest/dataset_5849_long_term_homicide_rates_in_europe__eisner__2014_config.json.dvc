@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5849
+    date_accessed: 2023-08-14 15:42:25.540583
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_5849_long_term_homicide_rates_in_europe__eisner__2014
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 32edfab383deb4a8aeabd464684db9d0
+  size: 2416
+  path: dataset_5849_long_term_homicide_rates_in_europe__eisner__2014_config.json

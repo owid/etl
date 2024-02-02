@@ -1,21 +1,16 @@
 meta:
-  namespace: backport
-  short_name: 
-    dataset_5598_ihme__global_burden_of_disease__child_mortality__institute_for_health_metrics_and_evaluation__2022_04_values
-  file_extension: feather
-  date_accessed: 2023-06-01 12:38:03.450751
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5598
+    date_accessed: 2023-08-10 08:07:17.411493
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: IHME - Global Burden of Disease - Child Mortality - Institute for Health Metrics
     and Evaluation  (2022-04)
   description: This is a dataset imported by the automated fetcher
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/5598
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: f9c32f958168a04d76c7a4e060151f8e
+- md5: 705cd2ae640278b0410ca8c31b4ea5fe
   size: 5430386
   path: 
     dataset_5598_ihme__global_burden_of_disease__child_mortality__institute_for_health_metrics_and_evaluation__2022_04_values.feather

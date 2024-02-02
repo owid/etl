@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4822
+    date_accessed: 2023-08-16 09:21:38.819390
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_4822_energy_intensity_level_of_primary_energy__megajoules_per_constant_2011_purchasing_power_parity_gdp
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 1662b613fddd71d37ffb4036aaf32c4a
+  size: 8661
+  path: 
+    dataset_4822_energy_intensity_level_of_primary_energy__megajoules_per_constant_2011_purchasing_power_parity_gdp_config.json

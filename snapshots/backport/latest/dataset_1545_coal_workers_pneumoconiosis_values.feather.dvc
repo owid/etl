@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1545
+    date_accessed: 2023-08-16 09:28:51.260353
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Coal workers pneumoconiosis
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 059fcd52266ffaa5d732cac559242e9e
+  size: 1475714
+  path: dataset_1545_coal_workers_pneumoconiosis_values.feather

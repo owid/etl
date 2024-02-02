@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1625
+    date_accessed: 2023-08-16 10:32:31.026314
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1625_maternal_obstructed_labor_and_uterine_rupture
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: cec314b415399d9b56f113c13fed8230
+  size: 27716
+  path: dataset_1625_maternal_obstructed_labor_and_uterine_rupture_config.json

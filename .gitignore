@@ -26,10 +26,11 @@ pyrightconfig.json
 ign.*
 .idea
 examples/data/*
+.cache
 
 playground*
 playground.ipynb
-!walkthrough/**/playground.ipynb
+!apps/wizard/**/playground.ipynb
 
 docs/_build
 docs/.vscode
@@ -37,8 +38,11 @@ docs/.vscode
 *.xlsx
 *.zip
 *.dta
+*.sav
 
 # mkdocs
 site/
 
 .sanity-check
+
+.wizard

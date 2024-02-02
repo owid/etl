@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4653
+    date_accessed: 2023-08-16 09:58:12.658293
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_4653_net_official_development_assistance__oda__from_oecd_dac_countries__grant_equivalent_methodology__by_donor_countries__millions_of_constant_2017_united_states_dollars
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 7c3fb26147bae61c1ff7986e5d4f9277
+  size: 6913
+  path: 
+    dataset_4653_net_official_development_assistance__oda__from_oecd_dac_countries__grant_equivalent_methodology__by_donor_countries__millions_of_constant_2017_united_states_dollars_config.json

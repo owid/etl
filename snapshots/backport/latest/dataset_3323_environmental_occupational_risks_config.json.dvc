@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/3323
+    date_accessed: 2023-08-16 08:32:14.450490
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_3323_environmental_occupational_risks (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: f1320e4f949533058bb58468f52e7575
+  size: 22324
+  path: dataset_3323_environmental_occupational_risks_config.json

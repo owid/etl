@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1066
+    date_accessed: 2023-08-10 14:30:16.605026
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1066_world_bank_global_findex__health__population__structure
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 5f39dbc1e011e57a1f31ca4acb26aae3
+  size: 7117
+  path: dataset_1066_world_bank_global_findex__health__population__structure_config.json

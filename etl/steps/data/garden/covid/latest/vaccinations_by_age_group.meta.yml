@@ -1,0 +1,1270 @@
+dataset:
+  title: COVID-19 - Vaccinations by age group
+  description: |-
+    Data on COVID-19 vaccinations. We only rely on figures that are verifiable based on public official sources.
+
+    You can download the full dataset here: https://github.com/owid/covid-19-data/tree/master/public/data/vaccinations
+  sources:
+  - name: Official data collated by Our World in Data
+    published_by: For source details see
+      https://github.com/owid/covid-19-data/tree/master/public/data/vaccinations/locations-age.csv
+tables:
+  vaccinations_by_age_group:
+    variables:
+      _0_15_booster:
+        title: 0-15_booster
+        unit: ''
+        display:
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _0_15_fully:
+        title: 0-15_fully
+        unit: ''
+        display:
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _0_15_partly:
+        title: 0-15_partly
+        unit: ''
+        display:
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _0_15_start:
+        title: 0-15_start
+        unit: ''
+        display:
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _0_17_booster:
+        title: 0-17_booster
+        unit: '%'
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+        short_unit: '%'
+      _0_17_fully:
+        title: 0-17_fully
+        unit: ''
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _0_17_partly:
+        title: 0-17_partly
+        unit: ''
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _0_17_start:
+        title: 0-17_start
+        unit: ''
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _0_19_booster:
+        title: 0-19_booster
+        unit: ''
+        display:
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _0_19_fully:
+        title: 0-19_fully
+        unit: ''
+        display:
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _0_19_partly:
+        title: 0-19_partly
+        unit: ''
+        display:
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _0_19_start:
+        title: 0-19_start
+        unit: ''
+        display:
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _0_4_booster:
+        title: 0-4_booster
+        unit: ''
+        display:
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _0_4_fully:
+        title: 0-4_fully
+        unit: ''
+        display:
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _0_4_partly:
+        title: 0-4_partly
+        unit: ''
+        display:
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _0_4_start:
+        title: 0-4_start
+        unit: ''
+        display:
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _0_5_booster:
+        title: 0-5_booster
+        unit: ''
+        display:
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _0_5_fully:
+        title: 0-5_fully
+        unit: ''
+        display:
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _0_5_partly:
+        title: 0-5_partly
+        unit: ''
+        display:
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _0_5_start:
+        title: 0-5_start
+        unit: ''
+        display:
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _0_9_start:
+        title: 0-9_start
+        unit: ''
+        display:
+          includeInTable: true
+          name: 0-9 years
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _10_14_booster:
+        title: 10-14_booster
+        unit: '%'
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+        short_unit: '%'
+      _10_14_fully:
+        title: 10-14_fully
+        unit: ''
+        display:
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _10_14_partly:
+        title: 10-14_partly
+        unit: ''
+        display:
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _10_14_start:
+        title: 10-14_start
+        unit: ''
+        display:
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _10_19_start:
+        title: 10-19_start
+        unit: ''
+        display:
+          includeInTable: true
+          name: 10-19 years
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _100plus_booster:
+        title: 100+_booster
+        unit: ''
+        display:
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _100plus_fully:
+        title: 100+_fully
+        unit: ''
+        display:
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _100plus_partly:
+        title: 100+_partly
+        unit: ''
+        display:
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _100plus_start:
+        title: 100+_start
+        unit: ''
+        display:
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _12_15_booster:
+        title: 12-15_booster
+        unit: '%'
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+        short_unit: '%'
+      _12_15_fully:
+        title: 12-15_fully
+        unit: ''
+        display:
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _12_15_partly:
+        title: 12-15_partly
+        unit: ''
+        display:
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _12_15_start:
+        title: 12-15_start
+        unit: ''
+        display:
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _12_17_booster:
+        title: 12-17_booster
+        unit: '%'
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+        short_unit: '%'
+      _12_17_fully:
+        title: 12-17_fully
+        unit: ''
+        display:
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _12_17_partly:
+        title: 12-17_partly
+        unit: ''
+        display:
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _12_17_start:
+        title: 12-17_start
+        unit: ''
+        display:
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _12_64_booster:
+        title: 12-64_booster
+        unit: ''
+        display:
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _12_64_fully:
+        title: 12-64_fully
+        unit: ''
+        display:
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _12_64_partly:
+        title: 12-64_partly
+        unit: ''
+        display:
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _12_64_start:
+        title: 12-64_start
+        unit: ''
+        display:
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _15_17_booster:
+        title: 15-17_booster
+        unit: '%'
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+        short_unit: '%'
+      _15_17_fully:
+        title: 15-17_fully
+        unit: ''
+        display:
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _15_17_partly:
+        title: 15-17_partly
+        unit: ''
+        display:
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _15_17_start:
+        title: 15-17_start
+        unit: ''
+        display:
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _16_17_booster:
+        title: 16-17_booster
+        unit: ''
+        display:
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _16_17_fully:
+        title: 16-17_fully
+        unit: ''
+        display:
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _16_17_partly:
+        title: 16-17_partly
+        unit: ''
+        display:
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _16_17_start:
+        title: 16-17_start
+        unit: ''
+        display:
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _16_19_booster:
+        title: 16-19_booster
+        unit: '%'
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+        short_unit: '%'
+      _16_19_fully:
+        title: 16-19_fully
+        unit: ''
+        display:
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _16_19_partly:
+        title: 16-19_partly
+        unit: ''
+        display:
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _16_19_start:
+        title: 16-19_start
+        unit: ''
+        display:
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _16_69_booster:
+        title: 16-69_booster
+        unit: ''
+        display:
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _16_69_fully:
+        title: 16-69_fully
+        unit: ''
+        display:
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _16_69_partly:
+        title: 16-69_partly
+        unit: ''
+        display:
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _16_69_start:
+        title: 16-69_start
+        unit: ''
+        display:
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _18_24_booster:
+        title: 18-24_booster
+        unit: '%'
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+        short_unit: '%'
+      _18_24_fully:
+        title: 18-24_fully
+        unit: ''
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _18_24_partly:
+        title: 18-24_partly
+        unit: ''
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _18_24_start:
+        title: 18-24_start
+        unit: ''
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _18_29_booster:
+        title: 18-29_booster
+        unit: '%'
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+        short_unit: '%'
+      _18_29_fully:
+        title: 18-29_fully
+        unit: ''
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _18_29_partly:
+        title: 18-29_partly
+        unit: ''
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _18_29_start:
+        title: 18-29_start
+        unit: ''
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _18_69_booster:
+        title: 18-69_booster
+        unit: ''
+        display:
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _18_69_fully:
+        title: 18-69_fully
+        unit: ''
+        display:
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _18_69_partly:
+        title: 18-69_partly
+        unit: ''
+        display:
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _18_69_start:
+        title: 18-69_start
+        unit: ''
+        display:
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _20_29_booster:
+        title: 20-29_booster
+        unit: '%'
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+        short_unit: '%'
+      _20_29_fully:
+        title: 20-29_fully
+        unit: ''
+        display:
+          includeInTable: true
+          name: 20-29 years
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _20_29_partly:
+        title: 20-29_partly
+        unit: ''
+        display:
+          includeInTable: true
+          name: 20-29 years
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _20_29_start:
+        title: 20-29_start
+        unit: ''
+        display:
+          includeInTable: true
+          name: 20-29 years
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _25_34_fully:
+        title: 25-34_fully
+        unit: ''
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _25_34_partly:
+        title: 25-34_partly
+        unit: ''
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _25_34_start:
+        title: 25-34_start
+        unit: ''
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _25_49_booster:
+        title: 25-49_booster
+        unit: '%'
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+        short_unit: '%'
+      _25_49_fully:
+        title: 25-49_fully
+        unit: ''
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _25_49_partly:
+        title: 25-49_partly
+        unit: ''
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _25_49_start:
+        title: 25-49_start
+        unit: ''
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _3_11_booster:
+        title: 3-11_booster
+        unit: ''
+        display:
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _3_11_fully:
+        title: 3-11_fully
+        unit: ''
+        display:
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _3_11_partly:
+        title: 3-11_partly
+        unit: ''
+        display:
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _3_11_start:
+        title: 3-11_start
+        unit: ''
+        display:
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _30_39_booster:
+        title: 30-39_booster
+        unit: '%'
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+        short_unit: '%'
+      _30_39_fully:
+        title: 30-39_fully
+        unit: ''
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _30_39_partly:
+        title: 30-39_partly
+        unit: ''
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _30_39_start:
+        title: 30-39_start
+        unit: ''
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _35_44_fully:
+        title: 35-44_fully
+        unit: ''
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _35_44_partly:
+        title: 35-44_partly
+        unit: ''
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _35_44_start:
+        title: 35-44_start
+        unit: ''
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _40_49_booster:
+        title: 40-49_booster
+        unit: '%'
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+        short_unit: '%'
+      _40_49_fully:
+        title: 40-49_fully
+        unit: ''
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _40_49_partly:
+        title: 40-49_partly
+        unit: ''
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _40_49_start:
+        title: 40-49_start
+        unit: ''
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _45_54_fully:
+        title: 45-54_fully
+        unit: ''
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _45_54_partly:
+        title: 45-54_partly
+        unit: ''
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _45_54_start:
+        title: 45-54_start
+        unit: ''
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _5_11_booster:
+        title: 5-11_booster
+        unit: '%'
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+        short_unit: '%'
+      _5_11_fully:
+        title: 5-11_fully
+        unit: ''
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _5_11_partly:
+        title: 5-11_partly
+        unit: ''
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _5_11_start:
+        title: 5-11_start
+        unit: ''
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _5_9_booster:
+        title: 5-9_booster
+        unit: '%'
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+        short_unit: '%'
+      _5_9_fully:
+        title: 5-9_fully
+        unit: ''
+        display:
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _5_9_partly:
+        title: 5-9_partly
+        unit: ''
+        display:
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _5_9_start:
+        title: 5-9_start
+        unit: ''
+        display:
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _50_54_booster:
+        title: 50-54_booster
+        unit: '%'
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+        short_unit: '%'
+      _50_54_fully:
+        title: 50-54_fully
+        unit: ''
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _50_54_partly:
+        title: 50-54_partly
+        unit: ''
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _50_54_start:
+        title: 50-54_start
+        unit: ''
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _50_59_booster:
+        title: 50-59_booster
+        unit: '%'
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+        short_unit: '%'
+      _50_59_fully:
+        title: 50-59_fully
+        unit: ''
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _50_59_partly:
+        title: 50-59_partly
+        unit: ''
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _50_59_start:
+        title: 50-59_start
+        unit: ''
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _55_59_booster:
+        title: 55-59_booster
+        unit: '%'
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+        short_unit: '%'
+      _55_59_fully:
+        title: 55-59_fully
+        unit: ''
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _55_59_partly:
+        title: 55-59_partly
+        unit: ''
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _55_59_start:
+        title: 55-59_start
+        unit: ''
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _55_64_fully:
+        title: 55-64_fully
+        unit: ''
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _55_64_partly:
+        title: 55-64_partly
+        unit: ''
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _55_64_start:
+        title: 55-64_start
+        unit: ''
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _60_64_booster:
+        title: 60-64_booster
+        unit: '%'
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+        short_unit: '%'
+      _60_64_fully:
+        title: 60-64_fully
+        unit: ''
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _60_64_partly:
+        title: 60-64_partly
+        unit: ''
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _60_64_start:
+        title: 60-64_start
+        unit: ''
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _60_69_booster:
+        title: 60-69_booster
+        unit: '%'
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+        short_unit: '%'
+      _60_69_fully:
+        title: 60-69_fully
+        unit: ''
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _60_69_partly:
+        title: 60-69_partly
+        unit: ''
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _60_69_start:
+        title: 60-69_start
+        unit: ''
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _65plus_booster:
+        title: 65+_booster
+        unit: ''
+        display:
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _65plus_fully:
+        title: 65+_fully
+        unit: ''
+        display:
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _65plus_partly:
+        title: 65+_partly
+        unit: ''
+        display:
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _65plus_start:
+        title: 65+_start
+        unit: ''
+        display:
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _65_69_booster:
+        title: 65-69_booster
+        unit: '%'
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+        short_unit: '%'
+      _65_69_fully:
+        title: 65-69_fully
+        unit: ''
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _65_69_partly:
+        title: 65-69_partly
+        unit: ''
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _65_69_start:
+        title: 65-69_start
+        unit: ''
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _65_74_fully:
+        title: 65-74_fully
+        unit: ''
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _65_74_partly:
+        title: 65-74_partly
+        unit: ''
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _65_74_start:
+        title: 65-74_start
+        unit: ''
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _70_74_booster:
+        title: 70-74_booster
+        unit: '%'
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+        short_unit: '%'
+      _70_74_fully:
+        title: 70-74_fully
+        unit: ''
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _70_74_partly:
+        title: 70-74_partly
+        unit: ''
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _70_74_start:
+        title: 70-74_start
+        unit: ''
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _70_79_booster:
+        title: 70-79_booster
+        unit: '%'
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+        short_unit: '%'
+      _70_79_fully:
+        title: 70-79_fully
+        unit: ''
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _70_79_partly:
+        title: 70-79_partly
+        unit: ''
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _70_79_start:
+        title: 70-79_start
+        unit: ''
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _75plus_fully:
+        title: 75+_fully
+        unit: ''
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _75plus_partly:
+        title: 75+_partly
+        unit: ''
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _75plus_start:
+        title: 75+_start
+        unit: ''
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _75_79_booster:
+        title: 75-79_booster
+        unit: '%'
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+        short_unit: '%'
+      _75_79_fully:
+        title: 75-79_fully
+        unit: ''
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _75_79_partly:
+        title: 75-79_partly
+        unit: ''
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _75_79_start:
+        title: 75-79_start
+        unit: ''
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _80plus_booster:
+        title: 80+_booster
+        unit: '%'
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+        short_unit: '%'
+      _80plus_fully:
+        title: 80+_fully
+        unit: ''
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _80plus_partly:
+        title: 80+_partly
+        unit: ''
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _80plus_start:
+        title: 80+_start
+        unit: ''
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _80_89_booster:
+        title: 80-89_booster
+        unit: '%'
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+        short_unit: '%'
+      _80_89_fully:
+        title: 80-89_fully
+        unit: ''
+        display:
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _80_89_partly:
+        title: 80-89_partly
+        unit: ''
+        display:
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _80_89_start:
+        title: 80-89_start
+        unit: ''
+        display:
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _90plus_booster:
+        title: 90+_booster
+        unit: ''
+        display:
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _90plus_fully:
+        title: 90+_fully
+        unit: ''
+        display:
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _90plus_partly:
+        title: 90+_partly
+        unit: ''
+        display:
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _90plus_start:
+        title: 90+_start
+        unit: ''
+        display:
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _90_99_booster:
+        title: 90-99_booster
+        unit: ''
+        display:
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _90_99_fully:
+        title: 90-99_fully
+        unit: ''
+        display:
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _90_99_partly:
+        title: 90-99_partly
+        unit: ''
+        display:
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _90_99_start:
+        title: 90-99_start
+        unit: ''
+        display:
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _0_9_fully:
+        title: 0-9_fully
+        unit: ''
+        display:
+          includeInTable: true
+          name: 0-9 years
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _10_19_partly:
+        title: 10-19_partly
+        unit: ''
+        display:
+          includeInTable: true
+          name: 10-19 years
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _0_9_partly:
+        title: 0-9_partly
+        unit: ''
+        display:
+          includeInTable: true
+          name: 0-9 years
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _10_19_fully:
+        title: 10-19_fully
+        unit: ''
+        display:
+          includeInTable: true
+          name: 10-19 years
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+      _25_34_booster:
+        title: 25-34_booster
+        unit: '%'
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+        short_unit: '%'
+      _75plus_booster:
+        title: 75+_booster
+        unit: '%'
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+        short_unit: '%'
+      _35_44_booster:
+        title: 35-44_booster
+        unit: '%'
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+        short_unit: '%'
+      _55_64_booster:
+        title: 55-64_booster
+        unit: '%'
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+        short_unit: '%'
+      _0_9_booster:
+        title: 0-9_booster
+        unit: '%'
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+        short_unit: '%'
+      _65_74_booster:
+        title: 65-74_booster
+        unit: '%'
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+        short_unit: '%'
+      _45_54_booster:
+        title: 45-54_booster
+        unit: '%'
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+        short_unit: '%'
+      _10_19_booster:
+        title: 10-19_booster
+        unit: '%'
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: '2021-01-01'
+        short_unit: '%'

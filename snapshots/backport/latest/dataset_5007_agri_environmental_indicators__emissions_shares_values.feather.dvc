@@ -1,0 +1,38 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5007
+    date_accessed: 2023-08-16 10:31:33.814998
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: 'Agri-Environmental Indicators: Emissions shares'
+  description: "The FAOSTAT Emissions shares domain of FAOSTAT Agri-Environmental
+    Indicators disseminates data on the greenhouse gas (GHG) emissions shares of agriculture
+    and related land use to the total emissions from all economic sectors, by gas,
+    country and year, for the period 1990\x962017. Emissions data are also disseminated,
+    for transparency. The economic sectors considered as emission sources are those
+    defined by the Intergovernmental Panel on Climate Change (IPCC) in the 2006 guidelines
+    (Vol.1, ch.8): Energy, Industrial Processes and Product Use, Waste, and Agriculture.
+    Agriculture-related land use emissions are also considered and used to compute
+    emissions shares. Emissions from agriculture and associated land use are taken
+    from the relevant FAOSTAT GHG emissions domains of Emissions-Agriculture and Emissions-Land
+    Use (2019). Agriculture-related land use emissions include emissions from cropland,
+    grassland, net forest conversion, and fires from burning of organic soils and
+    humid tropical forests. Emissions from the other sectors are taken from the third-party
+    PRIMAP-hist dataset v2.1 (Gütschow et al., 2016; Gütschow et al., 2019).    Shares
+    are computed and disseminated with respect to total CO2eq as well as single gas
+    emissions. Total emissions are computed by summing emissions in CO2 gas with emissions
+    of the other trace gases, the latter converted in CO2eq via Global Warming Potentials
+    (GWP) coefficients. Results are disseminated separately for GWPs corresponding
+    to three different options used in various IPCC reporting processes, namely GWPs
+    from: a) the IPCC Second Assessment Report (SAR)(IPCC, 1996); b) the IPCC Fourth
+    Assessment Report (AR4) (IPCC, 2007); and c) the IPCC Fifth Assessment Report
+    (AR5)(IPCC, 2014).  Data are available by country, by FAOSTAT regional aggregation
+    and special group, including the Annex I and Non-Annex I Parties to the United
+    Nations Framework Convention on Climate Change (UNFCCC).   A complete methodological
+    note is available at: http://fenixservices.fao.org/faostat/static/documents/EM/EM_e.pdf"
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: ca00b9ad4a5fb3725cf4055ad500f0dc
+  size: 3469562
+  path: dataset_5007_agri_environmental_indicators__emissions_shares_values.feather

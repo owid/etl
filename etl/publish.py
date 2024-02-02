@@ -8,6 +8,7 @@ import re
 import sys
 from collections.abc import Iterable
 from functools import lru_cache
+from http.client import IncompleteRead
 from pathlib import Path
 from typing import Any, Dict, Iterator, Optional, cast
 from urllib.error import HTTPError
@@ -34,7 +35,7 @@ class CannotPublish(Exception):
 @click.command()
 @click.option("--dry-run", is_flag=True, default=False)
 @click.option("--private", is_flag=True, default=False)
-@click.option("--bucket", type=str, help="Bucket name", default=config.S3_BUCKET)
+@click.option("--bucket", type=str, help="Bucket name", default=config.R2_BUCKET)
 @click.option(
     "--channel",
     "-c",
@@ -58,7 +59,7 @@ def publish_cli(dry_run: bool, private: bool, bucket: str, channel: Iterable[CHA
 def publish(
     dry_run: bool = False,
     private: bool = False,
-    bucket: str = config.S3_BUCKET,
+    bucket: str = config.R2_BUCKET,
     channel: Iterable[CHANNEL] = CHANNEL.__args__,
 ) -> None:
     catalog = Path(DATA_DIR)
@@ -154,6 +155,10 @@ def sync_folder(
     Perform a content-based sync of a local folder with a "folder" on an S3 bucket,
     by comparing checksums and only uploading files that have changed.
     """
+    # make sure we're not syncing other folders with the same prefix
+    if not dest_path.endswith("/"):
+        dest_path += "/"
+
     existing = {o["Key"]: object_md5(s3, bucket, o["Key"], o) for o in walk_s3(s3, bucket, dest_path)}
 
     # some datasets like `open_numbers/open_numbers/latest/gapminder__gapminder_world`
@@ -204,15 +209,22 @@ def object_md5(s3: Any, bucket: str, key: str, obj: Dict[str, Any]) -> Optional[
 
 
 def walk_s3(s3: Any, bucket: str, path: str) -> Iterator[Dict[str, Any]]:
-    objs = s3.list_objects(Bucket=bucket, Prefix=path)
+    objs = s3.list_objects(Bucket=bucket, Prefix=path, MaxKeys=100)
     yield from objs.get("Contents", [])
 
-    while objs["IsTruncated"]:
-        objs = s3.list_objects(Bucket=bucket, Prefix=path, Marker=objs["NextMarker"])
-        yield from objs.get("Contents", [])
+    while objs["IsTruncated"] and objs.get("Contents"):
+        # If the response does not include the NextMarker element and it is truncated, we can
+        # use the value of the last Key element in the response as the marker parameter
+        marker = objs.get("NextMarker", objs["Contents"][-1]["Key"])
+        objs = s3.list_objects(Bucket=bucket, Prefix=path, Marker=marker)
+        yield from objs["Contents"]
 
 
 def delete_dataset(s3: Any, bucket: str, relative_path: str) -> None:
+    # make sure we're not syncing other folders with the same prefix
+    if not relative_path.endswith("/"):
+        relative_path += "/"
+
     to_delete = [o["Key"] for o in walk_s3(s3, bucket, relative_path)]
     while to_delete:
         chunk = to_delete[:1000]
@@ -244,13 +256,16 @@ def update_catalog(s3: Any, bucket: str, catalog: Path, channel: CHANNEL) -> Non
 def get_published_checksums(bucket: str, channel: CHANNEL) -> Dict[str, str]:
     "Get the checksum of every dataset that's been published."
     format = INDEX_FORMATS[0]
-    uri = f"https://{bucket}.{config.S3_HOST}/{_channel_path(channel, format)}"
+    uri = f"https://{bucket.replace('owid-', '')}.owid.io/{_channel_path(channel, format)}"
     try:
         existing = read_frame(uri)
         existing["path"] = existing["path"].apply(lambda p: p.rsplit("/", 1)[0])
         existing = existing[["path", "checksum"]].drop_duplicates().set_index("path").checksum.to_dict()
     except HTTPError:
         existing = {}  # type: ignore
+    except IncompleteRead as e:
+        print(f"ERROR: error when reading {uri}: {e}", file=sys.stderr)
+        raise e
 
     return cast(Dict[str, str], existing)
 
@@ -267,54 +282,49 @@ def get_remote_checksum(s3: Any, bucket: str, path: str) -> Optional[str]:
     return object_md5(s3, bucket, path, obj)
 
 
-def connect_s3(s3_config: Optional[Config] = None, r2=False) -> Any:
-    # TODO: use lib/datautils/owid/datautils/s3.py
+def connect_s3(s3_config: Optional[Config] = None) -> Any:
     session = boto3.Session()
-    if r2:
-        assert config.R2_ACCESS_KEY, "R2_ACCESS_KEY not set in environment"
-        assert config.R2_SECRET_KEY, "R2_SECRET_KEY not set in environment"
-        return session.client(
-            "s3",
-            region_name=config.R2_REGION_NAME,
-            endpoint_url=config.R2_ENDPOINT_URL,
-            aws_access_key_id=config.R2_ACCESS_KEY,
-            aws_secret_access_key=config.R2_SECRET_KEY,
-            config=s3_config,
-        )
-    else:
-        return session.client(
-            "s3",
-            region_name=config.S3_REGION_NAME,
-            endpoint_url=config.S3_ENDPOINT_URL,
-            aws_access_key_id=config.S3_ACCESS_KEY,
-            aws_secret_access_key=config.S3_SECRET_KEY,
-            config=s3_config,
-        )
+    # if R2_ACCESS_KEY and R2_SECRET_KEY are null, we use credentials from ~/.aws/config
+    return session.client(
+        "s3",
+        region_name=config.R2_REGION_NAME,
+        endpoint_url=config.R2_ENDPOINT_URL,
+        aws_access_key_id=config.R2_ACCESS_KEY,
+        aws_secret_access_key=config.R2_SECRET_KEY,
+        config=s3_config,
+    )
 
 
 @lru_cache(maxsize=None)
-def connect_s3_cached(s3_config: Optional[Config] = None, r2=False) -> Any:
+def connect_s3_cached(s3_config: Optional[Config] = None) -> Any:
     """Connect to S3, but cache the connection for subsequent calls. This is more efficient than
     creating a new connection for every request."""
-    return connect_s3(s3_config=s3_config, r2=r2)
+    return connect_s3(s3_config=s3_config)
 
 
 def _channel_path(channel: CHANNEL, format: FileFormat) -> Path:
     return Path(f"catalog-{channel}.{format}")
 
 
-def read_frame(uri: str) -> pd.DataFrame:
-    if uri.endswith(".feather"):
-        return cast(pd.DataFrame, pd.read_feather(uri))
+def read_frame(uri: str, max_retries: int = 3) -> pd.DataFrame:  # type: ignore
+    retries = 0
+    while retries <= max_retries:
+        try:
+            if uri.endswith(".feather"):
+                return cast(pd.DataFrame, pd.read_feather(uri))
 
-    elif uri.endswith(".parquet"):
-        return cast(pd.DataFrame, pd.read_parquet(uri))
+            elif uri.endswith(".parquet"):
+                return cast(pd.DataFrame, pd.read_parquet(uri))
 
-    elif uri.endswith(".csv"):
-        return pd.read_csv(uri)
+            elif uri.endswith(".csv"):
+                return pd.read_csv(uri)
 
-    else:
-        raise ValueError(f"Unknown format for {uri}")
+            else:
+                raise ValueError(f"Unknown format for {uri}")
+        except IncompleteRead as e:
+            retries += 1
+            if retries > max_retries:
+                raise e
 
 
 if __name__ == "__main__":

@@ -1,19 +1,15 @@
 meta:
-  namespace: backport
-  short_name: dataset_1879_education_data_deprivation__gem_report__2017_18__uis__2017_config
-  file_extension: json
-  date_accessed: 2023-06-01 14:50:23.994375
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1879
+    date_accessed: 2023-08-10 09:46:27.275941
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_1879_education_data_deprivation__gem_report__2017_18__uis__2017
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/1879
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 19e8c42e868220dad3f1f00a638d2f59
-  size: 4040
+- md5: 23bc3b798422f93e0500fbf086d2dfaf
+  size: 4447
   path: 
     dataset_1879_education_data_deprivation__gem_report__2017_18__uis__2017_config.json

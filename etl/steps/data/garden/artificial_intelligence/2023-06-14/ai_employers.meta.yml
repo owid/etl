@@ -17,16 +17,18 @@ dataset:
     date_accessed: '2023-06-19'
     publication_date: '2023-03-21'
     publication_year: 2023
-    published_by: SCRA Taulbee Survey (2022) via AI Index 2023 Annual Report,” AI
+    published_by: SCRA Taulbee Survey (2022) via AI Index 2023 Annual Report, AI
       Index Steering Committee, Institute for Human-Centered AI, Stanford University,
       Stanford, CA, April 2023
 tables:
   ai_employers:
     variables:
-      new_ai_phd_graduates__pct_of_total:
-        title: New AI PhD graduates (% of total)
-        unit: '% of total'
-        short_unit: '%'
+      number_of_new_ai_phd_graduates:
+        title: New AI PhD graduates
+        unit: 'students'
+        display:
+          numDecimalPlaces: 0
+
       sector:
         title: Employment sector
         unit: ''

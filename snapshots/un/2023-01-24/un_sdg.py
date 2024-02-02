@@ -64,6 +64,7 @@ def main(upload: bool) -> None:
         add_snapshot("un/2023-01-24/un_sdg_dimension.json", filename=dim_file, upload=upload)  # type: ignore
 
         # fetch the file locally
+        assert metadata.source
         assert metadata.source.source_data_url is not None
         log.info("Downloading data...")
         all_data = download_data(snap)
@@ -76,6 +77,7 @@ def create_metadata(snap: Snapshot) -> SnapshotMeta:
     meta = snap.metadata
     meta_update = load_external_metadata()
     meta.name = meta_update["name"]
+    assert meta.source
     meta.source.publication_year = meta_update["publication_year"]
     meta.source.publication_date = meta_update["publication_date"]
     meta.source.date_accessed = str(dt.datetime.now().date())
@@ -105,6 +107,7 @@ def load_external_metadata() -> dict:
 def download_data(snap: Snapshot) -> pd.DataFrame:
     # retrieves all goal codes
     print("Retrieving SDG goal codes...")
+    assert snap.metadata.source
     url = f"{snap.metadata.source.source_data_url}/v1/sdg/Goal/List"
     res = requests.get(url)
     assert res.ok
@@ -192,6 +195,7 @@ def attributes_description(snap: Snapshot) -> Dict[Any, Any]:
     """Gathers each of the unit codes and their more descriptive counterparts."""
     goal_codes = get_goal_codes(snap)
     a = []
+    assert snap.metadata.source
     for goal in goal_codes:
         url = f"{snap.metadata.source.source_data_url}/v1/sdg/Goal/{goal}/Attributes"
         res = requests.get(url)
@@ -214,6 +218,7 @@ def dimensions_description(snap: Snapshot) -> dict:
     """Gathers each of the dimension codes and their more descriptive versions. This updates regularly so is important to snapshot"""
     goal_codes = get_goal_codes(snap)
     d = []
+    assert snap.metadata.source
     for goal in goal_codes:
         url = f"{snap.metadata.source.source_data_url}/v1/sdg/Goal/{goal}/Dimensions"
         res = requests.get(url)
@@ -237,6 +242,7 @@ def dimensions_description(snap: Snapshot) -> dict:
 
 def get_goal_codes(snap: Snapshot) -> List[int]:
     # retrieves all goal codes
+    assert snap.metadata.source
     url = f"{snap.metadata.source.source_data_url}/v1/sdg/Goal/List"
     res = requests.get(url)
     assert res.ok

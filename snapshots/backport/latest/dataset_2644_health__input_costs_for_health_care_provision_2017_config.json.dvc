@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2644
+    date_accessed: 2023-08-14 05:34:29.324379
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2644_health__input_costs_for_health_care_provision_2017
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 105feba417e5aefb8a8b7ff94dacb5e6
+  size: 16930
+  path: dataset_2644_health__input_costs_for_health_care_provision_2017_config.json

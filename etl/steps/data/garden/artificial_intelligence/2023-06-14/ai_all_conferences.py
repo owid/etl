@@ -36,7 +36,7 @@ def run(dest_dir: str) -> None:
 
     df_all["Number of Attendees (in Thousands)"] = (1000 * df_all["Number of Attendees (in Thousands)"]).round()
 
-    tb = Table(df_all, short_name="ai_all_conferences", underscore=True)
+    tb = Table(df_all, short_name=paths.short_name, underscore=True)
 
     #
     # Save outputs.

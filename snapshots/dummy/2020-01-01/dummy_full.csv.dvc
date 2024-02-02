@@ -1,0 +1,23 @@
+meta:
+  origin:
+    title: '[origin.title]'
+    description: '[origin.description]'
+    title_snapshot: '[origin.title_snapshot]'
+    description_snapshot: '[origin.description_snapshot]'
+    producer: '[origin.producer]'
+    citation_full: '[origin.citation_full]'
+    attribution: '[origin.attribution > origin.producer (year)]'
+    attribution_short: '[origin.attribution_short]'
+    version_producer: '[origin.version_producer]'
+    url_main: '[origin.url_main]'
+    url_download: https://raw.githubusercontent.com/owid/etl/master/apps/wizard/dummy_data.csv
+    date_published: 2000-01-01
+    date_accessed: 2020-01-01
+  license:
+    name: '[license.name]'
+    url: '[license.url]'
+wdir: ../../../data/snapshots/dummy/2020-01-01
+outs:
+- md5: becb9bc64792f7372580683b384e5411
+  size: 96
+  path: dummy_full.csv

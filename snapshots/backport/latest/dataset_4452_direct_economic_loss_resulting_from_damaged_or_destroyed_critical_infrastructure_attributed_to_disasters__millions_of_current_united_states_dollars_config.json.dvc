@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4452
+    date_accessed: 2023-08-16 10:29:11.936418
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_4452_direct_economic_loss_resulting_from_damaged_or_destroyed_critical_infrastructure_attributed_to_disasters__millions_of_current_united_states_dollars
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 16ca34c07801b2d2d27bfddfefa8e6ca
+  size: 12128
+  path: 
+    dataset_4452_direct_economic_loss_resulting_from_damaged_or_destroyed_critical_infrastructure_attributed_to_disasters__millions_of_current_united_states_dollars_config.json

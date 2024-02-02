@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4560
+    date_accessed: 2023-08-11 07:34:51.961052
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_4560_land_area__thousands_of_hectares (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 0c0a3e5b11da872d22a0bd97b11324a9
+  size: 14333
+  path: dataset_4560_land_area__thousands_of_hectares_config.json

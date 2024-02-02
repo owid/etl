@@ -1,15 +1,16 @@
-from owid import catalog
-
 from etl.helpers import PathFinder
 
-from .gbd_tools import run_wrapper
+from .shared import run_wrapper
 
-N = PathFinder(__file__)
+paths = PathFinder(__file__)
+
+# only include tables containing INCLUDE string, this is useful for debugging
+# but should be None before merging to master!!
+# TODO: set this to None before merging to master
+# INCLUDE = "diarrheal_diseases__both_sexes__age_standardized"
+INCLUDE = None
 
 
 def run(dest_dir: str) -> None:
-    garden_dataset = N.garden_dataset
-    dataset = catalog.Dataset.create_empty(dest_dir, garden_dataset.metadata)
-    dataset.save()
-
-    run_wrapper(garden_dataset=garden_dataset, dataset=dataset, dims=["sex", "age", "cause"])
+    ds_garden = paths.load_dataset("gbd_cause")
+    run_wrapper(dest_dir, garden_dataset=ds_garden, include=INCLUDE)

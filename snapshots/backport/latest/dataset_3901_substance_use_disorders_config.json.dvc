@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/3901
+    date_accessed: 2023-08-16 08:49:18.449422
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_3901_substance_use_disorders (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 3627388ff09f08c6ea92bc81611abb8f
+  size: 31797
+  path: dataset_3901_substance_use_disorders_config.json

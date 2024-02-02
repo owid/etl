@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2223
+    date_accessed: 2023-08-16 08:44:18.532544
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Motor neuron disease
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 404b76320f9718962b121371fd7f2658
+  size: 2116394
+  path: dataset_2223_motor_neuron_disease_values.feather

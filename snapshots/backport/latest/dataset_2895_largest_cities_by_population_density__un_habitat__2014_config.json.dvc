@@ -1,18 +1,14 @@
 meta:
-  namespace: backport
-  short_name: dataset_2895_largest_cities_by_population_density__un_habitat__2014_config
-  file_extension: json
-  date_accessed: 2023-02-23 18:59:22.163968
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2895
+    date_accessed: 2023-08-10 08:46:25.490124
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_2895_largest_cities_by_population_density__un_habitat__2014
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/2895
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: e6c2fc7d3a94c11d87c964f7b3702245
-  size: 1838
+- md5: 40abbffb77400432965a282cf1c552a9
+  size: 1991
   path: dataset_2895_largest_cities_by_population_density__un_habitat__2014_config.json

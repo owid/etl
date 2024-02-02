@@ -1,0 +1,54 @@
+# NOTE: To learn more about the fields, hover over their names.
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
+definitions:
+  common:
+    processing_level: minor
+    presentation:
+      topic_tags:
+        - Cardiovascular Diseases
+
+
+dataset:
+  update_period_days: 365
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
+tables:
+  medical_devices_atlas:
+    variables:
+
+      total_density_per_million_population__computed_tomography_units:
+        title: Total density per million population, computed tomography units
+        unit: units per million population
+        short_unit: ""
+        description_short: Number of [CT](#dod:ct-imaging) units, advanced medical imaging devices that provide detailed cross-sectional images of the body, per million people in the population.
+        display:
+          numDecimalPlaces: 0
+
+      total_density_per_million_population__gamma_camera_or_nuclear_medicine:
+        title: Total density per million population, gamma camera or nuclear medicine
+        unit: units per million population
+        short_unit: ""
+        description_short: Number of [gamma camera](#dod:gamma-camera-imaging) or [nuclear medicine](#dod:nuclear-medicine-imaging) units, specialized equipment for imaging using radioactive substances, per million people in the population.
+        display:
+          numDecimalPlaces: 0
+
+      total_density_per_million_population__magnetic_resonance_imaging:
+        title:  Total density per million population, magnetic resonance imaging
+        unit: units per million population
+        short_unit: ""
+        description_short: Number of [MRI](#dod:mri-imaging) units, machines that use magnetic fields and radio waves for detailed body imaging, per million people in the population.
+        display:
+          numDecimalPlaces: 0
+
+      total_density_per_million_population__positron_emission_tomography:
+        title:  Total density per million population, positron emission tomography
+        unit: units per million population
+        short_unit: ""
+        description_short: Number of [PET](#dod:pet-imaging) units, devices for advanced imaging using radioactive tracers, per million people in the population.
+        display:
+          numDecimalPlaces: 0

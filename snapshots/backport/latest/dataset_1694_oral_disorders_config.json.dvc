@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1694
+    date_accessed: 2023-08-10 14:49:31.439315
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1694_oral_disorders (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: f12c670efe47cbe28c813a12d4573c5c
+  size: 16502
+  path: dataset_1694_oral_disorders_config.json

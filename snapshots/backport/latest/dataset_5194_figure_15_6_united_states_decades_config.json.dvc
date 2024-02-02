@@ -1,18 +1,15 @@
 meta:
-  namespace: backport
-  short_name: dataset_5194_figure_15_6_united_states_decades_config
-  file_extension: json
-  date_accessed: 2023-02-23 17:02:08.035135
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5194
+    date_accessed: 2023-08-10 09:26:24.368353
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_5194_figure_15_6_united_states_decades
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/5194
-  source_published_by: Our World in Data catalog backport
   is_public: false
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 6d59c93aabbabc5899026d70efc5163c
-  size: 1311
+- md5: 8266640b733b995621d93787a8baa3d7
+  size: 1462
   path: dataset_5194_figure_15_6_united_states_decades_config.json

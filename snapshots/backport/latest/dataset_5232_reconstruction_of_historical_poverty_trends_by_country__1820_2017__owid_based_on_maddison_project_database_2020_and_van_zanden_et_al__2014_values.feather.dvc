@@ -1,19 +1,17 @@
 meta:
-  namespace: backport
-  short_name: dataset_5232_reconstruction_of_historical_poverty_trends_by_country__1820_2017__owid_based_on_maddison_project_database_2020_and_van_zanden_et_al__2014_values
-  file_extension: feather
-  date_accessed: 2023-02-23 15:03:42.525861
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5232
+    date_accessed: 2023-08-10 08:37:14.432772
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Reconstruction of historical poverty trends by country, 1820-2017 (OWID based
     on Maddison Project Database 2020 and van Zanden et al. (2014))
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/5232
-  source_published_by: Our World in Data catalog backport
   is_public: false
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: a415329edb7ab2fb7dd2c7216e1e2ea8
+- md5: e85a16d545e8126baf37e7f6a7d98c5b
   size: 459770
-  path: dataset_5232_reconstruction_of_historical_poverty_trends_by_country__1820_2017__owid_based_on_maddison_project_database_2020_and_van_zanden_et_al__2014_values.feather
+  path: 
+    dataset_5232_reconstruction_of_historical_poverty_trends_by_country__1820_2017__owid_based_on_maddison_project_database_2020_and_van_zanden_et_al__2014_values.feather

@@ -1,0 +1,18 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4620
+    date_accessed: 2023-08-10 14:31:53.943897
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_4620_developing_countries_and_least_developed_countries_share_of_global_services_imports__pct
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 5f0140eb18ad783c6d5b318d26ebacb1
+  size: 10382
+  path: 
+    dataset_4620_developing_countries_and_least_developed_countries_share_of_global_services_imports__pct_config.json

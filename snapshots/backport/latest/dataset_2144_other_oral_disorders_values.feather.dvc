@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2144
+    date_accessed: 2023-08-14 05:54:59.086174
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Other oral disorders
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 83a7955cd2c176cd353d6d6e16d1e4b0
+  size: 914786
+  path: dataset_2144_other_oral_disorders_values.feather

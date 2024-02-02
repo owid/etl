@@ -1,43 +1,53 @@
 dataset:
-  namespace: biodiversity
-  short_name: cherry_blossom
-  title: Peak Cherry Tree Blossom at Kyoto City (2022)
-  description: ''
-  licenses:
-  - url: http://atmenv.envi.osakafu-u.ac.jp/aono/kyophenotemp4/
-  version: '2023-01-11'
-  sources:
-  - name: Multiple sources compiled by Aono (2021)
-    description: |-
-
-      Multiple sources compiled by Aono (2021):
-
-      - Taguchi,T. (1939) Climatic change in historical time in Japan J. Mar. Meteorol. Soc. 19 217–27
-
-      - Sekiguchi,T. (1969) The historical dates of Japanese cherry festival since the 8th century and her climatic changes Tokyo Geog. Pap. 13 175–90
-
-      - Aono,Y. and Omoto,Y. (1994) Estimation of temperature at Kyoto since 11th century using flowering data of cherry tree in old documents J. Agric. Meteorol. 49 263–72
-
-      - Aono,Y. and Kazui,K. (2008) Phenological data series of cherry tree flowering in Kyoto, Japan, and its application to reconstruction of springtime temperatures since the 9th century Int. J. Climatol. 28 905–14
-
-      - Aono,Y. and Saito,S. (2010) Clarifying springtime temperature reconstructions of the medieval period by gap-filling the cherry blossom phenological data series at Kyoto, Japan Int. J. Biometeorol. 54 211–9
-
-      Data for 812-2021 is available here - http://atmenv.envi.osakafu-u.ac.jp/aono/kyophenotemp4/
-
-      Date for 2022 peak blossom gathered from the Met Office (2022) - https://www.metoffice.gov.uk/about-us/press-office/news/weather-and-climate/2022/kyoto-cherry-blossom-dates-shifted-by-human-influence#:~:text=Last%20year%20was%20the%20earliest,declared%20on%201%20April%202022.
+  update_period_days: 365
 tables:
   cherry_blossom:
     variables:
       full_flowering_date:
         title: Day of the year with peak cherry blossom
         unit: day of the year
-        short_unit: ''
+        short_unit: ""
         display:
           numDecimalPlaces: 0
+        processing_level: minor
+        presentation:
+          topic_tags:
+            - Biodiversity
+            - Climate Change
+          grapher_config:
+            title: Day of the year with peak cherry tree blossom in Kyoto, Japan
+            subtitle: >
+              The vertical axis shows the date of peak blossom, expressed as the number
+              of days since 1st January. The timing of the peak cherry blossom is influenced by
+              spring temperatures. Higher temperatures due to climate change have caused the peak
+              blossom to gradually move earlier in the year since the early 20th century.
+            yAxis:
+              min: 70
+            selectedEntityNames:
+              - Japan
+        license:
+          url: http://atmenv.envi.osakafu-u.ac.jp/aono/kyophenotemp4/
+
       average_20_years:
         title: Twenty-year average day of the year with peak cherry blossom
-        description: A twenty year moving average of the day of the year with peak cherry blossom. To be calculated at least five years within the 20 year period must have data.
+        description_short: A twenty year moving average of the day of the year with peak cherry blossom. To be calculated at least five years within the 20 year period must have data.
         unit: day of the year
-        short_unit: ''
+        short_unit: ""
         display:
           numDecimalPlaces: 2
+        processing_level: major
+        presentation:
+          topic_tags:
+            - Biodiversity
+            - Climate Change
+          grapher_config:
+            title: Day of the year with peak cherry tree blossom in Kyoto, Japan
+            subtitle: >
+              The vertical axis shows the date of peak blossom, expressed as the number
+              of days since 1st January. The timing of the peak cherry blossom is influenced by
+              spring temperatures. Higher temperatures due to climate change have caused the peak
+              blossom to gradually move earlier in the year since the early 20th century.
+            yAxis:
+              min: 70
+            selectedEntityNames:
+              - Japan

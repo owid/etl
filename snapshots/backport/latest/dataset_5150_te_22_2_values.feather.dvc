@@ -1,18 +1,15 @@
 meta:
-  namespace: backport
-  short_name: dataset_5150_te_22_2_values
-  file_extension: feather
-  date_accessed: 2023-02-23 15:19:29.572414
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5150
+    date_accessed: 2023-08-10 10:26:41.740158
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: TE-22.2
   description: core-econ.org
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/5150
-  source_published_by: Our World in Data catalog backport
   is_public: false
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 6ebbc6904f545ed26acdce753b5e01c5
+- md5: ce3b5c84df3cbacdeb9e5e3aa1ecf4f2
   size: 11434
   path: dataset_5150_te_22_2_values.feather

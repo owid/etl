@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1677
+    date_accessed: 2023-08-14 14:28:34.800837
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1677_physical_violence_by_sharp_object (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 60cdf937ad6d790a8d824ba0b5d70ded
+  size: 32095
+  path: dataset_1677_physical_violence_by_sharp_object_config.json

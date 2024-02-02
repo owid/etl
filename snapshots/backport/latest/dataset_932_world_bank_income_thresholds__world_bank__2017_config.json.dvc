@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/932
+    date_accessed: 2023-08-16 10:32:25.777093
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_932_world_bank_income_thresholds__world_bank__2017
+    (archived)
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 5544d0eab6946585282c1a66283abdc7
+  size: 4518
+  path: dataset_932_world_bank_income_thresholds__world_bank__2017_config.json

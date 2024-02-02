@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1046
+    date_accessed: 2023-08-14 15:07:52.975788
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_1046_world_bank_gender_statistics__environment
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 768be901bab77c47360330091ada0657
+  size: 16654
+  path: dataset_1046_world_bank_gender_statistics__environment_config.json

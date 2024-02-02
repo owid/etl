@@ -1,20 +1,15 @@
 meta:
-  namespace: backport
-  short_name: 
-    dataset_595_hidden_hunger_index_in_pre_school_children__muthayya_et_al__2013_config
-  file_extension: json
-  date_accessed: 2023-06-01 15:40:23.075010
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/595
+    date_accessed: 2023-08-10 09:23:33.859261
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_595_hidden_hunger_index_in_pre_school_children__muthayya_et_al__2013
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/595
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: f18f1a58402da47dafce0e8504ea6739
-  size: 2841
+- md5: 2bdecc3bf8fa1d0658a7670c1c55ad28
+  size: 2996
   path: 
     dataset_595_hidden_hunger_index_in_pre_school_children__muthayya_et_al__2013_config.json

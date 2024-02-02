@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4809
+    date_accessed: 2023-08-16 09:55:26.620815
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_4809_water_body_extent__permanent__pct_of_total_land_area
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 4504d566bb74ba3dafb574c363fd3eb4
+  size: 1800
+  path: dataset_4809_water_body_extent__permanent__pct_of_total_land_area_config.json

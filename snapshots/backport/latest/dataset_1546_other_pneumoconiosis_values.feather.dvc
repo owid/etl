@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1546
+    date_accessed: 2023-08-14 15:30:42.580081
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Other pneumoconiosis
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 65e079cc59da1db6954ddd0970d4b3bf
+  size: 1544322
+  path: dataset_1546_other_pneumoconiosis_values.feather

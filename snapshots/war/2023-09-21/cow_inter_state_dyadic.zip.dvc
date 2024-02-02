@@ -1,0 +1,38 @@
+meta:
+  origin:
+    # Data product / Snapshot
+    title: War Data
+    date_published: 2020-04-06
+    description: |-
+      The COW Project introduced COW Wars v4.0, 1816-2007 in 2010. The paper [“The COW Typology of War: Defining and Categorizing Wars (Version 4 of the Data)](https://correlatesofwar.org/wp-content/uploads/COW-Website-Typology-of-war-v4.pdf)” by Meredith Reid Sarkees gives an overview of the COW war typology, the descriptions of the basic variables, coding rules and some of the changes since “Resort to Arms.” In March 2010, the New COW War List was released. On June 30, 2010, the Non-State War Data (v4.0) became available. On October 28, 2010, the Intra-State War Data (v4.0) was released and on April 6, 2020 the Intra-State War Data (v5.1) became available online. On March 1, 2011, the Inter-State War Data (v4.0) became available online. Finally, we released the Extra-State War Data (v4.0) on December 8, 2011.
+    title_snapshot: War data - Inter-State Dyadic
+    description_snapshot: |-
+      The Correlates of War (COW) Project has utilized a classification of wars that is based upon the status of territorial entities, in particular focusing on those that are classified as members of the inter-state system (referred to as “states”). This dataset encompasses wars that take place between or among the recognized states, or inter-state wars.
+
+      The dyadic war dataset is built and fully compatible with the dyadic MID dataset (Maoz et al. 2019). It provides dyadic records of interstate wars over the period of 1816-2010, with a dyad-year unit of analysis.
+
+      Dyad refers to the fact that the dataset is structured at country-conflict level (instead of conflict-level).
+    version_producer: v3.0
+
+    # Citation
+    producer: Correlates of War
+    citation_full: |-
+      Zeev Maoz, Paul L. Johnson, Jasper Kaplan, Fiona Ogunkoya, and Aaron Shreve 2019. The Dyadic Militarized Interstate Disputes (MIDs) Dataset Version 3.0: Logic, Characteristics, and Comparisons to Alternative Datasets, Journal of Conflict Resolution (forthcoming).
+    attribution: Correlates of War - Wars (2020)
+    attribution_short: COW
+
+    # Files
+    url_main: https://correlatesofwar.org/data-sets/cow-war/
+    url_download: https://correlatesofwar.org/wp-content/uploads/Dyadic-Interstate-War-Dataset.zip
+    date_accessed: 2023-09-21
+
+    # License
+    license:
+      name: Correlates of War terms
+      url: https://correlatesofwar.org/data-sets/
+
+wdir: ../../../data/snapshots/war/2023-09-21
+outs:
+- md5: ebdf452ee71231abba84080db47d2fa0
+  size: 346286
+  path: cow_inter_state_dyadic.zip

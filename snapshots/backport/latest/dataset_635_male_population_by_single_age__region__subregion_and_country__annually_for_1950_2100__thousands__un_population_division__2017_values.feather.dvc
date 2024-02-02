@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/635
+    date_accessed: 2023-08-14 15:25:04.105508
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Male population by single age, region, subregion and country, annually for
+    1950-2100 (thousands) - UN Population Division (2017)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: e95a26f49f79ca3512b7ab007821cbe9
+  size: 17896994
+  path: 
+    dataset_635_male_population_by_single_age__region__subregion_and_country__annually_for_1950_2100__thousands__un_population_division__2017_values.feather

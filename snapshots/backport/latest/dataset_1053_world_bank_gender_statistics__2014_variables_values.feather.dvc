@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1053
+    date_accessed: 2023-08-16 09:42:41.327821
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: World Bank Gender Statistics - 2014 Variables
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 2587ec10db45c6a6ba645b3047fe2861
+  size: 86306
+  path: dataset_1053_world_bank_gender_statistics__2014_variables_values.feather

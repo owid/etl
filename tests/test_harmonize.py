@@ -1,7 +1,7 @@
 import pytest
 import yaml
 
-from etl.harmonize import _add_alias_to_regions
+from etl.harmonize_old import _add_alias_to_regions
 
 
 def test_add_alias_to_regions():

@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/807
+    date_accessed: 2023-08-16 07:28:21.710654
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_807_investment__country_investment_statistics_profile__fao__2017
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 9fe0948044770c389e8ea1deba777192
+  size: 23743
+  path: 
+    dataset_807_investment__country_investment_statistics_profile__fao__2017_config.json

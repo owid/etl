@@ -1,18 +1,14 @@
 meta:
-  namespace: backport
-  short_name: dataset_5071_covid_2019__ecdc__2020_config
-  file_extension: json
-  date_accessed: 2023-02-23 17:58:21.712967
-  name: Grapher metadata for dataset_5071_covid_2019__ecdc__2020
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5071
+    date_accessed: 2023-08-16 08:03:07.697817
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_5071_covid_2019__ecdc__2020 (archived)
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/5071
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 5e06f92063d3f9687a3a8ab8adc1816d
-  size: 41519
+- md5: f55a5e38314e8f5a90d31a602f77dbfa
+  size: 48043
   path: dataset_5071_covid_2019__ecdc__2020_config.json

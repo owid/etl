@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1806
+    date_accessed: 2023-08-16 07:24:20.729371
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: High body-mass index
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 54250c36b6e6907f38c716d541b33777
+  size: 1381090
+  path: dataset_1806_high_body_mass_index_values.feather

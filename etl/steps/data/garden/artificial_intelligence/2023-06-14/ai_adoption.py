@@ -34,7 +34,7 @@ def run(dest_dir: str) -> None:
         }
     )
 
-    tb = Table(df, short_name="ai_adoption", underscore=True)
+    tb = Table(df, short_name=paths.short_name, underscore=True)
     #
     # Save outputs.
     #

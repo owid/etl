@@ -1,7 +1,7 @@
 dataset:
   title: AI Job Postings (AI Index, 2023)
   description: >
-    Data from Lightcast which mined millions of job postings collected from over 51,000 websites since 2010 and flagged listings calling for AI skills (via AI Index (2023)). Includes percentage of all job
+    Data from Lightcast which mined millions of job postings collected from over 51,000 websites since 2010 and flagged listings calling for AI skills (via AI Index, 2023). Includes percentage of all job
     postings that require some kind of AI skil across select countries.
 
     The AI Index is an independent initiative at the Stanford University Institute for Human-Centered Artificial Intelligence.
@@ -18,7 +18,7 @@ dataset:
     date_accessed: '2023-06-19'
     publication_date: '2023-03-20'
     publication_year: 2023
-    published_by: Lightcast (2022) via the AI Index 2023 Annual Report,” AI Index
+    published_by: Lightcast (2022) via the AI Index 2023 Annual Report, AI Index
       Steering Committee, Institute for Human-Centered AI, Stanford University, Stanford,
       CA, April 2023
 tables:
@@ -28,3 +28,7 @@ tables:
         title: AI job postings (% of all job postings)
         unit: '% from total'
         short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+
+

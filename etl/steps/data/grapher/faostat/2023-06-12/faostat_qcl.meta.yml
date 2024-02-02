@@ -1,0 +1,78 @@
+definitions:
+  common:
+    sources: []
+    origins:
+      - producer: Food and Agriculture Organization of the United Nations
+        title: 'Production: Crops and livestock products'
+        description: |-
+          Crop and livestock statistics are recorded for 278 products, covering the following categories:
+
+          1) CROPS PRIMARY: Cereals, Citrus Fruit, Fibre Crops, Fruit, Oil Crops, Oil Crops and Cakes in Oil Equivalent, Pulses, Roots and Tubers, Sugar Crops, Treenuts and Vegetables. Data are expressed in terms of area harvested, production quantity and yield. Cereals: Area and production data on cereals relate to crops harvested for dry grain only. Cereal crops harvested for hay or harvested green for food, feed or silage or used for grazing are therefore excluded.
+
+          2) CROPS PROCESSED: Beer of barley; Cotton lint; Cottonseed; Margarine, short; Molasses; Oil, coconut (copra); Oil, cottonseed; Oil, groundnut; Oil, linseed; Oil, maize; Oil, olive, virgin; Oil, palm; Oil, palm kernel; Oil, rapeseed; Oil, safflower; Oil, sesame; Oil, soybean; Oil, sunflower; Palm kernels; Sugar Raw Centrifugal; Wine.
+
+          3) LIVE ANIMALS: Animals live n.e.s.; Asses; Beehives; Buffaloes; Camelids, other; Camels; Cattle; Chickens; Ducks; Geese and guinea fowls; Goats; Horses; Mules; Pigeons, other birds; Pigs; Rabbits and hares; Rodents, other; Sheep; Turkeys.
+
+          4) LIVESTOCK PRIMARY: Beeswax; Eggs (various types);  Hides buffalo, fresh; Hides, cattle, fresh; Honey, natural; Meat (ass, bird nes, buffalo, camel, cattle, chicken, duck,  game, goat, goose and guinea fowl, horse, mule, Meat nes, meat other camelids, Meat other rodents, pig, rabbit, sheep, turkey); Milk (buffalo, camel, cow, goat, sheep); Offals, nes; Silk-worm cocoons, reelable; Skins (goat, sheep); Snails, not sea; Wool, greasy.
+
+          5) LIVESTOCK PROCESSED: Butter (of milk from sheep, goat, buffalo, cow); Cheese (of milk from goat, buffalo, sheep, cow milk); Cheese of skimmed cow milk; Cream fresh; Ghee (cow and buffalo milk); Lard; Milk (dry buttermilk,  skimmed condensed, skimmed cow, skimmed dried, skimmed evaporated, whole condensed, whole dried, whole evaporated); Silk raw; Tallow; Whey (condensed and dry); Yoghurt.
+        citation_full: Food and Agriculture Organization of the United Nations.
+        url_main: http://www.fao.org/faostat/en/#data/QCL
+        url_download: https://fenixservices.fao.org/faostat/static/bulkdownloads/Production_Crops_Livestock_E_All_Data_(Normalized).zip
+        date_accessed: '2023-06-12'
+        date_published: '2023-03-22'
+        license:
+          name: CC BY-NC-SA 3.0 IGO
+          url: http://www.fao.org/contact-us/terms/db-terms-of-use/en
+
+dataset:
+  update_period_days: 365
+  sources: []
+
+tables:
+  faostat_qcl_flat:
+    variables:
+      cereals__00001717__yield__005419__tonnes_per_hectare:
+        processing_level: major
+        title: Cereals | 00001717 || Yield | 005419 || tonnes per hectare
+        unit: tonnes per hectare
+        short_unit: t/ha
+        description_short: Measured in tonnes per hectare.
+        description_key:
+          - Cereals include wheat, rice, maize, barley, oats, rye, millet, sorghum, buckwheat, and mixed grains.
+        description_from_producer: |
+          Cereals are generally of the gramineous family and, in the FAO concept, refer to crops harvested for dry grain only. Crops harvested green for forage, silage or grazingare classified as fodder crops. Also excluded are industrial crops, e.g. broom sorghum (Crude organic materials nes) and sweet sorghum when grown for syrup (Sugar crops nes). For international trade classifications, fresh cereals (other than sweet corn), whether or not suitable for use as fresh vegetables, are classified as cereals.
+
+          Cereals are identified according to their genus. However, when two or more genera are sown and harvested as a mixture they should be classified and reported as "mixed grains". Production data are reported in terms of clean, dry weight of grains (12-14 percent moisture) in the form usually marketed. Rice, however, is reported in terms of paddy. Apart from moisture content and inedible substances such as cellulose, cereal grains contain, along with traces of minerals and vitamins, carbohydrates - mainly starches - (comprising 65-75 percent of their total weight), as well as proteins (6-12 percent) and fat (1-5 percent).
+
+          The FAO definitions cover 17 primary cereals, of which one - white maize - is a component of maize. Each definition is listed along with its code, botanical name or names, and a short description. Cereal products derive either from the processing of grain through one or more mechanical or chemical operations, or from the processing of flour, meal or starch. Each cereal product is listed after the cereal from which it is derived.
+
+          Yield: Harvested production per unit of harvested area for crop products. In most of the cases yield data are not recorded but obtained by dividing the production data by the data on area harvested. Data on yields of permanent crops are not as reliable as those for temporary crops either because most of the area information may correspond to planted area, as for grapes, or because of the scarcity and unreliability of the area figures reported by the countries, as for example for cocoa and coffee. Source: FAO Statistics Division.
+        presentation:
+          topic_tags:
+            - Crop Yields
+          title_public: Cereal yields
+          attribution_short: FAO
+          grapher_config:
+            title: Cereal yields
+            subtitle: |-
+              Yields are measured in tonnes per hectare. Cereals include wheat, rice, maize, barley, oats, rye, millet, sorghum, buckwheat, and mixed grains.
+            originUrl: https://ourworldindata.org/crop-yields
+            hasMapTab: true
+            tab: map
+            yAxis:
+              max: 0
+              min: 0
+              facetDomain: shared
+            hideAnnotationFieldsInTitle:
+              time: true
+              entity: true
+              changeInPrefix: true
+            selectedEntityNames:
+              - World
+              - Asia
+              - Africa
+              - Northern America
+              - Europe
+              - South America
+            $schema: https://files.ourworldindata.org/schemas/grapher-schema.003.json

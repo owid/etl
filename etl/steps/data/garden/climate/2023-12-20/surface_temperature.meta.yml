@@ -1,0 +1,65 @@
+
+definitions:
+  common:
+    unit: °C
+    short_unit: °C
+    presentation:
+      topic_tags:
+      - Climate Change
+    display:
+      numDecimalPlaces: 1
+    processing_level: major
+  common_processing: |-
+    - Temperature measured in kelvin was converted to degrees Celsius (°C) by subtracting 273.15.
+
+    - Initially, the temperature dataset is provided with specific coordinates in terms of longitude and latitude. To tailor this data to each country, we utilize geographical boundaries as defined by the World Bank. The method involves trimming the global temperature dataset to match the exact geographical shape of each country. To correct for potential distortions caused by the Earth's curvature on a flat map, we apply a latitude-based weighting. This step is essential for maintaining accuracy, especially in high-latitude regions where distortion is more pronounced. The result of this process is a latitude-weighted average temperature for each nation.
+
+    - It's important to note, however, that due to the resolution constraints of the Copernicus dataset, this methodology might not be as effective for countries with very small landmasses. In these cases, the process may not yield reliable data.
+
+    - Furthermore, the derived 2-meter temperature readings are calculated based on administrative borders, encompassing all land surface types within these defined areas. Consequently, when computing regional or global temperature averages, these calculations are based solely on these administrative boundaries. As a result, temperatures over oceans and seas are not included in these averages, focusing the data primarily on terrestrial environments.
+  temperature_anomaly: The temperature anomaly is determined by comparing the average surface temperature of a given month with the average from 1950 to the most recent data, highlighting climate variations.
+  temperature_anomaly_above: Calculated when the average surface temperature for a month is higher than the historical average (1950 onwards), this anomaly indicates a colder-than-average temperature for that month.
+  temperature_anomaly_below: Calculated when the average surface temperature for a month is lower than the historical average (1950 onwards), this anomaly indicates a colder-than-average temperature for that month.
+
+
+dataset:
+  title: Monthly surface temperature since 1950 by country
+
+tables:
+  surface_temperature:
+    variables:
+      temperature_2m:
+        title: Average surface temperature
+        description_short: |-
+          The temperature of the air measured 2 meters above the ground, encompassing land, sea, and in-land water surfaces.
+        description_from_producer: |-
+          Temperature of air at 2m above the surface of land, sea or in-land waters. 2m temperature is calculated by interpolating between the lowest model level and the Earth's surface, taking account of the atmospheric conditions. Temperature measured in kelvin can be converted to degrees Celsius (°C) by subtracting 273.15.
+        description_processing: |-
+          {definitions.common_processing}
+
+
+      temperature_anomaly:
+        title: Temperature anomaly
+        description_short: |-
+          The deviation of a specific month's average surface temperature from the historical average surface temperature spanning from 1950 to the most recent data.
+        description_processing: |-
+            {definitions.common_processing}
+            - {definitions.temperature_anomaly}
+
+      anomaly_below_0:
+        title: Anomaly below 0
+        description_short: |-
+          The deviation of a specific month's average surface temperature when it falls below the historical average from 1950 to the present.
+        description_processing: |-
+            {definitions.common_processing}
+            - {definitions.temperature_anomaly}
+            - {definitions.temperature_anomaly_below}
+
+      anomaly_above_0:
+        title: Anomaly above 0
+        description_short: |-
+          The deviation of a specific month's average surface temperature when it exceeds the historical average from 1950 to the present.
+        description_processing: |-
+            {definitions.common_processing}
+            - {definitions.temperature_anomaly}
+            - {definitions.temperature_anomaly_above}

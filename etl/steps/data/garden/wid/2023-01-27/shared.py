@@ -5,18 +5,28 @@ If new variables are included in the dataset (from `wid` command in Stata) the d
 
 from owid.catalog import Table, VariableMeta
 
+# This is text common to all variables
+
+additional_description = """
+        The data is estimated from a combination of household surveys, tax records and national accounts data. This combination can provide a more accurate picture of the incomes of the richest, which tend to be captured poorly in household survey data alone.
+        These underlying data sources are not always available. For some countries, observations are extrapolated from data relating to other years, or are sometimes modeled based on data observed in other countries.
+        """
+
+# NOTE: Change the year when needed
+ppp_description = "The data is measured in international-$ at 2022 prices – this adjusts for inflation and for differences in the cost of living between countries."
+
 # These are parameters specifically defined for each type of variable
 var_dict = {
     "avg": {
         "title": "Average",
-        "description": "This is the mean income or wealth within the {pct_dict[pct]['decile10_extra'].lower()}.",
+        "description": "The mean {inc_cons_dict[wel]['type']} per year within the {pct_dict[pct]['decile10_extra'].lower()}.",
         "unit": "international-$ in 2022 prices",
         "short_unit": "$",
-        "numDecimalPlaces": 2,
+        "numDecimalPlaces": 0,
     },
     "share": {
         "title": "Share",
-        "description": "This is the income or wealth of the {pct_dict[pct]['decile10_extra'].lower()} as a share of total income or wealth.",
+        "description": "The share of {inc_cons_dict[wel]['type']} {inc_cons_dict[wel]['verb']} by the {pct_dict[pct]['decile10_extra'].lower()}.",
         "unit": "%",
         "short_unit": "%",
         "numDecimalPlaces": 1,
@@ -30,63 +40,63 @@ var_dict = {
     },
     "thr": {
         "title": "Threshold",
-        "description": "This is the level of income or wealth per year below which {str(pct_dict[pct]['thr_number'])}% of the population falls.",
+        "description": "The level of {inc_cons_dict[wel]['type']} per year below which {str(pct_dict[pct]['thr_number'])}% of the population falls.",
         "unit": "international-$ in 2022 prices",
         "short_unit": "$",
-        "numDecimalPlaces": 2,
+        "numDecimalPlaces": 0,
     },
     "p0p100_gini": {
         "title": "Gini coefficient",
-        "description": "The Gini coefficient is a measure of the inequality of the income or wealth distribution in a population. Higher values indicate a higher level of inequality.",
+        "description": "The Gini coefficient measures inequality on a scale from 0 to 1. Higher values indicate higher inequality.",
         "unit": "",
         "short_unit": "",
-        "numDecimalPlaces": 3,
+        "numDecimalPlaces": 2,
     },
     "p0p100_avg": {
         "title": "Mean",
-        "description": "Mean income or wealth.",
+        "description": "Mean {inc_cons_dict[wel]['type']}.",
         "unit": "international-$ in 2022 prices",
         "short_unit": "$",
-        "numDecimalPlaces": 2,
+        "numDecimalPlaces": 0,
     },
     "median": {
         "title": "Median",
-        "description": "Median income or wealth.",
+        "description": "Median {inc_cons_dict[wel]['type']}.",
         "unit": "international-$ in 2022 prices",
         "short_unit": "$",
-        "numDecimalPlaces": 2,
+        "numDecimalPlaces": 0,
     },
     "palma_ratio": {
         "title": "Palma ratio",
-        "description": "The Palma ratio is the share of total income or wealth of the top 10% divided by the share of the bottom 40%.",
+        "description": "The Palma ratio is a measure of inequality that divides the share received by the richest 10% by the share of the poorest 40%. Higher values indicate higher inequality.",
         "unit": "",
         "short_unit": "",
         "numDecimalPlaces": 2,
     },
     "s80_s20_ratio": {
         "title": "S80/S20 ratio",
-        "description": "The S80/S20 ratio is the share of total income or wealth of the top 20% divided by the share of the bottom 20%.",
+        "description": "The S80/S20 ratio is the share of total {inc_cons_dict[wel]['type']} of the top 20% divided by the share of the bottom 20%.",
         "unit": "",
         "short_unit": "",
         "numDecimalPlaces": 2,
     },
     "p90_p10_ratio": {
         "title": "P90/P10 ratio",
-        "description": "P90 and P10 are the levels of income or wealth below which 90% and 10% of the population live, respectively. This variable gives the ratio of the two. It is a measure of inequality that indicates the gap between the richest and poorest tenth of the population.",
+        "description": "P90 and P10 are the levels of {inc_cons_dict[wel]['type']} below which 90% and 10% of the population live, respectively. This variable gives the ratio of the two. It is a measure of inequality that indicates the gap between the richest and poorest tenth of the population.",
         "unit": "",
         "short_unit": "",
         "numDecimalPlaces": 2,
     },
     "p90_p50_ratio": {
         "title": "P90/P50 ratio",
-        "description": "The P90/P50 ratio measures the degree of inequality within the richest half of the population. A ratio of 2 means that someone just falling in the richest tenth of the population has twice the median income or wealth.",
+        "description": "The P90/P50 ratio measures the degree of inequality within the richest half of the population. A ratio of 2 means that someone just falling in the richest tenth of the population has twice the median {inc_cons_dict[wel]['type']}.",
         "unit": "",
         "short_unit": "",
         "numDecimalPlaces": 2,
     },
     "p50_p10_ratio": {
         "title": "P50/P10 ratio",
-        "description": "The P50/P10 ratio measures the degree of inequality within the poorest half of the population. A ratio of 2 means that the median income or wealth is two times higher than that of someone just falling in the poorest tenth of the population.",
+        "description": "The P50/P10 ratio measures the degree of inequality within the poorest half of the population. A ratio of 2 means that the median {inc_cons_dict[wel]['type']} is two times higher than that of someone just falling in the poorest tenth of the population.",
         "unit": "",
         "short_unit": "",
         "numDecimalPlaces": 2,
@@ -97,19 +107,27 @@ var_dict = {
 inc_cons_dict = {
     "pretax": {
         "name": "Pretax",
-        "description": "This measure is related to <b>pretax national income</b>, which is income before the payment and receipt of taxes and benefits, but after payment of public and private pensions.",
+        "type": "income",
+        "verb": "received",
+        "description": "Income is ‘pre-tax’ — measured before taxes have been paid and most government benefits have been received. It is, however, measured after the operation of pension schemes, both private and public.",
     },
     "posttax_dis": {
         "name": "Post-tax disposable",
-        "description": "This measure is related to <b>post-tax disposable income</b>, which includes all cash redistribution through the tax and transfer system, but does not include in-kind benefits and therefore does not add up to national income.",
+        "type": "income",
+        "verb": "received",
+        "description": "Income is ‘post-tax’ — measured after taxes have been paid and most government benefits have been received, but does not include in-kind benefits and therefore does not add up to national income.",
     },
     "posttax_nat": {
         "name": "Post-tax national",
-        "description": "This measure is related to <b>post-tax national income</b>. which includes all cash redistribution through the tax and transfer system and also all in-kind transfers (i.e., government consumption expenditures) to individuals.",
+        "type": "income",
+        "verb": "received",
+        "description": "Income is ‘post-tax’ — measured after taxes have been paid and most government benefits have been received.",
     },
     "wealth": {
         "name": "Net national wealth",
-        "description": "This measure is related to <b>net national wealth</b>, which is the total value of non-financial and financial assets (housing, land, deposits, bonds, equities, etc.) held by households, minus their debts.",
+        "type": "wealth",
+        "verb": "owned",
+        "description": "This measure is related to net national wealth, which is the total value of non-financial and financial assets (housing, land, deposits, bonds, equities, etc.) held by households, minus their debts.",
     },
 }
 
@@ -175,21 +193,21 @@ pct_dict = {
         "thr_number": 90,
         "decile10_extra": "Richest decile (tenth of the population)",
     },
-    "p99p100": {"decile10": "Top 1%", "decile9": "Top 1%", "thr_number": 99, "decile10_extra": "Top 1%"},
-    "p99_9p100": {"decile10": "Top 0.1%", "decile9": "Top 0.1%", "thr_number": 99.9, "decile10_extra": "Top 0.1%"},
+    "p99p100": {"decile10": "Top 1%", "decile9": "Top 1%", "thr_number": 99, "decile10_extra": "Richest 1%"},
+    "p99_9p100": {"decile10": "Top 0.1%", "decile9": "Top 0.1%", "thr_number": 99.9, "decile10_extra": "Richest 0.1%"},
     "p99_99p100": {
         "decile10": "Top 0.01%",
         "decile9": "Top 0.01%",
         "thr_number": 99.99,
-        "decile10_extra": "Top 0.01%",
+        "decile10_extra": "Richest 0.01%",
     },
     "p99_999p100": {
         "decile10": "Top 0.001%",
         "decile9": "Top 0.001%",
         "thr_number": 99.999,
-        "decile10_extra": "Top 0.001%",
+        "decile10_extra": "Richest 0.001%",
     },
-    "p0p50": {"decile10": "Bottom 50%", "decile9": "Bottom 50%", "thr_number": "", "decile10_extra": "Bottom 50%"},
+    "p0p50": {"decile10": "Bottom 50%", "decile9": "Bottom 50%", "thr_number": "", "decile10_extra": "Poorest 50%"},
     "p90p99": {
         "decile10": "Between 90th and 99th percentiles%",
         "decile9": "",
@@ -203,70 +221,67 @@ extrapolation_dict = {"": "Estimated", "_extrapolated": "Extrapolated"}
 
 
 def add_metadata_vars(tb_garden: Table) -> Table:
-
     # Get a list of all the variables available
     cols = list(tb_garden.columns)
 
     for var in var_dict:
         for wel in inc_cons_dict:
             for ext in extrapolation_dict:
-
                 # For variables that use income variable
                 col_name = f"{var}_{wel}{ext}"
 
                 if col_name in cols:
-
                     # Create metadata for these variables
                     tb_garden[col_name].metadata = var_metadata_income(var, wel, ext)
+                    # Replace income/wealth words according to `wel`
+                    tb_garden[col_name].metadata.description = tb_garden[col_name].metadata.description.replace(
+                        "{inc_cons_dict[wel]['type']}", str(inc_cons_dict[wel]["type"])
+                    )
 
                 for pct in pct_dict:
-
                     # For variables that use income variable and percentiles (deciles)
                     col_name = f"{pct}_{var}_{wel}{ext}"
 
                     if col_name in cols:
-
                         # Create metadata for these variables
                         tb_garden[col_name].metadata = var_metadata_income_percentiles(var, wel, pct, ext)
 
                         # Replace values in description according to `pct`, depending on `var`
                         if var == "thr":
-
                             tb_garden[col_name].metadata.description = tb_garden[col_name].metadata.description.replace(
                                 "{str(pct_dict[pct]['thr_number'])}", str(pct_dict[pct]["thr_number"])
                             )
 
                         else:
-
                             tb_garden[col_name].metadata.description = tb_garden[col_name].metadata.description.replace(
                                 "{pct_dict[pct]['decile10_extra'].lower()}",
                                 pct_dict[pct]["decile10_extra"].lower(),
                             )
+
+                        # Replace income/wealth words according to `wel`
+                        tb_garden[col_name].metadata.description = tb_garden[col_name].metadata.description.replace(
+                            "{inc_cons_dict[wel]['verb']}", str(inc_cons_dict[wel]["verb"])
+                        )
+                        tb_garden[col_name].metadata.description = tb_garden[col_name].metadata.description.replace(
+                            "{inc_cons_dict[wel]['type']}", str(inc_cons_dict[wel]["type"])
+                        )
 
     return tb_garden
 
 
 # Metadata functions to show a clearer main code
 def var_metadata_income(var, wel, ext) -> VariableMeta:
-    meta = VariableMeta(
-        title=f"{var_dict[var]['title']} ({inc_cons_dict[wel]['name']}) ({extrapolation_dict[ext]})",
-        description=f"{var_dict[var]['description']}\n\n{inc_cons_dict[wel]['description']}",
-        unit=var_dict[var]["unit"],
-        short_unit=var_dict[var]["short_unit"],
-    )
-    meta.display = {
-        "name": meta.title,
-        "numDecimalPlaces": var_dict[var]["numDecimalPlaces"],
-    }
-    return meta
-
-
-def var_metadata_income_percentiles(var, wel, pct, ext) -> VariableMeta:
-    if var == "thr":
-
+    # For monetary variables I include the PPP description
+    if var == "p0p100_avg" or var == "median":
         meta = VariableMeta(
-            title=f"{pct_dict[pct]['decile9']} - {var_dict[var]['title']} ({inc_cons_dict[wel]['name']}) ({extrapolation_dict[ext]})",
-            description=f"{var_dict[var]['description']}\n\n{inc_cons_dict[wel]['description']}",
+            title=f"{var_dict[var]['title']} ({inc_cons_dict[wel]['name']}) ({extrapolation_dict[ext]})",
+            description=f"""{var_dict[var]['description']}
+
+            {inc_cons_dict[wel]['description']}
+
+            {ppp_description}
+
+            {additional_description}""",
             unit=var_dict[var]["unit"],
             short_unit=var_dict[var]["short_unit"],
         )
@@ -277,8 +292,69 @@ def var_metadata_income_percentiles(var, wel, pct, ext) -> VariableMeta:
 
     else:
         meta = VariableMeta(
+            title=f"{var_dict[var]['title']} ({inc_cons_dict[wel]['name']}) ({extrapolation_dict[ext]})",
+            description=f"""{var_dict[var]['description']}
+
+            {inc_cons_dict[wel]['description']}
+
+            {additional_description}""",
+            unit=var_dict[var]["unit"],
+            short_unit=var_dict[var]["short_unit"],
+        )
+        meta.display = {
+            "name": meta.title,
+            "numDecimalPlaces": var_dict[var]["numDecimalPlaces"],
+        }
+
+    return meta
+
+
+def var_metadata_income_percentiles(var, wel, pct, ext) -> VariableMeta:
+    if var == "thr":
+        meta = VariableMeta(
+            title=f"{pct_dict[pct]['decile9']} - {var_dict[var]['title']} ({inc_cons_dict[wel]['name']}) ({extrapolation_dict[ext]})",
+            description=f"""{var_dict[var]['description']}
+
+            {inc_cons_dict[wel]['description']}
+
+            {ppp_description}
+
+            {additional_description}""",
+            unit=var_dict[var]["unit"],
+            short_unit=var_dict[var]["short_unit"],
+        )
+        meta.display = {
+            "name": meta.title,
+            "numDecimalPlaces": var_dict[var]["numDecimalPlaces"],
+        }
+
+    elif var == "avg":
+        meta = VariableMeta(
             title=f"{pct_dict[pct]['decile10']} - {var_dict[var]['title']} ({inc_cons_dict[wel]['name']}) ({extrapolation_dict[ext]})",
-            description=f"{var_dict[var]['description']}\n\n{inc_cons_dict[wel]['description']}",
+            description=f"""{var_dict[var]['description']}
+
+            {inc_cons_dict[wel]['description']}
+
+            {ppp_description}
+
+            {additional_description}""",
+            unit=var_dict[var]["unit"],
+            short_unit=var_dict[var]["short_unit"],
+        )
+        meta.display = {
+            "name": meta.title,
+            "numDecimalPlaces": var_dict[var]["numDecimalPlaces"],
+        }
+
+    # Shares do not have PPP description
+    else:
+        meta = VariableMeta(
+            title=f"{pct_dict[pct]['decile10']} - {var_dict[var]['title']} ({inc_cons_dict[wel]['name']}) ({extrapolation_dict[ext]})",
+            description=f"""{var_dict[var]['description']}
+
+            {inc_cons_dict[wel]['description']}
+
+            {additional_description}""",
             unit=var_dict[var]["unit"],
             short_unit=var_dict[var]["short_unit"],
         )

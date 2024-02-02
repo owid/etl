@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2155
+    date_accessed: 2023-08-14 05:32:29.620653
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2155_male_infertility (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: e24696f06984d73bf48e02548c63c017
+  size: 32587
+  path: dataset_2155_male_infertility_config.json

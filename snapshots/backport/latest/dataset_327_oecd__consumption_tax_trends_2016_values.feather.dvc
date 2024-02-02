@@ -1,18 +1,14 @@
 meta:
-  namespace: backport
-  short_name: dataset_327_oecd__consumption_tax_trends_2016_values
-  file_extension: feather
-  date_accessed: 2023-02-23 16:54:49.360817
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/327
+    date_accessed: 2023-08-10 09:49:48.017841
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: OECD – Consumption Tax Trends 2016
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/327
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: a0a70a76a64c90320a5d150fd405c8a7
+- md5: 47c37416cfd3f288ead3ab4fbfb2af6f
   size: 7362
   path: dataset_327_oecd__consumption_tax_trends_2016_values.feather

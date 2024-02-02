@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1788
+    date_accessed: 2023-08-16 08:37:05.780026
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Diet high in red meat
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 0e368122a01c6ae4569fac3c4f5edd46
+  size: 961138
+  path: dataset_1788_diet_high_in_red_meat_values.feather

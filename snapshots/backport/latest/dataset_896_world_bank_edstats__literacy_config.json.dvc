@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/896
+    date_accessed: 2023-08-16 08:43:37.884275
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_896_world_bank_edstats__literacy (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: dcf66c72a695653fa1af9cb268507086
+  size: 47968
+  path: dataset_896_world_bank_edstats__literacy_config.json

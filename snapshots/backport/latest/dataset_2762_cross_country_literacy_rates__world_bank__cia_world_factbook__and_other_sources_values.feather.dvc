@@ -1,20 +1,15 @@
 meta:
-  namespace: backport
-  short_name: 
-    dataset_2762_cross_country_literacy_rates__world_bank__cia_world_factbook__and_other_sources_values
-  file_extension: feather
-  date_accessed: 2023-06-01 13:13:58.246941
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2762
+    date_accessed: 2023-09-27 06:30:31.518935
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Cross-country literacy rates - World Bank, CIA World Factbook, and other sources
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/2762
-  source_published_by: Our World in Data catalog backport
-  is_public: true
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 7c3ef160f413b52d8ac8f3045657fe42
-  size: 26106
+- md5: f7127eb7fa156116408e550b70212a0f
+  size: 31722
   path: 
     dataset_2762_cross_country_literacy_rates__world_bank__cia_world_factbook__and_other_sources_values.feather

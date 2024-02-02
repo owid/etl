@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4758
+    date_accessed: 2023-08-14 15:51:07.403899
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: 'Legal frameworks that promote, enforce and monitor gender equality (percentage
+    of achievement, 0 - 100) --  Area 2: violence against women'
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 5e06400fc0dbfe3d3ec52c3dc8620b66
+  size: 7914
+  path: 
+    dataset_4758_legal_frameworks_that_promote__enforce_and_monitor_gender_equality__percentage_of_achievement__0__100__area_2__violence_against_women_values.feather

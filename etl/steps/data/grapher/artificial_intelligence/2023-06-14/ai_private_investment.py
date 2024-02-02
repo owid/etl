@@ -19,7 +19,10 @@ def run(dest_dir: str) -> None:
 
     # Read table from garden dataset.
     tb = ds_garden["ai_private_investment"]
-    tb = tb.rename(columns={"type": "country"})
+    tb.reset_index(inplace=True)
+
+    tb.rename(columns={"focus_area": "country"}, inplace=True)
+    tb.set_index(["country", "year"], inplace=True)
 
     # Save outputs.
     #

@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1594
+    date_accessed: 2023-08-16 10:11:16.138592
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Amphetamine use disorders
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: bad76cf204ba6f4d8a65206788a19fc3
+  size: 1557378
+  path: dataset_1594_amphetamine_use_disorders_values.feather

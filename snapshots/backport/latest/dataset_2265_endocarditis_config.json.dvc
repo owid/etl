@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2265
+    date_accessed: 2023-08-16 10:25:40.632981
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_2265_endocarditis (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 005074317e98fc5b99aa98d2fe509872
+  size: 32368
+  path: dataset_2265_endocarditis_config.json

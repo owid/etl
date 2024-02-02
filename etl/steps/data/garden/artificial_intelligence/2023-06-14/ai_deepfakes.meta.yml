@@ -1,12 +1,13 @@
 dataset:
   title: DeepFake detection (AI Index, 2023)
   description: >
-      Data from Li et al. (2022) via AI Index report on Celeb-DF, presently one of the most challenging deepfake detection benchmarks.
+    Data from Li et al. (2022) via AI Index report on Celeb-DF, presently one of the most challenging deepfake detection benchmarks.
 
 
-      The AI Index is an independent initiative at the Stanford University Institute for Human-Centered Artificial Intelligence.
-      The mission of the AI Index is “to provide unbiased, rigorously vetted, and globally sourced data for policymakers, researchers, executives, journalists, and the general public to develop intuitions about the complex field of AI.”
-      Their flagship output is the annual AI Index Report, which has been published since 2017.
+    The AI Index is an independent initiative at the Stanford University Institute for Human-Centered Artificial Intelligence.
+    The mission of the AI Index is “to provide unbiased, rigorously vetted, and globally sourced data for policymakers, researchers,
+    executives, journalists, and the general public to develop intuitions about the complex field of AI.” Their flagship output
+    is the annual AI Index Report, which has been published since 2017.
   licenses:
   - name: Public domain
     url: https://aiindex.stanford.edu/wp-content/uploads/2023/04/HAI_AI-Index-Report_2023.pdf
@@ -17,33 +18,44 @@ dataset:
     date_accessed: '2023-06-19'
     publication_date: '2023-05-19'
     publication_year: 2023
-    published_by: Li et al. (2022) via the AI Index 2023 Annual Report,” AI Index Steering Committee, Institute
-      for Human-Centered AI, Stanford University, Stanford, CA, April 2023
+    published_by: Li et al. (2022) via the AI Index 2023 Annual Report, AI Index Steering Committee, Institute for Human-Centered
+      AI, Stanford University, Stanford, CA, April 2023
 tables:
   ai_deepfakes:
     variables:
       area_under_curve_score__auc:
         title: Area Under Curve Score (AUC)
         description: >
-            The Area Under Curve Score (AUC), also known as the AUC-ROC (Receiver Operating Characteristic) score, is a popular evaluation metric used in machine learning and statistics to assess the performance of binary classification models.
+          The Area Under Curve Score (AUC), also known as the AUC-ROC (Receiver Operating Characteristic) score, is a popular
+          evaluation metric used in machine learning and statistics to assess the performance of binary classification models.
 
-            In binary classification, we aim to predict whether an instance belongs to one class (positive) or another (negative) based on its features. The ROC curve is created by plotting the true positive rate (TPR) against the false positive rate (FPR) at various classification thresholds. The TPR is the ratio of true positives to the total number of actual positives, while the FPR is the ratio of false positives to the total number of actual negatives.
+          In binary classification, the goal is to predict whether an instance belongs to one class (positive) or another
+          (negative) based on its features. The ROC curve is created by plotting the true positive rate (TPR) against the
+          false positive rate (FPR) at various classification thresholds. The TPR is the ratio of true positives to the total
+          number of actual positives, while the FPR is the ratio of false positives to the total number of actual negatives.
 
-            The AUC is a measure of the overall performance of the classifier across all possible classification thresholds. It represents the probability that a randomly chosen positive instance will be ranked higher than a randomly chosen negative instance according to the classifier's predicted probabilities. The AUC score ranges from 0 to 1, where a score of 1 indicates a perfect classifier, and a score of 0.5 represents a classifier with no discriminatory power (equivalent to random guessing).
+          The AUC is a measure of the overall performance of the classifier across all possible classification thresholds.
+          It represents the probability that a randomly chosen positive instance will be ranked higher than a randomly chosen
+          negative instance according to the classifier's predicted probabilities. The AUC score ranges from 0 to 1, where
+          a score of 1 indicates a perfect classifier, and a score of 0.5 represents a classifier with no discriminatory power
+          (equivalent to random guessing).
 
-            Interpreting the AUC score:
+          Interpreting the AUC score:
 
-            AUC = 1: Perfect classifier. The model has a clear separation between the positive and negative classes, correctly ranking all instances.
-            AUC > 0.5: Better than random guessing. The model has some discriminatory power and performs better than a random classifier.
-            AUC = 0.5: Random classifier. The model performs no better than flipping a coin and has no ability to distinguish between the classes.
-            AUC < 0.5: Inverted classifier. The model performs worse than random guessing, meaning it is making incorrect predictions.
-            The AUC score is widely used because it is insensitive to class imbalance and classification thresholds. It provides a single scalar value to compare different classifiers or evaluate the performance of a single classifier. Higher AUC scores generally indicate better classifier performance in terms of the trade-off between true positives and false positives.
+          AUC = 1: Perfect classifier. The model has a clear separation between the positive and negative classes, correctly
+          ranking all instances.
+          AUC > 0.5: Better than random guessing. The model has some discriminatory power and performs better than a random
+          classifier.
+          AUC = 0.5: Random classifier. The model performs no better than flipping a coin and has no ability to distinguish
+          between the classes.
+          AUC < 0.5: Inverted classifier. The model performs worse than random guessing, meaning it is making incorrect predictions.
+          The AUC score is widely used because it is insensitive to class imbalance and classification thresholds. It provides
+          a single scalar value to compare different classifiers or evaluate the performance of a single classifier. Higher
+          AUC scores generally indicate better classifier performance in terms of the trade-off between true positives and
+          false positives.
 
-            It's important to note that the AUC score is specific to binary classification problems and cannot be directly applied to multi-class classification tasks without modification.
-
-        unit: 'Area under curve'
+          It's important to note that the AUC score is specific to binary classification problems and cannot be directly applied
+          to multi-class classification tasks without modification.
+        unit: Area under curve
         display:
           numDecimalPlaces: 0
-
-
-

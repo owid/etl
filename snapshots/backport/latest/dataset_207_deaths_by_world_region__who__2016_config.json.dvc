@@ -1,0 +1,14 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/207
+    date_accessed: 2023-08-16 09:55:45.442624
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_207_deaths_by_world_region__who__2016 (archived)
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: c4c52d6695d25d611ea14736b1c2edfa
+  size: 1809
+  path: dataset_207_deaths_by_world_region__who__2016_config.json

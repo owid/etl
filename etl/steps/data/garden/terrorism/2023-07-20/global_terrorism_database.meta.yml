@@ -1,0 +1,1406 @@
+dataset:
+  title: Terrorism dataset, Global Terrorism Database (2022)
+  description: >
+    The GTD is an event-level database containing more than 200,000 records of terrorist attacks that took place
+    around the world since 1970. It is maintained by the National Consortium for the Study of Terrorism and Responses to Terrorism
+    (START) at the University of Maryland.
+
+
+    For target and attack type OWID GTD typically records only one attack/target type for each incident, recorded in columns targtype1 and attacktype1. OWID uses these two indicators, even though there are some events with several targets/methods.
+
+
+    Because the data is based on news reports, attacks and deaths may be underreported in countries with sparser media, especially during early years.
+  licenses:
+  - name: Copyright University of Maryland 2022
+    url: https://www.start.umd.edu/gtd/terms-of-use/
+  sources:
+  - name: Global Terrorism Database (2022)
+    description: >
+      The GTD is an event-level database containing more than 200,000 records of terrorist attacks that took place
+      around the world since 1970. It is maintained by the National Consortium for the Study of Terrorism and Responses to
+      Terrorism (START) at the University of Maryland.
+
+
+      For target and attack type OWID GTD typically records only one attack/target type for each incident, recorded in columns targtype1 and attacktype1. OWID uses these two indicators, even though there are some events with several targets/methods.
+
+
+      Because the data is based on news reports, attacks and deaths may be underreported in countries with sparser media, especially during early years.
+    url: https://www.start.umd.edu/gtd/
+    date_accessed: '2023-07-20'
+    publication_year: 2022
+    published_by: START (National Consortium for the Study of Terrorism and Responses to Terrorism). (2022). Global Terrorism
+      Database, 1970 - 2020 [data file]. https://www.start.umd.edu/gtd
+tables:
+  global_terrorism_database:
+    variables:
+      total_killed:
+        title: Terrorism deaths
+        description: >-
+          This field stores the number of total confirmed fatalities for the incident. The number includes all victims and
+          attackers who died as a direct result of the incident.
+
+
+          Where there is evidence of fatalities, but a figure is not reported or it is too vague to be of use, this field
+          remains blank. If information is missing regarding the number of victims killed in an attack, but perpetrator fatalities
+          are known, this value will reflect only the number of perpetrators who died as a result of the incident. Likewise,
+          if information on the number of perpetrators killed in an attack is missing, but victim fatalities are known, this
+          field will only report the number of victims killed in the incident.
+
+
+          Where several independent sources report different numbers of fatalities, the database will usually reflect the
+          number given by the most recent source. However, the most recent source will not be used if the source itself is
+          of questionable validity or if the source bases its death numbers on claims made by a perpetrator group. When there
+          are several "most recent" sources published around the same time, or there are concerns about the validity of a
+          recent source, the majority figure will be used. Where there is no majority figure among independent sources, the
+          database will record the lowest proffered fatality figure, unless that figure comes from a source of questionable
+          validity or there is another compelling reason to do otherwise. Conflicting reports of fatalities will be noted
+          in the "Additional Notes" field.
+        unit: deaths
+        display:
+          name: Fatalties
+          numDecimalPlaces: 0
+
+      total_killed_gtd:
+        title: Terrorism deaths (GTD)
+        description: >-
+          This field stores the number of total confirmed fatalities for the incident. The number includes all victims and
+          attackers who died as a direct result of the incident.
+
+
+          Where there is evidence of fatalities, but a figure is not reported or it is too vague to be of use, this field
+          remains blank. If information is missing regarding the number of victims killed in an attack, but perpetrator fatalities
+          are known, this value will reflect only the number of perpetrators who died as a result of the incident. Likewise,
+          if information on the number of perpetrators killed in an attack is missing, but victim fatalities are known, this
+          field will only report the number of victims killed in the incident.
+
+
+          Where several independent sources report different numbers of fatalities, the database will usually reflect the
+          number given by the most recent source. However, the most recent source will not be used if the source itself is
+          of questionable validity or if the source bases its death numbers on claims made by a perpetrator group. When there
+          are several "most recent" sources published around the same time, or there are concerns about the validity of a
+          recent source, the majority figure will be used. Where there is no majority figure among independent sources, the
+          database will record the lowest proffered fatality figure, unless that figure comes from a source of questionable
+          validity or there is another compelling reason to do otherwise. Conflicting reports of fatalities will be noted
+          in the "Additional Notes" field.
+        unit: deaths
+        display:
+          name: Global Terrorism Database
+          numDecimalPlaces: 0
+      total_wounded:
+        title: Terrorism non-fatal injuries
+        description: >-
+          This field records the number of confirmed non-fatal injuries to both perpetrators and victims.
+
+
+          Where there is evidence of non-fatal injuries, but a figure is not reported or it is too vague to be of use, this
+          field remains blank. If information is missing regarding the number of victims killed in an attack, but perpetrator
+          fatalities are known, this value will reflect only the number of perpetrators who died as a result of the incident.
+          Likewise, if information on the number of perpetrators killed in an attack is missing, but victim fatalities are
+          known, this field will only report the number of victims killed in the incident.
+
+
+          Where several independent sources report different numbers of non-fatal injuries, the database will usually reflect
+          the number given by the most recent source. However, the most recent source will not be used if the source itself
+          is of questionable validity or if the source bases its non-fatal injuries on claims made by a perpetrator group.
+          When there are several "most recent" sources published around the same time, or there are concerns about the validity
+          of a recent source, the majority figure will be used. Where there is no majority figure among independent sources,
+          the database will record the lowest proffered non-fatal injuries figure, unless that figure comes from a source
+          of questionable validity or there is another compelling reason to do otherwise. Conflicting reports of fatalities
+          will be noted in the "Additional Notes" field.
+        unit: injuries
+        display:
+          name: Non-fatal injuries
+          numDecimalPlaces: 0
+
+      total_incident_counts:
+        title: Terrorist attacks
+        description: >-
+          The GTD defines a terrorist attack as the threatened or actual use of illegal force and violence by a non- state
+          actor to attain a political, economic, religious, or social goal through fear, coercion, or intimidation. In practice
+          this means in order to consider an incident for inclusion in the GTD, all three of the following attributes must
+          be present:
+
+
+          - The incident must be intentional - the result of a conscious calculation on the part of a perpetrator.
+
+
+          - The incident must entail some level of violence or immediate threat of violence -including property violence,
+          as well as violence against people.
+
+
+          - The perpetrators of the incidents must be sub-national actors. The database does not include acts of state terrorism.
+
+
+          In addition, at least two of the following three criteria must be present for an incident to be included in the
+          GTD:
+
+
+          - Criterion 1: The act must be aimed at attaining a political, economic, religious, or social goal. In terms of
+          economic goals, the exclusive pursuit of profit does not satisfy this criterion. It must involve the pursuit of
+          more profound, systemic economic change.
+
+
+          - Criterion 2: There must be evidence of an intention to coerce, intimidate, or convey some other message to a larger
+          audience (or audiences) than the immediate victims. It is the act taken as a totality that is considered, irrespective
+          if every individual involved in carrying out the act was aware of this intention. As long as any of the planners
+          or decision-makers behind the attack intended to coerce, intimidate or publicize, the intentionality criterion is
+          met.
+
+
+          - Criterion 3: The action must be outside the context of legitimate warfare activities. That is, the act must be
+          outside the parameters permitted by international humanitarian law, insofar as it targets non-combatants
+        unit: attacks
+        display:
+          name: Attacks
+          numDecimalPlaces: 0
+
+      total_nkill_armed_assault:
+        title: Terrorism deaths Armed Assault
+        description: >
+          An armed assault is determined to be successful if the assault takes place and if a target is hit (including people and/or property). Unsuccessful armed assaults are those in which the perpetrators attack and do not hit the target. An armed assault is also unsuccessful if the perpetrators are apprehended on their way to commit the assault. To make this determination, however, there must be information to indicate that an actual assault was imminent.
+
+        unit: 'deaths'
+        display:
+            name: Armed assault
+            numDecimalPlaces: 0
+
+      total_nkill_assassination:
+        title: Terrorism deaths Assassination
+        description: >
+          An attack whose primary objective is to cause physical harm or death directly to human beings by use of a firearm, incendiary, or sharp instrument (knife, etc.). Not to include attacks involving the use of fists, rocks, sticks, or other handheld (less-than-lethal) weapons. Also includes attacks involving certain classes of explosive devices in addition to firearms, incendiaries, or sharp instruments. The explosive device subcategories that are included in this classification are grenades, projectiles, and unknown or other explosive devices that are thrown.
+
+        unit: 'deaths'
+        display:
+            name: Assassination
+            numDecimalPlaces: 0
+
+      total_nkill_bombing_explosion:
+        title: Terrorism deaths Bombing/Explosion
+        description: >
+          An attack where the primary effects are caused by an energetically unstable material undergoing rapid decomposition and releasing a pressure wave that causes physical damage to the surrounding environment. Can include either high or low explosives (including a dirty bomb) but does not include a nuclear explosive device that releases energy from fission and/or fusion, or an incendiary device where decomposition takes place at a much slower rate.
+
+
+          If an attack involves certain classes of explosive devices along with firearms, incendiaries, or sharp objects, then the attack is coded as an armed assault only. The explosive device subcategories that are included in this classification are grenades, projectiles, and unknown or other explosive devices that are thrown in which the bombers are also using firearms or incendiary devices.
+        unit: 'deaths'
+        display:
+            name: Bombing
+            numDecimalPlaces: 0
+
+      total_nkill_facility_infrastructure_attack:
+        title: Terrorism deaths Facility/Infrastructure Attack
+        description: >
+          An act, excluding the use of an explosive, whose primary objective is to cause damage to a non-human target, such as a building, monument, train, pipeline, etc. Such attacks include arson and various forms of sabotage (e.g., sabotaging a train track is a facility/infrastructure attack, even if passengers are killed). Facility/infrastructure attacks can include acts which aim to harm an installation, yet also cause harm to people incidentally (e.g. an arson attack primarily aimed at damaging a building, but causes injuries or fatalities).
+        unit: 'deaths'
+        display:
+            name: Infrastructure attack
+            numDecimalPlaces: 0
+
+      total_nkill_hijacking:
+        title: Terrorism deaths Hijacking
+        description: >
+          An act whose primary objective is to take control of a vehicle such as an aircraft, boat, bus, etc. for the purpose of diverting it to an unprogrammed destination, force the release of prisoners, or some other political objective. Obtaining payment of a ransom should not the sole purpose of a Hijacking, but can be one element of the incident so long as additional objectives have also been stated. Hijackings are distinct from Hostage Taking because the target is a vehicle, regardless of whether there are people/passengers in the vehicle.
+        unit: 'deaths'
+        display:
+            name: Hijacking
+            numDecimalPlaces: 0
+
+      total_nkill_hostage_taking__barricade_incident:
+        title: Terrorism deaths Hostage Taking (Barricade Incident)
+        description: >
+          An act whose primary objective is to take control of hostages for the purpose of achieving a political objective through concessions or through disruption of normal operations. Such attacks are distinguished from kidnapping since the incident occurs and usually plays out at the target location with little or no intention to hold the hostages for an extended period in a separate clandestine location.
+        unit: 'deaths'
+        display:
+            name: Hostage barricading
+            numDecimalPlaces: 0
+
+      total_nkill_hostage_taking__kidnapping:
+        title: Terrorism deaths Hostage Taking (Kidnapping)
+        description: >
+          An act whose primary objective is to take control of hostages for the purpose of achieving a political objective through concessions or through disruption of normal operations. Kidnappings are distinguished from barricading in that they involve moving and holding the hostages in another location.
+        unit: 'deaths'
+        display:
+            name: Hostage kidnapping
+            numDecimalPlaces: 0
+
+      total_nkill_unarmed_assault:
+        title: Terrorism deaths Unarmed Assault
+        description: >
+          An attack whose primary objective is to cause physical harm or death directly to human beings by any means other than explosive, firearm, incendiary, or sharp instrument (knife, etc.). Attacks involving chemical, biological or radiological weapons are considered unarmed assaults.
+        unit: 'deaths'
+        display:
+            name: Unarmed assault
+            numDecimalPlaces: 0
+
+      total_nkill_unknown:
+        title: Terrorism deaths Unknown
+        description: >
+          The attack type cannot be determined from the available information.
+        unit: 'deaths'
+        display:
+            name: Unknown
+            numDecimalPlaces: 0
+
+      total_nwound_armed_assault:
+        title: Terrorism non-fatal injuries Armed Assault
+        description: >
+          An armed assault is determined to be successful if the assault takes place and if a target is hit (including people and/or property). Unsuccessful armed assaults are those in which the perpetrators attack and do not hit the target. An armed assault is also unsuccessful if the perpetrators are apprehended on their way to commit the assault. To make this determination, however, there must be information to indicate that an actual assault was imminent.
+
+        unit: 'injuries'
+        display:
+            name: Armed assault
+            numDecimalPlaces: 0
+
+      total_nwound_assassination:
+        title: Terrorism non-fatal injuries Assassination
+        description: >
+          An attack whose primary objective is to cause physical harm or death directly to human beings by use of a firearm, incendiary, or sharp instrument (knife, etc.). Not to include attacks involving the use of fists, rocks, sticks, or other handheld (less-than-lethal) weapons. Also includes attacks involving certain classes of explosive devices in addition to firearms, incendiaries, or sharp instruments. The explosive device subcategories that are included in this classification are grenades, projectiles, and unknown or other explosive devices that are thrown.
+
+        unit: 'injuries'
+        display:
+            name: Assassination
+            numDecimalPlaces: 0
+
+      total_nwound_bombing_explosion:
+        title: Terrorism non-fatal injuries Bombing/Explosion
+        description: >
+          An attack where the primary effects are caused by an energetically unstable material undergoing rapid decomposition and releasing a pressure wave that causes physical damage to the surrounding environment. Can include either high or low explosives (including a dirty bomb) but does not include a nuclear explosive device that releases energy from fission and/or fusion, or an incendiary device where decomposition takes place at a much slower rate.
+
+
+          If an attack involves certain classes of explosive devices along with firearms, incendiaries, or sharp objects, then the attack is coded as an armed assault only. The explosive device subcategories that are included in this classification are grenades, projectiles, and unknown or other explosive devices that are thrown in which the bombers are also using firearms or incendiary devices.
+        unit: 'injuries'
+        display:
+            name: Bombing
+            numDecimalPlaces: 0
+
+      total_nwound_facility_infrastructure_attack:
+        title: Terrorism non-fatal injuries Facility/Infrastructure Attack
+        description: >
+          An act, excluding the use of an explosive, whose primary objective is to cause damage to a non-human target, such as a building, monument, train, pipeline, etc. Such attacks include arson and various forms of sabotage (e.g., sabotaging a train track is a facility/infrastructure attack, even if passengers are killed). Facility/infrastructure attacks can include acts which aim to harm an installation, yet also cause harm to people incidentally (e.g. an arson attack primarily aimed at damaging a building, but causes injuries or fatalities).
+        unit: 'injuries'
+        display:
+            name: Infrastructure attack
+            numDecimalPlaces: 0
+
+      total_nwound_hijacking:
+        title: Terrorism non-fatal injuries Hijacking
+        description: >
+          An act whose primary objective is to take control of a vehicle such as an aircraft, boat, bus, etc. for the purpose of diverting it to an unprogrammed destination, force the release of prisoners, or some other political objective. Obtaining payment of a ransom should not the sole purpose of a Hijacking, but can be one element of the incident so long as additional objectives have also been stated. Hijackings are distinct from Hostage Taking because the target is a vehicle, regardless of whether there are people/passengers in the vehicle.
+        unit: 'injuries'
+        display:
+            name: Hijacking
+            numDecimalPlaces: 0
+
+      total_nwound_hostage_taking__barricade_incident:
+        title: Terrorism non-fatal injuries Hostage Taking (Barricade Incident)
+        description: >
+          An act whose primary objective is to take control of hostages for the purpose of achieving a political objective through concessions or through disruption of normal operations. Such attacks are distinguished from kidnapping since the incident occurs and usually plays out at the target location with little or no intention to hold the hostages for an extended period in a separate clandestine location.
+
+        unit: 'injuries'
+        display:
+            name: Hostage barricading
+            numDecimalPlaces: 0
+
+      total_nwound_hostage_taking__kidnapping:
+        title: Terrorism non-fatal injuries Hostage Taking (Kidnapping)
+        description: >
+          An act whose primary objective is to take control of hostages for the purpose of achieving a political objective through concessions or through disruption of normal operations. Kidnappings are distinguished from barricading in that they involve moving and holding the hostages in another location.
+        unit: 'injuries'
+        display:
+            name: Hostage kidnapping
+            numDecimalPlaces: 0
+      total_nwound_unarmed_assault:
+        title: Terrorism non-fatal injuries Unarmed Assault
+        description: >
+          An attack whose primary objective is to cause physical harm or death directly to human beings by any means other than explosive, firearm, incendiary, or sharp instrument (knife, etc.). Attacks involving chemical, biological or radiological weapons are considered unarmed assaults.
+        unit: 'injuries'
+        display:
+            name: Unarmed assault
+            numDecimalPlaces: 0
+      total_nwound_unknown:
+        title: Terrorism non-fatal injuries Unknown
+        description: >
+          The attack type cannot be determined from the available information.
+        unit: 'injuries'
+        display:
+            name: Unknown
+            numDecimalPlaces: 0
+
+      total_incident_counts_armed_assault:
+        title: Terrorist attacks Armed Assault
+        description: >
+          An armed assault is determined to be successful if the assault takes place and if a target is hit (including people and/or property). Unsuccessful armed assaults are those in which the perpetrators attack and do not hit the target. An armed assault is also unsuccessful if the perpetrators are apprehended on their way to commit the assault. To make this determination, however, there must be information to indicate that an actual assault was imminent.
+
+        unit: 'attacks'
+        display:
+            name: Armed assault
+            numDecimalPlaces: 0
+
+      total_incident_counts_assassination:
+        title: Terrorist attacks Assassination
+        description: >
+          An attack whose primary objective is to cause physical harm or death directly to human beings by use of a firearm, incendiary, or sharp instrument (knife, etc.). Not to include attacks involving the use of fists, rocks, sticks, or other handheld (less-than-lethal) weapons. Also includes attacks involving certain classes of explosive devices in addition to firearms, incendiaries, or sharp instruments. The explosive device subcategories that are included in this classification are grenades, projectiles, and unknown or other explosive devices that are thrown.
+
+        unit: 'attacks'
+        display:
+            name: Assassination
+            numDecimalPlaces: 0
+
+      total_incident_counts_bombing_explosion:
+        title: Terrorist attacks Bombing/Explosion
+        description: >
+          An attack where the primary effects are caused by an energetically unstable material undergoing rapid decomposition and releasing a pressure wave that causes physical damage to the surrounding environment. Can include either high or low explosives (including a dirty bomb) but does not include a nuclear explosive device that releases energy from fission and/or fusion, or an incendiary device where decomposition takes place at a much slower rate.
+
+
+          If an attack involves certain classes of explosive devices along with firearms, incendiaries, or sharp objects, then the attack is coded as an armed assault only. The explosive device subcategories that are included in this classification are grenades, projectiles, and unknown or other explosive devices that are thrown in which the bombers are also using firearms or incendiary devices.
+        unit: 'attacks'
+        display:
+            name: Bombing
+            numDecimalPlaces: 0
+
+      total_incident_counts_facility_infrastructure_attack:
+        title: Terrorist attacks Facility/Infrastructure Attack
+        description: >
+          An act, excluding the use of an explosive, whose primary objective is to cause damage to a non-human target, such as a building, monument, train, pipeline, etc. Such attacks include arson and various forms of sabotage (e.g., sabotaging a train track is a facility/infrastructure attack, even if passengers are killed). Facility/infrastructure attacks can include acts which aim to harm an installation, yet also cause harm to people incidentally (e.g. an arson attack primarily aimed at damaging a building, but causes injuries or fatalities).
+        unit: 'attacks'
+        display:
+            name: Infrastructure attack
+            numDecimalPlaces: 0
+
+      total_incident_counts_hijacking:
+        title: Terrorist attacks Hijacking
+        description: >
+          An act whose primary objective is to take control of a vehicle such as an aircraft, boat, bus, etc. for the purpose of diverting it to an unprogrammed destination, force the release of prisoners, or some other political objective. Obtaining payment of a ransom should not the sole purpose of a Hijacking, but can be one element of the incident so long as additional objectives have also been stated. Hijackings are distinct from Hostage Taking because the target is a vehicle, regardless of whether there are people/passengers in the vehicle.
+        unit: 'attacks'
+        display:
+            name: Hijacking
+            numDecimalPlaces: 0
+
+      total_incident_counts_hostage_taking__barricade_incident:
+        title: Terrorist attacks Hostage Taking (Barricade Incident)
+        description: >
+          An act whose primary objective is to take control of hostages for the purpose of achieving a political objective through concessions or through disruption of normal operations. Such attacks are distinguished from kidnapping since the incident occurs and usually plays out at the target location with little or no intention to hold the hostages for an extended period in a separate clandestine location.
+
+        unit: 'attacks'
+        display:
+            name: Hostage barricading
+            numDecimalPlaces: 0
+
+      total_incident_counts_hostage_taking__kidnapping:
+        title: Terrorist attacks Hostage Taking (Kidnapping)
+        description: >
+          An act whose primary objective is to take control of hostages for the purpose of achieving a political objective through concessions or through disruption of normal operations. Kidnappings are distinguished from barricading in that they involve moving and holding the hostages in another location.
+        unit: 'attacks'
+        display:
+            name: Hostage kidnapping
+            numDecimalPlaces: 0
+
+      total_incident_counts_unarmed_assault:
+        title: Terrorist attacks Unarmed Assault
+        description: >
+          An attack whose primary objective is to cause physical harm or death directly to human beings by any means other than explosive, firearm, incendiary, or sharp instrument (knife, etc.). Attacks involving chemical, biological or radiological weapons are considered unarmed assaults.
+        unit: 'attacks'
+        display:
+            name: Unarmed assault
+            numDecimalPlaces: 0
+
+      total_incident_counts_unknown:
+        title: Terrorist attacks Unknown
+        description: >
+          The attack type cannot be determined from the available information.
+        unit: 'attacks'
+        display:
+            name: Unknown
+            numDecimalPlaces: 0
+
+      total_nkill_abortion_related_target:
+        title: Terrorism deaths Abortion Related Target
+        description: >
+          Attacks on abortion clinics, employees, patrons, or security personnel stationed at clinics.
+        unit: 'deaths'
+        display:
+          name: Abortion related
+          numDecimalPlaces: 0
+
+      total_nkill_airports__and__aircraft_target:
+        title: Terrorism deaths Airports & Aircraft Target
+        description: >
+          An attack that was carried out either against an aircraft or against an airport. Attacks against airline employees while on board are also included in this value.
+
+
+          Includes attacks conducted against airport business offices and executives. Military aircrafts are not included.
+        unit: 'deaths'
+        display:
+          name: Airports and airplanes
+          numDecimalPlaces: 0
+
+      total_nkill_business_target:
+        title: Terrorism deaths Business Target
+        description: >
+          Businesses are defined as individuals or organizations engaged in commercial or mercantile activity as a means of livelihood. Any attack on a business or private citizens patronizing a business such as a restaurant, gas station, music store, bar, café, etc.
+
+
+          This includes attacks carried out against corporate offices or employees of firms like mining companies, or oil corporations. Furthermore, includes attacks conducted on business people or corporate officers. Included in this value as well are hospitals and chambers of commerce and cooperatives.
+
+
+          Does not include attacks carried out in public or quasi-public areas such as “business district or commercial area”, or generic business-related individuals such as “businessmen” (these attack are captured under “Private Citizens and Property”).
+
+
+          Also does not include attacks against generic business-related individuals such as “businessmen.” Unless the victims were targeted because of their specific business affiliation, these attacks belong in “Private Citizens and Property.”
+        unit: 'deaths'
+        display:
+          name: Business
+          numDecimalPlaces: 0
+
+      total_nkill_educational_institution_target:
+        title: Terrorism deaths Educational Institution Target
+        description: >
+          Attacks against schools, teachers, or guards protecting school sites. Includes attacks against university professors, teaching staff and school buses. Moreover, includes attacks against religious schools in this value.
+
+
+          As noted below in the “Private Citizens and Property” value, the GTD has several attacks against students. If attacks involving students are not expressly against a school, university or other educational institution or are carried out in an educational setting, they are coded as private citizens and property.
+
+
+          Excludes attacks against military schools (attacks on military schools are coded as “Military".
+        unit: 'deaths'
+        display:
+          name: Educational institutions
+          numDecimalPlaces: 0
+
+      total_nkill_food_or_water_supply_target:
+        title: Terrorism deaths Food or Water Supply Target
+        description: >
+          Attacks on food or water supplies and reserves are included in this value. This generally includes attacks aimed at the infrastructure related to food and water for human consumption
+        unit: "deaths"
+        display:
+          name: Food or water supply
+          numDecimalPlaces: 0
+
+      total_nkill_government__diplomatic__target:
+        title: Terrorism deaths Government (Diplomatic) Target
+        description: >
+          Attacks carried out against foreign missions, including embassies, consulates, etc.
+
+
+          This value includes cultural centers that have diplomatic functions, and attacks against diplomatic staff and their families (when the relationship is relevant to the motive of the attack) and property. The United Nations is a diplomatic target.
+        unit: 'deaths'
+        display:
+          name: Diplomatic
+          numDecimalPlaces: 0
+
+      total_nkill_government__general__target:
+        title: Terrorism deaths Government (General) Target
+        description: >
+          Any attack on a government building; government member, former members, including members of political parties in official capacities, their convoys, or events sponsored by political parties; political movements; or a government sponsored institution where the attack is expressly carried out to harm the government.
+
+
+          This value includes attacks on judges, public attorneys (e.g., prosecutors), courts and court systems, politicians, royalty, head of state, government employees (unless police or military), election-related attacks, or intelligence agencies and spies.
+
+
+          This value does not include attacks on political candidates for office or members of political parties that do not hold an elected office (these attacks are captured in “Private Citizens and Property”).
+        unit: "deaths"
+        display:
+          name: Government
+          numDecimalPlaces: 0
+
+      total_nkill_journalists__and__media_target:
+        title: Terrorism deaths Journalists & Media Target
+        description: >
+            Includes, attacks on reporters, news assistants, photographers, publishers, as well as attacks on media headquarters and offices.
+
+
+            Attacks on transmission facilities such as antennae or transmission towers, or broadcast infrastructure are coded as “Telecommunications,”.
+        unit: 'deaths'
+        display:
+          name: Journalists & media
+          numDecimalPlaces: 0
+
+      total_nkill_maritime_target:
+        title: Terrorism deaths Maritime Target
+        description: >
+            Includes civilian maritime: attacks against fishing ships, oil tankers, ferries, yachts, etc. (Attacks on fishermen are coded as “Private Citizens and Property,”).
+        unit: "deaths"
+        display:
+          name: Maritime
+          numDecimalPlaces: 0
+
+      total_nkill_military_target:
+        title: Terrorism deaths Military Target
+        descrtiption: >
+          Includes attacks against military units, patrols, barracks, convoys, jeeps, and aircraft. Also includes attacks on recruiting sites, and soldiers engaged in internal policing functions such as at checkpoints and in anti-narcotics activities. This category also includes peacekeeping units that conduct military operations (e.g., AMISOM)
+        unit: "deaths"
+        display:
+          name: Military
+          numDecimalPlaces: 0
+
+      total_nkill_ngo_target:
+        title: Terrorism deaths NGO Target
+        description: >
+          Includes attacks on offices and employees of non-governmental organizations (NGOs). NGOs here include large multinational non-governmental organizations such as the Red Cross and
+
+          Doctors without Borders, as well as domestic organizations. Does not include labor unions, social clubs, student groups, and other non-NGO (such cases are coded as “Private Citizens and Property”).
+        unit: "deaths"
+        display:
+          name: NGO
+          numDecimalPlaces: 0
+      total_nkill_other_target:
+        title: Terrorism deaths Other Target
+        description: >
+          This value includes acts of terrorism committed against targets which do not fit into other categories. Some examples include ambulances, firefighters, and international demilitarized zones.
+        unit: "deaths"
+        display:
+          name: Other
+          numDecimalPlaces: 0
+
+      total_nkill_police_target:
+        title: Terrorism deaths Police Target
+        description: >
+          This value includes attacks on members of the police force or police installations; this includes police boxes, patrols headquarters, academies, cars, checkpoints, etc. Includes attacks against jails or prison facilities, or jail or prison staff or guards.
+        unit: "deaths"
+        display:
+          name: Police
+          numDecimalPlaces: 0
+
+      total_nkill_private_citizens__and__property_target:
+        title: Terrorism deaths Private Citizens & Property Target
+        description: >
+          This value includes attacks on individuals, the public in general or attacks in public areas including markets, commercial streets, busy intersections and pedestrian malls.
+
+
+          Also includes ambiguous cases where the target/victim was a named individual, or where the target/victim of an attack could be identified by name, age, occupation, gender or nationality.
+
+
+          This value also includes ceremonial events, such as weddings and funerals. The GTD contains a number of attacks against students. If these attacks are not expressly against a school, university or other educational institution or are not carried out in an educational setting, these attacks are coded using this value. Also, includes incidents involving political supporters as private citizens and property, provided that these supporters are not part of a government-sponsored event.
+
+
+          Finally, this value includes police informers. Does not include attacks causing civilian casualties in businesses such as restaurants, cafes or movie theaters (these categories are coded as “Business”)
+        unit: "deaths"
+        display:
+          name: Private citizens & property
+          numDecimalPlaces: 0
+      total_nkill_religious_figures_institutions_target:
+        title: Terrorism deaths Religious Figures/Institutions Target
+        description: >
+          This value includes attacks on religious leaders, (Imams, priests, bishops, etc.), religious institutions (mosques, churches), religious places or objects (shrines, relics, etc.). This value alsoincludes attacks on organizations that are affiliated with religious entities that are not NGOs, businesses or schools.
+
+
+          Attacks on religious pilgrims are considered “Private Citizens and Property;” attacks on missionaries are considered religious figures.
+        unit: "deaths"
+        display:
+          name: Religious targets
+          numDecimalPlaces: 0
+
+      total_nkill_telecommunication_target:
+        title: Terrorism deaths Telecommunication Target
+        description: >
+          This includes attacks on facilities and infrastructure for the transmission of information. More specifically this value includes things like cell phone towers, telephone booths, television transmitters, radio, and microwave towers.
+        unit: "deaths"
+        display:
+          name: Telecommunication
+          numDecimalPlaces: 0
+
+      total_nkill_terrorists_non_state_militia_target:
+        title: Terrorism deaths Terrorists/Non-State Militia Target
+        descrtiption: >
+          Terrorists or members of identified terrorist groups within the GTD are included in this value. Membership is broadly defined and includes informants for terrorist groups, but excludes former or surrendered terrorists.
+
+
+          This value also includes cases involving the targeting of militias and guerillas
+        unit: "deaths"
+        display:
+          name: Militia
+          numDecimalPlaces: 0
+
+      total_nkill_tourists_target:
+        title: Terrorism deaths Tourists Target
+        description: >
+          This value includes the targeting of tour buses, tourists, or “tours.” Tourists are persons who travel primarily for the purposes of leisure or amusement. Government tourist offices are included in this value.
+
+
+          The attack must clearly target tourists, not just an assault on a business or transportation system used by tourists. Travel agencies are coded as business targets.
+        unit: "deaths"
+        display:
+          name: Tourists
+          numDecimalPlaces: 0
+
+      total_nkill_transportation_target:
+        title: Terrorism deaths Transportation Target
+        description: >
+          Attacks on public transportation systems are included in this value. This can include efforts to assault public buses, minibuses, trains, metro/subways, highways (if the highway itself is the target of the attack), bridges, roads, etc.
+
+
+          The GTD contains a number of attacks on generic terms such as “cars” or “vehicles.” These attacks are assumed to be against “Private Citizens and Property” unless shown to be against public transportation systems. In this regard, buses are assumed to be public transportation unless otherwise noted.
+        unit: "deaths"
+        display:
+          name: Transportation
+          numDecimalPlaces: 0
+
+      total_nkill_unknown_target:
+        title: Terrorism deaths Unknown Target
+        description: >
+          The target type cannot be determined from the available information.
+        unit: "deaths"
+        display:
+          name: Unknown
+          numDecimalPlaces: 0
+
+      total_nkill_utilities_target:
+        title: Terrorism deaths Utilities Target
+        descrtiption: >
+          This value pertains to facilities for the transmission or generation of energy. For example, power lines, oil pipelines, electrical transformers, high tension lines, gas and electric substations, are all included in this value. This value also includes lampposts or street lights.
+
+
+          Attacks on officers, employees or facilities of utility companies excluding the type of facilities above are coded as business.
+        unit: "deaths"
+        display:
+          name: Utilities
+          numDecimalPlaces: 0
+
+      total_nkill_violent_political_party_target:
+        title: Terrorism deaths Violent Political Party Target
+        descrtiption: >
+          This value pertains to entities that are both political parties (and thus, coded as “government” in this coding scheme) and terrorists. It is operationally defined as groups that engage in electoral politics and appear as “Perpetrators” in the GTD.
+        unit: "deaths"
+        display:
+          name: Violent political parties
+          numDecimalPlaces: 0
+
+      total_nwound_abortion_related_target:
+        title: Terrorism non-fatal injuries Abortion Related Target
+        description: >
+          Attacks on abortion clinics, employees, patrons, or security personnel stationed at clinics.
+        unit: 'injuries'
+        display:
+          name: Abortion related
+          numDecimalPlaces: 0
+
+      total_nwound_airports__and__aircraft_target:
+        title: Terrorism non-fatal injuries Airports & Aircraft Target
+        description: >
+          An attack that was carried out either against an aircraft or against an airport. Attacks against airline employees while on board are also included in this value.
+
+
+          Includes attacks conducted against airport business offices and executives. Military aircrafts are not included.
+        unit: 'injuries'
+        display:
+          name: Airports and airplanes
+          numDecimalPlaces: 0
+      total_nwound_business_target:
+        title: Terrorism non-fatal injuries Business Target
+        description: >
+          Businesses are defined as individuals or organizations engaged in commercial or mercantile activity as a means of livelihood. Any attack on a business or private citizens patronizing a business such as a restaurant, gas station, music store, bar, café, etc.
+
+
+          This includes attacks carried out against corporate offices or employees of firms like mining companies, or oil corporations. Furthermore, includes attacks conducted on business people or corporate officers. Included in this value as well are hospitals and chambers of commerce and cooperatives.
+
+
+          Does not include attacks carried out in public or quasi-public areas such as “business district or commercial area”, or generic business-related individuals such as “businessmen” (these attack are captured under “Private Citizens and Property”).
+
+
+          Also does not include attacks against generic business-related individuals such as “businessmen.” Unless the victims were targeted because of their specific business affiliation, these attacks belong in “Private Citizens and Property.”
+        unit: 'injuries'
+        display:
+          name: Business
+          numDecimalPlaces: 0
+      total_nwound_educational_institution_target:
+        title: Terrorism non-fatal injuries Educational Institution Target
+        description: >
+          Attacks against schools, teachers, or guards protecting school sites. Includes attacks against university professors, teaching staff and school buses. Moreover, includes attacks against religious schools in this value.
+
+
+          As noted below in the “Private Citizens and Property” value, the GTD has several attacks against students. If attacks involving students are not expressly against a school, university or other educational institution or are carried out in an educational setting, they are coded as private citizens and property.
+
+
+          Excludes attacks against military schools (attacks on military schools are coded as “Military".
+        unit: 'injuries'
+        display:
+          name: Educational institutions
+          numDecimalPlaces: 0
+      total_nwound_food_or_water_supply_target:
+        title: Terrorism non-fatal injuries Food or Water Supply Target
+        description: >
+          Attacks on food or water supplies and reserves are included in this value. This generally includes attacks aimed at the infrastructure related to food and water for human consumption
+        unit: "injuries"
+        display:
+          name: Food or water supply
+          numDecimalPlaces: 0
+
+      total_nwound_government__diplomatic__target:
+        title: Terrorism non-fatal injuries Government (Diplomatic) Target
+        description: >
+          Attacks carried out against foreign missions, including embassies, consulates, etc.
+
+
+          This value includes cultural centers that have diplomatic functions, and attacks against diplomatic staff and their families (when the relationship is relevant to the motive of the attack) and property. The United Nations is a diplomatic target.
+        unit: 'injuries'
+        display:
+          name: Diplomatic
+          numDecimalPlaces: 0
+      total_nwound_government__general__target:
+        title: Terrorism non-fatal injuries Government (General) Target
+        description: >
+          Any attack on a government building; government member, former members, including members of political parties in official capacities, their convoys, or events sponsored by political parties; political movements; or a government sponsored institution where the attack is expressly carried out to harm the government.
+
+
+          This value includes attacks on judges, public attorneys (e.g., prosecutors), courts and court systems, politicians, royalty, head of state, government employees (unless police or military), election-related attacks, or intelligence agencies and spies.
+
+
+          This value does not include attacks on political candidates for office or members of political parties that do not hold an elected office (these attacks are captured in “Private Citizens and Property”).
+        unit: "injuries"
+        display:
+          name: Government
+          numDecimalPlaces: 0
+      total_nwound_journalists__and__media_target:
+        title: Terrorism non-fatal injuries Journalists & Media Target
+        description: >
+            Includes, attacks on reporters, news assistants, photographers, publishers, as well as attacks on media headquarters and offices.
+
+
+            Attacks on transmission facilities such as antennae or transmission towers, or broadcast infrastructure are coded as “Telecommunications,”.
+        unit: 'injuries'
+        display:
+          name: Journalists & media
+          numDecimalPlaces: 0
+      total_nwound_maritime_target:
+        title: Terrorism non-fatal injuries Maritime Target
+        description: >
+            Includes civilian maritime: attacks against fishing ships, oil tankers, ferries, yachts, etc. (Attacks on fishermen are coded as “Private Citizens and Property,”).
+        unit: 'injuries'
+        display:
+          name: Maritime
+          numDecimalPlaces: 0
+      total_nwound_military_target:
+        title: Terrorism non-fatal injuries Military Target
+        descrtiption: >
+          Includes attacks against military units, patrols, barracks, convoys, jeeps, and aircraft. Also includes attacks on recruiting sites, and soldiers engaged in internal policing functions such as at checkpoints and in anti-narcotics activities. This category also includes peacekeeping units that conduct military operations (e.g., AMISOM)
+        unit: "injuries"
+        display:
+          name: Military
+          numDecimalPlaces: 0
+      total_nwound_ngo_target:
+        title: Terrorism non-fatal injuries NGO Target
+        description: >
+          Includes attacks on offices and employees of non-governmental organizations (NGOs). NGOs here include large multinational non-governmental organizations such as the Red Cross and
+
+          Doctors without Borders, as well as domestic organizations. Does not include labor unions, social clubs, student groups, and other non-NGO (such cases are coded as “Private Citizens and Property”).
+        unit: "injuries"
+        display:
+          name: NGO
+          numDecimalPlaces: 0
+      total_nwound_other_target:
+        title: Terrorism non-fatal injuries Other Target
+        description: >
+          This value includes acts of terrorism committed against targets which do not fit into other categories. Some examples include ambulances, firefighters, and international demilitarized zones.
+        unit: "injuries"
+        display:
+          name: Other
+          numDecimalPlaces: 0
+      total_nwound_police_target:
+        title: Terrorism non-fatal injuries Police Target
+        description: >
+          This value includes attacks on members of the police force or police installations; this includes police boxes, patrols headquarters, academies, cars, checkpoints, etc. Includes attacks against jails or prison facilities, or jail or prison staff or guards.
+        unit: "injuries"
+        display:
+          name: Police
+          numDecimalPlaces: 0
+      total_nwound_private_citizens__and__property_target:
+        title: Terrorism non-fatal injuries Private Citizens & Property Target
+        description: >
+          This value includes attacks on individuals, the public in general or attacks in public areas including markets, commercial streets, busy intersections and pedestrian malls.
+
+
+          Also includes ambiguous cases where the target/victim was a named individual, or where the target/victim of an attack could be identified by name, age, occupation, gender or nationality.
+
+
+          This value also includes ceremonial events, such as weddings and funerals. The GTD contains a number of attacks against students. If these attacks are not expressly against a school, university or other educational institution or are not carried out in an educational setting, these attacks are coded using this value. Also, includes incidents involving political supporters as private citizens and property, provided that these supporters are not part of a government-sponsored event.
+
+
+          Finally, this value includes police informers. Does not include attacks causing civilian casualties in businesses such as restaurants, cafes or movie theaters (these categories are coded as “Business”)
+        unit: "deaths"
+        display:
+          name: Private citizens & property
+          numDecimalPlaces: 0
+      total_nwound_religious_figures_institutions_target:
+        title: Terrorism non-fatal injuries Religious Figures/Institutions Target
+        description: >
+          This value includes attacks on religious leaders, (Imams, priests, bishops, etc.), religious institutions (mosques, churches), religious places or objects (shrines, relics, etc.). This value alsoincludes attacks on organizations that are affiliated with religious entities that are not NGOs, businesses or schools.
+
+
+          Attacks on religious pilgrims are considered “Private Citizens and Property;” attacks on missionaries are considered religious figures.
+        unit: "injuries"
+        display:
+          name: Religious targets
+          numDecimalPlaces: 0
+      total_nwound_telecommunication_target:
+        title: Terrorism non-fatal injuries Telecommunication Target
+        description: >
+          This includes attacks on facilities and infrastructure for the transmission of information. More specifically this value includes things like cell phone towers, telephone booths, television transmitters, radio, and microwave towers.
+        unit: "injuries"
+        display:
+          name: Telecommunication
+          numDecimalPlaces: 0
+
+      total_nwound_terrorists_non_state_militia_target:
+        title: Terrorism non-fatal injuries Terrorists/Non-State Militia Target
+        descrtiption: >
+          Terrorists or members of identified terrorist groups within the GTD are included in this value. Membership is broadly defined and includes informants for terrorist groups, but excludes former or surrendered terrorists.
+
+
+          This value also includes cases involving the targeting of militias and guerillas
+        unit: "injuries"
+        display:
+          name: Militia
+          numDecimalPlaces: 0
+
+      total_nwound_tourists_target:
+        title: Terrorism non-fatal injuries Tourists Target
+        description: >
+          This value includes the targeting of tour buses, tourists, or “tours.” Tourists are persons who travel primarily for the purposes of leisure or amusement. Government tourist offices are included in this value.
+
+
+          The attack must clearly target tourists, not just an assault on a business or transportation system used by tourists. Travel agencies are coded as business targets.
+        unit: "injuries"
+        display:
+          name: Tourists
+          numDecimalPlaces: 0
+      total_nwound_transportation_target:
+        title: Terrorism non-fatal injuries Transportation Target
+        description: >
+          Attacks on public transportation systems are included in this value. This can include efforts to assault public buses, minibuses, trains, metro/subways, highways (if the highway itself is the target of the attack), bridges, roads, etc.
+
+
+          The GTD contains a number of attacks on generic terms such as “cars” or “vehicles.” These attacks are assumed to be against “Private Citizens and Property” unless shown to be against public transportation systems. In this regard, buses are assumed to be public transportation unless otherwise noted.
+        unit: "injuries"
+        display:
+          name: Transportation
+          numDecimalPlaces: 0
+      total_nwound_unknown_target:
+        title: Terrorism non-fatal injuries Unknown Target
+        description: >
+          The target type cannot be determined from the available information.
+        unit: "injuries"
+        display:
+          name: Unknown
+          numDecimalPlaces: 0
+
+      total_nwound_utilities_target:
+        title: Terrorism non-fatal injuries Utilities Target
+        descrtiption: >
+          This value pertains to facilities for the transmission or generation of energy. For example, power lines, oil pipelines, electrical transformers, high tension lines, gas and electric substations, are all included in this value. This value also includes lampposts or street lights.
+
+
+          Attacks on officers, employees or facilities of utility companies excluding the type of facilities above are coded as business.
+        unit: "injuries"
+        display:
+          name: Utilities
+          numDecimalPlaces: 0
+      total_nwound_violent_political_party_target:
+        title: Terrorism non-fatal injuries Violent Political Party Target
+        descrtiption: >
+          This value pertains to entities that are both political parties (and thus, coded as “government” in this coding scheme) and terrorists. It is operationally defined as groups that engage in electoral politics and appear as “Perpetrators” in the GTD.
+        unit: "injuries"
+        display:
+          name: Violent political parties
+          numDecimalPlaces: 0
+      total_incident_counts_abortion_related_target:
+        title: Terrorist attacks Abortion Related Target
+        description: >
+          Attacks on abortion clinics, employees, patrons, or security personnel stationed at clinics.
+        unit: 'attacks'
+        display:
+          name: Abortion related
+          numDecimalPlaces: 0
+
+      total_incident_counts_airports__and__aircraft_target:
+        title: Terrorist attacks Airports & Aircraft Target
+        description: >
+          An attack that was carried out either against an aircraft or against an airport. Attacks against airline employees while on board are also included in this value.
+
+
+          Includes attacks conducted against airport business offices and executives. Military aircrafts are not included.
+        unit: 'attacks'
+        display:
+          name: Airports and airplanes
+          numDecimalPlaces: 0
+      total_incident_counts_business_target:
+        title: Terrorist attacks Business Target
+        description: >
+          Businesses are defined as individuals or organizations engaged in commercial or mercantile activity as a means of livelihood. Any attack on a business or private citizens patronizing a business such as a restaurant, gas station, music store, bar, café, etc.
+
+
+          This includes attacks carried out against corporate offices or employees of firms like mining companies, or oil corporations. Furthermore, includes attacks conducted on business people or corporate officers. Included in this value as well are hospitals and chambers of commerce and cooperatives.
+
+
+          Does not include attacks carried out in public or quasi-public areas such as “business district or commercial area”, or generic business-related individuals such as “businessmen” (these attack are captured under “Private Citizens and Property”).
+
+
+          Also does not include attacks against generic business-related individuals such as “businessmen.” Unless the victims were targeted because of their specific business affiliation, these attacks belong in “Private Citizens and Property.”
+        unit: 'attacks'
+        display:
+          name: Business
+          numDecimalPlaces: 0
+      total_incident_counts_educational_institution_target:
+        title: Terrorist attacks Educational Institution Target
+        description: >
+          Attacks against schools, teachers, or guards protecting school sites. Includes attacks against university professors, teaching staff and school buses. Moreover, includes attacks against religious schools in this value.
+
+
+          As noted below in the “Private Citizens and Property” value, the GTD has several attacks against students. If attacks involving students are not expressly against a school, university or other educational institution or are carried out in an educational setting, they are coded as private citizens and property.
+
+
+          Excludes attacks against military schools (attacks on military schools are coded as “Military".
+        unit: 'attacks'
+        display:
+          name: Educational institutions
+          numDecimalPlaces: 0
+      total_incident_counts_food_or_water_supply_target:
+        title: Terrorist attacks Food or Water Supply Target
+        description: >
+          Attacks on food or water supplies and reserves are included in this value. This generally includes attacks aimed at the infrastructure related to food and water for human consumption
+        unit: "attacks"
+        display:
+          name: Food or water supply
+          numDecimalPlaces: 0
+
+      total_incident_counts_government__diplomatic__target:
+        title: Terrorist attacks Government (Diplomatic) Target
+        description: >
+          Attacks carried out against foreign missions, including embassies, consulates, etc.
+
+
+          This value includes cultural centers that have diplomatic functions, and attacks against diplomatic staff and their families (when the relationship is relevant to the motive of the attack) and property. The United Nations is a diplomatic target.
+        unit: 'attacks'
+        display:
+          name: Diplomatic
+          numDecimalPlaces: 0
+      total_incident_counts_government__general__target:
+        title: Terrorist attacks Government (General) Target
+        description: >
+          Any attack on a government building; government member, former members, including members of political parties in official capacities, their convoys, or events sponsored by political parties; political movements; or a government sponsored institution where the attack is expressly carried out to harm the government.
+
+
+          This value includes attacks on judges, public attorneys (e.g., prosecutors), courts and court systems, politicians, royalty, head of state, government employees (unless police or military), election-related attacks, or intelligence agencies and spies.
+
+
+          This value does not include attacks on political candidates for office or members of political parties that do not hold an elected office (these attacks are captured in “Private Citizens and Property”).
+        unit: "attacks"
+        display:
+          name: Government
+          numDecimalPlaces: 0
+      total_incident_counts_journalists__and__media_target:
+        title: Terrorist attacks Journalists & Media Target
+        description: >-
+          The GTD defines a terrorist attack as the threatened or actual use of illegal force and violence by a non- state
+          actor to attain a political, economic, religious, or social goal through fear, coercion, or intimidation. In practice
+          this means in order to consider an incident for inclusion in the GTD, all three of the following attributes must
+          be present:
+
+
+          - The incident must be intentional - the result of a conscious calculation on the part of a perpetrator.
+
+
+          - The incident must entail some level of violence or immediate threat of violence -including property violence,
+          as well as violence against people.
+
+
+          - The perpetrators of the incidents must be sub-national actors. The database does not include acts of state terrorism.
+
+
+          In addition, at least two of the following three criteria must be present for an incident to be included in the
+          GTD:
+
+
+          - Criterion 1: The act must be aimed at attaining a political, economic, religious, or social goal. In terms of
+          economic goals, the exclusive pursuit of profit does not satisfy this criterion. It must involve the pursuit of
+          more profound, systemic economic change.
+
+
+          - Criterion 2: There must be evidence of an intention to coerce, intimidate, or convey some other message to a larger
+          audience (or audiences) than the immediate victims. It is the act taken as a totality that is considered, irrespective
+          if every individual involved in carrying out the act was aware of this intention. As long as any of the planners
+          or decision-makers behind the attack intended to coerce, intimidate or publicize, the intentionality criterion is
+          met.
+
+
+          - Criterion 3: The action must be outside the context of legitimate warfare activities. That is, the act must be
+          outside the parameters permitted by international humanitarian law, insofar as it targets non-combatants
+        unit: attacks
+        display:
+          name: Journalists & media
+          numDecimalPlaces: 0
+
+      total_incident_counts_maritime_target:
+        title: Terrorist attacks Maritime Target
+        description: >-
+          The GTD defines a terrorist attack as the threatened or actual use of illegal force and violence by a non- state
+          actor to attain a political, economic, religious, or social goal through fear, coercion, or intimidation. In practice
+          this means in order to consider an incident for inclusion in the GTD, all three of the following attributes must
+          be present:
+
+
+          - The incident must be intentional - the result of a conscious calculation on the part of a perpetrator.
+
+
+          - The incident must entail some level of violence or immediate threat of violence -including property violence,
+          as well as violence against people.
+
+
+          - The perpetrators of the incidents must be sub-national actors. The database does not include acts of state terrorism.
+
+
+          In addition, at least two of the following three criteria must be present for an incident to be included in the
+          GTD:
+
+
+          - Criterion 1: The act must be aimed at attaining a political, economic, religious, or social goal. In terms of
+          economic goals, the exclusive pursuit of profit does not satisfy this criterion. It must involve the pursuit of
+          more profound, systemic economic change.
+
+
+          - Criterion 2: There must be evidence of an intention to coerce, intimidate, or convey some other message to a larger
+          audience (or audiences) than the immediate victims. It is the act taken as a totality that is considered, irrespective
+          if every individual involved in carrying out the act was aware of this intention. As long as any of the planners
+          or decision-makers behind the attack intended to coerce, intimidate or publicize, the intentionality criterion is
+          met.
+
+
+          - Criterion 3: The action must be outside the context of legitimate warfare activities. That is, the act must be
+          outside the parameters permitted by international humanitarian law, insofar as it targets non-combatants
+        unit: attacks
+        display:
+          name: Maritime
+          numDecimalPlaces: 0
+      total_incident_counts_military_target:
+        title: Terrorist attacks Military Target
+        descrtiption: >
+          Includes attacks against military units, patrols, barracks, convoys, jeeps, and aircraft. Also includes attacks on recruiting sites, and soldiers engaged in internal policing functions such as at checkpoints and in anti-narcotics activities. This category also includes peacekeeping units that conduct military operations (e.g., AMISOM)
+        unit: "attacks"
+        display:
+          name: Military
+          numDecimalPlaces: 0
+      total_incident_counts_ngo_target:
+        title: Terrorist attacks NGO Target
+        description: >
+          Includes attacks on offices and employees of non-governmental organizations (NGOs). NGOs here include large multinational non-governmental organizations such as the Red Cross and
+
+          Doctors without Borders, as well as domestic organizations. Does not include labor unions, social clubs, student groups, and other non-NGO (such cases are coded as “Private Citizens and Property”).
+        unit: "attacks"
+        display:
+          name: NGO
+          numDecimalPlaces: 0
+      total_incident_counts_other_target:
+        title: Terrorist attacks Other Target
+        description: >
+          This value includes acts of terrorism committed against targets which do not fit into other categories. Some examples include ambulances, firefighters, and international demilitarized zones.
+        unit: "attacks"
+        display:
+          name: Other
+          numDecimalPlaces: 0
+      total_incident_counts_police_target:
+        title: Terrorist attacks Police Target
+        description: >
+          This value includes attacks on members of the police force or police installations; this includes police boxes, patrols headquarters, academies, cars, checkpoints, etc. Includes attacks against jails or prison facilities, or jail or prison staff or guards.
+        unit: "attacks"
+        display:
+          name: Police
+          numDecimalPlaces: 0
+      total_incident_counts_private_citizens__and__property_target:
+        title: Terrorist attacks Private Citizens & Property Target
+        description: >
+          This value includes attacks on individuals, the public in general or attacks in public areas including markets, commercial streets, busy intersections and pedestrian malls.
+
+
+          Also includes ambiguous cases where the target/victim was a named individual, or where the target/victim of an attack could be identified by name, age, occupation, gender or nationality.
+
+
+          This value also includes ceremonial events, such as weddings and funerals. The GTD contains a number of attacks against students. If these attacks are not expressly against a school, university or other educational institution or are not carried out in an educational setting, these attacks are coded using this value. Also, includes incidents involving political supporters as private citizens and property, provided that these supporters are not part of a government-sponsored event.
+
+
+          Finally, this value includes police informers. Does not include attacks causing civilian casualties in businesses such as restaurants, cafes or movie theaters (these categories are coded as “Business”)
+        unit: "attacks"
+        display:
+          name: Private citizens & property
+          numDecimalPlaces: 0
+      total_incident_counts_religious_figures_institutions_target:
+        title: Terrorist attacks Religious Figures/Institutions Target
+        description: >
+          This value includes attacks on religious leaders, (Imams, priests, bishops, etc.), religious institutions (mosques, churches), religious places or objects (shrines, relics, etc.). This value alsoincludes attacks on organizations that are affiliated with religious entities that are not NGOs, businesses or schools.
+
+
+          Attacks on religious pilgrims are considered “Private Citizens and Property;” attacks on missionaries are considered religious figures.
+        unit: "attacks"
+        display:
+          name: Religious targets
+          numDecimalPlaces: 0
+
+      total_incident_counts_telecommunication_target:
+        title: Terrorist attacks Telecommunication Target
+        description: >
+          This includes attacks on facilities and infrastructure for the transmission of information. More specifically this value includes things like cell phone towers, telephone booths, television transmitters, radio, and microwave towers.
+        unit: "attacks"
+        display:
+          name: Telecommunication
+          numDecimalPlaces: 0
+
+      total_incident_counts_terrorists_non_state_militia_target:
+        title: Terrorist attacks Terrorists/Non-State Militia Target
+        descrtiption: >
+          Terrorists or members of identified terrorist groups within the GTD are included in this value. Membership is broadly defined and includes informants for terrorist groups, but excludes former or surrendered terrorists.
+
+
+          This value also includes cases involving the targeting of militias and guerillas
+        unit: "attacks"
+        display:
+          name: Militia
+          numDecimalPlaces: 0
+
+      total_incident_counts_tourists_target:
+        title: Terrorist attacks Tourists Target
+        description: >
+          This value includes the targeting of tour buses, tourists, or “tours.” Tourists are persons who travel primarily for the purposes of leisure or amusement. Government tourist offices are included in this value.
+
+
+          The attack must clearly target tourists, not just an assault on a business or transportation system used by tourists. Travel agencies are coded as business targets.
+        unit: "attacks"
+        display:
+          name: Tourists
+          numDecimalPlaces: 0
+      total_incident_counts_transportation_target:
+        title: Terrorist attacks Transportation Target
+        description: >
+          Attacks on public transportation systems are included in this value. This can include efforts to assault public buses, minibuses, trains, metro/subways, highways (if the highway itself is the target of the attack), bridges, roads, etc.
+
+
+          The GTD contains a number of attacks on generic terms such as “cars” or “vehicles.” These attacks are assumed to be against “Private Citizens and Property” unless shown to be against public transportation systems. In this regard, buses are assumed to be public transportation unless otherwise noted.
+        unit: "attacks"
+        display:
+          name: Transportation
+          numDecimalPlaces: 0
+
+      total_incident_counts_unknown_target:
+        title: Terrorist attacks Unknown Target
+        description: >
+          The target type cannot be determined from the available information.
+        unit: "attacks"
+        display:
+          name: Unknown
+          numDecimalPlaces: 0
+
+      total_incident_counts_utilities_target:
+        title: Terrorist attacks Utilities Target
+        descrtiption: >
+          This value pertains to facilities for the transmission or generation of energy. For example, power lines, oil pipelines, electrical transformers, high tension lines, gas and electric substations, are all included in this value. This value also includes lampposts or street lights.
+
+
+          Attacks on officers, employees or facilities of utility companies excluding the type of facilities above are coded as business.
+        unit: "attacks"
+        display:
+          name: Utilities
+          numDecimalPlaces: 0
+      total_incident_counts_violent_political_party_target:
+        title: Terrorist attacks Violent Political Party Target
+        descrtiption: >
+          This value pertains to entities that are both political parties (and thus, coded as “government” in this coding scheme) and terrorists. It is operationally defined as groups that engage in electoral politics and appear as “Perpetrators” in the GTD.
+        unit: "attacks"
+        display:
+          name: Violent political parties
+          numDecimalPlaces: 0
+      total_nkill_no_suicide:
+        title: Terrorism deaths No Suicide
+        description: >
+           There is no indication that the incident was a suicide attack.
+        unit: 'deaths'
+        display:
+          name: Deaths from non-suicide terrorist attacks
+          numDecimalPlaces: 0
+      total_nkill_suicide:
+        title: Terrorism deaths Suicide
+        description: >
+            The incident was a suicide attack.
+        unit: 'deaths'
+        display:
+          name: Deaths from suicide terrorist attacks
+          numDecimalPlaces: 0
+
+      total_nwound_no_suicide:
+        title: Terrorism non-fatal injuries No Suicide
+        description: >
+           There is no indication that the incident was a suicide attack.
+        unit: 'injuries'
+        display:
+          name: Injuries from non-suicide terrorist attacks
+          numDecimalPlaces: 0
+      total_nwound_suicide:
+        title:  Terrorism non-fatal injuries Suicide
+        description: >
+            The incident was a suicide attack.
+        unit: 'injuries'
+        display:
+          name: Injuries from suicide terrorist attacks
+          numDecimalPlaces: 0
+
+      total_incident_counts_no_suicide:
+        title: Terrorist attacks No Suicide
+        description: >
+           There is no indication that the incident was a suicide attack.
+        unit: 'attacks'
+        display:
+          name: Non-suicide terrorist attacks
+          numDecimalPlaces: 0
+
+      total_incident_counts_suicide:
+        title: Terrorist attacks Suicide
+        description: >
+            The incident was a suicide attack.
+        unit: 'attacks'
+        display:
+          name: Suicide terrorist attacks
+          numDecimalPlaces: 0
+
+      _0_deaths:
+        title: Terrorist attacks (0 deaths)
+        description: >
+            Number of terrorist attacks with 0 deaths.
+        unit: 'attacks'
+        display:
+          name: 0 deaths
+          numDecimalPlaces: 0
+
+      _1_5_deaths:
+        title: Terrorist attacks (1-5 deaths)
+        description: >
+            Number of terrorist attacks with 1-5 deaths.
+        unit: 'attacks'
+        display:
+          name: 1-5 deaths
+          numDecimalPlaces: 0
+      _100plus:
+        title: Terrorist attacks (100+ deaths)
+        description: >
+            Number of terrorist attacks with above 100 deaths.
+        unit: 'attacks'
+        display:
+          name: More than 100 deaths
+          numDecimalPlaces: 0
+      _11_20_deaths:
+        title: Terrorist attacks (11-20 deaths)
+        description: >
+            Number of terrorist attacks with 11-20 deaths.
+        unit: 'attacks'
+        display:
+          name: 11-20 deaths
+          numDecimalPlaces: 0
+      _21_50_deaths:
+        title: Terrorist attacks (21-50 deaths)
+        description: >
+            Number of terrorist attacks with 21-50 deaths.
+        unit: 'attacks'
+        display:
+          name: 21-50 deaths
+          numDecimalPlaces: 0
+      _51_99_deaths:
+        title: Terrorist attacks (51-99 deaths)
+        description: >
+            Number of terrorist attacks with 51-99 deaths.
+        unit: 'attacks'
+        display:
+          name: 51-99 deaths
+          numDecimalPlaces: 0
+      _6_10_deaths:
+        title: Terrorist attacks (6-10 deaths)
+        description: >
+            Number of terrorist attacks with 6-10 deaths.
+        unit: 'attacks'
+        display:
+          name: 6-10 deaths
+          numDecimalPlaces: 0
+      terrorism_wounded_per_100k:
+        title: Terrorism non-fatal injuries per 100,000 people
+        description: >-
+          This field records the number of confirmed non-fatal injuries to both perpetrators and victims.
+
+
+          Where there is evidence of non-fatal injuries, but a figure is not reported or it is too vague to be of use, this
+          field remains blank. If information is missing regarding the number of victims killed in an attack, but perpetrator
+          fatalities are known, this value will reflect only the number of perpetrators who died as a result of the incident.
+          Likewise, if information on the number of perpetrators killed in an attack is missing, but victim fatalities are
+          known, this field will only report the number of victims killed in the incident.
+
+
+          Where several independent sources report different numbers of non-fatal injuries, the database will usually reflect
+          the number given by the most recent source. However, the most recent source will not be used if the source itself
+          is of questionable validity or if the source bases its non-fatal injuries on claims made by a perpetrator group.
+          When there are several "most recent" sources published around the same time, or there are concerns about the validity
+          of a recent source, the majority figure will be used. Where there is no majority figure among independent sources,
+          the database will record the lowest proffered non-fatal injuries figure, unless that figure comes from a source
+          of questionable validity or there is another compelling reason to do otherwise. Conflicting reports of fatalities
+          will be noted in the "Additional Notes" field.
+        unit: injuries per 100,000 people
+        display:
+          name: Non-fatal injuries per 100,000 people
+          numDecimalPlaces: 2
+      terrorism_deaths_per_100k:
+        title: Terrorism deaths per 100,000 people
+        description: >-
+          This field stores the number of total confirmed fatalities for the incident. The number includes all victims and
+          attackers who died as a direct result of the incident.
+
+
+          Where there is evidence of fatalities, but a figure is not reported or it is too vague to be of use, this field
+          remains blank. If information is missing regarding the number of victims killed in an attack, but perpetrator fatalities
+          are known, this value will reflect only the number of perpetrators who died as a result of the incident. Likewise,
+          if information on the number of perpetrators killed in an attack is missing, but victim fatalities are known, this
+          field will only report the number of victims killed in the incident.
+
+
+          Where several independent sources report different numbers of fatalities, the database will usually reflect the
+          number given by the most recent source. However, the most recent source will not be used if the source itself is
+          of questionable validity or if the source bases its death numbers on claims made by a perpetrator group. When there
+          are several "most recent" sources published around the same time, or there are concerns about the validity of a
+          recent source, the majority figure will be used. Where there is no majority figure among independent sources, the
+          database will record the lowest proffered fatality figure, unless that figure comes from a source of questionable
+          validity or there is another compelling reason to do otherwise. Conflicting reports of fatalities will be noted
+          in the "Additional Notes" field.
+        unit: deaths
+        display:
+          numDecimalPlaces: 2
+      share_of_deaths:
+        title: Share of deaths from terrorism
+        description: >
+            The percentage of deaths due to terrorism is derived by comparing the confirmed fatalities data from the Global Terrorism Database to the overall mortality figures obtained from the 2022 UN World Population Prospects data.
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 2
+
+      killed_per_suicide_attack:
+        title: Terrorism deaths per suicide attack
+        description: The incident was a suicide attack.
+        unit: 'deaths per attack'
+        display:
+          name: Deaths per suicide attack
+          numDecimalPlaces: 0
+
+      killed_per_non_suicide_attack:
+        title: Terrorism deaths per no suicide attack
+        description: >
+           There is no indication that the incident was a suicide attack.
+        unit: 'deaths per attack'
+        display:
+          name: Deaths per non-suicide attack
+          numDecimalPlaces: 0
+
+      injured_per_suicide_attack:
+        title: Terrorism injuries per suicide attack
+        description: The incident was a suicide attack.
+        unit: 'injuries per attack'
+        display:
+          name: Injuries per suicide attack
+          numDecimalPlaces: 0
+      injured_per_non_suicide_attack:
+        title: Terrorism injuries per non-suicide attack
+        description: >
+           There is no indication that the incident was a suicide attack.
+        unit: 'injuries per attack'
+        display:
+          name: Injuries per non-suicide attack
+          numDecimalPlaces: 0

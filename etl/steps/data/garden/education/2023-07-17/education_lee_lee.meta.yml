@@ -1,0 +1,197 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Global Education
+  others:
+    description_processing: &description_processing
+      Historical data up to the year 1985 has been sourced from 'Human Capital in the Long Run' by Lee and Lee (2016). This historical data was then combined with recent estimates provided by the World Bank.
+
+
+      For the period before 1985, regional aggregates were computed by Our World in Data through yearly population-weighted averages, where annual values are proportionally adjusted to emphasize the influence of larger populations.
+
+dataset:
+  title: Human Capital in the Long Run (Lee and Lee 2016) and WDI (World Bank)
+  description: >
+    This dataset is based on 'Human Capital in the Long Run' by Lee and Lee (2016) and World Development Indicators by World Bank.
+    It includes indicators relating to enrollment rates in various levels of education, historic data on average years of education and educational attainment, specifically share of people with no education.
+
+tables:
+  education_lee_lee:
+    variables:
+      mf_primary_enrollment_rates_combined_wb:
+        title: Combined total net enrolment rate, primary, both sexes
+        description_key:
+          - Net enrollment rate for primary school is calculated by dividing the number of students of official school age enrolled in primary education by the population of the age group which officially corresponds to primary education, and multiplying by 100.
+        description_processing: *description_processing
+        unit: '%'
+        short_unit: '%'
+        processing_level: major
+        display:
+          numDecimalPlaces: 1
+
+      f_primary_enrollment_rates_combined_wb:
+        title: Combined total net enrolment rate, primary, female
+        description_key:
+          - Net enrollment rate for primary school is calculated by dividing the number of students of official school age enrolled in primary education by the population of the age group which officially corresponds to primary education, and multiplying by 100.
+        description_processing: *description_processing
+        unit: '%'
+        short_unit: '%'
+        processing_level: major
+        display:
+          numDecimalPlaces: 1
+
+      m_primary_enrollment_rates_combined_wb:
+        title: Combined total net enrolment rate, primary, male
+        description_key:
+          - Net enrollment rate for primary school is calculated by dividing the number of students of official school age enrolled in primary education by the population of the age group which officially corresponds to primary education, and multiplying by 100.
+        description_processing: *description_processing
+        unit: '%'
+        short_unit: '%'
+        processing_level: major
+        display:
+          numDecimalPlaces: 1
+
+      mf_secondary_enrollment_rates_combined_wb:
+        title: Combined total net enrolment rate, secondary, both sexes
+        description_key:
+          - Net enrollment rate for secondary school is calculated by dividing the number of students of official school age enrolled in secondary education by the population of the age group which officially corresponds to secondary education, and multiplying by 100.
+        description_processing: *description_processing
+        unit: '%'
+        short_unit: '%'
+        processing_level: major
+        display:
+          numDecimalPlaces: 1
+
+      f_secondary_enrollment_rates_combined_wb:
+        title: Combined total net enrolment rate, secondary, female
+        description_key:
+          - Net enrollment rate for secondary school is calculated by dividing the number of students of official school age enrolled in secondary education by the population of the age group which officially corresponds to secondary education, and multiplying by 100.
+        description_processing: *description_processing
+        unit: '%'
+        short_unit: '%'
+        processing_level: major
+        display:
+          numDecimalPlaces: 1
+
+      m_secondary_enrollment_rates_combined_wb:
+        title: Combined total net enrolment rate, secondary, male
+        description_key:
+          - Net enrollment rate for secondary school is calculated by dividing the number of students of official school age enrolled in secondary education by the population of the age group which officially corresponds to secondary education, and multiplying by 100.
+        description_processing: *description_processing
+        unit: '%'
+        short_unit: '%'
+        processing_level: major
+        display:
+          numDecimalPlaces: 1
+
+      mf_tertiary_enrollment_rates_combined_wb:
+        title: Combined gross enrolment ratio for tertiary education, both sexes
+        description_key:
+         - Total enrolment in tertiary education regardless of age expressed as a percentage of the population in the 5-year age group immediately following upper secondary education.
+        description_processing: *description_processing
+        unit: '%'
+        short_unit: '%'
+        processing_level: major
+        display:
+          numDecimalPlaces: 1
+
+      f_tertiary_enrollment_rates_combined_wb:
+        title: Combined gross enrolment ratio for tertiary education, female
+        description_key:
+          - Total enrolment in tertiary education regardless of age expressed as a percentage of the population in the 5-year age group immediately following upper secondary education.
+        description_processing: *description_processing
+        unit: '%'
+        short_unit: '%'
+        processing_level: major
+        display:
+          numDecimalPlaces: 1
+
+      m_tertiary_enrollment_rates_combined_wb:
+        title: Combined gross enrolment ratio for tertiary education, male
+        description_key:
+          - Total enrolment in tertiary education regardless of age expressed as a percentage of the population in the 5-year age group immediately following upper secondary education.
+        description_processing: *description_processing
+        unit: '%'
+        short_unit: '%'
+        processing_level: major
+        display:
+          numDecimalPlaces: 1
+
+      female_over_male_enrollment_rates_primary:
+        title: Female to male gross enrolment ratio for primary education
+        description_key:
+          - Ratio of net enrolment rates in primary education of males to females expressed the number of students of official school age enrolled in primary education by the population of the age group which officially corresponds to primary education.
+        description_processing: *description_processing
+        unit: 'ratio'
+        short_unit: ''
+        processing_level: major
+        display:
+          numDecimalPlaces: 1
+
+      female_over_male_enrollment_rates_secondary:
+        title: Female to male gross enrolment ratio for secondary education
+        description_key:
+          - Ratio of net enrolment rates in secondary education of males to females expressed the number of students of official school age enrolled in secondary education by the population of the age group which officially corresponds to secondary education.
+        description_processing: *description_processing
+        unit: 'ratio'
+        short_unit: ''
+        processing_level: major
+        display:
+          numDecimalPlaces: 1
+
+      female_over_male_enrollment_rates_tertiary:
+        title: Female to male gross enrolment ratio for tertiary education
+        description_key:
+          - Ratio of enrolment rates in tertiary education of males to females regardless of age expressed as a percentage of the population in the 5-year age group immediately following upper secondary education.
+        description_processing: *description_processing
+        unit: 'ratio'
+        short_unit: ''
+        processing_level: major
+        display:
+          numDecimalPlaces: 1
+
+      mf_youth_and_adults__15_64_years__percentage_of_no_education:
+        title: Percentage of youth and adults aged between 15 and 64 years with no education
+        unit: '%'
+        short_unit: '%'
+        processing_level: minor
+        display:
+          numDecimalPlaces: 1
+
+      f_youth_and_adults__15_64_years__percentage_of_no_education:
+        title: Percentage of female youth and adults aged between 15 and 64 years with no education
+        unit: '%'
+        short_unit: '%'
+        processing_level: minor
+        display:
+          numDecimalPlaces: 1
+
+      f_adults__25_64_years__percentage_of_no_education:
+        title: Percentage of female adults aged between 25 and 64 years with no education
+        unit: '%'
+        short_unit: '%'
+        processing_level: minor
+        display:
+          numDecimalPlaces: 1
+
+      mf_adults__25_64_years__percentage_of_tertiary_education:
+        title: Percentage of 25-64 years adults with incomplete tertiary education
+        unit: '%'
+        processing_level: minor
+        display:
+          numDecimalPlaces: 1
+
+      mf_youth_and_adults__15_64_years__average_years_of_education:
+        title: Average years of education for 15-64 years male and female youth and adults
+        unit: years
+        processing_level: minor
+        display:
+          numDecimalPlaces: 1
+
+      f_youth_and_adults__15_64_years__average_years_of_education:
+        title: Average years of education for 15-64 years female youth and adults
+        unit: years
+        processing_level: minor
+        display:
+          numDecimalPlaces: 1

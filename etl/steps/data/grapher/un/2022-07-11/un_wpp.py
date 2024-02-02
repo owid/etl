@@ -47,7 +47,7 @@ def _get_shaped_table(dataset: catalog.Dataset) -> catalog.Table:
 
 
 def _propagate_metadata(dataset: catalog.Dataset, table: catalog.Table) -> catalog.Table:
-    with open(STEP_DIR / "data/garden/un/2022-07-11/un_wpp/un_wpp.meta.yml", "r") as f:
+    with open(STEP_DIR / "data/garden/un/2022-07-11/un_wpp/un_wpp_grapher.meta.yml", "r") as f:
         meta = yaml.safe_load(f)
 
     meta_map = {}

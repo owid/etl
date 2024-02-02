@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2641
+    date_accessed: 2023-08-16 07:23:21.848086
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Health - Gross fixed capital formation in the health care system
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: fac1460339e0b67af0637038e4bbb92e
+  size: 9082
+  path: 
+    dataset_2641_health__gross_fixed_capital_formation_in_the_health_care_system_values.feather

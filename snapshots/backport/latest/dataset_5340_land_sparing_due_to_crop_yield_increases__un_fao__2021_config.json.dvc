@@ -1,0 +1,16 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5340
+    date_accessed: 2023-08-16 08:39:27.016629
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_5340_land_sparing_due_to_crop_yield_increases__un_fao__2021
+    (archived)
+  description: ''
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 2191a7ab4b4b5ce501b0d80801a7314e
+  size: 5692
+  path: dataset_5340_land_sparing_due_to_crop_yield_increases__un_fao__2021_config.json

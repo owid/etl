@@ -85,6 +85,12 @@ def format_df(df: pd.DataFrame) -> pd.DataFrame:
     df = df.melt(id_vars=["country"])
     df[["variable", "year"]] = df["variable"].str.extract(r"(.*)_(\d{4})")
     df = df.pivot(index=["country", "year"], columns="variable", values="value")
+
+    # Make Atkinson indices not percentages
+    atkinson_cols = ["ineq_edu", "ineq_inc", "ineq_le", "coef_ineq"]
+    for col in atkinson_cols:
+        df[col] /= 100
+
     return df
 
 

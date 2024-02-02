@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/4855
+    date_accessed: 2023-08-14 15:45:34.141510
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for dataset_4855_carbon_dioxide_emissions_from_fuel_combustion__millions_of_tonnes
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: f16f3a06b22b69a32a6e9ff6b3a99494
+  size: 16834
+  path: 
+    dataset_4855_carbon_dioxide_emissions_from_fuel_combustion__millions_of_tonnes_config.json

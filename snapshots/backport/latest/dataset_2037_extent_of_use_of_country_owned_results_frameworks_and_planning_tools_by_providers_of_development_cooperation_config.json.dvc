@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2037
+    date_accessed: 2023-08-11 07:57:08.548828
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_2037_extent_of_use_of_country_owned_results_frameworks_and_planning_tools_by_providers_of_development_cooperation
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: cd7c98620117925f9fb67f340df1390a
+  size: 8416
+  path: 
+    dataset_2037_extent_of_use_of_country_owned_results_frameworks_and_planning_tools_by_providers_of_development_cooperation_config.json

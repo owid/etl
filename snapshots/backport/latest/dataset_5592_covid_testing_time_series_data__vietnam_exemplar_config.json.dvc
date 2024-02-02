@@ -1,18 +1,15 @@
 meta:
-  namespace: backport
-  short_name: dataset_5592_covid_testing_time_series_data__vietnam_exemplar_config
-  file_extension: json
-  date_accessed: 2023-02-23 18:49:08.909385
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/5592
+    date_accessed: 2023-08-10 12:14:17.578038
+    publication_date: latest
+    published_by: Our World in Data catalog backport
   name: Grapher metadata for dataset_5592_covid_testing_time_series_data__vietnam_exemplar
   description: ''
-  source_name: Our World in Data catalog backport
-  url: https://owid.cloud/admin/datasets/5592
-  source_published_by: Our World in Data catalog backport
   is_public: false
-  version: latest
-  publication_date: latest
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 7be2ea969484419e02efdd34d4dccaf5
-  size: 2650
+- md5: 7e2d226ed7fbdbed4efa3215930e9ad9
+  size: 2221
   path: dataset_5592_covid_testing_time_series_data__vietnam_exemplar_config.json

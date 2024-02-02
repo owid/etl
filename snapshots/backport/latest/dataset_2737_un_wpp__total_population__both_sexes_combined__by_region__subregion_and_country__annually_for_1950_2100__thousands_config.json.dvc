@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2737
+    date_accessed: 2023-08-14 15:05:49.150863
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_2737_un_wpp__total_population__both_sexes_combined__by_region__subregion_and_country__annually_for_1950_2100__thousands
+    (archived)
+  description: This is a dataset imported by the automated fetcher
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 57ad55267787494a8d1ce120b35a94bf
+  size: 9701
+  path: 
+    dataset_2737_un_wpp__total_population__both_sexes_combined__by_region__subregion_and_country__annually_for_1950_2100__thousands_config.json

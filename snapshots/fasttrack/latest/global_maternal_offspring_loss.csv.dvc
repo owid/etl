@@ -1,0 +1,24 @@
+meta:
+  source:
+    name: Google Sheet
+    url: https://gh.bmj.com/content/6/4/e004837.abstract
+    source_data_url: 
+      https://docs.google.com/spreadsheets/d/e/2PACX-1vSiCgGTJ8kXoVPpaaskyRz79os2jbWtLbcqk18ybEXI_tsE6WPJy6DH-lXggK_VbHir456mI3D98Jbd/pub?output=csv
+    date_accessed: '2023-09-05'
+    publication_year: '2021'
+    published_by: Google Sheet
+  name: Global maternal offspring loss - Smith-Greenaway et al. 2021
+  description: This dataset shows survey data and estimates of maternal offspring
+    loss across countries. This includes mothers who have lost an infant, child under
+    5 years old, or offspring. These are given as a rate per 1000 women in the age
+    group. Underlying data comes from large-scale surveys (such as the Demographic
+    and Health Surveys and Multiple Indicator Cluster Surveys) conducted in many low-
+    and middle-income countries. For countries lacking data, these are estimated using
+    an indirect approach that combines formal kinship models and life-table methods
+    in an additional 81 countries.
+  license: {}
+wdir: ../../../data/snapshots/fasttrack/latest
+outs:
+- md5: 7ce7e9d8a371afa038a470f8977d160d
+  size: 8075
+  path: global_maternal_offspring_loss.csv

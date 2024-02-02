@@ -1,0 +1,15 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/1092
+    date_accessed: 2023-08-14 15:21:41.125677
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Patent and publication rates  - OWID based on World Bank & UN
+  description: ''
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: a42ef1d23e7f5675ae6c43f73cd1fd3b
+  size: 125450
+  path: 
+    dataset_1092_patent_and_publication_rates__owid_based_on_world_bank__and__un_values.feather

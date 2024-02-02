@@ -1,0 +1,23 @@
+meta:
+  source:
+    name: Our World in Data catalog backport
+    url: https://owid.cloud/admin/datasets/2991
+    date_accessed: 2023-08-14 05:45:56.091750
+    publication_date: latest
+    published_by: Our World in Data catalog backport
+  name: Grapher metadata for 
+    dataset_2991_share_of_population_living_in_extreme_poverty_by_region__povcalnet__world_bank__2017__split
+    (archived)
+  description: |-
+    Includes previous dataset:
+
+    - Cost of filling the poverty gap in int-$ 2011 - Povcal created on the 8th March 2017
+    - New Poverty headcount absolute number, by regions - Povcal
+    - Share of World Population living in Absolute Poverty 1981-2030 - PovcalNe
+  is_public: false
+wdir: ../../../data/snapshots/backport/latest
+outs:
+- md5: 4e7aef98a7e2ab0f4802fc02200acdf2
+  size: 3703
+  path: 
+    dataset_2991_share_of_population_living_in_extreme_poverty_by_region__povcalnet__world_bank__2017__split_config.json

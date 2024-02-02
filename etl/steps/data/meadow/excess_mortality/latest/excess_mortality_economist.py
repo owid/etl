@@ -28,6 +28,7 @@ def run(dest_dir: str) -> None:
     #
     # Create a new table and ensure all columns are snake-case.
     tb = Table(df, short_name=paths.short_name, underscore=True)
+    tb = tb.set_index(["country", "date"], verify_integrity=True)
 
     #
     # Save outputs.
