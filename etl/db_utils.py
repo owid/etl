@@ -4,6 +4,7 @@ to be extended, but slowly replaced by etl/grapher_model.py"""
 from typing import Any, Dict, Iterable, List, Optional, Tuple, cast
 
 import structlog
+from MySQLdb import IntegrityError
 from MySQLdb.cursors import Cursor
 from unidecode import unidecode
 
@@ -93,15 +94,21 @@ class DBUtils:
             return entity_id
         # If still not in cache, it's a new entity and we have to insert it
         else:
-            self.upsert_one(
-                """
-                INSERT INTO entities
-                    (name, displayName, validated, createdAt, updatedAt)
-                VALUES
-                    (%s, '', FALSE, NOW(), NOW())
-            """,
-                [name],
-            )
+            try:
+                self.upsert_one(
+                    """
+                    INSERT INTO entities
+                        (name, displayName, validated, createdAt, updatedAt)
+                    VALUES
+                        (%s, '', FALSE, NOW(), NOW())
+                """,
+                    [name],
+                )
+            except IntegrityError:
+                # If another process inserted the same entity before us, we can
+                # safely ignore the error and fetch the ID
+                pass
+
             (entity_id,) = self.fetch_one(
                 """
                 SELECT id FROM entities

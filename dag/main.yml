@@ -226,14 +226,6 @@ steps:
   data://garden/ggdc/2022-12-23/maddison_database:
     - data://meadow/ggdc/2022-12-23/maddison_database
 
-  #Multidimensional Poverty Index
-  data://meadow/ophi/2023-07-05/multidimensional_poverty_index:
-    - snapshot://ophi/2023-07-05/multidimensional_poverty_index.csv
-  data://garden/ophi/2023-07-05/multidimensional_poverty_index:
-    - data://meadow/ophi/2023-07-05/multidimensional_poverty_index
-  data://grapher/ophi/2023-07-05/multidimensional_poverty_index:
-    - data://garden/ophi/2023-07-05/multidimensional_poverty_index
-
   #Penn World Table
   data://meadow/ggdc/2022-11-28/penn_world_table:
     - walden://ggdc/2021-06-18/penn_world_table
@@ -257,43 +249,6 @@ steps:
     - data://meadow/met_office_hadley_centre/2023-10-18/near_surface_temperature
   data://grapher/met_office_hadley_centre/2023-10-18/near_surface_temperature:
     - data://garden/met_office_hadley_centre/2023-10-18/near_surface_temperature
-
-  #Luxembourg Income Study
-  data://meadow/lis/2023-08-30/luxembourg_income_study:
-    - snapshot://lis/2023-08-30/lis_keyvars.csv
-    - snapshot://lis/2023-08-30/lis_abs_poverty.csv
-    - snapshot://lis/2023-08-30/lis_distribution.csv
-    - snapshot://lis/2023-08-30/lis_keyvars_adults.csv
-    - snapshot://lis/2023-08-30/lis_abs_poverty_adults.csv
-    - snapshot://lis/2023-08-30/lis_distribution_adults.csv
-    - snapshot://lis/2023-08-30/lis_percentiles.csv
-    - snapshot://lis/2023-08-30/lis_percentiles_adults.csv
-    - data://garden/regions/2023-01-01/regions
-  data://garden/lis/2023-08-30/luxembourg_income_study:
-    - data://meadow/lis/2023-08-30/luxembourg_income_study
-  data://grapher/lis/2023-08-30/luxembourg_income_study:
-    - data://garden/lis/2023-08-30/luxembourg_income_study
-  data://explorers/lis/2023-08-30/luxembourg_income_study:
-    - data://garden/lis/2023-08-30/luxembourg_income_study
-
-  # World Inequality Database
-  data://meadow/wid/2023-08-24/world_inequality_database:
-    - data://garden/regions/2023-01-01/regions
-    - snapshot://wid/2023-08-24/world_inequality_database.csv
-    - snapshot://wid/2023-08-24/world_inequality_database_with_extrapolations.csv
-    - snapshot://wid/2023-08-24/world_inequality_database_distribution.csv
-    - snapshot://wid/2023-08-24/world_inequality_database_distribution_with_extrapolations.csv
-  data://garden/wid/2023-08-24/world_inequality_database:
-    - data://meadow/wid/2023-08-24/world_inequality_database
-  data://grapher/wid/2023-08-24/world_inequality_database:
-    - data://garden/wid/2023-08-24/world_inequality_database
-  data://explorers/wid/2023-08-24/world_inequality_database:
-    - data://garden/wid/2023-08-24/world_inequality_database
-
-  # Poverty and inequality dataset for comparison explorers
-  data://explorers/poverty_inequality/2023-08-24/poverty_inequality:
-    - data://explorers/wid/2023-08-24/world_inequality_database
-    - data://explorers/lis/2023-08-30/luxembourg_income_study
 
   # Global mobile money dataset (GSMA)
   data://meadow/technology/2023-03-06/mobile_money:
@@ -499,14 +454,6 @@ steps:
     - data://meadow/research_development/2023-05-24/us_patents
   data://grapher/research_development/2023-05-25/us_patents:
     - data://garden/research_development/2023-05-25/us_patents
-
-  # OECD Income Distribution Database
-  data://meadow/oecd/2023-06-06/income_distribution_database:
-    - snapshot://oecd/2023-06-06/income_distribution_database.csv
-  data://garden/oecd/2023-06-06/income_distribution_database:
-    - data://meadow/oecd/2023-06-06/income_distribution_database
-  data://grapher/oecd/2023-06-06/income_distribution_database:
-    - data://garden/oecd/2023-06-06/income_distribution_database
 
   # Real commodity prices
   data://grapher/papers/2023-06-07/commodity_prices:
@@ -720,19 +667,6 @@ steps:
   data://grapher/survey/2023-08-04/trust_surveys:
     - data://garden/survey/2023-08-04/trust_surveys
 
-  # Historical poverty data - Moatsos (2021)
-  data://meadow/moatsos/2023-10-09/moatsos_historical_poverty:
-    - snapshot://moatsos/2023-10-09/moatsos_historical_poverty_oecd.csv
-    - snapshot://moatsos/2023-10-09/moatsos_historical_poverty_oecd_countries_share.xlsx
-    - snapshot://moatsos/2023-10-09/moatsos_historical_poverty_oecd_regions_number.xlsx
-    - snapshot://moatsos/2023-10-09/moatsos_historical_poverty_5.csv
-    - snapshot://moatsos/2023-10-09/moatsos_historical_poverty_10.csv
-    - snapshot://moatsos/2023-10-09/moatsos_historical_poverty_30.csv
-  data://garden/moatsos/2023-10-09/moatsos_historical_poverty:
-    - data://meadow/moatsos/2023-10-09/moatsos_historical_poverty
-  data://grapher/moatsos/2023-10-09/moatsos_historical_poverty:
-    - data://garden/moatsos/2023-10-09/moatsos_historical_poverty
-
   # World Bank GenderStats
   data://meadow/wb/2023-12-29/gender_statistics:
     - snapshot://wb/2023-12-29/gender_statistics.feather
@@ -740,12 +674,6 @@ steps:
     - data://meadow/wb/2023-12-29/gender_statistics
   data://grapher/wb/2023-12-29/gender_statistics:
     - data://garden/wb/2023-12-29/gender_statistics
-
-  # 1000 Binned Global Distribution (Mahler, Yonzan and Lakner 2022)
-  data://meadow/wb/2024-01-22/thousand_bins_distribution:
-    - snapshot://wb/2024-01-22/thousand_bins_distribution.dta
-  data://garden/wb/2024-01-22/thousand_bins_distribution:
-    - data://meadow/wb/2024-01-22/thousand_bins_distribution
 
   ######################################################################################################################
   # Older versions to be archived once they are not used by any other steps.
@@ -768,6 +696,7 @@ steps:
     - data://meadow/geography/2023-11-28/nat_earth_110
 
   ######################################################################################################################
+
 
 include:
   - dag/open_numbers.yml
@@ -795,3 +724,4 @@ include:
   - dag/statins.yml
   - dag/climate.yml
   - dag/urbanization.yml
+  - dag/poverty_inequality.yml

@@ -114,7 +114,7 @@ click.rich_click.OPTION_GROUPS = {
 @click.option(
     "-n",
     "--model-name",
-    type=click.Choice(list(MODELS_AVAILABLE.keys())),
+    type=click.Choice(sorted(MODELS_AVAILABLE.keys())),
     default=MODEL_DEFAULT,
     help="Choose chart_revision backend version to use. By default uses latest version.",
 )

@@ -103,6 +103,7 @@ steps:
   data://garden/war/2023-09-21/brecke:
     - data://meadow/war/2023-09-21/brecke
     - data://garden/countries/2023-09-25/isd
+    - data://garden/demography/2023-03-31/population
   data://grapher/war/2023-09-21/brecke:
     - data://garden/war/2023-09-21/brecke
 
@@ -130,13 +131,13 @@ steps:
     - data://meadow/war/2023-11-29/chupilkin_koczan
 
   # The Strategic Nuclear Forces Dataset (Suh).
-  data://meadow/war/2024-01-08/strategic_nuclear_forces:
-    - snapshot://war/2024-01-08/strategic_nuclear_forces.xlsx
-    - snapshot://war/2024-01-08/strategic_nuclear_forces_monadic.xlsx
-  data://garden/war/2024-01-08/strategic_nuclear_forces:
-    - data://meadow/war/2024-01-08/strategic_nuclear_forces
-  data://grapher/war/2024-01-08/strategic_nuclear_forces:
-    - data://garden/war/2024-01-08/strategic_nuclear_forces
+  data://meadow/war/2024-01-30/strategic_nuclear_forces:
+    - snapshot://war/2024-01-30/strategic_nuclear_forces.xlsx
+    - snapshot://war/2024-01-30/strategic_nuclear_forces_monadic.xlsx
+  data://garden/war/2024-01-30/strategic_nuclear_forces:
+    - data://meadow/war/2024-01-30/strategic_nuclear_forces
+  data://grapher/war/2024-01-30/strategic_nuclear_forces:
+    - data://garden/war/2024-01-30/strategic_nuclear_forces
 
   # Federation of American Scientists - Estimated Global Nuclear Warhead Inventories.
   data://meadow/war/2024-01-09/nuclear_weapons_inventories:
