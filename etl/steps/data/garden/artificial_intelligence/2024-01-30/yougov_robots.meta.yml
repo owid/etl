@@ -1,0 +1,69 @@
+
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    processing_level: minor
+    presentation:
+      topic_tags:
+        - Artificial Intelligence
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
+dataset:
+  update_period_days: 180
+
+tables:
+  yougov_robots:
+    variables:
+      dont_know:
+        title: Don't know
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+          zeroDay: '2021-01-01'
+          yearIsDay: true
+
+      most_robots_have_already_developed_higher_levels_of_intelligence_than_humans:
+        title: Most robots have already developed higher levels of intelligence than humans
+        unit: '%'
+        short_unit: '%'
+        presentation:
+          title_public: "Robots smarter than humans now"
+        display:
+          numDecimalPlaces: 1
+          zeroDay: '2021-01-01'
+          yearIsDay: true
+          name: "Robots smarter than humans now"
+
+      none_of_these:
+        title: None of these
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+          zeroDay: '2021-01-01'
+          yearIsDay: true
+
+      robots_will_be_able_to_develop_higher_levels_of_intelligence_than_humans_in_the_future:
+        title: Robots will be able to develop higher levels of intelligence than humans in the future
+        unit: '%'
+        short_unit: '%'
+        presentation:
+          title_public: "Robots will surpass human intelligence in the future"
+        display:
+          numDecimalPlaces: 1
+          zeroDay: '2021-01-01'
+          yearIsDay: true
+          name: "Robots will surpass human intelligence in the future"
+
+      robots_will_never_be_able_to_develop_higher_levels_of_intelligence_than_humans:
+        title: Robots will never be able to develop higher levels of intelligence than humans
+        unit: '%'
+        short_unit: '%'
+        presentation:
+          title_public: "Robots will never surpass human intelligence"
+        display:
+          numDecimalPlaces: 1
+          zeroDay: '2021-01-01'
+          yearIsDay: true
+          name: "Robots will never surpass human intelligence"
