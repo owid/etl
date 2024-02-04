@@ -15,7 +15,7 @@ log = get_logger()
 paths = PathFinder(__file__)
 # Minimum and maximum years expected in data
 YEAR_MIN_EXPECTED = 2015
-YEAR_MAX_EXPECTED = 2023
+YEAR_MAX_EXPECTED = 2024
 
 
 def run(dest_dir: str) -> None:

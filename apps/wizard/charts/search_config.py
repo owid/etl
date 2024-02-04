@@ -35,7 +35,11 @@ def build_dataset_form(df: pd.DataFrame, similarity_names: Dict[str, Any]) -> "S
     col0, _, _ = st.columns(3)
     with col0:
         with st.expander("Parameters"):
-            map_identical = st.checkbox("Map identically named variables", value=True)
+            map_identical = st.checkbox(
+                "Map identically named variables",
+                value=True,
+                help="Map variables with the same name in the old and new datasets. \n\n**NOTE:** This is option is DISABLED when working with the same dataset (i.e. old dataset and new dataset are the same) and can't be changed via this checkbox.",
+            )
             enable_explore = st.checkbox(
                 "Explore variable mappings (Experimental)",
                 help="Compare the variable mappings with tables and charts. This might take some time initially, as we need to download data values from S3",

@@ -1,49 +1,33 @@
 meta:
   source:
     name: World Mortality Dataset (2023)
-    description: >-
+    description: |-
       World Mortality Dataset: international data on all-cause mortality.
 
+      This dataset contains country-level data on all-cause mortality in 2015–2022 collected from various sources. They are currently providing data for 122 countries and territories.
 
-      This dataset contains country-level data on all-cause mortality in 2015–2022
-      collected from various sources. They are
-      currently providing data for 122 countries and territories.
+      For a complete and up-to-date list of notes on the dataset, please refer to their GitHub page at https://github.com/akarlinsky/world_mortality/.
 
-
-      For a complete and up-to-date list of notes on the dataset, please refer to
-      their GitHub page at https://github.com/akarlinsky/world_mortality/.
-
-
-      For the list of sources that they use, please go to https://github.com/akarlinsky/world_mortality/#sou
-      rces.
-
+      For the list of sources that they use, please go to https://github.com/akarlinsky/world_mortality/#sou rces.
 
       Published paper available at https://elifesciences.org/articles/69336.
     url: https://github.com/akarlinsky/world_mortality/
     source_data_url: 
       https://raw.githubusercontent.com/akarlinsky/world_mortality/main/world_mortality.csv
-    date_accessed: 2024-01-09
+    date_accessed: 2024-02-02
     publication_date: '2021-06-30'
     publication_year: 2021
-    published_by: Karlinsky & Kobak 2021, Tracking excess mortality across countries
-      during the COVID-19 pandemic with the World Mortality Dataset, eLife https://doi.org/10.7554/eLife.69336
+    published_by: |-
+      Karlinsky & Kobak 2021, Tracking excess mortality across countries during the COVID-19 pandemic with the World Mortality Dataset, eLife https://doi.org/10.7554/eLife.69336
   name: World Mortality Dataset
-  description: >-
+  description: |-
     World Mortality Dataset: international data on all-cause mortality.
 
+    This dataset contains country-level data on all-cause mortality in 2015–2022 collected from various sources. They are currently providing data for 122 countries and territories.
 
-    This dataset contains country-level data on all-cause mortality in 2015–2022 collected
-    from various sources. They are
-    currently providing data for 122 countries and territories.
+    For a complete and up-to-date list of notes on the dataset, please refer to their GitHub page at https://github.com/akarlinsky/world_mortality/.
 
-
-    For a complete and up-to-date list of notes on the dataset, please refer to their
-    GitHub page at https://github.com/akarlinsky/world_mortality/.
-
-
-    For the list of sources that they use, please go to https://github.com/akarlinsky/world_mortality/#sou
-    rces.
-
+    For the list of sources that they use, please go to https://github.com/akarlinsky/world_mortality/#sou rces.
 
     Published paper available at https://elifesciences.org/articles/69336.
   license:
@@ -51,6 +35,6 @@ meta:
     url: https://github.com/akarlinsky/world_mortality/blob/main/LICENSE
 wdir: ../../../data/snapshots/excess_mortality/latest
 outs:
-- md5: 8def6eb0f18bba03977db58eb4b81db6
-  size: 996694
+- md5: 23a3d7a8d76f752cd5eb59ad70b1a2c8
+  size: 1003844
   path: wmd.csv

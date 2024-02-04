@@ -27,6 +27,7 @@ definitions:
     presentation:
       topic_tags:
       - CO2 & Greenhouse Gas Emissions
+      attribution_short: GCB
     processing_level: major
 
 dataset:

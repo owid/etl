@@ -29,7 +29,11 @@ def ask_and_get_variable_mapping(search_form, owid_env: OWIDEnv) -> "VariableCon
 
     # 2.1 INTERNAL PROCESSING
     # Get variables from old and new datasets
-    old_variables, new_variables = get_variables_from_datasets(search_form.dataset_old_id, search_form.dataset_new_id)
+    old_variables, new_variables = get_variables_from_datasets(
+        search_form.dataset_old_id,
+        search_form.dataset_new_id,
+        show_new_not_in_old=False,
+    )
 
     # Build display mappings: id -> display_name
     df = pd.concat([old_variables, new_variables], ignore_index=True)
@@ -37,8 +41,14 @@ def ask_and_get_variable_mapping(search_form, owid_env: OWIDEnv) -> "VariableCon
     variable_id_to_display = df.set_index("id")["display_name"].to_dict()
 
     # Get auto variable mapping (if mapping by identical name is enabled)
+    if search_form.dataset_old_id == search_form.dataset_new_id:
+        match_identical_vars = False
+    else:
+        match_identical_vars = search_form.map_identical_variables
     mapping, missing_old, missing_new = preliminary_mapping(
-        old_variables, new_variables, search_form.map_identical_variables
+        old_variables,
+        new_variables,
+        match_identical=match_identical_vars,
     )
     if not mapping.empty:
         variable_mapping_auto = mapping.set_index("id_old")["id_new"].to_dict()
@@ -73,7 +83,7 @@ def ask_and_get_variable_mapping(search_form, owid_env: OWIDEnv) -> "VariableCon
     )
     if not variable_mapping_auto and not suggestions:
         st.warning(
-            f"It looks as the dataset [{search_form.dataset_old_id}](https://owid.cloud) has no variable in use in any chart! Therefore, no mapping is needed."
+            f"It looks as the dataset [{search_form.dataset_old_id}](https://owid.cloud/admin/datasets/{search_form.dataset_old_id}) has no variable in use in any chart! Therefore, no mapping is needed."
         )
     else:
         with st.container():

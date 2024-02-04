@@ -19,6 +19,7 @@ dataset:
     publication_year: 2022
     published_by: 'Institute for Health Metrics and Evaluation (IHME). Health-related
       SDGs. Seattle, WA: IHME, University of Washington, 2022. Available from https://api.healthdata.org/sdg/v1/docs'
+  non_redistributable: true
 tables:
   sdg:
     variables:

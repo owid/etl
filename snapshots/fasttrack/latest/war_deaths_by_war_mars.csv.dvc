@@ -1,16 +1,40 @@
 meta:
-  source:
-    name: Unknown
-    source_data_url: 
-      gAAAAABlbZo6UMdZjEuudq_PXW59_NamxowCIdbUXHopOMyQKJlTACtK2a05Pqhr22qVPJJ31DrpU795lvpT3O1Kce7piLtqza4RSsKHkWa2O7vRuI2TkUqbr7zysFLnPzxxTeRbWGxWXd3SrErAPyBN-yyTxBWbS8SoTmMbkQr_ZFISw35QO3wdcwaJro_pfqkf4ORCP9pHr94lOhVOCYv_Ij-x1oL6J0RtSuU8iC4TZ0VSa5YwUMDaukP80qVNe95bycGQyuQz
-    date_accessed: '2023-12-04'
-    publication_year: 2023
-    published_by: Unknown
+  origin:
+    producer: Jason Lyall
+    title: Project Mars
+    description: >-
+      This dataset records new data on 229 unique belligerents in 252 conventional
+      wars fought between 1800 and 2011. Project
+      Mars introduces new data about these belligerents, including their level of
+      prewar military inequality, and new measures
+      of battlefield performance, including desertion, defection, and fratricidal
+      violence. The latest version is Version
+      1.1. (2022-02-08).
+
+
+      You can find more details on the dataset in its notes at https://web.archive.org/web/20230717140532/https://dataverse.harvard.edu/file.xhtml?fileId=5857673&version=2.0
+    citation_full: 'Lyall, Jason. Divided Armies: Inequality and Battlefield Performance
+      in Modern War (Princeton, NJ: Princeton University Press, 2020)'
+    attribution: Jason Lyall - Project Mars (2020)
+    version_producer: Google Sheet
+    url_main: https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/DUO7IE
+    url_download: 
+      https://docs.google.com/spreadsheets/d/e/2PACX-1vRbq_yaMbSCxeoKNr5u4nUk6iUrRXJjlv81JTCfIRve3hJFuQl4OJMlQOEjTZ909OzwYs3Na3IHTS-b/pub?output=csv
+    date_accessed: '2024-01-29'
+    date_published: '2020-10-26'
   name: War Deaths by War — Project Mars
-  description: This dataset provides information on number of combatant deaths in
-    wars by war, using data from Project Mars (Jason Lyall 2020)
+  description: >-
+    This dataset records new data on 229 unique belligerents in 252 conventional wars
+    fought between 1800 and 2011. Project
+    Mars introduces new data about these belligerents, including their level of prewar
+    military inequality, and new measures
+    of battlefield performance, including desertion, defection, and fratricidal violence.
+    The latest version is Version 1.1.
+    (2022-02-08).
+
+
+    You can find more details on the dataset in its notes at https://web.archive.org/web/20230717140532/https://dataverse.harvard.edu/file.xhtml?fileId=5857673&version=2.0
   license: {}
-  is_public: false
 wdir: ../../../data/snapshots/fasttrack/latest
 outs:
 - md5: 1216d5fc24b9763755c9474d4a24df92

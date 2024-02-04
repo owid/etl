@@ -50,6 +50,33 @@ class RuntimeCache:
 
 CACHE_CHECKSUM_FILE = RuntimeCache()
 
+TEXT_CHARS = bytes(range(32, 127)) + b"\n\r\t\f\b"
+DEFAULT_CHUNK_SIZE = 512
+
+
+def dos2unix(data: bytes) -> bytes:
+    return data.replace(b"\r\n", b"\n")
+
+
+def istextblock(block: bytes) -> bool:
+    if not block:
+        # An empty file is considered a valid text file
+        return True
+
+    if b"\x00" in block:
+        # Files with null bytes are binary
+        return False
+
+    # Use translate's 'deletechars' argument to efficiently remove all
+    # occurrences of TEXT_CHARS from the block
+    nontext = block.translate(None, TEXT_CHARS)
+    return float(len(nontext)) / len(block) <= 0.30
+
+
+def checksum_str(s: str) -> str:
+    "Return the md5 hex digest of the string."
+    return hashlib.md5(dos2unix(s.encode())).hexdigest()
+
 
 def checksum_file_nocache(filename: Union[str, Path]) -> str:
     "Return the md5 hex digest of the file without using cache."
@@ -58,6 +85,9 @@ def checksum_file_nocache(filename: Union[str, Path]) -> str:
     with open(filename, "rb") as istream:
         chunk = istream.read(chunk_size)
         while chunk:
+            if istextblock(chunk[:DEFAULT_CHUNK_SIZE]):
+                chunk = dos2unix(chunk)
+
             _hash.update(chunk)
             chunk = istream.read(chunk_size)
 
@@ -90,11 +120,6 @@ def checksum_file(filename: Union[str, Path]) -> str:
     return CACHE_CHECKSUM_FILE[key]
 
 
-def checksum_str(s: str) -> str:
-    "Return the md5 hex digest of the string."
-    return hashlib.md5(s.encode()).hexdigest()
-
-
 def walk(folder: Path, ignore_set: Set[str] = {"__pycache__", ".ipynb_checkpoints"}) -> List[Path]:
     paths = []
     for p in folder.iterdir():
@@ -115,12 +140,11 @@ class _MyDumper(Dumper):
 
 def _str_presenter(dumper: Any, data: Any) -> Any:
     lines = data.splitlines()
-    if len(lines) > 1:  # check for multiline string
-        max_line_length = max([len(line) for line in lines])
-        if max_line_length > 120:
-            return dumper.represent_scalar("tag:yaml.org,2002:str", data, style=">")
-        else:
-            return dumper.represent_scalar("tag:yaml.org,2002:str", data, style="|")
+    # If there are multiple lines, or there is a line that is longer than 120 characters, use the literal style.
+    # NOTE: Here the 120 is a bit arbitrary. This is the default length of our lines in the code, but once written
+    # to YAML, the lines will be longer because of the indentation. So, we could use a smaller number here.
+    if (len(lines) > 1) or (max([len(line) for line in lines]) > 120):
+        return dumper.represent_scalar("tag:yaml.org,2002:str", data, style="|")
     else:
         return dumper.represent_scalar("tag:yaml.org,2002:str", data)
 

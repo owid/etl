@@ -1,0 +1,55 @@
+steps:
+  #
+  # UN urbanization dataset.
+  #
+  data://meadow/un/2024-01-17/urbanization_urban_rural:
+    - snapshot://un/2024-01-17/urbanization_urban_rural.csv
+  data://garden/un/2024-01-17/urbanization_urban_rural:
+    - data://meadow/un/2024-01-17/urbanization_urban_rural
+    - data://garden/hyde/2024-01-02/all_indicators
+
+  data://grapher/un/2024-01-17/urbanization_urban_rural:
+    - data://garden/un/2024-01-17/urbanization_urban_rural
+
+  data://meadow/un/2024-01-17/urban_agglomerations_300k:
+    - snapshot://un/2024-01-17/urban_agglomerations_300k.csv
+  data://garden/un/2024-01-17/urban_agglomerations_300k:
+    - data://meadow/un/2024-01-17/urban_agglomerations_300k
+  data://grapher/un/2024-01-17/urban_agglomerations_300k:
+    - data://garden/un/2024-01-17/urban_agglomerations_300k
+
+  data://meadow/un/2024-01-17/urban_agglomerations_size_class:
+    - snapshot://un/2024-01-17/urban_agglomerations_size_class.xls
+  data://garden/un/2024-01-17/urban_agglomerations_size_class:
+    - data://meadow/un/2024-01-17/urban_agglomerations_size_class
+  data://grapher/un/2024-01-17/urban_agglomerations_size_class:
+    - data://garden/un/2024-01-17/urban_agglomerations_size_class
+
+  data://meadow/un/2024-01-17/urban_agglomerations_largest_cities:
+    - snapshot://un/2024-01-17/urban_agglomerations_largest_cities.csv
+  data://garden/un/2024-01-17/urban_agglomerations_largest_cities:
+    - data://meadow/un/2024-01-17/urban_agglomerations_largest_cities
+  data://grapher/un/2024-01-17/urban_agglomerations_largest_cities:
+    - data://garden/un/2024-01-17/urban_agglomerations_largest_cities
+  data://grapher/un/2024-01-17/urban_agglomerations_capitals:
+    - data://garden/un/2024-01-17/urban_agglomerations_largest_cities
+
+  data://meadow/un/2024-01-17/urban_agglomerations_definition:
+    - snapshot://un/2024-01-17/urban_agglomerations_definition.xls
+  data://garden/un/2024-01-17/urban_agglomerations_definition:
+    - data://meadow/un/2024-01-17/urban_agglomerations_definition
+  data://grapher/un/2024-01-17/urban_agglomerations_definition:
+    - data://garden/un/2024-01-17/urban_agglomerations_definition
+  data://garden/un/2024-01-17/urban_agglomerations_definition_count:
+    - data://garden/un/2024-01-17/urban_agglomerations_definition
+  data://grapher/un/2024-01-17/urban_agglomerations_definition_count:
+    - data://garden/un/2024-01-17/urban_agglomerations_definition_count
+
+  data://meadow/urbanization/2024-01-26/ghsl_degree_of_urbanisation:
+    - snapshot://urbanization/2024-01-26/ghsl_degree_of_urbanisation.zip
+  data://garden/urbanization/2024-01-26/ghsl_degree_of_urbanisation:
+    - data://meadow/urbanization/2024-01-26/ghsl_degree_of_urbanisation
+    - data://garden/wb/2023-04-30/income_groups
+    - data://garden/regions/2023-01-01/regions
+  data://grapher/urbanization/2024-01-26/ghsl_degree_of_urbanisation:
+    - data://garden/urbanization/2024-01-26/ghsl_degree_of_urbanisation

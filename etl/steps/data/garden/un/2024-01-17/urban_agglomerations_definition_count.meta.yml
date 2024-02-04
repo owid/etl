@@ -1,0 +1,24 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Urbanization
+    processing_level: major
+
+dataset:
+  title: World Urbanization Prospects Dataset - Number of countries with a given minimum urban population threshold
+
+tables:
+  urban_agglomerations_definition:
+    variables:
+      minimum_inhabitants:
+        title: Number of countries with minimum urban population threshold
+        unit: 'countries'
+        short_unit: ''
+        description_short: The number of countries which have adopted a given minimum population threshold (number of inhabitants) for classification of an 'urban area'.
+        description_key:
+          - There is no consistent definition of what constitutes an 'urban area'. This is highly variable across countries. This data presents the number of countries with given minimum thresholds of inhabitants needed for an area to be defined an 'urban area'. For many countries, there is no defined threshold based on inhabitants; other metrics such as population density, infrastructure, or even pre-defined cities may be used.
+          - Note that some countries with minimum inhabitant thresholds noted here also require additional qualities (such as population density) to be met.
+        display:
+          numDecimalPlaces: 0

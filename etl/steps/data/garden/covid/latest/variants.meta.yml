@@ -30,13 +30,13 @@ dataset:
   - name: GISAID, via CoVariants.org – Last updated {TODAY}
     url: https://www.gisaid.org/
     published_by: GISAID, via CoVariants.org – Last updated 2 November 2022
+  non_redistributable: true
 tables:
   variants:
     variables:
       alpha:
         title: Alpha
-        description: The share of analyzed sequences that correspond to the Alpha COVID-19 variant. Only a fraction of all
-          cases are sequenced.
+        description: The share of analyzed sequences that correspond to the Alpha COVID-19 variant. Only a fraction of all cases are sequenced.
         unit: ''
         display: *default_display
       alpha_percentage:
@@ -117,8 +117,7 @@ tables:
         display: *default_display
       beta:
         title: Beta
-        description: The share of analyzed sequences that correspond to the Beta COVID-19 variant. Only a fraction of all
-          cases are sequenced.
+        description: The share of analyzed sequences that correspond to the Beta COVID-19 variant. Only a fraction of all cases are sequenced.
         unit: ''
         display: *default_display
       beta_percentage:
@@ -127,8 +126,7 @@ tables:
         display: *default_display
       delta:
         title: Delta
-        description: The share of analyzed sequences that correspond to the Delta COVID-19 variant. Only a fraction of all
-          cases are sequenced.
+        description: The share of analyzed sequences that correspond to the Delta COVID-19 variant. Only a fraction of all cases are sequenced.
         unit: ''
         display: *default_display
       delta_percentage:
@@ -137,8 +135,7 @@ tables:
         display: *default_display
       epsilon:
         title: Epsilon
-        description: The share of analyzed sequences that correspond to the Epsilon COVID-19 variant. Only a fraction of all
-          cases are sequenced.
+        description: The share of analyzed sequences that correspond to the Epsilon COVID-19 variant. Only a fraction of all cases are sequenced.
         unit: ''
         display: *default_display
       epsilon_percentage:
@@ -147,8 +144,7 @@ tables:
         display: *default_display
       eta:
         title: Eta
-        description: The share of analyzed sequences that correspond to the Eta COVID-19 variant. Only a fraction of all cases
-          are sequenced.
+        description: The share of analyzed sequences that correspond to the Eta COVID-19 variant. Only a fraction of all cases are sequenced.
         unit: ''
         display: *default_display
       eta_percentage:
@@ -157,8 +153,7 @@ tables:
         display: *default_display
       gamma:
         title: Gamma
-        description: The share of analyzed sequences that correspond to the Gamma COVID-19 variant. Only a fraction of all
-          cases are sequenced.
+        description: The share of analyzed sequences that correspond to the Gamma COVID-19 variant. Only a fraction of all cases are sequenced.
         unit: ''
         display: *default_display
       gamma_percentage:
@@ -167,8 +162,7 @@ tables:
         display: *default_display
       iota:
         title: Iota
-        description: The share of analyzed sequences that correspond to the Iota COVID-19 variant. Only a fraction of all
-          cases are sequenced.
+        description: The share of analyzed sequences that correspond to the Iota COVID-19 variant. Only a fraction of all cases are sequenced.
         unit: ''
         display: *default_display
       iota_percentage:
@@ -177,8 +171,7 @@ tables:
         display: *default_display
       kappa:
         title: Kappa
-        description: The share of analyzed sequences that correspond to the Kappa variant. Only a fraction of all cases are
-          sequenced.
+        description: The share of analyzed sequences that correspond to the Kappa variant. Only a fraction of all cases are sequenced.
         unit: ''
         display: *default_display
       kappa_percentage:
@@ -321,6 +314,32 @@ tables:
         title: Omicron (XBB.2.3)_percentage
         unit: '%'
         display: *default_display
+      omicron__ba_2_86:
+        title: Omicron (BA.2.86)
+        unit: ''
+        display: *default_display
+      omicron__ba_2_86__percentage:
+        title: Omicron (BA.2.86)_percentage
+        unit: '%'
+        display: *default_display
+      omicron__xbb_1_5_70:
+        title: Omicron (XBB.1.5.70)
+        unit: ''
+        display: *default_display
+      omicron__xbb_1_5_70__percentage:
+        title: Omicron (XBB.1.5.70)_percentage
+        unit: '%'
+        display: *default_display
+
+      omicron__hk_3:
+        title: Omicron (HK.3)
+        unit: ''
+        display: *default_display
+      omicron__hk_3__percentage:
+        title: Omicron (HK.3)_percentage
+        unit: '%'
+        display: *default_display
+
       recombinant:
         title: Recombinant
         unit: ''
@@ -355,8 +374,7 @@ tables:
         display: *default_display
       others:
         title: others
-        description: The share of analyzed sequences that correspond to each variant group. Only a fraction of all cases are
-          sequenced.
+        description: The share of analyzed sequences that correspond to each variant group. Only a fraction of all cases are sequenced.
         unit: ''
         display: *default_display
       others_percentage:
