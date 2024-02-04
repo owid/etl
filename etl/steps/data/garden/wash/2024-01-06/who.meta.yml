@@ -8,54 +8,56 @@ definitions:
         - Sanitation
     display:
       numDecimalPlaces: 1
+  residence: |-
+    <% if residence == "Rural" %>rural <% elif residence == "Urban" %>urban <% elif residence == "Total" %><%- endif -%>
   hygiene_basic_description_short: &hygiene_basic_desc_short |
-    Share of the population with a handwashing facility with soap and water at home.
+    Share of the {definitions.residence} population with a handwashing facility with soap and water at home.
   hygiene_limited_description_short: &hygiene_limited_desc_short |
-    Share of the population with a handwashing facility lacking soap and/or water at home.
+    Share of the {definitions.residence} population with a handwashing facility lacking soap and/or water at home.
   hygiene_no_facility_description_short: &hygiene_no_facility_desc_short |
-    Share of the population with no handwashing facility at home.
+    Share of the {definitions.residence} population with no handwashing facility at home.
   sanitation_basic_description_short: &sanitation_basic_desc_short |
-    Share of the population using improved sanitation facilities that are not shared with other households. Improved sanitation facilities are those designed to hygienically separate excreta from human contact, and include: flush/pour flush toilets connected to piped sewer systems, septic tanks or pit latrines; pit latrines with slabs (including ventilated pit latrines), and composting toilets.
+    Share of the {definitions.residence} population using improved sanitation facilities that are not shared with other households. Improved sanitation facilities are those designed to hygienically separate excreta from human contact, and include: flush/pour flush toilets connected to piped sewer systems, septic tanks or pit latrines; pit latrines with slabs (including ventilated pit latrines), and composting toilets.
   sanitation_limited_description_short: &sanitation_limited_desc_short |
-    Share of the population using improved sanitation facilities that are shared between two or more households. Improved sanitation facilities are those designed to hygienically separate excreta from human contact, and include: flush/pour flush toilets connected to piped sewer systems, septic tanks or pit latrines; pit latrines with slabs (including ventilated pit latrines), and composting toilets.
+    Share of the {definitions.residence} population using improved sanitation facilities that are shared between two or more households. Improved sanitation facilities are those designed to hygienically separate excreta from human contact, and include: flush/pour flush toilets connected to piped sewer systems, septic tanks or pit latrines; pit latrines with slabs (including ventilated pit latrines), and composting toilets.
   sanitation_unimproved_description_short: &sanitation_unimproved_desc_short |
-    Share of the population using unimproved sanitation facilities. Unimproved sanitation facilities include pit latrines without a slab or platform, hanging latrines or bucket latrines.
+    Share of the {definitions.residence} population using unimproved sanitation facilities. Unimproved sanitation facilities include pit latrines without a slab or platform, hanging latrines or bucket latrines.
   sanitation_open_defecation_description_short: &sanitation_open_defecation_desc_short |
-    Share of the population practicing open defecation. Open defecation refers to the practice of defecating in fields, forests, bushes, bodies of water or other open spaces.
+    Share of the {definitions.residence} population practicing open defecation. Open defecation refers to the practice of defecating in fields, forests, bushes, bodies of water or other open spaces.
   sanitation_safe_management_description_short: &sanitation_safe_management_desc_short |
-    Share of the population using improved sanitation facilities (excluding shared facilities) that are safely managed. Safely managed sanitation services are defined as improved sanitation facilities that are not shared with other households and where excreta are safely disposed in situ or transported and treated off-site.
+    Share of the {definitions.residence} population using improved sanitation facilities (excluding shared facilities) that are safely managed. Safely managed sanitation services are defined as improved sanitation facilities that are not shared with other households and where excreta are safely disposed in situ or transported and treated off-site.
   sanitation_disposed_in_situ_description_short: &sanitation_disposed_in_situ_desc_short |
-    Share of the population using improved sanitation facilities (excluding shared facilities) that are disposed in situ. Improved sanitation facilities are those designed to hygienically separate excreta from human contact, and include: flush/pour flush toilets connected to piped sewer systems, septic tanks or pit latrines; pit latrines with slabs (including ventilated pit latrines), and composting toilets.
+    Share of the {definitions.residence} population using improved sanitation facilities (excluding shared facilities) that are disposed in situ. Improved sanitation facilities are those designed to hygienically separate excreta from human contact, and include: flush/pour flush toilets connected to piped sewer systems, septic tanks or pit latrines; pit latrines with slabs (including ventilated pit latrines), and composting toilets.
   sanitation_emptied_and_treated_description_short: &sanitation_emptied_and_treated_desc_short |
-    Share of the population using improved sanitation facilities (excluding shared facilities) that are emptied and treated. Improved sanitation facilities are those designed to hygienically separate excreta from human contact, and include: flush/pour flush toilets connected to piped sewer systems, septic tanks or pit latrines; pit latrines with slabs (including ventilated pit latrines), and composting toilets.
+    Share of the {definitions.residence} population using improved sanitation facilities (excluding shared facilities) that are emptied and treated. Improved sanitation facilities are those designed to hygienically separate excreta from human contact, and include: flush/pour flush toilets connected to piped sewer systems, septic tanks or pit latrines; pit latrines with slabs (including ventilated pit latrines), and composting toilets.
   sanitation_wastewater_treated: &sanitation_wastewater_treated_desc_short |
-    Share of the population using improved sanitation facilities (excluding shared facilities) that are connected to sewer systems and where wastewater is treated. Improved sanitation facilities are those designed to hygienically separate excreta from human contact, and include: flush/pour flush toilets connected to piped sewer systems, septic tanks or pit latrines; pit latrines with slabs (including ventilated pit latrines), and composting toilets.
+    Share of the {definitions.residence} population using improved sanitation facilities (excluding shared facilities) that are connected to sewer systems and where wastewater is treated. Improved sanitation facilities are those designed to hygienically separate excreta from human contact, and include: flush/pour flush toilets connected to piped sewer systems, septic tanks or pit latrines; pit latrines with slabs (including ventilated pit latrines), and composting toilets.
   sanitation_latrines_description_short: &sanitation_latrines_desc_short |
-    Share of the population using improved sanitation facilities (including shared facilities) which are latrines. Improved sanitation facilities are those designed to hygienically separate excreta from human contact, and include: flush/pour flush toilets connected to piped sewer systems, septic tanks or pit latrines; pit latrines with slabs (including ventilated pit latrines), and composting toilets.
+    Share of the {definitions.residence} population using improved sanitation facilities (including shared facilities) which are latrines. Improved sanitation facilities are those designed to hygienically separate excreta from human contact, and include: flush/pour flush toilets connected to piped sewer systems, septic tanks or pit latrines; pit latrines with slabs (including ventilated pit latrines), and composting toilets.
   sanitation_septic_tanks_description_short: &sanitation_septic_tanks_desc_short |
-    Share of the population using improved sanitation facilities (including shared facilities) that have septic tanks. Improved sanitation facilities are those designed to hygienically separate excreta from human contact, and include: flush/pour flush toilets connected to piped sewer systems, septic tanks or pit latrines; pit latrines with slabs (including ventilated pit latrines), and composting toilets.
+    Share of the {definitions.residence} population using improved sanitation facilities (including shared facilities) that have septic tanks. Improved sanitation facilities are those designed to hygienically separate excreta from human contact, and include: flush/pour flush toilets connected to piped sewer systems, septic tanks or pit latrines; pit latrines with slabs (including ventilated pit latrines), and composting toilets.
   sanitation_sewer_systems_description_short: &sanitation_sewer_systems_desc_short |
-    Share of the population using improved sanitation facilities (including shared facilities) that have sewer connections. Improved sanitation facilities are those designed to hygienically separate excreta from human contact, and include: flush/pour flush toilets connected to piped sewer systems, septic tanks or pit latrines; pit latrines with slabs (including ventilated pit latrines), and composting toilets.
+    Share of the {definitions.residence} population using improved sanitation facilities (including shared facilities) that have sewer connections. Improved sanitation facilities are those designed to hygienically separate excreta from human contact, and include: flush/pour flush toilets connected to piped sewer systems, septic tanks or pit latrines; pit latrines with slabs (including ventilated pit latrines), and composting toilets.
   water_safely_managed_description_short: &water_safely_managed_desc_short |
-    Share of the population using safely managed drinking water services. Safely managed drinking water services are defined as an improved drinking water source that is located on premises, available when needed and free from faecal and priority chemical contamination.
+    Share of the {definitions.residence} population using safely managed drinking water services. Safely managed drinking water services are defined as an improved drinking water source that is located on premises, available when needed and free from faecal and priority chemical contamination.
   water_basic_description_short: &water_basic_desc_short |
-    Share of the population using at least basic drinking water services. Basic drinking water services are defined as an improved drinking water source,provided collection time is not more than 30 minutes for a roundtrip including queuing.
+    Share of the {definitions.residence} population using at least basic drinking water services. Basic drinking water services are defined as an improved drinking water source,provided collection time is not more than 30 minutes for a roundtrip including queuing.
   water_limited_description_short: &water_limited_desc_short |
-    Share of the population using limited drinking water services. Limited drinking water services are defined as drinking water from an improved source for which collection time exceeds 30 minutes for a roundtrip including queuing.
+    Share of the {definitions.residence} population using limited drinking water services. Limited drinking water services are defined as drinking water from an improved source for which collection time exceeds 30 minutes for a roundtrip including queuing.
   water_unimproved_description_short: &water_unimproved_desc_short |
-    Share of the population using unimproved drinking water services. Unimproved drinking water services are defined as drinking water from an unprotected dug well or unprotected spring.
+    Share of the {definitions.residence} population using unimproved drinking water services. Unimproved drinking water services are defined as drinking water from an unprotected dug well or unprotected spring.
   water_surface_description_short: &water_surface_desc_short |
-    Share of the population using surface water as a primary source of drinking water. Surface water includes rivers, streams, ponds, lakes, dams, canals and irrigation channels.
+    Share of the {definitions.residence} population using surface water as a primary source of drinking water. Surface water includes rivers, streams, ponds, lakes, dams, canals and irrigation channels.
   water_accessible_on_premises_description_short: &water_accessible_on_premises_desc_short |
-    Share of the population using improved drinking water services that are accessible on premises. Improved drinking water sources are those that have the potential to deliver safe water by nature of their design and construction, and include: piped water, boreholes or tubewells, protected dug wells, protected springs, rainwater, and packaged or delivered water.
+    Share of the {definitions.residence} population using improved drinking water services that are accessible on premises. Improved drinking water sources are those that have the potential to deliver safe water by nature of their design and construction, and include: piped water, boreholes or tubewells, protected dug wells, protected springs, rainwater, and packaged or delivered water.
   water_available_when_needed_description_short: &water_available_when_needed_desc_short |
-    Share of the population using improved drinking water services that are available when needed. Improved drinking water sources are those that have the potential to deliver safe water by nature of their design and construction, and include: piped water, boreholes or tubewells, protected dug wells, protected springs, rainwater, and packaged or delivered water.
+    Share of the {definitions.residence} population using improved drinking water services that are available when needed. Improved drinking water sources are those that have the potential to deliver safe water by nature of their design and construction, and include: piped water, boreholes or tubewells, protected dug wells, protected springs, rainwater, and packaged or delivered water.
   water_free_from_contamination_description_short: &water_free_from_contamination_desc_short |
-    Share of the population using improved drinking water services that are free from faecal and priority chemical contamination. Improved drinking water sources are those that have the potential to deliver safe water by nature of their design and construction, and include: piped water, boreholes or tubewells, protected dug wells, protected springs, rainwater, and packaged or delivered water.
+    Share of the {definitions.residence} population using improved drinking water services that are free from faecal and priority chemical contamination. Improved drinking water sources are those that have the potential to deliver safe water by nature of their design and construction, and include: piped water, boreholes or tubewells, protected dug wells, protected springs, rainwater, and packaged or delivered water.
   water_piped_description_short: &water_piped_desc_short |
-    Share of the population using improved drinking water services that are piped. Improved drinking water sources are those that have the potential to deliver safe water by nature of their design and construction, and include: piped water, boreholes or tubewells, protected dug wells, protected springs, rainwater, and packaged or delivered water.
+    Share of the {definitions.residence} population using improved drinking water services that are piped. Improved drinking water sources are those that have the potential to deliver safe water by nature of their design and construction, and include: piped water, boreholes or tubewells, protected dug wells, protected springs, rainwater, and packaged or delivered water.
   water_non_piped_description_short: &water_non_piped_desc_short |
-    Share of the population using improved drinking water services that are not piped. Improved drinking water sources are those that have the potential to deliver safe water by nature of their design and construction, and include: piped water, boreholes or tubewells, protected dug wells, protected springs, rainwater, and packaged or delivered water.
+    Share of the {definitions.residence} population using improved drinking water services that are not piped. Improved drinking water sources are those that have the potential to deliver safe water by nature of their design and construction, and include: piped water, boreholes or tubewells, protected dug wells, protected springs, rainwater, and packaged or delivered water.
   population_hygiene_basic_description_short: &pop_hygiene_basic_desc_short |
     Population with a handwashing facility with soap and water at home.
   population_hygiene_limited_description_short: &pop_hygiene_limited_desc_short |
@@ -96,8 +98,64 @@ definitions:
 dataset:
   update_period_days: 730
 tables:
-  hygiene:
+  who:
     variables:
+      wat_imp:
+        title: Share of the {definitions.residence} population using improved water sources
+      wat_basal:
+        title: Share of the {definitions.residence} population using at least basic drinking water services
+      wat_baso:
+        title: Share of the {definitions.residence} population using only basic drinking water services
+      wat_lim:
+        title: Share of the {definitions.residence} population using limited drinking water services
+      wat_unimp:
+        title: Share of the {definitions.residence} population using unimproved drinking water services
+      wat_ns:
+        title: Share of the {definitions.residence} population using surface water as a primary source of drinking water
+      wat_pip:
+        title: Share of the {definitions.residence} population using improved drinking water services that are piped
+      wat_imp_npip:
+        title: Share of the {definitions.residence} population using improved drinking water services that are not piped
+      wat_imp_prem:
+        title: Share of the {definitions.residence} population using improved drinking water services that are accessible on premises
+      wat_imp_av:
+        title: Share of the {definitions.residence} population using improved drinking water services that are available when needed
+      wat_imp_qual:
+        title: Share of the {definitions.residence} population using improved drinking water services that are free from contamination
+      wat_sm:
+        title: Share of the {definitions.residence} population using safely managed drinking water services
+      san_imp:
+        title: Share of the {definitions.residence} population using improved sanitation facilities
+      san_basal:
+        title: Share of the {definitions.residence} population using at least basic sanitation services, improved sanitation facilities which are not shared
+      san_baso:
+        title: Share of the {definitions.residence} population using only basic sanitation services, improved sanitation facilities which are not shared
+      san_lim:
+        title: Share of the {definitions.residence} population using limited sanitation services, improved sanitation facilities which are shared
+      san_unimp:
+        title: Share of the {definitions.residence} population using unimproved sanitation facilities
+      san_ns:
+        title: Share of the {definitions.residence} population practicing open defecation
+      san_othimp:
+        title: Share of the {definitions.residence} population using improved pit latrines or other on-site improved facilities (including shared)
+      san_sep:
+        title: Share of the {definitions.residence} population using improved sanitation facilities connected to septic tanks (including shared)
+      san_sew:
+        title: Share of the {definitions.residence} population using improved sanitation facilities connected to sewers (including shared)
+      san_sdo_sm:
+        title: Share of the {definitions.residence} population using on-site sanitation facilities where wastes are safely disposed of in situ
+      san_fst_sm:
+        title: Share of the {definitions.residence} population using on-site sanitation facilities where faecal sludge is removed and treated off-site
+      san_sew_sm:
+        title: Share of the {definitions.residence} population using sewer connections where wastewater reaches treatment plants and is treated off-site
+      san_sm:
+        title: Share of the {definitions.residence} population using safely managed sanitation services
+      hyg_bas:
+        title: Share of the population with access to a handwashing facility with soap and water at home (basic hygiene service)
+      hyg_lim:
+        title: Share of the population with access to a limited handwashing services (a handwashing facility at home lacking soap and/or water)
+      hyg_ns:
+        title: Share of the population with no access to a handwashing service
       rural_basic:
         title: Share of the rural population with basic hygiene facilities
         description_short: *hygiene_basic_desc_short

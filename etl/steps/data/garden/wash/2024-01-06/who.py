@@ -20,34 +20,31 @@ def run(dest_dir: str) -> None:
     #
     # Load meadow dataset.
     ds_meadow = paths.load_dataset("who")
-
-    tables = []
-    table_names = ds_meadow.table_names
-    for table_name in table_names:
-        log.info(f"Loading table {table_name}...")
-        # Read table from meadow dataset.
-        tb = ds_meadow[table_name].reset_index()
-        # Clean values.
-        tb = geo.harmonize_countries(
-            df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
-        )
-        tb = clean_values(tb)
-        tb = drop_region_columns(tb)
-        tb = convert_given_population_to_absolute(tb, table_name)
-        tb = calculate_population_with_each_category(tb, table_name)
-        tb = tb.set_index(["country", "year"], verify_integrity=True).sort_index()
-        tables.append(tb)
-
+    tb = ds_meadow["who"].reset_index()
+    tb = tb.rename(columns={"name": "country"})
+    tb = tb.drop(columns=["iso3"], axis=1)
+    tb = drop_erroneous_rows(tb)
+    tb = geo.harmonize_countries(
+        df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
+    )
+    # The population is given as 'population (thousands)
+    tb["pop"] = tb["pop"].astype(float).multiply(1000)
     #
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = create_dataset(
-        dest_dir, tables=tables, check_variables_metadata=True, default_metadata=ds_meadow.metadata
-    )
+    ds_garden = create_dataset(dest_dir, tables=tb, check_variables_metadata=True, default_metadata=ds_meadow.metadata)
 
     # Save changes in the new garden dataset.
     ds_garden.save()
+
+
+def drop_erroneous_rows(tb: Table) -> Table:
+    """
+    The values for Kosovo are poorly formatted and the country name is given as a year. Let's remove those.
+    """
+    tb = tb[~tb["country"].str.startswith("2")]
+    return tb
 
 
 def clean_values(tb: Table) -> Table:
@@ -86,29 +83,6 @@ def drop_region_columns(tb: Table) -> Table:
     """
     columns_to_drop = [col for col in tb.columns if "region" in col.lower()]
     tb = tb.drop(columns_to_drop, axis=1)
-    return tb
-
-
-def convert_given_population_to_absolute(tb: Table, table_name: str) -> Table:
-    """
-    The population is given as 'population (thousands) and the percent of the population that is urban is given as a percent.
-
-    We should use these to create new columns with the actual total population, urban population and rural population.
-
-    For menstrual health we don't know the % urban of the 15-49 age group, just the total population so we won't try and estimate the urban/rural split.
-
-    """
-    if table_name in ["sanitation", "water", "hygiene"]:
-        # Create new columns.
-        tb["total_population"] = tb["population__thousands"].astype(float) * 1000
-        tb["urban_population"] = tb["pct_urban"].astype(float) * tb["total_population"] / 100
-        tb["rural_population"] = tb["total_population"] - tb["urban_population"]
-        # Drop old columns.
-        columns_to_drop = ["population__thousands", "pct_urban"]
-        tb = tb.drop(columns_to_drop, axis=1)
-    elif table_name == "menstrual_health":
-        tb["population_women_age_15_49"] = tb["population_of_women_and_girls_age_15_49__thousands"].astype(float) * 1000
-        tb = tb.drop(columns="population_of_women_and_girls_age_15_49__thousands", axis=1)
     return tb
 
 
