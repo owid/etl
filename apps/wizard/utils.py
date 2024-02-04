@@ -55,15 +55,15 @@ CURRENT_DIR = Path(__file__).parent
 PHASES = Literal["all", "snapshot", "meadow", "garden", "grapher", "charts", "metagpt", "dataexp"]
 
 # Paths to cookiecutter files
-COOKIE_SNAPSHOT = APPS_DIR / "wizard" / "templating" / "cookiecutter" / "snapshot"
-COOKIE_MEADOW = APPS_DIR / "wizard" / "templating" / "cookiecutter" / "meadow"
-COOKIE_GARDEN = APPS_DIR / "wizard" / "templating" / "cookiecutter" / "garden"
-COOKIE_GRAPHER = APPS_DIR / "wizard" / "templating" / "cookiecutter" / "grapher"
+COOKIE_SNAPSHOT = APPS_DIR / "wizard" / "etl_steps" / "cookiecutter" / "snapshot"
+COOKIE_MEADOW = APPS_DIR / "wizard" / "etl_steps" / "cookiecutter" / "meadow"
+COOKIE_GARDEN = APPS_DIR / "wizard" / "etl_steps" / "cookiecutter" / "garden"
+COOKIE_GRAPHER = APPS_DIR / "wizard" / "etl_steps" / "cookiecutter" / "grapher"
 # Paths to markdown templates
-MD_SNAPSHOT = APPS_DIR / "wizard" / "templating" / "markdown" / "snapshot.md"
-MD_MEADOW = APPS_DIR / "wizard" / "templating" / "markdown" / "meadow.md"
-MD_GARDEN = APPS_DIR / "wizard" / "templating" / "markdown" / "garden.md"
-MD_GRAPHER = APPS_DIR / "wizard" / "templating" / "markdown" / "grapher.md"
+MD_SNAPSHOT = APPS_DIR / "wizard" / "etl_steps" / "markdown" / "snapshot.md"
+MD_MEADOW = APPS_DIR / "wizard" / "etl_steps" / "markdown" / "meadow.md"
+MD_GARDEN = APPS_DIR / "wizard" / "etl_steps" / "markdown" / "garden.md"
+MD_GRAPHER = APPS_DIR / "wizard" / "etl_steps" / "markdown" / "grapher.md"
 
 # PATH WIZARD CONFIG
 WIZARD_CONFIG = BASE_DIR / ".wizard"
