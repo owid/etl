@@ -1,5 +1,6 @@
 """Home page of wizard."""
-from typing import List
+from copy import deepcopy
+from typing import Any, Dict, List, Optional
 
 import streamlit as st
 from st_pages import add_indentation
@@ -31,14 +32,19 @@ default_styles = {
 }
 
 
-def create_card(title: str, image_url: str, text: str | List[str] = "") -> None:
+def create_card(
+    title: str, image_url: str, text: str | List[str] = "", custom_styles: Optional[Dict[str, Any]] = None
+) -> None:
     """Create card."""
+    styles = deepcopy(default_styles)
+    if custom_styles:
+        styles["card"].update(custom_styles)
     go_to_page = card(
         title=title,
         image=image_url,
         text=text,
         # text=f"Press {i + 1}",
-        styles=default_styles,
+        styles=styles,
         on_click=lambda: None,
     )
     if go_to_page:
@@ -56,37 +62,25 @@ steps = WIZARD_CONFIG["etl"]["steps"]
 # 1. Classic: Snapshot -> Meadow -> Garden + Grapher
 # 2. Fast Track: Fast Track + Grapher
 
-# Create two columns, with ration 3:1 (right is reserved for Grapher card)
-RATIO_TO_1 = 3
-col1, col2 = st.columns([RATIO_TO_1, 1])
+# 1/ First row for [Snapshot, Meadow, Garden, Grapher]
+pages = [
+    {
+        "title": steps[step]["title"],
+        "image_url": steps[step]["image_url"],
+    }
+    for step in ["snapshot", "meadow", "garden", "grapher"]
+]
+columns = st.columns(len(pages))
+for i, page in enumerate(pages):
+    with columns[i]:
+        create_card(**page)
+# 2/ FAST TRACK
+create_card(
+    title=steps["fasttrack"]["title"],
+    image_url=steps["fasttrack"]["image_url"],
+    custom_styles={"height": "50px"},
+)
 
-# First column for [Snapshot, Meadow, Garden] or [Fast Track]
-with col1:
-    # 1. CLASSIC
-    pages = [
-        {
-            "title": steps[step]["title"],
-            "image_url": steps[step]["image_url"],
-        }
-        for step in ["snapshot", "meadow", "garden"]
-    ]
-    columns = st.columns(len(pages))
-    assert len(pages) == RATIO_TO_1, f"Number of pages should be valid for the ratio {RATIO_TO_1}:1"
-    for i, page in enumerate(pages):
-        with columns[i]:
-            create_card(**page)
-    # 2. FAST TRACK
-    create_card(
-        title=steps["fasttrack"]["title"],
-        image_url=steps["fasttrack"]["image_url"],
-    )
-
-# Second column for [Grapher]
-with col2:
-    create_card(
-        title=steps["grapher"]["title"],
-        image_url=steps["grapher"]["image_url"],
-    )
 
 #########################
 # OTHER TOOLS
