@@ -31,6 +31,7 @@ def run(dest_dir: str) -> None:
     # The population is given as 'population (thousands)
     tb["pop"] = tb["pop"].astype(float).multiply(1000)
     tb = calculate_population_with_each_category(tb)
+    tb = calculate_population_without_service(tb)
     tb = tb.set_index(["country", "year", "residence"], verify_integrity=True)
     # Save outputs.
     #
