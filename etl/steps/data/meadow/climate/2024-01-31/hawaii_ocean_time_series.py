@@ -6,12 +6,6 @@ from etl.helpers import PathFinder, create_dataset
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
-# Columns to select from annual data, and how to rename them.
-COLUMNS_ANNUAL = {
-    "YEAR": "date",
-    "WO": "ocean_heat_content",
-}
-
 
 def run(dest_dir: str) -> None:
     #

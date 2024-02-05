@@ -50,13 +50,10 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
     # Combine data.
-    tb = pr.concat(tables)
+    tb = pr.concat(tables, short_name=paths.short_name)
 
     # Set an appropriate index and sort conveniently.
     tb = tb.set_index(["location", "depth", "year"], verify_integrity=True).sort_index()
-
-    # Rename tables.
-    tb.metadata.short_name = "ocean_heat_content"
 
     #
     # Save outputs.

@@ -2,15 +2,10 @@ meta:
   origin:
     producer: NOAA National Centers for Environmental Information
     title: Heat Content Basin Time Series
-    description: >-
-      The time series of yearly heat content are presented for the 0-700 and 0-2000
-      meters layers.
+    description: |-
+      The time series of yearly heat content are presented for the 0-700 and 0-2000 meters layers.
 
-
-      The yearly data for each of four major oceanic basins - the World Ocean, the
-      Pacific Ocean, the Atlantic Ocean (which
-      includes the entire Arctic Ocean), and the Indian Ocean - can be accessed on
-      [this page](https://www.ncei.noaa.gov/access/global-ocean-heat-content/basin_heat_data.html).
+      The yearly data for each of four major oceanic basins, namely the World Ocean, the Pacific Ocean, the Atlantic Ocean (which includes the entire Arctic Ocean), and the Indian Ocean, can be accessed on [this page](https://www.ncei.noaa.gov/access/global-ocean-heat-content/basin_heat_data.html).
     title_snapshot: Heat Content Basin Time Series - World 0 to 700 meters
     citation_full: >-
       National Oceanic and Atmospheric Administration (NOAA) National Centers for
@@ -31,13 +26,13 @@ meta:
       Basin Time Series (2024)
     attribution_short: NOAA/NCEI
     url_main: https://www.ncei.noaa.gov/products/ocean-heat-salt-sea-level
-    url_download: 
+    url_download:
       https://www.ncei.noaa.gov/data/oceans/woa/DATA_ANALYSIS/3M_HEAT_CONTENT/DATA/basin/yearly/h22-w0-700m.dat
     date_accessed: '2024-01-31'
     date_published: '2024-01-31'
     license:
       name: CC BY 4.0
-      url: 
+      url:
         https://www.ncei.noaa.gov/sites/g/files/anmtlf171/files/2023-12/NCEI%20PD-10-2-02%20-%20Open%20Data%20Policy%20Signed.pdf
 wdir: ../../../data/snapshots/climate/2024-01-31
 outs:

@@ -58,18 +58,14 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
     # Combine monthly data and add a column for location.
-    tb_monthly = pr.concat(tables_monthly)
+    tb_monthly = pr.concat(tables_monthly, short_name="ocean_heat_content_monthly")
 
     # Combine annual data.
-    tb_annual = pr.concat(tables_annual)
+    tb_annual = pr.concat(tables_annual, short_name="ocean_heat_content_annual")
 
     # Set an appropriate index and sort conveniently.
     tb_monthly = tb_monthly.set_index(["location", "depth", "date"], verify_integrity=True).sort_index()
     tb_annual = tb_annual.set_index(["location", "depth", "date"], verify_integrity=True).sort_index()
-
-    # Rename tables.
-    tb_monthly.metadata.short_name = "ocean_heat_content_monthly"
-    tb_annual.metadata.short_name = "ocean_heat_content_annual"
 
     #
     # Save outputs.

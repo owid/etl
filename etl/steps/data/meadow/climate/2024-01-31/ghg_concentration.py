@@ -31,8 +31,8 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
     for file_name, tb in tables.items():
-        # Make all columns snake-case, set an appropriate index and sort conveniently.
-        tables[file_name] = tb.underscore().set_index(["year", "month"], verify_integrity=True).sort_index()
+        # Set an appropriate index and sort conveniently.
+        tables[file_name] = tb.set_index(["year", "month"], verify_integrity=True).sort_index()
 
     #
     # Save outputs.
