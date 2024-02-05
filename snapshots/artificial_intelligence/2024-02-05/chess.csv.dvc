@@ -4,7 +4,7 @@ meta:
   origin:
     # Data product / Snapshot
     title: Computer Chess Elo Ratings
-    description: |-
+    description: |2-
 
       "This dataset provides a historical record of the highest ELO-rated chess engines from 1985 to 2022. The data for the years 1985 through 2019 was sourced from Chess.com, with the primary data originating from the Swedish Computer Chess Association (SSDF). The compilation of this segment involved manual extraction from video content to identify the chess engine with the highest ELO rating for each year, due to the unavailability of the data in any other format.
 
@@ -25,10 +25,15 @@ meta:
     attribution: Chess.com (2020); SSDF (2022, 2023)
 
     # Files
-    url_main: https://web.archive.org/web/20240113111323/https://ssdf.bosjo.net/list.htm
+    url_main: https://twitter.com/chesscom/status/1263457516605845505; https://ssdf.bosjo.net/list.htm
     date_accessed: 2024-02-05
 
     # License
     license:
       name: Public Data
 
+wdir: ../../../data/snapshots/artificial_intelligence/2024-02-05
+outs:
+- md5: a50b0dfb80d7bdd15ea1fb807d8f7c6f
+  size: 1309
+  path: chess.csv
