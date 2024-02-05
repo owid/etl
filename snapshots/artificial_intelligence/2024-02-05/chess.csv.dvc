@@ -6,16 +6,16 @@ meta:
     title: Computer Chess Elo Ratings
     description: |2-
 
-      "This dataset provides a historical record of the highest ELO-rated chess engines from 1985 to 2022. The data for the years 1985 through 2019 was sourced from Chess.com, with the primary data originating from the Swedish Computer Chess Association (SSDF). The compilation of this segment involved manual extraction from video content to identify the chess engine with the highest ELO rating for each year, due to the unavailability of the data in any other format.
+      This dataset provides a historical record of the highest ELO-rated chess engines from 1985 to 2022. The data for the years 1985 through 2019 was sourced from Chess.com, with the primary data originating from the Swedish Computer Chess Association (SSDF). The compilation of this segment involved manual extraction from video content to identify the chess engine with the highest ELO rating for each year, due to the unavailability of the data in any other format.
 
-      For the years after 2019, the data was obtained directly from the SSDF, with each year's highest ELO-rated chess engine recorded as a separate data point. These data points are available through archived links of the SSDF's website:
+      For the years after 2019, the data was obtained directly from the SSDF, with each year's highest ELO-rated chess engine recorded as a separate data point. These data points are available through archived links of the SSDF's website.
 
       The 2020 data point can be found [here](https://web.archive.org/web/20210122165339/http://ssdf.bosjo.net/list.htm).
       The 2021 data point is documented [here](https://web.archive.org/web/20211231001026/http://ssdf.bosjo.net/list.htm).
       The 2022 data point is accessible [here](https://web.archive.org/web/20221030131425/http://ssdf.bosjo.net/list.htm).
       The 2023 data point is accessible [here](https://web.archive.org/web/20240113111323/https://ssdf.bosjo.net/list.htm)
 
-      This dataset provides an objective overview of the progression of chess engine performance over the years, offering valuable insights for research and analysis in the field of computer chess and artificial intelligence."
+      This dataset provides an objective overview of the progression of chess engine performance over the years, offering valuable insights for research and analysis in the field of computer chess and artificial intelligence.
     date_published: 2024-02-05
 
     # Citation
