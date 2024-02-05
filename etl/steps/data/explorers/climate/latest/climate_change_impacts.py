@@ -89,9 +89,9 @@ def run(dest_dir: str) -> None:
     ds_snow = paths.load_dataset("snow_cover_extent")
     tb_snow = ds_snow["snow_cover_extent"].reset_index()
 
-    # Load ice sheet mass balance data from IMBIE.
-    ds_imbie = paths.load_dataset("ice_sheet_mass_balance")
-    tb_imbie = ds_imbie["ice_sheet_mass_balance"].reset_index()
+    # Load ice sheet mass balance data from EPA.
+    ds_ice_sheet = paths.load_dataset("ice_sheet_mass_balance")
+    tb_ice_sheet = ds_ice_sheet["ice_sheet_mass_balance"].reset_index()
 
     # Load annual data on mass balance of US glaciers from EPA.
     ds_us_glaciers = paths.load_dataset("mass_balance_us_glaciers")
@@ -131,7 +131,7 @@ def run(dest_dir: str) -> None:
         tb_ocean_heat_monthly,
         tb_ocean_ph,
         tb_snow,
-        tb_imbie,
+        tb_ice_sheet,
         tb_gml,
         tb_sea_level,
     ]:

@@ -4,6 +4,8 @@ definitions:
       topic_tags:
       - Climate Change
     processing_level: minor
+    description_processing: |-
+      The amount of heat in the ocean, or ocean heat content, is an important indicator of climate change because the oceans ultimately absorb a large portion of the extra energy that greenhouse gases trap near the Earth's surface. Ocean heat content also plays an important role in the Earth's climate system because heat from ocean surface waters provides energy for storms and thereby influences weather patterns.
 
 dataset:
   title: Ocean Heat Content

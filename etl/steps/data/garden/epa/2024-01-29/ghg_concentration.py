@@ -62,10 +62,7 @@ def run(dest_dir: str) -> None:
     tb_n2o = approximate_data_for_each_year(tb_n2o, "n2o_concentration")
 
     # Combine data for all gases.
-    tb = tb_co2.merge(tb_ch4, on="year", how="outer").merge(tb_n2o, on="year", how="outer")
-
-    # Rename table.
-    tb.metadata.short_name = paths.short_name
+    tb = tb_co2.merge(tb_ch4, on="year", how="outer").merge(tb_n2o, on="year", how="outer", short_name=paths.short_name)
 
     # Set an appropriate index to each table and sort conveniently.
     tb = tb.set_index(["year"], verify_integrity=True).sort_index().sort_index(axis=1)
