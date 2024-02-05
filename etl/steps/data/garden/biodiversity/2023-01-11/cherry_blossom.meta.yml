@@ -24,7 +24,7 @@ tables:
             yAxis:
               min: 70
             selectedEntityNames:
-            - Japan
+              - Japan
         license:
           url: http://atmenv.envi.osakafu-u.ac.jp/aono/kyophenotemp4/
 
@@ -50,4 +50,4 @@ tables:
             yAxis:
               min: 70
             selectedEntityNames:
-            - Japan
+              - Japan

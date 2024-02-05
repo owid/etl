@@ -548,6 +548,9 @@ steps:
   data://grapher/countries/2023-09-29/cow_ssm:
     - data://garden/countries/2023-09-29/cow_ssm
 
+  data://garden/countries/2024-01-08/gleditsch_no_population:
+    - data://meadow/countries/2023-09-25/gleditsch
+
   # Fertility rate, Gapminder
   data://meadow/gapminder/2023-09-22/total_fertility_rate:
     - snapshot://gapminder/2023-09-22/total_fertility_rate.xlsx

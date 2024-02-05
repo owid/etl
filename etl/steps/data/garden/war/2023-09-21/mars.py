@@ -158,6 +158,14 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
+    # HOTFIX: https://github.com/owid/owid-issues/issues/1356
+    msk = (tb["warcode"] == 204) & (tb["ccode"].isin([1090, 678]))
+    assert (tb.loc[msk, "namerica"] == 1).all() & (
+        tb.loc[msk, "nafrme"] == 0
+    ).all(), "The hotfix may not be needed anymore! Check region assigned for warcode 204 (should be 'nafrme')"
+    tb.loc[msk, "namerica"] = 0
+    tb.loc[msk, "nafrme"] = 1
+
     paths.log.info("clean table")
     tb = clean_table(tb)
 

@@ -19,7 +19,7 @@ definitions:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
 dataset:
   update_period_days: 0
-  title: Global economic growth in the last two millennia
+  title: Global economic growth in the long run
 
 
 # Learn more about the available fields:
@@ -53,14 +53,14 @@ tables:
 
           GDP (1990 Int. GK$)
         presentation:
-          title_public: Global Gross Domestic Product (GDP)
+          title_public: Global GDP over the long run
           title_variant: Historical data
           attribution_short: World Bank, Maddison Project Database
           faqs:
             - fragment_id: poverty-international-dollars
               gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
           grapher_config:
-            title: World GDP over the last two millennia
+            title: Global GDP over the long run
             subtitle: Total output of the world economy. This data is adjusted for inflation and differences in the cost of
               living between countries.
             originUrl: https://ourworldindata.org/economic-growth
@@ -103,14 +103,14 @@ tables:
 
           GDP per capita (1990 Int. GK$)
         presentation:
-          title_public: Global GDP per capita
+          title_public: Global average GDP per capita over the long run
           title_variant: Historical data
           attribution_short: World Bank, Maddison Project Database
           faqs:
             - fragment_id: poverty-international-dollars
               gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
           grapher_config:
-            title: World GDP per capita over the last two millennia
+            title: Global average GDP per capita over the long run
             subtitle: This data is adjusted for inflation and differences in the cost of living between countries.
             originUrl: https://ourworldindata.org/economic-growth
             yAxis:

@@ -57,21 +57,13 @@ def run(dest_dir: str) -> None:
 
     # Ensure 'organization_categorization' and 'domain'
     for column in ["organization_categorization", "domain", "organization", "approach"]:
-        tb[column] = tb[column].replace({"nan": "Not specified"})
-
-    # Make the domain categories more concise.
-    domain_mapping = {
-        "3D reconstruction": "Other",
-        "Driving": "Other",
-        "Other": "Other",
-        "Video": "Other",
-        "Text-to-Video": "Other",
-        "Search": "Other",
-        "Audio": "Other",
-        "Robotics": "Other",
-    }
-
-    tb["domain"] = tb["domain"].replace(domain_mapping)
+        tb[column] = tb[column].replace("nan", "Not specified")
+    # Find domains with total numbrt of notable systems below 10
+    domain_counts = tb["domain"].value_counts()
+    domains_below_10 = domain_counts[domain_counts < 10].index.tolist()
+    log.info(f"Domains with less than 10 notable systems that were reclassified to Other: {domains_below_10}")
+    # Rename the domains with less than 10 notable systems to 'Other'
+    tb["domain"] = tb["domain"].apply(lambda x: "Other" if x in domains_below_10 else x)
 
     # Convert FLOP to petaFLOP and remove the column with FLOPs (along with training time in hours)
     tb["training_computation_petaflop"] = tb["training_compute__flop"] / 1e15

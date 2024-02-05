@@ -1,0 +1,45 @@
+dataset:
+  update_period_days: 365
+tables:
+  cherry_blossom:
+    variables:
+      full_flowering_date:
+        title: Day of the year with peak cherry blossom
+        description_short: The day of the year with the peak cherry blossom of the Prunus jamasakura species of cherry tree in Kyoto, Japan.
+        unit: day of the year
+        short_unit: ""
+        display:
+          numDecimalPlaces: 0
+        processing_level: minor
+        presentation:
+          topic_tags:
+            - Biodiversity
+            - Climate Change
+          grapher_config:
+            title: Day of the year with peak cherry tree blossom in Kyoto, Japan
+            subtitle: >
+              The vertical axis shows the date of peak blossom, expressed as the number of days since 1st January. The timing of the peak cherry blossom is influenced by spring temperatures. Higher temperatures due to climate change have caused the peak blossom to gradually move earlier in the year since the early 20th century.
+            yAxis:
+              min: 70
+            selectedEntityNames:
+              - Japan
+      average_20_years:
+        title: Twenty-year average day of the year with peak cherry blossom
+        description_short: A twenty year moving average of the day of the year with peak cherry blossom (Prunus jamasakura species). Only calculated for 20-year periods with at least five years of data.
+        unit: day of the year
+        short_unit: ""
+        display:
+          numDecimalPlaces: 2
+        processing_level: major
+        presentation:
+          topic_tags:
+            - Biodiversity
+            - Climate Change
+          grapher_config:
+            title: Day of the year with peak cherry tree blossom in Kyoto, Japan
+            subtitle: |-
+              The vertical axis shows the date of peak blossom, expressed as the number of days since 1st January. The timing of the peak cherry blossom is influenced by spring temperatures. Higher temperatures due to climate change have caused the peak blossom to gradually move earlier in the year since the early 20th century.
+            yAxis:
+              min: 70
+            selectedEntityNames:
+              - Japan

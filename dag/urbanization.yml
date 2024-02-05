@@ -6,6 +6,8 @@ steps:
     - snapshot://un/2024-01-17/urbanization_urban_rural.csv
   data://garden/un/2024-01-17/urbanization_urban_rural:
     - data://meadow/un/2024-01-17/urbanization_urban_rural
+    - data://garden/hyde/2024-01-02/all_indicators
+
   data://grapher/un/2024-01-17/urbanization_urban_rural:
     - data://garden/un/2024-01-17/urbanization_urban_rural
 
@@ -29,6 +31,8 @@ steps:
     - data://meadow/un/2024-01-17/urban_agglomerations_largest_cities
   data://grapher/un/2024-01-17/urban_agglomerations_largest_cities:
     - data://garden/un/2024-01-17/urban_agglomerations_largest_cities
+  data://grapher/un/2024-01-17/urban_agglomerations_capitals:
+    - data://garden/un/2024-01-17/urban_agglomerations_largest_cities
 
   data://meadow/un/2024-01-17/urban_agglomerations_definition:
     - snapshot://un/2024-01-17/urban_agglomerations_definition.xls
@@ -36,10 +40,16 @@ steps:
     - data://meadow/un/2024-01-17/urban_agglomerations_definition
   data://grapher/un/2024-01-17/urban_agglomerations_definition:
     - data://garden/un/2024-01-17/urban_agglomerations_definition
+  data://garden/un/2024-01-17/urban_agglomerations_definition_count:
+    - data://garden/un/2024-01-17/urban_agglomerations_definition
+  data://grapher/un/2024-01-17/urban_agglomerations_definition_count:
+    - data://garden/un/2024-01-17/urban_agglomerations_definition_count
 
   data://meadow/urbanization/2024-01-26/ghsl_degree_of_urbanisation:
     - snapshot://urbanization/2024-01-26/ghsl_degree_of_urbanisation.zip
   data://garden/urbanization/2024-01-26/ghsl_degree_of_urbanisation:
     - data://meadow/urbanization/2024-01-26/ghsl_degree_of_urbanisation
+    - data://garden/wb/2023-04-30/income_groups
+    - data://garden/regions/2023-01-01/regions
   data://grapher/urbanization/2024-01-26/ghsl_degree_of_urbanisation:
     - data://garden/urbanization/2024-01-26/ghsl_degree_of_urbanisation

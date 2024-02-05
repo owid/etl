@@ -103,6 +103,7 @@ steps:
   data://garden/war/2023-09-21/brecke:
     - data://meadow/war/2023-09-21/brecke
     - data://garden/countries/2023-09-25/isd
+    - data://garden/demography/2023-03-31/population
   data://grapher/war/2023-09-21/brecke:
     - data://garden/war/2023-09-21/brecke
 

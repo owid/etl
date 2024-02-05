@@ -53,7 +53,7 @@ tables:
           numDecimalPlaces: 0
 
       degurba_l1_population_town__and__suburbs_estimates:
-        title: Population of town and suburban(DEGURBA Level 1)
+        title: Population of towns and suburbs (DEGURBA Level 1)
         unit: people
         description_from_producer: Population of spatial units classified as Town & Suburbs in Degree of Urbanisation level 1
         display:
@@ -177,11 +177,13 @@ tables:
         display:
           numDecimalPlaces: 0
 
-      share_of_urban_population_estimates:
-        title: Share of urban population
+      share_of_urban_population_owid_estimates:
+        title: Share of urban population (estimates)
         unit: '%'
         short_unit: '%'
         description_short: Share of total population in administrative units classified as cities, towns and suburbs.
+        presentation:
+          title_public: Share of urban population
         display:
           numDecimalPlaces: 1
 
@@ -209,7 +211,7 @@ tables:
       #  Projections
       #
       average_area_km2_projections:
-        title: Average size of spatial units comprising the territory (projections)
+        title: Average size of spatial units comprising the territory (future projections)
         unit: km²
         description_short: Refers to all the geographic divisions, including cities, towns, semi-dense areas, and rural regions, as categorized according to the Degree of Urbanisation criteria.
         presentation:
@@ -220,7 +222,7 @@ tables:
           isProjection: true
 
       degurba_l1_population_city_projections:
-        title: Population of cities (DEGURBA Level 1) (projections)
+        title: Population of cities (DEGURBA Level 1) (future projections)
         unit: people
         presentation:
           title_public: Population of cities (DEGURBA Level 1)
@@ -231,7 +233,7 @@ tables:
           isProjection: true
 
       degurba_l1_population_rural_area_projections:
-        title: Population of rural area (DEGURBA Level 1) (projections)
+        title: Population of rural area (DEGURBA Level 1) (future projections)
         unit: people
         presentation:
           title_public: Population of rural area (DEGURBA Level 1)
@@ -242,18 +244,18 @@ tables:
           isProjection: true
 
       degurba_l1_population_town__and__suburbs_projections:
-        title: Population of town and suburban(DEGURBA Level 1) (projections)
+        title: Population of towns and suburbs (DEGURBA Level 1) (future projections)
         unit: people
         presentation:
-          title_public: Population of town and suburban(DEGURBA Level 1)
+          title_public: Population of towns and suburbs (DEGURBA Level 1)
         description_from_producer: Population of spatial units classified as Town & Suburbs in Degree of Urbanisation level 1
         display:
           numDecimalPlaces: 0
-          name: Population of town and suburban(DEGURBA Level 1)
+          name: Population of towns and suburbs (DEGURBA Level 1)
           isProjection: true
 
       degurba_l1_units_city_projections:
-        title: Number of cities (DEGURBA Level 1) (projections)
+        title: Number of cities (DEGURBA Level 1) (future projections)
         unit: cities
         presentation:
           title_public: Number of cities (DEGURBA Level 1)
@@ -264,7 +266,7 @@ tables:
           isProjection: true
 
       degurba_l1_units_rural_area_projections:
-        title: Number of rural areas (DEGURBA Level 1) (projections)
+        title: Number of rural areas (DEGURBA Level 1) (future projections)
         unit: rural areas
         presentation:
           title_public: Number of rural areas (DEGURBA Level 1)
@@ -275,7 +277,7 @@ tables:
           isProjection: true
 
       degurba_l1_units_town__and__suburbs_projections:
-        title: Number of towns and suburbs (DEGURBA Level 1) (projections)
+        title: Number of towns and suburbs (DEGURBA Level 1) (future projections)
         presentation:
           title_public: Number of towns and suburbs (DEGURBA Level 1)
         description_from_producer: Number of spatial units classified as Town & Suburbs in Degree of Urbanisation level 1.
@@ -286,7 +288,7 @@ tables:
           isProjection: true
 
       degurba_l2_population_city_projections:
-        title: Population of cities (DEGURBA Level 2) (projections)
+        title: Population of cities (DEGURBA Level 2) (future projections)
         unit: people
         presentation:
           title_public: Population of cities (DEGURBA Level 2)
@@ -297,7 +299,7 @@ tables:
           isProjection: true
 
       degurba_l2_population_dense_town_projections:
-        title: Population of dense towns (DEGURBA Level 2) (projections)
+        title: Population of dense towns (DEGURBA Level 2) (future projections)
         unit: people
         presentation:
           title_public: Population of dense towns (DEGURBA Level 2)
@@ -308,7 +310,7 @@ tables:
           isProjection: true
 
       degurba_l2_population_mostly_uninhabited_area_projections:
-        title: Population of mostly uninhabited areas (DEGURBA Level 2) (projections)
+        title: Population of mostly uninhabited areas (DEGURBA Level 2) (future projections)
         unit: people
         presentation:
           title_public: Population of mostly uninhabited areas (DEGURBA Level 2)
@@ -319,7 +321,7 @@ tables:
           isProjection: true
 
       degurba_l2_population_rural_dispersed_area_projections:
-        title: Population of rural dispersed areas (DEGURBA Level 2) (projections)
+        title: Population of rural dispersed areas (DEGURBA Level 2) (future projections)
         unit: people
         presentation:
           title_public: Population of rural dispersed areas (DEGURBA Level 2)
@@ -330,7 +332,7 @@ tables:
           isProjection: true
 
       degurba_l2_population_semi_dense_town_projections:
-        title: Population of semi-dense towns (DEGURBA Level 2) (projections)
+        title: Population of semi-dense towns (DEGURBA Level 2) (future projections)
         unit: people
         presentation:
           title_public: Population of semi-dense towns (DEGURBA Level 2)
@@ -341,7 +343,7 @@ tables:
           isProjection: true
 
       degurba_l2_population_suburbs_or_peri_urban_area_projections:
-        title: Population in suburbs or peri-urban areas (DEGURBA Level 2) (projections)
+        title: Population in suburbs or peri-urban areas (DEGURBA Level 2) (future projections)
         unit: people
         presentation:
           title_public: Population in suburbs or peri-urban areas (DEGURBA Level 2)
@@ -351,7 +353,7 @@ tables:
           isProjection: true
 
       degurba_l2_population_village_projections:
-        title: Population of villages (DEGURBA Level 2) (projections)
+        title: Population of villages (DEGURBA Level 2) (future projections)
         unit: people
         presentation:
           title_public: Population of villages (DEGURBA Level 2)
@@ -362,7 +364,7 @@ tables:
           isProjection: true
 
       degurba_l2_units_city_projections:
-        title: Number of cities (DEGURBA Level 2) (projections)
+        title: Number of cities (DEGURBA Level 2) (future projections)
         unit: cities
         presentation:
           title_public: Number of cities (DEGURBA Level 2)
@@ -373,7 +375,7 @@ tables:
           isProjection: true
 
       degurba_l2_units_dense_town_projections:
-        title: Number of dense towns (DEGURBA Level 2) (projections)
+        title: Number of dense towns (DEGURBA Level 2) (future projections)
         unit: dense towns
         presentation:
           title_public: Number of dense towns (DEGURBA Level 2)
@@ -384,7 +386,7 @@ tables:
           isProjection: true
 
       degurba_l2_units_mostly_uninhabited_area_projections:
-        title: Number of mostly uninhabited areas (DEGURBA Level 2) (projections)
+        title: Number of mostly uninhabited areas (DEGURBA Level 2) (future projections)
         unit: uninhabited areas
         presentation:
           title_public: Number of mostly uninhabited areas (DEGURBA Level 2)
@@ -395,7 +397,7 @@ tables:
           isProjection: true
 
       degurba_l2_units_rural_dispersed_area_projections:
-        title: Number of rural dispersed areas (DEGURBA Level 2) (projections)
+        title: Number of rural dispersed areas (DEGURBA Level 2) (future projections)
         unit: dispersed areas
         presentation:
           title_public: Number of rural dispersed areas (DEGURBA Level 2)
@@ -406,7 +408,7 @@ tables:
           isProjection: true
 
       degurba_l2_units_semi_dense_town_projections:
-        title: Number of semi-dense towns (DEGURBA Level 2) (projections)
+        title: Number of semi-dense towns (DEGURBA Level 2) (future projections)
         unit: towns
         presentation:
           title_public: Number of semi-dense towns (DEGURBA Level 2)
@@ -417,7 +419,7 @@ tables:
           isProjection: true
 
       degurba_l2_units_suburbs_or_peri_urban_area_projections:
-        title: Number of suburbs or peri-urban areas (DEGURBA Level 2) (projections)
+        title: Number of suburbs or peri-urban areas (DEGURBA Level 2) (future projections)
         unit: suburbs or peri-urban areas
         presentation:
           title_public: Number of suburbs or peri-urban areas (DEGURBA Level 2)
@@ -428,7 +430,7 @@ tables:
           isProjection: true
 
       degurba_l2_units_village_projections:
-        title: Number of villages (DEGURBA Level 2) (projections)
+        title: Number of villages (DEGURBA Level 2) (future projections)
         unit: 'villages'
         presentation:
           title_public: Number of villages (DEGURBA Level 2)
@@ -438,8 +440,8 @@ tables:
           name: Number of villages (DEGURBA Level 2)
           isProjection: true
 
-      share_of_urban_population_projections:
-        title: Share of urban population (projections)
+      share_of_urban_population_owid_projections:
+        title: Share of urban population (future projections)
         unit: '%'
         short_unit: '%'
         description_short: Share of total population in administrative units classified as cities, towns and suburbs.
@@ -450,7 +452,7 @@ tables:
           isProjection: true
 
       total_area_km2_projections:
-        title: Total area of the country (projections)
+        title: Total area of the country (future projections)
         unit: km²
         short_unit: km²
         display:
@@ -472,3 +474,4 @@ tables:
         display:
           numDecimalPlaces: 0
           isProjection: true
+

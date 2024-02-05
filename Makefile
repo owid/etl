@@ -148,3 +148,7 @@ fasttrack: .venv
 staging-sync: .venv
 	@echo '==> Starting Staging-sync on http://localhost:8083/'
 	poetry run streamlit run apps/staging_sync/app.py --server.port 8083
+
+wizard: .venv
+	@echo '==> Starting Wizard on http://localhost:8053/'
+	poetry run etl-wizard

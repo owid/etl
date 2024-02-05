@@ -15,7 +15,7 @@ def run(dest_dir: str) -> None:
     # Read table from meadow dataset.
     tb = ds_meadow["population_fariss"].reset_index()
     # Load Gleditsch dataset (country codes)
-    ds_gw = paths.load_dataset("gleditsch")
+    ds_gw = paths.load_dataset("gleditsch_no_population")
     tb_gw = ds_gw["gleditsch_countries"].reset_index()
 
     # Get code to country table
