@@ -10,18 +10,24 @@ definitions:
       numDecimalPlaces: 1
   residence: |-
     <% if residence == "Rural" %>rural <% elif residence == "Urban" %>urban <% elif residence == "Total" %><%- endif -%>
+  residence_pop:
+    <% if residence == "Rural" %>rural <% elif residence == "Urban" %>urban <% elif residence == "Total" %>total <%- endif -%>
   hygiene_basic_description_short: &hygiene_basic_desc_short |
     Share of the {definitions.residence} population with a handwashing facility with soap and water at home.
   hygiene_limited_description_short: &hygiene_limited_desc_short |
     Share of the {definitions.residence} population with a handwashing facility lacking soap and/or water at home.
   hygiene_no_facility_description_short: &hygiene_no_facility_desc_short |
     Share of the {definitions.residence} population with no handwashing facility at home.
-  sanitation_basic_description_short: &sanitation_basic_desc_short |
-    Share of the {definitions.residence} population using improved sanitation facilities that are not shared with other households. Improved sanitation facilities are those designed to hygienically separate excreta from human contact, and include: flush/pour flush toilets connected to piped sewer systems, septic tanks or pit latrines; pit latrines with slabs (including ventilated pit latrines), and composting toilets.
+  sanitation_basal_description_short: &sanitation_basic_desc_short |
+    Share of the {definitions.residence} population using at least improved sanitation facilities that are not shared with other households. Improved sanitation facilities are those designed to hygienically separate excreta from human contact, and include: flush/pour flush toilets connected to piped sewer systems, septic tanks or pit latrines; pit latrines with slabs (including ventilated pit latrines), and composting toilets.
+  sanitation_baso_description_short: &sanitation_basic_desc_short |
+    Share of the {definitions.residence} population using only improved sanitation facilities that are not shared with other households. Improved sanitation facilities are those designed to hygienically separate excreta from human contact, and include: flush/pour flush toilets connected to piped sewer systems, septic tanks or pit latrines; pit latrines with slabs (including ventilated pit latrines), and composting toilets.
   sanitation_limited_description_short: &sanitation_limited_desc_short |
     Share of the {definitions.residence} population using improved sanitation facilities that are shared between two or more households. Improved sanitation facilities are those designed to hygienically separate excreta from human contact, and include: flush/pour flush toilets connected to piped sewer systems, septic tanks or pit latrines; pit latrines with slabs (including ventilated pit latrines), and composting toilets.
   sanitation_unimproved_description_short: &sanitation_unimproved_desc_short |
     Share of the {definitions.residence} population using unimproved sanitation facilities. Unimproved sanitation facilities include pit latrines without a slab or platform, hanging latrines or bucket latrines.
+  sanitation_improved_description_short: &sanitation_improved_desc_short |
+    Share of the {definitions.residence} population using improved sanitation facilities. Improved sanitation facilities are those designed to hygienically separate excreta from human contact, and include: flush/pour flush toilets connected to piped sewer systems, septic tanks or pit latrines; pit latrines with slabs (including ventilated pit latrines), and composting toilets.
   sanitation_open_defecation_description_short: &sanitation_open_defecation_desc_short |
     Share of the {definitions.residence} population practicing open defecation. Open defecation refers to the practice of defecating in fields, forests, bushes, bodies of water or other open spaces.
   sanitation_safe_management_description_short: &sanitation_safe_management_desc_short |
@@ -38,6 +44,8 @@ definitions:
     Share of the {definitions.residence} population using improved sanitation facilities (including shared facilities) that have septic tanks. Improved sanitation facilities are those designed to hygienically separate excreta from human contact, and include: flush/pour flush toilets connected to piped sewer systems, septic tanks or pit latrines; pit latrines with slabs (including ventilated pit latrines), and composting toilets.
   sanitation_sewer_systems_description_short: &sanitation_sewer_systems_desc_short |
     Share of the {definitions.residence} population using improved sanitation facilities (including shared facilities) that have sewer connections. Improved sanitation facilities are those designed to hygienically separate excreta from human contact, and include: flush/pour flush toilets connected to piped sewer systems, septic tanks or pit latrines; pit latrines with slabs (including ventilated pit latrines), and composting toilets.
+  sanitation_other_improved_description_short: &sanitation_other_improved_desc_short |
+    Share of the {definitions.residence} population using improved pit latrines or other on-site improved facilities (including shared).
   water_safely_managed_description_short: &water_safely_managed_desc_short |
     Share of the {definitions.residence} population using safely managed drinking water services. Safely managed drinking water services are defined as an improved drinking water source that is located on premises, available when needed and free from faecal and priority chemical contamination.
   water_basal_description_short: &water_basic_desc_short |
@@ -126,789 +134,286 @@ tables:
         short_unit: "%"
       wat_unimp:
         title: Share of the {definitions.residence} population using unimproved drinking water services
+        description_short: *water_unimproved_desc_short
+        unit: "%"
+        short_unit: "%"
       wat_ns:
         title: Share of the {definitions.residence} population using surface water as a primary source of drinking water
+        description_short: *water_surface_desc_short
+        unit: "%"
+        short_unit: "%"
       wat_pip:
         title: Share of the {definitions.residence} population using improved drinking water services that are piped
+        description_short: *water_piped_desc_short
+        unit: "%"
+        short_unit: "%"
       wat_imp_npip:
         title: Share of the {definitions.residence} population using improved drinking water services that are not piped
+        description_short: *water_non_piped_desc_short
+        unit: "%"
+        short_unit: "%"
       wat_imp_prem:
         title: Share of the {definitions.residence} population using improved drinking water services that are accessible on premises
+        description_short: *water_accessible_on_premises_desc_short
+        unit: "%"
+        short_unit: "%"
       wat_imp_av:
         title: Share of the {definitions.residence} population using improved drinking water services that are available when needed
+        description_short: *water_available_when_needed_desc_short
+        unit: "%"
+        short_unit: "%"
       wat_imp_qual:
         title: Share of the {definitions.residence} population using improved drinking water services that are free from contamination
+        description_short: *water_free_from_contamination_desc_short
+        unit: "%"
+        short_unit: "%"
       wat_sm:
         title: Share of the {definitions.residence} population using safely managed drinking water services
+        description_short: *water_safely_managed_desc_short
+        unit: "%"
+        short_unit: "%"
       san_imp:
         title: Share of the {definitions.residence} population using improved sanitation facilities
+        description_short: *sanitation_improved_desc_short
+        unit: "%"
+        short_unit: "%"
       san_basal:
         title: Share of the {definitions.residence} population using at least basic sanitation services, improved sanitation facilities which are not shared
+        description_short: *sanitation_basal_desc_short
+        unit: "%"
+        short_unit: "%"
       san_baso:
         title: Share of the {definitions.residence} population using only basic sanitation services, improved sanitation facilities which are not shared
+        description_short: *sanitation_baso_desc_short
+        unit: "%"
+        short_unit: "%"
       san_lim:
         title: Share of the {definitions.residence} population using limited sanitation services, improved sanitation facilities which are shared
+        description_short: *sanitation_limited_desc_short
+        unit: "%"
+        short_unit: "%"
       san_unimp:
         title: Share of the {definitions.residence} population using unimproved sanitation facilities
+        description_short: *sanitation_unimproved_desc_short
+        unit: "%"
+        short_unit: "%"
       san_ns:
         title: Share of the {definitions.residence} population practicing open defecation
+        description_short: *sanitation_open_defecation_desc_short
+        unit: "%"
+        short_unit: "%"
       san_othimp:
         title: Share of the {definitions.residence} population using improved pit latrines or other on-site improved facilities (including shared)
+        description_short: *sanitation_other_improved_desc_short
+        unit: "%"
+        short_unit: "%"
       san_sep:
         title: Share of the {definitions.residence} population using improved sanitation facilities connected to septic tanks (including shared)
+        description_short: *sanitation_septic_tanks_desc_short
+        unit: "%"
+        short_unit: "%"
       san_sew:
         title: Share of the {definitions.residence} population using improved sanitation facilities connected to sewers (including shared)
+        description_short: *sanitation_sewer_systems_desc_short
+        unit: "%"
+        short_unit: "%"
       san_sdo_sm:
         title: Share of the {definitions.residence} population using on-site sanitation facilities where wastes are safely disposed of in situ
+        description_short: *sanitation_disposed_in_situ_desc_short
+        unit: "%"
+        short_unit: "%"
       san_fst_sm:
         title: Share of the {definitions.residence} population using on-site sanitation facilities where faecal sludge is removed and treated off-site
+        description_short: *sanitation_emptied_and_treated_desc_short
+        unit: "%"
+        short_unit: "%"
       san_sew_sm:
         title: Share of the {definitions.residence} population using sewer connections where wastewater reaches treatment plants and is treated off-site
+        description_short: *sanitation_wastewater_treated_desc_short
+        unit: "%"
+        short_unit: "%"
       san_sm:
         title: Share of the {definitions.residence} population using safely managed sanitation services
+        description_short: *sanitation_safe_management_desc_short
+        unit: "%"
+        short_unit: "%"
       hyg_bas:
         title: Share of the population with access to a handwashing facility with soap and water at home (basic hygiene service)
+        description_short: *hygiene_basic_desc_short
+        unit: "%"
+        short_unit: "%"
       hyg_lim:
         title: Share of the population with access to a limited handwashing services (a handwashing facility at home lacking soap and/or water)
+        description_short: *hygiene_limited_desc_short
+        unit: "%"
+        short_unit: "%"
       hyg_ns:
         title: Share of the population with no access to a handwashing service
-      rural_basic:
-        title: Share of the rural population with basic hygiene facilities
-        description_short: *hygiene_basic_desc_short
-        unit: "%"
-        short_unit: "%"
-      rural_limited__without_water_or_soap:
-        title: Share of the rural population with limited hygiene facilities
-        description_short: *hygiene_limited_desc_short
-        unit: "%"
-        short_unit: "%"
-      rural_no_facility:
-        title: Share of the rural population with no hygiene facilities
         description_short: *hygiene_no_facility_desc_short
         unit: "%"
         short_unit: "%"
-      rural_annual_rate_of_change_in_basic:
-        title: Annual rate of change in the share of the rural population with basic hygiene facilities
-        unit: "percentage points"
-      urban_basic:
-        title: Share of the urban population with basic hygiene facilities
-        description_short: *hygiene_basic_desc_short
-        unit: "%"
-        short_unit: "%"
-      urban_limited__without_water_or_soap:
-        title: Share of the urban population with limited hygiene facilities
-        description_short: *hygiene_limited_desc_short
-        unit: "%"
-        short_unit: "%"
-      urban_no_facility:
-        title: Share of the urban population with no hygiene facilities
-        description_short: *hygiene_no_facility_desc_short
-        unit: "%"
-        short_unit: "%"
-      urban_annual_rate_of_change_in_basic:
-        title: Annual rate of change in the share of the urban population with basic hygiene facilities
-        unit: "percentage points"
-      total_basic:
-        title: Share of the population with basic hygiene facilities
-        description_short: *hygiene_basic_desc_short
-        unit: "%"
-        short_unit: "%"
-      total_limited__without_water_or_soap:
-        title: Share of the population with limited hygiene facilities
-        description_short: *hygiene_limited_desc_short
-        unit: "%"
-        short_unit: "%"
-      total_no_facility:
-        title: Share of the population with no hygiene facilities
-        description_short: *hygiene_no_facility_desc_short
-        unit: "%"
-        short_unit: "%"
-      total_annual_rate_of_change_in_basic:
-        title: Annual rate of change in the share of the population with basic hygiene facilities
-        unit: "percentage points"
-      population_urban_basic:
-        title: Urban population with basic hygiene facilities
-        description_short: *pop_hygiene_basic_desc_short
-        unit: "people"
+      wat_imp_pop:
+        title: The {definitions.residence_pop} population using improved water sources
+        description_short: *pop_water_improved_desc_short
+        unit: people
         display:
           numDecimalPlaces: 0
-      population_urban_limited__without_water_or_soap:
-        title: Urban population with limited hygiene facilities
-        description_short: *pop_hygiene_limited_desc_short
-        unit: "people"
+      wat_basal_pop:
+        title: The {definitions.residence_pop} population using at least basic drinking water services
+        description_short: *pop_water_basal_desc_short
+        unit: people
         display:
           numDecimalPlaces: 0
-      population_urban_no_facility:
-        title: Urban population with no hygiene facilities
-        description_short: *pop_hygiene_no_facility_desc_short
-        unit: "people"
+      wat_baso_pop:
+        title: The {definitions.residence_pop} population using only basic drinking water services
+        description_short: *pop_water_baso_desc_short
+        unit: people
         display:
           numDecimalPlaces: 0
-      population_rural_basic:
-        title: Rural population with basic hygiene facilities
-        description_short: *pop_hygiene_basic_desc_short
-        unit: "people"
-        display:
-          numDecimalPlaces: 0
-      population_rural_limited__without_water_or_soap:
-        title: Rural population with limited hygiene facilities
-        description_short: *pop_hygiene_limited_desc_short
-        unit: "people"
-        display:
-          numDecimalPlaces: 0
-      population_rural_no_facility:
-        title: Rural population with no hygiene facilities
-        description_short: *pop_hygiene_no_facility_desc_short
-        unit: "people"
-        display:
-          numDecimalPlaces: 0
-      population_total_basic:
-        title: Total population with basic hygiene facilities
-        description_short: *pop_hygiene_basic_desc_short
-        unit: "people"
-        display:
-          numDecimalPlaces: 0
-      population_total_limited__without_water_or_soap:
-        title: Total population with limited hygiene facilities
-        description_short: *pop_hygiene_limited_desc_short
-        unit: "people"
-        display:
-          numDecimalPlaces: 0
-      population_total_no_facility:
-        title: Total population with no hygiene facilities
-        description_short: *pop_hygiene_no_facility_desc_short
-        unit: "people"
-        display:
-          numDecimalPlaces: 0
-  menstrual_health:
-    variables:
-      rural_proportion_of_women_and_girls_age_15_49_who_have_menstruated_in_the_previous_year_awareness_of_menstruation_before_menarche:
-        title: Share of rural women aged 15-49 who were aware of menstruation before their first period
-        description_short: Share of rural women aged 15-49 who have menstruated in the previous year who were aware of menstruation before their first period.
-        unit: "%"
-        short_unit: "%"
-      rural_proportion_of_women_and_girls_age_15_49_who_have_menstruated_in_the_previous_year_private_place_to_wash_and_change:
-        title: Share of rural women aged 15-49 who have access to a private place to wash and change
-        description_short: Share of rural women aged 15-49 who have menstruated in the previous year who have access to a private place to wash and change while at home.
-        unit: "%"
-        short_unit: "%"
-      rural_proportion_of_women_and_girls_age_15_49_who_have_menstruated_in_the_previous_year_participation_in_activities_during_menstruation:
-        title: Share of rural women aged 15-49 who participate in activities during menstruation
-        description_short: Share of rural women aged 15-49 who have menstruated in the previous year who participate in activities during menstruation.
-        unit: "%"
-        short_unit: "%"
-      rural_proportion_of_women_and_girls_age_15_49_who_have_menstruated_in_the_previous_year_use_of_menstrual_materials:
-        title: Share of rural women aged 15-49 who use menstrual materials
-        description_short: Share of rural women aged 15-49 who have menstruated in the previous year who use menstrual materials to capture and contain menstrual blood, such as sanitary pads, cloth, tampons, or cups.
-        unit: "%"
-        short_unit: "%"
-      rural_proportion_of_women_and_girls_age_15_49_who_have_menstruated_in_the_previous_year_use_of_reusable_materials:
-        title: Share of rural women aged 15-49 who use reusable menstrual materials
-        description_short: Share of women aged 15-49 who have menstruated in the previous year who use reusable menstrual materials to capture and contain menstrual blood.
-        unit: "%"
-        short_unit: "%"
-      rural_proportion_of_women_and_girls_age_15_49_who_have_menstruated_in_the_previous_year_use_of_single_use_materials:
-        title: Share of rural women aged 15-49 who use single-use menstrual materials
-        description_short: Share of women aged 15-49 who have menstruated in the previous year who use single-use menstrual materials to capture and contain menstrual blood.
-        unit: "%"
-        short_unit: "%"
-      urban_proportion_of_women_and_girls_age_15_49_who_have_menstruated_in_the_previous_year_awareness_of_menstruation_before_menarche:
-        title: Share of urban women aged 15-49 who were aware of menstruation before their first period
-        description_short: Share of urban women aged 15-49 who have menstruated in the previous year who were aware of menstruation before their first period.
-        unit: "%"
-        short_unit: "%"
-      urban_proportion_of_women_and_girls_age_15_49_who_have_menstruated_in_the_previous_year_private_place_to_wash_and_change:
-        title: Share of urban women aged 15-49 who have access to a private place to wash and change
-        description_short: Share of urban women aged 15-49 who have menstruated in the previous year who have access to a private place to wash and change while at home.
-        unit: "%"
-        short_unit: "%"
-      urban_proportion_of_women_and_girls_age_15_49_who_have_menstruated_in_the_previous_year_participation_in_activities_during_menstruation:
-        title: Share of urban women aged 15-49 who participate in activities during menstruation
-        description_short: Share of urban women aged 15-49 who have menstruated in the previous year who participate in activities during menstruation.
-        unit: "%"
-        short_unit: "%"
-      urban_proportion_of_women_and_girls_age_15_49_who_have_menstruated_in_the_previous_year_use_of_menstrual_materials:
-        title: Share of urban women aged 15-49 who use menstrual materials
-        description_short: Share of urban women and girls aged 15-49 who have menstruated in the previous year who use menstrual materials to capture and contain menstrual blood, such as sanitary pads, cloth, tampons, or cups.
-        unit: "%"
-      urban_proportion_of_women_and_girls_age_15_49_who_have_menstruated_in_the_previous_year_use_of_reusable_materials:
-        title: Share of urban women aged 15-49 who use reusable menstrual materials
-        description_short: Share of women aged 15-49 who have menstruated in the previous year who use reusable menstrual materials to capture and contain menstrual blood.
-        unit: "%"
-        short_unit: "%"
-      urban_proportion_of_women_and_girls_age_15_49_who_have_menstruated_in_the_previous_year_use_of_single_use_materials:
-        title: Share of urban women aged 15-49 who use single-use menstrual materials
-        description_short: Share of urban women aged 15-49 who have menstruated in the previous year who use single-use menstrual materials to capture and contain menstrual blood.
-        unit: "%"
-        short_unit: "%"
-      total_proportion_of_women_and_girls_age_15_49_who_have_menstruated_in_the_previous_year_awareness_of_menstruation_before_menarche:
-        title: Share of women aged 15-49 who were aware of menstruation before their first period
-        description_short: Share of women aged 15-49 who have menstruated in the previous year who were aware of menstruation before their first period.
-        unit: "%"
-        short_unit: "%"
-      total_proportion_of_women_and_girls_age_15_49_who_have_menstruated_in_the_previous_year_private_place_to_wash_and_change:
-        title: Share of women aged 15-49 who have access to a private place to wash and change
-        description_short: Share of women aged 15-49 who have menstruated in the previous year who have access to a private place to wash and change while at home.
-        unit: "%"
-        short_unit: "%"
-      total_proportion_of_women_and_girls_age_15_49_who_have_menstruated_in_the_previous_year_participation_in_activities_during_menstruation:
-        title: Share of women aged 15-49 who participate in activities during menstruation
-        description_short: Share of women aged 15-49 who have menstruated in the previous year who participate in activities during menstruation.
-        unit: "%"
-        short_unit: "%"
-      total_proportion_of_women_and_girls_age_15_49_who_have_menstruated_in_the_previous_year_use_of_menstrual_materials:
-        title: Share of women aged 15-49 who use menstrual materials
-        description_short: Share of women aged 15-49 who have menstruated in the previous year who use menstrual materials to capture and contain menstrual blood, such as sanitary pads, cloth, tampons, or cups.
-        unit: "%"
-        short_unit: "%"
-      total_proportion_of_women_and_girls_age_15_49_who_have_menstruated_in_the_previous_year_use_of_reusable_materials:
-        title: Share of women aged 15-49 who use reusable menstrual materials
-        description_short: Share of women aged 15-49 who have menstruated in the previous year who use reusable menstrual materials to capture and contain menstrual blood.
-        unit: "%"
-        short_unit: "%"
-      total_proportion_of_women_and_girls_age_15_49_who_have_menstruated_in_the_previous_year_use_of_single_use_materials:
-        title: Share of women aged 15-49 who use single-use menstrual materials
-        description_short: Share of women aged 15-49 who have menstruated in the previous year who use single-use menstrual materials to capture and contain menstrual blood.
-        unit: "%"
-        short_unit: "%"
-      population_women_age_15_49_awareness_of_menstruation_before_menarche:
-        title: Population of women aged 15-49 who were aware of menstruation before their first period
-        description_short: Population of women aged 15-49 who have menstruated in the previous year who were aware of menstruation before their first period.
-        unit: women aged 15-49
-        display:
-          numDecimalPlaces: 0
-      population_women_age_15_49_private_place_to_wash_and_change:
-        title: Population of women aged 15-49 who have a private place to wash and change
-        description_short: Population of women aged 15-49 who have menstruated in the previous year who have access to a private place to wash and change while at home.
-        unit: women aged 15-49
-        display:
-          numDecimalPlaces: 0
-      population_women_age_15_49_participation_in_activities_during_menstruation:
-        title: Population of women aged 15-49 who participate in activities during menstruation
-        description_short: Population of women aged 15-49 who have menstruated in the previous year who participate in activities during menstruation.
-        unit: women aged 15-49
-        display:
-          numDecimalPlaces: 0
-      population_women_age_15_49_use_of_menstrual_materials:
-        title: Population of women aged 15-49 who use menstrual materials
-        description_short: Population of women aged 15-49 who have menstruated in the previous year who use menstrual materials to capture and contain menstrual blood, such as sanitary pads, cloth, tampons, or cups.
-        unit: women aged 15-49
-        display:
-          numDecimalPlaces: 0
-      population_women_age_15_49_use_of_reusable_materials:
-        title: Population of women aged 15-49 who use reusable menstrual materials
-        description_short: Population of women aged 15-49 who have menstruated in the previous year who use reusable menstrual materials to capture and contain menstrual blood.
-        unit: women aged 15-49
-        display:
-          numDecimalPlaces: 0
-      population_women_age_15_49_use_of_single_use_materials:
-        title: Population of women aged 15-49 who use single-use menstrual materials
-        description_short: Population of women aged 15-49 who have menstruated in the previous year who use single-use menstrual materials to capture and contain menstrual blood.
-        unit: women aged 15-49
-        display:
-          numDecimalPlaces: 0
-  sanitation:
-    variables:
-      rural_at_least_basic:
-        title: Share of the rural population with at least basic sanitation facilities
-        description_short: *sanitation_basic_desc_short
-        unit: "%"
-        short_unit: "%"
-      rural_limited__shared:
-        title: Share of the rural population with limited sanitation facilities
-        description_short: *sanitation_limited_desc_short
-        unit: "%"
-        short_unit: "%"
-      rural_unimproved:
-        title: Share of the rural population with unimproved sanitation facilities
-        description_short: *sanitation_unimproved_desc_short
-        unit: "%"
-      rural_open_defecation:
-        title: Share of the rural population practicing open defecation
-        description_short: *sanitation_open_defecation_desc_short
-        unit: "%"
-        short_unit: "%"
-      rural_annual_rate_of_change_in__at_least_basic:
-        title: Annual rate of change in the share of the rural population with at least basic sanitation facilities
-        unit: "percentage points"
-      rural_annual_rate_of_change_in_open_defecation:
-        title: Annual rate of change in the share of the rural population practicing open defecation
-        unit: "percentage points"
-      urban_at_least_basic:
-        title: Share of the urban population with at least basic sanitation facilities
-        description_short: *sanitation_basic_desc_short
-        unit: "%"
-        short_unit: "%"
-      urban_limited__shared:
-        title: Share of the urban population with limited sanitation facilities
-        description_short: *sanitation_limited_desc_short
-        unit: "%"
-        short_unit: "%"
-      urban_unimproved:
-        title: Share of the urban population with unimproved sanitation facilities
-        description_short: *sanitation_unimproved_desc_short
-        unit: "%"
-        short_unit: "%"
-      urban_open_defecation:
-        title: Share of the urban population practicing open defecation
-        description_short: *sanitation_open_defecation_desc_short
-        unit: "%"
-        short_unit: "%"
-      urban_annual_rate_of_change_in__at_least_basic:
-        title: Annual rate of change in the share of the urban population with at least basic sanitation facilities
-        unit: "percentage points"
-      urban_annual_rate_of_change_in_open_defecation:
-        title: Annual rate of change in the share of the urban population practicing open defecation
-        unit: "percentage points"
-      total_at_least_basic:
-        title: Share of the population with at least basic sanitation facilities
-        description_short: *sanitation_basic_desc_short
-        unit: "%"
-        short_unit: "%"
-      total_limited__shared:
-        title: Share of the population with limited sanitation facilities
-        description_short: *sanitation_limited_desc_short
-        unit: "%"
-        short_unit: "%"
-      total_unimproved:
-        title: Share of the population with unimproved sanitation facilities
-        description_short: *sanitation_unimproved_desc_short
-        unit: "%"
-        short_unit: "%"
-      total_open_defecation:
-        title: Share of the population practicing open defecation
-        description_short: *sanitation_open_defecation_desc_short
-        unit: "%"
-        short_unit: "%"
-      total_annual_rate_of_change_in__at_least_basic:
-        title: Annual rate of change in the share of the population with at least basic sanitation facilities
-        unit: "percentage points"
-      total_annual_rate_of_change_in_open_defecation:
-        title: Annual rate of change in the share of the population practicing open defecation
-        unit: "percentage points"
-      rural_proportion_of_population_using_improved__sanitation_facilities__excluding_shared__safely_managed:
-        title: Share of the rural population using improved sanitation facilities (excluding shared facilities) that are safely managed
-        description_short: *sanitation_safe_management_desc_short
-        unit: "%"
-        short_unit: "%"
-      rural_proportion_of_population_using_improved__sanitation_facilities__excluding_shared__disposed_in_situ:
-        title: Share of the rural population using improved sanitation facilities (excluding shared facilities) that are disposed in situ
-        description_short: *sanitation_disposed_in_situ_desc_short
-        unit: "%"
-        short_unit: "%"
-      rural_proportion_of_population_using_improved__sanitation_facilities__excluding_shared__emptied_and_treated:
-        title: Share of the rural population using improved sanitation facilities (excluding shared facilities) that are emptied and treated
-        description_short: *sanitation_emptied_and_treated_desc_short
-        unit: "%"
-        short_unit: "%"
-      rural_proportion_of_population_using_improved__sanitation_facilities__excluding_shared__wastewater_treated:
-        title: Share of the rural population using improved sanitation facilities (excluding shared facilities) that are connected to sewer systems and where wastewater is treated
-        description_short: *sanitation_wastewater_treated_desc_short
-        unit: "%"
-        short_unit: "%"
-      rural_proportion_of_population_using_improved__sanitation_facilities__excluding_shared__annual_rate_of_change_in_safely_managed:
-        title: Annual rate of change in the share of the rural population using improved sanitation facilities (excluding shared facilities) that are safely managed
-        unit: "percentage points"
-      rural_proportion_of_population_using_improved__sanitation_facilities__including_shared__latrines_and_other:
-        title: Share of the rural population using improved sanitation facilities (including shared facilities) that are latrines and other
-        description_short: *sanitation_latrines_desc_short
-        unit: "%"
-        short_unit: "%"
-      rural_proportion_of_population_using_improved__sanitation_facilities__including_shared__septic_tanks:
-        title: Share of the rural population using improved sanitation facilities (including shared facilities) that are septic tanks
-        description_short: *sanitation_septic_tanks_desc_short
-        unit: "%"
-        short_unit: "%"
-      rural_proportion_of_population_using_improved__sanitation_facilities__including_shared__sewer_connections:
-        title: Share of the rural population using improved sanitation facilities (including shared facilities) that are sewer connections
-        description_short: *sanitation_sewer_systems_desc_short
-        unit: "%"
-        short_unit: "%"
-      urban_proportion_of_population_using_improved__sanitation_facilities__excluding_shared__safely_managed:
-        title: Share of the urban population using improved sanitation facilities (excluding shared facilities) that are safely managed
-        description_short: *sanitation_safe_management_desc_short
-        unit: "%"
-        short_unit: "%"
-      urban_proportion_of_population_using_improved__sanitation_facilities__excluding_shared__disposed_in_situ:
-        title: Share of the urban population using improved sanitation facilities (excluding shared facilities) that are disposed in situ
-        description_short: *sanitation_disposed_in_situ_desc_short
-        unit: "%"
-        short_unit: "%"
-      urban_proportion_of_population_using_improved__sanitation_facilities__excluding_shared__emptied_and_treated:
-        title: Share of the urban population using improved sanitation facilities (excluding shared facilities) that are emptied and treated
-        description_short: *sanitation_emptied_and_treated_desc_short
-        unit: "%"
-        short_unit: "%"
-      urban_proportion_of_population_using_improved__sanitation_facilities__excluding_shared__wastewater_treated:
-        title: Share of the urban population using improved sanitation facilities (excluding shared facilities) that are connected to sewer systems and where wastewater is treated
-        description_short: *sanitation_wastewater_treated_desc_short
-        unit: "%"
-        short_unit: "%"
-      urban_proportion_of_population_using_improved__sanitation_facilities__excluding_shared__annual_rate_of_change_in_safely_managed:
-        title: Annual rate of change in the share of the urban population using improved sanitation facilities (excluding shared facilities) that are safely managed
-        unit: "percentage points"
-      urban_proportion_of_population_using_improved__sanitation_facilities__including_shared__latrines_and_other:
-        title: Share of the urban population using improved sanitation facilities (including shared facilities) that are latrines and other
-        description_short: *sanitation_latrines_desc_short
-        unit: "%"
-        short_unit: "%"
-      urban_proportion_of_population_using_improved__sanitation_facilities__including_shared__septic_tanks:
-        title: Share of the urban population using improved sanitation facilities (including shared facilities) that are septic tanks
-        description_short: *sanitation_septic_tanks_desc_short
-        unit: "%"
-        short_unit: "%"
-      urban_proportion_of_population_using_improved__sanitation_facilities__including_shared__sewer_connections:
-        title: Share of the urban population using improved sanitation facilities (including shared facilities) that are sewer connections
-        description_short: *sanitation_sewer_systems_desc_short
-        unit: "%"
-        short_unit: "%"
-      total_proportion_of_population_using_improved__sanitation_facilities__excluding_shared__safely_managed:
-        title: Share of the population using improved sanitation facilities (excluding shared facilities) that are safely managed
-        description_short: *sanitation_safe_management_desc_short
-        unit: "%"
-      total_proportion_of_population_using_improved__sanitation_facilities__excluding_shared__disposed_in_situ:
-        title: Share of the population using improved sanitation facilities (excluding shared facilities) that are disposed in situ
-        description_short: *sanitation_disposed_in_situ_desc_short
-        unit: "%"
-      total_proportion_of_population_using_improved__sanitation_facilities__excluding_shared__emptied_and_treated:
-        title: Share of the population using improved sanitation facilities (excluding shared facilities) that are emptied and treated
-        description_short: *sanitation_emptied_and_treated_desc_short
-        unit: "%"
-        short_unit: "%"
-      total_proportion_of_population_using_improved__sanitation_facilities__excluding_shared__wastewater_treated:
-        title: Share of the population using improved sanitation facilities (excluding shared facilities) that are connected to sewer systems and where wastewater is treated
-        description_short: *sanitation_wastewater_treated_desc_short
-        unit: "%"
-        short_unit: "%"
-      total_proportion_of_population_using_improved__sanitation_facilities__excluding_shared__annual_rate_of_change_in_safely_managed:
-        title: Annual rate of change in the share of the population using improved sanitation facilities (excluding shared facilities) that are safely managed
-        unit: "percentage points"
-      total_proportion_of_population_using_improved__sanitation_facilities__including_shared__latrines_and_other:
-        title: Share of the total population using improved sanitation facilities (including shared facilities) that are latrines and other
-        description_short: *sanitation_latrines_desc_short
-        unit: "%"
-        short_unit: "%"
-      total_proportion_of_population_using_improved__sanitation_facilities__including_shared__septic_tanks:
-        title: Share of the total population using improved sanitation facilities (including shared facilities) that are septic tanks
-        description_short: *sanitation_septic_tanks_desc_short
-        unit: "%"
-        short_unit: "%"
-      total_proportion_of_population_using_improved__sanitation_facilities__including_shared__sewer_connections:
-        title: Share of the total population using improved sanitation facilities (including shared facilities) that are sewer connections
-        description_short: *sanitation_sewer_systems_desc_short
-        unit: "%"
-        short_unit: "%"
-      population_urban_at_least_basic:
-        title: Urban population with at least basic sanitation facilities
-        description_short: *pop_sanitation_basic_desc_short
-        unit: "people"
-        display:
-          numDecimalPlaces: 0
-      population_urban_limited__shared:
-        title: Urban population with limited sanitation facilities
-        description_short: *pop_sanitation_limited_desc_short
-        unit: "people"
-        display:
-          numDecimalPlaces: 0
-      population_urban_unimproved:
-        title: Urban population with unimproved sanitation facilities
-        description_short: *pop_sanitation_unimproved_desc_short
-        unit: "people"
-        display:
-          numDecimalPlaces: 0
-      population_urban_open_defecation:
-        title: Urban population practicing open defecation
-        description_short: *pop_sanitation_open_defecation_desc_short
-        unit: "people"
-        display:
-          numDecimalPlaces: 0
-      population_rural_at_least_basic:
-        title: Rural population with at least basic sanitation facilities
-        description_short: *pop_sanitation_basic_desc_short
-        unit: "people"
-        display:
-          numDecimalPlaces: 0
-      population_rural_limited__shared:
-        title: Rural population with limited sanitation facilities
-        description_short: *pop_sanitation_limited_desc_short
-        unit: "people"
-        display:
-          numDecimalPlaces: 0
-      population_rural_unimproved:
-        title: Rural population with unimproved sanitation facilities
-        description_short: *pop_sanitation_unimproved_desc_short
-        unit: "people"
-        display:
-          numDecimalPlaces: 0
-      population_rural_open_defecation:
-        title: Rural population practicing open defecation
-        description_short: *pop_sanitation_open_defecation_desc_short
-        unit: "people"
-        display:
-          numDecimalPlaces: 0
-      population_total_at_least_basic:
-        title: Total population with at least basic sanitation facilities
-        description_short: *pop_sanitation_basic_desc_short
-        unit: "people"
-        display:
-          numDecimalPlaces: 0
-      population_total_limited__shared:
-        title: Total population with limited sanitation facilities
-        description_short: *pop_sanitation_limited_desc_short
-        unit: "people"
-        display:
-          numDecimalPlaces: 0
-      population_total_unimproved:
-        title: Total population with unimproved sanitation facilities
-        description_short: *pop_sanitation_unimproved_desc_short
-        unit: "people"
-        display:
-          numDecimalPlaces: 0
-      population_total_open_defecation:
-        title: Total population practicing open defecation
-        description_short: *pop_sanitation_open_defecation_desc_short
-        unit: "people"
-        display:
-          numDecimalPlaces: 0
-  water:
-    variables:
-      rural_at_least_basic:
-        title: Share of the rural population with at least basic drinking water services
-        description_short: *water_basic_desc_short
-        unit: "%"
-        short_unit: "%"
-      rural_limited__more_than_30_mins:
-        title: Share of the rural population with limited drinking water services
-        description_short: *water_limited_desc_short
-        unit: "%"
-        short_unit: "%"
-      rural_unimproved:
-        title: Share of the rural population with unimproved drinking water services
-        description_short: *water_unimproved_desc_short
-        unit: "%"
-        short_unit: "%"
-      rural_surface_water:
-        title: Share of the rural population using surface water as a primary source of drinking water
-        description_short: *water_surface_desc_short
-        unit: "%"
-        short_unit: "%"
-      rural_annual_rate_of_change_in__at_least_basic:
-        title: Annual rate of change in the share of the rural population with at least basic drinking water services
-        unit: "percentage points"
-      urban_at_least_basic:
-        title: Share of the urban population with at least basic drinking water services
-        description_short: *water_basic_desc_short
-        unit: "%"
-        short_unit: "%"
-      urban_limited__more_than_30_mins:
-        title: Share of the urban population with limited drinking water services
-        description_short: *water_limited_desc_short
-        unit: "%"
-        short_unit: "%"
-      urban_unimproved:
-        title: Share of the urban population with unimproved drinking water services
-        description_short: *water_unimproved_desc_short
-        unit: "%"
-        short_unit: "%"
-      urban_surface_water:
-        title: Share of the urban population using surface water as a primary source of drinking water
-        description_short: *water_surface_desc_short
-        unit: "%"
-        short_unit: "%"
-      urban_annual_rate_of_change_in__at_least_basic:
-        title: Annual rate of change in the share of the urban population with at least basic drinking water services
-        unit: "percentage points"
-      total_at_least_basic:
-        title: Share of the population with at least basic drinking water services
-        description_short: *water_basic_desc_short
-        unit: "%"
-        short_unit: "%"
-      total_limited__more_than_30_mins:
-        title: Share of the population with limited drinking water services
-        description_short: *water_limited_desc_short
-        unit: "%"
-        short_unit: "%"
-      total_unimproved:
-        title: Share of the population with unimproved drinking water services
-        description_short: *water_unimproved_desc_short
-        unit: "%"
-        short_unit: "%"
-      total_surface_water:
-        title: Share of the population using surface water as a primary source of drinking water
-        description_short: *water_surface_desc_short
-        unit: "%"
-        short_unit: "%"
-      total_annual_rate_of_change_in__at_least_basic:
-        title: Annual rate of change in the share of the population with at least basic drinking water services
-        unit: "percentage points"
-      rural_proportion_of_population_using__improved_water_supplies_safely_managed:
-        title: Share of the rural population using improved water supplies that are safely managed
-        description_short: *water_safely_managed_desc_short
-        unit: "%"
-        short_unit: "%"
-      rural_proportion_of_population_using__improved_water_supplies_accessible_on_premises:
-        title: Share of the rural population using improved water supplies that are accessible on premises
-        description_short: *water_accessible_on_premises_desc_short
-        unit: "%"
-        short_unit: "%"
-      rural_proportion_of_population_using__improved_water_supplies_available_when_needed:
-        title: Share of the rural population using improved water supplies that are available when needed
-        description_short: *water_available_when_needed_desc_short
-        unit: "%"
-        short_unit: "%"
-      rural_proportion_of_population_using__improved_water_supplies_free_from_contamination:
-        title: Share of the rural population using improved water supplies that are free from contamination
-        description_short: *water_free_from_contamination_desc_short
-        unit: "%"
-        short_unit: "%"
-      rural_proportion_of_population_using__improved_water_supplies_annual_rate_of_change_in_safely_managed:
-        title: Annual rate of change in the share of the rural population using improved water supplies that are safely managed
-        unit: "percentage points"
-      rural_proportion_of_population_using__improved_water_supplies_piped:
-        title: Share of the rural population using improved water supplies that are piped
-        description_short: *water_piped_desc_short
-        unit: "%"
-        short_unit: "%"
-      rural_proportion_of_population_using__improved_water_supplies_non_piped:
-        title: Share of the rural population using improved water supplies that are not piped
-        description_short: *water_non_piped_desc_short
-        unit: "%"
-        short_unit: "%"
-      urban_proportion_of_population_using__improved_water_supplies_safely_managed:
-        title: Share of the urban population using improved water supplies that are safely managed
-        description_short: *water_safely_managed_desc_short
-        unit: "%"
-        short_unit: "%"
-      urban_proportion_of_population_using__improved_water_supplies_accessible_on_premises:
-        title: Share of the urban population using improved water supplies that are accessible on premises
-        description_short: *water_accessible_on_premises_desc_short
-        unit: "%"
-        short_unit: "%"
-      urban_proportion_of_population_using__improved_water_supplies_available_when_needed:
-        title: Share of the urban population using improved water supplies that are available when needed
-        description_short: *water_available_when_needed_desc_short
-        unit: "%"
-        short_unit: "%"
-      urban_proportion_of_population_using__improved_water_supplies_free_from_contamination:
-        title: Share of the urban population using improved water supplies that are free from contamination
-        description_short: *water_free_from_contamination_desc_short
-        unit: "%"
-        short_unit: "%"
-      urban_proportion_of_population_using__improved_water_supplies_annual_rate_of_change_in_safely_managed:
-        title: Annual rate of change in the share of the urban population using improved water supplies that are safely managed
-        unit: "percentage points"
-      urban_proportion_of_population_using__improved_water_supplies_piped:
-        title: Share of the urban population using improved water supplies that are piped
-        description_short: *water_piped_desc_short
-        unit: "%"
-        short_unit: "%"
-      urban_proportion_of_population_using__improved_water_supplies_non_piped:
-        title: Share of the urban population using improved water supplies that are not piped
-        description_short: *water_non_piped_desc_short
-        unit: "%"
-        short_unit: "%"
-      total_proportion_of_population_using__improved_water_supplies_safely_managed:
-        title: Share of the population using improved water supplies that are safely managed
-        description_short: *water_safely_managed_desc_short
-        unit: "%"
-        short_unit: "%"
-      total_proportion_of_population_using__improved_water_supplies_accessible_on_premises:
-        title: Share of the population using improved water supplies that are accessible on premises
-        description_short: *water_accessible_on_premises_desc_short
-        unit: "%"
-        short_unit: "%"
-      total_proportion_of_population_using__improved_water_supplies_available_when_needed:
-        title: Share of the population using improved water supplies that are available when needed
-        description_short: *water_available_when_needed_desc_short
-        unit: "%"
-        short_unit: "%"
-      total_proportion_of_population_using__improved_water_supplies_free_from_contamination:
-        title: Share of the population using improved water supplies that are free from contamination
-        description_short: *water_free_from_contamination_desc_short
-        unit: "%"
-        short_unit: "%"
-      total_proportion_of_population_using__improved_water_supplies_annual_rate_of_change_in_safely_managed:
-        title: Annual rate of change in the share of the population using improved water supplies that are safely managed
-        unit: "percentage points"
-      total_proportion_of_population_using__improved_water_supplies_piped:
-        title: Share of the population using improved water supplies that are piped
-        description_short: *water_piped_desc_short
-        unit: "%"
-        short_unit: "%"
-      total_proportion_of_population_using__improved_water_supplies_non_piped:
-        title: Share of the population using improved water supplies that are not piped
-        description_short: *water_non_piped_desc_short
-        unit: "%"
-        short_unit: "%"
-      population_urban_at_least_basic:
-        title: Urban population with at least basic drinking water services
-        description_short: *pop_water_basic_desc_short
-        unit: "people"
-        display:
-          numDecimalPlaces: 0
-      population_urban_limited__more_than_30_mins:
-        title: Urban population with limited drinking water services
+      wat_lim_pop:
+        title: The {definitions.residence_pop} population using limited drinking water services
         description_short: *pop_water_limited_desc_short
-        unit: "people"
+        unit: people
         display:
           numDecimalPlaces: 0
-      population_urban_unimproved:
-        title: Urban population with unimproved drinking water services
+      wat_unimp_pop:
+        title: The {definitions.residence_pop} population using unimproved drinking water services
         description_short: *pop_water_unimproved_desc_short
-        unit: "people"
+        unit: people
         display:
           numDecimalPlaces: 0
-      population_urban_surface_water:
-        title: Urban population using surface water as a primary source of drinking water
+      wat_ns_pop:
+        title: The {definitions.residence_pop} population using surface water as a primary source of drinking water
         description_short: *pop_water_surface_desc_short
-        unit: "people"
+        unit: people
         display:
           numDecimalPlaces: 0
-      population_rural_at_least_basic:
-        title: Rural population with at least basic drinking water services
-        description_short: *pop_water_basic_desc_short
-        unit: "people"
+      wat_pip_pop:
+        title: The {definitions.residence_pop} population using improved drinking water services that are piped
+        description_short: *pop_water_piped_desc_short
+        unit: people
         display:
           numDecimalPlaces: 0
-      population_rural_limited__more_than_30_mins:
-        title: Rural population with limited drinking water services
-        description_short: *pop_water_limited_desc_short
-        unit: "people"
+      wat_imp_npip_pop:
+        title: The {definitions.residence_pop} population using improved drinking water services that are not piped
+        description_short: *pop_water_non_piped_desc_short
+        unit: people
         display:
           numDecimalPlaces: 0
-      population_rural_unimproved:
-        title: Rural population with unimproved drinking water services
-        description_short: *pop_water_unimproved_desc_short
-        unit: "people"
+      wat_imp_prem_pop:
+        title: The {definitions.residence_pop} population using improved drinking water services that are accessible on premises
+        description_short: *pop_water_accessible_on_premises_desc_short
+        unit: people
         display:
           numDecimalPlaces: 0
-      population_rural_surface_water:
-        title: Rural population using surface water as a primary source of drinking water
-        description_short: *pop_water_surface_desc_short
-        unit: "people"
+      wat_imp_av_pop:
+        title: The {definitions.residence_pop} population using improved drinking water services that are available when needed
+        description_short: *pop_water_available_when_needed_desc_short
+        unit: people
         display:
           numDecimalPlaces: 0
-      population_total_at_least_basic:
-        title: Total population with at least basic drinking water services
-        description_short: *pop_water_basic_desc_short
-        unit: "people"
+      wat_imp_qual_pop:
+        title: The {definitions.residence_pop} population using improved drinking water services that are free from contamination
+        description_short: *pop_water_free_from_contamination_desc_short
+        unit: people
         display:
           numDecimalPlaces: 0
-      population_total_limited__more_than_30_mins:
-        title: Total population with limited drinking water services
-        description_short: *pop_water_limited_desc_short
-        unit: "people"
+      wat_sm_pop:
+        title: The {definitions.residence_pop} population using safely managed drinking water services
+        description_short: *pop_water_safely_managed_desc_short
+        unit: people
         display:
           numDecimalPlaces: 0
-      population_total_unimproved:
-        title: Total population with unimproved drinking water services
-        description_short: *pop_water_unimproved_desc_short
-        unit: "people"
+      san_imp_pop:
+        title: The {definitions.residence_pop} population using improved sanitation facilities
+        description_short: *pop_sanitation_improved_desc_short
+        unit: people
         display:
           numDecimalPlaces: 0
-      population_total_surface_water:
-        title: Total population using surface water as a primary source of drinking water
-        description_short: *pop_water_surface_desc_short
-        unit: "people"
+      san_basal_pop:
+        title: The {definitions.residence_pop} population using at least basic sanitation services, improved sanitation facilities which are not shared
+        description_short: *pop_sanitation_basal_desc_short
+        unit: people
+        display:
+          numDecimalPlaces: 0
+      san_baso_pop:
+        title: The {definitions.residence_pop} population using only basic sanitation services, improved sanitation facilities which are not shared
+        description_short: *pop_sanitation_baso_desc_short
+        unit: people
+        display:
+          numDecimalPlaces: 0
+      san_lim_pop:
+        title: The {definitions.residence_pop} population using limited sanitation services, improved sanitation facilities which are shared
+        description_short: *pop_sanitation_limited_desc_short
+        unit: people
+        display:
+          numDecimalPlaces: 0
+      san_unimp_pop:
+        title: The {definitions.residence_pop} population using unimproved sanitation facilities
+        description_short: *pop_sanitation_unimproved_desc_short
+        unit: people
+        display:
+          numDecimalPlaces: 0
+      san_ns_pop:
+        title: The {definitions.residence_pop} population practicing open defecation
+        description_short: *pop_sanitation_open_defecation_desc_short
+        unit: people
+        display:
+          numDecimalPlaces: 0
+      san_othimp_pop:
+        title: The {definitions.residence_pop} population using improved pit latrines or other on-site improved facilities (including shared)
+        description_short: *pop_sanitation_other_improved_desc_short
+        unit: people
+        display:
+          numDecimalPlaces: 0
+      san_sep_pop:
+        title: The {definitions.residence_pop} population using improved sanitation facilities connected to septic tanks (including shared)
+        description_short: *pop_sanitation_septic_tanks_desc_short
+        unit: people
+        display:
+          numDecimalPlaces: 0
+      san_sew_pop:
+        title: The {definitions.residence_pop} population using improved sanitation facilities connected to sewers (including shared)
+        description_short: *pop_sanitation_sewer_systems_desc_short
+        unit: people
+        display:
+          numDecimalPlaces: 0
+      san_sdo_sm_pop:
+        title: The {definitions.residence_pop} population using on-site sanitation facilities where wastes are safely disposed of in situ
+        description_short: *pop_sanitation_disposed_in_situ_desc_short
+        unit: people
+        display:
+          numDecimalPlaces: 0
+      san_fst_sm_pop:
+        title: The {definitions.residence_pop} population using on-site sanitation facilities where faecal sludge is removed and treated off-site
+        description_short: *pop_sanitation_emptied_and_treated_desc_short
+        unit: people
+        display:
+          numDecimalPlaces: 0
+      san_sew_sm_pop:
+        title: The {definitions.residence_pop} population using sewer connections where wastewater reaches treatment plants and is treated off-site
+        description_short: *pop_sanitation_wastewater_treated_desc_short
+        unit: people
+        display:
+          numDecimalPlaces: 0
+      san_sm_pop:
+        title: The {definitions.residence_pop} population using safely managed sanitation services
+        description_short: *pop_sanitation_safe_management_desc_short
+        unit: people
+        display:
+          numDecimalPlaces: 0
+      hyg_bas_pop:
+        title: The {definitions.residence_pop} population with access to a handwashing facility with soap and water at home (basic hygiene service)
+        description_short: *pop_hygiene_basic_desc_short
+        unit: people
+        display:
+          numDecimalPlaces: 0
+      hyg_lim_pop:
+        title: The {definitions.residence_pop} population with access to a limited handwashing services (a handwashing facility at home lacking soap and/or water)
+        description_short: *pop_hygiene_limited_desc_short
+      hyg_ns_pop:
+        title: The {definitions.residence_pop} population with no access to a handwashing service
+        description_short: *pop_hygiene_no_facility_desc_short
+        unit: people
         display:
           numDecimalPlaces: 0

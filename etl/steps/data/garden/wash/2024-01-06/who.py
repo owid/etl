@@ -29,11 +29,14 @@ def run(dest_dir: str) -> None:
     )
     # The population is given as 'population (thousands)
     tb["pop"] = tb["pop"].astype(float).multiply(1000)
-    #
+    tb = calculate_population_with_each_category(tb)
+    tb = tb.set_index(["country", "year", "residence"])
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = create_dataset(dest_dir, tables=tb, check_variables_metadata=True, default_metadata=ds_meadow.metadata)
+    ds_garden = create_dataset(
+        dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=ds_meadow.metadata
+    )
 
     # Save changes in the new garden dataset.
     ds_garden.save()
@@ -44,6 +47,22 @@ def drop_erroneous_rows(tb: Table) -> Table:
     The values for Kosovo are poorly formatted and the country name is given as a year. Let's remove those.
     """
     tb = tb[~tb["country"].str.startswith("2")]
+    return tb
+
+
+def calculate_population_with_each_category(tb: Table) -> Table:
+    """
+    Calculate the population living with each category and also by urban/rural.
+
+    Multiply each column by the 'pop' column and append '_pop' to the column name.
+
+    """
+    columns = tb.columns.drop(["country", "year", "pop", "residence"])
+
+    for col in columns:
+        tb[f"{col}_pop"] = tb[col] * tb["pop"]
+
+    tb = tb.drop(columns=["pop"])
     return tb
 
 
@@ -83,54 +102,4 @@ def drop_region_columns(tb: Table) -> Table:
     """
     columns_to_drop = [col for col in tb.columns if "region" in col.lower()]
     tb = tb.drop(columns_to_drop, axis=1)
-    return tb
-
-
-def calculate_population_with_each_category(tb: Table, table_name: str) -> Table:
-    """
-    For water, hygiene and sanitation calculate the population living with each category and also by urban/rural.
-
-    For menstrual health we just calculate number of women (aged 15-49) in each category.
-
-    """
-    areas = ["urban", "rural", "total"]
-    categories_water = ["at_least_basic", "limited__more_than_30_mins", "unimproved", "surface_water"]
-    categories_hygiene = ["basic", "limited__without_water_or_soap", "no_facility"]
-    categories_sanitation = ["at_least_basic", "limited__shared", "unimproved", "open_defecation"]
-
-    if table_name in ["sanitation", "water", "hygiene"]:
-        # Determine the appropriate list of categories
-        if table_name == "water":
-            categories = categories_water
-        elif table_name == "hygiene":
-            categories = categories_hygiene
-        elif table_name == "sanitation":
-            categories = categories_sanitation
-        else:
-            raise ValueError("Invalid table name")
-
-        # Perform the calculation
-        for area in areas:
-            for category in categories:
-                tb[f"population_{area}_{category}"] = (tb[f"{area}_{category}"].astype(float) / 100) * tb[
-                    f"{area}_population"
-                ]
-            tb = tb.drop(columns=f"{area}_population", axis=1)
-    elif table_name == "menstrual_health":
-        categories_menstrual = [
-            "awareness_of_menstruation_before_menarche",
-            "private_place_to_wash_and_change",
-            "participation_in_activities_during_menstruation",
-            "use_of_menstrual_materials",
-            "use_of_reusable_materials",
-            "use_of_single_use_materials",
-        ]
-        for category in categories_menstrual:
-            tb[f"population_women_age_15_49_{category}"] = (
-                tb[
-                    f"total_proportion_of_women_and_girls_age_15_49_who_have_menstruated_in_the_previous_year_{category}"
-                ].astype(float)
-                / 100
-            ) * tb["population_women_age_15_49"]
-        tb = tb.drop(columns="population_women_age_15_49", axis=1)
     return tb
