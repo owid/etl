@@ -35,7 +35,6 @@
     "**/docs/api/*.md",
     "**/docs/architecture/*.md"
   ],
-<<<<<<< HEAD
   "sqltools.connections": [
     {
       "mysqlOptions": {
@@ -77,8 +76,6 @@
       "database": "live_grapher"
     }
   ],
-=======
->>>>>>> master
   "files.exclude": {
     "etl/steps/archive": true,
     "snapshots/archive": true

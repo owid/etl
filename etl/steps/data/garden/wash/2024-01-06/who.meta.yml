@@ -40,10 +40,14 @@ definitions:
     Share of the {definitions.residence} population using improved sanitation facilities (including shared facilities) that have sewer connections. Improved sanitation facilities are those designed to hygienically separate excreta from human contact, and include: flush/pour flush toilets connected to piped sewer systems, septic tanks or pit latrines; pit latrines with slabs (including ventilated pit latrines), and composting toilets.
   water_safely_managed_description_short: &water_safely_managed_desc_short |
     Share of the {definitions.residence} population using safely managed drinking water services. Safely managed drinking water services are defined as an improved drinking water source that is located on premises, available when needed and free from faecal and priority chemical contamination.
-  water_basic_description_short: &water_basic_desc_short |
+  water_basal_description_short: &water_basic_desc_short |
     Share of the {definitions.residence} population using at least basic drinking water services. Basic drinking water services are defined as an improved drinking water source,provided collection time is not more than 30 minutes for a roundtrip including queuing.
+  water_baso_description_short: &water_basic_desc_short |
+    Share of the {definitions.residence} population using only basic drinking water services. Basic drinking water services are defined as an improved drinking water source,provided collection time is not more than 30 minutes for a roundtrip including queuing.
   water_limited_description_short: &water_limited_desc_short |
     Share of the {definitions.residence} population using limited drinking water services. Limited drinking water services are defined as drinking water from an improved source for which collection time exceeds 30 minutes for a roundtrip including queuing.
+  water_improved_description_short: &water_improved_desc_short |
+    Share of the {definitions.residence} population using improved drinking water services. Improved drinking water sources are those that have the potential to deliver safe water by nature of their design and construction, and include: piped water, boreholes or tubewells, protected dug wells, protected springs, rainwater, and packaged or delivered water.
   water_unimproved_description_short: &water_unimproved_desc_short |
     Share of the {definitions.residence} population using unimproved drinking water services. Unimproved drinking water services are defined as drinking water from an unprotected dug well or unprotected spring.
   water_surface_description_short: &water_surface_desc_short |
@@ -102,12 +106,24 @@ tables:
     variables:
       wat_imp:
         title: Share of the {definitions.residence} population using improved water sources
+        description_short: *water_improved_desc_short
+        unit: "%"
+        short_unit: "%"
       wat_basal:
         title: Share of the {definitions.residence} population using at least basic drinking water services
+        description_short: *water_basal_desc_short
+        unit: "%"
+        short_unit: "%"
       wat_baso:
         title: Share of the {definitions.residence} population using only basic drinking water services
+        description_short: *water_baso_desc_short
+        unit: "%"
+        short_unit: "%"
       wat_lim:
         title: Share of the {definitions.residence} population using limited drinking water services
+        description_short: *water_limited_desc_short
+        unit: "%"
+        short_unit: "%"
       wat_unimp:
         title: Share of the {definitions.residence} population using unimproved drinking water services
       wat_ns:
