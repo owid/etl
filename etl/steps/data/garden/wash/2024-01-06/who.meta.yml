@@ -268,7 +268,7 @@ tables:
         description_short: *hygiene_limited_desc_short
         unit: "%"
         short_unit: "%"
-      hyg_fac:
+      hyg_ns:
         title: Share of the population with no access to a handwashing service
         description_short: *hygiene_no_facility_desc_short
         unit: "%"
@@ -435,7 +435,7 @@ tables:
         unit: people
         display:
           numDecimalPlaces: 0
-      hyg_fac_pop:
+      hyg_ns_pop:
         title: The {definitions.residence_pop} population with no access to a handwashing service
         description_short: *pop_hygiene_no_facility_desc_short
         unit: people

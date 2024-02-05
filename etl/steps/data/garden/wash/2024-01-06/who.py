@@ -24,6 +24,7 @@ def run(dest_dir: str) -> None:
     tb = tb.rename(columns={"name": "country"})
     tb = tb.drop(columns=["iso3"], axis=1)
     tb = drop_erroneous_rows(tb)
+    tb = calculate_hygiene_no_services(tb)
     tb = geo.harmonize_countries(
         df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
     )
@@ -103,4 +104,13 @@ def drop_region_columns(tb: Table) -> Table:
     """
     columns_to_drop = [col for col in tb.columns if "region" in col.lower()]
     tb = tb.drop(columns_to_drop, axis=1)
+    return tb
+
+
+def calculate_hygiene_no_services(tb: Table) -> Table:
+    """
+    Calculate the proportion of the population with no services.
+
+    """
+    tb["hyg_ns"] = 100 - tb["hyg_fac"]
     return tb
