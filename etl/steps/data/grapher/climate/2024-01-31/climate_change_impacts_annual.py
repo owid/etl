@@ -13,10 +13,9 @@ def run(dest_dir: str) -> None:
     #
     # Load inputs.
     #
-    # Load garden dataset and read its main table.
+    # Load garden dataset and read its annual table.
     ds_garden = paths.load_dataset("climate_change_impacts")
     tb_annual = ds_garden["climate_change_impacts_annual"].reset_index()
-    # tb_monthly = ds_garden["climate_change_impacts_monthly"].reset_index()
 
     #
     # Process data.

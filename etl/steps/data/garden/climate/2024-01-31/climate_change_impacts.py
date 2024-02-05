@@ -12,6 +12,7 @@ paths = PathFinder(__file__)
 
 
 def prepare_sea_ice_extent(tb_nsidc: Table) -> Table:
+    tb_nsidc = tb_nsidc.copy()
     # Create a table with the minimum and maximum Arctic sea ice extent.
     # Assume minimum and maximum occur in September and February every year.
     tb_nsidc["month"] = tb_nsidc["date"].astype(str).str[5:7]
