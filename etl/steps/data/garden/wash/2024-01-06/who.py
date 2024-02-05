@@ -32,6 +32,7 @@ def run(dest_dir: str) -> None:
     tb["pop"] = tb["pop"].astype(float).multiply(1000)
     tb = calculate_population_with_each_category(tb)
     tb = calculate_population_without_service(tb)
+    tb = tb.drop(columns=["pop"])
     tb = tb.set_index(["country", "year", "residence"], verify_integrity=True)
     # Save outputs.
     #
@@ -65,7 +66,6 @@ def calculate_population_with_each_category(tb: Table) -> Table:
     for col in columns:
         tb[f"{col}_pop"] = (tb[col] / 100) * tb["pop"]
 
-    tb = tb.drop(columns=["pop"])
     return tb
 
 
@@ -114,6 +114,7 @@ def calculate_hygiene_no_services(tb: Table) -> Table:
 
     """
     tb["hyg_ns"] = 100 - tb["hyg_fac"]
+    tb = tb.drop(columns=["hyg_fac"], axis=1)
     return tb
 
 

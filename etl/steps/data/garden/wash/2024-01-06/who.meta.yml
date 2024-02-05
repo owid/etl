@@ -138,9 +138,17 @@ tables:
         description_short: *water_improved_desc_short
         unit: "%"
         short_unit: "%"
+      wat_imp_without:
+        title: Share of the {definitions.residence} population not using improved water sources
+        unit: "%"
+        short_unit: "%"
       wat_basal:
         title: Share of the {definitions.residence} population using at least basic drinking water services
         description_short: *water_basal_desc_short
+        unit: "%"
+        short_unit: "%"
+      wat_basal_without:
+        title: Share of the {definitions.residence} population not using at least basic drinking water services
         unit: "%"
         short_unit: "%"
       wat_baso:
@@ -193,9 +201,17 @@ tables:
         description_short: *water_safely_managed_desc_short
         unit: "%"
         short_unit: "%"
+      wat_sm_without:
+        title: Share of the {definitions.residence} population not using safely managed drinking water services
+        unit: "%"
+        short_unit: "%"
       san_imp:
         title: Share of the {definitions.residence} population using improved sanitation facilities
         description_short: *sanitation_improved_desc_short
+        unit: "%"
+        short_unit: "%"
+      san_imp_without:
+        title: Share of the {definitions.residence} population not using improved sanitation facilities
         unit: "%"
         short_unit: "%"
       san_basal:
@@ -258,9 +274,17 @@ tables:
         description_short: *sanitation_safe_management_desc_short
         unit: "%"
         short_unit: "%"
+      san_sm_without:
+        title: Share of the {definitions.residence} population not using safely managed sanitation services
+        unit: "%"
+        short_unit: "%"
       hyg_bas:
         title: Share of the population with access to a handwashing facility with soap and water at home (basic hygiene service)
         description_short: *hygiene_basic_desc_short
+        unit: "%"
+        short_unit: "%"
+      hyg_bas_without:
+        title: Share of the population without access to a handwashing facility with soap and water at home (basic hygiene service)
         unit: "%"
         short_unit: "%"
       hyg_lim:
@@ -279,9 +303,19 @@ tables:
         unit: people
         display:
           numDecimalPlaces: 0
+      wat_imp_pop_without:
+        title: The {definitions.residence_pop} population not using improved water sources
+        unit: people
+        display:
+          numDecimalPlaces: 0
       wat_basal_pop:
         title: The {definitions.residence_pop} population using at least basic drinking water services
         description_short: *pop_water_basal_desc_short
+        unit: people
+        display:
+          numDecimalPlaces: 0
+      wat_basal_pop_without:
+        title: The {definitions.residence_pop} population not using at least basic drinking water services, excluding those using improved drinking water sources
         unit: people
         display:
           numDecimalPlaces: 0
@@ -345,9 +379,19 @@ tables:
         unit: people
         display:
           numDecimalPlaces: 0
+      wat_sm_pop_without:
+        title: The {definitions.residence_pop} population not using safely managed drinking water services
+        unit: people
+        display:
+          numDecimalPlaces: 0
       san_imp_pop:
         title: The {definitions.residence_pop} population using improved sanitation facilities
         description_short: *pop_sanitation_improved_desc_short
+        unit: people
+        display:
+          numDecimalPlaces: 0
+      san_imp_pop_without:
+        title: The {definitions.residence_pop} population not using improved sanitation facilities
         unit: people
         display:
           numDecimalPlaces: 0
@@ -423,9 +467,19 @@ tables:
         unit: people
         display:
           numDecimalPlaces: 0
+      san_sm_pop_without:
+        title: The {definitions.residence_pop} population not using safely managed sanitation services
+        unit: people
+        display:
+          numDecimalPlaces: 0
       hyg_bas_pop:
         title: The {definitions.residence_pop} population with access to a handwashing facility with soap and water at home (basic hygiene service)
         description_short: *pop_hygiene_basic_desc_short
+        unit: people
+        display:
+          numDecimalPlaces: 0
+      hyg_bas_pop_without:
+        title: The {definitions.residence_pop} population without access to a handwashing facility with soap and water at home (basic hygiene service)
         unit: people
         display:
           numDecimalPlaces: 0
