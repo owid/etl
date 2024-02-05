@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "owid-catalog"
-version = "0.3.8"
+version = "0.3.9"
 description = "Core data types used by OWID for managing data."
 authors = ["Our World in Data <tech@ourworldindata.org>"]
 license = "MIT"

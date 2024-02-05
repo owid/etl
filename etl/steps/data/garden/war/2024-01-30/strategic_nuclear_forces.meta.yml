@@ -1,0 +1,96 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Nuclear Weapons
+        - War & Peace
+    processing_level: major
+  # delivery_platform: |-
+  #   A delivery platform refers to the system used to transport and deliver at least one nuclear weapon to its intended target. They can be land-based, sea-based, or air-based.
+  # strategic_nuclear_mission: |-
+  #   Strategic nuclear missions include:
+  #   - Counter-value nuclear attacks, which aim at civilian targets such as population centers and major industrial complexes.
+  #   - Counter-force attacks, which aim at military targets such as an adversary's nuclear delivery platforms and command-and-control centers.
+  # delivery_platform_uses: |-
+  #   Some delivery platforms can be used solely for strategic nuclear missions, while others can be used for both strategic and battlefield nuclear missions.
+  # only_deployed_platforms: |-
+  #   This data contains information about strategic nuclear delivery platforms that have been deployed. Platforms that were tested but never deployed are not considered.
+  # yield: |-
+  #   The yield of a nuclear strike is measured in equivalent megatonnage (EMT). This is the destructive capability of all strategic nuclear warheads of one state that can be delivered to another state.
+  data_includes_all_states: |-
+    This data includes all nuclear-armed states from 1945 to 2010.
+  data_includes_strategic_warheads: |-
+    The warheads included here are strategic ones — those designed for use away from the battlefield, such as against military bases, arms industries, or infrastructure.
+  data_includes_deployable_strategic_warheads: |-
+    Only those strategic warheads are included that could be deployed — those that could be carried by ballistic missiles, bombers, and submarines in one strike.
+  number_of_warheads_uncertain: |-
+    The exact number of countries' warheads is secret, and the estimates are based on publicly available information, historical records, and experts' estimates.
+  world_area: |-
+    For reference, the world's current total urban land area is around 1.9 million square kilometers.
+  megaton: |-
+    A "megaton" is the explosive energy released by one million tons of TNT. For comparison, the bombs dropped on Hiroshima and Nagasaki were 0.015 and 0.021 megatons, respectively.
+  equivalent_megaton: |-
+    An equivalent megaton is a way of making the explosive energy of different warheads comparable. It weighs small warheads — in this case those with at most one megaton — more than large ones, because they are relatively more destructive.
+  area_destroyed: |-
+    This data refers to the destruction of unprotected structures, such as building and factories.
+  area_destroyed_calculation: |-
+    We calculate the destroyable area by multiplying the equivalent megatonnage of all warheads with the approximate area destroyed by one megaton (20 square miles) and then converting it into square kilometers.
+
+dataset:
+  update_period_days: 0
+
+tables:
+  strategic_nuclear_forces_dyadic: &all-variables-data
+    variables:
+      nuclear_warheads_owned:
+        title: Nuclear warheads possessed by a country
+        unit: warheads
+        short_unit: ""
+        description_key:
+          - "{definitions.data_includes_all_states}"
+          - "{definitions.number_of_warheads_uncertain}"
+          - "{definitions.data_includes_strategic_warheads}"
+          - "{definitions.data_includes_deployable_strategic_warheads}"
+        display:
+          numDecimalPlaces: 0
+      nuclear_warheads_deliverable:
+        title: Nuclear warheads deliverable in a first strike
+        unit: warheads
+        short_unit: ""
+        display:
+          numDecimalPlaces: 0
+        description_key:
+          - "{definitions.number_of_warheads_uncertain}"
+          - "{definitions.data_includes_strategic_warheads}"
+          - "{definitions.data_includes_deployable_strategic_warheads}"
+      nuclear_warheads_yield:
+        title: Nuclear warheads yield
+        unit: megatons
+        short_unit: mt
+        description_short: Equivalent megatonnage.
+        display:
+          numDecimalPlaces: 0
+        description_key:
+          - "{definitions.megaton}"
+          - "{definitions.equivalent_megaton}"
+          - "{definitions.number_of_warheads_uncertain}"
+          - "{definitions.data_includes_strategic_warheads}"
+          - "{definitions.data_includes_deployable_strategic_warheads}"
+      nuclear_warheads_area:
+        title: Area that can be destroyed by nuclear weapons in a first strike
+        description_short: Measured in square kilometers.
+        description_key:
+          - "{definitions.area_destroyed}"
+          - "{definitions.world_area}"
+          - "{definitions.area_destroyed_calculation}"
+          - "{definitions.megaton}"
+          - "{definitions.equivalent_megaton}"
+          - "{definitions.data_includes_strategic_warheads}"
+          - "{definitions.data_includes_deployable_strategic_warheads}"
+          - "{definitions.number_of_warheads_uncertain}"
+        unit: square kilometers
+        short_unit: km²
+        description_processing: |-
+          - The area that can be destroyed by nuclear weapons of a certain yield is calculated based on Richelson, Jeffrey. 1980. Evaluating the Strategic Balance. American Journal of Political Science 24(4): 782. We assume each equivalent megaton can destroy 20 square miles, which is equivalent to 51.8 square kilometers.
+  # For monadic data, simply repeat all the above metadata.
+  strategic_nuclear_forces_monadic: *all-variables-data

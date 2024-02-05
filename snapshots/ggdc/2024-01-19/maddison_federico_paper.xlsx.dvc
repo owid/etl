@@ -1,0 +1,32 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/origin/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: How many people on earth? World population 1800 1938
+    description: |-
+      The number of people is one of the most basic information about any society but it is difficult to know it. The data are missing for most of human history and scarce and/or hardly reliable for advanced countries until the early 19th century and for the rest of the world until the mid-20th century. Yet, historical demographers have tried hard and often successfully to estimate population in the past, but their results have often been neglected in the most common general historical data-bases. Thus, we do not have a continuous series of world population at least until World War One if not until 1950. In this paper we fill this gap by re-estimating series of population for all polities from 1800 to 1938 using first-hand sources and country-specific literature. We use our series to address two issues which have attracted some attention by economist and economic historians in the last years, the start of the demographic transition and the impact of major demographic crises such as the Tai'ping civil war, World War One and the Spanish flu.
+    date_published: 2022-11-01
+
+    # Citation
+    producer: Giovanni Federico and Antonio Tena-Junguito
+    citation_full: |-
+      Federico, G, and A Tena-Junguito (2022), “How many people on earth? World population 1800 1938”, Maddison project Working paper.
+    attribution: Maddison Project (2022)
+    attribution_short: Maddison Project
+
+    # Files
+    url_main: https://www.rug.nl/ggdc/historicaldevelopment/maddison/publications/wp16.pdf
+    date_accessed: 2024-01-19
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: 
+        https://www.rug.nl/ggdc/historicaldevelopment/maddison/releases/maddison-database-2010
+
+wdir: ../../../data/snapshots/ggdc/2024-01-19
+outs:
+- md5: ad15ad99a8773ec2a6ccdac9ac790632
+  size: 2677797
+  path: maddison_federico_paper.xlsx

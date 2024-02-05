@@ -1,0 +1,4 @@
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
+dataset:
+  title: World Bank Poverty and Inequality Platform (PIP) (2011 prices)

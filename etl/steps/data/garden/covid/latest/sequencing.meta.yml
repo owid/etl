@@ -26,6 +26,7 @@ dataset:
   - name: GISAID, via CoVariants.org – Last updated {TODAY}
     url: https://www.gisaid.org/
     published_by: GISAID, via CoVariants.org – Last updated 2 November 2022
+  non_redistributable: true
 tables:
   sequencing:
     variables:

@@ -3,8 +3,6 @@
 steps:
   data-private://grapher/fasttrack/2022-11-29/ai_index:
     - snapshot-private://fasttrack/2022-11-29/ai_index.csv
-  data-private://grapher/fasttrack/2022-02-28/nuclear_warhead_inventories:
-    - snapshot-private://fasttrack/2022-02-28/nuclear_warhead_inventories.csv
   # Long-term homicide rates in Europe - Eisner (2014)
   data://grapher/fasttrack/2023-01-03/long_term_homicide_rates_in_europe:
     - snapshot://fasttrack/2023-01-03/long_term_homicide_rates_in_europe.csv
@@ -120,7 +118,7 @@ steps:
     - snapshot://fasttrack/2023-09-29/un_space_objects.csv
   data://grapher/fasttrack/2023-10-05/great_pacific_garbage_lebreton:
     - snapshot://fasttrack/2023-10-05/great_pacific_garbage_lebreton.csv
-  data-private://grapher/fasttrack/latest/war_deaths_by_war_mars:
-    - snapshot-private://fasttrack/latest/war_deaths_by_war_mars.csv
   data-private://grapher/fasttrack/latest/owid_donations:
     - snapshot-private://fasttrack/latest/owid_donations.csv
+  data://grapher/fasttrack/latest/war_deaths_by_war_mars:
+    - snapshot://fasttrack/latest/war_deaths_by_war_mars.csv

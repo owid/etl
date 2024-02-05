@@ -294,6 +294,72 @@ tables:
               - India
             note: This data is expressed in [international-$](#dod:int_dollar_abbreviation) at 2017 prices.
             $schema: https://files.ourworldindata.org/schemas/grapher-schema.003.json
+      ny_gdp_mktp_pp_kd:
+        sources: []
+        origins:
+          - *wdi_origin
+        title: GDP, PPP (constant 2017 international $)
+        unit: international-$ in 2017 prices
+        short_unit: $
+        display:
+          name: GDP
+          numDecimalPlaces: 0
+          tolerance: 5
+        description_short: This data is adjusted for inflation and for differences in the cost of living between countries.
+        description_key:
+          - This GDP indicator provides information on economic growth and income levels from 1990.
+          - This data is adjusted for inflation and for differences in the cost of living between countries.
+          - This data is expressed in international-$ at 2017 prices.
+        description_from_producer: |
+          PPP GDP is gross domestic product converted to international dollars using purchasing power parity rates. An international dollar has the same purchasing power over GDP as the U.S. dollar has in the United States. GDP is the sum of gross value added by all resident producers in the country plus any product taxes and minus any subsidies not included in the value of the products. It is calculated without making deductions for depreciation of fabricated assets or for depletion and degradation of natural resources. Data are in constant 2017 international dollars.
+
+          For the concept and methodology of 2017 PPP, please refer to the [International Comparison Program (ICP)’s website](https://www.worldbank.org/en/programs/icp).
+        processing_level: minor
+        presentation:
+          title_public: Gross domestic product (GDP)
+          attribution_short: World Bank
+          faqs:
+            - fragment_id: poverty-international-dollars
+              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+          grapher_config:
+            title: Gross domestic product (GDP)
+            subtitle: |
+              This data is adjusted for inflation and differences in the cost of living between countries.
+            note: This data is expressed in [international-$](#dod:int_dollar_abbreviation) at 2017 prices.
+            hideRelativeToggle: false
+            hasMapTab: true
+            tab: map
+            variantName: World Bank, constant international-$
+            originUrl: https://ourworldindata.org/economic-growth
+            yAxis:
+              min: 0
+              canChangeScaleType: true
+            map:
+              colorScale:
+                baseColorScheme: PuBu
+                binningStrategy: manual
+                customNumericValues:
+                  - 10000000000
+                  - 30000000000
+                  - 100000000000
+                  - 300000000000
+                  - 1000000000000
+                  - 3000000000000
+                  - 10000000000000
+                  - 30000000000000
+            selectedEntityNames:
+              - China
+              - United States
+              - Japan
+              - United Kingdom
+              - Brazil
+              - India
+              - Germany
+              - Russia
+              - France
+              - Mexico
+            $schema: https://files.ourworldindata.org/schemas/grapher-schema.003.json
+
       eg_cft_accs_zs:
         sources: []
         origins:

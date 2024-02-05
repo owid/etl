@@ -51,7 +51,7 @@ def test_dict_mixin_nested():
 
 def test_empty_dataset_metadata():
     d1 = meta.DatasetMeta()
-    assert d1.to_dict() == {"is_public": True}
+    assert d1.to_dict() == {"is_public": True, "non_redistributable": False}
 
 
 def test_dataset_version():

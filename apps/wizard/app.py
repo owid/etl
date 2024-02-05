@@ -28,6 +28,7 @@ show_pages(
         Page(str(CURRENT_DIR / "charts/__main__.py"), "Charts", icon="📊"),
         Page(str(CURRENT_DIR / "metagpt.py"), "MetaGPT", icon="🤖"),
         Page(str(CURRENT_DIR / "dataset_explorer.py"), "Dataset Explorer", icon="🕵️"),
+        Page(str(CURRENT_DIR / "../staging_sync/app.py"), "Staging sync", icon="🔄"),
     ]
 )
 
@@ -35,5 +36,9 @@ add_indentation()
 
 if utils.AppState.args.phase == "all":  # type: ignore
     switch_page("Home")  # type: ignore
-if utils.AppState.args.phase != "all":  # type: ignore
+elif utils.AppState.args.phase == "metagpt":  # type: ignore
+    switch_page("MetaGPT")  # type: ignore
+elif utils.AppState.args.phase == "dataexp":  # type: ignore
+    switch_page("Dataset Explorer")  # type: ignore
+elif utils.AppState.args.phase in ["snapshot", "meadow", "garden", "grapher", "charts"]:  # type: ignore
     switch_page(utils.AppState.args.phase.title())  # type: ignore

@@ -26,6 +26,7 @@ pyrightconfig.json
 ign.*
 .idea
 examples/data/*
+.cache
 
 playground*
 playground.ipynb
