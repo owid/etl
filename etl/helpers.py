@@ -612,14 +612,11 @@ class PathFinder:
         short_name: Optional[str] = None,
         channel: Optional[str] = None,
         namespace: Optional[str] = None,
-        version: Optional[str] = None,
+        version: Optional[Union[str, int]] = None,
     ) -> catalog.Dataset:
         """Load dataset dependency. short_name defaults to the current step's short_name."""
         dataset = self.load_dependency(
-            short_name=short_name or self.short_name,
-            channel=channel,
-            namespace=namespace,
-            version=version,
+            short_name=short_name or self.short_name, channel=channel, namespace=namespace, version=version
         )
         assert isinstance(dataset, catalog.Dataset)
         return dataset

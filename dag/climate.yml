@@ -1,5 +1,63 @@
 steps:
-  # Copernicus Climate Change Service - Surface temperature
+  #
+  # NOAA National Centers for Environmental Information - Long-run CO2 concentration.
+  #
+  data://meadow/climate/2024-01-26/antarctic_ice_core_co2_concentration:
+    - snapshot://climate/2024-01-26/antarctic_ice_core_co2_concentration.xls
+  data://garden/climate/2024-01-26/antarctic_ice_core_co2_concentration:
+    - data://meadow/climate/2024-01-26/antarctic_ice_core_co2_concentration
+  #
+  # EPA - Climate change indicators.
+  #
+  data://meadow/epa/2024-01-29/ocean_heat_content:
+    - snapshot://epa/2024-01-29/ocean_heat_content_annual_world_700m.csv
+    - snapshot://epa/2024-01-29/ocean_heat_content_annual_world_2000m.csv
+  data://garden/epa/2024-01-29/ocean_heat_content:
+    - data://meadow/epa/2024-01-29/ocean_heat_content
+  data://meadow/epa/2024-01-29/ice_sheet_mass_balance:
+    - snapshot://epa/2024-01-29/ice_sheet_mass_balance.csv
+  data://garden/epa/2024-01-29/ice_sheet_mass_balance:
+    - data://meadow/epa/2024-01-29/ice_sheet_mass_balance
+  data://meadow/epa/2024-01-29/ghg_concentration:
+    - snapshot://epa/2024-01-29/co2_concentration.csv
+    - snapshot://epa/2024-01-29/ch4_concentration.csv
+    - snapshot://epa/2024-01-29/n2o_concentration.csv
+  data://garden/epa/2024-01-29/ghg_concentration:
+    - data://meadow/epa/2024-01-29/ghg_concentration
+  data://meadow/epa/2024-01-29/mass_balance_us_glaciers:
+    - snapshot://epa/2024-01-29/mass_balance_us_glaciers.csv
+  data://garden/epa/2024-01-29/mass_balance_us_glaciers:
+    - data://meadow/epa/2024-01-29/mass_balance_us_glaciers
+  #
+  # IMBIE - Ice sheet mass balance.
+  #
+  data://meadow/imbie/2024-01-02/ice_sheet_mass_balance:
+    - snapshot://imbie/2024-01-02/ice_sheet_mass_balance_antarctica.csv
+    - snapshot://imbie/2024-01-02/ice_sheet_mass_balance_greenland.csv
+  data://garden/imbie/2024-01-02/ice_sheet_mass_balance:
+    - data://meadow/imbie/2024-01-02/ice_sheet_mass_balance
+  #
+  # Met Office Hadley Centre - Near surface temperature anomaly (2023-10-18).
+  #
+  # TODO: Consider moving these steps to the "climate" namespace.
+  data://meadow/met_office_hadley_centre/2023-10-18/near_surface_temperature:
+    - snapshot://met_office_hadley_centre/2023-10-18/near_surface_temperature_global.csv
+    - snapshot://met_office_hadley_centre/2023-10-18/near_surface_temperature_northern_hemisphere.csv
+    - snapshot://met_office_hadley_centre/2023-10-18/near_surface_temperature_southern_hemisphere.csv
+  data://garden/met_office_hadley_centre/2023-10-18/near_surface_temperature:
+    - data://meadow/met_office_hadley_centre/2023-10-18/near_surface_temperature
+  data://grapher/met_office_hadley_centre/2023-10-18/near_surface_temperature:
+    - data://garden/met_office_hadley_centre/2023-10-18/near_surface_temperature
+  #
+  # NOAA Climate.gov - Global sea level.
+  #
+  data://meadow/climate/2024-01-28/global_sea_level:
+    - snapshot://climate/2024-01-28/global_sea_level.csv
+  data://garden/climate/2024-01-28/global_sea_level:
+    - data://meadow/climate/2024-01-28/global_sea_level
+  #
+  # Copernicus Climate Change Service - Surface temperature.
+  #
   data://meadow/climate/2023-12-20/surface_temperature:
   - snapshot://climate/2023-12-20/surface_temperature.gz
   - snapshot://countries/2023-12-27/world_bank.zip
@@ -17,3 +75,95 @@ steps:
   - data://garden/climate/2023-12-20/surface_temperature
   data://grapher/climate/2023-12-20/surface_temperature_annual_average:
   - data://garden/climate/2023-12-20/surface_temperature
+  ######################################################################################################################
+  # Steps to be updated together for the climate change impacts explorer.
+  #
+  # Met Office Hadley Centre - Sea surface temperature.
+  #
+  data://meadow/climate/2024-01-31/sea_surface_temperature:
+    - snapshot://climate/2024-01-31/sea_surface_temperature_world.csv
+    - snapshot://climate/2024-01-31/sea_surface_temperature_northern_hemisphere.csv
+    - snapshot://climate/2024-01-31/sea_surface_temperature_southern_hemisphere.csv
+  data://garden/climate/2024-01-31/sea_surface_temperature:
+    - data://meadow/climate/2024-01-31/sea_surface_temperature
+  #
+  # GISS - Surface temperature analysis.
+  #
+  data://meadow/climate/2024-01-31/surface_temperature_analysis:
+    - snapshot://climate/2024-01-31/surface_temperature_analysis_world.csv
+    - snapshot://climate/2024-01-31/surface_temperature_analysis_northern_hemisphere.csv
+    - snapshot://climate/2024-01-31/surface_temperature_analysis_southern_hemisphere.csv
+  data://garden/climate/2024-01-31/surface_temperature_analysis:
+    - data://meadow/climate/2024-01-31/surface_temperature_analysis
+  data://grapher/climate/latest/surface_temperature_analysis:
+    - data://garden/climate/2024-01-31/surface_temperature_analysis
+  #
+  # NSIDC - Arctic sea ice extent.
+  #
+  data://meadow/climate/2024-01-31/sea_ice_index:
+    - snapshot://climate/2024-01-31/sea_ice_index.xlsx
+  data://garden/climate/2024-01-31/sea_ice_index:
+    - data://meadow/climate/2024-01-31/sea_ice_index
+  #
+  # NOAA National Centers for Environmental Information - Ocean Heat Content.
+  #
+  data://meadow/climate/2024-01-31/ocean_heat_content:
+    - snapshot://climate/2024-01-31/ocean_heat_content_monthly_world_700m.csv
+    - snapshot://climate/2024-01-31/ocean_heat_content_monthly_world_2000m.csv
+    - snapshot://climate/2024-01-31/ocean_heat_content_annual_world_700m.csv
+    - snapshot://climate/2024-01-31/ocean_heat_content_annual_world_2000m.csv
+  data://garden/climate/2024-01-31/ocean_heat_content:
+    - data://meadow/climate/2024-01-31/ocean_heat_content
+  #
+  #  School of Ocean and Earth Science and Technology - Hawaii Ocean Time-series (HOT).
+  #
+  data://meadow/climate/2024-01-31/hawaii_ocean_time_series:
+    - snapshot://climate/2024-01-31/hawaii_ocean_time_series.csv
+  data://garden/climate/2024-01-31/ocean_ph_levels:
+    - data://meadow/climate/2024-01-31/hawaii_ocean_time_series
+  #
+  # Rutgers University Global Snow Lab - Snow Cover Extent.
+  #
+  data://meadow/climate/2024-01-31/snow_cover_extent:
+    - snapshot://climate/2024-01-31/snow_cover_extent_north_america.csv
+    - snapshot://climate/2024-01-31/snow_cover_extent_northern_hemisphere.csv
+  data://garden/climate/2024-01-31/snow_cover_extent:
+    - data://meadow/climate/2024-01-31/snow_cover_extent
+  #
+  # NOAA Global Monitoring Laboratory - GHG concentration.
+  #
+  data://meadow/climate/2024-01-31/ghg_concentration:
+    - snapshot://climate/2024-01-31/co2_concentration_monthly.csv
+    - snapshot://climate/2024-01-31/ch4_concentration_monthly.csv
+    - snapshot://climate/2024-01-31/n2o_concentration_monthly.csv
+  data://garden/climate/2024-01-31/ghg_concentration:
+    - data://meadow/climate/2024-01-31/ghg_concentration
+  #
+  # Various sources - Long-run greenhouse gas concentration.
+  #
+  data://garden/climate/2024-01-31/long_run_ghg_concentration:
+    - data://garden/epa/2024-01-29/ghg_concentration
+    - data://garden/climate/2024-01-31/ghg_concentration
+  #
+  # Climate change impacts data explorer (2024-01-31).
+  #
+  data://explorers/climate/latest/climate_change_impacts:
+    - data://garden/climate/2024-01-31/surface_temperature_analysis
+    - data://garden/climate/2024-01-31/sea_ice_index
+    - data://garden/climate/2024-01-31/sea_surface_temperature
+    - data://garden/climate/2024-01-31/ocean_heat_content
+    - data://garden/climate/2024-01-31/ocean_ph_levels
+    - data://garden/climate/2024-01-31/snow_cover_extent
+    - data://garden/climate/2024-01-31/ghg_concentration
+    - data://garden/climate/2024-01-31/long_run_ghg_concentration
+    # Indicators that will not be updated.
+    - data://garden/climate/2024-01-28/global_sea_level
+    - data://garden/epa/2024-01-29/ocean_heat_content
+    - data://garden/epa/2024-01-29/ice_sheet_mass_balance
+    - data://garden/epa/2024-01-29/mass_balance_us_glaciers
+  ######################################################################################################################
+
+  ######################################################################################################################
+  # Older versions to be archived once they are not used by any other steps.
+
+  ######################################################################################################################

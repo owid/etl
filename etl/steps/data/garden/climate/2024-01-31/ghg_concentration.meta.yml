@@ -1,0 +1,34 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+      - Climate Change
+    unit: part per million
+    short_unit: ppm
+    description_short: Measured in parts per million.
+
+dataset:
+  update_period_days: 60
+
+tables:
+  ghg_concentration:
+    title: Monthly greenhouse gas concentration
+    variables:
+      co2_concentration:
+        title: Monthly concentration of atmospheric carbon dioxide
+        processing_level: minor
+      ch4_concentration:
+        title: Monthly concentration of atmospheric methane
+        processing_level: minor
+      n2o_concentration:
+        title: Monthly concentration of atmospheric nitrous oxide
+        processing_level: minor
+      co2_concentration_yearly_average:
+        title: Rolling yearly average of the concentration of atmospheric carbon dioxide
+        processing_level: major
+      ch4_concentration_yearly_average:
+        title: Rolling yearly average of the concentration of atmospheric methane
+        processing_level: major
+      n2o_concentration_yearly_average:
+        title: Rolling yearly average of the concentration of atmospheric nitrous oxide
+        processing_level: major
