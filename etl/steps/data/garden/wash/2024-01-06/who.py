@@ -114,3 +114,24 @@ def calculate_hygiene_no_services(tb: Table) -> Table:
     """
     tb["hyg_ns"] = 100 - tb["hyg_fac"]
     return tb
+
+
+def calculate_population_without_service(tb: Table) -> Table:
+    """
+    Calculate the population without given services
+
+    """
+    # * wat_basal
+    # * wat_imp
+    # * wat_sm
+    # * san_imp
+    # * san_sm
+    # * hyg_bas
+
+    without_cols = ["wat_basal", "wat_imp", "wat_sm", "san_imp", "san_sm", "hyg_bas"]
+
+    for col in without_cols:
+        tb[f"{col}_without"] = 100 - tb[col]
+        tb[f"{col}_pop_without"] = (tb[f"{col}_without"] / 100) * tb["pop"]
+
+    return tb
