@@ -30,7 +30,7 @@ def run(dest_dir: str) -> None:
     # The population is given as 'population (thousands)
     tb["pop"] = tb["pop"].astype(float).multiply(1000)
     tb = calculate_population_with_each_category(tb)
-    tb = tb.set_index(["country", "year", "residence"])
+    tb = tb.set_index(["country", "year", "residence"], verify_integrity=True)
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
@@ -47,6 +47,7 @@ def drop_erroneous_rows(tb: Table) -> Table:
     The values for Kosovo are poorly formatted and the country name is given as a year. Let's remove those.
     """
     tb = tb[~tb["country"].str.startswith("2")]
+    tb = tb[tb["year"].notna()]
     return tb
 
 
