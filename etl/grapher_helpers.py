@@ -681,7 +681,11 @@ def add_columns_for_multiindicator_chart(
 
 
 def adapt_table_with_dates_to_grapher(
-    tb: catalog.Table, columns: Optional[List[str]] = None, date_column: str = "date", country_column: str = "country"
+    tb: catalog.Table,
+    columns: Optional[List[str]] = None,
+    date_column: str = "date",
+    country_column: str = "country",
+    drop_date_column: bool = True,
 ) -> catalog.Table:
     """Adapt a table that has a date column to grapher requirements.
 
@@ -734,7 +738,8 @@ def adapt_table_with_dates_to_grapher(
         # Add a "year" column with number of days after zeroDay.
         tb["year"] = (tb["date"] - zero_day).dt.days
 
-    # Drop the date column.
-    tb = tb.drop(columns=[date_column])
+    if drop_date_column:
+        # Drop the date column.
+        tb = tb.drop(columns=[date_column])
 
     return tb
