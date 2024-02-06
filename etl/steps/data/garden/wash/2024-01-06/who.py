@@ -22,8 +22,6 @@ def run(dest_dir: str) -> None:
     ds_meadow = paths.load_dataset("who")
     tb = ds_meadow["who"].reset_index()
     tb = tb.rename(columns={"name": "country"})
-    tb = tb.drop(columns=["iso3"], axis=1)
-    tb = drop_erroneous_rows(tb)
     tb = geo.harmonize_countries(
         df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
     )
@@ -63,6 +61,7 @@ def calculate_population_with_each_category(tb: Table) -> Table:
     columns = tb.columns.drop(["country", "year", "pop", "residence"])
 
     for col in columns:
+        print(col)
         tb[f"{col}_pop"] = (tb[col] / 100) * tb["pop"]
 
     return tb
@@ -94,16 +93,6 @@ def clean_values(tb: Table) -> Table:
         errors="ignore",  # not all tables have these columns
     )
 
-    return tb
-
-
-def drop_region_columns(tb: Table) -> Table:
-    """
-    Drop columns that contain region information.
-
-    """
-    columns_to_drop = [col for col in tb.columns if "region" in col.lower()]
-    tb = tb.drop(columns_to_drop, axis=1)
     return tb
 
 

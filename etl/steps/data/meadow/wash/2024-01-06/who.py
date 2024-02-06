@@ -25,7 +25,7 @@ def run(dest_dir: str) -> None:
     # Prepare data.
     tb = tb.drop(columns=["iso3"], axis=1)
     tb_reg["name"] = tb_reg["region"] + "-" + tb_reg["region_type"]
-    tb_reg = tb_reg.drop(columns=["region", "region_type"], axis=1)
+    tb_reg = tb_reg.drop(columns=["region", "region_type", "updated"], axis=1)
 
     # Combine national and regional data
     tb = pr.concat([tb, tb_reg])
