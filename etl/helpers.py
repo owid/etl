@@ -900,9 +900,10 @@ class VersionTracker:
     def _generate_error_for_missing_dependencies(self, missing_steps: Set[str]) -> str:
         error_message = "Missing dependencies in the dag:"
         for missing_step in missing_steps:
+            error_message += f"\n* Missing step \n    {missing_step}\n  is a dependency of the following active steps:"
             direct_usages = self.get_direct_usages_for_step(step=missing_step)
             for usage in direct_usages:
-                error_message += f"\n* Active step \n    {usage}\n  depends on missing step \n    {missing_step}"
+                error_message += f"\n    {usage}"
 
         return error_message
 
