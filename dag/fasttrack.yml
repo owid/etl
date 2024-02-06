@@ -120,3 +120,5 @@ steps:
     - snapshot-private://fasttrack/latest/owid_donations.csv
   data://grapher/fasttrack/latest/war_deaths_by_war_mars:
     - snapshot://fasttrack/latest/war_deaths_by_war_mars.csv
+  data://grapher/fasttrack/latest/electric_cars_iea:
+    - snapshot://fasttrack/latest/electric_cars_iea.csv

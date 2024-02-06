@@ -1,0 +1,19 @@
+meta:
+  origin:
+    producer: International Energy Agency
+    title: electric_cars_iea
+    citation_full: 'IEA (2023), Global EV Outlook 2023, IEA, Paris https://www.iea.org/reports/global-ev-outlook-2023,
+      License: CC BY 4.0'
+    version_producer: Google Sheet
+    url_main: https://www.iea.org/reports/global-ev-outlook-2023
+    url_download: |-
+      https://docs.google.com/spreadsheets/d/e/2PACX-1vRDQ1EYuQPZasmbfjaghH9f65Nd2yLkQ0QAnOP5bp0LHWkwnjVcwssk6VFDhmWPOzjw2gCFyOqXBTQU/pub?output=csv
+    date_accessed: '2024-02-06'
+  name: Electric car sales (IEA, 2023)
+  description: Electric car sales and stocks data from the International Energy Agency.
+  license: {}
+wdir: ../../../data/snapshots/fasttrack/latest
+outs:
+- md5: cb5ab72cb47c4c833b31992396fa076e
+  size: 47708
+  path: electric_cars_iea.csv
