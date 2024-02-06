@@ -3,6 +3,7 @@ steps:
     #- snapshot://wash/2024-01-06/who_country_level.xlsx
     #- snapshot://wash/2024-01-06/who_regional.xlsx
     - snapshot://wash/2024-02-04/who.csv
+    - snapshot://wash/2024-02-04/who_regions.csv
   data://garden/wash/2024-01-06/who:
     - data://meadow/wash/2024-01-06/who
   data://grapher/wash/2024-01-06/who:

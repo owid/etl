@@ -1,6 +1,7 @@
 """Load a snapshot and create a meadow dataset."""
 import numpy as np
 from owid.catalog import Table
+from owid.catalog import processing as pr
 from owid.catalog.utils import underscore
 from structlog import get_logger
 
@@ -18,10 +19,17 @@ def run(dest_dir: str) -> None:
     #
     # Retrieve snapshot.
     snap = paths.load_snapshot("who.csv")
-    # snap_regional = paths.load_snapshot("who_regional.xlsx")
+    snap_regions = paths.load_snapshot("who_regions.csv")
     tb = snap.read()
-    # Load each sheet from the snapshot - the hygiene sheet has a different header structure.
-    tb = tb.set_index(["iso3", "name", "year", "residence"])
+    tb_reg = snap_regions.read()
+    # Prepare data.
+    tb = tb.drop(columns=["iso3"], axis=1)
+    tb_reg["name"] = tb_reg["region"] + "-" + tb_reg["region_type"]
+    tb_reg = tb_reg.drop(columns=["region", "region_type"], axis=1)
+
+    # Combine national and regional data
+    tb = pr.concat([tb, tb_reg])
+    tb = tb.set_index(["name", "year", "residence"])
     # Save outputs.
     #
     # Create a new meadow dataset with the same metadata as the snapshot.
