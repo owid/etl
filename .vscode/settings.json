@@ -6,10 +6,7 @@
   "files.trimTrailingWhitespace": true,
   "yaml.schemas": {
     "schemas/snapshot-schema.json": "**/*.dvc",
-    "schemas/dataset-schema.json": [
-      "**/*.meta.yml",
-      "**/*.meta.override.yml"
-    ]
+    "schemas/dataset-schema.json": ["**/*.meta.yml", "**/*.meta.override.yml"]
   },
   "[python]": {
     "editor.formatOnSave": true,
@@ -25,64 +22,22 @@
     "**/*"
   ],
   "grammarly.files.include": [
-    "**/README.md",
-    "**/readme.md",
-    "**/*.txt",
-    "**/docs/*.md",
-    "**/docs/adding-data/*.md",
-    "**/docs/adding-data/*.md",
-    "**/docs/getting-started/*.md",
-    "**/docs/api/*.md",
-    "**/docs/architecture/*.md"
-  ],
-  "sqltools.connections": [
-    {
-      "mysqlOptions": {
-        "authProtocol": "default"
-      },
-      "previewLimit": 50,
-      "server": "localhost",
-      "port": 3316,
-      "driver": "MySQL",
-      "name": "grapher-local",
-      "group": "grapher",
-      "database": "grapher",
-      "username": "grapher"
-    },
-    {
-      "mysqlOptions": {
-        "authProtocol": "default"
-      },
-      "previewLimit": 50,
-      "server": "localhost",
-      "port": 13306,
-      "driver": "MySQL",
-      "name": "grapher-staging",
-      "group": "grapher",
-      "database": "staging_grapher",
-      "username": "staging_grapher"
-    },
-    {
-      "mysqlOptions": {
-        "authProtocol": "default"
-      },
-      "previewLimit": 50,
-      "server": "localhost",
-      "port": 13333,
-      "driver": "MySQL",
-      "name": "grapher-live",
-      "group": "grapher",
-      "username": "etl_grapher",
-      "database": "live_grapher"
-    }
+      "**/README.md",
+      "**/readme.md",
+      "**/*.txt",
+      "**/docs/*.md",
+      "**/docs/adding-data/*.md",
+      "**/docs/adding-data/*.md",
+      "**/docs/getting-started/*.md",
+      "**/docs/api/*.md",
+      "**/docs/architecture/*.md"
   ],
   "files.exclude": {
     "etl/steps/archive": true,
     "snapshots/archive": true
   },
   "search.exclude": {
-    "etl/steps/archive": true,
-    "snapshots/archive": true
+      "etl/steps/archive": true,
+      "snapshots/archive": true
   },
-  "yaml.format.printWidth": 999
 }
