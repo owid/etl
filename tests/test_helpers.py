@@ -166,10 +166,25 @@ class TestVersionTracker(unittest.TestCase):
         _mock_dag = mock_dag.copy()
         _mock_dag["steps"]["a"] = set(["b", "c", "g"])
         versions = create_mock_version_tracker(dag=_mock_dag)
-        versions.check_that_archive_steps_are_not_dependencies_of_active_steps()
+        versions.check_that_active_dependencies_are_not_archived()
         mock_log.error.assert_called()
         # Checks for a specific substring of the logged message.
         self.assertIn("Missing", mock_log.error.call_args[0][0])
+        # Reset the mock at the end of the test
+        mock_log.reset_mock()
+
+    @patch("etl.helpers.log")
+    def test_raise_error_if_active_step_depends_on_missing_step(self, mock_log):
+        # Remove the definition of a step that is an active dependency of another step.
+        _mock_dag = mock_dag.copy()
+        del _mock_dag["steps"]["b"]
+        versions = create_mock_version_tracker(dag=_mock_dag)
+        versions.check_that_active_dependencies_are_defined()
+        mock_log.error.assert_called()
+        # Checks for a specific substring of the logged message.
+        self.assertIn("Missing", mock_log.error.call_args[0][0])
+        # Reset the mock at the end of the test
+        mock_log.reset_mock()
 
 
 def test_create_dataset(tmp_path):
