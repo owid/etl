@@ -4,8 +4,8 @@ definitions:
       topic_tags:
       - Climate Change
     processing_level: major
-    description_key: |-
-      Based on ice core studies of historical concentration of greenhouse gases, and recent air monitoring sites around the world.
+    description_key:
+      - Based on ice core studies of historical concentration of greenhouse gases, and recent air monitoring sites around the world.
     description_from_producer: |-
       This indicator describes how the levels of major greenhouse gases (GHGs) in the atmosphere have changed over geological time and in recent years. Changes in atmospheric GHGs, in part caused by human activities, affect the amount of energy held in the Earth-atmosphere system and thus affect the Earth's climate. This indicator is highly relevant to climate change because greenhouse gases from human activities are the primary driver of observed climate change since the mid-20th century (IPCC, 2021).
 
@@ -13,7 +13,7 @@ dataset:
   update_period_days: 0
 
 tables:
-  ice_sheet_mass_balance:
+  ghg_concentration:
     title: Global Atmospheric Concentrations of Greenhouse Gases
     variables:
       co2_concentration:

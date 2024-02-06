@@ -678,3 +678,68 @@ def add_columns_for_multiindicator_chart(
         table[column].metadata.title += suffix_for_titles
 
     return table
+
+
+def adapt_table_with_dates_to_grapher(
+    tb: catalog.Table,
+    columns: Optional[List[str]] = None,
+    date_column: str = "date",
+    country_column: str = "country",
+    drop_date_column: bool = True,
+) -> catalog.Table:
+    """Adapt a table that has a date column to grapher requirements.
+
+    This function adapts a table with, e.g. monthly data, so that it can be properly interpreted by grapher, and plotted
+    with dates in the horizontal axis instead of years.
+
+    Parameters
+    ----------
+    tb : Table
+        Input table that has a date column.
+    columns : Optional[List[str]], optional
+        Columns that will be used in grapher.
+    date_column : str, optional
+        Name of column with dates, by default "date".
+    country_column : str, optional
+        Name of country column, by default "country".
+
+    Returns
+    -------
+    Table
+        Table adapted to grapher requirements.
+    """
+    tb = tb.copy()
+
+    # Remove "year" column in the table, if any.
+    if "year" in tb.columns:
+        tb = tb.drop(columns=["year"], errors="raise")
+
+    # Ensure date column is in datetime format.
+    tb[date_column] = pd.to_datetime(tb[date_column])
+
+    # If no columns are specified, list all columns in the table (except the country and date columns).
+    if columns is None:
+        columns = [column for column in tb.columns if column not in [date_column, country_column]]
+
+    for column in columns:
+        # Find earliest date in the table.
+        zero_day = tb[date_column].min()
+
+        # Ensure display dictionary is present in the metadata of the relevant columns.
+        if tb[column].metadata.display is None:
+            tb[column].metadata.display = {}
+
+        # Set the yearIsDay metadata field, so that grapher can read years as dates.
+        tb[column].metadata.display["yearIsDay"] = True
+
+        # Set zeroDay, which grapher will interpret as the earliest day from which to start counting dates.
+        tb[column].metadata.display["zeroDay"] = zero_day.strftime("%Y-%m-%d")
+
+        # Add a "year" column with number of days after zeroDay.
+        tb["year"] = (tb["date"] - zero_day).dt.days
+
+    if drop_date_column:
+        # Drop the date column.
+        tb = tb.drop(columns=[date_column])
+
+    return tb

@@ -20,10 +20,12 @@ tables:
     title: Ice Sheet Mass Balance
     variables:
       cumulative_ice_mass_change_imbie:
-        title: Cumulative change in mass in the ice sheets
-        title_variant: IMBIE
+        title: Cumulative change in mass in the ice sheets, according to IMBIE
         description_short: Measured in billion tonnes. Based on more than 20 different studies that have been combined for each region.
+        presentation:
+          title_variant: IMBIE
       land_ice_mass_nasa:
-        title: Cumulative change in mass in the ice sheets
-        title_variant: NASA/JPL
+        title: Cumulative change in mass in the ice sheets, according to NASA/JPL
         description_short: Measured in billion tonnes.
+        presentation:
+          title_variant: NASA/JPL
