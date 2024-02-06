@@ -1,0 +1,38 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+      - Climate Change
+    processing_level: minor
+
+dataset:
+  title: Ocean Heat Content
+  update_period_days: 60
+
+tables:
+  ocean_heat_content_monthly:
+    title: Ocean Heat Content - Monthly average
+    variables:
+      ocean_heat_content_700m:
+        title: Monthly average ocean heat content for the 0-700 meters layer
+        description_short: Measured in 10²² Joules.
+        unit: 10²² Joules
+        short_unit: 10²² J
+      ocean_heat_content_2000m:
+        title: Monthly average ocean heat content for the 0-2000 meters layer
+        description_short: Measured in 10²² Joules.
+        unit: 10²² Joules
+        short_unit: 10²² Joules
+  ocean_heat_content_annual:
+    title: Ocean Heat Content - Annual average
+    variables:
+      ocean_heat_content_700m:
+        title: Annual average ocean heat content for the 0-700 meters layer
+        description_short: Measured in 10²² Joules.
+        unit: 10²² Joules
+        short_unit: 10²² Joules
+      ocean_heat_content_2000m:
+        title: Annual average ocean heat content for the 0-2000 meters layer
+        description_short: Measured in 10²² Joules.
+        unit: 10²² Joules
+        short_unit: 10²² Joules

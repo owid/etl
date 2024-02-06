@@ -140,3 +140,4 @@ include:
   - dag/archive/fasttrack.yml
   # - dag/archive/biodiversity.yml
   # - dag/archive/health.yml
+  - dag/archive/climate.yml
