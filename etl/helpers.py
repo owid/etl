@@ -897,7 +897,7 @@ class VersionTracker:
 
         return self._steps_df
 
-    def _generate_error_for_missing_dependencies(self, missing_steps: Set[str]) -> None:
+    def _generate_error_for_missing_dependencies(self, missing_steps: Set[str]) -> str:
         error_message = "Missing dependencies in the dag:"
         for missing_step in missing_steps:
             direct_usages = self.get_direct_usages_for_step(step=missing_step)
