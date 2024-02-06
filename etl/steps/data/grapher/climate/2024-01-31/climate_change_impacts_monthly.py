@@ -2,7 +2,7 @@
 
 """
 
-
+from etl.grapher_helpers import adapt_table_with_dates_to_grapher
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
@@ -15,29 +15,23 @@ def run(dest_dir: str) -> None:
     #
     # Load garden dataset and read its monthly table.
     ds_garden = paths.load_dataset("climate_change_impacts")
-    tb_monthly = ds_garden["climate_change_impacts_monthly"].reset_index()
+    tb = ds_garden["climate_change_impacts_monthly"].reset_index()
 
     #
     # Process data.
     #
-    # Create country, year and month columns (required by grapher).
-    tb_monthly = tb_monthly.rename(columns={"location": "country"}, errors="raise")
-    tb_monthly["year"] = tb_monthly["date"].astype(str).str.split("-").str[0].astype(int)
-    tb_monthly["month"] = tb_monthly["date"].astype(str).str.split("-").str[1].astype(int)
+    # Create a country column (required by grapher).
+    tb = tb.rename(columns={"location": "country"}, errors="raise")
 
+    # Adapt table with dates to grapher requirements.
+    tb = adapt_table_with_dates_to_grapher(tb)
 
     # Set an appropriate index and sort conveniently.
-    tb_monthly = tb_monthly.set_index(["country", "year"], verify_integrity=True).sort_index()
-
-    # Fix metadata to be able to work in grapher.
-    for column in tb_monthly.columns:
-        if not tb_monthly[column].metadata.display:
-            tb_monthly[column].metadata.display = {}
-        tb_monthly[column].metadata.display["yearIsDay"] = True
+    tb = tb.set_index(["country", "year"], verify_integrity=True).sort_index()
 
     #
     # Save outputs.
     #
     # Create a new grapher dataset.
-    ds_grapher = create_dataset(dest_dir, tables=[tb_monthly], check_variables_metadata=True)
+    ds_grapher = create_dataset(dest_dir, tables=[tb], check_variables_metadata=True)
     ds_grapher.save()

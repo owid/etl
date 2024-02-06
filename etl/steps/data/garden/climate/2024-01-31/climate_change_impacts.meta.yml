@@ -11,5 +11,14 @@ dataset:
 tables:
   climate_change_impacts_annual:
     title: Climate Change Impacts - Annual
+    variables:
+      arctic_sea_ice_extent_min:
+        title: Minimum Arctic sea ice extent
+      arctic_sea_ice_extent_max:
+        title: Maximum Arctic sea ice extent
+      antarctic_sea_ice_extent_min:
+        title: Minimum Antarctic sea ice extent
+      antarctic_sea_ice_extent_max:
+        title: Maximum Antarctic sea ice extent
   climate_change_impacts_monthly:
     title: Climate Change Impacts - Monthly
