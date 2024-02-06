@@ -8,6 +8,7 @@ definitions:
         - Sanitation
     display:
       numDecimalPlaces: 1
+    processing_level: major
   residence: |-
     <% if residence == "Rural" %>rural <% elif residence == "Urban" %>urban <% elif residence == "Total" %><%- endif -%>
   residence_pop: <% if residence == "Rural" %>rural <% elif residence == "Urban" %>urban <% elif residence == "Total" %>total <%- endif -%>
