@@ -765,15 +765,6 @@ def get_all_usages_for_step_in_dag(dag: Dict[str, Any], step: str) -> Set[str]:
     return dependencies
 
 
-class ArchiveStepUsedByActiveStep(ExceptionFromDocstring):
-    """Archived steps have been found as dependencies of active steps.
-
-    The solution is either:
-    * To archive those active steps.
-    * To un-archive those archive steps.
-    """
-
-
 class LatestVersionOfStepShouldBeActive(ExceptionFromDocstring):
     """The latest version of each data step should be in the dag as a main step (maybe it was accidentally removed)."""
 
@@ -909,10 +900,14 @@ class VersionTracker:
         missing_steps = set(self.dag_archive) & set(self.all_active_dependencies)
 
         if len(missing_steps) > 0:
+            error_message = "Missing dependencies in the dag:"
             for missing_step in missing_steps:
                 direct_usages = self.get_direct_usages_for_step(step=missing_step)
-                print(f"Archive step {missing_step} is used by active steps: {direct_usages}")
-            raise ArchiveStepUsedByActiveStep
+                for usage in direct_usages:
+                    error_message += f"\n* Active step \n    {usage}\n  depends on archive step \n    {missing_step}"
+            log.error(
+                f"{error_message}\n\nSolution: Either archive those active steps or un-archive those archive steps."
+            )
 
     def check_that_latest_version_of_steps_are_active(self) -> None:
         # Check that the latest version of each main data step is in the dag.
