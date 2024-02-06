@@ -959,7 +959,10 @@ class VersionTracker:
         unused_data_steps = outdated_data_steps - set(self.all_active_dependencies)
 
         if len(unused_data_steps) > 0:
-            log.warning(f"Some data steps can be safely archived: {unused_data_steps}")
+            error_message = "Some data steps are not used and can safely be archived:"
+            for unused_data_step in unused_data_steps:
+                error_message += f"\n    {unused_data_step}"
+            log.warning(error_message)
 
     def get_backported_db_dataset_ids(self) -> List[int]:
         """Get list of ids of DB datasets that are used as backported datasets in active steps of ETL.
