@@ -160,13 +160,16 @@ class TestVersionTracker(unittest.TestCase):
         with self.assertRaises(etl.helpers.LatestVersionOfStepShouldBeActive):
             versions.check_that_latest_version_of_steps_are_active()
 
-    def test_raise_error_if_archived_step_should_be_active(self):
+    @patch("etl.helpers.log")
+    def test_raise_error_if_active_step_depends_on_archive_step(self, mock_log):
         # Include an archive step as a dependency of an active step.
         _mock_dag = mock_dag.copy()
         _mock_dag["steps"]["a"] = set(["b", "c", "g"])
         versions = create_mock_version_tracker(dag=_mock_dag)
-        with self.assertRaises(etl.helpers.ArchiveStepUsedByActiveStep):
-            versions.check_that_archive_steps_are_not_dependencies_of_active_steps()
+        versions.check_that_archive_steps_are_not_dependencies_of_active_steps()
+        mock_log.error.assert_called()
+        # Checks for a specific substring of the logged message.
+        self.assertIn("Missing", mock_log.error.call_args[0][0])
 
 
 def test_create_dataset(tmp_path):
