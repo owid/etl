@@ -53,3 +53,9 @@ steps:
     - data://garden/regions/2023-01-01/regions
   data://grapher/urbanization/2024-01-26/ghsl_degree_of_urbanisation:
     - data://garden/urbanization/2024-01-26/ghsl_degree_of_urbanisation
+  data://meadow/oecd/2024-02-05/population_density_cities_fuas:
+    - snapshot://oecd/2024-02-05/population_density_cities_fuas.csv
+  data://garden/oecd/2024-02-05/population_density_cities_fuas:
+    - data://meadow/oecd/2024-02-05/population_density_cities_fuas
+  data://grapher/oecd/2024-02-05/population_density_cities_fuas:
+    - data://garden/oecd/2024-02-05/population_density_cities_fuas

@@ -1,0 +1,44 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/origin/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Population and built-up density - Cities and FUAs
+    description: |-
+      This dataset provides measures of population density and built-up area in FUAs and cities.
+
+      **Data sources and methodology**
+      Built-up data is computed using GHS built-up surface grids (European Commission, GHSL Data Package 2023). Information on population is extracted from the Population by age and sex - FUAs and cities dataset and FUA and city surfaces are calculated from FUA and city shapefiles, using GIS tools.
+
+      **The FUA and city definitions**
+      The OECD, in cooperation with the EU, has developed a harmonised definition of functional urban areas (FUAs). Being composed of a city and its commuting zone, FUAs encompass the economic and functional extent of cities based on daily people’s movements (OECD, 2012).
+
+      FUAs and cities are defined in several steps. First, urban centres defined by the degree of urbanisation are adapted to the closest local administrative units to define a city. Next, commuting flows are used to identify which of the surrounding, less densely populated local units are part of the city’s labour market (commuting zone). Commuting zones are defined as all local units with at least 15% of their employed residents working in a certain city. Municipalities surrounded by a single functional urban area are included and non-contiguous municipalities are dropped.
+
+      Around 1 300 FUAs and 1400 cities were delineated in 37 OECD countries. The dataset covers the period 2000-2020.
+    date_published: '2023'
+
+    # Citation
+    producer: OECD
+    citation_full: |-
+      OECD (2023), OECD Regions and Cities databases. Accessed on 05 February 2024.
+
+    # Files
+    url_main: 
+      https://data-explorer.oecd.org/vis?fs[0]=Topic%2C1%7CRegions%2C%20cities%20and%20local%20areas%23GEO%23%7CCities%20and%20functional%20urban%20areas%23GEO_URB%23&pg=0&fc=Topic&bp=true&snb=17&df[ds]=dsDisseminateFinalDMZ&df[id]=DSD_FUA_TERR%40DF_DENSITY&df[ag]=OECD.CFE.EDS&df[vs]=1.0&pd=%2C&dq=.A.POP_DEN..&ly[rw]=REF_AREA%2CTERRITORIAL_LEVEL&ly[cl]=TIME_PERIOD&to[TIME_PERIOD]=false
+    url_download: 
+      https://sdmx.oecd.org/public/rest/data/OECD.CFE.EDS,DSD_FUA_TERR@DF_DENSITY,1.0/all?dimensionAtObservation=AllDimensions&format=csvfilewithlabels
+
+
+    date_accessed: 2024-02-05
+    version_producer: 2023-12-19
+
+    # License
+    license:
+      name: OECD terms
+      url: https://www.oecd.org/termsandconditions/
+wdir: ../../../data/snapshots/oecd/2024-02-05
+outs:
+- md5: a39277f7ec393e842d3f1d56c328059d
+  size: 25619283
+  path: population_density_cities_fuas.csv
