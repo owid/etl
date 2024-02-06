@@ -4,14 +4,30 @@ import re
 
 import numpy as np
 from owid.catalog import Table
+from owid.catalog import processing as pr
 from structlog import get_logger
 
 from etl.data_helpers import geo
+from etl.data_helpers.geo import add_regions_to_table
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 log = get_logger()
+
+REGIONS_TO_ADD = [
+    "North America",
+    "South America",
+    "Europe",
+    "Africa",
+    "Asia",
+    "Oceania",
+    "Low-income countries",
+    "Upper-middle-income countries",
+    "Lower-middle-income countries",
+    "High-income countries",
+    "World",
+]
 
 
 def run(dest_dir: str) -> None:
@@ -20,13 +36,18 @@ def run(dest_dir: str) -> None:
     #
     # Load meadow dataset.
     ds_meadow = paths.load_dataset("who")
+    # Load regions
+    # ds_regions = paths.load_dependency("regions")
+    # Load income groups dataset.
+    # ds_income_groups = paths.load_dependency("income_groups")
+    # Add population
+    ds_population = paths.load_dependency("population")
     tb = ds_meadow["who"].reset_index()
     tb = tb.rename(columns={"name": "country"})
-    tb = geo.harmonize_countries(
-        df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
-    )
+    tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
     # The population is given as 'population (thousands)
     tb["pop"] = tb["pop"].astype(float).multiply(1000)
+    tb = add_population_to_regions(tb, ds_population)
     tb = calculate_population_with_each_category(tb)
     tb = calculate_population_without_service(tb)
     tb = tb.drop(columns=["pop"])
@@ -107,7 +128,7 @@ def calculate_hygiene_no_services(tb: Table) -> Table:
 
 def calculate_population_without_service(tb: Table) -> Table:
     """
-    Calculate the population without given services
+    Calculate the population _without_ given services for a selection of services, that we show in charts.
 
     """
     # * wat_basal
@@ -122,5 +143,21 @@ def calculate_population_without_service(tb: Table) -> Table:
     for col in without_cols:
         tb[f"{col}_without"] = 100 - tb[col]
         tb[f"{col}_pop_without"] = (tb[f"{col}_without"] / 100) * tb["pop"]
+
+    return tb
+
+
+def add_population_to_regions(tb: Table, ds_population: Table) -> Table:
+    tb_to_add_pop = tb[["country", "year", "residence"]][(tb["pop"].isna()) & (tb["residence"] == "Total")]
+
+    tb_to_add_pop = geo.add_population_to_table(
+        tb_to_add_pop, ds_population=ds_population, warn_on_missing_countries=False
+    )
+
+    tb_cols = tb_to_add_pop.columns.drop(["population"]).to_list()
+    tb = pr.merge(tb, tb_to_add_pop, on=tb_cols, how="left")
+    tb["pop"] = tb["pop"].combine_first(tb["population"])
+
+    tb = tb.drop(columns=["population"])
 
     return tb
