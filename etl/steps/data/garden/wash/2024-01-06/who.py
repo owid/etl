@@ -61,7 +61,6 @@ def calculate_population_with_each_category(tb: Table) -> Table:
     columns = tb.columns.drop(["country", "year", "pop", "residence"])
 
     for col in columns:
-        print(col)
         tb[f"{col}_pop"] = (tb[col] / 100) * tb["pop"]
 
     return tb
