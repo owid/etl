@@ -786,6 +786,8 @@ class VersionTracker:
         self.all_steps = list_all_steps_in_dag(self.dag_all)
         # List all unique active steps.
         self.all_active_steps = list_all_steps_in_dag(self.dag_active)
+        # List all active steps usages (i.e. list of steps in the dag that should be executable by ETL).
+        self.all_active_usages = set(self.dag_active)
         # List all steps that are dependencies of active steps.
         self.all_active_dependencies = self.get_all_dependencies_of_active_steps()
 
@@ -895,19 +897,34 @@ class VersionTracker:
 
         return self._steps_df
 
-    def check_that_archive_steps_are_not_dependencies_of_active_steps(self) -> None:
+    def _generate_error_for_missing_dependencies(self, missing_steps: Set[str]) -> None:
+        error_message = "Missing dependencies in the dag:"
+        for missing_step in missing_steps:
+            direct_usages = self.get_direct_usages_for_step(step=missing_step)
+            for usage in direct_usages:
+                error_message += f"\n* Active step \n    {usage}\n  depends on missing step \n    {missing_step}"
+
+        return error_message
+
+    def check_that_active_dependencies_are_defined(self) -> None:
+        # Gather all steps that appear in the dag only as dependencies, but not as executable steps.
+        missing_steps = set(self.all_active_dependencies) - set(self.all_active_usages)
+
+        # Remove those special steps that are expected to not appear in the dag as executable steps (e.g. snapshots).
+        channels_to_ignore = ("snapshot", "backport", "etag", "github", "walden")
+        missing_steps = set([step for step in missing_steps if not step.startswith(channels_to_ignore)])
+
+        if len(missing_steps) > 0:
+            error_message = self._generate_error_for_missing_dependencies(missing_steps=missing_steps)
+            log.error(f"{error_message}\n\nSolution: Check if you may have accidentally deleted those missing steps.")
+
+    def check_that_active_dependencies_are_not_archived(self) -> None:
         # Find any archive steps that are dependencies of active steps, and should therefore not be archive steps.
         missing_steps = set(self.dag_archive) & set(self.all_active_dependencies)
 
         if len(missing_steps) > 0:
-            error_message = "Missing dependencies in the dag:"
-            for missing_step in missing_steps:
-                direct_usages = self.get_direct_usages_for_step(step=missing_step)
-                for usage in direct_usages:
-                    error_message += f"\n* Active step \n    {usage}\n  depends on archive step \n    {missing_step}"
-            log.error(
-                f"{error_message}\n\nSolution: Either archive those active steps or un-archive those archive steps."
-            )
+            error_message = self._generate_error_for_missing_dependencies(missing_steps=missing_steps)
+            log.error(f"{error_message}\n\nSolution: Either archive the active steps or un-archive the archive steps.")
 
     def check_that_latest_version_of_steps_are_active(self) -> None:
         # Check that the latest version of each main data step is in the dag.
@@ -959,7 +976,8 @@ class VersionTracker:
         return backported_dataset_ids
 
     def apply_sanity_checks(self) -> None:
-        self.check_that_archive_steps_are_not_dependencies_of_active_steps()
+        self.check_that_active_dependencies_are_defined()
+        self.check_that_active_dependencies_are_not_archived()
         # self.check_that_latest_version_of_steps_are_active()
         self.check_that_all_active_steps_are_necessary()
 
