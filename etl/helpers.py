@@ -799,6 +799,39 @@ def _recursive_get_all_archivable_steps(steps_df: pd.DataFrame, unused_steps: Se
         return _recursive_get_all_archivable_steps(steps_df=steps_df, unused_steps=unused_steps)
 
 
+def load_steps_for_each_dag_file():
+    # Create a temporary dictionary with the path to the folder of active and archive dag files.
+    dag_file_paths = {"active": paths.DAG_DIR.glob("*.yml"), "archive": paths.DAG_DIR.glob("archive/*.yml")}
+    # Create a dictionary that will contain the content of the active dag files and the archive dag files.
+    dag_file_steps = {"active": {}, "archive": {}}
+    for dag_file_path in dag_file_paths:
+        for dag_file in dag_file_paths[dag_file_path]:
+            # Open the current dag file and read its steps.
+            with open(dag_file, "r") as f:
+                content = yaml.load(f, Loader=yaml.Loader)["steps"]
+                if content:
+                    # Add an entry to the dictionary, with the name of the dag file, and the set of steps it contains.
+                    dag_file_steps[dag_file_path][dag_file.stem] = content
+
+    return dag_file_steps
+
+
+def load_dag_file_for_each_step():
+    dag_file_steps = load_steps_for_each_dag_file()
+    # Reverse active dictionary of dag files.
+    active_dag_files = reverse_graph(dag_file_steps["active"])
+    dag_file_steps_reverse = {
+        step: list(active_dag_files[step])[0] for step in active_dag_files if len(active_dag_files[step]) > 0
+    }
+    # Add the reverse of the archive dictionary of dag files.
+    archive_dag_files = reverse_graph(dag_file_steps["archive"])
+    dag_file_steps_reverse.update(
+        {step: list(archive_dag_files[step])[0] for step in archive_dag_files if len(archive_dag_files[step]) > 0}
+    )
+
+    return dag_file_steps_reverse
+
+
 class VersionTracker:
     """Helper object that loads the dag, provides useful functions to check for versions and dataset dependencies, and
     checks for inconsistencies.
@@ -822,6 +855,8 @@ class VersionTracker:
         self.all_active_usages = set(self.dag_active)
         # List all steps that are dependencies of active steps.
         self.all_active_dependencies = self.get_all_dependencies_of_active_steps()
+        # Create a dictionary of dag files for each step.
+        self.dag_file_for_each_step = load_dag_file_for_each_step()
 
         # Dataframe of step attributes will only be initialized once it's called.
         # This dataframe will have one row per existing step.
@@ -830,7 +865,6 @@ class VersionTracker:
         # This dataframe will have as many rows as entries in the dag.
         self._steps_df = None
 
-        # TODO: Another useful method would be to find in which dag file each step is (by yaml opening each file).
         # TODO: Check that for each active usage there is a script (it has happened a few times that the code for
         # fasttrack steps was removed, but the steps were still in the dag, and we noticed it when running ETL).
 
@@ -873,6 +907,14 @@ class VersionTracker:
 
     def get_all_archivable_steps(self) -> List[str]:
         return sorted(_recursive_get_all_archivable_steps(steps_df=self.steps_df))
+
+    def get_dag_file_for_step(self, step: str) -> str:
+        if step in self.dag_file_for_each_step:
+            dag_file_name = self.dag_file_for_each_step[step]
+        else:
+            dag_file_name = ""
+
+        return dag_file_name
 
     def _create_step_attributes(self) -> pd.DataFrame:
         # Extract all attributes of each unique active/archive/dependency step.
@@ -938,13 +980,16 @@ class VersionTracker:
         return steps_df
 
     def _create_steps_df(self) -> pd.DataFrame:
+        # Create a dataframe where each row correspond to one step.
         steps_df = pd.DataFrame({"step": self.all_steps.copy()})
+        # Add relevant information about each step.
         steps_df["direct_dependencies"] = [self.get_direct_step_dependencies(step=step) for step in self.all_steps]
         steps_df["direct_usages"] = [self.get_direct_step_usages(step=step) for step in self.all_steps]
         steps_df["all_dependencies"] = [self.get_all_step_dependencies(step=step) for step in self.all_steps]
         steps_df["all_usages"] = [self.get_all_step_usages(step=step) for step in self.all_steps]
         steps_df["state"] = ["active" if step in self.all_active_steps else "archive" for step in self.all_steps]
         steps_df["role"] = ["usage" if step in self.dag_all else "dependency" for step in self.all_steps]
+        steps_df["dag_file_name"] = [self.get_dag_file_for_step(step=step) for step in self.all_steps]
 
         # Add attributes to steps.
         steps = pd.merge(steps_df, self.step_attributes_df, on="step", how="left")
