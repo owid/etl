@@ -856,10 +856,17 @@ class VersionTracker:
 
         return dependencies
 
-    # # TODO: Create the following functions:
-    # def get_all_step_versions(self, step: str) -> Set[str]:
-    # def get_forward_step_versions(self, step: str) -> Set[str]:
-    # def get_backward_step_versions(self, step: str) -> Set[str]:
+    def get_all_step_versions(self, step: str) -> List[str]:
+        # TODO: Instead of using iloc, use item(), once the dataframe has only one row per step.
+        return self.steps_df[self.steps_df["step"] == step].iloc[0]["same_steps_all"]
+
+    def get_forward_step_versions(self, step: str) -> List[str]:
+        # TODO: Instead of using iloc, use item(), once the dataframe has only one row per step.
+        return self.steps_df[self.steps_df["step"] == step].iloc[0]["same_steps_forward"]
+
+    def get_backward_step_versions(self, step: str) -> List[str]:
+        # TODO: Instead of using iloc, use item(), once the dataframe has only one row per step.
+        return self.steps_df[self.steps_df["step"] == step].iloc[0]["same_steps_backward"]
 
     def get_all_dependencies_of_active_steps(self) -> Set[str]:
         # Gather all dependencies of active steps in the dag.
