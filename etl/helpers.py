@@ -647,7 +647,7 @@ def list_all_steps_in_dag(dag: Dict[str, Any]) -> List[str]:
     return all_steps
 
 
-def get_direct_dependencies_for_step_in_dag(dag: Dict[str, Any], step: str) -> Set[str]:
+def get_direct_step_dependencies(dag: Dict[str, Any], step: str) -> Set[str]:
     """Get direct dependencies of a given step in a dag.
 
     Direct dependencies of a step are those datasets that are listed in the dag as the step's dependencies.
@@ -670,7 +670,7 @@ def get_direct_dependencies_for_step_in_dag(dag: Dict[str, Any], step: str) -> S
     return dependencies
 
 
-def get_direct_usages_for_step_in_dag(dag: Dict[str, Any], step: str) -> Set[str]:
+def get_direct_step_usages(dag: Dict[str, Any], step: str) -> Set[str]:
     """Get direct usages of a given step in a dag.
 
     Direct usages of a step are those datasets that have the current step listed in the dag as one of the dependencies.
@@ -694,9 +694,7 @@ def get_direct_usages_for_step_in_dag(dag: Dict[str, Any], step: str) -> Set[str
     return used_by
 
 
-def _recursive_get_all_dependencies_for_step_in_dag(
-    dag: Dict[str, Any], step: str, dependencies: Set[str] = set()
-) -> Set[str]:
+def _recursive_get_all_step_dependencies(dag: Dict[str, Any], step: str, dependencies: Set[str] = set()) -> Set[str]:
     if step in dag:
         # If step is in the dag, gather all its substeps.
         substeps = dag[step]
@@ -704,7 +702,7 @@ def _recursive_get_all_dependencies_for_step_in_dag(
         dependencies = dependencies | set(substeps)
         for substep in substeps:
             # For each of the substeps, repeat the process.
-            dependencies = dependencies | _recursive_get_all_dependencies_for_step_in_dag(
+            dependencies = dependencies | _recursive_get_all_step_dependencies(
                 dag, step=substep, dependencies=dependencies
             )
     else:
@@ -714,7 +712,7 @@ def _recursive_get_all_dependencies_for_step_in_dag(
     return dependencies
 
 
-def get_all_dependencies_for_step_in_dag(dag: Dict[str, Any], step: str) -> Set[str]:
+def get_all_step_dependencies(dag: Dict[str, Any], step: str) -> Set[str]:
     """Get all dependencies for a given step in a dag.
 
     This function returns all dependencies of a step, as well as their direct dependencies, and so on. In the end, the
@@ -732,12 +730,12 @@ def get_all_dependencies_for_step_in_dag(dag: Dict[str, Any], step: str) -> Set[
     dependencies : Set[str]
         All dependencies of a given step in a dag.
     """
-    dependencies = _recursive_get_all_dependencies_for_step_in_dag(dag=dag, step=step)
+    dependencies = _recursive_get_all_step_dependencies(dag=dag, step=step)
 
     return dependencies
 
 
-def get_all_usages_for_step_in_dag(dag: Dict[str, Any], step: str) -> Set[str]:
+def get_all_step_usages(dag_reverse: Dict[str, Any], step: str) -> Set[str]:
     """Get all dependencies for a given step in a dag.
 
     This function returns all datasets for which a given step is a dependency, as well as those datasets for which they
@@ -746,8 +744,8 @@ def get_all_usages_for_step_in_dag(dag: Dict[str, Any], step: str) -> Set[str]:
 
     Parameters
     ----------
-    dag : Dict[str, Any]
-        Dag.
+    dag_reverse : Dict[str, Any]
+        Dag reversed (a dictionary where each item is step: set of usages).
     step : str
         Step (as it appears in the dag).
 
@@ -759,8 +757,7 @@ def get_all_usages_for_step_in_dag(dag: Dict[str, Any], step: str) -> Set[str]:
     """
     # A simple solution is to simply reverse the graph, and apply the already existing function that finds all
     # dependencies.
-    reverse_dag = reverse_graph(graph=dag)
-    dependencies = get_all_dependencies_for_step_in_dag(dag=reverse_dag, step=step)
+    dependencies = get_all_step_dependencies(dag=dag_reverse, step=step)
 
     return dependencies
 
@@ -809,8 +806,10 @@ class VersionTracker:
     """
 
     def __init__(self):
-        # Load dag of active and archive steps.
+        # Load dag of active and archive steps (a dictionary where each item is step: set of dependencies).
         self.dag_all = load_dag(paths.DAG_ARCHIVE_FILE)
+        # Create a reverse dag (a dictionary where each item is step: set of usages).
+        self.dag_all_reverse = reverse_graph(graph=self.dag_all)
         # Load dag of active steps.
         self.dag_active = load_dag(paths.DAG_FILE)
         # Generate the dag of only archive steps.
@@ -835,33 +834,38 @@ class VersionTracker:
         # TODO: Check that for each active usage there is a script (it has happened a few times that the code for
         # fasttrack steps was removed, but the steps were still in the dag, and we noticed it when running ETL).
         # TODO: Consider that steps_df could just contain as many steps as unique steps.
-        # Column "used_by" would be a list, and "depends_on" would be another list.
+        # We could have columns for direct usages, all usages, direct dependencies, and all dependencies.
 
-    def get_direct_dependencies_for_step(self, step: str) -> Set[str]:
-        dependencies = get_direct_dependencies_for_step_in_dag(dag=self.dag_all, step=step)
-
-        return dependencies
-
-    def get_direct_usages_for_step(self, step: str) -> Set[str]:
-        dependencies = get_direct_usages_for_step_in_dag(dag=self.dag_all, step=step)
+    def get_direct_step_dependencies(self, step: str) -> Set[str]:
+        dependencies = get_direct_step_dependencies(dag=self.dag_all, step=step)
 
         return dependencies
 
-    def get_all_dependencies_for_step(self, step: str) -> Set[str]:
-        dependencies = get_all_dependencies_for_step_in_dag(dag=self.dag_all, step=step)
+    def get_direct_step_usages(self, step: str) -> Set[str]:
+        dependencies = get_direct_step_usages(dag=self.dag_all, step=step)
 
         return dependencies
 
-    def get_all_usages_for_step(self, step: str) -> Set[str]:
-        dependencies = get_all_usages_for_step_in_dag(dag=self.dag_all, step=step)
+    def get_all_step_dependencies(self, step: str) -> Set[str]:
+        dependencies = get_all_step_dependencies(dag=self.dag_all, step=step)
 
         return dependencies
+
+    def get_all_step_usages(self, step: str) -> Set[str]:
+        dependencies = get_all_step_usages(dag_reverse=self.dag_all_reverse, step=step)
+
+        return dependencies
+
+    # # TODO: Create the following functions:
+    # def get_all_step_versions(self, step: str) -> Set[str]:
+    # def get_forward_step_versions(self, step: str) -> Set[str]:
+    # def get_backward_step_versions(self, step: str) -> Set[str]:
 
     def get_all_dependencies_of_active_steps(self) -> Set[str]:
         # Gather all dependencies of active steps in the dag.
         active_dependencies = set()
         for step in self.dag_active:
-            active_dependencies = active_dependencies | self.get_all_dependencies_for_step(step=step)
+            active_dependencies = active_dependencies | self.get_all_step_dependencies(step=step)
 
         return active_dependencies
 
@@ -897,7 +901,7 @@ class VersionTracker:
         return step_attributes
 
     @staticmethod
-    def _add_columns_with_different_versions_of_the_same_step(steps_df: pd.DataFrame) -> pd.DataFrame:
+    def _add_columns_with_different_step_versions(steps_df: pd.DataFrame) -> pd.DataFrame:
         steps_df = steps_df.copy()
         # Create a dataframe with one row per unique step.
         df = steps_df.drop_duplicates(subset="step")[["step", "identifier", "version"]].reset_index(drop=True)
@@ -951,7 +955,7 @@ class VersionTracker:
         steps = pd.merge(steps, self.step_attributes_df, on="step", how="left")
 
         # Add columns with the list of forward and backwards versions for each step.
-        steps = self._add_columns_with_different_versions_of_the_same_step(steps_df=steps)
+        steps = self._add_columns_with_different_step_versions(steps_df=steps)
 
         return steps
 
@@ -973,7 +977,7 @@ class VersionTracker:
         error_message = "Missing dependencies in the dag:"
         for missing_step in missing_steps:
             error_message += f"\n* Missing step \n    {missing_step}\n  is a dependency of the following active steps:"
-            direct_usages = self.get_direct_usages_for_step(step=missing_step)
+            direct_usages = self.get_direct_step_usages(step=missing_step)
             for usage in direct_usages:
                 error_message += f"\n    {usage}"
 
