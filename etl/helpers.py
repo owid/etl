@@ -647,7 +647,7 @@ def list_all_steps_in_dag(dag: Dict[str, Any]) -> List[str]:
     return all_steps
 
 
-def get_direct_step_dependencies(dag: Dict[str, Any], step: str) -> Set[str]:
+def get_direct_step_dependencies(dag: Dict[str, Any], step: str) -> List[str]:
     """Get direct dependencies of a given step in a dag.
 
     Direct dependencies of a step are those datasets that are listed in the dag as the step's dependencies.
@@ -661,16 +661,21 @@ def get_direct_step_dependencies(dag: Dict[str, Any], step: str) -> Set[str]:
 
     Returns
     -------
-    dependencies : Set[str]
+    dependencies : List[str]
         Direct dependencies of a step in a dag.
 
     """
-    dependencies = dag[step]
+    if step in dag:
+        # If step is in the dag, return its dependencies.
+        dependencies = sorted(dag[step])
+    else:
+        # If step is not in the dag, return an empty list.
+        dependencies = []
 
     return dependencies
 
 
-def get_direct_step_usages(dag: Dict[str, Any], step: str) -> Set[str]:
+def get_direct_step_usages(dag: Dict[str, Any], step: str) -> List[str]:
     """Get direct usages of a given step in a dag.
 
     Direct usages of a step are those datasets that have the current step listed in the dag as one of the dependencies.
@@ -684,12 +689,12 @@ def get_direct_step_usages(dag: Dict[str, Any], step: str) -> Set[str]:
 
     Returns
     -------
-    dependencies : Set[str]
+    dependencies : List[str]
         Direct usages of a step in a dag.
 
     """
 
-    used_by = set([_step for _step in dag if step in dag[_step]])
+    used_by = sorted(set([_step for _step in dag if step in dag[_step]]))
 
     return used_by
 
@@ -712,7 +717,7 @@ def _recursive_get_all_step_dependencies(dag: Dict[str, Any], step: str, depende
     return dependencies
 
 
-def get_all_step_dependencies(dag: Dict[str, Any], step: str) -> Set[str]:
+def get_all_step_dependencies(dag: Dict[str, Any], step: str) -> List[str]:
     """Get all dependencies for a given step in a dag.
 
     This function returns all dependencies of a step, as well as their direct dependencies, and so on. In the end, the
@@ -727,15 +732,15 @@ def get_all_step_dependencies(dag: Dict[str, Any], step: str) -> Set[str]:
 
     Returns
     -------
-    dependencies : Set[str]
+    dependencies : List[str]
         All dependencies of a given step in a dag.
     """
-    dependencies = _recursive_get_all_step_dependencies(dag=dag, step=step)
+    dependencies = sorted(_recursive_get_all_step_dependencies(dag=dag, step=step))
 
     return dependencies
 
 
-def get_all_step_usages(dag_reverse: Dict[str, Any], step: str) -> Set[str]:
+def get_all_step_usages(dag_reverse: Dict[str, Any], step: str) -> List[str]:
     """Get all dependencies for a given step in a dag.
 
     This function returns all datasets for which a given step is a dependency, as well as those datasets for which they
@@ -751,7 +756,7 @@ def get_all_step_usages(dag_reverse: Dict[str, Any], step: str) -> Set[str]:
 
     Returns
     -------
-    dependencies : Set[str]
+    dependencies : List[str]
         All usages of a given step in a dag.
 
     """
@@ -768,7 +773,7 @@ class LatestVersionOfStepShouldBeActive(ExceptionFromDocstring):
 
 def _recursive_get_all_archivable_steps(steps_df: pd.DataFrame, unused_steps: Set[str] = set()) -> Set[str]:
     # Find active meadow/garden steps for which there is a newer version.
-    outdated_steps = set(
+    new_unused_steps = set(
         steps_df[
             (~steps_df["step"].isin(unused_steps) & steps_df["n_newer_versions"] > 0)
             & (steps_df["state"] == "active")
@@ -776,17 +781,12 @@ def _recursive_get_all_archivable_steps(steps_df: pd.DataFrame, unused_steps: Se
             & (steps_df["channel"].isin(["meadow", "garden"]))
         ]["step"]
     )
-    # Find all active dependencies.
-    active_dependencies = set(
-        steps_df[
-            (~steps_df["used_by"].isin(unused_steps))
-            & (steps_df["state"] == "active")
-            & (steps_df["role"] == "dependency")
-        ]["step"]
-    )
-
-    # Find the set of steps that can safely be archived.
-    new_unused_steps = outdated_steps - active_dependencies
+    # Of those, remove the ones that are active dependencies of other steps (excluding the steps in unused_steps).
+    new_unused_steps = {
+        step
+        for step in new_unused_steps
+        if (set(steps_df[steps_df["step"] == step]["all_usages"].item()) - unused_steps) == set()
+    }
 
     # Add them to the set of unused steps.
     unused_steps = unused_steps | new_unused_steps
@@ -833,48 +833,46 @@ class VersionTracker:
         # TODO: Another useful method would be to find in which dag file each step is (by yaml opening each file).
         # TODO: Check that for each active usage there is a script (it has happened a few times that the code for
         # fasttrack steps was removed, but the steps were still in the dag, and we noticed it when running ETL).
-        # TODO: Consider that steps_df could just contain as many steps as unique steps.
-        # We could have columns for direct usages, all usages, direct dependencies, and all dependencies.
 
-    def get_direct_step_dependencies(self, step: str) -> Set[str]:
+    def get_direct_step_dependencies(self, step: str) -> List[str]:
         dependencies = get_direct_step_dependencies(dag=self.dag_all, step=step)
 
         return dependencies
 
-    def get_direct_step_usages(self, step: str) -> Set[str]:
+    def get_direct_step_usages(self, step: str) -> List[str]:
         dependencies = get_direct_step_usages(dag=self.dag_all, step=step)
 
         return dependencies
 
-    def get_all_step_dependencies(self, step: str) -> Set[str]:
+    def get_all_step_dependencies(self, step: str) -> List[str]:
         dependencies = get_all_step_dependencies(dag=self.dag_all, step=step)
 
         return dependencies
 
-    def get_all_step_usages(self, step: str) -> Set[str]:
+    def get_all_step_usages(self, step: str) -> List[str]:
         dependencies = get_all_step_usages(dag_reverse=self.dag_all_reverse, step=step)
 
         return dependencies
 
     def get_all_step_versions(self, step: str) -> List[str]:
-        # TODO: Instead of using iloc, use item(), once the dataframe has only one row per step.
-        return self.steps_df[self.steps_df["step"] == step].iloc[0]["same_steps_all"]
+        return self.steps_df[self.steps_df["step"] == step]["same_steps_all"].item()
 
     def get_forward_step_versions(self, step: str) -> List[str]:
-        # TODO: Instead of using iloc, use item(), once the dataframe has only one row per step.
-        return self.steps_df[self.steps_df["step"] == step].iloc[0]["same_steps_forward"]
+        return self.steps_df[self.steps_df["step"] == step]["same_steps_forward"].item()
 
     def get_backward_step_versions(self, step: str) -> List[str]:
-        # TODO: Instead of using iloc, use item(), once the dataframe has only one row per step.
-        return self.steps_df[self.steps_df["step"] == step].iloc[0]["same_steps_backward"]
+        return self.steps_df[self.steps_df["step"] == step]["same_steps_backward"].item()
 
-    def get_all_dependencies_of_active_steps(self) -> Set[str]:
+    def get_all_dependencies_of_active_steps(self) -> List[str]:
         # Gather all dependencies of active steps in the dag.
         active_dependencies = set()
         for step in self.dag_active:
-            active_dependencies = active_dependencies | self.get_all_step_dependencies(step=step)
+            active_dependencies = active_dependencies | set(self.get_all_step_dependencies(step=step))
 
-        return active_dependencies
+        return sorted(active_dependencies)
+
+    def get_all_archivable_steps(self) -> List[str]:
+        return sorted(_recursive_get_all_archivable_steps(steps_df=self.steps_df))
 
     def _create_step_attributes(self) -> pd.DataFrame:
         # Extract all attributes of each unique active/archive/dependency step.
@@ -940,26 +938,16 @@ class VersionTracker:
         return steps_df
 
     def _create_steps_df(self) -> pd.DataFrame:
-        steps = []
-        # Gather active steps and their dependencies.
-        for step in self.dag_active:
-            steps.append([step, step, "active", "usage"])
-            for substep in self.dag_active[step]:
-                steps.append([substep, step, "active", "dependency"])
-        # Gather archive steps and their dependencies.
-        for step in self.dag_archive:
-            steps.append([step, step, "archive", "usage"])
-            for substep in self.dag_archive[step]:
-                steps.append([substep, step, "archive", "dependency"])
-
-        # Store all steps and their dependencies.
-        # Column "used_by" includes:
-        # * For a dependency step, the step that is using it.
-        # * For a usage step, the step itself.
-        steps = pd.DataFrame.from_records(steps, columns=["step", "used_by", "state", "role"])
+        steps_df = pd.DataFrame({"step": self.all_steps.copy()})
+        steps_df["direct_dependencies"] = [self.get_direct_step_dependencies(step=step) for step in self.all_steps]
+        steps_df["direct_usages"] = [self.get_direct_step_usages(step=step) for step in self.all_steps]
+        steps_df["all_dependencies"] = [self.get_all_step_dependencies(step=step) for step in self.all_steps]
+        steps_df["all_usages"] = [self.get_all_step_usages(step=step) for step in self.all_steps]
+        steps_df["state"] = ["active" if step in self.all_active_steps else "archive" for step in self.all_steps]
+        steps_df["role"] = ["usage" if step in self.dag_all else "dependency" for step in self.all_steps]
 
         # Add attributes to steps.
-        steps = pd.merge(steps, self.step_attributes_df, on="step", how="left")
+        steps = pd.merge(steps_df, self.step_attributes_df, on="step", how="left")
 
         # Add columns with the list of forward and backwards versions for each step.
         steps = self._add_columns_with_different_step_versions(steps_df=steps)
@@ -1029,7 +1017,7 @@ class VersionTracker:
 
     def check_that_all_active_steps_are_necessary(self) -> None:
         # Find all active steps that can safely be archived.
-        unused_data_steps = _recursive_get_all_archivable_steps(steps_df=self.steps_df)
+        unused_data_steps = self.get_all_archivable_steps()
         if len(unused_data_steps) > 0:
             error_message = "Some data steps are not used and can safely be archived:"
             for unused_data_step in unused_data_steps:
