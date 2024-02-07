@@ -769,6 +769,39 @@ class LatestVersionOfStepShouldBeActive(ExceptionFromDocstring):
     """The latest version of each data step should be in the dag as a main step (maybe it was accidentally removed)."""
 
 
+def _recursive_get_all_archivable_steps(steps_df: pd.DataFrame, unused_steps: Set[str] = set()) -> Set[str]:
+    # Find active meadow/garden steps for which there is a newer version.
+    outdated_steps = set(
+        steps_df[
+            (~steps_df["step"].isin(unused_steps) & steps_df["n_newer_versions"] > 0)
+            & (steps_df["state"] == "active")
+            & (steps_df["role"] == "usage")
+            & (steps_df["channel"].isin(["meadow", "garden"]))
+        ]["step"]
+    )
+    # Find all active dependencies.
+    active_dependencies = set(
+        steps_df[
+            (~steps_df["used_by"].isin(unused_steps))
+            & (steps_df["state"] == "active")
+            & (steps_df["role"] == "dependency")
+        ]["step"]
+    )
+
+    # Find the set of steps that can safely be archived.
+    new_unused_steps = outdated_steps - active_dependencies
+
+    # Add them to the set of unused steps.
+    unused_steps = unused_steps | new_unused_steps
+
+    if new_unused_steps == set():
+        # If no new unused step has been detected, return the set of unused steps.
+        return unused_steps
+    else:
+        # Otherwise, repeat the process to keep finding new archivable steps.
+        return _recursive_get_all_archivable_steps(steps_df=steps_df, unused_steps=unused_steps)
+
+
 class VersionTracker:
     """Helper object that loads the dag, provides useful functions to check for versions and dataset dependencies, and
     checks for inconsistencies.
@@ -866,7 +899,6 @@ class VersionTracker:
         # Gather active steps and their dependencies.
         for step in self.dag_active:
             steps.append([step, step, "active", "usage"])
-            # for substep in self.dag_all[step]:
             for substep in self.dag_active[step]:
                 steps.append([substep, step, "active", "dependency"])
         # Gather archive steps and their dependencies.
@@ -877,8 +909,8 @@ class VersionTracker:
 
         # Store all steps and their dependencies.
         # Column "used_by" includes:
-        # * For a dependency step, the main step that is using it.
-        # * For a main step, the main step itself.
+        # * For a dependency step, the step that is using it.
+        # * For a usage step, the step itself.
         steps = pd.DataFrame.from_records(steps, columns=["step", "used_by", "state", "role"])
 
         # Add attributes to steps.
@@ -948,19 +980,8 @@ class VersionTracker:
             raise LatestVersionOfStepShouldBeActive
 
     def check_that_all_active_steps_are_necessary(self) -> None:
-        # TODO: This function may need to become recurrent, because once an unused step is taken out, another step
-        #  may also become unnecessary (e.g. the meadow step of an unused garden step will be detected only after the
-        #  garden step has been removed).
-        outdated_data_steps = set(
-            self.steps_df[
-                (self.steps_df["n_newer_versions"] > 0)
-                & (self.steps_df["state"] == "active")
-                & (self.steps_df["channel"].isin(["meadow", "garden"]))
-            ]["step"]
-        )
-
-        unused_data_steps = outdated_data_steps - set(self.all_active_dependencies)
-
+        # Find all active steps that can safely be archived.
+        unused_data_steps = _recursive_get_all_archivable_steps(steps_df=self.steps_df)
         if len(unused_data_steps) > 0:
             error_message = "Some data steps are not used and can safely be archived:"
             for unused_data_step in unused_data_steps:
