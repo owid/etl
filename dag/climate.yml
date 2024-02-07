@@ -145,9 +145,9 @@ steps:
     - data://garden/epa/2024-01-29/ghg_concentration
     - data://garden/climate/2024-01-31/ghg_concentration
   #
-  # Climate change impacts data explorer (2024-01-31).
+  # Various sources - Climate change impacts (2024-01-31).
   #
-  data://explorers/climate/latest/climate_change_impacts:
+  data://garden/climate/2024-01-31/climate_change_impacts:
     - data://garden/climate/2024-01-31/surface_temperature_analysis
     - data://garden/climate/2024-01-31/sea_ice_index
     - data://garden/climate/2024-01-31/sea_surface_temperature
@@ -161,6 +161,15 @@ steps:
     - data://garden/epa/2024-01-29/ocean_heat_content
     - data://garden/epa/2024-01-29/ice_sheet_mass_balance
     - data://garden/epa/2024-01-29/mass_balance_us_glaciers
+  data://grapher/climate/2024-01-31/climate_change_impacts_annual:
+    - data://garden/climate/2024-01-31/climate_change_impacts
+  data://grapher/climate/2024-01-31/climate_change_impacts_monthly:
+    - data://garden/climate/2024-01-31/climate_change_impacts
+  #
+  # Climate change impacts data explorer (2024-01-31).
+  #
+  data://explorers/climate/latest/climate_change_impacts:
+    - data://garden/climate/2024-01-31/climate_change_impacts
   ######################################################################################################################
 
   ######################################################################################################################
