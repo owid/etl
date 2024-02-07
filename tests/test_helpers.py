@@ -7,6 +7,7 @@ from owid import catalog
 import etl.helpers
 from etl import paths
 from etl.helpers import PathFinder, VersionTracker, create_dataset, isolated_env
+from etl.steps import reverse_graph
 
 # For the previous mock dag to work, we have to structure the steps as data://channel/namespace/version/dataset.
 # So I will assign an arbitrary prefix to all steps in the mock dag.
@@ -62,7 +63,7 @@ def test_PathFinder_paths():
 
 def test_get_direct_dependencies_for_step_in_dag(mock_dag):
     for step in mock_dag["steps"]:
-        dependencies = etl.helpers.get_direct_dependencies_for_step_in_dag(dag=mock_dag["steps"], step=step)
+        dependencies = etl.helpers.get_direct_step_dependencies(dag=mock_dag["steps"], step=step)
         expected_dependencies = mock_dag["steps"][step]
         assert sorted(dependencies) == sorted(expected_dependencies)
 
@@ -71,21 +72,22 @@ def test_get_direct_usages_for_step_in_dag(mock_dag, mock_expected_direct_usages
     mock_dag_all = mock_dag["steps"].copy()
     mock_dag_all.update(mock_dag["archive"])
     for step in mock_dag["steps"]:
-        usages = etl.helpers.get_direct_usages_for_step_in_dag(dag=mock_dag_all, step=step)
+        usages = etl.helpers.get_direct_step_usages(dag=mock_dag_all, step=step)
         assert sorted(usages) == sorted(mock_expected_direct_usages[step])
 
 
 def test_get_all_dependencies_for_step_in_dag(mock_dag, mock_expected_dependencies):
     for step in mock_dag["steps"]:
-        dependencies = etl.helpers.get_all_dependencies_for_step_in_dag(dag=mock_dag["steps"], step=step)
+        dependencies = etl.helpers.get_all_step_dependencies(dag=mock_dag["steps"], step=step)
         assert sorted(dependencies) == sorted(mock_expected_dependencies[step])
 
 
 def test_get_all_usages_for_step_in_dag(mock_dag, mock_expected_usages):
     mock_dag_all = mock_dag["steps"].copy()
     mock_dag_all.update(mock_dag["archive"])
+    mock_dag_all_reverse = reverse_graph(mock_dag_all)
     for step in mock_dag["steps"]:
-        usages = etl.helpers.get_all_usages_for_step_in_dag(dag=mock_dag_all, step=step)
+        usages = etl.helpers.get_all_step_usages(dag_reverse=mock_dag_all_reverse, step=step)
         assert sorted(usages) == sorted(mock_expected_usages[step])
 
 
@@ -98,7 +100,7 @@ def test_version_tracker_get_all_dependencies(mock_dag, mock_expected_dependenci
     versions = create_mock_version_tracker(dag=mock_dag)
     expected_dependencies = rename_steps_in_dag(dag=mock_expected_dependencies, prefix=MOCK_STEP_PREFIX)
     for step in rename_steps_in_dag(dag=mock_dag["steps"], prefix=MOCK_STEP_PREFIX):
-        dependencies = versions.get_all_dependencies_for_step(step=step)
+        dependencies = versions.get_all_step_dependencies(step=step)
         assert sorted(dependencies) == sorted(expected_dependencies[step])
 
 
@@ -106,7 +108,7 @@ def test_version_tracker_get_all_usages(mock_dag, mock_expected_usages):
     versions = create_mock_version_tracker(dag=mock_dag)
     expected_usages = rename_steps_in_dag(dag=mock_expected_usages, prefix=MOCK_STEP_PREFIX)
     for step in rename_steps_in_dag(dag=mock_dag["steps"], prefix=MOCK_STEP_PREFIX):
-        dependencies = versions.get_all_usages_for_step(step=step)
+        dependencies = versions.get_all_step_usages(step=step)
         assert sorted(dependencies) == sorted(expected_usages[step])
 
 
