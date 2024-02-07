@@ -48,7 +48,8 @@ def run(dest_dir: str) -> None:
     tb["month"] = tb["time"].astype(str).str[5:7]
 
     # Calculate mean temperature for each month in the entire period (to be used for anomaly calculations)
-    monthly_climatology = tb.groupby(["country", "month"], as_index=False)["temperature_2m"].mean()
+    tb_base = tb[(tb["year"].astype(int) > 1950) & (tb["year"].astype(int) < 1981)]
+    monthly_climatology = tb_base.groupby(["country", "month"], as_index=False)["temperature_2m"].mean()
     monthly_climatology = monthly_climatology.rename(columns={"temperature_2m": "mean_temp"})
 
     # Ensure that the reference mean DataFrame has a name for the mean column, e.g., 'mean_temp'
