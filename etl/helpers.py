@@ -832,8 +832,10 @@ class VersionTracker:
         self._steps_df = None
 
         # TODO: Another useful method would be to find in which dag file each step is (by yaml opening each file).
-
-        # TODO: Create function that returns a dictionary of each step with its previous versions.
+        # TODO: Check that for each active usage there is a script (it has happened a few times that the code for
+        # fasttrack steps was removed, but the steps were still in the dag, and we noticed it when running ETL).
+        # TODO: Consider that steps_df could just contain as many steps as unique steps.
+        # Column "used_by" would be a list, and "depends_on" would be another list.
 
     def get_direct_dependencies_for_step(self, step: str) -> Set[str]:
         dependencies = get_direct_dependencies_for_step_in_dag(dag=self.dag_all, step=step)
@@ -894,6 +896,38 @@ class VersionTracker:
 
         return step_attributes
 
+    @staticmethod
+    def _add_columns_with_different_versions_of_the_same_step(steps_df: pd.DataFrame) -> pd.DataFrame:
+        steps_df = steps_df.copy()
+        # Create a dataframe with one row per unique step.
+        df = steps_df.drop_duplicates(subset="step")[["step", "identifier", "version"]].reset_index(drop=True)
+        # For each step, find all alternative versions.
+        # One column will contain forward versions, another backward versions, and another all versions.
+        other_versions_forward = []
+        other_versions_backward = []
+        other_versions_all = []
+        for _, row in df.iterrows():
+            # Create a mask that selects all steps with the same identifier.
+            select_same_identifier = df["identifier"] == row["identifier"]
+            # Find all forward versions of the current step.
+            other_versions_forward.append(
+                sorted(set(df[select_same_identifier & (df["version"] > row["version"])]["step"]))
+            )
+            # Find all backward versions of the current step.
+            other_versions_backward.append(
+                sorted(set(df[select_same_identifier & (df["version"] < row["version"])]["step"]))
+            )
+            # Find all versions of the current step.
+            other_versions_all.append(sorted(set(df[select_same_identifier]["step"])))
+        # Add columns to the dataframe.
+        df["same_steps_forward"] = other_versions_forward
+        df["same_steps_backward"] = other_versions_backward
+        df["same_steps_all"] = other_versions_all
+        # Add new columns to the original steps dataframe.
+        steps_df = pd.merge(steps_df, df.drop(columns=["identifier", "version"]), on="step", how="left")
+
+        return steps_df
+
     def _create_steps_df(self) -> pd.DataFrame:
         steps = []
         # Gather active steps and their dependencies.
@@ -915,6 +949,9 @@ class VersionTracker:
 
         # Add attributes to steps.
         steps = pd.merge(steps, self.step_attributes_df, on="step", how="left")
+
+        # Add columns with the list of forward and backwards versions for each step.
+        steps = self._add_columns_with_different_versions_of_the_same_step(steps_df=steps)
 
         return steps
 
