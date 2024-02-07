@@ -184,7 +184,10 @@ def get_archivable_grapher_steps(db_conn: Connection, tracker: VersionTracker) -
     # Only public steps will be considered. The archival of private steps has be done manually.
     steps_df = tracker.steps_df.copy()
     grapher_steps = steps_df[
-        (steps_df["status"] == "active") & (steps_df["channel"] == "grapher") & (steps_df["kind"] == "public")
+        (steps_df["state"] == "active")
+        & (steps_df["role"] == "usage")
+        & (steps_df["channel"] == "grapher")
+        & (steps_df["kind"] == "public")
     ].rename(columns={"name": "short_name"})
 
     # Warn about grapher steps used as dependencies
