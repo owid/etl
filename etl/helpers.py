@@ -800,6 +800,8 @@ class VersionTracker:
 
         # TODO: Another useful method would be to find in which dag file each step is (by yaml opening each file).
 
+        # TODO: Create function that returns a dictionary of each step with its previous versions.
+
     def get_direct_dependencies_for_step(self, step: str) -> Set[str]:
         dependencies = get_direct_dependencies_for_step_in_dag(dag=self.dag_all, step=step)
 
@@ -854,7 +856,7 @@ class VersionTracker:
         # Find how many newer versions exist for each step.
         step_attributes["n_newer_versions"] = [
             row["n_versions"] - row["versions"].index(row["version"]) - 1
-            for i, row in step_attributes[["n_versions", "versions", "version"]].iterrows()
+            for _, row in step_attributes[["n_versions", "versions", "version"]].iterrows()
         ]
 
         return step_attributes
@@ -863,20 +865,21 @@ class VersionTracker:
         steps = []
         # Gather active steps and their dependencies.
         for step in self.dag_active:
-            steps.append([step, step, "active"])
-            for substep in self.dag_all[step]:
-                steps.append([substep, step, "dependency"])
+            steps.append([step, step, "active", "usage"])
+            # for substep in self.dag_all[step]:
+            for substep in self.dag_active[step]:
+                steps.append([substep, step, "active", "dependency"])
         # Gather archive steps and their dependencies.
         for step in self.dag_archive:
-            steps.append([step, step, "archive"])
+            steps.append([step, step, "archive", "usage"])
             for substep in self.dag_archive[step]:
-                steps.append([substep, step, "dependency"])
+                steps.append([substep, step, "archive", "dependency"])
 
         # Store all steps and their dependencies.
         # Column "used_by" includes:
         # * For a dependency step, the main step that is using it.
         # * For a main step, the main step itself.
-        steps = pd.DataFrame.from_records(steps, columns=["step", "used_by", "status"])
+        steps = pd.DataFrame.from_records(steps, columns=["step", "used_by", "state", "role"])
 
         # Add attributes to steps.
         steps = pd.merge(steps, self.step_attributes_df, on="step", how="left")
@@ -951,7 +954,7 @@ class VersionTracker:
         outdated_data_steps = set(
             self.steps_df[
                 (self.steps_df["n_newer_versions"] > 0)
-                & (self.steps_df["status"] == "active")
+                & (self.steps_df["state"] == "active")
                 & (self.steps_df["channel"].isin(["meadow", "garden"]))
             ]["step"]
         )
