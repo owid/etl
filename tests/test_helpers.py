@@ -179,6 +179,88 @@ def test_version_tracker_raise_warning_if_active_steps_can_safely_be_archived(mo
     assert "data://garden/institution_1/2024-01-02/dataset_c" not in mock_log.warning.call_args[0][0]
 
 
+def test_version_tracker_get_all_step_versions():
+    mock_dag = {
+        "steps": {
+            "data://garden/institution_1/2024-01-01/dataset_a": set(
+                ["data://garden/institution_1/2024-01-01/dataset_b", "data://garden/institution_1/2024-01-01/dataset_c"]
+            ),
+            "data://garden/institution_1/2024-01-02/dataset_a": set(
+                ["data://garden/institution_1/2024-01-02/dataset_b", "data://garden/institution_1/2024-01-01/dataset_c"]
+            ),
+            "data://garden/institution_1/2024-01-03/dataset_a": set(),
+            "data://garden/institution_1/2024-01-01/dataset_b": set(),
+            "data://garden/institution_1/2024-01-02/dataset_c": set(),
+        },
+        "archive": {
+            "data://garden/institution_1/2024-01-02/dataset_b": set(),
+            "data://garden/institution_1/2024-01-01/dataset_c": set(),
+        },
+    }
+    versions = create_mock_version_tracker(dag=mock_dag, step_prefix="")
+    # Checks for dataset a.
+    assert versions.get_backward_step_versions(step="data://garden/institution_1/2024-01-01/dataset_a") == []
+    assert versions.get_backward_step_versions(step="data://garden/institution_1/2024-01-02/dataset_a") == [
+        "data://garden/institution_1/2024-01-01/dataset_a"
+    ]
+    assert versions.get_backward_step_versions(step="data://garden/institution_1/2024-01-03/dataset_a") == [
+        "data://garden/institution_1/2024-01-01/dataset_a",
+        "data://garden/institution_1/2024-01-02/dataset_a",
+    ]
+    assert versions.get_forward_step_versions(step="data://garden/institution_1/2024-01-01/dataset_a") == [
+        "data://garden/institution_1/2024-01-02/dataset_a",
+        "data://garden/institution_1/2024-01-03/dataset_a",
+    ]
+    assert versions.get_forward_step_versions(step="data://garden/institution_1/2024-01-02/dataset_a") == [
+        "data://garden/institution_1/2024-01-03/dataset_a",
+    ]
+    assert versions.get_forward_step_versions(step="data://garden/institution_1/2024-01-03/dataset_a") == []
+    assert (
+        versions.get_all_step_versions(step="data://garden/institution_1/2024-01-01/dataset_a")
+        == versions.get_all_step_versions(step="data://garden/institution_1/2024-01-02/dataset_a")
+        == versions.get_all_step_versions(step="data://garden/institution_1/2024-01-03/dataset_a")
+        == [
+            "data://garden/institution_1/2024-01-01/dataset_a",
+            "data://garden/institution_1/2024-01-02/dataset_a",
+            "data://garden/institution_1/2024-01-03/dataset_a",
+        ]
+    )
+    # Checks for dataset b.
+    assert versions.get_backward_step_versions(step="data://garden/institution_1/2024-01-01/dataset_b") == []
+    assert versions.get_backward_step_versions(step="data://garden/institution_1/2024-01-02/dataset_b") == [
+        "data://garden/institution_1/2024-01-01/dataset_b"
+    ]
+    assert versions.get_forward_step_versions(step="data://garden/institution_1/2024-01-01/dataset_b") == [
+        "data://garden/institution_1/2024-01-02/dataset_b",
+    ]
+    assert versions.get_forward_step_versions(step="data://garden/institution_1/2024-01-02/dataset_b") == []
+    assert (
+        versions.get_all_step_versions(step="data://garden/institution_1/2024-01-01/dataset_b")
+        == versions.get_all_step_versions(step="data://garden/institution_1/2024-01-02/dataset_b")
+        == [
+            "data://garden/institution_1/2024-01-01/dataset_b",
+            "data://garden/institution_1/2024-01-02/dataset_b",
+        ]
+    )
+    # Checks for dataset c.
+    assert versions.get_backward_step_versions(step="data://garden/institution_1/2024-01-01/dataset_c") == []
+    assert versions.get_backward_step_versions(step="data://garden/institution_1/2024-01-02/dataset_c") == [
+        "data://garden/institution_1/2024-01-01/dataset_c"
+    ]
+    assert versions.get_forward_step_versions(step="data://garden/institution_1/2024-01-01/dataset_c") == [
+        "data://garden/institution_1/2024-01-02/dataset_c",
+    ]
+    assert versions.get_forward_step_versions(step="data://garden/institution_1/2024-01-02/dataset_c") == []
+    assert (
+        versions.get_all_step_versions(step="data://garden/institution_1/2024-01-01/dataset_c")
+        == versions.get_all_step_versions(step="data://garden/institution_1/2024-01-02/dataset_c")
+        == [
+            "data://garden/institution_1/2024-01-01/dataset_c",
+            "data://garden/institution_1/2024-01-02/dataset_c",
+        ]
+    )
+
+
 def test_create_dataset(tmp_path):
     meta = catalog.DatasetMeta(title="Test title")
 
