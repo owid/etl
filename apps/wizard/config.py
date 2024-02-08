@@ -2,6 +2,8 @@
 
 It basically reads the configuration from .wizard.yml and renders the home page and other details.
 """
+from typing import Literal
+
 import yaml
 
 from etl.paths import APPS_DIR
@@ -48,3 +50,14 @@ def _check_wizard_config(config: dict):
 
 
 WIZARD_CONFIG = load_wizard_config()
+
+# Phases accepted
+_aliases = []
+## Load all aliases
+for section in WIZARD_CONFIG["sections"]:
+    for app in section["apps"]:
+        _aliases.append(app["alias"])
+for step in WIZARD_CONFIG["etl"]["steps"].values():
+    _aliases.append(step["alias"])
+_aliases = tuple(_aliases + ["all"])
+WIZARD_PHASES = Literal[_aliases]  # type: ignore

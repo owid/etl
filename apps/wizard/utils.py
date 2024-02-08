@@ -11,7 +11,7 @@ import shutil
 import tempfile
 from copy import deepcopy
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Literal, Optional, Type, cast
+from typing import Any, Callable, Dict, List, Optional, Type, cast
 
 import jsonref
 import jsonschema
@@ -50,9 +50,6 @@ DATE_TODAY = dt.date.today().strftime("%Y-%m-%d")
 
 # Get current directory
 CURRENT_DIR = Path(__file__).parent
-
-# Phases accepted
-PHASES = Literal["all", "snapshot", "meadow", "garden", "grapher", "charts", "metagpt", "dataexp"]
 
 # Paths to cookiecutter files
 COOKIE_SNAPSHOT = APPS_DIR / "wizard" / "etl_steps" / "cookiecutter" / "snapshot"

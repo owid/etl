@@ -50,11 +50,16 @@ show_pages(toc)
 add_indentation()
 
 # Go to specific page if argument is passed
+## Home
 if utils.AppState.args.phase == "all":  # type: ignore
     switch_page("Home")  # type: ignore
-elif utils.AppState.args.phase == "metagpt":  # type: ignore
-    switch_page("MetaGPT")  # type: ignore
-elif utils.AppState.args.phase == "dataexp":  # type: ignore
-    switch_page("Dataset Explorer")  # type: ignore
-elif utils.AppState.args.phase in ["snapshot", "meadow", "garden", "grapher", "charts"]:  # type: ignore
-    switch_page(utils.AppState.args.phase.title())  # type: ignore
+## ETL step
+for step in WIZARD_CONFIG["etl"]["steps"].values():
+    if utils.AppState.args.phase == step["alias"]:  # type: ignore
+        switch_page(step["title"])  # type: ignore
+## Section
+for section in WIZARD_CONFIG["sections"]:
+    for app in section["apps"]:
+        if utils.AppState.args.phase == app["alias"]:  # type: ignore
+            switch_page(app["title"])  # type: ignore
+            print(2, app["title"])
