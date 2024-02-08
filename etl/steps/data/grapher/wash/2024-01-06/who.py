@@ -13,9 +13,6 @@ def run(dest_dir: str) -> None:
     # Load garden dataset.
     ds_garden = paths.load_dataset("who")
     tb = ds_garden["who"]
-    tb = tb.reset_index()
-    tb["year"] = tb["year"].astype("Int64")
-    tb = tb.set_index(["country", "year", "residence"], verify_integrity=True)
     #
     # Save outputs.
     #

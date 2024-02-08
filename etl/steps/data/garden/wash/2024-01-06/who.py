@@ -14,8 +14,6 @@ from etl.helpers import PathFinder, create_dataset
 paths = PathFinder(__file__)
 log = get_logger()
 
-REGIONS_TO_ADD = ["North America", "South America", "Europe", "Africa", "Asia", "Oceania"]
-
 
 def run(dest_dir: str) -> None:
     #
@@ -63,45 +61,6 @@ def calculate_population_with_each_category(tb: Table) -> Table:
     for col in columns:
         tb[f"{col}_pop"] = (tb[col] / 100) * tb["pop"]
 
-    return tb
-
-
-def clean_values(tb: Table) -> Table:
-    """
-    Some values are strings that begin with either < or >. These are not valid numbers, so we need to clean them by removing those non-numeric characters.
-    Additionally, NAs are represented with - in the data, we need to replace those with NaNs.
-
-    """
-    # Replace - with NaNs.
-    tb = tb.replace("-", np.nan)
-
-    # Remove < and > from strings.
-    tb = tb.applymap(lambda x: re.sub(r"[<>]", "", x) if isinstance(x, str) else x)
-
-    # There is a strange column at the end of each table that is just the row number. We can drop this.
-
-    tb = tb.drop(
-        columns=[
-            "year_survey_name",
-            "pct_urban__of_total_population",
-            "total_sl",
-            "total_proportion_of_population_using__improved_water_supplies_sl",
-            "total_proportion_of_population_using_improved__sanitation_facilities__including_shared__sl",
-        ],
-        axis=1,
-        errors="ignore",  # not all tables have these columns
-    )
-
-    return tb
-
-
-def calculate_hygiene_no_services(tb: Table) -> Table:
-    """
-    Calculate the proportion of the population with no services.
-
-    """
-    tb["hyg_ns"] = 100 - tb["hyg_fac"]
-    tb = tb.drop(columns=["hyg_fac"], axis=1)
     return tb
 
 
