@@ -767,10 +767,6 @@ def get_all_step_usages(dag_reverse: Dict[str, Any], step: str) -> List[str]:
     return dependencies
 
 
-class LatestVersionOfStepShouldBeActive(ExceptionFromDocstring):
-    """The latest version of each data step should be in the dag as a main step (maybe it was accidentally removed)."""
-
-
 def _recursive_get_all_archivable_steps(steps_df: pd.DataFrame, unused_steps: Set[str] = set()) -> Set[str]:
     # Find active meadow/garden steps for which there is a newer version.
     new_unused_steps = set(
@@ -799,7 +795,14 @@ def _recursive_get_all_archivable_steps(steps_df: pd.DataFrame, unused_steps: Se
         return _recursive_get_all_archivable_steps(steps_df=steps_df, unused_steps=unused_steps)
 
 
-def load_steps_for_each_dag_file():
+def load_steps_for_each_dag_file() -> Dict[str, Dict[str, List[str]]]:
+    """Return a dictionary of all ETL (active and archive) dag files, and the steps they contain.
+
+    Returns
+    -------
+    dag_file_steps : Dict[str, Dict[str, List[str]]]
+        Dictionary with items {"active": {step_1: dag_file_name_1, step_2: dag_file_name_2, ...}, "archive": {...}}.
+    """
     # Create a temporary dictionary with the path to the folder of active and archive dag files.
     dag_file_paths = {"active": paths.DAG_DIR.glob("*.yml"), "archive": paths.DAG_DIR.glob("archive/*.yml")}
     # Create a dictionary that will contain the content of the active dag files and the archive dag files.
@@ -816,15 +819,22 @@ def load_steps_for_each_dag_file():
     return dag_file_steps
 
 
-def load_dag_file_for_each_step():
+def load_dag_file_for_each_step() -> Dict[str, str]:
+    """Return a dictionary of all ETL (active and archive) steps and name of their dag file.
+
+    Returns
+    -------
+    dag_file_steps_reverse : Dict[str, str]
+        Dictionary with items {step_1: dag_file_name_1, step_2: dag_file_name_2, ...}.
+    """
     dag_file_steps = load_steps_for_each_dag_file()
     # Reverse active dictionary of dag files.
-    active_dag_files = reverse_graph(dag_file_steps["active"])
+    active_dag_files = reverse_graph(dag_file_steps["active"])  # type: ignore
     dag_file_steps_reverse = {
         step: list(active_dag_files[step])[0] for step in active_dag_files if len(active_dag_files[step]) > 0
     }
     # Add the reverse of the archive dictionary of dag files.
-    archive_dag_files = reverse_graph(dag_file_steps["archive"])
+    archive_dag_files = reverse_graph(dag_file_steps["archive"])  # type: ignore
     dag_file_steps_reverse.update(
         {step: list(archive_dag_files[step])[0] for step in archive_dag_files if len(archive_dag_files[step]) > 0}
     )
@@ -869,35 +879,43 @@ class VersionTracker:
         # fasttrack steps was removed, but the steps were still in the dag, and we noticed it when running ETL).
 
     def get_direct_step_dependencies(self, step: str) -> List[str]:
+        """Get direct dependencies of a given step in the dag."""
         dependencies = get_direct_step_dependencies(dag=self.dag_all, step=step)
 
         return dependencies
 
     def get_direct_step_usages(self, step: str) -> List[str]:
+        """Get direct usages of a given step in the dag."""
         dependencies = get_direct_step_usages(dag=self.dag_all, step=step)
 
         return dependencies
 
     def get_all_step_dependencies(self, step: str) -> List[str]:
+        """Get all dependencies for a given step in the dag (including dependencies of dependencies)."""
         dependencies = get_all_step_dependencies(dag=self.dag_all, step=step)
 
         return dependencies
 
     def get_all_step_usages(self, step: str) -> List[str]:
+        """Get all usages for a given step in the dag (including usages of usages)."""
         dependencies = get_all_step_usages(dag_reverse=self.dag_all_reverse, step=step)
 
         return dependencies
 
     def get_all_step_versions(self, step: str) -> List[str]:
+        """Get all versions of a given step in the dag."""
         return self.steps_df[self.steps_df["step"] == step]["same_steps_all"].item()
 
     def get_forward_step_versions(self, step: str) -> List[str]:
+        """Get all forward versions of a given step in the dag."""
         return self.steps_df[self.steps_df["step"] == step]["same_steps_forward"].item()
 
     def get_backward_step_versions(self, step: str) -> List[str]:
+        """Get all backward versions of a given step in the dag."""
         return self.steps_df[self.steps_df["step"] == step]["same_steps_backward"].item()
 
     def get_all_dependencies_of_active_steps(self) -> List[str]:
+        """Get all dependencies of active steps in the dag."""
         # Gather all dependencies of active steps in the dag.
         active_dependencies = set()
         for step in self.dag_active:
@@ -906,9 +924,11 @@ class VersionTracker:
         return sorted(active_dependencies)
 
     def get_all_archivable_steps(self) -> List[str]:
+        """Get all steps in the dag that can safely be moved to the archive."""
         return sorted(_recursive_get_all_archivable_steps(steps_df=self.steps_df))
 
     def get_dag_file_for_step(self, step: str) -> str:
+        """Get the name of the dag file for a given step."""
         if step in self.dag_file_for_each_step:
             dag_file_name = self.dag_file_for_each_step[step]
         else:
@@ -1008,6 +1028,13 @@ class VersionTracker:
 
     @property
     def steps_df(self) -> pd.DataFrame:
+        """Dataframe where each row corresponds to a unique step that appears in the (active or archive) dag.
+
+        Returns
+        -------
+        steps_df : pd.DataFrame
+            Steps dataframe.
+        """
         if self._steps_df is None:
             self._steps_df = self._create_steps_df()
 
@@ -1024,6 +1051,7 @@ class VersionTracker:
         return error_message
 
     def check_that_active_dependencies_are_defined(self) -> None:
+        """Check that all active dependencies are defined in the dag; if not, raise an informative error."""
         # Gather all steps that appear in the dag only as dependencies, but not as executable steps.
         missing_steps = set(self.all_active_dependencies) - set(self.all_active_usages)
 
@@ -1036,6 +1064,7 @@ class VersionTracker:
             log.error(f"{error_message}\n\nSolution: Check if you may have accidentally deleted those missing steps.")
 
     def check_that_active_dependencies_are_not_archived(self) -> None:
+        """Check that all active dependencies are not archived; if they are, raise an informative error."""
         # Find any archive steps that are dependencies of active steps, and should therefore not be archive steps.
         missing_steps = set(self.dag_archive) & set(self.all_active_dependencies)
 
@@ -1043,24 +1072,8 @@ class VersionTracker:
             error_message = self._generate_error_for_missing_dependencies(missing_steps=missing_steps)
             log.error(f"{error_message}\n\nSolution: Either archive the active steps or un-archive the archive steps.")
 
-    def check_that_latest_version_of_steps_are_active(self) -> None:
-        # Check that the latest version of each main data step is in the dag.
-        # If not, it could be because it has been deleted by accident.
-        # We may decide to remove this test, because it will raise an error if an old step is archived, and it has no
-        # newer version. This can happen for example if the name of the step was changed during the update.
-        latest_data_steps = set(
-            self.step_attributes_df[
-                (self.step_attributes_df["n_newer_versions"] == 0)
-                & (self.step_attributes_df["channel"].isin(["meadow", "garden"]))
-            ]["step"]
-        )
-        missing_steps = latest_data_steps - set(list(self.dag_active))
-        if len(missing_steps) > 0:
-            for missing_step in missing_steps:
-                print(f"Step {missing_step} is the latest version of a step and hence should be in the dag.")
-            raise LatestVersionOfStepShouldBeActive
-
     def check_that_all_active_steps_are_necessary(self) -> None:
+        """Check that all active steps are needed in the dag; if not, raise an informative warning."""
         # Find all active steps that can safely be archived.
         unused_data_steps = self.get_all_archivable_steps()
         if len(unused_data_steps) > 0:
@@ -1085,13 +1098,14 @@ class VersionTracker:
         return backported_dataset_ids
 
     def apply_sanity_checks(self) -> None:
+        """Apply all sanity checks."""
         self.check_that_active_dependencies_are_defined()
         self.check_that_active_dependencies_are_not_archived()
-        # self.check_that_latest_version_of_steps_are_active()
         self.check_that_all_active_steps_are_necessary()
 
 
 def run_version_tracker_checks():
+    """Run all version tracker sanity checks."""
     VersionTracker().apply_sanity_checks()
 
 
