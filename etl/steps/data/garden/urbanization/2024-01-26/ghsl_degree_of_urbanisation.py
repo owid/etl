@@ -17,10 +17,10 @@ REGIONS = [
     "Africa",
     "Asia",
     "Oceania",
-    "Low income",
-    "Lower middle income",
-    "Upper middle income",
-    "High income",
+    "Low-income countries",
+    "Upper-middle-income countries",
+    "Lower-middle-income countries",
+    "High-income countries",
     "World",
 ]
 
