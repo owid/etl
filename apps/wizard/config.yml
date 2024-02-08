@@ -73,9 +73,9 @@ sections:
         emoji: "🔄"
         image_url: "https://cdn.pixabay.com/photo/2018/04/12/18/13/sync-3314296_1280.png"
 
-  - title: "Other tools"
+  - title: "Metadata"
     description: |-
-      Other helpful tools in the ETL ecosystem.
+      Tools to improve our metadata or learn how to use it.
     apps:
     - title: "MetaGPT"
       description: "Migrate old metadata to new format."
@@ -84,10 +84,23 @@ sections:
       emoji: "🤖"
       alias: metagpt
       image_url: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/04/ChatGPT_logo.svg/1024px-ChatGPT_logo.svg.png"
-    - title: "Dataset Explorer"
-      alias: dataexp
-      description: "Explore datasets and their metadata."
+    - title: "Metadata playground"
+      alias: metaplay
+      description: "Understand how metadata is presented in data pages."
       maintainer: "@lucas"
-      entrypoint: dataset_explorer.py
-      emoji: "🔍"
-      image_url: "https://upload.wikimedia.org/wikipedia/commons/c/c3/NGC_4414_%28NASA-med%29.jpg"
+      entrypoint: metaplay.py
+      emoji: "🏐"
+      image_url: "https://upload.wikimedia.org/wikipedia/commons/d/d4/PlayEquipComboPlastic_wb.jpg"
+
+  - title: "Others"
+    description: |-
+      Other helpful tools in the ETL ecosystem.
+    apps:
+      - title: "Dataset Explorer"
+        alias: dataexp
+        description: "Explore datasets and their metadata."
+        maintainer: "@lucas"
+        entrypoint: dataset_explorer.py
+        emoji: "🔍"
+        image_url: "https://upload.wikimedia.org/wikipedia/commons/c/c3/NGC_4414_%28NASA-med%29.jpg"
+

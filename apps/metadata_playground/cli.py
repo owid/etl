@@ -11,7 +11,7 @@ from streamlit.web import cli as stcli
 from etl.config import METAPLAY_PORT
 from etl.paths import APPS_DIR
 
-SCRIPT_PATH = APPS_DIR / "metadata_playground" / "app.py"
+SCRIPT_PATH = APPS_DIR / "wizard" / "metaplay.py"
 
 print(SCRIPT_PATH)
 
