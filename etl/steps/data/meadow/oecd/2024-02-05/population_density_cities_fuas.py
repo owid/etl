@@ -19,10 +19,7 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
-
-    for col in tb.columns:
-        print(col)
-        print(tb[col].unique())
+    print(tb)
     cols_to_select = ["REF_AREA", "Reference area", "Unit of measure", "Territorial level", "TIME_PERIOD", "OBS_VALUE"]
     tb = tb[cols_to_select]
 
@@ -36,15 +33,10 @@ def run(dest_dir: str) -> None:
         }
     )
 
-    # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
-    tb = (
-        tb.underscore()
-        .set_index(["ref_area", "reference_area", "year", "unit_of_measure", "territorial_level"])
-        .sort_index()
+    tb = tb.underscore().set_index(
+        ["ref_area", "reference_area", "year", "unit_of_measure", "territorial_level"], verify_integrity=True
     )
-    # Python
-    duplicated_index = tb.index.duplicated(keep=False)
-    print(tb[duplicated_index][:20])
+
     #
     # Save outputs.
     #
