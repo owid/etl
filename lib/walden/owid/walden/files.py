@@ -78,7 +78,12 @@ def download(url: str, filename: str, expected_md5: Optional[str] = None, quiet:
     # issues one some systems, it's safer to stream directly to the file and remove it
     # if md5 don't match
     tmp_filename = filename + ".tmp"
-    with open(tmp_filename, "wb") as f, requests.get(url, stream=True) as r:
+    # Add a header to the request, to avoid a "requests.exceptions.HTTPError: 403 Client Error: Forbidden for url: ..."
+    # error when accessing data files in certain URLs.
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.9.0.7) Gecko/2009021910 Firefox/3.0.7"
+    }
+    with open(tmp_filename, "wb") as f, requests.get(url, stream=True, headers=headers) as r:
         r.raise_for_status()
 
         md5 = _stream_to_file(r, f, **kwargs)

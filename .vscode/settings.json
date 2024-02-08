@@ -32,47 +32,6 @@
       "**/docs/api/*.md",
       "**/docs/architecture/*.md"
   ],
-  "sqltools.connections": [
-      {
-          "mysqlOptions": {
-              "authProtocol": "default"
-          },
-          "previewLimit": 50,
-          "server": "localhost",
-          "port": 3316,
-          "driver": "MySQL",
-          "name": "grapher-local",
-          "group": "grapher",
-          "database": "grapher",
-          "username": "grapher"
-      },
-      {
-          "mysqlOptions": {
-              "authProtocol": "default"
-          },
-          "previewLimit": 50,
-          "server": "localhost",
-          "port": 13306,
-          "driver": "MySQL",
-          "name": "grapher-staging",
-          "group": "grapher",
-          "database": "staging_grapher",
-          "username": "staging_grapher"
-      },
-      {
-          "mysqlOptions": {
-              "authProtocol": "default"
-          },
-          "previewLimit": 50,
-          "server": "localhost",
-          "port": 13333,
-          "driver": "MySQL",
-          "name": "grapher-live",
-          "group": "grapher",
-          "username": "etl_grapher",
-          "database": "live_grapher"
-      }
-  ],
   "files.exclude": {
     "etl/steps/archive": true,
     "snapshots/archive": true
