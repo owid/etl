@@ -19,7 +19,6 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
-    print(tb)
     cols_to_select = ["REF_AREA", "Reference area", "Unit of measure", "Territorial level", "TIME_PERIOD", "OBS_VALUE"]
     tb = tb[cols_to_select]
 
@@ -32,6 +31,13 @@ def run(dest_dir: str) -> None:
             "OBS_VALUE": "value",
         }
     )
+
+    tb_2020 = tb[
+        (tb["year"] == 2020)
+        & (tb["unit_of_measure"] == "Persons per square kilometer")
+        & (tb["territorial_level"] == "City")
+    ]
+    top_100_cities = tb_2020.nlargest(10, "value")
 
     tb = tb.underscore().set_index(
         ["ref_area", "reference_area", "year", "unit_of_measure", "territorial_level"], verify_integrity=True
