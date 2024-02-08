@@ -1,10 +1,11 @@
-"""Fast-track import."""
+"""Fast-track import FRONT-END (WIP).
+
+TODO: Fully decouple front-end from backend (see fasttrack_utils for back-end, i.e. should not have streamlit calls).
+"""
 from pathlib import Path
-from typing import Any, Dict
 
 import pandas as pd
 import streamlit as st
-from owid.catalog import Dataset, Table
 from st_pages import add_indentation
 from structlog import get_logger
 
@@ -13,18 +14,17 @@ from apps.wizard.etl_steps.fasttrack_utils import (
     IMPORT_GSHEET,
     LOCAL_CSV,
     UPDATE_GSHEET,
-    FasttrackImport,
     _add_to_dag,
     _commit_and_push,
-    _data_diff,
     _dataset_id,
     _load_existing_sheets_from_snapshots,
-    _metadata_diff,
+    continue_processing,
     load_data_from_resource,
+    set_states,
 )
 from etl import config
 from etl.command import main as etl_main
-from etl.paths import DAG_DIR, DATA_DIR
+from etl.paths import DAG_DIR
 
 # Page config
 st.set_page_config(page_title="Wizard (meadow)", page_icon="🪄")
@@ -44,57 +44,6 @@ st.session_state["to_be_submitted"] = st.session_state.get("to_be_submitted", Fa
 st.session_state["to_be_submitted_confirmed_1"] = st.session_state.get("to_be_submitted_confirmed_1", False)
 st.session_state["to_be_submitted_confirmed_2"] = st.session_state.get("to_be_submitted_confirmed_2", False)
 st.session_state["fast_import"] = st.session_state.get("fast_import", None)
-
-
-def set_states(states_values: Dict[str, Any]):
-    for key, value in states_values.items():
-        print(key)
-        st.session_state[key] = value
-
-
-def continue_processing(data, dataset_meta, variables_meta_dict, origin, dataset_uri, status):
-    with status:
-        # Build table
-        st.write("Building table and dataset objects...")
-        tb = Table(data, short_name=dataset_meta.short_name)
-        for short_name, var_meta in variables_meta_dict.items():
-            tb[short_name].metadata = var_meta
-        # Build dataset
-        dataset_meta.channel = "grapher"
-        dataset = Dataset.create_empty(DATA_DIR / dataset_meta.uri, dataset_meta)
-        dataset.add(tb)
-        dataset.save()
-
-        # Prepare import
-        st.write("Building submission...")
-        fast_import = FasttrackImport(
-            dataset=dataset,
-            origin=origin,
-            dataset_uri=dataset_uri,
-            is_gsheet=import_method in (IMPORT_GSHEET, UPDATE_GSHEET),
-        )
-
-    # Cross-check with existing dataset
-    if fast_import.snapshot_exists() and fast_import.metadata_path.exists():
-        with st.form("crosscheck_form"):
-            st.markdown("Do you want to continue and add the dataset to the Grapher database?")
-            with st.expander("See changes in metadata", expanded=False):
-                st.write("""Data differences from existing dataset...""")
-                _data_diff(fast_import)
-
-                st.write("""Metadata differences from existing dataset...""")
-                _metadata_diff(fast_import)
-
-            st.form_submit_button(
-                "Continue",
-                type="primary",
-                use_container_width=True,
-                on_click=lambda: set_states({"to_be_submitted_confirmed_2": True}),
-            )
-    else:
-        set_states({"to_be_submitted_confirmed_2": True})
-
-    return fast_import
 
 
 ##########################################################
@@ -244,6 +193,7 @@ if st.session_state.to_be_submitted:
             origin=origin,
             dataset_uri=dataset_uri,
             status=status_main,
+            import_method=import_method,
         )
 
     # If there are unknown countries, do something about it
@@ -288,6 +238,7 @@ if st.session_state.to_be_submitted:
                 origin=origin,
                 dataset_uri=dataset_uri,
                 status=status_second,
+                import_method=import_method,
             )
 
 

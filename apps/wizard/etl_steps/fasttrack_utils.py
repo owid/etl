@@ -1,11 +1,11 @@
-"""Fast-track import."""
+"""Fast-track import BACKEND."""
 import datetime as dt
 import difflib
 import json
 import os
 import urllib.error
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
@@ -27,7 +27,7 @@ from etl.compare import diff_print
 from etl.db import get_engine
 from etl.files import apply_ruff_formatter_to_files, yaml_dump
 from etl.metadata_export import metadata_export
-from etl.paths import BASE_DIR, DAG_DIR, LATEST_REGIONS_DATASET_PATH, SNAPSHOTS_DIR, STEP_DIR
+from etl.paths import BASE_DIR, DAG_DIR, DATA_DIR, LATEST_REGIONS_DATASET_PATH, SNAPSHOTS_DIR, STEP_DIR
 from etl.snapshot import Snapshot, SnapshotMeta
 
 log = get_logger()
@@ -588,6 +588,61 @@ def load_data_from_sheets(sheets_url, _status):
             )
 
     return data, dataset_meta, variables_meta_dict, origin
+
+
+def continue_processing(data, dataset_meta, variables_meta_dict, origin, dataset_uri, status, import_method):
+    """Continue processing after data has been loaded.
+
+    This function is expected to be run after `load_data_from_sheets` has been executed.
+    """
+    with status:
+        # Build table
+        st.write("Building table and dataset objects...")
+        tb = Table(data, short_name=dataset_meta.short_name)
+        for short_name, var_meta in variables_meta_dict.items():
+            tb[short_name].metadata = var_meta
+        # Build dataset
+        dataset_meta.channel = "grapher"
+        dataset = Dataset.create_empty(DATA_DIR / dataset_meta.uri, dataset_meta)
+        dataset.add(tb)
+        dataset.save()
+
+        # Prepare import
+        st.write("Building submission...")
+        fast_import = FasttrackImport(
+            dataset=dataset,
+            origin=origin,
+            dataset_uri=dataset_uri,
+            is_gsheet=import_method in (IMPORT_GSHEET, UPDATE_GSHEET),
+        )
+
+    # Cross-check with existing dataset
+    if fast_import.snapshot_exists() and fast_import.metadata_path.exists():
+        with st.form("crosscheck_form"):
+            st.markdown("Do you want to continue and add the dataset to the Grapher database?")
+            with st.expander("See changes in metadata", expanded=False):
+                st.write("""Data differences from existing dataset...""")
+                _data_diff(fast_import)
+
+                st.write("""Metadata differences from existing dataset...""")
+                _metadata_diff(fast_import)
+
+            st.form_submit_button(
+                "Continue",
+                type="primary",
+                use_container_width=True,
+                on_click=lambda: set_states({"to_be_submitted_confirmed_2": True}),
+            )
+    else:
+        set_states({"to_be_submitted_confirmed_2": True})
+
+    return fast_import
+
+
+def set_states(states_values: Dict[str, Any]):
+    for key, value in states_values.items():
+        print(key)
+        st.session_state[key] = value
 
 
 def _dataset_id(ds_meta: DatasetMeta) -> int:
