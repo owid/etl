@@ -8,26 +8,13 @@ from owid.catalog import processing as pr
 from structlog import get_logger
 
 from etl.data_helpers import geo
-from etl.data_helpers.geo import add_regions_to_table
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 log = get_logger()
 
-REGIONS_TO_ADD = [
-    "North America",
-    "South America",
-    "Europe",
-    "Africa",
-    "Asia",
-    "Oceania",
-    "Low-income countries",
-    "Upper-middle-income countries",
-    "Lower-middle-income countries",
-    "High-income countries",
-    "World",
-]
+REGIONS_TO_ADD = ["North America", "South America", "Europe", "Africa", "Asia", "Oceania"]
 
 
 def run(dest_dir: str) -> None:
@@ -37,9 +24,9 @@ def run(dest_dir: str) -> None:
     # Load meadow dataset.
     ds_meadow = paths.load_dataset("who")
     # Load regions
-    # ds_regions = paths.load_dependency("regions")
+    ds_regions = paths.load_dependency("regions")
     # Load income groups dataset.
-    # ds_income_groups = paths.load_dependency("income_groups")
+    ds_income_groups = paths.load_dependency("income_groups")
     # Add population
     ds_population = paths.load_dependency("population")
     tb = ds_meadow["who"].reset_index()
@@ -47,9 +34,10 @@ def run(dest_dir: str) -> None:
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
     # The population is given as 'population (thousands)
     tb["pop"] = tb["pop"].astype(float).multiply(1000)
-    tb = add_population_to_regions(tb, ds_population)
+    tb = add_population_to_regions(tb, ds_population, ds_regions, ds_income_groups)
     tb = calculate_population_with_each_category(tb)
     tb = calculate_population_without_service(tb)
+
     tb = tb.drop(columns=["pop"])
     tb = tb.set_index(["country", "year", "residence"], verify_integrity=True)
     # Save outputs.
@@ -61,15 +49,6 @@ def run(dest_dir: str) -> None:
 
     # Save changes in the new garden dataset.
     ds_garden.save()
-
-
-def drop_erroneous_rows(tb: Table) -> Table:
-    """
-    The values for Kosovo are poorly formatted and the country name is given as a year. Let's remove those.
-    """
-    tb = tb[~tb["country"].str.startswith("2")]
-    tb = tb[tb["year"].notna()]
-    return tb
 
 
 def calculate_population_with_each_category(tb: Table) -> Table:
@@ -147,7 +126,7 @@ def calculate_population_without_service(tb: Table) -> Table:
     return tb
 
 
-def add_population_to_regions(tb: Table, ds_population: Table) -> Table:
+def add_population_to_regions(tb: Table, ds_population: Table, ds_regions: Table, ds_income_groups: Table) -> Table:
     tb_to_add_pop = tb[["country", "year", "residence"]][(tb["pop"].isna()) & (tb["residence"] == "Total")]
 
     tb_to_add_pop = geo.add_population_to_table(
