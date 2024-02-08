@@ -3,6 +3,7 @@ import datetime as dt
 import difflib
 import json
 import os
+import urllib.error
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
@@ -15,11 +16,15 @@ from owid.catalog import Dataset, DatasetMeta, Origin, Source, Table, VariableMe
 from owid.catalog.utils import underscore, validate_underscore
 from owid.datautils import io
 from rich.console import Console
+from sqlmodel import Session
 from structlog import get_logger
 
+import apps.fasttrack.csv as csv
 import apps.fasttrack.sheets as sheets
 from apps.wizard import utils as wizard_utils
+from etl import grapher_model as gm
 from etl.compare import diff_print
+from etl.db import get_engine
 from etl.files import apply_ruff_formatter_to_files, yaml_dump
 from etl.metadata_export import metadata_export
 from etl.paths import BASE_DIR, DAG_DIR, LATEST_REGIONS_DATASET_PATH, SNAPSHOTS_DIR, STEP_DIR
@@ -34,11 +39,13 @@ class FasttrackImport:
         self,
         dataset: Dataset,
         origin: Optional[Origin],
-        sheets_url: str,
+        dataset_uri: str,
+        is_gsheet: bool = False,
     ):
         self.dataset = dataset
         self.origin = origin
-        self.sheets_url = sheets_url
+        self.dataset_uri = dataset_uri
+        self.is_gsheet = is_gsheet
 
     @property
     def meta(self) -> DatasetMeta:
@@ -67,7 +74,7 @@ class FasttrackImport:
     @property
     def snapshot_meta(self) -> SnapshotMeta:
         # since sheets url is accessible with link, we have to encrypt it when storing in metadata
-        sheets_url = _encrypt(self.sheets_url) if not self.meta.is_public else self.sheets_url
+        dataset_uri = _encrypt(self.dataset_uri) if not self.meta.is_public else self.dataset_uri
 
         if len(self.meta.sources) == 1:
             dataset_source = self.meta.sources[0]
@@ -75,7 +82,7 @@ class FasttrackImport:
                 url=dataset_source.url,
                 name=dataset_source.name,
                 published_by=dataset_source.published_by,
-                source_data_url=sheets_url,
+                source_data_url=dataset_uri,
                 date_accessed=str(dt.date.today()),
                 publication_year=dataset_source.publication_year
                 if not pd.isnull(dataset_source.publication_year)
@@ -89,8 +96,8 @@ class FasttrackImport:
             origin.date_accessed = str(dt.date.today())
 
             # Misuse the version field and url_download fields to store info about the spreadsheet
-            origin.version_producer = "Google Sheet" if self.sheets_url != "local_csv" else "Local CSV"
-            origin.url_download = sheets_url
+            origin.version_producer = "Google Sheet" if self.is_gsheet else "Local CSV"
+            origin.url_download = dataset_uri
             license = self.meta.licenses[0]
         else:
             raise ValueError("Dataset must have either one source or one origin")
@@ -141,7 +148,6 @@ class FasttrackImport:
 def _data_diff(fast_import: FasttrackImport) -> bool:
     """Get difference between existing and imported data."""
     console = Console(record=True)
-
     # load data from snapshot
     if not fast_import.snapshot.path.exists():
         fast_import.snapshot.pull()
@@ -161,35 +167,61 @@ def _data_diff(fast_import: FasttrackImport) -> bool:
     )
 
     html = console.export_html(inline_styles=True, code_format="<pre>{code}</pre>")
-
-    st.markdown(html, unsafe_allow_html=True)
+    html = html.replace('"', "'")
+    st.markdown(
+        f'<iframe srcdoc="{html}" width="100%" style="border: 1px solid black; background: white"></iframe>',
+        unsafe_allow_html=True,
+    )
 
     return exit_code != 0
 
 
+def _diff_files_as_list(current, new):
+    d = difflib.Differ()
+    diff = list(d.compare(current, new))
+    diff_html = "<pre>"
+    for line in diff:
+        if line.startswith("+"):
+            diff_html += f"<span style='color:green;'>{line}</span>"
+        elif line.startswith("-"):
+            diff_html += f"<span style='color:red;'>{line}</span>"
+        else:
+            diff_html += line
+    diff_html += "</pre>"
+    return diff_html
+
+
 def _metadata_diff(fast_import: FasttrackImport) -> bool:
-    # load existing metadata file
+    # Load existing metadata
+    ## Grapher
     with open(fast_import.metadata_path, "r") as f:
-        existing_meta = f.read()
+        meta_now_grapher = f.readlines()
+    ## Snapshot
+    meta_now_snapshot = fast_import.snapshot.metadata.to_yaml().split("\n")
+    meta_now_snapshot = [line + "\n" for line in meta_now_snapshot if line]
+    ## Combine
+    meta_now = meta_now_snapshot + meta_now_grapher
 
-    # load old snapshot metadata from path
-    old_snapshot_yaml = fast_import.snapshot.metadata.to_yaml()
-    # create new snapshot metadata
-    new_snapshot_yaml = fast_import.snapshot_meta.to_yaml()
+    # Load new metadata
+    ## Snapshot
+    meta_new_snapshot = fast_import.snapshot_meta.to_yaml().split("\n")
+    meta_new_snapshot = [line + "\n" for line in meta_new_snapshot if line]
+    ## Grapher
+    meta_new_grapher = fast_import.dataset_yaml().split("\n")
+    meta_new_grapher = [line + "\n" for line in meta_new_grapher if line]
+    ## Combine
+    meta_new = meta_new_snapshot + meta_new_grapher
 
-    # create metadata file
-    new_meta_yaml = fast_import.dataset_yaml()
-
-    # combine snapshot YAML and grapher YAML file
-    diff = difflib.HtmlDiff()
-    html_diff = diff.make_table(
-        (existing_meta + old_snapshot_yaml).split("\n"), (new_meta_yaml + new_snapshot_yaml).split("\n"), context=True
-    )
+    # Compare Snapshot
+    html_diff = _diff_files_as_list(meta_now, meta_new)
     if "No Differences Found" in html_diff:
-        st.success("No metadata differences found.")
+        st.success("No metadata differences found in Snapshot metadata.")
         return False
     else:
-        st.markdown(html_diff, unsafe_allow_html=True)
+        st.markdown(
+            f'<iframe srcdoc="{html_diff}" width="100%" height="400px" style="border: 1px solid black; background: white"></iframe>',
+            unsafe_allow_html=True,
+        )
         return True
 
 
@@ -368,7 +400,6 @@ def _validate_data(df: pd.DataFrame, variables_meta_dict: Dict[str, VariableMeta
             st.exception(error)
         return False
     else:
-        st.success("Data and metadata is valid")
         return True
 
 
@@ -414,3 +445,159 @@ def _harmonize_countries(df: pd.DataFrame) -> Tuple[pd.DataFrame, List[str]]:
     df.set_index(["country", "year"], inplace=True)
 
     return df, unknown_countries
+
+
+# Read file methods
+IMPORT_GSHEET = "import_gsheet"
+UPDATE_GSHEET = "update_gsheet"
+LOCAL_CSV = "local_csv"
+
+
+@st.cache_data(show_spinner=False)
+def load_data_from_resource(import_method, dataset_uri, infer_metadata, is_private, _status):
+    # 1/ LOCAL CSV
+    if import_method == LOCAL_CSV:
+        # Get filename, show notification
+        data, dataset_meta, variables_meta_dict, origin = load_data_from_csv(dataset_uri)
+
+    # 2/ GOOGLE SHEET (New or existing)
+    else:
+        # Get filename, show notification
+        sheets_url = dataset_uri
+        if import_method in (UPDATE_GSHEET, IMPORT_GSHEET):
+            dataset_uri = sheets_url["value"]
+        data, dataset_meta, variables_meta_dict, origin = load_data_from_sheets(dataset_uri, _status=_status)
+
+    # PROCES
+    if infer_metadata:
+        st.write("Inferring metadata...")
+        data, variables_meta_dict = _infer_metadata(data, variables_meta_dict)
+        # add unknown source if we have neither sources nor origins
+        if not dataset_meta.sources and not origin:
+            dataset_meta.sources = [
+                Source(
+                    name="Unknown",
+                    published_by="Unknown",
+                    publication_year=dt.date.today().year,
+                    date_accessed=str(dt.date.today()),
+                )
+            ]
+
+    # VALIDATION
+    st.write("Validating data and metadata...")
+    success = _validate_data(data, variables_meta_dict)
+    if not success:
+        _status.update(state="error")
+        st.stop()
+
+    # HARMONIZATION
+    # NOTE: harmonization is not done in ETL, but here in fast-track for technical reasons
+    # It's not yet clear what will authors prefer and how should we handle preprocessing from
+    # raw data to data saved as snapshot
+    st.write("Harmonizing countries...")
+    data, unknown_countries = _harmonize_countries(data)
+    if unknown_countries:
+        st.error(f"There are {len(unknown_countries)} unknown entities!")
+        _status.update(state="error")
+
+    # Update dataset metadata
+    dataset_meta.is_public = not is_private
+
+    return data, dataset_meta, variables_meta_dict, origin, unknown_countries, dataset_uri
+
+
+@st.cache_data(show_spinner=False)
+def load_data_from_csv(uploaded_file):
+    print("RUNNING FOR SHEETS")
+    # Read CSV file as a dataframe
+    st.write("Importing CSV...")
+    csv_df = pd.read_csv(uploaded_file)
+
+    # Parse dataframe
+    st.write("Parsing data...")
+    data = csv.parse_data_from_csv(csv_df)
+
+    # Obtain dataset and other objects
+    st.write("Parsing metadata...")
+    dataset_meta, variables_meta_dict, origin = csv.parse_metadata_from_csv(
+        uploaded_file.name,
+        csv_df.columns,
+    )
+
+    # Success message
+    st.success("Data imported from CSV")
+
+    return data, dataset_meta, variables_meta_dict, origin
+
+
+@st.cache_data(show_spinner=False)
+def load_data_from_sheets(sheets_url, _status):
+    # Show status progress as we import data
+    st.info(
+        """
+        Note that Google Sheets refreshes its published version every 5 minutes, so you may need to wait a bit after you update your data.
+        """
+    )
+    # Sanity check
+    st.write("Sanity checks...")
+    if "?output=csv" not in sheets_url:
+        st.exception(
+            sheets.ValidationError(
+                f"URL does not contain `?output=csv`. Have you published it as CSV and not as HTML by accident? URL was {sheets_url}"
+            )
+        )
+        _status.update(state="error")
+        st.stop()
+    else:
+        try:
+            # Import data from Google Sheets
+            st.write(f"Importing [sheet]({sheets_url.replace('?output=csv', '')})...")
+            google_sheets = sheets.import_google_sheets(sheets_url)
+            # TODO: it would make sense to repeat the import until we're sure that it has been updated
+            # we wouldn't risk importing data that is not up to date then
+            # the question is how much can we trust the timestamp in the published version
+
+            # Parse data into dataframe
+            st.write("Parsing data...")
+            data = sheets.parse_data_from_sheets(google_sheets["data"])
+
+            # Obtain dataset and other objects
+            st.write("Creating dataset...")
+            dataset_meta, variables_meta_dict, origin = sheets.parse_metadata_from_sheets(
+                google_sheets["dataset_meta"],
+                google_sheets["variables_meta"],
+                google_sheets["sources_meta"],
+                google_sheets["origins_meta"],
+            )
+
+        except urllib.error.HTTPError:
+            st.exception(
+                sheets.ValidationError(
+                    "Sheet not found, have you copied the template? Creating new Google Sheets document or new "
+                    "sheets with the same name in the existing document does not work."
+                )
+            )
+            _status.update(state="error")
+            st.stop()
+        except sheets.ValidationError as e:
+            st.exception(e)
+            st.stop()
+        else:
+            st.success(
+                f"Data imported (sheet refreshed {_last_updated_before_minutes(google_sheets['dataset_meta'])} minutes ago)"
+            )
+
+    return data, dataset_meta, variables_meta_dict, origin
+
+
+def _dataset_id(ds_meta: DatasetMeta) -> int:
+    """Get dataset ID from dataset."""
+    with Session(get_engine()) as session:
+        ds = gm.Dataset.load_with_path(
+            session,
+            namespace=ds_meta.namespace,
+            short_name=ds_meta.short_name,
+            version=str(ds_meta.version),  # type: ignore
+        )
+        assert ds.id
+        return ds.id

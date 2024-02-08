@@ -1,25 +1,30 @@
 """Fast-track import."""
-import datetime as dt
-import urllib.error
 from pathlib import Path
 from typing import Any, Dict
 
 import pandas as pd
 import streamlit as st
-from owid.catalog import Source
+from owid.catalog import Dataset, Table
 from st_pages import add_indentation
 from structlog import get_logger
 
-import apps.fasttrack.csv as csv
-import apps.fasttrack.sheets as sheets
 from apps.wizard import utils as wizard_utils
 from apps.wizard.etl_steps.fasttrack_utils import (
-    _harmonize_countries,
-    _infer_metadata,
-    _last_updated_before_minutes,
+    IMPORT_GSHEET,
+    LOCAL_CSV,
+    UPDATE_GSHEET,
+    FasttrackImport,
+    _add_to_dag,
+    _commit_and_push,
+    _data_diff,
+    _dataset_id,
     _load_existing_sheets_from_snapshots,
-    _validate_data,
+    _metadata_diff,
+    load_data_from_resource,
 )
+from etl import config
+from etl.command import main as etl_main
+from etl.paths import DAG_DIR, DATA_DIR
 
 # Page config
 st.set_page_config(page_title="Wizard (meadow)", page_icon="🪄")
@@ -28,16 +33,68 @@ add_indentation()
 
 # CONFIG
 CURRENT_DIR = Path(__file__).parent
+DAG_FASTTRACK_PATH = DAG_DIR / "fasttrack.yml"
 # Config style
 wizard_utils.config_style_html()
 # Logger
 log = get_logger()
 
+# Initialize session state
+st.session_state["to_be_submitted"] = st.session_state.get("to_be_submitted", False)
+st.session_state["to_be_submitted_confirmed_1"] = st.session_state.get("to_be_submitted_confirmed_1", False)
+st.session_state["to_be_submitted_confirmed_2"] = st.session_state.get("to_be_submitted_confirmed_2", False)
+st.session_state["fast_import"] = st.session_state.get("fast_import", None)
+
 
 def set_states(states_values: Dict[str, Any]):
     for key, value in states_values.items():
-        print(key, value)
+        print(key)
         st.session_state[key] = value
+
+
+def continue_processing(data, dataset_meta, variables_meta_dict, origin, dataset_uri, status):
+    with status:
+        # Build table
+        st.write("Building table and dataset objects...")
+        tb = Table(data, short_name=dataset_meta.short_name)
+        for short_name, var_meta in variables_meta_dict.items():
+            tb[short_name].metadata = var_meta
+        # Build dataset
+        dataset_meta.channel = "grapher"
+        dataset = Dataset.create_empty(DATA_DIR / dataset_meta.uri, dataset_meta)
+        dataset.add(tb)
+        dataset.save()
+
+        # Prepare import
+        st.write("Building submission...")
+        fast_import = FasttrackImport(
+            dataset=dataset,
+            origin=origin,
+            dataset_uri=dataset_uri,
+            is_gsheet=import_method in (IMPORT_GSHEET, UPDATE_GSHEET),
+        )
+
+    # Cross-check with existing dataset
+    if fast_import.snapshot_exists() and fast_import.metadata_path.exists():
+        with st.form("crosscheck_form"):
+            st.markdown("Do you want to continue and add the dataset to the Grapher database?")
+            with st.expander("See changes in metadata", expanded=False):
+                st.write("""Data differences from existing dataset...""")
+                _data_diff(fast_import)
+
+                st.write("""Metadata differences from existing dataset...""")
+                _metadata_diff(fast_import)
+
+            st.form_submit_button(
+                "Continue",
+                type="primary",
+                use_container_width=True,
+                on_click=lambda: set_states({"to_be_submitted_confirmed_2": True}),
+            )
+    else:
+        set_states({"to_be_submitted_confirmed_2": True})
+
+    return fast_import
 
 
 ##########################################################
@@ -59,15 +116,12 @@ st.markdown(
 # 2. Update from an existing Google sheet
 # 3. Import from a local CSV
 ##########################################################
-IMPORT_GSHEET = "import_gsheet"
-UPDATE_GSHEET = "update_gsheet"
-LOCAL_CSV = "local_csv"
 IMPORT_OPTIONS = {
     IMPORT_GSHEET: {
         "title": "New Google sheet",
         "description": "Import data from a Google sheet",
         "guidelines": {
-            "heading": "❓ **How to import from a Google sheet**",
+            "heading": "**How to import from a Google sheet**",
             "file_path": CURRENT_DIR / "markdown" / "fasttrack_gsheet_import.md",
         },
     },
@@ -75,7 +129,7 @@ IMPORT_OPTIONS = {
         "title": "Existing Google sheet",
         "description": "Update from a Google sheet (already imported in the database)",
         "guidelines": {
-            "heading": "❓ **How to update from an existing sheet**",
+            "heading": "**How to update from an existing sheet**",
             "file_path": CURRENT_DIR / "markdown" / "fasttrack_gsheet_update.md",
         },
     },
@@ -83,7 +137,7 @@ IMPORT_OPTIONS = {
         "title": "Local CSV",
         "description": "Import from a local CSV",
         "guidelines": {
-            "heading": "❓ **How to import a local CSV**",
+            "heading": "**How to import a local CSV**",
             "file_path": CURRENT_DIR / "markdown" / "fasttrack_csv.md",
         },
     },
@@ -100,13 +154,13 @@ import_method = st.radio(
 # Show brief guidelines for each import method
 for option, option_params in IMPORT_OPTIONS.items():
     if import_method == option:
-        with st.expander(option_params["guidelines"]["heading"], expanded=False):
+        with st.expander(f"More info: {option_params['guidelines']['heading']}", expanded=False):
             with open(option_params["guidelines"]["file_path"], "r") as f:
                 st.markdown(f.read())
 
 
 ##########################################################
-# Actually create & show form
+# CREATE AND SHOW THE FORM
 ##########################################################
 with st.form("fasttrack-form"):
     # Import field
@@ -124,7 +178,6 @@ with st.form("fasttrack-form"):
             format_func=lambda x: x["label"],
             help="Selected sheet will be used if you don't specify Google Sheets URL.",
             key="dataset_uri",
-            on_change=set_states({"is_private": False}),
         )
     else:
         st.file_uploader(
@@ -149,146 +202,168 @@ with st.form("fasttrack-form"):
         "Submit",
         type="primary",
         use_container_width=True,
-        # on_click=update_state,
+        on_click=lambda: set_states(
+            {
+                "to_be_submitted": True,
+                "to_be_submitted_confirmed_1": False,
+                "to_be_submitted_confirmed_2": False,
+            }
+        ),
     )
 
 
 ##########################################################
-# SUBMISSION
+# USER CLICKS ON SUBMIT
 ##########################################################
-if submitted:
+if st.session_state.to_be_submitted:
     # Sanity check: dataset_uri is not empty?
     if st.session_state["dataset_uri"] in (None, ""):
         st.error("Please provide a valid dataset URI.")
         st.stop()
 
     #####################################################
-    # IMPORT DATA
+    # IMPORT & PROCESS DATA
     #####################################################
-    # 1/ LOCAL CSV FILE
-    if import_method == LOCAL_CSV:
-        # Get filename, show notification
-        uploaded_file = st.session_state["dataset_uri"]
-
-        # Read CSV file as a dataframe
-        csv_df = pd.read_csv(uploaded_file)
-
-        # Parse dataframe
-        data = csv.parse_data_from_csv(csv_df)
-
-        # Obtain dataset and other objects
-        dataset_meta, variables_meta_dict, origin = csv.parse_metadata_from_csv(
-            uploaded_file.name,
-            csv_df.columns,
+    status_main = st.status("Importing data from Google Sheets...", expanded=False)
+    with status_main:
+        data, dataset_meta, variables_meta_dict, origin, unknown_countries, dataset_uri = load_data_from_resource(
+            import_method=import_method,
+            dataset_uri=st.session_state["dataset_uri"],
+            infer_metadata=st.session_state["infer_metadata"],
+            is_private=st.session_state["is_private"],
+            _status=status_main,
         )
 
-        # Success message
-        st.success("Data imported from CSV")
+    # If all countries are known, proceed without alterations
+    if unknown_countries in ([], None):
+        # continue with submission
+        st.session_state["fast_import"] = continue_processing(
+            data=data,
+            dataset_meta=dataset_meta,
+            variables_meta_dict=variables_meta_dict,
+            origin=origin,
+            dataset_uri=dataset_uri,
+            status=status_main,
+        )
 
-    # 2/ GOOGLE SHEET (New or existing)
+    # If there are unknown countries, do something about it
     else:
-        # Get filename, show notification
-        sheets_url = st.session_state["dataset_uri"]
-        if import_method == UPDATE_GSHEET:
-            sheets_url = sheets_url["value"]
-
-        # Show status progress as we import data
-        with st.status("Importing data from Google Sheets...", expanded=True):
-            st.info(
-                """
-                Note that Google Sheets refreshes its published version every 5 minutes, so you may need to wait a bit after you update your data.
-                """
+        # 1/ Ask what to do
+        with st.form("unknown_countries_form"):
+            st.radio(
+                label="⚠️ There are unknown countries. What do you want to do?",
+                options=["Keep unknown entities", "Drop unknown entities"],
+                key="unknown_countries_action",
+            )
+            with st.expander(f"See list of {len(unknown_countries)} unknown entities", expanded=False):
+                df_countries = pd.DataFrame(unknown_countries, columns=["entity"]).sort_values(by="entity")
+                st.dataframe(df_countries, hide_index=True)
+            proceed_1 = st.form_submit_button(
+                "Proceed",
+                type="primary",
+                use_container_width=True,
+                on_click=lambda: set_states(
+                    {
+                        "to_be_submitted_confirmed_1": True,
+                        "to_be_submitted_confirmed_2": False,
+                    }
+                ),
             )
 
-            try:
-                # Sanity check
-                st.write("Sanity checks...")
-                if "?output=csv" not in sheets_url:
-                    st.exception(
-                        sheets.ValidationError(
-                            "URL does not contain `?output=csv`. Have you published it as CSV and not as HTML by accident?"
-                        )
-                    )
-                    st.stop()
+        if st.session_state.to_be_submitted_confirmed_1:
+            # 2/ Do something
+            status_second = st.status("Processing unknown countries...", expanded=False)
+            with status_second:
+                if (unknown_countries not in ([], None)) & (
+                    st.session_state["unknown_countries_action"] == "Drop unknown entities"
+                ):
+                    st.write("Dropping unknown entities...")
+                    data = data.loc[~data.index.get_level_values("country").isin(unknown_countries)]
 
-                # Import data from Google Sheets
-                st.write(f"Importing [sheet]({sheets_url.replace('?output=csv', '')})...")
-                google_sheets = sheets.import_google_sheets(sheets_url)
-                # TODO: it would make sense to repeat the import until we're sure that it has been updated
-                # we wouldn't risk importing data that is not up to date then
-                # the question is how much can we trust the timestamp in the published version
+            # 3/ Proceed
+            st.session_state["fast_import"] = continue_processing(
+                data=data,
+                dataset_meta=dataset_meta,
+                variables_meta_dict=variables_meta_dict,
+                origin=origin,
+                dataset_uri=dataset_uri,
+                status=status_second,
+            )
 
-                # Parse data into dataframe
-                st.write("Parsing data...")
-                data = sheets.parse_data_from_sheets(google_sheets["data"])
 
-                # Obtain dataset and other objects
-                st.write("Creating dataset...")
-                dataset_meta, variables_meta_dict, origin = sheets.parse_metadata_from_sheets(
-                    google_sheets["dataset_meta"],
-                    google_sheets["variables_meta"],
-                    google_sheets["sources_meta"],
-                    google_sheets["origins_meta"],
-                )
+##########################################################
+# DATA HAS BEEN PROCESSED
+##########################################################
+if st.session_state.to_be_submitted_confirmed_2:
+    if st.session_state.fast_import:
+        with st.status("Uploading to Grapher...", expanded=True):
+            fast_import = st.session_state.fast_import
+            # add dataset to dag
+            st.write("Adding dataset to the DAG...")
+            dag_content = _add_to_dag(fast_import.dataset.metadata)
 
-            except urllib.error.HTTPError:
-                st.exception(
-                    sheets.ValidationError(
-                        "Sheet not found, have you copied the template? Creating new Google Sheets document or new "
-                        "sheets with the same name in the existing document does not work."
-                    )
-                )
-                st.stop()
-            except sheets.ValidationError as e:
-                st.exception(e)
-                st.stop()
-            finally:
-                st.success(
-                    f"Data imported (sheet refreshed {_last_updated_before_minutes(google_sheets['dataset_meta'])} minutes ago)"
-                )
+            # create step and metadata file
+            st.write("Creating step and metadata files...")
+            wizard_utils.generate_step_to_channel(
+                CURRENT_DIR / "cookiecutter/grapher_fasttrack/", fast_import.meta.to_dict()
+            )
+            fast_import.save_metadata()
 
-    #####################################################
-    # PROCESS DATA
-    #####################################################
-    with st.status("Further processing..."):
-        if st.session_state["infer_metadata"]:
-            st.write("Inferring metadata...")
-            data, variables_meta_dict = _infer_metadata(data, variables_meta_dict)
-            # add unknown source if we have neither sources nor origins
-            if not dataset_meta.sources and not origin:
-                dataset_meta.sources = [
-                    Source(
-                        name="Unknown",
-                        published_by="Unknown",
-                        publication_year=dt.date.today().year,
-                        date_accessed=str(dt.date.today()),
-                    )
-                ]
+            # Uploading snapshot
+            st.write("Uploading snapshot...")
+            snapshot_path = fast_import.upload_snapshot()
+            st.success("Upload successful!")
 
-        # validation
-        st.write("Validating data and metadata...")
-        success = _validate_data(data, variables_meta_dict)
-        if not success:
-            st.stop()
+            # Running ETL and upserting to GrapherDB...
+            st.write("Running ETL and upserting to GrapherDB...")
+            step = f"{fast_import.dataset.metadata.uri}"
+            etl_main(
+                dag_path=DAG_FASTTRACK_PATH,
+                steps=[step],
+                grapher=True,
+                private=not fast_import.dataset.metadata.is_public,
+                workers=1,
+                # NOTE: force is necessary because we are caching checksums with files.CACHE_CHECKSUM_FILE
+                # we could have cleared the cache, but this is cleaner
+                force=True,
+            )
+            st.success("Import to MySQL successful!")
 
-        # NOTE: harmonization is not done in ETL, but here in fast-track for technical reasons
-        # It's not yet clear what will authors prefer and how should we handle preprocessing from
-        # raw data to data saved as snapshot
-        st.write("Harmonizing countries...")
-        data, unknown_countries = _harmonize_countries(data)
-        if unknown_countries:
-            st.error(f"Unknown countries: {unknown_countries}")
+            # Others
+            if config.FASTTRACK_COMMIT:
+                # Commiting and pushing to Github...
+                st.write("Commiting and pushing to Github...")
+                github_link = _commit_and_push(fast_import, snapshot_path)
+                st.success("Changes commited and pushed successfully!")
+            else:
+                github_link = ""
 
-    # Want to continue even if unknown countries?
-    if unknown_countries:
-        st.text(
-            "There are unknown countries. What do you want to do?",
+        # Show final success messages
+        if config.DB_HOST == "localhost":
+            url = f"http://localhost:3030/admin/datasets/{_dataset_id(fast_import.dataset.metadata)}"
+        else:
+            url = f"http://{config.DB_HOST}/admin/datasets/{_dataset_id(fast_import.dataset.metadata)}"
+        st.success(f"The dataset was imported to the [database]({url})!")
+        if config.FASTTRACK_COMMIT:
+            st.success(f"See commit in [ETL repository]({github_link})")
+
+        # Show generated files
+        wizard_utils.preview_dag_additions(
+            dag_content=dag_content,
+            dag_path=DAG_FASTTRACK_PATH,
         )
-        keep = st.button("Keep unknown countries")
-        drop = st.button("Drop unknown countries")
+        wizard_utils.preview_file(
+            snapshot_path,
+            language="yaml",
+        )
+        wizard_utils.preview_file(
+            fast_import.step_path,
+            language="python",
+        )
+        wizard_utils.preview_file(
+            fast_import.metadata_path,
+            "yaml",
+        )
 
-        if keep:
-            st.write("Keeping unknown countries...")
-        if drop:
-            st.write("Dropping unknown countries...")
-            data = data[~data["iso_code"].isin(unknown_countries)]
+    else:
+        st.error("ERROR 100: No fast_import object found. Please report.")

@@ -1,4 +1,4 @@
-## Importing local CSV
+#### Importing local CSV
 
 **Importing local CSV should be only used for exploration and draft datasets.** Datasets that should be public should be either imported from Google Sheets or go through ETL.
 
@@ -6,7 +6,7 @@
 
 2. Some metadata **is not editable** after importing to grapher (but you can still edit chart configs). Let me know if this turns out to be a problem.
 
-## Importing large CSV
+#### Importing large CSV
 
 If your dataset is too big to fit into Google Sheets (your CSV has >20mb), you can instead upload it somewhere else and tell fasttrack to import it from there.
 

@@ -1,4 +1,4 @@
-## Create Google Sheets
+#### Create Google Sheets
 
 1. Copy [Fast-track template](https://docs.google.com/spreadsheets/d/1j_mclAffQ2_jpbVEmI3VOiWRBeclBAIr-U7NpGAdV9A/edit?usp=sharing), ideally to a shared [OWID Fast-track](https://drive.google.com/drive/folders/0AAjVjD6_217sUk9PVA) folder. Then in the sheet, copy your data into `raw_data` or `data` sheet. (**Don't create a new document!** You have to make a copy of the template, then you can remove sheets that you don't need.)
 
@@ -18,7 +18,7 @@ Examples:
 * [Gravitational waves](https://docs.google.com/spreadsheets/d/1NKoZMe6bkXMS29mORNw3o25cENx3MnpYFJk2y3cWXOc/edit?usp=sharing)
 
 
-## Import it with Fast-track
+#### Import it with Fast-track
 
 1. Paste the link into `New Google Sheets URL` field in the form below. Make sure to check `Make dataset private`, this will let you explore your dataset in Admin without publishing it.
 
