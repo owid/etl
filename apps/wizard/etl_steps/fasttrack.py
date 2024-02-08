@@ -44,7 +44,9 @@ st.session_state["to_be_submitted"] = st.session_state.get("to_be_submitted", Fa
 st.session_state["to_be_submitted_confirmed_1"] = st.session_state.get("to_be_submitted_confirmed_1", False)
 st.session_state["to_be_submitted_confirmed_2"] = st.session_state.get("to_be_submitted_confirmed_2", False)
 st.session_state["fast_import"] = st.session_state.get("fast_import", None)
-
+# App state
+st.session_state["step_name"] = "fasttrack"
+APP_STATE = wizard_utils.AppState()
 
 ##########################################################
 # MAIN ###################################################
