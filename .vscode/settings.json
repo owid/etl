@@ -6,7 +6,10 @@
   "files.trimTrailingWhitespace": true,
   "yaml.schemas": {
     "schemas/snapshot-schema.json": "**/*.dvc",
-    "schemas/dataset-schema.json": ["**/*.meta.yml", "**/*.meta.override.yml"]
+    "schemas/dataset-schema.json": [
+      "**/*.meta.yml",
+      "**/*.meta.override.yml"
+    ]
   },
   "[python]": {
     "editor.formatOnSave": true,
@@ -22,22 +25,23 @@
     "**/*"
   ],
   "grammarly.files.include": [
-      "**/README.md",
-      "**/readme.md",
-      "**/*.txt",
-      "**/docs/*.md",
-      "**/docs/adding-data/*.md",
-      "**/docs/adding-data/*.md",
-      "**/docs/getting-started/*.md",
-      "**/docs/api/*.md",
-      "**/docs/architecture/*.md"
+    "**/README.md",
+    "**/readme.md",
+    "**/*.txt",
+    "**/docs/*.md",
+    "**/docs/adding-data/*.md",
+    "**/docs/adding-data/*.md",
+    "**/docs/getting-started/*.md",
+    "**/docs/api/*.md",
+    "**/docs/architecture/*.md"
   ],
   "files.exclude": {
     "etl/steps/archive": true,
     "snapshots/archive": true
   },
   "search.exclude": {
-      "etl/steps/archive": true,
-      "snapshots/archive": true
+    "etl/steps/archive": true,
+    "snapshots/archive": true
   },
+  "yaml.format.printWidth": 999
 }

@@ -1,0 +1,411 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Clean Water & Sanitation
+        - Clean Water
+        - Sanitation
+    display:
+      numDecimalPlaces: 1
+    processing_level: major
+  residence: |-
+    <% if residence == "Rural" %>rural <% elif residence == "Urban" %>urban <% elif residence == "Total" %><%- endif -%>
+  residence_pop: <% if residence == "Rural" %>rural <% elif residence == "Urban" %>urban <% elif residence == "Total" %>total <%- endif -%>
+  basic_sanitation_desc: &basic_sanitation_desc |
+    Basic sanitation services are defined as improved sanitation facilities that are not shared with other households.
+  improved_sanitation_desc: &improved_sanitation_desc |
+    Improved sanitation facilities are those designed to hygienically separate excreta from human contact, and include: flush/pour flush toilets connected to piped sewer systems, septic tanks or pit latrines; pit latrines with slabs (including ventilated pit latrines), and composting toilets.
+  unimproved_sanitation_desc: &unimproved_sanitation_desc |
+    Unimproved sanitation facilities include pit latrines without a slab or platform, hanging latrines or bucket latrines.
+  limited_sanitation_desc: &limited_sanitation_desc |
+    Limited sanitation services are defined as improved sanitation facilities that are shared with other households.
+  open_defecation_desc: &open_defecation_desc |
+    Open defecation refers to the practice of defecating in fields, forests, bushes, bodies of water or other open spaces.
+  safely_managed_sanitation_desc: &safely_managed_sanitation_desc |
+    Safely managed sanitation services are defined as improved sanitation facilities that are not shared with other households and where excreta are safely disposed in situ or transported and treated off-site.
+  basic_drinking_water_desc: &basic_drinking_water_desc |
+    Basic drinking water services are defined as an improved drinking water source,provided collection time is not more than 30 minutes for a roundtrip including queuing.
+  limited_drinking_water_desc: &limited_drinking_water_desc |
+    Limited drinking water services are defined as drinking water from an improved source for which collection time exceeds 30 minutes for a roundtrip including queuing.
+  improved_drinking_water_desc: &improved_drinking_water_desc |
+    Improved drinking water sources are those that have the potential to deliver safe water by nature of their design and construction, and include: piped water, boreholes or tubewells, protected dug wells, protected springs, rainwater, and packaged or delivered water.
+  unimp_drinking_water_desc: &unimp_drinking_water_desc |
+    Unimproved drinking water services are defined as drinking water from an unprotected dug well or unprotected spring.
+  surface_water_desc: &surface_water_desc |
+    Surface water includes rivers, streams, ponds, lakes, dams, canals and irrigation channels.
+  safely_managed_water_desc: &safely_managed_water_desc |
+    Safely managed drinking water services are defined as an improved drinking water source that is located on premises, available when needed and free from faecal and priority chemical contamination.
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
+dataset:
+  update_period_days: 730
+tables:
+  who:
+    variables:
+      wat_imp:
+        title: Share of the {definitions.residence} population using improved water sources
+        description_short: *improved_drinking_water_desc
+        unit: "%"
+        short_unit: "%"
+      wat_imp_without:
+        title: Share of the {definitions.residence} population not using improved water sources
+        description_short: *improved_drinking_water_desc
+        unit: "%"
+        short_unit: "%"
+      wat_basal:
+        title: Share of the {definitions.residence} population using at least basic drinking water services
+        description_short: *basic_drinking_water_desc
+        unit: "%"
+        short_unit: "%"
+      wat_basal_without:
+        title: Share of the {definitions.residence} population not using at least basic drinking water services
+        description_short: *basic_drinking_water_desc
+        unit: "%"
+        short_unit: "%"
+      wat_baso:
+        title: Share of the {definitions.residence} population using only basic drinking water services
+        description_short: *basic_drinking_water_desc
+        unit: "%"
+        short_unit: "%"
+      wat_lim:
+        title: Share of the {definitions.residence} population using limited drinking water services
+        description_short: *limited_drinking_water_desc
+        unit: "%"
+        short_unit: "%"
+      wat_unimp:
+        title: Share of the {definitions.residence} population using unimproved drinking water services
+        description_short: *unimp_drinking_water_desc
+        unit: "%"
+        short_unit: "%"
+      wat_ns:
+        title: Share of the {definitions.residence} population using surface water as a primary source of drinking water
+        description_short: *surface_water_desc
+        unit: "%"
+        short_unit: "%"
+      wat_pip:
+        title: Share of the {definitions.residence} population using improved drinking water services that are piped
+        description_short: *improved_drinking_water_desc
+        unit: "%"
+        short_unit: "%"
+      wat_imp_npip:
+        title: Share of the {definitions.residence} population using improved drinking water services that are not piped
+        description_short: *improved_drinking_water_desc
+        unit: "%"
+        short_unit: "%"
+      wat_imp_prem:
+        title: Share of the {definitions.residence} population using improved drinking water services that are accessible on premises
+        description_short: *improved_drinking_water_desc
+        unit: "%"
+        short_unit: "%"
+      wat_imp_av:
+        title: Share of the {definitions.residence} population using improved drinking water services that are available when needed
+        description_short: *improved_drinking_water_desc
+        unit: "%"
+        short_unit: "%"
+      wat_imp_qual:
+        title: Share of the {definitions.residence} population using improved drinking water services that are free from contamination
+        description_short: *improved_drinking_water_desc
+        unit: "%"
+        short_unit: "%"
+      wat_sm:
+        title: Share of the {definitions.residence} population using safely managed drinking water services
+        description_short: *safely_managed_water_desc
+        unit: "%"
+        short_unit: "%"
+      wat_sm_without:
+        title: Share of the {definitions.residence} population not using safely managed drinking water services
+        description_short: *safely_managed_water_desc
+        unit: "%"
+        short_unit: "%"
+      san_imp:
+        title: Share of the {definitions.residence} population using improved sanitation facilities
+        description_short: *improved_sanitation_desc
+        unit: "%"
+        short_unit: "%"
+      san_imp_without:
+        title: Share of the {definitions.residence} population not using improved sanitation facilities
+        description_short: *improved_sanitation_desc
+        unit: "%"
+        short_unit: "%"
+      san_basal:
+        title: Share of the {definitions.residence} population using at least basic sanitation services, improved sanitation facilities which are not shared
+        description_short: *basic_sanitation_desc
+        unit: "%"
+        short_unit: "%"
+      san_baso:
+        title: Share of the {definitions.residence} population using only basic sanitation services, improved sanitation facilities which are not shared
+        description_short: *basic_sanitation_desc
+        unit: "%"
+        short_unit: "%"
+      san_lim:
+        title: Share of the {definitions.residence} population using limited sanitation services, improved sanitation facilities which are shared
+        description_short: *limited_sanitation_desc
+        unit: "%"
+        short_unit: "%"
+      san_unimp:
+        title: Share of the {definitions.residence} population using unimproved sanitation facilities
+        description_short: *unimproved_sanitation_desc
+        unit: "%"
+        short_unit: "%"
+      san_ns:
+        title: Share of the {definitions.residence} population practicing open defecation
+        description_short: *open_defecation_desc
+        unit: "%"
+        short_unit: "%"
+      san_othimp:
+        title: Share of the {definitions.residence} population using improved pit latrines or other on-site improved facilities (including shared)
+        description_short: *improved_sanitation_desc
+        unit: "%"
+        short_unit: "%"
+      san_sep:
+        title: Share of the {definitions.residence} population using improved sanitation facilities connected to septic tanks (including shared)
+        description_short: *improved_sanitation_desc
+        unit: "%"
+        short_unit: "%"
+      san_sew:
+        title: Share of the {definitions.residence} population using improved sanitation facilities connected to sewers (including shared)
+        description_short: *improved_sanitation_desc
+        unit: "%"
+        short_unit: "%"
+      san_sdo_sm:
+        title: Share of the {definitions.residence} population using on-site sanitation facilities where wastes are safely disposed of in situ
+        description_short: *safely_managed_sanitation_desc
+        unit: "%"
+        short_unit: "%"
+      san_fst_sm:
+        title: Share of the {definitions.residence} population using on-site sanitation facilities where faecal sludge is removed and treated off-site
+        description_short: *safely_managed_sanitation_desc
+        unit: "%"
+        short_unit: "%"
+      san_sew_sm:
+        title: Share of the {definitions.residence} population using sewer connections where wastewater reaches treatment plants and is treated off-site
+        description_short: *safely_managed_sanitation_desc
+        unit: "%"
+        short_unit: "%"
+      san_sm:
+        title: Share of the {definitions.residence} population using safely managed sanitation services
+        description_short: *safely_managed_sanitation_desc
+        unit: "%"
+        short_unit: "%"
+      san_sm_without:
+        title: Share of the {definitions.residence} population not using safely managed sanitation services
+        description_short: *safely_managed_sanitation_desc
+        unit: "%"
+        short_unit: "%"
+      hyg_bas:
+        title: Share of the population with access to a handwashing facility with soap and water at home (basic hygiene service)
+        unit: "%"
+        short_unit: "%"
+      hyg_bas_without:
+        title: Share of the population without access to a handwashing facility with soap and water at home (basic hygiene service)
+        unit: "%"
+        short_unit: "%"
+      hyg_lim:
+        title: Share of the population with access to a limited handwashing services (a handwashing facility at home lacking soap and/or water)
+        unit: "%"
+        short_unit: "%"
+      hyg_ns:
+        title: Share of the population with no access to a handwashing service
+        unit: "%"
+        short_unit: "%"
+      wat_imp_pop:
+        title: The {definitions.residence_pop} population using improved water sources
+        description_short: *improved_drinking_water_desc
+        unit: people
+        display:
+          numDecimalPlaces: 0
+      wat_imp_pop_without:
+        title: The {definitions.residence_pop} population not using improved water sources
+        unit: people
+        description_short: *improved_drinking_water_desc
+        display:
+          numDecimalPlaces: 0
+      wat_basal_pop:
+        title: The {definitions.residence_pop} population using at least basic drinking water services
+        description_short: *basic_drinking_water_desc
+        unit: people
+        display:
+          numDecimalPlaces: 0
+      wat_basal_pop_without:
+        title: The {definitions.residence_pop} population not using at least basic drinking water services, excluding those using improved drinking water sources
+        description_short: *basic_drinking_water_desc
+        unit: people
+        display:
+          numDecimalPlaces: 0
+      wat_baso_pop:
+        title: The {definitions.residence_pop} population using only basic drinking water services
+        description_short: *basic_drinking_water_desc
+        unit: people
+        display:
+          numDecimalPlaces: 0
+      wat_lim_pop:
+        title: The {definitions.residence_pop} population using limited drinking water services
+        description_short: *limited_drinking_water_desc
+        unit: people
+        display:
+          numDecimalPlaces: 0
+      wat_unimp_pop:
+        title: The {definitions.residence_pop} population using unimproved drinking water services
+        description_short: *unimp_drinking_water_desc
+        unit: people
+        display:
+          numDecimalPlaces: 0
+      wat_ns_pop:
+        title: The {definitions.residence_pop} population using surface water as a primary source of drinking water
+        description_short: *surface_water_desc
+        unit: people
+        display:
+          numDecimalPlaces: 0
+      wat_pip_pop:
+        title: The {definitions.residence_pop} population using improved drinking water services that are piped
+        description_short: *improved_drinking_water_desc
+        unit: people
+        display:
+          numDecimalPlaces: 0
+      wat_imp_npip_pop:
+        title: The {definitions.residence_pop} population using improved drinking water services that are not piped
+        description_short: *improved_drinking_water_desc
+        unit: people
+        display:
+          numDecimalPlaces: 0
+      wat_imp_prem_pop:
+        title: The {definitions.residence_pop} population using improved drinking water services that are accessible on premises
+        description_short: *improved_drinking_water_desc
+        unit: people
+        display:
+          numDecimalPlaces: 0
+      wat_imp_av_pop:
+        title: The {definitions.residence_pop} population using improved drinking water services that are available when needed
+        description_short: *improved_drinking_water_desc
+        unit: people
+        display:
+          numDecimalPlaces: 0
+      wat_imp_qual_pop:
+        title: The {definitions.residence_pop} population using improved drinking water services that are free from contamination
+        description_short: *improved_drinking_water_desc
+        unit: people
+        display:
+          numDecimalPlaces: 0
+      wat_sm_pop:
+        title: The {definitions.residence_pop} population using safely managed drinking water services
+        description_short: *safely_managed_water_desc
+        unit: people
+        display:
+          numDecimalPlaces: 0
+      wat_sm_pop_without:
+        title: The {definitions.residence_pop} population not using safely managed drinking water services
+        description_short: *safely_managed_water_desc
+        unit: people
+        display:
+          numDecimalPlaces: 0
+      san_imp_pop:
+        title: The {definitions.residence_pop} population using improved sanitation facilities
+        description_short: *improved_sanitation_desc
+        unit: people
+        display:
+          numDecimalPlaces: 0
+      san_imp_pop_without:
+        title: The {definitions.residence_pop} population not using improved sanitation facilities
+        description_short: *improved_sanitation_desc
+        unit: people
+        display:
+          numDecimalPlaces: 0
+      san_basal_pop:
+        title: The {definitions.residence_pop} population using at least basic sanitation services, improved sanitation facilities which are not shared
+        description_short: *basic_sanitation_desc
+        unit: people
+        display:
+          numDecimalPlaces: 0
+      san_baso_pop:
+        title: The {definitions.residence_pop} population using only basic sanitation services, improved sanitation facilities which are not shared
+        description_short: *basic_sanitation_desc
+        unit: people
+        display:
+          numDecimalPlaces: 0
+      san_lim_pop:
+        title: The {definitions.residence_pop} population using limited sanitation services, improved sanitation facilities which are shared
+        description_short: *limited_sanitation_desc
+        unit: people
+        display:
+          numDecimalPlaces: 0
+      san_unimp_pop:
+        title: The {definitions.residence_pop} population using unimproved sanitation facilities
+        description_short: *unimproved_sanitation_desc
+        unit: people
+        display:
+          numDecimalPlaces: 0
+      san_ns_pop:
+        title: The {definitions.residence_pop} population practicing open defecation
+        description_short: *open_defecation_desc
+        unit: people
+        display:
+          numDecimalPlaces: 0
+      san_othimp_pop:
+        title: The {definitions.residence_pop} population using improved pit latrines or other on-site improved facilities (including shared)
+        description_short: *improved_sanitation_desc
+        unit: people
+        display:
+          numDecimalPlaces: 0
+      san_sep_pop:
+        title: The {definitions.residence_pop} population using improved sanitation facilities connected to septic tanks (including shared)
+        description_short: *improved_sanitation_desc
+        unit: people
+        display:
+          numDecimalPlaces: 0
+      san_sew_pop:
+        title: The {definitions.residence_pop} population using improved sanitation facilities connected to sewers (including shared)
+        description_short: *improved_sanitation_desc
+        unit: people
+        display:
+          numDecimalPlaces: 0
+      san_sdo_sm_pop:
+        title: The {definitions.residence_pop} population using on-site sanitation facilities where wastes are safely disposed of in situ
+        description_short: *safely_managed_sanitation_desc
+        unit: people
+        display:
+          numDecimalPlaces: 0
+      san_fst_sm_pop:
+        title: The {definitions.residence_pop} population using on-site sanitation facilities where faecal sludge is removed and treated off-site
+        description_short: *safely_managed_sanitation_desc
+        unit: people
+        display:
+          numDecimalPlaces: 0
+      san_sew_sm_pop:
+        title: The {definitions.residence_pop} population using sewer connections where wastewater reaches treatment plants and is treated off-site
+        description_short: *safely_managed_sanitation_desc
+        unit: people
+        display:
+          numDecimalPlaces: 0
+      san_sm_pop:
+        title: The {definitions.residence_pop} population using safely managed sanitation services
+        description_short: *safely_managed_sanitation_desc
+        unit: people
+        display:
+          numDecimalPlaces: 0
+      san_sm_pop_without:
+        title: The {definitions.residence_pop} population not using safely managed sanitation services
+        description_short: *safely_managed_sanitation_desc
+        unit: people
+        display:
+          numDecimalPlaces: 0
+      hyg_bas_pop:
+        title: The {definitions.residence_pop} population with access to a handwashing facility with soap and water at home (basic hygiene service)
+        unit: people
+        display:
+          numDecimalPlaces: 0
+      hyg_bas_pop_without:
+        title: The {definitions.residence_pop} population without access to a handwashing facility with soap and water at home (basic hygiene service)
+        unit: people
+        display:
+          numDecimalPlaces: 0
+      hyg_lim_pop:
+        title: The {definitions.residence_pop} population with access to a limited handwashing services (a handwashing facility at home lacking soap and/or water)
+        unit: people
+        display:
+          numDecimalPlaces: 0
+      hyg_ns_pop:
+        title: The {definitions.residence_pop} population with no access to a handwashing service
+        unit: people
+        display:
+          numDecimalPlaces: 0
