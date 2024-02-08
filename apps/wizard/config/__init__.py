@@ -8,7 +8,7 @@ import yaml
 
 from etl.paths import APPS_DIR
 
-_config_path = APPS_DIR / "wizard" / "config.yml"
+_config_path = APPS_DIR / "wizard" / "config" / "config.yml"
 
 
 def load_wizard_config():
@@ -24,10 +24,10 @@ def _check_wizard_config(config: dict):
     app_properties_expected = ["title", "alias", "entrypoint", "emoji", "image_url"]
 
     # Check `etl` property
-    assert "etl" in config, "etl property is required in wizard config!"
-    assert "title" in config["etl"], "etl.title property is required in wizard config!"
-    assert "description" in config["etl"], "etl.description property is required in wizard config!"
-    assert "steps" in config["etl"], "etl.steps property is required in wizard config!"
+    assert "etl" in config, "`etl` property is required in wizard config!"
+    assert "title" in config["etl"], "`etl.title` property is required in wizard config!"
+    assert "description" in config["etl"], "`etl.description` property is required in wizard config!"
+    assert "steps" in config["etl"], "`etl.steps` property is required in wizard config!"
     steps = config["etl"]["steps"]
     steps_expected = ["snapshot", "meadow", "garden", "fasttrack", "grapher"]
     for step_expected in steps_expected:
@@ -35,18 +35,18 @@ def _check_wizard_config(config: dict):
         for prop in app_properties_expected:
             assert (
                 prop in steps[step_expected]
-            ), f"etl.steps.{step_expected}.{prop} property is required in etl.steps property in wizard config!"
+            ), f"`etl.steps.{step_expected}.{prop}` property is required in `etl.steps` property in wizard config!"
     # Check `sections` property
     assert "sections" in config, "sections property is required in wizard config!"
     for section in config["sections"]:
-        assert "title" in section, "sections.title property is required in wizard config!"
-        assert "description" in section, "sections.description property is required in wizard config!"
-        assert "apps" in section, "sections.apps property is required in wizard config!"
+        assert "title" in section, "`sections.title` property is required in wizard config!"
+        assert "description" in section, "`sections.description` property is required in wizard config!"
+        assert "apps" in section, "`sections.apps` property is required in wizard config!"
         for app in section["apps"]:
             for prop in app_properties_expected + ["description"]:
                 assert (
                     prop in app
-                ), f"sections.apps.{app['title']}.{prop} property is required in sections.apps property in wizard config!"
+                ), f"`sections.apps.{app['title']}.{prop}` property is required in sections.apps property in wizard config!"
 
 
 WIZARD_CONFIG = load_wizard_config()

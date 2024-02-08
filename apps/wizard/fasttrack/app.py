@@ -1,6 +1,6 @@
 """Fast-track import FRONT-END (WIP).
 
-TODO: Fully decouple front-end from backend (see fasttrack_utils for back-end, i.e. should not have streamlit calls).
+TODO: Fully decouple front-end from backend (see fasttrack.utils for back-end, i.e. should not have streamlit calls).
 """
 from pathlib import Path
 
@@ -10,16 +10,12 @@ from st_pages import add_indentation
 from structlog import get_logger
 
 from apps.wizard import utils as wizard_utils
-from apps.wizard.etl_steps.fasttrack_utils import (
+from apps.wizard.fasttrack.load import load_existing_sheets_from_snapshots
+from apps.wizard.fasttrack.process import processing_part_1, processing_part_2
+from apps.wizard.fasttrack.utils import (
     IMPORT_GSHEET,
     LOCAL_CSV,
     UPDATE_GSHEET,
-    _add_to_dag,
-    _commit_and_push,
-    _dataset_id,
-    _load_existing_sheets_from_snapshots,
-    continue_processing,
-    load_data_from_resource,
     set_states,
 )
 from etl import config
@@ -27,7 +23,7 @@ from etl.command import main as etl_main
 from etl.paths import DAG_DIR
 
 # Page config
-st.set_page_config(page_title="Wizard (meadow)", page_icon="🪄")
+st.set_page_config(page_title="Wizard (fasttrack)", page_icon="🪄")
 add_indentation()
 
 
@@ -73,7 +69,7 @@ IMPORT_OPTIONS = {
         "description": "Import data from a Google sheet",
         "guidelines": {
             "heading": "**How to import from a Google sheet**",
-            "file_path": CURRENT_DIR / "markdown" / "fasttrack_gsheet_import.md",
+            "file_path": CURRENT_DIR / "fasttrack_gsheet_import.md",
         },
     },
     UPDATE_GSHEET: {
@@ -81,7 +77,7 @@ IMPORT_OPTIONS = {
         "description": "Update from a Google sheet (already imported in the database)",
         "guidelines": {
             "heading": "**How to update from an existing sheet**",
-            "file_path": CURRENT_DIR / "markdown" / "fasttrack_gsheet_update.md",
+            "file_path": CURRENT_DIR / "fasttrack_gsheet_update.md",
         },
     },
     LOCAL_CSV: {
@@ -89,7 +85,7 @@ IMPORT_OPTIONS = {
         "description": "Import from a local CSV",
         "guidelines": {
             "heading": "**How to import a local CSV**",
-            "file_path": CURRENT_DIR / "markdown" / "fasttrack_csv.md",
+            "file_path": CURRENT_DIR / "fasttrack_csv.md",
         },
     },
 }
@@ -122,7 +118,7 @@ with st.form("fasttrack-form"):
             key="dataset_uri",
         )
     elif import_method == UPDATE_GSHEET:
-        options = _load_existing_sheets_from_snapshots()
+        options = load_existing_sheets_from_snapshots()
         st.selectbox(
             label="Existing Google Sheets",
             options=options,
@@ -177,7 +173,7 @@ if st.session_state.to_be_submitted:
     #####################################################
     status_main = st.status("Importing data from Google Sheets...", expanded=False)
     with status_main:
-        data, dataset_meta, variables_meta_dict, origin, unknown_countries, dataset_uri = load_data_from_resource(
+        data, dataset_meta, variables_meta_dict, origin, unknown_countries, dataset_uri = processing_part_1(
             import_method=import_method,
             dataset_uri=st.session_state["dataset_uri"],
             infer_metadata=st.session_state["infer_metadata"],
@@ -188,7 +184,7 @@ if st.session_state.to_be_submitted:
     # If all countries are known, proceed without alterations
     if unknown_countries in ([], None):
         # continue with submission
-        st.session_state["fast_import"] = continue_processing(
+        st.session_state["fast_import"] = processing_part_2(
             data=data,
             dataset_meta=dataset_meta,
             variables_meta_dict=variables_meta_dict,
@@ -233,7 +229,7 @@ if st.session_state.to_be_submitted:
                     data = data.loc[~data.index.get_level_values("country").isin(unknown_countries)]
 
             # 3/ Proceed
-            st.session_state["fast_import"] = continue_processing(
+            st.session_state["fast_import"] = processing_part_2(
                 data=data,
                 dataset_meta=dataset_meta,
                 variables_meta_dict=variables_meta_dict,
@@ -253,13 +249,11 @@ if st.session_state.to_be_submitted_confirmed_2:
             fast_import = st.session_state.fast_import
             # add dataset to dag
             st.write("Adding dataset to the DAG...")
-            dag_content = _add_to_dag(fast_import.dataset.metadata)
+            dag_content = fast_import.add_to_dag()
 
             # create step and metadata file
             st.write("Creating step and metadata files...")
-            wizard_utils.generate_step_to_channel(
-                CURRENT_DIR / "cookiecutter/grapher_fasttrack/", fast_import.meta.to_dict()
-            )
+            wizard_utils.generate_step_to_channel(CURRENT_DIR / "cookiecutter/", fast_import.meta.to_dict())
             fast_import.save_metadata()
 
             # Uploading snapshot
@@ -286,16 +280,16 @@ if st.session_state.to_be_submitted_confirmed_2:
             if config.FASTTRACK_COMMIT:
                 # Commiting and pushing to Github...
                 st.write("Commiting and pushing to Github...")
-                github_link = _commit_and_push(fast_import, snapshot_path)
+                github_link = fast_import.commit_and_push()
                 st.success("Changes commited and pushed successfully!")
             else:
                 github_link = ""
 
         # Show final success messages
         if config.DB_HOST == "localhost":
-            url = f"http://localhost:3030/admin/datasets/{_dataset_id(fast_import.dataset.metadata)}"
+            url = f"http://localhost:3030/admin/datasets/{fast_import.dataset_id}"
         else:
-            url = f"http://{config.DB_HOST}/admin/datasets/{_dataset_id(fast_import.dataset.metadata)}"
+            url = f"http://{config.DB_HOST}/admin/datasets/{fast_import.dataset_id}"
         st.success(f"The dataset was imported to the [database]({url})!")
         if config.FASTTRACK_COMMIT:
             st.success(f"See commit in [ETL repository]({github_link})")

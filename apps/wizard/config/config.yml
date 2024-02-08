@@ -49,7 +49,7 @@ etl:
     fasttrack:
       title: "Fast Track"
       alias: fasttrack
-      entrypoint: etl_steps/fasttrack.py
+      entrypoint: fasttrack/app.py
       emoji: "🏎️"
       image_url: "https://upload.wikimedia.org/wikipedia/commons/b/be/Alonso_%28Renault%29_qualifying_at_USGP_2005.jpg"
 
