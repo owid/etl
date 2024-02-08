@@ -32,6 +32,7 @@ definitions:
 
 dataset:
   title: Greenhouse gas emissions by sector
+  update_period_days: 365
 
 tables:
   greenhouse_gas_emissions_by_sector:

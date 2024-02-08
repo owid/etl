@@ -1,0 +1,31 @@
+meta:
+  origin:
+    producer: United States Environmental Protection Agency
+    title: 'Climate Change Indicators: Atmospheric Concentrations of Greenhouse Gases'
+    description: |-
+      This indicator describes how the levels of major greenhouse gases in the atmosphere have changed over time.
+
+      The data contains concentrations of carbon dioxide in the atmosphere from hundreds of thousands of years ago through 2021, measured in parts per million (ppm). The data come from a variety of historical ice core studies and recent air monitoring sites around the world.
+    title_snapshot: 'Climate Change Indicators: Atmospheric Concentrations of Greenhouse
+      Gases - Carbon Dioxide'
+    citation_full: |-
+      United States Environmental Protection Agency (EPA) - Climate Change Indicators: Atmospheric Concentrations of Greenhouse Gases (2022)
+
+      Global atmospheric concentration measurements for carbon dioxide, methane, and nitrous oxide come from a variety of monitoring programs and studies published in peer-reviewed literature.
+
+      More details can be found on [their technical documentation](https://www.epa.gov/sites/default/files/2021-03/documents/ghg-concentrations_td.pdf).
+    attribution: EPA based on various sources (2022)
+    attribution_short: EPA
+    url_main: 
+      https://www.epa.gov/climate-indicators/climate-change-indicators-atmospheric-concentrations-greenhouse-gases
+    url_download: https://www.epa.gov/sites/default/files/2021-03/ghg-concentrations_fig-1.csv
+    date_accessed: '2024-01-29'
+    date_published: '2022-07-01'
+    license:
+      name: Public domain
+      url: https://edg.epa.gov/epa_data_license.html
+wdir: ../../../data/snapshots/epa/2024-01-29
+outs:
+- md5: 61d82b2624d8f71da5d7b2ec0f592d03
+  size: 51721
+  path: co2_concentration.csv

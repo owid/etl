@@ -74,8 +74,6 @@ steps:
     - snapshot://fasttrack/2023-06-19/world_population_comparison.csv
   data-private://grapher/fasttrack/latest/fiscal_top1_shares_country_standardized:
     - snapshot-private://fasttrack/latest/fiscal_top1_shares_country_standardized.csv
-  data://grapher/fasttrack/latest/monadic_strategic_nuclear_forces:
-    - snapshot://fasttrack/latest/monadic_strategic_nuclear_forces.csv
   data://grapher/fasttrack/2023-04-30/paratz:
     - snapshot://fasttrack/2023-04-30/paratz.csv
   data-private://grapher/fasttrack/latest/pain_hours_hen_systems:
@@ -96,10 +94,6 @@ steps:
     - snapshot://fasttrack/2023-08-21/survey_livestock_oklahoma.csv
   data://grapher/fasttrack/latest/sentience_institute:
     - snapshot://fasttrack/latest/sentience_institute.csv
-  data://grapher/fasttrack/latest/nuclear_warhead_stockpiles:
-    - snapshot://fasttrack/latest/nuclear_warhead_stockpiles.csv
-  data://grapher/fasttrack/latest/nuclear_warhead_inventories:
-    - snapshot://fasttrack/latest/nuclear_warhead_inventories.csv
   data://grapher/fasttrack/latest/smallpox_cases:
     - snapshot://fasttrack/latest/smallpox_cases.csv
   data://grapher/fasttrack/latest/transport_co2_emissions_modes:
@@ -122,3 +116,5 @@ steps:
     - snapshot-private://fasttrack/latest/owid_donations.csv
   data://grapher/fasttrack/latest/war_deaths_by_war_mars:
     - snapshot://fasttrack/latest/war_deaths_by_war_mars.csv
+  data://grapher/fasttrack/latest/electric_cars_iea:
+    - snapshot://fasttrack/latest/electric_cars_iea.csv
