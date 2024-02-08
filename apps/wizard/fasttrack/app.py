@@ -69,7 +69,7 @@ IMPORT_OPTIONS = {
         "description": "Import data from a Google sheet",
         "guidelines": {
             "heading": "**How to import from a Google sheet**",
-            "file_path": CURRENT_DIR / "fasttrack_gsheet_import.md",
+            "file_path": CURRENT_DIR / "markdown" / "fasttrack_gsheet_import.md",
         },
     },
     UPDATE_GSHEET: {
@@ -77,7 +77,7 @@ IMPORT_OPTIONS = {
         "description": "Update from a Google sheet (already imported in the database)",
         "guidelines": {
             "heading": "**How to update from an existing sheet**",
-            "file_path": CURRENT_DIR / "fasttrack_gsheet_update.md",
+            "file_path": CURRENT_DIR / "markdown" / "fasttrack_gsheet_update.md",
         },
     },
     LOCAL_CSV: {
@@ -85,7 +85,7 @@ IMPORT_OPTIONS = {
         "description": "Import from a local CSV",
         "guidelines": {
             "heading": "**How to import a local CSV**",
-            "file_path": CURRENT_DIR / "fasttrack_csv.md",
+            "file_path": CURRENT_DIR / "markdown" / "fasttrack_csv.md",
         },
     },
 }
