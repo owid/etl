@@ -170,8 +170,7 @@ def parse_data_from_csv(csv_df: pd.DataFrame) -> pd.DataFrame:
     data = parse_data_from_sheets(csv_df)
 
     # underscore columns from CSV
-    for col in data.columns:
-        data = data.rename(columns={col: underscore(col)})
+    data.columns = [underscore(col) for col in data.columns]
 
     return data
 
