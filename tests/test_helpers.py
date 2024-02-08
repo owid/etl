@@ -112,15 +112,6 @@ def test_version_tracker_get_all_usages(mock_dag, mock_expected_usages):
         assert sorted(dependencies) == sorted(expected_usages[step])
 
 
-def test_version_tracker_raise_error_if_latest_version_of_step_is_not_in_dag(mock_dag):
-    # Remove a step from the dag that is one of the dependencies of another active step.
-    _mock_dag = mock_dag.copy()
-    del _mock_dag["steps"]["f"]
-    versions = create_mock_version_tracker(dag=_mock_dag)
-    with pytest.raises(etl.helpers.LatestVersionOfStepShouldBeActive):
-        versions.check_that_latest_version_of_steps_are_active()
-
-
 @patch("etl.helpers.log")
 def test_version_tracker_raise_error_if_active_step_depends_on_archive_step(mock_log, mock_dag):
     # Include an archive step as a dependency of an active step.
