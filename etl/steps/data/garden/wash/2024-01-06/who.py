@@ -1,8 +1,6 @@
 """Load a meadow dataset and create a garden dataset."""
 
-import re
 
-import numpy as np
 from owid.catalog import Table
 from owid.catalog import processing as pr
 from structlog import get_logger
@@ -21,10 +19,6 @@ def run(dest_dir: str) -> None:
     #
     # Load meadow dataset.
     ds_meadow = paths.load_dataset("who")
-    # Load regions
-    ds_regions = paths.load_dependency("regions")
-    # Load income groups dataset.
-    ds_income_groups = paths.load_dependency("income_groups")
     # Add population
     ds_population = paths.load_dependency("population")
     tb = ds_meadow["who"].reset_index()
@@ -32,7 +26,7 @@ def run(dest_dir: str) -> None:
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
     # The population is given as 'population (thousands)
     tb["pop"] = tb["pop"].astype(float).multiply(1000)
-    tb = add_population_to_regions(tb, ds_population, ds_regions, ds_income_groups)
+    tb = add_population_to_regions(tb, ds_population)
     tb = calculate_population_with_each_category(tb)
     tb = calculate_population_without_service(tb)
 
@@ -85,7 +79,7 @@ def calculate_population_without_service(tb: Table) -> Table:
     return tb
 
 
-def add_population_to_regions(tb: Table, ds_population: Table, ds_regions: Table, ds_income_groups: Table) -> Table:
+def add_population_to_regions(tb: Table, ds_population: Table) -> Table:
     tb_to_add_pop = tb[["country", "year", "residence"]][(tb["pop"].isna()) & (tb["residence"] == "Total")]
 
     tb_to_add_pop = geo.add_population_to_table(

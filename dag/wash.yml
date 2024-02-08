@@ -4,8 +4,6 @@ steps:
     - snapshot://wash/2024-02-04/who_regions.csv
   data://garden/wash/2024-01-06/who:
     - data://meadow/wash/2024-01-06/who
-    - data://garden/regions/2023-01-01/regions
-    - data://garden/wb/2023-04-30/income_groups
     - data://garden/demography/2023-03-31/population
   data://grapher/wash/2024-01-06/who:
     - data://garden/wash/2024-01-06/who
