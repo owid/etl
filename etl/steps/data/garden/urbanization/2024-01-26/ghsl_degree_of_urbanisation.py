@@ -126,6 +126,23 @@ def run(dest_dir: str) -> None:
     # Remove rows with 'World (GHSL)'; we'll use our OWID generated 'World' instead
     tb = tb[tb["country"] != "World (GHSL)"]
 
+    # Aggregate the table to the region level.
+    columns_to_calculate_share = [
+        "degurba_l1_population_city",
+        "degurba_l1_population_rural_area",
+        "degurba_l1_population_town__and__suburbs",
+        "degurba_l2_population_city",
+        "degurba_l2_population_dense_town",
+        "degurba_l2_population_mostly_uninhabited_area",
+        "degurba_l2_population_rural_dispersed_area",
+        "degurba_l2_population_semi_dense_town",
+        "degurba_l2_population_suburbs_or_peri_urban_area",
+        "degurba_l2_population_village",
+    ]
+
+    for col in columns_to_calculate_share:
+        tb[col + "_share"] = (tb[col] / tb["total_pop"]) * 100
+
     # Create two new dataframes to separate data into estimates and projections (pre-2025 and post-2025 (five year intervals)))
     past_estimates = tb[tb["year"] < 2025].copy()
     future_projections = tb[tb["year"] >= 2025].copy()
