@@ -61,8 +61,15 @@ def drop_indicators_and_replace_nans(tb: Table) -> Table:
     ]
     tb = tb.drop(columns=vars_to_drop)
 
-    # Replace zero values with nulls
-    tb = tb.replace(0, float("nan"))
+    # Define columns containing "missing" and "dont_know"
+    missing_cols = [cols for cols in tb.columns if "missing" in cols]
+    dont_know_cols = [cols for cols in tb.columns if "dont_know" in cols]
+
+    # Replace zero values with nulls, except for columns containing "missing" and "dont_know"
+    tb = tb.replace(0, float("nan"), subset=tb.columns.difference(missing_cols + dont_know_cols))
+
+    # Replace 100 by null in columns containing "missing"
+    tb = tb.replace(100, float("nan"), subset=missing_cols)
 
     # Drop rows with all null values in columns not country and year
     tb = tb.dropna(how="all", subset=tb.columns.difference(["country", "year"]))
