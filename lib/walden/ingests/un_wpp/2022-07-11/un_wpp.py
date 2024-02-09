@@ -10,10 +10,9 @@ import zipfile
 from pathlib import Path
 
 import requests
-from structlog import get_logger
-
 from owid.walden import add_to_catalog
 from owid.walden.catalog import Dataset
+from structlog import get_logger
 
 log = get_logger()
 

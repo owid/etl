@@ -8,9 +8,8 @@ import click
 import pandas as pd
 import requests
 from owid.repack import repack_frame
-from structlog import get_logger
-
 from owid.walden import Dataset, add_to_catalog
+from structlog import get_logger
 
 log = get_logger()
 

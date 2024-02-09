@@ -16,9 +16,8 @@ from datetime import datetime
 from pathlib import Path
 
 import click
-from structlog import get_logger
-
 from owid.walden import Catalog, Dataset
+from structlog import get_logger
 
 log = get_logger()
 

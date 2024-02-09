@@ -11,10 +11,9 @@ import numpy as np
 import pandas as pd
 import requests
 import yaml
-from structlog import get_logger
-
 from owid.walden import add_to_catalog
 from owid.walden.catalog import Dataset
+from structlog import get_logger
 
 BASE_URL = "https://unstats.un.org/sdgapi"
 log = get_logger()
@@ -139,7 +138,7 @@ def download_file(url: str, goal: int, area_codes: list, max_retries: int, bytes
     exception.
     """
     log.info(
-        f"Downloading data...",
+        "Downloading data...",
         url=url,
         bytes_read=bytes_read,
         remaining_retries=max_retries,

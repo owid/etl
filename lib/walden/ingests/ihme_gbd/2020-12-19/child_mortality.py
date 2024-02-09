@@ -9,10 +9,9 @@ import click
 import pandas as pd
 import requests
 from owid.repack import repack_frame
-from structlog import get_logger
-
 from owid.walden import add_to_catalog
 from owid.walden.catalog import Dataset
+from structlog import get_logger
 
 log = get_logger()
 
@@ -27,7 +26,6 @@ BASE_URL = "https://ghdx.healthdata.org/sites/default/files/record-attached-file
     help="Upload dataset to Walden",
 )
 def main(upload: bool) -> None:
-
     locations = get_location_hierachies()
 
     start_years = [1950, 1960, 1970, 1980, 1990, 2000, 2010]

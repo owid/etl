@@ -16,7 +16,6 @@ import requests
 import structlog
 import yaml
 from bs4 import BeautifulSoup
-
 from owid.walden import add_to_catalog
 from owid.walden.catalog import Dataset
 
@@ -30,7 +29,6 @@ CHUNK_SIZE = 8192
 def main():
     metadata = create_metadata()
     with tempfile.TemporaryDirectory() as temp_dir:
-
         # fetch the file locally
         assert metadata.source_data_url is not None and metadata.file_extension is not None
         content = download_file(metadata.source_data_url, MAX_RETRIES)
@@ -85,7 +83,7 @@ def download_file(url, max_retries: int, bytes_read: int = 0) -> bytes:
     exception.
     """
     log.info(
-        f"Downloading data...",
+        "Downloading data...",
         url=url,
         bytes_read=bytes_read,
         remaining_retries=max_retries,

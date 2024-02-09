@@ -12,7 +12,6 @@ import unicodedata
 
 import click
 import pandas as pd
-
 from owid.walden import add_to_catalog, files
 from owid.walden.catalog import Dataset
 
