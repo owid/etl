@@ -24,7 +24,7 @@ def get_username():
 ENV_FILE = env.get("ENV", BASE_DIR / ".env")
 
 # cfg = dotenv_values(ENV_FILE)
-test = load_dotenv(ENV_FILE, override=True)
+load_dotenv(ENV_FILE, override=True)
 
 # When DEBUG is on
 # - run steps in the same process (speeding up ETL)
