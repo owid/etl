@@ -138,12 +138,3 @@ steps:
     - data://garden/wb/2023-04-30/income_groups
   data://grapher/gcp/2023-12-05/global_carbon_budget:
     - data://garden/gcp/2023-12-05/global_carbon_budget
-  #
-  # EIA - Energy consumption 2023.
-  #
-  data://meadow/eia/2023-07-10/energy_consumption:
-    - snapshot://eia/2023-07-10/international_energy_data.zip
-  data://garden/eia/2023-07-10/energy_consumption:
-    - data://meadow/eia/2023-07-10/energy_consumption
-    - data://garden/wb/2023-04-30/income_groups
-    - data://garden/regions/2023-01-01/regions
