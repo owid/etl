@@ -875,9 +875,6 @@ class VersionTracker:
         # This dataframe will have as many rows as entries in the dag.
         self._steps_df = None
 
-        # TODO: Check that for each active usage there is a script (it has happened a few times that the code for
-        # fasttrack steps was removed, but the steps were still in the dag, and we noticed it when running ETL).
-
     def get_direct_step_dependencies(self, step: str) -> List[str]:
         """Get direct dependencies of a given step in the dag."""
         dependencies = get_direct_step_dependencies(dag=self.dag_all, step=step)
@@ -936,14 +933,68 @@ class VersionTracker:
 
         return dag_file_name
 
+    def get_path_to_script(self, step: str, omit_base_dir: bool = False) -> Optional[Path]:
+        """Get the path to the script of a given step."""
+        # Get step attributes.
+        _, _, channel, namespace, version, name, _ = extract_step_attributes(step=step).values()
+        state = "active" if step in self.all_active_steps else "archive"
+
+        # Create a dictionary that contains the path to a script for a given step.
+        # This dictionary has to keys, namely "active" and "archive".
+        # Active steps should have a script in the active directory.
+        # But steps that are in the archive dag can be either in the active or the archive directory.
+        path_to_script = {"active": None, "archive": None}
+        if channel == "snapshot":
+            path_to_script["active"] = paths.SNAPSHOTS_DIR / namespace / version / name  # type: ignore
+            path_to_script["archive"] = paths.SNAPSHOTS_DIR_ARCHIVE / namespace / version / name  # type: ignore
+        elif channel in ["meadow", "garden", "grapher", "explorers", "open_numbers", "examples"]:
+            path_to_script["active"] = paths.STEP_DIR / "data" / channel / namespace / version / name  # type: ignore
+            path_to_script["archive"] = paths.STEP_DIR_ARCHIVE / channel / namespace / version / name  # type: ignore
+        elif channel == "walden":
+            path_to_script["active"] = paths.BASE_DIR / "lib" / "walden" / "ingests" / namespace / version / name  # type: ignore
+            path_to_script["archive"] = paths.BASE_DIR / "lib" / "walden" / "ingests" / namespace / version / name  # type: ignore
+        elif channel in ["backport", "etag"]:
+            # Ignore these channels, for which there is never a script.
+            return None
+        else:
+            log.error(f"Unknown channel {channel} for step {step}.")
+
+        if state == "active":
+            # Steps in the active dag should only have a script in the active directory.
+            del path_to_script["archive"]
+
+        path_to_script_detected = None
+        for state in path_to_script:
+            # A step script can exist either as a .py file, as a .ipynb file, or a __init__.py file inside a folder.
+            # In the case of snapshots, there may or may not be a .py file, but there definitely needs to be a dvc file.
+            # In that case, the corresponding script is not trivial to find, but at least we can return the dvc file.
+            for path_to_script_candidate in [
+                path_to_script[state].with_suffix(".py"),  # type: ignore
+                path_to_script[state].with_suffix(".ipynb"),  # type: ignore
+                path_to_script[state] / "__init__.py",  # type: ignore
+                path_to_script[state].with_name(path_to_script[state].name + ".dvc"),  # type: ignore
+            ]:
+                if path_to_script_candidate.exists():
+                    path_to_script_detected = path_to_script_candidate
+                    break
+        if path_to_script_detected is None:
+            if state == "active":
+                log.error(f"Script for step {step} not found.")
+            else:
+                log.warning(f"Script for archive step {step} not found.")
+
+        if omit_base_dir and path_to_script_detected is not None:
+            # Return the path relative to the base directory (omitting the local path to the ETL repos).
+            path_to_script_detected = path_to_script_detected.relative_to(paths.BASE_DIR)
+
+        return path_to_script_detected
+
     def _create_step_attributes(self) -> pd.DataFrame:
         # Extract all attributes of each unique active/archive/dependency step.
         step_attributes = pd.DataFrame(
             [extract_step_attributes(step).values() for step in self.all_steps],
             columns=["step", "kind", "channel", "namespace", "version", "name", "identifier"],
         )
-
-        # Create custom features that will let us prioritize which datasets to update.
 
         # Add list of all existing versions for each step.
         versions = (
@@ -1010,6 +1061,7 @@ class VersionTracker:
         steps_df["state"] = ["active" if step in self.all_active_steps else "archive" for step in self.all_steps]
         steps_df["role"] = ["usage" if step in self.dag_all else "dependency" for step in self.all_steps]
         steps_df["dag_file_name"] = [self.get_dag_file_for_step(step=step) for step in self.all_steps]
+        steps_df["path_to_script"] = [self.get_path_to_script(step=step, omit_base_dir=True) for step in self.all_steps]
 
         # Add attributes to steps.
         steps = pd.merge(steps_df, self.step_attributes_df, on="step", how="left")
@@ -1082,6 +1134,15 @@ class VersionTracker:
                 error_message += f"\n    {unused_data_step}"
             log.warning(error_message)
 
+    def check_that_all_steps_have_a_script(self) -> None:
+        """Check that all steps have code.
+
+        If the step is active and there is no code, raise an error.
+        If the step is archived and there is no code, raise a warning.
+        For snapshots, the code can either be the script to generate the snapshot, or a metadata dvc file.
+        """
+        [self.get_path_to_script(step) for step in self.all_steps]
+
     def get_backported_db_dataset_ids(self) -> List[int]:
         """Get list of ids of DB datasets that are used as backported datasets in active steps of ETL.
 
@@ -1102,6 +1163,7 @@ class VersionTracker:
         self.check_that_active_dependencies_are_defined()
         self.check_that_active_dependencies_are_not_archived()
         self.check_that_all_active_steps_are_necessary()
+        self.check_that_all_steps_have_a_script()
 
 
 def run_version_tracker_checks():
