@@ -20,10 +20,10 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
-    tb = geo.harmonize_countries(
-        df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
-    )
-    tb = tb.set_index(["country", "year"], verify_integrity=True)
+    cols_to_select = ["reference_area", "year", "value"]
+    tb = tb[cols_to_select]
+    tb = tb.rename(columns={"value": "population_density"})
+    tb = tb.set_index(["reference_area", "year"], verify_integrity=True)
 
     #
     # Save outputs.

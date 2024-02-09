@@ -14,12 +14,13 @@ def run(dest_dir: str) -> None:
     ds_garden = paths.load_dataset("population_density_cities_fuas")
 
     # Read table from garden dataset.
-    tb = ds_garden["population_density_cities_fuas"]
+    tb = ds_garden["population_density_cities_fuas"].reset_index()
 
     #
     # Process data.
     #
-
+    tb = tb.rename(columns={"reference_area": "country"})
+    tb = tb.set_index(["country", "year"], verify_integrity=True)
     #
     # Save outputs.
     #
