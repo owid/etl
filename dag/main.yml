@@ -685,7 +685,6 @@ steps:
 
   ######################################################################################################################
 
-
 include:
   - dag/open_numbers.yml
   - dag/faostat.yml
@@ -710,6 +709,7 @@ include:
   - dag/animal_welfare.yml
   - dag/plastic_use.yml
   - dag/statins.yml
+  - dag/wash.yml
   - dag/climate.yml
   - dag/urbanization.yml
   - dag/poverty_inequality.yml
