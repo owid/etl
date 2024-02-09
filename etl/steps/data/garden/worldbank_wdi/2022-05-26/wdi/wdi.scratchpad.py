@@ -1,7 +1,7 @@
 """Scratchpad for peripheral checks related to the World Development
 Indicators bulk update.
 
-The code in this file is not intended to be run as part of any etl step. 
+The code in this file is not intended to be run as part of any etl step.
 """
 # flake8: noqa
 
@@ -73,7 +73,7 @@ q = """
         FROM charts
         WHERE id in (SELECT chartId from chart_dims)
     )
-    
+
     SELECT
         id,
         config -> "$.selectedEntityNames" AS selectedEntityNames
@@ -111,7 +111,7 @@ def load_excluded_countries() -> List[str]:
 
 excluded_countries = load_excluded_countries()
 q = f"""
-    WITH 
+    WITH
     datasets AS (
         SELECT
             id
@@ -152,7 +152,7 @@ df
 # -------------------------------------------- #
 # reject pending/flagged suggested chart revisions from a previous dataset version.
 
-load_dotenv()
+load_dotenv(override=True)
 
 CLOUDFLARE_SESSION_ID = os.environ["CLOUDFLARE_SESSION_ID"]
 OWID_HOST = os.environ["OWID_HOST"]
