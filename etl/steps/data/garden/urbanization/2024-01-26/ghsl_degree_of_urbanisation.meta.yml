@@ -28,7 +28,7 @@ definitions:
 
       The method uses fixed population size and density thresholds for consistency and simplicity, though this may not always accurately reflect local urban characteristics.
 
-    description_short: The European Commission combines satellite imagery with national census data to derive urban and rural populations based on its own standardized definitions. Note that this result differs from UN figures which are based on nationally-defined urban definitions.
+    description_short: The European Commission combines satellite imagery with national census data to identify [cities](#dod:cities-degurba), [towns and suburbs](#dod:towns-suburbs-degurba), and [rural areas](#dod:rural-areas-degurba) and estimate their respective populations.
 
 tables:
   ghsl_degree_of_urbanisation:
