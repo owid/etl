@@ -385,22 +385,6 @@ class DataStep(Step):
             else:
                 raise e
 
-    def can_run(self, archive_ok: bool = True) -> bool:
-        sp = self._search_path
-
-        if not archive_ok and "/archive/" in sp.as_posix():
-            return False
-
-        py_path = sp.with_suffix(".py")
-        mod_path = sp / "__init__.py"
-        ipynb_path = sp.with_suffix(".ipynb")
-
-        for p in [py_path, mod_path, ipynb_path]:
-            if p.exists():
-                return True
-
-        return False
-
     def run(self) -> None:
         # make sure the enclosing folder is there
         self._dest_dir.parent.mkdir(parents=True, exist_ok=True)
@@ -461,8 +445,11 @@ class DataStep(Step):
     def has_existing_data(self) -> bool:
         return self._dest_dir.is_dir()
 
-    def can_execute(self) -> bool:
+    def can_execute(self, archive_ok: bool = True) -> bool:
         sp = self._search_path
+        if not archive_ok and "/archive/" in sp.as_posix():
+            return False
+
         return (
             # python script
             sp.with_suffix(".py").exists()
@@ -674,7 +661,7 @@ class SnapshotStep(Step):
     def __str__(self) -> str:
         return f"snapshot://{self.path}"
 
-    def can_run(self, archive_ok: bool = True) -> bool:
+    def can_execute(self, archive_ok: bool = True) -> bool:
         try:
             Snapshot(self.path)
             return True
@@ -961,7 +948,7 @@ class BackportStep(DataStep):
 
         self.after_run()
 
-    def can_execute(self) -> bool:
+    def can_execute(self, archive_ok: bool = True) -> bool:
         return True
 
     @property
