@@ -6,7 +6,7 @@ definitions:
         - Urbanization
     processing_level: minor
     description_from_producer: The term “urban agglomeration” refers to the population contained within the contours of a contiguous territory inhabited at urban density levels without regard to administrative boundaries. It usually incorporates the population in a city or town plus that in the suburban areas lying outside of, but being adjacent to, the city boundaries. Whenever possible, data classified according to the concept of urban agglomeration are used. However, some countries do not produce data according to the concept of urban agglomeration but use instead that of metropolitan area or city proper. If possible, such data are adjusted to conform to the concept urban agglomeration. When sufficient information is not available to permit such an adjustment, data based on the concept of city proper or metropolitan area are used.
-  rate_of_change: &rate_of_change Measures the average annual percentage change in urban populations for agglomerations with 300,000 inhabitants or more.
+  rate_of_change: &rate_of_change Measures the average annual percentage change in urban populations for agglomerations with 300,000 inhabitants or more, based on five-year intervals. For example, the rate for 2015 represents the average annual growth from 2010 to 2015.
   share_urban: &share_urban Indicates the proportion of the urban population residing in urban agglomerations with 300,000 inhabitants or more.
   share_urban_from_tot: &share_urban_from_tot Measures the percentage of a country's total population living in urban agglomerations with 300,000 inhabitants or more.
   urban_pop: &urban_pop Refers to the annual population figures for urban agglomerations with 300,000 inhabitants or more.
