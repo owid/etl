@@ -335,7 +335,8 @@
         },
         "non_redistributable": {
           "type": "boolean",
-          "title": "Redistribution is prohibited (disable chart download)"
+          "title": "Non-redistribution of dataset ",
+          "description": "Whether the dataset is non-redistributable, and therefore data should not be downloadable from the chart."
         },
         "licenses": {
           "type": "array",
