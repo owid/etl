@@ -9,9 +9,9 @@ from owid.catalog import Dataset
 from rich_click.rich_command import RichCommand
 from typing_extensions import Self
 
-from apps.metagpt.gpt import GPTResponse, OpenAIWrapper
 from apps.metagpt.prompts import create_query_data_step, create_query_snapshot
 from apps.metagpt.utils import Channels, convert_list_to_dict, read_metadata_file
+from apps.wizard.utils.gpt import GPTResponse, OpenAIWrapper
 from etl.files import yaml_dump
 
 # Fields to ask GPT for (garden, grapher)
