@@ -88,7 +88,7 @@ sections:
       alias: metaplay
       description: "Understand how metadata is presented in data pages."
       maintainer: "@lucas"
-      entrypoint: pages/metaplay.py
+      entrypoint: metaplay.py
       emoji: "🏐"
       image_url: "https://upload.wikimedia.org/wikipedia/commons/d/d4/PlayEquipComboPlastic_wb.jpg"
 

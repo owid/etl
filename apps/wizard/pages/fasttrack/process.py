@@ -13,9 +13,9 @@ from owid.catalog import Dataset, Source, Table, VariableMeta
 from owid.catalog.utils import underscore, validate_underscore
 
 import apps.fasttrack.sheets as sheets
-from apps.wizard.fasttrack.fast_import import FasttrackImport
-from apps.wizard.fasttrack.load import load_data_from_csv, load_data_from_sheets
-from apps.wizard.fasttrack.utils import IMPORT_GSHEET, LOCAL_CSV, UPDATE_GSHEET, set_states
+from apps.wizard.pages.fasttrack.fast_import import FasttrackImport
+from apps.wizard.pages.fasttrack.load import load_data_from_csv, load_data_from_sheets
+from apps.wizard.pages.fasttrack.utils import IMPORT_GSHEET, LOCAL_CSV, UPDATE_GSHEET, set_states
 from etl.paths import DATA_DIR, LATEST_REGIONS_DATASET_PATH
 
 

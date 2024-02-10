@@ -20,7 +20,7 @@ from owid.catalog import (
 )
 from owid.catalog.utils import underscore
 
-from apps.wizard.fasttrack.utils import _decrypt
+from apps.wizard.pages.fasttrack.utils import _decrypt
 from etl.grapher_helpers import INT_TYPES
 from etl.paths import SNAPSHOTS_DIR
 from etl.snapshot import SnapshotMeta
