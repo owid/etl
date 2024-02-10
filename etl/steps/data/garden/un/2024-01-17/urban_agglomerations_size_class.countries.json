@@ -1,8 +1,8 @@
 
 
 {
-  "AFRICA": "Africa",
-  "ASIA": "Asia",
+  "AFRICA": "Africa (UN)",
+  "ASIA": "Asia (UN)",
   "Afghanistan": "Afghanistan",
   "Albania": "Albania",
   "Algeria": "Algeria",
@@ -136,7 +136,7 @@
   "Niger": "Niger",
   "Nigeria": "Nigeria",
   "Norway": "Norway",
-  "OCEANIA": "Oceania",
+  "OCEANIA": "Oceania (UN)",
   "Oman": "Oman",
   "Pakistan": "Pakistan",
   "Panama": "Panama",
@@ -170,7 +170,7 @@
   "Solomon Islands": "Solomon Islands",
   "Somalia": "Somalia",
   "South Africa": "South Africa",
-  "South America": "South America",
+  "South America": "South America (UN)",
   "South Sudan": "South Sudan",
   "Spain": "Spain",
   "Sri Lanka": "Sri Lanka",
@@ -227,7 +227,7 @@
   "Middle Africa": "Middle Africa (UN)",
   "Middle-income countries": "Middle-income countries (UN)",
   "More developed regions": "More developed regions (UN)",
-  "NORTHERN AMERICA": "Northern America (UN)",
+  "NORTHERN AMERICA": "North America (UN)",
   "Northern Africa": "Northern Africa (UN)",
   "Northern Europe": "Northern Europe (UN)",
   "South-Central Asia": "South-Central Asia (UN)",

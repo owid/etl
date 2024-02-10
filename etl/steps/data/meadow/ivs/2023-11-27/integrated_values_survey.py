@@ -116,6 +116,19 @@ def rename_vars(tb: Table) -> Table:
         "G007_18_B": "Neighborhood",
         "G007_35_B": "Another religion",
         "G007_36_B": "Another nationality",
+        "A001": "Family",
+        "A002": "Friends",
+        "A003": "Leisure time",
+        "A004": "Politics",
+        "A005": "Work",
+        "A006": "Religion",
+        "E023": "Politics",
+        "E025": "Signing a petition",
+        "E026": "Joining in boycotts",
+        "E027": "Attending peaceful demonstrations",
+        "E028": "Joining unofficial strikes",
+        "B008": "Protecting environment vs. economic growth",
+        "E035": "Income eqauality",
     }
 
     # Rename columns, replacing var with name when the original name ends with var

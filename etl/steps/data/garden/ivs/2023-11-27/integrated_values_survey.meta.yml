@@ -11,6 +11,9 @@ definitions:
       The indicators are processed from microdata of the Integrated Values Surveys (IVS) using Stata. Weights are applied for each country.
     display: &common-display
       numDecimalPlaces: 1
+      tolerance: 5
+    unit: "%"
+    short_unit: "%"
 
 
 # Learn more about the available fields:
@@ -27,353 +30,1064 @@ tables:
       trust:
         title: Agree "Most people can be trusted"
         description_short: '% of respondents replying "Most people can be trusted" when asked "Generally speaking, would you say that most people can be trusted or that you need to be very careful in dealing with people?" Possible answers include "Most people can be trusted", "Do not know" and "Need to be very careful".'
-        unit: "%"
-        short_unit: "%"
         display:
           name: Agree "Most people can be trusted"
           <<: *common-display
+        presentation:
+          title_public: "Agree: Most people can be trusted"
       trust_first:
         title: Agree "Trust those I meet for the first time"
         description_short: '% of respondents replying that they "trust completely" or "trust somewhat" when asked "I‘d like to ask you how much you trust people from various groups. Could you tell me for each whether you trust people from this group completely, somewhat, not very much or not at all?" in the group "People you meet for the first time".'
-        unit: "%"
-        short_unit: "%"
         display:
           name: Agree "Trust those I meet for the first time"
           <<: *common-display
+        presentation:
+          title_public: "Agree: Trust those I meet for the first time"
       trust_personally:
         title: Agree "Trust those I know personally"
         description_short: '% of respondents replying that they "trust completely" or "trust somewhat" when asked "I‘d like to ask you how much you trust people from various groups. Could you tell me for each whether you trust people from this group completely, somewhat, not very much or not at all?" in the group "People you know personally".'
-        unit: "%"
-        short_unit: "%"
         display:
           name: Agree "Trust those I know personally"
           <<: *common-display
+        presentation:
+          title_public: "Agree: Trust those I know personally"
       trust_first_not_at_all:
         title: Agree "Do not trust those I meet for the first time"
         description_short: '% of respondents replying that they "do not trust at all" when asked "I‘d like to ask you how much you trust people from various groups. Could you tell me for each whether you trust people from this group completely, somewhat, not very much or not at all?" in the group "People you meet for the first time".'
-        unit: "%"
-        short_unit: "%"
         display:
           name: Agree "Do not trust those I meet for the first time"
           <<: *common-display
+        presentation:
+          title_public: "Agree: Do not trust those I meet for the first time"
       trust_personally_not_at_all:
         title: Agree "Do not trust those I know personally"
         description_short: '% of respondents replying that they "do not trust at all" when asked "I‘d like to ask you how much you trust people from various groups. Could you tell me for each whether you trust people from this group completely, somewhat, not very much or not at all?" in the group "People you know personally".'
-        unit: "%"
-        short_unit: "%"
         display:
           name: Agree "Do not trust those I know personally"
           <<: *common-display
+        presentation:
+          title_public: "Agree: Do not trust those I know personally"
       take_advantage:
         title: Agree "Most people would try to take advantage of you"
         description_short: '% of respondents replying that people "would take advantage" when asked "Do you think most people try to take advantage of you". Possible answers include they "would try to be fair", "would take advantage" and "do not know".'
-        unit: "%"
-        short_unit: "%"
         display:
           name: Agree "Most people would try to take advantage of you"
           <<: *common-display
+        presentation:
+          title_public: "Agree: Most people would try to take advantage of you"
       trust_family:
         title: Agree "Trust in family"
         description_short: '% of respondents replying that they "trust completely" or "trust somewhat" when asked "I‘d like to ask you how much you trust people from various groups. Could you tell me for each whether you trust people from this group completely, somewhat, not very much or not at all?" in the group "Family".'
-        unit: "%"
-        short_unit: "%"
         display:
           name: Agree "Trust in family"
           <<: *common-display
+        presentation:
+          title_public: "Agree: Trust in family"
       trust_neighborhood:
         title: Agree "Trust in neighborhood"
         description_short: '% of respondents replying that they "trust completely" or "trust somewhat" when asked "I‘d like to ask you how much you trust people from various groups. Could you tell me for each whether you trust people from this group completely, somewhat, not very much or not at all?" in the group "Your neighborhood".'
-        unit: "%"
-        short_unit: "%"
         display:
           name: Agree "Trust in neighborhood"
           <<: *common-display
+        presentation:
+          title_public: "Agree: Trust in neighborhood"
       trust_another_religion:
         title: Agree "Trust in people of another religion"
         description_short: '% of respondents replying that they "trust completely" or "trust somewhat" when asked "I‘d like to ask you how much you trust people from various groups. Could you tell me for each whether you trust people from this group completely, somewhat, not very much or not at all?" in the group "People of another religion".'
-        unit: "%"
-        short_unit: "%"
         display:
           name: Agree "Trust in people of another religion"
           <<: *common-display
+        presentation:
+          title_public: "Agree: Trust in people of another religion"
       trust_another_nationality:
         title: Agree "Trust in people of another nationality"
         description_short: '% of respondents replying that they "trust completely" or "trust somewhat" when asked "I‘d like to ask you how much you trust people from various groups. Could you tell me for each whether you trust people from this group completely, somewhat, not very much or not at all?" in the group "People of another nationality".'
-        unit: "%"
-        short_unit: "%"
         display:
           name: Agree "Trust in people of another nationality"
           <<: *common-display
+        presentation:
+          title_public: "Agree: Trust in people of another nationality"
       confidence_government:
         title: "Trust: Confidence in government"
         description_short: '% of respondents replying that they "trust completely" or "trust somewhat" when asked "I am going to name a number of organisations. For each one, could you tell me how much confidence you have in them: is it a great deal of confidence, quite a lot of confidence, not very much confidence or none at all?" in the organization "Government".'
-        unit: "%"
-        short_unit: "%"
         display:
           name: "Trust: Confidence in government"
           <<: *common-display
+        presentation:
+          title_public: "Trust: Confidence in government"
       confidence_churches:
         title: "Trust: Confidence in the churches"
         description_short: '% of respondents replying that they "trust completely" or "trust somewhat" when asked "I am going to name a number of organisations. For each one, could you tell me how much confidence you have in them: is it a great deal of confidence, quite a lot of confidence, not very much confidence or none at all?" in the organization "The Churches (mosque, temple, etc.)".'
-        unit: "%"
-        short_unit: "%"
         display:
           name: "Trust: Confidence in the churches"
           <<: *common-display
+        presentation:
+          title_public: "Trust: Confidence in the churches"
       confidence_armed_forces:
         title: "Trust: Confidence in the armed forces"
         description_short: '% of respondents replying that they "trust completely" or "trust somewhat" when asked "I am going to name a number of organisations. For each one, could you tell me how much confidence you have in them: is it a great deal of confidence, quite a lot of confidence, not very much confidence or none at all?" in the organization "The armed forces".'
-        unit: "%"
-        short_unit: "%"
         display:
           name: "Trust: Confidence in the armed forces"
           <<: *common-display
+        presentation:
+          title_public: "Trust: Confidence in the armed forces"
       confidence_press:
         title: "Trust: Confidence in the press"
         description_short: '% of respondents replying that they "trust completely" or "trust somewhat" when asked "I am going to name a number of organisations. For each one, could you tell me how much confidence you have in them: is it a great deal of confidence, quite a lot of confidence, not very much confidence or none at all?" in the organization "The press".'
-        unit: "%"
-        short_unit: "%"
         display:
           name: "Trust: Confidence in the press"
           <<: *common-display
+        presentation:
+          title_public: "Trust: Confidence in the press"
       confidence_labour_unions:
         title: "Trust: Confidence in labor unions"
         description_short: '% of respondents replying that they "trust completely" or "trust somewhat" when asked "I am going to name a number of organisations. For each one, could you tell me how much confidence you have in them: is it a great deal of confidence, quite a lot of confidence, not very much confidence or none at all?" in the organization "Labor unions".'
-        unit: "%"
-        short_unit: "%"
         display:
           name: "Trust: Confidence in labor unions"
           <<: *common-display
+        presentation:
+          title_public: "Trust: Confidence in labor unions"
       confidence_police:
         title: "Trust: Confidence in the police"
         description_short: '% of respondents replying that they "trust completely" or "trust somewhat" when asked "I am going to name a number of organisations. For each one, could you tell me how much confidence you have in them: is it a great deal of confidence, quite a lot of confidence, not very much confidence or none at all?" in the organization "The police".'
-        unit: "%"
-        short_unit: "%"
         display:
           name: "Trust: Confidence in the police"
           <<: *common-display
+        presentation:
+          title_public: "Trust: Confidence in the police"
       confidence_parliament:
         title: "Trust: Confidence in the Parliament"
         description_short: '% of respondents replying that they "trust completely" or "trust somewhat" when asked "I am going to name a number of organisations. For each one, could you tell me how much confidence you have in them: is it a great deal of confidence, quite a lot of confidence, not very much confidence or none at all?" in the organization "Parliament".'
-        unit: "%"
-        short_unit: "%"
         display:
           name: "Trust: Confidence in the Parliament"
           <<: *common-display
+        presentation:
+          title_public: "Trust: Confidence in the Parliament"
       confidence_civil_services:
         title: "Trust: Confidence in the civil services"
         description_short: '% of respondents replying that they "trust completely" or "trust somewhat" when asked "I am going to name a number of organisations. For each one, could you tell me how much confidence you have in them: is it a great deal of confidence, quite a lot of confidence, not very much confidence or none at all?" in organization "Civil services".'
-        unit: "%"
-        short_unit: "%"
         display:
           name: "Trust: Confidence in the civil services"
           <<: *common-display
+        presentation:
+          title_public: "Trust: Confidence in the civil services"
       confidence_television:
         title: "Trust: Confidence in television"
         description_short: '% of respondents replying that they "trust completely" or "trust somewhat" when asked "I am going to name a number of organizations. For each one, could you tell me how much confidence you have in them: is it a great deal of confidence, quite a lot of confidence, not very much confidence or none at all?" in the organization "Television".'
-        unit: "%"
-        short_unit: "%"
         display:
           name: "Trust: Confidence in television"
           <<: *common-display
+        presentation:
+          title_public: "Trust: Confidence in television"
       confidence_political_parties:
         title: "Trust: Confidence in political parties"
         description_short: '% of respondents replying that they "trust completely" or "trust somewhat" when asked "I am going to name a number of organizations. For each one, could you tell me how much confidence you have in them: is it a great deal of confidence, quite a lot of confidence, not very much confidence or none at all?" in the organization "Political parties".'
-        unit: "%"
-        short_unit: "%"
         display:
           name: "Trust: Confidence in political parties"
           <<: *common-display
+        presentation:
+          title_public: "Trust: Confidence in political parties"
       confidence_major_companies:
         title: "Trust: Confidence in major companies"
         description_short: '% of respondents replying that they "trust completely" or "trust somewhat" when asked "I am going to name a number of organizations. For each one, could you tell me how much confidence you have in them: is it a great deal of confidence, quite a lot of confidence, not very much confidence or none at all?" in the organization "Major companies".'
-        unit: "%"
-        short_unit: "%"
         display:
           name: "Trust: Confidence in major companies"
           <<: *common-display
+        presentation:
+          title_public: "Trust: Confidence in major companies"
       confidence_environmental_protection_movement:
         title: "Trust: Confidence in the environmental protection movement"
         description_short: '% of respondents replying that they "trust completely" or "trust somewhat" when asked "I am going to name a number of organizations. For each one, could you tell me how much confidence you have in them: is it a great deal of confidence, quite a lot of confidence, not very much confidence or none at all?" in the organization "The environmental protection movement".'
-        unit: "%"
-        short_unit: "%"
         display:
           name: "Trust: Confidence in the environmental protection movement"
           <<: *common-display
+        presentation:
+          title_public: "Trust: Confidence in the environmental protection movement"
       confidence_womens_movement:
         title: "Trust: Confidence in the women's movement"
         description_short: '% of respondents replying that they "trust completely" or "trust somewhat" when asked "I am going to name a number of organizations. For each one, could you tell me how much confidence you have in them: is it a great deal of confidence, quite a lot of confidence, not very much confidence or none at all?" in the organization "The women‘s movement".'
-        unit: "%"
-        short_unit: "%"
         display:
           name: "Trust: Confidence in the women's movement"
           <<: *common-display
+        presentation:
+          title_public: "Trust: Confidence in the women's movement"
       confidence_health_care_system:
         title: "Trust: Confidence in the health care system"
         description_short: '% of respondents replying that they "trust completely" or "trust somewhat" when asked "I am going to name a number of organizations. How much confidence do you have in them: is it a great deal of confidence, quite a lot of confidence, not much confidence or no confidence at all?" in the organization "The health care system".'
-        unit: "%"
-        short_unit: "%"
         display:
           name: "Trust: Confidence in the health care system"
           <<: *common-display
+        presentation:
+          title_public: "Trust: Confidence in the health care system"
       confidence_justice_system_courts:
         title: "Trust: Confidence in the justice system (courts)"
         description_short: '% of respondents replying that they "trust completely" or "trust somewhat" when asked "I am going to name a number of organizations. For each one, could you tell me how much confidence you have in them: is it a great deal of confidence, quite a lot of confidence, not very much confidence or none at all?" in the organization "The justice system (courts)".'
-        unit: "%"
-        short_unit: "%"
         display:
           name: "Trust: Confidence in the justice system (courts)"
           <<: *common-display
+        presentation:
+          title_public: "Trust: Confidence in the justice system (courts)"
       confidence_european_union:
         title: "Trust: Confidence in the European Union"
         description_short: '% of respondents replying that they "trust completely" or "trust somewhat" when asked "I am going to name a number of organizations. For each one, could you tell me how much confidence you have in them: is it a great deal of confidence, quite a lot of confidence, not very much confidence or none at all?" in the organization "The European Union".'
-        unit: "%"
-        short_unit: "%"
         display:
           name: "Trust: Confidence in the European Union"
           <<: *common-display
+        presentation:
+          title_public: "Trust: Confidence in the European Union"
       confidence_major_regional_organization__combined_from_country_specific:
         title: "Trust: Confidence in major regional organization"
         description_short: 'This is a consolidated variable of the % of respondents replying that they "trust completely" or "trust somewhat" when asked "I am going to name a number of organizations. For each one, could you tell me how much confidence you have in them: is it a great deal of confidence, quite a lot of confidence, not very much confidence or none at all?" for each major regional organization.'
-        unit: "%"
-        short_unit: "%"
         display:
           name: "Trust: Confidence in major regional organization"
           <<: *common-display
+        presentation:
+          title_public: "Trust: Confidence in major regional organization"
       confidence_nato:
         title: "Trust: Confidence in NATO"
         description_short: '% of respondents replying that they "trust completely" or "trust somewhat" when asked "I am going to name a number of organizations. For each one, could you tell me how much confidence you have in them: is it a great deal of confidence, quite a lot of confidence, not very much confidence or none at all?" in the organization "NATO".'
-        unit: "%"
-        short_unit: "%"
         display:
           name: "Trust: Confidence in NATO"
           <<: *common-display
+        presentation:
+          title_public: "Trust: Confidence in NATO"
       confidence_united_nations:
         title: "Trust: Confidence in the United Nations"
         description_short: '% of respondents replying that they "trust completely" or "trust somewhat" when asked "I am going to name a number of organizations. For each one, could you tell me how much confidence you have in them: is it a great deal of confidence, quite a lot of confidence, not very much confidence or none at all?" in the organization "United Nations".'
-        unit: "%"
-        short_unit: "%"
         display:
           name: "Trust: Confidence in the United Nations"
           <<: *common-display
+        presentation:
+          title_public: "Trust: Confidence in the United Nations"
       confidence_arab_league:
         title: "Trust: Confidence in the Arab League"
         description_short: '% of respondents replying that they "trust completely" or "trust somewhat" when asked "I am going to name a number of organizations. For each one, could you tell me how much confidence you have in them: is it a great deal of confidence, quite a lot of confidence, not very much confidence or no confidence at all?" in the organization "Arab League".'
-        unit: "%"
-        short_unit: "%"
         display:
           name: "Trust: Confidence in the Arab League"
           <<: *common-display
+        presentation:
+          title_public: "Trust: Confidence in the Arab League"
       confidence_association_of_south_east_asian_nations__asean:
         title: "Trust: Confidence in the Association of South East Asian Nations (ASEAN)"
         description_short: '% of respondents replying that they "trust completely" or "trust somewhat" when asked "I am going to name a number of organizations. For each one, could you tell me how much confidence you have in them: is it a great deal of confidence, quite a lot of confidence, not much confidence or no confidence at all?" in the organization "Association of South East Asian Nations (ASEAN)".'
-        unit: "%"
-        short_unit: "%"
         display:
           name: "Trust: Confidence in the Association of South East Asian Nations (ASEAN)"
           <<: *common-display
+        presentation:
+          title_public: "Trust: Confidence in the Association of South East Asian Nations (ASEAN)"
       confidence_organization_for_african_unity_oau:
         title: "Trust: Confidence in the Organization for African Unity (OAU)"
         description_short: '% of respondents replying that they "trust completely" or "trust somewhat" when asked "I am going to name a number of organizations. For each one, could you tell me how much confidence you have in them: a great deal of confidence, quite a lot of confidence, not much confidence or no confidence at all?" in the organization "Organization for African Unity (OAU)".'
-        unit: "%"
-        short_unit: "%"
         display:
           name: "Trust: Confidence in the Organization for African Unity (OAU)"
           <<: *common-display
+        presentation:
+          title_public: "Trust: Confidence in the Organization for African Unity (OAU)"
       confidence_nafta:
         title: "Trust: Confidence in NAFTA"
         description_short: '% of respondents replying that they "trust completely" or "trust somewhat" when asked "I am going to name a number of organizations. For each one, could you tell me how much confidence you have in a great deal of confidence, quite a lot of confidence, not much confidence or no confidence at all?" in the organization "NAFTA".'
-        unit: "%"
-        short_unit: "%"
         display:
           name: "Trust: Confidence in NAFTA"
           <<: *common-display
+        presentation:
+          title_public: "Trust: Confidence in NAFTA"
       confidence_mercosur:
         title: "Trust: Confidence in MERCOSUR"
         description_short: '% of respondents replying that they "trust completely" or "trust somewhat" when asked "I am going to name a number of organizations. For each one, how much confidence do you have in them: a great deal of confidence, quite a lot of confidence, not much confidence or no confidence at all?" in the organization "MERCOSUR".'
-        unit: "%"
-        short_unit: "%"
         display:
           name: "Trust: Confidence in MERCOSUR"
           <<: *common-display
+        presentation:
+          title_public: "Trust: Confidence in MERCOSUR"
       confidence_saarc:
         title: "Trust: Confidence in SAARC"
         description_short: '% of respondents replying that they "trust completely" or "trust somewhat" when asked "I am going to name a number of organizations. For each one, how much confidence do you have in them: a great deal of confidence, quite a lot of confidence, not much confidence or no confidence at all?" in the organization "South Asian Association for Regional Cooperation (SAARC)".'
-        unit: "%"
-        short_unit: "%"
         display:
           name: "Trust: Confidence in SAARC"
           <<: *common-display
+        presentation:
+          title_public: "Trust: Confidence in SAARC"
       confidence_apec:
         title: "Trust: Confidence in APEC"
         description_short: '% of respondents replying that they "trust completely" or "trust somewhat" when asked "I am going to name a number of organizations. For each one, how much confidence do you have in them: a great deal of confidence, quite a lot of confidence, not much confidence or no confidence at all?" in the organization "Asia-Pacific Economic Cooperation (APEC)".'
-        unit: "%"
-        short_unit: "%"
         display:
           name: "Trust: Confidence in APEC"
           <<: *common-display
+        presentation:
+          title_public: "Trust: Confidence in APEC"
       confidence_charitable_or_humanitarian_organizations:
         title: "Trust: Confidence in charitable or humanitarian organizations"
         description_short: '% of respondents replying that they "trust completely" or "trust somewhat" when asked "I am going to name a number of organizations. For each one how much confidence do you have in them: a great deal of confidence, quite a lot of confidence, not much confidence or no confidence at all?" in the organization "Charitable or humanitarian organizations".'
-        unit: "%"
-        short_unit: "%"
         display:
           name: "Trust: Confidence in charitable or humanitarian organizations"
           <<: *common-display
+        presentation:
+          title_public: "Trust: Confidence in charitable or humanitarian organizations"
       confidence_banks:
         title: "Trust: Confidence in banks"
         description_short: '% of respondents replying that they "trust completely" or "trust somewhat" when asked "I am going to name a number of organizations. For each one how much confidence do you have in them: a great deal of confidence, quite a lot of confidence, not much confidence or no confidence at all?" in the organization "Banks".'
-        unit: "%"
-        short_unit: "%"
         display:
           name: "Trust: Confidence in banks"
           <<: *common-display
+        presentation:
+          title_public: "Trust: Confidence in banks"
       confidence_caricom:
         title: "Trust: Confidence in CARICOM"
         description_short: '% of respondents replying that they "trust completely" or "trust somewhat" when asked "I am going to name a number of organizations. For each one how much confidence do you have in them: a great deal of confidence, quite a lot of confidence, not much confidence or no confidence at all?" in the organization "Caribbean Community (CARICOM)".'
-        unit: "%"
-        short_unit: "%"
         display:
           name: "Trust: Confidence in CARICOM"
           <<: *common-display
+        presentation:
+          title_public: "Trust: Confidence in CARICOM"
       confidence_cis:
         title: "Trust: Confidence in CIS"
         description_short: '% of respondents replying that they "trust completely" or "trust somewhat" when asked "I am going to name a number of organizations. For each one how much confidence do you have in them: a great deal of confidence, quite a lot of confidence, not much confidence or no confidence at all?" in organization "Commonwealth of Independent States (CIS)".'
-        unit: "%"
-        short_unit: "%"
         display:
           name: "Trust: Confidence in CIS"
           <<: *common-display
+        presentation:
+          title_public: "Trust: Confidence in CIS"
       confidence_international_monetary_found__imf:
         title: "Trust: Confidence in the International Monetary Fund (IMF)"
         description_short: '% of respondents replying that they "trust completely" or "trust somewhat" when asked "I am going to name a number of organizations. How much confidence do you have in them: a great deal of confidence, quite a lot of confidence, not much confidence or no confidence at all?" in the organization "International Monetary Fund (IMF)".'
-        unit: "%"
-        short_unit: "%"
         display:
           name: "Trust: Confidence in the International Monetary Fund (IMF)"
           <<: *common-display
+        presentation:
+          title_public: "Trust: Confidence in the International Monetary Fund (IMF)"
       confidence_universities:
         title: "Trust: Confidence in universities"
         description_short: '% of respondents replying that they "trust completely" or "trust somewhat" when asked "I am going to name a number of organizations. How much confidence do you have in them: a great deal of confidence, quite a lot of confidence, not much confidence or no confidence at all?" in the organization "Universities".'
-        unit: "%"
-        short_unit: "%"
         display:
           name: "Trust: Confidence in universities"
           <<: *common-display
+        presentation:
+          title_public: "Trust: Confidence in universities"
       confidence_organization_of_the_islamic_world:
         title: "Trust: Confidence in the Organization of the Islamic World"
         description_short: '% of respondents replying that they "trust completely" or "trust somewhat" when asked "I am going to name a number of organizations. How much confidence do you have in them: a great deal of confidence, quite a lot of confidence, not much confidence or no confidence at all?" in the organization "Organization of the Islamic World".'
-        unit: "%"
-        short_unit: "%"
         display:
           name: "Trust: Confidence in the Organization of the Islamic World"
           <<: *common-display
+        presentation:
+          title_public: "Trust: Confidence in the Organization of the Islamic World"
       confidence_cooperation_council_for_the_arab_states_of_gulf__gcc:
         title: "Trust: Confidence in the Cooperation Council for the Arab States of Gulf (GCC)"
         description_short: '% of respondents replying that they "trust completely" or "trust somewhat" when asked "I am going to name a number of organizations. How much confidence do you have in them: a great deal of confidence, quite a lot of confidence, not much confidence or no confidence at all?" in the organization "Cooperation Council for the Arab States of Gulf (GCC)".'
-        unit: "%"
-        short_unit: "%"
         display:
           name: "Trust: Confidence in the Cooperation Council for the Arab States of Gulf (GCC)"
           <<: *common-display
+        presentation:
+          title_public: "Trust: Confidence in the Cooperation Council for the Arab States of Gulf (GCC)"
+
+      important_in_life_family:
+        title: "Important in life: Family"
+        description_short: '% of respondents replying "very important" or "rather important" when asked "For each of the following aspects, indicate how important it is in your life. Would you say it is very important, rather important, not very important or not important at all?" in the item "Family".'
+        display:
+          name: "Important in life: Family"
+          <<: *common-display
+        presentation:
+          title_public: "Important in life: Family"
+      not_important_in_life_family:
+        title: "Not important in life: Family"
+        description_short: '% of respondents replying "not very important" or "not important at all" when asked "For each of the following aspects, indicate how important it is in your life. Would you say it is very important, rather important, not very important or not important at all?" in the item "Family".'
+        display:
+          name: "Not important in life: Family"
+          <<: *common-display
+        presentation:
+          title_public: "Not important in life: Family"
+      very_important_in_life_family:
+        title: "Very important in life: Family"
+        description_short: '% of respondents replying "very important" when asked "For each of the following aspects, indicate how important it is in your life. Would you say it is very important, rather important, not very important or not important at all?" in the item "Family".'
+        display:
+          name: "Very important in life: Family"
+          <<: *common-display
+        presentation:
+          title_public: "Very important in life: Family"
+      rather_important_in_life_family:
+        title: "Rather important in life: Family"
+        description_short: '% of respondents replying "rather important" when asked "For each of the following aspects, indicate how important it is in your life. Would you say it is very important, rather important, not very important or not important at all?" in the item "Family".'
+        display:
+          name: "Rather important in life: Family"
+          <<: *common-display
+        presentation:
+          title_public: "Rather important in life: Family"
+      not_very_important_in_life_family:
+        title: "Not very important in life: Family"
+        description_short: '% of respondents replying "not very important" when asked "For each of the following aspects, indicate how important it is in your life. Would you say it is very important, rather important, not very important or not important at all?" in the item "Family".'
+        display:
+          name: "Not very important in life: Family"
+          <<: *common-display
+        presentation:
+          title_public: "Not very important in life: Family"
+      notatall_important_in_life_family:
+        title: "Not at all important in life: Family"
+        description_short: '% of respondents replying "not important at all" when asked "For each of the following aspects, indicate how important it is in your life. Would you say it is very important, rather important, not very important or not important at all?" in the item "Family".'
+        display:
+          name: "Not at all important in life: Family"
+          <<: *common-display
+        presentation:
+          title_public: "Not at all important in life: Family"
+      dont_know_important_in_life_family:
+        title: "Don't know: Important in life: Family"
+        description_short: '% of respondents replying "don‘t know" when asked "For each of the following aspects, indicate how important it is in your life. Would you say it is very important, rather important, not very important or not important at all?" in the item "Family".'
+        display:
+          name: "Don't know: Important in life: Family"
+          <<: *common-display
+        presentation:
+          title_public: "Don't know: Important in life: Family"
+      missing_important_in_life_family:
+        title: "Missing: Important in life: Family"
+        description_short: '% of answers classified as No answer, not applicable, not asked in survey o missing: other for the question "For each of the following aspects, indicate how important it is in your life. Would you say it is very important, rather important, not very important or not important at all?" in the item "Family".'
+        display:
+          name: "Missing: Important in life: Family"
+          <<: *common-display
+        presentation:
+          title_public: "Missing: Important in life: Family"
+
+      important_in_life_friends:
+        title: "Important in life: Friends"
+        description_short: '% of respondents replying "very important" or "rather important" when asked "For each of the following aspects, indicate how important it is in your life. Would you say it is very important, rather important, not very important or not important at all?" in the item "Friends".'
+        display:
+          name: "Important in life: Friends"
+          <<: *common-display
+        presentation:
+          title_public: "Important in life: Friends"
+      not_important_in_life_friends:
+        title: "Not important in life: Friends"
+        description_short: '% of respondents replying "not very important" or "not important at all" when asked "For each of the following aspects, indicate how important it is in your life. Would you say it is very important, rather important, not very important or not important at all?" in the item "Friends".'
+        display:
+          name: "Not important in life: Friends"
+          <<: *common-display
+        presentation:
+          title_public: "Not important in life: Friends"
+      very_important_in_life_friends:
+        title: "Very important in life: Friends"
+        description_short: '% of respondents replying "very important" when asked "For each of the following aspects, indicate how important it is in your life. Would you say it is very important, rather important, not very important or not important at all?" in the item "Friends".'
+        display:
+          name: "Very important in life: Friends"
+          <<: *common-display
+        presentation:
+          title_public: "Very important in life: Friends"
+      rather_important_in_life_friends:
+        title: "Rather important in life: Friends"
+        description_short: '% of respondents replying "rather important" when asked "For each of the following aspects, indicate how important it is in your life. Would you say it is very important, rather important, not very important or not important at all?" in the item "Friends".'
+        display:
+          name: "Rather important in life: Friends"
+          <<: *common-display
+        presentation:
+          title_public: "Rather important in life: Friends"
+      not_very_important_in_life_friends:
+        title: "Not very important in life: Friends"
+        description_short: '% of respondents replying "not very important" when asked "For each of the following aspects, indicate how important it is in your life. Would you say it is very important, rather important, not very important or not important at all?" in the item "Friends".'
+        display:
+          name: "Not very important in life: Friends"
+          <<: *common-display
+        presentation:
+          title_public: "Not very important in life: Friends"
+      notatall_important_in_life_friends:
+        title: "Not at all important in life: Friends"
+        description_short: '% of respondents replying "not important at all" when asked "For each of the following aspects, indicate how important it is in your life. Would you say it is very important, rather important, not very important or not important at all?" in the item "Friends".'
+        display:
+          name: "Not at all important in life: Friends"
+          <<: *common-display
+        presentation:
+          title_public: "Not at all important in life: Friends"
+      dont_know_important_in_life_friends:
+        title: "Don't know: Important in life: Friends"
+        description_short: '% of respondents replying "don‘t know" when asked "For each of the following aspects, indicate how important it is in your life. Would you say it is very important, rather important, not very important or not important at all?" in the item "Friends".'
+        display:
+          name: "Don't know: Important in life: Friends"
+          <<: *common-display
+        presentation:
+          title_public: "Don't know: Important in life: Friends"
+      missing_important_in_life_friends:
+        title: "Missing: Important in life: Friends"
+        description_short: '% of answers classified as No answer, not applicable, not asked in survey o missing: other for the question "For each of the following aspects, indicate how important it is in your life. Would you say it is very important, rather important, not very important or not important at all?" in the item "Friends".'
+        display:
+          name: "Missing: Important in life: Friends"
+          <<: *common-display
+        presentation:
+          title_public: "Missing: Important in life: Friends"
+
+      important_in_life_leisure_time:
+        title: "Important in life: Leisure time"
+        description_short: '% of respondents replying "very important" or "rather important" when asked "For each of the following aspects, indicate how important it is in your life. Would you say it is very important, rather important, not very important or not important at all?" in the item "Leisure time".'
+        display:
+          name: "Important in life: Leisure time"
+          <<: *common-display
+        presentation:
+          title_public: "Important in life: Leisure time"
+      not_important_in_life_leisure_time:
+        title: "Not important in life: Leisure time"
+        description_short: '% of respondents replying "not very important" or "not important at all" when asked "For each of the following aspects, indicate how important it is in your life. Would you say it is very important, rather important, not very important or not important at all?" in the item "Leisure time".'
+        display:
+          name: "Not important in life: Leisure time"
+          <<: *common-display
+        presentation:
+          title_public: "Not important in life: Leisure time"
+      very_important_in_life_leisure_time:
+        title: "Very important in life: Leisure time"
+        description_short: '% of respondents replying "very important" when asked "For each of the following aspects, indicate how important it is in your life. Would you say it is very important, rather important, not very important or not important at all?" in the item "Leisure time".'
+        display:
+          name: "Very important in life: Leisure time"
+          <<: *common-display
+        presentation:
+          title_public: "Very important in life: Leisure time"
+      rather_important_in_life_leisure_time:
+        title: "Rather important in life: Leisure time"
+        description_short: '% of respondents replying "rather important" when asked "For each of the following aspects, indicate how important it is in your life. Would you say it is very important, rather important, not very important or not important at all?" in the item "Leisure time".'
+        display:
+          name: "Rather important in life: Leisure time"
+          <<: *common-display
+        presentation:
+          title_public: "Rather important in life: Leisure time"
+      not_very_important_in_life_leisure_time:
+        title: "Not very important in life: Leisure time"
+        description_short: '% of respondents replying "not very important" when asked "For each of the following aspects, indicate how important it is in your life. Would you say it is very important, rather important, not very important or not important at all?" in the item "Leisure time".'
+        display:
+          name: "Not very important in life: Leisure time"
+          <<: *common-display
+        presentation:
+          title_public: "Not very important in life: Leisure time"
+      notatall_important_in_life_leisure_time:
+        title: "Not at all important in life: Leisure time"
+        description_short: '% of respondents replying "not important at all" when asked "For each of the following aspects, indicate how important it is in your life. Would you say it is very important, rather important, not very important or not important at all?" in the item "Leisure time".'
+        display:
+          name: "Not at all important in life: Leisure time"
+          <<: *common-display
+        presentation:
+          title_public: "Not at all important in life: Leisure time"
+      dont_know_important_in_life_leisure_time:
+        title: "Don't know: Important in life: Leisure time"
+        description_short: '% of respondents replying "don‘t know" when asked "For each of the following aspects, indicate how important it is in your life. Would you say it is very important, rather important, not very important or not important at all?" in the item "Leisure time".'
+        display:
+          name: "Don't know: Important in life: Leisure time"
+          <<: *common-display
+        presentation:
+          title_public: "Don't know: Important in life: Leisure time"
+      missing_important_in_life_leisure_time:
+        title: "Missing: Important in life: Leisure time"
+        description_short: '% of answers classified as No answer, not applicable, not asked in survey o missing: other for the question "For each of the following aspects, indicate how important it is in your life. Would you say it is very important, rather important, not very important or not important at all?" in the item "Leisure time".'
+        display:
+          name: "Missing: Important in life: Leisure time"
+          <<: *common-display
+        presentation:
+          title_public: "Missing: Important in life: Leisure time"
+
+      important_in_life_politics:
+        title: "Important in life: Politics"
+        description_short: '% of respondents replying "very important" or "rather important" when asked "For each of the following aspects, indicate how important it is in your life. Would you say it is very important, rather important, not very important or not important at all?" in the item "Politics".'
+        display:
+          name: "Important in life: Politics"
+          <<: *common-display
+        presentation:
+            title_public: "Important in life: Politics"
+      not_important_in_life_politics:
+        title: "Not important in life: Politics"
+        description_short: '% of respondents replying "not very important" or "not important at all" when asked "For each of the following aspects, indicate how important it is in your life. Would you say it is very important, rather important, not very important or not important at all?" in the item "Politics".'
+        display:
+          name: "Not important in life: Politics"
+          <<: *common-display
+        presentation:
+          title_public: "Not important in life: Politics"
+      very_important_in_life_politics:
+        title: "Very important in life: Politics"
+        description_short: '% of respondents replying "very important" when asked "For each of the following aspects, indicate how important it is in your life. Would you say it is very important, rather important, not very important or not important at all?" in the item "Politics".'
+        display:
+          name: "Very important in life: Politics"
+          <<: *common-display
+        presentation:
+          title_public: "Very important in life: Politics"
+      rather_important_in_life_politics:
+        title: "Rather important in life: Politics"
+        description_short: '% of respondents replying "rather important" when asked "For each of the following aspects, indicate how important it is in your life. Would you say it is very important, rather important, not very important or not important at all?" in the item "Politics".'
+        display:
+          name: "Rather important in life: Politics"
+          <<: *common-display
+        presentation:
+          title_public: "Rather important in life: Politics"
+      not_very_important_in_life_politics:
+        title: "Not very important in life: Politics"
+        description_short: '% of respondents replying "not very important" when asked "For each of the following aspects, indicate how important it is in your life. Would you say it is very important, rather important, not very important or not important at all?" in the item "Politics".'
+        display:
+          name: "Not very important in life: Politics"
+          <<: *common-display
+        presentation:
+          title_public: "Not very important in life: Politics"
+      notatall_important_in_life_politics:
+        title: "Not at all important in life: Politics"
+        description_short: '% of respondents replying "not important at all" when asked "For each of the following aspects, indicate how important it is in your life. Would you say it is very important, rather important, not very important or not important at all?" in the item "Politics".'
+        display:
+          name: "Not at all important in life: Politics"
+          <<: *common-display
+        presentation:
+          title_public: "Not at all important in life: Politics"
+      dont_know_important_in_life_politics:
+        title: "Don't know: Important in life: Politics"
+        description_short: '% of respondents replying "don‘t know" when asked "For each of the following aspects, indicate how important it is in your life. Would you say it is very important, rather important, not very important or not important at all?" in the item "Politics".'
+        display:
+          name: "Don't know: Important in life: Politics"
+          <<: *common-display
+        presentation:
+          title_public: "Don't know: Important in life: Politics"
+      missing_important_in_life_politics:
+        title: "Missing: Important in life: Politics"
+        description_short: '% of answers classified as No answer, not applicable, not asked in survey o missing: other for the question "For each of the following aspects, indicate how important it is in your life. Would you say it is very important, rather important, not very important or not important at all?" in the item "Politics".'
+        display:
+          name: "Missing: Important in life: Politics"
+          <<: *common-display
+        presentation:
+          title_public: "Missing: Important in life: Politics"
+
+      important_in_life_work:
+        title: "Important in life: Work"
+        description_short: '% of respondents replying "very important" or "rather important" when asked "For each of the following aspects, indicate how important it is in your life. Would you say it is very important, rather important, not very important or not important at all?" in the item "Work".'
+        display:
+          name: "Important in life: Work"
+          <<: *common-display
+        presentation:
+          title_public: "Important in life: Work"
+      not_important_in_life_work:
+        title: "Not important in life: Work"
+        description_short: '% of respondents replying "not very important" or "not important at all" when asked "For each of the following aspects, indicate how important it is in your life. Would you say it is very important, rather important, not very important or not important at all?" in the item "Work".'
+        display:
+          name: "Not important in life: Work"
+          <<: *common-display
+        presentation:
+          title_public: "Not important in life: Work"
+      very_important_in_life_work:
+        title: "Very important in life: Work"
+        description_short: '% of respondents replying "very important" when asked "For each of the following aspects, indicate how important it is in your life. Would you say it is very important, rather important, not very important or not important at all?" in the item "Work".'
+        display:
+          name: "Very important in life: Work"
+          <<: *common-display
+        presentation:
+          title_public: "Very important in life: Work"
+      rather_important_in_life_work:
+        title: "Rather important in life: Work"
+        description_short: '% of respondents replying "rather important" when asked "For each of the following aspects, indicate how important it is in your life. Would you say it is very important, rather important, not very important or not important at all?" in the item "Work".'
+        display:
+          name: "Rather important in life: Work"
+          <<: *common-display
+        presentation:
+          title_public: "Rather important in life: Work"
+      not_very_important_in_life_work:
+        title: "Not very important in life: Work"
+        description_short: '% of respondents replying "not very important" when asked "For each of the following aspects, indicate how important it is in your life. Would you say it is very important, rather important, not very important or not important at all?" in the item "Work".'
+        display:
+          name: "Not very important in life: Work"
+          <<: *common-display
+        presentation:
+          title_public: "Not very important in life: Work"
+      notatall_important_in_life_work:
+        title: "Not at all important in life: Work"
+        description_short: '% of respondents replying "not important at all" when asked "For each of the following aspects, indicate how important it is in your life. Would you say it is very important, rather important, not very important or not important at all?" in the item "Work".'
+        display:
+          name: "Not at all important in life: Work"
+          <<: *common-display
+        presentation:
+          title_public: "Not at all important in life: Work"
+      dont_know_important_in_life_work:
+        title: "Don't know: Important in life: Work"
+        description_short: '% of respondents replying "don‘t know" when asked "For each of the following aspects, indicate how important it is in your life. Would you say it is very important, rather important, not very important or not important at all?" in the item "Work".'
+        display:
+          name: "Don't know: Important in life: Work"
+          <<: *common-display
+        presentation:
+          title_public: "Don't know: Important in life: Work"
+      missing_important_in_life_work:
+        title: "Missing: Important in life: Work"
+        description_short: '% of answers classified as No answer, not applicable, not asked in survey o missing: other for the question "For each of the following aspects, indicate how important it is in your life. Would you say it is very important, rather important, not very important or not important at all?" in the item "Work".'
+        display:
+          name: "Missing: Important in life: Work"
+          <<: *common-display
+        presentation:
+          title_public: "Missing: Important in life: Work"
+
+      important_in_life_religion:
+        title: "Important in life: Religion"
+        description_short: '% of respondents replying "very important" or "rather important" when asked "For each of the following aspects, indicate how important it is in your life. Would you say it is very important, rather important, not very important or not important at all?" in the item "Religion".'
+        display:
+          name: "Important in life: Religion"
+          <<: *common-display
+        presentation:
+          title_public: "Important in life: Religion"
+      not_important_in_life_religion:
+        title: "Not important in life: Religion"
+        description_short: '% of respondents replying "not very important" or "not important at all" when asked "For each of the following aspects, indicate how important it is in your life. Would you say it is very important, rather important, not very important or not important at all?" in the item "Religion".'
+        display:
+          name: "Not important in life: Religion"
+          <<: *common-display
+        presentation:
+          title_public: "Not important in life: Religion"
+      very_important_in_life_religion:
+        title: "Very important in life: Religion"
+        description_short: '% of respondents replying "very important" when asked "For each of the following aspects, indicate how important it is in your life. Would you say it is very important, rather important, not very important or not important at all?" in the item "Religion".'
+        display:
+          name: "Very important in life: Religion"
+          <<: *common-display
+        presentation:
+          title_public: "Very important in life: Religion"
+      rather_important_in_life_religion:
+        title: "Rather important in life: Religion"
+        description_short: '% of respondents replying "rather important" when asked "For each of the following aspects, indicate how important it is in your life. Would you say it is very important, rather important, not very important or not important at all?" in the item "Religion".'
+        display:
+          name: "Rather important in life: Religion"
+          <<: *common-display
+        presentation:
+          title_public: "Rather important in life: Religion"
+      not_very_important_in_life_religion:
+        title: "Not very important in life: Religion"
+        description_short: '% of respondents replying "not very important" when asked "For each of the following aspects, indicate how important it is in your life. Would you say it is very important, rather important, not very important or not important at all?" in the item "Religion".'
+        display:
+          name: "Not very important in life: Religion"
+          <<: *common-display
+        presentation:
+          title_public: "Not very important in life: Religion"
+      notatall_important_in_life_religion:
+        title: "Not at all important in life: Religion"
+        description_short: '% of respondents replying "not important at all" when asked "For each of the following aspects, indicate how important it is in your life. Would you say it is very important, rather important, not very important or not important at all?" in the item "Religion".'
+        display:
+          name: "Not at all important in life: Religion"
+          <<: *common-display
+        presentation:
+          title_public: "Not at all important in life: Religion"
+      dont_know_important_in_life_religion:
+        title: "Don't know: Important in life: Religion"
+        description_short: '% of respondents replying "don‘t know" when asked "For each of the following aspects, indicate how important it is in your life. Would you say it is very important, rather important, not very important or not important at all?" in the item "Religion".'
+        display:
+          name: "Don't know: Important in life: Religion"
+          <<: *common-display
+        presentation:
+          title_public: "Don't know: Important in life: Religion"
+      missing_important_in_life_religion:
+        title: "Missing: Important in life: Religion"
+        description_short: '% of answers classified as No answer, not applicable, not asked in survey o missing: other for the question "For each of the following aspects, indicate how important it is in your life. Would you say it is very important, rather important, not very important or not important at all?" in the item "Religion".'
+        display:
+          name: "Missing: Important in life: Religion"
+          <<: *common-display
+        presentation:
+          title_public: "Missing: Important in life: Religion"
+
+      interested_politics:
+        title: "Interest in politics"
+        description_short: '% of respondents replying "very interested" or "somewhat interested" when asked "How interested would you say you are in politics?"'
+        display:
+          name: "Interest in politics"
+          <<: *common-display
+        presentation:
+          title_public: "Interest in politics"
+      not_interested_politics:
+        title: "Not interested in politics"
+        description_short: '% of respondents replying "not very interested" or "not at all interested" when asked "How interested would you say you are in politics?"'
+        display:
+          name: "Not interested in politics"
+          <<: *common-display
+        presentation:
+          title_public: "Not interested in politics"
+      very_interested_politics:
+        title: "Very interested in politics"
+        description_short: '% of respondents replying "very interested" when asked "How interested would you say you are in politics?"'
+        display:
+          name: "Very interested in politics"
+          <<: *common-display
+        presentation:
+          title_public: "Very interested in politics"
+      somewhat_interested_politics:
+        title: "Somewhat interested in politics"
+        description_short: '% of respondents replying "somewhat interested" when asked "How interested would you say you are in politics?"'
+        display:
+          name: "Somewhat interested in politics"
+          <<: *common-display
+        presentation:
+          title_public: "Somewhat interested in politics"
+      not_very_interested_politics:
+        title: "Not very interested in politics"
+        description_short: '% of respondents replying "not very interested" when asked "How interested would you say you are in politics?"'
+        display:
+          name: "Not very interested in politics"
+          <<: *common-display
+        presentation:
+          title_public: "Not very interested in politics"
+      not_at_all_interested_politics:
+        title: "Not at all interested in politics"
+        description_short: '% of respondents replying "not at all interested" when asked "How interested would you say you are in politics?"'
+        display:
+          name: "Not at all interested in politics"
+          <<: *common-display
+        presentation:
+          title_public: "Not at all interested in politics"
+      dont_know_interested_politics:
+        title: "Don't know: Interest in politics"
+        description_short: '% of respondents replying "don‘t know" when asked "How interested would you say you are in politics?"'
+        display:
+          name: "Don't know: Interest in politics"
+          <<: *common-display
+        presentation:
+          title_public: "Don't know: Interest in politics"
+      missing_interested_politics:
+        title: "Missing: Interest in politics"
+        description_short: '% of answers classified as No answer, not applicable, not asked in survey o missing: other for the question "How interested would you say you are in politics?"'
+        display:
+          name: "Missing: Interest in politics"
+          <<: *common-display
+        presentation:
+          title_public: "Missing: Interest in politics"
+
+      political_action_have_done_signing_a_petition:
+        title: "Political action: Have signed a petition"
+        description_short: '% of respondents replying "have done it" when asked "Now I would like you to look at this card. I am going to read out some different forms of political action that people can take, and I would like you to tell me, for each one, whether you have actually done any of these things, whether you might do it or would never, under any circumstances, do it." in the item "Signed a petition".'
+        display:
+          name: "Have signed a petition"
+          <<: *common-display
+        presentation:
+          title_public: "Have signed a petition"
+      political_action_might_do_signing_a_petition:
+        title: "Political action: Might sign a petition"
+        description_short: '% of respondents replying "might do it" when asked "Now I would like you to look at this card. I am going to read out some different forms of political action that people can take, and I would like you to tell me, for each one, whether you have actually done any of these things, whether you might do it or would never, under any circumstances, do it." in the item "Signed a petition".'
+        display:
+          name: "Might do signing a petition"
+          <<: *common-display
+        presentation:
+          title_public: "Might sign a petition"
+      political_action_never_signing_a_petition:
+        title: "Political action: Would never sign a petition"
+        description_short: '% of respondents replying "would never do it" when asked "Now I would like you to look at this card. I am going to read out some different forms of political action that people can take, and I would like you to tell me, for each one, whether you have actually done any of these things, whether you might do it or would never, under any circumstances, do it." in the item "Signed a petition".'
+        display:
+          name: "Would never sign a petition"
+          <<: *common-display
+        presentation:
+          title_public: "Would never sign a petition"
+      political_action_dont_know_signing_a_petition:
+        title: "Political action: Signing a petition (Don't know)"
+        description_short: '% of respondents replying "don‘t know" when asked "Now I would like you to look at this card. I am going to read out some different forms of political action that people can take, and I would like you to tell me, for each one, whether you have actually done any of these things, whether you might do it or would never, under any circumstances, do it." in the item "Signed a petition".'
+        display:
+          name: "Signing a petition (Don't know)"
+          <<: *common-display
+        presentation:
+          title_public: "Signing a petition (Don't know)"
+      political_action_missing_signing_a_petition:
+        title: "Political action: Signing a petition (Missing)"
+        description_short: '% of answers classified as No answer, not applicable, not asked in survey o missing: other for the question "Now I would like you to look at this card. I am going to read out some different forms of political action that people can take, and I would like you to tell me, for each one, whether you have actually done any of these things, whether you might do it or would never, under any circumstances, do it." in the item "Signed a petition".'
+        display:
+          name: "Signing a petition (Missing)"
+          <<: *common-display
+        presentation:
+          title_public: "Signing a petition (Missing)"
+
+      political_action_have_done_joining_in_boycotts:
+        title: "Political action: Have joined in boycotts"
+        description_short: '% of respondents replying "have done it" when asked "Now I would like you to look at this card. I am going to read out some different forms of political action that people can take, and I would like you to tell me, for each one, whether you have actually done any of these things, whether you might do it or would never, under any circumstances, do it." in the item "Joining in boycotts".'
+        display:
+          name: "Have joined in boycotts"
+          <<: *common-display
+        presentation:
+          title_public: "Have joined in boycotts"
+      political_action_might_do_joining_in_boycotts:
+        title: "Political action: Might join in boycotts"
+        description_short: '% of respondents replying "might do it" when asked "Now I would like you to look at this card. I am going to read out some different forms of political action that people can take, and I would like you to tell me, for each one, whether you have actually done any of these things, whether you might do it or would never, under any circumstances, do it." in the item "Joining in boycotts".'
+        display:
+          name: "Might do joining in boycotts"
+          <<: *common-display
+        presentation:
+          title_public: "Might join in boycotts"
+      political_action_never_joining_in_boycotts:
+        title: "Political action: Would never join in boycotts"
+        description_short: '% of respondents replying "would never do it" when asked "Now I would like you to look at this card. I am going to read out some different forms of political action that people can take, and I would like you to tell me, for each one, whether you have actually done any of these things, whether you might do it or would never, under any circumstances, do it." in the item "Joining in boycotts".'
+        display:
+          name: "Would never join in boycotts"
+          <<: *common-display
+        presentation:
+          title_public: "Would never join in boycotts"
+      political_action_dont_know_joining_in_boycotts:
+        title: "Political action: Joining in boycotts (Don't know)"
+        description_short: '% of respondents replying "don‘t know" when asked "Now I would like you to look at this card. I am going to read out some different forms of political action that people can take, and I would like you to tell me, for each one, whether you have actually done any of these things, whether you might do it or would never, under any circumstances, do it." in the item "Joining in boycotts".'
+        display:
+          name: "Joining in boycotts (Don't know)"
+          <<: *common-display
+        presentation:
+          title_public: "Joining in boycotts (Don't know)"
+      political_action_missing_joining_in_boycotts:
+        title: "Political action: Joining in boycotts (Missing)"
+        description_short: '% of answers classified as No answer, not applicable, not asked in survey o missing: other for the question "Now I would like you to look at this card. I am going to read out some different forms of political action that people can take, and I would like you to tell me, for each one, whether you have actually done any of these things, whether you might do it or would never, under any circumstances, do it." in the item "Joining in boycotts".'
+        display:
+          name: "Joining in boycotts (Missing)"
+          <<: *common-display
+        presentation:
+          title_public: "Joining in boycotts (Missing)"
+
+      political_action_have_done_attending_peaceful_demonstrations:
+        title: "Political action: Have attended peaceful demonstrations"
+        description_short: '% of respondents replying "have done it" when asked "Now I would like you to look at this card. I am going to read out some different forms of political action that people can take, and I would like you to tell me, for each one, whether you have actually done any of these things, whether you might do it or would never, under any circumstances, do it." in the item "Attending peaceful demonstrations".'
+        display:
+          name: "Have attended peaceful demonstrations"
+          <<: *common-display
+        presentation:
+          title_public: "Have attended peaceful demonstrations"
+      political_action_might_do_attending_peaceful_demonstrations:
+        title: "Political action: Might attend peaceful demonstrations"
+        description_short: '% of respondents replying "might do it" when asked "Now I would like you to look at this card. I am going to read out some different forms of political action that people can take, and I would like you to tell me, for each one, whether you have actually done any of these things, whether you might do it or would never, under any circumstances, do it." in the item "Attending peaceful demonstrations".'
+        display:
+          name: "Might do attending peaceful demonstrations"
+          <<: *common-display
+        presentation:
+          title_public: "Might attend peaceful demonstrations"
+      political_action_never_attending_peaceful_demonstrations:
+        title: "Political action: Would never attend peaceful demonstrations"
+        description_short: '% of respondents replying "would never do it" when asked "Now I would like you to look at this card. I am going to read out some different forms of political action that people can take, and I would like you to tell me, for each one, whether you have actually done any of these things, whether you might do it or would never, under any circumstances, do it." in the item "Attending peaceful demonstrations".'
+        display:
+          name: "Would never attend peaceful demonstrations"
+          <<: *common-display
+        presentation:
+          title_public: "Would never attend peaceful demonstrations"
+      political_action_dont_know_attending_peaceful_demonstrations:
+        title: "Political action: Attending peaceful demonstrations (Don't know)"
+        description_short: '% of respondents replying "don‘t know" when asked "Now I would like you to look at this card. I am going to read out some different forms of political action that people can take, and I would like you to tell me, for each one, whether you have actually done any of these things, whether you might do it or would never, under any circumstances, do it." in the item "Attending peaceful demonstrations".'
+        display:
+          name: "Attending peaceful demonstrations (Don't know)"
+          <<: *common-display
+        presentation:
+          title_public: "Attending peaceful demonstrations (Don't know)"
+      political_action_missing_attending_peaceful_demonstrations:
+        title: "Political action: Attending peaceful demonstrations (Missing)"
+        description_short: '% of answers classified as No answer, not applicable, not asked in survey o missing: other for the question "Now I would like you to look at this card. I am going to read out some different forms of political action that people can take, and I would like you to tell me, for each one, whether you have actually done any of these things, whether you might do it or would never, under any circumstances, do it." in the item "Attending peaceful demonstrations".'
+        display:
+          name: "Attending peaceful demonstrations (Missing)"
+          <<: *common-display
+        presentation:
+          title_public: "Attending peaceful demonstrations (Missing)"
+
+      political_action_have_done_joining_unofficial_strikes:
+        title: "Political action: Have joined unofficial strikes"
+        description_short: '% of respondents replying "have done it" when asked "Now I would like you to look at this card. I am going to read out some different forms of political action that people can take, and I would like you to tell me, for each one, whether you have actually done any of these things, whether you might do it or would never, under any circumstances, do it." in the item "Joining unofficial strikes".'
+        display:
+          name: "Have joined unofficial strikes"
+          <<: *common-display
+        presentation:
+          title_public: "Have joined unofficial strikes"
+      political_action_might_do_joining_unofficial_strikes:
+        title: "Political action: Might join unofficial strikes"
+        description_short: '% of respondents replying "might do it" when asked "Now I would like you to look at this card. I am going to read out some different forms of political action that people can take, and I would like you to tell me, for each one, whether you have actually done any of these things, whether you might do it or would never, under any circumstances, do it." in the item "Joining unofficial strikes".'
+        display:
+          name: "Might do joining unofficial strikes"
+          <<: *common-display
+        presentation:
+          title_public: "Might join unofficial strikes"
+      political_action_never_joining_unofficial_strikes:
+        title: "Political action: Would never join unofficial strikes"
+        description_short: '% of respondents replying "would never do it" when asked "Now I would like you to look at this card. I am going to read out some different forms of political action that people can take, and I would like you to tell me, for each one, whether you have actually done any of these things, whether you might do it or would never, under any circumstances, do it." in the item "Joining unofficial strikes".'
+        display:
+          name: "Would never join unofficial strikes"
+          <<: *common-display
+        presentation:
+          title_public: "Would never join unofficial strikes"
+      political_action_dont_know_joining_unofficial_strikes:
+        title: "Political action: Joining unofficial strikes (Don't know)"
+        description_short: '% of respondents replying "don‘t know" when asked "Now I would like you to look at this card. I am going to read out some different forms of political action that people can take, and I would like you to tell me, for each one, whether you have actually done any of these things, whether you might do it or would never, under any circumstances, do it." in the item "Joining unofficial strikes".'
+        display:
+          name: "Joining unofficial strikes (Don't know)"
+          <<: *common-display
+        presentation:
+          title_public: "Joining unofficial strikes (Don't know)"
+      political_action_missing_joining_unofficial_strikes:
+        title: "Political action: Joining unofficial strikes (Missing)"
+        description_short: '% of answers classified as No answer, not applicable, not asked in survey o missing: other for the question "Now I would like you to look at this card. I am going to read out some different forms of political action that people can take, and I would like you to tell me, for each one, whether you have actually done any of these things, whether you might do it or would never, under any circumstances, do it." in the item "Joining unofficial strikes".'
+        display:
+          name: "Joining unofficial strikes (Missing)"
+          <<: *common-display
+        presentation:
+          title_public: "Joining unofficial strikes (Missing)"
+
+      environment:
+        title: "Environment vs economic growth: Environment"
+        description_short: '% of respondents choosing option A when asked "Here are two statements people sometimes make when discussing the environment and economic growth. Which of them comes closer to your own point of view? A. Protecting the environment should be given priority, even if it causes slower economic growth and some loss of jobs B. Economic growth and creating jobs should be the top priority, even if the environment suffers to some extent"'
+        display:
+          name: "Environment vs economic growth: Environment"
+          <<: *common-display
+        presentation:
+          title_public: "Environment vs economic growth: Environment"
+      economic_growth:
+        title: "Environment vs economic growth: Economic growth"
+        description_short: '% of respondents choosing option B when asked "Here are two statements people sometimes make when discussing the environment and economic growth. Which of them comes closer to your own point of view? A. Protecting the environment should be given priority, even if it causes slower economic growth and some loss of jobs B. Economic growth and creating jobs should be the top priority, even if the environment suffers to some extent"'
+        display:
+          name: "Environment vs economic growth: Economic growth"
+          <<: *common-display
+        presentation:
+          title_public: "Environment vs economic growth: Economic growth"
+      other_answer_env_ec:
+        title: "Environment vs economic growth: Other answer"
+        description_short: '% of respondents choosing "Other answer" when asked "Here are two statements people sometimes make when discussing the environment and economic growth. Which of them comes closer to your own point of view? A. Protecting the environment should be given priority, even if it causes slower economic growth and some loss of jobs B. Economic growth and creating jobs should be the top priority, even if the environment suffers to some extent"'
+        display:
+          name: "Environment vs economic growth: Other answer"
+          <<: *common-display
+        presentation:
+          title_public: "Environment vs economic growth: Other answer"
+      dont_know_env_ec:
+        title: "Environment vs economic growth: Don't know"
+        description_short: '% of respondents choosing "Don‘t know" when asked "Here are two statements people sometimes make when discussing the environment and economic growth. Which of them comes closer to your own point of view? A. Protecting the environment should be given priority, even if it causes slower economic growth and some loss of jobs B. Economic growth and creating jobs should be the top priority, even if the environment suffers to some extent"'
+        display:
+          name: "Environment vs economic growth: Don't know"
+          <<: *common-display
+        presentation:
+          title_public: "Environment vs economic growth: Don't know"
+      missing_env_ec:
+        title: "Environment vs economic growth: Missing"
+        description_short: '% of answers classified as No answer, not applicable, not asked in survey o missing: other for the question "Here are two statements people sometimes make when discussing the environment and economic growth. Which of them comes closer to your own point of view? A. Protecting the environment should be given priority, even if it causes slower economic growth and some loss of jobs B. Economic growth and creating jobs should be the top priority, even if the environment suffers to some extent"'
+        display:
+          name: "Environment vs economic growth: Missing"
+          <<: *common-display
+        presentation:
+          title_public: "Environment vs economic growth: Missing"
+
+      income_equality:
+        title: "Income equality: Incomes should be made more equal"
+        description_short: '% of respondents replying in a scale from 1 to 4 when asked "Now I would like you to tell me your views on various issues. How would you place your views on this scale? 1 means you agree completely with the statement on the left; 10 means you agree completely with the statement on the right; and if your views fall somewhere in between, you can choose any number in between." in the statement "Incomes should be made more equal vs There should be greater incentives for individual effort".'
+        display:
+          name: "Incomes should be made more equal"
+          <<: *common-display
+        presentation:
+          title_public: "Income equality: Incomes should be made more equal"
+      neutral_about_equality:
+        title: "Income equality: Neutral"
+        description_short: '% of respondents replying "5" when asked "Now I would like you to tell me your views on various issues. How would you place your views on this scale? 1 means you agree completely with the statement on the left; 10 means you agree completely with the statement on the right; and if your views fall somewhere in between, you can choose any number in between." in the statement "Incomes should be made more equal vs There should be greater incentives for individual effort".'
+        display:
+          name: "Neutral"
+          <<: *common-display
+        presentation:
+          title_public: "Income equality: Neutral"
+      income_inequality:
+        title: "Income equality: There should be greater incentives for individual effort"
+        description_short: '% of respondents replying in a scale from 6 to 10 when asked "Now I would like you to tell me your views on various issues. How would you place your views on this scale? 1 means you agree completely with the statement on the left; 10 means you agree completely with the statement on the right; and if your views fall somewhere in between, you can choose any number in between." in the statement "Incomes should be made more equal vs There should be greater incentives for individual effort".'
+        display:
+          name: "There should be greater incentives for individual effort"
+          <<: *common-display
+        presentation:
+          title_public: "Income equality: There should be greater incentives for individual effort"
+      dont_know_income_equality:
+        title: "Income equality: Don't know"
+        description_short: '% of respondents replying "don‘t know" when asked "Now I would like you to tell me your views on various issues. How would you place your views on this scale? 1 means you agree completely with the statement on the left; 10 means you agree completely with the statement on the right; and if your views fall somewhere in between, you can choose any number in between." in the statement "Incomes should be made more equal vs There should be greater incentives for individual effort".'
+        display:
+          name: "Don't know"
+          <<: *common-display
+        presentation:
+          title_public: "Income equality: Don't know"
+      missing_income_equality:
+        title: "Income equality: Missing"
+        description_short: '% of answers classified as No answer, not applicable, not asked in survey o missing: other for the question "Now I would like you to tell me your views on various issues. How would you place your views on this scale? 1 means you agree completely with the statement on the left; 10 means you agree completely with the statement on the right; and if your views fall somewhere in between, you can choose any number in between." in the statement "Incomes should be made more equal vs There should be greater incentives for individual effort".'
+        display:
+          name: "Missing"
+          <<: *common-display
+        presentation:
+          title_public: "Income equality: Missing"
+      income_equality_avg_score:
+        title: "Income equality: Average score"
+        description_short: 'Average score of respondents when asked "Now I would like you to tell me your views on various issues. How would you place your views on this scale? 1 means you agree completely with the statement on the left; 10 means you agree completely with the statement on the right; and if your views fall somewhere in between, you can choose any number in between." in the statement "Incomes should be made more equal vs There should be greater incentives for individual effort".'
+        display:
+          name: "Average score"
+          <<: *common-display
+        unit: ""
+        short_unit: ""
+        presentation:
+          title_public: "Income equality: Average score"
 
