@@ -72,8 +72,9 @@ class OpenAIWrapper(OpenAI):
 
     def __init__(self: Self, **kwargs) -> None:
         """Initialize OpenAI API wrapper."""
-        super().__init__(**kwargs)
         self.model = kwargs.get("model", GPT_MODEL)
+        kwargs = {k: v for k, v in kwargs.items() if k != "model"}
+        super().__init__(**kwargs)
 
     def query_gpt(self: Self, query: GPTQuery | None = None, **kwargs) -> GPTResponse | None:
         """Query Chat GPT to get message content from the chat completion."""
