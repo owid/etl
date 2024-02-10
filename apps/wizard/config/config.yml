@@ -84,6 +84,13 @@ sections:
       emoji: "🤖"
       alias: metagpt
       image_url: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/04/ChatGPT_logo.svg/1024px-ChatGPT_logo.svg.png"
+    - title: "Metadata questioner"
+      alias: metaquest
+      description: "Ask chat GPT about our metadata."
+      maintainer: "@lucas"
+      entrypoint: metadata_q.py
+      emoji: "❓"
+      image_url: "https://upload.wikimedia.org/wikipedia/commons/d/d4/PlayEquipComboPlastic_wb.jpg"
     - title: "Metadata playground"
       alias: metaplay
       description: "Understand how metadata is presented in data pages."
