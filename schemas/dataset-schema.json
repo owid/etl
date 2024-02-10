@@ -336,7 +336,7 @@
         "non_redistributable": {
           "type": "boolean",
           "title": "Non-redistribution of dataset ",
-          "description": "Whether the dataset is non-redistributable, and therefore data should not be downloadable from the chart.",
+          "description": "Whether the dataset is non-redistributable, and therefore data should not be downloadable from the chart."
         },
         "licenses": {
           "type": "array",
