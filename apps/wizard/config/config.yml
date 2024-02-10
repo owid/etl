@@ -88,7 +88,7 @@ sections:
       alias: metaquest
       description: "Ask chat GPT about our metadata."
       maintainer: "@lucas"
-      entrypoint: metadata_q.py
+      entrypoint: pages/metadata_q.py
       emoji: "❓"
       image_url: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/dd/Questionmark-icon.png/1920px-Questionmark-icon.png"
     - title: "Metadata playground"
