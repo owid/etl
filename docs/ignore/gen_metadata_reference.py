@@ -148,7 +148,7 @@ def render_table() -> str:
     # Rendering of 'snapshot' is only meta.origin and meta.license
     ## Origin
     tables = DATASET_SCHEMA["properties"]["tables"]
-    documentation = render_props_recursive(tables, "table", 1, "", ignore_fields=["table.variables"])
+    documentation = render_props_recursive(tables, "table", 1, "", ignore_fields=["table.variables", "table.common"])
     return documentation
 
 
