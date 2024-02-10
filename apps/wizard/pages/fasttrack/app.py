@@ -10,9 +10,9 @@ from st_pages import add_indentation
 from structlog import get_logger
 
 from apps.wizard import utils as wizard_utils
-from apps.wizard.fasttrack.load import load_existing_sheets_from_snapshots
-from apps.wizard.fasttrack.process import processing_part_1, processing_part_2
-from apps.wizard.fasttrack.utils import (
+from apps.wizard.pages.fasttrack.load import load_existing_sheets_from_snapshots
+from apps.wizard.pages.fasttrack.process import processing_part_1, processing_part_2
+from apps.wizard.pages.fasttrack.utils import (
     IMPORT_GSHEET,
     LOCAL_CSV,
     UPDATE_GSHEET,

@@ -13,7 +13,7 @@ from sqlmodel import Session
 from structlog import get_logger
 
 from apps.wizard import utils as wizard_utils
-from apps.wizard.fasttrack.utils import _encrypt
+from apps.wizard.pages.fasttrack.utils import _encrypt
 from etl import grapher_model as gm
 from etl.compare import diff_print
 from etl.db import get_engine

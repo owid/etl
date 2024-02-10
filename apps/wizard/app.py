@@ -1,4 +1,6 @@
-"""Entry page."""
+"""Entry page.
+
+This is the page that is loaded when the app is started. It redirects to the home page, unless an argument is passed. E.g. `etl-wizard charts` will redirect to the charts page."""
 from pathlib import Path
 
 import streamlit as st
@@ -62,4 +64,3 @@ for section in WIZARD_CONFIG["sections"]:
     for app in section["apps"]:
         if utils.AppState.args.phase == app["alias"]:  # type: ignore
             switch_page(app["title"])  # type: ignore
-            print(2, app["title"])
