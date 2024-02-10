@@ -103,8 +103,8 @@ sections:
         entrypoint: dataset_explorer.py
         emoji: "🔍"
         image_url: "https://upload.wikimedia.org/wikipedia/commons/c/c3/NGC_4414_%28NASA-med%29.jpg"
-      - title: "Harmonize"
-        alias: harmonize
+      - title: "Harmonizer"
+        alias: harmonizer
         description: "Harmonize column of table."
         maintainer: "@lucas"
         entrypoint: harmonize.py

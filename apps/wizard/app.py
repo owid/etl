@@ -62,4 +62,3 @@ for section in WIZARD_CONFIG["sections"]:
     for app in section["apps"]:
         if utils.AppState.args.phase == app["alias"]:  # type: ignore
             switch_page(app["title"])  # type: ignore
-            print(2, app["title"])

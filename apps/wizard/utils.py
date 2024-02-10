@@ -32,7 +32,7 @@ from etl.paths import (
     LATEST_REGIONS_VERSION,
     STEP_DIR,
 )
-from etl.steps import DAG
+from etl.steps import DAG, load_dag
 
 DAG_WIZARD_PATH = DAG_DIR / "wizard.yml"
 
@@ -640,3 +640,56 @@ def render_responsive_field_in_form(
                 key=f"{key}_custom",
                 default_last=default_value,
             )
+
+
+def st_select_dataset(
+    label: str | None = None,
+    dag: Dict[str, Any] | None = None,
+    snapshots: bool = False,
+    prefixes: List[str] | None = None,
+    prefix_priorities: List[str] | None = None,
+    **kwargs,
+) -> Any:
+    """Show a selectbox with all datasets available."""
+    # Label of the input box
+    if label is None:
+        label = "Select a dataset"
+
+    # Load dag
+    if dag is None:
+        dag = load_dag()
+
+    # Define list with options
+    options = sorted(list(dag.keys()))
+    ## Optional: Show some options first based on their prefix. E.g. Show those that are Meadow (i.e. start with 'data://meadow') first.
+    if prefix_priorities:
+        options, options_left = [], options
+        for prefix in prefix_priorities:
+            options_ = [o for o in options_left if o.startswith(f"{prefix}/")]
+            options.extend(sorted(options_))
+            options_left = [o for o in options_left if o not in options_]
+        options.extend(options_left)
+
+    # Show only datasets that start with a given prefix
+    if prefixes:
+        options, options_all = [], options
+        for prefix in prefixes:
+            options = [o for o in options_all if o.startswith(prefix)]
+
+    # Discard snapshots if flag is enabled
+    if not snapshots:
+        options = [o for o in options if not o.startswith("snapshot://")]
+
+    # Load all dataset
+    option = st.selectbox(
+        label,
+        options=options,
+        **kwargs,
+    )
+    return option
+
+
+def set_states(states_values: Dict[str, Any]):
+    """Set states from any key in dictionary."""
+    for key, value in states_values.items():
+        st.session_state[key] = value
