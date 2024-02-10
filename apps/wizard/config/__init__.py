@@ -13,9 +13,13 @@ _config_path = APPS_DIR / "wizard" / "config" / "config.yml"
 
 def load_wizard_config():
     """Load config."""
+    # Load file
     with open(_config_path, "r") as file:
         config = yaml.safe_load(file)
+    # Some input checks
     _check_wizard_config(config)
+    # Some transformations
+
     return config
 
 

@@ -1,16 +1,16 @@
 """Streamlit-based tool for chart revision baker.
 
-Run as `wizard charts` or python -m wizard.charts
+Run as `wizard charts` or python -m wizard.pages.charts
 """
 
 import streamlit as st
 from structlog import get_logger
 
-from apps.wizard.charts.init_config import init_app, set_session_states
-from apps.wizard.charts.search_config import build_dataset_form
-from apps.wizard.charts.submission import create_submission, push_submission
-from apps.wizard.charts.utils import OWIDEnv, get_datasets, get_schema
-from apps.wizard.charts.variable_config import ask_and_get_variable_mapping
+from apps.wizard.pages.charts.init_config import init_app, set_session_states
+from apps.wizard.pages.charts.search_config import build_dataset_form
+from apps.wizard.pages.charts.submission import create_submission, push_submission
+from apps.wizard.pages.charts.utils import OWIDEnv, get_datasets, get_schema
+from apps.wizard.pages.charts.variable_config import ask_and_get_variable_mapping
 from etl.match_variables import SIMILARITY_NAMES
 
 # logger

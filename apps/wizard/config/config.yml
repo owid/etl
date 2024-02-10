@@ -49,7 +49,7 @@ etl:
     fasttrack:
       title: "Fast Track"
       alias: fasttrack
-      entrypoint: fasttrack/app.py
+      entrypoint: pages/fasttrack/app.py
       emoji: "🏎️"
       image_url: "https://upload.wikimedia.org/wikipedia/commons/b/be/Alonso_%28Renault%29_qualifying_at_USGP_2005.jpg"
 
@@ -60,7 +60,7 @@ sections:
     apps:
       - title: "Chart revision baker"
         alias: charts
-        entrypoint: charts/__main__.py
+        entrypoint: pages/charts/__main__.py
         description: Prepare chart revisions.
         maintainer: "@lucas"
         emoji: "🧑‍🍳"
@@ -80,7 +80,7 @@ sections:
     - title: "MetaGPT"
       description: "Migrate old metadata to new format."
       maintainer: "@veronika / @lucas"
-      entrypoint: metagpt.py
+      entrypoint: pages/metagpt.py
       emoji: "🤖"
       alias: metagpt
       image_url: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/04/ChatGPT_logo.svg/1024px-ChatGPT_logo.svg.png"
@@ -88,7 +88,7 @@ sections:
       alias: metaplay
       description: "Understand how metadata is presented in data pages."
       maintainer: "@lucas"
-      entrypoint: metaplay.py
+      entrypoint: pages/metaplay.py
       emoji: "🏐"
       image_url: "https://upload.wikimedia.org/wikipedia/commons/d/d4/PlayEquipComboPlastic_wb.jpg"
 
@@ -100,7 +100,7 @@ sections:
         alias: dataexp
         description: "Explore datasets and their metadata."
         maintainer: "@lucas"
-        entrypoint: dataset_explorer.py
+        entrypoint: pages/dataset_explorer.py
         emoji: "🔍"
         image_url: "https://upload.wikimedia.org/wikipedia/commons/c/c3/NGC_4414_%28NASA-med%29.jpg"
       - title: "Harmonizer"
