@@ -1,6 +1,6 @@
 """Auxiliary classes, functions and variables."""
 from dataclasses import asdict, dataclass
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 import structlog
 import yaml
@@ -76,20 +76,18 @@ class OpenAIWrapper(OpenAI):
         kwargs = {k: v for k, v in kwargs.items() if k != "model"}
         super().__init__(**kwargs)
 
-    def query_gpt(self: Self, query: GPTQuery | None = None, **kwargs) -> GPTResponse | None:
+    def query_gpt(self: Self, query: Optional[GPTQuery] = None, **kwargs) -> GPTResponse | None:
         """Query Chat GPT to get message content from the chat completion."""
         # Get chat completion
         _ = kwargs.pop("model", None)
         if query:
             kwargs = {
                 "model": self.model,
-                # "max_tokens": 20000,
                 **query.to_dict(),
             }
         else:
             kwargs = {
                 "model": self.model,
-                # "max_tokens": 20000,
                 **kwargs,
             }
         chat_completion = self.chat.completions.create(**kwargs)  # type: ignore

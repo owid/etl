@@ -178,7 +178,7 @@ class MetadataGPTUpdater:
         """Run main code for snapshot."""
         # Create system prompt
         query = create_query_snapshot(self.metadata_old_str)
-        response = self.client.query_gpt(query=query)
+        response = self.client.query_gpt(query=query)  # type: ignore
 
         if isinstance(response, GPTResponse):
             self.__metadata_new = response.message_content_as_dict  # type: ignore
@@ -223,7 +223,7 @@ class MetadataGPTUpdater:
                         est_cost = query.estimated_cost
                         cost += len(original_yaml_content["tables"].items()) * est_cost
                     else:
-                        result = self.client.query_gpt(query=query)
+                        result = self.client.query_gpt(query=query)  # type: ignore
                         # Act based on reply (only if valid)
                         if result:
                             cost += result.cost
