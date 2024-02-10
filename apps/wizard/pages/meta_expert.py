@@ -10,6 +10,9 @@ from etl.paths import SCHEMAS_DIR
 
 # CONFIG
 add_indentation()
+st.title("Metadata 🧐 **:gray[Expert]**")
+st.markdown("Ask the Metadata Expert anything about the metadata.")
+
 load_env()
 SNAPSHOT_SCHEMA = read_json_schema(path=SCHEMAS_DIR / "snapshot-schema.json")
 DATASET_SCHEMA = read_json_schema(path=SCHEMAS_DIR / "dataset-schema.json")
