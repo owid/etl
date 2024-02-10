@@ -28,7 +28,8 @@ def init_app():
     """,
         },
     )
-    st.title("🧑‍🍳 Chart revisions baker")
+    st.title("Metadata 🧑‍🍳 **:gray[Revision Baker]**")
+    st.markdown("Migrate your metadata to the up-to-date standard using GPT.")
     add_indentation()
 
     # CONFIGURATION SIDEBAR

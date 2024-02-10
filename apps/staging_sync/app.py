@@ -11,7 +11,7 @@ add_indentation()
 
 
 def main():
-    st.title("🔄 Staging sync")
+    st.title("Chart 🔄 **:gray[Sync]**")
     st.markdown(
         """
     Synchronize charts and revisions from the source server to the target server. Typically, the source is a
