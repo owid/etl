@@ -10,8 +10,8 @@ from structlog import get_logger
 import etl.grapher_model as gm
 
 # from etl.chart_revision.v2.base import ChartUpdater
-from apps.wizard.charts.utils import OWIDEnv
-from apps.wizard.charts.variable_config import VariableConfig
+from apps.wizard.pages.charts.utils import OWIDEnv
+from apps.wizard.pages.charts.variable_config import VariableConfig
 from etl.chart_revision.v2.core import (
     build_updaters_and_get_charts,
     create_chart_comparison,

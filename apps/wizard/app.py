@@ -25,7 +25,7 @@ toc.append(Section(WIZARD_CONFIG["etl"]["title"]))
 for step in WIZARD_CONFIG["etl"]["steps"].values():
     toc.append(
         Page(
-            path=str(CURRENT_DIR / "pages" / step["entrypoint"]),
+            path=str(CURRENT_DIR / step["entrypoint"]),
             name=step["title"],
             icon=step["emoji"],
         )
