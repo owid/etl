@@ -2,7 +2,7 @@
 import streamlit as st
 from st_pages import add_indentation
 
-from apps.metagpt.gpt import GPTQuery, OpenAIWrapper
+from apps.wizard.utils.gpt import GPTQuery, OpenAIWrapper
 from docs.ignore.gen_metadata_reference import render_dataset, render_indicator, render_origin, render_table
 from etl.config import load_env
 from etl.helpers import read_json_schema
@@ -19,8 +19,6 @@ DATASET_SCHEMA = read_json_schema(path=SCHEMAS_DIR / "dataset-schema.json")
 def ask_gpt(query):
     response = api.query_gpt(query)
     return response
-
-
 
 
 # LOAD SCHEMAS
