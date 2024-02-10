@@ -101,7 +101,7 @@ def update_state() -> None:
 # MAIN ##################################################
 #########################################################
 # TITLE
-st.title("Wizard  **:gray[Meadow]**")
+st.title("Create step  **:gray[Meadow]**")
 
 # SIDEBAR
 with st.sidebar:

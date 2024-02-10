@@ -77,12 +77,13 @@ def set_run_gpt_to_false():
 
 # Page config
 st.set_page_config(
-    page_title="ETL Meta GPT",
+    page_title="Metadata Upgrader",
     layout="wide",
-    page_icon="🤖",
+    page_icon="🌟",
     initial_sidebar_state="collapsed",
 )
-st.title("🤖 ETL Meta GPT")
+st.title("Metadata 🌟 **:gray[Upgrader]**")
+st.markdown("Migrate your metadata to the up-to-date standard using GPT.")
 add_indentation()
 
 # ACE config

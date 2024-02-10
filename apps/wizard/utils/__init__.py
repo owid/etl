@@ -49,7 +49,7 @@ ADD_DAG_OPTIONS = [dag_not_add_option] + dag_files
 DATE_TODAY = dt.date.today().strftime("%Y-%m-%d")
 
 # Get current directory
-CURRENT_DIR = Path(__file__).parent
+CURRENT_DIR = Path(__file__).parent.parent
 
 # Paths to cookiecutter files
 COOKIE_SNAPSHOT = APPS_DIR / "wizard" / "etl_steps" / "cookiecutter" / "snapshot"

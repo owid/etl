@@ -6,6 +6,7 @@ import webbrowser
 from pathlib import Path
 
 import streamlit as st
+from st_pages import add_indentation
 from streamlit_ace import st_ace
 
 import etl.grapher_model as gm
@@ -18,7 +19,10 @@ from etl.db import get_session
 ###################################################
 # Set page config
 st.set_page_config(page_title="Metadata v2 preview", layout="wide", page_icon="🎨")
-st.title("Metadata v2 preview")
+add_indentation()
+# st.title("🏐 Metadata playground")
+st.title("Metadata  🏐 **:gray[Playground]**")
+st.markdown("Visualise how the metadata fields in the YAML files are shown in data pages.")
 DUMMY = str(st.selectbox("Choose ETL step to play with", ["dummy_full", "dummy"], index=0))
 
 # Current directory
@@ -79,7 +83,7 @@ def reset_metadata_files():
 ###################################################
 # Show header #####################################
 ###################################################
-URL_METADATA = "https://www.notion.so/owid/Metadata-guidelines-29ca6e19b6f1409ea6826a88dbb18bcc"
+URL_METADATA = "https://docs.owid.io/projects/etl/architecture/metadata/reference"
 
 # Define columns
 col1, col2 = st.columns(2)

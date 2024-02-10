@@ -77,21 +77,21 @@ sections:
     description: |-
       Tools to improve our metadata or learn how to use it.
     apps:
-    - title: "MetaGPT"
+    - title: "Meta Upgrader"
       description: "Migrate old metadata to new format."
       maintainer: "@veronika / @lucas"
       entrypoint: pages/metagpt.py
-      emoji: "🤖"
+      emoji: "🌟"
       alias: metagpt
       image_url: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/04/ChatGPT_logo.svg/1024px-ChatGPT_logo.svg.png"
-    - title: "Metadata questioner"
+    - title: "Meta Questioner"
       alias: metaquest
       description: "Ask chat GPT about our metadata."
       maintainer: "@lucas"
       entrypoint: pages/metadata_q.py
       emoji: "❓"
       image_url: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/dd/Questionmark-icon.png/1920px-Questionmark-icon.png"
-    - title: "Metadata playground"
+    - title: "Meta Playground"
       alias: metaplay
       description: "Understand how metadata is presented in data pages."
       maintainer: "@lucas"

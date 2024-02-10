@@ -189,7 +189,7 @@ def _fill_dummy_metadata_yaml(metadata_path: Path) -> None:
 # MAIN ##################################################
 #########################################################
 # TITLE
-st.title("Wizard  **:gray[Garden]**")
+st.title("Create step  **:gray[Garden]**")
 
 # SIDEBAR
 with st.sidebar:

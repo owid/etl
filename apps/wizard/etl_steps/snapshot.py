@@ -707,7 +707,7 @@ def run_snap_step() -> None:
 #########################################################
 
 # TITLE
-st.title("Wizard **:gray[Snapshot]**")
+st.title("Create step **:gray[Snapshot]**")
 
 # SIDEBAR
 with st.sidebar:
