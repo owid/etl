@@ -14,7 +14,7 @@ from etl.paths import DAG_DIR, GRAPHER_DIR
 # CONSTANTS #############################################
 #########################################################
 # Page config
-st.set_page_config(page_title="Wizard (grapher)", page_icon="🪄")
+st.set_page_config(page_title="Wizard: Create a Grapher step", page_icon="🪄")
 add_indentation()
 
 # Available namespaces

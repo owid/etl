@@ -77,9 +77,9 @@ def set_run_gpt_to_false():
 
 # Page config
 st.set_page_config(
-    page_title="Metadata Upgrader",
+    page_title="Wizard: Metadata Upgrader",
     layout="wide",
-    page_icon="🌟",
+    page_icon="🪄",
     initial_sidebar_state="collapsed",
 )
 st.title("Metadata 🌟 **:gray[Upgrader]**")
@@ -164,8 +164,9 @@ with col21:
 # If user clicks on 'Run', we estimate the cost of the query and ask user to confirm again.
 # Only exception is if it is a snapshot file, where we just don't need user's approval.
 if st.session_state["run_gpt"]:
-    st.write(model_name)
-    st.session_state.gpt_updater = MetadataGPTUpdater(st.session_state["filepath_metadata"], model=model_name)
+    st.session_state.gpt_updater = MetadataGPTUpdater(
+        st.session_state["filepath_metadata"], model=cast(str, model_name)
+    )
     # Run in lazy mode to estimate the cost
     cost = st.session_state.gpt_updater.run(lazy=True)
     if cost:

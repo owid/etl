@@ -7,7 +7,7 @@ import streamlit as st
 from st_pages import add_indentation
 
 from apps.wizard.pages.meta_expert.prompts import SYSTEM_PROMPT_FULL, SYSTEM_PROMPT_REDUCED
-from apps.wizard.utils.gpt import GPTQuery, OpenAIWrapper, get_cost, get_number_tokens
+from apps.wizard.utils.gpt import GPTQuery, OpenAIWrapper, get_cost
 from etl.config import load_env
 
 # CONFIG
@@ -78,7 +78,7 @@ if prompt := st.chat_input("Ask a question about the metadata"):
             model=model_name,
             messages=st.session_state.messages,
             temperature=0,
-            stream=True,  # this time, we set stream=True
+            stream=True,
         )
         response = st.write_stream(stream)
         # st.markdown(response.message_content)

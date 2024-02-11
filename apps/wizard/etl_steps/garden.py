@@ -18,7 +18,7 @@ from etl.paths import BASE_DIR, DAG_DIR, DATA_DIR, GARDEN_DIR
 # CONSTANTS #############################################
 #########################################################
 # Page config
-st.set_page_config(page_title="Wizard (garden)", page_icon="🪄")
+st.set_page_config(page_title="Wizard: Create a Garden step", page_icon="🪄")
 add_indentation()
 
 # Available namespaces

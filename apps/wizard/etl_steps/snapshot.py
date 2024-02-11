@@ -18,7 +18,7 @@ from etl.paths import BASE_DIR, SCHEMAS_DIR, SNAPSHOTS_DIR
 #########################################################
 # CONSTANTS #############################################
 #########################################################
-st.set_page_config(page_title="Wizard (snapshot)", page_icon="🪄")
+st.set_page_config(page_title="Wizard: Create a Snapshot step", page_icon="🪄")
 add_indentation()
 
 # Page config

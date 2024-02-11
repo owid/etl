@@ -18,7 +18,7 @@ from etl.db import get_session
 # Initial configuration ###########################
 ###################################################
 # Set page config
-st.set_page_config(page_title="Metadata v2 preview", layout="wide", page_icon="🎨")
+st.set_page_config(page_title="Wizard: Metadata Playground", layout="wide", page_icon="🪄")
 add_indentation()
 # st.title("🏐 Metadata playground")
 st.title("Metadata  🏐 **:gray[Playground]**")

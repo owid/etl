@@ -15,7 +15,7 @@ from etl.paths import BASE_DIR, DAG_DIR, MEADOW_DIR
 #########################################################
 
 # Page config
-st.set_page_config(page_title="Wizard (meadow)", page_icon="🪄")
+st.set_page_config(page_title="Wizard: Create a Meadow step", page_icon="🪄")
 add_indentation()
 
 # Available namespaces

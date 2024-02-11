@@ -10,9 +10,9 @@ APP_STATE = utils.AppState()
 
 def init_app():
     st.set_page_config(
-        page_title="Chart revisions baker",
+        page_title="Wizard: Chart Revisions Baker",
         layout="wide",
-        page_icon="🧑‍🍳",
+        page_icon="🪄",
         initial_sidebar_state="collapsed",
         menu_items={
             "Report a bug": "https://github.com/owid/etl/issues/new?assignees=marigold%2Clucasrodes&labels=wizard&projects=&template=wizard-issue---.md&title=wizard%3A+meaningful+title+for+the+issue",
