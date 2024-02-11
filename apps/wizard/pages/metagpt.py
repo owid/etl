@@ -143,6 +143,8 @@ col11, col12 = st.columns(2)
 with col11:
     # Ask user to select metadata file
     metadata_file = st.selectbox("Select metadata file", paths, on_change=set_run_gpt_to_false)
+    # Model name
+    model_name = st.selectbox(label="Model name", options=["gpt-3.5-turbo", "gpt-4-turbo-preview"], index=0)
     # Run GPT
     st.button("Run", type="primary", on_click=run_gpt)
 
@@ -162,13 +164,14 @@ with col21:
 # If user clicks on 'Run', we estimate the cost of the query and ask user to confirm again.
 # Only exception is if it is a snapshot file, where we just don't need user's approval.
 if st.session_state["run_gpt"]:
-    st.session_state.gpt_updater = MetadataGPTUpdater(st.session_state["filepath_metadata"])
+    st.write(model_name)
+    st.session_state.gpt_updater = MetadataGPTUpdater(st.session_state["filepath_metadata"], model=model_name)
     # Run in lazy mode to estimate the cost
     cost = st.session_state.gpt_updater.run(lazy=True)
     if cost:
         with col11:
             col11a, col11b = st.columns(2)
-            st.toast(f"_Estimated_ cost is {cost:.3f} USD.", icon="💰")
+            st.toast(f"_Estimated_ cost using {model_name} is {cost:.3f} USD.", icon="💰")
             with col11a:
                 st.info(f"💰 _Estimated_ cost is {cost:.3f} USD.")
             with col11b:

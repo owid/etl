@@ -1,0 +1,33 @@
+# `table`
+
+A table groups indicators with a shared index. Its metadata attributes are defined by the `TableMeta` object in ETL.
+
+## `table.common`
+
+## `table.description`
+
+*type*: `string` | recommended (often automatic)
+
+Briefly describes the table for internal use or data catalog users. It should be a concise one or few paragraphs.
+
+### Guidelines
+        
+- Begin with a capital letter and end with a period.
+- Avoid mentioning other metadata fields (e.g., `producer`, `date_published`), except when essential for describing the data product.
+- Use to provide a specific description if the automatic one (usually from the origin) is insufficient, such as for tables with multiple origins.
+
+## `table.title`
+
+*type*: `string` | required (often automatic)
+
+A short title for the table for internal or catalog use.
+
+### Guidelines
+        
+- Start with a capital letter; do not end with a period.
+- Clearly identify the table.
+- Override the automatic title (usually from the origin) if necessary, like for tables with multiple origins.
+
+## `table.variables`
+
+Indicators, or 'variables', are data point collections (typically time series) with metadata, defined by the `VariableMeta` object in ETL.

@@ -1,39 +1,118 @@
 """Auxiliary classes, functions and variables."""
 from dataclasses import asdict, dataclass
-from typing import Any, Dict, List, Optional
+from datetime import date
+from typing import Any, Dict, List, Optional, Tuple
 
 import structlog
+import tiktoken
 import yaml
 from openai import OpenAI
 from openai.types.chat import ChatCompletion
-from openai.types.completion_usage import CompletionUsage
 from typing_extensions import Self
 
 log = structlog.get_logger()
 
 
 # GPT
-GPT_MODEL = "gpt-3.5-turbo"
-RATE_PER_1000_TOKENS = 0.0015  # Approximate average cost per 1000 tokens from here - https://openai.com/pricing (USD)
+MODEL_DEFAULT = "gpt-3.5-turbo"
+
+# PRICING (per 1,000 tokens)
+## See pricing list: https://openai.com/pricing (USD)
+## See model list: https://platform.openai.com/docs/models/gpt-4-and-gpt-4-turbo
+RATE_DEFAULT_IN = 0.005
+MODEL_EQUIVALENCES = {
+    # "gpt-3.5-turbo": "gpt-3.5-turbo-0125",
+    "gpt-3.5-turbo": "gpt-3.5-turbo-0613" if date.today() >= date(2024, 2, 16) else "gpt-3.5-turbo-0125",
+    "gpt-4-turbo-preview": "gpt-4-0125-preview",
+}
+MODEL_RATES_1000_TOKEN = {
+    "gpt-3.5-turbo-0613": {
+        "in": 0.0015,
+        "out": 0.0020,
+    },
+    "gpt-3.5-turbo-0125": {
+        "in": 0.0005,
+        "out": 0.0015,
+    },
+    "gpt-4-0125-preview": {
+        "in": 0.01,
+        "out": 0.03,
+    },
+    "gpt-4": {
+        "in": 0.03,
+        "out": 0.06,
+    },
+    "gpt-4-32k": {
+        "in": 0.06,
+        "out": 0.12,
+    },
+}
+MODEL_RATES_1000_TOKEN = {
+    **MODEL_RATES_1000_TOKEN,
+    **{new: MODEL_RATES_1000_TOKEN[equivalent] for new, equivalent in MODEL_EQUIVALENCES.items()},
+}
 
 
 # Interface with GPT
 @dataclass
-class GPTResponse:
-    """Dataclass with chat GPT response."""
+class GPTResponse(ChatCompletion):
+    """GPT response."""
 
-    message_content: str
-    cost: float
-    _message_contnent_dix: Dict[str, Any] | None = None
+    _message_content_dix: Dict[str, Any] | None = None
+
+    def __init__(self: Self, chat_completion_instance: ChatCompletion | None = None, **kwargs) -> None:
+        """Initialize OpenAI API wrapper."""
+        if chat_completion_instance:
+            super().__init__(**chat_completion_instance.dict())
+        else:
+            super().__init__(**kwargs)
+
+        # Check
+        if not isinstance(self.message_content, str):
+            raise ValueError("Chat completion is not a ChatCompletion object.")
+
+    @property
+    def message_content(self) -> str:
+        """Get message content from first choice."""
+        content = self.choices[0].message.content
+        if content:
+            return content
+        else:
+            raise ValueError("`message_content` is empty!")
 
     @property
     def message_content_as_dict(self: Self) -> Dict[str, Any]:
         """Message content from GPT as dictionary."""
-        if self._message_contnent_dix is None:
-            self._message_contnent_dix = yaml.safe_load(self.message_content)
-        else:
+        if self.message_content is None:
             raise ValueError("`message_content` is empty!")
-        return self._message_contnent_dix
+        else:
+            if self._message_content_dix is None:
+                self._message_content_dix = yaml.safe_load(self.message_content)
+            else:
+                raise ValueError("`message_content` is empty!")
+        return self._message_content_dix
+
+    @property
+    def cost(self) -> float | None:
+        """Get cost of the complete request (including input and output).
+
+        The cost is given in USD.
+
+        If model is not in MODEL_RATES_1000_TOKEN, None is returned
+        """
+        if self.usage is None:
+            raise ValueError("`usage` is empty!")
+        elif self.model not in MODEL_RATES_1000_TOKEN:
+            log.info(f"Model {self.model} not registered in MODEL_RATES_1000_TOKEN!")
+            return None
+        else:
+            tokens_in = self.usage.prompt_tokens
+            tokens_out = self.usage.completion_tokens
+            cost = (
+                tokens_in / 1000 * MODEL_RATES_1000_TOKEN[self.model]["in"]
+                + tokens_out / 1000 * MODEL_RATES_1000_TOKEN[self.model]["out"]
+            )
+            return cost
 
 
 @dataclass
@@ -43,24 +122,30 @@ class GPTQuery:
     messages: List[Dict[str, str]]
     temperature: float = 0
 
-    @property
-    def estimated_cost(self: Self) -> float:
+    def estimated_cost(self: Self, model_name: str) -> float:
         """
         Calculate the cost of using GPT based on the number of characters of the message content.
 
-        This function estimates the cost of using GPT by converting the number of characters into tokens,
-        rounding up to the nearest thousand tokens, and then multiplying by the rate per thousand tokens.
-
-        The cost is given in USD.
+        Note that it only considers the input messages (and not the GPT response).
 
         Returns:
-            float: The estimated cost of using GPT for the given number of characters.
+            float: The estimated cost of using GPT for the given number of tokens (only input).
         """
-        char_count = len(self.messages[0]["content"])  # type: ignore
-        tokens = char_count / 4  # Average size of a token is 4 characters
-        tokens_rounded_up = -(-tokens // 1000) * 1000  # Round up to the nearest 1000 tokens
-        estimated_cost = (tokens_rounded_up / 1000) * RATE_PER_1000_TOKENS
+        # Check that model_name is registered. Else, use the default model
+        if model_name not in MODEL_RATES_1000_TOKEN:
+            raise ValueError(f"Model {model_name} not registered in MODEL_RATES_1000_TOKEN.")
+        # Get rate per 1,000 tokens (USD) for the model
+        rate = MODEL_RATES_1000_TOKEN[model_name]["in"]
+        # Get the token count
+        tokens_count = self.get_number_tokens(model_name)
+        # Estimate the cost as token_count x rate
+        estimated_cost = tokens_count / 1000 * rate
         return estimated_cost
+
+    def get_number_tokens(self, model_name: str) -> int:
+        """Get number of tokens of the message content."""
+        token_count = sum([get_number_tokens(message["content"], model_name) for message in self.messages])
+        return token_count
 
     def to_dict(self: Self) -> Dict[str, Any]:
         """Class as dictionary."""
@@ -72,40 +157,60 @@ class OpenAIWrapper(OpenAI):
 
     def __init__(self: Self, **kwargs) -> None:
         """Initialize OpenAI API wrapper."""
-        self.model = kwargs.get("model", GPT_MODEL)
-        kwargs = {k: v for k, v in kwargs.items() if k != "model"}
         super().__init__(**kwargs)
 
-    def query_gpt(self: Self, query: Optional[GPTQuery] = None, **kwargs) -> GPTResponse | None:
+    def query_gpt(
+        self: Self, query: Optional[GPTQuery] = None, model: str = MODEL_DEFAULT, **kwargs
+    ) -> GPTResponse | None:
         """Query Chat GPT to get message content from the chat completion."""
-        # Get chat completion
-        _ = kwargs.pop("model", None)
+        # Get model to be used (+ sanity checks)
+        if model not in MODEL_RATES_1000_TOKEN:
+            raise ValueError(f"Model {model} not registered in MODEL_RATES_1000_TOKEN!")
+
+        # Build query from query object + model name
         if query:
             kwargs = {
-                "model": self.model,
+                "model": model,
                 **query.to_dict(),
             }
         else:
             kwargs = {
-                "model": self.model,
+                "model": model,
                 **kwargs,
             }
-        chat_completion = self.chat.completions.create(**kwargs)  # type: ignore
-        # Return value only if message content is not None
-        if isinstance(chat_completion, ChatCompletion) and isinstance(chat_completion.usage, CompletionUsage):
-            chat_completion_tokens = chat_completion.usage.total_tokens
-            cost = (chat_completion_tokens / 1000) * RATE_PER_1000_TOKENS
-            message_content = chat_completion.choices[0].message.content
 
-            # Log cost
-            log.info(f"Chat completion {self.model} cost: {cost}")
-            # Build return object
-            if isinstance(message_content, str):
-                return GPTResponse(
-                    message_content=message_content,
-                    cost=cost,
-                )
-            else:
-                raise ValueError("Chat completion is not a ChatCompletion object.")
+        # Get chat completion
+        chat_completion = self.chat.completions.create(**kwargs)  # type: ignore
+
+        # Build response
+        if isinstance(chat_completion, ChatCompletion):
+            response = GPTResponse(chat_completion)
+            return response
         else:
             raise ValueError("message_content is expected to be a string!")
+
+
+def get_number_tokens(text: str, model_name: str) -> int:
+    """Get number of tokens of text.
+
+    Note that tokens here is not equivalent to words. The number of tokens changes depending
+    on the model used.
+
+    More info: https://openai.com/pricing#language-models
+    """
+    encoding = tiktoken.encoding_for_model(model_name)
+    token_count = len(encoding.encode(text))
+    return token_count
+
+
+def get_cost(text_in: str, text_out: str, model_name: str) -> Tuple[float, float]:
+    """Get cost using tiktoken tokenisation."""
+    if model_name not in MODEL_RATES_1000_TOKEN:
+        raise ValueError(f"Model {model_name} not registered in MODEL_RATES_1000_TOKEN.")
+    tokens_in = get_number_tokens(text_in, model_name)
+    tokens_out = get_number_tokens(text_out, model_name)
+    cost = (
+        tokens_in / 1000 * MODEL_RATES_1000_TOKEN[model_name]["in"]
+        + tokens_out / 1000 * MODEL_RATES_1000_TOKEN[model_name]["out"]
+    )
+    return cost, tokens_in + tokens_out

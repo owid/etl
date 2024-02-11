@@ -83,17 +83,17 @@ sections:
       entrypoint: pages/metagpt.py
       emoji: "🌟"
       alias: metagpt
-      image_url: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/04/ChatGPT_logo.svg/1024px-ChatGPT_logo.svg.png"
+      image_url: "https://cdn.pixabay.com/photo/2016/12/04/18/58/instagram-1882329_1280.png"
     - title: "Meta Expert"
       alias: expert
       description: "Ask chat GPT about our metadata."
       maintainer: "@lucas"
-      entrypoint: pages/meta_expert.py
-      emoji: "🧐"
+      entrypoint: pages/meta_expert/app.py
+      emoji: "🧙"
       image_url: "https://i1.sndcdn.com/artworks-lyidNFrSCzymr7fo-mmlyoQ-t500x500.jpg"
     - title: "Meta Playground"
       alias: metaplay
-      description: "How iss metadata presented in data pages?"
+      description: "How is metadata presented in data pages?"
       maintainer: "@lucas"
       entrypoint: pages/metaplay.py
       emoji: "🏐"
