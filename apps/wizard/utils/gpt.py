@@ -203,7 +203,7 @@ def get_number_tokens(text: str, model_name: str) -> int:
     return token_count
 
 
-def get_cost(text_in: str, text_out: str, model_name: str) -> Tuple[float, float]:
+def get_cost_and_tokens(text_in: str, text_out: str, model_name: str) -> Tuple[float, float]:
     """Get cost using tiktoken tokenisation."""
     if model_name not in MODEL_RATES_1000_TOKEN:
         raise ValueError(f"Model {model_name} not registered in MODEL_RATES_1000_TOKEN.")

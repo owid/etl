@@ -19,12 +19,17 @@ log = get_logger()
 
 # ENVIRONMENT CONFIG
 load_env()
+
+
+#########################################
+# GENERATE REDUCED DOCUMENTATION
+#########################################
 # Path
 DOCS_REDUCED_DIR = WIZARD_DIR / "pages" / "meta_expert" / "docs_reduced"
 
 # GPT CONFIG
 # Model name
-MODEL_NAME = "gpt-4-turbo-preview"  # "gpt-4"
+MODEL_NAME_REDUCED_DEFAULT = "gpt-4-turbo-preview"  # "gpt-4"
 # System prompt
 SYSTEM_PROMPT = """
 - You are a technical expert.
@@ -46,7 +51,7 @@ metadata_original = {
 }
 
 
-def generate_documentation(model_name: str = MODEL_NAME):
+def generate_documentation(model_name: str = MODEL_NAME_REDUCED_DEFAULT) -> None:
     """Generate reducede version of the documentation using chat GPT."""
     # Initiate OpenAI
     api = OpenAIWrapper()
@@ -74,8 +79,7 @@ def generate_documentation(model_name: str = MODEL_NAME):
                 text = response.message_content
 
                 tokens_before = get_number_tokens(docs, model_name)
-                if response.usage:
-                    tokens_after = get_number_tokens(text, model_name)
+                tokens_after = get_number_tokens(text, model_name)
                 path = f"{DOCS_REDUCED_DIR}/{docs_name}.txt"
                 log.info(
                     f"Reducing '{docs_name}' documentation from {tokens_before} to {tokens_after} tokens. Cost: {response.cost} USD. Saving it to file {path}"
@@ -88,9 +92,12 @@ def generate_documentation(model_name: str = MODEL_NAME):
                 raise ValueError("Error in GPT query!")
 
 
+#########################################
+# OTHER PROMPTS
+#########################################
 # Prompt using original documentation
 SYSTEM_PROMPT_FULL = f"""
-As an ETL metadata expert, you'll respond to inquiries about its structure, comprising four main entities: Origin, Dataset, Table, and Indicator (Variable). Datasets group together Tables, which are akin to pandas DataFrames but include extra metadata, and Tables feature Indicators as columns. Indicators may be linked to multiple Origins, identifying the data's sources. Detailed explanations of each entity follow, separated by '------'.
+As an expert in OWID's metadata structure, you'll respond to inquiries about its structure, comprising four main entities: Origin, Dataset, Table, and Indicator (Variable). Datasets group together Tables, which are akin to pandas DataFrames but include extra metadata, and Tables feature Indicators as columns. Indicators may be linked to multiple Origins, identifying the data's sources. Detailed explanations of each entity follow, separated by '------'.
 
 
 # Datasets:
@@ -117,7 +124,12 @@ def render_docs_reduced(entity_name):
 
 
 SYSTEM_PROMPT_REDUCED = f"""
-As an ETL metadata expert, you'll respond to inquiries about its structure, comprising four main entities: Origin, Dataset, Table, and Indicator (Variable). Datasets group together Tables, which are akin to pandas DataFrames but include extra metadata, and Tables feature Indicators as columns. Indicators may be linked to multiple Origins, identifying the data's sources. Detailed explanations of each entity follow, separated by '------'.
+You are a technical expert at Our World in Data. Your expertise is in the metadata structure of the ETL pipeline. You'll respond to inquiries about ETL's metadata structure.
+
+You should answer in the context of OWID's metadata structure, which is explained below.
+
+
+There are four main entities: Origin, Dataset, Table, and Indicator (Variable). Datasets group together Tables, which are akin to pandas DataFrames but include extra metadata, and Tables feature Indicators as columns. Indicators may be linked to multiple Origins, identifying the data's sources. Detailed explanations of each entity follow, separated by '------'.
 
 
 # Datasets:
