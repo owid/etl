@@ -8,10 +8,15 @@ import streamlit as st
 from owid.catalog import Dataset
 from st_pages import add_indentation
 
-from apps.wizard.utils import set_states, st_select_dataset
+from apps.wizard.utils import get_datasets_in_etl, set_states
 from etl.harmonize import CountryRegionMapper, harmonize_simple
 from etl.paths import STEP_DIR
 from etl.steps import load_from_uri
+
+path = None
+if ("steps" in st.session_state) and ("garden" in st.session_state.steps):
+    garden_vars = st.session_state["steps"]["garden"]
+    path = f"data://meadow/{garden_vars['namespace']}/{garden_vars['meadow_version']}/{garden_vars['short_name']}"
 
 
 ####################################################################################################
@@ -97,11 +102,16 @@ st.markdown(
 ####################################################################################################
 # 1/ DATASET
 # show_all = False
-option = st_select_dataset(
-    placeholder="Choose a dataset",
-    index=None,
+options = get_datasets_in_etl(
     snapshots=False,
     prefixes=None if st.session_state.show_all else ["data://meadow"],
+)
+option = st.selectbox(
+    label="Select a dataset",
+    placeholder="Select a dataset",
+    options=options,
+    index=options.index(path) if path in options else None,
+    help="By default, only meadow datasets are shown in the dataset search bar.",
 )
 st.toggle(
     "Show all datasets",
@@ -143,6 +153,14 @@ if option:
         # HARMONIZATION (generation)
         ####################################################################################################
         if column_name:
+            # Sanity check on typing: only support for indicators of type string
+            if not tb[column_name].apply(type).eq(str).all():
+                # if tb[column_name].dtype not in ["object", "category"]:
+                st.error(
+                    f"Column '{column_name}' is of type `{tb[column_name].dtype}` but 'string' is expected. Harmonization for non-string columns is not supported yet."
+                )
+                st.stop()
+
             mapping = {}
             to_map = sorted(set(tb[column_name]))
             mapper = CountryRegionMapper()
@@ -174,7 +192,7 @@ if option:
                         col1, col2, col3 = st.columns(3)
                         # Original name
                         with col1:
-                            st.markdown(f"**{region}**")
+                            st.markdown(f"**`{region}`**")
                             value_ignore = st.toggle(
                                 label="Ignore",
                                 key=f"region_ignore_{i}",
