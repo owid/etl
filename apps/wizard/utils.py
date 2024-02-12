@@ -643,19 +643,13 @@ def render_responsive_field_in_form(
             )
 
 
-def st_select_dataset(
-    label: str | None = None,
+def get_datasets_in_etl(
     dag: Dict[str, Any] | None = None,
     snapshots: bool = False,
     prefixes: List[str] | None = None,
     prefix_priorities: List[str] | None = None,
-    **kwargs,
 ) -> Any:
     """Show a selectbox with all datasets available."""
-    # Label of the input box
-    if label is None:
-        label = "Select a dataset"
-
     # Load dag
     if dag is None:
         dag = load_dag()
@@ -678,13 +672,7 @@ def st_select_dataset(
     if not snapshots:
         options = [o for o in options if not o.startswith("snapshot://")]
 
-    # Load all dataset
-    option = st.selectbox(
-        label,
-        options=options,
-        **kwargs,
-    )
-    return option
+    return options
 
 
 def set_states(states_values: Dict[str, Any]) -> None:
