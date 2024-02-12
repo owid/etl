@@ -18,7 +18,7 @@ def run(dest_dir: str) -> None:
     tb.columns = [modify_column_name(col) for col in tb.columns]
 
     # Create explorer dataset, with garden table and metadata in csv format
-    ds_explorer = create_dataset(dest_dir, tables=[tb], default_metadata=tb.metadata, formats=["csv"])
+    ds_explorer = create_dataset(dest_dir, tables=[tb], formats=["csv"])
     ds_explorer.save()
 
 
