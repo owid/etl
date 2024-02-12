@@ -73,15 +73,71 @@ def drop_indicators_and_replace_nans(tb: Table) -> Table:
     tb[missing_cols] = tb[missing_cols].replace(100, float("nan"))
 
     # Replace 0 by null for don't know columns if the rest of columns are null
-    questions = ["family", "friends", "leisure_time", "politics", "work", "religion"]
-    answers = [
-        "very_important_in_life",
-        "rather_important_in_life",
-        "not_very_important_in_life",
-        "notatall_important_in_life",
-    ]
+    # For important in life questions
+    tb = replace_dont_know_by_null(
+        tb=tb,
+        questions=[
+            "important_in_life_family",
+            "important_in_life_friends",
+            "important_in_life_leisure_time",
+            "important_in_life_politics",
+            "important_in_life_work",
+            "important_in_life_religion",
+        ],
+        answers=[
+            "very",
+            "rather",
+            "not_very",
+            "notatall",
+        ],
+    )
+
+    # For interested in politics question
+    tb = replace_dont_know_by_null(
+        tb=tb,
+        questions=["interested_politics"],
+        answers=["very", "somewhat", "not_very", "not_at_all"],
+    )
+
+    # For political action questions
+    tb = replace_dont_know_by_null(
+        tb=tb,
+        questions=[
+            "political_action_signing_a_petition",
+            "political_action_joining_in_boycotts",
+            "political_action_attending_peaceful_demonstrations",
+            "political_action_joining_unofficial_strikes",
+        ],
+        answers=["have_done", "might_do", "never"],
+    )
+
+    # For environment vs. economy question
+    tb = replace_dont_know_by_null(tb=tb, questions=["env_ec"], answers=["environment", "economy", "other_answer"])
+
+    # For income equality question
+    tb = replace_dont_know_by_null(tb=tb, questions=["eq_ineq"], answers=["equality", "neutral", "inequality"])
 
     # Drop rows with all null values in columns not country and year
     tb = tb.dropna(how="all", subset=tb.columns.difference(["country", "year"]))
+
+    return tb
+
+
+def replace_dont_know_by_null(tb: Table, questions: list, answers: list) -> Table:
+    """
+    Replace empty don't know answers when the rest of the answers is null
+    """
+    for q in questions:
+        # Add q to each member of answers
+        answers_by_question = [f"{a}_{q}" for a in answers]
+
+        # Check if all columns in answers_by_question are null
+        tb["null_check"] = tb[answers_by_question].all(axis=1)
+
+        # if null_check is False and f"dont_know_{q}" is 0, set f"dont_know_{q}" as null
+        tb.loc[(~tb["null_check"]) & (tb[f"dont_know_{q}"]), f"dont_know_{q}"] = float("nan")
+
+    # Remove null_check
+    tb = tb.drop(columns=["null_check"])
 
     return tb

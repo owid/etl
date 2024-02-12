@@ -287,22 +287,22 @@ foreach var of varlist $rest_politics_questions {
 	
 	keep if `var' >= 1
 
-	gen political_action_have_done_`var' = 0
-	replace political_action_have_done_`var' = 1 if `var' == 1
+	gen have_done_political_action_`var' = 0
+	replace have_done_political_action_`var' = 1 if `var' == 1
 	
-	gen political_action_might_do_`var' = 0
-	replace political_action_might_do_`var' = 1 if `var' == 2
+	gen might_do_political_action_`var' = 0
+	replace might_do_political_action_`var' = 1 if `var' == 2
 	
-	gen political_action_never_`var' = 0
-	replace political_action_never_`var' = 1 if `var' == 3
+	gen never_political_action_`var' = 0
+	replace never_political_action_`var' = 1 if `var' == 3
 	
-	gen political_action_dont_know_`var' = 0
-	replace political_action_dont_know_`var' = 1 if `var' == .a
+	gen dont_know_political_action_`var' = 0
+	replace dont_know_political_action_`var' = 1 if `var' == .a
 	
-	gen political_action_missing_`var' = 0
-	replace political_action_missing_`var' = 1 if `var' == .b | `var' == .c | `var' == .d | `var' == .e
+	gen missing_political_action_`var' = 0
+	replace missing_political_action_`var' = 1 if `var' == .b | `var' == .c | `var' == .d | `var' == .e
 
-	collapse (mean) political_action_have_done_`var' political_action_might_do_`var' political_action_never_`var' political_action_dont_know_`var' political_action_missing_`var' [w=S017], by (year country)
+	collapse (mean) have_done_political_action_`var' might_do_political_action_`var' never_political_action_`var' dont_know_political_action_`var' missing_political_action_`var' [w=S017], by (year country)
 	tempfile politics_`var'_file
 	save "`politics_`var'_file'"
 	
@@ -327,11 +327,11 @@ foreach var of varlist $rest_politics_questions {
 keep if B008 >= 1
 
 *Generate variables
-gen environment = 0
-replace environment = 1 if B008 == 1
+gen environment_env_ec = 0
+replace environment_env_ec = 1 if B008 == 1
 
-gen economic_growth = 0
-replace economic_growth = 1 if B008 == 2
+gen economy_env_ec = 0
+replace economy_env_ec = 1 if B008 == 2
 
 gen other_answer_env_ec = 0
 replace other_answer_env_ec = 1 if B008 == 3
@@ -343,7 +343,7 @@ gen missing_env_ec = 0
 replace missing_env_ec = 1 if B008 == .b | B008 == .c | B008 == .d | B008 == .e
 
 * Make dataset of the mean trust (which ends up being the % of people saying "most people can be trusted") by wave and country (CHECK WEIGHTS)
-collapse (mean) environment economic_growth other_answer_env_ec dont_know_env_ec missing_env_ec [w=S017], by (year country)
+collapse (mean) environment_env_ec economy_env_ec other_answer_env_ec dont_know_env_ec missing_env_ec [w=S017], by (year country)
 tempfile environment_vs_econ_file
 save "`environment_vs_econ_file'"
 
@@ -374,25 +374,25 @@ preserve
 keep if E035 >= 1
 
 *Generate variables
-gen income_equality = 0
-replace income_equality = 1 if E035 <= 4
+gen equality_eq_ineq = 0
+replace equality_eq_ineq = 1 if E035 <= 4
 
-gen neutral_about_equality = 0
-replace neutral_about_equality = 1 if E035 == 5
+gen neutral_eq_ineq = 0
+replace neutral_eq_ineq = 1 if E035 == 5
 
-gen income_inequality = 0
-replace income_inequality = 1 if E035 >= 6
+gen inequality_eq_ineq = 0
+replace inequality_eq_ineq = 1 if E035 >= 6
 
-gen dont_know_income_equality = 0
-replace dont_know_income_equality = 1 if E035 == .a
+gen dont_know_eq_ineq = 0
+replace dont_know_eq_ineq = 1 if E035 == .a
 
-gen missing_income_equality = 0
-replace missing_income_equality = 1 if E035 == .b | E035 == .c | E035 == .d | E035 == .e
+gen missing_eq_ineq = 0
+replace missing_eq_ineq = 1 if E035 == .b | E035 == .c | E035 == .d | E035 == .e
 
-gen income_equality_avg_score = E035
+gen avg_score_eq_ineq = E035
 
 * Make dataset of the mean trust (which ends up being the % of people saying "most people can be trusted") by wave and country (CHECK WEIGHTS)
-collapse (mean) income_equality neutral_about_equality income_inequality dont_know_income_equality missing_income_equality income_equality_avg_score [w=S017], by (year country)
+collapse (mean) equality_eq_ineq neutral_eq_ineq inequality_eq_ineq dont_know_eq_ineq missing_eq_ineq avg_score_eq_ineq [w=S017], by (year country)
 tempfile income_equality_file
 save "`income_equality_file'"
 
@@ -427,8 +427,8 @@ merge 1:1 year country using "`environment_vs_econ_file'", nogenerate // keep(ma
 merge 1:1 year country using "`income_equality_file'", nogenerate // keep(master match)
 
 
-* Get a list of variables excluding country and year (and income_equality_avg_score to not multiply it by 100)
-ds country year income_equality_avg_score, not
+* Get a list of variables excluding country and year (and avg_score_eq_ineq to not multiply it by 100)
+ds country year avg_score_eq_ineq, not
 
 * Multiply variables by 100 to get percentages
 foreach var of varlist `r(varlist)' {
