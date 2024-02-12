@@ -129,7 +129,7 @@ if prompt := st.chat_input("Ask a question about the metadata"):
     text_in = "\n".join([m["content"] for m in st.session_state.messages])
     cost, num_tokens = get_cost_and_tokens(text_in, response, cast(str, model_name))
     cost_msg = f"**Cost**: ≥{cost} USD.\n\n **Tokens**: ≥{num_tokens}."
-    st.info(st.session_state.cost_msg)
+    st.info(cost_msg)
 
     # Add new response by the System
     st.session_state.messages.append({"role": "assistant", "content": response})
