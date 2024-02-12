@@ -13,6 +13,7 @@ from apps.wizard import utils as wizard_utils
 from apps.wizard.pages.fasttrack.load import load_existing_sheets_from_snapshots
 from apps.wizard.pages.fasttrack.process import processing_part_1, processing_part_2
 from apps.wizard.pages.fasttrack.utils import (
+    FERNET_KEY,
     IMPORT_GSHEET,
     LOCAL_CSV,
     UPDATE_GSHEET,
@@ -188,12 +189,19 @@ with placeholder_for_private:
 
     st.checkbox(
         label="Make dataset private (your metadata will be still public!)",
-        # value=st.session_state.get("is_private", not default_is_public),
         value=not default_is_public,
-        key="is_private",
+        key="fasttrack_is_private",
         on_change=reset_states,
     )
 
+if (FERNET_KEY is None) and (st.session_state.fasttrack_is_private):
+    if import_method == UPDATE_GSHEET:
+        st.error(
+            "FASTTRACK_SECRET_KEY not found in environment variables. Not using encryption. Therefore, won't be able to decrypt the existing Google Sheets URL for private datasets!"
+        )
+        st.stop()
+    else:
+        st.warning("FASTTRACK_SECRET_KEY not found in environment variables. Not using encryption.")
 
 ##########################################################
 # USER CLICKS ON SUBMIT
@@ -213,7 +221,7 @@ if st.session_state.to_be_submitted:
             import_method=import_method,
             dataset_uri=st.session_state["dataset_uri"],
             infer_metadata=st.session_state["infer_metadata"],
-            is_private=st.session_state["is_private"],
+            is_private=st.session_state["fasttrack_is_private"],
             _status=status_main,
         )
 
