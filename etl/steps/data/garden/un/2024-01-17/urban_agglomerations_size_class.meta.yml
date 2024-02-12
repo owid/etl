@@ -191,6 +191,7 @@ tables:
         display:
           numDecimalPlaces: 0
           name: 1 to 5 million
+          isProjection: true
 
       _1_to_5_million_percentage_of_urban_population_projections:
         title: Percentage of urban population in agglomerations with 1 to 5 million population (future projections)
@@ -201,6 +202,7 @@ tables:
         display:
           numDecimalPlaces: 1
           name: 1 to 5 million
+          isProjection: true
 
       _1_to_5_million_population_projections:
         title: Population in agglomerations with 1 to 5 million (future projections)
@@ -211,6 +213,7 @@ tables:
         display:
           numDecimalPlaces: 0
           name: 1 to 5 million
+          isProjection: true
 
       _10_million_or_more_number_of_agglomerations_projections:
         title: Number of agglomerations with 10 million or more population (future projections)
@@ -221,6 +224,7 @@ tables:
         display:
           numDecimalPlaces: 0
           name: 10 million or more
+          isProjection: true
 
       _10_million_or_more_percentage_of_urban_population_projections:
         title: Percentage of urban population in agglomerations with 10 million or more population (future projections)
@@ -231,6 +235,7 @@ tables:
         display:
           numDecimalPlaces: 1
           name: 10 million or more
+          isProjection: true
 
       _10_million_or_more_population_projections:
         title: Population in agglomerations with 10 million or more (future projections)
@@ -241,6 +246,7 @@ tables:
         display:
           numDecimalPlaces: 0
           name: 10 million or more
+          isProjection: true
 
       _300_000_to_500_000_number_of_agglomerations_projections:
         title: Number of agglomerations with 300,000 to 500,000 population (future projections)
@@ -251,6 +257,7 @@ tables:
         display:
           numDecimalPlaces: 0
           name: 300,000 to 500,000
+          isProjection: true
 
       _300_000_to_500_000_percentage_of_urban_population_projections:
         title: Percentage of urban population in agglomerations with 300,000 to 500,000 population (future projections)
@@ -261,6 +268,7 @@ tables:
         display:
           numDecimalPlaces: 1
           name: 300,000 to 500,000
+          isProjection: true
 
       _300_000_to_500_000_population_projections:
         title: Population in agglomerations with 300,000 to 500,000 (future projections)
@@ -271,6 +279,7 @@ tables:
         display:
           numDecimalPlaces: 0
           name: 300,000 to 500,000
+          isProjection: true
 
       _5_to_10_million_number_of_agglomerations_projections:
         title: Number of agglomerations with 5 to 10 million population (future projections)
@@ -281,6 +290,7 @@ tables:
         display:
           numDecimalPlaces: 0
           name: 5 to 10 million
+          isProjection: true
 
       _5_to_10_million_percentage_of_urban_population_projections:
         title: Percentage of urban population in agglomerations with 5 to 10 million population (future projections)
@@ -290,6 +300,7 @@ tables:
         display:
           numDecimalPlaces: 1
           name: 5 to 10 million
+          isProjection: true
 
       _5_to_10_million_population_projections:
         title: Population in agglomerations with 5 to 10 million (future projections)
@@ -300,6 +311,7 @@ tables:
         display:
           numDecimalPlaces: 0
           name: 5 to 10 million
+          isProjection: true
 
       _500_000_to_1_million_number_of_agglomerations_projections:
         title: Number of agglomerations with 500,000 to 1 million population (future projections)
@@ -310,6 +322,7 @@ tables:
         display:
           numDecimalPlaces: 0
           name: 500,000 to 1 million
+          isProjection: true
 
       _500_000_to_1_million_percentage_of_urban_population_projections:
         title: Percentage of urban population in agglomerations with 500,000 to 1 million population (future projections)
@@ -320,6 +333,7 @@ tables:
         display:
           numDecimalPlaces: 1
           name: 500,000 to 1 million
+          isProjection: true
 
       _500_000_to_1_million_population_projections:
         title: Population in agglomerations with 500,000 to 1 million (future projections)
@@ -330,6 +344,7 @@ tables:
         display:
           numDecimalPlaces: 0
           name: 500,000 to 1 million
+          isProjection: true
 
       fewer_than_300_000_percentage_of_urban_population_projections:
         title: Percentage of urban population in agglomerations with fewer than 300,000 population (future projections)
@@ -340,6 +355,7 @@ tables:
         display:
           numDecimalPlaces: 1
           name: fewer than 300,000
+          isProjection: true
 
       fewer_than_300_000_population_projections:
         title: Population in agglomerations with fewer than 300,000 (future projections)
@@ -350,3 +366,4 @@ tables:
         display:
           numDecimalPlaces: 0
           name: fewer than 300,000
+          isProjection: true
