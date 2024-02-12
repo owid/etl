@@ -56,9 +56,9 @@ add_indentation()
 if utils.AppState.args.phase == "all":  # type: ignore
     switch_page("Home")  # type: ignore
 ## ETL step
-for step in WIZARD_CONFIG["etl"]["steps"].values():
-    if utils.AppState.args.phase == step["alias"]:  # type: ignore
-        switch_page(step["title"])  # type: ignore
+for step_name, step_props in WIZARD_CONFIG["etl"]["steps"].items():
+    if utils.AppState.args.phase == step_name:  # type: ignore
+        switch_page(step_props["title"])  # type: ignore
 ## Section
 for section in WIZARD_CONFIG["sections"]:
     for app in section["apps"]:
