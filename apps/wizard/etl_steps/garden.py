@@ -186,6 +186,17 @@ def _fill_dummy_metadata_yaml(metadata_path: Path) -> None:
         f.write(ruamel_dump(doc))
 
 
+def export_metadata() -> None:
+    dataset_path = st.session_state["garden.dataset_path"]
+    try:
+        output_path = utils.meta_export(dataset_path=dataset_path)
+    except Exception as e:
+        st.exception(e)
+        st.stop()
+    finally:
+        st.success(f"Metadata exported to `{output_path}`.")
+
+
 #########################################################
 # MAIN ##################################################
 #########################################################
@@ -423,24 +434,37 @@ if submitted:
             with st.container(border=True):
                 st.markdown("**(Optional)**")
                 # A/ Playground notebook
-                st.markdown("##### Playground notebook")
+                st.markdown("#### Playground notebook")
                 st.markdown(
                     f"Use the generated notebook `{notebook_path.relative_to(BASE_DIR)}` to examine the dataset output interactively."
                 )
                 # B/ Generate metadata
-                st.markdown("##### Generate metadata")
+                st.session_state[
+                    "garden.dataset_path"
+                ] = f"data/garden/{form.namespace}/{form.version}/{form.short_name}"
+                st.markdown("#### Generate metadata")
                 st.markdown(f"Generate metadata file `{form.short_name}.meta.yml` from your dataset with:")
-                st.code(
-                    f"poetry run etl-metadata-export data/garden/{form.namespace}/{form.version}/{form.short_name}",
-                    "bash",
+                st.button(
+                    "Metadata export",
+                    help="Once clicked, the whole guideline will disappear.",
+                    on_click=export_metadata,
                 )
+
+                with st.container(border=True):
+                    st.markdown("Alternitavely you can generate the metadata with the following command:")
+                    st.code(
+                        f"poetry run etl-metadata-export {st.session_state['garden.dataset_path']}",
+                        "bash",
+                    )
+
                 st.markdown("then manual edit it and rerun the step again with")
                 st.code(
                     f"poetry run etl data{private_suffix}://garden/{form.namespace}/{form.version}/{form.short_name} {'--private' if form.is_private else ''}",
                     "bash",
                 )
-                # C/ Generate metadata
-                st.markdown("##### Organize the DAG")
+
+                # C/ Organize DAG
+                st.markdown("#### Organize the DAG")
                 st.markdown(f"Check the DAG `{dag_path}`.")
 
             # 4/ Final steps
