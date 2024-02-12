@@ -17,8 +17,6 @@ Before tax income is estimated by calculating the sum of income from labor and c
 
 After tax income (cash) is obtained using the disposable household cash income variable (dhci).
 
-Consumption is obtained using the total consumption variable (hcexp).
-
 Income data is converted from local currency into international-$ by dividing by the [LIS PPP factor](https://www.lisdatacenter.org/resources/ppp-deflators/), available as an additional database in the system.
 
 Incomes are top and bottom-coded by replacing negative values with zeros and setting boundaries for extreme values of log income: at the top Q3 plus 3 times the interquartile range (Q3-Q1), and at the bottom Q1 minus 3 times the interquartile range.
@@ -127,28 +125,28 @@ var_dict = {
     },
     "s80_s20_ratio": {
         "title": "S80/S20 ratio",
-        "description": "The S80/S20 ratio is the share of total income or consumption of the top 20% divided by the share of the bottom 20%.",
+        "description": "The S80/S20 ratio is the share of total income of the top 20% divided by the share of the bottom 20%.",
         "unit": "",
         "short_unit": "",
         "numDecimalPlaces": 2,
     },
     "p90_p10_ratio": {
         "title": "P90/P10 ratio",
-        "description": "P90 and P10 are the levels of income or consumption below which 90% and 10% of the population live, respectively. This variable gives the ratio of the two. It is a measure of inequality that indicates the gap between the richest and poorest tenth of the population.",
+        "description": "P90 and P10 are the levels of income below which 90% and 10% of the population live, respectively. This variable gives the ratio of the two. It is a measure of inequality that indicates the gap between the richest and poorest tenth of the population.",
         "unit": "",
         "short_unit": "",
         "numDecimalPlaces": 2,
     },
     "p90_p50_ratio": {
         "title": "P90/P50 ratio",
-        "description": "The P90/P50 ratio measures the degree of inequality within the richest half of the population. A ratio of 2 means that someone just falling in the richest tenth of the population has twice the median income or consumption.",
+        "description": "The P90/P50 ratio measures the degree of inequality within the richest half of the population. A ratio of 2 means that someone just falling in the richest tenth of the population has twice the median income.",
         "unit": "",
         "short_unit": "",
         "numDecimalPlaces": 2,
     },
     "p50_p10_ratio": {
         "title": "P50/P10 ratio",
-        "description": "The P50/P10 ratio measures the degree of inequality within the poorest half of the population. A ratio of 2 means that the median income or consumption is two times higher than that of someone just falling in the poorest tenth of the population.",
+        "description": "The P50/P10 ratio measures the degree of inequality within the poorest half of the population. A ratio of 2 means that the median income is two times higher than that of someone just falling in the poorest tenth of the population.",
         "unit": "",
         "short_unit": "",
         "numDecimalPlaces": 2,
@@ -162,14 +160,14 @@ var_dict = {
     },
     "share_middle40": {
         "title": "Share of the middle 40%",
-        "description": "The share of {inc_cons_dict[wel]['type']} {inc_cons_dict[wel]['verb']} by the middle 40%. The middle 40% is the share of the population whose income or consumption lies between the poorest 50% and the richest 10%.",
+        "description": "The share of {inc_cons_dict[wel]['type']} {inc_cons_dict[wel]['verb']} by the middle 40%. The middle 40% is the share of the population whose income lies between the poorest 50% and the richest 10%.",
         "unit": "%",
         "short_unit": "%",
         "numDecimalPlaces": 1,
     },
 }
 
-# Details for each consumption or income variable
+# Details for each income variable
 inc_cons_dict = {
     "dhi": {
         "name": "Disposable household income",
