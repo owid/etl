@@ -26,7 +26,7 @@ def load_wizard_config():
 def _check_wizard_config(config: dict):
     """Check if the wizard config is valid."""
     app_properties_expected = ["title", "alias", "entrypoint", "emoji", "image_url"]
-
+    etl_steps_properties_expected = ["title", "entrypoint", "emoji", "image_url"]
     # Check `etl` property
     assert "etl" in config, "`etl` property is required in wizard config!"
     assert "title" in config["etl"], "`etl.title` property is required in wizard config!"
@@ -61,7 +61,12 @@ _aliases = []
 for section in WIZARD_CONFIG["sections"]:
     for app in section["apps"]:
         _aliases.append(app["alias"])
-for step in WIZARD_CONFIG["etl"]["steps"].values():
-    _aliases.append(step["alias"])
-_aliases = tuple(_aliases + ["all"])
+_aliases += list(WIZARD_CONFIG["etl"]["steps"].keys())
 WIZARD_PHASES = Literal[_aliases]  # type: ignore
+
+# Get all pages by alias
+_pages = [ww for w in WIZARD_CONFIG["sections"] for ww in w["apps"]]
+PAGES_BY_ALIAS = {
+    **WIZARD_CONFIG["etl"]["steps"],
+    **{p["alias"]: {k: v for k, v in p.items() if k not in ["alias"]} for p in _pages},
+}

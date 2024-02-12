@@ -38,6 +38,7 @@ dummy_values = {
     "version": utils.DATE_TODAY,
     "short_name": "dummy",
     "meadow_version": utils.DATE_TODAY,
+    "topic_tags": ["Uncategorized"],
 }
 # Get list of available tags from DB (only those used as topic pages)
 with get_session() as session:
@@ -263,7 +264,7 @@ with form_widget.form("garden"):
         key="topic_tags",
         options=tag_list,
         placeholder="Choose a tag (or multiple)",
-        default=None,
+        default=dummy_values["topic_tags"] if APP_STATE.args.dummy_data else None,
     )
 
     st.markdown("#### Dependencies")
@@ -397,8 +398,16 @@ if submitted:
 
         # Display next steps
         with st.expander("## Next steps", expanded=True):
+            # st.markdown(
+            #     """
+            #     ####  1. Harmonize Country names
+            # """
+            # )
+            # st_page_link("harmonizer")
+
             st.markdown(
                 f"""
+        ## Others
         1. Harmonize country names with the following command (assuming country field is called `country`). Check out a [short demo](https://drive.google.com/file/d/1tBFMkgOgy4MmB7E7NmfMlfa4noWaiG3t/view) of the tool
 
             ```
