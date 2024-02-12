@@ -381,7 +381,7 @@ gen neutral_eq_ineq = 0
 replace neutral_eq_ineq = 1 if E035 == 5
 
 gen inequality_eq_ineq = 0
-replace inequality_eq_ineq = 1 if E035 >= 6
+replace inequality_eq_ineq = 1 if E035 >= 6 & E035 <=10
 
 gen dont_know_eq_ineq = 0
 replace dont_know_eq_ineq = 1 if E035 == .a

@@ -1,12 +1,20 @@
 """Load a meadow dataset and create a garden dataset."""
 
 from owid.catalog import Table
+from structlog import get_logger
+from tabulate import tabulate
 
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
+
+# Initialize logger.
+log = get_logger()
+
+# Set table format when printing
+TABLEFMT = "pretty"
 
 
 def run(dest_dir: str) -> None:
@@ -26,6 +34,10 @@ def run(dest_dir: str) -> None:
     tb = drop_indicators_and_replace_nans(tb)
 
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
+
+    # Sanity checks
+    tb = sanity_checks(tb)
+
     tb = tb.set_index(["country", "year"], verify_integrity=True)
 
     #
@@ -134,16 +146,99 @@ def replace_dont_know_by_null(tb: Table, questions: list, answers: list) -> Tabl
         # Check if all columns in answers_by_question are null
         tb["null_check"] = tb[answers_by_question].notnull().all(axis=1)
 
-        print(
-            tb[(tb["country"] == "Great Britain") & (tb["year"] >= 1984)][
-                ["country", "year"] + answers_by_question + [f"dont_know_{q}", "null_check"]
-            ]
-        )
-
         # if null_check is False and f"dont_know_{q}" is 0, set f"dont_know_{q}" as null
         tb.loc[(~tb["null_check"]) & (tb[f"dont_know_{q}"] == 0), f"dont_know_{q}"] = float("nan")
 
     # Remove null_check
     tb = tb.drop(columns=["null_check"])
+
+    return tb
+
+
+def sanity_checks(tb: Table) -> Table:
+    """
+    Perform sanity checks on the data
+    """
+    # Check if the sum of the answers is 100
+    # For important in life questions
+    tb = check_sum_100(
+        tb=tb,
+        questions=[
+            "important_in_life_family",
+            "important_in_life_friends",
+            "important_in_life_leisure_time",
+            "important_in_life_politics",
+            "important_in_life_work",
+            "important_in_life_religion",
+        ],
+        answers=["very", "rather", "not_very", "notatall", "dont_know", "missing"],
+        margin=0.5,
+    )
+
+    # For interested in politics question
+    tb = check_sum_100(
+        tb=tb,
+        questions=["interested_politics"],
+        answers=["very", "somewhat", "not_very", "not_at_all", "dont_know", "missing"],
+        margin=0.5,
+    )
+
+    # For political action questions
+    tb = check_sum_100(
+        tb=tb,
+        questions=[
+            "political_action_signing_a_petition",
+            "political_action_joining_in_boycotts",
+            "political_action_attending_peaceful_demonstrations",
+            "political_action_joining_unofficial_strikes",
+        ],
+        answers=["have_done", "might_do", "never", "dont_know", "missing"],
+        margin=0.5,
+    )
+
+    # For environment vs. economy question
+    tb = check_sum_100(
+        tb=tb,
+        questions=["env_ec"],
+        answers=["environment", "economy", "other_answer", "dont_know", "missing"],
+        margin=0.5,
+    )
+
+    # For income equality question
+    tb = check_sum_100(
+        tb=tb,
+        questions=["eq_ineq"],
+        answers=["equality", "neutral", "inequality", "dont_know", "missing"],
+        margin=0.5,
+    )
+
+    return tb
+
+
+def check_sum_100(tb: Table, questions: list, answers: list, margin: float) -> Table:
+    """
+    Check if the sum of the answers is 100
+    """
+    for q in questions:
+        # Add q to each member of answers
+        answers_by_question = [f"{a}_{q}" for a in answers]
+
+        # Check if all columns in answers_by_question are null
+        tb["sum_check"] = tb[answers_by_question].sum(axis=1)
+
+        # Create mask to check if sum is 100
+        mask = ((tb["sum_check"] <= 100 - margin) | (tb["sum_check"] >= 100 + margin)) & tb[
+            answers_by_question
+        ].notnull().all(axis=1)
+        tb_error = tb[mask].reset_index(drop=True).copy()
+
+        if not tb_error.empty:
+            log.fatal(
+                f"""{len(tb_error)} answers for {q} are not adding up to 100%:
+                {tabulate(tb_error[['country', 'year'] + answers_by_question +['sum_check']], headers = 'keys', tablefmt = TABLEFMT, floatfmt=".1f")}"""
+            )
+
+    # Remove sum_check
+    tb = tb.drop(columns=["sum_check"])
 
     return tb
