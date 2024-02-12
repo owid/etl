@@ -693,10 +693,11 @@ def set_states(states_values: Dict[str, Any]) -> None:
         st.session_state[key] = value
 
 
-def st_page_link(alias: str) -> None:
+def st_page_link(alias: str, **kwargs) -> None:
     """Link to page."""
-    st.link_button(
+    st.page_link(
         page=PAGES_BY_ALIAS[alias]["entrypoint"],
         label=PAGES_BY_ALIAS[alias]["title"],
         icon=PAGES_BY_ALIAS[alias]["emoji"],
+        **kwargs,
     )
