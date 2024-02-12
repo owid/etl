@@ -132,10 +132,16 @@ def replace_dont_know_by_null(tb: Table, questions: list, answers: list) -> Tabl
         answers_by_question = [f"{a}_{q}" for a in answers]
 
         # Check if all columns in answers_by_question are null
-        tb["null_check"] = tb[answers_by_question].all(axis=1)
+        tb["null_check"] = tb[answers_by_question].notnull().all(axis=1)
+
+        print(
+            tb[(tb["country"] == "Great Britain") & (tb["year"] >= 1984)][
+                ["country", "year"] + answers_by_question + [f"dont_know_{q}", "null_check"]
+            ]
+        )
 
         # if null_check is False and f"dont_know_{q}" is 0, set f"dont_know_{q}" as null
-        tb.loc[(~tb["null_check"]) & (tb[f"dont_know_{q}"]), f"dont_know_{q}"] = float("nan")
+        tb.loc[(~tb["null_check"]) & (tb[f"dont_know_{q}"] == 0), f"dont_know_{q}"] = float("nan")
 
     # Remove null_check
     tb = tb.drop(columns=["null_check"])
