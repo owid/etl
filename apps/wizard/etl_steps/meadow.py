@@ -215,7 +215,7 @@ if submitted:
         # User asked for private mode?
         private_suffix = "-private" if form.is_private else ""
 
-        # handle DAG-addition
+        # Handle addition to the DAG
         dag_path = DAG_DIR / form.dag_file
         if form.add_to_dag:
             dag_content = utils.add_to_dag(

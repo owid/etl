@@ -21,6 +21,7 @@ from MySQLdb import OperationalError
 from pydantic import BaseModel
 from typing_extensions import Self
 
+from apps.wizard.config import PAGES_BY_ALIAS
 from etl import config
 from etl.db import get_connection
 from etl.files import apply_ruff_formatter_to_files, ruamel_dump, ruamel_load
@@ -66,7 +67,7 @@ MD_GARDEN = WIZARD_DIR / "etl_steps" / "markdown" / "garden.md"
 MD_GRAPHER = WIZARD_DIR / "etl_steps" / "markdown" / "grapher.md"
 
 # PATH WIZARD CONFIG
-WIZARD_CONFIG = BASE_DIR / ".wizard"
+WIZARD_VARIABLES_CONFIG = BASE_DIR / ".wizard"
 
 
 DUMMY_DATA = {
@@ -574,8 +575,8 @@ def warning_metadata_unstable() -> None:
 
 def load_wizard_config() -> Dict[str, Any]:
     """Load default wizard config."""
-    if os.path.exists(WIZARD_CONFIG):
-        with open(WIZARD_CONFIG, "r") as f:
+    if os.path.exists(WIZARD_VARIABLES_CONFIG):
+        with open(WIZARD_VARIABLES_CONFIG, "r") as f:
             return json.load(f)
     return {
         "template": {
@@ -596,7 +597,7 @@ def update_wizard_config(form: StepForm) -> None:
         config["template"][form.step_name]["generate_notebook"] = form_dix.get("generate_notebook", False)
 
     # Export config
-    with open(WIZARD_CONFIG, "w") as f:
+    with open(WIZARD_VARIABLES_CONFIG, "w") as f:
         json.dump(config, f)
 
 
@@ -693,3 +694,12 @@ def set_states(states_values: Dict[str, Any]) -> None:
     """Set states from any key in dictionary."""
     for key, value in states_values.items():
         st.session_state[key] = value
+
+
+def st_page_link(alias: str) -> None:
+    """Link to page."""
+    st.link_button(
+        page=PAGES_BY_ALIAS[alias]["entrypoint"],
+        label=PAGES_BY_ALIAS[alias]["title"],
+        icon=PAGES_BY_ALIAS[alias]["emoji"],
+    )
