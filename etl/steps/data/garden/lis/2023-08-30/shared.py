@@ -332,17 +332,17 @@ def var_metadata_income_and_equivalence_scale(var, wel, e) -> VariableMeta:
             title=f"{var_dict[var]['title']} ({inc_cons_dict[wel]['name']}, {equivalence_scales_dict[e]['name']})",
             description=f"""{var_dict[var]['description']}
 
-            {inc_cons_dict[wel]['description']}
+{inc_cons_dict[wel]['description']}
 
-            {equivalence_scales_dict[e]['description']}
+{equivalence_scales_dict[e]['description']}
 
-            {ppp_description}
+{ppp_description}
 
-            {notes_title}
+{notes_title}
 
-            {processing_description}
+{processing_description}
 
-            {processing_gini_mean_median}""",
+{processing_gini_mean_median}""",
             unit=var_dict[var]["unit"],
             short_unit=var_dict[var]["short_unit"],
         )
@@ -356,17 +356,17 @@ def var_metadata_income_and_equivalence_scale(var, wel, e) -> VariableMeta:
             title=f"{var_dict[var]['title']} ({inc_cons_dict[wel]['name']}, {equivalence_scales_dict[e]['name']})",
             description=f"""{var_dict[var]['description']}
 
-            {inc_cons_dict[wel]['description']}
+{inc_cons_dict[wel]['description']}
 
-            {equivalence_scales_dict[e]['description']}
+{equivalence_scales_dict[e]['description']}
 
-            {notes_title}
+{notes_title}
 
-            {processing_description}
+{processing_description}
 
-            {processing_gini_mean_median}
+{processing_gini_mean_median}
 
-            {processing_distribution}""",
+{processing_distribution}""",
             unit=var_dict[var]["unit"],
             short_unit=var_dict[var]["short_unit"],
         )
@@ -382,15 +382,15 @@ def var_metadata_income_equivalence_scale_relative(var, wel, e, rel) -> Variable
         title=f"{rel_dict[rel]} - {var_dict[var]['title']} ({inc_cons_dict[wel]['name']}, {equivalence_scales_dict[e]['name']})",
         description=f"""{var_dict[var]['description']}
 
-        {inc_cons_dict[wel]['description']}
+{inc_cons_dict[wel]['description']}
 
-        {equivalence_scales_dict[e]['description']}
+{equivalence_scales_dict[e]['description']}
 
-        {notes_title}
+{notes_title}
 
-        {processing_description}
+{processing_description}
 
-        {processing_poverty}""",
+{processing_poverty}""",
         unit=var_dict[var]["unit"],
         short_unit=var_dict[var]["short_unit"],
     )
@@ -406,17 +406,17 @@ def var_metadata_income_equivalence_scale_absolute(var, wel, e, abs) -> Variable
         title=f"{abs_dict[abs]} - {var_dict[var]['title']} ({inc_cons_dict[wel]['name']}, {equivalence_scales_dict[e]['name']})",
         description=f"""{var_dict[var]['description']}
 
-        {inc_cons_dict[wel]['description']}
+{inc_cons_dict[wel]['description']}
 
-        {equivalence_scales_dict[e]['description']}
+{equivalence_scales_dict[e]['description']}
 
-        {ppp_description}
+{ppp_description}
 
-        {notes_title}
+{notes_title}
 
-        {processing_description}
+{processing_description}
 
-        {processing_poverty}""",
+{processing_poverty}""",
         unit=var_dict[var]["unit"],
         short_unit=var_dict[var]["short_unit"],
     )
@@ -433,17 +433,17 @@ def var_metadata_income_equivalence_scale_percentiles(var, wel, e, pct) -> Varia
             title=f"{pct_dict[pct]['decile9']} - {var_dict[var]['title']} ({inc_cons_dict[wel]['name']}, {equivalence_scales_dict[e]['name']})",
             description=f"""{var_dict[var]['description']}
 
-            {inc_cons_dict[wel]['description']}
+{inc_cons_dict[wel]['description']}
 
-            {equivalence_scales_dict[e]['description']}
+{equivalence_scales_dict[e]['description']}
 
-            {ppp_description}
+{ppp_description}
 
-            {notes_title}
+{notes_title}
 
-            {processing_description}
+{processing_description}
 
-            {processing_distribution}""",
+{processing_distribution}""",
             unit=var_dict[var]["unit"],
             short_unit=var_dict[var]["short_unit"],
         )
@@ -457,17 +457,17 @@ def var_metadata_income_equivalence_scale_percentiles(var, wel, e, pct) -> Varia
             title=f"{pct_dict[pct]['decile10']} - {var_dict[var]['title']} ({inc_cons_dict[wel]['name']}, {equivalence_scales_dict[e]['name']})",
             description=f"""{var_dict[var]['description']}
 
-            {inc_cons_dict[wel]['description']}
+{inc_cons_dict[wel]['description']}
 
-            {equivalence_scales_dict[e]['description']}
+{equivalence_scales_dict[e]['description']}
 
-            {ppp_description}
+{ppp_description}
 
-            {notes_title}
+{notes_title}
 
-            {processing_description}
+{processing_description}
 
-            {processing_distribution}""",
+{processing_distribution}""",
             unit=var_dict[var]["unit"],
             short_unit=var_dict[var]["short_unit"],
         )
@@ -481,15 +481,15 @@ def var_metadata_income_equivalence_scale_percentiles(var, wel, e, pct) -> Varia
             title=f"{pct_dict[pct]['decile10']} - {var_dict[var]['title']} ({inc_cons_dict[wel]['name']}, {equivalence_scales_dict[e]['name']})",
             description=f"""{var_dict[var]['description']}
 
-            {inc_cons_dict[wel]['description']}
+{inc_cons_dict[wel]['description']}
 
-            {equivalence_scales_dict[e]['description']}
+{equivalence_scales_dict[e]['description']}
 
-            {notes_title}
+{notes_title}
 
-            {processing_description}
+{processing_description}
 
-            {processing_distribution}""",
+{processing_distribution}""",
             unit=var_dict[var]["unit"],
             short_unit=var_dict[var]["short_unit"],
         )
@@ -574,15 +574,15 @@ def var_metadata_distribution(var: str) -> VariableMeta:
             title=f"Income {var_dict_distribution[var]['title'].lower()}",
             description=f"""{var_dict_distribution[var]['description']}
 
-            {welfare_definitions}
+{welfare_definitions}
 
-            {equivalence_scales_definitions}
+{equivalence_scales_definitions}
 
-            {notes_title}
+{notes_title}
 
-            {processing_description}
+{processing_description}
 
-            {processing_distribution}""",
+{processing_distribution}""",
             unit=var_dict_distribution[var]["unit"],
             short_unit=var_dict_distribution[var]["short_unit"],
         )
@@ -597,17 +597,17 @@ def var_metadata_distribution(var: str) -> VariableMeta:
             title=f"{var_dict_distribution[var]['title']} income",
             description=f"""{var_dict_distribution[var]['description']}
 
-            {welfare_definitions}
+{welfare_definitions}
 
-            {equivalence_scales_definitions}
+{equivalence_scales_definitions}
 
-            {ppp_description}
+{ppp_description}
 
-            {notes_title}
+{notes_title}
 
-            {processing_description}
+{processing_description}
 
-            {processing_distribution}""",
+{processing_distribution}""",
             unit=var_dict_distribution[var]["unit"],
             short_unit=var_dict_distribution[var]["short_unit"],
         )

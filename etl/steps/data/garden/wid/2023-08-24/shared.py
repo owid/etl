@@ -311,11 +311,11 @@ def var_metadata_income(var, wel, ext) -> VariableMeta:
             title=f"{var_dict[var]['title']} ({inc_cons_dict[wel]['name']}) ({extrapolation_dict[ext]})",
             description=f"""{var_dict[var]['description']}
 
-            {inc_cons_dict[wel]['description']}
+{inc_cons_dict[wel]['description']}
 
-            {ppp_description}
+{ppp_description}
 
-            {additional_description}""",
+{additional_description}""",
             unit=var_dict[var]["unit"],
             short_unit=var_dict[var]["short_unit"],
         )
@@ -329,9 +329,9 @@ def var_metadata_income(var, wel, ext) -> VariableMeta:
             title=f"{var_dict[var]['title']} ({inc_cons_dict[wel]['name']}) ({extrapolation_dict[ext]})",
             description=f"""{var_dict[var]['description']}
 
-            {inc_cons_dict[wel]['description']}
+{inc_cons_dict[wel]['description']}
 
-            {additional_description}""",
+{additional_description}""",
             unit=var_dict[var]["unit"],
             short_unit=var_dict[var]["short_unit"],
         )
@@ -352,9 +352,9 @@ def var_metadata_income_percentiles(var, wel, pct, ext) -> VariableMeta:
             title=f"{pct_dict[pct]['decile9']} - {var_dict[var]['title']} ({inc_cons_dict[wel]['name']}) ({extrapolation_dict[ext]})",
             description=f"""{var_dict[var]['description']}
 
-            {inc_cons_dict[wel]['description']}
+{inc_cons_dict[wel]['description']}
 
-            {ppp_description}
+{ppp_description}
 
             {additional_description}""",
             unit=var_dict[var]["unit"],
@@ -370,11 +370,11 @@ def var_metadata_income_percentiles(var, wel, pct, ext) -> VariableMeta:
             title=f"{pct_dict[pct]['decile10']} - {var_dict[var]['title']} ({inc_cons_dict[wel]['name']}) ({extrapolation_dict[ext]})",
             description=f"""{var_dict[var]['description']}
 
-            {inc_cons_dict[wel]['description']}
+{inc_cons_dict[wel]['description']}
 
-            {ppp_description}
+{ppp_description}
 
-            {additional_description}""",
+{additional_description}""",
             unit=var_dict[var]["unit"],
             short_unit=var_dict[var]["short_unit"],
         )
@@ -389,9 +389,9 @@ def var_metadata_income_percentiles(var, wel, pct, ext) -> VariableMeta:
             title=f"{pct_dict[pct]['decile10']} - {var_dict[var]['title']} ({inc_cons_dict[wel]['name']}) ({extrapolation_dict[ext]})",
             description=f"""{var_dict[var]['description']}
 
-            {inc_cons_dict[wel]['description']}
+{inc_cons_dict[wel]['description']}
 
-            {additional_description}""",
+{additional_description}""",
             unit=var_dict[var]["unit"],
             short_unit=var_dict[var]["short_unit"],
         )
@@ -407,11 +407,11 @@ def var_metadata_income_relative(var, wel, rel, ext) -> VariableMeta:
         title=f"{rel_dict[rel]} - {var_dict[var]['title']} ({inc_cons_dict[wel]['name']}) ({extrapolation_dict[ext]})",
         description=f"""{var_dict[var]['description']}
 
-        {inc_cons_dict[wel]['description']}
+{inc_cons_dict[wel]['description']}
 
-        {additional_description}
+{additional_description}
 
-        {relative_poverty_descritption}""",
+{relative_poverty_descritption}""",
         unit=var_dict[var]["unit"],
         short_unit=var_dict[var]["short_unit"],
     )
@@ -492,9 +492,9 @@ def var_metadata_distribution(var: str, ext: str) -> VariableMeta:
             title=f"Income or wealth {var_dict_distribution[var]['title'].lower()} ({extrapolation_dict[ext]})",
             description=f"""{var_dict_distribution[var]['description']}
 
-            {welfare_definitions}
+{welfare_definitions}
 
-            {additional_description}""",
+{additional_description}""",
             unit=var_dict_distribution[var]["unit"],
             short_unit=var_dict_distribution[var]["short_unit"],
         )
@@ -509,11 +509,11 @@ def var_metadata_distribution(var: str, ext: str) -> VariableMeta:
             title=f"{var_dict_distribution[var]['title']} income or wealth ({extrapolation_dict[ext]})",
             description=f"""{var_dict_distribution[var]['description']}
 
-            {welfare_definitions}
+{welfare_definitions}
 
-            {ppp_description}
+{ppp_description}
 
-            {additional_description}""",
+{additional_description}""",
             unit=var_dict_distribution[var]["unit"],
             short_unit=var_dict_distribution[var]["short_unit"],
         )
