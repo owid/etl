@@ -91,6 +91,21 @@ def run(dest_dir: str) -> None:
             # If an error occurs (usually due to small size of the country), add the country's name to the small_countries list.
             small_countries.append(shapefile.iloc[i]["WB_NAME"])
 
+    # Select the desired latitude and longitude range for Global averages - https://climate.copernicus.eu/copernicus-2024-world-experienced-warmest-january-record
+    da_global = da.sel(latitude=slice(-90, 90), longitude=slice(-180, 180))
+
+    # Calculate weights based on latitude to account for area distortion in latitude-longitude grids.
+    weights_global = np.cos(np.deg2rad(da_global.latitude))
+    weights_global.name = "weights"
+
+    # Apply the weights to the temperature data.
+    clim_month_weighted_global = da_global.weighted(weights_global)
+
+    # Calculate the weighted mean temperature for the globe.
+    global_weighted_mean = clim_month_weighted_global.mean(dim=["longitude", "latitude"]).values
+    # Store the calculated mean temperature in the dictionary with the country's name as the key.
+    temp_country["Global"] = global_weighted_mean
+
     # Log information about countries for which temperature data could not be extracted.
     log.info(
         f"It wasn't possible to extract temperature data for {len(small_countries)} small countries as they are too small for the resolution of the Copernicus data."

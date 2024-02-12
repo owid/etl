@@ -63,8 +63,6 @@ steps:
   - snapshot://countries/2023-12-27/world_bank.zip
   data://garden/climate/2023-12-20/surface_temperature:
   - data://meadow/climate/2023-12-20/surface_temperature
-  - data://garden/wb/2023-04-30/income_groups
-  - data://garden/regions/2023-01-01/regions
   data://grapher/climate/2023-12-20/surface_temperature_anomalies:
   - data://garden/climate/2023-12-20/surface_temperature
   data://grapher/climate/2023-12-20/surface_temperature_monthly:
