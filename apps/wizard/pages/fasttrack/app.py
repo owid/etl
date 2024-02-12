@@ -110,6 +110,8 @@ for option, option_params in IMPORT_OPTIONS.items():
 # CREATE AND SHOW THE FORM
 ##########################################################
 with st.form("fasttrack-form"):
+    existing_google_sheet = None
+
     # Import field
     if import_method == IMPORT_GSHEET:
         st.text_input(
@@ -119,13 +121,7 @@ with st.form("fasttrack-form"):
         )
     elif import_method == UPDATE_GSHEET:
         options = load_existing_sheets_from_snapshots()
-        st.selectbox(
-            label="Existing Google Sheets",
-            options=options,
-            format_func=lambda x: x["label"],
-            help="Selected sheet will be used if you don't specify Google Sheets URL.",
-            key="dataset_uri",
-        )
+        placeholder_for_existing_google_sheet = st.empty()
     else:
         st.file_uploader(
             label="Upload Local CSV",
@@ -139,11 +135,8 @@ with st.form("fasttrack-form"):
         value=True,
         key="infer_metadata",
     )
-    st.checkbox(
-        label="Make dataset private (your metadata will be still public!)",
-        value=st.session_state.get("is_private", False),
-        key="is_private",
-    )
+
+    placeholder_for_private = st.empty()
 
     submitted = st.form_submit_button(
         "Submit",
@@ -156,6 +149,31 @@ with st.form("fasttrack-form"):
                 "to_be_submitted_confirmed_2": False,
             }
         ),
+    )
+
+# These need to be defined outside of the form to be able to make the `is_public` checkbox dependent
+# on the `existing_google_sheet` value
+if import_method == UPDATE_GSHEET:
+    with placeholder_for_existing_google_sheet:
+        existing_google_sheet = st.selectbox(
+            label="Existing Google Sheets",
+            options=options,
+            format_func=lambda x: x["label"],
+            help="Selected sheet will be used if you don't specify Google Sheets URL.",
+            key="dataset_uri",
+        )
+
+with placeholder_for_private:
+    if existing_google_sheet:
+        default_is_public = existing_google_sheet["is_public"]
+    else:
+        default_is_public = True
+
+    st.checkbox(
+        label="Make dataset private (your metadata will be still public!)",
+        # value=st.session_state.get("is_private", not default_is_public),
+        value=not default_is_public,
+        key="is_private",
     )
 
 
