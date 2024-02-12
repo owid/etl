@@ -27,6 +27,18 @@ st.set_page_config(page_title="Wizard (fasttrack)", page_icon="🪄")
 add_indentation()
 
 
+# Reset states
+def reset_states() -> None:
+    """Reset states so nothing is executed (only first form is shown)."""
+    set_states(
+        {
+            "to_be_submitted": False,
+            "to_be_submitted_confirmed_1": False,
+            "to_be_submitted_confirmed_2": False,
+        }
+    )
+
+
 # CONFIG
 CURRENT_DIR = Path(__file__).parent
 DAG_FASTTRACK_PATH = DAG_DIR / "fasttrack.yml"
@@ -111,6 +123,7 @@ for option, option_params in IMPORT_OPTIONS.items():
 ##########################################################
 with st.form("fasttrack-form"):
     existing_google_sheet = None
+    placeholder_for_existing_google_sheet = None
 
     # Import field
     if import_method == IMPORT_GSHEET:
@@ -154,14 +167,18 @@ with st.form("fasttrack-form"):
 # These need to be defined outside of the form to be able to make the `is_public` checkbox dependent
 # on the `existing_google_sheet` value
 if import_method == UPDATE_GSHEET:
-    with placeholder_for_existing_google_sheet:
-        existing_google_sheet = st.selectbox(
-            label="Existing Google Sheets",
-            options=options,
-            format_func=lambda x: x["label"],
-            help="Selected sheet will be used if you don't specify Google Sheets URL.",
-            key="dataset_uri",
-        )
+    if placeholder_for_existing_google_sheet is None:
+        raise ValueError("placeholder_for_existing_google_sheet is None. This was not expected.")
+    else:
+        with placeholder_for_existing_google_sheet:
+            existing_google_sheet = st.selectbox(
+                label="Existing Google Sheets",
+                options=options,  # type: ignore
+                format_func=lambda x: x["label"],
+                help="Selected sheet will be used if you don't specify Google Sheets URL.",
+                key="dataset_uri",
+                on_change=reset_states,
+            )
 
 with placeholder_for_private:
     if existing_google_sheet:
@@ -174,6 +191,7 @@ with placeholder_for_private:
         # value=st.session_state.get("is_private", not default_is_public),
         value=not default_is_public,
         key="is_private",
+        on_change=reset_states,
     )
 
 
