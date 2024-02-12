@@ -44,16 +44,41 @@ with st.sidebar:
         options=MODELS_AVAILABLE_LIST,
         format_func=lambda x: MODELS_AVAILABLE[x],
         index=MODELS_AVAILABLE_LIST.index(MODEL_DEFAULT),
+        help="[Pricing](https://openai.com/pricing) | [Model list](https://platform.openai.com/docs/models/gpt-4-and-gpt-4-turbo)",
     )
+    ## See pricing list: https://openai.com/pricing (USD)
+    ## See model list: https://platform.openai.com/docs/models/gpt-4-and-gpt-4-turbo
+
     use_all_context = st.toggle(
-        "Full context window",
+        "Full chat as context",
         value=True,
         help="If set to True, all the messages in the chat are used to query GPT (i.e. more tokens, i.e. more expensive). Unselect for cheaper usage.",
     )
-    temperature = st.slider("Temperature", min_value=0.0, max_value=2.0, value=0.5, step=0.01)
-    max_tokens = int(st.number_input("Max tokens", min_value=32, max_value=2048, value=512, step=32))
+    use_full_docs = st.toggle(
+        "Reduced docs",
+        value=True,
+        help="If set to True, a reduced ETL documentation is used in the GPT query. Otherwise, the complete documentation is used (slightly more costly)",
+    )
+    temperature = st.slider(
+        "Temperature",
+        min_value=0.0,
+        max_value=2.0,
+        value=0.5,
+        step=0.01,
+        help="What sampling temperature to use, between 0 and 2. Higher values like 0.8 will make the output more random, while lower values like 0.2 will make it more focused and deterministic.",
+    )
+    max_tokens = int(
+        st.number_input(
+            "Max tokens",
+            min_value=32,
+            max_value=2048,
+            value=512,
+            step=32,
+            help="The maximum number of tokens in the response.",
+        )
+    )
 
-if model_name == "gpt-4-turbo-preview":
+if use_full_docs:
     SYSTEM_PROMPT = SYSTEM_PROMPT_FULL
 else:
     SYSTEM_PROMPT = SYSTEM_PROMPT_REDUCED
