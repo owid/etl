@@ -16,6 +16,7 @@ import requests
 import structlog
 import yaml
 from bs4 import BeautifulSoup
+
 from owid.walden import add_to_catalog
 from owid.walden.catalog import Dataset
 
