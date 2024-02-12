@@ -163,25 +163,26 @@ def render_indicator() -> str:
     return documentation
 
 
-# Origin reference
-with mkdocs_gen_files.open("architecture/metadata/reference/origin.md", "w") as f:
-    text_origin = render_origin()
-    print(text_origin, file=f)
+if __name__ == "__main__":
+    # Origin reference
+    with mkdocs_gen_files.open("architecture/metadata/reference/origin.md", "w") as f:
+        text_origin = render_origin()
+        print(text_origin, file=f)
 
-# Dataset reference
-with mkdocs_gen_files.open("architecture/metadata/reference/dataset.md", "w") as f:
-    text_dataset = render_dataset()
-    print(text_dataset, file=f)
+    # Dataset reference
+    with mkdocs_gen_files.open("architecture/metadata/reference/dataset.md", "w") as f:
+        text_dataset = render_dataset()
+        print(text_dataset, file=f)
 
-# Tables reference
-with mkdocs_gen_files.open("architecture/metadata/reference/tables.md", "w") as f:
-    text_tables = render_table()
-    print(text_tables, file=f)
+    # Tables reference
+    with mkdocs_gen_files.open("architecture/metadata/reference/tables.md", "w") as f:
+        text_tables = render_table()
+        print(text_tables, file=f)
 
-# Indicator reference
-with mkdocs_gen_files.open("architecture/metadata/reference/indicator.md", "w") as f:
-    text_tables = render_indicator()
-    print(text_tables, file=f)
+    # Indicator reference
+    with mkdocs_gen_files.open("architecture/metadata/reference/indicator.md", "w") as f:
+        text_tables = render_indicator()
+        print(text_tables, file=f)
 
 
 # with open("docs/architecture/metadata/reference2.md", "w") as f:
