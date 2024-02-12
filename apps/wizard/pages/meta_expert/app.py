@@ -15,9 +15,19 @@ from etl.config import load_env
 # CONFIG
 st.set_page_config(page_title="Wizard: Ask the Metadata Expert", page_icon="🪄")
 add_indentation()
+## Title/subtitle
 st.title("Metadata 🧙 **:gray[Expert]**")
-st.markdown("Ask me anything about the metadata!")
-
+st.markdown("Ask the Expert any questions about the metadata!")
+## Examples
+EXAMPLE_QUERIES = [
+    "What is the difference between `description_key` and `description_from_producer`? Be concise.",
+    "Is the following snapshot title correct? 'Cherry Blossom Full Blook Dates in Kyoto, Japan'",
+    "What is the difference between an Origin and Dataset?",
+]
+with st.expander("See examples"):
+    for example in EXAMPLE_QUERIES:
+        st.caption(example)
+## Load variables
 load_env()
 
 
@@ -28,7 +38,7 @@ def ask_gpt(query, model):
 
 
 # GPT CONFIG
-MODEL_DEFAULT = "gpt-3.5-turbo-0125"
+MODEL_DEFAULT = "gpt-4-turbo-preview"
 MODELS_AVAILABLE = {
     "gpt-3.5-turbo-0125": "GPT-3.5 Turbo (gpt-3.5-turbo-0125)",
     "gpt-4-turbo-preview": "GPT-4 Turbo (gpt-4-turbo-preview)",
@@ -56,14 +66,14 @@ with st.sidebar:
     )
     use_full_docs = st.toggle(
         "Reduced docs",
-        value=True,
+        value=False,
         help="If set to True, a reduced ETL documentation is used in the GPT query. Otherwise, the complete documentation is used (slightly more costly)",
     )
     temperature = st.slider(
         "Temperature",
         min_value=0.0,
         max_value=2.0,
-        value=0.5,
+        value=0.15,
         step=0.01,
         help="What sampling temperature to use, between 0 and 2. Higher values like 0.8 will make the output more random, while lower values like 0.2 will make it more focused and deterministic.",
     )
@@ -98,7 +108,7 @@ for message in st.session_state.messages:
 # st.session_state.messages = st.session_state.messages[-2:]
 
 # React to user input
-if prompt := st.chat_input("Ask a question about the metadata"):
+if prompt := st.chat_input("Ask me!"):
     # Display user message in chat message container
     st.chat_message("user").markdown(prompt)
     # Add user message to chat history
