@@ -18,6 +18,7 @@ import jsonschema
 import streamlit as st
 from cookiecutter.main import cookiecutter
 from MySQLdb import OperationalError
+from owid.catalog import Dataset
 from pydantic import BaseModel
 from typing_extensions import Self
 
@@ -25,6 +26,7 @@ from apps.wizard.config import PAGES_BY_ALIAS
 from etl import config
 from etl.db import get_connection
 from etl.files import apply_ruff_formatter_to_files, ruamel_dump, ruamel_load
+from etl.metadata_export import main as metadata_export
 from etl.paths import (
     APPS_DIR,
     BASE_DIR,
@@ -692,3 +694,24 @@ def st_page_link(alias: str, **kwargs) -> None:
         icon=PAGES_BY_ALIAS[alias]["emoji"],
         **kwargs,
     )
+
+
+def meta_export(dataset: Dataset, dataset_path: str | None = None) -> Path:
+    """Export metadata of a dataset.
+
+    The metadata of the dataset may have changed in run time.
+    """
+    # Handle inputs
+    if dataset:
+        dataset_path = str(dataset.path)
+    elif dataset_path is None:
+        raise ValueError("Either a dataset or a dataset_path must be provided.")
+
+    output = STEP_DIR / "data" / f"{dataset.metadata.uri}.meta.yml"
+    metadata_export(
+        path=dataset_path,
+        output=str(output),
+        show=False,
+        decimals="auto",
+    )
+    return output
