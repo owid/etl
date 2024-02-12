@@ -672,10 +672,7 @@ def st_select_dataset(
 
     # Show only datasets that start with a given prefix
     if prefixes:
-        options, options_all = [], options
-        for prefix in prefixes:
-            options = [o for o in options_all if o.startswith(prefix)]
-
+        options = [o for o in options if any(o.startswith(prefix) for prefix in prefixes)]
     # Discard snapshots if flag is enabled
     if not snapshots:
         options = [o for o in options if not o.startswith("snapshot://")]
