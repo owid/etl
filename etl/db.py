@@ -173,3 +173,90 @@ def get_all_datasets(archived: bool = True, db_conn: Optional[MySQLdb.Connection
 
 def dict_to_object(d):
     return type("DynamicObject", (object,), d)()
+
+
+def get_info_for_etl_datasets(db_conn: Optional[MySQLdb.Connection] = None) -> pd.DataFrame:
+    if db_conn is None:
+        db_conn = get_connection()
+
+    # First, increase the GROUP_CONCAT limit, to avoid the list of chart ids to be truncated.
+    GROUP_CONCAT_MAX_LEN = 4096
+    cursor = db_conn.cursor()
+    cursor.execute(f"SET SESSION group_concat_max_len = {GROUP_CONCAT_MAX_LEN};")
+    db_conn.commit()
+
+    query = """\
+    SELECT
+        q1.datasetId AS dataset_id,
+        d.name AS dataset_name,
+        q1.etlPath AS etl_path,
+        d.isArchived AS is_archived,
+        d.isPrivate AS is_private,
+        q2.chartIds AS chart_ids
+    FROM
+        (SELECT
+            datasetId,
+            MIN(catalogPath) AS etlPath
+        FROM
+            variables
+        WHERE
+            catalogPath IS NOT NULL
+        GROUP BY
+            datasetId) q1
+    LEFT JOIN
+        (SELECT
+            d.id AS datasetId,
+            d.isArchived,
+            d.isPrivate,
+            GROUP_CONCAT(DISTINCT c.id) AS chartIds
+        FROM
+            datasets d
+            JOIN variables v ON v.datasetId = d.id
+            JOIN chart_dimensions cd ON cd.variableId = v.id
+            JOIN charts c ON c.id = cd.chartId
+        WHERE
+            json_extract(c.config, "$.isPublished") = TRUE
+        GROUP BY
+            d.id) q2
+        ON q1.datasetId = q2.datasetId
+    JOIN
+        datasets d ON q1.datasetId = d.id
+    ORDER BY
+        q1.datasetId ASC;
+
+    """
+
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", UserWarning)
+        df = pd.read_sql(query, con=db_conn)
+
+    if max([len(row) for row in df["chart_ids"] if row is not None]) == GROUP_CONCAT_MAX_LEN:
+        log.error(
+            f"The value of group_concat_max_len (set to {GROUP_CONCAT_MAX_LEN}) has been exceeded."
+            "This means that the list of chart ids will be incomplete in some cases. Consider increasing it."
+        )
+
+    # Instead of having a string of chart ids, make chart_ids a column with lists of integers.
+    df["chart_ids"] = [
+        [int(chart_id) for chart_id in chart_ids.split(",")] if chart_ids else [] for chart_ids in df["chart_ids"]
+    ]
+
+    # Make is_archived and is_private boolean columns.
+    df["is_archived"] = df["is_archived"].astype(bool)
+    df["is_private"] = df["is_private"].astype(bool)
+
+    # Sanity check.
+    unknown_channels = set([etl_path.split("/")[0] for etl_path in set(df["etl_path"])]) - {"grapher"}
+    if len(unknown_channels) > 0:
+        log.error(
+            "Variables in grapher DB are expected to come only from ETL grapher channel, "
+            f"but other channels were found: {unknown_channels}"
+        )
+
+    # Create a column with the step name.
+    # First assume all steps are public (hence starting with "data://").
+    # Then edit private steps so they start with "data-private://".
+    df["step"] = ["data://" + "/".join(etl_path.split("#")[0].split("/")[:-1]) for etl_path in df["etl_path"]]
+    df.loc[df["is_private"], "step"] = df[df["is_private"]]["step"].str.replace("data://", "data-private://")
+
+    return df

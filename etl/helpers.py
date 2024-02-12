@@ -31,6 +31,7 @@ from owid.walden import Catalog as WaldenCatalog
 from owid.walden import Dataset as WaldenDataset
 
 from etl import paths
+from etl.db import get_info_for_etl_datasets
 from etl.snapshot import Snapshot, SnapshotMeta
 from etl.steps import extract_step_attributes, load_dag, reverse_graph
 
@@ -848,7 +849,7 @@ class VersionTracker:
 
     """
 
-    def __init__(self):
+    def __init__(self, connect_to_db: bool = False):
         # Load dag of active and archive steps (a dictionary where each item is step: set of dependencies).
         self.dag_all = load_dag(paths.DAG_ARCHIVE_FILE)
         # Create a reverse dag (a dictionary where each item is step: set of usages).
@@ -867,6 +868,9 @@ class VersionTracker:
         self.all_active_dependencies = self.get_all_dependencies_of_active_steps()
         # Create a dictionary of dag files for each step.
         self.dag_file_for_each_step = load_dag_file_for_each_step()
+
+        # Connect to DB to extract additional info about charts.
+        self.connect_to_db = connect_to_db
 
         # Dataframe of step attributes will only be initialized once it's called.
         # This dataframe will have one row per existing step.
@@ -1064,12 +1068,39 @@ class VersionTracker:
         steps_df["path_to_script"] = [self.get_path_to_script(step=step, omit_base_dir=True) for step in self.all_steps]
 
         # Add attributes to steps.
-        steps = pd.merge(steps_df, self.step_attributes_df, on="step", how="left")
+        steps_df = pd.merge(steps_df, self.step_attributes_df, on="step", how="left")
+
+        if self.connect_to_db:
+            # TODO: Create a hidden function for all the following code.
+            # Fetch all info about datasets from the DB.
+            info_df = get_info_for_etl_datasets()
+            steps_df = pd.merge(
+                steps_df, info_df[["dataset_id", "dataset_name", "step", "chart_ids"]], on="step", how="outer"
+            )
+            # Fill missing rows with empty lists.
+            # TODO: Should this be done for other columns too?
+            for column in ["chart_ids", "all_usages"]:
+                steps_df[column] = [row if isinstance(row, list) else [] for row in steps_df[column]]
+            # Create a dictionary step: chart_ids.
+            step_chart_ids = steps_df[["step", "chart_ids"]].set_index("step").to_dict()["chart_ids"]
+            # TODO: A step currently always appears in the list of direct dependencies. Consider removing it.
+            #   Alternatively, add it to the list of direct usages too.
+            # TODO: Instead of this approach, an alternative would be to add grapher db datasets as steps of a different
+            #   channel (e.g. "db"). But that would be a little bit more complicated for now.
+            # Create a column with all chart ids of all dependencies of each step.
+            # To achieve that, for each step, sum the list of chart ids from all its usages to the list of chart ids of
+            # the step itself. Then create a sorted list of the set of all those chart ids.
+            steps_df["all_chart_ids"] = [
+                sorted(set(sum([step_chart_ids[usage] for usage in row["all_usages"]], step_chart_ids[row["step"]])))  # type: ignore
+                for _, row in steps_df.iterrows()
+            ]
+            # Create a column with the number of charts affected (in any way possible) by each step.
+            steps_df["n_charts"] = [len(chart_ids) for chart_ids in steps_df["all_chart_ids"]]
 
         # Add columns with the list of forward and backwards versions for each step.
-        steps = self._add_columns_with_different_step_versions(steps_df=steps)
+        steps_df = self._add_columns_with_different_step_versions(steps_df=steps_df)
 
-        return steps
+        return steps_df
 
     @property
     def step_attributes_df(self) -> pd.DataFrame:
@@ -1142,6 +1173,15 @@ class VersionTracker:
         For snapshots, the code can either be the script to generate the snapshot, or a metadata dvc file.
         """
         [self.get_path_to_script(step) for step in self.all_steps]
+
+    def check_that_all_db_datasets_have_a_step(self) -> None:
+        if self.connect_to_db:
+            pass
+            # TODO: Fix missing steps (that are in grapher db but not in ETL):
+            #  One of them was grapher/fasttrack/2023-08-07/animal_lives_per_kilogram
+            #  which is used in chart https://owid.cloud/admin/charts/7066/edit
+        else:
+            log.warning("Unable to connect to DB. Use `connect_to_db=True` to enable this operation.")
 
     def get_backported_db_dataset_ids(self) -> List[int]:
         """Get list of ids of DB datasets that are used as backported datasets in active steps of ETL.
