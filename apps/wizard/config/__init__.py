@@ -25,8 +25,10 @@ def load_wizard_config():
 
 def _check_wizard_config(config: dict):
     """Check if the wizard config is valid."""
-    app_properties_expected = ["title", "alias", "entrypoint", "emoji", "image_url"]
-    etl_steps_properties_expected = ["title", "entrypoint", "emoji", "image_url"]
+    _app_properties_expected = ["title", "entrypoint", "emoji", "image_url"]
+    pages_properties_expected = _app_properties_expected + ["alias", "description"]
+    etl_steps_properties_expected = _app_properties_expected
+
     # Check `etl` property
     assert "etl" in config, "`etl` property is required in wizard config!"
     assert "title" in config["etl"], "`etl.title` property is required in wizard config!"
@@ -36,7 +38,7 @@ def _check_wizard_config(config: dict):
     steps_expected = ["snapshot", "meadow", "garden", "fasttrack", "grapher"]
     for step_expected in steps_expected:
         assert step_expected in steps, f"{step_expected} property is required in etl.steps property in wizard config!"
-        for prop in app_properties_expected:
+        for prop in etl_steps_properties_expected:
             assert (
                 prop in steps[step_expected]
             ), f"`etl.steps.{step_expected}.{prop}` property is required in `etl.steps` property in wizard config!"
@@ -47,7 +49,7 @@ def _check_wizard_config(config: dict):
         assert "description" in section, "`sections.description` property is required in wizard config!"
         assert "apps" in section, "`sections.apps` property is required in wizard config!"
         for app in section["apps"]:
-            for prop in app_properties_expected + ["description"]:
+            for prop in pages_properties_expected:
                 assert (
                     prop in app
                 ), f"`sections.apps.{app['title']}.{prop}` property is required in sections.apps property in wizard config!"
@@ -57,14 +59,12 @@ WIZARD_CONFIG = load_wizard_config()
 
 # Phases accepted
 _aliases = []
-## Load all aliases
+## Aliases from pages
 for section in WIZARD_CONFIG["sections"]:
     for app in section["apps"]:
         _aliases.append(app["alias"])
-for step in WIZARD_CONFIG["etl"]["steps"]:
-    _aliases.append(app["alias"])
-# _aliases += list(WIZARD_CONFIG["etl"]["steps"].keys())
-print(_aliases)
+## Add aliases from etl steps and 'all'
+_aliases = tuple(_aliases + list(WIZARD_CONFIG["etl"]["steps"].keys()) + ["all"])
 WIZARD_PHASES = Literal[_aliases]  # type: ignore
 
 # Get all pages by alias
