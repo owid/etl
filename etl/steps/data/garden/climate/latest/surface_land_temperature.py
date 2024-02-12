@@ -14,8 +14,8 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load meadow dataset and read its main table.
-    ds_meadow = paths.load_dataset("surface_temperature")
-    tb = ds_meadow["surface_temperature"].reset_index()
+    ds_meadow = paths.load_dataset("surface_land_temperature")
+    tb = ds_meadow["surface_land_temperature"].reset_index()
     #
     # Process data.
     #

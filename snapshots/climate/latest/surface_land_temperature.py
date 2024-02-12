@@ -1,4 +1,4 @@
-"""Script to create a snapshot of the monthly averaged surface temperature data from 1950 to present from the Copernicus Climate Change Service.
+"""Script to create a snapshot of the monthly averaged surface land temperature data from 1950 to present from the Copernicus Climate Change Service.
 
    The script assumes that the data is available on the CDS API.
    Instructions on how to access the API on a Mac are here: https://confluence.ecmwf.int/display/CKB/How+to+install+and+use+CDS+API+on+macOS
@@ -27,7 +27,7 @@ SNAPSHOT_VERSION = Path(__file__).parent.name
 @click.option("--upload/--skip-upload", default=True, type=bool, help="Upload dataset to Snapshot")
 def main(upload: bool) -> None:
     # Create a new snapshot.
-    snap = Snapshot(f"climate/{SNAPSHOT_VERSION}/surface_temperature.gz")
+    snap = Snapshot(f"climate/{SNAPSHOT_VERSION}/surface_land_temperature.gz")
     # Save data as a compressed temporary file.
     with tempfile.TemporaryDirectory() as temp_dir:
         c = cdsapi.Client()

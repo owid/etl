@@ -12,15 +12,15 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load garden dataset.
-    ds_garden = paths.load_dataset("surface_temperature")
-    tb = ds_garden["surface_temperature"].reset_index()
+    ds_garden = paths.load_dataset("surface_land_temperature")
+    tb = ds_garden["surface_land_temperature"].reset_index()
     tb["year"] = tb["time"].astype(str).str[0:4]
     tb["month"] = tb["time"].astype(str).str[5:7]
 
     #
     # Process data.
     #
-    tb_global = tb[tb["country"] == "World"]
+    tb_global = tb[tb["country"] == "Global"]
     tb_anomalies = tb_global[["year", "month", "anomaly_below_0", "anomaly_above_0"]]
     tb_anomalies = tb_anomalies.rename(
         columns={"anomaly_below_0": "Below the average", "anomaly_above_0": "Above the average"}
@@ -57,5 +57,5 @@ def run(dest_dir: str) -> None:
     #
     # Create a new grapher dataset with the same metadata as the garden dataset.
     ds_grapher = create_dataset(dest_dir, tables=[tb_pivot], default_metadata=ds_garden.metadata)
-    ds_grapher.metadata.title = "Global monthly temperature anomalies since 1950"
+    ds_grapher.metadata.title = "Global monthly land surface temperature anomalies since 1950"
     ds_grapher.save()
