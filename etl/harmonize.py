@@ -113,7 +113,17 @@ def interactive_harmonize(
     return mapping
 
 
-def harmonize_simple(to_map, mapping, mapper) -> Tuple[List[str], Dict[str, str]]:
+def harmonize_simple(
+    to_map: List[str], mapping: Dict[str, str], mapper: "CountryRegionMapper"
+) -> Tuple[List[str], Dict[str, str]]:
+    """Apply basic harmonization (map entities with identical names).
+
+    Uses `mapper` to map entities in `to_map` to standard OWID naming conventions.
+
+    It returns two objects:
+        - `mapping`: Dictionary with the entity mapping.
+        - `ambiguous`: List of entities from `to_map` that could not be mapped.
+    """
     ambiguous = []
     for region in to_map:
         if region in mapping:

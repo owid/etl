@@ -689,7 +689,7 @@ def st_select_dataset(
     return option
 
 
-def set_states(states_values: Dict[str, Any]):
+def set_states(states_values: Dict[str, Any]) -> None:
     """Set states from any key in dictionary."""
     for key, value in states_values.items():
         st.session_state[key] = value
