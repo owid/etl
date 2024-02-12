@@ -61,7 +61,10 @@ _aliases = []
 for section in WIZARD_CONFIG["sections"]:
     for app in section["apps"]:
         _aliases.append(app["alias"])
-_aliases += list(WIZARD_CONFIG["etl"]["steps"].keys())
+for step in WIZARD_CONFIG["etl"]["steps"]:
+    _aliases.append(app["alias"])
+# _aliases += list(WIZARD_CONFIG["etl"]["steps"].keys())
+print(_aliases)
 WIZARD_PHASES = Literal[_aliases]  # type: ignore
 
 # Get all pages by alias
