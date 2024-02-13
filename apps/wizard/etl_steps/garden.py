@@ -189,11 +189,11 @@ def _fill_dummy_metadata_yaml(metadata_path: Path) -> None:
 def export_metadata() -> None:
     dataset_path = st.session_state["garden.dataset_path"]
     try:
-        output_path = utils.meta_export(dataset_path=dataset_path)
+        output_path = utils.metadata_export_basic(dataset_path=dataset_path)
     except Exception as e:
         st.exception(e)
         st.stop()
-    finally:
+    else:
         st.success(f"Metadata exported to `{output_path}`.")
 
 

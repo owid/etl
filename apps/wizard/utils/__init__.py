@@ -696,7 +696,7 @@ def st_page_link(alias: str, **kwargs) -> None:
     )
 
 
-def meta_export(dataset_path: str | None = None, dataset: Dataset | None = None) -> str:
+def metadata_export_basic(dataset_path: str | None = None, dataset: Dataset | None = None) -> str:
     """Export metadata of a dataset.
 
     The metadata of the dataset may have changed in run time.
@@ -704,11 +704,10 @@ def meta_export(dataset_path: str | None = None, dataset: Dataset | None = None)
     # Handle inputs
     if dataset:
         dataset_path = str(dataset.path)
-        output_path = str(STEP_DIR / "data" / f"{dataset.metadata.uri}.meta.yml")
     elif dataset_path is None:
         raise ValueError("Either a dataset or a dataset_path must be provided.")
 
-    metadata_export(
+    output_path = metadata_export(
         path=dataset_path,
         output="",  # Will assign the default value
         show=False,

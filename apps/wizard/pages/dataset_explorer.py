@@ -11,7 +11,7 @@ from owid import catalog
 from st_pages import add_indentation
 from streamlit_agraph import Config, ConfigBuilder, Edge, Node, agraph
 
-from apps.wizard.utils import meta_export
+from apps.wizard.utils import metadata_export_basic
 from etl.paths import DATA_DIR
 from etl.steps import extract_step_attributes, filter_to_subgraph, load_dag
 
@@ -298,11 +298,11 @@ if st.session_state.get("show"):
 
                     if export_metadata:
                         try:
-                            output_path = meta_export(dataset=dataset)
+                            output_path = metadata_export_basic(dataset=dataset)
                         except Exception as e:
                             st.exception(e)
                             st.stop()
-                        finally:
+                        else:
                             st.success(f"Metadata exported to `{output_path}`.")
     else:
         tab_graph = st.tabs(["Dependency graph"])
