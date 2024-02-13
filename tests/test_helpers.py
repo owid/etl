@@ -33,7 +33,7 @@ def create_mock_version_tracker(dag, step_prefix=MOCK_STEP_PREFIX):
     @patch.object(etl.helpers, "load_dag", mock_load_dag)
     def mock_version_tracker():
         # This function initializes VersionTracker using a mock dag.
-        return VersionTracker()
+        return VersionTracker(connect_to_db=False, warn_on_archivable=True)
 
     return mock_version_tracker()
 

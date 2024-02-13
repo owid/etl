@@ -8,6 +8,7 @@ import sys
 import tempfile
 from collections.abc import Generator
 from contextlib import contextmanager
+from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any, Dict, Iterable, Iterator, List, Optional, Set, Union, cast
 from urllib.parse import urljoin
@@ -850,7 +851,22 @@ class VersionTracker:
 
     """
 
-    def __init__(self, connect_to_db: bool = False):
+    # TODO: Decide about whether the following steps should be archived.
+    KNOWN_ARCHIVABLE_STEPS = [
+        "data://explorers/dummy/2020-01-01/dummy",
+        "data://garden/dummy/2020-01-01/dummy",
+        "data://garden/dummy/2020-01-01/dummy_full",
+        "data://garden/dummy/2023-10-12/dummy_monster",
+        "data://grapher/dummy/2020-01-01/dummy",
+        "data://grapher/dummy/2020-01-01/dummy_full",
+        "data://grapher/dummy/2023-10-12/dummy_monster",
+        "data://meadow/dummy/2020-01-01/dummy",
+        "data://meadow/dummy/2020-01-01/dummy_full",
+        "snapshot://dummy/2020-01-01/dummy.csv",
+        "snapshot://dummy/2020-01-01/dummy_full.csv",
+    ]
+
+    def __init__(self, connect_to_db: bool = False, warn_on_archivable: bool = True):
         # Load dag of active and archive steps (a dictionary where each item is step: set of dependencies).
         self.dag_all = load_dag(paths.DAG_ARCHIVE_FILE)
         # Create a reverse dag (a dictionary where each item is step: set of usages).
@@ -872,6 +888,9 @@ class VersionTracker:
 
         # Connect to DB to extract additional info about charts.
         self.connect_to_db = connect_to_db
+
+        # Warn about archivable steps.
+        self.warn_on_archivable = warn_on_archivable
 
         # Dataframe of step attributes will only be initialized once it's called.
         # This dataframe will have one row per existing step.
@@ -926,8 +945,45 @@ class VersionTracker:
         return sorted(active_dependencies)
 
     def get_all_archivable_steps(self) -> List[str]:
-        """Get all steps in the dag that can safely be moved to the archive."""
-        return sorted(_recursive_get_all_archivable_steps(steps_df=self.steps_df))
+        """Get all steps in the dag that can safely be moved to the archive.
+
+        If we have access to DB, a step is archivable is:
+        * It is active.
+        * It has no charts (including all indirect charts).
+        * It has a date version and it is older than a certain number of days (n_days_before_archiving).
+        * It is not listed in the KNOWN_ARCHIVABLE_STEPS.
+
+        TODO: The old way to check for archivable steps doesn't seem to be working anymore, even though the unit tests
+          pass. Consider removing this check or fixing the check and units tests.
+        Otherwise, a step is archivable if:
+        * It is active.
+        * There is a newer version of the same step in the active dag.
+        * It is either in channel meadow or garden.
+        * It is not an active dependency.
+        * It is not listed in the KNOWN_ARCHIVABLE_STEPS.
+
+        """
+        if self.connect_to_db:
+            # Number of days that an ETL active step is allowed to exist without charts, before we warn about archiving it.
+            n_days_before_archiving = 7
+            # Calculate the earliest date that a step can have without having charts, before we warn about archiving it.
+            earliest_date = (datetime.now() - timedelta(days=n_days_before_archiving)).strftime("%Y-%m-%d")
+            archivable_steps = sorted(
+                set(self.steps_df[(self.steps_df["state"] == "active") & (self.steps_df["n_charts"] == 0)]["step"])
+            )
+            # Remove steps that are very recent (since maybe charts have not yet been created).
+            archivable_steps = [
+                step
+                for step in archivable_steps
+                if ((re.findall(r"\d{4}-\d{2}-\d{2}", step) or ["9999"])[0] < earliest_date)
+            ]
+        else:
+            archivable_steps = sorted(_recursive_get_all_archivable_steps(steps_df=self.steps_df))
+
+        # Remove steps that are already known to be archivable.
+        archivable_steps = [step for step in archivable_steps if step not in self.KNOWN_ARCHIVABLE_STEPS]
+
+        return archivable_steps
 
     def get_dag_file_for_step(self, step: str) -> str:
         """Get the name of the dag file for a given step."""
@@ -1238,11 +1294,15 @@ class VersionTracker:
         """Apply all sanity checks."""
         self.check_that_active_dependencies_are_defined()
         self.check_that_active_dependencies_are_not_archived()
-        self.check_that_all_active_steps_are_necessary()
         self.check_that_all_steps_have_a_script()
         if self.connect_to_db:
             self.check_that_db_datasets_with_charts_are_not_archived()
             self.check_that_db_datasets_with_charts_have_active_etl_steps()
+        if self.warn_on_archivable:
+            # The following check will warn of archivable steps.
+            # Depending on whether connect_to_db is True or False, the criterion will be different.
+            # When False, the criterion is rather a proxy; True uses a more meaningful criterion.
+            self.check_that_all_active_steps_are_necessary()
 
     def get_backported_db_dataset_ids(self) -> List[int]:
         """Get list of ids of DB datasets that are used as backported datasets in active steps of ETL.
@@ -1260,9 +1320,9 @@ class VersionTracker:
         return backported_dataset_ids
 
 
-def run_version_tracker_checks():
+def run_version_tracker_checks(connect_to_db: bool = False, warn_on_archivable: bool = False) -> None:
     """Run all version tracker sanity checks."""
-    VersionTracker().apply_sanity_checks()
+    VersionTracker(connect_to_db=connect_to_db, warn_on_archivable=warn_on_archivable).apply_sanity_checks()
 
 
 def print_tables_metadata_template(tables: List[Table]):
