@@ -12,9 +12,9 @@ from MySQLdb.connections import Connection
 from structlog import get_logger
 
 from etl import db
-from etl.helpers import VersionTracker
 from etl.scripts.faostat.create_new_steps import find_latest_version_for_step
 from etl.scripts.faostat.shared import NAMESPACE
+from etl.version_tracker import VersionTracker
 
 log = get_logger()
 
