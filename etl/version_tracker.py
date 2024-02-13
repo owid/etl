@@ -670,9 +670,11 @@ class VersionTracker:
         """Check that DB datasets with public charts have active ETL steps."""
         missing_etl_steps = sorted(
             set(
-                self.steps_df[(self.steps_df["n_charts"] > 0) & (self.steps_df["state"].isin([np.nan, "archive"]))][
-                    "step"
-                ]
+                self.steps_df[
+                    (self.steps_df["db_dataset_id"].notnull())
+                    & (self.steps_df["n_charts"] > 0)
+                    & (self.steps_df["state"].isin([np.nan, "archive"]))
+                ]["step"]
             )
         )
         self._log_warnings_and_errors(
@@ -728,7 +730,3 @@ def run_version_tracker_checks(connect_to_db: bool = False, warn_on_archivable: 
     archivable steps.
     """
     VersionTracker(connect_to_db=connect_to_db, warn_on_archivable=warn_on_archivable).apply_sanity_checks()
-
-
-if __name__ == "__main__":
-    run_version_tracker_checks()
