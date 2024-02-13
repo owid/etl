@@ -31,6 +31,6 @@ meta:
 
 wdir: ../../../data/snapshots/wash/2024-02-04
 outs:
-- md5: a963a2c652a7407fadff0c3f34036423
-  size: 690714
+- md5: 2ebc481f5b75a139bf039f2bd455e86d
+  size: 715813
   path: who_regions.csv
