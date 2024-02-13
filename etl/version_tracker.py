@@ -537,8 +537,6 @@ class VersionTracker:
             steps_df[column] = steps_df[column].fillna(False)
         # Create a dictionary step: chart_ids.
         step_chart_ids = steps_df[["step", "chart_ids"]].set_index("step").to_dict()["chart_ids"]
-        # TODO: A step currently always appears in the list of direct dependencies. Consider removing it.
-        #   Alternatively, add it to the list of direct usages too.
         # NOTE: Instead of this approach, an alternative would be to add grapher db datasets as steps of a different
         #   channel (e.g. "db").
         # Create a column with all chart ids of all dependencies of each step.
