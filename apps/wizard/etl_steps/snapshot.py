@@ -793,14 +793,12 @@ if submitted:
         else:
             manual_import_instructions = ""
         st.subheader("Next steps")
-        with st.expander("", expanded=True):
-            st.markdown(
-                """
-            1. Verify that generated files are correct and update them if necessary.
-
-            2. Run the snapshot step to upload files to S3
-            """
-            )
+        with st.expander("⏭️ **Next steps**", expanded=True):
+            # 1/ Verification
+            st.markdown("#### 1. Verification")
+            st.markdown("Verify that generated files are correct and update them if necessary.")
+            # 2/ Run snapshot step
+            st.markdown("#### 2. Run snapshot step")
             args = []
             if form.dataset_manual_import:
                 s_file = st.text_input(
@@ -813,10 +811,11 @@ if submitted:
             ```bash
             python {ingest_path.relative_to(BASE_DIR)} {manual_import_instructions}
             ```
-
-            3. Continue to the meadow step.
             """
             )
+
+            st.markdown("#### 3. Proceed to next step")
+            utils.st_page_link("meadow", use_container_width=True, border=True)
 
         # User message
         st.toast("Templates generated. Read the next steps.", icon="✅")

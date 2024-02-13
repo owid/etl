@@ -408,7 +408,7 @@ if submitted:
         utils.preview_dag_additions(dag_content, dag_path)
 
         # Display next steps
-        with st.expander("## Next steps", expanded=True):
+        with st.expander("⏭️ **Next steps**", expanded=True):
             # 1/ Harmonize
             st.markdown("####  1. Harmonize Country names")
             st.markdown("Run it in your terminal:")
@@ -493,6 +493,7 @@ if submitted:
             st.markdown(
                 "If you are an internal OWID member and want to push data to our Grapher DB, continue to the grapher step or to explorers step."
             )
+            utils.st_page_link("grapher", use_container_width=True, border=True)
 
         # User message
         st.toast("Templates generated. Read the next steps.", icon="✅")

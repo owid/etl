@@ -686,14 +686,23 @@ def set_states(states_values: Dict[str, Any]) -> None:
         st.session_state[key] = value
 
 
-def st_page_link(alias: str, **kwargs) -> None:
+def st_page_link(alias: str, border: bool = False, **kwargs) -> None:
     """Link to page."""
-    st.page_link(
-        page=PAGES_BY_ALIAS[alias]["entrypoint"],
-        label=PAGES_BY_ALIAS[alias]["title"],
-        icon=PAGES_BY_ALIAS[alias]["emoji"],
-        **kwargs,
-    )
+    if border:
+        with st.container(border=True):
+            st.page_link(
+                page=PAGES_BY_ALIAS[alias]["entrypoint"],
+                label=PAGES_BY_ALIAS[alias]["title"],
+                icon=PAGES_BY_ALIAS[alias]["emoji"],
+                **kwargs,
+            )
+    else:
+        st.page_link(
+            page=PAGES_BY_ALIAS[alias]["entrypoint"],
+            label=PAGES_BY_ALIAS[alias]["title"],
+            icon=PAGES_BY_ALIAS[alias]["emoji"],
+            **kwargs,
+        )
 
 
 def metadata_export_basic(dataset_path: str | None = None, dataset: Dataset | None = None) -> str:

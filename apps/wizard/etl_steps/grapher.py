@@ -227,7 +227,7 @@ if submitted:
         step_path = DATASET_DIR / (form.short_name + ".py")
 
         # Display next steps
-        with st.expander("## Next steps", expanded=True):
+        with st.expander("⏭️ **Next steps**", expanded=True):
             st.markdown(
                 f"""
         1. Test your step against your local database. If you have your grapher DB configured locally, your `.env` file should look similar to this:
@@ -292,6 +292,7 @@ if submitted:
         5. If you are an internal OWID member and, because of this dataset update, you want to update charts in our Grapher DB, continue with charts
         """
             )
+            utils.st_page_link("charts", use_container_width=True, border=True)
 
         # Preview generated files
         st.subheader("Generated files")
