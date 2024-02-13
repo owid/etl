@@ -30,7 +30,7 @@ from structlog import get_logger
 
 from apps.wizard.pages.charts.init_config import init_app, set_session_states
 from apps.wizard.pages.charts.search_config import build_dataset_form
-from apps.wizard.pages.charts.submission import create_submission, push_submission
+from apps.wizard.pages.charts.submission import create_submission
 from apps.wizard.pages.charts.utils import get_datasets, get_schema
 from apps.wizard.pages.charts.variable_config import ask_and_get_variable_mapping
 from apps.wizard.utils.env import OWIDEnv
