@@ -16,7 +16,8 @@ from etl.db import get_engine
 
 # ChatGPT model name
 # details: https://platform.openai.com/docs/models
-MODELS_AVAILABLE = {"gpt-3.5": "gpt-3.5-turbo", "gpt-4": "gpt-4-1106-preview"}
+# pricing: https://openai.com/pricing
+MODELS_AVAILABLE = {"gpt-3.5": "gpt-3.5-turbo", "gpt-4": "gpt-4-0125-preview"}
 
 MODEL_DEFAULT = "gpt-3.5"
 GPT_SAMPLE_SIZE = 3
@@ -32,7 +33,7 @@ To improve these fields, focus on the following:
 - Ideally, the title length should be less than 80 characters
 - Ideally, the subtitle length should be less than 250 characters.
 - Correct spelling and grammar mistakes.
-- The subtitle should end with a period.
+- If the subtitle is a sentence, it must end with a period.
 
 The title is given after the keyword "TITLE", and the subtitle after the keyword "SUBTITLE".
 
@@ -116,7 +117,7 @@ click.rich_click.OPTION_GROUPS = {
     "--model-name",
     type=click.Choice(sorted(MODELS_AVAILABLE.keys())),
     default=MODEL_DEFAULT,
-    help="Choose chart_revision backend version to use. By default uses latest version.",
+    help=f"Choose chat GPT model version. By default uses {MODEL_DEFAULT}.",
 )
 @click.option(
     "-t",
@@ -181,7 +182,7 @@ def cli(
         if not overwrite:
             revisions = [r for r in revisions if r.experimental is None]
 
-        # Create new config`urations
+        # Create new configurations
         log.info(f"Found {len(revisions)} revisions pending!")
         if not revisions:
             log.info("No revisions pending! Exiting...")
@@ -224,7 +225,9 @@ def ask_gpt(question: str, system_prompt: str = "", model: str = "gpt-4", num_re
         frequency_penalty=1,
         n=num_responses,
     )
-    return [c["message"]["content"] for c in response["choices"]]  # type: ignore
+    print("-----------------------")
+    print(1, response.dict())
+    return [c.message.content for c in response.choices]  # type: ignore
 
 
 def suggest_new_config_fields(

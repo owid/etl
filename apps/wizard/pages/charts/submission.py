@@ -12,6 +12,8 @@ import etl.grapher_model as gm
 # from etl.chart_revision.v2.base import ChartUpdater
 from apps.wizard.pages.charts.utils import OWIDEnv
 from apps.wizard.pages.charts.variable_config import VariableConfig
+from apps.wizard.utils import set_states
+from etl.chart_revision.v2.chartgpt import SYSTEM_PROMPT_TEXT, suggest_new_config_fields
 from etl.chart_revision.v2.core import (
     build_updaters_and_get_charts,
     create_chart_comparison,
@@ -72,12 +74,29 @@ def create_submission(variable_config: VariableConfig, schema_chart_config: Dict
             st.write(variable_config.variable_mapping)
         with st.expander("📊  Show affected charts (before update)"):
             st.warning("Charts that are not public at ourworldindata.org will not be rendered correctly.")
-            for chart in charts:  # type: ignore
+            for i, chart in enumerate(charts):  # type: ignore
                 slug = chart.config["slug"]
-                st.markdown(
-                    f"""<iframe src="https://ourworldindata.org/grapher/{slug}" loading="lazy" style="width: 100%; height: 600px; border: 0px none;"></iframe>""",
-                    unsafe_allow_html=True,
-                )
+                a, b = st.columns(2)
+                with a:
+                    st.markdown(
+                        f"""<iframe src="https://ourworldindata.org/grapher/{slug}" loading="lazy" style="width: 100%; height: 600px; border: 0px none;"></iframe>""",
+                        unsafe_allow_html=True,
+                    )
+                with b:
+                    st.button(
+                        "Run GPT", key=f"_run_gpt_{i}", on_click=lambda i=i: set_states({f"experimental_{i}": True})
+                    )
+                    if (f"experimental_{i}" in st.session_state) and (st.session_state[f"experimental_{i}"]):
+                        with st.form(key=f"form_{i}"):
+                            configs = suggest_new_config_fields(
+                                config=chart.config,
+                                system_prompt=SYSTEM_PROMPT_TEXT,
+                                num_suggestions=3,
+                                model_name="gpt-3.5",
+                            )
+                            st.selectbox("Alternative title", options=[config["title"] for config in configs])
+                            st.selectbox("Alternative title", options=[config["subtitle"] for config in configs])
+                            st.form_submit_button("Update")
 
         # Button to finally submit the revisions
         submitted_revisions = st.button(label="🚀 SUBMIT CHART REVISIONS", use_container_width=True, type="primary")
