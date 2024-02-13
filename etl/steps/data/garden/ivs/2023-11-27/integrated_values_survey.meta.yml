@@ -835,7 +835,7 @@ tables:
         presentation:
           title_public: "Missing: Interest in politics"
 
-      political_action_have_done_signing_a_petition:
+      have_done_political_action_signing_a_petition:
         title: "Political action: Have signed a petition"
         description_short: '% of respondents replying "have done it" when asked "Now I would like you to look at this card. I am going to read out some different forms of political action that people can take, and I would like you to tell me, for each one, whether you have actually done any of these things, whether you might do it or would never, under any circumstances, do it." in the item "Signed a petition".'
         display:
@@ -843,7 +843,7 @@ tables:
           <<: *common-display
         presentation:
           title_public: "Have signed a petition"
-      political_action_might_do_signing_a_petition:
+      might_do_political_action_signing_a_petition:
         title: "Political action: Might sign a petition"
         description_short: '% of respondents replying "might do it" when asked "Now I would like you to look at this card. I am going to read out some different forms of political action that people can take, and I would like you to tell me, for each one, whether you have actually done any of these things, whether you might do it or would never, under any circumstances, do it." in the item "Signed a petition".'
         display:
@@ -851,7 +851,7 @@ tables:
           <<: *common-display
         presentation:
           title_public: "Might sign a petition"
-      political_action_never_signing_a_petition:
+      never_political_action_signing_a_petition:
         title: "Political action: Would never sign a petition"
         description_short: '% of respondents replying "would never do it" when asked "Now I would like you to look at this card. I am going to read out some different forms of political action that people can take, and I would like you to tell me, for each one, whether you have actually done any of these things, whether you might do it or would never, under any circumstances, do it." in the item "Signed a petition".'
         display:
@@ -859,7 +859,7 @@ tables:
           <<: *common-display
         presentation:
           title_public: "Would never sign a petition"
-      political_action_dont_know_signing_a_petition:
+      dont_know_political_action_signing_a_petition:
         title: "Political action: Signing a petition (Don't know)"
         description_short: '% of respondents replying "don‘t know" when asked "Now I would like you to look at this card. I am going to read out some different forms of political action that people can take, and I would like you to tell me, for each one, whether you have actually done any of these things, whether you might do it or would never, under any circumstances, do it." in the item "Signed a petition".'
         display:
@@ -867,7 +867,7 @@ tables:
           <<: *common-display
         presentation:
           title_public: "Signing a petition (Don't know)"
-      political_action_missing_signing_a_petition:
+      missing_political_action_signing_a_petition:
         title: "Political action: Signing a petition (Missing)"
         description_short: '% of answers classified as No answer, not applicable, not asked in survey o missing: other for the question "Now I would like you to look at this card. I am going to read out some different forms of political action that people can take, and I would like you to tell me, for each one, whether you have actually done any of these things, whether you might do it or would never, under any circumstances, do it." in the item "Signed a petition".'
         display:
@@ -876,7 +876,7 @@ tables:
         presentation:
           title_public: "Signing a petition (Missing)"
 
-      political_action_have_done_joining_in_boycotts:
+      have_done_political_action_joining_in_boycotts:
         title: "Political action: Have joined in boycotts"
         description_short: '% of respondents replying "have done it" when asked "Now I would like you to look at this card. I am going to read out some different forms of political action that people can take, and I would like you to tell me, for each one, whether you have actually done any of these things, whether you might do it or would never, under any circumstances, do it." in the item "Joining in boycotts".'
         display:
@@ -884,7 +884,7 @@ tables:
           <<: *common-display
         presentation:
           title_public: "Have joined in boycotts"
-      political_action_might_do_joining_in_boycotts:
+      might_do_political_action_joining_in_boycotts:
         title: "Political action: Might join in boycotts"
         description_short: '% of respondents replying "might do it" when asked "Now I would like you to look at this card. I am going to read out some different forms of political action that people can take, and I would like you to tell me, for each one, whether you have actually done any of these things, whether you might do it or would never, under any circumstances, do it." in the item "Joining in boycotts".'
         display:
@@ -892,7 +892,7 @@ tables:
           <<: *common-display
         presentation:
           title_public: "Might join in boycotts"
-      political_action_never_joining_in_boycotts:
+      never_political_action_joining_in_boycotts:
         title: "Political action: Would never join in boycotts"
         description_short: '% of respondents replying "would never do it" when asked "Now I would like you to look at this card. I am going to read out some different forms of political action that people can take, and I would like you to tell me, for each one, whether you have actually done any of these things, whether you might do it or would never, under any circumstances, do it." in the item "Joining in boycotts".'
         display:
@@ -900,7 +900,7 @@ tables:
           <<: *common-display
         presentation:
           title_public: "Would never join in boycotts"
-      political_action_dont_know_joining_in_boycotts:
+      dont_know_political_action_joining_in_boycotts:
         title: "Political action: Joining in boycotts (Don't know)"
         description_short: '% of respondents replying "don‘t know" when asked "Now I would like you to look at this card. I am going to read out some different forms of political action that people can take, and I would like you to tell me, for each one, whether you have actually done any of these things, whether you might do it or would never, under any circumstances, do it." in the item "Joining in boycotts".'
         display:
@@ -908,7 +908,7 @@ tables:
           <<: *common-display
         presentation:
           title_public: "Joining in boycotts (Don't know)"
-      political_action_missing_joining_in_boycotts:
+      missing_political_action_joining_in_boycotts:
         title: "Political action: Joining in boycotts (Missing)"
         description_short: '% of answers classified as No answer, not applicable, not asked in survey o missing: other for the question "Now I would like you to look at this card. I am going to read out some different forms of political action that people can take, and I would like you to tell me, for each one, whether you have actually done any of these things, whether you might do it or would never, under any circumstances, do it." in the item "Joining in boycotts".'
         display:
@@ -917,7 +917,7 @@ tables:
         presentation:
           title_public: "Joining in boycotts (Missing)"
 
-      political_action_have_done_attending_peaceful_demonstrations:
+      have_done_political_action_attending_peaceful_demonstrations:
         title: "Political action: Have attended peaceful demonstrations"
         description_short: '% of respondents replying "have done it" when asked "Now I would like you to look at this card. I am going to read out some different forms of political action that people can take, and I would like you to tell me, for each one, whether you have actually done any of these things, whether you might do it or would never, under any circumstances, do it." in the item "Attending peaceful demonstrations".'
         display:
@@ -925,7 +925,7 @@ tables:
           <<: *common-display
         presentation:
           title_public: "Have attended peaceful demonstrations"
-      political_action_might_do_attending_peaceful_demonstrations:
+      might_do_political_action_attending_peaceful_demonstrations:
         title: "Political action: Might attend peaceful demonstrations"
         description_short: '% of respondents replying "might do it" when asked "Now I would like you to look at this card. I am going to read out some different forms of political action that people can take, and I would like you to tell me, for each one, whether you have actually done any of these things, whether you might do it or would never, under any circumstances, do it." in the item "Attending peaceful demonstrations".'
         display:
@@ -933,7 +933,7 @@ tables:
           <<: *common-display
         presentation:
           title_public: "Might attend peaceful demonstrations"
-      political_action_never_attending_peaceful_demonstrations:
+      never_political_action_attending_peaceful_demonstrations:
         title: "Political action: Would never attend peaceful demonstrations"
         description_short: '% of respondents replying "would never do it" when asked "Now I would like you to look at this card. I am going to read out some different forms of political action that people can take, and I would like you to tell me, for each one, whether you have actually done any of these things, whether you might do it or would never, under any circumstances, do it." in the item "Attending peaceful demonstrations".'
         display:
@@ -941,7 +941,7 @@ tables:
           <<: *common-display
         presentation:
           title_public: "Would never attend peaceful demonstrations"
-      political_action_dont_know_attending_peaceful_demonstrations:
+      dont_know_political_action_attending_peaceful_demonstrations:
         title: "Political action: Attending peaceful demonstrations (Don't know)"
         description_short: '% of respondents replying "don‘t know" when asked "Now I would like you to look at this card. I am going to read out some different forms of political action that people can take, and I would like you to tell me, for each one, whether you have actually done any of these things, whether you might do it or would never, under any circumstances, do it." in the item "Attending peaceful demonstrations".'
         display:
@@ -949,7 +949,7 @@ tables:
           <<: *common-display
         presentation:
           title_public: "Attending peaceful demonstrations (Don't know)"
-      political_action_missing_attending_peaceful_demonstrations:
+      missing_political_action_attending_peaceful_demonstrations:
         title: "Political action: Attending peaceful demonstrations (Missing)"
         description_short: '% of answers classified as No answer, not applicable, not asked in survey o missing: other for the question "Now I would like you to look at this card. I am going to read out some different forms of political action that people can take, and I would like you to tell me, for each one, whether you have actually done any of these things, whether you might do it or would never, under any circumstances, do it." in the item "Attending peaceful demonstrations".'
         display:
@@ -958,7 +958,7 @@ tables:
         presentation:
           title_public: "Attending peaceful demonstrations (Missing)"
 
-      political_action_have_done_joining_unofficial_strikes:
+      have_done_political_action_joining_unofficial_strikes:
         title: "Political action: Have joined unofficial strikes"
         description_short: '% of respondents replying "have done it" when asked "Now I would like you to look at this card. I am going to read out some different forms of political action that people can take, and I would like you to tell me, for each one, whether you have actually done any of these things, whether you might do it or would never, under any circumstances, do it." in the item "Joining unofficial strikes".'
         display:
@@ -966,7 +966,7 @@ tables:
           <<: *common-display
         presentation:
           title_public: "Have joined unofficial strikes"
-      political_action_might_do_joining_unofficial_strikes:
+      might_do_political_action_joining_unofficial_strikes:
         title: "Political action: Might join unofficial strikes"
         description_short: '% of respondents replying "might do it" when asked "Now I would like you to look at this card. I am going to read out some different forms of political action that people can take, and I would like you to tell me, for each one, whether you have actually done any of these things, whether you might do it or would never, under any circumstances, do it." in the item "Joining unofficial strikes".'
         display:
@@ -974,7 +974,7 @@ tables:
           <<: *common-display
         presentation:
           title_public: "Might join unofficial strikes"
-      political_action_never_joining_unofficial_strikes:
+      never_political_action_joining_unofficial_strikes:
         title: "Political action: Would never join unofficial strikes"
         description_short: '% of respondents replying "would never do it" when asked "Now I would like you to look at this card. I am going to read out some different forms of political action that people can take, and I would like you to tell me, for each one, whether you have actually done any of these things, whether you might do it or would never, under any circumstances, do it." in the item "Joining unofficial strikes".'
         display:
@@ -982,7 +982,7 @@ tables:
           <<: *common-display
         presentation:
           title_public: "Would never join unofficial strikes"
-      political_action_dont_know_joining_unofficial_strikes:
+      dont_know_political_action_joining_unofficial_strikes:
         title: "Political action: Joining unofficial strikes (Don't know)"
         description_short: '% of respondents replying "don‘t know" when asked "Now I would like you to look at this card. I am going to read out some different forms of political action that people can take, and I would like you to tell me, for each one, whether you have actually done any of these things, whether you might do it or would never, under any circumstances, do it." in the item "Joining unofficial strikes".'
         display:
@@ -990,7 +990,7 @@ tables:
           <<: *common-display
         presentation:
           title_public: "Joining unofficial strikes (Don't know)"
-      political_action_missing_joining_unofficial_strikes:
+      missing_political_action_joining_unofficial_strikes:
         title: "Political action: Joining unofficial strikes (Missing)"
         description_short: '% of answers classified as No answer, not applicable, not asked in survey o missing: other for the question "Now I would like you to look at this card. I am going to read out some different forms of political action that people can take, and I would like you to tell me, for each one, whether you have actually done any of these things, whether you might do it or would never, under any circumstances, do it." in the item "Joining unofficial strikes".'
         display:
@@ -999,7 +999,7 @@ tables:
         presentation:
           title_public: "Joining unofficial strikes (Missing)"
 
-      environment:
+      environment_env_ec:
         title: "Environment vs economic growth: Environment"
         description_short: '% of respondents choosing option A when asked "Here are two statements people sometimes make when discussing the environment and economic growth. Which of them comes closer to your own point of view? A. Protecting the environment should be given priority, even if it causes slower economic growth and some loss of jobs B. Economic growth and creating jobs should be the top priority, even if the environment suffers to some extent"'
         display:
@@ -1007,7 +1007,7 @@ tables:
           <<: *common-display
         presentation:
           title_public: "Environment vs economic growth: Environment"
-      economic_growth:
+      economy_env_ec:
         title: "Environment vs economic growth: Economic growth"
         description_short: '% of respondents choosing option B when asked "Here are two statements people sometimes make when discussing the environment and economic growth. Which of them comes closer to your own point of view? A. Protecting the environment should be given priority, even if it causes slower economic growth and some loss of jobs B. Economic growth and creating jobs should be the top priority, even if the environment suffers to some extent"'
         display:
@@ -1040,7 +1040,7 @@ tables:
         presentation:
           title_public: "Environment vs economic growth: Missing"
 
-      income_equality:
+      equality_eq_ineq:
         title: "Income equality: Incomes should be made more equal"
         description_short: '% of respondents replying in a scale from 1 to 4 when asked "Now I would like you to tell me your views on various issues. How would you place your views on this scale? 1 means you agree completely with the statement on the left; 10 means you agree completely with the statement on the right; and if your views fall somewhere in between, you can choose any number in between." in the statement "Incomes should be made more equal vs There should be greater incentives for individual effort".'
         display:
@@ -1048,7 +1048,7 @@ tables:
           <<: *common-display
         presentation:
           title_public: "Income equality: Incomes should be made more equal"
-      neutral_about_equality:
+      neutral_eq_ineq:
         title: "Income equality: Neutral"
         description_short: '% of respondents replying "5" when asked "Now I would like you to tell me your views on various issues. How would you place your views on this scale? 1 means you agree completely with the statement on the left; 10 means you agree completely with the statement on the right; and if your views fall somewhere in between, you can choose any number in between." in the statement "Incomes should be made more equal vs There should be greater incentives for individual effort".'
         display:
@@ -1056,7 +1056,7 @@ tables:
           <<: *common-display
         presentation:
           title_public: "Income equality: Neutral"
-      income_inequality:
+      inequality_eq_ineq:
         title: "Income equality: There should be greater incentives for individual effort"
         description_short: '% of respondents replying in a scale from 6 to 10 when asked "Now I would like you to tell me your views on various issues. How would you place your views on this scale? 1 means you agree completely with the statement on the left; 10 means you agree completely with the statement on the right; and if your views fall somewhere in between, you can choose any number in between." in the statement "Incomes should be made more equal vs There should be greater incentives for individual effort".'
         display:
@@ -1064,7 +1064,7 @@ tables:
           <<: *common-display
         presentation:
           title_public: "Income equality: There should be greater incentives for individual effort"
-      dont_know_income_equality:
+      dont_know_eq_ineq:
         title: "Income equality: Don't know"
         description_short: '% of respondents replying "don‘t know" when asked "Now I would like you to tell me your views on various issues. How would you place your views on this scale? 1 means you agree completely with the statement on the left; 10 means you agree completely with the statement on the right; and if your views fall somewhere in between, you can choose any number in between." in the statement "Incomes should be made more equal vs There should be greater incentives for individual effort".'
         display:
@@ -1072,7 +1072,7 @@ tables:
           <<: *common-display
         presentation:
           title_public: "Income equality: Don't know"
-      missing_income_equality:
+      missing_eq_ineq:
         title: "Income equality: Missing"
         description_short: '% of answers classified as No answer, not applicable, not asked in survey o missing: other for the question "Now I would like you to tell me your views on various issues. How would you place your views on this scale? 1 means you agree completely with the statement on the left; 10 means you agree completely with the statement on the right; and if your views fall somewhere in between, you can choose any number in between." in the statement "Incomes should be made more equal vs There should be greater incentives for individual effort".'
         display:
@@ -1080,7 +1080,7 @@ tables:
           <<: *common-display
         presentation:
           title_public: "Income equality: Missing"
-      income_equality_avg_score:
+      avg_score_eq_ineq:
         title: "Income equality: Average score"
         description_short: 'Average score of respondents when asked "Now I would like you to tell me your views on various issues. How would you place your views on this scale? 1 means you agree completely with the statement on the left; 10 means you agree completely with the statement on the right; and if your views fall somewhere in between, you can choose any number in between." in the statement "Incomes should be made more equal vs There should be greater incentives for individual effort".'
         display:

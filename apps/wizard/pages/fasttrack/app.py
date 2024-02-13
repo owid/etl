@@ -13,6 +13,7 @@ from apps.wizard import utils as wizard_utils
 from apps.wizard.pages.fasttrack.load import load_existing_sheets_from_snapshots
 from apps.wizard.pages.fasttrack.process import processing_part_1, processing_part_2
 from apps.wizard.pages.fasttrack.utils import (
+    FERNET_KEY,
     IMPORT_GSHEET,
     LOCAL_CSV,
     UPDATE_GSHEET,
@@ -25,6 +26,18 @@ from etl.paths import DAG_DIR
 # Page config
 st.set_page_config(page_title="Wizard: Import data via Fast-Track", page_icon="🪄")
 add_indentation()
+
+
+# Reset states
+def reset_states() -> None:
+    """Reset states so nothing is executed (only first form is shown)."""
+    set_states(
+        {
+            "to_be_submitted": False,
+            "to_be_submitted_confirmed_1": False,
+            "to_be_submitted_confirmed_2": False,
+        }
+    )
 
 
 # CONFIG
@@ -110,6 +123,9 @@ for option, option_params in IMPORT_OPTIONS.items():
 # CREATE AND SHOW THE FORM
 ##########################################################
 with st.form("fasttrack-form"):
+    existing_google_sheet = None
+    placeholder_for_existing_google_sheet = None
+
     # Import field
     if import_method == IMPORT_GSHEET:
         st.text_input(
@@ -119,13 +135,7 @@ with st.form("fasttrack-form"):
         )
     elif import_method == UPDATE_GSHEET:
         options = load_existing_sheets_from_snapshots()
-        st.selectbox(
-            label="Existing Google Sheets",
-            options=options,
-            format_func=lambda x: x["label"],
-            help="Selected sheet will be used if you don't specify Google Sheets URL.",
-            key="dataset_uri",
-        )
+        placeholder_for_existing_google_sheet = st.empty()
     else:
         st.file_uploader(
             label="Upload Local CSV",
@@ -139,11 +149,8 @@ with st.form("fasttrack-form"):
         value=True,
         key="infer_metadata",
     )
-    st.checkbox(
-        label="Make dataset private (your metadata will be still public!)",
-        value=st.session_state.get("is_private", False),
-        key="is_private",
-    )
+
+    placeholder_for_private = st.empty()
 
     submitted = st.form_submit_button(
         "Submit",
@@ -158,6 +165,43 @@ with st.form("fasttrack-form"):
         ),
     )
 
+# These need to be defined outside of the form to be able to make the `is_public` checkbox dependent
+# on the `existing_google_sheet` value
+if import_method == UPDATE_GSHEET:
+    if placeholder_for_existing_google_sheet is None:
+        raise ValueError("placeholder_for_existing_google_sheet is None. This was not expected.")
+    else:
+        with placeholder_for_existing_google_sheet:
+            existing_google_sheet = st.selectbox(
+                label="Existing Google Sheets",
+                options=options,  # type: ignore
+                format_func=lambda x: x["label"],
+                help="Selected sheet will be used if you don't specify Google Sheets URL.",
+                key="dataset_uri",
+                on_change=reset_states,
+            )
+
+with placeholder_for_private:
+    if existing_google_sheet:
+        default_is_public = existing_google_sheet["is_public"]
+    else:
+        default_is_public = True
+
+    st.checkbox(
+        label="Make dataset private (your metadata will be still public!)",
+        value=not default_is_public,
+        key="fasttrack_is_private",
+        on_change=reset_states,
+    )
+
+if (FERNET_KEY is None) and (st.session_state.fasttrack_is_private):
+    if import_method == UPDATE_GSHEET:
+        st.error(
+            "FASTTRACK_SECRET_KEY not found in environment variables. Not using encryption. Therefore, won't be able to decrypt the existing Google Sheets URL for private datasets!"
+        )
+        st.stop()
+    else:
+        st.warning("FASTTRACK_SECRET_KEY not found in environment variables. Not using encryption.")
 
 ##########################################################
 # USER CLICKS ON SUBMIT
@@ -177,7 +221,7 @@ if st.session_state.to_be_submitted:
             import_method=import_method,
             dataset_uri=st.session_state["dataset_uri"],
             infer_metadata=st.session_state["infer_metadata"],
-            is_private=st.session_state["is_private"],
+            is_private=st.session_state["fasttrack_is_private"],
             _status=status_main,
         )
 

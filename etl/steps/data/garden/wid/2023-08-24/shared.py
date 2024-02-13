@@ -38,7 +38,7 @@ var_dict = {
     },
     "p50p90_share": {
         "title": "Middle 40% - Share",
-        "description": "This is the income or wealth of the middle 40% as a share of total income or wealth. The middle 40% is the share of the population whose income or consumption lies between the poorest 50% and the richest 10%.",
+        "description": "This is the {inc_cons_dict[wel]['type']} {inc_cons_dict[wel]['verb']} by the middle 40%. The middle 40% is the share of the population whose {inc_cons_dict[wel]['type']} lies between the poorest 50% and the richest 10%.",
         "unit": "%",
         "short_unit": "%",
         "numDecimalPlaces": 1,
@@ -115,7 +115,7 @@ var_dict = {
     },
 }
 
-# Details for each consumption or income variable
+# Details for each income variable
 inc_cons_dict = {
     "pretax": {
         "name": "Pretax",
@@ -252,8 +252,10 @@ def add_metadata_vars(tb_garden: Table) -> Table:
                     # Create metadata for these variables
                     tb_garden[col_name].metadata = var_metadata_income(var, wel, ext)
                     # Replace income/wealth words according to `wel`
-                    tb_garden[col_name].metadata.description = tb_garden[col_name].metadata.description.replace(
-                        "{inc_cons_dict[wel]['type']}", str(inc_cons_dict[wel]["type"])
+                    tb_garden[col_name].metadata.description = (
+                        tb_garden[col_name]
+                        .metadata.description.replace("{inc_cons_dict[wel]['type']}", str(inc_cons_dict[wel]["type"]))
+                        .replace("{inc_cons_dict[wel]['verb']}", str(inc_cons_dict[wel]["verb"]))
                     )
 
                 for rel in rel_dict:
@@ -311,11 +313,11 @@ def var_metadata_income(var, wel, ext) -> VariableMeta:
             title=f"{var_dict[var]['title']} ({inc_cons_dict[wel]['name']}) ({extrapolation_dict[ext]})",
             description=f"""{var_dict[var]['description']}
 
-            {inc_cons_dict[wel]['description']}
+{inc_cons_dict[wel]['description']}
 
-            {ppp_description}
+{ppp_description}
 
-            {additional_description}""",
+{additional_description}""",
             unit=var_dict[var]["unit"],
             short_unit=var_dict[var]["short_unit"],
         )
@@ -329,9 +331,9 @@ def var_metadata_income(var, wel, ext) -> VariableMeta:
             title=f"{var_dict[var]['title']} ({inc_cons_dict[wel]['name']}) ({extrapolation_dict[ext]})",
             description=f"""{var_dict[var]['description']}
 
-            {inc_cons_dict[wel]['description']}
+{inc_cons_dict[wel]['description']}
 
-            {additional_description}""",
+{additional_description}""",
             unit=var_dict[var]["unit"],
             short_unit=var_dict[var]["short_unit"],
         )
@@ -352,9 +354,9 @@ def var_metadata_income_percentiles(var, wel, pct, ext) -> VariableMeta:
             title=f"{pct_dict[pct]['decile9']} - {var_dict[var]['title']} ({inc_cons_dict[wel]['name']}) ({extrapolation_dict[ext]})",
             description=f"""{var_dict[var]['description']}
 
-            {inc_cons_dict[wel]['description']}
+{inc_cons_dict[wel]['description']}
 
-            {ppp_description}
+{ppp_description}
 
             {additional_description}""",
             unit=var_dict[var]["unit"],
@@ -370,11 +372,11 @@ def var_metadata_income_percentiles(var, wel, pct, ext) -> VariableMeta:
             title=f"{pct_dict[pct]['decile10']} - {var_dict[var]['title']} ({inc_cons_dict[wel]['name']}) ({extrapolation_dict[ext]})",
             description=f"""{var_dict[var]['description']}
 
-            {inc_cons_dict[wel]['description']}
+{inc_cons_dict[wel]['description']}
 
-            {ppp_description}
+{ppp_description}
 
-            {additional_description}""",
+{additional_description}""",
             unit=var_dict[var]["unit"],
             short_unit=var_dict[var]["short_unit"],
         )
@@ -389,9 +391,9 @@ def var_metadata_income_percentiles(var, wel, pct, ext) -> VariableMeta:
             title=f"{pct_dict[pct]['decile10']} - {var_dict[var]['title']} ({inc_cons_dict[wel]['name']}) ({extrapolation_dict[ext]})",
             description=f"""{var_dict[var]['description']}
 
-            {inc_cons_dict[wel]['description']}
+{inc_cons_dict[wel]['description']}
 
-            {additional_description}""",
+{additional_description}""",
             unit=var_dict[var]["unit"],
             short_unit=var_dict[var]["short_unit"],
         )
@@ -407,11 +409,11 @@ def var_metadata_income_relative(var, wel, rel, ext) -> VariableMeta:
         title=f"{rel_dict[rel]} - {var_dict[var]['title']} ({inc_cons_dict[wel]['name']}) ({extrapolation_dict[ext]})",
         description=f"""{var_dict[var]['description']}
 
-        {inc_cons_dict[wel]['description']}
+{inc_cons_dict[wel]['description']}
 
-        {additional_description}
+{additional_description}
 
-        {relative_poverty_descritption}""",
+{relative_poverty_descritption}""",
         unit=var_dict[var]["unit"],
         short_unit=var_dict[var]["short_unit"],
     )
@@ -492,9 +494,9 @@ def var_metadata_distribution(var: str, ext: str) -> VariableMeta:
             title=f"Income or wealth {var_dict_distribution[var]['title'].lower()} ({extrapolation_dict[ext]})",
             description=f"""{var_dict_distribution[var]['description']}
 
-            {welfare_definitions}
+{welfare_definitions}
 
-            {additional_description}""",
+{additional_description}""",
             unit=var_dict_distribution[var]["unit"],
             short_unit=var_dict_distribution[var]["short_unit"],
         )
@@ -509,11 +511,11 @@ def var_metadata_distribution(var: str, ext: str) -> VariableMeta:
             title=f"{var_dict_distribution[var]['title']} income or wealth ({extrapolation_dict[ext]})",
             description=f"""{var_dict_distribution[var]['description']}
 
-            {welfare_definitions}
+{welfare_definitions}
 
-            {ppp_description}
+{ppp_description}
 
-            {additional_description}""",
+{additional_description}""",
             unit=var_dict_distribution[var]["unit"],
             short_unit=var_dict_distribution[var]["short_unit"],
         )

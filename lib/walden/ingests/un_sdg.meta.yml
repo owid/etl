@@ -1,9 +1,0 @@
-# note: other metadata fields not listed here are filled using metadata retrieved from the external source
-namespace: un_sdg
-short_name: un_sdg
-source_name: United Nations
-url: https://sdgs.un.org/goals
-file_extension: feather
-license_url: https://www.un.org/en/about-us/terms-of-use
-source_data_url: https://unstats.un.org/sdgapi/swagger/
-description: "The United Nations Sustainable Development Goal (SDG) dataset is the primary collection of data tracking progress towards the SDG indicators, compiled from officially-recognized international sources."
