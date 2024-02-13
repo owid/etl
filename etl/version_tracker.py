@@ -157,7 +157,7 @@ def _recursive_get_all_archivable_steps(steps_df: pd.DataFrame, unused_steps: Se
     new_unused_steps = {
         step
         for step in new_unused_steps
-        if (set(steps_df[steps_df["step"] == step]["all_usages"].item()) - unused_steps) == set()
+        if (set(steps_df[steps_df["step"] == step]["all_active_usages"].item()) - unused_steps) == set()
     }
 
     # Add them to the set of unused steps.
@@ -264,6 +264,8 @@ class VersionTracker:
         self.dag_all_reverse = reverse_graph(graph=self.dag_all)
         # Load dag of active steps.
         self.dag_active = load_dag(paths.DAG_FILE)
+        # Create a reverse dag (a dictionary where each item is step: set of usages) of active steps.
+        self.dag_active_reverse = reverse_graph(graph=self.dag_active)
         # Generate the dag of only archive steps.
         self.dag_archive = {step: self.dag_all[step] for step in self.dag_all if step not in self.dag_active}
         # List all unique steps that exist in the dag.
@@ -302,15 +304,21 @@ class VersionTracker:
 
         return dependencies
 
-    def get_all_step_dependencies(self, step: str) -> List[str]:
+    def get_all_step_dependencies(self, step: str, only_active: bool = False) -> List[str]:
         """Get all dependencies for a given step in the dag (including dependencies of dependencies)."""
-        dependencies = get_all_step_dependencies(dag=self.dag_all, step=step)
+        if only_active:
+            dependencies = get_all_step_dependencies(dag=self.dag_active, step=step)
+        else:
+            dependencies = get_all_step_dependencies(dag=self.dag_all, step=step)
 
         return dependencies
 
-    def get_all_step_usages(self, step: str) -> List[str]:
+    def get_all_step_usages(self, step: str, only_active: bool = False) -> List[str]:
         """Get all usages for a given step in the dag (including usages of usages)."""
-        dependencies = get_all_step_usages(dag_reverse=self.dag_all_reverse, step=step)
+        if only_active:
+            dependencies = get_all_step_usages(dag_reverse=self.dag_active_reverse, step=step)
+        else:
+            dependencies = get_all_step_usages(dag_reverse=self.dag_all_reverse, step=step)
 
         return dependencies
 
@@ -508,7 +516,13 @@ class VersionTracker:
         # Add relevant information about each step.
         steps_df["direct_dependencies"] = [self.get_direct_step_dependencies(step=step) for step in self.all_steps]
         steps_df["direct_usages"] = [self.get_direct_step_usages(step=step) for step in self.all_steps]
+        steps_df["all_active_dependencies"] = [
+            self.get_all_step_dependencies(step=step, only_active=True) for step in self.all_steps
+        ]
         steps_df["all_dependencies"] = [self.get_all_step_dependencies(step=step) for step in self.all_steps]
+        steps_df["all_active_usages"] = [
+            self.get_all_step_usages(step=step, only_active=True) for step in self.all_steps
+        ]
         steps_df["all_usages"] = [self.get_all_step_usages(step=step) for step in self.all_steps]
         steps_df["state"] = ["active" if step in self.all_active_steps else "archive" for step in self.all_steps]
         steps_df["role"] = ["usage" if step in self.dag_all else "dependency" for step in self.all_steps]
