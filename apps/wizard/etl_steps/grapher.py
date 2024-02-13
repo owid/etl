@@ -278,7 +278,7 @@ if submitted:
             DB_NAME=etl_grapher
             DB_PASS=***
             DB_PORT=3306
-            DB_HOST=owid-live-db
+            DB_HOST=prod_db
             ```
 
             and running
