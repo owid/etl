@@ -84,7 +84,7 @@ def sort_indicators(indicators: List[str]) -> List[str]:
 
 # Page config
 st.set_page_config(
-    page_title="Wizard: Harmonizer",
+    page_title="Wizard: Entity Harmonizer",
     page_icon="🪄",
 )
 st.title("🎶 Harmonizer")
