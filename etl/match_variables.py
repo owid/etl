@@ -303,6 +303,9 @@ def find_mapping_suggestions(
     - "old": Dictionary with old variable name and ID.
     - "new": pandas.DataFrame with new variable names, IDs, sorted by similarity to old variable name (according to matching_function).
 
+    It uses the similiarity function `similarity_name` to estimate the score between `missing_old` and `missing_new`. Note that regardless of the score,
+    if `missing_old` and `missing_new` have the same name, this will appear first with score 9999. (see _get_score internal function).
+
     Parameters
     ----------
     missing_old : pandas.DataFrame
