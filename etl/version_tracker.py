@@ -1,8 +1,3 @@
-#
-#  harmonize.py
-#  etl
-#
-
 import re
 from datetime import datetime, timedelta
 from pathlib import Path
