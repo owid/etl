@@ -242,7 +242,8 @@ class VersionTracker:
 
     """
 
-    # TODO: Decide about whether the following steps should be archived.
+    # List of steps known to be archivable, for which we don't want to see warnings.
+    # We keep them in the active dag for technical reasons.
     KNOWN_ARCHIVABLE_STEPS = [
         "data://explorers/dummy/2020-01-01/dummy",
         "data://garden/dummy/2020-01-01/dummy",
@@ -352,8 +353,6 @@ class VersionTracker:
         * It has a date version and it is older than a certain number of days (n_days_before_archiving).
         * It is not listed in the KNOWN_ARCHIVABLE_STEPS.
 
-        TODO: The old way to check for archivable steps doesn't seem to be working anymore, even though the unit tests
-          pass. Consider removing this check or fixing the check and units tests.
         Otherwise, a step is archivable if:
         * It is active.
         * There is a newer version of the same step in the active dag.
@@ -652,13 +651,14 @@ class VersionTracker:
 
     def check_that_all_active_steps_are_necessary(self) -> None:
         """Check that all active steps are needed in the dag; if not, raise an informative warning."""
-        # Find all active steps that can safely be archived.
-        unused_data_steps = self.get_all_archivable_steps()
-        self._log_warnings_and_errors(
-            message="Some active steps are not used and can safely be archived:",
-            list_affected=unused_data_steps,
-            warning_or_error="warning",
-        )
+        if self.warn_on_archivable:
+            # Find all active steps that can safely be archived.
+            unused_data_steps = self.get_all_archivable_steps()
+            self._log_warnings_and_errors(
+                message="Some active steps are not used and can safely be archived:",
+                list_affected=unused_data_steps,
+                warning_or_error="warning",
+            )
 
     def check_that_all_steps_have_a_script(self) -> None:
         """Check that all steps have code.
@@ -705,11 +705,10 @@ class VersionTracker:
         if self.connect_to_db:
             self.check_that_db_datasets_with_charts_are_not_archived()
             self.check_that_db_datasets_with_charts_have_active_etl_steps()
-        if self.warn_on_archivable:
-            # The following check will warn of archivable steps.
-            # Depending on whether connect_to_db is True or False, the criterion will be different.
-            # When False, the criterion is rather a proxy; True uses a more meaningful criterion.
-            self.check_that_all_active_steps_are_necessary()
+        # The following check will warn of archivable steps (if warn_on_archivable is True).
+        # Depending on whether connect_to_db is True or False, the criterion will be different.
+        # When False, the criterion is rather a proxy; True uses a more meaningful criterion.
+        self.check_that_all_active_steps_are_necessary()
 
     def get_backported_db_dataset_ids(self) -> List[int]:
         """Get list of ids of DB datasets that are used as backported datasets in active steps of ETL.
