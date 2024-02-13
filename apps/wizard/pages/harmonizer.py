@@ -87,7 +87,7 @@ st.set_page_config(
     page_title="Wizard: Entity Harmonizer",
     page_icon="🪄",
 )
-st.title("🎶 Harmonizer")
+st.title("🎶 Entity Harmonizer")
 add_indentation()
 
 # Set states
