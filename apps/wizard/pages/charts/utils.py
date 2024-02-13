@@ -1,11 +1,10 @@
 """Utils for chart revision tool."""
-from typing import Any, Dict, Literal, Optional, Tuple
+from typing import Any, Dict, Tuple
 
 import pandas as pd
 import streamlit as st
 from MySQLdb import OperationalError
 from structlog import get_logger
-from typing_extensions import Self
 
 from etl.chart_revision.v2.schema import get_schema_chart_config
 from etl.db import config, get_all_datasets, get_connection, get_variables_in_dataset

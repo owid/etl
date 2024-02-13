@@ -11,7 +11,7 @@ from apps.wizard.utils import set_states
 log = get_logger()
 
 # Set to True to select good initial default dataset selections
-DEBUG = False
+DEBUG = True
 dataset_old_debug = "Population (various sources, 2023.1)"
 dataset_new_debug = "Population (Experimental)"
 
@@ -73,14 +73,13 @@ def build_dataset_form(df: pd.DataFrame, similarity_names: Dict[str, Any]) -> "S
             )
 
     # Submit button
-    submitted_datasets = st.form_submit_button("Next", type="primary")
+    submitted_datasets = st.form_submit_button("Next (1/3)", type="primary", use_container_width=True)
 
     # If user clicks on next, proceed
     if submitted_datasets:
         set_states(
             {
                 "submitted_datasets": True,  # This means that the user has submitted the datasets
-                "show_submission_details": False,
                 "submitted_variables": False,
                 "submitted_revisions": False,
             },

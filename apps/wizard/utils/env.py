@@ -42,26 +42,24 @@ class OWIDEnv:
     def site(self) -> str | None:
         """Get site."""
         if self.env_type_id == "live":
-            return "ourworldindata.org"
+            return "https://ourworldindata.org"
         elif self.env_type_id == "staging":
-            return "staging.ourworldindata.org"
+            return "https://staging.ourworldindata.org"
         elif self.env_type_id == "local":
-            return "localhost:3030"
+            return "http://localhost:3030"
         elif self.env_type_id == "remote-staging":
-            return config.DB_HOST
+            return f"http://{config.DB_HOST}"
         return None
 
     @property
     def base_site(self) -> str | None:
         """Get site."""
         if self.env_type_id == "live":
-            return "owid.cloud"
+            return "https://owid.cloud"
         elif self.env_type_id == "staging":
-            return "staging.owid.cloud"
-        elif self.env_type_id == "local":
-            return "localhost:3030"
-        elif self.env_type_id == "remote-staging":
-            return config.DB_HOST
+            return "https://staging.owid.cloud"
+        elif self.env_type_id in ["local", "remote-staging"]:
+            return self.site
         return None
 
     @property
@@ -88,3 +86,10 @@ class OWIDEnv:
     def chart_admin_site(self: Self, chart_id: str | int) -> str:
         """Get chart admin url."""
         return f"{self.admin_site}/charts/{chart_id}/edit"
+
+    def chart_site(self, slug: str) -> str:
+        """Get chart url."""
+        return f"{self.site}/grapher/{slug}"
+
+
+OWID_ENV = OWIDEnv()

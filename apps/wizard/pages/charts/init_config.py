@@ -49,5 +49,4 @@ def set_session_states() -> None:
     st.session_state.submitted_datasets = st.session_state.get("submitted_datasets", False)
     st.session_state.submitted_variables = st.session_state.get("submitted_variables", False)
     st.session_state.submitted_revisions = st.session_state.get("submitted_revisions", False)
-    st.session_state.show_submission_details = st.session_state.get("show_submission_details", False)
     st.session_state.variable_mapping = st.session_state.get("variable_mapping", {})

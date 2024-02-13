@@ -12,7 +12,7 @@ from apps.wizard.pages.charts.variable_config import VariableConfig
 from apps.wizard.utils import set_states
 
 # from etl.chart_revision.v2.base import ChartUpdater
-from apps.wizard.utils.env import OWIDEnv
+from apps.wizard.utils.env import OWID_ENV
 from etl.chart_revision.v2.chartgpt import SYSTEM_PROMPT_TEXT, suggest_new_config_fields
 from etl.chart_revision.v2.core import (
     build_updaters_and_get_charts,
@@ -71,13 +71,13 @@ def create_submission(variable_config: VariableConfig, schema_chart_config: Dict
         with st.expander("🔎  Show variable id mapping"):
             st.write(variable_config.variable_mapping)
         with st.expander("🧙 Improve charts with chatGPT"):
-            st.warning("Charts that are not public at ourworldindata.org will not be rendered correctly.")
+            st.warning(f"Charts that are not public at {OWID_ENV.site} will not be rendered correctly.")
             for i, chart in enumerate(charts):  # type: ignore
                 slug = chart.config["slug"]
                 a, b = st.columns(2)
                 with a:
                     st.markdown(
-                        f"""<iframe src="https://ourworldindata.org/grapher/{slug}" loading="lazy" style="width: 100%; height: 600px; border: 0px none;"></iframe>""",
+                        f"""<iframe src="{OWID_ENV.chart_site(slug)}" loading="lazy" style="width: 100%; height: 600px; border: 0px none;"></iframe>""",
                         unsafe_allow_html=True,
                     )
                 with b:
@@ -110,7 +110,7 @@ def create_submission(variable_config: VariableConfig, schema_chart_config: Dict
     return submission
 
 
-def push_submission(submission_config: "SubmissionConfig", owid_env: OWIDEnv) -> None:
+def push_submission(submission_config: "SubmissionConfig") -> None:
     """Push submissions to the database."""
     # Create chart comparisons
     progress_text = "Submitting chart revisions..."
@@ -134,7 +134,7 @@ def push_submission(submission_config: "SubmissionConfig", owid_env: OWIDEnv) ->
         st.error(f"Something went wrong! {e}")
     else:
         st.balloons()
-        if owid_env.env_type_id == "unknown":
+        if OWID_ENV.env_type_id == "unknown":
             live_link = "https://owid.cloud/admin/suggested-chart-revisions/review"
             staging_link = "https://staging.owid.cloud/admin/suggested-chart-revisions/review"
             local_link = "http://localhost:3030/admin/suggested-chart-revisions/review"
@@ -152,7 +152,7 @@ def push_submission(submission_config: "SubmissionConfig", owid_env: OWIDEnv) ->
             )
         else:
             st.success(
-                f"Chart revisions submitted successfully! Now review these at the [approval tool]({owid_env.chart_approval_tool_url})!"
+                f"Chart revisions submitted successfully! Now review these at the [approval tool]({OWID_ENV.chart_approval_tool_url})!"
             )
 
 
