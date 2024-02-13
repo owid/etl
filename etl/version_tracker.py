@@ -347,13 +347,17 @@ class VersionTracker:
     def get_all_archivable_steps(self) -> List[str]:
         """Get all steps in the dag that can safely be moved to the archive.
 
+        NOTE: This function currently doesn't take into account whether a dataset is used in an explorer, or an external
+        repos (like energy-data, co2-data, poverty-data, or covid-19-data). Currently, there is no easy way to check for
+        those usages.
+
         If we have access to DB, a step is archivable is:
         * It is active.
         * It has no charts (including all indirect charts).
         * It has a date version and it is older than a certain number of days (n_days_before_archiving).
         * It is not listed in the KNOWN_ARCHIVABLE_STEPS.
 
-        Otherwise, a step is archivable if:
+        Otherwise, without access to DB, a step is archivable if:
         * It is active.
         * There is a newer version of the same step in the active dag.
         * It is either in channel meadow or garden.
