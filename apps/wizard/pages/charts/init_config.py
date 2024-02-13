@@ -8,7 +8,7 @@ st.session_state["step_name"] = "charts"
 APP_STATE = utils.AppState()
 
 
-def init_app():
+def init_app() -> None:
     st.set_page_config(
         page_title="Wizard: Chart Revisions Baker",
         layout="wide",

@@ -79,23 +79,23 @@ def ask_and_get_variable_mapping(search_form) -> "VariableConfig":
     # 2/ DISPLAY: Show the variable mapping form
     #
     ###########################################################################
-    # 2.1/ DISPLAY MAPPING SECTION
-    ## Header
-    st.header("Map variables")
-    st.markdown(
-        "Map variables from the old to the new dataset. The idea is that the variables in the new dataset will replace those from the old dataset in our charts. You can choose to ignore some variables if you want to.",
-    )
     if not variable_mapping_auto and not suggestions:
         st.warning(
             f"It looks as the dataset [{search_form.dataset_old_id}]({OWID_ENV.dataset_admin_site(search_form.dataset_old_id)}) has no variable in use in any chart! Therefore, no mapping is needed."
         )
     else:
         with st.container(border=True):
+            # 2.1/ DISPLAY MAPPING SECTION
+            ## Header
+            st.header("Map variables")
+            st.markdown(
+                "Map variables from the old to the new dataset. The idea is that the variables in the new dataset will replace those from the old dataset in our charts. You can choose to ignore some variables if you want to.",
+            )
             # Column proportions per row (out of 1)
             cols = [0.43, 0.07, 0.38, 0.06, 0.06] if search_form.enable_explore_mode else [0.43, 0.07, 0.43, 0.07]
 
             #################################
-            # 2.1/ Header: Titles, links, general checkboxes
+            # 2.2/ Header: Titles, links, general checkboxes
             #################################
             grid_variables_header = grid(2, cols, [6, 1, 7])
             # Row 1
@@ -124,11 +124,12 @@ def ask_and_get_variable_mapping(search_form) -> "VariableConfig":
             IGNORE_ALL = grid_variables_header.checkbox(
                 "All",
                 help="Check to ignore all mappings.",
-                on_change=lambda x: set_states({"submitted_variables": False}),
+                on_change=lambda: set_states({"submitted_variables": False}),
+                key="ignore-all",
             )
 
             #################################
-            # 2.2/ Automatically mapped variables
+            # 2.3/ Automatically mapped variables
             #################################
             old_var_selectbox = []
             ignore_selectbox = []
@@ -190,7 +191,7 @@ def ask_and_get_variable_mapping(search_form) -> "VariableConfig":
                         )  # type: ignore
 
             #################################
-            # 2.3/ Manually mapped variables
+            # 2.4/ Manually mapped variables
             #################################
             if search_form.enable_explore_mode:
                 row_cols = len(suggestions) * [cols, 1]
@@ -259,7 +260,7 @@ def ask_and_get_variable_mapping(search_form) -> "VariableConfig":
                         )  # type: ignore
 
             #################################
-            # 2.4/ Submit button
+            # 2.5/ Submit button
             #################################
             # Form button
             st.button(
@@ -284,6 +285,7 @@ def ask_and_get_variable_mapping(search_form) -> "VariableConfig":
                     ignore_selectbox,
                 )
                 variable_config = VariableConfig(variable_mapping=variable_mapping)
+
     return variable_config
 
 
@@ -385,3 +387,26 @@ def plot_comparison_two_variables(df, variable_old, variable_new, var_id_to_disp
 
     # Show table
     st.dataframe(df_variables)
+
+
+def reset_variable_form() -> None:
+    """ "Reset variable form."""
+    # Create dictionary with checkboxes set to False
+    checks = {
+        str(k): False
+        for k in st.session_state.keys()
+        if str(k).startswith("auto-ignore-") or str(k).startswith("manual-ignore-")
+    }
+    # Create dictionary with toggles set to False
+    toggles = {
+        str(k): False
+        for k in st.session_state.keys()
+        if str(k).startswith("auto-explore-") or str(k).startswith("manual-explore-")
+    }
+    set_states(
+        {
+            # "ignore-all": False,
+            **checks,
+            **toggles,
+        }
+    )

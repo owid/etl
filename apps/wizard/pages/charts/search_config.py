@@ -6,6 +6,7 @@ import streamlit as st
 from pydantic import BaseModel
 from structlog import get_logger
 
+from apps.wizard.pages.charts.variable_config import reset_variable_form
 from apps.wizard.utils import set_states
 
 log = get_logger()
@@ -85,6 +86,7 @@ def build_dataset_form(df: pd.DataFrame, similarity_names: Dict[str, Any]) -> "S
             },
             logging=True,
         )
+        reset_variable_form()
 
     # Get IDs of datasets
     dataset_old_id = display_name_to_id_mapping[dataset_old]

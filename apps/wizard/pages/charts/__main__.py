@@ -8,7 +8,7 @@ The code is structured as follows:
 - `init_config.py`: Initial configuration of the app. This includes setting up the session states and other app settings.
 - `search_config.py`: Dataset search form. This is the first thing we ask the user to fill in. "Which dataset are you updating to which dataset?"
 - `variable_config.py`: Variable mapping form. Map variables from the old dataset to variables in the new dataset.
-- `submission.py`: Chart revision submission.
+- `submission.py`: Find out the charts affected by the submitted variable mapping. Create the submission.
 - `utils.py`: Utility functions.
 
 
@@ -16,7 +16,7 @@ We use various session state variables to control the flow of the app:
 
 - `submitted_datasets` [default False]: Whether the user has clicked on the first form (dataset form). Shows/hides the steps after the first form.
     - Set to True: When the user submits the first form (Old dataset -> New dataset)
-    - Set to False:
+    - Set to False: Never. Once is submitted, something will be shown below. This can be done here bc it is an actual form and changing its fields won't trigger re-runs!
 - `submitted_variables` [default False]: Whether the user has submitted the second form (variable mapping form). Controls the creation and preview of the chart revisions.
     - Set to True: When user submits variable mapping form.
     - Set to False: When user submits dataset form. When the user interacts with the variable form changing the mapping (i.e. ignore checkboxes, new variable selectboxes, but NOT the explore toggle)
@@ -82,18 +82,20 @@ with st.form("form-datasets"):
 #
 ##########################################################################################
 if st.session_state.submitted_datasets:
-    log.info(f"SEARCH FORM: {search_form}")
+    # log.info(f"SEARCH FORM: {search_form}")
     variable_config = ask_and_get_variable_mapping(search_form)
-    log.info(f"VARIABLE CONFIG (2): {variable_config}")
+    # log.info(f"VARIABLE CONFIG (2): {variable_config}")
 
 
 ##########################################################################################
 # 3 CHART REVISIONS BAKING
 #
-# TODO: add description
+# Once the variable mapping is done, we create the revisions. We store these under what we
+# call the "submission_config". This is a dataclass that holds the charts and updaters.
+#
 ##########################################################################################
 if st.session_state.submitted_datasets and st.session_state.submitted_variables:
-    log.info(f"VARIABLE CONFIG (3): {variable_config}")
+    # log.info(f"VARIABLE CONFIG (3): {variable_config}")
     if variable_config is not None:
         if variable_config.is_valid:
             submission_config = create_submission(variable_config, SCHEMA_CHART_CONFIG)
@@ -105,9 +107,15 @@ if st.session_state.submitted_datasets and st.session_state.submitted_variables:
 #
 # TODO: add description
 ##########################################################################################
-if st.session_state.submitted_datasets and st.session_state.submitted_revisions:
+if (
+    st.session_state.submitted_datasets
+    and st.session_state.submitted_variables
+    and st.session_state.submitted_revisions
+):
+    st.markdown("Entered last step, but submission is None?")
     if submission_config is not None:
         if submission_config.is_valid:
-            push_submission(submission_config)
+            st.success("Would submit the chart revisions here.")
+            # push_submission(submission_config)
         else:
             st.error("Something went wrong with the submission. Please try again. Report the error #004001")
