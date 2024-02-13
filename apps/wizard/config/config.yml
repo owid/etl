@@ -99,9 +99,9 @@ sections:
         entrypoint: pages/dataset_explorer.py
         emoji: "🔍"
         image_url: "https://upload.wikimedia.org/wikipedia/commons/c/c3/NGC_4414_%28NASA-med%29.jpg"
-      - title: "Harmonizer"
+      - title: "Entity Harmonizer"
         alias: harmonizer
-        description: "Harmonize column of table."
+        description: "Harmonize a column of a table."
         maintainer: "@lucas"
         entrypoint: pages/harmonizer.py
         emoji: "🎶"

@@ -83,7 +83,7 @@ def sort_indicators(indicators: List[str]) -> List[str]:
 
 
 # Page config
-st.title("🎶 Harmonizer")
+st.title("🎶 Entity Harmonizer")
 add_indentation()
 
 # Set states
