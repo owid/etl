@@ -14,27 +14,30 @@ UPDATE_GSHEET = "update_gsheet"
 LOCAL_CSV = "local_csv"
 
 
-def _encrypt(s: str) -> str:
-    fernet = _get_secret_key()
-    return fernet.encrypt(s.encode()).decode() if fernet else s
-
-
-def _decrypt(s: str) -> str:
-    fernet = _get_secret_key()
-    # content is not encrypted, this is to keep it backward compatible with old datasets
-    # that weren't using encryption
-    if "docs.google.com" in s:
-        return s
-    else:
-        return fernet.decrypt(s.encode()).decode() if fernet else s
-
-
 def _get_secret_key() -> Optional[Fernet]:
     secret_key = os.environ.get("FASTTRACK_SECRET_KEY")
     if not secret_key:
         log.warning("FASTTRACK_SECRET_KEY not found in environment variables. Not using encryption.")
         return None
     return Fernet(secret_key)
+
+
+FERNET_KEY = _get_secret_key()
+
+
+def _encrypt(s: str) -> str:
+    fernet = FERNET_KEY
+    return fernet.encrypt(s.encode()).decode() if fernet else s
+
+
+def _decrypt(s: str) -> str:
+    fernet = FERNET_KEY
+    # content is not encrypted, this is to keep it backward compatible with old datasets
+    # that weren't using encryption
+    if "docs.google.com" in s:
+        return s
+    else:
+        return fernet.decrypt(s.encode()).decode() if fernet else s
 
 
 def set_states(states_values: Dict[str, Any]):
