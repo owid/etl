@@ -1,0 +1,21 @@
+meta:
+  origin:
+    producer: Georgeson et al. (2017). Global disparity in the supply of commercial
+      weather and climate information services.
+    title: weather_spending_georgeson
+    citation_full: |-
+      Georgeson, L., Maslin, M., & Poessinouw, M. (2017). Global disparity in the supply of commercial weather and climate information services. Science Advances, 3(5), e1602632.
+    version_producer: Google Sheet
+    url_main: https://www.science.org/doi/10.1126/sciadv.1602632
+    url_download: |-
+      https://docs.google.com/spreadsheets/d/e/2PACX-1vTnfEl1Gxmsy41EzPd4PywKXeX4qNznWaqcG94Df38mq-IRd_o8tEdx_XR3eyTV8qmVau7hPF1IIMOB/pub?output=csv
+    date_accessed: '2024-02-13'
+  name: Weather forecast spending by income group (Georgeson et al. 2017)
+  description: Spending on weathering forecasting and services across income groups
+    in 2015.
+  license: {}
+wdir: ../../../data/snapshots/fasttrack/latest
+outs:
+- md5: 1c7a09b8bfd40288c6ba11190df957eb
+  size: 289
+  path: weather_spending_georgeson.csv
