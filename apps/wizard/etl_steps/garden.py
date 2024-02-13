@@ -37,7 +37,8 @@ dummy_values = {
     "namespace": "dummy",
     "version": utils.DATE_TODAY,
     "short_name": "dummy",
-    "meadow_version": utils.DATE_TODAY,
+    "meadow_version": "2020-01-01",
+    "topic_tags": ["Uncategorized"],
 }
 # Get list of available tags from DB (only those used as topic pages)
 with get_session() as session:
@@ -118,7 +119,7 @@ def _check_dataset_in_meadow(form: GardenForm) -> None:
     try:
         ds = Dataset(DATA_DIR / "meadow" / form.namespace / form.meadow_version / form.short_name)
         if form.short_name not in ds.table_names:
-            st.warning(f"Table `{form.short_name}` not found in Meadow dataset. Have you run ```etl {dataset_uri}```?")
+            st.warning(f"Table `{form.short_name}` not found in Meadow dataset. Available tables are {ds.table_names}.")
         else:
             st.success(f"Dataset ```{dataset_uri}``` found in Meadow!")
     except FileNotFoundError:
@@ -263,7 +264,7 @@ with form_widget.form("garden"):
         key="topic_tags",
         options=tag_list,
         placeholder="Choose a tag (or multiple)",
-        default=None,
+        default=dummy_values["topic_tags"] if APP_STATE.args.dummy_data else None,
     )
 
     st.markdown("#### Dependencies")
@@ -397,49 +398,76 @@ if submitted:
 
         # Display next steps
         with st.expander("## Next steps", expanded=True):
+            # 1/ Harmonize
+            st.markdown("####  1. Harmonize Country names")
+            st.markdown("Run it in your terminal:")
+            st.code(
+                f"poetry run etl-harmonize data/meadow/{form.namespace}/{form.meadow_version}/{form.short_name}/{form.short_name}.feather country etl/steps/data/garden/{form.namespace}/{form.version}/{form.short_name}.countries.json",
+                "bash",
+            )
+            st.markdown("Or run it on Wizard")
+            utils.st_page_link(
+                "harmonizer",
+                use_container_width=True,
+                help="You will leave this page, and the guideline text will be hidden.",
+            )
+
+            # 2/ Run etl step
+            st.markdown("####  2. Run ETL step")
+            st.markdown("After editing the code of your Garden step, run the following command:")
+            st.code(
+                f"poetry run etl data{private_suffix}://garden/{form.namespace}/{form.version}/{form.short_name} {'--private' if form.is_private else ''}",
+                "bash",
+            )
+            # 3/ Optional shit
+            with st.container(border=True):
+                st.markdown("**(Optional)**")
+                # A/ Playground notebook
+                st.markdown("##### Playground notebook")
+                st.markdown(
+                    f"Use the generated notebook `{notebook_path.relative_to(BASE_DIR)}` to examine the dataset output interactively."
+                )
+                # B/ Generate metadata
+                st.markdown("##### Generate metadata")
+                st.markdown(f"Generate metadata file `{form.short_name}.meta.yml` from your dataset with:")
+                st.code(
+                    f"poetry run etl-metadata-export data/garden/{form.namespace}/{form.version}/{form.short_name}",
+                    "bash",
+                )
+                st.markdown("then manual edit it and rerun the step again with")
+                st.code(
+                    f"poetry run etl data{private_suffix}://garden/{form.namespace}/{form.version}/{form.short_name} {'--private' if form.is_private else ''}",
+                    "bash",
+                )
+                # C/ Generate metadata
+                st.markdown("##### Organize the DAG")
+                st.markdown(f"Check the DAG `{dag_path}`.")
+
+            # 4/ Final steps
+            st.markdown("####  3. Pull request")
+            st.markdown("Create a pull request in [ETL](https://github.com/owid/etl), get it reviewed and merged.")
+
+            # D/ Load dataset from catalog
+            with st.container(border=True):
+                st.markdown("**(Optional)**")
+                st.markdown("##### Load dataset from catalog")
+                st.markdown(
+                    "Once your changes are merged, your steps will be run automatically by our server and published to the OWID catalog. Then it can be loaded by anyone using:"
+                )
+                st.code(
+                    f"""
+                from owid.catalog import find_one
+                tab = find_one(table="{form.short_name}", namespace="{form.namespace}", dataset="{form.short_name}")
+                print(tab.metadata)
+                print(tab.head())
+                """,
+                    "python",
+                )
+
+            # 5/ Push to Grapher
+            st.markdown("####  4. Push to Grapher")
             st.markdown(
-                f"""
-        1. Harmonize country names with the following command (assuming country field is called `country`). Check out a [short demo](https://drive.google.com/file/d/1tBFMkgOgy4MmB7E7NmfMlfa4noWaiG3t/view) of the tool
-
-            ```
-            poetry run etl-harmonize data/meadow/{form.namespace}/{form.meadow_version}/{form.short_name}/{form.short_name}.feather country etl/steps/data/garden/{form.namespace}/{form.version}/{form.short_name}.countries.json
-            ```
-
-            you can also add more countries manually there or to `{form.short_name}.country_excluded.json` file.
-
-        2. Run `etl` to generate the dataset
-
-            ```
-            poetry run etl data{private_suffix}://garden/{form.namespace}/{form.version}/{form.short_name} {"--private" if form.is_private else ""}
-            ```
-
-        2. (Optional) Generated notebook `{notebook_path.relative_to(BASE_DIR)}` can be used to examine the dataset output interactively.
-
-        3. (Optional) Generate metadata file `{form.short_name}.meta.yml` from your dataset with
-            ```
-            poetry run etl-metadata-export data/garden/{form.namespace}/{form.version}/{form.short_name}
-            ```
-            then manual edit it and rerun the step again with
-            ```
-            poetry run etl data{private_suffix}://garden/{form.namespace}/{form.version}/{form.short_name} {"--private" if form.is_private else ""}
-            ```
-            Note that origins are inherited from previous step (snapshot) and you don't have to repeat them.
-
-        4. (Optional) You can manually move steps from `dag/wizard.yml` to some other `dag/*.yml` if you feel like it belongs there. After you are happy with your code, run `make test` to find any issues.
-
-        5. Create a pull request in [ETL](https://github.com/owid/etl), get it reviewed and merged.
-
-        6. (Optional) Once your changes are merged, your steps will be run automatically by our server and published to the OWID catalog. Then it can be loaded by anyone using:
-
-            ```python
-            from owid.catalog import find_one
-            tab = find_one(table="{form.short_name}", namespace="{form.namespace}", dataset="{form.short_name}")
-            print(tab.metadata)
-            print(tab.head())
-            ```
-
-        7. If you are an internal OWID member and want to push data to our Grapher DB, continue to the grapher step or to explorers step.
-        """
+                "If you are an internal OWID member and want to push data to our Grapher DB, continue to the grapher step or to explorers step."
             )
 
         # User message

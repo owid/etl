@@ -10,7 +10,7 @@
 #
 # Your app should have the following properties:
 # - title (str): Title of the app. This will be shown in the home page and sidebar menu of Wizard.
-# - alias (str): [NOT WORKING ATM] Alias of the app. This is used if you want to directly access the app from the command line (e.g. `etl-wizard [alias]`).
+# - alias (str): [not needed in etl.steps] Alias of the app. This is used if you want to directly access the app from the command line (e.g. `etl-wizard [alias]`).
 # - description (str): Description of the app. This will be shown in the card of the app in the home page of Wizard.
 # - maintenaner (str): Slack handle of the person responsible for the app.
 # - entrypoint (str): Path to the main file of the app. This file should be the streamlit python script.
@@ -24,25 +24,21 @@ etl:
   steps:
     snapshot:
       title: "Snapshot"
-      alias: snapshot
       entrypoint: etl_steps/snapshot.py
       emoji: "1️⃣"
       image_url: "https://cdn.pixabay.com/photo/2014/10/16/09/15/lens-490806_1280.jpg"
     meadow:
       title: "Meadow"
-      alias: meadow
       entrypoint: etl_steps/meadow.py
       emoji: "2️⃣"
       image_url: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Blumenwiese_bei_Obermaiselstein05.jpg/1024px-Blumenwiese_bei_Obermaiselstein05.jpg"
     garden:
       title: "Garden"
-      alias: garden
       entrypoint: etl_steps/garden.py
       emoji: "3️⃣"
       image_url: "https://upload.wikimedia.org/wikipedia/commons/2/27/Butchart_gardens.JPG"
     grapher:
       title: "Grapher"
-      alias: grapher
       entrypoint: etl_steps/grapher.py
       emoji: "4️⃣"
       image_url: "https://pbs.twimg.com/media/EbHwdjwUcAEfen4?format=jpg&name=large"
@@ -103,4 +99,12 @@ sections:
         entrypoint: pages/dataset_explorer.py
         emoji: "🔍"
         image_url: "https://upload.wikimedia.org/wikipedia/commons/c/c3/NGC_4414_%28NASA-med%29.jpg"
+      - title: "Entity Harmonizer"
+        alias: harmonizer
+        description: "Harmonize a column of a table."
+        maintainer: "@lucas"
+        entrypoint: pages/harmonizer.py
+        emoji: "🎶"
+        image_url: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/C_triad.svg/2560px-C_triad.svg.png"
+
 
