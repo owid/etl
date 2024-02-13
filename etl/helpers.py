@@ -13,6 +13,7 @@ from typing import Any, Dict, Iterable, Iterator, List, Optional, Set, Union, ca
 from urllib.parse import urljoin
 
 import jsonref
+import numpy as np
 import pandas as pd
 import structlog
 import yaml
@@ -1111,6 +1112,14 @@ class VersionTracker:
             # Create a column with the number of charts affected (in any way possible) by each step.
             steps_df["n_charts"] = [len(chart_ids) for chart_ids in steps_df["all_chart_ids"]]
 
+            # Remove all those rows that correspond to DB datasets which:
+            # * Are archived.
+            # * Have no charts.
+            # * Have no ETL steps (they may have already been deleted).
+            steps_df = steps_df.drop(
+                steps_df[(steps_df["db_archived"]) & (steps_df["n_charts"] == 0) & (steps_df["kind"].isnull())].index
+            ).reset_index(drop=True)
+
         # Add columns with the list of forward and backwards versions for each step.
         steps_df = self._add_columns_with_different_step_versions(steps_df=steps_df)
 
@@ -1136,6 +1145,17 @@ class VersionTracker:
             self._steps_df = self._create_steps_df()
 
         return self._steps_df
+
+    @staticmethod
+    def _log_warnings_and_errors(message, list_affected, warning_or_error):
+        error_message = message
+        if len(list_affected) > 0:
+            for affected in list_affected:
+                error_message += f"\n    {affected}"
+            if warning_or_error == "error":
+                log.error(error_message)
+            elif warning_or_error == "warning":
+                log.warning(error_message)
 
     def _generate_error_for_missing_dependencies(self, missing_steps: Set[str]) -> str:
         error_message = "Missing dependencies in the dag:"
@@ -1173,11 +1193,11 @@ class VersionTracker:
         """Check that all active steps are needed in the dag; if not, raise an informative warning."""
         # Find all active steps that can safely be archived.
         unused_data_steps = self.get_all_archivable_steps()
-        if len(unused_data_steps) > 0:
-            error_message = "Some data steps are not used and can safely be archived:"
-            for unused_data_step in unused_data_steps:
-                error_message += f"\n    {unused_data_step}"
-            log.warning(error_message)
+        self._log_warnings_and_errors(
+            message="Some active steps are not used and can safely be archived:",
+            list_affected=unused_data_steps,
+            warning_or_error="warning",
+        )
 
     def check_that_all_steps_have_a_script(self) -> None:
         """Check that all steps have code.
@@ -1188,25 +1208,41 @@ class VersionTracker:
         """
         [self.get_path_to_script(step) for step in self.all_steps]
 
-    def check_that_all_db_datasets_have_a_step(self) -> None:
-        if self.connect_to_db:
-            pass
-            # TODO: Fix missing steps (that are in grapher db but not in ETL):
-            #  One of them was grapher/fasttrack/2023-08-07/animal_lives_per_kilogram
-            #  which is used in chart https://owid.cloud/admin/charts/7066/edit
-        else:
-            log.warning("Unable to connect to DB. Use `connect_to_db=True` to enable this operation.")
-
     def check_that_db_datasets_with_charts_are_not_archived(self) -> None:
         """Check that DB datasets with public charts are not archived (though they may be private)."""
-        archived_db_datasets = set(
-            self.steps_df[(self.steps_df["n_charts"] > 0) & (self.steps_df["db_archived"])]["step"]
+        archived_db_datasets = sorted(
+            set(self.steps_df[(self.steps_df["n_charts"] > 0) & (self.steps_df["db_archived"])]["step"])
         )
-        if len(archived_db_datasets) > 0:
-            error_message = "Some DB datasets are archived even though they have public charts. They should be public:"
-            for db_dataset in archived_db_datasets:
-                error_message += f"\n    {db_dataset}"
-            log.error(error_message)
+        self._log_warnings_and_errors(
+            message="Some DB datasets are archived even though they have public charts. They should be public:",
+            list_affected=archived_db_datasets,
+            warning_or_error="error",
+        )
+
+    def check_that_db_datasets_with_charts_have_active_etl_steps(self) -> None:
+        """Check that DB datasets with public charts have active ETL steps."""
+        missing_etl_steps = sorted(
+            set(
+                self.steps_df[(self.steps_df["n_charts"] > 0) & (self.steps_df["state"].isin([np.nan, "archive"]))][
+                    "step"
+                ]
+            )
+        )
+        self._log_warnings_and_errors(
+            message="Some DB datasets with public charts have no active ETL steps:",
+            list_affected=missing_etl_steps,
+            warning_or_error="error",
+        )
+
+    def apply_sanity_checks(self) -> None:
+        """Apply all sanity checks."""
+        self.check_that_active_dependencies_are_defined()
+        self.check_that_active_dependencies_are_not_archived()
+        self.check_that_all_active_steps_are_necessary()
+        self.check_that_all_steps_have_a_script()
+        if self.connect_to_db:
+            self.check_that_db_datasets_with_charts_are_not_archived()
+            self.check_that_db_datasets_with_charts_have_active_etl_steps()
 
     def get_backported_db_dataset_ids(self) -> List[int]:
         """Get list of ids of DB datasets that are used as backported datasets in active steps of ETL.
@@ -1222,15 +1258,6 @@ class VersionTracker:
         )
 
         return backported_dataset_ids
-
-    def apply_sanity_checks(self) -> None:
-        """Apply all sanity checks."""
-        self.check_that_active_dependencies_are_defined()
-        self.check_that_active_dependencies_are_not_archived()
-        self.check_that_all_active_steps_are_necessary()
-        self.check_that_all_steps_have_a_script()
-        if self.connect_to_db:
-            self.check_that_db_datasets_with_charts_are_not_archived()
 
 
 def run_version_tracker_checks():
