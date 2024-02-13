@@ -1,6 +1,31 @@
 """Streamlit-based tool for chart revision baker.
 
 Run as `wizard charts` or python -m wizard.pages.charts
+
+The code is structured as follows:
+
+- `__main__.py`: The entrypoint to the app. This is what gets first rendered. From here, we call the rest of the submodules.
+- `init_config.py`: Initial configuration of the app. This includes setting up the session states and other app settings.
+- `search_config.py`: Dataset search form. This is the first thing we ask the user to fill in. "Which dataset are you updating to which dataset?"
+- `submission.py`: Chart revision submission.
+- `variable_config.py`: Variable mapping form.
+- `utils.py`: Utility functions.
+
+
+We use various session state variables to control the flow of the app:
+
+- `submitted_datasets` [default False]: Shows/hides the steps after the first form
+    - Set to True: When the user submits the first form (Old dataset -> New dataset)
+    - Set to False:
+- `submitted_variables` [default False]: Whether the user has submitted the variable mapping.
+    - Set to True:
+    - Set to False:
+- `submitted_revisions` [default False]: Whether the user has submitted the chart revisions.
+    - Set to True:
+    - Set to False:
+- `show_submission_details` [default False]: Whether the user has clicked on "Show submission details" button.
+    - Set to True:
+    - Set to False:
 """
 
 import streamlit as st
@@ -9,8 +34,9 @@ from structlog import get_logger
 from apps.wizard.pages.charts.init_config import init_app, set_session_states
 from apps.wizard.pages.charts.search_config import build_dataset_form
 from apps.wizard.pages.charts.submission import create_submission, push_submission
-from apps.wizard.pages.charts.utils import OWIDEnv, get_datasets, get_schema
+from apps.wizard.pages.charts.utils import get_datasets, get_schema
 from apps.wizard.pages.charts.variable_config import ask_and_get_variable_mapping
+from apps.wizard.utils.env import OWIDEnv
 from etl.match_variables import SIMILARITY_NAMES
 
 # logger
@@ -54,12 +80,16 @@ with st.form("form-datasets"):
 ##########################################################################################
 # 2 VARIABLE MAPPING
 #
-# TODO: add description
+# We present the user with the variables from the old and the new dataset.
+# The user is asked to define the mapping between these, so that we can create the submission.
+#
 ##########################################################################################
 if st.session_state.submitted_datasets:
     log.info(f"SEARCH FORM: {search_form}")
     variable_config = ask_and_get_variable_mapping(search_form, owid_env)
     log.info(f"VARIABLE CONFIG (2): {variable_config}")
+
+
 ##########################################################################################
 # 3 CHART REVISIONS BAKING
 #

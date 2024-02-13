@@ -1,6 +1,6 @@
 """Concerns the second stage of wizard charts, when the variable mapping is constructed."""
 import uuid
-from typing import Any, Dict, List, Literal
+from typing import Any, Dict, List
 
 import pandas as pd
 import streamlit as st
@@ -8,26 +8,27 @@ from pydantic import BaseModel
 from structlog import get_logger
 
 from apps.backport.datasync.data_metadata import variable_data_df_from_s3
-from apps.wizard.pages.charts.utils import OWIDEnv, get_variables_from_datasets
+from apps.wizard.pages.charts.utils import get_variables_from_datasets
+from apps.wizard.utils.env import OWIDEnv
 from etl.db import get_engine
 from etl.match_variables import find_mapping_suggestions, preliminary_mapping
 
 # Logger
 log = get_logger()
 
-RADIO_OPTIONS = {
-    0: "No (Recommended)",
-    1: "Only if it is a small dataset update",
-    2: "Yes",
-}
-ignore_all = False
+# Ignore all variables (boxes are checked for all variables, hence no variable will be considered in the variable mapping)
+IGNORE_ALL = False
 
 
 def ask_and_get_variable_mapping(search_form, owid_env: OWIDEnv) -> "VariableConfig":
     """Ask and get variable mapping."""
     variable_config = VariableConfig()
 
-    # 2.1 INTERNAL PROCESSING
+    ###########################################################################
+    # 1/ PROCESSING: Get variables, find similarities and suggestions, etc.
+    ###########################################################################
+
+    # 1.1/ INTERNAL PROCESSING
     # Get variables from old and new datasets
     old_variables, new_variables = get_variables_from_datasets(
         search_form.dataset_old_id,
@@ -35,12 +36,14 @@ def ask_and_get_variable_mapping(search_form, owid_env: OWIDEnv) -> "VariableCon
         show_new_not_in_old=False,
     )
 
-    # Build display mappings: id -> display_name
-    df = pd.concat([old_variables, new_variables], ignore_index=True)
+    # 1.2/ Build display mappings: id -> display_name
+    ## This is to display the variables in the selectboxes with format "[id] name"
+    df = pd.concat([old_variables, new_variables], ignore_index=True)  # .drop_duplicates()
     df["display_name"] = "[" + df["id"].astype(str) + "] " + df["name"]
     variable_id_to_display = df.set_index("id")["display_name"].to_dict()
 
-    # Get auto variable mapping (if mapping by identical name is enabled)
+    # 1.3/ Get auto variable mapping (if mapping by identical name is enabled)
+    ## Note that when the old and new datasets are the same, this option is disabled. Otherwise all variables are mapped (which probably does not make sense?)
     if search_form.dataset_old_id == search_form.dataset_new_id:
         match_identical_vars = False
     else:
@@ -54,11 +57,14 @@ def ask_and_get_variable_mapping(search_form, owid_env: OWIDEnv) -> "VariableCon
         variable_mapping_auto = mapping.set_index("id_old")["id_new"].to_dict()
     else:
         variable_mapping_auto = {}
-    # Get remaining mapping suggestions
+
+    # 1.4/ Get remaining mapping suggestions
+    # This is for those variables which couldn't be automatically mapped
     suggestions = find_mapping_suggestions(missing_old, missing_new, search_form.similarity_function_name)  # type: ignore
-    # Sort by max similarity: First suggestion is that one that has the highest similarity score with any of its suggested new vars
+    # Sort by max similarity: First suggestion is that one that has the highest similarity score with any of its suggested new vars.
     suggestions = sorted(suggestions, key=lambda x: x["new"]["similarity"].max(), reverse=True)
 
+    # [OPTIONAL] EXPLORE MODE
     # Get data points
     if search_form.enable_explore_mode:
         with st.spinner(
@@ -66,17 +72,11 @@ def ask_and_get_variable_mapping(search_form, owid_env: OWIDEnv) -> "VariableCon
         ):
             df_data = get_variable_data_cached(list(set(old_variables["id"]) | set(new_variables["id"])))
 
-    # with st.expander("👷  Mapping details (debugging)"):
-    #     st.subheader("Variable mapping")
-    #     st.markdown("##### Automatically mapped variables")
-    #     st.write(variable_mapping_auto)
-    #     st.markdown("##### Variables that need manual mapping from the user.")
-    #     for suggestion in suggestions:
-    #         st.markdown(f"##### Variable #{suggestion['old']['id_old']}")
-    #         st.write(suggestion["old"])
-    #         st.write(suggestion["new"].head(5).to_dict())
-
-    # 2.2 DISPLAY MAPPING SECTION
+    ###########################################################################
+    # 2/ DISPLAY: Show the variable mapping form
+    ###########################################################################
+    # 2.1/ DISPLAY MAPPING SECTION
+    ## Header
     st.header(
         "Map variables",
         help="Map variables from the old to the new dataset. The idea is that the variables in the new dataset will replace those from the old dataset in our charts. You can choose to ignore some variables if you want to.",
@@ -96,10 +96,10 @@ def ask_and_get_variable_mapping(search_form, owid_env: OWIDEnv) -> "VariableCon
                 st.subheader("Old dataset")
                 col11, col12 = st.columns(col_1_widths)
                 with col11:
-                    st.caption(f"[Explore dataset]({owid_env.admin_url}/datasets/{search_form.dataset_old_id}/)")
+                    st.caption(f"[Explore dataset]({owid_env.admin_site}/datasets/{search_form.dataset_old_id}/)")
                 with col12:
                     st.caption("Ignore", help="Check to ignore this variable in the mapping.")
-                    ignore_all = st.checkbox(
+                    IGNORE_ALL = st.checkbox(
                         "All",
                         help="Check to ignore all mappings.",
                     )
@@ -107,7 +107,7 @@ def ask_and_get_variable_mapping(search_form, owid_env: OWIDEnv) -> "VariableCon
                 st.subheader("New dataset")
                 cols2 = st.columns(col_2_widths)
                 with cols2[0]:
-                    st.caption(f"[Explore dataset]({owid_env.admin_url}/datasets/{search_form.dataset_new_id}/)")
+                    st.caption(f"[Explore dataset]({owid_env.admin_site}/datasets/{search_form.dataset_new_id}/)")
                 with cols2[1]:
                     st.caption(
                         "Score",
@@ -140,7 +140,7 @@ def ask_and_get_variable_mapping(search_form, owid_env: OWIDEnv) -> "VariableCon
                             old_var_selectbox.append(element)
                         with cols_auto[1]:
                             element = st.checkbox(
-                                "Ignore", key=f"auto-ignore-{i}", label_visibility="collapsed", value=ignore_all
+                                "Ignore", key=f"auto-ignore-{i}", label_visibility="collapsed", value=IGNORE_ALL
                             )
                             ignore_selectbox.append(element)
                     with col_auto_2:
@@ -187,7 +187,7 @@ def ask_and_get_variable_mapping(search_form, owid_env: OWIDEnv) -> "VariableCon
                             old_var_selectbox.append(element)
                         with col_manual_12:
                             element = st.checkbox(
-                                "Ignore", key=f"manual-ignore-{i}", label_visibility="collapsed", value=ignore_all
+                                "Ignore", key=f"manual-ignore-{i}", label_visibility="collapsed", value=IGNORE_ALL
                             )
                             ignore_selectbox.append(element)
                     with col_manual_2:
@@ -219,22 +219,6 @@ def ask_and_get_variable_mapping(search_form, owid_env: OWIDEnv) -> "VariableCon
                     if search_form.enable_explore_mode and element_check:  # type: ignore
                         plot_comparison_two_variables(df_data, variable_old, element, variable_id_to_display)  # type: ignore
 
-            # Options
-            skip_slider_check = st.radio(
-                label="Review the time slider in charts",
-                options=RADIO_OPTIONS.keys(),
-                index=0,
-                help=(
-                    "### What is this?\n\n"
-                    "Review that the new selected timeline range is consistent with the new timeline range.\n\n"
-                    "To do this, we need to get the data values for *all* the variables involved (i.e. not only the variables "
-                    "being updated). This is a costly operation, and hence we recommend skipping whenever there are more than 50 variables involved.\n\n"
-                    "Note, also, that the time slider should almost never be updated. If set to a specific year (or range of years) we should"
-                    "assume that there is a good editorial reason for that. If set to 'earliest' or 'latest', the chart will be rendered with the new time range, so no need"
-                    "to update the time slider config field value."
-                ),
-                format_func=RADIO_OPTIONS.get,
-            )
             # Submission button
             submitted_variables = st.button("Next", type="primary")
             if submitted_variables or st.session_state.show_submission_details:
@@ -246,7 +230,7 @@ def ask_and_get_variable_mapping(search_form, owid_env: OWIDEnv) -> "VariableCon
                 )
                 # BUILD MAPPING
                 variable_mapping = _build_variable_mapping(old_var_selectbox, new_var_selectbox, ignore_selectbox)
-                variable_config = VariableConfig(variable_mapping=variable_mapping, skip_slider_check=skip_slider_check)
+                variable_config = VariableConfig(variable_mapping=variable_mapping)
             else:
                 st.session_state.submitted_variables = False
     return variable_config
@@ -255,30 +239,12 @@ def ask_and_get_variable_mapping(search_form, owid_env: OWIDEnv) -> "VariableCon
 class VariableConfig(BaseModel):
     is_valid: bool = False
     variable_mapping: Dict[int, int] = {}
-    skip_slider_check: Literal[0, 1, 2] = 0
 
     def __init__(self, **data: Any) -> None:
-        """Constructor."""
-        print(data)
-        if "variable_mapping" in data and "skip_slider_check" in data:
+        """Construct variable config object."""
+        if "variable_mapping" in data:
             data["is_valid"] = True
         super().__init__(**data)
-
-    @property
-    def skip_slider_check_limit(self):
-        match self.skip_slider_check:
-            # No review
-            case 0:
-                return -1
-            # Only review for small dataset updates (<50 variables involved)
-            case 1:
-                return 50
-            # Review all
-            case 2:
-                return 1e6
-            # No case? default to option 1
-            case _:
-                return 50
 
 
 def _build_variable_mapping(old_var_selectbox, new_var_selectbox, ignore_selectbox) -> Dict[int, int]:
@@ -320,7 +286,7 @@ def build_df_comparison_two_variables_cached(df, variable_old, variable_new, var
 
 
 # @st.cache_data(show_spinner=False)
-def plot_comparison_two_variables(df, variable_old, variable_new, var_id_to_display):
+def plot_comparison_two_variables(df, variable_old, variable_new, var_id_to_display) -> None:
     log.info("table: comparison of two variables")
     df_variables = build_df_comparison_two_variables_cached(df, variable_old, variable_new, var_id_to_display)
     # Show country filters
@@ -336,12 +302,3 @@ def plot_comparison_two_variables(df, variable_old, variable_new, var_id_to_disp
     st.dataframe(
         df_variables.style.background_gradient(cmap="OrRd", subset=["Relative difference (abs, %)"], vmin=0, vmax=20)
     )
-    # years = sorted(set(df_variables["year"]))
-    # year = st.select_slider('Year', years)
-    # df_variables_year = df_variables[df_variables["year"] == year]
-    # chart = alt.Chart(df_variables_year).mark_bar().encode(
-    #     x="diff",
-    #     y="entityName",
-    #     tooltip='entityName',
-    # ).interactive()
-    # st.altair_chart(chart, theme="streamlit", use_container_width=True)

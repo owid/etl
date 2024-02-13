@@ -8,11 +8,11 @@ from pydantic import BaseModel
 from structlog import get_logger
 
 import etl.grapher_model as gm
-
-# from etl.chart_revision.v2.base import ChartUpdater
-from apps.wizard.pages.charts.utils import OWIDEnv
 from apps.wizard.pages.charts.variable_config import VariableConfig
 from apps.wizard.utils import set_states
+
+# from etl.chart_revision.v2.base import ChartUpdater
+from apps.wizard.utils.env import OWIDEnv
 from etl.chart_revision.v2.chartgpt import SYSTEM_PROMPT_TEXT, suggest_new_config_fields
 from etl.chart_revision.v2.core import (
     build_updaters_and_get_charts,
@@ -41,7 +41,6 @@ def create_submission(variable_config: VariableConfig, schema_chart_config: Dict
                 updaters, charts = build_updaters_and_get_charts_cached(
                     variable_mapping=variable_config.variable_mapping,
                     schema_chart_config=schema_chart_config,
-                    skip_slider_check_limit=variable_config.skip_slider_check_limit,
                 )
             except (URLError, RemoteDisconnected) as e:
                 st.error(e.__traceback__)
@@ -54,7 +53,6 @@ def create_submission(variable_config: VariableConfig, schema_chart_config: Dict
             updaters, charts = build_updaters_and_get_charts_cached(
                 variable_mapping=st.session_state.variable_mapping,
                 schema_chart_config=schema_chart_config,
-                skip_slider_check_limit=variable_config.skip_slider_check_limit,
             )
         except (URLError, RemoteDisconnected) as e:
             st.error(e.__traceback__)
@@ -72,7 +70,7 @@ def create_submission(variable_config: VariableConfig, schema_chart_config: Dict
             st.info(f"""Number of charts to be updated: {num_charts}""")
         with st.expander("🔎  Show variable id mapping"):
             st.write(variable_config.variable_mapping)
-        with st.expander("📊  Show affected charts (before update)"):
+        with st.expander("🧙 Improve charts with chatGPT"):
             st.warning("Charts that are not public at ourworldindata.org will not be rendered correctly.")
             for i, chart in enumerate(charts):  # type: ignore
                 slug = chart.config["slug"]
@@ -159,7 +157,7 @@ def push_submission(submission_config: "SubmissionConfig", owid_env: OWIDEnv) ->
 
 
 @st.cache_data(show_spinner=False)
-def build_updaters_and_get_charts_cached(variable_mapping, schema_chart_config, skip_slider_check_limit):
+def build_updaters_and_get_charts_cached(variable_mapping, schema_chart_config):
     # st.write(variable_mapping)
     if not variable_mapping:
         msg_error = "No variables selected! Please select at least one variable."
@@ -167,7 +165,6 @@ def build_updaters_and_get_charts_cached(variable_mapping, schema_chart_config, 
     return build_updaters_and_get_charts(
         variable_mapping=variable_mapping,
         schema_chart_config=schema_chart_config,
-        skip_slider_check_limit=skip_slider_check_limit,
     )
 
 

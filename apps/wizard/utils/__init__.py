@@ -20,6 +20,7 @@ from cookiecutter.main import cookiecutter
 from MySQLdb import OperationalError
 from owid.catalog import Dataset
 from pydantic import BaseModel
+from structlog import get_logger
 from typing_extensions import Self
 
 from apps.wizard.config import PAGES_BY_ALIAS
@@ -37,6 +38,10 @@ from etl.paths import (
 )
 from etl.steps import DAG, load_dag
 
+# Logger
+log = get_logger()
+
+# Path to variable configs
 DAG_WIZARD_PATH = DAG_DIR / "wizard.yml"
 
 # Load latest dataset versions
@@ -680,9 +685,14 @@ def get_datasets_in_etl(
     return options
 
 
-def set_states(states_values: Dict[str, Any]) -> None:
-    """Set states from any key in dictionary."""
+def set_states(states_values: Dict[str, Any], logging: bool = False) -> None:
+    """Set states from any key in dictionary.
+
+    Set logging to true to log the state changes
+    """
     for key, value in states_values.items():
+        if logging:
+            print(f"{key}: {st.session_state[key]} -> {value}")
         st.session_state[key] = value
 
 
