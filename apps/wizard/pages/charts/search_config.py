@@ -41,7 +41,7 @@ def build_dataset_form(df: pd.DataFrame, similarity_names: Dict[str, Any]) -> "S
             label="Old dataset",
             options=df["display_name"],
             help="Dataset containing variables to be replaced in our charts.",
-            index=index_old if DEBUG else 0,  # Debugging
+            index=index_old if DEBUG else 0,  # type: ignore , Debugging
         )
     with col2:
         ## New dataset
@@ -49,7 +49,7 @@ def build_dataset_form(df: pd.DataFrame, similarity_names: Dict[str, Any]) -> "S
             label="New dataset",
             options=df["display_name"],
             help="Dataset contianinng the new variables. These will replace the old variables in our charts.",
-            index=index_new if DEBUG else 0,  # Debugging
+            index=index_new if DEBUG else 0,  # type: ignore , Debugging
         )
 
     # Parameters

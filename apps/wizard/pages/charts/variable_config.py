@@ -1,5 +1,4 @@
 """Concerns the second stage of wizard charts, when the variable mapping is constructed."""
-import uuid
 from typing import Any, Dict, List
 
 import pandas as pd
@@ -92,8 +91,7 @@ def ask_and_get_variable_mapping(search_form) -> "VariableConfig":
         )
     else:
         with st.container(border=True):
-            col_1_widths = [0.86, 0.14]
-            col_2_widths = [7, 1, 1] if search_form.enable_explore_mode else [0.86, 0.14]
+            # Column proportions per row (out of 1)
             cols = [0.43, 0.07, 0.38, 0.06, 0.06] if search_form.enable_explore_mode else [0.43, 0.07, 0.43, 0.07]
 
             #################################
@@ -184,9 +182,9 @@ def ask_and_get_variable_mapping(search_form) -> "VariableConfig":
                     ## Explore mode plot
                     with grid_variables_auto.container():
                         show_explore_df(
-                            df_data,
-                            variable_old,
-                            variable_new,
+                            df_data,  # type: ignore
+                            variable_old,  # type: ignore
+                            variable_new,  # type: ignore
                             variable_id_to_display,
                             element_check,
                         )  # type: ignore
@@ -253,7 +251,7 @@ def ask_and_get_variable_mapping(search_form) -> "VariableConfig":
                     ## Explore mode plot
                     with grid_variables_manual.container():
                         show_explore_df(
-                            df_data,
+                            df_data,  # type: ignore
                             variable_old_manual,
                             variable_new_manual,
                             variable_id_to_display,
