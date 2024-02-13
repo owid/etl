@@ -50,18 +50,21 @@ ADD_DAG_OPTIONS = [dag_not_add_option] + dag_files
 DATE_TODAY = dt.date.today().strftime("%Y-%m-%d")
 
 # Get current directory
-CURRENT_DIR = Path(__file__).parent
+CURRENT_DIR = Path(__file__).parent.parent
+
+# Wizard path
+WIZARD_DIR = APPS_DIR / "wizard"
 
 # Paths to cookiecutter files
-COOKIE_SNAPSHOT = APPS_DIR / "wizard" / "etl_steps" / "cookiecutter" / "snapshot"
-COOKIE_MEADOW = APPS_DIR / "wizard" / "etl_steps" / "cookiecutter" / "meadow"
-COOKIE_GARDEN = APPS_DIR / "wizard" / "etl_steps" / "cookiecutter" / "garden"
-COOKIE_GRAPHER = APPS_DIR / "wizard" / "etl_steps" / "cookiecutter" / "grapher"
+COOKIE_SNAPSHOT = WIZARD_DIR / "etl_steps" / "cookiecutter" / "snapshot"
+COOKIE_MEADOW = WIZARD_DIR / "etl_steps" / "cookiecutter" / "meadow"
+COOKIE_GARDEN = WIZARD_DIR / "etl_steps" / "cookiecutter" / "garden"
+COOKIE_GRAPHER = WIZARD_DIR / "etl_steps" / "cookiecutter" / "grapher"
 # Paths to markdown templates
-MD_SNAPSHOT = APPS_DIR / "wizard" / "etl_steps" / "markdown" / "snapshot.md"
-MD_MEADOW = APPS_DIR / "wizard" / "etl_steps" / "markdown" / "meadow.md"
-MD_GARDEN = APPS_DIR / "wizard" / "etl_steps" / "markdown" / "garden.md"
-MD_GRAPHER = APPS_DIR / "wizard" / "etl_steps" / "markdown" / "grapher.md"
+MD_SNAPSHOT = WIZARD_DIR / "etl_steps" / "markdown" / "snapshot.md"
+MD_MEADOW = WIZARD_DIR / "etl_steps" / "markdown" / "meadow.md"
+MD_GARDEN = WIZARD_DIR / "etl_steps" / "markdown" / "garden.md"
+MD_GRAPHER = WIZARD_DIR / "etl_steps" / "markdown" / "grapher.md"
 
 # PATH WIZARD CONFIG
 WIZARD_VARIABLES_CONFIG = BASE_DIR / ".wizard"
