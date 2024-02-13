@@ -7,3 +7,5 @@ steps:
     - data://garden/demography/2023-03-31/population
   data://grapher/wash/2024-01-06/who:
     - data://garden/wash/2024-01-06/who
+  data://explorers/wash/2024-01-06/who:
+    - data://garden/wash/2024-01-06/who

@@ -36,6 +36,13 @@ c:
     )
 
 
+def test_yaml_empty():
+    d = {
+        "a": "",
+    }
+    assert files.yaml_dump(d) == "a: ''\n"
+
+
 def test_checksum_file_regions(tmp_path):
     s = """
 - code: "FOO"
