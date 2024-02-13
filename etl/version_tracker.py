@@ -509,6 +509,58 @@ class VersionTracker:
 
         return steps_df
 
+    @staticmethod
+    def _add_info_from_db(steps_df: pd.DataFrame) -> pd.DataFrame:
+        steps_df = steps_df.copy()
+        # Fetch all info about datasets from the DB.
+        info_df = get_info_for_etl_datasets().rename(
+            columns={
+                "dataset_id": "db_dataset_id",
+                "dataset_name": "db_dataset_name",
+                "is_private": "db_private",
+                "is_archived": "db_archived",
+            },
+            errors="raise",
+        )
+        steps_df = pd.merge(
+            steps_df,
+            info_df[["step", "chart_ids", "db_dataset_id", "db_dataset_name", "db_private", "db_archived"]],
+            on="step",
+            how="outer",
+        )
+        # Fill missing values.
+        for column in ["chart_ids", "all_usages"]:
+            steps_df[column] = [row if isinstance(row, list) else [] for row in steps_df[column]]
+        for column in ["db_dataset_id", "db_dataset_name"]:
+            steps_df.loc[steps_df[column].isnull(), column] = None
+        for column in ["db_private", "db_archived"]:
+            steps_df[column] = steps_df[column].fillna(False)
+        # Create a dictionary step: chart_ids.
+        step_chart_ids = steps_df[["step", "chart_ids"]].set_index("step").to_dict()["chart_ids"]
+        # TODO: A step currently always appears in the list of direct dependencies. Consider removing it.
+        #   Alternatively, add it to the list of direct usages too.
+        # NOTE: Instead of this approach, an alternative would be to add grapher db datasets as steps of a different
+        #   channel (e.g. "db").
+        # Create a column with all chart ids of all dependencies of each step.
+        # To achieve that, for each step, sum the list of chart ids from all its usages to the list of chart ids of
+        # the step itself. Then create a sorted list of the set of all those chart ids.
+        steps_df["all_chart_ids"] = [
+            sorted(set(sum([step_chart_ids[usage] for usage in row["all_usages"]], step_chart_ids[row["step"]])))  # type: ignore
+            for _, row in steps_df.iterrows()
+        ]
+        # Create a column with the number of charts affected (in any way possible) by each step.
+        steps_df["n_charts"] = [len(chart_ids) for chart_ids in steps_df["all_chart_ids"]]
+
+        # Remove all those rows that correspond to DB datasets which:
+        # * Are archived.
+        # * Have no charts.
+        # * Have no ETL steps (they may have already been deleted).
+        steps_df = steps_df.drop(
+            steps_df[(steps_df["db_archived"]) & (steps_df["n_charts"] == 0) & (steps_df["kind"].isnull())].index
+        ).reset_index(drop=True)
+
+        return steps_df
+
     def _create_steps_df(self) -> pd.DataFrame:
         # Create a dataframe where each row correspond to one step.
         steps_df = pd.DataFrame({"step": self.all_steps.copy()})
@@ -532,53 +584,8 @@ class VersionTracker:
         steps_df = pd.merge(steps_df, self.step_attributes_df, on="step", how="left")
 
         if self.connect_to_db:
-            # TODO: Create a hidden function for all the following code.
-            # Fetch all info about datasets from the DB.
-            info_df = get_info_for_etl_datasets().rename(
-                columns={
-                    "dataset_id": "db_dataset_id",
-                    "dataset_name": "db_dataset_name",
-                    "is_private": "db_private",
-                    "is_archived": "db_archived",
-                },
-                errors="raise",
-            )
-            steps_df = pd.merge(
-                steps_df,
-                info_df[["step", "chart_ids", "db_dataset_id", "db_dataset_name", "db_private", "db_archived"]],
-                on="step",
-                how="outer",
-            )
-            # Fill missing values.
-            for column in ["chart_ids", "all_usages"]:
-                steps_df[column] = [row if isinstance(row, list) else [] for row in steps_df[column]]
-            for column in ["db_dataset_id", "db_dataset_name"]:
-                steps_df.loc[steps_df[column].isnull(), column] = None
-            for column in ["db_private", "db_archived"]:
-                steps_df[column] = steps_df[column].fillna(False)
-            # Create a dictionary step: chart_ids.
-            step_chart_ids = steps_df[["step", "chart_ids"]].set_index("step").to_dict()["chart_ids"]
-            # TODO: A step currently always appears in the list of direct dependencies. Consider removing it.
-            #   Alternatively, add it to the list of direct usages too.
-            # TODO: Instead of this approach, an alternative would be to add grapher db datasets as steps of a different
-            #   channel (e.g. "db"). But that would be a little bit more complicated for now.
-            # Create a column with all chart ids of all dependencies of each step.
-            # To achieve that, for each step, sum the list of chart ids from all its usages to the list of chart ids of
-            # the step itself. Then create a sorted list of the set of all those chart ids.
-            steps_df["all_chart_ids"] = [
-                sorted(set(sum([step_chart_ids[usage] for usage in row["all_usages"]], step_chart_ids[row["step"]])))  # type: ignore
-                for _, row in steps_df.iterrows()
-            ]
-            # Create a column with the number of charts affected (in any way possible) by each step.
-            steps_df["n_charts"] = [len(chart_ids) for chart_ids in steps_df["all_chart_ids"]]
-
-            # Remove all those rows that correspond to DB datasets which:
-            # * Are archived.
-            # * Have no charts.
-            # * Have no ETL steps (they may have already been deleted).
-            steps_df = steps_df.drop(
-                steps_df[(steps_df["db_archived"]) & (steps_df["n_charts"] == 0) & (steps_df["kind"].isnull())].index
-            ).reset_index(drop=True)
+            # Add info from DB.
+            steps_df = self._add_info_from_db(steps_df=steps_df)
 
         # Add columns with the list of forward and backwards versions for each step.
         steps_df = self._add_columns_with_different_step_versions(steps_df=steps_df)
