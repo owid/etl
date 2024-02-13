@@ -143,7 +143,7 @@ def _str_presenter(dumper: Any, data: Any) -> Any:
     # If there are multiple lines, or there is a line that is longer than 120 characters, use the literal style.
     # NOTE: Here the 120 is a bit arbitrary. This is the default length of our lines in the code, but once written
     # to YAML, the lines will be longer because of the indentation. So, we could use a smaller number here.
-    if (len(lines) > 1) or (max([len(line) for line in lines]) > 120):
+    if (len(lines) > 1) or (len(lines) > 0 and max([len(line) for line in lines]) > 120):
         return dumper.represent_scalar("tag:yaml.org,2002:str", data, style="|")
     else:
         return dumper.represent_scalar("tag:yaml.org,2002:str", data)

@@ -1,17 +1,4 @@
 steps:
-  # Life expectancy OMM
-  ## Meadow
-  data://meadow/papers/2022-11-04/riley_2005:
-    - walden://papers/2022-11-01/riley_2005
-  ## Garden
-  data://garden/papers/2022-11-04/riley_2005:
-    - data://meadow/papers/2022-11-04/riley_2005
-  data://garden/demography/2022-11-30/life_expectancy:
-    - data://garden/papers/2022-11-03/zijdeman_et_al_2015
-    - data://garden/papers/2022-11-04/riley_2005
-    - data://garden/un/2022-07-11/un_wpp
-    - data://garden/hmd/2022-11-04/life_tables
-    - data://garden/owid/latest/key_indicators
   # Population density
   data://garden/demography/2023-04-14/population_density:
     - data://garden/demography/2023-03-31/population
@@ -24,25 +11,3 @@ steps:
     - data://garden/hmd/2023-09-19/hmd
   data://grapher/demography/2023-09-29/gini_le:
     - data://garden/demography/2023-09-29/gini_le
-
-  ## Zijdeman
-  data://meadow/papers/2022-11-03/zijdeman_et_al_2015:
-    - walden://papers/2022-11-01/zijdeman_et_al_2015
-  data://garden/papers/2022-11-03/zijdeman_et_al_2015:
-    - data://meadow/papers/2022-11-03/zijdeman_et_al_2015
-
-  ## Riley
-  data://meadow/papers/2023-02-03/riley_2005:
-    - walden://papers/2022-11-01/riley_2005
-  data://garden/papers/2023-02-03/riley_2005:
-    - data://meadow/papers/2023-02-03/riley_2005
-
-  ## OMM
-  data://garden/demography/2023-02-03/life_expectancy:
-    - data://garden/papers/2022-11-03/zijdeman_et_al_2015
-    - data://garden/papers/2023-02-03/riley_2005
-    - data://garden/un/2022-07-11/un_wpp
-    - data://garden/hmd/2022-11-04/life_tables
-    - data://garden/owid/latest/key_indicators
-  data://grapher/demography/2022-11-30/life_expectancy:
-    - data://garden/demography/2023-02-03/life_expectancy
