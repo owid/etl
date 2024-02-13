@@ -1073,14 +1073,28 @@ class VersionTracker:
         if self.connect_to_db:
             # TODO: Create a hidden function for all the following code.
             # Fetch all info about datasets from the DB.
-            info_df = get_info_for_etl_datasets()
-            steps_df = pd.merge(
-                steps_df, info_df[["dataset_id", "dataset_name", "step", "chart_ids"]], on="step", how="outer"
+            info_df = get_info_for_etl_datasets().rename(
+                columns={
+                    "dataset_id": "db_dataset_id",
+                    "dataset_name": "db_dataset_name",
+                    "is_private": "db_private",
+                    "is_archived": "db_archived",
+                },
+                errors="raise",
             )
-            # Fill missing rows with empty lists.
-            # TODO: Should this be done for other columns too?
+            steps_df = pd.merge(
+                steps_df,
+                info_df[["step", "chart_ids", "db_dataset_id", "db_dataset_name", "db_private", "db_archived"]],
+                on="step",
+                how="outer",
+            )
+            # Fill missing values.
             for column in ["chart_ids", "all_usages"]:
                 steps_df[column] = [row if isinstance(row, list) else [] for row in steps_df[column]]
+            for column in ["db_dataset_id", "db_dataset_name"]:
+                steps_df.loc[steps_df[column].isnull(), column] = None
+            for column in ["db_private", "db_archived"]:
+                steps_df[column] = steps_df[column].fillna(False)
             # Create a dictionary step: chart_ids.
             step_chart_ids = steps_df[["step", "chart_ids"]].set_index("step").to_dict()["chart_ids"]
             # TODO: A step currently always appears in the list of direct dependencies. Consider removing it.
@@ -1183,6 +1197,17 @@ class VersionTracker:
         else:
             log.warning("Unable to connect to DB. Use `connect_to_db=True` to enable this operation.")
 
+    def check_that_db_datasets_with_charts_are_not_archived(self) -> None:
+        """Check that DB datasets with public charts are not archived (though they may be private)."""
+        archived_db_datasets = set(
+            self.steps_df[(self.steps_df["n_charts"] > 0) & (self.steps_df["db_archived"])]["step"]
+        )
+        if len(archived_db_datasets) > 0:
+            error_message = "Some DB datasets are archived even though they have public charts. They should be public:"
+            for db_dataset in archived_db_datasets:
+                error_message += f"\n    {db_dataset}"
+            log.error(error_message)
+
     def get_backported_db_dataset_ids(self) -> List[int]:
         """Get list of ids of DB datasets that are used as backported datasets in active steps of ETL.
 
@@ -1204,6 +1229,8 @@ class VersionTracker:
         self.check_that_active_dependencies_are_not_archived()
         self.check_that_all_active_steps_are_necessary()
         self.check_that_all_steps_have_a_script()
+        if self.connect_to_db:
+            self.check_that_db_datasets_with_charts_are_not_archived()
 
 
 def run_version_tracker_checks():
