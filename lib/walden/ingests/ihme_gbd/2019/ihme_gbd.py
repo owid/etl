@@ -73,8 +73,9 @@ import os
 import click
 import pandas as pd
 from owid.repack import repack_frame
-from owid.walden import add_to_catalog
 from structlog import get_logger
+
+from owid.walden import add_to_catalog
 
 log = get_logger()
 

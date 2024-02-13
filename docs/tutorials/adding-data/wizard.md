@@ -1,14 +1,15 @@
+!!! note
+    Wizard is currently [being developed](https://github.com/owid/owid-issues/issues/1365), so things might be different from what explained below.
+
 The wizard is an interactive web UI for setting up the different ETL steps. It creates the base files to help you
 create the recipe for a dataset.
-
-It builds on `walkthrough`, and is compatible with the latest metadata format.
 
 ## Get set up
 
 Before you begin, make sure you've set up the ETL as described in [Getting Started](../../getting-started/index.md).
 
 ## Wizard options
-The walkthrough currently supports the following stages:
+The Wizard currently supports the following stages:
 
 | Option      | Description                                                                                                   |
 | ----------- | ------------------------------------------------------------------------------------------------------------- |

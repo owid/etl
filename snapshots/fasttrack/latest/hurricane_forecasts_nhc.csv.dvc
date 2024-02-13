@@ -1,0 +1,19 @@
+meta:
+  origin:
+    producer: Hurricane forecasting error (National Hurricane Center, 2023)
+    title: hurricane_forecasts_nhc
+    citation_full: NHC (2023), National Hurricane Center Forecast Verification.
+    version_producer: Google Sheet
+    url_main: https://www.nhc.noaa.gov/verification/verify5.shtml
+    url_download: |-
+      https://docs.google.com/spreadsheets/d/e/2PACX-1vTICnsHZmDS07FBiNgp-ek3krJFCIPQupMGjqZjBba7Nwz9bUjf15vY9feeHgASuLZv8LRB3m68M5db/pub?output=csv
+    date_accessed: '2024-02-13'
+  name: Hurricane forecasting error (National Hurricane Center, 2023)
+  description: Track error of hurricanes and tropical cyclones from the National Hurricane
+    Center.
+  license: {}
+wdir: ../../../data/snapshots/fasttrack/latest
+outs:
+- md5: 6cb9d08e940049e706320e73e1eb3f17
+  size: 6758
+  path: hurricane_forecasts_nhc.csv

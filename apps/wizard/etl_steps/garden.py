@@ -425,7 +425,7 @@ if submitted:
             ```
             Note that origins are inherited from previous step (snapshot) and you don't have to repeat them.
 
-        4. (Optional) You can manually move steps from `dag/walkthrough.yml` to some other `dag/*.yml` if you feel like it belongs there. After you are happy with your code, run `make test` to find any issues.
+        4. (Optional) You can manually move steps from `dag/wizard.yml` to some other `dag/*.yml` if you feel like it belongs there. After you are happy with your code, run `make test` to find any issues.
 
         5. Create a pull request in [ETL](https://github.com/owid/etl), get it reviewed and merged.
 

@@ -118,3 +118,7 @@ steps:
     - snapshot://fasttrack/latest/war_deaths_by_war_mars.csv
   data://grapher/fasttrack/latest/electric_cars_iea:
     - snapshot://fasttrack/latest/electric_cars_iea.csv
+  data://grapher/fasttrack/latest/hurricane_forecasts_nhc:
+    - snapshot://fasttrack/latest/hurricane_forecasts_nhc.csv
+  data://grapher/fasttrack/latest/weather_spending_georgeson:
+    - snapshot://fasttrack/latest/weather_spending_georgeson.csv
