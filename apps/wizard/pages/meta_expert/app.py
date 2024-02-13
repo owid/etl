@@ -59,15 +59,15 @@ with st.sidebar:
     ## See pricing list: https://openai.com/pricing (USD)
     ## See model list: https://platform.openai.com/docs/models/gpt-4-and-gpt-4-turbo
 
-    use_all_context = st.toggle(
-        "Full chat as context",
-        value=True,
-        help="If set to True, all the messages in the chat are used to query GPT (i.e. more tokens, i.e. more expensive). Unselect for cheaper usage.",
+    use_reduced_context = st.toggle(
+        "Reduced context window",
+        value=False,
+        help="If checked, only the last user message will be accounted (i.e less tokens and therefore cheaper).",
     )
-    use_full_docs = st.toggle(
+    use_reduced_docs = st.toggle(
         "Reduced docs",
         value=False,
-        help="If set to True, a reduced ETL documentation is used in the GPT query. Otherwise, the complete documentation is used (slightly more costly)",
+        help="If checked, a reduced ETL documentation is used in the GPT query (i.e. less tokens and therefore cheaper). Otherwise, the complete documentation is used (slightly more costly)",
     )
     temperature = st.slider(
         "Temperature",
@@ -88,10 +88,10 @@ with st.sidebar:
         )
     )
 
-if use_full_docs:
-    SYSTEM_PROMPT = SYSTEM_PROMPT_FULL
-else:
+if use_reduced_docs:
     SYSTEM_PROMPT = SYSTEM_PROMPT_REDUCED
+else:
+    SYSTEM_PROMPT = SYSTEM_PROMPT_FULL
 api = OpenAIWrapper()
 
 # ACTUAL APP
@@ -115,10 +115,10 @@ if prompt := st.chat_input("Ask me!"):
     st.session_state.messages.append({"role": "user", "content": prompt})
 
     # Build GPT query (only use the system prompt and latest user input)
-    if use_all_context:
-        messages = st.session_state.messages
-    else:
+    if use_reduced_context:
         messages = [{"role": "system", "content": SYSTEM_PROMPT}, {"role": "user", "content": prompt}]
+    else:
+        messages = st.session_state.messages
 
     # Display assistant response in chat message container
     with st.chat_message("assistant"):
