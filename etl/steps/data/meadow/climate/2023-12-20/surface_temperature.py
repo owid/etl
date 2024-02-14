@@ -95,6 +95,14 @@ def run(dest_dir: str) -> None:
     log.info(
         f"It wasn't possible to extract temperature data for {len(small_countries)} small countries as they are too small for the resolution of the Copernicus data."
     )
+
+    # Add Global mean temperature
+    weights = np.cos(np.deg2rad(da.latitude))
+    weights.name = "weights"
+    clim_month_weighted = da.weighted(weights)
+    global_mean = clim_month_weighted.mean(["longitude", "latitude"])
+    temp_country["Global"] = global_mean
+
     # Define the start and end dates
     start_time = da["time"].min().dt.date.astype(str).item()
     end_time = da["time"].max().dt.date.astype(str).item()
