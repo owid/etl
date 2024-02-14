@@ -299,10 +299,10 @@ def cli(
 
     Usage:
         # compare local catalog with remote catalog
-        etl-datadiff REMOTE data/ --include maddison
+        etlcli diff REMOTE data/ --include maddison
 
         # compare two local catalogs
-        etl-datadiff other-data/ data/ --include maddison
+        etlcli diff other-data/ data/ --include maddison
     """
     console = Console(tab_size=2)
 
@@ -358,7 +358,7 @@ def cli(
         "[b]Legend[/b]: [green]+New[/green]  [yellow]~Modified[/yellow]  [red]-Removed[/red]  [white]=Identical[/white]  [violet]Details[/violet]"
     )
     console.print(
-        "[b]Hint[/b]: Run this locally with [cyan][b]etl-datadiff REMOTE data/ --include yourdataset --verbose --snippet[/b][/cyan]"
+        "[b]Hint[/b]: Run this locally with [cyan][b]etl diff REMOTE data/ --include yourdataset --verbose --snippet[/b][/cyan]"
     )
     console.print(
         "[b]Hint[/b]: Get detailed comparison with [cyan][b]compare --show-values channel namespace version short_name --values[/b][/cyan]"

@@ -53,9 +53,9 @@ COMMANDS = {
     "compare": cli_compare,
     "harmonize": cli_harmonize,
     "diff": cli_datadiff,
-    "metaup": meta_upgrader_cli,
+    "meta-up": meta_upgrader_cli,
     # "wiz": cli_wizard,
-    "ssync": cli_staging_sync,
+    "chart-sync": cli_staging_sync,
     "graphviz": graphviz_cli,
 }
 
