@@ -27,7 +27,7 @@ def run(dest_dir: str) -> None:
 
     tb["year"] = tb["time"].astype(str).str[0:4]
     tb["month"] = tb["time"].astype(str).str[5:7]
-    # Use the baseline from GISS Surface Temperature Analysis (1951 - 1980) https://owid.cloud/admin/datasets/6375
+    # Use the baseline from the Copernicus Climate Service https://climate.copernicus.eu/surface-air-temperature-january-2024
     tb_base = tb[(tb["year"].astype(int) > 1990) & (tb["year"].astype(int) < 2021)]
     monthly_climatology = tb_base.groupby(["country", "month"], as_index=False)["temperature_2m"].mean()
     monthly_climatology = monthly_climatology.rename(columns={"temperature_2m": "mean_temp"})
