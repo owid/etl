@@ -1,0 +1,22 @@
+meta:
+  source:
+    name: Baxter et al. (2013)
+    url: https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0065514
+    source_data_url: |-
+      https://docs.google.com/spreadsheets/d/e/2PACX-1vTc9pnvq5Q4ztKjTXZEH0l0DeExyf3u074L7z4DLZF-X8mK1aV439ejXQl-Ji85mjhCCc0F82TI8aNj/pub?output=csv
+    date_accessed: '2024-02-14'
+    publication_year: '2013'
+    published_by: |-
+      Baxter, A. J., Patton, G., Scott, K. M., Degenhardt, L., & Whiteford, H. A. (2013). Global Epidemiology of Mental Disorders: What Are We Missing? PLoS ONE, 8(6), e65514
+  name: Adult coverage in prevalence studies of mental disorders in GBD 2010 (Baxter
+    et al., 2013)
+  description: |-
+    This dataset shows the coverage of each country for which mental health data has been collected, by age and sex, between 1980 and 2008 using DSM or ICD diagnostic criteria. For example, if mental health data has been collected for men and women across all adult age groups from a country, then its coverage would be given as 100%. Mental health data was defined as any studies on disease epidemiology in the general population. For schizophrenia, bipolar disorder and eating disorder, this also included remission and mortality studies based on clinical samples with naturalistic follow-up, due to a lack of community studies on the topic. For studies with subnational data, coverage was considered as the population coverage of that subnational region, then the population of that subnational region relative to the country. These were calculated for GBD world regions.
+  license:
+    name: Open access
+    url: https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0065514
+wdir: ../../../data/snapshots/fasttrack/latest
+outs:
+- md5: ee8edcf104c5049e9d10f7316c577a2d
+  size: 1165
+  path: baxter_2013_gbd_adult_coverage.csv
