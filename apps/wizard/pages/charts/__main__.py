@@ -100,8 +100,12 @@ if st.session_state.submitted_datasets:
 ##########################################################################################
 if st.session_state.submitted_datasets and st.session_state.submitted_variables:
     # log.info(f"VARIABLE CONFIG (3): {variable_config}")
+    # st.write(variable_config)
     if variable_config is not None:
-        if variable_config.is_valid:
+        if not variable_config.variable_mapping:
+            msg_error = "No variables selected! Please select at least one variable."
+            st.error(msg_error)
+        elif variable_config.is_valid:
             submission_config = create_submission(variable_config, SCHEMA_CHART_CONFIG)
         else:
             st.error("Something went wrong with the submission. Please try again. Report the error #003001")
