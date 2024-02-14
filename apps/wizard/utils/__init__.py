@@ -691,7 +691,7 @@ def set_states(states_values: Dict[str, Any], logging: bool = False) -> None:
     Set logging to true to log the state changes
     """
     for key, value in states_values.items():
-        if logging:
+        if logging and (st.session_state[key] != value):
             print(f"{key}: {st.session_state[key]} -> {value}")
         st.session_state[key] = value
 

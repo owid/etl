@@ -17,9 +17,6 @@ from etl.match_variables import find_mapping_suggestions, preliminary_mapping
 # Logger
 log = get_logger()
 
-# Ignore all variables (boxes are checked for all variables, hence no variable will be considered in the variable mapping)
-IGNORE_ALL = False
-
 
 def ask_and_get_variable_mapping(search_form) -> "VariableConfig":
     """Ask and get variable mapping."""
@@ -121,7 +118,7 @@ def ask_and_get_variable_mapping(search_form) -> "VariableConfig":
                 )
             # Row 3
             grid_variables_header.empty()
-            IGNORE_ALL = grid_variables_header.checkbox(
+            grid_variables_header.checkbox(
                 "All",
                 help="Check to ignore all mappings.",
                 on_change=lambda: set_states({"submitted_variables": False}),
@@ -155,11 +152,13 @@ def ask_and_get_variable_mapping(search_form) -> "VariableConfig":
                 )
                 old_var_selectbox.append(element)
                 # Ignore checkbox
+                check = st.session_state.get("ignore-all")
+                check = check if check else st.session_state.get(f"auto-ignore-{i}", False)
                 element = grid_variables_auto.checkbox(
                     "Ignore",
                     key=f"auto-ignore-{i}",
                     label_visibility="collapsed",
-                    value=IGNORE_ALL,
+                    value=st.session_state.get("ignore-all", st.session_state.get(f"auto-ignore-{i}", False)),
                     on_change=lambda: set_states({"submitted_variables": False}),
                 )
                 ignore_selectbox.append(element)
@@ -215,11 +214,14 @@ def ask_and_get_variable_mapping(search_form) -> "VariableConfig":
 
                 old_var_selectbox.append(variable_old_manual)
                 # Ignore checkbox
+                ## If ignore-all is checked, then inherit. Otherwise preserve value.
+                check = st.session_state.get("ignore-all")
+                check = check if check else st.session_state.get(f"manual-ignore-{i}", False)
                 element_ignore = grid_variables_manual.checkbox(
                     "Ignore",
                     key=f"manual-ignore-{i}",
                     label_visibility="collapsed",
-                    value=IGNORE_ALL,
+                    value=check,
                     on_change=lambda: set_states({"submitted_variables": False}),
                 )
                 ignore_selectbox.append(element_ignore)
@@ -267,17 +269,16 @@ def ask_and_get_variable_mapping(search_form) -> "VariableConfig":
                 label="Next (2/3)",
                 type="primary",
                 use_container_width=True,
-                on_click=lambda: set_states({"submitted_variables": True}),
-            )
-
-            if st.session_state.submitted_variables:
-                set_states(
+                on_click=lambda: set_states(
                     {
                         "submitted_variables": True,
                         "submitted_revisions": False,
                     },
                     logging=True,
-                )
+                ),
+            )
+
+            if st.session_state.submitted_variables:
                 # BUILD MAPPING
                 variable_mapping = _build_variable_mapping(
                     old_var_selectbox,
@@ -285,7 +286,6 @@ def ask_and_get_variable_mapping(search_form) -> "VariableConfig":
                     ignore_selectbox,
                 )
                 variable_config = VariableConfig(variable_mapping=variable_mapping)
-
     return variable_config
 
 
@@ -405,7 +405,7 @@ def reset_variable_form() -> None:
     }
     set_states(
         {
-            # "ignore-all": False,
+            "ignore-all": False,
             **checks,
             **toggles,
         }
