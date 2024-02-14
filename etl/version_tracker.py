@@ -11,7 +11,7 @@ import yaml
 from rich_click.rich_command import RichCommand
 
 from etl import paths
-from etl.db import get_info_for_etl_datasets
+from etl.db import can_connect, get_info_for_etl_datasets
 from etl.steps import extract_step_attributes, load_dag, reverse_graph
 
 log = structlog.get_logger()
@@ -253,7 +253,7 @@ class VersionTracker:
         "snapshot://dummy/2020-01-01/dummy_full.csv",
     ]
 
-    def __init__(self, connect_to_db: bool = False, warn_on_archivable: bool = True):
+    def __init__(self, connect_to_db: bool = True, warn_on_archivable: bool = True):
         # Load dag of active and archive steps (a dictionary where each item is step: set of dependencies).
         self.dag_all = load_dag(paths.DAG_ARCHIVE_FILE)
         # Create a reverse dag (a dictionary where each item is step: set of usages).
@@ -275,8 +275,11 @@ class VersionTracker:
         # Create a dictionary of dag files for each step.
         self.dag_file_for_each_step = load_dag_file_for_each_step()
 
-        # Connect to DB to extract additional info about charts.
+        # If connect_to_db is True, attempt to connect to DB to extract additional info about charts.
         self.connect_to_db = connect_to_db
+        if not can_connect():
+            log.warning("Unable to connect to DB. Some checks will be skipped and charts info will not be available.")
+            self.connect_to_db = False
 
         # Warn about archivable steps.
         self.warn_on_archivable = warn_on_archivable
@@ -732,18 +735,19 @@ class VersionTracker:
 
 @click.command(cls=RichCommand)
 @click.option(
-    "--connect_to_db",
+    "--skip_db",
     is_flag=True,
     default=False,
 )
 @click.option("--warn_on_archivable", is_flag=True, default=False)
-def run_version_tracker_checks(connect_to_db: bool = False, warn_on_archivable: bool = False) -> None:
+def run_version_tracker_checks(skip_db: bool = False, warn_on_archivable: bool = False) -> None:
     """Run all version tracker sanity checks.
 
-    --connect_to_db : True to connect to the database of your current environment, to get a better informed picture of
-    what steps may be missing or archivable. Otherwise, all checks will be based purely on the content of the ETL dag.
+    --skip_db : True to skip connecting to the database of the current environment. False to try to connect to DB, to
+    get a better informed picture of what steps may be missing or archivable. If not connected, all checks will be based
+    purely on the content of the ETL dag.
 
     --warn_on_archivable : True to warn about archivable steps. By default this is False, because we currently have many
     archivable steps.
     """
-    VersionTracker(connect_to_db=connect_to_db, warn_on_archivable=warn_on_archivable).apply_sanity_checks()
+    VersionTracker(connect_to_db=not skip_db, warn_on_archivable=warn_on_archivable).apply_sanity_checks()

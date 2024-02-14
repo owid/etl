@@ -18,6 +18,14 @@ from etl.db_utils import DBUtils
 log = structlog.get_logger()
 
 
+def can_connect(conf: Optional[Dict[str, Any]] = None) -> bool:
+    try:
+        get_connection(conf=conf)
+        return True
+    except MySQLdb.OperationalError:
+        return False
+
+
 def get_connection(conf: Optional[Dict[str, Any]] = None) -> MySQLdb.Connection:
     "Connect to the Grapher database."
     cf: Any = dict_to_object(conf) if conf else config
