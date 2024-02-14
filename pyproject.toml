@@ -30,6 +30,7 @@ etl-wizard = 'apps.wizard.cli:cli'
 etl-staging-sync = 'apps.staging_sync.cli:cli'
 etl-staging-sync-app = 'apps.staging_sync.app:cli'
 etl-metagpt = 'apps.metagpt.cli:main'
+etl-step-update = 'apps.step_update.cli:cli'
 
 [tool.poetry.dependencies]
 python = ">=3.10, <3.12"
