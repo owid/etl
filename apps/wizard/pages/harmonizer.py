@@ -100,7 +100,7 @@ NUM_SUGGESTIONS = 1000
 
 # INTRO
 st.markdown(
-    "Harmonize entity names with this tool. Start by loading an indicator from a dataset below. If you find any problem, remember you can still run `etl-harmonize` in the terminal."
+    "Harmonize entity names with this tool. Start by loading an indicator from a dataset below. If you find any problem, remember you can still run `etlcli harmonize` in the terminal."
 )
 ####################################################################################################
 # SELECT DATASET, TABLE and INDICATOR

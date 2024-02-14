@@ -402,7 +402,7 @@ if submitted:
             st.markdown("####  1. Harmonize Country names")
             st.markdown("Run it in your terminal:")
             st.code(
-                f"poetry run etl-harmonize data/meadow/{form.namespace}/{form.meadow_version}/{form.short_name}/{form.short_name}.feather country etl/steps/data/garden/{form.namespace}/{form.version}/{form.short_name}.countries.json",
+                f"poetry run etlcli harmonize data/meadow/{form.namespace}/{form.meadow_version}/{form.short_name}/{form.short_name}.feather country etl/steps/data/garden/{form.namespace}/{form.version}/{form.short_name}.countries.json",
                 "bash",
             )
             st.markdown("Or run it on Wizard")
