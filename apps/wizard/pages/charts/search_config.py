@@ -12,7 +12,7 @@ from apps.wizard.utils import set_states
 log = get_logger()
 
 # Set to True to select good initial default dataset selections
-DEBUG = True
+DEBUG = False
 dataset_old_debug = "Population (various sources, 2023.1)"
 dataset_new_debug = "Population (Experimental)"
 
