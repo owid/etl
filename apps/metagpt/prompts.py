@@ -6,7 +6,7 @@ import json
 from typing import Any, Dict, List
 
 from apps.metagpt.utils import read_metadata_file
-from apps.wizard.utils.gpt import GPTQuery
+from apps.utils.gpt import GPTQuery
 from etl.paths import BASE_DIR
 
 # Example of new metadata format
