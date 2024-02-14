@@ -83,8 +83,8 @@ There are two methods that we use, both of which are semi-automated and involve 
 The [etl](https://github.com/owid/etl) codebase contains an interactive `harmonize` command-line tool which can be used to harmonize a CSV file that contains a column with country names.
 
 ```
-$ poetry run etl-harmonize --help
-Usage: etl-harmonize [OPTIONS] DATA_FILE COLUMN OUTPUT_FILE [INSTITUTION]
+$ poetry run etlcli harmonize --help
+Usage: etlcli harmonize [OPTIONS] DATA_FILE COLUMN OUTPUT_FILE [INSTITUTION]
                      [NUM_SUGGESTIONS]
 
  Given a DATA_FILE in feather or CSV format, and the name of the COLUMN representing country
@@ -130,7 +130,7 @@ The output mapping is saved in `mapping.json`.
 
 #### Using the Grapher admin
 
-!!! danger  "This method is not preferred. Instead, consider using the `etl-harmonize` command tool."
+!!! danger  "This method is not preferred. Instead, consider using the `etlcli harmonize` command tool."
 
 The [owid-grapher](https://github.com/owid/owid-grapher) codebase contains a interactive country harmonization tool that can be accessed at [http://localhost:3030/admin/standardize](http://localhost:3030/admin/standardize) when running the dev server.
 
