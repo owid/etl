@@ -121,5 +121,6 @@ if (
         if submission_config.is_valid:
             # st.write(st.session_state.gpt_tweaks)
             push_submission(submission_config)
+            # TODO: We should also push the variable mapping to the database! But where?
         else:
             st.error("Something went wrong with the submission. Please try again. Report the error #004001")
