@@ -1,0 +1,17 @@
+meta:
+  source:
+    name: Impact of Replacing Animal Products (Faunalytics, 2023)
+    url: https://faunalytics.org/animal-product-impact-scales/
+    source_data_url: |-
+      https://docs.google.com/spreadsheets/d/e/2PACX-1vSI2h9_6Q-Iy6ygi5Ff7DPpDbNvy6GWt_-WlbKVX8G12QcWJOizo3ZAFUwzjVjnhNF18Px91nS5YNsc/pub?output=csv
+    date_accessed: '2024-02-14'
+    publication_year: '2023'
+    published_by: Faunalytics
+  name: Animal lives lost per kilogram (Faunalytics)
+  description: ''
+  license: {}
+wdir: ../../../data/snapshots/fasttrack/2023-08-07
+outs:
+- md5: 453a487e6bb415ec5da93a9fca369764
+  size: 794
+  path: animal_lives_per_kilogram.csv
