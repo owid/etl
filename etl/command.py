@@ -16,7 +16,7 @@ from os import environ
 from pathlib import Path
 from typing import Any, Callable, Dict, Iterator, List, Optional, Set
 
-import click
+import rich_click as click
 import structlog
 from ipdb import launch_ipdb_on_exception
 
@@ -123,6 +123,7 @@ def main_cli(
     strict: Optional[bool] = None,
     watch: bool = False,
 ) -> None:
+    """Run an ETL step."""
     _update_open_file_limit()
 
     # enable grapher channel when called with --grapher

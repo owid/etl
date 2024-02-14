@@ -6,7 +6,7 @@ import sys
 from importlib import import_module
 from typing import Optional
 
-import click
+import rich_click as click
 from ipdb import launch_ipdb_on_exception
 
 from etl.paths import BASE_PACKAGE, STEP_DIR

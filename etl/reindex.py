@@ -31,6 +31,10 @@ config.enable_bugsnag()
     help="Reindex only datasets matching pattern",
 )
 def reindex_cli(channel: Iterable[CHANNEL], include: Optional[str]) -> None:
+    """Create a catalog-[channel].feather file inside etl/data with all tables in each channel.
+
+    This enables `catalog.find` to be aware of what datasets currently exists. So, if for example you create a new dataset locally, you won't be able to find it in your local catalog unless you re-run reindex.
+    """
     return reindex(channel=channel, include=include)
 
 

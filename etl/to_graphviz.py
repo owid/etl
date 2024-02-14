@@ -4,7 +4,7 @@
 
 from typing import Optional
 
-import click
+import rich_click as click
 
 from etl.steps import filter_to_subgraph, load_dag
 

@@ -735,11 +735,11 @@ class VersionTracker:
 
 @click.command(cls=RichCommand)
 @click.option(
-    "--skip_db",
+    "--skip-db",
     is_flag=True,
     default=False,
 )
-@click.option("--warn_on_archivable", is_flag=True, default=False)
+@click.option("--warn-on-archivable", is_flag=True, default=False)
 def run_version_tracker_checks(skip_db: bool = False, warn_on_archivable: bool = False) -> None:
     """Run all version tracker sanity checks.
 
