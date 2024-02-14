@@ -277,7 +277,7 @@ class VersionTracker:
 
         # If connect_to_db is True, attempt to connect to DB to extract additional info about charts.
         self.connect_to_db = connect_to_db
-        if not can_connect():
+        if self.connect_to_db and not can_connect():
             log.warning("Unable to connect to DB. Some checks will be skipped and charts info will not be available.")
             self.connect_to_db = False
 
