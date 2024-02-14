@@ -30,6 +30,7 @@ etl-wizard = 'apps.wizard.cli:cli'
 etl-staging-sync = 'apps.staging_sync.cli:cli'
 etl-staging-sync-app = 'apps.staging_sync.app:cli'
 etl-metagpt = 'apps.metagpt.cli:main'
+etlcli = 'apps.cli:cli'
 
 [tool.poetry.dependencies]
 python = ">=3.10, <3.12"
@@ -57,7 +58,7 @@ structlog = ">=21.5.0"
 sqlmodel = "^0.0.6"
 rich = ">=12.1.0"
 owid-datautils = {path = "lib/datautils", develop = true}
-rich-click = ">=1.5.1"
+rich-click = ">=1.7.3"
 tenacity = ">=8.0.1"
 simplejson = ">=3.17.6"
 bugsnag = ">=4.2.1"
