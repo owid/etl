@@ -3,10 +3,11 @@
 The modified titles and subtitles are generated using the following a specific system prompt (see `etl.chart_revision.v2.SYSTEM_PROMPT`).
 """
 import json
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Tuple, cast
 
 import rich_click as click
 from openai import OpenAI
+from openai.types.chat import ChatCompletion
 from sqlmodel import Session, select
 from structlog import get_logger
 
@@ -17,7 +18,11 @@ from etl.db import get_engine
 # ChatGPT model name
 # details: https://platform.openai.com/docs/models
 # pricing: https://openai.com/pricing
-MODELS_AVAILABLE = {"gpt-3.5": "gpt-3.5-turbo", "gpt-4": "gpt-4-0125-preview"}
+MODELS_AVAILABLE = {
+    "gpt-3.5": "gpt-3.5-turbo-0125",
+    "gpt-3.5-turbo": "gpt-3.5-turbo-0125",
+    "gpt-4": "gpt-4-turbo-preview",
+}
 
 MODEL_DEFAULT = "gpt-3.5"
 GPT_SAMPLE_SIZE = 3
@@ -26,18 +31,19 @@ GPT_SAMPLE_SIZE = 3
 SYSTEM_PROMPT_TEXT = """
 You are a researcher and science communicator that publishes charts on various topics. You are tasked to improve the title and subtitle of a chart.
 
-To improve these fields, focus on the following:
+A user will provide you with a title and, if available, a subtitle. The format will be You must improve these fields.
+A user will send a message with the title and, if available, the subtitle of a chart. The format will be as follows: "TITLE: 'This is the title'\nSUBTITLE: 'This is the subtitle'".
 
-- Make sure the title and subtitle are short and concise.
-- Don't make the title or subtitle longer.
-- Ideally, the title length should be less than 80 characters
-- Ideally, the subtitle length should be less than 250 characters.
-- Correct spelling and grammar mistakes.
-- If the subtitle is a sentence, it must end with a period.
+Your task is to improve these fields. To do so follow the following guidelines:
+    - If the subtitle contains a markdown link, you MUST keep it. For example, if you have a subtitle like "This is [some word](#dod:some-link)", you MUST keep the '[some word](#dod:some-link)' part.
+    - The title SHOULD NOT be longer than 80 characters, unless strictly necessary for clarity.
+    - The subtitle SHOULD NOT be longer than 250 characters, unless strictly necessary for clarity.
+    - Correct any spelling and grammar mistakes.
+    - The title and the subtitle SHOULD NOT be redundant with each other.
+    - The title and the subtitle MUST be concise.
+    - If the subtitle is a sentence, it MUST end with a period.
 
-The title is given after the keyword "TITLE", and the subtitle after the keyword "SUBTITLE".
-
-Return the title and subtitle in JSON format. For example, if the title is "This is the title" and the subtitle is "This is the subtitle", return {"title": "This is the title", "subtitle": "This is the subtitle"}.
+After creating the new title and subtitle, return these values in JSON format. For example, if the title is "This is the title" and the subtitle is "This is the subtitle", return {"title": "This is the title", "subtitle": "This is the subtitle"}. If the subtitle is empty, you can return {"title": "This is the title", "subtitle": ""}.
 """
 
 # Logger
@@ -190,7 +196,7 @@ def cli(
             num_suggestions = sample_size
             for revision in revisions:
                 log.info(f"Getting new configurations from chatGPT for revision #{revision.id}...")
-                new_configs = suggest_new_config_fields(
+                new_configs, _ = suggest_new_config_fields(
                     revision.suggestedConfig, system_prompt, num_suggestions, real_model_name
                 )
 
@@ -207,13 +213,16 @@ def cli(
                 session.commit()
 
 
-def ask_gpt(question: str, system_prompt: str = "", model: str = "gpt-4", num_responses: int = 1) -> List[str]:
+def ask_gpt(question: str, system_prompt: str = "", model: str = "gpt-4", num_responses: int = 1) -> "ChatCompletion":
     """Ask chatGPT a question, with a system prompt.
 
     More on its API can be found at https://platform.openai.com/docs/api-reference.
     """
     client = OpenAI()
-    real_model = MODELS_AVAILABLE[model]
+    if model in set(MODELS_AVAILABLE.values()):
+        real_model = model
+    else:
+        real_model = MODELS_AVAILABLE[model]
     response = client.chat.completions.create(
         model=real_model,
         messages=[
@@ -225,14 +234,14 @@ def ask_gpt(question: str, system_prompt: str = "", model: str = "gpt-4", num_re
         frequency_penalty=1,
         n=num_responses,
     )
-    print("-----------------------")
-    print(1, response.dict())
-    return [c.message.content for c in response.choices]  # type: ignore
+    log.info(f"Querying chatGPT using model {real_model}")
+    # print(1, response.dict())
+    return response  # type: ignore
 
 
 def suggest_new_config_fields(
     config: Dict[str, Any], system_prompt: str, num_suggestions: int, model_name: str
-) -> List[Dict[str, Any]]:
+) -> Tuple[List[Dict[str, Any]], "ChatCompletion"]:
     """Obtain `num_suggestions` new configurations for a given chart configuration.
 
     Note that the new configurations only contain the affected fields (e.g. title and subtitle).
@@ -242,14 +251,15 @@ def suggest_new_config_fields(
 
     # Create question
     title = config["title"]
-    subtitle = config["subtitle"]
+    subtitle = config.get("subtitle", "")
     question = f"""TITLE: '{title}'\nSUBTITLE: '{subtitle}'"""
     # Get response from chatGPT
-    responses = ask_gpt(question, system_prompt=system_prompt, model=model_name, num_responses=num_suggestions)
+    chat_completion = ask_gpt(question, system_prompt=system_prompt, model=model_name, num_responses=num_suggestions)
+    responses = [c.message.content for c in chat_completion.choices]
     # Check if response is valid (should be a dictionary with two fields: title and subtitle)
     for i, response in enumerate(responses):
         try:
-            response = json.loads(response)
+            response = json.loads(cast(str, response))
         except ValueError:
             log.error(
                 f"Could not parse new configuration #{i}! Returned response is not a JSON with fields `title` and `subtitle`: {response}."
@@ -266,4 +276,4 @@ def suggest_new_config_fields(
                         "subtitle": response["subtitle"],
                     }
                 )
-    return configs
+    return configs, chat_completion

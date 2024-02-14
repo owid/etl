@@ -21,7 +21,7 @@ We use various session state variables to control the flow of the app:
     - Set to True: When user submits variable mapping form.
     - Set to False: When user submits dataset form. When the user interacts with the variable form changing the mapping (i.e. ignore checkboxes, new variable selectboxes, but NOT the explore toggle)
 - `submitted_revisions` [default False]: Whether the user has submitted the chart revisions.
-    - Set to True:
+    - Set to True: When the user clicks on "Finish (3/3)" in the third form.
     - Set to False:
 """
 
@@ -30,7 +30,7 @@ from structlog import get_logger
 
 from apps.wizard.pages.charts.init_config import init_app, set_session_states
 from apps.wizard.pages.charts.search_config import build_dataset_form
-from apps.wizard.pages.charts.submission import create_submission
+from apps.wizard.pages.charts.submission import create_submission, push_submission
 from apps.wizard.pages.charts.utils import get_datasets, get_schema
 from apps.wizard.pages.charts.variable_config import ask_and_get_variable_mapping
 from apps.wizard.utils.env import OWIDEnv
@@ -62,6 +62,10 @@ variable_mapping = {}
 variable_config = None
 submission_config = None
 
+# DEBUGGING
+# st.write(f"SUBMITTED DATASETS: {st.session_state.submitted_datasets}")
+# st.write(f"SUBMITTED VARIALBES: {st.session_state.submitted_variables}")
+# st.write(f"SUBMITTED REVISIONS: {st.session_state.submitted_revisions}")
 ##########################################################################################
 # 1 DATASET MAPPING
 #
@@ -115,7 +119,7 @@ if (
     st.markdown("Entered last step, but submission is None?")
     if submission_config is not None:
         if submission_config.is_valid:
-            st.success("Would submit the chart revisions here.")
-            # push_submission(submission_config)
+            # st.write(st.session_state.gpt_tweaks)
+            push_submission(submission_config)
         else:
             st.error("Something went wrong with the submission. Please try again. Report the error #004001")
