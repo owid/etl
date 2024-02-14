@@ -1,0 +1,47 @@
+dataset:
+  title: Animal lives lost per kilogram (Faunalytics)
+  description: ''
+  licenses:
+    - {}
+tables:
+  animal_lives_per_kilogram:
+    variables:
+      lives_per_kg_direct:
+        title: lives_per_kg_direct
+        unit: lives
+        short_unit: lives
+        display:
+          numDecimalPlaces: 0
+        description: |-
+          The estimated number of animal lives that go toward each kilogram of animal product purchased for retail sale, including direct deaths only. For example, the pork numbers include only the deaths of pigs slaughtered for food.
+      lives_per_kg_total:
+        title: lives_per_kg_total
+        unit: lives
+        short_unit: lives
+        display:
+          numDecimalPlaces: 2
+        description: |-
+          The estimated number of animal lives that go toward each kilogram of animal product purchased for retail sale, including direct and indirect deaths. For example, the pork numbers include the deaths of pigs slaughtered for food (direct) but also those who die pre-slaughter and feed fish given to those pigs (indirect).
+      days_per_kg_direct:
+        title: days_per_kg_direct
+        unit: days
+        short_unit: days
+        display:
+          numDecimalPlaces: 0
+        description: |-
+          The estimated number of days of animal suffering that go toward each kilogram of animal product purchased for retail sale, including direct suffering only. For example, the pork numbers include only the suffering of pigs slaughtered for food.
+      days_per_kg_total:
+        title: days_per_kg_total
+        unit: days
+        short_unit: days
+        display:
+          numDecimalPlaces: 0
+        description: |-
+          The estimated number of days of suffering that go toward each kilogram of animal product purchased for retail sale, including the suffering of animals used directly in production and those used indirectly. For example, the pork numbers include the suffering of pigs slaughtered for food (direct) but also those who die pre-slaughter and feed fish given to those pigs (indirect).
+      kilograms_per_animal_direct:
+        title: kilograms_per_animal_direct
+        unit: kilograms
+        short_unit: kg
+        display:
+          numDecimalPlaces: 0
+        description: The estimated quantity of edible meat produced per animal, measured in kilograms.

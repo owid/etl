@@ -1,0 +1,40 @@
+dataset:
+  title: Adult coverage in prevalence studies of mental disorders in GBD 2010 (Baxter et al., 2013)
+  description: |-
+    This dataset shows the coverage of each country for which mental health data has been collected, by age and sex, between 1980 and 2008 using DSM or ICD diagnostic criteria. For example, if mental health data has been collected for men and women across all adult age groups from a country, then its coverage would be given as 100%. Mental health data was defined as any studies on disease epidemiology in the general population. For schizophrenia, bipolar disorder and eating disorder, this also included remission and mortality studies based on clinical samples with naturalistic follow-up, due to a lack of community studies on the topic. For studies with subnational data, coverage was considered as the population coverage of that subnational region, then the population of that subnational region relative to the country. These were calculated for GBD world regions.
+  licenses:
+    - name: Open access
+      url: https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0065514
+tables:
+  baxter_2013_gbd_adult_coverage:
+    variables:
+      major_depression:
+        title: Major depression
+        unit: '%'
+        short_unit: '%'
+        description: Coverage of adult population in primary data
+      dysthymia:
+        title: Dysthymia
+        unit: '%'
+        short_unit: '%'
+        description: Coverage of adult population in primary data
+      anxiety_disorders:
+        title: Anxiety disorders
+        unit: '%'
+        short_unit: '%'
+        description: Coverage of adult population in primary data
+      schizophrenia:
+        title: Schizophrenia
+        unit: '%'
+        short_unit: '%'
+        description: Coverage of adult population in primary data
+      bipolar_disorders:
+        title: Bipolar disorder
+        unit: '%'
+        short_unit: '%'
+        description: Coverage of adult population in primary data
+      eating_disorders:
+        title: Eating disorders
+        unit: '%'
+        short_unit: '%'
+        description: Coverage of adult population in primary data
