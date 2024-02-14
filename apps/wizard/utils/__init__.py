@@ -21,6 +21,7 @@ from MySQLdb import OperationalError
 from pydantic import BaseModel
 from typing_extensions import Self
 
+from apps.wizard.config import PAGES_BY_ALIAS
 from etl import config
 from etl.db import get_connection
 from etl.files import apply_ruff_formatter_to_files, ruamel_dump, ruamel_load
@@ -32,7 +33,7 @@ from etl.paths import (
     LATEST_REGIONS_VERSION,
     STEP_DIR,
 )
-from etl.steps import DAG
+from etl.steps import DAG, load_dag
 
 DAG_WIZARD_PATH = DAG_DIR / "wizard.yml"
 
@@ -49,21 +50,24 @@ ADD_DAG_OPTIONS = [dag_not_add_option] + dag_files
 DATE_TODAY = dt.date.today().strftime("%Y-%m-%d")
 
 # Get current directory
-CURRENT_DIR = Path(__file__).parent
+CURRENT_DIR = Path(__file__).parent.parent
+
+# Wizard path
+WIZARD_DIR = APPS_DIR / "wizard"
 
 # Paths to cookiecutter files
-COOKIE_SNAPSHOT = APPS_DIR / "wizard" / "etl_steps" / "cookiecutter" / "snapshot"
-COOKIE_MEADOW = APPS_DIR / "wizard" / "etl_steps" / "cookiecutter" / "meadow"
-COOKIE_GARDEN = APPS_DIR / "wizard" / "etl_steps" / "cookiecutter" / "garden"
-COOKIE_GRAPHER = APPS_DIR / "wizard" / "etl_steps" / "cookiecutter" / "grapher"
+COOKIE_SNAPSHOT = WIZARD_DIR / "etl_steps" / "cookiecutter" / "snapshot"
+COOKIE_MEADOW = WIZARD_DIR / "etl_steps" / "cookiecutter" / "meadow"
+COOKIE_GARDEN = WIZARD_DIR / "etl_steps" / "cookiecutter" / "garden"
+COOKIE_GRAPHER = WIZARD_DIR / "etl_steps" / "cookiecutter" / "grapher"
 # Paths to markdown templates
-MD_SNAPSHOT = APPS_DIR / "wizard" / "etl_steps" / "markdown" / "snapshot.md"
-MD_MEADOW = APPS_DIR / "wizard" / "etl_steps" / "markdown" / "meadow.md"
-MD_GARDEN = APPS_DIR / "wizard" / "etl_steps" / "markdown" / "garden.md"
-MD_GRAPHER = APPS_DIR / "wizard" / "etl_steps" / "markdown" / "grapher.md"
+MD_SNAPSHOT = WIZARD_DIR / "etl_steps" / "markdown" / "snapshot.md"
+MD_MEADOW = WIZARD_DIR / "etl_steps" / "markdown" / "meadow.md"
+MD_GARDEN = WIZARD_DIR / "etl_steps" / "markdown" / "garden.md"
+MD_GRAPHER = WIZARD_DIR / "etl_steps" / "markdown" / "grapher.md"
 
 # PATH WIZARD CONFIG
-WIZARD_CONFIG = BASE_DIR / ".wizard"
+WIZARD_VARIABLES_CONFIG = BASE_DIR / ".wizard"
 
 
 DUMMY_DATA = {
@@ -571,8 +575,8 @@ def warning_metadata_unstable() -> None:
 
 def load_wizard_config() -> Dict[str, Any]:
     """Load default wizard config."""
-    if os.path.exists(WIZARD_CONFIG):
-        with open(WIZARD_CONFIG, "r") as f:
+    if os.path.exists(WIZARD_VARIABLES_CONFIG):
+        with open(WIZARD_VARIABLES_CONFIG, "r") as f:
             return json.load(f)
     return {
         "template": {
@@ -593,7 +597,7 @@ def update_wizard_config(form: StepForm) -> None:
         config["template"][form.step_name]["generate_notebook"] = form_dix.get("generate_notebook", False)
 
     # Export config
-    with open(WIZARD_CONFIG, "w") as f:
+    with open(WIZARD_VARIABLES_CONFIG, "w") as f:
         json.dump(config, f)
 
 
@@ -640,3 +644,51 @@ def render_responsive_field_in_form(
                 key=f"{key}_custom",
                 default_last=default_value,
             )
+
+
+def get_datasets_in_etl(
+    dag: Dict[str, Any] | None = None,
+    snapshots: bool = False,
+    prefixes: List[str] | None = None,
+    prefix_priorities: List[str] | None = None,
+) -> Any:
+    """Show a selectbox with all datasets available."""
+    # Load dag
+    if dag is None:
+        dag = load_dag()
+
+    # Define list with options
+    options = sorted(list(dag.keys()))
+    ## Optional: Show some options first based on their prefix. E.g. Show those that are Meadow (i.e. start with 'data://meadow') first.
+    if prefix_priorities:
+        options, options_left = [], options
+        for prefix in prefix_priorities:
+            options_ = [o for o in options_left if o.startswith(f"{prefix}/")]
+            options.extend(sorted(options_))
+            options_left = [o for o in options_left if o not in options_]
+        options.extend(options_left)
+
+    # Show only datasets that start with a given prefix
+    if prefixes:
+        options = [o for o in options if any(o.startswith(prefix) for prefix in prefixes)]
+    # Discard snapshots if flag is enabled
+    if not snapshots:
+        options = [o for o in options if not o.startswith("snapshot://")]
+
+    return options
+
+
+def set_states(states_values: Dict[str, Any]) -> None:
+    """Set states from any key in dictionary."""
+    for key, value in states_values.items():
+        st.session_state[key] = value
+
+
+def st_page_link(alias: str, **kwargs) -> None:
+    """Link to page."""
+    st.page_link(
+        page=PAGES_BY_ALIAS[alias]["entrypoint"],
+        label=PAGES_BY_ALIAS[alias]["title"],
+        icon=PAGES_BY_ALIAS[alias]["emoji"],
+        **kwargs,
+    )

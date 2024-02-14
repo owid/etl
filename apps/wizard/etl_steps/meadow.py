@@ -15,7 +15,7 @@ from etl.paths import BASE_DIR, DAG_DIR, MEADOW_DIR
 #########################################################
 
 # Page config
-st.set_page_config(page_title="Wizard (meadow)", page_icon="🪄")
+st.set_page_config(page_title="Wizard: Create a Meadow step", page_icon="🪄")
 add_indentation()
 
 # Available namespaces
@@ -101,7 +101,7 @@ def update_state() -> None:
 # MAIN ##################################################
 #########################################################
 # TITLE
-st.title("Wizard  **:gray[Meadow]**")
+st.title("Create step  **:gray[Meadow]**")
 
 # SIDEBAR
 with st.sidebar:
@@ -215,7 +215,7 @@ if submitted:
         # User asked for private mode?
         private_suffix = "-private" if form.is_private else ""
 
-        # handle DAG-addition
+        # Handle addition to the DAG
         dag_path = DAG_DIR / form.dag_file
         if form.add_to_dag:
             dag_content = utils.add_to_dag(

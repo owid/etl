@@ -1,0 +1,68 @@
+# Simplified Documentation for `origin`
+
+## Overview
+
+The `origin` details the source of an indicator's data and metadata, referring to a specific snapshot from a data product. A snapshot is a selected portion of data from a broader dataset, paper, or database captured on a specific date. The data product's producer is usually an institution or authors.
+
+Snapshots can be the entire data product or a subset, depending on the data's nature and source. The `Origin` object attributes in ETL describe these details.
+
+## Fields
+
+### `origin.attribution` (Optional, String)
+Citation for the data product, overriding the default `producer (year)` format when necessary. Follow these rules:
+- Start with a capital letter, except for specific names (e.g., `van Haasteren`).
+- Do not end with a period but conclude with the publication year in parentheses.
+- Avoid semicolons and use only if the default format is insufficient, following the format `{producer} - {title} {version_producer} ({year})`.
+
+### `origin.attribution_short` (Recommended, String)
+A concise version of `attribution` for limited spaces, omitting the year. It should:
+- Begin with a capital letter, except for specific names.
+- Not end with a period.
+- Preferably be an acronym or a brief name of the producer or data product.
+
+### `origin.citation_full` (Required, String)
+The complete citation as specified by the producer, including the publication year. It should:
+- Start with a capital letter and end with a period.
+- Adhere to the producer's guidelines, allowing minor edits for formatting or typos.
+
+### `origin.date_accessed` (Required, String)
+The date the current version of the data was accessed, in `YYYY-MM-DD` format.
+
+### `origin.date_published` (Required, String)
+The publication date of the current data version, in `YYYY-MM-DD` or `YYYY` if the day is unknown.
+
+### `origin.description` (Recommended, String)
+A brief description of the data product, avoiding other metadata fields unless crucial.
+
+### `origin.description_snapshot` (Recommended, String)
+Details the snapshot if it differs from the data product, without repeating the `description` content.
+
+### `origin.license`
+Specifies the data product's license. Required fields include:
+- `origin.license.name` (Required, String): The license name, following standard or producer-specific formats.
+- `origin.license.url` (Required if existing, String): The URL to the license details on the producer's site.
+
+### `origin.producer` (Required, String)
+The name of the data producer, following specific formatting rules for capitalization, author names, and acronyms.
+
+### `origin.title` (Required, String)
+The data product's title, clearly identifying the content without ending in a period or including unrelated metadata.
+
+### `origin.title_snapshot` (Required if different, String)
+The snapshot's title, distinct from the data product's title, following similar formatting rules.
+
+### `origin.url_download` (Required if existing, String)
+A direct URL or S3 URI for downloading the data as a single file.
+
+### `origin.url_main` (Required, String)
+The main website URL for the data product, providing detailed information.
+
+### `origin.version_producer` (Recommended, String/Number)
+The version of the data product as specified by the producer.
+
+## Guidelines Summary
+- Capitalization and punctuation are crucial across fields, with specific exceptions noted.
+- Avoid periods at the end of fields unless specified.
+- Use concise, clear formatting for citations and descriptions.
+- Direct URLs are preferred for downloads and license details.
+- Producer names and titles should be accurately represented, adhering to any specific requests or known formats.

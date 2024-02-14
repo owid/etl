@@ -16,11 +16,12 @@ from etl.steps import extract_step_attributes, filter_to_subgraph, load_dag
 
 # CONFIG
 st.set_page_config(
-    page_title="Dataset Explorer",
+    page_title="Wizard: Dataset Explorer",
     layout="wide",
-    page_icon="🕵️",
+    page_icon="🪄",
     initial_sidebar_state="collapsed",
 )
+
 st.title("🕵️ Dataset Explorer")
 add_indentation()
 

@@ -2,14 +2,16 @@ import subprocess
 from pathlib import Path
 
 import streamlit as st
+from st_pages import add_indentation
 
 from apps.utils import run_command
 
 CURRENT_DIR = Path(__file__).resolve().parent
+add_indentation()
 
 
 def main():
-    st.title("🔄 etl-staging-sync")
+    st.title("Chart 🔄 **:gray[Sync]**")
     st.markdown(
         """
     Synchronize charts and revisions from the source server to the target server. Typically, the source is a

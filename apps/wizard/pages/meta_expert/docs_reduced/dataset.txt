@@ -1,0 +1,73 @@
+# `dataset`
+
+An ETL dataset comprises tables, described by `DatasetMeta` attributes.
+
+## `dataset.description`
+
+*Type*: `string` | Recommended
+
+Describes the dataset for internal use or data catalog users, typically a short paragraph detailing table contents.
+
+### Guidelines
+        
+- Start with a capital letter and end with a period.
+- Avoid mentioning other metadata fields unless crucial.
+- Focus on describing the dataset succinctly.
+- Override the automatic description for datasets with multiple tables.
+    
+
+## `dataset.licenses`
+
+*Type*: `array`
+
+Lists licenses from the dataset's processing history.
+
+### Guidelines
+        
+- Licenses usually propagate automatically. Manually fill only if this fails. Future updates may remove this field as licenses will reside in `origins`.
+    
+
+## `dataset.non_redistributable`
+
+*Type*: `boolean`
+
+Indicates if the dataset is non-redistributable, restricting data download.
+
+## `dataset.sources`
+
+*Type*: `array`
+
+(DEPRECATED) Lists the dataset's indicator sources.
+
+## `dataset.title`
+
+*Type*: `string` | Required
+
+One-line dataset title for internal use or data catalog users.
+
+### Guidelines
+        
+- Start with a capital letter without ending in a period.
+- Clearly identify the dataset.
+- Override the automatic title for datasets with multiple tables.
+    
+
+## `dataset.update_period_days`
+
+*Type*: `integer` | Required
+
+Defines the expected update frequency in days by OWID (e.g., `30`, `90`, `365`). Use `0` for datasets not planned to be updated.
+
+### Guidelines
+        
+- Define during the garden step.
+- Use integers to specify OWID's update frequency.
+
+### Examples
+        
+| DO  | DON'T  |
+| --- | ------ |
+| `7` | `2023-01-07` |
+| `30` | `monthly` |
+| `90` | `0.2` |
+| `365` | `1/365` |

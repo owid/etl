@@ -318,3 +318,8 @@ steps:
     - data://garden/faostat/2023-06-12/faostat_fbsc
     - data://garden/faostat/2023-06-12/faostat_ef
     - data://garden/faostat/2023-06-12/faostat_rfn
+  #
+  # FAOSTAT grapher step for additional variables for version 2023-06-12
+  #
+  data://grapher/faostat/2023-06-12/additional_variables:
+    - data://garden/faostat/2023-06-12/additional_variables
