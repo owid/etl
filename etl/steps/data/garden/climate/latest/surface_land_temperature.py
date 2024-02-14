@@ -29,7 +29,7 @@ def run(dest_dir: str) -> None:
 
     # Calculate mean temperature for each month in the entire period (to be used for anomaly calculations)
     # Use the baseline from GISS Surface Temperature Analysis (1951 - 1980) https://owid.cloud/admin/datasets/6375
-    tb_base = tb[(tb["year"].astype(int) > 1950) & (tb["year"].astype(int) < 1981)]
+    tb_base = tb[(tb["year"].astype(int) > 1949) & (tb["year"].astype(int) < 1981)]
     monthly_climatology = tb_base.groupby(["country", "month"], as_index=False)["temperature_2m"].mean()
     monthly_climatology = monthly_climatology.rename(columns={"temperature_2m": "mean_temp"})
 

@@ -13,11 +13,16 @@ meta:
     version_producer: 2
     citation_full: |-
       Muñoz Sabater, J. (2019): ERA5-Land monthly averaged data from 1950 to present. Copernicus Climate Change Service (C3S) Climate Data Store (CDS). DOI: 10.24381/cds.68d2bb30 (Accessed on 26-Dec-2023)
-    url_main:
+    url_main: 
       https://cds.climate.copernicus.eu/cdsapp#!/dataset/reanalysis-era5-land-monthly-means?tab=overview
     date_accessed: 2023-12-26
     date_published: 2023-12-26
     license:
       name: Copernicus License
-      url:
+      url: 
         https://cds.climate.copernicus.eu/api/v2/terms/static/licence-to-use-copernicus-products.pdf
+wdir: ../../../data/snapshots/climate/latest
+outs:
+- md5: 9af91c6c86dcbf32f620fbf72679176c
+  size: 3505476988
+  path: surface_land_temperature.zip

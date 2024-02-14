@@ -1,13 +1,14 @@
 """Load a snapshot and create a meadow dataset."""
-import gzip
+import os
+import tempfile
 import zipfile
 
+import dask
 import geopandas as gpd
 import numpy as np
 import pandas as pd
 import xarray as xr
 from owid.catalog import Table
-from shapely.geometry import mapping
 from structlog import get_logger
 from tqdm import tqdm
 
@@ -24,9 +25,20 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Retrieve snapshot.
-    snap = paths.load_snapshot("surface_land_temperature.gz")
-    # Load data from snapshot.
-    with gzip.open(snap.path, "r") as _file:
+    snap = paths.load_snapshot("surface_land_temperature.zip")
+    file_name = "data.nc"
+
+    # Create a temporary directory to extract the file to
+    with tempfile.TemporaryDirectory() as temp_dir:
+        # Open the ZIP file
+        with zipfile.ZipFile(snap.path, "r") as zip_ref:
+            # Extract the file
+            zip_ref.extract(file_name, path=temp_dir)
+
+        # Construct the path to the extracted file
+        _file = os.path.join(temp_dir, file_name)
+
+        # Open the file with xarray
         ds = xr.open_dataset(_file)
 
     # The latest 3 months in this dataset are made available through ERA5T, which is slightly different to ERA5. In the downloaded file, an extra dimenions ‘expver’ indicates which data is ERA5 (expver = 1) and which is ERA5T (expver = 5).
@@ -62,34 +74,45 @@ def run(dest_dir: str) -> None:
     # Initialize a list to keep track of small countries where temperature data extraction fails.
     small_countries = []
 
-    # Iterate over each row in the shapefile data.
-    for i in tqdm(range(shapefile.shape[0])):
-        # Extract the data for the current row.
-        data = shapefile[shapefile.index == i]
+    da.rio.write_crs("epsg:4326", inplace=True)
 
-        # Set the coordinate reference system for the temperature data to EPSG 4326.
-        da.rio.write_crs("epsg:4326", inplace=True)
+    # Initialize an empty dictionary to store the country-wise average temperature.
+    temp_country = {}
+
+    # Initialize a list to keep track of small countries where temperature data extraction fails.
+    small_countries = []
+
+    da.rio.write_crs("epsg:4326", inplace=True)
+
+    # Chunk the data array using Dask
+    da_chunked = da.chunk({"time": 100})  # Adjust the chunk size as needed
+
+    for i in tqdm(shapefile.index):
+        # Directly access the geometry and other attributes without filtering the GeoDataFrame
+        current_geometry = shapefile.at[i, "geometry"]
+        country_name = shapefile.at[i, "WB_NAME"]
 
         try:
-            # Clip the temperature data to the current country's shape.
-            clip = da.rio.clip(data.geometry.apply(mapping), data.crs)
+            # Use Dask's lazy evaluation
+            with dask.config.set(scheduler="threads"):  # Use the threaded scheduler
+                # Clip the temperature data to the current country's shape
+                clip = da_chunked.rio.clip([current_geometry], crs=shapefile.crs).compute()
 
-            # Calculate weights based on latitude to account for area distortion in latitude-longitude grids.
-            weights = np.cos(np.deg2rad(clip.latitude))
-            weights.name = "weights"
+                # Calculate weights based on latitude
+                weights = np.cos(np.deg2rad(clip.latitude))
+                weights.name = "weights"
+                clim_month_weighted = clip.weighted(weights)
 
-            # Apply the weights to the clipped temperature data.
-            clim_month_weighted = clip.weighted(weights)
+                # Calculate the weighted mean temperature
+                country_weighted_mean = clim_month_weighted.mean(dim=["longitude", "latitude"]).values
 
-            # Calculate the weighted mean temperature for the country.
-            country_weighted_mean = clim_month_weighted.mean(dim=["longitude", "latitude"]).values
+                # Store the result
+                temp_country[country_name] = country_weighted_mean
 
-            # Store the calculated mean temperature in the dictionary with the country's name as the key.
-            temp_country[shapefile.iloc[i]["WB_NAME"]] = country_weighted_mean
-
-        except Exception:
-            # If an error occurs (usually due to small size of the country), add the country's name to the small_countries list.
-            small_countries.append(shapefile.iloc[i]["WB_NAME"])
+        except Exception as e:
+            # Handle errors, possibly by logging or appending the country to a list of failed attempts
+            log.info(f"Error processing {country_name}: {e}")
+            small_countries.append(country_name)
 
     # Log information about countries for which temperature data could not be extracted.
     log.info(

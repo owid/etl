@@ -59,7 +59,7 @@ steps:
   # Copernicus Climate Change Service - Surface temperature.
   #
   data://meadow/climate/latest/surface_land_temperature:
-  - snapshot://climate/latest/surface_land_temperature.gz
+  - snapshot://climate/latest/surface_land_temperature.zip
   - snapshot://countries/2023-12-27/world_bank.zip
   data://garden/climate/latest/surface_land_temperature:
   - data://meadow/climate/latest/surface_land_temperature
