@@ -1,7 +1,7 @@
 """ETL services CLI."""
 import rich_click as click
 
-from apps.backport.backport import backport_cli as cli_backport
+from apps.backport.backport import backport_cli as cli_backport_run
 from apps.backport.bulk_backport import bulk_backport as cli_bulk_backport
 from apps.backport.fasttrack_backport import cli as cli_fasttrack_backport
 from apps.backport.migrate.migrate import cli as cli_backport_migrate
@@ -103,7 +103,7 @@ for name, cmd in COMMANDS_METADATA.items():
 #
 ################################
 COMMANDS_BACKPORT = {
-    "run": cli_backport,
+    "run": cli_backport_run,
     "bulk": cli_bulk_backport,
     "fasttrack": cli_fasttrack_backport,
     "migrate": cli_backport_migrate,
