@@ -49,7 +49,7 @@ YEAR_HIST_PROJ = 2021
 VERSION = "2022-11-30"
 # Cold start
 # The first time this is executed, no metadata file is available. It is created on the fly, during execution time.
-# Once this is done, we create the metadata YAML file using etl-metadata-export command.
+# Once this is done, we create the metadata YAML file using etl metadata-export command.
 # From then, we use the metadata in that YAML file, which might have some manual edits.
 COLD_START = False
 
