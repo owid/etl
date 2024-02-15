@@ -369,7 +369,7 @@ def _modified_chart_ids_by_admin(session: Session) -> Set[int]:
     union
 
     -- charts revisions that were approved on staging, such charts would have publishedByUserId
-    -- of the user that ran etl-wizard locally, but would be updated by Admin
+    -- of the user that ran etlwiz locally, but would be updated by Admin
     select
         chartId
     from suggested_chart_revisions

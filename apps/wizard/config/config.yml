@@ -10,7 +10,7 @@
 #
 # Your app should have the following properties:
 # - title (str): Title of the app. This will be shown in the home page and sidebar menu of Wizard.
-# - alias (str): [not needed in etl.steps] Alias of the app. This is used if you want to directly access the app from the command line (e.g. `etl-wizard [alias]`).
+# - alias (str): [not needed in etl.steps] Alias of the app. This is used if you want to directly access the app from the command line (e.g. `etlwiz [alias]`).
 # - description (str): Description of the app. This will be shown in the card of the app in the home page of Wizard.
 # - maintenaner (str): Slack handle of the person responsible for the app.
 # - entrypoint (str): Path to the main file of the app. This file should be the streamlit python script.

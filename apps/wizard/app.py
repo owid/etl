@@ -1,6 +1,6 @@
 """Entry page.
 
-This is the page that is loaded when the app is started. It redirects to the home page, unless an argument is passed. E.g. `etl-wizard charts` will redirect to the charts page."""
+This is the page that is loaded when the app is started. It redirects to the home page, unless an argument is passed. E.g. `etlwiz charts` will redirect to the charts page."""
 from pathlib import Path
 
 import streamlit as st

@@ -134,7 +134,7 @@ def migrate(
     print(
         f"[green]3.[/green] Merge changes or run it directly against production with [bold]`ENV=.env.prod.write etl {namespace}/{version}/{short_name} --grapher`[/bold]"
     )
-    print("[green]4.[/green] Run chart revisions with [bold]`ENV=.env.prod.write etl-wizard charts`[/bold]")
+    print("[green]4.[/green] Run chart revisions with [bold]`ENV=.env.prod.write etlwiz charts`[/bold]")
     print("[green]5.[/green] [bold]Delete[/bold] or archive the old dataset")
 
 
