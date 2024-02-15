@@ -32,13 +32,6 @@ steps:
   data://grapher/artificial_intelligence/2024-02-15/epoch_llms:
   - data://garden/artificial_intelligence/2024-02-15/epoch_llms
 
-
- # Artificial Intelligence (EPOCH aggregates by domain and reseach affiliation)
-  data://garden/artificial_intelligence/2023-06-21/epoch_aggregates:
-  - data://garden/artificial_intelligence/2023-06-21/epoch
-  data://grapher/artificial_intelligence/2023-06-21/epoch_aggregates:
-  - data://garden/artificial_intelligence/2023-06-21/epoch_aggregates
-
   # World Risk Poll
   data://meadow/world_risk_poll/2023-06-26/wrp_2021:
   - snapshot://world_risk_poll/2023-06-26/wrp_2021.zip
