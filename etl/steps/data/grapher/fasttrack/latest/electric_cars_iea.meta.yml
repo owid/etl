@@ -1,0 +1,79 @@
+dataset:
+  title: Electric car sales (IEA, 2023)
+  description: Electric car sales and stocks data from the International Energy Agency.
+  licenses:
+    - {}
+tables:
+  electric_cars_iea:
+    variables:
+      ev_sales_share:
+        title: Share of new cars that are electric
+        unit: '%'
+        short_unit: '%'
+        description: The share of new cars sold that are electric. This includes plug-in hybrids and battery-electric cars.
+      ev_stock_share:
+        title: Share of car stocks that are electric
+        unit: '%'
+        short_unit: '%'
+        description: The share of car stocks that are electric. This includes plug-in hybrids and battery-electric cars.
+      bev_sales:
+        title: Battery-electric cars sold
+        unit: cars
+        short_unit: cars
+        description: The number of new fully battery-electric cars sold.
+      bev_stock:
+        title: Battery-electric car stocks
+        unit: cars
+        short_unit: cars
+        description: The number of fully battery-electric car stocks.
+      phev_sales:
+        title: Plug-in hybrid cars sold
+        unit: cars
+        short_unit: cars
+        description: The number of plug-in hybrid cars sold.
+      phev_stock:
+        title: Plug-in hybrid car stocks
+        unit: cars
+        short_unit: cars
+        description: The number of plug-in hybrid car stocks.
+      ev_sales:
+        title: Electric cars sold
+        unit: cars
+        short_unit: cars
+        description: The number of new electric cars sold. This includes plug-in hybrids and battery-electric cars.
+      bev_share_ev_cars:
+        title: Battery-electric as a share of electric cars sold
+        unit: '%'
+        short_unit: '%'
+        description: The share of electric car stocks that are fully battery-electric.
+      phev_share_ev_cars:
+        title: Plug-in hybrid as a share of electric cars sold
+        unit: '%'
+        short_unit: '%'
+        description: The share of electric car stocks that are plug-in hybrids.
+      bev_share_car_sales:
+        title: Battery-electric as a share of cars sold
+        unit: '%'
+        short_unit: '%'
+        description: The share of new cars sold that are fully battery-electric.
+      phev_share_car_sales:
+        title: Plug-in hybrid as a share of cars sold
+        unit: '%'
+        short_unit: '%'
+        description: The share of new cars sold that are plug-in hybrids.
+      ev_stock:
+        title: Electric car stocks
+        unit: cars
+        short_unit: cars
+        description: The number of electric car stocks. This includes plug-in hybrids and battery-electric cars.
+      total_cars_sold:
+        title: Total new car sales
+        unit: cars
+        short_unit: cars
+        description: The total number of new cars sold.
+      non_ev_cars_sold:
+        title: Non-electric car sales
+        unit: cars
+        short_unit: cars
+        description: |-
+          The total number of new cars sold that are not electric. This includes, petrol, diesel and hybrids. It does not include plug-in hybrids.

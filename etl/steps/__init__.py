@@ -27,6 +27,7 @@ import structlog
 import yaml
 from owid import catalog
 from owid.walden import CATALOG as WALDEN_CATALOG
+from owid.walden import Catalog as WaldenCatalog
 from owid.walden import Dataset as WaldenDataset
 
 from etl import config, files, git, paths
@@ -317,6 +318,31 @@ def extract_step_attributes(step: str) -> Dict[str, str]:
     return attributes
 
 
+def load_from_uri(uri: str) -> catalog.Dataset | Snapshot | WaldenDataset:
+    """Load an ETL dataset from a URI."""
+    attributes = extract_step_attributes(cast(str, uri))
+    # Walden
+    if attributes["channel"] == "walden":
+        dataset = WaldenCatalog().find_one(
+            namespace=attributes["namespace"], version=attributes["version"], short_name=attributes["name"]
+        )
+    # Snapshot
+    elif attributes["channel"] == "snapshot":
+        path = f"{attributes['namespace']} / {attributes['version']} / {attributes['name']}"
+        try:
+            dataset = Snapshot(path)
+        except FileNotFoundError:
+            raise FileNotFoundError(f"Snapshot not found for URI '{uri}'. You may want to run `python {path}` first")
+    # Data
+    else:
+        path = f"{attributes['channel']}/{attributes['namespace']}/{attributes['version']}/{attributes['name']}"
+        try:
+            dataset = catalog.Dataset(paths.DATA_DIR / path)
+        except FileNotFoundError:
+            raise FileNotFoundError(f"Dataset not found for URI '{uri}'. You may want to run `etl {uri}` first")
+    return dataset
+
+
 class Step(Protocol):
     path: str
     is_public: bool = True
@@ -445,8 +471,11 @@ class DataStep(Step):
     def has_existing_data(self) -> bool:
         return self._dest_dir.is_dir()
 
-    def can_execute(self) -> bool:
+    def can_execute(self, archive_ok: bool = True) -> bool:
         sp = self._search_path
+        if not archive_ok and "/archive/" in sp.as_posix():
+            return False
+
         return (
             # python script
             sp.with_suffix(".py").exists()
@@ -657,6 +686,14 @@ class SnapshotStep(Step):
 
     def __str__(self) -> str:
         return f"snapshot://{self.path}"
+
+    def can_execute(self, archive_ok: bool = True) -> bool:
+        try:
+            Snapshot(self.path)
+            return True
+
+        except Exception:
+            return False
 
     def run(self) -> None:
         snap = Snapshot(self.path)
@@ -937,7 +974,7 @@ class BackportStep(DataStep):
 
         self.after_run()
 
-    def can_execute(self) -> bool:
+    def can_execute(self, archive_ok: bool = True) -> bool:
         return True
 
     @property

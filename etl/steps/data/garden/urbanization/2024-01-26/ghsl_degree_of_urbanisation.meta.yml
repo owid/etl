@@ -28,13 +28,14 @@ definitions:
 
       The method uses fixed population size and density thresholds for consistency and simplicity, though this may not always accurately reflect local urban characteristics.
 
+    description_short: The European Commission combines satellite imagery with national census data to identify [cities](#dod:cities-degurba), [towns and suburbs](#dod:towns-suburbs-degurba), and [rural areas](#dod:rural-areas-degurba) and estimate their respective populations.
+
 tables:
   ghsl_degree_of_urbanisation:
     variables:
       average_area_km2_estimates:
         title: Average size of spatial units comprising the territory
         unit: km²
-        description_short: Refers to all the geographic divisions, including cities, towns, semi-dense areas, and rural regions, as categorized according to the Degree of Urbanisation criteria.
         display:
           numDecimalPlaces: 0
 
@@ -181,9 +182,8 @@ tables:
         title: Share of urban population (estimates)
         unit: '%'
         short_unit: '%'
-        description_short: Share of total population in administrative units classified as cities, towns and suburbs.
         presentation:
-          title_public: Share of urban population
+          title_public: Share of population living in cities, towns and suburbs
         display:
           numDecimalPlaces: 1
 
@@ -207,13 +207,74 @@ tables:
         short_unit: ''
         display:
           numDecimalPlaces: 0
+      degurba_l1_population_city_share_estimates:
+        title: Share of population living in cities (DEGURBA Level 1)
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      degurba_l1_population_rural_area_share_estimates:
+        title: Share of population living in rural areas (DEGURBA Level 1)
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      degurba_l1_population_town__and__suburbs_share_estimates:
+        title: Share of population living in towns and suburbs (DEGURBA Level 1)
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      degurba_l2_population_city_share_estimates:
+        title: Share of population living in cities (DEGURBA Level 2)
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      degurba_l2_population_dense_town_share_estimates:
+        title: Share of population living in dense towns (DEGURBA Level 2)
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      degurba_l2_population_mostly_uninhabited_area_share_estimates:
+        title: Share of population living in mostly uninhabited areas (DEGURBA Level 2)
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      degurba_l2_population_rural_dispersed_area_share_estimates:
+        title: Share of population living in rural dispersed areas (DEGURBA Level 2)
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      degurba_l2_population_semi_dense_town_share_estimates:
+        title: Share of population living in semi-dense towns (DEGURBA Level 2)
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+      degurba_l2_population_suburbs_or_peri_urban_area_share_estimates:
+        title: Share of population living in suburbs or peri-urban areas (DEGURBA Level 2)
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+
+      degurba_l2_population_village_share_estimates:
+        title: Share of population living in villages (DEGURBA Level 2)
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+
       #
       #  Projections
       #
       average_area_km2_projections:
         title: Average size of spatial units comprising the territory (future projections)
         unit: km²
-        description_short: Refers to all the geographic divisions, including cities, towns, semi-dense areas, and rural regions, as categorized according to the Degree of Urbanisation criteria.
         presentation:
           title_public: Average size of spatial units comprising the territory
         display:
@@ -444,9 +505,8 @@ tables:
         title: Share of urban population (future projections)
         unit: '%'
         short_unit: '%'
-        description_short: Share of total population in administrative units classified as cities, towns and suburbs.
         presentation:
-          title_public: Share of urban population
+          title_public:  Share population living in cities, towns and suburbs
         display:
           numDecimalPlaces: 1
           isProjection: true
@@ -460,7 +520,7 @@ tables:
           isProjection: true
 
       total_pop_projections:
-        title: Total population (projections)
+        title: Total population (future projections)
         unit: people
         short_unit: ''
         display:
@@ -475,3 +535,99 @@ tables:
           numDecimalPlaces: 0
           isProjection: true
 
+      degurba_l1_population_city_share_projections:
+        title: Share of population living in cities (DEGURBA Level 1) (future projections)
+        unit: '%'
+        short_unit: '%'
+        presentation:
+          title_public: Share of population living in cities (DEGURBA Level 1)
+        display:
+          numDecimalPlaces: 1
+          isProjection: true
+
+      degurba_l1_population_rural_area_share_projections:
+        title: Share of population living in rural areas (DEGURBA Level 1) (future projections)
+        unit: '%'
+        short_unit: '%'
+        presentation:
+          title_public: Share of population living in rural areas (DEGURBA Level 1)
+        display:
+          numDecimalPlaces: 1
+          isProjection: true
+
+      degurba_l1_population_town__and__suburbs_share_projections:
+        title: Share of population living in towns and suburbs (DEGURBA Level 1) (future projections)
+        unit: '%'
+        short_unit: '%'
+        presentation:
+          title_public: Share of population living in towns and suburbs (DEGURBA Level 1)
+        display:
+          numDecimalPlaces: 1
+          isProjection: true
+
+      degurba_l2_population_city_share_projections:
+        title: Share of population living in cities (DEGURBA Level 2) (future projections)
+        unit: '%'
+        short_unit: '%'
+        presentation:
+          title_public: Share of population living in cities (DEGURBA Level 2)
+        display:
+          numDecimalPlaces: 1
+          isProjection: true
+
+      degurba_l2_population_dense_town_share_projections:
+        title: Share of population living in dense towns (DEGURBA Level 2) (future projections)
+        unit: '%'
+        short_unit: '%'
+        presentation:
+          title_public: Share of population living in dense towns (DEGURBA Level 2)
+        display:
+          numDecimalPlaces: 1
+          isProjection: true
+      degurba_l2_population_mostly_uninhabited_area_share_projections:
+        title: Share of population living in mostly uninhabited areas (DEGURBA Level 2) (future projections)
+        unit: '%'
+        short_unit: '%'
+        presentation:
+          title_public: Share of population living in mostly uninhabited areas (DEGURBA Level 2)
+        display:
+          numDecimalPlaces: 1
+          isProjection: true
+      degurba_l2_population_rural_dispersed_area_share_projections:
+        title: Share of population living in rural dispersed areas (DEGURBA Level 2) (future projections)
+        unit: '%'
+        short_unit: '%'
+        presentation:
+          title_public: Share of population living in rural dispersed areas (DEGURBA Level 2)
+        display:
+          numDecimalPlaces: 1
+          isProjection: true
+
+      degurba_l2_population_semi_dense_town_share_projections:
+        title: Share of population living in semi-dense towns (DEGURBA Level 2) (future projections)
+        unit: '%'
+        short_unit: '%'
+        presentation:
+          title_public: Share of population living in semi-dense towns (DEGURBA Level 2)
+        display:
+          numDecimalPlaces: 1
+          isProjection: true
+      degurba_l2_population_suburbs_or_peri_urban_area_share_projections:
+        title: Share of population living in suburbs or peri-urban areas (DEGURBA Level 2) (future projections)
+        unit: '%'
+        short_unit: '%'
+        presentation:
+          title_public: Share of population living in suburbs or peri-urban areas (DEGURBA Level 2)
+        display:
+          numDecimalPlaces: 1
+          isProjection: true
+
+      degurba_l2_population_village_share_projections:
+        title: Share of population living in villages (DEGURBA Level 2) (future projections)
+        unit: '%'
+        short_unit: '%'
+        presentation:
+          title_public: Share of population living in villages (DEGURBA Level 2)
+        display:
+          numDecimalPlaces: 1
+          isProjection: true

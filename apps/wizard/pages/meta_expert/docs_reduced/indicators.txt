@@ -1,0 +1,134 @@
+# Simplified Documentation
+
+## `variable`
+
+An indicator, or variable, is a data series with metadata, defined by `VariableMeta`.
+
+### `variable.description_from_producer`
+
+- *Type*: `string` | Recommended
+- Producer's description.
+- **Guidelines**:
+  - Capitalize the first letter and end with a period.
+  - Keep producer's text with minor edits allowed.
+  - Include only if provided by the producer.
+
+### `variable.description_key`
+
+- *Type*: `array` | Recommended for curated indicators
+- Key information list.
+- **Guidelines**:
+  - Use short paragraphs, capitalized and ending with a period.
+  - Exclude `description_short`.
+  - Include essential information, excluding processing details.
+
+### `variable.description_processing`
+
+- *Type*: `string` | Required if applicable
+- Processing details by OWID.
+- **Guidelines**:
+  - Start with a capital letter and end with a period.
+  - Include only significant editorial decisions.
+
+### `variable.description_short`
+
+- *Type*: `string` | Required
+- Brief description complementing the title.
+- **Guidelines**:
+  - One short paragraph, capitalized, ending with a period.
+  - Exclude metadata fields except crucial units.
+
+### `variable.display`
+
+Less powerful than grapher config, retains display settings.
+
+#### Display Attributes
+
+- `color`: *Type*: `string` | Chart color.
+- `conversionFactor`: *Type*: `number` | Avoid using; prefer ETL conversion.
+- `description`: *Type*: `string` | Display description.
+- `entityAnnotationsMap`: *Type*: `string` | Entity annotations.
+- `includeInTable`: *Type*: `boolean` | Indicator in table sheet.
+- `isProjection`: *Type*: `boolean` | Forward projection indicator.
+- `name`: *Type*: `string` | Required | Chart legend title.
+  - **Guidelines**:
+    - Very short, no period.
+- `numDecimalPlaces`: *Type*: `integer` | Decimal places in charts.
+- `shortUnit`: *Type*: `string` | Short unit in charts.
+- `tableDisplay`: Config for table tab.
+  - `hideAbsoluteChange`: *Type*: `boolean` | Hide absolute change.
+  - `hideRelativeChange`: *Type*: `boolean` | Hide relative change.
+- `tolerance`: *Type*: `integer` | Tolerance in charts.
+- `unit`: *Type*: `string` | Unit in charts.
+- `yearIsDay`: *Type*: `boolean` | Year column as day.
+- `zeroDay`: *Type*: `string` | Starting date if `yearIsDay` is true.
+
+### `variable.license`
+
+- *Type*: `string` | Required (future automation)
+- Depends on processing level and origin licenses.
+- **Guidelines**:
+  - `CC BY 4.0` for major processing.
+  - Strictest origin license for minor processing.
+
+### `variable.origins`
+
+- *Type*: `array`
+- List of indicator origins.
+- **Note**: Automatic propagation preferred.
+
+### `variable.presentation`
+
+Defines public metadata display.
+
+#### Presentation Attributes
+
+- `attribution`: *Type*: `string` | Optional | Custom citation.
+- `attribution_short`: *Type*: `string` | Recommended for curated indicators | Short citation.
+- `faqs`: *Type*: `array` | Recommended for curated indicators | FAQ references.
+- `grapher_config`: OWID grapher configuration.
+- `title_public`: *Type*: `string` | Optional | Public title.
+- `title_variant`: *Type*: `string` | Optional | Title disambiguation.
+- `topic_tags`: *Type*: `array` | Recommended for curated indicators | Relevant topics.
+
+### `variable.presentation_license`
+
+Overrides `license`.
+
+- `name`: *Type*: `string`
+- `url`: *Type*: `string`
+
+### `variable.processing_level`
+
+- *Type*: `string` | Required (future automation)
+- Indicates minor or major processing.
+- **Guidelines**:
+  - `minor` for simple operations.
+  - `major` for complex operations.
+
+### `variable.short_unit`
+
+- *Type*: `string` | Required
+- Measurement unit abbreviation.
+- **Guidelines**:
+  - Follow SI capitalization, no period, no spaces.
+  - Use `display.short_unit` for chart simplifications.
+
+### `variable.sources`
+
+- *Type*: `array`
+- List of sources, replaced by `origins`.
+
+### `variable.title`
+
+- *Type*: `string` | Required
+- Indicator title.
+- **Guidelines**:
+  - Capitalized, no period, short sentence.
+
+### `variable.unit`
+
+- *Type*: `string` | Required
+- Measurement unit name.
+- **Guidelines**:
+  - Lowercase, plural, metric units preferred, '%' for percentages.

@@ -12,7 +12,8 @@ import click
 import streamlit.web.cli as stcli
 from rich_click.rich_command import RichCommand
 
-from apps.wizard.utils import CURRENT_DIR, PHASES
+from apps.wizard.config import WIZARD_PHASES
+from apps.wizard.utils import CURRENT_DIR
 
 # Disable streamlit cache data API logging
 # ref: @kajarenc from https://github.com/streamlit/streamlit/issues/6620#issuecomment-1564735996
@@ -24,7 +25,7 @@ logging.getLogger("streamlit.runtime.caching.cache_data_api").setLevel(logging.E
 @click.command(cls=RichCommand)
 @click.argument(
     "phase",
-    type=click.Choice(PHASES.__args__),  # type: ignore
+    type=click.Choice(WIZARD_PHASES.__args__),  # type: ignore
     default="all",
 )
 @click.option(
@@ -44,7 +45,7 @@ logging.getLogger("streamlit.runtime.caching.cache_data_api").setLevel(logging.E
     type=int,
     help="Application port",
 )
-def cli(phase: Iterable[PHASES], run_checks: bool, dummy_data: bool, port: int) -> None:
+def cli(phase: Iterable[WIZARD_PHASES], run_checks: bool, dummy_data: bool, port: int) -> None:
     """Generate template fo each step of ETL."""
     script_path = CURRENT_DIR / "app.py"
 

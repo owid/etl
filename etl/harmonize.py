@@ -7,7 +7,7 @@ import json
 import re
 from collections import defaultdict
 from pathlib import Path
-from typing import DefaultDict, Dict, List, Optional, Set, cast
+from typing import DefaultDict, Dict, List, Optional, Set, Tuple, cast
 
 import click
 import pandas as pd
@@ -100,6 +100,30 @@ def interactive_harmonize(
     mapper = CountryRegionMapper()
 
     # do the easy cases first
+    ambiguous, mapping = harmonize_simple(to_map, mapping, mapper)
+
+    # first summary
+    questionary.print(f"  └ {len(to_map) - len(ambiguous)} automatically matched")
+    questionary.print(f"  └ {len(ambiguous)} ambiguous countries/regions")
+    questionary.print("")
+
+    # actually ask user
+    prompt_user(ambiguous, mapping, mapper, institution, num_suggestions)
+
+    return mapping
+
+
+def harmonize_simple(
+    to_map: List[str], mapping: Dict[str, str], mapper: "CountryRegionMapper"
+) -> Tuple[List[str], Dict[str, str]]:
+    """Apply basic harmonization (map entities with identical names).
+
+    Uses `mapper` to map entities in `to_map` to standard OWID naming conventions.
+
+    It returns two objects:
+        - `mapping`: Dictionary with the entity mapping.
+        - `ambiguous`: List of entities from `to_map` that could not be mapped.
+    """
     ambiguous = []
     for region in to_map:
         if region in mapping:
@@ -113,16 +137,7 @@ def interactive_harmonize(
             continue
 
         ambiguous.append(region)
-
-    # first summary
-    questionary.print(f"  └ {len(to_map) - len(ambiguous)} automatically matched")
-    questionary.print(f"  └ {len(ambiguous)} ambiguous countries/regions")
-    questionary.print("")
-
-    # actually ask user
-    prompt_user(ambiguous, mapping, mapper, institution, num_suggestions)
-
-    return mapping
+    return ambiguous, mapping
 
 
 def prompt_user(

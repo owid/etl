@@ -1,6 +1,6 @@
-"""Clientn module."""
+"""Client module."""
 import os
-from typing import Any, Dict, Literal
+from typing import Any, Dict, Literal, cast
 
 import click
 import structlog
@@ -9,9 +9,9 @@ from owid.catalog import Dataset
 from rich_click.rich_command import RichCommand
 from typing_extensions import Self
 
-from apps.metagpt.gpt import GPTResponse, OpenAIWrapper
 from apps.metagpt.prompts import create_query_data_step, create_query_snapshot
 from apps.metagpt.utils import Channels, convert_list_to_dict, read_metadata_file
+from apps.wizard.utils.gpt import MODEL_DEFAULT, GPTResponse, OpenAIWrapper
 from etl.files import yaml_dump
 
 # Fields to ask GPT for (garden, grapher)
@@ -37,7 +37,8 @@ log = structlog.get_logger()
     is_flag=True,
     help="Overwrite input file if set to True. Otherwise, save the new file in the output directory.",
 )
-def main(path_to_file: str, output_dir: str, overwrite: bool) -> None:
+@click.option("--model", default=MODEL_DEFAULT, type=str, help="Name of the model.")
+def main(path_to_file: str, output_dir: str, overwrite: bool, model: str) -> None:
     """Process and update metadata using GPT-based tool.
 
     To learn more about the behaviour of this tool, please refer to https://docs.owid.io/projects/etl/architecture/metadata/.
@@ -54,7 +55,7 @@ def main(path_to_file: str, output_dir: str, overwrite: bool) -> None:
 
     try:
         # Start tool (initialise gpt client)
-        gpt_updater = MetadataGPTUpdater(path_to_file)
+        gpt_updater = MetadataGPTUpdater(path_to_file, model=model)
         if gpt_updater.channel in [Channels.GARDEN, Channels.GRAPHER]:
             # Calculate the total estimated cost
             cost_estimated = gpt_updater.run(lazy=True)
@@ -76,8 +77,10 @@ def main(path_to_file: str, output_dir: str, overwrite: bool) -> None:
 class MetadataGPTUpdater:
     """Update metadata file using Chat GPT."""
 
-    def __init__(self: Self, path_to_file: str) -> None:
+    def __init__(self: Self, path_to_file: str, model: str) -> None:
         """Initialize the metadata updater."""
+        # Name of the model
+        self.model: str = model
         # Path to the metadata file
         self.path_to_file: str = path_to_file
         # Will contain the original metadata file content. Access to it via the property `metadata_old_str`
@@ -178,7 +181,7 @@ class MetadataGPTUpdater:
         """Run main code for snapshot."""
         # Create system prompt
         query = create_query_snapshot(self.metadata_old_str)
-        response = self.client.query_gpt(query=query)
+        response = self.client.query_gpt(query=query, model=self.model)  # type: ignore
 
         if isinstance(response, GPTResponse):
             self.__metadata_new = response.message_content_as_dict  # type: ignore
@@ -220,13 +223,13 @@ class MetadataGPTUpdater:
                     )
                     # Query GPT (or just estimate cost if lazy mode is on)
                     if lazy:
-                        est_cost = query.estimated_cost
+                        est_cost = query.estimated_cost(self.model)  # type: ignore
                         cost += len(original_yaml_content["tables"].items()) * est_cost
                     else:
-                        result = self.client.query_gpt(query=query)
+                        result = self.client.query_gpt(query=query, model=self.model)  # type: ignore
                         # Act based on reply (only if valid)
                         if result:
-                            cost += result.cost
+                            cost += cast(int, result.cost)
                             indicator_metadata.append(result.message_content)
                 # Update indicator metadata (when lazy mode is OFF)
                 if not lazy:

@@ -9,7 +9,6 @@ etl = 'etl.command:main_cli'
 reindex = 'etl.reindex:reindex_cli'
 publish = 'etl.publish:publish_cli'
 prune = 'etl.prune:prune_cli'
-harmonize = 'etl.harmonize_old:harmonize'
 backport = 'apps.backport.backport:backport_cli'
 bulk_backport = 'apps.backport.bulk_backport:bulk_backport'
 backport-migrate = 'apps.backport.migrate.migrate:cli'
@@ -18,7 +17,7 @@ fasttrack = 'apps.fasttrack.cli:cli'
 run_python_step = 'etl.run_python_step:main'
 compare = 'etl.compare:cli'
 generate_graph = 'etl.to_graphviz:to_graphviz'
-version_tracker = 'etl.helpers:run_version_tracker_checks'
+version_tracker = 'etl.version_tracker:run_version_tracker_checks'
 etl-harmonize = 'etl.harmonize:harmonize'
 etl-match-variables = 'etl.match_variables:main_cli'
 etl-translate-varmap = 'etl.variable_mapping_translate:main_cli'
@@ -27,7 +26,6 @@ etl-metadata-export = 'etl.metadata_export:cli'
 etl-metadata-migrate = 'apps.metadata_migrate.cli:cli'
 etl-datadiff = 'etl.datadiff:cli'
 etl-chartgpt = 'etl.chart_revision.v2.chartgpt:cli'
-etl-metaplay = 'apps.metadata_playground.cli:cli'
 etl-wizard = 'apps.wizard.cli:cli'
 etl-staging-sync = 'apps.staging_sync.cli:cli'
 etl-staging-sync-app = 'apps.staging_sync.app:cli'
@@ -41,8 +39,7 @@ click = ">=8.0.1"
 PyYAML = ">=6.0.1"
 papermill = ">=2.3.3"
 jupyterlab = ">=3.1.13"
-# 2.2.0 was raising weird error, pin to 2.1.1 which is stable
-mysqlclient = "2.1.1"
+mysqlclient = ">=2.2.4"
 SPARQLWrapper = ">=1.8.5"
 openpyxl = ">=3.0.9"
 sh = "1.14.3"
@@ -82,7 +79,7 @@ wbgapi = "^1.0.12"
 odfpy = "^1.4.1"
 world-bank-data = "^0.1.3"
 questionary = "^2.0.0"
-streamlit = "^1.26.0"
+streamlit = "^1.31.0"
 streamlit-ace = "^0.1.1"
 st-pages = "^0.4.4"
 streamlit-extras = "^0.3.0"
@@ -95,6 +92,7 @@ fasteners = "^0.19"
 streamlit-agraph = "^0.0.45"
 cdsapi = "^0.6.1"
 rioxarray = "^0.15.0"
+tiktoken = "^0.6.0"
 
 [tool.poetry.group.api.dependencies]
 fastapi = "^0.109.0"
@@ -149,7 +147,8 @@ exclude = [
     "lib/",
     "etl/steps/archive",
     "etl/snapshots/archive",
-    "apps/wizard/templating/cookiecutter",
+    "apps/wizard/etl_steps/cookiecutter/",
+    "apps/wizard/etl_steps/cookiecutter/snapshot/**",
     "**/node_modules",
     "**/__pycache__",
     ".git",

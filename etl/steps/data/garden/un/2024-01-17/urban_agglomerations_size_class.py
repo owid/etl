@@ -1,5 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
 
+import owid.catalog.processing as pr
+
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
 
@@ -35,12 +37,28 @@ def run(dest_dir: str) -> None:
         if "_Population" in col:
             tb_pivot[col] = tb_pivot[col] * 1000
 
+    tb_pivot = tb_pivot.reset_index()
+    # Create two new dataframes to separate data into estimates and projections (pre-2019 and post-2019)
+    past_estimates = tb_pivot[tb_pivot["year"] < 2019].copy()
+    future_projections = tb_pivot[tb_pivot["year"] >= 2019].copy()
+
+    # Now, for each column in the original dataframe, split it into two (projections and estimates)
+    for col in tb_pivot.columns:
+        if col not in ["country", "year"]:
+            past_estimates[f"{col}_estimates"] = tb_pivot.loc[tb_pivot["year"] < 2019, col]
+            future_projections[f"{col}_projections"] = tb_pivot.loc[tb_pivot["year"] >= 2019, col]
+            past_estimates = past_estimates.drop(columns=[col])
+            future_projections = future_projections.drop(columns=[col])
+
+    tb_merged = pr.merge(past_estimates, future_projections, on=["country", "year"], how="outer")
+    tb_merged = tb_merged.underscore().set_index(["country", "year"], verify_integrity=True)
+
     #
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
     ds_garden = create_dataset(
-        dest_dir, tables=[tb_pivot], check_variables_metadata=True, default_metadata=ds_meadow.metadata
+        dest_dir, tables=[tb_merged], check_variables_metadata=True, default_metadata=ds_meadow.metadata
     )
 
     # Save changes in the new garden dataset.

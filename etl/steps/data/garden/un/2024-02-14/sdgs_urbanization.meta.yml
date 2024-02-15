@@ -1,0 +1,37 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    description_processing: |-
+        For each country the average across all cities avaialble was calculated.
+    presentation:
+      topic_tags:
+        - Urbanization
+    display:
+      numDecimalPlaces: 1
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
+dataset:
+  update_period_days: 364
+  title: United Nations Sustainable Development Goals (2023-Q2) - Urbanization
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
+tables:
+  un_sdg:
+    # Learn more about the available fields:
+    # http://docs.owid.io/projects/etl/architecture/metadata/reference/indicator/
+    variables:
+      average_share_of_the_built_up_area_of_cities_that_is_open_space_for_public_use_for_all__pct:
+        title: Average share of the built-up area of cities that is open space for public use for all
+        unit: '%'
+        short_unit: '%'
+        description_from_producer: Data on estimated share of urban population within 400 meters walking distance along the street network to an open public space.
+
+      proportion_of_population_that_has_convenient_access_to_public_transport__pct:
+        title: Proportion of population that has convenient access to public transport
+        unit: '%'
+        short_unit: '%'
+        description_from_producer: Estimated share of urban population who can access a public transport stop within a walking distance of 500 meters (for low capacity public transport systems) and/or 1000 meters (for high capacity public transport systems) along the street network.
+

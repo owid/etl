@@ -1,0 +1,19 @@
+dataset:
+  title: Weather forecast spending by income group (Georgeson et al. 2017)
+  description: Spending on weathering forecasting and services across income groups in 2015.
+  licenses:
+    - {}
+tables:
+  weather_spending_georgeson:
+    variables:
+      weather_spending_per_capita:
+        title: Spending per person
+        unit: US$ per person
+        short_unit: $
+        description: The amount spent on weather forecasting and services, measured per person. This is measured in 2015 US
+          dollars.
+      weather_spending_percent_gdp:
+        title: Spending as a share of GDP
+        unit: percent
+        short_unit: '%'
+        description: The amount spent on weather forecasting and services, measured as a share of gross domestic product (GDP).

@@ -21,11 +21,12 @@ def get_username():
     return pwd.getpwuid(os.getuid())[0]
 
 
-ENV_FILE = env.get("ENV", BASE_DIR / ".env")
+def load_env():
+    ENV_FILE = env.get("ENV", BASE_DIR / ".env")
+    load_dotenv(ENV_FILE, override=True)
 
-load_dotenv(ENV_FILE)
 
-
+load_env()
 # When DEBUG is on
 # - run steps in the same process (speeding up ETL)
 DEBUG = env.get("DEBUG") in ("True", "true", "1")
@@ -45,10 +46,6 @@ DB_HOST = env.get("DB_HOST", "localhost")
 DB_PORT = int(env.get("DB_PORT", "3306"))
 DB_USER = env.get("DB_USER", "root")
 DB_PASS = env.get("DB_PASS", "")
-
-# metaplay config
-METAPLAY_PORT = int(env.get("METAPLAY_PORT", "8051"))
-
 
 if "DATA_API_ENV" in env:
     DATA_API_ENV = env["DATA_API_ENV"]
@@ -132,6 +129,8 @@ ETL_API_COMMIT = env.get("ETL_API_COMMIT") in ("True", "true", "1")
 FASTTRACK_COMMIT = env.get("FASTTRACK_COMMIT") in ("True", "true", "1")
 
 BUGSNAG_API_KEY = env.get("BUGSNAG_API_KEY")
+
+OPENAI_API_KEY = env.get("OPENAI_API_KEY", None)
 
 
 def enable_bugsnag() -> None:

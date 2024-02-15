@@ -248,3 +248,9 @@ steps:
 
   data://grapher/artificial_intelligence/2023-07-25/cset:
   - data://garden/artificial_intelligence/2023-07-25/cset
+
+  # Chess dataset (ELO ratings)
+  data://garden/artificial_intelligence/2024-02-05/chess:
+    - snapshot://artificial_intelligence/2024-02-05/chess.csv
+  data://grapher/artificial_intelligence/2024-02-05/chess:
+    - data://garden/artificial_intelligence/2024-02-05/chess
