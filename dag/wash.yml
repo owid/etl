@@ -2,6 +2,7 @@ steps:
   ## European Environment Agency - Water Information System for Europe
   data://meadow/wash/2024-01-04/nutrients:
     - snapshot://wash/2024-01-04/nutrients.zip
+    - snapshot://wash/2024-02-15/nutrients_europe.csv
   data://garden/wash/2024-01-04/nutrients:
     - data://meadow/wash/2024-01-04/nutrients
   data://grapher/wash/2024-01-04/nutrients:

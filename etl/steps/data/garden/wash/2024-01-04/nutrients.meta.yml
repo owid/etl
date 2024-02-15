@@ -18,7 +18,7 @@ definitions:
       <<unit>>
   title_public: |-
     <% if indicator == "Ammonium" %>
-    Ammonium concentation in <<water_body_category>>
+    Ammonium concentration in <<water_body_category>>
     <% elif indicator == "BOD5" %>
     Biological oxygen demand over five days in <<water_body_category>>
     <% elif indicator == "Nitrate" %>
@@ -112,3 +112,19 @@ tables:
           sites
         short_unit: |-
           sites
+      numberofcountries:
+        title: Number of countries
+        description_short: |-
+          Number of countries used to measure the {definitions.description_short}
+        unit: |-
+          countries
+        short_unit: |-
+          countries
+      numberofreportedcountries:
+        title: Number of reported countries
+        description_short: |-
+          Number of reporting countries used to measure the {definitions.description_short}
+        unit: |-
+          countries
+        short_unit: |-
+          countries

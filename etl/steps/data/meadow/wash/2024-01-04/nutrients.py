@@ -16,13 +16,18 @@ def run(dest_dir: str) -> None:
     #
     # Retrieve snapshot.
     snap = paths.load_snapshot("nutrients.zip")
-    # Load data from snapshot.
+    snap_regions = paths.load_snapshot("nutrients_europe.csv")
+
+    # Load europe aggregate data from snapshot.
+    tb_reg = snap_regions.read()
+    tb_reg["countryName"] = "Europe (EEA)"
     # Load data from snapshot.
     with zipfile.ZipFile(snap.path) as z:
         # open the csv file in the dataset
         with z.open("aggregateddata_country.csv") as f:
             # read the dataset
             tb = pr.read_csv(f, metadata=snap.to_table_metadata(), origin=snap.m.origin, delimiter=";")
+    tb = pr.concat([tb, tb_reg])
     tb = tb.rename(columns={"countryName": "country", "phenomenonTimeReferenceYear": "year"})
     #
     # Process data.
