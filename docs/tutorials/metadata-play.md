@@ -4,7 +4,7 @@ To better understand how the different metadata fields are mapped to the differe
 Simply execute
 
 ```shell
-etl-wizard metaplay
+etlwiz metaplay
 ```
 
 !!! note "Use the correct environment variables"
@@ -14,7 +14,7 @@ etl-wizard metaplay
     You can define custom environment variables in the file `.env.staging` and then run:
 
     ```shell
-    ENV=.env.staging etl-wizard metaplay
+    ENV=.env.staging etlwiz metaplay
     ```
 
 

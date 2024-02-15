@@ -87,7 +87,7 @@ GROUPS = [
         "commands": {
             "metadata-export": cli_metadata_export,
             "metadata-migrate": cli_metadata_migrate,
-            "metadata-upgrader": cli_meta_upgrader,
+            "metadata-upgrade": cli_meta_upgrader,
         },
     },
     {
