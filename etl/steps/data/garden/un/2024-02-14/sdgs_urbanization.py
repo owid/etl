@@ -26,7 +26,9 @@ def run(dest_dir: str) -> None:
     #
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
 
-    average_by_country = tb.groupby(["country", "year", "seriesdescription"])["value"].mean().reset_index()
+    average_by_country = (
+        tb.groupby(["country", "year", "seriesdescription"], observed=True)["value"].mean().reset_index()
+    )
 
     average_by_country = average_by_country.dropna(subset=["value"])
     pivot_tb = average_by_country.pivot(
@@ -35,8 +37,6 @@ def run(dest_dir: str) -> None:
     pivot_tb = pivot_tb.underscore().set_index(["country", "year"], verify_integrity=True)
 
     pivot_tb.metadata = metadata
-
-    print(pivot_tb.columns)
 
     #
     # Save outputs.

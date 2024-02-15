@@ -20,8 +20,6 @@ def run(dest_dir: str) -> None:
     urbanization_tb = tb[(tb["indicator"] == "11.7.1") | (tb["indicator"] == "11.2.1")]
     cols = ["seriesdescription", "country", "year", "value", "cities"]
     urbanization_tb = urbanization_tb[cols]
-    # Convert the seriesdescription to string to avoid using categorical data
-    urbanization_tb["seriesdescription"] = urbanization_tb["seriesdescription"].astype(str)
 
     urbanization_tb = urbanization_tb.set_index(
         ["country", "seriesdescription", "year", "cities"], verify_integrity=True
