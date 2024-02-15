@@ -9,3 +9,5 @@ steps:
     - data://garden/wash/2024-01-06/who
   data://explorers/wash/2024-01-06/who:
     - data://garden/wash/2024-01-06/who
+  data://meadow/wash/2024-02-15/bathing_water:
+    - snapshot://wash/2024-02-15/bathing_water.zip
