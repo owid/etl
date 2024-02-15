@@ -21,8 +21,7 @@ def run(dest_dir: str) -> None:
     tb = tb.drop("Approx Compute (FLOP)", axis=1)
     tb["MMLU avg"] *= 100
     tb["Architecture"] = tb["Architecture"].str.replace("Llama", "LLaMA", regex=True)
-    tb["Organisation"] = tb["Organisation"].str.replace("DeepMind", "Google DeepMind", regex=True)
-
+    tb["Organisation"] = tb["Organisation"].replace("DeepMind", "Google DeepMind")
     tb = tb.underscore().set_index(["architecture", "year"], verify_integrity=True)
     #
     # Save outputs.
