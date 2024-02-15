@@ -5,7 +5,7 @@ from apps.backport.backport import backport_cli as cli_backport_run
 from apps.backport.bulk_backport import bulk_backport as cli_bulk_backport
 from apps.backport.fasttrack_backport import cli as cli_fasttrack_backport
 from apps.backport.migrate.migrate import cli as cli_backport_migrate
-from apps.metadata_migrate import cli as cli_metadata_migrate
+from apps.metadata_migrate.cli import cli as cli_metadata_migrate
 from apps.metagpt.cli import main as cli_meta_upgrader
 from apps.staging_sync.cli import cli as cli_staging_sync
 from etl.chart_revision.cli import main_cli as cli_chart_revision
@@ -17,7 +17,7 @@ from etl.compare import cli as cli_compare
 from etl.datadiff import cli as cli_datadiff
 from etl.harmonize import harmonize as cli_harmonize
 from etl.match_variables import main_cli as cli_match_variables
-from etl.metadata_export import metadata_export as cli_metadata_export
+from etl.metadata_export import cli as cli_metadata_export
 from etl.prune import prune_cli as cli_prune
 from etl.publish import publish_cli as cli_publish
 from etl.reindex import reindex_cli as cli_reindex
@@ -29,7 +29,8 @@ from etl.version_tracker import run_version_tracker_checks as cli_vtracker
 ################################
 #
 # DEV SUBCOMMAND
-# Configuration of the command `etlcli dev`
+# Configuration of the command `etlcli dev`.
+# We define it first because we need to reference it.
 #
 ################################
 COMMANDS_DEV = {
@@ -53,101 +54,110 @@ for name, cmd in COMMANDS_DEV.items():
 
 ################################
 #
-# VARIABLE-MAPPING SUBCOMMAND
-# Configuration of the command `etlcli variable-mapping`
-#
-################################
-COMMANDS_VARIABLE_MAPPING = {
-    "translate": cli_variable_mapping_translate,
-    "match": cli_match_variables,
-}
-
-
-@click.group("variable-mapping", help="Variable mapping commands.")
-def cli_variable_mapping() -> None:
-    """Variable mapping utils."""
-    pass
-
-
-for name, cmd in COMMANDS_VARIABLE_MAPPING.items():
-    cli_variable_mapping.add_command(cmd=cmd, name=name)
-
-
-################################
-#
-# METADATA SUBCOMMAND
-# Configuration of the command `etlcli metadata`
-#
-################################
-COMMANDS_METADATA = {
-    "migrate": cli_metadata_migrate,
-    "export": cli_metadata_export,
-    "upgrader": cli_meta_upgrader,
-}
-
-
-@click.group("metadata", help="Metadata commands.")
-def cli_metadata() -> None:
-    """Metadata mapping utils."""
-    pass
-
-
-for name, cmd in COMMANDS_METADATA.items():
-    cli_metadata.add_command(cmd=cmd, name=name)
-
-
-################################
-#
-# BACKPORT SUBCOMMAND
-# Configuration of the command `etlcli backport`
-#
-################################
-COMMANDS_BACKPORT = {
-    "run": cli_backport_run,
-    "bulk": cli_bulk_backport,
-    "fasttrack": cli_fasttrack_backport,
-    "migrate": cli_backport_migrate,
-}
-
-
-@click.group("backport", help="Backport commands.")
-def cli_backport() -> None:
-    """Metadata mapping utils."""
-    pass
-
-
-for name, cmd in COMMANDS_BACKPORT.items():
-    cli_backport.add_command(cmd=cmd, name=name)
-
-################################
-#
 # MAIN CLIENT
 # Configuration of the command `etlcli`
 #
 ################################
-COMMANDS = {
-    "dev": cli_dev,
-    "variable-mapping": cli_variable_mapping,
-    "run": cli_run,
-    "compare": cli_compare,
-    "harmonize": cli_harmonize,
-    "diff": cli_datadiff,
-    # "meta-up": cli_meta_upgrader,
-    # "wiz": cli_wizard,
-    "chart-sync": cli_staging_sync,
-    "chart-revisions": cli_chart_revision,
-    "chart-gpt": cli_chartgpt,
-    "graphviz": cli_graphviz,
-    "metadata": cli_metadata,
-    "backport": cli_backport,
-}
+
+# DEFINE GROUPS, AND HOW THEY ARE SHOWN
+## List with all groups and their commands.
+## Each item is a group, with a name and the commands it contains.
+## The commands are provided as a dictionary, with the command name as key, and the actual command function as value.
+##
+## Add here your new command! Make sure to add it as a (key, value)-pair in the "commands" dictionary of the group you want it to belong to. Alternatively, you can also create a new group.
+GROUPS = [
+    {
+        "name": "Run ETL step",
+        "commands": {
+            "run": cli_run,
+        },
+    },
+    {
+        "name": "Charts",
+        "commands": {
+            "chart-sync": cli_staging_sync,
+            "chart-gpt": cli_chartgpt,
+            "chart-revisions": cli_chart_revision,
+        },
+    },
+    {
+        "name": "Metadata",
+        "commands": {
+            "metadata-export": cli_metadata_export,
+            "metadata-migrate": cli_metadata_migrate,
+            "metadata-upgrader": cli_meta_upgrader,
+        },
+    },
+    {
+        "name": "Data",
+        "commands": {
+            "harmonize": cli_harmonize,
+            "diff": cli_datadiff,
+            "graphviz": cli_graphviz,
+            "compare": cli_compare,
+        },
+    },
+    {
+        "name": "Backport",
+        "commands": {
+            "backport-run": cli_backport_run,
+            "backport-bulk": cli_bulk_backport,
+            "backport-fasttrack": cli_fasttrack_backport,
+            "backport-migrate": cli_backport_migrate,
+        },
+    },
+    {
+        "name": "Others",
+        "commands": {
+            # "dev": cli_dev,
+            "variable-match": cli_match_variables,
+            "variable-mapping-translate": cli_variable_mapping_translate,
+        },
+    },
+]
 
 
-@click.group(name="etl", help="ETL operations")
+# MAIN CLIENT ENTRYPOINT (no action actually)
+## Note that the entrypoint has no action, it is just a group. The commands that fall under it do actually have actions.
+@click.group(name="etl")
+# @click.rich_config(help_config=help_config)
 def cli() -> None:
-    """Run etl operations."""
+    """OWID's ETL client.
+
+    Create ETL step templates, compare different datasets, generate dependency visualisations, synchronise charts across different servers, import datasets from non-ETL OWID sources, improve your metadata, etc.
+    """
     pass
 
 
-for name, cmd in COMMANDS.items():
-    cli.add_command(cmd=cmd, name=name)
+# ADD ALL COMMANDS TO THE CLI
+for group in GROUPS:
+    for name, cmd in group["commands"].items():
+        cli.add_command(cmd=cmd, name=name)
+# Add dev
+cli.add_command(cli_dev)
+
+
+################################
+#
+# RICH CLICK CONFIG
+# Configuration rich_click
+#
+################################
+
+# RICH-CLICK CONFIGURATION
+click.rich_click.USE_MARKDOWN = True
+# click.rich_click.SHOW_ARGUMENTS = True
+# click.rich_click.GROUP_ARGUMENTS_OPTIONS = True
+# Show variable types under description
+# click.rich_click.SHOW_METAVARS_COLUMN = False
+# click.rich_click.APPEND_METAVARS_HELP = True
+
+## Convert GROUPS to the format expected by rich-click, and submit the ordering and groups so they are shown in the terminal (--help).
+command_groups = [
+    {
+        "name": group["name"],
+        "commands": list(group["commands"].keys()),
+    }
+    for group in GROUPS
+]
+click.rich_click.COMMAND_GROUPS = {"etlcli": command_groups}
