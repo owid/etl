@@ -1,0 +1,123 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Clean Water
+        - Environmental Impacts of Food Production
+      title_public: |-
+        {definitions.title_public}
+      grapher_config:
+        title: |-
+          {definitions.title_public}
+    display:
+      numDecimalPlaces: 2
+    unit: |-
+      <% if unit == "mg/L" %>milligrams per litre<% elif unit == "ug/L" %>micrograms per litre<% elif unit == "m" %>metres<%- endif -%>
+    short_unit: |-
+      <<unit>>
+    processing_level: minor
+  title_public: |-
+    <% if indicator == "Ammonium" %>
+    Ammonium concentration in <<water_body_category>>
+    <% elif indicator == "BOD5" %>
+    Biological oxygen demand over five days in <<water_body_category>>
+    <% elif indicator == "Nitrate" %>
+    Nitrate concentration in <<water_body_category>>
+    <% elif indicator == "Nitrite" %>
+    Nitrite concentration in <<water_body_category>>
+    <% elif indicator == "Phosphate" %>
+    Phosphate concentration in <<water_body_category>>
+    <% elif indicator == "Total phosphorus" %>
+    Total phosphorus concentration in <<water_body_category>>
+    <% elif indicator == 'Secchi depth' %>
+    Secchi depth in <<water_body_category>>
+    <% elif indicator == 'Chlorophyll a' %>
+    Chlorophyll a concentration in <<water_body_category>>
+    <% elif indicator == 'Total organic carbon (TOC)' %>
+    Total organic carbon concentration in <<water_body_category>>
+    <% elif indicator == 'Dissolved organic carbon (DOC)' %>
+    Dissolved organic carbon concentration in <<water_body_category>>
+    <% elif indicator == 'Total phytoplankton biomass' %>
+    Total phytoplankton biomass in <<water_body_category>>
+    <% elif indicator == 'Cyanobacteria biomass' %>
+    Cyanobacteria biomass in <<water_body_category>>
+    <%- endif -%>
+  description_short: |-
+    <% if indicator == "Ammonium" %>
+    concentration of ammonium in <<water_body_category>>.
+    <% elif indicator == "BOD5" %>
+    biochemical Oxygen Demand over five days (BOD5) in <<water_body_category>>. High levels of BOD indicate a large amount of organic pollution. When BOD5 values are high, it means that there are more organic materials in the water that need to be broken down by microorganisms.
+    <% elif indicator == "Nitrate" %>
+    concentration of nitrate in <<water_body_category>>.
+    <% elif indicator == "Nitrite" %>
+    concentration of nitrite in <<water_body_category>>.
+    <% elif indicator == "Phosphate" %>
+    concentration of phosphate in <<water_body_category>>.
+    <% elif indicator == "Total phosphorus" %>
+    concentration of total phosphorus in <<water_body_category>>.
+    <% elif indicator == 'Secchi depth' %>
+    Secchi depth in <<water_body_category>>. Secchi depth is a measure of water transparency. It is measured by lowering a Secchi disk into the water until it is no longer visible. The depth at which the disk is no longer visible is the Secchi depth. The Secchi depth is an indicator of the amount of algae in the water. The more algae there is, the less light can penetrate the water and the shallower the Secchi depth will be.
+    <% elif indicator == 'Chlorophyll a' %>
+    concentrations of chlorophyll a in <<water_body_category>>. Chlorophyll a is a measure of the amount of algae in the water. The more algae there is, the higher the value for chlorophyll a there will be.
+    <% elif indicator == 'Total organic carbon (TOC)' %>
+    concentration of total organic carbon in <<water_body_category>>.
+    <% elif indicator == 'Dissolved organic carbon (DOC)' %>
+    concentration of dissolved organic carbon in <<water_body_category>>.
+    <% elif indicator == 'Total phytoplankton biomass' %>
+    concentration of total phytoplankton biomass in <<water_body_category>>.
+    <% elif indicator == 'Cyanobacteria biomass' %>
+    concentration of cyanobacteria biomass in <<water_body_category>>.
+    <%- endif -%>
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
+dataset:
+  update_period_days: 365
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
+tables:
+  nutrients:
+    # Learn more about the available fields:
+    # http://docs.owid.io/projects/etl/architecture/metadata/reference/indicator/
+    variables:
+      meanvalue:
+        title: Mean value
+        description_short: |-
+          Average annual {definitions.description_short}
+      stdevvalue:
+        title: Standard deviation
+        description_short: |-
+          Standard deviation of annual {definitions.description_short}
+      minvalue:
+        title: Minimum value
+        description_short: |-
+          Minimum annual {definitions.description_short}
+      maxvalue:
+        title: Maximum value
+        description_short: |-
+          Maximum annual {definitions.description_short}
+      numberofsites:
+        title: Number of sites
+        description_short: |-
+          Number of sites used to measure the {definitions.description_short}
+        unit: |-
+          sites
+      numberofreportedsites:
+        title: Number of reported sites
+        description_short: |-
+          Number of reporting sites used to measure the {definitions.description_short}
+        unit: |-
+          sites
+      numberofcountries:
+        title: Number of countries
+        description_short: |-
+          Number of countries used to measure the {definitions.description_short}
+        unit: |-
+          countries
+      numberofreportedcountries:
+        title: Number of reported countries
+        description_short: |-
+          Number of reporting countries used to measure the {definitions.description_short}
+        unit: |-
+          countries
