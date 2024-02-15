@@ -25,6 +25,7 @@ tables:
           numDecimalPlaces: 0
       sdg_14_40_nr_ex_c:
         title: Number of coastal bathing sites with excellent water quality
+        description_short: Coastal bathing water sites are areas of water by the sea or ocean that are used by the public for bathing.
         unit: sites
         description_key:
           - "Escherichia coli (E. coli): The E. coli count must not exceed 250 cfu (colony-forming units) per 100 ml of water in more than 95% of the samples taken over a period of four bathing seasons. This means that in at least 95% of the samples, the E. coli levels must be below this threshold."
@@ -33,6 +34,7 @@ tables:
           numDecimalPlaces: 0
       sdg_14_40_pct_ex_c:
         title: Percentage of coastal bathing sites with excellent water quality
+        description_short: Coastal bathing water sites are areas of water by the sea or ocean that are used by the public for bathing.
         description_key:
           - "Escherichia coli (E. coli): The E. coli count must not exceed 250 cfu (colony-forming units) per 100 ml of water in more than 95% of the samples taken over a period of four bathing seasons. This means that in at least 95% of the samples, the E. coli levels must be below this threshold."
           - "Intestinal enterococci: The count for intestinal enterococci must not exceed 100 cfu per 100 ml of water in more than 95% of the samples taken over a period of four bathing seasons."
@@ -48,6 +50,7 @@ tables:
           numDecimalPlaces: 0
       sdg_14_40_nr_ex_in:
         title: Number of inland bathing sites with excellent water quality
+        description_short: Inland bathing water sites are areas of water, such as lakes or rivers, that are used by the public for bathing and are not by the sea or ocean.
         unit: sites
         description_key:
           - "Escherichia coli (E. coli): The E. coli count must not exceed 500 cfu (colony-forming units) per 100 ml of water in more than 95% of the samples taken over a period of four bathing seasons. This means that in at least 95% of the samples, the E. coli levels must be below this threshold."
@@ -56,6 +59,7 @@ tables:
           numDecimalPlaces: 0
       sdg_14_40_pct_ex_in:
         title: Percentage of inland bathing sites with excellent water quality
+        description_short: Inland bathing water sites are areas of water, such as lakes or rivers, that are used by the public for bathing and are not by the sea or ocean.
         description_key:
           - "Escherichia coli (E. coli): The E. coli count must not exceed 500 cfu (colony-forming units) per 100 ml of water in more than 95% of the samples taken over a period of four bathing seasons. This means that in at least 95% of the samples, the E. coli levels must be below this threshold."
           - "Intestinal enterococci: The count for intestinal enterococci must not exceed 200 cfu per 100 ml of water in more than 95% of the samples taken over a period of four bathing seasons."
