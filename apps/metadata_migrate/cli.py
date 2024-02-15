@@ -9,6 +9,7 @@ from owid.catalog import Dataset, DatasetMeta, License, Origin, Source, Table
 from rich import print
 from rich.console import Console
 from rich.syntax import Syntax
+from rich_click.rich_command import RichCommand
 from sqlalchemy.engine import Engine
 from sqlmodel import Session
 
@@ -22,7 +23,7 @@ from etl.paths import BASE_DIR, DAG_FILE, DATA_DIR, STEP_DIR
 log = structlog.get_logger()
 
 
-@click.command()
+@click.command(cls=RichCommand)
 @click.option(
     "--chart-slug",
     type=str,
@@ -76,12 +77,12 @@ def cli(
 
     Usage:
         # show generated YAML in console
-        STAGING=mojmir etlcli metadata migrate --chart-slug political-regime --show
+        STAGING=mojmir etlcli metadata-migrate --chart-slug political-regime --show
 
         # create YAML file in grapher step
-        STAGING=mojmir etlcli metadata migrate --chart-slug political-regime
+        STAGING=mojmir etlcli metadata-migrate --chart-slug political-regime
     """
-    assert config.STAGING, "You have to run this as STAGING=mystaging etlcli metadata migrate ..."
+    assert config.STAGING, "You have to run this as STAGING=mystaging etlcli-metadata migrate ..."
 
     engine = get_engine()
     col = None

@@ -19,7 +19,7 @@ To generate a metadata YAML file with pre-populated variable names for an existi
 poetry run etlcli metadata export data/garden/my_namespace/my_version/my_dataset
 ```
 
-Check `poetry run etlcli metadata export --help` for more options.
+Check `poetry run etlcli metadata-export --help` for more options.
 
 ## Handling Multi-line Strings and Whitespace
 

@@ -49,10 +49,10 @@ def cli(
 
     Usage:
         # save to YAML file etl/steps/data/garden/ggdc/2020-10-01/ggdc_maddison.meta.yml
-        etlcli metadata export data/garden/ggdc/2020-10-01/ggdc_maddison
+        etlcli metadata-export data/garden/ggdc/2020-10-01/ggdc_maddison
 
         # show output instead of saving the file
-        etlcli metadata export data/garden/ggdc/2020-10-01/ggdc_maddison --show
+        etlcli metadata-export data/garden/ggdc/2020-10-01/ggdc_maddison --show
     """
     if show:
         assert not output, "Can't use --show and --output at the same time."

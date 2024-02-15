@@ -432,7 +432,7 @@ if submitted:
                 st.markdown("##### Generate metadata")
                 st.markdown(f"Generate metadata file `{form.short_name}.meta.yml` from your dataset with:")
                 st.code(
-                    f"poetry run etlcli metadata export data/garden/{form.namespace}/{form.version}/{form.short_name}",
+                    f"poetry run etlcli metadata-export data/garden/{form.namespace}/{form.version}/{form.short_name}",
                     "bash",
                 )
                 st.markdown("then manual edit it and rerun the step again with")

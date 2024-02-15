@@ -73,7 +73,7 @@ def cli(
     - Grapher step
 
     Example usage:
-        ENV=.env.prod etlcli backport migrate --dataset-id 5205 --namespace covid --short-name hospital__and__icu --no-backport
+        ENV=.env.prod etlcli backport-migrate --dataset-id 5205 --namespace covid --short-name hospital__and__icu --no-backport
     """
     return migrate(
         dataset_id=dataset_id,

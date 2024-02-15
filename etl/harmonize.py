@@ -43,7 +43,7 @@ custom_style_fancy = questionary.Style(
 def harmonize(
     data_file: str, column: str, output_file: str, num_suggestions: int, institution: Optional[str] = None
 ) -> None:
-    """Given a DATA_FILE in feather or CSV format, and the name of the COLUMN representing
+    """Given a `DATA_FILE` in feather or CSV format, and the name of the COLUMN representing
     country or region names, interactively generate the JSON mapping OUTPUT_FILE from the given names
     to OWID's canonical names. Optionally, can use INSTITUTION to append "(institution)" to countries.
 
