@@ -27,11 +27,11 @@ tables:
         title: Average share of the built-up area of cities that is open space for public use for all
         unit: '%'
         short_unit: '%'
-        description_from_producer: Estimated share of urban population who can access a public transport stop within a walking distance of 500 meters (for low capacity public transport systems) and/or 1000 meters (for high capacity public transport systems) along the street network.
+        description_from_producer: Data on estimated share of urban population within 400 meters walking distance along the street network to an open public space.
 
       proportion_of_population_that_has_convenient_access_to_public_transport__pct:
         title: Proportion of population that has convenient access to public transport
         unit: '%'
         short_unit: '%'
-        description_from_producer: Data on estimated share of urban population within 400 meters walking distance along the street network to an open public space.
+        description_from_producer: Estimated share of urban population who can access a public transport stop within a walking distance of 500 meters (for low capacity public transport systems) and/or 1000 meters (for high capacity public transport systems) along the street network.
 
