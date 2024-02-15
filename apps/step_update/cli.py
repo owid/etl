@@ -1,3 +1,4 @@
+import difflib
 import sys
 from datetime import datetime
 from pathlib import Path
@@ -7,7 +8,7 @@ import click
 import structlog
 from rich_click.rich_command import RichCommand
 
-from etl.paths import DAG_TEMP_FILE, SNAPSHOTS_DIR
+from etl.paths import DAG_DIR, DAG_TEMP_FILE, SNAPSHOTS_DIR, STEP_DIR
 from etl.snapshot import SnapshotMeta
 from etl.version_tracker import VersionTracker
 
@@ -92,7 +93,9 @@ def write_to_dag_file(
         if step not in steps_found:
             # Add the comment for this step, if any was given.
             if step in comments:
-                updated_lines.append(" " * indent_step + comments[step] + "\n")
+                updated_lines.append(
+                    " " * indent_step + ("\n" + " " * indent_step).join(comments[step].split("\n")) + "\n"
+                )
             # Add the step itself.
             updated_lines.append(" " * indent_step + f"{step}:\n")
             # Add each of its dependencies.
@@ -118,28 +121,36 @@ class StepUpdater:
     def __init__(self, dry_run: bool = False):
         # Initialize version tracker and load dataframe of all steps.
         self.steps_df = VersionTracker().steps_df.copy()
+        # Select only active steps.
+        self.steps_df = self.steps_df[self.steps_df["state"] == "active"].reset_index(drop=True)
         # If dry_run is True, then nothing will be written to the dag, and no files will be created.
         self.dry_run = dry_run
 
     def check_that_step_exists(self, step: str) -> None:
         """Check that step to be updated exists in the active dag."""
-        if step not in set(self.steps_df["step"]):
-            log.error(f"Step {step} not found among active steps.")
+        # Get the list of active steps.
+        active_steps = sorted(set(self.steps_df["step"]))
+        if step not in active_steps:
+            error_message = f"Step {step} not found among active steps. Closest matches:\n"
+            # NOTE: We could use a better edit distance to find the closest matches.
+            for match in difflib.get_close_matches(step, active_steps, n=5, cutoff=0.0):
+                error_message += f"{match}\n"
+            log.error(error_message)
             sys.exit(1)
+
+    def get_step_info(self, step: str) -> Dict[str, Any]:
+        # Get info for step to be updated.
+        step_info = self.steps_df[self.steps_df["step"] == step].iloc[0].to_dict()
+
+        return step_info
 
     def update_snapshot_step(
         self,
         step: str,
         step_version_new: Optional[str] = STEP_VERSION_NEW,
     ) -> None:
-        # Select only active steps.
-        steps_df = self.steps_df[self.steps_df["state"] == "active"].reset_index(drop=True)
-
-        # Check that step to be updated exists in the active dag.
-        self.check_that_step_exists(step=step)
-
         # Get info for step to be updated.
-        step_info = steps_df[steps_df["step"] == step].iloc[0].to_dict()
+        step_info = self.get_step_info(step=step)
 
         # Check that a .dvc file exists for this snapshot step.
         step_dvc_file = SNAPSHOTS_DIR / step_info["namespace"] / step_info["version"] / (step_info["name"] + ".dvc")
@@ -208,14 +219,90 @@ class StepUpdater:
             # Save temporary dag.
             write_to_dag_file(dag_file=DAG_TEMP_FILE, dag_part=step_temp)
 
+    def update_data_step(
+        self,
+        step: str,
+        step_version_new: Optional[str] = STEP_VERSION_NEW,
+    ) -> None:
+        # Get info for step to be updated.
+        step_info = self.get_step_info(step=step)
+
+        # Define the folder of the old step files.
+        folder = STEP_DIR / "data" / step_info["channel"] / step_info["namespace"] / step_info["version"]
+
+        # Define folder for new version.
+        folder_new = STEP_DIR / "data" / step_info["channel"] / step_info["namespace"] / step_version_new
+
+        if ((folder / step_info["name"]).with_suffix(".py")).is_file():
+            # Gather all relevant files from this folder.
+            step_files = [
+                file_name
+                for file_name in list(folder.glob("*"))
+                if str(file_name.stem).split(".")[0] in [step_info["name"], "shared"]
+            ]
+        elif (folder / step_info["name"]).is_dir():
+            # TODO: Implement.
+            step_files = []
+        else:
+            log.error(f"No step files found for step {step}.")
+            sys.exit(1)
+
+        # Define the new step.
+        step_new = step.replace(step_info["version"], step_version_new)  # type: ignore
+
+        # Find the latest version of each of the step's dependencies.
+        step_dependencies = set(self.steps_df[self.steps_df["step"] == step].iloc[0]["direct_dependencies"])
+        step_dependencies_new = set(
+            [
+                self.steps_df[self.steps_df["step"] == dependency]["same_steps_latest"].item()
+                for dependency in step_dependencies
+            ]
+        )
+        # Create a new partial dag with the new step and its dependencies.
+        dag_part = {step_new: step_dependencies_new}
+
+        # Identify the dag file for this step.
+        dag_file = (DAG_DIR / self.steps_df[self.steps_df["step"] == step].iloc[0]["dag_file_name"]).with_suffix(".yml")
+
+        # Define a header for the new step in the dag file.
+        # TODO: Add header of the step as an argument from the command line. If not given, fetch the commented lines
+        #  right above the current step in the dag.
+        #  And ensure that the header appears only once, not for every step.
+        step_header = {step_new: "#\n# Temporary header.\n#"}
+
+        if not self.dry_run:
+            # If new folder does not exist, create it.
+            folder_new.mkdir(parents=True, exist_ok=True)
+
+            # Copy files to new folder.
+            for step_file in step_files:
+                # Define the path to the new version of this file.
+                step_file_new = Path(str(step_file).replace(step_info["version"], step_version_new))  # type: ignore
+
+                # Check that the new file does not exist.
+                if step_file_new.exists():
+                    log.error(f"New file already exists: {step_file_new}")
+                    sys.exit(1)
+
+                # Create new file.
+                step_file_new.write_bytes(step_file.read_bytes())
+
+            # Add new step and its dependencies to the dag.
+            write_to_dag_file(dag_file=dag_file, dag_part=dag_part, comments=step_header)
+
     def update_step(self, step: str, step_version_new: Optional[str] = STEP_VERSION_NEW) -> None:
         """Update step to new version."""
+
+        # Check that step to be updated exists in the active dag.
+        self.check_that_step_exists(step=step)
 
         # Extract channel from step.
         step_channel = self.steps_df[self.steps_df["step"] == step].iloc[0]["channel"]
 
         if step_channel == "snapshot":
             self.update_snapshot_step(step=step, step_version_new=step_version_new)
+        elif step_channel in ["meadow", "garden", "grapher"]:
+            self.update_data_step(step=step, step_version_new=step_version_new)
         else:
             log.error(f"Channel {step_channel} not yet supported.")
             sys.exit(1)
@@ -241,3 +328,4 @@ def cli(
     """TODO"""
     # Initialize step updater and run update.
     StepUpdater(dry_run=dry_run).update_step(step=step, step_version_new=step_version_new)
+    # TODO: Allow for updating multiple steps and dependencies at once.
