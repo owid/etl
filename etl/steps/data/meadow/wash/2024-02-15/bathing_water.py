@@ -37,6 +37,7 @@ def run(dest_dir: str) -> None:
                 tb_temp = tb_temp.drop(columns=["Type", "GEO (Codes)"])
                 tb_temp = tb_temp.melt(id_vars=["GEO (Labels)"], var_name="year", value_name="value")
                 tb_temp = tb_temp.rename(columns={"GEO (Labels)": "country", "value": sheet})
+                tb_temp[sheet] = tb_temp[sheet].replace(":", None).astype(float)
                 tables.append(tb_temp)
 
     # Iterate through the remaining dataframes and merge them one by one
@@ -45,12 +46,11 @@ def run(dest_dir: str) -> None:
     for tb in tables[1:]:
         combined_tb = pr.merge(combined_tb, tb, how="outer", on=["country", "year"])
 
+    combined_tb.metadata = snap.to_table_metadata()
     # Save outputs.
     #
     # Create a new meadow dataset with the same metadata as the snapshot.
-    ds_meadow = create_dataset(
-        dest_dir, tables=combined_tb, check_variables_metadata=True, default_metadata=snap.metadata
-    )
+    ds_meadow = create_dataset(dest_dir, tables=[combined_tb], default_metadata=snap.metadata)
 
     # Save changes in the new meadow dataset.
     ds_meadow.save()
