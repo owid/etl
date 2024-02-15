@@ -57,12 +57,12 @@ replace S002VS=2010 if S002VS==5
 replace S002VS=2014 if S002VS==6
 replace S002VS=2022 if S002VS==7
 
-* There are several S002VS missing (only in EVS), so they are replaced according to the year of survey of EVS
+* There are several S002VS missing (only in EVS), so they are replaced according to the WVS-EVS waves
 replace S002VS = 1984 if S002VS==. & S002EVS==1
 replace S002VS = 1993 if S002VS==. & S002EVS==2
-replace S002VS = 2001 if S002VS==. & S002EVS==3
+replace S002VS = 2004 if S002VS==. & S002EVS==3
 replace S002VS = 2010 if S002VS==. & S002EVS==4
-replace S002VS = 2021 if S002VS==. & S002EVS==5
+replace S002VS = 2022 if S002VS==. & S002EVS==5
 
 rename S002VS year
 rename S003 country
