@@ -12,8 +12,8 @@ import json
 from dataclasses import dataclass
 from typing import Any, Dict, Tuple
 
-import click
 import pandas as pd
+import rich_click as click
 import structlog
 from dotenv import dotenv_values
 from sqlalchemy import create_engine
@@ -49,7 +49,7 @@ log = structlog.get_logger()
     type=str,
     help=(
         "Path to the JSON file containing the variable mapping from connection 1. This file should have been previously"
-        " created and curated by the user. See command `etl-match-variables` to create this file."
+        " created and curated by the user. See command `etlcli variable-mapping create` to create this file."
     ),
     required=True,
 )

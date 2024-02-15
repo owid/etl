@@ -1,6 +1,6 @@
 # Meta Update Tool
 
-This tool, accessible via the command `etlcli meta-up`, is designed to update metadata files using OpenAI's GPT model. It currently supports two types of metadata files: 'snapshot' and 'grapher'.
+This tool, accessible via the command `etlcli metadata upgrader`, is designed to update metadata files using OpenAI's GPT model. It currently supports two types of metadata files: 'snapshot' and 'grapher'.
 
 For 'grapher' metadata files, the tool completes the `description_from_producer`, `description_key`, and `description_short` fields, thereby enriching the metadata with more detailed information.
 
@@ -17,13 +17,13 @@ The main function is set up as a command-line interface (CLI). It takes three ar
     To use this tool, run it from the command line with the required arguments. For example:
 
     ```bash
-    etlcli meta-up --path-to-file /path/to/metadata/file --output-dir /path/to/output/directory --overwrite
+    etlcli metadata upgrader --path-to-file /path/to/metadata/file --output-dir /path/to/output/directory --overwrite
     ```
 
 
 ## Snapshot vs Grapher Metadata Files
 
-The `etlcli meta-up` tool handles 'snapshot' and 'grapher' metadata files differently.
+The `etlcli metadata upgrader` tool handles 'snapshot' and 'grapher' metadata files differently.
 
 ### Snapshot Updates
 
@@ -42,7 +42,7 @@ The `etlcli meta-up` tool handles 'snapshot' and 'grapher' metadata files differ
 
 ## Setting Up OpenAI API Key
 
-The `etlcli meta-up` tool requires the `OPENAI_API_KEY` environment variable to function properly. This is the API key provided by OpenAI for accessing their GPT model.
+The `etlcli metadata upgrader` tool requires the `OPENAI_API_KEY` environment variable to function properly. This is the API key provided by OpenAI for accessing their GPT model.
 
 To obtain the API key, you need to sign up on the [OpenAI platform](https://openai.com). After signing up, you can find your API key in the account [settings](https://platform.openai.com/api-keys). For more information see OpenAI [FAQs](https://help.openai.com/en/articles/4936850-where-do-i-find-my-api-key)
 

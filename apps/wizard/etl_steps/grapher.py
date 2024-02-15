@@ -7,6 +7,7 @@ import streamlit as st
 from st_pages import add_indentation
 from typing_extensions import Self
 
+from apps.utils.files import add_to_dag, generate_step_to_channel
 from apps.wizard import utils
 from etl.paths import DAG_DIR, GRAPHER_DIR
 
@@ -208,7 +209,7 @@ if submitted:
         # handle DAG-addition
         dag_path = DAG_DIR / form.dag_file
         if form.add_to_dag:
-            dag_content = utils.add_to_dag(
+            dag_content = add_to_dag(
                 dag={
                     f"data{private_suffix}://grapher/{form.namespace}/{form.version}/{form.short_name}": [
                         f"data{private_suffix}://garden/{form.namespace}/{form.garden_version}/{form.short_name}"
@@ -220,7 +221,7 @@ if submitted:
             dag_content = ""
 
         # Create necessary files
-        DATASET_DIR = utils.generate_step_to_channel(
+        DATASET_DIR = generate_step_to_channel(
             cookiecutter_path=utils.COOKIE_GRAPHER, data=dict(**form.dict(), channel="grapher")
         )
 

@@ -29,6 +29,7 @@ from rich import print
 from rich.console import Console
 from sqlmodel import Session
 
+from apps.utils.files import add_to_dag, generate_step_to_channel
 from apps.wizard import utils as wizard_utils
 from etl import config
 from etl import grapher_model as gm
@@ -260,7 +261,7 @@ def app(dummy_data: bool) -> None:
     dag_content = _add_to_dag(dataset.metadata)
 
     # create step and metadata file
-    wizard_utils.generate_step_to_channel(CURRENT_DIR / "grapher_cookiecutter/", fast_import.meta.to_dict())
+    generate_step_to_channel(CURRENT_DIR / "grapher_cookiecutter/", fast_import.meta.to_dict())
     fast_import.save_metadata()
 
     po.put_markdown(
@@ -713,7 +714,7 @@ def _add_to_dag(ds_meta: DatasetMeta) -> str:
         to_remove,
         DAG_FASTTRACK_PATH,
     )
-    return wizard_utils.add_to_dag(
+    return add_to_dag(
         to_add,
         DAG_FASTTRACK_PATH,
     )

@@ -24,7 +24,7 @@ def init_app():
     - The tool creates chart revisions for all the public charts using variables in the _old dataset_ that have been mapped to variables in the _new dataset_.
     - Once the chart revisions are created, you can review these and submit them to the database so that they become available on the _Approval tool_.
 
-    Note that this step is equivalent to running `etl-match-variables` and `etl-chart-suggester` commands in terminal. Call them in terminal with option `--help` for more details.
+    Note that this step is equivalent to running `etlcli variable-mapping create` and `etl-chart-suggester` commands in terminal. Call them in terminal with option `--help` for more details.
     """,
         },
     )

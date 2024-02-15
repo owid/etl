@@ -51,7 +51,7 @@ def cli(
     4. Share [Fast-track template](https://docs.google.com/spreadsheets/d/1j_mclAffQ2_jpbVEmI3VOiWRBeclBAIr-U7NpGAdV9A/edit#gid=1898134479) with the service account email address (e.g. 937270026338-compute@developer.gserviceaccount.com)
 
     Example usage:
-        ENV=.env.prod backport-fasttrack --dataset-id 5546 --short-name democracy_lexical_index --no-backport
+        ENV=.env.prod etlcli backport fasttrack --dataset-id 5546 --short-name democracy_lexical_index --no-backport
     """
     return migrate(dataset_id=dataset_id, short_name=short_name, backport=backport, recreate=recreate)
 

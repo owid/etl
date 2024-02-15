@@ -76,12 +76,12 @@ def cli(
 
     Usage:
         # show generated YAML in console
-        STAGING=mojmir etl-metadata-migrate --chart-slug political-regime --show
+        STAGING=mojmir etlcli metadata migrate --chart-slug political-regime --show
 
         # create YAML file in grapher step
-        STAGING=mojmir etl-metadata-migrate --chart-slug political-regime
+        STAGING=mojmir etlcli metadata migrate --chart-slug political-regime
     """
-    assert config.STAGING, "You have to run this as STAGING=mystaging etl-metadata-migrate ..."
+    assert config.STAGING, "You have to run this as STAGING=mystaging etlcli metadata migrate ..."
 
     engine = get_engine()
     col = None

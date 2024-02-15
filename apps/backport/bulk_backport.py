@@ -2,8 +2,8 @@ import concurrent.futures
 import re
 from typing import Any, cast
 
-import click
 import pandas as pd
+import rich_click as click
 import structlog
 from owid.catalog.utils import underscore
 from sqlalchemy.engine import Engine

@@ -9,7 +9,7 @@ from rich import print
 from sqlalchemy.engine import Engine
 
 from apps.backport.backport import PotentialBackport
-from apps.wizard.utils import add_to_dag, generate_step
+from apps.utils.files import add_to_dag, generate_step
 from etl import config
 from etl.backport_helpers import create_dataset
 from etl.db import get_engine
@@ -73,7 +73,7 @@ def cli(
     - Grapher step
 
     Example usage:
-        ENV=.env.prod backport-migrate --dataset-id 5205 --namespace covid --short-name hospital__and__icu --no-backport
+        ENV=.env.prod etlcli backport migrate --dataset-id 5205 --namespace covid --short-name hospital__and__icu --no-backport
     """
     return migrate(
         dataset_id=dataset_id,

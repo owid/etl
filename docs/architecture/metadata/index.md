@@ -57,8 +57,8 @@ Users can consume the metadata programmatically using the [`owid-catalog`](https
 
 ## Updating metadata using ChatGPT
 
-We have developed a tool, `etlcli meta-up`, that uses OpenAI's GPT model to help us update metadata files. This tool supports two types of metadata files: 'snapshot' and 'grapher'. It reads the metadata file, generates an updated version, and saves it either in the specified output directory or overwrites the original file.
+We have developed a tool, `etlcli metadata upgrader`, that uses OpenAI's GPT model to help us update metadata files. This tool supports two types of metadata files: 'snapshot' and 'grapher'. It reads the metadata file, generates an updated version, and saves it either in the specified output directory or overwrites the original file.
 
 !!! info "Learn more"
 
-    - [Learn about how to use the `etlcli meta-up` tool :octicons-arrow-right-24:](metadata_chatgpt_update.md)
+    - [Learn about how to use the `etlcli metadata upgrader` tool :octicons-arrow-right-24:](metadata_chatgpt_update.md)

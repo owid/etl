@@ -9,6 +9,7 @@ from st_pages import add_indentation
 from typing_extensions import Self
 
 import etl.grapher_model as gm
+from apps.utils.files import add_to_dag, generate_step_to_channel
 from apps.wizard import utils
 from etl.db import get_session
 from etl.files import ruamel_dump, ruamel_load
@@ -351,7 +352,7 @@ if submitted:
         dag_path = DAG_DIR / form.dag_file
         if form.add_to_dag:
             deps = [f"data{private_suffix}://meadow/{form.namespace}/{form.meadow_version}/{form.short_name}"]
-            dag_content = utils.add_to_dag(
+            dag_content = add_to_dag(
                 dag={f"data{private_suffix}://garden/{form.namespace}/{form.version}/{form.short_name}": deps},
                 dag_path=dag_path,
             )
@@ -368,7 +369,7 @@ if submitted:
         else:
             form_dict["topic_tags"] = "- " + "\n- ".join(form_dict["topic_tags"])
 
-        DATASET_DIR = utils.generate_step_to_channel(
+        DATASET_DIR = generate_step_to_channel(
             cookiecutter_path=utils.COOKIE_GARDEN, data=dict(**form_dict, channel="garden")
         )
 
@@ -431,7 +432,7 @@ if submitted:
                 st.markdown("##### Generate metadata")
                 st.markdown(f"Generate metadata file `{form.short_name}.meta.yml` from your dataset with:")
                 st.code(
-                    f"poetry run etl-metadata-export data/garden/{form.namespace}/{form.version}/{form.short_name}",
+                    f"poetry run etlcli metadata export data/garden/{form.namespace}/{form.version}/{form.short_name}",
                     "bash",
                 )
                 st.markdown("then manual edit it and rerun the step again with")

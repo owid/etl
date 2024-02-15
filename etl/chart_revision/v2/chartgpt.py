@@ -44,7 +44,7 @@ log = get_logger()
 
 # Click options
 click.rich_click.OPTION_GROUPS = {
-    "etl-chartgpt": [
+    "etlcli chart-gpt": [
         {
             "name": "Basic usage",
             "options": ["-me"],
@@ -52,10 +52,6 @@ click.rich_click.OPTION_GROUPS = {
         {
             "name": "Advanced options",
             "options": ["-f", "--user-id", "--revision-id"],
-            # You can also set table styles at group-level instead of using globals if you want
-            # "table_styles": {
-            #     "row_styles": ["bold", "yellow", "cyan"],
-            # },
         },
         {
             "name": "GPT options",
@@ -63,18 +59,6 @@ click.rich_click.OPTION_GROUPS = {
         },
     ],
 }
-# click.rich_click.COMMAND_GROUPS = {
-#     "03_groups_sorting.py": [
-#         {
-#             "name": "Main usage",
-#             "commands": ["sync", "download"],
-#         },
-#         {
-#             "name": "Configuration",
-#             "commands": ["config", "auth"],
-#         },
-#     ],
-# }
 
 
 @click.command(context_settings={"help_option_names": ["-h", "--help"]})
@@ -124,7 +108,7 @@ click.rich_click.OPTION_GROUPS = {
     type=str,
     help="Path to a custom chatGPT system prompt.",
 )
-@click.version_option("0.1.0", prog_name="etl-chartgpt")
+@click.version_option("0.1.0", prog_name="etlcli chart-gpt")
 def cli(
     user_id: int,
     revision_id: int,

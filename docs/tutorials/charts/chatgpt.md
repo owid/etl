@@ -8,7 +8,7 @@ We have an experimental tool that uses chatGPT to review our titles and subtitle
 - You need to have submitted chart revisions to admin.
 - Then, run
     ```
-    poetry run etl-chartgpt
+    poetry run etlcli chart-gpt
     ```
     You can check all the available options with `--help`.
 - This generates new subtitles and titles of the chart revisions and pushes these to the `suggested_chart_revisions` table. It stores these in the column `experimental` of this same table.
@@ -21,23 +21,23 @@ We have an experimental tool that uses chatGPT to review our titles and subtitle
     - We use a custom system prompt, but you can use another one by using the option `--system-prompt`.
 
 
-### Example calls of `etl-chartgpt`
+### Example calls of `etlcli chart-gpt`
 
 #### Only generate chatGPT revisions for me
 Only create these for revisions created by you:
 ```
-poetry run etl-chartgpt -me
+poetry run etlcli chart-gpt -me
 ```
 
 #### Force overwrite new chatGPT revisions
 
 ```
-poetry run etl-chartgpt -f
+poetry run etlcli chart-gpt -f
 ```
 
 #### Other options
 Generate revision for chart revision with id `123` using model `gpt-4` and a custom system prompt stored in `custom-system-prompt.txt` file.
 
 ```
-poetry run etl-chartgpt -i 123 -n "gpt-4" -t custom-system-prompt.txt
+poetry run etlcli chart-gpt -i 123 -n "gpt-4" -t custom-system-prompt.txt
 ```
