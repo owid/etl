@@ -1,5 +1,9 @@
 # Learn more at:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/origin/
+# The data can be accessed at:
+# https://sdi.eea.europa.eu/catalogue/srv/eng/catalog.search#/metadata/271f545b-cdc7-4b18-89fb-1adda5a3f4ef
+# And is the 'Nutrients - AggregatedData_Country' file, also available at: https://discomap.eea.europa.eu/App/DiscodataViewer/?fqn=[WISE_Indicators].[v4r1].[AggregatedData_Country]
+
 meta:
   origin:
     # Data product / Snapshot
@@ -12,7 +16,7 @@ meta:
     # Citation
     producer: European Environment Agency
     citation_full: |-
-      European Environment Agency  (2023). WISE statistics - nutrients (1990-2021), 2023.
+      European Environment Agency (2023). WISE statistics - nutrients (1990-2021), 2023.
     attribution_short: EEA
     # Files
     url_main: https://sdi.eea.europa.eu/catalogue/srv/eng/catalog.search#/metadata/271f545b-cdc7-4b18-89fb-1adda5a3f4ef

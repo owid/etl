@@ -16,6 +16,7 @@ definitions:
       <% if unit == "mg/L" %>milligrams per litre<% elif unit == "ug/L" %>micrograms per litre<% elif unit == "m" %>metres<%- endif -%>
     short_unit: |-
       <<unit>>
+    processing_level: minor
   title_public: |-
     <% if indicator == "Ammonium" %>
     Ammonium concentration in <<water_body_category>>
@@ -102,15 +103,11 @@ tables:
           Number of sites used to measure the {definitions.description_short}
         unit: |-
           sites
-        short_unit: |-
-          sites
       numberofreportedsites:
         title: Number of reported sites
         description_short: |-
           Number of reporting sites used to measure the {definitions.description_short}
         unit: |-
-          sites
-        short_unit: |-
           sites
       numberofcountries:
         title: Number of countries
@@ -118,13 +115,9 @@ tables:
           Number of countries used to measure the {definitions.description_short}
         unit: |-
           countries
-        short_unit: |-
-          countries
       numberofreportedcountries:
         title: Number of reported countries
         description_short: |-
           Number of reporting countries used to measure the {definitions.description_short}
         unit: |-
-          countries
-        short_unit: |-
           countries
