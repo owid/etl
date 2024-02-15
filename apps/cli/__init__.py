@@ -63,6 +63,7 @@ for name, cmd in COMMANDS_DEV.items():
 ## List with all groups and their commands.
 ## Each item is a group, with a name and the commands it contains.
 ## The commands are provided as a dictionary, with the command name as key, and the actual command function as value.
+## The list is sorted in the order we want the groups to be shown in the terminal (--help).
 ##
 ## Add here your new command! Make sure to add it as a (key, value)-pair in the "commands" dictionary of the group you want it to belong to. Alternatively, you can also create a new group.
 GROUPS = [
@@ -73,11 +74,12 @@ GROUPS = [
         },
     },
     {
-        "name": "Charts",
+        "name": "Data",
         "commands": {
-            "chart-sync": cli_staging_sync,
-            "chart-gpt": cli_chartgpt,
-            "chart-revisions": cli_chart_revision,
+            "harmonize": cli_harmonize,
+            "diff": cli_datadiff,
+            "graphviz": cli_graphviz,
+            "compare": cli_compare,
         },
     },
     {
@@ -89,12 +91,11 @@ GROUPS = [
         },
     },
     {
-        "name": "Data",
+        "name": "Charts",
         "commands": {
-            "harmonize": cli_harmonize,
-            "diff": cli_datadiff,
-            "graphviz": cli_graphviz,
-            "compare": cli_compare,
+            "chart-sync": cli_staging_sync,
+            "chart-gpt": cli_chartgpt,
+            "chart-revisions": cli_chart_revision,
         },
     },
     {
