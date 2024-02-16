@@ -68,7 +68,7 @@ for name, cmd in COMMANDS_DEV.items():
 ## Add here your new command! Make sure to add it as a (key, value)-pair in the "commands" dictionary of the group you want it to belong to. Alternatively, you can also create a new group.
 GROUPS = [
     {
-        "name": "Run ETL step",
+        "name": "Run ETL steps",
         "commands": {
             "run": cli_run,
         },
@@ -110,7 +110,7 @@ GROUPS = [
     {
         "name": "Others",
         "commands": {
-            # "dev": cli_dev,
+            "dev": cli_dev,
             "variable-match": cli_match_variables,
             "variable-mapping-translate": cli_variable_mapping_translate,
         },
@@ -146,13 +146,16 @@ cli.add_command(cli_dev)
 ################################
 
 # RICH-CLICK CONFIGURATION
+# click.rich_click.USE_RICH_MARKUP = True
 click.rich_click.USE_MARKDOWN = True
-# click.rich_click.SHOW_ARGUMENTS = True
+click.rich_click.SHOW_ARGUMENTS = True
+# click.rich_click.STYLE_HEADER_TEXT = "bold"
 # click.rich_click.GROUP_ARGUMENTS_OPTIONS = True
 # Show variable types under description
-# click.rich_click.SHOW_METAVARS_COLUMN = False
-# click.rich_click.APPEND_METAVARS_HELP = True
-
+click.rich_click.SHOW_METAVARS_COLUMN = False
+click.rich_click.APPEND_METAVARS_HELP = True
+click.rich_click.OPTION_ENVVAR_FIRST = True
+# click.rich_click.USE_CLICK_SHORT_HELP = True
 ## Convert GROUPS to the format expected by rich-click, and submit the ordering and groups so they are shown in the terminal (--help).
 command_groups = [
     {

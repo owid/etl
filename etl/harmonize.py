@@ -38,20 +38,34 @@ custom_style_fancy = questionary.Style(
 @click.argument("data_file")
 @click.argument("column")
 @click.argument("output_file")
-@click.argument("institution", required=False)
-@click.argument("num_suggestions", required=False, default=5)
+@click.option(
+    "--institution",
+    "-i",
+    required=False,
+    default=None,
+    show_default=True,
+    help="Append '(institution)' to countries",
+)
+@click.option(
+    "--num-suggestions",
+    "-n",
+    required=False,
+    default=5,
+    show_default=True,
+    help="Number of suggestions to show per entity",
+)
 def harmonize(
     data_file: str, column: str, output_file: str, num_suggestions: int, institution: Optional[str] = None
 ) -> None:
-    """Given a `DATA_FILE` in feather or CSV format, and the name of the COLUMN representing
-    country or region names, interactively generate the JSON mapping OUTPUT_FILE from the given names
-    to OWID's canonical names. Optionally, can use INSTITUTION to append "(institution)" to countries.
+    """Generate a dictionary with the mapping of country names to OWID's canonical names.
 
+    Harmonize the country names in `COLUMN` of a `DATA_FILE` (CSV or feather) and save the mapping to `OUTPUT_FILE` as a JSON file. The harmonization process is done according to OWID's canonical country names.
 
-    When a name is ambiguous, you can use:
+    The harmonization process is done interactively, where the user is prompted with a list of ambiguous country names and asked to select the correct country name from a list of suggestions (ranked by similarity).
 
-    - Choose Option (9) [custom] to enter a custom name
+    When the mapping is ambiguous, you can use:
 
+    - Choose Option [custom] to enter a custom name.
     - Type `Ctrl-C` to exit and save the partially complete mapping
 
 
