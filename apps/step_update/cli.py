@@ -2,7 +2,7 @@ import difflib
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any, Dict, List, Optional, Union
 
 import click
 import structlog
@@ -125,6 +125,11 @@ class StepUpdater:
         self.steps_df = self.steps_df[self.steps_df["state"] == "active"].reset_index(drop=True)
         # If dry_run is True, then nothing will be written to the dag, and no files will be created.
         self.dry_run = dry_run
+        # For convenience, add full local path to dag files to steps dataframe.
+        self.steps_df["dag_file_path"] = [
+            (DAG_DIR / dag_file_name).with_suffix(".yml") if dag_file_name else None
+            for dag_file_name in self.steps_df["dag_file_name"]
+        ]
 
     def check_that_step_exists(self, step: str) -> None:
         """Check that step to be updated exists in the active dag."""
@@ -148,6 +153,7 @@ class StepUpdater:
         self,
         step: str,
         step_version_new: Optional[str] = STEP_VERSION_NEW,
+        step_header: Optional[str] = None,
     ) -> None:
         # Get info for step to be updated.
         step_info = self.get_step_info(step=step)
@@ -190,6 +196,11 @@ class StepUpdater:
         # Define the new step.
         step_new = step.replace(step_info["version"], step_version_new)  # type: ignore
 
+        # Define a header for the new step in the dag file.
+        if step_header is None:
+            # TODO: Get header from the comment lines right above the current step in the dag.
+            step_header = get_comments_above_step_in_dag(step=step, dag_file=step_info["dag_file_path"])
+
         if not self.dry_run:
             # If new folder does not exist, create it.
             folder_new.mkdir(parents=True, exist_ok=True)
@@ -217,12 +228,13 @@ class StepUpdater:
             # Add the new snapshot as a dependency of the temporary step (and make it a set instead of a list).
             step_temp[step_temp_name] = set(step_temp[step_temp_name] + [step_new])
             # Save temporary dag.
-            write_to_dag_file(dag_file=DAG_TEMP_FILE, dag_part=step_temp)
+            write_to_dag_file(dag_file=DAG_TEMP_FILE, dag_part=step_temp, comments={step_new: step_header})
 
     def update_data_step(
         self,
         step: str,
         step_version_new: Optional[str] = STEP_VERSION_NEW,
+        step_header: Optional[str] = None,
     ) -> None:
         # Get info for step to be updated.
         step_info = self.get_step_info(step=step)
@@ -262,13 +274,12 @@ class StepUpdater:
         dag_part = {step_new: step_dependencies_new}
 
         # Identify the dag file for this step.
-        dag_file = (DAG_DIR / self.steps_df[self.steps_df["step"] == step].iloc[0]["dag_file_name"]).with_suffix(".yml")
+        dag_file = self.steps_df[self.steps_df["step"] == step].iloc[0]["dag_file_path"]
 
         # Define a header for the new step in the dag file.
-        # TODO: Add header of the step as an argument from the command line. If not given, fetch the commented lines
-        #  right above the current step in the dag.
-        #  And ensure that the header appears only once, not for every step.
-        step_header = {step_new: "#\n# Temporary header.\n#"}
+        if step_header is None:
+            # TODO: Get header from the comment lines right above the current step in the dag.
+            step_header = get_comments_above_step_in_dag(step=step, dag_file=dag_file)
 
         if not self.dry_run:
             # If new folder does not exist, create it.
@@ -288,9 +299,11 @@ class StepUpdater:
                 step_file_new.write_bytes(step_file.read_bytes())
 
             # Add new step and its dependencies to the dag.
-            write_to_dag_file(dag_file=dag_file, dag_part=dag_part, comments=step_header)
+            write_to_dag_file(dag_file=dag_file, dag_part=dag_part, comments={step_new: step_header})
 
-    def update_step(self, step: str, step_version_new: Optional[str] = STEP_VERSION_NEW) -> None:
+    def update_step(
+        self, step: str, step_version_new: Optional[str] = STEP_VERSION_NEW, step_header: Optional[str] = None
+    ) -> None:
         """Update step to new version."""
 
         # Check that step to be updated exists in the active dag.
@@ -299,19 +312,106 @@ class StepUpdater:
         # Extract channel from step.
         step_channel = self.steps_df[self.steps_df["step"] == step].iloc[0]["channel"]
 
+        log.info(f"Updating {step} to version {step_version_new}.")
         if step_channel == "snapshot":
-            self.update_snapshot_step(step=step, step_version_new=step_version_new)
+            self.update_snapshot_step(step=step, step_version_new=step_version_new, step_header=step_header)
         elif step_channel in ["meadow", "garden", "grapher"]:
-            self.update_data_step(step=step, step_version_new=step_version_new)
+            self.update_data_step(step=step, step_version_new=step_version_new, step_header=step_header)
         else:
             log.error(f"Channel {step_channel} not yet supported.")
             sys.exit(1)
 
+    def update_steps(
+        self,
+        steps: Union[str, List[str]],
+        step_version_new: Optional[str] = STEP_VERSION_NEW,
+        include_dependencies: bool = False,
+        include_usages: bool = False,
+        step_headers: Optional[Dict[str, str]] = None,
+    ) -> None:
+        """Update multiple steps to new version."""
+
+        # If a single step is given, convert it to a list.
+        if isinstance(steps, str):
+            steps = [steps]
+
+        # Define a dictionary of default step headers (to be used if step_headers is not defined), taken from the dag.
+        step_headers_default = {}
+
+        # Gather all steps to be updated.
+        for step in steps:
+            step_df = self.steps_df[self.steps_df["step"] == step]
+            # Get the header for this step.
+            step_headers_default[step] = get_comments_above_step_in_dag(
+                step=step, dag_file=step_df["dag_file_path"].item()
+            )
+
+            if include_dependencies:
+                dependencies = step_df["direct_dependencies"].item()
+                steps += dependencies
+                # For dependencies, add no header.
+                step_headers_default.update({dependency: "" for dependency in dependencies})
+
+            if include_usages:
+                usages = step_df["direct_usages"].item()
+                steps += usages
+                # For usages, add no header.
+                step_headers_default.update({usage: "" for usage in usages})
+
+        # If step_headers is not explicitly defined, use the default headers.
+        if step_headers is None:
+            step_headers = step_headers_default
+
+        # For convenience, sort steps by channel and then by name.
+        steps = sort_steps(steps=steps)  # type: ignore
+
+        # Update each step.
+        for step in steps:
+            self.update_step(step=step, step_version_new=step_version_new, step_header=step_headers[step])
+
+
+def get_comments_above_step_in_dag(step: str, dag_file: Path) -> str:
+    # TODO: Get header from the comment lines right above the current step in the dag.
+    step_header = "#\n# Temporary header.\n#"
+
+    return step_header
+
+
+def sort_steps(steps: List[str]) -> List[str]:
+    # Sort steps by channel and then by name.
+    steps_sorted = sum(
+        [
+            sorted([step for step in steps if channel_str in step])
+            for channel_str in ["walden://", "snapshot://", "/meadow/", "/garden/", "/grapher/", "/explorers/"]
+        ],
+        [],
+    )
+
+    # Add any other steps (from channels that were not included above) at the end of the list.
+    # As of today, those would be "backport", "etag", "examples", "open_numbers".
+    steps_sorted = steps_sorted + sorted([step for step in steps if step not in steps_sorted])
+
+    return steps_sorted
+
 
 @click.command(cls=RichCommand, help=__doc__)
-@click.argument("step", type=str)
+@click.argument("steps", type=str or List[str])
 @click.option(
     "--step-version-new", type=str, default=STEP_VERSION_NEW, help=f"New version for step. Default: {STEP_VERSION_NEW}."
+)
+@click.option(
+    "--include-dependencies",
+    is_flag=True,
+    default=False,
+    type=bool,
+    help="Include dependencies of step. Default: False.",
+)
+@click.option(
+    "--include-usages",
+    is_flag=True,
+    default=False,
+    type=bool,
+    help="Include usages of step. Default: False.",
 )
 @click.option(
     "--dry-run",
@@ -321,11 +421,18 @@ class StepUpdater:
     help="Do not write to dag or create step files. Default: False.",
 )
 def cli(
-    step: str,
+    steps: Union[str, List[str]],
     step_version_new: Optional[str] = STEP_VERSION_NEW,
+    include_dependencies: bool = False,
+    include_usages: bool = False,
     dry_run: bool = False,
 ) -> None:
     """TODO"""
     # Initialize step updater and run update.
-    StepUpdater(dry_run=dry_run).update_step(step=step, step_version_new=step_version_new)
+    StepUpdater(dry_run=dry_run).update_steps(
+        steps=steps,
+        step_version_new=step_version_new,
+        include_dependencies=include_dependencies,
+        include_usages=include_usages,
+    )
     # TODO: Allow for updating multiple steps and dependencies at once.
