@@ -26,33 +26,44 @@ log = structlog.get_logger()
 @click.command(cls=RichCommand)
 @click.option(
     "--chart-slug",
+    "-c",
     type=str,
+    show_default=True,
     help="Slug of the chart to generate metadata for. Example: 'human-rights-index-vdem'.",
 )
 @click.option(
     "--uri",
+    "-u",
     type=str,
+    show_default=True,
     help="URI of the dataset to generate metadata for. Example: 'happiness/2023-03-20/happiness'.",
 )
 @click.option(
     "--cols",
+    "-c",
     type=str,
+    show_default=True,
     help="Only generate metadata for columns matching pattern. ",
 )
 @click.option(
     "--table-name",
+    "-t",
     type=str,
+    show_default=True,
     help="Table to select.",
 )
 @click.option(
     "--run-etl/--no-run-etl",
     default=True,
+    show_default=True,
     type=bool,
     help="Refresh ETL for the given dataset.",
 )
 @click.option(
     "--show/--no-show",
+    "-s",
     default=False,
+    show_default=True,
     type=bool,
     help="Show output instead of saving it into a file.",
 )
@@ -64,23 +75,29 @@ def cli(
     run_etl: bool,
     show: bool,
 ) -> None:
-    """Generate or update the metadata YAML in the grapher step using the given chart slug. This process pre-fills
-    the indicator with all available metadata from the existing dataset (in the old format) and adds grapher
-    configuration taken from the chart.
+    """Generate (or update) the metadata YAML in a Grapher step based on an existing chart.
+
+    This process pre-fills the indicator with all available metadata from the existing dataset (in the old format) and adds grapher
+    configuration taken from the chart config (accessed via its chart slug).
 
     Fields that are missing will be prefixed with 'TBD' and should either be filled in manually or removed. The
     description field needs to be restructured into new fields. This step could potentially be automated by
     ChatGPT in the future.
 
-    It is designed for use with the --chart-slug option. The use of --uri in conjunction with other options
+    **Note:** It is designed for use with the --chart-slug option. The use of --uri in conjunction with other options
     has not been as thoroughly tested.
 
-    Usage:
-        # show generated YAML in console
-        STAGING=mojmir etlcli metadata-migrate --chart-slug political-regime --show
+    **Example 1:** Show generated YAML in console
 
-        # create YAML file in grapher step
-        STAGING=mojmir etlcli metadata-migrate --chart-slug political-regime
+    ```
+    STAGING=mojmir etlcli metadata-migrate --chart-slug political-regime --show
+    ```
+
+    **Example 2:** Create YAML file in Grapher step
+
+    ```
+    STAGING=mojmir etlcli metadata-migrate --chart-slug political-regime
+    ```
     """
     assert config.STAGING, "You have to run this as STAGING=mystaging etlcli-metadata migrate ..."
 
