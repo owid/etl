@@ -198,7 +198,6 @@ class StepUpdater:
 
         # Define a header for the new step in the dag file.
         if step_header is None:
-            # TODO: Get header from the comment lines right above the current step in the dag.
             step_header = get_comments_above_step_in_dag(step=step, dag_file=step_info["dag_file_path"])
 
         if not self.dry_run:
@@ -242,9 +241,6 @@ class StepUpdater:
         # Define the folder of the old step files.
         folder = STEP_DIR / "data" / step_info["channel"] / step_info["namespace"] / step_info["version"]
 
-        # Define folder for new version.
-        folder_new = STEP_DIR / "data" / step_info["channel"] / step_info["namespace"] / step_version_new
-
         if ((folder / step_info["name"]).with_suffix(".py")).is_file():
             # Gather all relevant files from this folder.
             step_files = [
@@ -253,8 +249,8 @@ class StepUpdater:
                 if str(file_name.stem).split(".")[0] in [step_info["name"], "shared"]
             ]
         elif (folder / step_info["name"]).is_dir():
-            # TODO: Implement.
-            step_files = []
+            # Gather all relevant files from this folder.
+            step_files = [file_name for file_name in list(folder.glob(f"{step_info['name']}/*")) if file_name.is_file()]
         else:
             log.error(f"No step files found for step {step}.")
             sys.exit(1)
@@ -278,13 +274,10 @@ class StepUpdater:
 
         # Define a header for the new step in the dag file.
         if step_header is None:
-            # TODO: Get header from the comment lines right above the current step in the dag.
+            # Get header from the comment lines right above the current step in the dag.
             step_header = get_comments_above_step_in_dag(step=step, dag_file=dag_file)
 
         if not self.dry_run:
-            # If new folder does not exist, create it.
-            folder_new.mkdir(parents=True, exist_ok=True)
-
             # Copy files to new folder.
             for step_file in step_files:
                 # Define the path to the new version of this file.
@@ -294,6 +287,9 @@ class StepUpdater:
                 if step_file_new.exists():
                     log.error(f"New file already exists: {step_file_new}")
                     sys.exit(1)
+
+                # If new folder does not exist, create it.
+                step_file_new.parent.mkdir(parents=True, exist_ok=True)
 
                 # Create new file.
                 step_file_new.write_bytes(step_file.read_bytes())
@@ -456,4 +452,3 @@ def cli(
         include_dependencies=include_dependencies,
         include_usages=include_usages,
     )
-    # TODO: Allow for updating multiple steps and dependencies at once.
