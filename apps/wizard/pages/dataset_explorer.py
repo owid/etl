@@ -54,7 +54,7 @@ def activate():
 def display_metadata(metadata):
     if not isinstance(metadata, dict):
         metadata = metadata.to_dict()
-    ds = pd.Series(metadata)
+    ds = pd.Series(metadata).astype(str)
     ds.name = "value"
     st.table(data=ds)
 
@@ -254,42 +254,40 @@ if st.session_state.get("show"):
         if dataset is not None:
             # 2/ Show dataset details
             with tab_details:
-                # Tables and indicators
-                if dataset is not None:
-                    # Dataset metadata
-                    st.markdown("## Dataset")
-                    display_metadata(dataset.metadata)
+                # Dataset metadata
+                st.markdown("## Dataset")
+                display_metadata(dataset.metadata)
 
-                    # Table metadata
-                    st.markdown("## Tables")
-                    tnames = [f"`{tname}`" for tname in dataset.table_names]
-                    st.markdown(f"This dataset has {len(tnames)} tables: {', '.join(tnames)}.")
-                    for tname in dataset.table_names:
-                        st.write(f"#### Table `{tname}`")
-                        tb = dataset[tname]
-                        # Metadata for each indicator
-                        tabs = st.tabs([f"`{colname}`" for colname in tb.columns])
-                        for tab, colname in zip(tabs, tb.columns):
-                            with tab:
-                                metadata = tb[colname].metadata.to_dict()
-                                origins = metadata.pop("origins", None)
-                                presentation = metadata.pop("presentation", None)
-                                display = metadata.pop("display", None)
+                # Table metadata
+                st.markdown("## Tables")
+                tnames = [f"`{tname}`" for tname in dataset.table_names]
+                st.markdown(f"This dataset has {len(tnames)} tables: {', '.join(tnames)}.")
+                for tname in dataset.table_names:
+                    st.write(f"#### Table `{tname}`")
+                    tb = dataset[tname]
+                    # Metadata for each indicator
+                    tabs = st.tabs([f"`{colname}`" for colname in tb.columns])
+                    for tab, colname in zip(tabs, tb.columns):
+                        with tab:
+                            metadata = tb[colname].metadata.to_dict()
+                            origins = metadata.pop("origins", None)
+                            presentation = metadata.pop("presentation", None)
+                            display = metadata.pop("display", None)
 
-                                # Display metadata
-                                display_metadata(metadata)
+                            # Display metadata
+                            display_metadata(metadata)
 
-                                if display:
-                                    with st.expander("display.*"):
-                                        display_metadata(display)
-                                if presentation:
-                                    with st.expander("presentation.*"):
-                                        display_metadata(presentation)
-                                if origins:
-                                    with st.expander("origins.*"):
-                                        for origin in origins:
-                                            display_metadata(origin)
-                        st.divider()
+                            if display:
+                                with st.expander("display.*"):
+                                    display_metadata(display)
+                            if presentation:
+                                with st.expander("presentation.*"):
+                                    display_metadata(presentation)
+                            if origins:
+                                with st.expander("origins.*"):
+                                    for origin in origins:
+                                        display_metadata(origin)
+                    st.divider()
 
             # 3/ Show actions available
             ## Some actions where writing to files is involved, we provide an alternative solution for remote settings (download button)
