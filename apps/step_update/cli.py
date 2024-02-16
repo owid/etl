@@ -6,6 +6,7 @@ from typing import Any, Dict, List, Optional, Union
 
 import click
 import structlog
+from rapidfuzz import fuzz
 from rich_click.rich_command import RichCommand
 
 from etl.paths import DAG_DIR, DAG_TEMP_FILE, SNAPSHOTS_DIR, STEP_DIR
@@ -182,16 +183,25 @@ class StepUpdater:
         # Find script file for old step.
         _step_py_files = list(step_dvc_file.parent.glob("*.py"))
         if len(_step_py_files) == 1:
+            # Usually there is a single .py file with the same name. But it is possible that:
+            #  * The single .py file has a different name.
+            #    Example: gcp/2023-12-12/global_carbon_budget.py
+            #  * There are multiple .py files, corresponding to different snapshots altogether.
+            #    Example: animal_welfare/2023-08-01/global_hen_inventory.py and uk_egg_statistics.py
+            #  Therefore: If there is a single .py file in the same folder, that's the script.
             step_py_file = _step_py_files[0]
         else:
-            # TODO: Usually there is a single .py file with the same name. But it is possible that:
-            #  * The single .py file has a different name (e.g. gcp/2023-12-12/global_carbon_budget.py).
-            #  * There are multiple .py files, corresponding to different snapshots altogether.
-            #  Therefore: Check if there is a single .py file in the same folder. If so, that's the script.
-            #  If there are multiple, choose the one whose name has a shorter edit distance to the step name,
-            #  and prompt user confirmation (and allow inputting the right file).
-            log.error(f"No single .py file found for step {step}.")
-            sys.exit(1)
+            #  If there are multiple .py files, choose the one whose name has a shorter edit distance to the step name,
+            #  and ask for user confirmation (and allow choosing the right file).
+            print(f"Multiple .py files found for step {step}. Choose the correct one:\n")
+            steps_sorted = sorted(
+                _step_py_files,
+                key=lambda file_name: fuzz.ratio(step_dvc_file_new.stem.split(".")[0], file_name.stem),
+                reverse=True,
+            )
+            steps_names_sorted = [file_name.stem for file_name in steps_sorted]
+            choice = _confirm_choice(multiple_files=steps_names_sorted)
+            step_py_file = steps_sorted[choice]
 
         # Define the new step.
         step_new = step.replace(step_info["version"], step_version_new)  # type: ignore
@@ -209,12 +219,10 @@ class StepUpdater:
 
             # Check if a new py file already exists.
             step_py_file_new = folder_new / step_py_file.name
-            if step_py_file_new.exists():
-                # If there is already a .py file in the new folder, it may be because another dvc file (used by that script) has
-                # already been updated. So, simply skip it (alternatively, consider raising a warning).
-                pass
-            else:
+            if not step_py_file_new.exists():
                 # Create a new py file.
+                # NOTE: If there is already a .py file in the new folder, it may be because another dvc file (used by
+                # that script) has already been updated. So, simply skip it.
                 step_py_file_new.write_bytes(step_py_file.read_bytes())
 
             # Add the new snapshot as a dependency of the temporary dag.
@@ -358,6 +366,23 @@ class StepUpdater:
         # Update each step.
         for step in steps:
             self.update_step(step=step, step_version_new=step_version_new, step_header=step_headers[step])
+
+
+def _confirm_choice(multiple_files: List[Any]) -> int:
+    choice_default = 0
+    for i, file_name in enumerate(multiple_files):
+        print(f"{i} {file_name}")
+    while True:
+        choice = input(f"Currently selected: {choice_default}. Press enter to accept, or choose a different number.")
+        if choice == "":
+            choice = choice_default
+            break
+        elif choice.isdigit():
+            choice = int(choice)
+            break
+        else:
+            print("Invalid input. Please choose a number.")
+    return choice
 
 
 def get_comments_above_step_in_dag(step: str, dag_file: Path) -> str:
