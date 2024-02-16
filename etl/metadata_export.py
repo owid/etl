@@ -56,8 +56,17 @@ def cli(
     """
     if show:
         assert not output, "Can't use --show and --output at the same time."
+    output = main(path, output, show, decimals)
 
-    ds = Dataset(path)
+
+def main(
+    path: str,
+    output: str,
+    show: bool,
+    decimals: Optional[str],
+) -> str:
+    """Read docstring of `cli`."""
+    ds = Dataset(path=path)
     meta_dict = metadata_export(ds, prune=True, decimals=int(decimals) if decimals.isnumeric() else decimals)  # type: ignore
 
     output_path = Path(output) if output else paths.STEP_DIR / "data" / f"{ds.metadata.uri}.meta.yml"
@@ -76,6 +85,8 @@ def cli(
         output_path.parent.mkdir(parents=True, exist_ok=True)
         with open(output_path, "w") as f:
             f.write(yaml_str)  # type: ignore
+
+    return str(output_path)
 
 
 def merge_or_create_yaml(meta_dict: Dict[str, Any], output_path: Path, delete_empty: bool = True) -> str:

@@ -1,11 +1,10 @@
 """Utils for chart revision tool."""
-from typing import Any, Dict, Literal, Optional, Tuple
+from typing import Any, Dict, Tuple
 
 import pandas as pd
 import streamlit as st
 from MySQLdb import OperationalError
 from structlog import get_logger
-from typing_extensions import Self
 
 from etl.chart_revision.v2.schema import get_schema_chart_config
 from etl.db import config, get_all_datasets, get_connection, get_variables_in_dataset
@@ -107,69 +106,3 @@ def _check_env_and_environment() -> None:
             st.success(msg)
             st.subheader("Environment")
             _show_environment()
-
-
-OWIDEnvType = Literal["live", "staging", "local", "remote-staging", "unknown"]
-
-
-class OWIDEnv:
-    """OWID environment."""
-
-    env_type_id: OWIDEnvType
-
-    def __init__(
-        self: Self,
-        env_type_id: Optional[OWIDEnvType] = None,
-    ) -> None:
-        if env_type_id is None:
-            self.env_type_id = self.detect_env_type()
-        else:
-            self.env_type_id = env_type_id
-
-    def detect_env_type(self: Self) -> OWIDEnvType:
-        """Detect environment type."""
-        # live
-        if config.DB_NAME == "live_grapher":
-            return "live"
-        # staging
-        elif config.DB_NAME == "staging_grapher" and config.DB_USER == "staging_grapher":
-            return "staging"
-        # local
-        elif config.DB_NAME == "grapher" and config.DB_USER == "grapher":
-            return "local"
-        # other
-        elif config.DB_NAME == "owid" and config.DB_USER == "owid":
-            return "remote-staging"
-        return "unknown"
-
-    @property
-    def admin_url(
-        self: Self,
-    ) -> str | None:
-        """Get admin url."""
-        if self.env_type_id == "live":
-            return "https://owid.cloud/admin"
-        elif self.env_type_id == "staging":
-            return "https://staging.owid.cloud/admin"
-        elif self.env_type_id == "local":
-            return "http://localhost:3030/admin"
-        elif self.env_type_id == "remote-staging":
-            return f"http://{config.DB_HOST}/admin"
-        return None
-
-    @property
-    def chart_approval_tool_url(self: Self) -> str:
-        """Get chart approval tool url."""
-        return f"{self.admin_url}/suggested-chart-revisions/review"
-
-    def dataset_admin_url(self: Self, dataset_id: str | int) -> str:
-        """Get dataset admin url."""
-        return f"{self.admin_url}/datasets/{dataset_id}/"
-
-    def variable_admin_url(self: Self, variable_id: str | int) -> str:
-        """Get variable admin url."""
-        return f"{self.admin_url}/variables/{variable_id}/"
-
-    def chart_admin_url(self: Self, chart_id: str | int) -> str:
-        """Get chart admin url."""
-        return f"{self.admin_url}/charts/{chart_id}/edit"

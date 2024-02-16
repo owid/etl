@@ -18,13 +18,16 @@ import jsonschema
 import streamlit as st
 from cookiecutter.main import cookiecutter
 from MySQLdb import OperationalError
+from owid.catalog import Dataset
 from pydantic import BaseModel
+from structlog import get_logger
 from typing_extensions import Self
 
 from apps.wizard.config import PAGES_BY_ALIAS
 from etl import config
 from etl.db import get_connection
 from etl.files import apply_ruff_formatter_to_files, ruamel_dump, ruamel_load
+from etl.metadata_export import main as metadata_export
 from etl.paths import (
     APPS_DIR,
     BASE_DIR,
@@ -35,6 +38,10 @@ from etl.paths import (
 )
 from etl.steps import DAG, load_dag
 
+# Logger
+log = get_logger()
+
+# Path to variable configs
 DAG_WIZARD_PATH = DAG_DIR / "wizard.yml"
 
 # Load latest dataset versions
@@ -678,17 +685,51 @@ def get_datasets_in_etl(
     return options
 
 
-def set_states(states_values: Dict[str, Any]) -> None:
-    """Set states from any key in dictionary."""
+def set_states(states_values: Dict[str, Any], logging: bool = False) -> None:
+    """Set states from any key in dictionary.
+
+    Set logging to true to log the state changes
+    """
     for key, value in states_values.items():
+        if logging and (st.session_state[key] != value):
+            print(f"{key}: {st.session_state[key]} -> {value}")
         st.session_state[key] = value
 
 
-def st_page_link(alias: str, **kwargs) -> None:
+def st_page_link(alias: str, border: bool = False, **kwargs) -> None:
     """Link to page."""
-    st.page_link(
-        page=PAGES_BY_ALIAS[alias]["entrypoint"],
-        label=PAGES_BY_ALIAS[alias]["title"],
-        icon=PAGES_BY_ALIAS[alias]["emoji"],
-        **kwargs,
+    if border:
+        with st.container(border=True):
+            st.page_link(
+                page=PAGES_BY_ALIAS[alias]["entrypoint"],
+                label=PAGES_BY_ALIAS[alias]["title"],
+                icon=PAGES_BY_ALIAS[alias]["emoji"],
+                **kwargs,
+            )
+    else:
+        st.page_link(
+            page=PAGES_BY_ALIAS[alias]["entrypoint"],
+            label=PAGES_BY_ALIAS[alias]["title"],
+            icon=PAGES_BY_ALIAS[alias]["emoji"],
+            **kwargs,
+        )
+
+
+def metadata_export_basic(dataset_path: str | None = None, dataset: Dataset | None = None) -> str:
+    """Export metadata of a dataset.
+
+    The metadata of the dataset may have changed in run time.
+    """
+    # Handle inputs
+    if dataset:
+        dataset_path = str(dataset.path)
+    elif dataset_path is None:
+        raise ValueError("Either a dataset or a dataset_path must be provided.")
+
+    output_path = metadata_export(
+        path=dataset_path,
+        output="",  # Will assign the default value
+        show=False,
+        decimals="auto",
     )
+    return output_path

@@ -8,7 +8,7 @@ st.session_state["step_name"] = "charts"
 APP_STATE = utils.AppState()
 
 
-def init_app():
+def init_app() -> None:
     st.set_page_config(
         page_title="Wizard: Chart Revisions Baker",
         layout="wide",
@@ -28,8 +28,8 @@ def init_app():
     """,
         },
     )
-    st.title("Metadata 🧑‍🍳 **:gray[Revision Baker]**")
-    st.markdown("Migrate your metadata to the up-to-date standard using GPT.")
+    st.title("Charts 🧑‍🍳 **:gray[Revision Baker]**")
+    st.markdown("Replace the usage from the variables in a dataset with the variables from another dataset..")
     add_indentation()
 
     # CONFIGURATION SIDEBAR
@@ -43,15 +43,10 @@ def init_app():
                         utils._show_environment()
 
 
-def set_session_states():
+def set_session_states() -> None:
+    """Initiate session states."""
     # Session states
-    if "submitted_datasets" not in st.session_state:
-        st.session_state.submitted_datasets = False
-    if "submitted_variables" not in st.session_state:
-        st.session_state.submitted_variables = False
-    if "submitted_revisions" not in st.session_state:
-        st.session_state.submitted_revisions = False
-    if "show_submission_details" not in st.session_state:
-        st.session_state.show_submission_details = False
-    if "variable_mapping" not in st.session_state:
-        st.session_state.variable_mapping = {}
+    st.session_state.submitted_datasets = st.session_state.get("submitted_datasets", False)
+    st.session_state.submitted_variables = st.session_state.get("submitted_variables", False)
+    st.session_state.submitted_revisions = st.session_state.get("submitted_revisions", False)
+    st.session_state.variable_mapping = st.session_state.get("variable_mapping", {})
