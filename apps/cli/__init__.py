@@ -161,6 +161,8 @@ def cli() -> None:
     """Run OWID's ETL client.
 
     Create ETL step templates, compare different datasets, generate dependency visualisations, synchronise charts across different servers, import datasets from non-ETL OWID sources, improve your metadata, etc.
+
+    **Note: For a UI experience, refer to CLI `etlwiz`.**
     """
     pass
 
