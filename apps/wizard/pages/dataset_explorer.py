@@ -11,6 +11,7 @@ from owid import catalog
 from st_pages import add_indentation
 from streamlit_agraph import Config, ConfigBuilder, Edge, Node, agraph
 
+from apps.wizard.utils import metadata_export_basic
 from etl.paths import DATA_DIR
 from etl.steps import extract_step_attributes, filter_to_subgraph, load_dag
 
@@ -182,6 +183,20 @@ def generate_graph(
     return agraph(nodes=nodes, edges=edges, config=config)
 
 
+def get_dataset(dataset_uri: str) -> catalog.Dataset | None:
+    """Get dataset."""
+    attributes = extract_step_attributes(dataset_uri)
+    dataset_path = (
+        DATA_DIR / f"{attributes['channel']}/{attributes['namespace']}/{attributes['version']}/{attributes['name']}"
+    )
+    dataset = None
+    try:
+        dataset = catalog.Dataset(dataset_path)
+    except Exception:
+        st.warning(f"Dataset not found. You may want to run `etl {attributes['step']}` first")
+    return dataset
+
+
 with st.form("form"):
     dag = load_dag()
     options = sorted(list(dag.keys()))
@@ -196,7 +211,7 @@ with st.form("form"):
     collapse_meadow = st.toggle("Collapse meadow", value=False, help=help_template.format(channel="meadow"))
     downstream = st.toggle("Show downstream", value=False, help="Show nodes that depend on the selected node.")
     # Form submit button
-    st.form_submit_button("Explore", on_click=activate)
+    st.form_submit_button("Explore", on_click=activate, type="primary")
 
 
 if st.session_state.get("show"):
@@ -216,57 +231,79 @@ if st.session_state.get("show"):
     attributes = extract_step_attributes(cast(str, option))
     show_d_details = attributes["channel"] in ["garden", "grapher"]
 
+    #  Show a more complete overview for Garden and Grapher datasets
     if show_d_details:
-        tab_graph, tab_details = st.tabs(["Dependency graph", "Dataset details"])
+        tab_graph, tab_details, tab_actions = st.tabs(["Dependency graph", "Metadata", "🚀 Actions"])
 
-        # Show graph
+        # 1/ Show graph
         _show_tab_graph(tab_graph, option, dag)
 
-        # Show dataset details
-        ## Load dataset
-        attributes = extract_step_attributes(cast(str, option))
-        dataset_path = (
-            DATA_DIR / f"{attributes['channel']}/{attributes['namespace']}/{attributes['version']}/{attributes['name']}"
-        )
-        dataset = None
-        try:
-            dataset = catalog.Dataset(dataset_path)
-        except Exception:
-            st.warning(f"Dataset not found. You may want to run `etl {attributes['step']}` first")
-        else:
-            # Display metadata
-            display_metadata(dataset.metadata)
+        # Get dataset
+        dataset = get_dataset(cast(str, option))
 
-        # Tables and indicators
         if dataset is not None:
-            tnames = [f"`{tname}`" for tname in dataset.table_names]
-            st.info(f"This dataset has {len(tnames)} tables: {', '.join(tnames)}")
-            for tname in dataset.table_names:
-                st.write(f"### Table `{tname}`")
-                tb = dataset[tname]
-                # Metadata for each indicator
-                tabs = st.tabs([f"`{colname}`" for colname in tb.columns])
-                for tab, colname in zip(tabs, tb.columns):
-                    with tab:
-                        metadata = tb[colname].metadata.to_dict()
-                        origins = metadata.pop("origins", None)
-                        presentation = metadata.pop("presentation", None)
-                        display = metadata.pop("display", None)
+            # 2/ Show dataset details
+            with tab_details:
+                # Tables and indicators
+                if dataset is not None:
+                    # Dataset metadata
+                    st.markdown("## Dataset")
+                    display_metadata(dataset.metadata)
 
-                        # Display metadata
-                        display_metadata(metadata)
+                    # Table metadata
+                    st.markdown("## Tables")
+                    tnames = [f"`{tname}`" for tname in dataset.table_names]
+                    st.markdown(f"This dataset has {len(tnames)} tables: {', '.join(tnames)}.")
+                    for tname in dataset.table_names:
+                        st.write(f"#### Table `{tname}`")
+                        tb = dataset[tname]
+                        # Metadata for each indicator
+                        tabs = st.tabs([f"`{colname}`" for colname in tb.columns])
+                        for tab, colname in zip(tabs, tb.columns):
+                            with tab:
+                                metadata = tb[colname].metadata.to_dict()
+                                origins = metadata.pop("origins", None)
+                                presentation = metadata.pop("presentation", None)
+                                display = metadata.pop("display", None)
 
-                        if display:
-                            with st.expander("display.*"):
-                                display_metadata(display)
-                        if presentation:
-                            with st.expander("presentation.*"):
-                                display_metadata(presentation)
-                        if origins:
-                            with st.expander("origins.*"):
-                                for origin in origins:
-                                    display_metadata(origin)
+                                # Display metadata
+                                display_metadata(metadata)
 
+                                if display:
+                                    with st.expander("display.*"):
+                                        display_metadata(display)
+                                if presentation:
+                                    with st.expander("presentation.*"):
+                                        display_metadata(presentation)
+                                if origins:
+                                    with st.expander("origins.*"):
+                                        for origin in origins:
+                                            display_metadata(origin)
+                        st.divider()
+
+            # 3/ Show actions available
+            with tab_actions:
+                with st.container(border=True):
+                    st.markdown("### Export metadata")
+                    st.markdown(
+                        """
+                    - Export dataset & tables & columns metadata in YAML format. This is useful for generating *.meta.yml files that can be later manually edited. It provides a good starting point with all indicators added to the metadata YAML file.
+                    - If the output YAML already exists, it will be updated with new values.
+                    - This is equivalent to using CLI command `etl-export-metadata`.
+                    """
+                    )
+                    export_metadata = st.button(
+                        label="Export",
+                    )
+
+                    if export_metadata:
+                        try:
+                            output_path = metadata_export_basic(dataset=dataset)
+                        except Exception as e:
+                            st.exception(e)
+                            st.stop()
+                        else:
+                            st.success(f"Metadata exported to `{output_path}`.")
     else:
         tab_graph = st.tabs(["Dependency graph"])
         _show_tab_graph(tab_graph[0], option, dag)

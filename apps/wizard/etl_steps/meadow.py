@@ -250,20 +250,25 @@ if submitted:
         utils.preview_dag_additions(dag_content=dag_content, dag_path=dag_path)
 
         # Display next steps
-        with st.expander("## Next steps", expanded=True):
-            st.markdown(
-                f"""
-        1. Run `etl` to generate the dataset
-
-            ```
-            poetry run etl data{private_suffix}://meadow/{form.namespace}/{form.version}/{form.short_name} {"--private" if form.is_private else ""}
-            ```
-
-        {f"2. (Optional) Generated notebook `{notebook_path.relative_to(BASE_DIR)}` can be used to examine the dataset output interactively." if form.generate_notebook else ""}
-
-        {"3. Continue to the garden step." if form.generate_notebook else "2. Continue to the garden step."}
-        """
+        with st.expander("⏭️ **Next steps**", expanded=True):
+            # 1/ Run ETL step
+            st.markdown("#### 1. Run ETL step")
+            st.code(
+                f"poetry run etl data{private_suffix}://meadow/{form.namespace}/{form.version}/{form.short_name} {'--private' if form.is_private else ''}"
             )
+
+            if form.generate_notebook:
+                # 2/ Open notebook
+                with st.container(border=True):
+                    st.markdown("**(Optional)**")
+                    # A/ Playground notebook
+                    st.markdown("#### Playground notebook")
+                    st.markdown(
+                        f"Use the generated notebook `{notebook_path.relative_to(BASE_DIR)}` to examine the dataset output interactively."
+                    )
+
+            st.markdown("#### 2. Proceed to next step")
+            utils.st_page_link("garden", use_container_width=True, border=True)
 
         # User message
         st.toast("Templates generated. Read the next steps.", icon="✅")
