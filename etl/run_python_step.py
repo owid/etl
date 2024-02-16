@@ -1,5 +1,5 @@
 #
-#  etlcli run-python-step
+#  etlcli d run-python-step
 #
 
 import sys

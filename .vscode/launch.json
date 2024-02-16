@@ -9,7 +9,7 @@
             "type": "python",
             "request": "launch",
             "program": "/home/daniel/.local/bin/poetry",
-            "args": ["run", "etlcli", "backport", "bulk", "--dry-run"],
+            "args": ["run", "etlcli", "b", "bulk", "--dry-run"],
             "console": "integratedTerminal",
             "justMyCode": true,
             "python": "/usr/bin/python",
