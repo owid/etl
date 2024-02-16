@@ -126,3 +126,5 @@ steps:
     - snapshot://fasttrack/2023-08-07/animal_lives_per_kilogram.csv
   data://grapher/fasttrack/latest/baxter_2013_gbd_adult_coverage:
     - snapshot://fasttrack/latest/baxter_2013_gbd_adult_coverage.csv
+  data://grapher/fasttrack/latest/joe_test_please_delete:
+    - snapshot://fasttrack/latest/joe_test_please_delete.csv
