@@ -73,12 +73,14 @@ click.rich_click.OPTION_GROUPS = {
     "-u",
     "--user-id",
     type=int,
+    show_default=True,
     help="ID of the user. Use this to only get the revisions created by this particular user. By default will get revisions from all users.",
 )
 @click.option(
     "-i",
     "--revision-id",
     type=int,
+    show_default=True,
     help="ID of the revision. Use this to only get a specific review. By default will get revisions from all users.",
 )
 @click.option(
@@ -86,6 +88,7 @@ click.rich_click.OPTION_GROUPS = {
     "--only-mine",
     is_flag=True,
     default=False,
+    show_default=True,
     help="Use this to only modify those revisions created using your user id. Make sure that your environment variable GPT_SAMPLE_SIZE is properly set. If set, userid value will be ignored.",
 )
 @click.option(
@@ -93,6 +96,7 @@ click.rich_click.OPTION_GROUPS = {
     "--overwrite",
     is_flag=True,
     default=False,
+    show_default=True,
     help="Use this to overwrite existing suggestions. That is, existing gpt suggestions for the retrieved revisions will be replaced.",
 )
 @click.option(
@@ -100,6 +104,7 @@ click.rich_click.OPTION_GROUPS = {
     "--sample-size",
     type=int,
     default=GPT_SAMPLE_SIZE,
+    show_default=True,
     help="Number of reviews sampled from chatGPT.",
 )
 @click.option(
@@ -107,15 +112,20 @@ click.rich_click.OPTION_GROUPS = {
     "--model-name",
     type=click.Choice(sorted(MODELS_AVAILABLE.keys())),
     default=MODEL_DEFAULT,
+    show_default=True,
     help=f"Choose chat GPT model version. By default uses {MODEL_DEFAULT}.",
 )
 @click.option(
     "-t",
     "--system-prompt",
     type=str,
+    show_default=True,
     help="Path to a custom chatGPT system prompt.",
 )
-@click.version_option("0.1.0", prog_name="etlcli chart-gpt")
+@click.version_option(
+    "0.1.0",
+    prog_name="etlcli chart-gpt",
+)
 def cli(
     user_id: int,
     revision_id: int,
@@ -125,7 +135,15 @@ def cli(
     model_name: str,
     system_prompt: str,
 ) -> None:
-    """Add suggestions by chatGPT to pending revisions."""
+    """Add FASTT suggestions by chatGPT to pending chart revisions in admin.
+
+    # Description
+    This command gets a set of chart revision suggestions from the database, and queries chatGPT to get new suggestions for the title and subtitle of the chart. The new suggestions are then added to the database in an auxiliary table.
+
+    The new suggestions are available from the chart revision admin tool.
+
+    # Reference
+    """
     real_model_name = MODELS_AVAILABLE[model_name]
     if system_prompt:
         with open(system_prompt, "r") as f:

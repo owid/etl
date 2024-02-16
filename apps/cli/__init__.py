@@ -1,4 +1,7 @@
-"""ETL services CLI."""
+"""ETL services CLI.
+
+If you want to add a new service, make sure to add it to the `GROUPS` list. If it is a subgroup, you can add it to the `SUBGROUPS` list.
+"""
 import rich_click as click
 
 from apps.backport.backport import backport_cli as cli_backport_run
@@ -28,28 +31,61 @@ from etl.version_tracker import run_version_tracker_checks as cli_vtracker
 
 ################################
 #
-# DEV SUBCOMMAND
-# Configuration of the command `etlcli dev`.
-# We define it first because we need to reference it.
+# SUBGROUPS
+#
+# Configuration of the subcommands like `etlcli d` or `etlcli b`.
+# We define it first because we need to reference it later.
+#
+# You can edit `SUBGROUPS` to add new subcommands!
 #
 ################################
-COMMANDS_DEV = {
-    "version-tracker": cli_vtracker,
-    "prune": cli_prune,
-    "publish": cli_publish,
-    "reindex": cli_reindex,
-    "run-python-step": cli_run_python_step,
-}
+SUBGROUPS = [
+    {
+        "description": "Development commands.",
+        "alias": "d",
+        "name": "Development",
+        "commands": {
+            "version-tracker": cli_vtracker,
+            "prune": cli_prune,
+            "publish": cli_publish,
+            "reindex": cli_reindex,
+            "run-python-step": cli_run_python_step,
+        },
+    },
+    {
+        "alias": "b",
+        "name": "Backport",
+        "description": "Backport commands.",
+        "commands": {
+            "fasttrack": cli_fasttrack_backport,
+            "migrate": cli_backport_migrate,
+            "bulk": cli_bulk_backport,
+            "run": cli_backport_run,
+        },
+    },
+]
 
+# Convert this so we can use it in `GROUPS`
+subgroups = []
+for subgroup in SUBGROUPS:
+    # Define group command
+    def _cli() -> None:
+        f"""{subgroup['description']}"""
+        pass
 
-@click.group("dev", help="Development commands.")
-def cli_dev() -> None:
-    """Development utils."""
-    pass
+    _cli = click.group(subgroup["alias"])(_cli)
+    _group = {
+        "name": subgroup["name"],
+        "commands": {
+            subgroup["alias"]: _cli,
+        },
+    }
 
-
-for name, cmd in COMMANDS_DEV.items():
-    cli_dev.add_command(cmd=cmd, name=name)
+    # Define subgroup commands, add to group
+    for name, cmd in subgroup["commands"].items():
+        _cli.add_command(cmd=cmd, name=name)
+        _group["commands"][f"{subgroup['alias']} {name}"] = cmd
+    subgroups.append(_group)
 
 
 ################################
@@ -66,64 +102,63 @@ for name, cmd in COMMANDS_DEV.items():
 ## The list is sorted in the order we want the groups to be shown in the terminal (--help).
 ##
 ## Add here your new command! Make sure to add it as a (key, value)-pair in the "commands" dictionary of the group you want it to belong to. Alternatively, you can also create a new group.
-GROUPS = [
-    {
-        "name": "Run ETL steps",
-        "commands": {
-            "run": cli_run,
+#
+GROUPS = (
+    # Main groups
+    [
+        {
+            "name": "Run ETL steps",
+            "commands": {
+                "run": cli_run,
+            },
         },
-    },
-    {
-        "name": "Data",
-        "commands": {
-            "harmonize": cli_harmonize,
-            "diff": cli_datadiff,
-            "graphviz": cli_graphviz,
-            "compare": cli_compare,
+        {
+            "name": "Data",
+            "commands": {
+                "harmonize": cli_harmonize,
+                "diff": cli_datadiff,
+                "graphviz": cli_graphviz,
+                "compare": cli_compare,
+            },
         },
-    },
-    {
-        "name": "Metadata",
-        "commands": {
-            "metadata-export": cli_metadata_export,
-            "metadata-migrate": cli_metadata_migrate,
-            "metadata-upgrade": cli_meta_upgrader,
+        {
+            "name": "Metadata",
+            "commands": {
+                "metadata-export": cli_metadata_export,
+                "metadata-migrate": cli_metadata_migrate,
+                "metadata-upgrade": cli_meta_upgrader,
+            },
         },
-    },
-    {
-        "name": "Charts",
-        "commands": {
-            "chart-sync": cli_staging_sync,
-            "chart-gpt": cli_chartgpt,
-            "chart-revisions": cli_chart_revision,
+        {
+            "name": "Charts",
+            "commands": {
+                "chart-sync": cli_staging_sync,
+                "chart-gpt": cli_chartgpt,
+                "chart-upgrade": cli_chart_revision,
+            },
         },
-    },
-    {
-        "name": "Backport",
-        "commands": {
-            "backport-run": cli_backport_run,
-            "backport-bulk": cli_bulk_backport,
-            "backport-fasttrack": cli_fasttrack_backport,
-            "backport-migrate": cli_backport_migrate,
+    ]
+    # Add subroups (don't moddify)
+    + subgroups
+    # Others (not so relevant, maybe deprecated one day...)
+    + [
+        {
+            "name": "Others",
+            "commands": {
+                "variable-match": cli_match_variables,
+                "variable-mapping-translate": cli_variable_mapping_translate,
+            },
         },
-    },
-    {
-        "name": "Others",
-        "commands": {
-            "dev": cli_dev,
-            "variable-match": cli_match_variables,
-            "variable-mapping-translate": cli_variable_mapping_translate,
-        },
-    },
-]
+    ]
+)
 
 
 # MAIN CLIENT ENTRYPOINT (no action actually)
 ## Note that the entrypoint has no action, it is just a group. The commands that fall under it do actually have actions.
-@click.group(name="etl")
+@click.group(name="etlcli")
 # @click.rich_config(help_config=help_config)
 def cli() -> None:
-    """OWID's ETL client.
+    """Run OWID's ETL client.
 
     Create ETL step templates, compare different datasets, generate dependency visualisations, synchronise charts across different servers, import datasets from non-ETL OWID sources, improve your metadata, etc.
     """
@@ -135,7 +170,7 @@ for group in GROUPS:
     for name, cmd in group["commands"].items():
         cli.add_command(cmd=cmd, name=name)
 # Add dev
-cli.add_command(cli_dev)
+# cli.add_command(cli_dev)
 
 
 ################################
@@ -156,7 +191,8 @@ click.rich_click.SHOW_METAVARS_COLUMN = False
 click.rich_click.APPEND_METAVARS_HELP = True
 click.rich_click.OPTION_ENVVAR_FIRST = True
 # click.rich_click.USE_CLICK_SHORT_HELP = True
-## Convert GROUPS to the format expected by rich-click, and submit the ordering and groups so they are shown in the terminal (--help).
+
+## Convert GROUPS and SUBROUPS to the format expected by rich-click, and submit the ordering and groups so they are shown in the terminal (--help).
 command_groups = [
     {
         "name": group["name"],
@@ -164,4 +200,16 @@ command_groups = [
     }
     for group in GROUPS
 ]
-click.rich_click.COMMAND_GROUPS = {"etlcli": command_groups}
+commands_subgroups = {
+    f"etlcli {subgroup['alias']}": [
+        {
+            "name": "Commands",
+            "commands": list(subgroup["commands"].keys()),
+        }
+    ]
+    for subgroup in SUBGROUPS
+}
+click.rich_click.COMMAND_GROUPS = {
+    "etlcli": command_groups,
+    **commands_subgroups,
+}

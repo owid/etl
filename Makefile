@@ -108,15 +108,15 @@ lab: .venv
 
 publish: etl reindex
 	@echo '==> Publishing the catalog'
-	poetry run etlcli dev publish --private
+	poetry run etlcli d publish --private
 
 reindex: .venv
 	@echo '==> Creating a catalog index'
-	poetry run etlcli dev reindex
+	poetry run etlcli d reindex
 
 prune: .venv
 	@echo '==> Prune datasets with no recipe from catalog'
-	poetry run etlcli dev prune
+	poetry run etlcli d prune
 
 grapher: .venv
 	@echo '==> Running full etl with grapher upsert'
@@ -135,7 +135,7 @@ deploy:
 
 version-tracker: .venv
 	@echo '==> Check that no archive dataset is used by an active dataset, and that all active datasets are used'
-	poetry run etlcli dev version-tracker
+	poetry run etlcli d version-tracker
 
 api: .venv
 	@echo '==> Starting ETL API on http://localhost:8081/api/v1/indicators'

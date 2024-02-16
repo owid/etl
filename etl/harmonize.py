@@ -59,6 +59,7 @@ def harmonize(
 ) -> None:
     """Generate a dictionary with the mapping of country names to OWID's canonical names.
 
+    # Description
     Harmonize the country names in `COLUMN` of a `DATA_FILE` (CSV or feather) and save the mapping to `OUTPUT_FILE` as a JSON file. The harmonization process is done according to OWID's canonical country names.
 
     The harmonization process is done interactively, where the user is prompted with a list of ambiguous country names and asked to select the correct country name from a list of suggestions (ranked by similarity).
@@ -70,6 +71,8 @@ def harmonize(
 
 
     If a mapping file already exists, it will resume where the mapping file left off.
+
+    # Examples
     """
 
     df = read_table(data_file)

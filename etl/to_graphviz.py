@@ -25,7 +25,10 @@ from etl.steps import filter_to_subgraph, load_dag
 def to_graphviz(output_file: str, filter: Optional[str] = None, targets: bool = False) -> None:
     """Generate a [Graphviz DOT file](https://graphviz.org/doc/info/lang.html) to see all dependencies.
 
+    # Description
     Saves the output as a file in `OUTPUT_PATH`.
+
+    # Reference
     """
     dag = load_dag()
     if filter:

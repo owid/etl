@@ -2,7 +2,7 @@ import shutil
 from pathlib import Path
 from typing import Optional, cast
 
-import click
+import rich_click as click
 import structlog
 from owid.catalog.utils import underscore
 from rich import print
@@ -27,33 +27,59 @@ DAG_MIGRATED_PATH = DAG_DIR / "migrated.yml"
 
 
 @click.command()
-@click.option("--dataset-id", type=int, required=True)
-@click.option("--namespace", type=str, required=True, help="New namespace")
-@click.option("--version", type=str, required=False, default="latest", help="New version")
 @click.option(
-    "--short-name", type=str, required=False, help="New short name to use, underscored dataset name by default"
+    "--dataset-id",
+    type=int,
+    required=True,
+    show_default=True,
+    help="Dataset ID to migrate",
+)
+@click.option(
+    "--namespace",
+    type=str,
+    required=True,
+    help="New namespace",
+    show_default=True,
+)
+@click.option(
+    "--version",
+    type=str,
+    required=False,
+    default="latest",
+    help="New version",
+)
+@click.option(
+    "--short-name",
+    type=str,
+    required=False,
+    show_default=True,
+    help="New short name to use, underscored dataset name by default",
 )
 @click.option(
     "--backport/--no-backport",
     default=True,
+    show_default=True,
     type=bool,
     help="Backport dataset before migrating",
 )
 @click.option(
     "--force/--no-force",
     default=False,
+    show_default=True,
     type=bool,
     help="Force overwrite even if checksums match",
 )
 @click.option(
     "--dry-run/--no-dry-run",
     default=False,
+    show_default=True,
     type=bool,
     help="Do not add dataset to a catalog on dry-run",
 )
 @click.option(
     "--upload/--skip-upload",
     default=True,
+    show_default=True,
     type=bool,
     help="Upload dataset to S3 as snapshot",
 )
@@ -67,13 +93,22 @@ def cli(
     dry_run: bool = False,
     upload: bool = True,
 ) -> None:
-    """Migrate existing dataset from MySQL into ETL by creating:
+    """Migrate existing dataset from MySQL into ETL.
+
+    # Description
+
+    It imports datasets into ETL from MySQL by creating:
     - Ingest script that downloads data from S3 backport
     - Garden step with YAML metadata
     - Grapher step
 
-    Example usage:
-        ENV=.env.prod etlcli backport-migrate --dataset-id 5205 --namespace covid --short-name hospital__and__icu --no-backport
+    ## Example
+
+    ```
+    ENV=.env.live etlcli b migrate --dataset-id 5205 --namespace covid --short-name hospital__and__icu --no-backport
+    ```
+
+    # Reference
     """
     return migrate(
         dataset_id=dataset_id,

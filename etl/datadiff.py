@@ -290,6 +290,7 @@ def cli(
 ) -> None:
     """Compare all datasets from two catalogs and print out a summary of their differences.
 
+    # Description
     Compare all the datasets from catalog in `PATH_A` with all the datasets in catalog `PATH_B`. The catalog paths link to the `data/` folder with all the datasets (it contains a `catalog.meta.json` file)
 
     Note that you can use the keyword "REMOTE" as the path, if you want to run a comparison with the remote catalog.
@@ -298,8 +299,12 @@ def cli(
 
     **Note:** This command differs from `etlcli compare` in that it compares _all_ the datasets and not two specific ones.
 
-    **How it works?**
+    ## Other considerations
+    **How does it works?**
+
     It uses **source checksums** to find candidates for comparison. Source checksum includes all files used to generate the dataset and should be sufficient to find changed datasets, just note that we're not using checksum of the files themselves. So if you change core ETL code or some of the dependencies, e.g. change in owid-datautils-py, core ETL code or updating library version, the change won't be detected. In cases like these you should increment ETL version which is added to all source checksums (not implemented yet).
+
+    ## Examples
 
     **Example 1:** Compare the remote catalog with a local one
 
@@ -312,6 +317,7 @@ def cli(
     ```
     $ etlcli diff other-data/ data/ --include maddison
     ```
+    # Reference
     """
     console = Console(tab_size=2)
 

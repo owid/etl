@@ -1,13 +1,3 @@
-"""Translate the variable mapping dictionary from environment 1 to environment 2.
-
-
-That is, the variable IDs for the same variables may differ between environments (local, staging or production environments).
-If you have the variable mapping for one of the environments, you can easily obtain the equivalent for another environment using this command.
-
-A common use case is when you have the mapping for your local environment and wish to have the equivalent for the production environment. Instead
-of creating yet again the mapping for the production environment, simply run this command which will 'translate' the mapping you found for your
-local environment to one that is consistent with the production environment's variable IDs.
-"""
 import json
 from dataclasses import dataclass
 from typing import Any, Dict, Tuple
@@ -27,9 +17,9 @@ log = structlog.get_logger()
     "-e1",
     "--env-file-1",
     type=str,
+    show_default=True,
     help=(
-        "Path to the configuration file for connection 1. This file should contain all the environment variables"
-        " required to connect to the SQL. Should be in the format of a .env file."
+        "Path to the configuration file for connection 1. This file should contain all the environment variables required to connect to the SQL. Should be in the format of a .env file."
     ),
     required=True,
 )
@@ -37,9 +27,9 @@ log = structlog.get_logger()
     "-e2",
     "--env-file-2",
     type=str,
+    show_default=True,
     help=(
-        "Path to the configuration file for connection 2. This file should contain all the environment variables"
-        " required to connect to the SQL. Should be in the format of a .env file."
+        "Path to the configuration file for connection 2. This file should contain all the environment variables required to connect to the SQL. Should be in the format of a .env file."
     ),
     required=True,
 )
@@ -47,9 +37,9 @@ log = structlog.get_logger()
     "-m1",
     "--mapping-file-1",
     type=str,
+    show_default=True,
     help=(
-        "Path to the JSON file containing the variable mapping from connection 1. This file should have been previously"
-        " created and curated by the user. See command `etlcli variable-match` to create this file."
+        "Path to the JSON file containing the variable mapping from connection 1. This file should have been previously created and curated by the user. See command `etlcli variable-match` to create this file."
     ),
     required=True,
 )
@@ -57,22 +47,22 @@ log = structlog.get_logger()
     "-m2",
     "--mapping-file-2",
     type=str,
+    show_default=True,
     help="Path where to store the newly generated variable mapping from connection 2.",
     required=True,
 )
 def main_cli(env_file_1: str, env_file_2: str, mapping_file_1: str, mapping_file_2: str) -> None:
-    """Generate equivalent variable mapping file for the new DB.
+    """Translate the variable mapping dictionary from from one environment to another.
 
-    Parameters
-    ----------
-        env_1_file: str
-            Path to environment file with configuration to connect to database 1 (aka old DB).
-        env_file_2: str
-            Path to environment file with configuration to connect to database 2 (aka new DB).
-        mapping_file_1: str
-            Path to JSON file with variable IDs mapping (according to database 1)
-        mapping_file_2: str
-            Path to JSON file with variable IDs mapping (according to database 2)
+    # Description
+    Generate equivalent variable mapping file for the new DB. This is because the variable IDs for the same variables may differ between environments (local, staging or production environments).
+    If you have the variable mapping for one of the environments, you can easily obtain the equivalent for another environment using this command.
+
+    A common use case is when you have the mapping for your local environment and wish to have the equivalent for the production environment. Instead
+    of creating yet again the mapping for the production environment, simply run this command which will 'translate' the mapping you found for your
+    local environment to one that is consistent with the production environment's variable IDs.
+
+    # Reference
     """
     var_translator = VariableMappingTranslate.from_files(
         config_file_1=env_file_1,

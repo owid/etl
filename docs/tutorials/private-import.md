@@ -39,6 +39,6 @@ dataset.save()
 
 ```
 etlcli run --private
-etlcli dev reindex
-etlcli dev publish --private
+etlcli d reindex
+etlcli d publish --private
 ```

@@ -77,6 +77,7 @@ def cli(
 ) -> None:
     """Generate (or update) the metadata YAML in a Grapher step based on an existing chart.
 
+    # Description
     This process pre-fills the indicator with all available metadata from the existing dataset (in the old format) and adds grapher
     configuration taken from the chart config (accessed via its chart slug).
 
@@ -87,6 +88,7 @@ def cli(
     **Note:** It is designed for use with the --chart-slug option. The use of --uri in conjunction with other options
     has not been as thoroughly tested.
 
+    ## Examples
     **Example 1:** Show generated YAML in console
 
     ```
@@ -98,6 +100,8 @@ def cli(
     ```
     STAGING=mojmir etlcli metadata-migrate --chart-slug political-regime
     ```
+
+    # Reference
     """
     assert config.STAGING, "You have to run this as STAGING=mystaging etlcli-metadata migrate ..."
 

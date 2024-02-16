@@ -164,8 +164,10 @@ def main_cli(
 ) -> None:
     """Generate datasets by running their corresponding ETL steps.
 
+    # Description
     Run all ETL steps in the DAG matching the value of `STEPS`. A match is a dataset with an uri that contains the value of any of the words in `STEPS`.
 
+    ## Examples
     **Example 1**: Run steps matching "mars" in the DAG file:
 
     ```
@@ -183,6 +185,8 @@ def main_cli(
     ```
     $ etlcli run mars prio --dry-run
     ```
+
+    # Reference
     """
 
     _update_open_file_limit()

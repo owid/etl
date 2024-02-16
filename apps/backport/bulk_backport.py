@@ -21,7 +21,7 @@ config.enable_bugsnag()
 log = structlog.get_logger()
 
 
-@click.command()
+@click.command(deprecated=True)
 @click.option("--dataset-ids", "-d", type=int, multiple=True)
 @click.option(
     "--dry-run/--no-dry-run",
@@ -88,6 +88,10 @@ def bulk_backport(
     all: bool,
     workers: int,
 ) -> None:
+    """Backport in bulk.
+
+    # Reference
+    """
     engine = get_engine()
 
     if backport:

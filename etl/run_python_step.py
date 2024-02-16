@@ -17,10 +17,12 @@ from etl.paths import BASE_PACKAGE, STEP_DIR
 @click.argument("dest_dir")
 @click.option("--ipdb", is_flag=True)
 def main(uri: str, dest_dir: str, ipdb: Optional[bool]) -> None:
-    """
-    Import and run a specific step of the ETL. Meant to be ran as
-    a subprocess by the main `etl` command. There's a quite big
-    overhead (~3s) from importing all packages again in the new subprocess.
+    """Import and run a specific step of the ETL.
+
+    # Description
+    Meant to be ran as a subprocess by the main `etl` command. There's a quite big overhead (~3s) from importing all packages again in the new subprocess.
+
+    # Reference
     """
     if not uri.startswith("data://") and not uri.startswith("data-private://"):
         raise ValueError("Only data:// or data-private:// URIs are supported")

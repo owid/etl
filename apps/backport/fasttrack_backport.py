@@ -2,9 +2,9 @@ import datetime as dt
 import os
 from typing import Optional, cast
 
-import click
 import gspread
 import pandas as pd
+import rich_click as click
 import structlog
 from google.oauth2.service_account import Credentials
 from owid.catalog.utils import underscore
@@ -19,19 +19,31 @@ log = structlog.get_logger()
 
 
 @click.command()
-@click.option("--dataset-id", type=int, required=True)
 @click.option(
-    "--short-name", type=str, required=False, help="New short name to use, underscored dataset name by default"
+    "--dataset-id",
+    type=int,
+    required=True,
+    show_default=True,
+    help="Dataset ID to migrate",
+)
+@click.option(
+    "--short-name",
+    type=str,
+    required=False,
+    help="New short name to use, underscored dataset name by default",
+    show_default=True,
 )
 @click.option(
     "--backport/--no-backport",
     default=True,
+    show_default=True,
     type=bool,
     help="Backport dataset before migrating",
 )
 @click.option(
     "--recreate/--no-recreate",
     default=False,
+    show_default=True,
     type=bool,
     help="Recreate the spreadsheet if it already exists",
 )
@@ -47,11 +59,16 @@ def cli(
 
     1. Add Google Sheets API and Google Drive API to your project in the Google Cloud Platform Console.
     2. Download the credentials as a JSON file and save it in the same directory as this notebook.
-    3. Point env variable GOOGLE_APPLICATION_CREDENTIALS to the credentials file.
+    3. Point env variable `GOOGLE_APPLICATION_CREDENTIALS` to the credentials file.
     4. Share [Fast-track template](https://docs.google.com/spreadsheets/d/1j_mclAffQ2_jpbVEmI3VOiWRBeclBAIr-U7NpGAdV9A/edit#gid=1898134479) with the service account email address (e.g. 937270026338-compute@developer.gserviceaccount.com)
 
-    Example usage:
-        ENV=.env.prod etlcli backport-fasttrack --dataset-id 5546 --short-name democracy_lexical_index --no-backport
+    ## Example
+
+    ```
+    ENV=.env.live etlcli b fasttrack --dataset-id 5546 --short-name democracy_lexical_index --no-backport
+    ```
+
+    # Reference
     """
     return migrate(dataset_id=dataset_id, short_name=short_name, backport=backport, recreate=recreate)
 

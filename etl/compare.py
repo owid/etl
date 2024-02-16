@@ -60,7 +60,10 @@ def cli(
     show_shared: bool,
     truncate_lists_at: int,
 ) -> None:
-    """Compare two dataframes/tables/datasets in terms of their structure, values and metadata."""
+    """Compare two dataframes/tables/datasets in terms of their structure, values and metadata.
+
+    # Reference
+    """
     ctx.ensure_object(dict)
     ctx.obj["absolute_tolerance"] = absolute_tolerance
     ctx.obj["relative_tolerance"] = relative_tolerance
@@ -133,6 +136,7 @@ def etl_catalog(
     """
     Compare a table in the local catalog with the analogous one in the remote catalog.
 
+    # Description
     The table in the local catalog is loaded from `CHANNEL`/`NAMESPACE`/`DATASET`/{version}/`TABLE`. The value for {version} is given by the option `--version`. If not given, the latest local version of the dataset is compared with the latest remote version of the same dataset.
 
     It compares the columns, index columns and index values (row indices) as sets between the two dataframes and outputs
@@ -144,6 +148,8 @@ def etl_catalog(
     - 1 if there is an error loading the tables
     - 2 if the tables are structurally equal but are otherwise different
     - 3 if the tables have different structure and/or different values.
+
+    # Reference
     """
     try:
         remote_df = catalog.find_latest(
@@ -226,12 +232,18 @@ def grapher(
 ) -> None:
     """Compare a dataset in the local database with the remote database.
 
+    # Description
     It loads the dataset from grapher/`NAMESPACE`/`VERSION`/`DATASET`. It compares dataset and variables metadata, and optionally the values from S3 with (use the `--values` flag for this). It does the comparison in the same way as the `etl-catalog` command.
 
     The exit code is always 0 even if dataframes are different.
 
-    Example usage:
-        compare  --show-values grapher ggdc 2020-10-01 ggdc_maddison__2020_10_01 --values
+    ## Examples
+
+    ```
+    compare  --show-values grapher ggdc 2020-10-01 ggdc_maddison__2020_10_01 --values
+    ```
+
+    # Reference
     """
     remote_dataset_df = read_dataset_from_db(remote_env, namespace, version, dataset)
     local_dataset_df = read_dataset_from_db(local_env, namespace, version, dataset)
@@ -434,6 +446,7 @@ def dataframes(
     """
     Compare two `DATAFRAME1` with `DATAFRAME2`.
 
+    # Description
     It compares the columns, index columns and index values (row indices) as sets between the two dataframes and outputs the differences. Finally it compares the values of the overlapping columns and rows with the given threshold values for absolute and relative tolerance.
 
     The **exit code** is:
@@ -441,6 +454,8 @@ def dataframes(
     - 1 if there is an error loading the dataframes
     - 2 if the dataframes are structurally equal but are otherwise different
     - 3 if the dataframes have different structure and/or different values.
+
+    # Reference
     """
     df1: pd.DataFrame
     df2: pd.DataFrame
