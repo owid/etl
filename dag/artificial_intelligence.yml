@@ -1,11 +1,4 @@
 steps:
-  # Artificial Intelligence (EPOCH)
-  data://meadow/artificial_intelligence/2023-06-21/epoch:
-  - snapshot://artificial_intelligence/2023-06-21/epoch.csv
-  data://garden/artificial_intelligence/2023-06-21/epoch:
-  - data://meadow/artificial_intelligence/2023-06-21/epoch
-  data://grapher/artificial_intelligence/2023-06-21/epoch:
-  - data://garden/artificial_intelligence/2023-06-21/epoch
 
   # Artificial Intelligence (EPOCH, latest)
   data://meadow/artificial_intelligence/latest/epoch:
@@ -34,17 +27,10 @@ steps:
   - data://garden/artificial_intelligence/latest/epoch_aggregates_approach
 
   # Large Language Models and Compute (EPOCH)
-  data://garden/artificial_intelligence/2023-07-12/epoch_llms:
-  - snapshot://artificial_intelligence/2023-07-12/epoch_llms.csv
-  data://grapher/artificial_intelligence/2023-07-12/epoch_llms:
-  - data://garden/artificial_intelligence/2023-07-12/epoch_llms
-
-
- # Artificial Intelligence (EPOCH aggregates by domain and reseach affiliation)
-  data://garden/artificial_intelligence/2023-06-21/epoch_aggregates:
-  - data://garden/artificial_intelligence/2023-06-21/epoch
-  data://grapher/artificial_intelligence/2023-06-21/epoch_aggregates:
-  - data://garden/artificial_intelligence/2023-06-21/epoch_aggregates
+  data://garden/artificial_intelligence/2024-02-15/epoch_llms:
+  - snapshot://artificial_intelligence/2024-02-15/epoch_llms.csv
+  data://grapher/artificial_intelligence/2024-02-15/epoch_llms:
+  - data://garden/artificial_intelligence/2024-02-15/epoch_llms
 
   # World Risk Poll
   data://meadow/world_risk_poll/2023-06-26/wrp_2021:
