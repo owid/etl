@@ -670,6 +670,8 @@ def st_page_link(alias: str, border: bool = False, **kwargs) -> None:
 
 
 st.cache_data
+
+
 def metadata_export_basic(dataset_path: str | None = None, dataset: Dataset | None = None, output: str = "") -> str:
     """Export metadata of a dataset.
 

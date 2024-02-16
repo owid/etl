@@ -7,7 +7,7 @@ from st_pages import add_indentation
 from streamlit_card import card
 from streamlit_extras.switch_page_button import switch_page
 
-from apps.wizard.config import WIZARD_CONFIG, WIZARD_IS_REMOTE
+from apps.wizard.config import WIZARD_CONFIG
 
 # Initial configuration (side bar menu, title, etc.)
 st.set_page_config(page_title="Wizard: Home", page_icon="🪄")

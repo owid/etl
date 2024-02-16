@@ -1,6 +1,5 @@
 """Harmonize entities."""
 import json
-import tempfile
 from operator import itemgetter
 from pathlib import Path
 from typing import List, cast

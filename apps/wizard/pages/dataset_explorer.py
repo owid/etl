@@ -4,13 +4,11 @@
 - [ ] Preview its metadata
 """
 import tempfile
-from pathlib import Path
 from typing import Any, Dict, List, cast
 
 import pandas as pd
 import streamlit as st
 from owid import catalog
-from owid.catalog import Dataset
 from st_pages import add_indentation
 from streamlit_agraph import Config, ConfigBuilder, Edge, Node, agraph
 
