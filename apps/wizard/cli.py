@@ -8,7 +8,7 @@ import logging
 import sys
 from typing import Iterable
 
-import click
+import rich_click as click
 import streamlit.web.cli as stcli
 from rich_click.rich_command import RichCommand
 
@@ -18,6 +18,16 @@ from apps.wizard.utils import CURRENT_DIR
 # Disable streamlit cache data API logging
 # ref: @kajarenc from https://github.com/streamlit/streamlit/issues/6620#issuecomment-1564735996
 logging.getLogger("streamlit.runtime.caching.cache_data_api").setLevel(logging.ERROR)
+# RICH-CLICK CONFIGURATION
+# click.rich_click.USE_RICH_MARKUP = True
+click.rich_click.USE_MARKDOWN = True
+click.rich_click.SHOW_ARGUMENTS = True
+# click.rich_click.STYLE_HEADER_TEXT = "bold"
+# click.rich_click.GROUP_ARGUMENTS_OPTIONS = True
+# Show variable types under description
+click.rich_click.SHOW_METAVARS_COLUMN = False
+click.rich_click.APPEND_METAVARS_HELP = True
+click.rich_click.OPTION_ENVVAR_FIRST = True
 
 
 # NOTE: Any new arguments here need to be in sync with the arguments defined in
@@ -46,7 +56,20 @@ logging.getLogger("streamlit.runtime.caching.cache_data_api").setLevel(logging.E
     help="Application port",
 )
 def cli(phase: Iterable[WIZARD_PHASES], run_checks: bool, dummy_data: bool, port: int) -> None:
-    """Generate template fo each step of ETL."""
+    """Run OWID's ETL admin tool, the Wizard.
+
+    ```
+    ..__    __ _                  _
+    ./ / /\ \ (_)______ _ _ __ __| |
+    .\ \/  \/ | |_  / _` | '__/ _` |
+    ..\  /\  /| |/ | (_| | | | (_| |
+    ...\/  \/ |_/___\__,_|_|  \__,_|
+    ```
+
+    Just launch it and start using it! 🪄
+
+    **Note:** Alternatively, you can run it as `streamlit run apps/wizard/app.py`.
+    """
     script_path = CURRENT_DIR / "app.py"
 
     # Define command with arguments

@@ -138,3 +138,10 @@ def enable_bugsnag() -> None:
         bugsnag.configure(
             api_key=BUGSNAG_API_KEY,
         )  # type: ignore
+
+
+# For Wizard to know if it is running on remote
+## This could eventuallyb be just a generic flag for other apps/processes too.
+## Why is this important for Wizard? Refer to field `disable_on_remote` in apps/wizard/config/config.yml`
+WIZARD_IS_REMOTE = env.get("WIZARD_IS_REMOTE") in ("True", "true", "1")
+print(WIZARD_IS_REMOTE)

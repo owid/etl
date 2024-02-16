@@ -3,15 +3,19 @@
 - [ ] See its dependencies
 - [ ] Preview its metadata
 """
+import tempfile
+from pathlib import Path
 from typing import Any, Dict, List, cast
 
 import pandas as pd
 import streamlit as st
 from owid import catalog
+from owid.catalog import Dataset
 from st_pages import add_indentation
 from streamlit_agraph import Config, ConfigBuilder, Edge, Node, agraph
 
-from apps.wizard.utils import metadata_export_basic
+from apps.wizard.utils import metadata_export_basic, set_states
+from etl.config import WIZARD_IS_REMOTE
 from etl.paths import DATA_DIR
 from etl.steps import extract_step_attributes, filter_to_subgraph, load_dag
 
@@ -22,6 +26,7 @@ st.set_page_config(
     page_icon="🪄",
     initial_sidebar_state="collapsed",
 )
+st.session_state.export_metadata = st.session_state.get("export_metadata", False)
 
 st.title("🕵️ Dataset Explorer")
 add_indentation()
@@ -38,7 +43,12 @@ COLOR_MAIN = "#81429A"
 
 
 def activate():
-    st.session_state["show"] = True
+    set_states(
+        {
+            "export_metadata": False,
+            "show": True,
+        }
+    )
 
 
 def display_metadata(metadata):
@@ -282,6 +292,7 @@ if st.session_state.get("show"):
                         st.divider()
 
             # 3/ Show actions available
+            ## Some actions where writing to files is involved, we provide an alternative solution for remote settings (download button)
             with tab_actions:
                 with st.container(border=True):
                     st.markdown("### Export metadata")
@@ -292,18 +303,39 @@ if st.session_state.get("show"):
                     - This is equivalent to using CLI command `etl-export-metadata`.
                     """
                     )
-                    export_metadata = st.button(
-                        label="Export",
-                    )
-
-                    if export_metadata:
-                        try:
-                            output_path = metadata_export_basic(dataset=dataset)
-                        except Exception as e:
-                            st.exception(e)
-                            st.stop()
+                    # 1/ EXPORT METADATA
+                    st.button(label="Export", on_click=lambda: set_states({"export_metadata": True}))
+                    if st.session_state.export_metadata:
+                        ## Remote setting
+                        if WIZARD_IS_REMOTE:
+                            try:
+                                with tempfile.TemporaryFile() as f:
+                                    output_path = metadata_export_basic(dataset=dataset, output=str(f.name))
+                            except Exception as e:
+                                st.exception(e)
+                                st.stop()
+                            else:
+                                with open(output_path, "r") as f:
+                                    if dataset.metadata.short_name:
+                                        filename = f"{dataset.metadata.short_name}.meta.yml"
+                                    else:
+                                        filename = "metadata.meta.yml"
+                                    st.download_button(
+                                        label="Download YAML file",
+                                        data=f,
+                                        file_name=filename,
+                                        mime="text/yaml",
+                                    )
+                        ## Local setting
                         else:
-                            st.success(f"Metadata exported to `{output_path}`.")
+                            try:
+                                output_path = metadata_export_basic(dataset=dataset)
+                            except Exception as e:
+                                st.exception(e)
+                                st.stop()
+                            else:
+                                st.success(f"Metadata exported to `{output_path}`.")
+
     else:
         tab_graph = st.tabs(["Dependency graph"])
         _show_tab_graph(tab_graph[0], option, dag)

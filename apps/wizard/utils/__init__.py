@@ -669,7 +669,8 @@ def st_page_link(alias: str, border: bool = False, **kwargs) -> None:
         )
 
 
-def metadata_export_basic(dataset_path: str | None = None, dataset: Dataset | None = None) -> str:
+st.cache_data
+def metadata_export_basic(dataset_path: str | None = None, dataset: Dataset | None = None, output: str = "") -> str:
     """Export metadata of a dataset.
 
     The metadata of the dataset may have changed in run time.
@@ -682,7 +683,7 @@ def metadata_export_basic(dataset_path: str | None = None, dataset: Dataset | No
 
     output_path = metadata_export(
         path=dataset_path,
-        output="",  # Will assign the default value
+        output=output,  # Will assign the default value
         show=False,
         decimals="auto",
     )

@@ -1,5 +1,6 @@
 """Harmonize entities."""
 import json
+import tempfile
 from operator import itemgetter
 from pathlib import Path
 from typing import List, cast
@@ -9,6 +10,7 @@ from owid.catalog import Dataset
 from st_pages import add_indentation
 
 from apps.wizard.utils import get_datasets_in_etl, set_states
+from etl.config import WIZARD_IS_REMOTE
 from etl.harmonize import CountryRegionMapper, harmonize_simple
 from etl.paths import STEP_DIR
 from etl.steps import load_from_uri
@@ -228,34 +230,53 @@ if option:
                 # 3/ PATH to export & export button
                 directory = f"{STEP_DIR}/data/garden/{dataset.m.namespace}/{dataset.m.version}"
                 path_export = f"{directory}/{dataset.m.short_name}.countries.json"
-                path_export = st.text_input(
-                    label="Export to...",
-                    value=path_export,
-                )
-                # Submit button
-                export_btn = st.form_submit_button(
-                    label="Export mapping",
-                    type="primary",
-                )
+                if WIZARD_IS_REMOTE:
+                    # Submit button
+                    export_btn = st.form_submit_button(
+                        label="Generate mapping",
+                        type="primary",
+                    )
+
+                else:
+                    path_export = st.text_input(
+                        label="Export to...",
+                        value=path_export,
+                    )
+                    # Submit button
+                    export_btn = st.form_submit_button(
+                        label="Export mapping",
+                        type="primary",
+                    )
 
             ####################################################################################################
             # EXPORT
             ####################################################################################################
             if export_btn:
-                path_export = Path(path_export)
-                # Sanity checks
-                if not path_export.parent.exists():
-                    st.error(f"Directory {path_export.parent} does not exist!")
-                    st.stop()
-                if not (suf := path_export.suffix) == ".json":
-                    st.error(
-                        f"Please provide a valid extension of the file. Should be a JSON file, but instead '{suf}' was given."
+                if WIZARD_IS_REMOTE:
+                    path_export = Path(path_export).name
+                    json_string = json.dumps(st.session_state.entity_mapping)
+                    st.download_button(
+                        label="Download the mapping",
+                        data=json_string,
+                        key="mapping",
+                        file_name=path_export,
+                        help="This file will be downloaded to your computer.",
                     )
-                    st.stop()
+                else:
+                    path_export = Path(path_export)
+                    # Sanity checks
+                    if not path_export.parent.exists():
+                        st.error(f"Directory {path_export.parent} does not exist!")
+                        st.stop()
+                    if not (suf := path_export.suffix) == ".json":
+                        st.error(
+                            f"Please provide a valid extension of the file. Should be a JSON file, but instead '{suf}' was given."
+                        )
+                        st.stop()
 
-                # Export
-                st.json(st.session_state.entity_mapping, expanded=False)
-                with open(path_export, "w") as ostream:
-                    json.dump(mapping, ostream, indent=2)
+                    # Export
+                    st.json(st.session_state.entity_mapping, expanded=False)
+                    with open(path_export, "w") as ostream:
+                        json.dump(st.session_state.entity_mapping, ostream, indent=2)
 
-                st.success(f"Harmonization mapping exported to {path_export}")
+                    st.success(f"Harmonization mapping exported to {path_export}")
