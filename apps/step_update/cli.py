@@ -335,32 +335,26 @@ class StepUpdater:
         if isinstance(steps, str):
             steps = [steps]
 
-        # Define a dictionary of default step headers (to be used if step_headers is not defined), taken from the dag.
-        step_headers_default = {}
-
         # Gather all steps to be updated.
         for step in steps:
             step_df = self.steps_df[self.steps_df["step"] == step]
-            # Get the header for this step.
-            step_headers_default[step] = get_comments_above_step_in_dag(
-                step=step, dag_file=step_df["dag_file_path"].item()
-            )
 
             if include_dependencies:
                 dependencies = step_df["direct_dependencies"].item()
                 steps += dependencies
-                # For dependencies, add no header.
-                step_headers_default.update({dependency: "" for dependency in dependencies})
 
             if include_usages:
                 usages = step_df["direct_usages"].item()
                 steps += usages
-                # For usages, add no header.
-                step_headers_default.update({usage: "" for usage in usages})
 
-        # If step_headers is not explicitly defined, use the default headers.
+        # If step_headers is not explicitly defined, get headers for each step from their corresponding dag file.
         if step_headers is None:
-            step_headers = step_headers_default
+            step_headers = {}
+            for step in steps:
+                dag_file = self.steps_df[self.steps_df["step"] == step]["dag_file_path"].item()
+                step_headers.update(
+                    {step: get_comments_above_step_in_dag(step=step, dag_file=dag_file) if dag_file else ""}
+                )
 
         # For convenience, sort steps by channel and then by name.
         steps = sort_steps(steps=steps)  # type: ignore
@@ -371,10 +365,37 @@ class StepUpdater:
 
 
 def get_comments_above_step_in_dag(step: str, dag_file: Path) -> str:
-    # TODO: Get header from the comment lines right above the current step in the dag.
-    step_header = "#\n# Temporary header.\n#"
+    """Get the comment lines right above a step in the dag file."""
 
-    return step_header
+    # Read the content of the dag file.
+    with open(dag_file, "r") as _dag_file:
+        lines = _dag_file.readlines()
+
+    # Initialize a list to store the header lines.
+    header_lines = []
+    for line in lines:
+        if line.strip().startswith("-") or (
+            line.strip().endswith(":") and (not line.strip().startswith("#")) and (step not in line)
+        ):
+            # Restart the header if the current line:
+            # * Is a dependency.
+            # * Is a step that is not the current step.
+            # * Is a special line like "steps:" or "include:".
+            header_lines = []
+        elif step in line and line.strip().endswith(":"):
+            # If the current line is the step, stop reading the rest of the file.
+            return "".join(header_lines)
+        elif line.strip() == "":
+            # If the current line is empty, ignore it.
+            continue
+        else:
+            # Any line that is not a dependency,
+            header_lines.append(line)
+
+    # If the step has not been found, raise an error and return nothing.
+    log.error(f"Step {step} not found in dag file {dag_file}.")
+
+    return ""
 
 
 def sort_steps(steps: List[str]) -> List[str]:
