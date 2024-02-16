@@ -1,473 +1,419 @@
 dataset:
   title: Democracy - Lexical Index
-  description: >-
+  description: |-
     This dataset provides information on political regimes, using data from Skaaning et al. (2015).
-
 
     You can read a description of the data in this post: https://ourworldindata.org/democracies-measurement
 
-
     You can download the code and complete dataset, including supplementary variables, from GitHub: https://github.com/owid/notebooks/tree/main/BastianHerre/democracy
   licenses:
-  - {}
-  sources:
-  - name: Skaaning et al. (2015)
-    url: https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/29106
-    date_accessed: '2023-09-05'
-    published_by: Skaaning, Svend-Erik, John Gerring and Henrikas Bartusevičius. 2015. A Lexical Index of Electoral Democracy.
-      Comparative Political Studies 48(12):1491-1525.
+    - {}
 tables:
   democracy_lexical_index:
     variables:
+      democracy_lied:
+        title: Democracy
+        unit: ''
+        description: |-
+          The variable identifies the political regime of a country using the Lexical Index of Electoral Democracy by political scientists Svend-Erik Skaaning, John Gerring, and Henrikas Bartusevičius.
+
+          It distinguishes between autocracies (score 0) and democracies (score 1).
+
+          Democracies are understood here as political systems in which citizens have the right to choose the chief executive and the legislature in multi-party, uncertain elections.
+
+          Autocracies are understood here as non-democracies.
       regime_lied:
         title: Political regime
-        description: >-
-          The variable identifies the political regime of a country using the Lexical Index of Electoral Democracy by political
-          scientists Svend-Erik Skaaning, John Gerring, and Henrikas Bartusevičius. It distinguishes between non-electoral
-          autocracies (score 0), one-party autocracies (score 1), multi-party autocracies without elected executive (score
-          2), multi-party autocracies (score 3), exclusive democracies (score 4), male democracies (score 5), electoral democracies
-          (score 6), and polyarchies (score 7).
-
+        unit: ''
+        description: |-
+          The variable identifies the political regime of a country using the Lexical Index of Electoral Democracy by political scientists Svend-Erik Skaaning, John Gerring, and Henrikas Bartusevičius. It distinguishes between non-electoral autocracies (score 0), one-party autocracies (score 1), multi-party autocracies without elected executive (score 2), multi-party autocracies (score 3), exclusive democracies (score 4), male democracies (score 5), electoral democracies (score 6), and polyarchies (score 7).
 
           In non-electoral autocracies, citizens do not have the right to elect the chief executive or the legislature.
 
+          In one-party autocracies, some citizens have the right to choose the chief executive or the legislature, but only have one choice.
 
-          In one-party autocracies, some citizens have the right to choose the chief executive or the legislature, but only
-          have one choice.
+          Multiparty autocracies without an elected executive are otherwise one-party autocracies, but the chief executive of the government is not elected even if citizens have more than one choice in legislative elections.
 
+          Multiparty autocracies are one-party autocracies in which citizens have more than one choice, though election outcome is certain.
 
-          Multiparty autocracies without an elected executive are otherwise one-party autocracies, but the chief executive
-          of the government is not elected even if citizens have more than one choice in legislative elections.
-
-
-          Multiparty autocracies are one-party autocracies in which citizens have more than one choice, though election outcome
-          is certain.
-
-
-          In exclusive democracies, citizens have the right to choose the chief executive and the legislature in multi-party,
-          uncertain elections, but suffrage is restricted.
-
+          In exclusive democracies, citizens have the right to choose the chief executive and the legislature in multi-party, uncertain elections, but suffrage is restricted.
 
           Male democracies are exclusive democracies that have comprehensive suffrage for men.
 
-
           Electoral democracies are male democracies that also have comprehensive suffrage for women.
-
 
           Polyarchies are electoral democracies that also protect the freedoms of expression, assembly, and association.
 
-
           It matches the variable lexical_index_plus in Skaaning et al. (2015).
-        unit: ''
       electdem_age_lied:
         title: Age of electoral democracy
-        description: >-
+        unit: ''
+        description: |-
           The identification of electoral democracies is based on the classification by Skaaning et al. (2015).
 
-
-          Electoral democracies are understood here as political systems in which citizens have the right to choose the chief
-          executive and the legislature in multi-party, uncertain elections.
-        unit: ''
+          Electoral democracies are understood here as political systems in which citizens have the right to choose the chief executive and the legislature in multi-party, uncertain elections.
       electdem_age_group_lied:
         title: electdem_age_group_lied
-        description: >-
+        unit: ''
+        description: |-
           The identification of electoral democracies is based on the classification by Skaaning et al. (2015).
 
+          Electoral democracies are understood here as political systems in which citizens have the right to choose the chief executive and the legislature in multi-party, uncertain elections.
 
-          Electoral democracies are understood here as political systems in which citizens have the right to choose the chief
-          executive and the legislature in multi-party, uncertain elections.
-
-
-          The variable distinguishes between non-electoral autocracies (score of 0), one-party autocracies (score of 1), multi-party
-          autocracies without elected executive (score of 2), multi-party autocracies (score of 3), exclusive democracies
-          (score of 4), male democracies (score of 5), electoral democracies aged 1-18 years (score of 6), 19-30 years (score
-          of 7), 31-60 years (score of 8), 61-90 years (score of 9), and 91+ years (score of 10).
-        unit: ''
+          The variable distinguishes between non-electoral autocracies (score of 0), one-party autocracies (score of 1), multi-party autocracies without elected executive (score of 2), multi-party autocracies (score of 3), exclusive democracies (score of 4), male democracies (score of 5), electoral democracies aged 1-18 years (score of 6), 19-30 years (score of 7), 31-60 years (score of 8), 61-90 years (score of 9), and 91+ years (score of 10).
       polyarchy_age_lied:
         title: Age of polyarchy
-        description: >-
+        unit: ''
+        description: |-
           The identification of polyarchies is based on the classification by Skaaning et al. (2015).
 
-
-          Electoral democracies are understood here as political systems in which citizens have the right to choose the chief
-          executive and the legislature in multi-party, uncertain elections, and enjoy freedoms of expression, assembly, and
-          association.
-        unit: ''
+          Electoral democracies are understood here as political systems in which citizens have the right to choose the chief executive and the legislature in multi-party, uncertain elections, and enjoy freedoms of expression, assembly, and association.
       polyarchy_age_group_lied:
         title: polyarchy_age_group_lied
-        description: >-
+        unit: ''
+        description: |-
           The identification of polyarchies is based on the classification by Skaaning et al. (2015).
 
-
-          Polyarchies are understood here as political systems in which citizens have the right to choose the chief executive
-          and the legislature in multi-party, uncertain elections, and enjoy freedoms of expression, assembly, and association.
-
+          Polyarchies are understood here as political systems in which citizens have the right to choose the chief executive and the legislature in multi-party, uncertain elections, and enjoy freedoms of expression, assembly, and association.
 
           The identification of electoral democracies is based on the classification by Skaaning et al. (2015).
 
+          Electoral democracies are understood here as political systems in which citizens have the right to choose the chief executive and the legislature in multi-party, uncertain elections.
 
-          Electoral democracies are understood here as political systems in which citizens have the right to choose the chief
-          executive and the legislature in multi-party, uncertain elections.
-
-
-          The variable distinguishes between non-electoral autocracies (score of 0), one-party autocracies (score of 1), multi-party
-          autocracies without elected executive (score of 2), multi-party autocracies (score of 3), exclusive democracies
-          (score of 4), male democracies (score of 5), electoral democracies (score of 6), polyarchies aged 1-18 years (score
-          of 7), 19-30 years (score of 8), 31-60 years (score of 9), 61-90 years (score of 10), and 91+ years (score of 11).
-        unit: ''
+          The variable distinguishes between non-electoral autocracies (score of 0), one-party autocracies (score of 1), multi-party autocracies without elected executive (score of 2), multi-party autocracies (score of 3), exclusive democracies (score of 4), male democracies (score of 5), electoral democracies (score of 6), polyarchies aged 1-18 years (score of 7), 19-30 years (score of 8), 31-60 years (score of 9), 61-90 years (score of 10), and 91+ years (score of 11).
       regime_redux_lied:
         title: Electoral democracy
-        description: >-
-          The variable identifies the political regime of a country using the reduced Lexical Index of Electoral Democracy
-          by political scientists Svend-Erik Skaaning, John Gerring, and Henrikas Bartusevičius. It distinguishes between
-          non-electoral autocracies (score 0), one-party autocracies (score 1), multi-party autocracies without elected executive
-          (score 2), multi-party autocracies (score 3), exclusive democracies (score 4), male democracies (score 5), and electoral
-          democracies (score 6, including polyarchies).
-
+        unit: ''
+        description: |-
+          The variable identifies the political regime of a country using the reduced Lexical Index of Electoral Democracy by political scientists Svend-Erik Skaaning, John Gerring, and Henrikas Bartusevičius. It distinguishes between non-electoral autocracies (score 0), one-party autocracies (score 1), multi-party autocracies without elected executive (score 2), multi-party autocracies (score 3), exclusive democracies (score 4), male democracies (score 5), and electoral democracies (score 6, including polyarchies).
 
           In non-electoral autocracies, citizens do not have the right to elect the chief executive or the legislature.
 
+          In one-party autocracies, some citizens have the right to choose the chief executive or the legislature, but only have one choice.
 
-          In one-party autocracies, some citizens have the right to choose the chief executive or the legislature, but only
-          have one choice.
+          Multiparty autocracies without an elected executive are otherwise one-party autocracies, but the chief executive of the government is not elected even if citizens have more than one choice in legislative elections.
 
+          Multiparty autocracies are one-party autocracies in which citizens have more than one choice, though election outcome is certain.
 
-          Multiparty autocracies without an elected executive are otherwise one-party autocracies, but the chief executive
-          of the government is not elected even if citizens have more than one choice in legislative elections.
-
-
-          Multiparty autocracies are one-party autocracies in which citizens have more than one choice, though election outcome
-          is certain.
-
-
-          In exclusive democracies, citizens have the right to choose the chief executive and the legislature in multi-party,
-          uncertain elections, but suffrage is restricted.
-
+          In exclusive democracies, citizens have the right to choose the chief executive and the legislature in multi-party, uncertain elections, but suffrage is restricted.
 
           Male democracies are exclusive democracies that have comprehensive suffrage for men.
 
-
           Electoral democracies are male democracies that also have comprehensive suffrage for women.
 
-
           It matches the variable lexical_index in Skaaning et al. (2015).
-        unit: ''
       exelec_lied:
         title: Elections for chief executive
-        description: >-
-          The variable indicates whether some citizens directly or indirectly elect the chief executive. It considers political
-          system which do not govern themselves — such as due to external interventions, occupations, or colonization — as
-          not holding executive elections.
-
+        unit: ''
+        description: |-
+          The variable indicates whether some citizens directly or indirectly elect the chief executive. It considers political system which do not govern themselves — such as due to external interventions, occupations, or colonization — as not holding executive elections.
 
           It matches the variable executive_elections in Skaaning et al. (2015).
-        unit: ''
       legelec_lied:
         title: Elections for legislature
-        description: >-
-          The variable indicates whether some citizens elect a legislature which does issue some laws, but does not perform
-          executive functions.
-
+        unit: ''
+        description: |-
+          The variable indicates whether some citizens elect a legislature which does issue some laws, but does not perform executive functions.
 
           It matches the variable legislative_elections in Skaaning et al. (2015).
-        unit: ''
       opposition_lied:
         title: Political opposition
-        description: >-
-          The variable indicates whether more than one party or non-party candidate are able to compete in elections for the
-          legislature.
-
+        unit: ''
+        description: |-
+          The variable indicates whether more than one party or non-party candidate are able to compete in elections for the legislature.
 
           It matches the variable multiparty_legislative_election in Skaaning et al. (2015).
-        unit: ''
       competition_lied:
         title: Competitive elections
-        description: >-
-          The variable indicates whether the outcomes of elections are uncertain because their timing is not violated, voters
-          are not systematically coerced, and election fraud is not consequential.
+        unit: ''
+        description: |-
+          The variable indicates whether the outcomes of elections are uncertain because their timing is not violated, voters are not systematically coerced, and election fraud is not consequential.
 
-
-          It considers the incumbent changing after multi-party elections as a strong indicator, but neither necessary nor
-          sufficient. It does not consider whether all contestants have access to funding and the media, and media coverage
-          is unbiased.
-
+          It considers the incumbent changing after multi-party elections as a strong indicator, but neither necessary nor sufficient. It does not consider whether all contestants have access to funding and the media, and media coverage is unbiased.
 
           It matches the variable competitive_elections in Skaaning et al. (2015).
-        unit: ''
       male_suffrage_lied:
         title: Universal right to vote for men
-        description: >-
-          The variable indicates whether virtually all men that are citizens are allowed to vote in national elections. It
-          neither considers informal restrictions nor legal restrictions based on age, criminal conviction, disability, and
-          local residency.
-
+        unit: ''
+        description: |-
+          The variable indicates whether virtually all men that are citizens are allowed to vote in national elections. It neither considers informal restrictions nor legal restrictions based on age, criminal conviction, disability, and local residency.
 
           It matches the variable male_suffrage in Skaaning et al. (2015).
-        unit: ''
       female_suffrage_lied:
         title: Universal right to vote for women
-        description: >-
-          The variable indicates whether virtually all citizens that are women are allowed to vote in national elections.
-          It neither considers informal restrictions nor legal restrictions based on age, criminal conviction, disability,
-          and local residency.
-
+        unit: ''
+        description: |-
+          The variable indicates whether virtually all citizens that are women are allowed to vote in national elections. It neither considers informal restrictions nor legal restrictions based on age, criminal conviction, disability, and local residency.
 
           It matches the variable female_suffrage in Skaaning et al. (2015).
-        unit: ''
       suffrage_lied:
         title: suffrage_lied
-        description: >-
-          The variable indicates whether virtually all men and women that are citizens are allowed to vote in national elections,
-          whether it is only men, or there is no universal rights to vote for either men or women. It neither considers informal
-          restrictions nor legal restrictions based on age, criminal conviction, disability, and local residency.
-
-
-          It combines the variables male_suffrage and female_suffrage in Skaaning et al. (2015).
         unit: ''
         display:
           numDecimalPlaces: 0.0
+        description: |-
+          The variable indicates whether virtually all men and women that are citizens are allowed to vote in national elections, whether it is only men, or there is no universal rights to vote for either men or women. It neither considers informal restrictions nor legal restrictions based on age, criminal conviction, disability, and local residency.
+
+          It combines the variables male_suffrage and female_suffrage in Skaaning et al. (2015).
       poliberties_lied:
         title: Political liberties
+        unit: ''
         description: |-
           The variable indicates whether the freedoms of expression, assembly, and association are respected.
 
           It matches the variable political_liberties in Skaaning et al. (2015).
-        unit: ''
       electdem_exp_lied:
         title: Experience with electoral democracy
-        description: >-
+        unit: ''
+        description: |-
           The variable identifies the number of years a country was an electoral democracy since 1789.
 
+          The identification of electoral democracies is based on the Lexical Index of Electoral Democracy-classification by Skaaning et al. (2015).
 
-          The identification of electoral democracies is based on the Lexical Index of Electoral Democracy-classification
-          by Skaaning et al. (2015).
-
-
-          In electoral democracies, citizens have the right to choose the chief executive and the legislature in multi-party,
-          uncertain elections.
-        unit: ''
+          In electoral democracies, citizens have the right to choose the chief executive and the legislature in multi-party, uncertain elections.
       polyarchy_exp_lied:
         title: Experience with polyarchy
-        description: >-
+        unit: ''
+        description: |-
           The variable identifies the number of years a country was a polyarchy since 1789.
 
+          The identification of polyarchies is based on the Lexical Index of Electoral Democracy-classification by Skaaning et al. (2015).
 
-          The identification of polyarchies is based on the Lexical Index of Electoral Democracy-classification by Skaaning
-          et al. (2015).
-
-
-          In polyarchies, citizens have the right to choose the chief executive and the legislature in multi-party, uncertain
-          elections, and enjoy freedoms of expression, assembly, and association.
-        unit: ''
+          In polyarchies, citizens have the right to choose the chief executive and the legislature in multi-party, uncertain elections, and enjoy freedoms of expression, assembly, and association.
       number_nonelectaut_lied:
         title: number_nonelectaut_lied
-        description: The variable denotes the number of non-electoral autocracies based on the Lexical Index of Electoral
-          Democracy-classification based on Skaaning et al. (2015).
         unit: ''
+        description: |-
+          The variable denotes the number of non-electoral autocracies based on the Lexical Index of Electoral Democracy-classification based on Skaaning et al. (2015).
       number_onepaut_lied:
         title: number_onepaut_lied
-        description: The variable denotes the number of one-party autocracies based on the Lexical Index of Electoral Democracy-classification
-          based on Skaaning et al. (2015).
         unit: ''
+        description: |-
+          The variable denotes the number of one-party autocracies based on the Lexical Index of Electoral Democracy-classification based on Skaaning et al. (2015).
       number_multipautne_lied:
         title: number_multipautne_lied
-        description: The variable denotes the number of multi-party autocracies without elected executive based on the Lexical
-          Index of Electoral Democracy-classification based on Skaaning et al. (2015).
         unit: ''
+        description: |-
+          The variable denotes the number of multi-party autocracies without elected executive based on the Lexical Index of Electoral Democracy-classification based on Skaaning et al. (2015).
       number_multipaut_lied:
         title: number_multipaut_lied
-        description: The variable denotes the number of multi-party autocracies based on the Lexical Index of Electoral Democracy-classification
-          based on Skaaning et al. (2015).
         unit: ''
+        description: |-
+          The variable denotes the number of multi-party autocracies based on the Lexical Index of Electoral Democracy-classification based on Skaaning et al. (2015).
       number_excldem_lied:
         title: number_excldem_lied
-        description: The variable denotes the number of exclusive democracies based on the Lexical Index of Electoral Democracy-classification
-          based on Skaaning et al. (2015).
         unit: ''
+        description: |-
+          The variable denotes the number of exclusive democracies based on the Lexical Index of Electoral Democracy-classification based on Skaaning et al. (2015).
       number_maledem_lied:
         title: number_maledem_lied
-        description: The variable denotes the number of male democracies based on the Lexical Index of Electoral Democracy-classification
-          based on Skaaning et al. (2015).
         unit: ''
+        description: |-
+          The variable denotes the number of male democracies based on the Lexical Index of Electoral Democracy-classification based on Skaaning et al. (2015).
       number_electdem_lied:
         title: number_electdem_lied
-        description: The variable denotes the number of electoral democracies based on the Lexical Index of Electoral Democracy-classification
-          based on Skaaning et al. (2015).
         unit: ''
+        description: |-
+          The variable denotes the number of electoral democracies based on the Lexical Index of Electoral Democracy-classification based on Skaaning et al. (2015).
       number_poly_lied:
         title: number_poly_lied
-        description: The variable denotes the number of polyarchies based on the Lexical Index of Electoral Democracy-classification
-          based on Skaaning et al. (2015).
         unit: ''
+        description: |-
+          The variable denotes the number of polyarchies based on the Lexical Index of Electoral Democracy-classification based on Skaaning et al. (2015).
       number_electdem_18_lied:
         title: number_electdem_18_lied
-        description: The variable denotes the number of electoral democracies aged 1-18 based on the Lexical Index of Electoral
-          Democracy-classification based on Skaaning et al. (2015).
         unit: ''
+        description: |-
+          The variable denotes the number of electoral democracies aged 1-18 based on the Lexical Index of Electoral Democracy-classification based on Skaaning et al. (2015).
       number_electdem_30_lied:
         title: number_electdem_30_lied
-        description: The variable denotes the number of electoral democracies aged 19-30 based on the Lexical Index of Electoral
-          Democracy-classification based on Skaaning et al. (2015).
         unit: ''
+        description: |-
+          The variable denotes the number of electoral democracies aged 19-30 based on the Lexical Index of Electoral Democracy-classification based on Skaaning et al. (2015).
       number_electdem_60_lied:
         title: number_electdem_60_lied
-        description: The variable denotes the number of electoral democracies aged 31-60 based on the Lexical Index of Electoral
-          Democracy-classification based on Skaaning et al. (2015).
         unit: ''
+        description: |-
+          The variable denotes the number of electoral democracies aged 31-60 based on the Lexical Index of Electoral Democracy-classification based on Skaaning et al. (2015).
       number_electdem_90_lied:
         title: number_electdem_90_lied
-        description: The variable denotes the number of electoral democracies aged 61-90 based on the Lexical Index of Electoral
-          Democracy-classification based on Skaaning et al. (2015).
         unit: ''
+        description: |-
+          The variable denotes the number of electoral democracies aged 61-90 based on the Lexical Index of Electoral Democracy-classification based on Skaaning et al. (2015).
       number_electdem_91plus_lied:
         title: number_electdem_91plus_lied
-        description: The variable denotes the number of electoral democracies aged 91 and older based on the Lexical Index
-          of Electoral Democracy-classification based on Skaaning et al. (2015).
         unit: ''
+        description: |-
+          The variable denotes the number of electoral democracies aged 91 and older based on the Lexical Index of Electoral Democracy-classification based on Skaaning et al. (2015).
       number_poly_18_lied:
         title: number_poly_18_lied
-        description: The variable denotes the number of polyarchies aged 1-18 based on the Lexical Index of Electoral Democracy-classification
-          based on Skaaning et al. (2015).
         unit: ''
+        description: |-
+          The variable denotes the number of polyarchies aged 1-18 based on the Lexical Index of Electoral Democracy-classification based on Skaaning et al. (2015).
       number_poly_30_lied:
         title: number_poly_30_lied
-        description: The variable denotes the number of polyarchies aged 19-30 based on the Lexical Index of Electoral Democracy-classification
-          based on Skaaning et al. (2015).
         unit: ''
+        description: |-
+          The variable denotes the number of polyarchies aged 19-30 based on the Lexical Index of Electoral Democracy-classification based on Skaaning et al. (2015).
       number_poly_60_lied:
         title: number_poly_60_lied
-        description: The variable denotes the number of polyarchies aged 31-60 based on the Lexical Index of Electoral Democracy-classification
-          based on Skaaning et al. (2015).
         unit: ''
+        description: |-
+          The variable denotes the number of polyarchies aged 31-60 based on the Lexical Index of Electoral Democracy-classification based on Skaaning et al. (2015).
       number_poly_90_lied:
         title: number_poly_90_lied
-        description: The variable denotes the number of polyarchies aged 61-90 based on the Lexical Index of Electoral Democracy-classification
-          based on Skaaning et al. (2015).
         unit: ''
+        description: |-
+          The variable denotes the number of polyarchies aged 61-90 based on the Lexical Index of Electoral Democracy-classification based on Skaaning et al. (2015).
       number_unisuffrage_none:
         title: number_unisuffrage_none
-        description: The variable denotes the number of countries without universal suffrage.
         unit: ''
         display:
           numDecimalPlaces: 0.0
+        description: The variable denotes the number of countries without universal suffrage.
       number_unisuffrage_men:
         title: number_unisuffrage_men
-        description: The variable denotes the number of countries with universal suffrage for men only.
         unit: ''
         display:
           numDecimalPlaces: 0.0
+        description: The variable denotes the number of countries with universal suffrage for men only.
       number_unisuffrage_all:
         title: number_unisuffrage_all
-        description: The variable denotes the number of countries with universal suffrage for men and women.
         unit: ''
         display:
           numDecimalPlaces: 0.0
+        description: The variable denotes the number of countries with universal suffrage for men and women.
       pop_nonelectaut_lied:
         title: pop_nonelectaut_lied
-        description: The variable denotes the number of people living in non-electoral autocracies based on the Lexical Index
-          of Electoral Democracy-classification by Skaaning et al. (2015).
         unit: ''
+        description: |-
+          The variable denotes the number of people living in non-electoral autocracies based on the Lexical Index of Electoral Democracy-classification by Skaaning et al. (2015).
       pop_onepaut_lied:
         title: pop_onepaut_lied
-        description: The variable denotes the number of people living in one-party autocracies based on the Lexical Index
-          of Electoral Democracy-classification by Skaaning et al. (2015).
         unit: ''
+        description: |-
+          The variable denotes the number of people living in one-party autocracies based on the Lexical Index of Electoral Democracy-classification by Skaaning et al. (2015).
       pop_multipautne_lied:
         title: pop_multipautne_lied
-        description: The variable denotes the number of people living in multi-party autocracies without elected executive
-          based on the Lexical Index of Electoral Democracy-classification by Skaaning et al. (2015).
         unit: ''
+        description: |-
+          The variable denotes the number of people living in multi-party autocracies without elected executive based on the Lexical Index of Electoral Democracy-classification by Skaaning et al. (2015).
       pop_multipaut_lied:
         title: pop_multipaut_lied
-        description: The variable denotes the number of people living in multi-party autocracies based on the Lexical Index
-          of Electoral Democracy-classification by Skaaning et al. (2015).
         unit: ''
+        description: |-
+          The variable denotes the number of people living in multi-party autocracies based on the Lexical Index of Electoral Democracy-classification by Skaaning et al. (2015).
       pop_excldem_lied:
         title: pop_excldem_lied
-        description: The variable denotes the number of people living in exclusive democracies based on the Lexical Index
-          of Electoral Democracy-classification by Skaaning et al. (2015).
         unit: ''
+        description: |-
+          The variable denotes the number of people living in exclusive democracies based on the Lexical Index of Electoral Democracy-classification by Skaaning et al. (2015).
       pop_maledem_lied:
         title: pop_maledem_lied
-        description: The variable denotes the number of people living in male democracies based on the Lexical Index of Electoral
-          Democracy-classification by Skaaning et al. (2015).
         unit: ''
+        description: |-
+          The variable denotes the number of people living in male democracies based on the Lexical Index of Electoral Democracy-classification by Skaaning et al. (2015).
       pop_electdem_lied:
         title: pop_electdem_lied
-        description: The variable denotes the number of people living in electoral democracies based on the Lexical Index
-          of Electoral Democracy-classification by Skaaning et al. (2015).
         unit: ''
+        description: |-
+          The variable denotes the number of people living in electoral democracies based on the Lexical Index of Electoral Democracy-classification by Skaaning et al. (2015).
       pop_poly_lied:
         title: pop_poly_lied
-        description: The variable denotes the number of people living in polyarchies based on the Lexical Index of Electoral
-          Democracy-classification by Skaaning et al. (2015).
         unit: ''
+        description: |-
+          The variable denotes the number of people living in polyarchies based on the Lexical Index of Electoral Democracy-classification by Skaaning et al. (2015).
       pop_missreg_lied:
         title: pop_missreg_lied
-        description: The variable denotes the number of people living in countries without regime data based on the Lexical
-          Index of Electoral Democracy-classification by Skaaning et al. (2015).
         unit: ''
+        description: |-
+          The variable denotes the number of people living in countries without regime data based on the Lexical Index of Electoral Democracy-classification by Skaaning et al. (2015).
       pop_electdem_18_lied:
         title: pop_electdem_18_lied
-        description: The variable denotes the number of people living in electoral democracies aged 1-18 based on the Lexical
-          Index of Electoral Democracy-classification by Skaaning et al. (2015).
         unit: ''
+        description: |-
+          The variable denotes the number of people living in electoral democracies aged 1-18 based on the Lexical Index of Electoral Democracy-classification by Skaaning et al. (2015).
       pop_electdem_30_lied:
         title: pop_electdem_30_lied
-        description: The variable denotes the number of people living in electoral democracies aged 19-30 based on the Lexical
-          Index of Electoral Democracy-classification by Skaaning et al. (2015).
         unit: ''
+        description: |-
+          The variable denotes the number of people living in electoral democracies aged 19-30 based on the Lexical Index of Electoral Democracy-classification by Skaaning et al. (2015).
       pop_electdem_60_lied:
         title: pop_electdem_60_lied
-        description: The variable denotes the number of people living in electoral democracies aged 31-60 based on the Lexical
-          Index of Electoral Democracy-classification by Skaaning et al. (2015).
         unit: ''
+        description: |-
+          The variable denotes the number of people living in electoral democracies aged 31-60 based on the Lexical Index of Electoral Democracy-classification by Skaaning et al. (2015).
       pop_electdem_90_lied:
         title: pop_electdem_90_lied
-        description: The variable denotes the number of people living in electoral democracies aged 61-90 based on the Lexical
-          Index of Electoral Democracy-classification by Skaaning et al. (2015).
         unit: ''
+        description: |-
+          The variable denotes the number of people living in electoral democracies aged 61-90 based on the Lexical Index of Electoral Democracy-classification by Skaaning et al. (2015).
       pop_electdem_91plus_lied:
         title: pop_electdem_91plus_lied
-        description: The variable denotes the number of people living in electoral democracies aged 91 and older based on
-          the Lexical Index of Electoral Democracy-classification by Skaaning et al. (2015).
         unit: ''
+        description: |-
+          The variable denotes the number of people living in electoral democracies aged 91 and older based on the Lexical Index of Electoral Democracy-classification by Skaaning et al. (2015).
       pop_poly_18_lied:
         title: pop_poly_18_lied
-        description: The variable denotes the number of people living in polyarchies aged 1-18 based on the Lexical Index
-          of Electoral Democracy-classification by Skaaning et al. (2015).
         unit: ''
+        description: |-
+          The variable denotes the number of people living in polyarchies aged 1-18 based on the Lexical Index of Electoral Democracy-classification by Skaaning et al. (2015).
       pop_poly_30_lied:
         title: pop_poly_30_lied
-        description: The variable denotes the number of people living in polyarchies aged 19-30 based on the Lexical Index
-          of Electoral Democracy-classification by Skaaning et al. (2015).
         unit: ''
+        description: |-
+          The variable denotes the number of people living in polyarchies aged 19-30 based on the Lexical Index of Electoral Democracy-classification by Skaaning et al. (2015).
       pop_poly_60_lied:
         title: pop_poly_60_lied
-        description: The variable denotes the number of people living in polyarchies aged 31-60 based on the Lexical Index
-          of Electoral Democracy-classification by Skaaning et al. (2015).
         unit: ''
+        description: |-
+          The variable denotes the number of people living in polyarchies aged 31-60 based on the Lexical Index of Electoral Democracy-classification by Skaaning et al. (2015).
       pop_poly_90_lied:
         title: pop_poly_90_lied
-        description: The variable denotes the number of people living in polyarchies aged 61-90 based on the Lexical Index
-          of Electoral Democracy-classification by Skaaning et al. (2015).
         unit: ''
+        description: |-
+          The variable denotes the number of people living in polyarchies aged 61-90 based on the Lexical Index of Electoral Democracy-classification by Skaaning et al. (2015).
       pop_unisuffrage_none:
         title: pop_unisuffrage_none
-        description: The variable denotes the number of people living in countries without universal suffrage.
         unit: ''
+        description: The variable denotes the number of people living in countries without universal suffrage.
       pop_unisuffrage_men:
         title: pop_unisuffrage_men
-        description: The variable denotes the number of people living in countries with universal suffrage for men only.
         unit: ''
+        description: The variable denotes the number of people living in countries with universal suffrage for men only.
       pop_unisuffrage_all:
         title: pop_unisuffrage_all
-        description: The variable denotes the number of people living in countries with universal suffrage for men and women.
         unit: ''
+        description: The variable denotes the number of people living in countries with universal suffrage for men and women.
       pop_unisuffrage_miss:
         title: pop_unisuffrage_miss
-        description: The variable denotes the number of people living in countries without data on universal suffrage.
         unit: ''
+        description: The variable denotes the number of people living in countries without data on universal suffrage.
+      number_aut_lied:
+        title: Number of autocracies
+        unit: ''
+        description: |-
+          The variable denotes the number of autocracies based on the Lexical Index of Electoral Democracy-classification based on Skaaning et al. (2015).
+      number_dem_lied:
+        title: Number of democracies
+        unit: ''
+        description: |-
+          The variable denotes the number of democracies based on the Lexical Index of Electoral Democracy-classification based on Skaaning et al. (2015).
+      pop_aut_lied:
+        title: People living in autocracies
+        unit: ''
+        description: |-
+          The variable denotes the number of people living in autocracies based on the Lexical Index of Electoral Democracy-classification by Skaaning et al. (2015).
+      pop_dem_lied:
+        title: People living in democracies
+        unit: ''
+        description: |-
+          The variable denotes the number of people living in democracies based on the Lexical Index of Electoral Democracy-classification by Skaaning et al. (2015).
+      pop_missdem_lied:
+        title: People living in countries without democracy data
+        unit: ''
+        description: |-
+          The variable denotes the number of people living in countries without democracy data from the Lexical Index of Electoral Democracy-classification by Skaaning et al. (2015).
       region:
         title: region
         unit: ''
