@@ -121,7 +121,7 @@ def create_submission(variable_config: VariableConfig, schema_chart_config: Dict
 
             # Button to finally submit the revisions
             st.button(
-                label="🚀 Finish (3/3)",
+                label="🚀 Submit chart revisions (3/3)",
                 use_container_width=True,
                 type="primary",
                 on_click=lambda: set_states({"submitted_revisions": True}),

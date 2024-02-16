@@ -120,7 +120,6 @@ if (
     and st.session_state.submitted_variables
     and st.session_state.submitted_revisions
 ):
-    st.markdown("Entered last step, but submission is None?")
     if submission_config is not None:
         if submission_config.is_valid:
             # st.write(st.session_state.gpt_tweaks)
