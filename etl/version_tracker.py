@@ -13,7 +13,7 @@ from rich_click.rich_command import RichCommand
 from etl import paths
 from etl.config import ADMIN_HOST
 from etl.db import can_connect, get_info_for_etl_datasets
-from etl.steps import extract_step_attributes, load_dag, reverse_graph
+from etl.steps import create_step_from_uri, load_dag, reverse_graph
 
 log = structlog.get_logger()
 
@@ -444,7 +444,8 @@ class VersionTracker:
     def get_path_to_script(self, step: str, omit_base_dir: bool = False) -> Optional[Path]:
         """Get the path to the script of a given step."""
         # Get step attributes.
-        _, step_type, _, channel, namespace, version, name, _ = extract_step_attributes(step=step).values()
+        st = create_step_from_uri(step)
+
         state = "active" if step in self.all_active_steps else "archive"
 
         # Create a dictionary that contains the path to a script for a given step.
@@ -452,22 +453,26 @@ class VersionTracker:
         # Active steps should have a script in the active directory.
         # But steps that are in the archive dag can be either in the active or the archive directory.
         path_to_script = {"active": None, "archive": None}
-        if step_type == "export":
-            path_to_script["active"] = paths.STEP_DIR / "export" / channel / namespace / version / name  # type: ignore
-        elif channel == "snapshot":
-            path_to_script["active"] = paths.SNAPSHOTS_DIR / namespace / version / name  # type: ignore
-            path_to_script["archive"] = paths.SNAPSHOTS_DIR_ARCHIVE / namespace / version / name  # type: ignore
-        elif channel in ["meadow", "garden", "grapher", "explorers", "open_numbers", "examples", "external"]:
-            path_to_script["active"] = paths.STEP_DIR / "data" / channel / namespace / version / name  # type: ignore
-            path_to_script["archive"] = paths.STEP_DIR_ARCHIVE / channel / namespace / version / name  # type: ignore
-        elif channel == "walden":
-            path_to_script["active"] = paths.BASE_DIR / "lib" / "walden" / "ingests" / namespace / version / name  # type: ignore
-            path_to_script["archive"] = paths.BASE_DIR / "lib" / "walden" / "ingests" / namespace / version / name  # type: ignore
-        elif channel in ["backport", "etag"]:
+        if st.step_type == "export":
+            path_to_script["active"] = paths.STEP_DIR / "export" / st.channel / st.namespace / st.version / st.name  # type: ignore
+        elif st.channel == "snapshot":
+            path_to_script["active"] = paths.SNAPSHOTS_DIR / st.namespace / st.version / st.name  # type: ignore
+            path_to_script["archive"] = paths.SNAPSHOTS_DIR_ARCHIVE / st.namespace / st.version / st.name  # type: ignore
+        elif st.channel in ["meadow", "garden", "grapher", "explorers", "open_numbers", "examples", "external"]:
+            path_to_script["active"] = paths.STEP_DIR / "data" / st.channel / st.namespace / st.version / st.name  # type: ignore
+            path_to_script["archive"] = paths.STEP_DIR_ARCHIVE / st.channel / st.namespace / st.version / st.name  # type: ignore
+        elif st.channel == "walden":
+            path_to_script["active"] = (
+                paths.BASE_DIR / "lib" / "walden" / "ingests" / st.namespace / st.version / st.name
+            )  # type: ignore
+            path_to_script["archive"] = (
+                paths.BASE_DIR / "lib" / "walden" / "ingests" / st.namespace / st.version / st.name
+            )  # type: ignore
+        elif st.channel in ["backport", "etag"]:
             # Ignore these channels, for which there is never a script.
             return None
         else:
-            log.error(f"Unknown channel {channel} for step {step}.")
+            log.error(f"Unknown channel {st.channel} for step {step}.")
 
         if state == "active":
             # Steps in the active dag should only have a script in the active directory.
@@ -501,10 +506,22 @@ class VersionTracker:
 
     def _create_step_attributes(self) -> pd.DataFrame:
         # Extract all attributes of each unique active/archive/dependency step.
-        step_attributes = pd.DataFrame(
-            [extract_step_attributes(step).values() for step in self.all_steps],
-            columns=["step", "step_type", "kind", "channel", "namespace", "version", "name", "identifier"],
-        )
+        step_attributes = []
+        for uri in self.all_steps:
+            st = create_step_from_uri(uri)
+            step_attributes.append(
+                {
+                    "step": uri,
+                    "step_type": st.step_type,
+                    "kind": "public" if st.is_public else "private",
+                    "channel": st.channel,
+                    "namespace": st.namespace,
+                    "version": st.version,
+                    "name": st.name,
+                    "identifier": st.identifier,
+                }
+            )
+        step_attributes = pd.DataFrame(step_attributes)
 
         # Add list of all existing versions for each step.
         versions = (

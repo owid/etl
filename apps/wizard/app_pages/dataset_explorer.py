@@ -14,7 +14,7 @@ from streamlit_agraph import Config, ConfigBuilder, Edge, Node, agraph
 from apps.wizard.utils import metadata_export_basic, set_states
 from etl.config import ENV_IS_REMOTE
 from etl.paths import DATA_DIR
-from etl.steps import extract_step_attributes, filter_to_subgraph, load_dag
+from etl.steps import Step, create_step_from_uri, filter_to_subgraph, load_dag
 
 # CONFIG
 st.set_page_config(
@@ -62,29 +62,29 @@ def generate_graph(
     collapse_others: bool = True,
     collapse_meadow: bool = True,
 ) -> Any:
-    def _friendly_label(attributes: Dict[str, str], length_limit: int = 32) -> str:
-        label_1 = f"{attributes['namespace']}/{attributes['name']}"
+    def _friendly_label(st: Step, length_limit: int = 32) -> str:
+        label_1 = f"{st.namespace}/{st.name}"
         if len(label_1) > length_limit:
             label_1 = label_1[:length_limit] + "..."
-        label = f"{label_1}\n{attributes['version']}"
+        label = f"{label_1}\n{st.version}"
         return label
 
-    def _friendly_title(attributes: Dict[str, str], children: List[str]) -> str:
+    def _friendly_title(st: Step, children: List[str]) -> str:
         deps = "\n- ".join(children)
-        title = f"""{attributes['identifier'].upper()}
-        version {attributes['version']} ({attributes['kind']})
+        title = f"""{st.identifier.upper()}
+        version {st.version} ({"public" if st.is_public else "private"})
         """
-        title = attributes["step"].upper()
+        title = st.path.upper()
         if deps:
             title = title + "\n\ndependencies:\n- " + deps
         return title
 
-    def _collapse_node(attributes: Dict[str, str]) -> bool:
-        if collapse_snapshot and (attributes["channel"] in ["snapshot", "walden"]):
+    def _collapse_node(st: Step) -> bool:
+        if collapse_snapshot and (st.channel in ["snapshot", "walden"]):
             return True
-        if collapse_meadow and (attributes["channel"] in ["meadow"]):
+        if collapse_meadow and (st.channel in ["meadow"]):
             return True
-        if collapse_others and (attributes["channel"] not in ["snapshot", "walden", "meadow", "garden", "grapher"]):
+        if collapse_others and (st.channel not in ["snapshot", "walden", "meadow", "garden", "grapher"]):
             return True
         return False
 
@@ -92,14 +92,14 @@ def generate_graph(
     edges = []
     nodes = []
     for parent, children in dag.items():
-        attributes = extract_step_attributes(parent)
+        step = create_step_from_uri(parent)
 
         # Main node
         if parent == uri_main:
             kwargs = {
-                "color": COLORS.get(attributes["channel"], COLOR_OTHER),
-                "label": f"{attributes['namespace'].upper()}/{attributes['name'].upper()}\n{attributes['version']}",
-                "title": _friendly_title(attributes, children),
+                "color": COLORS.get(step.channel, COLOR_OTHER),
+                "label": f"{step.namespace.upper()}/{step.name.upper()}\n{step.version}",
+                "title": _friendly_title(step, children),
                 "font": {
                     "size": 40,
                     "face": "courier",
@@ -111,14 +111,14 @@ def generate_graph(
         else:
             # Nodes that will not show label within them (user chose to hide them)
             kwargs = {
-                "color": COLORS.get(attributes["channel"], COLOR_OTHER),
+                "color": COLORS.get(step.channel, COLOR_OTHER),
                 "mass": 1,
                 "opacity": 0.9,
             }
-            if _collapse_node(attributes):
+            if _collapse_node(step):
                 kwargs = {
                     **kwargs,
-                    "title": _friendly_title(attributes, children),
+                    "title": _friendly_title(step, children),
                     "mass": 1,
                     "opacity": 0.9,
                 }
@@ -126,8 +126,8 @@ def generate_graph(
             else:
                 kwargs = {
                     **kwargs,
-                    "label": _friendly_label(attributes),
-                    "title": _friendly_title(attributes, children),
+                    "label": _friendly_label(step),
+                    "title": _friendly_title(step, children),
                     "font": {
                         "size": 20,
                         "face": "courier",
@@ -136,7 +136,7 @@ def generate_graph(
                 }
 
         # Change if step is private
-        if attributes["kind"] == "private":
+        if step.is_private:
             kwargs["label"] = "🔒 " + kwargs.get("label", "")
 
         node = Node(
@@ -191,10 +191,8 @@ def generate_graph(
 
 def get_dataset(dataset_uri: str) -> catalog.Dataset | None:
     """Get dataset."""
-    attributes = extract_step_attributes(dataset_uri)
-    dataset_path = (
-        DATA_DIR / f"{attributes['channel']}/{attributes['namespace']}/{attributes['version']}/{attributes['name']}"
-    )
+    uri = dataset_uri.split("//")[1]
+    dataset_path = DATA_DIR / uri
     dataset = None
     try:
         dataset = catalog.Dataset(dataset_path)
@@ -234,8 +232,8 @@ if st.session_state.get("show"):
                 _ = generate_graph(dag, option, collapse_snapshot, collapse_others, collapse_meadow)
 
     # Get dataset attributes, check we want to display it
-    attributes = extract_step_attributes(cast(str, option))
-    show_d_details = attributes["channel"] in ["garden", "grapher"]
+    step = create_step_from_uri(cast(str, option))
+    show_d_details = step.channel in ["garden", "grapher"]
 
     #  Show a more complete overview for Garden and Grapher datasets
     if show_d_details:

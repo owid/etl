@@ -244,103 +244,22 @@ def parse_step(step_name: str, dag: Dict[str, Any]) -> "Step":
     return step
 
 
-def extract_step_attributes(step: str) -> Dict[str, str]:
-    """Extract attributes of a step from its name in the dag.
-
-    Parameters
-    ----------
-    step : str
-        Step (as it appears in the dag).
-
-    Returns
-    -------
-    step : str
-        Step (as it appears in the dag).
-    step_type : str
-        Type of step (e.g. data or export).
-    kind : str
-        Kind of step (namely, 'public' or 'private').
-    channel: str
-        Channel (e.g. 'meadow').
-    namespace: str
-        Namespace (e.g. 'energy').
-    version: str
-        Version (e.g. '2023-01-26').
-    name: str
-        Short name of the dataset (e.g. 'primary_energy').
-    identifier : str
-        Identifier of the step that is independent of the kind and of the version of the step.
-
-    """
-    # Extract the prefix (whatever is on the left of the '://') and the root of the step name.
-    prefix, root = step.split("://")
-
-    # Field 'kind' informs whether the dataset is public or private.
-    if "private" in prefix:
-        kind = "private"
-    else:
-        kind = "public"
-
-    # From now on we remove the 'public' or 'private' from the prefix.
-    prefix = prefix.split("-")[0]
-
-    if prefix in ["etag", "github"]:
-        # Special kinds of steps.
-        channel = "etag"
-        namespace = "etag"
-        version = "latest"
-        name = root
-        identifier = root
-    elif prefix in ["snapshot", "walden"]:
-        # Ingestion steps.
-        channel = prefix
-
-        # Extract attributes from root of the step.
-        namespace, version, name = root.split("/")
-
-        # Define an identifier for this step, that is identical for all versions.
-        identifier = f"{channel}/{namespace}/{name}"
-    else:
-        # Regular data steps.
-
-        # Extract attributes from root of the step.
-        channel, namespace, version, name = root.split("/")
-
-        # Define an identifier for this step, that is identical for all versions.
-        identifier = f"{channel}/{namespace}/{name}"
-
-    attributes = {
-        "step": step,
-        "step_type": prefix,
-        "kind": kind,
-        "channel": channel,
-        "namespace": namespace,
-        "version": version,
-        "name": name,
-        "identifier": identifier,
-    }
-
-    return attributes
-
-
 def load_from_uri(uri: str) -> catalog.Dataset | Snapshot | WaldenDataset:
     """Load an ETL dataset from a URI."""
-    attributes = extract_step_attributes(cast(str, uri))
+    step = create_step_from_uri(uri)
     # Walden
-    if attributes["channel"] == "walden":
-        dataset = WaldenCatalog().find_one(
-            namespace=attributes["namespace"], version=attributes["version"], short_name=attributes["name"]
-        )
+    if step.channel == "walden":
+        dataset = WaldenCatalog().find_one(namespace=step.namespace, version=step.version, short_name=step.name)
     # Snapshot
-    elif attributes["channel"] == "snapshot":
-        path = f"{attributes['namespace']} / {attributes['version']} / {attributes['name']}"
+    elif step.channel == "snapshot":
+        path = f"{step.namespace} / {step.version} / {step.name}"
         try:
             dataset = Snapshot(path)
         except FileNotFoundError:
             raise FileNotFoundError(f"Snapshot not found for URI '{uri}'. You may want to run `python {path}` first")
     # Data
     else:
-        path = f"{attributes['channel']}/{attributes['namespace']}/{attributes['version']}/{attributes['name']}"
+        path = f"{step.channel}/{step.namespace}/{step.version}/{step.name}"
         try:
             dataset = catalog.Dataset(paths.DATA_DIR / path)
         except FileNotFoundError:
@@ -351,7 +270,11 @@ def load_from_uri(uri: str) -> catalog.Dataset | Snapshot | WaldenDataset:
 class Step(Protocol):
     path: str
     is_public: bool = True
+    step_type: str
+    channel: str
+    namespace: str
     version: str
+    name: str
     dependencies: List["Step"]
 
     def run(self) -> None:
@@ -365,6 +288,19 @@ class Step(Protocol):
 
     def __str__(self) -> str:
         raise NotImplementedError()
+
+    @property
+    def step_type(self) -> str:
+        return self.path.split("://")[0]
+
+    @property
+    def identifier(self) -> str:
+        # Define an identifier for this step, that is identical for all versions.
+        return f"{self.channel}/{self.namespace}/{self.name}"
+
+    @property
+    def is_private(self) -> bool:
+        return not self.is_public
 
 
 @dataclass
@@ -401,6 +337,10 @@ class DataStep(Step):
     @property
     def dataset(self) -> str:
         return self.path.split("/")[3]
+
+    @property
+    def name(self) -> str:
+        return self.dataset
 
     def _dataset_index_mtime(self) -> Optional[float]:
         try:
@@ -678,6 +618,7 @@ class DataStep(Step):
 class WaldenStep(Step):
     path: str
     dependencies = []
+    channel = "walden"
 
     def __init__(self, path: str) -> None:
         self.path = path
@@ -732,15 +673,26 @@ class WaldenStep(Step):
         return dataset
 
     @property
+    def namespace(self) -> str:
+        # namspace / version / dataset
+        return self.path.split("/")[0]
+
+    @property
     def version(self) -> str:
         # namspace / version / dataset
         return self.path.split("/")[1]
+
+    @property
+    def name(self) -> str:
+        # namspace / version / dataset
+        return self.path.split("/")[2]
 
 
 @dataclass
 class SnapshotStep(Step):
     path: str
     dependencies = []
+    channel = "snapshot"
 
     def __init__(self, path: str) -> None:
         self.path = path
@@ -779,9 +731,19 @@ class SnapshotStep(Step):
         return f"{paths.DATA_DIR}/snapshots/{self.path}"
 
     @property
+    def namespace(self) -> str:
+        # namspace / version / dataset
+        return self.path.split("/")[0]
+
+    @property
     def version(self) -> str:
-        # namspace / version / filename
+        # namspace / version / dataset
         return self.path.split("/")[1]
+
+    @property
+    def name(self) -> str:
+        # namspace / version / dataset
+        return self.path.split("/")[2]
 
 
 class SnapshotStepPrivate(SnapshotStep):
@@ -819,9 +781,24 @@ class GrapherStep(Step):
         return f"grapher://{self.path}"
 
     @property
+    def channel(self) -> str:
+        # channel / namspace / version / dataset
+        return self.path.split("/")[0]
+
+    @property
+    def namespace(self) -> str:
+        # channel / namspace / version / dataset
+        return self.path.split("/")[1]
+
+    @property
     def version(self) -> str:
         # channel / namspace / version / dataset
         return self.path.split("/")[2]
+
+    @property
+    def name(self) -> str:
+        # channel / namspace / version / dataset
+        return self.path.split("/")[3]
 
     @property
     def dataset(self) -> catalog.Dataset:
@@ -1017,6 +994,8 @@ class GithubStep(Step):
 
     path: str
     gh_repo: git_helpers.GithubRepo = field(repr=False)
+    channel: str = "etag"
+    namespace: str = "etag"
     version: str = "latest"
     dependencies = []
 
@@ -1043,6 +1022,11 @@ class GithubStep(Step):
     def checksum_output(self) -> str:
         return self.gh_repo.latest_sha
 
+    @property
+    def name(self) -> str:
+        _, repo = self.path.split("/")
+        return repo
+
 
 def get_etag(url: str) -> str:
     resp = requests.head(url, verify=TLS_VERIFY)
@@ -1056,6 +1040,8 @@ class ETagStep(Step):
     """
 
     path: str
+    channel: str = "etag"
+    namespace: str = "etag"
     version: str = "latest"
     dependencies = []
 
@@ -1064,6 +1050,10 @@ class ETagStep(Step):
 
     def __str__(self) -> str:
         return f"etag://{self.path}"
+
+    @property
+    def name(self) -> str:
+        return self.path
 
     def is_dirty(self) -> bool:
         return False
@@ -1140,3 +1130,10 @@ def _uses_old_schema(e: KeyError) -> bool:
     """Origins without `title` use old schema before rename. This can be removed once
     we recompute all datasets."""
     return e.args[0] == "title"
+
+
+def create_step_from_uri(uri: str) -> Step:
+    """Create a step from a URI like 'data://energy/2023-01-26/primary_energy' with no dependencies.
+    This is useful to get step attributes like namespace, version, etc.
+    """
+    return parse_step(uri, {})

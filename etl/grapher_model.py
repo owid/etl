@@ -52,7 +52,7 @@ from typing_extensions import Self, TypedDict
 
 from etl import config, paths
 from etl.config import GRAPHER_USER_ID
-from etl.db import read_sql
+from etl.db import CatalogPath, read_sql
 
 log = structlog.get_logger()
 
@@ -1183,7 +1183,7 @@ class Variable(Base):
     @property
     def table_name(self) -> str:
         assert self.catalogPath
-        return self.catalogPath.split("#")[0].rsplit("/", 1)[1]
+        return CatalogPath(self.catalogPath).table
 
     @property
     def step_path(self) -> Path:
