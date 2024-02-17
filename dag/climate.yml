@@ -74,13 +74,6 @@ steps:
   data://grapher/climate/2023-12-20/surface_temperature_annual_average:
   - data://garden/climate/2023-12-20/surface_temperature
 
-  data://meadow/climate/latest/surface_land_temperature:
-  - snapshot://climate/latest/surface_land_temperature.zip
-  - snapshot://countries/2023-12-27/world_bank.zip
-  data://garden/climate/latest/surface_land_temperature:
-  - data://meadow/climate/latest/surface_land_temperature
-  data://grapher/climate/latest/surface_land_temperature:
-  - data://garden/climate/latest/surface_land_temperature
   ######################################################################################################################
   # Steps to be updated together for the climate change impacts explorer.
   #
