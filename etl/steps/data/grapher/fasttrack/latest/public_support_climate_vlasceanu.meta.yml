@@ -1,0 +1,20 @@
+dataset:
+  title: Support for climate action (Vlasceanu et al. 2024)
+  description: The share of populations across the world that support climate action.
+  licenses:
+    - {}
+tables:
+  public_support_climate_vlasceanu:
+    variables:
+      policy_support_climate:
+        title: Support political action on climate
+        unit: '%'
+        short_unit: '%'
+        description: |-
+          Share of the population that support climate policies. This was measured across nine interventions including carbon taxes on fossil fuels, expanding public transport, more renewable energy, more electric car chargers, taxes on airlines, investments in green jobs and businesses, laws to keep waterways clean, protecting forests, and increasing taxes on carbon-intensive foods.
+      belief_climate_change:
+        title: Believe climate change is a serious threat to humanity
+        unit: '%'
+        short_unit: '%'
+        description: |-
+          Share of the population that believes in climate change and thinks it is a serious threat. 'Belief' was measured based on answers to questions about whether action was necessary to avoid a global catastrophe, humans were causing climate change, it was a serious threat to humanity, and was a global emergency.

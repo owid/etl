@@ -130,3 +130,5 @@ steps:
     - snapshot://fasttrack/latest/joe_test_please_delete.csv
   data://grapher/fasttrack/latest/public_support_climate_andre:
     - snapshot://fasttrack/latest/public_support_climate_andre.csv
+  data://grapher/fasttrack/latest/public_support_climate_vlasceanu:
+    - snapshot://fasttrack/latest/public_support_climate_vlasceanu.csv
