@@ -1,0 +1,30 @@
+dataset:
+  title: Public support for climate action (Andre et al, 2024)
+  description: |-
+    The share of populations across the world that support climate action, and would be willing to give 1% of their income to it.
+  licenses:
+    - {}
+tables:
+  public_support_climate_andre:
+    variables:
+      approval_climate_action:
+        title: Actions to tackle climate change
+        unit: '%'
+        short_unit: '%'
+        description: Share that think people in their country should act to fight global warming.
+      demand_political_action_climate:
+        title: Government action on climate
+        unit: '%'
+        short_unit: '%'
+        description: Share that want to see their national government should do more to tackle climate change.
+      willingness_contribute_1pct_climate_others:
+        title: Perception willing to give 1% of income
+        unit: '%'
+        short_unit: '%'
+        description: |-
+          The share of the population in their country that people think would be willing to give 1% of their income to tackle climate change.
+      willingness_contribute_pct_climate:
+        title: Willingness to give 1% of income
+        unit: '%'
+        short_unit: '%'
+        description: Share that say they would be willing to give 1% of their income to tackle climate change.

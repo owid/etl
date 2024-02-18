@@ -128,3 +128,5 @@ steps:
     - snapshot://fasttrack/latest/baxter_2013_gbd_adult_coverage.csv
   data://grapher/fasttrack/latest/joe_test_please_delete:
     - snapshot://fasttrack/latest/joe_test_please_delete.csv
+  data://grapher/fasttrack/latest/public_support_climate_andre:
+    - snapshot://fasttrack/latest/public_support_climate_andre.csv
