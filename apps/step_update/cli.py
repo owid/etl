@@ -125,11 +125,14 @@ def write_to_dag_file(
 
 
 class StepUpdater:
-    def __init__(self, dry_run: bool = False):
+    def __init__(self, dry_run: bool = False, interactive: bool = True):
         # Initialize version tracker and load dataframe of all active steps.
         self.load_version_tracker()
         # If dry_run is True, then nothing will be written to the dag, and no files will be created.
         self.dry_run = dry_run
+        # If interactive is True, then the user will be asked for confirmation before updating each step, and on
+        # situations where there is some ambiguity.
+        self.interactive = interactive
 
     def load_version_tracker(self) -> None:
         # This function will start a new instance of VersionTracker, and load the dataframe of all active steps.
@@ -211,15 +214,18 @@ class StepUpdater:
             step_py_file = _step_py_files[0]
         else:
             #  If there are multiple .py files, choose the one whose name has a shorter edit distance to the step name,
-            #  and ask for user confirmation (and allow choosing the right file).
-            print(f"Multiple .py files found for step {step}. Choose the correct one:\n")
+            #  and optionally ask for user confirmation (and allow user to choose the correct file).
             steps_sorted = sorted(
                 _step_py_files,
                 key=lambda file_name: fuzz.ratio(step_dvc_file_new.stem.split(".")[0], file_name.stem),
                 reverse=True,
             )
             steps_names_sorted = [file_name.stem for file_name in steps_sorted]
-            choice = _confirm_choice(multiple_files=steps_names_sorted)
+            log.warning(f"Multiple .py files found for step {step}.")
+            if self.interactive:
+                choice = _confirm_choice(multiple_files=steps_names_sorted)
+            else:
+                choice = 0
             step_py_file = steps_sorted[choice]
 
         # Define the new step.
@@ -409,6 +415,13 @@ class StepUpdater:
             only=True,
         )
 
+        message = "The following steps will be updated:"
+        for step in steps:
+            message += f"\n  {step}"
+        log.info(message)
+        if self.interactive:
+            input("Press enter to continue.")
+
         # Update each step.
         for step in steps:
             self.update_step(step=step, step_version_new=step_version_new, step_header=step_headers[step])
@@ -434,9 +447,9 @@ def _update_temporary_dag(dag_active, dag_all_reverse) -> None:
 def _confirm_choice(multiple_files: List[Any]) -> int:
     choice_default = 0
     for i, file_name in enumerate(multiple_files):
-        print(f"{i} {file_name}")
+        print(f"    {i} - {file_name}")
     while True:
-        choice = input(f"Currently selected: {choice_default}. Press enter to accept, or choose a different number.")
+        choice = input(f"Press enter to use option {choice_default}, or choose a different number and press enter.")
         if choice == "":
             choice = choice_default
             break
@@ -514,10 +527,11 @@ def cli(
     include_dependencies: bool = False,
     include_usages: bool = False,
     dry_run: bool = False,
+    interactive: bool = True,
 ) -> None:
     """TODO"""
     # Initialize step updater and run update.
-    StepUpdater(dry_run=dry_run).update_steps(
+    StepUpdater(dry_run=dry_run, interactive=interactive).update_steps(
         steps=steps,
         step_version_new=step_version_new,
         include_dependencies=include_dependencies,
