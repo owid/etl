@@ -48,6 +48,9 @@ DAG_FASTTRACK_PATH = DAG_DIR / "fasttrack.yml"
 wizard_utils.config_style_html()
 # Logger
 log = get_logger()
+# Bugsnag
+wizard_utils.enable_bugsnag_for_streamlit()
+
 
 # Initialize session state
 st.session_state["to_be_submitted"] = st.session_state.get("to_be_submitted", False)
