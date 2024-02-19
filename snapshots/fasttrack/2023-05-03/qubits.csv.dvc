@@ -1,11 +1,11 @@
 meta:
   source:
-    name: Wikipedia, List of quantum processors (2023)
+    name: Wikipedia, List of quantum processors (2024)
     url: https://en.wikipedia.org/wiki/List_of_quantum_processors
     source_data_url: |-
       https://docs.google.com/spreadsheets/d/e/2PACX-1vRrPtesiBSsIk8DLFLGddJ9tH_maokRQLnRmSV9XyH8RuKk31SJPLADJ7-4loKe4Aid48xXf_c_Munq/pub?output=csv
     date_accessed: '2024-02-19'
-    publication_year: '2023'
+    publication_year: '2024'
     published_by: Wikipedia, List of quantum processors, Circuit-based quantum processors
   name: Quantum processors over time
   description: ''
@@ -15,6 +15,6 @@ meta:
       https://en.wikipedia.org/wiki/Wikipedia:Text_of_the_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License
 wdir: ../../../data/snapshots/fasttrack/2023-05-03
 outs:
-- md5: 1fe20229745ae15ca1928af9fb9b1535
-  size: 119
+- md5: 33a1d150a0261088258fa8b4b4a51a34
+  size: 135
   path: qubits.csv
