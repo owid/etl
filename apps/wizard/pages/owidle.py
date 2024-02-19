@@ -4,7 +4,6 @@ from pathlib import Path
 from typing import List, Tuple, cast
 
 import geopandas as gpd
-import numpy as np
 import pandas as pd
 import plotly.express as px
 import streamlit as st
@@ -44,7 +43,8 @@ st.session_state.user_has_succeded = st.session_state.get("user_has_succeded", F
 ##########################################
 @st.cache_data
 def load_data() -> Tuple[pd.DataFrame, gpd.GeoDataFrame, str]:
-    # Load indicator
+    """Load data for the game."""
+    # Load population indicator
     ds = Dataset(DATA_DIR / "garden" / "un" / "2022-07-11" / "un_wpp")
     tb = ds["population"].reset_index()
     tb = tb.loc[
@@ -52,6 +52,10 @@ def load_data() -> Tuple[pd.DataFrame, gpd.GeoDataFrame, str]:
         ["year", "location", "value"],
     ]
     df = pd.DataFrame(tb)
+
+    # Load GDP indicator
+    ds_gdp = Dataset(DATA_DIR / "garden/worldbank_wdi/2023-05-29/wdi")
+    tb_gdp = ds_gdp["wdi"].reset_index()[["year", "country", "ny_gdp_pcap_pp_kd"]]
 
     # Load geographic info
     ## file from https://gist.github.com/metal3d/5b925077e66194551df949de64e910f6 (later harmonized)
@@ -61,17 +65,18 @@ def load_data() -> Tuple[pd.DataFrame, gpd.GeoDataFrame, str]:
 
     # Combine
     df = df.merge(geo, left_on="location", right_on="Country", how="left")
+    df = df.merge(tb_gdp, left_on=["year", "location"], right_on=["year", "country"], how="left")
+
     # Remove NaNs
     df = df.dropna(subset=["Latitude", "Longitude"])
 
     # Get indicator df
-    df_indicator = df[
-        [
-            "year",
-            "location",
-            "value",
-        ]
-    ]
+    df_indicator = df[["year", "location", "value", "ny_gdp_pcap_pp_kd"]].rename(
+        columns={
+            "value": "population",
+            "ny_gdp_pcap_pp_kd": "gdp_per_capita",
+        }
+    )
 
     # Get geographic df
     df_geo = gpd.GeoDataFrame(
@@ -88,7 +93,7 @@ def load_data() -> Tuple[pd.DataFrame, gpd.GeoDataFrame, str]:
     # df_geo = df_geo.to_crs(3310)
 
     # Arbitrary daily solution
-    seed = (dt.date.today() - dt.date(2020, 1, 1)).days
+    seed = (dt.date.today() - dt.date(1900, 1, 1)).days
     solution = df["location"].sample(random_state=seed).item()
 
     return df_indicator, df_geo, solution
@@ -121,79 +126,6 @@ def get_flat_earth_bearing(lat1: float, lon1: float, lat2: float, lon2: float) -
     return degrees(angle)
 
 
-def vector_calc(lat, long, ht):
-    """
-    Calculates the vector from a specified point on the Earth's surface to the North Pole.
-    """
-    a = 6378137.0  # Equatorial radius of the Earth
-    b = 6356752.314245  # Polar radius of the Earth
-
-    e_squared = 1 - ((b**2) / (a**2))  # e is the eccentricity of the Earth
-    n_phi = a / (np.sqrt(1 - (e_squared * (np.sin(lat) ** 2))))
-
-    x = (n_phi + ht) * np.cos(lat) * np.cos(long)
-    y = (n_phi + ht) * np.cos(lat) * np.sin(long)
-    z = ((((b**2) / (a**2)) * n_phi) + ht) * np.sin(lat)
-
-    x_npole = 0.0
-    y_npole = 6378137.0
-    z_npole = 0.0
-
-    v = ((x_npole - x), (y_npole - y), (z_npole - z))
-
-    return v
-
-
-def angle_calc(lat1, long1, lat2, long2, ht1=0, ht2=0):
-    """
-    Calculates the angle between the vectors from 2 points to the North Pole.
-    """
-    # Convert from degrees to radians
-    lat1_rad = (lat1 / 180) * np.pi
-    long1_rad = (long1 / 180) * np.pi
-    lat2_rad = (lat2 / 180) * np.pi
-    long2_rad = (long2 / 180) * np.pi
-
-    v1 = vector_calc(lat1_rad, long1_rad, ht1)
-    v2 = vector_calc(lat2_rad, long2_rad, ht2)
-
-    # The angle between two vectors, vect1 and vect2 is given by:
-    # arccos[vect1.vect2 / |vect1||vect2|]
-    dot = np.dot(v1, v2)  # The dot product of the two vectors
-    v1_mag = np.linalg.norm(v1)  # The magnitude of the vector v1
-    v2_mag = np.linalg.norm(v2)  # The magnitude of the vector v2
-
-    theta_rad = np.arccos(dot / (v1_mag * v2_mag))
-    # Convert radians back to degrees
-    theta = (theta_rad / np.pi) * 180
-
-    return theta
-
-
-def calc_bearing(lat1, long1, lat2, long2):
-    import math
-
-    # Convert latitude and longitude to radians
-    lat1 = math.radians(lat1)
-    long1 = math.radians(long1)
-    lat2 = math.radians(lat2)
-    long2 = math.radians(long2)
-
-    # Calculate the bearing
-    bearing = math.atan2(
-        math.sin(long2 - long1) * math.cos(lat2),
-        math.cos(lat1) * math.sin(lat2) - math.sin(lat1) * math.cos(lat2) * math.cos(long2 - long1),
-    )
-
-    # Convert the bearing to degrees
-    bearing = math.degrees(bearing)
-
-    # Make sure the bearing is positive
-    bearing = (bearing + 360) % 360
-
-    return bearing
-
-
 def distance_to_solution(country_selected: str) -> Tuple[str, str]:
     """Estimate distance (km) from guessed to solution, including direction."""
     # Estimate distance
@@ -206,14 +138,7 @@ def distance_to_solution(country_selected: str) -> Tuple[str, str]:
     # Estimate direction
     guess = guess.item()
     solution = solution.item()
-    direction = get_flat_earth_bearing(guess.x, guess.y, solution.x, solution.y)
-    st.write(GEO.loc[GEO["location"] == country_selected])
-    st.write(guess)
-    st.write(guess.x, guess.y)
-    st.write(GEO.loc[GEO["location"] == SOLUTION])
-    st.write(solution)
-    st.write(solution.x, solution.y)
-    st.write(direction)
+    direction = get_flat_earth_bearing(guess.y, guess.x, solution.y, solution.x)
     if (direction > -22.5) & (direction <= 22.5):
         arrow = "⬆️"
     elif (direction > 22.5) & (direction <= 67.5):
@@ -241,7 +166,7 @@ def distance_to_solution(country_selected: str) -> Tuple[str, str]:
     if country_selected == SOLUTION:
         st.session_state.user_has_succeded = True
         return "0", "🎉"
-    return direction, arrow
+    return distance, arrow
 
 
 # Actions once user clicks on "GUESS" button
@@ -267,7 +192,7 @@ def guess() -> None:
 # PLOT CHART
 ##########################################
 @st.cache_data
-def plot_chart(countries_guessed: List[str]):
+def plot_chart_population(countries_guessed: List[str]):
     """Plot timeseries."""
     # Get data
     countries_to_plot = [SOLUTION] + countries_guessed
@@ -276,8 +201,33 @@ def plot_chart(countries_guessed: List[str]):
     df = DATA[DATA["location"].isin(countries_to_plot)].reset_index(drop=True)
     df["location"] = df["location"].replace({SOLUTION: "?"})
 
+    # Hide country name if user has not succeded yet.
+    if not st.session_state.user_has_succeded:
+        df["location"] = df["location"].replace({SOLUTION: "?"})
+
     # Create plotly figure & plot
-    fig = px.line(df, x="year", y="value", color="location")
+    fig = px.line(df, x="year", y="population", color="location", title="Population")
+    st.plotly_chart(fig, theme=None, use_container_width=True)
+
+
+@st.cache_data
+def plot_chart_gdp_pc(countries_guessed: List[str]):
+    """Plot timeseries."""
+    # Get data
+    countries_to_plot = [SOLUTION] + countries_guessed
+
+    # COLORS =
+    df = DATA[DATA["location"].isin(countries_to_plot)].reset_index(drop=True)
+    df["location"] = df["location"]
+
+    # Hide country name if user has not succeded yet.
+    if not st.session_state.user_has_succeded:
+        df["location"] = df["location"].replace({SOLUTION: "?"})
+
+    # Create plotly figure & plot
+    fig = px.line(
+        df.dropna(subset="gdp_per_capita"), x="year", y="gdp_per_capita", color="location", title="GDP per capita"
+    )
     st.plotly_chart(fig, theme=None, use_container_width=True)
 
 
@@ -286,7 +236,11 @@ def plot_chart(countries_guessed: List[str]):
 ##########################################
 with st.container(border=True):
     countries_guessed = [guess["guess"] for guess in st.session_state.guesses]
-    plot_chart(countries_guessed)
+    col1, col2 = st.columns(2)
+    with col1:
+        plot_chart_population(countries_guessed)
+    with col2:
+        plot_chart_gdp_pc(countries_guessed)
     st.empty()
 
 ##########################################
