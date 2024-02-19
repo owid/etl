@@ -23,7 +23,6 @@ log = structlog.get_logger()
     "--dataset-id",
     type=int,
     required=True,
-    show_default=True,
     help="Dataset ID to migrate",
 )
 @click.option(
@@ -31,19 +30,16 @@ log = structlog.get_logger()
     type=str,
     required=False,
     help="New short name to use, underscored dataset name by default",
-    show_default=True,
 )
 @click.option(
     "--backport/--no-backport",
     default=True,
-    show_default=True,
     type=bool,
     help="Backport dataset before migrating",
 )
 @click.option(
     "--recreate/--no-recreate",
     default=False,
-    show_default=True,
     type=bool,
     help="Recreate the spreadsheet if it already exists",
 )

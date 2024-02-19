@@ -31,7 +31,6 @@ DAG_MIGRATED_PATH = DAG_DIR / "migrated.yml"
     "--dataset-id",
     type=int,
     required=True,
-    show_default=True,
     help="Dataset ID to migrate",
 )
 @click.option(
@@ -39,7 +38,6 @@ DAG_MIGRATED_PATH = DAG_DIR / "migrated.yml"
     type=str,
     required=True,
     help="New namespace",
-    show_default=True,
 )
 @click.option(
     "--version",
@@ -52,34 +50,29 @@ DAG_MIGRATED_PATH = DAG_DIR / "migrated.yml"
     "--short-name",
     type=str,
     required=False,
-    show_default=True,
     help="New short name to use, underscored dataset name by default",
 )
 @click.option(
     "--backport/--no-backport",
     default=True,
-    show_default=True,
     type=bool,
     help="Backport dataset before migrating",
 )
 @click.option(
     "--force/--no-force",
     default=False,
-    show_default=True,
     type=bool,
     help="Force overwrite even if checksums match",
 )
 @click.option(
     "--dry-run/--no-dry-run",
     default=False,
-    show_default=True,
     type=bool,
     help="Do not add dataset to a catalog on dry-run",
 )
 @click.option(
     "--upload/--skip-upload",
     default=True,
-    show_default=True,
     type=bool,
     help="Upload dataset to S3 as snapshot",
 )

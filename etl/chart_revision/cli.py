@@ -25,7 +25,6 @@ VERSION_DEFAULT = max(VERSIONS)
     "--revision-reason",
     "-r",
     default=None,
-    show_default=True,
     help="Assign a reason for the suggested chart revision.",
 )
 @click.option(
@@ -33,7 +32,6 @@ VERSION_DEFAULT = max(VERSIONS)
     "--use-version",
     type=click.Choice(VERSIONS),
     default=VERSION_DEFAULT,
-    show_default=True,
     help="Choose the backend version to use. By default uses latest version.",
 )
 def main_cli(mapping_file: str, revision_reason: str, use_version: int) -> None:

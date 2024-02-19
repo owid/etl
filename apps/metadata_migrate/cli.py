@@ -28,34 +28,29 @@ log = structlog.get_logger()
     "--chart-slug",
     "-c",
     type=str,
-    show_default=True,
     help="Slug of the chart to generate metadata for. Example: 'human-rights-index-vdem'.",
 )
 @click.option(
     "--uri",
     "-u",
     type=str,
-    show_default=True,
     help="URI of the dataset to generate metadata for. Example: 'happiness/2023-03-20/happiness'.",
 )
 @click.option(
     "--cols",
     "-c",
     type=str,
-    show_default=True,
     help="Only generate metadata for columns matching pattern. ",
 )
 @click.option(
     "--table-name",
     "-t",
     type=str,
-    show_default=True,
     help="Table to select.",
 )
 @click.option(
     "--run-etl/--no-run-etl",
     default=True,
-    show_default=True,
     type=bool,
     help="Refresh ETL for the given dataset.",
 )
@@ -63,7 +58,6 @@ log = structlog.get_logger()
     "--show/--no-show",
     "-s",
     default=False,
-    show_default=True,
     type=bool,
     help="Show output instead of saving it into a file.",
 )
@@ -103,7 +97,7 @@ def cli(
 
     # Reference
     """
-    assert config.STAGING, "You have to run this as STAGING=mystaging etlcli-metadata migrate ..."
+    assert config.STAGING, "You have to run this as STAGING=mystaging etlcli metadata-migrate ..."
 
     engine = get_engine()
     col = None

@@ -739,13 +739,11 @@ class VersionTracker:
     is_flag=True,
     default=False,
     help="True to skip connecting to the database of the current environment. False to try to connect to DB, to get a better informed picture of what steps may be missing or archivable. If not connected, all checks will be based purely on the content of the ETL dag.",
-    show_default=True,
 )
 @click.option(
     "--warn-on-archivable",
     is_flag=True,
     default=False,
-    show_default=True,
     help="True to warn about archivable steps. By default this is False, because we currently have many archivable steps.",
 )
 def run_version_tracker_checks(skip_db: bool = False, warn_on_archivable: bool = False) -> None:

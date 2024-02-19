@@ -63,7 +63,6 @@ log = structlog.get_logger()
 @click.option(
     "--grapher-channel/--no-grapher-channel",
     default=True,
-    show_default=True,
     type=bool,
     help="Include grapher channel datasets _(OWID staff only, DB access required)_.",
 )
@@ -71,7 +70,6 @@ log = structlog.get_logger()
     "--grapher/--no-grapher",
     "-g/-ng",
     default=False,
-    show_default=True,
     type=bool,
     help="Upsert datasets from grapher channel to DB _(OWID staff only, DB access required)_",
 )
@@ -108,7 +106,6 @@ log = structlog.get_logger()
     type=click.Path(exists=True),
     help="Path to DAG yaml file",
     default=paths.DEFAULT_DAG_FILE,
-    show_default=True,
 )
 @click.option(
     "--workers",
@@ -116,7 +113,6 @@ log = structlog.get_logger()
     type=int,
     help=f"Parallelize execution of steps. [{config.RUN_STEPS_WORKERS}]",
     default=config.RUN_STEPS_WORKERS,
-    show_default=True,
 )
 @click.option(
     "--use-threads/--no-threads",
@@ -131,7 +127,6 @@ log = structlog.get_logger()
     is_flag=True,
     help="Force strict or lax validation on DAG steps (e.g. checks for primary keys in data steps).",
     default=None,
-    show_default=True,
 )
 @click.option(
     "--watch",

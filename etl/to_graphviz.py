@@ -20,7 +20,6 @@ from etl.steps import filter_to_subgraph, load_dag
     help="Show target nodes.",
     is_flag=True,
     default=False,
-    show_default=True,
 )
 def to_graphviz(output_file: str, filter: Optional[str] = None, targets: bool = False) -> None:
     """Generate a [Graphviz DOT file](https://graphviz.org/doc/info/lang.html) to see all dependencies.

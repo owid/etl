@@ -24,31 +24,26 @@ from etl.db import get_engine
 @click.option(
     "--absolute-tolerance",
     default=0.00000001,
-    show_default=True,
     help="The absolute tolerance for floating point comparisons.",
 )
 @click.option(
     "--relative-tolerance",
     default=0.05,
-    show_default=True,
     help="The relative tolerance for floating point comparisons.",
 )
 @click.option(
     "--show-values/--hide-values",
     default=False,
-    show_default=True,
     help="Show a preview of the values where the dataframes are different.",
 )
 @click.option(
     "--show-shared/--hide-shared",
     default=False,
-    show_default=True,
     help="Show the structural overlap of the two dataframes (shared columns, index columns and index values).",
 )
 @click.option(
     "--truncate-lists-at",
     default=20,
-    show_default=True,
     help="Print truncated lists if they are longer than the given length.",
 )
 @click.pass_context
@@ -114,13 +109,11 @@ def diff_print(
 @click.option(
     "--version",
     default=None,
-    show_default=True,
     help="Version of catalog dataset to compare with.",
 )
 @click.option(
     "--debug",
     is_flag=True,
-    show_default=True,
     help="Print debug information.",
 )
 @click.pass_context
@@ -210,14 +203,12 @@ def etl_catalog(
     type=click.Path(exists=True),
     help="Path to .env file with remote database credentials.",
     default=".env.prod",
-    show_default=True,
 )
 @click.option(
     "--local-env",
     type=click.Path(exists=True),
     help="Path to .env file with remote database credentials.",
     default=".env",
-    show_default=True,
 )
 @click.option("--values", is_flag=True, help="Compare values from S3 (can be both CPU and memory heavy!).")
 @click.pass_context

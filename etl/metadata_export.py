@@ -27,14 +27,12 @@ from etl.files import ruamel_dump, ruamel_load, yaml_dump
 @click.option(
     "--show/--no-show",
     default=False,
-    show_default=True,
     type=bool,
     help="Show output instead of saving it into a file.",
 )
 @click.option(
     "--decimals",
     default="auto",
-    show_default=True,
     type=str,
     help="Add display.numDecimalPlaces to all numeric variables. Use integer or `auto` for autodetection. Disable with `no`.",
 )
