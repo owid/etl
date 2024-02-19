@@ -11,6 +11,7 @@ from rich_click.rich_command import RichCommand
 
 from etl.paths import DAG_DIR, DAG_TEMP_FILE, SNAPSHOTS_DIR, STEP_DIR
 from etl.snapshot import SnapshotMeta
+from etl.steps import to_dependency_order
 from etl.version_tracker import DAG_TEMP_STEP, VersionTracker
 
 log = structlog.get_logger()
@@ -126,22 +127,22 @@ def write_to_dag_file(
 class StepUpdater:
     def __init__(self, dry_run: bool = False):
         # Initialize version tracker and load dataframe of all active steps.
-        self.load_steps_df()
+        self.load_version_tracker()
         # If dry_run is True, then nothing will be written to the dag, and no files will be created.
         self.dry_run = dry_run
 
-    def load_steps_df(self) -> None:
+    def load_version_tracker(self) -> None:
         # This function will start a new instance of VersionTracker, and load the dataframe of all active steps.
         # It can be used when initializing StepUpdater, but also to reload steps_df after making changes to the dag.
 
         # Initialize version tracker.
-        tracker = VersionTracker()
+        self.tracker = VersionTracker()
 
         # Update the temporary dag.
-        _update_temporary_dag(dag_active=tracker.dag_active, dag_all_reverse=tracker.dag_all_reverse)
+        _update_temporary_dag(dag_active=self.tracker.dag_active, dag_all_reverse=self.tracker.dag_all_reverse)
 
         # Load steps dataframe.
-        self.steps_df = tracker.steps_df.copy()
+        self.steps_df = self.tracker.steps_df.copy()
         # Select only active steps.
         self.steps_df = self.steps_df[self.steps_df["state"] == "active"].reset_index(drop=True)
         # For convenience, add full local path to dag files to steps dataframe.
@@ -260,7 +261,7 @@ class StepUpdater:
             write_to_dag_file(dag_file=DAG_TEMP_FILE, dag_part=step_temp, comments={step_new: step_header})
 
             # Reload steps dataframe.
-            self.load_steps_df()
+            self.load_version_tracker()
 
     def update_data_step(
         self,
@@ -331,7 +332,7 @@ class StepUpdater:
             write_to_dag_file(dag_file=dag_file, dag_part=dag_part, comments={step_new: step_header})
 
             # Reload steps dataframe.
-            self.load_steps_df()
+            self.load_version_tracker()
 
     def update_step(
         self, step: str, step_version_new: Optional[str] = STEP_VERSION_NEW, step_header: Optional[str] = None
@@ -390,14 +391,21 @@ class StepUpdater:
                 )
 
         # Steps need to be updated hierarchically: First snapshots, then meadow, then garden, then grapher.
-        # Hence, we need to sort steps by channel.
-        # TODO: This logic is incomplete. Imagine the following partial dag:
-        #   {meadow_a: [snapshot:a], meadow_b: [snapshot_b], meadow_c: [meadow_a, meadow_b]}
-        #   We would need to update first snapshot_a and snapshot_b, then meadow_a and meadow_b, and then meadow_c.
-        #   We can try to improve sort_steps so that the order fixes these interdependencies (this logic must be similar
-        #   to the one implemented in ETL when deciding in which order to run steps). An alternative, brute-force
-        #   approach is to run update_steps infinite times until no more updates are necessary.
-        steps = sort_steps(steps=steps)  # type: ignore
+        # Also, if a data step depends on other steps, the dependencies need to be updated first.
+        # For example, imagine the following partial dag:
+        # {meadow_a: [snapshot:a], meadow_b: [snapshot_b], meadow_c: [meadow_a, meadow_b]}
+        # We would need to update first snapshot_a and snapshot_b, then meadow_a and meadow_b, and then meadow_c.
+        # Otherwise, if we updated meadow_c before meadow_a and meadow_b, the new version of meadow_c would depend on
+        # the old versions of meadow_a and meadow_b, and the new versions of meadow_a and meadow_b would not be used.
+        # This is the same topological sorting problem we have when deciding the order of steps to be executed by etl.
+        # Therefore, we can use the same function to_dependency_order to solve it.
+        steps = to_dependency_order(
+            dag=self.tracker.dag_active,
+            includes=steps,  # type: ignore
+            excludes=[],
+            downstream=False,
+            only=True,
+        )
 
         # Update each step.
         for step in steps:
@@ -470,23 +478,6 @@ def get_comments_above_step_in_dag(step: str, dag_file: Path) -> str:
     log.error(f"Step {step} not found in dag file {dag_file}.")
 
     return ""
-
-
-def sort_steps(steps: List[str]) -> List[str]:
-    # Sort steps by channel and then by name.
-    steps_sorted = sum(
-        [
-            sorted([step for step in steps if channel_str in step])
-            for channel_str in ["walden://", "snapshot://", "/meadow/", "/garden/", "/grapher/", "/explorers/"]
-        ],
-        [],
-    )
-
-    # Add any other steps (from channels that were not included above) at the end of the list.
-    # As of today, those would be "backport", "etag", "examples", "open_numbers".
-    steps_sorted = steps_sorted + sorted([step for step in steps if step not in steps_sorted])
-
-    return steps_sorted
 
 
 @click.command(cls=RichCommand, help=__doc__)
