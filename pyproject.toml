@@ -22,7 +22,7 @@ click = ">=8.0.1"
 PyYAML = ">=6.0.1"
 papermill = ">=2.3.3"
 jupyterlab = ">=3.1.13"
-mysqlclient = ">=2.2.4"
+mysqlclient = "^2.2.4"
 SPARQLWrapper = ">=1.8.5"
 openpyxl = ">=3.0.9"
 sh = "1.14.3"
@@ -46,9 +46,6 @@ simplejson = ">=3.17.6"
 bugsnag = ">=4.2.1"
 xlrd = ">=2.0.1"
 PyPDF2 = ">=2.11.1"
-# DVC 3.0.0 does not allow storing metadata in a different place (we store data in `data/snapshots` and dvc files in `snapshots/*`)
-# It doesn't even improve performance and complicates our use case
-dvc = {version = ">=2.58.2,<3.0.0", extras = ["s3"]}
 "ruamel.yaml" = ">=0.17.21"
 owid-repack = {path = "lib/repack", develop = true}
 gitpython = "^3.1.30"
