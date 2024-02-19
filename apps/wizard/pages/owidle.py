@@ -142,7 +142,7 @@ def distance_to_solution(country_selected: str) -> Tuple[str, str]:
         direction = "↙️"
     elif (direction > -112.5) & (direction <= -67.5):
         direction = "⬅️"
-    elif (direction > -67.5) & (direction <= -22.5):
+    else:
         direction = "↖️"
 
     if country_selected == SOLUTION:
