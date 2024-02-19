@@ -16,7 +16,7 @@ from os import environ
 from pathlib import Path
 from typing import Any, Callable, Dict, Iterator, List, Optional, Set
 
-import click
+import rich_click as click
 import structlog
 from ipdb import launch_ipdb_on_exception
 
@@ -42,39 +42,65 @@ log = structlog.get_logger()
 
 
 @click.command()
-@click.option("--dry-run", is_flag=True, help="Only print the steps that would be run")
-@click.option("--force", is_flag=True, help="Redo a step even if it appears done and up-to-date")
-@click.option("--private", is_flag=True, help="Execute private steps")
+@click.option(
+    "--dry-run",
+    is_flag=True,
+    help="Preview the steps without actually running them.",
+)
+@click.option(
+    "--force",
+    "-f",
+    is_flag=True,
+    help="Re-run the steps even if they appear done and up-to-date",
+)
+@click.option(
+    "--private",
+    "-p",
+    is_flag=True,
+    help="Run private steps.",
+)
 # TODO: once grapher channel stops using the grapher db, remove this flag
 @click.option(
     "--grapher-channel/--no-grapher-channel",
     default=True,
     type=bool,
-    help="Include grapher channel (OWID staff only, needs access to DB)",
+    help="Include grapher channel datasets _(OWID staff only, DB access required)_.",
 )
 @click.option(
     "--grapher/--no-grapher",
+    "-g/-ng",
     default=False,
     type=bool,
-    help="Upsert datasets from grapher channel to DB (OWID staff only, needs access to DB)",
+    help="Upsert datasets from grapher channel to DB _(OWID staff only, DB access required)_",
 )
-@click.option("--ipdb", is_flag=True, help="Run the debugger on uncaught exceptions")
+@click.option(
+    "--ipdb",
+    is_flag=True,
+    help="Run the debugger on uncaught exceptions.",
+)
 @click.option(
     "--backport",
+    "-b",
     is_flag=True,
-    help="Add steps for backporting OWID datasets",
+    help="Add steps for backporting OWID datasets.",
 )
 @click.option(
     "--downstream",
+    "-d",
     is_flag=True,
-    help="Include downstream dependencies (steps that depend on the included steps)",
+    help="Include downstream dependencies (steps that depend on the included steps).",
 )
 @click.option(
     "--only",
+    "-o",
     is_flag=True,
-    help="Only run the selected step (no upstream or downstream dependencies). Overrides `downstream` option",
+    help="Only run the selected step (no upstream or downstream dependencies). Overrides `--downstream` option.",
 )
-@click.option("--exclude", help="Comma-separated patterns to exclude")
+@click.option(
+    "--exclude",
+    "-e",
+    help="Comma-separated patterns to exclude",
+)
 @click.option(
     "--dag-path",
     type=click.Path(exists=True),
@@ -83,28 +109,36 @@ log = structlog.get_logger()
 )
 @click.option(
     "--workers",
+    "-w",
     type=int,
     help=f"Parallelize execution of steps. [{config.RUN_STEPS_WORKERS}]",
     default=config.RUN_STEPS_WORKERS,
 )
 @click.option(
     "--use-threads/--no-threads",
+    "-t/-nt",
     type=bool,
     help="Use threads when checking dirty steps and upserting to MySQL. Turn off when debugging.",
     default=True,
 )
 @click.option(
     "--strict/--no-strict",
+    "-s/-ns",
     is_flag=True,
-    help="Force strict or lax validation on DAG steps, e.g. checks for primary keys in data steps.",
+    help="Force strict or lax validation on DAG steps (e.g. checks for primary keys in data steps).",
     default=None,
 )
 @click.option(
     "--watch",
+    "-w",
     is_flag=True,
     help="Run ETL infinitely and update changed files.",
 )
-@click.argument("steps", nargs=-1)
+@click.argument(
+    "steps",
+    nargs=-1,
+    type=str,
+)
 def main_cli(
     steps: List[str],
     dry_run: bool = False,
@@ -123,6 +157,32 @@ def main_cli(
     strict: Optional[bool] = None,
     watch: bool = False,
 ) -> None:
+    """Generate datasets by running their corresponding ETL steps.
+
+    # Description
+    Run all ETL steps in the DAG matching the value of `STEPS`. A match is a dataset with an uri that contains the value of any of the words in `STEPS`.
+
+    ## Examples
+    **Example 1**: Run steps matching "mars" in the DAG file:
+
+    ```
+    $ etlcli run mars
+    ```
+
+    **Example 2**: Preview those steps that match "mars" or "prio" (i.e. don't run them):
+
+    ```
+    $ etlcli run mars prio
+    ```
+
+    **Example 3**: If you only want to preview what would be executed, use the `--dry-run` flag:
+
+    ```
+    $ etlcli run mars prio --dry-run
+    ```
+
+    # Reference
+    """
     _update_open_file_limit()
 
     # enable grapher channel when called with --grapher

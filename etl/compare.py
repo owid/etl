@@ -24,31 +24,26 @@ from etl.db import get_engine
 @click.option(
     "--absolute-tolerance",
     default=0.00000001,
-    show_default=True,
     help="The absolute tolerance for floating point comparisons.",
 )
 @click.option(
     "--relative-tolerance",
     default=0.05,
-    show_default=True,
     help="The relative tolerance for floating point comparisons.",
 )
 @click.option(
     "--show-values/--hide-values",
     default=False,
-    show_default=True,
     help="Show a preview of the values where the dataframes are different.",
 )
 @click.option(
     "--show-shared/--hide-shared",
     default=False,
-    show_default=True,
     help="Show the structural overlap of the two dataframes (shared columns, index columns and index values).",
 )
 @click.option(
     "--truncate-lists-at",
     default=20,
-    show_default=True,
     help="Print truncated lists if they are longer than the given length.",
 )
 @click.pass_context
@@ -60,7 +55,10 @@ def cli(
     show_shared: bool,
     truncate_lists_at: int,
 ) -> None:
-    """Compare two dataframes/tables/datasets in terms of their structure, values and metadata."""
+    """Compare two dataframes/tables/datasets in terms of their structure, values and metadata.
+
+    # Reference
+    """
     ctx.ensure_object(dict)
     ctx.obj["absolute_tolerance"] = absolute_tolerance
     ctx.obj["relative_tolerance"] = relative_tolerance
@@ -108,8 +106,16 @@ def diff_print(
 @click.argument("namespace")
 @click.argument("dataset")
 @click.argument("table")
-@click.option("--version", default=None, help="Version of catalog dataset to compare with.")
-@click.option("--debug", is_flag=True, help="Print debug information.")
+@click.option(
+    "--version",
+    default=None,
+    help="Version of catalog dataset to compare with.",
+)
+@click.option(
+    "--debug",
+    is_flag=True,
+    help="Print debug information.",
+)
 @click.pass_context
 def etl_catalog(
     ctx: click.core.Context,
@@ -123,16 +129,20 @@ def etl_catalog(
     """
     Compare a table in the local catalog with the analogous one in the remote catalog.
 
-    If "version" is not specified, the latest local version of the dataset is compared with the latest remote version of
-    the same dataset. To impose a specific version of both the local and remote datasets, use use the "version"
-    optional argument, e.g. --version "2022-01-01".
+    # Description
+    The table in the local catalog is loaded from `CHANNEL`/`NAMESPACE`/`DATASET`/{version}/`TABLE`. The value for {version} is given by the option `--version`. If not given, the latest local version of the dataset is compared with the latest remote version of the same dataset.
 
     It compares the columns, index columns and index values (row indices) as sets between the two dataframes and outputs
     the differences. Finally it compares the values of the overlapping columns and rows with the given threshold values
     for absolute and relative tolerance.
 
-    The exit code is 0 if the dataframes are equal, 1 if there is an error loading the dataframes, 2 if the dataframes
-    are structurally equal but are otherwise different, 3 if the dataframes have different structure and/or different values.
+    The **exit code** is:
+    - 0 if the tables are equal
+    - 1 if there is an error loading the tables
+    - 2 if the tables are structurally equal but are otherwise different
+    - 3 if the tables have different structure and/or different values.
+
+    # Reference
     """
     try:
         remote_df = catalog.find_latest(
@@ -200,7 +210,7 @@ def etl_catalog(
     help="Path to .env file with remote database credentials.",
     default=".env",
 )
-@click.option("--values", is_flag=True, help="Compare values from S3.")
+@click.option("--values", is_flag=True, help="Compare values from S3 (can be both CPU and memory heavy!).")
 @click.pass_context
 def grapher(
     ctx: click.core.Context,
@@ -211,16 +221,20 @@ def grapher(
     local_env: str,
     values: bool,
 ) -> None:
-    """
-    Compare a dataset in the local database with the remote database.
+    """Compare a dataset in the local database with the remote database.
 
-    It compares dataset and variables metadata, and optionally the values from S3 with --values flag
-    (which can be both CPU and memory heavy). It does the comparison in the same way as the etl-catalog command.
+    # Description
+    It loads the dataset from grapher/`NAMESPACE`/`VERSION`/`DATASET`. It compares dataset and variables metadata, and optionally the values from S3 with (use the `--values` flag for this). It does the comparison in the same way as the `etl-catalog` command.
 
     The exit code is always 0 even if dataframes are different.
 
-    Example usage:
-        compare  --show-values grapher ggdc 2020-10-01 ggdc_maddison__2020_10_01 --values
+    ## Examples
+
+    ```
+    compare  --show-values grapher ggdc 2020-10-01 ggdc_maddison__2020_10_01 --values
+    ```
+
+    # Reference
     """
     remote_dataset_df = read_dataset_from_db(remote_env, namespace, version, dataset)
     local_dataset_df = read_dataset_from_db(local_env, namespace, version, dataset)
@@ -412,8 +426,8 @@ def load_dataframe(path_str: str) -> pd.DataFrame:
 
 
 @cli.command(cls=RichCommand)
-@click.argument("dataframe1")
-@click.argument("dataframe2")
+@click.argument("dataframe1", type=click.Path(exists=True))
+@click.argument("dataframe2", type=click.Path(exists=True))
 @click.pass_context
 def dataframes(
     ctx: click.core.Context,
@@ -421,14 +435,18 @@ def dataframes(
     dataframe2: str,
 ) -> None:
     """
-    Compare two dataframes given as paths.
+    Compare two `DATAFRAME1` with `DATAFRAME2`.
 
-    It compares the columns, index columns and index values (row indices) as
-    sets between the two dataframes and outputs the differences. Finally it compares the values of the overlapping
-    columns and rows with the given threshold values for absolute and relative tolerance.
+    # Description
+    It compares the columns, index columns and index values (row indices) as sets between the two dataframes and outputs the differences. Finally it compares the values of the overlapping columns and rows with the given threshold values for absolute and relative tolerance.
 
-    The exit code is 0 if the dataframes are equal, 1 if there is an error loading the dataframes, 2 if the dataframes
-    are structurally equal but are otherwise different, 3 if the dataframes have different structure and/or different values.
+    The **exit code** is:
+    - 0 if the dataframes are equal
+    - 1 if there is an error loading the dataframes
+    - 2 if the dataframes are structurally equal but are otherwise different
+    - 3 if the dataframes have different structure and/or different values.
+
+    # Reference
     """
     df1: pd.DataFrame
     df2: pd.DataFrame

@@ -565,7 +565,7 @@ class DataStep(Step):
         if sys.platform == "linux":
             args.extend(["prlimit", f"--as={config.MAX_VIRTUAL_MEMORY_LINUX}"])
 
-        args.extend(["poetry", "run", "run_python_step"])
+        args.extend(["poetry", "run", "etlcli", "d", "run-python-step"])
 
         if config.IPDB_ENABLED:
             args.append("--ipdb")

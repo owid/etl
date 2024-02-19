@@ -31,7 +31,7 @@ log = structlog.get_logger()
 @click.option(
     "--chart-id",
     type=int,
-    help="Sync only this chart id.",
+    help="Sync **_only_** the chart with this id.",
 )
 @click.option(
     "--publish/--no-publish",
@@ -43,8 +43,7 @@ log = structlog.get_logger()
     "--approve-revisions/--keep-revisions",
     default=False,
     type=bool,
-    help="""Directly update existing charts with approved revisions
-    (skip chart revision). Useful for large updates. This still
+    help="""Directly update existing charts with approved revisions (i.e. skip chart revision). Useful for large updates. This still
     creates a chart revision if the target chart has been modified.""",
 )
 @click.option(
@@ -69,47 +68,60 @@ def cli(
     staging_created_at: Optional[dt.datetime],
     dry_run: bool,
 ) -> None:
-    """Syncs grapher charts and revisions from SOURCE (e.g. staging-site-mybranch or just
-    mybranch) to TARGET (e.g. .env.prod.write).
+    """Sync Grapher charts and revisions from an environment to the main environemnt.
 
-    SOURCE and TARGET can be either name of servers like staging-site-mybranch or paths
-    to .env files. You have to use `.env.prod.write` as TARGET to sync to live.
+    # Description
+    It syncs the charts and revisions from `SOURCE` to `TARGET`. This is especially useful for syncing work from staging servers to production.
 
-    This is especially useful for syncing work from staging servers to production.
+    `SOURCE` and `TARGET` can be either name of staging servers (e.g. "staging-site-mybranch") or paths to .env files. Use ".env.prod.write" as TARGET to sync to live.
 
-    Staging servers are destroyed after 1 day of merging to master, so this script should be
-    run before that, but after the dataset has been built by ETL in production.
+    - **Note 1:** The dataset (with the new chart's underlying indicators) from `SOURCE` must exist in `TARGET`. This means that you have to merge your work to master and wait for the ETL to finish running all steps.
 
-    SOURCE and TARGET can be either paths to .env file or name of a staging server.
+    - **Note 2:** Staging servers are destroyed after 1 day of merging to master, so this script should be run before that, but after the dataset has been built by ETL in production.
 
-    The dataset from source must exist in target (i.e. you have to merge your work to master and wait for the ETL to finish).
+    ## Other considerations
+    **Charts:**
 
-    Usage:
-        # Run staging-sync in dry-run mode to see what charts will be updated
-        etl-staging-sync staging-site-my-branch .env.prod.write --dry-run
+    - Only **_published charts_** from staging are synced.
+    - New charts are synced as **_drafts_** in target (unless `--publish` flag is used).
+    - Existing charts (with the same slug) are added as chart revisions in target. (Revisions could be pre-approved with `--approve-revisions` flag)
+    - You get a warning if the chart **_has been modified on live_** after staging server was created.
+    - Deleted charts are **_not synced_**.
 
-        # Run it for real
-        etl-staging-sync staging-site-my-branch .env.prod.write
+    **Chart revisions:**
 
-        # Sync only one chart
-        etl-staging-sync staging-site-my-branch .env.prod.write --chart-id 123 --dry-run
+    - Approved chart revisions on staging are automatically applied in target, assuming the chart has not been modified.
 
-        # Update charts directly without creating chart revisions (useful for large datasets
-        # updates like population)
-        etl-staging-sync staging-site-my-branch .env.prod.write --approve-revisions
+    **Tags:**
 
-    Charts:
-        - Only **published charts** from staging are synced.
-        - New charts are synced as **drafts** in target (unless `--publish` flag is used).
-        - Existing charts (with the same slug) are added as chart revisions in target. (Revisions could be pre-approved with --approve-revisions flag)
-        - You get a warning if the chart **has been modified on live** after staging server was created.
-        - Deleted charts are **not synced**.
+    - Tags are synced only for **_new charts_**, any edits to tags in existing charts are ignored.
 
-    Chart revisions:
-        - Approved chart revisions on staging are automatically applied in target, assuming the chart has not been modified.
+    ## Examples
+    **Example 1:** Run staging-sync in dry-run mode to see what charts will be updated
 
-    Tags:
-        - Tags are synced only for **new charts**, any edits to tags in existing charts are ignored.
+    ```
+    $ etlcli chart-sync staging-site-my-branch .env.prod.write --dry-run
+    ```
+
+    **Example 2:** Run it for real
+
+    ```
+    etlcli chart-sync staging-site-my-branch .env.prod.write
+    ```
+
+    **Example 3:** Sync only one chart
+
+    ```
+    etlcli chart-sync staging-site-my-branch .env.prod.write --chart-id 123 --dry-run
+    ```
+
+    **Example 4:** Update charts directly without creating chart revisions (useful for large datasets updates like population)
+
+    ```
+    etlcli chart-sync staging-site-my-branch .env.prod.write --approve-revisions
+    ```
+
+    # Reference
     """
     source_engine = _get_engine_for_env(source)
     target_engine = _get_engine_for_env(target)
@@ -369,7 +381,7 @@ def _modified_chart_ids_by_admin(session: Session) -> Set[int]:
     union
 
     -- charts revisions that were approved on staging, such charts would have publishedByUserId
-    -- of the user that ran etl-wizard locally, but would be updated by Admin
+    -- of the user that ran etlwiz locally, but would be updated by Admin
     select
         chartId
     from suggested_chart_revisions

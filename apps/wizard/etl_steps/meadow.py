@@ -7,6 +7,7 @@ import streamlit as st
 from st_pages import add_indentation
 from typing_extensions import Self
 
+from apps.utils.files import add_to_dag, generate_step_to_channel
 from apps.wizard import utils
 from etl.paths import BASE_DIR, DAG_DIR, MEADOW_DIR
 
@@ -218,7 +219,7 @@ if submitted:
         # Handle addition to the DAG
         dag_path = DAG_DIR / form.dag_file
         if form.add_to_dag:
-            dag_content = utils.add_to_dag(
+            dag_content = add_to_dag(
                 dag={
                     f"data{private_suffix}://meadow/{form.namespace}/{form.version}/{form.short_name}": [
                         f"snapshot{private_suffix}://{form.namespace}/{form.snapshot_version}/{form.short_name}.{form.file_extension}",
@@ -230,7 +231,7 @@ if submitted:
             dag_content = ""
 
         # Create necessary files
-        DATASET_DIR = utils.generate_step_to_channel(
+        DATASET_DIR = generate_step_to_channel(
             cookiecutter_path=utils.COOKIE_MEADOW, data=dict(**form.dict(), channel="meadow")
         )
 

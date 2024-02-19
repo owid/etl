@@ -248,28 +248,29 @@ class RemoteDataset:
     multiple=True,
     type=click.Choice(CHANNEL.__args__),
     default=["garden", "meadow", "grapher"],
-    help="Compare only selected channel (subfolder of data/), compare only meadow, garden and grapher by default",
+    help="Compare only selected channel (subfolder of data/).",
 )
 @click.option(
     "--include",
     type=str,
-    help="Compare only datasets matching pattern",
+    help="Compare only datasets matching pattern.",
 )
 @click.option(
     "--cols",
     type=str,
-    help="Compare only columns matching pattern",
+    help="Compare only columns matching pattern.",
 )
 @click.option(
     "--exclude",
     "-e",
     type=str,
-    help="Exclude datasets matching pattern",
+    help="Exclude datasets matching pattern.",
 )
 @click.option(
     "--verbose",
+    "-v",
     is_flag=True,
-    help="Print detailed differences",
+    help="Print more detailed differences.",
 )
 @click.option(
     "--snippet",
@@ -286,23 +287,36 @@ def cli(
     verbose: bool,
     snippet: bool,
 ) -> None:
-    """Compare all datasets from two catalogs (`a` and `b`) and print out summary of their differences. This is
-    different from `compare` tool which compares two specific datasets and prints out more detailed output. This
-    tool is useful as a quick way to see what has changed in the catalog and whether our updates don't have any
-    unexpected side effects.
+    """Compare all datasets from two catalogs and print out a summary of their differences.
 
-    It uses **source checksums** to find candidates for comparison. Source checksum includes all files used to
-    generate the dataset and should be sufficient to find changed datasets, just note that we're not using
-    checksum of the files themselves. So if you change core ETL code or some of the dependencies, e.g. change in
-    owid-datautils-py, core ETL code or updating library version, the change won't be detected. In cases like
-    these you should increment ETL version which is added to all source checksums (not implemented yet).
+    # Description
+    Compare all the datasets from catalog in `PATH_A` with all the datasets in catalog `PATH_B`. The catalog paths link to the `data/` folder with all the datasets (it contains a `catalog.meta.json` file)
 
-    Usage:
-        # compare local catalog with remote catalog
-        etl-datadiff REMOTE data/ --include maddison
+    Note that you can use the keyword "REMOTE" as the path, if you want to run a comparison with the remote catalog.
 
-        # compare two local catalogs
-        etl-datadiff other-data/ data/ --include maddison
+    This tool is useful as a quick way to see what has changed in the catalog and whether our updates don't have any unexpected side effects.
+
+    **Note:** This command differs from `etlcli compare` in that it compares _all_ the datasets and not two specific ones.
+
+    ## Other considerations
+    **How does it works?**
+
+    It uses **source checksums** to find candidates for comparison. Source checksum includes all files used to generate the dataset and should be sufficient to find changed datasets, just note that we're not using checksum of the files themselves. So if you change core ETL code or some of the dependencies, e.g. change in owid-datautils-py, core ETL code or updating library version, the change won't be detected. In cases like these you should increment ETL version which is added to all source checksums (not implemented yet).
+
+    ## Examples
+
+    **Example 1:** Compare the remote catalog with a local one
+
+    ```
+    $ etlcli diff REMOTE data/ --include maddison
+    ```
+
+    **Example 2:** Compare two local catalogs
+
+    ```
+    $ etlcli diff other-data/ data/ --include maddison
+    ```
+    # Reference
     """
     console = Console(tab_size=2)
 
@@ -358,7 +372,7 @@ def cli(
         "[b]Legend[/b]: [green]+New[/green]  [yellow]~Modified[/yellow]  [red]-Removed[/red]  [white]=Identical[/white]  [violet]Details[/violet]"
     )
     console.print(
-        "[b]Hint[/b]: Run this locally with [cyan][b]etl-datadiff REMOTE data/ --include yourdataset --verbose --snippet[/b][/cyan]"
+        "[b]Hint[/b]: Run this locally with [cyan][b]etl diff REMOTE data/ --include yourdataset --verbose --snippet[/b][/cyan]"
     )
     console.print(
         "[b]Hint[/b]: Get detailed comparison with [cyan][b]compare --show-values channel namespace version short_name --values[/b][/cyan]"

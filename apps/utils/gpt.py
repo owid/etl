@@ -1,6 +1,4 @@
-"""[DEPRECATED] Use `apps.utils.gpt` instead.
-Auxiliary classes, functions and variables.
-"""
+"""Auxiliary classes, functions and variables."""
 from dataclasses import asdict, dataclass
 from datetime import date
 from typing import Any, Dict, List, Optional, Tuple

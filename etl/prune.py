@@ -3,7 +3,7 @@ from pathlib import Path
 from typing import Set
 from urllib.parse import urlparse
 
-import click
+import rich_click as click
 import structlog
 from owid.catalog import CHANNEL, LocalCatalog
 
@@ -31,13 +31,20 @@ EXCLUDE_STEP_TYPES = ("grapher", "walden", "walden-private", "github")
     help="Path to data directory",
     default=paths.DATA_DIR,
 )
-@click.option("--dry-run", is_flag=True, help="Only print files that would be deleted")
+@click.option(
+    "--dry-run",
+    is_flag=True,
+    help="Only print files that would be deleted",
+)
 def prune_cli(
     dag_path: Path,
     data_dir: Path,
     dry_run: bool,
 ) -> None:
-    """Prune data without steps in the DAG."""
+    """Prune data without steps in the DAG.
+
+    # Reference
+    """
     return prune(dag_path=dag_path, data_dir=data_dir, dry_run=dry_run)
 
 

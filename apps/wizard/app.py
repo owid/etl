@@ -1,6 +1,6 @@
 """Entry page.
 
-This is the page that is loaded when the app is started. It redirects to the home page, unless an argument is passed. E.g. `etl-wizard charts` will redirect to the charts page."""
+This is the page that is loaded when the app is started. It redirects to the home page, unless an argument is passed. E.g. `etlwiz charts` will redirect to the charts page."""
 from pathlib import Path
 
 import streamlit as st
@@ -16,7 +16,6 @@ CURRENT_DIR = Path(__file__).parent
 st.set_page_config(page_title="Wizard", page_icon="🪄")
 st.title("Wizard")
 
-
 # Initial apps (etl steps)
 toc = [
     Page(str(CURRENT_DIR / "home.py"), "Home", icon="🏠"),
@@ -25,25 +24,27 @@ toc = [
 # ETL steps
 toc.append(Section(WIZARD_CONFIG["etl"]["title"]))
 for step in WIZARD_CONFIG["etl"]["steps"].values():
-    toc.append(
-        Page(
-            path=str(CURRENT_DIR / step["entrypoint"]),
-            name=step["title"],
-            icon=step["emoji"],
+    if step["enable"]:
+        toc.append(
+            Page(
+                path=str(CURRENT_DIR / step["entrypoint"]),
+                name=step["title"],
+                icon=step["emoji"],
+            )
         )
-    )
 
 # Other apps specified in the config
 for section in WIZARD_CONFIG["sections"]:
     toc.append(Section(section["title"]))
     for app in section["apps"]:
-        toc.append(
-            Page(
-                path=str(CURRENT_DIR / app["entrypoint"]),
-                name=app["title"],
-                icon=app["emoji"],
+        if app["enable"]:
+            toc.append(
+                Page(
+                    path=str(CURRENT_DIR / app["entrypoint"]),
+                    name=app["title"],
+                    icon=app["emoji"],
+                )
             )
-        )
 
 # Show table of content (apps)
 show_pages(toc)

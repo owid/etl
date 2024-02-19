@@ -12,6 +12,7 @@ from rich.console import Console
 from sqlmodel import Session
 from structlog import get_logger
 
+from apps.utils.files import add_to_dag
 from apps.wizard import utils as wizard_utils
 from apps.wizard.pages.fasttrack.utils import _encrypt
 from etl import grapher_model as gm
@@ -279,7 +280,7 @@ class FasttrackImport:
         wizard_utils.remove_from_dag(to_remove, DAG_FASTTRACK_PATH)
 
         # Add the step to the DAG
-        return wizard_utils.add_to_dag(to_add, DAG_FASTTRACK_PATH)
+        return add_to_dag(to_add, DAG_FASTTRACK_PATH)
 
     @property
     def dataset_id(self) -> int:

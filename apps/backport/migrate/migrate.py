@@ -2,14 +2,14 @@ import shutil
 from pathlib import Path
 from typing import Optional, cast
 
-import click
+import rich_click as click
 import structlog
 from owid.catalog.utils import underscore
 from rich import print
 from sqlalchemy.engine import Engine
 
 from apps.backport.backport import PotentialBackport
-from apps.wizard.utils import add_to_dag, generate_step
+from apps.utils.files import add_to_dag, generate_step
 from etl import config
 from etl.backport_helpers import create_dataset
 from etl.db import get_engine
@@ -27,11 +27,30 @@ DAG_MIGRATED_PATH = DAG_DIR / "migrated.yml"
 
 
 @click.command()
-@click.option("--dataset-id", type=int, required=True)
-@click.option("--namespace", type=str, required=True, help="New namespace")
-@click.option("--version", type=str, required=False, default="latest", help="New version")
 @click.option(
-    "--short-name", type=str, required=False, help="New short name to use, underscored dataset name by default"
+    "--dataset-id",
+    type=int,
+    required=True,
+    help="Dataset ID to migrate",
+)
+@click.option(
+    "--namespace",
+    type=str,
+    required=True,
+    help="New namespace",
+)
+@click.option(
+    "--version",
+    type=str,
+    required=False,
+    default="latest",
+    help="New version",
+)
+@click.option(
+    "--short-name",
+    type=str,
+    required=False,
+    help="New short name to use, underscored dataset name by default",
 )
 @click.option(
     "--backport/--no-backport",
@@ -67,13 +86,22 @@ def cli(
     dry_run: bool = False,
     upload: bool = True,
 ) -> None:
-    """Migrate existing dataset from MySQL into ETL by creating:
+    """Migrate existing dataset from MySQL into ETL.
+
+    # Description
+
+    It imports datasets into ETL from MySQL by creating:
     - Ingest script that downloads data from S3 backport
     - Garden step with YAML metadata
     - Grapher step
 
-    Example usage:
-        ENV=.env.prod backport-migrate --dataset-id 5205 --namespace covid --short-name hospital__and__icu --no-backport
+    ## Example
+
+    ```
+    ENV=.env.live etlcli b migrate --dataset-id 5205 --namespace covid --short-name hospital__and__icu --no-backport
+    ```
+
+    # Reference
     """
     return migrate(
         dataset_id=dataset_id,
@@ -134,7 +162,7 @@ def migrate(
     print(
         f"[green]3.[/green] Merge changes or run it directly against production with [bold]`ENV=.env.prod.write etl {namespace}/{version}/{short_name} --grapher`[/bold]"
     )
-    print("[green]4.[/green] Run chart revisions with [bold]`ENV=.env.prod.write etl-wizard charts`[/bold]")
+    print("[green]4.[/green] Run chart revisions with [bold]`ENV=.env.prod.write etlwiz charts`[/bold]")
     print("[green]5.[/green] [bold]Delete[/bold] or archive the old dataset")
 
 

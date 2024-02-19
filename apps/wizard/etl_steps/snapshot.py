@@ -10,6 +10,7 @@ import streamlit as st
 from st_pages import add_indentation
 from typing_extensions import Self
 
+from apps.utils.files import generate_step
 from apps.wizard import utils
 from etl.docs import examples_to_markdown, faqs_to_markdown, guidelines_to_markdown
 from etl.helpers import read_json_schema
@@ -772,7 +773,7 @@ if submitted:
         form_widget.empty()
 
         # Create files
-        utils.generate_step(
+        generate_step(
             cookiecutter_path=utils.COOKIE_SNAPSHOT,
             data=dict(**form.dict(), channel="snapshots"),
             target_dir=SNAPSHOTS_DIR,
