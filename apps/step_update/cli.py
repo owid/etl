@@ -2,7 +2,7 @@ import difflib
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 import click
 import structlog
@@ -356,7 +356,7 @@ class StepUpdater:
 
     def update_steps(
         self,
-        steps: Union[str, List[str]],
+        steps: Union[str, List[str], Tuple[str]],
         step_version_new: Optional[str] = STEP_VERSION_NEW,
         include_dependencies: bool = False,
         include_usages: bool = False,
@@ -365,8 +365,8 @@ class StepUpdater:
         """Update multiple steps to new version."""
 
         # If a single step is given, convert it to a list.
-        if isinstance(steps, str):
-            steps = [steps]
+        if isinstance(steps, str) or isinstance(steps, tuple):
+            steps = list(steps)
 
         # Gather all steps to be updated.
         for step in steps:
@@ -374,12 +374,14 @@ class StepUpdater:
             self.check_that_step_exists(step=step)
 
             if include_dependencies:
+                # Add direct dependencies of current step to the list of steps to update (if not already in the list).
                 dependencies = self.steps_df[self.steps_df["step"] == step]["direct_dependencies"].item()
-                steps += dependencies
+                steps += [dependency for dependency in dependencies if dependency not in steps]
 
             if include_usages:
+                # Add direct usages of current step to the list of steps to update (if not already in the list).
                 usages = self.steps_df[self.steps_df["step"] == step]["direct_usages"].item()
-                steps += usages
+                steps += [usage for usage in usages if usage not in steps]
 
         # If step_headers is not explicitly defined, get headers for each step from their corresponding dag file.
         if step_headers is None:
@@ -481,7 +483,7 @@ def get_comments_above_step_in_dag(step: str, dag_file: Path) -> str:
 
 
 @click.command(cls=RichCommand, help=__doc__)
-@click.argument("steps", type=str or List[str])
+@click.argument("steps", type=str or List[str], nargs=-1)
 @click.option(
     "--step-version-new", type=str, default=STEP_VERSION_NEW, help=f"New version for step. Default: {STEP_VERSION_NEW}."
 )
