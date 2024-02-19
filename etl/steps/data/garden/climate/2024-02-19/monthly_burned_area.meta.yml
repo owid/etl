@@ -1,0 +1,45 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Climate Change
+    display:
+      numDecimalPlaces: 0
+      zeroDay: '2000-01-01'
+      yearIsDay: true
+    short_unit: ha
+    unit: hectares
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
+dataset:
+  update_period_days: 365
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
+tables:
+  monthly_burned_area:
+    # Learn more about the available fields:
+    # http://docs.owid.io/projects/etl/architecture/metadata/reference/indicator/
+    variables:
+      forest:
+        title: Monthly burned area in forests
+
+      savannas:
+        title: Monthly burned area in savannas
+
+      shrublands_grasslands:
+        title: Monthly burned area in shrublands and grasslands
+
+      croplands:
+        title: Monthly burned area in cropland
+
+      other:
+        title: Monthly burned area in other land
+
+      all:
+        title: Monthly burned area in all land
+
