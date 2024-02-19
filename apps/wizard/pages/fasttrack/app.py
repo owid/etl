@@ -9,6 +9,7 @@ import streamlit as st
 from st_pages import add_indentation
 from structlog import get_logger
 
+from apps.utils.files import generate_step_to_channel
 from apps.wizard import utils as wizard_utils
 from apps.wizard.pages.fasttrack.load import load_existing_sheets_from_snapshots
 from apps.wizard.pages.fasttrack.process import processing_part_1, processing_part_2
@@ -300,7 +301,7 @@ if st.session_state.to_be_submitted_confirmed_2:
 
             # create step and metadata file
             st.write("Creating step and metadata files...")
-            wizard_utils.generate_step_to_channel(CURRENT_DIR / "cookiecutter/", fast_import.meta.to_dict())
+            generate_step_to_channel(CURRENT_DIR / "cookiecutter/", fast_import.meta.to_dict())
             fast_import.save_metadata()
 
             # Uploading snapshot

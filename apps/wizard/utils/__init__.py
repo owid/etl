@@ -1,6 +1,13 @@
 """General utils.
 
 TODO: Should probably re-order this file and split it into multiple files.
+    - Ideally we want to leave front-end stuff here.
+    - More backendy stuff should be moved to apps/utils.
+
+    IF a tool here is used by something outside of Wizard domains, then we should place it elsewhere.
+    At the moment, I'm moving things to apps/utils/. But I could see this going elsewhere under etl/.
+
+    Also, can imagine apps/wizard/ being renamed to just wizard/, and stuff other than wizard should be either (i) deleted or (ii) migrated elsewhere in etl/.
 """
 import argparse
 import datetime as dt
@@ -18,7 +25,6 @@ import bugsnag
 import jsonref
 import jsonschema
 import streamlit as st
-from cookiecutter.main import cookiecutter
 from MySQLdb import OperationalError
 from owid.catalog import Dataset
 from pydantic import BaseModel
@@ -28,7 +34,7 @@ from typing_extensions import Self
 from apps.wizard.config import PAGES_BY_ALIAS
 from etl import config
 from etl.db import get_connection
-from etl.files import apply_ruff_formatter_to_files, ruamel_dump, ruamel_load
+from etl.files import ruamel_dump, ruamel_load
 from etl.metadata_export import main as metadata_export
 from etl.paths import (
     APPS_DIR,
@@ -36,9 +42,8 @@ from etl.paths import (
     DAG_DIR,
     LATEST_POPULATION_VERSION,
     LATEST_REGIONS_VERSION,
-    STEP_DIR,
 )
-from etl.steps import DAG, load_dag
+from etl.steps import load_dag
 
 # Logger
 log = get_logger()
@@ -96,20 +101,6 @@ DUMMY_DATA = {
 }
 
 
-def add_to_dag(dag: DAG, dag_path: Path = DAG_WIZARD_PATH) -> str:
-    """Add dag to dag_path file."""
-    with open(dag_path, "r") as f:
-        doc = ruamel_load(f)
-
-    doc["steps"].update(dag)
-
-    with open(dag_path, "w") as f:
-        f.write(ruamel_dump(doc))
-
-    # Get subdag as string
-    return ruamel_dump({"steps": dag})
-
-
 def remove_from_dag(step: str, dag_path: Path = DAG_WIZARD_PATH) -> None:
     with open(dag_path, "r") as f:
         doc = ruamel_load(f)
@@ -119,41 +110,6 @@ def remove_from_dag(step: str, dag_path: Path = DAG_WIZARD_PATH) -> None:
     with open(dag_path, "w") as f:
         # Add new step to DAG
         f.write(ruamel_dump(doc))
-
-
-def generate_step(cookiecutter_path: Path, data: Dict[str, Any], target_dir: Path) -> None:
-    with tempfile.TemporaryDirectory() as temp_dir:
-        # create config file with data for cookiecutter
-        config_path = cookiecutter_path / "cookiecutter.json"
-        with open(config_path, "w") as f:
-            json.dump(data, f, default=str)
-
-        try:
-            cookiecutter(
-                cookiecutter_path.as_posix(),
-                no_input=True,
-                output_dir=temp_dir,
-                overwrite_if_exists=True,
-            )
-        finally:
-            config_path.unlink()
-
-        # Apply black formatter to generated files.
-        apply_ruff_formatter_to_files(file_paths=list(Path(temp_dir).glob("**/*.py")))
-
-        shutil.copytree(
-            Path(temp_dir),
-            target_dir,
-            dirs_exist_ok=True,
-        )
-
-
-def generate_step_to_channel(cookiecutter_path: Path, data: Dict[str, Any]) -> Path:
-    assert {"channel", "namespace", "version"} <= data.keys()
-
-    target_dir = STEP_DIR / "data" / data["channel"]
-    generate_step(cookiecutter_path, data, target_dir)
-    return target_dir / data["namespace"] / data["version"]
 
 
 class classproperty(property):
@@ -717,7 +673,8 @@ def st_page_link(alias: str, border: bool = False, **kwargs) -> None:
         )
 
 
-def metadata_export_basic(dataset_path: str | None = None, dataset: Dataset | None = None) -> str:
+st.cache_data
+def metadata_export_basic(dataset_path: str | None = None, dataset: Dataset | None = None, output: str = "") -> str:
     """Export metadata of a dataset.
 
     The metadata of the dataset may have changed in run time.
@@ -730,7 +687,7 @@ def metadata_export_basic(dataset_path: str | None = None, dataset: Dataset | No
 
     output_path = metadata_export(
         path=dataset_path,
-        output="",  # Will assign the default value
+        output=output,  # Will assign the default value
         show=False,
         decimals="auto",
     )

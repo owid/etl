@@ -42,8 +42,6 @@ steps:
     - snapshot-private://fasttrack/latest/quantum_processors_over_time.csv
   data-private://grapher/fasttrack/2023-05-02/tomitaka_2018:
     - snapshot-private://fasttrack/2023-05-02/tomitaka_2018.csv
-  data-private://grapher/fasttrack/2023-05-03/qubits:
-    - snapshot-private://fasttrack/2023-05-03/qubits.csv
   data-private://grapher/fasttrack/2023-05-03/apms_2014:
     - snapshot-private://fasttrack/2023-05-03/apms_2014.csv
   data-private://grapher/fasttrack/latest/gbd_2019_mental_health_country_coverage:
@@ -132,3 +130,7 @@ steps:
     - snapshot://fasttrack/latest/public_support_climate_andre.csv
   data://grapher/fasttrack/latest/public_support_climate_vlasceanu:
     - snapshot://fasttrack/latest/public_support_climate_vlasceanu.csv
+  data://grapher/fasttrack/2023-05-03/qubits:
+    - snapshot://fasttrack/2023-05-03/qubits.csv
+  data://grapher/fasttrack/latest/completeness_disaster_emdat:
+    - snapshot://fasttrack/latest/completeness_disaster_emdat.csv

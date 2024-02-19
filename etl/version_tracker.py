@@ -735,19 +735,23 @@ class VersionTracker:
 
 @click.command(cls=RichCommand)
 @click.option(
-    "--skip_db",
+    "--skip-db",
     is_flag=True,
     default=False,
+    help="True to skip connecting to the database of the current environment. False to try to connect to DB, to get a better informed picture of what steps may be missing or archivable. If not connected, all checks will be based purely on the content of the ETL dag.",
 )
-@click.option("--warn_on_archivable", is_flag=True, default=False)
+@click.option(
+    "--warn-on-archivable",
+    is_flag=True,
+    default=False,
+    help="True to warn about archivable steps. By default this is False, because we currently have many archivable steps.",
+)
 def run_version_tracker_checks(skip_db: bool = False, warn_on_archivable: bool = False) -> None:
-    """Run all version tracker sanity checks.
+    """Check that all DAG dependencies (e.g. make sure no step is missing).
 
-    --skip_db : True to skip connecting to the database of the current environment. False to try to connect to DB, to
-    get a better informed picture of what steps may be missing or archivable. If not connected, all checks will be based
-    purely on the content of the ETL dag.
+    # Description
+    Run all version tracker sanity checks.
 
-    --warn_on_archivable : True to warn about archivable steps. By default this is False, because we currently have many
-    archivable steps.
+    # Reference
     """
     VersionTracker(connect_to_db=not skip_db, warn_on_archivable=warn_on_archivable).apply_sanity_checks()

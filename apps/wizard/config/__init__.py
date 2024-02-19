@@ -6,12 +6,13 @@ from typing import Literal
 
 import yaml
 
+from etl.config import WIZARD_IS_REMOTE
 from etl.paths import APPS_DIR
 
 _config_path = APPS_DIR / "wizard" / "config" / "config.yml"
 
 
-def load_wizard_config():
+def load_wizard_config():  # -> Any:
     """Load config."""
     # Load file
     with open(_config_path, "r") as file:
@@ -20,6 +21,25 @@ def load_wizard_config():
     _check_wizard_config(config)
     # Some transformations
 
+    def _get_enable(props):
+        # Default for `disable_on_remote` is False
+        disable_on_remote = props.get("disable_on_remote", False)
+        # Default for `enable` is True
+        enable = props.get("enable", True)
+
+        # If `disable_on_remote` is set, then disable if we are on remote (i.e. WIZARD_IS_REMOTE is set to True)
+        if WIZARD_IS_REMOTE:
+            enable = (not disable_on_remote) and enable
+
+        return enable
+
+    ## ETL steps
+    for _, step in config["etl"]["steps"].items():
+        step["enable"] = _get_enable(step)
+    ## Sections
+    for section in config["sections"]:
+        for app in section["apps"]:
+            app["enable"] = _get_enable(app)
     return config
 
 
