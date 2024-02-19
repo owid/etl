@@ -6,6 +6,7 @@ authors = ["Our World in Data <tech@ourworldindata.org>"]
 
 [tool.poetry.scripts]
 etl = 'apps.cli:cli'
+etlcli = 'apps.cli:cli'
 etlwiz = 'apps.wizard.cli:cli'
 etl-wizard = 'apps.wizard.cli:cli'
 etlr = 'etl.command:main_cli'
