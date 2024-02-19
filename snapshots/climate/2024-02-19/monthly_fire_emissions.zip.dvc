@@ -1,0 +1,27 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/origin/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Global Monthly Emissions from Fires
+    description: |-
+     Monthly biomass burning emissions (in tons) by pollutant for years 2002-2022 for all countries and sub-country administrative units (GADM level 0 and level 1 administrative units). The dataset is derived from the Global Fire Emission Database (GFED) which combines satellite information on fire activity and vegetation productivity to estimate fire emissions.
+    date_published: 2022
+
+    # Citation
+    producer: Global Wildfire Information System
+    citation_full: |-
+      Van Der Werf, Guido R., et al. "Global fire emissions estimates during 1997-2016." Earth System Science Data 9.2 (2017): 697-720.
+    attribution_short: GWIS
+
+    # Files
+    url_main: https://gwis.jrc.ec.europa.eu/apps/country.profile/downloads
+    url_download:
+      https://effis-gwis-cms.s3.eu-west-1.amazonaws.com/apps/country.profile/emission_gfed_full_2002_2022.zip
+    date_accessed: 2024-02-19
+
+    # License
+    license:
+      name: European Union, 1995-2023
+      url: https://gwis.jrc.ec.europa.eu/about-gwis/data-license
+
