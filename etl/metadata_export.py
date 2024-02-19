@@ -58,13 +58,13 @@ def cli(
     **Example 1:** Save to YAML file `etl/steps/data/garden/ggdc/2020-10-01/ggdc_maddison.meta.yml`
 
     ```
-    etlcli metadata-export data/garden/ggdc/2020-10-01/ggdc_maddison
+    etl metadata-export data/garden/ggdc/2020-10-01/ggdc_maddison
     ```
 
     **Example 2:** Show output instead of saving the file
 
     ```
-    etlcli metadata-export data/garden/ggdc/2020-10-01/ggdc_maddison --show
+    etl metadata-export data/garden/ggdc/2020-10-01/ggdc_maddison --show
     ```
 
     # Reference
