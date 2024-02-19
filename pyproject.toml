@@ -8,7 +8,6 @@ authors = ["Our World in Data <tech@ourworldindata.org>"]
 etlcli = 'apps.cli:cli'
 etlwiz = 'apps.wizard.cli:cli'
 etlr = 'etl.command:main_cli'
-
 etl-wizard = 'apps.wizard.cli:cli'
 etl = 'etl.command:main_cli'
 fasttrack = 'apps.fasttrack.cli:cli'

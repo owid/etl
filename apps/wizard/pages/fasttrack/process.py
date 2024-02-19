@@ -29,10 +29,12 @@ def processing_part_1(import_method, dataset_uri, infer_metadata, is_private, _s
 
     # 2/ GOOGLE SHEET (New or existing)
     else:
-        # Get filename, show notification
-        sheets_url = dataset_uri
-        if import_method in (UPDATE_GSHEET, IMPORT_GSHEET):
-            dataset_uri = sheets_url["value"]
+        # NOTE: this was there before but it was wrong, the code below works
+        # sheets_url = dataset_uri
+        # if import_method in (UPDATE_GSHEET, IMPORT_GSHEET):
+        #     dataset_uri = sheets_url["value"]
+        # data, dataset_meta, variables_meta_dict, origin = load_data_from_sheets(dataset_uri, _status=_status)
+
         data, dataset_meta, variables_meta_dict, origin = load_data_from_sheets(dataset_uri, _status=_status)
 
     # PROCES

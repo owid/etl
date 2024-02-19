@@ -2,99 +2,135 @@
 
 If you want to add a new service, make sure to add it to the `GROUPS` list. If it is part of a subgroup, add it to the corresponding subgroup in the  `SUBGROUPS` list.
 """
+import importlib
+
 import rich_click as click
 
-from apps.backport.backport import backport_cli as cli_backport_run
-from apps.backport.bulk_backport import bulk_backport as cli_bulk_backport
-from apps.backport.fasttrack_backport import cli as cli_fasttrack_backport
-from apps.backport.migrate.migrate import cli as cli_backport_migrate
-from apps.metadata_migrate.cli import cli as cli_metadata_migrate
-from apps.metagpt.cli import main as cli_meta_upgrader
-from apps.staging_sync.cli import cli as cli_staging_sync
-from apps.utils.style import set_rich_click_style
-from etl.chart_revision.cli import main_cli as cli_chart_revision
-from etl.chart_revision.v2.chartgpt import cli as cli_chartgpt
+# Styling
+# from apps.utils.style import set_rich_click_style
+# set_rich_click_style()
+click.rich_click.USE_MARKDOWN = True
 
-# from apps.wizard.cli import cli as cli_wizard
-from etl.command import main_cli as cli_run
-from etl.compare import cli as cli_compare
-from etl.datadiff import cli as cli_datadiff
-from etl.harmonize import harmonize as cli_harmonize
-from etl.match_variables import main_cli as cli_match_variables
-from etl.metadata_export import cli as cli_metadata_export
-from etl.prune import prune_cli as cli_prune
-from etl.publish import publish_cli as cli_publish
-from etl.reindex import reindex_cli as cli_reindex
-from etl.run_python_step import main as cli_run_python_step
-from etl.to_graphviz import to_graphviz as cli_graphviz
-from etl.variable_mapping_translate import main_cli as cli_variable_mapping_translate
-from etl.version_tracker import run_version_tracker_checks as cli_vtracker
 
-################################
+# Lazy load
+# Ref: https://click.palletsprojects.com/en/8.1.x/complex/#lazily-loading-subcommands
+class LazyGroup(click.RichGroup):
+    """Ref: https://click.palletsprojects.com/en/8.1.x/complex/#lazily-loading-subcommands"""
+
+    def __init__(self, *args, lazy_subcommands=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        # lazy_subcommands is a map of the form:
+        #
+        #   {command-name} -> {module-name}.{command-object-name}
+        #
+        self.lazy_subcommands = lazy_subcommands or {}
+
+    def list_commands(self, ctx):
+        base = super().list_commands(ctx)
+        lazy = sorted(self.lazy_subcommands.keys())
+        return base + lazy
+
+    def get_command(self, ctx, cmd_name):
+        if cmd_name in self.lazy_subcommands:
+            return self._lazy_load(cmd_name)
+        return super().get_command(ctx, cmd_name)
+
+    def _lazy_load(self, cmd_name):
+        # lazily loading a command, first get the module name and attribute name
+        import_path = self.lazy_subcommands[cmd_name]
+        modname, cmd_object_name = import_path.rsplit(".", 1)
+        # do the import
+        mod = importlib.import_module(modname)
+        # get the Command object from that module
+        cmd_object = getattr(mod, cmd_object_name)
+        # check the result to make debugging easier
+        if not isinstance(cmd_object, click.BaseCommand):  # type: ignore
+            raise ValueError(f"Lazy loading of {import_path} failed by returning " "a non-command object")
+        return cmd_object
+
+
+################################################################
 #
 # SUBGROUPS
 #
-# Configuration of the subcommands like `etlcli d` or `etlcli b`.
+# Configuration of the subcommands `etlcli d` (development) and `etlcli b` (backport).
 # We define it first because we need to reference it later.
 #
-# You can edit `SUBGROUPS` to add new subcommands!
+# You can edit `SUBGROUPS` to add new subgroups!
 #
-################################
-SUBGROUPS = [
-    {
+################################################################
+SUBGROUPS = {
+    "d": {
+        "entrypoint": "apps.cli.cli_dev",
         "description": "Development commands.",
-        "alias": "d",
         "name": "Development",
         "commands": {
-            "version-tracker": cli_vtracker,
-            "prune": cli_prune,
-            "publish": cli_publish,
-            "reindex": cli_reindex,
-            "run-python-step": cli_run_python_step,
+            "version-tracker": "etl.version_tracker.run_version_tracker_checks",
+            "prune": "etl.prune.prune_cli",
+            "publish": "etl.publish.publish_cli",
+            "reindex": "etl.reindex.reindex_cli",
+            "run-python-step": "etl.run_python_step.main",
         },
     },
-    {
-        "alias": "b",
+    "b": {
+        "entrypoint": "apps.cli.cli_back",
         "name": "Backport",
         "description": "Backport commands.",
         "commands": {
-            "fasttrack": cli_fasttrack_backport,
-            "migrate": cli_backport_migrate,
-            "bulk": cli_bulk_backport,
-            "run": cli_backport_run,
+            "fasttrack": "apps.backport.fasttrack_backport.cli",
+            "migrate": "apps.backport.migrate.migrate.cli",
+            "bulk": "apps.backport.bulk_backport.bulk_backport",
+            "run": "apps.backport.backport.backport_cli",
         },
     },
-]
+}
 
-# Convert this so we can use it in `GROUPS`
+
+# Development
+@click.group(
+    name="d",
+    context_settings=dict(show_default=True),
+    cls=LazyGroup,
+    lazy_subcommands=SUBGROUPS["d"]["commands"],
+)
+def cli_dev() -> None:
+    """Run development tools."""
+    pass
+
+
+# Backport
+@click.group(
+    name="etlcli",
+    context_settings=dict(show_default=True),
+    cls=LazyGroup,
+    lazy_subcommands=SUBGROUPS["b"]["commands"],
+)
+def cli_back() -> None:
+    """Run Backport tools."""
+    pass
+
+
+# Create `subgroups` list, to be used to display commands in `etlcli --help`
 subgroups = []
-for subgroup in SUBGROUPS:
-    # Define group command
-    def _cli() -> None:
-        f"""{subgroup['description']}"""
-        pass
+for alias, props in SUBGROUPS.items():
+    subgroups.append(
+        {
+            "name": props["name"],
+            "commands": {
+                alias: props["entrypoint"],
+                **{f"{alias} {k}": v for k, v in props["commands"].items()},
+            },
+        }
+    )
 
-    _cli = click.group(subgroup["alias"])(_cli)
-    _group = {
-        "name": subgroup["name"],
-        "commands": {
-            subgroup["alias"]: _cli,
-        },
-    }
-
-    # Define subgroup commands, add to group
-    for name, cmd in subgroup["commands"].items():
-        _cli.add_command(cmd=cmd, name=name)
-        _group["commands"][f"{subgroup['alias']} {name}"] = cmd
-    subgroups.append(_group)
-
-
-################################
+################################################################
 #
 # MAIN CLIENT
-# Configuration of the command `etlcli`
+# Configuration of the command `etlcli`.
 #
-################################
+# You can edit `GROUPS` to add new commands!
+#
+################################################################
 
 # DEFINE GROUPS, AND HOW THEY ARE SHOWN
 ## List with all groups and their commands.
@@ -110,32 +146,32 @@ GROUPS = (
         {
             "name": "Run ETL steps",
             "commands": {
-                "run": cli_run,
+                "run": "etl.command.main_cli",
             },
         },
         {
             "name": "Data",
             "commands": {
-                "harmonize": cli_harmonize,
-                "diff": cli_datadiff,
-                "graphviz": cli_graphviz,
-                "compare": cli_compare,
+                "harmonize": "etl.harmonize.harmonize",
+                "diff": "etl.datadiff.cli",
+                "graphviz": "etl.to_graphviz.to_graphviz",
+                "compare": "etl.compare.cli",
             },
         },
         {
             "name": "Metadata",
             "commands": {
-                "metadata-export": cli_metadata_export,
-                "metadata-migrate": cli_metadata_migrate,
-                "metadata-upgrade": cli_meta_upgrader,
+                "metadata-export": "etl.metadata_export.cli",
+                "metadata-migrate": "apps.metadata_migrate.cli.cli",
+                "metadata-upgrade": "apps.metagpt.cli.main",
             },
         },
         {
             "name": "Charts",
             "commands": {
-                "chart-sync": cli_staging_sync,
-                "chart-gpt": cli_chartgpt,
-                "chart-upgrade": cli_chart_revision,
+                "chart-sync": "apps.staging_sync.cli.cli",
+                "chart-gpt": "etl.chart_revision.v2.chartgpt.cli",
+                "chart-upgrade": "etl.chart_revision.cli.main_cli",
             },
         },
     ]
@@ -146,8 +182,8 @@ GROUPS = (
         {
             "name": "Others",
             "commands": {
-                "variable-match": cli_match_variables,
-                "variable-mapping-translate": cli_variable_mapping_translate,
+                "variable-match": "etl.match_variables.main_cli",
+                "variable-mapping-translate": "etl.variable_mapping_translate.main_cli",
             },
         },
     ]
@@ -156,8 +192,17 @@ GROUPS = (
 
 # MAIN CLIENT ENTRYPOINT (no action actually)
 ## Note that the entrypoint has no action, it is just a group. The commands that fall under it do actually have actions.
-@click.group(name="etlcli", context_settings=dict(show_default=True))
-# @click.rich_config(help_config=help_config)
+lazy_cmds = {}
+for group in GROUPS:
+    lazy_cmds.update(group["commands"])
+
+
+@click.group(
+    name="etlcli",
+    context_settings=dict(show_default=True),
+    cls=LazyGroup,
+    lazy_subcommands=lazy_cmds,  # {k: v for group in GROUPS for k, v in group["commands"].items()},
+)
 def cli() -> None:
     """Run OWID's ETL client.
 
@@ -168,14 +213,6 @@ def cli() -> None:
     pass
 
 
-# ADD ALL COMMANDS TO THE CLI
-for group in GROUPS:
-    for name, cmd in group["commands"].items():
-        cli.add_command(cmd=cmd, name=name)
-# Add dev
-# cli.add_command(cli_dev)
-
-
 ################################
 #
 # RICH CLICK CONFIG
@@ -184,26 +221,20 @@ for group in GROUPS:
 ################################
 
 # RICH-CLICK CONFIGURATION
-set_rich_click_style()
+# set_rich_click_style()
 
-## Convert GROUPS and SUBROUPS to the format expected by rich-click, and submit the ordering and groups so they are shown in the terminal (--help).
-command_groups = [
-    {
-        "name": group["name"],
-        "commands": list(group["commands"].keys()),
-    }
-    for group in GROUPS
-]
+# Actually use GROUPS to show the commands in the terminal in the right order.
+# We do some tweaking of SUBROUPS, so that they are also shown in their corresponding subcommands (`etlcli d --help` and `etlcli b --help`).
 commands_subgroups = {
-    f"etlcli {subgroup['alias']}": [
+    f"etlcli {alias}": [
         {
             "name": "Commands",
             "commands": list(subgroup["commands"].keys()),
         }
     ]
-    for subgroup in SUBGROUPS
+    for alias, subgroup in SUBGROUPS.items()
 }
 click.rich_click.COMMAND_GROUPS = {
-    "etlcli": command_groups,
+    "etlcli": GROUPS,
     **commands_subgroups,
 }

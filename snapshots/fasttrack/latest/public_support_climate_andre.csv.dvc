@@ -1,0 +1,21 @@
+meta:
+  origin:
+    producer: Andre et al. (2024). Globally representative evidence on the actual
+      and perceived support for climate action.
+    title: public_support_climate_andre
+    citation_full: |-
+      Andre, P., Boneva, T., Chopra, F., & Falk, A. (2024). Globally representative evidence on the actual and perceived support for climate action. Nature Climate Change.
+    version_producer: Google Sheet
+    url_main: https://www.nature.com/articles/s41558-024-01925-3
+    url_download: |-
+      https://docs.google.com/spreadsheets/d/e/2PACX-1vSc878GqcwLNRM1f_Y-SKsj5e0IPWd4vA8w21hwUNgavs_oOkWLztgC_31bAYgKGmQ3tiS1zm7SnOS-/pub?output=csv
+    date_accessed: '2024-02-18'
+  name: Public support for climate action (Andre et al, 2024)
+  description: |-
+    The share of populations across the world that support climate action, and would be willing to give 1% of their income to it.
+  license: {}
+wdir: ../../../data/snapshots/fasttrack/latest
+outs:
+- md5: 503e4ae64eb01c2e65110e5d52737635
+  size: 4399
+  path: public_support_climate_andre.csv
