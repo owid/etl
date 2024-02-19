@@ -42,9 +42,6 @@ def run(dest_dir: str) -> None:
 
     # Create a date column
     grouped_tb["date"] = pd.to_datetime(grouped_tb["year"].astype(str) + "-" + grouped_tb["month"].astype(str) + "-01")
-    # Create a variable with days since column
-    grouped_tb["days_since_2000"] = (grouped_tb["date"] - pd.to_datetime("2000-01-01")).dt.days
-    grouped_tb = grouped_tb.drop(columns=["date"])
 
     aggregations = {
         "forest": "sum",
@@ -61,8 +58,17 @@ def run(dest_dir: str) -> None:
         ds_regions=ds_regions,
         ds_income_groups=ds_income_groups,
         min_num_values_per_year=1,
-        year_col="year",
+        year_col="date",
     )
+
+    # Create a variable with days since column
+    grouped_tb["days_since_2000"] = (grouped_tb["date"] - pd.to_datetime("2000-01-01")).dt.days
+    # Make sure there are no NaN values in 'year' and 'month' columns after aggregations
+    grouped_tb["year"] = grouped_tb["date"].dt.year
+    grouped_tb["month"] = grouped_tb["date"].dt.month
+
+    grouped_tb = grouped_tb.drop(columns=["date"])
+
     grouped_tb["all"] = grouped_tb[["forest", "savannas", "shrublands_grasslands", "croplands", "other"]].sum(axis=1)
 
     grouped_tb = grouped_tb.set_index(["country", "year", "month", "days_since_2000"], verify_integrity=True)
