@@ -183,7 +183,7 @@ def main_cli(
 
     # Reference
     """
-
+    return None
     _update_open_file_limit()
 
     # enable grapher channel when called with --grapher
