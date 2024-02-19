@@ -5,6 +5,9 @@ import streamlit as st
 from st_pages import add_indentation
 
 from apps.utils import run_command
+from apps.wizard import utils as wizard_utils
+
+wizard_utils.enable_bugsnag_for_streamlit()
 
 CURRENT_DIR = Path(__file__).resolve().parent
 add_indentation()
