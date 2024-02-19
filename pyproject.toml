@@ -5,31 +5,13 @@ description = ""
 authors = ["Our World in Data <tech@ourworldindata.org>"]
 
 [tool.poetry.scripts]
-etl = 'etl.command:main_cli'
-reindex = 'etl.reindex:reindex_cli'
-publish = 'etl.publish:publish_cli'
-prune = 'etl.prune:prune_cli'
-backport = 'apps.backport.backport:backport_cli'
-bulk_backport = 'apps.backport.bulk_backport:bulk_backport'
-backport-migrate = 'apps.backport.migrate.migrate:cli'
-backport-fasttrack = 'apps.backport.fasttrack_backport:cli'
-fasttrack = 'apps.fasttrack.cli:cli'
-run_python_step = 'etl.run_python_step:main'
-compare = 'etl.compare:cli'
-generate_graph = 'etl.to_graphviz:to_graphviz'
-version_tracker = 'etl.version_tracker:run_version_tracker_checks'
-etl-harmonize = 'etl.harmonize:harmonize'
-etl-match-variables = 'etl.match_variables:main_cli'
-etl-translate-varmap = 'etl.variable_mapping_translate:main_cli'
-etl-chart-suggester = 'etl.chart_revision.cli:main_cli'
-etl-metadata-export = 'etl.metadata_export:cli'
-etl-metadata-migrate = 'apps.metadata_migrate.cli:cli'
-etl-datadiff = 'etl.datadiff:cli'
-etl-chartgpt = 'etl.chart_revision.v2.chartgpt:cli'
+etlcli = 'apps.cli:cli'
+etlwiz = 'apps.wizard.cli:cli'
 etl-wizard = 'apps.wizard.cli:cli'
-etl-staging-sync = 'apps.staging_sync.cli:cli'
-etl-staging-sync-app = 'apps.staging_sync.app:cli'
-etl-metagpt = 'apps.metagpt.cli:main'
+etl = 'etl.command:main_cli'
+fasttrack = 'apps.fasttrack.cli:cli'
+compare = 'etl.compare:cli'
+backport = 'apps.backport.backport:backport_cli'
 etl-step-update = 'apps.step_update.cli:cli'
 
 [tool.poetry.dependencies]
@@ -58,7 +40,7 @@ structlog = ">=21.5.0"
 sqlmodel = "^0.0.6"
 rich = ">=12.1.0"
 owid-datautils = {path = "lib/datautils", develop = true}
-rich-click = ">=1.5.1"
+rich-click = ">=1.7.3"
 tenacity = ">=8.0.1"
 simplejson = ">=3.17.6"
 bugsnag = ">=4.2.1"

@@ -10,13 +10,14 @@
 #
 # Your app should have the following properties:
 # - title (str): Title of the app. This will be shown in the home page and sidebar menu of Wizard.
-# - alias (str): [not needed in etl.steps] Alias of the app. This is used if you want to directly access the app from the command line (e.g. `etl-wizard [alias]`).
+# - alias (str): [not needed in etl.steps] Alias of the app. This is used if you want to directly access the app from the command line (e.g. `etlwiz [alias]`).
 # - description (str): Description of the app. This will be shown in the card of the app in the home page of Wizard.
 # - maintenaner (str): Slack handle of the person responsible for the app.
 # - entrypoint (str): Path to the main file of the app. This file should be the streamlit python script.
 # - emoji (str): Emoji to show in the sidebar menu.
-# - enabled (bool): Whether the app is enabled or not. If it's not enabled, it won't be shown at all.
+# - enabled (bool): Whether the app is enabled or not. If it's not enabled, it won't be shown at all. Default is True.
 # - image_url (str): Link to the image you want to show on the card in the home page of Wizard.
+# - disable_on_remote (bool): Whether the app is disabled in remote settings. To detect if the app is running in a remote setting, it checks the value of the environment variable `WIZARD_IS_REMOTE`. If it's set to `True`, the app will be disabled and overwrites the value of `enabled`. Set to "False" by default.
 
 etl:
   title: ETL steps
@@ -27,21 +28,25 @@ etl:
       entrypoint: etl_steps/snapshot.py
       emoji: "1️⃣"
       image_url: "https://cdn.pixabay.com/photo/2014/10/16/09/15/lens-490806_1280.jpg"
+      disable_on_remote: True
     meadow:
       title: "Meadow"
       entrypoint: etl_steps/meadow.py
       emoji: "2️⃣"
       image_url: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Blumenwiese_bei_Obermaiselstein05.jpg/1024px-Blumenwiese_bei_Obermaiselstein05.jpg"
+      disable_on_remote: True
     garden:
       title: "Garden"
       entrypoint: etl_steps/garden.py
       emoji: "3️⃣"
       image_url: "https://upload.wikimedia.org/wikipedia/commons/2/27/Butchart_gardens.JPG"
+      disable_on_remote: True
     grapher:
       title: "Grapher"
       entrypoint: etl_steps/grapher.py
       emoji: "4️⃣"
       image_url: "https://pbs.twimg.com/media/EbHwdjwUcAEfen4?format=jpg&name=large"
+      disable_on_remote: True
     fasttrack:
       title: "Fast Track"
       alias: fasttrack
@@ -80,6 +85,7 @@ sections:
       emoji: "🌟"
       alias: metagpt
       image_url: "https://cdn.pixabay.com/photo/2016/12/04/18/58/instagram-1882329_1280.png"
+      disable_on_remote: True
     - title: "Meta Expert"
       alias: expert
       description: "Ask chat GPT about our metadata."
@@ -94,6 +100,7 @@ sections:
       entrypoint: pages/metaplay.py
       emoji: "🏐"
       image_url: "https://upload.wikimedia.org/wikipedia/commons/d/d4/PlayEquipComboPlastic_wb.jpg"
+      disable_on_remote: True
 
   - title: "Others"
     description: |-
@@ -113,5 +120,3 @@ sections:
         entrypoint: pages/harmonizer.py
         emoji: "🎶"
         image_url: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/C_triad.svg/2560px-C_triad.svg.png"
-
-

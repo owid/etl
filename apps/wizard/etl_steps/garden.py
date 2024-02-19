@@ -9,6 +9,7 @@ from st_pages import add_indentation
 from typing_extensions import Self
 
 import etl.grapher_model as gm
+from apps.utils.files import add_to_dag, generate_step_to_channel
 from apps.wizard import utils
 from etl.db import get_session
 from etl.files import ruamel_dump, ruamel_load
@@ -130,7 +131,7 @@ def _check_dataset_in_meadow(form: GardenForm) -> None:
 def _fill_dummy_metadata_yaml(metadata_path: Path) -> None:
     """Fill dummy metadata yaml file with some dummy values.
 
-    Only useful when `--dummy-data` is used. We need this to avoid errors in `etl-wizard grapher --dummy-data`.
+    Only useful when `--dummy-data` is used. We need this to avoid errors in `etlwiz grapher --dummy-data`.
     """
     with open(metadata_path, "r") as f:
         doc = ruamel_load(f)
@@ -362,7 +363,7 @@ if submitted:
         dag_path = DAG_DIR / form.dag_file
         if form.add_to_dag:
             deps = [f"data{private_suffix}://meadow/{form.namespace}/{form.meadow_version}/{form.short_name}"]
-            dag_content = utils.add_to_dag(
+            dag_content = add_to_dag(
                 dag={f"data{private_suffix}://garden/{form.namespace}/{form.version}/{form.short_name}": deps},
                 dag_path=dag_path,
             )
@@ -379,7 +380,7 @@ if submitted:
         else:
             form_dict["topic_tags"] = "- " + "\n- ".join(form_dict["topic_tags"])
 
-        DATASET_DIR = utils.generate_step_to_channel(
+        DATASET_DIR = generate_step_to_channel(
             cookiecutter_path=utils.COOKIE_GARDEN, data=dict(**form_dict, channel="garden")
         )
 
@@ -413,7 +414,7 @@ if submitted:
             st.markdown("####  1. Harmonize Country names")
             st.markdown("Run it in your terminal:")
             st.code(
-                f"poetry run etl-harmonize data/meadow/{form.namespace}/{form.meadow_version}/{form.short_name}/{form.short_name}.feather country etl/steps/data/garden/{form.namespace}/{form.version}/{form.short_name}.countries.json",
+                f"poetry run etlcli harmonize data/meadow/{form.namespace}/{form.meadow_version}/{form.short_name}/{form.short_name}.feather country etl/steps/data/garden/{form.namespace}/{form.version}/{form.short_name}.countries.json",
                 "bash",
             )
             st.markdown("Or run it on Wizard")
@@ -453,7 +454,7 @@ if submitted:
                 with st.container(border=True):
                     st.markdown("Alternitavely you can generate the metadata with the following command:")
                     st.code(
-                        f"poetry run etl-metadata-export {st.session_state['garden.dataset_path']}",
+                        f"poetry run etlcli metadata-export {st.session_state['garden.dataset_path']}",
                         "bash",
                     )
 

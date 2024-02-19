@@ -4,18 +4,30 @@
 
 from typing import Optional
 
-import click
+import rich_click as click
 
 from etl.steps import filter_to_subgraph, load_dag
 
 
 @click.command()
 @click.argument("output_file")
-@click.option("--filter", help="Filter the DAG by regex")
-@click.option("--targets", help="Show target nodes", is_flag=True, default=False)
+@click.option(
+    "--filter",
+    help="Filter the DAG by regex",
+)
+@click.option(
+    "--targets",
+    help="Show target nodes.",
+    is_flag=True,
+    default=False,
+)
 def to_graphviz(output_file: str, filter: Optional[str] = None, targets: bool = False) -> None:
-    """
-    Generate a DOT file that can be rendered by Graphviz to see all dependencies.
+    """Generate a [Graphviz DOT file](https://graphviz.org/doc/info/lang.html) to see all dependencies.
+
+    # Description
+    Saves the output as a file in `OUTPUT_PATH`.
+
+    # Reference
     """
     dag = load_dag()
     if filter:

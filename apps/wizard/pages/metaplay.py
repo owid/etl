@@ -23,6 +23,7 @@ add_indentation()
 # st.title("🏐 Metadata playground")
 st.title("Metadata  🏐 **:gray[Playground]**")
 st.markdown("Visualise how the metadata fields in the YAML files are shown in data pages.")
+st.warning("This tool is currently not maintained. Please use it with caution.")
 DUMMY = str(st.selectbox("Choose ETL step to play with", ["dummy_full", "dummy"], index=0))
 
 # Current directory

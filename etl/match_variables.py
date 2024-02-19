@@ -1,20 +1,10 @@
-"""Match variable IDs from and old version of a dataset to the analogous variables in the new version of the dataset.
-
-After a dataset has been uploaded to OWID's MySQL database, we need to pair new variable IDs with the old ones,
-so that all graphs update properly. If the variable names are identical, the task is trivial: find indexes of old
-variables and map them to the indexes of the identical variables in the new dataset.
-However, if variable names have changed (or the number of variables have changed) the pairing may need to be done
-manually. This script is a CLI tool that may help in either scenario.
-
-"""
-
 import json
 import os
 from pathlib import Path
 from typing import Any, Dict, List, Tuple, Union, cast
 
-import click
 import pandas as pd
+import rich_click as click
 from rapidfuzz import fuzz
 
 from etl import db
@@ -99,6 +89,16 @@ def main_cli(
     similarity_name: str,
     max_suggestions: int,
 ) -> None:
+    """Match variable IDs from an old dataset to a new dataset's.
+
+    # Description
+    After a dataset has been uploaded to OWID's MySQL database, we need to pair new variable IDs with the old ones,
+    so that all graphs update properly.
+
+    If the variable names are identical, the task is trivial: find indexes of old variables and map them to the indexes of the identical variables in the new dataset. However, if variable names have changed (or the number of variables have changed) the pairing may need to be done manually. This CLI helps in either scenario.
+
+    # Reference
+    """
     main(
         old_dataset_name=old_dataset_name,
         new_dataset_name=new_dataset_name,

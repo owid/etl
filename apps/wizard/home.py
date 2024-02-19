@@ -28,7 +28,7 @@ default_styles = {
         "padding": "0",
         "margin": "0",
         "font-size": ".8rem",
-        # "font-family": "Helvetica",
+        "font-family": "Helvetica",
     }
 }
 
@@ -70,36 +70,40 @@ pages = [
         "image_url": steps[step]["image_url"],
     }
     for step in ["snapshot", "meadow", "garden", "grapher"]
+    if steps[step]["enable"]
 ]
-columns = st.columns(len(pages))
-for i, page in enumerate(pages):
-    with columns[i]:
-        create_card(**page)
+if len(pages) > 0:
+    columns = st.columns(len(pages))
+    for i, page in enumerate(pages):
+        with columns[i]:
+            create_card(**page)
 # 2/ FAST TRACK
-create_card(
-    title=steps["fasttrack"]["title"],
-    image_url=steps["fasttrack"]["image_url"],
-    custom_styles={"height": "50px"},
-)
+if steps["fasttrack"]["enable"]:
+    create_card(
+        title=steps["fasttrack"]["title"],
+        image_url=steps["fasttrack"]["image_url"],
+        custom_styles={"height": "50px"},
+    )
 
 
 #########################
-# OTHER TOOLS
+# Sections
 #########################
 for section in WIZARD_CONFIG["sections"]:
     st.markdown(f"## {section['title']}")
     st.markdown(section["description"])
-    apps = section["apps"]
+    apps = [app for app in section["apps"] if app["enable"]]
     columns = st.columns(len(apps))
-    for i, app in enumerate(section["apps"]):
+    for i, app in enumerate(apps):
         text = [
             app["description"],
         ]
         # if "maintainer" in app:
         #     text.append(f"maintainer: {app['maintainer']}")
-        with columns[i]:
-            create_card(
-                title=app["title"],
-                image_url=app["image_url"],
-                text=text,
-            )
+        if app["enable"]:
+            with columns[i]:
+                create_card(
+                    title=app["title"],
+                    image_url=app["image_url"],
+                    text=text,
+                )

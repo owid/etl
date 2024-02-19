@@ -14,8 +14,8 @@ from typing import Any, Dict, Iterator, Optional, cast
 from urllib.error import HTTPError
 
 import boto3
-import click
 import pandas as pd
+import rich_click as click
 from botocore.client import ClientError
 from botocore.config import Config
 from owid.catalog import CHANNEL, LocalCatalog
@@ -33,20 +33,38 @@ class CannotPublish(Exception):
 
 
 @click.command()
-@click.option("--dry-run", is_flag=True, default=False)
-@click.option("--private", is_flag=True, default=False)
-@click.option("--bucket", type=str, help="Bucket name", default=config.R2_BUCKET)
+@click.option(
+    "--dry-run",
+    is_flag=True,
+    default=False,
+    help="Preview the datasets to sync without actually publishing them.",
+)
+@click.option(
+    "--private",
+    "-p",
+    is_flag=True,
+    default=False,
+    help="Publish private catalog.",
+)
+@click.option(
+    "--bucket",
+    "-b",
+    type=str,
+    help="Bucket name.",
+    default=config.R2_BUCKET,
+)
 @click.option(
     "--channel",
     "-c",
     multiple=True,
     type=click.Choice(CHANNEL.__args__),
     default=CHANNEL.__args__,
-    help="Publish only selected channel (subfolder of data/), push all by default",
+    help="Publish only selected channel (subfolder of data/), push all by default.",
 )
 def publish_cli(dry_run: bool, private: bool, bucket: str, channel: Iterable[CHANNEL]) -> None:
-    """
-    Publish the generated data catalog to S3.
+    """Publish the generated data catalog to S3.
+
+    # Reference
     """
     return publish(
         dry_run=dry_run,

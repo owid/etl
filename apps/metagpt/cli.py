@@ -11,7 +11,7 @@ from typing_extensions import Self
 
 from apps.metagpt.prompts import create_query_data_step, create_query_snapshot
 from apps.metagpt.utils import Channels, convert_list_to_dict, read_metadata_file
-from apps.wizard.utils.gpt import MODEL_DEFAULT, GPTResponse, OpenAIWrapper
+from apps.utils.gpt import MODEL_DEFAULT, GPTResponse, OpenAIWrapper
 from etl.files import yaml_dump
 
 # Fields to ask GPT for (garden, grapher)
@@ -29,8 +29,18 @@ log = structlog.get_logger()
 
 # Main CLI command setup with Click
 @click.command(cls=RichCommand)
-@click.option("--path-to-file", prompt=True, type=str, help="Path to the metadata file.")
-@click.option("--output-dir", default=None, type=str, help="Path to save the new metadata file.")
+@click.option(
+    "--path-to-file",
+    prompt=True,
+    type=str,
+    help="Path to the metadata file.",
+)
+@click.option(
+    "--output-dir",
+    default=None,
+    type=str,
+    help="Path to save the new metadata file.",
+)
 @click.option(
     "--overwrite",
     default=False,
@@ -39,9 +49,12 @@ log = structlog.get_logger()
 )
 @click.option("--model", default=MODEL_DEFAULT, type=str, help="Name of the model.")
 def main(path_to_file: str, output_dir: str, overwrite: bool, model: str) -> None:
-    """Process and update metadata using GPT-based tool.
+    """Process and update metadata using chatGPT tool.
 
-    To learn more about the behaviour of this tool, please refer to https://docs.owid.io/projects/etl/architecture/metadata/.
+    # Description
+    You can learn more about this tool in our [official documentation](https://docs.owid.io/projects/etl/architecture/metadata/).
+
+    # Reference
     """
     log.info("Starting metadata update process.")
 

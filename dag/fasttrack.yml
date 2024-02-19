@@ -132,3 +132,5 @@ steps:
     - snapshot://fasttrack/latest/public_support_climate_vlasceanu.csv
   data://grapher/fasttrack/2023-05-03/qubits:
     - snapshot://fasttrack/2023-05-03/qubits.csv
+  data://grapher/fasttrack/latest/completeness_disaster_emdat:
+    - snapshot://fasttrack/latest/completeness_disaster_emdat.csv

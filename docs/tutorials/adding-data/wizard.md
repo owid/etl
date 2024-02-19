@@ -21,10 +21,10 @@ The Wizard currently supports the following stages:
 
 Find more details with **`--help`**:
 ```bash
-$ etl-wizard --help
+$ etlwiz --help
 2023-09-14 12:43:39.395 WARNING streamlit.runtime.caching.cache_data_api: No runtime found, using MemoryCacheStorageManager
 
- Usage: etl-wizard [OPTIONS] [[all|snapshot|meadow|garden|grapher|charts]]
+ Usage: etlwiz [OPTIONS] [[all|snapshot|meadow|garden|grapher|charts]]
 
  Generate template fo each step of ETL.
 
@@ -45,7 +45,7 @@ have implemented the step.**
 Just start by running
 
 ```bash
-poetry run etl-wizard
+poetry run etlwiz
 ```
 
 and going to [localhost:8053](localhost:8053). You can create all the steps from there.

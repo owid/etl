@@ -2,8 +2,8 @@ import datetime as dt
 import json
 from typing import Any, List, Optional
 
-import click
 import pandas as pd
+import rich_click as click
 import structlog
 from git.exc import GitCommandError
 from git.repo import Repo
@@ -31,7 +31,7 @@ config.enable_bugsnag()
 log = structlog.get_logger()
 
 
-@click.command()
+@click.command(deprecated=True)
 @click.option("--dataset-id", type=int, required=True)
 @click.option(
     "--force/--no-force",
@@ -64,6 +64,10 @@ def backport_cli(
     upload: bool = True,
     data_metadata: bool = False,
 ) -> None:
+    """Bakcport datasets.
+
+    # Reference
+    """
     return backport(
         dataset_id=dataset_id,
         force=force,
@@ -307,7 +311,7 @@ def _snapshot_values_metadata(ds: gm.Dataset, short_name: str, public: bool) -> 
             published_by="Our World in Data catalog backport",
             url=f"https://owid.cloud/admin/datasets/{ds.id}",
             publication_date="latest",
-            date_accessed=dt.datetime.utcnow(),
+            date_accessed=dt.datetime.utcnow(),  # type: ignore
         ),
         file_extension="feather",
         is_public=public,
