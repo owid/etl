@@ -1,0 +1,15 @@
+dataset:
+  title: Completeness of disaster data (EM-DAT, 2022)
+  description: |-
+    The share of disaster events in the EM-DAT database with missing data for a given metric. This is measured over the period from 1990 to 2020.
+  licenses:
+    - {}
+tables:
+  completeness_disaster_emdat:
+    variables:
+      share_events_missing_data:
+        title: Share of disaster events with missing data
+        unit: '%'
+        short_unit: '%'
+        description: |-
+          The share of disaster events in the EM-DAT database with missing data for a given metric. This is measured over the period from 1990 to 2020.
