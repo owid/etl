@@ -61,7 +61,7 @@ def run(dest_dir: str) -> None:
         ds_regions=ds_regions,
         ds_income_groups=ds_income_groups,
         min_num_values_per_year=1,
-        year_col="days_since_2000",
+        year_col="year",
     )
     grouped_tb["all"] = grouped_tb[["forest", "savannas", "shrublands_grasslands", "croplands", "other"]].sum(axis=1)
 
