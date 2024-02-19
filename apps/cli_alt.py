@@ -211,7 +211,7 @@ class LazyGroup(click.RichGroup):
         "prune": "etl.prune.prune_cli",
         "publish": "etl.publish.publish_cli",
         "reindex": "etl.reindex.reindex_cli",
-        "run-python-step": "etl.run_python_step.main",
+        "run-python-step": "",
         "metadata-export": "etl.metadata_export.cli",
         "metadata-migrate": "apps.metadata_migrate.cli.cli",
         "metadata-upgrade": "apps.metagpt.cli.main",
