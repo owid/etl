@@ -26,20 +26,20 @@ tables:
     # http://docs.owid.io/projects/etl/architecture/metadata/reference/indicator/
     variables:
       forest:
-        title: Monthly burned area in forests
+        title: Monthly burned area across forests
 
       savannas:
-        title: Monthly burned area in savannas
+        title: Monthly burned area across savannas
 
       shrublands_grasslands:
-        title: Monthly burned area in shrublands and grasslands
+        title: Monthly burned area across shrublands and grasslands
 
       croplands:
-        title: Monthly burned area in cropland
+        title: Monthly burned area across croplands
 
       other:
-        title: Monthly burned area in other land
+        title: Monthly burned area across other land categories
 
       all:
-        title: Monthly burned area in all land
+        title: Monthly burned area across all land types
 

@@ -9,3 +9,36 @@ definitions:
       yearIsDay: false
     short_unit: ha
     unit: hectares
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
+dataset:
+  update_period_days: 365
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
+tables:
+  monthly_burned_area:
+    # Learn more about the available fields:
+    # http://docs.owid.io/projects/etl/architecture/metadata/reference/indicator/
+    variables:
+      forest:
+        title: Yearly burned area across forests
+
+      savannas:
+        title: Yearly burned area across savannas
+
+      shrublands_grasslands:
+        title: Yearly burned area across shrublands and grasslands
+
+      croplands:
+        title: Yearly burned area across croplands
+
+      other:
+        title: Yearly burned area across other land categories
+
+      all:
+        title: Yearly burned area across all land types
+

@@ -33,7 +33,6 @@ def run(dest_dir: str) -> None:
         .sum()
         .reset_index()
     )
-    print(grouped_tb)
 
     #  Use the days since colimn instead of year and month for grapher
     grouped_tb = grouped_tb.set_index(["country", "year"], verify_integrity=True)
