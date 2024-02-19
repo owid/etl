@@ -61,7 +61,7 @@ def cli(
     ## Example
 
     ```
-    ENV=.env.live etlcli b fasttrack --dataset-id 5546 --short-name democracy_lexical_index --no-backport
+    ENV=.env.live etl b fasttrack --dataset-id 5546 --short-name democracy_lexical_index --no-backport
     ```
 
     # Reference

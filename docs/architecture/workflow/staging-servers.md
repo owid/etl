@@ -22,14 +22,14 @@ sequenceDiagram
     SSB -->>- SSB: Bake & run ETL
     PR ->> SSB: Merge PR
     Note right of PR: Schedule Destruction in 1 day
-    SSB ->> live: etlcli chart-sync
+    SSB ->> live: etl chart-sync
     Note left of live: Sync all charts
     PR ->> SSB: Destroy server
 ```
 
 ## Staging Sync Workflow
 
-Once the work is merged, data manager should run `etlcli chart-sync` to migrate all charts to the live site. This command will sync all charts from staging to live as either draft charts or revisions.
+Once the work is merged, data manager should run `etl chart-sync` to migrate all charts to the live site. This command will sync all charts from staging to live as either draft charts or revisions.
 
 ```mermaid
 sequenceDiagram

@@ -53,7 +53,7 @@ class LazyGroup(click.RichGroup):
 #
 # SUBGROUPS
 #
-# Configuration of the subcommands `etlcli d` (development) and `etlcli b` (backport).
+# Configuration of the subcommands `etl d` (development) and `etl b` (backport).
 # We define it first because we need to reference it later.
 #
 # You can edit `SUBGROUPS` to add new subgroups!
@@ -100,7 +100,7 @@ def cli_dev() -> None:
 
 # Backport
 @click.group(
-    name="etlcli",
+    name="etl",
     context_settings=dict(show_default=True),
     cls=LazyGroup,
     lazy_subcommands=SUBGROUPS["b"]["commands"],
@@ -110,7 +110,7 @@ def cli_back() -> None:
     pass
 
 
-# Create `subgroups` list, to be used to display commands in `etlcli --help`
+# Create `subgroups` list, to be used to display commands in `etl --help`
 subgroups = []
 for alias, props in SUBGROUPS.items():
     subgroups.append(
@@ -126,7 +126,7 @@ for alias, props in SUBGROUPS.items():
 ################################################################
 #
 # MAIN CLIENT
-# Configuration of the command `etlcli`.
+# Configuration of the command `etl`.
 #
 # You can edit `GROUPS` to add new commands!
 #
@@ -198,7 +198,7 @@ for group in GROUPS:
 
 
 @click.group(
-    name="etlcli",
+    name="etl",
     context_settings=dict(show_default=True),
     cls=LazyGroup,
     lazy_subcommands=lazy_cmds,  # {k: v for group in GROUPS for k, v in group["commands"].items()},
@@ -224,9 +224,9 @@ def cli() -> None:
 # set_rich_click_style()
 
 # Actually use GROUPS to show the commands in the terminal in the right order.
-# We do some tweaking of SUBROUPS, so that they are also shown in their corresponding subcommands (`etlcli d --help` and `etlcli b --help`).
+# We do some tweaking of SUBROUPS, so that they are also shown in their corresponding subcommands (`etl d --help` and `etl b --help`).
 commands_subgroups = {
-    f"etlcli {alias}": [
+    f"etl {alias}": [
         {
             "name": "Commands",
             "commands": list(subgroup["commands"].keys()),
@@ -235,6 +235,6 @@ commands_subgroups = {
     for alias, subgroup in SUBGROUPS.items()
 }
 click.rich_click.COMMAND_GROUPS = {
-    "etlcli": GROUPS,
+    "etl": GROUPS,
     **commands_subgroups,
 }

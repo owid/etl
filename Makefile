@@ -108,15 +108,15 @@ lab: .venv
 
 publish: etl reindex
 	@echo '==> Publishing the catalog'
-	poetry run etlcli d publish --private
+	poetry run etl d publish --private
 
 reindex: .venv
 	@echo '==> Creating a catalog index'
-	poetry run etlcli d reindex
+	poetry run etl d reindex
 
 prune: .venv
 	@echo '==> Prune datasets with no recipe from catalog'
-	poetry run etlcli d prune
+	poetry run etl d prune
 
 grapher: .venv
 	@echo '==> Running full etl with grapher upsert'
@@ -125,7 +125,7 @@ grapher: .venv
 dot: dependencies.pdf
 
 dependencies.pdf: .venv dag/main.yml etl/to_graphviz.py
-	poetry run etlcli graphviz dependencies.dot
+	poetry run etl graphviz dependencies.dot
 	dot -Tpdf dependencies.dot >$@.tmp
 	mv -f $@.tmp $@
 
@@ -135,7 +135,7 @@ deploy:
 
 version-tracker: .venv
 	@echo '==> Check that no archive dataset is used by an active dataset, and that all active datasets are used'
-	poetry run etlcli d version-tracker
+	poetry run etl d version-tracker
 
 api: .venv
 	@echo '==> Starting ETL API on http://localhost:8081/api/v1/indicators'

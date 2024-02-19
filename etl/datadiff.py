@@ -296,7 +296,7 @@ def cli(
 
     This tool is useful as a quick way to see what has changed in the catalog and whether our updates don't have any unexpected side effects.
 
-    **Note:** This command differs from `etlcli compare` in that it compares _all_ the datasets and not two specific ones.
+    **Note:** This command differs from `etl compare` in that it compares _all_ the datasets and not two specific ones.
 
     ## Other considerations
     **How does it works?**
@@ -308,13 +308,13 @@ def cli(
     **Example 1:** Compare the remote catalog with a local one
 
     ```
-    $ etlcli diff REMOTE data/ --include maddison
+    $ etl diff REMOTE data/ --include maddison
     ```
 
     **Example 2:** Compare two local catalogs
 
     ```
-    $ etlcli diff other-data/ data/ --include maddison
+    $ etl diff other-data/ data/ --include maddison
     ```
     # Reference
     """
