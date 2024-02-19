@@ -32,6 +32,11 @@ def write_to_dag_file(
     if comments is None:
         comments = {}
 
+    for step in comments:
+        if len(comments[step]) > 0 and comments[step][-1] != "\n":
+            # Ensure all comments end in a line break, otherwise add it.
+            comments[step] = comments[step] + "\n"
+
     # Read the lines in the original dag file.
     with open(dag_file, "r") as file:
         lines = file.readlines()
@@ -93,7 +98,9 @@ def write_to_dag_file(
             # Add the comment for this step, if any was given.
             if step in comments:
                 updated_lines.append(
-                    " " * indent_step + ("\n" + " " * indent_step).join(comments[step].split("\n")) + "\n"
+                    " " * indent_step + ("\n" + " " * indent_step).join(comments[step].split("\n")[:-1]) + "\n"
+                    if len(comments[step]) > 0
+                    else ""
                 )
             # Add the step itself.
             updated_lines.append(" " * indent_step + f"{step}:\n")
@@ -219,7 +226,11 @@ class StepUpdater:
 
         # Define a header for the new step in the dag file.
         if step_header is None:
-            step_header = get_comments_above_step_in_dag(step=step, dag_file=step_info["dag_file_path"])
+            step_header = (
+                get_comments_above_step_in_dag(step=step, dag_file=step_info["dag_file_path"])
+                if step_info["dag_file_path"]
+                else ""
+            )
 
         if not self.dry_run:
             # If new folder does not exist, create it.
@@ -447,7 +458,7 @@ def get_comments_above_step_in_dag(step: str, dag_file: Path) -> str:
             header_lines = []
         elif step in line and line.strip().endswith(":"):
             # If the current line is the step, stop reading the rest of the file.
-            return "".join(header_lines)
+            return "\n".join([line.strip() for line in header_lines]) + "\n" if len(header_lines) > 0 else ""
         elif line.strip() == "":
             # If the current line is empty, ignore it.
             continue
