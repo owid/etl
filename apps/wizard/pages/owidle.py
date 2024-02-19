@@ -7,7 +7,7 @@ import geopandas as gpd
 import pandas as pd
 import plotly.express as px
 import streamlit as st
-from owid.catalog import Dataset
+from owid.catalog import Dataset, Table
 from st_pages import add_indentation
 
 from etl.paths import DATA_DIR
@@ -51,7 +51,7 @@ def load_data() -> Tuple[pd.DataFrame, gpd.GeoDataFrame, str]:
         (tb["metric"] == "population") & (tb["sex"] == "all") & (tb["age"] == "all") & (tb["variant"] == "estimates"),
         ["year", "location", "value"],
     ]
-    df = pd.DataFrame(tb)
+    # df = pd.DataFrame(tb)
 
     # Load GDP indicator
     ds_gdp = Dataset(DATA_DIR / "garden/worldbank_wdi/2023-05-29/wdi")
@@ -62,16 +62,17 @@ def load_data() -> Tuple[pd.DataFrame, gpd.GeoDataFrame, str]:
     geo = pd.read_csv(
         Path(__file__).parent / "owidle_countries.csv",
     )
+    geo = Table(geo)
 
     # Combine
-    df = df.merge(geo, left_on="location", right_on="Country", how="left")
-    df = df.merge(tb_gdp, left_on=["year", "location"], right_on=["year", "country"], how="left")
+    tb = tb.merge(geo, left_on="location", right_on="Country", how="left")
+    tb = tb.merge(tb_gdp, left_on=["year", "location"], right_on=["year", "country"], how="left")
 
     # Remove NaNs
-    df = df.dropna(subset=["Latitude", "Longitude"])
+    tb = tb.dropna(subset=["Latitude", "Longitude"])
 
     # Get indicator df
-    df_indicator = df[["year", "location", "value", "ny_gdp_pcap_pp_kd"]].rename(
+    tb_indicator = tb[["year", "location", "value", "ny_gdp_pcap_pp_kd"]].rename(
         columns={
             "value": "population",
             "ny_gdp_pcap_pp_kd": "gdp_per_capita",
@@ -80,8 +81,8 @@ def load_data() -> Tuple[pd.DataFrame, gpd.GeoDataFrame, str]:
 
     # Get geographic df
     df_geo = gpd.GeoDataFrame(
-        df,
-        geometry=gpd.points_from_xy(df.Longitude, y=df.Latitude),
+        tb,
+        geometry=gpd.points_from_xy(tb.Longitude, y=tb.Latitude),
         crs="EPSG:4326",
     )
     df_geo = df_geo[
@@ -94,9 +95,9 @@ def load_data() -> Tuple[pd.DataFrame, gpd.GeoDataFrame, str]:
 
     # Arbitrary daily solution
     seed = (dt.date.today() - dt.date(1900, 1, 1)).days
-    solution = df["location"].sample(random_state=seed).item()
+    solution = tb["location"].sample(random_state=seed).item()
 
-    return df_indicator, df_geo, solution
+    return tb_indicator, df_geo, solution
 
 
 DATA, GEO, SOLUTION = load_data()
@@ -231,17 +232,46 @@ def plot_chart_gdp_pc(countries_guessed: List[str]):
     st.plotly_chart(fig, theme=None, use_container_width=True)
 
 
+def display_metadata(metadata):
+    if not isinstance(metadata, dict):
+        metadata = metadata.to_dict()
+    ds = pd.Series(metadata).astype(str)
+    ds.name = "value"
+    st.table(data=ds)
+
+
 ##########################################
-# PLOT CHART
+# PLOT CHARTS
 ##########################################
 with st.container(border=True):
     countries_guessed = [guess["guess"] for guess in st.session_state.guesses]
     col1, col2 = st.columns(2)
     with col1:
         plot_chart_population(countries_guessed)
+        with st.expander("Sources"):
+            try:
+                metadata = DATA["population"].metadata.to_dict()
+                origins = metadata.pop("origins", None)
+                _ = metadata.pop("display", None)
+                # display_metadata(metadata)
+                if origins:
+                    for origin in origins:
+                        display_metadata(origin)
+            except Exception:
+                st.info("Metadata couldn't be accssed")
     with col2:
         plot_chart_gdp_pc(countries_guessed)
-    st.empty()
+        with st.expander("Sources"):
+            try:
+                metadata = DATA["gdp_per_capita"].metadata.to_dict()
+                origins = metadata.pop("origins", None)
+                _ = metadata.pop("display", None)
+                # display_metadata(metadata)
+                if origins:
+                    for origin in origins:
+                        display_metadata(origin)
+            except Exception:
+                st.info("Metadata couldn't be accssed")
 
 ##########################################
 # INPUT FROM USER
