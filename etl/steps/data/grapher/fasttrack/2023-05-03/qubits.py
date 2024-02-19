@@ -1,19 +1,22 @@
-import pandas as pd
-from owid import catalog
-
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder, create_dataset, get_metadata_path
 from etl.snapshot import Snapshot
 
-P = PathFinder(__file__)
+paths = PathFinder(__file__)
 
 
 def run(dest_dir: str) -> None:
     # load snapshot
-    data = pd.read_csv(Snapshot("fasttrack/2023-05-03/qubits.csv").path)
+    snap = Snapshot("fasttrack/2023-05-03/qubits.csv")
 
-    # create empty dataframe and table
-    tb = catalog.Table(data, short_name=P.short_name)
+    # load data
+    tb = snap.read_csv()
 
     # add table, update metadata from *.meta.yml and save
-    ds = create_dataset(dest_dir, tables=[tb])
+    ds = create_dataset(dest_dir, tables=[tb.set_index(["country", "year"])], default_metadata=snap.metadata)
+
+    # override metadata if necessary
+    meta_path = get_metadata_path(dest_dir).with_suffix(".override.yml")
+    if meta_path.exists():
+        ds.update_metadata(meta_path)
+
     ds.save()

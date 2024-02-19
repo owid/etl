@@ -102,7 +102,6 @@ def build_updaters_and_get_charts(
     chatgpt_reviews: bool = False,
     fastt_reduce: bool = True,
     schema_chart_config: Optional[Dict[str, Any]] = None,
-    skip_slider_check_limit: Optional[int] = None,
 ) -> Tuple[List[ChartUpdater], List[gm.Chart]]:
     """Build the list of updaters to process charts.
 
@@ -126,9 +125,6 @@ def build_updaters_and_get_charts(
         Set to True if you want to simplify the FASTT. At the moment it just removes the field "data". Defaults to True.
     schema : Optional[Dict[str, Any]]
             Schema of the chart configuration. Defaults to None.
-    skip_slider_check_limit : int
-        If the number of variables to be updated is greater than this value, the slider range check is disabled. That is, no changes to the slider are performed.
-        This is to avoid errors when updating charts with many variables. Defaults to None.
 
     Returns
     -------
@@ -143,7 +139,7 @@ def build_updaters_and_get_charts(
         updater_from_variables = ChartVariableUpdater(
             variable_mapping,
             schema=schema_chart_config,
-            skip_slider_check_limit=skip_slider_check_limit,
+            skip_slider_check_limit=-1,  # No slider check!
         )
         # Get list of charts affected
         charts = updater_from_variables.find_charts_to_be_updated()
