@@ -37,7 +37,6 @@ class CannotPublish(Exception):
     "--dry-run",
     is_flag=True,
     default=False,
-    show_default=True,
     help="Preview the datasets to sync without actually publishing them.",
 )
 @click.option(
@@ -45,7 +44,6 @@ class CannotPublish(Exception):
     "-p",
     is_flag=True,
     default=False,
-    show_default=True,
     help="Publish private catalog.",
 )
 @click.option(
@@ -54,7 +52,6 @@ class CannotPublish(Exception):
     type=str,
     help="Bucket name.",
     default=config.R2_BUCKET,
-    show_default=True,
 )
 @click.option(
     "--channel",

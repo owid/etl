@@ -43,7 +43,6 @@ custom_style_fancy = questionary.Style(
     "-i",
     required=False,
     default=None,
-    show_default=True,
     help="Append '(institution)' to countries",
 )
 @click.option(
@@ -51,7 +50,6 @@ custom_style_fancy = questionary.Style(
     "-n",
     required=False,
     default=5,
-    show_default=True,
     help="Number of suggestions to show per entity",
 )
 def harmonize(

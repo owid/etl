@@ -248,7 +248,6 @@ class RemoteDataset:
     multiple=True,
     type=click.Choice(CHANNEL.__args__),
     default=["garden", "meadow", "grapher"],
-    show_default=True,
     help="Compare only selected channel (subfolder of data/).",
 )
 @click.option(

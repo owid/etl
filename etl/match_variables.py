@@ -32,7 +32,6 @@ SIMILARITY_NAMES = {
     "-f",
     "--output-file",
     type=str,
-    show_default=True,
     help="Path to output JSON file.",
     required=True,
 )
@@ -40,7 +39,6 @@ SIMILARITY_NAMES = {
     "-old",
     "--old-dataset-name",
     type=str,
-    show_default=True,
     help="Old dataset name (as defined in grapher).",
     required=True,
 )
@@ -48,7 +46,6 @@ SIMILARITY_NAMES = {
     "-new",
     "--new-dataset-name",
     type=str,
-    show_default=True,
     help="New dataset name (as defined in grapher).",
     required=True,
 )
@@ -56,7 +53,6 @@ SIMILARITY_NAMES = {
     "-s",
     "--similarity-name",
     type=str,
-    show_default=True,
     default=SIMILARITY_NAME,
     help=(
         "Name of similarity function to use when fuzzy matching variables."
@@ -68,7 +64,6 @@ SIMILARITY_NAMES = {
     "-a",
     "--add-identical-pairs",
     is_flag=True,
-    show_default=True,
     default=False,  # TODO: we may want to change default behaviour to True
     help=(
         "If given, add variables with identical names in both datasets to the"
@@ -80,7 +75,6 @@ SIMILARITY_NAMES = {
     "-m",
     "--max-suggestions",
     type=int,
-    show_default=True,
     default=N_MAX_SUGGESTIONS,
     help=(
         "Number of suggestions to show per old variable. That is, for every old"

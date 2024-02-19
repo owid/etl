@@ -23,7 +23,6 @@ config.enable_bugsnag()
     multiple=True,
     type=click.Choice(CHANNEL.__args__),
     default=CHANNEL.__args__,
-    show_default=True,
     help="Reindex only the selected channel(s) (subfolders of data/)",
 )
 @click.option(

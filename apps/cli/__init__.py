@@ -1,6 +1,6 @@
 """ETL services CLI.
 
-If you want to add a new service, make sure to add it to the `GROUPS` list. If it is a subgroup, you can add it to the `SUBGROUPS` list.
+If you want to add a new service, make sure to add it to the `GROUPS` list. If it is part of a subgroup, add it to the corresponding subgroup in the  `SUBGROUPS` list.
 """
 import rich_click as click
 
@@ -11,6 +11,7 @@ from apps.backport.migrate.migrate import cli as cli_backport_migrate
 from apps.metadata_migrate.cli import cli as cli_metadata_migrate
 from apps.metagpt.cli import main as cli_meta_upgrader
 from apps.staging_sync.cli import cli as cli_staging_sync
+from apps.utils.style import set_rich_click_style
 from etl.chart_revision.cli import main_cli as cli_chart_revision
 from etl.chart_revision.v2.chartgpt import cli as cli_chartgpt
 
@@ -155,7 +156,7 @@ GROUPS = (
 
 # MAIN CLIENT ENTRYPOINT (no action actually)
 ## Note that the entrypoint has no action, it is just a group. The commands that fall under it do actually have actions.
-@click.group(name="etlcli")
+@click.group(name="etlcli", context_settings=dict(show_default=True))
 # @click.rich_config(help_config=help_config)
 def cli() -> None:
     """Run OWID's ETL client.
@@ -183,16 +184,7 @@ for group in GROUPS:
 ################################
 
 # RICH-CLICK CONFIGURATION
-# click.rich_click.USE_RICH_MARKUP = True
-click.rich_click.USE_MARKDOWN = True
-click.rich_click.SHOW_ARGUMENTS = True
-# click.rich_click.STYLE_HEADER_TEXT = "bold"
-# click.rich_click.GROUP_ARGUMENTS_OPTIONS = True
-# Show variable types under description
-click.rich_click.SHOW_METAVARS_COLUMN = False
-click.rich_click.APPEND_METAVARS_HELP = True
-click.rich_click.OPTION_ENVVAR_FIRST = True
-# click.rich_click.USE_CLICK_SHORT_HELP = True
+set_rich_click_style()
 
 ## Convert GROUPS and SUBROUPS to the format expected by rich-click, and submit the ordering and groups so they are shown in the terminal (--help).
 command_groups = [

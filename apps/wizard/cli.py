@@ -12,27 +12,21 @@ import rich_click as click
 import streamlit.web.cli as stcli
 from rich_click.rich_command import RichCommand
 
+from apps.utils.style import set_rich_click_style
 from apps.wizard.config import WIZARD_PHASES
 from apps.wizard.utils import CURRENT_DIR
 
 # Disable streamlit cache data API logging
 # ref: @kajarenc from https://github.com/streamlit/streamlit/issues/6620#issuecomment-1564735996
 logging.getLogger("streamlit.runtime.caching.cache_data_api").setLevel(logging.ERROR)
+
 # RICH-CLICK CONFIGURATION
-# click.rich_click.USE_RICH_MARKUP = True
-click.rich_click.USE_MARKDOWN = True
-click.rich_click.SHOW_ARGUMENTS = True
-# click.rich_click.STYLE_HEADER_TEXT = "bold"
-# click.rich_click.GROUP_ARGUMENTS_OPTIONS = True
-# Show variable types under description
-click.rich_click.SHOW_METAVARS_COLUMN = False
-click.rich_click.APPEND_METAVARS_HELP = True
-click.rich_click.OPTION_ENVVAR_FIRST = True
+set_rich_click_style()
 
 
 # NOTE: Any new arguments here need to be in sync with the arguments defined in
 # wizard.utils.APP_STATE.args property method
-@click.command(cls=RichCommand)
+@click.command(cls=RichCommand, context_settings=dict(show_default=True))
 @click.argument(
     "phase",
     type=click.Choice(WIZARD_PHASES.__args__),  # type: ignore
@@ -42,6 +36,7 @@ click.rich_click.OPTION_ENVVAR_FIRST = True
     "--run-checks/--skip-checks",
     default=True,
     type=bool,
+    show_default=True,
     help="Environment checks",
 )
 @click.option(

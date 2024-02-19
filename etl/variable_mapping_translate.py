@@ -17,7 +17,6 @@ log = structlog.get_logger()
     "-e1",
     "--env-file-1",
     type=str,
-    show_default=True,
     help=(
         "Path to the configuration file for connection 1. This file should contain all the environment variables required to connect to the SQL. Should be in the format of a .env file."
     ),
@@ -27,7 +26,6 @@ log = structlog.get_logger()
     "-e2",
     "--env-file-2",
     type=str,
-    show_default=True,
     help=(
         "Path to the configuration file for connection 2. This file should contain all the environment variables required to connect to the SQL. Should be in the format of a .env file."
     ),
@@ -37,7 +35,6 @@ log = structlog.get_logger()
     "-m1",
     "--mapping-file-1",
     type=str,
-    show_default=True,
     help=(
         "Path to the JSON file containing the variable mapping from connection 1. This file should have been previously created and curated by the user. See command `etlcli variable-match` to create this file."
     ),
@@ -47,7 +44,6 @@ log = structlog.get_logger()
     "-m2",
     "--mapping-file-2",
     type=str,
-    show_default=True,
     help="Path where to store the newly generated variable mapping from connection 2.",
     required=True,
 )

@@ -6,7 +6,6 @@
     "configurations": [
         {
             "name": "Python: bulk_packport",
-            "type": "python",
             "request": "launch",
             "program": "/home/daniel/.local/bin/poetry",
             "args": ["run", "etlcli", "b", "bulk", "--dry-run"],
