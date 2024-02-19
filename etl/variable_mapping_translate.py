@@ -36,7 +36,7 @@ log = structlog.get_logger()
     "--mapping-file-1",
     type=str,
     help=(
-        "Path to the JSON file containing the variable mapping from connection 1. This file should have been previously created and curated by the user. See command `etlcli variable-match` to create this file."
+        "Path to the JSON file containing the variable mapping from connection 1. This file should have been previously created and curated by the user. See command `etl variable-match` to create this file."
     ),
     required=True,
 )

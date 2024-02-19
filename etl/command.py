@@ -166,19 +166,19 @@ def main_cli(
     **Example 1**: Run steps matching "mars" in the DAG file:
 
     ```
-    $ etlcli run mars
+    $ etl run mars
     ```
 
     **Example 2**: Preview those steps that match "mars" or "prio" (i.e. don't run them):
 
     ```
-    $ etlcli run mars prio
+    $ etl run mars prio
     ```
 
     **Example 3**: If you only want to preview what would be executed, use the `--dry-run` flag:
 
     ```
-    $ etlcli run mars prio --dry-run
+    $ etl run mars prio --dry-run
     ```
 
     # Reference

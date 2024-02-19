@@ -55,7 +55,7 @@ def main():
         if not _is_valid_config(source, target):
             return
 
-        cmd = ["poetry", "run", "etlcli", "chart-sync", source, target]
+        cmd = ["poetry", "run", "etl", "chart-sync", source, target]
         if dry_run:
             cmd.append("--dry-run")
         if publish:

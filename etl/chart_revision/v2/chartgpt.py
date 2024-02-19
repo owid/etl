@@ -51,7 +51,7 @@ log = get_logger()
 
 # Click options
 click.rich_click.OPTION_GROUPS = {
-    "etlcli chart-gpt": [
+    "etl chart-gpt": [
         {
             "name": "Basic usage",
             "options": ["-me"],
@@ -117,7 +117,7 @@ click.rich_click.OPTION_GROUPS = {
 )
 @click.version_option(
     "0.1.0",
-    prog_name="etlcli chart-gpt",
+    prog_name="etl chart-gpt",
 )
 def cli(
     user_id: int,

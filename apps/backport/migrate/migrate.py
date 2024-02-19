@@ -98,7 +98,7 @@ def cli(
     ## Example
 
     ```
-    ENV=.env.live etlcli b migrate --dataset-id 5205 --namespace covid --short-name hospital__and__icu --no-backport
+    ENV=.env.live etl b migrate --dataset-id 5205 --namespace covid --short-name hospital__and__icu --no-backport
     ```
 
     # Reference
