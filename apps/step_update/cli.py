@@ -11,14 +11,12 @@ from rich_click.rich_command import RichCommand
 
 from etl.paths import DAG_DIR, DAG_TEMP_FILE, SNAPSHOTS_DIR, STEP_DIR
 from etl.snapshot import SnapshotMeta
-from etl.version_tracker import VersionTracker
+from etl.version_tracker import DAG_TEMP_STEP, VersionTracker
 
 log = structlog.get_logger()
 
 # If a new version is not specified, assume current date.
 STEP_VERSION_NEW = datetime.now().strftime("%Y-%m-%d")
-# TODO: Every time this script runs, it will check if any of those snapshots are already in the dag.
-#  If so, it will remove them from the dependencies of the temporary step.
 
 
 def write_to_dag_file(
@@ -120,12 +118,25 @@ def write_to_dag_file(
 
 class StepUpdater:
     def __init__(self, dry_run: bool = False):
-        # Initialize version tracker and load dataframe of all steps.
-        self.steps_df = VersionTracker().steps_df.copy()
-        # Select only active steps.
-        self.steps_df = self.steps_df[self.steps_df["state"] == "active"].reset_index(drop=True)
+        # Initialize version tracker and load dataframe of all active steps.
+        self.load_steps_df()
         # If dry_run is True, then nothing will be written to the dag, and no files will be created.
         self.dry_run = dry_run
+
+    def load_steps_df(self) -> None:
+        # This function will start a new instance of VersionTracker, and load the dataframe of all active steps.
+        # It can be used when initializing StepUpdater, but also to reload steps_df after making changes to the dag.
+
+        # Initialize version tracker.
+        tracker = VersionTracker()
+
+        # Update the temporary dag.
+        _update_temporary_dag(dag_active=tracker.dag_active, dag_all_reverse=tracker.dag_all_reverse)
+
+        # Load steps dataframe.
+        self.steps_df = tracker.steps_df.copy()
+        # Select only active steps.
+        self.steps_df = self.steps_df[self.steps_df["state"] == "active"].reset_index(drop=True)
         # For convenience, add full local path to dag files to steps dataframe.
         self.steps_df["dag_file_path"] = [
             (DAG_DIR / dag_file_name).with_suffix(".yml") if dag_file_name else None
@@ -227,7 +238,7 @@ class StepUpdater:
 
             # Add the new snapshot as a dependency of the temporary dag.
             step_temp = (
-                self.steps_df[self.steps_df["namespace"] == "temp"][["step", "direct_dependencies"]]
+                self.steps_df[self.steps_df["step"] == DAG_TEMP_STEP][["step", "direct_dependencies"]]
                 .set_index("step")
                 .to_dict()["direct_dependencies"]
             )
@@ -236,6 +247,9 @@ class StepUpdater:
             step_temp[step_temp_name] = set(step_temp[step_temp_name] + [step_new])
             # Save temporary dag.
             write_to_dag_file(dag_file=DAG_TEMP_FILE, dag_part=step_temp, comments={step_new: step_header})
+
+            # Reload steps dataframe.
+            self.load_steps_df()
 
     def update_data_step(
         self,
@@ -305,6 +319,9 @@ class StepUpdater:
             # Add new step and its dependencies to the dag.
             write_to_dag_file(dag_file=dag_file, dag_part=dag_part, comments={step_new: step_header})
 
+            # Reload steps dataframe.
+            self.load_steps_df()
+
     def update_step(
         self, step: str, step_version_new: Optional[str] = STEP_VERSION_NEW, step_header: Optional[str] = None
     ) -> None:
@@ -341,14 +358,15 @@ class StepUpdater:
 
         # Gather all steps to be updated.
         for step in steps:
-            step_df = self.steps_df[self.steps_df["step"] == step]
+            # Check that step to be updated exists in the active dag.
+            self.check_that_step_exists(step=step)
 
             if include_dependencies:
-                dependencies = step_df["direct_dependencies"].item()
+                dependencies = self.steps_df[self.steps_df["step"] == step]["direct_dependencies"].item()
                 steps += dependencies
 
             if include_usages:
-                usages = step_df["direct_usages"].item()
+                usages = self.steps_df[self.steps_df["step"] == step]["direct_usages"].item()
                 steps += usages
 
         # If step_headers is not explicitly defined, get headers for each step from their corresponding dag file.
@@ -360,12 +378,36 @@ class StepUpdater:
                     {step: get_comments_above_step_in_dag(step=step, dag_file=dag_file) if dag_file else ""}
                 )
 
-        # For convenience, sort steps by channel and then by name.
+        # Steps need to be updated hierarchically: First snapshots, then meadow, then garden, then grapher.
+        # Hence, we need to sort steps by channel.
+        # TODO: This logic is incomplete. Imagine the following partial dag:
+        #   {meadow_a: [snapshot:a], meadow_b: [snapshot_b], meadow_c: [meadow_a, meadow_b]}
+        #   We would need to update first snapshot_a and snapshot_b, then meadow_a and meadow_b, and then meadow_c.
+        #   We can try to improve sort_steps so that the order fixes these interdependencies (this logic must be similar
+        #   to the one implemented in ETL when deciding in which order to run steps). An alternative, brute-force
+        #   approach is to run update_steps infinite times until no more updates are necessary.
         steps = sort_steps(steps=steps)  # type: ignore
 
         # Update each step.
         for step in steps:
             self.update_step(step=step, step_version_new=step_version_new, step_header=step_headers[step])
+
+
+def _update_temporary_dag(dag_active, dag_all_reverse) -> None:
+    # The temporary step in the temporary dag depends on the latest version of each newly created snapshot, before
+    # they are used by any other active steps. We need to check if those snapshots are already used by active steps,
+    # and hence can be removed from the temporary dag.
+    temp_dependencies_new = set()
+    for dependency in dag_active[DAG_TEMP_STEP]:
+        # If that dependency is used only by the temporary step, that means no active step is using it yet, and
+        # hence it must stay in the temporary dag.
+        if set(dag_all_reverse[dependency]) == {DAG_TEMP_STEP}:
+            temp_dependencies_new.add(dependency)
+    # Update the content of the temporary dag.
+    write_to_dag_file(
+        dag_file=DAG_TEMP_FILE,
+        dag_part={DAG_TEMP_STEP: temp_dependencies_new},
+    )
 
 
 def _confirm_choice(multiple_files: List[Any]) -> int:

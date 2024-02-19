@@ -16,6 +16,9 @@ from etl.steps import extract_step_attributes, load_dag, reverse_graph
 
 log = structlog.get_logger()
 
+# Define the temporary step that will depend on newly created snapshots before they are used by any active steps.
+DAG_TEMP_STEP = "data-private://meadow/temp/latest/step"
+
 
 def list_all_steps_in_dag(dag: Dict[str, Any]) -> List[str]:
     """List all steps in a dag.
@@ -240,6 +243,7 @@ class VersionTracker:
     # List of steps known to be archivable, for which we don't want to see warnings.
     # We keep them in the active dag for technical reasons.
     KNOWN_ARCHIVABLE_STEPS = [
+        DAG_TEMP_STEP,
         "data://explorers/dummy/2020-01-01/dummy",
         "data://garden/dummy/2020-01-01/dummy",
         "data://garden/dummy/2020-01-01/dummy_full",
