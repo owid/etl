@@ -1,0 +1,11 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Climate Change
+    display:
+      numDecimalPlaces: 0
+      yearIsDay: false
+    short_unit: ha
+    unit: hectares

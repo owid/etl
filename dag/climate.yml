@@ -182,6 +182,8 @@ steps:
     - data://garden/regions/2023-01-01/regions
   data://grapher/climate/2024-02-19/monthly_burned_area:
     - data://garden/climate/2024-02-19/monthly_burned_area
+  data://grapher/climate/2024-02-19/yearly_burned_area:
+    - data://garden/climate/2024-02-19/monthly_burned_area
   ######################################################################################################################
 
   ######################################################################################################################
