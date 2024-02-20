@@ -127,16 +127,18 @@ def write_to_dag_file(
 
 
 class StepUpdater:
-    def __init__(self, dry_run: bool = False, interactive: bool = True):
+    def __init__(self, dry_run: bool = False, interactive: bool = True, edit_metadata: bool = False):
         # Initialize version tracker and load dataframe of all active steps.
-        self.load_version_tracker()
+        self._load_version_tracker()
         # If dry_run is True, then nothing will be written to the dag, and no files will be created.
         self.dry_run = dry_run
         # If interactive is True, then the user will be asked for confirmation before updating each step, and on
         # situations where there is some ambiguity.
         self.interactive = interactive
+        # If edit_metadata is True, the browser will open an etl-wizard snapshots page for each snapshot to be updated.
+        self.edit_metadata = edit_metadata
 
-    def load_version_tracker(self) -> None:
+    def _load_version_tracker(self) -> None:
         # This function will start a new instance of VersionTracker, and load the dataframe of all active steps.
         # It can be used when initializing StepUpdater, but also to reload steps_df after making changes to the dag.
 
@@ -174,7 +176,7 @@ class StepUpdater:
 
         return step_info
 
-    def update_snapshot_step(
+    def _update_snapshot_step(
         self,
         step: str,
         step_version_new: Optional[str] = STEP_VERSION_NEW,
@@ -239,7 +241,7 @@ class StepUpdater:
             # If new folder does not exist, create it.
             folder_new.mkdir(parents=True, exist_ok=True)
 
-            if self.interactive:
+            if self.edit_metadata:
                 # Create a new snapshot metadata file interactively, using etl-wizard.
                 _create_new_snapshot_metadata_file_interactively(
                     step_dvc_file=step_dvc_file, step_dvc_file_new=step_dvc_file_new, step_version_new=step_version_new
@@ -274,9 +276,9 @@ class StepUpdater:
             write_to_dag_file(dag_file=DAG_TEMP_FILE, dag_part=step_temp, comments={step_new: step_header})
 
             # Reload steps dataframe.
-            self.load_version_tracker()
+            self._load_version_tracker()
 
-    def update_data_step(
+    def _update_data_step(
         self,
         step: str,
         step_version_new: Optional[str] = STEP_VERSION_NEW,
@@ -345,9 +347,9 @@ class StepUpdater:
             write_to_dag_file(dag_file=dag_file, dag_part=dag_part, comments={step_new: step_header})
 
             # Reload steps dataframe.
-            self.load_version_tracker()
+            self._load_version_tracker()
 
-    def update_step(
+    def _update_step(
         self, step: str, step_version_new: Optional[str] = STEP_VERSION_NEW, step_header: Optional[str] = None
     ) -> None:
         """Update step to new version."""
@@ -360,9 +362,9 @@ class StepUpdater:
 
         log.info(f"Updating {step} to version {step_version_new}.")
         if step_channel == "snapshot":
-            self.update_snapshot_step(step=step, step_version_new=step_version_new, step_header=step_header)
-        elif step_channel in ["meadow", "garden", "grapher"]:
-            self.update_data_step(step=step, step_version_new=step_version_new, step_header=step_header)
+            self._update_snapshot_step(step=step, step_version_new=step_version_new, step_header=step_header)
+        elif step_channel in ["meadow", "garden", "grapher", "explorers"]:
+            self._update_data_step(step=step, step_version_new=step_version_new, step_header=step_header)
         else:
             log.error(f"Channel {step_channel} not yet supported.")
             sys.exit(1)
@@ -375,10 +377,12 @@ class StepUpdater:
         include_usages: bool = False,
         step_headers: Optional[Dict[str, str]] = None,
     ) -> None:
-        """Update multiple steps to new version."""
+        """Update one or more steps to their new version, if possible."""
 
         # If a single step is given, convert it to a list.
-        if isinstance(steps, str) or isinstance(steps, tuple):
+        if isinstance(steps, str):
+            steps = [steps]
+        elif isinstance(steps, tuple):
             steps = list(steps)
 
         # Gather all steps to be updated.
@@ -396,6 +400,14 @@ class StepUpdater:
                 usages = self.steps_df[self.steps_df["step"] == step]["direct_usages"].item()
                 steps += [usage for usage in usages if usage not in steps]
 
+        # Remove steps that cannot be updated because they are in their latest version,
+        # or because their version is "latest".
+        steps = [
+            step
+            for step in steps
+            if self.steps_df[self.steps_df["step"] == step]["version"].item() not in [step_version_new, "latest"]
+        ]
+
         # If step_headers is not explicitly defined, get headers for each step from their corresponding dag file.
         if step_headers is None:
             step_headers = {}
@@ -405,33 +417,36 @@ class StepUpdater:
                     {step: get_comments_above_step_in_dag(step=step, dag_file=dag_file) if dag_file else ""}
                 )
 
-        # Steps need to be updated hierarchically: First snapshots, then meadow, then garden, then grapher.
-        # Also, if a data step depends on other steps, the dependencies need to be updated first.
-        # For example, imagine the following partial dag:
-        # {meadow_a: [snapshot:a], meadow_b: [snapshot_b], meadow_c: [meadow_a, meadow_b]}
-        # We would need to update first snapshot_a and snapshot_b, then meadow_a and meadow_b, and then meadow_c.
-        # Otherwise, if we updated meadow_c before meadow_a and meadow_b, the new version of meadow_c would depend on
-        # the old versions of meadow_a and meadow_b, and the new versions of meadow_a and meadow_b would not be used.
-        # This is the same topological sorting problem we have when deciding the order of steps to be executed by etl.
-        # Therefore, we can use the same function to_dependency_order to solve it.
-        steps = to_dependency_order(
-            dag=self.tracker.dag_active,
-            includes=steps,  # type: ignore
-            excludes=[],
-            downstream=False,
-            only=True,
-        )
+        if len(steps) == 0:
+            log.info("No steps can be updated (they may be in their latest version).")
+        else:
+            # Steps need to be updated hierarchically: First snapshots, then meadow, then garden, then grapher.
+            # Also, if a data step depends on other steps, the dependencies need to be updated first.
+            # For example, imagine the following partial dag:
+            # {meadow_a: [snapshot:a], meadow_b: [snapshot_b], meadow_c: [meadow_a, meadow_b]}
+            # We would need to update first snapshot_a and snapshot_b, then meadow_a and meadow_b, and then meadow_c.
+            # Otherwise, if we updated meadow_c before meadow_a and meadow_b, the new meadow_c would depend on the old
+            # meadow_a and meadow_b, and the new meadow_a and meadow_b would not be used.
+            # This is the same topological sorting problem we have when deciding the order of steps to execute by etl.
+            # Therefore, we can use the same function to_dependency_order to solve it.
+            steps = to_dependency_order(
+                dag=self.tracker.dag_active,
+                includes=steps,  # type: ignore
+                excludes=[],
+                downstream=False,
+                only=True,
+            )
 
-        message = "The following steps will be updated:"
-        for step in steps:
-            message += f"\n  {step}"
-        log.info(message)
-        if self.interactive:
-            input("Press enter to continue.")
+            message = "The following steps will be updated:"
+            for step in steps:
+                message += f"\n  {step}"
+            log.info(message)
+            if self.interactive:
+                input("Press enter to continue.")
 
-        # Update each step.
-        for step in steps:
-            self.update_step(step=step, step_version_new=step_version_new, step_header=step_headers[step])
+            # Update each step.
+            for step in steps:
+                self._update_step(step=step, step_version_new=step_version_new, step_header=step_headers[step])
 
 
 def _create_new_snapshot_metadata_file_interactively(step_dvc_file, step_dvc_file_new, step_version_new) -> None:
@@ -544,6 +559,13 @@ def get_comments_above_step_in_dag(step: str, dag_file: Path) -> str:
     type=bool,
     help="Do not write to dag or create step files. Default: False.",
 )
+@click.option(
+    "--edit-metadata",
+    is_flag=True,
+    default=False,
+    type=bool,
+    help="Use etl-wizard to update the metadata of snapshots. Default: False.",
+)
 def cli(
     steps: Union[str, List[str]],
     step_version_new: Optional[str] = STEP_VERSION_NEW,
@@ -551,10 +573,11 @@ def cli(
     include_usages: bool = False,
     dry_run: bool = False,
     interactive: bool = True,
+    edit_metadata: bool = False,
 ) -> None:
     """TODO"""
     # Initialize step updater and run update.
-    StepUpdater(dry_run=dry_run, interactive=interactive).update_steps(
+    StepUpdater(dry_run=dry_run, interactive=interactive, edit_metadata=edit_metadata).update_steps(
         steps=steps,
         step_version_new=step_version_new,
         include_dependencies=include_dependencies,
