@@ -1,7 +1,6 @@
 import datetime as dt
 import json
 import re
-import shutil
 import tempfile
 from dataclasses import dataclass
 from pathlib import Path
@@ -73,10 +72,14 @@ class Snapshot:
             download_url = f"{config.R2_SNAPSHOTS_PUBLIC_READ}/{md5[:2]}/{md5[2:]}"
             files.download(download_url, str(self.path), progress_bar_min_bytes=2**100)
         else:
-            download_url = f"{config.R2_SNAPSHOTS_PRIVATE}/{md5[:2]}/{md5[2:]}"
+            download_url = f"s3://{config.R2_SNAPSHOTS_PRIVATE}/{md5[:2]}/{md5[2:]}"
             s3_utils.download(download_url, str(self.path))
 
-        assert checksum_file(self.path) == md5, f"Checksum mismatch for {self.path}"
+        # Check if file was downloaded correctly. This should never happen
+        if checksum_file(self.path) != md5:
+            # remove the downloaded file
+            self.path.unlink()
+            raise ValueError(f"Checksum mismatch for {self.path}")
 
     def pull(self, force=True) -> None:
         """Pull file from S3."""
