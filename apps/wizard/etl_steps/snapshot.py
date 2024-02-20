@@ -15,6 +15,7 @@ from apps.wizard import utils
 from etl.docs import examples_to_markdown, faqs_to_markdown, guidelines_to_markdown
 from etl.helpers import read_json_schema
 from etl.paths import BASE_DIR, SCHEMAS_DIR, SNAPSHOTS_DIR
+from etl.snapshot import SnapshotMeta
 
 #########################################################
 # CONSTANTS #############################################
@@ -58,6 +59,25 @@ dummy_values = {
     "origin.url_main": "https://dummy.dummy",
     "origin.date_accessed": utils.DATE_TODAY,
 }
+# Default values taken from a file.
+if APP_STATE.args.data_from_step:
+    metadata = SnapshotMeta.load_from_yaml(APP_STATE.args.data_from_step)
+    dummy_values = {
+        "namespace": metadata.namespace,
+        "snapshot_version": utils.DATE_TODAY,
+        "short_name": metadata.short_name,
+        "file_extension": metadata.file_extension,
+        "origin.title": metadata.origin.title,  # type: ignore
+        "origin.date_published": metadata.origin.date_published,  # type: ignore
+        "origin.producer": metadata.origin.producer,  # type: ignore
+        "origin.citation_full": metadata.origin.citation_full,  # type: ignore
+        "origin.url_main": metadata.origin.url_main,  # type: ignore
+        "origin.date_accessed": metadata.origin.date_accessed,  # type: ignore
+    }
+    if APP_STATE.args.snapshot_version:
+        dummy_values["snapshot_version"] = APP_STATE.args.snapshot_version
+        dummy_values["origin.date_accessed"] = APP_STATE.args.snapshot_version
+
 # Other state vars
 if "show_form" not in st.session_state:
     st.session_state["show_form"] = True
@@ -327,7 +347,7 @@ def render_fields_init() -> List[str]:
                 "key": key,
                 "default_last": field.get("value", ""),
             }
-            if APP_STATE.args.dummy_data:
+            if APP_STATE.args.dummy_data or APP_STATE.args.data_from_step:
                 args["value"] = dummy_values[key]
 
             field = APP_STATE.st_widget(**args)
@@ -398,7 +418,7 @@ def render_fields_from_schema(
                     "placeholder": props["examples"][:3] if isinstance(props["examples"], str) else "",
                     "key": prop_uri,
                 }
-                if APP_STATE.args.dummy_data:
+                if APP_STATE.args.dummy_data or APP_STATE.args.data_from_step:
                     kwargs["value"] = dummy_values.get(prop_uri, "")
 
                 if categories:
@@ -432,7 +452,7 @@ def render_fields_from_schema(
                     else "",
                     "key": prop_uri,
                 }
-                if APP_STATE.args.dummy_data:
+                if APP_STATE.args.dummy_data or APP_STATE.args.data_from_step:
                     kwargs["value"] = dummy_values.get(prop_uri, "")
 
                 if categories:
@@ -652,7 +672,7 @@ def render_namespace_field(form: List[Any]) -> List[str]:
     for field in form:
         if isinstance(field, list) and field[0] == "namespace":
             with field[1]:
-                if APP_STATE.args.dummy_data:
+                if APP_STATE.args.dummy_data or APP_STATE.args.data_from_step:
                     namespace_field = APP_STATE.st_widget(
                         st.selectbox,
                         label=display_name,

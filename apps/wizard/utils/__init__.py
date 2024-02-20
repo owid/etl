@@ -279,10 +279,13 @@ class AppState:
         if "args" in st.session_state:
             return st.session_state["args"]
         else:
-            parser = argparse.ArgumentParser(description="This app lists animals")
+            parser = argparse.ArgumentParser()
             parser.add_argument("--phase")
             parser.add_argument("--run-checks", action="store_true")
             parser.add_argument("--dummy-data", action="store_true")
+            # Hidden arguments.
+            parser.add_argument("--data-from-step")
+            parser.add_argument("--snapshot-version")
             args = parser.parse_args()
             st.session_state["args"] = args
         return st.session_state["args"]

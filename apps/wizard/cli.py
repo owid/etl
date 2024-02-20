@@ -50,8 +50,17 @@ set_rich_click_style()
     type=int,
     help="Application port",
 )
-def cli(phase: Iterable[WIZARD_PHASES], run_checks: bool, dummy_data: bool, port: int) -> None:
-    """Run OWID's ETL admin tool, the Wizard.
+@click.option("--data-from-step", type=str, help="Prefill form with metadata from a specific step", hidden=True)
+@click.option("--snapshot-version", type=str, help="Prefill snapshot metadata with a specific version", hidden=True)
+def cli(
+    phase: Iterable[WIZARD_PHASES],
+    run_checks: bool,
+    dummy_data: bool,
+    port: int,
+    data_from_step: str,
+    snapshot_version: str,
+) -> None:
+    r"""Run OWID's ETL admin tool, the Wizard.
 
     ```
     ..__    __ _                  _
@@ -82,6 +91,12 @@ def cli(phase: Iterable[WIZARD_PHASES], run_checks: bool, dummy_data: bool, port
         args.append("--run-checks")
     if dummy_data:
         args.append("--dummy-data")
+    if data_from_step:
+        args.append("--data-from-step")
+        args.append(data_from_step)
+    if snapshot_version:
+        args.append("--snapshot-version")
+        args.append(snapshot_version)
     sys.argv = args
 
     # Call

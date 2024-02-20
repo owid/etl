@@ -1,5 +1,7 @@
 import difflib
+import subprocess
 import sys
+import time
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple, Union
@@ -196,12 +198,6 @@ class StepUpdater:
             log.error(f"New .dvc file already exists: {step_dvc_file_new}")
             sys.exit(1)
 
-        # Load metadata from last step.
-        metadata = SnapshotMeta.load_from_yaml(step_dvc_file)
-        # Update metadata.
-        # TODO: Generalize this to be able to update metadata using etl-wizard snapshot.
-        metadata.version = step_version_new  # type: ignore
-
         # Find script file for old step.
         _step_py_files = list(step_dvc_file.parent.glob("*.py"))
         if len(_step_py_files) == 1:
@@ -243,8 +239,19 @@ class StepUpdater:
             # If new folder does not exist, create it.
             folder_new.mkdir(parents=True, exist_ok=True)
 
-            # Write metadata to new dvc file.
-            step_dvc_file_new.write_text(metadata.to_yaml())
+            if self.interactive:
+                # Create a new snapshot metadata file interactively, using etl-wizard.
+                _create_new_snapshot_metadata_file_interactively(
+                    step_dvc_file=step_dvc_file, step_dvc_file_new=step_dvc_file_new, step_version_new=step_version_new
+                )
+            else:
+                # Load metadata from last step.
+                metadata = SnapshotMeta.load_from_yaml(step_dvc_file)
+                # Update version and date accessed.
+                metadata.version = step_version_new  # type: ignore
+                metadata.origin.date_accessed = step_version_new  # type: ignore
+                # Write metadata to new file.
+                step_dvc_file_new.write_text(metadata.to_yaml())
 
             # Check if a new py file already exists.
             step_py_file_new = folder_new / step_py_file.name
@@ -425,6 +432,22 @@ class StepUpdater:
         # Update each step.
         for step in steps:
             self.update_step(step=step, step_version_new=step_version_new, step_header=step_headers[step])
+
+
+def _create_new_snapshot_metadata_file_interactively(step_dvc_file, step_dvc_file_new, step_version_new) -> None:
+    # Open the etl-wizard snapshot form with the metadata from the last step.
+    # NOTE: A better solution could be to pass the dictionary directly (with the new version and date_accessed).
+    subprocess_script = subprocess.Popen(
+        ["etl-wizard", "snapshot", "--data-from-step", step_dvc_file, "--snapshot-version", step_version_new],
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+    )
+    log.info("Edit metadata on the browser and hit submit. Then come back here.")
+    while not step_dvc_file_new.exists():
+        # Wait for the new dvc file to be created by etl-wizard.
+        time.sleep(1)
+    # Terminate the etl-wizard subprocess.
+    subprocess_script.terminate()
 
 
 def _update_temporary_dag(dag_active, dag_all_reverse) -> None:
