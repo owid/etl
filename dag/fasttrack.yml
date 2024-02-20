@@ -134,3 +134,5 @@ steps:
     - snapshot://fasttrack/2023-05-03/qubits.csv
   data://grapher/fasttrack/latest/completeness_disaster_emdat:
     - snapshot://fasttrack/latest/completeness_disaster_emdat.csv
+  data-private://grapher/fasttrack/latest/mojmir_test_please_delete:
+    - snapshot-private://fasttrack/latest/mojmir_test_please_delete.csv
