@@ -38,7 +38,7 @@ dataset.save()
 `--private` flag rebuilds everything including private datasets
 
 ```
-etlcli run --private
-etlcli d reindex
-etlcli d publish --private
+etl run --private
+etl d reindex
+etl d publish --private
 ```

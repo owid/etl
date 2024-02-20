@@ -14,10 +14,14 @@ import datetime as dt
 import json
 import os
 import re
+import shutil
+import sys
+import tempfile
 from copy import deepcopy
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, Type, cast
 
+import bugsnag
 import jsonref
 import jsonschema
 import streamlit as st
@@ -670,8 +674,6 @@ def st_page_link(alias: str, border: bool = False, **kwargs) -> None:
 
 
 st.cache_data
-
-
 def metadata_export_basic(dataset_path: str | None = None, dataset: Dataset | None = None, output: str = "") -> str:
     """Export metadata of a dataset.
 
@@ -690,3 +692,20 @@ def metadata_export_basic(dataset_path: str | None = None, dataset: Dataset | No
         decimals="auto",
     )
     return output_path
+
+
+def enable_bugsnag_for_streamlit():
+    """Enable bugsnag for streamlit. Uses this workaround
+    https://github.com/streamlit/streamlit/issues/3426#issuecomment-1848429254
+    """
+    config.enable_bugsnag()
+    # error_util = sys.modules["streamlit.error_util"]
+    error_util = sys.modules["streamlit.runtime.scriptrunner.script_runner"]
+    original_handler = error_util.handle_uncaught_app_exception
+
+    def bugsnag_handler(exception: Exception) -> None:
+        """Pass the provided exception through to bugsnag."""
+        bugsnag.notify(exception)
+        return original_handler(exception)
+
+    error_util.handle_uncaught_app_exception = bugsnag_handler  # type: ignore

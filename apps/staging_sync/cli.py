@@ -100,25 +100,25 @@ def cli(
     **Example 1:** Run staging-sync in dry-run mode to see what charts will be updated
 
     ```
-    $ etlcli chart-sync staging-site-my-branch .env.prod.write --dry-run
+    $ etl chart-sync staging-site-my-branch .env.prod.write --dry-run
     ```
 
     **Example 2:** Run it for real
 
     ```
-    etlcli chart-sync staging-site-my-branch .env.prod.write
+    etl chart-sync staging-site-my-branch .env.prod.write
     ```
 
     **Example 3:** Sync only one chart
 
     ```
-    etlcli chart-sync staging-site-my-branch .env.prod.write --chart-id 123 --dry-run
+    etl chart-sync staging-site-my-branch .env.prod.write --chart-id 123 --dry-run
     ```
 
     **Example 4:** Update charts directly without creating chart revisions (useful for large datasets updates like population)
 
     ```
-    etlcli chart-sync staging-site-my-branch .env.prod.write --approve-revisions
+    etl chart-sync staging-site-my-branch .env.prod.write --approve-revisions
     ```
 
     # Reference
