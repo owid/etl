@@ -211,6 +211,7 @@ def guess() -> None:
 def plot_chart_population(countries_guessed: List[str]):
     """Plot timeseries."""
     # Get data
+    countries_guessed = [c for c in countries_guessed if c != SOLUTION]
     countries_to_plot = [SOLUTION] + countries_guessed
 
     # COLORS =
@@ -243,6 +244,7 @@ def plot_chart_population(countries_guessed: List[str]):
 def plot_chart_gdp_pc(countries_guessed: List[str]):
     """Plot timeseries."""
     # Get data
+    countries_guessed = [c for c in countries_guessed if c != SOLUTION]
     countries_to_plot = [SOLUTION] + countries_guessed
 
     # COLORS =
