@@ -3,9 +3,11 @@ import os
 from pathlib import Path
 from typing import Any, Dict, List, Tuple, Union, cast
 
+import numpy as np
 import pandas as pd
 import rich_click as click
 from rapidfuzz import fuzz
+from structlog import get_logger
 
 from etl import db
 
@@ -25,6 +27,7 @@ SIMILARITY_NAMES = {
     "partial_token_sort_ratio": fuzz.partial_token_sort_ratio,
     "ratio": fuzz.ratio,
 }
+log = get_logger()
 
 
 @click.command(help=__doc__)
@@ -348,6 +351,87 @@ def find_mapping_suggestions(
             {
                 "old": row.to_dict(),
                 "new": missing_new.copy(),
+            }
+        )
+    return suggestions
+
+
+def find_mapping_suggestions_optim(
+    missing_old: pd.DataFrame,
+    missing_new: pd.DataFrame,
+    similarity_name: str = "partial_ratio",
+) -> List[Dict[str, Union[pd.DataFrame, pd.Series]]]:
+    """Find suggestions for mapping old variables to new variables.
+
+    Creates a list with new variable suggestions for each old variable. The list is therefore the same
+    size as len(old_variables). Each item is a dictionary with two keys:
+
+    - "old": Dictionary with old variable name and ID.
+    - "new": pandas.DataFrame with new variable names, IDs, sorted by similarity to old variable name (according to matching_function).
+
+    It uses the similiarity function `similarity_name` to estimate the score between `missing_old` and `missing_new`. Note that regardless of the score,
+    if `missing_old` and `missing_new` have the same name, this will appear first with score 9999. (see _get_score internal function).
+
+    Parameters
+    ----------
+    missing_old : pandas.DataFrame
+        Dataframe with old variables.
+    missing_new : pandas.DataFrame
+        Dataframe with new variables.
+    similarity_name : function, optional
+        Similarity function name. The default is 'partial_ratio'. Must be in `SIMILARITY_NAMES`.
+
+    Returns
+    -------
+    list
+        List of suggestions for mapping old variables to new variables.
+    """
+    # get similarity function
+    matching_function = get_similarity_function(similarity_name)
+
+    def _get_score(old_name, new_name) -> float:
+        """Get similarity score for a row.
+
+        Uses matching_function, but on top of that ensures that score is maximum if names of old and new variables are identical.
+        """
+        if old_name == new_name:
+            return 9999
+        return matching_function(old_name, new_name)
+
+    # Vectorized approach to compute similarities (this needs adjustment based on matching_function capabilities)
+    def compute_similarities_vectorized(old_names, new_names):
+        # This function needs to be adapted to your specific similarity function
+        # For example, using a vectorized string comparison if possible
+        # Placeholder for actual implementation
+        similarity_matrix = np.zeros((len(old_names), len(new_names)))
+        for i, old_name in enumerate(old_names):
+            for j, new_name in enumerate(new_names):
+                similarity_matrix[i, j] = _get_score(old_name, new_name) if old_name != new_name else 9999
+        return similarity_matrix
+
+    # Pre-compute the similarity scores for all combinations
+    old_names = missing_old["name_old"].to_numpy()
+    new_names = missing_new["name_new"].to_numpy()
+    similarity_scores = compute_similarities_vectorized(old_names, new_names)
+
+    # Iterate over old variables to sort new variables based on pre-computed similarities
+    suggestions = []
+    for idx, old_row in missing_old.iterrows():
+        old_name = old_row["name_old"]
+
+        # Retrieve the similarity scores for the current old_name
+        scores = similarity_scores[idx]
+
+        # Sort missing_new based on these scores
+        sorted_indices = np.argsort(-scores)  # Negative for descending sort
+        sorted_missing_new = missing_new.iloc[sorted_indices].copy()
+        sorted_missing_new["similarity"] = np.minimum(scores[sorted_indices], 100)
+
+        # Add results to suggestions list
+        suggestions.append(
+            {
+                "old": old_row.to_dict(),
+                "new": sorted_missing_new,
             }
         )
     return suggestions

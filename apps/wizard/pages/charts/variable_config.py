@@ -16,6 +16,17 @@ from etl.match_variables import find_mapping_suggestions, preliminary_mapping
 
 # Logger
 log = get_logger()
+# App can't hanle too many variables to map. We set an upper limit
+LIMIT_VARS_TO_MAP = 100
+
+
+@st.cache_data(show_spinner=False)
+def find_mapping_suggestions_cached(missing_old, missing_new, similarity_name):
+    return find_mapping_suggestions(
+        missing_old=missing_old,
+        missing_new=missing_new,
+        similarity_name=similarity_name,
+    )  # type: ignore
 
 
 def ask_and_get_variable_mapping(search_form) -> "VariableConfig":
@@ -48,8 +59,8 @@ def ask_and_get_variable_mapping(search_form) -> "VariableConfig":
     else:
         match_identical_vars = search_form.map_identical_variables
     mapping, missing_old, missing_new = preliminary_mapping(
-        old_variables,
-        new_variables,
+        old_variables=old_variables,
+        new_variables=new_variables,
         match_identical=match_identical_vars,
     )
     if not mapping.empty:
@@ -59,7 +70,17 @@ def ask_and_get_variable_mapping(search_form) -> "VariableConfig":
 
     # 1.4/ Get remaining mapping suggestions
     # This is for those variables which couldn't be automatically mapped
-    suggestions = find_mapping_suggestions(missing_old, missing_new, search_form.similarity_function_name)  # type: ignore
+    import time
+
+    print("start")
+    t0 = time.time()
+    with st.spinner():
+        suggestions = find_mapping_suggestions_cached(
+            missing_old=missing_old,
+            missing_new=missing_new,
+            similarity_name=search_form.similarity_function_name,
+        )  # type: ignore
+    print(time.time() - t0)
     # Sort by max similarity: First suggestion is that one that has the highest similarity score with any of its suggested new vars.
     suggestions = sorted(suggestions, key=lambda x: x["new"]["similarity"].max(), reverse=True)
 
@@ -192,6 +213,13 @@ def ask_and_get_variable_mapping(search_form) -> "VariableConfig":
             #################################
             # 2.4/ Manually mapped variables
             #################################
+            # Show only first 100 variables to map (otherwise app crashes)
+            if len(suggestions) > LIMIT_VARS_TO_MAP:
+                st.warning(
+                    f"Too many variables to map! Showing only the first {LIMIT_VARS_TO_MAP}. If you want to map more variables, do it in batches. That is, first map this batch and approve the generated chart revisions in admin. Once you are done, run this app again. Make sure you have approved the previously generated revisions!"
+                )
+                suggestions = suggestions[:LIMIT_VARS_TO_MAP]
+
             if search_form.enable_explore_mode:
                 row_cols = len(suggestions) * [cols, 1]
             else:
@@ -201,7 +229,6 @@ def ask_and_get_variable_mapping(search_form) -> "VariableConfig":
             for i, suggestion in enumerate(suggestions):
                 variable_old = suggestion["old"]["id_old"]
                 similarity_max = int(suggestion["new"]["similarity"].max().round(0))
-                # Old variable selectbox
                 variable_old_manual = grid_variables_manual.selectbox(
                     label=f"manual-{i}-left",
                     options=[variable_old],
@@ -209,8 +236,6 @@ def ask_and_get_variable_mapping(search_form) -> "VariableConfig":
                     label_visibility="collapsed",
                     format_func=variable_id_to_display.get,
                 )
-                # st.caption("test1")
-                # st.caption("test 2")
 
                 old_var_selectbox.append(variable_old_manual)
                 # Ignore checkbox
