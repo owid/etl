@@ -215,7 +215,6 @@ def plot_chart_population(countries_guessed: List[str]):
 
     # COLORS =
     df = DATA[DATA["location"].isin(countries_to_plot)].reset_index(drop=True)
-    df["location"] = df["location"].replace({SOLUTION: "?"})
 
     color_map = dict(zip(countries_to_plot, COLORS))
     color_map["?"] = color_map[SOLUTION]
@@ -248,7 +247,6 @@ def plot_chart_gdp_pc(countries_guessed: List[str]):
 
     # COLORS =
     df = DATA[DATA["location"].isin(countries_to_plot)].reset_index(drop=True)
-    df["location"] = df["location"]
 
     # Drop NaNs
     df = df.dropna(subset="gdp_per_capita")
