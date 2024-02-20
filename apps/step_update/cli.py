@@ -467,18 +467,18 @@ def cli(
 
     * To update a single snapshot to the latest version:
     ```
-    $ etl-step-update snapshot://animal_welfare/2023-10-24/fur_laws.xlsx --dry-run
+    $ etl update snapshot://animal_welfare/2023-10-24/fur_laws.xlsx --dry-run
     ```
     Note that, since no steps are using this snapshot, the new snapshot will be added to the temporary dag.
 
     * To update not only that snapshot, but also the steps that use it:
     ```
-    $ etl-step-update snapshot://animal_welfare/2023-10-24/fur_laws.xlsx --include-usages --dry-run
+    $ etl update snapshot://animal_welfare/2023-10-24/fur_laws.xlsx --include-usages --dry-run
     ```
 
-    * To update all dependencies of the climate change impacts explorer (without editing metadata):
+    * To update all dependencies of the climate change impacts explorer:
     ```
-    $ etl-step-update data://explorers/climate/latest/climate_change_impacts --include-dependencies --dry-run
+    $ etl update data://explorers/climate/latest/climate_change_impacts --include-dependencies --dry-run
     ```
     Note that the explorers step itself will not be updated, since it is already in its "latest" version.
 
