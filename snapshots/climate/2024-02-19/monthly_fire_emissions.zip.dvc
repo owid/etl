@@ -5,7 +5,7 @@ meta:
     # Data product / Snapshot
     title: Global Monthly Emissions from Fires
     description: |-
-     Monthly biomass burning emissions (in tons) by pollutant for years 2002-2022 for all countries and sub-country administrative units (GADM level 0 and level 1 administrative units). The dataset is derived from the Global Fire Emission Database (GFED) which combines satellite information on fire activity and vegetation productivity to estimate fire emissions.
+      Monthly biomass burning emissions (in tons) by pollutant for years 2002-2022 for all countries and sub-country administrative units (GADM level 0 and level 1 administrative units). The dataset is derived from the Global Fire Emission Database (GFED) which combines satellite information on fire activity and vegetation productivity to estimate fire emissions.
     date_published: 2022
 
     # Citation
@@ -16,7 +16,7 @@ meta:
 
     # Files
     url_main: https://gwis.jrc.ec.europa.eu/apps/country.profile/downloads
-    url_download:
+    url_download: 
       https://effis-gwis-cms.s3.eu-west-1.amazonaws.com/apps/country.profile/emission_gfed_full_2002_2022.zip
     date_accessed: 2024-02-19
 
@@ -25,3 +25,8 @@ meta:
       name: European Union, 1995-2023
       url: https://gwis.jrc.ec.europa.eu/about-gwis/data-license
 
+wdir: ../../../data/snapshots/climate/2024-02-19
+outs:
+- md5: 414a2a077431a4bdaba9cf6321415fcd
+  size: 24428285
+  path: monthly_fire_emissions.zip

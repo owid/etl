@@ -189,12 +189,17 @@ steps:
   #
   data://meadow/climate/2024-02-19/monthly_fire_emissions:
     - snapshot://climate/2024-02-19/monthly_fire_emissions.zip
+  data://garden/climate/2024-02-19/monthly_fire_emissions:
+    - data://meadow/climate/2024-02-19/monthly_fire_emissions
+    - data://garden/wb/2023-04-30/income_groups
+    - data://garden/regions/2023-01-01/regions
+  data://grapher/climate/2024-02-19/monthly_fire_emissions:
+    - data://garden/climate/2024-02-19/monthly_fire_emissions
+  data://grapher/climate/2024-02-19/yearly_fire_emissions:
+    - data://garden/climate/2024-02-19/monthly_fire_emissions
   ######################################################################################################################
 
   ######################################################################################################################
   # Older versions to be archived once they are not used by any other steps.
 
   ######################################################################################################################
-
-  data://meadow/climate/2024-02-20/monthly_fire_emissions:
-    - snapshot://climate/2024-02-20/monthly_fire_emissions.zip

@@ -16,7 +16,7 @@ def run(dest_dir: str) -> None:
     #
     # Retrieve snapshot.
     snap = paths.load_snapshot("monthly_fire_emissions.zip")
-    file_name = "emission_gfed_full_2002_2022 2.csv"
+    file_name = "emission_gfed_full_2002_2022.csv"
 
     # Create a temporary directory to extract the file to
     with zipfile.ZipFile(snap.path) as z:
@@ -26,17 +26,22 @@ def run(dest_dir: str) -> None:
             tb = pr.read_csv(f, metadata=snap.to_table_metadata(), origin=snap.m.origin)
 
     tb.metadata = snap.to_table_metadata()
-    print(tb)
     columns_to_keep = [
         "year",
         "month",
         "country",
         "region",
-        "forest",
-        "savannas",
-        "shrublands_grasslands",
-        "croplands",
-        "other",
+        "CO2",
+        "CO",
+        "TPM",
+        "PM25",
+        "TPC",
+        "NMHC",
+        "OC",
+        "CH4",
+        "SO2",
+        "BC",
+        "NOx",
     ]
     tb = tb[columns_to_keep]
     #
