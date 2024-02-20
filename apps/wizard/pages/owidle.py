@@ -1,5 +1,6 @@
 """Game owidle."""
 import datetime as dt
+from math import asin, cos, radians, sin, sqrt
 from pathlib import Path
 from typing import List, Tuple, cast
 
@@ -142,6 +143,23 @@ def get_flat_earth_bearing(lat1: float, lon1: float, lat2: float, lon2: float) -
     return degrees(angle)
 
 
+def haversine(lat1: float, lon1: float, lat2: float, lon2: float):
+    """
+    Calculate the great circle distance between two points
+    on the earth (specified in decimal degrees)
+    """
+    # convert decimal degrees to radians
+    lon1, lat1, lon2, lat2 = map(radians, [lon1, lat1, lon2, lat2])
+
+    # haversine formula
+    dlon = lon2 - lon1
+    dlat = lat2 - lat1
+    a = sin(dlat / 2) ** 2 + cos(lat1) * cos(lat2) * sin(dlon / 2) ** 2
+    c = 2 * asin(sqrt(a))
+    r = 6371  # Radius of earth in kilometers. Use 3956 for miles
+    return c * r
+
+
 def distance_to_solution(country_selected: str) -> Tuple[str, str]:
     """Estimate distance (km) from guessed to solution, including direction."""
     # Estimate distance
@@ -173,11 +191,14 @@ def distance_to_solution(country_selected: str) -> Tuple[str, str]:
         arrow = "↖️"
 
     # Estimate distance
-    GEO_DIST = cast(gpd.GeoDataFrame, GEO.to_crs(3310))
-    solution = GEO_DIST.loc[GEO_DIST["location"] == SOLUTION, "geometry"]
-    guess = GEO_DIST.loc[GEO_DIST["location"] == country_selected, "geometry"]
-    distance = int((solution.distance(guess, align=False) / 1e3).round().item())
-    distance = str(distance)
+    # GEO_DIST = cast(gpd.GeoDataFrame, GEO.to_crs("EPSG:5234"))
+    # solution = GEO_DIST.loc[GEO_DIST["location"] == SOLUTION, "geometry"]
+    # guess = GEO_DIST.loc[GEO_DIST["location"] == country_selected, "geometry"]
+    # distance = int((solution.distance(guess, align=False) / 1e3).round().item())
+    # distance = str(distance)
+
+    distance = haversine(guess.y, guess.x, solution.y, solution.x)
+    distance = str(int(distance))
 
     if country_selected == SOLUTION:
         st.session_state.user_has_succeded = True
