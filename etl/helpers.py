@@ -793,8 +793,8 @@ def write_to_dag_file(
                 # This step was not in dag_part, so it will be copied as is.
                 skip_until_next_step = False
 
-        # Skip dependency lines of the step being updated.
-        if skip_until_next_step and stripped_line.startswith("-"):
+        # Skip dependencies and comments among dependencies of the step being updated.
+        if skip_until_next_step and stripped_line.startswith(("-", "#")):
             continue
 
         # Add lines that should not be skipped.
