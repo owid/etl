@@ -417,10 +417,8 @@ def find_mapping_suggestions_optim(
     # Iterate over old variables to sort new variables based on pre-computed similarities
     suggestions = []
     for idx, old_row in missing_old.iterrows():
-        old_name = old_row["name_old"]
-
         # Retrieve the similarity scores for the current old_name
-        scores = similarity_scores[idx]
+        scores = similarity_scores[idx]  # type: ignore
 
         # Sort missing_new based on these scores
         sorted_indices = np.argsort(-scores)  # Negative for descending sort
