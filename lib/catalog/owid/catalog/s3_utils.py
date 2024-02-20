@@ -37,6 +37,21 @@ def download(s3_url: str, filename: str, quiet: bool = False) -> None:
         logging.info("DOWNLOADED", f"{s3_url} -> {filename}")
 
 
+def upload(s3_url: str, filename: str, public: bool = False, quiet: bool = False) -> None:
+    """Upload the file at the given local filename to the S3 URL."""
+    client = connect()
+    bucket, key = s3_bucket_key(s3_url)
+    extra_args = {"ACL": "public-read"} if public else {}
+    try:
+        client.upload_file(filename, bucket, key, ExtraArgs=extra_args)
+    except ClientError as e:
+        logging.error(e)
+        raise UploadError(e)
+
+    if not quiet:
+        logging.info("UPLOADED", f"{filename} -> {s3_url}")
+
+
 def connect() -> Any:
     "Return a connection to Cloudflare's R2."
     import boto3

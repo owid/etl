@@ -46,3 +46,4 @@ site/
 .sanity-check
 
 .wizard
+.ipynb_lock

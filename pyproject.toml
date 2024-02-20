@@ -46,9 +46,6 @@ simplejson = ">=3.17.6"
 bugsnag = ">=4.2.1"
 xlrd = ">=2.0.1"
 PyPDF2 = ">=2.11.1"
-# DVC 3.0.0 does not allow storing metadata in a different place (we store data in `data/snapshots` and dvc files in `snapshots/*`)
-# It doesn't even improve performance and complicates our use case
-dvc = {version = ">=2.58.2,<3.0.0", extras = ["s3"]}
 "ruamel.yaml" = ">=0.17.21"
 owid-repack = {path = "lib/repack", develop = true}
 gitpython = "^3.1.30"

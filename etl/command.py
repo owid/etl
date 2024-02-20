@@ -531,6 +531,8 @@ def _backporting_steps(private: bool, filter_steps: Optional[Set[str]] = None) -
     # get all backports, this takes a long time
     if filter_steps is None:
         match = "backport/.*"
+    elif len(filter_steps) == 0:
+        return {}
     else:
         match = "|".join([step.split("/")[-1] for step in filter_steps])
 

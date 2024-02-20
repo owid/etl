@@ -22,6 +22,9 @@ from rich.progress import (
 
 from .ui import log
 
+TEXT_CHARS = bytes(range(32, 127)) + b"\n\r\t\f\b"
+DEFAULT_CHUNK_SIZE = 512
+
 
 def _create_progress_bar() -> Progress:
     """Create a fancy progress bar to use for display of download progress.
@@ -37,6 +40,25 @@ def _create_progress_bar() -> Progress:
         "•",
         TimeElapsedColumn(),
     )
+
+
+def dos2unix(data: bytes) -> bytes:
+    return data.replace(b"\r\n", b"\n")
+
+
+def istextblock(block: bytes) -> bool:
+    if not block:
+        # An empty file is considered a valid text file
+        return True
+
+    if b"\x00" in block:
+        # Files with null bytes are binary
+        return False
+
+    # Use translate's 'deletechars' argument to efficiently remove all
+    # occurrences of TEXT_CHARS from the block
+    nontext = block.translate(None, TEXT_CHARS)
+    return float(len(nontext)) / len(block) <= 0.30
 
 
 def _stream_to_file(
@@ -61,6 +83,8 @@ def _stream_to_file(
         task_id = progress.add_task("Downloading", total=total_length)
 
     for chunk in streamer:  # 16k
+        if istextblock(chunk[:DEFAULT_CHUNK_SIZE]):
+            chunk = dos2unix(chunk)
         file.write(chunk)
         md5.update(chunk)
         if display_progress:
