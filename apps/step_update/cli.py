@@ -9,7 +9,7 @@ import structlog
 from rapidfuzz import fuzz
 from rich_click.rich_command import RichCommand
 
-from etl.helpers import write_to_dag_file
+from etl.helpers import get_comments_above_step_in_dag, write_to_dag_file
 from etl.paths import DAG_DIR, DAG_TEMP_FILE, SNAPSHOTS_DIR, STEP_DIR
 from etl.snapshot import SnapshotMeta
 from etl.steps import to_dependency_order
@@ -368,40 +368,6 @@ def _confirm_choice(multiple_files: List[Any]) -> int:
         else:
             print("Invalid input. Please choose a number.")
     return choice
-
-
-def get_comments_above_step_in_dag(step: str, dag_file: Path) -> str:
-    """Get the comment lines right above a step in the dag file."""
-
-    # Read the content of the dag file.
-    with open(dag_file, "r") as _dag_file:
-        lines = _dag_file.readlines()
-
-    # Initialize a list to store the header lines.
-    header_lines = []
-    for line in lines:
-        if line.strip().startswith("-") or (
-            line.strip().endswith(":") and (not line.strip().startswith("#")) and (step not in line)
-        ):
-            # Restart the header if the current line:
-            # * Is a dependency.
-            # * Is a step that is not the current step.
-            # * Is a special line like "steps:" or "include:".
-            header_lines = []
-        elif step in line and line.strip().endswith(":"):
-            # If the current line is the step, stop reading the rest of the file.
-            return "\n".join([line.strip() for line in header_lines]) + "\n" if len(header_lines) > 0 else ""
-        elif line.strip() == "":
-            # If the current line is empty, ignore it.
-            continue
-        else:
-            # Any line that is not a dependency,
-            header_lines.append(line)
-
-    # If the step has not been found, raise an error and return nothing.
-    log.error(f"Step {step} not found in dag file {dag_file}.")
-
-    return ""
 
 
 @click.command(cls=RichCommand, help=__doc__)

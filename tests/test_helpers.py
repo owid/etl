@@ -7,7 +7,7 @@ import pytest
 from owid import catalog
 
 from etl import paths
-from etl.helpers import PathFinder, create_dataset, isolated_env, write_to_dag_file
+from etl.helpers import PathFinder, create_dataset, get_comments_above_step_in_dag, isolated_env, write_to_dag_file
 
 
 def test_PathFinder_paths():
@@ -379,3 +379,45 @@ include:
         dag_part={"meadow_c": ["snapshot_a", "snapshot_b"]},
         comments={"meadow_c": "# Comment for meadow_c."},
     )
+
+
+def test_get_comments_above_step_in_dag():
+    yaml_content = """\
+steps:
+  # Comment for meadow_a.
+  meadow_a:
+    # Comment for snapshot_a.
+    - snapshot_a
+  # Comment for meadow_b.
+  # And another comment.
+  meadow_b:
+    # Comment for snapshot_b.
+    - snapshot_b
+
+  meadow_c:
+    - snapshot_a
+    - snapshot_b
+  #
+  meadow_d:
+
+  # Comment for meadow_e.
+
+  meadow_e:
+    - snapshot_e
+
+include:
+  - path/to/another/dag.yml
+"""
+    with tempfile.TemporaryDirectory() as temp_dir:
+        temp_file = Path(temp_dir) / "temp.yml"
+        # Create a dag file inside a temporary folder.
+        temp_file.write_text(yaml_content)
+        assert get_comments_above_step_in_dag(step="meadow_a", dag_file=temp_file) == "# Comment for meadow_a.\n"
+        assert (
+            get_comments_above_step_in_dag(step="meadow_b", dag_file=temp_file)
+            == "# Comment for meadow_b.\n# And another comment.\n"
+        )
+        assert get_comments_above_step_in_dag(step="meadow_c", dag_file=temp_file) == ""
+        assert get_comments_above_step_in_dag(step="meadow_d", dag_file=temp_file) == "#\n"
+        assert get_comments_above_step_in_dag(step="meadow_e", dag_file=temp_file) == "# Comment for meadow_e.\n"
+        assert get_comments_above_step_in_dag(step="non_existing_step", dag_file=temp_file) == ""
