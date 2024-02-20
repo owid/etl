@@ -11,6 +11,7 @@ import structlog
 from rapidfuzz import fuzz
 from rich_click.rich_command import RichCommand
 
+from etl.helpers import write_to_dag_file
 from etl.paths import DAG_DIR, DAG_TEMP_FILE, SNAPSHOTS_DIR, STEP_DIR
 from etl.snapshot import SnapshotMeta
 from etl.steps import to_dependency_order
@@ -20,110 +21,6 @@ log = structlog.get_logger()
 
 # If a new version is not specified, assume current date.
 STEP_VERSION_NEW = datetime.now().strftime("%Y-%m-%d")
-
-
-def write_to_dag_file(
-    dag_file: Path,
-    dag_part: Dict[str, Any],
-    comments: Optional[Dict[str, str]] = None,
-    indent_step=2,
-    indent_dependency=4,
-):
-    # TODO: Add docstring and unit tests. Consider moving this function to another module.
-
-    # If comments is not defined, assume an empty dictionary.
-    if comments is None:
-        comments = {}
-
-    for step in comments:
-        if len(comments[step]) > 0 and comments[step][-1] != "\n":
-            # Ensure all comments end in a line break, otherwise add it.
-            comments[step] = comments[step] + "\n"
-
-    # Read the lines in the original dag file.
-    with open(dag_file, "r") as file:
-        lines = file.readlines()
-
-    # Separate that content into the "steps" section (always given) and the "include" section (sometimes given).
-    section_steps = []
-    section_include = []
-    inside_section_steps = True
-    for line in lines:
-        if line.strip().startswith("include"):
-            inside_section_steps = False
-        if inside_section_steps:
-            section_steps.append(line)
-        else:
-            section_include.append(line)
-
-    # Now the "steps" section will be updated, and at the end the "include" section will be appended.
-
-    # Initialize a list with the new lines that will be written to the dag file.
-    updated_lines = []
-    # Initialize a flag to skip lines until the next step.
-    skip_until_next_step = False
-    # Initialize a set to keep track of the steps that were found in the original dag file.
-    steps_found = set()
-    for line in section_steps:
-        # Remove leading and trailing whitespace from the line.
-        stripped_line = line.strip()
-
-        # Identify the start of a step, e.g. "  data://meadow/temp/latest/step:".
-        if stripped_line.endswith(":") and not stripped_line.startswith("-"):
-            # Extract the name of the step (without the ":" at the end).
-            current_step = ":".join(stripped_line.split(":")[:-1])
-            if current_step in dag_part:
-                # This step was in dag_part, which means it needs to be updated.
-                # First add the step itself.
-                updated_lines.append(line)
-                # Now add each of its dependencies.
-                for dep in dag_part[current_step]:
-                    updated_lines.append(" " * indent_dependency + f"- {dep}\n")
-                # Skip the following lines until the next step is found.
-                skip_until_next_step = True
-                # Add the current step to the set of steps found in the dag file.
-                steps_found.add(current_step)
-                continue
-            else:
-                # This step was not in dag_part, so it will be copied as is.
-                skip_until_next_step = False
-
-        # Skip dependency lines of the step being updated.
-        if skip_until_next_step and stripped_line.startswith("-"):
-            continue
-
-        # Add lines that should not be skipped.
-        updated_lines.append(line)
-
-    # Append new steps that weren't found in the original content.
-    for step, dependencies in dag_part.items():
-        if step not in steps_found:
-            # Add the comment for this step, if any was given.
-            if step in comments:
-                updated_lines.append(
-                    " " * indent_step + ("\n" + " " * indent_step).join(comments[step].split("\n")[:-1]) + "\n"
-                    if len(comments[step]) > 0
-                    else ""
-                )
-            # Add the step itself.
-            updated_lines.append(" " * indent_step + f"{step}:\n")
-            # Add each of its dependencies.
-            for dep in dependencies:
-                updated_lines.append(" " * indent_dependency + f"- {dep}\n")
-
-    if len(section_include) > 0:
-        # Append the include section, ensuring there is only one line break in between.
-        for i in range(len(updated_lines) - 1, -1, -1):
-            if updated_lines[i] != "\n":
-                # Slice the list to remove trailing line breaks
-                updated_lines = updated_lines[: i + 1]
-                break
-        # Add a single line break before the include section, and then add the include section.
-        updated_lines.extend(["\n"] + section_include)
-
-    # Write the updated content back to the dag file.
-    with open(dag_file, "w") as file:
-        file.writelines(updated_lines)
 
 
 class StepUpdater:
@@ -543,14 +440,14 @@ def get_comments_above_step_in_dag(step: str, dag_file: Path) -> str:
     is_flag=True,
     default=False,
     type=bool,
-    help="Include dependencies of step. Default: False.",
+    help="Update also steps that are direct dependencies of the given steps. Default: False.",
 )
 @click.option(
     "--include-usages",
     is_flag=True,
     default=False,
     type=bool,
-    help="Include usages of step. Default: False.",
+    help="Update also steps that are directly using the given steps. Default: False.",
 )
 @click.option(
     "--dry-run",
@@ -564,7 +461,7 @@ def get_comments_above_step_in_dag(step: str, dag_file: Path) -> str:
     is_flag=True,
     default=False,
     type=bool,
-    help="Use etl-wizard to update the metadata of snapshots. Default: False.",
+    help="Use etl-wizard to be able to edit the metadata of new snapshots (a tab in the browser will be opened for each new snapshot). Default: False.",
 )
 def cli(
     steps: Union[str, List[str]],
@@ -575,7 +472,46 @@ def cli(
     interactive: bool = True,
     edit_metadata: bool = False,
 ) -> None:
-    """TODO"""
+    """Update one or more steps to their new version, if possible.
+
+    This tool lets you update one or more snapshots or data steps to a new version. It will:
+
+    * Create new folders and files for each of the steps.
+
+    * Add the new steps to the dag, with the same header comments as their current version.
+
+    NOTES:
+
+    * If there is ambiguity, the user will be asked for confirmation before updating each step, and on situations where there is some ambiguity.
+
+    * If new snapshots are created that are not used by any steps, they are added to a temporary dag (temp.yml). These steps are then removed from the temporary dag as soon as they are used by an active step.
+
+    * All dependencies of new steps will be assumed to use their latest version possible.
+
+    * Steps that are already in their latest version (or whose version is "latest") will be skipped.
+
+    EXAMPLES:
+
+    NOTE: Remove the --dry-run if you want to actually execute the updates in the examples below (but then remember to revert changes).
+
+    * To update a single snapshot to the latest version, using etl-wizard:
+    ```
+    $ etl-step-update snapshot://animal_welfare/2023-10-24/fur_laws.xlsx --edit-metadata --dry-run
+    ```
+    Note that, since no steps are using this snapshot, the new snapshot will be added to the temporary dag.
+
+    * To update not only that snapshot, but also the steps that use it (and without using etl-wizard):
+    ```
+    $ etl-step-update snapshot://animal_welfare/2023-10-24/fur_laws.xlsx --include-usages --dry-run
+    ```
+
+    * To update all dependencies of the climate change impacts explorer (without editing metadata):
+    ```
+    $ etl-step-update data://explorers/climate/latest/climate_change_impacts --include-dependencies --dry-run
+    ```
+    Note that the explorers step itself will not be updated, since it is already in its "latest" version.
+
+    """
     # Initialize step updater and run update.
     StepUpdater(dry_run=dry_run, interactive=interactive, edit_metadata=edit_metadata).update_steps(
         steps=steps,
