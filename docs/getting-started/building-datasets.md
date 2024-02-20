@@ -20,7 +20,7 @@ data://garden/un/2022-11-29/undp_hdr
 See what steps would be executed to build the `undp_hdr` dataset by running:
 
 ```bash
-$ poetry run etl --dry-run data://garden/un/2022-11-29/undp_hdr
+$ poetry run etl run --dry-run data://garden/un/2022-11-29/undp_hdr
 Detecting which steps need rebuilding...
 OK (0s)
 Running 4 steps:
@@ -42,7 +42,7 @@ The first two listed steps are `snapshot://` steps, which when executed will dow
 Note that you can skip the full path of the step, in which case it will do a regex match against all available steps:
 
 ```bash
-$ poetry run etl --dry-run undp_hdr
+$ poetry run etl run --dry-run undp_hdr
 Detecting which steps need rebuilding...
 OK (0s)
 Running 4 steps:
@@ -59,7 +59,7 @@ Note that here there is an extra dataset listed, with prefix `data://grapher/`, 
 Now let's build the dataset, by removing the `--dry-run` option:
 
 ```bash
-$ poetry run etl data://garden/un/2022-11-29/undp_hdr
+$ poetry run etl run data://garden/un/2022-11-29/undp_hdr
 Detecting which steps need rebuilding...
 OK (0s)
 Running 4 steps:
