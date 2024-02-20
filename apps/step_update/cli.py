@@ -474,13 +474,16 @@ def cli(
 ) -> None:
     """Update one or more steps to their new version, if possible.
 
+    # Description
     This tool lets you update one or more snapshots or data steps to a new version. It will:
 
     * Create new folders and files for each of the steps.
 
     * Add the new steps to the dag, with the same header comments as their current version.
 
-    NOTES:
+    # Notes
+
+    Keep in mind that:
 
     * If there is ambiguity, the user will be asked for confirmation before updating each step, and on situations where there is some ambiguity.
 
@@ -490,7 +493,9 @@ def cli(
 
     * Steps that are already in their latest version (or whose version is "latest") will be skipped.
 
-    EXAMPLES:
+    # Examples
+
+    Here are some examples of how to use the tool:
 
     NOTE: Remove the --dry-run if you want to actually execute the updates in the examples below (but then remember to revert changes).
 

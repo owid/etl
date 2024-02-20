@@ -13,7 +13,6 @@ etl-wizard = 'apps.wizard.cli:cli'
 fasttrack = 'apps.fasttrack.cli:cli'
 compare = 'etl.compare:cli'
 backport = 'apps.backport.backport:backport_cli'
-etl-step-update = 'apps.step_update.cli:cli'
 
 [tool.poetry.dependencies]
 python = ">=3.10, <3.12"
