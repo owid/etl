@@ -31,25 +31,16 @@ def run(dest_dir: str) -> None:
     # Load income groups dataset.
     ds_income_groups = paths.load_dataset("income_groups")
 
+    area_types = ["forest", "savannas", "shrublands_grasslands", "croplands", "other"]
+
     # Sum the burned area by country, year, and month
-    grouped_tb = (
-        tb.groupby(["country", "year", "month"], observed=True)[
-            ["forest", "savannas", "shrublands_grasslands", "croplands", "other"]
-        ]
-        .sum()
-        .reset_index()
-    )
+    grouped_tb = tb.groupby(["country", "year", "month"], observed=True)[area_types].sum().reset_index()
 
     # Create a date column
     grouped_tb["date"] = pd.to_datetime(grouped_tb["year"].astype(str) + "-" + grouped_tb["month"].astype(str) + "-01")
 
-    aggregations = {
-        "forest": "sum",
-        "savannas": "sum",
-        "shrublands_grasslands": "sum",
-        "croplands": "sum",
-        "other": "sum",
-    }
+    aggregations = {emission: "sum" for emission in area_types}
+
     # Add region aggregates.
     grouped_tb = geo.add_regions_to_table(
         grouped_tb,
@@ -69,7 +60,7 @@ def run(dest_dir: str) -> None:
 
     grouped_tb = grouped_tb.drop(columns=["date"])
 
-    grouped_tb["all"] = grouped_tb[["forest", "savannas", "shrublands_grasslands", "croplands", "other"]].sum(axis=1)
+    grouped_tb["all"] = grouped_tb[area_types].sum(axis=1)
 
     grouped_tb = grouped_tb.set_index(["country", "year", "month", "days_since_2000"], verify_integrity=True)
 
