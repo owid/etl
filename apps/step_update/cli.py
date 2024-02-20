@@ -1,7 +1,5 @@
 import difflib
-import subprocess
 import sys
-import time
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple, Union
@@ -24,7 +22,7 @@ STEP_VERSION_NEW = datetime.now().strftime("%Y-%m-%d")
 
 
 class StepUpdater:
-    def __init__(self, dry_run: bool = False, interactive: bool = True, edit_metadata: bool = False):
+    def __init__(self, dry_run: bool = False, interactive: bool = True):
         # Initialize version tracker and load dataframe of all active steps.
         self._load_version_tracker()
         # If dry_run is True, then nothing will be written to the dag, and no files will be created.
@@ -32,8 +30,6 @@ class StepUpdater:
         # If interactive is True, then the user will be asked for confirmation before updating each step, and on
         # situations where there is some ambiguity.
         self.interactive = interactive
-        # If edit_metadata is True, the browser will open an etl-wizard snapshots page for each snapshot to be updated.
-        self.edit_metadata = edit_metadata
 
     def _load_version_tracker(self) -> None:
         # This function will start a new instance of VersionTracker, and load the dataframe of all active steps.
@@ -138,19 +134,13 @@ class StepUpdater:
             # If new folder does not exist, create it.
             folder_new.mkdir(parents=True, exist_ok=True)
 
-            if self.edit_metadata:
-                # Create a new snapshot metadata file interactively, using etl-wizard.
-                _create_new_snapshot_metadata_file_interactively(
-                    step_dvc_file=step_dvc_file, step_dvc_file_new=step_dvc_file_new, step_version_new=step_version_new
-                )
-            else:
-                # Load metadata from last step.
-                metadata = SnapshotMeta.load_from_yaml(step_dvc_file)
-                # Update version and date accessed.
-                metadata.version = step_version_new  # type: ignore
-                metadata.origin.date_accessed = step_version_new  # type: ignore
-                # Write metadata to new file.
-                step_dvc_file_new.write_text(metadata.to_yaml())
+            # Load metadata from last step.
+            metadata = SnapshotMeta.load_from_yaml(step_dvc_file)
+            # Update version and date accessed.
+            metadata.version = step_version_new  # type: ignore
+            metadata.origin.date_accessed = step_version_new  # type: ignore
+            # Write metadata to new file.
+            step_dvc_file_new.write_text(metadata.to_yaml())
 
             # Check if a new py file already exists.
             step_py_file_new = folder_new / step_py_file.name
@@ -346,22 +336,6 @@ class StepUpdater:
                 self._update_step(step=step, step_version_new=step_version_new, step_header=step_headers[step])
 
 
-def _create_new_snapshot_metadata_file_interactively(step_dvc_file, step_dvc_file_new, step_version_new) -> None:
-    # Open the etl-wizard snapshot form with the metadata from the last step.
-    # NOTE: A better solution could be to pass the dictionary directly (with the new version and date_accessed).
-    subprocess_script = subprocess.Popen(
-        ["etl-wizard", "snapshot", "--data-from-step", step_dvc_file, "--snapshot-version", step_version_new],
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL,
-    )
-    log.info("Edit metadata on the browser and hit submit. Then come back here.")
-    while not step_dvc_file_new.exists():
-        # Wait for the new dvc file to be created by etl-wizard.
-        time.sleep(1)
-    # Terminate the etl-wizard subprocess.
-    subprocess_script.terminate()
-
-
 def _update_temporary_dag(dag_active, dag_all_reverse) -> None:
     # The temporary step in the temporary dag depends on the latest version of each newly created snapshot, before
     # they are used by any other active steps. We need to check if those snapshots are already used by active steps,
@@ -456,13 +430,6 @@ def get_comments_above_step_in_dag(step: str, dag_file: Path) -> str:
     type=bool,
     help="Do not write to dag or create step files. Default: False.",
 )
-@click.option(
-    "--edit-metadata",
-    is_flag=True,
-    default=False,
-    type=bool,
-    help="Use etl-wizard to be able to edit the metadata of new snapshots (a tab in the browser will be opened for each new snapshot). Default: False.",
-)
 def cli(
     steps: Union[str, List[str]],
     step_version_new: Optional[str] = STEP_VERSION_NEW,
@@ -470,7 +437,6 @@ def cli(
     include_usages: bool = False,
     dry_run: bool = False,
     interactive: bool = True,
-    edit_metadata: bool = False,
 ) -> None:
     """Update one or more steps to their new version, if possible.
 
@@ -499,13 +465,13 @@ def cli(
 
     NOTE: Remove the --dry-run if you want to actually execute the updates in the examples below (but then remember to revert changes).
 
-    * To update a single snapshot to the latest version, using etl-wizard:
+    * To update a single snapshot to the latest version:
     ```
-    $ etl-step-update snapshot://animal_welfare/2023-10-24/fur_laws.xlsx --edit-metadata --dry-run
+    $ etl-step-update snapshot://animal_welfare/2023-10-24/fur_laws.xlsx --dry-run
     ```
     Note that, since no steps are using this snapshot, the new snapshot will be added to the temporary dag.
 
-    * To update not only that snapshot, but also the steps that use it (and without using etl-wizard):
+    * To update not only that snapshot, but also the steps that use it:
     ```
     $ etl-step-update snapshot://animal_welfare/2023-10-24/fur_laws.xlsx --include-usages --dry-run
     ```
@@ -518,7 +484,7 @@ def cli(
 
     """
     # Initialize step updater and run update.
-    StepUpdater(dry_run=dry_run, interactive=interactive, edit_metadata=edit_metadata).update_steps(
+    StepUpdater(dry_run=dry_run, interactive=interactive).update_steps(
         steps=steps,
         step_version_new=step_version_new,
         include_dependencies=include_dependencies,
