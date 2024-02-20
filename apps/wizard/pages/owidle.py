@@ -17,7 +17,12 @@ from etl.paths import DATA_DIR
 ##########################################
 st.set_page_config(page_title="Wizard: owidle", layout="wide", page_icon="🪄")
 add_indentation()
-st.title(body="👾 :rainbow[OWIDLE] ")
+st.title(
+    body="👾 :rainbow[owidle] ",
+)
+st.markdown(
+    "Guess the country using the population and GDP hints. For each guess, you will get a geographical hint (distance and direction to the country). There is a daily challenge!"
+)
 
 ## Maximum number of guesses allowed to the user
 NUM_GUESSES = 6
@@ -41,8 +46,18 @@ st.session_state.user_has_succeded = st.session_state.get("user_has_succeded", F
 ##########################################
 ## LOAD DATA
 ##########################################
+COLORS = [
+    "#C15065",
+    "#2C8465",
+    "#BE5915",
+    "#6D3E91",
+    "#286BBB",
+    "#996D39",
+]
+
+
 @st.cache_data
-def load_data() -> Tuple[pd.DataFrame, gpd.GeoDataFrame, str]:
+def load_data(placeholder: str) -> Tuple[pd.DataFrame, gpd.GeoDataFrame, str]:
     """Load data for the game."""
     # Load population indicator
     ds = Dataset(DATA_DIR / "garden" / "un" / "2022-07-11" / "un_wpp")
@@ -94,13 +109,13 @@ def load_data() -> Tuple[pd.DataFrame, gpd.GeoDataFrame, str]:
     # df_geo = df_geo.to_crs(3310)
 
     # Arbitrary daily solution
-    seed = (dt.date.today() - dt.date(1900, 1, 1)).days
+    seed = (dt.date.today() - dt.date(1993, 7, 13)).days
     solution = tb["location"].sample(random_state=seed).item()
 
     return tb_indicator, df_geo, solution
 
 
-DATA, GEO, SOLUTION = load_data()
+DATA, GEO, SOLUTION = load_data("cached")
 # st.write(SOLUTION)
 OPTIONS = sorted(DATA["location"].unique())
 
@@ -202,13 +217,27 @@ def plot_chart_population(countries_guessed: List[str]):
     df = DATA[DATA["location"].isin(countries_to_plot)].reset_index(drop=True)
     df["location"] = df["location"].replace({SOLUTION: "?"})
 
+    color_map = dict(zip(countries_to_plot, COLORS))
+    color_map["?"] = color_map[SOLUTION]
+
     # Hide country name if user has not succeded yet.
     if not st.session_state.user_has_succeded:
         df["location"] = df["location"].replace({SOLUTION: "?"})
 
     # Create plotly figure & plot
-    fig = px.line(df, x="year", y="population", color="location", title="Population")
-    st.plotly_chart(fig, theme=None, use_container_width=True)
+    fig = px.line(
+        df,
+        x="year",
+        y="population",
+        color="location",
+        color_discrete_map=color_map,
+        title="Population",
+    )
+    st.plotly_chart(
+        fig,
+        theme=None,
+        use_container_width=True,
+    )
 
 
 @st.cache_data
@@ -221,15 +250,31 @@ def plot_chart_gdp_pc(countries_guessed: List[str]):
     df = DATA[DATA["location"].isin(countries_to_plot)].reset_index(drop=True)
     df["location"] = df["location"]
 
+    # Drop NaNs
+    df = df.dropna(subset="gdp_per_capita")
+
+    # Get color column
+    color_map = dict(zip(countries_to_plot, COLORS))
+    color_map["?"] = color_map[SOLUTION]
+
     # Hide country name if user has not succeded yet.
     if not st.session_state.user_has_succeded:
         df["location"] = df["location"].replace({SOLUTION: "?"})
 
     # Create plotly figure & plot
     fig = px.line(
-        df.dropna(subset="gdp_per_capita"), x="year", y="gdp_per_capita", color="location", title="GDP per capita"
+        df.dropna(subset="gdp_per_capita"),
+        x="year",
+        y="gdp_per_capita",
+        color="location",
+        color_discrete_map=color_map,
+        title="GDP per capita (constant 2017 intl-$)",
     )
-    st.plotly_chart(fig, theme=None, use_container_width=True)
+    st.plotly_chart(
+        fig,
+        theme=None,
+        use_container_width=True,
+    )
 
 
 def display_metadata(metadata):
@@ -244,7 +289,7 @@ def display_metadata(metadata):
 # PLOT CHARTS
 ##########################################
 with st.container(border=True):
-    countries_guessed = [guess["guess"] for guess in st.session_state.guesses]
+    countries_guessed = [guess["guess"] for guess in st.session_state.guesses if guess["guess"] != ""]
     col1, col2 = st.columns(2)
     with col1:
         plot_chart_population(countries_guessed)
@@ -266,10 +311,12 @@ with st.container(border=True):
                 metadata = DATA["gdp_per_capita"].metadata.to_dict()
                 origins = metadata.pop("origins", None)
                 _ = metadata.pop("display", None)
-                # display_metadata(metadata)
+                display_metadata(metadata)
                 if origins:
                     for origin in origins:
                         display_metadata(origin)
+                # else:
+                #     st.info("")
             except Exception:
                 st.info("Metadata couldn't be accssed")
 
@@ -288,34 +335,37 @@ with st.form("form_guess", border=False):
         key="guess_last",
     )
     # with col_guess_2:
+    _num_guesses_bound = min(st.session_state.num_guesses + 1, NUM_GUESSES)
+    disabled = (st.session_state.num_guesses >= NUM_GUESSES) or st.session_state.user_has_succeded
     btn = st.form_submit_button(
-        "GUESS",
+        f"GUESS {_num_guesses_bound}/6" if not disabled else "NO MORE GUESSES :(",
         type="primary",
         use_container_width=True,
         on_click=lambda: guess(),
-        disabled=(st.session_state.num_guesses >= NUM_GUESSES) or st.session_state.user_has_succeded,
+        disabled=disabled,
     )
 
 ##########################################
 # SHOW GUESSES (this far)
 ##########################################
 guesses_display = []
-for i in range(min(st.session_state.num_guesses, NUM_GUESSES)):
+num_guesses_bound = min(st.session_state.num_guesses, NUM_GUESSES)
+for i in range(num_guesses_bound):
     with st.container(border=True):
         col1, col2, col3 = st.columns([4, 1, 1])
         with col1:
             # st.text(st.session_state.guesses[i]["guess"])
             st.markdown(f"**{st.session_state.guesses[i]['guess']}**")
         with col2:
-            st.text(f"{st.session_state.guesses[i]['distance']} km")
+            st.markdown(f"{st.session_state.guesses[i]['distance']} km")
         with col3:
-            st.text(st.session_state.guesses[i]["direction"])
+            st.markdown(st.session_state.guesses[i]["direction"])
 
 
 ##########################################
 # SHOW REMAINING GUESSES BOXES
 ##########################################
-for i in range(min(st.session_state.num_guesses, NUM_GUESSES), NUM_GUESSES):
+for i in range(num_guesses_bound, NUM_GUESSES):
     with st.container(border=True):
         st.empty()
 
@@ -326,6 +376,21 @@ for i in range(min(st.session_state.num_guesses, NUM_GUESSES), NUM_GUESSES):
 if st.session_state.user_has_succeded:
     st.balloons()
     st.success("🎉 You have guessed the correct country! 🎉")
+    col, _ = st.columns(2)
+    with col:
+        s = []
+        for count, i in enumerate(range(num_guesses_bound)):
+            _s = f"{st.session_state.guesses[i]['distance']}km"
+            s.append(_s)
+
+        r = "round" if num_guesses_bound == 1 else "rounds"
+        s = (
+            f"I did the daily owidle challenge in {num_guesses_bound} {r}!\n\n"
+            + " → ".join(s)
+            + "\n\nVisit http://etl.owid.io/wizard/owidle"
+        )
+        st.subheader("Share it")
+        st.code(s)
     st.stop()
 ## Unsuccessful
 elif st.session_state.num_guesses >= NUM_GUESSES:
