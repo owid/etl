@@ -39,6 +39,10 @@ R2_ENDPOINT_URL = env.get("R2_ENDPOINT_URL", "https://078fcdfed9955087315dd86792
 R2_ACCESS_KEY = env.get("R2_ACCESS_KEY")
 R2_SECRET_KEY = env.get("R2_SECRET_KEY")
 
+R2_SNAPSHOTS_PUBLIC = "owid-snapshots"
+R2_SNAPSHOTS_PRIVATE = "owid-snapshots-private"
+R2_SNAPSHOTS_PUBLIC_READ = "https://snapshots.owid.io"
+
 # publishing to grapher's MySQL db
 GRAPHER_USER_ID = env.get("GRAPHER_USER_ID")
 DB_NAME = env.get("DB_NAME", "grapher")
@@ -127,6 +131,8 @@ ETL_API_COMMIT = env.get("ETL_API_COMMIT") in ("True", "true", "1")
 
 # if True, commit and push updates from fasttrack
 FASTTRACK_COMMIT = env.get("FASTTRACK_COMMIT") in ("True", "true", "1")
+
+ADMIN_HOST = env.get("ADMIN_HOST", "http://localhost:3030")
 
 BUGSNAG_API_KEY = env.get("BUGSNAG_API_KEY")
 

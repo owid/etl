@@ -1,16 +1,14 @@
-import configparser
 import datetime as dt
 import json
 import re
 import tempfile
-from contextlib import contextmanager
 from dataclasses import dataclass
-from multiprocessing import Lock
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Dict, Iterator, Optional, Union
+from typing import Any, Dict, Iterator, Optional, Union
 
 import owid.catalog.processing as pr
 import pandas as pd
+import structlog
 import yaml
 from dataclasses_json import dataclass_json
 from owid.catalog import Table, s3_utils
@@ -25,55 +23,11 @@ from owid.catalog.meta import (
 from owid.datautils import dataframes
 from owid.datautils.io import decompress_file
 from owid.walden import files
-from tenacity import Retrying
-from tenacity.retry import retry_if_exception_type
-from tenacity.stop import stop_after_attempt
-
-if TYPE_CHECKING:
-    from dvc.repo import Repo
 
 from etl import config, paths
-from etl.files import RuntimeCache, checksum_file, yaml_dump
+from etl.files import checksum_file, ruamel_dump, ruamel_load, yaml_dump
 
-# DVC is not thread-safe, so we need to lock it
-dvc_lock = Lock()
-unignore_backports_lock = Lock()
-
-DVC_REPO_CACHE = RuntimeCache()
-
-DVC_CONFIG = configparser.ConfigParser()
-DVC_CONFIG.read(paths.BASE_DIR / ".dvc/config")
-
-
-def get_dvc(use_cache: bool = True) -> "Repo":
-    """Return DVC repo. If `use_cache` is True, the repo is cached in memory. Cache is thread-safe."""
-    from dvc.repo import Repo
-
-    key = str(paths.BASE_DIR)
-    cache = DVC_REPO_CACHE
-    if not use_cache or key not in cache:
-        if config.R2_ACCESS_KEY and config.R2_SECRET_KEY:
-            remote_config = {
-                "access_key_id": config.R2_ACCESS_KEY,
-                "secret_access_key": config.R2_SECRET_KEY,
-                "region": "auto",
-            }
-            dvc_config = {"remote": {"public": remote_config, "private": remote_config}}
-        else:
-            dvc_config = None
-
-        dvc = Repo(
-            paths.BASE_DIR,
-            config=dvc_config,
-        )
-
-        # Store repo in cache.
-        if use_cache:
-            cache.add(key, dvc)
-    else:
-        dvc = cache[key]
-
-    return dvc
+log = structlog.get_logger()
 
 
 @dataclass
@@ -111,25 +65,21 @@ class Snapshot:
         else:
             return Path(f"{paths.SNAPSHOTS_DIR / self.uri}.dvc")
 
-    def _cached_dvc_repo(self) -> Any:
-        """Return DVC repo and cache it. Backported steps do not use cached repository."""
-        if "backport" in str(self.metadata_path):
-            # The repo has to be created again to pick unignored files
-            return get_dvc(use_cache=False)
-        else:
-            return get_dvc(use_cache=True)
-
     def _download_dvc_file(self, md5: str) -> None:
-        """Download file from DVC remote to self.path."""
+        """Download file from remote to self.path."""
         self.path.parent.mkdir(exist_ok=True, parents=True)
         if self.metadata.is_public:
-            https_url = DVC_CONFIG['remote "public-read"']["url"]
-            download_url = f"{https_url}/{md5[:2]}/{md5[2:]}"
+            download_url = f"{config.R2_SNAPSHOTS_PUBLIC_READ}/{md5[:2]}/{md5[2:]}"
             files.download(download_url, str(self.path), progress_bar_min_bytes=2**100)
         else:
-            s3_url = DVC_CONFIG['remote "private"']["url"]
-            download_url = f"{s3_url}/{md5[:2]}/{md5[2:]}"
+            download_url = f"s3://{config.R2_SNAPSHOTS_PRIVATE}/{md5[:2]}/{md5[2:]}"
             s3_utils.download(download_url, str(self.path))
+
+        # Check if file was downloaded correctly. This should never happen
+        if checksum_file(self.path) != md5:
+            # remove the downloaded file
+            self.path.unlink()
+            raise ValueError(f"Checksum mismatch for {self.path}")
 
     def pull(self, force=True) -> None:
         """Pull file from S3."""
@@ -183,20 +133,23 @@ class Snapshot:
 
     def dvc_add(self, upload: bool) -> None:
         """Add file to DVC and upload to S3."""
-        from dvc.exceptions import UploadError
+        if not upload:
+            log.warn("Skipping upload", snapshot=self.uri)
+            return
 
-        dvc = get_dvc()
+        # Upload to S3
+        md5 = checksum_file(self.path)
+        bucket = config.R2_SNAPSHOTS_PUBLIC if self.metadata.is_public else config.R2_SNAPSHOTS_PRIVATE
+        s3_utils.upload(f"s3://{bucket}/{md5[:2]}/{md5[2:]}", str(self.path), public=self.metadata.is_public)
 
-        with dvc_lock, _unignore_backports(self.path):
-            dvc.add(str(self.path), fname=str(self.metadata_path))
-            if upload:
-                # DVC sometimes returns UploadError, retry a few times
-                for attempt in Retrying(
-                    stop=stop_after_attempt(3),
-                    retry=retry_if_exception_type(UploadError),
-                ):
-                    with attempt:
-                        dvc.push(str(self.path), remote="public" if self.metadata.is_public else "private")
+        # Update metadata file
+        with open(self.metadata_path, "r") as f:
+            meta = ruamel_load(f)
+
+        meta["outs"] = [{"md5": md5, "size": self.path.stat().st_size, "path": self.path.name}]
+
+        with open(self.metadata_path, "w") as f:
+            f.write(ruamel_dump(meta))
 
     def create_snapshot(
         self,
@@ -535,38 +488,6 @@ def snapshot_catalog(match: str = r".*") -> Iterator[Snapshot]:
         uri = str(path.relative_to(paths.SNAPSHOTS_DIR)).replace(".dvc", "")
         if re.search(match, uri):
             yield Snapshot(uri)
-
-
-@contextmanager
-def _unignore_backports(path: Path):
-    """Folder snapshots/backports contains thousands of .dvc files which adds significant overhead
-    to running DVC commands (+8s overhead). That is why we ignore this folder in .dvcignore. This
-    context manager checks if the path is in snapshots/backports and if so, temporarily removes
-    this folder from .dvcignore.
-    This makes non-backport DVC operations run under 1s and backport DVC operations at ~8s.
-    Changing .dvcignore in-place is not great, but no other way was working (tried monkey-patching
-    DVC and subrepos).
-    """
-    dvc_ignore_path = paths.BASE_DIR / ".dvcignore"
-    if "backport/" in str(path):
-        with unignore_backports_lock:
-            with open(dvc_ignore_path) as f:
-                s = f.read()
-            try:
-                with open(dvc_ignore_path, "w") as f:
-                    dataset_id = path.name.split("_")[1]
-                    f.write(
-                        s.replace(
-                            "snapshots/backport/latest/*",
-                            f"snapshots/backport/latest/*\n!snapshots/backport/latest/dataset_{dataset_id}*",
-                        )
-                    )
-                yield
-            finally:
-                with open(dvc_ignore_path, "w") as f:
-                    f.write(s)
-    else:
-        yield
 
 
 def _parse_snapshot_path(path: Path) -> tuple[str, str, str, str]:

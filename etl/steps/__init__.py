@@ -41,7 +41,7 @@ Graph = Dict[str, Set[str]]
 DAG = Dict[str, Any]
 
 
-ipynb_lock = fasteners.InterProcessLock(paths.BASE_DIR / ".dvc/tmp/ipynb_lock")
+ipynb_lock = fasteners.InterProcessLock(paths.BASE_DIR / ".ipynb_lock")
 
 
 def compile_steps(
