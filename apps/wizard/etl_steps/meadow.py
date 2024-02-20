@@ -254,7 +254,7 @@ if submitted:
             # 1/ Run ETL step
             st.markdown("#### 1. Run ETL step")
             st.code(
-                f"poetry run etl data{private_suffix}://meadow/{form.namespace}/{form.version}/{form.short_name} {'--private' if form.is_private else ''}"
+                f"poetry run etl run data{private_suffix}://meadow/{form.namespace}/{form.version}/{form.short_name} {'--private' if form.is_private else ''}"
             )
 
             if form.generate_notebook:

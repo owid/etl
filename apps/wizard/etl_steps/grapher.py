@@ -246,7 +246,7 @@ if submitted:
 
             Then run the grapher step:
             ```
-            poetry run etl grapher/{form.namespace}/{form.version}/{form.short_name} --grapher {"--private" if form.is_private else ""}
+            poetry run etl run grapher/{form.namespace}/{form.version}/{form.short_name} --grapher {"--private" if form.is_private else ""}
             ```
             Your new dataset should then appear in your local set-up: http://localhost:3030/admin/datasets. Follow the instructions [here](https://github.com/owid/owid-grapher/blob/master/docs/docker-compose-mysql.md) to create your local Grapher development set-up.
 
@@ -266,7 +266,7 @@ if submitted:
             After you run
 
             ```
-            ENV=.env.staging poetry run etl grapher/{form.namespace}/{form.version}/{form.short_name} --grapher {"--private" if form.is_private else ""}
+            ENV=.env.staging poetry run etl run grapher/{form.namespace}/{form.version}/{form.short_name} --grapher {"--private" if form.is_private else ""}
             ```
 
             you should see it [in staging admin](https://staging.owid.cloud/admin/datasets).
@@ -285,7 +285,7 @@ if submitted:
             and running
 
             ```
-            ENV=.env.prod poetry run etl grapher/{form.namespace}/{form.version}/{form.short_name} --grapher {"--private" if form.is_private else ""}
+            ENV=.env.prod poetry run etl run grapher/{form.namespace}/{form.version}/{form.short_name} --grapher {"--private" if form.is_private else ""}
             ```
 
         4. Check your dataset in [admin](https://owid.cloud/admin/datasets).

@@ -428,7 +428,7 @@ if submitted:
             st.markdown("####  2. Run ETL step")
             st.markdown("After editing the code of your Garden step, run the following command:")
             st.code(
-                f"poetry run etl data{private_suffix}://garden/{form.namespace}/{form.version}/{form.short_name} {'--private' if form.is_private else ''}",
+                f"poetry run etl run data{private_suffix}://garden/{form.namespace}/{form.version}/{form.short_name} {'--private' if form.is_private else ''}",
                 "bash",
             )
             # 3/ Optional shit
@@ -460,7 +460,7 @@ if submitted:
 
                 st.markdown("then manual edit it and rerun the step again with")
                 st.code(
-                    f"poetry run etl data{private_suffix}://garden/{form.namespace}/{form.version}/{form.short_name} {'--private' if form.is_private else ''}",
+                    f"poetry run etl run data{private_suffix}://garden/{form.namespace}/{form.version}/{form.short_name} {'--private' if form.is_private else ''}",
                     "bash",
                 )
 

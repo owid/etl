@@ -87,11 +87,11 @@ coverage: .venv
 
 etl: .venv
 	@echo '==> Running etl on garden'
-	poetry run etl garden
+	poetry run etl run garden
 
 full: .venv
 	@echo '==> Running full etl'
-	poetry run etl
+	poetry run etl run
 
 clean:
 	@echo '==> Cleaning data/ folder'
@@ -120,7 +120,7 @@ prune: .venv
 
 grapher: .venv
 	@echo '==> Running full etl with grapher upsert'
-	poetry run etl --grapher
+	poetry run etl run --grapher
 
 dot: dependencies.pdf
 

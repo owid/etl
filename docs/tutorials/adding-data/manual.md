@@ -66,7 +66,7 @@ Add the dependencies for the dataset to the appropriate dag file.
 #### Run the meadow step
 
 ```
-poetry run etl data://meadow/<namespace>/<version>/<dataset_short_name>
+poetry run etl run data://meadow/<namespace>/<version>/<dataset_short_name>
 ```
 
 ### Create Garden step
@@ -87,7 +87,7 @@ Add the dependencies for the dataset to the appropriate dag file.
 #### Run the garden step
 
 ```
-poetry run etl data://garden/<namespace>/<version>/<dataset_short_name>
+poetry run etl run data://garden/<namespace>/<version>/<dataset_short_name>
 ```
 
 ### Create Grapher step
@@ -101,13 +101,13 @@ creates a dataset with one or more tables and the necessary metadata.
 
 #### Run the grapher step
 ```
-poetry run etl data://grapher/<namespace>/<version>/<dataset_short_name>
+poetry run etl run data://grapher/<namespace>/<version>/<dataset_short_name>
 ```
 
 Add `--grapher` flags to `etl` command to upsert data into grapher database.
 
 ```
-poetry run etl data://grapher/<namespace>/<version>/<dataset_short_name> --grapher
+poetry run etl run data://grapher/<namespace>/<version>/<dataset_short_name> --grapher
 ```
 
 To test the step, you can run it on the grapher `staging` database, or using
