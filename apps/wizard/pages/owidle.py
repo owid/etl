@@ -173,7 +173,7 @@ def distance_to_solution(country_selected: str) -> Tuple[str, str]:
         arrow = "↖️"
 
     # Estimate distance
-    GEO_DIST = cast(gpd.GeoDataFrame, GEO.to_crs(3310))
+    GEO_DIST = cast(gpd.GeoDataFrame, GEO.to_crs("EPSG:5234"))
     solution = GEO_DIST.loc[GEO_DIST["location"] == SOLUTION, "geometry"]
     guess = GEO_DIST.loc[GEO_DIST["location"] == country_selected, "geometry"]
     distance = int((solution.distance(guess, align=False) / 1e3).round().item())
