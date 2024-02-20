@@ -132,6 +132,8 @@ ETL_API_COMMIT = env.get("ETL_API_COMMIT") in ("True", "true", "1")
 # if True, commit and push updates from fasttrack
 FASTTRACK_COMMIT = env.get("FASTTRACK_COMMIT") in ("True", "true", "1")
 
+ADMIN_HOST = env.get("ADMIN_HOST", "http://localhost:3030")
+
 BUGSNAG_API_KEY = env.get("BUGSNAG_API_KEY")
 
 OPENAI_API_KEY = env.get("OPENAI_API_KEY", None)

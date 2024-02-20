@@ -299,7 +299,7 @@ def app(dummy_data: bool) -> None:
     po.put_markdown("""## Links""")
     po.put_markdown(
         f"""
-    * [Dataset in admin]({os.environ.get("ADMIN_HOST", "")}/admin/datasets/{_dataset_id(dataset.metadata)})
+    * [Dataset in admin]({config.ADMIN_HOST}/admin/datasets/{_dataset_id(dataset.metadata)})
     * [Commit in ETL]({github_link})
     """
     )
