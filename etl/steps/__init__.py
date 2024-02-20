@@ -709,7 +709,7 @@ class SnapshotStep(Step):
     def checksum_output(self) -> str:
         # NOTE: we could use the checksum from `_dvc_path` to
         # speed this up. Test the performance on
-        # time poetry run etl garden --dry-run
+        # time poetry run etl run garden --dry-run
         # Make sure that the checksum below is the same as DVC checksum! It
         # looks like it might be different for some reason
         return files.checksum_file(self._dvc_path)
