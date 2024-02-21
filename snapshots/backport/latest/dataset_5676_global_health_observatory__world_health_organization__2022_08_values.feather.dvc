@@ -9,7 +9,6 @@ meta:
   description: This is a dataset imported by the automated fetcher
 wdir: ../../../data/snapshots/backport/latest
 outs:
-- md5: 6b9e6c6a47fe24b3c8d2a73ed728f077
-  size: 31578410
-  path: 
-    dataset_5676_global_health_observatory__world_health_organization__2022_08_values.feather
+  - md5: 04e7de5a67a01d201b31a244c111d205
+    size: 31578410
+    path: dataset_5676_global_health_observatory__world_health_organization__2022_08_values.feather
