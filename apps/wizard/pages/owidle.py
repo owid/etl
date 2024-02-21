@@ -228,6 +228,14 @@ def guess() -> None:
 ##########################################
 # PLOT CHART
 ##########################################
+
+
+def _add_dash_column(df):
+    df["dash"] = "dash"
+    df.loc[df["location"] == SOLUTION, "dash"] = "solid"
+    return df
+
+
 @st.cache_data
 def plot_chart_population(countries_guessed: List[str]):
     """Plot timeseries."""
@@ -235,11 +243,15 @@ def plot_chart_population(countries_guessed: List[str]):
     countries_guessed = [c for c in countries_guessed if c != SOLUTION]
     countries_to_plot = [SOLUTION] + countries_guessed
 
-    # COLORS =
+    # COLORS
     df = DATA[DATA["location"].isin(countries_to_plot)].reset_index(drop=True)
 
+    # Get color column
     color_map = dict(zip(countries_to_plot, COLORS))
     color_map["?"] = color_map[SOLUTION]
+
+    # Add dash
+    df = _add_dash_column(df)
 
     # Hide country name if user has not succeded yet.
     if not st.session_state.user_has_succeded:
@@ -253,6 +265,7 @@ def plot_chart_population(countries_guessed: List[str]):
         color="location",
         color_discrete_map=color_map,
         title="Population",
+        line_dash="dash",
     )
     st.plotly_chart(
         fig,
@@ -278,6 +291,9 @@ def plot_chart_gdp_pc(countries_guessed: List[str]):
     color_map = dict(zip(countries_to_plot, COLORS))
     color_map["?"] = color_map[SOLUTION]
 
+    # Add dash
+    df = _add_dash_column(df)
+
     # Hide country name if user has not succeded yet.
     if not st.session_state.user_has_succeded:
         df["location"] = df["location"].replace({SOLUTION: "?"})
@@ -290,6 +306,7 @@ def plot_chart_gdp_pc(countries_guessed: List[str]):
         color="location",
         color_discrete_map=color_map,
         title="GDP per capita (constant 2017 intl-$)",
+        line_dash="dash",
     )
     st.plotly_chart(
         fig,
