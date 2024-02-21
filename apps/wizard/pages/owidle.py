@@ -2,7 +2,7 @@
 import datetime as dt
 from math import asin, cos, radians, sin, sqrt
 from pathlib import Path
-from typing import List, Tuple, cast
+from typing import List, Tuple
 
 import geopandas as gpd
 import pandas as pd

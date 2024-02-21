@@ -5,6 +5,7 @@ BASE_DIR = Path(os.environ.get("BASE_DIR", Path(__file__).parent.parent))
 DAG_DIR = BASE_DIR / "dag"
 DAG_FILE = DAG_DIR / "main.yml"
 DAG_ARCHIVE_FILE = DAG_DIR / "archive" / "main.yml"
+DAG_TEMP_FILE = DAG_DIR / "temp.yml"
 DATA_DIR = BASE_DIR / "data"
 SNAPSHOTS_DIR = BASE_DIR / "snapshots"
 SNAPSHOTS_DIR_ARCHIVE = BASE_DIR / "snapshots_archive"

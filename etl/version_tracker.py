@@ -16,6 +16,9 @@ from etl.steps import extract_step_attributes, load_dag, reverse_graph
 
 log = structlog.get_logger()
 
+# Define the temporary step that will depend on newly created snapshots before they are used by any active steps.
+DAG_TEMP_STEP = "data-private://meadow/temp/latest/step"
+
 
 def list_all_steps_in_dag(dag: Dict[str, Any]) -> List[str]:
     """List all steps in a dag.
@@ -240,6 +243,7 @@ class VersionTracker:
     # List of steps known to be archivable, for which we don't want to see warnings.
     # We keep them in the active dag for technical reasons.
     KNOWN_ARCHIVABLE_STEPS = [
+        DAG_TEMP_STEP,
         "data://explorers/dummy/2020-01-01/dummy",
         "data://garden/dummy/2020-01-01/dummy",
         "data://garden/dummy/2020-01-01/dummy_full",
@@ -485,27 +489,30 @@ class VersionTracker:
         # Create a dataframe with one row per unique step.
         df = steps_df.drop_duplicates(subset="step")[["step", "identifier", "version"]].reset_index(drop=True)
         # For each step, find all alternative versions.
-        # One column will contain forward versions, another backward versions, and another all versions.
+        # New columns will contain forward versions, backward versions, all versions, and latest version.
         other_versions_forward = []
         other_versions_backward = []
         other_versions_all = []
+        latest_version = []
         for _, row in df.iterrows():
             # Create a mask that selects all steps with the same identifier.
             select_same_identifier = df["identifier"] == row["identifier"]
             # Find all forward versions of the current step.
-            other_versions_forward.append(
-                sorted(set(df[select_same_identifier & (df["version"] > row["version"])]["step"]))
-            )
+            versions_forward = sorted(set(df[select_same_identifier & (df["version"] > row["version"])]["step"]))
+            other_versions_forward.append(versions_forward)
             # Find all backward versions of the current step.
             other_versions_backward.append(
                 sorted(set(df[select_same_identifier & (df["version"] < row["version"])]["step"]))
             )
             # Find all versions of the current step.
             other_versions_all.append(sorted(set(df[select_same_identifier]["step"])))
+            # Find latest version of the current step.
+            latest_version.append(versions_forward[-1] if len(versions_forward) > 0 else row["step"])
         # Add columns to the dataframe.
         df["same_steps_forward"] = other_versions_forward
         df["same_steps_backward"] = other_versions_backward
         df["same_steps_all"] = other_versions_all
+        df["same_steps_latest"] = latest_version
         # Add new columns to the original steps dataframe.
         steps_df = pd.merge(steps_df, df.drop(columns=["identifier", "version"]), on="step", how="left")
 

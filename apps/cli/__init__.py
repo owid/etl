@@ -156,6 +156,7 @@ GROUPS = (
                 "diff": "etl.datadiff.cli",
                 "graphviz": "etl.to_graphviz.to_graphviz",
                 "compare": "etl.compare.cli",
+                "update": "apps.step_update.cli.cli",
             },
         },
         {

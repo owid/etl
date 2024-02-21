@@ -706,3 +706,160 @@ def read_json_schema(path: Union[Path, str]) -> Dict[str, Any]:
     with path.open("r") as f:
         dix = jsonref.loads(f.read(), base_uri=base_file_url, lazy_load=False)
         return cast(Dict[str, Any], dix)
+
+
+def get_comments_above_step_in_dag(step: str, dag_file: Path) -> str:
+    """Get the comment lines right above a step in the dag file."""
+
+    # Read the content of the dag file.
+    with open(dag_file, "r") as _dag_file:
+        lines = _dag_file.readlines()
+
+    # Initialize a list to store the header lines.
+    header_lines = []
+    for line in lines:
+        if line.strip().startswith("-") or (
+            line.strip().endswith(":") and (not line.strip().startswith("#")) and (step not in line)
+        ):
+            # Restart the header if the current line:
+            # * Is a dependency.
+            # * Is a step that is not the current step.
+            # * Is a special line like "steps:" or "include:".
+            header_lines = []
+        elif step in line and line.strip().endswith(":"):
+            # If the current line is the step, stop reading the rest of the file.
+            return "\n".join([line.strip() for line in header_lines]) + "\n" if len(header_lines) > 0 else ""
+        elif line.strip() == "":
+            # If the current line is empty, ignore it.
+            continue
+        else:
+            # Any line that is not a dependency,
+            header_lines.append(line)
+
+    # If the step has not been found, raise an error and return nothing.
+    log.error(f"Step {step} not found in dag file {dag_file}.")
+
+    return ""
+
+
+def write_to_dag_file(
+    dag_file: Path,
+    dag_part: Dict[str, Any],
+    comments: Optional[Dict[str, str]] = None,
+    indent_step=2,
+    indent_dependency=4,
+):
+    """Update the content of a dag file, respecting the comments above the steps.
+
+    NOTE: A simpler implementation of function may be possible using ruamel. However, I couldn't find out how to respect
+    comments that are above steps.
+
+    Parameters
+    ----------
+    dag_file : Path
+        Path to dag file.
+    dag_part : Dict[str, Any]
+        Partial dag, containing the steps that need to be updated.
+        This partial dag is a dictionary with steps as keys and the set of dependencies as values.
+    comments : Optional[Dict[str, str]], optional
+        Comments to add above the steps in the partial dag. The keys are the steps, and the values are the comments.
+    indent_step : int, optional
+        Number of spaces to use as indentation for steps in the dag.
+    indent_dependency : int, optional
+        Number of spaces to use as indentation for dependencies in the dag.
+
+    """
+
+    # If comments is not defined, assume an empty dictionary.
+    if comments is None:
+        comments = {}
+
+    for step in comments:
+        if len(comments[step]) > 0 and comments[step][-1] != "\n":
+            # Ensure all comments end in a line break, otherwise add it.
+            comments[step] = comments[step] + "\n"
+
+    # Read the lines in the original dag file.
+    with open(dag_file, "r") as file:
+        lines = file.readlines()
+
+    # Separate that content into the "steps" section (always given) and the "include" section (sometimes given).
+    section_steps = []
+    section_include = []
+    inside_section_steps = True
+    for line in lines:
+        if line.strip().startswith("include"):
+            inside_section_steps = False
+        if inside_section_steps:
+            section_steps.append(line)
+        else:
+            section_include.append(line)
+
+    # Now the "steps" section will be updated, and at the end the "include" section will be appended.
+
+    # Initialize a list with the new lines that will be written to the dag file.
+    updated_lines = []
+    # Initialize a flag to skip lines until the next step.
+    skip_until_next_step = False
+    # Initialize a set to keep track of the steps that were found in the original dag file.
+    steps_found = set()
+    for line in section_steps:
+        # Remove leading and trailing whitespace from the line.
+        stripped_line = line.strip()
+
+        # Identify the start of a step, e.g. "  data://meadow/temp/latest/step:".
+        if stripped_line.endswith(":") and not stripped_line.startswith("-"):
+            # Extract the name of the step (without the ":" at the end).
+            current_step = ":".join(stripped_line.split(":")[:-1])
+            if current_step in dag_part:
+                # This step was in dag_part, which means it needs to be updated.
+                # First add the step itself.
+                updated_lines.append(line)
+                # Now add each of its dependencies.
+                for dep in dag_part[current_step]:
+                    updated_lines.append(" " * indent_dependency + f"- {dep}\n")
+                # Skip the following lines until the next step is found.
+                skip_until_next_step = True
+                # Add the current step to the set of steps found in the dag file.
+                steps_found.add(current_step)
+                continue
+            else:
+                # This step was not in dag_part, so it will be copied as is.
+                skip_until_next_step = False
+
+        # Skip dependencies and comments among dependencies of the step being updated.
+        if skip_until_next_step and stripped_line.startswith(("-", "#")):
+            continue
+
+        # Add lines that should not be skipped.
+        updated_lines.append(line)
+
+    # Append new steps that weren't found in the original content.
+    for step, dependencies in dag_part.items():
+        if step not in steps_found:
+            # Add the comment for this step, if any was given.
+            if step in comments:
+                updated_lines.append(
+                    " " * indent_step + ("\n" + " " * indent_step).join(comments[step].split("\n")[:-1]) + "\n"
+                    if len(comments[step]) > 0
+                    else ""
+                )
+            # Add the step itself.
+            updated_lines.append(" " * indent_step + f"{step}:\n")
+            # Add each of its dependencies.
+            for dep in dependencies:
+                updated_lines.append(" " * indent_dependency + f"- {dep}\n")
+
+    if len(section_include) > 0:
+        # Append the include section, ensuring there is only one line break in between.
+        for i in range(len(updated_lines) - 1, -1, -1):
+            if updated_lines[i] != "\n":
+                # Slice the list to remove trailing line breaks
+                updated_lines = updated_lines[: i + 1]
+                break
+        # Add a single line break before the include section, and then add the include section.
+        updated_lines.extend(["\n"] + section_include)
+
+    # Write the updated content back to the dag file.
+    with open(dag_file, "w") as file:
+        file.writelines(updated_lines)

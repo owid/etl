@@ -50,8 +50,13 @@ set_rich_click_style()
     type=int,
     help="Application port",
 )
-def cli(phase: Iterable[WIZARD_PHASES], run_checks: bool, dummy_data: bool, port: int) -> None:
-    """Run OWID's ETL admin tool, the Wizard.
+def cli(
+    phase: Iterable[WIZARD_PHASES],
+    run_checks: bool,
+    dummy_data: bool,
+    port: int,
+) -> None:
+    r"""Run OWID's ETL admin tool, the Wizard.
 
     ```
     ..__    __ _                  _

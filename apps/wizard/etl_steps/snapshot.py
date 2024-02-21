@@ -58,6 +58,7 @@ dummy_values = {
     "origin.url_main": "https://dummy.dummy",
     "origin.date_accessed": utils.DATE_TODAY,
 }
+
 # Other state vars
 if "show_form" not in st.session_state:
     st.session_state["show_form"] = True

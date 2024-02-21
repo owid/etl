@@ -1,11 +1,13 @@
 import sys
+import tempfile
+from pathlib import Path
 from unittest.mock import patch
 
 import pytest
 from owid import catalog
 
 from etl import paths
-from etl.helpers import PathFinder, create_dataset, isolated_env
+from etl.helpers import PathFinder, create_dataset, get_comments_above_step_in_dag, isolated_env, write_to_dag_file
 
 
 def test_PathFinder_paths():
@@ -103,3 +105,319 @@ def test_isolated_env(tmp_path):
         import shared  # type: ignore
 
     assert "test_abc" not in sys.modules.keys()
+
+
+def _assert_write_to_dag_file(
+    old_content, expected_content, dag_part, comments=None, indent_step=2, indent_dependency=4
+):
+    with tempfile.TemporaryDirectory() as temp_dir:
+        temp_file = Path(temp_dir) / "temp.yml"
+        # Create a dag file inside a temporary folder.
+        temp_file.write_text(old_content)
+        # Update dag file with the given dag part.
+        write_to_dag_file(
+            dag_file=temp_file,
+            dag_part=dag_part,
+            comments=comments,
+            indent_step=indent_step,
+            indent_dependency=indent_dependency,
+        )
+        # Assert that the file content is the same as before.
+        with open(temp_file, "r") as updated_file:
+            new_content = updated_file.read()
+    assert new_content == expected_content
+
+
+def test_write_to_dag_file_empty_dag_part():
+    old_content = """\
+steps:
+    meadow_a:
+    - snapshot_a
+    meadow_b:
+    - snapshot_b
+"""
+    expected_content = old_content
+    _assert_write_to_dag_file(old_content, expected_content, dag_part={})
+
+
+def test_write_to_dag_file_add_new_step():
+    old_content = """\
+steps:
+  meadow_a:
+    - snapshot_a
+  meadow_b:
+    - snapshot_b
+"""
+    expected_content = """\
+steps:
+  meadow_a:
+    - snapshot_a
+  meadow_b:
+    - snapshot_b
+  meadow_c:
+    - snapshot_a
+    - snapshot_b
+"""
+    _assert_write_to_dag_file(old_content, expected_content, dag_part={"meadow_c": ["snapshot_a", "snapshot_b"]})
+
+
+def test_write_to_dag_file_update_existing_step():
+    old_content = """\
+steps:
+  meadow_a:
+    - snapshot_a
+  meadow_b:
+    - snapshot_b
+"""
+    expected_content = """\
+steps:
+  meadow_a:
+    - snapshot_a
+  meadow_b:
+    - snapshot_b
+    - snapshot_c
+"""
+    _assert_write_to_dag_file(old_content, expected_content, dag_part={"meadow_b": ["snapshot_b", "snapshot_c"]})
+
+
+def test_write_to_dag_file_change_indent():
+    old_content = """\
+steps:
+  meadow_a:
+    - snapshot_a
+  meadow_b:
+    - snapshot_b
+  meadow_c:
+    - snapshot_a
+    - snapshot_b
+"""
+    expected_content = """\
+steps:
+  meadow_a:
+    - snapshot_a
+  meadow_b:
+    - snapshot_b
+  meadow_c:
+    - snapshot_a
+    - snapshot_b
+   meadow_d:
+     - snapshot_d
+"""
+    _assert_write_to_dag_file(
+        old_content, expected_content, dag_part={"meadow_d": ["snapshot_d"]}, indent_step=3, indent_dependency=5
+    )
+
+
+def test_write_to_dag_file_respect_comments():
+    old_content = """\
+steps:
+  # Comment for meadow_a.
+  meadow_a:
+    # Comment for snapshot_a.
+    - snapshot_a
+  # Comment for meadow_b.
+  # And another comment.
+  meadow_b:
+    - snapshot_b
+"""
+    expected_content = """\
+steps:
+  # Comment for meadow_a.
+  meadow_a:
+    # Comment for snapshot_a.
+    - snapshot_a
+  # Comment for meadow_b.
+  # And another comment.
+  meadow_b:
+    - snapshot_b
+  meadow_c:
+    - snapshot_a
+    - snapshot_b
+"""
+    _assert_write_to_dag_file(old_content, expected_content, dag_part={"meadow_c": ["snapshot_a", "snapshot_b"]})
+
+
+def test_write_to_dag_file_respect_line_breaks():
+    old_content = """\
+steps:
+  # Comment for meadow_a.
+  meadow_a:
+    # Comment for snapshot_a.
+    - snapshot_a
+
+  # Comment for meadow_b.
+
+  # And another comment.
+  meadow_b:
+
+    - snapshot_b
+"""
+    expected_content = """\
+steps:
+  # Comment for meadow_a.
+  meadow_a:
+    # Comment for snapshot_a.
+    - snapshot_a
+
+  # Comment for meadow_b.
+
+  # And another comment.
+  meadow_b:
+
+    - snapshot_b
+  meadow_c:
+    - snapshot_a
+    - snapshot_b
+"""
+    _assert_write_to_dag_file(old_content, expected_content, dag_part={"meadow_c": ["snapshot_a", "snapshot_b"]})
+
+
+def test_write_to_dag_file_remove_comments_within_updated_dependencies():
+    old_content = """\
+steps:
+  # Comment for meadow_a.
+  meadow_a:
+    # Comment for snapshot_a.
+    - snapshot_a
+  # Comment for meadow_b.
+  # And another comment.
+  meadow_b:
+    # Comment for snapshot_b.
+    - snapshot_b
+"""
+    # NOTE: This is not necessarily desired behavior, but it is the one to be expected.
+    # Keeping track of comments among dependencies may be a bit trickier.
+    expected_content = """\
+steps:
+  # Comment for meadow_a.
+  meadow_a:
+    # Comment for snapshot_a.
+    - snapshot_a
+  # Comment for meadow_b.
+  # And another comment.
+  meadow_b:
+    - snapshot_b
+"""
+    _assert_write_to_dag_file(old_content, expected_content, dag_part={"meadow_b": ["snapshot_b"]})
+
+
+def test_write_to_dag_file_add_comments():
+    old_content = """\
+steps:
+  # Comment for meadow_a.
+  meadow_a:
+    # Comment for snapshot_a.
+    - snapshot_a
+  # Comment for meadow_b.
+  # And another comment.
+  meadow_b:
+    # Comment for snapshot_b.
+    - snapshot_b
+"""
+    expected_content = """\
+steps:
+  # Comment for meadow_a.
+  meadow_a:
+    # Comment for snapshot_a.
+    - snapshot_a
+  # Comment for meadow_b.
+  # And another comment.
+  meadow_b:
+    # Comment for snapshot_b.
+    - snapshot_b
+  # Comment for meadow_c.
+  meadow_c:
+    - snapshot_a
+    - snapshot_b
+"""
+    _assert_write_to_dag_file(
+        old_content,
+        expected_content,
+        dag_part={"meadow_c": ["snapshot_a", "snapshot_b"]},
+        comments={"meadow_c": "# Comment for meadow_c."},
+    )
+
+
+def test_write_to_dag_file_with_include_section():
+    old_content = """\
+steps:
+  # Comment for meadow_a.
+  meadow_a:
+    # Comment for snapshot_a.
+    - snapshot_a
+  # Comment for meadow_b.
+  # And another comment.
+  meadow_b:
+    # Comment for snapshot_b.
+    - snapshot_b
+include:
+  - path/to/another/dag.yml
+"""
+    # NOTE: By construction, we impose that there must be an empty space between steps and include sections.
+    expected_content = """\
+steps:
+  # Comment for meadow_a.
+  meadow_a:
+    # Comment for snapshot_a.
+    - snapshot_a
+  # Comment for meadow_b.
+  # And another comment.
+  meadow_b:
+    # Comment for snapshot_b.
+    - snapshot_b
+  # Comment for meadow_c.
+  meadow_c:
+    - snapshot_a
+    - snapshot_b
+
+include:
+  - path/to/another/dag.yml
+"""
+    _assert_write_to_dag_file(
+        old_content,
+        expected_content,
+        dag_part={"meadow_c": ["snapshot_a", "snapshot_b"]},
+        comments={"meadow_c": "# Comment for meadow_c."},
+    )
+
+
+def test_get_comments_above_step_in_dag():
+    yaml_content = """\
+steps:
+  # Comment for meadow_a.
+  meadow_a:
+    # Comment for snapshot_a.
+    - snapshot_a
+  # Comment for meadow_b.
+  # And another comment.
+  meadow_b:
+    # Comment for snapshot_b.
+    - snapshot_b
+
+  meadow_c:
+    - snapshot_a
+    - snapshot_b
+  #
+  meadow_d:
+
+  # Comment for meadow_e.
+
+  meadow_e:
+    - snapshot_e
+
+include:
+  - path/to/another/dag.yml
+"""
+    with tempfile.TemporaryDirectory() as temp_dir:
+        temp_file = Path(temp_dir) / "temp.yml"
+        # Create a dag file inside a temporary folder.
+        temp_file.write_text(yaml_content)
+        assert get_comments_above_step_in_dag(step="meadow_a", dag_file=temp_file) == "# Comment for meadow_a.\n"
+        assert (
+            get_comments_above_step_in_dag(step="meadow_b", dag_file=temp_file)
+            == "# Comment for meadow_b.\n# And another comment.\n"
+        )
+        assert get_comments_above_step_in_dag(step="meadow_c", dag_file=temp_file) == ""
+        assert get_comments_above_step_in_dag(step="meadow_d", dag_file=temp_file) == "#\n"
+        assert get_comments_above_step_in_dag(step="meadow_e", dag_file=temp_file) == "# Comment for meadow_e.\n"
+        assert get_comments_above_step_in_dag(step="non_existing_step", dag_file=temp_file) == ""
