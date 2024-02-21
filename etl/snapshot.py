@@ -76,10 +76,11 @@ class Snapshot:
             s3_utils.download(download_url, str(self.path))
 
         # Check if file was downloaded correctly. This should never happen
-        if checksum_file(self.path) != md5:
+        downloaded_md5 = checksum_file(self.path)
+        if downloaded_md5 != md5:
             # remove the downloaded file
             self.path.unlink()
-            raise ValueError(f"Checksum mismatch for {self.path}")
+            raise ValueError(f"Checksum mismatch for {self.path}: expected {md5}, got {downloaded_md5}")
 
     def pull(self, force=True) -> None:
         """Pull file from S3."""

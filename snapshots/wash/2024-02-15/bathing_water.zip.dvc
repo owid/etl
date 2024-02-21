@@ -15,7 +15,7 @@ meta:
     attribution_short: EEA
 
     # Files
-    url_main: 
+    url_main:
       https://sdi.eea.europa.eu/catalogue/eea-statistical-data/eng/catalog.search#/metadata/345d79dc-64eb-4b59-8a5d-b3d806081c14
     url_download: https://sdi.eea.europa.eu/datashare/s/gYspcEwmfZggS96/download
     date_accessed: 2024-02-15
@@ -27,6 +27,6 @@ meta:
 
 wdir: ../../../data/snapshots/wash/2024-02-15
 outs:
-- md5: 293e5a55e96cc323c8586501a9fdd92d
+- md5: 640bbdc025b5bdbb45d604a3dae774ea
   size: 124607
   path: bathing_water.zip
