@@ -1,0 +1,44 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Climate Change
+    display:
+      numDecimalPlaces: 0
+      yearIsDay: false
+    short_unit: tonnes
+    unit: t
+    processing_level: major
+
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
+dataset:
+  update_period_days: 365
+  title: "Global Yearly Emissions from Fires"
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
+tables:
+  monthly_fire_emissions:
+    # Learn more about the available fields:
+    # http://docs.owid.io/projects/etl/architecture/metadata/reference/indicator/
+    variables:
+      co2:
+        title: Yearly CO₂ emissions from fires
+        description_short: Yearly CO₂ emissions from fires measure the carbon dioxide released by fires annually.
+        description_key:
+        - Primary emission sources include wildfires, agricultural burning, and prescribed burns.
+        - CO₂ emissions contribute to the greenhouse effect, influencing global warming and climate change.
+
+      pm25:
+        title: Yearly PM2.5 emissions from fires
+        description_short: Yearly PM2.5 emissions from fires represent the quantity of fine particulate matter (diameter less than 2.5 micrometers) released by fires annually.
+        description_key:
+          - Emission sources can include wildfires, agricultural burning, and prescribed burns.
+          - PM2.5 can penetrate deep into the respiratory tract, affecting the lungs and potentially entering the bloodstream.
+          - Exposure to PM2.5 is linked to respiratory and cardiovascular issues, and premature death in people with heart or lung disease.
+
