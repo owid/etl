@@ -7,6 +7,7 @@ import numpy as np
 import pandas as pd
 import xarray as xr
 from owid.catalog import Table
+from rioxarray.exceptions import NoDataInBounds
 from shapely.geometry import mapping
 from structlog import get_logger
 from tqdm import tqdm
@@ -87,7 +88,8 @@ def run(dest_dir: str) -> None:
             # Store the calculated mean temperature in the dictionary with the country's name as the key.
             temp_country[shapefile.iloc[i]["WB_NAME"]] = country_weighted_mean
 
-        except Exception:
+        except NoDataInBounds:
+            print("No data was found in the specified bounds.")
             # If an error occurs (usually due to small size of the country), add the country's name to the small_countries list.
             small_countries.append(shapefile.iloc[i]["WB_NAME"])
 
@@ -101,7 +103,7 @@ def run(dest_dir: str) -> None:
     weights.name = "weights"
     clim_month_weighted = da.weighted(weights)
     global_mean = clim_month_weighted.mean(["longitude", "latitude"])
-    temp_country["Global"] = global_mean
+    temp_country["World"] = global_mean
 
     # Define the start and end dates
     start_time = da["time"].min().dt.date.astype(str).item()

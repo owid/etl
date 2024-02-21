@@ -20,7 +20,7 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
-    tb_global = tb[tb["country"] == "Global"]
+    tb_global = tb[tb["country"] == "World"]
     tb_anomalies = tb_global[["year", "month", "anomaly_below_0", "anomaly_above_0"]]
     tb_anomalies = tb_anomalies.rename(
         columns={"anomaly_below_0": "Below the average", "anomaly_above_0": "Above the average"}

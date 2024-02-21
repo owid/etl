@@ -16,9 +16,11 @@ definitions:
 
     - It's important to note, however, that due to the resolution constraints of the Copernicus dataset, this methodology might not be as effective for countries with very small landmasses. In these cases, the process may not yield reliable data.
 
-    - Furthermore, the derived 2-meter temperature readings are calculated based on administrative borders, encompassing all land surface types within these defined areas. Consequently, when computing regional or global temperature averages, these calculations are based solely on these administrative boundaries. As a result, temperatures over oceans and seas are not included in these averages, focusing the data primarily on terrestrial environments.
-  temperature_anomaly: The temperature anomaly is determined by comparing the average surface temperature of a given month to the 1951-1980 mean, highlighting climate variations.
-  temperature_anomaly_above: Calculated when the average surface temperature for a month is higher than the 1991-2020 average, this anomaly indicates a colder-than-average temperature for that month.
+    - The derived 2-meter temperature readings for each country are calculated based on administrative borders, encompassing all land surface types within these defined areas. As a result, temperatures over oceans and seas are not included in these averages, focusing the data primarily on terrestrial environments.
+
+    - Global temperature averages are calculated over all land and ocean surfaces.
+  temperature_anomaly: The temperature anomaly is determined by comparing the average surface temperature of a given month to the 1991-2020 mean, highlighting climate variations.
+  temperature_anomaly_above: Calculated when the average surface temperature for a month is higher than the 1991-2020 average, this anomaly indicates a hotter-than-average temperature for that month.
   temperature_anomaly_below: Calculated when the average surface temperature for a month is lower than the 1991-2020 average, this anomaly indicates a colder-than-average temperature for that month.
 
 dataset:

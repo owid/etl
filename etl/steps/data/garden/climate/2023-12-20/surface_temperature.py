@@ -28,12 +28,12 @@ def run(dest_dir: str) -> None:
     tb["year"] = tb["time"].astype(str).str[0:4]
     tb["month"] = tb["time"].astype(str).str[5:7]
     # Use the baseline from the Copernicus Climate Service https://climate.copernicus.eu/surface-air-temperature-january-2024
-    tb_base = tb[(tb["year"].astype(int) > 1990) & (tb["year"].astype(int) < 2021)]
-    monthly_climatology = tb_base.groupby(["country", "month"], as_index=False)["temperature_2m"].mean()
-    monthly_climatology = monthly_climatology.rename(columns={"temperature_2m": "mean_temp"})
+    tb_baseline = tb[(tb["year"].astype(int) > 1990) & (tb["year"].astype(int) < 2021)]
+    tb_baseline = tb_baseline.groupby(["country", "month"], as_index=False)["temperature_2m"].mean()
+    tb_baseline = tb_baseline.rename(columns={"temperature_2m": "mean_temp"})
 
     # Ensure that the reference mean DataFrame has a name for the mean column, e.g., 'mean_temp'
-    merged_df = pr.merge(tb, monthly_climatology, on=["country", "month"])
+    merged_df = pr.merge(tb, tb_baseline, on=["country", "month"])
 
     # Calculate the anomalies (below and above the mean)
     merged_df["temperature_anomaly"] = merged_df["temperature_2m"] - merged_df["mean_temp"]
