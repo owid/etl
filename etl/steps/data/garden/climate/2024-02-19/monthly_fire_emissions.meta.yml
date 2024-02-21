@@ -10,7 +10,7 @@ definitions:
       yearIsDay: true
     short_unit: tonnes
     unit: t
-
+    processing_level: minor
 
 
 # Learn more about the available fields:
@@ -28,16 +28,16 @@ tables:
     variables:
       co2:
         title: Monthly CO₂ emissions from fires
+        description_short: Monthly CO₂ emissions from fires measure the carbon dioxide released by fires each month.
         description_key:
-        - Monthly CO₂ emissions from fires measure the carbon dioxide released by fires each month.
-        - Primary sources include wildfires, agricultural burning, and prescribed burns.
+        - Primary sources of emissions include wildfires, agricultural burning, and prescribed burns.
         - CO₂ emissions contribute to the greenhouse effect, influencing global warming and climate change.
 
       pm25:
         title: Monthly PM2.5 emissions from fires
+        description_short: Monthly PM2.5 emissions from fires represent the quantity of fine particulate matter (diameter less than 2.5 micrometers) released by fires over a month.
         description_key:
-          - Monthly PM2.5 emissions from fires represent the quantity of fine particulate matter (diameter less than 2.5 micrometers) released by fires over a month.
-          - Sources can include wildfires, agricultural burning, and prescribed burns.
+          - Sources of emissions can include wildfires, agricultural burning, and prescribed burns.
           - PM2.5 can penetrate deep into the respiratory tract, affecting the lungs and potentially entering the bloodstream.
           - Exposure to PM2.5 is linked to respiratory and cardiovascular issues, and premature death in people with heart or lung disease.
 

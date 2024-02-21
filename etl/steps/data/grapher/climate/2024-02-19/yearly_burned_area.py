@@ -44,7 +44,6 @@ def run(dest_dir: str) -> None:
     ds_grapher = create_dataset(
         dest_dir, tables=[grouped_tb], check_variables_metadata=True, default_metadata=ds_garden.metadata
     )
-    ds_grapher.metadata.title = "Global Yearly Burned Area"
 
     # Save changes in the new grapher dataset.
     ds_grapher.save()

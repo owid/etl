@@ -16,13 +16,13 @@ meta:
 
     # Files
     url_main: https://gwis.jrc.ec.europa.eu/apps/country.profile/downloads
-    url_download: 
+    url_download:
       https://effis-gwis-cms.s3.eu-west-1.amazonaws.com/apps/country.profile/MCD64A1_burned_area_full_dataset_2002-2022.zip
     date_accessed: 2024-02-19
 
     # License
     license:
-      name: European Union, 1995-2023
+      name: CC BY 4.0
       url: https://gwis.jrc.ec.europa.eu/about-gwis/data-license
 
 wdir: ../../../data/snapshots/climate/2024-02-19
