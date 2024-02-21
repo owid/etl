@@ -24,7 +24,7 @@ definitions:
   temperature_anomaly_below: Calculated when the average surface temperature for a month is lower than the 1991-2020 average, this anomaly indicates a colder-than-average temperature for that month.
 
 dataset:
-  title: Monthly surface temperature since 1950 by country
+  title: Monthly surface temperature since 1940 by country
 
 tables:
   surface_temperature:
