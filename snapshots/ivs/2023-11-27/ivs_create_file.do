@@ -41,9 +41,27 @@ global environment_vs_econ_questions B008
 * income equality
 global income_equality_questions E035
 
+* Schwartz questions
+global schwartz_questions A189 A190 A191 A192 A193 A194 A195 A196 A197 A198
+
+* Work vs. leisure
+global work_leisure_questions C008
+
+* Work
+global work_questions C039 C041
+
+* Most serious problem
+global most_serious_problem_questions E238
+
+* Justifiable
+global justifiable_questions F114A F114B F114C F114D F115 F116 F117 F118 F119 F120 F121 F122 F123 F132 F135A F144_01 F144_02 F199 E290
+
+* Worries
+global worries_questions H006_01 H006_02 H006_03 H006_04 H006_05
+
 * List of questions to work with
 * NOTE: A168 is not available in IVS
-global questions A165 A168 G007_33_B G007_34_B $additional_questions $important_in_life_questions $politics_questions $environment_vs_econ_questions $income_equality_questions
+global questions A165 A168 G007_33_B G007_34_B $additional_questions $important_in_life_questions $politics_questions $environment_vs_econ_questions $income_equality_questions $schwartz_questions $work_leisure_questions $work_questions $most_serious_problem_questions $justifiable_questions $worries_questions
 
  * Keep wave ID, country, weight and the list of questions
 keep S002VS S002EVS S003 S017 $questions
@@ -399,6 +417,329 @@ save "`income_equality_file'"
 restore
 preserve
 
+* Processing "Schwartz" questions
+/*
+           1 Not at all like me
+           2 Not like me
+           3 A little like me
+           4 Somewhat like me
+           5 Like me
+           6 Very much like me
+          .a Don't know
+          .b No answer
+          .c Not applicable
+          .d Not asked in survey
+          .e Missing: other
+
+*/
+
+
+foreach var in $schwartz_questions {
+	keep if `var' >= 1
+
+	gen like_me_agg_`var' = 0
+	replace like_me_agg_`var' = 1 if `var' == 4 | `var' == 5 | `var' == 6
+	
+	gen not_like_me_agg_`var' = 0
+	replace not_like_me_agg_`var' = 1 if `var' == 1 | `var' == 2
+	
+	gen very_much_like_me_`var' = 0
+	replace very_much_like_me_`var' = 1 if `var' == 6
+	
+	gen like_me_`var' = 0
+	replace like_me_`var' = 1 if `var' == 5
+	
+	gen somewhat_like_me_`var' = 0
+	replace somewhat_like_me_`var' = 1 if `var' == 4
+	
+	gen a_little_like_me_`var' = 0
+	replace a_little_like_me_`var' = 1 if `var' == 3
+	
+	gen not_like_me_`var' = 0
+	replace not_like_me_`var' = 1 if `var' == 2
+	
+	gen not_at_all_like_me_`var' = 0
+	replace not_at_all_like_me_`var' = 1 if `var' == 1
+	
+	gen dont_know_like_me_`var' = 0
+	replace dont_know_like_me_`var' = 1 if `var' == .a
+	
+	gen missing_like_me_`var' = 0
+	replace missing_like_me_`var' = 1 if `var' == .b | `var' == .c | `var' == .d | `var' == .e
+
+	collapse (mean) like_me_agg_`var' not_like_me_agg_`var' very_much_like_me_`var' like_me_`var' somewhat_like_me_`var' a_little_like_me_`var' not_like_me_`var' not_at_all_like_me_`var' dont_know_like_me_`var' missing_like_me_`var' [w=S017], by (year country)
+	tempfile schwartz_`var'_file
+	save "`schwartz_`var'_file'"
+
+	restore
+	preserve
+}
+
+* Processing work vs. leisure question
+/*
+           1 It's leisure that makes life worth living, not work
+           2 2
+           3 3
+           4 4
+           5 Work is what makes life worth living, not leisure
+          .a Don't know
+          .b No answer
+          .c Not applicable
+          .d Not asked in survey
+          .e Missing: other
+*/
+
+* Keep only answers
+keep if C008 >= 1
+
+*Generate variables
+gen leisure_lei_vs_wk = 0
+replace leisure_lei_vs_wk = 1 if C008 <= 2
+
+gen neutral_lei_vs_wk = 0
+replace neutral_lei_vs_wk = 1 if C008 == 3
+
+gen work_lei_vs_wk = 0
+replace work_lei_vs_wk = 1 if C008 == 4 | C008 == 5
+
+gen lei_vs_wk_1 = 0
+replace lei_vs_wk_1  = 1 if C008 == 1
+
+gen lei_vs_wk_2 = 0
+replace lei_vs_wk_2  = 1 if C008 == 2
+
+gen lei_vs_wk_4 = 0
+replace lei_vs_wk_4  = 1 if C008 == 4
+
+gen lei_vs_wk_5 = 0
+replace lei_vs_wk_5  = 1 if C008 == 5
+
+gen dont_know_lei_vs_wk = 0
+replace dont_know_lei_vs_wk = 1 if C008 == .a
+
+gen missing_know_lei_vs_wk = 0
+replace missing_know_lei_vs_wk = 1 if C008 == .b | C008 == .c | C008 == .d | C008 == .e
+
+gen avg_score_lei_vs_wk = C008
+
+* Make dataset of the mean trust (which ends up being the % of people saying "most people can be trusted") by wave and country (CHECK WEIGHTS)
+collapse (mean) leisure_lei_vs_wk neutral_lei_vs_wk work_lei_vs_wk lei_vs_wk_1 lei_vs_wk_2 lei_vs_wk_4 lei_vs_wk_5 dont_know_lei_vs_wk missing_know_lei_vs_wk avg_score_lei_vs_wk [w=S017], by (year country)
+tempfile leisure_vs_work_file
+save "`leisure_vs_work_file'"
+
+restore
+preserve
+
+* Processing work questions
+/*
+           1 Strongly agree
+           2 Agree
+           3 Neither agree nor disagree
+           4 Disagree
+           5 Strongly disagree
+          .a Don't know
+          .b No answer
+          .c Not applicable
+          .d Not asked in survey
+          .e Missing: other
+
+*/
+
+
+foreach var in $work_questions {
+	keep if `var' >= 1
+
+	gen agree_agg_`var' = 0
+	replace agree_agg_`var' = 1 if `var' == 1 | `var' == 2
+	
+	gen disagree_agg_`var' = 0
+	replace disagree_agg_`var' = 1 if `var' == 4 | `var' == 5
+	
+	gen strongly_agree_`var' = 0
+	replace strongly_agree_`var' = 1 if `var' == 1
+	
+	gen agree_`var' = 0
+	replace agree_`var' = 1 if `var' == 2
+	
+	gen neither_`var' = 0
+	replace neither_`var' = 1 if `var' == 3
+	
+	gen disagree_`var' = 0
+	replace disagree_`var' = 1 if `var' == 4
+	
+	gen strongly_disagree_`var' = 0
+	replace strongly_disagree_`var' = 1 if `var' == 5
+	
+	gen dont_know_`var' = 0
+	replace dont_know_`var' = 1 if `var' == .a
+	
+	gen missing_`var' = 0
+	replace missing_`var' = 1 if `var' == .b | `var' == .c | `var' == .d | `var' == .e
+
+	collapse (mean) agree_agg_`var' disagree_agg_`var' strongly_agree_`var' agree_`var' neither_`var' disagree_`var' strongly_disagree_`var' dont_know_`var' missing_`var' [w=S017], by (year country)
+	tempfile work_`var'_file
+	save "`work_`var'_file'"
+
+	restore
+	preserve
+}
+
+* Processing most serious problem of the world
+/*
+           1 People living in poverty and need
+           2 Discrimination against girls and women
+           3 Poor sanitation and infectious diseases
+           4 Inadequate education
+           5 Environmental pollution
+          .a Don't know
+          .b No answer
+          .c Not applicable
+          .d Not asked in survey
+          .e Missing: other
+
+*/
+
+* Keep only answers
+keep if E238 >= 1
+
+*Generate variables
+gen poverty_most_serious = 0
+replace poverty_most_serious = 1 if E238 == 1
+
+gen women_discr_most_serious = 0
+replace women_discr_most_serious = 1 if E238 == 2
+
+gen sanitation_most_serious = 0
+replace sanitation_most_serious = 1 if E238 == 3
+
+gen education_most_serious = 0
+replace education_most_serious  = 1 if E238 == 4
+
+gen pollution_most_serious = 0
+replace pollution_most_serious  = 1 if E238 == 5
+
+gen dont_know_most_serious = 0
+replace dont_know_most_serious = 1 if E238 == .a
+
+gen missing_most_serious = 0
+replace missing_most_serious = 1 if E238 == .b | E238 == .c | E238 == .d | E238 == .e
+
+* Make dataset of the mean trust (which ends up being the % of people saying "most people can be trusted") by wave and country (CHECK WEIGHTS)
+collapse (mean) poverty_most_serious women_discr_most_serious sanitation_most_serious education_most_serious pollution_most_serious dont_know_most_serious missing_most_serious [w=S017], by (year country)
+tempfile most_serious_file
+save "`most_serious_file'"
+
+restore
+preserve
+
+* Processing justifiable questions
+/*
+           1 Never justifiable
+           2 2
+           3 3
+           4 4
+           5 5
+           6 6
+           7 7
+           8 8
+           9 9
+          10 Always justifiable
+          .a Don't know
+          .b No answer
+          .c Not applicable
+          .d Not asked in survey
+          .e Missing: other
+
+
+*/
+
+
+foreach var in $justifiable_questions {
+	keep if `var' >= 1
+
+	gen never_just_agg_`var' = 0
+	replace never_just_agg_`var' = 1 if `var' <= 4
+	
+	gen always_just_agg_`var' = 0
+	replace always_just_agg_`var' = 1 if `var' >= 6 | `var' <= 10
+	
+	gen never_just_`var' = 0
+	replace never_just_`var' = 1 if `var' == 1
+	
+	gen always_just_`var' = 0
+	replace always_just_`var' = 1 if `var' == 10
+	
+	gen neutral_`var' = 0
+	replace neutral_`var' = 1 if `var' == 5
+	
+	gen dont_know_`var' = 0
+	replace dont_know_`var' = 1 if `var' == .a
+	
+	gen missing_`var' = 0
+	replace missing_`var' = 1 if `var' == .b | `var' == .c | `var' == .d | `var' == .e
+	
+	gen avg_score_`var' = `var'
+
+	collapse (mean) never_just_agg_`var' always_just_agg_`var' never_just_`var' always_just_`var' neutral_`var' dont_know_`var' missing_`var' avg_score_`var' [w=S017], by (year country)
+	tempfile justifiable_`var'_file
+	save "`justifiable_`var'_file'"
+
+	restore
+	preserve
+}
+
+* Processing worries questions
+/*
+           1 Very much
+           2 A great deal
+           3 Not much
+           4 Not at all
+          .a Don't know
+          .b No answer
+          .c Not applicable
+          .d Not asked in survey
+          .e Missing: other
+
+*/
+
+
+foreach var in $worries_questions {
+	keep if `var' >= 1
+
+	gen worry_`var' = 0
+	replace worry_`var' = 1 if `var' <= 2
+	
+	gen not_worry_`var' = 0
+	replace not_worry_`var' = 1 if `var' == 3 | `var' == 4
+	
+	gen very_much_`var' = 0
+	replace very_much_`var' = 1 if `var' == 1
+	
+	gen a_great_deal_`var' = 0
+	replace a_great_deal_`var' = 1 if `var' == 2
+	
+	gen not_much_`var' = 0
+	replace not_much_`var' = 1 if `var' == 3
+	
+	gen not_at_all_`var' = 0
+	replace not_at_all_`var' = 1 if `var' == 4
+	
+	gen dont_know_`var' = 0
+	replace dont_know_`var' = 1 if `var' == .a
+	
+	gen missing_`var' = 0
+	replace missing_`var' = 1 if `var' == .b | `var' == .c | `var' == .d | `var' == .e
+	
+	gen avg_score_`var' = `var'
+
+	collapse (mean) worry_`var' not_worry_`var' very_much_`var' a_great_deal_`var' not_much_`var' not_at_all_`var' dont_know_`var' missing_`var' avg_score_`var' [w=S017], by (year country)
+	tempfile worries_`var'_file
+	save "`worries_`var'_file'"
+
+	restore
+	preserve
+}
+
 
 
 * Combine all the saved datasets
@@ -426,9 +767,29 @@ merge 1:1 year country using "`environment_vs_econ_file'", nogenerate // keep(ma
 
 merge 1:1 year country using "`income_equality_file'", nogenerate // keep(master match)
 
+foreach var in $schwartz_questions {
+	merge 1:1 year country using "`schwartz_`var'_file'", nogenerate // keep(master match)
+}
+
+merge 1:1 year country using "`leisure_vs_work_file'", nogenerate // keep(master match)
+
+foreach var in $work_questions {
+	merge 1:1 year country using "`work_`var'_file'", nogenerate // keep(master match)
+}
+
+merge 1:1 year country using "`most_serious_file'", nogenerate // keep(master match)
+
+foreach var in $justifiable_questions {
+	merge 1:1 year country using "`justifiable_`var'_file'", nogenerate // keep(master match)
+}
+
+foreach var in $worries_questions {
+	merge 1:1 year country using "`worries_`var'_file'", nogenerate // keep(master match)
+}
+
 
 * Get a list of variables excluding country and year (and avg_score_eq_ineq to not multiply it by 100)
-ds country year avg_score_eq_ineq, not
+ds country year avg_score*, not
 
 * Multiply variables by 100 to get percentages
 foreach var of varlist `r(varlist)' {
