@@ -1,0 +1,14 @@
+dataset:
+  title: DRAFT Mojmir test please delete
+  description: ''
+  licenses:
+    - {}
+tables:
+  mojmir_test_please_delete:
+    variables:
+      variable_a:
+        title: Variable A
+        unit: ''
+      variable_b:
+        title: Variable B
+        unit: ''
