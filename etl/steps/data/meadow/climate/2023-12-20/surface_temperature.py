@@ -67,6 +67,7 @@ def run(dest_dir: str) -> None:
     for i in tqdm(range(shapefile.shape[0])):
         # Extract the data for the current row.
         data = shapefile[shapefile.index == i]
+        country_name = shapefile.iloc[i]["WB_NAME"]
 
         # Set the coordinate reference system for the temperature data to EPSG 4326.
         da.rio.write_crs("epsg:4326", inplace=True)
@@ -86,11 +87,12 @@ def run(dest_dir: str) -> None:
             country_weighted_mean = clim_month_weighted.mean(dim=["longitude", "latitude"]).values
 
             # Store the calculated mean temperature in the dictionary with the country's name as the key.
-            temp_country[shapefile.iloc[i]["WB_NAME"]] = country_weighted_mean
+            temp_country[country_name] = country_weighted_mean
 
         except NoDataInBounds:
-            print("No data was found in the specified bounds.")
-            # If an error occurs (usually due to small size of the country), add the country's name to the small_countries list.
+            log.info(
+                f"No data was found in the specified bounds for {country_name}."
+            )  # If an error occurs (usually due to small size of the country), add the country's name to the small_countries list.  # If an error occurs (usually due to small size of the country), add the country's name to the small_countries list.
             small_countries.append(shapefile.iloc[i]["WB_NAME"])
 
     # Log information about countries for which temperature data could not be extracted.
