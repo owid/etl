@@ -413,7 +413,7 @@ def cli(
 
     * Add the new steps to the dag, with the same header comments as their current version.
 
-    # Notes
+    ## Notes
 
     Keep in mind that:
 
@@ -425,7 +425,7 @@ def cli(
 
     * Steps that are already in their latest version (or whose version is "latest") will be skipped.
 
-    # Examples
+    ## Examples
 
     Here are some examples of how to use the tool:
 
@@ -448,6 +448,7 @@ def cli(
     ```
     Note that the explorers step itself will not be updated, since it is already in its "latest" version.
 
+    # Reference
     """
     # Initialize step updater and run update.
     StepUpdater(dry_run=dry_run, interactive=interactive).update_steps(
