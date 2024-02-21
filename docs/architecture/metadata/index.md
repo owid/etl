@@ -50,7 +50,7 @@ We have built a logic into ETL to automatically propagate metadata fields forwar
 ### Metadata and Data pages
 We automatically create data pages from an indicator using its metadata fields. Learn how the metadata fields are mapped to a data page with our demo app.
 
-[Try the demo :octicons-arrow-right-24:](../../tutorials/metadata-play.md)
+[Try the demo :octicons-arrow-right-24:](../../guides/metadata-play.md)
 
 ### Other uses
 Users can consume the metadata programmatically using the [`owid-catalog`](https://github.com/owid/etl/tree/master/lib/catalog).

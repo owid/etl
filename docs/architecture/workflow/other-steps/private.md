@@ -11,4 +11,4 @@ In the [DAG](../../design/dag.md), these steps appear with the prefix `data-priv
     data-private://garden/ihme_gbd/2023-03-29/gbd_drug_disorders
     ```
 
-!!! info "[How to implement a private step](../../../tutorials/private-import.md)"
+!!! info "[How to implement a private step](../../../guides/private-import.md)"

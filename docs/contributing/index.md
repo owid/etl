@@ -8,6 +8,3 @@ Since collecting and republishing data is part of an editorial process for us, w
 - You can [report issues](https://github.com/owid/etl/issues) you encounter, either with our code or with our datasets
 - You can try using our [API](api/index.md) to access our data and give us feedback on it
 - You can [make suggestions](https://github.com/owid/etl/discussions) for important data sets that you think would add a lot of value to our work
-
-
-If you want to learn more about the maintenance of this project, please [head here](dev/index.md).
