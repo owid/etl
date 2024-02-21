@@ -128,7 +128,7 @@ def rename_vars(tb: Table) -> Table:
         "E027": "Attending peaceful demonstrations",
         "E028": "Joining unofficial strikes",
         "B008": "Protecting environment vs. economic growth",
-        "E035": "Income eqauality",
+        "E035": "Income equality",
     }
 
     # Rename columns, replacing var with name when the original name ends with var
