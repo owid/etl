@@ -235,14 +235,14 @@
 
 
 <!-- Main site entry button descriptions -->
-<div class="tx-container">
+<section class="tx-container">
     <div class="md-grid md-typeset">
       <div class="tx-hero">
 
         <!-- Custom Image -->
-        <!-- <div class="tx-hero__image">
-	  <img src="{{ config.home_cover_image }}" draggable="false">
-        </div> -->
+        <div class="tx-hero__image">
+	  <img src="{{ config.home.cover_image }}" draggable="false">
+        </div>
 
 	<!-- Main Tagline -->
         <div class="tx-hero__content">
@@ -251,26 +251,26 @@
 
 	  <!-- Added Buttons (up to 3) -->
           {%- if config.home.buttons[0].name -%}
-          <a href="{{ config.home.buttons[0].name }}" title="Material | MkDocs" class="{{ config.home.buttons[0].theme }}">
+          <a href="{{ config.home.buttons[0].url }}" title="Material | MkDocs" class="{{ config.home.buttons[0].theme }}">
             {{ config.home.buttons[0].name }}
           </a>
 	  {%- endif -%}
 
           {%- if config.home.buttons[1].name -%}
-          <a href="{{ config.home.buttons[1].name }}" title="Material | MkDocs" class="{{ config.home.buttons[1].theme }}">
+          <a href="{{ config.home.buttons[1].url }}" title="Material | MkDocs" class="{{ config.home.buttons[1].theme }}">
             {{ config.home.buttons[1].name }}
           </a>
 	  {%- endif -%}
 
 	  {%- if config.home.buttons[2].name -%}
-          <a href="{{ config.home.buttons[2].name }}" title="Material | MkDocs" class="{{ config.home.buttons[2].theme }}">
+          <a href="{{ config.home.buttons[2].url }}" title="Material | MkDocs" class="{{ config.home.buttons[2].theme }}">
             {{ config.home.buttons[2].name }}
           </a>
 	  {%- endif -%}
         </div>
-      </div>
     </div>
-</div>
+    </div>
+</section>
 
 
 

@@ -1,4 +1,4 @@
-# Getting started
+# Installation
 The ETL can be used by OWID staff or the general public to build a copy of our data catalog. It is supported and regularly run on Linux, MacOS and Windows via WSL. Here's how to get set up.
 
 !!! warning
