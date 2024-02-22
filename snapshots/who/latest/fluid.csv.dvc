@@ -21,5 +21,5 @@ meta:
 wdir: ../../../data/snapshots/who/latest
 outs:
   - md5: 6968b584dd96d00a26c5c7e4bc29486b
-    size: 125009397
+    size: 125829120
     path: fluid.csv
