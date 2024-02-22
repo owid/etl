@@ -135,7 +135,7 @@ with st.form("fasttrack-form"):
         st.text_input(
             label="New Google Sheets URL",
             help="In the Google spreadsheet, click on `File -> Share -> Publish to Web` and share the entire document as csv.",
-            key="dataset_uri",
+            key="sheets_url",
         )
     elif import_method == UPDATE_GSHEET:
         options = load_existing_sheets_from_snapshots()
@@ -145,7 +145,7 @@ with st.form("fasttrack-form"):
             label="Upload Local CSV",
             type=["csv"],
             help="Upload a local CSV file to import data.",
-            key="dataset_uri",
+            key="uploaded_file",
         )
     # Other parameters
     st.checkbox(
@@ -181,7 +181,7 @@ if import_method == UPDATE_GSHEET:
                 options=options,  # type: ignore
                 format_func=lambda x: x["label"],
                 help="Selected sheet will be used if you don't specify Google Sheets URL.",
-                key="dataset_uri",
+                key="existing_sheet",
                 on_change=reset_states,
             )
 
@@ -211,23 +211,33 @@ if (FERNET_KEY is None) and (st.session_state.fasttrack_is_private):
 # USER CLICKS ON SUBMIT
 ##########################################################
 if st.session_state.to_be_submitted:
-    # Sanity check: dataset_uri is not empty?
-    if st.session_state["dataset_uri"] in (None, ""):
+    # Sanity check
+    if (
+        not st.session_state.get("existing_sheet")
+        and not st.session_state.get("uploaded_file")
+        and st.session_state.get("sheets_url") in (None, "")
+    ):
         st.error("Please provide a valid dataset URI.")
         st.stop()
 
     #####################################################
     # IMPORT & PROCESS DATA
     #####################################################
-    status_main = st.status("Importing data from Google Sheets...", expanded=False)
+    # expand it first and collapse if successful
+    status_main = st.status("Importing data from Google Sheets...", expanded=True)
     with status_main:
         data, dataset_meta, variables_meta_dict, origin, unknown_countries, dataset_uri = processing_part_1(
             import_method=import_method,
-            dataset_uri=st.session_state["dataset_uri"],
+            dataset_uris={
+                k: v
+                for k, v in st.session_state.to_dict().items()
+                if k in ("uploaded_file", "sheets_url", "existing_sheet")
+            },
             infer_metadata=st.session_state["infer_metadata"],
             is_private=st.session_state["fasttrack_is_private"],
             _status=status_main,
         )
+        status_main.update(expanded=False)
 
     # If all countries are known, proceed without alterations
     if unknown_countries in ([], None):
@@ -337,7 +347,7 @@ if st.session_state.to_be_submitted_confirmed_2:
         if config.DB_HOST == "localhost":
             url = f"http://localhost:3030/admin/datasets/{fast_import.dataset_id}"
         else:
-            url = f"http://{config.DB_HOST}/admin/datasets/{fast_import.dataset_id}"
+            url = f"http://{config.ADMIN_HOST}/admin/datasets/{fast_import.dataset_id}"
         st.success(f"The dataset was imported to the [database]({url})!")
         if config.FASTTRACK_COMMIT:
             st.success(f"See commit in [ETL repository]({github_link})")

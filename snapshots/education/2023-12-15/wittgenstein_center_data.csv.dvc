@@ -10,8 +10,7 @@ meta:
       This dataset includes demographic data up to the year 2012, reflecting changes in the population structure by age, sex, and education since the base year of 2010. These changes are primarily attributed to newer and more accurate data. The dataset captures shifts in mortality rates, especially in countries affected by HIV/AIDS and those with high child mortality rates. It also considers the impact of COVID-19 on demographic trends, noting significant shifts such as the rapid decline of fertility rates in many countries and the unpredictable patterns of international migration. These updates and changes are comprehensively reflected in the dataset, offering a refined and current view of the SSPs.
     date_published: 2023-03-31
     version_producer: 2023-05-10
-    title_snapshot: Wittgenstein Center Population and Human Capital Projections -
-      Educational Attainment - Data
+    title_snapshot: Wittgenstein Center Population and Human Capital Projections - Educational Attainment - Data
     description_snapshot: |-
       The dataset provides annual population projections from 2020 to 2100 based on the SSP2 "Middle of the Road" scenario, detailing demographic changes by age group, educational attainment, and sex for each country. It includes a range of age groups from newborns up to those aged 120+, educational levels from no education to post-secondary, and demographic indicators such as births per 1000 women, mean age in years, proportions, ratios, and population numbers in thousands.
 
@@ -31,6 +30,6 @@ meta:
 
 wdir: ../../../data/snapshots/education/2023-12-15
 outs:
-- md5: 56fbd4dc31402e2f226e66a386589ee5
-  size: 101373997
-  path: wittgenstein_center_data.csv
+  - md5: a4a21fb6806012919b14d9a8a9515331
+    size: 100313261
+    path: wittgenstein_center_data.csv

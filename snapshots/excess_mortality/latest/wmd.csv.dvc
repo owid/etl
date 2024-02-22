@@ -12,9 +12,8 @@ meta:
 
       Published paper available at https://elifesciences.org/articles/69336.
     url: https://github.com/akarlinsky/world_mortality/
-    source_data_url: 
-      https://raw.githubusercontent.com/akarlinsky/world_mortality/main/world_mortality.csv
-    date_accessed: 2024-02-20
+    source_data_url: https://raw.githubusercontent.com/akarlinsky/world_mortality/main/world_mortality.csv
+    date_accessed: 2024-02-22
     publication_date: '2021-06-30'
     publication_year: 2021
     published_by: |-
@@ -33,8 +32,7 @@ meta:
   license:
     name: MIT License
     url: https://github.com/akarlinsky/world_mortality/blob/main/LICENSE
-wdir: ../../../data/snapshots/excess_mortality/latest
 outs:
-- md5: 00d118e8eb89a2d15d0efcfdadca9d6f
-  size: 1006356
-  path: wmd.csv
+  - md5: 00d118e8eb89a2d15d0efcfdadca9d6f
+    size: 1006356
+    path: wmd.csv

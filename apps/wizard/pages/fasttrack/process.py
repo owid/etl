@@ -20,22 +20,31 @@ from etl.paths import DATA_DIR, LATEST_REGIONS_DATASET_PATH
 
 
 @st.cache_data(show_spinner=False)
-def processing_part_1(import_method, dataset_uri, infer_metadata, is_private, _status):
+def processing_part_1(import_method, dataset_uris, infer_metadata, is_private, _status):
     """Load and first processing."""
     # 1/ LOCAL CSV
     if import_method == LOCAL_CSV:
         # Get filename, show notification
-        data, dataset_meta, variables_meta_dict, origin = load_data_from_csv(dataset_uri)
+        data, dataset_meta, variables_meta_dict, origin = load_data_from_csv(
+            dataset_uris["uploaded_file"],
+        )
+        dataset_uri = dataset_uris["uploaded_file"].name
 
-    # 2/ GOOGLE SHEET (New or existing)
+    # 2/ New GOOGLE SHEET
+    elif import_method == IMPORT_GSHEET:
+        data, dataset_meta, variables_meta_dict, origin = load_data_from_sheets(
+            dataset_uris["sheets_url"], _status=_status
+        )
+        dataset_uri = dataset_uris["sheets_url"]
+
+    # 3/ UPDATE GOOGLE SHEET
+    elif import_method == UPDATE_GSHEET:
+        data, dataset_meta, variables_meta_dict, origin = load_data_from_sheets(
+            dataset_uris["existing_sheet"]["value"], _status=_status
+        )
+        dataset_uri = dataset_uris["existing_sheet"]["value"]
     else:
-        # NOTE: this was there before but it was wrong, the code below works
-        # sheets_url = dataset_uri
-        # if import_method in (UPDATE_GSHEET, IMPORT_GSHEET):
-        #     dataset_uri = sheets_url["value"]
-        # data, dataset_meta, variables_meta_dict, origin = load_data_from_sheets(dataset_uri, _status=_status)
-
-        data, dataset_meta, variables_meta_dict, origin = load_data_from_sheets(dataset_uri, _status=_status)
+        raise ValueError(f"Unknown import method: {import_method}")
 
     # PROCES
     if infer_metadata:

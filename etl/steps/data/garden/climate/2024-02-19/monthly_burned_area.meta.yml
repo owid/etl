@@ -1,0 +1,52 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Climate Change
+    display:
+      numDecimalPlaces: 0
+      zeroDay: '2000-01-01'
+      yearIsDay: true
+    short_unit: ha
+    unit: hectares
+    processing_level: minor
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
+dataset:
+  update_period_days: 365
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
+tables:
+  monthly_burned_area:
+    # Learn more about the available fields:
+    # http://docs.owid.io/projects/etl/architecture/metadata/reference/indicator/
+    variables:
+      forest:
+        title: Monthly burned area across forests
+        description_short: Total area of forests that have been burned each month.
+
+      savannas:
+        title: Monthly burned area across savannas
+        description_short: Total area of savannas that have been burned each month.
+
+      shrublands_grasslands:
+        title: Monthly burned area across shrublands and grasslands
+        description_short: Total area of shrublands and grasslands that have been burned each month.
+
+      croplands:
+        title: Monthly burned area across croplands
+        description_short: Total area of agricultural lands that have burned as a result of fires each month, which can include both accidental fires and those used as a land management tool.
+
+      other:
+        title: Monthly burned area across other land categories
+        description_short: Total area of land categories other than forests, savannas, shrublands/grasslands and croplands that have been burned each month.
+
+      all:
+        title: Monthly burned area across all land types
+        description_short: Total area of all land types that have been burned each month.
+
+
