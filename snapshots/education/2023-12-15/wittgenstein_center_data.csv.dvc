@@ -30,6 +30,6 @@ meta:
 
 wdir: ../../../data/snapshots/education/2023-12-15
 outs:
-  - md5: a4a21fb6806012919b14d9a8a9515331
-    size: 100313261
+  - md5: 56fbd4dc31402e2f226e66a386589ee5
+    size: 101373997
     path: wittgenstein_center_data.csv
