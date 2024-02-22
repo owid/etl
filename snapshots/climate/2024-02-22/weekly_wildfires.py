@@ -325,7 +325,7 @@ def main(upload: bool) -> None:
 
                 # Start the browser with the custom options
                 driver = webdriver.Chrome(options=chrome_options)
-                wait = WebDriverWait(driver, 10)  # Adjust wait time to a reasonable value
+                wait = WebDriverWait(driver, 50)  # Adjust wait time to a reasonable value
                 link = f"https://gwis.jrc.ec.europa.eu/apps/gwis.statistics/seasonaltrend/{country}/{year}/CO2"
                 driver.get(link)
                 all_dfs = []
@@ -345,7 +345,7 @@ def main(upload: bool) -> None:
                         driver.execute_script(
                             "arguments[0].scrollIntoView({behavior: 'smooth', block: 'nearest'});", container
                         )
-                        time.sleep(3)  # Give time for any lazy-loaded elements to load
+                        time.sleep(5)  # Give time for any lazy-loaded elements to load
 
                         try:
                             # Remove potential overlays by setting their CSS to 'none'
@@ -372,12 +372,6 @@ def main(upload: bool) -> None:
                             log.info(f"Necessary element was not found in container {index+1}.")
                         except Exception as e:
                             log.info(f"An error occurred while processing container {index+1}: {e}")
-
-                except TimeoutException:
-                    log.info("Failed to locate containers within the timeout period.")
-                finally:
-                    driver.quit()
-
                     # Now, load the file. This part assumes there's only one file and its name ends with '.csv'
                     downloaded_files = [f for f in os.listdir(download_path) if f.endswith(".csv")]
                     for file in downloaded_files:
@@ -395,6 +389,8 @@ def main(upload: bool) -> None:
                         df["indicator"] = column_name
                         df = df.rename(columns={f"Year {year}": "value", "Day": "day"})  # Use f-string formatting
                         all_dfs.append(df)
+                except TimeoutException:
+                    log.info("Failed to locate containers within the timeout period.")
 
     all_dfs = pd.concat(all_dfs)
     df_to_file(all_dfs, file_path=snap.path)
