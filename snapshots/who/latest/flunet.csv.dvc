@@ -6,8 +6,7 @@ meta:
   publication_year: 2023
   publication_date: 2023-02-16
   source_name: FluNet, World Health Organization (2023)
-  source_published_by: Global Influenza Surveillance and Response System, World Health
-    Organization
+  source_published_by: Global Influenza Surveillance and Response System, World Health Organization
   url: https://www.who.int/tools/flunet
   source_data_url: https://frontdoor-l4uikgap6gz3m.azurefd.net/FLUMART/VIW_FNT?&$format=csv
   file_extension: csv
@@ -21,6 +20,6 @@ meta:
     The data are provided remotely by National Influenza Centres (NICs) of the Global Influenza Surveillance and Response System (GISRS) and other national influenza reference laboratories collaborating actively with GISRS, or are uploaded from WHO regional databases.
 wdir: ../../../data/snapshots/who/latest
 outs:
-- md5: 6c5b4622f93692b7776cc02206fa5f64
-  size: 25432110
-  path: flunet.csv
+  - md5: 6c5b4622f93692b7776cc02206fa5f64
+    size: 25432110
+    path: flunet.csv

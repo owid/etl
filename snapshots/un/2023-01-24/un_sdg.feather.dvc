@@ -6,8 +6,7 @@ meta:
   publication_year: 2023
   publication_date: 2023-01-24
   source_name: United Nations (2023)
-  source_published_by: SDG Indicators Database, United Nations, Department of Economic
-    and Social Affairs (2023)
+  source_published_by: SDG Indicators Database, United Nations, Department of Economic and Social Affairs (2023)
   url: https://unstats.un.org/sdgs/dataportal/database
   source_data_url: https://unstats.un.org/sdgapi
   file_extension: feather
@@ -19,6 +18,6 @@ meta:
 
 wdir: ../../../data/snapshots/un/2023-01-24
 outs:
-- md5: 4eec76d904280209ba5a635b21e28b54
-  size: 684540210
-  path: un_sdg.feather
+  - md5: eb837bbb87823b7923f919c0c7e93220
+    size: 684540210
+    path: un_sdg.feather

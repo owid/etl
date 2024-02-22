@@ -5,9 +5,8 @@ meta:
       The data are sourced from the World Mortality Dataset (https://github.com/akarlinsky/world_mortality). Excess mortality is computed relative to the baseline obtained using linear extrapolation of the 2015–19 trend (different baselines for years since 2020).
       For more details, refer to https://github.com/dkobak/excess-mortality#excess-mortality-during-the-covid-19-pandemic.
     url: https://github.com/dkobak/excess-mortality
-    source_data_url: 
-      https://raw.githubusercontent.com/dkobak/excess-mortality/main/baselines-stmf.csv
-    date_accessed: 2024-02-20
+    source_data_url: https://raw.githubusercontent.com/dkobak/excess-mortality/main/baselines-stmf.csv
+    date_accessed: 2024-02-22
     publication_date: '2021-06-30'
     publication_year: 2021
     published_by: |-
@@ -21,8 +20,7 @@ meta:
     name: GPL-3.0
     url: https://github.com/dkobak/excess-mortality/blob/main/LICENSE
   access_notes: Contains data by age.
-wdir: ../../../data/snapshots/excess_mortality/latest
 outs:
-- md5: fbb63baba797dd1b9ad13b50c6731404
-  size: 4528557
-  path: xm_karlinsky_kobak_ages.csv
+  - md5: fbb63baba797dd1b9ad13b50c6731404
+    size: 4528557
+    path: xm_karlinsky_kobak_ages.csv

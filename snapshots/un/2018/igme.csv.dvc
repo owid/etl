@@ -11,10 +11,7 @@ meta:
 
     # Citation
     producer: UN Inter-agency Group for Child Mortality Estimation
-    citation_full: 'United Nations Inter-agency Group for Child Mortality Estimation
-      (UN IGME), Levels & Trends in Child Mortality: Report 2018, Estimates developed
-      by the United Nations Inter-agency Group for Child Mortality Estimation, United
-      Nations Children’s Fund, New York, 2018.'
+    citation_full: 'United Nations Inter-agency Group for Child Mortality Estimation (UN IGME), Levels & Trends in Child Mortality: Report 2018, Estimates developed by the United Nations Inter-agency Group for Child Mortality Estimation, United Nations Children’s Fund, New York, 2018.'
     attribution_short: UN IGME
 
     # Files
@@ -27,6 +24,6 @@ meta:
       url: https://www.unicef.org/legal#copyright
 wdir: ../../../data/snapshots/un/2018
 outs:
-- md5: 16fc4f6a083467848e58093d85636eed
-  size: 62755821
-  path: igme.csv
+  - md5: 16fc4f6a083467848e58093d85636eed
+    size: 62755821
+    path: igme.csv
