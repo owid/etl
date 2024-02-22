@@ -37,7 +37,7 @@ def run(dest_dir: str) -> None:
 
     # Group by month, country, and decade, then calculate the mean
     decadal_averages = tb_long.groupby(["month", "country", "decade"])["value"].mean().reset_index()
-    # Adjust the decade column to be a string (e.g., 1950s) for later transforming it into columns
+    # Adjust the decade column to be a string (e.g., 1940s) for later transforming it into columns
     decadal_averages["decade"] = decadal_averages["decade"].astype(str) + "s"
 
     # Pivot to transform decades into columns
@@ -68,5 +68,5 @@ def run(dest_dir: str) -> None:
     #
     # Create a new grapher dataset with the same metadata as the garden dataset.
     ds_grapher = create_dataset(dest_dir, tables=[tb_merged], default_metadata=ds_garden.metadata)
-    ds_grapher.metadata.title = "Monthly surface temperatures since 1950 by country"
+    ds_grapher.metadata.title = "Monthly surface temperatures by country"
     ds_grapher.save()

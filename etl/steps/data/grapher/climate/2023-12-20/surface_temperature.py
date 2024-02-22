@@ -36,6 +36,6 @@ def run(dest_dir: str) -> None:
     #
     # Create a new grapher dataset with the same metadata as the garden dataset.
     ds_grapher = create_dataset(dest_dir, tables=[tb], default_metadata=ds_garden.metadata)
-    ds_grapher.metadata.title = "Surface temperatures and anomalies since 1950 by country"
+    ds_grapher.metadata.title = "Surface temperatures and anomalies by country"
 
     ds_grapher.save()

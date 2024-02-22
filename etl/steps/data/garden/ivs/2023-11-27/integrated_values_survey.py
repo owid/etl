@@ -16,6 +16,9 @@ log = get_logger()
 # Set table format when printing
 TABLEFMT = "pretty"
 
+# Set margin for checks
+MARGIN = 0.5
+
 
 def run(dest_dir: str) -> None:
     #
@@ -129,6 +132,77 @@ def drop_indicators_and_replace_nans(tb: Table) -> Table:
     # For income equality question
     tb = replace_dont_know_by_null(tb=tb, questions=["eq_ineq"], answers=["equality", "neutral", "inequality"])
 
+    # For "Scwartz" questions
+    tb = replace_dont_know_by_null(
+        tb=tb,
+        questions=[
+            "new_ideas",
+            "rich",
+            "secure",
+            "good_time",
+            "help_others",
+            "success",
+            "risks",
+            "behave",
+            "respect_environment",
+            "tradition",
+        ],
+        answers=["very_much_like_me", "like_me", "somewhat_like_me", "a_little_like_me", "not_like_me"],
+    )
+
+    # For "Work vs. leisure" question
+    tb = replace_dont_know_by_null(
+        tb=tb,
+        questions=["lei_vs_wk"],
+        answers=["work", "leisure", "neutral"],
+    )
+
+    # For work questions
+    tb = replace_dont_know_by_null(
+        tb=tb,
+        questions=["work_is_a_duty", "work_should_come_first"],
+        answers=["strongly_agree", "agree", "neither", "disagree", "strongly_disagree"],
+    )
+
+    # For most serious problem of the world question
+    tb = replace_dont_know_by_null(
+        tb=tb, questions=["most_serious"], answers=["poverty", "women_discr", "sanitation", "education", "pollution"]
+    )
+
+    # For justifiable questions
+    tb = replace_dont_know_by_null(
+        tb=tb,
+        questions=[
+            "claiming_benefits",
+            "stealing_property",
+            "parents_beating_children",
+            "violence_against_other_people",
+            "avoiding_fare_on_public_transport",
+            "cheating_on_taxes",
+            "accepting_a_bribe",
+            "homosexuality",
+            "prostitution",
+            "abortion",
+            "divorce",
+            "euthanasia",
+            "suicide",
+            "having_casual_sex",
+            "sex_before_marriage",
+            "invitro_fertilization",
+            "death_penalty",
+            "man_beating_wife",
+            "political_violence",
+        ],
+        answers=["never_just_agg", "always_just_agg", "neutral"],
+    )
+
+    # For worries questions
+    tb = replace_dont_know_by_null(
+        tb=tb,
+        questions=["losing_job", "not_being_able_to_provide_good_education", "war", "terrorist_attack", "civil_war"],
+        answers=["very_much", "a_great_deal", "not_much", "not_at_all"],
+    )
+
     # Drop rows with all null values in columns not country and year
     tb = tb.dropna(how="all", subset=tb.columns.difference(["country", "year"]))
 
@@ -172,7 +246,7 @@ def sanity_checks(tb: Table) -> Table:
             "important_in_life_religion",
         ],
         answers=["very", "rather", "not_very", "notatall", "dont_know", "missing"],
-        margin=0.5,
+        margin=MARGIN,
     )
 
     # For interested in politics question
@@ -180,7 +254,7 @@ def sanity_checks(tb: Table) -> Table:
         tb=tb,
         questions=["interested_politics"],
         answers=["very", "somewhat", "not_very", "not_at_all", "dont_know", "missing"],
-        margin=0.5,
+        margin=MARGIN,
     )
 
     # For political action questions
@@ -193,7 +267,7 @@ def sanity_checks(tb: Table) -> Table:
             "political_action_joining_unofficial_strikes",
         ],
         answers=["have_done", "might_do", "never", "dont_know", "missing"],
-        margin=0.5,
+        margin=MARGIN,
     )
 
     # For environment vs. economy question
@@ -201,7 +275,7 @@ def sanity_checks(tb: Table) -> Table:
         tb=tb,
         questions=["env_ec"],
         answers=["environment", "economy", "other_answer", "dont_know", "missing"],
-        margin=0.5,
+        margin=MARGIN,
     )
 
     # For income equality question
@@ -209,7 +283,95 @@ def sanity_checks(tb: Table) -> Table:
         tb=tb,
         questions=["eq_ineq"],
         answers=["equality", "neutral", "inequality", "dont_know", "missing"],
-        margin=0.5,
+        margin=MARGIN,
+    )
+
+    # For "Scwartz" questions
+    tb = check_sum_100(
+        tb=tb,
+        questions=[
+            "new_ideas",
+            "rich",
+            "secure",
+            "good_time",
+            "help_others",
+            "success",
+            "risks",
+            "behave",
+            "respect_environment",
+            "tradition",
+        ],
+        answers=[
+            "very_much_like_me",
+            "like_me",
+            "somewhat_like_me",
+            "a_little_like_me",
+            "not_like_me",
+            "not_at_all_like_me",
+            "dont_know",
+            "missing",
+        ],
+        margin=MARGIN,
+    )
+
+    # For "Work vs. leisure" question
+    tb = check_sum_100(
+        tb=tb,
+        questions=["lei_vs_wk"],
+        answers=["work", "leisure", "neutral", "dont_know", "missing"],
+        margin=MARGIN,
+    )
+
+    # For work questions
+    tb = check_sum_100(
+        tb=tb,
+        questions=["work_is_a_duty", "work_should_come_first"],
+        answers=["strongly_agree", "agree", "neither", "disagree", "strongly_disagree", "dont_know", "missing"],
+        margin=MARGIN,
+    )
+
+    # For most serious problem of the world question
+    tb = check_sum_100(
+        tb=tb,
+        questions=["most_serious"],
+        answers=["poverty", "women_discr", "sanitation", "education", "pollution", "dont_know", "missing"],
+        margin=MARGIN,
+    )
+
+    # For justifiable questions
+    tb = check_sum_100(
+        tb=tb,
+        questions=[
+            "claiming_benefits",
+            "stealing_property",
+            "parents_beating_children",
+            "violence_against_other_people",
+            "avoiding_fare_on_public_transport",
+            "cheating_on_taxes",
+            "accepting_a_bribe",
+            "homosexuality",
+            "prostitution",
+            "abortion",
+            "divorce",
+            "euthanasia",
+            "suicide",
+            "having_casual_sex",
+            "sex_before_marriage",
+            "invitro_fertilization",
+            "death_penalty",
+            "man_beating_wife",
+            "political_violence",
+        ],
+        answers=["never_just_agg", "always_just_agg", "neutral", "dont_know", "missing"],
+        margin=MARGIN,
+    )
+
+    # For worries questions
+    tb = check_sum_100(
+        tb=tb,
+        questions=["losing_job", "not_being_able_to_provide_good_education", "war", "terrorist_attack", "civil_war"],
+        answers=["very_much", "a_great_deal", "not_much", "not_at_all", "dont_know", "missing"],
+        margin=MARGIN,
     )
 
     return tb
@@ -235,7 +397,7 @@ def check_sum_100(tb: Table, questions: list, answers: list, margin: float) -> T
         if not tb_error.empty:
             log.fatal(
                 f"""{len(tb_error)} answers for {q} are not adding up to 100%:
-                {tabulate(tb_error[['country', 'year'] + answers_by_question +['sum_check']], headers = 'keys', tablefmt = TABLEFMT, floatfmt=".1f")}"""
+                {tabulate(tb_error[['country', 'year'] + answers_by_question + ['sum_check']], headers = 'keys', tablefmt = TABLEFMT, floatfmt=".1f")}"""
             )
 
     # Remove sum_check
