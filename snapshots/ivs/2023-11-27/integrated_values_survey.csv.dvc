@@ -3,14 +3,14 @@
 meta:
   origin:
     # Data product / Snapshot
-    title: Integrated Values Survey (IVS)
+    title: Integrated Values Surveys (IVS)
     description: |-
-      The European Value Study (EVS) and the World Value Survey (WVS) are two large-scale, cross-national, and repeated cross-sectional longitudinal survey research programs. Since their emergence in the early 1980s, the EVS has conducted 5 survey waves (every 9 years) and the WVS has conducted 7 survey waves (every 5 years). Both research programs include a large number of questions, which have been replicated over time and across the EVS and the WVS surveys. Such repeated questions constitute the Integrated Values Surveys (IVS), the joint EVS-WVS time-series data which at the moment covers a 40-years period (1981-2022). 
+      The European Value Study (EVS) and the World Value Survey (WVS) are two large-scale, cross-national, and repeated cross-sectional longitudinal survey research programs. Since their emergence in the early 1980s, the EVS has conducted 5 survey waves (every 9 years) and the WVS has conducted 7 survey waves (every 5 years). Both research programs include a large number of questions, which have been replicated over time and across the EVS and the WVS surveys. Such repeated questions constitute the Integrated Values Surveys (IVS), the joint EVS-WVS time-series data which at the moment covers a 40-years period (1981-2022).
     date_published: 2022-12-14
     version_producer: Version 3
 
     # Citation
-    producer: Integrated Values Survey
+    producer: Integrated Values Surveys
     citation_full: |-
       - EVS (2022): EVS Trend File 1981-2017. GESIS Data Archive, Cologne. ZA7503 Data file Version 3.0.0, doi:10.4232/1.14021
       - Haerpfer, C., Inglehart, R., Moreno, A., Welzel, C., Kizilova, K., Diez-Medrano J., M. Lagos, P. Norris, E. Ponarin & B. Puranen et al. (eds.). 2022. World Values Survey Trend File (1981-2022) Cross-National Data-Set. Madrid, Spain  &  Vienna,  Austria:  JD  Systems  Institute  &  WVSA Secretariat. Data File Version 3.0.0, doi:10.14281/18241.23.

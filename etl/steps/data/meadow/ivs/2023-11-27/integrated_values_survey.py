@@ -160,7 +160,7 @@ def rename_vars(tb: Table) -> Table:
         "F135A": "Sex before marriage",
         "F144_01": "Invitro fertilization",
         "F144_02": "Death penalty",
-        "F199": "Mean beating wife",
+        "F199": "Man beating wife",
         "E290": "Political violence",
         "H006_01": "Losing job",
         "H006_02": "Not being able to provide good education",
