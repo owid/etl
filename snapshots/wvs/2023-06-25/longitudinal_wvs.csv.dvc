@@ -15,5 +15,5 @@ meta:
 wdir: ../../../data/snapshots/wvs/2023-06-25
 outs:
   - md5: 20ddc662945bef22464c8614066e7afe
-    size: 1394309380
+    size: 1394309381
     path: longitudinal_wvs.csv
