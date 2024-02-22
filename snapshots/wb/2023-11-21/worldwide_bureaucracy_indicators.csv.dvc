@@ -28,5 +28,5 @@ meta:
 wdir: ../../../data/snapshots/wb/2023-11-21
 outs:
   - md5: 191d0f3335056c4b3548b9c83c49e2a8
-    size: 13308262
+    size: 13369262
     path: worldwide_bureaucracy_indicators.csv

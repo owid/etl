@@ -14,5 +14,5 @@ meta:
 wdir: ../../../data/snapshots/terrorism/2023-07-20
 outs:
   - md5: 6a76caa30fd2266952401d55351e209b
-    size: 193241848
+    size: 193451541
     path: global_terrorism_database.csv
