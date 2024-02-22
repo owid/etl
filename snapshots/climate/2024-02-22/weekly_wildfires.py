@@ -13,7 +13,7 @@ from selenium.common.exceptions import NoSuchElementException, TimeoutException
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support.wait import WebDriverWait
 from structlog import get_logger
 from tqdm import tqdm
 
@@ -387,7 +387,7 @@ def main(upload: bool) -> None:
                         df = df[cols_to_keep]
                         df["year"] = year
                         df["country"] = country_name
-
+                        column_name = ""
                         parts = file.split("_")
                         for i, part in enumerate(parts):
                             if part.isupper():
