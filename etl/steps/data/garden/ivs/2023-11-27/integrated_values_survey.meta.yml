@@ -1092,7 +1092,7 @@ tables:
           title_public: "Income equality: Average score"
 
       like_me_agg_new_ideas:
-        title: "It is important to this person to think up new ideas and be creative: Like me"
+        title: "It is important to this person to think up new ideas and be creative: Like me (aggregate)"
         description_short: '% of respondents replying "very much like me", "like me" or "somewhat like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, not like you, or not at all like you?" in the description "It is important to this person to think up new ideas and be creative".'
         display:
           name: "Like me: Important to think up new ideas"
@@ -1926,7 +1926,7 @@ tables:
         presentation:
           title_public: "Leisure vs work: Work"
       lei_vs_wk_1:
-        title: "Leisure vs work: Leisure"
+        title: "Leisure vs work: Leisure (1)"
         description_short: '% of respondents replying 1 in a scale from 1 to 5 when asked "Which point on this scale most clearly describes how much weight you place on work (including housework and schoolwork), as compared with leisure or recreation? A It´s leisure that makes life worth living, not work B Work is what makes life worth living, not leisure", where 1 is description A and 5 is description B.'
         display:
           name: "Leisure vs work: Leisure"
@@ -1934,7 +1934,7 @@ tables:
         presentation:
           title_public: "Leisure vs work: Leisure"
       lei_vs_wk_2:
-        title: "Leisure vs work: Leisure"
+        title: "Leisure vs work: Leisure (2)"
         description_short: '% of respondents replying 2 in a scale from 1 to 5 when asked "Which point on this scale most clearly describes how much weight you place on work (including housework and schoolwork), as compared with leisure or recreation? A It´s leisure that makes life worth living, not work B Work is what makes life worth living, not leisure", where 1 is description A and 5 is description B.'
         display:
           name: "Leisure vs work: Leisure"
@@ -1942,7 +1942,7 @@ tables:
         presentation:
           title_public: "Leisure vs work: Leisure"
       lei_vs_wk_4:
-        title: "Leisure vs work: Work"
+        title: "Leisure vs work: Work (4)"
         description_short: '% of respondents replying 4 in a scale from 1 to 5 when asked "Which point on this scale most clearly describes how much weight you place on work (including housework and schoolwork), as compared with leisure or recreation? A It´s leisure that makes life worth living, not work B Work is what makes life worth living, not leisure", where 1 is description A and 5 is description B.'
         display:
           name: "Leisure vs work: Work"
@@ -1950,7 +1950,7 @@ tables:
         presentation:
           title_public: "Leisure vs work: Work"
       lei_vs_wk_5:
-        title: "Leisure vs work: Work"
+        title: "Leisure vs work: Work (5)"
         description_short: '% of respondents replying 5 in a scale from 1 to 5 when asked "Which point on this scale most clearly describes how much weight you place on work (including housework and schoolwork), as compared with leisure or recreation? A It´s leisure that makes life worth living, not work B Work is what makes life worth living, not leisure", where 1 is description A and 5 is description B.'
         display:
           name: "Leisure vs work: Work"
@@ -3000,7 +3000,7 @@ tables:
         presentation:
           title_public: "Suicide: Never justifiable"
       always_just_agg_suicide:
-        title: "Suicide: Always justifiable"
+        title: "Suicide: Always justifiable (aggregate)"
         description_short: '% of respondents replying 10 in a scale from 1 to 10 when asked "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Suicide". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
         display:
           name: "Suicide: Always justifiable"
@@ -3067,7 +3067,7 @@ tables:
         presentation:
           title_public: "Having casual sex: Never justifiable"
       always_just_agg_having_casual_sex:
-        title: "Having casual sex: Always justifiable"
+        title: "Having casual sex: Always justifiable (aggregate)"
         description_short: '% of respondents replying 10 in a scale from 1 to 10 when asked "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Having casual sex". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
         display:
           name: "Having casual sex: Always justifiable"
@@ -3134,7 +3134,7 @@ tables:
         presentation:
           title_public: "Sex before marriage: Never justifiable"
       always_just_agg_sex_before_marriage:
-        title: "Sex before marriage: Always justifiable"
+        title: "Sex before marriage: Always justifiable (aggregate)"
         description_short: '% of respondents replying 10 in a scale from 1 to 10 when asked "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Sex before marriage". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
         display:
           name: "Sex before marriage: Always justifiable"
