@@ -25,5 +25,5 @@ meta:
 wdir: ../../../data/snapshots/un/2018
 outs:
   - md5: 16fc4f6a083467848e58093d85636eed
-    size: 62516710
+    size: 62755821
     path: igme.csv

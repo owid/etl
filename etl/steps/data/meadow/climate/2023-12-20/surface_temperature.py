@@ -7,6 +7,7 @@ import numpy as np
 import pandas as pd
 import xarray as xr
 from owid.catalog import Table
+from rioxarray.exceptions import NoDataInBounds
 from shapely.geometry import mapping
 from structlog import get_logger
 from tqdm import tqdm
@@ -66,6 +67,7 @@ def run(dest_dir: str) -> None:
     for i in tqdm(range(shapefile.shape[0])):
         # Extract the data for the current row.
         data = shapefile[shapefile.index == i]
+        country_name = shapefile.iloc[i]["WB_NAME"]
 
         # Set the coordinate reference system for the temperature data to EPSG 4326.
         da.rio.write_crs("epsg:4326", inplace=True)
@@ -85,16 +87,26 @@ def run(dest_dir: str) -> None:
             country_weighted_mean = clim_month_weighted.mean(dim=["longitude", "latitude"]).values
 
             # Store the calculated mean temperature in the dictionary with the country's name as the key.
-            temp_country[shapefile.iloc[i]["WB_NAME"]] = country_weighted_mean
+            temp_country[country_name] = country_weighted_mean
 
-        except Exception:
-            # If an error occurs (usually due to small size of the country), add the country's name to the small_countries list.
+        except NoDataInBounds:
+            log.info(
+                f"No data was found in the specified bounds for {country_name}."
+            )  # If an error occurs (usually due to small size of the country), add the country's name to the small_countries list.  # If an error occurs (usually due to small size of the country), add the country's name to the small_countries list.
             small_countries.append(shapefile.iloc[i]["WB_NAME"])
 
     # Log information about countries for which temperature data could not be extracted.
     log.info(
         f"It wasn't possible to extract temperature data for {len(small_countries)} small countries as they are too small for the resolution of the Copernicus data."
     )
+
+    # Add Global mean temperature
+    weights = np.cos(np.deg2rad(da.latitude))
+    weights.name = "weights"
+    clim_month_weighted = da.weighted(weights)
+    global_mean = clim_month_weighted.mean(["longitude", "latitude"])
+    temp_country["World"] = global_mean
+
     # Define the start and end dates
     start_time = da["time"].min().dt.date.astype(str).item()
     end_time = da["time"].max().dt.date.astype(str).item()
