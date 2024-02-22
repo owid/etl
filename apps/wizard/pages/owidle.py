@@ -50,10 +50,10 @@ st.session_state.user_has_succeded = st.session_state.get("user_has_succeded", F
 COLORS = [
     "#C15065",
     "#2C8465",
-    "#BE5915",
-    "#6D3E91",
     "#286BBB",
+    "#6D3E91",
     "#996D39",
+    "#BE5915",
 ]
 
 
@@ -190,13 +190,6 @@ def distance_to_solution(country_selected: str) -> Tuple[str, str]:
     else:
         arrow = "↖️"
 
-    # Estimate distance
-    # GEO_DIST = cast(gpd.GeoDataFrame, GEO.to_crs("EPSG:5234"))
-    # solution = GEO_DIST.loc[GEO_DIST["location"] == SOLUTION, "geometry"]
-    # guess = GEO_DIST.loc[GEO_DIST["location"] == country_selected, "geometry"]
-    # distance = int((solution.distance(guess, align=False) / 1e3).round().item())
-    # distance = str(distance)
-
     distance = haversine(guess.y, guess.x, solution.y, solution.x)
     distance = str(int(distance))
 
@@ -213,16 +206,20 @@ def guess() -> None:
     if st.session_state.guess_last is None:
         pass
     else:
-        # Estimate distance from correct answer
-        distance, direction = distance_to_solution(st.session_state.guess_last)
-        # Add to session state
-        st.session_state.guesses[st.session_state.num_guesses] = {
-            "guess": st.session_state.guess_last,
-            "distance": distance,
-            "direction": direction,
-        }
-        # Increment number of guesses
-        st.session_state.num_guesses += 1
+        # Check if guess was already submitted
+        if st.session_state.guess_last in [guess["guess"] for guess in st.session_state.guesses]:
+            st.toast("⚠️ You have already guessed this country!")
+        else:
+            # Estimate distance from correct answer
+            distance, direction = distance_to_solution(st.session_state.guess_last)
+            # Add to session state
+            st.session_state.guesses[st.session_state.num_guesses] = {
+                "guess": st.session_state.guess_last,
+                "distance": distance,
+                "direction": direction,
+            }
+            # Increment number of guesses
+            st.session_state.num_guesses += 1
 
 
 ##########################################
@@ -230,88 +227,72 @@ def guess() -> None:
 ##########################################
 
 
-def _add_dash_column(df):
-    df["dash"] = "dash"
-    df.loc[df["location"] == SOLUTION, "dash"] = "solid"
-    return df
-
-
-@st.cache_data
-def plot_chart_population(countries_guessed: List[str]):
-    """Plot timeseries."""
-    # Get data
+def _plot_chart(countries_guessed: List[str], column_indicator: str, title: str, column_country: str):
+    # Filter out solution countri if given within guessed countries
     countries_guessed = [c for c in countries_guessed if c != SOLUTION]
     countries_to_plot = [SOLUTION] + countries_guessed
 
-    # COLORS
+    # Filter only data for countries to plot
     df = DATA[DATA["location"].isin(countries_to_plot)].reset_index(drop=True)
 
-    # Get color column
+    # Map locations to lcolor
     color_map = dict(zip(countries_to_plot, COLORS))
     color_map["?"] = color_map[SOLUTION]
 
-    # Add dash
-    df = _add_dash_column(df)
+    # Map locations to line dash
+    line_dash_map = {
+        **{c: "dot" for c in countries_guessed},
+        SOLUTION: "solid",
+        "?": "solid",
+    }
 
     # Hide country name if user has not succeded yet.
     if not st.session_state.user_has_succeded:
-        df["location"] = df["location"].replace({SOLUTION: "?"})
+        df[column_country] = df[column_country].replace({SOLUTION: "?"})
+
+    # Change location column name to "Country"
+    df["Country"] = df[column_country]
+
+    # Drop NaN
+    df = df.dropna(subset=[column_indicator])
 
     # Create plotly figure & plot
     fig = px.line(
         df,
         x="year",
-        y="population",
-        color="location",
+        y=column_indicator,
+        title=title,
+        color="Country",
         color_discrete_map=color_map,
-        title="Population",
-        line_dash="dash",
+        line_dash="Country",
+        line_dash_map=line_dash_map,
     )
     st.plotly_chart(
         fig,
         theme=None,
         use_container_width=True,
+    )
+
+
+@st.cache_data
+def plot_chart_population(countries_guessed: List[str]):
+    """Plot timeseries."""
+    _plot_chart(
+        countries_guessed,
+        column_indicator="population",
+        title="Population",
+        column_country="location",
     )
 
 
 @st.cache_data
 def plot_chart_gdp_pc(countries_guessed: List[str]):
     """Plot timeseries."""
-    # Get data
-    countries_guessed = [c for c in countries_guessed if c != SOLUTION]
-    countries_to_plot = [SOLUTION] + countries_guessed
-
-    # COLORS =
-    df = DATA[DATA["location"].isin(countries_to_plot)].reset_index(drop=True)
-
-    # Drop NaNs
-    df = df.dropna(subset="gdp_per_capita")
-
-    # Get color column
-    color_map = dict(zip(countries_to_plot, COLORS))
-    color_map["?"] = color_map[SOLUTION]
-
-    # Add dash
-    df = _add_dash_column(df)
-
-    # Hide country name if user has not succeded yet.
-    if not st.session_state.user_has_succeded:
-        df["location"] = df["location"].replace({SOLUTION: "?"})
-
-    # Create plotly figure & plot
-    fig = px.line(
-        df.dropna(subset="gdp_per_capita"),
-        x="year",
-        y="gdp_per_capita",
-        color="location",
-        color_discrete_map=color_map,
+    _plot_chart(
+        countries_guessed,
+        column_indicator="gdp_per_capita",
         title="GDP per capita (constant 2017 intl-$)",
-        line_dash="dash",
-    )
-    st.plotly_chart(
-        fig,
-        theme=None,
-        use_container_width=True,
+        column_country="location",
     )
 
 
@@ -372,17 +353,26 @@ with st.form("form_guess", border=False):
         index=None,
         key="guess_last",
     )
-    # with col_guess_2:
-    _num_guesses_bound = min(st.session_state.num_guesses + 1, NUM_GUESSES)
+    # Disable button if user has finished their guesses or has succeeded
     disabled = (st.session_state.num_guesses >= NUM_GUESSES) or st.session_state.user_has_succeded
+    # Label for button
+    if st.session_state.user_has_succeded:
+        label = "YOU GUESSED IT!"
+    elif st.session_state.num_guesses >= NUM_GUESSES:
+        label = "NO MORE GUESSES :("
+    else:
+        label = f"GUESS {st.session_state.num_guesses + 1}/6"
+
+    # Show button
     btn = st.form_submit_button(
-        f"GUESS {_num_guesses_bound}/6" if not disabled else "NO MORE GUESSES :(",
+        label=label,
         type="primary",
         use_container_width=True,
         on_click=lambda: guess(),
         disabled=disabled,
     )
 
+    st.session_state["placeholder_warning_repear"] = st.container()
 ##########################################
 # SHOW GUESSES (this far)
 ##########################################
@@ -432,5 +422,5 @@ if st.session_state.user_has_succeded:
     st.stop()
 ## Unsuccessful
 elif st.session_state.num_guesses >= NUM_GUESSES:
-    st.error(f"The correct answer was {SOLUTION}. Better luck next time!")
+    st.error(f"The correct answer was **{SOLUTION}**. Better luck next time!")
     st.stop()
