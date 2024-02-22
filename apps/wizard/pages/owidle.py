@@ -227,7 +227,13 @@ def guess() -> None:
 ##########################################
 
 
-def _plot_chart(countries_guessed: List[str], column_indicator: str, title: str, column_country: str):
+def _plot_chart(
+    countries_guessed: List[str],
+    column_indicator: str,
+    title: str,
+    column_country: str,
+    indicator_name: str | None = None,
+):
     # Filter out solution countri if given within guessed countries
     countries_guessed = [c for c in countries_guessed if c != SOLUTION]
     countries_to_plot = [SOLUTION] + countries_guessed
@@ -245,6 +251,10 @@ def _plot_chart(countries_guessed: List[str], column_indicator: str, title: str,
         SOLUTION: "solid",
         "?": "solid",
     }
+
+    # Add legend group
+    df["group"] = 1
+    df.loc[df["location"] == SOLUTION, "group"] = 2
 
     # Hide country name if user has not succeded yet.
     if not st.session_state.user_has_succeded:
@@ -266,6 +276,13 @@ def _plot_chart(countries_guessed: List[str], column_indicator: str, title: str,
         color_discrete_map=color_map,
         line_dash="Country",
         line_dash_map=line_dash_map,
+        line_group="group",
+        labels={
+            "year": "Year",
+            column_indicator: indicator_name if indicator_name else column_indicator,
+        },
+        # markers=True,
+        line_shape="spline",
     )
     st.plotly_chart(
         fig,
@@ -282,6 +299,7 @@ def plot_chart_population(countries_guessed: List[str]):
         column_indicator="population",
         title="Population",
         column_country="location",
+        indicator_name="Poppulation",
     )
 
 
@@ -291,8 +309,9 @@ def plot_chart_gdp_pc(countries_guessed: List[str]):
     _plot_chart(
         countries_guessed,
         column_indicator="gdp_per_capita",
-        title="GDP per capita (constant 2017 intl-$)",
+        title="GDP per capita",
         column_country="location",
+        indicator_name="GDP per capita (constant 2017 intl-$)",
     )
 
 
