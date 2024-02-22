@@ -401,7 +401,7 @@ with st.form("form_guess", border=False, clear_on_submit=True):
     if st.session_state.user_has_succeded:
         label = "YOU GUESSED IT!"
     elif st.session_state.num_guesses >= NUM_GUESSES:
-        label = "NO MORE GUESSES :("
+        label = "MAYBE NEXT TIME!"
     else:
         label = f"GUESS {st.session_state.num_guesses + 1}/6"
 
