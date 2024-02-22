@@ -9,7 +9,7 @@ import click
 import pandas as pd
 from owid.datautils.io import df_to_file
 from selenium import webdriver
-from selenium.common.exceptions import ElementClickInterceptedException, NoSuchElementException, TimeoutException
+from selenium.common.exceptions import NoSuchElementException, TimeoutException
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
@@ -17,10 +17,11 @@ from selenium.webdriver.support.ui import WebDriverWait
 from structlog import get_logger
 from tqdm import tqdm
 
+from etl.snapshot import Snapshot
+
 # Initialize logger.
 log = get_logger()
 
-from etl.snapshot import Snapshot
 
 # Version for current snapshot dataset.
 SNAPSHOT_VERSION = Path(__file__).parent.name
@@ -294,8 +295,7 @@ def main(upload: bool) -> None:
     all_dfs = []
 
     years = range(2003, 2024)
-
-    for year in tqdm(years[:2], desc="Processing years"):
+    for year in tqdm(years, desc="Processing years"):
         for country, country_name in tqdm(COUNTRIES.items(), desc=f"Processing regions for year {year}"):
             with tempfile.TemporaryDirectory() as download_path:
                 log.info(f"Processing {country_name} for year {year}.")
@@ -328,13 +328,18 @@ def main(upload: bool) -> None:
                 wait = WebDriverWait(driver, 10)  # Adjust wait time to a reasonable value
                 link = f"https://gwis.jrc.ec.europa.eu/apps/gwis.statistics/seasonaltrend/{country}/{year}/CO2"
                 driver.get(link)
-
+                all_dfs = []
                 try:
                     chart_containers = wait.until(
                         EC.presence_of_all_elements_located((By.CSS_SELECTOR, "div.col-lg-6.col-12"))
                     )
+                    # Include only the first, third, and fifth containers (area burnt, CO2 emissions and number of areas)
+                    containers_to_include = [0, 2, 4]
+                    chart_containers = [chart_containers[i] for i in containers_to_include]
                     for index, container in tqdm(
-                        enumerate(chart_containers), total=len(chart_containers), desc="Processing chart containers"
+                        enumerate(chart_containers),
+                        total=len(chart_containers),
+                        desc="Processing chart containers",
                     ):
                         # Scroll the container into view
                         driver.execute_script(
@@ -387,8 +392,10 @@ def main(upload: bool) -> None:
                         for i, part in enumerate(parts):
                             if part.isupper():
                                 column_name = "_".join(parts[:i])
-                        df = df.rename(columns={f"Year {year}": column_name})  # Use f-string formatting
+                        df["indicator"] = column_name
+                        df = df.rename(columns={f"Year {year}": "value", "Day": "day"})  # Use f-string formatting
                         all_dfs.append(df)
+
     all_dfs = pd.concat(all_dfs)
     df_to_file(all_dfs, file_path=snap.path)
     # Add file to DVC and upload to S3.
