@@ -322,7 +322,7 @@ def plot_chart_population(countries_guessed: List[str]):
         column_indicator="population",
         title="Population",
         column_country="location",
-        indicator_name="Poppulation",
+        indicator_name="Population",
     )
 
 
