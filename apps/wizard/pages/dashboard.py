@@ -4,11 +4,11 @@
 import subprocess
 
 import streamlit as st
-from st_aggrid import AgGrid, GridUpdateMode
+from st_aggrid import AgGrid, GridUpdateMode, JsCode
 from st_aggrid.grid_options_builder import GridOptionsBuilder
-from st_pages import add_indentation
 
 from apps.step_update.cli import StepUpdater
+from etl.config import WIZARD_IS_REMOTE
 
 # CONFIG
 st.set_page_config(
@@ -19,7 +19,8 @@ st.set_page_config(
 )
 
 st.title("📋 ETL Dashboard")
-add_indentation()
+st.markdown("Control panel for ETL updates.")
+# add_indentation()
 
 
 @st.cache_data
@@ -27,18 +28,83 @@ def load_steps_df():
     # Load steps dataframe.
     steps_df = StepUpdater().steps_df
 
+    # Fix some columns.
+    steps_df["full_path_to_script"] = steps_df["full_path_to_script"].fillna("").astype(str)
+    steps_df["dag_file_path"] = steps_df["dag_file_path"].fillna("").astype(str)
+
     return steps_df
 
 
 # Load the steps dataframe.
 steps_df = load_steps_df()
 
-# Select columns to be displayed in the dashboard.
-df = steps_df[["step", "namespace", "channel", "n_versions", "n_charts"]]
+# Prepare dataframe to be displayed in the dashboard.
+df = steps_df[
+    [
+        "step",
+        "db_dataset_name",
+        "n_charts",
+        "kind",
+        "namespace",
+        "version",
+        "channel",
+        "name",
+        # "dag_file_name",
+        # "n_versions",
+        "db_dataset_id",
+        "state",
+        "full_path_to_script",
+        "dag_file_path",
+        # "versions",
+        # "role",
+        # "all_usages",
+        # "direct_usages",
+        # "all_chart_ids",
+        # "all_active_dependencies",
+        # "all_active_usages",
+        # "direct_dependencies",
+        # "chart_ids",
+        # "same_steps_forward",
+        # "all_dependencies",
+        # "same_steps_all",
+        # "same_steps_latest",
+        # "latest_version",
+        # "identifier",
+        # "same_steps_backward",
+        # "n_newer_versions",
+        # "db_archived",
+        # "db_private",
+    ]
+]
+
+# Streamlit UI to let users toggle the filter
+show_all_channels = st.checkbox("Show All Channels", False)
+
+if show_all_channels:
+    # If the toggle is checked, show all data
+    df = df
+else:
+    # Otherwise, pre-filter the DataFrame to show only rows where "channel" equals "grapher"
+    df = df[df["channel"] == "grapher"]
+
+# Sort displayed data conveniently.
+df = df.sort_values(by=["kind", "version"], ascending=[False, False])
+
+# Define the width of some columns in the main grid table (to avoid them from taking too much space).
+COLUMN_WIDTHS = {
+    "kind": 100,
+    "channel": 120,
+    "namespace": 150,
+    "version": 120,
+    "n_versions": 100,
+    "n_charts": 120,
+}
 
 # Define the options of the main grid table with pagination.
 gb = GridOptionsBuilder.from_dataframe(df)
-gb.configure_default_column(editable=True, groupable=True, sortable=True, filterable=True, resizable=True)
+gb.configure_default_column(editable=False, groupable=True, sortable=True, filterable=True, resizable=True)
+for column, width in COLUMN_WIDTHS.items():
+    gb.configure_column(column, width=width)
 gb.configure_grid_options(domLayout="autoHeight")
 gb.configure_selection(
     selection_mode="multiple",
@@ -48,20 +114,40 @@ gb.configure_selection(
     groupSelectsChildren=True,
     groupSelectsFiltered=True,
 )
-gb.configure_pagination(paginationAutoPageSize=False, paginationPageSize=50)
+# TODO: Consider coloring each row depending on the status of the step (e.g. green for up-to-date, red for outdated).
+cellstyle_jscode = JsCode(
+    """
+    function(params){
+        if (params.value == 'grapher') {
+            return {
+                'color': 'black',
+                'backgroundColor' : 'orange'
+        }
+        }
+        else{
+            return{
+                'color': 'black',
+                'backgroundColor': 'lightpink'
+            }
+        }
+};
+"""
+)
+gb.configure_columns("channel", cellStyle=cellstyle_jscode)
+gb.configure_pagination(paginationAutoPageSize=False, paginationPageSize=20)
 grid_options = gb.build()
 
 # Display the grid table with pagination.
-# TODO: By default it would be good to show only grapher steps, and sort them in some meaningful way.
 # TODO: Let VersionTracker.steps_df fetch updatePeriodDays from the datasets table, and add that info to the main table.
-# TODO: Consider coloring each row depending on the status of the step (e.g. green for up-to-date, red for outdated).
 grid_response = AgGrid(
     df,
     gridOptions=grid_options,
     height=300,
     width="100%",
     update_mode=GridUpdateMode.MODEL_CHANGED,
-    fit_columns_on_grid_load=True,
+    fit_columns_on_grid_load=False,
+    allow_unsafe_jscode=True,
+    theme="material",
 )
 
 
@@ -139,12 +225,22 @@ def execute_command(cmd):
 
 
 # Button to execute the update command and show its output.
+dry_run = st.checkbox("Dry run", True)
 if st.button("Update steps"):
-    # TODO: It would be better to directly use StepUpdater instead of a subprocess.
-    command = "etl update " + " ".join(st.session_state.get("selected_steps", [])) + " --dry-run --non-interactive"
-    cmd_output = execute_command(command)
-    # Show the output of the command in an expander.
-    with st.expander("Command Output:", expanded=True):
-        st.text_area("Output", value=cmd_output, height=300, key="cmd_output_area")
-    # Add a button to close the output expander.
-    st.button("Close", key="acknowledge_cmd_output")
+    if WIZARD_IS_REMOTE:
+        st.error("The update command is not available in the remote version of the wizard.")
+        st.stop()
+    else:
+        # TODO: It would be better to directly use StepUpdater instead of a subprocess.
+        command = "etl update " + " ".join(st.session_state.get("selected_steps", [])) + " --non-interactive"
+        if dry_run:
+            command += " --dry-run"
+        cmd_output = execute_command(command)
+        # Show the output of the command in an expander.
+        with st.expander("Command Output:", expanded=True):
+            st.text_area("Output", value=cmd_output, height=300, key="cmd_output_area")
+        if "error" not in cmd_output.lower():
+            # Celebrate that the update was successful, why not.
+            st.balloons()
+        # Add a button to close the output expander.
+        st.button("Close", key="acknowledge_cmd_output")
