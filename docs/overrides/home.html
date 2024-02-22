@@ -9,6 +9,14 @@
 <!-- .tx-container Original Green Gradient: hsla(160deg,47%,55%,1) -->
 <style>
 
+    body {
+        background-color: var(--md-primary-fg-color);
+    }
+
+    /* .body {
+        background-color: var(--md-primary-bg-color);
+    } */
+
     .md-main {
         flex-grow: 0
     }
@@ -20,7 +28,7 @@
 
     .tx-container {
         padding-top: .0rem;
-        background: linear-gradient(to bottom, var(--md-primary-fg-color), {{ config.home_gradient_hsla }} 99%,#fff 99%)
+        background: linear-gradient(to bottom, var(--md-primary-fg-color), {{ config.home.gradient_hsla }} 99%)
     }
 
     .tx-hero {
@@ -55,7 +63,7 @@
 
     .tx-hero .md-button--primary {
         background-color: var(--md-primary-bg-color);
-        color: hsla(280deg, 37%, 48%, 1);
+        color: var(--md-primary-fg-color);
         border-color: var(--md-primary-bg-color)
     }
 
@@ -227,7 +235,7 @@
 
 
 <!-- Main site entry button descriptions -->
-<section class="tx-container">
+<div class="tx-container">
     <div class="md-grid md-typeset">
       <div class="tx-hero">
 
@@ -238,31 +246,31 @@
 
 	<!-- Main Tagline -->
         <div class="tx-hero__content">
-          <h1>{{ config.home_tagline }}</h1>
-          <p>{{ config.home_description }}</p>
+          <h1>{{ config.home.tagline }}</h1>
+          <p>{{ config.home.description }}</p>
 
 	  <!-- Added Buttons (up to 3) -->
-          {%- if config.home_button1_name -%}
-          <a href="{{ config.home_button1_url }}" title="Material | MkDocs" class="{{ config.home_button1_theme }}">
-            {{ config.home_button1_name }}
+          {%- if config.home.buttons[0].name -%}
+          <a href="{{ config.home.buttons[0].name }}" title="Material | MkDocs" class="{{ config.home.buttons[0].theme }}">
+            {{ config.home.buttons[0].name }}
           </a>
 	  {%- endif -%}
 
-          {%- if config.home_button2_name -%}
-          <a href="{{ config.home_button2_url }}" title="Material | MkDocs" class="{{ config.home_button2_theme }}">
-            {{ config.home_button2_name }}
+          {%- if config.home.buttons[1].name -%}
+          <a href="{{ config.home.buttons[1].name }}" title="Material | MkDocs" class="{{ config.home.buttons[1].theme }}">
+            {{ config.home.buttons[1].name }}
           </a>
 	  {%- endif -%}
 
-	  {%- if config.home_button3_name -%}
-          <a href="{{ config.home_button3_url }}" title="Material | MkDocs" class="{{ config.home_button3_theme }}">
-            {{ config.home_button3_name }}
+	  {%- if config.home.buttons[2].name -%}
+          <a href="{{ config.home.buttons[2].name }}" title="Material | MkDocs" class="{{ config.home.buttons[2].theme }}">
+            {{ config.home.buttons[2].name }}
           </a>
 	  {%- endif -%}
         </div>
       </div>
     </div>
-</section>
+</div>
 
 
 
