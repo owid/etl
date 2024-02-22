@@ -241,20 +241,21 @@ def _plot_chart(
     # Filter only data for countries to plot
     df = DATA[DATA["location"].isin(countries_to_plot)].reset_index(drop=True)
 
+    # Sort
+    priority = {c: i for i, c in enumerate(countries_to_plot)}
+    df["priority"] = df[column_country].map(priority)
+    df = df.sort_values(["priority", "year"])
+
     # Map locations to lcolor
     color_map = dict(zip(countries_to_plot, COLORS))
     color_map["?"] = color_map[SOLUTION]
 
     # Map locations to line dash
     line_dash_map = {
-        **{c: "dot" for c in countries_guessed},
+        **{c: "dashdot" for c in countries_guessed},
         SOLUTION: "solid",
         "?": "solid",
     }
-
-    # Add legend group
-    df["group"] = 1
-    df.loc[df["location"] == SOLUTION, "group"] = 2
 
     # Hide country name if user has not succeded yet.
     if not st.session_state.user_has_succeded:
@@ -276,17 +277,30 @@ def _plot_chart(
         color_discrete_map=color_map,
         line_dash="Country",
         line_dash_map=line_dash_map,
-        line_group="group",
-        labels={
-            "year": "Year",
-            column_indicator: indicator_name if indicator_name else column_indicator,
-        },
+        # labels={
+        #     "year": "Year",
+        #     column_indicator: indicator_name if indicator_name else column_indicator,
+        # },
         # markers=True,
         line_shape="spline",
     )
+
+    # Remove axis labels
+    fig.update_layout(xaxis_title=None, yaxis_title=None)
+    # Legends
+    fig.update_layout(
+        legend=dict(
+            orientation="h",
+            # yanchor="bottom",
+            # y=1.02,  # Places the legend above the chart
+            # xanchor="center",
+            # x=0.5,
+        )
+    )
+
     st.plotly_chart(
         fig,
-        theme=None,
+        theme="streamlit",
         use_container_width=True,
     )
 
@@ -309,7 +323,7 @@ def plot_chart_gdp_pc(countries_guessed: List[str]):
     _plot_chart(
         countries_guessed,
         column_indicator="gdp_per_capita",
-        title="GDP per capita",
+        title="GDP per capita (constant 2017 intl-$)",
         column_country="location",
         indicator_name="GDP per capita (constant 2017 intl-$)",
     )
@@ -361,7 +375,7 @@ with st.container(border=True):
 ##########################################
 # INPUT FROM USER
 ##########################################
-with st.form("form_guess", border=False):
+with st.form("form_guess", border=False, clear_on_submit=True):
     col_guess_1, col_guess_2 = st.columns([4, 1])
     # with col_guess_1:
     value = st.selectbox(
