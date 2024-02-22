@@ -200,7 +200,8 @@ def get_info_for_etl_datasets(db_conn: Optional[MySQLdb.Connection] = None) -> p
         q1.etlPath AS etl_path,
         d.isArchived AS is_archived,
         d.isPrivate AS is_private,
-        q2.chartIds AS chart_ids
+        q2.chartIds AS chart_ids,
+        q2.updatePeriodDays AS update_period_days
     FROM
         (SELECT
             datasetId,
@@ -216,6 +217,7 @@ def get_info_for_etl_datasets(db_conn: Optional[MySQLdb.Connection] = None) -> p
             d.id AS datasetId,
             d.isArchived,
             d.isPrivate,
+            d.updatePeriodDays,
             GROUP_CONCAT(DISTINCT c.id) AS chartIds
         FROM
             datasets d

@@ -32,6 +32,14 @@ def load_steps_df():
     steps_df["full_path_to_script"] = steps_df["full_path_to_script"].fillna("").astype(str)
     steps_df["dag_file_path"] = steps_df["dag_file_path"].fillna("").astype(str)
 
+    # There is no clear way to show the expected date of update of a dataset.
+    # One could simply add the version to update_days_period.
+    # But a dataset may have had a minor update since the main release.
+    # So, it would be better to count from the date_published of its snapshots.
+    # However, if there are multiple snapshots, it is not clear which one to use as a reference.
+    # For example, if a dataset uses the income groups dataset, that would have a date_published that is irrelevant.
+    # So, we could create a table of estimated dates of update. But then we would need some manual way to change them.
+
     return steps_df
 
 
@@ -51,6 +59,7 @@ df = steps_df[
         "name",
         # "dag_file_name",
         # "n_versions",
+        "update_period_days",
         "db_dataset_id",
         "state",
         "full_path_to_script",

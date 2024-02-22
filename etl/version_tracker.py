@@ -528,12 +528,23 @@ class VersionTracker:
                 "dataset_name": "db_dataset_name",
                 "is_private": "db_private",
                 "is_archived": "db_archived",
+                "update_period_days": "update_period_days",
             },
             errors="raise",
         )
         steps_df = pd.merge(
             steps_df,
-            info_df[["step", "chart_ids", "db_dataset_id", "db_dataset_name", "db_private", "db_archived"]],
+            info_df[
+                [
+                    "step",
+                    "chart_ids",
+                    "db_dataset_id",
+                    "db_dataset_name",
+                    "db_private",
+                    "db_archived",
+                    "update_period_days",
+                ]
+            ],
             on="step",
             how="outer",
         )
