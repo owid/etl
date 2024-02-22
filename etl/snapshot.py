@@ -69,8 +69,14 @@ class Snapshot:
         """Download file from remote to self.path."""
         self.path.parent.mkdir(exist_ok=True, parents=True)
         if self.metadata.is_public:
-            download_url = f"{config.R2_SNAPSHOTS_PUBLIC_READ}/{md5[:2]}/{md5[2:]}"
-            files.download(download_url, str(self.path), progress_bar_min_bytes=2**100)
+            # TODO: temporarily download files from R2 instead of public link to prevent
+            # issues with cached snapshots. Remove this when convenient
+            if config.R2_ACCESS_KEY:
+                download_url = f"s3://{config.R2_SNAPSHOTS_PUBLIC}/{md5[:2]}/{md5[2:]}"
+                s3_utils.download(download_url, str(self.path))
+            else:
+                download_url = f"{config.R2_SNAPSHOTS_PUBLIC_READ}/{md5[:2]}/{md5[2:]}"
+                files.download(download_url, str(self.path), progress_bar_min_bytes=2**100)
         else:
             download_url = f"s3://{config.R2_SNAPSHOTS_PRIVATE}/{md5[:2]}/{md5[2:]}"
             s3_utils.download(download_url, str(self.path))
@@ -91,6 +97,13 @@ class Snapshot:
         md5 = self.metadata.outs[0]["md5"]
 
         self._download_dvc_file(md5)
+
+        expected_size = self.metadata.outs[0]["size"]
+        downloaded_size = self.path.stat().st_size
+        if downloaded_size != expected_size:
+            # remove the downloaded file
+            self.path.unlink()
+            raise ValueError(f"Size mismatch for {self.path}: expected {expected_size}, got {downloaded_size}")
 
     def is_dirty(self) -> bool:
         """Return True if snapshot exists and is in DVC."""

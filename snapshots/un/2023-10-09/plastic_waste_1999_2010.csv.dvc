@@ -19,11 +19,11 @@ meta:
     date_published: '2023'
     title_snapshot: 'Comtrade Database: Plastic Waste Trade, 1999-2010'
     description_snapshot: |-
-        Subset of Comtrade database only concerning indicators related to plastic waste.
+      Subset of Comtrade database only concerning indicators related to plastic waste.
 
-        The data is sourced from the commodity category '3915 – Waste, parings and scrap, of plastics' from the UN's Comtrade Database.
+      The data is sourced from the commodity category '3915 – Waste, parings and scrap, of plastics' from the UN's Comtrade Database.
 
-        This snapshot only includes data from 1999 until 2010.
+      This snapshot only includes data from 1999 until 2010.
 
 
     # Citation

@@ -2,20 +2,11 @@ meta:
   name: World Values Survey time-series data (1981-2022)
   publication_year: 2022
   source_name: World Values Survey (1981-2022)
-  source_published_by: 'Inglehart, R., C. Haerpfer, A. Moreno, C. Welzel, K. Kizilova,
-    J. Diez-Medrano, M. Lagos, P. Norris, E. Ponarin & B. Puranen (eds.). 2022. World
-    Values Survey: All Rounds - Country-Pooled Datafile. Madrid, Spain & Vienna, Austria:
-    JD Systems Institute & WVSA Secretariat. Dataset Version 3.0.0. doi:10.14281/18241.17'
+  source_published_by: 'Inglehart, R., C. Haerpfer, A. Moreno, C. Welzel, K. Kizilova, J. Diez-Medrano, M. Lagos, P. Norris, E. Ponarin & B. Puranen (eds.). 2022. World Values Survey: All Rounds - Country-Pooled Datafile. Madrid, Spain & Vienna, Austria: JD Systems Institute & WVSA Secretariat. Dataset Version 3.0.0. doi:10.14281/18241.17'
   url: https://www.worldvaluessurvey.org/WVSDocumentationWVL.jsp
   source_data_url:
   license_url:
-  license_name: ' These data files are available without restrictions, provided: a)
-    that they are used for non-profit purposes; b) correct citations are provided
-    and sent to the World Values Survey Association for each publication of results
-    based in part or entirely on these data files; c) the data files themselves are not
-    redistributed; d) proper citation to the WVS data is included into the references
-    list of the publication (citation format available for downloading in the Documentation
-    section).'
+  license_name: ' These data files are available without restrictions, provided: a) that they are used for non-profit purposes; b) correct citations are provided and sent to the World Values Survey Association for each publication of results based in part or entirely on these data files; c) the data files themselves are not redistributed; d) proper citation to the WVS data is included into the references list of the publication (citation format available for downloading in the Documentation section).'
   date_accessed: 2023-06-25
   is_public: true
   description: |-
@@ -23,6 +14,6 @@ meta:
 
 wdir: ../../../data/snapshots/wvs/2023-06-25
 outs:
-- md5: 20ddc662945bef22464c8614066e7afe
-  size: 1394309381
-  path: longitudinal_wvs.csv
+  - md5: 20ddc662945bef22464c8614066e7afe
+    size: 1394309381
+    path: longitudinal_wvs.csv

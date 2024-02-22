@@ -347,7 +347,7 @@ if st.session_state.to_be_submitted_confirmed_2:
         if config.DB_HOST == "localhost":
             url = f"http://localhost:3030/admin/datasets/{fast_import.dataset_id}"
         else:
-            url = f"http://{config.DB_HOST}/admin/datasets/{fast_import.dataset_id}"
+            url = f"http://{config.ADMIN_HOST}/admin/datasets/{fast_import.dataset_id}"
         st.success(f"The dataset was imported to the [database]({url})!")
         if config.FASTTRACK_COMMIT:
             st.success(f"See commit in [ETL repository]({github_link})")

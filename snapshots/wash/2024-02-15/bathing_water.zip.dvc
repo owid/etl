@@ -28,5 +28,5 @@ meta:
 wdir: ../../../data/snapshots/wash/2024-02-15
 outs:
 - md5: 640bbdc025b5bdbb45d604a3dae774ea
-  size: 124607
+  size: 123760
   path: bathing_water.zip

@@ -6,9 +6,8 @@ meta:
 
       For more details, refer to https://github.com/dkobak/excess-mortality#excess-mortality-during-the-covid-19-pandemic.
     url: https://github.com/dkobak/excess-mortality
-    source_data_url: 
-      https://raw.githubusercontent.com/dkobak/excess-mortality/main/baselines-per-year.csv
-    date_accessed: 2024-02-20
+    source_data_url: https://raw.githubusercontent.com/dkobak/excess-mortality/main/baselines-per-year.csv
+    date_accessed: 2024-02-22
     publication_date: '2021-06-30'
     publication_year: 2021
     published_by: |-
@@ -22,8 +21,7 @@ meta:
     name: GPL-3.0
     url: https://github.com/dkobak/excess-mortality/blob/main/LICENSE
   access_notes: Contains data by age.
-wdir: ../../../data/snapshots/excess_mortality/latest
 outs:
-- md5: 10c0cc43c5ca86c76ba103990b882444
-  size: 381802
-  path: xm_karlinsky_kobak.csv
+  - md5: 10c0cc43c5ca86c76ba103990b882444
+    size: 381802
+    path: xm_karlinsky_kobak.csv

@@ -19,19 +19,16 @@ meta:
       Mahler, Daniel Gerszon; Yonzan, Nishant; Lakner, Christoph. 2022. The Impact of COVID-19 on Global Inequality and Poverty. Policy Research Working Papers;10198. © World Bank, Washington, DC. https://openknowledge.worldbank.org/entities/publication/54fae299-8800-585f-9f18-a42514f8d83b License: [CC BY 3.0 IGO](https://creativecommons.org/licenses/by/3.0/igo/).
 
     # Files
-    url_main: 
-      https://datacatalog.worldbank.org/search/dataset/0064304/1000-Binned-Global-Distribution
-    url_download: 
-      https://datacatalogfiles.worldbank.org/ddh-published/0064304/DR0091199/GlobalDist1000bins_1990-2019.dta
+    url_main: https://datacatalog.worldbank.org/search/dataset/0064304/1000-Binned-Global-Distribution
+    url_download: https://datacatalogfiles.worldbank.org/ddh-published/0064304/DR0091199/GlobalDist1000bins_1990-2019.dta
     date_accessed: 2024-01-22
 
     # License
     license:
       name: CC BY 3.0 IGO DEED
-      url: 
-        https://datacatalog.worldbank.org/search/dataset/0064304/1000-Binned-Global-Distribution
+      url: https://datacatalog.worldbank.org/search/dataset/0064304/1000-Binned-Global-Distribution
 wdir: ../../../data/snapshots/wb/2024-01-22
 outs:
-- md5: 4b16b3f0756675e086062f289cce64a7
-  size: 143888715
-  path: thousand_bins_distribution.dta
+  - md5: 93e2c66478e4dec90ca9ef9c4ed4bfbd
+    size: 143888715
+    path: thousand_bins_distribution.dta
