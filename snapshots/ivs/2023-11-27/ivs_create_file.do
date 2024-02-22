@@ -461,13 +461,13 @@ foreach var in $schwartz_questions {
 	gen not_at_all_like_me_`var' = 0
 	replace not_at_all_like_me_`var' = 1 if `var' == 1
 	
-	gen dont_know_like_me_`var' = 0
-	replace dont_know_like_me_`var' = 1 if `var' == .a
+	gen dont_know_`var' = 0
+	replace dont_know_`var' = 1 if `var' == .a
 	
-	gen missing_like_me_`var' = 0
-	replace missing_like_me_`var' = 1 if `var' == .b | `var' == .c | `var' == .d | `var' == .e
+	gen missing_`var' = 0
+	replace missing_`var' = 1 if `var' == .b | `var' == .c | `var' == .d | `var' == .e
 
-	collapse (mean) like_me_agg_`var' not_like_me_agg_`var' very_much_like_me_`var' like_me_`var' somewhat_like_me_`var' a_little_like_me_`var' not_like_me_`var' not_at_all_like_me_`var' dont_know_like_me_`var' missing_like_me_`var' [w=S017], by (year country)
+	collapse (mean) like_me_agg_`var' not_like_me_agg_`var' very_much_like_me_`var' like_me_`var' somewhat_like_me_`var' a_little_like_me_`var' not_like_me_`var' not_at_all_like_me_`var' dont_know_`var' missing_`var' [w=S017], by (year country)
 	tempfile schwartz_`var'_file
 	save "`schwartz_`var'_file'"
 
@@ -517,13 +517,13 @@ replace lei_vs_wk_5  = 1 if C008 == 5
 gen dont_know_lei_vs_wk = 0
 replace dont_know_lei_vs_wk = 1 if C008 == .a
 
-gen missing_know_lei_vs_wk = 0
-replace missing_know_lei_vs_wk = 1 if C008 == .b | C008 == .c | C008 == .d | C008 == .e
+gen missing_lei_vs_wk = 0
+replace missing_lei_vs_wk = 1 if C008 == .b | C008 == .c | C008 == .d | C008 == .e
 
 gen avg_score_lei_vs_wk = C008
 
 * Make dataset of the mean trust (which ends up being the % of people saying "most people can be trusted") by wave and country (CHECK WEIGHTS)
-collapse (mean) leisure_lei_vs_wk neutral_lei_vs_wk work_lei_vs_wk lei_vs_wk_1 lei_vs_wk_2 lei_vs_wk_4 lei_vs_wk_5 dont_know_lei_vs_wk missing_know_lei_vs_wk avg_score_lei_vs_wk [w=S017], by (year country)
+collapse (mean) leisure_lei_vs_wk neutral_lei_vs_wk work_lei_vs_wk lei_vs_wk_1 lei_vs_wk_2 lei_vs_wk_4 lei_vs_wk_5 dont_know_lei_vs_wk missing_lei_vs_wk avg_score_lei_vs_wk [w=S017], by (year country)
 tempfile leisure_vs_work_file
 save "`leisure_vs_work_file'"
 
@@ -661,7 +661,7 @@ foreach var in $justifiable_questions {
 	replace never_just_agg_`var' = 1 if `var' <= 4
 	
 	gen always_just_agg_`var' = 0
-	replace always_just_agg_`var' = 1 if `var' >= 6 | `var' <= 10
+	replace always_just_agg_`var' = 1 if `var' >= 6 & `var' <= 10
 	
 	gen never_just_`var' = 0
 	replace never_just_`var' = 1 if `var' == 1

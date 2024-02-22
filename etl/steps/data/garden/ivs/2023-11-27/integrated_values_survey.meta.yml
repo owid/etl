@@ -1155,7 +1155,7 @@ tables:
           <<: *common-display
         presentation:
           title_public: "Not at all like me: Important to think up new ideas"
-      dont_know_like_me_new_ideas:
+      dont_know_new_ideas:
         title: "It is important to this person to think up new ideas and be creative: Don't know"
         description_short: '% of respondents replying "don‘t know" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, not like you, or not at all like you?" in the description "It is important to this person to think up new ideas and be creative".'
         display:
@@ -1163,7 +1163,7 @@ tables:
           <<: *common-display
         presentation:
           title_public: "Don't know: Important to think up new ideas"
-      missing_like_me_new_ideas:
+      missing_new_ideas:
         title: "It is important to this person to think up new ideas and be creative: Missing"
         description_short: '% of answers classified as No answer, not applicable, not asked in survey o missing: other for the question "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, not like you, or not at all like you?" in the description "It is important to this person to think up new ideas and be creative".'
         display:
@@ -1236,7 +1236,7 @@ tables:
           <<: *common-display
         presentation:
           title_public: "Not at all like me: Important to be rich"
-      dont_know_like_me_rich:
+      dont_know_rich:
         title: "It is important to this person to be rich: Don't know"
         description_short: '% of respondents replying "don‘t know" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, not like you, or not at all like you?" in the description "It is important to this person to be rich".'
         display:
@@ -1244,7 +1244,7 @@ tables:
           <<: *common-display
         presentation:
           title_public: "Don't know: Important to be rich"
-      missing_like_me_rich:
+      missing_rich:
         title: "It is important to this person to be rich: Missing"
         description_short: '% of answers classified as No answer, not applicable, not asked in survey o missing: other for the question "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, not like you, or not at all like you?" in the description "It is important to this person to be rich".'
         display:
@@ -1317,7 +1317,7 @@ tables:
           <<: *common-display
         presentation:
           title_public: "Not at all like me: Important living in secure surroundings"
-      dont_know_like_me_secure:
+      dont_know_secure:
         title: "It is important to this person living in secure surroundings: Don't know"
         description_short: '% of respondents replying "don‘t know" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, not like you, or not at all like you?" in the description "It is important to this person living in secure surroundings".'
         display:
@@ -1325,7 +1325,7 @@ tables:
           <<: *common-display
         presentation:
           title_public: "Don't know: Important living in secure surroundings"
-      missing_like_me_secure:
+      missing_secure:
         title: "It is important to this person living in secure surroundings: Missing"
         description_short: '% of answers classified as No answer, not applicable, not asked in survey o missing: other for the question "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, not like you, or not at all like you?" in the description "It is important to this person living in secure surroundings".'
         display:
@@ -1398,7 +1398,7 @@ tables:
           <<: *common-display
         presentation:
           title_public: "Not at all like me: Important to have a good time"
-      dont_know_like_me_good_time:
+      dont_know_good_time:
         title: "It is important to this person to have a good time: Don't know"
         description_short: '% of respondents replying "don‘t know" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, not like you, or not at all like you?" in the description "It is important to this person to have a good time".'
         display:
@@ -1406,7 +1406,7 @@ tables:
           <<: *common-display
         presentation:
           title_public: "Don't know: Important to have a good time"
-      missing_like_me_good_time:
+      missing_good_time:
         title: "It is important to this person to have a good time: Missing"
         description_short: '% of answers classified as No answer, not applicable, not asked in survey o missing: other for the question "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, not like you, or not at all like you?" in the description "It is important to this person to have a good time".'
         display:
@@ -1479,7 +1479,7 @@ tables:
           <<: *common-display
         presentation:
           title_public: "Not at all like me: Important to help the people nearby"
-      dont_know_like_me_help_others:
+      dont_know_help_others:
         title: "It is important to this person to help the people nearby: Don't know"
         description_short: '% of respondents replying "don‘t know" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, not like you, or not at all like you?" in the description "It is important to this person to help the people nearby".'
         display:
@@ -1487,7 +1487,7 @@ tables:
           <<: *common-display
         presentation:
           title_public: "Don't know: Important to help the people nearby"
-      missing_like_me_help_others:
+      missing_help_others:
         title: "It is important to this person to help the people nearby: Missing"
         description_short: '% of answers classified as No answer, not applicable, not asked in survey o missing: other for the question "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, not like you, or not at all like you?" in the description "It is important to this person to help the people nearby".'
         display:
@@ -1560,7 +1560,7 @@ tables:
           <<: *common-display
         presentation:
           title_public: "Not at all like me: Important being very successful"
-      dont_know_like_me_success:
+      dont_know_success:
         title: "It is important to this person being very successful: Don't know"
         description_short: '% of respondents replying "don‘t know" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, not like you, or not at all like you?" in the description "It is important to this person being very successful".'
         display:
@@ -1568,7 +1568,7 @@ tables:
           <<: *common-display
         presentation:
           title_public: "Don't know: Important being very successful"
-      missing_like_me_success:
+      missing_success:
         title: "It is important to this person being very successful: Missing"
         description_short: '% of answers classified as No answer, not applicable, not asked in survey o missing: other for the question "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, not like you, or not at all like you?" in the description "It is important to this person being very successful".'
         display:
@@ -1641,7 +1641,7 @@ tables:
           <<: *common-display
         presentation:
           title_public: "Not at all like me: Important taking risks"
-      dont_know_like_me_risks:
+      dont_know_risks:
         title: "It is important to this person adventure and taking risks: Don't know"
         description_short: '% of respondents replying "don‘t know" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, not like you, or not at all like you?" in the description "It is important to this person adventure and taking risks".'
         display:
@@ -1649,7 +1649,7 @@ tables:
           <<: *common-display
         presentation:
           title_public: "Don't know: Important taking risks"
-      missing_like_me_risks:
+      missing_risks:
         title: "It is important to this person adventure and taking risks: Missing"
         description_short: '% of answers classified as No answer, not applicable, not asked in survey o missing: other for the question "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, not like you, or not at all like you?" in the description "It is important to this person adventure and taking risks".'
         display:
@@ -1722,7 +1722,7 @@ tables:
           <<: *common-display
         presentation:
           title_public: "Not at all like me: Important to always behave properly"
-      dont_know_like_me_behave:
+      dont_know_behave:
         title: "It is important to this person to always behave properly: Don't know"
         description_short: '% of respondents replying "don‘t know" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, not like you, or not at all like you?" in the description "It is important to this person to always behave properly".'
         display:
@@ -1730,7 +1730,7 @@ tables:
           <<: *common-display
         presentation:
           title_public: "Don't know: Important to always behave properly"
-      missing_like_me_behave:
+      missing_behave:
         title: "It is important to this person to always behave properly: Missing"
         description_short: '% of answers classified as No answer, not applicable, not asked in survey o missing: other for the question "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, not like you, or not at all like you?" in the description "It is important to this person to always behave properly".'
         display:
@@ -1803,7 +1803,7 @@ tables:
           <<: *common-display
         presentation:
           title_public: "Not at all like me: Important looking after the environment"
-      dont_know_like_me_respect_environment:
+      dont_know_respect_environment:
         title: "It is important to this person looking after the environment: Don't know"
         description_short: '% of respondents replying "don‘t know" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, not like you, or not at all like you?" in the description "It is important to this person looking after the environment".'
         display:
@@ -1811,7 +1811,7 @@ tables:
           <<: *common-display
         presentation:
           title_public: "Don't know: Important looking after the environment"
-      missing_like_me_respect_environment:
+      missing_respect_environment:
         title: "It is important to this person looking after the environment: Missing"
         description_short: '% of answers classified as No answer, not applicable, not asked in survey o missing: other for the question "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, not like you, or not at all like you?" in the description "It is important to this person looking after the environment".'
         display:
@@ -1884,7 +1884,7 @@ tables:
           <<: *common-display
         presentation:
           title_public: "Not at all like me: Important tradition"
-      dont_know_like_me_tradition:
+      dont_know_tradition:
         title: "It is important to this person tradition: Don't know"
         description_short: '% of respondents replying "don‘t know" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, not like you, or not at all like you?" in the description "It is important to this person tradition".'
         display:
@@ -1892,7 +1892,7 @@ tables:
           <<: *common-display
         presentation:
           title_public: "Don't know: Important tradition"
-      missing_like_me_tradition:
+      missing_tradition:
         title: "It is important to this person tradition: Missing"
         description_short: '% of answers classified as No answer, not applicable, not asked in survey o missing: other for the question "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, not like you, or not at all like you?" in the description "It is important to this person tradition".'
         display:
@@ -1965,7 +1965,7 @@ tables:
           <<: *common-display
         presentation:
           title_public: "Leisure vs work: Don't know"
-      missing_know_lei_vs_wk:
+      missing_lei_vs_wk:
         title: "Leisure vs work: Missing"
         description_short: '% of answers classified as No answer, not applicable, not asked in survey o missing: other for the question "Which point on this scale most clearly describes how much weight you place on work (including housework and schoolwork), as compared with leisure or recreation? A It´s leisure that makes life worth living, not work B Work is what makes life worth living, not leisure", where 1 is description A and 5 is description B.'
         display:
