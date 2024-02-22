@@ -23,5 +23,5 @@ meta:
 wdir: ../../../data/snapshots/oecd/2023-05-18
 outs:
 - md5: 320570f5ee7c11eff8123a78abb2426e
-  size: 84521205
+  size: 84203878
   path: co2_air_transport.csv

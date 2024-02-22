@@ -34,5 +34,5 @@ meta:
     url: https://www.mortality.org/Data/UserAgreement
 outs:
   - md5: 77d5aa1745dfc7467302555c54f3ab6a
-    size: 20377339
+    size: 20377337
     path: hmd_stmf.csv
