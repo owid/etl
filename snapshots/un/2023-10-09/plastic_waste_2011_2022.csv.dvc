@@ -44,5 +44,5 @@ meta:
 wdir: ../../../data/snapshots/un/2023-10-09
 outs:
 - md5: a008db2144789b0aeb52791277e66504
-  size: 31869412
+  size: 31960508
   path: plastic_waste_2011_2022.csv
