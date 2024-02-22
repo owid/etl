@@ -396,6 +396,13 @@ def _confirm_choice(multiple_files: List[Any]) -> int:
     type=bool,
     help="Do not write to dag or create step files. Default: False.",
 )
+@click.option(
+    "--interactive/--non-interactive",
+    is_flag=True,
+    default=False,
+    type=bool,
+    help="Skip user interactions (for confirmation and when there is ambiguity). Default: False.",
+)
 def cli(
     steps: Union[str, List[str]],
     step_version_new: Optional[str] = STEP_VERSION_NEW,

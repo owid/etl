@@ -74,6 +74,18 @@ sections:
         emoji: "🔄"
         image_url: "https://cdn.pixabay.com/photo/2018/04/12/18/13/sync-3314296_1280.png"
 
+  - title: "Dashboard"
+    description: |-
+      Control panel for ETL updates.
+    apps:
+      - title: "ETL Dashboard"
+        alias: dashboard
+        entrypoint: pages/dashboard.py
+        description: Control panel for ETL updates.
+        maintainer: "@pablo"
+        emoji: "📋"
+        image_url: "https://cdn.pixabay.com/photo/2018/09/04/17/02/indicator-3654257_960_720.jpg"
+
   - title: "Metadata"
     description: |-
       Tools to improve our metadata or learn how to use it.
