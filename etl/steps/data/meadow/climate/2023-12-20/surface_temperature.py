@@ -13,11 +13,30 @@ from structlog import get_logger
 from tqdm import tqdm
 
 from etl.helpers import PathFinder, create_dataset
+from etl.snapshot import Snapshot
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 # Initialize logger.
 log = get_logger()
+
+
+def _load_data_array(snap: Snapshot) -> xr.DataArray:
+    log.info("load_data_array.start")
+    # Load data from snapshot.
+    with gzip.open(snap.path, "r") as _file:
+        ds = xr.open_dataset(_file)
+
+    # The latest 3 months in this dataset are made available through ERA5T, which is slightly different to ERA5. In the downloaded file, an extra dimenions ‘expver’ indicates which data is ERA5 (expver = 1) and which is ERA5T (expver = 5).
+    # If a value is missing in the first dataset, it is filled with the value from the second dataset.
+    # Select the 't2m' variable from the combined dataset.
+    return ds.sel(expver=1).combine_first(ds.sel(expver=5))["t2m"]
+
+
+def _load_shapefile(file_path: str) -> gpd.GeoDataFrame:
+    log.info("load_shapefile.start")
+    shapefile = gpd.read_file(file_path)
+    return shapefile[["geometry", "WB_NAME"]]
 
 
 def run(dest_dir: str) -> None:
@@ -26,16 +45,8 @@ def run(dest_dir: str) -> None:
     #
     # Retrieve snapshot.
     snap = paths.load_snapshot("surface_temperature.gz")
-    # Load data from snapshot.
-    with gzip.open(snap.path, "r") as _file:
-        ds = xr.open_dataset(_file)
 
-    # The latest 3 months in this dataset are made available through ERA5T, which is slightly different to ERA5. In the downloaded file, an extra dimenions ‘expver’ indicates which data is ERA5 (expver = 1) and which is ERA5T (expver = 5).
-    # If a value is missing in the first dataset, it is filled with the value from the second dataset.
-    ERA5_combine = ds.sel(expver=1).combine_first(ds.sel(expver=5))
-
-    # Select the 't2m' variable from the combined dataset and assign it to 'da'.
-    da = ERA5_combine["t2m"]
+    da = _load_data_array(snap)
 
     # Convert the temperature values from Kelvin to Celsius by subtracting 273.15.
     da = da - 273.15
@@ -50,8 +61,7 @@ def run(dest_dir: str) -> None:
         file_path = f"zip://{snap_geo.path}!/{shapefile_name}"
 
         # Read the shapefile directly from the ZIP archive
-        shapefile = gpd.read_file(file_path)
-        shapefile = shapefile[["geometry", "WB_NAME"]]
+        shapefile = _load_shapefile(file_path)
 
     #
     # Process data.
@@ -63,14 +73,14 @@ def run(dest_dir: str) -> None:
     # Initialize a list to keep track of small countries where temperature data extraction fails.
     small_countries = []
 
+    # Set the coordinate reference system for the temperature data to EPSG 4326.
+    da.rio.write_crs("epsg:4326", inplace=True)
+
     # Iterate over each row in the shapefile data.
     for i in tqdm(range(shapefile.shape[0])):
         # Extract the data for the current row.
         data = shapefile[shapefile.index == i]
         country_name = shapefile.iloc[i]["WB_NAME"]
-
-        # Set the coordinate reference system for the temperature data to EPSG 4326.
-        da.rio.write_crs("epsg:4326", inplace=True)
 
         try:
             # Clip the temperature data to the current country's shape.
