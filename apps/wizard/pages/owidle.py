@@ -55,6 +55,7 @@ COLORS = [
     "#996D39",
     "#BE5915",
 ]
+MAX_DISTANCE_ON_EARTH = 20_000
 
 
 @st.cache_data
@@ -143,7 +144,7 @@ def get_flat_earth_bearing(lat1: float, lon1: float, lat2: float, lon2: float) -
     return degrees(angle)
 
 
-def haversine(lat1: float, lon1: float, lat2: float, lon2: float):
+def haversine(lat1: float, lon1: float, lat2: float, lon2: float) -> int:
     """
     Calculate the great circle distance between two points
     on the earth (specified in decimal degrees)
@@ -157,10 +158,10 @@ def haversine(lat1: float, lon1: float, lat2: float, lon2: float):
     a = sin(dlat / 2) ** 2 + cos(lat1) * cos(lat2) * sin(dlon / 2) ** 2
     c = 2 * asin(sqrt(a))
     r = 6371  # Radius of earth in kilometers. Use 3956 for miles
-    return c * r
+    return int(c * r)
 
 
-def distance_to_solution(country_selected: str) -> Tuple[str, str]:
+def distance_to_solution(country_selected: str) -> Tuple[str, str, str]:
     """Estimate distance (km) from guessed to solution, including direction."""
     # Estimate distance
     # st.write(GEO)
@@ -191,12 +192,19 @@ def distance_to_solution(country_selected: str) -> Tuple[str, str]:
         arrow = "↖️"
 
     distance = haversine(guess.y, guess.x, solution.y, solution.x)
-    distance = str(int(distance))
 
     if country_selected == SOLUTION:
         st.session_state.user_has_succeded = True
-        return "0", "🎉"
-    return distance, arrow
+        return "0", "🎉", "100"
+
+    # Estimate score
+    score = int(round(100 - (distance / MAX_DISTANCE_ON_EARTH) * 100, 0))
+
+    # Ensure string types
+    score = str(score)
+    distance = str(distance)
+
+    return distance, arrow, score
 
 
 # Actions once user clicks on "GUESS" button
@@ -211,12 +219,13 @@ def guess() -> None:
             st.toast("⚠️ You have already guessed this country!")
         else:
             # Estimate distance from correct answer
-            distance, direction = distance_to_solution(st.session_state.guess_last)
+            distance, direction, score = distance_to_solution(st.session_state.guess_last)
             # Add to session state
             st.session_state.guesses[st.session_state.num_guesses] = {
                 "guess": st.session_state.guess_last,
                 "distance": distance,
                 "direction": direction,
+                "score": score,
             }
             # Increment number of guesses
             st.session_state.num_guesses += 1
@@ -413,14 +422,16 @@ guesses_display = []
 num_guesses_bound = min(st.session_state.num_guesses, NUM_GUESSES)
 for i in range(num_guesses_bound):
     with st.container(border=True):
-        col1, col2, col3 = st.columns([4, 1, 1])
+        col1, col2, col3, col4 = st.columns([30, 10, 7, 7])
         with col1:
             # st.text(st.session_state.guesses[i]["guess"])
             st.markdown(f"**{st.session_state.guesses[i]['guess']}**")
         with col2:
-            st.markdown(f"{st.session_state.guesses[i]['distance']} km")
+            st.markdown(f"{st.session_state.guesses[i]['distance']}km")
         with col3:
             st.markdown(st.session_state.guesses[i]["direction"])
+        with col4:
+            st.markdown(f"{st.session_state.guesses[i]['score']}%")
 
 
 ##########################################
