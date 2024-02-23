@@ -46,10 +46,8 @@ def run(dest_dir: str) -> None:
     # Retrieve snapshot.
     snap = paths.load_snapshot("surface_temperature.gz")
 
-    da = _load_data_array(snap)
-
-    # Convert the temperature values from Kelvin to Celsius by subtracting 273.15.
-    da = da - 273.15
+    # Read surface temperature data from snapshot and convert temperature from Kelvin to Celsius.
+    da = _load_data_array(snap) - 273.15
 
     # Read the shapefile to extract country informaiton
     snap_geo = paths.load_snapshot("world_bank.zip")
@@ -74,7 +72,7 @@ def run(dest_dir: str) -> None:
     small_countries = []
 
     # Set the coordinate reference system for the temperature data to EPSG 4326.
-    da.rio.write_crs("epsg:4326", inplace=True)
+    da = da.rio.write_crs("epsg:4326")
 
     # Iterate over each row in the shapefile data.
     for i in tqdm(range(shapefile.shape[0])):
@@ -84,7 +82,7 @@ def run(dest_dir: str) -> None:
 
         try:
             # Clip the temperature data to the current country's shape.
-            clip = da.rio.clip(data.geometry.apply(mapping), data.crs)
+            clip = da.rio.clip(data.geometry.apply(mapping), data.crs, from_disk=True)
 
             # Calculate weights based on latitude to account for area distortion in latitude-longitude grids.
             weights = np.cos(np.deg2rad(clip.latitude))
