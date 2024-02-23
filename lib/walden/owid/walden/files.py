@@ -83,9 +83,9 @@ def _stream_to_file(
         task_id = progress.add_task("Downloading", total=total_length)
 
     for chunk in streamer:  # 16k
+        file.write(chunk)
         if istextblock(chunk[:DEFAULT_CHUNK_SIZE]):
             chunk = dos2unix(chunk)
-        file.write(chunk)
         md5.update(chunk)
         if display_progress:
             progress.update(task_id, advance=len(chunk))  # type: ignore
