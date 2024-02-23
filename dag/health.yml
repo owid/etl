@@ -467,3 +467,5 @@ steps:
   # OECD Health Expenditure and Financing Database
   data://meadow/oecd/2024-02-23/health_expenditure:
     - snapshot://oecd/2024-02-23/health_expenditure.csv
+  data://garden/oecd/2024-02-23/health_expenditure:
+    - data://meadow/oecd/2024-02-23/health_expenditure
