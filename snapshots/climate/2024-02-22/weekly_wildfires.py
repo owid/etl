@@ -1,6 +1,7 @@
 """Script to create a snapshot of dataset."""
 
 import os
+import shutil
 import tempfile
 import time
 from pathlib import Path
@@ -393,6 +394,7 @@ def main(upload: bool) -> None:
                         df["indicator"] = column_name
                         df = df.rename(columns={f"Year {year}": "value", "Day": "day"})
                         all_dfs.append(df)
+                    shutil.rmtree(download_path, ignore_errors=True)
 
     all_dfs = pd.concat(all_dfs)
     df_to_file(all_dfs, file_path=snap.path)
