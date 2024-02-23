@@ -7066,7 +7066,7 @@ tooling-extras = ["pyaml (>=23.7.0)", "pypandoc-binary (>=1.11)", "pytest (>=7.4
 
 [[package]]
 name = "walden"
-version = "0.1.0"
+version = "0.1.1"
 description = ""
 optional = false
 python-versions = "^3.8.1"

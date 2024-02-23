@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "walden"
-version = "0.1.0"
+version = "0.1.1"
 description = ""
 authors = ["Our World in Data <tech@ourworldindata.org>"]
 packages = [{ include = "owid" }]

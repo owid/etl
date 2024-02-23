@@ -55,6 +55,7 @@ COLORS = [
     "#996D39",
     "#BE5915",
 ]
+MAX_DISTANCE_ON_EARTH = 20_000
 
 
 @st.cache_data
@@ -143,7 +144,7 @@ def get_flat_earth_bearing(lat1: float, lon1: float, lat2: float, lon2: float) -
     return degrees(angle)
 
 
-def haversine(lat1: float, lon1: float, lat2: float, lon2: float):
+def haversine(lat1: float, lon1: float, lat2: float, lon2: float) -> int:
     """
     Calculate the great circle distance between two points
     on the earth (specified in decimal degrees)
@@ -157,10 +158,10 @@ def haversine(lat1: float, lon1: float, lat2: float, lon2: float):
     a = sin(dlat / 2) ** 2 + cos(lat1) * cos(lat2) * sin(dlon / 2) ** 2
     c = 2 * asin(sqrt(a))
     r = 6371  # Radius of earth in kilometers. Use 3956 for miles
-    return c * r
+    return int(c * r)
 
 
-def distance_to_solution(country_selected: str) -> Tuple[str, str]:
+def distance_to_solution(country_selected: str) -> Tuple[str, str, str]:
     """Estimate distance (km) from guessed to solution, including direction."""
     # Estimate distance
     # st.write(GEO)
@@ -191,12 +192,19 @@ def distance_to_solution(country_selected: str) -> Tuple[str, str]:
         arrow = "↖️"
 
     distance = haversine(guess.y, guess.x, solution.y, solution.x)
-    distance = str(int(distance))
 
     if country_selected == SOLUTION:
         st.session_state.user_has_succeded = True
-        return "0", "🎉"
-    return distance, arrow
+        return "0", "🎉", "100"
+
+    # Estimate score
+    score = int(round(100 - (distance / MAX_DISTANCE_ON_EARTH) * 100, 0))
+
+    # Ensure string types
+    score = str(score)
+    distance = str(distance)
+
+    return distance, arrow, score
 
 
 # Actions once user clicks on "GUESS" button
@@ -211,12 +219,13 @@ def guess() -> None:
             st.toast("⚠️ You have already guessed this country!")
         else:
             # Estimate distance from correct answer
-            distance, direction = distance_to_solution(st.session_state.guess_last)
+            distance, direction, score = distance_to_solution(st.session_state.guess_last)
             # Add to session state
             st.session_state.guesses[st.session_state.num_guesses] = {
                 "guess": st.session_state.guess_last,
                 "distance": distance,
                 "direction": direction,
+                "score": score,
             }
             # Increment number of guesses
             st.session_state.num_guesses += 1
@@ -241,20 +250,21 @@ def _plot_chart(
     # Filter only data for countries to plot
     df = DATA[DATA["location"].isin(countries_to_plot)].reset_index(drop=True)
 
+    # Sort
+    priority = {c: i for i, c in enumerate(countries_to_plot)}
+    df["priority"] = df[column_country].map(priority)
+    df = df.sort_values(["priority", "year"])
+
     # Map locations to lcolor
     color_map = dict(zip(countries_to_plot, COLORS))
     color_map["?"] = color_map[SOLUTION]
 
     # Map locations to line dash
     line_dash_map = {
-        **{c: "dot" for c in countries_guessed},
+        **{c: "dashdot" for c in countries_guessed},
         SOLUTION: "solid",
         "?": "solid",
     }
-
-    # Add legend group
-    df["group"] = 1
-    df.loc[df["location"] == SOLUTION, "group"] = 2
 
     # Hide country name if user has not succeded yet.
     if not st.session_state.user_has_succeded:
@@ -276,17 +286,30 @@ def _plot_chart(
         color_discrete_map=color_map,
         line_dash="Country",
         line_dash_map=line_dash_map,
-        line_group="group",
-        labels={
-            "year": "Year",
-            column_indicator: indicator_name if indicator_name else column_indicator,
-        },
+        # labels={
+        #     "year": "Year",
+        #     column_indicator: indicator_name if indicator_name else column_indicator,
+        # },
         # markers=True,
         line_shape="spline",
     )
+
+    # Remove axis labels
+    fig.update_layout(xaxis_title=None, yaxis_title=None)
+    # Legends
+    fig.update_layout(
+        legend=dict(
+            orientation="h",
+            # yanchor="bottom",
+            # y=1.02,  # Places the legend above the chart
+            # xanchor="center",
+            # x=0.5,
+        )
+    )
+
     st.plotly_chart(
         fig,
-        theme=None,
+        theme="streamlit",
         use_container_width=True,
     )
 
@@ -299,7 +322,7 @@ def plot_chart_population(countries_guessed: List[str]):
         column_indicator="population",
         title="Population",
         column_country="location",
-        indicator_name="Poppulation",
+        indicator_name="Population",
     )
 
 
@@ -309,7 +332,7 @@ def plot_chart_gdp_pc(countries_guessed: List[str]):
     _plot_chart(
         countries_guessed,
         column_indicator="gdp_per_capita",
-        title="GDP per capita",
+        title="GDP per capita (constant 2017 intl-$)",
         column_country="location",
         indicator_name="GDP per capita (constant 2017 intl-$)",
     )
@@ -361,7 +384,7 @@ with st.container(border=True):
 ##########################################
 # INPUT FROM USER
 ##########################################
-with st.form("form_guess", border=False):
+with st.form("form_guess", border=False, clear_on_submit=True):
     col_guess_1, col_guess_2 = st.columns([4, 1])
     # with col_guess_1:
     value = st.selectbox(
@@ -378,7 +401,7 @@ with st.form("form_guess", border=False):
     if st.session_state.user_has_succeded:
         label = "YOU GUESSED IT!"
     elif st.session_state.num_guesses >= NUM_GUESSES:
-        label = "NO MORE GUESSES :("
+        label = "MAYBE NEXT TIME!"
     else:
         label = f"GUESS {st.session_state.num_guesses + 1}/6"
 
@@ -399,14 +422,16 @@ guesses_display = []
 num_guesses_bound = min(st.session_state.num_guesses, NUM_GUESSES)
 for i in range(num_guesses_bound):
     with st.container(border=True):
-        col1, col2, col3 = st.columns([4, 1, 1])
+        col1, col2, col3, col4 = st.columns([30, 10, 7, 7])
         with col1:
             # st.text(st.session_state.guesses[i]["guess"])
             st.markdown(f"**{st.session_state.guesses[i]['guess']}**")
         with col2:
-            st.markdown(f"{st.session_state.guesses[i]['distance']} km")
+            st.markdown(f"{st.session_state.guesses[i]['distance']}km")
         with col3:
             st.markdown(st.session_state.guesses[i]["direction"])
+        with col4:
+            st.markdown(f"{st.session_state.guesses[i]['score']}%")
 
 
 ##########################################
