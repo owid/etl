@@ -347,7 +347,9 @@ tables:
         short_unit: ""
         unit: ""
         description: |
-          Inequality in education. This metric is needed to estimate the Inequality-adjusted Human Development Index.
+          The [Atkinson index](#dod:atkinson) measures inequality on a scale from 0 to 1. Higher values indicate higher inequality. Inequality is measured here in terms of the number of years adults older than 25 participated in formal education. This metric is needed to estimate the Inequality-adjusted Human Development Index.
+
+          This version of the Atkinson index uses an inequality aversion parameter ε equal to 1. The parameter defines how sensitive the index is to changes in the lower end of the distribution. In this form, the inequality measure is A = 1– g/μ, where g is the geometric mean and μ is the arithmetic mean of the distribution.
         display:
           numDecimalPlaces: 2
       ineq_inc:
@@ -355,7 +357,9 @@ tables:
         short_unit: ""
         unit: ""
         description: |
-          Inequality in income. This metric is needed to estimate the Inequality-adjusted Human Development Index.
+          The [Atkinson index](#dod:atkinson) measures inequality on a scale from 0 to 1. Higher values indicate higher inequality. Depending on the country and year, the data relates to income measured after taxes and benefits, or to consumption, [per capita](#dod:per-capita).
+
+          This version of the Atkinson index uses an inequality aversion parameter ε equal to 1. The parameter defines how sensitive the index is to changes in the lower end of the distribution. In this form, the inequality measure is A = 1– g/μ, where g is the geometric mean and μ is the arithmetic mean of the distribution.
         display:
           numDecimalPlaces: 2
       ineq_le:
@@ -363,7 +367,9 @@ tables:
         short_unit: ""
         unit: ""
         description: |
-          Inequality in life expectancy. This metric is needed to estimate the Inequality-adjusted Human Development Index.
+          The [Atkinson index](#dod:atkinson) measures inequality on a scale from 0 to 1. Higher values indicate higher inequality. Inequality is measured here in terms of the number of years a newborn would live if age-specific mortality rates in the current year were to stay the same throughout its life.
+
+          This version of the Atkinson index uses an inequality aversion parameter ε equal to 1. The parameter defines how sensitive the index is to changes in the lower end of the distribution. In this form, the inequality measure is A = 1– g/μ, where g is the geometric mean and μ is the arithmetic mean of the distribution.
         display:
           numDecimalPlaces: 2
       coef_ineq:
