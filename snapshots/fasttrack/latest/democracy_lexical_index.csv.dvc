@@ -4,7 +4,7 @@ meta:
     url: https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/29106
     source_data_url: |-
       https://docs.google.com/spreadsheets/d/e/2PACX-1vT14CztQpK4EGV898Xlw8Lirh_SYsAH5DnxHBr329XKLGkK5Bl3PEmOsnWwbHn_n6TE4uEnksOBSfp-/pub?output=csv
-    date_accessed: '2024-02-16'
+    date_accessed: '2024-02-23'
     published_by: |-
       Skaaning, Svend-Erik, John Gerring and Henrikas Bartusevičius. 2015. A Lexical Index of Electoral Democracy. Comparative Political Studies 48(12):1491-1525.
   name: Democracy - Lexical Index
@@ -15,8 +15,7 @@ meta:
 
     You can download the code and complete dataset, including supplementary variables, from GitHub: https://github.com/owid/notebooks/tree/main/BastianHerre/democracy
   license: {}
-wdir: ../../../data/snapshots/fasttrack/latest
 outs:
-- md5: 0f368fadcf5777fb8c613b097bcf249e
-  size: 5085897
-  path: democracy_lexical_index.csv
+  - md5: 0f368fadcf5777fb8c613b097bcf249e
+    size: 5085897
+    path: democracy_lexical_index.csv

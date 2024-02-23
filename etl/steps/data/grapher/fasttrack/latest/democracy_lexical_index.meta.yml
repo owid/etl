@@ -21,7 +21,11 @@ tables:
 
           Democracies are understood here as political systems in which citizens have the right to choose the chief executive and the legislature in multi-party, uncertain elections.
 
+          This includes electoral democracies and polyarchies.
+
           Autocracies are understood here as non-democracies.
+
+          This includes non-electoral autocracies, one-party autocracies, multiparty autocracies without an elected executive multiparty autocracies, exclusive democracies, and male democracies.
       regime_lied:
         title: Political regime
         unit: ''
@@ -394,21 +398,37 @@ tables:
         unit: ''
         description: |-
           The variable denotes the number of autocracies based on the Lexical Index of Electoral Democracy-classification based on Skaaning et al. (2015).
+
+          Autocracies are understood here as non-democracies. Democracies are understood here as political systems in which citizens have the right to choose the chief executive and the legislature in multi-party, uncertain elections.
+
+          This includes non-electoral autocracies, one-party autocracies, multiparty autocracies without an elected executive multiparty autocracies, exclusive democracies, and male democracies.
       number_dem_lied:
         title: Number of democracies
         unit: ''
         description: |-
           The variable denotes the number of democracies based on the Lexical Index of Electoral Democracy-classification based on Skaaning et al. (2015).
+
+          Democracies are understood here as political systems in which citizens have the right to choose the chief executive and the legislature in multi-party, uncertain elections.
+
+          This includes electoral democracies and polyarchies.
       pop_aut_lied:
         title: People living in autocracies
         unit: ''
         description: |-
           The variable denotes the number of people living in autocracies based on the Lexical Index of Electoral Democracy-classification by Skaaning et al. (2015).
+
+          Autocracies are understood here as non-democracies.
+
+          This includes non-electoral autocracies, one-party autocracies, multiparty autocracies without an elected executive multiparty autocracies, exclusive democracies, and male democracies.
       pop_dem_lied:
         title: People living in democracies
         unit: ''
         description: |-
           The variable denotes the number of people living in democracies based on the Lexical Index of Electoral Democracy-classification by Skaaning et al. (2015).
+
+          Democracies are understood here as political systems in which citizens have the right to choose the chief executive and the legislature in multi-party, uncertain elections.
+
+          This includes electoral democracies and polyarchies.
       pop_missdem_lied:
         title: People living in countries without democracy data
         unit: ''
