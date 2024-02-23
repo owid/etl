@@ -1,5 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
 
+from typing import List
+
 from owid.catalog import Table
 from structlog import get_logger
 from tabulate import tabulate
@@ -282,7 +284,7 @@ def solve_nulls_values_in_schwartz_questions(
     tb: Table,
     questions: list,
     main_answer: str,
-    other_answers: str,
+    other_answers: List[str],
 ) -> Table:
     """
     Replace null values in Schwartz questions by 0 when the main answer is not null
