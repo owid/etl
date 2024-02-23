@@ -138,6 +138,17 @@ plugins:
       scripts:
         - docs/ignore/gen_metadata_reference.py  # or any other name or path
   - blog
+  # ref: https://github.com/timvink/mkdocs-git-authors-plugin
+  - git-authors:
+      show_email_address: false
+      # authorship_threshold_percent: 1
+      # show_contribution: true
+      # show_line_count: true
+      # count_empty_lines: true
+  - git-revision-date-localized
+  - tags:
+      tags_file: tags.md
+  - privacy
 
 # CSS config
 extra_css:
@@ -176,32 +187,33 @@ nav:
   - Getting started:
     - "getting-started/index.md"
     - Installation: "getting-started/working-environment.md"
-    - Building datasets: "getting-started/building-datasets.md"
-    - Loading datasets: "getting-started/consuming-datasets.md"
-    - Contributing:
-      - "contributing/index.md"
-      - Maintenance of our documentation: "dev/docs.md"
-      - Catalog: "dev/update-catalog.md"
+    - First steps: "getting-started/building-datasets.md"
+    - Contributing: "contributing/index.md"
   - Guides:
-    - Guides: "guides/index.md"
+    - Upgrading indicators: "guides/indicator-upgrade.md"
     - Wizard: "guides/wizard.md"
+    - Updating owid-catalog: "dev/update-catalog.md"
+    - Using ChartGPT: "guides/chartgpt.md"
+    - Maintenance of our documentation: "dev/docs.md"
+    - Guides: "guides/index.md"
     - etl CLI: "guides/etl-cli.md"
     - Adding data:
       - Adding data: "guides/adding-data/index.md"
       - Wizard: "guides/adding-data/wizard.md"
       - Manually add: "guides/adding-data/manual.md"
       - Fast-track: "guides/adding-data/fast-track.md"
-    - Updating charts:
-      - Submitting chart revisions: "guides/charts/updating-charts.md"
-      - Reviewing chart revisions: "guides/charts/reviewing-charts.md"
-      - Using chatGPT: "guides/charts/chatgpt.md"
-    - Harmonize country names: "guides/monize-countries.md"
+    # - Updating charts:
+    #   - Submitting chart revisions: "guides/charts/updating-charts.md"
+    #   - Reviewing chart revisions: "guides/charts/reviewing-charts.md"
+    #   - Using chatGPT: "guides/charts/chatgpt.md"
+    - Harmonize country names: "guides/harmonize-countries.md"
     - Metadata in data pages: "guides/metadata-play.md"
     - Backport a dataset to ETL: "guides/backport.md"
     - Import a private dataset to ETL: "guides/private-import.md"
   - Design principles:
       - Design principles & workflow: architecture/index.md
-      - Our journey: "architecture/our-journey.md"
+      - Our journey:
+        - "architecture/our-journey/index.md"
       - Fundamentals:
         - Computational graph:
           - Computational graph: "architecture/design/compute-graph/index.md"
@@ -230,26 +242,27 @@ nav:
     # - Workflow with metadata: "architecture/metadata/workflow.md"
     # - Reference:
     - Reference:
-      - Reference: "architecture/metadata/reference/index.md"
-      - Origin: "architecture/metadata/reference/origin.md"
+      - "architecture/metadata/reference/index.md"
       - Indicator: "architecture/metadata/reference/indicator.md"
+      - Origin: "architecture/metadata/reference/origin.md"
       - Table: "architecture/metadata/reference/tables.md"
       - Dataset: "architecture/metadata/reference/dataset.md"
-    - Structuring YAML file: "architecture/metadata/structuring-yaml.md"
-    - Data Pages Workflow: "architecture/metadata/data_pages_workflow.md"
-    - ETL MetaGPT Tool: "architecture/metadata/metadata_chatgpt_update.md"
-    - Propagation of metadata: "architecture/metadata/propagation.md"
-    - Using metadata: "architecture/metadata/using.md"
-    - Processing log: "architecture/metadata/processing_log.md"
-    - FAQs: "architecture/metadata/faqs.md"
+    - Working with Metadata:
+      - Structuring YAML file: "architecture/metadata/structuring-yaml.md"
+      - Data Pages Workflow: "architecture/metadata/data_pages_workflow.md"
+      - ETL MetaGPT Tool: "architecture/metadata/metadata_chatgpt_update.md"
+      - Propagation of metadata: "architecture/metadata/propagation.md"
+      - Using metadata: "architecture/metadata/using.md"
+      - Processing log: "architecture/metadata/processing_log.md"
+      - FAQs: "architecture/metadata/faqs.md"
   - API and catalog:
     - API: "api/index.md"
     - Python: "api/python.ipynb"
-    - Dataset catalog:
-      - Dataset catalog: "data/index.md"
-      - Faostat: "data/faostat.md"
-      - Regions: "data/regions.md"
-  - Blog:
-    - blog/index.md
+    # - Dataset catalog:
+    #   - Dataset catalog: "data/index.md"
+    #   - Faostat: "data/faostat.md"
+    #   - Regions: "data/regions.md"
+  # - Blog:
+  #   - blog/index.md
 
 

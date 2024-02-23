@@ -1,3 +1,9 @@
+---
+status: new
+hide:
+    - toc
+---
+
 # Getting started
 
 The ETL is a key tool at Our World in Data (OWID) to ingest, process and publish data. This documentation is aimed at both OWID staff and the general public who want to learn more about our data work.
@@ -8,16 +14,47 @@ Making this documentation public is part of our commitment to **transparency** a
 *[ETL]: Extract Transform Load
 
 
+### Quick reference
 <div class="grid cards" markdown>
 
-- [Installation](working-environment.md)
-- [:material-update: Updating charts on our site](updating-charts.md)
-- [:material-music-clef-treble: Harmonize country names from a table](harmonize-countries.md)
-- [:material-chart-bar: Metadata in the context of data pages](metadata-play.md)
-- [:fontawesome-solid-backward-step: Import datasets from Grapher to ETL](backport.md)
-- [:octicons-key-16: Importing a private dataset to ETL](private-import.md)
+-   __[:octicons-code-16: &nbsp; Installation](working-environment.md)__
+
+    ---
+
+    Set up your working environment.
+
+    Practice your [first steps](building-datasets.md).
+
+-   __[:fontawesome-solid-pen-nib: &nbsp; Design principles](../architecture/)__
+
+    ---
+
+    Learn the fundamentals.
+
+-   __[:fontawesome-solid-book: &nbsp; Metadata reference](../architecture/metadata/reference/index.md)__
+
+    ---
+
+    Data alone is not enough.
+
+    Learn more about our [metadata](../architecture/metadata/index.md).
+
+-   __[:fontawesome-solid-hat-wizard: &nbsp; Wizard](../guides/wizard.md)__
+
+    ---
+
+    Create datasets using Wizard.
+
+-   __[:fontawesome-solid-users: &nbsp; Contributing](../contributing/index.md)__
+
+    ---
+
+    Help us improve our work.
+
+-   __[:material-api: &nbsp; API](../api/index.md)__
+
+    ---
+
+    Access our data catalog.
 
 </div>
-
-In this section we provide the necessary material to [set up your local working environment](working-environment.md), which is a requirement to correctly build and consume datasets in our catalog. To this end, we also review how you can run some simple tests to ensure that you can actually [build datasets](building-datasets.md) and [consume them](consuming-datasets.md).
-
