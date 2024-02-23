@@ -132,3 +132,5 @@ steps:
     - snapshot://fasttrack/2023-05-03/qubits.csv
   data://grapher/fasttrack/latest/completeness_disaster_emdat:
     - snapshot://fasttrack/latest/completeness_disaster_emdat.csv
+  data-private://grapher/fasttrack/latest/vdem_women_executives:
+    - snapshot-private://fasttrack/latest/vdem_women_executives.csv
