@@ -3,13 +3,13 @@
 #  walden
 #
 
-import tempfile
 import hashlib
-import requests_mock
+import tempfile
+from pathlib import Path
+
 import pytest
-
+import requests_mock
 from owid.walden import files
-
 
 test_dataset = """some,data,wow
 42,24,00
@@ -48,13 +48,21 @@ def test_download_with_md5():
 
 
 def test_download_with_wrong_md5_raises():
-    with requests_mock.Mocker() as mocker, tempfile.NamedTemporaryFile(
-        delete=False
-    ) as destination:
+    with requests_mock.Mocker() as mocker, tempfile.NamedTemporaryFile(delete=False) as destination:
         data_url = "https://very/important/data.csv"
         mocker.get(data_url, content=encoded)
         with pytest.raises(files.ChecksumDoesNotMatch):
             files.download(data_url, destination.name, expected_md5="oh no.")
+
+
+def test_download_with_windows_newlines_size():
+    encoded = b"a\r\nb"
+
+    with requests_mock.Mocker() as mocker, tempfile.NamedTemporaryFile(delete=False) as destination:
+        data_url = "https://very/important/data.csv"
+        mocker.get(data_url, content=encoded)
+        files.download(data_url, destination.name)
+        assert Path(destination.name).stat().st_size == len(encoded)
 
 
 def test_empty_checksum():

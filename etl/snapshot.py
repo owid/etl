@@ -71,12 +71,8 @@ class Snapshot:
         if self.metadata.is_public:
             # TODO: temporarily download files from R2 instead of public link to prevent
             # issues with cached snapshots. Remove this when convenient
-            if config.R2_ACCESS_KEY:
-                download_url = f"s3://{config.R2_SNAPSHOTS_PUBLIC}/{md5[:2]}/{md5[2:]}"
-                s3_utils.download(download_url, str(self.path))
-            else:
-                download_url = f"{config.R2_SNAPSHOTS_PUBLIC_READ}/{md5[:2]}/{md5[2:]}"
-                files.download(download_url, str(self.path), progress_bar_min_bytes=2**100)
+            download_url = f"{config.R2_SNAPSHOTS_PUBLIC_READ}/{md5[:2]}/{md5[2:]}"
+            files.download(download_url, str(self.path), progress_bar_min_bytes=2**100)
         else:
             download_url = f"s3://{config.R2_SNAPSHOTS_PRIVATE}/{md5[:2]}/{md5[2:]}"
             s3_utils.download(download_url, str(self.path))
