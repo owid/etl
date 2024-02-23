@@ -372,12 +372,16 @@ def main(upload: bool) -> None:
                             log.info(f"Necessary element was not found in container {index+1}.")
                         except Exception as e:
                             log.info(f"An error occurred while processing container {index+1}: {e}")
-                    # Now, load the file. This part assumes there's only one file and its name ends with '.csv'
+
+                except TimeoutException:
+                    log.info("Failed to locate containers within the timeout period.")
+                finally:
+                    # Now, load the files. This part assumes there's only one file and its name ends with '.csv'
                     downloaded_files = [f for f in os.listdir(download_path) if f.endswith(".csv")]
                     for file in downloaded_files:
                         file_path = os.path.join(download_path, file)
                         df = pd.read_csv(file_path)
-                        cols_to_keep = ["Day", f"Year {year}"]  # Use f-string formatting
+                        cols_to_keep = ["Day", f"Year {year}"]
                         df = df[cols_to_keep]
                         df["year"] = year
                         df["country"] = country_name
@@ -387,10 +391,8 @@ def main(upload: bool) -> None:
                             if part.isupper():
                                 column_name = "_".join(parts[:i])
                         df["indicator"] = column_name
-                        df = df.rename(columns={f"Year {year}": "value", "Day": "day"})  # Use f-string formatting
+                        df = df.rename(columns={f"Year {year}": "value", "Day": "day"})
                         all_dfs.append(df)
-                except TimeoutException:
-                    log.info("Failed to locate containers within the timeout period.")
 
     all_dfs = pd.concat(all_dfs)
     df_to_file(all_dfs, file_path=snap.path)
