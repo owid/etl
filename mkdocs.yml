@@ -124,6 +124,7 @@ markdown_extensions:
           format: !!python/name:pymdownx.superfences.fence_code_format
   - pymdownx.tabbed:
       alternate_style: true
+  - mkdocs-click
 
 # Plugins
 plugins:
@@ -190,12 +191,12 @@ nav:
     - First steps: "getting-started/building-datasets.md"
     - Contributing: "contributing/index.md"
   - Guides:
+    - "guides/index.md"
     - Upgrading indicators: "guides/indicator-upgrade.md"
     - Wizard: "guides/wizard.md"
     - Updating owid-catalog: "dev/update-catalog.md"
     - Using ChartGPT: "guides/chartgpt.md"
     - Maintenance of our documentation: "dev/docs.md"
-    - Guides: "guides/index.md"
     - etl CLI: "guides/etl-cli.md"
     - Adding data:
       - Adding data: "guides/adding-data/index.md"
