@@ -37,43 +37,10 @@ There are different ways you can add data to the catalog, depending on your tech
 
 ## Using Wizard
 
-!!! note
-    Wizard is currently [being developed](https://github.com/owid/owid-issues/issues/1365), so things might be different from what explained below.
+!!! info
+    Learn more about Wizard in [this dedicated guideline](guides/wizard.md)
 
-The wizard is an interactive web UI for setting up the different ETL steps. It creates the base files to help you
-create the recipe for a dataset.
-
-### Get set up
-
-Before you begin, make sure you've set up the ETL as described in [Getting Started](../../getting-started/index.md).
-
-### Wizard options
-The Wizard currently supports the following stages:
-
-| Option      | Description                                                                                                   |
-| ----------- | ------------------------------------------------------------------------------------------------------------- |
-| `snapshot`  | Create a Snapshot step: Insert upstream data to our catalog.                                                  |
-| `meadow`    | Create a Meadow step: Format data.                                                                            |
-| `garden`    | Create a Garden step: Harmonize and process data.                                                             |
-| `grapher`   | Create a Grapher step: Transform data to be Grapher-ready.                                                    |
-| `charts`    | Tool to update our charts.                                                                                    |
-
-Find more details with **`--help`**:
-```bash
-$ etlwiz --help
-2023-09-14 12:43:39.395 WARNING streamlit.runtime.caching.cache_data_api: No runtime found, using MemoryCacheStorageManager
-
-Usage: etlwiz [OPTIONS] [[all|snapshot|meadow|garden|grapher|charts]]
-
-Generate template fo each step of ETL.
-
-╭─ Options ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
-│ --run-checks/--skip-checks             Environment checks                                                                              │
-│ --dummy-data                           Prefill form with dummy data, useful for development                                            │
-│ --port                        INTEGER  Application port                                                                                │
-│ --help                                 Show this message and exit.                                                                     │
-╰────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
-```
+The wizard is an interactive web UI that takes the role of our ETL admin. One of the main uses of Wizard is to create ETL steps. It is loaded with templates so that it is easier for you to create a new step just by using Wizard.
 
 ### Start the wizard
 
@@ -99,6 +66,56 @@ and going to [localhost:8053](localhost:8053). You can create all the steps from
     [Create a new issue :octicons-arrow-right-24:](https://github.com/owid/etl/issues/new)
 
 
+### Wizard options
+The Wizard currently supports the following stages:
+
+| Option      | Description                                                                                                   |
+| ----------- | ------------------------------------------------------------------------------------------------------------- |
+| `snapshot`  | Create a Snapshot step: Insert upstream data to our catalog.                                                  |
+| `meadow`    | Create a Meadow step: Format data.                                                                            |
+| `garden`    | Create a Garden step: Harmonize and process data.                                                             |
+| `grapher`   | Create a Grapher step: Transform data to be Grapher-ready.                                                    |
+| `charts`    | Tool to update our charts.                                                                                    |
+
+<!-- ::: mkdocs-click
+    :module: apps.wizard.cli
+    :command: cli -->
+
+Find more details with **`--help`**:
+```plaintext
+$ etlwiz --help
+
+ Usage: etlwiz [OPTIONS] [[charts|staging_sync|metagpt|expert|metaplay|dataexp|harmonizer|owidle|snapshot|meadow|garden|grapher|fasttrack|all]]
+
+ Run OWID's ETL admin tool, the Wizard.
+
+  ..__    __ _                  _
+  ./ / /\ \ (_)______ _ _ __ __| |
+  .\ \/  \/ | |_  / _` | '__/ _` |
+  ..\  /\  /| |/ | (_| | | | (_| |
+  ...\/  \/ |_/___\__,_|_|  \__,_|
+
+
+ Just launch it and start using it! 🪄
+
+ Note: Alternatively, you can run it as streamlit run apps/wizard/app.py.
+
+╭─ Arguments ───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+│ PHASE    (charts|staging_sync|metagpt|expert|metaplay|dataexp|harmonizer|owidle|snapshot|meadow|garden|grapher|fasttrack|all)                                                                                 │
+╰───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+╭─ Options ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+│ --run-checks/--skip-checks    Environment checks                                                                                                                                                              │
+│                               [default: run-checks]                                                                                                                                                           │
+│ --dummy-data                  Prefill form with dummy data, useful for development                                                                                                                            │
+│ --port                        Application port                                                                                                                                                                │
+│                               (INTEGER)                                                                                                                                                                       │
+│                               [default: 8053]                                                                                                                                                                 │
+│ --help                        Show this message and exit.                                                                                                                                                     │
+╰───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+```
+
+
+
 ## Using the fast-track
 
 !!! warning "You need Tailscale to access fast-track"
@@ -122,11 +139,9 @@ _Super_ fast-track is a variation of fast-track that imports data directly from 
 
 
 ## Manually add a dataset to the ETL
-### Get set up
 
-Before you begin, make sure you've set up the ETL as described in [Getting Started](../../getting-started/index.md).
+!!! note "Before you begin, make sure you've [set up the ETL working environment](../../getting-started/working-environment.md)."
 
-### Adding steps to the ETL
 
 You will need to add a step to the ETL for each stage of data processing you need to do. The steps are:
 
@@ -152,97 +167,89 @@ You will also need to choose a short name for the dataset itself (e.g. `populati
     - ✗ `electricity-demand`
     - ✗ `really_long_elaborate_description_of_the_variable_in_question`
 
-### Add ETL steps
 
-#### Create a new branch in `etl`
+### Create a new branch in `etl`
 
 ```bash
 git checkout -b data/new-dataset
 ```
 
-#### Create Snapshot step
+### Snapshot step
 
-##### Create an ingest snapshot ingest script
+1. **Create an ingest script**
+    - Create a script in `snapshots/<namespace>/<version>/<dataset_short_name>.py`
+    - Create the corresponding metadata DVC file in `snapshots/<namespace>/<version>/<dataset_short_name>.<extension>.dvc`
+    - Run `make format && make test` to ensure that the step runs well and is well formatted.
 
-- Create a script in `snapshots/<namespace>/<version>/<dataset_short_name>.py`
-- Create the corresponding metadata DVC file in `snapshots/<namespace>/<version>/<dataset_short_name>.<extension>.dvc`
-- Run `make format && make test` to ensure that the step runs well and is well formatted.
+2. **Add snapshot data**
+    ```bash
+    poetry run python snapshots/<namespace>/<version>/<dataset_short_name>.py
+    ```
 
-##### Add snapshot data
+### Meadow step
 
-```bash
-poetry run python snapshots/<namespace>/<version>/<dataset_short_name>.py
-```
+1. **Create the step**
+    - Path of the step should be similar to `etl/steps/data/meadow/<namespace>/<version>/<dataset_short_name>.py`.
+    - The step script must contain a `run(dest_dir)` function that loads data from the `snapshot` and creates a dataset
+    (a `catalog.Dataset` object) with one or more tables (`catalog.Table` objects) containing the raw data.
+    - Run `make format && make test` to ensure that the step runs well and is well formatted.
 
-#### Create Meadow step
+2. **Add the step to the dag**, including its dependencies.
+    Add the dependencies for the dataset to the appropriate dag file.
 
-##### Create a new `meadow` step file
+3. **Run the step**
+    ```
+    poetry run etl run data://meadow/<namespace>/<version>/<dataset_short_name>
+    ```
 
-- Path of the step should be similar to `etl/steps/data/meadow/<namespace>/<version>/<dataset_short_name>.py`.
-- The step must contain a `run(dest_dir)` function that loads data from the `snapshot` and creates a dataset
-(a `catalog.Dataset` object) with one or more tables (`catalog.Table` objects) containing the raw data.
-- Run `make format && make test` to ensure that the step runs well and is well formatted.
+### Garden step
 
-##### Add the new meadow step to the dag, including its dependencies.
-Add the dependencies for the dataset to the appropriate dag file.
+1. **Create the step**
+    - Path of the step should be similar to `etl/steps/data/garden/<namespace>/<version>/<dataset_short_name>.py`.
+    - The step must contain a `run(dest_dir)` function that loads data from the last `meadow` step, processes the data and
+    creates a dataset with one or more tables and the necessary metadata.
+    - Country names must be harmonized (for which the [harmonize](../architecture/workflow/harmonization.md) tool of `etl` can be used).
+    - Add plenty of assertions and sanity checks to the step (if possible, compare the data with its previous version and
+    check for abrupt changes).
+    - Run `make format && make test` to ensure that the step runs well and is well formatted.
 
-##### Run the meadow step
+2. **Add the step to the dag**, including its dependencies.
+    Add the dependencies for the dataset to the appropriate dag file.
 
-```
-poetry run etl run data://meadow/<namespace>/<version>/<dataset_short_name>
-```
+3. **Run the step**
+    ```
+    poetry run etl run data://garden/<namespace>/<version>/<dataset_short_name>
+    ```
 
-#### Create Garden step
+### Grapher step
 
-##### Create a new `Garden` step file
-
-- Path of the step should be similar to `etl/steps/data/garden/<namespace>/<version>/<dataset_short_name>.py`.
-- The step must contain a `run(dest_dir)` function that loads data from the last `meadow` step, processes the data and
-creates a dataset with one or more tables and the necessary metadata.
-- Country names must be harmonized (for which the [harmonize](../architecture/workflow/harmonization.md) tool of `etl` can be used).
-- Add plenty of assertions and sanity checks to the step (if possible, compare the data with its previous version and
-check for abrupt changes).
-- Run `make format && make test` to ensure that the step runs well and is well formatted.
-
-##### Add the new garden step to the dag, including its dependencies.
-Add the dependencies for the dataset to the appropriate dag file.
-
-##### Run the garden step
-
-```
-poetry run etl run data://garden/<namespace>/<version>/<dataset_short_name>
-```
-
-#### Create Grapher step
-
-##### Create a new grapher step
-- Path of the step should be similar to `etl/steps/data/grapher/<namespace>/<version>/<dataset_short_name>.py`.
-- The step must contain a `run(dest_dir)` function that loads data from the last `garden` step, processes the data and
-creates a dataset with one or more tables and the necessary metadata.
-- Run `make format && make test` to ensure that the step runs well and is well formatted.
+1. **Create the step**
+    - Path of the step should be similar to `etl/steps/data/grapher/<namespace>/<version>/<dataset_short_name>.py`.
+    - The step must contain a `run(dest_dir)` function that loads data from the last `garden` step, processes the data and
+    creates a dataset with one or more tables and the necessary metadata.
+    - Run `make format && make test` to ensure that the step runs well and is well formatted.
 
 
-##### Run the grapher step
-```
-poetry run etl run data://grapher/<namespace>/<version>/<dataset_short_name>
-```
+2. **Run the step**
+    ```
+    poetry run etl run data://grapher/<namespace>/<version>/<dataset_short_name>
+    ```
 
-Add `--grapher` flags to `etl` command to upsert data into grapher database.
+    Add `--grapher` flags to `etl` command to upsert data into grapher database.
 
-```
-poetry run etl run data://grapher/<namespace>/<version>/<dataset_short_name> --grapher
-```
+    ```
+    poetry run etl run data://grapher/<namespace>/<version>/<dataset_short_name> --grapher
+    ```
 
-To test the step, you can run it on the grapher `staging` database, or using
-[a local grapher](https://github.com/owid/owid-grapher/blob/master/docs/docker-compose-mysql.md).
+    To test the step, you can run it on the grapher `staging` database, or using
+    [a local grapher](https://github.com/owid/owid-grapher/blob/master/docs/docker-compose-mysql.md).
 
-!!! warning "The `grapher` step to import the dataset to Grapher is now automatic"
-    We have automatic deploys to grapher database from ETL. This means that whenever we push to master, `etl --grapher` is automatically run and pushes your data to MySQL. This means:
+    !!! warning "The `grapher` step to import the dataset to Grapher is now automatic"
+        We have automatic deploys to grapher database from ETL. This means that whenever we push to master, `etl --grapher` is automatically run and pushes your data to MySQL. This means:
 
-    - **You don't have to manually push to grapher**. Just merge and wait for CI status on master to turn green.
-    - You can still manually push new datasets (a new dataset doesn't have recipe in master yet). This is useful if you want to explore it in grapher, get feedback, iterate on a PR, etc. However, if you manually deploy an existing dataset, it'll be overwritten by the version in master
+        - **You don't have to manually push to grapher**. Just merge and wait for CI status on master to turn green.
+        - You can still manually push new datasets (a new dataset doesn't have recipe in master yet). This is useful if you want to explore it in grapher, get feedback, iterate on a PR, etc. However, if you manually deploy an existing dataset, it'll be overwritten by the version in master
 
-    Automatic deploys will run on both production and staging. This process is not final, we are still iterating.
+        Automatic deploys will run on both production and staging. This process is not final, we are still iterating.
 
-##### Create a pull request to merge the new branch with the master branch in `etl`.
-At this point, some further editing of the step files may be required before merging the branch with master.
+3. **Create a pull request** to merge the new branch with the master branch in `etl`. At this point, some further editing of the step files may be required before merging the branch with master.

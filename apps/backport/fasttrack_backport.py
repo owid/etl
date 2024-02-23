@@ -18,7 +18,7 @@ from etl.metadata_export import metadata_export
 log = structlog.get_logger()
 
 
-@click.command()
+@click.command(name="fasttrack")
 @click.option(
     "--dataset-id",
     type=int,
@@ -51,20 +51,18 @@ def cli(
 ) -> None:
     """Create Fast-track ready spreadsheet from an existing dataset.
 
-    ## Installation
+    **Installation:**
 
     1. Add Google Sheets API and Google Drive API to your project in the Google Cloud Platform Console.
     2. Download the credentials as a JSON file and save it in the same directory as this notebook.
     3. Point env variable `GOOGLE_APPLICATION_CREDENTIALS` to the credentials file.
     4. Share [Fast-track template](https://docs.google.com/spreadsheets/d/1j_mclAffQ2_jpbVEmI3VOiWRBeclBAIr-U7NpGAdV9A/edit#gid=1898134479) with the service account email address (e.g. 937270026338-compute@developer.gserviceaccount.com)
 
-    ## Example
+    **Example:**
 
     ```
     ENV=.env.live etl b fasttrack --dataset-id 5546 --short-name democracy_lexical_index --no-backport
     ```
-
-    # Reference
     """
     return migrate(dataset_id=dataset_id, short_name=short_name, backport=backport, recreate=recreate)
 

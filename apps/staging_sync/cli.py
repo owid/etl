@@ -25,7 +25,7 @@ from .admin_api import AdminAPI
 log = structlog.get_logger()
 
 
-@click.command(cls=RichCommand, help=__doc__)
+@click.command(name="chart-sync", cls=RichCommand, help=__doc__)
 @click.argument("source", type=Path)
 @click.argument("target", type=Path)
 @click.option(
@@ -68,9 +68,8 @@ def cli(
     staging_created_at: Optional[dt.datetime],
     dry_run: bool,
 ) -> None:
-    """Sync Grapher charts and revisions from an environment to the main environemnt.
+    """Sync Grapher charts and revisions from an environment to the main environment.
 
-    # Description
     It syncs the charts and revisions from `SOURCE` to `TARGET`. This is especially useful for syncing work from staging servers to production.
 
     `SOURCE` and `TARGET` can be either name of staging servers (e.g. "staging-site-mybranch") or paths to .env files. Use ".env.prod.write" as TARGET to sync to live.
@@ -79,8 +78,7 @@ def cli(
 
     - **Note 2:** Staging servers are destroyed after 1 day of merging to master, so this script should be run before that, but after the dataset has been built by ETL in production.
 
-    ## Other considerations
-    **Charts:**
+    **Considerations on charts:**
 
     - Only **_published charts_** from staging are synced.
     - New charts are synced as **_drafts_** in target (unless `--publish` flag is used).
@@ -88,15 +86,14 @@ def cli(
     - You get a warning if the chart **_has been modified on live_** after staging server was created.
     - Deleted charts are **_not synced_**.
 
-    **Chart revisions:**
+    **Considerations on chart revisions:**
 
     - Approved chart revisions on staging are automatically applied in target, assuming the chart has not been modified.
 
-    **Tags:**
+    **Considerations on tags:**
 
     - Tags are synced only for **_new charts_**, any edits to tags in existing charts are ignored.
 
-    ## Examples
     **Example 1:** Run staging-sync in dry-run mode to see what charts will be updated
 
     ```
@@ -120,8 +117,6 @@ def cli(
     ```
     etl chart-sync staging-site-my-branch .env.prod.write --approve-revisions
     ```
-
-    # Reference
     """
     source_engine = _get_engine_for_env(source)
     target_engine = _get_engine_for_env(target)

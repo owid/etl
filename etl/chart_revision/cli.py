@@ -16,7 +16,7 @@ VERSIONS = ["0", "1", "2"]
 VERSION_DEFAULT = max(VERSIONS)
 
 
-@click.command()
+@click.command(name="chart-upgrade")
 @click.argument(
     "mapping-file",
     type=str,
@@ -37,14 +37,13 @@ VERSION_DEFAULT = max(VERSIONS)
 def main_cli(mapping_file: str, revision_reason: str, use_version: int) -> None:
     """Generate chart revisions in Grapher using `MAPPING_FILE` JSON file.
 
-    # Description
     `MAPPING_FILE` is a JSON file mapping "old variables" to "new" ones. Typically old variables belong to a dataset that you want to deprecate and replace with a new one, which contains the "new variables".
 
     **Note 1:** Make sure that you are connected to the database. By default, it connects to Grapher based on the environment file found in the project's root directory "path/to/etl/.env".
 
     **Note 2:** You should use the default `--use-version` option value, unless you are aware of the changes in the backend.
 
-    ## Example
+    **Example:**
 
     ```json
     /* file: variable-mapping.json */
@@ -53,8 +52,6 @@ def main_cli(mapping_file: str, revision_reason: str, use_version: int) -> None:
         2033: 147396
     }
     ```
-
-    # Reference
     """
     try:
         if use_version == "0":
