@@ -124,8 +124,6 @@ steps:
     - snapshot://fasttrack/2023-08-07/animal_lives_per_kilogram.csv
   data://grapher/fasttrack/latest/baxter_2013_gbd_adult_coverage:
     - snapshot://fasttrack/latest/baxter_2013_gbd_adult_coverage.csv
-  data://grapher/fasttrack/latest/joe_test_please_delete:
-    - snapshot://fasttrack/latest/joe_test_please_delete.csv
   data://grapher/fasttrack/latest/public_support_climate_andre:
     - snapshot://fasttrack/latest/public_support_climate_andre.csv
   data://grapher/fasttrack/latest/public_support_climate_vlasceanu:
@@ -134,5 +132,3 @@ steps:
     - snapshot://fasttrack/2023-05-03/qubits.csv
   data://grapher/fasttrack/latest/completeness_disaster_emdat:
     - snapshot://fasttrack/latest/completeness_disaster_emdat.csv
-  data-private://grapher/fasttrack/latest/mojmir_test_please_delete:
-    - snapshot-private://fasttrack/latest/mojmir_test_please_delete.csv
