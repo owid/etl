@@ -19,7 +19,18 @@ st.set_page_config(
 )
 
 st.title("📋 ETL Dashboard")
-st.markdown("Control panel for ETL updates.")
+st.markdown(
+    """\
+## Control panel for ETL updates.
+This dashboard lets you explore all active ETL steps, and, if you are working on your local machine, update them.
+
+🔨 To update some steps, select them from the _Steps table_ and add them to the _Operations list_ below.
+
+💡 If you want to update, say, a specific grapher dataset, you can select just that step to the _Operations list_, then click on "Add dependencies", and bulk-update them all in one go.
+
+### Steps table
+"""
+)
 # add_indentation()
 
 
@@ -61,7 +72,7 @@ df = steps_df[
         # "n_versions",
         "update_period_days",
         "db_dataset_id",
-        "state",
+        # "state",
         "full_path_to_script",
         "dag_file_path",
         # "versions",
@@ -87,20 +98,21 @@ df = steps_df[
 ]
 
 # Streamlit UI to let users toggle the filter
-show_all_channels = st.checkbox("Show All Channels", False)
+show_all_channels = not st.checkbox("Select only grapher steps with charts, and explorer steps", True)
 
 if show_all_channels:
     # If the toggle is checked, show all data
     df = df
 else:
     # Otherwise, pre-filter the DataFrame to show only rows where "channel" equals "grapher"
-    df = df[df["channel"] == "grapher"]
+    df = df[(df["channel"].isin(["grapher", "explorers"])) & (df["n_charts"] > 0)]
 
 # Sort displayed data conveniently.
-df = df.sort_values(by=["kind", "version"], ascending=[False, False])
+df = df.sort_values(by=["n_charts", "kind", "version"], ascending=[False, False, True])
 
 # Define the width of some columns in the main grid table (to avoid them from taking too much space).
 COLUMN_WIDTHS = {
+    "step": 400,
     "kind": 100,
     "channel": 120,
     "namespace": 150,
@@ -191,37 +203,50 @@ def remove_selected_step(step):
     st.session_state["selected_steps"] = [s for s in st.session_state["selected_steps"] if s != step]
 
 
-# Create an operations list, that contains the steps (selected from the main steps table) we will operate upon.
-if st.session_state.get("selected_steps"):
-    for step in st.session_state["selected_steps"]:
-        # Define the layout of the list.
-        cols = st.columns([1, 3, 1, 1])
+st.markdown(
+    """\
+### Operations list
 
-        # Define the columns in order (from left to right) as a list of tuples (message, key suffix, function).
-        actions = [
-            ("🗑️", "remove", remove_selected_step),
-            ("write", None, lambda step: step),
-            ("Add dependencies", "deps", include_dependencies),
-            ("Add usages", "usages", include_usages),
-        ]
+Add here steps from the _Steps table_ and operate on them.
+"""
+)
+with st.container(border=True):
+    # Create an operations list, that contains the steps (selected from the main steps table) we will operate upon.
+    if st.session_state.get("selected_steps"):
+        for step in st.session_state["selected_steps"]:
+            # Define the layout of the list.
+            cols = st.columns([1, 3, 1, 1])
 
-        # TODO: Consider adding step buttons to:
-        #  * Execute ETL step for only the current step.
-        #  * Edit metadata for the current step.
-        # TODO: Consider adding bulk buttons to:
-        #  * Clear operations list.
-        #  * Sort them in ETL execution order.
-        #  * Select the steps currently in the operation list in the main table (to see their attributes).
-        #  * Execute ETL for all steps in the operation list.
+            # Define the columns in order (from left to right) as a list of tuples (message, key suffix, function).
+            actions = [
+                ("🗑️", "remove", remove_selected_step, "Remove this step from the _Operations list_."),
+                ("write", None, lambda step: step, ""),
+                (
+                    "Add dependencies",
+                    "deps",
+                    include_dependencies,
+                    "Add all dependencies of this step to the _Operations list_.",
+                ),
+                ("Add usages", "usages", include_usages, "Add all usages of this step to the _Operations list_."),
+            ]
 
-        # Display the operations list.
-        for (action, key_suffix, callback), col in zip(actions, cols):
-            if action == "write":
-                col.write(callback(step))
-            else:
-                col.button(action, key=f"{key_suffix}_{step}", on_click=callback, args=(step,))
-else:
-    st.write("No rows selected for operation.")
+            # TODO: Consider adding step buttons to:
+            #  * Execute ETL step for only the current step.
+            #  * Edit metadata for the current step.
+            # TODO: Consider adding bulk buttons to:
+            #  * Clear operations list.
+            #  * Sort them in ETL execution order.
+            #  * Select the steps currently in the operation list in the main table (to see their attributes).
+            #  * Execute ETL for all steps in the operation list.
+
+            # Display the operations list.
+            for (action, key_suffix, callback, help), col in zip(actions, cols):
+                if action == "write":
+                    col.write(callback(step))
+                else:
+                    col.button(action, key=f"{key_suffix}_{step}", on_click=callback, args=(step,), help=help)
+    else:
+        st.write("No rows selected for operation.")
 
 
 def execute_command(cmd):
@@ -235,21 +260,26 @@ def execute_command(cmd):
 
 # Button to execute the update command and show its output.
 dry_run = st.checkbox("Dry run", True)
-if st.button("Update steps"):
-    if WIZARD_IS_REMOTE:
-        st.error("The update command is not available in the remote version of the wizard.")
-        st.stop()
-    else:
-        # TODO: It would be better to directly use StepUpdater instead of a subprocess.
-        command = "etl update " + " ".join(st.session_state.get("selected_steps", [])) + " --non-interactive"
-        if dry_run:
-            command += " --dry-run"
-        cmd_output = execute_command(command)
-        # Show the output of the command in an expander.
-        with st.expander("Command Output:", expanded=True):
-            st.text_area("Output", value=cmd_output, height=300, key="cmd_output_area")
-        if "error" not in cmd_output.lower():
-            # Celebrate that the update was successful, why not.
-            st.balloons()
-        # Add a button to close the output expander.
-        st.button("Close", key="acknowledge_cmd_output")
+if st.button(
+    f"Update {len(st.session_state.get('selected_steps', []))} steps",
+    help="Update steps in the _Operations list_.",
+    type="primary",
+):
+    with st.spinner("Executing step updater..."):
+        if WIZARD_IS_REMOTE:
+            st.error("The update command is not available in the remote version of the wizard.")
+            st.stop()
+        else:
+            # TODO: It would be better to directly use StepUpdater instead of a subprocess.
+            command = "etl update " + " ".join(st.session_state.get("selected_steps", [])) + " --non-interactive"
+            if dry_run:
+                command += " --dry-run"
+            cmd_output = execute_command(command)
+            # Show the output of the command in an expander.
+            with st.expander("Command Output:", expanded=True):
+                st.text_area("Output", value=cmd_output, height=300, key="cmd_output_area")
+            if "error" not in cmd_output.lower():
+                # Celebrate that the update was successful, why not.
+                st.balloons()
+            # Add a button to close the output expander.
+            st.button("Close", key="acknowledge_cmd_output")

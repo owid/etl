@@ -310,7 +310,10 @@ class StepUpdater:
                 )
 
         if len(steps) == 0:
-            log.info("No steps can be updated (they may be in their latest version).")
+            log.info(
+                "No steps to be updated. "
+                "You may have attempted to update steps that are already in their latest version."
+            )
         else:
             # Steps need to be updated hierarchically: First snapshots, then meadow, then garden, then grapher.
             # Also, if a data step depends on other steps, the dependencies need to be updated first.
