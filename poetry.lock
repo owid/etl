@@ -1648,6 +1648,17 @@ six = "*"
 tqdm = "*"
 
 [[package]]
+name = "geographiclib"
+version = "2.0"
+description = "The geodesic routines from GeographicLib"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "geographiclib-2.0-py3-none-any.whl", hash = "sha256:6b7225248e45ff7edcee32becc4e0a1504c606ac5ee163a5656d482e0cd38734"},
+    {file = "geographiclib-2.0.tar.gz", hash = "sha256:f7f41c85dc3e1c2d3d935ec86660dc3b2c848c83e17f9a9e51ba9d5146a15859"},
+]
+
+[[package]]
 name = "geopandas"
 version = "0.14.1"
 description = "Geographic pandas extensions"
@@ -7498,4 +7509,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.10, <3.12"
-content-hash = "512bf8587f315a71fb8b4881f80600a3bd7e4dc62c03ec6e8c1f5be0151b05f4"
+content-hash = "711d562aa99c21e38c2120223b6400ecc27280413b89d20d76a3c52fc7ca7d62"
