@@ -1,0 +1,17 @@
+dataset:
+  title: DRAFT vdem_women_executives
+  description: ''
+  licenses:
+    - {}
+tables:
+  vdem_women_executives:
+    variables:
+      wom_hoe_ever_vdem:
+        title: wom_hoe_ever_vdem
+        unit: ''
+      wom_hoe_dem_ever_vdem:
+        title: wom_hoe_dem_ever_vdem
+        unit: ''
+      wom_hoe_onlyaut_ever_vdem:
+        title: wom_hoe_onlyaut_ever_vdem
+        unit: ''
