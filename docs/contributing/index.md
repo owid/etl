@@ -9,7 +9,7 @@ All our data work is public and open-source. Our ETL work is available on GitHub
 
 <div class="grid cards" markdown>
 
-- [:fontawesome-brands-github: owid/etl :octicons-link-external-16:](https://github.com/owid/etl)
+- [:fontawesome-brands-github: &nbsp; owid/etl :octicons-link-external-16:](https://github.com/owid/etl)
 </div>
 
 

@@ -30,7 +30,7 @@ There are different ways you can add data to the catalog, depending on your tech
 
     ---
 
-    Report on Slack: [#data-scientists](https://app.slack.com/client/T3DR40MTQ/C025BDNS5AA/)
+    Report on Slack: [#data-scientists  :octicons-link-external-16:](https://app.slack.com/client/T3DR40MTQ/C025BDNS5AA/)
 
 </div>
 

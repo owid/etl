@@ -1,3 +1,7 @@
+---
+status: new
+---
+
 ::: mkdocs-click
     :module: apps.cli.__init__
     :command: cli

@@ -3,7 +3,7 @@ tags:
     - 👷 Staff
 ---
 
-# Upgrading indicators
+# Indicator upgrade
 Consider as an example that the UN releases a new dataset on their Population estimates. In our catalog, we have an old version of it, and rely on its indicators for various charts on our site. As a consequence of this new release, we need to update our catalog with the new dataset, and then update all the charts that rely on the old indicators.
 
 This process is very common in our workflow, and we have tools to help us with it. This guide will walk you through the steps to update the indicators in our catalog, and then update the charts that rely on them.

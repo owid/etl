@@ -1,5 +1,4 @@
 ---
-status: new
 hide:
     - toc
 ---
@@ -31,7 +30,7 @@ Making this documentation public is part of our commitment to **transparency** a
 
     Learn the fundamentals.
 
--   __[:fontawesome-solid-book: &nbsp; Metadata reference](../architecture/metadata/reference/index.md)__
+-   __[:fontawesome-solid-book: &nbsp; Metadata reference](../architecture/metadata/reference.md)__
 
     ---
 

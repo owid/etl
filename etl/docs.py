@@ -122,40 +122,42 @@ def render_props_recursive(
     return text
 
 
-def render_origin() -> str:
+def render_origin(level: int = 1) -> str:
     """Render documentation for origin."""
     # Rendering of 'snapshot' is only meta.origin and meta.license
     ## Origin
     origin = SNAPSHOT_SCHEMA["properties"]["meta"]["properties"]["origin"]
-    documentation = render_props_recursive(origin, "origin", 1, "")
+    documentation = render_props_recursive(origin, "origin", level, "")
     return documentation
 
 
-def render_dataset() -> str:
+def render_dataset(level: int = 1) -> str:
     """Render documentation for origin."""
     # Rendering of 'snapshot' is only meta.origin and meta.license
     ## Origin
     dataset = DATASET_SCHEMA["properties"]["dataset"]
-    documentation = render_props_recursive(dataset, "dataset", 1, "")
+    documentation = render_props_recursive(dataset, "dataset", level, "")
     return documentation
 
 
-def render_table() -> str:
+def render_table(level: int = 1) -> str:
     """Render documentation for origin."""
     # Rendering of 'snapshot' is only meta.origin and meta.license
     ## Origin
     tables = DATASET_SCHEMA["properties"]["tables"]
-    documentation = render_props_recursive(tables, "table", 1, "", ignore_fields=["table.variables", "table.common"])
+    documentation = render_props_recursive(
+        tables, "table", level, "", ignore_fields=["table.variables", "table.common"]
+    )
     return documentation
 
 
-def render_indicator() -> str:
+def render_indicator(level: int = 1) -> str:
     """Render documentation for origin."""
     # Rendering of 'snapshot' is only meta.origin and meta.license
     ## Origin
     variables = DATASET_SCHEMA["properties"]["tables"]["additionalProperties"]["properties"]["variables"]
     documentation = render_props_recursive(
-        variables, "variable", 1, "", ignore_fields=["variable.presentation.grapher_config"]
+        variables, "variable", level, "", ignore_fields=["variable.presentation.grapher_config"]
     )
     return documentation
 

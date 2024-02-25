@@ -1,3 +1,7 @@
+---
+tags:
+    - 👷 Staff
+---
 # Data Pages Workflow
 
 ## Live Reloading of a Data Page

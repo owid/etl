@@ -108,6 +108,7 @@ markdown_extensions:
   - footnotes
   # The Markdown in HTML extension allows for writing Markdown inside of HTML, which is useful for wrapping Markdown content with custom elements. ref: https://squidfunk.github.io/mkdocs-material/setup/extensions/python-markdown/#markdown-in-html
   - md_in_html
+  - mkdocs-click
   - pymdownx.critic
   - pymdownx.emoji:
       emoji_index: !!python/name:materialx.emoji.twemoji
@@ -124,7 +125,10 @@ markdown_extensions:
           format: !!python/name:pymdownx.superfences.fence_code_format
   - pymdownx.tabbed:
       alternate_style: true
-  - mkdocs-click
+  - toc:
+        permalink: true
+        title: On this page
+        permalink_title: Anchor link to this section for reference
 
 # Plugins
 plugins:
@@ -137,7 +141,7 @@ plugins:
         - ignore/
   - gen-files:
       scripts:
-        - docs/ignore/gen_metadata_reference.py  # or any other name or path
+        - docs/ignore/generate_dynamic_docs.py  # or any other name or path
   - blog
   # ref: https://github.com/timvink/mkdocs-git-authors-plugin
   - git-authors:
@@ -192,25 +196,24 @@ nav:
     - Contributing: "contributing/index.md"
   - Guides:
     - "guides/index.md"
-    - Upgrading indicators: "guides/indicator-upgrade.md"
+    - Adding data: "guides/adding-data.md"
+    - Indicator upgrade: "guides/indicator-upgrade.md"
     - Wizard: "guides/wizard.md"
+    - CLI: "guides/etl-cli.md"
+    - Staging servers: "guides/staging-servers.md"
+    - Backport a dataset to ETL: "guides/backport.md"
+    - OpenAI setup: "guides/openai.md"
+
     - Updating owid-catalog: "dev/update-catalog.md"
     - Using ChartGPT: "guides/chartgpt.md"
     - Maintenance of our documentation: "dev/docs.md"
-    - etl CLI: "guides/etl-cli.md"
-    - Adding data:
-      - Adding data: "guides/adding-data/index.md"
-      - Wizard: "guides/adding-data/wizard.md"
-      - Manually add: "guides/adding-data/manual.md"
-      - Fast-track: "guides/adding-data/fast-track.md"
+    - Harmonize country names: "guides/harmonize-countries.md"
+    - Metadata in data pages: "guides/metadata-play.md"
+    - Import a private dataset to ETL: "guides/private-import.md"
     # - Updating charts:
     #   - Submitting chart revisions: "guides/charts/updating-charts.md"
     #   - Reviewing chart revisions: "guides/charts/reviewing-charts.md"
     #   - Using chatGPT: "guides/charts/chatgpt.md"
-    - Harmonize country names: "guides/harmonize-countries.md"
-    - Metadata in data pages: "guides/metadata-play.md"
-    - Backport a dataset to ETL: "guides/backport.md"
-    - Import a private dataset to ETL: "guides/private-import.md"
   - Design principles:
       - Design principles & workflow: architecture/index.md
       - Our journey:
@@ -225,40 +228,27 @@ nav:
         - The URI: "architecture/design/uri.md"
       - ETL steps:
         - ETL steps: "architecture/workflow/index.md"
-        - Snapshot step: "architecture/workflow/snapshot.md"
-        - Meadow step: "architecture/workflow/meadow.md"
-        - Garden step: "architecture/workflow/garden.md"
-        - Grapher step: "architecture/workflow/grapher.md"
-        - Special steps:
-          # - Special steps: "architecture/workflow/other-steps/index.md"
-          - Explorers: "architecture/workflow/other-steps/explorers.md"
-          - Backport: "architecture/workflow/other-steps/backport.md"
-          - Open Numbers: "architecture/workflow/other-steps/open-numbers.md"
-          - ETag: "architecture/workflow/other-steps/etag.md"
-          - GitHub: "architecture/workflow/other-steps/github.md"
-          - Private steps: "architecture/workflow/other-steps/private.md"
-        - Staging servers: "architecture/workflow/staging-servers.md"
+        - Other steps: "architecture/workflow/other-steps.md"
   - Metadata:
     - Metadata: "architecture/metadata/index.md"
     # - Workflow with metadata: "architecture/metadata/workflow.md"
     # - Reference:
-    - Reference:
-      - "architecture/metadata/reference/index.md"
-      - Indicator: "architecture/metadata/reference/indicator.md"
-      - Origin: "architecture/metadata/reference/origin.md"
-      - Table: "architecture/metadata/reference/tables.md"
-      - Dataset: "architecture/metadata/reference/dataset.md"
+    - Reference: "architecture/metadata/reference/index.md"
+      # - Indicator: "architecture/metadata/reference/indicator.md"
+      # - Origin: "architecture/metadata/reference/origin.md"
+      # - Table: "architecture/metadata/reference/tables.md"
+      # - Dataset: "architecture/metadata/reference/dataset.md"
     - Working with Metadata:
       - Structuring YAML file: "architecture/metadata/structuring-yaml.md"
       - Data Pages Workflow: "architecture/metadata/data_pages_workflow.md"
       - ETL MetaGPT Tool: "architecture/metadata/metadata_chatgpt_update.md"
       - Propagation of metadata: "architecture/metadata/propagation.md"
-      - Using metadata: "architecture/metadata/using.md"
       - Processing log: "architecture/metadata/processing_log.md"
       - FAQs: "architecture/metadata/faqs.md"
   - API and catalog:
     - API: "api/index.md"
-    - Python: "api/python.ipynb"
+    - Notebook: "api/python.ipynb"
+    - Maintenance: "api/maintenance.md"
     # - Dataset catalog:
     #   - Dataset catalog: "data/index.md"
     #   - Faostat: "data/faostat.md"
