@@ -3306,6 +3306,17 @@ mkdocs = ">=1.0"
 pytz = "*"
 
 [[package]]
+name = "mkdocs-glightbox"
+version = "0.3.7"
+description = "MkDocs plugin supports image lightbox with GLightbox."
+optional = false
+python-versions = "*"
+files = [
+    {file = "mkdocs-glightbox-0.3.7.tar.gz", hash = "sha256:4e890140a97dd4ad128cb92174384bd0ac33adec3304bbd2b7c48d0847685c4f"},
+    {file = "mkdocs_glightbox-0.3.7-py3-none-any.whl", hash = "sha256:9659631a9829d93d8fb0ce3a20a10261c258605ba4dc87a3b7b5d847b93a276d"},
+]
+
+[[package]]
 name = "mkdocs-jupyter"
 version = "0.24.2"
 description = "Use Jupyter in mkdocs websites"
@@ -7509,4 +7520,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.10, <3.12"
-content-hash = "711d562aa99c21e38c2120223b6400ecc27280413b89d20d76a3c52fc7ca7d62"
+content-hash = "1a3723852458d630c18518411bb9f7b205d67426adc67f679ac6723a5a4f5347"

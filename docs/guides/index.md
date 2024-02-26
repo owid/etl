@@ -33,6 +33,12 @@ In this section you will find guides for different use cases and tasks you might
     We also have a CLI, so that you can do some tasks from your terminal.
 
 
+-   __[:octicons-globe-16: &nbsp; Using different environments](environment)__
+
+    ---
+
+    All our tooling can be executed in different environments. Learn how to use them.
+
 -   __[:material-server: &nbsp; Staging servers](adding-data)__
 
     ---
@@ -44,6 +50,24 @@ In this section you will find guides for different use cases and tasks you might
     ---
 
     We use backporting to add legacy datasets to our catalog.
+
+-   __[:octicons-lock-16: &nbsp; Import private datasets](private-import)__
+
+    ---
+
+    Import private datasets.
+
+-   __[:material-music-clef-bass: &nbsp; Harmonize country names](harmonize-countries)__
+
+    ---
+
+    Standardize country names to use OWID's defaults.
+
+-   __[:material-note-edit: &nbsp; Edit the docs](harmonize-countries)__
+
+    ---
+
+    Improve, update our documentation.
 
 -   __[:simple-openai: &nbsp; OpenAI setup ](openai)__
 

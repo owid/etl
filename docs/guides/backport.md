@@ -18,7 +18,7 @@ Fast-Track is recommended for users who prefer working on Google sheets rather t
 Automatically generate ETL steps for a specific dataset with the following command. Choose the appropriate namespace, version and short name for the migrated dataset.
 
 ```
-ENV=.env.prod etl b migrate --dataset-id your_dataset_id --namespace your_namespace --version your_version --short-name your_short_name
+ENV_FILE=.env.prod etl b migrate --dataset-id your_dataset_id --namespace your_namespace --version your_version --short-name your_short_name
 ```
 
 After running this, follow the terminal prompts.
@@ -29,7 +29,7 @@ After running this, follow the terminal prompts.
 To move a dataset to Fast-Track, generate a Google spreadsheet using:
 
 ```
-ENV=.env.prod etl b fasttrack --dataset-id xxx --short-name your_short_name
+ENV_FILE=.env.prod etl b fasttrack --dataset-id xxx --short-name your_short_name
 ```
 
 Once generated, open the Fast-Track spreadsheet and follow the provided instructions.

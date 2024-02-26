@@ -9,7 +9,24 @@ Learn more about our architecture in the following sections: -->
 
 <div class="grid cards" markdown>
 
-- [:material-road-variant: Our journey](our-journey)
-- [:fontawesome-solid-paintbrush: The design principles of the ETL](design/compute-graph/index.md)
-- [:fontawesome-solid-gear: Our workflow in ETL](workflow/index.md)
+- __[:material-road-variant: &nbsp; Our journey](our-journey)__
+
+    ---
+
+    A bit of history. Learn how we got here.
+
+- __[:fontawesome-solid-paintbrush: &nbsp; The design principles of the ETL](design/compute-graph/index.md)__
+
+    ---
+
+    Learn the design principles of our data architecture.
+
+- __[:fontawesome-solid-gear: &nbsp; Our workflow in ETL](workflow/index.md)__
+
+    ---
+
+    Learn the different steps in ETL.
+
 </div>
+
+

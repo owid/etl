@@ -50,7 +50,7 @@ where
 
 | Prefix      | Description                          |
 | ----------- | ------------------------------------ |
-| `channel`       | Denotes the curation level of the dataset. Possible values include [`meadow`](../workflow/#meadow), [`garden`](../workflow/#garden), [`grapher`](../workflow/#grapher), [`explorers`](../workflow/other-steps#explorers). |
+| `channel`       | Denotes the curation level of the dataset. Possible values include [`meadow`](../../workflow#meadow), [`garden`](../../workflow#garden), [`grapher`](../../workflow#grapher), [`explorers`](../../workflow/other-steps#explorers). |
 | `namespace`       | Used to group datasets from similar topics or sources. Namespace are typically source names (e.g. `un`) or topic names (e.g. `health`).|
 | `version`    | Version of the file. Typically, we use the date the file was downloaded in the format `YYYY-mm-dd`. |
 | `dataset-name`    | Short name of the curated dataset (e.g. `un_wpp`). |
