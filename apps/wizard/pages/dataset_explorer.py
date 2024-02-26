@@ -13,7 +13,7 @@ from st_pages import add_indentation
 from streamlit_agraph import Config, ConfigBuilder, Edge, Node, agraph
 
 from apps.wizard.utils import metadata_export_basic, set_states
-from etl.config import ENV
+from apps.wizard.utils.env import ENV_IS_REMOTE
 from etl.paths import DATA_DIR
 from etl.steps import extract_step_attributes, filter_to_subgraph, load_dag
 
@@ -303,7 +303,7 @@ if st.session_state.get("show"):
                     st.button(label="Export", on_click=lambda: set_states({"export_metadata": True}))
                     if st.session_state.export_metadata:
                         ## Remote setting
-                        if ENV in ("production", "staging"):
+                        if ENV_IS_REMOTE:
                             try:
                                 with tempfile.TemporaryFile() as f:
                                     output_path = metadata_export_basic(dataset=dataset, output=str(f.name))
