@@ -5,8 +5,155 @@ definitions:
     presentation:
       topic_tags:
         - Financing Healthcare
+    description_from_producer: |-
+      <% if financing_scheme == "Government/compulsory schemes" %>
+      This category includes all schemes aimed at ensuring access to basic health care for the whole society, a large part of it, or at least some vulnerable groups. Included are: government schemes, social health insurance, compulsory private insurance and compulsory medical saving accounts.
+
+      A key rationale for government intervention in health systems is to ensure access to basic health care for the whole society (or vulnerable social groups). This purpose can be pursued through different coverage schemes, which implies differing levels of redistribution between social groups and individuals. Health accounts are also expected to provide information for assessing how well health systems achieve this key policy goal. Therefore, for international comparability, it is important to have a general, aggregate category that includes all financing schemes that serve this goal.
+
+      <% elif financing_scheme == "Government schemes" %>
+      The characteristics of government health care financing schemes are determined by law or by the government. A separate budget is set for the programme, and a government unit has an overall responsibility for it. Usually, but not necessarily, government schemes are operated by government unit(s). The government schemes may also be managed by NPISH or by an enterprise.
+
+      Government (health care financing) schemes have the following characteristics:
+      - Mode of participation: automatic for all citizens/residents, or for a specific group of the population (e.g. the poor) defined by law/government regulation;
+      - Benefit entitlement: non-contributory, typically universal or available for a specific population group or disease category defined by law (e.g. TB, HIV, oncology);
+      - Basic method for fund-raising: compulsory; domestic revenues of government(primarily taxes). Foreign revenues may also play an important role in some lower-income countries.
+      - Mechanism and extent of pooling funds: national, sub-national, or programme level.
+
+      A government scheme does not necessarily cover the total price of the services and goods included in its benefit basket, that is, the scheme may involve cost-sharing with the patients through co-payments, or other forms of cost-sharing). The full costs of certain services are shared between two financing schemes: the government scheme and the OOP (cost-sharing). (The same holds true for the compulsory insurance and voluntary insurance schemes.) Obviously, only the costs covered by the government scheme are accounted under HF.1.1. As the full cost of these services also constitutes important information, the following memorandum items are included in the classification: government schemes and compulsory contributory health insurance schemes together with cost-sharing (HF.1 + HF.3.2.1); and Voluntary health insurance schemes together with cost-sharing (HF.2.1 + HF.3.2.2).
+
+      <% elif financing_scheme == "Compulsory contributory health insurance schemes" %>
+      Compulsory health insurance involves a financing arrangement to ensure access to health care for specific population groups through mandatory participation and eligibility based on the payment of health insurance contributions by or on behalf of the individuals concerned.
+
+      <% elif financing_scheme == "Social health insurance schemes" %>
+      Social health insurance is a financing arrangement that ensures access to health care based on a payment of a non-risk-related contribution by or on behalf of the eligible person. The social health insurance scheme is established by a specific public law, defining, among others, the eligibility, benefit package and rules for the contribution payment.
+
+      Social health insurance schemes have the following characteristics:
+
+      - Mode of participation: mandatory, either for all citizens/residents or for a specific population group defined by law/government regulations (e.g. formal sector employees);
+      - Benefit entitlement: contributory, based on non-risk-related payments made by or on behalf of the insured person. Family members may or may not be covered on the basis of the contributor’s payment. The government may make contributions on behalf of certain defined categories of the population (e.g. pensioners).
+      - Basic method for fund-raising: compulsory non-risk-related health insurance contributions. Insurance contributions may be paid by the government (from the state budget) on behalf of some non-contributing groups of the population, and the government may also provide general subsidies to the scheme.
+      - Mechanism and extent of pooling funds:national, sub-national, or by scheme. With multiple funds, the extent of pooling will depend on risk-equalisation mechanisms across schemes. By using such mechanisms, it is possible to create pooling across schemes.
+
+      Traditionally, laws on social health insurance define the coverage of persons and the benefit basket to which the insured persons are entitled. Usually (but not necessarily) those who are entitled are also mandated. Entitlement for services originates from the law on social health insurance, which establishes the insurance automatically for all persons who meet the criteria. With some exceptions (e.g. non-residents), no individual contract between the insurance fund and the insured is involved on the basis of their contributions (including made on their behalf). Membership may be legally assigned, usually based on two criteria: 1) professional status or employer; and 2) place of residence. In some countries insurees may have the right to choose an insurance fund.
+
+      One main characteristic of social insurance schemes is that contributions are not related to risk. Contributions are raised mainly through wage-related (and occasionally income-related) contributions that are shared between employers and employees. There are differences between countries with respect to: the uniformity of the rate; the ratio of employer contributions to employee contributions; the existence of an upper contribution ceiling; the existence of additional non-wage-related revenues; the calculation of contributions for non-waged persons; and the role of general government revenues in funding.
+
+      This category includes all social insurance schemes that provide health care services, even if their main activity is not health-related (e.g. some pension schemes would fall into this category). Of course, only the health-related spending of these schemes is reported under HF.1.2.1.
+
+      <% elif financing_scheme == "Compulsory private insurance schemes" %>
+      Compulsory private insurance is a financing arrangement under which all residents (or a large group of the population) are obliged to take out health insurance with a health insurance company or health insurance fund, meaning that the purchase of private coverage is mandatory. The insurance is established by (i.e. entitlement for services is based on) an insurance contract/ agreement between the individual and the insurer.
+
+      Compulsory private insurance schemes have the following characteristics:
+      - Mode of participation: mandatory, either for all citizens/residents, or for a specific group of the population obligated by law/government regulation to purchase a health insurance policy (e.g. formal sector employees);
+      - Benefit entitlement: contributory, based upon the purchase of an insurance policy from a selected health insurance company (or other agency involved);
+      - Basic method for fund-raising: compulsory health insurance premiums, sometimes partially or fully subsidised by the government, including the possible use of tax credits;
+      - Mechanism and extent of pooling funds: national, sub-national, or by scheme; with multiple funds, the extent of pooling will depend on risk-equalisation mechanisms across schemes. This also depends on the extent of regulation of the premium and the standardisation of benefits across schemes.
+
+      <% elif financing_scheme == "Voluntary schemes/household out-of-pocket payments" %>
+      _For voluntary schemes_
+      {definitions.voluntary_scheme_payments}
+
+      _For household out-of-pocket payments_
+      {definitions.household_out_of_pocket_payments}
+
+      <% elif financing_scheme == "Voluntary health care payment schemes" %>
+      {definitions.voluntary_scheme_payments}
+
+      <% elif financing_scheme == "Voluntary health insurance schemes" %>
+      Voluntary health insurance schemes are based upon the purchase of a health insurance policy, which is not made compulsory by government. Insurance premiums may be directly or indirectly subsidised by the government.
+
+      Voluntary health insurance (VHI) schemes have the following characteristics:
+      - Mode of participation: voluntary, at the discretion of an individual or a firm;
+      - Benefit entitlement: contributory: based upon the purchase of the voluntary health insurance policy (usually on the basis of a contract);
+      - Basic method for fund-raising: usually non-income-related premiums (often directly or indirectly risk-related); may be directly or indirectly subsidised by the government (e.g. through tax credits);
+      - Mechanism and extent of pooling funds: individual scheme level.
+
+      Voluntary health insurance is taken up and paid for at the discretion of individuals or firms. Voluntary health insurance may also be purchased by the employer.
+
+      Premiums may be either risk-rated or community-rated, but in some countries (e.g. France) even income-related. Voluntary insurance is usually purchased from private insurance organisations (both for-profit and non-profit), although in some cases it may also be purchased from public or quasi-public bodies. In several countries enterprises may also have their own insurance arrangements.
+
+      There are several possible aspects that distinguish different types of voluntary health insurance. These aspects may overlap or may be combined when creating sub-categories of voluntary health insurance. For example, both group policies and individual policies can provide either primary or complementary coverage. The type of coverage, that is, whether the voluntary insurance provides primary coverage or complementary coverage for an individual, is the most important factor for defining the sub-categories.
+
+      <% elif financing_scheme == "NPISH financing schemes" %>
+      Non-profit institutions (NPISH) financing schemes means non-compulsory financing arrangements and programmes with non-contributory benefit entitlement that are based on donations from the general public, the government or corporations.
+
+      NPISH financing arrangements or financing programmes consist of a “quasi-set” of rules that define the mode of participation, entitlement and methods of fund-raising, and hence they can be treated as categories of financing schemes.
+
+      International institutions that have representation in the country are considered resident NPISHs and any schemes linked to these institutions are included under HF.2.2. Such institutions may include resident representations of bilateral agencies, international organisations or international NGOs (see HF.4 for further details).
+
+      NPISH financing schemes have the following characteristics:
+      - Mode of participation: voluntary;
+      - Benefit entitlement: non-contributory, discretionary;
+      - Basic method for fund-raising: donations from the general public, governments (budget of national government or foreign aid) or corporations;
+      - Mechanism and extent of pooling funds: varies across programmes but typically programme-level.
+
+      This category is proposed as a replacement for SHA 1.0 item “HF.2.4. Non-profit institutions serving households (other than social insurance)”. The category of non-profit institutions has proved rather ambiguous during SHA implementation. The definition in SHA 1.0 was taken from SNA 1993: “Non-profit institutions serving households (NPISH) consist of non-profit institutions which provide goods or services to households free or at prices that are not economically significant.” This definition does not allow for a clear distinction between non-profit institutions as third-party payers of health care and non- profit institutions as providers of care. For example, hospitals may have a non-profit legal status and provide services to households free of charge under a social insurance scheme, in which case, of course, the social insurance is the financing scheme and the hospital (HP.1) is the provider. The unambiguous way in which the ICHA-HF interprets financing schemes provides a starting point.
+
+      A qualitative analysis of an NGO’s activity is always required in order to decide whether the given activity can be regarded as the operation of a financing scheme. A few examples are given for the different NPISH functions.
+
+      - An NPISH organisation may provide – besides their non-health activity – resources for other NPISH that carry out the financing of special health programmes. The NPISH in question does not have a direct relationship with providers of care. In this case NPISH is a provider of resources and the programme of the NPISH is the financing scheme.
+      - A non-profit institution may create a special fund, usually through donations to finance special types of health services, for example, to operate special facilities for the homeless, or to provide care for households affected by natural disasters or war. Donations may be provided in cash or in kind from the general public, corporations or governments. During implementation, the NPISH may pay for its own staff and also for health care providers and other entities. (For example a charity organisation may pay for a special operation for a child abroad that is not available in the home country.) In these cases the NPISH programme is a financing scheme.
+      - The “non-profit” institution may be the legal form through which providers receive payment, for example, from a social health insurance scheme as compensation for the services they provide. In this case the NPISH is a provider and the social health insurance is the financing scheme.
+
+      <% elif financing_scheme == "Enterprise financing schemes" %>
+      This category includes primarily arrangements where enterprises directly provide or finance health services for their employees (such as occupational health services), without the involvement of an insurance-type scheme. Therefore, this excludes employer-based insurance schemes.
+
+      Enterprise financing schemes have the following characteristics:
+      - Mode of participation: voluntary choice of particular enterprise/corporation, with coverage based on employment at the firm (e.g. compulsory occupational health care);
+      - Benefit entitlement: non-contributory, discretionary with regard to the type of services, though may sometimes be specified by law;
+      - Basic method for fund-raising: voluntary choice of the firm to use its revenues for this purpose;
+      - Mechanism and extent of pooling funds: at an individual enterprise level.
+
+      Compared to SHA 1.0, the change is in the label (and hence the definition) so that it better reflects the content of the data. The label in the SHA 1.0 Manual is: “Corporations (other than health insurance)”. This label is not accurate, as corporations may provide revenues to other financing schemes, for example, they may pay insurance contributions or voluntary insurance premiums. The revised category better reflects the actual role of the enterprises accounted under this category (as financing schemes).
+
+      A distinction between two sub-categories is proposed: enterprise financing schemes (except health care providers); and Health care providers..
+
+      Under the special category of Health care providers financing schemes (HF.2.3.2) health care providers finance part of the services they provide to their patients from their own sources (that are additional sources to the payment they receive from the financing schemes). These are “imputed” expenditures included in health accounts in order to obtain an adequate estimation of the value of the services consumed by individuals. In fact, payments are made for the factors of health care provision by the providers or suppliers of these factors (e.g. pharmaceuticals), as the payment by the purchasers does not cover the full costs of providing the services concerned. For an adequate estimate of the value of the services concerned, these specific items are estimated and accounted as expenditure by Health care providers financing schemes (HF.2.3.2), and the revenues are accounted as FS. 6.2. Other revenues from corporations n.e.c. These specific sources may be as follows:
+      - Health care providers may have special revenues from economic activities other than the provision of health services (for example, lending premises, providing laundry or catering services for other institutions, or private hospitals may have revenues from interest, etc.) and they may use these revenues to cover the costs of health services they provide.
+      - A private hospital may incur a loss in one year. To balance revenues and expenditure, the hospital may take out a loan from a commercial bank to be repaid in subsequent periods.
+      - In some countries, a public hospital may accumulate arrears (unpaid bills) towards suppliers of pharmaceuticals (or other material resources). The increase in these arrears in the given accounting period can, in fact, be interpreted as additional financing raised by the provider.
+
+      <% elif financing_scheme == "Household out-of-pocket payments" %>
+      {definitions.household_out_of_pocket_payments}
+
+      <% elif financing_scheme == "Out-of-pocket excluding cost-sharing" %>
+      {definitions.household_out_of_pocket_payments}
+
+      {definitions.cost_sharing}
+
+      <% elif financing_scheme == "Cost-sharing with third-party payers" %>
+      {definitions.cost_sharing}
+
+      <% elif financing_scheme == "Rest of the world financing schemes (non-resident)" %>
+      This item comprises financial arrangements involving institutional units (or managed by institutional units) that are resident abroad, but who collect, pool resources and purchase health care goods and services on behalf of residents, without transiting their funds through a resident scheme. For example, a person resident in country A can buy a voluntary insurance in country B and can use that insurance to pay for services in either Country A or B. US citizens of Mexican origin, for instance, may buy health insurance in Mexico that gives them emergency cover in the United States but pays for elective treatment in Mexico.
+
+      A resident scheme has the predominant economic interest in the country for which the accounts are drawn up. It has a physical presence in the country and is under the jurisdiction of the local government (e.g. compulsory reporting activities). Non-resident (RoW) schemes may also operate in the country for which the health accounts are produced, but these schemes originate with and are controlled by agencies subject to foreign government jurisdiction, including, for example, aid agencies and military agencies.
+
+      Rest of the world financing arrangements are defined according to the following characteristics:
+      - Mode of participation: 1) mandatory, e.g. based on the conditions of employment (such as foreign insurance), or 2) voluntary;
+      - Basis for entitlement: 1) a contract between an insurance carrier and the individual, or 2) discretion of a private entity (charity foundation, employer, foreign entity);
+      - Method for fundraising: funds are collected and pooled abroad;
+      - Coverage: foreign entities usually have the freedom to design the benefits.
+
+      Note that the rest of the world usually contributes to the financing of health care in the example of a typical model economy, as international aid and other flows, by channelling the funds via government or resident NPISH agencies. This is a typical case of RoW revenue for resident financing schemes, and could thus be classified as HF.1 or HF.2 spending and RoW revenue.
+
+      International agreements strive to ensure that external funding agencies work with resident health care agencies to ensure that external resources (financing revenues) are directed towards national priorities in a co-ordinated way. There is a need for reporting to national authorities and co-ordinating with national efforts to achieve that goal and foster complementary health actions. Agencies managing external funds for aid would then be acting as residents (resident units and schemes). If SHA adjusts for international aid agreements, the external resources would be recorded as external sources (revenues) and would in most cases be executed by resident schemes, grouped as NGOs and corporations.
+
+      It is not always clear whether a foreign assistance programme should be accounted as i) a financing RoW source (FS), or ii) both as a financing RoW source and a financing RoW scheme.
+
+      In the case of enclaves, these are non-resident units that are physically located in the host territory but have immunity from the host country laws (e.g. international organisations and embassies). When health care for the personnel of enclaves does not require any allowance or jurisdiction of the resident country, then the foreign health scheme should be classified as a RoW financing scheme (HF.4). However, an entity created by a government under the laws of another jurisdiction is a resident unit in the host jurisdiction, and not part of the general government sector in either economy (SNA 2008, 26.43). Thus, a foreign aid programme set up by an external aid organisation to handle resources in a foreign country is to be considered as a resident NGO or corporation in that country.
+
+      Foreign assistance may be given for a specific purpose (e.g. an AIDS programme), and a separate organisation, also part of the foreign entity, may be established to manage the fund, which is not necessarily involved in the provision of the service.
+
+      When the scheme is part of a global or multinational entity but is operated in the country as a “branch”, it is considered resident, e.g. an insurance agency having a local setting is resident. The key feature is that it shares permanent economic interests with local entities, as well as a physical presence; individual accounting and linkages to the rules of local governments, such as reporting, are also features of resident schemes.
+
+      However, when the scheme cannot be differentiated as a specific “branch” but is kept as a unique scheme because it is run as an indivisible operation with no separate accounts, then it is treated as a RoW scheme. The value of multinational schemes reported as RoW schemes cannot be taken as the entirety of multinational schemes, but would be based prorata on the volume of activity in the country.
+
+      <%- endif -%>
+
   household_out_of_pocket_payments: |-
-    Households’ out-of-pocket expenditure by definition is regarded as a financing scheme. Its distinguishing characteristic is that it is a direct payment for health care goods and services from the household primary income20 or savings (no third-party payer is involved): the payment is made by the user at the time of the purchase of goods or use of services. Included are cost-sharing and informal payments (both in cash and kind).
+    Households’ out-of-pocket expenditure by definition is regarded as a financing scheme. Its distinguishing characteristic is that it is a direct payment for health care goods and services from the household primary income or savings (no third-party payer is involved): the payment is made by the user at the time of the purchase of goods or use of services. Included are cost-sharing and informal payments (both in cash and kind).
 
     Out-of-pocket payments (OOP) show the direct burden of medical costs that households bear at the time of service use. (This is the reason for categorising OOP as a first-digit level category of ICHA-HF.) OOP play an important role in every health care system. In lower-income countries, out-of-pocket expenditure is often the main form of health care financing.
 
@@ -34,151 +181,51 @@ definitions:
 
     Voluntary insurance may reimburse cost-sharing by the patient. This case should be treated similarly to the case when voluntary insurance reimburses the bill of a service not covered by compulsory insurance. The payment is considered expenditure by the voluntary insurance. Consequently, the part of cost-sharing reimbursed by voluntary insurance should be accounted as expenditure by voluntary insurance, and should not be considered as OOP payment by the households. This treatment ensures that a proper picture of financial protection is provided. It should, however, be noted that the characteristics of the coverage by the government scheme or insurance determine the household cost-sharing, which is a component of household out-of-pocket payment (OOP). The full cost of the services or goods concerned accounts for its two payer components: the third-party payer and the OOP. As the full costs of the services or goods concerned are also important information, the following memorandum items are included in the classification: government schemes and compulsory contributory health insurance schemes, together with cost-sharing (HF.1+HF.3.2.1); and Voluntary health insurance schemes, together with cost-sharing (HF.2+HF.3.2.2).
 
-
-  description_from_producer: |-
+  description_short: |-
     <% if financing_scheme == "Government/compulsory schemes" %>
-    This category includes all schemes aimed at ensuring access to basic health care for the whole society, a large part of it, or at least some vulnerable groups. Included are: government schemes, social health insurance, compulsory private insurance and compulsory medical saving accounts.
-
-    A key rationale for government intervention in health systems is to ensure access to basic health care for the whole society (or vulnerable social groups). This purpose can be pursued through different coverage schemes, which implies differing levels of redistribution between social groups and individuals. Health accounts are also expected to provide information for assessing how well health systems achieve this key policy goal. Therefore, for international comparability, it is important to have a general, aggregate category that includes all financing schemes that serve this goal.
+    Includes government schemes, social health insurance, compulsory private insurance and compulsory medical saving accounts.
 
     <% elif financing_scheme == "Government schemes" %>
-    The characteristics of government health care financing schemes are determined by law or by the government. A separate budget is set for the programme, and a government unit has an overall responsibility for it. Usually, but not necessarily, government schemes are operated by government unit(s). The government schemes may also be managed by NPISH or by an enterprise.
-
-    Government (health care financing) schemes have the following characteristics:
-    - Mode of participation: automatic for all citizens/residents, or for a specific group of the population (e.g. the poor) defined by law/government regulation;
-    - Benefit entitlement: non-contributory, typically universal or available for a specific population group or disease category defined by law (e.g. TB, HIV, oncology);
-    - Basic method for fund-raising: compulsory; domestic revenues of government(primarily taxes). Foreign revenues may also play an important role in some lower-income countries.
-    - Mechanism and extent of pooling funds: national, sub-national, or programme level.
-
-    A government scheme does not necessarily cover the total price of the services and goods included in its benefit basket, that is, the scheme may involve cost-sharing with the patients through co-payments, or other forms of cost-sharing). The full costs of certain services are shared between two financing schemes: the government scheme and the OOP (cost-sharing). (The same holds true for the compulsory insurance and voluntary insurance schemes.) Obviously, only the costs covered by the government scheme are accounted under HF.1.1. As the full cost of these services also constitutes important information, the following memorandum items are included in the classification: government schemes and compulsory contributory health insurance schemes together with cost-sharing (HF.1 + HF.3.2.1); and Voluntary health insurance schemes together with cost-sharing (HF.2.1 + HF.3.2.2).
+    Includes schemes defined by law or by the government, with a separate budget set for the programme, and where a government unit has an overall responsibility for it.
 
     <% elif financing_scheme == "Compulsory contributory health insurance schemes" %>
-    Compulsory health insurance involves a financing arrangement to ensure access to health care for specific population groups through mandatory participation and eligibility based on the payment of health insurance contributions by or on behalf of the individuals concerned.
+    Includes financing arrangements to ensure access to health care for specific population groups through mandatory participation and eligibility based on the payment of health insurance contributions by or on behalf of the individuals concerned.
 
     <% elif financing_scheme == "Social health insurance schemes" %>
-    Social health insurance is a financing arrangement that ensures access to health care based on a payment of a non-risk-related contribution by or on behalf of the eligible person. The social health insurance scheme is established by a specific public law, defining, among others, the eligibility, benefit package and rules for the contribution payment.
-
-    Social health insurance schemes have the following characteristics:
-
-    - Mode of participation: mandatory, either for all citizens/residents or for a specific population group defined by law/government regulations (e.g. formal sector employees);
-    - Benefit entitlement: contributory, based on non-risk-related payments made by or on behalf of the insured person. Family members may or may not be covered on the basis of the contributor’s payment. The government may make contributions on behalf of certain defined categories of the population (e.g. pensioners).
-    - Basic method for fund-raising: compulsory non-risk-related health insurance contributions. Insurance contributions may be paid by the government (from the state budget) on behalf of some non-contributing groups of the population, and the government may also provide general subsidies to the scheme.
-    - Mechanism and extent of pooling funds:national, sub-national, or by scheme. With multiple funds, the extent of pooling will depend on risk-equalisation mechanisms across schemes. By using such mechanisms, it is possible to create pooling across schemes.
-
-    Traditionally, laws on social health insurance define the coverage of persons and the benefit basket to which the insured persons are entitled. Usually (but not necessarily) those who are entitled are also mandated. Entitlement for services originates from the law on social health insurance, which establishes the insurance automatically for all persons who meet the criteria. With some exceptions (e.g. non-residents), no individual contract between the insurance fund and the insured is involved on the basis of their contributions (including made on their behalf). Membership may be legally assigned, usually based on two criteria: 1) professional status or employer; and 2) place of residence. In some countries insurees may have the right to choose an insurance fund.
-
-    One main characteristic of social insurance schemes is that contributions are not related to risk. Contributions are raised mainly through wage-related (and occasionally income-related) contributions that are shared between employers and employees. There are differences between countries with respect to: the uniformity of the rate; the ratio of employer contributions to employee contributions; the existence of an upper contribution ceiling; the existence of additional non-wage-related revenues; the calculation of contributions for non-waged persons; and the role of general government revenues in funding.
-
-    This category includes all social insurance schemes that provide health care services, even if their main activity is not health-related (e.g. some pension schemes would fall into this category). Of course, only the health-related spending of these schemes is reported under HF.1.2.1.
+    Includes financing arrangements that ensure access to health care based on a payment of a non-risk-related contribution by or on behalf of the eligible person.
 
     <% elif financing_scheme == "Compulsory private insurance schemes" %>
-    Compulsory private insurance is a financing arrangement under which all residents (or a large group of the population) are obliged to take out health insurance with a health insurance company or health insurance fund, meaning that the purchase of private coverage is mandatory. The insurance is established by (i.e. entitlement for services is based on) an insurance contract/ agreement between the individual and the insurer.
-
-    Compulsory private insurance schemes have the following characteristics:
-    - Mode of participation: mandatory, either for all citizens/residents, or for a specific group of the population obligated by law/government regulation to purchase a health insurance policy (e.g. formal sector employees);
-    - Benefit entitlement: contributory, based upon the purchase of an insurance policy from a selected health insurance company (or other agency involved);
-    - Basic method for fund-raising: compulsory health insurance premiums, sometimes partially or fully subsidised by the government, including the possible use of tax credits;
-    - Mechanism and extent of pooling funds: national, sub-national, or by scheme; with multiple funds, the extent of pooling will depend on risk-equalisation mechanisms across schemes. This also depends on the extent of regulation of the premium and the standardisation of benefits across schemes.
+    Includes financing arrangements under which all residents (or a large group of the population) are obliged to take out health insurance with a health insurance company or health insurance fund.
 
     <% elif financing_scheme == "Voluntary schemes/household out-of-pocket payments" %>
-    _For voluntary schemes_
-    {definitions.voluntary_scheme_payments}
-
-    _For household out-of-pocket payments_
-    {definitions.household_out_of_pocket_payments}
+    Includes domestic pre-paid financing schemes under which the access to health services is at the discretion of private actors, or where direct payment is made at the time of the purchase of goods or use of services.
 
     <% elif financing_scheme == "Voluntary health care payment schemes" %>
-    {definitions.voluntary_scheme_payments}
+    Includes domestic pre-paid financing schemes under which the access to health services is at the discretion of private actors.
 
     <% elif financing_scheme == "Voluntary health insurance schemes" %>
-    Voluntary health insurance schemes are based upon the purchase of a health insurance policy, which is not made compulsory by government. Insurance premiums may be directly or indirectly subsidised by the government.
-
-    Voluntary health insurance (VHI) schemes have the following characteristics:
-    - Mode of participation: voluntary, at the discretion of an individual or a firm;
-    - Benefit entitlement: contributory: based upon the purchase of the voluntary health insurance policy (usually on the basis of a contract);
-    - Basic method for fund-raising: usually non-income-related premiums (often directly or indirectly risk-related); may be directly or indirectly subsidised by the government (e.g. through tax credits);
-    - Mechanism and extent of pooling funds: individual scheme level.
-
-    Voluntary health insurance is taken up and paid for at the discretion of individuals or firms. Voluntary health insurance may also be purchased by the employer.
-
-    Premiums may be either risk-rated or community-rated, but in some countries (e.g. France) even income-related. Voluntary insurance is usually purchased from private insurance organisations (both for-profit and non-profit), although in some cases it may also be purchased from public or quasi-public bodies. In several countries enterprises may also have their own insurance arrangements.
-
-    There are several possible aspects that distinguish different types of voluntary health insurance. These aspects may overlap or may be combined when creating sub-categories of voluntary health insurance. For example, both group policies and individual policies can provide either primary or complementary coverage. The type of coverage, that is, whether the voluntary insurance provides primary coverage or complementary coverage for an individual, is the most important factor for defining the sub-categories.
+    Includes financing arrangements based upon the purchase of a health insurance policy, which is not made compulsory by government.
 
     <% elif financing_scheme == "NPISH financing schemes" %>
-    Non-profit institutions (NPISH) financing schemes means non-compulsory financing arrangements and programmes with non-contributory benefit entitlement that are based on donations from the general public, the government or corporations.
-
-    NPISH financing arrangements or financing programmes consist of a “quasi-set” of rules that define the mode of participation, entitlement and methods of fund-raising, and hence they can be treated as categories of financing schemes.
-
-    International institutions that have representation in the country are considered resident NPISHs and any schemes linked to these institutions are included under HF.2.2. Such institutions may include resident representations of bilateral agencies, international organisations or international NGOs (see HF.4 for further details).
-
-    NPISH financing schemes have the following characteristics:
-    - Mode of participation: voluntary;
-    - Benefit entitlement: non-contributory, discretionary;
-    - Basic method for fund-raising: donations from the general public, governments (budget of national government or foreign aid) or corporations;
-    - Mechanism and extent of pooling funds: varies across programmes but typically programme-level.
-
-    This category is proposed as a replacement for SHA 1.0 item “HF.2.4. Non-profit institutions serving households (other than social insurance)”. The category of non-profit institutions has proved rather ambiguous during SHA implementation. The definition in SHA 1.0 was taken from SNA 1993: “Non-profit institutions serving households (NPISH) consist of non-profit institutions which provide goods or services to households free or at prices that are not economically significant.” This definition does not allow for a clear distinction between non-profit institutions as third-party payers of health care and non- profit institutions as providers of care. For example, hospitals may have a non-profit legal status and provide services to households free of charge under a social insurance scheme, in which case, of course, the social insurance is the financing scheme and the hospital (HP.1) is the provider. The unambiguous way in which the ICHA-HF interprets financing schemes provides a starting point.
-
-    A qualitative analysis of an NGO’s activity is always required in order to decide whether the given activity can be regarded as the operation of a financing scheme. A few examples are given for the different NPISH functions.
-
-    - An NPISH organisation may provide – besides their non-health activity – resources for other NPISH that carry out the financing of special health programmes. The NPISH in question does not have a direct relationship with providers of care. In this case NPISH is a provider of resources and the programme of the NPISH is the financing scheme.
-    - A non-profit institution may create a special fund, usually through donations to finance special types of health services, for example, to operate special facilities for the homeless, or to provide care for households affected by natural disasters or war. Donations may be provided in cash or in kind from the general public, corporations or governments. During implementation, the NPISH may pay for its own staff and also for health care providers and other entities. (For example a charity organisation may pay for a special operation for a child abroad that is not available in the home country.) In these cases the NPISH programme is a financing scheme.
-    - The “non-profit” institution may be the legal form through which providers receive payment, for example, from a social health insurance scheme as compensation for the services they provide. In this case the NPISH is a provider and the social health insurance is the financing scheme.
+    Includes non-compulsory financing arrangements and programmes with non-contributory benefit entitlement that are based on donations from the general public, the government or corporations.
 
     <% elif financing_scheme == "Enterprise financing schemes" %>
-    This category includes primarily arrangements where enterprises directly provide or finance health services for their employees (such as occupational health services), without the involvement of an insurance-type scheme. Therefore, this excludes employer-based insurance schemes.
-
-    Enterprise financing schemes have the following characteristics:
-    - Mode of participation: voluntary choice of particular enterprise/corporation, with coverage based on employment at the firm (e.g. compulsory occupational health care);
-    - Benefit entitlement: non-contributory, discretionary with regard to the type of services, though may sometimes be specified by law;
-    - Basic method for fund-raising: voluntary choice of the firm to use its revenues for this purpose;
-    - Mechanism and extent of pooling funds: at an individual enterprise level.
-
-    Compared to SHA 1.0, the change is in the label (and hence the definition) so that it better reflects the content of the data. The label in the SHA 1.0 Manual is: “Corporations (other than health insurance)”. This label is not accurate, as corporations may provide revenues to other financing schemes, for example, they may pay insurance contributions or voluntary insurance premiums. The revised category better reflects the actual role of the enterprises accounted under this category (as financing schemes).
-
-    A distinction between two sub-categories is proposed: enterprise financing schemes (except health care providers); and Health care providers..
-
-    Under the special category of Health care providers financing schemes (HF.2.3.2) health care providers finance part of the services they provide to their patients from their own sources (that are additional sources to the payment they receive from the financing schemes). These are “imputed” expenditures included in health accounts in order to obtain an adequate estimation of the value of the services consumed by individuals. In fact, payments are made for the factors of health care provision by the providers or suppliers of these factors (e.g. pharmaceuticals), as the payment by the purchasers does not cover the full costs of providing the services concerned. For an adequate estimate of the value of the services concerned, these specific items are estimated and accounted as expenditure by Health care providers financing schemes (HF.2.3.2), and the revenues are accounted as FS. 6.2. Other revenues from corporations n.e.c. These specific sources may be as follows:
-    - Health care providers may have special revenues from economic activities other than the provision of health services (for example, lending premises, providing laundry or catering services for other institutions, or private hospitals may have revenues from interest, etc.) and they may use these revenues to cover the costs of health services they provide.
-    - A private hospital may incur a loss in one year. To balance revenues and expenditure, the hospital may take out a loan from a commercial bank to be repaid in subsequent periods.
-    - In some countries, a public hospital may accumulate arrears (unpaid bills) towards suppliers of pharmaceuticals (or other material resources). The increase in these arrears in the given accounting period can, in fact, be interpreted as additional financing raised by the provider.
+    Includes primarily arrangements where enterprises directly provide or finance health services for their employees, without the involvement of an insurance-type scheme.
 
     <% elif financing_scheme == "Household out-of-pocket payments" %>
-    {definitions.household_out_of_pocket_payments}
+    Includes financing schemes under which direct payment is made at the time of the purchase of goods or use of services.
 
     <% elif financing_scheme == "Out-of-pocket excluding cost-sharing" %>
-    {definitions.household_out_of_pocket_payments}
-
-    {definitions.cost_sharing}
+    Includes financing schemes under which direct payment is made at the time of the purchase of goods or use of services, but excludes the share of the costs of the given services covered by the scheme.
 
     <% elif financing_scheme == "Cost-sharing with third-party payers" %>
-    {definitions.cost_sharing}
+    Includes the share of the cost of health care services covered by the scheme.
 
     <% elif financing_scheme == "Rest of the world financing schemes (non-resident)" %>
-    This item comprises financial arrangements involving institutional units (or managed by institutional units) that are resident abroad, but who collect, pool resources and purchase health care goods and services on behalf of residents, without transiting their funds through a resident scheme. For example, a person resident in country A can buy a voluntary insurance in country B and can use that insurance to pay for services in either Country A or B. US citizens of Mexican origin, for instance, may buy health insurance in Mexico that gives them emergency cover in the United States but pays for elective treatment in Mexico.
+    Includes financial arrangements involving institutional units that are resident abroad, but who collect, pool resources and purchase health care goods and services on behalf of residents, without transiting their funds through a resident scheme.
 
-    A resident scheme has the predominant economic interest in the country for which the accounts are drawn up. It has a physical presence in the country and is under the jurisdiction of the local government (e.g. compulsory reporting activities). Non-resident (RoW) schemes may also operate in the country for which the health accounts are produced, but these schemes originate with and are controlled by agencies subject to foreign government jurisdiction, including, for example, aid agencies and military agencies.
+    <%- endif -%>
 
-    Rest of the world financing arrangements are defined according to the following characteristics:
-    - Mode of participation: 1) mandatory, e.g. based on the conditions of employment (such as foreign insurance), or 2) voluntary;
-    - Basis for entitlement: 1) a contract between an insurance carrier and the individual, or 2) discretion of a private entity (charity foundation, employer, foreign entity);
-    - Method for fundraising: funds are collected and pooled abroad;
-    - Coverage: foreign entities usually have the freedom to design the benefits.
-
-    Note that the rest of the world usually contributes to the financing of health care in the example of a typical model economy, as international aid and other flows, by channelling the funds via government or resident NPISH agencies. This is a typical case of RoW revenue for resident financing schemes, and could thus be classified as HF.1 or HF.2 spending and RoW revenue.
-
-    International agreements strive to ensure that external funding agencies work with resident health care agencies to ensure that external resources (financing revenues) are directed towards national priorities in a co-ordinated way. There is a need for reporting to national authorities and co-ordinating with national efforts to achieve that goal and foster complementary health actions. Agencies managing external funds for aid would then be acting as residents (resident units and schemes). If SHA adjusts for international aid agreements, the external resources would be recorded as external sources (revenues) and would in most cases be executed by resident schemes, grouped as NGOs and corporations.
-
-    It is not always clear whether a foreign assistance programme should be accounted as i) a financing RoW source (FS), or ii) both as a financing RoW source and a financing RoW scheme.
-
-    In the case of enclaves, these are non-resident units that are physically located in the host territory but have immunity from the host country laws (e.g. international organisations and embassies). When health care for the personnel of enclaves does not require any allowance or jurisdiction of the resident country, then the foreign health scheme should be classified as a RoW financing scheme (HF.4). However, an entity created by a government under the laws of another jurisdiction is a resident unit in the host jurisdiction, and not part of the general government sector in either economy (SNA 2008, 26.43). Thus, a foreign aid programme set up by an external aid organisation to handle resources in a foreign country is to be considered as a resident NGO or corporation in that country.
-
-    Foreign assistance may be given for a specific purpose (e.g. an AIDS programme), and a separate organisation, also part of the foreign entity, may be established to manage the fund, which is not necessarily involved in the provision of the service.
-
-    When the scheme is part of a global or multinational entity but is operated in the country as a “branch”, it is considered resident, e.g. an insurance agency having a local setting is resident. The key feature is that it shares permanent economic interests with local entities, as well as a physical presence; individual accounting and linkages to the rules of local governments, such as reporting, are also features of resident schemes.
-
-    However, when the scheme cannot be differentiated as a specific “branch” but is kept as a unique scheme because it is run as an indivisible operation with no separate accounts, then it is treated as a RoW scheme. The value of multinational schemes reported as RoW schemes cannot be taken as the entirety of multinational schemes, but would be based prorata on the volume of activity in the country.
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
@@ -194,70 +241,46 @@ tables:
     # http://docs.owid.io/projects/etl/architecture/metadata/reference/indicator/
     variables:
       share_expenditure:
-        title: Health expenditure as a share of GDP
+        title: Health expenditure (as a share of total expenditure) - <<financing_scheme>>
+        description_short: Health expenditure in <<financing_scheme.lower()>> divided by the total health expenditure, expressed as a percentage. {definitions.description_short}
         unit: '%'
         short_unit: '%'
         display:
+          name: Health expenditure (% of total health expenditure) - <<financing_scheme>>
           numDecimalPlaces: 1
           tolerance: 5
 
         # description_short:
         # description_key:
-        # description_from_producer:
-
 
         # presentation:
         #   title_public:
+      share_gdp:
+        title: Health expenditure (as a share of GDP) - <<financing_scheme>>
+        description_short: Health expenditure in <<financing_scheme.lower()>> divided by gross domestic product, expressed as a percentage. {definitions.description_short}
+        unit: '% of GDP'
+        short_unit: '%'
+        display:
+          name: Health expenditure (% of GDP) - <<financing_scheme>>
+          numDecimalPlaces: 1
+          tolerance: 5
 
       ppp_dollars_per_capita:
-        title: Health expenditure per capita
+        title: Health expenditure per capita - <<financing_scheme>>
+        description_short: Health expenditure in <<financing_scheme.lower()>> divided by population. {definitions.description_short}
         unit: international-$ in 2017 prices
         short_unit: $
         display:
+          name: Health expenditure per capita - <<financing_scheme>>
           numDecimalPlaces: 0
           tolerance: 5
 
       ppp_dollars:
-        title: Health expenditure in PPP dollars
+        title: Health expenditure - <<financing_scheme>>
+        description_short: Health expenditure in <<financing_scheme.lower()>>. {definitions.description_short}
         unit: international-$ in 2017 prices
         short_unit: $
         display:
+          name: Health expenditure - <<financing_scheme>>
           numDecimalPlaces: 0
           tolerance: 5
-
-      # testing_variable:
-      #   title: Testing variable title
-      #   unit: arbitrary units
-      #   short_unit: au
-      #   description_short: Short description of testing variable.
-      #   description_processing: Description of processing of testing variable.
-      #   description_key: List of key points about the indicator.
-      #   description_from_producer: Description of testing variable from producer.
-      #   processing_level: minor
-      #   presentation:
-      #     attribution:
-      #     attribution_short:
-      #     faqs:
-      #     grapher_config:
-      #     title_public:
-      #     title_variant:
-      #     topic_tags:
-      #   display:
-      #     color:
-      #     conversionFactor: 1
-      #     description:
-      #     entityAnnotationsMap: Test annotation
-      #     includeInTable:
-      #     isProjection: false
-      #     name: Testing variable
-      #     numDecimalPlaces: 0
-      #     shortUnit: au
-      #     tableDisplay:
-      #       hideAbsoluteChange:
-      #       hideRelativeChange:
-      #     tolerance: 0
-      #     unit: arbitrary units
-      #     yearIsDay: false
-      #     zeroDay:
-      {}
-
