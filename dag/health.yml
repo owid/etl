@@ -469,3 +469,5 @@ steps:
     - snapshot://oecd/2024-02-23/health_expenditure.csv
   data://garden/oecd/2024-02-23/health_expenditure:
     - data://meadow/oecd/2024-02-23/health_expenditure
+  data://grapher/oecd/2024-02-23/health_expenditure:
+    - data://garden/oecd/2024-02-26/health_expenditure
