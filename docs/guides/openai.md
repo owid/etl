@@ -1,12 +1,16 @@
-
+---
+tags:
+    - 👷 Staff
+---
 ## Setting Up OpenAI API Key
 
-The `etl metadata-upgrade` tool requires the `OPENAI_API_KEY` environment variable to function properly. This is the API key provided by OpenAI for accessing their GPT model.
+Some of our tooling require access to OpenAI's models. To use these tools, you need to set up an API key:
 
-To obtain the API key, you need to sign up on the [OpenAI platform](https://openai.com). After signing up, you can find your API key in the account [settings](https://platform.openai.com/api-keys). For more information see OpenAI [FAQs](https://help.openai.com/en/articles/4936850-where-do-i-find-my-api-key)
+1. Make sure that you are added to the team on OpenAI's platform. If you are not, ask a colleague to add you.
+2. Go to the [API keys](https://platform.openai.com/api-keys) page and create a new secret key.
+    - Use "Restricted" permissions with: "Read" permissions for Models, Assistant and Threads, "Write" for Model Capabilities. Leave the rest with default values.
+    - Copy the secret key (++cmd+v++).
+3. Set the `OPENAI_API_KEY` environment variable to the secret key. We recommend setting this environment variable in your `.env` file as `OPENAI_API_KEY='sk-...'`.
 
-Once you have the API key, set it as an environment variable in your development environment. For example, in a Unix-based system, you can add the following line to your `.bashrc` or `.zshrc`:
 
-```bash
-export OPENAI_API_KEY='your-api-key'
-```
+If this does not work, please report it on Slack.

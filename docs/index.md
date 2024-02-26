@@ -23,7 +23,7 @@ Choose the material that most interests you:
 [Read more :octicons-arrow-right-24:](guides/index.md)
 
 :material-open-source-initiative: I am a member of the public, and want to **contribute**<br>
-[Read more :octicons-arrow-right-24:](contributing/index.md)
+[Read more :octicons-arrow-right-24:](contributing.md)
 
 
 Thanks for your interest in our work :material-heart:

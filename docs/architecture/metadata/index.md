@@ -66,3 +66,4 @@ We have developed a tool, `etl metadata-upgrade`, that uses OpenAI's GPT model t
 !!! info "Learn more"
 
     - [Learn about how to use the `etl metadata-upgrade` tool :octicons-arrow-right-24:](metadata_chatgpt_update.md)
+    - [Get your OpenAI key :octicons-arrow-right-24:](../../guides/openai/)

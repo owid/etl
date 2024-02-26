@@ -193,7 +193,7 @@ nav:
     - "getting-started/index.md"
     - Installation: "getting-started/working-environment.md"
     - First steps: "getting-started/building-datasets.md"
-    - Contributing: "contributing/index.md"
+    - Contributing: "contributing.md"
   - Guides:
     - "guides/index.md"
     - Adding data: "guides/adding-data.md"
@@ -202,14 +202,13 @@ nav:
     - CLI: "guides/etl-cli.md"
     - Staging servers: "guides/staging-servers.md"
     - Backport a dataset to ETL: "guides/backport.md"
-    - OpenAI setup: "guides/openai.md"
-
-    - Updating owid-catalog: "dev/update-catalog.md"
-    - Using ChartGPT: "guides/chartgpt.md"
-    - Maintenance of our documentation: "dev/docs.md"
+    - Private dataset import to ETL: "guides/private-import.md"
     - Harmonize country names: "guides/harmonize-countries.md"
     - Metadata in data pages: "guides/metadata-play.md"
-    - Import a private dataset to ETL: "guides/private-import.md"
+    - Maintenance of our documentation: "dev/docs.md"
+    - OpenAI setup: "guides/openai.md"
+    - Using ChartGPT: "guides/chartgpt.md"
+
     # - Updating charts:
     #   - Submitting chart revisions: "guides/charts/updating-charts.md"
     #   - Reviewing chart revisions: "guides/charts/reviewing-charts.md"

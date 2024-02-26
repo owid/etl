@@ -3,7 +3,7 @@ tags:
     - 👷 Staff
 status: deprecated
 ---
-## Using ChartGPT
+# Using ChartGPT
 
 !!! warning "This is an experimental tool. Please check with the team if you have questions."
 

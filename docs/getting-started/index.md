@@ -44,7 +44,7 @@ Making this documentation public is part of our commitment to **transparency** a
 
     Create datasets using Wizard.
 
--   __[:fontawesome-solid-users: &nbsp; Contributing](../contributing/index.md)__
+-   __[:fontawesome-solid-users: &nbsp; Contributing](../contributing.md)__
 
     ---
 

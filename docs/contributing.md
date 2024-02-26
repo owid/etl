@@ -13,7 +13,7 @@ All our data work is public and open-source. Our ETL work is available on GitHub
 </div>
 
 
-To build any of our datasets, you first need [to install the ETL](getting-started/working-environment/) and then execute any step you want to build:
+To build any of our datasets, you first need [to install the ETL](../getting-started/working-environment/) and then execute any step you want to build:
 
 ```
 poetry run etl run <step>
@@ -23,13 +23,10 @@ poetry run etl run <step>
 If you find any issues with our datasets or our code, please [report them on GitHub](https://github.com/owid/etl/issues).
 
 ## Try our API
-You can try using our [API](../api/index.md) to access our data and give us feedback on it.
-
-Basically,
+You can try using our [API](../api/) to access our data and give us feedback on it.
 
 
 ## Suggest new datasets
-- You can try to build our datasets yourself and verify that they build cleanly
-- You can [report issues](https://github.com/owid/etl/issues) you encounter, either with our code or with our datasets
--
-- You can [make suggestions](https://github.com/owid/etl/discussions) for important data sets that you think would add a lot of value to our work
+- You can try to build our datasets yourself and verify that they build cleanly.
+- You can [report issues](https://github.com/owid/etl/issues) you encounter, either with our code or with our datasets.
+- You can [make suggestions](https://github.com/owid/etl/discussions) for important data sets that you think would add a lot of value to our work.

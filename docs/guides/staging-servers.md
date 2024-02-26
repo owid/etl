@@ -1,3 +1,8 @@
+---
+tags:
+    - 👷 Staff
+---
+
 ## Data Manager Workflow
 
 Dedicated staging servers are automatically created from every ETL pull request. That gives data manager the ability to share and test their changes before they are merged into the live site.

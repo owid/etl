@@ -35,28 +35,24 @@ There are different ways you can add data to the catalog, depending on your tech
 </div>
 
 
-## Using Wizard
+## Using Wizard (recommended)
 
 !!! info
     Learn more about Wizard in [this dedicated guideline](guides/wizard.md)
 
-The wizard is an interactive web UI that takes the role of our ETL admin. One of the main uses of Wizard is to create ETL steps. It is loaded with templates so that it is easier for you to create a new step just by using Wizard.
+The Wizard is an interactive web app that serves as OWID's ETL admin. One of the main uses of Wizard is to create ETL steps, as it is has provides templates to ease the creation of a new step.
 
-### Start the wizard
-
-Wizard consists of a web app that will ask you for various metadata fields (such as `namespace`, `version`, `source_url`, etc.). Based on your input,
-it will generate the required files in the appropriate `snapshots/` or `etl/` directory. **Wizard will point you to the commands that you need to run once you
-have implemented the step.**
-
-Just start by running
+Just start it with
 
 ```bash
 poetry run etlwiz
 ```
 
-and going to [localhost:8053](localhost:8053). You can create all the steps from there.
+And then go to [localhost:8053](localhost:8053). In there, you will see all options available in Wizard. For the purpose of this guide, we are just interested in those that fall under the section "ETL Steps", with which you can create Snapshot, Meadow, Garden and Grapher steps (and, alternatively, also Fast-Track steps).
 
+When creating a step, you will be presented with a form to fill in the metadata of the step (fields such as `namespace`, `version`, `date_published`, etc.). Based on your input, it will generate the required files in the appropriate `snapshots/` or `etl/` directories.
 
+**Wizard will guide you through the whole process, describing all the steps you need to follow to successfully create a new ETL step.**
 
 !!! info
     Minor issues with wizard<br>
@@ -65,61 +61,16 @@ and going to [localhost:8053](localhost:8053). You can create all the steps from
     Major issue<br>
     [Create a new issue :octicons-arrow-right-24:](https://github.com/owid/etl/issues/new)
 
-
-### Wizard options
-The Wizard currently supports the following stages:
-
-| Option      | Description                                                                                                   |
-| ----------- | ------------------------------------------------------------------------------------------------------------- |
-| `snapshot`  | Create a Snapshot step: Insert upstream data to our catalog.                                                  |
-| `meadow`    | Create a Meadow step: Format data.                                                                            |
-| `garden`    | Create a Garden step: Harmonize and process data.                                                             |
-| `grapher`   | Create a Grapher step: Transform data to be Grapher-ready.                                                    |
-| `charts`    | Tool to update our charts.                                                                                    |
-
-<!-- ::: mkdocs-click
+::: mkdocs-click
     :module: apps.wizard.cli
-    :command: cli -->
+    :command: cli
+    :depth: 2
+    :prog_name: etlwiz
 
-Find more details with **`--help`**:
-```plaintext
-$ etlwiz --help
-
- Usage: etlwiz [OPTIONS] [[charts|staging_sync|metagpt|expert|metaplay|dataexp|harmonizer|owidle|snapshot|meadow|garden|grapher|fasttrack|all]]
-
- Run OWID's ETL admin tool, the Wizard.
-
-  ..__    __ _                  _
-  ./ / /\ \ (_)______ _ _ __ __| |
-  .\ \/  \/ | |_  / _` | '__/ _` |
-  ..\  /\  /| |/ | (_| | | | (_| |
-  ...\/  \/ |_/___\__,_|_|  \__,_|
-
-
- Just launch it and start using it! 🪄
-
- Note: Alternatively, you can run it as streamlit run apps/wizard/app.py.
-
-╭─ Arguments ───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
-│ PHASE    (charts|staging_sync|metagpt|expert|metaplay|dataexp|harmonizer|owidle|snapshot|meadow|garden|grapher|fasttrack|all)                                                                                 │
-╰───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
-╭─ Options ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
-│ --run-checks/--skip-checks    Environment checks                                                                                                                                                              │
-│                               [default: run-checks]                                                                                                                                                           │
-│ --dummy-data                  Prefill form with dummy data, useful for development                                                                                                                            │
-│ --port                        Application port                                                                                                                                                                │
-│                               (INTEGER)                                                                                                                                                                       │
-│                               [default: 8053]                                                                                                                                                                 │
-│ --help                        Show this message and exit.                                                                                                                                                     │
-╰───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
-```
-
-
-
-## Using the fast-track
+## Using the Fast-Track
 
 !!! warning "You need Tailscale to access fast-track"
-    Alternatively, run fast-track locally with `fasttrack --no-commit`
+    Alternatively, run fast-track locally with `etl fasttrack --no-commit`
 
 While the ETL is excellent for making data reproducible, it is still slower than manual CSV uploads for small datasets. For this reason, we provide an alternative path for small datasets. Fast-track is a tool for importing datasets from Google Sheets. The idea is to keep all data and metadata there and use this interface to import or update the data in the Grapher database, where it can be used to create charts. Fast-track also commits your work to the ETL repository, where you can further process your data with Python.
 
@@ -132,7 +83,7 @@ etl --> mysql
 ```
 
 
-### _Super_ fast-track
+### Import CSV files using Fast-Track
 !!! warning "_Super_ fast-track should only be used for data exploration, and never for production datasets."
 
 _Super_ fast-track is a variation of fast-track that imports data directly from CSV files without needing a Google Spreadsheet. It is useful for exploring datasets in Grapher but isn't intended for production datasets. _Super_ fast-track was developed to replace the "Import CSV" functionality in the admin interface. However, it doesn't support adding complex metadata in the ETL like regular fast-track does.
@@ -140,8 +91,9 @@ _Super_ fast-track is a variation of fast-track that imports data directly from 
 
 ## Manually add a dataset to the ETL
 
-!!! note "Before you begin, make sure you've [set up the ETL working environment](../../getting-started/working-environment.md)."
+!!! warning "If possible, use [the Wizard](#using-wizard-recommended)"
 
+    If you are not familiar with the ETL, it is recommended to use Wizard to add a new dataset. This will ensure that the dataset is added in a consistent way and that all necessary metadata is included.
 
 You will need to add a step to the ETL for each stage of data processing you need to do. The steps are:
 
