@@ -22,7 +22,10 @@ def get_username():
 
 
 def load_env():
-    ENV_FILE = env.get("ENV", BASE_DIR / ".env")
+    if env.get("ENV", "").startswith("."):
+        raise ValueError(f"ENV was replaced by ENV_FILE, please use ENV_FILE={env['ENV']} ... instead.")
+
+    ENV_FILE = env.get("ENV_FILE", BASE_DIR / ".env")
     load_dotenv(ENV_FILE, override=True)
 
 
@@ -30,6 +33,10 @@ load_env()
 # When DEBUG is on
 # - run steps in the same process (speeding up ETL)
 DEBUG = env.get("DEBUG") in ("True", "true", "1")
+
+# Environment, e.g. production, staging, dev
+ENV = env.get("ENV", "dev")
+ENV_IS_REMOTE = ENV in ("production", "staging")
 
 # publishing to OWID's public data catalog in R2
 R2_BUCKET = "owid-catalog"
@@ -144,9 +151,3 @@ def enable_bugsnag() -> None:
         bugsnag.configure(
             api_key=BUGSNAG_API_KEY,
         )  # type: ignore
-
-
-# For Wizard to know if it is running on remote
-## This could eventuallyb be just a generic flag for other apps/processes too.
-## Why is this important for Wizard? Refer to field `disable_on_remote` in apps/wizard/config/config.yml`
-WIZARD_IS_REMOTE = env.get("WIZARD_IS_REMOTE") in ("True", "true", "1")

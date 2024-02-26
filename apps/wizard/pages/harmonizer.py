@@ -9,7 +9,7 @@ from owid.catalog import Dataset
 from st_pages import add_indentation
 
 from apps.wizard.utils import get_datasets_in_etl, set_states
-from etl.config import WIZARD_IS_REMOTE
+from etl.config import ENV_IS_REMOTE
 from etl.harmonize import CountryRegionMapper, harmonize_simple
 from etl.paths import STEP_DIR
 from etl.steps import load_from_uri
@@ -229,7 +229,7 @@ if option:
                 # 3/ PATH to export & export button
                 directory = f"{STEP_DIR}/data/garden/{dataset.m.namespace}/{dataset.m.version}"
                 path_export = f"{directory}/{dataset.m.short_name}.countries.json"
-                if WIZARD_IS_REMOTE:
+                if ENV_IS_REMOTE:
                     # Submit button
                     export_btn = st.form_submit_button(
                         label="Generate mapping",
@@ -251,7 +251,7 @@ if option:
             # EXPORT
             ####################################################################################################
             if export_btn:
-                if WIZARD_IS_REMOTE:
+                if ENV_IS_REMOTE:
                     path_export = Path(path_export).name
                     json_string = json.dumps(st.session_state.entity_mapping)
                     st.download_button(
