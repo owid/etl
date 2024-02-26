@@ -233,7 +233,7 @@ grid_response = AgGrid(
 )
 
 
-def update_operations_list(new_items):
+def update_operations_list(new_items, clear_all=False):
     """Append new items to the operation list, preserving existing order and avoiding duplicates."""
     existing_items = set(st.session_state["selected_steps"])
     for item in new_items:
@@ -272,6 +272,11 @@ def include_all_usages(step):
 
 def remove_selected_step(step):
     st.session_state["selected_steps"] = [s for s in st.session_state["selected_steps"] if s != step]
+
+
+def empty_operations_list():
+    """Empty the operations list."""
+    st.session_state["selected_steps"] = []
 
 
 st.markdown(
@@ -322,7 +327,6 @@ with st.container(border=True):
             #  * Execute ETL step for only the current step.
             #  * Edit metadata for the current step.
             # TODO: Consider adding bulk buttons to:
-            #  * Clear operations list.
             #  * Sort them in ETL execution order.
             #  * Select the steps currently in the operation list in the main table (to see their attributes).
             #  * Execute ETL for all steps in the operation list.
@@ -344,6 +348,16 @@ def execute_command(cmd):
         return result.stdout
     except subprocess.CalledProcessError as e:
         return e.stderr
+
+
+# Add button to clear the operations list.
+# TODO: Currently, it needs to be pressed twice to clear the list; not clear why.
+if st.button(
+    "Clear Operations list",
+    help="Remove all steps currently in the _Operations list_.",
+    type="secondary",
+):
+    empty_operations_list()
 
 
 # Add an expander menu with additional parameters for the update command.
