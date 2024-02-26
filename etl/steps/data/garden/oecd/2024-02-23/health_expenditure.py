@@ -64,4 +64,7 @@ def make_indicators_wide(tb: Table, indicator_names: Dict[str, str]) -> Table:
         values="value",
     ).reset_index()
 
+    # Make share_expenditure null when financing_scheme is "Total"
+    tb.loc[tb["financing_scheme"] == "Total", "share_expenditure"] = None
+
     return tb
