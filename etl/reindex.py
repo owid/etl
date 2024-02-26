@@ -16,7 +16,7 @@ from etl.paths import DATA_DIR
 config.enable_bugsnag()
 
 
-@click.command()
+@click.command(name="d publish")
 @click.option(
     "--channel",
     "-c",
@@ -33,11 +33,7 @@ config.enable_bugsnag()
 def reindex_cli(channel: Iterable[CHANNEL], include: Optional[str]) -> None:
     """Create a catalog-[channel].feather file inside etl/data with all tables in each channel.
 
-    # Description
-    This enables `catalog.find` to be aware of what datasets currently exists. So, if for example you create a new dataset locally, you won't be able to find it in your local catalog unless you re-run reindex.
-
-    # Reference
-    """
+    This enables `catalog.find` to be aware of what datasets currently exists. So, if for example you create a new dataset locally, you won't be able to find it in your local catalog unless you re-run reindex."""
     return reindex(channel=channel, include=include)
 
 

@@ -100,7 +100,7 @@ def cli_dev() -> None:
 
 # Backport
 @click.group(
-    name="etl",
+    name="b",
     context_settings=dict(show_default=True),
     cls=LazyGroup,
     lazy_subcommands=SUBGROUPS["b"]["commands"],
@@ -111,18 +111,23 @@ def cli_back() -> None:
 
 
 # Create `subgroups` list, to be used to display commands in `etl --help`
-subgroups = []
-for alias, props in SUBGROUPS.items():
-    subgroups.append(
-        {
-            "name": props["name"],
-            "commands": {
-                alias: props["entrypoint"],
-                **{f"{alias} {k}": v for k, v in props["commands"].items()},
-            },
-        }
-    )
-
+# subgroups = []
+# for alias, props in SUBGROUPS.items():
+#     subgroups.append(
+#         {
+#             "name": props["name"],
+#             "commands": {
+#                 alias: props["entrypoint"],
+#                 **{f"{alias} {k}": v for k, v in props["commands"].items()},
+#             },
+#         }
+#     )
+subgroups = [
+    {
+        "name": "Subcommands",
+        "commands": {alias: props["entrypoint"] for alias, props in SUBGROUPS.items()},
+    }
+]
 ################################################################
 #
 # MAIN CLIENT

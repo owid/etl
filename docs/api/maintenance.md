@@ -1,3 +1,7 @@
+---
+tags:
+    - 👷 Staff
+---
 We have created a python library to enable easy access to our large data catalog. It also assists our work in ETL, as it contains various methods and objects essential to the data wrangling procceses.
 
 

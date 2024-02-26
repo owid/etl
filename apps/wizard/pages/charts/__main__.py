@@ -1,4 +1,4 @@
-"""Streamlit-based tool for chart revision baker.
+"""Streamlit-based tool for chart upgrader.
 
 Run as `wizard charts` or python -m wizard.pages.charts
 

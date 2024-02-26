@@ -1,3 +1,7 @@
+---
+tags:
+  - 👷 Staff
+---
 !!! warning "This tutorial might be partial or incomplete. Please check with the team if you have questions."
 
 Most of the steps have private versions with `-private` suffix (e.g. `data-private://...`, `walden-private://...`) that remember and enforce a dataset level `is_public` flag.

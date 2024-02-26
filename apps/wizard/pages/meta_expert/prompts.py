@@ -11,8 +11,8 @@ from structlog import get_logger
 
 from apps.wizard.utils import WIZARD_DIR
 from apps.wizard.utils.gpt import GPTQuery, OpenAIWrapper, get_number_tokens
-from docs.ignore.gen_metadata_reference import render_dataset, render_indicator, render_origin, render_table
 from etl.config import load_env
+from etl.docs import render_dataset, render_indicator, render_origin, render_table
 
 # Logger
 log = get_logger()
