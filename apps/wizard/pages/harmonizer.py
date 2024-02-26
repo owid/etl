@@ -9,7 +9,7 @@ from owid.catalog import Dataset
 from st_pages import add_indentation
 
 from apps.wizard.utils import get_datasets_in_etl, set_states
-from apps.wizard.utils.env import ENV_IS_REMOTE
+from etl.config import ENV_IS_REMOTE
 from etl.harmonize import CountryRegionMapper, harmonize_simple
 from etl.paths import STEP_DIR
 from etl.steps import load_from_uri

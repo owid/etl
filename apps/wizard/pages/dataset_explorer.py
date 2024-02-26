@@ -13,7 +13,7 @@ from st_pages import add_indentation
 from streamlit_agraph import Config, ConfigBuilder, Edge, Node, agraph
 
 from apps.wizard.utils import metadata_export_basic, set_states
-from apps.wizard.utils.env import ENV_IS_REMOTE
+from etl.config import ENV_IS_REMOTE
 from etl.paths import DATA_DIR
 from etl.steps import extract_step_attributes, filter_to_subgraph, load_dag
 

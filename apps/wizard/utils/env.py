@@ -8,9 +8,6 @@ from etl import config
 OWIDEnvType = Literal["live", "staging", "local", "remote-staging", "unknown"]
 
 
-ENV_IS_REMOTE = config.ENV in ("production", "staging")
-
-
 class OWIDEnv:
     """OWID environment."""
 

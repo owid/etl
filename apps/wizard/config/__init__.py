@@ -6,7 +6,7 @@ from typing import Literal
 
 import yaml
 
-from apps.wizard.utils.env import ENV_IS_REMOTE
+from etl.config import ENV_IS_REMOTE
 from etl.paths import APPS_DIR
 
 _config_path = APPS_DIR / "wizard" / "config" / "config.yml"

@@ -36,6 +36,7 @@ DEBUG = env.get("DEBUG") in ("True", "true", "1")
 
 # Environment, e.g. production, staging, dev
 ENV = env.get("ENV", "dev")
+ENV_IS_REMOTE = ENV in ("production", "staging")
 
 # publishing to OWID's public data catalog in R2
 R2_BUCKET = "owid-catalog"
