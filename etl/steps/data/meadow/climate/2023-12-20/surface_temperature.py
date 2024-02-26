@@ -5,6 +5,7 @@ import zipfile
 import geopandas as gpd
 import numpy as np
 import pandas as pd
+import pyproj
 import xarray as xr
 from owid.catalog import Table
 from rioxarray.exceptions import NoDataInBounds
@@ -40,6 +41,10 @@ def _load_shapefile(file_path: str) -> gpd.GeoDataFrame:
 
 
 def run(dest_dir: str) -> None:
+    # Activates the usage of the global context. Using this option can enhance the performance
+    # of initializing objects in single-threaded applications.
+    pyproj.set_use_global_context(True)
+
     #
     # Load inputs.
     #
@@ -77,12 +82,22 @@ def run(dest_dir: str) -> None:
     # Iterate over each row in the shapefile data.
     for i in tqdm(range(shapefile.shape[0])):
         # Extract the data for the current row.
-        data = shapefile[shapefile.index == i]
+        geometry = mapping(shapefile.iloc[i]["geometry"])
         country_name = shapefile.iloc[i]["WB_NAME"]
 
         try:
             # Clip the temperature data to the current country's shape.
-            clip = da.rio.clip(data.geometry.apply(mapping), data.crs, from_disk=True)
+            # clip = da.rio.clip(data.geometry.apply(mapping), data.crs)
+
+            # Get the bounding box of the MultiPolygon
+            xmin, ymin, xmax, ymax = geometry.bounds
+
+            # Now, you can use these bounds with `xds.rio.clip_box`
+            clip = da.rio.clip_box(minx=xmin, miny=ymin, maxx=xmax, maxy=ymax)
+
+            # Clip data to the country's shape.
+            # NOTE: if memory is an issue, we could use `from_disk=True` arg
+            clip = clip.rio.clip([geometry], shapefile.crs)
 
             # Calculate weights based on latitude to account for area distortion in latitude-longitude grids.
             weights = np.cos(np.deg2rad(clip.latitude))
