@@ -28,6 +28,6 @@ meta:
 
 wdir: ../../../data/snapshots/ihme_gbd/2023-10-04
 outs:
-  - md5: 4a8b78999255e14d7faf03b76793a97d
+  - md5: 7954d55badd3d2d551d62d2525883fd2
     size: 26745
     path: cause_hierarchy.csv

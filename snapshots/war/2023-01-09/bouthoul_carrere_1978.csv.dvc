@@ -65,6 +65,6 @@ meta:
       - We excluded conflicts without deaths.
 wdir: ../../../data/snapshots/war/2023-01-09
 outs:
-- md5: d0b1416eade865e82e5f935f1c641610
-  size: 46668
-  path: bouthoul_carrere_1978.csv
+  - md5: 4a417e2fb2e8563a715a7bb61104bc7a
+    size: 46668
+    path: bouthoul_carrere_1978.csv

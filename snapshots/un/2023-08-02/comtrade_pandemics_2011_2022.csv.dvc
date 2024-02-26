@@ -31,6 +31,6 @@ meta:
 
 wdir: ../../../data/snapshots/un/2023-08-02
 outs:
-- md5: 7a26d05d445d2ddf9967c5515e801044
-  size: 6212557
-  path: comtrade_pandemics_2011_2022.csv
+  - md5: 10ab464972a70e8ac1a0395d923c93c1
+    size: 6212557
+    path: comtrade_pandemics_2011_2022.csv

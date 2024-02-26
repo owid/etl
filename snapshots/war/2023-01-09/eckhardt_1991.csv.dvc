@@ -58,6 +58,6 @@ meta:
       this book by Eckhardt may have more details in chapter 9.
 wdir: ../../../data/snapshots/war/2023-01-09
 outs:
-- md5: ef6af27bf85a82675f41a9e4423b6120
-  size: 103932
-  path: eckhardt_1991.csv
+  - md5: 8714107efdc4a5d6a7bf1e7ac0531382
+    size: 103932
+    path: eckhardt_1991.csv

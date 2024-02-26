@@ -13,8 +13,7 @@ meta:
 
     # Citation
     producer: OECD
-    citation_full: OECD (2022), Global Plastics Outlook ,https://stats.oecd.org/viewhtml.aspx?datasetcode=PLASTIC_LEAKAGE_V2_3&lang=en,      accessed
-      on 21 September 2023
+    citation_full: OECD (2022), Global Plastics Outlook ,https://stats.oecd.org/viewhtml.aspx?datasetcode=PLASTIC_LEAKAGE_V2_3&lang=en,      accessed on 21 September 2023
 
     # Files
     url_main: https://stats.oecd.org/viewhtml.aspx?datasetcode=PLASTIC_LEAKAGE_V2_3&lang=en
@@ -26,6 +25,6 @@ meta:
       url: https://www.oecd.org/termsandconditions
 wdir: ../../../data/snapshots/oecd/2023-09-21
 outs:
-- md5: e86b116ac8c6b7ddaf98ef10338fab13
-  size: 34953
-  path: plastic_environment_leakage_projections.csv
+  - md5: 8d1ec0e160b296da1120593e70a92260
+    size: 34953
+    path: plastic_environment_leakage_projections.csv

@@ -5,8 +5,7 @@ meta:
   version: '2023-06-20'
   publication_year: 2023
   source_name: OECD (2023)
-  source_published_by: 'OECD (2023), Exchange rates and PPP. doi: 10.1787/037ed317-en
-    (Accessed on 20 June 2023)'
+  source_published_by: 'OECD (2023), Exchange rates and PPP. doi: 10.1787/037ed317-en (Accessed on 20 June 2023)'
   url: https://stats.oecd.org/viewhtml.aspx?datasetcode=SNA_TABLE4&lang=en
   source_data_url:
   file_extension: csv
@@ -18,6 +17,6 @@ meta:
     OECD provides data on Purchasing Power Parities (actual individual consumption, private consumption and GDP) and Exchange rates (period-average and end of period data) between 2000-2022. 
 wdir: ../../../data/snapshots/oecd/2023-06-20
 outs:
-- md5: 50ea96e4b29a88a99e8c6aaebaee1f21
-  size: 1179935
-  path: ppp_exchange_rates.csv
+  - md5: 4a71eedfc146928442b826f1d008459f
+    size: 1179935
+    path: ppp_exchange_rates.csv

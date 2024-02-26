@@ -22,6 +22,6 @@ meta:
     H5N1 bird flu viruses that are currently circulating in wild birds and poultry in much of the world are genetically different from earlier versions of the virus and emerged to become the predominant subtype of HPAI H5 in the fall of 2021. These viruses have caused sporadic poultry infections and poultry outbreaks in many countries, most recently the United States. In contrast to previous H5N1 viruses, which still circulate to a lesser extent in several countries, at this time, fewer than 10 cases with current H5N1 bird flu viruses have been reported globally. However, illness in humans from all bird flu virus infections has ranged in severity from no symptoms or mild illness to severe disease that resulted in death.
 wdir: ../../../data/snapshots/who/2023-08-14
 outs:
-- md5: 16498ed922a90d22c50a4b465e9c5255
-  size: 21641
-  path: avian_influenza_ah5n1.csv
+  - md5: 39cf203df8b39811b7c9f3a01b65f6da
+    size: 21641
+    path: avian_influenza_ah5n1.csv
