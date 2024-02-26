@@ -10,16 +10,14 @@ meta:
       * The early part of the time series comes from the sea level group of CSIRO (Commonwealth Scientific and Industrial Research Organisation), Australia's national science agency. Church, J. A., and White, N. J. (2011). Sea-Level Rise from the Late 19th to the Early 21st Century. Surveys in Geophysics, 32(4-5), 585-602. http://doi.org/10.1007/s10712-011-9119-1
       * The more recent part of the time series is from the University of Hawaii Sea Level Center (UHSLC). It is based on a weighted average of 373 global tide gauge records collected by the U.S. National Ocean Service, UHSLC, and partner agencies worldwide.
     attribution_short: NOAA/Climate.gov
-    url_main: 
-      https://www.climate.gov/news-features/understanding-climate/climate-change-global-sea-level
-    url_download: 
-      https://www.climate.gov/sites/default/files/Climate_dot_gov_dashboard_SeaLevel_Jan2021update.txt
+    url_main: https://www.climate.gov/news-features/understanding-climate/climate-change-global-sea-level
+    url_download: https://www.climate.gov/sites/default/files/Climate_dot_gov_dashboard_SeaLevel_Jan2021update.txt
     date_accessed: 2024-01-28
     license:
       name: CC BY 4.0
 
 wdir: ../../../data/snapshots/climate/2024-01-28
 outs:
-- md5: 58d29b59f9dac796412beddc92bbb163
-  size: 18100
-  path: global_sea_level.csv
+  - md5: 9c00ba285d35437306eaf22459230198
+    size: 18100
+    path: global_sea_level.csv

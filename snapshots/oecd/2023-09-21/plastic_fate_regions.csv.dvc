@@ -28,6 +28,6 @@ meta:
       url: https://www.oecd.org/termsandconditions
 wdir: ../../../data/snapshots/oecd/2023-09-21
 outs:
-- md5: 7c1ba26d48b9e16acae1bdd93b398920
-  size: 116164
-  path: plastic_fate_regions.csv
+  - md5: 9c3e686776ec21d9ae52d906645aac84
+    size: 116164
+    path: plastic_fate_regions.csv

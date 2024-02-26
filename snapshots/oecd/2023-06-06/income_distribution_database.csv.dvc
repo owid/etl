@@ -21,6 +21,6 @@ meta:
     Small changes in estimates between years should be treated with caution as they may not be statistically significant.
 wdir: ../../../data/snapshots/oecd/2023-06-06
 outs:
-- md5: 475da98f3f67e8a349af4114dcae2125
-  size: 1026173
-  path: income_distribution_database.csv
+  - md5: ec61534a8ad1a438fb3aef3faad181e5
+    size: 1026173
+    path: income_distribution_database.csv

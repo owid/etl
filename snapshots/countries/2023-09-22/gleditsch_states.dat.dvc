@@ -27,6 +27,6 @@ meta:
 
 wdir: ../../../data/snapshots/countries/2023-09-22
 outs:
-- md5: a14a4d36ab74faeab281e431c11996aa
-  size: 9093
-  path: gleditsch_states.dat
+  - md5: 304fa68f0809dfb7351241d63b9bc3b4
+    size: 9093
+    path: gleditsch_states.dat

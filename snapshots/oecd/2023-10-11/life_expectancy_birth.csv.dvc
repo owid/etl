@@ -15,8 +15,7 @@ meta:
 
     # Files
     url_main: https://data.oecd.org/healthstat/life-expectancy-at-birth.htm
-    url_download: 
-      https://stats.oecd.org/sdmx-json/data/DP_LIVE/.LIFEEXP.../OECD?contentType=csv&detail=code&separator=comma&csv-lang=en
+    url_download: https://stats.oecd.org/sdmx-json/data/DP_LIVE/.LIFEEXP.../OECD?contentType=csv&detail=code&separator=comma&csv-lang=en
     date_accessed: 2023-10-11
 
     # License
@@ -26,6 +25,6 @@ meta:
 
 wdir: ../../../data/snapshots/oecd/2023-10-11
 outs:
-- md5: f28e5fbe6538efe3e1d01a8859808808
-  size: 381472
-  path: life_expectancy_birth.csv
+  - md5: c6b660c01904ea745f02eeedb215fb6f
+    size: 381472
+    path: life_expectancy_birth.csv

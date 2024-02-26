@@ -7,8 +7,7 @@ meta:
     description: |-
       WHO has published a global tuberculosis (TB) report every year since 1997. The report provides a comprehensive and up-to-date assessment of the TB epidemic, and of progress in prevention, diagnosis and treatment of the disease at global, regional and country levels.
     date_published: 2023-11-07
-    title_snapshot: Global Tuberculosis Report - Treatment outcomes by age group and
-      sex
+    title_snapshot: Global Tuberculosis Report - Treatment outcomes by age group and sex
 
     # Citation
     producer: WHO
@@ -28,6 +27,6 @@ meta:
 
 wdir: ../../../data/snapshots/tuberculosis/2023-12-12
 outs:
-- md5: 4fcb4c45a89a7faf2399ce0f2441d045
-  size: 88146
-  path: outcomes_disagg.csv
+  - md5: fbe3128e0ce59fca725026412f012452
+    size: 88146
+    path: outcomes_disagg.csv

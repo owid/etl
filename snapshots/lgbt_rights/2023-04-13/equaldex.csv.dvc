@@ -17,6 +17,6 @@ meta:
     Equaldex is a collaborative knowledge base for the LGBT (lesbian, gay, bisexual, transgender) movement. The site aims to crowdsource every law related to LGBT rights to provide a comprehensive and global view of the LGBT rights movement.
 wdir: ../../../data/snapshots/lgbt_rights/2023-04-13
 outs:
-- md5: 7b78427e2622821f8f035a4b0868b90e
-  size: 9442348
-  path: equaldex.csv
+  - md5: 587d0a876f4255a52300d242d8a87533
+    size: 9442348
+    path: equaldex.csv

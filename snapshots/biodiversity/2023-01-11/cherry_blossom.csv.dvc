@@ -27,6 +27,6 @@ meta:
       url: http://atmenv.envi.osakafu-u.ac.jp/aono/kyophenotemp4/
 wdir: ../../../data/snapshots/biodiversity/2023-01-11
 outs:
-- md5: e966a7746093969705cf9582cd6109a4
-  path: cherry_blossom.csv
-  size: 42758
+  - md5: 86bf238517d1f2711a69057669ad8042
+    path: cherry_blossom.csv
+    size: 42758

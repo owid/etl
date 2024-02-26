@@ -17,8 +17,7 @@ meta:
 
     # Files
     url_main: https://doi.org/10.1111/j.1728-4457.2005.00083.x
-    url_download: 
-      https://u.demog.berkeley.edu/~jrw/Biblio/Eprints/%20P-S/riley.2005_estimates.global.e0.pdf
+    url_download: https://u.demog.berkeley.edu/~jrw/Biblio/Eprints/%20P-S/riley.2005_estimates.global.e0.pdf
     date_accessed: 2023-10-10
 
     # License
@@ -28,6 +27,6 @@ meta:
 
 wdir: ../../../data/snapshots/demography/2023-10-10
 outs:
-- md5: f72f60c74142ec25af1c6e069c25c728
-  size: 1107
-  path: riley_2005.pdf
+  - md5: 3f325cfc2cf3ba93bb8d2261c1373220
+    size: 1107
+    path: riley_2005.pdf

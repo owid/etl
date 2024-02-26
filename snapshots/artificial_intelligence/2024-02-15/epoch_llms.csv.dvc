@@ -1,21 +1,18 @@
 meta:
   origin:
     title: Large Language Model Performance and Compute
-    description: Epoch dataset on how performance on a MMLU language benchmark scales
-      with computational resources.
+    description: Epoch dataset on how performance on a MMLU language benchmark scales with computational resources.
     producer: Epoch
     citation_full: |-
       Owen, David. (2023). Large Language Model performance and compute, Epoch (2023) [Data set]. In Extrapolating performance in language modeling benchmarks. Published online at epochai.org. Retrieved from: 'https://epochai.org/blog/extrapolating-performance-in-language-modelling-benchmarks' [online resource].
-    url_main:
-      https://epochai.org/blog/extrapolating-performance-in-language-modelling-benchmarks
+    url_main: https://epochai.org/blog/extrapolating-performance-in-language-modelling-benchmarks
     date_accessed: 2024-02-15
     date_published: 2023-07-12
     license:
       name: Creative Commons BY 4.0
-      url:
-        https://epochai.org/blog/extrapolating-performance-in-language-modelling-benchmarks
+      url: https://epochai.org/blog/extrapolating-performance-in-language-modelling-benchmarks
 wdir: ../../../data/snapshots/artificial_intelligence/2024-02-15
 outs:
-- md5: b325a41d52e44c2fd2285cf558f0a3ab
-  size: 1611
-  path: epoch_llms.csv
+  - md5: 134cb73f28be470ee6566d86a19812e4
+    size: 1611
+    path: epoch_llms.csv
