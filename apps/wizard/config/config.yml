@@ -17,7 +17,7 @@
 # - emoji (str): Emoji to show in the sidebar menu.
 # - enabled (bool): Whether the app is enabled or not. If it's not enabled, it won't be shown at all. Default is True.
 # - image_url (str): Link to the image you want to show on the card in the home page of Wizard.
-# - disable_on_remote (bool): Whether the app is disabled in remote settings. To detect if the app is running in a remote setting, it checks the value of the environment variable `WIZARD_IS_REMOTE`. If it's set to `True`, the app will be disabled and overwrites the value of `enabled`. Set to "False" by default.
+# - disable_on_remote (bool): Whether the app is disabled in remote settings. To detect if the app is running in a remote setting, it checks the value of the environment variable `ENV`. If it's not `staging` or `production`, the app will be disabled and overwrites the value of `enabled`.
 
 etl:
   title: ETL steps
