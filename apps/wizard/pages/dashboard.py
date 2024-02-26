@@ -2,7 +2,9 @@
 
 """
 import subprocess
+from datetime import datetime
 
+import pandas as pd
 import streamlit as st
 from st_aggrid import AgGrid, GridUpdateMode, JsCode
 from st_aggrid.grid_options_builder import GridOptionsBuilder
@@ -11,12 +13,7 @@ from apps.step_update.cli import StepUpdater
 from etl.config import WIZARD_IS_REMOTE
 
 # TODO:
-# Ensure update_period_days can only be >= 0. Add this to the guidelines.
 # Add columns:
-#  * "days to update":
-#    * Red: If days to update <= 0.
-#    * Shades of color (e.g. green to orange): Going from the day when it's updated to the day when it's due for next update.
-#    * Yellow: If update_period_days is not defined.
 #  * "updatability":
 #    * "up-to-date": The step is up to date if update_period_days is 0 or all step's dependencies are on their latest version.
 #    * "minor": The step can have a minor update if update_period_days is not 0 and any dependency is not latest while all snapshots are latest.
@@ -25,6 +22,9 @@ from etl.config import WIZARD_IS_REMOTE
 #  * Consider creating a script to regularly check for snapshot updates, fetch them and add them to the temporary dag (this is the way that the "updatability" will know if there are snapshot updates available).
 #  * Define a metric of update prioritisation, based on number of charts (or views) and days to update. Sort steps table by this metric.
 #  * Let user optionally define the version of the new steps to be created.
+
+# Current date.
+TODAY = datetime.now().strftime("%Y-%m-%d")
 
 # CONFIG
 st.set_page_config(
@@ -50,6 +50,44 @@ This dashboard lets you explore all active ETL steps, and, if you are working on
 # add_indentation()
 
 
+def add_days_to_update_columns(steps_df):
+    df = steps_df.copy()
+    # There is no clear way to show the expected date of update of a dataset.
+    # One could simply add the version to update_days_period.
+    # But a dataset may have had a minor update since the main release.
+    # So, it would be better to count from the date_published of its snapshots.
+    # However, if there are multiple snapshots, it is not clear which one to use as a reference.
+    # For example, if a dataset uses the income groups dataset, that would have a date_published that is irrelevant.
+    # So, we could create a table of estimated dates of update. But then we would need some manual way to change them.
+    # For now, calculate the number of days to the next expected update simply based on the step version.
+
+    # Extract version from steps data frame, and make it a string.
+    version = df["version"].copy().astype(str)
+    # Assume first of January to those versions that are only given as years.
+    filter_years = (version.str.len() == 4) & (version.str.isdigit())
+    version[filter_years] = version[filter_years] + "-01-01"
+    # Convert version to datetime where possible, setting "latest" to NaT.
+    version_date = pd.to_datetime(version, errors="coerce", format="%Y-%m-%d")
+
+    # Extract update_period_days from steps dataframe, ensuring it is numeric, or NaT where it was None.
+    update_period_days = pd.to_numeric(df["update_period_days"], errors="coerce")
+
+    # Create a column with the date of next update where possible.
+    df["date_of_next_update"] = None
+    filter_dates = (version_date.notnull()) & (update_period_days > 0)
+    df.loc[filter_dates, "date_of_next_update"] = (
+        version_date[filter_dates] + pd.to_timedelta(update_period_days[filter_dates], unit="D")
+    ).dt.strftime("%Y-%m-%d")
+
+    # Create a column with the number of days until the next update.
+    df["days_to_update"] = None
+    df.loc[filter_dates, "days_to_update"] = (
+        pd.to_datetime(df.loc[filter_dates, "date_of_next_update"]) - pd.to_datetime(TODAY)
+    ).dt.days
+
+    return df
+
+
 @st.cache_data
 def load_steps_df():
     # Load steps dataframe.
@@ -58,14 +96,8 @@ def load_steps_df():
     # Fix some columns.
     steps_df["full_path_to_script"] = steps_df["full_path_to_script"].fillna("").astype(str)
     steps_df["dag_file_path"] = steps_df["dag_file_path"].fillna("").astype(str)
-
-    # There is no clear way to show the expected date of update of a dataset.
-    # One could simply add the version to update_days_period.
-    # But a dataset may have had a minor update since the main release.
-    # So, it would be better to count from the date_published of its snapshots.
-    # However, if there are multiple snapshots, it is not clear which one to use as a reference.
-    # For example, if a dataset uses the income groups dataset, that would have a date_published that is irrelevant.
-    # So, we could create a table of estimated dates of update. But then we would need some manual way to change them.
+    # Add column with the number of days until the next expected update.
+    steps_df = add_days_to_update_columns(steps_df=steps_df)
 
     return steps_df
 
@@ -79,6 +111,8 @@ df = steps_df[
         "step",
         "db_dataset_name",
         "n_charts",
+        "days_to_update",
+        "date_of_next_update",
         "kind",
         "namespace",
         "version",
@@ -135,6 +169,8 @@ COLUMN_WIDTHS = {
     "version": 120,
     "n_versions": 100,
     "n_charts": 120,
+    "days_to_update": 180,
+    "date_of_next_update": 120,
 }
 
 # Define the options of the main grid table with pagination.
@@ -151,26 +187,34 @@ gb.configure_selection(
     groupSelectsChildren=True,
     groupSelectsFiltered=True,
 )
-# TODO: Consider coloring each row depending on the status of the step (e.g. green for up-to-date, red for outdated).
-cellstyle_jscode = JsCode(
+days_to_update_jscode = JsCode(
     """
     function(params){
-        if (params.value == 'grapher') {
+        if (params.value === undefined || params.value === null) {
             return {
                 'color': 'black',
-                'backgroundColor' : 'orange'
-        }
-        }
-        else{
-            return{
+                'backgroundColor': 'yellow'
+            }
+        } else if (params.value <= 0) {
+            return {
                 'color': 'black',
-                'backgroundColor': 'lightpink'
+                'backgroundColor': 'red'
+            }
+        } else if (params.value > 0 && params.value < 31) {
+            return {
+                'color': 'black',
+                'backgroundColor': 'orange'
+            }
+        } else {
+            return {
+                'color': 'black',
+                'backgroundColor': 'green'
             }
         }
-};
-"""
+    }
+    """
 )
-gb.configure_columns("channel", cellStyle=cellstyle_jscode)
+gb.configure_columns("days_to_update", cellStyle=days_to_update_jscode)
 gb.configure_pagination(paginationAutoPageSize=False, paginationPageSize=20)
 grid_options = gb.build()
 
