@@ -21,9 +21,10 @@ from etl.config import WIZARD_IS_REMOTE
 #    * "archivable": The step is archivable if the step has no chart, and the same step exists in a newer version.
 #  * Consider creating a script to regularly check for snapshot updates, fetch them and add them to the temporary dag (this is the way that the "updatability" will know if there are snapshot updates available).
 #  * Define a metric of update prioritisation, based on number of charts (or views) and days to update. Sort steps table by this metric.
-#  * Let user optionally define the version of the new steps to be created.
 
 # Current date.
+# This is used as the default version of new steps to be created.
+# It is also used to calculate the number of days until the next expected update.
 TODAY = datetime.now().strftime("%Y-%m-%d")
 
 # CONFIG
@@ -345,8 +346,14 @@ def execute_command(cmd):
         return e.stderr
 
 
+# Add an expander menu with additional parameters for the update command.
+with st.expander("Update parameters", expanded=False):
+    dry_run = st.checkbox(
+        "Dry run", True, help="If checked, the update command will not write anything to the dag or create any files."
+    )
+    version_new = st.text_input("New version", value=TODAY, help="Version of the new steps to be created.")
+
 # Button to execute the update command and show its output.
-dry_run = st.checkbox("Dry run", True)
 if st.button(
     f"Update {len(st.session_state.get('selected_steps', []))} steps",
     help="Update steps in the _Operations list_.",
@@ -358,7 +365,12 @@ if st.button(
             st.stop()
         else:
             # TODO: It would be better to directly use StepUpdater instead of a subprocess.
-            command = "etl update " + " ".join(st.session_state.get("selected_steps", [])) + " --non-interactive"
+            command = (
+                "etl update "
+                + " ".join(st.session_state.get("selected_steps", []))
+                + " --non-interactive"
+                + f" --step-version-new {version_new}"
+            )
             if dry_run:
                 command += " --dry-run"
             cmd_output = execute_command(command)
