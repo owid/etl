@@ -297,7 +297,8 @@ class StepUpdater:
         steps = [
             step
             for step in steps
-            if self.steps_df[self.steps_df["step"] == step]["version"].item() not in [step_version_new, "latest"]
+            if (self.steps_df[self.steps_df["step"] == step]["version"].item() not in [step_version_new, "latest"])
+            and (self.steps_df[self.steps_df["step"] == step]["update_period_days"].item() != 0)
         ]
 
         # If step_headers is not explicitly defined, get headers for each step from their corresponding dag file.
@@ -312,7 +313,7 @@ class StepUpdater:
         if len(steps) == 0:
             log.info(
                 "No steps to be updated. "
-                "You may have attempted to update steps that are already in their latest version."
+                "You may have attempted to update steps that are already in their latest version or that have update periods of 0 days."
             )
         else:
             # Steps need to be updated hierarchically: First snapshots, then meadow, then garden, then grapher.

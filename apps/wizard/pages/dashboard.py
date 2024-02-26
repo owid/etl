@@ -10,6 +10,22 @@ from st_aggrid.grid_options_builder import GridOptionsBuilder
 from apps.step_update.cli import StepUpdater
 from etl.config import WIZARD_IS_REMOTE
 
+# TODO:
+# Ensure update_period_days can only be >= 0. Add this to the guidelines.
+# Add columns:
+#  * "days to update":
+#    * Red: If days to update <= 0.
+#    * Shades of color (e.g. green to orange): Going from the day when it's updated to the day when it's due for next update.
+#    * Yellow: If update_period_days is not defined.
+#  * "updatability":
+#    * "up-to-date": The step is up to date if update_period_days is 0 or all step's dependencies are on their latest version.
+#    * "minor": The step can have a minor update if update_period_days is not 0 and any dependency is not latest while all snapshots are latest.
+#    * "major": The step needs a major update if update_period_days is not 0 and any snapshot is not latest.
+#    * "archivable": The step is archivable if the step has no chart, and the same step exists in a newer version.
+#  * Consider creating a script to regularly check for snapshot updates, fetch them and add them to the temporary dag (this is the way that the "updatability" will know if there are snapshot updates available).
+#  * Define a metric of update prioritisation, based on number of charts (or views) and days to update. Sort steps table by this metric.
+#  * Let user optionally define the version of the new steps to be created.
+
 # CONFIG
 st.set_page_config(
     page_title="Wizard: ETL Dashboard",
@@ -189,12 +205,22 @@ if st.button("Add selected steps to the operation list"):
     update_operations_list(new_selected_steps)
 
 
-def include_dependencies(step):
+def include_all_dependencies(step):
     step_dependencies = steps_df[steps_df["step"] == step]["all_active_dependencies"].item()
     update_operations_list(step_dependencies)
 
 
-def include_usages(step):
+def include_direct_dependencies(step):
+    step_dependencies = steps_df[steps_df["step"] == step]["direct_dependencies"].item()
+    update_operations_list(step_dependencies)
+
+
+def include_direct_usages(step):
+    step_usages = steps_df[steps_df["step"] == step]["direct_usages"].item()
+    update_operations_list(step_usages)
+
+
+def include_all_usages(step):
     step_usages = steps_df[steps_df["step"] == step]["all_active_usages"].item()
     update_operations_list(step_usages)
 
@@ -215,19 +241,36 @@ with st.container(border=True):
     if st.session_state.get("selected_steps"):
         for step in st.session_state["selected_steps"]:
             # Define the layout of the list.
-            cols = st.columns([1, 3, 1, 1])
+            cols = st.columns([1, 3, 1, 1, 1, 1])
 
             # Define the columns in order (from left to right) as a list of tuples (message, key suffix, function).
             actions = [
                 ("🗑️", "remove", remove_selected_step, "Remove this step from the _Operations list_."),
                 ("write", None, lambda step: step, ""),
                 (
-                    "Add dependencies",
-                    "deps",
-                    include_dependencies,
+                    "Add direct dependencies",
+                    "dependencies_direct",
+                    include_direct_dependencies,
+                    "Add direct dependencies of this step to the _Operations list_.",
+                ),
+                (
+                    "Add all dependencies",
+                    "dependencies_all",
+                    include_all_dependencies,
                     "Add all dependencies of this step to the _Operations list_.",
                 ),
-                ("Add usages", "usages", include_usages, "Add all usages of this step to the _Operations list_."),
+                (
+                    "Add direct usages",
+                    "usages_direct",
+                    include_all_usages,
+                    "Add direct usages of this step to the _Operations list_.",
+                ),
+                (
+                    "Add all usages",
+                    "usages_all",
+                    include_all_usages,
+                    "Add all usages of this step to the _Operations list_.",
+                ),
             ]
 
             # TODO: Consider adding step buttons to:
