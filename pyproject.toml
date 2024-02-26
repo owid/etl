@@ -64,10 +64,10 @@ typing-extensions = "^4.7.1"
 scipy = "^1.11.2"
 selenium = "^4.15.1"
 geopandas = "^0.14.1"
-shapely = "^2.0.2"
+shapely = "^2.0.3"
 fasteners = "^0.19"
 cdsapi = "^0.6.1"
-rioxarray = "^0.15.0"
+rioxarray = "^0.15.1"
 tiktoken = "^0.6.0"
 
 [tool.poetry.group.api.dependencies]
@@ -84,6 +84,7 @@ streamlit-extras = "^0.3.0"
 streamlit-agraph = "^0.0.45"
 streamlit-vertical-slider = "^2.0"
 plotly = ">=5.7.0"
+geographiclib = "^2.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = ">=7.1.2"

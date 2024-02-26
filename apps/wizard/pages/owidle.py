@@ -8,6 +8,7 @@ import geopandas as gpd
 import pandas as pd
 import plotly.express as px
 import streamlit as st
+from geographiclib.geodesic import Geodesic
 from owid.catalog import Dataset, Table
 from st_pages import add_indentation
 
@@ -120,49 +121,19 @@ def load_data(placeholder: str) -> Tuple[pd.DataFrame, gpd.GeoDataFrame, str]:
 DATA, GEO, SOLUTION = load_data("cached")
 # st.write(SOLUTION)
 OPTIONS = sorted(DATA["location"].unique())
+# Check if solution has gdp data
+countries_with_gdp_data = set(DATA.dropna(subset=["gdp_per_capita"])["location"].unique())
+SOLUTION_HAS_GDP = SOLUTION in countries_with_gdp_data
 
 
 ##########################################
 # COMPARE GUESS WITH SOLUTION
 ##########################################
-def get_flat_earth_bearing(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
-    """
-    Flat-earther bearing
-
-    For globe projected initial or final bearing: https://www.movable-type.co.uk/scripts/latlong.html
-    # y = sin(lon2 - lon1) * cos(lat2)
-    # x = cos(lat1) * sin(lat2) - sin(lat1) * cos(lat2) * cos(lon2 - lon1)
-    # angle = atan2(x, y)
-    # bearing = (degrees(angle) + 360) % 360  # in degrees
-    """
-    from math import atan2, degrees
-
-    relative_lat = lat2 - lat1
-    relative_lon = lon2 - lon1
-    angle = atan2(relative_lon, relative_lat)
-
-    return degrees(angle)
-
-
-def haversine(lat1: float, lon1: float, lat2: float, lon2: float) -> int:
-    """
-    Calculate the great circle distance between two points
-    on the earth (specified in decimal degrees)
-    """
-    # convert decimal degrees to radians
-    lon1, lat1, lon2, lat2 = map(radians, [lon1, lat1, lon2, lat2])
-
-    # haversine formula
-    dlon = lon2 - lon1
-    dlat = lat2 - lat1
-    a = sin(dlat / 2) ** 2 + cos(lat1) * cos(lat2) * sin(dlon / 2) ** 2
-    c = 2 * asin(sqrt(a))
-    r = 6371  # Radius of earth in kilometers. Use 3956 for miles
-    return int(c * r)
-
-
 def distance_to_solution(country_selected: str) -> Tuple[str, str, str]:
-    """Estimate distance (km) from guessed to solution, including direction."""
+    """Estimate distance (km) from guessed to solution, including direction.
+
+    ref: https://stackoverflow.com/a/47780264
+    """
     # Estimate distance
     # st.write(GEO)
     # GEO_DIST = cast(gpd.GeoDataFrame, GEO.to_crs(3310))
@@ -173,26 +144,41 @@ def distance_to_solution(country_selected: str) -> Tuple[str, str, str]:
     # Estimate direction
     guess = guess.item()
     solution = solution.item()
-    direction = get_flat_earth_bearing(guess.y, guess.x, solution.y, solution.x)
-    if (direction > -22.5) & (direction <= 22.5):
+
+    # Use Geodesic to calculate distance
+    # More details:
+    # - https://geographiclib.sourceforge.io/Python/doc/examples.html#initializing
+    geod = Geodesic.WGS84  # type: ignore
+    # geod.Inverse returns a Geodesic dictionary (https://geographiclib.sourceforge.io/Python/doc/interface.html#dict)
+    print("----------------")
+    print(guess.y, solution.y, guess.x, solution.x)
+    print("----------------")
+    g = geod.Inverse(guess.y, guess.x, solution.y, solution.x)
+    print(g)
+    # Distance in km
+    distance = g["s12"] / 1000
+    print(distance)
+    # Initial bearing angle (angle from guess to solution in degrees)
+    bearing = g["azi1"]
+
+    if (bearing > -22.5) & (bearing <= 22.5):
         arrow = "⬆️"
-    elif (direction > 22.5) & (direction <= 67.5):
+    elif (bearing > 22.5) & (bearing <= 67.5):
         arrow = "↗️"
-    elif (direction > 67.5) & (direction <= 112.5):
+    elif (bearing > 67.5) & (bearing <= 112.5):
         arrow = "➡️"
-    elif (direction > 112.5) & (direction <= 157.5):
+    elif (bearing > 112.5) & (bearing <= 157.5):
         arrow = "↘️"
-    elif (direction > 157.5) | (direction <= -157.5):
+    elif (bearing > 157.5) | (bearing <= -157.5):
         arrow = "⬇️"
-    elif (direction > -157.5) & (direction <= -112.5):
+    elif (bearing > -157.5) & (bearing <= -112.5):
         arrow = "↙️"
-    elif (direction > -112.5) & (direction <= -67.5):
+    elif (bearing > -112.5) & (bearing <= -67.5):
         arrow = "⬅️"
     else:
         arrow = "↖️"
 
-    distance = haversine(guess.y, guess.x, solution.y, solution.x)
-
+    # If user has guessed the correct country
     if country_selected == SOLUTION:
         st.session_state.user_has_succeded = True
         return "0", "🎉", "100"
@@ -202,7 +188,7 @@ def distance_to_solution(country_selected: str) -> Tuple[str, str, str]:
 
     # Ensure string types
     score = str(score)
-    distance = str(distance)
+    distance = str(int(distance))
 
     return distance, arrow, score
 
@@ -351,6 +337,8 @@ def display_metadata(metadata):
 ##########################################
 with st.container(border=True):
     countries_guessed = [guess["guess"] for guess in st.session_state.guesses if guess["guess"] != ""]
+    if not SOLUTION_HAS_GDP:
+        st.warning("We don't have GDP data for this country!")
     col1, col2 = st.columns(2)
     with col1:
         plot_chart_population(countries_guessed)
