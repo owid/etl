@@ -6,7 +6,7 @@ from typing import Literal
 
 import yaml
 
-from etl.config import WIZARD_IS_REMOTE
+from etl.config import ENV
 from etl.paths import APPS_DIR
 
 _config_path = APPS_DIR / "wizard" / "config" / "config.yml"
@@ -27,8 +27,8 @@ def load_wizard_config():  # -> Any:
         # Default for `enable` is True
         enable = props.get("enable", True)
 
-        # If `disable_on_remote` is set, then disable if we are on remote (i.e. WIZARD_IS_REMOTE is set to True)
-        if WIZARD_IS_REMOTE:
+        # If `disable_on_remote` is set, then disable if we are on remote (i.e. staging or production)
+        if ENV in ("production", "staging"):
             enable = (not disable_on_remote) and enable
 
         return enable
