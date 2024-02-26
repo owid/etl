@@ -8,7 +8,7 @@ import pandas as pd
 import pyproj
 import xarray as xr
 from owid.catalog import Table
-from rioxarray.exceptions import NoDataInBounds
+from rioxarray.exceptions import NoDataInBounds, OneDimensionalRaster
 from shapely.geometry import mapping
 from structlog import get_logger
 from tqdm import tqdm
@@ -43,7 +43,7 @@ def _load_shapefile(file_path: str) -> gpd.GeoDataFrame:
 def run(dest_dir: str) -> None:
     # Activates the usage of the global context. Using this option can enhance the performance
     # of initializing objects in single-threaded applications.
-    pyproj.set_use_global_context(True)
+    pyproj.set_use_global_context(True)  # type: ignore
 
     #
     # Load inputs.
@@ -82,22 +82,17 @@ def run(dest_dir: str) -> None:
     # Iterate over each row in the shapefile data.
     for i in tqdm(range(shapefile.shape[0])):
         # Extract the data for the current row.
-        geometry = mapping(shapefile.iloc[i]["geometry"])
+        geometry = shapefile.iloc[i]["geometry"]
         country_name = shapefile.iloc[i]["WB_NAME"]
 
         try:
-            # Clip the temperature data to the current country's shape.
-            # clip = da.rio.clip(data.geometry.apply(mapping), data.crs)
-
-            # Get the bounding box of the MultiPolygon
+            # Clip to the bounding box for the country's shape to significantly improve performance.
             xmin, ymin, xmax, ymax = geometry.bounds
-
-            # Now, you can use these bounds with `xds.rio.clip_box`
             clip = da.rio.clip_box(minx=xmin, miny=ymin, maxx=xmax, maxy=ymax)
 
             # Clip data to the country's shape.
             # NOTE: if memory is an issue, we could use `from_disk=True` arg
-            clip = clip.rio.clip([geometry], shapefile.crs)
+            clip = clip.rio.clip([mapping(geometry)], shapefile.crs)
 
             # Calculate weights based on latitude to account for area distortion in latitude-longitude grids.
             weights = np.cos(np.deg2rad(clip.latitude))
@@ -112,7 +107,7 @@ def run(dest_dir: str) -> None:
             # Store the calculated mean temperature in the dictionary with the country's name as the key.
             temp_country[country_name] = country_weighted_mean
 
-        except NoDataInBounds:
+        except (NoDataInBounds, OneDimensionalRaster):
             log.info(
                 f"No data was found in the specified bounds for {country_name}."
             )  # If an error occurs (usually due to small size of the country), add the country's name to the small_countries list.  # If an error occurs (usually due to small size of the country), add the country's name to the small_countries list.

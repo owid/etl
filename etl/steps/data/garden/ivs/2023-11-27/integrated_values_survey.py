@@ -1,5 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
 
+from typing import List
+
 from owid.catalog import Table
 from structlog import get_logger
 from tabulate import tabulate
@@ -18,6 +20,74 @@ TABLEFMT = "pretty"
 
 # Set margin for checks
 MARGIN = 0.5
+
+# Define question suffixes
+
+
+IMPORTANT_IN_LIFE_QUESTIONS = [
+    "important_in_life_family",
+    "important_in_life_friends",
+    "important_in_life_leisure_time",
+    "important_in_life_politics",
+    "important_in_life_work",
+    "important_in_life_religion",
+]
+
+INTERESTED_IN_POLITICS_QUESTIONS = ["interested_politics"]
+
+POLITICAL_ACTION_QUESTIONS = [
+    "political_action_signing_a_petition",
+    "political_action_joining_in_boycotts",
+    "political_action_attending_peaceful_demonstrations",
+    "political_action_joining_unofficial_strikes",
+]
+
+ENVIRONMENT_VS_ECONOMY_QUESTIONS = ["env_ec"]
+
+INCOME_EQUALITY_QUESTIONS = ["eq_ineq"]
+
+SCHWARTZ_QUESTIONS = [
+    "new_ideas",
+    "rich",
+    "secure",
+    "good_time",
+    "help_others",
+    "success",
+    "risks",
+    "behave",
+    "respect_environment",
+    "tradition",
+]
+
+WORK_VS_LEISURE_QUESTIONS = ["lei_vs_wk"]
+
+WORK_QUESTIONS = ["work_is_a_duty", "work_should_come_first"]
+
+MOST_SERIOUS_PROBLEM_QUESTIONS = ["most_serious"]
+
+JUSTIFIABLE_QUESTIONS = [
+    "claiming_benefits",
+    "stealing_property",
+    "parents_beating_children",
+    "violence_against_other_people",
+    "avoiding_fare_on_public_transport",
+    "cheating_on_taxes",
+    "accepting_a_bribe",
+    "homosexuality",
+    "prostitution",
+    "abortion",
+    "divorce",
+    "euthanasia",
+    "suicide",
+    "having_casual_sex",
+    "sex_before_marriage",
+    "invitro_fertilization",
+    "death_penalty",
+    "man_beating_wife",
+    "political_violence",
+]
+
+WORRIES_QUESTIONS = ["losing_job", "not_being_able_to_provide_good_education", "war", "terrorist_attack", "civil_war"]
 
 
 def run(dest_dir: str) -> None:
@@ -87,18 +157,29 @@ def drop_indicators_and_replace_nans(tb: Table) -> Table:
     # Replace 100 by null in columns containing "missing"
     tb[missing_cols] = tb[missing_cols].replace(100, float("nan"))
 
+    # Replace nulls in Schwartz questions by 0 when the main answer is not null
+    tb = solve_nulls_values_in_schwartz_questions(
+        tb=tb,
+        questions=SCHWARTZ_QUESTIONS,
+        main_answer="like_me_agg",
+        other_answers=[
+            "not_like_me_agg",
+            "very_much_like_me",
+            "like_me",
+            "somewhat_like_me",
+            "a_little_like_me",
+            "not_like_me",
+            "not_at_all_like_me",
+            "dont_know",
+            "missing",
+        ],
+    )
+
     # Replace 0 by null for don't know columns if the rest of columns are null
     # For important in life questions
     tb = replace_dont_know_by_null(
         tb=tb,
-        questions=[
-            "important_in_life_family",
-            "important_in_life_friends",
-            "important_in_life_leisure_time",
-            "important_in_life_politics",
-            "important_in_life_work",
-            "important_in_life_religion",
-        ],
+        questions=IMPORTANT_IN_LIFE_QUESTIONS,
         answers=[
             "very",
             "rather",
@@ -110,96 +191,66 @@ def drop_indicators_and_replace_nans(tb: Table) -> Table:
     # For interested in politics question
     tb = replace_dont_know_by_null(
         tb=tb,
-        questions=["interested_politics"],
+        questions=INTERESTED_IN_POLITICS_QUESTIONS,
         answers=["very", "somewhat", "not_very", "not_at_all"],
     )
 
     # For political action questions
     tb = replace_dont_know_by_null(
         tb=tb,
-        questions=[
-            "political_action_signing_a_petition",
-            "political_action_joining_in_boycotts",
-            "political_action_attending_peaceful_demonstrations",
-            "political_action_joining_unofficial_strikes",
-        ],
+        questions=POLITICAL_ACTION_QUESTIONS,
         answers=["have_done", "might_do", "never"],
     )
 
     # For environment vs. economy question
-    tb = replace_dont_know_by_null(tb=tb, questions=["env_ec"], answers=["environment", "economy", "other_answer"])
+    tb = replace_dont_know_by_null(
+        tb=tb, questions=ENVIRONMENT_VS_ECONOMY_QUESTIONS, answers=["environment", "economy", "other_answer"]
+    )
 
     # For income equality question
-    tb = replace_dont_know_by_null(tb=tb, questions=["eq_ineq"], answers=["equality", "neutral", "inequality"])
+    tb = replace_dont_know_by_null(
+        tb=tb, questions=INCOME_EQUALITY_QUESTIONS, answers=["equality", "neutral", "inequality"]
+    )
 
-    # For "Scwartz" questions
+    # For "Schwartz" questions
     tb = replace_dont_know_by_null(
         tb=tb,
-        questions=[
-            "new_ideas",
-            "rich",
-            "secure",
-            "good_time",
-            "help_others",
-            "success",
-            "risks",
-            "behave",
-            "respect_environment",
-            "tradition",
-        ],
+        questions=SCHWARTZ_QUESTIONS,
         answers=["very_much_like_me", "like_me", "somewhat_like_me", "a_little_like_me", "not_like_me"],
     )
 
     # For "Work vs. leisure" question
     tb = replace_dont_know_by_null(
         tb=tb,
-        questions=["lei_vs_wk"],
+        questions=WORK_VS_LEISURE_QUESTIONS,
         answers=["work", "leisure", "neutral"],
     )
 
     # For work questions
     tb = replace_dont_know_by_null(
         tb=tb,
-        questions=["work_is_a_duty", "work_should_come_first"],
+        questions=WORK_QUESTIONS,
         answers=["strongly_agree", "agree", "neither", "disagree", "strongly_disagree"],
     )
 
     # For most serious problem of the world question
     tb = replace_dont_know_by_null(
-        tb=tb, questions=["most_serious"], answers=["poverty", "women_discr", "sanitation", "education", "pollution"]
+        tb=tb,
+        questions=MOST_SERIOUS_PROBLEM_QUESTIONS,
+        answers=["poverty", "women_discr", "sanitation", "education", "pollution"],
     )
 
     # For justifiable questions
     tb = replace_dont_know_by_null(
         tb=tb,
-        questions=[
-            "claiming_benefits",
-            "stealing_property",
-            "parents_beating_children",
-            "violence_against_other_people",
-            "avoiding_fare_on_public_transport",
-            "cheating_on_taxes",
-            "accepting_a_bribe",
-            "homosexuality",
-            "prostitution",
-            "abortion",
-            "divorce",
-            "euthanasia",
-            "suicide",
-            "having_casual_sex",
-            "sex_before_marriage",
-            "invitro_fertilization",
-            "death_penalty",
-            "man_beating_wife",
-            "political_violence",
-        ],
+        questions=JUSTIFIABLE_QUESTIONS,
         answers=["never_just_agg", "always_just_agg", "neutral"],
     )
 
     # For worries questions
     tb = replace_dont_know_by_null(
         tb=tb,
-        questions=["losing_job", "not_being_able_to_provide_good_education", "war", "terrorist_attack", "civil_war"],
+        questions=WORRIES_QUESTIONS,
         answers=["very_much", "a_great_deal", "not_much", "not_at_all"],
     )
 
@@ -229,6 +280,28 @@ def replace_dont_know_by_null(tb: Table, questions: list, answers: list) -> Tabl
     return tb
 
 
+def solve_nulls_values_in_schwartz_questions(
+    tb: Table,
+    questions: list,
+    main_answer: str,
+    other_answers: List[str],
+) -> Table:
+    """
+    Replace null values in Schwartz questions by 0 when the main answer is not null
+    """
+
+    for q in questions:
+        # Add q to each member of answers
+        main_answer_by_question = f"{main_answer}_{q}"
+        other_answers_by_question = [f"{a}_{q}" for a in other_answers]
+
+        # Assign 0 to each other_answers_by_question when it's null and when main_answer_by_question is not null
+        for a in other_answers_by_question:
+            tb.loc[(tb[main_answer_by_question].notnull()) & (tb[a].isnull()), a] = 0
+
+    return tb
+
+
 def sanity_checks(tb: Table) -> Table:
     """
     Perform sanity checks on the data
@@ -237,14 +310,7 @@ def sanity_checks(tb: Table) -> Table:
     # For important in life questions
     tb = check_sum_100(
         tb=tb,
-        questions=[
-            "important_in_life_family",
-            "important_in_life_friends",
-            "important_in_life_leisure_time",
-            "important_in_life_politics",
-            "important_in_life_work",
-            "important_in_life_religion",
-        ],
+        questions=IMPORTANT_IN_LIFE_QUESTIONS,
         answers=["very", "rather", "not_very", "notatall", "dont_know", "missing"],
         margin=MARGIN,
     )
@@ -252,7 +318,7 @@ def sanity_checks(tb: Table) -> Table:
     # For interested in politics question
     tb = check_sum_100(
         tb=tb,
-        questions=["interested_politics"],
+        questions=INTERESTED_IN_POLITICS_QUESTIONS,
         answers=["very", "somewhat", "not_very", "not_at_all", "dont_know", "missing"],
         margin=MARGIN,
     )
@@ -260,12 +326,7 @@ def sanity_checks(tb: Table) -> Table:
     # For political action questions
     tb = check_sum_100(
         tb=tb,
-        questions=[
-            "political_action_signing_a_petition",
-            "political_action_joining_in_boycotts",
-            "political_action_attending_peaceful_demonstrations",
-            "political_action_joining_unofficial_strikes",
-        ],
+        questions=POLITICAL_ACTION_QUESTIONS,
         answers=["have_done", "might_do", "never", "dont_know", "missing"],
         margin=MARGIN,
     )
@@ -273,7 +334,7 @@ def sanity_checks(tb: Table) -> Table:
     # For environment vs. economy question
     tb = check_sum_100(
         tb=tb,
-        questions=["env_ec"],
+        questions=ENVIRONMENT_VS_ECONOMY_QUESTIONS,
         answers=["environment", "economy", "other_answer", "dont_know", "missing"],
         margin=MARGIN,
     )
@@ -281,26 +342,15 @@ def sanity_checks(tb: Table) -> Table:
     # For income equality question
     tb = check_sum_100(
         tb=tb,
-        questions=["eq_ineq"],
+        questions=INCOME_EQUALITY_QUESTIONS,
         answers=["equality", "neutral", "inequality", "dont_know", "missing"],
         margin=MARGIN,
     )
 
-    # For "Scwartz" questions
+    # For "Schwartz" questions
     tb = check_sum_100(
         tb=tb,
-        questions=[
-            "new_ideas",
-            "rich",
-            "secure",
-            "good_time",
-            "help_others",
-            "success",
-            "risks",
-            "behave",
-            "respect_environment",
-            "tradition",
-        ],
+        questions=SCHWARTZ_QUESTIONS,
         answers=[
             "very_much_like_me",
             "like_me",
@@ -317,7 +367,7 @@ def sanity_checks(tb: Table) -> Table:
     # For "Work vs. leisure" question
     tb = check_sum_100(
         tb=tb,
-        questions=["lei_vs_wk"],
+        questions=WORK_VS_LEISURE_QUESTIONS,
         answers=["work", "leisure", "neutral", "dont_know", "missing"],
         margin=MARGIN,
     )
@@ -325,7 +375,7 @@ def sanity_checks(tb: Table) -> Table:
     # For work questions
     tb = check_sum_100(
         tb=tb,
-        questions=["work_is_a_duty", "work_should_come_first"],
+        questions=WORK_QUESTIONS,
         answers=["strongly_agree", "agree", "neither", "disagree", "strongly_disagree", "dont_know", "missing"],
         margin=MARGIN,
     )
@@ -333,7 +383,7 @@ def sanity_checks(tb: Table) -> Table:
     # For most serious problem of the world question
     tb = check_sum_100(
         tb=tb,
-        questions=["most_serious"],
+        questions=MOST_SERIOUS_PROBLEM_QUESTIONS,
         answers=["poverty", "women_discr", "sanitation", "education", "pollution", "dont_know", "missing"],
         margin=MARGIN,
     )
@@ -341,27 +391,7 @@ def sanity_checks(tb: Table) -> Table:
     # For justifiable questions
     tb = check_sum_100(
         tb=tb,
-        questions=[
-            "claiming_benefits",
-            "stealing_property",
-            "parents_beating_children",
-            "violence_against_other_people",
-            "avoiding_fare_on_public_transport",
-            "cheating_on_taxes",
-            "accepting_a_bribe",
-            "homosexuality",
-            "prostitution",
-            "abortion",
-            "divorce",
-            "euthanasia",
-            "suicide",
-            "having_casual_sex",
-            "sex_before_marriage",
-            "invitro_fertilization",
-            "death_penalty",
-            "man_beating_wife",
-            "political_violence",
-        ],
+        questions=JUSTIFIABLE_QUESTIONS,
         answers=["never_just_agg", "always_just_agg", "neutral", "dont_know", "missing"],
         margin=MARGIN,
     )
@@ -369,7 +399,7 @@ def sanity_checks(tb: Table) -> Table:
     # For worries questions
     tb = check_sum_100(
         tb=tb,
-        questions=["losing_job", "not_being_able_to_provide_good_education", "war", "terrorist_attack", "civil_war"],
+        questions=WORRIES_QUESTIONS,
         answers=["very_much", "a_great_deal", "not_much", "not_at_all", "dont_know", "missing"],
         margin=MARGIN,
     )
