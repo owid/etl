@@ -29,6 +29,6 @@ meta:
       url: https://www.oecd.org/termsandconditions
 wdir: ../../../data/snapshots/oecd/2023-09-21
 outs:
-- md5: a4673d7ac7dfdf488963b7e6eab6f1ee
-  size: 136268
-  path: plastic_aquatic_leakage.csv
+  - md5: 8f3b627b94f4e1bc0583290b9c257906
+    size: 136268
+    path: plastic_aquatic_leakage.csv

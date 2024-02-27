@@ -35,6 +35,6 @@ meta:
 
 wdir: ../../../data/snapshots/countries/2023-09-22
 outs:
-- md5: eaa0e0d76834b0f583e753dbe2cfdc97
-  size: 539
-  path: cow_ssm_majors.csv
+  - md5: 72d84c81e926d4d6538ec8302ffe8d86
+    size: 539
+    path: cow_ssm_majors.csv

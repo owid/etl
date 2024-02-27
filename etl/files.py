@@ -54,10 +54,6 @@ TEXT_CHARS = bytes(range(32, 127)) + b"\n\r\t\f\b"
 DEFAULT_CHUNK_SIZE = 512
 
 
-def dos2unix(data: bytes) -> bytes:
-    return data.replace(b"\r\n", b"\n")
-
-
 def istextblock(block: bytes) -> bool:
     if not block:
         # An empty file is considered a valid text file
@@ -75,7 +71,7 @@ def istextblock(block: bytes) -> bool:
 
 def checksum_str(s: str) -> str:
     "Return the md5 hex digest of the string."
-    return hashlib.md5(dos2unix(s.encode())).hexdigest()
+    return hashlib.md5(s.encode()).hexdigest()
 
 
 def checksum_file_nocache(filename: Union[str, Path]) -> str:
@@ -85,9 +81,6 @@ def checksum_file_nocache(filename: Union[str, Path]) -> str:
     with open(filename, "rb") as istream:
         chunk = istream.read(chunk_size)
         while chunk:
-            if istextblock(chunk[:DEFAULT_CHUNK_SIZE]):
-                chunk = dos2unix(chunk)
-
             _hash.update(chunk)
             chunk = istream.read(chunk_size)
 

@@ -15,8 +15,7 @@ meta:
     attribution_short: WHO
 
     # Files
-    url_main:
-      https://www.who.int/data/gho/data/indicators/indicator-details/GHO/general-availability-of-statins-in-the-public-health-sector
+    url_main: https://www.who.int/data/gho/data/indicators/indicator-details/GHO/general-availability-of-statins-in-the-public-health-sector
     date_accessed: 2023-11-01
 
     # License
@@ -25,6 +24,6 @@ meta:
       url: https://www.who.int/about/policies/publishing/copyright
 wdir: ../../../data/snapshots/who/2023-11-01
 outs:
-- md5: 655553642366040b293ccda2ab5ca4d2
-  size: 186313
-  path: who_statins.csv
+  - md5: e7469e5b10fbc1ab47a31586f1d153fe
+    size: 186313
+    path: who_statins.csv

@@ -1,20 +1,16 @@
 meta:
   namespace: artificial_intelligence
   short_name: ai_corporate_investment
-  name: Global Corporate Investment in AI by Investment Activity, 2013–22 (AI Index,
-    2023)
+  name: Global Corporate Investment in AI by Investment Activity, 2013–22 (AI Index, 2023)
   version: '2023-06-14'
   publication_year: 2023
   publication_date: '2023-03-20'
   source_name: NetBase Quid (2022) via AI Index (2023)
-  source_published_by: NetBase Quid (2022) via the AI Index 2023 Annual Report, AI
-    Index Steering Committee, Institute for Human-Centered AI, Stanford University,
-    Stanford, CA, April 2023
+  source_published_by: NetBase Quid (2022) via the AI Index 2023 Annual Report, AI Index Steering Committee, Institute for Human-Centered AI, Stanford University, Stanford, CA, April 2023
   url: https://drive.google.com/drive/folders/1ma9WZJzKreS8f2It1rMy_KkkbX6XwDOK
   source_data_url: https://drive.google.com/uc?export=download&id=1Vqc-L9XlaPgghNZGbAGpU23d9Pn5ZuHh
   file_extension: csv
-  license_url:
-    https://aiindex.stanford.edu/wp-content/uploads/2023/04/HAI_AI-Index-Report_2023.pdf
+  license_url: https://aiindex.stanford.edu/wp-content/uploads/2023/04/HAI_AI-Index-Report_2023.pdf
   license_name: Public domain
   date_accessed: 2023-06-19
   is_public: true
@@ -22,6 +18,6 @@ meta:
     Data from NetBase Quid via AI Index (2023) on global corporate investment in AI from 2013 to 2022. Corporate investment includes mergers and acquisitions, minority stakes, private investment, and public offerings.
 wdir: ../../../data/snapshots/artificial_intelligence/2023-06-14
 outs:
-- md5: 92e59f47fe749ff1b20fdc6b6c3347f6
-  size: 1205
-  path: ai_corporate_investment.csv
+  - md5: 1044a26d4ce3e6259e30ac9dde93194d
+    size: 1205
+    path: ai_corporate_investment.csv

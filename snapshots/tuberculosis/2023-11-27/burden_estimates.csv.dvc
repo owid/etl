@@ -26,6 +26,6 @@ meta:
 
 wdir: ../../../data/snapshots/tuberculosis/2023-11-27
 outs:
-  - md5: e43b1122a8387c2f4e3d7278caada121
+  - md5: 7b25e5471711704535b036f69530f7cb
     size: 1015793
     path: burden_estimates.csv

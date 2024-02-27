@@ -18,8 +18,7 @@ meta:
 
     # Citation
     producer: Correlates of War
-    citation_full: Correlates of War Project. 2017. “State System Membership List,
-      v2016.” Online, http://correlatesofwar.org
+    citation_full: Correlates of War Project. 2017. “State System Membership List, v2016.” Online, http://correlatesofwar.org
     attribution: Correlates of War - State System Membership (2017)
     attribution_short: COW
 
@@ -35,6 +34,6 @@ meta:
 
 wdir: ../../../data/snapshots/countries/2023-09-22
 outs:
-- md5: 66885ad5b0281f620cabdd899a814434
-  size: 10845
-  path: cow_ssm_states.csv
+  - md5: 3f234a00f07689a4297dc80d39cc832b
+    size: 10845
+    path: cow_ssm_states.csv

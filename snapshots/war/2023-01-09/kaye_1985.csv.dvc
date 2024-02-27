@@ -5,14 +5,11 @@ meta:
   source_name: Kaye et al. (1985)
   publication_year: 1985
   publication_date: 1985-11-01
-  url: 
-    https://books.google.es/books/about/Major_Armed_Conflict.html?id=Xce_PwAACAAJ&redir_esc=y
-  source_data_url: 
-    https://docs.google.com/spreadsheets/d/1GIB-8ZPNXqTATwHU4ZDavKz0iJoiOg2UROfoRz43kQY/edit#gid=1251805698
+  url: https://books.google.es/books/about/Major_Armed_Conflict.html?id=Xce_PwAACAAJ&redir_esc=y
+  source_data_url: https://docs.google.com/spreadsheets/d/1GIB-8ZPNXqTATwHU4ZDavKz0iJoiOg2UROfoRz43kQY/edit#gid=1251805698
   file_extension: csv
   license_url:
-  license_name: Department of National Defence, Canada, Operational Research and Analysis
-    Establishment, 1985
+  license_name: Department of National Defence, Canada, Operational Research and Analysis Establishment, 1985
   date_accessed: 2023-01-09
   is_public: true
   description: >-
@@ -144,6 +141,6 @@ meta:
       - We excluded conflicts with 0 deaths.
 wdir: ../../../data/snapshots/war/2023-01-09
 outs:
-- md5: ebe21d08d52544800ffdfdb2b9ceec62
-  size: 81484
-  path: kaye_1985.csv
+  - md5: 3d199e72dd14724172c093594f1225ec
+    size: 81484
+    path: kaye_1985.csv

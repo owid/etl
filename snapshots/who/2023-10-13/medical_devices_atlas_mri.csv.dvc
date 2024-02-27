@@ -19,8 +19,7 @@ meta:
 
       The **WHO Baseline Country Survey on Medical Devices** was developed in 2009. The aim was to determine the health technology areas that required support in countries and regions. It was launched in February 2010. In 2013, it was updated and re-launched as the Global Atlas of Medical Devices. The GAMD was updated in 2017, and the 2022 update is under development.
     date_published: '2022'
-    title_snapshot: Global atlas of medical devices -  Magnetic Resonance Imaging
-      Units (MRI)
+    title_snapshot: Global atlas of medical devices -  Magnetic Resonance Imaging Units (MRI)
     description_snapshot: |-
       The dataset contains information obtained from the Global Atlas of Medical Devices (GAMD) pertaining to the total density of Magnetic Resonance Imaging Units (MRI) per million population.
     # Citation
@@ -30,8 +29,7 @@ meta:
     attribution_short: WHO
 
     # Files
-    url_main:
-      https://www.who.int/teams/health-product-policy-and-standards/assistive-and-medical-technology/medical-devices/global-atlas-of-medical-devices
+    url_main: https://www.who.int/teams/health-product-policy-and-standards/assistive-and-medical-technology/medical-devices/global-atlas-of-medical-devices
     date_accessed: 2023-10-13
 
     # License
@@ -41,6 +39,6 @@ meta:
 
 wdir: ../../../data/snapshots/who/2023-10-13
 outs:
-- md5: 3f9ccbcd55cdbb67fc16f950b814942a
-  size: 62382
-  path: medical_devices_atlas_mri.csv
+  - md5: cb1b7cb7d5be79d84d53b91dccff5a57
+    size: 62382
+    path: medical_devices_atlas_mri.csv
