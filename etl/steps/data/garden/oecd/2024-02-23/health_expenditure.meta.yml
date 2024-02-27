@@ -186,7 +186,7 @@ definitions:
     Includes government schemes, social health insurance, compulsory private insurance and compulsory medical saving accounts.
 
     <% elif financing_scheme == "Government schemes" %>
-    Includes schemes defined by law or by the government, with a separate budget set for the programme, and where a government unit has an overall responsibility for it.
+    Includes schemes defined by law or by the government, with a separate budget set for the programme, and where a government unit has overall responsibility for it.
 
     <% elif financing_scheme == "Compulsory contributory health insurance schemes" %>
     Includes financing arrangements to ensure access to health care for specific population groups through mandatory participation and eligibility based on the payment of health insurance contributions by or on behalf of the individuals concerned.
@@ -224,6 +224,9 @@ definitions:
     <% elif financing_scheme == "Rest of the world financing schemes (non-resident)" %>
     Includes financial arrangements involving institutional units that are resident abroad, but who collect, pool resources and purchase health care goods and services on behalf of residents, without transiting their funds through a resident scheme.
 
+    <% elif financing_scheme == "Total" %>
+    Includes all health care financing schemes: government, compulsory contributory insurance, voluntary insurance, household out-of-pocket payments, and rest of the world financing schemes.
+
     <%- endif -%>
 
 
@@ -249,12 +252,9 @@ tables:
           name: Health expenditure (% of total health expenditure) - <<financing_scheme>>
           numDecimalPlaces: 1
           tolerance: 5
+        presentation:
+          title_public: Health expenditure (as a share of total expenditure) - <<financing_scheme>>
 
-        # description_short:
-        # description_key:
-
-        # presentation:
-        #   title_public:
       share_gdp:
         title: Health expenditure (as a share of GDP) - <<financing_scheme>>
         description_short: Health expenditure in <<financing_scheme.lower()>> divided by gross domestic product, expressed as a percentage. {definitions.description_short}
@@ -264,6 +264,8 @@ tables:
           name: Health expenditure (% of GDP) - <<financing_scheme>>
           numDecimalPlaces: 1
           tolerance: 5
+        presentation:
+          title_public: Health expenditure (as a share of GDP) - <<financing_scheme>>
 
       ppp_dollars_per_capita:
         title: Health expenditure per capita - <<financing_scheme>>
@@ -274,6 +276,8 @@ tables:
           name: Health expenditure per capita - <<financing_scheme>>
           numDecimalPlaces: 0
           tolerance: 5
+        presentation:
+          title_public: Health expenditure per capita - <<financing_scheme>>
 
       ppp_dollars:
         title: Health expenditure - <<financing_scheme>>
@@ -284,3 +288,5 @@ tables:
           name: Health expenditure - <<financing_scheme>>
           numDecimalPlaces: 0
           tolerance: 5
+        presentation:
+          title_public: Health expenditure - <<financing_scheme>>
