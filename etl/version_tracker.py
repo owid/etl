@@ -20,6 +20,10 @@ log = structlog.get_logger()
 DAG_TEMP_STEP = "data-private://meadow/temp/latest/step"
 
 
+# Get current date (used to estimate the number of days until the next update of each step).
+TODAY = datetime.now().strftime("%Y-%m-%d")
+
+
 def list_all_steps_in_dag(dag: Dict[str, Any]) -> List[str]:
     """List all steps in a dag.
 
@@ -603,10 +607,29 @@ class VersionTracker:
 
         if self.connect_to_db:
             # Add info from DB.
+            # NOTE: The output may have more rows than the input. This can happen for different reasons:
+            #  * A grapher dataset was created by ETL, but the ETL step has been removed from the dag, while the
+            #    grapher dataset still exists. This shouldn't happen, but it does happen (mostly for fasttrack drafts).
+            #  * A grapher dataset (in production) has been created by ETL in a branch which is not yet merged. This,
+            #    again, should not happen, but it does happen every now and then, exceptionally.
             steps_df = self._add_info_from_db(steps_df=steps_df)
 
         # Add columns with the list of forward and backwards versions for each step.
         steps_df = self._add_columns_with_different_step_versions(steps_df=steps_df)
+
+        # Add columns with the date and the number of days until the next update.
+        steps_df = add_days_to_update_columns(steps_df=steps_df)
+
+        # For convenience, add full local path to dag files to steps dataframe.
+        steps_df["dag_file_path"] = [
+            (paths.DAG_DIR / dag_file_name).with_suffix(".yml") if dag_file_name else None
+            for dag_file_name in steps_df["dag_file_name"].fillna("")
+        ]
+        # For convenience, add full local path to script files.
+        steps_df["full_path_to_script"] = [
+            paths.BASE_DIR / script_file_name if script_file_name else None
+            for script_file_name in steps_df["path_to_script"].fillna("")
+        ]
 
         return steps_df
 
@@ -770,3 +793,58 @@ def run_version_tracker_checks(skip_db: bool = False, warn_on_archivable: bool =
     Run all version tracker sanity checks.
     """
     VersionTracker(connect_to_db=not skip_db, warn_on_archivable=warn_on_archivable).apply_sanity_checks()
+
+
+def add_days_to_update_columns(steps_df):
+    """Add columns to steps dataframe with the date of next update and the number of days until the next update.
+
+    We currently don't have a clear way to calculate the expected date of update of a dataset.
+    For now, we simply add update_period_days to the step's version.
+    But a dataset may have had a minor update since the main release (while the origins are still the same).
+
+    Alternatively, we could add update_period_days to the date_published of its snapshots.
+    However, if there are multiple snapshots, it is not clear which one to use as a reference.
+    For example, if a dataset uses the income groups dataset, that would have a date_published that is irrelevant.
+    We would need some way to decide which snapshot(s) is (are) the main one(s).
+
+    For now, one option is that, on a minor update, we manually edit update_period_days.
+    For example, if a dataset is expected to be updated every 365 days, but had a minor update after 1 month, we could
+    modify update_period_days to be 335.
+
+    Parameters
+    ----------
+    steps_df : pd.DataFrame
+        Steps dataframe.
+
+    Returns
+    -------
+    df : pd.DataFrame
+        Steps dataframe with the new columns "date_of_next_update" and "days_to_update".
+    """
+    df = steps_df.copy()
+
+    # Extract version from steps data frame, and make it a string.
+    version = df["version"].copy().astype(str)
+    # Assume first of January to those versions that are only given as years.
+    filter_years = (version.str.len() == 4) & (version.str.isdigit())
+    version[filter_years] = version[filter_years] + "-01-01"
+    # Convert version to datetime where possible, setting "latest" to NaT.
+    version_date = pd.to_datetime(version, errors="coerce", format="%Y-%m-%d")
+
+    # Extract update_period_days from steps dataframe, ensuring it is numeric, or NaT where it was None.
+    update_period_days = pd.to_numeric(df["update_period_days"], errors="coerce")
+
+    # Create a column with the date of next update where possible.
+    df["date_of_next_update"] = None
+    filter_dates = (version_date.notnull()) & (update_period_days > 0)
+    df.loc[filter_dates, "date_of_next_update"] = (
+        version_date[filter_dates] + pd.to_timedelta(update_period_days[filter_dates], unit="D")
+    ).dt.strftime("%Y-%m-%d")
+
+    # Create a column with the number of days until the next update.
+    df["days_to_update"] = None
+    df.loc[filter_dates, "days_to_update"] = (
+        pd.to_datetime(df.loc[filter_dates, "date_of_next_update"]) - pd.to_datetime(TODAY)
+    ).dt.days
+
+    return df

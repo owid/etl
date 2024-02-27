@@ -4,7 +4,6 @@
 import subprocess
 from datetime import datetime
 
-import pandas as pd
 import streamlit as st
 from st_aggrid import AgGrid, GridUpdateMode, JsCode
 from st_aggrid.grid_options_builder import GridOptionsBuilder
@@ -24,7 +23,6 @@ from etl.config import DB_HOST, ENV_IS_REMOTE
 
 # Current date.
 # This is used as the default version of new steps to be created.
-# It is also used to calculate the number of days until the next expected update.
 TODAY = datetime.now().strftime("%Y-%m-%d")
 
 # Define the base URL for the grapher datasets (which will be different depending on the environment).
@@ -54,44 +52,6 @@ This dashboard lets you explore all active ETL steps, and, if you are working on
 # add_indentation()
 
 
-def add_days_to_update_columns(steps_df):
-    df = steps_df.copy()
-    # There is no clear way to show the expected date of update of a dataset.
-    # One could simply add the version to update_days_period.
-    # But a dataset may have had a minor update since the main release.
-    # So, it would be better to count from the date_published of its snapshots.
-    # However, if there are multiple snapshots, it is not clear which one to use as a reference.
-    # For example, if a dataset uses the income groups dataset, that would have a date_published that is irrelevant.
-    # So, we could create a table of estimated dates of update. But then we would need some manual way to change them.
-    # For now, calculate the number of days to the next expected update simply based on the step version.
-
-    # Extract version from steps data frame, and make it a string.
-    version = df["version"].copy().astype(str)
-    # Assume first of January to those versions that are only given as years.
-    filter_years = (version.str.len() == 4) & (version.str.isdigit())
-    version[filter_years] = version[filter_years] + "-01-01"
-    # Convert version to datetime where possible, setting "latest" to NaT.
-    version_date = pd.to_datetime(version, errors="coerce", format="%Y-%m-%d")
-
-    # Extract update_period_days from steps dataframe, ensuring it is numeric, or NaT where it was None.
-    update_period_days = pd.to_numeric(df["update_period_days"], errors="coerce")
-
-    # Create a column with the date of next update where possible.
-    df["date_of_next_update"] = None
-    filter_dates = (version_date.notnull()) & (update_period_days > 0)
-    df.loc[filter_dates, "date_of_next_update"] = (
-        version_date[filter_dates] + pd.to_timedelta(update_period_days[filter_dates], unit="D")
-    ).dt.strftime("%Y-%m-%d")
-
-    # Create a column with the number of days until the next update.
-    df["days_to_update"] = None
-    df.loc[filter_dates, "days_to_update"] = (
-        pd.to_datetime(df.loc[filter_dates, "date_of_next_update"]) - pd.to_datetime(TODAY)
-    ).dt.days
-
-    return df
-
-
 @st.cache_data
 def load_steps_df():
     # Load steps dataframe.
@@ -100,8 +60,6 @@ def load_steps_df():
     # Fix some columns.
     steps_df["full_path_to_script"] = steps_df["full_path_to_script"].fillna("").astype(str)
     steps_df["dag_file_path"] = steps_df["dag_file_path"].fillna("").astype(str)
-    # Add column with the number of days until the next expected update.
-    steps_df = add_days_to_update_columns(steps_df=steps_df)
 
     return steps_df
 

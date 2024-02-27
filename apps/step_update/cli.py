@@ -10,7 +10,7 @@ from rapidfuzz import fuzz
 from rich_click.rich_command import RichCommand
 
 from etl.helpers import get_comments_above_step_in_dag, write_to_dag_file
-from etl.paths import BASE_DIR, DAG_DIR, DAG_TEMP_FILE, SNAPSHOTS_DIR, STEP_DIR
+from etl.paths import DAG_TEMP_FILE, SNAPSHOTS_DIR, STEP_DIR
 from etl.snapshot import SnapshotMeta
 from etl.steps import to_dependency_order
 from etl.version_tracker import DAG_TEMP_STEP, VersionTracker
@@ -45,16 +45,6 @@ class StepUpdater:
         self.steps_df = self.tracker.steps_df.copy()
         # Select only active steps.
         self.steps_df = self.steps_df[self.steps_df["state"] == "active"].reset_index(drop=True)
-        # For convenience, add full local path to dag files to steps dataframe.
-        self.steps_df["dag_file_path"] = [
-            (DAG_DIR / dag_file_name).with_suffix(".yml") if dag_file_name else None
-            for dag_file_name in self.steps_df["dag_file_name"]
-        ]
-        # For convenience, add full local path to script files.
-        self.steps_df["full_path_to_script"] = [
-            BASE_DIR / script_file_name if script_file_name else None
-            for script_file_name in self.steps_df["path_to_script"]
-        ]
 
     def check_that_step_exists(self, step: str) -> None:
         """Check that step to be updated exists in the active dag."""
