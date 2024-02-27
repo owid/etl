@@ -269,11 +269,11 @@ class AppState:
         """Wrap a streamlit widget with a default value."""
         key = cast(str, kwargs["key"])
         # Get default value (either from previous edits, or from previous steps)
-        if self.dataset_edit[self.step]:
+        if self.dataset_edit[self.step] is not None:
             if dataset_field_name:
                 default_value = getattr(self.dataset_edit[self.step], dataset_field_name, "")
             else:
-                default_value = getattr(self.dataset_edit[self.step].metadata, key, "")
+                default_value = getattr(self.dataset_edit[self.step].metadata, key, "")  # type: ignore
         else:
             default_value = self.default_value(key, default_last=default_last)
         # Change key name, to be stored it in general st.session_state
@@ -283,7 +283,7 @@ class AppState:
             # Default value for selectbox (and other widgets with selectbox-like behavior)
             if "options" in kwargs:
                 options = cast(List[str], kwargs["options"])
-                index = options.index(default_value) if default_value in options else 0
+                index = options.index(default_value) if default_value in options else 0  # type: ignore
                 kwargs["index"] = index
             # Default value for other widgets (if none is given)
             elif (

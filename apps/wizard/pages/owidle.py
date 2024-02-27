@@ -213,6 +213,7 @@ gdp_indicator_titles = {
     "gdp_per_capita_wdi": "GDP per capita (constant 2017 intl-$)",
 }
 gdp_indicators = list(gdp_indicator_titles.keys())
+GDP_INDICATOR = None
 for ind in gdp_indicators:
     s = set(
         DATA.dropna(
