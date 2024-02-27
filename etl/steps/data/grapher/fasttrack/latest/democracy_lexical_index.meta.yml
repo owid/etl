@@ -11,21 +11,6 @@ dataset:
 tables:
   democracy_lexical_index:
     variables:
-      democracy_lied:
-        title: Democracy
-        unit: ''
-        description: |-
-          The variable identifies the political regime of a country using the Lexical Index of Electoral Democracy by political scientists Svend-Erik Skaaning, John Gerring, and Henrikas Bartusevičius.
-
-          It distinguishes between autocracies (score 0) and democracies (score 1).
-
-          Democracies are understood here as political systems in which citizens have the right to choose the chief executive and the legislature in multi-party, uncertain elections.
-
-          This includes electoral democracies and polyarchies.
-
-          Autocracies are understood here as non-democracies.
-
-          This includes non-electoral autocracies, one-party autocracies, multiparty autocracies without an elected executive multiparty autocracies, exclusive democracies, and male democracies.
       regime_lied:
         title: Political regime
         unit: ''
@@ -166,6 +151,21 @@ tables:
           The variable indicates whether the freedoms of expression, assembly, and association are respected.
 
           It matches the variable political_liberties in Skaaning et al. (2015).
+      democracy_lied:
+        title: Democracy
+        unit: ''
+        description: |-
+          The variable identifies the political regime of a country using the Lexical Index of Electoral Democracy by political scientists Svend-Erik Skaaning, John Gerring, and Henrikas Bartusevičius.
+
+          It distinguishes between autocracies (score 0) and democracies (score 1).
+
+          Democracies are understood here as political systems in which citizens have the right to choose the chief executive and the legislature in multi-party, uncertain elections.
+
+          This includes electoral democracies and polyarchies.
+
+          Autocracies are understood here as non-democracies.
+
+          This includes non-electoral autocracies, one-party autocracies, multiparty autocracies without an elected executive multiparty autocracies, exclusive democracies, and male democracies.
       electdem_exp_lied:
         title: Experience with electoral democracy
         unit: ''
@@ -184,6 +184,24 @@ tables:
           The identification of polyarchies is based on the Lexical Index of Electoral Democracy-classification by Skaaning et al. (2015).
 
           In polyarchies, citizens have the right to choose the chief executive and the legislature in multi-party, uncertain elections, and enjoy freedoms of expression, assembly, and association.
+      number_aut_lied:
+        title: Number of autocracies
+        unit: ''
+        description: |-
+          The variable denotes the number of autocracies based on the Lexical Index of Electoral Democracy-classification based on Skaaning et al. (2015).
+
+          Autocracies are understood here as non-democracies. Democracies are understood here as political systems in which citizens have the right to choose the chief executive and the legislature in multi-party, uncertain elections.
+
+          This includes non-electoral autocracies, one-party autocracies, multiparty autocracies without an elected executive multiparty autocracies, exclusive democracies, and male democracies.
+      number_dem_lied:
+        title: Number of democracies
+        unit: ''
+        description: |-
+          The variable denotes the number of democracies based on the Lexical Index of Electoral Democracy-classification based on Skaaning et al. (2015).
+
+          Democracies are understood here as political systems in which citizens have the right to choose the chief executive and the legislature in multi-party, uncertain elections.
+
+          This includes electoral democracies and polyarchies.
       number_nonelectaut_lied:
         title: number_nonelectaut_lied
         unit: ''
@@ -287,6 +305,27 @@ tables:
         display:
           numDecimalPlaces: 0.0
         description: The variable denotes the number of countries with universal suffrage for men and women.
+      pop_aut_lied:
+        title: People living in autocracies
+        unit: ''
+        description: |-
+          The variable denotes the number of people living in autocracies, using data from the Lexical Index of Electoral Democracy-classification by Skaaning et al. (2015).
+
+          We here combine the following regimes types under "autocracies": non-electoral autocracies, one-party autocracies, multiparty autocracies without an elected executive multiparty autocracies, exclusive democracies, and male democracies.
+      pop_dem_lied:
+        title: People living in democracies
+        unit: ''
+        description: |-
+          The variable denotes the number of people living in democracies, using data from the Lexical Index of Electoral Democracy-classification by Skaaning et al. (2015).
+
+          The classification defines electoral democracies as political systems in which citizens have the right to choose the chief executive and the legislature in multi-party, uncertain elections.
+
+          We here combine electoral democracies with polyarchies, which are electoral democracies that also grant freedoms of expression, assembly, and association.
+      pop_missdem_lied:
+        title: People living in countries for which democracy data is missing
+        unit: ''
+        description: |-
+          The variable denotes the number of people living in countries for which democracy data from the Lexical Index of Electoral Democracy-classification by Skaaning et al. (2015) is missing.
       pop_nonelectaut_lied:
         title: pop_nonelectaut_lied
         unit: ''
@@ -393,47 +432,6 @@ tables:
         title: pop_unisuffrage_miss
         unit: ''
         description: The variable denotes the number of people living in countries without data on universal suffrage.
-      number_aut_lied:
-        title: Number of autocracies
-        unit: ''
-        description: |-
-          The variable denotes the number of autocracies based on the Lexical Index of Electoral Democracy-classification based on Skaaning et al. (2015).
-
-          Autocracies are understood here as non-democracies. Democracies are understood here as political systems in which citizens have the right to choose the chief executive and the legislature in multi-party, uncertain elections.
-
-          This includes non-electoral autocracies, one-party autocracies, multiparty autocracies without an elected executive multiparty autocracies, exclusive democracies, and male democracies.
-      number_dem_lied:
-        title: Number of democracies
-        unit: ''
-        description: |-
-          The variable denotes the number of democracies based on the Lexical Index of Electoral Democracy-classification based on Skaaning et al. (2015).
-
-          Democracies are understood here as political systems in which citizens have the right to choose the chief executive and the legislature in multi-party, uncertain elections.
-
-          This includes electoral democracies and polyarchies.
-      pop_aut_lied:
-        title: People living in autocracies
-        unit: ''
-        description: |-
-          The variable denotes the number of people living in autocracies based on the Lexical Index of Electoral Democracy-classification by Skaaning et al. (2015).
-
-          Autocracies are understood here as non-democracies.
-
-          This includes non-electoral autocracies, one-party autocracies, multiparty autocracies without an elected executive multiparty autocracies, exclusive democracies, and male democracies.
-      pop_dem_lied:
-        title: People living in democracies
-        unit: ''
-        description: |-
-          The variable denotes the number of people living in democracies based on the Lexical Index of Electoral Democracy-classification by Skaaning et al. (2015).
-
-          Democracies are understood here as political systems in which citizens have the right to choose the chief executive and the legislature in multi-party, uncertain elections.
-
-          This includes electoral democracies and polyarchies.
-      pop_missdem_lied:
-        title: People living in countries without democracy data
-        unit: ''
-        description: |-
-          The variable denotes the number of people living in countries without democracy data from the Lexical Index of Electoral Democracy-classification by Skaaning et al. (2015).
       region:
         title: region
         unit: ''

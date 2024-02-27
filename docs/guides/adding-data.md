@@ -45,7 +45,7 @@ The Wizard is an interactive web app that serves as OWID's ETL admin. One of the
 Just start it with
 
 ```bash
-poetry run etlwiz
+etlwiz
 ```
 
 And then go to [localhost:8053](localhost:8053). In there, you will see all options available in Wizard. For the purpose of this guide, we are just interested in those that fall under the section "ETL Steps", with which you can create Snapshot, Meadow, Garden and Grapher steps (and, alternatively, also Fast-Track steps).
@@ -151,7 +151,7 @@ git checkout -b data/new-dataset
 
 3. **Run the step**
     ```
-    poetry run etl run data://meadow/<namespace>/<version>/<dataset_short_name>
+    etl run data://meadow/<namespace>/<version>/<dataset_short_name>
     ```
 
 ### Garden step
@@ -170,7 +170,7 @@ git checkout -b data/new-dataset
 
 3. **Run the step**
     ```
-    poetry run etl run data://garden/<namespace>/<version>/<dataset_short_name>
+    etl run data://garden/<namespace>/<version>/<dataset_short_name>
     ```
 
 ### Grapher step
@@ -184,13 +184,13 @@ git checkout -b data/new-dataset
 
 2. **Run the step**
     ```
-    poetry run etl run data://grapher/<namespace>/<version>/<dataset_short_name>
+    etl run data://grapher/<namespace>/<version>/<dataset_short_name>
     ```
 
     Add `--grapher` flags to `etl` command to upsert data into grapher database.
 
     ```
-    poetry run etl run data://grapher/<namespace>/<version>/<dataset_short_name> --grapher
+    etl run data://grapher/<namespace>/<version>/<dataset_short_name> --grapher
     ```
 
     To test the step, you can run it on the grapher `staging` database, or using

@@ -12,17 +12,26 @@ It was initially developed to ease the creating of ETL steps by means of templat
 Run it locally with the following command:
 
 ```bash
-poetry run etlwiz
+etlwiz
 ```
 
 and then visit [localhost:8053](localhost:8053).
 
 !!! tip "Run it from admin"
-    It is now available from any server baking   OWID's site, including live admin page. Just look for "Wizard" in the navigation menu.
+    Wizard is available from any server that bakes OWID's site (e.g. [staging servers](staging-servers.md)), including live admin page. Just look for "Wizard" in the navigation menu.
 
     The production version runs at [etl.owid.io/wizard](http://etl.owid.io/wizard/) (needs Tailscale).
 
     Note that some of the functionalities might not be enabled in a remote setting. For instance, creating steps is currently only available when running locally.
+
+!!! tip "Use [different environments](environment.md)"
+
+    If your Wizard session interacts with Grapher database (e.g. submit chart revisions), you can use `ENV_FILE` to connect to the appropriate server:
+
+    ```
+    ENV_FILE=.env.name etlwiz
+    ```
+
 
 ## The different pages in Wizard
 Wizard is structured into different sections, each of them grouping different pages (or apps) depending on what they do.
@@ -51,7 +60,7 @@ Pages to help us improve our charts (e.g. keeping them up to date). The current 
 
 ### Others
 - **Dataset Explorer**: A tool to explore the datasets in the ETL catalog. You can check the step dependancies and its metadata. If it is a Garden step, you can also perform some actions with it.
-- **Entity Harmonizer**: Harmonize the entity names of a table. Mostly useful to standardise country names. An alternative to [../our CLI](etl-cli/#etl-harmonize).
+- **Entity Harmonizer**: Harmonize the entity names of a table. Mostly useful to standardise country names. An alternative to [our CLI](../etl-cli/#etl-harmonize).
 
 ## Adding new functionalities to Wizard
 The code for the Wizard lives in [`apps/wizard`](https://github.com/owid/etl/tree/master/apps/wizard). It is a streamlit app, you can also run it with `streamlit run apps/wizard/app.py`.

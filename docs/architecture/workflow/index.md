@@ -62,7 +62,9 @@ Note that we need a DVC file per upstream data file; hence, in some instances, i
 
 A Snapshot is a picture of a data product (e.g. a data CSV file) provided by an upstream data provider at a particular point in time. It is the entrypoint to ETL and where we define metadata attributes of that picture. This is fundamental to ensure that the data is properly documented and that the metadata is propagated to the rest of the system.
 
-The metadata in Snapshot consists mainly of one object: `meta.origin`. To learn more about it, please refer to [the reference](../reference#origin).
+The metadata in Snapshot consists mainly of one object: `meta.origin`.
+
+!!! info "Learn more in our [metadata reference](../metadata/reference#origin)."
 
 
 This metadata is captured in a DVC file (similar to a yaml file), which contains all the snapshot metadata fields as key-value pairs.
@@ -95,7 +97,6 @@ This metadata is captured in a DVC file (similar to a yaml file), which contains
     ```
 
 
-!!! info "Learn more in our [reference](../metadata/#origin)."
 
 
 ## Meadow
@@ -286,7 +287,7 @@ After adapting and processing the origin's data, we have a curated dataset. This
 
 The metadata in Garden consists mainly of two objects: `dataset` and `tables`. The metadata comes as a YAML file next to the processing scripts.
 
-!!! info "Learn more in our [dataset reference](../metadata/#dataset), [tables reference](../metadata/reference#table) and  [indicator reference](../metadata/reference#variable)."
+!!! info "Learn more in our [dataset reference](../metadata/reference/#dataset), [tables reference](../metadata/reference/#table) and  [indicator reference](../metadata/reference/#variable)."
 
 ## Grapher
 In the `grapher` step the work should be minimal. Here, we create a `grapher` view by adapting our Garden dataset to fit the Grapher requirements.
