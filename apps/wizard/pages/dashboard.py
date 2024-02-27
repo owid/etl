@@ -408,7 +408,7 @@ if st.button(
 ):
     with st.spinner("Executing step updater..."):
         if ENV_IS_REMOTE:
-            st.error("The update command is not available in the remote version of the wizard.")
+            st.error("The update command is not available in the remote version of the wizard. Update steps locally.")
             st.stop()
         else:
             # TODO: It would be better to directly use StepUpdater instead of a subprocess.
