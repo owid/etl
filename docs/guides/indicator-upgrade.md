@@ -17,7 +17,7 @@ git checkout -b data/new-dataset
 
 Create all the new steps required to import the new dataset. Note that this guide only applies to those datasets that make it to the database (e.g. have Grapher steps). Other datasets are not relevant, since they are not used by any charts.
 
-Creating new steps (or updating old ones) can be done using the [Wizard](../wizard).
+You can create these steps manually, by duplicating the steps from older versions of the dataset and updating them accordingly. Alternatively, you can use the [Wizard](../wizard).
 
 ## Add the new dataset to grapher
 Once you have implemented all the steps, test if the dataset can successfully be added to the Grapher:
@@ -27,21 +27,21 @@ etl run <short_name> --grapher
 ```
 
 !!! note "Choose the database"
-    Note that you can choose which database to push your changes to (local environment or personal staging server, etc.) by setting the `ENV_FILE` variable:
+    We recommend using the environment variable `STAGING` to select which staging server to upload the new dataset to. Here, you can use your personal staging server.
 
     ```
-    ENV_FILE=.env.yourname etl run <short_name> --grapher
+    STAGING=yourname etl run <short_name> --grapher
     ```
 
-    [Learn more about environments :octicons-arrow-right-24:](../environments)
+    Learn more about [setting up your personal staging server :octicons-arrow-right-24:](../environment#personal-staging-environment)
 
+If that works, push all your changes to the remote branch `data/new-dataset` and create a draft Pull request (PR). This will trigger several things:
 
-If that works, push all your changes to your branch `data/new-dataset`. This will trigger an ETL build, and your dataset will be available in the Grapher admin from the PR staging server.
+- [A dedicated staging server](../staging-servers) will be created for your PR, in which the OWID admin site and databe will be running (you need tailscale to access this server).
+- An etl build will be executed in this new server, with the new steps you created.
 
-!!! info "Learn more about [staging servers](../staging-servers)"
+Consequently, your dataset and all its indicators will be available from the admin page of the PR staging server.
 
-
-After this, all the new indicators will be now available from the admin page.
 
 ## Match old indicators to new ones
 !!! abstract "Chart revision"
@@ -49,13 +49,15 @@ After this, all the new indicators will be now available from the admin page.
 
     `etlwiz` assists you with the creation and update of these configuration files.
 
-Once a dataset is available on the Grapher database, you can create charts from its indicators.
+Once a dataset is available on the Grapher database from your PR staging server, you can create charts from its indicators. You need to update all the charts that rely on the old indicators to use the new ones. This is done with the _Chart Upgrader_ app in Wizard, which is accessible in the admin site of your PR staging server (at https://staging-site-name/admin/etl/wizard/).
 
-Start the Wizard _Chart Upgrader_ app with
+!!! tip "Alternative"
+    You can also use `etlwiz` locally, and use the environment variable `STAGING` to select which staging server to submit the revisions to.
 
-```
-ENV_FILE=.env.yourname etlwiz charts
-```
+    ```
+    STAGING=yourname etlwiz charts
+    ```
+
 
 <figure markdown="span">
   ![Chart Upgrader](../assets/chart-upgrader.png)
@@ -67,10 +69,9 @@ This tool will help you match indicators from the old dataset to indicators from
 
 !!! tip "Tips"
     - Under the expandable window "Parameters", check the "Explore indicator mappings" option to display indicator comparisons on the fly.
-    - You can use the [live Wizard version for this](http://etl.owid.io/wizard/Chart%20Revision%20Baker).
 
 
-Once you have finished, your chart revisions are submitted to the Grapher database, and are ready to be reviewed from there.
+Once you have finished, your chart revisions are submitted to the Grapher database of the PR staging server, and are ready to be reviewed from there.
 
 <figure markdown="span">
   ![Chart Upgrader](../assets/chart-upgrader-2.png)
@@ -79,11 +80,10 @@ Once you have finished, your chart revisions are submitted to the Grapher databa
 
 !!! note "Notes"
     - All chart suggestions are stored in the grapher database table `suggested_chart_revisions`.
-    - Again, `ENV_FILE` will determine to which database you are submitting your chart revisions.
 
 ## Approving new charts
 
-Once you have successfully created and submitted your chart revisions, go to the admin tool "Suggested chart revisions" (in the environment determined by `ENV_FILE`). You can find it in the admin panel, on the right menu bar under "DATA".
+Once you have successfully created and submitted your chart revisions, go to the admin tool "Suggested chart revisions" (in the environment determined by `STAGING`). You can find it in the admin panel, on the right menu bar under "DATA".
 
 In there, you will be presented with all the chart revisions, which you can approve or reject. Approving a chart revision means that the chart will be updated with the new configuration. You can read further under the "Instructions" tab. Note that you can filter these by the user that created them.
 
