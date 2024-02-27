@@ -121,6 +121,12 @@ class AppState:
     """Management of state variables shared across different apps."""
 
     steps: List[str] = ["snapshot", "meadow", "garden", "grapher", "explorers"]
+    dataset_edit: Dict[str, Dataset | None] = {
+        "snapshot": None,
+        "meadow": None,
+        "garden": None,
+        "grapher": None,
+    }
 
     def __init__(self: "AppState") -> None:
         """Construct variable."""
@@ -158,6 +164,14 @@ class AppState:
         """Check that the value for step is valid."""
         if self.step is None or self.step not in self.steps:
             raise ValueError(f"Step {self.step} not in {self.steps}.")
+
+    def reset_dataset_to_edit(self: "AppState") -> None:
+        """Set dataset to edit."""
+        self.dataset_edit[self.step] = None
+
+    def set_dataset_to_edit(self: "AppState", ds: Dataset) -> None:
+        """Set dataset to edit."""
+        self.dataset_edit[self.step] = ds
 
     def get_variables_of_step(self: "AppState") -> Dict[str, Any]:
         """Get variables of a specific step.
@@ -249,12 +263,19 @@ class AppState:
         self: "AppState",
         st_widget: Callable,
         default_last: Optional[str | bool | int] = "",
+        dataset_field_name: Optional[str] = None,
         **kwargs: Optional[str | int | List[str]],
     ) -> None:
         """Wrap a streamlit widget with a default value."""
         key = cast(str, kwargs["key"])
         # Get default value (either from previous edits, or from previous steps)
-        default_value = self.default_value(key, default_last=default_last)
+        if self.dataset_edit[self.step]:
+            if dataset_field_name:
+                default_value = getattr(self.dataset_edit[self.step], dataset_field_name, "")
+            else:
+                default_value = getattr(self.dataset_edit[self.step].metadata, key, "")
+        else:
+            default_value = self.default_value(key, default_last=default_last)
         # Change key name, to be stored it in general st.session_state
         kwargs["key"] = f"{self.step}.{key}"
         # Special behaviour for multiselect
@@ -265,7 +286,11 @@ class AppState:
                 index = options.index(default_value) if default_value in options else 0
                 kwargs["index"] = index
             # Default value for other widgets (if none is given)
-            elif ("value" not in kwargs) or ("value" in kwargs and kwargs.get("value") is None):
+            elif (
+                ("value" not in kwargs)
+                or ("value" in kwargs and kwargs.get("value") is None)
+                or self.dataset_edit[self.step]
+            ):
                 kwargs["value"] = default_value
         elif "default" not in kwargs:
             kwargs["default"] = default_value
