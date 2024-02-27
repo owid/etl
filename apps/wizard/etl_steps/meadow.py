@@ -4,12 +4,15 @@ from pathlib import Path
 from typing import cast
 
 import streamlit as st
+from owid.catalog import Dataset
 from st_pages import add_indentation
 from typing_extensions import Self
 
 from apps.utils.files import add_to_dag, generate_step_to_channel
 from apps.wizard import utils
+from apps.wizard.etl_steps.utils import load_datasets
 from etl.paths import BASE_DIR, DAG_DIR, MEADOW_DIR
+from etl.steps import load_from_uri
 
 #########################################################
 # CONSTANTS #############################################
@@ -101,8 +104,34 @@ def update_state() -> None:
 #########################################################
 # MAIN ##################################################
 #########################################################
+# PRE-LOAD METADATA
+st.selectbox(
+    label="Edit metadata from existing dataset",
+    options=load_datasets("://meadow/"),
+    placeholder="(Experimental) Edit metadata from existing dataset",
+    index=None,
+    help="You can fill the metadata fields with the metadata from an existing dataset or snapshot. This is useful when updating a step",
+    label_visibility="collapsed",
+    key="meadow.edit_dataset",
+)
+ds_edit = None
+if st.session_state["meadow.edit_dataset"]:
+    try:
+        ds_edit = cast(Dataset, load_from_uri(uri=st.session_state["meadow.edit_dataset"]))
+        APP_STATE.set_dataset_to_edit(ds_edit)
+    except Exception:
+        st.error(
+            f"Error loading metadata for {st.session_state['meadow.edit_dataset']}. Remember to run `etl run {st.session_state['meadow.edit_dataset']}` first."
+        )
+        st.stop()
+else:
+    APP_STATE.reset_dataset_to_edit()
+
 # TITLE
-st.title("Create step  **:gray[Meadow]**")
+if st.session_state["meadow.edit_dataset"]:
+    st.title("Edit step  **:gray[Meadow]**")
+else:
+    st.title("Create step  **:gray[Meadow]**")
 
 # SIDEBAR
 with st.sidebar:
@@ -110,6 +139,7 @@ with st.sidebar:
     with st.expander("**Instructions**", expanded=True):
         text = load_instructions()
         st.markdown(text)
+
 
 # FORM
 form_widget = st.empty()
@@ -120,7 +150,7 @@ with form_widget.form("meadow"):
     if (default_version := APP_STATE.default_value("version")) == "":
         default_version = APP_STATE.default_value("snapshot_version")
     APP_STATE.st_widget(
-        st.text_input,
+        st_widget=st.text_input,
         label="Meadow dataset version",
         help="Version of the meadow dataset (by default, the current date, or exceptionally the publication date).",
         key="version",
@@ -128,7 +158,7 @@ with form_widget.form("meadow"):
     )
     # Meadow short name
     APP_STATE.st_widget(
-        st.text_input,
+        st_widget=st.text_input,
         label="Meadow dataset short name",
         help="Dataset short name using [snake case](https://en.wikipedia.org/wiki/Snake_case). Example: natural_disasters",
         placeholder="Example: 'cherry_blossom'",
@@ -254,18 +284,24 @@ if submitted:
             # 1/ Run ETL step
             st.markdown("#### 1. Run ETL step")
             st.code(
-                f"poetry run etl run data{private_suffix}://meadow/{form.namespace}/{form.version}/{form.short_name} {'--private' if form.is_private else ''}"
+                f"poetry run etl run data{private_suffix}://meadow/{form.namespace}/{form.version}/{form.short_name} {'--private' if form.is_private else ''}",
+                language="shellSession",
             )
 
-            if form.generate_notebook:
-                # 2/ Open notebook
+            container = st.container(border=True)
+            if form.generate_notebook or dag_content:
                 with st.container(border=True):
-                    st.markdown("**(Optional)**")
-                    # A/ Playground notebook
-                    st.markdown("#### Playground notebook")
-                    st.markdown(
-                        f"Use the generated notebook `{notebook_path.relative_to(BASE_DIR)}` to examine the dataset output interactively."
-                    )
+                    if form.generate_notebook:
+                        # 2/ Open notebook
+                        st.markdown("**(Optional)**")
+                        # A/ Playground notebook
+                        st.markdown("#### Playground notebook")
+                        st.markdown(
+                            f"Use the generated notebook `{notebook_path.relative_to(BASE_DIR)}` to examine the dataset output interactively."
+                        )
+                    if dag_content:
+                        st.markdown("#### Organize the DAG")
+                        st.markdown(f"Check the DAG `{dag_path}`.")
 
             st.markdown("#### 2. Proceed to next step")
             utils.st_page_link("garden", use_container_width=True, border=True)
