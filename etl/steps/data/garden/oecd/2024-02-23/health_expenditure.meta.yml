@@ -270,7 +270,9 @@ tables:
       ppp_dollars_per_capita:
         title: Health expenditure per capita - <<financing_scheme>>
         description_short: Health expenditure in <<financing_scheme.lower()>> divided by population. {definitions.description_short}
-        unit: international-$ in 2017 prices
+        description_key:
+          - The data is measured in international-$ at 2015 prices – this adjusts for inflation and for differences in the cost of living between countries.
+        unit: international-$ in 2015 prices
         short_unit: $
         display:
           name: Health expenditure per capita - <<financing_scheme>>
@@ -282,7 +284,9 @@ tables:
       ppp_dollars:
         title: Health expenditure - <<financing_scheme>>
         description_short: Health expenditure in <<financing_scheme.lower()>>. {definitions.description_short}
-        unit: international-$ in 2017 prices
+        description_key:
+          - The data is measured in international-$ at 2015 prices – this adjusts for inflation and for differences in the cost of living between countries.
+        unit: international-$ in 2015 prices
         short_unit: $
         display:
           name: Health expenditure - <<financing_scheme>>
