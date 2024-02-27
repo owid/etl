@@ -79,7 +79,7 @@ class StepUpdater:
         step: str,
         step_version_new: Optional[str] = STEP_VERSION_NEW,
         step_header: Optional[str] = None,
-    ) -> None:
+    ) -> int:
         # Get info for step to be updated.
         step_info = self.get_step_info(step=step)
 
@@ -87,7 +87,7 @@ class StepUpdater:
         step_dvc_file = SNAPSHOTS_DIR / step_info["namespace"] / step_info["version"] / (step_info["name"] + ".dvc")
         if not step_dvc_file.exists():
             log.error(f"No .dvc file found for step {step}.")
-            sys.exit(1)
+            return 1
 
         # Define folder for new version.
         folder_new = SNAPSHOTS_DIR / step_info["namespace"] / step_version_new
@@ -96,7 +96,7 @@ class StepUpdater:
         step_dvc_file_new = folder_new / (step_info["name"] + ".dvc")
         if step_dvc_file_new.exists():
             log.error(f"New .dvc file already exists: {step_dvc_file_new}")
-            sys.exit(1)
+            return 1
 
         # Find script file for old step.
         _step_py_files = list(step_dvc_file.parent.glob("*.py"))
@@ -170,12 +170,14 @@ class StepUpdater:
             # Reload steps dataframe.
             self._load_version_tracker()
 
+        return 0
+
     def _update_data_step(
         self,
         step: str,
         step_version_new: Optional[str] = STEP_VERSION_NEW,
         step_header: Optional[str] = None,
-    ) -> None:
+    ) -> int:
         # Get info for step to be updated.
         step_info = self.get_step_info(step=step)
 
@@ -194,7 +196,7 @@ class StepUpdater:
             step_files = [file_name for file_name in list(folder.glob(f"{step_info['name']}/*")) if file_name.is_file()]
         else:
             log.error(f"No step files found for step {step}.")
-            sys.exit(1)
+            return 1
 
         # Define the new step.
         step_new = step.replace(step_info["version"], step_version_new)  # type: ignore
@@ -227,7 +229,7 @@ class StepUpdater:
                 # Check that the new file does not exist.
                 if step_file_new.exists():
                     log.error(f"New file already exists: {step_file_new}")
-                    sys.exit(1)
+                    return 1
 
                 # If new folder does not exist, create it.
                 step_file_new.parent.mkdir(parents=True, exist_ok=True)
@@ -241,9 +243,11 @@ class StepUpdater:
             # Reload steps dataframe.
             self._load_version_tracker()
 
+        return 0
+
     def _update_step(
         self, step: str, step_version_new: Optional[str] = STEP_VERSION_NEW, step_header: Optional[str] = None
-    ) -> None:
+    ) -> int:
         """Update step to new version."""
 
         # Check that step to be updated exists in the active dag.
@@ -254,12 +258,12 @@ class StepUpdater:
 
         log.info(f"Updating {step} to version {step_version_new}.")
         if step_channel == "snapshot":
-            self._update_snapshot_step(step=step, step_version_new=step_version_new, step_header=step_header)
+            return self._update_snapshot_step(step=step, step_version_new=step_version_new, step_header=step_header)
         elif step_channel in ["meadow", "garden", "grapher", "explorers"]:
-            self._update_data_step(step=step, step_version_new=step_version_new, step_header=step_header)
+            return self._update_data_step(step=step, step_version_new=step_version_new, step_header=step_header)
         else:
             log.error(f"Channel {step_channel} not yet supported.")
-            sys.exit(1)
+            return 1
 
     def update_steps(
         self,
@@ -342,7 +346,12 @@ class StepUpdater:
 
             # Update each step.
             for step in steps:
-                self._update_step(step=step, step_version_new=step_version_new, step_header=step_headers[step])
+                success = self._update_step(
+                    step=step, step_version_new=step_version_new, step_header=step_headers[step]
+                )
+                if success == 1:
+                    log.error(f"Stopped because of a failure on step {step}.")
+                    break
 
 
 def _update_temporary_dag(dag_active, dag_all_reverse) -> None:

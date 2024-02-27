@@ -10,7 +10,7 @@ from st_aggrid import AgGrid, GridUpdateMode, JsCode
 from st_aggrid.grid_options_builder import GridOptionsBuilder
 
 from apps.step_update.cli import StepUpdater
-from etl.config import DB_HOST, WIZARD_IS_REMOTE
+from etl.config import DB_HOST, ENV_IS_REMOTE
 
 # TODO:
 # Add columns:
@@ -407,7 +407,7 @@ if st.button(
     type="primary",
 ):
     with st.spinner("Executing step updater..."):
-        if WIZARD_IS_REMOTE:
+        if ENV_IS_REMOTE:
             st.error("The update command is not available in the remote version of the wizard.")
             st.stop()
         else:
