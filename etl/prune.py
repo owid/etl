@@ -18,7 +18,7 @@ log = structlog.get_logger()
 EXCLUDE_STEP_TYPES = ("grapher", "walden", "walden-private", "github")
 
 
-@click.command()
+@click.command(name="prune")
 @click.option(
     "--dag-path",
     type=click.Path(exists=True),
@@ -41,10 +41,7 @@ def prune_cli(
     data_dir: Path,
     dry_run: bool,
 ) -> None:
-    """Prune data without steps in the DAG.
-
-    # Reference
-    """
+    """Prune data without steps in the DAG."""
     return prune(dag_path=dag_path, data_dir=data_dir, dry_run=dry_run)
 
 

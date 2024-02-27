@@ -18,8 +18,7 @@ meta:
 
       More details can be found at [the HOT Carbon Dioxide page](https://hahana.soest.hawaii.edu/hot/hotco2/hotco2.html),
       specifically in [this technical document](https://hahana.soest.hawaii.edu/hot/hotco2/HOT_surface_CO2_readme.pdf).
-    attribution: School of Ocean & Earth Science & Technology - Hawaii Ocean Time-series
-      (2023)
+    attribution: School of Ocean & Earth Science & Technology - Hawaii Ocean Time-series (2023)
     attribution_short: SOEST/Hawaii
     url_main: https://hahana.soest.hawaii.edu/hot/
     url_download: https://hahana.soest.hawaii.edu/hot/hotco2/HOT_surface_CO2.txt
@@ -30,6 +29,6 @@ meta:
       url: https://hahana.soest.hawaii.edu/hot/dataaccess.html
 wdir: ../../../data/snapshots/climate/2024-01-31
 outs:
-- md5: 74e636539b06abae72a4cba91df12f51
-  size: 44820
-  path: hawaii_ocean_time_series.csv
+  - md5: fd502d28aa85a6f241e9507d85b8ca8b
+    size: 44820
+    path: hawaii_ocean_time_series.csv

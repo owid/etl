@@ -42,10 +42,6 @@ def _create_progress_bar() -> Progress:
     )
 
 
-def dos2unix(data: bytes) -> bytes:
-    return data.replace(b"\r\n", b"\n")
-
-
 def istextblock(block: bytes) -> bool:
     if not block:
         # An empty file is considered a valid text file
@@ -84,8 +80,6 @@ def _stream_to_file(
 
     for chunk in streamer:  # 16k
         file.write(chunk)
-        if istextblock(chunk[:DEFAULT_CHUNK_SIZE]):
-            chunk = dos2unix(chunk)
         md5.update(chunk)
         if display_progress:
             progress.update(task_id, advance=len(chunk))  # type: ignore

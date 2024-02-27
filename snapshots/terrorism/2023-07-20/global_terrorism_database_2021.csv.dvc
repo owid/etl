@@ -2,8 +2,7 @@ meta:
   name: Terrorism dataset, Global Terrorism Database (2020-2021)
   publication_year: 2022
   source_name: Global Terrorism Database (2022)
-  source_published_by: START (National Consortium for the Study of Terrorism and Responses
-    to Terrorism). (2022). Global Terrorism Database, 1970 - 2020 [data file]. https://www.start.umd.edu/gtd
+  source_published_by: START (National Consortium for the Study of Terrorism and Responses to Terrorism). (2022). Global Terrorism Database, 1970 - 2020 [data file]. https://www.start.umd.edu/gtd
   url: https://www.start.umd.edu/gtd/
   source_data_url:
   license_url: https://www.start.umd.edu/gtd/terms-of-use/
@@ -15,6 +14,6 @@ meta:
     Seperate file for terrorism data between 2020 and 2021.
 wdir: ../../../data/snapshots/terrorism/2023-07-20
 outs:
-- md5: dfaeaea5b32c7c2ad88cb9afcc93e056
-  size: 5468150
-  path: global_terrorism_database_2021.csv
+  - md5: 6cb1b18acee1f130d807095aa157d8e2
+    size: 5468150
+    path: global_terrorism_database_2021.csv

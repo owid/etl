@@ -12,7 +12,7 @@ from sqlalchemy.engine.base import Engine
 log = structlog.get_logger()
 
 
-@click.command(help=__doc__)
+@click.command(name="variable-mapping-translate", help=__doc__)
 @click.option(
     "-e1",
     "--env-file-1",
@@ -50,15 +50,12 @@ log = structlog.get_logger()
 def main_cli(env_file_1: str, env_file_2: str, mapping_file_1: str, mapping_file_2: str) -> None:
     """Translate the variable mapping dictionary from from one environment to another.
 
-    # Description
     Generate equivalent variable mapping file for the new DB. This is because the variable IDs for the same variables may differ between environments (local, staging or production environments).
     If you have the variable mapping for one of the environments, you can easily obtain the equivalent for another environment using this command.
 
     A common use case is when you have the mapping for your local environment and wish to have the equivalent for the production environment. Instead
     of creating yet again the mapping for the production environment, simply run this command which will 'translate' the mapping you found for your
     local environment to one that is consistent with the production environment's variable IDs.
-
-    # Reference
     """
     var_translator = VariableMappingTranslate.from_files(
         config_file_1=env_file_1,

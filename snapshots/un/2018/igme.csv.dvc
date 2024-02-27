@@ -24,6 +24,6 @@ meta:
       url: https://www.unicef.org/legal#copyright
 wdir: ../../../data/snapshots/un/2018
 outs:
-  - md5: 16fc4f6a083467848e58093d85636eed
+  - md5: 9517a40cce8b20366543c5791d347054
     size: 62755821
     path: igme.csv

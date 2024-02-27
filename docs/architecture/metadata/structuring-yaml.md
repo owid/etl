@@ -1,3 +1,8 @@
+---
+tags:
+  - 👷 Staff
+---
+
 ## Creating YAML Files
 
 Metadata YAML files are typically stored within a garden step as `my_dataset.meta.yml`. Their content is applied **at the very end** of any ETL step. Therefore, YAML files have "the final word" on the metadata of any step. The conventional structure is as follows:

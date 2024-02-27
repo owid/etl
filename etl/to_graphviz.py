@@ -9,7 +9,7 @@ import rich_click as click
 from etl.steps import filter_to_subgraph, load_dag
 
 
-@click.command()
+@click.command(name="graphviz")
 @click.argument("output_file")
 @click.option(
     "--filter",
@@ -24,11 +24,7 @@ from etl.steps import filter_to_subgraph, load_dag
 def to_graphviz(output_file: str, filter: Optional[str] = None, targets: bool = False) -> None:
     """Generate a [Graphviz DOT file](https://graphviz.org/doc/info/lang.html) to see all dependencies.
 
-    # Description
-    Saves the output as a file in `OUTPUT_PATH`.
-
-    # Reference
-    """
+    Saves the output as a file in `OUTPUT_PATH`."""
     dag = load_dag()
     if filter:
         dag = filter_to_subgraph(dag, includes=[filter])

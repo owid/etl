@@ -109,6 +109,10 @@ mkdocs-jupyter = "^0.24.2"
 mkdocs-exclude = "^1.0.2"
 mkdocs-gen-files = "^0.5.0"
 ruff = "0.1.6"
+mkdocs-git-authors-plugin = "^0.7.2"
+mkdocs-git-revision-date-localized-plugin = "^1.2.4"
+mkdocs-click = "^0.8.1"
+mkdocs-glightbox = "^0.3.7"
 
 [tool.ruff]
 extend-select = [

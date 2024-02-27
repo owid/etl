@@ -10,7 +10,7 @@ APP_STATE = utils.AppState()
 
 def init_app() -> None:
     st.set_page_config(
-        page_title="Wizard: Chart Revisions Baker",
+        page_title="Wizard: Chart Upgrader",
         layout="wide",
         page_icon="🪄",
         initial_sidebar_state="collapsed",
@@ -28,7 +28,7 @@ def init_app() -> None:
     """,
         },
     )
-    st.title("Charts 🧑‍🍳 **:gray[Revision Baker]**")
+    st.title("Charts 🌟 **:gray[Upgrader]**")
     st.markdown("Replace the usage from the variables in a dataset with the variables from another dataset..")
     add_indentation()
 

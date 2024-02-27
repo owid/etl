@@ -13,7 +13,7 @@ from etl import paths
 from etl.files import ruamel_dump, ruamel_load, yaml_dump
 
 
-@click.command(help=__doc__)
+@click.command(name="metadata-export", help=__doc__)
 @click.argument(
     "dataset_path",
     type=click.Path(),
@@ -44,7 +44,6 @@ def cli(
 ) -> None:
     """Export dataset, tables & indicator metadata in YAML format.
 
-    # Description
     Given a `DATASET_PATH`, load the corresponding dataset and export its metadata in YAML format (including table and indicator metadata). The metadata file and can be later edited manually. If the output YAML already exists, it will be updated with new values.
 
 
@@ -52,8 +51,6 @@ def cli(
     - This is useful when some metadata fields have been created dynamically in the code and you want to see the final result.
     - To prefill the YAML metadata file with the list of indicators and tables in the dataset. Note that, when first created, an ETL step is not yet aware of the columns of the tables of the dataset. It only knows that once you've executed th step.
 
-
-    ## Examples
 
     **Example 1:** Save to YAML file `etl/steps/data/garden/ggdc/2020-10-01/ggdc_maddison.meta.yml`
 
@@ -66,8 +63,6 @@ def cli(
     ```
     etl metadata-export data/garden/ggdc/2020-10-01/ggdc_maddison --show
     ```
-
-    # Reference
     """
     if show:
         assert not output, "Can't use --show and --output at the same time."

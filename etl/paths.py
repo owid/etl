@@ -3,6 +3,7 @@ from pathlib import Path
 
 BASE_DIR = Path(os.environ.get("BASE_DIR", Path(__file__).parent.parent))
 DAG_DIR = BASE_DIR / "dag"
+LIB_DIR = BASE_DIR / "lib"
 DAG_FILE = DAG_DIR / "main.yml"
 DAG_ARCHIVE_FILE = DAG_DIR / "archive" / "main.yml"
 DAG_TEMP_FILE = DAG_DIR / "temp.yml"

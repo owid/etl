@@ -14,7 +14,7 @@ etlwiz metaplay
     You can define custom environment variables in the file `.env.staging` and then run:
 
     ```shell
-    ENV=.env.staging etlwiz metaplay
+    ENV_FILE=.env.staging etlwiz metaplay
     ```
 
 

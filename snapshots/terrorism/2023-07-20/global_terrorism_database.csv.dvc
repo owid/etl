@@ -13,6 +13,6 @@ meta:
     The GTD is an event-level database containing more than 200,000 records of terrorist attacks that took place around the world since 1970. It is maintained by the National Consortium for the Study of Terrorism and Responses to Terrorism (START) at the University of Maryland.
 wdir: ../../../data/snapshots/terrorism/2023-07-20
 outs:
-  - md5: 6a76caa30fd2266952401d55351e209b
+  - md5: 783d2bf94a2267ba8c30cf5ebb77026c
     size: 193451541
     path: global_terrorism_database.csv

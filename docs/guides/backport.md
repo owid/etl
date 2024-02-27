@@ -1,3 +1,7 @@
+---
+tags:
+    - 👷 Staff
+---
 !!! warning "This tutorial might be partial or incomplete. Please check with the team if you have questions."
 
 Before ETL came along, datasets were uploaded directly to our Grapher admin site. If you want to leverage these datasets in the ETL, they won't be available out of the box, since they weren't initially imported via ETL. You have two main options to bring them into ETL:
@@ -14,7 +18,7 @@ Fast-Track is recommended for users who prefer working on Google sheets rather t
 Automatically generate ETL steps for a specific dataset with the following command. Choose the appropriate namespace, version and short name for the migrated dataset.
 
 ```
-ENV=.env.prod etl b migrate --dataset-id your_dataset_id --namespace your_namespace --version your_version --short-name your_short_name
+ENV_FILE=.env.prod etl b migrate --dataset-id your_dataset_id --namespace your_namespace --version your_version --short-name your_short_name
 ```
 
 After running this, follow the terminal prompts.
@@ -25,7 +29,7 @@ After running this, follow the terminal prompts.
 To move a dataset to Fast-Track, generate a Google spreadsheet using:
 
 ```
-ENV=.env.prod etl b fasttrack --dataset-id xxx --short-name your_short_name
+ENV_FILE=.env.prod etl b fasttrack --dataset-id xxx --short-name your_short_name
 ```
 
 Once generated, open the Fast-Track spreadsheet and follow the provided instructions.

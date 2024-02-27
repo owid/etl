@@ -26,6 +26,6 @@ meta:
 
 wdir: ../../../data/snapshots/tuberculosis/2023-11-27
 outs:
-  - md5: 448a7b668c0234746af432350682792b
+  - md5: 437d099e8c0e2ad39af8728fd0476d6e
     size: 97992
     path: data_dictionary.csv

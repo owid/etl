@@ -29,6 +29,6 @@ meta:
 
 wdir: ../../../data/snapshots/tuberculosis/2023-12-12
 outs:
-- md5: ee4a262e14cc4818b8af0b1d395dc746
-  size: 17817
-  path: unhlm_commitments.csv
+  - md5: b4cd70eff8bdff1dd6ce822f96e63e7a
+    size: 17817
+    path: unhlm_commitments.csv

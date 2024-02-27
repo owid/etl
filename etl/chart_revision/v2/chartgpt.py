@@ -68,7 +68,7 @@ click.rich_click.OPTION_GROUPS = {
 }
 
 
-@click.command(context_settings={"help_option_names": ["-h", "--help"]})
+@click.command(name="chart-gpt", context_settings={"help_option_names": ["-h", "--help"]})
 @click.option(
     "-u",
     "--user-id",
@@ -130,12 +130,9 @@ def cli(
 ) -> None:
     """Add FASTT suggestions by chatGPT to pending chart revisions in admin.
 
-    # Description
     This command gets a set of chart revision suggestions from the database, and queries chatGPT to get new suggestions for the title and subtitle of the chart. The new suggestions are then added to the database in an auxiliary table.
 
     The new suggestions are available from the chart revision admin tool.
-
-    # Reference
     """
     real_model_name = MODELS_AVAILABLE[model_name]
     if system_prompt:

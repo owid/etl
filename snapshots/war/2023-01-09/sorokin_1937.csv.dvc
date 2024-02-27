@@ -1,8 +1,7 @@
 meta:
   namespace: war
   short_name: sorokin_1937
-  name: 'Social and cultural dynamics. Volume III: Fluctuation of Social Relationships,
-    War, and Revolution (1937)'
+  name: 'Social and cultural dynamics. Volume III: Fluctuation of Social Relationships, War, and Revolution (1937)'
   source_name: Sorokin (1937)
   publication_year: 1937
   publication_date: 1937-12-01
@@ -85,6 +84,6 @@ meta:
 
 wdir: ../../../data/snapshots/war/2023-01-09
 outs:
-- md5: 62db4de77391db49dca0ee88c989f6e9
-  size: 115599
-  path: sorokin_1937.csv
+  - md5: b3f14480bf4936bccc548afa77d237b6
+    size: 115599
+    path: sorokin_1937.csv
