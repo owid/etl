@@ -28,6 +28,6 @@ meta:
       url: https://www.oecd.org/termsandconditions/
 
 outs:
-  - md5: 68b80a59879fc3594d9ada7277e1abea
+  - md5: 889c571c402f600539487014af478bb0
     size: 20413080
     path: health_expenditure.csv
