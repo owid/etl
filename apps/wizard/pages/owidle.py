@@ -151,7 +151,7 @@ def distance_to_solution(country_selected: str) -> Tuple[str, str, str]:
     geod = Geodesic.WGS84  # type: ignore
     # geod.Inverse returns a Geodesic dictionary (https://geographiclib.sourceforge.io/Python/doc/interface.html#dict)
     print("----------------")
-    print(guess.y, solution.y, guess.x, solution.x)
+    print(guess.y, guess.x, solution.y, solution.x)
     print("----------------")
     g = geod.Inverse(guess.y, guess.x, solution.y, solution.x)
     print(g)
