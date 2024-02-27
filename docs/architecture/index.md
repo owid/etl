@@ -9,12 +9,6 @@ Learn more about our architecture in the following sections: -->
 
 <div class="grid cards" markdown>
 
-- __[:material-road-variant: &nbsp; Our journey](our-journey)__
-
-    ---
-
-    A bit of history. Learn how we got here.
-
 - __[:fontawesome-solid-paintbrush: &nbsp; The design principles of the ETL](design/compute-graph/index.md)__
 
     ---
@@ -26,6 +20,21 @@ Learn more about our architecture in the following sections: -->
     ---
 
     Learn the different steps in ETL.
+
+-   __[:fontawesome-solid-book: &nbsp; Metadata reference](../architecture/metadata/reference.md)__
+
+    ---
+
+    Data alone is not enough.
+
+    Learn more about our [metadata](../architecture/metadata/index.md).
+
+- __[:material-road-variant: &nbsp; Our journey](our-journey)__
+
+    ---
+
+    A bit of history. Learn how we got here.
+
 
 </div>
 
