@@ -51,7 +51,7 @@ Pages to help us improve our charts (e.g. keeping them up to date). The current 
 
 ### Others
 - **Dataset Explorer**: A tool to explore the datasets in the ETL catalog. You can check the step dependancies and its metadata. If it is a Garden step, you can also perform some actions with it.
-- **Entity Harmonizer**: Harmonize the entity names of a table. Mostly useful to standardise country names. An alternative to [../our CLI](etl-cli/#etl-harmonize).
+- **Entity Harmonizer**: Harmonize the entity names of a table. Mostly useful to standardise country names. An alternative to [our CLI](../etl-cli/#etl-harmonize).
 
 ## Adding new functionalities to Wizard
 The code for the Wizard lives in [`apps/wizard`](https://github.com/owid/etl/tree/master/apps/wizard). It is a streamlit app, you can also run it with `streamlit run apps/wizard/app.py`.
