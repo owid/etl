@@ -36,6 +36,9 @@ def run(dest_dir: str) -> None:
     # Make the indicators wide
     tb = make_indicators_wide(tb, INDICATOR_NAMES)
 
+    # Transform health expenditure, saved originally in millions of dollars
+    tb["ppp_dollars"] *= 1e6
+
     tb = tb.set_index(["country", "year", "financing_scheme"], verify_integrity=True)
 
     #
