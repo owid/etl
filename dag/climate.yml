@@ -171,6 +171,7 @@ steps:
     - data://garden/climate/2024-02-19/monthly_burned_area
   data://grapher/climate/2024-02-19/yearly_burned_area:
     - data://garden/climate/2024-02-19/monthly_burned_area
+
   #
   # Emissions from wildfires.
   #
@@ -184,6 +185,18 @@ steps:
     - data://garden/climate/2024-02-19/monthly_fire_emissions
   data://grapher/climate/2024-02-19/yearly_fire_emissions:
     - data://garden/climate/2024-02-19/monthly_fire_emissions
+  #
+  # Weekly area burnt and emissions data on wildfires.
+  #
+
+  data://meadow/climate/latest/weekly_wildfires:
+    - snapshot://climate/2024-02-22/weekly_wildfires_2003_2023.csv
+    - snapshot://climate/latest/weekly_wildfires.csv
+  data://garden/climate/latest/weekly_wildfires:
+    - data://meadow/climate/latest/weekly_wildfires
+    - data://garden/regions/2023-01-01/regions
+  data://grapher/climate/latest/weekly_wildfires:
+    - data://garden/climate/latest/weekly_wildfires
   ######################################################################################################################
 
   ######################################################################################################################

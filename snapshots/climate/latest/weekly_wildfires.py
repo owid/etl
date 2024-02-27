@@ -1,20 +1,12 @@
-"""Script to create a snapshot of dataset."""
+"""Script to create a snapshot of dataset. Loads data from the EFFIS API and creates a snapshot of the dataset with weekly wildire numbers, area burnt and emissions.
+This script generates data from 2003-2023. The data for the year 2024 and above will be processed separately to avoid long processing times."""
 
-import os
-import shutil
-import tempfile
-import time
 from pathlib import Path
 
 import click
 import pandas as pd
+import requests
 from owid.datautils.io import df_to_file
-from selenium import webdriver
-from selenium.common.exceptions import NoSuchElementException, TimeoutException
-from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.support.wait import WebDriverWait
 from structlog import get_logger
 from tqdm import tqdm
 
@@ -26,6 +18,9 @@ log = get_logger()
 
 # Version for current snapshot dataset.
 SNAPSHOT_VERSION = Path(__file__).parent.name
+# Define a range of years for which data will be processed.
+
+YEAR = 2024
 
 COUNTRIES = {
     "ALB": "Albania",
@@ -280,125 +275,132 @@ COUNTRIES = {
     "UMI": "United States Minor Outlying Islands",
     "VUT": "Vanuatu",
     "WLF": "Wallis and Futuna",
-    "UN_OCE": "Oceania",
-    "UN_ASI": "Asia",
-    "UN_EUR": "Europe",
-    "UN_AME": "Americas",
-    "UN_AFR": "Africa",
 }
 
 
 @click.command()
 @click.option("--upload/--skip-upload", default=True, type=bool, help="Upload dataset to Snapshot")
 def main(upload: bool) -> None:
-    # Create a new snapshot.
+    # Initialize a new snapshot object for storing data, using a predefined file path structure.
     snap = Snapshot(f"climate/{SNAPSHOT_VERSION}/weekly_wildfires.csv")
-    all_dfs = []
 
-    years = range(2003, 2024)
-    for year in tqdm(years, desc="Processing years"):
-        for country, country_name in tqdm(COUNTRIES.items(), desc=f"Processing regions for year {year}"):
-            with tempfile.TemporaryDirectory() as download_path:
-                log.info(f"Processing {country_name} for year {year}.")
-                chrome_options = Options()
-                chrome_options.add_argument("--headless")
-                chrome_options.add_argument("--window-size=1920,1080")
-                chrome_options.add_argument(
-                    "--disable-gpu"
-                )  # Sometimes recommended for headless mode to avoid unnecessary use of GPU
-                chrome_options.add_argument(
-                    "--no-sandbox"
-                )  # Bypass OS security model; be cautious with this in production environments
-                chrome_options.add_argument("--disable-dev-shm-usage")  # Overcome limited resource problems
+    # Initialize an empty list to hold DataFrames for wildfire data.
+    dfs_fires = []
 
-                # Explicitly allow downloads in headless mode
-                chrome_options.add_experimental_option(
-                    "prefs",
-                    {
-                        "download.default_directory": download_path,
-                        "download.prompt_for_download": False,
-                        "download.directory_upgrade": True,
-                        "safebrowsing.enabled": True,
-                        "profile.default_content_settings.popups": 0,
-                        "profile.content_settings.exceptions.automatic_downloads.*.setting": 1,
-                    },
-                )
+    # Iterate through each country in the COUNTRIES dictionary.
+    for country, country_name in tqdm(
+        COUNTRIES.items(), desc=f"Processing number of fires and area burnt data for countries {YEAR}"
+    ):
+        # Format the API request URL for weekly wildfire data with current country and year.
+        base_url = (
+            "https://api2.effis.emergency.copernicus.eu/statistics/v2/gwis/weekly?country={country_code}&year={year}"
+        )
+        url = base_url.format(country_code=country, year=YEAR)
+        response = requests.get(url)
+        if response.status_code == 200:
+            data = response.json()
 
-                # Start the browser with the custom options
-                driver = webdriver.Chrome(options=chrome_options)
-                wait = WebDriverWait(driver, 50)  # Adjust wait time to a reasonable value
-                link = f"https://gwis.jrc.ec.europa.eu/apps/gwis.statistics/seasonaltrend/{country}/{year}/CO2"
-                driver.get(link)
-                all_dfs = []
-                try:
-                    chart_containers = wait.until(
-                        EC.presence_of_all_elements_located((By.CSS_SELECTOR, "div.col-lg-6.col-12"))
-                    )
-                    # Include only the first, third, and fifth containers (area burnt, CO2 emissions and number of areas)
-                    containers_to_include = [0, 2, 4]
-                    chart_containers = [chart_containers[i] for i in containers_to_include]
-                    for index, container in tqdm(
-                        enumerate(chart_containers),
-                        total=len(chart_containers),
-                        desc="Processing chart containers",
-                    ):
-                        # Scroll the container into view
-                        driver.execute_script(
-                            "arguments[0].scrollIntoView({behavior: 'smooth', block: 'nearest'});", container
-                        )
-                        time.sleep(5)  # Give time for any lazy-loaded elements to load
+            # Extract the weekly wildfire data.
+            banfweekly = data["banfweekly"]
+            # Convert the weekly data into a pandas DataFrame.
+            df = pd.DataFrame(banfweekly)
 
-                        try:
-                            # Remove potential overlays by setting their CSS to 'none'
-                            # Attempt to interact with the container
-                            main_export = container.find_element(
-                                By.CSS_SELECTOR, ".amcharts-amexport-label.amcharts-amexport-label-level-0"
-                            )
-                            main_export.click()
+            # Select and rename relevant columns, and calculate the 'month_day' column.
+            df = df[["mddate", "events", "area_ha"]]
+            df["month_day"] = [date[4:6] + "-" + date[6:] for date in df["mddate"]]
 
-                            data_link_specific_selector = (
-                                '.amcharts-amexport-item-blank[aria-label="Data [Click, tap or press ENTER to open]"]'
-                            )
-                            data_link = container.find_element(By.CSS_SELECTOR, data_link_specific_selector)
-                            data_link.click()
+            # Add 'year' and 'country' columns with the current iteration values.
+            df["year"] = YEAR
+            df["country"] = COUNTRIES[country]
 
-                            csv_option = container.find_element(
-                                By.CSS_SELECTOR,
-                                "li.amcharts-amexport-item.amcharts-amexport-item-level-2.amcharts-amexport-item-csv",
-                            )
+            # Reshape the DataFrame to have a consistent format for analysis, separating 'events' and 'area_ha' into separate rows.
+            df_melted = pd.melt(
+                df,
+                id_vars=["country", "year", "month_day"],
+                value_vars=["events", "area_ha"],
+                var_name="indicator",
+                value_name="value",
+            )
 
-                            csv_option.click()
+            # Extract the cumulative wildfire data.
+            banfcumulative = data["banfcumulative"]
+            # Convert the cumulative data into a pandas DataFrame.
+            df_cum = pd.DataFrame(banfcumulative)
+            # Similar processing as above for the cumulative data.
+            df_cum = df_cum[["mddate", "events", "area_ha"]]
+            df_cum["month_day"] = [date[4:6] + "-" + date[6:] for date in df_cum["mddate"]]
+            df_cum["year"] = YEAR
+            df_cum["country"] = COUNTRIES[country]
 
-                        except NoSuchElementException:
-                            log.info(f"Necessary element was not found in container {index+1}.")
-                        except Exception as e:
-                            log.info(f"An error occurred while processing container {index+1}: {e}")
+            # Reshape the cumulative DataFrame to match the format of the weekly data, marking indicators as cumulative.
+            df_melted_cum = pd.melt(
+                df_cum,
+                id_vars=["country", "year", "month_day"],
+                value_vars=["events", "area_ha"],
+                var_name="indicator",
+                value_name="value",
+            )
+            df_melted_cum["indicator"] = df_melted_cum["indicator"].apply(lambda x: x + "_cumulative")
 
-                except TimeoutException:
-                    log.info("Failed to locate containers within the timeout period.")
-                finally:
-                    # Now, load the files. This part assumes there's only one file and its name ends with '.csv'
-                    downloaded_files = [f for f in os.listdir(download_path) if f.endswith(".csv")]
-                    for file in downloaded_files:
-                        file_path = os.path.join(download_path, file)
-                        df = pd.read_csv(file_path)
-                        cols_to_keep = ["Day", f"Year {year}"]
-                        df = df[cols_to_keep]
-                        df["year"] = year
-                        df["country"] = country_name
-                        column_name = ""
-                        parts = file.split("_")
-                        for i, part in enumerate(parts):
-                            if part.isupper():
-                                column_name = "_".join(parts[:i])
-                        df["indicator"] = column_name
-                        df = df.rename(columns={f"Year {year}": "value", "Day": "day"})
-                        all_dfs.append(df)
-                    shutil.rmtree(download_path, ignore_errors=True)
+            # Concatenate the weekly and cumulative data into a single DataFrame.
+            df_all = pd.concat([df_melted, df_melted_cum])
 
-    all_dfs = pd.concat(all_dfs)
-    df_to_file(all_dfs, file_path=snap.path)
-    # Add file to DVC and upload to S3.
+            # Append the processed DataFrame to the list of fire DataFrames.
+            dfs_fires.append(df_all)
+
+    # Combine all individual fire DataFrames into one.
+    dfs_fires = pd.concat(dfs_fires)
+
+    # Similar process as above is repeated for emissions data, stored in `dfs_emissions`.
+    dfs_emissions = []
+    # Iterate through each country for emission data.
+    for country, country_name in tqdm(
+        COUNTRIES.items(), desc=f"Processing emissions data for countries for year {YEAR}"
+    ):
+        # Format the API request URL for weekly emissions data.
+        base_url = "https://api2.effis.emergency.copernicus.eu/statistics/v2/emissions/weekly?country={country_code}&year={year}"
+
+        url = base_url.format(country_code=country, year=YEAR)
+        response = requests.get(url)
+        if response.status_code == 200:
+            # Parse the emissions data from the JSON response.
+            data = response.json()
+
+            # Extract and process the weekly emissions data.
+            emiss_weekly = data["emissionsweekly"]
+            df = pd.DataFrame(emiss_weekly)
+            df["month_day"] = [date[4:6] + "-" + date[6:] for date in df["dt"]]
+
+            # Select relevant columns and rename for consistency.
+            df = df[["plt", "month_day", "curv"]]
+            df["year"] = YEAR
+            df["country"] = COUNTRIES[country]
+            df = df.rename(columns={"plt": "indicator", "curv": "value"})
+
+            # Process cumulative emissions data similarly.
+            emiss_cumulative = data["emissionsweeklycum"]
+            df_cum = pd.DataFrame(emiss_cumulative)
+            df_cum["month_day"] = [date[4:6] + "-" + date[6:] for date in df_cum["dt"]]
+            df_cum = df_cum[["plt", "month_day", "curv"]]
+            df_cum["year"] = YEAR
+            df_cum["country"] = COUNTRIES[country]
+            df_cum = df_cum.rename(columns={"plt": "indicator", "curv": "value"})
+            df_cum["indicator"] = df_cum["indicator"].apply(lambda x: x + "_cumulative")
+
+            # Concatenate weekly and cumulative emissions data.
+            df_all = pd.concat([df, df_cum])
+            # Append to the list of emissions DataFrames.
+            dfs_emissions.append(df_all)
+
+    # Combine all emissions DataFrames into one.
+    dfs_emissions = pd.concat(dfs_emissions)
+
+    # Combine both fires and emissions data into a final DataFrame.
+    df_final = pd.concat([dfs_fires, dfs_emissions])
+    # Save the final DataFrame to the specified file path in the snapshot.
+    df_to_file(df_final, file_path=snap.path)
+
+    # Add the file to DVC and optionally upload it to S3, based on the `upload` parameter.
     snap.dvc_add(upload=upload)
 
 
