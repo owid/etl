@@ -10,7 +10,7 @@ from st_aggrid import AgGrid, GridUpdateMode, JsCode
 from st_aggrid.grid_options_builder import GridOptionsBuilder
 
 from apps.step_update.cli import StepUpdater
-from etl.config import WIZARD_IS_REMOTE
+from etl.config import DB_HOST, WIZARD_IS_REMOTE
 
 # TODO:
 # Add columns:
@@ -26,6 +26,9 @@ from etl.config import WIZARD_IS_REMOTE
 # This is used as the default version of new steps to be created.
 # It is also used to calculate the number of days until the next expected update.
 TODAY = datetime.now().strftime("%Y-%m-%d")
+
+# Define the base URL for the grapher datasets (which will be different depending on the environment).
+GRAPHER_DATASET_BASE_URL = f"http://{DB_HOST.replace('127.0.0.1', 'localhost:3030')}/admin/datasets/"
 
 # CONFIG
 st.set_page_config(
@@ -122,6 +125,7 @@ df = steps_df[
         # "dag_file_name",
         # "n_versions",
         "update_period_days",
+        # The following column is needed to create the URLs to grapher datasets. It will be hidden in the Steps table.
         "db_dataset_id",
         # "state",
         "full_path_to_script",
@@ -188,6 +192,7 @@ gb.configure_selection(
     groupSelectsChildren=True,
     groupSelectsFiltered=True,
 )
+# Create a column with the number of days until the next expected update, colored according to its value.
 days_to_update_jscode = JsCode(
     """
     function(params){
@@ -216,6 +221,34 @@ days_to_update_jscode = JsCode(
     """
 )
 gb.configure_columns("days_to_update", cellStyle=days_to_update_jscode)
+# Create a column with grapher dataset names that are clickable and open in a new tab.
+gb.configure_column(
+    "db_dataset_name",  # This will be the displayed column
+    headerName="Grapher dataset",
+    cellRenderer=JsCode(
+        """
+        class UrlCellRenderer {
+          init(params) {
+            this.eGui = document.createElement('a');
+            const baseUrl = "%s";
+            const datasetId = params.data.db_dataset_id;
+            const url = baseUrl + datasetId;
+            this.eGui.innerText = params.value;
+            this.eGui.setAttribute('href', url);
+            this.eGui.setAttribute('style', "text-decoration:none");
+            this.eGui.setAttribute('target', "_blank");
+          }
+          getGui() {
+            return this.eGui;
+          }
+        }
+        """
+        % GRAPHER_DATASET_BASE_URL
+    ),
+    autoHeight=True,
+)
+# Now hide the unnecessary column of dataset ids.
+gb.configure_column("db_dataset_id", hide=True)
 gb.configure_pagination(paginationAutoPageSize=False, paginationPageSize=20)
 grid_options = gb.build()
 
