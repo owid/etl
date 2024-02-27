@@ -146,16 +146,13 @@ def drop_indicators_and_replace_nans(tb: Table) -> Table:
     ]
     tb = tb.drop(columns=vars_to_drop)
 
-    # Define columns containing "missing" and "dont_know"
-    missing_cols = [cols for cols in tb.columns if "missing" in cols]
+    # Define columns containing "no_answer" and "dont_know"
+    no_answer_cols = [cols for cols in tb.columns if "no_answer" in cols]
     dont_know_cols = [cols for cols in tb.columns if "dont_know" in cols]
 
-    # Replace zero values with nulls, except for columns containing "missing" and "dont_know"
-    subset_cols = tb.columns.difference(missing_cols + dont_know_cols)
+    # Replace zero values with nulls, except for columns containing "no_answer" and "dont_know"
+    subset_cols = tb.columns.difference(no_answer_cols + dont_know_cols)
     tb[subset_cols] = tb[subset_cols].replace(0, float("nan"))
-
-    # Replace 100 by null in columns containing "missing"
-    tb[missing_cols] = tb[missing_cols].replace(100, float("nan"))
 
     # Replace nulls in Schwartz questions by 0 when the main answer is not null
     tb = solve_nulls_values_in_schwartz_questions(
@@ -171,7 +168,7 @@ def drop_indicators_and_replace_nans(tb: Table) -> Table:
             "not_like_me",
             "not_at_all_like_me",
             "dont_know",
-            "missing",
+            "no_answer",
         ],
     )
 
@@ -311,7 +308,7 @@ def sanity_checks(tb: Table) -> Table:
     tb = check_sum_100(
         tb=tb,
         questions=IMPORTANT_IN_LIFE_QUESTIONS,
-        answers=["very", "rather", "not_very", "notatall", "dont_know", "missing"],
+        answers=["very", "rather", "not_very", "notatall", "dont_know", "no_answer"],
         margin=MARGIN,
     )
 
@@ -319,7 +316,7 @@ def sanity_checks(tb: Table) -> Table:
     tb = check_sum_100(
         tb=tb,
         questions=INTERESTED_IN_POLITICS_QUESTIONS,
-        answers=["very", "somewhat", "not_very", "not_at_all", "dont_know", "missing"],
+        answers=["very", "somewhat", "not_very", "not_at_all", "dont_know", "no_answer"],
         margin=MARGIN,
     )
 
@@ -327,7 +324,7 @@ def sanity_checks(tb: Table) -> Table:
     tb = check_sum_100(
         tb=tb,
         questions=POLITICAL_ACTION_QUESTIONS,
-        answers=["have_done", "might_do", "never", "dont_know", "missing"],
+        answers=["have_done", "might_do", "never", "dont_know", "no_answer"],
         margin=MARGIN,
     )
 
@@ -335,7 +332,7 @@ def sanity_checks(tb: Table) -> Table:
     tb = check_sum_100(
         tb=tb,
         questions=ENVIRONMENT_VS_ECONOMY_QUESTIONS,
-        answers=["environment", "economy", "other_answer", "dont_know", "missing"],
+        answers=["environment", "economy", "other_answer", "dont_know", "no_answer"],
         margin=MARGIN,
     )
 
@@ -343,7 +340,7 @@ def sanity_checks(tb: Table) -> Table:
     tb = check_sum_100(
         tb=tb,
         questions=INCOME_EQUALITY_QUESTIONS,
-        answers=["equality", "neutral", "inequality", "dont_know", "missing"],
+        answers=["equality", "neutral", "inequality", "dont_know", "no_answer"],
         margin=MARGIN,
     )
 
@@ -359,7 +356,7 @@ def sanity_checks(tb: Table) -> Table:
             "not_like_me",
             "not_at_all_like_me",
             "dont_know",
-            "missing",
+            "no_answer",
         ],
         margin=MARGIN,
     )
@@ -368,7 +365,7 @@ def sanity_checks(tb: Table) -> Table:
     tb = check_sum_100(
         tb=tb,
         questions=WORK_VS_LEISURE_QUESTIONS,
-        answers=["work", "leisure", "neutral", "dont_know", "missing"],
+        answers=["work", "leisure", "neutral", "dont_know", "no_answer"],
         margin=MARGIN,
     )
 
@@ -376,7 +373,7 @@ def sanity_checks(tb: Table) -> Table:
     tb = check_sum_100(
         tb=tb,
         questions=WORK_QUESTIONS,
-        answers=["strongly_agree", "agree", "neither", "disagree", "strongly_disagree", "dont_know", "missing"],
+        answers=["strongly_agree", "agree", "neither", "disagree", "strongly_disagree", "dont_know", "no_answer"],
         margin=MARGIN,
     )
 
@@ -384,7 +381,7 @@ def sanity_checks(tb: Table) -> Table:
     tb = check_sum_100(
         tb=tb,
         questions=MOST_SERIOUS_PROBLEM_QUESTIONS,
-        answers=["poverty", "women_discr", "sanitation", "education", "pollution", "dont_know", "missing"],
+        answers=["poverty", "women_discr", "sanitation", "education", "pollution", "dont_know", "no_answer"],
         margin=MARGIN,
     )
 
@@ -392,7 +389,7 @@ def sanity_checks(tb: Table) -> Table:
     tb = check_sum_100(
         tb=tb,
         questions=JUSTIFIABLE_QUESTIONS,
-        answers=["never_just_agg", "always_just_agg", "neutral", "dont_know", "missing"],
+        answers=["never_just_agg", "always_just_agg", "neutral", "dont_know", "no_answer"],
         margin=MARGIN,
     )
 
@@ -400,7 +397,7 @@ def sanity_checks(tb: Table) -> Table:
     tb = check_sum_100(
         tb=tb,
         questions=WORRIES_QUESTIONS,
-        answers=["very_much", "a_great_deal", "not_much", "not_at_all", "dont_know", "missing"],
+        answers=["very_much", "a_great_deal", "not_much", "not_at_all", "dont_know", "no_answer"],
         margin=MARGIN,
     )
 
