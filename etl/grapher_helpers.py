@@ -15,6 +15,7 @@ from owid.catalog.utils import underscore
 
 from etl.db import get_connection, get_engine
 from etl.db_utils import DBUtils
+from etl.files import checksum_str
 
 log = structlog.get_logger()
 
@@ -233,7 +234,7 @@ def _underscore_column_and_dimensions(column: str, dim_dict: Dict[str, Any], tri
 
     if len(short_name) > 255:
         if trim_long_short_name:
-            unique_hash = f"_{abs(hash(short_name))}"
+            unique_hash = f"_{checksum_str(short_name)}"
             short_name = short_name[: (255 - len(unique_hash))] + unique_hash
             log.warning(
                 "short_name_trimmed",

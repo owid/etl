@@ -49,16 +49,18 @@ def test_yield_wide_table():
 def test_yield_wide_table_with_dimensions():
     df = pd.DataFrame(
         {
-            "year": [2019, 2019, 2019],
-            "entity_id": [1, 1, 1],
-            "age": ["10-18", "19-25", "19-25"],
-            "deaths": [1, 2, 3],
+            "year": [2019, 2019, 2019, 2019],
+            "entity_id": [1, 1, 1, 1],
+            "age": ["10-18", "19-25", "19-25", np.nan],
+            "deaths": [1, 2, 3, 4],
         }
     )
     table = Table(df.set_index(["entity_id", "year", "age"]))
     table.deaths.metadata.unit = "people"
     table.deaths.metadata.title = "Deaths"
     grapher_tables = list(gh._yield_wide_table(table))
+
+    assert len(grapher_tables) == 3
 
     t = grapher_tables[0]
     assert t.columns[0] == "deaths__age_10_18"
@@ -67,6 +69,10 @@ def test_yield_wide_table_with_dimensions():
     t = grapher_tables[1]
     assert t.columns[0] == "deaths__age_19_25"
     assert t[t.columns[0]].metadata.title == "Deaths - Age: 19-25"
+
+    t = grapher_tables[2]
+    assert t.columns[0] == "deaths"
+    assert t[t.columns[0]].metadata.title == "Deaths"
 
 
 def test_long_to_wide_tables():
@@ -213,3 +219,15 @@ def test_expand_jinja():
         "description_key": ["This is bar"],
         "presentation": {"title_variant": "Variant bar"},
     }
+
+
+def test_underscore_column_and_dimensions():
+    short_name = "a" * 200
+    dims = {"age": "1" * 100}
+    expected = short_name + "__age_1111111111111111_4e8d3bae4e8b9786396245429a8430af"
+    assert gh._underscore_column_and_dimensions(short_name, dims, trim_long_short_name=True) == expected
+
+
+def test_title_column_and_dimensions():
+    assert gh._title_column_and_dimensions("A", {"age": "1"}) == "A - Age: 1"
+    assert gh._title_column_and_dimensions("A", {"age_group": "15-18"}) == "A - Age group: 15-18"
