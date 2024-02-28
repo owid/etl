@@ -18,7 +18,10 @@ def run(dest_dir: str) -> None:
     tb = ds_meadow["all_indicators"].reset_index()
 
     # Read 'general_files' table, which contains the country codes (used to map country codes to country names)
-    tb_codes = ds_meadow["general_files"].reset_index()
+    tb_codes = ds_meadow["country_codes"].reset_index()
+
+    # Read country -> region table
+    tb_regions = ds_meadow["region_mapping"].reset_index()
 
     #
     # Process data.
@@ -27,6 +30,12 @@ def run(dest_dir: str) -> None:
     tb_codes = geo.harmonize_countries(
         df=tb_codes,
         countries_file=paths.country_mapping_path,
+    )
+
+    # Standardise country codes in codes table
+    tb_regions = geo.harmonize_countries(
+        df=tb_regions,
+        countries_file=paths.directory / (paths.short_name + ".regions.countries.json"),
     )
 
     # Add country name to main table
@@ -57,9 +66,35 @@ def run(dest_dir: str) -> None:
         ]
     ] *= 100
 
-    # Additional indicators
-    tb["urbc_c_share"] = (tb["urbc_c"] / tb["popc_c"]) * 100
-    tb["rurc_c_share"] = (tb["rurc_c"] / tb["popc_c"]) * 100
+    # Add regional data
+    ## Exclude relative indicators (e.g. population density)
+    # columns_exclude = ["popd_c"]
+    tb_with_regions = tb.merge(tb_regions, on="country", how="left").copy()
+    ## Set region column as string
+    tb_with_regions["region"] = tb_with_regions["region"].astype("string")
+    ## Add missing mapping for Serbia and Montenegro
+    tb_with_regions.loc[tb_with_regions["country"] == "Serbia and Montenegro", "region"] = "Europe"
+    ## Remove World
+    tb_with_regions = tb_with_regions.loc[tb_with_regions["country"] != "World"]
+    ## Ensure that all countries have a region
+    countries_missing = set(tb_with_regions.loc[tb_with_regions["region"].isna(), "country"])
+    assert not countries_missing, f"Missing regions for {countries_missing}"
+    ## Map region names
+    # region_renames = {
+
+    # }
+
+    # Add agriculture land
+    tb["agriculture_c"] = tb["grazing_c"] + tb["cropland_c"]
+
+    # SHARE indicators. Add indicators
+    ## NOTE: you should add metadata for these indicators in the YAML file
+    columns = ["urbc_c", "rurc_c", "agriculture_c"]
+    for col in columns:
+        tb[col + "_share"] = (tb[col] / tb["popc_c"]) * 100
+
+    # Replace year 0 with year 1
+    ## More: https://en.wikipedia.org/wiki/Year_zero#cite_note-7
 
     # Set index
     tb = tb.set_index(["country", "year"], verify_integrity=True).sort_index()
