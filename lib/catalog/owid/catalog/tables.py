@@ -704,6 +704,9 @@ class Table(pd.DataFrame):
 
         return cast("Table", tb)
 
+    def drop(self, *args, **kwargs) -> "Table":
+        return cast(Table, super().drop(*args, **kwargs))
+
     def update_log(
         self,
         operation: str,
@@ -1335,7 +1338,7 @@ def read_fwf(
 
 
 def read_feather(
-    filepath: Union[str, Path],
+    filepath: Union[str, Path, IO[AnyStr]],
     metadata: Optional[TableMeta] = None,
     origin: Optional[Origin] = None,
     underscore: bool = False,

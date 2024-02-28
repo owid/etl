@@ -69,8 +69,8 @@ def expand_dimensions(tb: catalog.Table) -> catalog.Table:
 def _yield_wide_table(
     table: catalog.Table,
     na_action: Literal["drop", "raise"] = "raise",
-    dim_titles: Optional[List[str]] = None,
     warn_null_variables: bool = True,
+    trim_long_short_name: bool = True,
 ) -> Iterable[catalog.Table]:
     """We have 5 dimensions but graphers data model can only handle 2 (year and entityId). This means
     we have to iterate all combinations of the remaining 3 dimensions and create a new variable for
@@ -79,8 +79,8 @@ def _yield_wide_table(
 
     :param na_action: grapher does not support missing values, you can either drop them using this argument
         or raise an exception
-    :param dim_titles: Custom names to use for the dimensions, if not provided, the default names will be used.
-        Dimension title will be used to create variable name, e.g. `Deaths - Age: 10-18` instead of `Deaths - age: 10-18`
+    :param trim_long_short_name: If true and there's a short name longer than 255 characters, we trim it to 240 characters
+        and add a hash from its short name to the end to make it unique.
     """
     table = copy.deepcopy(table)
     table.metadata = copy.deepcopy(table.metadata)
@@ -99,21 +99,22 @@ def _yield_wide_table(
         raise Exception("Columns with missing units: " + ", ".join(cols_with_none_units))
 
     dim_names = [k for k in table.primary_key if k not in ("year", "entity_id")]
-    if dim_titles:
-        assert len(dim_names) == len(
-            dim_titles
-        ), "`dim_titles` must be the same length as your index without year and entity_id"
-    else:
-        dim_titles = dim_names
 
     if dim_names:
-        grouped = table.groupby(dim_names if len(dim_names) > 1 else dim_names[0], as_index=False, observed=True)
+        # `dropna=False` makes sure we don't drop NaN values from index
+        grouped = table.groupby(
+            dim_names if len(dim_names) > 1 else dim_names[0], as_index=False, observed=True, dropna=False
+        )
     else:
         # a situation when there's only year and entity_id in index with no additional dimensions
         grouped = [([], table)]
 
     for dim_values, table_to_yield in grouped:
-        dim_values = [dim_values] if isinstance(dim_values, str) else dim_values
+        if not isinstance(dim_values, tuple):
+            dim_values = (dim_values,)
+
+        # Filter NaN values from dimensions and return dictionary
+        dim_dict: Dict[str, Any] = {n: v for n, v in zip(dim_names, dim_values) if pd.notnull(v)}
 
         # Now iterate over every column in the original dataset and export the
         # subset of data that we prepared above
@@ -121,7 +122,7 @@ def _yield_wide_table(
             # If all values are null, skip variable
             if table_to_yield[column].isnull().all():
                 if warn_null_variables:
-                    log.warning("yield_wide_table.null_variable", column=column, dims=dim_values)
+                    log.warning("yield_wide_table.null_variable", column=column, dim_dict=dim_dict)
                 continue
 
             # Safety check to see if the metadata is still intact
@@ -136,26 +137,28 @@ def _yield_wide_table(
             tab = tab.dropna() if na_action == "drop" else tab
 
             # Create underscored name of a new column from the combination of column and dimensions
-            short_name = _underscore_column_and_dimensions(column, dim_values, dim_names)
+            short_name = _underscore_column_and_dimensions(
+                column,
+                dim_dict,
+                trim_long_short_name=trim_long_short_name,
+            )
 
             # set new metadata with dimensions
             tab.metadata.short_name = short_name
             tab = tab.rename(columns={column: short_name})
 
             # add info about dimensions to metadata
-            if dim_values:
+            if dim_dict:
                 tab[short_name].metadata.additional_info = {
                     "dimensions": {
                         "originalShortName": column,
                         "originalName": tab[short_name].metadata.title,
                         "filters": [
                             {"name": dim_name, "value": sanitize_numpy(dim_value)}
-                            for dim_name, dim_value in zip(dim_names, dim_values)
+                            for dim_name, dim_value in dim_dict.items()
                         ],
                     }
                 }
-
-            dim_dict = dict(zip(dim_names, dim_values))
 
             # Add dimensions to title (which will be used as variable name in grapher)
             if tab[short_name].metadata.title:
@@ -164,9 +167,7 @@ def _yield_wide_table(
                     title_with_dims = _expand_jinja_text(tab[short_name].metadata.title, dim_dict)
                 # Otherwise use default
                 else:
-                    title_with_dims = _title_column_and_dimensions(
-                        tab[short_name].metadata.title, dim_values, dim_titles
-                    )
+                    title_with_dims = _title_column_and_dimensions(tab[short_name].metadata.title, dim_dict)
 
                 tab[short_name].metadata.title = title_with_dims
 
@@ -212,24 +213,38 @@ def _expand_jinja(obj: Any, dim_dict: Dict[str, str]) -> Any:
         return obj
 
 
-def _title_column_and_dimensions(title: str, dims: List[str], dim_names: List[str]) -> str:
+def _title_column_and_dimensions(title: str, dim_dict: Dict[str, Any]) -> str:
     """Create new title from column title and dimensions.
     For instance `Deaths`, ["age", "sex"], ["10-18", "male"] will be converted into
     Deaths - Age: 10-18 - Sex: male
     """
-    dims = [f"{dim_name.capitalize()}: {dim}" for dim, dim_name in zip(dims, dim_names)]
-
+    dims = [f"{dim_name.replace('_', ' ').capitalize()}: {dim_value}" for dim_name, dim_value in dim_dict.items()]
     return " - ".join([title] + dims)
 
 
-def _underscore_column_and_dimensions(column: str, dims: List[str], dim_names: List[str]) -> str:
+def _underscore_column_and_dimensions(column: str, dim_dict: Dict[str, Any], trim_long_short_name: bool = True) -> str:
     # add dimension names to dimensions
-    dims = [f"{dim_name}_{dim}" for dim, dim_name in zip(dims, dim_names)]
+    dims = [f"{dim_name}_{dim_value}" for dim_name, dim_value in dim_dict.items()]
 
     # underscore dimensions and append them using double underscores
     # NOTE: `column` has been already underscored in a table
     slug = "__".join([column] + [underscore(n) for n in dims])
-    return cast(str, slug)
+    short_name = cast(str, slug)
+
+    if len(short_name) > 255:
+        if trim_long_short_name:
+            unique_hash = f"_{abs(hash(short_name))}"
+            short_name = short_name[: (255 - len(unique_hash))] + unique_hash
+            log.warning(
+                "short_name_trimmed",
+                short_name=short_name,
+                column=column,
+                dims=dim_dict,
+            )
+        else:
+            raise AssertionError(f"short_name {short_name} is too long for MySQL variables.shortName column")
+
+    return short_name
 
 
 def _assert_long_table(table: catalog.Table) -> None:

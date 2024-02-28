@@ -58,15 +58,15 @@ def test_yield_wide_table_with_dimensions():
     table = Table(df.set_index(["entity_id", "year", "age"]))
     table.deaths.metadata.unit = "people"
     table.deaths.metadata.title = "Deaths"
-    grapher_tables = list(gh._yield_wide_table(table, dim_titles=["Age group"]))
+    grapher_tables = list(gh._yield_wide_table(table))
 
     t = grapher_tables[0]
     assert t.columns[0] == "deaths__age_10_18"
-    assert t[t.columns[0]].metadata.title == "Deaths - Age group: 10-18"
+    assert t[t.columns[0]].metadata.title == "Deaths - Age: 10-18"
 
     t = grapher_tables[1]
     assert t.columns[0] == "deaths__age_19_25"
-    assert t[t.columns[0]].metadata.title == "Deaths - Age group: 19-25"
+    assert t[t.columns[0]].metadata.title == "Deaths - Age: 19-25"
 
 
 def test_long_to_wide_tables():

@@ -9,7 +9,7 @@ import tempfile
 from collections.abc import Generator
 from contextlib import contextmanager
 from pathlib import Path
-from typing import Any, Dict, Iterable, Iterator, List, Optional, Union, cast
+from typing import Any, Dict, Iterable, Iterator, List, Literal, Optional, Union, cast
 from urllib.parse import urljoin
 
 import jsonref
@@ -124,6 +124,7 @@ def create_dataset(
     check_variables_metadata: bool = False,
     run_grapher_checks: bool = True,
     if_origins_exist: SOURCE_EXISTS_OPTIONS = "replace",
+    errors: Literal["ignore", "warn", "raise"] = "raise",
 ) -> catalog.Dataset:
     """Create a dataset and add a list of tables. The dataset metadata is inferred from
     default_metadata and the dest_dir (which is in the form `channel/namespace/version/short_name`).
@@ -204,7 +205,7 @@ def create_dataset(
 
     meta_path = get_metadata_path(str(dest_dir))
     if meta_path.exists():
-        ds.update_metadata(meta_path, if_origins_exist=if_origins_exist)
+        ds.update_metadata(meta_path, if_origins_exist=if_origins_exist, errors=errors)
 
         # check that we are not using metadata inconsistent with path
         for k, v in match.groupdict().items():

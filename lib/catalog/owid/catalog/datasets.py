@@ -191,6 +191,7 @@ class Dataset:
         metadata_path: Path,
         if_source_exists: SOURCE_EXISTS_OPTIONS = "replace",
         if_origins_exist: SOURCE_EXISTS_OPTIONS = "replace",
+        errors: Literal["ignore", "warn", "raise"] = "raise",
     ) -> None:
         """
         Load YAML file with metadata from given path and update metadata of dataset and its tables.
@@ -205,6 +206,7 @@ class Dataset:
             - "replace" (default): replace existing origin with new one
             - "append": append new origin to existing ones
             - "fail": raise an exception if origin already exists
+        :param errors: Optionally ignore errors like missing tables that are specified in YAML file
         """
         self.metadata.update_from_yaml(metadata_path, if_source_exists=if_source_exists)
 
@@ -212,7 +214,15 @@ class Dataset:
             metadata = yaml.safe_load(istream)
             for table_name in metadata.get("tables", {}).keys():
                 with disable_processing_log():
-                    table = self[table_name]
+                    try:
+                        table = self[table_name]
+                    except KeyError as e:
+                        if errors == "raise":
+                            raise e
+                        else:
+                            if errors == "warn":
+                                warnings.warn(str(e))
+                            continue
                 table.update_metadata_from_yaml(metadata_path, table_name, if_origins_exist=if_origins_exist)
                 table._save_metadata(join(self.path, table.metadata.checked_name + ".meta.json"))
 
