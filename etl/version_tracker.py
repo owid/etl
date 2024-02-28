@@ -625,11 +625,11 @@ class VersionTracker:
             self.unknown_steps_with_grapher_dataset_df = steps_df[steps_df["state"].isnull()].reset_index(drop=True)
             steps_df = steps_df.dropna(subset=["state"]).reset_index(drop=True)
 
+            # Add columns with the date and the number of days until the next update.
+            steps_df = add_days_to_update_columns(steps_df=steps_df)
+
         # Add columns with the list of forward and backwards versions for each step.
         steps_df = self._add_columns_with_different_step_versions(steps_df=steps_df)
-
-        # Add columns with the date and the number of days until the next update.
-        steps_df = add_days_to_update_columns(steps_df=steps_df)
 
         # For convenience, add full local path to dag files to steps dataframe.
         steps_df["dag_file_path"] = [
