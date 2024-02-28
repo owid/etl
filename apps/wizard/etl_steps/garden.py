@@ -415,7 +415,7 @@ if submitted:
             st.markdown("Run it in your terminal:")
             st.code(
                 f"poetry run etl harmonize data/meadow/{form.namespace}/{form.meadow_version}/{form.short_name}/{form.short_name}.feather country etl/steps/data/garden/{form.namespace}/{form.version}/{form.short_name}.countries.json",
-                "bash",
+                "shellSession",
             )
             st.markdown("Or run it on Wizard")
             utils.st_page_link(
@@ -429,7 +429,7 @@ if submitted:
             st.markdown("After editing the code of your Garden step, run the following command:")
             st.code(
                 f"poetry run etl run data{private_suffix}://garden/{form.namespace}/{form.version}/{form.short_name} {'--private' if form.is_private else ''}",
-                "bash",
+                "shellSession",
             )
             # 3/ Optional shit
             with st.container(border=True):
@@ -455,18 +455,19 @@ if submitted:
                     st.markdown("Alternitavely you can generate the metadata with the following command:")
                     st.code(
                         f"poetry run etl metadata-export {st.session_state['garden.dataset_path']}",
-                        "bash",
+                        "shellSession",
                     )
 
                 st.markdown("then manual edit it and rerun the step again with")
                 st.code(
                     f"poetry run etl run data{private_suffix}://garden/{form.namespace}/{form.version}/{form.short_name} {'--private' if form.is_private else ''}",
-                    "bash",
+                    "shellSession",
                 )
 
                 # C/ Organize DAG
-                st.markdown("#### Organize the DAG")
-                st.markdown(f"Check the DAG `{dag_path}`.")
+                if dag_content:
+                    st.markdown("#### Organize the DAG")
+                    st.markdown(f"Check the DAG `{dag_path}`.")
 
             # 4/ Final steps
             st.markdown("####  3. Pull request")

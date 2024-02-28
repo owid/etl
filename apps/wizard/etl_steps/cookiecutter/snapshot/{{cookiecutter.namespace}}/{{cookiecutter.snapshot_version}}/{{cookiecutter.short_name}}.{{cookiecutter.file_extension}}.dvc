@@ -8,7 +8,7 @@ meta:
     description: |-
       {{cookiecutter.description.replace("\n", "\n      ")}}
     {%- endif %}
-    date_published: {{cookiecutter.date_published}}
+    date_published: "{{cookiecutter.date_published}}"
     {%- if cookiecutter.origin_version %}
     version_producer: {{cookiecutter.origin_version}}
     {%- endif %}

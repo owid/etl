@@ -96,7 +96,10 @@ A165 is the question "most people can be trusted"
 */
 
 * Keep only "most people can be trusted" (1), "Need to be very careful" (2), "Don't know" (-1)
-keep if A165 >= -1
+keep if A165 >= 1
+keep if A165 != .c
+keep if A165 != .d
+keep if A165 != .e
 
 *Generate trust variable, with 1 if it's option 1
 gen trust = 0
@@ -114,7 +117,7 @@ preserve
 G007_34 is the question about trusting people you meet fot the first time
 */
 
-keep if G007_34 >= -1
+keep if G007_34 >= 1
 
 gen trust_first = 0
 replace trust_first = 1 if G007_34 == 1 | G007_34 == 2
@@ -136,7 +139,7 @@ preserve
 G007_33 is the question about trusting people you know personally
 */
 
-keep if G007_33 >= -1
+keep if G007_33 >= 1
 
 gen trust_personally = 0
 replace trust_personally = 1 if G007_33 == 1 | G007_33 == 2
@@ -158,7 +161,10 @@ preserve
 A168 is the question "do you think most people try to take advantage of you"
 */
 
-keep if A168 >= -1
+keep if A168 >= 1
+keep if A168 != .c
+keep if A168 != .d
+keep if A168 != .e
 
 gen take_advantage = 0
 replace take_advantage = 1 if A168 == 1
@@ -175,7 +181,10 @@ Processing of multiple additional trust and confidence questions
 */
 
 foreach var in $additional_questions {
-	keep if `var' >= -1
+	keep if `var' >= 1
+	keep if `var' != .c
+	keep if `var' != .d
+	keep if `var' != .e
 
 	gen confidence_`var' = 0
 	replace confidence_`var' = 1 if `var' == 1 | `var' == 2
@@ -204,6 +213,9 @@ foreach var in $additional_questions {
 
 foreach var in $important_in_life_questions {
 	keep if `var' >= 1
+	keep if `var' != .c
+	keep if `var' != .d
+	keep if `var' != .e
 
 	gen important_in_life_`var' = 0
 	replace important_in_life_`var' = 1 if `var' == 1 | `var' == 2
@@ -226,10 +238,10 @@ foreach var in $important_in_life_questions {
 	gen dont_know_important_in_life_`var' = 0
 	replace dont_know_important_in_life_`var' = 1 if `var' == .a
 	
-	gen missing_important_in_life_`var' = 0
-	replace missing_important_in_life_`var' = 1 if `var' == .b | `var' == .c | `var' == .d | `var' == .e
+	gen no_answer_important_in_life_`var' = 0
+	replace no_answer_important_in_life_`var' = 1 if `var' == .b
 
-	collapse (mean) important_in_life_`var' not_important_in_life_`var' very_important_in_life_`var' rather_important_in_life_`var' not_very_important_in_life_`var' notatall_important_in_life_`var' dont_know_important_in_life_`var' missing_important_in_life_`var' [w=S017], by (year country)
+	collapse (mean) important_in_life_`var' not_important_in_life_`var' very_important_in_life_`var' rather_important_in_life_`var' not_very_important_in_life_`var' notatall_important_in_life_`var' dont_know_important_in_life_`var' no_answer_important_in_life_`var' [w=S017], by (year country)
 	tempfile important_in_life_`var'_file
 	save "`important_in_life_`var'_file'"
 
@@ -253,6 +265,9 @@ foreach var in $important_in_life_questions {
 
 */
 keep if E023 >= 1
+keep if E023 != .c
+keep if E023 != .d
+keep if E023 != .e
 
 gen interested_politics = 0
 replace interested_politics = 1 if E023 == 1 | E023 == 2
@@ -275,10 +290,10 @@ replace not_at_all_interested_politics = 1 if E023 == 4
 gen dont_know_interested_politics = 0
 replace dont_know_interested_politics = 1 if E023 == .a
 
-gen missing_interested_politics = 0
-replace missing_interested_politics = 1 if E023 == .b | E023 == .c | E023 == .d | E023 == .e
+gen no_answer_interested_politics = 0
+replace no_answer_interested_politics = 1 if E023 == .b
 
-collapse (mean) interested_politics not_interested_politics very_interested_politics somewhat_interested_politics not_very_interested_politics not_at_all_interested_politics dont_know_interested_politics missing_interested_politics [w=S017], by (year country)
+collapse (mean) interested_politics not_interested_politics very_interested_politics somewhat_interested_politics not_very_interested_politics not_at_all_interested_politics dont_know_interested_politics no_answer_interested_politics [w=S017], by (year country)
 tempfile interest_politics_file
 save "`interest_politics_file'"
 
@@ -304,6 +319,9 @@ global rest_politics_questions : list global(politics_questions) - global(intere
 foreach var of varlist $rest_politics_questions {
 	
 	keep if `var' >= 1
+	keep if `var' != .c
+	keep if `var' != .d
+	keep if `var' != .e
 
 	gen have_done_political_action_`var' = 0
 	replace have_done_political_action_`var' = 1 if `var' == 1
@@ -317,10 +335,10 @@ foreach var of varlist $rest_politics_questions {
 	gen dont_know_political_action_`var' = 0
 	replace dont_know_political_action_`var' = 1 if `var' == .a
 	
-	gen missing_political_action_`var' = 0
-	replace missing_political_action_`var' = 1 if `var' == .b | `var' == .c | `var' == .d | `var' == .e
+	gen no_answer_political_action_`var' = 0
+	replace no_answer_political_action_`var' = 1 if `var' == .b
 
-	collapse (mean) have_done_political_action_`var' might_do_political_action_`var' never_political_action_`var' dont_know_political_action_`var' missing_political_action_`var' [w=S017], by (year country)
+	collapse (mean) have_done_political_action_`var' might_do_political_action_`var' never_political_action_`var' dont_know_political_action_`var' no_answer_political_action_`var' [w=S017], by (year country)
 	tempfile politics_`var'_file
 	save "`politics_`var'_file'"
 	
@@ -343,6 +361,9 @@ foreach var of varlist $rest_politics_questions {
 
 * Keep only answers
 keep if B008 >= 1
+keep if B008 != .c
+keep if B008 != .d
+keep if B008 != .e
 
 *Generate variables
 gen environment_env_ec = 0
@@ -357,11 +378,11 @@ replace other_answer_env_ec = 1 if B008 == 3
 gen dont_know_env_ec = 0
 replace dont_know_env_ec = 1 if B008 == .a
 
-gen missing_env_ec = 0
-replace missing_env_ec = 1 if B008 == .b | B008 == .c | B008 == .d | B008 == .e
+gen no_answer_env_ec = 0
+replace no_answer_env_ec = 1 if B008 == .b
 
 * Make dataset of the mean trust (which ends up being the % of people saying "most people can be trusted") by wave and country (CHECK WEIGHTS)
-collapse (mean) environment_env_ec economy_env_ec other_answer_env_ec dont_know_env_ec missing_env_ec [w=S017], by (year country)
+collapse (mean) environment_env_ec economy_env_ec other_answer_env_ec dont_know_env_ec no_answer_env_ec [w=S017], by (year country)
 tempfile environment_vs_econ_file
 save "`environment_vs_econ_file'"
 
@@ -390,6 +411,9 @@ preserve
 
 * Keep only answers
 keep if E035 >= 1
+keep if E035 != .c
+keep if E035 != .d
+keep if E035 != .e
 
 *Generate variables
 gen equality_eq_ineq = 0
@@ -404,13 +428,13 @@ replace inequality_eq_ineq = 1 if E035 >= 6 & E035 <=10
 gen dont_know_eq_ineq = 0
 replace dont_know_eq_ineq = 1 if E035 == .a
 
-gen missing_eq_ineq = 0
-replace missing_eq_ineq = 1 if E035 == .b | E035 == .c | E035 == .d | E035 == .e
+gen no_answer_eq_ineq = 0
+replace no_answer_eq_ineq = 1 if E035 == .b
 
 gen avg_score_eq_ineq = E035
 
 * Make dataset of the mean trust (which ends up being the % of people saying "most people can be trusted") by wave and country (CHECK WEIGHTS)
-collapse (mean) equality_eq_ineq neutral_eq_ineq inequality_eq_ineq dont_know_eq_ineq missing_eq_ineq avg_score_eq_ineq [w=S017], by (year country)
+collapse (mean) equality_eq_ineq neutral_eq_ineq inequality_eq_ineq dont_know_eq_ineq no_answer_eq_ineq avg_score_eq_ineq [w=S017], by (year country)
 tempfile income_equality_file
 save "`income_equality_file'"
 
@@ -436,6 +460,9 @@ preserve
 
 foreach var in $schwartz_questions {
 	keep if `var' >= 1
+	keep if `var' != .c
+	keep if `var' != .d
+	keep if `var' != .e
 
 	gen like_me_agg_`var' = 0
 	replace like_me_agg_`var' = 1 if `var' == 4 | `var' == 5 | `var' == 6
@@ -464,10 +491,10 @@ foreach var in $schwartz_questions {
 	gen dont_know_`var' = 0
 	replace dont_know_`var' = 1 if `var' == .a
 	
-	gen missing_`var' = 0
-	replace missing_`var' = 1 if `var' == .b | `var' == .c | `var' == .d | `var' == .e
+	gen no_answer_`var' = 0
+	replace no_answer_`var' = 1 if `var' == .b
 
-	collapse (mean) like_me_agg_`var' not_like_me_agg_`var' very_much_like_me_`var' like_me_`var' somewhat_like_me_`var' a_little_like_me_`var' not_like_me_`var' not_at_all_like_me_`var' dont_know_`var' missing_`var' [w=S017], by (year country)
+	collapse (mean) like_me_agg_`var' not_like_me_agg_`var' very_much_like_me_`var' like_me_`var' somewhat_like_me_`var' a_little_like_me_`var' not_like_me_`var' not_at_all_like_me_`var' dont_know_`var' no_answer_`var' [w=S017], by (year country)
 	tempfile schwartz_`var'_file
 	save "`schwartz_`var'_file'"
 
@@ -491,6 +518,9 @@ foreach var in $schwartz_questions {
 
 * Keep only answers
 keep if C008 >= 1
+keep if C008 != .c
+keep if C008 != .d
+keep if C008 != .e
 
 *Generate variables
 gen leisure_lei_vs_wk = 0
@@ -517,13 +547,13 @@ replace lei_vs_wk_5  = 1 if C008 == 5
 gen dont_know_lei_vs_wk = 0
 replace dont_know_lei_vs_wk = 1 if C008 == .a
 
-gen missing_lei_vs_wk = 0
-replace missing_lei_vs_wk = 1 if C008 == .b | C008 == .c | C008 == .d | C008 == .e
+gen no_answer_lei_vs_wk = 0
+replace no_answer_lei_vs_wk = 1 if C008 == .b
 
 gen avg_score_lei_vs_wk = C008
 
 * Make dataset of the mean trust (which ends up being the % of people saying "most people can be trusted") by wave and country (CHECK WEIGHTS)
-collapse (mean) leisure_lei_vs_wk neutral_lei_vs_wk work_lei_vs_wk lei_vs_wk_1 lei_vs_wk_2 lei_vs_wk_4 lei_vs_wk_5 dont_know_lei_vs_wk missing_lei_vs_wk avg_score_lei_vs_wk [w=S017], by (year country)
+collapse (mean) leisure_lei_vs_wk neutral_lei_vs_wk work_lei_vs_wk lei_vs_wk_1 lei_vs_wk_2 lei_vs_wk_4 lei_vs_wk_5 dont_know_lei_vs_wk no_answer_lei_vs_wk avg_score_lei_vs_wk [w=S017], by (year country)
 tempfile leisure_vs_work_file
 save "`leisure_vs_work_file'"
 
@@ -548,6 +578,9 @@ preserve
 
 foreach var in $work_questions {
 	keep if `var' >= 1
+	keep if `var' != .c
+	keep if `var' != .d
+	keep if `var' != .e
 
 	gen agree_agg_`var' = 0
 	replace agree_agg_`var' = 1 if `var' == 1 | `var' == 2
@@ -573,10 +606,10 @@ foreach var in $work_questions {
 	gen dont_know_`var' = 0
 	replace dont_know_`var' = 1 if `var' == .a
 	
-	gen missing_`var' = 0
-	replace missing_`var' = 1 if `var' == .b | `var' == .c | `var' == .d | `var' == .e
+	gen no_answer_`var' = 0
+	replace no_answer_`var' = 1 if `var' == .b
 
-	collapse (mean) agree_agg_`var' disagree_agg_`var' strongly_agree_`var' agree_`var' neither_`var' disagree_`var' strongly_disagree_`var' dont_know_`var' missing_`var' [w=S017], by (year country)
+	collapse (mean) agree_agg_`var' disagree_agg_`var' strongly_agree_`var' agree_`var' neither_`var' disagree_`var' strongly_disagree_`var' dont_know_`var' no_answer_`var' [w=S017], by (year country)
 	tempfile work_`var'_file
 	save "`work_`var'_file'"
 
@@ -601,6 +634,9 @@ foreach var in $work_questions {
 
 * Keep only answers
 keep if E238 >= 1
+keep if E238 != .c
+keep if E238 != .d
+keep if E238 != .e
 
 *Generate variables
 gen poverty_most_serious = 0
@@ -621,11 +657,11 @@ replace pollution_most_serious  = 1 if E238 == 5
 gen dont_know_most_serious = 0
 replace dont_know_most_serious = 1 if E238 == .a
 
-gen missing_most_serious = 0
-replace missing_most_serious = 1 if E238 == .b | E238 == .c | E238 == .d | E238 == .e
+gen no_answer_most_serious = 0
+replace no_answer_most_serious = 1 if E238 == .b
 
 * Make dataset of the mean trust (which ends up being the % of people saying "most people can be trusted") by wave and country (CHECK WEIGHTS)
-collapse (mean) poverty_most_serious women_discr_most_serious sanitation_most_serious education_most_serious pollution_most_serious dont_know_most_serious missing_most_serious [w=S017], by (year country)
+collapse (mean) poverty_most_serious women_discr_most_serious sanitation_most_serious education_most_serious pollution_most_serious dont_know_most_serious no_answer_most_serious [w=S017], by (year country)
 tempfile most_serious_file
 save "`most_serious_file'"
 
@@ -656,6 +692,9 @@ preserve
 
 foreach var in $justifiable_questions {
 	keep if `var' >= 1
+	keep if `var' != .c
+	keep if `var' != .d
+	keep if `var' != .e
 
 	gen never_just_agg_`var' = 0
 	replace never_just_agg_`var' = 1 if `var' <= 4
@@ -675,12 +714,12 @@ foreach var in $justifiable_questions {
 	gen dont_know_`var' = 0
 	replace dont_know_`var' = 1 if `var' == .a
 	
-	gen missing_`var' = 0
-	replace missing_`var' = 1 if `var' == .b | `var' == .c | `var' == .d | `var' == .e
+	gen no_answer_`var' = 0
+	replace no_answer_`var' = 1 if `var' == .b
 	
 	gen avg_score_`var' = `var'
 
-	collapse (mean) never_just_agg_`var' always_just_agg_`var' never_just_`var' always_just_`var' neutral_`var' dont_know_`var' missing_`var' avg_score_`var' [w=S017], by (year country)
+	collapse (mean) never_just_agg_`var' always_just_agg_`var' never_just_`var' always_just_`var' neutral_`var' dont_know_`var' no_answer_`var' avg_score_`var' [w=S017], by (year country)
 	tempfile justifiable_`var'_file
 	save "`justifiable_`var'_file'"
 
@@ -705,6 +744,9 @@ foreach var in $justifiable_questions {
 
 foreach var in $worries_questions {
 	keep if `var' >= 1
+	keep if `var' != .c
+	keep if `var' != .d
+	keep if `var' != .e
 
 	gen worry_`var' = 0
 	replace worry_`var' = 1 if `var' <= 2
@@ -727,12 +769,12 @@ foreach var in $worries_questions {
 	gen dont_know_`var' = 0
 	replace dont_know_`var' = 1 if `var' == .a
 	
-	gen missing_`var' = 0
-	replace missing_`var' = 1 if `var' == .b | `var' == .c | `var' == .d | `var' == .e
+	gen no_answer_`var' = 0
+	replace no_answer_`var' = 1 if `var' == .b
 	
 	gen avg_score_`var' = `var'
 
-	collapse (mean) worry_`var' not_worry_`var' very_much_`var' a_great_deal_`var' not_much_`var' not_at_all_`var' dont_know_`var' missing_`var' avg_score_`var' [w=S017], by (year country)
+	collapse (mean) worry_`var' not_worry_`var' very_much_`var' a_great_deal_`var' not_much_`var' not_at_all_`var' dont_know_`var' no_answer_`var' avg_score_`var' [w=S017], by (year country)
 	tempfile worries_`var'_file
 	save "`worries_`var'_file'"
 

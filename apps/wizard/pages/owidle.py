@@ -1,6 +1,5 @@
 """Game owidle."""
 import datetime as dt
-from math import asin, cos, radians, sin, sqrt
 from pathlib import Path
 from typing import List, Tuple
 
@@ -19,18 +18,12 @@ from etl.paths import DATA_DIR
 ##########################################
 st.set_page_config(page_title="Wizard: owidle", layout="wide", page_icon="🪄")
 add_indentation()
-st.title(
-    body="👾 :rainbow[owidle] ",
-)
-st.markdown(
-    "Guess the country using the population and GDP hints. For each guess, you will get a geographical hint (distance and direction to the country). There is a daily challenge!"
-)
 
 ## Maximum number of guesses allowed to the user
 NUM_GUESSES = 6
 default_guess = [
     {
-        "guess": "",
+        "name": "",
         "distance": "",
         "direction": "",
         "score": "",
@@ -43,7 +36,30 @@ st.session_state.guesses = st.session_state.get("guesses", default_guess)
 st.session_state.num_guesses = st.session_state.get("num_guesses", 0)
 # Tells whether the user has succeded in guessing the correct country
 st.session_state.user_has_succeded = st.session_state.get("user_has_succeded", False)
+# Wether we are playing easy mode
+st.session_state.owidle_easy_mode = st.session_state.get("owidle_easy_mode", False)
+# Wether we are playing easy mode
+st.session_state.guess_last = st.session_state.get("guess_last", None)
+# Number of the minimum number of countries shown if set to EASY mode
+NUM_COUNTRIES_EASY_MODE = 6
 
+# TITLE
+if st.session_state.owidle_easy_mode:
+    title = "👶 :gray[(beginner)] :rainbow[owidle]"
+else:
+    title = "👾 :rainbow[owidle]"
+st.title(title)
+st.markdown(
+    "Guess the country using the population and GDP hints. For each guess, you will get a geographical hint (distance and direction to the country). There is a daily challenge!"
+)
+
+st.toggle(
+    "Beginner mode",
+    value=False,
+    key="owidle_easy_mode",
+    disabled=st.session_state.num_guesses > 0,
+    help=f"In beginner mode, the dropdown will only show countries within the radius of your most recent guess (or the nearest {NUM_COUNTRIES_EASY_MODE} countries).",
+)
 
 ##########################################
 ## LOAD DATA
@@ -71,9 +87,35 @@ def load_data(placeholder: str) -> Tuple[pd.DataFrame, gpd.GeoDataFrame, str]:
     ]
     # df = pd.DataFrame(tb)
 
-    # Load GDP indicator
-    ds_gdp = Dataset(DATA_DIR / "garden/worldbank_wdi/2023-05-29/wdi")
-    tb_gdp = ds_gdp["wdi"].reset_index()[["year", "country", "ny_gdp_pcap_pp_kd"]]
+    # Load GDP indicator(s)
+    ## WDI
+    ds = Dataset(DATA_DIR / "garden/worldbank_wdi/2023-05-29/wdi")
+    tb_gdp_wdi = ds["wdi"].reset_index()[["year", "country", "ny_gdp_pcap_pp_kd"]]
+    tb_gdp_wdi = tb_gdp_wdi.rename(
+        columns={
+            "ny_gdp_pcap_pp_kd": "gdp_per_capita_wdi",
+            "country": "location",
+        }
+    )
+    ## PWT
+    ds = Dataset(DATA_DIR / "garden/ggdc/2022-11-28/penn_world_table")
+    tb_gdp_pwt = ds["penn_world_table"].reset_index()[["year", "country", "rgdpo_pc"]]
+    tb_gdp_pwt = tb_gdp_pwt.rename(
+        columns={
+            "rgdpo_pc": "gdp_per_capita_pwt",
+            "country": "location",
+        }
+    )
+    ## MDP
+    ds = Dataset(DATA_DIR / "garden/ggdc/2020-10-01/ggdc_maddison")
+    tb_gdp_mdp = ds["maddison_gdp"].reset_index()[["year", "country", "gdp_per_capita"]]
+    tb_gdp_mdp = tb_gdp_mdp.rename(
+        columns={
+            "gdp_per_capita": "gdp_per_capita_mdp",
+            "country": "location",
+        }
+    )
+    tb_gdp_mdp = tb_gdp_mdp[tb_gdp_mdp["year"] >= 1950]
 
     # Load geographic info
     ## file from https://gist.github.com/metal3d/5b925077e66194551df949de64e910f6 (later harmonized)
@@ -84,16 +126,19 @@ def load_data(placeholder: str) -> Tuple[pd.DataFrame, gpd.GeoDataFrame, str]:
 
     # Combine
     tb = tb.merge(geo, left_on="location", right_on="Country", how="left")
-    tb = tb.merge(tb_gdp, left_on=["year", "location"], right_on=["year", "country"], how="left")
+    tb = tb.merge(tb_gdp_wdi, on=["year", "location"], how="left")
+    tb = tb.merge(tb_gdp_pwt, on=["year", "location"], how="left")
+    tb = tb.merge(tb_gdp_mdp, on=["year", "location"], how="left")
 
     # Remove NaNs
     tb = tb.dropna(subset=["Latitude", "Longitude"])
 
     # Get indicator df
-    tb_indicator = tb[["year", "location", "value", "ny_gdp_pcap_pp_kd"]].rename(
+    tb_indicator = tb[
+        ["year", "location", "value", "gdp_per_capita_wdi", "gdp_per_capita_pwt", "gdp_per_capita_mdp"]
+    ].rename(
         columns={
             "value": "population",
-            "ny_gdp_pcap_pp_kd": "gdp_per_capita",
         }
     )
 
@@ -112,18 +157,83 @@ def load_data(placeholder: str) -> Tuple[pd.DataFrame, gpd.GeoDataFrame, str]:
     # df_geo = df_geo.to_crs(3310)
 
     # Arbitrary daily solution
-    seed = (dt.date.today() - dt.date(1993, 7, 13)).days
+    seed = (dt.datetime.now(dt.timezone.utc).date() - dt.date(1993, 7, 13)).days
     solution = tb["location"].sample(random_state=seed).item()
 
     return tb_indicator, df_geo, solution
 
 
+@st.cache_data
+def get_all_distances():
+    # Build geodataframe with all possible combinations of countries
+    distances = GEO.merge(GEO, how="cross", suffixes=("_1", "_2"))
+
+    # Split dataframe in two, so that we can estimate distances
+    distances_1 = gpd.GeoDataFrame(
+        distances[["location_1", "geometry_1"]],
+        crs={"init": "epsg:4326"},
+        geometry="geometry_1",
+    ).to_crs(epsg=32663)
+
+    distances_2 = gpd.GeoDataFrame(
+        distances[["location_2", "geometry_2"]],
+        crs={"init": "epsg:4326"},
+        geometry="geometry_2",
+    ).to_crs(epsg=32663)
+
+    # Filter own country
+    distances = distances[distances["location_1"] != distances["location_2"]]
+
+    # Estimate distances in km
+    distances["distance"] = distances_1.distance(distances_2) // 1000
+
+    # Rename columns
+    distances = distances.rename(
+        columns={
+            "location_1": "origin",
+            "location_2": "target",
+        }
+    )
+
+    # Keep relevant columns, set index
+    distances = distances[["origin", "target", "distance"]].set_index("origin")
+
+    # Filter own country
+    return distances
+
+
 DATA, GEO, SOLUTION = load_data("cached")
-# st.write(SOLUTION)
+# SOLUTION = "Spain"
 OPTIONS = sorted(DATA["location"].unique())
-# Check if solution has gdp data
-countries_with_gdp_data = set(DATA.dropna(subset=["gdp_per_capita"])["location"].unique())
-SOLUTION_HAS_GDP = SOLUTION in countries_with_gdp_data
+
+# Find indicator for this solution (we prioritise PWD > MDP > WDI)
+gdp_indicator_titles = {
+    "gdp_per_capita_pwt": "GDP per capita (constant 2017 intl-$)",
+    "gdp_per_capita_mdp": "GDP per capita (constant 2011 intl-$)",
+    "gdp_per_capita_wdi": "GDP per capita (constant 2017 intl-$)",
+}
+gdp_indicators = list(gdp_indicator_titles.keys())
+GDP_INDICATOR = None
+for ind in gdp_indicators:
+    s = set(
+        DATA.dropna(
+            subset=[ind],
+        )["location"].unique()
+    )
+    if SOLUTION in s:
+        GDP_INDICATOR = ind
+        break
+if GDP_INDICATOR is None:
+    SOLUTION_HAS_GDP = False
+    GDP_INDICATOR = gdp_indicators[0]
+else:
+    SOLUTION_HAS_GDP = True
+# print(f"Going with indicator {GDP_INDICATOR}")
+# st.write(SOLUTION)
+# st.write(GDP_INDICATOR)
+
+# Distances
+DISTANCES = get_all_distances()
 
 
 ##########################################
@@ -134,6 +244,10 @@ def distance_to_solution(country_selected: str) -> Tuple[str, str, str]:
 
     ref: https://stackoverflow.com/a/47780264
     """
+    # If user has guessed the correct country
+    if country_selected == SOLUTION:
+        st.session_state.user_has_succeded = True
+        return "0", "🎉", "100"
     # Estimate distance
     # st.write(GEO)
     # GEO_DIST = cast(gpd.GeoDataFrame, GEO.to_crs(3310))
@@ -153,11 +267,19 @@ def distance_to_solution(country_selected: str) -> Tuple[str, str, str]:
     print("----------------")
     print(guess.y, guess.x, solution.y, solution.x)
     print("----------------")
-    g = geod.Inverse(guess.y, guess.x, solution.y, solution.x)
+    g = geod.Inverse(
+        lat1=guess.y,
+        lon1=guess.x,
+        lat2=solution.y,
+        lon2=solution.x,
+    )
     print(g)
-    # Distance in km
-    distance = g["s12"] / 1000
-    print(distance)
+    # Option 1 (using geographiclib)
+    # distance = g["s12"] / 1000
+    # print(distance)
+    # Option 2 (using pre-calculated distances)
+    dist = DISTANCES.loc[SOLUTION]
+    distance = dist[dist["target"] == country_selected]["distance"].item()
     # Initial bearing angle (angle from guess to solution in degrees)
     bearing = g["azi1"]
 
@@ -178,11 +300,6 @@ def distance_to_solution(country_selected: str) -> Tuple[str, str, str]:
     else:
         arrow = "↖️"
 
-    # If user has guessed the correct country
-    if country_selected == SOLUTION:
-        st.session_state.user_has_succeded = True
-        return "0", "🎉", "100"
-
     # Estimate score
     score = int(round(100 - (distance / MAX_DISTANCE_ON_EARTH) * 100, 0))
 
@@ -197,22 +314,24 @@ def distance_to_solution(country_selected: str) -> Tuple[str, str, str]:
 def guess() -> None:
     """Actions performed once the user clicks on 'GUESS' button."""
     # If guess is None, don't do anything
-    if st.session_state.guess_last is None:
+    if st.session_state.guess_last_submitted is None:
         pass
     else:
+        st.session_state.user_has_guessed = True
         # Check if guess was already submitted
-        if st.session_state.guess_last in [guess["guess"] for guess in st.session_state.guesses]:
+        if st.session_state.guess_last_submitted in [guess["name"] for guess in st.session_state.guesses]:
             st.toast("⚠️ You have already guessed this country!")
         else:
             # Estimate distance from correct answer
-            distance, direction, score = distance_to_solution(st.session_state.guess_last)
+            distance, direction, score = distance_to_solution(st.session_state.guess_last_submitted)
             # Add to session state
-            st.session_state.guesses[st.session_state.num_guesses] = {
-                "guess": st.session_state.guess_last,
+            st.session_state.guess_last = {
+                "name": st.session_state.guess_last_submitted,
                 "distance": distance,
                 "direction": direction,
                 "score": score,
             }
+            st.session_state.guesses[st.session_state.num_guesses] = st.session_state.guess_last
             # Increment number of guesses
             st.session_state.num_guesses += 1
 
@@ -227,7 +346,6 @@ def _plot_chart(
     column_indicator: str,
     title: str,
     column_country: str,
-    indicator_name: str | None = None,
 ):
     # Filter out solution countri if given within guessed countries
     countries_guessed = [c for c in countries_guessed if c != SOLUTION]
@@ -308,7 +426,6 @@ def plot_chart_population(countries_guessed: List[str]):
         column_indicator="population",
         title="Population",
         column_country="location",
-        indicator_name="Population",
     )
 
 
@@ -317,10 +434,9 @@ def plot_chart_gdp_pc(countries_guessed: List[str]):
     """Plot timeseries."""
     _plot_chart(
         countries_guessed,
-        column_indicator="gdp_per_capita",
-        title="GDP per capita (constant 2017 intl-$)",
+        column_indicator=GDP_INDICATOR,
+        title=gdp_indicator_titles[GDP_INDICATOR],
         column_country="location",
-        indicator_name="GDP per capita (constant 2017 intl-$)",
     )
 
 
@@ -336,7 +452,7 @@ def display_metadata(metadata):
 # PLOT CHARTS
 ##########################################
 with st.container(border=True):
-    countries_guessed = [guess["guess"] for guess in st.session_state.guesses if guess["guess"] != ""]
+    countries_guessed = [guess["name"] for guess in st.session_state.guesses if guess["name"] != ""]
     if not SOLUTION_HAS_GDP:
         st.warning("We don't have GDP data for this country!")
     col1, col2 = st.columns(2)
@@ -357,7 +473,7 @@ with st.container(border=True):
         plot_chart_gdp_pc(countries_guessed)
         with st.expander("Sources"):
             try:
-                metadata = DATA["gdp_per_capita"].metadata.to_dict()
+                metadata = DATA[GDP_INDICATOR].metadata.to_dict()
                 origins = metadata.pop("origins", None)
                 _ = metadata.pop("display", None)
                 display_metadata(metadata)
@@ -374,14 +490,32 @@ with st.container(border=True):
 ##########################################
 with st.form("form_guess", border=False, clear_on_submit=True):
     col_guess_1, col_guess_2 = st.columns([4, 1])
-    # with col_guess_1:
+    # EASY MODE: Filter options
+    ## Only consider options within the radius of the last guess
+    ## If there are less than NUM_COUNTRIES_EASY_MODE, show the NUM_COUNTRIES_EASY_MODE closest ones.
+    if st.session_state.owidle_easy_mode and (st.session_state.guess_last is not None):
+        distances = DISTANCES.loc[st.session_state.guess_last["name"]]
+        options = distances.loc[
+            distances["distance"] <= int(st.session_state.guess_last["distance"]), "target"
+        ].tolist()
+        if len(options) <= NUM_COUNTRIES_EASY_MODE:
+            options = distances.sort_values("distance").head(NUM_COUNTRIES_EASY_MODE)["target"].tolist()
+        else:
+            options = distances.loc[
+                distances["distance"] <= int(st.session_state.guess_last["distance"]), "target"
+            ].tolist()
+        options = sorted(options)
+    else:
+        options = OPTIONS
+
+    # Show dropdown
     value = st.selectbox(
         label="Guess a country",
         placeholder="Choose a country... ",
-        options=OPTIONS,
+        options=options,
         label_visibility="collapsed",
         index=None,
-        key="guess_last",
+        key="guess_last_submitted",
     )
     # Disable button if user has finished their guesses or has succeeded
     disabled = (st.session_state.num_guesses >= NUM_GUESSES) or st.session_state.user_has_succeded
@@ -402,7 +536,6 @@ with st.form("form_guess", border=False, clear_on_submit=True):
         disabled=disabled,
     )
 
-    st.session_state["placeholder_warning_repear"] = st.container()
 ##########################################
 # SHOW GUESSES (this far)
 ##########################################
@@ -412,8 +545,8 @@ for i in range(num_guesses_bound):
     with st.container(border=True):
         col1, col2, col3, col4 = st.columns([30, 10, 7, 7])
         with col1:
-            # st.text(st.session_state.guesses[i]["guess"])
-            st.markdown(f"**{st.session_state.guesses[i]['guess']}**")
+            # st.text(st.session_state.guesses[i]["name"])
+            st.markdown(f"**{st.session_state.guesses[i]['name']}**")
         with col2:
             st.markdown(f"{st.session_state.guesses[i]['distance']}km")
         with col3:
