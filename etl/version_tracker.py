@@ -670,7 +670,7 @@ class VersionTracker:
         return self._steps_df
 
     @staticmethod
-    def _log_warnings_and_errors(message, list_affected, warning_or_error, additional_info=""):
+    def _log_warnings_and_errors(message, list_affected, warning_or_error, additional_info=None):
         error_message = message
         if len(list_affected) > 0:
             for i, affected in enumerate(list_affected):
