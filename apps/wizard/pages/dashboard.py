@@ -140,7 +140,7 @@ df = steps_df[
         "name",
         "kind",
         # "dag_file_name",
-        # "n_versions",
+        "n_versions",
         "update_period_days",
         # The following column is needed to create the URLs to grapher datasets. It will be hidden in the Steps table.
         "db_dataset_id",
@@ -314,8 +314,8 @@ def update_operations_list(new_items, clear_all=False):
 if "selected_steps" not in st.session_state:
     st.session_state["selected_steps"] = []
 
-# Button to add selected steps to the operation list.
-if st.button("Add selected steps to the operation list"):
+# Button to add selected steps to the Operations list.
+if st.button("Add selected steps to the _Operations list_"):
     new_selected_steps = [row["step"] for row in grid_response["selected_rows"]]
     update_operations_list(new_selected_steps)
 
