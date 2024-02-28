@@ -116,6 +116,14 @@ steps:
     - data://meadow/emissions/2023-11-06/global_warming_potential_factors
   data://grapher/emissions/2023-11-06/global_warming_potential_factors:
     - data://garden/emissions/2023-11-06/global_warming_potential_factors
+  #
+  # Decoupling of GDP and CO2 (2023).
+  #
+  # The data from the following step will be used in this static chart:
+  # https://drive.google.com/file/d/1PflfQpr4mceVWRSGEqMP6Gbo1tFQZzOp/view?usp=sharing
+  data://garden/emissions/2024-02-26/gdp_and_co2_decoupling:
+    - data://garden/gcp/2023-12-12/global_carbon_budget
+    - data://garden/worldbank_wdi/2023-05-29/wdi
 
   ######################################################################################################################
   # Older versions that should be archived once they are not used by any other steps.

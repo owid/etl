@@ -6,7 +6,7 @@ for per capita GDP and per capita, consumption-based CO2 emissions:
 https://ourworldindata.org/grapher/co2-emissions-and-gdp
 
 The data in the current step is not used by any grapher step, but will be used by the following static chart:
-https://drive.google.com/file/d/1PflfQpr4mceVWRSGEqMP6Gbo1tFQZzOp/view?usp=sharing
+TODO: Include link to the updated static chart once it is created.
 
 """
 from structlog import get_logger
@@ -19,8 +19,8 @@ log = get_logger()
 paths = PathFinder(__file__)
 
 # First and final years whose (per capita) GDP and emissions will be compared.
-START_YEAR = 2010
-END_YEAR = 2020
+START_YEAR = 2006
+END_YEAR = 2021
 
 # Columns to select from WDI, and how to rename them.
 COLUMNS_WDI = {
@@ -83,7 +83,6 @@ def run(dest_dir: str) -> None:
     tb = tb.dropna(subset=data_columns, how="all").reset_index(drop=True)
 
     # Select years between START_YEAR and END_YEAR.
-    # tb = tb[(tb["year"] >= START_YEAR) & (tb["year"] <= END_YEAR)].reset_index(drop=True)
     tb_start = tb[(tb["year"] == START_YEAR)].reset_index(drop=True)
 
     # Select data for all countries at the final year.
@@ -111,7 +110,7 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new garden dataset.
-    ds_garden = create_dataset(dest_dir=dest_dir, tables=[tb], check_variables_metadata=True)
+    ds_garden = create_dataset(dest_dir=dest_dir, tables=[tb], check_variables_metadata=True, formats=["csv"])
     ds_garden.save()
 
 
@@ -120,6 +119,7 @@ def run(dest_dir: str) -> None:
 #     import plotly.express as px
 #     import owid.catalog.processing as pr
 #     from tqdm.auto import tqdm
+
 #     column = "gdp_per_capita_change"
 #     emissions_column = "consumption_emissions_per_capita_change"
 #     _tb = tb.reset_index().astype({"country": str})[["country", column, emissions_column]]
@@ -139,3 +139,24 @@ def run(dest_dir: str) -> None:
 #         tb_plot = tb_plot.melt(id_vars=["country", "year"], var_name="Indicator")
 #         plot = px.line(tb_plot, x="year", y="value", color="Indicator", title=f"{country} - {title}")
 #         plot.show()
+
+# List of countries currently considered for the static chart:
+# countries = ["Ireland", "Finland", "Sweden", "Denmark", "Netherlands", "Estonia", "United States", "Canada", "Germany",
+# "Belgium", "New Zealand", "Israel", "Japan", "Singapore", "Dominican Republic", "Hungary", "Australia", "Zimbabwe",
+# "Ukraine", "Bulgaria", "Switzerland", "Hong Kong", "Slovakia", "Romania", "Czechia", "Nicaragua", "Nigeria",
+# "Azerbaijan", "Slovenia", "Croatia"]
+# Check that the chosen countries still fulfil the expected conditions.
+# print("Countries in the list where GDP has increased less than 5% or emissions have decreased less than 5%:")
+# for c in countries:
+#     if not tb.loc[c]["consumption_emissions_per_capita_change"] < -5:
+#         print("emissions", c, tb.loc[c]["consumption_emissions_per_capita_change"])
+#     if not tb.loc[c]["gdp_per_capita_change"] > 5:
+#         print("gdp", c, tb.loc[c]["gdp_per_capita_change"])
+
+# If not, print other countries that do fulfil the conditions and are not in the chart.
+# other_countries = sorted(set(tb.index) - set(countries))
+# for c in other_countries:
+#     if (tb.loc[c]["consumption_emissions_per_capita_change"] < -5) and (tb.loc[c]["gdp_per_capita_change"] > 5):
+#         print(c, f' -> GDP: {tb.loc[c]["gdp_per_capita_change"]: .1f}%, Emissions: {tb.loc[c]["consumption_emissions_per_capita_change"]:.1f}%')
+
+# plot_decoupling(tb, countries=countries)
