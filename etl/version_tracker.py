@@ -11,6 +11,7 @@ import yaml
 from rich_click.rich_command import RichCommand
 
 from etl import paths
+from etl.config import ADMIN_HOST
 from etl.db import can_connect, get_info_for_etl_datasets
 from etl.steps import extract_step_attributes, load_dag, reverse_graph
 
@@ -19,6 +20,8 @@ log = structlog.get_logger()
 # Define the temporary step that will depend on newly created snapshots before they are used by any active steps.
 DAG_TEMP_STEP = "data-private://meadow/temp/latest/step"
 
+# Define the base URL for the grapher datasets (which will be different depending on the environment).
+GRAPHER_DATASET_BASE_URL = f"{ADMIN_HOST}/admin/datasets/"
 
 # Get current date (used to estimate the number of days until the next update of each step).
 TODAY = datetime.now().strftime("%Y-%m-%d")
@@ -291,6 +294,10 @@ class VersionTracker:
 
         # Warn about archivable steps.
         self.warn_on_archivable = warn_on_archivable
+
+        # Initialize a dataframe of steps that have a grapher dataset (with or without charts) but does not exist in the
+        # dag (active or archive) anymore.
+        self.unknown_steps_with_grapher_dataset_df = None
 
         # Dataframe of step attributes will only be initialized once it's called.
         # This dataframe will have one row per existing step.
@@ -613,6 +620,10 @@ class VersionTracker:
             #  * A grapher dataset (in production) has been created by ETL in a branch which is not yet merged. This,
             #    again, should not happen, but it does happen every now and then, exceptionally.
             steps_df = self._add_info_from_db(steps_df=steps_df)
+            # Because of this mismatch, all columns of the unknown grapher datasets will be nan.
+            # List these problematic steps and then remove them from the dataframe, to avoid nans.
+            self.unknown_steps_with_grapher_dataset_df = steps_df[steps_df["state"].isnull()].reset_index(drop=True)
+            steps_df = steps_df.dropna(subset=["state"]).reset_index(drop=True)
 
         # Add columns with the list of forward and backwards versions for each step.
         steps_df = self._add_columns_with_different_step_versions(steps_df=steps_df)
@@ -630,6 +641,10 @@ class VersionTracker:
             paths.BASE_DIR / script_file_name if script_file_name else None
             for script_file_name in steps_df["path_to_script"].fillna("")
         ]
+
+        # Add column that is true if the step is the latest version.
+        steps_df["is_latest"] = False
+        steps_df.loc[steps_df["version"] == steps_df["latest_version"], "is_latest"] = True
 
         return steps_df
 
@@ -655,11 +670,13 @@ class VersionTracker:
         return self._steps_df
 
     @staticmethod
-    def _log_warnings_and_errors(message, list_affected, warning_or_error):
+    def _log_warnings_and_errors(message, list_affected, warning_or_error, additional_info=""):
         error_message = message
         if len(list_affected) > 0:
-            for affected in list_affected:
+            for i, affected in enumerate(list_affected):
                 error_message += f"\n    {affected}"
+                if additional_info:
+                    error_message += f" - {additional_info[i]}"
             if warning_or_error == "error":
                 log.error(error_message)
             elif warning_or_error == "warning":
@@ -718,7 +735,10 @@ class VersionTracker:
         [self.get_path_to_script(step) for step in self.all_steps]
 
     def check_that_db_datasets_with_charts_are_not_archived(self) -> None:
-        """Check that DB datasets with public charts are not archived (though they may be private)."""
+        """Check that DB datasets with public charts are not archived (though they may be private).
+
+        This check can only be performed if we have access to the DB.
+        """
         archived_db_datasets = sorted(
             set(self.steps_df[(self.steps_df["n_charts"] > 0) & (self.steps_df["db_archived"])]["step"])
         )
@@ -729,7 +749,10 @@ class VersionTracker:
         )
 
     def check_that_db_datasets_with_charts_have_active_etl_steps(self) -> None:
-        """Check that DB datasets with public charts have active ETL steps."""
+        """Check that DB datasets with public charts have active ETL steps.
+
+        This check can only be performed if we have access to the DB.
+        """
         missing_etl_steps = sorted(
             set(
                 self.steps_df[
@@ -745,6 +768,29 @@ class VersionTracker:
             warning_or_error="error",
         )
 
+    def check_that_db_datasets_exist_in_etl(self) -> None:
+        """Check that all DB datasets (with or without charts) exist in the ETL dag (active or archive).
+
+        This check can only be performed if we have access to the DB.
+        """
+        if self.connect_to_db:
+            # Ensure steps_df is calculated.
+            _ = self.steps_df
+        if self.unknown_steps_with_grapher_dataset_df is not None:
+            missing_df = self.unknown_steps_with_grapher_dataset_df.sort_values("db_dataset_name").reset_index(
+                drop=True
+            )
+            dataset_names = missing_df["db_dataset_name"].tolist()
+            dataset_urls = [
+                f"{GRAPHER_DATASET_BASE_URL}{int(dataset_id)}" for dataset_id in missing_df["db_dataset_id"]
+            ]
+            self._log_warnings_and_errors(
+                message="Some DB datasets do not exist in the ETL:",
+                list_affected=dataset_names,
+                warning_or_error="warning",
+                additional_info=dataset_urls,
+            )
+
     def apply_sanity_checks(self) -> None:
         """Apply all sanity checks."""
         self.check_that_active_dependencies_are_defined()
@@ -753,6 +799,7 @@ class VersionTracker:
         if self.connect_to_db:
             self.check_that_db_datasets_with_charts_are_not_archived()
             self.check_that_db_datasets_with_charts_have_active_etl_steps()
+            self.check_that_db_datasets_exist_in_etl()
         # The following check will warn of archivable steps (if warn_on_archivable is True).
         # Depending on whether connect_to_db is True or False, the criterion will be different.
         # When False, the criterion is rather a proxy; True uses a more meaningful criterion.

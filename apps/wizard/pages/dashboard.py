@@ -9,7 +9,7 @@ from st_aggrid import AgGrid, GridUpdateMode, JsCode
 from st_aggrid.grid_options_builder import GridOptionsBuilder
 
 from apps.step_update.cli import StepUpdater
-from etl.config import DB_HOST, ENV_IS_REMOTE
+from etl.config import ADMIN_HOST, ENV_IS_REMOTE
 
 # TODO:
 # Add columns:
@@ -26,7 +26,7 @@ from etl.config import DB_HOST, ENV_IS_REMOTE
 TODAY = datetime.now().strftime("%Y-%m-%d")
 
 # Define the base URL for the grapher datasets (which will be different depending on the environment).
-GRAPHER_DATASET_BASE_URL = f"http://{DB_HOST.replace('127.0.0.1', 'localhost:3030')}/admin/datasets/"
+GRAPHER_DATASET_BASE_URL = f"{ADMIN_HOST}/admin/datasets/"
 
 # CONFIG
 st.set_page_config(
@@ -57,9 +57,27 @@ def load_steps_df():
     # Load steps dataframe.
     steps_df = StepUpdater().steps_df
 
-    # Fix some columns.
+    # # Fix some columns.
     steps_df["full_path_to_script"] = steps_df["full_path_to_script"].fillna("").astype(str)
     steps_df["dag_file_path"] = steps_df["dag_file_path"].fillna("").astype(str)
+
+    # Add a column with the total number of dependencies that are not their latest version.
+    steps_df["n_updateable_dependencies"] = [
+        sum([not steps_df[steps_df["step"] == dependency]["is_latest"].item() for dependency in dependencies])
+        for dependencies in steps_df["all_active_dependencies"]
+    ]
+    # Number of snapshot dependencies that are not their latest version.
+    steps_df["n_updateable_snapshot_dependencies"] = [
+        sum(
+            [
+                not steps_df[steps_df["step"] == dependency]["is_latest"].item()
+                if steps_df[steps_df["step"] == dependency]["channel"].item() == "snapshot"
+                else False
+                for dependency in dependencies
+            ]
+        )
+        for dependencies in steps_df["all_active_dependencies"]
+    ]
 
     return steps_df
 
