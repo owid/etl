@@ -130,10 +130,10 @@ def run(dest_dir: str) -> None:
     end_time = da["time"].max().dt.date.astype(str).item()
 
     # Generate a date range from start_time to end_time with monthly frequency
-    month_starts = pd.date_range(start=start_time, end=end_time, freq="MS")
+    month_middles = pd.date_range(start=start_time, end=end_time, freq="MS") + pd.offsets.Day(14)
 
     # month_starts is a DateTimeIndex object; you can convert it to a list if needed
-    month_starts_list = month_starts.tolist()
+    month_starts_list = month_middles.tolist()
 
     # df of temperatures for each country
     df_temp = pd.DataFrame(temp_country)
