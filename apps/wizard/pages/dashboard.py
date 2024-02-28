@@ -12,14 +12,8 @@ from apps.step_update.cli import StepUpdater
 from etl.config import ADMIN_HOST, ENV_IS_REMOTE
 
 # TODO:
-# Add columns:
-#  * "updatability":
-#    * "up-to-date": The step is up to date if update_period_days is 0 or all step's dependencies are on their latest version.
-#    * "minor": The step can have a minor update if update_period_days is not 0 and any dependency is not latest while all snapshots are latest.
-#    * "major": The step needs a major update if update_period_days is not 0 and any snapshot is not latest.
-#    * "archivable": The step is archivable if the step has no chart, and the same step exists in a newer version.
-#  * Consider creating a script to regularly check for snapshot updates, fetch them and add them to the temporary dag (this is the way that the "updatability" will know if there are snapshot updates available).
-#  * Define a metric of update prioritisation, based on number of charts (or views) and days to update. Sort steps table by this metric.
+#  * Consider creating a script to regularly check for snapshot updates, fetch them and add them to the temporary dag (this is the way that the "update state" will know if there are snapshot updates available).
+#  * Define a metric of update prioritization, based on number of charts (or views) and days to update. Sort steps table by this metric.
 
 # Current date.
 # This is used as the default version of new steps to be created.
@@ -27,6 +21,21 @@ TODAY = datetime.now().strftime("%Y-%m-%d")
 
 # Define the base URL for the grapher datasets (which will be different depending on the environment).
 GRAPHER_DATASET_BASE_URL = f"{ADMIN_HOST}/admin/datasets/"
+
+# List of dependencies to ignore when calculating the update state.
+# This is done to avoid a certain common dependency (e.g. population) to make all steps appear as needing major update.
+DEPENDENCIES_TO_IGNORE = [
+    "data://garden/demography/2023-03-31/population",
+    "snapshot://hyde/2017/general_files.zip",
+]
+
+# Define labels for update states.
+UPDATE_STATE_UNKNOWN = "Unknown"
+UPDATE_STATE_UP_TO_DATE = "No updates known"
+UPDATE_STATE_OUTDATED = "Outdated"
+UPDATE_STATE_MINOR_UPDATE = "Minor update possible"
+UPDATE_STATE_MAJOR_UPDATE = "Major update possible"
+UPDATE_STATE_ARCHIVABLE = "Archivable"
 
 # CONFIG
 st.set_page_config(
@@ -57,13 +66,24 @@ def load_steps_df():
     # Load steps dataframe.
     steps_df = StepUpdater().steps_df
 
-    # # Fix some columns.
+    # Fix some columns.
     steps_df["full_path_to_script"] = steps_df["full_path_to_script"].fillna("").astype(str)
     steps_df["dag_file_path"] = steps_df["dag_file_path"].fillna("").astype(str)
 
+    # For convenience, convert days to update to a string, and fill nans with "Unknown".
+    # Otherwise when sorting, nans are placed before negative numbers, and hence it's not easy to first see steps that
+    # need to be updated more urgently.
+    steps_df["days_to_update"] = steps_df["days_to_update"].fillna(9999)
+
     # Add a column with the total number of dependencies that are not their latest version.
     steps_df["n_updateable_dependencies"] = [
-        sum([not steps_df[steps_df["step"] == dependency]["is_latest"].item() for dependency in dependencies])
+        sum(
+            [
+                not steps_df[steps_df["step"] == dependency]["is_latest"].item()
+                for dependency in dependencies
+                if dependency not in DEPENDENCIES_TO_IGNORE
+            ]
+        )
         for dependencies in steps_df["all_active_dependencies"]
     ]
     # Number of snapshot dependencies that are not their latest version.
@@ -74,10 +94,30 @@ def load_steps_df():
                 if steps_df[steps_df["step"] == dependency]["channel"].item() == "snapshot"
                 else False
                 for dependency in dependencies
+                if dependency not in DEPENDENCIES_TO_IGNORE
             ]
         )
         for dependencies in steps_df["all_active_dependencies"]
     ]
+    # Add a column with the update state.
+    # By default, the state is unknown.
+    steps_df["update_state"] = "Unknown"
+    # If there is a newer version of the step, it is outdated.
+    steps_df.loc[~steps_df["is_latest"], "update_state"] = UPDATE_STATE_OUTDATED
+    # If there are any dependencies that are not their latest version, it needs a minor update.
+    # NOTE: If any of those dependencies is a snapshot, it needs a major update (defined in the following line).
+    steps_df.loc[steps_df["n_updateable_dependencies"] > 0, "update_state"] = UPDATE_STATE_MINOR_UPDATE
+    # If there are any snapshot dependencies that are not their latest version, it needs a major update.
+    steps_df.loc[steps_df["n_updateable_snapshot_dependencies"] > 0, "update_state"] = UPDATE_STATE_MAJOR_UPDATE
+    # If the step does not need to be updated (i.e. update_period_days = 0) or if all dependencies are up to date,
+    # then the step is up to date (in other words, we are not aware of any possible update).
+    steps_df.loc[
+        (steps_df["update_period_days"] == 0)
+        | ((steps_df["n_updateable_snapshot_dependencies"] == 0) & (steps_df["n_updateable_dependencies"] == 0)),
+        "update_state",
+    ] = UPDATE_STATE_UP_TO_DATE
+    # If a step has no charts and is not the latest version, it is archivable.
+    steps_df.loc[(steps_df["n_charts"] == 0) & (~steps_df["is_latest"]), "update_state"] = UPDATE_STATE_ARCHIVABLE
 
     return steps_df
 
@@ -92,12 +132,13 @@ df = steps_df[
         "db_dataset_name",
         "n_charts",
         "days_to_update",
+        "update_state",
         "date_of_next_update",
-        "kind",
         "namespace",
         "version",
         "channel",
         "name",
+        "kind",
         # "dag_file_name",
         # "n_versions",
         "update_period_days",
@@ -139,26 +180,12 @@ else:
     df = df[(df["channel"].isin(["grapher", "explorers"])) & (df["n_charts"] > 0)]
 
 # Sort displayed data conveniently.
-df = df.sort_values(by=["n_charts", "kind", "version"], ascending=[False, False, True])
-
-# Define the width of some columns in the main grid table (to avoid them from taking too much space).
-COLUMN_WIDTHS = {
-    "step": 400,
-    "kind": 100,
-    "channel": 120,
-    "namespace": 150,
-    "version": 120,
-    "n_versions": 100,
-    "n_charts": 120,
-    "days_to_update": 180,
-    "date_of_next_update": 120,
-}
+df = df.sort_values(
+    by=["days_to_update", "n_charts", "kind", "version"], na_position="last", ascending=[True, False, False, True]
+)
 
 # Define the options of the main grid table with pagination.
 gb = GridOptionsBuilder.from_dataframe(df)
-gb.configure_default_column(editable=False, groupable=True, sortable=True, filterable=True, resizable=True)
-for column, width in COLUMN_WIDTHS.items():
-    gb.configure_column(column, width=width)
 gb.configure_grid_options(domLayout="autoHeight")
 gb.configure_selection(
     selection_mode="multiple",
@@ -168,35 +195,70 @@ gb.configure_selection(
     groupSelectsChildren=True,
     groupSelectsFiltered=True,
 )
+gb.configure_default_column(editable=False, groupable=True, sortable=True, filterable=True, resizable=True)
+gb.configure_column("step", headerName="Step", width=500)
+gb.configure_column("kind", headerName="Kind", width=100)
+gb.configure_column("channel", headerName="Channel", width=120)
+gb.configure_column("namespace", headerName="Namespace", width=150)
+gb.configure_column("version", headerName="Version", width=120)
+gb.configure_column("name", headerName="Step name", width=140)
+gb.configure_column("n_charts", headerName="N. charts", width=120)
+gb.configure_column("days_to_update", headerName="Days to update", width=180)
+gb.configure_column("date_of_next_update", headerName="Next update", width=140)
+gb.configure_column("update_period_days", headerName="Update period", width=150)
+gb.configure_column("full_path_to_script", headerName="Path to script", width=150)
+gb.configure_column("dag_file_path", headerName="Path to dag file", width=160)
+gb.configure_column("n_versions", headerName="N. versions", width=140)
 # Create a column with the number of days until the next expected update, colored according to its value.
 days_to_update_jscode = JsCode(
     """
     function(params){
-        if (params.value === undefined || params.value === null) {
-            return {
-                'color': 'black',
-                'backgroundColor': 'yellow'
-            }
-        } else if (params.value <= 0) {
+        if (params.value <= 0) {
             return {
                 'color': 'black',
                 'backgroundColor': 'red'
             }
-        } else if (params.value > 0 && params.value < 31) {
+        } else if (params.value > 0 && params.value <= 31) {
             return {
                 'color': 'black',
                 'backgroundColor': 'orange'
             }
-        } else {
+        } else if (params.value > 31) {
             return {
                 'color': 'black',
                 'backgroundColor': 'green'
+            }
+        } else {
+            return {
+                'color': 'black',
+                'backgroundColor': 'yellow'
             }
         }
     }
     """
 )
 gb.configure_columns("days_to_update", cellStyle=days_to_update_jscode)
+# Create a column colored depending on the update state.
+update_state_jscode = JsCode(
+    f"""
+function(params){{
+    if (params.value === "{UPDATE_STATE_UP_TO_DATE}") {{
+        return {{'color': 'black', 'backgroundColor': 'green'}}
+    }} else if (params.value === "{UPDATE_STATE_OUTDATED}") {{
+        return {{'color': 'black', 'backgroundColor': 'gray'}}
+    }} else if (params.value === "{UPDATE_STATE_MAJOR_UPDATE}") {{
+        return {{'color': 'black', 'backgroundColor': 'red'}}
+    }} else if (params.value === "{UPDATE_STATE_MINOR_UPDATE}") {{
+        return {{'color': 'black', 'backgroundColor': 'orange'}}
+    }} else if (params.value === "{UPDATE_STATE_ARCHIVABLE}") {{
+        return {{'color': 'black', 'backgroundColor': 'blue'}}
+    }} else {{
+        return {{'color': 'black', 'backgroundColor': 'yellow'}}
+    }}
+}}
+"""
+)
+gb.configure_columns("update_state", headerName="Update state", cellStyle=update_state_jscode)
 # Create a column with grapher dataset names that are clickable and open in a new tab.
 gb.configure_column(
     "db_dataset_name",  # This will be the displayed column
@@ -229,7 +291,6 @@ gb.configure_pagination(paginationAutoPageSize=False, paginationPageSize=20)
 grid_options = gb.build()
 
 # Display the grid table with pagination.
-# TODO: Let VersionTracker.steps_df fetch updatePeriodDays from the datasets table, and add that info to the main table.
 grid_response = AgGrid(
     df,
     gridOptions=grid_options,
