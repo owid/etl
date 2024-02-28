@@ -25,7 +25,7 @@ GRAPHER_DATASET_BASE_URL = f"{ADMIN_HOST}/admin/datasets/"
 # List of dependencies to ignore when calculating the update state.
 # This is done to avoid a certain common dependency (e.g. population) to make all steps appear as needing major update.
 DEPENDENCIES_TO_IGNORE = [
-    "data://garden/demography/2023-03-31/population",
+    # "data://garden/demography/2023-03-31/population",
     "snapshot://hyde/2017/general_files.zip",
 ]
 
@@ -101,19 +101,27 @@ def load_steps_df():
     ]
     # Add a column with the update state.
     # By default, the state is unknown.
-    steps_df["update_state"] = "Unknown"
+    steps_df["update_state"] = UPDATE_STATE_UNKNOWN
     # If there is a newer version of the step, it is outdated.
     steps_df.loc[~steps_df["is_latest"], "update_state"] = UPDATE_STATE_OUTDATED
     # If there are any dependencies that are not their latest version, it needs a minor update.
     # NOTE: If any of those dependencies is a snapshot, it needs a major update (defined in the following line).
-    steps_df.loc[steps_df["n_updateable_dependencies"] > 0, "update_state"] = UPDATE_STATE_MINOR_UPDATE
+    steps_df.loc[
+        (steps_df["is_latest"]) & (steps_df["n_updateable_dependencies"] > 0), "update_state"
+    ] = UPDATE_STATE_MINOR_UPDATE
     # If there are any snapshot dependencies that are not their latest version, it needs a major update.
-    steps_df.loc[steps_df["n_updateable_snapshot_dependencies"] > 0, "update_state"] = UPDATE_STATE_MAJOR_UPDATE
+    steps_df.loc[
+        (steps_df["is_latest"]) & (steps_df["n_updateable_snapshot_dependencies"] > 0), "update_state"
+    ] = UPDATE_STATE_MAJOR_UPDATE
     # If the step does not need to be updated (i.e. update_period_days = 0) or if all dependencies are up to date,
     # then the step is up to date (in other words, we are not aware of any possible update).
     steps_df.loc[
         (steps_df["update_period_days"] == 0)
-        | ((steps_df["n_updateable_snapshot_dependencies"] == 0) & (steps_df["n_updateable_dependencies"] == 0)),
+        | (
+            (steps_df["is_latest"])
+            & (steps_df["n_updateable_snapshot_dependencies"] == 0)
+            & (steps_df["n_updateable_dependencies"] == 0)
+        ),
         "update_state",
     ] = UPDATE_STATE_UP_TO_DATE
     # If a step has no charts and is not the latest version, it is archivable.
