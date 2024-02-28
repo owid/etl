@@ -311,7 +311,9 @@ tables:
         description: |-
           The variable denotes the number of people living in autocracies, using data from the Lexical Index of Electoral Democracy-classification by Skaaning et al. (2015).
 
-          We here combine the following regimes types under "autocracies": non-electoral autocracies, one-party autocracies, multiparty autocracies without an elected executive multiparty autocracies, exclusive democracies, and male democracies.
+          The original classification distinguishes multiple types of autocracies, which we here combined into a single group of "autocracies".
+
+          Specifically, we combined: non-electoral autocracies, one-party autocracies, multiparty autocracies without an elected executive multiparty autocracies, exclusive democracies, and male democracies.
       pop_dem_lied:
         title: People living in democracies
         unit: ''
@@ -320,7 +322,9 @@ tables:
 
           The classification defines electoral democracies as political systems in which citizens have the right to choose the chief executive and the legislature in multi-party, uncertain elections.
 
-          We here combine electoral democracies with polyarchies, which are electoral democracies that also grant freedoms of expression, assembly, and association.
+          It distinguishes two types: electoral democracies and polyarchies, which are electoral democracies that also grant freedoms of expression, assembly, and association.
+
+          We here combined them into a single group of "democracies."
       pop_missdem_lied:
         title: People living in countries for which democracy data is missing
         unit: ''
