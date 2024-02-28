@@ -87,11 +87,16 @@ def run(dest_dir: str) -> None:
     # Add agriculture land
     tb["agriculture_c"] = tb["grazing_c"] + tb["cropland_c"]
 
-    # SHARE indicators. Add indicators
+    # Relative indicators (%, per capita)
     ## NOTE: you should add metadata for these indicators in the YAML file
-    columns = ["urbc_c", "rurc_c", "agriculture_c"]
+    ## Share indicators (%)
+    columns = ["urbc_c", "rurc_c"]
     for col in columns:
         tb[col + "_share"] = (tb[col] / tb["popc_c"]) * 100
+    ## Per capita
+    columns = ["agriculture_c"]
+    for col in columns:
+        tb[col + "_per_capita"] = tb[col] / tb["popc_c"]
 
     # Replace year 0 with year 1
     ## More: https://en.wikipedia.org/wiki/Year_zero#cite_note-7

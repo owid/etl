@@ -86,12 +86,22 @@ tables:
         title: "Land use: Agriculture"
         description_short: Total agricultural area for each seperate country over time.
         description_key:
-          - "'Grazingland' is equivalent to the FAO category of 'permanent meadows and pastures'."
           - "{definitions.land_use_allocation}"
         description_processing: |-
           We estimate this indicator by summing cropland and grazingland land areas for each country.
         unit: "hectares"
         short_unit: "ha"
+      agriculture_c_per_capita:
+        title: "Land use (per capita): Agriculture"
+        description_short: Total agricultural land per person for each seperate country over time.
+        description_key:
+          - "{definitions.land_use_allocation}"
+        description_processing: |-
+          We estimate this indicator by summing cropland and grazingland land areas for each country.
+        unit: "hectares per person"
+        short_unit: "ha per person"
+        display:
+          numDecimalPlaces: 1
 
       # Land use for different crops (rainfed / irrigated)
       tot_rice_c:
