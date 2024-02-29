@@ -206,7 +206,10 @@ class Dataset:
             - "replace" (default): replace existing origin with new one
             - "append": append new origin to existing ones
             - "fail": raise an exception if origin already exists
-        :param errors: Optionally ignore errors like missing tables that are specified in YAML file
+        :param errors: How to handle errors encountered during metadata update. Possible values:
+            - "ignore" (default): ignore all errors
+            - "warn": issue a warning if there's an indicator in metadata that doesn't exist in the dataset
+            - "raise": same as "warn" but also raise an exception
         """
         self.metadata.update_from_yaml(metadata_path, if_source_exists=if_source_exists)
 
