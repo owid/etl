@@ -76,7 +76,7 @@ def _get_github_branches(org: str, repo: str) -> List[Any]:
     return branches
 
 
-def grapher_checks(ds: catalog.Dataset) -> None:
+def grapher_checks(ds: catalog.Dataset, warn_title_public: bool = True) -> None:
     """Check that the table is in the correct format for Grapher."""
     from etl import grapher_helpers as gh
 
@@ -108,7 +108,7 @@ def grapher_checks(ds: catalog.Dataset) -> None:
             # would override the indicator title in the Data Page.
             display_name = (tab[col].m.display or {}).get("name")
             title_public = getattr(tab[col].m.presentation, "title_public", None)
-            if display_name and not title_public:
+            if warn_title_public and display_name and not title_public:
                 log.warning(
                     f"Column {col} uses display.name but no presentation.title_public. Ensure the latter is also defined, otherwise display.name will be used as the indicator's title.",
                 )
