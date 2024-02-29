@@ -540,6 +540,7 @@ class VersionTracker:
                 "is_archived": "db_archived",
                 "update_period_days": "update_period_days",
                 "views_7d": "charts_views_7d",
+                "views_365d": "charts_views_365d",
             },
             errors="raise",
         )
@@ -561,6 +562,7 @@ class VersionTracker:
                     "chart_ids",
                     "chart_slugs",
                     "charts_views_7d",
+                    "charts_views_365d",
                     "db_dataset_id",
                     "db_dataset_name",
                     "db_private",
@@ -572,16 +574,25 @@ class VersionTracker:
             how="left",
         )
         # Fill missing values (e.g. "chart_ids" for steps that are not grapher steps).
-        for column in ["chart_ids", "chart_slugs", "charts_views_7d", "all_usages"]:
+        for column in ["chart_ids", "chart_slugs", "charts_views_7d", "charts_views_365d", "all_usages"]:
             steps_df[column] = [row if isinstance(row, list) else [] for row in steps_df[column]]
         for column in ["db_dataset_id", "db_dataset_name"]:
             steps_df.loc[steps_df[column].isnull(), column] = None
         for column in ["db_private", "db_archived"]:
             steps_df[column] = steps_df[column].fillna(False)
-        # Create a dictionary mapping step: chart_ids.
+        # Create a dictionary mapping steps to chart ids,
+        # e.g. {"step_1": [123, 456], "step_2": [789, 1011], ...}.
         step_to_chart_ids = steps_df[["step", "chart_ids"]].set_index("step").to_dict()["chart_ids"]
+        # Create a dictionary mapping steps to chart slugs,
+        # e.g. {"step_1": [(123, "slug_1"), (456, "slug_2")], "step_2": [], "step_3": ...}.
         step_to_chart_slugs = steps_df[["step", "chart_slugs"]].set_index("step").to_dict()["chart_slugs"]
-        step_to_chart_views_7d = steps_df[["step", "charts_views_7d"]].set_index("step").to_dict()["charts_views_7d"]
+        # Create a dictionary mapping steps to chart views,
+        # e.g. {"step_1": [(123, 1000), (456, 2000)], "step_2": [], "step_3": ...}.
+        step_to_chart_views = {}
+        for metric in ["views_7d", "views_365d"]:
+            step_to_chart_views[metric] = (
+                steps_df[["step", f"charts_{metric}"]].set_index("step").to_dict()[f"charts_{metric}"]
+            )
         # NOTE: Instead of this approach, an alternative would be to add grapher db datasets as steps of a different
         #   channel (e.g. "db").
         # Create a column with all chart ids of all dependencies of each step.
@@ -598,24 +609,27 @@ class VersionTracker:
             )
             for _, row in steps_df.iterrows()
         ]
-        # Create a column with the number of chart views, i.e. for each step, [(123, 1000), (456, 2000), ...].
-        steps_df["all_chart_views_7d"] = [
-            sorted(
-                set(
-                    sum(
-                        [step_to_chart_views_7d[usage] for usage in row["all_usages"]],  # type: ignore
-                        step_to_chart_views_7d[row["step"]],
-                    )
-                )
-            )
-            for _, row in steps_df.iterrows()
-        ]
         # Create a column with the number of charts affected (in any way possible) by each step.
         steps_df["n_charts"] = [len(charts_ids) for charts_ids in steps_df["all_chart_ids"]]
-        # Create a column with the total number of views of all charts affected by each step.
-        steps_df["n_charts_views_7d"] = [
-            sum([chart_views[1] for chart_views in charts_views]) for charts_views in steps_df["all_chart_views_7d"]
-        ]
+        # Add analytics for all charts.
+        for metric in ["views_7d", "views_365d"]:
+            # Create a column with the number of chart views, i.e. for each step, [(123, 1000), (456, 2000), ...].
+            steps_df[f"all_chart_{metric}"] = [
+                sorted(
+                    set(
+                        sum(
+                            [step_to_chart_views[metric][usage] for usage in row["all_usages"]],  # type: ignore
+                            step_to_chart_views[metric][row["step"]],
+                        )
+                    )
+                )
+                for _, row in steps_df.iterrows()
+            ]
+            # Create a column with the total number of views of all charts affected by each step.
+            steps_df[f"n_charts_{metric}"] = [
+                sum([chart_views[1] for chart_views in charts_views])
+                for charts_views in steps_df[f"all_chart_{metric}"]
+            ]
 
         # Remove all those rows that correspond to DB datasets which:
         # * Are archived.

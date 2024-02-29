@@ -140,6 +140,7 @@ df = steps_df[
         "db_dataset_name",
         "n_charts",
         "n_charts_views_7d",
+        "n_charts_views_365d",
         "days_to_update",
         "update_state",
         "date_of_next_update",
@@ -163,6 +164,7 @@ df = steps_df[
         # "all_chart_ids",
         # "all_chart_slugs",
         # "all_chart_views_7d",
+        # "all_chart_views_365d",
         # "all_active_dependencies",
         # "all_active_usages",
         # "direct_dependencies",
@@ -217,6 +219,7 @@ gb.configure_column("version", headerName="Version", width=120)
 gb.configure_column("name", headerName="Step name", width=140)
 gb.configure_column("n_charts", headerName="N. charts", width=120)
 gb.configure_column("n_charts_views_7d", headerName="7-day views", width=140)
+gb.configure_column("n_charts_views_365d", headerName="365-day views", width=140)
 gb.configure_column("days_to_update", headerName="Days to update", width=180)
 gb.configure_column("date_of_next_update", headerName="Next update", width=140)
 gb.configure_column("update_period_days", headerName="Update period", width=150)
