@@ -303,6 +303,7 @@ def distance_to_solution(country_selected: str) -> Tuple[str, str, str]:
     ref: https://stackoverflow.com/a/47780264
     """
     # If user has guessed the correct country
+    st.session_state.user_has_succeded_country = False
     if country_selected == SOLUTION:
         st.session_state.user_has_succeded_country = True
         return "0", "🎉", "100"
@@ -369,6 +370,7 @@ def distance_to_solution(country_selected: str) -> Tuple[str, str, str]:
 
 
 def distance_to_solution_year(year_selected: int) -> Tuple[str, str]:
+    st.session_state.user_has_succeded_year = False
     diff = SOLUTION_YEAR - year_selected
     if diff == 0:
         st.session_state.user_has_succeded_year = True
