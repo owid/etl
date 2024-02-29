@@ -467,6 +467,9 @@ foreach var in $schwartz_questions {
 	gen like_me_agg_`var' = 0
 	replace like_me_agg_`var' = 1 if `var' == 4 | `var' == 5 | `var' == 6
 	
+	gen like_me_agg_2_`var' = 0
+	replace like_me_agg_2_`var' = 1 if `var' == 5 | `var' == 6
+	
 	gen not_like_me_agg_`var' = 0
 	replace not_like_me_agg_`var' = 1 if `var' == 1 | `var' == 2
 	
@@ -494,7 +497,7 @@ foreach var in $schwartz_questions {
 	gen no_answer_`var' = 0
 	replace no_answer_`var' = 1 if `var' == .b
 
-	collapse (mean) like_me_agg_`var' not_like_me_agg_`var' very_much_like_me_`var' like_me_`var' somewhat_like_me_`var' a_little_like_me_`var' not_like_me_`var' not_at_all_like_me_`var' dont_know_`var' no_answer_`var' [w=S017], by (year country)
+	collapse (mean) like_me_agg_`var' like_me_agg_2_`var' not_like_me_agg_`var' very_much_like_me_`var' like_me_`var' somewhat_like_me_`var' a_little_like_me_`var' not_like_me_`var' not_at_all_like_me_`var' dont_know_`var' no_answer_`var' [w=S017], by (year country)
 	tempfile schwartz_`var'_file
 	save "`schwartz_`var'_file'"
 

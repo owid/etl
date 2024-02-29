@@ -1099,6 +1099,14 @@ tables:
           <<: *common-display
         presentation:
           title_public: "Like me: Important to think up new ideas"
+      like_me_agg_2_new_ideas:
+        title: "It is important to this person to think up new ideas and be creative: Like me (aggregate 2)"
+        description_short: '% of respondents replying "very much like me" or "like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person to think up new ideas and be creative".'
+        display:
+          name: "Like me: Important to think up new ideas"
+          <<: *common-display
+        presentation:
+          title_public: "Like me: Important to think up new ideas"
       not_like_me_agg_new_ideas:
         title: "It is important to this person to think up new ideas and be creative: Not like me (aggregate)"
         description_short: '% of respondents replying "not like me" or "not at all like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person to think up new ideas and be creative".'
@@ -1175,6 +1183,14 @@ tables:
       like_me_agg_rich:
         title: "It is important to this person to be rich: Like me (aggregate)"
         description_short: '% of respondents replying "very much like me", "like me" or "somewhat like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person to be rich".'
+        display:
+          name: "Like me: Important to be rich"
+          <<: *common-display
+        presentation:
+          title_public: "Like me: Important to be rich"
+      like_me_agg_2_rich:
+        title: "It is important to this person to be rich: Like me (aggregate 2)"
+        description_short: '% of respondents replying "very much like me" or "like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person to be rich".'
         display:
           name: "Like me: Important to be rich"
           <<: *common-display
@@ -1261,6 +1277,14 @@ tables:
           <<: *common-display
         presentation:
           title_public: "Like me: Important living in secure surroundings"
+      like_me_agg_2_secure:
+        title: "It is important to this person living in secure surroundings: Like me (aggregate 2)"
+        description_short: '% of respondents replying "very much like me" or "like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person living in secure surroundings".'
+        display:
+          name: "Like me: Important living in secure surroundings"
+          <<: *common-display
+        presentation:
+          title_public: "Like me: Important living in secure surroundings"
       not_like_me_agg_secure:
         title: "It is important to this person living in secure surroundings: Not like me (aggregate)"
         description_short: '% of respondents replying "not like me" or "not at all like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person living in secure surroundings".'
@@ -1337,6 +1361,14 @@ tables:
       like_me_agg_good_time:
         title: "It is important to this person to have a good time: Like me (aggregate)"
         description_short: '% of respondents replying "very much like me", "like me" or "somewhat like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person to have a good time".'
+        display:
+          name: "Like me: Important to have a good time"
+          <<: *common-display
+        presentation:
+          title_public: "Like me: Important to have a good time"
+      like_me_agg_2_good_time:
+        title: "It is important to this person to have a good time: Like me (aggregate 2)"
+        description_short: '% of respondents replying "very much like me" or "like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person to have a good time".'
         display:
           name: "Like me: Important to have a good time"
           <<: *common-display
@@ -1423,6 +1455,14 @@ tables:
           <<: *common-display
         presentation:
           title_public: "Like me: Important to help the people nearby"
+      like_me_agg_2_help_others:
+        title: "It is important to this person to help the people nearby: Like me (aggregate 2)"
+        description_short: '% of respondents replying "very much like me" or "like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person to help the people nearby".'
+        display:
+          name: "Like me: Important to help the people nearby"
+          <<: *common-display
+        presentation:
+          title_public: "Like me: Important to help the people nearby"
       not_like_me_agg_help_others:
         title: "It is important to this person to help the people nearby: Not like me (aggregate)"
         description_short: '% of respondents replying "not like me" or "not at all like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person to help the people nearby".'
@@ -1499,6 +1539,14 @@ tables:
       like_me_agg_success:
         title: "It is important to this person being very successful: Like me (aggregate)"
         description_short: '% of respondents replying "very much like me", "like me" or "somewhat like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person being very successful".'
+        display:
+          name: "Like me: Important being very successful"
+          <<: *common-display
+        presentation:
+          title_public: "Like me: Important being very successful"
+      like_me_agg_2_success:
+        title: "It is important to this person being very successful: Like me (aggregate 2)"
+        description_short: '% of respondents replying "very much like me" or "like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person being very successful".'
         display:
           name: "Like me: Important being very successful"
           <<: *common-display
@@ -1585,6 +1633,14 @@ tables:
           <<: *common-display
         presentation:
           title_public: "Like me: Important taking risks"
+      like_me_agg_2_risks:
+        title: "It is important to this person adventure and taking risks: Like me (aggregate 2)"
+        description_short: '% of respondents replying "very much like me" or "like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person adventure and taking risks".'
+        display:
+          name: "Like me: Important taking risks"
+          <<: *common-display
+        presentation:
+          title_public: "Like me: Important taking risks"
       not_like_me_agg_risks:
         title: "It is important to this person adventure and taking risks: Not like me (aggregate)"
         description_short: '% of respondents replying "not like me" or "not at all like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person adventure and taking risks".'
@@ -1661,6 +1717,14 @@ tables:
       like_me_agg_behave:
         title: "It is important to this person to always behave properly: Like me (aggregate)"
         description_short: '% of respondents replying "very much like me", "like me" or "somewhat like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person to always behave properly".'
+        display:
+          name: "Like me: Important to always behave properly"
+          <<: *common-display
+        presentation:
+          title_public: "Like me: Important to always behave properly"
+      like_me_agg_2_behave:
+        title: "It is important to this person to always behave properly: Like me (aggregate 2)"
+        description_short: '% of respondents replying "very much like me" or "like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person to always behave properly".'
         display:
           name: "Like me: Important to always behave properly"
           <<: *common-display
@@ -1747,6 +1811,14 @@ tables:
           <<: *common-display
         presentation:
           title_public: "Like me: Important looking after the environment"
+      like_me_agg_2_respect_environment:
+        title: "It is important to this person looking after the environment: Like me (aggregate 2)"
+        description_short: '% of respondents replying "very much like me" or "like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person looking after the environment".'
+        display:
+          name: "Like me: Important looking after the environment"
+          <<: *common-display
+        presentation:
+          title_public: "Like me: Important looking after the environment"
       not_like_me_agg_respect_environment:
         title: "It is important to this person looking after the environment: Not like me (aggregate)"
         description_short: '% of respondents replying "not like me" or "not at all like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person looking after the environment".'
@@ -1823,6 +1895,14 @@ tables:
       like_me_agg_tradition:
         title: "It is important to this person tradition: Like me (aggregate)"
         description_short: '% of respondents replying "very much like me", "like me" or "somewhat like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person tradition".'
+        display:
+          name: "Like me: Important tradition"
+          <<: *common-display
+        presentation:
+          title_public: "Like me: Important tradition"
+      like_me_agg_2_tradition:
+        title: "It is important to this person tradition: Like me (aggregate 2)"
+        description_short: '% of respondents replying "very much like me" or "like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person tradition".'
         display:
           name: "Like me: Important tradition"
           <<: *common-display
