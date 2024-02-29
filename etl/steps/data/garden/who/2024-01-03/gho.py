@@ -13,6 +13,8 @@ from owid.repack import repack_series
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
 
+from .gho_omms import create_omms
+
 log = structlog.get_logger()
 
 # Get paths and naming conventions for current step.
@@ -145,13 +147,21 @@ def run(dest_dir: str) -> None:
     # Custom fixes.
     tables = merge_identical_tables(tables)
 
+    tables_dict = {tb.m.title: tb for tb in tables}
+    assert len(tables) == len(tables_dict), "Duplicate titles in tables found"
+
+    # Create OOMs
+    ds_population = paths.load_dataset("population")
+    ds_regions = paths.load_dataset("regions")
+    create_omms(tables_dict, ds_population, ds_regions)  # type: ignore
+
     #
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
     ds_garden = create_dataset(
         dest_dir,
-        tables=tables,
+        tables=tables_dict.values(),
         check_variables_metadata=True,
         default_metadata=ds_meadow.metadata,
         errors="raise",
@@ -249,7 +259,7 @@ def set_indicator(tb: Table, short_name: str, meta: dict[str, str]) -> Table:
 def is_percentage(meta: dict[str, Any], ind_meta: VariableMeta) -> bool:
     if meta.get("Data type") == "Per Cent":
         return True
-    elif meta.get("Unit of Measure", "%") in ("N/A", "%"):
+    elif meta.get("Unit of Measure") in ("N/A", "%"):
         return True
     elif ind_meta.title and "(%" in ind_meta.title:
         return True

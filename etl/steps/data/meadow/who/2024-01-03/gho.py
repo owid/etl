@@ -32,6 +32,9 @@ log = structlog.get_logger()
 
 # Subset of indicators to process separated by comma. Case insensitive.
 SUBSET = os.environ.get("SUBSET")
+if SUBSET:
+    # These are required by OOMs in the garden step
+    SUBSET += ",WHS3_45,PHE_HHAIR_POP_CLEAN_FUELS,WHS3_56,PHE_HHAIR_PROP_POP_CLEAN_FUELS,NTD_YAWSNUM"
 
 
 def run(dest_dir: str) -> None:
