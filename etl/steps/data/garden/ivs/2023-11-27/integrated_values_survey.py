@@ -89,6 +89,8 @@ JUSTIFIABLE_QUESTIONS = [
 
 WORRIES_QUESTIONS = ["losing_job", "not_being_able_to_provide_good_education", "war", "terrorist_attack", "civil_war"]
 
+HAPPINESS_QUESTIONS = ["happy"]
+
 
 def run(dest_dir: str) -> None:
     #
@@ -251,6 +253,11 @@ def drop_indicators_and_replace_nans(tb: Table) -> Table:
         answers=["very_much", "a_great_deal", "not_much", "not_at_all"],
     )
 
+    # For happiness questions
+    tb = replace_dont_know_by_null(
+        tb=tb, questions=HAPPINESS_QUESTIONS, answers=["very", "quite", "not_very", "not_at_all"]
+    )
+
     # Drop rows with all null values in columns not country and year
     tb = tb.dropna(how="all", subset=tb.columns.difference(["country", "year"]))
 
@@ -398,6 +405,14 @@ def sanity_checks(tb: Table) -> Table:
         tb=tb,
         questions=WORRIES_QUESTIONS,
         answers=["very_much", "a_great_deal", "not_much", "not_at_all", "dont_know", "no_answer"],
+        margin=MARGIN,
+    )
+
+    # For happiness questions
+    tb = check_sum_100(
+        tb=tb,
+        questions=HAPPINESS_QUESTIONS,
+        answers=["very", "quite", "not_very", "not_at_all", "dont_know", "no_answer"],
         margin=MARGIN,
     )
 
