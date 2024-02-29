@@ -27,7 +27,6 @@ st.session_state.user_has_succeded_country = st.session_state.get("user_has_succ
 st.session_state.user_has_succeded_year = st.session_state.get("user_has_succeded_year", False)
 # Wether we are playing easy mode
 st.session_state.owidle_difficulty = st.session_state.get("owidle_difficulty_", 1)
-st.session_state.owidle_easy_mode = st.session_state.get("owidle_easy_mode", False)
 # Wether we are playing easy mode
 st.session_state.guess_last = st.session_state.get("guess_last", None)
 
