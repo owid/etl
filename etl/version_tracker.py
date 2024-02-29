@@ -529,8 +529,7 @@ class VersionTracker:
 
         return steps_df
 
-    @staticmethod
-    def _add_info_from_db(steps_df: pd.DataFrame) -> pd.DataFrame:
+    def _add_info_from_db(self, steps_df: pd.DataFrame) -> pd.DataFrame:
         steps_df = steps_df.copy()
         # Fetch all info about datasets from the DB.
         info_df = get_info_for_etl_datasets().rename(
@@ -544,6 +543,16 @@ class VersionTracker:
             },
             errors="raise",
         )
+        # NOTE: This dataframe may have more steps than steps_df, for different reasons:
+        #  * A grapher dataset was created by ETL, but the ETL step has been removed from the dag, while the
+        #    grapher dataset still exists. This shouldn't happen, but it does happen (mostly for fasttrack drafts).
+        #  * A grapher dataset (in production) has been created by ETL in a branch which is not yet merged. This,
+        #    again, should not happen, but it does happen every now and then, exceptionally.
+        # Identify these steps.
+        self.unknown_steps_with_grapher_dataset_df = info_df[~info_df["step"].isin(steps_df["step"])].reset_index(
+            drop=True
+        )
+        # Add info from db to steps dataframe.
         steps_df = pd.merge(
             steps_df,
             info_df[
@@ -560,18 +569,16 @@ class VersionTracker:
                 ]
             ],
             on="step",
-            how="outer",
+            how="left",
         )
-        # Fill missing values.
+        # Fill missing values (e.g. "chart_ids" for steps that are not grapher steps).
         for column in ["chart_ids", "chart_slugs", "charts_views_7d", "all_usages"]:
             steps_df[column] = [row if isinstance(row, list) else [] for row in steps_df[column]]
-        # for column in ["charts"]:
-        #     steps_df[column] = [row if isinstance(row, dict) else dict() for row in steps_df[column]]
         for column in ["db_dataset_id", "db_dataset_name"]:
             steps_df.loc[steps_df[column].isnull(), column] = None
         for column in ["db_private", "db_archived"]:
             steps_df[column] = steps_df[column].fillna(False)
-        # Create a dictionary step: chart_ids.
+        # Create a dictionary mapping step: chart_ids.
         step_to_chart_ids = steps_df[["step", "chart_ids"]].set_index("step").to_dict()["chart_ids"]
         step_to_chart_slugs = steps_df[["step", "chart_slugs"]].set_index("step").to_dict()["chart_slugs"]
         step_to_chart_views_7d = steps_df[["step", "charts_views_7d"]].set_index("step").to_dict()["charts_views_7d"]
@@ -648,16 +655,7 @@ class VersionTracker:
 
         if self.connect_to_db:
             # Add info from DB.
-            # NOTE: The output may have more rows than the input. This can happen for different reasons:
-            #  * A grapher dataset was created by ETL, but the ETL step has been removed from the dag, while the
-            #    grapher dataset still exists. This shouldn't happen, but it does happen (mostly for fasttrack drafts).
-            #  * A grapher dataset (in production) has been created by ETL in a branch which is not yet merged. This,
-            #    again, should not happen, but it does happen every now and then, exceptionally.
             steps_df = self._add_info_from_db(steps_df=steps_df)
-            # Because of this mismatch, all columns of the unknown grapher datasets will be nan.
-            # List these problematic steps and then remove them from the dataframe, to avoid nans.
-            self.unknown_steps_with_grapher_dataset_df = steps_df[steps_df["state"].isnull()].reset_index(drop=True)
-            steps_df = steps_df.dropna(subset=["state"]).reset_index(drop=True)
 
             # Add columns with the date and the number of days until the next update.
             steps_df = add_days_to_update_columns(steps_df=steps_df)
