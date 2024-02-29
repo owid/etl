@@ -3835,3 +3835,70 @@ tables:
         presentation:
           title_public: "A civil war: Average score"
 
+      happy:
+        title: "Happiness: Happy (aggregate)"
+        description_short: '% of respondents replying "very happy" or "quite happy" when asked "Taking all things together, would you say you are very happy, quite happy, not very happy or not at all happy?"'
+        display:
+          name: "Happiness: Happy"
+          <<: *common-display
+        presentation:
+          title_public: "Happiness: Happy"
+      not_happy:
+        title: "Happiness: Not happy (aggregate)"
+        description_short: '% of respondents replying "not very happy" or "not at all happy" when asked "Taking all things together, would you say you are very happy, quite happy, not very happy or not at all happy?"'
+        display:
+          name: "Happiness: Not happy"
+          <<: *common-display
+        presentation:
+          title_public: "Happiness: Not happy"
+      very_happy:
+        title: "Happiness: Very happy"
+        description_short: '% of respondents replying "very happy" when asked "Taking all things together, would you say you are very happy, quite happy, not very happy or not at all happy?"'
+        display:
+          name: "Happiness: Very happy"
+          <<: *common-display
+        presentation:
+          title_public: "Happiness: Very happy"
+      quite_happy:
+        title: "Happiness: Quite happy"
+        description_short: '% of respondents replying "quite happy" when asked "Taking all things together, would you say you are very happy, quite happy, not very happy or not at all happy?"'
+        display:
+          name: "Happiness: Quite happy"
+          <<: *common-display
+        presentation:
+          title_public: "Happiness: Quite happy"
+      not_very_happy:
+        title: "Happiness: Not very happy"
+        description_short: '% of respondents replying "not very happy" when asked "Taking all things together, would you say you are very happy, quite happy, not very happy or not at all happy?"'
+        display:
+          name: "Happiness: Not very happy"
+          <<: *common-display
+        presentation:
+          title_public: "Happiness: Not very happy"
+      not_at_all_happy:
+        title: "Happiness: Not at all happy"
+        description_short: '% of respondents replying "not at all happy" when asked "Taking all things together, would you say you are very happy, quite happy, not very happy or not at all happy?"'
+        display:
+          name: "Happiness: Not at all happy"
+          <<: *common-display
+        presentation:
+          title_public: "Happiness: Not at all happy"
+      dont_know_happy:
+        title: "Happiness: Don't know"
+        description_short: '% of respondents replying "don‘t know" when asked "Taking all things together, would you say you are very happy, quite happy, not very happy or not at all happy?"'
+        display:
+          name: "Happiness: Don't know"
+          <<: *common-display
+        presentation:
+          title_public: "Happiness: Don't know"
+      no_answer_happy:
+        title: "Happiness: No answer"
+        description_short: '% of answers classified as "No answer" for the question "Taking all things together, would you say you are very happy, quite happy, not very happy or not at all happy?"'
+        display:
+          name: "Happiness: No answer"
+          <<: *common-display
+        presentation:
+          title_public: "Happiness: No answer"
+
+
+

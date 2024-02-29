@@ -59,9 +59,12 @@ global justifiable_questions F114A F114B F114C F114D F115 F116 F117 F118 F119 F1
 * Worries
 global worries_questions H006_01 H006_02 H006_03 H006_04 H006_05
 
+* Happiness
+global happiness_questions A008
+
 * List of questions to work with
 * NOTE: A168 is not available in IVS
-global questions A165 A168 G007_33_B G007_34_B $additional_questions $important_in_life_questions $politics_questions $environment_vs_econ_questions $income_equality_questions $schwartz_questions $work_leisure_questions $work_questions $most_serious_problem_questions $justifiable_questions $worries_questions
+global questions A165 A168 G007_33_B G007_34_B $additional_questions $important_in_life_questions $politics_questions $environment_vs_econ_questions $income_equality_questions $schwartz_questions $work_leisure_questions $work_questions $most_serious_problem_questions $justifiable_questions $worries_questions $happiness_questions
 
  * Keep wave ID, country, weight and the list of questions
 keep S002VS S002EVS S003 S017 $questions
@@ -782,6 +785,58 @@ foreach var in $worries_questions {
 	preserve
 }
 
+* Processing happiness questions
+/*
+           1 Very happy
+           2 Quite happy
+           3 Not very happy
+           4 Not at all happy
+          .a Don't know
+          .b No answer
+          .c Not applicable
+          .d Not asked in survey
+          .e Missing: other
+*/
+
+* Keep only answers
+keep if A008 >= 1
+keep if A008 != .c
+keep if A008 != .d
+keep if A008 != .e
+
+*Generate variables
+gen happy = 0
+replace happy = 1 if A008 == 1 | A008 == 2
+
+gen not_happy = 0
+replace not_happy = 1 if A008 == 3 | A008 == 4
+
+gen very_happy = 0
+replace very_happy = 1 if A008 == 1
+
+gen quite_happy = 0
+replace quite_happy = 1 if A008 == 2
+
+gen not_very_happy = 0
+replace not_very_happy = 1 if A008 == 3
+
+gen not_at_all_happy = 0
+replace not_at_all_happy = 1 if A008 == 4
+
+gen dont_know_happy = 0
+replace dont_know_happy = 1 if A008 == .a
+
+gen no_answer_happy = 0
+replace no_answer_happy = 1 if A008 == .b
+
+* Make dataset of the mean trust (which ends up being the % of people saying "most people can be trusted") by wave and country (CHECK WEIGHTS)
+collapse (mean) happy not_happy very_happy quite_happy not_very_happy not_at_all_happy dont_know_happy no_answer_happy [w=S017], by (year country)
+tempfile happiness_file
+save "`happiness_file'"
+
+restore
+preserve
+
 
 
 * Combine all the saved datasets
@@ -828,6 +883,8 @@ foreach var in $justifiable_questions {
 foreach var in $worries_questions {
 	merge 1:1 year country using "`worries_`var'_file'", nogenerate // keep(master match)
 }
+
+merge 1:1 year country using "`happiness_file'", nogenerate // keep(master match)
 
 
 * Get a list of variables excluding country and year (and avg_score_eq_ineq to not multiply it by 100)
