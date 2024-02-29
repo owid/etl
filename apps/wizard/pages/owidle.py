@@ -27,7 +27,6 @@ st.session_state.user_has_succeded_country = st.session_state.get("user_has_succ
 st.session_state.user_has_succeded_year = st.session_state.get("user_has_succeded_year", False)
 # Wether we are playing easy mode
 st.session_state.owidle_difficulty = st.session_state.get("owidle_difficulty_", 1)
-st.session_state.owidle_easy_mode = st.session_state.get("owidle_easy_mode", False)
 # Wether we are playing easy mode
 st.session_state.guess_last = st.session_state.get("guess_last", None)
 
@@ -732,7 +731,7 @@ with st.form("form_guess", border=False, clear_on_submit=True):
     # EASY MODE: Filter options
     ## Only consider options within the radius of the last guess
     ## If there are less than NUM_COUNTRIES_EASY_MODE, show the NUM_COUNTRIES_EASY_MODE closest ones.
-    if st.session_state.owidle_easy_mode and (st.session_state.guess_last is not None):
+    if (st.session_state.owidle_difficulty == 0) and (st.session_state.guess_last is not None):
         distances = DISTANCES.loc[st.session_state.guess_last["name"]]
         options = distances.loc[
             distances["distance"] <= int(st.session_state.guess_last["distance"]), "target"
