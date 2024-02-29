@@ -202,8 +202,8 @@ def load_data(placeholder: str) -> Tuple[pd.DataFrame, gpd.GeoDataFrame]:
 def pick_solution(difficuty_level: int):
     df_ = DATA.drop_duplicates(subset="location")
     seed = (dt.datetime.now(dt.timezone.utc).date() - dt.date(1993, 7, 13)).days
-    # if difficuty_level == 2:
-    #     seed = seed * seed
+    if difficuty_level == 2:
+        seed = seed * seed
     return df_["location"].sample(random_state=seed).item()
 
 
