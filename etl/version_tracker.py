@@ -549,10 +549,10 @@ class VersionTracker:
         #    grapher dataset still exists. This shouldn't happen, but it does happen (mostly for fasttrack drafts).
         #  * A grapher dataset (in production) has been created by ETL in a branch which is not yet merged. This,
         #    again, should not happen, but it does happen every now and then, exceptionally.
-        # Identify these steps.
-        self.unknown_steps_with_grapher_dataset_df = info_df[~info_df["step"].isin(steps_df["step"])].reset_index(
-            drop=True
-        )
+        # Identify these steps (and ignore archive DB datasets).
+        self.unknown_steps_with_grapher_dataset_df = info_df[
+            (~info_df["step"].isin(steps_df["step"])) & (~info_df["db_archived"])
+        ].reset_index(drop=True)
         # Add info from db to steps dataframe.
         steps_df = pd.merge(
             steps_df,
@@ -815,13 +815,14 @@ class VersionTracker:
         )
 
     def check_that_db_datasets_exist_in_etl(self) -> None:
-        """Check that all DB datasets (with or without charts) exist in the ETL dag (active or archive).
+        """Check that all active DB datasets (with or without charts) exist in the ETL dag (active or archive).
 
         This check can only be performed if we have access to the DB.
         """
         if self.connect_to_db:
             # Ensure steps_df is calculated.
             _ = self.steps_df
+
         if self.unknown_steps_with_grapher_dataset_df is not None:
             missing_df = self.unknown_steps_with_grapher_dataset_df.sort_values("db_dataset_name").reset_index(
                 drop=True
