@@ -34,7 +34,7 @@ st.session_state.guess_last = st.session_state.get("guess_last", None)
 ## Maximum number of guesses allowed to the user
 NUM_GUESSES = 6
 if st.session_state.owidle_difficulty == 2:
-    NUM_GUESSES += 2
+    NUM_GUESSES += 0
 
 default_guess = [
     {
@@ -203,7 +203,7 @@ def pick_solution(difficuty_level: int):
     df_ = DATA.drop_duplicates(subset="location")
     seed = (dt.datetime.now(dt.timezone.utc).date() - dt.date(1993, 7, 13)).days
     if difficuty_level == 2:
-        seed = seed * seed
+        seed = 2 * seed * seed
     return df_["location"].sample(random_state=seed).item()
 
 
