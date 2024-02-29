@@ -82,7 +82,7 @@ if st.session_state.owidle_difficulty == 2:
 else:
     if st.session_state.owidle_difficulty == 0:
         title = "👶 :gray[(beginner)] :rainbow[owidle]"
-    elif (st.session_state.owidle_difficulty == 1) or (st.session_state.owidle_difficulty is None):
+    else:
         title = "👾 :rainbow[owidle]"
     st.title(title)
 
@@ -574,16 +574,17 @@ def _plot_chart_hard(
     }
 
     # Hide country name if user has not succeded yet.
-    if st.session_state.user_has_succeded_year:
-        df["locationyear"] = df["locationyear"].replace({solution_year: f"? ({SOLUTION_YEAR})"})
-        df[column_country] = df[column_country].replace({solution: "?"})
-    elif st.session_state.user_has_succeded_country:
-        df["year"] = df["year"].replace({SOLUTION_YEAR: "?"})
-        df["locationyear"] = df["locationyear"].replace({solution_year: f"{solution} ?"})
     if not st.session_state.user_has_succeded:
-        df[column_country] = df[column_country].replace({solution: "?"})
-        df["year"] = df["year"].replace({SOLUTION_YEAR: "?"})
-        df["locationyear"] = df["locationyear"].replace({solution_year: "?"})
+        if st.session_state.user_has_succeded_year:
+            df["locationyear"] = df["locationyear"].replace({solution_year: f"? ({SOLUTION_YEAR})"})
+            df[column_country] = df[column_country].replace({solution: "?"})
+        elif st.session_state.user_has_succeded_country:
+            df["year"] = df["year"].replace({SOLUTION_YEAR: "?"})
+            df["locationyear"] = df["locationyear"].replace({solution_year: f"{solution} ?"})
+        else:
+            df[column_country] = df[column_country].replace({solution: "?"})
+            df["year"] = df["year"].replace({SOLUTION_YEAR: "?"})
+            df["locationyear"] = df["locationyear"].replace({solution_year: "?"})
 
     # Change location column name to "Country"
     df["Country"] = df[column_country]
