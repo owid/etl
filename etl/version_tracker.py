@@ -540,6 +540,7 @@ class VersionTracker:
                 "is_private": "db_private",
                 "is_archived": "db_archived",
                 "update_period_days": "update_period_days",
+                "views_7d": "charts_views_7d",
             },
             errors="raise",
         )
@@ -549,6 +550,8 @@ class VersionTracker:
                 [
                     "step",
                     "chart_ids",
+                    "chart_slugs",
+                    "charts_views_7d",
                     "db_dataset_id",
                     "db_dataset_name",
                     "db_private",
@@ -560,25 +563,52 @@ class VersionTracker:
             how="outer",
         )
         # Fill missing values.
-        for column in ["chart_ids", "all_usages"]:
+        for column in ["chart_ids", "chart_slugs", "charts_views_7d", "all_usages"]:
             steps_df[column] = [row if isinstance(row, list) else [] for row in steps_df[column]]
+        # for column in ["charts"]:
+        #     steps_df[column] = [row if isinstance(row, dict) else dict() for row in steps_df[column]]
         for column in ["db_dataset_id", "db_dataset_name"]:
             steps_df.loc[steps_df[column].isnull(), column] = None
         for column in ["db_private", "db_archived"]:
             steps_df[column] = steps_df[column].fillna(False)
         # Create a dictionary step: chart_ids.
-        step_chart_ids = steps_df[["step", "chart_ids"]].set_index("step").to_dict()["chart_ids"]
+        step_to_chart_ids = steps_df[["step", "chart_ids"]].set_index("step").to_dict()["chart_ids"]
+        step_to_chart_slugs = steps_df[["step", "chart_slugs"]].set_index("step").to_dict()["chart_slugs"]
+        step_to_chart_views_7d = steps_df[["step", "charts_views_7d"]].set_index("step").to_dict()["charts_views_7d"]
         # NOTE: Instead of this approach, an alternative would be to add grapher db datasets as steps of a different
         #   channel (e.g. "db").
         # Create a column with all chart ids of all dependencies of each step.
         # To achieve that, for each step, sum the list of chart ids from all its usages to the list of chart ids of
         # the step itself. Then create a sorted list of the set of all those chart ids.
         steps_df["all_chart_ids"] = [
-            sorted(set(sum([step_chart_ids[usage] for usage in row["all_usages"]], step_chart_ids[row["step"]])))  # type: ignore
+            sorted(set(sum([step_to_chart_ids[usage] for usage in row["all_usages"]], step_to_chart_ids[row["step"]])))  # type: ignore
+            for _, row in steps_df.iterrows()
+        ]
+        # Create a column with charts slugs, i.e. for each step, [(123, "some_chart"), (456, "some_other_chart"), ...].
+        steps_df["all_chart_slugs"] = [
+            sorted(
+                set(sum([step_to_chart_slugs[usage] for usage in row["all_usages"]], step_to_chart_slugs[row["step"]]))  # type: ignore
+            )
+            for _, row in steps_df.iterrows()
+        ]
+        # Create a column with the number of chart views, i.e. for each step, [(123, 1000), (456, 2000), ...].
+        steps_df["all_chart_views_7d"] = [
+            sorted(
+                set(
+                    sum(
+                        [step_to_chart_views_7d[usage] for usage in row["all_usages"]],  # type: ignore
+                        step_to_chart_views_7d[row["step"]],
+                    )
+                )
+            )
             for _, row in steps_df.iterrows()
         ]
         # Create a column with the number of charts affected (in any way possible) by each step.
-        steps_df["n_charts"] = [len(chart_ids) for chart_ids in steps_df["all_chart_ids"]]
+        steps_df["n_charts"] = [len(charts_ids) for charts_ids in steps_df["all_chart_ids"]]
+        # Create a column with the total number of views of all charts affected by each step.
+        steps_df["n_charts_views_7d"] = [
+            sum([chart_views[1] for chart_views in charts_views]) for charts_views in steps_df["all_chart_views_7d"]
+        ]
 
         # Remove all those rows that correspond to DB datasets which:
         # * Are archived.
@@ -608,6 +638,10 @@ class VersionTracker:
         steps_df["role"] = ["usage" if step in self.dag_all else "dependency" for step in self.all_steps]
         steps_df["dag_file_name"] = [self.get_dag_file_for_step(step=step) for step in self.all_steps]
         steps_df["path_to_script"] = [self.get_path_to_script(step=step, omit_base_dir=True) for step in self.all_steps]
+
+        # Add column for the total number of all dependencies and usges.
+        steps_df["n_all_dependencies"] = [len(dependencies) for dependencies in steps_df["all_dependencies"]]
+        steps_df["n_all_usages"] = [len(usages) for usages in steps_df["all_usages"]]
 
         # Add attributes to steps.
         steps_df = pd.merge(steps_df, self.step_attributes_df, on="step", how="left")
