@@ -1,0 +1,10 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Global Health
+
+dataset:
+  # title: WHO Global Health Observatory
+  title: Global Health Observatory - World Health Organization
+  update_period_days: 365

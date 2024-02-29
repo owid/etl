@@ -17,10 +17,10 @@ from etl.match_variables import find_mapping_suggestions, preliminary_mapping
 # Logger
 log = get_logger()
 # App can't hanle too many variables to map. We set an upper limit
-LIMIT_VARS_TO_MAP = 100
+LIMIT_VARS_TO_MAP = 200
 
 
-@st.cache_data(show_spinner=False)
+# @st.cache_data(show_spinner=False)
 def find_mapping_suggestions_cached(missing_old, missing_new, similarity_name):
     return find_mapping_suggestions(
         missing_old=missing_old,
@@ -82,7 +82,7 @@ def ask_and_get_variable_mapping(search_form) -> "VariableConfig":
         )  # type: ignore
     print(time.time() - t0)
     # Sort by max similarity: First suggestion is that one that has the highest similarity score with any of its suggested new vars.
-    suggestions = sorted(suggestions, key=lambda x: x["new"]["similarity"].max(), reverse=True)
+    suggestions = sorted(suggestions, key=lambda x: x["new"]["similarity"].max(), reverse=False)
 
     # [OPTIONAL] EXPLORE MODE
     # Get data points

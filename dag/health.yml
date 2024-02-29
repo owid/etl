@@ -471,3 +471,17 @@ steps:
     - data://meadow/oecd/2024-02-23/health_expenditure
   data://grapher/oecd/2024-02-23/health_expenditure:
     - data://garden/oecd/2024-02-23/health_expenditure
+
+  # Global Health Observatory (GHO) from WHO
+  data://meadow/who/2024-01-03/gho:
+    - snapshot://who/2024-01-03/gho.zip
+  data://garden/who/2024-01-03/gho:
+    - data://meadow/who/2024-01-03/gho
+  data://grapher/who/2024-01-03/gho:
+    - data://garden/who/2024-01-03/gho
+
+  # Suicides based on GHO dataset
+  data://garden/who/2024-02-14/gho_suicides:
+    - data://garden/who/2024-01-03/gho
+  data://grapher/who/2024-02-14/gho_suicides:
+    - data://garden/who/2024-02-14/gho_suicides
