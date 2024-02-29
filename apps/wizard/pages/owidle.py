@@ -631,7 +631,7 @@ def _plot_chart_hard(
     )
 
 
-# @st.cache_data
+@st.cache_data
 def plot_chart_population(countries_guessed: List[str], years_guessed: List[str], solution: str):
     """Plot timeseries."""
     if st.session_state.owidle_difficulty == 2:
@@ -653,7 +653,7 @@ def plot_chart_population(countries_guessed: List[str], years_guessed: List[str]
         )
 
 
-# @st.cache_data
+@st.cache_data
 def plot_chart_gdp_pc(countries_guessed: List[str], years_guessed: List[str], solution: str):
     """Plot timeseries."""
     if st.session_state.owidle_difficulty == 2:
