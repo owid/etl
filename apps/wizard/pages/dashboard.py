@@ -75,6 +75,19 @@ def load_steps_df():
     # need to be updated more urgently.
     steps_df["days_to_update"] = steps_df["days_to_update"].fillna(9999)
 
+    # For convenience, combine dataset name and url in a single column.
+    # This will be useful when creating cells with the name of the dataset as a clickable link.
+    # In principle, one can access different columns of the dataframe with UrlCellRenderer
+    # (and then hide db_dataset_id column), however, then using "group by" fails.
+    # So this is a workaround to allows to have both clickable cells with names, and "group by".
+    steps_df["db_dataset_name_and_url"] = [
+        f"{row['db_dataset_name']}||{GRAPHER_DATASET_BASE_URL}{int(row['db_dataset_id'])}"
+        if row["db_dataset_name"]
+        else None
+        for row in steps_df.to_dict(orient="records")
+    ]
+    steps_df = steps_df.drop(columns=["db_dataset_name", "db_dataset_id"], errors="raise")
+
     # Add a column with the total number of dependencies that are not their latest version.
     steps_df["n_updateable_dependencies"] = [
         sum(
@@ -137,7 +150,7 @@ steps_df = load_steps_df()
 df = steps_df[
     [
         "step",
-        "db_dataset_name",
+        "db_dataset_name_and_url",
         "n_charts",
         "n_charts_views_7d",
         "n_charts_views_365d",
@@ -152,8 +165,6 @@ df = steps_df[
         # "dag_file_name",
         "n_versions",
         "update_period_days",
-        # The following column is needed to create the URLs to grapher datasets. It will be hidden in the Steps table.
-        "db_dataset_id",
         # "state",
         "full_path_to_script",
         "dag_file_path",
@@ -278,31 +289,36 @@ function(params){{
 gb.configure_columns("update_state", headerName="Update state", cellStyle=update_state_jscode)
 # Create a column with grapher dataset names that are clickable and open in a new tab.
 gb.configure_column(
-    "db_dataset_name",  # This will be the displayed column
+    "db_dataset_name_and_url",  # This will be the displayed column
     headerName="Grapher dataset",
     cellRenderer=JsCode(
         """
         class UrlCellRenderer {
-          init(params) {
+        init(params) {
             this.eGui = document.createElement('a');
-            const baseUrl = "%s";
-            const datasetId = params.data.db_dataset_id;
-            const url = baseUrl + datasetId;
-            this.eGui.innerText = params.value;
-            this.eGui.setAttribute('href', url);
+            if(params.value) {
+                const parts = params.value.split("||");
+                if(parts.length === 2) {
+                    const datasetName = parts[0];
+                    const datasetUrl = parts[1];
+                    this.eGui.innerText = datasetName;
+                    this.eGui.setAttribute('href', datasetUrl);
+                } else {
+                    this.eGui.innerText = '';
+                }
+            } else {
+                this.eGui.innerText = '';
+            }
             this.eGui.setAttribute('style', "text-decoration:none");
             this.eGui.setAttribute('target', "_blank");
-          }
-          getGui() {
+        }
+        getGui() {
             return this.eGui;
-          }
+        }
         }
         """
-        % GRAPHER_DATASET_BASE_URL
     ),
 )
-# Now hide the unnecessary column of dataset ids.
-gb.configure_column("db_dataset_id", hide=True)
 gb.configure_pagination(paginationAutoPageSize=False, paginationPageSize=20)
 grid_options = gb.build()
 
