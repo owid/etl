@@ -673,6 +673,27 @@ class VersionTracker:
 
             # Add columns with the date and the number of days until the next update.
             steps_df = add_days_to_update_columns(steps_df=steps_df)
+        else:
+            # Add empty columns.
+            for column in [
+                "chart_ids",
+                "chart_slugs",
+                "charts_views_7d",
+                "charts_views_365d",
+                "db_dataset_id",
+                "db_dataset_name",
+                "db_private",
+                "db_archived",
+                "update_period_days",
+                "date_of_next_update",
+                "days_to_update",
+                "all_chart_ids",
+                "all_chart_slugs",
+                "n_charts",
+                "n_charts_views_7d",
+                "n_charts_views_365d",
+            ]:
+                steps_df[column] = None
 
         # Add columns with the list of forward and backwards versions for each step.
         steps_df = self._add_columns_with_different_step_versions(steps_df=steps_df)

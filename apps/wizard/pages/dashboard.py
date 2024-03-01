@@ -10,6 +10,7 @@ from st_aggrid.grid_options_builder import GridOptionsBuilder
 
 from apps.step_update.cli import StepUpdater
 from etl.config import ADMIN_HOST, ENV_IS_REMOTE
+from etl.db import can_connect
 
 # TODO:
 #  * Consider creating a script to regularly check for snapshot updates, fetch them and add them to the temporary DAG (this is the way that the "update state" will know if there are snapshot updates available).
@@ -58,7 +59,8 @@ This dashboard lets you explore all active ETL steps, and, if you are working on
 ### Steps table
 """
 )
-# add_indentation()
+if not can_connect():
+    st.error("Unable to connect to grapher DB.")
 
 
 @st.cache_data
