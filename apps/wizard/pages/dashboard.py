@@ -300,7 +300,6 @@ gb.configure_column(
         """
         % GRAPHER_DATASET_BASE_URL
     ),
-    autoHeight=True,
 )
 # Now hide the unnecessary column of dataset ids.
 gb.configure_column("db_dataset_id", hide=True)
@@ -311,12 +310,18 @@ grid_options = gb.build()
 grid_response = AgGrid(
     df,
     gridOptions=grid_options,
-    height=300,
+    height=1000,
     width="100%",
     update_mode=GridUpdateMode.MODEL_CHANGED,
     fit_columns_on_grid_load=False,
     allow_unsafe_jscode=True,
-    theme="material",
+    theme="streamlit",
+    # The following ensures that the pagination controls are not cropped.
+    custom_css={
+        "#gridToolBar": {
+            "padding-bottom": "0px !important",
+        }
+    },
 )
 
 
