@@ -66,6 +66,14 @@ tables:
           - "{definitions.land_use_allocation}"
         unit: km² per grid cell
         short_unit: "km²"
+      uopp_c_per_capita:
+        title: "Land use (per capita): Built-up area"
+        description_short: Total built-up area per person of a country over time.
+        description_key:
+          - Built-up areas are computed by dividing total urban population in a country at a given year by the average urban densities in a country at that year.
+          - "{definitions.land_use_allocation}"
+        unit: "km² per grid cell"
+        short_unit: "km² per grid cell per person"
       cropland_c:
         title: "Land use: Cropland"
         description_short: Total cropland area for each seperate country over time.
@@ -74,6 +82,14 @@ tables:
           - "{definitions.land_use_allocation}"
         unit: "hectares"
         short_unit: "ha"
+      cropland_c_per_capita:
+        title: "Land use (per capita): Cropland"
+        description_short: Total cropland area for per person each seperate country over time.
+        description_key:
+          - "'Cropland' here is equivalent to the FAO category of 'arable land and permanent crops'."
+          - "{definitions.land_use_allocation}"
+        unit: "hectares per person"
+        short_unit: "ha per person"
       grazing_c:
         title: "Land use: Grazingland"
         description_short: Total grazingland area for each seperate country over time.
@@ -82,6 +98,14 @@ tables:
           - "{definitions.land_use_allocation}"
         unit: "hectares"
         short_unit: "ha"
+      grazing_c_per_capita:
+        title: "Land use (per capita): Grazingland"
+        description_short: Total grazingland area per person for each seperate country over time.
+        description_key:
+          - "'Grazingland' is equivalent to the FAO category of 'permanent meadows and pastures'."
+          - "{definitions.land_use_allocation}"
+        unit: "hectares per person"
+        short_unit: "ha per person"
       agriculture_c:
         title: "Land use: Agriculture"
         description_short: Total agricultural area for each seperate country over time.

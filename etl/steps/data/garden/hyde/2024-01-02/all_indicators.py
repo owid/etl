@@ -120,7 +120,7 @@ def run(dest_dir: str) -> None:
     for col in columns:
         tb[col + "_share"] = (tb[col] / tb["popc_c"]) * 100
     ## Per capita
-    columns = ["agriculture_c"]
+    columns = ["uopp_c", "cropland_c_per_capita", "grazing_c_per_capita", "agriculture_c"]
     for col in columns:
         tb[col + "_per_capita"] = tb[col] / tb["popc_c"]
 
