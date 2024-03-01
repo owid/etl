@@ -67,14 +67,15 @@ seed_idx = st.selectbox(
     key="seed_idx",
 )
 
+# st.write(seed_idx)
 seeds = []
 
 for i in range(20):
-    seed = (dt.datetime.now(dt.timezone.utc).date() - dt.date(1990, 7, i + 1)).days
+    seed = (dt.datetime.now(dt.timezone.utc).date() - dt.date(1999, 7, i + 1)).days
     seeds.append(seed)
-st.session_state.seed_idx = st.session_state.get("seed_idx", 0)
-SEED = seeds[st.session_state.seed_idx]
-
+# st.session_state["seed_idx"] = st.session_state.get("seed_idx_", 0)
+SEED = seeds[int(seed_idx)]
+# st.write(seeds)
 # TITLE
 if st.session_state.owidle_difficulty == 2:
     title = ":red[O W I D L E]"
@@ -215,10 +216,9 @@ def load_data(placeholder: str) -> Tuple[pd.DataFrame, gpd.GeoDataFrame]:
 
 
 @st.cache_data
-def pick_solution(difficuty_level: int):
+def pick_solution(difficuty_level: int, seed):
     df_ = DATA.drop_duplicates(subset="location")
     # seed = (dt.datetime.now(dt.timezone.utc).date() - dt.date(1993, 7, 13)).days
-    seed = SEED
     if difficuty_level == 2:
         seed = 2 * seed * seed
     return df_["location"].sample(random_state=seed).item()
@@ -276,7 +276,9 @@ def get_all_distances():
 
 DATA, GEO = load_data("cached")
 # Arbitrary daily solution
-SOLUTION = pick_solution(st.session_state.owidle_difficulty)
+SOLUTION = pick_solution(st.session_state.owidle_difficulty, SEED)
+# st.write(SOLUTION)
+# st.write(SEED)
 YEAR_MAX, YEAR_MIN, SOLUTION_YEAR = pick_solution_year()
 # SOLUTION = "Spain"
 OPTIONS = sorted(DATA["location"].unique())
