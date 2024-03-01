@@ -12,7 +12,7 @@ from apps.step_update.cli import StepUpdater
 from etl.config import ADMIN_HOST, ENV_IS_REMOTE
 
 # TODO:
-#  * Consider creating a script to regularly check for snapshot updates, fetch them and add them to the temporary dag (this is the way that the "update state" will know if there are snapshot updates available).
+#  * Consider creating a script to regularly check for snapshot updates, fetch them and add them to the temporary DAG (this is the way that the "update state" will know if there are snapshot updates available).
 #  * Define a metric of update prioritization, based on number of charts (or views) and days to update. Sort steps table by this metric.
 
 # Current date.
@@ -81,11 +81,12 @@ def load_steps_df():
     # (and then hide db_dataset_id column), however, then using "group by" fails.
     # So this is a workaround to allows to have both clickable cells with names, and "group by".
     steps_df["db_dataset_name_and_url"] = [
-        f"{row['db_dataset_name']}||{GRAPHER_DATASET_BASE_URL}{int(row['db_dataset_id'])}"
+        f"[{row['db_dataset_name']}]({GRAPHER_DATASET_BASE_URL}{int(row['db_dataset_id'])})"
         if row["db_dataset_name"]
         else None
         for row in steps_df.to_dict(orient="records")
     ]
+
     steps_df = steps_df.drop(columns=["db_dataset_name", "db_dataset_id"], errors="raise")
 
     # Add a column with the total number of dependencies that are not their latest version.
@@ -151,18 +152,18 @@ df = steps_df[
     [
         "step",
         "db_dataset_name_and_url",
+        "days_to_update",
+        "update_state",
         "n_charts",
         "n_charts_views_7d",
         "n_charts_views_365d",
-        "days_to_update",
-        "update_state",
         "date_of_next_update",
         "namespace",
         "version",
         "channel",
         "name",
         "kind",
-        # "dag_file_name",
+        "dag_file_name",
         "n_versions",
         "update_period_days",
         # "state",
@@ -212,7 +213,7 @@ df = df.sort_values(
 
 # Define the options of the main grid table with pagination.
 gb = GridOptionsBuilder.from_dataframe(df)
-gb.configure_grid_options(domLayout="autoHeight")
+gb.configure_grid_options(domLayout="autoHeight", enableCellTextSelection=True)
 gb.configure_selection(
     selection_mode="multiple",
     use_checkbox=True,
@@ -222,21 +223,65 @@ gb.configure_selection(
     groupSelectsFiltered=True,
 )
 gb.configure_default_column(editable=False, groupable=True, sortable=True, filterable=True, resizable=True)
-gb.configure_column("step", headerName="Step", width=500)
-gb.configure_column("kind", headerName="Kind", width=100)
-gb.configure_column("channel", headerName="Channel", width=120)
-gb.configure_column("namespace", headerName="Namespace", width=150)
-gb.configure_column("version", headerName="Version", width=120)
-gb.configure_column("name", headerName="Step name", width=140)
-gb.configure_column("n_charts", headerName="N. charts", width=120)
-gb.configure_column("n_charts_views_7d", headerName="7-day views", width=140)
-gb.configure_column("n_charts_views_365d", headerName="365-day views", width=140)
-gb.configure_column("days_to_update", headerName="Days to update", width=180)
-gb.configure_column("date_of_next_update", headerName="Next update", width=140)
-gb.configure_column("update_period_days", headerName="Update period", width=150)
-gb.configure_column("full_path_to_script", headerName="Path to script", width=150)
-gb.configure_column("dag_file_path", headerName="Path to dag file", width=160)
-gb.configure_column("n_versions", headerName="N. versions", width=140)
+gb.configure_column("step", headerName="Step", width=500, headerTooltip="Step URI, as it appears in the ETL DAG.")
+gb.configure_column(
+    "channel", headerName="Channel", width=120, headerTooltip="Channel of the step (e.g. garden or grapher)."
+)
+gb.configure_column("namespace", headerName="Namespace", width=150, headerTooltip="Namespace of the step.")
+gb.configure_column("version", headerName="Version", width=120, headerTooltip="Version of the step.")
+gb.configure_column("name", headerName="Step name", width=140, headerTooltip="Short name of the step.")
+gb.configure_column("kind", headerName="Kind", width=100, headerTooltip="Kind of step (i.e. public or private).")
+gb.configure_column(
+    "n_charts", headerName="N. charts", width=120, headerTooltip="Number of charts that use data from the step."
+)
+gb.configure_column(
+    "n_charts_views_7d",
+    headerName="7-day views",
+    width=140,
+    headerTooltip="Number of views of charts that use data from the step in the last 7 days.",
+)
+gb.configure_column(
+    "n_charts_views_365d",
+    headerName="365-day views",
+    width=140,
+    headerTooltip="Number of views of charts that use data from the step in the last 365 days.",
+)
+gb.configure_column(
+    "date_of_next_update",
+    headerName="Next update",
+    width=140,
+    headerTooltip="Date of the next expected OWID update of the step.",
+)
+gb.configure_column(
+    "update_period_days",
+    headerName="Update period",
+    width=150,
+    headerTooltip="Number of days between consecutive OWID updates of the step.",
+)
+gb.configure_column(
+    "dag_file_name",
+    headerName="Name of DAG file",
+    width=160,
+    headerTooltip="Name of the DAG file that defines the step.",
+)
+gb.configure_column(
+    "full_path_to_script",
+    headerName="Path to script",
+    width=150,
+    headerTooltip="Path to the script that creates the ETL snapshot or dataset of this step.",
+)
+gb.configure_column(
+    "dag_file_path",
+    headerName="Path to DAG file",
+    width=160,
+    headerTooltip="Path to the DAG file that defines the step.",
+)
+gb.configure_column(
+    "n_versions",
+    headerName="N. versions",
+    width=140,
+    headerTooltip="Number of (active or archive) versions of the step.",
+)
 # Create a column with the number of days until the next expected update, colored according to its value.
 days_to_update_jscode = JsCode(
     """
@@ -265,7 +310,13 @@ days_to_update_jscode = JsCode(
     }
     """
 )
-gb.configure_columns("days_to_update", cellStyle=days_to_update_jscode)
+gb.configure_columns(
+    "days_to_update",
+    cellStyle=days_to_update_jscode,
+    headerName="Days to update",
+    width=120,
+    headerTooltip="Number of days until the next expected OWID update of the step (if negative, an update is due).",
+)
 # Create a column colored depending on the update state.
 update_state_jscode = JsCode(
     f"""
@@ -286,38 +337,46 @@ function(params){{
 }}
 """
 )
-gb.configure_columns("update_state", headerName="Update state", cellStyle=update_state_jscode)
+gb.configure_columns(
+    "update_state",
+    headerName="Update state",
+    cellStyle=update_state_jscode,
+    width=150,
+    headerTooltip=f'Update state of the step: "{UPDATE_STATE_UP_TO_DATE}" (up to date), "{UPDATE_STATE_MINOR_UPDATE}" (a dependency is outdated, but all origins are up to date), "{UPDATE_STATE_MAJOR_UPDATE}" (an origin is outdated), "{UPDATE_STATE_OUTDATED}" (there is a newer version of the step), "{UPDATE_STATE_ARCHIVABLE}" (the step is outdated and not used in charts, therefore can safely be archived).',
+)
 # Create a column with grapher dataset names that are clickable and open in a new tab.
-gb.configure_column(
-    "db_dataset_name_and_url",  # This will be the displayed column
-    headerName="Grapher dataset",
-    cellRenderer=JsCode(
-        """
-        class UrlCellRenderer {
-        init(params) {
-            this.eGui = document.createElement('a');
-            if(params.value) {
-                const parts = params.value.split("||");
-                if(parts.length === 2) {
-                    const datasetName = parts[0];
-                    const datasetUrl = parts[1];
-                    this.eGui.innerText = datasetName;
-                    this.eGui.setAttribute('href', datasetUrl);
-                } else {
-                    this.eGui.innerText = '';
-                }
+grapher_dataset_jscode = JsCode(
+    r"""
+    class UrlCellRenderer {
+    init(params) {
+        this.eGui = document.createElement('a');
+        if(params.value) {
+            const match = params.value.match(/\[(.*?)\]\((.*?)\)/);
+            if(match && match.length >= 3) {
+                const datasetName = match[1];
+                const datasetUrl = match[2];
+                this.eGui.innerText = datasetName;
+                this.eGui.setAttribute('href', datasetUrl);
             } else {
                 this.eGui.innerText = '';
             }
-            this.eGui.setAttribute('style', "text-decoration:none");
-            this.eGui.setAttribute('target', "_blank");
+        } else {
+            this.eGui.innerText = '';
         }
-        getGui() {
-            return this.eGui;
-        }
-        }
-        """
-    ),
+        this.eGui.setAttribute('style', "text-decoration:none");
+        this.eGui.setAttribute('target', "_blank");
+    }
+    getGui() {
+        return this.eGui;
+    }
+    }
+    """
+)
+gb.configure_column(
+    "db_dataset_name_and_url",  # This will be the displayed column
+    headerName="Grapher dataset",
+    cellRenderer=grapher_dataset_jscode,
+    headerTooltip="Name of the grapher dataset (if any), linked to its corresponding dataset admin page.",
 )
 gb.configure_pagination(paginationAutoPageSize=False, paginationPageSize=20)
 grid_options = gb.build()
@@ -471,7 +530,7 @@ if st.button(
 # Add an expander menu with additional parameters for the update command.
 with st.expander("Update parameters", expanded=False):
     dry_run = st.checkbox(
-        "Dry run", True, help="If checked, the update command will not write anything to the dag or create any files."
+        "Dry run", True, help="If checked, the update command will not write anything to the DAG or create any files."
     )
     version_new = st.text_input("New version", value=TODAY, help="Version of the new steps to be created.")
 
