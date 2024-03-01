@@ -209,7 +209,7 @@ if show_all_channels:
     df = df
 else:
     # Otherwise, pre-filter the DataFrame to show only rows where "channel" equals "grapher"
-    df = df[(df["channel"].isin(["grapher", "explorers"])) & (df["n_charts"] > 0)]
+    df = df[((df["channel"] == "grapher") & (df["n_charts"] > 0)) | (df["channel"] == "explorers")]
 
 # Sort displayed data conveniently.
 df = df.sort_values(
