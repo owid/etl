@@ -2,13 +2,12 @@ meta:
   source:
     name: Unknown
     url: ''
-    source_data_url: gAAAAABl2JzrjZIkkVn3uQVOq6TfYxlHmrhH2h8zyf6wjwzg1uaGWDeEWnpoefgDnjw6OCMN933hnPqvdVXppRztyPZJ2cM5VJpUAPocjtezGrvm9iBVmAA=
-    date_accessed: '2024-02-23'
+    source_data_url: vdem_women_executives.csv
+    date_accessed: '2024-02-29'
   name: DRAFT vdem_women_executives
   description: ''
   license: {}
-  is_public: false
 outs:
-  - md5: e2ad98dbe96e7a743e384d42e16b5028
-    size: 4272
+  - md5: b38d3d047c9147a413d53dbb454b04ef
+    size: 7884
     path: vdem_women_executives.csv

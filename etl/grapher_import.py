@@ -360,7 +360,7 @@ def cleanup_ghost_variables(dataset_id: int, upserted_variable_ids: List[int]) -
             """
             SELECT id FROM variables WHERE datasetId=%(dataset_id)s AND id NOT IN %(variable_ids)s
         """,
-            {"dataset_id": dataset_id, "variable_ids": upserted_variable_ids},
+            {"dataset_id": dataset_id, "variable_ids": upserted_variable_ids or [-1]},
         )
         rows = db.cursor.fetchall()
 
