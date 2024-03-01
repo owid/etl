@@ -189,7 +189,11 @@ class StepUpdater:
             return 1
 
         # Define the new step.
-        step_new = step.replace(step_info["version"], step_version_new)  # type: ignore
+        if step_info["version"] == "latest":
+            # If the step has version "latest", the new step will also have version "latest".
+            step_new = step
+        else:
+            step_new = step.replace(step_info["version"], step_version_new)  # type: ignore
 
         # Find the latest version of each of the step's dependencies.
         step_dependencies = set(self.steps_df[self.steps_df["step"] == step].iloc[0]["direct_dependencies"])
@@ -211,21 +215,23 @@ class StepUpdater:
             step_header = get_comments_above_step_in_dag(step=step, dag_file=dag_file)
 
         if not self.dry_run:
-            # Copy files to new folder.
-            for step_file in step_files:
-                # Define the path to the new version of this file.
-                step_file_new = Path(str(step_file).replace(step_info["version"], step_version_new))  # type: ignore
+            # If the step has version "latest", the files do not need to be updated, but the dag may need to be updated.
+            if step_info["version"] != "latest":
+                # Copy files to new folder.
+                for step_file in step_files:
+                    # Define the path to the new version of this file.
+                    step_file_new = Path(str(step_file).replace(step_info["version"], step_version_new))  # type: ignore
 
-                # Check that the new file does not exist.
-                if step_file_new.exists():
-                    log.error(f"New file already exists: {step_file_new}")
-                    return 1
+                    # Check that the new file does not exist.
+                    if step_file_new.exists():
+                        log.error(f"New file already exists: {step_file_new}")
+                        return 1
 
-                # If new folder does not exist, create it.
-                step_file_new.parent.mkdir(parents=True, exist_ok=True)
+                    # If new folder does not exist, create it.
+                    step_file_new.parent.mkdir(parents=True, exist_ok=True)
 
-                # Create new file.
-                step_file_new.write_bytes(step_file.read_bytes())
+                    # Create new file.
+                    step_file_new.write_bytes(step_file.read_bytes())
 
             # Add new step and its dependencies to the dag.
             write_to_dag_file(dag_file=dag_file, dag_part=dag_part, comments={step_new: step_header})
@@ -245,8 +251,12 @@ class StepUpdater:
 
         # Extract channel from step.
         step_channel = self.steps_df[self.steps_df["step"] == step].iloc[0]["channel"]
+        step_version = self.steps_df[self.steps_df["step"] == step].iloc[0]["version"]
 
-        log.info(f"Updating {step} to version {step_version_new}.")
+        if step_version == "latest":
+            log.info(f"Updating {step} (by simply updating the DAG).")
+        else:
+            log.info(f"Updating {step} to version {step_version_new}.")
         if step_channel == "snapshot":
             return self._update_snapshot_step(step=step, step_version_new=step_version_new, step_header=step_header)
         elif step_channel in ["meadow", "garden", "grapher", "explorers"]:
@@ -286,12 +296,13 @@ class StepUpdater:
                 usages = self.steps_df[self.steps_df["step"] == step]["direct_usages"].item()
                 steps += [usage for usage in usages if usage not in steps]
 
-        # Remove steps that cannot be updated because they are in their latest version,
-        # or because their version is "latest".
+        # Remove steps that cannot be updated because their version is already equal to the new version.
+        # NOTE: One could think that steps with version "latest" should also be skipped. But their dependencies may need
+        # to be updated. So they may need to be updated in the dag, even if their code should not be edited.
         steps = [
             step
             for step in steps
-            if (self.steps_df[self.steps_df["step"] == step]["version"].item() not in [step_version_new, "latest"])
+            if (self.steps_df[self.steps_df["step"] == step]["version"].item() != step_version_new)
             and (self.steps_df[self.steps_df["step"] == step]["update_period_days"].item() != 0)
         ]
 
@@ -307,7 +318,7 @@ class StepUpdater:
         if len(steps) == 0:
             log.info(
                 "No steps to be updated. "
-                "You may have attempted to update steps that are already in their latest version or that have update periods of 0 days."
+                "You may have attempted to update steps that are already updated or that have update periods of 0 days."
             )
         else:
             # Steps need to be updated hierarchically: First snapshots, then meadow, then garden, then grapher.
@@ -433,13 +444,13 @@ def cli(
     * If there is ambiguity, the user will be asked for confirmation before updating each step, and on situations where there is some ambiguity.
     * If new snapshots are created that are not used by any steps, they are added to a temporary dag (temp.yml). These steps are then removed from the temporary dag as soon as they are used by an active step.
     * All dependencies of new steps will be assumed to use their latest version possible.
-    * Steps that are already in their latest version (or whose version is "latest") will be skipped.
+    * Steps whose version is already equal to the new version will be skipped.
 
     **Examples:**
 
     **Note:** Remove the --dry-run if you want to actually execute the updates in the examples below (but then remember to revert changes).
 
-    * To update a single snapshot to the latest version:
+    * To update a single snapshot to the new version:
         ```
         $ etl update snapshot://animal_welfare/2023-10-24/fur_laws.xlsx --dry-run
         ```
@@ -456,7 +467,7 @@ def cli(
         $ etl update data://explorers/climate/latest/climate_change_impacts --include-dependencies --dry-run
         ```
 
-        Note that the explorers step itself will not be updated, since it is already in its "latest" version.
+        Note that the code of the explorers step itself will not be updated (since it has version "latest"), but its dependencies will be updated in the dag.
     """
     # Initialize step updater and run update.
     StepUpdater(dry_run=dry_run, interactive=interactive).update_steps(
