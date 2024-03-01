@@ -22,6 +22,11 @@ TODAY = datetime.now().strftime("%Y-%m-%d")
 
 # Define the base URL for the grapher datasets (which will be different depending on the environment).
 GRAPHER_DATASET_BASE_URL = f"{ADMIN_HOST}/admin/datasets/"
+if not GRAPHER_DATASET_BASE_URL.startswith(("http://", "https://")):
+    # Links in the steps table seem to only work if they start with "http://" or "https://".
+    # But ADMIN_HOST for staging servers starts with "staging-site-" and is not a valid URL.
+    # Therefore, prepend "http://" (not "https://" because the site is not secure, and the browser will block the link).
+    GRAPHER_DATASET_BASE_URL = f"http://{GRAPHER_DATASET_BASE_URL}"
 
 # List of dependencies to ignore when calculating the update state.
 # This is done to avoid a certain common dependency (e.g. population) to make all steps appear as needing major update.
