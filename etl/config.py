@@ -121,6 +121,11 @@ GRAPHER_INSERT_WORKERS = int(env.get("GRAPHER_WORKERS", max(10, int(40 / RUN_STE
 # of data pages for a single indicator
 GRAPHER_FILTER = env.get("GRAPHER_FILTER", None)
 
+# if set, don't delete indicators from MySQL, only append / update new ones
+# you can use this to only process subset of indicators in your step to
+# speed up development. It's up to you how you define filtering logic in your step
+SUBSET = env.get("SUBSET", None)
+
 # forbid any individual step from consuming more than this much memory
 # (only enforced on Linux)
 MAX_VIRTUAL_MEMORY_LINUX = 32 * 2**30  # 32 GB

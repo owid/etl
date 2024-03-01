@@ -62,7 +62,7 @@ steps:
     - data://garden/malnutrition/2022-10-18/malnutrition
   data://garden/malnutrition/2022-10-18/malnutrition:
     - data://garden/worldbank_wdi/2022-05-26/wdi
-    - data://meadow/un/2022-07-11/un_wpp
+    - data://garden/un/2022-07-11/un_wpp
 
   # World Development Indicators - WDI
   data://meadow/worldbank_wdi/2023-05-29/wdi:

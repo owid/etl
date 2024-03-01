@@ -109,7 +109,11 @@ def run(dest_dir: str) -> None:
 
     # Add tables to dataset
     ds_garden = create_dataset(
-        dest_dir, tables=tables, check_variables_metadata=True, default_metadata=ds_meadow.metadata
+        dest_dir,
+        tables=tables,
+        # Set to False to make missing origins less verbose
+        check_variables_metadata=False,
+        default_metadata=ds_meadow.metadata,
     )
     ds_garden.save()
 
