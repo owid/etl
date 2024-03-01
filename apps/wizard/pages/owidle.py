@@ -11,6 +11,7 @@ from geographiclib.geodesic import Geodesic
 from owid.catalog import Dataset, Table
 from st_pages import add_indentation
 
+from apps.wizard.utils import set_states
 from etl.paths import DATA_DIR
 
 ##########################################
@@ -57,6 +58,22 @@ DIF_LVLS = {
 st.session_state.guesses = st.session_state.get("guesses", default_guess)
 # Number of the minimum number of countries shown if set to EASY mode
 NUM_COUNTRIES_EASY_MODE = 6
+
+seed_idx = st.selectbox(
+    label="round",
+    options=[r + 1 for r in range(20)],
+    index=0,
+    format_func=lambda x: f"round {x}",
+    key="seed_idx",
+)
+
+seeds = []
+
+for i in range(20):
+    seed = (dt.datetime.now(dt.timezone.utc).date() - dt.date(1990, 7, i + 1)).days
+    seeds.append(seed)
+st.session_state.seed_idx = st.session_state.get("seed_idx", 0)
+SEED = seeds[st.session_state.seed_idx]
 
 # TITLE
 if st.session_state.owidle_difficulty == 2:
@@ -200,7 +217,8 @@ def load_data(placeholder: str) -> Tuple[pd.DataFrame, gpd.GeoDataFrame]:
 @st.cache_data
 def pick_solution(difficuty_level: int):
     df_ = DATA.drop_duplicates(subset="location")
-    seed = (dt.datetime.now(dt.timezone.utc).date() - dt.date(1993, 7, 13)).days
+    # seed = (dt.datetime.now(dt.timezone.utc).date() - dt.date(1993, 7, 13)).days
+    seed = SEED
     if difficuty_level == 2:
         seed = 2 * seed * seed
     return df_["location"].sample(random_state=seed).item()
