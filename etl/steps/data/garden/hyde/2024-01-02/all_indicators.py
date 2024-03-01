@@ -13,6 +13,7 @@ def run(dest_dir: str) -> None:
     #
     # Load 'meadow dataset.'
     ds_meadow = paths.load_dataset("all_indicators")
+    ds_regions = paths.load_dataset("regions")
 
     # Read 'all_indicators' table, which contains the actual indicators
     tb = ds_meadow["all_indicators"].reset_index()
@@ -66,7 +67,7 @@ def run(dest_dir: str) -> None:
         ]
     ] *= 100
 
-    # Add regional data
+    # TODO: Work on keeping table with custom regions
     ## Exclude relative indicators (e.g. population density)
     # columns_exclude = ["popd_c"]
     tb_with_regions = tb.merge(tb_regions, on="country", how="left").copy()
@@ -83,6 +84,31 @@ def run(dest_dir: str) -> None:
     # region_renames = {
 
     # }
+
+    # Add region column
+    columns = [col for col in tb.columns if col not in ["popd_c", "shifting_c", "year", "country"]]
+    aggregations = dict(zip(columns, ["sum"] * len(columns)))
+    tb = geo.add_regions_to_table(
+        tb=tb,
+        ds_regions=ds_regions,
+        aggregations=aggregations,
+        regions={
+            "Africa": {},
+            "Asia": {},
+            "Asia (excl. China and India)": {
+                "additional_regions": ["Asia"],
+                "excluded_members": ["China", "India"],
+            },
+            "Europe": {},
+            "Europe (excl. Russia)": {
+                "additional_regions": ["Europe"],
+                "excluded_members": ["Russia"],
+            },
+            "North America": {},
+            "South America": {},
+            "Oceania": {},
+        },
+    )
 
     # Add agriculture land
     tb["agriculture_c"] = tb["grazing_c"] + tb["cropland_c"]

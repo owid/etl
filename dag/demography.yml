@@ -65,6 +65,7 @@ steps:
     - snapshot://hyde/2024-01-02/general_files.zip
   data://garden/hyde/2024-01-02/all_indicators:
     - data://meadow/hyde/2024-01-02/all_indicators
+    - data://garden/regions/2023-01-01/regions
   data://grapher/hyde/2024-01-02/all_indicators:
     - data://garden/hyde/2024-01-02/all_indicators
 
