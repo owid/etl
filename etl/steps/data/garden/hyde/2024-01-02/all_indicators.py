@@ -106,6 +106,10 @@ def run(dest_dir: str) -> None:
             },
             "North America": {},
             "South America": {},
+            "South America (excl. Brazil)": {
+                "additional_regions": ["South America"],
+                "excluded_members": ["Brazil"],
+            },
             "Oceania": {},
         },
     )
