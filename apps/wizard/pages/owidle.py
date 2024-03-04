@@ -1,11 +1,14 @@
 """Game owidle."""
 import datetime as dt
+import math
+from itertools import product
 from pathlib import Path
-from typing import List, Tuple
+from typing import List, Tuple, cast
 
 import geopandas as gpd
 import pandas as pd
 import plotly.express as px
+import pyproj
 import streamlit as st
 from geographiclib.geodesic import Geodesic
 from owid.catalog import Dataset, Table
@@ -14,7 +17,27 @@ from st_pages import add_indentation
 from etl.paths import DATA_DIR
 
 ##########################################
+#
+# NEW UPDATE MESSAGES
+#
+# Add here updates to the app (backend).
+# This will be shown in the sidebar if less than 5 days old.
+#
+##########################################
+UPDATES = {
+    "2024-03-04": [
+        "🐛 Fixed bug in distance estimation.",
+        "✨ Bearing angle is now estimated using flat-earth approximation.",
+    ]
+}
+DAYS_TO_SHOW_UPDATES = 3
+
+##########################################
+#
 # CONFIG PAGE & SESSION STATE INIT
+#
+# Configuration of the session, and page layout.
+#
 ##########################################
 st.set_page_config(page_title="Wizard: owidle", layout="wide", page_icon="🪄")
 add_indentation()
@@ -58,6 +81,72 @@ st.session_state.guesses = st.session_state.get("guesses", default_guess)
 # Number of the minimum number of countries shown if set to EASY mode
 NUM_COUNTRIES_EASY_MODE = 6
 
+# Colors for the plot
+COLORS = [
+    "#C15065",
+    "#2C8465",
+    "#286BBB",
+    "#6D3E91",
+    "#996D39",
+    "#BE5915",
+]
+
+# EXTRA: have multiple rounds
+# seed_idx = st.selectbox(
+#     label="round",
+#     options=[r + 1 for r in range(20)],
+#     index=0,
+#     format_func=lambda x: f"round {x}",
+#     key="seed_idx",
+# )
+
+# st.write(seed_idx)
+# seeds = []
+
+# for i in range(20):
+#     seed = (dt.datetime.now(dt.timezone.utc).date() - dt.date(1999, 7, i + 1)).days
+#     seeds.append(seed)
+# # st.session_state["seed_idx"] = st.session_state.get("seed_idx_", 0)
+# seed_idx = 0
+# SEED = seeds[int(seed_idx)]
+
+##########################################
+#
+# SIDEBAR
+#
+# Show updates, if any, in the sidebar
+#
+##########################################
+
+# Side bar if need to display updates
+UPDATES = {
+    dt_str: updates
+    for dt_str, updates in UPDATES.items()
+    if dt.datetime.strptime(dt_str, "%Y-%m-%d") >= (dt.datetime.now() - dt.timedelta(days=DAYS_TO_SHOW_UPDATES))
+}
+if UPDATES:
+    with st.sidebar:
+        st.markdown("### 🆕 Updates")
+        for date, updates in UPDATES.items():
+            st.markdown(f"#### {date}")
+            for update in updates:
+                st.info(update)
+
+
+EQUATOR_IN_KM = 40_075
+MAX_DISTANCE_ON_EARTH = EQUATOR_IN_KM / 2
+# Projection to use to estimate bearing angles
+USE_WGS84 = False
+
+
+##########################################
+#
+# TITLE
+#
+# Title, description and difficulty level
+#
+##########################################
+
 # TITLE
 if st.session_state.owidle_difficulty == 2:
     title = ":red[O W I D L E]"
@@ -100,17 +189,12 @@ else:
     )
 
 ##########################################
+#
 ## LOAD DATA
+#
+# Load data for the game, including indicators, but also geographic data.
+#
 ##########################################
-COLORS = [
-    "#C15065",
-    "#2C8465",
-    "#286BBB",
-    "#6D3E91",
-    "#996D39",
-    "#BE5915",
-]
-MAX_DISTANCE_ON_EARTH = 20_000
 
 
 @st.cache_data
@@ -198,9 +282,74 @@ def load_data(placeholder: str) -> Tuple[pd.DataFrame, gpd.GeoDataFrame]:
 
 
 @st.cache_data
-def pick_solution(difficuty_level: int):
+def get_all_distances():
+    # Create columns with lat and lon
+    df = GEO.copy()
+    df["lat"] = df["geometry"].y
+    df["lon"] = df["geometry"].x
+
+    # Initialise geod
+    geod = pyproj.Geod(ellps="WGS84")
+
+    # Formula to estimate distance in km
+    def calculate_distance(lat1, lon1, lat2, lon2):
+        _, _, distance = geod.inv(lon1, lat1, lon2, lat2)
+        return distance // 1000  # Convert meters to kilometers
+
+    # Get distances for each pair of countries
+    distances = []
+    for (_, row1), (_, row2) in product(df.iterrows(), repeat=2):
+        distance_km = calculate_distance(
+            lat1=row1["lat"],
+            lon1=row1["lon"],
+            lat2=row2["lat"],
+            lon2=row2["lon"],
+        )
+        distances.append(
+            {
+                "origin": row1["location"],
+                "target": row2["location"],
+                "distance": distance_km,
+            }
+        )
+    # Create dataframe from list
+    distances = pd.DataFrame(distances)
+
+    # Filter own country
+    distances = distances[distances["origin"] != distances["target"]]
+
+    # Keep relevant columns, set index
+    distances = distances.set_index("origin")
+
+    # Set type
+    distances = distances.astype({"distance": "int"})
+
+    # Ensure distances are correct
+    assert not (
+        distances["distance"] > MAX_DISTANCE_ON_EARTH
+    ).any(), f"Unexpected error! Some countries have a distance greater than the maximum distance on Earth ({MAX_DISTANCE_ON_EARTH} km)"
+    # Filter own country
+    return distances
+
+
+# Get data
+DATA, GEO = load_data("cached")
+OPTIONS = sorted(DATA["location"].unique())
+# Distances
+DISTANCES = get_all_distances()
+
+##########################################
+#
+## PICK SOLUTION
+#
+##########################################
+
+
+@st.cache_data
+def pick_solution(difficuty_level: int, seed: int | None = None):
     df_ = DATA.drop_duplicates(subset="location")
-    seed = (dt.datetime.now(dt.timezone.utc).date() - dt.date(1993, 7, 13)).days
+    if seed is None:
+        seed = (dt.datetime.now(dt.timezone.utc).date() - dt.date(1993, 7, 13)).days
     if difficuty_level == 2:
         seed = 2 * seed * seed
     return df_["location"].sample(random_state=seed).item()
@@ -213,56 +362,16 @@ def pick_solution_year():
     return df_["year"].max().item(), df_["year"].min().item(), df_["year"].sample(random_state=seed).item()
 
 
-@st.cache_data
-def get_all_distances():
-    # Build geodataframe with all possible combinations of countries
-    distances = GEO.merge(GEO, how="cross", suffixes=("_1", "_2"))
-
-    # Split dataframe in two, so that we can estimate distances
-    distances_1 = gpd.GeoDataFrame(
-        distances[["location_1", "geometry_1"]],
-        crs={"init": "epsg:4326"},
-        geometry="geometry_1",
-    ).to_crs(epsg=32663)
-
-    distances_2 = gpd.GeoDataFrame(
-        distances[["location_2", "geometry_2"]],
-        crs={"init": "epsg:4326"},
-        geometry="geometry_2",
-    ).to_crs(epsg=32663)
-
-    # Filter own country
-    distances = distances[distances["location_1"] != distances["location_2"]]
-
-    # Estimate distances in km
-    distances["distance"] = distances_1.distance(distances_2) // 1000
-
-    # Rename columns
-    distances = distances.rename(
-        columns={
-            "location_1": "origin",
-            "location_2": "target",
-        }
-    )
-
-    # Keep relevant columns, set index
-    distances = distances[["origin", "target", "distance"]].set_index("origin")
-
-    # Correct distances
-    distances.loc[distances["distance"] > MAX_DISTANCE_ON_EARTH, "distance"] = (
-        2 * MAX_DISTANCE_ON_EARTH - distances.loc[distances["distance"] > MAX_DISTANCE_ON_EARTH, "distance"]
-    )
-    # Filter own country
-    return distances
-
-
-DATA, GEO = load_data("cached")
 # Arbitrary daily solution
 SOLUTION = pick_solution(st.session_state.owidle_difficulty)
+# Year solution
 YEAR_MAX, YEAR_MIN, SOLUTION_YEAR = pick_solution_year()
-# SOLUTION = "Spain"
-OPTIONS = sorted(DATA["location"].unique())
 
+##########################################
+#
+## INDICATORS
+#
+##########################################
 # Find indicator for this solution (we prioritise PWD > MDP > WDI)
 gdp_indicator_titles = {
     "gdp_per_capita_pwt": "GDP per capita (constant 2017 intl-$)",
@@ -285,17 +394,33 @@ if GDP_INDICATOR is None:
     GDP_INDICATOR = gdp_indicators[0]
 else:
     SOLUTION_HAS_GDP = True
-# print(f"Going with indicator {GDP_INDICATOR}")
-# st.write(SOLUTION)
-# st.write(GDP_INDICATOR)
-
-# Distances
-DISTANCES = get_all_distances()
 
 
 ##########################################
+#
 # COMPARE GUESS WITH SOLUTION
+#
 ##########################################
+def calculate_flat_earth_bearing(lat1, lon1, lat2, lon2):
+    # Longitude and latitude differences
+    dLon = lon2 - lon1
+    dLat = lat2 - lat1
+
+    if abs(dLon) > 180:
+        dLon = -(360 - abs(dLon)) if dLon > 0 else (360 - abs(dLon))
+
+    # Calculate approximate bearing
+    theta = math.atan2(dLon, dLat)
+
+    # Convert from radians to degrees
+    bearing = math.degrees(theta)
+
+    # Adjust so that 0 degrees is North
+    bearing = (bearing + 360) % 360
+
+    return bearing
+
+
 def distance_to_solution(country_selected: str) -> Tuple[str, str, str]:
     """Estimate distance (km) from guessed to solution, including direction.
 
@@ -310,8 +435,10 @@ def distance_to_solution(country_selected: str) -> Tuple[str, str, str]:
     # st.write(GEO)
     # GEO_DIST = cast(gpd.GeoDataFrame, GEO.to_crs(3310))
     # GEO = cast(gpd.GeoDataFrame, GEO.to_crs(3310))
-    solution = GEO.loc[GEO["location"] == SOLUTION, "geometry"]
-    guess = GEO.loc[GEO["location"] == country_selected, "geometry"]
+    df_geo = GEO.copy()
+    df_geo = cast(gpd.GeoDataFrame, df_geo.to_crs(epsg=3395))
+    solution = df_geo.loc[df_geo["location"] == SOLUTION, "geometry"]
+    guess = df_geo.loc[df_geo["location"] == country_selected, "geometry"]
 
     # Estimate direction
     guess = guess.item()
@@ -320,43 +447,63 @@ def distance_to_solution(country_selected: str) -> Tuple[str, str, str]:
     # Use Geodesic to calculate distance
     # More details:
     # - https://geographiclib.sourceforge.io/Python/doc/examples.html#initializing
-    geod = Geodesic.WGS84  # type: ignore
-    # geod.Inverse returns a Geodesic dictionary (https://geographiclib.sourceforge.io/Python/doc/interface.html#dict)
-    print("----------------")
-    print(guess.y, guess.x, solution.y, solution.x)
-    print("----------------")
-    g = geod.Inverse(
-        lat1=guess.y,
-        lon1=guess.x,
-        lat2=solution.y,
-        lon2=solution.x,
-    )
-    print(g)
-    # Option 1 (using geographiclib)
-    # distance = g["s12"] / 1000
-    # print(distance)
-    # Option 2 (using pre-calculated distances)
+    if USE_WGS84:
+        geod = Geodesic.WGS84  # type: ignore
+        # geod.Inverse returns a Geodesic dictionary (https://geographiclib.sourceforge.io/Python/doc/interface.html#dict)
+        print("----------------")
+        print(guess.y, guess.x, solution.y, solution.x)
+        print("----------------")
+        g = geod.Inverse(
+            lat1=guess.y,
+            lon1=guess.x,
+            lat2=solution.y,
+            lon2=solution.x,
+        )
+        bearing = g["azi1"]
+
+        # Get arrow
+        if (bearing > -22.5) & (bearing <= 22.5):
+            arrow = "⬆️"
+        elif (bearing > 22.5) & (bearing <= 67.5):
+            arrow = "↗️"
+        elif (bearing > 67.5) & (bearing <= 112.5):
+            arrow = "➡️"
+        elif (bearing > 112.5) & (bearing <= 157.5):
+            arrow = "↘️"
+        elif (bearing > 157.5) | (bearing <= -157.5):
+            arrow = "⬇️"
+        elif (bearing > -157.5) & (bearing <= -112.5):
+            arrow = "↙️"
+        elif (bearing > -112.5) & (bearing <= -67.5):
+            arrow = "⬅️"
+        else:
+            arrow = "↖️"
+    else:
+        bearing = calculate_flat_earth_bearing(
+            lat1=guess.y,
+            lon1=guess.x,
+            lat2=solution.y,
+            lon2=solution.x,
+        )
+
+        # Get arrow
+        arrow_idx = int(((bearing + 22.5) // 45) % 8)
+        arrows = [
+            "⬆️",
+            "↗️",
+            "➡️",
+            "↘️",
+            "⬇️",
+            "↙️",
+            "⬅️",
+            "↖️",
+        ]
+        arrow = arrows[arrow_idx]
+
+    # Get distance
     dist = DISTANCES.loc[SOLUTION]
     distance = dist[dist["target"] == country_selected]["distance"].item()
     # Initial bearing angle (angle from guess to solution in degrees)
-    bearing = g["azi1"]
-
-    if (bearing > -22.5) & (bearing <= 22.5):
-        arrow = "⬆️"
-    elif (bearing > 22.5) & (bearing <= 67.5):
-        arrow = "↗️"
-    elif (bearing > 67.5) & (bearing <= 112.5):
-        arrow = "➡️"
-    elif (bearing > 112.5) & (bearing <= 157.5):
-        arrow = "↘️"
-    elif (bearing > 157.5) | (bearing <= -157.5):
-        arrow = "⬇️"
-    elif (bearing > -157.5) & (bearing <= -112.5):
-        arrow = "↙️"
-    elif (bearing > -112.5) & (bearing <= -67.5):
-        arrow = "⬅️"
-    else:
-        arrow = "↖️"
 
     # Estimate score
     score = int(round(100 - (distance / MAX_DISTANCE_ON_EARTH) * 100, 0))
@@ -458,10 +605,12 @@ def guess() -> None:
 
 
 ##########################################
+#
 # PLOT CHART
+#
+# Define functions, actual plot
+#
 ##########################################
-
-
 def _plot_chart(
     countries_guessed: List[str],
     solution: str,
@@ -512,11 +661,6 @@ def _plot_chart(
         color_discrete_map=color_map,
         line_dash="Country",
         line_dash_map=line_dash_map,
-        # labels={
-        #     "year": "Year",
-        #     column_indicator: indicator_name if indicator_name else column_indicator,
-        # },
-        # markers=True,
         line_shape="spline",
     )
 
@@ -526,10 +670,6 @@ def _plot_chart(
     fig.update_layout(
         legend=dict(
             orientation="h",
-            # yanchor="bottom",
-            # y=1.02,  # Places the legend above the chart
-            # xanchor="center",
-            # x=0.5,
         )
     )
 
@@ -603,11 +743,6 @@ def _plot_chart_hard(
         color_discrete_map=color_map,
         pattern_shape="Country",
         pattern_shape_map=pattern_map,
-        # labels={
-        #     "year": "Year",
-        #     column_indicator: indicator_name if indicator_name else column_indicator,
-        # },
-        # markers=True,
     )
 
     # Remove axis labels
@@ -682,9 +817,6 @@ def display_metadata(metadata):
     st.table(data=ds)
 
 
-##########################################
-# PLOT CHARTS
-##########################################
 with st.container(border=True):
     countries_guessed = [guess["name"] for guess in st.session_state.guesses if guess["name"] != ""]
     if st.session_state.owidle_difficulty == 2:
@@ -724,7 +856,9 @@ with st.container(border=True):
                 st.info("Metadata couldn't be accssed")
 
 ##########################################
+#
 # INPUT FROM USER
+#
 ##########################################
 with st.form("form_guess", border=False, clear_on_submit=True):
     col_guess_1, col_guess_2 = st.columns([4, 1])
@@ -798,7 +932,9 @@ with st.form("form_guess", border=False, clear_on_submit=True):
     )
 
 ##########################################
+#
 # SHOW GUESSES (this far)
+#
 ##########################################
 guesses_display = []
 num_guesses_bound = min(st.session_state.num_guesses, NUM_GUESSES)
@@ -836,14 +972,18 @@ for i in range(num_guesses_bound):
                 st.markdown(f"{st.session_state.guesses[i]['score']}%")
 
 ##########################################
+#
 # SHOW REMAINING GUESSES BOXES
+#
 ##########################################
 for i in range(num_guesses_bound, NUM_GUESSES):
     with st.container(border=True):
         st.empty()
 
 ##########################################
+#
 # FINAL MESSAGE
+#
 ##########################################
 if st.session_state.owidle_difficulty == 2:
     ## Successful
