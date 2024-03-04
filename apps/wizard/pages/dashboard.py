@@ -5,6 +5,7 @@ import subprocess
 from datetime import datetime
 from enum import Enum
 
+import pandas as pd
 import streamlit as st
 from st_aggrid import AgGrid, GridUpdateMode, JsCode
 from st_aggrid.grid_options_builder import GridOptionsBuilder
@@ -15,7 +16,7 @@ from etl.config import ADMIN_HOST, ENV_IS_REMOTE
 from etl.db import can_connect
 
 ########################################
-# GLOBAL VARIABLES
+# GLOBAL VARIABLES and SESSION STATE
 ########################################
 # TODO:
 #  * Consider creating a script to regularly check for snapshot updates, fetch them and add them to the temporary DAG (this is the way that the "update state" will know if there are snapshot updates available).
@@ -39,6 +40,10 @@ DEPENDENCIES_TO_IGNORE = [
     # "data://garden/demography/2023-03-31/population",
     "snapshot://hyde/2017/general_files.zip",
 ]
+
+# Initialise session state
+## Selected steps
+st.session_state.selected_steps = st.session_state.get("selected_steps", set())
 
 
 # Define labels for update states.
@@ -65,11 +70,10 @@ add_indentation()
 ########################################
 # TITLE and DESCRIPTION
 ########################################
-st.title("📋 ETL Dashboard")
+st.title("ETL Dashboard 📋 :grey[Control panel for ETL updates]")
 st.markdown(
     """\
-## Control panel for ETL updates.
-This dashboard lets you explore all active ETL steps, and, if you are working on your local machine, update them.
+Explore all active ETL steps, and, if you are working on your local machine, update them.
 
 🔨 To update some steps, select them from the _Steps table_ and add them to the _Operations list_ below.
 
@@ -86,7 +90,11 @@ if not can_connect():
 # LOAD STEPS TABLE
 ########################################
 @st.cache_data
-def load_steps_df_all():
+def load_steps_df_all() -> pd.DataFrame:
+    """Generate and load the steps dataframe.
+
+    This is just done once, at the beginning.
+    """
     # Load steps dataframe.
     steps_df = StepUpdater().steps_df
 
@@ -215,7 +223,8 @@ def load_steps_df_all():
 
 
 @st.cache_data
-def load_steps_df(show_all_channels: bool):
+def load_steps_df(show_all_channels: bool) -> pd.DataFrame:
+    """Load the steps dataframe, and filter it according to the user's choice."""
     # Load all data
     df = load_steps_df_all()
 
@@ -234,12 +243,15 @@ def load_steps_df(show_all_channels: bool):
 
 
 # Streamlit UI to let users toggle the filter
-show_all_channels = not st.checkbox("Select only grapher steps with charts, and explorer steps", True)
+show_all_channels = not st.toggle("Select only grapher steps with charts, and explorer steps", True)
 
 # Load the steps dataframe.
 steps_df = load_steps_df(show_all_channels)
 
 
+########################################
+# Display STEPS TABLE
+########################################
 # Define the options of the main grid table with pagination.
 gb = GridOptionsBuilder.from_dataframe(steps_df)
 gb.configure_grid_options(domLayout="autoHeight", enableCellTextSelection=True)
@@ -428,93 +440,81 @@ grid_response = AgGrid(
     },
 )
 
+########################################
+# OPERATIONS LIST MANAGEMENT
+#
+# Add steps based on user selections.
+# User can add from checking in the steps table, but also there are some options to add dependencies, usages, etc.
+########################################
 
-def update_operations_list(new_items, clear_all=False):
-    """Append new items to the operation list, preserving existing order and avoiding duplicates."""
-    existing_items = set(st.session_state["selected_steps"])
-    for item in new_items:
-        if item not in existing_items:
-            st.session_state["selected_steps"].append(item)
 
+# Execute command to update selected steps.
+@st.cache_data(show_spinner=False)
+def execute_command(cmd):
+    """Execute a command and get its output.
 
-if "selected_steps" not in st.session_state:
-    st.session_state["selected_steps"] = []
+    TODO: This is not ideal. Shouldn't be executing commands in terminal.
+    """
+    try:
+        result = subprocess.run(cmd, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, shell=True)
+        return result.stdout
+    except subprocess.CalledProcessError as e:
+        return e.stderr
+
 
 # Button to add selected steps to the Operations list.
-if st.button("Add selected steps to the _Operations list_"):
-    new_selected_steps = [row["step"] for row in grid_response["selected_rows"]]
-    update_operations_list(new_selected_steps)
+if st.button("Add selected steps to the _Operations list_", type="primary"):
+    new_selected_steps = set(row["step"] for row in grid_response["selected_rows"])
+    st.session_state.selected_steps |= new_selected_steps
 
 
-def include_all_dependencies(step):
-    step_dependencies = steps_df[steps_df["step"] == step]["all_active_dependencies"].item()
-    update_operations_list(step_dependencies)
+def include_related_steps(step: str, column_related: str):
+    """User can add additional steps to the operations list based on the selected step.
+
+    E.g. adding direct dependencies, all usages, etc.
+    """
+    steps_related = set(steps_df[steps_df["step"] == step][column_related].item())
+    st.session_state.selected_steps |= steps_related
 
 
-def include_direct_dependencies(step):
-    step_dependencies = steps_df[steps_df["step"] == step]["direct_dependencies"].item()
-    update_operations_list(step_dependencies)
-
-
-def include_direct_usages(step):
-    step_usages = steps_df[steps_df["step"] == step]["direct_usages"].item()
-    update_operations_list(step_usages)
-
-
-def include_all_usages(step):
-    step_usages = steps_df[steps_df["step"] == step]["all_active_usages"].item()
-    update_operations_list(step_usages)
-
-
-def remove_selected_step(step):
-    st.session_state["selected_steps"] = [s for s in st.session_state["selected_steps"] if s != step]
-
-
-def empty_operations_list():
-    """Empty the operations list."""
-    st.session_state["selected_steps"] = []
-
-
+# Header
 st.markdown(
-    """\
-### Operations list
+    """### Operations list
 
 Add here steps from the _Steps table_ and operate on them.
 """
 )
+
 with st.container(border=True):
     # Create an operations list, that contains the steps (selected from the main steps table) we will operate upon.
-    if st.session_state.get("selected_steps"):
-        for step in st.session_state["selected_steps"]:
+    # Note: Selected steps might contain steps other those selected in the main steps table, based on user selections (e.g. dependencies).
+    if st.session_state.selected_steps:
+        for step in st.session_state.selected_steps:
             # Define the layout of the list.
-            cols = st.columns([1, 3, 1, 1, 1, 1])
+            cols = st.columns([0.5, 3, 1, 1, 1, 1])
 
             # Define the columns in order (from left to right) as a list of tuples (message, key suffix, function).
             actions = [
-                ("🗑️", "remove", remove_selected_step, "Remove this step from the _Operations list_."),
-                ("write", None, lambda step: step, ""),
+                ("🗑️", "remove", "Remove this step from the _Operations list_."),
+                (None, "write", ""),
                 (
                     "Add direct dependencies",
-                    "dependencies_direct",
-                    include_direct_dependencies,
+                    "direct_dependencies",
                     "Add direct dependencies of this step to the _Operations list_.",
                 ),
                 (
                     "Add all dependencies",
-                    "dependencies_all",
-                    include_all_dependencies,
+                    "all_active_dependencies",
                     "Add all dependencies of this step to the _Operations list_.",
                 ),
                 (
                     "Add direct usages",
-                    "usages_direct",
-                    include_all_usages,
+                    "direct_usages",
                     "Add direct usages of this step to the _Operations list_.",
                 ),
                 (
                     "Add all usages",
-                    "usages_all",
-                    include_all_usages,
+                    "all_active_usages",
                     "Add all usages of this step to the _Operations list_.",
                 ),
             ]
@@ -528,67 +528,84 @@ with st.container(border=True):
             #  * Execute ETL for all steps in the operation list.
 
             # Display the operations list.
-            for (action, key_suffix, callback, help), col in zip(actions, cols):
-                if action == "write":
-                    col.write(callback(step))
+            for (action_name, key_suffix, help_text), col in zip(actions, cols):
+                # Write step URI
+                if key_suffix == "write":
+                    col.text(step)
+                # Remove step
+                elif key_suffix == "remove":
+                    col.button(
+                        label=action_name,
+                        key=f"{key_suffix}_{step}",
+                        on_click=lambda step=step: st.session_state.selected_steps.discard(step),
+                        help=help_text,
+                    )
+                # Add relared steps
                 else:
-                    col.button(action, key=f"{key_suffix}_{step}", on_click=callback, args=(step,), help=help)
+                    col.button(
+                        label=action_name,
+                        key=f"{key_suffix}_{step}",
+                        on_click=lambda step=step, key_suffix=key_suffix: include_related_steps(step, key_suffix),
+                        help=help_text,
+                    )
+        # Add button to clear the operations list.
+        st.button(
+            "Clear Operations list",
+            help="Remove all steps currently in the _Operations list_.",
+            type="secondary",
+            on_click=lambda: st.session_state.selected_steps.clear(),
+        )
+
     else:
-        st.write("No rows selected for operation.")
+        st.markdown("_No rows selected for operation..._")
 
 
-def execute_command(cmd):
-    # Function to execute a command and get its output.
-    try:
-        result = subprocess.run(cmd, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, shell=True)
-        return result.stdout
-    except subprocess.CalledProcessError as e:
-        return e.stderr
+########################################
+# SUBMISSION
+########################################
 
-
-# Add button to clear the operations list.
-# TODO: Currently, it needs to be pressed twice to clear the list; not clear why.
-if st.button(
-    "Clear Operations list",
-    help="Remove all steps currently in the _Operations list_.",
-    type="secondary",
-):
-    empty_operations_list()
-
-
-# Add an expander menu with additional parameters for the update command.
-with st.expander("Update parameters", expanded=False):
-    dry_run = st.checkbox(
-        "Dry run", True, help="If checked, the update command will not write anything to the DAG or create any files."
-    )
-    version_new = st.text_input("New version", value=TODAY, help="Version of the new steps to be created.")
-
-# Button to execute the update command and show its output.
-if st.button(
-    f"Update {len(st.session_state.get('selected_steps', []))} steps",
-    help="Update steps in the _Operations list_.",
-    type="primary",
-):
-    with st.spinner("Executing step updater..."):
-        if ENV_IS_REMOTE:
-            st.error("The update command is not available in the remote version of the wizard. Update steps locally.")
-            st.stop()
-        else:
-            # TODO: It would be better to directly use StepUpdater instead of a subprocess.
-            command = (
-                "etl update "
-                + " ".join(st.session_state.get("selected_steps", []))
-                + " --non-interactive"
-                + f" --step-version-new {version_new}"
+if st.session_state.selected_steps:
+    # Add an expander menu with additional parameters for the update command.
+    with st.container(border=True):
+        with st.expander("Additional parameters", expanded=False):
+            dry_run = st.toggle(
+                "Dry run",
+                True,
+                help="If checked, the update command will not write anything to the DAG or create any files.",
             )
-            if dry_run:
-                command += " --dry-run"
-            cmd_output = execute_command(command)
-            # Show the output of the command in an expander.
-            with st.expander("Command Output:", expanded=True):
-                st.text_area("Output", value=cmd_output, height=300, key="cmd_output_area")
-            if "error" not in cmd_output.lower():
-                # Celebrate that the update was successful, why not.
-                st.balloons()
-            # Add a button to close the output expander.
-            st.button("Close", key="acknowledge_cmd_output")
+            version_new = st.text_input("New version", value=TODAY, help="Version of the new steps to be created.")
+
+        btn_submit = st.button(
+            f"Update {len(st.session_state.selected_steps)} steps",
+            help="Update steps in the _Operations list_.",
+            type="primary",
+            use_container_width=True,
+        )
+
+        # Button to execute the update command and show its output.
+        if btn_submit:
+            if ENV_IS_REMOTE:
+                st.error(
+                    "The update command is not available in the remote version of the wizard. Update steps locally."
+                )
+                st.stop()
+            else:
+                with st.spinner("Executing step updater..."):
+                    # TODO: It would be better to directly use StepUpdater instead of a subprocess.
+                    command = (
+                        "etl update "
+                        + " ".join(st.session_state.selected_steps)
+                        + " --non-interactive"
+                        + f" --step-version-new {version_new}"
+                    )
+                    if dry_run:
+                        command += " --dry-run"
+                    cmd_output = execute_command(command)
+                    # Show the output of the command in an expander.
+                    with st.expander("Command Output:", expanded=True):
+                        st.text_area("Output", value=cmd_output, height=300, key="cmd_output_area")
+                    if "error" not in cmd_output.lower():
+                        # Celebrate that the update was successful, why not.
+                        st.balloons()
+                    # Add a button to close the output expander.
+                    st.button("Close", key="acknowledge_cmd_output")
