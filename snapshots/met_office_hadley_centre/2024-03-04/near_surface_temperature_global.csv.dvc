@@ -1,0 +1,20 @@
+meta:
+  origin:
+    producer: Met Office Hadley Centre
+    title: HadCRUT5
+    description: |-
+      The HadCRUT5 near surface temperature data set is produced by blending data from the CRUTEM5 surface air temperature dataset and the HadSST4 sea-surface temperature dataset.
+
+      Temperature anomalies are based on the HadCRUT5 near-surface temperature dataset as published by the Met Office Hadley Centre.
+    title_snapshot: HadCRUT5 - Global near surface temperature
+    citation_full: |-
+      Morice, C.P., J.J. Kennedy, N.A. Rayner, J.P. Winn, E. Hogan, R.E. Killick, R.J.H. Dunn, T.J. Osborn, P.D. Jones and I.R. Simpson (in press) An updated assessment of near-surface temperature change from 1850: the HadCRUT5 dataset. Journal of Geophysical Research (Atmospheres) [doi:10.1029/2019JD032361](https://www.metoffice.gov.uk/hadobs/hadcrut5/HadCRUT5_accepted.pdf) ([supporting information](https://www.metoffice.gov.uk/hadobs/hadcrut5/HadCRUT5_supporting_information_accepted.pdf)).
+    version_producer: HadCRUT.5.0.1.0
+    url_main: https://www.metoffice.gov.uk/hadobs/hadcrut5/
+    url_download: |-
+      https://www.metoffice.gov.uk/hadobs/hadcrut5/data/current/analysis/diagnostics/HadCRUT.5.0.1.0.analysis.summary_series.global.annual.csv
+    date_accessed: '2024-03-04'
+    date_published: '2023-10-18'
+  license:
+    name: Open Government License v3
+    url: https://www.metoffice.gov.uk/hadobs/hadcrut5/terms_and_conditions.html
