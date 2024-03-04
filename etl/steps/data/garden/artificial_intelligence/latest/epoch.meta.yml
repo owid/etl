@@ -84,7 +84,7 @@ tables:
         unit: 'petaFLOP'
         description_short: Computation is measured in total petaFLOP, which is 10¹⁵ [floating-point operations](#dod:flop) estimated from AI literature, albeit with some uncertainty.
         description_key:
-          - In the context of artificial intelligence (AI), training computation is predominantly measured using floating-point operations or “FLOP” . Each FLOP corresponds to fundamental arithmetic operations, such as addition or multiplication, executed on two floating points. To adapt to the vast computational demands of AI systems, the measurement unit of petaFLOP is commonly used. One petaFLOP stands as a staggering one quadrillion FLOPs, underscoring the magnitude of computational operations within AI.
+          - In the context of artificial intelligence (AI), training computation is predominantly measured using floating-point operations or “FLOP”. One FLOP represents a single arithmetic operation involving floating-point numbers, such as addition, subtraction, multiplication, or division. To adapt to the vast computational demands of AI systems, the measurement unit of petaFLOP is commonly used. One petaFLOP stands as a staggering one quadrillion FLOPs, underscoring the magnitude of computational operations within AI.
 
           - Modern AI systems are rooted in machine learning and deep learning techniques. These methodologies are notorious for their computational intensity, involving complex mathematical processes and algorithms. During the training phase, AI models process large volumes of data, while continuously adapting and refining their parameters to optimize performance, rendering the training process computationally intensive.
 
