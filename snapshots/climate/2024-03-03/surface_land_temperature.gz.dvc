@@ -1,0 +1,19 @@
+meta:
+  origin:
+    title_snapshot: ERA5-Land monthly averaged data from 1950 to present
+    title: ERA5-Land monthly average surfce temperture data from 1950 to present
+    description: |-
+      ERA5-Land is a high-resolution dataset that offers a detailed view of Earth's land conditions, such as temperature and precipitation, over many decades. Developed by the European Centre for Medium-Range Weather Forecasts, it updates the earlier ERA5 dataset with improved land surface measurements. By combining advanced computer models with observations from around the world, ERA5-Land provides a complete and consistent record of our planet's climate history starting from 1950. This dataset tracks changes in water and energy on the surface, offering hourly updates across a grid that covers the entire globe with 9km resolution, though for easier access, it's been adjusted to show average conditions in blocks of approximately 11km by 11km. Monthly average data is also available, designed for users who need quick and straightforward access to long-term climate trends without needing every hourly detail.
+    producer: Copernicus Climate Change Service
+    citation_full: |-
+      Muñoz Sabater, J. (2019): ERA5-Land monthly averaged data from 1950 to present. Copernicus Climate Change Service (C3S) Climate Data Store (CDS). DOI: 10.24381/cds.68d2bb30 (Accessed on 03-March-2024)
+    url_main: https://cds.climate.copernicus.eu/cdsapp#!/dataset/reanalysis-era5-land-monthly-means?tab=overview
+    date_accessed: 2024-03-03
+    date_published: 2024-03-03
+    license:
+      name: Copernicus License
+      url: https://cds.climate.copernicus.eu/api/v2/terms/static/licence-to-use-copernicus-products.pdf
+outs:
+  - md5: c76576370ad6b6e9d8838fed96d87937
+    size: 3499140406
+    path: surface_land_temperature.gz

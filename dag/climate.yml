@@ -59,7 +59,7 @@ steps:
   # Copernicus Climate Change Service - Surface temperature.
   #
   data://meadow/climate/2023-12-20/surface_temperature:
-  - snapshot://climate/2024-02-14/surface_temperature.gz
+  - snapshot://climate/2024-03-03/surface_temperature.gz
   - snapshot://countries/2023-12-27/world_bank.zip
   data://garden/climate/2023-12-20/surface_temperature:
   - data://meadow/climate/2023-12-20/surface_temperature
@@ -73,7 +73,16 @@ steps:
     - data://garden/climate/2023-12-20/surface_temperature
   data://grapher/climate/2023-12-20/surface_temperature_annual_average:
   - data://garden/climate/2023-12-20/surface_temperature
-
+  #
+  # Copernicus Climate Change Service - Surface Land temperature.
+  #
+  data://meadow/climate/2024-03-03/surface_land_temperature:
+  - snapshot://climate/2024-03-03/surface_land_temperature.gz
+  - snapshot://countries/2023-12-27/world_bank.zip
+  data://garden/climate/2024-03-03/surface_land_temperature:
+    - data://meadow/climate/2024-03-03/surface_land_temperature
+  data://grapher/climate/2024-03-03/surface_land_temperature:
+    - data://garden/climate/2024-03-03/surface_land_temperature
   ######################################################################################################################
   # Steps to be updated together for the climate change impacts explorer.
   #
