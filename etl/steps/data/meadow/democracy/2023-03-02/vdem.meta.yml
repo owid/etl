@@ -956,16 +956,6 @@ tables:
         description: The variable denotes the number of people living in countries without data on the head of state’s gender.
       pop_hos_women_vdem_owid:
         description: The variable denotes the number of people living in countries in which the head of state is a woman.
-      pop_less10women_vdem_owid:
-        description: The variable denotes the number of people living in countries with less than 10% women in parliament.
-      pop_less20women_vdem_owid:
-        description: The variable denotes the number of people living in countries with 10-20% women in parliament.
-      pop_less30women_vdem_owid:
-        description: The variable denotes the number of people living in countries with 20-30% women in parliament.
-      pop_less40women_vdem_owid:
-        description: The variable denotes the number of people living in countries with 30-40% women in parliament.
-      pop_less50women_vdem_owid:
-        description: The variable denotes the number of people living in countries with 40-50% women in parliament.
       pop_libdem_18_row_owid:
         description: The variable denotes the number of people living in liberal democracies
           aged 1-18, as based on the Regimes of the World-classification by Lührmann et
@@ -1001,12 +991,6 @@ tables:
         description: The variable denotes the number of people living in countries without
           regime data based on the Regimes of the World-classification by Lührmann et al.
           (2018).
-      pop_misswomen_vdem_owid:
-        description: The variable denotes the number of people living in countries without data on women's representation in parliament.
-      pop_more50women_vdem_owid:
-        description: The variable denotes the number of people living in countries with more than 50% women in parliament.
-      pop_nowomen_vdem_owid:
-        description: The variable denotes the number of people living in countries with no women in parliament.
       popw_civ_libs_vdem_high_owid:
         description: |-
           The variable denotes the upper-bound estimate of the extent to which people are free from government torture, political killings, and forced labor, they have property rights, and enjoy the freedoms of movement, religion, expression, and association, weighted by population.
@@ -1758,4 +1742,3 @@ tables:
           It is based on the V-Dem indicator `v2svdomaut`, and we expand it to cover more years for some countries.
 
           Higher scores mean more freedom.
-

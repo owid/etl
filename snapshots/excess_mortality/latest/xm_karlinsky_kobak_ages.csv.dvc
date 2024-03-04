@@ -6,7 +6,7 @@ meta:
       For more details, refer to https://github.com/dkobak/excess-mortality#excess-mortality-during-the-covid-19-pandemic.
     url: https://github.com/dkobak/excess-mortality
     source_data_url: https://raw.githubusercontent.com/dkobak/excess-mortality/main/baselines-stmf.csv
-    date_accessed: 2024-03-01
+    date_accessed: 2024-03-04
     publication_date: '2021-06-30'
     publication_year: 2021
     published_by: |-
