@@ -1,4 +1,11 @@
-# Our World in Data's data pipeline
+---
+title: Home
+template: home.html
+---
+
+Some test.
+
+<!-- # OWID's data workflow
 Welcome to the public data pipeline for [Our World in Data](https://ourworldindata.org). This project powers the charts and data explorers on our site, as well as our public APIs.
 
 Choose the material that most interests you:
@@ -13,7 +20,7 @@ Choose the material that most interests you:
 [Read more :octicons-arrow-right-24:](api/)
 
 :material-upload: I am an **OWID staff** member, and want to **work with the ETL**<br>
-[Read more :octicons-arrow-right-24:](tutorials/index.md)
+[Read more :octicons-arrow-right-24:](guides/index.md)
 
 :material-open-source-initiative: I am a member of the public, and want to **contribute**<br>
 [Read more :octicons-arrow-right-24:](contributing.md)
@@ -22,3 +29,13 @@ Choose the material that most interests you:
 Thanks for your interest in our work :material-heart:
 
 !!! warning "Please [report any issue](https://github.com/owid/etl/issues/new?assignees=&labels=&template=docs-issue---.md) that you may find so we can keep improving our docs."
+
+
+<div class="grid cards" markdown>
+
+- :fontawesome-brands-html5: __HTML__ for [content and structure](guides/index.md)
+- :fontawesome-brands-js: __JavaScript__ for interactivity
+- :fontawesome-brands-css3: __CSS__ for text running out of boxes
+- :fontawesome-brands-internet-explorer: __Internet Explorer__ ... huh?
+
+</div> -->

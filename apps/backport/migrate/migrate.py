@@ -26,7 +26,7 @@ CURRENT_DIR = Path(__file__).parent
 DAG_MIGRATED_PATH = DAG_DIR / "migrated.yml"
 
 
-@click.command()
+@click.command(name="migrate")
 @click.option(
     "--dataset-id",
     type=int,
@@ -88,20 +88,16 @@ def cli(
 ) -> None:
     """Migrate existing dataset from MySQL into ETL.
 
-    # Description
-
     It imports datasets into ETL from MySQL by creating:
     - Ingest script that downloads data from S3 backport
     - Garden step with YAML metadata
     - Grapher step
 
-    ## Example
+    **Example:**
 
     ```
     ENV=.env.live etl b migrate --dataset-id 5205 --namespace covid --short-name hospital__and__icu --no-backport
     ```
-
-    # Reference
     """
     return migrate(
         dataset_id=dataset_id,

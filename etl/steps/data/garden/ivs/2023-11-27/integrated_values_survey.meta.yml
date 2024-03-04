@@ -436,14 +436,14 @@ tables:
           <<: *common-display
         presentation:
           title_public: "Don't know: Important in life: Family"
-      missing_important_in_life_family:
-        title: "Missing: Important in life: Family"
-        description_short: '% of answers classified as No answer, not applicable, not asked in survey o missing: other for the question "For each of the following aspects, indicate how important it is in your life. Would you say it is very important, rather important, not very important or not important at all?" in the item "Family".'
+      no_answer_important_in_life_family:
+        title: "No answer: Important in life: Family"
+        description_short: '% of answers classified as "No answer" for the question "For each of the following aspects, indicate how important it is in your life. Would you say it is very important, rather important, not very important or not important at all?" in the item "Family".'
         display:
-          name: "Missing: Important in life: Family"
+          name: "No answer: Important in life: Family"
           <<: *common-display
         presentation:
-          title_public: "Missing: Important in life: Family"
+          title_public: "No answer: Important in life: Family"
 
       important_in_life_friends:
         title: "Important in life: Friends"
@@ -501,14 +501,14 @@ tables:
           <<: *common-display
         presentation:
           title_public: "Don't know: Important in life: Friends"
-      missing_important_in_life_friends:
-        title: "Missing: Important in life: Friends"
-        description_short: '% of answers classified as No answer, not applicable, not asked in survey o missing: other for the question "For each of the following aspects, indicate how important it is in your life. Would you say it is very important, rather important, not very important or not important at all?" in the item "Friends".'
+      no_answer_important_in_life_friends:
+        title: "No answer: Important in life: Friends"
+        description_short: '% of answers classified as "No answer" for the question "For each of the following aspects, indicate how important it is in your life. Would you say it is very important, rather important, not very important or not important at all?" in the item "Friends".'
         display:
-          name: "Missing: Important in life: Friends"
+          name: "No answer: Important in life: Friends"
           <<: *common-display
         presentation:
-          title_public: "Missing: Important in life: Friends"
+          title_public: "No answer: Important in life: Friends"
 
       important_in_life_leisure_time:
         title: "Important in life: Leisure time"
@@ -566,14 +566,14 @@ tables:
           <<: *common-display
         presentation:
           title_public: "Don't know: Important in life: Leisure time"
-      missing_important_in_life_leisure_time:
-        title: "Missing: Important in life: Leisure time"
-        description_short: '% of answers classified as No answer, not applicable, not asked in survey o missing: other for the question "For each of the following aspects, indicate how important it is in your life. Would you say it is very important, rather important, not very important or not important at all?" in the item "Leisure time".'
+      no_answer_important_in_life_leisure_time:
+        title: "No answer: Important in life: Leisure time"
+        description_short: '% of answers classified as "No answer" for the question "For each of the following aspects, indicate how important it is in your life. Would you say it is very important, rather important, not very important or not important at all?" in the item "Leisure time".'
         display:
-          name: "Missing: Important in life: Leisure time"
+          name: "No answer: Important in life: Leisure time"
           <<: *common-display
         presentation:
-          title_public: "Missing: Important in life: Leisure time"
+          title_public: "No answer: Important in life: Leisure time"
 
       important_in_life_politics:
         title: "Important in life: Politics"
@@ -631,14 +631,14 @@ tables:
           <<: *common-display
         presentation:
           title_public: "Don't know: Important in life: Politics"
-      missing_important_in_life_politics:
-        title: "Missing: Important in life: Politics"
-        description_short: '% of answers classified as No answer, not applicable, not asked in survey o missing: other for the question "For each of the following aspects, indicate how important it is in your life. Would you say it is very important, rather important, not very important or not important at all?" in the item "Politics".'
+      no_answer_important_in_life_politics:
+        title: "No answer: Important in life: Politics"
+        description_short: '% of answers classified as "No answer" for the question "For each of the following aspects, indicate how important it is in your life. Would you say it is very important, rather important, not very important or not important at all?" in the item "Politics".'
         display:
-          name: "Missing: Important in life: Politics"
+          name: "No answer: Important in life: Politics"
           <<: *common-display
         presentation:
-          title_public: "Missing: Important in life: Politics"
+          title_public: "No answer: Important in life: Politics"
 
       important_in_life_work:
         title: "Important in life: Work"
@@ -696,14 +696,14 @@ tables:
           <<: *common-display
         presentation:
           title_public: "Don't know: Important in life: Work"
-      missing_important_in_life_work:
-        title: "Missing: Important in life: Work"
-        description_short: '% of answers classified as No answer, not applicable, not asked in survey o missing: other for the question "For each of the following aspects, indicate how important it is in your life. Would you say it is very important, rather important, not very important or not important at all?" in the item "Work".'
+      no_answer_important_in_life_work:
+        title: "No answer: Important in life: Work"
+        description_short: '% of answers classified as "No answer" for the question "For each of the following aspects, indicate how important it is in your life. Would you say it is very important, rather important, not very important or not important at all?" in the item "Work".'
         display:
-          name: "Missing: Important in life: Work"
+          name: "No answer: Important in life: Work"
           <<: *common-display
         presentation:
-          title_public: "Missing: Important in life: Work"
+          title_public: "No answer: Important in life: Work"
 
       important_in_life_religion:
         title: "Important in life: Religion"
@@ -761,14 +761,14 @@ tables:
           <<: *common-display
         presentation:
           title_public: "Don't know: Important in life: Religion"
-      missing_important_in_life_religion:
-        title: "Missing: Important in life: Religion"
-        description_short: '% of answers classified as No answer, not applicable, not asked in survey o missing: other for the question "For each of the following aspects, indicate how important it is in your life. Would you say it is very important, rather important, not very important or not important at all?" in the item "Religion".'
+      no_answer_important_in_life_religion:
+        title: "No answer: Important in life: Religion"
+        description_short: '% of answers classified as "No answer" for the question "For each of the following aspects, indicate how important it is in your life. Would you say it is very important, rather important, not very important or not important at all?" in the item "Religion".'
         display:
-          name: "Missing: Important in life: Religion"
+          name: "No answer: Important in life: Religion"
           <<: *common-display
         presentation:
-          title_public: "Missing: Important in life: Religion"
+          title_public: "No answer: Important in life: Religion"
 
       interested_politics:
         title: "Interest in politics"
@@ -826,14 +826,14 @@ tables:
           <<: *common-display
         presentation:
           title_public: "Don't know: Interest in politics"
-      missing_interested_politics:
-        title: "Missing: Interest in politics"
-        description_short: '% of answers classified as No answer, not applicable, not asked in survey o missing: other for the question "How interested would you say you are in politics?"'
+      no_answer_interested_politics:
+        title: "No answer: Interest in politics"
+        description_short: '% of answers classified as "No answer" for the question "How interested would you say you are in politics?"'
         display:
-          name: "Missing: Interest in politics"
+          name: "No answer: Interest in politics"
           <<: *common-display
         presentation:
-          title_public: "Missing: Interest in politics"
+          title_public: "No answer: Interest in politics"
 
       have_done_political_action_signing_a_petition:
         title: "Political action: Have signed a petition"
@@ -867,14 +867,14 @@ tables:
           <<: *common-display
         presentation:
           title_public: "Signing a petition (Don't know)"
-      missing_political_action_signing_a_petition:
-        title: "Political action: Signing a petition (Missing)"
-        description_short: '% of answers classified as No answer, not applicable, not asked in survey o missing: other for the question "Now I would like you to look at this card. I am going to read out some different forms of political action that people can take, and I would like you to tell me, for each one, whether you have actually done any of these things, whether you might do it or would never, under any circumstances, do it." in the item "Signed a petition".'
+      no_answer_political_action_signing_a_petition:
+        title: "Political action: Signing a petition (No answer)"
+        description_short: '% of answers classified as "No answer" for the question "Now I would like you to look at this card. I am going to read out some different forms of political action that people can take, and I would like you to tell me, for each one, whether you have actually done any of these things, whether you might do it or would never, under any circumstances, do it." in the item "Signed a petition".'
         display:
-          name: "Signing a petition (Missing)"
+          name: "Signing a petition (No answer)"
           <<: *common-display
         presentation:
-          title_public: "Signing a petition (Missing)"
+          title_public: "Signing a petition (No answer)"
 
       have_done_political_action_joining_in_boycotts:
         title: "Political action: Have joined in boycotts"
@@ -908,14 +908,14 @@ tables:
           <<: *common-display
         presentation:
           title_public: "Joining in boycotts (Don't know)"
-      missing_political_action_joining_in_boycotts:
-        title: "Political action: Joining in boycotts (Missing)"
-        description_short: '% of answers classified as No answer, not applicable, not asked in survey o missing: other for the question "Now I would like you to look at this card. I am going to read out some different forms of political action that people can take, and I would like you to tell me, for each one, whether you have actually done any of these things, whether you might do it or would never, under any circumstances, do it." in the item "Joining in boycotts".'
+      no_answer_political_action_joining_in_boycotts:
+        title: "Political action: Joining in boycotts (No answer)"
+        description_short: '% of answers classified as "No answer" for the question "Now I would like you to look at this card. I am going to read out some different forms of political action that people can take, and I would like you to tell me, for each one, whether you have actually done any of these things, whether you might do it or would never, under any circumstances, do it." in the item "Joining in boycotts".'
         display:
-          name: "Joining in boycotts (Missing)"
+          name: "Joining in boycotts (No answer)"
           <<: *common-display
         presentation:
-          title_public: "Joining in boycotts (Missing)"
+          title_public: "Joining in boycotts (No answer)"
 
       have_done_political_action_attending_peaceful_demonstrations:
         title: "Political action: Have attended peaceful demonstrations"
@@ -949,14 +949,14 @@ tables:
           <<: *common-display
         presentation:
           title_public: "Attending peaceful demonstrations (Don't know)"
-      missing_political_action_attending_peaceful_demonstrations:
-        title: "Political action: Attending peaceful demonstrations (Missing)"
-        description_short: '% of answers classified as No answer, not applicable, not asked in survey o missing: other for the question "Now I would like you to look at this card. I am going to read out some different forms of political action that people can take, and I would like you to tell me, for each one, whether you have actually done any of these things, whether you might do it or would never, under any circumstances, do it." in the item "Attending peaceful demonstrations".'
+      no_answer_political_action_attending_peaceful_demonstrations:
+        title: "Political action: Attending peaceful demonstrations (No answer)"
+        description_short: '% of answers classified as "No answer" for the question "Now I would like you to look at this card. I am going to read out some different forms of political action that people can take, and I would like you to tell me, for each one, whether you have actually done any of these things, whether you might do it or would never, under any circumstances, do it." in the item "Attending peaceful demonstrations".'
         display:
-          name: "Attending peaceful demonstrations (Missing)"
+          name: "Attending peaceful demonstrations (No answer)"
           <<: *common-display
         presentation:
-          title_public: "Attending peaceful demonstrations (Missing)"
+          title_public: "Attending peaceful demonstrations (No answer)"
 
       have_done_political_action_joining_unofficial_strikes:
         title: "Political action: Have joined unofficial strikes"
@@ -990,14 +990,14 @@ tables:
           <<: *common-display
         presentation:
           title_public: "Joining unofficial strikes (Don't know)"
-      missing_political_action_joining_unofficial_strikes:
-        title: "Political action: Joining unofficial strikes (Missing)"
-        description_short: '% of answers classified as No answer, not applicable, not asked in survey o missing: other for the question "Now I would like you to look at this card. I am going to read out some different forms of political action that people can take, and I would like you to tell me, for each one, whether you have actually done any of these things, whether you might do it or would never, under any circumstances, do it." in the item "Joining unofficial strikes".'
+      no_answer_political_action_joining_unofficial_strikes:
+        title: "Political action: Joining unofficial strikes (No answer)"
+        description_short: '% of answers classified as "No answer" for the question "Now I would like you to look at this card. I am going to read out some different forms of political action that people can take, and I would like you to tell me, for each one, whether you have actually done any of these things, whether you might do it or would never, under any circumstances, do it." in the item "Joining unofficial strikes".'
         display:
-          name: "Joining unofficial strikes (Missing)"
+          name: "Joining unofficial strikes (No answer)"
           <<: *common-display
         presentation:
-          title_public: "Joining unofficial strikes (Missing)"
+          title_public: "Joining unofficial strikes (No answer)"
 
       environment_env_ec:
         title: "Environment vs economic growth: Environment"
@@ -1031,14 +1031,14 @@ tables:
           <<: *common-display
         presentation:
           title_public: "Environment vs economic growth: Don't know"
-      missing_env_ec:
-        title: "Environment vs economic growth: Missing"
-        description_short: '% of answers classified as No answer, not applicable, not asked in survey o missing: other for the question "Here are two statements people sometimes make when discussing the environment and economic growth. Which of them comes closer to your own point of view? A. Protecting the environment should be given priority, even if it causes slower economic growth and some loss of jobs B. Economic growth and creating jobs should be the top priority, even if the environment suffers to some extent"'
+      no_answer_env_ec:
+        title: "Environment vs economic growth: No answer"
+        description_short: '% of answers classified as "No answer" for the question "Here are two statements people sometimes make when discussing the environment and economic growth. Which of them comes closer to your own point of view? A. Protecting the environment should be given priority, even if it causes slower economic growth and some loss of jobs B. Economic growth and creating jobs should be the top priority, even if the environment suffers to some extent"'
         display:
-          name: "Environment vs economic growth: Missing"
+          name: "Environment vs economic growth: No answer"
           <<: *common-display
         presentation:
-          title_public: "Environment vs economic growth: Missing"
+          title_public: "Environment vs economic growth: No answer"
 
       equality_eq_ineq:
         title: "Income equality: Incomes should be made more equal"
@@ -1072,14 +1072,14 @@ tables:
           <<: *common-display
         presentation:
           title_public: "Income equality: Don't know"
-      missing_eq_ineq:
-        title: "Income equality: Missing"
-        description_short: '% of answers classified as No answer, not applicable, not asked in survey o missing: other for the question "Now I would like you to tell me your views on various issues. How would you place your views on this scale? 1 means you agree completely with the statement on the left; 10 means you agree completely with the statement on the right; and if your views fall somewhere in between, you can choose any number in between." in the statement "Incomes should be made more equal vs There should be greater incentives for individual effort".'
+      no_answer_eq_ineq:
+        title: "Income equality: No answer"
+        description_short: '% of answers classified as "No answer" for the question "Now I would like you to tell me your views on various issues. How would you place your views on this scale? 1 means you agree completely with the statement on the left; 10 means you agree completely with the statement on the right; and if your views fall somewhere in between, you can choose any number in between." in the statement "Incomes should be made more equal vs There should be greater incentives for individual effort".'
         display:
-          name: "Missing"
+          name: "No answer"
           <<: *common-display
         presentation:
-          title_public: "Income equality: Missing"
+          title_public: "Income equality: No answer"
       avg_score_eq_ineq:
         title: "Income equality: Average score"
         description_short: 'Average score of respondents when asked "Now I would like you to tell me your views on various issues. How would you place your views on this scale? 1 means you agree completely with the statement on the left; 10 means you agree completely with the statement on the right; and if your views fall somewhere in between, you can choose any number in between." in the statement "Incomes should be made more equal vs There should be greater incentives for individual effort".'
@@ -1093,7 +1093,7 @@ tables:
 
       like_me_agg_new_ideas:
         title: "It is important to this person to think up new ideas and be creative: Like me (aggregate)"
-        description_short: '% of respondents replying "very much like me", "like me" or "somewhat like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, not like you, or not at all like you?" in the description "It is important to this person to think up new ideas and be creative".'
+        description_short: '% of respondents replying "very much like me", "like me" or "somewhat like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person to think up new ideas and be creative".'
         display:
           name: "Like me: Important to think up new ideas"
           <<: *common-display
@@ -1101,7 +1101,7 @@ tables:
           title_public: "Like me: Important to think up new ideas"
       not_like_me_agg_new_ideas:
         title: "It is important to this person to think up new ideas and be creative: Not like me (aggregate)"
-        description_short: '% of respondents replying "not like me" or "not at all like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, not like you, or not at all like you?" in the description "It is important to this person to think up new ideas and be creative".'
+        description_short: '% of respondents replying "not like me" or "not at all like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person to think up new ideas and be creative".'
         display:
           name: "Not like me: Important to think up new ideas"
           <<: *common-display
@@ -1109,7 +1109,7 @@ tables:
           title_public: "Not like me: Important to think up new ideas"
       very_much_like_me_new_ideas:
         title: "It is important to this person to think up new ideas and be creative: Very much like me (aggregate)"
-        description_short: '% of respondents replying "very much like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, not like you, or not at all like you?" in the description "It is important to this person to think up new ideas and be creative".'
+        description_short: '% of respondents replying "very much like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person to think up new ideas and be creative".'
         display:
           name: "Very much like me: Important to think up new ideas"
           <<: *common-display
@@ -1117,7 +1117,7 @@ tables:
           title_public: "Very much like me: Important to think up new ideas"
       like_me_new_ideas:
         title: "It is important to this person to think up new ideas and be creative: Like me"
-        description_short: '% of respondents replying "like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, not like you, or not at all like you?" in the description "It is important to this person to think up new ideas and be creative".'
+        description_short: '% of respondents replying "like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person to think up new ideas and be creative".'
         display:
           name: "Like me: Important to think up new ideas"
           <<: *common-display
@@ -1125,7 +1125,7 @@ tables:
           title_public: "Like me: Important to think up new ideas"
       somewhat_like_me_new_ideas:
         title: "It is important to this person to think up new ideas and be creative: Somewhat like me"
-        description_short: '% of respondents replying "somewhat like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, not like you, or not at all like you?" in the description "It is important to this person to think up new ideas and be creative".'
+        description_short: '% of respondents replying "somewhat like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person to think up new ideas and be creative".'
         display:
           name: "Somewhat like me: Important to think up new ideas"
           <<: *common-display
@@ -1133,7 +1133,7 @@ tables:
           title_public: "Somewhat like me: Important to think up new ideas"
       a_little_like_me_new_ideas:
         title: "It is important to this person to think up new ideas and be creative: A little like me"
-        description_short: '% of respondents replying "a little like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, not like you, or not at all like you?" in the description "It is important to this person to think up new ideas and be creative".'
+        description_short: '% of respondents replying "a little like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person to think up new ideas and be creative".'
         display:
           name: "A little like me: Important to think up new ideas"
           <<: *common-display
@@ -1141,7 +1141,7 @@ tables:
           title_public: "A little like me: Important to think up new ideas"
       not_like_me_new_ideas:
         title: "It is important to this person to think up new ideas and be creative: Not like me"
-        description_short: '% of respondents replying "not like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, not like you, or not at all like you?" in the description "It is important to this person to think up new ideas and be creative".'
+        description_short: '% of respondents replying "not like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person to think up new ideas and be creative".'
         display:
           name: "Not like me: Important to think up new ideas"
           <<: *common-display
@@ -1149,7 +1149,7 @@ tables:
           title_public: "Not like me: Important to think up new ideas"
       not_at_all_like_me_new_ideas:
         title: "It is important to this person to think up new ideas and be creative: Not at all like me"
-        description_short: '% of respondents replying "not at all like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, not like you, or not at all like you?" in the description "It is important to this person to think up new ideas and be creative".'
+        description_short: '% of respondents replying "not at all like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person to think up new ideas and be creative".'
         display:
           name: "Not at all like me: Important to think up new ideas"
           <<: *common-display
@@ -1157,24 +1157,24 @@ tables:
           title_public: "Not at all like me: Important to think up new ideas"
       dont_know_new_ideas:
         title: "It is important to this person to think up new ideas and be creative: Don't know"
-        description_short: '% of respondents replying "don‘t know" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, not like you, or not at all like you?" in the description "It is important to this person to think up new ideas and be creative".'
+        description_short: '% of respondents replying "don‘t know" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person to think up new ideas and be creative".'
         display:
           name: "Don't know: Important to think up new ideas"
           <<: *common-display
         presentation:
           title_public: "Don't know: Important to think up new ideas"
-      missing_new_ideas:
-        title: "It is important to this person to think up new ideas and be creative: Missing"
-        description_short: '% of answers classified as No answer, not applicable, not asked in survey o missing: other for the question "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, not like you, or not at all like you?" in the description "It is important to this person to think up new ideas and be creative".'
+      no_answer_new_ideas:
+        title: "It is important to this person to think up new ideas and be creative: No answer"
+        description_short: '% of answers classified as "No answer" for the question "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person to think up new ideas and be creative".'
         display:
-          name: "Missing: Important to think up new ideas"
+          name: "No answer: Important to think up new ideas"
           <<: *common-display
         presentation:
-          title_public: "Missing: Important to think up new ideas"
+          title_public: "No answer: Important to think up new ideas"
 
       like_me_agg_rich:
         title: "It is important to this person to be rich: Like me (aggregate)"
-        description_short: '% of respondents replying "very much like me", "like me" or "somewhat like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, not like you, or not at all like you?" in the description "It is important to this person to be rich".'
+        description_short: '% of respondents replying "very much like me", "like me" or "somewhat like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person to be rich".'
         display:
           name: "Like me: Important to be rich"
           <<: *common-display
@@ -1182,7 +1182,7 @@ tables:
           title_public: "Like me: Important to be rich"
       not_like_me_agg_rich:
         title: "It is important to this person to be rich: Not like me (aggregate)"
-        description_short: '% of respondents replying "not like me" or "not at all like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, not like you, or not at all like you?" in the description "It is important to this person to be rich".'
+        description_short: '% of respondents replying "not like me" or "not at all like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person to be rich".'
         display:
           name: "Not like me: Important to be rich"
           <<: *common-display
@@ -1190,7 +1190,7 @@ tables:
           title_public: "Not like me: Important to be rich"
       very_much_like_me_rich:
         title: "It is important to this person to be rich: Very much like me (aggregate)"
-        description_short: '% of respondents replying "very much like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, not like you, or not at all like you?" in the description "It is important to this person to be rich".'
+        description_short: '% of respondents replying "very much like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person to be rich".'
         display:
           name: "Very much like me: Important to be rich"
           <<: *common-display
@@ -1198,7 +1198,7 @@ tables:
           title_public: "Very much like me: Important to be rich"
       like_me_rich:
         title: "It is important to this person to be rich: Like me"
-        description_short: '% of respondents replying "like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, not like you, or not at all like you?" in the description "It is important to this person to be rich".'
+        description_short: '% of respondents replying "like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person to be rich".'
         display:
           name: "Like me: Important to be rich"
           <<: *common-display
@@ -1206,7 +1206,7 @@ tables:
           title_public: "Like me: Important to be rich"
       somewhat_like_me_rich:
         title: "It is important to this person to be rich: Somewhat like me"
-        description_short: '% of respondents replying "somewhat like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, not like you, or not at all like you?" in the description "It is important to this person to be rich".'
+        description_short: '% of respondents replying "somewhat like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person to be rich".'
         display:
           name: "Somewhat like me: Important to be rich"
           <<: *common-display
@@ -1214,7 +1214,7 @@ tables:
           title_public: "Somewhat like me: Important to be rich"
       a_little_like_me_rich:
         title: "It is important to this person to be rich: A little like me"
-        description_short: '% of respondents replying "a little like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, not like you, or not at all like you?" in the description "It is important to this person to be rich".'
+        description_short: '% of respondents replying "a little like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person to be rich".'
         display:
           name: "A little like me: Important to be rich"
           <<: *common-display
@@ -1222,7 +1222,7 @@ tables:
           title_public: "A little like me: Important to be rich"
       not_like_me_rich:
         title: "It is important to this person to be rich: Not like me"
-        description_short: '% of respondents replying "not like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, not like you, or not at all like you?" in the description "It is important to this person to be rich".'
+        description_short: '% of respondents replying "not like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person to be rich".'
         display:
           name: "Not like me: Important to be rich"
           <<: *common-display
@@ -1230,7 +1230,7 @@ tables:
           title_public: "Not like me: Important to be rich"
       not_at_all_like_me_rich:
         title: "It is important to this person to be rich: Not at all like me"
-        description_short: '% of respondents replying "not at all like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, not like you, or not at all like you?" in the description "It is important to this person to be rich".'
+        description_short: '% of respondents replying "not at all like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person to be rich".'
         display:
           name: "Not at all like me: Important to be rich"
           <<: *common-display
@@ -1238,24 +1238,24 @@ tables:
           title_public: "Not at all like me: Important to be rich"
       dont_know_rich:
         title: "It is important to this person to be rich: Don't know"
-        description_short: '% of respondents replying "don‘t know" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, not like you, or not at all like you?" in the description "It is important to this person to be rich".'
+        description_short: '% of respondents replying "don‘t know" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person to be rich".'
         display:
           name: "Don't know: Important to be rich"
           <<: *common-display
         presentation:
           title_public: "Don't know: Important to be rich"
-      missing_rich:
-        title: "It is important to this person to be rich: Missing"
-        description_short: '% of answers classified as No answer, not applicable, not asked in survey o missing: other for the question "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, not like you, or not at all like you?" in the description "It is important to this person to be rich".'
+      no_answer_rich:
+        title: "It is important to this person to be rich: No answer"
+        description_short: '% of answers classified as "No answer" for the question "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person to be rich".'
         display:
-          name: "Missing: Important to be rich"
+          name: "No answer: Important to be rich"
           <<: *common-display
         presentation:
-          title_public: "Missing: Important to be rich"
+          title_public: "No answer: Important to be rich"
 
       like_me_agg_secure:
         title: "It is important to this person living in secure surroundings: Like me (aggregate)"
-        description_short: '% of respondents replying "very much like me", "like me" or "somewhat like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, not like you, or not at all like you?" in the description "It is important to this person living in secure surroundings".'
+        description_short: '% of respondents replying "very much like me", "like me" or "somewhat like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person living in secure surroundings".'
         display:
           name: "Like me: Important living in secure surroundings"
           <<: *common-display
@@ -1263,7 +1263,7 @@ tables:
           title_public: "Like me: Important living in secure surroundings"
       not_like_me_agg_secure:
         title: "It is important to this person living in secure surroundings: Not like me (aggregate)"
-        description_short: '% of respondents replying "not like me" or "not at all like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, not like you, or not at all like you?" in the description "It is important to this person living in secure surroundings".'
+        description_short: '% of respondents replying "not like me" or "not at all like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person living in secure surroundings".'
         display:
           name: "Not like me: Important living in secure surroundings"
           <<: *common-display
@@ -1271,7 +1271,7 @@ tables:
           title_public: "Not like me: Important living in secure surroundings"
       very_much_like_me_secure:
         title: "It is important to this person living in secure surroundings: Very much like me"
-        description_short: '% of respondents replying "very much like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, not like you, or not at all like you?" in the description "It is important to this person living in secure surroundings".'
+        description_short: '% of respondents replying "very much like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person living in secure surroundings".'
         display:
           name: "Very much like me: Important living in secure surroundings"
           <<: *common-display
@@ -1279,7 +1279,7 @@ tables:
           title_public: "Very much like me: Important living in secure surroundings"
       like_me_secure:
         title: "It is important to this person living in secure surroundings: Like me"
-        description_short: '% of respondents replying "like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, not like you, or not at all like you?" in the description "It is important to this person living in secure surroundings".'
+        description_short: '% of respondents replying "like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person living in secure surroundings".'
         display:
           name: "Like me: Important living in secure surroundings"
           <<: *common-display
@@ -1287,7 +1287,7 @@ tables:
           title_public: "Like me: Important living in secure surroundings"
       somewhat_like_me_secure:
         title: "It is important to this person living in secure surroundings: Somewhat like me"
-        description_short: '% of respondents replying "somewhat like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, not like you, or not at all like you?" in the description "It is important to this person living in secure surroundings".'
+        description_short: '% of respondents replying "somewhat like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person living in secure surroundings".'
         display:
           name: "Somewhat like me: Important living in secure surroundings"
           <<: *common-display
@@ -1295,7 +1295,7 @@ tables:
           title_public: "Somewhat like me: Important living in secure surroundings"
       a_little_like_me_secure:
         title: "It is important to this person living in secure surroundings: A little like me"
-        description_short: '% of respondents replying "a little like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, not like you, or not at all like you?" in the description "It is important to this person living in secure surroundings".'
+        description_short: '% of respondents replying "a little like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person living in secure surroundings".'
         display:
           name: "A little like me: Important living in secure surroundings"
           <<: *common-display
@@ -1303,7 +1303,7 @@ tables:
           title_public: "A little like me: Important living in secure surroundings"
       not_like_me_secure:
         title: "It is important to this person living in secure surroundings: Not like me"
-        description_short: '% of respondents replying "not like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, not like you, or not at all like you?" in the description "It is important to this person living in secure surroundings".'
+        description_short: '% of respondents replying "not like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person living in secure surroundings".'
         display:
           name: "Not like me: Important living in secure surroundings"
           <<: *common-display
@@ -1311,7 +1311,7 @@ tables:
           title_public: "Not like me: Important living in secure surroundings"
       not_at_all_like_me_secure:
         title: "It is important to this person living in secure surroundings: Not at all like me"
-        description_short: '% of respondents replying "not at all like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, not like you, or not at all like you?" in the description "It is important to this person living in secure surroundings".'
+        description_short: '% of respondents replying "not at all like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person living in secure surroundings".'
         display:
           name: "Not at all like me: Important living in secure surroundings"
           <<: *common-display
@@ -1319,24 +1319,24 @@ tables:
           title_public: "Not at all like me: Important living in secure surroundings"
       dont_know_secure:
         title: "It is important to this person living in secure surroundings: Don't know"
-        description_short: '% of respondents replying "don‘t know" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, not like you, or not at all like you?" in the description "It is important to this person living in secure surroundings".'
+        description_short: '% of respondents replying "don‘t know" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person living in secure surroundings".'
         display:
           name: "Don't know: Important living in secure surroundings"
           <<: *common-display
         presentation:
           title_public: "Don't know: Important living in secure surroundings"
-      missing_secure:
-        title: "It is important to this person living in secure surroundings: Missing"
-        description_short: '% of answers classified as No answer, not applicable, not asked in survey o missing: other for the question "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, not like you, or not at all like you?" in the description "It is important to this person living in secure surroundings".'
+      no_answer_secure:
+        title: "It is important to this person living in secure surroundings: No answer"
+        description_short: '% of answers classified as "No answer" for the question "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person living in secure surroundings".'
         display:
-          name: "Missing: Important living in secure surroundings"
+          name: "No answer: Important living in secure surroundings"
           <<: *common-display
         presentation:
-          title_public: "Missing: Important living in secure surroundings"
+          title_public: "No answer: Important living in secure surroundings"
 
       like_me_agg_good_time:
         title: "It is important to this person to have a good time: Like me (aggregate)"
-        description_short: '% of respondents replying "very much like me", "like me" or "somewhat like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, not like you, or not at all like you?" in the description "It is important to this person to have a good time".'
+        description_short: '% of respondents replying "very much like me", "like me" or "somewhat like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person to have a good time".'
         display:
           name: "Like me: Important to have a good time"
           <<: *common-display
@@ -1344,7 +1344,7 @@ tables:
           title_public: "Like me: Important to have a good time"
       not_like_me_agg_good_time:
         title: "It is important to this person to have a good time: Not like me (aggregate)"
-        description_short: '% of respondents replying "not like me" or "not at all like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, not like you, or not at all like you?" in the description "It is important to this person to have a good time".'
+        description_short: '% of respondents replying "not like me" or "not at all like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person to have a good time".'
         display:
           name: "Not like me: Important to have a good time"
           <<: *common-display
@@ -1352,7 +1352,7 @@ tables:
           title_public: "Not like me: Important to have a good time"
       very_much_like_me_good_time:
         title: "It is important to this person to have a good time: Very much like me"
-        description_short: '% of respondents replying "very much like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, not like you, or not at all like you?" in the description "It is important to this person to have a good time".'
+        description_short: '% of respondents replying "very much like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person to have a good time".'
         display:
           name: "Very much like me: Important to have a good time"
           <<: *common-display
@@ -1360,7 +1360,7 @@ tables:
           title_public: "Very much like me: Important to have a good time"
       like_me_good_time:
         title: "It is important to this person to have a good time: Like me"
-        description_short: '% of respondents replying "like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, not like you, or not at all like you?" in the description "It is important to this person to have a good time".'
+        description_short: '% of respondents replying "like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person to have a good time".'
         display:
           name: "Like me: Important to have a good time"
           <<: *common-display
@@ -1368,7 +1368,7 @@ tables:
           title_public: "Like me: Important to have a good time"
       somewhat_like_me_good_time:
         title: "It is important to this person to have a good time: Somewhat like me"
-        description_short: '% of respondents replying "somewhat like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, not like you, or not at all like you?" in the description "It is important to this person to have a good time".'
+        description_short: '% of respondents replying "somewhat like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person to have a good time".'
         display:
           name: "Somewhat like me: Important to have a good time"
           <<: *common-display
@@ -1376,7 +1376,7 @@ tables:
           title_public: "Somewhat like me: Important to have a good time"
       a_little_like_me_good_time:
         title: "It is important to this person to have a good time: A little like me"
-        description_short: '% of respondents replying "a little like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, not like you, or not at all like you?" in the description "It is important to this person to have a good time".'
+        description_short: '% of respondents replying "a little like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person to have a good time".'
         display:
           name: "A little like me: Important to have a good time"
           <<: *common-display
@@ -1384,7 +1384,7 @@ tables:
           title_public: "A little like me: Important to have a good time"
       not_like_me_good_time:
         title: "It is important to this person to have a good time: Not like me"
-        description_short: '% of respondents replying "not like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, not like you, or not at all like you?" in the description "It is important to this person to have a good time".'
+        description_short: '% of respondents replying "not like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person to have a good time".'
         display:
           name: "Not like me: Important to have a good time"
           <<: *common-display
@@ -1392,7 +1392,7 @@ tables:
           title_public: "Not like me: Important to have a good time"
       not_at_all_like_me_good_time:
         title: "It is important to this person to have a good time: Not at all like me"
-        description_short: '% of respondents replying "not at all like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, not like you, or not at all like you?" in the description "It is important to this person to have a good time".'
+        description_short: '% of respondents replying "not at all like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person to have a good time".'
         display:
           name: "Not at all like me: Important to have a good time"
           <<: *common-display
@@ -1400,24 +1400,24 @@ tables:
           title_public: "Not at all like me: Important to have a good time"
       dont_know_good_time:
         title: "It is important to this person to have a good time: Don't know"
-        description_short: '% of respondents replying "don‘t know" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, not like you, or not at all like you?" in the description "It is important to this person to have a good time".'
+        description_short: '% of respondents replying "don‘t know" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person to have a good time".'
         display:
           name: "Don't know: Important to have a good time"
           <<: *common-display
         presentation:
           title_public: "Don't know: Important to have a good time"
-      missing_good_time:
-        title: "It is important to this person to have a good time: Missing"
-        description_short: '% of answers classified as No answer, not applicable, not asked in survey o missing: other for the question "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, not like you, or not at all like you?" in the description "It is important to this person to have a good time".'
+      no_answer_good_time:
+        title: "It is important to this person to have a good time: No answer"
+        description_short: '% of answers classified as "No answer" for the question "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person to have a good time".'
         display:
-          name: "Missing: Important to have a good time"
+          name: "No answer: Important to have a good time"
           <<: *common-display
         presentation:
-          title_public: "Missing: Important to have a good time"
+          title_public: "No answer: Important to have a good time"
 
       like_me_agg_help_others:
         title: "It is important to this person to help the people nearby: Like me (aggregate)"
-        description_short: '% of respondents replying "very much like me", "like me" or "somewhat like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, not like you, or not at all like you?" in the description "It is important to this person to help the people nearby".'
+        description_short: '% of respondents replying "very much like me", "like me" or "somewhat like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person to help the people nearby".'
         display:
           name: "Like me: Important to help the people nearby"
           <<: *common-display
@@ -1425,7 +1425,7 @@ tables:
           title_public: "Like me: Important to help the people nearby"
       not_like_me_agg_help_others:
         title: "It is important to this person to help the people nearby: Not like me (aggregate)"
-        description_short: '% of respondents replying "not like me" or "not at all like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, not like you, or not at all like you?" in the description "It is important to this person to help the people nearby".'
+        description_short: '% of respondents replying "not like me" or "not at all like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person to help the people nearby".'
         display:
           name: "Not like me: Important to help the people nearby"
           <<: *common-display
@@ -1433,7 +1433,7 @@ tables:
           title_public: "Not like me: Important to help the people nearby"
       very_much_like_me_help_others:
         title: "It is important to this person to help the people nearby: Very much like me"
-        description_short: '% of respondents replying "very much like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, not like you, or not at all like you?" in the description "It is important to this person to help the people nearby".'
+        description_short: '% of respondents replying "very much like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person to help the people nearby".'
         display:
           name: "Very much like me: Important to help the people nearby"
           <<: *common-display
@@ -1441,7 +1441,7 @@ tables:
           title_public: "Very much like me: Important to help the people nearby"
       like_me_help_others:
         title: "It is important to this person to help the people nearby: Like me"
-        description_short: '% of respondents replying "like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, not like you, or not at all like you?" in the description "It is important to this person to help the people nearby".'
+        description_short: '% of respondents replying "like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person to help the people nearby".'
         display:
           name: "Like me: Important to help the people nearby"
           <<: *common-display
@@ -1449,7 +1449,7 @@ tables:
           title_public: "Like me: Important to help the people nearby"
       somewhat_like_me_help_others:
         title: "It is important to this person to help the people nearby: Somewhat like me"
-        description_short: '% of respondents replying "somewhat like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, not like you, or not at all like you?" in the description "It is important to this person to help the people nearby".'
+        description_short: '% of respondents replying "somewhat like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person to help the people nearby".'
         display:
           name: "Somewhat like me: Important to help the people nearby"
           <<: *common-display
@@ -1457,7 +1457,7 @@ tables:
           title_public: "Somewhat like me: Important to help the people nearby"
       a_little_like_me_help_others:
         title: "It is important to this person to help the people nearby: A little like me"
-        description_short: '% of respondents replying "a little like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, not like you, or not at all like you?" in the description "It is important to this person to help the people nearby".'
+        description_short: '% of respondents replying "a little like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person to help the people nearby".'
         display:
           name: "A little like me: Important to help the people nearby"
           <<: *common-display
@@ -1465,7 +1465,7 @@ tables:
           title_public: "A little like me: Important to help the people nearby"
       not_like_me_help_others:
         title: "It is important to this person to help the people nearby: Not like me"
-        description_short: '% of respondents replying "not like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, not like you, or not at all like you?" in the description "It is important to this person to help the people nearby".'
+        description_short: '% of respondents replying "not like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person to help the people nearby".'
         display:
           name: "Not like me: Important to help the people nearby"
           <<: *common-display
@@ -1473,7 +1473,7 @@ tables:
           title_public: "Not like me: Important to help the people nearby"
       not_at_all_like_me_help_others:
         title: "It is important to this person to help the people nearby: Not at all like me"
-        description_short: '% of respondents replying "not at all like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, not like you, or not at all like you?" in the description "It is important to this person to help the people nearby".'
+        description_short: '% of respondents replying "not at all like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person to help the people nearby".'
         display:
           name: "Not at all like me: Important to help the people nearby"
           <<: *common-display
@@ -1481,24 +1481,24 @@ tables:
           title_public: "Not at all like me: Important to help the people nearby"
       dont_know_help_others:
         title: "It is important to this person to help the people nearby: Don't know"
-        description_short: '% of respondents replying "don‘t know" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, not like you, or not at all like you?" in the description "It is important to this person to help the people nearby".'
+        description_short: '% of respondents replying "don‘t know" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person to help the people nearby".'
         display:
           name: "Don't know: Important to help the people nearby"
           <<: *common-display
         presentation:
           title_public: "Don't know: Important to help the people nearby"
-      missing_help_others:
-        title: "It is important to this person to help the people nearby: Missing"
-        description_short: '% of answers classified as No answer, not applicable, not asked in survey o missing: other for the question "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, not like you, or not at all like you?" in the description "It is important to this person to help the people nearby".'
+      no_answer_help_others:
+        title: "It is important to this person to help the people nearby: No answer"
+        description_short: '% of answers classified as "No answer" for the question "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person to help the people nearby".'
         display:
-          name: "Missing: Important to help the people nearby"
+          name: "No answer: Important to help the people nearby"
           <<: *common-display
         presentation:
-          title_public: "Missing: Important to help the people nearby"
+          title_public: "No answer: Important to help the people nearby"
 
       like_me_agg_success:
         title: "It is important to this person being very successful: Like me (aggregate)"
-        description_short: '% of respondents replying "very much like me", "like me" or "somewhat like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, not like you, or not at all like you?" in the description "It is important to this person being very successful".'
+        description_short: '% of respondents replying "very much like me", "like me" or "somewhat like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person being very successful".'
         display:
           name: "Like me: Important being very successful"
           <<: *common-display
@@ -1506,7 +1506,7 @@ tables:
           title_public: "Like me: Important being very successful"
       not_like_me_agg_success:
         title: "It is important to this person being very successful: Not like me (aggregate)"
-        description_short: '% of respondents replying "not like me" or "not at all like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, not like you, or not at all like you?" in the description "It is important to this person being very successful".'
+        description_short: '% of respondents replying "not like me" or "not at all like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person being very successful".'
         display:
           name: "Not like me: Important being very successful"
           <<: *common-display
@@ -1514,7 +1514,7 @@ tables:
           title_public: "Not like me: Important being very successful"
       very_much_like_me_success:
         title: "It is important to this person being very successful: Very much like me"
-        description_short: '% of respondents replying "very much like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, not like you, or not at all like you?" in the description "It is important to this person being very successful".'
+        description_short: '% of respondents replying "very much like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person being very successful".'
         display:
           name: "Very much like me: Important being very successful"
           <<: *common-display
@@ -1522,7 +1522,7 @@ tables:
           title_public: "Very much like me: Important being very successful"
       like_me_success:
         title: "It is important to this person being very successful: Like me"
-        description_short: '% of respondents replying "like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, not like you, or not at all like you?" in the description "It is important to this person being very successful".'
+        description_short: '% of respondents replying "like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person being very successful".'
         display:
           name: "Like me: Important being very successful"
           <<: *common-display
@@ -1530,7 +1530,7 @@ tables:
           title_public: "Like me: Important being very successful"
       somewhat_like_me_success:
         title: "It is important to this person being very successful: Somewhat like me"
-        description_short: '% of respondents replying "somewhat like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, not like you, or not at all like you?" in the description "It is important to this person being very successful".'
+        description_short: '% of respondents replying "somewhat like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person being very successful".'
         display:
           name: "Somewhat like me: Important being very successful"
           <<: *common-display
@@ -1538,7 +1538,7 @@ tables:
           title_public: "Somewhat like me: Important being very successful"
       a_little_like_me_success:
         title: "It is important to this person being very successful: A little like me"
-        description_short: '% of respondents replying "a little like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, not like you, or not at all like you?" in the description "It is important to this person being very successful".'
+        description_short: '% of respondents replying "a little like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person being very successful".'
         display:
           name: "A little like me: Important being very successful"
           <<: *common-display
@@ -1546,7 +1546,7 @@ tables:
           title_public: "A little like me: Important being very successful"
       not_like_me_success:
         title: "It is important to this person being very successful: Not like me"
-        description_short: '% of respondents replying "not like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, not like you, or not at all like you?" in the description "It is important to this person being very successful".'
+        description_short: '% of respondents replying "not like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person being very successful".'
         display:
           name: "Not like me: Important being very successful"
           <<: *common-display
@@ -1554,7 +1554,7 @@ tables:
           title_public: "Not like me: Important being very successful"
       not_at_all_like_me_success:
         title: "It is important to this person being very successful: Not at all like me"
-        description_short: '% of respondents replying "not at all like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, not like you, or not at all like you?" in the description "It is important to this person being very successful".'
+        description_short: '% of respondents replying "not at all like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person being very successful".'
         display:
           name: "Not at all like me: Important being very successful"
           <<: *common-display
@@ -1562,24 +1562,24 @@ tables:
           title_public: "Not at all like me: Important being very successful"
       dont_know_success:
         title: "It is important to this person being very successful: Don't know"
-        description_short: '% of respondents replying "don‘t know" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, not like you, or not at all like you?" in the description "It is important to this person being very successful".'
+        description_short: '% of respondents replying "don‘t know" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person being very successful".'
         display:
           name: "Don't know: Important being very successful"
           <<: *common-display
         presentation:
           title_public: "Don't know: Important being very successful"
-      missing_success:
-        title: "It is important to this person being very successful: Missing"
-        description_short: '% of answers classified as No answer, not applicable, not asked in survey o missing: other for the question "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, not like you, or not at all like you?" in the description "It is important to this person being very successful".'
+      no_answer_success:
+        title: "It is important to this person being very successful: No answer"
+        description_short: '% of answers classified as "No answer" for the question "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person being very successful".'
         display:
-          name: "Missing: Important being very successful"
+          name: "No answer: Important being very successful"
           <<: *common-display
         presentation:
-          title_public: "Missing: Important being very successful"
+          title_public: "No answer: Important being very successful"
 
       like_me_agg_risks:
         title: "It is important to this person adventure and taking risks: Like me (aggregate)"
-        description_short: '% of respondents replying "very much like me", "like me" or "somewhat like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, not like you, or not at all like you?" in the description "It is important to this person adventure and taking risks".'
+        description_short: '% of respondents replying "very much like me", "like me" or "somewhat like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person adventure and taking risks".'
         display:
           name: "Like me: Important taking risks"
           <<: *common-display
@@ -1587,7 +1587,7 @@ tables:
           title_public: "Like me: Important taking risks"
       not_like_me_agg_risks:
         title: "It is important to this person adventure and taking risks: Not like me (aggregate)"
-        description_short: '% of respondents replying "not like me" or "not at all like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, not like you, or not at all like you?" in the description "It is important to this person adventure and taking risks".'
+        description_short: '% of respondents replying "not like me" or "not at all like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person adventure and taking risks".'
         display:
           name: "Not like me: Important taking risks"
           <<: *common-display
@@ -1595,7 +1595,7 @@ tables:
           title_public: "Not like me: Important taking risks"
       very_much_like_me_risks:
         title: "It is important to this person adventure and taking risks: Very much like me"
-        description_short: '% of respondents replying "very much like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, not like you, or not at all like you?" in the description "It is important to this person adventure and taking risks".'
+        description_short: '% of respondents replying "very much like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person adventure and taking risks".'
         display:
           name: "Very much like me: Important taking risks"
           <<: *common-display
@@ -1603,7 +1603,7 @@ tables:
           title_public: "Very much like me: Important taking risks"
       like_me_risks:
         title: "It is important to this person adventure and taking risks: Like me"
-        description_short: '% of respondents replying "like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, not like you, or not at all like you?" in the description "It is important to this person adventure and taking risks".'
+        description_short: '% of respondents replying "like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person adventure and taking risks".'
         display:
           name: "Like me: Important taking risks"
           <<: *common-display
@@ -1611,7 +1611,7 @@ tables:
           title_public: "Like me: Important taking risks"
       somewhat_like_me_risks:
         title: "It is important to this person adventure and taking risks: Somewhat like me"
-        description_short: '% of respondents replying "somewhat like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, not like you, or not at all like you?" in the description "It is important to this person adventure and taking risks".'
+        description_short: '% of respondents replying "somewhat like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person adventure and taking risks".'
         display:
           name: "Somewhat like me: Important taking risks"
           <<: *common-display
@@ -1619,7 +1619,7 @@ tables:
           title_public: "Somewhat like me: Important taking risks"
       a_little_like_me_risks:
         title: "It is important to this person adventure and taking risks: A little like me"
-        description_short: '% of respondents replying "a little like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, not like you, or not at all like you?" in the description "It is important to this person adventure and taking risks".'
+        description_short: '% of respondents replying "a little like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person adventure and taking risks".'
         display:
           name: "A little like me: Important taking risks"
           <<: *common-display
@@ -1627,7 +1627,7 @@ tables:
           title_public: "A little like me: Important taking risks"
       not_like_me_risks:
         title: "It is important to this person adventure and taking risks: Not like me"
-        description_short: '% of respondents replying "not like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, not like you, or not at all like you?" in the description "It is important to this person adventure and taking risks".'
+        description_short: '% of respondents replying "not like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person adventure and taking risks".'
         display:
           name: "Not like me: Important taking risks"
           <<: *common-display
@@ -1635,7 +1635,7 @@ tables:
           title_public: "Not like me: Important taking risks"
       not_at_all_like_me_risks:
         title: "It is important to this person adventure and taking risks: Not at all like me"
-        description_short: '% of respondents replying "not at all like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, not like you, or not at all like you?" in the description "It is important to this person adventure and taking risks".'
+        description_short: '% of respondents replying "not at all like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person adventure and taking risks".'
         display:
           name: "Not at all like me: Important taking risks"
           <<: *common-display
@@ -1643,24 +1643,24 @@ tables:
           title_public: "Not at all like me: Important taking risks"
       dont_know_risks:
         title: "It is important to this person adventure and taking risks: Don't know"
-        description_short: '% of respondents replying "don‘t know" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, not like you, or not at all like you?" in the description "It is important to this person adventure and taking risks".'
+        description_short: '% of respondents replying "don‘t know" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person adventure and taking risks".'
         display:
           name: "Don't know: Important taking risks"
           <<: *common-display
         presentation:
           title_public: "Don't know: Important taking risks"
-      missing_risks:
-        title: "It is important to this person adventure and taking risks: Missing"
-        description_short: '% of answers classified as No answer, not applicable, not asked in survey o missing: other for the question "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, not like you, or not at all like you?" in the description "It is important to this person adventure and taking risks".'
+      no_answer_risks:
+        title: "It is important to this person adventure and taking risks: No answer"
+        description_short: '% of answers classified as "No answer" for the question "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person adventure and taking risks".'
         display:
-          name: "Missing: Important taking risks"
+          name: "No answer: Important taking risks"
           <<: *common-display
         presentation:
-          title_public: "Missing: Important taking risks"
+          title_public: "No answer: Important taking risks"
 
       like_me_agg_behave:
         title: "It is important to this person to always behave properly: Like me (aggregate)"
-        description_short: '% of respondents replying "very much like me", "like me" or "somewhat like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, not like you, or not at all like you?" in the description "It is important to this person to always behave properly".'
+        description_short: '% of respondents replying "very much like me", "like me" or "somewhat like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person to always behave properly".'
         display:
           name: "Like me: Important to always behave properly"
           <<: *common-display
@@ -1668,7 +1668,7 @@ tables:
           title_public: "Like me: Important to always behave properly"
       not_like_me_agg_behave:
         title: "It is important to this person to always behave properly: Not like me (aggregate)"
-        description_short: '% of respondents replying "not like me" or "not at all like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, not like you, or not at all like you?" in the description "It is important to this person to always behave properly".'
+        description_short: '% of respondents replying "not like me" or "not at all like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person to always behave properly".'
         display:
           name: "Not like me: Important to always behave properly"
           <<: *common-display
@@ -1676,7 +1676,7 @@ tables:
           title_public: "Not like me: Important to always behave properly"
       very_much_like_me_behave:
         title: "It is important to this person to always behave properly: Very much like me"
-        description_short: '% of respondents replying "very much like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, not like you, or not at all like you?" in the description "It is important to this person to always behave properly".'
+        description_short: '% of respondents replying "very much like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person to always behave properly".'
         display:
           name: "Very much like me: Important to always behave properly"
           <<: *common-display
@@ -1684,7 +1684,7 @@ tables:
           title_public: "Very much like me: Important to always behave properly"
       like_me_behave:
         title: "It is important to this person to always behave properly: Like me"
-        description_short: '% of respondents replying "like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, not like you, or not at all like you?" in the description "It is important to this person to always behave properly".'
+        description_short: '% of respondents replying "like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person to always behave properly".'
         display:
           name: "Like me: Important to always behave properly"
           <<: *common-display
@@ -1692,7 +1692,7 @@ tables:
           title_public: "Like me: Important to always behave properly"
       somewhat_like_me_behave:
         title: "It is important to this person to always behave properly: Somewhat like me"
-        description_short: '% of respondents replying "somewhat like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, not like you, or not at all like you?" in the description "It is important to this person to always behave properly".'
+        description_short: '% of respondents replying "somewhat like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person to always behave properly".'
         display:
           name: "Somewhat like me: Important to always behave properly"
           <<: *common-display
@@ -1700,7 +1700,7 @@ tables:
           title_public: "Somewhat like me: Important to always behave properly"
       a_little_like_me_behave:
         title: "It is important to this person to always behave properly: A little like me"
-        description_short: '% of respondents replying "a little like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, not like you, or not at all like you?" in the description "It is important to this person to always behave properly".'
+        description_short: '% of respondents replying "a little like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person to always behave properly".'
         display:
           name: "A little like me: Important to always behave properly"
           <<: *common-display
@@ -1708,7 +1708,7 @@ tables:
           title_public: "A little like me: Important to always behave properly"
       not_like_me_behave:
         title: "It is important to this person to always behave properly: Not like me"
-        description_short: '% of respondents replying "not like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, not like you, or not at all like you?" in the description "It is important to this person to always behave properly".'
+        description_short: '% of respondents replying "not like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person to always behave properly".'
         display:
           name: "Not like me: Important to always behave properly"
           <<: *common-display
@@ -1716,7 +1716,7 @@ tables:
           title_public: "Not like me: Important to always behave properly"
       not_at_all_like_me_behave:
         title: "It is important to this person to always behave properly: Not at all like me"
-        description_short: '% of respondents replying "not at all like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, not like you, or not at all like you?" in the description "It is important to this person to always behave properly".'
+        description_short: '% of respondents replying "not at all like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person to always behave properly".'
         display:
           name: "Not at all like me: Important to always behave properly"
           <<: *common-display
@@ -1724,24 +1724,24 @@ tables:
           title_public: "Not at all like me: Important to always behave properly"
       dont_know_behave:
         title: "It is important to this person to always behave properly: Don't know"
-        description_short: '% of respondents replying "don‘t know" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, not like you, or not at all like you?" in the description "It is important to this person to always behave properly".'
+        description_short: '% of respondents replying "don‘t know" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person to always behave properly".'
         display:
           name: "Don't know: Important to always behave properly"
           <<: *common-display
         presentation:
           title_public: "Don't know: Important to always behave properly"
-      missing_behave:
-        title: "It is important to this person to always behave properly: Missing"
-        description_short: '% of answers classified as No answer, not applicable, not asked in survey o missing: other for the question "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, not like you, or not at all like you?" in the description "It is important to this person to always behave properly".'
+      no_answer_behave:
+        title: "It is important to this person to always behave properly: No answer"
+        description_short: '% of answers classified as "No answer" for the question "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person to always behave properly".'
         display:
-          name: "Missing: Important to always behave properly"
+          name: "No answer: Important to always behave properly"
           <<: *common-display
         presentation:
-          title_public: "Missing: Important to always behave properly"
+          title_public: "No answer: Important to always behave properly"
 
       like_me_agg_respect_environment:
         title: "It is important to this person looking after the environment: Like me (aggregate)"
-        description_short: '% of respondents replying "very much like me", "like me" or "somewhat like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, not like you, or not at all like you?" in the description "It is important to this person looking after the environment".'
+        description_short: '% of respondents replying "very much like me", "like me" or "somewhat like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person looking after the environment".'
         display:
           name: "Like me: Important looking after the environment"
           <<: *common-display
@@ -1749,7 +1749,7 @@ tables:
           title_public: "Like me: Important looking after the environment"
       not_like_me_agg_respect_environment:
         title: "It is important to this person looking after the environment: Not like me (aggregate)"
-        description_short: '% of respondents replying "not like me" or "not at all like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, not like you, or not at all like you?" in the description "It is important to this person looking after the environment".'
+        description_short: '% of respondents replying "not like me" or "not at all like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person looking after the environment".'
         display:
           name: "Not like me: Important looking after the environment"
           <<: *common-display
@@ -1757,7 +1757,7 @@ tables:
           title_public: "Not like me: Important looking after the environment"
       very_much_like_me_respect_environment:
         title: "It is important to this person looking after the environment: Very much like me"
-        description_short: '% of respondents replying "very much like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, not like you, or not at all like you?" in the description "It is important to this person looking after the environment".'
+        description_short: '% of respondents replying "very much like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person looking after the environment".'
         display:
           name: "Very much like me: Important looking after the environment"
           <<: *common-display
@@ -1765,7 +1765,7 @@ tables:
           title_public: "Very much like me: Important looking after the environment"
       like_me_respect_environment:
         title: "It is important to this person looking after the environment: Like me"
-        description_short: '% of respondents replying "like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, not like you, or not at all like you?" in the description "It is important to this person looking after the environment".'
+        description_short: '% of respondents replying "like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person looking after the environment".'
         display:
           name: "Like me: Important looking after the environment"
           <<: *common-display
@@ -1773,7 +1773,7 @@ tables:
           title_public: "Like me: Important looking after the environment"
       somewhat_like_me_respect_environment:
         title: "It is important to this person looking after the environment: Somewhat like me"
-        description_short: '% of respondents replying "somewhat like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, not like you, or not at all like you?" in the description "It is important to this person looking after the environment".'
+        description_short: '% of respondents replying "somewhat like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person looking after the environment".'
         display:
           name: "Somewhat like me: Important looking after the environment"
           <<: *common-display
@@ -1781,7 +1781,7 @@ tables:
           title_public: "Somewhat like me: Important looking after the environment"
       a_little_like_me_respect_environment:
         title: "It is important to this person looking after the environment: A little like me"
-        description_short: '% of respondents replying "a little like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, not like you, or not at all like you?" in the description "It is important to this person looking after the environment".'
+        description_short: '% of respondents replying "a little like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person looking after the environment".'
         display:
           name: "A little like me: Important looking after the environment"
           <<: *common-display
@@ -1789,7 +1789,7 @@ tables:
           title_public: "A little like me: Important looking after the environment"
       not_like_me_respect_environment:
         title: "It is important to this person looking after the environment: Not like me"
-        description_short: '% of respondents replying "not like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, not like you, or not at all like you?" in the description "It is important to this person looking after the environment".'
+        description_short: '% of respondents replying "not like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person looking after the environment".'
         display:
           name: "Not like me: Important looking after the environment"
           <<: *common-display
@@ -1797,7 +1797,7 @@ tables:
           title_public: "Not like me: Important looking after the environment"
       not_at_all_like_me_respect_environment:
         title: "It is important to this person looking after the environment: Not at all like me"
-        description_short: '% of respondents replying "not at all like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, not like you, or not at all like you?" in the description "It is important to this person looking after the environment".'
+        description_short: '% of respondents replying "not at all like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person looking after the environment".'
         display:
           name: "Not at all like me: Important looking after the environment"
           <<: *common-display
@@ -1805,24 +1805,24 @@ tables:
           title_public: "Not at all like me: Important looking after the environment"
       dont_know_respect_environment:
         title: "It is important to this person looking after the environment: Don't know"
-        description_short: '% of respondents replying "don‘t know" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, not like you, or not at all like you?" in the description "It is important to this person looking after the environment".'
+        description_short: '% of respondents replying "don‘t know" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person looking after the environment".'
         display:
           name: "Don't know: Important looking after the environment"
           <<: *common-display
         presentation:
           title_public: "Don't know: Important looking after the environment"
-      missing_respect_environment:
-        title: "It is important to this person looking after the environment: Missing"
-        description_short: '% of answers classified as No answer, not applicable, not asked in survey o missing: other for the question "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, not like you, or not at all like you?" in the description "It is important to this person looking after the environment".'
+      no_answer_respect_environment:
+        title: "It is important to this person looking after the environment: No answer"
+        description_short: '% of answers classified as "No answer" for the question "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person looking after the environment".'
         display:
-          name: "Missing: Important looking after the environment"
+          name: "No answer: Important looking after the environment"
           <<: *common-display
         presentation:
-          title_public: "Missing: Important looking after the environment"
+          title_public: "No answer: Important looking after the environment"
 
       like_me_agg_tradition:
         title: "It is important to this person tradition: Like me (aggregate)"
-        description_short: '% of respondents replying "very much like me", "like me" or "somewhat like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, not like you, or not at all like you?" in the description "It is important to this person tradition".'
+        description_short: '% of respondents replying "very much like me", "like me" or "somewhat like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person tradition".'
         display:
           name: "Like me: Important tradition"
           <<: *common-display
@@ -1830,7 +1830,7 @@ tables:
           title_public: "Like me: Important tradition"
       not_like_me_agg_tradition:
         title: "It is important to this person tradition: Not like me (aggregate)"
-        description_short: '% of respondents replying "not like me" or "not at all like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, not like you, or not at all like you?" in the description "It is important to this person tradition".'
+        description_short: '% of respondents replying "not like me" or "not at all like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person tradition".'
         display:
           name: "Not like me: Important tradition"
           <<: *common-display
@@ -1838,7 +1838,7 @@ tables:
           title_public: "Not like me: Important tradition"
       very_much_like_me_tradition:
         title: "It is important to this person tradition: Very much like me"
-        description_short: '% of respondents replying "very much like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, not like you, or not at all like you?" in the description "It is important to this person tradition".'
+        description_short: '% of respondents replying "very much like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person tradition".'
         display:
           name: "Very much like me: Important tradition"
           <<: *common-display
@@ -1846,7 +1846,7 @@ tables:
           title_public: "Very much like me: Important tradition"
       like_me_tradition:
         title: "It is important to this person tradition: Like me"
-        description_short: '% of respondents replying "like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, not like you, or not at all like you?" in the description "It is important to this person tradition".'
+        description_short: '% of respondents replying "like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person tradition".'
         display:
           name: "Like me: Important tradition"
           <<: *common-display
@@ -1854,7 +1854,7 @@ tables:
           title_public: "Like me: Important tradition"
       somewhat_like_me_tradition:
         title: "It is important to this person tradition: Somewhat like me"
-        description_short: '% of respondents replying "somewhat like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, not like you, or not at all like you?" in the description "It is important to this person tradition".'
+        description_short: '% of respondents replying "somewhat like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person tradition".'
         display:
           name: "Somewhat like me: Important tradition"
           <<: *common-display
@@ -1862,7 +1862,7 @@ tables:
           title_public: "Somewhat like me: Important tradition"
       a_little_like_me_tradition:
         title: "It is important to this person tradition: A little like me"
-        description_short: '% of respondents replying "a little like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, not like you, or not at all like you?" in the description "It is important to this person tradition".'
+        description_short: '% of respondents replying "a little like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person tradition".'
         display:
           name: "A little like me: Important tradition"
           <<: *common-display
@@ -1870,7 +1870,7 @@ tables:
           title_public: "A little like me: Important tradition"
       not_like_me_tradition:
         title: "It is important to this person tradition: Not like me"
-        description_short: '% of respondents replying "not like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, not like you, or not at all like you?" in the description "It is important to this person tradition".'
+        description_short: '% of respondents replying "not like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person tradition".'
         display:
           name: "Not like me: Important tradition"
           <<: *common-display
@@ -1878,7 +1878,7 @@ tables:
           title_public: "Not like me: Important tradition"
       not_at_all_like_me_tradition:
         title: "It is important to this person tradition: Not at all like me"
-        description_short: '% of respondents replying "not at all like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, not like you, or not at all like you?" in the description "It is important to this person tradition".'
+        description_short: '% of respondents replying "not at all like me" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person tradition".'
         display:
           name: "Not at all like me: Important tradition"
           <<: *common-display
@@ -1886,20 +1886,20 @@ tables:
           title_public: "Not at all like me: Important tradition"
       dont_know_tradition:
         title: "It is important to this person tradition: Don't know"
-        description_short: '% of respondents replying "don‘t know" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, not like you, or not at all like you?" in the description "It is important to this person tradition".'
+        description_short: '% of respondents replying "don‘t know" when asked "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person tradition".'
         display:
           name: "Don't know: Important tradition"
           <<: *common-display
         presentation:
           title_public: "Don't know: Important tradition"
-      missing_tradition:
-        title: "It is important to this person tradition: Missing"
-        description_short: '% of answers classified as No answer, not applicable, not asked in survey o missing: other for the question "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, not like you, or not at all like you?" in the description "It is important to this person tradition".'
+      no_answer_tradition:
+        title: "It is important to this person tradition: No answer"
+        description_short: '% of answers classified as "No answer" for the question "Now I will briefly describe some people. Using this card, would you please indicate for each description whether that person is very much like you, like you, somewhat like you, a little like you, not like you, or not at all like you?" in the description "It is important to this person tradition".'
         display:
-          name: "Missing: Important tradition"
+          name: "No answer: Important tradition"
           <<: *common-display
         presentation:
-          title_public: "Missing: Important tradition"
+          title_public: "No answer: Important tradition"
 
       leisure_lei_vs_wk:
         title: "Leisure vs work: Leisure (aggregate)"
@@ -1965,14 +1965,14 @@ tables:
           <<: *common-display
         presentation:
           title_public: "Leisure vs work: Don't know"
-      missing_lei_vs_wk:
-        title: "Leisure vs work: Missing"
-        description_short: '% of answers classified as No answer, not applicable, not asked in survey o missing: other for the question "Which point on this scale most clearly describes how much weight you place on work (including housework and schoolwork), as compared with leisure or recreation? A It´s leisure that makes life worth living, not work B Work is what makes life worth living, not leisure", where 1 is description A and 5 is description B.'
+      no_answer_lei_vs_wk:
+        title: "Leisure vs work: No answer"
+        description_short: '% of answers classified as "No answer" for the question "Which point on this scale most clearly describes how much weight you place on work (including housework and schoolwork), as compared with leisure or recreation? A It´s leisure that makes life worth living, not work B Work is what makes life worth living, not leisure", where 1 is description A and 5 is description B.'
         display:
-          name: "Leisure vs work: Missing"
+          name: "Leisure vs work: No answer"
           <<: *common-display
         presentation:
-          title_public: "Leisure vs work: Missing"
+          title_public: "Leisure vs work: No answer"
       avg_score_lei_vs_wk:
         title: "Leisure vs work: Average score"
         description_short: 'Average score in a scale from 1 to 5 when asked "Which point on this scale most clearly describes how much weight you place on work (including housework and schoolwork), as compared with leisure or recreation? A It´s leisure that makes life worth living, not work B Work is what makes life worth living, not leisure", where 1 is description A and 5 is description B.'
@@ -2048,14 +2048,14 @@ tables:
           <<: *common-display
         presentation:
           title_public: "Work is a duty towards society: Don't know"
-      missing_work_is_a_duty:
-        title: "Work is a duty towards society: Missing"
-        description_short: '% of answers classified as No answer, not applicable, not asked in survey o missing: other for the question "Do you agree or disagree with the following statements? Work is a duty towards society".'
+      no_answer_work_is_a_duty:
+        title: "Work is a duty towards society: No answer"
+        description_short: '% of answers classified as "No answer" for the question "Do you agree or disagree with the following statements? Work is a duty towards society".'
         display:
-          name: "Work is a duty towards society: Missing"
+          name: "Work is a duty towards society: No answer"
           <<: *common-display
         presentation:
-          title_public: "Work is a duty towards society: Missing"
+          title_public: "Work is a duty towards society: No answer"
 
       agree_agg_work_should_come_first:
         title: "Work should come first: Agree (aggregate)"
@@ -2121,14 +2121,14 @@ tables:
           <<: *common-display
         presentation:
           title_public: "Work should come first: Don't know"
-      missing_work_should_come_first:
-        title: "Work should come first: Missing"
-        description_short: '% of answers classified as No answer, not applicable, not asked in survey o missing: other for the question "Do you agree or disagree with the following statements? Work should always come first, even if it means less spare time".'
+      no_answer_work_should_come_first:
+        title: "Work should come first: No answer"
+        description_short: '% of answers classified as "No answer" for the question "Do you agree or disagree with the following statements? Work should always come first, even if it means less spare time".'
         display:
-          name: "Work should come first: Missing"
+          name: "Work should come first: No answer"
           <<: *common-display
         presentation:
-          title_public: "Work should come first: Missing"
+          title_public: "Work should come first: No answer"
 
       poverty_most_serious:
         title: "Most serious problem: Poverty"
@@ -2178,14 +2178,14 @@ tables:
           <<: *common-display
         presentation:
           title_public: "Most serious problem: Don't know"
-      missing_most_serious:
-        title: "Most serious problem: Missing"
-        description_short: '% of answers classified as No answer, not applicable, not asked in survey o missing: other for the question "I’m going to read out some problems. Please indicate which of the following problems you consider the most serious one for the world as a whole?" The problems listed were: "People living in poverty and need", "Discrimination against girls and women", "Poor sanitation and infectious diseases", "Inadequate education", and "Environmental pollution"'
+      no_answer_most_serious:
+        title: "Most serious problem: No answer"
+        description_short: '% of answers classified as "No answer" for the question "I’m going to read out some problems. Please indicate which of the following problems you consider the most serious one for the world as a whole?" The problems listed were: "People living in poverty and need", "Discrimination against girls and women", "Poor sanitation and infectious diseases", "Inadequate education", and "Environmental pollution"'
         display:
-          name: "Most serious problem: Missing"
+          name: "Most serious problem: No answer"
           <<: *common-display
         presentation:
-          title_public: "Most serious problem: Missing"
+          title_public: "Most serious problem: No answer"
 
       never_just_agg_claiming_benefits:
         title: "Claiming government benefits to which you are not entitled: Never justifiable (aggregate)"
@@ -2235,14 +2235,14 @@ tables:
           <<: *common-display
         presentation:
           title_public: "Claiming benefits: Don't know"
-      missing_claiming_benefits:
-        title: "Claiming government benefits to which you are not entitled: Missing"
-        description_short: '% of answers classified as No answer, not applicable, not asked in survey o missing: other for the question "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Claiming government benefits to which you are not entitled". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
+      no_answer_claiming_benefits:
+        title: "Claiming government benefits to which you are not entitled: No answer"
+        description_short: '% of answers classified as "No answer" for the question "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Claiming government benefits to which you are not entitled". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
         display:
-          name: "Claiming benefits: Missing"
+          name: "Claiming benefits: No answer"
           <<: *common-display
         presentation:
-          title_public: "Claiming benefits: Missing"
+          title_public: "Claiming benefits: No answer"
       avg_score_claiming_benefits:
         title: "Claiming government benefits to which you are not entitled: Average score"
         description_short: 'Average score in a scale from 1 to 10 when asked "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Claiming government benefits to which you are not entitled". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
@@ -2302,14 +2302,14 @@ tables:
           <<: *common-display
         presentation:
           title_public: "Stealing property: Don't know"
-      missing_stealing_property:
-        title: "Stealing property: Missing"
-        description_short: '% of answers classified as No answer, not applicable, not asked in survey o missing: other for the question "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Stealing property". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
+      no_answer_stealing_property:
+        title: "Stealing property: No answer"
+        description_short: '% of answers classified as "No answer" for the question "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Stealing property". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
         display:
-          name: "Stealing property: Missing"
+          name: "Stealing property: No answer"
           <<: *common-display
         presentation:
-          title_public: "Stealing property: Missing"
+          title_public: "Stealing property: No answer"
       avg_score_stealing_property:
         title: "Stealing property: Average score"
         description_short: 'Average score in a scale from 1 to 10 when asked "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Stealing property". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
@@ -2369,14 +2369,14 @@ tables:
           <<: *common-display
         presentation:
           title_public: "Parents beating children: Don't know"
-      missing_parents_beating_children:
-        title: "Parents beating children: Missing"
-        description_short: '% of answers classified as No answer, not applicable, not asked in survey o missing: other for the question "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Parents beating their children". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
+      no_answer_parents_beating_children:
+        title: "Parents beating children: No answer"
+        description_short: '% of answers classified as "No answer" for the question "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Parents beating their children". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
         display:
-          name: "Parents beating children: Missing"
+          name: "Parents beating children: No answer"
           <<: *common-display
         presentation:
-          title_public: "Parents beating children: Missing"
+          title_public: "Parents beating children: No answer"
       avg_score_parents_beating_children:
         title: "Parents beating children: Average score"
         description_short: 'Average score in a scale from 1 to 10 when asked "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Parents beating their children". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
@@ -2436,14 +2436,14 @@ tables:
           <<: *common-display
         presentation:
           title_public: "Violence against other people: Don't know"
-      missing_violence_against_other_people:
-        title: "Violence against other people: Missing"
-        description_short: '% of answers classified as No answer, not applicable, not asked in survey o missing: other for the question "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Violence against other people". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
+      no_answer_violence_against_other_people:
+        title: "Violence against other people: No answer"
+        description_short: '% of answers classified as "No answer" for the question "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Violence against other people". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
         display:
-          name: "Violence against other people: Missing"
+          name: "Violence against other people: No answer"
           <<: *common-display
         presentation:
-          title_public: "Violence against other people: Missing"
+          title_public: "Violence against other people: No answer"
       avg_score_violence_against_other_people:
         title: "Violence against other people: Average score"
         description_short: 'Average score in a scale from 1 to 10 when asked "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Violence against other people". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
@@ -2503,14 +2503,14 @@ tables:
           <<: *common-display
         presentation:
           title_public: "Avoiding a fare on public transport: Don't know"
-      missing_avoiding_fare_on_public_transport:
-        title: "Avoiding a fare on public transport: Missing"
-        description_short: '% of answers classified as No answer, not applicable, not asked in survey o missing: other for the question "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Avoiding a fare on public transport". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
+      no_answer_avoiding_fare_on_public_transport:
+        title: "Avoiding a fare on public transport: No answer"
+        description_short: '% of answers classified as "No answer" for the question "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Avoiding a fare on public transport". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
         display:
-          name: "Avoiding a fare on public transport: Missing"
+          name: "Avoiding a fare on public transport: No answer"
           <<: *common-display
         presentation:
-          title_public: "Avoiding a fare on public transport: Missing"
+          title_public: "Avoiding a fare on public transport: No answer"
       avg_score_avoiding_fare_on_public_transport:
         title: "Avoiding a fare on public transport: Average score"
         description_short: 'Average score in a scale from 1 to 10 when asked "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Avoiding a fare on public transport". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
@@ -2570,14 +2570,14 @@ tables:
           <<: *common-display
         presentation:
           title_public: "Cheating on taxes: Don't know"
-      missing_cheating_on_taxes:
-        title: "Cheating on taxes: Missing"
-        description_short: '% of answers classified as No answer, not applicable, not asked in survey o missing: other for the question "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Cheating on taxes". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
+      no_answer_cheating_on_taxes:
+        title: "Cheating on taxes: No answer"
+        description_short: '% of answers classified as "No answer" for the question "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Cheating on taxes". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
         display:
-          name: "Cheating on taxes: Missing"
+          name: "Cheating on taxes: No answer"
           <<: *common-display
         presentation:
-          title_public: "Cheating on taxes: Missing"
+          title_public: "Cheating on taxes: No answer"
       avg_score_cheating_on_taxes:
         title: "Cheating on taxes: Average score"
         description_short: 'Average score in a scale from 1 to 10 when asked "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Cheating on taxes". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
@@ -2637,14 +2637,14 @@ tables:
           <<: *common-display
         presentation:
           title_public: "Accepting a bribe: Don't know"
-      missing_accepting_a_bribe:
-        title: "Accepting a bribe in the course of their duties: Missing"
-        description_short: '% of answers classified as No answer, not applicable, not asked in survey o missing: other for the question "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Accepting a bribe in the course of their duties". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
+      no_answer_accepting_a_bribe:
+        title: "Accepting a bribe in the course of their duties: No answer"
+        description_short: '% of answers classified as "No answer" for the question "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Accepting a bribe in the course of their duties". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
         display:
-          name: "Accepting a bribe: Missing"
+          name: "Accepting a bribe: No answer"
           <<: *common-display
         presentation:
-          title_public: "Accepting a bribe: Missing"
+          title_public: "Accepting a bribe: No answer"
       avg_score_accepting_a_bribe:
         title: "Accepting a bribe in the course of their duties: Average score"
         description_short: 'Average score in a scale from 1 to 10 when asked "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Accepting a bribe in the course of their duties". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
@@ -2704,14 +2704,14 @@ tables:
           <<: *common-display
         presentation:
           title_public: "Homosexuality: Don't know"
-      missing_homosexuality:
-        title: "Homosexuality: Missing"
-        description_short: '% of answers classified as No answer, not applicable, not asked in survey o missing: other for the question "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Homosexuality". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
+      no_answer_homosexuality:
+        title: "Homosexuality: No answer"
+        description_short: '% of answers classified as "No answer" for the question "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Homosexuality". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
         display:
-          name: "Homosexuality: Missing"
+          name: "Homosexuality: No answer"
           <<: *common-display
         presentation:
-          title_public: "Homosexuality: Missing"
+          title_public: "Homosexuality: No answer"
       avg_score_homosexuality:
         title: "Homosexuality: Average score"
         description_short: 'Average score in a scale from 1 to 10 when asked "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Homosexuality". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
@@ -2771,14 +2771,14 @@ tables:
           <<: *common-display
         presentation:
           title_public: "Prostitution: Don't know"
-      missing_prostitution:
-        title: "Prostitution: Missing"
-        description_short: '% of answers classified as No answer, not applicable, not asked in survey o missing: other for the question "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Prostitution". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
+      no_answer_prostitution:
+        title: "Prostitution: No answer"
+        description_short: '% of answers classified as "No answer" for the question "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Prostitution". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
         display:
-          name: "Prostitution: Missing"
+          name: "Prostitution: No answer"
           <<: *common-display
         presentation:
-          title_public: "Prostitution: Missing"
+          title_public: "Prostitution: No answer"
       avg_score_prostitution:
         title: "Prostitution: Average score"
         description_short: 'Average score in a scale from 1 to 10 when asked "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Prostitution". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
@@ -2838,14 +2838,14 @@ tables:
           <<: *common-display
         presentation:
           title_public: "Abortion: Don't know"
-      missing_abortion:
-        title: "Abortion: Missing"
-        description_short: '% of answers classified as No answer, not applicable, not asked in survey o missing: other for the question "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Abortion". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
+      no_answer_abortion:
+        title: "Abortion: No answer"
+        description_short: '% of answers classified as "No answer" for the question "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Abortion". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
         display:
-          name: "Abortion: Missing"
+          name: "Abortion: No answer"
           <<: *common-display
         presentation:
-          title_public: "Abortion: Missing"
+          title_public: "Abortion: No answer"
       avg_score_abortion:
         title: "Abortion: Average score"
         description_short: 'Average score in a scale from 1 to 10 when asked "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Abortion". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
@@ -2905,14 +2905,14 @@ tables:
           <<: *common-display
         presentation:
           title_public: "Divorce: Don't know"
-      missing_divorce:
-        title: "Divorce: Missing"
-        description_short: '% of answers classified as No answer, not applicable, not asked in survey o missing: other for the question "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Divorce". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
+      no_answer_divorce:
+        title: "Divorce: No answer"
+        description_short: '% of answers classified as "No answer" for the question "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Divorce". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
         display:
-          name: "Divorce: Missing"
+          name: "Divorce: No answer"
           <<: *common-display
         presentation:
-          title_public: "Divorce: Missing"
+          title_public: "Divorce: No answer"
       avg_score_divorce:
         title: "Divorce: Average score"
         description_short: 'Average score in a scale from 1 to 10 when asked "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Divorce". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
@@ -2972,14 +2972,14 @@ tables:
           <<: *common-display
         presentation:
           title_public: "Euthanasia: Don't know"
-      missing_euthanasia:
-        title: "Euthanasia: Missing"
-        description_short: '% of answers classified as No answer, not applicable, not asked in survey o missing: other for the question "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Euthanasia". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
+      no_answer_euthanasia:
+        title: "Euthanasia: No answer"
+        description_short: '% of answers classified as "No answer" for the question "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Euthanasia". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
         display:
-          name: "Euthanasia: Missing"
+          name: "Euthanasia: No answer"
           <<: *common-display
         presentation:
-          title_public: "Euthanasia: Missing"
+          title_public: "Euthanasia: No answer"
       avg_score_euthanasia:
         title: "Euthanasia: Average score"
         description_short: 'Average score in a scale from 1 to 10 when asked "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Euthanasia". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
@@ -3039,14 +3039,14 @@ tables:
           <<: *common-display
         presentation:
           title_public: "Suicide: Don't know"
-      missing_suicide:
-        title: "Suicide: Missing"
-        description_short: '% of answers classified as No answer, not applicable, not asked in survey o missing: other for the question "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Suicide". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
+      no_answer_suicide:
+        title: "Suicide: No answer"
+        description_short: '% of answers classified as "No answer" for the question "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Suicide". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
         display:
-          name: "Suicide: Missing"
+          name: "Suicide: No answer"
           <<: *common-display
         presentation:
-          title_public: "Suicide: Missing"
+          title_public: "Suicide: No answer"
       avg_score_suicide:
         title: "Suicide: Average score"
         description_short: 'Average score in a scale from 1 to 10 when asked "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Suicide". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
@@ -3106,14 +3106,14 @@ tables:
           <<: *common-display
         presentation:
           title_public: "Having casual sex: Don't know"
-      missing_having_casual_sex:
-        title: "Having casual sex: Missing"
-        description_short: '% of answers classified as No answer, not applicable, not asked in survey o missing: other for the question "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Having casual sex". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
+      no_answer_having_casual_sex:
+        title: "Having casual sex: No answer"
+        description_short: '% of answers classified as "No answer" for the question "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Having casual sex". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
         display:
-          name: "Having casual sex: Missing"
+          name: "Having casual sex: No answer"
           <<: *common-display
         presentation:
-          title_public: "Having casual sex: Missing"
+          title_public: "Having casual sex: No answer"
       avg_score_having_casual_sex:
         title: "Having casual sex: Average score"
         description_short: 'Average score in a scale from 1 to 10 when asked "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Having casual sex". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
@@ -3173,14 +3173,14 @@ tables:
           <<: *common-display
         presentation:
           title_public: "Sex before marriage: Don't know"
-      missing_sex_before_marriage:
-        title: "Sex before marriage: Missing"
-        description_short: '% of answers classified as No answer, not applicable, not asked in survey o missing: other for the question "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Sex before marriage". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
+      no_answer_sex_before_marriage:
+        title: "Sex before marriage: No answer"
+        description_short: '% of answers classified as "No answer" for the question "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Sex before marriage". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
         display:
-          name: "Sex before marriage: Missing"
+          name: "Sex before marriage: No answer"
           <<: *common-display
         presentation:
-          title_public: "Sex before marriage: Missing"
+          title_public: "Sex before marriage: No answer"
       avg_score_sex_before_marriage:
         title: "Sex before marriage: Average score"
         description_short: 'Average score in a scale from 1 to 10 when asked "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Sex before marriage". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
@@ -3240,14 +3240,14 @@ tables:
           <<: *common-display
         presentation:
           title_public: "Invitro fertilization: Don't know"
-      missing_invitro_fertilization:
-        title: "Invitro fertilization: Missing"
-        description_short: '% of answers classified as No answer, not applicable, not asked in survey o missing: other for the question "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Invitro fertilization". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
+      no_answer_invitro_fertilization:
+        title: "Invitro fertilization: No answer"
+        description_short: '% of answers classified as "No answer" for the question "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Invitro fertilization". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
         display:
-          name: "Invitro fertilization: Missing"
+          name: "Invitro fertilization: No answer"
           <<: *common-display
         presentation:
-          title_public: "Invitro fertilization: Missing"
+          title_public: "Invitro fertilization: No answer"
       avg_score_invitro_fertilization:
         title: "Invitro fertilization: Average score"
         description_short: 'Average score in a scale from 1 to 10 when asked "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Invitro fertilization". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
@@ -3307,14 +3307,14 @@ tables:
           <<: *common-display
         presentation:
           title_public: "Death penalty: Don't know"
-      missing_death_penalty:
-        title: "Death penalty: Missing"
-        description_short: '% of answers classified as No answer, not applicable, not asked in survey o missing: other for the question "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Death penalty". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
+      no_answer_death_penalty:
+        title: "Death penalty: No answer"
+        description_short: '% of answers classified as "No answer" for the question "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Death penalty". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
         display:
-          name: "Death penalty: Missing"
+          name: "Death penalty: No answer"
           <<: *common-display
         presentation:
-          title_public: "Death penalty: Missing"
+          title_public: "Death penalty: No answer"
       avg_score_death_penalty:
         title: "Death penalty: Average score"
         description_short: 'Average score in a scale from 1 to 10 when asked "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Death penalty". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
@@ -3374,14 +3374,14 @@ tables:
           <<: *common-display
         presentation:
           title_public: "Man beating wife: Don't know"
-      missing_man_beating_wife:
-        title: "Man beating wife: Missing"
-        description_short: '% of answers classified as No answer, not applicable, not asked in survey o missing: other for the question "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Man beating wife". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
+      no_answer_man_beating_wife:
+        title: "Man beating wife: No answer"
+        description_short: '% of answers classified as "No answer" for the question "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Man beating wife". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
         display:
-          name: "Man beating wife: Missing"
+          name: "Man beating wife: No answer"
           <<: *common-display
         presentation:
-          title_public: "Man beating wife: Missing"
+          title_public: "Man beating wife: No answer"
       avg_score_man_beating_wife:
         title: "Man beating wife: Average score"
         description_short: 'Average score in a scale from 1 to 10 when asked "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Man beating wife". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
@@ -3441,14 +3441,14 @@ tables:
           <<: *common-display
         presentation:
           title_public: "Political violence: Don't know"
-      missing_political_violence:
-        title: "Political violence: Missing"
-        description_short: '% of answers classified as No answer, not applicable, not asked in survey o missing: other for the question "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Political violence". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
+      no_answer_political_violence:
+        title: "Political violence: No answer"
+        description_short: '% of answers classified as "No answer" for the question "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Political violence". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
         display:
-          name: "Political violence: Missing"
+          name: "Political violence: No answer"
           <<: *common-display
         presentation:
-          title_public: "Political violence: Missing"
+          title_public: "Political violence: No answer"
       avg_score_political_violence:
         title: "Political violence: Average score"
         description_short: 'Average score in a scale from 1 to 10 when asked "Please tell me for each of the following statements whether you think it can always be justified, never be justified, or something in between, using this card", when the statement was "Political violence". In the scale, 1 means "never justifiable" and 10 means "always justifiable".'
@@ -3516,14 +3516,14 @@ tables:
           <<: *common-display
         presentation:
           title_public: "Losing my job or not finding a job: Don't know"
-      missing_losing_job:
-        title: "Losing my job or not finding a job: Missing"
-        description_short: '% of answers classified as No answer, not applicable, not asked in survey o missing: other for the question "To what degree are you worried about the following situations?", when the situation was "Losing my job or not finding a job".'
+      no_answer_losing_job:
+        title: "Losing my job or not finding a job: No answer"
+        description_short: '% of answers classified as "No answer" for the question "To what degree are you worried about the following situations?", when the situation was "Losing my job or not finding a job".'
         display:
-          name: "Losing my job or not finding a job: Missing"
+          name: "Losing my job or not finding a job: No answer"
           <<: *common-display
         presentation:
-          title_public: "Losing my job or not finding a job: Missing"
+          title_public: "Losing my job or not finding a job: No answer"
       avg_score_losing_job:
         title: "Losing my job or not finding a job: Average score"
         description_short: 'Average score in a scale from 1 to 4 when asked "To what degree are you worried about the following situations?", when the situation was "Losing my job or not finding a job". In the scale, 1 means "very much" and 4 means "not at all".'
@@ -3591,14 +3591,14 @@ tables:
           <<: *common-display
         presentation:
           title_public: "Not being able to give one's children a good education: Don't know"
-      missing_not_being_able_to_provide_good_education:
-        title: "Not being able to give one's children a good education: Missing"
-        description_short: '% of answers classified as No answer, not applicable, not asked in survey o missing: other for the question "To what degree are you worried about the following situations?", when the situation was "Not being able to give one''s children a good education".'
+      no_answer_not_being_able_to_provide_good_education:
+        title: "Not being able to give one's children a good education: No answer"
+        description_short: '% of answers classified as "No answer" for the question "To what degree are you worried about the following situations?", when the situation was "Not being able to give one''s children a good education".'
         display:
-          name: "Not being able to give one's children a good education: Missing"
+          name: "Not being able to give one's children a good education: No answer"
           <<: *common-display
         presentation:
-          title_public: "Not being able to give one's children a good education: Missing"
+          title_public: "Not being able to give one's children a good education: No answer"
       avg_score_not_being_able_to_provide_good_education:
         title: "Not being able to give one's children a good education: Average score"
         description_short: 'Average score in a scale from 1 to 10 when asked "To what degree are you worried about the following situations?", when the situation was "Not being able to give one''s children a good education". In the scale, 1 means "very much" and 4 means "not at all".'
@@ -3666,14 +3666,14 @@ tables:
           <<: *common-display
         presentation:
           title_public: "A war involving my country: Don't know"
-      missing_war:
-        title: "A war involving my country: Missing"
-        description_short: '% of answers classified as No answer, not applicable, not asked in survey o missing: other for the question "To what degree are you worried about the following situations?", when the situation was "A war involving my country".'
+      no_answer_war:
+        title: "A war involving my country: No answer"
+        description_short: '% of answers classified as "No answer" for the question "To what degree are you worried about the following situations?", when the situation was "A war involving my country".'
         display:
-          name: "A war involving my country: Missing"
+          name: "A war involving my country: No answer"
           <<: *common-display
         presentation:
-          title_public: "A war involving my country: Missing"
+          title_public: "A war involving my country: No answer"
       avg_score_war:
         title: "A war involving my country: Average score"
         description_short: 'Average score in a scale from 1 to 4 when asked "To what degree are you worried about the following situations?", when the situation was "A war involving my country". In the scale, 1 means "very much" and 4 means "not at all".'
@@ -3741,14 +3741,14 @@ tables:
           <<: *common-display
         presentation:
           title_public: "A terrorist attack: Don't know"
-      missing_terrorist_attack:
-        title: "A terrorist attack: Missing"
-        description_short: '% of answers classified as No answer, not applicable, not asked in survey o missing: other for the question "To what degree are you worried about the following situations?", when the situation was "A terrorist attack".'
+      no_answer_terrorist_attack:
+        title: "A terrorist attack: No answer"
+        description_short: '% of answers classified as "No answer" for the question "To what degree are you worried about the following situations?", when the situation was "A terrorist attack".'
         display:
-          name: "A terrorist attack: Missing"
+          name: "A terrorist attack: No answer"
           <<: *common-display
         presentation:
-          title_public: "A terrorist attack: Missing"
+          title_public: "A terrorist attack: No answer"
       avg_score_terrorist_attack:
         title: "A terrorist attack: Average score"
         description_short: 'Average score in a scale from 1 to 4 when asked "To what degree are you worried about the following situations?", when the situation was "A terrorist attack". In the scale, 1 means "very much" and 4 means "not at all".'
@@ -3816,14 +3816,14 @@ tables:
           <<: *common-display
         presentation:
           title_public: "A civil war: Don't know"
-      missing_civil_war:
-        title: "A civil war: Missing"
-        description_short: '% of answers classified as No answer, not applicable, not asked in survey o missing: other for the question "To what degree are you worried about the following situations?", when the situation was "A civil war".'
+      no_answer_civil_war:
+        title: "A civil war: No answer"
+        description_short: '% of answers classified as "No answer" for the question "To what degree are you worried about the following situations?", when the situation was "A civil war".'
         display:
-          name: "A civil war: Missing"
+          name: "A civil war: No answer"
           <<: *common-display
         presentation:
-          title_public: "A civil war: Missing"
+          title_public: "A civil war: No answer"
       avg_score_civil_war:
         title: "A civil war: Average score"
         description_short: 'Average score in a scale from 1 to 4 when asked "To what degree are you worried about the following situations?", when the situation was "A civil war". In the scale, 1 means "very much" and 4 means "not at all".'
@@ -3834,4 +3834,71 @@ tables:
         short_unit: ""
         presentation:
           title_public: "A civil war: Average score"
+
+      happy:
+        title: "Happiness: Happy (aggregate)"
+        description_short: '% of respondents replying "very happy" or "quite happy" when asked "Taking all things together, would you say you are very happy, quite happy, not very happy or not at all happy?"'
+        display:
+          name: "Happiness: Happy"
+          <<: *common-display
+        presentation:
+          title_public: "Happiness: Happy"
+      not_happy:
+        title: "Happiness: Not happy (aggregate)"
+        description_short: '% of respondents replying "not very happy" or "not at all happy" when asked "Taking all things together, would you say you are very happy, quite happy, not very happy or not at all happy?"'
+        display:
+          name: "Happiness: Not happy"
+          <<: *common-display
+        presentation:
+          title_public: "Happiness: Not happy"
+      very_happy:
+        title: "Happiness: Very happy"
+        description_short: '% of respondents replying "very happy" when asked "Taking all things together, would you say you are very happy, quite happy, not very happy or not at all happy?"'
+        display:
+          name: "Happiness: Very happy"
+          <<: *common-display
+        presentation:
+          title_public: "Happiness: Very happy"
+      quite_happy:
+        title: "Happiness: Quite happy"
+        description_short: '% of respondents replying "quite happy" when asked "Taking all things together, would you say you are very happy, quite happy, not very happy or not at all happy?"'
+        display:
+          name: "Happiness: Quite happy"
+          <<: *common-display
+        presentation:
+          title_public: "Happiness: Quite happy"
+      not_very_happy:
+        title: "Happiness: Not very happy"
+        description_short: '% of respondents replying "not very happy" when asked "Taking all things together, would you say you are very happy, quite happy, not very happy or not at all happy?"'
+        display:
+          name: "Happiness: Not very happy"
+          <<: *common-display
+        presentation:
+          title_public: "Happiness: Not very happy"
+      not_at_all_happy:
+        title: "Happiness: Not at all happy"
+        description_short: '% of respondents replying "not at all happy" when asked "Taking all things together, would you say you are very happy, quite happy, not very happy or not at all happy?"'
+        display:
+          name: "Happiness: Not at all happy"
+          <<: *common-display
+        presentation:
+          title_public: "Happiness: Not at all happy"
+      dont_know_happy:
+        title: "Happiness: Don't know"
+        description_short: '% of respondents replying "don‘t know" when asked "Taking all things together, would you say you are very happy, quite happy, not very happy or not at all happy?"'
+        display:
+          name: "Happiness: Don't know"
+          <<: *common-display
+        presentation:
+          title_public: "Happiness: Don't know"
+      no_answer_happy:
+        title: "Happiness: No answer"
+        description_short: '% of answers classified as "No answer" for the question "Taking all things together, would you say you are very happy, quite happy, not very happy or not at all happy?"'
+        display:
+          name: "Happiness: No answer"
+          <<: *common-display
+        presentation:
+          title_public: "Happiness: No answer"
+
+
 

@@ -5,8 +5,7 @@ meta:
   version: '2023-05-24'
   publication_year: 2020
   source_name: United States Patent and Trademark Office (2020)
-  source_published_by: U.S. Patent and Trademark Office, U.S. Patent Activity Calendar
-    Years 1790 to the Present
+  source_published_by: U.S. Patent and Trademark Office, U.S. Patent Activity Calendar Years 1790 to the Present
   url: https://www.uspto.gov/web/offices/ac/ido/oeip/taf/reports.htm
   source_data_url: https://www.uspto.gov/web/offices/ac/ido/oeip/taf/h_counts.htm
   file_extension: htm
@@ -14,13 +13,9 @@ meta:
   license_name: USPTO Terms and Conditions
   date_accessed: 2023-05-24
   is_public: true
-  description: The U.S. Patent and Trademark Office (USPTO)'s Patent Technology Monitoring
-    Team periodically issues general statistics and reports that profile patenting
-    activity. The data imported by Our World in Data focuses on annual, U.S. patent
-    application and grant activity from 1790 to the present. Annual activity is determined
-    based on the calendar year.
+  description: The U.S. Patent and Trademark Office (USPTO)'s Patent Technology Monitoring Team periodically issues general statistics and reports that profile patenting activity. The data imported by Our World in Data focuses on annual, U.S. patent application and grant activity from 1790 to the present. Annual activity is determined based on the calendar year.
 wdir: ../../../data/snapshots/research_development/2023-05-24
 outs:
-- md5: a7d47bb15446f0fcd347ee743a5893ee
-  size: 48933
-  path: us_patents.htm
+  - md5: f3c6d86e711ed577cbcb34ca83212eef
+    size: 48933
+    path: us_patents.htm

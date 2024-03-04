@@ -29,8 +29,7 @@ meta:
     attribution_short: WHO
 
     # Files
-    url_main:
-      https://www.who.int/teams/health-product-policy-and-standards/assistive-and-medical-technology/medical-devices/global-atlas-of-medical-devices
+    url_main: https://www.who.int/teams/health-product-policy-and-standards/assistive-and-medical-technology/medical-devices/global-atlas-of-medical-devices
     date_accessed: 2023-10-13
 
     # License
@@ -40,6 +39,6 @@ meta:
 
 wdir: ../../../data/snapshots/who/2023-10-13
 outs:
-- md5: 66e2217616942a63cd5129504fb71ea0
-  size: 56546
-  path: medical_devices_atlas_gc_nm.csv
+  - md5: fc394631ad1b3d914eebd2d74b96d11c
+    size: 56546
+    path: medical_devices_atlas_gc_nm.csv

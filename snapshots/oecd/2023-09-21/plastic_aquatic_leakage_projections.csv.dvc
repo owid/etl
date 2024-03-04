@@ -28,10 +28,9 @@ meta:
     # License
     license:
       name: CC BY 4.0
-      url:
-        https://www.oecd.org/termsandconditions
+      url: https://www.oecd.org/termsandconditions
 wdir: ../../../data/snapshots/oecd/2023-09-21
 outs:
-- md5: a6f73452abc54c9be3bd42d0c0417aaa
-  size: 87887
-  path: plastic_aquatic_leakage_projections.csv
+  - md5: 3988172bf5cb3179008c837e74224309
+    size: 87887
+    path: plastic_aquatic_leakage_projections.csv

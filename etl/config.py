@@ -22,7 +22,10 @@ def get_username():
 
 
 def load_env():
-    ENV_FILE = env.get("ENV", BASE_DIR / ".env")
+    if env.get("ENV", "").startswith("."):
+        raise ValueError(f"ENV was replaced by ENV_FILE, please use ENV_FILE={env['ENV']} ... instead.")
+
+    ENV_FILE = env.get("ENV_FILE", BASE_DIR / ".env")
     load_dotenv(ENV_FILE, override=True)
 
 
@@ -30,6 +33,10 @@ load_env()
 # When DEBUG is on
 # - run steps in the same process (speeding up ETL)
 DEBUG = env.get("DEBUG") in ("True", "true", "1")
+
+# Environment, e.g. production, staging, dev
+ENV = env.get("ENV", "dev")
+ENV_IS_REMOTE = ENV in ("production", "staging")
 
 # publishing to OWID's public data catalog in R2
 R2_BUCKET = "owid-catalog"
@@ -114,12 +121,17 @@ GRAPHER_INSERT_WORKERS = int(env.get("GRAPHER_WORKERS", max(10, int(40 / RUN_STE
 # of data pages for a single indicator
 GRAPHER_FILTER = env.get("GRAPHER_FILTER", None)
 
+# if set, don't delete indicators from MySQL, only append / update new ones
+# you can use this to only process subset of indicators in your step to
+# speed up development. It's up to you how you define filtering logic in your step
+SUBSET = env.get("SUBSET", None)
+
 # forbid any individual step from consuming more than this much memory
 # (only enforced on Linux)
 MAX_VIRTUAL_MEMORY_LINUX = 32 * 2**30  # 32 GB
 
 # increment this to force a full rebuild of all datasets
-ETL_EPOCH = 3
+ETL_EPOCH = 4
 
 # any garden or grapher dataset after this date will have strict mode enabled
 STRICT_AFTER = "2023-06-25"
@@ -144,9 +156,3 @@ def enable_bugsnag() -> None:
         bugsnag.configure(
             api_key=BUGSNAG_API_KEY,
         )  # type: ignore
-
-
-# For Wizard to know if it is running on remote
-## This could eventuallyb be just a generic flag for other apps/processes too.
-## Why is this important for Wizard? Refer to field `disable_on_remote` in apps/wizard/config/config.yml`
-WIZARD_IS_REMOTE = env.get("WIZARD_IS_REMOTE") in ("True", "true", "1")

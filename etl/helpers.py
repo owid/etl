@@ -9,7 +9,7 @@ import tempfile
 from collections.abc import Generator
 from contextlib import contextmanager
 from pathlib import Path
-from typing import Any, Dict, Iterable, Iterator, List, Optional, Union, cast
+from typing import Any, Dict, Iterable, Iterator, List, Literal, Optional, Union, cast
 from urllib.parse import urljoin
 
 import jsonref
@@ -76,7 +76,7 @@ def _get_github_branches(org: str, repo: str) -> List[Any]:
     return branches
 
 
-def grapher_checks(ds: catalog.Dataset) -> None:
+def grapher_checks(ds: catalog.Dataset, warn_title_public: bool = True) -> None:
     """Check that the table is in the correct format for Grapher."""
     from etl import grapher_helpers as gh
 
@@ -108,7 +108,7 @@ def grapher_checks(ds: catalog.Dataset) -> None:
             # would override the indicator title in the Data Page.
             display_name = (tab[col].m.display or {}).get("name")
             title_public = getattr(tab[col].m.presentation, "title_public", None)
-            if display_name and not title_public:
+            if warn_title_public and display_name and not title_public:
                 log.warning(
                     f"Column {col} uses display.name but no presentation.title_public. Ensure the latter is also defined, otherwise display.name will be used as the indicator's title.",
                 )
@@ -124,6 +124,7 @@ def create_dataset(
     check_variables_metadata: bool = False,
     run_grapher_checks: bool = True,
     if_origins_exist: SOURCE_EXISTS_OPTIONS = "replace",
+    errors: Literal["ignore", "warn", "raise"] = "raise",
 ) -> catalog.Dataset:
     """Create a dataset and add a list of tables. The dataset metadata is inferred from
     default_metadata and the dest_dir (which is in the form `channel/namespace/version/short_name`).
@@ -204,7 +205,7 @@ def create_dataset(
 
     meta_path = get_metadata_path(str(dest_dir))
     if meta_path.exists():
-        ds.update_metadata(meta_path, if_origins_exist=if_origins_exist)
+        ds.update_metadata(meta_path, if_origins_exist=if_origins_exist, errors=errors)
 
         # check that we are not using metadata inconsistent with path
         for k, v in match.groupdict().items():

@@ -1,0 +1,13 @@
+meta:
+  source:
+    name: Unknown
+    url: ''
+    source_data_url: vdem_women_executives.csv
+    date_accessed: '2024-02-29'
+  name: DRAFT vdem_women_executives
+  description: ''
+  license: {}
+outs:
+  - md5: b38d3d047c9147a413d53dbb454b04ef
+    size: 7884
+    path: vdem_women_executives.csv

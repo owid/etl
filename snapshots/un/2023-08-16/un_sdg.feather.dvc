@@ -18,6 +18,6 @@ meta:
 
 wdir: ../../../data/snapshots/un/2023-08-16
 outs:
-  - md5: 7feccfad2b08751074249ee4bd4849fe
+  - md5: d5e6755cbe4650e8434e0ddabeb228ce
     size: 816163802
     path: un_sdg.feather

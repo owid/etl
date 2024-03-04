@@ -30,7 +30,7 @@ SIMILARITY_NAMES = {
 log = get_logger()
 
 
-@click.command(help=__doc__)
+@click.command(name="variable-match", help=__doc__)
 @click.option(
     "-f",
     "--output-file",
@@ -94,13 +94,10 @@ def main_cli(
 ) -> None:
     """Match variable IDs from an old dataset to a new dataset's.
 
-    # Description
     After a dataset has been uploaded to OWID's MySQL database, we need to pair new variable IDs with the old ones,
     so that all graphs update properly.
 
     If the variable names are identical, the task is trivial: find indexes of old variables and map them to the indexes of the identical variables in the new dataset. However, if variable names have changed (or the number of variables have changed) the pairing may need to be done manually. This CLI helps in either scenario.
-
-    # Reference
     """
     main(
         old_dataset_name=old_dataset_name,

@@ -6,11 +6,9 @@ meta:
   publication_year: 2023
   publication_date:
   source_name: Epoch (2023)
-  source_published_by: 'Epoch, Parameter, Compute and Data Trends in Machine Learning.
-    Published online at epochai.org. Retrieved from: https://epochai.org/mlinputs/visualization'
+  source_published_by: 'Epoch, Parameter, Compute and Data Trends in Machine Learning. Published online at epochai.org. Retrieved from: https://epochai.org/mlinputs/visualization'
   url: https://epochai.org/mlinputs/visualization
-  source_data_url: 
-    https://docs.google.com/spreadsheets/d/1AAIebjNsnJj_uKALHbXNfn3_YsT6sHXtCU0q7OIPuc4/export?gid=0&format=csv
+  source_data_url: https://docs.google.com/spreadsheets/d/1AAIebjNsnJj_uKALHbXNfn3_YsT6sHXtCU0q7OIPuc4/export?gid=0&format=csv
 
   file_extension: csv
   license_url:
@@ -34,6 +32,6 @@ meta:
         The authors note that: "For new models (from 2020 onward) it is harder to assess these criteria, so we fall back to a subjective selection. We refer to models meeting our selection criteria as 'milestone models.'"
 wdir: ../../../data/snapshots/artificial_intelligence/2023-06-21
 outs:
-- md5: 28c4f1e432b7ce3b2b5467ed4991c0f4
-  size: 609893
-  path: epoch.csv
+  - md5: f7e94b8afdccd19e04d71664880cdb18
+    size: 609893
+    path: epoch.csv

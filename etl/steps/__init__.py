@@ -499,6 +499,13 @@ class DataStep(Step):
         for f in self._step_files():
             checksums[f] = files.checksum_file(f)
 
+            # if using SUBSET to process just a subset of the data, then add it to its checksum if
+            # the file contains it
+            if config.SUBSET:
+                with open(f) as istream:
+                    if "SUBSET" in istream.read():
+                        checksums[f] += config.SUBSET
+
         in_order = [v for _, v in sorted(checksums.items())]
         return hashlib.md5(",".join(in_order).encode("utf8")).hexdigest()
 
@@ -849,7 +856,7 @@ class GrapherStep(Step):
 
             variable_upsert_results = [future.result() for future in as_completed(futures)]
 
-        if not config.GRAPHER_FILTER:
+        if not config.GRAPHER_FILTER and not config.SUBSET:
             self._cleanup_ghost_resources(dataset_upsert_results, variable_upsert_results)
 
             # set checksum and updatedAt timestamps after all data got inserted

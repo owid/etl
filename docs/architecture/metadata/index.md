@@ -1,11 +1,9 @@
 <!-- !!! warning "This is still being written."
 
     Our metadata formats are still in flux, and are likely to change over the coming weeks. -->
-!!! note "Questions about the metadata?"
 
-    If you have questions about the metadata, you can share these in our [discussion](https://github.com/owid/etl/discussions/categories/metadata). This greatly helps us keep track of the questions and answers, and makes it easier for others to find answers to similar questions.
+!!! info "Check the [metadata reference](reference.md) for a complete list of metadata fields."
 
-    :material-chat-question: Additionally, we have added a [FAQs](faqs) section to this entry.
 
 One of the main values of our work is the careful documentation that we provide along with our data and articles. In the context of
  data, we have created a metadata system in ETL that allows us to describe the data that we are working with.
@@ -18,14 +16,20 @@ In our [data model](../design/common-format.md) there are various data objects (
 The metadata is ingested into ETL in the form of [YAML files](./structuring-yaml.md), which live next to the scripts. Metadata can be ingested at any ETL step to tweak, change and add new metadata. However, the most standard places to have metadata defined are in Snapshot and in Garden.
 
 
+!!! note "Questions about the metadata?"
+
+    If you have questions about the metadata, you can share these in our [discussion](https://github.com/owid/etl/discussions/categories/metadata). This greatly helps us keep track of the questions and answers, and makes it easier for others to find answers to similar questions.
+
+    :material-chat-question: Additionally, we have added a [FAQs](faqs) section to this entry.
+
 ## Snapshot
 In Snapshot we define metadata attributes for the data source product. We make sure that all the different files, datasets and publications that we ingest to our system are properly documented. This includes making sure that these have licenses, descriptions, titles and other information assigned.
 
 
 !!! info "Learn more"
 
-    - [Learn about the fields available in `origin` :octicons-arrow-right-24:](reference/origin)
-    - [Learn about our workflow in Snapshot :octicons-arrow-right-24:](../workflow/snapshot#metadata)
+    - [Learn about the fields available in `origin` :octicons-arrow-right-24:](reference#origin)
+    - [Learn about our workflow in Snapshot :octicons-arrow-right-24:](../workflow/#snapshot)
 
 ## Garden
 In Garden we focus on the metadata of the finished product. After all necessary ETL steps, the initial source file (or files) has (or have) been transformed into a curated dataset. This dataset may have multiple tables, each of them with various indicators.
@@ -34,10 +38,10 @@ In this step we add metadata that describes this dataset, these tables and these
 
 !!! info "Learn more"
 
-    - [Learn about the fields available in `indicator` :octicons-arrow-right-24:](reference/indicator)
-    - [Learn about the fields available in `table` :octicons-arrow-right-24:](reference/tables)
-    - [Learn about the fields available in `dataset` :octicons-arrow-right-24:](reference/dataset)
-    - [Learn about our workflow in Garden :octicons-arrow-right-24:](../workflow/garden#metadata)
+    - [Learn about the fields available in `indicator` :octicons-arrow-right-24:](reference#variable)
+    - [Learn about the fields available in `table` :octicons-arrow-right-24:](reference#table)
+    - [Learn about the fields available in `dataset` :octicons-arrow-right-24:](reference#dataset)
+    - [Learn about our workflow in Garden :octicons-arrow-right-24:](../workflow/#garden)
 
 
 ## Propagation of metadata
@@ -50,7 +54,7 @@ We have built a logic into ETL to automatically propagate metadata fields forwar
 ### Metadata and Data pages
 We automatically create data pages from an indicator using its metadata fields. Learn how the metadata fields are mapped to a data page with our demo app.
 
-[Try the demo :octicons-arrow-right-24:](../../tutorials/metadata-play.md)
+[Try the demo :octicons-arrow-right-24:](../../guides/metadata-play.md)
 
 ### Other uses
 Users can consume the metadata programmatically using the [`owid-catalog`](https://github.com/owid/etl/tree/master/lib/catalog).
@@ -62,3 +66,4 @@ We have developed a tool, `etl metadata-upgrade`, that uses OpenAI's GPT model t
 !!! info "Learn more"
 
     - [Learn about how to use the `etl metadata-upgrade` tool :octicons-arrow-right-24:](metadata_chatgpt_update.md)
+    - [Get your OpenAI key :octicons-arrow-right-24:](../../guides/openai/)

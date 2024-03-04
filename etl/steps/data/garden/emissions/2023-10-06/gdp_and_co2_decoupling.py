@@ -5,8 +5,8 @@ We already have an interactive chart showing similar data,
 for per capita GDP and per capita, consumption-based CO2 emissions:
 https://ourworldindata.org/grapher/co2-emissions-and-gdp
 
-The data in the current step is not used by any grapher step, but will be used by a static chart.
-TODO: Include link to static chart once it is created.
+The data in the current step is not used by any grapher step, but will be used by the following static chart:
+https://drive.google.com/file/d/1PflfQpr4mceVWRSGEqMP6Gbo1tFQZzOp/view?usp=sharing
 
 """
 from structlog import get_logger

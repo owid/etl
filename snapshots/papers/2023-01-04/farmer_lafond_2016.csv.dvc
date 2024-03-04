@@ -15,6 +15,6 @@ meta:
   description: |
 wdir: ../../../data/snapshots/papers/2023-01-04
 outs:
-- md5: b2dd2d2d7bdf788da15bd2e7dba8aaa9
-  size: 18416
-  path: farmer_lafond_2016.csv
+  - md5: e76cc538ad6bf6233b99a075eb0cea10
+    size: 18416
+    path: farmer_lafond_2016.csv

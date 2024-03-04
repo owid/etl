@@ -1,3 +1,7 @@
+---
+tags:
+    - 👷 Staff
+---
 # Data Pages Workflow
 
 ## Live Reloading of a Data Page
@@ -21,7 +25,7 @@ For illustration, the step `grapher/gcp/2023-07-10/global_carbon_budget` is cons
 
 ### Command Summary
 ```bash
-ENV=.env.myname GRAPHER_FILTER=consumption_emissions_per_capita etl grapher/gcp/2023-07-10/global_carbon_budget --grapher --watch --only
+ENV_FILE=.env.myname GRAPHER_FILTER=consumption_emissions_per_capita etl grapher/gcp/2023-07-10/global_carbon_budget --grapher --watch --only
 ```
 !!! note
     Working on your local grapher instead of a remote grapher will also reduce upload times. One option is to work on local grapher to begin with, and move to your staging server at a later point to be able to share the result with other colleagues.

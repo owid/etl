@@ -5,14 +5,16 @@ import zipfile
 import geopandas as gpd
 import numpy as np
 import pandas as pd
+import pyproj
 import xarray as xr
 from owid.catalog import Table
-from rioxarray.exceptions import NoDataInBounds
+from rioxarray.exceptions import NoDataInBounds, OneDimensionalRaster
 from shapely.geometry import mapping
 from structlog import get_logger
 from tqdm import tqdm
 
 from etl.helpers import PathFinder, create_dataset
+from etl.snapshot import Snapshot
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -20,25 +22,37 @@ paths = PathFinder(__file__)
 log = get_logger()
 
 
-def run(dest_dir: str) -> None:
-    #
-    # Load inputs.
-    #
-    # Retrieve snapshot.
-    snap = paths.load_snapshot("surface_temperature.gz")
+def _load_data_array(snap: Snapshot) -> xr.DataArray:
+    log.info("load_data_array.start")
     # Load data from snapshot.
     with gzip.open(snap.path, "r") as _file:
         ds = xr.open_dataset(_file)
 
     # The latest 3 months in this dataset are made available through ERA5T, which is slightly different to ERA5. In the downloaded file, an extra dimenions ‘expver’ indicates which data is ERA5 (expver = 1) and which is ERA5T (expver = 5).
     # If a value is missing in the first dataset, it is filled with the value from the second dataset.
-    ERA5_combine = ds.sel(expver=1).combine_first(ds.sel(expver=5))
+    # Select the 't2m' variable from the combined dataset.
+    return ds.sel(expver=1).combine_first(ds.sel(expver=5))["t2m"]
 
-    # Select the 't2m' variable from the combined dataset and assign it to 'da'.
-    da = ERA5_combine["t2m"]
 
-    # Convert the temperature values from Kelvin to Celsius by subtracting 273.15.
-    da = da - 273.15
+def _load_shapefile(file_path: str) -> gpd.GeoDataFrame:
+    log.info("load_shapefile.start")
+    shapefile = gpd.read_file(file_path)
+    return shapefile[["geometry", "WB_NAME"]]
+
+
+def run(dest_dir: str) -> None:
+    # Activates the usage of the global context. Using this option can enhance the performance
+    # of initializing objects in single-threaded applications.
+    pyproj.set_use_global_context(True)  # type: ignore
+
+    #
+    # Load inputs.
+    #
+    # Retrieve snapshot.
+    snap = paths.load_snapshot("surface_temperature.gz")
+
+    # Read surface temperature data from snapshot and convert temperature from Kelvin to Celsius.
+    da = _load_data_array(snap) - 273.15
 
     # Read the shapefile to extract country informaiton
     snap_geo = paths.load_snapshot("world_bank.zip")
@@ -50,8 +64,7 @@ def run(dest_dir: str) -> None:
         file_path = f"zip://{snap_geo.path}!/{shapefile_name}"
 
         # Read the shapefile directly from the ZIP archive
-        shapefile = gpd.read_file(file_path)
-        shapefile = shapefile[["geometry", "WB_NAME"]]
+        shapefile = _load_shapefile(file_path)
 
     #
     # Process data.
@@ -63,18 +76,23 @@ def run(dest_dir: str) -> None:
     # Initialize a list to keep track of small countries where temperature data extraction fails.
     small_countries = []
 
+    # Set the coordinate reference system for the temperature data to EPSG 4326.
+    da = da.rio.write_crs("epsg:4326")
+
     # Iterate over each row in the shapefile data.
     for i in tqdm(range(shapefile.shape[0])):
         # Extract the data for the current row.
-        data = shapefile[shapefile.index == i]
+        geometry = shapefile.iloc[i]["geometry"]
         country_name = shapefile.iloc[i]["WB_NAME"]
 
-        # Set the coordinate reference system for the temperature data to EPSG 4326.
-        da.rio.write_crs("epsg:4326", inplace=True)
-
         try:
-            # Clip the temperature data to the current country's shape.
-            clip = da.rio.clip(data.geometry.apply(mapping), data.crs)
+            # Clip to the bounding box for the country's shape to significantly improve performance.
+            xmin, ymin, xmax, ymax = geometry.bounds
+            clip = da.rio.clip_box(minx=xmin, miny=ymin, maxx=xmax, maxy=ymax)
+
+            # Clip data to the country's shape.
+            # NOTE: if memory is an issue, we could use `from_disk=True` arg
+            clip = clip.rio.clip([mapping(geometry)], shapefile.crs)
 
             # Calculate weights based on latitude to account for area distortion in latitude-longitude grids.
             weights = np.cos(np.deg2rad(clip.latitude))
@@ -89,7 +107,7 @@ def run(dest_dir: str) -> None:
             # Store the calculated mean temperature in the dictionary with the country's name as the key.
             temp_country[country_name] = country_weighted_mean
 
-        except NoDataInBounds:
+        except (NoDataInBounds, OneDimensionalRaster):
             log.info(
                 f"No data was found in the specified bounds for {country_name}."
             )  # If an error occurs (usually due to small size of the country), add the country's name to the small_countries list.  # If an error occurs (usually due to small size of the country), add the country's name to the small_countries list.
@@ -112,10 +130,10 @@ def run(dest_dir: str) -> None:
     end_time = da["time"].max().dt.date.astype(str).item()
 
     # Generate a date range from start_time to end_time with monthly frequency
-    month_starts = pd.date_range(start=start_time, end=end_time, freq="MS")
+    month_middles = pd.date_range(start=start_time, end=end_time, freq="MS") + pd.offsets.Day(14)
 
     # month_starts is a DateTimeIndex object; you can convert it to a list if needed
-    month_starts_list = month_starts.tolist()
+    month_starts_list = month_middles.tolist()
 
     # df of temperatures for each country
     df_temp = pd.DataFrame(temp_country)

@@ -29,6 +29,6 @@ meta:
       url: https://datacatalog.worldbank.org/search/dataset/0064304/1000-Binned-Global-Distribution
 wdir: ../../../data/snapshots/wb/2024-01-22
 outs:
-  - md5: 93e2c66478e4dec90ca9ef9c4ed4bfbd
+  - md5: 4b16b3f0756675e086062f289cce64a7
     size: 143888715
     path: thousand_bins_distribution.dta

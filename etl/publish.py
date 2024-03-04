@@ -32,7 +32,7 @@ class CannotPublish(Exception):
     pass
 
 
-@click.command()
+@click.command(name="publish")
 @click.option(
     "--dry-run",
     is_flag=True,
@@ -62,10 +62,7 @@ class CannotPublish(Exception):
     help="Publish only selected channel (subfolder of data/), push all by default.",
 )
 def publish_cli(dry_run: bool, private: bool, bucket: str, channel: Iterable[CHANNEL]) -> None:
-    """Publish the generated data catalog to S3.
-
-    # Reference
-    """
+    """Publish the generated data catalog to S3."""
     return publish(
         dry_run=dry_run,
         private=private,

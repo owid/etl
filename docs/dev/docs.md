@@ -1,3 +1,8 @@
+---
+tags:
+    - 👷 Staff
+---
+
 Our documentation is built using `mkdocs`, which renders markdown files into HTML/CSS files.
 
 !!! info "[Learn more about `mkdocs` :octicons-arrow-right-24:](https://squidfunk.github.io/mkdocs-material/getting-started/)"

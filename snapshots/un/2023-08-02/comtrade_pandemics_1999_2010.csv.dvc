@@ -31,6 +31,6 @@ meta:
 
 wdir: ../../../data/snapshots/un/2023-08-02
 outs:
-- md5: 7e1950d13c4aa46ef0a5f836f336bd04
-  size: 6104688
-  path: comtrade_pandemics_1999_2010.csv
+  - md5: 8705b5e580de5e5aa6e41c43fd9cb114
+    size: 6104688
+    path: comtrade_pandemics_1999_2010.csv

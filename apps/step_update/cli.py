@@ -375,7 +375,7 @@ def _confirm_choice(multiple_files: List[Any]) -> int:
     return choice
 
 
-@click.command(cls=RichCommand, help=__doc__)
+@click.command(name="update", cls=RichCommand, help=__doc__)
 @click.argument("steps", type=str or List[str], nargs=-1)
 @click.option(
     "--step-version-new", type=str, default=STEP_VERSION_NEW, help=f"New version for step. Default: {STEP_VERSION_NEW}."
@@ -418,49 +418,42 @@ def cli(
 ) -> None:
     """Update one or more steps to their new version, if possible.
 
-    # Description
     This tool lets you update one or more snapshots or data steps to a new version. It will:
 
     * Create new folders and files for each of the steps.
-
     * Add the new steps to the dag, with the same header comments as their current version.
 
-    ## Notes
+    **Notes:**
 
     Keep in mind that:
 
     * If there is ambiguity, the user will be asked for confirmation before updating each step, and on situations where there is some ambiguity.
-
     * If new snapshots are created that are not used by any steps, they are added to a temporary dag (temp.yml). These steps are then removed from the temporary dag as soon as they are used by an active step.
-
     * All dependencies of new steps will be assumed to use their latest version possible.
-
     * Steps that are already in their latest version (or whose version is "latest") will be skipped.
 
-    ## Examples
+    **Examples:**
 
-    Here are some examples of how to use the tool:
-
-    NOTE: Remove the --dry-run if you want to actually execute the updates in the examples below (but then remember to revert changes).
+    **Note:** Remove the --dry-run if you want to actually execute the updates in the examples below (but then remember to revert changes).
 
     * To update a single snapshot to the latest version:
-    ```
-    $ etl update snapshot://animal_welfare/2023-10-24/fur_laws.xlsx --dry-run
-    ```
-    Note that, since no steps are using this snapshot, the new snapshot will be added to the temporary dag.
+        ```
+        $ etl update snapshot://animal_welfare/2023-10-24/fur_laws.xlsx --dry-run
+        ```
+
+        Note that, since no steps are using this snapshot, the new snapshot will be added to the temporary dag.
 
     * To update not only that snapshot, but also the steps that use it:
-    ```
-    $ etl update snapshot://animal_welfare/2023-10-24/fur_laws.xlsx --include-usages --dry-run
-    ```
+        ```
+        $ etl update snapshot://animal_welfare/2023-10-24/fur_laws.xlsx --include-usages --dry-run
+        ```
 
     * To update all dependencies of the climate change impacts explorer:
-    ```
-    $ etl update data://explorers/climate/latest/climate_change_impacts --include-dependencies --dry-run
-    ```
-    Note that the explorers step itself will not be updated, since it is already in its "latest" version.
+        ```
+        $ etl update data://explorers/climate/latest/climate_change_impacts --include-dependencies --dry-run
+        ```
 
-    # Reference
+        Note that the explorers step itself will not be updated, since it is already in its "latest" version.
     """
     # Initialize step updater and run update.
     StepUpdater(dry_run=dry_run, interactive=interactive).update_steps(

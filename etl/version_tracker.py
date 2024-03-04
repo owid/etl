@@ -751,7 +751,7 @@ class VersionTracker:
         return backported_dataset_ids
 
 
-@click.command(cls=RichCommand)
+@click.command(name="version-tracker", cls=RichCommand)
 @click.option(
     "--skip-db",
     is_flag=True,
@@ -767,9 +767,6 @@ class VersionTracker:
 def run_version_tracker_checks(skip_db: bool = False, warn_on_archivable: bool = False) -> None:
     """Check that all DAG dependencies (e.g. make sure no step is missing).
 
-    # Description
     Run all version tracker sanity checks.
-
-    # Reference
     """
     VersionTracker(connect_to_db=not skip_db, warn_on_archivable=warn_on_archivable).apply_sanity_checks()

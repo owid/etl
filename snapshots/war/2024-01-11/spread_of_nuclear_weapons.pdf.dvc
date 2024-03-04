@@ -17,20 +17,17 @@ meta:
     attribution_short: Bleek
 
     # Files
-    url_main: 
-      https://www.belfercenter.org/sites/default/files/files/publication/When%20Did%20%28and%20Didn%27t%29%20States%20Proliferate%3F_1.pdf
-    url_download: 
-      https://www.belfercenter.org/sites/default/files/files/publication/When%20Did%20%28and%20Didn%27t%29%20States%20Proliferate%3F_1.pdf
+    url_main: https://www.belfercenter.org/sites/default/files/files/publication/When%20Did%20%28and%20Didn%27t%29%20States%20Proliferate%3F_1.pdf
+    url_download: https://www.belfercenter.org/sites/default/files/files/publication/When%20Did%20%28and%20Didn%27t%29%20States%20Proliferate%3F_1.pdf
     date_accessed: 2024-01-11
 
     # License
     license:
       name: Copyright 2017, President and Fellows of Harvard College
-      url: 
-        https://www.belfercenter.org/sites/default/files/files/publication/When%20Did%20%28and%20Didn%27t%29%20States%20Proliferate%3F_1.pdf
+      url: https://www.belfercenter.org/sites/default/files/files/publication/When%20Did%20%28and%20Didn%27t%29%20States%20Proliferate%3F_1.pdf
 
 wdir: ../../../data/snapshots/war/2024-01-11
 outs:
-- md5: dfcb04001bf2161d794d9964af627dd4
-  size: 728103
-  path: spread_of_nuclear_weapons.pdf
+  - md5: 46ffcdd3c9b40e718a45411c0e2acab2
+    size: 728103
+    path: spread_of_nuclear_weapons.pdf
