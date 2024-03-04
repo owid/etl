@@ -8,11 +8,15 @@ from enum import Enum
 import streamlit as st
 from st_aggrid import AgGrid, GridUpdateMode, JsCode
 from st_aggrid.grid_options_builder import GridOptionsBuilder
+from st_pages import add_indentation
 
 from apps.step_update.cli import StepUpdater
 from etl.config import ADMIN_HOST, ENV_IS_REMOTE
 from etl.db import can_connect
 
+########################################
+# GLOBAL VARIABLES
+########################################
 # TODO:
 #  * Consider creating a script to regularly check for snapshot updates, fetch them and add them to the temporary DAG (this is the way that the "update state" will know if there are snapshot updates available).
 #  * Define a metric of update prioritization, based on number of charts (or views) and days to update. Sort steps table by this metric.
@@ -47,14 +51,20 @@ class UpdateState(Enum):
     ARCHIVABLE = "Archivable"
 
 
-# CONFIG
+########################################
+# PAGE CONFIG
+########################################
 st.set_page_config(
     page_title="Wizard: ETL Dashboard",
     layout="wide",
     page_icon="🪄",
     initial_sidebar_state="collapsed",
 )
+add_indentation()
 
+########################################
+# TITLE and DESCRIPTION
+########################################
 st.title("📋 ETL Dashboard")
 st.markdown(
     """\
@@ -72,8 +82,11 @@ if not can_connect():
     st.error("Unable to connect to grapher DB.")
 
 
+########################################
+# LOAD STEPS TABLE
+########################################
 @st.cache_data
-def load_steps_df():
+def load_steps_df_all():
     # Load steps dataframe.
     steps_df = StepUpdater().steps_df
 
@@ -152,78 +165,83 @@ def load_steps_df():
     # If a step has no charts and is not the latest version, it is archivable.
     steps_df.loc[(steps_df["n_charts"] == 0) & (~steps_df["is_latest"]), "update_state"] = UpdateState.ARCHIVABLE.value
 
+    # Prepare dataframe to be displayed in the dashboard.
+    steps_df = steps_df[
+        [
+            "step",
+            "db_dataset_name_and_url",
+            "days_to_update",
+            "update_state",
+            "n_charts",
+            "n_charts_views_7d",
+            "n_charts_views_365d",
+            "date_of_next_update",
+            "namespace",
+            "version",
+            "channel",
+            "name",
+            "kind",
+            "dag_file_name",
+            "n_versions",
+            "update_period_days",
+            # "state",
+            "full_path_to_script",
+            "dag_file_path",
+            # "versions",
+            # "role",
+            # "all_usages",
+            # "direct_usages",
+            # "all_chart_ids",
+            # "all_chart_slugs",
+            # "all_chart_views_7d",
+            # "all_chart_views_365d",
+            # "all_active_dependencies",
+            # "all_active_usages",
+            # "direct_dependencies",
+            # "chart_ids",
+            # "same_steps_forward",
+            # "all_dependencies",
+            # "same_steps_all",
+            # "same_steps_latest",
+            # "latest_version",
+            # "identifier",
+            # "same_steps_backward",
+            # "n_newer_versions",
+            # "db_archived",
+            # "db_private",
+        ]
+    ]
     return steps_df
 
 
-# Load the steps dataframe.
-steps_df = load_steps_df()
+@st.cache_data
+def load_steps_df(show_all_channels: bool):
+    # Load all data
+    df = load_steps_df_all()
 
-# Prepare dataframe to be displayed in the dashboard.
-df = steps_df[
-    [
-        "step",
-        "db_dataset_name_and_url",
-        "days_to_update",
-        "update_state",
-        "n_charts",
-        "n_charts_views_7d",
-        "n_charts_views_365d",
-        "date_of_next_update",
-        "namespace",
-        "version",
-        "channel",
-        "name",
-        "kind",
-        "dag_file_name",
-        "n_versions",
-        "update_period_days",
-        # "state",
-        "full_path_to_script",
-        "dag_file_path",
-        # "versions",
-        # "role",
-        # "all_usages",
-        # "direct_usages",
-        # "all_chart_ids",
-        # "all_chart_slugs",
-        # "all_chart_views_7d",
-        # "all_chart_views_365d",
-        # "all_active_dependencies",
-        # "all_active_usages",
-        # "direct_dependencies",
-        # "chart_ids",
-        # "same_steps_forward",
-        # "all_dependencies",
-        # "same_steps_all",
-        # "same_steps_latest",
-        # "latest_version",
-        # "identifier",
-        # "same_steps_backward",
-        # "n_newer_versions",
-        # "db_archived",
-        # "db_private",
-    ]
-]
+    # If toggle is not shown, pre-filter the DataFrame to show only rows where "channel" equals "grapher"
+    if not show_all_channels:
+        df = df[((df["channel"] == "grapher") & (df["n_charts"] > 0)) | (df["channel"] == "explorers")]
+
+    # Sort displayed data conveniently.
+    df = df.sort_values(
+        by=["days_to_update", "n_charts_views_7d", "n_charts", "kind", "version"],
+        na_position="last",
+        ascending=[True, False, False, False, True],
+    )
+
+    return df
+
 
 # Streamlit UI to let users toggle the filter
 show_all_channels = not st.checkbox("Select only grapher steps with charts, and explorer steps", True)
 
-if show_all_channels:
-    # If the toggle is checked, show all data
-    df = df
-else:
-    # Otherwise, pre-filter the DataFrame to show only rows where "channel" equals "grapher"
-    df = df[((df["channel"] == "grapher") & (df["n_charts"] > 0)) | (df["channel"] == "explorers")]
+# Load the steps dataframe.
+steps_df = load_steps_df(show_all_channels)
 
-# Sort displayed data conveniently.
-df = df.sort_values(
-    by=["days_to_update", "n_charts_views_7d", "n_charts", "kind", "version"],
-    na_position="last",
-    ascending=[True, False, False, False, True],
-)
 
 # Define the options of the main grid table with pagination.
-gb = GridOptionsBuilder.from_dataframe(df)
+gb = GridOptionsBuilder.from_dataframe(steps_df)
 gb.configure_grid_options(domLayout="autoHeight", enableCellTextSelection=True)
 gb.configure_selection(
     selection_mode="multiple",
@@ -394,7 +412,7 @@ grid_options = gb.build()
 
 # Display the grid table with pagination.
 grid_response = AgGrid(
-    df,
+    data=steps_df,
     gridOptions=grid_options,
     height=1000,
     width="100%",
