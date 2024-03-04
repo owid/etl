@@ -3,6 +3,7 @@
 """
 import subprocess
 from datetime import datetime
+from enum import Enum
 
 import streamlit as st
 from st_aggrid import AgGrid, GridUpdateMode, JsCode
@@ -35,13 +36,16 @@ DEPENDENCIES_TO_IGNORE = [
     "snapshot://hyde/2017/general_files.zip",
 ]
 
+
 # Define labels for update states.
-UPDATE_STATE_UNKNOWN = "Unknown"
-UPDATE_STATE_UP_TO_DATE = "No updates known"
-UPDATE_STATE_OUTDATED = "Outdated"
-UPDATE_STATE_MINOR_UPDATE = "Minor update possible"
-UPDATE_STATE_MAJOR_UPDATE = "Major update possible"
-UPDATE_STATE_ARCHIVABLE = "Archivable"
+class UpdateState(Enum):
+    UNKNOWN = "Unknown"
+    UP_TO_DATE = "No updates known"
+    OUTDATED = "Outdated"
+    MINOR_UPDATE = "Minor update possible"
+    MAJOR_UPDATE = "Major update possible"
+    ARCHIVABLE = "Archivable"
+
 
 # CONFIG
 st.set_page_config(
@@ -122,18 +126,18 @@ def load_steps_df():
     ]
     # Add a column with the update state.
     # By default, the state is unknown.
-    steps_df["update_state"] = UPDATE_STATE_UNKNOWN
+    steps_df["update_state"] = UpdateState.UNKNOWN.value
     # If there is a newer version of the step, it is outdated.
-    steps_df.loc[~steps_df["is_latest"], "update_state"] = UPDATE_STATE_OUTDATED
+    steps_df.loc[~steps_df["is_latest"], "update_state"] = UpdateState.OUTDATED.value
     # If there are any dependencies that are not their latest version, it needs a minor update.
     # NOTE: If any of those dependencies is a snapshot, it needs a major update (defined in the following line).
     steps_df.loc[
         (steps_df["is_latest"]) & (steps_df["n_updateable_dependencies"] > 0), "update_state"
-    ] = UPDATE_STATE_MINOR_UPDATE
+    ] = UpdateState.MINOR_UPDATE.value
     # If there are any snapshot dependencies that are not their latest version, it needs a major update.
     steps_df.loc[
         (steps_df["is_latest"]) & (steps_df["n_updateable_snapshot_dependencies"] > 0), "update_state"
-    ] = UPDATE_STATE_MAJOR_UPDATE
+    ] = UpdateState.MAJOR_UPDATE.value
     # If the step does not need to be updated (i.e. update_period_days = 0) or if all dependencies are up to date,
     # then the step is up to date (in other words, we are not aware of any possible update).
     steps_df.loc[
@@ -144,9 +148,9 @@ def load_steps_df():
             & (steps_df["n_updateable_dependencies"] == 0)
         ),
         "update_state",
-    ] = UPDATE_STATE_UP_TO_DATE
+    ] = UpdateState.UP_TO_DATE.value
     # If a step has no charts and is not the latest version, it is archivable.
-    steps_df.loc[(steps_df["n_charts"] == 0) & (~steps_df["is_latest"]), "update_state"] = UPDATE_STATE_ARCHIVABLE
+    steps_df.loc[(steps_df["n_charts"] == 0) & (~steps_df["is_latest"]), "update_state"] = UpdateState.ARCHIVABLE.value
 
     return steps_df
 
@@ -328,15 +332,15 @@ gb.configure_columns(
 update_state_jscode = JsCode(
     f"""
 function(params){{
-    if (params.value === "{UPDATE_STATE_UP_TO_DATE}") {{
+    if (params.value === "{UpdateState.UP_TO_DATE.value}") {{
         return {{'color': 'black', 'backgroundColor': 'green'}}
-    }} else if (params.value === "{UPDATE_STATE_OUTDATED}") {{
+    }} else if (params.value === "{UpdateState.OUTDATED.value}") {{
         return {{'color': 'black', 'backgroundColor': 'gray'}}
-    }} else if (params.value === "{UPDATE_STATE_MAJOR_UPDATE}") {{
+    }} else if (params.value === "{UpdateState.MAJOR_UPDATE.value}") {{
         return {{'color': 'black', 'backgroundColor': 'red'}}
-    }} else if (params.value === "{UPDATE_STATE_MINOR_UPDATE}") {{
+    }} else if (params.value === "{UpdateState.MINOR_UPDATE.value}") {{
         return {{'color': 'black', 'backgroundColor': 'orange'}}
-    }} else if (params.value === "{UPDATE_STATE_ARCHIVABLE}") {{
+    }} else if (params.value === "{UpdateState.ARCHIVABLE.value}") {{
         return {{'color': 'black', 'backgroundColor': 'blue'}}
     }} else {{
         return {{'color': 'black', 'backgroundColor': 'yellow'}}
@@ -349,7 +353,7 @@ gb.configure_columns(
     headerName="Update state",
     cellStyle=update_state_jscode,
     width=150,
-    headerTooltip=f'Update state of the step: "{UPDATE_STATE_UP_TO_DATE}" (up to date), "{UPDATE_STATE_MINOR_UPDATE}" (a dependency is outdated, but all origins are up to date), "{UPDATE_STATE_MAJOR_UPDATE}" (an origin is outdated), "{UPDATE_STATE_OUTDATED}" (there is a newer version of the step), "{UPDATE_STATE_ARCHIVABLE}" (the step is outdated and not used in charts, therefore can safely be archived).',
+    headerTooltip=f'Update state of the step: "{UpdateState.UP_TO_DATE.value}" (up to date), "{UpdateState.MINOR_UPDATE.value}" (a dependency is outdated, but all origins are up to date), "{UpdateState.MAJOR_UPDATE.value}" (an origin is outdated), "{UpdateState.OUTDATED.value}" (there is a newer version of the step), "{UpdateState.ARCHIVABLE.value}" (the step is outdated and not used in charts, therefore can safely be archived).',
 )
 # Create a column with grapher dataset names that are clickable and open in a new tab.
 grapher_dataset_jscode = JsCode(
