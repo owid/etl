@@ -83,6 +83,7 @@ streamlit-extras = "^0.3.0"
 streamlit-agraph = "^0.0.45"
 plotly = ">=5.7.0"
 geographiclib = "^2.0"
+pyproj = "^3.6.1"
 
 [tool.poetry.group.dev.dependencies]
 pytest = ">=7.1.2"
