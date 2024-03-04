@@ -43,3 +43,7 @@ def _decrypt(s: str) -> str:
 def set_states(states_values: Dict[str, Any]):
     for key, value in states_values.items():
         st.session_state[key] = value
+
+
+class ValidationError(Exception):
+    pass
