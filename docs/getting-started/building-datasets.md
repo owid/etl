@@ -30,11 +30,11 @@ OK (0.0s)
 3. data://garden/biodiversity/2024-01-25/cherry_blossom
 ```
 
-??? note "Activate your virtual environment"
+!!! note "Activate your virtual environment"
 
     If you are not already, make sure to use these tools within your **virtual environment**.
 
-    Details can be found in the [Poetry docs](https://python-poetry.org/docs/basic-usage/#using-your-virtual-environment), but if you have never used the tool before here is a basic usage that will get you started (this assumes you have been [here](https://docs.owid.io/projects/etl/getting-started/working-environment/#install-dependencies) and installed Poetry):
+    Details can be found in the [Poetry docs](https://python-poetry.org/docs/basic-usage/#using-your-virtual-environment), but if you have never used the tool before here is a basic usage that will get you started (this assumes you have been [here](../working-environment/#install-dependencies) and installed Poetry):
 
     ```bash
     # Install the dependencies defined in pyproject.toml and poetry.lock
