@@ -486,7 +486,7 @@ def _add_steps_to_operations(steps_related):
 # Button to add selected steps to the Operations list.
 if st.button("Add selected steps to the _Operations list_", type="primary"):
     new_selected_steps = [row["step"] for row in grid_response["selected_rows"]]
-    st.session_state.selected_steps_table = new_selected_steps
+    st.session_state.selected_steps_table += new_selected_steps
     _add_steps_to_operations(new_selected_steps)
 
 
@@ -505,6 +505,13 @@ def include_related_steps(step: str, column_related: str):
     else:
         st.error(f"More than one step found with the same URI {step}!")
         st.stop()
+
+
+def remove_step(step: str):
+    """Remove a step from the operations list."""
+    st.session_state.selected_steps.remove(step)
+    if step in st.session_state.selected_steps_table:
+        st.session_state.selected_steps_table.remove(step)
 
 
 # Header
@@ -570,7 +577,7 @@ with st.container(border=True):
                     col.button(
                         label=action_name,
                         key=f"{key_suffix}_{step}",
-                        on_click=lambda step=step: st.session_state.selected_steps.remove(step),
+                        on_click=lambda step=step: remove_step(step),
                         help=help_text,
                     )
                 # Add relared steps
