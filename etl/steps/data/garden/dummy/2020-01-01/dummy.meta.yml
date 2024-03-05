@@ -8,7 +8,7 @@ tables:
   dummy:
     variables:
       dummy_variable:
-        title: Dummy
+        title: Dummy - updated for demo purposes
         licenses: []
         unit: Dummy unit
         short_unit: Du
