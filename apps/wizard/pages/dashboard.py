@@ -10,6 +10,7 @@ import streamlit as st
 from st_aggrid import AgGrid, GridUpdateMode, JsCode
 from st_aggrid.grid_options_builder import GridOptionsBuilder
 from st_pages import add_indentation
+from structlog import get_logger
 
 from apps.step_update.cli import StepUpdater
 from etl.config import ADMIN_HOST, ENV_IS_REMOTE
@@ -43,7 +44,12 @@ DEPENDENCIES_TO_IGNORE = [
 
 # Initialise session state
 ## Selected steps
-st.session_state.selected_steps = st.session_state.get("selected_steps", set())
+st.session_state.selected_steps = st.session_state.get("selected_steps", [])
+## Selected steps in table
+st.session_state.selected_steps_table = st.session_state.get("selected_steps_table", [])
+
+# Logging
+log = get_logger()
 
 
 # Define labels for update states.
@@ -173,8 +179,33 @@ def load_steps_df_all() -> pd.DataFrame:
     # If a step has no charts and is not the latest version, it is archivable.
     steps_df.loc[(steps_df["n_charts"] == 0) & (~steps_df["is_latest"]), "update_state"] = UpdateState.ARCHIVABLE.value
 
+    return steps_df
+
+
+@st.cache_data
+def load_steps_df(show_all_channels: bool) -> pd.DataFrame:
+    """Load the steps dataframe, and filter it according to the user's choice."""
+    # Load all data
+    df = load_steps_df_all()
+
+    # If toggle is not shown, pre-filter the DataFrame to show only rows where "channel" equals "grapher"
+    if not show_all_channels:
+        df = df[((df["channel"] == "grapher") & (df["n_charts"] > 0)) | (df["channel"] == "explorers")]
+
+    # Sort displayed data conveniently.
+    df = df.sort_values(
+        by=["days_to_update", "n_charts_views_7d", "n_charts", "kind", "version"],
+        na_position="last",
+        ascending=[True, False, False, False, True],
+    )
+
+    return df
+
+
+@st.cache_data
+def filter_columns_display(df) -> pd.DataFrame:
     # Prepare dataframe to be displayed in the dashboard.
-    steps_df = steps_df[
+    df = df[
         [
             "step",
             "db_dataset_name_and_url",
@@ -219,26 +250,6 @@ def load_steps_df_all() -> pd.DataFrame:
             # "db_private",
         ]
     ]
-    return steps_df
-
-
-@st.cache_data
-def load_steps_df(show_all_channels: bool) -> pd.DataFrame:
-    """Load the steps dataframe, and filter it according to the user's choice."""
-    # Load all data
-    df = load_steps_df_all()
-
-    # If toggle is not shown, pre-filter the DataFrame to show only rows where "channel" equals "grapher"
-    if not show_all_channels:
-        df = df[((df["channel"] == "grapher") & (df["n_charts"] > 0)) | (df["channel"] == "explorers")]
-
-    # Sort displayed data conveniently.
-    df = df.sort_values(
-        by=["days_to_update", "n_charts_views_7d", "n_charts", "kind", "version"],
-        na_position="last",
-        ascending=[True, False, False, False, True],
-    )
-
     return df
 
 
@@ -252,8 +263,11 @@ steps_df = load_steps_df(show_all_channels)
 ########################################
 # Display STEPS TABLE
 ########################################
+# Get only columns to be shown
+steps_df_display = filter_columns_display(steps_df)
+
 # Define the options of the main grid table with pagination.
-gb = GridOptionsBuilder.from_dataframe(steps_df)
+gb = GridOptionsBuilder.from_dataframe(steps_df_display)
 gb.configure_grid_options(domLayout="autoHeight", enableCellTextSelection=True)
 gb.configure_selection(
     selection_mode="multiple",
@@ -424,7 +438,7 @@ grid_options = gb.build()
 
 # Display the grid table with pagination.
 grid_response = AgGrid(
-    data=steps_df,
+    data=steps_df_display,
     gridOptions=grid_options,
     height=1000,
     width="100%",
@@ -462,10 +476,18 @@ def execute_command(cmd):
         return e.stderr
 
 
+def _add_steps_to_operations(steps_related):
+    # Remove those already in operations list
+    new_selected_steps = [step for step in steps_related if step not in st.session_state.selected_steps]
+    # Add new steps to the operations list.
+    st.session_state.selected_steps += new_selected_steps
+
+
 # Button to add selected steps to the Operations list.
 if st.button("Add selected steps to the _Operations list_", type="primary"):
-    new_selected_steps = set(row["step"] for row in grid_response["selected_rows"])
-    st.session_state.selected_steps |= new_selected_steps
+    new_selected_steps = [row["step"] for row in grid_response["selected_rows"]]
+    st.session_state.selected_steps_table = new_selected_steps
+    _add_steps_to_operations(new_selected_steps)
 
 
 def include_related_steps(step: str, column_related: str):
@@ -473,8 +495,16 @@ def include_related_steps(step: str, column_related: str):
 
     E.g. adding direct dependencies, all usages, etc.
     """
-    steps_related = set(steps_df[steps_df["step"] == step][column_related].item())
-    st.session_state.selected_steps |= steps_related
+    steps_related = steps_df[steps_df["step"] == step]
+    if len(steps_related) == 0:
+        log.error(f"Step {step} not found in the steps table.")
+    elif len(steps_related) == 1:
+        steps_related = steps_df[steps_df["step"] == step][column_related].item()
+        # Add steps to operations list
+        _add_steps_to_operations(steps_related)
+    else:
+        st.error(f"More than one step found with the same URI {step}!")
+        st.stop()
 
 
 # Header
@@ -531,13 +561,16 @@ with st.container(border=True):
             for (action_name, key_suffix, help_text), col in zip(actions, cols):
                 # Write step URI
                 if key_suffix == "write":
-                    col.text(step)
+                    if step in st.session_state.selected_steps_table:
+                        col.markdown(f"**{step}**")
+                    else:
+                        col.markdown(step)
                 # Remove step
                 elif key_suffix == "remove":
                     col.button(
                         label=action_name,
                         key=f"{key_suffix}_{step}",
-                        on_click=lambda step=step: st.session_state.selected_steps.discard(step),
+                        on_click=lambda step=step: st.session_state.selected_steps.remove(step),
                         help=help_text,
                     )
                 # Add relared steps
@@ -557,7 +590,7 @@ with st.container(border=True):
         )
 
     else:
-        st.markdown("_No rows selected for operation..._")
+        st.markdown(":grey[_No rows selected for operation..._]")
 
 
 ########################################
