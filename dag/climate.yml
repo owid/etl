@@ -197,6 +197,11 @@ steps:
     - data://garden/regions/2023-01-01/regions
   data://grapher/climate/latest/weekly_wildfires:
     - data://garden/climate/latest/weekly_wildfires
+  data://grapher/climate/latest/weekly_wildfires_annual_average:
+    - data://garden/climate/latest/weekly_wildfires
+  data://grapher/climate/latest/weekly_wildfires_by_week:
+    - data://garden/climate/latest/weekly_wildfires
+
   ######################################################################################################################
 
   ######################################################################################################################

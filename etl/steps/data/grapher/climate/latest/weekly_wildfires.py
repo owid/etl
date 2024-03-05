@@ -27,6 +27,11 @@ def run(dest_dir: str) -> None:
     tb = tb.drop(columns=["date"])
     tb = tb.set_index(["country", "year"], verify_integrity=True)
 
+    for column in tb.columns:
+        tb[column].metadata.display = {}
+        tb[column].metadata.display["zeroDay"] = "2000-01-01"
+        tb[column].metadata.display["yearIsDay"] = True
+
     #
     # Save outputs.
     #
