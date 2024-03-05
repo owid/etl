@@ -10,7 +10,6 @@ etlcli = 'apps.cli:cli'
 etlwiz = 'apps.wizard.cli:cli'
 etlr = 'etl.command:main_cli'
 etl-wizard = 'apps.wizard.cli:cli'
-fasttrack = 'apps.fasttrack.cli:cli'
 compare = 'etl.compare:cli'
 backport = 'apps.backport.backport:backport_cli'
 
@@ -22,7 +21,8 @@ click = ">=8.0.1"
 PyYAML = ">=6.0.1"
 papermill = ">=2.3.3"
 jupyterlab = ">=3.1.13"
-mysqlclient = ">=2.2.4"
+# we had to pin this because of this bug https://github.com/owid/etl/issues/2320, versions newer than 2.2.4 might be working again
+mysqlclient = "2.2.3"
 SPARQLWrapper = ">=1.8.5"
 openpyxl = ">=3.0.9"
 sh = "1.14.3"
@@ -78,9 +78,11 @@ joblib = "^1.3.2"
 
 [tool.poetry.group.wizard.dependencies]
 streamlit = "^1.31.0"
+streamlit-aggrid = "^0.3.4.post3"
 streamlit-ace = "^0.1.1"
 streamlit-extras = "^0.3.0"
 streamlit-agraph = "^0.0.45"
+streamlit-vertical-slider = "^2.0"
 plotly = ">=5.7.0"
 geographiclib = "^2.0"
 pyproj = "^3.6.1"
@@ -97,7 +99,6 @@ plotly = ">=5.7.0"
 cookiecutter = ">=2.1.1"
 types-PyYAML = ">=6.0.12"
 hydra-core = ">=1.3.0"
-pywebio = ">=1.8.2"
 boto3-stubs = { extras = ["s3"], version = ">=1.21.16" }
 gspread = "^5.10.0"
 # unpinning those would introduce tons of type errors

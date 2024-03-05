@@ -22,6 +22,7 @@ from owid.catalog.meta import SOURCE_EXISTS_OPTIONS
 from owid.catalog.tables import (
     combine_tables_description,
     combine_tables_title,
+    combine_tables_update_period_days,
     get_unique_licenses_from_tables,
     get_unique_sources_from_tables,
 )
@@ -158,7 +159,10 @@ def create_dataset(
         licenses = get_unique_licenses_from_tables(tables=tables)
         if any(["origins" in table[column].metadata.to_dict() for table in tables for column in table.columns]):
             # If any of the variables contains "origins" this means that it is a recently created dataset.
-            default_metadata = DatasetMeta(licenses=licenses, title=title, description=description)
+            update_period_days_combined = combine_tables_update_period_days(tables=tables)
+            default_metadata = DatasetMeta(
+                licenses=licenses, title=title, description=description, update_period_days=update_period_days_combined
+            )
         else:
             # None of the variables includes "origins", which means it is an old dataset, with "sources".
             sources = get_unique_sources_from_tables(tables=tables)
