@@ -1588,6 +1588,25 @@ def combine_tables_metadata(tables: List[Table], short_name: Optional[str] = Non
     return metadata
 
 
+def combine_tables_update_period_days(tables: List[Table]) -> Optional[int]:
+    # NOTE: This is a metadata field that is extracted from the dataset, not the table itself.
+
+    # Gather all update_period_days from all tables (technically, from their dataset metadata).
+    update_period_days_gathered = [
+        getattr(table.metadata.dataset, "update_period_days")
+        for table in tables
+        if getattr(table.metadata, "dataset") and getattr(table.metadata.dataset, "update_period_days")
+    ]
+    if len(update_period_days_gathered) > 0:
+        # Get minimum period of all tables.
+        update_period_days_combined = min(update_period_days_gathered)
+    else:
+        # If no table had update_period_days defined, return None.
+        update_period_days_combined = None
+
+    return update_period_days_combined
+
+
 def check_all_variables_have_metadata(tables: List[Table], fields: Optional[List[str]] = None) -> None:
     if fields is None:
         fields = ["origins"]
