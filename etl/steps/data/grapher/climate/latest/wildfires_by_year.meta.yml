@@ -49,6 +49,15 @@ tables:
           unit: fires
           short_unit: ''
 
+        share_area_ha:
+          title: Annual share of the total land area burnt by wildfires
+          unit: '%'
+          short_unit: '%'
+          description_short: Share of the total land area burnt by wildfires.
+          description_key:
+            - The area burnt by wildfires is determined using satellite imagery from high-resolution satellite imagery collected by MODIS (Moderate Resolution Imaging Spectroradiometer) and VIIRS (Visible Infrared Imaging Radiometer Suite), which are instrumental in detecting thermal anomalies and changes in landscape patterns indicative of burning. These satellite systems, equipped with advanced sensors, capture detailed images that enable precise estimation of burnt areas, even in remote and inaccessible regions.
+          description_processing: The share of the total land area burnt by wildfires is calculated by dividing the area burnt by wildfires by the total land area of the country.
+
         pm2_5:
           title: Annual PM2.5 emissions from wildfires
           unit: metric tons
@@ -60,7 +69,7 @@ tables:
             - Exposure to PM2.5 is linked to respiratory and cardiovascular issues, and premature death in people with heart or lung disease.
 
         pm2_5_cumulative:
-          title: Annual cmulative PM2.5 emissions from wildfires
+          title: Annual cumulative PM2.5 emissions from wildfires
           unit: metric tons
           short_unit: MT
           description_short: Annual PM2.5 emissions from fires represent the quantity of fine particulate matter (diameter less than 2.5 micrometers) released by fires.

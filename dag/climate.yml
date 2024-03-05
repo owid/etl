@@ -198,7 +198,7 @@ steps:
     - data://garden/faostat/2023-06-12/faostat_rl
   data://grapher/climate/latest/weekly_wildfires:
     - data://garden/climate/latest/weekly_wildfires
-  data://grapher/climate/latest/weekly_wildfires_annual_average:
+  data://grapher/climate/latest/wildfires_by_year:
     - data://garden/climate/latest/weekly_wildfires
   data://grapher/climate/latest/wildfires_by_week:
     - data://garden/climate/latest/weekly_wildfires

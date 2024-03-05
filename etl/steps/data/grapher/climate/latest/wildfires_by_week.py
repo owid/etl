@@ -39,6 +39,8 @@ def run(dest_dir: str) -> None:
     tb_pivot_pm25_cum = process_data(tb, "pm2_5_cumulative", "Cumulative PM2.5 emissions released by wildfires in ")
 
     tb_pivot_area = process_data(tb, "area_ha", "Area burnt by wildfires in ")
+    tb_pivot_events = process_data(tb, "area_ha", "Number of wildfires in ")
+
     tb_pivot_area_share = process_data(tb, "share_area_ha", "Share of total area burnt by wildfires in ")
     tb_pivot_co2 = process_data(tb, "co2", "CO₂ emissions released by wildfires in ")
     tb_pivot_pm25 = process_data(tb, "pm2_5", "PM2.5 emissions released by wildfires in ")
@@ -53,6 +55,7 @@ def run(dest_dir: str) -> None:
             tb_pivot_co2_cum,
             tb_pivot_pm25_cum,
             tb_pivot_area_share_cum,
+            tb_pivot_events,
         ],
         axis=1,
     )

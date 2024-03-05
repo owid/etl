@@ -23,13 +23,20 @@ def run(dest_dir: str) -> None:
 
     # Get the year
     tb["year"] = tb["date"].astype(str).str[0:4]
-    tb = tb[["country", "year", "area_ha", "events", "pm2_5", "co2"]]
+    tb = tb[["country", "year", "area_ha", "events", "pm2_5", "co2", "share_area_ha"]]
 
     # Aggregate the data by year and country (ignore missing values when summing the columns)
     tb_annual_sum = tb.groupby(["country", "year"]).sum(min_count=1).reset_index()
 
-    tb_cumulative = tb.groupby(["country", "year"]).sum(min_count=1).groupby("country").cumsum().reset_index()
-    for col in ["area_ha", "events", "pm2_5", "co2"]:
+    tb_cumulative = (
+        tb[["country", "year", "area_ha", "events", "pm2_5", "co2"]]
+        .groupby(["country", "year"])
+        .sum(min_count=1)
+        .groupby("country")
+        .cumsum()
+        .reset_index()
+    )
+    for col in ["area_ha", "events", "pm2_5", "co2", "share_area_ha"]:
         tb_cumulative = tb_cumulative.rename(columns={col: col + "_cumulative"})
     tb = pr.merge(tb_annual_sum, tb_cumulative, on=["year", "country"])
     tb = tb.set_index(["country", "year"], verify_integrity=True)
