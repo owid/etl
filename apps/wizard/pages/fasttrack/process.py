@@ -12,10 +12,9 @@ import streamlit as st
 from owid.catalog import Dataset, Source, Table, VariableMeta
 from owid.catalog.utils import underscore, validate_underscore
 
-import apps.fasttrack.sheets as sheets
 from apps.wizard.pages.fasttrack.fast_import import FasttrackImport
 from apps.wizard.pages.fasttrack.load import load_data_from_csv, load_data_from_sheets
-from apps.wizard.pages.fasttrack.utils import IMPORT_GSHEET, LOCAL_CSV, UPDATE_GSHEET, set_states
+from apps.wizard.pages.fasttrack.utils import IMPORT_GSHEET, LOCAL_CSV, UPDATE_GSHEET, ValidationError, set_states
 from etl.paths import DATA_DIR, LATEST_REGIONS_DATASET_PATH
 
 
@@ -154,25 +153,25 @@ def _validate_data(df: pd.DataFrame, variables_meta_dict: Dict[str, VariableMeta
         try:
             validate_underscore(col, "Variables")
         except NameError as e:
-            errors.append(sheets.ValidationError(e))
+            errors.append(ValidationError(e))
 
     # missing columns in metadata
     for col in set(df.columns) - set(variables_meta_dict.keys()):
-        errors.append(sheets.ValidationError(f"Variable {col} is not defined in metadata"))
+        errors.append(ValidationError(f"Variable {col} is not defined in metadata"))
 
     # extra columns in metadata
     for col in set(variables_meta_dict.keys()) - set(df.columns):
-        errors.append(sheets.ValidationError(f"Variable {col} in metadata is not in the data"))
+        errors.append(ValidationError(f"Variable {col} in metadata is not in the data"))
 
     # missing titles
     for col in df.columns:
         if col in variables_meta_dict and not variables_meta_dict[col].title:
-            errors.append(sheets.ValidationError(f"Variable {col} is missing title (you can use its short name)"))
+            errors.append(ValidationError(f"Variable {col} is missing title (you can use its short name)"))
 
     # no inf values
     for col in df.select_dtypes("number").columns:
         if col in df.columns and np.isinf(df[col].abs().max()):
-            errors.append(sheets.ValidationError(f"Variable {col} has inf values"))
+            errors.append(ValidationError(f"Variable {col} has inf values"))
 
     if errors:
         for error in errors:

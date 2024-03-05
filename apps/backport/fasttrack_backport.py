@@ -10,12 +10,21 @@ from google.oauth2.service_account import Credentials
 from owid.catalog.utils import underscore
 
 from apps.backport.backport import PotentialBackport
-from apps.fasttrack.sheets import SHEET_TO_GID
 from etl.backport_helpers import create_dataset
 from etl.db import get_engine
 from etl.metadata_export import metadata_export
 
 log = structlog.get_logger()
+
+
+SHEET_TO_GID = {
+    "data": 409110122,
+    "raw_data": 901452831,
+    "variables_meta": 777328216,
+    "dataset_meta": 1719161864,
+    "sources_meta": 1399503534,
+    "origins_meta": 279169148,
+}
 
 
 @click.command(name="fasttrack")

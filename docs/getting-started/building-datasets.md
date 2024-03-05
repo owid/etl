@@ -30,6 +30,33 @@ OK (0.0s)
 3. data://garden/biodiversity/2024-01-25/cherry_blossom
 ```
 
+!!! note "Activate your virtual environment"
+
+    If you are not already, make sure to use these tools within your **virtual environment**.
+
+    Details can be found in the [Poetry docs](https://python-poetry.org/docs/basic-usage/#using-your-virtual-environment), but if you have never used the tool before here is a basic usage that will get you started (this assumes you have been [here](../working-environment/#install-dependencies) and installed Poetry):
+
+    ```bash
+    # Install the dependencies defined in pyproject.toml and poetry.lock
+    poetry install
+    ```
+
+    Next you can use one of the following two methods:
+
+    ```bash
+    # Activate virtual environment. Once activated, you can use the tools here as normal.
+    poetry shell
+    etl run --dry-run data://garden/biodiversity/2024-01-25/cherry_blossom
+    ```
+
+    Or
+
+    ```bash
+    # Run a specific command in virtual environment. This will not leave you in the virtual environment.
+    poetry run etl run --dry-run data://garden/biodiversity/2024-01-25/cherry_blossom
+    ```
+
+
 The first step is a `snapshot://` steps, which when executed will download upstream snapshot of the dataset to the `data/snapshots/` folder. The remaining steps are `data://` steps, which will generate local datasets in the `data/` folder.
 
 !!! note "`meadow` and `garden` channels"

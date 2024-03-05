@@ -3,15 +3,22 @@
 """
 import subprocess
 from datetime import datetime
+from enum import Enum
 
+import pandas as pd
 import streamlit as st
 from st_aggrid import AgGrid, GridUpdateMode, JsCode
 from st_aggrid.grid_options_builder import GridOptionsBuilder
+from st_pages import add_indentation
+from structlog import get_logger
 
 from apps.step_update.cli import StepUpdater
 from etl.config import ADMIN_HOST, ENV_IS_REMOTE
 from etl.db import can_connect
 
+########################################
+# GLOBAL VARIABLES and SESSION STATE
+########################################
 # TODO:
 #  * Consider creating a script to regularly check for snapshot updates, fetch them and add them to the temporary DAG (this is the way that the "update state" will know if there are snapshot updates available).
 #  * Define a metric of update prioritization, based on number of charts (or views) and days to update. Sort steps table by this metric.
@@ -35,27 +42,44 @@ DEPENDENCIES_TO_IGNORE = [
     "snapshot://hyde/2017/general_files.zip",
 ]
 
-# Define labels for update states.
-UPDATE_STATE_UNKNOWN = "Unknown"
-UPDATE_STATE_UP_TO_DATE = "No updates known"
-UPDATE_STATE_OUTDATED = "Outdated"
-UPDATE_STATE_MINOR_UPDATE = "Minor update possible"
-UPDATE_STATE_MAJOR_UPDATE = "Major update possible"
-UPDATE_STATE_ARCHIVABLE = "Archivable"
+# Initialise session state
+## Selected steps
+st.session_state.selected_steps = st.session_state.get("selected_steps", [])
+## Selected steps in table
+st.session_state.selected_steps_table = st.session_state.get("selected_steps_table", [])
 
-# CONFIG
+# Logging
+log = get_logger()
+
+
+# Define labels for update states.
+class UpdateState(Enum):
+    UNKNOWN = "Unknown"
+    UP_TO_DATE = "No updates known"
+    OUTDATED = "Outdated"
+    MINOR_UPDATE = "Minor update possible"
+    MAJOR_UPDATE = "Major update possible"
+    ARCHIVABLE = "Archivable"
+
+
+########################################
+# PAGE CONFIG
+########################################
 st.set_page_config(
     page_title="Wizard: ETL Dashboard",
     layout="wide",
     page_icon="🪄",
     initial_sidebar_state="collapsed",
 )
+add_indentation()
 
-st.title("📋 ETL Dashboard")
+########################################
+# TITLE and DESCRIPTION
+########################################
+st.title("ETL Dashboard 📋 :grey[Control panel for ETL updates]")
 st.markdown(
     """\
-## Control panel for ETL updates.
-This dashboard lets you explore all active ETL steps, and, if you are working on your local machine, update them.
+Explore all active ETL steps, and, if you are working on your local machine, update them.
 
 🔨 To update some steps, select them from the _Steps table_ and add them to the _Operations list_ below.
 
@@ -68,8 +92,15 @@ if not can_connect():
     st.error("Unable to connect to grapher DB.")
 
 
+########################################
+# LOAD STEPS TABLE
+########################################
 @st.cache_data
-def load_steps_df():
+def load_steps_df_all() -> pd.DataFrame:
+    """Generate and load the steps dataframe.
+
+    This is just done once, at the beginning.
+    """
     # Load steps dataframe.
     steps_df = StepUpdater().steps_df
 
@@ -122,18 +153,18 @@ def load_steps_df():
     ]
     # Add a column with the update state.
     # By default, the state is unknown.
-    steps_df["update_state"] = UPDATE_STATE_UNKNOWN
+    steps_df["update_state"] = UpdateState.UNKNOWN.value
     # If there is a newer version of the step, it is outdated.
-    steps_df.loc[~steps_df["is_latest"], "update_state"] = UPDATE_STATE_OUTDATED
+    steps_df.loc[~steps_df["is_latest"], "update_state"] = UpdateState.OUTDATED.value
     # If there are any dependencies that are not their latest version, it needs a minor update.
     # NOTE: If any of those dependencies is a snapshot, it needs a major update (defined in the following line).
     steps_df.loc[
         (steps_df["is_latest"]) & (steps_df["n_updateable_dependencies"] > 0), "update_state"
-    ] = UPDATE_STATE_MINOR_UPDATE
+    ] = UpdateState.MINOR_UPDATE.value
     # If there are any snapshot dependencies that are not their latest version, it needs a major update.
     steps_df.loc[
         (steps_df["is_latest"]) & (steps_df["n_updateable_snapshot_dependencies"] > 0), "update_state"
-    ] = UPDATE_STATE_MAJOR_UPDATE
+    ] = UpdateState.MAJOR_UPDATE.value
     # If the step does not need to be updated (i.e. update_period_days = 0) or if all dependencies are up to date,
     # then the step is up to date (in other words, we are not aware of any possible update).
     steps_df.loc[
@@ -144,82 +175,99 @@ def load_steps_df():
             & (steps_df["n_updateable_dependencies"] == 0)
         ),
         "update_state",
-    ] = UPDATE_STATE_UP_TO_DATE
+    ] = UpdateState.UP_TO_DATE.value
     # If a step has no charts and is not the latest version, it is archivable.
-    steps_df.loc[(steps_df["n_charts"] == 0) & (~steps_df["is_latest"]), "update_state"] = UPDATE_STATE_ARCHIVABLE
+    steps_df.loc[(steps_df["n_charts"] == 0) & (~steps_df["is_latest"]), "update_state"] = UpdateState.ARCHIVABLE.value
 
     return steps_df
 
 
-# Load the steps dataframe.
-steps_df = load_steps_df()
+@st.cache_data
+def load_steps_df(show_all_channels: bool) -> pd.DataFrame:
+    """Load the steps dataframe, and filter it according to the user's choice."""
+    # Load all data
+    df = load_steps_df_all()
 
-# Prepare dataframe to be displayed in the dashboard.
-df = steps_df[
-    [
-        "step",
-        "db_dataset_name_and_url",
-        "days_to_update",
-        "update_state",
-        "n_charts",
-        "n_charts_views_7d",
-        "n_charts_views_365d",
-        "date_of_next_update",
-        "namespace",
-        "version",
-        "channel",
-        "name",
-        "kind",
-        "dag_file_name",
-        "n_versions",
-        "update_period_days",
-        # "state",
-        "full_path_to_script",
-        "dag_file_path",
-        # "versions",
-        # "role",
-        # "all_usages",
-        # "direct_usages",
-        # "all_chart_ids",
-        # "all_chart_slugs",
-        # "all_chart_views_7d",
-        # "all_chart_views_365d",
-        # "all_active_dependencies",
-        # "all_active_usages",
-        # "direct_dependencies",
-        # "chart_ids",
-        # "same_steps_forward",
-        # "all_dependencies",
-        # "same_steps_all",
-        # "same_steps_latest",
-        # "latest_version",
-        # "identifier",
-        # "same_steps_backward",
-        # "n_newer_versions",
-        # "db_archived",
-        # "db_private",
+    # If toggle is not shown, pre-filter the DataFrame to show only rows where "channel" equals "grapher"
+    if not show_all_channels:
+        df = df[((df["channel"] == "grapher") & (df["n_charts"] > 0)) | (df["channel"] == "explorers")]
+
+    # Sort displayed data conveniently.
+    df = df.sort_values(
+        by=["days_to_update", "n_charts_views_7d", "n_charts", "kind", "version"],
+        na_position="last",
+        ascending=[True, False, False, False, True],
+    )
+
+    return df
+
+
+@st.cache_data
+def filter_columns_display(df) -> pd.DataFrame:
+    # Prepare dataframe to be displayed in the dashboard.
+    df = df[
+        [
+            "step",
+            "db_dataset_name_and_url",
+            "days_to_update",
+            "update_state",
+            "n_charts",
+            "n_charts_views_7d",
+            "n_charts_views_365d",
+            "date_of_next_update",
+            "namespace",
+            "version",
+            "channel",
+            "name",
+            "kind",
+            "dag_file_name",
+            "n_versions",
+            "update_period_days",
+            # "state",
+            "full_path_to_script",
+            "dag_file_path",
+            # "versions",
+            # "role",
+            # "all_usages",
+            # "direct_usages",
+            # "all_chart_ids",
+            # "all_chart_slugs",
+            # "all_chart_views_7d",
+            # "all_chart_views_365d",
+            # "all_active_dependencies",
+            # "all_active_usages",
+            # "direct_dependencies",
+            # "chart_ids",
+            # "same_steps_forward",
+            # "all_dependencies",
+            # "same_steps_all",
+            # "same_steps_latest",
+            # "latest_version",
+            # "identifier",
+            # "same_steps_backward",
+            # "n_newer_versions",
+            # "db_archived",
+            # "db_private",
+        ]
     ]
-]
+    return df
+
 
 # Streamlit UI to let users toggle the filter
-show_all_channels = not st.checkbox("Select only grapher steps with charts, and explorer steps", True)
+show_all_channels = not st.toggle("Select only grapher steps with charts, and explorer steps", True)
 
-if show_all_channels:
-    # If the toggle is checked, show all data
-    df = df
-else:
-    # Otherwise, pre-filter the DataFrame to show only rows where "channel" equals "grapher"
-    df = df[((df["channel"] == "grapher") & (df["n_charts"] > 0)) | (df["channel"] == "explorers")]
+# Load the steps dataframe.
+steps_df = load_steps_df(show_all_channels)
 
-# Sort displayed data conveniently.
-df = df.sort_values(
-    by=["days_to_update", "n_charts_views_7d", "n_charts", "kind", "version"],
-    na_position="last",
-    ascending=[True, False, False, False, True],
-)
+
+########################################
+# Display STEPS TABLE
+########################################
+# Get only columns to be shown
+steps_df_display = filter_columns_display(steps_df)
 
 # Define the options of the main grid table with pagination.
-gb = GridOptionsBuilder.from_dataframe(df)
+gb = GridOptionsBuilder.from_dataframe(steps_df_display)
 gb.configure_grid_options(domLayout="autoHeight", enableCellTextSelection=True)
 gb.configure_selection(
     selection_mode="multiple",
@@ -328,15 +376,15 @@ gb.configure_columns(
 update_state_jscode = JsCode(
     f"""
 function(params){{
-    if (params.value === "{UPDATE_STATE_UP_TO_DATE}") {{
+    if (params.value === "{UpdateState.UP_TO_DATE.value}") {{
         return {{'color': 'black', 'backgroundColor': 'green'}}
-    }} else if (params.value === "{UPDATE_STATE_OUTDATED}") {{
+    }} else if (params.value === "{UpdateState.OUTDATED.value}") {{
         return {{'color': 'black', 'backgroundColor': 'gray'}}
-    }} else if (params.value === "{UPDATE_STATE_MAJOR_UPDATE}") {{
+    }} else if (params.value === "{UpdateState.MAJOR_UPDATE.value}") {{
         return {{'color': 'black', 'backgroundColor': 'red'}}
-    }} else if (params.value === "{UPDATE_STATE_MINOR_UPDATE}") {{
+    }} else if (params.value === "{UpdateState.MINOR_UPDATE.value}") {{
         return {{'color': 'black', 'backgroundColor': 'orange'}}
-    }} else if (params.value === "{UPDATE_STATE_ARCHIVABLE}") {{
+    }} else if (params.value === "{UpdateState.ARCHIVABLE.value}") {{
         return {{'color': 'black', 'backgroundColor': 'blue'}}
     }} else {{
         return {{'color': 'black', 'backgroundColor': 'yellow'}}
@@ -349,7 +397,7 @@ gb.configure_columns(
     headerName="Update state",
     cellStyle=update_state_jscode,
     width=150,
-    headerTooltip=f'Update state of the step: "{UPDATE_STATE_UP_TO_DATE}" (up to date), "{UPDATE_STATE_MINOR_UPDATE}" (a dependency is outdated, but all origins are up to date), "{UPDATE_STATE_MAJOR_UPDATE}" (an origin is outdated), "{UPDATE_STATE_OUTDATED}" (there is a newer version of the step), "{UPDATE_STATE_ARCHIVABLE}" (the step is outdated and not used in charts, therefore can safely be archived).',
+    headerTooltip=f'Update state of the step: "{UpdateState.UP_TO_DATE.value}" (up to date), "{UpdateState.MINOR_UPDATE.value}" (a dependency is outdated, but all origins are up to date), "{UpdateState.MAJOR_UPDATE.value}" (an origin is outdated), "{UpdateState.OUTDATED.value}" (there is a newer version of the step), "{UpdateState.ARCHIVABLE.value}" (the step is outdated and not used in charts, therefore can safely be archived).',
 )
 # Create a column with grapher dataset names that are clickable and open in a new tab.
 grapher_dataset_jscode = JsCode(
@@ -390,7 +438,7 @@ grid_options = gb.build()
 
 # Display the grid table with pagination.
 grid_response = AgGrid(
-    df,
+    data=steps_df_display,
     gridOptions=grid_options,
     height=1000,
     width="100%",
@@ -406,93 +454,104 @@ grid_response = AgGrid(
     },
 )
 
+########################################
+# OPERATIONS LIST MANAGEMENT
+#
+# Add steps based on user selections.
+# User can add from checking in the steps table, but also there are some options to add dependencies, usages, etc.
+########################################
 
-def update_operations_list(new_items, clear_all=False):
-    """Append new items to the operation list, preserving existing order and avoiding duplicates."""
-    existing_items = set(st.session_state["selected_steps"])
-    for item in new_items:
-        if item not in existing_items:
-            st.session_state["selected_steps"].append(item)
+
+# Execute command to update selected steps.
+@st.cache_data(show_spinner=False)
+def execute_command(cmd):
+    """Execute a command and get its output.
+
+    TODO: This is not ideal. Shouldn't be executing commands in terminal.
+    """
+    try:
+        result = subprocess.run(cmd, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, shell=True)
+        return result.stdout
+    except subprocess.CalledProcessError as e:
+        return e.stderr
 
 
-if "selected_steps" not in st.session_state:
-    st.session_state["selected_steps"] = []
+def _add_steps_to_operations(steps_related):
+    # Remove those already in operations list
+    new_selected_steps = [step for step in steps_related if step not in st.session_state.selected_steps]
+    # Add new steps to the operations list.
+    st.session_state.selected_steps += new_selected_steps
+
 
 # Button to add selected steps to the Operations list.
-if st.button("Add selected steps to the _Operations list_"):
+if st.button("Add selected steps to the _Operations list_", type="primary"):
     new_selected_steps = [row["step"] for row in grid_response["selected_rows"]]
-    update_operations_list(new_selected_steps)
+    st.session_state.selected_steps_table += new_selected_steps
+    _add_steps_to_operations(new_selected_steps)
 
 
-def include_all_dependencies(step):
-    step_dependencies = steps_df[steps_df["step"] == step]["all_active_dependencies"].item()
-    update_operations_list(step_dependencies)
+def include_related_steps(step: str, column_related: str):
+    """User can add additional steps to the operations list based on the selected step.
+
+    E.g. adding direct dependencies, all usages, etc.
+    """
+    steps_related = steps_df[steps_df["step"] == step]
+    if len(steps_related) == 0:
+        log.error(f"Step {step} not found in the steps table.")
+    elif len(steps_related) == 1:
+        steps_related = steps_df[steps_df["step"] == step][column_related].item()
+        # Add steps to operations list
+        _add_steps_to_operations(steps_related)
+    else:
+        st.error(f"More than one step found with the same URI {step}!")
+        st.stop()
 
 
-def include_direct_dependencies(step):
-    step_dependencies = steps_df[steps_df["step"] == step]["direct_dependencies"].item()
-    update_operations_list(step_dependencies)
+def remove_step(step: str):
+    """Remove a step from the operations list."""
+    st.session_state.selected_steps.remove(step)
+    if step in st.session_state.selected_steps_table:
+        st.session_state.selected_steps_table.remove(step)
 
 
-def include_direct_usages(step):
-    step_usages = steps_df[steps_df["step"] == step]["direct_usages"].item()
-    update_operations_list(step_usages)
-
-
-def include_all_usages(step):
-    step_usages = steps_df[steps_df["step"] == step]["all_active_usages"].item()
-    update_operations_list(step_usages)
-
-
-def remove_selected_step(step):
-    st.session_state["selected_steps"] = [s for s in st.session_state["selected_steps"] if s != step]
-
-
-def empty_operations_list():
-    """Empty the operations list."""
-    st.session_state["selected_steps"] = []
-
-
+# Header
 st.markdown(
-    """\
-### Operations list
+    """### Operations list
 
 Add here steps from the _Steps table_ and operate on them.
 """
 )
+
 with st.container(border=True):
     # Create an operations list, that contains the steps (selected from the main steps table) we will operate upon.
-    if st.session_state.get("selected_steps"):
-        for step in st.session_state["selected_steps"]:
+    # Note: Selected steps might contain steps other those selected in the main steps table, based on user selections (e.g. dependencies).
+    if st.session_state.selected_steps:
+        for step in st.session_state.selected_steps:
             # Define the layout of the list.
-            cols = st.columns([1, 3, 1, 1, 1, 1])
+            cols = st.columns([0.5, 3, 1, 1, 1, 1])
 
             # Define the columns in order (from left to right) as a list of tuples (message, key suffix, function).
             actions = [
-                ("🗑️", "remove", remove_selected_step, "Remove this step from the _Operations list_."),
-                ("write", None, lambda step: step, ""),
+                ("🗑️", "remove", "Remove this step from the _Operations list_."),
+                (None, "write", ""),
                 (
                     "Add direct dependencies",
-                    "dependencies_direct",
-                    include_direct_dependencies,
+                    "direct_dependencies",
                     "Add direct dependencies of this step to the _Operations list_.",
                 ),
                 (
                     "Add all dependencies",
-                    "dependencies_all",
-                    include_all_dependencies,
+                    "all_active_dependencies",
                     "Add all dependencies of this step to the _Operations list_.",
                 ),
                 (
                     "Add direct usages",
-                    "usages_direct",
-                    include_all_usages,
+                    "direct_usages",
                     "Add direct usages of this step to the _Operations list_.",
                 ),
                 (
                     "Add all usages",
-                    "usages_all",
-                    include_all_usages,
+                    "all_active_usages",
                     "Add all usages of this step to the _Operations list_.",
                 ),
             ]
@@ -506,67 +565,87 @@ with st.container(border=True):
             #  * Execute ETL for all steps in the operation list.
 
             # Display the operations list.
-            for (action, key_suffix, callback, help), col in zip(actions, cols):
-                if action == "write":
-                    col.write(callback(step))
+            for (action_name, key_suffix, help_text), col in zip(actions, cols):
+                # Write step URI
+                if key_suffix == "write":
+                    if step in st.session_state.selected_steps_table:
+                        col.markdown(f"**{step}**")
+                    else:
+                        col.markdown(step)
+                # Remove step
+                elif key_suffix == "remove":
+                    col.button(
+                        label=action_name,
+                        key=f"{key_suffix}_{step}",
+                        on_click=lambda step=step: remove_step(step),
+                        help=help_text,
+                    )
+                # Add relared steps
                 else:
-                    col.button(action, key=f"{key_suffix}_{step}", on_click=callback, args=(step,), help=help)
+                    col.button(
+                        label=action_name,
+                        key=f"{key_suffix}_{step}",
+                        on_click=lambda step=step, key_suffix=key_suffix: include_related_steps(step, key_suffix),
+                        help=help_text,
+                    )
+        # Add button to clear the operations list.
+        st.button(
+            "Clear Operations list",
+            help="Remove all steps currently in the _Operations list_.",
+            type="secondary",
+            on_click=lambda: st.session_state.selected_steps.clear(),
+        )
+
     else:
-        st.write("No rows selected for operation.")
+        st.markdown(":grey[_No rows selected for operation..._]")
 
 
-def execute_command(cmd):
-    # Function to execute a command and get its output.
-    try:
-        result = subprocess.run(cmd, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, shell=True)
-        return result.stdout
-    except subprocess.CalledProcessError as e:
-        return e.stderr
+########################################
+# SUBMISSION
+########################################
 
-
-# Add button to clear the operations list.
-# TODO: Currently, it needs to be pressed twice to clear the list; not clear why.
-if st.button(
-    "Clear Operations list",
-    help="Remove all steps currently in the _Operations list_.",
-    type="secondary",
-):
-    empty_operations_list()
-
-
-# Add an expander menu with additional parameters for the update command.
-with st.expander("Update parameters", expanded=False):
-    dry_run = st.checkbox(
-        "Dry run", True, help="If checked, the update command will not write anything to the DAG or create any files."
-    )
-    version_new = st.text_input("New version", value=TODAY, help="Version of the new steps to be created.")
-
-# Button to execute the update command and show its output.
-if st.button(
-    f"Update {len(st.session_state.get('selected_steps', []))} steps",
-    help="Update steps in the _Operations list_.",
-    type="primary",
-):
-    with st.spinner("Executing step updater..."):
-        if ENV_IS_REMOTE:
-            st.error("The update command is not available in the remote version of the wizard. Update steps locally.")
-            st.stop()
-        else:
-            # TODO: It would be better to directly use StepUpdater instead of a subprocess.
-            command = (
-                "etl update "
-                + " ".join(st.session_state.get("selected_steps", []))
-                + " --non-interactive"
-                + f" --step-version-new {version_new}"
+if st.session_state.selected_steps:
+    # Add an expander menu with additional parameters for the update command.
+    with st.container(border=True):
+        with st.expander("Additional parameters", expanded=False):
+            dry_run = st.toggle(
+                "Dry run",
+                True,
+                help="If checked, the update command will not write anything to the DAG or create any files.",
             )
-            if dry_run:
-                command += " --dry-run"
-            cmd_output = execute_command(command)
-            # Show the output of the command in an expander.
-            with st.expander("Command Output:", expanded=True):
-                st.text_area("Output", value=cmd_output, height=300, key="cmd_output_area")
-            if "error" not in cmd_output.lower():
-                # Celebrate that the update was successful, why not.
-                st.balloons()
-            # Add a button to close the output expander.
-            st.button("Close", key="acknowledge_cmd_output")
+            version_new = st.text_input("New version", value=TODAY, help="Version of the new steps to be created.")
+
+        btn_submit = st.button(
+            f"Update {len(st.session_state.selected_steps)} steps",
+            help="Update steps in the _Operations list_.",
+            type="primary",
+            use_container_width=True,
+        )
+
+        # Button to execute the update command and show its output.
+        if btn_submit:
+            if ENV_IS_REMOTE:
+                st.error(
+                    "The update command is not available in the remote version of the wizard. Update steps locally."
+                )
+                st.stop()
+            else:
+                with st.spinner("Executing step updater..."):
+                    # TODO: It would be better to directly use StepUpdater instead of a subprocess.
+                    command = (
+                        "etl update "
+                        + " ".join(st.session_state.selected_steps)
+                        + " --non-interactive"
+                        + f" --step-version-new {version_new}"
+                    )
+                    if dry_run:
+                        command += " --dry-run"
+                    cmd_output = execute_command(command)
+                    # Show the output of the command in an expander.
+                    with st.expander("Command Output:", expanded=True):
+                        st.text_area("Output", value=cmd_output, height=300, key="cmd_output_area")
+                    if "error" not in cmd_output.lower():
+                        # Celebrate that the update was successful, why not.
+                        st.balloons()
+                    # Add a button to close the output expander.
+                    st.button("Close", key="acknowledge_cmd_output")
