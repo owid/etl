@@ -4,3 +4,7 @@ tables:
       dummy_variable:
         display:
           name: Test ETL API
+        description_key:
+          - First bullet point info about the data. [Detail on demand link](#dod:primaryenergy)
+          - Second bullet point with **bold** text and a [normal link](https://ourworldindata.org)
+          - The test bullet point
