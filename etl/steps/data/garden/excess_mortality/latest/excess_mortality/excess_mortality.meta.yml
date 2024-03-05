@@ -467,6 +467,22 @@ tables:
         sources:
           - name: Human Mortality Database (2024)
           - name: World Mortality Dataset (2024)
+      deaths_2024_all_ages:
+        title: deaths_2024_all_ages
+        # title: Number of deaths (weekly or monthly, 2022)
+        unit: ""
+        description: The reported number of weekly or monthly deaths from all causes for all ages in 2024.
+        display:
+          includeInTable: true
+          yearIsDay: true
+          zeroDay: 2020-01-01
+          numDecimalPlaces: 0
+        licenses:
+          - *license-hmd
+          - *license-wmd
+        sources:
+          - name: Human Mortality Database (2024)
+          - name: World Mortality Dataset (2024)
       deaths_since_2020_all_ages:
         title: deaths_since_2020_all_ages
         # title: Number of deaths (weekly or monthly, 2020–2022)
