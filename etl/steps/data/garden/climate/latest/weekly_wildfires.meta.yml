@@ -11,7 +11,7 @@ definitions:
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
 dataset:
-  update_period_days: 14
+  update_period_days: 7
 
 
 # Learn more about the available fields:
@@ -36,6 +36,24 @@ tables:
           description_short: Cumulative area burnt by wildfires in hectares.
           description_key:
             - The cumulative area burnt by wildfires is determined using satellite imagery from high-resolution satellite imagery collected by MODIS (Moderate Resolution Imaging Spectroradiometer) and VIIRS (Visible Infrared Imaging Radiometer Suite), which are instrumental in detecting thermal anomalies and changes in landscape patterns indicative of burning. These satellite systems, equipped with advanced sensors, capture detailed images that enable precise estimation of burnt areas, even in remote and inaccessible regions.
+
+        share_area_ha:
+          title: Share of the total land area burnt by wildfires
+          unit: '%'
+          short_unit: '%'
+          description_short: Share of the total land area burnt by wildfires.
+          description_key:
+            - The area burnt by wildfires is determined using satellite imagery from high-resolution satellite imagery collected by MODIS (Moderate Resolution Imaging Spectroradiometer) and VIIRS (Visible Infrared Imaging Radiometer Suite), which are instrumental in detecting thermal anomalies and changes in landscape patterns indicative of burning. These satellite systems, equipped with advanced sensors, capture detailed images that enable precise estimation of burnt areas, even in remote and inaccessible regions.
+          description_processing: The share of the total land area burnt by wildfires is calculated by dividing the area burnt by wildfires by the total land area of the country.
+
+        share_area_ha_cumulative:
+          title: Cumultive share of the total land area burnt by wildfires
+          unit: '%'
+          short_unit: '%'
+          description_short: Cumultive share of the total land area burnt by wildfires.
+          description_key:
+            - The cumulative area burnt by wildfires is determined using satellite imagery from high-resolution satellite imagery collected by MODIS (Moderate Resolution Imaging Spectroradiometer) and VIIRS (Visible Infrared Imaging Radiometer Suite), which are instrumental in detecting thermal anomalies and changes in landscape patterns indicative of burning. These satellite systems, equipped with advanced sensors, capture detailed images that enable precise estimation of burnt areas, even in remote and inaccessible regions.
+          description_processing: The share of the total land area burnt by wildfires is calculated by dividing the area burnt by wildfires by the total land area of the country.
 
         events:
           title: Number of fires
