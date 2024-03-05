@@ -1,0 +1,6 @@
+tables:
+  dummy:
+    variables:
+      dummy_variable:
+        display:
+          name: Test ETL API
