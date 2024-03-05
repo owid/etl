@@ -28,6 +28,6 @@ meta:
       url: https://gwis.jrc.ec.europa.eu/about-gwis/data-license
 
 outs:
-  - md5: d848e486e01ce16b572c1b0a46bfe9b0
-    size: 11436111
+  - md5: 7f7a9d5bd6a405b9e7210864916ed771
+    size: 11440167
     path: weekly_wildfires.csv
