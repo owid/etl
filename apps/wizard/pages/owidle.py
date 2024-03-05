@@ -28,7 +28,10 @@ UPDATES = {
     "2024-03-04": [
         "🐛 Fixed bug in distance estimation.",
         "✨ Bearing angle is now estimated using flat-earth approximation.",
-    ]
+    ],
+    "2024-03-05": [
+        "🐛 Fixed bug in bearing estimation.",
+    ],
 }
 DAYS_TO_SHOW_UPDATES = 3
 
@@ -436,7 +439,7 @@ def distance_to_solution(country_selected: str) -> Tuple[str, str, str]:
     # GEO_DIST = cast(gpd.GeoDataFrame, GEO.to_crs(3310))
     # GEO = cast(gpd.GeoDataFrame, GEO.to_crs(3310))
     df_geo = GEO.copy()
-    df_geo = cast(gpd.GeoDataFrame, df_geo.to_crs(epsg=3395))
+    # df_geo = cast(gpd.GeoDataFrame, df_geo.to_crs(epsg=3395))
     solution = df_geo.loc[df_geo["location"] == SOLUTION, "geometry"]
     guess = df_geo.loc[df_geo["location"] == country_selected, "geometry"]
 
