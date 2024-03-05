@@ -26,7 +26,7 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load meadow dataset.
-    ds_meadow: Dataset = paths.load_dependency("xm_karlinsky_kobak")
+    ds_meadow = paths.load_dataset("xm_karlinsky_kobak")
 
     # Read table from meadow dataset.
     tb_meadow = ds_meadow["xm_karlinsky_kobak"].reset_index()

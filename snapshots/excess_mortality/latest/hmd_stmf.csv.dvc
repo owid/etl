@@ -1,6 +1,6 @@
 meta:
   source:
-    name: Human Mortality Database (2023)
+    name: Human Mortality Database (2024)
     description: |-
       In response to the COVID-19 pandemic, the HMD team decided to establish a new data resource: Short-term Mortality Fluctuations (STMF) data series. Objective and internationally comparable data are crucial to determine the effectiveness of different strategies used to address epidemics. Weekly death counts provide the most objective and comparable way of assessing the scale of short-term mortality elevations across countries and time. More details about this data project can be found in the recently published paper (https://www.nature.com/articles/s41597-021-01019-1).
 
@@ -18,7 +18,7 @@ meta:
     publication_year: 2024
     published_by: |-
       HMD. Human Mortality Database. Max Planck Institute for Demographic Research (Germany), University of California, Berkeley (USA), and French Institute for Demographic Studies (France). Available at www.mortality.org.
-  name: Short-Term Mortality Fluctuations (HMD, 2023)
+  name: Short-Term Mortality Fluctuations (HMD, 2024)
   description: |-
     In response to the COVID-19 pandemic, the HMD team decided to establish a new data resource: Short-term Mortality Fluctuations (STMF) data series. Objective and internationally comparable data are crucial to determine the effectiveness of different strategies used to address epidemics. Weekly death counts provide the most objective and comparable way of assessing the scale of short-term mortality elevations across countries and time. More details about this data project can be found in the recently published paper (https://www.nature.com/articles/s41597-021-01019-1).
 
