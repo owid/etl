@@ -112,7 +112,6 @@ def merge_or_create_yaml(meta_dict: Dict[str, Any], output_path: Path, delete_em
             doc["tables"] = {}
 
         for k, v in meta_dict.get("dataset", {}).items():
-            # TODO: make sure that overwriting update_period_days works
             doc["dataset"][k] = v
 
         if delete_empty:
