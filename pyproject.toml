@@ -72,7 +72,7 @@ tiktoken = "^0.6.0"
 html2text = "^2020.1.16"
 
 [tool.poetry.group.api.dependencies]
-fastapi = "^0.109.0"
+fastapi = "^0.109.1"
 uvicorn = {extras = ["standard"], version = "^0.25.0"}
 slack-sdk = "^3.26.2"
 joblib = "^1.3.2"
