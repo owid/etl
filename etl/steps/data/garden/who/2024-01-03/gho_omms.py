@@ -2,6 +2,7 @@ from typing import Dict
 
 import numpy as np
 import owid.catalog.processing as pr
+import pandas as pd
 from owid.catalog import Dataset, Table
 
 from etl.data_helpers import geo
@@ -19,6 +20,8 @@ def create_omms(tables_dict: Dict[str, Table], ds_population: Dataset, ds_region
 
     add_global_total_leprosy(tables_dict, ds_regions)
 
+    add_both_sexes_for_pneumonia(tables_dict)
+
     # df_variables = add_youth_mortality_rates(
     #    df_variables=df_variables,
     #    younger_ind="Indicator:Under-five mortality rate (per 1000 live births) (SDG 3.2.1) - Sex:Both sexes",
@@ -27,6 +30,28 @@ def create_omms(tables_dict: Dict[str, Table], ds_population: Dataset, ds_region
     #    new_ind_name_long="Indicator:Under-ten mortality rate (per 1000 live births)",
     #    new_ind_desc="Definition: Under ten mortality rate is the share of newborns who die before reaching the age of 10. It is calculated by OWID based on WHO Global Health Observatory data.",
     # )
+
+
+def add_both_sexes_for_pneumonia(tables_dict: dict[str, Table]) -> None:
+    """We miss `both sexes` for pneumonia. Calculate it by averaging estimates for both sexes."""
+    indicator_name = "Children aged < 5 years with pneumonia symptoms taken to a health facility (%)"
+    col = "children_aged__lt__5_years_with_pneumonia_symptoms_taken_to_a_health_facility__pct"
+    tb = tables_dict[indicator_name]
+
+    # create `both sexes` by averaging males and females (this is not ideal as both populations might
+    # not be equal, but we don't have that data)
+    tb = tb.query("sex.notnull()")
+    both_sexes_avg = tb[[col]].groupby(["year", "country"], observed=True).mean().reset_index()
+    both_sexes_avg["sex"] = "both sexes"
+    for col in tb.index.names:
+        if col not in ("year", "country", "sex"):
+            both_sexes_avg[col] = np.nan
+
+    both_sexes_avg = both_sexes_avg.set_index(tb.index.names)
+
+    tb = pd.concat([tb, both_sexes_avg]).copy_metadata(tb)
+
+    tables_dict[indicator_name] = tb
 
 
 def add_population_without_clean_cooking_fuels(tables_dict: dict[str, Table], ds_population: Dataset) -> None:

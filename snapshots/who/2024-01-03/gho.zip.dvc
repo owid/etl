@@ -3,17 +3,16 @@
 meta:
   origin:
     # Data product / Snapshot
-    title: WHO Global Health Observatory
+    title: Global Health Observatory
     description: |-
       The GHO data repository is WHO's gateway to health-related statistics for its 194 Member States. It provides access to over 1000 indicators on priority health topics including mortality and burden of diseases, the Millennium Development Goals (child nutrition, child health, maternal and reproductive health, immunization, HIV/AIDS, tuberculosis, malaria, neglected diseases, water and sanitation), non communicable diseases and risk factors, epidemic-prone diseases, health systems, environmental health, violence and injuries, equity among others.
     date_published: 2024-01-03
 
     # Citation
     producer: World Health Organization
-    # NOTE: this is what we had in the previous version, perhaps we should change it?
-    attribution: WHO, Global Health Observatory
+    attribution: World Health Organization - Global Health Observatory (2024)
     citation_full: |-
-      World Health Organization. 2023. Global Health Observatory data repository. http://www.who.int/gho/en/. Accessed on 2024-01-03
+      World Health Organization. 2024. Global Health Observatory data repository. http://www.who.int/gho/en/. Accessed on 2024-01-03
     attribution_short: WHO
 
     # Files

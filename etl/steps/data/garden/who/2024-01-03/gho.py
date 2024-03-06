@@ -47,6 +47,8 @@ NAN_VALUES = [
     "None",
     "none",
     "Data not available",
+    "...",
+    "…",
 ]
 
 
@@ -144,7 +146,7 @@ def run(dest_dir: str) -> None:
 
         tables.append(tb)
 
-    # Custom fixes.
+    # Merge identical tables
     tables = merge_identical_tables(tables)
 
     tables_dict = {tb.m.title: tb for tb in tables}
