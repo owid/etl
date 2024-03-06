@@ -190,7 +190,7 @@ def load_steps_df_to_display(show_all_channels: bool) -> pd.DataFrame:
 
     # If toggle is not shown, pre-filter the DataFrame to show only rows where "channel" equals "grapher"
     if not show_all_channels:
-        df = df[((df["channel"] == "grapher") & (df["n_charts"] > 0)) | (df["channel"] == "explorers")]
+        df = df[df["channel"].isin(["grapher", "explorers"])]
 
     # Sort displayed data conveniently.
     df = df.sort_values(
@@ -249,7 +249,7 @@ def load_steps_df_to_display(show_all_channels: bool) -> pd.DataFrame:
 
 
 # Streamlit UI to let users toggle the filter
-show_all_channels = not st.toggle("Select only grapher steps with charts, and explorer steps", True)
+show_all_channels = not st.toggle("Select only grapher and explorer steps", True)
 
 # Load the steps dataframe.
 steps_df = load_steps_df()
