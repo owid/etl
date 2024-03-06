@@ -96,7 +96,7 @@ if not can_connect():
 # LOAD STEPS TABLE
 ########################################
 @st.cache_data
-def load_steps_df_all() -> pd.DataFrame:
+def load_steps_df() -> pd.DataFrame:
     """Generate and load the steps dataframe.
 
     This is just done once, at the beginning.
@@ -183,10 +183,10 @@ def load_steps_df_all() -> pd.DataFrame:
 
 
 @st.cache_data
-def load_steps_df(show_all_channels: bool) -> pd.DataFrame:
+def load_steps_df_to_display(show_all_channels: bool) -> pd.DataFrame:
     """Load the steps dataframe, and filter it according to the user's choice."""
     # Load all data
-    df = load_steps_df_all()
+    df = load_steps_df()
 
     # If toggle is not shown, pre-filter the DataFrame to show only rows where "channel" equals "grapher"
     if not show_all_channels:
@@ -199,11 +199,6 @@ def load_steps_df(show_all_channels: bool) -> pd.DataFrame:
         ascending=[True, False, False, False, True],
     )
 
-    return df
-
-
-@st.cache_data
-def filter_columns_display(df) -> pd.DataFrame:
     # Prepare dataframe to be displayed in the dashboard.
     df = df[
         [
@@ -257,14 +252,14 @@ def filter_columns_display(df) -> pd.DataFrame:
 show_all_channels = not st.toggle("Select only grapher steps with charts, and explorer steps", True)
 
 # Load the steps dataframe.
-steps_df = load_steps_df(show_all_channels)
+steps_df = load_steps_df()
 
 
 ########################################
 # Display STEPS TABLE
 ########################################
 # Get only columns to be shown
-steps_df_display = filter_columns_display(steps_df)
+steps_df_display = load_steps_df_to_display(show_all_channels)
 
 # Define the options of the main grid table with pagination.
 gb = GridOptionsBuilder.from_dataframe(steps_df_display)
