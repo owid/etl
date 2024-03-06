@@ -2,6 +2,7 @@ tables:
   dummy:
     variables:
       dummy_variable:
+        title: Dummy - Lars TEST
         display:
           name: Test ETL API
         description_key:
