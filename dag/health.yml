@@ -471,3 +471,13 @@ steps:
     - data://meadow/oecd/2024-02-23/health_expenditure
   data://grapher/oecd/2024-02-23/health_expenditure:
     - data://garden/oecd/2024-02-23/health_expenditure
+
+  # Global Health Observatory (GHO) from WHO
+  data://meadow/who/2024-01-03/gho:
+    - snapshot://who/2024-01-03/gho.zip
+  data://garden/who/2024-01-03/gho:
+    - data://meadow/who/2024-01-03/gho
+    - data://garden/demography/2023-03-31/population
+    - data://garden/regions/2023-01-01/regions
+  data://grapher/who/2024-01-03/gho:
+    - data://garden/who/2024-01-03/gho
