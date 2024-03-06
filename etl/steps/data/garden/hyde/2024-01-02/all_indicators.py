@@ -130,7 +130,7 @@ def run(dest_dir: str) -> None:
 
     # Replace year 0 with year 1
     ## More: https://en.wikipedia.org/wiki/Year_zero#cite_note-7
-    tb["year"] = tb["year"].replace(0, 1)
+    # tb["year"] = tb["year"].replace(0, -1)
 
     # Set index
     tb = tb.set_index(["country", "year"], verify_integrity=True).sort_index()
