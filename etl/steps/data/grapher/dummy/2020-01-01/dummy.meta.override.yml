@@ -9,3 +9,6 @@ tables:
           - First bullet point info about the data. [Detail on demand link](#dod:primaryenergy)
           - Second bullet point with **bold** text and a [normal link](https://ourworldindata.org)
           - The test bullet point
+        description_processing: ''
+        presentation:
+          title_public: The dummy indicator - data page title woof
