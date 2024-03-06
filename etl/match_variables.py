@@ -328,9 +328,9 @@ def find_mapping_suggestions(
 
         Uses matching_function, but on top of that ensures that score is maximum if names of old and new variables are identical.
         """
-        if _sanitize(old_name) == _sanitize(new_name):
+        if old_name == new_name:
             return 9999
-        return matching_function(_sanitize(old_name), _sanitize(new_name))
+        return matching_function(old_name, new_name)
 
     # Iterate over old variables, and find the right match among new variables.
     suggestions = []
@@ -393,7 +393,7 @@ def find_mapping_suggestions_optim(
         """
         if old_name == new_name:
             return 9999
-        return matching_function(_sanitize(old_name), _sanitize(new_name))
+        return matching_function(old_name, new_name)
 
     # Vectorized approach to compute similarities (this needs adjustment based on matching_function capabilities)
     def compute_similarities_vectorized(old_names, new_names):
@@ -573,10 +573,3 @@ def _input_manual_decision(new_indexes: list[Any]) -> Any:
         print(f"Invalid option: It should be one in {new_indexes}.")
 
     return chosen_index
-
-
-def _sanitize(s: str):
-    """Sanitize string."""
-    s = s.replace("Indicator:", "").replace("&GreaterEqual;", ">=")
-
-    return s
