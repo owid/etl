@@ -4,7 +4,7 @@ import math
 import time
 from itertools import product
 from pathlib import Path
-from typing import List, Tuple, cast
+from typing import List, Tuple
 
 import geopandas as gpd
 import pandas as pd
