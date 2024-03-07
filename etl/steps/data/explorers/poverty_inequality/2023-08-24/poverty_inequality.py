@@ -46,8 +46,8 @@ def add_pip_data(PIP_PATH: str):
         "reporting_pce",
         "mld",
         "polarization",
-        "reporting_level",
-        "welfare_type",
+        # "reporting_level",
+        # "welfare_type",
     ]
 
     tb_pip = tb_pip.drop(columns=drop_list)
