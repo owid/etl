@@ -115,6 +115,7 @@ def run(dest_dir: str) -> None:
         ],
         verify_integrity=True,
     )
+
     tb_percentiles = tb_percentiles.set_index(
         [
             "country",
@@ -133,6 +134,8 @@ def run(dest_dir: str) -> None:
         verify_integrity=True,
     )
 
+    tb_wdi = tb_wdi.set_index(["country", "year"], verify_integrity=True)
+
     # Create explorer dataset, with garden table and metadata in csv format
     ds_explorer = create_dataset(
         dest_dir,
@@ -143,12 +146,12 @@ def run(dest_dir: str) -> None:
     ds_explorer.save()
 
 
-def create_keyvars_file_pip(tb_pip: Table) -> Table:
+def create_keyvars_file_pip(tb: Table) -> Table:
     """
     Process the main table from PIP, to adapt it to a concatenated file with LIS and WID
     """
 
-    tb_pip = tb_pip.copy()
+    tb = tb.copy()
 
     # Set the list of indicators to use
     # TODO: Add averages and shares at the top of the distribution
@@ -162,20 +165,20 @@ def create_keyvars_file_pip(tb_pip: Table) -> Table:
     ]
 
     # Select the columns to keep
-    tb_pip = tb_pip[["country", "year", "reporting_level", "welfare_type"] + indicators_list]
+    tb = tb[["country", "year", "reporting_level", "welfare_type"] + indicators_list]
 
     # Make pip table longer
-    tb_pip = tb_pip.melt(
+    tb = tb.melt(
         id_vars=["country", "year", "reporting_level", "welfare_type"],
         var_name="indicator_name",
         value_name="value",
     )
 
     # Rename welfare_type and reporting_level
-    tb_pip = tb_pip.rename(columns={"welfare_type": "pipwelfare", "reporting_level": "pipReportingLevel"})
+    tb = tb.rename(columns={"welfare_type": "pipwelfare", "reporting_level": "pipReportingLevel"})
 
     # Rename welfare and equivalization columns
-    tb_pip["indicator_name"] = tb_pip["indicator_name"].replace(
+    tb["indicator_name"] = tb["indicator_name"].replace(
         {
             "palma_ratio": "palmaRatio",
             "headcount_ratio_50_median": "headcountRatio50Median",
@@ -184,51 +187,51 @@ def create_keyvars_file_pip(tb_pip: Table) -> Table:
     )
 
     # Add descriptive columns
-    tb_pip["welfare"] = "disposable"
-    tb_pip["resource_sharing"] = "perCapita"
-    tb_pip["source"] = "pip"
-    tb_pip["prices"] = ""
-    tb_pip["prices"] = tb_pip["prices"].where(
-        (tb_pip["indicator_name"] != "mean") & (tb_pip["indicator_name"] != "median"),
+    tb["welfare"] = "disposable"
+    tb["resource_sharing"] = "perCapita"
+    tb["source"] = "pip"
+    tb["prices"] = ""
+    tb["prices"] = tb["prices"].where(
+        (tb["indicator_name"] != "mean") & (tb["indicator_name"] != "median"),
         "2017ppp2017",
     )
-    tb_pip["prices"] = tb_pip["prices"].astype(str)
+    tb["prices"] = tb["prices"].astype(str)
 
     # Add the column series_code, which is the concatenation of welfare, equivalization and indicator_name
-    tb_pip["series_code"] = (
-        tb_pip["indicator_name"].astype(str)
+    tb["series_code"] = (
+        tb["indicator_name"].astype(str)
         + "_"
-        + tb_pip["source"].astype(str)
+        + tb["source"].astype(str)
         + "_"
-        + tb_pip["welfare"].astype(str)
+        + tb["welfare"].astype(str)
         + "_"
-        + tb_pip["resource_sharing"].astype(str)
+        + tb["resource_sharing"].astype(str)
         + "_"
-        + tb_pip["prices"].astype(str)
+        + tb["prices"].astype(str)
     )
 
     # Remove trailing "_" from series_code
-    tb_pip["series_code"] = tb_pip["series_code"].str.rstrip("_")
+    tb["series_code"] = tb["series_code"].str.rstrip("_")
 
     # Replace names for descriptive columns
-    tb_pip["source"] = tb_pip["source"].replace({"pip": "PIP"})
-    tb_pip["prices"] = tb_pip["prices"].replace({"2017ppp2017": "2017 PPPs, at 2017 prices"})
-    tb_pip["welfare"] = tb_pip["welfare"].replace({"disposable": "Disposable income or consumption"})
-    tb_pip["resource_sharing"] = tb_pip["resource_sharing"].replace({"perCapita": "Per capita"})
+    tb["source"] = tb["source"].replace({"pip": "PIP"})
+    tb["prices"] = tb["prices"].replace({"2017ppp2017": "2017 PPPs, at 2017 prices"})
+    tb["welfare"] = tb["welfare"].replace({"disposable": "Disposable income or consumption"})
+    tb["resource_sharing"] = tb["resource_sharing"].replace({"perCapita": "Per capita"})
 
     # Add unit column
-    tb_pip["unit"] = ""
-    tb_pip["unit"] = tb_pip["unit"].where(
-        (tb_pip["indicator_name"] != "mean") & (tb_pip["indicator_name"] != "median"),
+    tb["unit"] = ""
+    tb["unit"] = tb["unit"].where(
+        (tb["indicator_name"] != "mean") & (tb["indicator_name"] != "median"),
         "dollars",
     )
-    tb_pip["unit"] = tb_pip["unit"].where(tb_pip["indicator_name"] != "p90p100Share", "%")
-    tb_pip["unit"] = tb_pip["unit"].astype(str)
+    tb["unit"] = tb["unit"].where(tb["indicator_name"] != "p90p100Share", "%")
+    tb["unit"] = tb["unit"].astype(str)
 
-    return tb_pip
+    return tb
 
 
-def create_keyvars_file_lis(tb_lis: Table, adults: bool) -> Table:
+def create_keyvars_file_lis(tb: Table, adults: bool) -> Table:
     """
     Process the main table from LIS, to adapt it to a concatenated file with WID and PIP
     """
@@ -241,7 +244,7 @@ def create_keyvars_file_lis(tb_lis: Table, adults: bool) -> Table:
         pc_notation = "perCapita"
         pc_notation_human_readable = "Per capita"
 
-    tb_lis = tb_lis.copy()
+    tb = tb.copy()
 
     # Set the list of indicators to use
     # TODO: Add averages and shares at the top of the distribution
@@ -273,23 +276,23 @@ def create_keyvars_file_lis(tb_lis: Table, adults: bool) -> Table:
     ]
 
     # Select the columns to keep
-    tb_lis = tb_lis[["country", "year"] + indicators_list]
+    tb = tb[["country", "year"] + indicators_list]
 
     # Make lis table longer
-    tb_lis = tb_lis.melt(id_vars=["country", "year"], var_name="indicator_welfare_equivalization", value_name="value")
+    tb = tb.melt(id_vars=["country", "year"], var_name="indicator_welfare_equivalization", value_name="value")
 
     # Split indicator_welfare_equivalization column into three columns, using the last two "_" as separators
-    tb_lis[["indicator_name", "welfare", "equivalization"]] = tb_lis["indicator_welfare_equivalization"].str.rsplit(
+    tb[["indicator_name", "welfare", "equivalization"]] = tb["indicator_welfare_equivalization"].str.rsplit(
         "_", n=2, expand=True
     )
 
     # Drop indicator_welfare_equivalization column
-    tb_lis = tb_lis.drop(columns=["indicator_welfare_equivalization"])
+    tb = tb.drop(columns=["indicator_welfare_equivalization"])
 
     # Rename welfare and equivalization columns
-    tb_lis["welfare"] = tb_lis["welfare"].replace({"mi": "market", "dhi": "disposable"})
-    tb_lis["equivalization"] = tb_lis["equivalization"].replace({"eq": "equivalized", "pc": pc_notation})
-    tb_lis["indicator_name"] = tb_lis["indicator_name"].replace(
+    tb["welfare"] = tb["welfare"].replace({"mi": "market", "dhi": "disposable"})
+    tb["equivalization"] = tb["equivalization"].replace({"eq": "equivalized", "pc": pc_notation})
+    tb["indicator_name"] = tb["indicator_name"].replace(
         {
             "palma_ratio": "palmaRatio",
             "headcount_ratio_50_median": "headcountRatio50Median",
@@ -298,62 +301,62 @@ def create_keyvars_file_lis(tb_lis: Table, adults: bool) -> Table:
     )
 
     # Add descriptive columns
-    tb_lis["source"] = "lis"
-    tb_lis["prices"] = ""
-    tb_lis["prices"] = tb_lis["prices"].where(
-        (tb_lis["indicator_name"] != "mean") & (tb_lis["indicator_name"] != "median"),
+    tb["source"] = "lis"
+    tb["prices"] = ""
+    tb["prices"] = tb["prices"].where(
+        (tb["indicator_name"] != "mean") & (tb["indicator_name"] != "median"),
         "2017ppp2017",
     )
-    tb_lis["prices"] = tb_lis["prices"].astype(str)
+    tb["prices"] = tb["prices"].astype(str)
 
     # Add the column series_code, which is the concatenation of welfare, equivalization and indicator_name
-    tb_lis["series_code"] = (
-        tb_lis["indicator_name"].astype(str)
+    tb["series_code"] = (
+        tb["indicator_name"].astype(str)
         + "_"
-        + tb_lis["source"].astype(str)
+        + tb["source"].astype(str)
         + "_"
-        + tb_lis["welfare"].astype(str)
+        + tb["welfare"].astype(str)
         + "_"
-        + tb_lis["equivalization"].astype(str)
+        + tb["equivalization"].astype(str)
         + "_"
-        + tb_lis["prices"].astype(str)
+        + tb["prices"].astype(str)
     )
 
     # Remove trailing "_" from series_code
-    tb_lis["series_code"] = tb_lis["series_code"].str.rstrip("_")
+    tb["series_code"] = tb["series_code"].str.rstrip("_")
 
     # Replace names for descriptive columns
-    tb_lis["source"] = tb_lis["source"].replace({"lis": "LIS"})
-    tb_lis["prices"] = tb_lis["prices"].replace({"2017ppp2017": "2017 PPPs, at 2017 prices"})
-    tb_lis["welfare"] = tb_lis["welfare"].replace({"market": "Market income", "disposable": "Disposable income"})
-    tb_lis["equivalization"] = tb_lis["equivalization"].replace(
+    tb["source"] = tb["source"].replace({"lis": "LIS"})
+    tb["prices"] = tb["prices"].replace({"2017ppp2017": "2017 PPPs, at 2017 prices"})
+    tb["welfare"] = tb["welfare"].replace({"market": "Market income", "disposable": "Disposable income"})
+    tb["equivalization"] = tb["equivalization"].replace(
         {"equivalized": "Equivalized", "perCapita": pc_notation_human_readable}
     )
 
     # Add unit column
-    tb_lis["unit"] = ""
-    tb_lis["unit"] = tb_lis["unit"].where(
-        (tb_lis["indicator_name"] != "mean") & (tb_lis["indicator_name"] != "median"),
+    tb["unit"] = ""
+    tb["unit"] = tb["unit"].where(
+        (tb["indicator_name"] != "mean") & (tb["indicator_name"] != "median"),
         "dollars",
     )
-    tb_lis["unit"] = tb_lis["unit"].where(tb_lis["indicator_name"] != "p90p100Share", "%")
-    tb_lis["unit"] = tb_lis["unit"].astype(str)
+    tb["unit"] = tb["unit"].where(tb["indicator_name"] != "p90p100Share", "%")
+    tb["unit"] = tb["unit"].astype(str)
 
     # Rename column equivalization to resource_sharing
-    tb_lis = tb_lis.rename(columns={"equivalization": "resource_sharing"})
+    tb = tb.rename(columns={"equivalization": "resource_sharing"})
 
     # Remove equivalized data for adults
     if adults:
-        tb_lis = tb_lis[tb_lis["resource_sharing"] != "Equivalized"].reset_index(drop=True)
+        tb = tb[tb["resource_sharing"] != "Equivalized"].reset_index(drop=True)
 
-    return tb_lis
+    return tb
 
 
-def create_keyvars_file_wid(tb_wid: Table, extrapolated: bool) -> Table:
+def create_keyvars_file_wid(tb: Table, extrapolated: bool) -> Table:
     """
     Process the main table from WID, to adapt it to a concatenated file with LIS and PIP
     """
-    tb_wid = tb_wid.copy()
+    tb = tb.copy()
 
     # Set the list of indicators to use
     indicators_list = [
@@ -380,26 +383,26 @@ def create_keyvars_file_wid(tb_wid: Table, extrapolated: bool) -> Table:
         indicators_list = [indicator + "_extrapolated" for indicator in indicators_list]
 
     # Select the columns to keep
-    tb_wid = tb_wid[["country", "year"] + indicators_list]
+    tb = tb[["country", "year"] + indicators_list]
 
     # Make wid table longer
-    tb_wid = tb_wid.melt(id_vars=["country", "year"], var_name="indicator_welfare", value_name="value")
+    tb = tb.melt(id_vars=["country", "year"], var_name="indicator_welfare", value_name="value")
 
     # Replace the name posttax_nat with posttax
-    tb_wid["indicator_welfare"] = tb_wid["indicator_welfare"].str.replace("posttax_nat", "posttax")
+    tb["indicator_welfare"] = tb["indicator_welfare"].str.replace("posttax_nat", "posttax")
 
     if extrapolated:
-        tb_wid["indicator_welfare"] = tb_wid["indicator_welfare"].str.replace("_extrapolated", "")
+        tb["indicator_welfare"] = tb["indicator_welfare"].str.replace("_extrapolated", "")
 
     # Split indicator_welfare column into two columns, using the last "_" as separator
-    tb_wid[["indicator_name", "welfare"]] = tb_wid["indicator_welfare"].str.rsplit("_", n=1, expand=True)
+    tb[["indicator_name", "welfare"]] = tb["indicator_welfare"].str.rsplit("_", n=1, expand=True)
 
     # Drop indicator_welfare column
-    tb_wid = tb_wid.drop(columns=["indicator_welfare"])
+    tb = tb.drop(columns=["indicator_welfare"])
 
     # Rename welfare column
-    tb_wid["welfare"] = tb_wid["welfare"].replace({"pretax": "pretaxNational", "posttax": "posttaxNational"})
-    tb_wid["indicator_name"] = tb_wid["indicator_name"].replace(
+    tb["welfare"] = tb["welfare"].replace({"pretax": "pretaxNational", "posttax": "posttaxNational"})
+    tb["indicator_name"] = tb["indicator_name"].replace(
         {
             "p0p100_gini": "gini",
             "p0p100_avg": "mean",
@@ -413,66 +416,66 @@ def create_keyvars_file_wid(tb_wid: Table, extrapolated: bool) -> Table:
 
     # Add descriptive columns
     if extrapolated:
-        tb_wid["source"] = "widExtrapolated"
+        tb["source"] = "widExtrapolated"
     else:
-        tb_wid["source"] = "wid"
+        tb["source"] = "wid"
 
-    tb_wid["prices"] = ""
-    tb_wid["prices"] = tb_wid["prices"].where(
-        (tb_wid["indicator_name"] != "mean") & (tb_wid["indicator_name"] != "median"),
+    tb["prices"] = ""
+    tb["prices"] = tb["prices"].where(
+        (tb["indicator_name"] != "mean") & (tb["indicator_name"] != "median"),
         "2011ppp2022",
     )
-    tb_wid["prices"] = tb_wid["prices"].astype(str)
-    tb_wid["resource_sharing"] = "perAdult"
+    tb["prices"] = tb["prices"].astype(str)
+    tb["resource_sharing"] = "perAdult"
 
     # Add the column series_code, which is the concatenation of welfare, equivalization and indicator_name
-    tb_wid["series_code"] = (
-        tb_wid["indicator_name"].astype(str)
+    tb["series_code"] = (
+        tb["indicator_name"].astype(str)
         + "_"
-        + tb_wid["source"].astype(str)
+        + tb["source"].astype(str)
         + "_"
-        + tb_wid["welfare"].astype(str)
+        + tb["welfare"].astype(str)
         + "_"
-        + tb_wid["resource_sharing"].astype(str)
+        + tb["resource_sharing"].astype(str)
         + "_"
-        + tb_wid["prices"].astype(str)
+        + tb["prices"].astype(str)
     )
 
     # Remove trailing "_" from series_code
-    tb_wid["series_code"] = tb_wid["series_code"].str.rstrip("_")
+    tb["series_code"] = tb["series_code"].str.rstrip("_")
 
     # Replace names for descriptive columns
     if extrapolated:
-        tb_wid["source"] = tb_wid["source"].replace({"widExtrapolated": "WID (including extrapolated datapoints)"})
+        tb["source"] = tb["source"].replace({"widExtrapolated": "WID (including extrapolated datapoints)"})
     else:
-        tb_wid["source"] = tb_wid["source"].replace({"wid": "WID"})
+        tb["source"] = tb["source"].replace({"wid": "WID"})
 
-    tb_wid["prices"] = tb_wid["prices"].replace({"2011ppp2022": "2011 PPPs, at 2022 prices"})
-    tb_wid["welfare"] = tb_wid["welfare"].replace(
+    tb["prices"] = tb["prices"].replace({"2011ppp2022": "2011 PPPs, at 2022 prices"})
+    tb["welfare"] = tb["welfare"].replace(
         {"pretaxNational": "Pretax national income", "posttaxNational": "Post-tax national income"}
     )
-    tb_wid["resource_sharing"] = tb_wid["resource_sharing"].replace({"perAdult": "Per adult"})
+    tb["resource_sharing"] = tb["resource_sharing"].replace({"perAdult": "Per adult"})
 
     # Add unit column
-    tb_wid["unit"] = ""
-    tb_wid["unit"] = tb_wid["unit"].where(
-        (tb_wid["indicator_name"] != "mean") & (tb_wid["indicator_name"] != "median"),
+    tb["unit"] = ""
+    tb["unit"] = tb["unit"].where(
+        (tb["indicator_name"] != "mean") & (tb["indicator_name"] != "median"),
         "dollars",
     )
-    tb_wid["unit"] = tb_wid["unit"].where(tb_wid["indicator_name"] != "p99p100Share", "%")
-    tb_wid["unit"] = tb_wid["unit"].where(tb_wid["indicator_name"] != "p90p100Share", "%")
-    tb_wid["unit"] = tb_wid["unit"].astype(str)
+    tb["unit"] = tb["unit"].where(tb["indicator_name"] != "p99p100Share", "%")
+    tb["unit"] = tb["unit"].where(tb["indicator_name"] != "p90p100Share", "%")
+    tb["unit"] = tb["unit"].astype(str)
 
-    return tb_wid
+    return tb
 
 
-def create_percentiles_file_pip(tb_pip_percentiles: Table) -> Table:
+def create_percentiles_file_pip(tb: Table) -> Table:
     """
     Process the percentiles table from PIP, to adapt it to a concatenated file with LIS and WID
     """
 
     # Make pip table longer
-    tb_pip_percentiles = tb_pip_percentiles.melt(
+    tb = tb.melt(
         id_vars=["country", "year", "reporting_level", "welfare_type", "percentile"],
         value_vars=["thr", "avg", "share"],
         var_name="indicator_name",
@@ -480,88 +483,74 @@ def create_percentiles_file_pip(tb_pip_percentiles: Table) -> Table:
     )
 
     # Reduce percentile column by 1 when variable is share or average (when it's different from thr)
-    tb_pip_percentiles["percentile"] = tb_pip_percentiles["percentile"].where(
-        tb_pip_percentiles["indicator_name"] == "thr", tb_pip_percentiles["percentile"] - 1
-    )
+    tb["percentile"] = tb["percentile"].where(tb["indicator_name"] == "thr", tb["percentile"] - 1)
 
     # Replace percentile 100 with 0 (it's always null and only for thr)
-    tb_pip_percentiles["percentile"] = tb_pip_percentiles["percentile"].replace(100, 0)
+    tb["percentile"] = tb["percentile"].replace(100, 0)
 
     # Sort by country, year, reporting_level, welfare_type, percentile and variable
-    tb_pip_percentiles = tb_pip_percentiles.sort_values(
-        ["country", "year", "reporting_level", "welfare_type", "indicator_name", "percentile"]
-    )
+    tb = tb.sort_values(["country", "year", "reporting_level", "welfare_type", "indicator_name", "percentile"])
 
     # Create WID nomenclature for percentiles
-    tb_pip_percentiles["percentile"] = (
-        "p" + tb_pip_percentiles["percentile"].astype(str) + "p" + (tb_pip_percentiles["percentile"] + 1).astype(str)
-    )
+    tb["percentile"] = "p" + tb["percentile"].astype(str) + "p" + (tb["percentile"] + 1).astype(str)
 
     # Rename welfare_type and reporting_level columns
-    tb_pip_percentiles = tb_pip_percentiles.rename(
-        columns={"welfare_type": "pipwelfare", "reporting_level": "pipReportingLevel"}
-    )
+    tb = tb.rename(columns={"welfare_type": "pipwelfare", "reporting_level": "pipReportingLevel"})
 
     # Rename indicator_name column
-    tb_pip_percentiles["indicator_name"] = tb_pip_percentiles["indicator_name"].replace(
-        {"thr": "threshold", "avg": "average"}
-    )
+    tb["indicator_name"] = tb["indicator_name"].replace({"thr": "threshold", "avg": "average"})
 
     # Add column prices, and assign it the value 2017 PPPs, at 2017 prices only for indicator names different from share
-    tb_pip_percentiles["prices"] = ""
-    tb_pip_percentiles["prices"] = tb_pip_percentiles["prices"].where(
-        tb_pip_percentiles["indicator_name"] == "share", "2017ppp2017"
-    )
-    tb_pip_percentiles["prices"] = tb_pip_percentiles["prices"].astype(str)
+    tb["prices"] = ""
+    tb["prices"] = tb["prices"].where(tb["indicator_name"] == "share", "2017ppp2017")
+    tb["prices"] = tb["prices"].astype(str)
 
     # Add descriptive columns
-    tb_pip_percentiles["source"] = "pip"
-    tb_pip_percentiles["welfare"] = "disposable"
-    tb_pip_percentiles["resource_sharing"] = "perCapita"
+    tb["source"] = "pip"
+    tb["welfare"] = "disposable"
+    tb["resource_sharing"] = "perCapita"
 
     # Add the column series_code, which is the concatenation of welfare, equivalization and indicator_name
-    tb_pip_percentiles["series_code"] = (
-        tb_pip_percentiles["indicator_name"].astype(str)
+    tb["series_code"] = (
+        tb["indicator_name"].astype(str)
         + "_"
-        + tb_pip_percentiles["source"].astype(str)
+        + tb["source"].astype(str)
         + "_"
-        + tb_pip_percentiles["welfare"].astype(str)
+        + tb["welfare"].astype(str)
         + "_"
-        + tb_pip_percentiles["resource_sharing"].astype(str)
+        + tb["resource_sharing"].astype(str)
         + "_"
-        + tb_pip_percentiles["prices"].astype(str)
+        + tb["prices"].astype(str)
     )
 
     # Remove trailing "_" from series_code
-    tb_pip_percentiles["series_code"] = tb_pip_percentiles["series_code"].str.rstrip("_")
+    tb["series_code"] = tb["series_code"].str.rstrip("_")
 
     # Replace names for descriptive columns
-    tb_pip_percentiles["source"] = tb_pip_percentiles["source"].replace({"pip": "PIP"})
-    tb_pip_percentiles["prices"] = tb_pip_percentiles["prices"].replace({"2017ppp2017": "2017 PPPs, at 2017 prices"})
-    tb_pip_percentiles["welfare"] = tb_pip_percentiles["welfare"].replace(
-        {"disposable": "Disposable income or consumption"}
-    )
-    tb_pip_percentiles["resource_sharing"] = tb_pip_percentiles["resource_sharing"].replace({"perCapita": "Per capita"})
+    tb["source"] = tb["source"].replace({"pip": "PIP"})
+    tb["prices"] = tb["prices"].replace({"2017ppp2017": "2017 PPPs, at 2017 prices"})
+    tb["welfare"] = tb["welfare"].replace({"disposable": "Disposable income or consumption"})
+    tb["resource_sharing"] = tb["resource_sharing"].replace({"perCapita": "Per capita"})
 
     # Add unit column
-    tb_pip_percentiles["unit"] = ""
-    tb_pip_percentiles["unit"] = tb_pip_percentiles["unit"].where(tb_pip_percentiles["indicator_name"] != "share", "%")
-    tb_pip_percentiles["unit"] = tb_pip_percentiles["unit"].where(
-        (tb_pip_percentiles["indicator_name"] != "average") & (tb_pip_percentiles["indicator_name"] != "threshold"),
+    tb["unit"] = ""
+    tb["unit"] = tb["unit"].where(tb["indicator_name"] != "share", "%")
+    tb["unit"] = tb["unit"].where(
+        (tb["indicator_name"] != "average") & (tb["indicator_name"] != "threshold"),
         "dollars",
     )
-    tb_pip_percentiles["unit"] = tb_pip_percentiles["unit"].astype(str)
+    tb["unit"] = tb["unit"].astype(str)
 
-    return tb_pip_percentiles
+    return tb
 
 
-def create_percentiles_file_pip_1000(tb_pip_percentiles_1000: Table) -> Table:
+def create_percentiles_file_pip_1000(tb: Table) -> Table:
     """
     Process the percentiles table from PIP (1000 bins), to adapt it to a concatenated file with LIS and WID
     """
 
     # Make pip table longer
-    tb_pip_percentiles_1000 = tb_pip_percentiles_1000.melt(
+    tb = tb.melt(
         id_vars=["country", "year", "quantile"],
         value_vars=["avg"],
         var_name="indicator_name",
@@ -569,90 +558,68 @@ def create_percentiles_file_pip_1000(tb_pip_percentiles_1000: Table) -> Table:
     )
 
     # Rename quantile column
-    tb_pip_percentiles_1000 = tb_pip_percentiles_1000.rename(columns={"quantile": "percentile"})
+    tb = tb.rename(columns={"quantile": "percentile"})
 
     # Sort by country, year, reporting_level, welfare_type, percentile and variable
-    tb_pip_percentiles_1000 = tb_pip_percentiles_1000.sort_values(["country", "year", "indicator_name", "percentile"])
+    tb = tb.sort_values(["country", "year", "indicator_name", "percentile"])
 
     # Reduce percentile column by 1 when variable is share or average (when it's different from thr)
-    tb_pip_percentiles_1000["percentile"] = tb_pip_percentiles_1000["percentile"].where(
-        tb_pip_percentiles_1000["indicator_name"] == "thr", tb_pip_percentiles_1000["percentile"] - 1
-    )
+    tb["percentile"] = tb["percentile"].where(tb["indicator_name"] == "thr", tb["percentile"] - 1)
 
     # Replace percentile 1000 with 0 (it's always null and only for thr)
-    tb_pip_percentiles_1000["percentile"] = tb_pip_percentiles_1000["percentile"].replace(1000, 0)
+    tb["percentile"] = tb["percentile"].replace(1000, 0)
 
     # Create WID nomenclature for percentiles (for now I call them t1t2, ..., t999t1000 to dfferentiate them from the other percentiles)
-    tb_pip_percentiles_1000["percentile"] = (
-        "t"
-        + tb_pip_percentiles_1000["percentile"].astype(str)
-        + "t"
-        + (tb_pip_percentiles_1000["percentile"] + 1).astype(str)
-    )
+    tb["percentile"] = "t" + tb["percentile"].astype(str) + "t" + (tb["percentile"] + 1).astype(str)
 
     # Rename indicator_name column
-    tb_pip_percentiles_1000["indicator_name"] = tb_pip_percentiles_1000["indicator_name"].replace(
-        {"thr": "threshold", "avg": "average"}
-    )
+    tb["indicator_name"] = tb["indicator_name"].replace({"thr": "threshold", "avg": "average"})
 
     # Add column prices, and assign it the value 2017 PPPs, at 2017 prices only for indicator names different from share
-    tb_pip_percentiles_1000["prices"] = ""
-    tb_pip_percentiles_1000["prices"] = tb_pip_percentiles_1000["prices"].where(
-        tb_pip_percentiles_1000["indicator_name"] == "share", "2017ppp2017"
-    )
-    tb_pip_percentiles_1000["prices"] = tb_pip_percentiles_1000["prices"].astype(str)
+    tb["prices"] = ""
+    tb["prices"] = tb["prices"].where(tb["indicator_name"] == "share", "2017ppp2017")
+    tb["prices"] = tb["prices"].astype(str)
 
     # Add descriptive columns
-    tb_pip_percentiles_1000["source"] = "pipThousandBins"
-    tb_pip_percentiles_1000["welfare"] = "disposable"
-    tb_pip_percentiles_1000["resource_sharing"] = "perCapita"
+    tb["source"] = "pipThousandBins"
+    tb["welfare"] = "disposable"
+    tb["resource_sharing"] = "perCapita"
 
     # Add the column series_code, which is the concatenation of welfare, equivalization and indicator_name
-    tb_pip_percentiles_1000["series_code"] = (
-        tb_pip_percentiles_1000["indicator_name"].astype(str)
+    tb["series_code"] = (
+        tb["indicator_name"].astype(str)
         + "_"
-        + tb_pip_percentiles_1000["source"].astype(str)
+        + tb["source"].astype(str)
         + "_"
-        + tb_pip_percentiles_1000["welfare"].astype(str)
+        + tb["welfare"].astype(str)
         + "_"
-        + tb_pip_percentiles_1000["resource_sharing"].astype(str)
+        + tb["resource_sharing"].astype(str)
         + "_"
-        + tb_pip_percentiles_1000["prices"].astype(str)
+        + tb["prices"].astype(str)
     )
 
     # Remove trailing "_" from series_code
-    tb_pip_percentiles_1000["series_code"] = tb_pip_percentiles_1000["series_code"].str.rstrip("_")
+    tb["series_code"] = tb["series_code"].str.rstrip("_")
 
     # Replace names for descriptive columns
-    tb_pip_percentiles_1000["source"] = tb_pip_percentiles_1000["source"].replace(
-        {"pipThousandBins": "PIP (thousand bins)"}
-    )
-    tb_pip_percentiles_1000["prices"] = tb_pip_percentiles_1000["prices"].replace(
-        {"2017ppp2017": "2017 PPPs, at 2017 prices"}
-    )
-    tb_pip_percentiles_1000["welfare"] = tb_pip_percentiles_1000["welfare"].replace(
-        {"disposable": "Disposable income or consumption"}
-    )
-    tb_pip_percentiles_1000["resource_sharing"] = tb_pip_percentiles_1000["resource_sharing"].replace(
-        {"perCapita": "Per capita"}
-    )
+    tb["source"] = tb["source"].replace({"pipThousandBins": "PIP (thousand bins)"})
+    tb["prices"] = tb["prices"].replace({"2017ppp2017": "2017 PPPs, at 2017 prices"})
+    tb["welfare"] = tb["welfare"].replace({"disposable": "Disposable income or consumption"})
+    tb["resource_sharing"] = tb["resource_sharing"].replace({"perCapita": "Per capita"})
 
     # Add unit column
-    tb_pip_percentiles_1000["unit"] = ""
-    tb_pip_percentiles_1000["unit"] = tb_pip_percentiles_1000["unit"].where(
-        tb_pip_percentiles_1000["indicator_name"] != "share", "%"
-    )
-    tb_pip_percentiles_1000["unit"] = tb_pip_percentiles_1000["unit"].where(
-        (tb_pip_percentiles_1000["indicator_name"] != "average")
-        & (tb_pip_percentiles_1000["indicator_name"] != "threshold"),
+    tb["unit"] = ""
+    tb["unit"] = tb["unit"].where(tb["indicator_name"] != "share", "%")
+    tb["unit"] = tb["unit"].where(
+        (tb["indicator_name"] != "average") & (tb["indicator_name"] != "threshold"),
         "dollars",
     )
-    tb_pip_percentiles_1000["unit"] = tb_pip_percentiles_1000["unit"].astype(str)
+    tb["unit"] = tb["unit"].astype(str)
 
-    return tb_pip_percentiles_1000
+    return tb
 
 
-def create_percentiles_file_lis(tb_lis_percentiles: Table, adults: bool) -> Table:
+def create_percentiles_file_lis(tb: Table, adults: bool) -> Table:
     """
     Process the percentiles table from LIS, to adapt it to a concatenated file with WID and PIP
     """
@@ -665,7 +632,7 @@ def create_percentiles_file_lis(tb_lis_percentiles: Table, adults: bool) -> Tabl
         pc_notation_human_readable = "Per capita"
 
     # Make lis table longer
-    tb_lis_percentiles = tb_lis_percentiles.melt(
+    tb = tb.melt(
         id_vars=["country", "year", "welfare", "equivalization", "percentile"],
         value_vars=["thr", "avg", "share"],
         var_name="indicator_name",
@@ -673,102 +640,86 @@ def create_percentiles_file_lis(tb_lis_percentiles: Table, adults: bool) -> Tabl
     )
 
     # Reduce percentile column by 1 when variable is share or average (when it's different from thr)
-    tb_lis_percentiles["percentile"] = tb_lis_percentiles["percentile"].where(
-        tb_lis_percentiles["indicator_name"] == "thr", tb_lis_percentiles["percentile"] - 1
-    )
+    tb["percentile"] = tb["percentile"].where(tb["indicator_name"] == "thr", tb["percentile"] - 1)
 
     # Replace percentile 100 with 0 (it's always null and only for thr)
-    tb_lis_percentiles["percentile"] = tb_lis_percentiles["percentile"].replace(100, 0)
+    tb["percentile"] = tb["percentile"].replace(100, 0)
 
     # Sort by country, year, welfare, equivalization, percentile and variable
-    tb_lis_percentiles = tb_lis_percentiles.sort_values(
-        ["country", "year", "welfare", "equivalization", "indicator_name", "percentile"]
-    )
+    tb = tb.sort_values(["country", "year", "welfare", "equivalization", "indicator_name", "percentile"])
 
     # Create WID nomenclature for percentiles
-    tb_lis_percentiles["percentile"] = (
-        "p" + tb_lis_percentiles["percentile"].astype(str) + "p" + (tb_lis_percentiles["percentile"] + 1).astype(str)
-    )
+    tb["percentile"] = "p" + tb["percentile"].astype(str) + "p" + (tb["percentile"] + 1).astype(str)
 
     # Filter out welfare dhci
-    tb_lis_percentiles = tb_lis_percentiles[tb_lis_percentiles["welfare"] != "dhci"].reset_index(drop=True)
+    tb = tb[tb["welfare"] != "dhci"].reset_index(drop=True)
 
     # Rename welfare, equivalization and indicator_name columns
-    tb_lis_percentiles["welfare"] = tb_lis_percentiles["welfare"].replace({"mi": "market", "dhi": "disposable"})
-    tb_lis_percentiles["equivalization"] = tb_lis_percentiles["equivalization"].replace(
-        {"eq": "equivalized", "pc": pc_notation}
-    )
-    tb_lis_percentiles["indicator_name"] = tb_lis_percentiles["indicator_name"].replace(
-        {"thr": "threshold", "avg": "average"}
-    )
+    tb["welfare"] = tb["welfare"].replace({"mi": "market", "dhi": "disposable"})
+    tb["equivalization"] = tb["equivalization"].replace({"eq": "equivalized", "pc": pc_notation})
+    tb["indicator_name"] = tb["indicator_name"].replace({"thr": "threshold", "avg": "average"})
 
     # Add column prices, and assign it the value 2017 PPPs, at 2017 prices only for indicator names different from share
-    tb_lis_percentiles["prices"] = ""
-    tb_lis_percentiles["prices"] = tb_lis_percentiles["prices"].where(
-        tb_lis_percentiles["indicator_name"] == "share", "2017ppp2017"
-    )
-    tb_lis_percentiles["prices"] = tb_lis_percentiles["prices"].astype(str)
+    tb["prices"] = ""
+    tb["prices"] = tb["prices"].where(tb["indicator_name"] == "share", "2017ppp2017")
+    tb["prices"] = tb["prices"].astype(str)
 
     # Add descriptive columns
-    tb_lis_percentiles["source"] = "lis"
+    tb["source"] = "lis"
 
     # Add the column series_code, which is the concatenation of welfare, equivalization and indicator_name
-    tb_lis_percentiles["series_code"] = (
-        tb_lis_percentiles["indicator_name"].astype(str)
+    tb["series_code"] = (
+        tb["indicator_name"].astype(str)
         + "_"
-        + tb_lis_percentiles["source"].astype(str)
+        + tb["source"].astype(str)
         + "_"
-        + tb_lis_percentiles["welfare"].astype(str)
+        + tb["welfare"].astype(str)
         + "_"
-        + tb_lis_percentiles["equivalization"].astype(str)
+        + tb["equivalization"].astype(str)
         + "_"
-        + tb_lis_percentiles["prices"].astype(str)
+        + tb["prices"].astype(str)
     )
 
     # Remove trailing "_" from series_code
-    tb_lis_percentiles["series_code"] = tb_lis_percentiles["series_code"].str.rstrip("_")
+    tb["series_code"] = tb["series_code"].str.rstrip("_")
 
     # Replace names for descriptive columns
-    tb_lis_percentiles["source"] = tb_lis_percentiles["source"].replace({"lis": "LIS"})
+    tb["source"] = tb["source"].replace({"lis": "LIS"})
 
-    tb_lis_percentiles["prices"] = tb_lis_percentiles["prices"].replace({"2017ppp2017": "2017 PPPs, at 2017 prices"})
+    tb["prices"] = tb["prices"].replace({"2017ppp2017": "2017 PPPs, at 2017 prices"})
 
-    tb_lis_percentiles["welfare"] = tb_lis_percentiles["welfare"].replace(
-        {"market": "Market income", "disposable": "Disposable income"}
-    )
-    tb_lis_percentiles["equivalization"] = tb_lis_percentiles["equivalization"].replace(
+    tb["welfare"] = tb["welfare"].replace({"market": "Market income", "disposable": "Disposable income"})
+    tb["equivalization"] = tb["equivalization"].replace(
         {"equivalized": "Equivalized", "perCapita": pc_notation_human_readable}
     )
 
     # Rename column equivalization to resource_sharing
-    tb_lis_percentiles = tb_lis_percentiles.rename(columns={"equivalization": "resource_sharing"})
+    tb = tb.rename(columns={"equivalization": "resource_sharing"})
 
     # Add unit column
-    tb_lis_percentiles["unit"] = ""
-    tb_lis_percentiles["unit"] = tb_lis_percentiles["unit"].where(tb_lis_percentiles["indicator_name"] != "share", "%")
-    tb_lis_percentiles["unit"] = tb_lis_percentiles["unit"].where(
-        (tb_lis_percentiles["indicator_name"] != "average") & (tb_lis_percentiles["indicator_name"] != "threshold"),
+    tb["unit"] = ""
+    tb["unit"] = tb["unit"].where(tb["indicator_name"] != "share", "%")
+    tb["unit"] = tb["unit"].where(
+        (tb["indicator_name"] != "average") & (tb["indicator_name"] != "threshold"),
         "dollars",
     )
-    tb_lis_percentiles["unit"] = tb_lis_percentiles["unit"].astype(str)
+    tb["unit"] = tb["unit"].astype(str)
 
     # Remove equivalized data for adults
     if adults:
-        tb_lis_percentiles = tb_lis_percentiles[tb_lis_percentiles["resource_sharing"] != "Equivalized"].reset_index(
-            drop=True
-        )
+        tb = tb[tb["resource_sharing"] != "Equivalized"].reset_index(drop=True)
 
-    return tb_lis_percentiles
+    return tb
 
 
-def create_percentiles_file_wid(tb_wid_percentiles) -> Table:
+def create_percentiles_file_wid(tb) -> Table:
     """
     Process the percentiles table from WID, to adapt it to a concatenated file with LIS and PIP. It generates two tables, one with extrapolated datapoints and one without them
     """
     # WID PERCENTILES
 
     # Make wid table longer
-    tb_wid_percentiles = tb_wid_percentiles.melt(
+    tb = tb.melt(
         id_vars=["country", "year", "welfare", "p", "percentile"],
         value_vars=["thr", "avg", "share", "thr_extrapolated", "avg_extrapolated", "share_extrapolated"],
         var_name="indicator_name",
@@ -776,20 +727,16 @@ def create_percentiles_file_wid(tb_wid_percentiles) -> Table:
     )
 
     # Sort by country, year, welfare, equivalization, percentile and variable
-    tb_wid_percentiles = tb_wid_percentiles.sort_values(["country", "year", "welfare", "indicator_name", "p"])
+    tb = tb.sort_values(["country", "year", "welfare", "indicator_name", "p"])
 
     # Select only welfare types needed
-    tb_wid_percentiles = tb_wid_percentiles[tb_wid_percentiles["welfare"].isin(["pretax", "posttax_nat"])].reset_index(
-        drop=True
-    )
+    tb = tb[tb["welfare"].isin(["pretax", "posttax_nat"])].reset_index(drop=True)
 
     # Rename welfare and indicator_name columns
-    tb_wid_percentiles["welfare"] = tb_wid_percentiles["welfare"].replace(
-        {"pretax": "pretaxNational", "posttax_nat": "posttaxNational"}
-    )
+    tb["welfare"] = tb["welfare"].replace({"pretax": "pretaxNational", "posttax_nat": "posttaxNational"})
 
     # In indicator_name, replace values that contain avg with average and thr with threshold
-    tb_wid_percentiles["indicator_name"] = tb_wid_percentiles["indicator_name"].replace(
+    tb["indicator_name"] = tb["indicator_name"].replace(
         {
             "avg": "average",
             "thr": "threshold",
@@ -799,82 +746,76 @@ def create_percentiles_file_wid(tb_wid_percentiles) -> Table:
     )
 
     # Drop percentile values containing "."
-    tb_wid_percentiles = tb_wid_percentiles[~tb_wid_percentiles["percentile"].str.contains("\\.")].reset_index(
-        drop=True
-    )
+    tb = tb[~tb["percentile"].str.contains("\\.")].reset_index(drop=True)
 
     # Add descriptive columns
-    tb_wid_percentiles["source"] = "wid"
+    tb["source"] = "wid"
 
     # If indicator_name contains extrapolated, add the word extrapolated to the source column
-    tb_wid_percentiles["source"] = tb_wid_percentiles["source"].where(
-        ~tb_wid_percentiles["indicator_name"].str.contains("extrapolated"),
-        tb_wid_percentiles["source"] + "Extrapolated",
+    tb["source"] = tb["source"].where(
+        ~tb["indicator_name"].str.contains("extrapolated"),
+        tb["source"] + "Extrapolated",
     )
 
     # Remove substring _extrapolated from indicator_name
-    tb_wid_percentiles["indicator_name"] = tb_wid_percentiles["indicator_name"].str.replace("_extrapolated", "")
+    tb["indicator_name"] = tb["indicator_name"].str.replace("_extrapolated", "")
 
     # Define id columns
-    tb_wid_percentiles["resource_sharing"] = "perAdult"
-    tb_wid_percentiles["prices"] = ""
-    tb_wid_percentiles["prices"] = tb_wid_percentiles["prices"].where(
-        tb_wid_percentiles["indicator_name"] == "share", "2011ppp2022"
-    )
-    tb_wid_percentiles["prices"] = tb_wid_percentiles["prices"].astype(str)
+    tb["resource_sharing"] = "perAdult"
+    tb["prices"] = ""
+    tb["prices"] = tb["prices"].where(tb["indicator_name"] == "share", "2011ppp2022")
+    tb["prices"] = tb["prices"].astype(str)
 
     # Add the column series_code, which is the concatenation of welfare, equivalization and indicator_name
-    tb_wid_percentiles["series_code"] = (
-        tb_wid_percentiles["indicator_name"].astype(str)
+    tb["series_code"] = (
+        tb["indicator_name"].astype(str)
         + "_"
-        + tb_wid_percentiles["source"].astype(str)
+        + tb["source"].astype(str)
         + "_"
-        + tb_wid_percentiles["welfare"].astype(str)
+        + tb["welfare"].astype(str)
         + "_"
-        + tb_wid_percentiles["resource_sharing"].astype(str)
+        + tb["resource_sharing"].astype(str)
         + "_"
-        + tb_wid_percentiles["prices"].astype(str)
+        + tb["prices"].astype(str)
     )
 
     # Remove trailing "_" from series_code
-    tb_wid_percentiles["series_code"] = tb_wid_percentiles["series_code"].str.rstrip("_")
+    tb["series_code"] = tb["series_code"].str.rstrip("_")
 
     # Replace names for descriptive columns
 
-    tb_wid_percentiles["prices"] = tb_wid_percentiles["prices"].replace({"2011ppp2022": "2011 PPPs, at 2022 prices"})
-    tb_wid_percentiles["welfare"] = tb_wid_percentiles["welfare"].replace(
+    tb["prices"] = tb["prices"].replace({"2011ppp2022": "2011 PPPs, at 2022 prices"})
+    tb["welfare"] = tb["welfare"].replace(
         {"pretaxNational": "Pretax national income", "posttax_nat": "Post-tax national income"}
     )
-    tb_wid_percentiles["resource_sharing"] = tb_wid_percentiles["resource_sharing"].replace({"perAdult": "Per adult"})
+    tb["resource_sharing"] = tb["resource_sharing"].replace({"perAdult": "Per adult"})
 
     # Add unit column
-    tb_wid_percentiles["unit"] = ""
-    tb_wid_percentiles["unit"] = tb_wid_percentiles["unit"].where(tb_wid_percentiles["indicator_name"] != "share", "%")
-    tb_wid_percentiles["unit"] = tb_wid_percentiles["unit"].where(
-        (tb_wid_percentiles["indicator_name"] != "average") & (tb_wid_percentiles["indicator_name"] != "threshold"),
+    tb["unit"] = ""
+    tb["unit"] = tb["unit"].where(tb["indicator_name"] != "share", "%")
+    tb["unit"] = tb["unit"].where(
+        (tb["indicator_name"] != "average") & (tb["indicator_name"] != "threshold"),
         "dollars",
     )
-    tb_wid_percentiles["unit"] = tb_wid_percentiles["unit"].astype(str)
+    tb["unit"] = tb["unit"].astype(str)
 
     # Remove columns welfare and percentile
-    tb_wid_percentiles = tb_wid_percentiles.drop(columns=["p"])
+    tb = tb.drop(columns=["p"])
 
     # Create two different tables, one for extrapolated
-    tb_wid_percentiles_extrapolated = tb_wid_percentiles[tb_wid_percentiles["source"] == "widExtrapolated"].reset_index(
-        drop=True
-    )
-    tb_wid_percentiles = tb_wid_percentiles[tb_wid_percentiles["source"] == "wid"].reset_index(drop=True)
+    tb_extrapolated = tb[tb["source"] == "widExtrapolated"].reset_index(drop=True)
+    tb = tb[tb["source"] == "wid"].reset_index(drop=True)
 
     # Replace source for a more descriptive name
-    tb_wid_percentiles["source"] = tb_wid_percentiles["source"].replace({"wid": "WID"})
-    tb_wid_percentiles_extrapolated["source"] = tb_wid_percentiles_extrapolated["source"].replace(
+    tb["source"] = tb["source"].replace({"wid": "WID"})
+    tb_extrapolated["source"] = tb_extrapolated["source"].replace(
         {"widExtrapolated": "WID (including extrapolated datapoints)"}
     )
 
-    return tb_wid_percentiles, tb_wid_percentiles_extrapolated
+    return tb, tb_extrapolated
 
 
-def extract_gdp_from_wdi(tb_wdi: Table) -> Table:
+def extract_gdp_from_wdi(tb: Table) -> Table:
     """
     Load the table from WDI, to extract different GDP indicators
     """
@@ -886,6 +827,6 @@ def extract_gdp_from_wdi(tb_wdi: Table) -> Table:
     ]
 
     # Select the columns to keep
-    tb_wdi = tb_wdi[["country", "year"] + gdp_list]
+    tb = tb[["country", "year"] + gdp_list]
 
-    return tb_wdi
+    return tb
