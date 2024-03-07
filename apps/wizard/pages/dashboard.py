@@ -77,6 +77,10 @@ DEPENDENCIES_TO_IGNORE = [
 st.session_state.selected_steps = st.session_state.get("selected_steps", [])
 ## Selected steps in table
 st.session_state.selected_steps_table = st.session_state.get("selected_steps_table", [])
+# Initialize the cache key in the session state.
+# This key will be used to reload the steps table after making changes to the steps.
+if "reload_key" not in st.session_state:
+    st.session_state["reload_key"] = 0
 
 # Logging
 log = get_logger()
@@ -126,11 +130,14 @@ if not can_connect():
 # LOAD STEPS TABLE
 ########################################
 @st.cache_data
-def load_steps_df() -> pd.DataFrame:
+def load_steps_df(reload_key: int) -> pd.DataFrame:
     """Generate and load the steps dataframe.
 
     This is just done once, at the beginning.
     """
+    # Ensure that the function is re-run when the reload_key changes.
+    _ = reload_key
+
     # Load steps dataframe.
     steps_df = StepUpdater().steps_df
 
@@ -213,10 +220,10 @@ def load_steps_df() -> pd.DataFrame:
 
 
 @st.cache_data
-def load_steps_df_to_display(show_all_channels: bool) -> pd.DataFrame:
+def load_steps_df_to_display(show_all_channels: bool, reload_key: int) -> pd.DataFrame:
     """Load the steps dataframe, and filter it according to the user's choice."""
     # Load all data
-    df = load_steps_df()
+    df = load_steps_df(reload_key=reload_key)
 
     # If toggle is not shown, pre-filter the DataFrame to show only rows where "channel" equals "grapher"
     if not show_all_channels:
@@ -282,14 +289,14 @@ def load_steps_df_to_display(show_all_channels: bool) -> pd.DataFrame:
 show_all_channels = not st.toggle("Select only grapher and explorer steps", True)
 
 # Load the steps dataframe.
-steps_df = load_steps_df()
+steps_df = load_steps_df(reload_key=st.session_state["reload_key"])
 
 
 ########################################
 # Display STEPS TABLE
 ########################################
 # Get only columns to be shown
-steps_df_display = load_steps_df_to_display(show_all_channels)
+steps_df_display = load_steps_df_to_display(show_all_channels, reload_key=st.session_state["reload_key"])
 
 # Define the options of the main grid table with pagination.
 gb = GridOptionsBuilder.from_dataframe(steps_df_display)
@@ -490,10 +497,7 @@ grid_response = AgGrid(
 # Execute command to update selected steps.
 @st.cache_data(show_spinner=False)
 def execute_command(cmd):
-    """Execute a command and get its output.
-
-    TODO: This is not ideal. Shouldn't be executing commands in terminal.
-    """
+    """Execute a command and get its output."""
     try:
         result = subprocess.run(cmd, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, shell=True)
         return result.stdout
@@ -611,7 +615,7 @@ with st.container(border=True):
                     )
 
         # Add columns for general buttons (applying to all rows in the operations list).
-        col_button1, col_button2, _ = st.columns([1, 2, 3])
+        col_button1, col_button2, col_button3, _ = st.columns([2, 3, 3, 3])
 
         with col_button1:
             # Add button to clear the operations list.
@@ -638,6 +642,30 @@ with st.container(border=True):
                 help="Remove common steps (like population) and other steps that cannot be updated (for now, these steps are listed in `NON_UPDATEABLE_STEPS`, in `apps/wizard/pages/dashboard.py`).",
                 type="secondary",
                 on_click=remove_non_updateable_steps(),
+            )
+
+        def upgrade_steps_in_operations_list():
+            new_list = []
+            for step in st.session_state.selected_steps:
+                step_info = steps_df[steps_df["step"] == step].iloc[0].to_dict()
+                step_identifier = step_info["identifier"]
+                latest_version = step_info["latest_version"]
+                step_latest = steps_df[
+                    (steps_df["identifier"] == step_identifier) & (steps_df["version"] == latest_version)
+                ]["step"]
+                if not step_latest.empty:
+                    new_list.append(step_latest.item())
+                else:
+                    new_list.append(step)
+
+            st.session_state.selected_steps = new_list
+
+        with col_button3:
+            st.button(
+                f"Replace {len(st.session_state.selected_steps)} steps by their latest versions",
+                help="Replace steps in the _Operations list_ by their latest version (consider using after updating).",
+                type="secondary",
+                on_click=upgrade_steps_in_operations_list(),
             )
 
     else:
@@ -691,8 +719,11 @@ if st.session_state.selected_steps:
                     if "error" not in cmd_output.lower():
                         # Celebrate that the update was successful, why not.
                         st.balloons()
+                        if not dry_run_update:
+                            # Reload steps_df to include the new steps.
+                            st.session_state["reload_key"] += 1
                     # Add a button to close the output expander.
-                    st.button("Close", key="acknowledge_cmd_output")
+                    st.button("Close and reload _Steps table_", key="acknowledge_cmd_output")
 
     # Add an expander menu with additional parameters for the ETL command.
     with st.container(border=True):
