@@ -584,10 +584,6 @@ with st.container(border=True):
             # TODO: Consider adding step buttons to:
             #  * Execute ETL step for only the current step.
             #  * Edit metadata for the current step.
-            # TODO: Consider adding bulk buttons to:
-            #  * Sort them in ETL execution order.
-            #  * Select the steps currently in the operation list in the main table (to see their attributes).
-            #  * Execute ETL for all steps in the operation list.
 
             # Display the operations list.
             for (action_name, key_suffix, help_text), col in zip(actions, cols):
@@ -636,7 +632,6 @@ with st.container(border=True):
                 step for step in st.session_state.selected_steps if step not in non_updateable_steps
             ]
 
-        # Place the second button in the second column
         with col_button2:
             st.button(
                 "Remove non-updateable (e.g. population)",
@@ -656,7 +651,7 @@ with st.container(border=True):
 if st.session_state.selected_steps:
     # Add an expander menu with additional parameters for the update command.
     with st.container(border=True):
-        with st.expander("Additional parameters", expanded=False):
+        with st.expander("Additional parameters to update steps", expanded=False):
             dry_run = st.toggle(
                 "Dry run",
                 True,
@@ -698,3 +693,64 @@ if st.session_state.selected_steps:
                         st.balloons()
                     # Add a button to close the output expander.
                     st.button("Close", key="acknowledge_cmd_output")
+
+    # Add an expander menu with additional parameters for the ETL command.
+    with st.container(border=True):
+        with st.expander("Additional parameters to run snapshots and ETL steps", expanded=False):
+            dry_run = st.toggle(
+                "Dry run",
+                True,
+                help="If checked, no snapshots will be executed, and ETL will be executed in dry-run mode.",
+            )
+
+        def define_command_to_execute_snapshots_and_etl_steps(dry_run: bool = True):
+            # Execute ETL for all steps in the operations list.
+            snapshot_steps = [step for step in st.session_state.selected_steps if step.startswith("snapshot://")]
+            etl_steps = [step for step in st.session_state.selected_steps if not step.startswith("snapshot://")]
+
+            command = ""
+            # First attempt to run all snapshots sequentially.
+            for snapshot_step in snapshot_steps:
+                # Identify script for current snapshot.
+                script = steps_df[steps_df["step"] == snapshot_step]["full_path_to_script"].item()
+                # Define command to be executed.
+                command += f"python {script} ; "
+
+            if dry_run:
+                # If dry_run, we do not want to execute the command, but simply print it.
+                command = f"echo '{command}' ; "
+
+            if etl_steps:
+                # Then let ETL run all remaining steps (ETL will decide the order).
+                # Define command to be executed.
+                command += f"etl run {' '.join(etl_steps)} "
+
+                if dry_run:
+                    command += " --dry-run"
+
+            return command
+
+        btn_etl_run = st.button(
+            f"Run {len(st.session_state.selected_steps)} snapshots and ETL steps",
+            help="Run ETL on steps in the _Operations list_.",
+            type="primary",
+            use_container_width=True,
+        )
+
+        # Button to execute the update command and show its output.
+        if btn_etl_run:
+            if ENV_IS_REMOTE:
+                st.error("Running the ETL is not available in the remote version of the wizard. Run them locally.")
+                st.stop()
+            else:
+                with st.spinner("Executing ETL..."):
+                    command = define_command_to_execute_snapshots_and_etl_steps(dry_run=dry_run)
+                    cmd_output = execute_command(cmd=command)
+                    # Show the output of the command in an expander.
+                    with st.expander("Command Output:", expanded=True):
+                        st.text_area("Output", value=cmd_output, height=300, key="cmd_output_area")
+                    if "error" not in cmd_output.lower():
+                        # Celebrate that the update was successful, why not.
+                        st.balloons()
+                    # Add a button to close the output expander.
+                    st.button("Close", key="acknowledge_cmd_output_etl_run")
