@@ -652,7 +652,7 @@ if st.session_state.selected_steps:
     # Add an expander menu with additional parameters for the update command.
     with st.container(border=True):
         with st.expander("Additional parameters to update steps", expanded=False):
-            dry_run = st.toggle(
+            dry_run_update = st.toggle(
                 "Dry run",
                 True,
                 help="If checked, the update command will not write anything to the DAG or create any files.",
@@ -682,7 +682,7 @@ if st.session_state.selected_steps:
                         + " --non-interactive"
                         + f" --step-version-new {version_new}"
                     )
-                    if dry_run:
+                    if dry_run_update:
                         command += " --dry-run"
                     cmd_output = execute_command(command)
                     # Show the output of the command in an expander.
@@ -697,13 +697,18 @@ if st.session_state.selected_steps:
     # Add an expander menu with additional parameters for the ETL command.
     with st.container(border=True):
         with st.expander("Additional parameters to run snapshots and ETL steps", expanded=False):
-            dry_run = st.toggle(
+            dry_run_etl = st.toggle(
                 "Dry run",
                 True,
                 help="If checked, no snapshots will be executed, and ETL will be executed in dry-run mode.",
             )
+            force_only = st.toggle(
+                "Force run",
+                False,
+                help="If checked, the ETL steps will be forced to be executed (even if they are already executed).",
+            )
 
-        def define_command_to_execute_snapshots_and_etl_steps(dry_run: bool = True):
+        def define_command_to_execute_snapshots_and_etl_steps(dry_run: bool = True, force_only: bool = False):
             # Execute ETL for all steps in the operations list.
             snapshot_steps = [step for step in st.session_state.selected_steps if step.startswith("snapshot://")]
             etl_steps = [step for step in st.session_state.selected_steps if not step.startswith("snapshot://")]
@@ -714,11 +719,11 @@ if st.session_state.selected_steps:
                 # Identify script for current snapshot.
                 script = steps_df[steps_df["step"] == snapshot_step]["full_path_to_script"].item()
                 # Define command to be executed.
-                command += f"python {script} ; "
+                command += f"python {script} && "
 
             if dry_run:
                 # If dry_run, we do not want to execute the command, but simply print it.
-                command = f"echo '{command}' ; "
+                command = f"echo '{command}' && "
 
             if etl_steps:
                 # Then let ETL run all remaining steps (ETL will decide the order).
@@ -727,6 +732,9 @@ if st.session_state.selected_steps:
 
                 if dry_run:
                     command += " --dry-run"
+
+                if force_only:
+                    command += " --force --only"
 
             return command
 
@@ -744,7 +752,9 @@ if st.session_state.selected_steps:
                 st.stop()
             else:
                 with st.spinner("Executing ETL..."):
-                    command = define_command_to_execute_snapshots_and_etl_steps(dry_run=dry_run)
+                    command = define_command_to_execute_snapshots_and_etl_steps(
+                        dry_run=dry_run_etl, force_only=force_only
+                    )
                     cmd_output = execute_command(cmd=command)
                     # Show the output of the command in an expander.
                     with st.expander("Command Output:", expanded=True):
