@@ -37,7 +37,7 @@ if not GRAPHER_DATASET_BASE_URL.startswith(("http://", "https://")):
 
 # List of identifiers of steps that should be considered as non-updateable.
 # NOTE: The identifier is the step name without the version (and without the "data://").
-NON_UPDATEAIBLE_IDENTIFIERS = [
+NON_UPDATEABLE_IDENTIFIERS = [
     # All population-related datasets.
     "garden/demography/population",
     "garden/gapminder/population",
@@ -48,7 +48,7 @@ NON_UPDATEAIBLE_IDENTIFIERS = [
     "meadow/hyde/general_files",
     "meadow/un/un_wpp",
     "open_numbers/open_numbers/gapminder__systema_globalis",
-    "open-numbers/open-numbers/ddf--gapminder--systema_globalis",
+    "open-numbers/ddf--gapminder--systema_globalis",
     "snapshot/hyde/general_files.zip",
     "snapshot/hyde/baseline.zip",
     "snapshot/gapminder/population.xlsx",
@@ -630,7 +630,7 @@ with st.container(border=True):
             # Remove steps that cannot be updated (because update_period_days is set to 0).
             # For convenience, also remove steps that a user most likely doesn't want to update.
             non_updateable_steps = steps_df[
-                (steps_df["update_period_days"] == 0) | (steps_df["identifier"].isin(NON_UPDATEAIBLE_IDENTIFIERS))
+                (steps_df["update_period_days"] == 0) | (steps_df["identifier"].isin(NON_UPDATEABLE_IDENTIFIERS))
             ]["step"].tolist()
             st.session_state.selected_steps = [
                 step for step in st.session_state.selected_steps if step not in non_updateable_steps
@@ -640,7 +640,7 @@ with st.container(border=True):
         with col_button2:
             st.button(
                 "Remove non-updateable (e.g. population)",
-                help="Remove common steps (like population) and other steps that cannot be updated.",
+                help="Remove common steps (like population) and other steps that cannot be updated (for now, these steps are listed in `NON_UPDATEABLE_STEPS`, in `apps/wizard/pages/dashboard.py`).",
                 type="secondary",
                 on_click=remove_non_updateable_steps(),
             )
