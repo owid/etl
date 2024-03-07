@@ -1,6 +1,7 @@
 """Game owidle."""
 import datetime as dt
 import math
+import time
 from itertools import product
 from pathlib import Path
 from typing import List, Tuple, cast
@@ -31,6 +32,9 @@ UPDATES = {
     ],
     "2024-03-05": [
         "🐛 Fixed bug in bearing estimation.",
+    ],
+    "2024-03-07": [
+        "✨ Add score mosaic at the end (not in hard mode).",
     ],
 }
 DAYS_TO_SHOW_UPDATES = 3
@@ -130,7 +134,7 @@ UPDATES = {
 if UPDATES:
     with st.sidebar:
         st.markdown("### 🆕 Updates")
-        for date, updates in UPDATES.items():
+        for date, updates in reversed(UPDATES.items()):
             st.markdown(f"#### {date}")
             for update in updates:
                 st.info(update)
@@ -988,6 +992,45 @@ for i in range(num_guesses_bound, NUM_GUESSES):
 # FINAL MESSAGE
 #
 ##########################################
+
+
+def _convert_score_to_emojis(score: int) -> str:
+    """Return mosaic score.
+
+    🟩: 20%
+    🟨: 10%
+    🟧: 5%
+    ⬛: 0%
+    """
+    # Get number of green squares
+    num_g = score // 20
+    score -= num_g * 20
+    # Get number of yellow squares
+    num_y = score // 10
+    score -= num_y * 10
+    # Get number of orange squares
+    num_o = score // 5
+    score -= num_o * 5
+    # Get number of black squares
+    num_b = max(5 - (num_g + num_y + num_o), 0)
+
+    # Return mosaic
+    mosaic = "🟩" * num_g + "🟨" * num_y + "🟧" * num_o + "⬛" * num_b
+    return mosaic
+
+
+def get_score_mosaic():
+    """Get mosaic of score.
+
+    The mosaic provides a visual representation of the score for each round played.
+    """
+    scores = [int(guess["score"]) for guess in st.session_state.guesses if guess["score"] != ""]
+    mosaic = "\n".join([_convert_score_to_emojis(score) for score in scores])
+    return mosaic
+
+
+mosaic = get_score_mosaic()
+
 if st.session_state.owidle_difficulty == 2:
     ## Successful
     if st.session_state.user_has_succeded:
@@ -1034,7 +1077,7 @@ else:
             r = "round" if num_guesses_bound == 1 else "rounds"
             s = (
                 f"{num_guesses_bound} {r} ({DIF_LVLS[st.session_state.owidle_difficulty]} mode)\n"
-                + " → ".join(s)
+                + mosaic
                 + "\nVisit http://etl.owid.io/wizard/owidle"
             )
             st.subheader("Share it")
@@ -1043,4 +1086,11 @@ else:
     ## Unsuccessful
     elif st.session_state.num_guesses >= NUM_GUESSES:
         st.error(f"The correct answer was **{SOLUTION}**. Better luck next time!")
+        st.subheader("Share it")
+        s = (
+            f"Failed this time ({DIF_LVLS[st.session_state.owidle_difficulty]} mode)\n"
+            + mosaic
+            + "\nVisit http://etl.owid.io/wizard/owidle"
+        )
+        st.code(s)
         st.stop()
