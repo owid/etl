@@ -14,13 +14,13 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load garden dataset for LIS and WID
-    ds_pip = paths.load_dataset("poverty_inequality")
+    ds_pip = paths.load_dataset("world_bank_pip")
     ds_lis = paths.load_dataset("luxembourg_income_study")
     ds_wid = paths.load_dataset("world_inequality_database")
     ds_wdi = paths.load_dataset("wdi")
 
     # Read table from garden dataset.
-    tb_pip = ds_pip["poverty_inequality"].reset_index()
+    tb_pip = ds_pip["income_consumption_2017"].reset_index()
     tb_lis = ds_lis["luxembourg_income_study"].reset_index()
     tb_wid = ds_wid["world_inequality_database"].reset_index()
     tb_lis_adults = ds_lis["luxembourg_income_study_adults"].reset_index()

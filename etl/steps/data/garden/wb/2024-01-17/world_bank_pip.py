@@ -896,8 +896,6 @@ def drop_columns(tb: Table) -> Table:
     tb = tb.drop(
         columns=[
             "ppp_version",
-            "reporting_level",
-            "welfare_type",
             "reporting_pop",
             "is_interpolated",
             "distribution_type",

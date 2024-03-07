@@ -11,7 +11,7 @@ log = get_logger()
 
 PARENT_DIR = Path(__file__).parent.absolute()
 
-ds = Dataset(DATA_DIR / "explorers" / "poverty_inequality" / "2023-08-24" / "poverty_inequality_export")
+ds = Dataset(DATA_DIR / "explorers" / "poverty_inequality" / "latest" / "poverty_inequality_export")
 
 df = ds["keyvars"].reset_index()
 df = pd.DataFrame(df)
