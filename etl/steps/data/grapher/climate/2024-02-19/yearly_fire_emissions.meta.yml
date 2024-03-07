@@ -7,8 +7,8 @@ definitions:
     display:
       numDecimalPlaces: 0
       yearIsDay: false
-    short_unit: tonnes
-    unit: t
+    short_unit: t
+    unit: tonnes
     processing_level: major
 
 
