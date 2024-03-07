@@ -35,10 +35,40 @@ if not GRAPHER_DATASET_BASE_URL.startswith(("http://", "https://")):
     # Therefore, prepend "http://" (not "https://" because the site is not secure, and the browser will block the link).
     GRAPHER_DATASET_BASE_URL = f"http://{GRAPHER_DATASET_BASE_URL}"
 
+# List of identifiers of steps that should be considered as non-updateable.
+# NOTE: The identifier is the step name without the version (and without the "data://").
+NON_UPDATEAIBLE_IDENTIFIERS = [
+    # All population-related datasets.
+    "garden/demography/population",
+    "garden/gapminder/population",
+    "garden/hyde/baseline",
+    "garden/un/un_wpp",
+    "meadow/gapminder/population",
+    "meadow/hyde/baseline",
+    "meadow/hyde/general_files",
+    "meadow/un/un_wpp",
+    "open_numbers/open_numbers/gapminder__systema_globalis",
+    "open-numbers/open-numbers/ddf--gapminder--systema_globalis",
+    "snapshot/hyde/general_files.zip",
+    "snapshot/hyde/baseline.zip",
+    "snapshot/gapminder/population.xlsx",
+    "snapshot/un/un_wpp.zip",
+    # Regions dataset.
+    "garden/regions/regions",
+    # Old WB income groups.
+    "garden/wb/wb_income",
+    "meadow/wb/wb_income",
+    "walden/wb/wb_income",
+    # New WB income groups.
+    "garden/wb/income_groups",
+    "meadow/wb/income_groups",
+    "snapshot/wb/income_groups.xlsx",
+]
+
 # List of dependencies to ignore when calculating the update state.
 # This is done to avoid a certain common dependency (e.g. population) to make all steps appear as needing major update.
+# TODO: Consider removing this once the new unused population is removed or renamed.
 DEPENDENCIES_TO_IGNORE = [
-    # "data://garden/demography/2023-03-31/population",
     "snapshot://hyde/2017/general_files.zip",
 ]
 
@@ -575,7 +605,7 @@ with st.container(border=True):
                         on_click=lambda step=step: remove_step(step),
                         help=help_text,
                     )
-                # Add relared steps
+                # Add related steps
                 else:
                     col.button(
                         label=action_name,
@@ -583,13 +613,37 @@ with st.container(border=True):
                         on_click=lambda step=step, key_suffix=key_suffix: include_related_steps(step, key_suffix),
                         help=help_text,
                     )
-        # Add button to clear the operations list.
-        st.button(
-            "Clear Operations list",
-            help="Remove all steps currently in the _Operations list_.",
-            type="secondary",
-            on_click=lambda: st.session_state.selected_steps.clear(),
-        )
+
+        # Add columns for general buttons (applying to all rows in the operations list).
+        col_button1, col_button2, _ = st.columns([1, 2, 3])
+
+        with col_button1:
+            # Add button to clear the operations list.
+            st.button(
+                "Clear Operations list",
+                help="Remove all steps currently in the _Operations list_.",
+                type="secondary",
+                on_click=lambda: st.session_state.selected_steps.clear(),
+            )
+
+        def remove_non_updateable_steps():
+            # Remove steps that cannot be updated (because update_period_days is set to 0).
+            # For convenience, also remove steps that a user most likely doesn't want to update.
+            non_updateable_steps = steps_df[
+                (steps_df["update_period_days"] == 0) | (steps_df["identifier"].isin(NON_UPDATEAIBLE_IDENTIFIERS))
+            ]["step"].tolist()
+            st.session_state.selected_steps = [
+                step for step in st.session_state.selected_steps if step not in non_updateable_steps
+            ]
+
+        # Place the second button in the second column
+        with col_button2:
+            st.button(
+                "Remove non-updateable (e.g. population)",
+                help="Remove common steps (like population) and other steps that cannot be updated.",
+                type="secondary",
+                on_click=remove_non_updateable_steps(),
+            )
 
     else:
         st.markdown(":grey[_No rows selected for operation..._]")
