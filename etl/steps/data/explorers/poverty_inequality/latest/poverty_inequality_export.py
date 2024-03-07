@@ -51,6 +51,7 @@ def run(dest_dir: str) -> None:
     # Concatenate all the tables
     tb = pr.concat(
         [tb_pip_keyvars, tb_lis_keyvars, tb_lis_keyvars_adults, tb_wid_keyvars, tb_wid_keyvars_extrapolated],
+        ignore_index=True,
         short_name="keyvars",
     )
 
@@ -63,6 +64,7 @@ def run(dest_dir: str) -> None:
             tb_wid_percentiles,
             tb_wid_percentiles_extrapolated,
         ],
+        ignore_index=True,
         short_name="percentiles",
     )
 
@@ -108,7 +110,7 @@ def run(dest_dir: str) -> None:
             "source",
             "welfare",
             "resource_sharing",
-            "pipReportingLevel",
+            "pipreportinglevel",
             "pipwelfare",
             "prices",
             "unit",
@@ -126,7 +128,7 @@ def run(dest_dir: str) -> None:
             "source",
             "welfare",
             "resource_sharing",
-            "pipReportingLevel",
+            "pipreportinglevel",
             "pipwelfare",
             "prices",
             "unit",
@@ -175,7 +177,7 @@ def create_keyvars_file_pip(tb: Table) -> Table:
     )
 
     # Rename welfare_type and reporting_level
-    tb = tb.rename(columns={"welfare_type": "pipwelfare", "reporting_level": "pipReportingLevel"})
+    tb = tb.rename(columns={"welfare_type": "pipwelfare", "reporting_level": "pipreportinglevel"})
 
     # Rename welfare and equivalization columns
     tb["indicator_name"] = tb["indicator_name"].replace(
@@ -495,7 +497,7 @@ def create_percentiles_file_pip(tb: Table) -> Table:
     tb["percentile"] = "p" + tb["percentile"].astype(str) + "p" + (tb["percentile"] + 1).astype(str)
 
     # Rename welfare_type and reporting_level columns
-    tb = tb.rename(columns={"welfare_type": "pipwelfare", "reporting_level": "pipReportingLevel"})
+    tb = tb.rename(columns={"welfare_type": "pipwelfare", "reporting_level": "pipreportinglevel"})
 
     # Rename indicator_name column
     tb["indicator_name"] = tb["indicator_name"].replace({"thr": "threshold", "avg": "average"})
