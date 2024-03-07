@@ -4,7 +4,7 @@ import math
 import time
 from itertools import product
 from pathlib import Path
-from typing import List, Tuple, cast
+from typing import List, Tuple
 
 import geopandas as gpd
 import pandas as pd
@@ -34,11 +34,11 @@ UPDATES = {
         "🐛 Fixed bug in bearing estimation.",
     ],
     "2024-03-07": [
-        "✨ Add score mosaic at the end (not in hard mode).",
+        "✨ Add score mosaic at the end.",
     ],
 }
 DAYS_TO_SHOW_UPDATES = 3
-
+OWID_NUM = (dt.datetime.now(dt.timezone.utc).date() - dt.date(2024, 2, 20)).days
 ##########################################
 #
 # CONFIG PAGE & SESSION STATE INIT
@@ -74,6 +74,7 @@ default_guess = [
         "year": "",
         "distance_year": "",
         "direction_year": "",
+        "score_year": "",
     }
     for i in range(NUM_GUESSES)
 ]
@@ -522,12 +523,12 @@ def distance_to_solution(country_selected: str) -> Tuple[str, str, str]:
     return distance, arrow, score
 
 
-def distance_to_solution_year(year_selected: int) -> Tuple[str, str]:
+def distance_to_solution_year(year_selected: int) -> Tuple[str, str, str]:
     st.session_state.user_has_succeded_year = False
     diff = SOLUTION_YEAR - year_selected
     if diff == 0:
         st.session_state.user_has_succeded_year = True
-        return "0", "🎉"
+        return "0", "🎉", "100"
     elif (diff > 0) and (diff <= 5):
         arrows = "🔼"
     elif (diff > 5) and (diff <= 15):
@@ -544,7 +545,8 @@ def distance_to_solution_year(year_selected: int) -> Tuple[str, str]:
         arrows = "🔽🔽🔽"
     else:
         arrows = "🔽🔽🔽🔽"
-    return str(abs(diff)), arrows
+    score = str(int(round(100 - (abs(diff) / (YEAR_MAX - YEAR_MIN)) * 100, 0)))
+    return str(abs(diff)), arrows, score
 
 
 # Actions once user clicks on "GUESS" button
@@ -563,7 +565,9 @@ def guess() -> None:
             # else:
             # Estimate distance from correct answer
             distance, direction, score = distance_to_solution(st.session_state.guess_last_submitted)
-            distance_year, direction_year = distance_to_solution_year(st.session_state.guess_year_last_submitted)
+            distance_year, direction_year, score_year = distance_to_solution_year(
+                st.session_state.guess_year_last_submitted
+            )
             # Update has_succeded flag
             st.session_state.user_has_succeded = (
                 st.session_state.user_has_succeded_country and st.session_state.user_has_succeded_year
@@ -577,6 +581,7 @@ def guess() -> None:
                 "score": score,
                 "distance_year": distance_year,
                 "direction_year": direction_year,
+                "score_year": score_year,
             }
             st.session_state.guesses[st.session_state.num_guesses] = st.session_state.guess_last
             # Increment number of guesses
@@ -605,6 +610,7 @@ def guess() -> None:
                     "year": "",
                     "distance_year": "",
                     "direction_year": "",
+                    "score_year": "",
                 }
                 st.session_state.guesses[st.session_state.num_guesses] = st.session_state.guess_last
                 # Increment number of guesses
@@ -992,6 +998,7 @@ for i in range(num_guesses_bound, NUM_GUESSES):
 # FINAL MESSAGE
 #
 ##########################################
+LANGUAGE_SHARE = "markdown"
 
 
 def _convert_score_to_emojis(score: int) -> str:
@@ -999,7 +1006,7 @@ def _convert_score_to_emojis(score: int) -> str:
 
     🟩: 20%
     🟨: 10%
-    🟧: 5%
+    # 🟧: 5% (NOT IN USE). should only be used if we define a 15% square
     ⬛: 0%
     """
     # Get number of green squares
@@ -1009,13 +1016,38 @@ def _convert_score_to_emojis(score: int) -> str:
     num_y = score // 10
     score -= num_y * 10
     # Get number of orange squares
-    num_o = score // 5
-    score -= num_o * 5
+    # num_o = score // 5
+    # score -= num_o * 5
     # Get number of black squares
-    num_b = max(5 - (num_g + num_y + num_o), 0)
+    num_b = max(5 - (num_g + num_y), 0)
 
     # Return mosaic
-    mosaic = "🟩" * num_g + "🟨" * num_y + "🟧" * num_o + "⬛" * num_b
+    mosaic = "🟩" * num_g + "🟨" * num_y + "⬛" * num_b
+    return mosaic
+
+
+def _convert_year_score_to_emojis(score: int) -> str:
+    """Return mosaic score.
+
+    🟢: 20%
+    🟡: 10%
+    # 🟧: 5% (NOT IN USE). should only be used if we define a 15% square
+    ⚫: 0%
+    """
+    # Get number of green squares
+    num_g = score // 20
+    score -= num_g * 20
+    # Get number of yellow squares
+    num_y = score // 10
+    score -= num_y * 10
+    # Get number of orange squares
+    # num_o = score // 5
+    # score -= num_o * 5
+    # Get number of black squares
+    num_b = max(5 - (num_g + num_y), 0)
+
+    # Return mosaic
+    mosaic = "🟢" * num_g + "🟡" * num_y + "⚫" * num_b
     return mosaic
 
 
@@ -1029,9 +1061,36 @@ def get_score_mosaic():
     return mosaic
 
 
-mosaic = get_score_mosaic()
+def get_year_score_mosaic():
+    """Get mosaic of score (years).
 
+    The mosaic provides a visual representation of the score for each round played.
+    """
+    scores = [int(guess["score"]) for guess in st.session_state.guesses if guess["score"] != ""]
+    mosaic = "\n".join([_convert_year_score_to_emojis(score) for score in scores])
+    return mosaic
+
+
+def get_score_mosaic_hard():
+    # Distance
+    scores_dist = [int(guess["score"]) for guess in st.session_state.guesses if guess["score"] != ""]
+    # Years
+    scores_year = [int(guess["score"]) for guess in st.session_state.guesses if guess["score_year"] != ""]
+    # Combine into string
+    mosaic = "\n".join(
+        [
+            _convert_score_to_emojis(dist) + _convert_year_score_to_emojis(year)
+            for dist, year in zip(scores_dist, scores_year)
+        ]
+    )
+    return mosaic
+
+
+# st.write(st.session_state.guesses)
+
+# HARD MODE
 if st.session_state.owidle_difficulty == 2:
+    mosaic_hard = get_score_mosaic_hard()
     ## Successful
     if st.session_state.user_has_succeded:
         st.balloons()
@@ -1047,22 +1106,19 @@ if st.session_state.owidle_difficulty == 2:
                 s2.append(_s)
 
             r = "round" if num_guesses_bound == 1 else "rounds"
-            s = (
-                f"{num_guesses_bound} {r} ({DIF_LVLS[st.session_state.owidle_difficulty]} mode)\n"
-                + " → ".join(s)
-                + "\nyears: "
-                + " → ".join(s2)
-                + "\nVisit http://etl.owid.io/wizard/owidle"
-            )
+            s = f"owidle#{OWID_NUM} {num_guesses_bound}/6 (Hard)\n" + mosaic_hard + "\nhttp://etl.owid.io/wizard/owidle"
             st.subheader("Share it")
-            st.code(s)
-        st.stop()
+            st.code(s, language=LANGUAGE_SHARE)
     ## Unsuccessful
     elif st.session_state.num_guesses >= NUM_GUESSES:
         st.error(f"The correct answer was **{SOLUTION}** in **{SOLUTION_YEAR}**. Better luck next time!")
-        st.stop()
+        st.subheader("Share it")
+        s = f"owidle#{OWID_NUM}: Failed (Hard)\n" + mosaic_hard + "\nhttp://etl.owid.io/wizard/owidle"
+        st.code(s, language=LANGUAGE_SHARE)
 
+# EASY/MID MODE
 else:
+    mosaic = get_score_mosaic()
     ## Successful
     if st.session_state.user_has_succeded:
         st.balloons()
@@ -1076,21 +1132,45 @@ else:
 
             r = "round" if num_guesses_bound == 1 else "rounds"
             s = (
-                f"{num_guesses_bound} {r} ({DIF_LVLS[st.session_state.owidle_difficulty]} mode)\n"
+                f"owidle#{OWID_NUM} {num_guesses_bound}/6 ({DIF_LVLS[st.session_state.owidle_difficulty]})\n"
                 + mosaic
-                + "\nVisit http://etl.owid.io/wizard/owidle"
+                + "\nhttp://etl.owid.io/wizard/owidle"
             )
             st.subheader("Share it")
-            st.code(s)
-        st.stop()
+            st.code(s, language=LANGUAGE_SHARE)
     ## Unsuccessful
     elif st.session_state.num_guesses >= NUM_GUESSES:
         st.error(f"The correct answer was **{SOLUTION}**. Better luck next time!")
         st.subheader("Share it")
         s = (
-            f"Failed this time ({DIF_LVLS[st.session_state.owidle_difficulty]} mode)\n"
+            f"owidle#{OWID_NUM}: Failed ({DIF_LVLS[st.session_state.owidle_difficulty]})\n"
             + mosaic
-            + "\nVisit http://etl.owid.io/wizard/owidle"
+            + "\nhttp://etl.owid.io/wizard/owidle"
         )
-        st.code(s)
-        st.stop()
+        st.code(s, language=LANGUAGE_SHARE)
+
+
+if st.session_state.user_has_succeded or (st.session_state.num_guesses >= NUM_GUESSES):
+    # Explanation on how scores are estimated
+    with st.expander("How is the score estimated?"):
+        st.markdown("### Easy and Standard modes")
+        st.markdown(
+            "The distance score is calculated as the ratio between the distance from the guessed country to the solution country and the maximum distance on Earth (~20,000 km)."
+        )
+        st.markdown(
+            "We create a 5-square visual representation of the score where 🟩 = 20%, 🟨 = 10% and ⬛ = 0%. For example, a score of 70% will be represented as 🟩🟩🟩🟨⬛."
+        )
+
+        st.markdown("### Hard mode")
+        st.markdown(
+            "The distance score is calculated as the ratio between the distance from the guessed country to the solution country and the maximum distance on Earth (~20,000 km)."
+        )
+        st.markdown(
+            "The year score is calculated as the ratio between the difference in years from the guessed year to the solution year and the maximum difference in years (depends on year coverage for that country)."
+        )
+        st.markdown(
+            "We create a 2 x 5-slot visual representation of the score where (i) 🟩 = 20%, 🟨 = 10% and ⬛ = 0% (for distance) and 🟢 = 20%, 🟡 = 10%, ⚫ = 0% (for years). For example, a distance score of 70% and year score of 30% will be represented as 🟩🟩🟩🟨⬛🟢🟡⚫⚫⚫."
+        )
+        st.markdown("Note that in hard mode, scores are hidden as you guess.")
+        # .
+    st.stop()
