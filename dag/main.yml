@@ -713,4 +713,5 @@ include:
   - dag/climate.yml
   - dag/urbanization.yml
   - dag/poverty_inequality.yml
+  - dag/democracy.yml
   - dag/temp.yml
