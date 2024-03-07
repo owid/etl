@@ -66,8 +66,7 @@ NON_UPDATEABLE_IDENTIFIERS = [
 ]
 
 # List of dependencies to ignore when calculating the update state.
-# This is done to avoid a certain common dependency (e.g. population) to make all steps appear as needing major update.
-# TODO: Consider removing this once the new unused population is removed or renamed.
+# This is done to avoid a certain common dependency (e.g. hyde) to make all steps appear as needing a major update.
 DEPENDENCIES_TO_IGNORE = [
     "snapshot://hyde/2017/general_files.zip",
 ]
