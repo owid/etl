@@ -42,6 +42,7 @@ def run(dest_dir: str) -> None:
     tb_wid_keyvars_extrapolated = create_keyvars_file_wid(tb_wid, extrapolated=True)
 
     tb_pip_percentiles = create_percentiles_file_pip(tb_pip_percentiles)
+    tb_pip_percentiles_1000 = create_percentiles_file_pip_1000(tb_pip_percentiles_1000)
     tb_lis_percentiles = create_percentiles_file_lis(tb_lis_percentiles, adults=False)
     tb_lis_percentiles_adults = create_percentiles_file_lis(tb_lis_percentiles_adults, adults=True)
     tb_wid_percentiles, tb_wid_percentiles_extrapolated = create_percentiles_file_wid(tb_wid_percentiles)
@@ -138,11 +139,10 @@ def run(dest_dir: str) -> None:
 
     tb_wdi = tb_wdi.set_index(["country", "year"], verify_integrity=True)
 
-    # Create explorer dataset, with garden table and metadata in csv format
+    # Create explorer dataset
     ds_explorer = create_dataset(
         dest_dir,
         tables=[tb, tb_percentiles, tb_wdi],
-        formats=["csv"],
         default_metadata=ds_lis.metadata,
     )
     ds_explorer.save()
