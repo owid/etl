@@ -293,7 +293,17 @@ class Chart(SQLModel, table=True):
             cond = cls.id == chart_id
         elif slug:
             cond = _json_is(cls.config, "slug", slug)
-        return session.exec(select(cls).where(cond)).one()  # type: ignore
+        else:
+            raise ValueError("Either chart_id or slug must be provided")
+        charts = session.exec(select(cls).where(cond)).all()
+
+        # there can be multiple charts with the same slug, pick the published one
+        if len(charts) > 1:
+            charts = [c for c in charts if c.publishedAt is not None]
+        elif len(charts) == 0:
+            raise NoResultFound()
+
+        return charts[0]
 
     @classmethod
     def load_charts_using_variables(cls, session: Session, variable_ids: List[int]) -> List["Chart"]:
