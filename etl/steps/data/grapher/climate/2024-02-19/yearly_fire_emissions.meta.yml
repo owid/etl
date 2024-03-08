@@ -1,5 +1,6 @@
 
-
+dataset:
+  title: Global Yearly Emissions from Wildfires
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
