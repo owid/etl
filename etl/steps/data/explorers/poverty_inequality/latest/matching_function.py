@@ -1,29 +1,24 @@
 from pathlib import Path
 
 import pandas as pd
-from owid.catalog import Dataset
 from structlog import get_logger
-
-from etl.paths import DATA_DIR
 
 # Initialize logger.
 log = get_logger()
 
 PARENT_DIR = Path(__file__).parent.absolute()
+KEYVARS_PATH = (
+    "https://catalog.ourworldindata.org/explorers/poverty_inequality/latest/poverty_inequality_export/keyvars.feather"
+)
+PERCENTILES_PATH = "https://catalog.ourworldindata.org/explorers/poverty_inequality/latest/poverty_inequality_export/percentiles.feather"
+WDI_PATH = (
+    "https://catalog.ourworldindata.org/explorers/poverty_inequality/latest/poverty_inequality_export/wdi.feather"
+)
 
-ds = Dataset(DATA_DIR / "explorers" / "poverty_inequality" / "latest" / "poverty_inequality_export")
-
-df = ds["keyvars"].reset_index()
-df = pd.DataFrame(df)
-
-df_percentiles = ds["percentiles"].reset_index()
-df_percentiles = pd.DataFrame(df_percentiles)
-
-# # Create feather files with the data
-# NOTEBOOKS_DIR = Path(__file__).parent.parent.parent.parent.parent.parent.parent.parent.absolute()
-# MATCHING_DIR = f"{NOTEBOOKS_DIR}/notebooks/PabloArriagada/matching_function"
-# df.to_feather(f"{MATCHING_DIR}/tb.feather", compression="zstd")
-# # df_percentiles.to_feather(f"{MATCHING_DIR}/tb_percentiles.feather", compression="zstd")
+# Load the datasets
+df = pd.read_feather(KEYVARS_PATH)
+df_percentiles = pd.read_feather(PERCENTILES_PATH)
+df_wdi = pd.read_feather(WDI_PATH)
 
 ##############################################
 # FUNCTION SETTINGS
