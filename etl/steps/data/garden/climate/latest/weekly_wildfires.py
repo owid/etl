@@ -84,6 +84,9 @@ def run(dest_dir: str) -> None:
 
     tb["share_area_ha"] = (tb["area_ha"] / tb["total_area_ha"]) * 100
     tb["share_area_ha_cumulative"] = (tb["area_ha_cumulative"] / tb["total_area_ha"]) * 100
+
+    # Area per wildfire
+    tb["area_ha_per_wildfire"] = tb["area_ha"] / tb["events"]
     tb = tb.drop(columns=["total_area_ha"])
     tb = tb.set_index(["country", "date"], verify_integrity=True)
 
