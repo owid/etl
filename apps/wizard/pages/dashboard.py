@@ -35,10 +35,41 @@ if not GRAPHER_DATASET_BASE_URL.startswith(("http://", "https://")):
     # Therefore, prepend "http://" (not "https://" because the site is not secure, and the browser will block the link).
     GRAPHER_DATASET_BASE_URL = f"http://{GRAPHER_DATASET_BASE_URL}"
 
+# List of identifiers of steps that should be considered as non-updateable.
+# NOTE: The identifier is the step name without the version (and without the "data://").
+NON_UPDATEABLE_IDENTIFIERS = [
+    # All population-related datasets.
+    "garden/demography/population",
+    "garden/gapminder/population",
+    "garden/hyde/baseline",
+    "garden/un/un_wpp",
+    "meadow/gapminder/population",
+    "meadow/hyde/baseline",
+    "meadow/hyde/general_files",
+    "meadow/un/un_wpp",
+    "open_numbers/open_numbers/gapminder__systema_globalis",
+    "open-numbers/ddf--gapminder--systema_globalis",
+    "snapshot/hyde/general_files.zip",
+    "snapshot/hyde/baseline.zip",
+    "snapshot/gapminder/population.xlsx",
+    "snapshot/un/un_wpp.zip",
+    # Regions dataset.
+    "garden/regions/regions",
+    # Old WB income groups.
+    "garden/wb/wb_income",
+    "meadow/wb/wb_income",
+    "walden/wb/wb_income",
+    # New WB income groups.
+    "garden/wb/income_groups",
+    "meadow/wb/income_groups",
+    "snapshot/wb/income_groups.xlsx",
+    # World Bank country shapes.
+    "snapshot/countries/world_bank.zip",
+]
+
 # List of dependencies to ignore when calculating the update state.
-# This is done to avoid a certain common dependency (e.g. population) to make all steps appear as needing major update.
+# This is done to avoid a certain common dependency (e.g. hyde) to make all steps appear as needing a major update.
 DEPENDENCIES_TO_IGNORE = [
-    # "data://garden/demography/2023-03-31/population",
     "snapshot://hyde/2017/general_files.zip",
 ]
 
@@ -47,6 +78,10 @@ DEPENDENCIES_TO_IGNORE = [
 st.session_state.selected_steps = st.session_state.get("selected_steps", [])
 ## Selected steps in table
 st.session_state.selected_steps_table = st.session_state.get("selected_steps_table", [])
+# Initialize the cache key in the session state.
+# This key will be used to reload the steps table after making changes to the steps.
+if "reload_key" not in st.session_state:
+    st.session_state["reload_key"] = 0
 
 # Logging
 log = get_logger()
@@ -76,31 +111,60 @@ add_indentation()
 ########################################
 # TITLE and DESCRIPTION
 ########################################
-st.title("ETL Dashboard 📋 :grey[Control panel for ETL updates]")
+st.title("ETL Dashboard 📋 :grey[Control panel for ETL steps]")
 st.markdown(
     """\
-Explore all active ETL steps, and, if you are working on your local machine, update them.
+Explore all active ETL steps, and, if you are working on your local machine, perform some actions.
 
-🔨 To update some steps, select them from the _Steps table_ and add them to the _Operations list_ below.
-
-💡 If you want to update, say, a specific grapher dataset, you can select just that step to the _Operations list_, then click on "Add dependencies", and bulk-update them all in one go.
-
-### Steps table
+🔨 To perform actions on some steps, select them from the _Steps table_ and add them to the _Operations list_ below.
 """
 )
-if not can_connect():
-    st.error("Unable to connect to grapher DB.")
 
+
+def _create_html_button(text, border_color, background_color):
+    html = f"""\
+        <div style="border: 1px solid {border_color}; padding: 4px; display: inline-block; border-radius: 10px; background-color: {background_color}; cursor: pointer;">
+            {text}
+        </div>
+"""
+    return html
+
+
+tutorial_html = f"""
+<details>
+<summary>💡 Common example: Say you want to update a specific grapher dataset. Then:</summary>
+<ol>
+    <li>Select that step from the <i>Steps table</i>.</li>
+    <li>Click on{_create_html_button("Add selected steps to the <i>Operations list</i>", "#FE4446", "#FE4446")}.</li>
+    <li>Click on{_create_html_button("Add all dependencies", "#d3d3d3", "#000000")} (and optionally click on {_create_html_button("Remove non-updateable", "#d3d3d3", "#000000")}).</li>
+    <li>Click on{_create_html_button("Update X steps", "#FE4446", "#FE4446")} to bulk-update them all in one go.</li>
+    <li>Click on{_create_html_button("Replace steps with their latest version", "#d3d3d3", "#000000")} to populate the <i>Operations list</i> with the newly created steps.</li>
+    <li>Click on{_create_html_button("Run all ETL steps (including snapshots)", "#FE4446", "#FE4446")} to run the ETL on the new steps.</li>
+    <li>If a step fails, you can manually edit its code and try running ETL again.</li>
+</ol>
+</details>
+"""
+st.markdown(tutorial_html, unsafe_allow_html=True)
+
+st.markdown("### Steps table")
 
 ########################################
 # LOAD STEPS TABLE
 ########################################
+
+if not can_connect():
+    st.error("Unable to connect to grapher DB.")
+
+
 @st.cache_data
-def load_steps_df() -> pd.DataFrame:
+def load_steps_df(reload_key: int) -> pd.DataFrame:
     """Generate and load the steps dataframe.
 
     This is just done once, at the beginning.
     """
+    # Ensure that the function is re-run when the reload_key changes.
+    _ = reload_key
+
     # Load steps dataframe.
     steps_df = StepUpdater().steps_df
 
@@ -183,14 +247,14 @@ def load_steps_df() -> pd.DataFrame:
 
 
 @st.cache_data
-def load_steps_df_to_display(show_all_channels: bool) -> pd.DataFrame:
+def load_steps_df_to_display(show_all_channels: bool, reload_key: int) -> pd.DataFrame:
     """Load the steps dataframe, and filter it according to the user's choice."""
     # Load all data
-    df = load_steps_df()
+    df = load_steps_df(reload_key=reload_key)
 
     # If toggle is not shown, pre-filter the DataFrame to show only rows where "channel" equals "grapher"
     if not show_all_channels:
-        df = df[((df["channel"] == "grapher") & (df["n_charts"] > 0)) | (df["channel"] == "explorers")]
+        df = df[df["channel"].isin(["grapher", "explorers"])]
 
     # Sort displayed data conveniently.
     df = df.sort_values(
@@ -249,17 +313,17 @@ def load_steps_df_to_display(show_all_channels: bool) -> pd.DataFrame:
 
 
 # Streamlit UI to let users toggle the filter
-show_all_channels = not st.toggle("Select only grapher steps with charts, and explorer steps", True)
+show_all_channels = not st.toggle("Select only grapher and explorer steps", True)
 
 # Load the steps dataframe.
-steps_df = load_steps_df()
+steps_df = load_steps_df(reload_key=st.session_state["reload_key"])
 
 
 ########################################
 # Display STEPS TABLE
 ########################################
 # Get only columns to be shown
-steps_df_display = load_steps_df_to_display(show_all_channels)
+steps_df_display = load_steps_df_to_display(show_all_channels, reload_key=st.session_state["reload_key"])
 
 # Define the options of the main grid table with pagination.
 gb = GridOptionsBuilder.from_dataframe(steps_df_display)
@@ -460,10 +524,7 @@ grid_response = AgGrid(
 # Execute command to update selected steps.
 @st.cache_data(show_spinner=False)
 def execute_command(cmd):
-    """Execute a command and get its output.
-
-    TODO: This is not ideal. Shouldn't be executing commands in terminal.
-    """
+    """Execute a command and get its output."""
     try:
         result = subprocess.run(cmd, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, shell=True)
         return result.stdout
@@ -532,32 +593,28 @@ with st.container(border=True):
                 (
                     "Add direct dependencies",
                     "direct_dependencies",
-                    "Add direct dependencies of this step to the _Operations list_.",
+                    "Add direct dependencies of this step to the _Operations list_. Direct dependencies are steps that are loaded directly by the current step.",
                 ),
                 (
                     "Add all dependencies",
                     "all_active_dependencies",
-                    "Add all dependencies of this step to the _Operations list_.",
+                    "Add all dependencies (including indirect dependencies) of this step to the _Operations list_. Indirect dependencies are steps that are needed, but not directly loaded, by the current step. In other words: dependencies of dependencies.",
                 ),
                 (
                     "Add direct usages",
                     "direct_usages",
-                    "Add direct usages of this step to the _Operations list_.",
+                    "Add direct usages of this step to the _Operations list_. Direct usages are those steps that load the current step directly.",
                 ),
                 (
                     "Add all usages",
                     "all_active_usages",
-                    "Add all usages of this step to the _Operations list_.",
+                    "Add all usages (including indirect usages) of this step to the _Operations list_. Indirect usages are those steps that need, but do not directly load, the current step. In other words: usages of usages.",
                 ),
             ]
 
             # TODO: Consider adding step buttons to:
             #  * Execute ETL step for only the current step.
             #  * Edit metadata for the current step.
-            # TODO: Consider adding bulk buttons to:
-            #  * Sort them in ETL execution order.
-            #  * Select the steps currently in the operation list in the main table (to see their attributes).
-            #  * Execute ETL for all steps in the operation list.
 
             # Display the operations list.
             for (action_name, key_suffix, help_text), col in zip(actions, cols):
@@ -575,7 +632,7 @@ with st.container(border=True):
                         on_click=lambda step=step: remove_step(step),
                         help=help_text,
                     )
-                # Add relared steps
+                # Add related steps
                 else:
                     col.button(
                         label=action_name,
@@ -583,12 +640,54 @@ with st.container(border=True):
                         on_click=lambda step=step, key_suffix=key_suffix: include_related_steps(step, key_suffix),
                         help=help_text,
                     )
+
         # Add button to clear the operations list.
         st.button(
-            "Clear Operations list",
+            "Clear _Operations list_",
             help="Remove all steps currently in the _Operations list_.",
             type="secondary",
             on_click=lambda: st.session_state.selected_steps.clear(),
+        )
+
+        def remove_non_updateable_steps():
+            # Remove steps that cannot be updated (because update_period_days is set to 0).
+            # For convenience, also remove steps that a user most likely doesn't want to update.
+            non_updateable_steps = steps_df[
+                (steps_df["update_period_days"] == 0) | (steps_df["identifier"].isin(NON_UPDATEABLE_IDENTIFIERS))
+            ]["step"].tolist()
+            st.session_state.selected_steps = [
+                step for step in st.session_state.selected_steps if step not in non_updateable_steps
+            ]
+
+        st.button(
+            "Remove non-updateable (e.g. population)",
+            help="Remove steps that cannot be updated (i.e. with `update_period_days=0`), and other auxiliary datasets, namely: "
+            + "\n- ".join(sorted(NON_UPDATEABLE_IDENTIFIERS)),
+            type="secondary",
+            on_click=remove_non_updateable_steps(),
+        )
+
+        def upgrade_steps_in_operations_list():
+            new_list = []
+            for step in st.session_state.selected_steps:
+                step_info = steps_df[steps_df["step"] == step].iloc[0].to_dict()
+                step_identifier = step_info["identifier"]
+                latest_version = step_info["latest_version"]
+                step_latest = steps_df[
+                    (steps_df["identifier"] == step_identifier) & (steps_df["version"] == latest_version)
+                ]["step"]
+                if not step_latest.empty:
+                    new_list.append(step_latest.item())
+                else:
+                    new_list.append(step)
+
+            st.session_state.selected_steps = new_list
+
+        st.button(
+            "Replace steps with their latest versions",
+            help="Replace steps in the _Operations list_ by their latest version available. You may want to use this button after updating steps, to be able to operate on the newly created steps.",
+            type="secondary",
+            on_click=upgrade_steps_in_operations_list(),
         )
 
     else:
@@ -600,47 +699,125 @@ with st.container(border=True):
 ########################################
 
 if st.session_state.selected_steps:
-    # Add an expander menu with additional parameters for the update command.
-    with st.container(border=True):
-        with st.expander("Additional parameters", expanded=False):
-            dry_run = st.toggle(
-                "Dry run",
-                True,
-                help="If checked, the update command will not write anything to the DAG or create any files.",
-            )
-            version_new = st.text_input("New version", value=TODAY, help="Version of the new steps to be created.")
+    cols_primary_buttons = st.columns([2, 2])
 
-        btn_submit = st.button(
-            f"Update {len(st.session_state.selected_steps)} steps",
-            help="Update steps in the _Operations list_.",
-            type="primary",
-            use_container_width=True,
-        )
-
-        # Button to execute the update command and show its output.
-        if btn_submit:
-            if ENV_IS_REMOTE:
-                st.error(
-                    "The update command is not available in the remote version of the wizard. Update steps locally."
+    with cols_primary_buttons[0]:
+        # Add an expander menu with additional parameters for the update command.
+        with st.container(border=True):
+            with st.expander("Additional parameters to update steps", expanded=False):
+                dry_run_update = st.toggle(
+                    "Dry run",
+                    True,
+                    help="If checked, the update command will not write anything to the DAG or create any files.",
                 )
-                st.stop()
-            else:
-                with st.spinner("Executing step updater..."):
-                    # TODO: It would be better to directly use StepUpdater instead of a subprocess.
-                    command = (
-                        "etl update "
-                        + " ".join(st.session_state.selected_steps)
-                        + " --non-interactive"
-                        + f" --step-version-new {version_new}"
+                version_new = st.text_input("New version", value=TODAY, help="Version of the new steps to be created.")
+
+            btn_submit = st.button(
+                f"Update {len(st.session_state.selected_steps)} steps",
+                help="Update all steps in the _Operations list_.",
+                type="primary",
+                use_container_width=True,
+            )
+
+            # Button to execute the update command and show its output.
+            if btn_submit:
+                if ENV_IS_REMOTE:
+                    st.error(
+                        "The update command is not available in the remote version of the wizard. Update steps locally."
                     )
+                    st.stop()
+                else:
+                    with st.spinner("Executing step updater..."):
+                        # TODO: It would be better to directly use StepUpdater instead of a subprocess.
+                        command = (
+                            "etl update "
+                            + " ".join(st.session_state.selected_steps)
+                            + " --non-interactive"
+                            + f" --step-version-new {version_new}"
+                        )
+                        if dry_run_update:
+                            command += " --dry-run"
+                        cmd_output = execute_command(command)
+                        # Show the output of the command in an expander.
+                        with st.expander("Command Output:", expanded=True):
+                            st.text_area("Output", value=cmd_output, height=300, key="cmd_output_area")
+                        if "error" not in cmd_output.lower():
+                            # Celebrate that the update was successful, why not.
+                            st.balloons()
+                            if not dry_run_update:
+                                # Reload steps_df to include the new steps.
+                                st.session_state["reload_key"] += 1
+                        # Add a button to close the output expander.
+                        st.button("Close and reload _Steps table_", key="acknowledge_cmd_output")
+
+    with cols_primary_buttons[1]:
+        # Add an expander menu with additional parameters for the ETL command.
+        with st.container(border=True):
+            with st.expander("Additional parameters to run snapshots and ETL steps", expanded=False):
+                dry_run_etl = st.toggle(
+                    "Dry run",
+                    True,
+                    help="If checked, no snapshots will be executed, and ETL will be executed in dry-run mode.",
+                )
+                force_only = st.toggle(
+                    "Force run",
+                    False,
+                    help="If checked, the ETL steps will be forced to be executed (even if they are already executed).",
+                )
+
+            def define_command_to_execute_snapshots_and_etl_steps(dry_run: bool = True, force_only: bool = False):
+                # Execute ETL for all steps in the operations list.
+                snapshot_steps = [step for step in st.session_state.selected_steps if step.startswith("snapshot://")]
+                etl_steps = [step for step in st.session_state.selected_steps if not step.startswith("snapshot://")]
+
+                command = ""
+                # First attempt to run all snapshots sequentially.
+                for snapshot_step in snapshot_steps:
+                    # Identify script for current snapshot.
+                    script = steps_df[steps_df["step"] == snapshot_step]["full_path_to_script"].item()
+                    # Define command to be executed.
+                    command += f"python {script} && "
+
+                if dry_run:
+                    # If dry_run, we do not want to execute the command, but simply print it.
+                    command = f"echo '{command}' && "
+
+                if etl_steps:
+                    # Then let ETL run all remaining steps (ETL will decide the order).
+                    # Define command to be executed.
+                    command += f"etl run {' '.join(etl_steps)} "
+
                     if dry_run:
                         command += " --dry-run"
-                    cmd_output = execute_command(command)
-                    # Show the output of the command in an expander.
-                    with st.expander("Command Output:", expanded=True):
-                        st.text_area("Output", value=cmd_output, height=300, key="cmd_output_area")
-                    if "error" not in cmd_output.lower():
-                        # Celebrate that the update was successful, why not.
-                        st.balloons()
-                    # Add a button to close the output expander.
-                    st.button("Close", key="acknowledge_cmd_output")
+
+                    if force_only:
+                        command += " --force --only"
+
+                return command
+
+            btn_etl_run = st.button(
+                "Run all ETL steps (including snapshots)",
+                help="Execute all snapshots currently in the _Operations list_, and run ETL on all data steps.",
+                type="primary",
+                use_container_width=True,
+            )
+
+            # Button to execute the update command and show its output.
+            if btn_etl_run:
+                if ENV_IS_REMOTE:
+                    st.error("Running the ETL is not available in the remote version of the wizard. Run them locally.")
+                    st.stop()
+                else:
+                    with st.spinner("Executing ETL..."):
+                        command = define_command_to_execute_snapshots_and_etl_steps(
+                            dry_run=dry_run_etl, force_only=force_only
+                        )
+                        cmd_output = execute_command(cmd=command)
+                        # Show the output of the command in an expander.
+                        with st.expander("Command Output:", expanded=True):
+                            st.text_area("Output", value=cmd_output, height=300, key="cmd_output_area")
+                        if "error" not in cmd_output.lower():
+                            # Celebrate that the update was successful, why not.
+                            st.balloons()
+                        # Add a button to close the output expander.
+                        st.button("Close", key="acknowledge_cmd_output_etl_run")
