@@ -462,7 +462,7 @@ def combine_variables_processing_level(variables: List[Variable]) -> Optional[PR
 
 
 def combine_variables_metadata(
-    variables: List[Any], operation: OPERATION, name: str = UNNAMED_VARIABLE
+    variables: List[Any], operation: OPERATION, name: str = UNNAMED_VARIABLE, warn: bool = True
 ) -> VariableMeta:
     # Initialise an empty metadata.
     metadata = VariableMeta()
@@ -487,10 +487,10 @@ def combine_variables_metadata(
         variables=variables_only, field="description_from_producer", operation=operation
     )
     metadata.unit = _get_metadata_value_from_variables_if_all_identical(
-        variables=variables_only, field="unit", operation=operation, warn_if_different=True
+        variables=variables_only, field="unit", operation=operation, warn_if_different=warn
     )
     metadata.short_unit = _get_metadata_value_from_variables_if_all_identical(
-        variables=variables_only, field="short_unit", operation=operation, warn_if_different=True
+        variables=variables_only, field="short_unit", operation=operation, warn_if_different=warn
     )
     metadata.sources = get_unique_sources_from_variables(variables=variables_only)
     metadata.origins = get_unique_origins_from_variables(variables=variables_only)

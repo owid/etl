@@ -71,6 +71,9 @@ class Table(pd.DataFrame):
     # Set to True to help debugging metadata issues.
     DEBUG = False
 
+    # Set to True to enable warnings about metadata issues.
+    WARN = True
+
     # slicing and copying creates tables
     @property
     def _constructor(self) -> type:
@@ -609,9 +612,12 @@ class Table(pd.DataFrame):
         var_name: str = "variable",
         value_name: str = "value",
         short_name: Optional[str] = None,
+        warn: Optional[bool] = None,
         *args,
         **kwargs,
     ) -> "Table":
+        if warn is None:
+            warn = self.WARN
         return melt(
             frame=self,
             id_vars=id_vars,
@@ -619,6 +625,7 @@ class Table(pd.DataFrame):
             var_name=var_name,
             value_name=value_name,
             short_name=short_name,
+            warn=warn,
             *args,
             **kwargs,
         )
@@ -1161,6 +1168,7 @@ def melt(
     var_name: str = "variable",
     value_name: str = "value",
     short_name: Optional[str] = None,
+    warn: bool = True,
     *args,
     **kwargs,
 ) -> Table:
@@ -1196,18 +1204,18 @@ def melt(
 
     # Combine metadata of value variables and assign the combination to the new "value" column.
     table[value_name].metadata = variables.combine_variables_metadata(
-        variables=[frame[var] for var in value_vars_list], operation="melt", name=value_name
+        variables=[frame[var] for var in value_vars_list], operation="melt", name=value_name, warn=warn
     )
 
     # Assign that combined metadata also to the new "variable" column.
     table[var_name].metadata = variables.combine_variables_metadata(
-        variables=[frame[var] for var in value_vars_list], operation="melt", name=var_name
+        variables=[frame[var] for var in value_vars_list], operation="melt", name=var_name, warn=warn
     )
 
     for variable in id_vars_list:
         # Combine metadata of id variables and assign the combination to the new "id" variable.
         table[variable].metadata = variables.combine_variables_metadata(
-            variables=[frame[variable]], operation="melt", name=variable
+            variables=[frame[variable]], operation="melt", name=variable, warn=warn
         )
 
     # Update table metadata.
