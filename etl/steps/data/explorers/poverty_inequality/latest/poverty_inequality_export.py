@@ -169,6 +169,11 @@ def create_keyvars_file_pip(tb: Table) -> Table:
     # Select the columns to keep
     tb = tb[["country", "year", "reporting_level", "welfare_type"] + indicators_list]
 
+    # Remove metadata for units to avoid conflict warnings
+    for column in tb.columns:
+        tb[column].metadata.unit = None
+        tb[column].metadata.short_unit = None
+
     # Make pip table longer
     tb = tb.melt(
         id_vars=["country", "year", "reporting_level", "welfare_type"],
@@ -280,6 +285,11 @@ def create_keyvars_file_lis(tb: Table, adults: bool) -> Table:
     # Select the columns to keep
     tb = tb[["country", "year"] + indicators_list]
 
+    # Remove metadata for units to avoid conflict warnings
+    for column in tb.columns:
+        tb[column].metadata.unit = None
+        tb[column].metadata.short_unit = None
+
     # Make lis table longer
     tb = tb.melt(id_vars=["country", "year"], var_name="indicator_welfare_equivalization", value_name="value")
 
@@ -387,6 +397,11 @@ def create_keyvars_file_wid(tb: Table, extrapolated: bool) -> Table:
     # Select the columns to keep
     tb = tb[["country", "year"] + indicators_list]
 
+    # Remove metadata for units to avoid conflict warnings
+    for column in tb.columns:
+        tb[column].metadata.unit = None
+        tb[column].metadata.short_unit = None
+
     # Make wid table longer
     tb = tb.melt(id_vars=["country", "year"], var_name="indicator_welfare", value_name="value")
 
@@ -476,6 +491,11 @@ def create_percentiles_file_pip(tb: Table) -> Table:
     Process the percentiles table from PIP, to adapt it to a concatenated file with LIS and WID
     """
 
+    # Remove metadata for units to avoid conflict warnings
+    for column in tb.columns:
+        tb[column].metadata.unit = None
+        tb[column].metadata.short_unit = None
+
     # Make pip table longer
     tb = tb.melt(
         id_vars=["country", "year", "reporting_level", "welfare_type", "percentile"],
@@ -550,6 +570,11 @@ def create_percentiles_file_pip_1000(tb: Table) -> Table:
     """
     Process the percentiles table from PIP (1000 bins), to adapt it to a concatenated file with LIS and WID
     """
+
+    # Remove metadata for units to avoid conflict warnings
+    for column in tb.columns:
+        tb[column].metadata.unit = None
+        tb[column].metadata.short_unit = None
 
     # Make pip table longer
     tb = tb.melt(
@@ -632,6 +657,11 @@ def create_percentiles_file_lis(tb: Table, adults: bool) -> Table:
     else:
         pc_notation = "perCapita"
         pc_notation_human_readable = "Per capita"
+
+    # Remove metadata for units to avoid conflict warnings
+    for column in tb.columns:
+        tb[column].metadata.unit = None
+        tb[column].metadata.short_unit = None
 
     # Make lis table longer
     tb = tb.melt(
@@ -719,6 +749,11 @@ def create_percentiles_file_wid(tb) -> Table:
     Process the percentiles table from WID, to adapt it to a concatenated file with LIS and PIP. It generates two tables, one with extrapolated datapoints and one without them
     """
     # WID PERCENTILES
+
+    # Remove metadata for units to avoid conflict warnings
+    for column in tb.columns:
+        tb[column].metadata.unit = None
+        tb[column].metadata.short_unit = None
 
     # Make wid table longer
     tb = tb.melt(
