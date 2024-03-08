@@ -4,8 +4,33 @@ definitions:
     presentation:
       topic_tags:
         - Democracy
+  others:
+    description_processing_main: &description_processing_main |-
+      Old data for some countries has been imputed based on former countries:
 
-
+          - Colombia (1821 - 1830): Great Colombia (former)
+          - Costa Rica (1824 - 1837): Federal Republic of Central America (former)
+          - Czechia (1918 - 1992): Czechoslovakia
+          - Ecuador (1821 - 1829): Great Colombia (former)
+          - El Salvador (1824 - 1838): Federal Republic of Central America (former)
+          - Guatemala (1824 - 1838): Federal Republic of Central America (former)
+          - Honduras (1824 - 1838): Federal Republic of Central America (former)
+          - Nicaragua (1824 - 1837): Federal Republic of Central America (former)
+          - North Korea (1800 - 1910): Korea (former)
+          - Panama (1821 - 1830): Great Colombia (former)
+          - Slovakia (1918 - 1992): Czechoslovakia
+          - South Korea (1800 - 1910): Korea (former)
+          - Venezuela (1821 - 1829): Great Colombia (former)
+          - Russia (1922 - 1991): USSR
+          - Ethiopia (1952 - 1992): Ethiopia (former)
+          - Eritrea (1952 - 1992): Ethiopia (former)
+          - Pakistan (1947 - 1971): Pakistan (former)
+          - Bangladesh (1947 - 1970): Pakistan (former)
+    description_key:
+      demoscracy_general: &dk_democracy_1 |-
+        Democracies are political systems in which political leaders are selected under broad suffrage in free and fair elections.
+      democracy_ws: &dk_democracy_ws_1 |-
+        Democracies are political systems in which political leaders are elected under broad suffrage for both men and women in free and fair elections.
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
@@ -14,7 +39,67 @@ dataset:
 
 tables:
   bmr:
+    common:
+      processing_level: "major"
     variables:
+      regime:
+        title: Political regime
+        unit: ""
+        processing_level: "minor"
+        description_short: |-
+          Identifies the political regime of a country using the classification by political scientists Carles Boix, Michael Miller, and Sebastian Rosato.
+        description_key:
+          - This indicator distinguishes between (electoral) democracies (score 1) and non-democracies (score 0).
+          - *dk_democracy_1
+        description_processing: *description_processing_main
+        description_from_producer: |-
+          Indicator generated from `democracy_omitteddata`. This is the same measure as `democracy`, except it records an NA for countries occupied during an international war (e.g., the Netherlands 1940-44) or experiencing state collapse during a civil war (e.g., Lebanon 1976-89). The `democracy` variable instead fills in these years as continuations of the same regime type to avoid coding democratic transitions at the end of military occupations. Researchers who want to code this differently can fill in the NA values in `democracy_omitteddata` with 0.
+      regime_womsuffr:
+        title: Political regime (with women's suffrage)
+        unit: ""
+        description_short: |-
+          The variable identifies the political regime of a country using the classification by political scientists Carles Boix, Michael Miller, and Sebastian Rosato.
+        processing_level: "minor"
+        description_key:
+          - This indicator distinguishes between (electoral) democracies (score 1) and non-democracies (score 0).
+          - *dk_democracy_ws_1
+        description_processing: *description_processing_main
+        description_from_producer: |-
+          Indicator generated from `democracy_femalesuffrage:`. This adjusts democracy by also requiring that at least half of adult women have the right to vote. Thirty countries have changed values.
+
+      num_years_in_democracy_consecutive:
+        # formerly: dem_age_bmr_owid
+        title: "Age of democracy"
+        unit: "years"
+        description_short: |-
+          The number of consecutive years passed since the country last became a democracy(not necessarily including women's suffrage).
+        description_key:
+          - *dk_democracy_1
+      num_years_in_democracy:
+        # formerly: dem_exp_bmr_owid
+        title: "Experience with democracy"
+        unit: "years"
+        description_short: |-
+          The number of years a country has been a democracy (not necessarily including women's suffrage) since 1800. It sums all periods of democracy.
+        description_key:
+          - *dk_democracy_1
+      num_years_in_democracy_ws_consecutive:
+        # formerly: dem_ws_age_bmr_owid
+        title: "Age of democracy (with women's suffrage)"
+        unit: "years"
+        description_short: |-
+          The number of consecutive years passed since the country last became a democracy (including women's suffrage).
+        description_key:
+          - *dk_democracy_ws_1
+      num_years_in_democracy_ws:
+        # formerly: dem_ws_exp_bmr_owid
+        title: "Experience with democracy (with women's suffrage)"
+        unit: "years"
+        description_short: |-
+          The number of years a country has been a democracy (including women's suffrage) since 1800. It sums all periods of democracy.
+        description_key:
+          - *dk_democracy_ws_1
+
       # testing_variable:
       #   title: Testing variable title
       #   unit: arbitrary units
@@ -49,5 +134,4 @@ tables:
       #     unit: arbitrary units
       #     yearIsDay: false
       #     zeroDay:
-      {}
 

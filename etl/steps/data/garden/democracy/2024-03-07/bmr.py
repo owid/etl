@@ -1,6 +1,10 @@
 """Load a meadow dataset and create a garden dataset."""
 
+from typing import cast
+
+import numpy as np
 import pandas as pd
+from owid.catalog import Variable
 from owid.catalog.tables import Table, concat
 
 from etl.data_helpers import geo
@@ -10,7 +14,7 @@ from etl.helpers import PathFinder, create_dataset
 paths = PathFinder(__file__)
 
 
-# We will infer indicator values for some countries based on their historical equivalences.
+# IMPUTE: We will infer indicator values for some countries based on their historical equivalences.
 COUNTRIES_IMPUTE = [
     {
         "country": "Colombia",
@@ -152,8 +156,8 @@ def run(dest_dir: str) -> None:
     tb = tb[["country", "year", "democracy_omitteddata", "democracy_femalesuffrage"]]
     tb = tb.rename(
         columns={
-            "democracy_omitteddata": "regime_bmr",
-            "democracy_femalesuffrage": "regime_womsuffr_bmr",
+            "democracy_omitteddata": "regime",
+            "democracy_femalesuffrage": "regime_womsuffr",
         }
     )
 
@@ -162,22 +166,18 @@ def run(dest_dir: str) -> None:
 
     # Refine
     ## Set NaNs to womsuff
-    tb.loc[tb["regime_bmr"].isna(), "regime_womsuffr_bmr"] = pd.NA
+    tb.loc[tb["regime"].isna(), "regime_womsuffr"] = pd.NA
     ## Add country codes
-    tb["ccode"] = tb["country"].astype("category").cat.codes
-
-    tb = tb.sort_values(["country", "year"])
+    # tb["ccode"] = tb["country"].astype("category").cat.codes
 
     ## Add democracy age / experience
-    ### Count the number of years since the country first became a democracy. Transition NaN -> 1 is considered as 0 -> 1.
-    tb["dem_age_bmr_owid"] = tb.groupby(["country", tb["regime_bmr"].fillna(0).eq(0).cumsum()])["regime_bmr"].cumsum()
-    tb["dem_age_bmr_owid"] = tb["dem_age_bmr_owid"].astype(float)
-    ## Add democracy age (including women's suffrage) / experience
-    ### Count the number of years since the country first became a democracy. Transition NaN -> 1 is considered as 0 -> 1.
-    tb["dem_ws_age_bmr_owid"] = tb.groupby(["country", tb["regime_womsuffr_bmr"].fillna(0).eq(0).cumsum()])[
-        "regime_bmr"
-    ].cumsum()
-    tb["dem_ws_age_bmr_owid"] = tb["dem_ws_age_bmr_owid"].astype(float)
+    tb = tb.sort_values(["country", "year"])
+
+    # Add years in democracy (consecutive and total)
+    tb = add_years_in_democracy(tb)
+
+    # Add age groups
+    tb = add_year_counts_groups(tb)
 
     # Set index.
     tb = tb.set_index(["country", "year"], verify_integrity=True).sort_index()
@@ -194,7 +194,7 @@ def run(dest_dir: str) -> None:
     ds_garden.save()
 
 
-def add_imputes(tb) -> Table:
+def add_imputes(tb: Table) -> Table:
     """Add imputed values to the table."""
     tb_imputed = []
     for impute in COUNTRIES_IMPUTE:
@@ -212,12 +212,12 @@ def add_imputes(tb) -> Table:
         # Tweak them
         tb_ = tb_.rename(
             columns={
-                "country": "regime_imputed_country_bmr_owid",
+                "country": "regime_imputed_country",
             }
         ).assign(
             **{
                 "country": impute["country"],
-                "regime_imputed_bmr_owid": 1,
+                "regime_imputed": 1,
             }
         )
         tb_imputed.append(tb_)
@@ -225,14 +225,73 @@ def add_imputes(tb) -> Table:
     tb = concat(tb_imputed + [tb], ignore_index=True)
 
     # Re-order columns
-    tb = tb[
-        [
-            "country",
-            "year",
-            "regime_bmr",
-            "regime_womsuffr_bmr",
-            "regime_imputed_country_bmr_owid",
-            "regime_imputed_bmr_owid",
-        ]
+    cols = [
+        "country",
+        "year",
+        "regime",
+        "regime_womsuffr",
+        "regime_imputed_country",
+        "regime_imputed",
     ]
+    tb = cast(Table, tb[cols])
+
+    return tb
+
+
+def add_years_in_democracy(tb: Table) -> Table:
+    """Add years in democracy.
+
+    Two types of counters are generated:
+        - Total number of years in democracy.
+        - Number of consecutive years in democracy.
+
+    This is applied to two indicators: democracy with and without women's suffrage.
+
+    Consequently, four indicators are created:
+
+        - num_years_in_democracy_consecutive: Number of consecutive years in democracy.
+        - num_years_in_democracy: Total number of years in democracy.
+        - num_years_in_democracy_ws_consecutive: Number of consecutive years in democracy with women's suffrage.
+        - num_years_in_democracy_ws: Total number of years in democracy with women's suffrage.
+    """
+    ### Count the number of years since the country first became a democracy. Transition NaN -> 1 is considered as 0 -> 1.
+    tb["num_years_in_democracy_consecutive"] = tb.groupby(["country", tb["regime"].fillna(0).eq(0).cumsum()])[
+        "regime"
+    ].cumsum()
+    tb["num_years_in_democracy_consecutive"] = tb["num_years_in_democracy_consecutive"].astype(float)
+    tb["num_years_in_democracy"] = tb.groupby("country")["regime"].cumsum()
+    ## Add democracy age (including women's suffrage) / experience
+    ### Count the number of years since the country first became a democracy. Transition NaN -> 1 is considered as 0 -> 1.
+    tb["num_years_in_democracy_ws_consecutive"] = tb.groupby(
+        ["country", tb["regime_womsuffr"].fillna(0).eq(0).cumsum()]
+    )["regime"].cumsum()
+    tb["num_years_in_democracy_ws_consecutive"] = tb["num_years_in_democracy_ws_consecutive"].astype(float)
+    tb["num_years_in_democracy_ws"] = tb.groupby("country")["regime_womsuffr"].cumsum()
+
+    return tb
+
+
+def add_year_counts_groups(tb: Table) -> Table:
+    """Add age groups to the table."""
+    tb = _add_year_counts_groups(tb, "num_years_in_democracy")
+    tb = _add_year_counts_groups(tb, "num_years_in_democracy_ws")
+
+    return tb
+
+
+def _add_year_counts_groups(tb: Table, column: str) -> Table:
+    bins = [
+        -np.inf,
+        0,
+        18,
+        30,
+        60,
+        90,
+        np.inf,
+    ]
+    labels = [f"{i}" for i in range(6)]
+    assert len(bins) == len(labels) + 1, "Length mismatch!"
+
+    tb[f"{column}_group"] = pd.cut(tb[column], bins=bins, labels=labels)
+    tb[f"{column}_group"] = Variable(tb[f"{column}_group"]).copy_metadata(tb[column])
     return tb
