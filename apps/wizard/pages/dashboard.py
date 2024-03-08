@@ -565,22 +565,22 @@ with st.container(border=True):
                 (
                     "Add direct dependencies",
                     "direct_dependencies",
-                    "Add direct dependencies of this step to the _Operations list_.",
+                    "Add direct dependencies of this step to the _Operations list_. Direct dependencies are steps that are loaded directly by the current step.",
                 ),
                 (
                     "Add all dependencies",
                     "all_active_dependencies",
-                    "Add all dependencies of this step to the _Operations list_.",
+                    "Add all dependencies (including indirect dependencies) of this step to the _Operations list_. Indirect dependencies are steps that are needed, but not directly loaded, by the current step. In other words: dependencies of dependencies.",
                 ),
                 (
                     "Add direct usages",
                     "direct_usages",
-                    "Add direct usages of this step to the _Operations list_.",
+                    "Add direct usages of this step to the _Operations list_. Direct usages are those steps that load the current step directly.",
                 ),
                 (
                     "Add all usages",
                     "all_active_usages",
-                    "Add all usages of this step to the _Operations list_.",
+                    "Add all usages (including indirect usages) of this step to the _Operations list_. Indirect usages are those steps that need, but do not directly load, the current step. In other words: usages of usages.",
                 ),
             ]
 
@@ -619,7 +619,7 @@ with st.container(border=True):
         with col_button1:
             # Add button to clear the operations list.
             st.button(
-                "Clear Operations list",
+                "Clear _Operations list_",
                 help="Remove all steps currently in the _Operations list_.",
                 type="secondary",
                 on_click=lambda: st.session_state.selected_steps.clear(),
@@ -638,7 +638,7 @@ with st.container(border=True):
         with col_button2:
             st.button(
                 "Remove non-updateable (e.g. population)",
-                help="Remove common steps (like population) and other steps that cannot be updated (for now, these steps are listed in `NON_UPDATEABLE_STEPS`, in `apps/wizard/pages/dashboard.py`).",
+                help="Remove common steps (like population) and other steps that cannot be updated (for example, those with `update_period_days=0`).",
                 type="secondary",
                 on_click=remove_non_updateable_steps(),
             )
@@ -661,8 +661,8 @@ with st.container(border=True):
 
         with col_button3:
             st.button(
-                f"Replace {len(st.session_state.selected_steps)} steps by their latest versions",
-                help="Replace steps in the _Operations list_ by their latest version (consider using after updating).",
+                "Replace steps with their latest versions",
+                help="Replace steps in the _Operations list_ by their latest version available. You may want to use this button after updating steps, to be able to operate on the newly created steps.",
                 type="secondary",
                 on_click=upgrade_steps_in_operations_list(),
             )
@@ -691,7 +691,7 @@ if st.session_state.selected_steps:
 
             btn_submit = st.button(
                 f"Update {len(st.session_state.selected_steps)} steps",
-                help="Update steps in the _Operations list_.",
+                help="Update all steps in the _Operations list_.",
                 type="primary",
                 use_container_width=True,
             )
@@ -773,8 +773,8 @@ if st.session_state.selected_steps:
                 return command
 
             btn_etl_run = st.button(
-                f"Run {len(st.session_state.selected_steps)} snapshots and ETL steps",
-                help="Run ETL on steps in the _Operations list_.",
+                f"Run {len(st.session_state.selected_steps)} all ETL steps (including snapshots)",
+                help="Execute all snapshots currently in the _Operations list_, and run ETL on all data steps.",
                 type="primary",
                 use_container_width=True,
             )
