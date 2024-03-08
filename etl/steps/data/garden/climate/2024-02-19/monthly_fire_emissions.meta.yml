@@ -8,9 +8,11 @@ definitions:
       numDecimalPlaces: 0
       zeroDay: '2000-01-01'
       yearIsDay: true
-    short_unit: tonnes
-    unit: t
+    short_unit: t
+    unit: tonnes
     processing_level: minor
+    description_key:
+    - Wildfires are detected through the use of satellite imagery based on the NASA MCD64 MODIS product which offers global assessments of burned areas and fire occurrences. Although widely used, this product is known to consistently underestimate both the extent of burned areas and the frequency of fires. However, in terms of historical trends, it stands out as the most comprehensive dataset, offering the longest time series compared to other available options.
 
 
 # Learn more about the available fields:
@@ -28,16 +30,14 @@ tables:
     variables:
       co2:
         title: Monthly CO₂ emissions from fires
-        description_short: Monthly CO₂ emissions from fires measure the carbon dioxide released by fires each month.
+        description_short: Carbon dioxide released by [wildfires](#dod:wildfires) in tonnes.
         description_key:
-        - Primary sources of emissions include wildfires, agricultural burning, and prescribed burns.
         - CO₂ emissions contribute to the greenhouse effect, influencing global warming and climate change.
 
       pm25:
         title: Monthly PM2.5 emissions from fires
-        description_short: Monthly PM2.5 emissions from fires represent the quantity of fine particulate matter (diameter less than 2.5 micrometers) released by fires over a month.
+        description_short: PM2.5 emissions released by [wildfires](#dod:wildfires) in tonnes.
         description_key:
-          - Sources of emissions can include wildfires, agricultural burning, and prescribed burns.
           - PM2.5 can penetrate deep into the respiratory tract, affecting the lungs and potentially entering the bloodstream.
           - Exposure to PM2.5 is linked to respiratory and cardiovascular issues, and premature death in people with heart or lung disease.
 

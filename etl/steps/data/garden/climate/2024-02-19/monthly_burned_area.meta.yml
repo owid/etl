@@ -11,7 +11,8 @@ definitions:
     short_unit: ha
     unit: hectares
     processing_level: minor
-
+    description_key:
+    - Wildfires are detected through the use of satellite imagery based on the NASA MCD64 MODIS product which offers global assessments of burned areas and fire occurrences. Although widely used, this product is known to consistently underestimate both the extent of burned areas and the frequency of fires. However, in terms of historical trends, it stands out as the most comprehensive dataset, offering the longest time series compared to other available options.
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
@@ -27,26 +28,26 @@ tables:
     variables:
       forest:
         title: Monthly burned area across forests
-        description_short: Total area of forests that have been burned each month.
+        description_short: Total area of forests burnt by [wildfires](#dod:wildfires) in hectares.
 
       savannas:
         title: Monthly burned area across savannas
-        description_short: Total area of savannas that have been burned each month.
+        description_short: Total area of savannas burnt by [wildfires](#dod:wildfires) in hectares.
 
       shrublands_grasslands:
         title: Monthly burned area across shrublands and grasslands
-        description_short: Total area of shrublands and grasslands that have been burned each month.
+        description_short: Total area of shrublands and grasslands burnt by [wildfires](#dod:wildfires) in hectares.
 
       croplands:
         title: Monthly burned area across croplands
-        description_short: Total area of agricultural lands that have burned as a result of fires each month, which can include both accidental fires and those used as a land management tool.
+        description_short: Total area of agricultural lands burnt by [wildfires](#dod:wildfires) in hectares.
 
       other:
         title: Monthly burned area across other land categories
-        description_short: Total area of land categories other than forests, savannas, shrublands/grasslands and croplands that have been burned each month.
+        description_short: Total area of land categories other than forests, savannas, shrublands/grasslands and croplands burnt by [wildfires](#dod:wildfires) in hectares.
 
       all:
         title: Monthly burned area across all land types
-        description_short: Total area of all land types that have been burned each month.
+        description_short: Total area of all land types burnt by [wildfires](#dod:wildfires) in hectares.
 
 
