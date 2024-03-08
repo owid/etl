@@ -749,7 +749,7 @@ class Table(pd.DataFrame):
             )
         return self
 
-    def sort_values(self, by: str, *args, **kwargs) -> "Table":
+    def sort_values(self, by: str | List[str], *args, **kwargs) -> "Table":
         tb = super().sort_values(by=by, *args, **kwargs).copy()
         for column in list(tb.all_columns):
             if isinstance(by, str):
