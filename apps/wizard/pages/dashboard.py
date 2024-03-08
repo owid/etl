@@ -613,17 +613,13 @@ with st.container(border=True):
                         help=help_text,
                     )
 
-        # Add columns for general buttons (applying to all rows in the operations list).
-        col_button1, col_button2, col_button3, _ = st.columns([2, 3, 3, 3])
-
-        with col_button1:
-            # Add button to clear the operations list.
-            st.button(
-                "Clear _Operations list_",
-                help="Remove all steps currently in the _Operations list_.",
-                type="secondary",
-                on_click=lambda: st.session_state.selected_steps.clear(),
-            )
+        # Add button to clear the operations list.
+        st.button(
+            "Clear _Operations list_",
+            help="Remove all steps currently in the _Operations list_.",
+            type="secondary",
+            on_click=lambda: st.session_state.selected_steps.clear(),
+        )
 
         def remove_non_updateable_steps():
             # Remove steps that cannot be updated (because update_period_days is set to 0).
@@ -635,13 +631,12 @@ with st.container(border=True):
                 step for step in st.session_state.selected_steps if step not in non_updateable_steps
             ]
 
-        with col_button2:
-            st.button(
-                "Remove non-updateable (e.g. population)",
-                help="Remove common steps (like population) and other steps that cannot be updated (for example, those with `update_period_days=0`).",
-                type="secondary",
-                on_click=remove_non_updateable_steps(),
-            )
+        st.button(
+            "Remove non-updateable (e.g. population)",
+            help="Remove common steps (like population) and other steps that cannot be updated (for example, those with `update_period_days=0`).",
+            type="secondary",
+            on_click=remove_non_updateable_steps(),
+        )
 
         def upgrade_steps_in_operations_list():
             new_list = []
@@ -659,13 +654,12 @@ with st.container(border=True):
 
             st.session_state.selected_steps = new_list
 
-        with col_button3:
-            st.button(
-                "Replace steps with their latest versions",
-                help="Replace steps in the _Operations list_ by their latest version available. You may want to use this button after updating steps, to be able to operate on the newly created steps.",
-                type="secondary",
-                on_click=upgrade_steps_in_operations_list(),
-            )
+        st.button(
+            "Replace steps with their latest versions",
+            help="Replace steps in the _Operations list_ by their latest version available. You may want to use this button after updating steps, to be able to operate on the newly created steps.",
+            type="secondary",
+            on_click=upgrade_steps_in_operations_list(),
+        )
 
     else:
         st.markdown(":grey[_No rows selected for operation..._]")
