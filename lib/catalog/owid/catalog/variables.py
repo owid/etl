@@ -71,6 +71,9 @@ class Variable(pd.Series):
     _name: Optional[str] = None
     _fields: Dict[str, VariableMeta]
 
+    # Set to True to enable warnings about metadata issues.
+    WARN = True
+
     def __init__(
         self,
         data: Any = None,
@@ -167,7 +170,9 @@ class Variable(pd.Series):
     def __add__(self, other: Union[Scalar, Series, "Variable"]) -> "Variable":
         variable_name = self.name or UNNAMED_VARIABLE
         variable = Variable(super().__add__(other), name=variable_name)
-        variable.metadata = combine_variables_metadata(variables=[self, other], operation="+", name=variable_name)
+        variable.metadata = combine_variables_metadata(
+            variables=[self, other], operation="+", name=variable_name, warn=self.WARN
+        )
         return variable
 
     def __iadd__(self, other: Union[Scalar, Series, "Variable"]) -> "Variable":
@@ -176,7 +181,9 @@ class Variable(pd.Series):
     def __sub__(self, other: Union[Scalar, Series, "Variable"]) -> "Variable":
         variable_name = self.name or UNNAMED_VARIABLE
         variable = Variable(super().__sub__(other), name=variable_name)
-        variable.metadata = combine_variables_metadata(variables=[self, other], operation="-", name=variable_name)
+        variable.metadata = combine_variables_metadata(
+            variables=[self, other], operation="-", name=variable_name, warn=self.WARN
+        )
         return variable
 
     def __isub__(self, other: Union[Scalar, Series, "Variable"]) -> "Variable":
@@ -185,7 +192,9 @@ class Variable(pd.Series):
     def __mul__(self, other: Union[Scalar, Series, "Variable"]) -> "Variable":
         variable_name = self.name or UNNAMED_VARIABLE
         variable = Variable(super().__mul__(other), name=variable_name)
-        variable.metadata = combine_variables_metadata(variables=[self, other], operation="*", name=variable_name)
+        variable.metadata = combine_variables_metadata(
+            variables=[self, other], operation="*", name=variable_name, warn=self.WARN
+        )
         return variable
 
     def __imul__(self, other: Union[Scalar, Series, "Variable"]) -> "Variable":
@@ -194,7 +203,9 @@ class Variable(pd.Series):
     def __truediv__(self, other: Union[Scalar, Series, "Variable"]) -> "Variable":
         variable_name = self.name or UNNAMED_VARIABLE
         variable = Variable(super().__truediv__(other), name=variable_name)
-        variable.metadata = combine_variables_metadata(variables=[self, other], operation="/", name=variable_name)
+        variable.metadata = combine_variables_metadata(
+            variables=[self, other], operation="/", name=variable_name, warn=self.WARN
+        )
         return variable
 
     def __itruediv__(self, other: Union[Scalar, Series, "Variable"]) -> "Variable":
@@ -203,7 +214,9 @@ class Variable(pd.Series):
     def __floordiv__(self, other: Union[Scalar, Series, "Variable"]) -> "Variable":
         variable_name = self.name or UNNAMED_VARIABLE
         variable = Variable(super().__floordiv__(other), name=variable_name)
-        variable.metadata = combine_variables_metadata(variables=[self, other], operation="//", name=variable_name)
+        variable.metadata = combine_variables_metadata(
+            variables=[self, other], operation="//", name=variable_name, warn=self.WARN
+        )
         return variable
 
     def __ifloordiv__(self, other: Union[Scalar, Series, "Variable"]) -> "Variable":
@@ -212,7 +225,9 @@ class Variable(pd.Series):
     def __mod__(self, other: Union[Scalar, Series, "Variable"]) -> "Variable":
         variable_name = self.name or UNNAMED_VARIABLE
         variable = Variable(super().__mod__(other), name=variable_name)
-        variable.metadata = combine_variables_metadata(variables=[self, other], operation="%", name=variable_name)
+        variable.metadata = combine_variables_metadata(
+            variables=[self, other], operation="%", name=variable_name, warn=self.WARN
+        )
         return variable
 
     def __imod__(self, other: Union[Scalar, Series, "Variable"]) -> "Variable":
@@ -221,7 +236,9 @@ class Variable(pd.Series):
     def __pow__(self, other: Union[Scalar, Series, "Variable"]) -> "Variable":
         variable_name = self.name or UNNAMED_VARIABLE
         variable = Variable(super().__pow__(other), name=variable_name)
-        variable.metadata = combine_variables_metadata(variables=[self, other], operation="**", name=variable_name)
+        variable.metadata = combine_variables_metadata(
+            variables=[self, other], operation="**", name=variable_name, warn=self.WARN
+        )
         return variable
 
     def __ipow__(self, other: Union[Scalar, Series, "Variable"]) -> "Variable":
@@ -236,7 +253,7 @@ class Variable(pd.Series):
         variable = Variable(super().fillna(value, *args, **kwargs), name=variable_name)
         variable._fields = copy.deepcopy(self._fields)
         variable._fields[variable_name] = combine_variables_metadata(
-            variables=[self, value], operation="fillna", name=variable_name
+            variables=[self, value], operation="fillna", name=variable_name, warn=self.WARN
         )
         return variable
 
@@ -249,7 +266,7 @@ class Variable(pd.Series):
         variable = Variable(super().dropna(*args, **kwargs), name=variable_name)
         variable._fields = copy.deepcopy(self._fields)
         variable._fields[variable_name] = combine_variables_metadata(
-            variables=[self], operation="dropna", name=variable_name
+            variables=[self], operation="dropna", name=variable_name, warn=self.WARN
         )
         return variable
 
@@ -280,7 +297,7 @@ class Variable(pd.Series):
         variable_name = self.name or UNNAMED_VARIABLE
         variable = Variable(super().pct_change(*args, **kwargs), name=variable_name)
         variable._fields[variable_name] = combine_variables_metadata(
-            variables=[self], operation="pct_change", name=variable_name
+            variables=[self], operation="pct_change", name=variable_name, warn=self.WARN
         )
         return variable
 

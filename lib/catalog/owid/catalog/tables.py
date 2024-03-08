@@ -774,7 +774,7 @@ class Table(pd.DataFrame):
         variable_name = variables.UNNAMED_VARIABLE
         variable = variables.Variable(super().sum(*args, **kwargs), name=variable_name)
         variable.metadata = variables.combine_variables_metadata(
-            variables=[self[column] for column in self.columns], operation="+", name=variable_name
+            variables=[self[column] for column in self.columns], operation="+", name=variable_name, warn=self.WARN
         )
 
         return variable
@@ -783,7 +783,7 @@ class Table(pd.DataFrame):
         variable_name = variables.UNNAMED_VARIABLE
         variable = variables.Variable(super().prod(*args, **kwargs), name=variable_name)
         variable.metadata = variables.combine_variables_metadata(
-            variables=[self[column] for column in self.columns], operation="*", name=variable_name
+            variables=[self[column] for column in self.columns], operation="*", name=variable_name, warn=self.WARN
         )
 
         return variable
@@ -914,7 +914,7 @@ class Table(pd.DataFrame):
             for column in tb.columns:
                 if column in value.columns:
                     tb._fields[column] = variables.combine_variables_metadata(
-                        variables=[tb[column], value[column]], operation="fillna", name=column
+                        variables=[tb[column], value[column]], operation="fillna", name=column, warn=self.WARN
                     )
 
         return tb
@@ -1048,6 +1048,7 @@ def merge(
     right_on=None,
     suffixes=("_x", "_y"),
     short_name: Optional[str] = None,
+    warn: bool = True,
     **kwargs,
 ) -> Table:
     if ("left_index" in kwargs) or ("right_index" in kwargs):
@@ -1099,18 +1100,22 @@ def merge(
             new_column = f"{column}{suffixes[0]}"
         else:
             new_column = column
-        tb[new_column].metadata = variables.combine_variables_metadata([left[column]], operation="merge", name=column)
+        tb[new_column].metadata = variables.combine_variables_metadata(
+            [left[column]], operation="merge", name=column, warn=warn
+        )
 
     for column in columns_from_right:
         if column in overlapping_columns:
             new_column = f"{column}{suffixes[1]}"
         else:
             new_column = column
-        tb[new_column].metadata = variables.combine_variables_metadata([right[column]], operation="merge", name=column)
+        tb[new_column].metadata = variables.combine_variables_metadata(
+            [right[column]], operation="merge", name=column, warn=warn
+        )
 
     for column in common_columns:
         tb[column].metadata = variables.combine_variables_metadata(
-            [left[column], right[column]], operation="merge", name=column
+            [left[column], right[column]], operation="merge", name=column, warn=warn
         )
 
     # Update table metadata.
@@ -1126,6 +1131,7 @@ def concat(
     join: str = "outer",
     ignore_index: bool = False,
     short_name: Optional[str] = None,
+    warn: bool = True,
     **kwargs,
 ) -> Table:
     # TODO: Add more logic to this function to handle indexes and possibly other arguments.
@@ -1152,7 +1158,7 @@ def concat(
         for column in table.all_columns:
             variables_to_combine = [table_i[column] for table_i in objs if column in table_i.all_columns]
             table._fields[column] = variables.combine_variables_metadata(
-                variables=variables_to_combine, operation="concat", name=column
+                variables=variables_to_combine, operation="concat", name=column, warn=warn
             )
 
     # Update table metadata.
@@ -1245,6 +1251,7 @@ def pivot(
     values: Optional[Union[str, List[str]]] = None,
     join_column_levels_with: Optional[str] = None,
     short_name: Optional[str] = None,
+    warn: bool = True,
     **kwargs,
 ) -> Table:
     # Get the new pivot table.
@@ -1271,7 +1278,7 @@ def pivot(
         # Alternatively, we could combine the metadata of the upper level variable with the metadata of the original
         # variable of all subsequent levels.
         column_metadata = variables.combine_variables_metadata(
-            variables=variables_to_combine, operation="pivot", name=column
+            variables=variables_to_combine, operation="pivot", name=column, warn=warn
         )
         # Assign metadata of the original variable in the upper level to the new multiindex column.
         # NOTE: This allows accessing the metadata via, e.g. `table[("level_0", "level_1", "level_2")].metadata`,
