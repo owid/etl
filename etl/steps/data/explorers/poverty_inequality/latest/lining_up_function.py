@@ -1,25 +1,27 @@
 from pathlib import Path
 
 import pandas as pd
-from owid.catalog import Dataset
 from structlog import get_logger
-
-from etl.paths import DATA_DIR
 
 # Initialize logger.
 log = get_logger()
 
 PARENT_DIR = Path(__file__).parent.absolute()
 
-ds = Dataset(DATA_DIR / "explorers" / "poverty_inequality" / "2023-08-24" / "poverty_inequality_export")
+# Set the paths to the datasets
+PARENT_DIR = Path(__file__).parent.absolute()
+KEYVARS_PATH = (
+    "https://catalog.ourworldindata.org/explorers/poverty_inequality/latest/poverty_inequality_export/keyvars.feather"
+)
+PERCENTILES_PATH = "https://catalog.ourworldindata.org/explorers/poverty_inequality/latest/poverty_inequality_export/percentiles.feather"
+WDI_PATH = (
+    "https://catalog.ourworldindata.org/explorers/poverty_inequality/latest/poverty_inequality_export/wdi.feather"
+)
 
-df = ds["keyvars"].reset_index()
-df = pd.DataFrame(df)
-
-df_percentiles = ds["percentiles"].reset_index()
-df_percentiles = pd.DataFrame(df_percentiles)
-
-df_wdi = ds["wdi"].reset_index()
+# Load the datasets
+df = pd.read_feather(KEYVARS_PATH)
+df_percentiles = pd.read_feather(PERCENTILES_PATH)
+df_wdi = pd.read_feather(WDI_PATH)
 
 
 #############################################
@@ -46,7 +48,7 @@ reference_years = {
 }
 
 # Activate lining up function
-lining_up = True
+lining_up_option = True
 
 # scale_to_na defines if the numbers are scaled up to national accounts (somewhat similar to what WID does)
 scale_to_na = True
@@ -67,7 +69,7 @@ income_or_consumption = "income"
 
 
 def lining_up(
-    df: pd.DataFrame, series: list, reference_years: dict, lining_up: bool, scale_to_na: bool, gdp_type: str
+    df: pd.DataFrame, series: list, reference_years: dict, lining_up_option: bool, scale_to_na: bool, gdp_type: str
 ) -> pd.DataFrame:
     """
     Main function to lining up the data

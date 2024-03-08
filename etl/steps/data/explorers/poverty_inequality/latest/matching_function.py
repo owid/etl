@@ -6,6 +6,8 @@ from structlog import get_logger
 # Initialize logger.
 log = get_logger()
 
+
+# Set the paths to the datasets
 PARENT_DIR = Path(__file__).parent.absolute()
 KEYVARS_PATH = (
     "https://catalog.ourworldindata.org/explorers/poverty_inequality/latest/poverty_inequality_export/keyvars.feather"
