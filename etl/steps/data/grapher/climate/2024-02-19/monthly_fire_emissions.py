@@ -23,6 +23,10 @@ def run(dest_dir: str) -> None:
     #  Use the days since colimn instead of year and month for grapher
     tb = tb.rename(columns={"days_since_2000": "year"})
     tb = tb.set_index(["country", "year"], verify_integrity=True)
+    for column in tb.columns:
+        tb[column].metadata.display = {}
+        tb[column].metadata.display["zeroDay"] = "2000-01-01"
+        tb[column].metadata.display["yearIsDay"] = True
 
     #
     # Save outputs.
