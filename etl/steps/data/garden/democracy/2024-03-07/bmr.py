@@ -1,5 +1,6 @@
 """Load a meadow dataset and create a garden dataset."""
 
+import pandas as pd
 from owid.catalog.tables import Table, concat
 
 from etl.data_helpers import geo
@@ -158,6 +159,25 @@ def run(dest_dir: str) -> None:
 
     # Impute missing values
     tb = add_imputes(tb)
+
+    # Refine
+    ## Set NaNs to womsuff
+    tb.loc[tb["regime_bmr"].isna(), "regime_womsuffr_bmr"] = pd.NA
+    ## Add country codes
+    tb["ccode"] = tb["country"].astype("category").cat.codes
+
+    tb = tb.sort_values(["country", "year"])
+
+    ## Add democracy age / experience
+    ### Count the number of years since the country first became a democracy. Transition NaN -> 1 is considered as 0 -> 1.
+    tb["dem_age_bmr_owid"] = tb.groupby(["country", tb["regime_bmr"].fillna(0).eq(0).cumsum()])["regime_bmr"].cumsum()
+    tb["dem_age_bmr_owid"] = tb["dem_age_bmr_owid"].astype(float)
+    ## Add democracy age (including women's suffrage) / experience
+    ### Count the number of years since the country first became a democracy. Transition NaN -> 1 is considered as 0 -> 1.
+    tb["dem_ws_age_bmr_owid"] = tb.groupby(["country", tb["regime_womsuffr_bmr"].fillna(0).eq(0).cumsum()])[
+        "regime_bmr"
+    ].cumsum()
+    tb["dem_ws_age_bmr_owid"] = tb["dem_ws_age_bmr_owid"].astype(float)
 
     # Set index.
     tb = tb.set_index(["country", "year"], verify_integrity=True).sort_index()
