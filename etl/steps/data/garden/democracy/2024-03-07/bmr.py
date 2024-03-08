@@ -179,6 +179,29 @@ def run(dest_dir: str) -> None:
     # Add age groups
     tb = add_year_counts_groups(tb)
 
+    #### WIP ###############################
+    # Replace values with NaN where regime_imputed_bmr_owid == 1
+    # vars_to_replace = [
+    #     "regime",
+    #     "regime_womsuffr",
+    #     "num_years_in_democracy_consecutive",
+    #     "num_years_in_democracy_ws_consecutive",
+    # ]
+    # for var in vars_to_replace:
+    #     tb.loc[tb["regime_imputed"] == 1, var] = np.nan
+
+    # # Creating indicator variables
+    # vars_to_tabulate = [
+    #     "regime",
+    #     "regime_womsuffr",
+    #     "num_years_in_democracy_consecutive",
+    #     "num_years_in_democracy_ws_consecutive",
+    # ]
+    # for var in vars_to_tabulate:
+    #     dummies = pd.get_dummies(tb[var], prefix=var)
+    #     tb = pd.concat([tb, dummies], axis=1)
+
+    ########################################
     # Set index.
     tb = tb.set_index(["country", "year"], verify_integrity=True).sort_index()
 
