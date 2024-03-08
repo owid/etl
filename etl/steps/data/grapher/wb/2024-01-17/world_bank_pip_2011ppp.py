@@ -19,6 +19,8 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
+    # Drop reporting_level and welfare_type columns
+    tb = tb.drop(columns=["reporting_level", "welfare_type"])
 
     #
     # Save outputs.
