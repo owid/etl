@@ -63,6 +63,8 @@ NON_UPDATEABLE_IDENTIFIERS = [
     "garden/wb/income_groups",
     "meadow/wb/income_groups",
     "snapshot/wb/income_groups.xlsx",
+    # World Bank country shapes.
+    "snapshot/countries/world_bank.zip",
 ]
 
 # List of dependencies to ignore when calculating the update state.
@@ -109,25 +111,51 @@ add_indentation()
 ########################################
 # TITLE and DESCRIPTION
 ########################################
-st.title("ETL Dashboard 📋 :grey[Control panel for ETL updates]")
+st.title("ETL Dashboard 📋 :grey[Control panel for ETL steps]")
 st.markdown(
     """\
-Explore all active ETL steps, and, if you are working on your local machine, update them.
+Explore all active ETL steps, and, if you are working on your local machine, perform some actions.
 
-🔨 To update some steps, select them from the _Steps table_ and add them to the _Operations list_ below.
-
-💡 If you want to update, say, a specific grapher dataset, you can select just that step to the _Operations list_, then click on "Add dependencies", and bulk-update them all in one go.
-
-### Steps table
+🔨 To perform actions on some steps, select them from the _Steps table_ and add them to the _Operations list_ below.
 """
 )
-if not can_connect():
-    st.error("Unable to connect to grapher DB.")
 
+
+def _create_html_button(text, border_color, background_color):
+    html = f"""\
+        <div style="border: 1px solid {border_color}; padding: 4px; display: inline-block; border-radius: 10px; background-color: {background_color}; cursor: pointer;">
+            {text}
+        </div>
+"""
+    return html
+
+
+tutorial_html = f"""
+<details>
+<summary>💡 Common example: Say you want to update a specific grapher dataset. Then:</summary>
+<ol>
+    <li>Select that step from the <i>Steps table</i>.</li>
+    <li>Click on{_create_html_button("Add selected steps to the <i>Operations list</i>", "#FE4446", "#FE4446")}.</li>
+    <li>Click on{_create_html_button("Add all dependencies", "#d3d3d3", "#000000")} (and optionally click on {_create_html_button("Remove non-updateable", "#d3d3d3", "#000000")}).</li>
+    <li>Click on{_create_html_button("Update X steps", "#FE4446", "#FE4446")} to bulk-update them all in one go.</li>
+    <li>Click on{_create_html_button("Replace steps with their latest version", "#d3d3d3", "#000000")} to populate the <i>Operations list</i> with the newly created steps.</li>
+    <li>Click on{_create_html_button("Run all ETL steps (including snapshots)", "#FE4446", "#FE4446")} to run the ETL on the new steps.</li>
+    <li>If a step fails, you can manually edit its code and try running ETL again.</li>
+</ol>
+</details>
+"""
+st.markdown(tutorial_html, unsafe_allow_html=True)
+
+st.markdown("### Steps table")
 
 ########################################
 # LOAD STEPS TABLE
 ########################################
+
+if not can_connect():
+    st.error("Unable to connect to grapher DB.")
+
+
 @st.cache_data
 def load_steps_df(reload_key: int) -> pd.DataFrame:
     """Generate and load the steps dataframe.
@@ -633,7 +661,8 @@ with st.container(border=True):
 
         st.button(
             "Remove non-updateable (e.g. population)",
-            help="Remove common steps (like population) and other steps that cannot be updated (for example, those with `update_period_days=0`).",
+            help="Remove steps that cannot be updated (i.e. with `update_period_days=0`), and other auxiliary datasets, namely: "
+            + "\n- ".join(sorted(NON_UPDATEABLE_IDENTIFIERS)),
             type="secondary",
             on_click=remove_non_updateable_steps(),
         )
@@ -767,7 +796,7 @@ if st.session_state.selected_steps:
                 return command
 
             btn_etl_run = st.button(
-                f"Run {len(st.session_state.selected_steps)} all ETL steps (including snapshots)",
+                "Run all ETL steps (including snapshots)",
                 help="Execute all snapshots currently in the _Operations list_, and run ETL on all data steps.",
                 type="primary",
                 use_container_width=True,
