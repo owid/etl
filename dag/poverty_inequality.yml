@@ -5,6 +5,14 @@ steps:
     - data://explorers/wid/latest/world_inequality_database
     - data://explorers/lis/latest/luxembourg_income_study
 
+  # Poverty and inequality file for Joe's PhD
+  data://explorers/poverty_inequality/latest/poverty_inequality_export:
+    - data://garden/wb/2024-01-17/world_bank_pip
+    - data://garden/wid/2023-08-24/world_inequality_database
+    - data://garden/lis/2023-08-30/luxembourg_income_study
+    - data://garden/wb/2024-01-22/thousand_bins_distribution
+    - data://garden/worldbank_wdi/2023-05-29/wdi
+
   # World Bank Poverty and Inequality Platform
   data://meadow/wb/2024-01-17/world_bank_pip:
     - snapshot://wb/2024-01-17/world_bank_pip.csv
