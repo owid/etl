@@ -105,19 +105,41 @@ tables:
       processing_level: "major"
     variables:
       num_countries_regime:
-        title: "Number of countries in regime"
+        title: |-
+          <% if category == 0 %>
+          Number of countries not in a democracy
+          <% elif category == 1 %>
+          Number of countries in a democracy
+          <% else %>
+          Number of countries in an unknown regime
+          <% endif %>
         unit: "countries"
         description_short: |-
-          The number of countries in the regime.
+          <% if category == 0 %>
+          The number of countries in the region that are not democracies in a given year.
+          <% elif category == 1 %>
+          The number of countries in the region that are democracies in a given year.
+          <% else %>
+          The number of countries in the region that are in an unknown regime in a given year.
+          <% endif %>
         description_key:
           - *dk_democracy_1
       num_countries_regime_ws:
-        title: "Number of countries in regime (ws)"
+        title: |-
+          <% if category == 0 %>
+          Number of countries not in a democracy with women's suffrage
+          <% elif category == 1 %>
+          Number of countries in a democracy with women's suffrage
+          <% endif %>
         unit: "countries"
         description_short: |-
-          The number of countries in the regime in a given year.
+          <% if category == 0 %>
+          The number of countries in the region that are not democracies with women's suffrage in a given year.
+          <% elif category == 1 %>
+          The number of countries in the region that are democracies with women's suffrage in a given year.
+          <% endif %>
         description_key:
-          - *dk_democracy_1
+          - *dk_democracy_ws_1
 
   num_countries_regime_years:
     common:
@@ -136,7 +158,7 @@ tables:
         description_short: |-
           The number of countries in democracy (consecutive years).
         description_key:
-          - *dk_democracy_1
+          - *dk_democracy_ws_1
 
       # testing_variable:
       #   title: Testing variable title

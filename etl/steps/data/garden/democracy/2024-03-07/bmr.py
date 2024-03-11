@@ -1,10 +1,10 @@
 """Load a meadow dataset and create a garden dataset."""
 
-from typing import cast
+from typing import Tuple, cast
 
 import numpy as np
 import pandas as pd
-from owid.catalog import Variable
+from owid.catalog import Dataset, Variable
 from owid.catalog.tables import Table, concat
 
 from etl.data_helpers import geo
@@ -189,12 +189,12 @@ def run(dest_dir: str) -> None:
     # TODO
     # check coverage of regime and regime_ws
     # Get values for 'World' (until line 62)
-    # - Number of countries in democracy
-    # - Number of countries not in democracy
-    # - Number of countries in democracy with WS
-    # - Number of countries not in democracy with WS
-    # - Number of countries with X years in democracy
-    # - Number of countries with X years in democracy with WS
+    # -x Number of countries in democracy
+    # -x Number of countries not in democracy
+    # -x Number of countries in democracy with WS
+    # -x Number of countries not in democracy with WS
+    # -x Number of countries with X years in democracy
+    # -x Number of countries with X years in democracy with WS
     #
     # Get equivalents with population counts (kinda ignore former country rows)
     # - Number of people in democracy
@@ -207,167 +207,9 @@ def run(dest_dir: str) -> None:
     assert tb.loc[tb["regime"].isna(), "regime_womsuffr"].isna().all()
     assert tb.loc[tb["regime_womsuffr"].isna(), "regime"].isna().all()
 
-    # Estimates on number of countries: ignore imputed countries
-    ## World
-    # tb_ = tb[~tb["regime_imputed"]].copy()
-
-    # ### Is a democracy (with or without WS)
-    # tb_regime = (
-    #     tb_.groupby("year")
-    #     .agg(
-    #         {
-    #             "regime": "value_counts",
-    #             "regime_womsuffr": "value_counts",
-    #         }
-    #     )
-    #     .reset_index()
-    # )
-
-    # tb_regime = (
-    #     tb_regime.rename(
-    #         columns={
-    #             "level_1": "regime",
-    #             "regime": "number_countries",
-    #             "regime_womsuffr": "number_countries_ws",
-    #         }
-    #     ).assign(country="World")
-    #     # .set_index(["country", "year", "regime"], verify_integrity=True)
-    # )
-
-    # ### Has been a democracy for X years (with or without WS)
-    # tb_regime_years = (
-    #     tb_.groupby(["year"])
-    #     .agg(
-    #         {
-    #             "num_years_in_democracy_consecutive_group": "value_counts",
-    #             "num_years_in_democracy_ws_consecutive_group": "value_counts",
-    #         }
-    #     )
-    #     .reset_index()
-    # )
-
-    # tb_regime_years = (
-    #     tb_regime_years.rename(
-    #         columns={
-    #             "level_1": "years_in_democracy_consecutive",
-    #             "num_years_in_democracy_consecutive_group": "number_countries",
-    #             "num_years_in_democracy_ws_consecutive_group": "number_countries_ws",
-    #         }
-    #     ).assign(country="World")
-    #     # .set_index(["country", "year", "years_in_democracy_consecutive"], verify_integrity=True)
-    # )
-
-    # Estimate number of countries in democracies
-
-    ## Only consider non-imputed countries
-    tb_ = tb[~tb["regime_imputed"]].copy()
-
-    ## Sanity check: all countries are in the regions
-    members_tracked = set()
-    for region, _ in REGIONS.items():
-        members_tracked |= set(geo.list_members_of_region(region, ds_regions))
-    assert tb_["country"].isin(members_tracked).all(), "Some countries are not in the regions!"
-
-    ## Indicators to create counters for
-    indicators = [
-        {
-            "name": "regime",
-            "values_expected": {0, 1, -1},
-        },
-        {
-            "name": "regime_womsuffr",
-            "values_expected": {0, 1, -1},
-        },
-        {
-            "name": "num_years_in_democracy_consecutive_group",
-            "values_expected": {0, 1, 2, 3, 4, 5, -1},
-        },
-        {
-            "name": "num_years_in_democracy_ws_consecutive_group",
-            "values_expected": {0, 1, 2, 3, 4, 5, -1},
-        },
-    ]
-    indicator_names = [indicator["name"] for indicator in indicators]
-
-    ## Replace NaNs with -1 (easier to process)
-    tb_[indicator_names] = tb_[indicator_names].astype("Int8").fillna(-1)
-
-    ## Sanity checks
-    for indicator in indicators:
-        assert set(tb_[indicator["name"]]) == indicator["values_expected"]
-
-    ## Get dummy indicator table
-    tb_ = pd.get_dummies(tb_, dummy_na=True, columns=indicator_names)
-
-    ## Add missing metadata to dummy indicators
-    dummy_cols = []
-    for indicator in indicators:
-        for col in (_dummy_cols := [f"{indicator['name']}_{v}" for v in indicator["values_expected"]]):
-            tb_[col].metadata = tb[indicator["name"]].metadata
-        dummy_cols.extend(_dummy_cols)
-
-    ### Select subset of columns
-    tb_ = tb_[["year", "country"] + dummy_cols]
-
-    ### Get aggregates
-    tb_ = geo.add_regions_to_table(
-        tb_,
-        ds_regions,
-        regions=REGIONS,
-    )
-    tb_ = tb_.loc[tb_["country"].isin(REGIONS.keys())]
-
-    # Add world
-    tb_w = tb_.groupby("year", as_index=False).sum().assign(country="World")
-    tb_ = concat([tb_, tb_w], ignore_index=True, short_name="region_counts")
-
-    ## Long format
-    tb_ = from_wide_to_long(tb_)
-
-    # Rename indicators
-    tb_ = tb_.rename(
-        columns={
-            "regime": "num_countries_regime",
-            "regime_womsuffr": "num_countries_regime_ws",
-            "num_years_in_democracy_consecutive_group": "num_countries_years_in_democracy_consec",
-            "num_years_in_democracy_ws_consecutive_group": "num_countries_years_in_democracy_ws_consec",
-        }
-    )
-    ## Get two tables
-    tb_num_countries = (
-        (
-            tb_[["year", "country", "category", "num_countries_regime", "num_countries_regime_ws"]]
-            .copy()
-            .dropna(how="all")
-        )
-        .set_index(["country", "year", "category"], verify_integrity=True)
-        .sort_index()
-    )
-    tb_num_countries.metadata.short_name = "num_countries_regime"
-    tb_num_countries_years_consec = (
-        tb_[
-            [
-                "year",
-                "country",
-                "category",
-                "num_countries_years_in_democracy_consec",
-                "num_countries_years_in_democracy_ws_consec",
-            ]
-        ]
-        .copy()
-        .set_index(["country", "year", "category"], verify_integrity=True)
-        .sort_index()
-    )
-    tb_num_countries_years_consec.metadata.short_name = "num_countries_regime_years"
-
-    # Estimates on number of people: ignore former countries
-
-    # Drop unneded columns
-    # tb = tb.drop(columns=["num_years_in_democracy_group", "num_years_in_democracy_ws_group"])
-
-    # TODO:
-    # - Replace column names '_<NA>' with '_na'
-    # - Add missing year-observations with zero!
+    # Get country counters
+    ## Number of countries in X regime (with or withour WS), number of countries in democracy for Y years (with or without WS)
+    tb_num_countries, tb_num_countries_years_consec = make_tables_country_counters(tb, ds_regions)
 
     ########################################
     # Set index.
@@ -547,3 +389,115 @@ def from_wide_to_long(tb: Table) -> Table:
     tb.columns.name = None  # Remove the hierarchy
 
     return tb
+
+
+def make_tables_country_counters(tb: Table, ds_regions: Dataset) -> Tuple[Table, Table]:
+    tb_ = tb[~tb["regime_imputed"]].copy()
+
+    ## Sanity check: all countries are in the regions
+    members_tracked = set()
+    for region, _ in REGIONS.items():
+        members_tracked |= set(geo.list_members_of_region(region, ds_regions))
+    assert tb_["country"].isin(members_tracked).all(), "Some countries are not in the regions!"
+
+    ## Indicators to create counters for
+    indicators = [
+        {
+            "name": "regime",
+            "values_expected": {0, 1, -1},
+        },
+        {
+            "name": "regime_womsuffr",
+            "values_expected": {0, 1, -1},
+        },
+        {
+            "name": "num_years_in_democracy_consecutive_group",
+            "values_expected": {0, 1, 2, 3, 4, 5, -1},
+        },
+        {
+            "name": "num_years_in_democracy_ws_consecutive_group",
+            "values_expected": {0, 1, 2, 3, 4, 5, -1},
+        },
+    ]
+    indicator_names = [indicator["name"] for indicator in indicators]
+
+    ## Replace NaNs with -1 (easier to process)
+    tb_[indicator_names] = tb_[indicator_names].astype("Int8").fillna(-1)
+
+    ## Sanity checks
+    for indicator in indicators:
+        assert set(tb_[indicator["name"]]) == indicator["values_expected"]
+
+    ## Get dummy indicator table
+    tb_ = pd.get_dummies(tb_, dummy_na=True, columns=indicator_names)
+
+    ## Add missing metadata to dummy indicators
+    dummy_cols = []
+    for indicator in indicators:
+        for col in (_dummy_cols := [f"{indicator['name']}_{v}" for v in indicator["values_expected"]]):
+            tb_[col].metadata = tb[indicator["name"]].metadata
+        dummy_cols.extend(_dummy_cols)
+
+    ### Select subset of columns
+    tb_ = tb_[["year", "country"] + dummy_cols]
+
+    ### Get aggregates
+    tb_ = geo.add_regions_to_table(
+        tb_,
+        ds_regions,
+        regions=REGIONS,
+    )
+    tb_ = tb_.loc[tb_["country"].isin(REGIONS.keys())]
+
+    # Add world
+    tb_w = tb_.groupby("year", as_index=False).sum().assign(country="World")
+    tb_ = concat([tb_, tb_w], ignore_index=True, short_name="region_counts")
+
+    ## Long format
+    tb_ = from_wide_to_long(tb_)
+
+    # Category as INT
+    tb_["category"] = tb_["category"].astype(int)
+
+    # Rename indicators
+    tb_ = tb_.rename(
+        columns={
+            "regime": "num_countries_regime",
+            "regime_womsuffr": "num_countries_regime_ws",
+            "num_years_in_democracy_consecutive_group": "num_countries_years_in_democracy_consec",
+            "num_years_in_democracy_ws_consecutive_group": "num_countries_years_in_democracy_ws_consec",
+        }
+    )
+    ## Get two tables
+    tb_num_countries = (
+        (tb_[["year", "country", "category", "num_countries_regime", "num_countries_regime_ws"]].copy())
+        .set_index(["country", "year", "category"], verify_integrity=True)
+        .dropna(how="all")
+        .sort_index()
+    )
+    tb_num_countries.metadata.short_name = "num_countries_regime"
+    tb_num_countries_years_consec = (
+        tb_[
+            [
+                "year",
+                "country",
+                "category",
+                "num_countries_years_in_democracy_consec",
+                "num_countries_years_in_democracy_ws_consec",
+            ]
+        ]
+        .copy()
+        .set_index(["country", "year", "category"], verify_integrity=True)
+        .sort_index()
+    )
+    tb_num_countries_years_consec.metadata.short_name = "num_countries_regime_years"
+
+    # Remove "unknown regime" for democracy with WS (should be equivalent to without WS, hence the check)
+    mask = (slice(None), slice(None), -1)
+    diff = tb_num_countries.loc[mask, "num_countries_regime"] - tb_num_countries.loc[mask, "num_countries_regime_ws"]
+    assert (
+        diff == 0
+    ).all(), "The number of countries with unknown regimes should be the same according to indicators `num_countries_regime` and `num_countries_regime_ws`. Please check!"
+    tb_num_countries.loc[(slice(None), slice(None), -1), "num_countries_regime_ws"] = np.nan
+
+    return tb_num_countries, tb_num_countries_years_consec
