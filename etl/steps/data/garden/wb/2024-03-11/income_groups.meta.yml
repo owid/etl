@@ -1,7 +1,20 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Economic Growth
+    processing_level: minor
+
 tables:
   income_groups:
     variables:
       classification:
-        title: World Bank income classification
+        title: World Bank's historical income classification
         unit: ""
-        description: Classification by the World Bank based on the country's income.
+        description_short: Historical income classification based on the country's income each year.
+  income_groups_latest:
+    variables:
+      classification:
+        title: World Bank's latest income classification
+        unit: ""
+        description_short: Income classification based on the country's income for the latest year informed.

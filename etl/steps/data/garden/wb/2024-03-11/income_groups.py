@@ -1,14 +1,10 @@
 """Load a meadow dataset and create a garden dataset."""
 
 import numpy as np
-import pandas as pd
-from owid.catalog import Dataset, Table, VariableMeta
-from structlog import get_logger
+from owid.catalog import Table
 
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
-
-log = get_logger()
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -25,99 +21,95 @@ EXPECTED_MISSING_COUNTRIES_IN_LATEST_RELEASE = {
 
 
 def run(dest_dir: str) -> None:
-    log.info("income_groups: start")
-
     #
     # Load inputs.
     #
-    # Load meadow dataset.
-    ds_meadow: Dataset = paths.load_dependency("income_groups")
-
-    # Read table from meadow dataset.
-    tb_meadow = ds_meadow["income_groups"]
-
-    # Create a dataframe with data from the table.
-    df = pd.DataFrame(tb_meadow)
+    # Load meadow dataset and read its main table.
+    ds_meadow = paths.load_dataset("income_groups")
+    tb = ds_meadow["income_groups"].reset_index()
 
     #
-    # Process data for main table.
+    # Process data.
     #
-    log.info("income_groups: harmonize_countries")
-    df = geo.harmonize_countries(df=df, countries_file=paths.country_mapping_path)
-    # Harmonize income group labels
-    log.info("income_groups: harmonize income group labels")
-    df = harmonize_income_group_labels(df)
-    # Set index, drop code column
-    df = df.drop(columns=["country_code"]).set_index(["country", "year"], verify_integrity=True).sort_index()
+    # Run sanity checks on input data.
+    run_sanity_checks_on_inputs(tb=tb)
 
-    #
-    # Process data for table with values of latest release
-    #
-    # Get classifications for each country for the latest year available.
-    df_latest = df.reset_index().drop_duplicates(subset=["country"], keep="last")
-    # Sanity checks of missing countries for latest release
-    missing_countries = set(df_latest.loc[df_latest["year"] != df_latest["year"].max(), "country"])
+    # Harmonize country names.
+    tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
+
+    # Harmonize income group labels.
+    tb = harmonize_income_group_labels(tb)
+
+    # Drop unnecessary columns.
+    tb = tb.drop(columns=["country_code"], errors="raise")
+
+    # Set an appropriate index and sort conveniently.
+    tb = tb.set_index(["country", "year"], verify_integrity=True).sort_index()
+
+    # Create an additional table for the classification of the latest year available.
+    tb_latest = tb.reset_index().drop_duplicates(subset=["country"], keep="last")
+
+    # Rename new table.
+    tb_latest.metadata.short_name = "income_groups_latest"
+
+    # Check that countries without classification for the latest year are as expected.
+    missing_countries = set(tb_latest.loc[tb_latest["year"] != tb_latest["year"].max(), "country"])
     assert (
         missing_countries == EXPECTED_MISSING_COUNTRIES_IN_LATEST_RELEASE
     ), f"Unexpected missing countries in latest release. All missing countries: {missing_countries}"
-    # Get data only for latest release (and remove column year)
-    df_latest = df_latest[df_latest["year"] == df_latest["year"].max()].drop(columns=["year"])
-    # Set index, drop code column
-    df_latest = df_latest.set_index(["country"], verify_integrity=True).sort_index()
 
-    #
-    # Create tables from dataframes
-    #
-    tb_garden = Table(df, short_name=paths.short_name)
-    tb_garden_latest = Table(df_latest, short_name=f"{paths.short_name}_latest")
+    # Extract data only for latest release (and remove column year).
+    tb_latest = tb_latest[tb_latest["year"] == tb_latest["year"].max()].drop(columns=["year"])
 
-    # Fill metadata for table with latest values
-    # It makes references to latest release year, so it is helpful to do it in code
-    assert (num_sources := len(ds_meadow.metadata.sources) == 1), f"Number of sources should be 1, not {num_sources}"
-    release_year = ds_meadow.metadata.sources[0].publication_year
-    tb_garden_latest["classification"].metadata = VariableMeta(
-        title=f"World Bank income classification ({release_year} dataset release)",
-        description=f"Classification (as per the {release_year} dataset release) by the World Bank based on the country's income.",
-        unit="",
-    )
+    # Set an appropriate index and sort conveniently.
+    tb_latest = tb_latest.set_index(["country"], verify_integrity=True).sort_index()
 
     #
     # Save outputs.
     #
-    # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = create_dataset(dest_dir, tables=[tb_garden, tb_garden_latest], default_metadata=ds_meadow.metadata)
-    # Save changes in the new garden dataset.
+    # Create a new garden dataset.
+    ds_garden = create_dataset(dest_dir, tables=[tb, tb_latest], default_metadata=ds_meadow.metadata)
     ds_garden.save()
 
-    log.info("income_groups: end")
 
-
-def harmonize_income_group_labels(df: pd.DataFrame) -> pd.DataFrame:
-    # Check raw labels are as expected
-    log.info("income_groups: harmonizing classification labels (e.g. 'LM' -> 'Low-income countries')")
-    assert (labels := set(df["classification"])) == {
+def run_sanity_checks_on_inputs(tb: Table) -> None:
+    # Check that raw labels are as expected.
+    assert (labels := set(tb["classification"])) == {
+        # No available classification for country-year (maybe country didn't exist yet/anymore).
         "..",
+        # High income.
         "H",
+        # Low income.
         "L",
+        # Lower middle income.
         "LM",
+        # Exceptional case of lower middle income.
         "LM*",
+        # Upper middle income.
         "UM",
+        # Another label for when no classification is available.
         np.nan,
     }, f"Unknown income group label! Check {labels}"
-    # Check unusual LM* label
-    msk = df["classification"] == "LM*"
-    lm_special = set(df[msk]["country_code"].astype(str) + df[msk]["year"].astype(str))
-    assert lm_special == {"YEM1987", "YEM1988"}, f"Unexpected entries with classification 'LM*': {df[msk]}"
-    # Rename labels
-    MAPPING_CLASSIFICATION = {
-        "..": np.nan,  # no available classification for country-year (maybe country didn't exist yet/anymore)
+
+
+def harmonize_income_group_labels(tb: Table) -> Table:
+    # Check if unusual LM* label is still used for Yemen in 1987 and 1988.
+    msk = tb["classification"] == "LM*"
+    lm_special = set(tb[msk]["country_code"].astype(str) + tb[msk]["year"].astype(str))
+    assert lm_special == {"YEM1987", "YEM1988"}, f"Unexpected entries with classification 'LM*': {tb[msk]}"
+
+    # Rename labels.
+    classification_mapping = {
+        "..": np.nan,
         "L": "Low-income countries",
         "H": "High-income countries",
         "UM": "Upper-middle-income countries",
         "LM": "Lower-middle-income countries",
         "LM*": "Lower-middle-income countries",
     }
-    df["classification"] = df["classification"].map(MAPPING_CLASSIFICATION)
+    tb["classification"] = tb["classification"].map(classification_mapping)
+
     # Drop years with no country classification
-    df = df.dropna(subset="classification")
-    return df
+    tb = tb.dropna(subset="classification").reset_index(drop=True)
+
+    return tb
