@@ -3,16 +3,36 @@ definitions:
     presentation:
       topic_tags:
         - Economic Growth
-    processing_level: minor
+    processing_level: major
+    description_from_producer: |-
+      For the current 2024 fiscal year, low-income economies are defined as those with a GNI per capita, calculated using [the World Bank Atlas method](https://datahelpdesk.worldbank.org/knowledgebase/articles/378832-what-is-the-world-bank-atlas-method), of $1,135 or less in 2022; lower middle-income economies are those with a GNI per capita between $1,136 and $4,465; upper middle-income economies are those with a GNI per capita between $4,466 and $13,845; high-income economies are those with a GNI per capita of $13,846 or more.
+
+      Income classifications are set each year on July 1 for all World Bank member economies, and all other economies with populations of more than 30,000. These official analytical classifications are fixed during the World Bank's fiscal year (ending on June 30), thus economies remain in the categories in which they are classified irrespective of any revisions to their per capita income data. The historical classifications shown are as published on July 1 of
+      each fiscal year.
+
+      Regions in this dataset include economies at all income levels. The term country, used interchangeably with economy, does not imply political independence but refers to any territory for which authorities report separate social or economic statistics. For more information about how the World Bank classifies countries, check [their documentation](https://datahelpdesk.worldbank.org/knowledgebase/articles/378834-how-does-the-world-bank-classify-countries).
+    description_key:
+      - The World Bank creates a yearly classification of countries by income, for all countries with population over 30,000.
+      - This classification stays the same throughout the fiscal year (from July 1 to June 30) even if the income data for a country changes.
+      - Low-income countries are those with a gross national income (GNI) per capita of $1,135 or less in 2022.
+      - Lower-middle-income countries are those with a GNI per capita between $1,136 and $4,465 in 2022.
+      - Upper-middle-income countries are those with a GNI per capita between $4,466 and $13,845 in 2022.
+      - High-income countries are those with a GNI per capita of $13,846 or more in 2022.
+
+dataset:
+  title: World Bank's income classification
+  update_period_days: 0
 
 tables:
   income_groups:
+    title: World Bank's historical income classification
     variables:
       classification:
         title: World Bank's historical income classification
         unit: ""
         description_short: Historical income classification based on the country's income each year.
   income_groups_latest:
+    title: World Bank's latest income classification
     variables:
       classification:
         title: World Bank's latest income classification
