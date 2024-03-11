@@ -1,0 +1,4 @@
+tables:
+  dummy:
+    variables:
+      dummy_variable: {}
