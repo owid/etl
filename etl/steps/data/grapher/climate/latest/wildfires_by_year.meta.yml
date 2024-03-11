@@ -37,3 +37,9 @@ tables:
 
         area_ha_per_wildfire:
           title: Annual area burnt per wildfire
+
+        co2_ha_per_area:
+          title: Annual carbon dioxide emissions per area burnt
+
+        pm2_5_ha_per_area:
+          title: Annual PM2.5 emissions per area burnt
