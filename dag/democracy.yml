@@ -4,5 +4,6 @@ steps:
     - snapshot://democracy/2024-03-07/bmr.csv
   data://garden/democracy/2024-03-07/bmr:
     - data://meadow/democracy/2024-03-07/bmr
+    - data://garden/regions/2023-01-01/regions
   data://grapher/democracy/2024-03-07/bmr:
     - data://garden/democracy/2024-03-07/bmr

@@ -31,10 +31,11 @@ def run(dest_dir: str) -> None:
     columns_drop = [
         "regime_imputed_country",
         "regime_imputed",
-        "num_years_in_democracy_group",
-        "num_years_in_democracy_ws_group",
+        "num_years_in_democracy_consecutive_group",
+        "num_years_in_democracy_ws_consecutive_group",
     ]
     tb = tb.drop(columns=columns_drop)
+
     #
     # Save outputs.
     #
