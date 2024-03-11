@@ -1,0 +1,22 @@
+meta:
+  origin:
+    producer: Rutgers University Global Snow Lab
+    title: Snow Cover Extent
+    title_snapshot: Area of Snow Extent - Northern Hemisphere
+    citation_full: |-
+      Rutgers University Global Snow Lab - Area of Snow Extent.
+
+      Robinson, David A., Estilow, Thomas W., and NOAA CDR Program (2012): NOAA Climate Data Record (CDR) of Northern Hemisphere (NH) Snow Cover Extent (SCE), Version 1. NOAA National Centers for Environmental Information. doi: 10.7289/V5N014G9
+    attribution: Rutgers University Global Snow Lab - Snow Cover Extent (2024)
+    attribution_short: Rutgers
+    version_producer: Version 1
+    url_main: https://climate.rutgers.edu/snowcover/table_area.php?ui_set=1&ui_sort=0
+    url_download: https://climate.rutgers.edu/snowcover/files/moncov.nhland.txt
+    date_accessed: '2024-03-11'
+    date_published: '2024-03-11'
+    license:
+      name: CC BY 4.0
+outs:
+  - md5: 879cba4c0ef45a9e9824351f7269a90f
+    size: 12702
+    path: snow_cover_extent_northern_hemisphere.csv
