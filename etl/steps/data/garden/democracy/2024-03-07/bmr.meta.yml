@@ -100,43 +100,43 @@ tables:
         description_key:
           - *dk_democracy_ws_1
 
-  # num_countries_regime:
-  #   common:
-  #     processing_level: "major"
-  #   variables:
-  #     num_countries_regime:
-  #       title: "Number of countries in regime"
-  #       unit: "countries"
-  #       description_short: |-
-  #         The number of countries in the regime.
-  #       description_key:
-  #         - *dk_democracy_1
-  #     num_countries_regime_ws:
-  #       title: "Number of countries in regime (ws)"
-  #       unit: "countries"
-  #       description_short: |-
-  #         The number of countries in the regime in a given year.
-  #       description_key:
-  #         - *dk_democracy_1
+  num_countries_regime:
+    common:
+      processing_level: "major"
+    variables:
+      num_countries_regime:
+        title: "Number of countries in regime"
+        unit: "countries"
+        description_short: |-
+          The number of countries in the regime.
+        description_key:
+          - *dk_democracy_1
+      num_countries_regime_ws:
+        title: "Number of countries in regime (ws)"
+        unit: "countries"
+        description_short: |-
+          The number of countries in the regime in a given year.
+        description_key:
+          - *dk_democracy_1
 
-  # num_countries_regime_years:
-  #   common:
-  #     processing_level: "major"
-  #   variables:
-  #     num_countries_years_in_democracy_consec:
-  #       title: "Number of countries in democracy for a period consecutively"
-  #       unit: "countries"
-  #       description_short: |-
-  #         The number of countries in democracy (consecutive years).
-  #       description_key:
-  #         - *dk_democracy_1
-  #     num_countries_years_in_democracy_ws_consec:
-  #       title: "Number of countries in democracy for a period consecutively (ws)"
-  #       unit: "countries"
-  #       description_short: |-
-  #         The number of countries in democracy (consecutive years).
-  #       description_key:
-  #         - *dk_democracy_1
+  num_countries_regime_years:
+    common:
+      processing_level: "major"
+    variables:
+      num_countries_years_in_democracy_consec:
+        title: "Number of countries in democracy for a period consecutively"
+        unit: "countries"
+        description_short: |-
+          The number of countries in democracy (consecutive years).
+        description_key:
+          - *dk_democracy_1
+      num_countries_years_in_democracy_ws_consec:
+        title: "Number of countries in democracy for a period consecutively (ws)"
+        unit: "countries"
+        description_short: |-
+          The number of countries in democracy (consecutive years).
+        description_key:
+          - *dk_democracy_1
 
       # testing_variable:
       #   title: Testing variable title
