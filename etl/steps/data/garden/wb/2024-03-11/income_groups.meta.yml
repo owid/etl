@@ -1,0 +1,7 @@
+tables:
+  income_groups:
+    variables:
+      classification:
+        title: World Bank income classification
+        unit: ""
+        description: Classification by the World Bank based on the country's income.
