@@ -76,6 +76,7 @@ def _generate_yaml_string(meta_dict: Dict[str, Any], override_yml_path: Path) ->
     yaml_str = merge_or_create_yaml(
         meta_dict,
         override_yml_path,
+        delete_empty=True,
     )
 
     # reorder YAML and dump it back again in nice format
@@ -153,6 +154,12 @@ def _indicator_metadata_dict(indicator: Indicator, db_indicator: gm.Variable) ->
 
     if update_period_days:
         meta_dict["dataset"] = {"update_period_days": update_period_days}
+
+    # remove empty description keys
+    for table in meta_dict["tables"].values():
+        for variable in table["variables"].values():
+            if "description_key" in variable:
+                variable["description_key"] = [k for k in variable["description_key"] if k]
 
     return meta_dict
 
