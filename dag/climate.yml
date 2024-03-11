@@ -1,13 +1,13 @@
 steps:
   #
-  # NOAA National Centers for Environmental Information - Long-run CO2 concentration.
+  # NOAA National Centers for Environmental Information - Long-run CO2 concentration (possibly not updateable).
   #
   data://meadow/climate/2024-01-26/antarctic_ice_core_co2_concentration:
     - snapshot://climate/2024-01-26/antarctic_ice_core_co2_concentration.xls
   data://garden/climate/2024-01-26/antarctic_ice_core_co2_concentration:
     - data://meadow/climate/2024-01-26/antarctic_ice_core_co2_concentration
   #
-  # EPA - Climate change indicators.
+  # EPA - Climate change indicators (possibly not updateable).
   #
   data://meadow/epa/2024-01-29/ocean_heat_content:
     - snapshot://epa/2024-01-29/ocean_heat_content_annual_world_700m.csv
@@ -29,15 +29,7 @@ steps:
   data://garden/epa/2024-01-29/mass_balance_us_glaciers:
     - data://meadow/epa/2024-01-29/mass_balance_us_glaciers
   #
-  # IMBIE - Ice sheet mass balance.
-  #
-  data://meadow/imbie/2024-01-02/ice_sheet_mass_balance:
-    - snapshot://imbie/2024-01-02/ice_sheet_mass_balance_antarctica.csv
-    - snapshot://imbie/2024-01-02/ice_sheet_mass_balance_greenland.csv
-  data://garden/imbie/2024-01-02/ice_sheet_mass_balance:
-    - data://meadow/imbie/2024-01-02/ice_sheet_mass_balance
-  #
-  # NOAA Climate.gov - Global sea level.
+  # NOAA Climate.gov - Global sea level (possibly not updateable).
   #
   data://meadow/climate/2024-01-28/global_sea_level:
     - snapshot://climate/2024-01-28/global_sea_level.csv
@@ -61,9 +53,6 @@ steps:
     - data://garden/climate/2023-12-20/surface_temperature
   data://grapher/climate/2023-12-20/surface_temperature_annual_average:
   - data://garden/climate/2023-12-20/surface_temperature
-
-  ######################################################################################################################
-  # Steps to be updated together for the climate change impacts explorer.
   #
   # Met Office Hadley Centre - Sea surface temperature.
   #
@@ -143,7 +132,6 @@ steps:
     - data://garden/climate/2024-01-31/snow_cover_extent
     - data://garden/climate/2024-01-31/ghg_concentration
     - data://garden/climate/2024-01-31/long_run_ghg_concentration
-    # Indicators that will not be updated.
     - data://garden/climate/2024-01-28/global_sea_level
     - data://garden/epa/2024-01-29/ocean_heat_content
     - data://garden/epa/2024-01-29/ice_sheet_mass_balance
@@ -157,7 +145,6 @@ steps:
   #
   data://explorers/climate/latest/climate_change_impacts:
     - data://garden/climate/2024-01-31/climate_change_impacts
-
   #
   # Area burned by wildfires.
   #
@@ -171,7 +158,6 @@ steps:
     - data://garden/climate/2024-02-19/monthly_burned_area
   data://grapher/climate/2024-02-19/yearly_burned_area:
     - data://garden/climate/2024-02-19/monthly_burned_area
-
   #
   # Emissions from wildfires.
   #
@@ -188,7 +174,6 @@ steps:
   #
   # Weekly area burnt and emissions data on wildfires.
   #
-
   data://meadow/climate/latest/weekly_wildfires:
     - snapshot://climate/2024-02-22/weekly_wildfires_2003_2023.csv
     - snapshot://climate/latest/weekly_wildfires.csv
@@ -202,13 +187,6 @@ steps:
     - data://garden/climate/latest/weekly_wildfires
   data://grapher/climate/latest/wildfires_by_week:
     - data://garden/climate/latest/weekly_wildfires
-
-  ######################################################################################################################
-
-  ######################################################################################################################
-  # Older versions to be archived once they are not used by any other steps.
-
-  ######################################################################################################################
   #
   # Met Office Hadley Centre - Near surface temperature anomaly.
   #
