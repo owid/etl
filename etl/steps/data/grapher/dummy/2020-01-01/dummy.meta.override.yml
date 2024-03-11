@@ -1,4 +1,5 @@
 tables:
   dummy:
     variables:
-      dummy_variable: {}
+      dummy_variable:
+        title: Dummy abc
