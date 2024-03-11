@@ -65,7 +65,6 @@ NON_UPDATEABLE_IDENTIFIERS = [
     "snapshot/wb/income_groups.xlsx",
     # World Bank country shapes.
     "snapshot/countries/world_bank.zip",
-
     # Other steps we don't want to update (because the underlying data does not get updated).
     # TODO: We need a better way to achieve this, for example adding update_period_days to all steps and snapshots.
     #  A simpler alternative would be to move these steps to a separate file in a meaningful place.
