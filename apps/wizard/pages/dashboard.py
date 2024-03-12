@@ -831,21 +831,29 @@ if st.session_state.selected_steps:
                     False,
                     help="If checked, the ETL steps will be forced to be executed (even if they are already executed).",
                 )
-                skip_snapshots = st.toggle(
-                    "Skip snapshots",
-                    True,
-                    help="If checked, skip snapshots and run only ETL data steps.",
+                run_snapshots = st.toggle(
+                    "Run snapshot scripts",
+                    False,
+                    help="If checked, run snapshot scripts (if any in the _Operations list_).",
+                )
+                run_grapher = st.toggle(
+                    "Run grapher steps",
+                    False,
+                    help="If checked, run grapher steps with --grapher (if any in the _Operations list_).",
                 )
 
             def define_command_to_execute_snapshots_and_etl_steps(
-                dry_run: bool = True, force_only: bool = False, skip_snapshots: bool = True
+                dry_run: bool = True,
+                force_only: bool = False,
+                run_snapshots: bool = False,
+                run_grapher: bool = False,
             ):
                 # Execute ETL for all steps in the operations list.
                 snapshot_steps = [step for step in st.session_state.selected_steps if step.startswith("snapshot://")]
                 etl_steps = [step for step in st.session_state.selected_steps if not step.startswith("snapshot://")]
 
                 command = ""
-                if not skip_snapshots:
+                if run_snapshots:
                     # First write a command that will attempt to run all snapshots sequentially.
                     for snapshot_step in snapshot_steps:
                         # Identify script for current snapshot.
@@ -868,6 +876,12 @@ if st.session_state.selected_steps:
                     if force_only:
                         command += " --force --only"
 
+                    if run_grapher:
+                        # To run grapher steps (i.e. grapher://grapher/... steps) we need to remove the "data://" at the
+                        # beginning of the step name, otherwise, grapher://grapher/... steps will be ignored.
+                        command = command.replace("data://grapher/", "grapher/")
+                        command += " --grapher"
+
                 if command.endswith("&& "):
                     command = command[:-3]
 
@@ -888,7 +902,10 @@ if st.session_state.selected_steps:
                 else:
                     with st.spinner("Executing ETL..."):
                         command = define_command_to_execute_snapshots_and_etl_steps(
-                            dry_run=dry_run_etl, force_only=force_only, skip_snapshots=skip_snapshots
+                            dry_run=dry_run_etl,
+                            force_only=force_only,
+                            run_snapshots=run_snapshots,
+                            run_grapher=run_grapher,
                         )
                         cmd_output = execute_command(cmd=command)
                         # Show the output of the command in an expander.
