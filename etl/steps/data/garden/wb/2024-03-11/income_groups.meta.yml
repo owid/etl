@@ -21,7 +21,7 @@ definitions:
 
 dataset:
   title: World Bank's income classification
-  update_period_days: 0
+  update_period_days: 365
 
 tables:
   income_groups:
