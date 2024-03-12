@@ -339,7 +339,7 @@ def add_year_counts_groups(tb: Table) -> Table:
 
 def _add_year_counts_groups(tb: Table, column: str) -> Table:
     bins = [
-        -np.inf,
+        # -np.inf,
         0,
         18,
         30,
@@ -347,10 +347,16 @@ def _add_year_counts_groups(tb: Table, column: str) -> Table:
         90,
         np.inf,
     ]
-    labels = [i for i in range(6)]
+    labels = [
+        "1-18",
+        "19-30",
+        "31-60",
+        "61-90",
+        "91+",
+    ]
     assert len(bins) == len(labels) + 1, "Length mismatch!"
 
-    tb[f"{column}_group"] = pd.cut(tb[column], bins=bins, labels=labels).astype("UInt8")
+    tb[f"{column}_group"] = pd.cut(tb[column], bins=bins, labels=labels)
     tb[f"{column}_group"] = Variable(tb[f"{column}_group"]).copy_metadata(tb[column])
     return tb
 
@@ -404,25 +410,39 @@ def make_tables_country_counters(tb: Table, ds_regions: Dataset) -> Tuple[Table,
     indicators = [
         {
             "name": "regime",
-            "values_expected": {0, 1, -1},
+            "values_expected": {"0", "1", "-1"},
         },
         {
             "name": "regime_womsuffr",
-            "values_expected": {0, 1, -1},
+            "values_expected": {"0", "1", "-1"},
         },
         {
             "name": "num_years_in_democracy_consecutive_group",
-            "values_expected": {0, 1, 2, 3, 4, 5, -1},
+            "values_expected": {
+                "1-18",
+                "19-30",
+                "31-60",
+                "61-90",
+                "91+",
+                "-1",
+            },
         },
         {
             "name": "num_years_in_democracy_ws_consecutive_group",
-            "values_expected": {0, 1, 2, 3, 4, 5, -1},
+            "values_expected": {
+                "1-18",
+                "19-30",
+                "31-60",
+                "61-90",
+                "91+",
+                "-1",
+            },
         },
     ]
     indicator_names = [indicator["name"] for indicator in indicators]
 
     ## Replace NaNs with -1 (easier to process)
-    tb_[indicator_names] = tb_[indicator_names].astype("Int8").fillna(-1)
+    tb_[indicator_names] = tb_[indicator_names].astype("string").fillna("-1")
 
     ## Sanity checks
     for indicator in indicators:
@@ -457,7 +477,7 @@ def make_tables_country_counters(tb: Table, ds_regions: Dataset) -> Tuple[Table,
     tb_ = from_wide_to_long(tb_)
 
     # Category as INT
-    tb_["category"] = tb_["category"].astype(int)
+    # tb_["category"] = tb_["category"].astype(int)
 
     # Rename indicators
     tb_ = tb_.rename(
@@ -493,11 +513,13 @@ def make_tables_country_counters(tb: Table, ds_regions: Dataset) -> Tuple[Table,
     tb_num_countries_years_consec.metadata.short_name = "num_countries_regime_years"
 
     # Remove "unknown regime" for democracy with WS (should be equivalent to without WS, hence the check)
-    mask = (slice(None), slice(None), -1)
+    mask = (slice(None), slice(None), "-1")
     diff = tb_num_countries.loc[mask, "num_countries_regime"] - tb_num_countries.loc[mask, "num_countries_regime_ws"]
     assert (
         diff == 0
     ).all(), "The number of countries with unknown regimes should be the same according to indicators `num_countries_regime` and `num_countries_regime_ws`. Please check!"
-    tb_num_countries.loc[(slice(None), slice(None), -1), "num_countries_regime_ws"] = np.nan
+    tb_num_countries.loc[mask, "num_countries_regime_ws"] = np.nan
 
+    # Remove the "unknowns" from consecutive year counts
+    tb_num_countries_years_consec = tb_num_countries_years_consec.drop(index="-1", level="category")
     return tb_num_countries, tb_num_countries_years_consec

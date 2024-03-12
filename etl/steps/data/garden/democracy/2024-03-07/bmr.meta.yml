@@ -107,18 +107,18 @@ tables:
       num_countries_regime:
         title: |-
           <% if category == 0 %>
-          Number of countries not in a democracy
+          Number of non-democracies
           <% elif category == 1 %>
-          Number of countries in a democracy
+          Number of democracies
           <% else %>
           Number of countries in an unknown regime
           <% endif %>
         unit: "countries"
         description_short: |-
           <% if category == 0 %>
-          The number of countries in the region that are not democracies in a given year.
+          The number of countries that are not democracies in a given year.
           <% elif category == 1 %>
-          The number of countries in the region that are democracies in a given year.
+          The number of countries that are democracies in a given year.
           <% else %>
           The number of countries in the region that are in an unknown regime in a given year.
           <% endif %>
@@ -127,14 +127,14 @@ tables:
       num_countries_regime_ws:
         title: |-
           <% if category == 0 %>
-          Number of countries not in a democracy with women's suffrage
+          Number of non-democracies (accounting for women's suffrage)
           <% elif category == 1 %>
-          Number of countries in a democracy with women's suffrage
+          Number of democracies (including women's suffrage)
           <% endif %>
         unit: "countries"
         description_short: |-
           <% if category == 0 %>
-          The number of countries in the region that are not democracies with women's suffrage in a given year.
+          The number of countries that are not democracies with women's suffrage in a given year.
           <% elif category == 1 %>
           The number of countries in the region that are democracies with women's suffrage in a given year.
           <% endif %>
@@ -146,17 +146,35 @@ tables:
       processing_level: "major"
     variables:
       num_countries_years_in_democracy_consec:
-        title: "Number of countries in democracy for a period consecutively"
+        title: |-
+          <% if category == '91+' %>
+          Number of democracies aged 91 and older
+          <% else %>
+          Number of democracies aged << category >> years
+          <% endif %>
         unit: "countries"
         description_short: |-
-          The number of countries in democracy (consecutive years).
+          <% if category == '91+' %>
+          The number of countries that have been democracies for 91 or more years straight.
+          <% else %>
+          The number of countries that have been democracies for << category >> years straight.
+          <% endif %>
         description_key:
           - *dk_democracy_1
       num_countries_years_in_democracy_ws_consec:
-        title: "Number of countries in democracy for a period consecutively (ws)"
+        title: |-
+          <% if category == '91+' %>
+          Number of democracies (including women's suffrage) aged 91 and older
+          <% else %>
+          Number of democracies (including women's suffrage) aged << category >> years
+          <% endif %>
         unit: "countries"
         description_short: |-
-          The number of countries in democracy (consecutive years).
+          <% if category == '91+' %>
+          The number of countries that have been democracies (including women's suffrage) for 91 or more years straight.
+          <% else %>
+          The number of countries that have been democracies (including women's suffrage) for << category >> years straight.
+          <% endif %>
         description_key:
           - *dk_democracy_ws_1
 
