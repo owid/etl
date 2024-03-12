@@ -1,4 +1,4 @@
-"""Script to create a snapshot of dataset 'Income Classifications (World Bank, 2022)'."""
+"""Script to create a snapshot of the World Bank's Income Classification dataset."""
 
 from pathlib import Path
 
@@ -21,11 +21,8 @@ def main(upload: bool) -> None:
     # Create a new snapshot.
     snap = Snapshot(f"wb/{SNAPSHOT_VERSION}/income_groups.xlsx")
 
-    # Download data from source.
-    snap.download_from_source()
-
-    # Add file to DVC and upload to S3.
-    snap.dvc_add(upload=upload)
+    # Download data from source and upload to S3.
+    snap.create_snapshot(upload=upload)
 
 
 if __name__ == "__main__":
