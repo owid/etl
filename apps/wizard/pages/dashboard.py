@@ -591,8 +591,13 @@ if grid_response["selected_rows"]:
         with st.expander(f"Details for step {selected_step}"):
             for item, value in selected_steps_info.items():
                 item_name = item.replace("_", " ").capitalize()
-                if isinstance(value, list) and len(value) > 0:
-                    st.text(f"{item_name} ({len(value)}): \n* " + "\n* ".join(value))
+                if isinstance(value, list):
+                    list_html = (
+                        f"<details><summary> {item_name} ({len(value)}) </summary><ol>"
+                        + "".join([f"<li>{sub_value}</li>" for sub_value in value])
+                        + "</ol></details>"
+                    )
+                    st.markdown(list_html, unsafe_allow_html=True)
                 else:
                     st.text(f"{item_name}: {value}")
 else:
