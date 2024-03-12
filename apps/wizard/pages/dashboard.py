@@ -170,7 +170,7 @@ tutorial_html = f"""
     <li>Click on{_create_html_button("Add all dependencies", "#d3d3d3", "#000000")} (and optionally click on {_create_html_button("Remove non-updateable", "#d3d3d3", "#000000")}).</li>
     <li>Click on{_create_html_button("Update X steps", "#FE4446", "#FE4446")} to bulk-update them all in one go.</li>
     <li>Click on{_create_html_button("Replace steps with their latest version", "#d3d3d3", "#000000")} to populate the <i>Operations list</i> with the newly created steps.</li>
-    <li>Click on{_create_html_button("Run all ETL steps (including snapshots)", "#FE4446", "#FE4446")} to run the ETL on the new steps.</li>
+    <li>Click on{_create_html_button("Run all ETL steps", "#FE4446", "#FE4446")} to run the ETL on the new steps.</li>
     <li>If a step fails, you can manually edit its code and try running ETL again.</li>
 </ol>
 </details>
@@ -805,7 +805,8 @@ if st.session_state.selected_steps:
                             command += " --dry-run"
                         cmd_output = execute_command(command)
                         # Show the output of the command in an expander.
-                        with st.expander("Command Output:", expanded=True):
+                        with st.expander("Command:", expanded=True):
+                            st.text(command)
                             st.text_area("Output", value=cmd_output, height=300, key="cmd_output_area")
                         if "error" not in cmd_output.lower():
                             # Celebrate that the update was successful, why not.
@@ -830,23 +831,31 @@ if st.session_state.selected_steps:
                     False,
                     help="If checked, the ETL steps will be forced to be executed (even if they are already executed).",
                 )
+                skip_snapshots = st.toggle(
+                    "Skip snapshots",
+                    True,
+                    help="If checked, skip snapshots and run only ETL data steps.",
+                )
 
-            def define_command_to_execute_snapshots_and_etl_steps(dry_run: bool = True, force_only: bool = False):
+            def define_command_to_execute_snapshots_and_etl_steps(
+                dry_run: bool = True, force_only: bool = False, skip_snapshots: bool = True
+            ):
                 # Execute ETL for all steps in the operations list.
                 snapshot_steps = [step for step in st.session_state.selected_steps if step.startswith("snapshot://")]
                 etl_steps = [step for step in st.session_state.selected_steps if not step.startswith("snapshot://")]
 
                 command = ""
-                # First attempt to run all snapshots sequentially.
-                for snapshot_step in snapshot_steps:
-                    # Identify script for current snapshot.
-                    script = steps_df[steps_df["step"] == snapshot_step]["full_path_to_script"].item()
-                    # Define command to be executed.
-                    command += f"python {script} && "
+                if not skip_snapshots:
+                    # First write a command that will attempt to run all snapshots sequentially.
+                    for snapshot_step in snapshot_steps:
+                        # Identify script for current snapshot.
+                        script = steps_df[steps_df["step"] == snapshot_step]["full_path_to_script"].item()
+                        # Define command to be executed.
+                        command += f"python {script} && "
 
-                if dry_run:
-                    # If dry_run, we do not want to execute the command, but simply print it.
-                    command = f"echo '{command}' && "
+                    if dry_run:
+                        # If dry_run, we do not want to execute the command, but simply print it.
+                        command = f"echo '{command}' && "
 
                 if etl_steps:
                     # Then let ETL run all remaining steps (ETL will decide the order).
@@ -859,11 +868,14 @@ if st.session_state.selected_steps:
                     if force_only:
                         command += " --force --only"
 
+                if command.endswith("&& "):
+                    command = command[:-3]
+
                 return command
 
             btn_etl_run = st.button(
-                "Run all ETL steps (including snapshots)",
-                help="Execute all snapshots currently in the _Operations list_, and run ETL on all data steps.",
+                "Run all ETL steps",
+                help="Run ETL on all data steps in the _Operations list_ (and optionally also execute snapshots).",
                 type="primary",
                 use_container_width=True,
             )
@@ -876,11 +888,12 @@ if st.session_state.selected_steps:
                 else:
                     with st.spinner("Executing ETL..."):
                         command = define_command_to_execute_snapshots_and_etl_steps(
-                            dry_run=dry_run_etl, force_only=force_only
+                            dry_run=dry_run_etl, force_only=force_only, skip_snapshots=skip_snapshots
                         )
                         cmd_output = execute_command(cmd=command)
                         # Show the output of the command in an expander.
-                        with st.expander("Command Output:", expanded=True):
+                        with st.expander("Command:", expanded=True):
+                            st.text(command)
                             st.text_area("Output", value=cmd_output, height=300, key="cmd_output_area")
                         if "error" not in cmd_output.lower():
                             # Celebrate that the update was successful, why not.
