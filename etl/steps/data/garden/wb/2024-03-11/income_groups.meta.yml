@@ -25,12 +25,12 @@ dataset:
 
 tables:
   income_groups:
-    title: World Bank's historical income classification
+    title: World Bank's income classification
     variables:
       classification:
-        title: World Bank's historical income classification
+        title: World Bank's income classification
         unit: ""
-        description_short: Historical income classification based on the country's income each year.
+        description_short: Income classification based on the country's income each year.
   income_groups_latest:
     title: World Bank's latest income classification
     variables:
