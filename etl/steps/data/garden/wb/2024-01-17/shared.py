@@ -158,7 +158,7 @@ var_dict = {
     },
     "avg": {
         "title": "Average",
-        "description": "The mean {inc_cons_dict[wel]['name_distribution']} per year within the {pct_dict[pct]['decile10']} (tenth of the population).",
+        "description": "The mean {inc_cons_dict[wel]['name_distribution']} per day within the {pct_dict[pct]['decile10']} (tenth of the population).",
         "unit": "international-$ in {ppp} prices",
         "short_unit": "$",
         "numDecimalPlaces": 2,
@@ -172,7 +172,7 @@ var_dict = {
     },
     "thr": {
         "title": "Threshold",
-        "description": "The level of {inc_cons_dict[wel]['name_distribution']} per year below which {str(pct)}% of the population falls.",
+        "description": "The level of {inc_cons_dict[wel]['name_distribution']} per day below which {str(pct)}% of the population falls.",
         "unit": "international-$ in {ppp} prices",
         "short_unit": "$",
         "numDecimalPlaces": 2,
