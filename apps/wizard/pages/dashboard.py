@@ -199,6 +199,9 @@ def load_steps_df(reload_key: int) -> pd.DataFrame:
     # Load steps dataframe.
     steps_df = StepUpdater().steps_df
 
+    # To speed up calculations, create a dictionary with all info in steps_df.
+    steps_dict = steps_df.set_index("step").to_dict(orient="index")
+
     # Fix some columns.
     steps_df["full_path_to_script"] = steps_df["full_path_to_script"].fillna("").astype(str)
     steps_df["dag_file_path"] = steps_df["dag_file_path"].fillna("").astype(str)
@@ -227,26 +230,25 @@ def load_steps_df(reload_key: int) -> pd.DataFrame:
         [
             dependency
             for dependency in dependencies
-            if (dependency not in DEPENDENCIES_TO_IGNORE)
-            and (not steps_df[steps_df["step"] == dependency]["is_latest"].item())
+            if (dependency not in DEPENDENCIES_TO_IGNORE) and (not steps_dict[dependency]["is_latest"])
         ]
         for dependencies in steps_df["all_active_dependencies"]
     ]
+
     # Add a column with the total number of dependencies that are not their latest version.
     steps_df["n_updateable_dependencies"] = [len(dependencies) for dependencies in steps_df["updateable_dependencies"]]
     # Number of snapshot dependencies that are not their latest version.
     steps_df["n_updateable_snapshot_dependencies"] = [
         sum(
             [
-                not steps_df[steps_df["step"] == dependency]["is_latest"].item()
-                if steps_df[steps_df["step"] == dependency]["channel"].item() == "snapshot"
-                else False
+                not steps_dict[dependency]["is_latest"] if steps_dict[dependency]["channel"] == "snapshot" else False
                 for dependency in dependencies
                 if dependency not in DEPENDENCIES_TO_IGNORE
             ]
         )
         for dependencies in steps_df["all_active_dependencies"]
     ]
+
     # Add a column with the update state.
     # By default, the state is unknown.
     steps_df["update_state"] = UpdateState.UNKNOWN.value
