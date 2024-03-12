@@ -6,8 +6,6 @@ definitions:
         - Climate Change
     display:
       numDecimalPlaces: 0
-      zeroDay: '2000-01-01'
-      yearIsDay: true
     short_unit: t
     unit: tonnes
     processing_level: minor
