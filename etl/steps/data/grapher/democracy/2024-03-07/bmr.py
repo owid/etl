@@ -21,11 +21,13 @@ def run(dest_dir: str) -> None:
     #
     # Special indicator values renamings
     cols = [
-        "num_years_in_democracy",
-        "num_years_in_democracy_ws",
+        # "num_years_in_democracy",
+        # "num_years_in_democracy_ws",
+        "num_years_in_democracy_consecutive",
+        "num_years_in_democracy_ws_consecutive",
     ]
     for col in cols:
-        tb[col] = tb[col].astype(str).replace({"0": "non-democracy"})
+        tb[col] = tb[col].astype("string").replace({"0": "non-democracy"})
 
     # Drop indicators (only useful in Garden)
     columns_drop = [

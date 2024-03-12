@@ -322,7 +322,7 @@ def add_years_in_democracy(tb: Table) -> Table:
     ### Count the number of years since the country first became a democracy. Transition NaN -> 1 is considered as 0 -> 1.
     tb["num_years_in_democracy_ws_consecutive"] = tb.groupby(
         ["country", tb["regime_womsuffr"].fillna(0).eq(0).cumsum()]
-    )["regime"].cumsum()
+    )["regime_womsuffr"].cumsum()
     tb["num_years_in_democracy_ws_consecutive"] = tb["num_years_in_democracy_ws_consecutive"].astype(float)
     tb["num_years_in_democracy_ws"] = tb.groupby("country")["regime_womsuffr"].cumsum()
 
@@ -490,7 +490,8 @@ def make_tables_country_counters(tb: Table, ds_regions: Dataset) -> Tuple[Table,
     )
     ## Get two tables
     tb_num_countries = (
-        (tb_[["year", "country", "category", "num_countries_regime", "num_countries_regime_ws"]].copy())
+        tb_[["year", "country", "category", "num_countries_regime", "num_countries_regime_ws"]]
+        .copy()
         .set_index(["country", "year", "category"], verify_integrity=True)
         .dropna(how="all")
         .sort_index()
@@ -508,6 +509,7 @@ def make_tables_country_counters(tb: Table, ds_regions: Dataset) -> Tuple[Table,
         ]
         .copy()
         .set_index(["country", "year", "category"], verify_integrity=True)
+        .dropna(how="all")
         .sort_index()
     )
     tb_num_countries_years_consec.metadata.short_name = "num_countries_regime_years"
