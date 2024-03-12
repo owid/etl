@@ -222,17 +222,18 @@ def load_steps_df(reload_key: int) -> pd.DataFrame:
 
     steps_df = steps_df.drop(columns=["db_dataset_name", "db_dataset_id"], errors="raise")
 
-    # Add a column with the total number of dependencies that are not their latest version.
-    steps_df["n_updateable_dependencies"] = [
-        sum(
-            [
-                not steps_df[steps_df["step"] == dependency]["is_latest"].item()
-                for dependency in dependencies
-                if dependency not in DEPENDENCIES_TO_IGNORE
-            ]
-        )
+    # Add a column with the dependencies that are not their latest version.
+    steps_df["updateable_dependencies"] = [
+        [
+            dependency
+            for dependency in dependencies
+            if (dependency not in DEPENDENCIES_TO_IGNORE)
+            and (not steps_df[steps_df["step"] == dependency]["is_latest"].item())
+        ]
         for dependencies in steps_df["all_active_dependencies"]
     ]
+    # Add a column with the total number of dependencies that are not their latest version.
+    steps_df["n_updateable_dependencies"] = [len(dependencies) for dependencies in steps_df["updateable_dependencies"]]
     # Number of snapshot dependencies that are not their latest version.
     steps_df["n_updateable_snapshot_dependencies"] = [
         sum(
@@ -569,6 +570,33 @@ def _add_steps_to_operations(steps_related):
     # Add new steps to the operations list.
     st.session_state.selected_steps += new_selected_steps
 
+
+st.markdown("### Details list")
+if grid_response["selected_rows"]:
+    selected_steps = [row["step"] for row in grid_response["selected_rows"]]
+    selected_steps_info = (
+        steps_df[steps_df["step"].isin(selected_steps)][
+            [
+                "step",
+                "all_active_dependencies",
+                "all_active_usages",
+                "updateable_dependencies",
+            ]
+        ]
+        .set_index("step")
+        .to_dict(orient="index")
+    )
+    for selected_step, selected_steps_info in selected_steps_info.items():
+        # Display each selected row's data.
+        with st.expander(f"Details for step {selected_step}"):
+            for item, value in selected_steps_info.items():
+                item_name = item.replace("_", " ").capitalize()
+                if isinstance(value, list) and len(value) > 0:
+                    st.text(f"{item_name} ({len(value)}): \n* " + "\n* ".join(value))
+                else:
+                    st.text(f"{item_name}: {value}")
+else:
+    st.markdown(":grey[No rows selected for more details.]")
 
 # Button to add selected steps to the Operations list.
 if st.button("Add selected steps to the _Operations list_", type="primary"):
