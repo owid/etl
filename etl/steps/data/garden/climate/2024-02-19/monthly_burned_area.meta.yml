@@ -46,6 +46,4 @@ tables:
 
       all:
         title: Monthly burned area across all land types
-        description_short: Total area of all land types burnt by [wildfires](#dod:wildfires) in hectares.
-
-
+        description_short: Total area of forests, savannas, shrublands/grasslands, croplands, and other land that have been burned as a result of [wildfires](#dod:wildfires).

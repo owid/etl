@@ -20,7 +20,7 @@ meta:
 
     # Files
     url_main: https://gwis.jrc.ec.europa.eu/apps/gwis.statistics/seasonaltrend
-    date_accessed: 2024-02-27
+    date_accessed: 2024-03-12
 
     # License
     license:
@@ -28,6 +28,6 @@ meta:
       url: https://gwis.jrc.ec.europa.eu/about-gwis/data-license
 
 outs:
-  - md5: 7f7a9d5bd6a405b9e7210864916ed771
-    size: 11440167
+  - md5: c71e4c5255a4ca6300f27a9a41ce0e55
+    size: 11466398
     path: weekly_wildfires.csv
