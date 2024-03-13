@@ -873,6 +873,25 @@ def write_to_dag_file(
 
 
 def import_module_from_path(module_path: Union[str, Path], module_name: str = "module_name") -> ModuleType:
+    """Import module from a given path to a .py file.
+
+    This function is particularly useful when attempting to import a function from a step file, whose name contains
+    numbers, and it's hence impossible to do a simple `from ..2024-01-01 import run`.
+
+    Parameters
+    ----------
+    module_path : Union[str, Path]
+        Path to .py file.
+    module_name : str, optional
+        Name to assign to the imported module, by default "module_name". This is only important if this function is used
+        multiple times, in which case the imported modules should be given different names.
+
+    Returns
+    -------
+    module: ModuleType
+        Module imported from the given path.
+
+    """
     # Ensure the given path is a Path object.
     module_path = Path(module_path)
 
@@ -895,6 +914,30 @@ def import_module_from_path(module_path: Union[str, Path], module_name: str = "m
 
 
 def load_run_from_previous_version(path_to_current_file: Union[str, Path], previous_version: str) -> Callable:
+    """Load 'run' function from a previous version of a given step file.
+
+    If you update a data step, say, of version "2024-01-01", and the code of the new step is identical to the previous
+    version, instead of duplicating the code, you can use this function.
+    The resulting data step would have just the following content:
+    ```
+    from etl.helpers import load_run_from_previous_version
+
+    run = load_run_from_previous_version(__file__, "2024-01-01")
+    ```
+
+    Parameters
+    ----------
+    path_to_current_file : Union[str, Path]
+        Path to the file corresponding to new data step (simply use __file__).
+    previous_version : str
+        Version of the previous step file, whose code will also be used in the new step.
+
+    Returns
+    -------
+    run : Callable
+        Function 'run' imported from the previous version of the step file.
+
+    """
     # Ensure the given path is a Path object.
     path_to_current_file = Path(path_to_current_file)
 
