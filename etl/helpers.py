@@ -888,7 +888,7 @@ def import_module_from_path(module_path: Union[str, Path], module_name: str = "m
 
     Returns
     -------
-    module: ModuleType
+    module : ModuleType
         Module imported from the given path.
 
     """
@@ -899,16 +899,29 @@ def import_module_from_path(module_path: Union[str, Path], module_name: str = "m
     if module_path.suffix != ".py" or not module_path.is_file():
         raise ImportError(f"No Python file found at path: {module_path}")
 
-    # Load the module specification from the given file path.
+    # Temporarily add the module's directory to the Python path.
+    # This is necessary in case the imported module imports other modules from the same directory.
+    module_dir = str(module_path.parent)
+    if module_dir not in sys.path:
+        sys.path.insert(0, module_dir)
+        remove_module_dir_from_path = True
+    else:
+        remove_module_dir_from_path = False
+
+    # Create a module spec from the file path.
     spec = importlib.util.spec_from_file_location(module_name, str(module_path))
     if spec is None:
         raise ImportError(f"No module spec found for path: {module_path}")
 
-    # Create a module object from the spec
+    # Create a module object from the spec.
     module = importlib.util.module_from_spec(spec)
 
-    # Execute the module
+    # Execute the module.
     spec.loader.exec_module(module)  # type: ignore
+
+    # Remove the module directory from Python path if it was added by this function.
+    if remove_module_dir_from_path:
+        sys.path.remove(module_dir)
 
     return module
 
