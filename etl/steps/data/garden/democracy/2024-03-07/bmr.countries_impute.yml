@@ -1,0 +1,62 @@
+
+# Federal Republic of Central America
+- country:
+    - Nicaragua
+    - Costa Rica
+  country_impute: Federal Republic of Central America
+  year_min: 1824
+  year_max: 1837
+- country:
+    - El Salvador
+    - Guatemala
+    - Honduras
+  country_impute: Federal Republic of Central America
+  year_min: 1824
+  year_max: 1838
+# Czechoslovakia
+- country:
+    - Slovakia
+    - Czechia
+  country_impute: Czechoslovakia
+  year_min: 1918
+  year_max: 1992
+# Korea
+- country:
+    - South Korea
+    - North Korea
+  country_impute: Korea (former)
+  year_min: 1800
+  year_max: 1910
+# Great Colombia
+- country:
+    - Venezuela
+    - Ecuador
+  country_impute: Great Colombia
+  year_min: 1821
+  year_max: 1829
+- country:
+    - Panama
+    - Colombia
+  country_impute: Great Colombia
+  year_min: 1821
+  year_max: 1830
+# USSR
+- country:
+    - Russia
+  country_impute: USSR
+  year_min: 1922
+  year_max: 1991
+# Ethopia
+- country:
+    - Eritrea
+    - Ethiopia
+  country_impute: Ethiopia (former)
+  year_min: 1952
+  year_max: 1992
+# Pakistan
+- country:
+    - Pakistan
+    - Bangladesh
+  country_impute: Pakistan (former)
+  year_min: 1947
+  year_max: 1971
