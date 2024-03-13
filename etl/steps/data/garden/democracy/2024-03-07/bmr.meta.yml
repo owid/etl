@@ -4,6 +4,8 @@ definitions:
     presentation:
       topic_tags:
         - Democracy
+    processing_level: "major"
+
   others:
     description_processing_main: &description_processing_main |-
       Old data for some countries has been imputed based on former countries:
@@ -39,8 +41,6 @@ dataset:
 
 tables:
   bmr:
-    common:
-      processing_level: "major"
     variables:
       regime:
         title: Political regime
@@ -102,7 +102,9 @@ tables:
 
   num_countries_regime:
     common:
-      processing_level: "major"
+      presentation:
+          grapher_config:
+            hasMapTab: false
     variables:
       num_countries_regime:
         title: |-
@@ -143,7 +145,9 @@ tables:
 
   num_countries_regime_years:
     common:
-      processing_level: "major"
+      presentation:
+          grapher_config:
+            hasMapTab: false
     variables:
       num_countries_years_in_democracy_consec:
         title: |-
@@ -180,7 +184,9 @@ tables:
 
   population_regime:
     common:
-      processing_level: "major"
+      presentation:
+          grapher_config:
+            hasMapTab: false
     variables:
       population_regime:
         title: |-
@@ -221,7 +227,9 @@ tables:
 
   population_regime_years:
     common:
-      processing_level: "major"
+      presentation:
+          grapher_config:
+            hasMapTab: false
     variables:
       population_years_in_democracy_consec:
         title: |-
