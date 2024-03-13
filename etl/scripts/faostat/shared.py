@@ -22,6 +22,8 @@ SNAPSHOTS_FILE_EXTENSION = "zip"
 FAO_DATA_URL = "http://www.fao.org/faostat/en/#data"
 # Metadata source name.
 SOURCE_NAME = "Food and Agriculture Organization of the United Nations"
+# Short attribution.
+ATTRIBUTION_SHORT = "FAOSTAT"
 # Metadata related to license.
 LICENSE_URL = "http://www.fao.org/contact-us/terms/db-terms-of-use/en"
 LICENSE_NAME = "CC BY-NC-SA 3.0 IGO"
