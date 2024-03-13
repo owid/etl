@@ -428,8 +428,12 @@ def make_tables_population_counters(tb: Table, ds_regions: Dataset, ds_populatio
     # Drop historical countries (don't want to double-count population)
     tb_ = tb_.loc[~tb_["country"].isin(countries_ignore)]
 
+    # TODO:
+    # - why 'Czechoslovakia' is not filtered?
+    # - why are there countries w WS=1 when no-WS is NA? They are in different groups!
+
     # Get dummy indicators
-    tb_ = make_table_with_dummies(tb, ds_regions)
+    tb_ = make_table_with_dummies(tb_, ds_regions)
 
     # Add population column
     tb_ = geo.add_population_to_table(

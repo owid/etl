@@ -213,7 +213,7 @@ tables:
           <% if category == 0 %>
           People living in non-democracies, including women's suffrage
           <% elif category == 1 %>
-          People living in of democracies, including women's suffrage
+          People living in democracies, including women's suffrage
           <% endif %>
         unit: "people"
         description_short: |-
