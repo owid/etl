@@ -45,6 +45,8 @@ def run(dest_dir: str) -> None:
         tb,
         ds_garden["num_countries_regime"],
         ds_garden["num_countries_regime_years"],
+        ds_garden["population_regime"],
+        ds_garden["population_regime_years"],
     ]
     # Create a new grapher dataset with the same metadata as the garden dataset.
     ds_grapher = create_dataset(

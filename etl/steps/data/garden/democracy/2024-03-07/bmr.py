@@ -38,21 +38,6 @@ REGIONS = {
 }
 
 
-def _get_countries_to_ignore_population(ds_regions: Dataset) -> Set[str]:
-    # Table with regions
-    tb_regions = ds_regions["regions"].set_index("name", verify_integrity=True)
-
-    # Get country names from which we are imputing values from (most of them are historical countries)
-    countries_ignore = {c["country_impute"] for c in COUNTRIES_IMPUTE}
-
-    # Sanity check (all country names are valid as per tb_regions)
-    assert not (countries_ignore - set(tb_regions.index)), "Some countries are not in the regions!"
-
-    # Get only historical countries (we impute from currently existing countries, too!)
-    countries_ignore = {c for c in countries_ignore if tb_regions.loc[c, "is_historical"]}
-    return countries_ignore
-
-
 def run(dest_dir: str) -> None:
     #
     # Load inputs.
@@ -418,51 +403,18 @@ def make_tables_country_counters(tb: Table, ds_regions: Dataset) -> Tuple[Table,
     ## Long format
     tb_ = from_wide_to_long(tb_)
 
-    # Rename indicators
-    tb_ = tb_.rename(
-        columns={
+    # Generate two columns (1: in democracy, 2: age of democracy)
+    tb_num_countries, tb_num_countries_years_consec = split_into_two_tables(
+        tb=tb,
+        column_renames={
             "regime": "num_countries_regime",
             "regime_womsuffr": "num_countries_regime_ws",
             "num_years_in_democracy_consecutive_group": "num_countries_years_in_democracy_consec",
             "num_years_in_democracy_ws_consecutive_group": "num_countries_years_in_democracy_ws_consec",
-        }
+        },
+        table_1_name="num_countries_regime",
+        table_2_name="num_countries_regime_years",
     )
-    ## Get two tables
-    tb_num_countries = (
-        tb_[["year", "country", "category", "num_countries_regime", "num_countries_regime_ws"]]
-        .copy()
-        .set_index(["country", "year", "category"], verify_integrity=True)
-        .dropna(how="all")
-        .sort_index()
-    )
-    tb_num_countries.metadata.short_name = "num_countries_regime"
-    tb_num_countries_years_consec = (
-        tb_[
-            [
-                "year",
-                "country",
-                "category",
-                "num_countries_years_in_democracy_consec",
-                "num_countries_years_in_democracy_ws_consec",
-            ]
-        ]
-        .copy()
-        .set_index(["country", "year", "category"], verify_integrity=True)
-        .dropna(how="all")
-        .sort_index()
-    )
-    tb_num_countries_years_consec.metadata.short_name = "num_countries_regime_years"
-
-    # Remove "unknown regime" for democracy with WS (should be equivalent to without WS, hence the check)
-    mask = (slice(None), slice(None), "-1")
-    diff = tb_num_countries.loc[mask, "num_countries_regime"] - tb_num_countries.loc[mask, "num_countries_regime_ws"]
-    assert (
-        diff == 0
-    ).all(), "The number of countries with unknown regimes should be the same according to indicators `num_countries_regime` and `num_countries_regime_ws`. Please check!"
-    tb_num_countries.loc[mask, "num_countries_regime_ws"] = np.nan
-
-    # Remove the "unknowns" from consecutive year counts
-    tb_num_countries_years_consec = tb_num_countries_years_consec.drop(index="-1", level="category")
     return tb_num_countries, tb_num_countries_years_consec
 
 
@@ -505,12 +457,19 @@ def make_tables_population_counters(tb: Table, ds_regions: Dataset, ds_populatio
     )
     tb_ = cast(Table, tb_.dropna(subset="population"))
 
-    # Encode population in indicators: Population if 1, 0 otherwise
+    # Save metadata
     cols = [col for col in tb_.columns if col not in ["year", "country", "population"]]
+    meta = {col: tb_[col].metadata for col in cols} | {"population": tb_["population"].metadata}
+
+    # Encode population in indicators: Population if 1, 0 otherwise
     tb_[cols] = tb_[cols].multiply(tb_["population"], axis=0)
     tb_ = tb_.drop(columns="population")
 
-    # Get rid of former countries
+    # Add metadata back (combine origins from population)
+    for col in cols:
+        metadata = meta[col]
+        metadata.origins += meta["population"].origins
+        tb_[col].metadata = meta[col]
 
     ### Get aggregates
     tb_ = geo.add_regions_to_table(
@@ -527,52 +486,95 @@ def make_tables_population_counters(tb: Table, ds_regions: Dataset, ds_populatio
     ## Long format
     tb_ = from_wide_to_long(tb_)
 
-    # Category as INT
-    # tb_["category"] = tb_["category"].astype(int)
-
-    # Rename indicators
-    tb_ = tb_.rename(
-        columns={
+    # Generate two columns (1: in democracy, 2: age of democracy)
+    tb_population, tb_population_years_consec = split_into_two_tables(
+        tb=tb,
+        column_renames={
             "regime": "population_regime",
             "regime_womsuffr": "population_regime_ws",
             "num_years_in_democracy_consecutive_group": "population_years_in_democracy_consec",
             "num_years_in_democracy_ws_consecutive_group": "population_years_in_democracy_ws_consec",
-        }
+        },
+        table_1_name="population_regime",
+        table_2_name="population_regime_years",
     )
-    ## Get two tables
-    tb_population = (
-        tb_[["year", "country", "category", "population_regime", "population_regime_ws"]]
-        .copy()
-        .set_index(["country", "year", "category"], verify_integrity=True)
-        .dropna(how="all")
-        .sort_index()
-    )
-    tb_population.metadata.short_name = "population_regime"
-    tb_population_years_consec = (
-        tb_[
-            [
-                "year",
-                "country",
-                "category",
-                "population_years_in_democracy_consec",
-                "population_years_in_democracy_ws_consec",
-            ]
-        ]
-        .copy()
-        .set_index(["country", "year", "category"], verify_integrity=True)
-        .dropna(how="all")
-        .sort_index()
-    )
-    tb_population_years_consec.metadata.short_name = "population_regime_years"
+    return tb_population, tb_population_years_consec
 
-    # Remove "unknown regime" for democracy with WS (should be equivalent to without WS, hence the check)
+
+def _get_countries_to_ignore_population(ds_regions: Dataset) -> Set[str]:
+    """List of countries to ignore when working with population.
+
+    To avoid double-counting population, former countries are ignored.
+    """
+    # Get table with regions
+    tb_regions = ds_regions["regions"].set_index("name", verify_integrity=True)
+
+    # Get country names from which we are imputing values from (most of them are historical countries)
+    countries_ignore = {c["country_impute"] for c in COUNTRIES_IMPUTE}
+
+    # Sanity check (all country names are valid as per tb_regions)
+    assert not (countries_ignore - set(tb_regions.index)), "Some countries are not in the regions!"
+
+    # Get only historical countries (we impute from currently existing countries, too!)
+    countries_ignore = {c for c in countries_ignore if tb_regions.loc[c, "is_historical"]}
+    return countries_ignore
+
+
+def split_into_two_tables(
+    tb: Table, column_renames: Dict[str, str], table_1_name: str, table_2_name: str
+) -> tuple[Table, Table]:
+    """Make two tables from a single table.
+
+    The original table contains two groups of indicators:
+
+    Group 1: Reports if a country is a democracy or not.
+    Group 2: Reports if a country is a democracy with X years of age (indicator for each X years of age group).
+
+    Note that in each group of indicators we have two flavours of democracy: accounting with and without Women's suffrage.
+    """
+    # Sanity checks
+    assert set(column_renames.keys()) == {
+        "regime",
+        "regime_womsuffr",
+        "num_years_in_democracy_consecutive_group",
+        "num_years_in_democracy_ws_consecutive_group",
+    }, "Missing columns in `column_renames`!"
+
+    # Standardise names
+    tb_ = tb.rename(columns=column_renames).copy()
+
+    # Get column names
+    col_regime = column_renames["regime"]
+    col_regime_ws = column_renames["regime_womsuffr"]
+    col_years_consec = column_renames["num_years_in_democracy_consecutive_group"]
+    col_years_ws_consec = column_renames["num_years_in_democracy_ws_consecutive_group"]
+
+    def _get_table_subset(table: Table, col: str, col_ws: str, short_name: str) -> Table:
+        """Get subset of the table."""
+        tb_subset = (
+            table.loc[:, ["year", "country", "category", col, col_ws]]
+            .copy()
+            .set_index(["country", "year", "category"], verify_integrity=True)
+            .dropna(how="all")
+            .sort_index()
+        )
+        tb_subset.metadata.short_name = short_name
+        return tb_subset
+
+    # TABLE 1: Aggregate regime / regime_ws indicators
+    tb_1 = _get_table_subset(tb_, col_regime, col_regime_ws, table_1_name)
+    ## Remove "unknown regime" for democracy with WS (should be equivalent to without WS, hence the check)
     mask = (slice(None), slice(None), "-1")
-    diff = tb_population.loc[mask, "population_regime"] - tb_population.loc[mask, "population_regime_ws"]
+    diff = tb_1.loc[mask, col_regime] - tb_1.loc[mask, col_regime_ws]
     assert (
         diff == 0
-    ).all(), "The number of countries with unknown regimes should be the same according to indicators `population_regime` and `population_regime_ws`. Please check!"
-    tb_population.loc[mask, "population_regime_ws"] = np.nan
+    ).all(), f"The number of countries with unknown regimes should be the same according to indicators `{col_regime}` and `{col_regime_ws}`. Please check!"
+    tb_1.loc[mask, col_regime_ws] = np.nan
 
-    # Remove the "unknowns" from consecutive year counts
-    tb_population_years_consec = tb_population_years_consec.drop(index="-1", level="category")
-    return tb_population, tb_population_years_consec
+    # TABLE 2: Aggregate years in democracy (with or without WS)
+    tb_2 = _get_table_subset(tb_, col_years_consec, col_years_ws_consec, table_2_name)
+
+    ## Remove the "unknowns" from consecutive year counts
+    tb_2 = tb_2.drop(index="-1", level="category")
+
+    return tb_1, tb_2
