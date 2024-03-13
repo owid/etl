@@ -405,7 +405,7 @@ def make_tables_country_counters(tb: Table, ds_regions: Dataset) -> Tuple[Table,
 
     # Generate two columns (1: in democracy, 2: age of democracy)
     tb_num_countries, tb_num_countries_years_consec = split_into_two_tables(
-        tb=tb,
+        tb=tb_,
         column_renames={
             "regime": "num_countries_regime",
             "regime_womsuffr": "num_countries_regime_ws",
@@ -488,7 +488,7 @@ def make_tables_population_counters(tb: Table, ds_regions: Dataset, ds_populatio
 
     # Generate two columns (1: in democracy, 2: age of democracy)
     tb_population, tb_population_years_consec = split_into_two_tables(
-        tb=tb,
+        tb=tb_,
         column_renames={
             "regime": "population_regime",
             "regime_womsuffr": "population_regime_ws",
