@@ -3,13 +3,15 @@
 #  etl
 #
 
+import importlib.util
 import re
 import sys
 import tempfile
 from collections.abc import Generator
 from contextlib import contextmanager
 from pathlib import Path
-from typing import Any, Dict, Iterable, Iterator, List, Literal, Optional, Union, cast
+from types import ModuleType
+from typing import Any, Callable, Dict, Iterable, Iterator, List, Literal, Optional, Union, cast
 from urllib.parse import urljoin
 
 import jsonref
@@ -868,3 +870,46 @@ def write_to_dag_file(
     # Write the updated content back to the dag file.
     with open(dag_file, "w") as file:
         file.writelines(updated_lines)
+
+
+def import_module_from_path(module_path: Union[str, Path], module_name: str = "module_name") -> ModuleType:
+    # Ensure the given path is a Path object.
+    module_path = Path(module_path)
+
+    # Ensure the path exists and is a Python file.
+    if module_path.suffix != ".py" or not module_path.is_file():
+        raise ImportError(f"No Python file found at path: {module_path}")
+
+    # Load the module specification from the given file path.
+    spec = importlib.util.spec_from_file_location(module_name, str(module_path))
+    if spec is None:
+        raise ImportError(f"No module spec found for path: {module_path}")
+
+    # Create a module object from the spec
+    module = importlib.util.module_from_spec(spec)
+
+    # Execute the module
+    spec.loader.exec_module(module)  # type: ignore
+
+    return module
+
+
+def load_run_from_previous_version(path_to_current_file: Union[str, Path], previous_version: str) -> Callable:
+    # Ensure the given path is a Path object.
+    path_to_current_file = Path(path_to_current_file)
+
+    # Construct the path to the previous version file.
+    current_version = PathFinder(path_to_current_file.as_posix()).version
+    path_to_previous_file = path_to_current_file.as_posix().replace(current_version, previous_version)
+
+    # Load the module from the previous version file path
+    module = import_module_from_path(module_path=path_to_previous_file)
+
+    # Check if a 'run' function exists in the module.
+    if not hasattr(module, "run"):
+        raise ImportError(f"No 'run' function found in path: {path_to_previous_file}")
+
+    # Load 'run' function from the module.
+    run = getattr(module, "run")
+
+    return run
