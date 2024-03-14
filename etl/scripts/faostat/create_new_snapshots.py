@@ -145,11 +145,17 @@ class FAODataset:
         """
         log.info(f"Creating snapshot for step {self.metadata['short_name']}.")
 
-        # Create a new snapshot.
-        snap = Snapshot(self.snapshot_metadata.uri)
+        # Create a new snapshot metadata.
+        metadata = SnapshotMeta.from_dict(self.metadata)
+
+        # Ensure parent directory exists.
+        metadata.path.parent.mkdir(parents=True, exist_ok=True)
 
         # Create metadata file for current domain dataset.
-        snap.path.write_text(snap.metadata.to_yaml())
+        metadata.path.write_text(metadata.to_yaml())
+
+        # Create a new snapshot.
+        snap = Snapshot(metadata.uri)
 
         # Download data from source and upload to S3.
         snap.create_snapshot(upload=True)
@@ -250,11 +256,14 @@ class FAOAdditionalMetadata:
     def to_snapshot(self) -> None:
         log.info(f"Creating snapshot for step {self.metadata['short_name']}.")
 
-        # Create metadata file for current domain dataset.
-        snap = Snapshot(self.snapshot_metadata.uri)
+        # Create  new snapshot metadata object.
+        metadata = SnapshotMeta.from_dict(self.metadata)
 
         # Create metadata file for current domain dataset.
-        snap.path.write_text(snap.metadata.to_yaml())
+        metadata.path.write_text(metadata.to_yaml())
+
+        # Create a new snapshot.
+        snap = Snapshot(metadata.uri)
 
         with tempfile.NamedTemporaryFile() as f:
             # Download data into a temporary file.
