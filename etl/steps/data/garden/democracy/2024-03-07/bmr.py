@@ -422,12 +422,16 @@ def make_tables_population_counters(tb: Table, ds_regions: Dataset, ds_populatio
     """Get tables with number of people in democracy."""
     tb_ = tb.copy()
 
+    # Add missing observations
+    tb_ = expand_observations(tb_)
+
     # Get list of country names to ignore
     countries_ignore = _get_countries_to_ignore_population(ds_regions)
 
     # Drop historical countries (don't want to double-count population)
     tb_ = tb_.loc[~tb_["country"].isin(countries_ignore)]
 
+    # Extend observations to have all country-years
     # TODO:
     # - why 'Czechoslovakia' is not filtered?
     # - why are there countries w WS=1 when no-WS is NA? They are in different groups!
@@ -458,6 +462,7 @@ def make_tables_population_counters(tb: Table, ds_regions: Dataset, ds_populatio
             "Republic of Vietnam",
             "Kingdom of Bavaria",
         ],
+        # merge_how="outer",
     )
     tb_ = cast(Table, tb_.dropna(subset="population"))
 
@@ -503,6 +508,27 @@ def make_tables_population_counters(tb: Table, ds_regions: Dataset, ds_populatio
         table_2_name="population_regime_years",
     )
     return tb_population, tb_population_years_consec
+
+
+def expand_observations(tb: Table) -> Table:
+    """Expand to have a row per (year, country)."""
+    # Add missing years for each triplet ("warcode", "campcode", "ccode")
+
+    # List of countries
+    regions = set(tb["country"])
+
+    # List of possible years
+    years = np.arange(tb["year"].min(), tb["year"].max() + 1)
+
+    # New index
+    new_idx = pd.MultiIndex.from_product([years, regions], names=["year", "country"])
+
+    # Reset index
+    tb = tb.set_index(["year", "country"]).reindex(new_idx).reset_index()
+
+    # Type of `year`
+    tb["year"] = tb["year"].astype("int")
+    return tb
 
 
 def _get_countries_to_ignore_population(ds_regions: Dataset) -> Set[str]:
