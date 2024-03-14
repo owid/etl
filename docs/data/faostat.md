@@ -65,7 +65,6 @@ List of meadow datasets that are generated, and their titles:
 * `faostat_fbsh`: Food Balances: Food Balances (-2013, old methodology and population).
 * `faostat_fo`: Forestry: Forestry Production and Trade.
 * `faostat_fs`: Food Security and Nutrition: Suite of Food Security Indicators.
-* `faostat_gn`: Climate Change: Energy Use.
 * `faostat_ic`: Investment: Credit to Agriculture.
 * `faostat_lc`: Land, Inputs and Sustainability: Land Cover.
 * `faostat_qcl`: Production: Crops and livestock products.
@@ -80,7 +79,6 @@ List of meadow datasets that are generated, and their titles:
 * `faostat_sdgb`: SDG Indicators: SDG Indicators.
 * `faostat_tcl`: Trade: Crops and livestock products.
 * `faostat_ti`: Trade: Trade Indices.
-* `faostat_wcad`: World Census of Agriculture: Structural data from agricultural censuses.
 
 Each dataset `faostat_*` contains only one table:
 
