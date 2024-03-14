@@ -86,8 +86,9 @@ INCLUDED_DATASETS_CODES = [
     "tcl",
     # Trade: Trade Indices.
     "ti",
+    # Removed from the list (as they have not been used and were causing issues).
     # World Census of Agriculture.
-    "wcad",
+    # "wcad",
 ]
 # URL for dataset codes in FAOSTAT catalog.
 # This is the URL used to get the remote location of the actual data files to be downloaded, and the date of their

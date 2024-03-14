@@ -1,0 +1,19 @@
+meta:
+  origin:
+    producer: Food and Agriculture Organization of the United Nations
+    title: 'Land, Inputs and Sustainability: Land Cover'
+    description: |-
+      The FAOSTAT domain Land Cover under the Agri-Environmental Indicators section contains land cover information organized by the land cover classes of the international standard system for Environmental and Economic Accounting Central Framework (SEEA CF). The land cover information is compiled from publicly available Global Land Cover (GLC) maps: a) MODIS land cover types based on the Land Cover Classification System, LCCS (2001–2021); b) The European Spatial Agency (ESA) Climate Change Initiative (CCI) annual land cover maps (1992–2020) produced by the Université catholique de Louvain (UCL)-Geomatics and now under the European Copernicus Program; c) The annual land cover maps which were produced under the European Copernicus Global Land Service (CGLS) (CGLS land cover, containing discrete land cover categorization for the period 2015–2019), with spatial resolution 100m; and d) 4) The WorldCover maps of the European Space Agency —available for the years 2020  and 2021,  produced at 10m resolution.
+    citation_full: 'Food and Agriculture Organization of the United Nations - Land, Inputs and Sustainability: Land Cover (2023).'
+    attribution_short: FAOSTAT
+    url_main: http://www.fao.org/faostat/en/#data/LC
+    url_download: https://fenixservices.fao.org/faostat/static/bulkdownloads/Environment_LandCover_E_All_Data_(Normalized).zip
+    date_accessed: '2024-03-14'
+    date_published: '2023-06-13'
+    license:
+      name: CC BY-NC-SA 3.0 IGO
+      url: http://www.fao.org/contact-us/terms/db-terms-of-use/en
+outs:
+  - md5: a807127de14dacc4b321c344d12e3383
+    size: 1528536
+    path: faostat_lc.zip

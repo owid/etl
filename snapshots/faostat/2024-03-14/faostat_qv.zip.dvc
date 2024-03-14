@@ -1,0 +1,19 @@
+meta:
+  origin:
+    producer: Food and Agriculture Organization of the United Nations
+    title: 'Production: Value of Agricultural Production'
+    description: |-
+      Values of agricultural production are calculated based on production data of primary commodities from Production domain and producer prices from Prices domain. The livestock value of production is measured in terms of indigenous meat.
+    citation_full: 'Food and Agriculture Organization of the United Nations - Production: Value of Agricultural Production (2024).'
+    attribution_short: FAOSTAT
+    url_main: http://www.fao.org/faostat/en/#data/QV
+    url_download: https://fenixservices.fao.org/faostat/static/bulkdownloads/Value_of_Production_E_All_Data_(Normalized).zip
+    date_accessed: '2024-03-14'
+    date_published: '2024-03-07'
+    license:
+      name: CC BY-NC-SA 3.0 IGO
+      url: http://www.fao.org/contact-us/terms/db-terms-of-use/en
+outs:
+  - md5: 7bc127c8690bd3e25964d1fc75393a2c
+    size: 26486976
+    path: faostat_qv.zip

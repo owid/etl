@@ -228,13 +228,17 @@ If no dataset requires an update, the workflow stops here.
 
 2. Create new meadow steps.
 
+    !!! note
+
+        The `-a` flag ensures a meadow step is created for all steps. In principle, we could just create steps for those domains that have new snapshots. But, given that we update this dataset yearly, it seems more convenient to simply update all of them.
+
     ```bash
-    python etl/scripts/faostat/create_new_steps.py -c meadow
+    python etl/scripts/faostat/create_new_steps.py -c meadow -a
     ```
 3. Run the new etl meadow steps, to generate the meadow datasets.
 
     ```bash
-    etl meadow/faostat/YYYY-MM-DD
+    etl run meadow/faostat/YYYY-MM-DD
     ```
 
 4. Create new garden steps.
@@ -246,7 +250,7 @@ If no dataset requires an update, the workflow stops here.
 5. Run the new etl garden steps, to generate the garden datasets.
 
     ```bash
-    etl garden/faostat/YYYY-MM-DD
+    etl run garden/faostat/YYYY-MM-DD
     ```
 
     Optionally, set `INSPECT_ANOMALIES=True`, to visualize if anomalies that were detected in the previous version of the data are still present in the current version.
@@ -266,7 +270,7 @@ If no dataset requires an update, the workflow stops here.
 
     If any changes were found, re-run the garden steps.
     ```bash
-    etl garden/faostat/YYYY-MM-DD
+    etl run garden/faostat/YYYY-MM-DD
     ```
 
 7. Create new grapher steps.
@@ -278,7 +282,7 @@ If no dataset requires an update, the workflow stops here.
 8. Run the new etl grapher steps, to generate the grapher charts.
 
     ```bash
-    etl faostat/YYYY-MM-DD --grapher
+    etl run faostat/YYYY-MM-DD --grapher
     ```
 
 9. Generate chart revisions (showing a chart using an old version of a variable and the same chart using the new
@@ -302,7 +306,7 @@ accept or reject changes.
 12. Run the new etl explorers step, to generate the csv files for the global food explorer.
 
     ```bash
-    etl explorers/faostat/YYYY-MM-DD/food_explorer
+    etl run explorers/faostat/YYYY-MM-DD/food_explorer
     ```
 
     Run internal sanity checks on the generated files.

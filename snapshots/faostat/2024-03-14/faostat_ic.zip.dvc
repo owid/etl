@@ -1,0 +1,19 @@
+meta:
+  origin:
+    producer: Food and Agriculture Organization of the United Nations
+    title: 'Investment: Credit to Agriculture'
+    description: |-
+      The Credit to Agriculture dataset provides national data for over 130 countries on the amount of loans provided by the private/commercial banking sector to producers in agriculture, forestry and fishing, including household producers, cooperatives, and agro-businesses. For some countries, the three subsectors of agriculture, forestry, and fishing are completely specified. In other cases, complete disaggregations are not available. The dataset also provides statistics on the total credit to all industries, indicators on the share of credit to agricultural producers, and an agriculture orientation index (AOI) for credit that normalizes the share of credit to agriculture over total credit by dividing it by the share of agriculture in gross domestic product (GDP). As such, it can provide a more accurate indication of the relative importance that banking sectors place on financing the sector. An AOI lower than 1 indicates that the agriculture sector receives a credit share lower than its contribution to the economy, while an AOI greater than 1 indicates a credit share to the agriculture sector greater than its economic contribution.
+    citation_full: 'Food and Agriculture Organization of the United Nations - Investment: Credit to Agriculture (2023).'
+    attribution_short: FAOSTAT
+    url_main: http://www.fao.org/faostat/en/#data/IC
+    url_download: https://fenixservices.fao.org/faostat/static/bulkdownloads/Investment_CreditAgriculture_E_All_Data_(Normalized).zip
+    date_accessed: '2024-03-14'
+    date_published: '2023-11-16'
+    license:
+      name: CC BY-NC-SA 3.0 IGO
+      url: http://www.fao.org/contact-us/terms/db-terms-of-use/en
+outs:
+  - md5: b2379bf789d2774f8085206615ca6bc4
+    size: 501545
+    path: faostat_ic.zip

@@ -1,0 +1,20 @@
+meta:
+  origin:
+    producer: Food and Agriculture Organization of the United Nations
+    title: 'Climate Change: Agrifood systems emissions: Emissions from Energy use in agriculture'
+    description: |-
+      Greenhouse gas (GHG) emissions from direct on-farm energy use consist of carbon dioxide, methane, and nitrous oxide gases related with fuel combustion and electricity generation in agriculture (including fisheries). The FAOSTAT emissions database has a global scope for the period 1970 to 2021 (with annual updates), by motor gasoline, gas-diesel oils, gasoline, natural gas, liquefied petroleum gas, residual fuel oil, coal, electricity, heat, gas-diesel oils in fisheries, residual fuel oil in fisheries, and by aggregates (total energy, energy consumed in fishery and total energy without electricity  heat). Activity data(Energy use) is also provided.
+    citation_full: |-
+      Food and Agriculture Organization of the United Nations - Climate Change: Agrifood systems emissions: Emissions from Energy use in agriculture (2023).
+    attribution_short: FAOSTAT
+    url_main: http://www.fao.org/faostat/en/#data/GN
+    url_download: https://fenixservices.fao.org/faostat/static/bulkdownloads/Emissions_Agriculture_Energy_E_All_Data_(Normalized).zip
+    date_accessed: '2024-03-14'
+    date_published: '2023-12-07'
+    license:
+      name: CC BY-NC-SA 3.0 IGO
+      url: http://www.fao.org/contact-us/terms/db-terms-of-use/en
+outs:
+  - md5: 6637a49f9c5d4f28a7644d96d7e7469b
+    size: 1597810
+    path: faostat_gn.zip

@@ -323,3 +323,64 @@ steps:
   #
   data://grapher/faostat/2023-06-12/additional_variables:
     - data://garden/faostat/2023-06-12/additional_variables
+  #
+  # FAOSTAT meadow steps for version 2024-03-14
+  #
+  data://meadow/faostat/2024-03-14/faostat_cahd:
+    - snapshot://faostat/2024-03-14/faostat_cahd.zip
+  data://meadow/faostat/2024-03-14/faostat_ef:
+    - snapshot://faostat/2023-02-22/faostat_ef.zip
+  data://meadow/faostat/2024-03-14/faostat_ei:
+    - snapshot://faostat/2024-03-14/faostat_ei.zip
+  data://meadow/faostat/2024-03-14/faostat_ek:
+    - snapshot://faostat/2024-03-14/faostat_ek.zip
+  data://meadow/faostat/2024-03-14/faostat_el:
+    - snapshot://faostat/2023-06-12/faostat_el.zip
+  data://meadow/faostat/2024-03-14/faostat_emn:
+    - snapshot://faostat/2024-03-14/faostat_emn.zip
+  data://meadow/faostat/2024-03-14/faostat_ep:
+    - snapshot://faostat/2023-02-22/faostat_ep.zip
+  data://meadow/faostat/2024-03-14/faostat_esb:
+    - snapshot://faostat/2024-03-14/faostat_esb.zip
+  data://meadow/faostat/2024-03-14/faostat_fa:
+    - snapshot://faostat/2024-03-14/faostat_fa.zip
+  data://meadow/faostat/2024-03-14/faostat_fbs:
+    - snapshot://faostat/2024-03-14/faostat_fbs.zip
+  data://meadow/faostat/2024-03-14/faostat_fbsh:
+    - snapshot://faostat/2024-03-14/faostat_fbsh.zip
+  data://meadow/faostat/2024-03-14/faostat_fo:
+    - snapshot://faostat/2024-03-14/faostat_fo.zip
+  data://meadow/faostat/2024-03-14/faostat_fs:
+    - snapshot://faostat/2024-03-14/faostat_fs.zip
+  data://meadow/faostat/2024-03-14/faostat_gn:
+    - snapshot://faostat/2024-03-14/faostat_gn.zip
+  data://meadow/faostat/2024-03-14/faostat_ic:
+    - snapshot://faostat/2024-03-14/faostat_ic.zip
+  data://meadow/faostat/2024-03-14/faostat_lc:
+    - snapshot://faostat/2024-03-14/faostat_lc.zip
+  data://meadow/faostat/2024-03-14/faostat_metadata:
+    - snapshot://faostat/2024-03-14/faostat_metadata.json
+  data://meadow/faostat/2024-03-14/faostat_qcl:
+    - snapshot://faostat/2024-03-14/faostat_qcl.zip
+  data://meadow/faostat/2024-03-14/faostat_qi:
+    - snapshot://faostat/2024-03-14/faostat_qi.zip
+  data://meadow/faostat/2024-03-14/faostat_qv:
+    - snapshot://faostat/2024-03-14/faostat_qv.zip
+  data://meadow/faostat/2024-03-14/faostat_rfb:
+    - snapshot://faostat/2024-03-14/faostat_rfb.zip
+  data://meadow/faostat/2024-03-14/faostat_rfn:
+    - snapshot://faostat/2024-03-14/faostat_rfn.zip
+  data://meadow/faostat/2024-03-14/faostat_rl:
+    - snapshot://faostat/2024-03-14/faostat_rl.zip
+  data://meadow/faostat/2024-03-14/faostat_rp:
+    - snapshot://faostat/2024-03-14/faostat_rp.zip
+  data://meadow/faostat/2024-03-14/faostat_rt:
+    - snapshot://faostat/2024-03-14/faostat_rt.zip
+  data://meadow/faostat/2024-03-14/faostat_scl:
+    - snapshot://faostat/2024-03-14/faostat_scl.zip
+  data://meadow/faostat/2024-03-14/faostat_sdgb:
+    - snapshot://faostat/2024-03-14/faostat_sdgb.zip
+  data://meadow/faostat/2024-03-14/faostat_tcl:
+    - snapshot://faostat/2024-03-14/faostat_tcl.zip
+  data://meadow/faostat/2024-03-14/faostat_ti:
+    - snapshot://faostat/2024-03-14/faostat_ti.zip

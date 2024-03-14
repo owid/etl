@@ -1,0 +1,20 @@
+meta:
+  origin:
+    producer: Food and Agriculture Organization of the United Nations
+    title: 'Food Security and Nutrition: Suite of Food Security Indicators'
+    description: |-
+      The Suite of Food Security Indicators presents the core set of food security indicators. Following the recommendation of experts gathered in the Committee on World Food Security (CFS) Round Table on hunger measurement, hosted at FAO headquarters in September 2011, an initial set of indicators aiming to capture various aspects of food insecurity is presented here. The choice of the indicators has been informed by expert judgment and the availability of data with sufficient coverage to enable comparisons across regions and over time. Many of these indicators are produced and published elsewhere by FAO and other international organizations. They are reported here in a single database with the aim of building a wide food security information system. More indicators will be added to this set as more data will become available. Indicators are classified along the four dimensions of food security -- availability, access, utilization and stability. For definitions of these indicators, see Definitions and standards below (under Item).
+    citation_full: |-
+      Food and Agriculture Organization of the United Nations - Food Security and Nutrition: Suite of Food Security Indicators (2023).
+    attribution_short: FAOSTAT
+    url_main: http://www.fao.org/faostat/en/#data/FS
+    url_download: https://fenixservices.fao.org/faostat/static/bulkdownloads/Food_Security_Data_E_All_Data_(Normalized).zip
+    date_accessed: '2024-03-14'
+    date_published: '2023-08-14'
+    license:
+      name: CC BY-NC-SA 3.0 IGO
+      url: http://www.fao.org/contact-us/terms/db-terms-of-use/en
+outs:
+  - md5: 517e6695aafbfd3ddf69f3a6dd9a5bcc
+    size: 1881582
+    path: faostat_fs.zip
