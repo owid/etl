@@ -194,7 +194,7 @@ def _add_metric_population(df: Table) -> Tuple[Table, Table]:
     # 80 - 89
     df_p_80_89 = _add_age_group(df_p, 80, 89)
     # 90 - 99
-    df_p_90_99 = _add_age_group(df_p, 90, 99) 
+    df_p_90_99 = _add_age_group(df_p, 90, 99)
     # all
     df_p_all = (
         df_p.groupby(
