@@ -185,9 +185,15 @@ def is_dataset_already_up_to_date(
     """
     dataset_up_to_date = False
     for snapshot in existing_snapshots:
-        assert snapshot.metadata.source
-        snapshot_source_data_url = snapshot.metadata.source.source_data_url
-        snapshot_date_accessed = parser.parse(str(snapshot.metadata.source.date_accessed)).date()
+        assert snapshot.metadata.source or snapshot.metadata.origin
+        if snapshot.metadata.source:
+            snapshot_source_data_url = snapshot.metadata.source.source_data_url
+            snapshot_date_accessed = parser.parse(str(snapshot.metadata.source.date_accessed)).date()
+        elif snapshot.metadata.origin:
+            snapshot_source_data_url = snapshot.metadata.origin.url_download
+            snapshot_date_accessed = parser.parse(str(snapshot.metadata.origin.date_accessed)).date()
+        else:
+            raise ValueError(f"Snapshot {snapshot.metadata.short_name} does not have source or origin.")
         if (snapshot_source_data_url == source_data_url) and (snapshot_date_accessed > source_modification_date):
             dataset_up_to_date = True
 
@@ -275,7 +281,9 @@ class FAOAdditionalMetadata:
 
 def main(read_only: bool = False) -> None:
     # Load list of existing snapshots related to current NAMESPACE.
-    existing_snapshots = list(snapshot_catalog(match=NAMESPACE))
+    existing_snapshots = [
+        snapshot for snapshot in list(snapshot_catalog(match=NAMESPACE)) if "backport/" not in snapshot.uri
+    ]
 
     # Initialise a flag that will become true if any dataset needs to be updated.
     any_dataset_was_updated = False

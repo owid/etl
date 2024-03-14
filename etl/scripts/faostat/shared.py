@@ -56,8 +56,6 @@ INCLUDED_DATASETS_CODES = [
     "fo",
     # Food Security and Nutrition: Suite of Food Security Indicators.
     "fs",
-    # Energy use.
-    "gn",
     # Credit to Agriculture.
     "ic",
     # Land, Inputs and Sustainability: Land Cover.
@@ -89,6 +87,8 @@ INCLUDED_DATASETS_CODES = [
     # Removed from the list (as they have not been used and were causing issues).
     # World Census of Agriculture.
     # "wcad",
+    # Energy use.
+    # "gn",
 ]
 # URL for dataset codes in FAOSTAT catalog.
 # This is the URL used to get the remote location of the actual data files to be downloaded, and the date of their

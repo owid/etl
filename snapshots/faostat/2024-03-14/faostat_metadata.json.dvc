@@ -12,6 +12,6 @@ meta:
       name: CC BY-NC-SA 3.0 IGO
       url: http://www.fao.org/contact-us/terms/db-terms-of-use/en
 outs:
-  - md5: 7529f6174cd449873afc82cd0185be8c
-    size: 11642573
+  - md5: a8ed55bb4ac26e10651fa5517f07227d
+    size: 10861715
     path: faostat_metadata.json

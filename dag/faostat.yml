@@ -352,8 +352,6 @@ steps:
     - snapshot://faostat/2024-03-14/faostat_fo.zip
   data://meadow/faostat/2024-03-14/faostat_fs:
     - snapshot://faostat/2024-03-14/faostat_fs.zip
-  data://meadow/faostat/2024-03-14/faostat_gn:
-    - snapshot://faostat/2024-03-14/faostat_gn.zip
   data://meadow/faostat/2024-03-14/faostat_ic:
     - snapshot://faostat/2024-03-14/faostat_ic.zip
   data://meadow/faostat/2024-03-14/faostat_lc:
