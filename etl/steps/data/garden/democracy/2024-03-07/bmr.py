@@ -1,13 +1,36 @@
 """Load a meadow dataset and create a garden dataset.
 
-This dataset contains X tables. One ('bmr') focusses on country-level data, and the rest on regional aggregates.
+This dataset contains 5 tables. 'bmr' focusses on country-level data, and the rest on regional aggregates.
 
-Tables:
+TABLES
+------
 - 'bmr': Country-level data on democracy. Reports data for countries even if they did not exist. This is basically so that these countries show values on maps.
 - 'num_countries_regime': Number of countries in democracy, by region and World.
 - 'num_countries_regime_years': Number of countries in democracies aged X years old, by region and World.
 - 'population_regime': Number of people in democracy, by region and World.
 - 'population_regime_years': Number of people in democracies aged X years old, by region and World.
+
+GENERAL NOTES
+-------------
+To estimate regional-level countries, some workarounds are implemented. Note that not all workarounds apply to all tables.
+
+    - We "impute" classifications for countries that did not exist based on their historical equivalents. This serves two purposes:
+
+        1. To be able to colour these world regions in grapher map charts. (in table 'bmr')
+        2. To be able to count the number of people living in democracy (or non-democracy). (in table 'population_regime' and 'population_regime_years')
+
+        (applies to tables 'bmr', 'population_regime', 'population_regime_years')
+
+    - We ignore imputed values to avoid counting countries that did not actually exist back then. Note that when estimating the number of democracies, we only want to consider the countries that existed back then.
+
+
+ADDITIONAL FILES
+----------------
+Some additional files are provided to help out in the processing:
+
+    - 'bmr.countries_impute.yml': Specify how to impute countries (i.e. inherit values for country A from country B during certain year period Y1-Y2).
+
+    - 'bmr.countries_overlap.json': Specify which countries overlap with others when counting countries. USSR-ones are allowed since regions dataset is not accurate for them. Other states (german ones) are accepted, based on this dataset's cirterium.
 """
 
 import json
@@ -60,12 +83,13 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
+    # Harmonize country names
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
 
-    # Identify duplicate observations
+    # Identify observations from countries that would overlap with other countries (Russia with USSR in 1991)
     tb = remove_country_overlaps(tb)
 
-    # Keep relevant columns
+    # Keep relevant columns and rename
     tb = tb[["country", "year", "democracy_omitteddata", "democracy_femalesuffrage"]]
     tb = tb.rename(
         columns={
@@ -78,14 +102,13 @@ def run(dest_dir: str) -> None:
     cols_subset = [col for col in tb.columns if col not in ["country", "year"]]
     tb = tb.dropna(subset=cols_subset, how="all")
 
-    # Impute missing values
+    # Impute values for missing countries
+    # That is: Estimate whether a country was a democracy or not, based on its historical equivalents.
     tb = add_imputes(tb)
 
     # Refine
-    ## Set NaNs to womsuff
+    ## Set NaNs to `regime_womsuffr` whenever `regime` is NaN. Discussion on this here: https://github.com/owid/owid-issues/issues/1421#issuecomment-1992057534
     tb.loc[tb["regime"].isna(), "regime_womsuffr"] = pd.NA
-    # assert tb.loc[tb["regime"].isna(), "regime_womsuffr"].isna().all()
-    # assert tb.loc[tb["regime_womsuffr"].isna(), "regime"].isna().all()
 
     ## Add democracy age / experience
     tb = tb.sort_values(["country", "year"])
@@ -93,8 +116,8 @@ def run(dest_dir: str) -> None:
     # Add years in democracy (consecutive and total)
     tb = add_years_in_democracy(tb)
 
-    # Add age groups
-    tb = add_year_counts_groups(tb)
+    # Add categories for "years in democracy"
+    tb = add_categories_years_in_democracy(tb)
 
     # Get number of countries in democracy, by region and World
     tb_num_countries, tb_num_countries_years_consec = make_tables_country_counters(tb, ds_regions)
@@ -197,7 +220,18 @@ def remove_country_overlaps(tb: Table) -> Table:
 
 
 def add_imputes(tb: Table) -> Table:
-    """Add imputed values to the table."""
+    """Add imputed values to the table.
+
+    Imputed values are inferred from historical equivalents.
+
+    Example: Was "Eritrea" a democracy in 1993?
+
+        - We can infer this from "Ethiopia (former)" (historical equivalent). You can see all these mappings in bmr.countries_impute.yml file.
+
+        - This is useful to (i) be able to colour these world regions in grapher map charts, and (ii) to be able to count the number of people living in democracy (in `make_tables_population_counters`).
+
+        - Note that these "imputed country values" are ignored when estimating the number of countries in democracies (function `make_tables_country_counters`), since these countries did not exist at the time!
+    """
     # Drop known values that are not correct
 
     tb_imputed = []
@@ -284,17 +318,34 @@ def add_years_in_democracy(tb: Table) -> Table:
     return tb
 
 
-def add_year_counts_groups(tb: Table) -> Table:
-    """Add age groups to the table."""
-    tb = _add_year_counts_groups(tb, "num_years_in_democracy_consecutive")
-    tb = _add_year_counts_groups(tb, "num_years_in_democracy_ws_consecutive")
+def add_categories_years_in_democracy(tb: Table) -> Table:
+    """Add categories for "years in democracy" indicators.
+
+    We group countries in categories based on how long they've been - consecutively - a democracy (with and without women suffrage).
+
+    Again, we do this for two indicators:
+
+        - num_years_in_democracy_consecutive: Number of consecutive years in democracy.
+        - num_years_in_democracy_ws_consecutive: Number of consecutive years in democracy with women's suffrage.
+    """
+    tb = _add_categories_years_in_democracy(tb, "num_years_in_democracy_consecutive")
+    tb = _add_categories_years_in_democracy(tb, "num_years_in_democracy_ws_consecutive")
 
     return tb
 
 
-def _add_year_counts_groups(tb: Table, column: str) -> Table:
+def _add_categories_years_in_democracy(tb: Table, column: str) -> Table:
+    """Group countries in categories based on how long they've been - consecutively - a democracy.
+
+    Groups are:
+
+        - 1-18 years
+        - 19-30 years
+        - 31-60 years
+        - 61-90 years
+        - 91+ years
+    """
     bins = [
-        # -np.inf,
         0,
         18,
         30,
@@ -312,8 +363,109 @@ def _add_year_counts_groups(tb: Table, column: str) -> Table:
     assert len(bins) == len(labels) + 1, "Length mismatch!"
 
     tb[f"{column}_group"] = pd.cut(tb[column], bins=bins, labels=labels)
-    tb[f"{column}_group"] = Variable(tb[f"{column}_group"]).copy_metadata(tb[column])
+    tb[f"{column}_group"] = Variable(tb[f"{column}_group"]).copy_metadata(tb.loc[:, column])
     return tb
+
+
+def make_tables_country_counters(tb: Table, ds_regions: Dataset) -> Tuple[Table, Table]:
+    """Get tables with number of countries in democracy.
+
+    Creates two tables.
+
+        Table 1: Number of countries in democracy (and non-democracy), by region and World.
+
+        Table 2: Number of countries X-year-old democracies, by region and World.
+
+    Note: Democracy indicator comes in two flavours: with and without including women's suffrage.
+    """
+    tb_ = tb.loc[~tb["regime_imputed"]].copy()
+
+    tb_ = make_table_with_dummies(tb_, ds_regions)
+
+    ### Get aggregates
+    tb_ = geo.add_regions_to_table(
+        tb_,
+        ds_regions,
+        regions=REGIONS,
+        accepted_overlaps=COUNTRIES_OVERLAP,
+    )
+    tb_ = tb_.loc[tb_["country"].isin(REGIONS.keys())]
+
+    # Add world
+    tb_w = tb_.groupby("year", as_index=False).sum().assign(country="World")
+    tb_ = concat([tb_, tb_w], ignore_index=True, short_name="region_counts")
+
+    ## Long format
+    tb_ = from_wide_to_long(tb_)
+
+    # Generate two columns (1: in democracy, 2: age of democracy)
+    tb_num_countries, tb_num_countries_years_consec = split_into_two_tables(
+        tb=tb_,
+        column_renames={
+            "regime": "num_countries_regime",
+            "regime_womsuffr": "num_countries_regime_ws",
+            "num_years_in_democracy_consecutive_group": "num_countries_years_in_democracy_consec",
+            "num_years_in_democracy_ws_consecutive_group": "num_countries_years_in_democracy_ws_consec",
+        },
+        table_1_name="num_countries_regime",
+        table_2_name="num_countries_regime_years",
+    )
+    return tb_num_countries, tb_num_countries_years_consec
+
+
+def make_tables_population_counters(tb: Table, ds_regions: Dataset, ds_population: Dataset) -> Tuple[Table, Table]:
+    """Get tables with number of people in democracy.
+
+    Creates two tables.
+
+        Table 1: People living in democracies (and non-democracies), by region and World.
+
+        Table 2: People living in X-year-old democracies, by region and World. Democracy indicator comes in two flavours: with and without including women's suffrage.
+
+    Note: Democracy indicator comes in two flavours: with and without including women's suffrage.
+    """
+    tb_ = tb.copy()
+
+    # Drop historical countries (don't want to double-count population)
+    tb_ = expand_observations_without_leading_to_duplicates(tb_, ds_regions)
+
+    # DEBUG
+    # tb_.to_csv("temp-working.csv")
+
+    # Get dummy indicators
+    tb_ = make_table_with_dummies(tb_, ds_regions)
+
+    # Add population in dummies (population value replaces 1, 0 otherwise)
+    tb_ = add_population_in_dummies(tb_, ds_population)
+
+    # Get region aggregates
+    tb_ = geo.add_regions_to_table(
+        tb_,
+        ds_regions,
+        regions=REGIONS,
+    )
+    tb_ = tb_.loc[tb_["country"].isin(REGIONS.keys())]
+
+    # Add world
+    tb_w = tb_.groupby("year", as_index=False).sum().assign(country="World")
+    tb_ = concat([tb_, tb_w], ignore_index=True, short_name="region_counts")
+
+    # Long format
+    tb_ = from_wide_to_long(tb_)
+
+    # Generate two columns (1: in democracy, 2: age of democracy)
+    tb_population, tb_population_years_consec = split_into_two_tables(
+        tb=tb_,
+        column_renames={
+            "regime": "population_regime",
+            "regime_womsuffr": "population_regime_ws",
+            "num_years_in_democracy_consecutive_group": "population_years_in_democracy_consec",
+            "num_years_in_democracy_ws_consecutive_group": "population_years_in_democracy_ws_consec",
+        },
+        table_1_name="population_regime",
+        table_2_name="population_regime_years",
+    )
+    return tb_population, tb_population_years_consec
 
 
 def make_table_with_dummies(
@@ -322,6 +474,26 @@ def make_table_with_dummies(
     """Format table to have dummy indicators.
 
     From a table with categorical indicators, create a new table with dummy indicator for each indicator-category pair.
+
+    Example input:
+
+    | year | country |  regime   | regime_womsuffr |
+    |------|---------|-----------|-----------------|
+    | 2000 |   USA   |     1     |        0        |
+    | 2000 |   CAN   |     0     |        1        |
+    | 2000 |   DEU   |    NaN    |        NaN      |
+
+
+    Example output:
+
+    | year | country | regime_0 | regime_1 | regime_-1 | regime_womsuffr_0 | regime_womsuffr_1 | regime_womsuffr_-1 |
+    |------|---------|----------|----------|-----------|-------------------|-------------------|--------------------|
+    | 2000 |   USA   |    0     |    1     |     0     |        1          |        0          |         0          |
+    | 2000 |   CAN   |    1     |    0     |     0     |        0          |        1          |         0          |
+    | 2000 |   DEU   |    0     |    0     |     1     |        0          |        0          |         1          |
+
+    Note that '-1' denotes NaN category.
+
     """
     tb_ = tb.copy()
 
@@ -426,123 +598,6 @@ def from_wide_to_long(tb: Table) -> Table:
     return tb
 
 
-def make_tables_country_counters(tb: Table, ds_regions: Dataset) -> Tuple[Table, Table]:
-    """Get tables with number of countries in democracy."""
-    tb_ = tb.loc[~tb["regime_imputed"]].copy()
-
-    tb_ = make_table_with_dummies(tb_, ds_regions)
-
-    ### Get aggregates
-    tb_ = geo.add_regions_to_table(
-        tb_,
-        ds_regions,
-        regions=REGIONS,
-        accepted_overlaps=COUNTRIES_OVERLAP,
-    )
-    tb_ = tb_.loc[tb_["country"].isin(REGIONS.keys())]
-
-    # Add world
-    tb_w = tb_.groupby("year", as_index=False).sum().assign(country="World")
-    tb_ = concat([tb_, tb_w], ignore_index=True, short_name="region_counts")
-
-    ## Long format
-    tb_ = from_wide_to_long(tb_)
-
-    # Generate two columns (1: in democracy, 2: age of democracy)
-    tb_num_countries, tb_num_countries_years_consec = split_into_two_tables(
-        tb=tb_,
-        column_renames={
-            "regime": "num_countries_regime",
-            "regime_womsuffr": "num_countries_regime_ws",
-            "num_years_in_democracy_consecutive_group": "num_countries_years_in_democracy_consec",
-            "num_years_in_democracy_ws_consecutive_group": "num_countries_years_in_democracy_ws_consec",
-        },
-        table_1_name="num_countries_regime",
-        table_2_name="num_countries_regime_years",
-    )
-    return tb_num_countries, tb_num_countries_years_consec
-
-
-def make_tables_population_counters(tb: Table, ds_regions: Dataset, ds_population: Dataset) -> Tuple[Table, Table]:
-    """Get tables with number of people in democracy."""
-    tb_ = tb.copy()
-
-    # Drop historical countries (don't want to double-count population)
-    tb_ = expand_observations_without_leading_to_duplicates(tb_, ds_regions)
-
-    # DEBUG
-    # tb_.to_csv("temp-working.csv")
-
-    # Get dummy indicators
-    tb_ = make_table_with_dummies(tb_, ds_regions)
-
-    # Add population column
-    tb_ = geo.add_population_to_table(
-        tb_,
-        ds_population,
-        interpolate_missing_population=True,
-        expected_countries_without_population=[
-            "Pakistan (former)",
-            "Korea (former)",
-            "Duchy of Parma and Piacenza",
-            "Orange Free State",
-            "Federal Republic of Central America",
-            "Grand Duchy of Tuscany",
-            "Democratic Republic of Vietnam",
-            "Kingdom of Saxony",
-            "Duchy of Modena and Reggio",
-            "Kingdom of the Two Sicilies",
-            "Kingdom of Sardinia",
-            "Great Colombia",
-            "Grand Duchy of Baden",
-            "Kingdom of Wurttemberg",
-            "Republic of Vietnam",
-            "Kingdom of Bavaria",
-        ],
-    )
-    tb_ = cast(Table, tb_.dropna(subset="population"))
-    ## Save metadata
-    cols = [col for col in tb_.columns if col not in ["year", "country", "population"]]
-    meta = {col: tb_[col].metadata for col in cols} | {"population": tb_["population"].metadata}
-    ## Encode population in indicators: Population if 1, 0 otherwise
-    tb_[cols] = tb_[cols].multiply(tb_["population"], axis=0)
-    tb_ = tb_.drop(columns="population")
-    ## Add metadata back (combine origins from population)
-    for col in cols:
-        metadata = meta[col]
-        metadata.origins += meta["population"].origins
-        tb_[col].metadata = meta[col]
-
-    # Get region aggregates
-    tb_ = geo.add_regions_to_table(
-        tb_,
-        ds_regions,
-        regions=REGIONS,
-    )
-    tb_ = tb_.loc[tb_["country"].isin(REGIONS.keys())]
-
-    # Add world
-    tb_w = tb_.groupby("year", as_index=False).sum().assign(country="World")
-    tb_ = concat([tb_, tb_w], ignore_index=True, short_name="region_counts")
-
-    # Long format
-    tb_ = from_wide_to_long(tb_)
-
-    # Generate two columns (1: in democracy, 2: age of democracy)
-    tb_population, tb_population_years_consec = split_into_two_tables(
-        tb=tb_,
-        column_renames={
-            "regime": "population_regime",
-            "regime_womsuffr": "population_regime_ws",
-            "num_years_in_democracy_consecutive_group": "population_years_in_democracy_consec",
-            "num_years_in_democracy_ws_consecutive_group": "population_years_in_democracy_ws_consec",
-        },
-        table_1_name="population_regime",
-        table_2_name="population_regime_years",
-    )
-    return tb_population, tb_population_years_consec
-
-
 def expand_observations_without_leading_to_duplicates(tb: Table, ds_regions: Dataset) -> Table:
     """Expand observations (accounting for overlaps between former and current countries).
 
@@ -592,6 +647,47 @@ def expand_observations(tb: Table) -> Table:
 
     # Type of `year`
     tb["year"] = tb["year"].astype("int")
+    return tb
+
+
+def add_population_in_dummies(tb: Table, ds_population: Dataset):
+    # Add population column
+    tb = geo.add_population_to_table(
+        tb,
+        ds_population,
+        interpolate_missing_population=True,
+        expected_countries_without_population=[
+            "Pakistan (former)",
+            "Korea (former)",
+            "Duchy of Parma and Piacenza",
+            "Orange Free State",
+            "Federal Republic of Central America",
+            "Grand Duchy of Tuscany",
+            "Democratic Republic of Vietnam",
+            "Kingdom of Saxony",
+            "Duchy of Modena and Reggio",
+            "Kingdom of the Two Sicilies",
+            "Kingdom of Sardinia",
+            "Great Colombia",
+            "Grand Duchy of Baden",
+            "Kingdom of Wurttemberg",
+            "Republic of Vietnam",
+            "Kingdom of Bavaria",
+        ],
+    )
+    tb = cast(Table, tb.dropna(subset="population"))
+    # Add metadata (origins combined indicator+population)
+    cols = [col for col in tb.columns if col not in ["year", "country", "population"]]
+    meta = {col: tb[col].metadata for col in cols} | {"population": tb["population"].metadata}
+    ## Encode population in indicators: Population if 1, 0 otherwise
+    tb[cols] = tb[cols].multiply(tb["population"], axis=0)
+    tb = tb.drop(columns="population")
+    ## Add metadata back (combine origins from population)
+    for col in cols:
+        metadata = meta[col]
+        metadata.origins += meta["population"].origins
+        tb[col].metadata = meta[col]
+
     return tb
 
 

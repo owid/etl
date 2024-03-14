@@ -1,3 +1,15 @@
+# List specifying how to impute specific country.
+#
+# As an example:
+#
+# - country: Panama
+#   country_impute: Colombia
+#   year_min: 1832
+#   year_max: 1902
+#
+# This means that we want to inherit the classifications for Panama from Colombia between 1832 and 1902.
+#
+# We note that `country` can also be a list of countries.
 
 # Federal Republic of Central America
 - country:
