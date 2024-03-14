@@ -40,7 +40,6 @@ important issues (since we use item_code to merge different datasets, and we use
 import json
 import sys
 from copy import deepcopy
-from pathlib import Path
 from typing import Dict, List, Tuple, cast
 
 import pandas as pd
@@ -516,8 +515,16 @@ def clean_global_elements_dataframe(elements_df: pd.DataFrame, custom_elements: 
     elements_df = elements_df.copy()
 
     # Check that all elements of fbsh are in fbs (although fbs may contain additional elements).
-    assert set(elements_df[elements_df["dataset"] == "faostat_fbsh"]["element_code"]) <= set(
-        elements_df[elements_df["dataset"] == "faostat_fbs"]["element_code"]
+    # The only exception is "Stock Variation", which have slightly different definitions:
+    # On fbs "Stock Variation" (005072), "Net decreases (from stock) are generally indicated by the sign "-". No sign denotes net increases (add to stock)".
+    # On fbsh "Stock Variation" (005074), "Net increases in stocks (add to stock) are generally indicated by the sign "-". No sign denotes net decreases (from stock).".
+    # Given that they have different definitions, we should not map one to the other.
+    # So, for now, simply ignore it.
+    ELEMENTS_IN_FBSH_MISSING_IN_FBS = {"005074"}
+    assert (
+        set(elements_df[elements_df["dataset"] == "faostat_fbsh"]["element_code"])
+        - set(elements_df[elements_df["dataset"] == "faostat_fbs"]["element_code"])
+        == ELEMENTS_IN_FBSH_MISSING_IN_FBS
     )
     # Drop all rows for fbsh, and rename "fbs" to "fbsc" (since this will be the name for the combined dataset).
     elements_df = elements_df[elements_df["dataset"] != "faostat_fbsh"].reset_index(drop=True)
@@ -559,18 +566,25 @@ def clean_global_elements_dataframe(elements_df: pd.DataFrame, custom_elements: 
         }
     )
 
-    error = "Element names have changed with respect to custom elements file. Update custom elements file."
-    assert (
-        elements_df[elements_df["fao_element_check"].notnull()]["fao_element_check"]
-        == elements_df[elements_df["fao_element_check"].notnull()]["fao_element"]
-    ).all(), error
+    # Check if element or unit names have changed with respect to the custom elements and units file.
+    # NOTE: This raises an error instead of a warning because further steps will (certainly?) fail.
+    changed_elements = elements_df[
+        elements_df["fao_element_check"].notnull() & (elements_df["fao_element_check"] != elements_df["fao_element"])
+    ][["fao_element_check", "fao_element"]]
+    if len(changed_elements) > 0:
+        log.error(
+            f"{len(changed_elements)} element names have changed with respect to custom elements file. Use `update_custom_metadata.py` to update custom elements file."
+        )
     elements_df = elements_df.drop(columns=["fao_element_check"])
 
-    error = "Unit names have changed with respect to custom elements file. Update custom elements file."
-    assert (
-        elements_df[elements_df["fao_unit_short_name_check"].notnull()]["fao_unit_short_name_check"]
-        == elements_df[elements_df["fao_unit_short_name_check"].notnull()]["fao_unit_short_name"]
-    ).all(), error
+    changed_units = elements_df[
+        elements_df["fao_unit_short_name_check"].notnull()
+        & (elements_df["fao_unit_short_name_check"] != elements_df["fao_unit_short_name"])
+    ][["fao_unit_short_name_check", "fao_unit_short_name"]]
+    if len(changed_units) > 0:
+        log.error(
+            f"{len(changed_units)} unit names have changed with respect to custom elements file. Use `update_custom_metadata.py` to update custom elements file."
+        )
     elements_df = elements_df.drop(columns=["fao_unit_short_name_check"])
 
     # Assign original FAO names where there is no custom one.
@@ -895,7 +909,6 @@ def process_metadata(
 
     # Gather all variables from the latest version of each meadow dataset.
     for dataset_short_name in tqdm(dataset_short_names, file=sys.stdout):
-        print(dataset_short_name)
         # Load latest meadow table for current dataset.
         ds_latest = paths.load_dataset(dataset_short_name)
         table = ds_latest[dataset_short_name]
@@ -1000,7 +1013,7 @@ def run(dest_dir: str) -> None:
     # Load data.
     #
     # Fetch the dataset short name from dest_dir.
-    dataset_short_name = Path(dest_dir).name
+    dataset_short_name = f"{NAMESPACE}_metadata"
 
     # Define path to current step file.
     current_step_file = (CURRENT_DIR / dataset_short_name).with_suffix(".py")
