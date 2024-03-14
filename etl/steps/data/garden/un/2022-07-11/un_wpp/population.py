@@ -151,7 +151,6 @@ def _add_metric_population(df: Table) -> Tuple[Table, Table]:
     # Basic age groups
     age_map = {
         **{str(i): f"{i - i%5}-{i + 4 - i%5}" for i in range(0, 100)},
-        **{str(i): f"{i - i%10}-{i + 9 - i%10}" for i in range(20, 100)},
         **{"100+": "100+"},
     }
     df_p_granular = df_p.assign(age=df_p.age.map(age_map).astype("category"))
@@ -180,6 +179,22 @@ def _add_metric_population(df: Table) -> Tuple[Table, Table]:
     df_p_15_plus = _add_age_group(df_p, 15, 200, "15+")
     # 18+
     df_p_18_plus = _add_age_group(df_p, 18, 200, "18+")
+    # 20 - 29
+    df_p_20_29 = _add_age_group(df_p, 20, 29)
+    # 30 - 39
+    df_p_30_39 = _add_age_group(df_p, 30, 39)
+    # 40 - 49
+    df_p_40_49 = _add_age_group(df_p, 40, 49)
+    # 50 - 59
+    df_p_50_59 = _add_age_group(df_p, 50, 59)
+    # 60 - 69
+    df_p_60_69 = _add_age_group(df_p, 60, 69)
+    # 70 - 79
+    df_p_70_79 = _add_age_group(df_p, 70, 79)
+    # 80 - 89
+    df_p_80_89 = _add_age_group(df_p, 80, 89)
+    # 90 - 99
+    df_p_90_99 = _add_age_group(df_p, 90, 99) 
     # all
     df_p_all = (
         df_p.groupby(
@@ -203,6 +218,14 @@ def _add_metric_population(df: Table) -> Tuple[Table, Table]:
             df_p_15_64,
             df_p_15_plus,
             df_p_18_plus,
+            df_p_20_29,
+            df_p_30_39,
+            df_p_40_49,
+            df_p_50_59,
+            df_p_60_69,
+            df_p_70_79,
+            df_p_80_89,
+            df_p_90_99,
             df_p_all,
         ],
         ignore_index=True,
