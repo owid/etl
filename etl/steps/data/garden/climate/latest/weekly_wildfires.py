@@ -1,5 +1,6 @@
 """Load a meadow dataset and create a garden dataset."""
 
+import numpy as np
 import owid.catalog.processing as pr
 import pandas as pd
 
@@ -87,6 +88,13 @@ def run(dest_dir: str) -> None:
 
     # Area per wildfire
     tb["area_ha_per_wildfire"] = tb["area_ha"] / tb["events"]
+    tb["co2_ha_per_area"] = tb["CO2"] / tb["area_ha"]
+    tb["pm2_5_ha_per_area"] = tb["PM2.5"] / tb["area_ha"]
+
+    tb[["co2_ha_per_area", "pm2_5_ha_per_area"]] = tb[["co2_ha_per_area", "pm2_5_ha_per_area"]].replace(
+        [float("inf"), -float("inf")], np.nan
+    )
+
     tb = tb.drop(columns=["total_area_ha"])
     tb = tb.set_index(["country", "date"], verify_integrity=True)
 

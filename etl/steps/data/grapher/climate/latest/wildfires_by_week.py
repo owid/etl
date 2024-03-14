@@ -1,6 +1,5 @@
 """Load a garden dataset and create a grapher dataset."""
 
-
 import owid.catalog.processing as pr
 import pandas as pd
 
@@ -96,7 +95,7 @@ def process_data(tb, column_name, title):
 
     # Set metadata for each column
     for column in tb_pivot.columns:
-        tb_pivot[column].metadata.title = title + " in " + str(column[:4])
+        tb_pivot[column].metadata.title = title + str(column[:4])
         tb_pivot[column].metadata.presentation.title_public = str(column[:4])
         tb_pivot[column].metadata.display = {}
         tb_pivot[column].metadata.display["name"] = str(column[:4])
