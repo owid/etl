@@ -60,9 +60,7 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
-    tb = geo.harmonize_countries(
-        df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
-    )
+    tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
 
     # Identify duplicate observations
     tb = remove_country_overlaps(tb)
