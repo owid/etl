@@ -97,6 +97,11 @@ category_structure = {
         "index": ["Source Code"],
         "short_name": "sources",
     },
+    # Specific for faostat_sdgb.
+    "itemsSDG": {
+        "index": ["Item Code"],
+        "short_name": "item",
+    },
 }
 
 
