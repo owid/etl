@@ -33,7 +33,7 @@ LICENSE_NAME = "CC BY-NC-SA 3.0 IGO"
 # So we will convert it into a string of this number of characters (integers will be prepended with zeros).
 N_CHARACTERS_ITEM_CODE = 8
 # Idem for faostat_sdgb and faostat_fs (that have different, longer item codes with digits and letters).
-N_CHARACTERS_ITEM_CODE_EXTENDED = 14
+N_CHARACTERS_ITEM_CODE_EXTENDED = 15
 # Maximum number of characters for element_code (integers will be prepended with zeros).
 N_CHARACTERS_ELEMENT_CODE = 6
 # Codes of FAOSTAT domains to download from FAO and upload to walden bucket.

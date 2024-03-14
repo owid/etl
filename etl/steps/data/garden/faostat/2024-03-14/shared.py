@@ -46,7 +46,7 @@ FAOSTAT_METADATA_SHORT_NAME = f"{NAMESPACE}_metadata"
 N_CHARACTERS_ITEM_CODE = 8
 # Maximum number of characters for item_code for faostat_sdgb and faostat_fs, which have a different kind of item codes,
 # e.g. '24002-F-Y_GE15', '24002-M-Y_GE15', etc.
-N_CHARACTERS_ITEM_CODE_EXTENDED = 14
+N_CHARACTERS_ITEM_CODE_EXTENDED = 15
 # Maximum number of characters for element_code (integers will be prepended with zeros).
 N_CHARACTERS_ELEMENT_CODE = 6
 # Manual fixes to item codes to avoid ambiguities.
@@ -272,6 +272,7 @@ FLAGS_RANKING = (
             ("B", "Time series break"),
             ("N", "Not significant (negligible)"),
             ("U", "Low reliability"),
+            ("G", "Experimental value"),
             ("L", "Missing value; data exist"),
             ("O", "Missing value"),
             ("M", "Missing value (data cannot exist, not applicable)"),
