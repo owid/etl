@@ -6,6 +6,7 @@ This dataset contains X tables. One ('bmr') focusses on country-level data, and 
 
 """
 
+import json
 from typing import Any, Dict, List, Set, Tuple, Union, cast
 
 import numpy as np
@@ -25,7 +26,9 @@ paths = PathFinder(__file__)
 path = paths.directory / "bmr.countries_impute.yml"
 COUNTRIES_IMPUTE = yaml.safe_load(path.read_text())
 
-# IGNORE THESE COUNTRIES WHEN ESTIMATING POPULATION
+# Overlapping countries as expected when counting countries
+COUNTRIES_OVERLAP = json.loads((paths.directory / "bmr.countries_overlap.json").read_text())
+COUNTRIES_OVERLAP = [{int(k): set(v) for k, v in overlaps.items()} for overlaps in COUNTRIES_OVERLAP]
 
 # REGION AGGREGATES
 REGIONS = {
@@ -141,14 +144,69 @@ def remove_country_overlaps(tb: Table) -> Table:
     There are some years for which we have data for both the former and the current country. We should only have one, to avoid double counting.
     """
     ## "Germany" in 1945 and 1990 (those years we have West and East Germany)
-    ## "Yugoslavia" in 1991 (the country was dissolved) and "Yugoslavia/Serbia" in 2006 (the country was dissolved)
-    ## "Bangladesh" in 1971 (we have data for "Pakistan (former)")
     tb = tb.loc[~((tb["ccode"] == 255) & (tb["year"] == 1945))]
     tb = tb.loc[~((tb["ccode"] == 255) & (tb["year"] == 1990))]
+    ## "Yugoslavia" in 1991 (the country was dissolved) and "Yugoslavia/Serbia" in 2006 (the country was dissolved)
     tb = tb.loc[~((tb["ccode"] == 345) & (tb["year"] == 1991))]
     tb = tb.loc[~((tb["ccode"] == 347) & (tb["year"] == 2006))]
+    ## "Bangladesh" in 1971 (we have data for "Pakistan (former)")
     tb = tb.loc[~((tb["ccode"] == 771) & (tb["year"] == 1971))]
 
+    # Given (a, b, c, d), remove country with ccode `a` in year `c`
+    # If `d` is True, only remove if indicators for `a` and `b` are the same for year `c
+    drops = [
+        # Great Colombia
+        ## "Ecuador" in 1830
+        (130, 99, 1830, True),
+        ## "Venezuela" in 1830
+        (101, 99, 1830, True),
+        # Central American Union
+        ## "Nicaragua" in 1838
+        (93, 89, 1838, True),
+        ## "Costa Rica" in 1838
+        (94, 89, 1838, True),
+        # USSR
+        ## "Armenia" in 1991
+        (371, 364, 1991, True),
+        ## "Georgia" in 1991
+        (372, 364, 1991, True),
+        ## "Azerbaijan" in 1991
+        (373, 364, 1991, True),
+        ## "Moldova" in 1991
+        (359, 364, 1991, False),
+        ## "Ukraine" in 1991
+        (369, 364, 1991, False),
+        ## "Belarus" in 1991
+        (370, 364, 1991, False),
+        ## "Kazakhstan" in 1991
+        (705, 364, 1991, True),
+        ## "Uzbekistan" in 1991
+        (704, 364, 1991, True),
+        ## "Kyrgyzstan" in 1991
+        (703, 364, 1991, True),
+        ## "Tajikistan" in 1991
+        (702, 364, 1991, True),
+        ## "Turkmenistan" in 1991
+        (701, 364, 1991, True),
+        ## Lithuania in 1991
+        (368, 364, 1991, True),
+        ## Latvia in 1991
+        (367, 364, 1991, True),
+        ## Estonia in 1991
+        (366, 364, 1991, False),
+    ]
+    cols_indicators = ["democracy_omitteddata", "democracy_femalesuffrage"]
+    for drop in drops:
+        if drop[3]:
+            assert (
+                tb.loc[(tb["ccode"] == drop[0]) & (tb["year"] == drop[2]), cols_indicators]
+                .reset_index(drop=True)
+                .equals(
+                    tb.loc[(tb["ccode"] == drop[1]) & (tb["year"] == drop[2]), cols_indicators].reset_index(drop=True)
+                )
+            ), f"Something off with {drop[0]} and {drop[1]} in {drop[2]}"
+        # Remove country
+        tb = tb.loc[~((tb["ccode"] == drop[0]) & (tb["year"] == drop[2]))]
     return tb
 
 
@@ -393,6 +451,7 @@ def make_tables_country_counters(tb: Table, ds_regions: Dataset) -> Tuple[Table,
         tb_,
         ds_regions,
         regions=REGIONS,
+        accepted_overlaps=COUNTRIES_OVERLAP,
     )
     tb_ = tb_.loc[tb_["country"].isin(REGIONS.keys())]
 
@@ -422,19 +481,11 @@ def make_tables_population_counters(tb: Table, ds_regions: Dataset, ds_populatio
     """Get tables with number of people in democracy."""
     tb_ = tb.copy()
 
-    # Add missing observations
-    tb_ = expand_observations(tb_)
-
-    # Get list of country names to ignore
-    countries_ignore = _get_countries_to_ignore_population(ds_regions)
-
     # Drop historical countries (don't want to double-count population)
-    tb_ = tb_.loc[~tb_["country"].isin(countries_ignore)]
+    tb_ = expand_observations_without_leading_to_duplicates(tb_, ds_regions)
 
-    # Extend observations to have all country-years
-    # TODO:
-    # - why 'Czechoslovakia' is not filtered?
-    # - why are there countries w WS=1 when no-WS is NA? They are in different groups!
+    # DEBUG
+    tb_.to_csv("/home/lucas/repos/etl/temp-working.csv")
 
     # Get dummy indicators
     tb_ = make_table_with_dummies(tb_, ds_regions)
@@ -462,25 +513,21 @@ def make_tables_population_counters(tb: Table, ds_regions: Dataset, ds_populatio
             "Republic of Vietnam",
             "Kingdom of Bavaria",
         ],
-        # merge_how="outer",
     )
     tb_ = cast(Table, tb_.dropna(subset="population"))
-
-    # Save metadata
+    ## Save metadata
     cols = [col for col in tb_.columns if col not in ["year", "country", "population"]]
     meta = {col: tb_[col].metadata for col in cols} | {"population": tb_["population"].metadata}
-
-    # Encode population in indicators: Population if 1, 0 otherwise
+    ## Encode population in indicators: Population if 1, 0 otherwise
     tb_[cols] = tb_[cols].multiply(tb_["population"], axis=0)
     tb_ = tb_.drop(columns="population")
-
-    # Add metadata back (combine origins from population)
+    ## Add metadata back (combine origins from population)
     for col in cols:
         metadata = meta[col]
         metadata.origins += meta["population"].origins
         tb_[col].metadata = meta[col]
 
-    ### Get aggregates
+    # Get region aggregates
     tb_ = geo.add_regions_to_table(
         tb_,
         ds_regions,
@@ -492,7 +539,7 @@ def make_tables_population_counters(tb: Table, ds_regions: Dataset, ds_populatio
     tb_w = tb_.groupby("year", as_index=False).sum().assign(country="World")
     tb_ = concat([tb_, tb_w], ignore_index=True, short_name="region_counts")
 
-    ## Long format
+    # Long format
     tb_ = from_wide_to_long(tb_)
 
     # Generate two columns (1: in democracy, 2: age of democracy)
@@ -508,6 +555,37 @@ def make_tables_population_counters(tb: Table, ds_regions: Dataset, ds_populatio
         table_2_name="population_regime_years",
     )
     return tb_population, tb_population_years_consec
+
+
+def expand_observations_without_leading_to_duplicates(tb: Table, ds_regions: Dataset) -> Table:
+    """Expand observations (accounting for overlaps between former and current countries).
+
+    If the data has data for "USSR" and "Russia" for the same year, we should drop the "USSR" row.
+    """
+    # Extend observations to have all country-years
+    tb = expand_observations(tb)
+
+    # Drop former and current countries for some periods of years
+    ## We've kept countries that were two sides of a current country (need to keep them since each side could have different regime)
+    ## West and East Germany, North and South Yemen
+    tb = tb.loc[
+        ~(
+            ((tb["country"] == "Yemen Arab Republic") & ((tb["year"] > 1989) | (tb["year"] < 1918)))
+            | ((tb["country"] == "Yemen People's Republic") & ((tb["year"] > 1989) | (tb["year"] < 1967)))
+            | ((tb["country"] == "Yemen") & (tb["year"] >= 1918) & (tb["year"] <= 1989))
+            | ((tb["country"] == "West Germany") & ((tb["year"] > 1990) | (tb["year"] < 1945)))
+            | ((tb["country"] == "East Germany") & ((tb["year"] > 1990) | (tb["year"] < 1945)))
+            | ((tb["country"] == "Germany") & (tb["year"] >= 1945) & (tb["year"] <= 1990))
+        )
+    ]
+
+    # Get list of country names to ignore (always)
+    countries_ignore = _get_countries_to_ignore_population(ds_regions)
+
+    # Drop historical countries (don't want to double-count population)
+    tb = tb.loc[~tb["country"].isin(countries_ignore)]
+
+    return tb
 
 
 def expand_observations(tb: Table) -> Table:

@@ -1,15 +1,11 @@
 
 # Federal Republic of Central America
 - country:
-    - Nicaragua
-    - Costa Rica
-  country_impute: Federal Republic of Central America
-  year_min: 1824
-  year_max: 1837
-- country:
     - Guatemala
     - Honduras
     - El Salvador
+    - Nicaragua
+    - Costa Rica
   country_impute: Federal Republic of Central America
   year_min: 1824
   year_max: 1838
@@ -32,10 +28,6 @@
 - country:
     - Venezuela
     - Ecuador
-  country_impute: Great Colombia
-  year_min: 1821
-  year_max: 1829
-- country:
     - Panama
     - Colombia
   country_impute: Great Colombia
@@ -89,18 +81,18 @@
     - Kyrgyzstan
   country_impute: USSR
   year_min: 1922
-  year_max: 1990
+  year_max: 1991
 - country:
     - Lithuania
     - Latvia
     - Estonia
   country_impute: USSR
   year_min: 1941
-  year_max: 1990
+  year_max: 1991
 - country: Moldova
   country_impute: USSR
   year_min: 1940
-  year_max: 1990
+  year_max: 1991
 
 # Russian Empire
 - country:
