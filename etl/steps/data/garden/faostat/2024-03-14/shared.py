@@ -44,9 +44,9 @@ FAOSTAT_METADATA_SHORT_NAME = f"{NAMESPACE}_metadata"
 # FAOSTAT "item_code" is usually an integer number, however sometimes it has decimals and sometimes it contains letters.
 # So we will convert it into a string of this number of characters (integers will be prepended with zeros).
 N_CHARACTERS_ITEM_CODE = 8
-# Maximum number of characters for item_code for faostat_sdgb, which has a different kind of item codes,
+# Maximum number of characters for item_code for faostat_sdgb and faostat_fs, which have a different kind of item codes,
 # e.g. '24002-F-Y_GE15', '24002-M-Y_GE15', etc.
-N_CHARACTERS_ITEM_CODE_SDGB = 14
+N_CHARACTERS_ITEM_CODE_EXTENDED = 14
 # Maximum number of characters for element_code (integers will be prepended with zeros).
 N_CHARACTERS_ELEMENT_CODE = 6
 # Manual fixes to item codes to avoid ambiguities.
@@ -395,7 +395,7 @@ def harmonize_items(df: pd.DataFrame, dataset_short_name: str, item_col: str = "
 
     # Set the maximum number of characters for item_code.
     if dataset_short_name == f"{NAMESPACE}_sdgb":
-        n_characters_item_code = N_CHARACTERS_ITEM_CODE_SDGB
+        n_characters_item_code = N_CHARACTERS_ITEM_CODE_EXTENDED
     else:
         n_characters_item_code = N_CHARACTERS_ITEM_CODE
 

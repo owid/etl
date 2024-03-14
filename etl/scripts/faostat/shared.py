@@ -27,6 +27,15 @@ ATTRIBUTION_SHORT = "FAOSTAT"
 # Metadata related to license.
 LICENSE_URL = "http://www.fao.org/contact-us/terms/db-terms-of-use/en"
 LICENSE_NAME = "CC BY-NC-SA 3.0 IGO"
+# Maximum number of characters for item_code.
+# WARNING: These definitions should coincide with those given in the shared module of the garden step.
+# FAOSTAT "item_code" is usually an integer number, however sometimes it has decimals and sometimes it contains letters.
+# So we will convert it into a string of this number of characters (integers will be prepended with zeros).
+N_CHARACTERS_ITEM_CODE = 8
+# Idem for faostat_sdgb and faostat_fs (that have different, longer item codes with digits and letters).
+N_CHARACTERS_ITEM_CODE_EXTENDED = 14
+# Maximum number of characters for element_code (integers will be prepended with zeros).
+N_CHARACTERS_ELEMENT_CODE = 6
 # Codes of FAOSTAT domains to download from FAO and upload to walden bucket.
 # This is the list that will determine the datasets (faostat_*) to be created in all further etl data steps.
 INCLUDED_DATASETS_CODES = [

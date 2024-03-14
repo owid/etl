@@ -21,8 +21,14 @@ from structlog import get_logger
 from etl import db
 from etl.chart_revision.v1.revision import create_and_submit_charts_revisions
 from etl.paths import DATA_DIR
-from etl.scripts.faostat.shared import NAMESPACE
+from etl.scripts.faostat.shared import (
+    N_CHARACTERS_ELEMENT_CODE,
+    N_CHARACTERS_ITEM_CODE,
+    N_CHARACTERS_ITEM_CODE_EXTENDED,
+    NAMESPACE,
+)
 
+# Initialize logger.
 log = get_logger()
 
 # Channel from which the dataset versions and variables will be loaded.
@@ -31,14 +37,6 @@ CHANNEL = "grapher"
 # Columns to not take as variables.
 COLUMNS_TO_IGNORE = ["country", "year", "index"]
 
-# WARNING: These definitions should coincide with those given in the shared module of the garden step.
-# So we will convert it into a string of this number of characters (integers will be prepended with zeros).
-N_CHARACTERS_ITEM_CODE = 8
-# Idem for faostat_sdgb (that has different item codes).
-N_CHARACTERS_ITEM_CODE_SDGB = 14
-# Maximum number of characters for element_code (integers will be prepended with zeros).
-N_CHARACTERS_ELEMENT_CODE = 6
-
 # This regex should extract item codes and element codes, which are made of numbers, sometimes "pc"
 # (for per capita variables), and "M" and "F" (for male and female, only for certain domains, like fs and sdgb).
 REGEX_TO_EXTRACT_ITEM_AND_ELEMENT = (
@@ -46,7 +44,7 @@ REGEX_TO_EXTRACT_ITEM_AND_ELEMENT = (
 )
 # Idem for faostat_sdgb.
 REGEX_TO_EXTRACT_ITEM_AND_ELEMENT_SDGB = (
-    rf".*([0-9A-Z]{{{N_CHARACTERS_ITEM_CODE_SDGB}}}).*([0-9pcMF]{{{N_CHARACTERS_ELEMENT_CODE}}})"
+    rf".*([0-9A-Z]{{{N_CHARACTERS_ITEM_CODE_EXTENDED}}}).*([0-9pcMF]{{{N_CHARACTERS_ELEMENT_CODE}}})"
 )
 
 

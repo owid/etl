@@ -52,7 +52,7 @@ from shared import (
     FLAGS_RANKING,
     N_CHARACTERS_ELEMENT_CODE,
     N_CHARACTERS_ITEM_CODE,
-    N_CHARACTERS_ITEM_CODE_SDGB,
+    N_CHARACTERS_ITEM_CODE_EXTENDED,
     NAMESPACE,
     harmonize_elements,
     harmonize_items,
@@ -194,8 +194,8 @@ def check_that_item_and_element_harmonization_does_not_trim_codes(
     # respectively.
 
     # Set the maximum number of characters for item_code.
-    if dataset_short_name == f"{NAMESPACE}_sdgb":
-        n_characters_item_code = N_CHARACTERS_ITEM_CODE_SDGB
+    if dataset_short_name in [f"{NAMESPACE}_sdgb", f"{NAMESPACE}_fs"]:
+        n_characters_item_code = N_CHARACTERS_ITEM_CODE_EXTENDED
     else:
         n_characters_item_code = N_CHARACTERS_ITEM_CODE
 
@@ -897,7 +897,7 @@ def process_metadata(
     for dataset_short_name in tqdm(dataset_short_names, file=sys.stdout):
         print(dataset_short_name)
         # Load latest meadow table for current dataset.
-        ds_latest: catalog.Dataset = paths.load_dependency(dataset_short_name)
+        ds_latest = paths.load_dataset(dataset_short_name)
         table = ds_latest[dataset_short_name]
         df = pd.DataFrame(table.reset_index()).rename(
             columns={
