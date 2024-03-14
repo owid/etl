@@ -13,7 +13,7 @@ This module contains:
 import json
 import sys
 from pathlib import Path
-from typing import Dict, List, cast
+from typing import Dict, List, Optional, cast
 
 import numpy as np
 import pandas as pd
@@ -67,7 +67,27 @@ ITEM_AMENDMENTS = {
         },
     ],
 }
-
+# Manual fixes to elements and units to avoid ambiguities.
+ELEMENT_AMENDMENTS = {
+    "faostat_fbsh": [
+        # Mappings to harmonize element and unit names of fbsh with those of fbs.
+        {
+            "element_code": "000645",
+            "fao_element": "Food supply quantity (kg/capita/yr)",
+            "fao_unit": "kg/cap",
+            "new_element_code": "000645",
+            "new_fao_element": "Food supply quantity (kg/capita/yr)",
+            "new_fao_unit": "kg",
+        },
+    ],
+}
+# Ideally, all elements of fbsh should be in fbs (although fbs may contain additional elements).
+# The only exception is "Stock Variation", which have slightly different definitions:
+# On fbs "Stock Variation" (005072), "Net decreases (from stock) are generally indicated by the sign "-". No sign denotes net increases (add to stock)".
+# On fbsh "Stock Variation" (005074), "Net increases in stocks (add to stock) are generally indicated by the sign "-". No sign denotes net decreases (from stock).".
+# Given that they have different definitions, we should not map one to the other.
+# So, for now, simply ignore it.
+ELEMENTS_IN_FBSH_MISSING_IN_FBS = {"005074"}
 
 # Countries and regions.
 
@@ -428,13 +448,18 @@ def harmonize_items(df: pd.DataFrame, dataset_short_name: str, item_col: str = "
     return df
 
 
-def harmonize_elements(df: pd.DataFrame, element_col: str = "element") -> pd.DataFrame:
+def harmonize_elements(
+    df: pd.DataFrame, dataset_short_name: str, element_col: str = "element", unit_col: Optional[str] = "unit"
+) -> pd.DataFrame:
     """Harmonize element codes (by ensuring they are strings of numbers with a fixed length, prepended with zeros), and
     make element codes and elements of categorical dtype.
 
     Parameters
     ----------
     df : pd.DataFrame
+        Data before harmonizing element codes.
+    dataset_short_name : str
+        Dataset short name.
     element_col : str
         Name of element column (this is only necessary to convert element column into categorical dtype).
 
@@ -449,6 +474,30 @@ def harmonize_elements(df: pd.DataFrame, element_col: str = "element") -> pd.Dat
 
     # Convert both columns to category to reduce memory
     df = df.astype({"element_code": "category", element_col: "category"})
+
+    # Fix those few cases where there is more than one item per item code within a given dataset.
+    if dataset_short_name in ELEMENT_AMENDMENTS:
+        for amendment in ELEMENT_AMENDMENTS[dataset_short_name]:
+            # Ensure new item code and item name are added as categories, to avoid errors.
+            if amendment["new_element_code"] not in df["element_code"].cat.categories:
+                df["element_code"] = df["element_code"].cat.add_categories(amendment["new_element_code"])
+            if amendment["new_fao_element"] not in df[element_col].cat.categories:
+                df[element_col] = df[element_col].cat.add_categories(amendment["new_fao_element"])
+            if unit_col is not None and amendment["new_fao_unit"] not in df[unit_col].cat.categories:
+                df[unit_col] = df[unit_col].cat.add_categories(amendment["new_fao_unit"])
+
+            if unit_col is not None:
+                # Update element code, element name, and unit name.
+                df.loc[
+                    (df["element_code"] == amendment["element_code"]) & (df[element_col] == amendment["fao_element"]),
+                    ("element_code", element_col, unit_col),
+                ] = (amendment["new_element_code"], amendment["new_fao_element"], amendment["new_fao_unit"])
+            else:
+                # Update element code, and element name.
+                df.loc[
+                    (df["element_code"] == amendment["element_code"]) & (df[element_col] == amendment["fao_element"]),
+                    ("element_code", element_col),
+                ] = (amendment["new_element_code"], amendment["new_fao_element"])
 
     return df
 
@@ -1821,13 +1870,13 @@ def run(dest_dir: str) -> None:
     paths = PathFinder(current_step_file.as_posix())
 
     # Load latest meadow dataset and keep its metadata.
-    ds_meadow: catalog.Dataset = paths.load_dependency(dataset_short_name)
+    ds_meadow = paths.load_dataset(dataset_short_name)
     # Load main table from dataset.
     tb_meadow = ds_meadow[dataset_short_name]
     data = pd.DataFrame(tb_meadow).reset_index()
 
     # Load dataset of FAOSTAT metadata.
-    metadata: catalog.Dataset = paths.load_dependency(f"{NAMESPACE}_metadata")
+    metadata = paths.load_dataset(f"{NAMESPACE}_metadata")
 
     # Load dataset, items, element-units, countries metadata, and value amendments.
     dataset_metadata = pd.DataFrame(metadata["datasets"]).loc[dataset_short_name].to_dict()
@@ -1843,7 +1892,7 @@ def run(dest_dir: str) -> None:
     #
     # Harmonize items and elements, and clean data.
     data = harmonize_items(df=data, dataset_short_name=dataset_short_name)
-    data = harmonize_elements(df=data)
+    data = harmonize_elements(df=data, dataset_short_name=dataset_short_name)
 
     # Prepare data.
     data = clean_data(

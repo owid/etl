@@ -47,6 +47,7 @@ from owid import catalog
 from owid.datautils import dataframes, io
 from shared import (
     CURRENT_DIR,
+    ELEMENTS_IN_FBSH_MISSING_IN_FBS,
     FAOSTAT_METADATA_SHORT_NAME,
     FLAGS_RANKING,
     N_CHARACTERS_ELEMENT_CODE,
@@ -424,7 +425,12 @@ def create_elements_dataframe_for_domain(
         data=df, dataset_short_name=dataset_short_name, category="element"
     )
     # Ensure element_code is always a string of a fix number of characters.
-    elements_from_data = harmonize_elements(df=elements_from_data, element_col="fao_element")
+    elements_from_data = harmonize_elements(
+        df=elements_from_data,
+        dataset_short_name=dataset_short_name,
+        element_col="fao_element",
+        unit_col="fao_unit_short_name",
+    )
 
     # Load elements from metadata.
     elements_columns = {
@@ -440,7 +446,9 @@ def create_elements_dataframe_for_domain(
         .sort_values(list(elements_columns.values()))
         .reset_index(drop=True)
     )
-    _elements_df = harmonize_elements(df=_elements_df, element_col="fao_element")
+    _elements_df = harmonize_elements(
+        df=_elements_df, dataset_short_name=dataset_short_name, element_col="fao_element", unit_col=None
+    )
     _elements_df["fao_element_description"] = _elements_df["fao_element_description"].astype("string")
 
     # Load units metadata.
@@ -515,17 +523,11 @@ def clean_global_elements_dataframe(elements_df: pd.DataFrame, custom_elements: 
     elements_df = elements_df.copy()
 
     # Check that all elements of fbsh are in fbs (although fbs may contain additional elements).
-    # The only exception is "Stock Variation", which have slightly different definitions:
-    # On fbs "Stock Variation" (005072), "Net decreases (from stock) are generally indicated by the sign "-". No sign denotes net increases (add to stock)".
-    # On fbsh "Stock Variation" (005074), "Net increases in stocks (add to stock) are generally indicated by the sign "-". No sign denotes net decreases (from stock).".
-    # Given that they have different definitions, we should not map one to the other.
-    # So, for now, simply ignore it.
-    ELEMENTS_IN_FBSH_MISSING_IN_FBS = {"005074"}
     assert (
         set(elements_df[elements_df["dataset"] == "faostat_fbsh"]["element_code"])
         - set(elements_df[elements_df["dataset"] == "faostat_fbs"]["element_code"])
         == ELEMENTS_IN_FBSH_MISSING_IN_FBS
-    )
+    ), "There are new elements in fbsh that are not in fbs. Add them to ELEMENTS_IN_FBSH_MISSING_IN_FBS."
     # Drop all rows for fbsh, and rename "fbs" to "fbsc" (since this will be the name for the combined dataset).
     elements_df = elements_df[elements_df["dataset"] != "faostat_fbsh"].reset_index(drop=True)
     elements_df.loc[elements_df["dataset"] == "faostat_fbs", "dataset"] = "faostat_fbsc"

@@ -24,6 +24,7 @@ from owid.datautils import dataframes
 from shared import (
     ADDED_TITLE_TO_WIDE_TABLE,
     CURRENT_DIR,
+    ELEMENTS_IN_FBSH_MISSING_IN_FBS,
     NAMESPACE,
     add_per_capita_variables,
     add_regions,
@@ -75,9 +76,9 @@ def combine_fbsh_and_fbs_datasets(
 
     # Harmonize items and elements in both datasets.
     fbsh = harmonize_items(df=fbsh, dataset_short_name="faostat_fbsh")
-    fbsh = harmonize_elements(df=fbsh)
+    fbsh = harmonize_elements(df=fbsh, dataset_short_name="faostat_fbsh")
     fbs = harmonize_items(df=fbs, dataset_short_name="faostat_fbs")
-    fbs = harmonize_elements(df=fbs)
+    fbs = harmonize_elements(df=fbs, dataset_short_name="faostat_fbs")
 
     # Ensure there is no overlap in data between the two datasets, and that there is no gap between them.
     assert fbs["year"].min() == FBS_FIRST_YEAR, f"First year of fbs dataset is not {FBS_FIRST_YEAR}"
@@ -91,18 +92,27 @@ def combine_fbsh_and_fbs_datasets(
     # Ensure the elements that are in fbsh but not in fbs are covered by ITEMS_MAPPING.
     error = "Mismatch between items in fbsh and fbs. Redefine shared.ITEM_AMENDMENTS."
     assert set(fbsh["item"]) == set(fbs["item"]), error
+    assert set(fbsh["item_code"]) == set(fbs["item_code"]), error
     # Some elements are found in fbs but not in fbsh. This is understandable, since fbs is
     # more recent and may have additional elements. However, ensure that there are no
     # elements in fbsh that are not in fbs.
     error = "There are elements in fbsh that are not in fbs."
     assert set(fbsh["element"]) < set(fbs["element"]), error
+    assert set(fbsh["element_code"]) - set(fbs["element_code"]) == ELEMENTS_IN_FBSH_MISSING_IN_FBS, error
+
+    # Remove elements from fbsh that are not in fbs (since they have different meanings and hence should not be
+    # combined as if they were the same element).
+    fbsh = fbsh[~fbsh["element_code"].isin(ELEMENTS_IN_FBSH_MISSING_IN_FBS)].reset_index(drop=True)
 
     # Concatenate old and new dataframes using function that keeps categoricals.
     fbsc = dataframes.concatenate([fbsh, fbs]).sort_values(["area", "year"]).reset_index(drop=True)
 
     # Ensure that each element has only one unit and one description.
-    error = "Some elements in the combined dataset have more than one unit."
-    assert fbsc.groupby("element")["unit"].nunique().max() == 1, error
+    error = "Some elements in the combined dataset have more than one unit. Manually check them and consider adding them to ELEMENT_AMENDMENTS."
+    units_per_element = fbsc.groupby("element", as_index=False, observed=True)["unit"].nunique()
+    elements_with_ambiguous_units = units_per_element[units_per_element["unit"] > 1]["element"].tolist()
+    fbsc[fbsc["element"].isin(elements_with_ambiguous_units)].drop_duplicates(subset=["element", "unit"])
+    assert len(elements_with_ambiguous_units) == 0, error
 
     return cast(pd.DataFrame, fbsc)
 
@@ -128,11 +138,11 @@ def run(dest_dir: str) -> None:
 
     # Load fbsh and fbs.
     log.info("faostat_fbsc.loading_datasets")
-    fbsh_dataset: catalog.Dataset = paths.load_dependency(f"{NAMESPACE}_fbsh")
-    fbs_dataset: catalog.Dataset = paths.load_dependency(f"{NAMESPACE}_fbs")
+    fbsh_dataset = paths.load_dataset(f"{NAMESPACE}_fbsh")
+    fbs_dataset = paths.load_dataset(f"{NAMESPACE}_fbs")
 
     # Load dataset of FAOSTAT metadata.
-    metadata: catalog.Dataset = paths.load_dependency(f"{NAMESPACE}_metadata")
+    metadata = paths.load_dataset(f"{NAMESPACE}_metadata")
 
     # Load dataset, items, element-units, and countries metadata.
     dataset_metadata = pd.DataFrame(metadata["datasets"]).loc[dataset_short_name].to_dict()

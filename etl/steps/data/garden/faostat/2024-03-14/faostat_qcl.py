@@ -472,7 +472,7 @@ def run(dest_dir: str) -> None:
     #
     # Harmonize items and elements, and clean data.
     data = harmonize_items(df=data, dataset_short_name=dataset_short_name)
-    data = harmonize_elements(df=data)
+    data = harmonize_elements(df=data, dataset_short_name=dataset_short_name)
 
     # Prepare data.
     data = clean_data(
