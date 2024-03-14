@@ -2,8 +2,12 @@
 
 This dataset contains X tables. One ('bmr') focusses on country-level data, and the rest on regional aggregates.
 
+Tables:
 - 'bmr': Country-level data on democracy. Reports data for countries even if they did not exist. This is basically so that these countries show values on maps.
-
+- 'num_countries_regime': Number of countries in democracy, by region and World.
+- 'num_countries_regime_years': Number of countries in democracies aged X years old, by region and World.
+- 'population_regime': Number of people in democracy, by region and World.
+- 'population_regime_years': Number of people in democracies aged X years old, by region and World.
 """
 
 import json
@@ -99,22 +103,6 @@ def run(dest_dir: str) -> None:
 
     # Get number of people in democracy, by region and World
     tb_pop, tb_pop_years_consec = make_tables_population_counters(tb, ds_regions, ds_population)
-
-    #### WIP ###############################
-    # Get equivalents with population counts (kinda ignore former country rows)
-    # - Number of people in democracy
-    # - Number of people not in democracy
-    # - pop_missreg_bmr_owid: countries for which we don't have regime (comes from merging with population)
-    # - Number of people in democracy with WS
-    # - Number of people not in democracy with WS
-    # - Number of ppl in democracy aged X (with / withour WS)
-
-    # Sanity checks
-
-    # Get country counters
-    ## Number of countries in X regime (with or withour WS), number of countries in democracy for Y years (with or without WS)
-
-    ########################################
 
     # Set index.
     tb = tb.set_index(["country", "year"], verify_integrity=True).sort_index()
