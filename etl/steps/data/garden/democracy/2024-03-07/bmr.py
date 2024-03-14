@@ -473,7 +473,7 @@ def make_tables_population_counters(tb: Table, ds_regions: Dataset, ds_populatio
     tb_ = expand_observations_without_leading_to_duplicates(tb_, ds_regions)
 
     # DEBUG
-    tb_.to_csv("/home/lucas/repos/etl/temp-working.csv")
+    # tb_.to_csv("temp-working.csv")
 
     # Get dummy indicators
     tb_ = make_table_with_dummies(tb_, ds_regions)
