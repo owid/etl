@@ -1,6 +1,7 @@
 """Load the three LIS meadow datasets and create one garden dataset, `luxembourg_income_study`."""
 
 import numpy as np
+import owid.catalog.processing as pr
 import pandas as pd
 from owid.catalog import Dataset, Table
 from shared import add_metadata_vars, add_metadata_vars_distribution
@@ -104,8 +105,8 @@ def run(dest_dir: str) -> None:
     ######################################################
 
     # Add percentile data
-    tables.append(percentiles_table(tb_name="lis_percentiles", ds_meadow=ds_meadow))
-    tables.append(percentiles_table(tb_name="lis_percentiles_adults", ds_meadow=ds_meadow))
+    tables.append(percentiles_table(tb_name="lis_percentiles", ds_meadow=ds_meadow, tb_keyvars=tables[0]))
+    tables.append(percentiles_table(tb_name="lis_percentiles_adults", ds_meadow=ds_meadow, tb_keyvars=tables[1]))
 
     # Add tables to dataset
     ds_garden = create_dataset(
@@ -326,7 +327,7 @@ def create_distributional_variables(df_distribution: pd.DataFrame, age: str, ds_
     return df_distribution
 
 
-def percentiles_table(tb_name: str, ds_meadow: Dataset) -> Table:
+def percentiles_table(tb_name: str, ds_meadow: Dataset, tb_keyvars: Table) -> Table:
     # Read table from meadow dataset.
     tb = ds_meadow[tb_name].reset_index()
 
@@ -338,6 +339,44 @@ def percentiles_table(tb_name: str, ds_meadow: Dataset) -> Table:
 
     # Rename variable column to welfare
     tb = tb.rename(columns={"variable": "welfare", "eq": "equivalization"})
+
+    tb_keyvars = tb_keyvars.reset_index()
+    tb_keyvars = tb_keyvars[
+        ["country", "year", "mean_dhci_eq", "mean_dhci_pc", "mean_dhi_eq", "mean_dhi_pc", "mean_mi_eq", "mean_mi_pc"]
+    ]
+
+    # The names of the variables starting on mean contain this structure : main_welfare_equivalization. I want to make the table long and have a column with the welfare and equivalization variables
+    tb_keyvars = tb_keyvars.melt(
+        id_vars=["country", "year"],
+        value_vars=[
+            "mean_dhci_eq",
+            "mean_dhci_pc",
+            "mean_dhi_eq",
+            "mean_dhi_pc",
+            "mean_mi_eq",
+            "mean_mi_pc",
+        ],
+        var_name="welfare_equivalization",
+        value_name="mean",
+    )
+
+    # Remove mean_ from the variable name
+    tb_keyvars["welfare_equivalization"] = tb_keyvars["welfare_equivalization"].str.replace("mean_", "")
+
+    # Split welfare_equivalization column into two columns, welfare and equivalization
+    tb_keyvars[["welfare", "equivalization"]] = tb_keyvars["welfare_equivalization"].str.split("_", expand=True)
+
+    # Drop welfare_equivalization column
+    tb_keyvars = tb_keyvars.drop(columns=["welfare_equivalization"])
+
+    # Merge the two tables
+    tb = pr.merge(tb, tb_keyvars, on=["country", "year", "welfare", "equivalization"], how="left")
+
+    # Calculate average income by percentile, using mean and share (I don't divide by 100 because share is in % and it cancels out with the % size of the percentile)
+    tb["avg"] = tb["mean"] * tb["share"]
+
+    # Drop mean
+    tb = tb.drop(columns=["mean"])
 
     # Set indices and sort.
     tb = tb.set_index(

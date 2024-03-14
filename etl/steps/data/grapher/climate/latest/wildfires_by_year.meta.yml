@@ -1,21 +1,3 @@
-# NOTE: To learn more about the fields, hover over their names.
-definitions:
-  common:
-    presentation:
-      topic_tags:
-        - Climate Change
-    display:
-      numDecimalPlaces: 0
-      yearIsDay: false
-    processing_level: minor
-
-
-# Learn more about the available fields:
-# http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
-dataset:
-  update_period_days: 14
-
-
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
 tables:
@@ -25,82 +7,39 @@ tables:
     variables:
         area_ha:
           title: Annual area burnt by wildfires
-          unit: hectares
-          short_unit: ha
-          description_short: Area burnt by wildfires in hectares.
-          description_key:
-            - Area burnt by wildfires is determined using satellite imagery from high-resolution satellite imagery collected by MODIS (Moderate Resolution Imaging Spectroradiometer) and VIIRS (Visible Infrared Imaging Radiometer Suite), which are instrumental in detecting thermal anomalies and changes in landscape patterns indicative of burning. These satellite systems, equipped with advanced sensors, capture detailed images that enable precise estimation of burnt areas, even in remote and inaccessible regions.
 
         area_ha_cumulative:
           title: Annual cumulative area burnt by wildfires
-          unit: hectares
-          short_unit: ha
-          description_short: Cumulative area burnt by wildfires in hectares.
-          description_key:
-            - The cumulative area burnt by wildfires is determined using satellite imagery from high-resolution satellite imagery collected by MODIS (Moderate Resolution Imaging Spectroradiometer) and VIIRS (Visible Infrared Imaging Radiometer Suite), which are instrumental in detecting thermal anomalies and changes in landscape patterns indicative of burning. These satellite systems, equipped with advanced sensors, capture detailed images that enable precise estimation of burnt areas, even in remote and inaccessible regions.
-
-        events:
-          title: Annual number of fires
-          unit: fires
-          short_unit: ''
-
-        events_cumulative:
-          title: Annual cumulative number of fires
-          unit: fires
-          short_unit: ''
 
         share_area_ha:
           title: Annual share of the total land area burnt by wildfires
-          unit: '%'
-          short_unit: '%'
-          description_short: Share of the total land area burnt by wildfires.
-          description_key:
-            - The area burnt by wildfires is determined using satellite imagery from high-resolution satellite imagery collected by MODIS (Moderate Resolution Imaging Spectroradiometer) and VIIRS (Visible Infrared Imaging Radiometer Suite), which are instrumental in detecting thermal anomalies and changes in landscape patterns indicative of burning. These satellite systems, equipped with advanced sensors, capture detailed images that enable precise estimation of burnt areas, even in remote and inaccessible regions.
-          description_processing: The share of the total land area burnt by wildfires is calculated by dividing the area burnt by wildfires by the total land area of the country.
 
         share_area_ha_cumulative:
-          title: Annual cumulative share of the total land area burnt by wildfires
-          unit: '%'
-          short_unit: '%'
-          description_short: Share of the total land area burnt by wildfires.
-          description_key:
-            - The area burnt by wildfires is determined using satellite imagery from high-resolution satellite imagery collected by MODIS (Moderate Resolution Imaging Spectroradiometer) and VIIRS (Visible Infrared Imaging Radiometer Suite), which are instrumental in detecting thermal anomalies and changes in landscape patterns indicative of burning. These satellite systems, equipped with advanced sensors, capture detailed images that enable precise estimation of burnt areas, even in remote and inaccessible regions.
-          description_processing: The share of the total land area burnt by wildfires is calculated by dividing the area burnt by wildfires by the total land area of the country.
+          title: Annual cumultive share of the total land area burnt by wildfires
+
+        events:
+          title: Annual number of fires
+
+        events_cumulative:
+          title: Annual cumulative number of fires
 
         pm2_5:
           title: Annual PM2.5 emissions from wildfires
-          unit: metric tons
-          short_unit: MT
-          description_short: Annual PM2.5 emissions from fires represent the quantity of fine particulate matter (diameter less than 2.5 micrometers) released by fires.
-          description_key:
-            - Sources of emissions can include wildfires, agricultural burning, and prescribed burns.
-            - PM2.5 can penetrate deep into the respiratory tract, affecting the lungs and potentially entering the bloodstream.
-            - Exposure to PM2.5 is linked to respiratory and cardiovascular issues, and premature death in people with heart or lung disease.
 
         pm2_5_cumulative:
           title: Annual cumulative PM2.5 emissions from wildfires
-          unit: metric tons
-          short_unit: MT
-          description_short: Annual PM2.5 emissions from fires represent the quantity of fine particulate matter (diameter less than 2.5 micrometers) released by fires.
-          description_key:
-            - Sources of emissions can include wildfires, agricultural burning, and prescribed burns.
-            - PM2.5 can penetrate deep into the respiratory tract, affecting the lungs and potentially entering the bloodstream.
-            - Exposure to PM2.5 is linked to respiratory and cardiovascular issues, and premature death in people with heart or lung disease.
 
         co2:
           title: Annual carbon dioxide emissions
-          unit: metric tons
-          short_unit: MT
-          description_key:
-          - Primary sources of emissions include wildfires, agricultural burning, and prescribed burns.
-          - CO₂ emissions contribute to the greenhouse effect, influencing global warming and climate change.
 
         co2_cumulative:
           title: Annual cumulative carbon dioxide emissions
-          unit: metric tons
-          short_unit: MT
-          description_short: Annual PM2.5 emissions from fires represent the quantity of fine particulate matter (diameter less than 2.5 micrometers) released by fires.
-          description_key:
-          - Primary sources of emissions include wildfires, agricultural burning, and prescribed burns.
-          - CO₂ emissions contribute to the greenhouse effect, influencing global warming and climate change.
 
+        area_ha_per_wildfire:
+          title: Annual area burnt per wildfire
+
+        co2_ha_per_area:
+          title: Annual carbon dioxide emissions per area burnt
+
+        pm2_5_ha_per_area:
+          title: Annual PM2.5 emissions per area burnt

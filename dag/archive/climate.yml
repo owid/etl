@@ -10,3 +10,11 @@ steps:
     - data://meadow/met_office_hadley_centre/2023-10-18/near_surface_temperature
   data://grapher/met_office_hadley_centre/2023-10-18/near_surface_temperature:
     - data://garden/met_office_hadley_centre/2023-10-18/near_surface_temperature
+  #
+  # IMBIE - Ice sheet mass balance.
+  #
+  data://meadow/imbie/2024-01-02/ice_sheet_mass_balance:
+    - snapshot://imbie/2024-01-02/ice_sheet_mass_balance_antarctica.csv
+    - snapshot://imbie/2024-01-02/ice_sheet_mass_balance_greenland.csv
+  data://garden/imbie/2024-01-02/ice_sheet_mass_balance:
+    - data://meadow/imbie/2024-01-02/ice_sheet_mass_balance

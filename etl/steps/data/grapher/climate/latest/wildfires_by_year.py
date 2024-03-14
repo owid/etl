@@ -1,6 +1,5 @@
 """Load a garden dataset and create a grapher dataset."""
 
-
 import owid.catalog.processing as pr
 
 from etl.helpers import PathFinder, create_dataset
@@ -23,12 +22,31 @@ def run(dest_dir: str) -> None:
 
     # Get the year
     tb["year"] = tb["date"].astype(str).str[0:4]
-    tb = tb[["country", "year", "area_ha", "events", "pm2_5", "co2", "share_area_ha"]]
-
+    tb = tb[
+        [
+            "country",
+            "year",
+            "area_ha",
+            "events",
+            "pm2_5",
+            "co2",
+            "share_area_ha",
+            "area_ha_per_wildfire",
+            "co2_ha_per_area",
+            "pm2_5_ha_per_area",
+        ]
+    ]
     # Aggregate the data by year and country (ignore missing values when summing the columns)
     tb_annual_sum = tb.groupby(["country", "year"]).sum(min_count=1).reset_index()
 
-    tb_cumulative = tb.groupby(["country", "year"]).sum(min_count=1).groupby("country").cumsum().reset_index()
+    tb_cumulative = (
+        tb[["country", "year", "area_ha", "events", "pm2_5", "co2", "share_area_ha"]]
+        .groupby(["country", "year"])
+        .sum(min_count=1)
+        .groupby("country")
+        .cumsum()
+        .reset_index()
+    )
     for col in ["area_ha", "events", "pm2_5", "co2", "share_area_ha"]:
         tb_cumulative = tb_cumulative.rename(columns={col: col + "_cumulative"})
     tb = pr.merge(tb_annual_sum, tb_cumulative, on=["year", "country"])

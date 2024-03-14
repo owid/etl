@@ -22,6 +22,14 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
+
+    # Make reporting_level and welfare_type strings
+    tb["reporting_level"] = tb["reporting_level"].astype(str)
+    tb["welfare_type"] = tb["welfare_type"].astype(str)
+    tb_percentiles["reporting_level"] = tb_percentiles["reporting_level"].astype(str)
+    tb_percentiles["welfare_type"] = tb_percentiles["welfare_type"].astype(str)
+
+    # Set index and sort
     tb = tb.set_index(
         ["ppp_version", "poverty_line", "country", "year", "reporting_level", "welfare_type"], verify_integrity=True
     ).sort_index()

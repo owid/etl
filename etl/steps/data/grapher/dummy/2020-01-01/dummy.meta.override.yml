@@ -1,0 +1,5 @@
+tables:
+  dummy:
+    variables:
+      dummy_variable:
+        title: Dummy abc
