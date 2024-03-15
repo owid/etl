@@ -152,6 +152,9 @@ def remove_country_overlaps(tb: Table) -> Table:
 
     There are some years for which we have data for both the former and the current country. We should only have one, to avoid double counting.
     """
+    # Sanity check input shape
+    assert tb.shape == (19775, 11), "Unexpected input shape!"
+
     ## "Germany" in 1945 and 1990 (those years we have West and East Germany)
     tb = tb.loc[~((tb["ccode"] == 255) & (tb["year"] == 1945))]
     tb = tb.loc[~((tb["ccode"] == 255) & (tb["year"] == 1990))]
@@ -216,6 +219,10 @@ def remove_country_overlaps(tb: Table) -> Table:
             ), f"Something off with {drop[0]} and {drop[1]} in {drop[2]}"
         # Remove country
         tb = tb.loc[~((tb["ccode"] == drop[0]) & (tb["year"] == drop[2]))]
+
+    # Sanity check output shape
+    assert tb.shape == (19752, 11), "Unexpected output shape!"
+
     return tb
 
 
@@ -759,7 +766,6 @@ def split_into_two_tables(
     assert (
         diff == 0
     ).all(), f"The number of countries with unknown regimes should be the same according to indicators `{col_regime}` and `{col_regime_ws}`. Please check!"
-    tb_1.loc[mask, col_regime_ws] = np.nan
 
     # TABLE 2: Aggregate years in democracy (with or without WS)
     tb_2 = _get_table_subset(tb_, col_years_consec, col_years_ws_consec, table_2_name)
