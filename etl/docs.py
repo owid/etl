@@ -1,5 +1,7 @@
 from typing import Any, Dict, List, Optional
 
+import requests
+
 from etl.helpers import read_json_schema
 from etl.paths import SCHEMAS_DIR
 
@@ -284,3 +286,14 @@ def faqs_to_markdown(faqs: List[Any], extra_tab: int = 0) -> str:
 
     text = "\n\n".join(texts)
     return text
+
+
+def render_grapher_config() -> str:
+    """Render grapher config."""
+    grapher_config = requests.get("https://files.ourworldindata.org/schemas/grapher-schema.003.json", timeout=5).json()
+
+    grapher_config = f"""This is the JSON schema of field `variable.presentation.grapher_config`:
+
+    {grapher_config}
+    """
+    return grapher_config

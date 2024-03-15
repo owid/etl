@@ -90,6 +90,7 @@ WIZARD_PHASES = Literal[_aliases]  # type: ignore
 # Get all pages by alias
 _pages = [ww for w in WIZARD_CONFIG["sections"] for ww in w["apps"]]
 PAGES_BY_ALIAS = {
+    **WIZARD_CONFIG["main"],
     **WIZARD_CONFIG["etl"]["steps"],
     **{p["alias"]: {k: v for k, v in p.items() if k not in ["alias"]} for p in _pages},
 }
