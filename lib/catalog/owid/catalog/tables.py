@@ -36,7 +36,7 @@ from pandas.util._decorators import rewrite_axis_style_signature
 from owid.repack import repack_frame
 
 from . import processing_log as pl
-from . import variables
+from . import variables, warnings
 from .meta import (
     SOURCE_EXISTS_OPTIONS,
     License,
@@ -870,8 +870,9 @@ class Table(pd.DataFrame):
                 else:
                     by_type = "unknown"
                 if isinstance(by_type, str) and by_type == "category":
-                    log.warning(
-                        f"You're grouping by categorical variable `{by}` without using observed=True. This may lead to unexpected behaviour."
+                    warnings.warn(
+                        f"You're grouping by categorical variable `{by}` without using observed=True. This may lead to unexpected behaviour.",
+                        warnings.GroupingByCategoricalWarning,
                     )
 
         return TableGroupBy(
@@ -888,7 +889,7 @@ class Table(pd.DataFrame):
 
         for column in [column for column in self.columns if column not in ignore_columns]:
             if not self[column].metadata.origins:
-                log.warning(f"Variable {column} has no origins.")
+                warnings.warn(f"Variable {column} has no origins.", warnings.NoOriginsWarning)
 
     def rename_index_names(self, renames: Dict[str, str]) -> "Table":
         """Rename index."""
@@ -1616,7 +1617,8 @@ def check_all_variables_have_metadata(tables: List[Table], fields: Optional[List
         for column in table.columns:
             for field in fields:
                 if not getattr(table[column].metadata, field):
-                    log.warning(f"Table {table_name}, column {column} has no {field}.")
+                    warning_class = warnings.NoOriginsWarning if field == "origins" else warnings.MetadataWarning
+                    warnings.warn(f"Table {table_name}, column {column} has no {field}.", warning_class)
 
 
 def _resolve_collisions(
