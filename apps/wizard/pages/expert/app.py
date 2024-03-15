@@ -16,6 +16,7 @@ from apps.wizard.pages.expert.prompts import (
     SYSTEM_PROMPT_PRINCIPLES,
     SYSTEM_PROMPT_START,
 )
+from apps.wizard.utils import set_states
 from apps.wizard.utils.gpt import OpenAIWrapper, get_cost_and_tokens
 from etl.config import load_env
 
@@ -121,6 +122,10 @@ with st.popover("See examples"):
 
 # Sidebar with GPT config
 with st.sidebar:
+    st.button(
+        label="Clear chat",
+        on_click=lambda: set_states({"messages": [{"role": "system", "content": get_system_prompt()}]}),
+    )
     st.divider()
     st.markdown("## GPT Configuration")
     model_name = st.selectbox(

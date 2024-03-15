@@ -38,7 +38,8 @@ def generate_documentation(pages_md: List[str]) -> str:
 NOTE = """To help you with this task, find below the required ETL documentation. Each documentation page is separated by '{PAGE_SEPARATOR}', followed by the path to the page "_page: <page_path>_". The documentation content is given as markdown text (suitable for mkdocs).
 """
 # ONLY METADATA
-METADATA_BIT = f"""
+## Metadata reference
+METADATA_REFERENCE = f"""
 # Datasets:
 {render_dataset()}
 
@@ -56,16 +57,31 @@ METADATA_BIT = f"""
 
 ------
 #### `variable.presentation.grapher_config`
+
 {render_grapher_config()}
 """
+
+## Metadata usage
+PAGES_MD = glob.glob(str(DOCS_DIR) + "/architecture/metadata/structuring-yaml/**/*.md", recursive=True) + glob.glob(
+    str(DOCS_DIR) + "/*.md"
+)
+PAGES_TEXT = generate_documentation(PAGES_MD)
+METADATA_USAGE = f"""
+{NOTE}
+
+{PAGES_TEXT}
+"""
+
+## Complete Metadata prompt
 SYSTEM_PROMPT_METADATA = f"""
 As an expert in OWID's metadata structure, you'll respond to inquiries about its structure, comprising four main entities: Origin, Dataset, Table, and Indicator (Variable). Datasets group together Tables, which are akin to pandas DataFrames but include extra metadata, and Tables feature Indicators as columns. Indicators may be linked to multiple Origins, identifying the data's sources. Detailed explanations of each entity follow, separated by '------'.
 
-
-{METADATA_BIT}
+{METADATA_REFERENCE}
 """
 
-"contributing.md"
+## Additionally, here is some context on how to use and structure the metadata
+##
+## {METADATA_USAGE}
 
 # GETTING STARTED
 PAGES_MD = glob.glob(str(DOCS_DIR) + "/getting-started/**/*.md", recursive=True) + glob.glob(str(DOCS_DIR) + "/*.md")
@@ -119,5 +135,5 @@ As an expert in OWID's documentation, you'll respond to inquiries about various 
 {PAGE_SEPARATOR}
 page: architecture/metadata/reference/index.md
 
-{METADATA_BIT}
+{METADATA_REFERENCE}
 """
