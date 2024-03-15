@@ -275,7 +275,6 @@ class Chart(SQLModel, table=True):
     lastEditedAt: datetime = Field(sa_column=Column("lastEditedAt", DateTime, nullable=False))
     lastEditedByUserId: int = Field(sa_column=Column("lastEditedByUserId", Integer, nullable=False))
     is_indexable: int = Field(sa_column=Column("is_indexable", TINYINT(1), nullable=False, server_default=text("'0'")))
-    isExplorable: int = Field(sa_column=Column("isExplorable", TINYINT(1), nullable=False, server_default=text("'0'")))
     publishedAt: Optional[datetime] = Field(default=None, sa_column=Column("publishedAt", DateTime))
     publishedByUserId: Optional[int] = Field(default=None, sa_column=Column("publishedByUserId", Integer))
 
