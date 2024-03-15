@@ -2,6 +2,7 @@
 
 import numpy as np
 import owid.catalog.processing as pr
+import pandas as pd
 from owid.catalog import Table
 
 from etl.data_helpers import geo
@@ -47,17 +48,32 @@ def run(dest_dir: str) -> None:
     country_to_region = {
         country: region for region in REGIONS for country in geo.list_members_of_region(region, ds_regions)
     }
-    tb_data["region"] = tb_data["country"].map(country_to_region)
 
     country_to_income_group = {
         country: income_group
         for income_group in INCOME_GROUPS
         for country in geo.list_members_of_region(income_group, ds_regions, ds_income_groups)
     }
+
+    # Ensure we have all the countries that are considered countries by World Bank.
+    # Get all unique countries and years
+    all_countries = set(country_to_income_group.keys())
+    all_years = set(tb_data["year"].unique())
+
+    # Create a DataFrame with all combinations of countries and years
+    all_combinations = pd.DataFrame(
+        [(country, year) for country in all_countries for year in all_years], columns=["country", "year"]
+    )
+
+    # Merge this DataFrame with tb_data
+    tb_data = pd.merge(all_combinations, tb_data, on=["country", "year"], how="left")
+
+    tb_data["region"] = tb_data["country"].map(country_to_region)
     tb_data["income_group"] = tb_data["country"].map(country_to_income_group)
+    # print(tb_data)
 
     # Merge with population data.
-    tb_merged = pr.merge(tb_data, tb_population, on=["country", "year"]).drop(columns="source")
+    tb_merged = pd.merge(tb_data, tb_population, on=["country", "year"]).drop(columns="source")
 
     # Flag for 'se_prm_uner' data presence.
     tb_merged["se_prm_uner"] = np.where(tb_merged["se_prm_uner"].isna(), 0, 1)
@@ -74,9 +90,8 @@ def run(dest_dir: str) -> None:
             .agg(missing_countries=("country", "size"), missing_population=("population", "sum"))
             .reset_index()
         )
-
         # Merge with total countries and calculate fractions.
-        detailed_data = pr.merge(total_countries, missing_data, on=["year", group_by_column])
+        detailed_data = pd.merge(total_countries, missing_data, on=["year", group_by_column])
         detailed_data["fraction_missing_countries"] = (
             detailed_data["missing_countries"] / detailed_data["total_countries"]
         ) * 100
@@ -89,13 +104,13 @@ def run(dest_dir: str) -> None:
     income_details = calculate_details("income_group")
 
     # Combine and prepare the final dataset.
-    df_final = pr.concat([region_details, income_details], axis=0)
+    df_final = pd.concat([region_details, income_details], axis=0)
     df_final = df_final.set_index(["region", "year"], verify_integrity=True)
     tb_garden = Table(df_final, short_name="children_out_of_school")
 
     # Ensure metadata is correctly associated.
     for column in tb_garden.columns:
-        tb_garden[column].metadata.origins = tb_data["se_prm_uner"].metadata.origins
+        tb_garden[column].metadata.origins = tb["se_prm_uner"].metadata.origins
 
     # Save the final dataset.
     ds_garden = create_dataset(dest_dir=dest_dir, tables=[tb_garden], check_variables_metadata=True)
