@@ -1,4 +1,6 @@
-"""Generate reduced version of the documentation using chat GPT.
+"""Prompts for GPT-interaction.
+
+Also: Generate reduced version of the documentation using chat GPT.
 
 We need to provide some documentation context to the GPT model, via the system prompt. However, the original documentation is too long, especially if using a simple model like 3.5. Therefore, we need to reduce the length of the documentation before passing it to the GPT model. This process is done using GPT-4.
 
@@ -52,7 +54,7 @@ metadata_original = {
 
 
 def generate_documentation(model_name: str = MODEL_NAME_REDUCED_DEFAULT) -> None:
-    """Generate reducede version of the documentation using chat GPT."""
+    """Generate reduced version of the documentation using chat GPT."""
     # Initiate OpenAI
     api = OpenAIWrapper()
     # Generate docs for each category

@@ -1,7 +1,6 @@
 """Game owidle."""
 import datetime as dt
 import math
-import time
 from itertools import product
 from pathlib import Path
 from typing import List, Tuple
@@ -35,6 +34,11 @@ UPDATES = {
     ],
     "2024-03-07": [
         "✨ Add score mosaic at the end.",
+    ],
+    "2024-03-15": [
+        "✨ Charts start with 0 in the y-axis",
+        "✨ Hard mode: Improved readability of year hint emojis.",
+        "🐛 Hard mode: Fixed score mosaic 100%-rounding for years.",
     ],
 }
 DAYS_TO_SHOW_UPDATES = 3
@@ -515,7 +519,9 @@ def distance_to_solution(country_selected: str) -> Tuple[str, str, str]:
 
     # Estimate score
     score = int(round(100 - (distance / MAX_DISTANCE_ON_EARTH) * 100, 0))
-
+    # Only 100 if correct, not if 99.9%
+    if score == 100:
+        score = 99
     # Ensure string types
     score = str(score)
     distance = str(int(distance))
@@ -530,22 +536,26 @@ def distance_to_solution_year(year_selected: int) -> Tuple[str, str, str]:
         st.session_state.user_has_succeded_year = True
         return "0", "🎉", "100"
     elif (diff > 0) and (diff <= 5):
-        arrows = "🔼"
+        arrows = "🔥"
     elif (diff > 5) and (diff <= 15):
-        arrows = "🔼🔼"
+        arrows = "▶️"
     elif (diff > 15) and (diff <= 30):
-        arrows = "🔼🔼🔼"
+        arrows = "⏩▶️"
     elif diff > 30:
-        arrows = "🔼🔼🔼🔼"
+        arrows = "⏩⏩⏩"
     elif (diff < 0) and (diff >= -5):
-        arrows = "🔽"
+        arrows = "🔥"
     elif (diff < -5) and (diff >= -15):
-        arrows = "🔽🔽"
+        arrows = "◀️"
     elif (diff < -15) and (diff >= -30):
-        arrows = "🔽🔽🔽"
+        arrows = "⏪◀️"
     else:
-        arrows = "🔽🔽🔽🔽"
-    score = str(int(round(100 - (abs(diff) / (YEAR_MAX - YEAR_MIN)) * 100, 0)))
+        arrows = "⏪⏪"
+    score = int(round(100 - (abs(diff) / (YEAR_MAX - YEAR_MIN)) * 100, 0))
+    # Only 100 if correct, not even if 99.9%
+    if score == 100:
+        score = 99
+    score = str(score)
     return str(abs(diff)), arrows, score
 
 
@@ -675,6 +685,7 @@ def _plot_chart(
         line_dash="Country",
         line_dash_map=line_dash_map,
         line_shape="spline",
+        range_y=[0, df[column_indicator].max() * 1.1],
     )
 
     # Remove axis labels
@@ -966,7 +977,7 @@ for i in range(num_guesses_bound):
             if i == 0:
                 col22.markdown(
                     st.session_state.guesses[i]["direction_year"],
-                    help="🔽/🔼: up to ±5 years\n\n🔽🔽/🔼🔼: up to ±15 years\n\n🔽🔽🔽/🔼🔼🔼: up to ±30 years\n\n🔽🔽🔽🔽/🔼🔼🔼🔼: >30 years difference",
+                    help="🔥: up to ±5 years\n\n◀️/▶️: up to ±15 years\n\n⏪◀️/⏩▶️: up to ±30 years\n\n⏪⏪⏪/⏩⏩⏩: >30 years difference",
                 )
             else:
                 col22.markdown(st.session_state.guesses[i]["direction_year"])
