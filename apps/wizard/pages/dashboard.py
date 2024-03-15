@@ -167,10 +167,10 @@ tutorial_html = f"""
 <ol>
     <li>Select that step from the <i>Steps table</i>.</li>
     <li>Click on{_create_html_button("Add selected steps to the <i>Operations list</i>", "#FE4446", "#FE4446")}.</li>
-    <li>Click on{_create_html_button("Add all dependencies", "#d3d3d3", "#000000")} (and optionally click on {_create_html_button("Remove non-updateable", "#d3d3d3", "#000000")}).</li>
+    <li>Click on{_create_html_button("Add all dependencies", "#d3d3d3", "transparent")} (and optionally click on {_create_html_button("Remove non-updateable", "#d3d3d3", "transparent")}).</li>
     <li>Click on{_create_html_button("Update X steps", "#FE4446", "#FE4446")} to bulk-update them all in one go.</li>
-    <li>Click on{_create_html_button("Replace steps with their latest version", "#d3d3d3", "#000000")} to populate the <i>Operations list</i> with the newly created steps.</li>
-    <li>Click on{_create_html_button("Run all ETL steps (including snapshots)", "#FE4446", "#FE4446")} to run the ETL on the new steps.</li>
+    <li>Click on{_create_html_button("Replace steps with their latest version", "#d3d3d3", "transparent")} to populate the <i>Operations list</i> with the newly created steps.</li>
+    <li>Click on{_create_html_button("Run all ETL steps", "#FE4446", "#FE4446")} to run the ETL on the new steps.</li>
     <li>If a step fails, you can manually edit its code and try running ETL again.</li>
 </ol>
 </details>
@@ -199,6 +199,9 @@ def load_steps_df(reload_key: int) -> pd.DataFrame:
     # Load steps dataframe.
     steps_df = StepUpdater().steps_df
 
+    # To speed up calculations, create a dictionary with all info in steps_df.
+    steps_dict = steps_df.set_index("step").to_dict(orient="index")
+
     # Fix some columns.
     steps_df["full_path_to_script"] = steps_df["full_path_to_script"].fillna("").astype(str)
     steps_df["dag_file_path"] = steps_df["dag_file_path"].fillna("").astype(str)
@@ -222,30 +225,30 @@ def load_steps_df(reload_key: int) -> pd.DataFrame:
 
     steps_df = steps_df.drop(columns=["db_dataset_name", "db_dataset_id"], errors="raise")
 
-    # Add a column with the total number of dependencies that are not their latest version.
-    steps_df["n_updateable_dependencies"] = [
-        sum(
-            [
-                not steps_df[steps_df["step"] == dependency]["is_latest"].item()
-                for dependency in dependencies
-                if dependency not in DEPENDENCIES_TO_IGNORE
-            ]
-        )
+    # Add a column with the dependencies that are not their latest version.
+    steps_df["updateable_dependencies"] = [
+        [
+            dependency
+            for dependency in dependencies
+            if (dependency not in DEPENDENCIES_TO_IGNORE) and (not steps_dict[dependency]["is_latest"])
+        ]
         for dependencies in steps_df["all_active_dependencies"]
     ]
+
+    # Add a column with the total number of dependencies that are not their latest version.
+    steps_df["n_updateable_dependencies"] = [len(dependencies) for dependencies in steps_df["updateable_dependencies"]]
     # Number of snapshot dependencies that are not their latest version.
     steps_df["n_updateable_snapshot_dependencies"] = [
         sum(
             [
-                not steps_df[steps_df["step"] == dependency]["is_latest"].item()
-                if steps_df[steps_df["step"] == dependency]["channel"].item() == "snapshot"
-                else False
+                not steps_dict[dependency]["is_latest"] if steps_dict[dependency]["channel"] == "snapshot" else False
                 for dependency in dependencies
                 if dependency not in DEPENDENCIES_TO_IGNORE
             ]
         )
         for dependencies in steps_df["all_active_dependencies"]
     ]
+
     # Add a column with the update state.
     # By default, the state is unknown.
     steps_df["update_state"] = UpdateState.UNKNOWN.value
@@ -570,6 +573,38 @@ def _add_steps_to_operations(steps_related):
     st.session_state.selected_steps += new_selected_steps
 
 
+st.markdown("### Details list")
+if grid_response["selected_rows"]:
+    selected_steps = [row["step"] for row in grid_response["selected_rows"]]
+    selected_steps_info = (
+        steps_df[steps_df["step"].isin(selected_steps)][
+            [
+                "step",
+                "all_active_dependencies",
+                "all_active_usages",
+                "updateable_dependencies",
+            ]
+        ]
+        .set_index("step")
+        .to_dict(orient="index")
+    )
+    for selected_step, selected_steps_info in selected_steps_info.items():
+        # Display each selected row's data.
+        with st.expander(f"Details for step {selected_step}"):
+            for item, value in selected_steps_info.items():
+                item_name = item.replace("_", " ").capitalize()
+                if isinstance(value, list):
+                    list_html = (
+                        f"<details><summary> {item_name} ({len(value)}) </summary><ol>"
+                        + "".join([f"<li>{sub_value}</li>" for sub_value in value])
+                        + "</ol></details>"
+                    )
+                    st.markdown(list_html, unsafe_allow_html=True)
+                else:
+                    st.text(f"{item_name}: {value}")
+else:
+    st.markdown(":grey[No rows selected for more details.]")
+
 # Button to add selected steps to the Operations list.
 if st.button("Add selected steps to the _Operations list_", type="primary"):
     new_selected_steps = [row["step"] for row in grid_response["selected_rows"]]
@@ -770,7 +805,8 @@ if st.session_state.selected_steps:
                             command += " --dry-run"
                         cmd_output = execute_command(command)
                         # Show the output of the command in an expander.
-                        with st.expander("Command Output:", expanded=True):
+                        with st.expander("Command:", expanded=True):
+                            st.text(command)
                             st.text_area("Output", value=cmd_output, height=300, key="cmd_output_area")
                         if "error" not in cmd_output.lower():
                             # Celebrate that the update was successful, why not.
@@ -795,23 +831,39 @@ if st.session_state.selected_steps:
                     False,
                     help="If checked, the ETL steps will be forced to be executed (even if they are already executed).",
                 )
+                run_snapshots = st.toggle(
+                    "Run snapshot scripts",
+                    False,
+                    help="If checked, run snapshot scripts (if any in the _Operations list_).",
+                )
+                run_grapher = st.toggle(
+                    "Run grapher steps",
+                    False,
+                    help="If checked, run grapher steps with --grapher (if any in the _Operations list_).",
+                )
 
-            def define_command_to_execute_snapshots_and_etl_steps(dry_run: bool = True, force_only: bool = False):
+            def define_command_to_execute_snapshots_and_etl_steps(
+                dry_run: bool = True,
+                force_only: bool = False,
+                run_snapshots: bool = False,
+                run_grapher: bool = False,
+            ):
                 # Execute ETL for all steps in the operations list.
                 snapshot_steps = [step for step in st.session_state.selected_steps if step.startswith("snapshot://")]
                 etl_steps = [step for step in st.session_state.selected_steps if not step.startswith("snapshot://")]
 
                 command = ""
-                # First attempt to run all snapshots sequentially.
-                for snapshot_step in snapshot_steps:
-                    # Identify script for current snapshot.
-                    script = steps_df[steps_df["step"] == snapshot_step]["full_path_to_script"].item()
-                    # Define command to be executed.
-                    command += f"python {script} && "
+                if run_snapshots:
+                    # First write a command that will attempt to run all snapshots sequentially.
+                    for snapshot_step in snapshot_steps:
+                        # Identify script for current snapshot.
+                        script = steps_df[steps_df["step"] == snapshot_step]["full_path_to_script"].item()
+                        # Define command to be executed.
+                        command += f"python {script} && "
 
-                if dry_run:
-                    # If dry_run, we do not want to execute the command, but simply print it.
-                    command = f"echo '{command}' && "
+                    if dry_run:
+                        # If dry_run, we do not want to execute the command, but simply print it.
+                        command = f"echo '{command}' && "
 
                 if etl_steps:
                     # Then let ETL run all remaining steps (ETL will decide the order).
@@ -824,11 +876,20 @@ if st.session_state.selected_steps:
                     if force_only:
                         command += " --force --only"
 
+                    if run_grapher:
+                        # To run grapher steps (i.e. grapher://grapher/... steps) we need to remove the "data://" at the
+                        # beginning of the step name, otherwise, grapher://grapher/... steps will be ignored.
+                        command = command.replace("data://grapher/", "grapher/")
+                        command += " --grapher"
+
+                if command.endswith("&& "):
+                    command = command[:-3]
+
                 return command
 
             btn_etl_run = st.button(
-                "Run all ETL steps (including snapshots)",
-                help="Execute all snapshots currently in the _Operations list_, and run ETL on all data steps.",
+                "Run all ETL steps",
+                help="Run ETL on all data steps in the _Operations list_ (and optionally also execute snapshots).",
                 type="primary",
                 use_container_width=True,
             )
@@ -841,11 +902,15 @@ if st.session_state.selected_steps:
                 else:
                     with st.spinner("Executing ETL..."):
                         command = define_command_to_execute_snapshots_and_etl_steps(
-                            dry_run=dry_run_etl, force_only=force_only
+                            dry_run=dry_run_etl,
+                            force_only=force_only,
+                            run_snapshots=run_snapshots,
+                            run_grapher=run_grapher,
                         )
                         cmd_output = execute_command(cmd=command)
                         # Show the output of the command in an expander.
-                        with st.expander("Command Output:", expanded=True):
+                        with st.expander("Command:", expanded=True):
+                            st.text(command)
                             st.text_area("Output", value=cmd_output, height=300, key="cmd_output_area")
                         if "error" not in cmd_output.lower():
                             # Celebrate that the update was successful, why not.

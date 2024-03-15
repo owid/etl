@@ -1,6 +1,7 @@
 # Use this file to add new apps (or pages) to Wizard (see property 'sections')
 #
-# There are two main properties in this file:
+# There are three main properties in this file:
+# - main: Reserved for 'Home' and 'Expert' pages.
 # - etl: This is the section for the ETL apps. Each app in this section will be shown in the ETL home page.
 # - sections: This is a list of sections. Each section is a group of apps. Each section will have its own home page.
 #
@@ -19,6 +20,22 @@
 # - image_url (str): Link to the image you want to show on the card in the home page of Wizard.
 # - disable_on_remote (bool): Whether the app is disabled in remote settings. To detect if the app is running in a remote setting, it checks the value of the environment variable `ENV`. If it's not `staging` or `production`, the app will be disabled and overwrites the value of `enabled`.
 
+# Main pages
+main:
+  home:
+    title: "Home"
+    description: "App homepage"
+    maintainer: "@lucas"
+    entrypoint: home.py
+    emoji: "🏠"
+  expert:
+      title: "Expert"
+      description: "Ask the expert ETL questions!"
+      maintainer: "@lucas"
+      entrypoint: pages/expert/app.py
+      emoji: "🧙"
+
+# ETL steps
 etl:
   title: ETL steps
   description: Create an ETL step.
@@ -85,39 +102,6 @@ sections:
         maintainer: "@pablo"
         emoji: "📋"
         image_url: "https://cdn.pixabay.com/photo/2018/09/04/17/02/indicator-3654257_960_720.jpg"
-
-  - title: "Metadata"
-    description: |-
-      Tools to improve our metadata or learn how to use it.
-    apps:
-    - title: "Meta Upgrader"
-      description: "Migrate old metadata to new format."
-      maintainer: "@veronika / @lucas"
-      entrypoint: pages/metagpt.py
-      emoji: "🌟"
-      alias: metagpt
-      image_url: "https://cdn.pixabay.com/photo/2016/12/04/18/58/instagram-1882329_1280.png"
-      disable_on_remote: True
-    - title: "Meta Expert"
-      alias: expert
-      description: "Ask chat GPT about our metadata."
-      maintainer: "@lucas"
-      entrypoint: pages/meta_expert/app.py
-      emoji: "🧙"
-      image_url: "https://i1.sndcdn.com/artworks-lyidNFrSCzymr7fo-mmlyoQ-t500x500.jpg"
-    - title: "Meta Playground"
-      alias: metaplay
-      description: "How is metadata presented in data pages?"
-      maintainer: "@lucas"
-      entrypoint: pages/metaplay.py
-      emoji: "🏐"
-      image_url: "https://upload.wikimedia.org/wikipedia/commons/d/d4/PlayEquipComboPlastic_wb.jpg"
-      disable_on_remote: True
-
-  - title: "Others"
-    description: |-
-      Other helpful tools in the ETL ecosystem.
-    apps:
       - title: "Dataset Explorer"
         alias: dataexp
         description: "Explore datasets and their metadata."
@@ -125,6 +109,31 @@ sections:
         entrypoint: pages/dataset_explorer.py
         emoji: "🔍"
         image_url: "https://upload.wikimedia.org/wikipedia/commons/c/c3/NGC_4414_%28NASA-med%29.jpg"
+  - title: "Metadata"
+    description: |-
+      Tools to improve our metadata or learn how to use it.
+    apps:
+      - title: "Meta Upgrader"
+        description: "Migrate old metadata to new format."
+        maintainer: "@veronika / @lucas"
+        entrypoint: pages/metagpt.py
+        emoji: "🌟"
+        alias: metagpt
+        image_url: "https://cdn.pixabay.com/photo/2016/12/04/18/58/instagram-1882329_1280.png"
+        disable_on_remote: True
+      - title: "Meta Playground"
+        alias: metaplay
+        description: "How is metadata presented in data pages?"
+        maintainer: "@lucas"
+        entrypoint: pages/metaplay.py
+        emoji: "🏐"
+        image_url: "https://upload.wikimedia.org/wikipedia/commons/d/d4/PlayEquipComboPlastic_wb.jpg"
+        disable_on_remote: True
+
+  - title: "Others"
+    description: |-
+      Other helpful tools in the ETL ecosystem.
+    apps:
       - title: "Entity Harmonizer"
         alias: harmonizer
         description: "Harmonize a column of a table."
