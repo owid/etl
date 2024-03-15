@@ -1241,9 +1241,12 @@ def add_fao_population_if_given(data: pd.DataFrame) -> pd.DataFrame:
         Data, after adding a column 'fao_population', if FAO population was found in the data.
 
     """
-    # Select rows that correspond to FAO population.
+    # Name of item and element of FAO population (used to select population in the data).
     fao_population_item_name = "Population"
     fao_population_element_name = "Total Population - Both sexes"
+    # Expected name of unit of FAO population.
+    fao_population_unit_name = "thousand Number"
+    # Select rows that correspond to FAO population.
     population_rows_mask = (data["fao_item"] == fao_population_item_name) & (
         data["fao_element"] == fao_population_element_name
     )
@@ -1254,7 +1257,9 @@ def add_fao_population_if_given(data: pd.DataFrame) -> pd.DataFrame:
         fao_population = data[population_rows_mask].reset_index(drop=True)
 
         # Check that population is given in "1000 persons" and convert to persons.
-        assert list(fao_population["unit"].unique()) == ["1000 persons"], "FAO population may have changed units."
+        assert list(fao_population["unit"].unique()) == [
+            fao_population_unit_name
+        ], "FAO population may have changed units."
         fao_population["value"] *= 1000
 
         # Note: Here we will dismiss the flags related to population. But they are only relevant for those columns
@@ -1553,17 +1558,17 @@ def clean_data(
         }
     )
 
-    # Dataset faostat_wcad doesn't have a year column, but a "census_year", which has intervals like "2002-2003"
-    if "census_year" in data.columns:
-        if data["census_year"].astype(str).str.contains("-.{4}/", regex=True).any():
-            log.warning(
-                "Column 'census_year' in dataset 'faostat_wcad' contains values that need to be properly analysed "
-                "and processed, e.g. 1976-1977/1980-1981. For the moment, we take the first 4 digits as the year."
-            )
+    # # Dataset faostat_wcad doesn't have a year column, but a "census_year", which has intervals like "2002-2003"
+    # if "census_year" in data.columns:
+    #     if data["census_year"].astype(str).str.contains("-.{4}/", regex=True).any():
+    #         log.warning(
+    #             "Column 'census_year' in dataset 'faostat_wcad' contains values that need to be properly analysed "
+    #             "and processed, e.g. 1976-1977/1980-1981. For the moment, we take the first 4 digits as the year."
+    #         )
 
-        # Remove rows that don't have a census year, and take the first 4 digits
-        data = data.dropna(subset="census_year").reset_index(drop=True)
-        data["year"] = data["census_year"].astype(str).str[0:4].astype(int)
+    #     # Remove rows that don't have a census year, and take the first 4 digits
+    #     data = data.dropna(subset="census_year").reset_index(drop=True)
+    #     data["year"] = data["census_year"].astype(str).str[0:4].astype(int)
 
     # Ensure year column is integer (sometimes it is given as a range of years, e.g. 2013-2015).
     data["year"] = clean_year_column(data["year"])
@@ -1935,9 +1940,6 @@ def run(dest_dir: str) -> None:
     # Add description of anomalies (if any) to the dataset description.
     ds_garden.metadata.description = dataset_metadata["owid_dataset_description"] + anomaly_descriptions
     ds_garden.metadata.title = dataset_metadata["owid_dataset_title"]
-
-    # Update the main source's metadata description (which will be shown in charts).
-    ds_garden.metadata.sources[0].description = ds_garden.metadata.description
 
     # Create garden dataset.
     ds_garden.save()

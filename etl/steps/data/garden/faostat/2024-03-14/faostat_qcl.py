@@ -527,8 +527,5 @@ def run(dest_dir: str) -> None:
     )
     ds_garden.metadata.title = dataset_metadata["owid_dataset_title"]
 
-    # Update the main source's metadata description (which will be shown in charts).
-    ds_garden.metadata.sources[0].description = ds_garden.metadata.description
-
     # Create garden dataset.
     ds_garden.save()
