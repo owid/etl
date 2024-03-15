@@ -8,13 +8,13 @@ There are different ways you can add data to the catalog, depending on your tech
 
 <div class="grid cards" markdown>
 
--   __[:fontawesome-solid-hat-wizard: &nbsp; Wizard](#using-wizard)__  (recommended)
+-   __[:fontawesome-solid-hat-wizard: &nbsp; Wizard](#using-wizard-recommended)__ (recommended)
 
     ---
 
     Create ETL steps using default templates.
 
--   __[:material-tools: &nbsp; Manual](#manual)__
+-   __[:material-tools: &nbsp; Manual](#manually-add-a-dataset-to-the-etl)__
 
     ---
 

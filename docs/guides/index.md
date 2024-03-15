@@ -19,7 +19,7 @@ In this section you will find guides for different use cases and tasks you might
 
     Whenever you update a dataset, you need to upgrade all indicator references so that all charts reflect this update.
 
--   __[:fontawesome-solid-hat-wizard: &nbsp; Wizard](adding-data)__
+-   __[:fontawesome-solid-hat-wizard: &nbsp; Wizard](wizard)__
 
     ---
 
