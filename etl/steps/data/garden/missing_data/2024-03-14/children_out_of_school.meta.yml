@@ -1,0 +1,22 @@
+definitions:
+  presentation:
+    topic_tags:
+    - Education
+
+dataset:
+  title:  Missing data - Children out of school
+
+tables:
+  children_out_of_school:
+    variables:
+      missing_countries:
+        title: Number of countries with missing data on children out of school
+        short_unit: ''
+        unit: ''
+
+      fraction_missing:
+        title: Fraction of countries with missing data on children out of school
+        short_unit: '%'
+        unit: '%'
+
+
