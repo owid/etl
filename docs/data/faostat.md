@@ -254,7 +254,7 @@ If no dataset requires an update, the workflow stops here.
     Optionally, set `INSPECT_ANOMALIES=True`, to visualize if anomalies that were detected in the previous version of the data are still present in the current version.
 
     ```bash
-    INSPECT_ANOMALIES=True etl garden/faostat/YYYY-MM-DD
+    INSPECT_ANOMALIES=True etl run garden/faostat/YYYY-MM-DD
     ```
     !!! note
 

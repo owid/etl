@@ -197,112 +197,6 @@ class SpinachAreaHarvestedAnomaly(DataAnomaly):
         return df_fixed
 
 
-class CocoaBeansFoodAvailableAnomaly(DataAnomaly):
-    description = (  # type: ignore
-        "Food available for consumption for cocoa beans from 2010 onwards presents many zeros for different countries. "
-        "These zeros are likely to correspond to missing data. "
-        "This issue may be caused by a change in FAO methodology precisely on 2010. "
-        "Therefore, to be conservative, we eliminate those zeros and treat them as missing values. "
-        "For aggregate regions (like continents), data from 2010 onwards is not zero, but a small number (resulting "
-        "from summing many spurious zeros). "
-        "Therefore, we also remove data for region aggregates from 2010 onwards."
-    )
-
-    affected_item_codes = [
-        "00002633",
-    ]
-    affected_element_codes = [
-        "000645",
-        "0645pc",
-        "005142",
-        "5142pc",
-    ]
-    # List of countries with value of exactly zero for all years after 2010.
-    # This list does not need to include all countries with that problem (it's used just to check they are still zero).
-    expected_countries_with_all_zero = [
-        "United States",
-        "China",
-        "Norway",
-    ]
-
-    def check(self, df):
-        assert (
-            df[
-                (
-                    (df["item_code"].isin(self.affected_item_codes))
-                    & (df["element_code"].isin(self.affected_element_codes))
-                    & (df["year"] >= 2010)
-                    & (df["country"].isin(self.expected_countries_with_all_zero))
-                )
-            ]["value"]
-            == 0
-        ).all()
-        # Check that, for the same countries, there is at least one value prior to 2010 where value is not zero.
-        assert (
-            df[
-                (
-                    (df["item_code"].isin(self.affected_item_codes))
-                    & (df["element_code"].isin(self.affected_element_codes))
-                    & (df["year"] < 2010)
-                    & (df["country"].isin(self.expected_countries_with_all_zero))
-                )
-            ]["value"]
-            > 0
-        ).any()
-
-    def inspect(self, df):
-        log.info(
-            "The anomaly causes: "
-            "\n* Zeros from 2010 onwards. "
-            "\n* I's usually zero all years, but some countries also have single non-zero values (e.g. Afghanistan)."
-        )
-        for element_code in self.affected_element_codes:
-            selection = (df["item_code"].isin(self.affected_item_codes)) & (df["element_code"] == element_code)
-            df_affected = df[selection].astype({"country": str}).sort_values(["country", "year"])
-            title = _split_long_title(self.description + f"Element code {element_code}")
-            fig = px.line(df_affected, x="year", y="value", color="country", title=title, markers=True)
-            fig.show()
-
-    def fix(self, df):
-        # Remove all possibly spurious zeros from 2010 onwards in all countries.
-        indexes_to_drop = df[
-            (
-                (df["year"] > 2010)
-                & (df["item_code"].isin(self.affected_item_codes))
-                & (df["element_code"].isin(self.affected_element_codes))
-                & (df["value"] == 0)
-            )
-        ].index.tolist()
-        # Additionally, remove all data for region aggregates from 2010 onwards.
-        # List of possibly affected region aggregates, including all original FAO region aggregates.
-        aggregates = [
-            "North America",
-            "South America",
-            "Europe",
-            "European Union (27)",
-            "Africa",
-            "Asia",
-            "Oceania",
-            "Low-income countries",
-            "Upper-middle-income countries",
-            "Lower-middle-income countries",
-            "High-income countries",
-            "World",
-        ] + sorted(set(df[df["country"].str.contains("FAO")]["country"]))
-        indexes_to_drop.extend(
-            df[
-                (df["country"].isin(aggregates))
-                & (df["year"] >= 2010)
-                & (df["item_code"].isin(self.affected_item_codes))
-                & (df["element_code"].isin(self.affected_element_codes))
-            ].index.tolist()
-        )
-
-        df_fixed = df.drop(indexes_to_drop).reset_index(drop=True)
-
-        return df_fixed
-
-
 class EggYieldNorthernEuropeAnomaly(DataAnomaly):
     description = (  # type: ignore
         "The amount of eggs produced per bird for Northern Europe (FAO) is unreasonably high before 1973, with values "
@@ -809,9 +703,7 @@ detected_anomalies = {
         OtherTropicalFruitYieldNorthernAfricaAnomaly,
         OtherTropicalFruitYieldSouthAmericaAnomaly,
     ],
-    "faostat_fbsc": [
-        CocoaBeansFoodAvailableAnomaly,
-    ],
+    "faostat_fbsc": [],
 }
 
 
