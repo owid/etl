@@ -280,6 +280,8 @@ def upsert_table(
 
         df = table.rename(columns={column_name: "value", "entity_id": "entityId"})
 
+        db_variable.infer_type(df["value"])
+
         # following functions assume that `value` is string
         df["value"] = df["value"].astype(str)
 
