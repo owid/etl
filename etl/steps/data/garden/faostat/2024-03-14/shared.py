@@ -25,7 +25,6 @@ from tqdm.auto import tqdm
 
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
-from etl.paths import DATA_DIR
 
 # Initialise log.
 log = structlog.get_logger()
@@ -155,10 +154,7 @@ REGIONS_TO_ADD = {
 # countries, to avoid double-counting the data of those countries.
 # Note: This list does not contain all country groups, but only those that are in our list of harmonized countries
 # (without the *(FAO) suffix).
-REGIONS_TO_IGNORE_IN_AGGREGATES = [
-    "Melanesia",
-    "Polynesia",
-]
+REGIONS_TO_IGNORE_IN_AGGREGATES = []
 
 # When creating region aggregates, decide how to distribute historical regions.
 # The following decisions are based on the current location of the countries that succeeded the region, and their income
@@ -901,7 +897,7 @@ def remove_regions_from_countries_regions_members(
     return countries_regions
 
 
-def load_population() -> pd.DataFrame:
+def load_population(ds_population: catalog.Dataset) -> pd.DataFrame:
     """Load OWID population dataset, and add historical regions to it.
 
     Returns
@@ -911,9 +907,7 @@ def load_population() -> pd.DataFrame:
 
     """
     # Load population dataset.
-    population = catalog.Dataset(DATA_DIR / "garden/owid/latest/key_indicators/")["population"].reset_index()[
-        ["country", "year", "population"]
-    ]
+    population = ds_population["population"].reset_index()[["country", "year", "population"]]
 
     # Add data for historical regions (if not in population) by adding the population of its current successors.
     countries_with_population = population["country"].unique()
@@ -935,92 +929,6 @@ def load_population() -> pd.DataFrame:
     assert population[population.duplicated(subset=["country", "year"])].empty, error
 
     return cast(pd.DataFrame, population)
-
-
-def load_countries_regions() -> pd.DataFrame:
-    """Load countries-regions dataset from the OWID catalog, and remove certain regions (defined in
-    REGIONS_TO_IGNORE_IN_AGGREGATES) from the lists of members of countries or regions.
-
-    Returns
-    -------
-    countries_regions : pd.DataFrame
-        Countries-regions dataset.
-
-    """
-    # Load dataset of countries and regions.
-    countries_regions = catalog.Dataset(DATA_DIR / "garden/regions/2023-01-01/regions")["regions"]
-
-    countries_regions = remove_regions_from_countries_regions_members(
-        countries_regions, regions_to_remove=REGIONS_TO_IGNORE_IN_AGGREGATES
-    )
-
-    return cast(pd.DataFrame, countries_regions)
-
-
-def load_income_groups() -> pd.DataFrame:
-    """Load dataset of income groups and add historical regions to it.
-
-    Returns
-    -------
-    income_groups : pd.DataFrame
-        Income groups data.
-
-    """
-    # Load the WorldBank dataset for income grups.
-    income_groups = catalog.Dataset(DATA_DIR / "garden/wb/2021-07-01/wb_income")["wb_income_group"].reset_index()
-
-    # Add historical regions to income groups.
-    for historic_region in HISTORIC_TO_CURRENT_REGION:
-        historic_region_income_group = HISTORIC_TO_CURRENT_REGION[historic_region]["income_group"]
-        if historic_region not in income_groups["country"]:
-            historic_region_df = pd.DataFrame(
-                {
-                    "country": [historic_region],
-                    "income_group": [historic_region_income_group],
-                }
-            )
-            income_groups = pd.concat([income_groups, historic_region_df], ignore_index=True)
-
-    return cast(pd.DataFrame, income_groups)
-
-
-def list_countries_in_region(region: str, countries_regions: pd.DataFrame, income_groups: pd.DataFrame) -> List[str]:
-    """List all countries in a specific region or income group.
-
-    Parameters
-    ----------
-    region : str
-        Name of the region.
-    countries_regions : pd.DataFrame
-        Countries-regions dataset (after removing certain regions from the lists of members).
-    income_groups : pd.DataFrame
-        Dataset of income groups, which includes historical regions.
-
-    Returns
-    -------
-    countries_in_regions : list
-        List of countries in the given region or income group.
-
-    """
-    # Number of attempts to fetch countries regions data.
-    attempts = 5
-    attempt = 0
-    countries_in_region = list()
-    while attempt < attempts:
-        try:
-            # List countries in region.
-            countries_in_region = geo.list_countries_in_region(
-                region=region,
-                countries_regions=countries_regions,
-                income_groups=income_groups,
-            )
-            break
-        except ConnectionResetError:
-            attempt += 1
-        finally:
-            assert len(countries_in_region) > 0, "Unable to fetch countries-regions data."
-
-    return countries_in_region
 
 
 def remove_overlapping_data_between_historical_regions_and_successors(
@@ -1082,7 +990,13 @@ def remove_overlapping_data_between_historical_regions_and_successors(
     return data_region
 
 
-def add_regions(data: pd.DataFrame, elements_metadata: pd.DataFrame) -> pd.DataFrame:
+def add_regions(
+    data: pd.DataFrame,
+    ds_regions: catalog.Dataset,
+    ds_income_groups: catalog.Dataset,
+    ds_population: catalog.Dataset,
+    elements_metadata: pd.DataFrame,
+) -> pd.DataFrame:
     """Add region aggregates (i.e. aggregate data for continents and income groups).
 
     Regions to be created are defined above, in REGIONS_TO_ADD, and the variables for which data will be aggregated are
@@ -1118,9 +1032,7 @@ def add_regions(data: pd.DataFrame, elements_metadata: pd.DataFrame) -> pd.DataF
         log.info("add_regions", shape=data.shape)
 
         # Load population dataset, countries-regions, and income groups datasets.
-        population = load_population()
-        countries_regions = load_countries_regions()
-        income_groups = load_income_groups()
+        population = load_population(ds_population=ds_population)
 
         # Invert dictionary of aggregations to have the aggregation as key, and the list of element codes as value.
         aggregations_inverted = {
@@ -1128,8 +1040,12 @@ def add_regions(data: pd.DataFrame, elements_metadata: pd.DataFrame) -> pd.DataF
             for unique_value in aggregations.values()
         }
         for region in tqdm(REGIONS_TO_ADD, file=sys.stdout):
-            countries_in_region = list_countries_in_region(
-                region, countries_regions=countries_regions, income_groups=income_groups
+            countries_in_region = geo.list_members_of_region(
+                region,
+                ds_regions=ds_regions,
+                ds_income_groups=ds_income_groups,
+                excluded_regions=REGIONS_TO_IGNORE_IN_AGGREGATES,
+                include_historical_regions_in_income_groups=True,
             )
             region_code = REGIONS_TO_ADD[region]["area_code"]
             region_population = population[population["country"] == region][["year", "population"]].reset_index(
@@ -1201,7 +1117,7 @@ def add_regions(data: pd.DataFrame, elements_metadata: pd.DataFrame) -> pd.DataF
 
                     # Add data for current region to data.
                     data = dataframes.concatenate(
-                        [data[data["country"] != region], data_region],
+                        [data[data["country"] != region].reset_index(drop=True), data_region],
                         ignore_index=True,
                     )
 
@@ -1279,6 +1195,7 @@ def add_fao_population_if_given(data: pd.DataFrame) -> pd.DataFrame:
 
 def add_population(
     df: pd.DataFrame,
+    ds_population: catalog.Dataset,
     country_col: str = "country",
     year_col: str = "year",
     population_col: str = "population",
@@ -1313,7 +1230,7 @@ def add_population(
     """
 
     # Load population dataset.
-    population = load_population().rename(
+    population = load_population(ds_population=ds_population).rename(
         columns={
             "country": country_col,
             "year": year_col,
@@ -1504,6 +1421,7 @@ def clean_data_values(values: pd.Series, amendments: Dict[str, str]) -> pd.Serie
 
 def clean_data(
     data: pd.DataFrame,
+    ds_population: catalog.Dataset,
     items_metadata: pd.DataFrame,
     elements_metadata: pd.DataFrame,
     countries_metadata: pd.DataFrame,
@@ -1603,7 +1521,9 @@ def clean_data(
     # Add column for population; when creating region aggregates, this column will have the population of the countries
     # for which there was data. For example, for Europe in a specific year, the population may differ from item to item,
     # because for one item we may have more European countries informed than for the other.
-    data = add_population(df=data, population_col="population_with_data", warn_on_missing_countries=False)
+    data = add_population(
+        df=data, ds_population=ds_population, population_col="population_with_data", warn_on_missing_countries=False
+    )
 
     # Convert back to categorical columns (maybe this should be handled automatically in `add_population_to_dataframe`)
     data = data.astype({"country": "category"})
@@ -1892,6 +1812,9 @@ def run(dest_dir: str) -> None:
     countries_metadata = pd.DataFrame(metadata["countries"]).reset_index()
     amendments = parse_amendments_table(amendments=metadata["amendments"], dataset_short_name=dataset_short_name)
 
+    # Load population dataset.
+    ds_population = paths.load_dataset("population")
+
     #
     # Process data.
     #
@@ -1902,6 +1825,7 @@ def run(dest_dir: str) -> None:
     # Prepare data.
     data = clean_data(
         data=data,
+        ds_population=ds_population,
         items_metadata=items_metadata,
         elements_metadata=elements_metadata,
         countries_metadata=countries_metadata,

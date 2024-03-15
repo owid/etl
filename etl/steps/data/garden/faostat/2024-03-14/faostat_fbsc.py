@@ -153,6 +153,15 @@ def run(dest_dir: str) -> None:
     countries_metadata = pd.DataFrame(metadata["countries"]).reset_index()
     amendments = parse_amendments_table(amendments=metadata["amendments"], dataset_short_name=dataset_short_name)
 
+    # Load regions dataset.
+    ds_regions = paths.load_dataset("regions")
+
+    # Load income groups dataset.
+    ds_income_groups = paths.load_dataset("income_groups")
+
+    # Lod population dataset.
+    ds_population = paths.load_dataset("population")
+
     #
     # Process data.
     #
@@ -169,6 +178,7 @@ def run(dest_dir: str) -> None:
     # Prepare data.
     data = clean_data(
         data=data,
+        ds_population=ds_population,
         items_metadata=items_metadata,
         elements_metadata=elements_metadata,
         countries_metadata=countries_metadata,
@@ -176,7 +186,13 @@ def run(dest_dir: str) -> None:
     )
 
     # Add data for aggregate regions.
-    data = add_regions(data=data, elements_metadata=elements_metadata)
+    data = add_regions(
+        data=data,
+        ds_regions=ds_regions,
+        ds_income_groups=ds_income_groups,
+        ds_population=ds_population,
+        elements_metadata=elements_metadata,
+    )
 
     # Add per-capita variables.
     data = add_per_capita_variables(data=data, elements_metadata=elements_metadata)
