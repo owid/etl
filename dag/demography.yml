@@ -1,5 +1,4 @@
 steps:
-
   ####################################
   # Population #######################
   ####################################
@@ -70,7 +69,6 @@ steps:
     - data://garden/faostat/2023-06-12/faostat_rl
   data://grapher/demography/2023-06-12/population_density:
     - data://garden/demography/2023-06-12/population_density
-
 
   ####################################
   # Life expectancy ##################
@@ -174,3 +172,9 @@ steps:
     - snapshot://ggdc/2024-01-19/maddison_federico_paper.xlsx
   data://garden/ggdc/2024-01-19/maddison_federico_paper:
     - data://meadow/ggdc/2024-01-19/maddison_federico_paper
+
+  # UN WPP experiments
+  data://garden/un/2024-03-14/un_wpp_most:
+    - data://garden/un/2022-07-11/un_wpp
+  data://grapher/un/2024-03-14/un_wpp_most:
+    - data://garden/un/2024-03-14/un_wpp_most
