@@ -59,6 +59,8 @@ Select.inherit_cache = True  # type: ignore
 
 S3_PATH_TYP = Literal["s3", "http"]
 
+VARIABLE_TYPE = Literal["float", "int", "mixed", "string"]
+
 metadata = SQLModel.metadata
 
 
@@ -1061,6 +1063,13 @@ class Variable(SQLModel, table=True):
     licenses: Optional[List[dict]] = Field(default=None, sa_column=Column("licenses", JSON))
     # NOTE: License should be the resulting license, given all licenses of the indicator’s origins and given the indicator’s processing level.
     license: Optional[dict] = Field(default=None, sa_column=Column("license", JSON))
+    type: Optional[VARIABLE_TYPE] = Field(default=None, sa_column=Column("type", String(255, "utf8mb4_0900_as_cs")))
+    sort: Optional[List[str]] = Field(
+        sa_column=Column(
+            "sort",
+            JSON,
+        )
+    )
 
     datasets: Optional["Dataset"] = Relationship(back_populates="variables")
     sources: Optional["Source"] = Relationship(back_populates="variables")
@@ -1121,6 +1130,7 @@ class Variable(SQLModel, table=True):
             ds.descriptionProcessing = self.descriptionProcessing
             ds.licenses = self.licenses
             ds.license = self.license
+            ds.type = self.type
             ds.updatedAt = datetime.utcnow()
             # do not update these fields unless they're specified
             if self.columnOrder is not None:
@@ -1131,6 +1141,8 @@ class Variable(SQLModel, table=True):
                 ds.originalMetadata = self.originalMetadata
             if self.grapherConfigETL is not None:
                 ds.grapherConfigETL = self.grapherConfigETL
+            if self.sort is not None:
+                ds.sort = self.sort
             assert self.grapherConfigAdmin is None, "grapherConfigETL should be used instead of grapherConfigAdmin"
 
         session.add(ds)
@@ -1212,9 +1224,14 @@ class Variable(SQLModel, table=True):
         assert "#" in catalog_path, "catalog_path should end with #indicator_short_name"
         return session.exec(select(cls).where(cls.catalogPath == catalog_path)).one()
 
+    def infer_type(self, values: pd.Series) -> None:
+        """Set type and sort fields based on indicator values."""
+        self.type = _infer_variable_type(values)
+        self.sort = None
+
     def update_links(
         self, session: Session, db_origins: List["Origin"], faqs: List[catalog.FaqLink], tag_names: List[str]
-    ):
+    ) -> None:
         """
         Establishes relationships between the current variable and a list of origins and a list of posts.
         """
@@ -1447,3 +1464,34 @@ def _remap_variable_ids(config: Union[List, Dict[str, Any]], remap_ids: Dict[int
         return [_remap_variable_ids(item, remap_ids) for item in config]
     else:
         return config
+
+
+def _infer_variable_type(values: pd.Series) -> VARIABLE_TYPE:
+    # values don't contain null values
+    assert values.notnull().all(), "values must not contain nulls"
+    assert values.map(lambda x: isinstance(x, str)).all(), "only works for strings"
+    if values.empty:
+        return "mixed"
+    try:
+        values = pd.to_numeric(values)
+        inferred_type = pd.api.types.infer_dtype(values)
+        if inferred_type == "floating":
+            return "float"
+        elif inferred_type == "integer":
+            return "int"
+        else:
+            raise NotImplementedError()
+    except ValueError:
+        if values.map(_is_float).any():
+            return "mixed"
+        else:
+            return "string"
+
+
+def _is_float(x):
+    try:
+        float(x)
+    except ValueError:
+        return False
+    else:
+        return True
