@@ -32,7 +32,7 @@ def run(dest_dir: str) -> None:
     # Load datasets.
     ds_data = paths.load_dataset("gender_statistics")
     tb = ds_data["gender_statistics"].reset_index()
-    tb_data = tb[["country", "year", "se_prm_uner"]]  # Just the columns we need.
+    tb_data = tb[["country", "year", "se_prm_uner"]]  # Interested columns.
 
     ds_regions = paths.load_dataset("regions")
     ds_income_groups = paths.load_dataset("income_groups")
@@ -43,13 +43,12 @@ def run(dest_dir: str) -> None:
     years_with_data = tb_data.dropna(subset=["se_prm_uner"])["year"].unique()
     tb_data = tb_data[tb_data["year"].isin(years_with_data)]
 
-    # Map countries to their regions.
+    # Map countries to their regions and income groups.
     country_to_region = {
         country: region for region in REGIONS for country in geo.list_members_of_region(region, ds_regions)
     }
     tb_data["region"] = tb_data["country"].map(country_to_region)
 
-    # Map countries to their income groups.
     country_to_income_group = {
         country: income_group
         for income_group in INCOME_GROUPS
@@ -63,25 +62,38 @@ def run(dest_dir: str) -> None:
     # Flag for 'se_prm_uner' data presence.
     tb_merged["se_prm_uner"] = np.where(tb_merged["se_prm_uner"].isna(), 0, 1)
 
-    # Calculate missing data by region and income group.
-    def calculate_missing_data(group_by_column):
-        total = tb_merged.groupby(["year", group_by_column]).size().reset_index(name="total_countries")
-        missing = (
+    # Function to calculate missing data details.
+    def calculate_details(group_by_column):
+        # Group by year and group, then calculate total countries.
+        total_countries = tb_merged.groupby(["year", group_by_column]).size().reset_index(name="total_countries")
+
+        # Calculate missing data for countries and population.
+        missing_data = (
             tb_merged[tb_merged["se_prm_uner"] == 0]
             .groupby(["year", group_by_column])
-            .size()
-            .reset_index(name="missing_countries")
+            .agg(missing_countries=("country", "size"), missing_population=("population", "sum"))
+            .reset_index()
         )
-        missing["fraction_missing"] = (missing["missing_countries"] / total["total_countries"]) * 100
-        return missing.rename(columns={group_by_column: "region"})
 
-    region_missing = calculate_missing_data("region")
-    income_missing = calculate_missing_data("income_group")
+        # Merge with total countries and calculate fractions.
+        detailed_data = pr.merge(total_countries, missing_data, on=["year", group_by_column])
+        detailed_data["fraction_missing_countries"] = (
+            detailed_data["missing_countries"] / detailed_data["total_countries"]
+        ) * 100
+
+        # Rename columns for consistency.
+        return detailed_data.rename(columns={group_by_column: "region"})
+
+    # Calculate missing details for each region and income group.
+    region_details = calculate_details("region")
+    income_details = calculate_details("income_group")
 
     # Combine and prepare the final dataset.
-    df_final = pr.concat([region_missing, income_missing], axis=0).set_index(["region", "year"], verify_integrity=True)
+    df_final = pr.concat([region_details, income_details], axis=0)
+    df_final = df_final.set_index(["region", "year"], verify_integrity=True)
     tb_garden = Table(df_final, short_name="children_out_of_school")
 
+    # Ensure metadata is correctly associated.
     for column in tb_garden.columns:
         tb_garden[column].metadata.origins = tb_data["se_prm_uner"].metadata.origins
 

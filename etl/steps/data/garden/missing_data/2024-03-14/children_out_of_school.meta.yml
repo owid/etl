@@ -14,9 +14,19 @@ tables:
         short_unit: ''
         unit: ''
 
-      fraction_missing:
+      fraction_missing_countries:
         title: Fraction of countries with missing data on children out of school
         short_unit: '%'
         unit: '%'
+
+      missing_population:
+        title: Total population of countries with missing data on children out of school
+        short_unit: 'people'
+        unit: ''
+
+      total_countries:
+        title: Total number of countries within each region
+        short_unit: ''
+        unit: ''
 
 
