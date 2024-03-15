@@ -5,11 +5,11 @@ tables:
         title: Age-group with the highest population
         unit: ""
         description_short: |-
-          Age of the five-year population age-group with the highest population
+          Five-year age group with the highest population.
       value:
         title: Population of the most populous age group
         unit: "people"
         description_short: |-
-          Population of the most populous five-year age-group
+          Population of the most populous five-year age-group.
         display:
           numDecimalPlaces: 0

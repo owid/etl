@@ -29,10 +29,10 @@ def _keep_relevant_rows(df: pd.DataFrame) -> pd.DataFrame:
     df = df.reset_index()
     df = df.loc[
         df.variant.isin(["estimates", "low", "medium", "high"])
-        & -(
+        & ~(
             df.metric.isin(["net_migration", "net_migration_rate"])
             & (df.location == "World")
-            & -(df.metric == "population")
+            & ~(df.metric == "population")
             & (
                 df.age.isin(
                     [
