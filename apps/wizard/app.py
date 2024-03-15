@@ -41,9 +41,10 @@ for step in WIZARD_CONFIG["etl"]["steps"].values():
 
 # Other apps specified in the config
 for section in WIZARD_CONFIG["sections"]:
-    toc.append(Section(section["title"]))
-    for app in section["apps"]:
-        if app["enable"]:
+    apps = [app for app in section["apps"] if app["enable"]]
+    if apps:
+        toc.append(Section(section["title"]))
+        for app in apps:
             toc.append(
                 Page(
                     path=str(CURRENT_DIR / app["entrypoint"]),
