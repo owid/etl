@@ -262,9 +262,9 @@ tables:
       population_years_in_democracy_consec:
         title: |-
           <% if category == '91+' %>
-          People living in democracies aged 91 or older
+          People living in 91-year-old (or older) democracies
           <% else %>
-          People living in democracies aged << category >> years
+          People living in (<< category >>)-year-old democracies
           <% endif %>
         unit: "people"
         description_short: |-
@@ -278,9 +278,9 @@ tables:
       population_years_in_democracy_ws_consec:
         title: |-
           <% if category == '91+' %>
-          People living in democracies (incl. women's suffrage) aged 91 or older
+          People living in 91-year-old (or older) democracies (incl. women's suffrage)
           <% else %>
-          People living in democracies (incl. women's suffrage) aged << category >> years
+          People living in (<< category >>)-year-old democracies (incl. women's suffrage)
           <% endif %>
         unit: "people"
         description_short: |-
