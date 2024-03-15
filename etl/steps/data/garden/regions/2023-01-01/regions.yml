@@ -64,6 +64,7 @@
     - "NER"
     - "NGA"
     - "OWID_ERE"
+    - "OWID_OFS"
     - "REU"
     - "RWA"
     - "SDN"
@@ -171,10 +172,12 @@
     - "MYS"
     - "NPL"
     - "OMN"
+    - "OWID_DRV"
     - "OWID_KRU"
     - "OWID_RVN"
     - "OWID_YAR"
     - "OWID_YPR"
+    - "OWID_FPK"
     - "PAK"
     - "PHL"
     - "PRK"
@@ -579,6 +582,15 @@
     - "OWID_SRM"
     - "OWID_USS"
     - "OWID_YGS"
+    - "OWID_TSC"
+    - "OWID_DSI"
+    - "OWID_MOD"
+    - "OWID_SAR"
+    - "OWID_PAR"
+    - "OWID_BAD"
+    - "OWID_BAV"
+    - "OWID_SAX"
+    - "OWID_WTB"
     - "POL"
     - "PRT"
     - "ROU"
@@ -1057,6 +1069,7 @@
     - "MTQ"
     - "NIC"
     - "PAN"
+    - "OWID_RCA"
     - "PRI"
     - "SLV"
     - "SPM"
@@ -1204,6 +1217,15 @@
 
 - code: "QAT"
   name: "Qatar"
+
+- code: "OWID_DRV"
+  name: "Democratic Republic of Vietnam"
+  is_historical: True
+  end_year: 1975
+  aliases:
+    - "North Vietnam"
+  successors:
+    - "VNM"
 
 - code: "OWID_RVN"
   name: "Republic of Vietnam"
@@ -1358,6 +1380,7 @@
     - "FLK"
     - "GUF"
     - "GUY"
+    - "OWID_GCL"
     - "PER"
     - "PRY"
     - "SGS"
@@ -1657,6 +1680,8 @@
   name: "Yemen Arab Republic"
   is_historical: True
   end_year: 1990
+  aliases:
+    - "North Yemen"
   successors:
     - "YEM"
 
@@ -1695,3 +1720,130 @@
 - code: "ZWE"
   name: "Zimbabwe"
 
+# Former states in nowadays' Italy
+- code: "OWID_TSC"
+  name: "Grand Duchy of Tuscany"
+  is_historical: True
+  end_year: 1860
+  aliases:
+    - "Tuscany"
+  successors:
+    - "ITA"
+
+- code: "OWID_DSI"
+  name: "Kingdom of the Two Sicilies"
+  is_historical: True
+  end_year: 1860
+  aliases:
+    - "Regno delle Due Sicilie"
+    - "Two Sicilies"
+    - "Sicily"
+  successors:
+    - "ITA"
+
+- code: "OWID_MOD"
+  name: "Duchy of Modena and Reggio"
+  is_historical: True
+  end_year: 1860
+  aliases:
+    - "Modena"
+  successors:
+    - "ITA"
+
+- code: "OWID_SAR"
+  name: "Kingdom of Sardinia"
+  is_historical: True
+  end_year: 1860
+  aliases:
+    - "Sardinia"
+    - "Piedmont-Sardinia"
+  successors:
+    - "ITA"
+
+- code: "OWID_PAR"
+  name: "Duchy of Parma and Piacenza"
+  is_historical: True
+  end_year: 1860
+  aliases:
+    - "Parma"
+  successors:
+    - "ITA"
+
+# Former states in nowadays' Germany
+- code: "OWID_BAD"
+  name: "Grand Duchy of Baden"
+  is_historical: True
+  end_year: 1871
+  aliases:
+    - "Baden"
+  successors:
+    - "DEU"
+
+- code: "OWID_BAV"
+  name: "Kingdom of Bavaria"
+  is_historical: True
+  end_year: 1871
+  aliases:
+    - "Bavaria"
+  successors:
+    - "DEU"
+
+- code: "OWID_SAX"
+  name: "Kingdom of Saxony"
+  is_historical: True
+  end_year: 1871
+  aliases:
+    - "Saxony"
+  successors:
+    - "DEU"
+
+- code: "OWID_WTB"
+  name: "Kingdom of Wurttemberg"
+  is_historical: True
+  end_year: 1871
+  aliases:
+    - "Wurttemberg"
+    - "Wuerttemberg"
+  successors:
+    - "DEU"
+
+# Former states in Central America/South America
+- code: "OWID_GCL"
+  name: "Great Colombia"
+  is_historical: True
+  end_year: 1830
+  successors:
+    - "COL"
+    - "PAN"
+    - "ECU"
+    - "VEN"
+    - "GUY"
+
+- code: "OWID_RCA"
+  name: "Federal Republic of Central America"
+  is_historical: True
+  end_year: 1841
+  aliases:
+    - "Central American Union"
+  successors:
+    - "CRI"
+    - "SLV"
+    - "GTM"
+    - "HND"
+    - "NIC"
+
+# Other former states
+- code: "OWID_FPK"
+  name: "Pakistan (former)"
+  is_historical: True
+  end_year: 1971
+  successors:
+    - "PAK"
+    - "BGD"
+
+- code: "OWID_OFS"
+  name: "Orange Free State"
+  is_historical: True
+  end_year: 1902
+  successors:
+    - "ZAF"
