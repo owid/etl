@@ -203,12 +203,14 @@ def _variable_metadata(
     grapherConfigAdminJson = row.pop("grapherConfigAdmin")
     licenseJson = row.pop("license")
     descriptionKeyJson = row.pop("descriptionKey")
+    sortJson = row.pop("sort")
 
     display = json.loads(displayJson)
     grapherConfigETL = json.loads(grapherConfigETLJson) if grapherConfigETLJson else None
     grapherConfigAdmin = json.loads(grapherConfigAdminJson) if grapherConfigAdminJson else None
     license = json.loads(licenseJson) if licenseJson else None
     descriptionKey = json.loads(descriptionKeyJson) if descriptionKeyJson else None
+    sort = json.loads(sortJson) if sortJson else None
 
     # group fields from flat structure into presentation field
     presentation = dict(
@@ -231,6 +233,7 @@ def _variable_metadata(
         presentation=_omit_nullable_values(presentation),
         license=license,
         descriptionKey=descriptionKey,
+        sort=sort,
     )
 
     assert variableMetadata["type"], "type must be set"
@@ -275,9 +278,9 @@ def _variable_metadata(
         "entities": {"values": entityArray},
     }
     # Add values for ordinal variables
-    if db_variable_row.get("sort"):
+    if sort:
         dim_values = variableMetadata["dimensions"].get("values", {})
-        dim_values["values"] = [{"id": i, "name": v} for i, v in enumerate(json.loads(db_variable_row["sort"]))]
+        dim_values["values"] = [{"id": i, "name": v} for i, v in enumerate(sort)]
         variableMetadata["dimensions"]["values"] = dim_values
 
     # convert timestamp to string
