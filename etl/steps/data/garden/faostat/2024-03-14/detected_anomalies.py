@@ -122,7 +122,7 @@ def _split_long_title(text: str) -> str:
 
 class SpinachAreaHarvestedAnomaly(DataAnomaly):
     description = (  # type: ignore
-        "The area harvested of spinach for China (which refers to mainland) in 1984 is missing. "
+        "The area harvested of spinach for China (which refers to mainland) in 1984 is zero. "
         "This causes that other regions that are aggregates which include China mainland have a spurious reduction in "
         "area harvested of spinach in that year, and a spurious increase in yield. "
         "Therefore, we remove those spurious aggregate values."
@@ -150,20 +150,26 @@ class SpinachAreaHarvestedAnomaly(DataAnomaly):
     ]
 
     def check(self, df):
-        # Check that the data point is indeed missing.
-        assert df[
-            (df["country"] == "China")
-            & (df["item_code"].isin(self.affected_item_codes))
-            & (df["element_code"].isin(self.affected_element_codes))
-            & (df["year"].isin(self.affected_years))
-        ].empty
-        # For consistency, check that other years do have data for the same item and element.
-        assert not df[
-            (df["country"] == "China")
-            & (df["item_code"].isin(self.affected_item_codes))
-            & (df["element_code"].isin(self.affected_element_codes))
-            & ~(df["year"].isin(self.affected_years))
-        ].empty
+        # Check that the data point is indeed zero.
+        assert (
+            df[
+                (df["country"] == "China")
+                & (df["item_code"].isin(self.affected_item_codes))
+                & (df["element_code"].isin(self.affected_element_codes))
+                & (df["year"].isin(self.affected_years))
+            ]["value"]
+            == 0
+        ).all()
+        # For consistency, check that other years do have non-zero data for the same item and element.
+        assert (
+            df[
+                (df["country"] == "China")
+                & (df["item_code"].isin(self.affected_item_codes))
+                & (df["element_code"].isin(self.affected_element_codes))
+                & ~(df["year"].isin(self.affected_years))
+            ]["value"]
+            > 0
+        ).all()
 
     def inspect(self, df):
         log.info(
