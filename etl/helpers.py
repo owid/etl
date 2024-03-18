@@ -16,7 +16,7 @@ import jsonref
 import structlog
 import yaml
 from owid import catalog
-from owid.catalog import CHANNEL, DatasetMeta, Table
+from owid.catalog import CHANNEL, DatasetMeta, Table, warnings
 from owid.catalog.datasets import DEFAULT_FORMATS, FileFormat
 from owid.catalog.meta import SOURCE_EXISTS_OPTIONS
 from owid.catalog.tables import (
@@ -110,8 +110,9 @@ def grapher_checks(ds: catalog.Dataset, warn_title_public: bool = True) -> None:
             display_name = (tab[col].m.display or {}).get("name")
             title_public = getattr(tab[col].m.presentation, "title_public", None)
             if warn_title_public and display_name and not title_public:
-                log.warning(
+                warnings.warn(
                     f"Column {col} uses display.name but no presentation.title_public. Ensure the latter is also defined, otherwise display.name will be used as the indicator's title.",
+                    warnings.DisplayNameWarning,
                 )
 
 
