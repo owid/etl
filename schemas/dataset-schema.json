@@ -1664,6 +1664,19 @@
                       "additionalProperties": false
                     }
                   }
+                },
+                "sort": {
+                  "title": "Ordered categorical values of the indicator (ordinal)",
+                  "oneOf": [
+                    {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  ],
+                  "requirement_level": "recommended (for curated indicators)",
+                  "category": "metadata"
                 }
               }
             }

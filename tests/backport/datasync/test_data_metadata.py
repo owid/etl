@@ -6,26 +6,40 @@ from sqlmodel import Session
 
 from apps.backport.datasync.data_metadata import (
     _convert_strings_to_numeric,
-    _infer_variable_type,
     variable_data,
     variable_data_df_from_s3,
     variable_metadata,
 )
 from etl.db import get_engine
+from etl.grapher_model import _infer_variable_type
 
 
-def test_variable_metadata():
+def _call_variable_metadata(variable_id: int, variable_df: pd.DataFrame, variable_meta: dict) -> dict:
     engine = get_engine()
-    variable_df = pd.DataFrame(
+
+    origins_df = pd.DataFrame(
         {
-            "value": ["0.008", "0.038", "0.022", "0.031", "NA"],
-            "year": [-10000, -10000, -10000, -10000, -10000],
-            "entityId": [273, 275, 276, 277, 294],
-            "entityName": ["Africa", "Asia", "Europe", "Oceania", "North America"],
-            "entityCode": [None, None, None, None, None],
+            "descriptionSnapshot": ["Origin A", "Origin B"],
         }
     )
-    variable_meta = {
+    faqs = [
+        {
+            "gdocId": "1",
+            "fragmentId": "test",
+        }
+    ]
+    topic_tags = ["Population"]
+
+    with Session(engine) as session:
+        with mock.patch("apps.backport.datasync.data_metadata._load_variable", return_value=variable_meta):
+            with mock.patch("apps.backport.datasync.data_metadata._load_origins_df", return_value=origins_df):
+                with mock.patch("apps.backport.datasync.data_metadata._load_faqs", return_value=faqs):
+                    with mock.patch("apps.backport.datasync.data_metadata._load_topic_tags", return_value=topic_tags):
+                        return variable_metadata(session, variable_id, variable_df)
+
+
+def _variable_meta():
+    return {
         "id": 525715,
         "name": "Population density",
         "unit": "people per km²",
@@ -39,6 +53,7 @@ def test_variable_metadata():
         "sourceId": 27065,
         "shortUnit": None,
         "display": '{"name": "Population density", "unit": "people per km²", "shortUnit": null, "includeInTable": true, "numDecimalPlaces": 1}',
+        "type": "mixed",
         "columnOrder": 0,
         "originalMetadata": None,
         "grapherConfigAdmin": None,
@@ -60,24 +75,21 @@ def test_variable_metadata():
         "sourceName": "Gapminder (v6); UN (2022); HYDE (v3.2); Food and Agriculture Organization of the United Nations",
         "sourceDescription": '{"link": "https://www.gapminder.org/data/documentation/gd003/", "retrievedDate": "October 8, 2021", "additionalInfo": "Our World in Data builds...", "dataPublishedBy": "Gapminder (v6); United Nations - Population Division (2022); HYDE (v3.2); World Bank", "dataPublisherSource": null}',
     }
-    origins_df = pd.DataFrame(
+
+
+def test_variable_metadata():
+    variable_df = pd.DataFrame(
         {
-            "descriptionSnapshot": ["Origin A", "Origin B"],
+            "value": ["0.008", "0.038", "0.022", "0.031", "NA"],
+            "year": [-10000, -10000, -10000, -10000, -10000],
+            "entityId": [273, 275, 276, 277, 294],
+            "entityName": ["Africa", "Asia", "Europe", "Oceania", "North America"],
+            "entityCode": [None, None, None, None, None],
         }
     )
-    faqs = [
-        {
-            "gdocId": "1",
-            "fragmentId": "test",
-        }
-    ]
-    topic_tags = ["Population"]
-    with Session(engine) as session:
-        with mock.patch("apps.backport.datasync.data_metadata._load_variable", return_value=variable_meta):
-            with mock.patch("apps.backport.datasync.data_metadata._load_origins_df", return_value=origins_df):
-                with mock.patch("apps.backport.datasync.data_metadata._load_faqs", return_value=faqs):
-                    with mock.patch("apps.backport.datasync.data_metadata._load_topic_tags", return_value=topic_tags):
-                        meta = variable_metadata(session, 525715, variable_df)
+    variable_meta = _variable_meta()
+
+    meta = _call_variable_metadata(525715, variable_df, variable_meta)
 
     assert meta == {
         "catalogPath": "grapher/owid/latest/key_indicators/population_density#population_density",
@@ -157,6 +169,25 @@ def test_variable_data():
         "values": [-2, 1, 2.1, "UK", 9800000000],
         "years": [-10000, -10000, -10000, -10000, -10000],
     }
+
+
+def test_variable_metadata_ordinal():
+    variable_df = pd.DataFrame(
+        {
+            "value": ["Middle", "High", "Low", "Low", "Middle"],
+            "year": [2020, 2020, 2020, 2020, 2020],
+            "entityId": [273, 275, 276, 277, 294],
+            "entityName": ["Africa", "Asia", "Europe", "Oceania", "North America"],
+            "entityCode": [None, None, None, None, None],
+        }
+    )
+    variable_meta = _variable_meta()
+    variable_meta["type"] = "ordinal"
+    variable_meta["sort"] = ["Low", "Middle", "High"]
+
+    meta = _call_variable_metadata(525715, variable_df, variable_meta)
+    assert meta["type"] == "ordinal"
+    assert meta["sort"] == ["Low", "Middle", "High"]
 
 
 def test_variable_data_df_from_s3():

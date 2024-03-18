@@ -260,6 +260,9 @@ class VariableMeta:
     # This is the old sources that we keep for compatibility. Use is strongly discouraged going forward
     sources: List[Source] = field(default_factory=list)
 
+    # List of categories for ordinal type indicators
+    sort: List[str] = field(default_factory=list)
+
     def __hash__(self):
         """Hash that uniquely identifies VariableMeta."""
         return _hash_dataclass(self)

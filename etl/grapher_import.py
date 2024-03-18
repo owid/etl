@@ -280,10 +280,11 @@ def upsert_table(
 
         df = table.rename(columns={column_name: "value", "entity_id": "entityId"})
 
-        db_variable.infer_type(df["value"])
-
         # following functions assume that `value` is string
+        # NOTE: we could make the code more efficient if we didn't convert `value` to string
         df["value"] = df["value"].astype(str)
+
+        db_variable.type = db_variable.infer_type(df["value"])
 
         # NOTE: we could prefetch all entities in advance, but it's not a bottleneck as it takes
         # less than 10ms per variable
