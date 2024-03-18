@@ -103,6 +103,7 @@ def grapher_checks(ds: catalog.Dataset, warn_title_public: bool = True) -> None:
 
             # Validate ordinal variables
             if tab[col].m.sort:
+                assert tab[col].m.type == "ordinal", f"Column `{col}` has a sort but is not of type ordinal"
                 extra_values = set(tab[col]) - set(tab[col].m.sort)
                 assert (
                     not extra_values

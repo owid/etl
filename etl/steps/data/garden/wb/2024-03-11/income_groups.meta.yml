@@ -37,6 +37,7 @@ tables:
         title: World Bank's income classification
         unit: ""
         description_short: Income classification based on the country's income each year.
+        type: ordinal
         sort: *classification_sort
 
   income_groups_latest:
@@ -46,6 +47,7 @@ tables:
         title: World Bank's latest income classification
         unit: ""
         description_short: Income classification based on the country's income for the latest year informed.
+        type: ordinal
         sort: *classification_sort
 
 

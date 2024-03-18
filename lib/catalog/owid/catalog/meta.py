@@ -21,6 +21,7 @@ from .utils import pruned_json
 
 SOURCE_EXISTS_OPTIONS = Literal["fail", "append", "replace"]
 
+VARIABLE_TYPE = Literal["float", "int", "mixed", "string", "ordinal", "categorical"]
 
 YearDateLatest = NewType("YearDateLatest", str)
 
@@ -259,6 +260,9 @@ class VariableMeta:
 
     # This is the old sources that we keep for compatibility. Use is strongly discouraged going forward
     sources: List[Source] = field(default_factory=list)
+
+    # The type of the variable, automatically inferred from the data if empty
+    type: Optional[VARIABLE_TYPE] = None
 
     # List of categories for ordinal type indicators
     sort: List[str] = field(default_factory=list)
