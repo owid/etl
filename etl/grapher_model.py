@@ -1273,7 +1273,9 @@ class Variable(SQLModel, table=True):
 
     def s3_metadata_path(self, typ: S3_PATH_TYP = "s3") -> str:
         """Path to S3 with metadata in JSON format for Grapher. Typically
-        s3://owid-api/v1/indicators/123.metadata.json."""
+        s3://owid-api/v1/indicators/123.metadata.json or
+        s3://owid-api-staging/name/v1/indicators/123.metadata.json
+        ."""
         if typ == "s3":
             return f"{config.BAKED_VARIABLES_PATH}/{self.id}.metadata.json"
         elif typ == "http":
