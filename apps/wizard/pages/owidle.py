@@ -40,6 +40,10 @@ UPDATES = {
         "✨ Hard mode: Improved readability of year hint emojis.",
         "🐛 Hard mode: Fixed score mosaic 100%-rounding for years.",
     ],
+    "2024-03-18": [
+        "✨ Hard mode: Year emoji hint help message now shows in latest.",
+        "🐛 Hard mode: Year score in mosaic was pointing to geographic score.",
+    ],
 }
 DAYS_TO_SHOW_UPDATES = 3
 OWID_NUM = (dt.datetime.now(dt.timezone.utc).date() - dt.date(2024, 2, 20)).days
@@ -974,7 +978,7 @@ for i in range(num_guesses_bound):
         with col2.container(border=True):
             col21, col22 = st.columns(2)
             col21.markdown(f"**{st.session_state.guesses[i]['year']}**")
-            if i == 0:
+            if i == st.session_state.num_guesses - 1:
                 col22.markdown(
                     st.session_state.guesses[i]["direction_year"],
                     help="🔥: up to ±5 years\n\n◀️/▶️: up to ±15 years\n\n⏪◀️/⏩▶️: up to ±30 years\n\n⏪⏪⏪/⏩⏩⏩: >30 years difference",
@@ -1086,7 +1090,7 @@ def get_score_mosaic_hard():
     # Distance
     scores_dist = [int(guess["score"]) for guess in st.session_state.guesses if guess["score"] != ""]
     # Years
-    scores_year = [int(guess["score"]) for guess in st.session_state.guesses if guess["score_year"] != ""]
+    scores_year = [int(guess["score_year"]) for guess in st.session_state.guesses if guess["score_year"] != ""]
     # Combine into string
     mosaic = "\n".join(
         [
