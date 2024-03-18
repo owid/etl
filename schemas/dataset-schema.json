@@ -1666,17 +1666,17 @@
                   }
                 },
                 "sort": {
-                  "title": "Ordered categorical values of the indicator (ordinal)",
-                  "oneOf": [
-                    {
-                      "type": "array",
-                      "items": {
-                        "type": "string"
-                      }
-                    }
-                  ],
-                  "requirement_level": "recommended (for curated indicators)",
-                  "category": "metadata"
+                  "title": "Ordered categorical values for ordinal type",
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "type": {
+                  "title": "Indicator type",
+                  "description": "Indicator type is usually automatically inferred from the data, but must be manually set for ordinal and categorical types.",
+                  "type": "string",
+                  "enum": ["float", "int", "mixed", "string", "ordinal", "categorical"]
                 }
               }
             }

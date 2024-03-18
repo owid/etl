@@ -14,6 +14,7 @@ import humps
 import pandas as pd
 import structlog
 from owid import catalog
+from owid.catalog.meta import VARIABLE_TYPE
 from sqlalchemy import (
     BigInteger,
     Computed,
@@ -58,8 +59,6 @@ SelectOfScalar.inherit_cache = True  # type: ignore
 Select.inherit_cache = True  # type: ignore
 
 S3_PATH_TYP = Literal["s3", "http"]
-
-VARIABLE_TYPE = Literal["float", "int", "mixed", "string", "ordinal", "categorical"]
 
 metadata = SQLModel.metadata
 
@@ -1209,6 +1208,7 @@ class Variable(SQLModel, table=True):
             descriptionProcessing=metadata.description_processing,
             licenses=[license.to_dict() for license in metadata.licenses] if metadata.licenses else None,
             license=metadata.license.to_dict() if metadata.license else None,
+            type=metadata.type,
             sort=metadata.sort,
             **presentation_dict,
         )
@@ -1228,10 +1228,7 @@ class Variable(SQLModel, table=True):
 
     def infer_type(self, values: pd.Series) -> VARIABLE_TYPE:
         """Set type and sort fields based on indicator values."""
-        if self.sort:
-            return "ordinal"
-        else:
-            return _infer_variable_type(values)
+        return _infer_variable_type(values)
 
     def update_links(
         self, session: Session, db_origins: List["Origin"], faqs: List[catalog.FaqLink], tag_names: List[str]
