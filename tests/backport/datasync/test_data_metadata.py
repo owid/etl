@@ -1,3 +1,4 @@
+import json
 from unittest import mock
 
 import pandas as pd
@@ -183,11 +184,15 @@ def test_variable_metadata_ordinal():
     )
     variable_meta = _variable_meta()
     variable_meta["type"] = "ordinal"
-    variable_meta["sort"] = ["Low", "Middle", "High"]
+    variable_meta["sort"] = json.dumps(["Low", "Middle", "High"])
 
     meta = _call_variable_metadata(525715, variable_df, variable_meta)
     assert meta["type"] == "ordinal"
-    assert meta["sort"] == ["Low", "Middle", "High"]
+    # TODO: keep only one - either `sort` or `dimensions.values.values`
+    assert meta["sort"] == json.dumps(["Low", "Middle", "High"])
+    assert meta["dimensions"]["values"] == {
+        "values": [{"id": 0, "name": "Low"}, {"id": 1, "name": "Middle"}, {"id": 2, "name": "High"}]
+    }
 
 
 def test_variable_data_df_from_s3():

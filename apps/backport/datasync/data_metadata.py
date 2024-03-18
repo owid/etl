@@ -269,10 +269,16 @@ def _variable_metadata(
         .to_dict(orient="records")
     )
 
+    # Create dimensions
     variableMetadata["dimensions"] = {
         "years": {"values": yearArray},
         "entities": {"values": entityArray},
     }
+    # Add values for ordinal variables
+    if db_variable_row.get("sort"):
+        dim_values = variableMetadata["dimensions"].get("values", {})
+        dim_values["values"] = [{"id": i, "name": v} for i, v in enumerate(json.loads(db_variable_row["sort"]))]
+        variableMetadata["dimensions"]["values"] = dim_values
 
     # convert timestamp to string
     time_format = "%Y-%m-%dT%H:%M:%S.000Z"
