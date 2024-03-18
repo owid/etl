@@ -95,20 +95,21 @@ if steps["fasttrack"]["enable"]:
 # Sections
 #########################
 for section in WIZARD_CONFIG["sections"]:
-    st.markdown(f"## {section['title']}")
-    st.markdown(section["description"])
     apps = [app for app in section["apps"] if app["enable"]]
-    columns = st.columns(len(apps))
-    for i, app in enumerate(apps):
-        text = [
-            app["description"],
-        ]
-        # if "maintainer" in app:
-        #     text.append(f"maintainer: {app['maintainer']}")
-        if app["enable"]:
-            with columns[i]:
-                create_card(
-                    title=app["title"],
-                    image_url=app["image_url"],
-                    text=text,
-                )
+    if apps:
+        st.markdown(f"## {section['title']}")
+        st.markdown(section["description"])
+        columns = st.columns(len(apps))
+        for i, app in enumerate(apps):
+            text = [
+                app["description"],
+            ]
+            # if "maintainer" in app:
+            #     text.append(f"maintainer: {app['maintainer']}")
+            if app["enable"]:
+                with columns[i]:
+                    create_card(
+                        title=app["title"],
+                        image_url=app["image_url"],
+                        text=text,
+                    )

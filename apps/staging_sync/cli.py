@@ -141,7 +141,13 @@ def cli(
 
                 _remove_nonexisting_column_slug(source_chart, source_session)
 
-                target_chart = source_chart.migrate_to_db(source_session, target_session)
+                try:
+                    target_chart = source_chart.migrate_to_db(source_session, target_session)
+                except ValueError as e:
+                    if "variables.catalogPath not found in target" in str(e):
+                        raise ValueError("ETL deploy hasn't finished yet. Check the repository.") from e
+                    else:
+                        raise e
 
                 # try getting chart with the same slug
                 try:
@@ -387,7 +393,7 @@ def _modified_chart_ids_by_admin(session: Session) -> Set[int]:
 
 def _get_git_branch_creation_date(branch_name: str) -> dt.datetime:
     js = requests.get(f"https://api.github.com/repos/owid/etl/pulls?state=all&head=owid:{branch_name}").json()
-    assert len(js) == 1
+    assert len(js) == 1, f"Branch {branch_name} not found in owid/etl repository"
 
     return dt.datetime.fromisoformat(js[0]["created_at"].rstrip("Z")).astimezone(pytz.utc).replace(tzinfo=None)
 

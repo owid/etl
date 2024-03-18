@@ -14,6 +14,7 @@ from pandas._typing import Scalar
 from pandas.core.series import Series
 
 from . import processing_log as pl
+from . import warnings
 from .meta import (
     PROCESSING_LEVELS,
     PROCESSING_LEVELS_ORDER,
@@ -231,7 +232,9 @@ class Variable(pd.Series):
         # NOTE: Argument "inplace" will modify the original variable's data, but not its metadata.
         #  But we should not use "inplace" anyway.
         if "inplace" in kwargs and kwargs["inplace"] is True:
-            log.warning("Avoid using fillna(inplace=True), which may not handle metadata as expected.")
+            warnings.warn(
+                "Avoid using fillna(inplace=True), which may not handle metadata as expected.", warnings.MetadataWarning
+            )
         variable_name = self.name or UNNAMED_VARIABLE
         variable = Variable(super().fillna(value, *args, **kwargs), name=variable_name)
         variable._fields = copy.deepcopy(self._fields)
@@ -244,7 +247,9 @@ class Variable(pd.Series):
         # NOTE: Argument "inplace" will modify the original variable's data, but not its metadata.
         #  But we should not use "inplace" anyway.
         if "inplace" in kwargs and kwargs["inplace"] is True:
-            log.warning("Avoid using dropna(inplace=True), which may not handle metadata as expected.")
+            warnings.warn(
+                "Avoid using dropna(inplace=True), which may not handle metadata as expected.", warnings.MetadataWarning
+            )
         variable_name = self.name or UNNAMED_VARIABLE
         variable = Variable(super().dropna(*args, **kwargs), name=variable_name)
         variable._fields = copy.deepcopy(self._fields)
@@ -352,7 +357,10 @@ def _get_metadata_value_from_variables_if_all_identical(
             # There is no need to warn if units are different when doing a multiplication or a division.
             # In most cases, units will be different, and that is fine, as long as the resulting variable has no units.
             # Note that the same reasoning can be applied to other operations, so we may need to generalize this logic.
-            log.warning(f"Different values of '{field}' detected among variables: {unique_values}")
+            warnings.warn(
+                f"Different values of '{field}' detected among variables: {unique_values}",
+                warnings.DifferentValuesWarning,
+            )
 
     return combined_value
 
