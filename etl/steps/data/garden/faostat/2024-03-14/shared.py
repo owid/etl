@@ -1489,16 +1489,18 @@ def clean_data(
     # Remove rows with nan value.
     data = remove_rows_with_nan_value(data)
 
-    # Use custom names for items, elements and units (and keep original names in "fao_*" columns).
-    data = add_custom_names_and_descriptions(data, items_metadata, elements_metadata)
+    if len(items_metadata) > 0 and len(elements_metadata) > 0:
+        # This is not fulfilled for faostat_qv since the last update.
+        # Use custom names for items, elements and units (and keep original names in "fao_*" columns).
+        data = add_custom_names_and_descriptions(data, items_metadata, elements_metadata)
 
-    # Multiply data values by their corresponding unit factor, if any was given, and then drop unit_factor column.
-    unit_factor_mask = data["unit_factor"].notnull()
-    data.loc[unit_factor_mask, "value"] = data[unit_factor_mask]["value"] * data[unit_factor_mask]["unit_factor"]
-    data = data.drop(columns=["unit_factor"])
+        # Multiply data values by their corresponding unit factor, if any was given, and then drop unit_factor column.
+        unit_factor_mask = data["unit_factor"].notnull()
+        data.loc[unit_factor_mask, "value"] = data[unit_factor_mask]["value"] * data[unit_factor_mask]["unit_factor"]
+        data = data.drop(columns=["unit_factor"])
 
-    # Add FAO population as an additional column (if given in the original data).
-    data = add_fao_population_if_given(data)
+        # Add FAO population as an additional column (if given in the original data).
+        data = add_fao_population_if_given(data)
 
     # Convert variables that were given per-capita to total value.
     data = convert_variables_given_per_capita_to_total_value(data, elements_metadata=elements_metadata)
@@ -1677,11 +1679,15 @@ def prepare_wide_table(data: pd.DataFrame) -> catalog.Table:
         lambda item, element, unit: f"{item} - {element} ({unit})",
     )
 
-    # Construct a human-readable variable description (for the variable metadata).
-    data["variable_description"] = dataframes.apply_on_categoricals(
-        [data.item, data.element, data.item_description, data.element_description],
-        prepare_variable_description,
-    )
+    if "item_description" in data.columns:
+        # Construct a human-readable variable description (for the variable metadata).
+        data["variable_description"] = dataframes.apply_on_categoricals(
+            [data.item, data.element, data.item_description, data.element_description],
+            prepare_variable_description,
+        )
+    else:
+        # This is the case for faostat_qv since the last update.
+        data["variable_description"] = ""
 
     # Pivot over long dataframe to generate a wide dataframe with country-year as index, and as many columns as
     # unique elements in "variable_name" (which should be as many as combinations of item-elements).
@@ -1710,10 +1716,15 @@ def prepare_wide_table(data: pd.DataFrame) -> catalog.Table:
     for column in wide_table.columns:
         wide_table[column].metadata.unit = variable_name_mapping[column]
 
-    # Add variable unit (short name).
-    variable_name_mapping = _variable_name_map(data, "unit_short_name")
-    for column in wide_table.columns:
-        wide_table[column].metadata.short_unit = variable_name_mapping[column]
+    if "unit_short_name" in data.columns:
+        # Add variable unit (short name).
+        variable_name_mapping = _variable_name_map(data, "unit_short_name")
+        for column in wide_table.columns:
+            wide_table[column].metadata.short_unit = variable_name_mapping[column]
+    else:
+        # This is the case for faostat_qv since the last update.
+        for column in wide_table.columns:
+            wide_table[column].metadata.short_unit = ""
 
     # Add variable description.
     variable_name_mapping = _variable_name_map(data, "variable_description")

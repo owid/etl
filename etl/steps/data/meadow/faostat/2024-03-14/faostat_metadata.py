@@ -151,22 +151,24 @@ def create_tables_for_all_domain_records(additional_metadata: Dict[str, Any]) ->
         for category in list(additional_metadata[domain]):
             json_data = additional_metadata[domain][category]["data"]
             df = pd.DataFrame.from_dict(json_data)
-            if len(df) > 0:
-                df.set_index(
-                    category_structure[category]["index"],
-                    verify_integrity=True,
-                    inplace=True,
-                )
-                table_short_name = f'{NAMESPACE}_{domain.lower()}_{category_structure[category]["short_name"]}'
+            if len(df) == 0:
+                # This is the case for lc flag, rfb flag, scl itemfactor, and, since last version, all qv categories.
+                df = df.assign(**{col: [] for col in category_structure[category]["index"]})
+            df.set_index(
+                category_structure[category]["index"],
+                verify_integrity=True,
+                inplace=True,
+            )
+            table_short_name = f'{NAMESPACE}_{domain.lower()}_{category_structure[category]["short_name"]}'
 
-                # there might be duplicates coming from `itemsgroup` and `itemgroup`
-                if table_short_name in used_short_names:
-                    log.warning("faostat_metadata.duplicate_short_name", short_name=table_short_name)
-                    continue
-                used_short_names.add(table_short_name)
+            # there might be duplicates coming from `itemsgroup` and `itemgroup`
+            if table_short_name in used_short_names:
+                log.warning("faostat_metadata.duplicate_short_name", short_name=table_short_name)
+                continue
+            used_short_names.add(table_short_name)
 
-                table = Table(df, short_name=table_short_name)
-                tables.append(table)
+            table = Table(df, short_name=table_short_name)
+            tables.append(table)
 
     return tables
 

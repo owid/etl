@@ -249,9 +249,13 @@ def create_items_dataframe_for_domain(
         "item": "fao_item",
         "description": "fao_item_description",
     }
+    _metadata = metadata[f"{dataset_short_name}_item"].reset_index()
+    if not (set(items_columns) <= set(_metadata.columns)):
+        # This is the case for faostat_qv since last version.
+        return items_from_data
+
     _items_df = (
-        metadata[f"{dataset_short_name}_item"]
-        .reset_index()[list(items_columns)]
+        _metadata[list(items_columns)]
         .rename(columns=items_columns)
         .drop_duplicates()
         .sort_values(list(items_columns.values()))
@@ -438,9 +442,13 @@ def create_elements_dataframe_for_domain(
         "element": "fao_element",
         "description": "fao_element_description",
     }
+    _metadata = metadata[f"{dataset_short_name}_element"].reset_index()
+    if not (set(elements_columns) <= set(_metadata.columns)):
+        # This is the case for faostat_qv since last version.
+        return elements_from_data
+
     _elements_df = (
-        metadata[f"{dataset_short_name}_element"]
-        .reset_index()[list(elements_columns)]
+        _metadata[list(elements_columns)]
         .rename(columns=elements_columns)
         .drop_duplicates()
         .sort_values(list(elements_columns.values()))
@@ -754,7 +762,7 @@ def check_that_flag_definitions_in_dataset_agree_with_those_in_flags_ranking(
 
     """
     for table_name in metadata.table_names:
-        if "flag" in table_name:
+        if ("flag" in table_name) and ("flags" in metadata[table_name].columns):
             flag_df = metadata[table_name].reset_index()
             comparison = pd.merge(FLAGS_RANKING, flag_df, on="flag", how="inner")
             error_message = (
@@ -970,12 +978,10 @@ def process_metadata(
         countries_in_data = pd.concat([countries_in_data, df]).drop_duplicates()
 
         # Get country groups in this dataset.
-        area_group_table_name = f"{dataset_short_name}_area_group"
-        if area_group_table_name in metadata:
+        _metadata = metadata[f"{dataset_short_name}_area_group"].reset_index()
+        if set(["country_group", "country"]) <= set(_metadata.columns):
             country_groups = (
-                metadata[f"{dataset_short_name}_area_group"]
-                .reset_index()
-                .drop_duplicates(subset=["country_group", "country"])
+                _metadata.drop_duplicates(subset=["country_group", "country"])
                 .groupby("country_group")
                 .agg({"country": list})
                 .to_dict()["country"]
