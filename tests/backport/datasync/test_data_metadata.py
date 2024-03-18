@@ -55,6 +55,7 @@ def _variable_meta():
         "shortUnit": None,
         "display": '{"name": "Population density", "unit": "people per km²", "shortUnit": null, "includeInTable": true, "numDecimalPlaces": 1}',
         "type": "mixed",
+        "sort": None,
         "columnOrder": 0,
         "originalMetadata": None,
         "grapherConfigAdmin": None,
@@ -189,7 +190,7 @@ def test_variable_metadata_ordinal():
     meta = _call_variable_metadata(525715, variable_df, variable_meta)
     assert meta["type"] == "ordinal"
     # TODO: keep only one - either `sort` or `dimensions.values.values`
-    assert meta["sort"] == json.dumps(["Low", "Middle", "High"])
+    assert meta["sort"] == ["Low", "Middle", "High"]
     assert meta["dimensions"]["values"] == {
         "values": [{"id": 0, "name": "Low"}, {"id": 1, "name": "Middle"}, {"id": 2, "name": "High"}]
     }
