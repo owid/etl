@@ -1815,6 +1815,12 @@ def run(dest_dir: str) -> None:
     # Load population dataset.
     ds_population = paths.load_dataset("population")
 
+    # Load regions dataset.
+    ds_regions = paths.load_dataset("regions")
+
+    # Load income groups dataset.
+    ds_income_groups = paths.load_dataset("income_groups")
+
     #
     # Process data.
     #
@@ -1833,7 +1839,13 @@ def run(dest_dir: str) -> None:
     )
 
     # Add data for aggregate regions.
-    data = add_regions(data=data, elements_metadata=elements_metadata)
+    data = add_regions(
+        data=data,
+        ds_regions=ds_regions,
+        ds_population=ds_population,
+        ds_income_groups=ds_income_groups,
+        elements_metadata=elements_metadata,
+    )
 
     # Add per-capita variables.
     data = add_per_capita_variables(data=data, elements_metadata=elements_metadata)

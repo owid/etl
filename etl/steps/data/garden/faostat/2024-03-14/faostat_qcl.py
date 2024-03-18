@@ -4,7 +4,6 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
-from owid import catalog
 from owid.datautils import dataframes
 from shared import (
     ADDED_TITLE_TO_WIDE_TABLE,
@@ -450,13 +449,13 @@ def run(dest_dir: str) -> None:
     paths = PathFinder(current_step_file.as_posix())
 
     # Load latest meadow dataset and keep its metadata.
-    ds_meadow: catalog.Dataset = paths.load_dependency(dataset_short_name)
+    ds_meadow = paths.load_dataset(dataset_short_name)
     # Load main table from dataset.
     tb_meadow = ds_meadow[dataset_short_name]
     data = pd.DataFrame(tb_meadow).reset_index()
 
     # Load dataset of FAOSTAT metadata.
-    metadata: catalog.Dataset = paths.load_dependency(f"{NAMESPACE}_metadata")
+    metadata = paths.load_dataset(f"{NAMESPACE}_metadata")
 
     # Load dataset, items, element-units, and countries metadata.
     dataset_metadata = pd.DataFrame(metadata["datasets"]).loc[dataset_short_name].to_dict()
@@ -466,6 +465,15 @@ def run(dest_dir: str) -> None:
     elements_metadata = elements_metadata[elements_metadata["dataset"] == dataset_short_name].reset_index(drop=True)
     countries_metadata = pd.DataFrame(metadata["countries"]).reset_index()
     amendments = parse_amendments_table(amendments=metadata["amendments"], dataset_short_name=dataset_short_name)
+
+    # Load regions dataset.
+    ds_regions = paths.load_dataset("regions")
+
+    # Load population dataset.
+    ds_population = paths.load_dataset("population")
+
+    # Load income groups dataset.
+    ds_income_groups = paths.load_dataset("income_groups")
 
     #
     # Process data.
@@ -477,6 +485,7 @@ def run(dest_dir: str) -> None:
     # Prepare data.
     data = clean_data(
         data=data,
+        ds_population=ds_population,
         items_metadata=items_metadata,
         elements_metadata=elements_metadata,
         countries_metadata=countries_metadata,
@@ -490,7 +499,13 @@ def run(dest_dir: str) -> None:
     data = add_slaughtered_animals_to_meat_total(data=data)
 
     # Add data for aggregate regions.
-    data = add_regions(data=data, elements_metadata=elements_metadata)
+    data = add_regions(
+        data=data,
+        ds_regions=ds_regions,
+        ds_population=ds_population,
+        ds_income_groups=ds_income_groups,
+        elements_metadata=elements_metadata,
+    )
 
     # Add per-capita variables.
     data = add_per_capita_variables(data=data, elements_metadata=elements_metadata)
