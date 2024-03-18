@@ -255,6 +255,23 @@ class Snapshot:
         # Return temporary directory
         return temp_dir
 
+    def read_in_zip(self, filename: str, *args, **kwargs) -> Table:
+        """Read data from file inside a zip archive.
+
+        If the relevant data file is within a zip archive, this method will read this file and return it as a table.
+
+        To do so, this method first unzips the archive to a temporary directory, and then reads the file. Note that the file should have a supported extension (see `read` method).
+        """
+        with self.extract_to_tempdir() as tmpdir:
+            # Temporarily change the file extension so that .read works
+            extension_original = self.metadata.file_extension
+            self.metadata.file_extension = filename.split(".")[-1]
+            # Read
+            tb = self.read(Path(tmpdir) / filename, *args, **kwargs)
+            # Restore original file extension
+            self.metadata.file_extension = extension_original
+            return tb
+
 
 @pruned_json
 @dataclass_json
