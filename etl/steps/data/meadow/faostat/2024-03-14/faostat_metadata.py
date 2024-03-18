@@ -6,7 +6,6 @@ All categories are defined below in 'category_structure'.
 
 """
 
-from pathlib import Path
 from typing import Any, Dict, List
 
 import pandas as pd
@@ -177,7 +176,7 @@ def run(dest_dir: str) -> None:
     # Load data.
     #
     # Fetch the dataset short name from dest_dir.
-    dataset_short_name = Path(dest_dir).name
+    dataset_short_name = f"{NAMESPACE}_metadata"
 
     # Define path to current step file.
     current_step_file = (CURRENT_DIR / dataset_short_name).with_suffix(".py")

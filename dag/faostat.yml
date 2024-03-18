@@ -463,7 +463,6 @@ steps:
     - data://meadow/faostat/2024-03-14/faostat_rt
     - data://meadow/faostat/2024-03-14/faostat_scl
     - data://meadow/faostat/2024-03-14/faostat_el
-    - data://meadow/faostat/2023-06-12/faostat_gn
     - data://meadow/faostat/2024-03-14/faostat_sdgb
     - data://meadow/faostat/2024-03-14/faostat_qv
     - data://meadow/faostat/2024-03-14/faostat_emn
@@ -488,7 +487,6 @@ steps:
     - data://meadow/faostat/2024-03-14/faostat_cahd
     - data://meadow/faostat/2024-03-14/faostat_fbs
     - data://meadow/faostat/2024-03-14/faostat_ti
-    - data://meadow/faostat/2023-06-12/faostat_wcad
     - data://meadow/faostat/2024-03-14/faostat_ep
   data://garden/faostat/2024-03-14/faostat_qcl:
     - data://garden/faostat/2024-03-14/faostat_metadata
