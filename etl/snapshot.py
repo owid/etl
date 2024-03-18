@@ -176,27 +176,19 @@ class Snapshot:
             self.download_from_source()
             self.dvc_add(upload=upload)
 
-    def to_table_metadata(self):
+    def to_table_metadata(self) -> TableMeta:
         return self.metadata.to_table_metadata()
 
     def read(self, *args, **kwargs) -> Table:
         """Read file based on its Snapshot extension."""
-        if self.metadata.file_extension == "csv":
-            return self.read_csv(*args, **kwargs)
-        elif self.metadata.file_extension == "feather":
-            return self.read_feather(*args, **kwargs)
-        elif self.metadata.file_extension in ["xlsx", "xls", "xlsm", "xlsb", "odf", "ods", "odt"]:
-            return self.read_excel(*args, **kwargs)
-        elif self.metadata.file_extension == "json":
-            return self.read_json(*args, **kwargs)
-        elif self.metadata.file_extension == "dta":
-            return self.read_stata(*args, **kwargs)
-        elif self.metadata.file_extension == "rds":
-            return self.read_rds(*args, **kwargs)
-        elif self.metadata.file_extension == "rda":
-            return self.read_rda(*args, **kwargs)
-        else:
-            raise ValueError(f"Unknown extension {self.metadata.file_extension}")
+        return read_table_from_snapshot(
+            *args,
+            path=self.path,
+            table_metadata=self.to_table_metadata(),
+            snapshot_origin=self.metadata.origin,
+            file_extension=self.metadata.file_extension,
+            **kwargs,
+        )
 
     def read_csv(self, *args, **kwargs) -> Table:
         """Read CSV file into a Table and populate it with metadata."""
@@ -228,6 +220,10 @@ class Snapshot:
         """Read R data .rda file into a Table and populate it with metadata."""
         return pr.read_rda(self.path, *args, metadata=self.to_table_metadata(), origin=self.metadata.origin, **kwargs)
 
+    def read_fwf(self, *args, **kwargs) -> Table:
+        """Read a table of fixed-width formatted lines with metadata."""
+        return pr.read_fwf(self.path, *args, metadata=self.to_table_metadata(), origin=self.metadata.origin, **kwargs)
+
     def read_from_records(self, *args, **kwargs) -> Table:
         """Read records into a Table and populate it with metadata."""
         return pr.read_from_records(*args, metadata=self.to_table_metadata(), origin=self.metadata.origin, **kwargs)
@@ -235,10 +231,6 @@ class Snapshot:
     def read_from_dict(self, *args, **kwargs) -> Table:
         """Read data from a dictionary into a Table and populate it with metadata."""
         return pr.read_from_dict(*args, metadata=self.to_table_metadata(), origin=self.metadata.origin, **kwargs)
-
-    def read_fwf(self, *args, **kwargs) -> Table:
-        """Read a table of fixed-width formatted lines with metadata."""
-        return pr.read_fwf(self.path, *args, metadata=self.to_table_metadata(), origin=self.metadata.origin, **kwargs)
 
     def ExcelFile(self, *args, **kwargs) -> pr.ExcelFile:
         """Return an Excel file object ready for parsing."""
@@ -255,21 +247,24 @@ class Snapshot:
         # Return temporary directory
         return temp_dir
 
-    def read_in_zip(self, filename: str, *args, **kwargs) -> Table:
-        """Read data from file inside a zip archive.
+    def read_in_archive(self, filename: str, *args, **kwargs) -> Table:
+        """Read data from file inside a zip/tar archive.
 
-        If the relevant data file is within a zip archive, this method will read this file and return it as a table.
+        If the relevant data file is within a zip/tar archive, this method will read this file and return it as a table.
 
-        To do so, this method first unzips the archive to a temporary directory, and then reads the file. Note that the file should have a supported extension (see `read` method).
+        To do so, this method first unzips/untars the archive to a temporary directory, and then reads the file. Note that the file should have a supported extension (see `read` method).
         """
         with self.extract_to_tempdir() as tmpdir:
-            # Temporarily change the file extension so that .read works
-            extension_original = self.metadata.file_extension
-            self.metadata.file_extension = filename.split(".")[-1]
+            new_extension = filename.split(".")[-1]
             # Read
-            tb = self.read(Path(tmpdir) / filename, *args, **kwargs)
-            # Restore original file extension
-            self.metadata.file_extension = extension_original
+            tb = read_table_from_snapshot(
+                *args,
+                path=Path(tmpdir) / filename,
+                table_metadata=self.to_table_metadata(),
+                snapshot_origin=self.metadata.origin,
+                file_extension=new_extension,
+                **kwargs,
+            )
             return tb
 
 
@@ -472,6 +467,44 @@ class SnapshotMeta:
                 }
             )
         return table_meta
+
+
+def read_table_from_snapshot(
+    path: Union[str, Path],
+    table_metadata: TableMeta,
+    snapshot_origin: Union[Origin, None],
+    file_extension: str,
+    *args,
+    **kwargs,
+) -> Table:
+    """Read snapshot as a table."""
+    # Define kwargs / args
+    args = [
+        path,
+        *args,
+    ]
+    kwargs = {
+        **kwargs,
+        "metadata": table_metadata,
+        "origin": snapshot_origin,
+    }
+    # Read table
+    if file_extension == "csv":
+        return pr.read_csv(*args, **kwargs)
+    elif file_extension == "feather":
+        return pr.read_feather(*args, **kwargs)
+    elif file_extension in ["xlsx", "xls", "xlsm", "xlsb", "odf", "ods", "odt"]:
+        return pr.read_excel(*args, **kwargs)
+    elif file_extension == "json":
+        return pr.read_json(*args, **kwargs)
+    elif file_extension == "dta":
+        return pr.read_stata(*args, **kwargs)
+    elif file_extension == "rds":
+        return pr.read_rds(*args, **kwargs)
+    elif file_extension == "rda":
+        return pr.read_rda(*args, **kwargs)
+    else:
+        raise ValueError(f"Unknown extension {file_extension}")
 
 
 def add_snapshot(
