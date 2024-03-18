@@ -8,6 +8,7 @@ from streamlit_card import card
 from streamlit_extras.switch_page_button import switch_page
 
 from apps.wizard.config import WIZARD_CONFIG
+from apps.wizard.utils import st_page_link
 
 # Initial configuration (side bar menu, title, etc.)
 st.set_page_config(page_title="Wizard: Home", page_icon="🪄")
@@ -18,6 +19,10 @@ st.markdown(
 Wizard is a fundamental tool for data scientists at OWID to easily create ETL steps. Additionally, wizard provides a set of tools to explore and improve these steps.
 """
 )
+
+with st.container(border=True):
+    st.markdown("**NEW**: Questions about the documentation? Ask the expert!")
+    st_page_link("expert", help="Ask the expert any documentation question!", use_container_width=True)
 
 # Generic tools
 ## Default styling for the cards (Wizard apps are presented as cards)
@@ -90,20 +95,21 @@ if steps["fasttrack"]["enable"]:
 # Sections
 #########################
 for section in WIZARD_CONFIG["sections"]:
-    st.markdown(f"## {section['title']}")
-    st.markdown(section["description"])
     apps = [app for app in section["apps"] if app["enable"]]
-    columns = st.columns(len(apps))
-    for i, app in enumerate(apps):
-        text = [
-            app["description"],
-        ]
-        # if "maintainer" in app:
-        #     text.append(f"maintainer: {app['maintainer']}")
-        if app["enable"]:
-            with columns[i]:
-                create_card(
-                    title=app["title"],
-                    image_url=app["image_url"],
-                    text=text,
-                )
+    if apps:
+        st.markdown(f"## {section['title']}")
+        st.markdown(section["description"])
+        columns = st.columns(len(apps))
+        for i, app in enumerate(apps):
+            text = [
+                app["description"],
+            ]
+            # if "maintainer" in app:
+            #     text.append(f"maintainer: {app['maintainer']}")
+            if app["enable"]:
+                with columns[i]:
+                    create_card(
+                        title=app["title"],
+                        image_url=app["image_url"],
+                        text=text,
+                    )
