@@ -7,7 +7,7 @@ It has been slightly modified since then.
 import json
 from datetime import date, datetime
 from pathlib import Path
-from typing import Annotated, Any, Dict, List, Literal, Optional, TypedDict, Union
+from typing import Annotated, Any, Dict, List, Literal, Optional, TypedDict, Union, get_args
 from urllib.parse import quote
 
 import humps
@@ -59,7 +59,7 @@ Select.inherit_cache = True  # type: ignore
 
 S3_PATH_TYP = Literal["s3", "http"]
 
-VARIABLE_TYPE = Literal["float", "int", "mixed", "string"]
+VARIABLE_TYPE = Literal["float", "int", "mixed", "string", "ordinal", "categorical"]
 
 metadata = SQLModel.metadata
 
@@ -1063,12 +1063,13 @@ class Variable(SQLModel, table=True):
     licenses: Optional[List[dict]] = Field(default=None, sa_column=Column("licenses", JSON))
     # NOTE: License should be the resulting license, given all licenses of the indicator’s origins and given the indicator’s processing level.
     license: Optional[dict] = Field(default=None, sa_column=Column("license", JSON))
-    type: Optional[VARIABLE_TYPE] = Field(default=None, sa_column=Column("type", String(255, "utf8mb4_0900_as_cs")))
+    type: Optional[VARIABLE_TYPE] = Field(default=None, sa_column=Column("type", ENUM(*get_args(VARIABLE_TYPE))))
     sort: Optional[List[str]] = Field(
+        default=None,
         sa_column=Column(
             "sort",
             JSON,
-        )
+        ),
     )
 
     datasets: Optional["Dataset"] = Relationship(back_populates="variables")
@@ -1208,6 +1209,7 @@ class Variable(SQLModel, table=True):
             descriptionProcessing=metadata.description_processing,
             licenses=[license.to_dict() for license in metadata.licenses] if metadata.licenses else None,
             license=metadata.license.to_dict() if metadata.license else None,
+            sort=metadata.sort,
             **presentation_dict,
         )
 
@@ -1224,10 +1226,12 @@ class Variable(SQLModel, table=True):
         assert "#" in catalog_path, "catalog_path should end with #indicator_short_name"
         return session.exec(select(cls).where(cls.catalogPath == catalog_path)).one()
 
-    def infer_type(self, values: pd.Series) -> None:
+    def infer_type(self, values: pd.Series) -> VARIABLE_TYPE:
         """Set type and sort fields based on indicator values."""
-        self.type = _infer_variable_type(values)
-        self.sort = None
+        if self.sort:
+            return "ordinal"
+        else:
+            return _infer_variable_type(values)
 
     def update_links(
         self, session: Session, db_origins: List["Origin"], faqs: List[catalog.FaqLink], tag_names: List[str]
