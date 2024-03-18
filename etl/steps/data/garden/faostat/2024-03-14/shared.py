@@ -856,6 +856,13 @@ def add_custom_names_and_descriptions(
     # Remove "owid_" from column names.
     data = data.rename(columns={column: column.replace("owid_", "") for column in data.columns})
 
+    # Fill missing unit and short_unit columns with empty strings.
+    for column in ["unit", "unit_short_name"]:
+        missing_unit_mask = data[column].isnull()
+        if not data[missing_unit_mask].empty:
+            log.warning(f"Missing {column} for elements: {set(data[missing_unit_mask]['element'])}")
+            data[column] = data[column].cat.add_categories("").fillna("")
+
     return data
 
 
@@ -1475,18 +1482,6 @@ def clean_data(
             "recipient_country_code": "area_code",
         }
     )
-
-    # # Dataset faostat_wcad doesn't have a year column, but a "census_year", which has intervals like "2002-2003"
-    # if "census_year" in data.columns:
-    #     if data["census_year"].astype(str).str.contains("-.{4}/", regex=True).any():
-    #         log.warning(
-    #             "Column 'census_year' in dataset 'faostat_wcad' contains values that need to be properly analysed "
-    #             "and processed, e.g. 1976-1977/1980-1981. For the moment, we take the first 4 digits as the year."
-    #         )
-
-    #     # Remove rows that don't have a census year, and take the first 4 digits
-    #     data = data.dropna(subset="census_year").reset_index(drop=True)
-    #     data["year"] = data["census_year"].astype(str).str[0:4].astype(int)
 
     # Ensure year column is integer (sometimes it is given as a range of years, e.g. 2013-2015).
     data["year"] = clean_year_column(data["year"])
