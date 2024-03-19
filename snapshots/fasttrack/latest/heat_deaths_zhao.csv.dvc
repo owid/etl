@@ -15,6 +15,6 @@ meta:
     The share of deaths across regions that are attributed to sub-optimal temperatures. This includes deaths related to cold and heat.
   license: {}
 outs:
-  - md5: 820d97286ba356e1b76d4ec577ef1720
-    size: 817
+  - md5: b56a76f350b5a746e2cdb26535be2fb1
+    size: 753
     path: heat_deaths_zhao.csv
