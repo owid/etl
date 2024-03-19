@@ -1,10 +1,12 @@
 # NOTE: To learn more about the fields, hover over their names.
 definitions:
   common:
-    processing_level: minor
+    processing_level: major
     display: &common-display
       numDecimalPlaces: 1
       tolerance: 5
+    description_processing: |-
+      Where there were multiple observations for a particular year, the observation drawn from a more recent round of a survey is preferred.
     description_from_producer: |-
       We construct individual income by adding all income sources together. Whenever possible we distinguish among income from salaried work, self-employment and salaries assigned to owners. Whenever possible we compute labor income from the main activity. Individual non-labor income is divided into three categories: (i) pensions; (ii) capital and benefits; and (iii) transfers. Countries ask different questions to capture data on capital income, interests, profits, rents and dividends. For comparison purposes, we prefer to gather all these questions into a single category. The same criterion applies to transfers, although we also construct a variable that identifies those transfers made by the government, and another that captures transfers clearly associated to poverty-alleviation programs.
       Since we are interested in capturing current income, non-current items are not included in our definition of income. The same criterion leads to the exclusion of income from the sale of some goods and assets like vehicles, houses, or stocks. We also exclude income from gifts, life insurance, gambling and inheritances.
