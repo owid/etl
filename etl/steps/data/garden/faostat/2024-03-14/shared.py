@@ -1425,7 +1425,7 @@ def clean_data_values(values: Variable, amendments: Dict[str, str]) -> Variable:
                 show_full_warning=True,
             ),
             name="value",
-        )
+        ).copy_metadata(from_variable=values)
 
     # Convert all numbers into numeric.
     # Note: If this step fails with a ValueError, it may be because other spurious values have been introduced.
@@ -1883,7 +1883,7 @@ def run(dest_dir: str) -> None:
     tb_wide.metadata.title = dataset_metadata["owid_dataset_title"] + ADDED_TITLE_TO_WIDE_TABLE
 
     # Initialise new garden dataset.
-    ds_garden = create_dataset(dest_dir=dest_dir, tables=[tb_long, tb_wide], default_metadata=ds_meadow.metadata)
+    ds_garden = create_dataset(dest_dir=dest_dir, tables=[tb_long, tb_wide], default_metadata=ds_meadow.metadata, check_variables_metadata=True)
     # Update dataset metadata.
     # Add description of anomalies (if any) to the dataset description.
     ds_garden.metadata.description = dataset_metadata["owid_dataset_description"] + anomaly_descriptions

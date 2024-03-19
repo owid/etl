@@ -169,5 +169,5 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new meadow dataset.
-    ds_meadow = create_dataset(dest_dir=dest_dir, tables=[tb])
+    ds_meadow = create_dataset(dest_dir=dest_dir, tables=[tb], check_variables_metadata=True)
     ds_meadow.save()
