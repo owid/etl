@@ -53,26 +53,27 @@ COLUMNS_KEEP = [
     "v2elmulpar_osp_codehigh",
     "v2elmulpar_osp_codelow",
     "v2eltrnout",
-    "v2eltype_0",
-    "v2eltype_1",
-    "v2eltype_2",
-    "v2eltype_3",
-    "v2eltype_4",
-    "v2eltype_5",
-    "v2eltype_6",
-    "v2eltype_7",
-    "v2eltype_8",
-    "v2eltype_9",
-    "v2ex_hogw",
-    "v2ex_hosw",
+    # What type of election was held on this date?
+    "v2eltype_0",  # Legislative; lower, sole, or both chambers, first or only round.
+    "v2eltype_1",  # Legislative; lower, sole, or both chambers, second or later round.
+    "v2eltype_2",  # Legislative; upper chamber only, first or only round.
+    "v2eltype_3",  # Legislative; upper chamber only, second round.
+    "v2eltype_4",  # Constituent Assembly, first or only round.
+    "v2eltype_5",  # Constituent Assembly, second or later round.
+    "v2eltype_6",  # Presidential, first or only round.
+    "v2eltype_7",  # Presidential, second round.
+    "v2eltype_8",  # Metropolitan or supranational legislative, first or only round.
+    "v2eltype_9",  # Metropolitan or supranational legislative, second round.
+    "v2ex_hogw",  # HOG have more relative power than the HOS over the appointment and dismissal of cabinet ministers?
+    "v2ex_hosw",  # HOS have more relative power than the HOG over the appointment and dismissal of cabinet ministers?
     "v2ex_legconhog",
     "v2ex_legconhos",
     "v2exaphogp",
     "v2exfemhog",
     "v2exfemhos",
-    "v2exhoshog",
-    "v2exnamhog",
-    "v2exnamhos",
+    "v2exhoshog",  # Is the head of state (HOS) also head of government (HOG)?
+    "v2exnamhog",  # What is the name of the head of government?
+    "v2exnamhos",  # What is the name of the head of state?
     "v2expathhg",
     "v2expathhs",
     # v2j
@@ -231,8 +232,14 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
+    # Column rename
+    tb = tb.rename(
+        columns={
+            "country_name": "country",
+        }
+    )
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
-    tb = tb.underscore().set_index(["country_name", "year"], verify_integrity=True).sort_index()
+    tb = tb.underscore().set_index(["country", "year"], verify_integrity=True).sort_index()
 
     #
     # Save outputs.
