@@ -9,8 +9,8 @@ import abc
 import os
 from typing import Tuple
 
-import pandas as pd
 import plotly.express as px
+from owid.catalog import Table
 from structlog import get_logger
 
 log = get_logger()
@@ -38,77 +38,77 @@ class DataAnomaly(abc.ABC):
         raise NotImplementedError
 
     @abc.abstractmethod
-    def check(self, df: pd.DataFrame) -> None:
+    def check(self, tb: Table) -> None:
         """A method that ensures the anomaly exists in the data.
 
         This is useful to detect if an anomaly has been corrected after a data update.
 
         Parameters
         ----------
-        df : pd.DataFrame
+        tb : Table
             Data containing anomalies.
         """
         raise NotImplementedError
 
     @abc.abstractmethod
-    def fix(self, df: pd.DataFrame) -> pd.DataFrame:
+    def fix(self, tb: Table) -> Table:
         """A method that removes the anomaly.
 
         Parameters
         ----------
-        df : pd.DataFrame
+        tb : Table
             Data that contains anomalies to be removed.
 
         Returns
         -------
-        df_fixed : pd.DataFrame
+        tb_fixed : Table
             Data after removing anomalies.
         """
         raise NotImplementedError
 
-    def inspect(self, df: pd.DataFrame) -> None:
+    def inspect(self, tb: Table) -> None:
         """An optional method that plots (in the browser) a visualization that shows the anomaly.
 
         It can be used before and after removing the anomalies.
 
         Parameters
         ----------
-        df : pd.DataFrame
+        tb : Table
             Data to be inspected (before or after having anomalies removed).
         """
         raise NotImplementedError
 
-    def handle_anomalies(self, df: pd.DataFrame, inspect_anomalies: bool = INSPECT_ANOMALIES) -> pd.DataFrame:
+    def handle_anomalies(self, tb: Table, inspect_anomalies: bool = INSPECT_ANOMALIES) -> Table:
         """A helper method that uses all the previous methods in the usual order.
 
         Parameters
         ----------
-        df : pd.DataFrame
+        tb : Table
             Data with anomalies.
         inspect_anomalies : bool, optional
             True to open charts in the browser to visualize the data before and after removing the anomalies.
 
         Returns
         -------
-        df_fixed : pd.DataFrame
+        tb_fixed : Table
             Data after removing anomalies.
         """
         log.info(f"Handling anomaly: {self.description}")
         log.info("Checking that known data anomalies are present in the data")
-        self.check(df=df)
+        self.check(tb=tb)
 
         if inspect_anomalies:
             log.info("Inspect anomaly before fixing.")
-            self.inspect(df=df)
+            self.inspect(tb=tb)
 
         log.info("Fixing anomalies.")
-        df_fixed = self.fix(df=df)
+        tb_fixed = self.fix(tb=tb)
 
         if inspect_anomalies:
             log.info("Inspect anomaly after fixing.")
-            self.inspect(df=df_fixed)
+            self.inspect(tb=tb_fixed)
 
-        return df_fixed
+        return tb_fixed
 
 
 def _split_long_title(text: str) -> str:
@@ -149,29 +149,29 @@ class SpinachAreaHarvestedAnomaly(DataAnomaly):
         "World",
     ]
 
-    def check(self, df):
+    def check(self, tb):
         # Check that the data point is indeed zero.
         assert (
-            df[
-                (df["country"] == "China")
-                & (df["item_code"].isin(self.affected_item_codes))
-                & (df["element_code"].isin(self.affected_element_codes))
-                & (df["year"].isin(self.affected_years))
+            tb[
+                (tb["country"] == "China")
+                & (tb["item_code"].isin(self.affected_item_codes))
+                & (tb["element_code"].isin(self.affected_element_codes))
+                & (tb["year"].isin(self.affected_years))
             ]["value"]
             == 0
         ).all()
         # For consistency, check that other years do have non-zero data for the same item and element.
         assert (
-            df[
-                (df["country"] == "China")
-                & (df["item_code"].isin(self.affected_item_codes))
-                & (df["element_code"].isin(self.affected_element_codes))
-                & ~(df["year"].isin(self.affected_years))
+            tb[
+                (tb["country"] == "China")
+                & (tb["item_code"].isin(self.affected_item_codes))
+                & (tb["element_code"].isin(self.affected_element_codes))
+                & ~(tb["year"].isin(self.affected_years))
             ]["value"]
             > 0
         ).all()
 
-    def inspect(self, df):
+    def inspect(self, tb):
         log.info(
             "The anomaly causes: "
             "\n* A dip in area harvested of spinach in that year (element code 005312). "
@@ -180,27 +180,27 @@ class SpinachAreaHarvestedAnomaly(DataAnomaly):
         )
         for element_code in self.affected_element_codes:
             selection = (
-                (df["country"].isin(self.affected_countries))
-                & (df["item_code"].isin(self.affected_item_codes))
-                & (df["element_code"] == element_code)
+                (tb["country"].isin(self.affected_countries))
+                & (tb["item_code"].isin(self.affected_item_codes))
+                & (tb["element_code"] == element_code)
             )
-            df_affected = df[selection].astype({"country": str})
+            tb_affected = tb[selection].astype({"country": str})
             title = _split_long_title(self.description + f"Element code {element_code}")
-            fig = px.line(df_affected, x="year", y="value", color="country", title=title)
+            fig = px.line(tb_affected, x="year", y="value", color="country", title=title)
             fig.show()
 
-    def fix(self, df):
-        indexes_to_drop = df[
+    def fix(self, tb):
+        indexes_to_drop = tb[
             (
-                (df["country"].isin(self.affected_countries))
-                & (df["item_code"].isin(self.affected_item_codes))
-                & (df["element_code"].isin(self.affected_element_codes))
-                & (df["year"].isin(self.affected_years))
+                (tb["country"].isin(self.affected_countries))
+                & (tb["item_code"].isin(self.affected_item_codes))
+                & (tb["element_code"].isin(self.affected_element_codes))
+                & (tb["year"].isin(self.affected_years))
             )
         ].index
-        df_fixed = df.drop(indexes_to_drop).reset_index(drop=True)
+        tb_fixed = tb.drop(indexes_to_drop).reset_index(drop=True)
 
-        return df_fixed
+        return tb_fixed
 
 
 class EggYieldNorthernEuropeAnomaly(DataAnomaly):
@@ -234,51 +234,51 @@ class EggYieldNorthernEuropeAnomaly(DataAnomaly):
         "Northern Europe (FAO)",
     ]
 
-    def check(self, df):
+    def check(self, tb):
         # Check that the data prior to 1973 is indeed higher than expected, and significantly lower from then on.
         assert (
-            df[
-                (df["country"].isin(self.affected_countries))
-                & (df["item_code"].isin(self.affected_item_codes))
-                & (df["element_code"].isin(self.affected_element_codes))
-                & (df["year"].isin(self.affected_years))
+            tb[
+                (tb["country"].isin(self.affected_countries))
+                & (tb["item_code"].isin(self.affected_item_codes))
+                & (tb["element_code"].isin(self.affected_element_codes))
+                & (tb["year"].isin(self.affected_years))
             ]["value"]
             > 40
         ).all()
         assert (
-            df[
-                (df["country"].isin(self.affected_countries))
-                & (df["item_code"].isin(self.affected_item_codes))
-                & (df["element_code"].isin(self.affected_element_codes))
-                & ~(df["year"].isin(self.affected_years))
+            tb[
+                (tb["country"].isin(self.affected_countries))
+                & (tb["item_code"].isin(self.affected_item_codes))
+                & (tb["element_code"].isin(self.affected_element_codes))
+                & ~(tb["year"].isin(self.affected_years))
             ]["value"]
             < 40
         ).all()
 
-    def inspect(self, df):
+    def inspect(self, tb):
         log.info(
             "The anomaly causes: "
             "\n* The egg yield of Northern Europe (FAO) before 1973 much higher than any other year."
         )
         for element_code in self.affected_element_codes:
-            selection = (df["item_code"].isin(self.affected_item_codes)) & (df["element_code"] == element_code)
-            df_affected = df[selection].astype({"country": str}).sort_values(["country", "year"])
+            selection = (tb["item_code"].isin(self.affected_item_codes)) & (tb["element_code"] == element_code)
+            tb_affected = tb[selection].astype({"country": str}).sort_values(["country", "year"])
             title = _split_long_title(self.description + f"Element code {element_code}")
-            fig = px.line(df_affected, x="year", y="value", color="country", title=title)
+            fig = px.line(tb_affected, x="year", y="value", color="country", title=title)
             fig.show()
 
-    def fix(self, df):
-        indexes_to_drop = df[
+    def fix(self, tb):
+        indexes_to_drop = tb[
             (
-                (df["country"].isin(self.affected_countries))
-                & (df["item_code"].isin(self.affected_item_codes))
-                & (df["element_code"].isin(self.affected_element_codes))
-                & (df["year"].isin(self.affected_years))
+                (tb["country"].isin(self.affected_countries))
+                & (tb["item_code"].isin(self.affected_item_codes))
+                & (tb["element_code"].isin(self.affected_element_codes))
+                & (tb["year"].isin(self.affected_years))
             )
         ].index
-        df_fixed = df.drop(indexes_to_drop).reset_index(drop=True)
+        tb_fixed = tb.drop(indexes_to_drop).reset_index(drop=True)
 
-        return df_fixed
+        return tb_fixed
 
 
 class TeaProductionAnomaly(DataAnomaly):
@@ -340,19 +340,19 @@ class TeaProductionAnomaly(DataAnomaly):
         "Zimbabwe",
     ]
 
-    def check(self, df):
+    def check(self, tb):
         # Check that the data on 1990 has the flag "A" (Official figure) for each of the affected countries.
-        flagged_official = df[
-            (df["country"].isin(self.affected_countries))
-            & (df["item_code"].isin(self.affected_item_codes))
-            & (df["element_code"].isin(self.affected_element_codes))
-            & (df["year"] == 1990)
+        flagged_official = tb[
+            (tb["country"].isin(self.affected_countries))
+            & (tb["item_code"].isin(self.affected_item_codes))
+            & (tb["element_code"].isin(self.affected_element_codes))
+            & (tb["year"] == 1990)
         ]
-        flagged_estimate = df[
-            (df["country"].isin(self.affected_countries))
-            & (df["item_code"].isin(self.affected_item_codes))
-            & (df["element_code"].isin(self.affected_element_codes))
-            & (df["year"] > 1990)
+        flagged_estimate = tb[
+            (tb["country"].isin(self.affected_countries))
+            & (tb["item_code"].isin(self.affected_item_codes))
+            & (tb["element_code"].isin(self.affected_element_codes))
+            & (tb["year"] > 1990)
         ]
         # Check that all affected countries have official data on 1990, and estimated on 1991.
         for country in self.affected_countries:
@@ -366,26 +366,26 @@ class TeaProductionAnomaly(DataAnomaly):
             ]["value"].iloc[0]
             assert high_value / low_value > 3
 
-    def inspect(self, df):
+    def inspect(self, tb):
         log.info("The anomaly causes: " "\n* The production of tea to increase dramatically from 1990 to 1991.")
         for element_code in self.affected_element_codes:
-            selection = (df["item_code"].isin(self.affected_item_codes)) & (df["element_code"] == element_code)
-            df_affected = df[selection].astype({"country": str}).sort_values(["country", "year"])
+            selection = (tb["item_code"].isin(self.affected_item_codes)) & (tb["element_code"] == element_code)
+            tb_affected = tb[selection].astype({"country": str}).sort_values(["country", "year"])
             title = _split_long_title(self.description + f"Element code {element_code}")
-            fig = px.line(df_affected, x="year", y="value", color="country", title=title)
+            fig = px.line(tb_affected, x="year", y="value", color="country", title=title)
             fig.show()
 
-    def fix(self, df):
-        indexes_to_drop = df[
+    def fix(self, tb):
+        indexes_to_drop = tb[
             (
-                (df["item_code"].isin(self.affected_item_codes))
-                & (df["element_code"].isin(self.affected_element_codes))
-                & (df["year"] > 1990)
+                (tb["item_code"].isin(self.affected_item_codes))
+                & (tb["element_code"].isin(self.affected_element_codes))
+                & (tb["year"] > 1990)
             )
         ].index
-        df_fixed = df.drop(indexes_to_drop).reset_index(drop=True)
+        tb_fixed = tb.drop(indexes_to_drop).reset_index(drop=True)
 
-        return df_fixed
+        return tb_fixed
 
 
 class HighYieldAnomaly(DataAnomaly):
@@ -396,48 +396,48 @@ class HighYieldAnomaly(DataAnomaly):
     affected_years = []
     affected_countries = []
 
-    def check(self, df):
+    def check(self, tb):
         # Check that the data in the affected years is higher than expected, and significantly lower from then on.
         assert (
-            df[
-                (df["country"].isin(self.affected_countries))
-                & (df["item_code"].isin(self.affected_item_codes))
-                & (df["element_code"].isin(self.affected_element_codes))
-                & (df["year"].isin(self.affected_years))
+            tb[
+                (tb["country"].isin(self.affected_countries))
+                & (tb["item_code"].isin(self.affected_item_codes))
+                & (tb["element_code"].isin(self.affected_element_codes))
+                & (tb["year"].isin(self.affected_years))
             ]["value"]
             > 100
         ).all()
         assert (
-            df[
-                (df["country"].isin(self.affected_countries))
-                & (df["item_code"].isin(self.affected_item_codes))
-                & (df["element_code"].isin(self.affected_element_codes))
-                & ~(df["year"].isin(self.affected_years))
+            tb[
+                (tb["country"].isin(self.affected_countries))
+                & (tb["item_code"].isin(self.affected_item_codes))
+                & (tb["element_code"].isin(self.affected_element_codes))
+                & ~(tb["year"].isin(self.affected_years))
             ]["value"]
             < 100
         ).all()
 
-    def inspect(self, df):
+    def inspect(self, tb):
         log.info("The anomaly causes: " "\n* The yield of certain items, countries and years to be unreasonably high.")
         for element_code in self.affected_element_codes:
-            selection = (df["item_code"].isin(self.affected_item_codes)) & (df["element_code"] == element_code)
-            df_affected = df[selection].astype({"country": str}).sort_values(["country", "year"])
+            selection = (tb["item_code"].isin(self.affected_item_codes)) & (tb["element_code"] == element_code)
+            tb_affected = tb[selection].astype({"country": str}).sort_values(["country", "year"])
             title = _split_long_title(self.description + f"Element code {element_code}")
-            fig = px.line(df_affected, x="year", y="value", color="country", title=title)
+            fig = px.line(tb_affected, x="year", y="value", color="country", title=title)
             fig.show()
 
-    def fix(self, df):
-        indexes_to_drop = df[
+    def fix(self, tb):
+        indexes_to_drop = tb[
             (
-                (df["country"].isin(self.affected_countries))
-                & (df["item_code"].isin(self.affected_item_codes))
-                & (df["element_code"].isin(self.affected_element_codes))
-                & (df["year"].isin(self.affected_years))
+                (tb["country"].isin(self.affected_countries))
+                & (tb["item_code"].isin(self.affected_item_codes))
+                & (tb["element_code"].isin(self.affected_element_codes))
+                & (tb["year"].isin(self.affected_years))
             )
         ].index
-        df_fixed = df.drop(indexes_to_drop).reset_index(drop=True)
+        tb_fixed = tb.drop(indexes_to_drop).reset_index(drop=True)
 
-        return df_fixed
+        return tb_fixed
 
 
 class FruitYieldAnomaly(HighYieldAnomaly):
@@ -713,18 +713,18 @@ detected_anomalies = {
 }
 
 
-def handle_anomalies(dataset_short_name: str, data: pd.DataFrame) -> Tuple[pd.DataFrame, str]:
+def handle_anomalies(dataset_short_name: str, tb: Table) -> Tuple[Table, str]:
     if dataset_short_name not in detected_anomalies:
         # If there is no anomaly class for a given dataset, return the same data and an empty anomaly description.
-        return data, ""
+        return tb, ""
     else:
         # If there are anomalies, fix them, and return the fixed data and a text describing all anomalies.
-        data_fixed = data.copy()
+        tb_fixed = tb.copy()
         anomaly_descriptions = ANOMALY_DESCRIPTION_INTRODUCTION
 
         for anomaly_class in detected_anomalies[dataset_short_name]:
             anomaly = anomaly_class()
             anomaly_descriptions += "\n\n+" + anomaly.description
-            data_fixed = anomaly.handle_anomalies(df=data_fixed)
+            tb_fixed = anomaly.handle_anomalies(tb=tb_fixed)
 
-        return data_fixed, anomaly_descriptions
+        return tb_fixed, anomaly_descriptions

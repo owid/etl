@@ -66,18 +66,18 @@ SLAUGHTERED_ANIMALS_ADDITIONAL_DESCRIPTION = (
 )
 
 
-def fill_slaughtered_poultry_with_slaughtered_chicken(data: Table) -> Table:
+def fill_slaughtered_poultry_with_slaughtered_chicken(tb: Table) -> Table:
     """Fill missing data on slaughtered poultry with slaughtered chicken.
 
     Most of poultry meat comes from chicken. However, sometimes chicken is informed, but the rest of poultry isn't,
     which causes poultry data to be empty (e.g. Spain in 2018).
     Therefore, we fill missing data for poultry with chicken data.
     """
-    data = data.copy()
+    tb = tb.copy()
 
     # Prepare a slice of the data to extract additional data fields.
     additional_fields = (
-        data[(data["item_code"] == ITEM_CODE_MEAT_POULTRY) & (data["unit"] == SLAUGHTERED_ANIMALS_UNIT)][
+        tb[(tb["item_code"] == ITEM_CODE_MEAT_POULTRY) & (tb["unit"] == SLAUGHTERED_ANIMALS_UNIT)][
             ["fao_item", "item_description", "fao_unit_short_name"]
         ]
         .drop_duplicates()
@@ -85,17 +85,17 @@ def fill_slaughtered_poultry_with_slaughtered_chicken(data: Table) -> Table:
     )
 
     # Select data for the number of slaughtered chicken.
-    chickens_slaughtered = data[
-        (data["item_code"] == ITEM_CODE_MEAT_CHICKEN)
-        & (data["element"] == SLAUGHTERED_ANIMALS_ELEMENT)
-        & (data["unit"] == SLAUGHTERED_ANIMALS_UNIT)
+    chickens_slaughtered = tb[
+        (tb["item_code"] == ITEM_CODE_MEAT_CHICKEN)
+        & (tb["element"] == SLAUGHTERED_ANIMALS_ELEMENT)
+        & (tb["unit"] == SLAUGHTERED_ANIMALS_UNIT)
     ]
 
     # Select data for the number of slaughtered poultry.
-    poultry_slaughtered = data[
-        (data["item_code"] == ITEM_CODE_MEAT_POULTRY)
-        & (data["element"] == SLAUGHTERED_ANIMALS_ELEMENT)
-        & (data["unit"] == SLAUGHTERED_ANIMALS_UNIT)
+    poultry_slaughtered = tb[
+        (tb["item_code"] == ITEM_CODE_MEAT_POULTRY)
+        & (tb["element"] == SLAUGHTERED_ANIMALS_ELEMENT)
+        & (tb["unit"] == SLAUGHTERED_ANIMALS_UNIT)
     ][["country", "year", "value"]]
 
     # Combine poultry and chicken data.
@@ -134,12 +134,12 @@ def fill_slaughtered_poultry_with_slaughtered_chicken(data: Table) -> Table:
         "slaughtered chicken."
     )
     # Add chicken data to the full table.
-    data = pr.concat([data, poultry_slaughtered_missing_data], ignore_index=True)
+    tb = pr.concat([tb, poultry_slaughtered_missing_data], ignore_index=True)
 
-    return data
+    return tb
 
 
-def add_slaughtered_animals_to_meat_total(data: Table) -> Table:
+def add_slaughtered_animals_to_meat_total(tb: Table) -> Table:
     """Add number of slaughtered animals to meat total.
 
     There is no FAOSTAT data on slaughtered animals for total meat. We construct this data by aggregating that element
@@ -150,35 +150,33 @@ def add_slaughtered_animals_to_meat_total(data: Table) -> Table:
 
     Parameters
     ----------
-    data : Table
+    tb : Table
         Processed data where meat total does not have number of slaughtered animals.
 
     Returns
     -------
-    combined_data : Table
+    tb_combined : Table
         Data after adding the new variable.
 
     """
-    data = data.copy()
+    tb = tb.copy()
 
     error = f"Some items required to get the aggregate '{TOTAL_MEAT_ITEM}' are missing in data."
-    assert set(MEAT_TOTAL_ITEM_CODES) < set(data["item_code"]), error
-    assert SLAUGHTERED_ANIMALS_ELEMENT in data["element"].unique()
-    assert SLAUGHTERED_ANIMALS_UNIT in data["unit"].unique()
+    assert set(MEAT_TOTAL_ITEM_CODES) < set(tb["item_code"]), error
+    assert SLAUGHTERED_ANIMALS_ELEMENT in tb["element"].unique()
+    assert SLAUGHTERED_ANIMALS_UNIT in tb["unit"].unique()
 
     # Check that, indeed, the number of slaughtered animals for total meat is not given in the original data.
-    assert data[
-        (data["item"] == TOTAL_MEAT_ITEM)
-        & (data["element"] == SLAUGHTERED_ANIMALS_ELEMENT)
-        & (data["unit"] == SLAUGHTERED_ANIMALS_UNIT)
+    assert tb[
+        (tb["item"] == TOTAL_MEAT_ITEM)
+        & (tb["element"] == SLAUGHTERED_ANIMALS_ELEMENT)
+        & (tb["unit"] == SLAUGHTERED_ANIMALS_UNIT)
     ].empty
 
     # There are two element codes for the same element (they have different items assigned).
     error = "Element codes for 'Producing or slaughtered animals' may have changed."
     assert (
-        data[(data["element"] == SLAUGHTERED_ANIMALS_ELEMENT) & ~(data["element_code"].str.contains("pc"))][
-            "element_code"
-        ]
+        tb[(tb["element"] == SLAUGHTERED_ANIMALS_ELEMENT) & ~(tb["element_code"].str.contains("pc"))]["element_code"]
         .unique()
         .tolist()
         == SLAUGHTERED_ANIMALS_ELEMENT_CODES
@@ -187,7 +185,7 @@ def add_slaughtered_animals_to_meat_total(data: Table) -> Table:
     # Check that the items assigned to each the two element codes do not overlap.
     error = "Element codes for 'Producing or slaughtered animals' have overlapping items."
     items_for_different_elements = (
-        data[(data["element_code"].isin(SLAUGHTERED_ANIMALS_ELEMENT_CODES))]
+        tb[(tb["element_code"].isin(SLAUGHTERED_ANIMALS_ELEMENT_CODES))]
         .groupby("element_code", observed=True)
         .agg({"item_code": lambda x: list(x.unique())})
         .to_dict()["item_code"]
@@ -196,14 +194,14 @@ def add_slaughtered_animals_to_meat_total(data: Table) -> Table:
 
     # Confirm the item code for total meat.
     error = f"Item code for '{TOTAL_MEAT_ITEM}' may have changed."
-    assert list(data[data["item"] == TOTAL_MEAT_ITEM]["item_code"].unique()) == [TOTAL_MEAT_ITEM_CODE], error
+    assert list(tb[tb["item"] == TOTAL_MEAT_ITEM]["item_code"].unique()) == [TOTAL_MEAT_ITEM_CODE], error
 
     # Select the subset of data to aggregate.
     data_to_aggregate = (
-        data[
-            (data["element"] == SLAUGHTERED_ANIMALS_ELEMENT)
-            & (data["unit"] == SLAUGHTERED_ANIMALS_UNIT)
-            & (data["item_code"].isin(MEAT_TOTAL_ITEM_CODES))
+        tb[
+            (tb["element"] == SLAUGHTERED_ANIMALS_ELEMENT)
+            & (tb["unit"] == SLAUGHTERED_ANIMALS_UNIT)
+            & (tb["item_code"].isin(MEAT_TOTAL_ITEM_CODES))
         ]
         .dropna(subset="value")
         .reset_index(drop=True)
@@ -229,24 +227,24 @@ def add_slaughtered_animals_to_meat_total(data: Table) -> Table:
     ).reset_index()
 
     # Get element description for selected element code (so far it's always been an empty string).
-    _slaughtered_animals_element_description = data[data["element_code"].isin(SLAUGHTERED_ANIMALS_ELEMENT_CODES)][
+    _slaughtered_animals_element_description = tb[tb["element_code"].isin(SLAUGHTERED_ANIMALS_ELEMENT_CODES)][
         "element_description"
     ].unique()
     assert len(_slaughtered_animals_element_description) == 1
     slaughtered_animals_element_description = _slaughtered_animals_element_description[0]
 
     # Get item description for selected item code.
-    _total_meat_item_description = data[data["item_code"] == TOTAL_MEAT_ITEM_CODE]["item_description"].unique()
+    _total_meat_item_description = tb[tb["item_code"] == TOTAL_MEAT_ITEM_CODE]["item_description"].unique()
     assert len(_total_meat_item_description) == 1
     total_meat_item_description = _total_meat_item_description[0]
 
     # Get FAO item name for selected item code.
-    _total_meat_fao_item = data[data["item_code"] == TOTAL_MEAT_ITEM_CODE]["fao_item"].unique()
+    _total_meat_fao_item = tb[tb["item_code"] == TOTAL_MEAT_ITEM_CODE]["fao_item"].unique()
     assert len(_total_meat_fao_item) == 1
     total_meat_fao_item = _total_meat_fao_item[0]
 
     # Get FAO unit for selected item code.
-    _total_meat_fao_unit = data[data["item_code"] == TOTAL_MEAT_ITEM_CODE]["fao_unit_short_name"].unique()
+    _total_meat_fao_unit = tb[tb["item_code"] == TOTAL_MEAT_ITEM_CODE]["fao_unit_short_name"].unique()
     assert len(_total_meat_fao_unit) == 1
     total_meat_fao_unit = _total_meat_fao_unit[0]
 
@@ -274,10 +272,10 @@ def add_slaughtered_animals_to_meat_total(data: Table) -> Table:
 
     # Find country-years for which we have the number of poultry slaughtered.
     country_years_with_poultry_data = (
-        data[
-            (data["item_code"] == ITEM_CODE_MEAT_POULTRY)
-            & (data["element"] == SLAUGHTERED_ANIMALS_ELEMENT)
-            & (data["unit"] == SLAUGHTERED_ANIMALS_UNIT)
+        tb[
+            (tb["item_code"] == ITEM_CODE_MEAT_POULTRY)
+            & (tb["element"] == SLAUGHTERED_ANIMALS_ELEMENT)
+            & (tb["unit"] == SLAUGHTERED_ANIMALS_UNIT)
         ]
         .dropna(subset="value")[["country", "year"]]
         .drop_duplicates()
@@ -297,11 +295,11 @@ def add_slaughtered_animals_to_meat_total(data: Table) -> Table:
     animals_corrected = compared[compared["_merge"] == "both"].reset_index(drop=True).drop(columns=["_merge"])
 
     # Check that we are not missing any column.
-    assert set(data.columns) == set(animals_corrected.columns)
+    assert set(tb.columns) == set(animals_corrected.columns)
 
     # Add animals data to the original table.
-    combined_data = (
-        pr.concat([data, animals_corrected], ignore_index=True)
+    tb_combined = (
+        pr.concat([tb, animals_corrected], ignore_index=True)
         .reset_index(drop=True)
         .astype(
             {
@@ -320,7 +318,7 @@ def add_slaughtered_animals_to_meat_total(data: Table) -> Table:
         )
     )
 
-    return combined_data
+    return tb_combined
 
 
 def add_yield_to_aggregate_regions(data: Table) -> Table:
@@ -447,11 +445,9 @@ def run(dest_dir: str) -> None:
     # Get paths and naming conventions for current data step.
     paths = PathFinder(current_step_file.as_posix())
 
-    # Load latest meadow dataset and keep its metadata.
+    # Load latest meadow dataset and read its main table.
     ds_meadow = paths.load_dataset(dataset_short_name)
-    # Load main table from dataset.
-    tb_meadow = ds_meadow[dataset_short_name]
-    data = tb_meadow.reset_index()
+    tb = ds_meadow[dataset_short_name].reset_index()
 
     # Load dataset of FAOSTAT metadata.
     metadata = paths.load_dataset(f"{NAMESPACE}_metadata")
@@ -478,12 +474,12 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
     # Harmonize items and elements, and clean data.
-    data = harmonize_items(tb=data, dataset_short_name=dataset_short_name)
-    data = harmonize_elements(tb=data, dataset_short_name=dataset_short_name)
+    tb = harmonize_items(tb=tb, dataset_short_name=dataset_short_name)
+    tb = harmonize_elements(tb=tb, dataset_short_name=dataset_short_name)
 
     # Prepare data.
-    data = clean_data(
-        tb=data,
+    tb = clean_data(
+        tb=tb,
         ds_population=ds_population,
         items_metadata=items_metadata,
         elements_metadata=elements_metadata,
@@ -492,14 +488,14 @@ def run(dest_dir: str) -> None:
     )
 
     # Fill missing data for slaughtered poultry with slaughtered chicken.
-    data = fill_slaughtered_poultry_with_slaughtered_chicken(data=data)
+    tb = fill_slaughtered_poultry_with_slaughtered_chicken(tb=tb)
 
     # Include number of slaughtered animals in total meat (which is missing).
-    data = add_slaughtered_animals_to_meat_total(data=data)
+    tb = add_slaughtered_animals_to_meat_total(tb=tb)
 
     # Add data for aggregate regions.
-    data = add_regions(
-        tb=data,
+    tb = add_regions(
+        tb=tb,
         ds_regions=ds_regions,
         ds_population=ds_population,
         ds_income_groups=ds_income_groups,
@@ -507,33 +503,31 @@ def run(dest_dir: str) -> None:
     )
 
     # Add per-capita variables.
-    data = add_per_capita_variables(tb=data, elements_metadata=elements_metadata)
+    tb = add_per_capita_variables(tb=tb, elements_metadata=elements_metadata)
 
     # Add yield (production per area) to aggregate regions.
-    data = add_yield_to_aggregate_regions(data)
+    tb = add_yield_to_aggregate_regions(tb)
 
     # Handle detected anomalies in the data.
-    data, anomaly_descriptions = handle_anomalies(dataset_short_name=dataset_short_name, data=data)
+    tb, anomaly_descriptions = handle_anomalies(dataset_short_name=dataset_short_name, tb=tb)
 
     # Create a long table (with item code and element code as part of the index).
-    data_table_long = prepare_long_table(tb=data)
+    tb_long = prepare_long_table(tb=tb)
 
     # Create a wide table (with only country and year as index).
-    data_table_wide = prepare_wide_table(tb=data)
+    tb_wide = prepare_wide_table(tb=tb)
 
     #
     # Save outputs.
     #
     # Update tables metadata.
-    data_table_long.metadata.short_name = dataset_short_name
-    data_table_long.metadata.title = dataset_metadata["owid_dataset_title"]
-    data_table_wide.metadata.short_name = f"{dataset_short_name}_flat"
-    data_table_wide.metadata.title = dataset_metadata["owid_dataset_title"] + ADDED_TITLE_TO_WIDE_TABLE
+    tb_long.metadata.short_name = dataset_short_name
+    tb_long.metadata.title = dataset_metadata["owid_dataset_title"]
+    tb_wide.metadata.short_name = f"{dataset_short_name}_flat"
+    tb_wide.metadata.title = dataset_metadata["owid_dataset_title"] + ADDED_TITLE_TO_WIDE_TABLE
 
     # Initialise new garden dataset.
-    ds_garden = create_dataset(
-        dest_dir=dest_dir, tables=[data_table_long, data_table_wide], default_metadata=ds_meadow.metadata
-    )
+    ds_garden = create_dataset(dest_dir=dest_dir, tables=[tb_long, tb_wide], default_metadata=ds_meadow.metadata)
 
     # Update dataset metadata and add description of anomalies (if any) to the dataset description.
     ds_garden.metadata.description = (

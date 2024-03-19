@@ -1019,11 +1019,11 @@ def add_regions(
 
     Returns
     -------
-    tb : Table
+    tb_with_regions : Table
         Data after adding rows for aggregate regions.
 
     """
-    tb = tb.copy()
+    tb_with_regions = tb.copy()
 
     # Create a dictionary of aggregations, specifying the operation to use when creating regions.
     # These aggregations are defined in the custom_elements_and_units.csv file, and added to the metadata dataset.
@@ -1033,7 +1033,7 @@ def add_regions(
         .to_dict()["owid_aggregation"]
     )
     if len(aggregations) > 0:
-        log.info("add_regions", shape=tb.shape)
+        log.info("add_regions", shape=tb_with_regions.shape)
 
         # Load population dataset, countries-regions, and income groups datasets.
         population = load_population(ds_population=ds_population)
@@ -1061,7 +1061,10 @@ def add_regions(
                 element_codes = aggregations_inverted[aggregation]
 
                 # Select relevant rows in the data.
-                data_region = tb[(tb["country"].isin(countries_in_region)) & (tb["element_code"].isin(element_codes))]
+                data_region = tb_with_regions[
+                    (tb_with_regions["country"].isin(countries_in_region))
+                    & (tb_with_regions["element_code"].isin(element_codes))
+                ]
 
                 # Ensure there is no overlap between historical regions and their successors.
                 data_region = remove_overlapping_data_between_historical_regions_and_successors(data_region)
@@ -1118,27 +1121,30 @@ def add_regions(
                     )
 
                     # Add data for current region to data.
-                    tb = dataframes.concatenate(
-                        [tb[tb["country"] != region].reset_index(drop=True), data_region],
+                    tb_with_regions = dataframes.concatenate(
+                        [tb_with_regions[tb_with_regions["country"] != region].reset_index(drop=True), data_region],
                         ignore_index=True,
                     )
 
             # Check that the fraction of population with data is as high as expected.
-            frac_population = tb["population_with_data"] / tb["population"]
+            frac_population = tb_with_regions["population_with_data"] / tb_with_regions["population"]
             assert frac_population[frac_population.notnull()].min() >= region_min_frac_population_with_data
 
         # Drop column of total population (we will still keep population_with_data).
-        tb = tb.drop(columns=["population"])
+        tb_with_regions = tb_with_regions.drop(columns=["population"])
 
         # Make area_code of category type (it contains integers and strings, and feather does not support object types).
-        tb["area_code"] = tb["area_code"].astype(str).astype("category")
+        tb_with_regions["area_code"] = tb_with_regions["area_code"].astype(str).astype("category")
 
         # Sort conveniently.
-        tb = tb.sort_values(["country", "year"]).reset_index(drop=True)
+        tb_with_regions = tb_with_regions.sort_values(["country", "year"]).reset_index(drop=True)
 
-        check_that_countries_are_well_defined(tb)
+        check_that_countries_are_well_defined(tb_with_regions)
 
-    return tb
+    # Copy metadata of the original table (including indicators metadata).
+    tb_with_regions = tb_with_regions.copy_metadata(from_table=tb)
+
+    return tb_with_regions
 
 
 def add_fao_population_if_given(tb: Table) -> Table:
@@ -1333,17 +1339,19 @@ def add_per_capita_variables(tb: Table, elements_metadata: Table) -> Table:
         Data with per-capita variables.
 
     """
-    tb = tb.copy()
+    tb_with_pc_variables = tb.copy()
 
     # Find element codes that have to be made per capita.
     element_codes_to_make_per_capita = list(
         elements_metadata[elements_metadata["make_per_capita"]]["element_code"].unique()
     )
     if len(element_codes_to_make_per_capita) > 0:
-        log.info("add_per_capita_variables", shape=tb.shape)
+        log.info("add_per_capita_variables", shape=tb_with_pc_variables.shape)
 
         # Create a new dataframe that will have all per capita variables.
-        per_capita_data = tb[tb["element_code"].isin(element_codes_to_make_per_capita)].reset_index(drop=True)
+        per_capita_data = tb_with_pc_variables[
+            tb_with_pc_variables["element_code"].isin(element_codes_to_make_per_capita)
+        ].reset_index(drop=True)
 
         # Change element codes of per capita variables.
         per_capita_data["element_code"] = per_capita_data["element_code"].cat.rename_categories(
@@ -1382,7 +1390,12 @@ def add_per_capita_variables(tb: Table, elements_metadata: Table) -> Table:
             lambda c: f"{c} {NEW_PER_CAPITA_ADDED_ELEMENT_DESCRIPTION}"
         )
         # Add new rows with per capita variables to data.
-        tb = dataframes.concatenate([tb, per_capita_data], ignore_index=True).reset_index(drop=True)
+        tb_with_pc_variables = dataframes.concatenate(
+            [tb_with_pc_variables, per_capita_data], ignore_index=True
+        ).reset_index(drop=True)
+
+    # Copy metadata of the original table (including indicators metadata).
+    tb_with_pc_variables = tb_with_pc_variables.copy_metadata(from_table=tb)
 
     return tb
 
@@ -1571,7 +1584,7 @@ def prepare_long_table(tb: Table) -> Table:
 
     """
     # Create new table with long data.
-    tb_long = Table(tb)
+    tb_long = tb.copy()
 
     # Ensure table has the optimal dtypes before storing it as feather file.
     tb_long = optimize_table_dtypes(table=tb_long)
@@ -1693,12 +1706,10 @@ def prepare_wide_table(tb: Table) -> Table:
     # Note: `pivot` operation is usually faster on categorical columns
     log.info("prepare_wide_table.pivot", shape=tb.shape)
     # Create a wide table with just the data values.
-    tb_wide = Table(
-        tb.pivot(
-            index=["area_code", "country", "year"],
-            columns=["variable_name"],
-            values="value",
-        )
+    tb_wide = tb.pivot(
+        index=["area_code", "country", "year"],
+        columns=["variable_name"],
+        values="value",
     )
 
     # Add metadata to each new variable in the wide data table.
@@ -1799,9 +1810,8 @@ def run(dest_dir: str) -> None:
     # Get paths and naming conventions for current data step.
     paths = PathFinder(current_step_file.as_posix())
 
-    # Load latest meadow dataset and keep its metadata.
+    # Load latest meadow dataset and read its main table.
     ds_meadow = paths.load_dataset(dataset_short_name)
-    # Load main table from dataset.
     tb = ds_meadow[dataset_short_name].reset_index()
 
     # Load dataset of FAOSTAT metadata.
@@ -1855,7 +1865,7 @@ def run(dest_dir: str) -> None:
     tb = add_per_capita_variables(tb=tb, elements_metadata=elements_metadata)
 
     # Handle detected anomalies in the data.
-    tb, anomaly_descriptions = handle_anomalies(dataset_short_name=dataset_short_name, data=tb)
+    tb, anomaly_descriptions = handle_anomalies(dataset_short_name=dataset_short_name, tb=tb)
 
     # Create a long table (with item code and element code as part of the index).
     tb_long = prepare_long_table(tb=tb)

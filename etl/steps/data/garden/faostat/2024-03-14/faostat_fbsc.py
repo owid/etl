@@ -17,8 +17,8 @@ update.
 
 from pathlib import Path
 
+import owid.catalog.processing as pr
 from owid.catalog import Dataset, Table
-from owid.datautils import dataframes
 from shared import (
     ADDED_TITLE_TO_WIDE_TABLE,
     CURRENT_DIR,
@@ -59,7 +59,7 @@ def combine_fbsh_and_fbs_datasets(
     Returns
     -------
     tb_fbsc : Table
-        Combination of the tables of the two input datasets (as a dataframe, not a dataset).
+        Combination of the tables of the two input datasets (as a table, not a dataset).
 
     """
     # Sanity checks.
@@ -68,7 +68,7 @@ def combine_fbsh_and_fbs_datasets(
     error = "Licenses of fbsh and fbs are different."
     assert ds_fbsh.metadata.licenses == ds_fbs.metadata.licenses, error
 
-    # Load dataframes for fbs and fbsh datasets.
+    # Load tables for fbs and fbsh datasets.
     tb_fbsh = ds_fbsh["faostat_fbsh"].reset_index()
     tb_fbs = ds_fbs["faostat_fbs"].reset_index()
 
@@ -102,23 +102,24 @@ def combine_fbsh_and_fbs_datasets(
     # combined as if they were the same element).
     tb_fbsh = tb_fbsh[~tb_fbsh["element_code"].isin(ELEMENTS_IN_FBSH_MISSING_IN_FBS)].reset_index(drop=True)
 
-    # Concatenate old and new dataframes using function that keeps categoricals.
-    tb_fbsc = dataframes.concatenate([tb_fbsh, tb_fbs]).sort_values(["area", "year"]).reset_index(drop=True)
+    # Concatenate old and new tables.
+    # tb_fbsc = dataframes.concatenate([tb_fbsh, tb_fbs]).sort_values(["area", "year"]).reset_index(drop=True)
+    tb_fbsc = pr.concat([tb_fbsh, tb_fbs]).sort_values(["area", "year"]).reset_index(drop=True)
 
     # Ensure that each element has only one unit and one description.
     error = "Some elements in the combined dataset have more than one unit. Manually check them and consider adding them to ELEMENT_AMENDMENTS."
     units_per_element = tb_fbsc.groupby("element", as_index=False, observed=True)["unit"].nunique()
     elements_with_ambiguous_units = units_per_element[units_per_element["unit"] > 1]["element"].tolist()
-    tb_fbsc[tb_fbsc["element"].isin(elements_with_ambiguous_units)].drop_duplicates(subset=["element", "unit"])
+    # tb_fbsc[tb_fbsc["element"].isin(elements_with_ambiguous_units)].drop_duplicates(subset=["element", "unit"])
     assert len(elements_with_ambiguous_units) == 0, error
 
     return tb_fbsc
 
 
 def _assert_tb_size(tb: Table, size_mb: float) -> None:
-    """Check that dataframe is smaller than given size to prevent OOM errors."""
+    """Check that table is smaller than given size to prevent OOM errors."""
     real_size_mb = tb.memory_usage(deep=True).sum() / 1e6
-    assert real_size_mb <= size_mb, f"DataFrame size is too big: {real_size_mb} MB > {size_mb} MB"
+    assert real_size_mb <= size_mb, f"Table size is too big: {real_size_mb} MB > {size_mb} MB"
 
 
 def run(dest_dir: str) -> None:
@@ -136,8 +137,8 @@ def run(dest_dir: str) -> None:
 
     # Load fbsh and fbs.
     log.info("faostat_fbsc.loading_datasets")
-    fbsh_dataset = paths.load_dataset(f"{NAMESPACE}_fbsh")
-    fbs_dataset = paths.load_dataset(f"{NAMESPACE}_fbs")
+    ds_fbsh = paths.load_dataset(f"{NAMESPACE}_fbsh")
+    ds_fbs = paths.load_dataset(f"{NAMESPACE}_fbs")
 
     # Load dataset of FAOSTAT metadata.
     metadata = paths.load_dataset(f"{NAMESPACE}_metadata")
@@ -166,16 +167,16 @@ def run(dest_dir: str) -> None:
     # Combine fbsh and fbs datasets.
     log.info(
         "faostat_fbsc.combine_fbsh_and_fbs_datasets",
-        fbsh_shape=fbsh_dataset["faostat_fbsh"].shape,
-        fbs_shape=fbs_dataset["faostat_fbs"].shape,
+        fbsh_shape=ds_fbsh["faostat_fbsh"].shape,
+        fbs_shape=ds_fbs["faostat_fbs"].shape,
     )
-    data = combine_fbsh_and_fbs_datasets(fbsh_dataset, fbs_dataset)
+    tb = combine_fbsh_and_fbs_datasets(ds_fbsh=ds_fbsh, ds_fbs=ds_fbs)
 
-    _assert_tb_size(data, 2000)
+    _assert_tb_size(tb, 2000)
 
     # Prepare data.
-    data = clean_data(
-        tb=data,
+    tb = clean_data(
+        tb=tb,
         ds_population=ds_population,
         items_metadata=items_metadata,
         elements_metadata=elements_metadata,
@@ -184,8 +185,8 @@ def run(dest_dir: str) -> None:
     )
 
     # Add data for aggregate regions.
-    data = add_regions(
-        tb=data,
+    tb = add_regions(
+        tb=tb,
         ds_regions=ds_regions,
         ds_income_groups=ds_income_groups,
         ds_population=ds_population,
@@ -193,40 +194,38 @@ def run(dest_dir: str) -> None:
     )
 
     # Add per-capita variables.
-    data = add_per_capita_variables(tb=data, elements_metadata=elements_metadata)
+    tb = add_per_capita_variables(tb=tb, elements_metadata=elements_metadata)
 
     # Handle detected anomalies in the data.
-    data, anomaly_descriptions = handle_anomalies(dataset_short_name=dataset_short_name, data=data)
+    tb, anomaly_descriptions = handle_anomalies(dataset_short_name=dataset_short_name, tb=tb)
 
     # Avoid objects as they would explode memory, use categoricals instead.
-    for col in data.columns:
-        assert data[col].dtype != object, f"Column {col} should not have object type"
+    for col in tb.columns:
+        assert tb[col].dtype != object, f"Column {col} should not have object type"
 
-    _assert_tb_size(data, 2000)
+    _assert_tb_size(tb, 2000)
 
     # Create a long table (with item code and element code as part of the index).
-    log.info("faostat_fbsc.prepare_long_table", shape=data.shape)
-    data_table_long = prepare_long_table(tb=data)
+    log.info("faostat_fbsc.prepare_long_table", shape=tb.shape)
+    tb_long = prepare_long_table(tb=tb)
 
-    _assert_tb_size(data_table_long, 2000)
+    _assert_tb_size(tb_long, 2000)
 
     # Create a wide table (with only country and year as index).
-    log.info("faostat_fbsc.prepare_wide_table", shape=data.shape)
-    data_table_wide = prepare_wide_table(tb=data)
+    log.info("faostat_fbsc.prepare_wide_table", shape=tb.shape)
+    tb_wide = prepare_wide_table(tb=tb)
 
     #
     # Save outputs.
     #
     # Update tables metadata.
-    data_table_long.metadata.short_name = dataset_short_name
-    data_table_long.metadata.title = dataset_metadata["owid_dataset_title"]
-    data_table_wide.metadata.short_name = f"{dataset_short_name}_flat"
-    data_table_wide.metadata.title = dataset_metadata["owid_dataset_title"] + ADDED_TITLE_TO_WIDE_TABLE
+    tb_long.metadata.short_name = dataset_short_name
+    tb_long.metadata.title = dataset_metadata["owid_dataset_title"]
+    tb_wide.metadata.short_name = f"{dataset_short_name}_flat"
+    tb_wide.metadata.title = dataset_metadata["owid_dataset_title"] + ADDED_TITLE_TO_WIDE_TABLE
 
     # Initialise new garden dataset.
-    ds_garden = create_dataset(
-        dest_dir=dest_dir, tables=[data_table_long, data_table_wide], default_metadata=fbs_dataset.metadata
-    )
+    ds_garden = create_dataset(dest_dir=dest_dir, tables=[tb_long, tb_wide], default_metadata=ds_fbs.metadata)
 
     # Check that the title assigned here coincides with the one in custom_datasets.csv (for consistency).
     error = "Dataset title given to fbsc is different to the one in custom_datasets.csv. Update the latter file."
