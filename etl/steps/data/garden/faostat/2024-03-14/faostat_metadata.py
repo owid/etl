@@ -241,7 +241,7 @@ def create_items_dataframe_for_domain(
         data=df, dataset_short_name=dataset_short_name, category="item"
     )
     # Ensure items are well constructed and amend already known issues (defined in shared.ITEM_AMENDMENTS).
-    items_from_data = harmonize_items(df=items_from_data, dataset_short_name=dataset_short_name, item_col="fao_item")
+    items_from_data = harmonize_items(tb=items_from_data, dataset_short_name=dataset_short_name, item_col="fao_item")
 
     # Load items from metadata.
     items_columns = {
@@ -261,7 +261,7 @@ def create_items_dataframe_for_domain(
         .sort_values(list(items_columns.values()))
         .reset_index(drop=True)
     )
-    _items_df = harmonize_items(df=_items_df, dataset_short_name=dataset_short_name, item_col="fao_item")
+    _items_df = harmonize_items(tb=_items_df, dataset_short_name=dataset_short_name, item_col="fao_item")
     _items_df["fao_item_description"] = _items_df["fao_item_description"].astype("string")
 
     # Add descriptions (from metadata) to items (from data).
@@ -430,7 +430,7 @@ def create_elements_dataframe_for_domain(
     )
     # Ensure element_code is always a string of a fix number of characters.
     elements_from_data = harmonize_elements(
-        df=elements_from_data,
+        tb=elements_from_data,
         dataset_short_name=dataset_short_name,
         element_col="fao_element",
         unit_col="fao_unit_short_name",
@@ -455,7 +455,7 @@ def create_elements_dataframe_for_domain(
         .reset_index(drop=True)
     )
     _elements_df = harmonize_elements(
-        df=_elements_df, dataset_short_name=dataset_short_name, element_col="fao_element", unit_col=None
+        tb=_elements_df, dataset_short_name=dataset_short_name, element_col="fao_element", unit_col=None
     )
     _elements_df["fao_element_description"] = _elements_df["fao_element_description"].astype("string")
 

@@ -75,10 +75,10 @@ def combine_fbsh_and_fbs_datasets(
     fbs = pd.DataFrame(fbs_dataset["faostat_fbs"]).reset_index()
 
     # Harmonize items and elements in both datasets.
-    fbsh = harmonize_items(df=fbsh, dataset_short_name="faostat_fbsh")
-    fbsh = harmonize_elements(df=fbsh, dataset_short_name="faostat_fbsh")
-    fbs = harmonize_items(df=fbs, dataset_short_name="faostat_fbs")
-    fbs = harmonize_elements(df=fbs, dataset_short_name="faostat_fbs")
+    fbsh = harmonize_items(tb=fbsh, dataset_short_name="faostat_fbsh")
+    fbsh = harmonize_elements(tb=fbsh, dataset_short_name="faostat_fbsh")
+    fbs = harmonize_items(tb=fbs, dataset_short_name="faostat_fbs")
+    fbs = harmonize_elements(tb=fbs, dataset_short_name="faostat_fbs")
 
     # Ensure there is no overlap in data between the two datasets, and that there is no gap between them.
     assert fbs["year"].min() == FBS_FIRST_YEAR, f"First year of fbs dataset is not {FBS_FIRST_YEAR}"
@@ -177,7 +177,7 @@ def run(dest_dir: str) -> None:
 
     # Prepare data.
     data = clean_data(
-        data=data,
+        tb=data,
         ds_population=ds_population,
         items_metadata=items_metadata,
         elements_metadata=elements_metadata,
@@ -187,7 +187,7 @@ def run(dest_dir: str) -> None:
 
     # Add data for aggregate regions.
     data = add_regions(
-        data=data,
+        tb=data,
         ds_regions=ds_regions,
         ds_income_groups=ds_income_groups,
         ds_population=ds_population,
@@ -195,7 +195,7 @@ def run(dest_dir: str) -> None:
     )
 
     # Add per-capita variables.
-    data = add_per_capita_variables(data=data, elements_metadata=elements_metadata)
+    data = add_per_capita_variables(tb=data, elements_metadata=elements_metadata)
 
     # Handle detected anomalies in the data.
     data, anomaly_descriptions = handle_anomalies(dataset_short_name=dataset_short_name, data=data)
@@ -208,13 +208,13 @@ def run(dest_dir: str) -> None:
 
     # Create a long table (with item code and element code as part of the index).
     log.info("faostat_fbsc.prepare_long_table", shape=data.shape)
-    data_table_long = prepare_long_table(data=data)
+    data_table_long = prepare_long_table(tb=data)
 
     _assert_df_size(data_table_long, 2000)
 
     # Create a wide table (with only country and year as index).
     log.info("faostat_fbsc.prepare_wide_table", shape=data.shape)
-    data_table_wide = prepare_wide_table(data=data)
+    data_table_wide = prepare_wide_table(tb=data)
 
     #
     # Save outputs.

@@ -479,12 +479,12 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
     # Harmonize items and elements, and clean data.
-    data = harmonize_items(df=data, dataset_short_name=dataset_short_name)
-    data = harmonize_elements(df=data, dataset_short_name=dataset_short_name)
+    data = harmonize_items(tb=data, dataset_short_name=dataset_short_name)
+    data = harmonize_elements(tb=data, dataset_short_name=dataset_short_name)
 
     # Prepare data.
     data = clean_data(
-        data=data,
+        tb=data,
         ds_population=ds_population,
         items_metadata=items_metadata,
         elements_metadata=elements_metadata,
@@ -500,7 +500,7 @@ def run(dest_dir: str) -> None:
 
     # Add data for aggregate regions.
     data = add_regions(
-        data=data,
+        tb=data,
         ds_regions=ds_regions,
         ds_population=ds_population,
         ds_income_groups=ds_income_groups,
@@ -508,7 +508,7 @@ def run(dest_dir: str) -> None:
     )
 
     # Add per-capita variables.
-    data = add_per_capita_variables(data=data, elements_metadata=elements_metadata)
+    data = add_per_capita_variables(tb=data, elements_metadata=elements_metadata)
 
     # Add yield (production per area) to aggregate regions.
     data = add_yield_to_aggregate_regions(data)
@@ -517,10 +517,10 @@ def run(dest_dir: str) -> None:
     data, anomaly_descriptions = handle_anomalies(dataset_short_name=dataset_short_name, data=data)
 
     # Create a long table (with item code and element code as part of the index).
-    data_table_long = prepare_long_table(data=data)
+    data_table_long = prepare_long_table(tb=data)
 
     # Create a wide table (with only country and year as index).
-    data_table_wide = prepare_wide_table(data=data)
+    data_table_wide = prepare_wide_table(tb=data)
 
     #
     # Save outputs.

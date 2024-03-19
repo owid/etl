@@ -13,13 +13,17 @@ This module contains:
 import json
 import sys
 from pathlib import Path
-from typing import Dict, List, Optional, cast
+from typing import Dict, List, Optional
 
 import numpy as np
+import owid.catalog.processing as pr
 import pandas as pd
 import structlog
 from detected_anomalies import handle_anomalies
-from owid import catalog, repack  # type: ignore
+from owid import repack  # type: ignore
+from owid.catalog import Dataset, Table, Variable, VariablePresentationMeta
+from owid.catalog.tables import read_from_records
+from owid.catalog.utils import underscore
 from owid.datautils import dataframes
 from tqdm.auto import tqdm
 
@@ -272,7 +276,7 @@ FLAG_OFFICIAL_DATA = "official_data"
 FLAG_MULTIPLE_FLAGS = "multiple_flags"
 # Rank flags by priority (where lowest index is highest priority).
 FLAGS_RANKING = (
-    pd.DataFrame.from_records(
+    read_from_records(
         columns=["flag", "description"],
         data=[
             # FAO uses nan flag for official data; in our datasets we will replace nans by FLAG_OFFICIAL_DATA.
@@ -324,19 +328,19 @@ FAO_POPULATION_UNIT_NAME = "thousand Number"
 # Shared functions.
 
 
-def check_that_countries_are_well_defined(data: pd.DataFrame) -> None:
+def check_that_countries_are_well_defined(tb: Table) -> None:
     """Apply sanity checks related to the definition of countries.
 
     Parameters
     ----------
-    data : pd.DataFrame
+    tb : Table
         Data, right after harmonizing country names.
 
     """
     # Ensure area codes and countries are well defined, and no ambiguities were introduced when mapping country names.
-    n_countries_per_area_code = data.groupby("area_code")["country"].transform("nunique")
+    n_countries_per_area_code = tb.groupby("area_code")["country"].transform("nunique")
     ambiguous_area_codes = (
-        data.loc[n_countries_per_area_code > 1][["area_code", "country"]]
+        tb.loc[n_countries_per_area_code > 1][["area_code", "country"]]
         .drop_duplicates()
         .set_index("area_code")["country"]
         .to_dict()
@@ -346,9 +350,9 @@ def check_that_countries_are_well_defined(data: pd.DataFrame) -> None:
         f"Redefine countries file for:\n{ambiguous_area_codes}."
     )
     assert len(ambiguous_area_codes) == 0, error
-    n_area_codes_per_country = data.groupby("country")["area_code"].transform("nunique")
+    n_area_codes_per_country = tb.groupby("country")["area_code"].transform("nunique")
     ambiguous_countries = (
-        data.loc[n_area_codes_per_country > 1][["area_code", "country"]]
+        tb.loc[n_area_codes_per_country > 1][["area_code", "country"]]
         .drop_duplicates()
         .set_index("area_code")["country"]
         .to_dict()
@@ -361,14 +365,14 @@ def check_that_countries_are_well_defined(data: pd.DataFrame) -> None:
 
 
 def check_that_regions_with_subregions_are_ignored_when_constructing_aggregates(
-    countries_metadata: pd.DataFrame,
+    countries_metadata: Table,
 ) -> None:
     """Check that regions that contain subregions are ignored when constructing region aggregates, to avoid
     double-counting those subregions.
 
     Parameters
     ----------
-    countries_metadata : pd.DataFrame
+    countries_metadata : Table
         Table 'countries' from garden faostat_metadata dataset.
 
     """
@@ -393,13 +397,13 @@ def check_that_regions_with_subregions_are_ignored_when_constructing_aggregates(
     assert len(countries_with_subregions) == 0, error
 
 
-def harmonize_items(df: pd.DataFrame, dataset_short_name: str, item_col: str = "item") -> pd.DataFrame:
+def harmonize_items(tb: Table, dataset_short_name: str, item_col: str = "item") -> Table:
     """Harmonize item codes (by ensuring they are strings of numbers with a fixed length, prepended with zeros), make
     amendments to faulty items, and make item codes and items of categorical dtype.
 
     Parameters
     ----------
-    df : pd.DataFrame
+    tb : Table
         Data before harmonizing item codes.
     dataset_short_name : str
         Dataset short name.
@@ -408,11 +412,11 @@ def harmonize_items(df: pd.DataFrame, dataset_short_name: str, item_col: str = "
 
     Returns
     -------
-    df : pd.DataFrame
+    tb : Table
         Data after harmonizing item codes.
 
     """
-    df = df.copy()
+    tb = tb.copy()
 
     # Set the maximum number of characters for item_code.
     if dataset_short_name == f"{NAMESPACE}_sdgb":
@@ -421,42 +425,42 @@ def harmonize_items(df: pd.DataFrame, dataset_short_name: str, item_col: str = "
         n_characters_item_code = N_CHARACTERS_ITEM_CODE
 
     # Note: Here list comprehension is faster than doing .astype(str).str.zfill(...).
-    df["item_code"] = [str(item_code).zfill(n_characters_item_code) for item_code in df["item_code"]]
+    tb["item_code"] = [str(item_code).zfill(n_characters_item_code) for item_code in tb["item_code"]]
 
     # Convert both columns to category to reduce memory.
-    df = df.astype({"item_code": "category", item_col: "category"})
+    tb = tb.astype({"item_code": "category", item_col: "category"})
 
     # Fix those few cases where there is more than one item per item code within a given dataset.
     if dataset_short_name in ITEM_AMENDMENTS:
         for amendment in ITEM_AMENDMENTS[dataset_short_name]:
             # Ensure new item code and item name are added as categories, to avoid errors.
-            if amendment["new_item_code"] not in df["item_code"].cat.categories:
-                df["item_code"] = df["item_code"].cat.add_categories(amendment["new_item_code"])
-            if amendment["new_fao_item"] not in df[item_col].cat.categories:
-                df[item_col] = df[item_col].cat.add_categories(amendment["new_fao_item"])
+            if amendment["new_item_code"] not in tb["item_code"].cat.categories:
+                tb["item_code"] = tb["item_code"].cat.add_categories(amendment["new_item_code"])
+            if amendment["new_fao_item"] not in tb[item_col].cat.categories:
+                tb[item_col] = tb[item_col].cat.add_categories(amendment["new_fao_item"])
 
             # Update item code and item name.
-            df.loc[
-                (df["item_code"] == amendment["item_code"]) & (df[item_col] == amendment["fao_item"]),
+            tb.loc[
+                (tb["item_code"] == amendment["item_code"]) & (tb[item_col] == amendment["fao_item"]),
                 ("item_code", item_col),
             ] = (amendment["new_item_code"], amendment["new_fao_item"])
 
     # Remove unused categories.
-    df["item_code"] = df["item_code"].cat.remove_unused_categories()
-    df[item_col] = df[item_col].cat.remove_unused_categories()
+    tb["item_code"] = tb["item_code"].cat.remove_unused_categories()
+    tb[item_col] = tb[item_col].cat.remove_unused_categories()
 
-    return df
+    return tb
 
 
 def harmonize_elements(
-    df: pd.DataFrame, dataset_short_name: str, element_col: str = "element", unit_col: Optional[str] = "unit"
-) -> pd.DataFrame:
+    tb: Table, dataset_short_name: str, element_col: str = "element", unit_col: Optional[str] = "unit"
+) -> Table:
     """Harmonize element codes (by ensuring they are strings of numbers with a fixed length, prepended with zeros), and
     make element codes and elements of categorical dtype.
 
     Parameters
     ----------
-    df : pd.DataFrame
+    tb : Table
         Data before harmonizing element codes.
     dataset_short_name : str
         Dataset short name.
@@ -465,44 +469,44 @@ def harmonize_elements(
 
     Returns
     -------
-    df : pd.DataFrame
+    tb : Table
         Data after harmonizing element codes.
 
     """
-    df = df.copy()
-    df["element_code"] = [str(element_code).zfill(N_CHARACTERS_ELEMENT_CODE) for element_code in df["element_code"]]
+    tb = tb.copy()
+    tb["element_code"] = [str(element_code).zfill(N_CHARACTERS_ELEMENT_CODE) for element_code in tb["element_code"]]
 
     # Convert both columns to category to reduce memory
-    df = df.astype({"element_code": "category", element_col: "category"})
+    tb = tb.astype({"element_code": "category", element_col: "category"})
 
     # Fix those few cases where there is more than one item per item code within a given dataset.
     if dataset_short_name in ELEMENT_AMENDMENTS:
         for amendment in ELEMENT_AMENDMENTS[dataset_short_name]:
             # Ensure new item code and item name are added as categories, to avoid errors.
-            if amendment["new_element_code"] not in df["element_code"].cat.categories:
-                df["element_code"] = df["element_code"].cat.add_categories(amendment["new_element_code"])
-            if amendment["new_fao_element"] not in df[element_col].cat.categories:
-                df[element_col] = df[element_col].cat.add_categories(amendment["new_fao_element"])
-            if unit_col is not None and amendment["new_fao_unit"] not in df[unit_col].cat.categories:
-                df[unit_col] = df[unit_col].cat.add_categories(amendment["new_fao_unit"])
+            if amendment["new_element_code"] not in tb["element_code"].cat.categories:
+                tb["element_code"] = tb["element_code"].cat.add_categories(amendment["new_element_code"])
+            if amendment["new_fao_element"] not in tb[element_col].cat.categories:
+                tb[element_col] = tb[element_col].cat.add_categories(amendment["new_fao_element"])
+            if unit_col is not None and amendment["new_fao_unit"] not in tb[unit_col].cat.categories:
+                tb[unit_col] = tb[unit_col].cat.add_categories(amendment["new_fao_unit"])
 
             if unit_col is not None:
                 # Update element code, element name, and unit name.
-                df.loc[
-                    (df["element_code"] == amendment["element_code"]) & (df[element_col] == amendment["fao_element"]),
+                tb.loc[
+                    (tb["element_code"] == amendment["element_code"]) & (tb[element_col] == amendment["fao_element"]),
                     ("element_code", element_col, unit_col),
                 ] = (amendment["new_element_code"], amendment["new_fao_element"], amendment["new_fao_unit"])
             else:
                 # Update element code, and element name.
-                df.loc[
-                    (df["element_code"] == amendment["element_code"]) & (df[element_col] == amendment["fao_element"]),
+                tb.loc[
+                    (tb["element_code"] == amendment["element_code"]) & (tb[element_col] == amendment["fao_element"]),
                     ("element_code", element_col),
                 ] = (amendment["new_element_code"], amendment["new_fao_element"])
 
-    return df
+    return tb
 
 
-def harmonize_countries(data: pd.DataFrame, countries_metadata: pd.DataFrame) -> pd.DataFrame:
+def harmonize_countries(tb: Table, countries_metadata: Table) -> Table:
     """Harmonize country names.
 
     A new column 'country' will be added, with the harmonized country names. Column 'fao_country' will remain, to have
@@ -510,21 +514,20 @@ def harmonize_countries(data: pd.DataFrame, countries_metadata: pd.DataFrame) ->
 
     Parameters
     ----------
-    data : pd.DataFrame
+    tb : Table
         Data before harmonizing country names.
-    countries_metadata : pd.DataFrame
+    countries_metadata : Table
         Table 'countries' from garden faostat_metadata dataset.
 
     Returns
     -------
-    data : pd.DataFrame
+    tb : Table
         Data after harmonizing country names.
 
     """
-    data = data.copy()
+    tb = tb.copy()
     # Add harmonized country names (from countries metadata) to data.
-    data = pd.merge(
-        data,
+    tb = tb.merge(
         countries_metadata[["area_code", "fao_country", "country"]].rename(
             columns={"fao_country": "fao_country_check"}
         ),
@@ -533,26 +536,26 @@ def harmonize_countries(data: pd.DataFrame, countries_metadata: pd.DataFrame) ->
     )
 
     # area_code should always be an int
-    data["area_code"] = data["area_code"].astype(int)
+    tb["area_code"] = tb["area_code"].astype(int)
 
     # Sanity check.
-    country_mismatch = data[(data["fao_country"].astype(str) != data["fao_country_check"])]
+    country_mismatch = tb[(tb["fao_country"].astype(str) != tb["fao_country_check"])]
     if len(country_mismatch) > 0:
         faulty_mapping = country_mismatch.set_index("fao_country").to_dict()["fao_country_check"]
         log.warning(f"Mismatch between fao_country in data and in metadata: {faulty_mapping}")
-    data = data.drop(columns="fao_country_check")
+    tb = tb.drop(columns="fao_country_check")
 
     # Remove unmapped countries.
-    data = data[data["country"].notnull()].reset_index(drop=True)
+    tb = tb[tb["country"].notnull()].reset_index(drop=True)
 
     # Further sanity checks.
-    check_that_countries_are_well_defined(data)
+    check_that_countries_are_well_defined(tb)
     check_that_regions_with_subregions_are_ignored_when_constructing_aggregates(countries_metadata)
 
     # Set appropriate dtypes.
-    data = data.astype({"country": "category", "fao_country": "category"})
+    tb = tb.astype({"country": "category", "fao_country": "category"})
 
-    return data
+    return tb
 
 
 def prepare_dataset_description(fao_description: str, owid_description: str) -> str:
@@ -619,77 +622,77 @@ def prepare_variable_description(item: str, element: str, item_description: str,
     return description
 
 
-def remove_rows_with_nan_value(data: pd.DataFrame, verbose: bool = False) -> pd.DataFrame:
+def remove_rows_with_nan_value(tb: Table, verbose: bool = False) -> Table:
     """Remove rows for which column "value" is nan.
 
     Parameters
     ----------
-    data : pd.DataFrame
+    tb : Table
         Data for current dataset.
     verbose : bool
         True to display information about the number and fraction of rows removed.
 
     Returns
     -------
-    data : pd.DataFrame
+    tb : Table
         Data after removing nan values.
 
     """
-    data = data.copy()
+    tb = tb.copy()
     # Number of rows with a nan in column "value".
     # We could also remove rows with any nan, however, before doing that, we would need to assign a value to nan flags.
-    n_rows_with_nan_value = len(data[data["value"].isnull()])
+    n_rows_with_nan_value = len(tb[tb["value"].isnull()])
     if n_rows_with_nan_value > 0:
-        frac_nan_rows = n_rows_with_nan_value / len(data)
+        frac_nan_rows = n_rows_with_nan_value / len(tb)
         if verbose:
             log.info(f"Removing {n_rows_with_nan_value} rows ({frac_nan_rows: .2%}) " f"with nan in column 'value'.")
         if frac_nan_rows > 0.15:
             log.warning(f"{frac_nan_rows: .0%} rows of nan values removed.")
-        data = data.dropna(subset="value").reset_index(drop=True)
+        tb = tb.dropna(subset="value").reset_index(drop=True)
 
-    return data
+    return tb
 
 
-def remove_columns_with_only_nans(data: pd.DataFrame, verbose: bool = True) -> pd.DataFrame:
+def remove_columns_with_only_nans(tb: Table, verbose: bool = True) -> Table:
     """Remove columns that only have nans.
 
     In principle, it should not be possible that columns have only nan values, but we use this function just in case.
 
     Parameters
     ----------
-    data : pd.DataFrame
+    tb : Table
         Data for current dataset.
     verbose : bool
         True to display information about the removal of columns with nan values.
 
     Returns
     -------
-    data : pd.DataFrame
+    tb : Table
         Data after removing columns of nans.
 
     """
-    data = data.copy()
+    tb = tb.copy()
     # Remove columns that only have nans.
-    columns_of_nans = data.columns[data.isnull().all(axis=0)]
+    columns_of_nans = tb.columns[tb.isnull().all(axis=0)]
     if len(columns_of_nans) > 0:
         if verbose:
             log.info(
-                f"Removing {len(columns_of_nans)} columns ({len(columns_of_nans) / len(data.columns): .2%}) "
+                f"Removing {len(columns_of_nans)} columns ({len(columns_of_nans) / len(tb.columns): .2%}) "
                 f"that have only nans."
             )
-        data = data.drop(columns=columns_of_nans)
+        tb = tb.drop(columns=columns_of_nans)
 
-    return data
+    return tb
 
 
-def remove_duplicates(data: pd.DataFrame, index_columns: List[str], verbose: bool = True) -> pd.DataFrame:
+def remove_duplicates(tb: Table, index_columns: List[str], verbose: bool = True) -> Table:
     """Remove rows with duplicated index (country, year, item, element, unit).
 
     First attempt to use flags to remove duplicates. If there are still duplicates, remove in whatever way possible.
 
     Parameters
     ----------
-    data : pd.DataFrame
+    tb : Table
         Data for current dataset.
     index_columns : list
         Columns expected to be used as index of the data.
@@ -698,35 +701,32 @@ def remove_duplicates(data: pd.DataFrame, index_columns: List[str], verbose: boo
 
     Returns
     -------
-    data : pd.DataFrame
+    tb : Table
         Data (with a dummy numerical index) after removing duplicates.
 
     """
-    data = data.copy()
+    tb = tb.copy()
 
     # Select columns that will be used as indexes.
-    _index_columns = [column for column in index_columns if column in data.columns]
+    _index_columns = [column for column in index_columns if column in tb.columns]
     # Number of ambiguous indexes (those that have multiple data values).
-    n_ambiguous_indexes = len(data[data.duplicated(subset=_index_columns, keep="first")])
+    n_ambiguous_indexes = len(tb[tb.duplicated(subset=_index_columns, keep="first")])
     if n_ambiguous_indexes > 0:
         # Add flag ranking to dataset.
         flags_ranking = FLAGS_RANKING.copy()
         flags_ranking["flag"] = flags_ranking["flag"].fillna(FLAG_OFFICIAL_DATA)
-        data = pd.merge(
-            data,
+        tb = tb.merge(
             flags_ranking[["flag", "ranking"]].rename(columns={"ranking": "flag_ranking"}),
             on="flag",
             how="left",
         ).astype({"flag": "category"})
 
         # Number of ambiguous indexes that cannot be solved using flags.
-        n_ambiguous_indexes_unsolvable = len(
-            data[data.duplicated(subset=_index_columns + ["flag_ranking"], keep="first")]
-        )
+        n_ambiguous_indexes_unsolvable = len(tb[tb.duplicated(subset=_index_columns + ["flag_ranking"], keep="first")])
         # Remove ambiguous indexes (those that have multiple data values).
         # When possible, use flags to prioritise among duplicates.
-        data = data.sort_values(_index_columns + ["flag_ranking"]).drop_duplicates(subset=_index_columns, keep="first")
-        frac_ambiguous = n_ambiguous_indexes / len(data)
+        tb = tb.sort_values(_index_columns + ["flag_ranking"]).drop_duplicates(subset=_index_columns, keep="first")
+        frac_ambiguous = n_ambiguous_indexes / len(tb)
         frac_ambiguous_solved_by_flags = 1 - (n_ambiguous_indexes_unsolvable / n_ambiguous_indexes)
         if verbose:
             log.info(
@@ -734,12 +734,12 @@ def remove_duplicates(data: pd.DataFrame, index_columns: List[str], verbose: boo
                 f"{frac_ambiguous_solved_by_flags: .2%} of ambiguities were solved with flags."
             )
 
-        data = data.drop(columns=["flag_ranking"])
+        tb = tb.drop(columns=["flag_ranking"])
 
-    return data
+    return tb
 
 
-def clean_year_column(year_column: pd.Series) -> pd.Series:
+def clean_year_column(year_column: Variable) -> Variable:
     """Clean year column.
 
     Year is given almost always as an integer value. But sometimes (e.g. in the faostat_fs dataset) it is a range of
@@ -748,12 +748,12 @@ def clean_year_column(year_column: pd.Series) -> pd.Series:
 
     Parameters
     ----------
-    year_column : pd.Series
+    year_column : Variable
         Original column of year values (which may be integer, or ranges of values).
 
     Returns
     -------
-    year_clean_series : pd.Series
+    year_clean_series : Variable
         Clean column of years, as integer values.
 
     """
@@ -769,15 +769,12 @@ def clean_year_column(year_column: pd.Series) -> pd.Series:
             year_clean.append(int(year))
 
     # Prepare series of integer year values.
-    year_clean_series = pd.Series(year_clean)
-    year_clean_series.name = "year"
+    year_clean_series = Variable(year_clean, name="year")
 
     return year_clean_series
 
 
-def add_custom_names_and_descriptions(
-    data: pd.DataFrame, items_metadata: pd.DataFrame, elements_metadata: pd.DataFrame
-) -> pd.DataFrame:
+def add_custom_names_and_descriptions(tb: Table, items_metadata: Table, elements_metadata: Table) -> Table:
     """Add columns with custom names, descriptions and conversion factors for elements, items and units.
 
     The returned dataframe will have the same number of rows as the ingested data, but:
@@ -802,38 +799,36 @@ def add_custom_names_and_descriptions(
 
     Parameters
     ----------
-    data : pd.DataFrame
+    tb : Table
         Data for a particular domain, with harmonized item codes and element codes.
-    items_metadata : pd.DataFrame
+    items_metadata : Table
         Table 'items' from the garden faostat_metadata dataset, after selecting items for the current dataset.
-    elements_metadata : pd.DataFrame
+    elements_metadata : Table
         Table 'elements' from the garden faostat_metadata dataset, after selecting elements for the current dataset.
 
     Returns
     -------
-    data : pd.DataFrame
+    tb : Table
         Data after adding and editing its columns as described above.
 
     """
-    data = data.copy()
+    tb = tb.copy()
 
     error = "There are missing item codes in metadata."
-    assert set(data["item_code"]) <= set(items_metadata["item_code"]), error
+    assert set(tb["item_code"]) <= set(items_metadata["item_code"]), error
 
     error = "There are missing element codes in metadata."
-    assert set(data["element_code"]) <= set(elements_metadata["element_code"]), error
+    assert set(tb["element_code"]) <= set(elements_metadata["element_code"]), error
 
-    _expected_n_rows = len(data)
-    data = pd.merge(
-        data.rename(columns={"item": "fao_item"}),
+    _expected_n_rows = len(tb)
+    tb = tb.rename(columns={"item": "fao_item"}, errors="raise").merge(
         items_metadata[["item_code", "owid_item", "owid_item_description"]],
         on="item_code",
         how="left",
     )
-    assert len(data) == _expected_n_rows, "Something went wrong when merging data with items metadata."
+    assert len(tb) == _expected_n_rows, "Something went wrong when merging data with items metadata."
 
-    data = pd.merge(
-        data.rename(columns={"element": "fao_element", "unit": "fao_unit_short_name"}),
+    tb = tb.rename(columns={"element": "fao_element", "unit": "fao_unit_short_name"}, errors="raise").merge(
         elements_metadata[
             [
                 "element_code",
@@ -847,10 +842,10 @@ def add_custom_names_and_descriptions(
         on=["element_code"],
         how="left",
     )
-    assert len(data) == _expected_n_rows, "Something went wrong when merging data with elements metadata."
+    assert len(tb) == _expected_n_rows, "Something went wrong when merging data with elements metadata."
 
     # `category` type was lost during merge, convert it back
-    data = data.astype(
+    tb = tb.astype(
         {
             "element_code": "category",
             "item_code": "category",
@@ -858,33 +853,31 @@ def add_custom_names_and_descriptions(
     )
 
     # Remove "owid_" from column names.
-    data = data.rename(columns={column: column.replace("owid_", "") for column in data.columns})
+    tb = tb.rename(columns={column: column.replace("owid_", "") for column in tb.columns})
 
     # Fill missing unit and short_unit columns with empty strings.
     for column in ["unit", "unit_short_name"]:
-        missing_unit_mask = data[column].isnull()
-        if not data[missing_unit_mask].empty:
-            log.warning(f"Missing {column} for elements: {set(data[missing_unit_mask]['element'])}")
-            data[column] = data[column].cat.add_categories("").fillna("")
+        missing_unit_mask = tb[column].isnull()
+        if not tb[missing_unit_mask].empty:
+            log.warning(f"Missing {column} for elements: {set(tb[missing_unit_mask]['element'])}")
+            tb[column] = tb[column].cat.add_categories("").fillna("")
 
-    return data
+    return tb
 
 
-def remove_regions_from_countries_regions_members(
-    countries_regions: pd.DataFrame, regions_to_remove: List[str]
-) -> pd.DataFrame:
+def remove_regions_from_countries_regions_members(countries_regions: Table, regions_to_remove: List[str]) -> Table:
     """Remove regions that have to be ignored from the lists of members in the countries-regions dataset.
 
     Parameters
     ----------
-    countries_regions : pd.DataFrame
+    countries_regions : Table
         Countries-regions dataset (from the OWID catalog).
     regions_to_remove : list
         Regions to ignore.
 
     Returns
     -------
-    countries_regions : pd.DataFrame
+    countries_regions : Table
         Countries-regions dataset after removing regions from the lists of members of each country or region.
 
     """
@@ -908,12 +901,12 @@ def remove_regions_from_countries_regions_members(
     return countries_regions
 
 
-def load_population(ds_population: catalog.Dataset) -> pd.DataFrame:
+def load_population(ds_population: Dataset) -> Table:
     """Load OWID population dataset, and add historical regions to it.
 
     Returns
     -------
-    population : pd.DataFrame
+    population : Table
         Population dataset.
 
     """
@@ -934,17 +927,17 @@ def load_population(ds_population: catalog.Dataset) -> pd.DataFrame:
         # Select only years for which we have data for all member countries.
         _population = _population[_population["country"] == len(members)].reset_index(drop=True)
         _population["country"] = country
-        population = pd.concat([population, _population], ignore_index=True).reset_index(drop=True)
+        population = pr.concat([population, _population], ignore_index=True).reset_index(drop=True)
 
     error = "Duplicate country-years found in population. Check if historical regions changed."
     assert population[population.duplicated(subset=["country", "year"])].empty, error
 
-    return cast(pd.DataFrame, population)
+    return population
 
 
 def remove_overlapping_data_between_historical_regions_and_successors(
-    data_region: pd.DataFrame,
-) -> pd.DataFrame:
+    data_region: Table,
+) -> Table:
     """Remove overlapping data between a historical region and any of its successors (if there is any overlap), to avoid
     double-counting those regions when aggregating data.
 
@@ -953,12 +946,12 @@ def remove_overlapping_data_between_historical_regions_and_successors(
 
     Parameters
     ----------
-    data_region : pd.DataFrame
+    data_region : Table
         Data (after selecting the countries of a certain relevant region).
 
     Returns
     -------
-    data_region : pd.DataFrame
+    data_region : Table
         Data after removing data with overlapping regions.
 
     """
@@ -976,7 +969,7 @@ def remove_overlapping_data_between_historical_regions_and_successors(
             columns
         ].drop_duplicates()
         # Find unique years where the above combinations of item-element-years of region and successors overlap.
-        overlapping_years = pd.concat([historical_region_years, historical_successors_years], ignore_index=True)
+        overlapping_years = pr.concat([historical_region_years, historical_successors_years], ignore_index=True)
         overlapping_years = overlapping_years[overlapping_years.duplicated()]
         if not overlapping_years.empty:
             log.warning(
@@ -986,12 +979,13 @@ def remove_overlapping_data_between_historical_regions_and_successors(
             # Select rows in data_region to drop.
             overlapping_years["country"] = historical_region
             indexes_to_drop.extend(
-                pd.merge(
-                    data_region.reset_index(),
+                data_region.reset_index()
+                .merge(
                     overlapping_years,
                     how="inner",
                     on=["country"] + columns,
-                )["index"].tolist()
+                )["index"]
+                .tolist()
             )
 
     if len(indexes_to_drop) > 0:
@@ -1002,12 +996,12 @@ def remove_overlapping_data_between_historical_regions_and_successors(
 
 
 def add_regions(
-    data: pd.DataFrame,
-    ds_regions: catalog.Dataset,
-    ds_income_groups: catalog.Dataset,
-    ds_population: catalog.Dataset,
-    elements_metadata: pd.DataFrame,
-) -> pd.DataFrame:
+    tb: Table,
+    ds_regions: Dataset,
+    ds_income_groups: Dataset,
+    ds_population: Dataset,
+    elements_metadata: Table,
+) -> Table:
     """Add region aggregates (i.e. aggregate data for continents and income groups).
 
     Regions to be created are defined above, in REGIONS_TO_ADD, and the variables for which data will be aggregated are
@@ -1019,18 +1013,18 @@ def add_regions(
 
     Parameters
     ----------
-    data : pd.DataFrame
+    tb : Table
         Clean data (after harmonizing items, element and countries).
-    elements_metadata : pd.DataFrame
+    elements_metadata : Table
         Table 'elements' from the garden faostat_metadata dataset, after selecting elements for the current domain.
 
     Returns
     -------
-    data : pd.DataFrame
+    tb : Table
         Data after adding rows for aggregate regions.
 
     """
-    data = data.copy()
+    tb = tb.copy()
 
     # Create a dictionary of aggregations, specifying the operation to use when creating regions.
     # These aggregations are defined in the custom_elements_and_units.csv file, and added to the metadata dataset.
@@ -1040,7 +1034,7 @@ def add_regions(
         .to_dict()["owid_aggregation"]
     )
     if len(aggregations) > 0:
-        log.info("add_regions", shape=data.shape)
+        log.info("add_regions", shape=tb.shape)
 
         # Load population dataset, countries-regions, and income groups datasets.
         population = load_population(ds_population=ds_population)
@@ -1068,9 +1062,7 @@ def add_regions(
                 element_codes = aggregations_inverted[aggregation]
 
                 # Select relevant rows in the data.
-                data_region = data[
-                    (data["country"].isin(countries_in_region)) & (data["element_code"].isin(element_codes))
-                ]
+                data_region = tb[(tb["country"].isin(countries_in_region)) & (tb["element_code"].isin(element_codes))]
 
                 # Ensure there is no overlap between historical regions and their successors.
                 data_region = remove_overlapping_data_between_historical_regions_and_successors(data_region)
@@ -1106,7 +1098,7 @@ def add_regions(
                     )
 
                     # Add total population of the region (for each year) to the relevant data.
-                    data_region = pd.merge(data_region, region_population, on="year", how="left")
+                    data_region = data_region.merge(region_population, on="year", how="left")
 
                     # Keep only rows for which we have sufficient data.
                     data_region = data_region[
@@ -1127,30 +1119,30 @@ def add_regions(
                     )
 
                     # Add data for current region to data.
-                    data = dataframes.concatenate(
-                        [data[data["country"] != region].reset_index(drop=True), data_region],
+                    tb = dataframes.concatenate(
+                        [tb[tb["country"] != region].reset_index(drop=True), data_region],
                         ignore_index=True,
                     )
 
             # Check that the fraction of population with data is as high as expected.
-            frac_population = data["population_with_data"] / data["population"]
+            frac_population = tb["population_with_data"] / tb["population"]
             assert frac_population[frac_population.notnull()].min() >= region_min_frac_population_with_data
 
         # Drop column of total population (we will still keep population_with_data).
-        data = data.drop(columns=["population"])
+        tb = tb.drop(columns=["population"])
 
         # Make area_code of category type (it contains integers and strings, and feather does not support object types).
-        data["area_code"] = data["area_code"].astype(str).astype("category")
+        tb["area_code"] = tb["area_code"].astype(str).astype("category")
 
         # Sort conveniently.
-        data = data.sort_values(["country", "year"]).reset_index(drop=True)
+        tb = tb.sort_values(["country", "year"]).reset_index(drop=True)
 
-        check_that_countries_are_well_defined(data)
+        check_that_countries_are_well_defined(tb)
 
-    return data
+    return tb
 
 
-def add_fao_population_if_given(data: pd.DataFrame) -> pd.DataFrame:
+def add_fao_population_if_given(tb: Table) -> Table:
     """Add a new column for FAO population, if population values are given in the data.
 
     Some datasets (e.g. faostat_fbsh and faostat_fbs) include per-capita variables from the beginning. When this
@@ -1159,12 +1151,12 @@ def add_fao_population_if_given(data: pd.DataFrame) -> pd.DataFrame:
 
     Parameters
     ----------
-    data : pd.DataFrame
+    tb : Table
         Data (after harmonizing elements and items, but before harmonizing countries).
 
     Returns
     -------
-    data : pd.DataFrame
+    tb : Table
         Data, after adding a column 'fao_population', if FAO population was found in the data.
 
     """
@@ -1174,14 +1166,14 @@ def add_fao_population_if_given(data: pd.DataFrame) -> pd.DataFrame:
     # Expected name of unit of FAO population.
     fao_population_unit_name = "thousand Number"
     # Select rows that correspond to FAO population.
-    population_rows_mask = (data["fao_item"] == fao_population_item_name) & (
-        data["fao_element"] == fao_population_element_name
+    population_rows_mask = (tb["fao_item"] == fao_population_item_name) & (
+        tb["fao_element"] == fao_population_element_name
     )
 
     if population_rows_mask.any():
-        data = data.copy()
+        tb = tb.copy()
 
-        fao_population = data[population_rows_mask].reset_index(drop=True)
+        fao_population = tb[population_rows_mask].reset_index(drop=True)
 
         # Check that population is given in "1000 persons" and convert to persons.
         assert list(fao_population["unit"].unique()) == [
@@ -1199,20 +1191,20 @@ def add_fao_population_if_given(data: pd.DataFrame) -> pd.DataFrame:
         )
 
         # Add FAO population as a new column in data.
-        data = pd.merge(data, fao_population, how="left", on=["area_code", "year"])
+        tb = tb.merge(fao_population, how="left", on=["area_code", "year"])
 
-    return data
+    return tb
 
 
 def add_population(
-    df: pd.DataFrame,
-    ds_population: catalog.Dataset,
+    tb: Table,
+    ds_population: Dataset,
     country_col: str = "country",
     year_col: str = "year",
     population_col: str = "population",
     warn_on_missing_countries: bool = True,
     show_full_warning: bool = True,
-) -> pd.DataFrame:
+) -> Table:
     """Add a column of OWID population to the countries in the data, including population of historical regions.
 
     This function has been adapted from datautils.geo, because population currently does not include historic regions.
@@ -1220,7 +1212,7 @@ def add_population(
 
     Parameters
     ----------
-    df : pd.DataFrame
+    tb : Table
         Data without a column for population (after harmonizing elements, items and country names).
     country_col : str
         Name of country column in data.
@@ -1235,7 +1227,7 @@ def add_population(
 
     Returns
     -------
-    df_with_population : pd.DataFrame
+    tb_with_population : Table
         Data after adding a column for population for all countries in the data.
 
     """
@@ -1250,7 +1242,7 @@ def add_population(
     )[[country_col, year_col, population_col]]
 
     # Check if there is any missing country.
-    missing_countries = set(df[country_col]) - set(population[country_col])
+    missing_countries = set(tb[country_col]) - set(population[country_col])
     if len(missing_countries) > 0:
         if warn_on_missing_countries:
             geo.warn_on_list_of_entities(
@@ -1264,14 +1256,12 @@ def add_population(
             )
 
     # Add population to original dataframe.
-    df_with_population = pd.merge(df, population, on=[country_col, year_col], how="left")
+    tb_with_population = tb.merge(population, on=[country_col, year_col], how="left")
 
-    return df_with_population
+    return tb_with_population
 
 
-def convert_variables_given_per_capita_to_total_value(
-    data: pd.DataFrame, elements_metadata: pd.DataFrame
-) -> pd.DataFrame:
+def convert_variables_given_per_capita_to_total_value(tb: Table, elements_metadata: Table) -> Table:
     """Replace variables given per capita in the original data by total values.
 
     NOTE:
@@ -1281,14 +1271,14 @@ def convert_variables_given_per_capita_to_total_value(
 
     Parameters
     ----------
-    data : pd.DataFrame
+    tb : Table
         Data (after harmonizing elements and items, but before harmonizing countries).
-    elements_metadata : pd.DataFrame
+    elements_metadata : Table
         Table 'elements' from the garden faostat_metadata dataset, after selecting the elements of the relevant domain.
 
     Returns
     -------
-    data : pd.DataFrame
+    tb : Table
         Data, after converting per-capita variables to total value.
 
     """
@@ -1300,29 +1290,29 @@ def convert_variables_given_per_capita_to_total_value(
         elements_metadata[elements_metadata["was_per_capita"]]["element_code"].unique()
     )
     if len(element_codes_that_were_per_capita) > 0:
-        data = data.copy()
+        tb = tb.copy()
 
-        assert "fao_population" in data.columns, "fao_population not found, maybe it changed item, element."
+        assert "fao_population" in tb.columns, "fao_population not found, maybe it changed item, element."
 
         # Select variables that were given as per capita variables in the original data and that need to be converted.
-        per_capita_mask = data["element_code"].isin(element_codes_that_were_per_capita)
+        per_capita_mask = tb["element_code"].isin(element_codes_that_were_per_capita)
 
         # Multiply them by the FAO population to convert them into total value.
-        data.loc[per_capita_mask, "value"] = data[per_capita_mask]["value"] * data[per_capita_mask]["fao_population"]
+        tb.loc[per_capita_mask, "value"] = tb[per_capita_mask]["value"] * tb[per_capita_mask]["fao_population"]
 
         # Include an additional description to all elements that were converted from per capita to total variables.
-        if "" not in data["element_description"].cat.categories:
-            data["element_description"] = data["element_description"].cat.add_categories([""])
-        data.loc[per_capita_mask, "element_description"] = data.loc[per_capita_mask, "element_description"].fillna("")
-        data["element_description"] = dataframes.apply_on_categoricals(
-            [data.element_description, per_capita_mask.astype("category")],
+        if "" not in tb["element_description"].cat.categories:
+            tb["element_description"] = tb["element_description"].cat.add_categories([""])
+        tb.loc[per_capita_mask, "element_description"] = tb.loc[per_capita_mask, "element_description"].fillna("")
+        tb["element_description"] = dataframes.apply_on_categoricals(
+            [tb.element_description, per_capita_mask.astype("category")],
             lambda desc, mask: f"{desc} {WAS_PER_CAPITA_ADDED_ELEMENT_DESCRIPTION}".lstrip() if mask else f"{desc}",
         )
 
-    return data
+    return tb
 
 
-def add_per_capita_variables(data: pd.DataFrame, elements_metadata: pd.DataFrame) -> pd.DataFrame:
+def add_per_capita_variables(tb: Table, elements_metadata: Table) -> Table:
     """Add per-capita variables to data in a long format (and keep original variables as well).
 
     NOTE:
@@ -1333,28 +1323,28 @@ def add_per_capita_variables(data: pd.DataFrame, elements_metadata: pd.DataFrame
 
     Parameters
     ----------
-    data : pd.DataFrame
+    tb : Table
         Clean data (after harmonizing item codes and element codes, and countries, and adding aggregate regions).
-    elements_metadata : pd.DataFrame
+    elements_metadata : Table
         Elements table from the garden faostat_metadata dataset, after selecting elements for the relevant domain.
 
     Returns
     -------
-    data : pd.DataFrame
+    tb : Table
         Data with per-capita variables.
 
     """
-    data = data.copy()
+    tb = tb.copy()
 
     # Find element codes that have to be made per capita.
     element_codes_to_make_per_capita = list(
         elements_metadata[elements_metadata["make_per_capita"]]["element_code"].unique()
     )
     if len(element_codes_to_make_per_capita) > 0:
-        log.info("add_per_capita_variables", shape=data.shape)
+        log.info("add_per_capita_variables", shape=tb.shape)
 
         # Create a new dataframe that will have all per capita variables.
-        per_capita_data = data[data["element_code"].isin(element_codes_to_make_per_capita)].reset_index(drop=True)
+        per_capita_data = tb[tb["element_code"].isin(element_codes_to_make_per_capita)].reset_index(drop=True)
 
         # Change element codes of per capita variables.
         per_capita_data["element_code"] = per_capita_data["element_code"].cat.rename_categories(
@@ -1393,33 +1383,36 @@ def add_per_capita_variables(data: pd.DataFrame, elements_metadata: pd.DataFrame
             lambda c: f"{c} {NEW_PER_CAPITA_ADDED_ELEMENT_DESCRIPTION}"
         )
         # Add new rows with per capita variables to data.
-        data = dataframes.concatenate([data, per_capita_data], ignore_index=True).reset_index(drop=True)
+        tb = dataframes.concatenate([tb, per_capita_data], ignore_index=True).reset_index(drop=True)
 
-    return data
+    return tb
 
 
-def clean_data_values(values: pd.Series, amendments: Dict[str, str]) -> pd.Series:
+def clean_data_values(values: Variable, amendments: Dict[str, str]) -> Variable:
     """Fix spurious data values (defined in value_amendments.csv) and make values a float column.
 
     Parameters
     ----------
-    values : pd.Series
+    values : Variable
         Content of the "value" column in the original data.
 
     Returns
     -------
-    values_clean : pd.Series
+    values_clean : Variable
         Original values after fixing known issues and converting to float.
 
     """
     values_clean = values.copy()
     if len(amendments) > 0:
-        values_clean = dataframes.map_series(
-            series=values_clean,
-            mapping=amendments,
-            warn_on_missing_mappings=False,
-            warn_on_unused_mappings=True,
-            show_full_warning=True,
+        values_clean = Variable(
+            dataframes.map_series(
+                series=values_clean,
+                mapping=amendments,
+                warn_on_missing_mappings=False,
+                warn_on_unused_mappings=True,
+                show_full_warning=True,
+            ),
+            name="value",
         )
 
     # Convert all numbers into numeric.
@@ -1431,13 +1424,13 @@ def clean_data_values(values: pd.Series, amendments: Dict[str, str]) -> pd.Serie
 
 
 def clean_data(
-    data: pd.DataFrame,
-    ds_population: catalog.Dataset,
-    items_metadata: pd.DataFrame,
-    elements_metadata: pd.DataFrame,
-    countries_metadata: pd.DataFrame,
+    tb: Table,
+    ds_population: Dataset,
+    items_metadata: Table,
+    elements_metadata: Table,
+    countries_metadata: Table,
     amendments: Dict[str, str],
-) -> pd.DataFrame:
+) -> Table:
     """Process data (with already harmonized item codes and element codes), before adding aggregate regions and
     per-capita variables.
 
@@ -1450,36 +1443,37 @@ def clean_data(
 
     Parameters
     ----------
-    data : pd.DataFrame
+    tb : Table
         Unprocessed data for current dataset (with harmonized item codes and element codes).
-    items_metadata : pd.DataFrame
+    items_metadata : Table
         Items metadata (from the metadata dataset) after selecting items for only the relevant domain.
-    elements_metadata : pd.DataFrame
+    elements_metadata : Table
         Elements metadata (from the metadata dataset) after selecting elements for only the relevant domain.
-    countries_metadata : pd.DataFrame
+    countries_metadata : Table
         Countries metadata (from the metadata dataset).
     amendments : dict
         Value amendments (if any).
 
     Returns
     -------
-    data : pd.DataFrame
+    tb : Table
         Processed data, ready to be made into a table for a garden dataset.
 
     """
-    data = data.copy()
+    tb = tb.copy()
 
     # Fix spurious data values (applying mapping in value_amendments.csv) and ensure column of values is float.
-    data["value"] = clean_data_values(data["value"], amendments=amendments)
+    tb["value"] = clean_data_values(tb["value"], amendments=amendments)
 
     # Convert nan flags into "official" (to avoid issues later on when dealing with flags).
-    data["flag"] = pd.Series(
-        [flag if not pd.isnull(flag) else FLAG_OFFICIAL_DATA for flag in data["flag"]],
+    tb["flag"] = Variable(
+        [flag if not pd.isnull(flag) else FLAG_OFFICIAL_DATA for flag in tb["flag"]],
         dtype="category",
+        name="flag",
     )
 
     # Some datasets (at least faostat_fa) use "recipient_country" instead of "area". For consistency, change this.
-    data = data.rename(
+    tb = tb.rename(
         columns={
             "area": "fao_country",
             "recipient_country": "fao_country",
@@ -1488,33 +1482,33 @@ def clean_data(
     )
 
     # Ensure year column is integer (sometimes it is given as a range of years, e.g. 2013-2015).
-    data["year"] = clean_year_column(data["year"])
+    tb["year"] = clean_year_column(tb["year"])
 
     # Remove rows with nan value.
-    data = remove_rows_with_nan_value(data)
+    tb = remove_rows_with_nan_value(tb)
 
     if len(items_metadata) > 0 and len(elements_metadata) > 0:
         # This is not fulfilled for faostat_qv since the last update.
         # Use custom names for items, elements and units (and keep original names in "fao_*" columns).
-        data = add_custom_names_and_descriptions(data, items_metadata, elements_metadata)
+        tb = add_custom_names_and_descriptions(tb, items_metadata, elements_metadata)
 
         # Multiply data values by their corresponding unit factor, if any was given, and then drop unit_factor column.
-        unit_factor_mask = data["unit_factor"].notnull()
-        data.loc[unit_factor_mask, "value"] = data[unit_factor_mask]["value"] * data[unit_factor_mask]["unit_factor"]
-        data = data.drop(columns=["unit_factor"])
+        unit_factor_mask = tb["unit_factor"].notnull()
+        tb.loc[unit_factor_mask, "value"] = tb[unit_factor_mask]["value"] * tb[unit_factor_mask]["unit_factor"]
+        tb = tb.drop(columns=["unit_factor"])
 
         # Add FAO population as an additional column (if given in the original data).
-        data = add_fao_population_if_given(data)
+        tb = add_fao_population_if_given(tb)
 
     # Convert variables that were given per-capita to total value.
-    data = convert_variables_given_per_capita_to_total_value(data, elements_metadata=elements_metadata)
+    tb = convert_variables_given_per_capita_to_total_value(tb, elements_metadata=elements_metadata)
 
     # Harmonize country names.
-    data = harmonize_countries(data=data, countries_metadata=countries_metadata)
+    tb = harmonize_countries(tb=tb, countries_metadata=countries_metadata)
 
     # Remove duplicated data points (if any) keeping the one with lowest ranking flag (i.e. highest priority).
-    data = remove_duplicates(
-        data=data,
+    tb = remove_duplicates(
+        tb=tb,
         index_columns=["area_code", "year", "item_code", "element_code"],
         verbose=True,
     )
@@ -1522,17 +1516,17 @@ def clean_data(
     # Add column for population; when creating region aggregates, this column will have the population of the countries
     # for which there was data. For example, for Europe in a specific year, the population may differ from item to item,
     # because for one item we may have more European countries informed than for the other.
-    data = add_population(
-        df=data, ds_population=ds_population, population_col="population_with_data", warn_on_missing_countries=False
+    tb = add_population(
+        tb=tb, ds_population=ds_population, population_col="population_with_data", warn_on_missing_countries=False
     )
 
     # Convert back to categorical columns (maybe this should be handled automatically in `add_population_to_dataframe`)
-    data = data.astype({"country": "category"})
+    tb = tb.astype({"country": "category"})
 
-    return data
+    return tb
 
 
-def optimize_table_dtypes(table: catalog.Table) -> catalog.Table:
+def optimize_table_dtypes(table: Table) -> Table:
     """Optimize the dtypes of the columns in a table.
 
     NOTE: Using `.astype` in a loop over different columns is slow. Instead, it is better to map all columns at once or
@@ -1540,12 +1534,12 @@ def optimize_table_dtypes(table: catalog.Table) -> catalog.Table:
 
     Parameters
     ----------
-    table : catalog.Table
+    table : Table
         Table with possibly non-optimal column dtypes.
 
     Returns
     -------
-    optimized_table : catalog.Table
+    optimized_table : Table
         Table with optimized dtypes.
 
     """
@@ -1563,35 +1557,35 @@ def optimize_table_dtypes(table: catalog.Table) -> catalog.Table:
     return optimized_table
 
 
-def prepare_long_table(data: pd.DataFrame) -> catalog.Table:
+def prepare_long_table(tb: Table) -> Table:
     """Prepare a data table in long format.
 
     Parameters
     ----------
-    data : pd.DataFrame
+    tb : Table
         Data (as a dataframe) in long format.
 
     Returns
     -------
-    data_table_long : catalog.Table
+    tb_long : Table
         Data (as a table) in long format.
 
     """
     # Create new table with long data.
-    data_table_long = catalog.Table(data)
+    tb_long = Table(tb)
 
     # Ensure table has the optimal dtypes before storing it as feather file.
-    data_table_long = optimize_table_dtypes(table=data_table_long)
+    tb_long = optimize_table_dtypes(table=tb_long)
 
     # Set appropriate indexes.
     index_columns = ["area_code", "year", "item_code", "element_code"]
-    data_table_long = data_table_long.set_index(index_columns, verify_integrity=True).sort_index()
+    tb_long = tb_long.set_index(index_columns, verify_integrity=True).sort_index()
 
     # Sanity check.
-    number_of_infinities = len(data_table_long[data_table_long["value"] == np.inf])
+    number_of_infinities = len(tb_long[tb_long["value"] == np.inf])
     assert number_of_infinities == 0, f"There are {number_of_infinities} infinity values in the long table."
 
-    return cast(catalog.Table, data_table_long)
+    return tb_long
 
 
 def create_variable_short_names(variable_name: str) -> str:
@@ -1618,7 +1612,7 @@ def create_variable_short_names(variable_name: str) -> str:
     # Check that the extraction was correct by constructing the variable name again and comparing with the original.
     assert variable_name == f"{item} | {item_code} || {element} | {element_code} || {unit}"
 
-    new_name = catalog.utils.underscore(variable_name)
+    new_name = underscore(variable_name)
 
     # Check that the number of characters of the short name is not too long.
     n_char = len(new_name)
@@ -1629,17 +1623,17 @@ def create_variable_short_names(variable_name: str) -> str:
         # It could happen that it is not the item name that is long, but the element name, dataset, or unit.
         # But for the moment, assume it is the item name.
         assert len(item) > n_char_to_be_removed, "Variable name is too long, but it is not due to item name."
-        new_item = catalog.utils.underscore(item)[0:-n_char_to_be_removed]
-        new_name = catalog.utils.underscore(f"{new_item} | {item_code} || {element} | {element_code} || {unit}")
+        new_item = underscore(item)[0:-n_char_to_be_removed]
+        new_name = underscore(f"{new_item} | {item_code} || {element} | {element_code} || {unit}")
 
     # Check that now the new name now fulfils the length requirement.
     error = "Variable short name is too long. Improve create_variable_names function to account for this case."
     assert len(new_name) <= 255, error
 
-    return cast(str, new_name)
+    return new_name
 
 
-def prepare_wide_table(data: pd.DataFrame) -> catalog.Table:
+def prepare_wide_table(tb: Table) -> Table:
     """Flatten a long table to obtain a wide table with ["country", "year"] as index.
 
     The input table will be pivoted to have [country, year] as index, and as many columns as combinations of
@@ -1647,20 +1641,20 @@ def prepare_wide_table(data: pd.DataFrame) -> catalog.Table:
 
     Parameters
     ----------
-    data : pd.DataFrame
+    tb : Table
         Data for current domain.
 
     Returns
     -------
-    wide_table : catalog.Table
+    tb_wide : Table
         Data table with index [country, year].
 
     """
-    data = data.copy(deep=False)
+    tb = tb.copy(deep=False)
 
     # Ensure "item" exists in data (there are some datasets where it may be missing).
-    if "item" not in data.columns:
-        data["item"] = ""
+    if "item" not in tb.columns:
+        tb["item"] = ""
 
     # Construct a variable name that will not yield any possible duplicates.
     # This will be used as column names (which will then be formatted properly with underscores and lower case),
@@ -1668,8 +1662,8 @@ def prepare_wide_table(data: pd.DataFrame) -> catalog.Table:
     # Also, for convenience, keep a similar structure as in the previous OWID dataset release.
     # Finally, ensure that the short name version of the variable is not too long
     # (which would cause issues when uploading to grapher).
-    data["variable_name"] = dataframes.apply_on_categoricals(
-        [data.item, data.item_code, data.element, data.element_code, data.unit],
+    tb["variable_name"] = dataframes.apply_on_categoricals(
+        [tb.item, tb.item_code, tb.element, tb.element_code, tb.unit],
         lambda item,
         item_code,
         element,
@@ -1678,30 +1672,30 @@ def prepare_wide_table(data: pd.DataFrame) -> catalog.Table:
     )
 
     # Construct a human-readable variable display name (which will be shown in grapher charts).
-    data["variable_display_name"] = dataframes.apply_on_categoricals(
-        [data.item, data.element, data.unit],
+    tb["variable_display_name"] = dataframes.apply_on_categoricals(
+        [tb.item, tb.element, tb.unit],
         lambda item, element, unit: f"{item} - {element} ({unit})",
     )
 
-    if "item_description" in data.columns:
+    if "item_description" in tb.columns:
         # Construct a human-readable variable description (for the variable metadata).
-        data["variable_description"] = dataframes.apply_on_categoricals(
-            [data.item, data.element, data.item_description, data.element_description],
+        tb["variable_description"] = dataframes.apply_on_categoricals(
+            [tb.item, tb.element, tb.item_description, tb.element_description],
             prepare_variable_description,
         )
     else:
         # This is the case for faostat_qv since the last update.
-        data["variable_description"] = ""
+        tb["variable_description"] = ""
 
     # Pivot over long dataframe to generate a wide dataframe with country-year as index, and as many columns as
     # unique elements in "variable_name" (which should be as many as combinations of item-elements).
     # Note: We include area_code in the index for completeness, but by construction country-year should not have
     # duplicates.
     # Note: `pivot` operation is usually faster on categorical columns
-    log.info("prepare_wide_table.pivot", shape=data.shape)
+    log.info("prepare_wide_table.pivot", shape=tb.shape)
     # Create a wide table with just the data values.
-    wide_table = catalog.Table(
-        data.pivot(
+    tb_wide = Table(
+        tb.pivot(
             index=["area_code", "country", "year"],
             columns=["variable_name"],
             values="value",
@@ -1709,66 +1703,68 @@ def prepare_wide_table(data: pd.DataFrame) -> catalog.Table:
     )
 
     # Add metadata to each new variable in the wide data table.
-    log.info("prepare_wide_table.adding_metadata", shape=wide_table.shape)
+    log.info("prepare_wide_table.adding_metadata", shape=tb_wide.shape)
 
     # Add variable name.
-    for column in wide_table.columns:
-        wide_table[column].metadata.title = column
+    for column in tb_wide.columns:
+        tb_wide[column].metadata.title = column
 
     # Add variable unit (long name).
-    variable_name_mapping = _variable_name_map(data, "unit")
-    for column in wide_table.columns:
-        wide_table[column].metadata.unit = variable_name_mapping[column]
+    variable_name_mapping = _variable_name_map(tb, "unit")
+    for column in tb_wide.columns:
+        tb_wide[column].metadata.unit = variable_name_mapping[column]
 
-    if "unit_short_name" in data.columns:
+    if "unit_short_name" in tb.columns:
         # Add variable unit (short name).
-        variable_name_mapping = _variable_name_map(data, "unit_short_name")
-        for column in wide_table.columns:
-            wide_table[column].metadata.short_unit = variable_name_mapping[column]
+        variable_name_mapping = _variable_name_map(tb, "unit_short_name")
+        for column in tb_wide.columns:
+            tb_wide[column].metadata.short_unit = variable_name_mapping[column]
     else:
         # This is the case for faostat_qv since the last update.
-        for column in wide_table.columns:
-            wide_table[column].metadata.short_unit = ""
+        for column in tb_wide.columns:
+            tb_wide[column].metadata.short_unit = ""
 
     # Add variable description.
-    variable_name_mapping = _variable_name_map(data, "variable_description")
-    for column in wide_table.columns:
-        wide_table[column].metadata.description = variable_name_mapping[column]
+    variable_name_mapping = _variable_name_map(tb, "variable_description")
+    for column in tb_wide.columns:
+        tb_wide[column].metadata.description = variable_name_mapping[column]
 
-    # Add display parameters (for grapher).
-    for column in wide_table.columns:
-        wide_table[column].metadata.display = {}
+    # Add display and presentation parameters (for grapher).
+    for column in tb_wide.columns:
+        tb_wide[column].metadata.display = {}
+        tb_wide[column].metadata.presentation = VariablePresentationMeta()
 
     # Display name.
-    variable_name_mapping = _variable_name_map(data, "variable_display_name")
-    for column in wide_table.columns:
-        wide_table[column].metadata.display["name"] = variable_name_mapping[column]
+    variable_name_mapping = _variable_name_map(tb, "variable_display_name")
+    for column in tb_wide.columns:
+        tb_wide[column].metadata.display["name"] = variable_name_mapping[column]
+        tb_wide[column].metadata.presentation.title_public = variable_name_mapping[column]
 
     # Ensure columns have the optimal dtypes, but codes are categories.
-    log.info("prepare_wide_table.optimize_table_dtypes", shape=wide_table.shape)
-    wide_table = optimize_table_dtypes(table=wide_table.reset_index())
+    log.info("prepare_wide_table.optimize_table_dtypes", shape=tb_wide.shape)
+    tb_wide = optimize_table_dtypes(table=tb_wide.reset_index())
 
     # Sort columns and rows conveniently.
-    wide_table = wide_table.set_index(["country", "year"], verify_integrity=True)
-    wide_table = wide_table[["area_code"] + sorted([column for column in wide_table.columns if column != "area_code"])]
-    wide_table = wide_table.sort_index(level=["country", "year"]).sort_index()
+    tb_wide = tb_wide.set_index(["country", "year"], verify_integrity=True)
+    tb_wide = tb_wide[["area_code"] + sorted([column for column in tb_wide.columns if column != "area_code"])]
+    tb_wide = tb_wide.sort_index(level=["country", "year"]).sort_index()
 
     # Make all column names snake_case.
     variable_to_short_name = {
-        column: create_variable_short_names(variable_name=wide_table[column].metadata.title)
-        for column in wide_table.columns
-        if wide_table[column].metadata.title is not None
+        column: create_variable_short_names(variable_name=tb_wide[column].metadata.title)
+        for column in tb_wide.columns
+        if tb_wide[column].metadata.title is not None
     }
-    wide_table = wide_table.rename(columns=variable_to_short_name, errors="raise")
+    tb_wide = tb_wide.rename(columns=variable_to_short_name, errors="raise")
 
     # Sanity check.
-    number_of_infinities = np.isinf(wide_table.select_dtypes(include=np.number).fillna(0)).values.sum()
+    number_of_infinities = np.isinf(tb_wide.select_dtypes(include=np.number).fillna(0)).values.sum()
     assert number_of_infinities == 0, f"There are {number_of_infinities} infinity values in the wide table."
 
-    return wide_table
+    return tb_wide
 
 
-def _variable_name_map(data: pd.DataFrame, column: str) -> Dict[str, str]:
+def _variable_name_map(data: Table, column: str) -> Dict[str, str]:
     """Extract map {variable name -> column} from dataframe and make sure it is unique (i.e. ensure that one variable
     does not map to two distinct values)."""
     pivot = data.dropna(subset=[column]).groupby(["variable_name"], observed=True)[column].apply(set)
@@ -1776,8 +1772,8 @@ def _variable_name_map(data: pd.DataFrame, column: str) -> Dict[str, str]:
     return pivot.map(lambda x: list(x)[0]).to_dict()  # type: ignore
 
 
-def parse_amendments_table(amendments: catalog.Table, dataset_short_name: str):
-    amendments = pd.DataFrame(amendments).reset_index()
+def parse_amendments_table(amendments: Table, dataset_short_name: str):
+    amendments = Table(amendments).reset_index()
     # Create a dictionary mapping spurious values to amended values.
     amendments = (
         amendments[amendments["dataset"] == dataset_short_name]
@@ -1807,19 +1803,18 @@ def run(dest_dir: str) -> None:
     # Load latest meadow dataset and keep its metadata.
     ds_meadow = paths.load_dataset(dataset_short_name)
     # Load main table from dataset.
-    tb_meadow = ds_meadow[dataset_short_name]
-    data = pd.DataFrame(tb_meadow).reset_index()
+    tb = ds_meadow[dataset_short_name].reset_index()
 
     # Load dataset of FAOSTAT metadata.
     metadata = paths.load_dataset(f"{NAMESPACE}_metadata")
 
     # Load dataset, items, element-units, countries metadata, and value amendments.
-    dataset_metadata = pd.DataFrame(metadata["datasets"]).loc[dataset_short_name].to_dict()
-    items_metadata = pd.DataFrame(metadata["items"]).reset_index()
+    dataset_metadata = metadata["datasets"].loc[dataset_short_name].to_dict()
+    items_metadata = metadata["items"].reset_index()
     items_metadata = items_metadata[items_metadata["dataset"] == dataset_short_name].reset_index(drop=True)
-    elements_metadata = pd.DataFrame(metadata["elements"]).reset_index()
+    elements_metadata = metadata["elements"].reset_index()
     elements_metadata = elements_metadata[elements_metadata["dataset"] == dataset_short_name].reset_index(drop=True)
-    countries_metadata = pd.DataFrame(metadata["countries"]).reset_index()
+    countries_metadata = metadata["countries"].reset_index()
     amendments = parse_amendments_table(amendments=metadata["amendments"], dataset_short_name=dataset_short_name)
 
     # Load population dataset.
@@ -1835,12 +1830,12 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
     # Harmonize items and elements, and clean data.
-    data = harmonize_items(df=data, dataset_short_name=dataset_short_name)
-    data = harmonize_elements(df=data, dataset_short_name=dataset_short_name)
+    tb = harmonize_items(tb=tb, dataset_short_name=dataset_short_name)
+    tb = harmonize_elements(tb=tb, dataset_short_name=dataset_short_name)
 
     # Prepare data.
-    data = clean_data(
-        data=data,
+    tb = clean_data(
+        tb=tb,
         ds_population=ds_population,
         items_metadata=items_metadata,
         elements_metadata=elements_metadata,
@@ -1849,8 +1844,8 @@ def run(dest_dir: str) -> None:
     )
 
     # Add data for aggregate regions.
-    data = add_regions(
-        data=data,
+    tb = add_regions(
+        tb=tb,
         ds_regions=ds_regions,
         ds_population=ds_population,
         ds_income_groups=ds_income_groups,
@@ -1858,30 +1853,28 @@ def run(dest_dir: str) -> None:
     )
 
     # Add per-capita variables.
-    data = add_per_capita_variables(data=data, elements_metadata=elements_metadata)
+    tb = add_per_capita_variables(tb=tb, elements_metadata=elements_metadata)
 
     # Handle detected anomalies in the data.
-    data, anomaly_descriptions = handle_anomalies(dataset_short_name=dataset_short_name, data=data)
+    tb, anomaly_descriptions = handle_anomalies(dataset_short_name=dataset_short_name, data=tb)
 
     # Create a long table (with item code and element code as part of the index).
-    data_table_long = prepare_long_table(data=data)
+    tb_long = prepare_long_table(tb=tb)
 
     # Create a wide table (with only country and year as index).
-    data_table_wide = prepare_wide_table(data=data)
+    tb_wide = prepare_wide_table(tb=tb)
 
     #
     # Save outputs.
     #
     # Update tables metadata.
-    data_table_long.metadata.short_name = dataset_short_name
-    data_table_long.metadata.title = dataset_metadata["owid_dataset_title"]
-    data_table_wide.metadata.short_name = f"{dataset_short_name}_flat"
-    data_table_wide.metadata.title = dataset_metadata["owid_dataset_title"] + ADDED_TITLE_TO_WIDE_TABLE
+    tb_long.metadata.short_name = dataset_short_name
+    tb_long.metadata.title = dataset_metadata["owid_dataset_title"]
+    tb_wide.metadata.short_name = f"{dataset_short_name}_flat"
+    tb_wide.metadata.title = dataset_metadata["owid_dataset_title"] + ADDED_TITLE_TO_WIDE_TABLE
 
     # Initialise new garden dataset.
-    ds_garden = create_dataset(
-        dest_dir=dest_dir, tables=[data_table_long, data_table_wide], default_metadata=ds_meadow.metadata
-    )
+    ds_garden = create_dataset(dest_dir=dest_dir, tables=[tb_long, tb_wide], default_metadata=ds_meadow.metadata)
     # Update dataset metadata.
     # Add description of anomalies (if any) to the dataset description.
     ds_garden.metadata.description = dataset_metadata["owid_dataset_description"] + anomaly_descriptions
