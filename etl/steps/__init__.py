@@ -9,6 +9,7 @@ import re
 import subprocess
 import sys
 import tempfile
+import time
 import warnings
 from collections import defaultdict
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -834,13 +835,11 @@ class GrapherStep(Step):
                     catalog_path = f"{self.path}/{table.metadata.short_name}#{t.columns[0]}"
 
                     # stop logging to stop cluttering logs
-                    """Uncomment!
                     if i > 20 and verbose:
                         verbose = False
                         thread_pool.submit(
                             lambda: (time.sleep(10), log.info("upsert_dataset.continue_without_logging"))
                         )
-                    """
 
                     # generate table with entity_id, year and value for every column
                     futures.append(

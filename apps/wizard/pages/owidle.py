@@ -40,6 +40,11 @@ UPDATES = {
         "✨ Hard mode: Improved readability of year hint emojis.",
         "🐛 Hard mode: Fixed score mosaic 100%-rounding for years.",
     ],
+    "2024-03-18": [
+        "✨ Hard mode: If user guesses country, leave it as default selection.",
+        "✨ Hard mode: Year emoji hint help message now shows in latest.",
+        "🐛 Hard mode: Year score in mosaic was pointing to geographic score.",
+    ],
 }
 DAYS_TO_SHOW_UPDATES = 3
 OWID_NUM = (dt.datetime.now(dt.timezone.utc).date() - dt.date(2024, 2, 20)).days
@@ -538,19 +543,19 @@ def distance_to_solution_year(year_selected: int) -> Tuple[str, str, str]:
     elif (diff > 0) and (diff <= 5):
         arrows = "🔥"
     elif (diff > 5) and (diff <= 15):
-        arrows = "▶️"
+        arrows = "🔼"
     elif (diff > 15) and (diff <= 30):
-        arrows = "⏩▶️"
+        arrows = "⏫️🔼"
     elif diff > 30:
-        arrows = "⏩⏩⏩"
+        arrows = "⏫️⏫️⏫️"
     elif (diff < 0) and (diff >= -5):
         arrows = "🔥"
     elif (diff < -5) and (diff >= -15):
-        arrows = "◀️"
+        arrows = "🔽"
     elif (diff < -15) and (diff >= -30):
-        arrows = "⏪◀️"
+        arrows = "⏬️🔽"
     else:
-        arrows = "⏪⏪"
+        arrows = "⏬️⏬️⏬️"
     score = int(round(100 - (abs(diff) / (YEAR_MAX - YEAR_MIN)) * 100, 0))
     # Only 100 if correct, not even if 99.9%
     if score == 100:
@@ -906,6 +911,13 @@ with st.form("form_guess", border=False, clear_on_submit=True):
 
     # Show dropdown for options
     if st.session_state.owidle_difficulty == 2:
+        # Get default for country selector if we got it right
+        if st.session_state.user_has_succeded_country:
+            country = st.session_state.get("guess_last_submitted")
+            index = options.index(country)
+        else:
+            index = None
+
         col1, col2 = st.columns([1, 1])
         with col1:
             value = st.selectbox(
@@ -913,7 +925,7 @@ with st.form("form_guess", border=False, clear_on_submit=True):
                 placeholder="Choose a country... ",
                 options=options,
                 label_visibility="collapsed",
-                index=None,
+                index=index,
                 key="guess_last_submitted",
             )
         with col2:
@@ -974,10 +986,10 @@ for i in range(num_guesses_bound):
         with col2.container(border=True):
             col21, col22 = st.columns(2)
             col21.markdown(f"**{st.session_state.guesses[i]['year']}**")
-            if i == 0:
+            if i == st.session_state.num_guesses - 1:
                 col22.markdown(
                     st.session_state.guesses[i]["direction_year"],
-                    help="🔥: up to ±5 years\n\n◀️/▶️: up to ±15 years\n\n⏪◀️/⏩▶️: up to ±30 years\n\n⏪⏪⏪/⏩⏩⏩: >30 years difference",
+                    help="🔥: up to ±5 years\n\n🔽/🔼: between ±5 and ±15 years\n\n⏬️/⏫️🔼: between ±15 and ±30 years\n\n⏬️⏬️⏬️/⏫️⏫️⏫️: More than 30 (or less than -30) years difference",
                 )
             else:
                 col22.markdown(st.session_state.guesses[i]["direction_year"])
@@ -1086,7 +1098,7 @@ def get_score_mosaic_hard():
     # Distance
     scores_dist = [int(guess["score"]) for guess in st.session_state.guesses if guess["score"] != ""]
     # Years
-    scores_year = [int(guess["score"]) for guess in st.session_state.guesses if guess["score_year"] != ""]
+    scores_year = [int(guess["score_year"]) for guess in st.session_state.guesses if guess["score_year"] != ""]
     # Combine into string
     mosaic = "\n".join(
         [
