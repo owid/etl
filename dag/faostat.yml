@@ -561,6 +561,55 @@ steps:
     - data://meadow/faostat/2024-03-14/faostat_ti
     - data://garden/wb/2024-03-11/income_groups
   #
+  # FAOSTAT grapher steps for version 2024-03-14
+  #
+  data://grapher/faostat/2024-03-14/faostat_cahd:
+    - data://garden/faostat/2024-03-14/faostat_cahd
+  data://grapher/faostat/2024-03-14/faostat_ei:
+    - data://garden/faostat/2024-03-14/faostat_ei
+  data://grapher/faostat/2024-03-14/faostat_ek:
+    - data://garden/faostat/2024-03-14/faostat_ek
+  data://grapher/faostat/2024-03-14/faostat_emn:
+    - data://garden/faostat/2024-03-14/faostat_emn
+  data://grapher/faostat/2024-03-14/faostat_esb:
+    - data://garden/faostat/2024-03-14/faostat_esb
+  data://grapher/faostat/2024-03-14/faostat_fa:
+    - data://garden/faostat/2024-03-14/faostat_fa
+  data://grapher/faostat/2024-03-14/faostat_fbsc:
+    - data://garden/faostat/2024-03-14/faostat_fbsc
+  data://grapher/faostat/2024-03-14/faostat_fo:
+    - data://garden/faostat/2024-03-14/faostat_fo
+  data://grapher/faostat/2024-03-14/faostat_fs:
+    - data://garden/faostat/2024-03-14/faostat_fs
+  data://grapher/faostat/2024-03-14/faostat_ic:
+    - data://garden/faostat/2024-03-14/faostat_ic
+  data://grapher/faostat/2024-03-14/faostat_lc:
+    - data://garden/faostat/2024-03-14/faostat_lc
+  data://grapher/faostat/2024-03-14/faostat_qcl:
+    - data://garden/faostat/2024-03-14/faostat_qcl
+  data://grapher/faostat/2024-03-14/faostat_qi:
+    - data://garden/faostat/2024-03-14/faostat_qi
+  data://grapher/faostat/2024-03-14/faostat_qv:
+    - data://garden/faostat/2024-03-14/faostat_qv
+  data://grapher/faostat/2024-03-14/faostat_rfb:
+    - data://garden/faostat/2024-03-14/faostat_rfb
+  data://grapher/faostat/2024-03-14/faostat_rfn:
+    - data://garden/faostat/2024-03-14/faostat_rfn
+  data://grapher/faostat/2024-03-14/faostat_rl:
+    - data://garden/faostat/2024-03-14/faostat_rl
+  data://grapher/faostat/2024-03-14/faostat_rp:
+    - data://garden/faostat/2024-03-14/faostat_rp
+  data://grapher/faostat/2024-03-14/faostat_rt:
+    - data://garden/faostat/2024-03-14/faostat_rt
+  data://grapher/faostat/2024-03-14/faostat_scl:
+    - data://garden/faostat/2024-03-14/faostat_scl
+  data://grapher/faostat/2024-03-14/faostat_sdgb:
+    - data://garden/faostat/2024-03-14/faostat_sdgb
+  data://grapher/faostat/2024-03-14/faostat_tcl:
+    - data://garden/faostat/2024-03-14/faostat_tcl
+  data://grapher/faostat/2024-03-14/faostat_ti:
+    - data://garden/faostat/2024-03-14/faostat_ti
+  #
   # FAOSTAT food explorer step
   #
   data://explorers/faostat/latest/food_explorer:
