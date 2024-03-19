@@ -560,3 +560,8 @@ steps:
     - data://garden/regions/2023-01-01/regions
     - data://meadow/faostat/2024-03-14/faostat_ti
     - data://garden/wb/2024-03-11/income_groups
+  #
+  # FAOSTAT food explorer step
+  #
+  data://explorers/faostat/latest/food_explorer:
+    - data://garden/faostat/2024-03-14/faostat_food_explorer

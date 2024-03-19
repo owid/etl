@@ -14,7 +14,13 @@ from typing import cast
 import pandas as pd
 from owid import catalog
 from owid.datautils import dataframes
-from shared import CURRENT_DIR, NAMESPACE
+from shared import (
+    CURRENT_DIR,
+    FAO_POPULATION_ELEMENT_NAME,
+    FAO_POPULATION_ITEM_NAME,
+    FAO_POPULATION_UNIT_NAME,
+    NAMESPACE,
+)
 
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
@@ -79,7 +85,7 @@ ITEM_CODES_QCL = [
     "00000258",  # From faostat_qcl - 'Palm kernel oil' (previously 'Palm kernel oil').
     "00000156",  # From faostat_qcl - 'Sugar cane' (previously 'Sugar cane').
     "00000373",  # From faostat_qcl - 'Spinach' (previously 'Spinach').
-    "00000773",  # From faostat_qcl - 'Flax fibre' (previously 'Flax fibre').
+    "00000771",  # From faostat_qcl - 'Flax, raw or retted' (previously 'Flax fibre').
     "00000116",  # From faostat_qcl - 'Potatoes' (previously 'Potatoes').
     "00000869",  # From faostat_qcl - 'Cattle fat, unrendered' (previously 'Fat, cattle').
     "00000358",  # From faostat_qcl - 'Cabbages' (previously 'Cabbages').
@@ -284,11 +290,6 @@ ITEM_CODES_FBSC = [
     "00002908",  # From faostat_fbsc - 'Sugar crops' (previously 'Sugar crops').
 ]
 
-# OWID item name, element name, and unit name for population (as given in faostat_qcl and faostat_fbsc datasets).
-FAO_POPULATION_ITEM_NAME = "Population"
-FAO_POPULATION_ELEMENT_NAME = "Total Population - Both sexes"
-FAO_POPULATION_UNIT = "1000 persons"
-
 # List of element codes to consider from faostat_qcl.
 ELEMENT_CODES_QCL = [
     "005312",
@@ -439,7 +440,7 @@ def get_fao_population(combined: pd.DataFrame) -> pd.DataFrame:
 
     # Check that population is given in "1000 persons" and convert to persons.
     error = "FAOSTAT population changed item, element, or unit."
-    assert list(fao_population["unit"].unique()) == [FAO_POPULATION_UNIT], error
+    assert list(fao_population["unit"].unique()) == [FAO_POPULATION_UNIT_NAME], error
     fao_population["value"] *= 1000
 
     # Drop missing values and prepare output dataframe.
@@ -521,8 +522,8 @@ def run(dest_dir: str) -> None:
     paths = PathFinder(current_step_file.as_posix())
 
     # Load latest qcl and fbsc datasets from garden.
-    qcl_dataset: catalog.Dataset = paths.load_dependency(f"{NAMESPACE}_qcl")
-    fbsc_dataset: catalog.Dataset = paths.load_dependency(f"{NAMESPACE}_fbsc")
+    qcl_dataset = paths.load_dataset(f"{NAMESPACE}_qcl")
+    fbsc_dataset = paths.load_dataset(f"{NAMESPACE}_fbsc")
 
     # Get main long tables from qcl and fbsc datasets.
     qcl_table = qcl_dataset[f"{NAMESPACE}_qcl"]

@@ -297,17 +297,19 @@ version) for each dataset, to replace variables of a dataset from its second lat
 10. Use OWID's internal approval tool to visually inspect changes between the old and new versions of updated charts, and
 accept or reject changes.
 
-11. Create a new explorers step. For the moment, this has to be done manually:
-    * Duplicate the latest step in `etl/etl/steps/data/explorers/faostat/` and use the current date as the new version.
-    * Duplicate entry of explorers step in the dag, and replace versions (of the step itself and its dependencies) by the corresponding latest versions.
+11. Update the explorers step `data://explorers/faostat/latest/food_explorer` (for the moment, this has to be done manually): Edit the version of its only dependency in the dag, so that it loads the latest garden step. It should be `data://garden/faostat/YYYY-MM-DD/faostat_food_explorer`.
 
 12. Run the new etl explorers step, to generate the csv files for the global food explorer.
 
     ```bash
-    etl run explorers/faostat/YYYY-MM-DD/food_explorer
+    etl run explorers/faostat/latest/food_explorer
     ```
 
     Run internal sanity checks on the generated files.
+
+    !!! note
+
+        Sometimes items change in FAOSTAT. If that's the case, you may need to edit a file in the `owid-content` repository, namely `scripts/global-food-explorer/foods.csv`. Then, follow the instructions in `scripts/global-food-explorer/README.md`.
 
 13. Manually create a new garden dataset of additional variables `additional_variables` for the new version, and update its metadata. Then create a new grapher dataset too. Manually update all other datasets that use any faostat dataset as a dependency.
 

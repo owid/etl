@@ -1,5 +1,5 @@
 dataset,item_code,fao_item,owid_item,fao_item_description,owid_item_description
-faostat_qcl,00000773,,Flax fibre,,
+faostat_qcl,00000771,,"Flax, raw or retted",,
 faostat_qcl,00000221,"Almonds, in shell",Almonds,"Almonds, in shell This subclass is defined through the following headings/subheadings of the HS 2007: 0802.11.",
 faostat_fbsc,00002946,Animal fats,Animal fats group,,
 faostat_qcl,00000711,"Anise, badian, coriander, cumin, caraway, fennel and juniper berries, raw",Herbs (e.g. fennel),"Anise, badian, coriander, cumin, caraway, fennel and juniper berries, raw This subclass includes: - aniseed, Pimpinella anisum, raw - star anise (badian) or Chinese star anise, Illicium verum, raw - fennel, Foeniculum vulgare, raw (when used as spice) - coriander (cilantro), Coriandrum sativum, raw - cumin, Cuminum cyminum, raw - caraway seeds, Carum carvi, raw -  juniper berries, Juniperus communis, raw This subclass does not include: - fennel (when used as a vegetable), cf. 01290 -  processed anise, fennel, coriander, cumin, caraway and juniper berries, cf. 23924",
