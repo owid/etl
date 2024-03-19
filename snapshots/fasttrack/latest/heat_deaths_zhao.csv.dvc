@@ -1,0 +1,20 @@
+meta:
+  origin:
+    producer: |-
+      Zhao et al. (2021). Global, regional, and national burden of mortality associated with non-optimal ambient temperatures from 2000 to 2019: a three-stage modelling study.
+    title: heat_deaths_zhao
+    citation_full: |-
+      Zhao, Q., Guo, Y., Ye, T., Gasparrini, A., Tong, S., Overcenco, A., ... & Li, S. (2021). Global, regional, and national burden of mortality associated with non-optimal ambient temperatures from 2000 to 2019: a three-stage modelling study. The Lancet Planetary Health.
+    version_producer: Google Sheet
+    url_main: https://www.thelancet.com/journals/lanplh/article/PIIS2542-5196(21)00081-4/fulltext
+    url_download: |-
+      https://docs.google.com/spreadsheets/d/e/2PACX-1vRj-1hx6ZhXvay9RzT3fcTYH0wWMg3bUdZ6q8oc86ZMPMwgYeiepDcSATg7e5Ke3HVQFW0DZKAjvKSz/pub?output=csv
+    date_accessed: '2024-03-19'
+  name: Heat deaths by region (Zhao et al. 2021)
+  description: |-
+    The share of deaths across regions that are attributed to sub-optimal temperatures. This includes deaths related to cold and heat.
+  license: {}
+outs:
+  - md5: b56a76f350b5a746e2cdb26535be2fb1
+    size: 753
+    path: heat_deaths_zhao.csv
