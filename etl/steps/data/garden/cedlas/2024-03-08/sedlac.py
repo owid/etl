@@ -49,21 +49,16 @@ def run(dest_dir: str) -> None:
     tb_poverty = load_tables(dataset=ds_meadow, tables_dict=POVERTY_TABLES)
     tb_ineq_indices = load_tables(dataset=ds_meadow, tables_dict=INEQUALITY_INDICES_TABLES)
     tb_ineq_deciles = load_tables(dataset=ds_meadow, tables_dict=INEQUALITY_DECILES_TABLES)
-    # tb_gini = load_tables(dataset=ds_meadow, tables_dict=INEQUALITY_GINI_TABLES)
 
     #
     # Process data.
     tb_poverty = merge_tables(tables=tb_poverty, merge_or_concat="concat", short_name="poverty")
     tb_ineq_indices = merge_tables(tables=tb_ineq_indices, merge_or_concat="concat", short_name="ineq_indices")
     tb_ineq_deciles = merge_tables(tables=tb_ineq_deciles, merge_or_concat="concat", short_name="ineq_deciles")
-    # tb_gini = merge_tables(tables=tb_gini, merge_or_concat="merge", short_name="gini")
 
     tb_inequality = merge_tables(
         tables=[tb_ineq_indices, tb_ineq_deciles], merge_or_concat="merge", short_name="inequality"
     )
-    # tb_inequality = merge_tables(
-    #     tables=[tb_inequality_indices_deciles, tb_gini], merge_or_concat="concat", short_name="inequality"
-    # )
 
     tb = merge_tables(tables=[tb_poverty, tb_inequality], merge_or_concat="merge", short_name="sedlac")
 
