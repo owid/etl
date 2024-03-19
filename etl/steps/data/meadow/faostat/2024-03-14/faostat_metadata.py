@@ -8,13 +8,14 @@ All categories are defined below in 'category_structure'.
 
 from typing import Any, Dict, List
 
-import pandas as pd
+import owid.catalog.processing as pr
 import structlog
 from owid.catalog import Table
 from owid.datautils.io import load_json
 from shared import CURRENT_DIR, NAMESPACE
 
 from etl.helpers import PathFinder, create_dataset
+from etl.snapshot import Snapshot
 
 log = structlog.get_logger()
 
@@ -130,7 +131,7 @@ def check_that_category_structure_is_well_defined(md: Dict[str, Any]) -> None:
                         assert category_index in entry, error
 
 
-def create_tables_for_all_domain_records(additional_metadata: Dict[str, Any]) -> List[Table]:
+def create_tables_for_all_domain_records(additional_metadata: Dict[str, Any], snapshot: Snapshot) -> List[Table]:
     """Create a table for each of the domain-categories (e.g. 'faostat_qcl_item').
 
     Parameters
@@ -150,11 +151,11 @@ def create_tables_for_all_domain_records(additional_metadata: Dict[str, Any]) ->
     for domain in additional_metadata:
         for category in list(additional_metadata[domain]):
             json_data = additional_metadata[domain][category]["data"]
-            df = pd.DataFrame.from_dict(json_data)
-            if len(df) == 0:
+            tb = pr.read_from_dict(json_data, metadata=snapshot.to_table_metadata(), origin=snapshot.metadata.origin)
+            if len(tb) == 0:
                 # This is the case for lc flag, rfb flag, scl itemfactor, and, since last version, all qv categories.
-                df = df.assign(**{col: [] for col in category_structure[category]["index"]})
-            df.set_index(
+                tb = tb.assign(**{col: [] for col in category_structure[category]["index"]})
+            tb.set_index(
                 category_structure[category]["index"],
                 verify_integrity=True,
                 inplace=True,
@@ -167,8 +168,8 @@ def create_tables_for_all_domain_records(additional_metadata: Dict[str, Any]) ->
                 continue
             used_short_names.add(table_short_name)
 
-            table = Table(df, short_name=table_short_name)
-            tables.append(table)
+            tb.metadata.short_name = table_short_name
+            tables.append(tb)
 
     return tables
 
@@ -197,7 +198,7 @@ def run(dest_dir: str) -> None:
     check_that_category_structure_is_well_defined(md=additional_metadata)
 
     # Create a new table for each domain-record (e.g. 'faostat_qcl_item').
-    tables = create_tables_for_all_domain_records(additional_metadata=additional_metadata)
+    tables = create_tables_for_all_domain_records(additional_metadata=additional_metadata, snapshot=snapshot)
 
     #
     # Save outputs.
