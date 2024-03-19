@@ -460,7 +460,7 @@ tables:
           name: Gini coefficient (<<table>>)
           <<: *common-display
         presentation:
-          title_public: Gini coefficient (<<table>>)
+          title_public: "Income inequality: Gini coefficient in Latin America"
 
       theil:
         title: Theil index (<<table>>)
