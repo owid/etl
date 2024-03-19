@@ -9,10 +9,9 @@ The resulting dataset will later be loaded by the `explorer/food_explorer` which
 """
 
 from pathlib import Path
-from typing import cast
 
 import pandas as pd
-from owid import catalog
+from owid.catalog import Table
 from owid.datautils import dataframes
 from shared import (
     CURRENT_DIR,
@@ -350,20 +349,20 @@ ELEMENT_CODES_FBSC = [
 ]
 
 
-def combine_qcl_and_fbsc(qcl_table: catalog.Table, fbsc_table: catalog.Table) -> pd.DataFrame:
+def combine_qcl_and_fbsc(tb_qcl: Table, tb_fbsc: Table) -> Table:
     """Combine garden `faostat_qcl` and `faostat_fbsc` datasets.
 
     Parameters
     ----------
-    qcl_table : catalog.Table
+    tb_qcl : Table
         Main table (in long format) of the `faostat_qcl` dataset.
-    fbsc_table : catalog.Table
+    tb_fbsc : Table
         Main table (in long format) of the `faostat_fbsc` dataset.
 
     Returns
     -------
-    combined : pd.DataFrame
-        Combined data (as a dataframe, not a table).
+    combined : Table
+        Combined data.
 
     """
     columns = [
@@ -378,14 +377,14 @@ def combine_qcl_and_fbsc(qcl_table: catalog.Table, fbsc_table: catalog.Table) ->
         "value",
         "population_with_data",
     ]
-    qcl = pd.DataFrame(qcl_table).reset_index()[columns]
+    qcl = tb_qcl.reset_index()[columns]
     # Select relevant element codes.
     qcl = qcl[qcl["element_code"].isin(ELEMENT_CODES_QCL)].reset_index(drop=True)
     qcl["value"] = qcl["value"].astype(float)
     qcl["element"] = [element for element in qcl["element"]]
     qcl["unit"] = [unit for unit in qcl["unit"]]
     qcl["item"] = [item for item in qcl["item"]]
-    fbsc = pd.DataFrame(fbsc_table).reset_index()[columns]
+    fbsc = tb_fbsc.reset_index()[columns]
     # Select relevant element codes.
     fbsc = fbsc[fbsc["element_code"].isin(ELEMENT_CODES_FBSC)].reset_index(drop=True)
     fbsc["value"] = fbsc["value"].astype(float)
@@ -415,21 +414,21 @@ def combine_qcl_and_fbsc(qcl_table: catalog.Table, fbsc_table: catalog.Table) ->
     error = "There are unexpected duplicate rows. Rename items in custom_items.csv to avoid clashes."
     assert combined[combined.duplicated(subset=["product", "country", "year", "element", "unit"])].empty, error
 
-    return cast(pd.DataFrame, combined)
+    return combined
 
 
-def get_fao_population(combined: pd.DataFrame) -> pd.DataFrame:
+def get_fao_population(combined: Table) -> Table:
     """Extract the FAO population data from data (in long format).
 
     Parameters
     ----------
-    combined : pd.DataFrame
+    combined : Table
         Combination of `faostat_qcl` and `faostat_fbsc` data (although this function could also be applied to just
         `faostat_fbsc` data, since `faostat_qcl` does not contain FAO population data).
 
     Returns
     -------
-    fao_population : pd.DataFrame
+    fao_population : Table
         Population (by country and year) according to FAO, extracted from the `faostat_fbsc` dataset.
 
     """
@@ -443,7 +442,7 @@ def get_fao_population(combined: pd.DataFrame) -> pd.DataFrame:
     assert list(fao_population["unit"].unique()) == [FAO_POPULATION_UNIT_NAME], error
     fao_population["value"] *= 1000
 
-    # Drop missing values and prepare output dataframe.
+    # Drop missing values and prepare output table.
     fao_population = (
         fao_population[["country", "year", "value"]].dropna(how="any").rename(columns={"value": "fao_population"})
     )
@@ -451,18 +450,18 @@ def get_fao_population(combined: pd.DataFrame) -> pd.DataFrame:
     return fao_population
 
 
-def process_combined_data(combined: pd.DataFrame) -> pd.DataFrame:
+def process_combined_data(combined: Table) -> Table:
     """Process combined data (combination of `faostat_qcl` and `faostat_fbsc` data) to have the content and format
     required by the food explorer.
 
     Parameters
     ----------
-    combined : pd.DataFrame
+    combined : Table
         Combination of `faostat_qcl` and `faostat_fbsc` data.
 
     Returns
     -------
-    data_wide : pd.DataFrame
+    data_wide : Table
         Processed data (in wide format).
 
     """
@@ -526,20 +525,20 @@ def run(dest_dir: str) -> None:
     fbsc_dataset = paths.load_dataset(f"{NAMESPACE}_fbsc")
 
     # Get main long tables from qcl and fbsc datasets.
-    qcl_table = qcl_dataset[f"{NAMESPACE}_qcl"]
-    fbsc_table = fbsc_dataset[f"{NAMESPACE}_fbsc"]
+    tb_qcl = qcl_dataset[f"{NAMESPACE}_qcl"]
+    tb_fbsc = fbsc_dataset[f"{NAMESPACE}_fbsc"]
 
     #
     # Process data.
     #
     # Combine qcl and fbsc data.
-    data = combine_qcl_and_fbsc(qcl_table=qcl_table, fbsc_table=fbsc_table)
+    data = combine_qcl_and_fbsc(tb_qcl=tb_qcl, tb_fbsc=tb_fbsc)
 
     # Prepare data in the format required by the food explorer.
     data = process_combined_data(combined=data)
 
     # Create table of products.
-    table = catalog.Table(data, short_name=dataset_short_name)
+    table = Table(data, short_name=dataset_short_name)
 
     #
     # Save outputs.

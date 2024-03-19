@@ -16,10 +16,8 @@ update.
 """
 
 from pathlib import Path
-from typing import cast
 
-import pandas as pd
-from owid import catalog
+from owid.catalog import Dataset, Table
 from owid.datautils import dataframes
 from shared import (
     ADDED_TITLE_TO_WIDE_TABLE,
@@ -46,80 +44,80 @@ DATASET_TITLE = f"Food Balances (old methodology before {FBS_FIRST_YEAR}, and ne
 
 
 def combine_fbsh_and_fbs_datasets(
-    fbsh_dataset: catalog.Dataset,
-    fbs_dataset: catalog.Dataset,
-) -> pd.DataFrame:
+    ds_fbsh: Dataset,
+    ds_fbs: Dataset,
+) -> Table:
     """Combine `faostat_fbsh` and `faostat_fbs` meadow datasets.
 
     Parameters
     ----------
-    fbsh_dataset : catalog.Dataset
+    ds_fbsh : Dataset
         Meadow `faostat_fbsh` dataset.
-    fbs_dataset : catalog.Dataset
+    ds_fbs : Dataset
         Meadow `faostat_fbs` dataset.
 
     Returns
     -------
-    fbsc : pd.DataFrame
+    tb_fbsc : Table
         Combination of the tables of the two input datasets (as a dataframe, not a dataset).
 
     """
     # Sanity checks.
     error = "Description of fbs and fbsh datasets is different."
-    assert fbsh_dataset.metadata.description == fbs_dataset.metadata.description, error
+    assert ds_fbsh.metadata.description == ds_fbs.metadata.description, error
     error = "Licenses of fbsh and fbs are different."
-    assert fbsh_dataset.metadata.licenses == fbs_dataset.metadata.licenses, error
+    assert ds_fbsh.metadata.licenses == ds_fbs.metadata.licenses, error
 
     # Load dataframes for fbs and fbsh datasets.
-    fbsh = pd.DataFrame(fbsh_dataset["faostat_fbsh"]).reset_index()
-    fbs = pd.DataFrame(fbs_dataset["faostat_fbs"]).reset_index()
+    tb_fbsh = ds_fbsh["faostat_fbsh"].reset_index()
+    tb_fbs = ds_fbs["faostat_fbs"].reset_index()
 
     # Harmonize items and elements in both datasets.
-    fbsh = harmonize_items(tb=fbsh, dataset_short_name="faostat_fbsh")
-    fbsh = harmonize_elements(tb=fbsh, dataset_short_name="faostat_fbsh")
-    fbs = harmonize_items(tb=fbs, dataset_short_name="faostat_fbs")
-    fbs = harmonize_elements(tb=fbs, dataset_short_name="faostat_fbs")
+    tb_fbsh = harmonize_items(tb=tb_fbsh, dataset_short_name="faostat_fbsh")
+    tb_fbsh = harmonize_elements(tb=tb_fbsh, dataset_short_name="faostat_fbsh")
+    tb_fbs = harmonize_items(tb=tb_fbs, dataset_short_name="faostat_fbs")
+    tb_fbs = harmonize_elements(tb=tb_fbs, dataset_short_name="faostat_fbs")
 
     # Ensure there is no overlap in data between the two datasets, and that there is no gap between them.
-    assert fbs["year"].min() == FBS_FIRST_YEAR, f"First year of fbs dataset is not {FBS_FIRST_YEAR}"
-    if fbsh["year"].max() >= fbs["year"].min():
+    assert tb_fbs["year"].min() == FBS_FIRST_YEAR, f"First year of fbs dataset is not {FBS_FIRST_YEAR}"
+    if tb_fbsh["year"].max() >= tb_fbs["year"].min():
         # There is overlapping data between fbsh and fbs datasets. Prioritising fbs over fbsh."
-        fbsh = fbsh.loc[fbsh["year"] < fbs["year"].min()].reset_index(drop=True)
-    if (fbsh["year"].max() + 1) < fbs["year"].min():
+        tb_fbsh = tb_fbsh.loc[tb_fbsh["year"] < tb_fbs["year"].min()].reset_index(drop=True)
+    if (tb_fbsh["year"].max() + 1) < tb_fbs["year"].min():
         log.warning("Data is missing for one or more years between fbsh and fbs datasets.")
 
     # Sanity checks.
     # Ensure the elements that are in fbsh but not in fbs are covered by ITEMS_MAPPING.
     error = "Mismatch between items in fbsh and fbs. Redefine shared.ITEM_AMENDMENTS."
-    assert set(fbsh["item"]) == set(fbs["item"]), error
-    assert set(fbsh["item_code"]) == set(fbs["item_code"]), error
+    assert set(tb_fbsh["item"]) == set(tb_fbs["item"]), error
+    assert set(tb_fbsh["item_code"]) == set(tb_fbs["item_code"]), error
     # Some elements are found in fbs but not in fbsh. This is understandable, since fbs is
     # more recent and may have additional elements. However, ensure that there are no
     # elements in fbsh that are not in fbs.
     error = "There are elements in fbsh that are not in fbs."
-    assert set(fbsh["element"]) < set(fbs["element"]), error
-    assert set(fbsh["element_code"]) - set(fbs["element_code"]) == ELEMENTS_IN_FBSH_MISSING_IN_FBS, error
+    assert set(tb_fbsh["element"]) < set(tb_fbs["element"]), error
+    assert set(tb_fbsh["element_code"]) - set(tb_fbs["element_code"]) == ELEMENTS_IN_FBSH_MISSING_IN_FBS, error
 
     # Remove elements from fbsh that are not in fbs (since they have different meanings and hence should not be
     # combined as if they were the same element).
-    fbsh = fbsh[~fbsh["element_code"].isin(ELEMENTS_IN_FBSH_MISSING_IN_FBS)].reset_index(drop=True)
+    tb_fbsh = tb_fbsh[~tb_fbsh["element_code"].isin(ELEMENTS_IN_FBSH_MISSING_IN_FBS)].reset_index(drop=True)
 
     # Concatenate old and new dataframes using function that keeps categoricals.
-    fbsc = dataframes.concatenate([fbsh, fbs]).sort_values(["area", "year"]).reset_index(drop=True)
+    tb_fbsc = dataframes.concatenate([tb_fbsh, tb_fbs]).sort_values(["area", "year"]).reset_index(drop=True)
 
     # Ensure that each element has only one unit and one description.
     error = "Some elements in the combined dataset have more than one unit. Manually check them and consider adding them to ELEMENT_AMENDMENTS."
-    units_per_element = fbsc.groupby("element", as_index=False, observed=True)["unit"].nunique()
+    units_per_element = tb_fbsc.groupby("element", as_index=False, observed=True)["unit"].nunique()
     elements_with_ambiguous_units = units_per_element[units_per_element["unit"] > 1]["element"].tolist()
-    fbsc[fbsc["element"].isin(elements_with_ambiguous_units)].drop_duplicates(subset=["element", "unit"])
+    tb_fbsc[tb_fbsc["element"].isin(elements_with_ambiguous_units)].drop_duplicates(subset=["element", "unit"])
     assert len(elements_with_ambiguous_units) == 0, error
 
-    return cast(pd.DataFrame, fbsc)
+    return tb_fbsc
 
 
-def _assert_df_size(df: pd.DataFrame, size_mb: float) -> None:
+def _assert_tb_size(tb: Table, size_mb: float) -> None:
     """Check that dataframe is smaller than given size to prevent OOM errors."""
-    real_size_mb = df.memory_usage(deep=True).sum() / 1e6
+    real_size_mb = tb.memory_usage(deep=True).sum() / 1e6
     assert real_size_mb <= size_mb, f"DataFrame size is too big: {real_size_mb} MB > {size_mb} MB"
 
 
@@ -145,12 +143,12 @@ def run(dest_dir: str) -> None:
     metadata = paths.load_dataset(f"{NAMESPACE}_metadata")
 
     # Load dataset, items, element-units, and countries metadata.
-    dataset_metadata = pd.DataFrame(metadata["datasets"]).loc[dataset_short_name].to_dict()
-    items_metadata = pd.DataFrame(metadata["items"]).reset_index()
+    dataset_metadata = metadata["datasets"].loc[dataset_short_name].to_dict()
+    items_metadata = metadata["items"].reset_index()
     items_metadata = items_metadata[items_metadata["dataset"] == dataset_short_name].reset_index(drop=True)
-    elements_metadata = pd.DataFrame(metadata["elements"]).reset_index()
+    elements_metadata = metadata["elements"].reset_index()
     elements_metadata = elements_metadata[elements_metadata["dataset"] == dataset_short_name].reset_index(drop=True)
-    countries_metadata = pd.DataFrame(metadata["countries"]).reset_index()
+    countries_metadata = metadata["countries"].reset_index()
     amendments = parse_amendments_table(amendments=metadata["amendments"], dataset_short_name=dataset_short_name)
 
     # Load regions dataset.
@@ -173,7 +171,7 @@ def run(dest_dir: str) -> None:
     )
     data = combine_fbsh_and_fbs_datasets(fbsh_dataset, fbs_dataset)
 
-    _assert_df_size(data, 2000)
+    _assert_tb_size(data, 2000)
 
     # Prepare data.
     data = clean_data(
@@ -204,13 +202,13 @@ def run(dest_dir: str) -> None:
     for col in data.columns:
         assert data[col].dtype != object, f"Column {col} should not have object type"
 
-    _assert_df_size(data, 2000)
+    _assert_tb_size(data, 2000)
 
     # Create a long table (with item code and element code as part of the index).
     log.info("faostat_fbsc.prepare_long_table", shape=data.shape)
     data_table_long = prepare_long_table(tb=data)
 
-    _assert_df_size(data_table_long, 2000)
+    _assert_tb_size(data_table_long, 2000)
 
     # Create a wide table (with only country and year as index).
     log.info("faostat_fbsc.prepare_wide_table", shape=data.shape)

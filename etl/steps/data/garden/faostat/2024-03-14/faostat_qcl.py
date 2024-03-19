@@ -3,7 +3,8 @@
 from pathlib import Path
 
 import numpy as np
-import pandas as pd
+import owid.catalog.processing as pr
+from owid.catalog import Table
 from owid.datautils import dataframes
 from shared import (
     ADDED_TITLE_TO_WIDE_TABLE,
@@ -46,7 +47,7 @@ MEAT_TOTAL_ITEM_CODES = [
 
 # List of element codes for "Producing or slaughtered animals" (they have different items assigned).
 SLAUGHTERED_ANIMALS_ELEMENT_CODES = ["005320", "005321"]
-# For the resulting dataframe, we arbitrarily assign the first of those codes.
+# For the resulting table, we arbitrarily assign the first of those codes.
 SLAUGHTERED_ANIMALS_ELEMENT_CODE = SLAUGHTERED_ANIMALS_ELEMENT_CODES[0]
 # Item code for 'Meat, total'.
 TOTAL_MEAT_ITEM_CODE = "00001765"
@@ -65,7 +66,7 @@ SLAUGHTERED_ANIMALS_ADDITIONAL_DESCRIPTION = (
 )
 
 
-def fill_slaughtered_poultry_with_slaughtered_chicken(data: pd.DataFrame) -> pd.DataFrame:
+def fill_slaughtered_poultry_with_slaughtered_chicken(data: Table) -> Table:
     """Fill missing data on slaughtered poultry with slaughtered chicken.
 
     Most of poultry meat comes from chicken. However, sometimes chicken is informed, but the rest of poultry isn't,
@@ -98,8 +99,7 @@ def fill_slaughtered_poultry_with_slaughtered_chicken(data: pd.DataFrame) -> pd.
     ][["country", "year", "value"]]
 
     # Combine poultry and chicken data.
-    compared = pd.merge(
-        chickens_slaughtered,
+    compared = chickens_slaughtered.merge(
         poultry_slaughtered,
         on=["country", "year"],
         how="outer",
@@ -113,7 +113,7 @@ def fill_slaughtered_poultry_with_slaughtered_chicken(data: pd.DataFrame) -> pd.
     error = "There are rows where there is more slaughtered poultry than slaughtered chicken."
     assert compared[compared["value_poultry"] < compared["value_chicken"]].empty, error
 
-    # Prepare a replacement dataframe for missing data on slaughtered poultry.
+    # Prepare a replacement table for missing data on slaughtered poultry.
     poultry_slaughtered_missing_data = (
         compared[compared["_merge"] == "left_only"]
         .assign(
@@ -133,13 +133,13 @@ def fill_slaughtered_poultry_with_slaughtered_chicken(data: pd.DataFrame) -> pd.
         f"Filling {len(poultry_slaughtered_missing_data)} rows of missing data for slaughtered poultry with "
         "slaughtered chicken."
     )
-    # Add chicken data to the full dataframe.
-    data = pd.concat([data, poultry_slaughtered_missing_data], ignore_index=True)
+    # Add chicken data to the full table.
+    data = pr.concat([data, poultry_slaughtered_missing_data], ignore_index=True)
 
     return data
 
 
-def add_slaughtered_animals_to_meat_total(data: pd.DataFrame) -> pd.DataFrame:
+def add_slaughtered_animals_to_meat_total(data: Table) -> Table:
     """Add number of slaughtered animals to meat total.
 
     There is no FAOSTAT data on slaughtered animals for total meat. We construct this data by aggregating that element
@@ -150,12 +150,12 @@ def add_slaughtered_animals_to_meat_total(data: pd.DataFrame) -> pd.DataFrame:
 
     Parameters
     ----------
-    data : pd.DataFrame
+    data : Table
         Processed data where meat total does not have number of slaughtered animals.
 
     Returns
     -------
-    combined_data : pd.DataFrame
+    combined_data : Table
         Data after adding the new variable.
 
     """
@@ -209,7 +209,7 @@ def add_slaughtered_animals_to_meat_total(data: pd.DataFrame) -> pd.DataFrame:
         .reset_index(drop=True)
     )
 
-    # Create a dataframe with the total number of animals used for meat.
+    # Create a table with the total number of animals used for meat.
     animals = dataframes.groupby_agg(
         data_to_aggregate,
         groupby_columns=[
@@ -285,7 +285,7 @@ def add_slaughtered_animals_to_meat_total(data: pd.DataFrame) -> pd.DataFrame:
     )
 
     # Add a column to inform of all those rows for which we don't have poultry data.
-    compared = pd.merge(animals, country_years_with_poultry_data, how="outer", indicator=True)
+    compared = animals.merge(country_years_with_poultry_data, how="outer", indicator=True)
 
     assert compared[compared["_merge"] == "right_only"].empty, "Expected 'left_only' or 'both', not 'right_only'."
 
@@ -299,9 +299,9 @@ def add_slaughtered_animals_to_meat_total(data: pd.DataFrame) -> pd.DataFrame:
     # Check that we are not missing any column.
     assert set(data.columns) == set(animals_corrected.columns)
 
-    # Add animals data to the original dataframe.
+    # Add animals data to the original table.
     combined_data = (
-        pd.concat([data, animals_corrected], ignore_index=True)
+        pr.concat([data, animals_corrected], ignore_index=True)
         .reset_index(drop=True)
         .astype(
             {
@@ -323,7 +323,7 @@ def add_slaughtered_animals_to_meat_total(data: pd.DataFrame) -> pd.DataFrame:
     return combined_data
 
 
-def add_yield_to_aggregate_regions(data: pd.DataFrame) -> pd.DataFrame:
+def add_yield_to_aggregate_regions(data: Table) -> Table:
     """Add yield (production / area harvested) to data for aggregate regions (i.e. continents and income groups).
 
     This data is not included in aggregate regions because it cannot be aggregated by simply summing the contribution of
@@ -339,12 +339,12 @@ def add_yield_to_aggregate_regions(data: pd.DataFrame) -> pd.DataFrame:
 
     Parameters
     ----------
-    data : pd.DataFrame
+    data : Table
         Data that does not contain yield for aggregate regions.
 
     Returns
     -------
-    combined_data : pd.DataFrame
+    combined_data : Table
         Data after adding yield.
 
     """
@@ -369,13 +369,13 @@ def add_yield_to_aggregate_regions(data: pd.DataFrame) -> pd.DataFrame:
     ].drop_duplicates()
     assert len(additional_fields) == 1
 
-    # Create a dataframe of production of regions.
+    # Create a table of production of regions.
     data_production = data[(data["country"].isin(REGIONS_TO_ADD)) & (data["element_code"] == production_element_code)]
 
-    # Create a dataframe of area of regions.
+    # Create a table of area of regions.
     data_area = data[(data["country"].isin(REGIONS_TO_ADD)) & (data["element_code"] == area_element_code)]
 
-    # Merge the two dataframes and create the new yield variable.
+    # Merge the two tables and create the new yield variable.
     merge_cols = [
         "area_code",
         "year",
@@ -386,8 +386,7 @@ def add_yield_to_aggregate_regions(data: pd.DataFrame) -> pd.DataFrame:
         "item_description",
         "country",
     ]
-    combined = pd.merge(
-        data_production,
+    combined = data_production.merge(
         data_area[merge_cols + ["flag", "value"]],
         on=merge_cols,
         how="inner",
@@ -416,7 +415,7 @@ def add_yield_to_aggregate_regions(data: pd.DataFrame) -> pd.DataFrame:
         combined[field] = additional_fields[field].item()
     assert set(data.columns) == set(combined.columns)
     combined_data = (
-        pd.concat([data, combined], ignore_index=True)
+        pr.concat([data, combined], ignore_index=True)
         .reset_index(drop=True)
         .astype(
             {
@@ -452,18 +451,18 @@ def run(dest_dir: str) -> None:
     ds_meadow = paths.load_dataset(dataset_short_name)
     # Load main table from dataset.
     tb_meadow = ds_meadow[dataset_short_name]
-    data = pd.DataFrame(tb_meadow).reset_index()
+    data = tb_meadow.reset_index()
 
     # Load dataset of FAOSTAT metadata.
     metadata = paths.load_dataset(f"{NAMESPACE}_metadata")
 
     # Load dataset, items, element-units, and countries metadata.
-    dataset_metadata = pd.DataFrame(metadata["datasets"]).loc[dataset_short_name].to_dict()
-    items_metadata = pd.DataFrame(metadata["items"]).reset_index()
+    dataset_metadata = metadata["datasets"].loc[dataset_short_name].to_dict()
+    items_metadata = metadata["items"].reset_index()
     items_metadata = items_metadata[items_metadata["dataset"] == dataset_short_name].reset_index(drop=True)
-    elements_metadata = pd.DataFrame(metadata["elements"]).reset_index()
+    elements_metadata = metadata["elements"].reset_index()
     elements_metadata = elements_metadata[elements_metadata["dataset"] == dataset_short_name].reset_index(drop=True)
-    countries_metadata = pd.DataFrame(metadata["countries"]).reset_index()
+    countries_metadata = metadata["countries"].reset_index()
     amendments = parse_amendments_table(amendments=metadata["amendments"], dataset_short_name=dataset_short_name)
 
     # Load regions dataset.
