@@ -40,10 +40,10 @@ important issues (since we use item_code to merge different datasets, and we use
 import json
 import sys
 from copy import deepcopy
-from typing import Dict, List, Tuple, cast
+from typing import Dict, List, Tuple
 
-import pandas as pd
-from owid import catalog
+import owid.catalog.processing as pr
+from owid.catalog import Dataset, Table
 from owid.datautils import dataframes, io
 from shared import (
     CURRENT_DIR,
@@ -68,23 +68,23 @@ from etl.helpers import PathFinder
 N_ISSUES_ON_ITEMS_FOR_WARNING = 1
 
 
-def create_dataset_descriptions_dataframe_for_domain(table: catalog.Table, dataset_short_name: str) -> pd.DataFrame:
-    """Create a single row dataframe with the dataset name, title and description, for a given domain.
+def create_dataset_descriptions_table_for_domain(table: Table, dataset_short_name: str) -> Table:
+    """Create a single row table with the dataset name, title and description, for a given domain.
 
     Parameters
     ----------
-    table : catalog.Table
+    table : Table
         Latest table for considered domain.
     dataset_short_name : str
         Dataset short name (e.g. 'faostat_qcl').
 
     Returns
     -------
-    dataset_descriptions_df : pd.DataFrame
-        Dataframe of name, title and description of a domain.
+    tb_dataset_descriptions : Table
+        Table of name, title and description of a domain.
 
     """
-    dataset_descriptions_df = pd.DataFrame(
+    tb_dataset_descriptions = Table(
         {
             "dataset": [dataset_short_name],
             "fao_dataset_title": [table.metadata.dataset.title],
@@ -92,29 +92,27 @@ def create_dataset_descriptions_dataframe_for_domain(table: catalog.Table, datas
         }
     )
 
-    return dataset_descriptions_df
+    return tb_dataset_descriptions
 
 
-def clean_global_dataset_descriptions_dataframe(
-    datasets_df: pd.DataFrame, custom_datasets: pd.DataFrame
-) -> pd.DataFrame:
-    """Apply sanity checks to the dataframe gathered from the data of each individual datasets, and add custom dataset
+def clean_global_dataset_descriptions_table(tb_datasets: Table, tb_custom_datasets: Table) -> Table:
+    """Apply sanity checks to the table gathered from the data of each individual datasets, and add custom dataset
     titles and descriptions.
 
     Parameters
     ----------
-    datasets_df : pd.DataFrame
-        Dataframe of descriptions gathered from the data of each individual dataset.
-    custom_datasets : pd.DataFrame
+    tb_datasets : Table
+        Table of descriptions gathered from the data of each individual dataset.
+    tb_custom_datasets : Table
         Data from the custom_datasets.csv file.
 
     Returns
     -------
-    datasets_df : pd.Dataframe
-        Clean dataframe of dataset titles and descriptions (customized and original FAO ones).
+    tb_datasets : Table
+        Clean table of dataset titles and descriptions (customized and original FAO ones).
 
     """
-    datasets_df = datasets_df.copy()
+    tb_datasets = tb_datasets.copy()
 
     # Check that the dataset descriptions of fbsh and fbs are identical.
     error = (
@@ -122,27 +120,26 @@ def clean_global_dataset_descriptions_dataframe(
         "This may happen in the future: Simply check that nothing significant has changed and remove this assertion."
     )
     assert (
-        datasets_df[datasets_df["dataset"] == "faostat_fbsh"]["fao_dataset_description"].item()
-        == datasets_df[datasets_df["dataset"] == "faostat_fbs"]["fao_dataset_description"].item()
+        tb_datasets[tb_datasets["dataset"] == "faostat_fbsh"]["fao_dataset_description"].item()
+        == tb_datasets[tb_datasets["dataset"] == "faostat_fbs"]["fao_dataset_description"].item()
     ), error
     # Drop row for fbsh, and rename "fbs" to "fbsc" (since this will be the name for the combined dataset).
-    datasets_df = datasets_df[datasets_df["dataset"] != "faostat_fbsh"].reset_index(drop=True)
-    datasets_df.loc[datasets_df["dataset"] == "faostat_fbs", "dataset"] = "faostat_fbsc"
+    tb_datasets = tb_datasets[tb_datasets["dataset"] != "faostat_fbsh"].reset_index(drop=True)
+    tb_datasets.loc[tb_datasets["dataset"] == "faostat_fbs", "dataset"] = "faostat_fbsc"
 
     # Add custom dataset titles.
-    datasets_df = pd.merge(
-        datasets_df,
-        custom_datasets,
+    tb_datasets = tb_datasets.merge(
+        tb_custom_datasets,
         on="dataset",
         how="left",
         suffixes=("_new", "_old"),
     )
 
-    changed_titles = datasets_df[
-        datasets_df["fao_dataset_title_old"].fillna("") != datasets_df["fao_dataset_title_new"].fillna("")
+    changed_titles = tb_datasets[
+        tb_datasets["fao_dataset_title_old"].fillna("") != tb_datasets["fao_dataset_title_new"].fillna("")
     ]
-    changed_descriptions = datasets_df[
-        datasets_df["fao_dataset_description_old"].fillna("") != datasets_df["fao_dataset_description_new"].fillna("")
+    changed_descriptions = tb_datasets[
+        tb_datasets["fao_dataset_description_old"].fillna("") != tb_datasets["fao_dataset_description_new"].fillna("")
     ]
 
     if len(changed_titles) > 0:
@@ -151,29 +148,29 @@ def clean_global_dataset_descriptions_dataframe(
         log.warning(
             f"{len(changed_descriptions)} domains have changed descriptions. " f"Consider updating custom_datasets.csv."
         )
-    datasets_df = datasets_df.drop(columns=["fao_dataset_title_old", "fao_dataset_description_old"]).rename(
+    tb_datasets = tb_datasets.drop(columns=["fao_dataset_title_old", "fao_dataset_description_old"]).rename(
         columns={
             "fao_dataset_title_new": "fao_dataset_title",
             "fao_dataset_description_new": "fao_dataset_description",
         }
     )
 
-    datasets_df["owid_dataset_title"] = datasets_df["owid_dataset_title"].fillna(datasets_df["fao_dataset_title"])
+    tb_datasets["owid_dataset_title"] = tb_datasets["owid_dataset_title"].fillna(tb_datasets["fao_dataset_title"])
     error = "Custom titles for different datasets are equal. Edit custom_datasets.csv file."
-    assert len(set(datasets_df["dataset"])) == len(set(datasets_df["owid_dataset_title"])), error
+    assert len(set(tb_datasets["dataset"])) == len(set(tb_datasets["owid_dataset_title"])), error
 
     # The final description will be the owid description (if there is any) followed by the original FAO description
     # (if there is any).
-    datasets_df["owid_dataset_description"] = [
+    tb_datasets["owid_dataset_description"] = [
         prepare_dataset_description(
             fao_description=dataset["fao_dataset_description"],
             owid_description=dataset["owid_dataset_description"],
         )
-        for _, dataset in datasets_df.fillna("").iterrows()
+        for _, dataset in tb_datasets.fillna("").iterrows()
     ]
 
     # Reorder columns.
-    datasets_df = datasets_df[
+    tb_datasets = tb_datasets[
         [
             "dataset",
             "fao_dataset_title",
@@ -183,11 +180,11 @@ def clean_global_dataset_descriptions_dataframe(
         ]
     ]
 
-    return datasets_df
+    return tb_datasets
 
 
 def check_that_item_and_element_harmonization_does_not_trim_codes(
-    data: pd.DataFrame, dataset_short_name: str, category: str
+    data: Table, dataset_short_name: str, category: str
 ) -> None:
     # Ensure that the number of digits of all item and element codes is smaller than the limits defined
     # at the beginning of the garden shared module, by N_CHARACTERS_ITEM_CODE and N_CHARACTERS_ELEMENT_CODE,
@@ -209,36 +206,34 @@ def check_that_item_and_element_harmonization_does_not_trim_codes(
     assert all([len(str(code)) <= n_characters[category] for code in data[f"{category}_code"].unique()]), error
 
 
-def create_items_dataframe_for_domain(
-    table: catalog.Table, metadata: catalog.Dataset, dataset_short_name: str
-) -> pd.DataFrame:
+def create_items_table_for_domain(table: Table, metadata: Dataset, dataset_short_name: str) -> Table:
     """Apply sanity checks to the items of a table in a dataset, and to the items from the metadata, harmonize all item
     codes and items, and add item descriptions.
 
     Parameters
     ----------
-    table : catalog.Table
+    table : Table
         Data for a given domain.
-    metadata: catalog.Dataset
+    metadata: Dataset
          Metadata dataset from meadow.
     dataset_short_name : str
         Dataset short name (e.g. 'faostat_qcl').
 
     Returns
     -------
-    items_from_data : pd.Dataframe
+    items_from_data : Table
         Item names and descriptions (customized ones and FAO original ones) for a particular domain.
 
     """
-    df = pd.DataFrame(table).reset_index()
+    tb = table.reset_index()
 
     # Load items from data.
     items_from_data = (
-        df.rename(columns={"item": "fao_item"})[["item_code", "fao_item"]].drop_duplicates().reset_index(drop=True)
+        tb.rename(columns={"item": "fao_item"})[["item_code", "fao_item"]].drop_duplicates().reset_index(drop=True)
     )
     # Sanity check.
     check_that_item_and_element_harmonization_does_not_trim_codes(
-        data=df, dataset_short_name=dataset_short_name, category="item"
+        data=tb, dataset_short_name=dataset_short_name, category="item"
     )
     # Ensure items are well constructed and amend already known issues (defined in shared.ITEM_AMENDMENTS).
     items_from_data = harmonize_items(tb=items_from_data, dataset_short_name=dataset_short_name, item_col="fao_item")
@@ -254,19 +249,19 @@ def create_items_dataframe_for_domain(
         # This is the case for faostat_qv since last version.
         return items_from_data
 
-    _items_df = (
+    _tb_items = (
         _metadata[list(items_columns)]
         .rename(columns=items_columns)
         .drop_duplicates()
         .sort_values(list(items_columns.values()))
         .reset_index(drop=True)
     )
-    _items_df = harmonize_items(tb=_items_df, dataset_short_name=dataset_short_name, item_col="fao_item")
-    _items_df["fao_item_description"] = _items_df["fao_item_description"].astype("string")
+    _tb_items = harmonize_items(tb=_tb_items, dataset_short_name=dataset_short_name, item_col="fao_item")
+    _tb_items["fao_item_description"] = _tb_items["fao_item_description"].astype("string")
 
     # Add descriptions (from metadata) to items (from data).
     items_from_data = (
-        pd.merge(items_from_data, _items_df, on=["item_code", "fao_item"], how="left")
+        items_from_data.merge(_tb_items, on=["item_code", "fao_item"], how="left")
         .sort_values(["item_code", "fao_item"])
         .reset_index(drop=True)
     )
@@ -282,15 +277,14 @@ def create_items_dataframe_for_domain(
 
     # Check that all item codes in data are defined in metadata, and check that the mapping item code -> item in
     # the data is the same as in the metadata (which often is not the case).
-    compared = pd.merge(
-        items_from_data[["item_code", "fao_item"]],
-        _items_df[["item_code", "fao_item"]],
+    compared = items_from_data[["item_code", "fao_item"]].merge(
+        _tb_items[["item_code", "fao_item"]],
         on="item_code",
         how="left",
         suffixes=("_in_data", "_in_metadata"),
     )
     different_items = compared[compared["fao_item_in_data"] != compared["fao_item_in_metadata"]]
-    missing_item_codes = set(items_from_data["item_code"]) - set(_items_df["item_code"])
+    missing_item_codes = set(items_from_data["item_code"]) - set(_tb_items["item_code"])
     if (len(different_items) + len(missing_item_codes)) > N_ISSUES_ON_ITEMS_FOR_WARNING:
         log.warning(
             f"{len(missing_item_codes)} item codes in {dataset_short_name} missing in metadata. "
@@ -300,49 +294,51 @@ def create_items_dataframe_for_domain(
     return items_from_data
 
 
-def clean_global_items_dataframe(items_df: pd.DataFrame, custom_items: pd.DataFrame) -> pd.DataFrame:
-    """Apply global sanity checks to items gathered from all datasets, and create a clean global items dataframe.
+def clean_global_items_table(tb_items: Table, custom_items: Table) -> Table:
+    """Apply global sanity checks to items gathered from all datasets, and create a clean global items table.
 
     Parameters
     ----------
-    items_df : pd.DataFrame
-        Items dataframe gathered from all domains.
-    custom_items : pd.DataFrame
+    tb_items : Table
+        Items table gathered from all domains.
+    custom_items : Table
         Data from custom_items.csv file.
 
     Returns
     -------
-    items_df : pd.DataFrame
-        Clean global items dataframe.
+    tb_items : Table
+        Clean global items table.
 
     """
-    items_df = items_df.copy()
+    tb_items = tb_items.copy()
 
     # Check that fbs and fbsh have the same contributions, remove one of them, and rename the other to fbsc.
-    check = pd.merge(
-        items_df[items_df["dataset"] == "faostat_fbsh"].reset_index(drop=True)[["item_code", "fao_item"]],
-        items_df[items_df["dataset"] == "faostat_fbs"].reset_index(drop=True)[["item_code", "fao_item"]],
-        how="outer",
-        on=["item_code"],
-        suffixes=("_fbsh", "_fbs"),
+    check = (
+        tb_items[tb_items["dataset"] == "faostat_fbsh"]
+        .reset_index(drop=True)[["item_code", "fao_item"]]
+        .merge(
+            tb_items[tb_items["dataset"] == "faostat_fbs"].reset_index(drop=True)[["item_code", "fao_item"]],
+            how="outer",
+            on=["item_code"],
+            suffixes=("_fbsh", "_fbs"),
+        )
     )
     assert (check["fao_item_fbsh"] == check["fao_item_fbs"]).all()
     # Drop all rows for fbsh, and rename "fbs" to "fbsc" (since this will be the name for the combined dataset).
-    items_df = items_df[items_df["dataset"] != "faostat_fbsh"].reset_index(drop=True)
-    items_df.loc[items_df["dataset"] == "faostat_fbs", "dataset"] = "faostat_fbsc"
+    tb_items = tb_items[tb_items["dataset"] != "faostat_fbsh"].reset_index(drop=True)
+    tb_items.loc[tb_items["dataset"] == "faostat_fbs", "dataset"] = "faostat_fbsc"
 
     # Add custom item names.
-    items_df = pd.merge(
-        items_df,
+    tb_items = tb_items.merge(
         custom_items.rename(columns={"fao_item": "fao_item_check"}),
         on=["dataset", "item_code"],
         how="left",
         suffixes=("_new", "_old"),
     )
 
-    changed_descriptions = items_df[
-        (items_df["fao_item_description_old"] != items_df["fao_item_description_new"])
-        & (items_df["fao_item_description_old"].notnull())
+    changed_descriptions = tb_items[
+        (tb_items["fao_item_description_old"] != tb_items["fao_item_description_new"])
+        & (tb_items["fao_item_description_old"].notnull())
     ]
     if len(changed_descriptions) > 0:
         log.warning(
@@ -350,32 +346,32 @@ def clean_global_items_dataframe(items_df: pd.DataFrame, custom_items: pd.DataFr
             f"Consider updating custom_items.csv."
         )
 
-    items_df = items_df.drop(columns="fao_item_description_old").rename(
+    tb_items = tb_items.drop(columns="fao_item_description_old").rename(
         columns={"fao_item_description_new": "fao_item_description"}
     )
 
     # Check that item names have not changed.
     # NOTE: This condition used to raise an error if not fulfilled. Consider making it an assertion.
     if not (
-        items_df[items_df["fao_item_check"].notnull()]["fao_item_check"]
-        == items_df[items_df["fao_item_check"].notnull()]["fao_item"]
+        tb_items[tb_items["fao_item_check"].notnull()]["fao_item_check"]
+        == tb_items[tb_items["fao_item_check"].notnull()]["fao_item"]
     ).all():
         log.warning("Item names may have changed with respect to custom items file. Update custom items file.")
-    items_df = items_df.drop(columns=["fao_item_check"])
+    tb_items = tb_items.drop(columns=["fao_item_check"])
 
     # Assign original FAO name to all owid items that do not have a custom name.
-    items_df["owid_item"] = items_df["owid_item"].fillna(items_df["fao_item"])
+    tb_items["owid_item"] = tb_items["owid_item"].fillna(tb_items["fao_item"])
 
     # Add custom item descriptions, and assign original FAO descriptions to items that do not have a custom description.
-    items_df["owid_item_description"] = items_df["owid_item_description"].fillna(items_df["fao_item_description"])
+    tb_items["owid_item_description"] = tb_items["owid_item_description"].fillna(tb_items["fao_item_description"])
 
     # Check that we have not introduced ambiguities when assigning custom item names.
-    n_owid_items_per_item_code = items_df.groupby(["dataset", "item_code"])["owid_item"].transform("nunique")
+    n_owid_items_per_item_code = tb_items.groupby(["dataset", "item_code"])["owid_item"].transform("nunique")
     error = "Multiple owid items for a given item code in a dataset."
-    assert items_df[n_owid_items_per_item_code > 1].empty, error
+    assert tb_items[n_owid_items_per_item_code > 1].empty, error
 
-    items_df = (
-        items_df[
+    tb_items = (
+        tb_items[
             [
                 "dataset",
                 "item_code",
@@ -389,36 +385,34 @@ def clean_global_items_dataframe(items_df: pd.DataFrame, custom_items: pd.DataFr
         .reset_index(drop=True)
     )
 
-    return items_df
+    return tb_items
 
 
-def create_elements_dataframe_for_domain(
-    table: catalog.Table, metadata: catalog.Dataset, dataset_short_name: str
-) -> pd.DataFrame:
+def create_elements_table_for_domain(table: Table, metadata: Dataset, dataset_short_name: str) -> Table:
     """Apply sanity checks to the elements and units of a table in a dataset, and to the elements and units from the
     metadata, harmonize all element code, and add descriptions.
 
     Parameters
     ----------
-    table : catalog.Table
+    table : Table
         Data for a given domain.
-    metadata: catalog.Dataset
+    metadata: Dataset
          Additional metadata dataset from meadow.
     dataset_short_name : str
         Dataset short name (e.g. 'faostat_qcl').
 
     Returns
     -------
-    elements_from_data : pd.Dataframe
+    elements_from_data : Table
         Element names and descriptions and unit names and descriptions (customized ones and FAO original ones) for a
         particular domain.
 
     """
 
-    df = pd.DataFrame(table).reset_index()
+    tb = table.reset_index()
     # Load elements from data.
     elements_from_data = (
-        df.rename(columns={"element": "fao_element", "unit": "fao_unit_short_name"})[
+        tb.rename(columns={"element": "fao_element", "unit": "fao_unit_short_name"})[
             ["element_code", "fao_element", "fao_unit_short_name"]
         ]
         .drop_duplicates()
@@ -426,7 +420,7 @@ def create_elements_dataframe_for_domain(
     )
     # Sanity check.
     check_that_item_and_element_harmonization_does_not_trim_codes(
-        data=df, dataset_short_name=dataset_short_name, category="element"
+        data=tb, dataset_short_name=dataset_short_name, category="element"
     )
     # Ensure element_code is always a string of a fix number of characters.
     elements_from_data = harmonize_elements(
@@ -447,24 +441,24 @@ def create_elements_dataframe_for_domain(
         # This is the case for faostat_qv since last version.
         return elements_from_data
 
-    _elements_df = (
+    _tb_elements = (
         _metadata[list(elements_columns)]
         .rename(columns=elements_columns)
         .drop_duplicates()
         .sort_values(list(elements_columns.values()))
         .reset_index(drop=True)
     )
-    _elements_df = harmonize_elements(
-        tb=_elements_df, dataset_short_name=dataset_short_name, element_col="fao_element", unit_col=None
+    _tb_elements = harmonize_elements(
+        tb=_tb_elements, dataset_short_name=dataset_short_name, element_col="fao_element", unit_col=None
     )
-    _elements_df["fao_element_description"] = _elements_df["fao_element_description"].astype("string")
+    _tb_elements["fao_element_description"] = _tb_elements["fao_element_description"].astype("string")
 
     # Load units metadata.
     units_columns = {
         "unit_name": "fao_unit_short_name",
         "description": "fao_unit",
     }
-    _units_df = (
+    _tb_units = (
         metadata[f"{dataset_short_name}_unit"]
         .reset_index()[list(units_columns)]
         .rename(columns=units_columns)
@@ -472,13 +466,12 @@ def create_elements_dataframe_for_domain(
         .sort_values(list(units_columns.values()))
         .reset_index(drop=True)
     )
-    _units_df["fao_unit"] = _units_df["fao_unit"].astype("string")
+    _tb_units["fao_unit"] = _tb_units["fao_unit"].astype("string")
 
     # Add element descriptions (from metadata).
     elements_from_data = (
-        pd.merge(
-            elements_from_data,
-            _elements_df,
+        elements_from_data.merge(
+            _tb_elements,
             on=["element_code", "fao_element"],
             how="left",
         )
@@ -490,7 +483,7 @@ def create_elements_dataframe_for_domain(
 
     # Add unit descriptions (from metadata).
     elements_from_data = (
-        pd.merge(elements_from_data, _units_df, on=["fao_unit_short_name"], how="left")
+        elements_from_data.merge(_tb_units, on=["fao_unit_short_name"], how="left")
         .sort_values(["fao_unit_short_name"])
         .reset_index(drop=True)
     )
@@ -499,9 +492,9 @@ def create_elements_dataframe_for_domain(
     # Sanity checks:
 
     # Check that in data, there is only one unit per element code.
-    n_units_per_element_code = df.groupby("element_code")["unit"].transform("nunique")
+    n_units_per_element_code = tb.groupby("element_code")["unit"].transform("nunique")
     error = f"Multiple units for a given element code in dataset {dataset_short_name}."
-    assert df[n_units_per_element_code > 1].empty, error
+    assert tb[n_units_per_element_code > 1].empty, error
 
     # Check that in data, there is only one element per element code.
     n_elements_per_element_code = elements_from_data.groupby("element_code")["fao_element"].transform("nunique")
@@ -511,37 +504,36 @@ def create_elements_dataframe_for_domain(
     return elements_from_data
 
 
-def clean_global_elements_dataframe(elements_df: pd.DataFrame, custom_elements: pd.DataFrame) -> pd.DataFrame:
+def clean_global_elements_table(tb_elements: Table, custom_elements: Table) -> Table:
     """Apply global sanity checks to elements and units gathered from all datasets, and create a clean global elements
-    and units dataframe.
+    and units table.
 
     Parameters
     ----------
-    elements_df : pd.DataFrame
-        Elements and units dataframe gathered from all domains.
-    custom_elements : pd.DataFrame
+    tb_elements : Table
+        Elements and units table gathered from all domains.
+    custom_elements : Table
         Data from custom_element_and_units.csv file.
 
     Returns
     -------
-    elements_df : pd.DataFrame
-        Clean global elements and units dataframe.
+    tb_elements : Table
+        Clean global elements and units table.
 
     """
-    elements_df = elements_df.copy()
+    tb_elements = tb_elements.copy()
 
     # Check that all elements of fbsh are in fbs (although fbs may contain additional elements).
     assert (
-        set(elements_df[elements_df["dataset"] == "faostat_fbsh"]["element_code"])
-        - set(elements_df[elements_df["dataset"] == "faostat_fbs"]["element_code"])
+        set(tb_elements[tb_elements["dataset"] == "faostat_fbsh"]["element_code"])
+        - set(tb_elements[tb_elements["dataset"] == "faostat_fbs"]["element_code"])
         == ELEMENTS_IN_FBSH_MISSING_IN_FBS
     ), "There are new elements in fbsh that are not in fbs. Add them to ELEMENTS_IN_FBSH_MISSING_IN_FBS."
     # Drop all rows for fbsh, and rename "fbs" to "fbsc" (since this will be the name for the combined dataset).
-    elements_df = elements_df[elements_df["dataset"] != "faostat_fbsh"].reset_index(drop=True)
-    elements_df.loc[elements_df["dataset"] == "faostat_fbs", "dataset"] = "faostat_fbsc"
+    tb_elements = tb_elements[tb_elements["dataset"] != "faostat_fbsh"].reset_index(drop=True)
+    tb_elements.loc[tb_elements["dataset"] == "faostat_fbs", "dataset"] = "faostat_fbsc"
 
-    elements_df = pd.merge(
-        elements_df,
+    tb_elements = tb_elements.merge(
         custom_elements.rename(
             columns={
                 "fao_element": "fao_element_check",
@@ -553,15 +545,15 @@ def clean_global_elements_dataframe(elements_df: pd.DataFrame, custom_elements: 
         suffixes=("_new", "_old"),
     )
 
-    changed_units = elements_df[
-        (elements_df["fao_unit_new"] != elements_df["fao_unit_old"]) & (elements_df["fao_unit_old"].notnull())
+    changed_units = tb_elements[
+        (tb_elements["fao_unit_new"] != tb_elements["fao_unit_old"]) & (tb_elements["fao_unit_old"].notnull())
     ]
     if len(changed_units) > 0:
         log.warning(f"{len(changed_units)} domains have changed units, consider updating custom_elements.csv.")
 
-    changed_descriptions = elements_df[
-        (elements_df["fao_element_description_new"] != elements_df["fao_element_description_old"])
-        & (elements_df["fao_element_description_old"].notnull())
+    changed_descriptions = tb_elements[
+        (tb_elements["fao_element_description_new"] != tb_elements["fao_element_description_old"])
+        & (tb_elements["fao_element_description_old"].notnull())
     ]
     if len(changed_descriptions) > 0:
         log.warning(
@@ -569,7 +561,7 @@ def clean_global_elements_dataframe(elements_df: pd.DataFrame, custom_elements: 
             f"Consider updating custom_elements.csv."
         )
 
-    elements_df = elements_df.drop(columns=["fao_unit_old", "fao_element_description_old"]).rename(
+    tb_elements = tb_elements.drop(columns=["fao_unit_old", "fao_element_description_old"]).rename(
         columns={
             "fao_element_description_new": "fao_element_description",
             "fao_unit_new": "fao_unit",
@@ -578,59 +570,59 @@ def clean_global_elements_dataframe(elements_df: pd.DataFrame, custom_elements: 
 
     # Check if element or unit names have changed with respect to the custom elements and units file.
     # NOTE: This raises an error instead of a warning because further steps will (certainly?) fail.
-    changed_elements = elements_df[
-        elements_df["fao_element_check"].notnull() & (elements_df["fao_element_check"] != elements_df["fao_element"])
+    changed_elements = tb_elements[
+        tb_elements["fao_element_check"].notnull() & (tb_elements["fao_element_check"] != tb_elements["fao_element"])
     ][["fao_element_check", "fao_element"]]
     if len(changed_elements) > 0:
         log.error(
             f"{len(changed_elements)} element names have changed with respect to custom elements file. Use `update_custom_metadata.py` to update custom elements file."
         )
-    elements_df = elements_df.drop(columns=["fao_element_check"])
+    tb_elements = tb_elements.drop(columns=["fao_element_check"])
 
-    changed_units = elements_df[
-        elements_df["fao_unit_short_name_check"].notnull()
-        & (elements_df["fao_unit_short_name_check"] != elements_df["fao_unit_short_name"])
+    changed_units = tb_elements[
+        tb_elements["fao_unit_short_name_check"].notnull()
+        & (tb_elements["fao_unit_short_name_check"] != tb_elements["fao_unit_short_name"])
     ][["fao_unit_short_name_check", "fao_unit_short_name"]]
     if len(changed_units) > 0:
         log.error(
             f"{len(changed_units)} unit names have changed with respect to custom elements file. Use `update_custom_metadata.py` to update custom elements file."
         )
-    elements_df = elements_df.drop(columns=["fao_unit_short_name_check"])
+    tb_elements = tb_elements.drop(columns=["fao_unit_short_name_check"])
 
     # Assign original FAO names where there is no custom one.
-    elements_df["owid_element"] = elements_df["owid_element"].fillna(elements_df["fao_element"])
-    elements_df["owid_unit"] = elements_df["owid_unit"].fillna(elements_df["fao_unit"])
-    elements_df["owid_element_description"] = elements_df["owid_element_description"].fillna(
-        elements_df["fao_element_description"]
+    tb_elements["owid_element"] = tb_elements["owid_element"].fillna(tb_elements["fao_element"])
+    tb_elements["owid_unit"] = tb_elements["owid_unit"].fillna(tb_elements["fao_unit"])
+    tb_elements["owid_element_description"] = tb_elements["owid_element_description"].fillna(
+        tb_elements["fao_element_description"]
     )
-    elements_df["owid_unit_short_name"] = elements_df["owid_unit_short_name"].fillna(elements_df["fao_unit_short_name"])
+    tb_elements["owid_unit_short_name"] = tb_elements["owid_unit_short_name"].fillna(tb_elements["fao_unit_short_name"])
 
     # Assume variables were not per capita, if was_per_capita is not informed, and make boolean.
-    elements_df["was_per_capita"] = elements_df["was_per_capita"].fillna("0").replace({"0": False, "1": True})
+    tb_elements["was_per_capita"] = tb_elements["was_per_capita"].fillna("0").replace({"0": False, "1": True})
 
     # Idem for variables to make per capita.
-    elements_df["make_per_capita"] = elements_df["make_per_capita"].fillna("0").replace({"0": False, "1": True})
+    tb_elements["make_per_capita"] = tb_elements["make_per_capita"].fillna("0").replace({"0": False, "1": True})
 
     # Check that we have not introduced ambiguities when assigning custom element or unit names.
-    n_owid_elements_per_element_code = elements_df.groupby(["dataset", "element_code"])["owid_element"].transform(
+    n_owid_elements_per_element_code = tb_elements.groupby(["dataset", "element_code"])["owid_element"].transform(
         "nunique"
     )
     error = "Multiple owid elements for a given element code in a dataset."
-    assert elements_df[n_owid_elements_per_element_code > 1].empty, error
+    assert tb_elements[n_owid_elements_per_element_code > 1].empty, error
 
     # Check that we have not introduced ambiguities when assigning custom element or unit names.
-    n_owid_units_per_element_code = elements_df.groupby(["dataset", "element_code"])["owid_unit"].transform("nunique")
+    n_owid_units_per_element_code = tb_elements.groupby(["dataset", "element_code"])["owid_unit"].transform("nunique")
     error = "Multiple owid elements for a given element code in a dataset."
-    assert elements_df[n_owid_units_per_element_code > 1].empty, error
+    assert tb_elements[n_owid_units_per_element_code > 1].empty, error
 
     # NOTE: We assert that there is one element for each element code. But the opposite may not be true: there can be
     # multiple element codes with the same element. And idem for items.
 
-    return elements_df
+    return tb_elements
 
 
 def check_countries_to_exclude_or_harmonize(
-    countries_in_data: pd.DataFrame, excluded_countries: List[str], countries_harmonization: Dict[str, str]
+    countries_in_data: Table, excluded_countries: List[str], countries_harmonization: Dict[str, str]
 ) -> None:
     # Check that all excluded countries are in the data.
     unknown_excluded_countries = set(excluded_countries) - set(countries_in_data["fao_country"])
@@ -650,18 +642,18 @@ def check_countries_to_exclude_or_harmonize(
     assert len(unknown_countries) == 0, error
 
 
-def clean_global_countries_dataframe(
-    countries_in_data: pd.DataFrame,
+def clean_global_countries_table(
+    countries_in_data: Table,
     country_groups: Dict[str, List[str]],
     countries_harmonization: Dict[str, str],
     excluded_countries: List[str],
-) -> pd.DataFrame:
-    """Clean dataframe of countries gathered from the data of the individual domains, harmonize country names (and
-    country names of members of regions), and create a clean global countries dataframe.
+) -> Table:
+    """Clean table of countries gathered from the data of the individual domains, harmonize country names (and
+    country names of members of regions), and create a clean global countries table.
 
     Parameters
     ----------
-    countries_in_data : pd.DataFrame
+    countries_in_data : Table
         Countries gathered from the data of all domains.
     country_groups : dict
         Countries and their members, gathered from the data.
@@ -672,11 +664,11 @@ def clean_global_countries_dataframe(
 
     Returns
     -------
-    countries_df : pd.DataFrame
-        Clean global countries dataframe.
+    tb_countries : Table
+        Clean global countries table.
 
     """
-    countries_df = countries_in_data.copy()
+    tb_countries = countries_in_data.copy()
 
     # Sanity checks.
     check_countries_to_exclude_or_harmonize(
@@ -693,8 +685,8 @@ def clean_global_countries_dataframe(
     }
 
     # Harmonize country names.
-    countries_df["country"] = dataframes.map_series(
-        series=countries_df["fao_country"],
+    tb_countries["country"] = dataframes.map_series(
+        series=tb_countries["fao_country"],
         mapping=countries_harmonization,
         warn_on_missing_mappings=False,
         warn_on_unused_mappings=False,
@@ -702,28 +694,28 @@ def clean_global_countries_dataframe(
         show_full_warning=True,
     )
 
-    # Add country members to countries dataframe.
-    countries_df["members"] = dataframes.map_series(
-        series=countries_df["country"],
+    # Add country members to countries table.
+    tb_countries["members"] = dataframes.map_series(
+        series=tb_countries["country"],
         mapping=country_groups_harmonized,
         make_unmapped_values_nan=True,
     )
 
     # Feather does not support object types, so convert column of lists to column of strings.
-    countries_df["members"] = [
-        json.dumps(members) if isinstance(members, list) else members for members in countries_df["members"]
+    tb_countries["members"] = [
+        json.dumps(members) if isinstance(members, list) else members for members in tb_countries["members"]
     ]
 
-    return countries_df
+    return tb_countries
 
 
-def create_table(df: pd.DataFrame, short_name: str, index_cols: List[str]) -> catalog.Table:
-    """Create a table with optimal format and basic metadata, out of a dataframe.
+def create_table(tb: Table, short_name: str, index_cols: List[str]) -> Table:
+    """Create a table with optimal format and basic metadata, out of a table.
 
     Parameters
     ----------
-    df : pd.DataFrame
-        Input dataframe.
+    tb : Table
+        Input table.
     short_name : str
         Short name to add in the metadata of the new table.
     index_cols : list
@@ -731,11 +723,11 @@ def create_table(df: pd.DataFrame, short_name: str, index_cols: List[str]) -> ca
 
     Returns
     -------
-    table : catalog.Table
+    table : Table
         New table.
 
     """
-    table = catalog.Table(df).copy()
+    table = Table(tb).copy()
 
     # Optimize column dtypes before storing feather file, and ensure codes are categories (instead of ints).
     table = optimize_table_dtypes(table)
@@ -746,25 +738,25 @@ def create_table(df: pd.DataFrame, short_name: str, index_cols: List[str]) -> ca
     table.metadata.short_name = short_name
     table.metadata.primary_key = index_cols
 
-    return cast(catalog.Table, table)
+    return table
 
 
 def check_that_flag_definitions_in_dataset_agree_with_those_in_flags_ranking(
-    metadata: catalog.Dataset,
+    metadata: Dataset,
 ) -> None:
     """Check that the definition of flags in the additional metadata for current dataset agree with the ones we have
     manually written down in our flags ranking (raise error otherwise).
 
     Parameters
     ----------
-    metadata : catalog.Dataset
+    metadata : Dataset
         Additional metadata dataset (that must contain one table for current dataset).
 
     """
     for table_name in metadata.table_names:
         if ("flag" in table_name) and ("flags" in metadata[table_name].columns):
-            flag_df = metadata[table_name].reset_index()
-            comparison = pd.merge(FLAGS_RANKING, flag_df, on="flag", how="inner")
+            tb_flag = metadata[table_name].reset_index()
+            comparison = FLAGS_RANKING.merge(tb_flag, on="flag", how="inner")
             error_message = (
                 f"Flag definitions in file {table_name} are different to those in our flags ranking. "
                 f"Redefine shared.FLAGS_RANKING."
@@ -772,23 +764,23 @@ def check_that_flag_definitions_in_dataset_agree_with_those_in_flags_ranking(
             assert (comparison["description"] == comparison["flags"]).all(), error_message
 
 
-def check_that_all_flags_in_dataset_are_in_ranking(table: catalog.Table, metadata_for_flags: catalog.Table) -> None:
+def check_that_all_flags_in_dataset_are_in_ranking(table: Table, metadata_for_flags: Table) -> None:
     """Check that all flags found in current dataset are defined in our flags ranking (raise error otherwise).
 
     Parameters
     ----------
-    table : pd.DataFrame
+    table : Table
         Data table for current dataset.
-    metadata_for_flags : catalog.Table
+    metadata_for_flags : Table
         Flags for current dataset, as defined in dataset of additional metadata.
 
     """
     if not set(table["flag"]) < set(FLAGS_RANKING["flag"]):
         missing_flags = set(table["flag"]) - set(FLAGS_RANKING["flag"])
-        flags_data = pd.DataFrame(metadata_for_flags).reset_index()
+        flags_data = metadata_for_flags.reset_index()
         if set(missing_flags) < set(flags_data["flag"]):
             message = "Missing flags. Copy the following lines to FLAGS_RANKING (and put them in the right order):"
-            for i, j in pd.DataFrame(metadata_for_flags).loc[list(missing_flags)].iterrows():
+            for i, j in metadata_for_flags.loc[list(missing_flags)].iterrows():
                 message += f"\n{(i, j['flags'])},"
             log.warning(message)
         else:
@@ -799,9 +791,7 @@ def check_that_all_flags_in_dataset_are_in_ranking(table: catalog.Table, metadat
         raise AssertionError("Flags in dataset not found in FLAGS_RANKING. Manually add those flags.")
 
 
-def check_definitions_in_value_amendments(
-    table: catalog.Table, dataset_short_name: str, value_amendments: pd.DataFrame
-) -> None:
+def check_definitions_in_value_amendments(table: Table, dataset_short_name: str, value_amendments: Table) -> None:
     """Check definitions in the value_amendments.csv file.
 
     This function will assert that:
@@ -813,11 +803,11 @@ def check_definitions_in_value_amendments(
 
     Parameters
     ----------
-    table : catalog.Table
+    table : Table
         _description_
     dataset_short_name : str
         _description_
-    value_amendments : pd.DataFrame
+    value_amendments : Table
         _description_
     """
     # Regular expression used to search for spurious values in the "value" column.
@@ -848,45 +838,45 @@ def check_definitions_in_value_amendments(
 
 def process_metadata(
     paths: PathFinder,
-    metadata: catalog.Dataset,
-    custom_datasets: pd.DataFrame,
-    custom_elements: pd.DataFrame,
-    custom_items: pd.DataFrame,
+    metadata: Dataset,
+    custom_datasets: Table,
+    custom_elements: Table,
+    custom_items: Table,
     countries_harmonization: Dict[str, str],
     excluded_countries: List[str],
-    value_amendments: pd.DataFrame,
-) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+    value_amendments: Table,
+) -> Tuple[Table, Table, Table, Table]:
     """Apply various sanity checks, gather data (about dataset, item, element and unit names and descriptions) from all
-    domains, compare with data from its corresponding metadata file, and create clean dataframes of metadata about
+    domains, compare with data from its corresponding metadata file, and create clean tables of metadata about
     dataset, elements, units, items, and countries.
 
     Parameters
     ----------
-    metadata : catalog.Dataset
+    metadata : Dataset
         Additional metadata dataset from meadow.
-    custom_datasets : pd.DataFrame
+    custom_datasets : Table
         Data from custom_datasets.csv file.
-    custom_elements : pd.DataFrame
+    custom_elements : Table
         Data from custom_elements_and_units.csv file.
-    custom_items : pd.DataFrame
+    custom_items : Table
         Data from custom_items.csv file.
     countries_harmonization : dict
         Data from faostat.countries.json file.
     excluded_countries : list
         Data from faostat.excluded_countries.json file.
-    value_amendments : pd.DataFrame
+    value_amendments : Table
         Data from value_amendments.csv file.
 
     Returns
     -------
-    countries_df : pd.DataFrame
-        Clean dataframe of global countries.
-    datasets_df : pd.DataFrame
-        Clean dataframe of global dataset names and descriptions.
-    elements_df : pd.DataFrame
-        Clean dataframe of global element and unit names and descriptions.
-    items_df : pd.DataFrame
-        Clean dataframe of global item names and descriptions.
+    tb_countries : Table
+        Clean table of global countries.
+    tb_datasets : Table
+        Clean table of global dataset names and descriptions.
+    tb_elements : Table
+        Clean table of global element and unit names and descriptions.
+    tb_items : Table
+        Clean table of global item names and descriptions.
 
     """
     # Check if flags definitions need to be updated.
@@ -897,12 +887,12 @@ def process_metadata(
         set([NAMESPACE + "_" + table_name.split("_")[1] for table_name in metadata.table_names])
     )
 
-    # Initialise dataframe of dataset descriptions, items, and element-units.
-    # We cannot remove "dataset" from the items and elements dataframes, because it can happen that, for a given
+    # Initialise table of dataset descriptions, items, and element-units.
+    # We cannot remove "dataset" from the items and elements tables, because it can happen that, for a given
     # item code, the item name is slightly different in two different datasets.
-    datasets_df = pd.DataFrame({"dataset": [], "fao_dataset_title": [], "fao_dataset_description": []})
-    items_df = pd.DataFrame({"dataset": [], "item_code": [], "fao_item": [], "fao_item_description": []})
-    elements_df = pd.DataFrame(
+    tb_datasets = Table({"dataset": [], "fao_dataset_title": [], "fao_dataset_description": []})
+    tb_items = Table({"dataset": [], "item_code": [], "fao_item": [], "fao_item_description": []})
+    tb_elements = Table(
         {
             "dataset": [],
             "element_code": [],
@@ -914,7 +904,7 @@ def process_metadata(
     )
 
     # Initialise list of all countries in all datasets, and all country groups.
-    countries_in_data = pd.DataFrame({"area_code": [], "fao_country": []}).astype({"area_code": "Int64"})
+    countries_in_data = Table({"area_code": [], "fao_country": []}).astype({"area_code": "Int64"})
     country_groups_in_data: Dict[str, List[str]] = {}
 
     # Gather all variables from the latest version of each meadow dataset.
@@ -922,7 +912,7 @@ def process_metadata(
         # Load latest meadow table for current dataset.
         ds_latest = paths.load_dataset(dataset_short_name)
         table = ds_latest[dataset_short_name]
-        df = pd.DataFrame(table.reset_index()).rename(
+        tb = table.reset_index().rename(
             columns={
                 "area": "fao_country",
                 "recipient_country": "fao_country",
@@ -930,22 +920,22 @@ def process_metadata(
             }
         )[["area_code", "fao_country"]]
 
-        df["area_code"] = df["area_code"].astype("Int64")
+        tb["area_code"] = tb["area_code"].astype("Int64")
 
         ################################################################################################################
         # Temporary patch.
         # Some areas are defined with different names (but same area codes) in different domains.
         # This causes some issues at a later stage.
         # For now, manually rename those areas here.
-        if "French Guiana" in df["fao_country"].unique():
-            df["fao_country"] = dataframes.map_series(df["fao_country"], mapping={"French Guiana": "French Guyana"})
-        if "Netherlands (Kingdom of the)" in df["fao_country"].unique():
-            df["fao_country"] = dataframes.map_series(
-                df["fao_country"], mapping={"Netherlands (Kingdom of the)": "Netherlands"}
+        if "French Guiana" in tb["fao_country"].unique():
+            tb["fao_country"] = dataframes.map_series(tb["fao_country"], mapping={"French Guiana": "French Guyana"})
+        if "Netherlands (Kingdom of the)" in tb["fao_country"].unique():
+            tb["fao_country"] = dataframes.map_series(
+                tb["fao_country"], mapping={"Netherlands (Kingdom of the)": "Netherlands"}
             )
-        if "Saint Martin (French part)" in df["fao_country"].unique():
-            df["fao_country"] = dataframes.map_series(
-                df["fao_country"], mapping={"Saint Martin (French part)": "Saint-Martin (French part)"}
+        if "Saint Martin (French part)" in tb["fao_country"].unique():
+            tb["fao_country"] = dataframes.map_series(
+                tb["fao_country"], mapping={"Saint Martin (French part)": "Saint-Martin (French part)"}
             )
 
         ################################################################################################################
@@ -962,20 +952,20 @@ def process_metadata(
         )
 
         # Gather dataset descriptions, items, and element-units for current domain.
-        datasets_from_data = create_dataset_descriptions_dataframe_for_domain(
+        datasets_from_data = create_dataset_descriptions_table_for_domain(
             table=table, dataset_short_name=dataset_short_name
         )
 
-        items_from_data = create_items_dataframe_for_domain(
+        items_from_data = create_items_table_for_domain(
             table=table, metadata=metadata, dataset_short_name=dataset_short_name
         )
 
-        elements_from_data = create_elements_dataframe_for_domain(
+        elements_from_data = create_elements_table_for_domain(
             table=table, metadata=metadata, dataset_short_name=dataset_short_name
         )
 
         # Add countries in this dataset to the list of all countries.
-        countries_in_data = pd.concat([countries_in_data, df]).drop_duplicates()
+        countries_in_data = pr.concat([countries_in_data, tb]).drop_duplicates()
 
         # Get country groups in this dataset.
         _metadata = metadata[f"{dataset_short_name}_area_group"].reset_index()
@@ -997,23 +987,23 @@ def process_metadata(
                 else:
                     country_groups_in_data[group] = country_groups[group]
 
-        # Add dataset descriptions, items, and element-units from current dataset to global dataframes.
-        datasets_df = dataframes.concatenate([datasets_df, datasets_from_data], ignore_index=True)
-        items_df = dataframes.concatenate([items_df, items_from_data], ignore_index=True)
-        elements_df = dataframes.concatenate([elements_df, elements_from_data], ignore_index=True)
+        # Add dataset descriptions, items, and element-units from current dataset to global tables.
+        tb_datasets = dataframes.concatenate([tb_datasets, datasets_from_data], ignore_index=True)
+        tb_items = dataframes.concatenate([tb_items, items_from_data], ignore_index=True)
+        tb_elements = dataframes.concatenate([tb_elements, elements_from_data], ignore_index=True)
 
-    datasets_df = clean_global_dataset_descriptions_dataframe(datasets_df=datasets_df, custom_datasets=custom_datasets)
-    items_df = clean_global_items_dataframe(items_df=items_df, custom_items=custom_items)
+    tb_datasets = clean_global_dataset_descriptions_table(tb_datasets=tb_datasets, tb_custom_datasets=custom_datasets)
+    tb_items = clean_global_items_table(tb_items=tb_items, custom_items=custom_items)
 
-    elements_df = clean_global_elements_dataframe(elements_df=elements_df, custom_elements=custom_elements)
-    countries_df = clean_global_countries_dataframe(
+    tb_elements = clean_global_elements_table(tb_elements=tb_elements, custom_elements=custom_elements)
+    tb_countries = clean_global_countries_table(
         countries_in_data=countries_in_data,
         country_groups=country_groups_in_data,
         countries_harmonization=countries_harmonization,
         excluded_countries=excluded_countries,
     )
 
-    return countries_df, datasets_df, elements_df, items_df
+    return tb_countries, tb_datasets, tb_elements, tb_items
 
 
 def run(dest_dir: str) -> None:
@@ -1046,10 +1036,10 @@ def run(dest_dir: str) -> None:
     metadata = paths.load_dataset()
 
     # Load custom dataset names, items, element-unit names, and value amendments.
-    custom_datasets = pd.read_csv(custom_datasets_file, dtype=str)
-    custom_elements = pd.read_csv(custom_elements_and_units_file, dtype=str)
-    custom_items = pd.read_csv(custom_items_file, dtype=str)
-    value_amendments = pd.read_csv(value_amendments_file, dtype=str)
+    custom_datasets = pr.read_csv(custom_datasets_file, dtype=str)
+    custom_elements = pr.read_csv(custom_elements_and_units_file, dtype=str)
+    custom_items = pr.read_csv(custom_items_file, dtype=str)
+    value_amendments = pr.read_csv(value_amendments_file, dtype=str)
 
     # Load country mapping and excluded countries files.
     countries_harmonization = io.load_json(countries_file)
@@ -1058,7 +1048,7 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
-    countries_df, datasets_df, elements_df, items_df = process_metadata(
+    tb_countries, tb_datasets, tb_elements, tb_items = process_metadata(
         paths=paths,
         metadata=metadata,
         custom_datasets=custom_datasets,
@@ -1073,7 +1063,7 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Initialize new garden dataset.
-    dataset_garden = catalog.Dataset.create_empty(dest_dir)
+    dataset_garden = Dataset.create_empty(dest_dir)
     dataset_garden.short_name = FAOSTAT_METADATA_SHORT_NAME
     # Keep original dataset's metadata from meadow.
     dataset_garden.metadata = deepcopy(metadata.metadata)
@@ -1081,11 +1071,11 @@ def run(dest_dir: str) -> None:
     dataset_garden.save()
 
     # Create new garden dataset with all dataset descriptions, items, element-units, and countries.
-    datasets_table = create_table(df=datasets_df, short_name="datasets", index_cols=["dataset"])
-    items_table = create_table(df=items_df, short_name="items", index_cols=["dataset", "item_code"])
-    elements_table = create_table(df=elements_df, short_name="elements", index_cols=["dataset", "element_code"])
-    countries_table = create_table(df=countries_df, short_name="countries", index_cols=["area_code"])
-    amendments_table = catalog.Table(value_amendments, short_name="amendments").set_index(
+    datasets_table = create_table(tb=tb_datasets, short_name="datasets", index_cols=["dataset"])
+    items_table = create_table(tb=tb_items, short_name="items", index_cols=["dataset", "item_code"])
+    elements_table = create_table(tb=tb_elements, short_name="elements", index_cols=["dataset", "element_code"])
+    countries_table = create_table(tb=tb_countries, short_name="countries", index_cols=["area_code"])
+    amendments_table = Table(value_amendments, short_name="amendments").set_index(
         ["dataset", "spurious_value"], verify_integrity=True
     )
 

@@ -22,7 +22,6 @@ import structlog
 from detected_anomalies import handle_anomalies
 from owid import repack  # type: ignore
 from owid.catalog import Dataset, Table, Variable, VariablePresentationMeta
-from owid.catalog.tables import read_from_records
 from owid.catalog.utils import underscore
 from owid.datautils import dataframes
 from tqdm.auto import tqdm
@@ -276,7 +275,7 @@ FLAG_OFFICIAL_DATA = "official_data"
 FLAG_MULTIPLE_FLAGS = "multiple_flags"
 # Rank flags by priority (where lowest index is highest priority).
 FLAGS_RANKING = (
-    read_from_records(
+    pr.read_from_records(
         columns=["flag", "description"],
         data=[
             # FAO uses nan flag for official data; in our datasets we will replace nans by FLAG_OFFICIAL_DATA.
