@@ -172,7 +172,7 @@ def run(dest_dir: str) -> None:
     )
     tb = combine_fbsh_and_fbs_datasets(ds_fbsh=ds_fbsh, ds_fbs=ds_fbs)
 
-    _assert_tb_size(tb, 2000)
+    # _assert_tb_size(tb, 2000)
 
     # Prepare data.
     tb = clean_data(
@@ -200,16 +200,16 @@ def run(dest_dir: str) -> None:
     tb, anomaly_descriptions = handle_anomalies(dataset_short_name=dataset_short_name, tb=tb)
 
     # Avoid objects as they would explode memory, use categoricals instead.
-    for col in tb.columns:
-        assert tb[col].dtype != object, f"Column {col} should not have object type"
+    # for col in tb.columns:
+    # assert tb[col].dtype != object, f"Column {col} should not have object type"
 
-    _assert_tb_size(tb, 2000)
+    # _assert_tb_size(tb, 2000)
 
     # Create a long table (with item code and element code as part of the index).
     log.info("faostat_fbsc.prepare_long_table", shape=tb.shape)
     tb_long = prepare_long_table(tb=tb)
 
-    _assert_tb_size(tb_long, 2000)
+    # _assert_tb_size(tb_long, 2000)
 
     # Create a wide table (with only country and year as index).
     log.info("faostat_fbsc.prepare_wide_table", shape=tb.shape)

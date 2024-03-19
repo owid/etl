@@ -1397,7 +1397,7 @@ def add_per_capita_variables(tb: Table, elements_metadata: Table) -> Table:
     # Copy metadata of the original table (including indicators metadata).
     tb_with_pc_variables = tb_with_pc_variables.copy_metadata(from_table=tb)
 
-    return tb
+    return tb_with_pc_variables
 
 
 def clean_data_values(values: Variable, amendments: Dict[str, str]) -> Variable:

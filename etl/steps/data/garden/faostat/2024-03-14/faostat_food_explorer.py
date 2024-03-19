@@ -10,8 +10,7 @@ The resulting dataset will later be loaded by the `explorer/food_explorer` which
 
 from pathlib import Path
 
-import pandas as pd
-from owid.catalog import Table
+from owid.catalog import Dataset, Table
 from owid.datautils import dataframes
 from shared import (
     CURRENT_DIR,
@@ -450,7 +449,7 @@ def get_fao_population(combined: Table) -> Table:
     return fao_population
 
 
-def process_combined_data(combined: Table) -> Table:
+def process_combined_data(tb: Table, ds_population: Dataset) -> Table:
     """Process combined data (combination of `faostat_qcl` and `faostat_fbsc` data) to have the content and format
     required by the food explorer.
 
@@ -465,46 +464,46 @@ def process_combined_data(combined: Table) -> Table:
         Processed data (in wide format).
 
     """
-    combined = combined.copy()
+    tb = tb.copy()
 
     # Get FAO population from data (it is given as another item).
-    fao_population = get_fao_population(combined=combined)
+    fao_population = get_fao_population(combined=tb)
 
     # List of all item codes to select.
     selected_item_codes = sorted(set(ITEM_CODES_FBSC).union(ITEM_CODES_QCL))
 
     # Check that all expected products are included in the data.
-    missing_products = sorted(set(selected_item_codes) - set(set(combined["item_code"])))
+    missing_products = sorted(set(selected_item_codes) - set(set(tb["item_code"])))
     assert len(missing_products) == 0, f"{len(missing_products)} missing products for food explorer."
 
     # Select relevant products for the food explorer.
-    combined = combined[combined["item_code"].isin(selected_item_codes)].reset_index(drop=True)
+    tb = tb[tb["item_code"].isin(selected_item_codes)].reset_index(drop=True)
 
     # Join element and unit into one title column.
-    combined["title"] = combined["element"] + " (" + combined["unit"] + ")"
+    tb["title"] = tb["element"] + " (" + tb["unit"] + ")"
 
     # This will create a table with just one column and country-year as index.
     index_columns = ["product", "country", "year"]
-    data_wide = combined.pivot(index=index_columns, columns=["title"], values="value").reset_index()
+    tb_wide = tb.pivot(index=index_columns, columns=["title"], values="value").reset_index()
 
     # Add column for FAO population.
-    data_wide = pd.merge(data_wide, fao_population, on=["country", "year"], how="left")
+    tb_wide = tb_wide.merge(fao_population, on=["country", "year"], how="left")
 
     # Add column for OWID population.
-    data_wide = geo.add_population_to_dataframe(df=data_wide, warn_on_missing_countries=False)
+    tb_wide = geo.add_population_to_table(tb=tb_wide, ds_population=ds_population, warn_on_missing_countries=False)
 
     # Fill gaps in OWID population with FAO population (for "* (FAO)" countries, i.e. countries that were not
     # harmonized and for which there is no OWID population).
     # Then drop "fao_population", since it is no longer needed.
-    data_wide["population"] = data_wide["population"].fillna(data_wide["fao_population"])
-    data_wide = data_wide.drop(columns="fao_population")
+    tb_wide["population"] = tb_wide["population"].fillna(tb_wide["fao_population"])
+    tb_wide = tb_wide.drop(columns="fao_population")
 
-    assert len(data_wide.columns[data_wide.isnull().all(axis=0)]) == 0, "Unexpected columns with only nan values."
+    assert len(tb_wide.columns[tb_wide.isnull().all(axis=0)]) == 0, "Unexpected columns with only nan values."
 
     # Set a reasonable index.
-    data_wide = data_wide.set_index(index_columns, verify_integrity=True)
+    tb_wide = tb_wide.set_index(index_columns, verify_integrity=True)
 
-    return data_wide
+    return tb_wide
 
 
 def run(dest_dir: str) -> None:
@@ -521,35 +520,37 @@ def run(dest_dir: str) -> None:
     paths = PathFinder(current_step_file.as_posix())
 
     # Load latest qcl and fbsc datasets from garden.
-    qcl_dataset = paths.load_dataset(f"{NAMESPACE}_qcl")
-    fbsc_dataset = paths.load_dataset(f"{NAMESPACE}_fbsc")
+    ds_qcl = paths.load_dataset(f"{NAMESPACE}_qcl")
+    ds_fbsc = paths.load_dataset(f"{NAMESPACE}_fbsc")
 
     # Get main long tables from qcl and fbsc datasets.
-    tb_qcl = qcl_dataset[f"{NAMESPACE}_qcl"]
-    tb_fbsc = fbsc_dataset[f"{NAMESPACE}_fbsc"]
+    tb_qcl = ds_qcl[f"{NAMESPACE}_qcl"]
+    tb_fbsc = ds_fbsc[f"{NAMESPACE}_fbsc"]
+
+    # Load population dataset.
+    ds_population = paths.load_dataset("population")
 
     #
     # Process data.
     #
     # Combine qcl and fbsc data.
-    data = combine_qcl_and_fbsc(tb_qcl=tb_qcl, tb_fbsc=tb_fbsc)
+    tb = combine_qcl_and_fbsc(tb_qcl=tb_qcl, tb_fbsc=tb_fbsc)
 
     # Prepare data in the format required by the food explorer.
-    data = process_combined_data(combined=data)
+    tb = process_combined_data(tb=tb, ds_population=ds_population)
 
-    # Create table of products.
-    table = Table(data, short_name=dataset_short_name)
+    # Rename table of products.
+    tb.metadata.short_name = dataset_short_name
 
     #
     # Save outputs.
     #
     # Initialise new garden dataset.
-    ds_garden = create_dataset(dest_dir=dest_dir, tables=[table], default_metadata=fbsc_dataset.metadata)
+    ds_garden = create_dataset(dest_dir=dest_dir, tables=[tb], default_metadata=ds_fbsc.metadata)
 
     # Update dataset metadata and combine sources from qcl and fbsc datasets.
     ds_garden.metadata.title = DATASET_TITLE
     ds_garden.metadata.description = DATASET_DESCRIPTION
-    ds_garden.metadata.sources = fbsc_dataset.metadata.sources + qcl_dataset.metadata.sources
 
     # Create new dataset in garden.
     ds_garden.save()
