@@ -1,0 +1,37 @@
+definitions:
+  presentation:
+    topic_tags:
+    - Mental Health
+
+dataset:
+  title:  Missing data - Deaths from Neuropsychiatric conditions
+
+tables:
+  neuropsychiatric_conditions:
+    variables:
+      missing_countries:
+        title: Number of countries with missing data on deaths from neuropsychiatric conditions
+        short_unit: ''
+        unit: ''
+
+      fraction_missing_countries:
+        title: Fraction of countries with missing data on deaths from neuropsychiatric conditions
+        short_unit: '%'
+        unit: '%'
+
+      fraction_available_countries:
+        title: Fraction of countries with available data on deaths from neuropsychiatric conditions
+        short_unit: '%'
+        unit: '%'
+
+      missing_population:
+        title: Total population of countries with missing data on deaths from  neuropsychiatric conditions
+        short_unit: 'people'
+        unit: ''
+
+      total_countries:
+        title: Total number of countries within each region
+        short_unit: ''
+        unit: ''
+
+
