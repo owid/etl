@@ -1,0 +1,18 @@
+meta:
+  origin:
+    producer: Bergero et al. (2023). Pathways to net-zero emissions from aviation.
+    title: aviation_emissions_bergero
+    citation_full: |-
+      Bergero, C., Gosnell, G., Gielen, D., Kang, S., Bazilian, M., & Davis, S. J. (2023). Pathways to net-zero emissions from aviation. Nature Sustainability.
+    version_producer: Google Sheet
+    url_main: https://www.nature.com/articles/s41893-022-01046-9
+    url_download: |-
+      https://docs.google.com/spreadsheets/d/e/2PACX-1vRWoePX6ndPLsiS-nIS4Nz4ax_bEdf9YrWl6WVKv7hGFfcVUdMh1nW0QmhFFHPvlYNcUtE9vOX6GwcJ/pub?output=csv
+    date_accessed: '2024-03-19'
+  name: Global aviation emissions (Bergero et al. 2023)
+  description: Global trends in aviation demand, energy use, and carbon emissions from 1990 onwards.
+  license: {}
+outs:
+  - md5: 70c9a4680949a659756d7c9cbdae75e3
+    size: 1958
+    path: aviation_emissions_bergero.csv
