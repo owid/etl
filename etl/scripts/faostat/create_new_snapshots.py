@@ -289,6 +289,14 @@ def main(read_only: bool = False) -> None:
     any_dataset_was_updated = False
     # Fetch dataset codes from FAOSTAT catalog.
     faostat_catalog = load_faostat_catalog()
+
+    # Check if any of the domains that we want to download are missing.
+    missing_domains = sorted(
+        set(INCLUDED_DATASETS_CODES) - set([entry["DatasetCode"].lower() for entry in faostat_catalog])
+    )
+    if len(missing_domains) > 0:
+        log.warning(f"The following domains cannot be found in FAOSTAT anymore: {missing_domains}")
+
     for description in faostat_catalog:
         # Build FAODataset instance.
         dataset_code = description["DatasetCode"].lower()

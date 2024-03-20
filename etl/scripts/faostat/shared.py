@@ -41,18 +41,12 @@ N_CHARACTERS_ELEMENT_CODE = 6
 INCLUDED_DATASETS_CODES = [
     # Cost and Affordability of a Healthy Diet.
     "cahd",
-    # Land, Inputs and Sustainability: Fertilizers indicators.
-    "ef",
     # Climate Change: Emissions intensities.
     "ei",
     # Land, Inputs and Sustainability: Livestock Patterns.
     "ek",
-    # Land, Inputs and Sustainability: Land use indicators.
-    "el",
     # Land, Inputs and Sustainability: Livestock Manure.
     "emn",
-    # Land, Inputs and Sustainability: Pesticides indicators.
-    "ep",
     # Land, Inputs and Sustainability: Soil nutrient budget.
     "esb",
     # Discontinued archives and data series: Food Aid Shipments (WFP).
@@ -98,6 +92,13 @@ INCLUDED_DATASETS_CODES = [
     # "wcad",
     # Energy use.
     # "gn",
+    # The following domains used to exist in FAOSTAT, but they have been removed.
+    # Land, Inputs and Sustainability: Fertilizers indicators.
+    # "ef",
+    # Land, Inputs and Sustainability: Land use indicators.
+    # "el",
+    # Land, Inputs and Sustainability: Pesticides indicators.
+    # "ep",
 ]
 # URL for dataset codes in FAOSTAT catalog.
 # This is the URL used to get the remote location of the actual data files to be downloaded, and the date of their
