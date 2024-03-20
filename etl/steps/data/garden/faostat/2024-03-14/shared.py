@@ -855,11 +855,17 @@ def add_custom_names_and_descriptions(tb: Table, items_metadata: Table, elements
     tb = tb.rename(columns={column: column.replace("owid_", "") for column in tb.columns})
 
     # Fill missing unit and short_unit columns with empty strings.
+    missing_fields = {"fields": [], "elements": []}
     for column in ["unit", "unit_short_name"]:
         missing_unit_mask = tb[column].isnull()
         if not tb[missing_unit_mask].empty:
-            log.warning(f"Missing {column} for elements: {set(tb[missing_unit_mask]['element'])}")
             tb[column] = tb[column].cat.add_categories("").fillna("")
+            missing_fields["fields"].append(column)
+            missing_fields["elements"] = sorted(set(missing_fields["elements"]) | set(tb[missing_unit_mask]["element"]))
+    if missing_fields["fields"]:
+        log.info(
+            f"Filling missing fields {missing_fields['fields']} with ''. Affected elements: {missing_fields['elements']}"
+        )
 
     return tb
 
