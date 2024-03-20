@@ -7,6 +7,7 @@ from typing import cast
 
 import streamlit as st
 from st_pages import add_indentation
+from streamlit_feedback import streamlit_feedback
 from structlog import get_logger
 
 from apps.wizard.pages.expert.prompts import (
@@ -59,6 +60,13 @@ class Options:
     GUIDES = "How to use, tools, APIs, and guides"
     PRINCIPLES = "Design principles"
     FULL = "Complete documentation"
+    DEBUG = "Debug"
+
+
+# Handle feedback
+def handle_feedback(feedback) -> None:
+    print("handle feedback")
+    print(feedback)
 
 
 # Switch category function
@@ -81,6 +89,9 @@ def get_system_prompt() -> str:
         case Options.FULL:
             log.warning("Switching to 'All' system prompt.")
             system_prompt = SYSTEM_PROMPT_FULL
+        case Options.DEBUG:
+            log.warning("Switching to 'DEBUG' system prompt.")
+            system_prompt = ""
         case _:
             log.info("Nothing selected. Switching to 'All' system prompt.")
             system_prompt = SYSTEM_PROMPT_FULL
@@ -102,6 +113,7 @@ st.selectbox(
         Options.START,
         Options.GUIDES,
         Options.PRINCIPLES,
+        Options.DEBUG,
     ],
     index=1,
     help="Choosing a domain reduces the cost of the query to chatGPT, since only a subset of the documentation will be used in the query (i.e. fewer tokens used).",
@@ -176,9 +188,10 @@ for message in st.session_state.messages:
         with st.chat_message(message["role"]):
             st.markdown(message["content"])
 # Reduce to only systme prompt
-# st.session_state.messages = st.session_state.messages[-2:]
+st.session_state.response = st.session_state.get("response", None)
 
 # React to user input
+response = None
 if prompt := st.chat_input("Ask me!"):
     # Display user message in chat message container
     st.chat_message("user").markdown(prompt)
@@ -201,13 +214,22 @@ if prompt := st.chat_input("Ask me!"):
             max_tokens=max_tokens,
             stream=True,
         )
-        response = cast(str, st.write_stream(stream))
+        st.session_state.response = cast(str, st.write_stream(stream))
+
+if st.session_state.response:
+    feedback = streamlit_feedback(
+        feedback_type="thumbs",
+        # optional_text_label="[Optional] Please provide an explanation",
+        # align="flex-start",
+        key="fb_k",
+        on_submit=handle_feedback,
+    )
 
     # Get cost & tokens
     text_in = "\n".join([m["content"] for m in st.session_state.messages])
-    cost, num_tokens = get_cost_and_tokens(text_in, response, cast(str, model_name))
+    cost, num_tokens = get_cost_and_tokens(text_in, st.session_state.response, cast(str, model_name))
     cost_msg = f"**Cost**: ≥{cost} USD.\n\n **Tokens**: ≥{num_tokens}."
     st.info(cost_msg)
 
     # Add new response by the System
-    st.session_state.messages.append({"role": "assistant", "content": response})
+    st.session_state.messages.append({"role": "assistant", "content": st.session_state.response})
