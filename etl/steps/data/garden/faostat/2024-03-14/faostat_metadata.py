@@ -922,24 +922,6 @@ def process_metadata(
 
         tb["area_code"] = tb["area_code"].astype("Int64")
 
-        ################################################################################################################
-        # Temporary patch.
-        # Some areas are defined with different names (but same area codes) in different domains.
-        # This causes some issues at a later stage.
-        # For now, manually rename those areas here.
-        if "French Guiana" in tb["fao_country"].unique():
-            tb["fao_country"] = dataframes.map_series(tb["fao_country"], mapping={"French Guiana": "French Guyana"})
-        if "Netherlands (Kingdom of the)" in tb["fao_country"].unique():
-            tb["fao_country"] = dataframes.map_series(
-                tb["fao_country"], mapping={"Netherlands (Kingdom of the)": "Netherlands"}
-            )
-        if "Saint Martin (French part)" in tb["fao_country"].unique():
-            tb["fao_country"] = dataframes.map_series(
-                tb["fao_country"], mapping={"Saint Martin (French part)": "Saint-Martin (French part)"}
-            )
-
-        ################################################################################################################
-
         if f"{dataset_short_name}_flag" in metadata.table_names:
             check_that_all_flags_in_dataset_are_in_ranking(
                 table=table, metadata_for_flags=metadata[f"{dataset_short_name}_flag"]
