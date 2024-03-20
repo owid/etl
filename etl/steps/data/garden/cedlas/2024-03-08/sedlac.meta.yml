@@ -1,0 +1,755 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    processing_level: major
+    display: &common-display
+      numDecimalPlaces: 1
+      tolerance: 5
+    description_processing: |-
+      Where there were multiple observations for a particular year, we selected the observation drawn from a more recent round of a survey.
+    description_from_producer: |-
+      We construct individual income by adding all income sources together. Whenever possible we distinguish among income from salaried work, self-employment and salaries assigned to owners. Whenever possible we compute labor income from the main activity. Individual non-labor income is divided into three categories: (i) pensions; (ii) capital and benefits; and (iii) transfers. Countries ask different questions to capture data on capital income, interests, profits, rents and dividends. For comparison purposes, we prefer to gather all these questions into a single category. The same criterion applies to transfers, although we also construct a variable that identifies those transfers made by the government, and another that captures transfers clearly associated to poverty-alleviation programs.
+      Since we are interested in capturing current income, non-current items are not included in our definition of income. The same criterion leads to the exclusion of income from the sale of some goods and assets like vehicles, houses, or stocks. We also exclude income from gifts, life insurance, gambling and inheritances.
+
+      Once we have individual income, we construct household income by adding income for all members from the household. Household per capita income is computed as the ratio between total household income and the number of members in the household. Finally, we compute adjusted household income by several equivalence scales.
+
+      _Is the implicit rent from own-housing included in the calculation of income?_
+
+      Yes, it is included. The concept of income considered in SEDLAC refers to the flow of resources obtained as remuneration towards the use of all the assets owned by an individual or household. According to this definition, income should include not only returns for the use of labor and capital, but also any other rents produced by the possession of durable goods, such as houses or cars.
+
+      Families that live in their own dwellings implicitly receive a flow of income equivalent to the market value of the service that the use of this property represents for them. This remuneration should be computed as part of household income, even though it is never recorded in a formal market.
+
+      In some surveys, owners are asked to estimate the rent they would have to pay if they had to rent the houses they occupy. The answer to this question is used to impute rents to own-housing, although issues of reliability in the answers are usually raised, in particular in areas where housing markets are not well developed.
+
+      In those surveys where this information is not available or is clearly unreliable, we increase household income of housing owners by 10%, a value that is consistent with estimates of implicit rents in the region.
+
+    presentation:
+      topic_tags:
+        - Poverty
+        - Economic Inequality
+
+  poverty_lines: |-
+    <% if table == "$2.15 a day" %>
+    Extreme poverty here is defined as living below the International Poverty Line of $2.15 per day.
+    <% elif table == "$3.65 a day" %>
+    A poverty line of $3.65 a day represents definitions of national poverty lines in lower-middle-income countries.
+    <% elif table == "$6.85 a day" %>
+    A poverty line of $6.85 a day represents definitions of national poverty lines in upper-middle-income countries.
+    <% elif table == "50% of median" %>
+    This is a measure of _relative_ poverty – it captures the share of people whose income is low by the standards typical in their own country.
+    <%- endif -%>
+
+  ppps: |-
+    The data is measured in international-$ at 2017 prices – this adjusts for inflation and for differences in the cost of living between countries.
+
+  welfare_equivalence: |-
+    <% if table == "$2.15 a day" or table == "$3.65 a day" or table == "$6.85 a day" or table == "50% of median" or table == "Per capita income"%>
+    This is household income per capita. 'Per capita' means that the income of each household is attributed equally to each member of the household (including children).
+    <% elif table == "Equivalized income" %>
+    Household income has been equivalized – adjusted to account for the fact that people in the same household can share costs like rent and heating.
+    <%- endif -%>
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+
+tables:
+  sedlac:
+    variables:
+      national_headcount_ratio:
+        title: <<table>> - Share of population in poverty (Spell <<survey_number>>)
+        description_short: Percentage of population living in households with an income or consumption per person below <<table.lower()>>
+        description_key:
+          - "{definitions.poverty_lines}"
+          - "{definitions.ppps}"
+          - "{definitions.welfare_equivalence}"
+        unit: '%'
+        short_unit: '%'
+        display:
+          name: <<table>> - Share of population in poverty
+          <<: *common-display
+        presentation:
+          title_public: <<table>> - Share of population in poverty
+
+      national_poverty_gap_index:
+        title: <<table>> - Poverty gap index (Spell <<survey_number>>)
+        description_short: The poverty gap index is a poverty measure that reflects both the prevalence and the depth of poverty. It is calculated as the share of population in poverty multiplied by the average shortfall from the poverty line (expressed as a % of the poverty line).
+        description_key:
+          - "{definitions.poverty_lines}"
+          - "{definitions.ppps}"
+          - "{definitions.welfare_equivalence}"
+        unit: '%'
+        short_unit: '%'
+        display:
+          name: <<table>> - Poverty gap index
+          <<: *common-display
+        presentation:
+          title_public: <<table>> - Poverty gap index
+
+      national_fgt2:
+        title: <<table>> - Poverty severity index (Spell <<survey_number>>)
+        description_short: The squared poverty gap index is a poverty measure that reflects both the prevalence, the depth and the distribution of poverty. A poverty severity of 5 percent means that the poorest people are 5 percent worse off compared to poor people on average.
+        description_key:
+          - "{definitions.poverty_lines}"
+          - "{definitions.ppps}"
+          - "{definitions.welfare_equivalence}"
+        unit: '%'
+        short_unit: '%'
+        display:
+          name: <<table>> - Poverty severity index
+          <<: *common-display
+        presentation:
+          title_public: <<table>> - Poverty severity index
+
+      gini:
+        title: Gini coefficient (<<table>>) (Spell <<survey_number>>)
+        description_short: The [Gini coefficient](#dod:gini) measures inequality on a scale from 0 to 1. Higher values indicate higher inequality.
+        description_key:
+          - "{definitions.welfare_equivalence}"
+        unit: ''
+        short_unit: ''
+        display:
+          name: Gini coefficient (<<table>>)
+          <<: *common-display
+        presentation:
+          title_public: Gini coefficient (<<table>>)
+
+      theil:
+        title: Theil index (<<table>>) (Spell <<survey_number>>)
+        description_short: The Theil index is a measure of inequality. Higher values indicate higher inequality.
+        description_key:
+          - "{definitions.welfare_equivalence}"
+        unit: ''
+        short_unit: ''
+        display:
+          name: Theil index (<<table>>)
+          <<: *common-display
+        presentation:
+          title_public: Theil index (<<table>>)
+
+      cv:
+        title: Coefficient of variation (<<table>>) (Spell <<survey_number>>)
+        description_short: The coefficient of variation is a measure of inequality. It is the ratio of the standard deviation to the mean. Higher values indicate higher inequality.
+        description_key:
+          - "{definitions.welfare_equivalence}"
+        unit: ''
+        short_unit: ''
+        display:
+          name: Coefficient of variation (<<table>>)
+          <<: *common-display
+        presentation:
+          title_public: Coefficient of variation (<<table>>)
+
+      a_05:
+        title: Atkinson index - ε = 0.5 (<<table>>) (Spell <<survey_number>>)
+        description_short: The [Atkinson index](#dod:atkinson) measures inequality on a scale from 0 to 1. Higher values indicate higher inequality.
+        description_key:
+          - This version of the Atkinson index uses an inequality aversion parameter of 0.5. The parameter defines how sensitive the index is to changes in the lower end of the distribution.
+          - "{definitions.welfare_equivalence}"
+        unit: ''
+        short_unit: ''
+        display:
+          name: Atkinson index (<<table>>)
+          <<: *common-display
+        presentation:
+          title_public: Atkinson index - ε = 0.5 (<<table>>)
+
+      a_1:
+        title: Atkinson index - ε = 1 (<<table>>) (Spell <<survey_number>>)
+        description_short: The [Atkinson index](#dod:atkinson) measures inequality on a scale from 0 to 1. Higher values indicate higher inequality.
+        description_key:
+          - This version of the Atkinson index uses an inequality aversion parameter of 1. The parameter defines how sensitive the index is to changes in the lower end of the distribution.
+          - "{definitions.welfare_equivalence}"
+        unit: ''
+        short_unit: ''
+        display:
+          name: Atkinson index (<<table>>)
+          <<: *common-display
+        presentation:
+          title_public: Atkinson index - ε = 1 (<<table>>)
+
+      a_2:
+        title: Atkinson index - ε = 2 (<<table>>) (Spell <<survey_number>>)
+        description_short: The [Atkinson index](#dod:atkinson) measures inequality on a scale from 0 to 1. Higher values indicate higher inequality.
+        description_key:
+          - This version of the Atkinson index uses an inequality aversion parameter of 2. The parameter defines how sensitive the index is to changes in the lower end of the distribution.
+          - "{definitions.welfare_equivalence}"
+        unit: ''
+        short_unit: ''
+        display:
+          name: Atkinson index (<<table>>)
+          <<: *common-display
+        presentation:
+          title_public: Atkinson index - ε = 2 (<<table>>)
+
+      e_0:
+        title: Mean log deviation (<<table>>) (Spell <<survey_number>>)
+        description_short: The mean log deviation (MLD) is a measure of inequality. An MLD of zero indicates perfect equality and it takes on larger positive values as incomes become more unequal.
+        description_key:
+          - "{definitions.welfare_equivalence}"
+        unit: ''
+        short_unit: ''
+        display:
+          name: Mean log deviation (<<table>>)
+          <<: *common-display
+        presentation:
+          title_public: Mean log deviation (<<table>>)
+
+      decile1_share:
+        title: Poorest decile - Share (<<table>>) (Spell <<survey_number>>)
+        description_short: The share of income received by the poorest 10% of the population.
+        description_key:
+          - "{definitions.welfare_equivalence}"
+        unit: '%'
+        short_unit: '%'
+        display:
+          name: Poorest decile - Share (<<table>>)
+          <<: *common-display
+        presentation:
+          title_public: Poorest decile - Share (<<table>>)
+
+      decile2_share:
+        title: 2nd decile - Share (<<table>>) (Spell <<survey_number>>)
+        description_short: The share of income received by the 2nd decile (tenth of the population).
+        description_key:
+          - "{definitions.welfare_equivalence}"
+        unit: '%'
+        short_unit: '%'
+        display:
+          name: 2nd decile - Share (<<table>>)
+          <<: *common-display
+        presentation:
+          title_public: 2nd decile - Share (<<table>>)
+
+      decile3_share:
+        title: 3rd decile - Share (<<table>>) (Spell <<survey_number>>)
+        description_short: The share of income received by the 3rd decile (tenth of the population).
+        description_key:
+          - "{definitions.welfare_equivalence}"
+        unit: '%'
+        short_unit: '%'
+        display:
+          name: 3rd decile - Share (<<table>>)
+          <<: *common-display
+        presentation:
+          title_public: 3rd decile - Share (<<table>>)
+
+      decile4_share:
+        title: 4th decile - Share (<<table>>) (Spell <<survey_number>>)
+        description_short: The share of income received by the 4th decile (tenth of the population).
+        description_key:
+          - "{definitions.welfare_equivalence}"
+        unit: '%'
+        short_unit: '%'
+        display:
+          name: 4th decile - Share (<<table>>)
+          <<: *common-display
+        presentation:
+          title_public: 4th decile - Share (<<table>>)
+
+      decile5_share:
+        title: 5th decile - Share (<<table>>) (Spell <<survey_number>>)
+        description_short: The share of income received by the 5th decile (tenth of the population).
+        description_key:
+          - "{definitions.welfare_equivalence}"
+        unit: '%'
+        short_unit: '%'
+        display:
+          name: 5th decile - Share (<<table>>)
+          <<: *common-display
+        presentation:
+          title_public: 5th decile - Share (<<table>>)
+
+      decile6_share:
+        title: 6th decile - Share (<<table>>) (Spell <<survey_number>>)
+        description_short: The share of income received by the 6th decile (tenth of the population).
+        description_key:
+          - "{definitions.welfare_equivalence}"
+        unit: '%'
+        short_unit: '%'
+        display:
+          name: 6th decile - Share (<<table>>)
+          <<: *common-display
+        presentation:
+          title_public: 6th decile - Share (<<table>>)
+
+      decile7_share:
+        title: 7th decile - Share (<<table>>) (Spell <<survey_number>>)
+        description_short: The share of income received by the 7th decile (tenth of the population).
+        description_key:
+          - "{definitions.welfare_equivalence}"
+        unit: '%'
+        short_unit: '%'
+        display:
+          name: 7th decile - Share (<<table>>)
+          <<: *common-display
+        presentation:
+          title_public: 7th decile - Share (<<table>>)
+
+      decile8_share:
+        title: 8th decile - Share (<<table>>) (Spell <<survey_number>>)
+        description_short: The share of income received by the 8th decile (tenth of the population).
+        description_key:
+          - "{definitions.welfare_equivalence}"
+        unit: '%'
+        short_unit: '%'
+        display:
+          name: 8th decile - Share (<<table>>)
+          <<: *common-display
+        presentation:
+          title_public: 8th decile - Share (<<table>>)
+
+      decile9_share:
+        title: 9th decile - Share (<<table>>) (Spell <<survey_number>>)
+        description_short: The share of income received by the 9th decile (tenth of the population).
+        description_key:
+          - "{definitions.welfare_equivalence}"
+        unit: '%'
+        short_unit: '%'
+        display:
+          name: 9th decile - Share (<<table>>)
+          <<: *common-display
+        presentation:
+          title_public: 9th decile - Share (<<table>>)
+
+      decile10_share:
+        title: Richest decile - Share (<<table>>) (Spell <<survey_number>>)
+        description_short: The share of income received by the richest 10% of the population.
+        description_key:
+          - "{definitions.welfare_equivalence}"
+        unit: '%'
+        short_unit: '%'
+        display:
+          name: Richest decile - Share (<<table>>)
+          <<: *common-display
+        presentation:
+          title_public: Richest decile - Share (<<table>>)
+
+      _10_1_ratio:
+        title: A10/A1 ratio (<<table>>) (Spell <<survey_number>>)
+        description_short: This is a measure of inequality that divides the average income of the richest 10% by the average income of the poorest 10%. Higher values indicate higher inequality.
+        description_key:
+          - "{definitions.welfare_equivalence}"
+        unit: ''
+        short_unit: ''
+        display:
+          name: A10/A1 ratio (<<table>>)
+          <<: *common-display
+        presentation:
+          title_public: A10/A1 ratio (<<table>>)
+
+      _90_10_ratio:
+        title: A90/A10 ratio (<<table>>) (Spell <<survey_number>>)
+        description_short: This is a measure of inequality that divides the average income of the percentile 90 by the average income of percentile 10. Higher values indicate higher inequality.
+        description_key:
+          - "{definitions.welfare_equivalence}"
+        unit: ''
+        short_unit: ''
+        display:
+          name: A90/A10 ratio (<<table>>)
+          <<: *common-display
+        presentation:
+          title_public: A90/A10 ratio (<<table>>)
+
+      _95_5_ratio:
+        title: A95/A5 ratio (<<table>>) (Spell <<survey_number>>)
+        description_short: This is a measure of inequality that divides the average income of the percentile 95 by the average income of percentile 5. Higher values indicate higher inequality.
+        description_key:
+          - "{definitions.welfare_equivalence}"
+        unit: ''
+        short_unit: ''
+        display:
+          name: A95/A5 ratio (<<table>>)
+          <<: *common-display
+        presentation:
+          title_public: A95/A5 ratio (<<table>>)
+
+      _95_50_ratio:
+        title: A95/A50 ratio (<<table>>) (Spell <<survey_number>>)
+        description_short: This is a measure of inequality that divides the average income of the percentile 95 by the average income of percentile 50. Higher values indicate higher inequality.
+        description_key:
+          - "{definitions.welfare_equivalence}"
+        unit: ''
+        short_unit: ''
+        display:
+          name: A95/A50 ratio (<<table>>)
+          <<: *common-display
+        presentation:
+          title_public: A95/A50 ratio (<<table>>)
+
+      _50_5_ratio:
+        title: A50/A5 ratio (<<table>>) (Spell <<survey_number>>)
+        description_short: This is a measure of inequality that divides the average income of the percentile 50 by the average income of percentile 5. Higher values indicate higher inequality.
+        description_key:
+          - "{definitions.welfare_equivalence}"
+        unit: ''
+        short_unit: ''
+        display:
+          name: A50/A5 ratio (<<table>>)
+          <<: *common-display
+        presentation:
+          title_public: A50/A5 ratio (<<table>>)
+
+      _95_80_ratio:
+        title: A95/A80 ratio (<<table>>) (Spell <<survey_number>>)
+        description_short: This is a measure of inequality that divides the average income of the percentile 95 by the average income of percentile 80. Higher values indicate higher inequality.
+        description_key:
+          - "{definitions.welfare_equivalence}"
+        unit: ''
+        short_unit: ''
+        display:
+          name: A95/A80 ratio (<<table>>)
+          <<: *common-display
+        presentation:
+          title_public: A95/A80 ratio (<<table>>)
+
+  sedlac_no_spells:
+    variables:
+      national_headcount_ratio:
+        title: <<table>> - Share of population in poverty
+        description_short: Percentage of population living in households with an income or consumption per person below <<table.lower()>>
+        description_key:
+          - "{definitions.poverty_lines}"
+          - "{definitions.ppps}"
+          - "{definitions.welfare_equivalence}"
+        unit: '%'
+        short_unit: '%'
+        display:
+          name: <<table>> - Share of population in poverty
+          <<: *common-display
+        presentation:
+          title_public: <<table>> - Share of population in poverty
+
+      national_poverty_gap_index:
+        title: <<table>> - Poverty gap index
+        description_short: The poverty gap index is a poverty measure that reflects both the prevalence and the depth of poverty. It is calculated as the share of population in poverty multiplied by the average shortfall from the poverty line (expressed as a % of the poverty line).
+        description_key:
+          - "{definitions.poverty_lines}"
+          - "{definitions.ppps}"
+          - "{definitions.welfare_equivalence}"
+        unit: '%'
+        short_unit: '%'
+        display:
+          name: <<table>> - Poverty gap index
+          <<: *common-display
+        presentation:
+          title_public: <<table>> - Poverty gap index
+
+      national_fgt2:
+        title: <<table>> - Poverty severity index
+        description_short: The squared poverty gap index is a poverty measure that reflects both the prevalence, the depth and the distribution of poverty. A poverty severity of 5 percent means that the poorest people are 5 percent worse off compared to poor people on average.
+        description_key:
+          - "{definitions.poverty_lines}"
+          - "{definitions.ppps}"
+          - "{definitions.welfare_equivalence}"
+        unit: '%'
+        short_unit: '%'
+        display:
+          name: <<table>> - Poverty severity index
+          <<: *common-display
+        presentation:
+          title_public: <<table>> - Poverty severity index
+
+      gini:
+        title: Gini coefficient (<<table>>)
+        description_short: The [Gini coefficient](#dod:gini) measures inequality on a scale from 0 to 1. Higher values indicate higher inequality.
+        description_key:
+          - "{definitions.welfare_equivalence}"
+        unit: ''
+        short_unit: ''
+        display:
+          name: Gini coefficient (<<table>>)
+          <<: *common-display
+        presentation:
+          title_public: "Income inequality: Gini coefficient in Latin America"
+
+      theil:
+        title: Theil index (<<table>>)
+        description_short: The Theil index is a measure of inequality. Higher values indicate higher inequality.
+        description_key:
+          - "{definitions.welfare_equivalence}"
+        unit: ''
+        short_unit: ''
+        display:
+          name: Theil index (<<table>>)
+          <<: *common-display
+        presentation:
+          title_public: Theil index (<<table>>)
+
+      cv:
+        title: Coefficient of variation (<<table>>)
+        description_short: The coefficient of variation is a measure of inequality. It is the ratio of the standard deviation to the mean. Higher values indicate higher inequality.
+        description_key:
+          - "{definitions.welfare_equivalence}"
+        unit: ''
+        short_unit: ''
+        display:
+          name: Coefficient of variation (<<table>>)
+          <<: *common-display
+        presentation:
+          title_public: Coefficient of variation (<<table>>)
+
+      a_05:
+        title: Atkinson index - ε = 0.5 (<<table>>)
+        description_short: The [Atkinson index](#dod:atkinson) measures inequality on a scale from 0 to 1. Higher values indicate higher inequality.
+        description_key:
+          - This version of the Atkinson index uses an inequality aversion parameter of 0.5. The parameter defines how sensitive the index is to changes in the lower end of the distribution.
+          - "{definitions.welfare_equivalence}"
+        unit: ''
+        short_unit: ''
+        display:
+          name: Atkinson index (<<table>>)
+          <<: *common-display
+        presentation:
+          title_public: Atkinson index - ε = 0.5 (<<table>>)
+
+      a_1:
+        title: Atkinson index - ε = 1 (<<table>>)
+        description_short: The [Atkinson index](#dod:atkinson) measures inequality on a scale from 0 to 1. Higher values indicate higher inequality.
+        description_key:
+          - This version of the Atkinson index uses an inequality aversion parameter of 1. The parameter defines how sensitive the index is to changes in the lower end of the distribution.
+          - "{definitions.welfare_equivalence}"
+        unit: ''
+        short_unit: ''
+        display:
+          name: Atkinson index (<<table>>)
+          <<: *common-display
+        presentation:
+          title_public: Atkinson index - ε = 1 (<<table>>)
+
+      a_2:
+        title: Atkinson index - ε = 2 (<<table>>)
+        description_short: The [Atkinson index](#dod:atkinson) measures inequality on a scale from 0 to 1. Higher values indicate higher inequality.
+        description_key:
+          - This version of the Atkinson index uses an inequality aversion parameter of 2. The parameter defines how sensitive the index is to changes in the lower end of the distribution.
+          - "{definitions.welfare_equivalence}"
+        unit: ''
+        short_unit: ''
+        display:
+          name: Atkinson index (<<table>>)
+          <<: *common-display
+        presentation:
+          title_public: Atkinson index - ε = 2 (<<table>>)
+
+      e_0:
+        title: Mean log deviation (<<table>>)
+        description_short: The mean log deviation (MLD) is a measure of inequality. An MLD of zero indicates perfect equality and it takes on larger positive values as incomes become more unequal.
+        description_key:
+          - "{definitions.welfare_equivalence}"
+        unit: ''
+        short_unit: ''
+        display:
+          name: Mean log deviation (<<table>>)
+          <<: *common-display
+        presentation:
+          title_public: Mean log deviation (<<table>>)
+
+      decile1_share:
+        title: Poorest decile - Share (<<table>>)
+        description_short: The share of income received by the poorest 10% of the population.
+        description_key:
+          - "{definitions.welfare_equivalence}"
+        unit: '%'
+        short_unit: '%'
+        display:
+          name: Poorest decile - Share (<<table>>)
+          <<: *common-display
+        presentation:
+          title_public: Poorest decile - Share (<<table>>)
+
+      decile2_share:
+        title: 2nd decile - Share (<<table>>)
+        description_short: The share of income received by the 2nd decile (tenth of the population).
+        description_key:
+          - "{definitions.welfare_equivalence}"
+        unit: '%'
+        short_unit: '%'
+        display:
+          name: 2nd decile - Share (<<table>>)
+          <<: *common-display
+        presentation:
+          title_public: 2nd decile - Share (<<table>>)
+
+      decile3_share:
+        title: 3rd decile - Share (<<table>>)
+        description_short: The share of income received by the 3rd decile (tenth of the population).
+        description_key:
+          - "{definitions.welfare_equivalence}"
+        unit: '%'
+        short_unit: '%'
+        display:
+          name: 3rd decile - Share (<<table>>)
+          <<: *common-display
+        presentation:
+          title_public: 3rd decile - Share (<<table>>)
+
+      decile4_share:
+        title: 4th decile - Share (<<table>>)
+        description_short: The share of income received by the 4th decile (tenth of the population).
+        description_key:
+          - "{definitions.welfare_equivalence}"
+        unit: '%'
+        short_unit: '%'
+        display:
+          name: 4th decile - Share (<<table>>)
+          <<: *common-display
+        presentation:
+          title_public: 4th decile - Share (<<table>>)
+
+      decile5_share:
+        title: 5th decile - Share (<<table>>)
+        description_short: The share of income received by the 5th decile (tenth of the population).
+        description_key:
+          - "{definitions.welfare_equivalence}"
+        unit: '%'
+        short_unit: '%'
+        display:
+          name: 5th decile - Share (<<table>>)
+          <<: *common-display
+        presentation:
+          title_public: 5th decile - Share (<<table>>)
+
+      decile6_share:
+        title: 6th decile - Share (<<table>>)
+        description_short: The share of income received by the 6th decile (tenth of the population).
+        description_key:
+          - "{definitions.welfare_equivalence}"
+        unit: '%'
+        short_unit: '%'
+        display:
+          name: 6th decile - Share (<<table>>)
+          <<: *common-display
+        presentation:
+          title_public: 6th decile - Share (<<table>>)
+
+      decile7_share:
+        title: 7th decile - Share (<<table>>)
+        description_short: The share of income received by the 7th decile (tenth of the population).
+        description_key:
+          - "{definitions.welfare_equivalence}"
+        unit: '%'
+        short_unit: '%'
+        display:
+          name: 7th decile - Share (<<table>>)
+          <<: *common-display
+        presentation:
+          title_public: 7th decile - Share (<<table>>)
+
+      decile8_share:
+        title: 8th decile - Share (<<table>>)
+        description_short: The share of income received by the 8th decile (tenth of the population).
+        description_key:
+          - "{definitions.welfare_equivalence}"
+        unit: '%'
+        short_unit: '%'
+        display:
+          name: 8th decile - Share (<<table>>)
+          <<: *common-display
+        presentation:
+          title_public: 8th decile - Share (<<table>>)
+
+      decile9_share:
+        title: 9th decile - Share (<<table>>)
+        description_short: The share of income received by the 9th decile (tenth of the population).
+        description_key:
+          - "{definitions.welfare_equivalence}"
+        unit: '%'
+        short_unit: '%'
+        display:
+          name: 9th decile - Share (<<table>>)
+          <<: *common-display
+        presentation:
+          title_public: 9th decile - Share (<<table>>)
+
+      decile10_share:
+        title: Richest decile - Share (<<table>>)
+        description_short: The share of income received by the richest 10% of the population.
+        description_key:
+          - "{definitions.welfare_equivalence}"
+        unit: '%'
+        short_unit: '%'
+        display:
+          name: Richest decile - Share (<<table>>)
+          <<: *common-display
+        presentation:
+          title_public: Richest decile - Share (<<table>>)
+
+      _10_1_ratio:
+        title: A10/A1 ratio (<<table>>)
+        description_short: This is a measure of inequality that divides the average income of the richest 10% by the average income of the poorest 10%. Higher values indicate higher inequality.
+        description_key:
+          - "{definitions.welfare_equivalence}"
+        unit: ''
+        short_unit: ''
+        display:
+          name: A10/A1 ratio (<<table>>)
+          <<: *common-display
+        presentation:
+          title_public: A10/A1 ratio (<<table>>)
+
+      _90_10_ratio:
+        title: A90/A10 ratio (<<table>>)
+        description_short: This is a measure of inequality that divides the average income of the percentile 90 by the average income of percentile 10. Higher values indicate higher inequality.
+        description_key:
+          - "{definitions.welfare_equivalence}"
+        unit: ''
+        short_unit: ''
+        display:
+          name: A90/A10 ratio (<<table>>)
+          <<: *common-display
+        presentation:
+          title_public: A90/A10 ratio (<<table>>)
+
+      _95_5_ratio:
+        title: A95/A5 ratio (<<table>>)
+        description_short: This is a measure of inequality that divides the average income of the percentile 95 by the average income of percentile 5. Higher values indicate higher inequality.
+        description_key:
+          - "{definitions.welfare_equivalence}"
+        unit: ''
+        short_unit: ''
+        display:
+          name: A95/A5 ratio (<<table>>)
+          <<: *common-display
+        presentation:
+          title_public: A95/A5 ratio (<<table>>)
+
+      _95_50_ratio:
+        title: A95/A50 ratio (<<table>>)
+        description_short: This is a measure of inequality that divides the average income of the percentile 95 by the average income of percentile 50. Higher values indicate higher inequality.
+        description_key:
+          - "{definitions.welfare_equivalence}"
+        unit: ''
+        short_unit: ''
+        display:
+          name: A95/A50 ratio (<<table>>)
+          <<: *common-display
+        presentation:
+          title_public: A95/A50 ratio (<<table>>)
+
+      _50_5_ratio:
+        title: A50/A5 ratio (<<table>>)
+        description_short: This is a measure of inequality that divides the average income of the percentile 50 by the average income of percentile 5. Higher values indicate higher inequality.
+        description_key:
+          - "{definitions.welfare_equivalence}"
+        unit: ''
+        short_unit: ''
+        display:
+          name: A50/A5 ratio (<<table>>)
+          <<: *common-display
+        presentation:
+          title_public: A50/A5 ratio (<<table>>)
+
+      _95_80_ratio:
+        title: A95/A80 ratio (<<table>>)
+        description_short: This is a measure of inequality that divides the average income of the percentile 95 by the average income of percentile 80. Higher values indicate higher inequality.
+        description_key:
+          - "{definitions.welfare_equivalence}"
+        unit: ''
+        short_unit: ''
+        display:
+          name: A95/A80 ratio (<<table>>)
+          <<: *common-display
+        presentation:
+          title_public: A95/A80 ratio (<<table>>)
