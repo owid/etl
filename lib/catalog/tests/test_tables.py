@@ -1036,3 +1036,48 @@ def test_fillna_with_another_table(table_1, origins, licenses) -> None:
     # # Now check the table metadata has not changed.
     assert tb.metadata == table_1.metadata
     assert tb2.metadata == table_1.metadata
+
+
+def test_ffill_with_number(table_1) -> None:
+    # Make a copy of table_1 and introduce a nan in it.
+    table = table_1.copy()
+    table.loc[1, "a"] = None
+    # Now fill it up with a number.
+    table["a"] = table["a"].ffill()
+    # The metadata of "a" should be preserved.
+    assert table["a"].metadata == table_1["a"].metadata
+    assert table.loc[1, "a"] == table_1.loc[0, "a"]
+
+    # Make a copy of table_1 and introduce a nan in it.
+    table = table_1.copy()
+    table.loc[1, "a"] = None
+    # Now fill it up with a number.
+    table["a"] = table["a"].fillna(method="ffill")
+    # The metadata of "a" should be preserved.
+    assert table["a"].metadata == table_1["a"].metadata
+    assert table.loc[1, "a"] == table_1.loc[0, "a"]
+
+
+def test_bfill_with_number(table_1) -> None:
+    # Make a copy of table_1 and introduce a nan in it.
+    table = table_1.copy()
+    table.loc[0, "a"] = None
+    # Now fill it up with a number.
+    table["a"] = table["a"].bfill()
+    # The metadata of "a" should be preserved.
+    assert table["a"].metadata == table_1["a"].metadata
+    assert table.loc[0, "a"] == table_1.loc[1, "a"]
+
+    # Make a copy of table_1 and introduce a nan in it.
+    table = table_1.copy()
+    table.loc[0, "a"] = None
+    # Now fill it up with a number.
+    table["a"] = table["a"].fillna(method="bfill")
+    # The metadata of "a" should be preserved.
+    assert table["a"].metadata == table_1["a"].metadata
+    assert table.loc[0, "a"] == table_1.loc[1, "a"]
+
+
+def test_fillna_error(table_1: Table) -> None:
+    with pytest.raises(ValueError):
+        table_1["a"].fillna()
