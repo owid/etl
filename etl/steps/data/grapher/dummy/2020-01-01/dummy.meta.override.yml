@@ -5,4 +5,4 @@ tables:
         title: Dummy abcsd
         display:
           numDecimalPlaces: 12
-        description_processing: d
+        description_processing: as
