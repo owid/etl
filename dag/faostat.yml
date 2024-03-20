@@ -605,3 +605,18 @@ steps:
   #
   data://explorers/faostat/latest/food_explorer:
     - data://garden/faostat/2024-03-14/faostat_food_explorer
+  #
+  # FAOSTAT garden step for additional variables
+  #
+  data://garden/faostat/2024-03-14/additional_variables:
+    - data://garden/faostat/2024-03-14/faostat_rl
+    - data://garden/faostat/2024-03-14/faostat_qi
+    - data://garden/faostat/2024-03-14/faostat_qcl
+    - data://garden/faostat/2024-03-14/faostat_sdgb
+    - data://garden/faostat/2024-03-14/faostat_fbsc
+    - data://garden/faostat/2024-03-14/faostat_rfn
+  #
+  # FAOSTAT grapher step for additional variables
+  #
+  data://grapher/faostat/2024-03-14/additional_variables:
+    - data://garden/faostat/2024-03-14/additional_variables
