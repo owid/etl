@@ -147,15 +147,17 @@ def remove_spells_duplicates_and_add_urban(tb: Table, short_name: str) -> Table:
     # Make country string
     tb["country"] = tb["country"].astype(str)
 
-    # For Argentina
-    mask = tb["country"] == "Argentina"
-    tb.loc[mask, "country"] = tb.loc[mask, "country"] + " (urban)"
-    # For Bolivia
-    mask = (tb["country"] == "Bolivia") & (tb["survey_number"] == 1) & (tb["year"] <= 1997)
-    tb.loc[mask, "country"] = tb.loc[mask, "country"] + " (urban)"
-    # For Uruguay
-    mask = (tb["country"] == "Uruguay") & (tb["survey_number"] == 1)
-    tb.loc[mask, "country"] = tb.loc[mask, "country"] + " (urban)"
+    # Define the conditions to add "(urban)" to country names
+    # In the case of Bolivia, I add the year condition to avoid adding "(urban)" to the whole poverty series (it only has one survey spell beginning in 2000)
+    countries_conditions = [
+        ("Argentina", tb["country"] == "Argentina"),
+        ("Bolivia", (tb["country"] == "Bolivia") & (tb["survey_number"] == 1) & (tb["year"] <= 1997)),
+        ("Uruguay", (tb["country"] == "Uruguay") & (tb["survey_number"] == 1)),
+    ]
+
+    for country, condition in countries_conditions:
+        mask = condition
+        tb.loc[mask, "country"] = tb.loc[mask, "country"] + " (urban)"
 
     # Drop survey columns
     tb = tb.drop(columns=["survey", "survey_number"])
