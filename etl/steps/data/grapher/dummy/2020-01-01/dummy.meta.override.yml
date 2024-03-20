@@ -2,4 +2,4 @@ tables:
   dummy:
     variables:
       dummy_variable:
-        title: Dummy abcd
+        title: Dummy abcsd
