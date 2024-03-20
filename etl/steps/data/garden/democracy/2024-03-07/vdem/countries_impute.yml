@@ -1,0 +1,285 @@
+# List specifying how to impute specific country.
+#
+# As an example:
+#
+# - country: Panama
+#   country_impute: Colombia
+#   year_min: 1832
+#   year_max: 1902
+#
+# This means that we want to inherit the classifications for Panama from Colombia between 1832 and 1902.
+#
+# We note that `country` can also be a list of countries.
+
+
+# BANGLADESH (1945-1948)
+## 1947-1970 imperial power/part of Pakistan (Wimmer and Min 2006, Cshapes 2.0)
+- country: Bangladesh
+  country_impute: Pakistan
+  year_min: 1947
+  year_max: 1970
+## 1765-1946 imperial power United Kingdom, 1886-1946 part of colony India (Cshapes 2.0), colonized in 1757 (Ertan et al. 2016)
+- country: Bangladesh
+  country_impute: Pakistan
+  year_min: 1789
+  year_max: 1946
+
+# UKRAINE (1789-1989)
+## 1946-1989 imperial power/part of Russia (Wimmer and Min 2006, Cshapes 2.0), 1921-1945 and 1816-1918 mixed rule (Wimmer and Min 2006).
+- country: Ukraine
+  country_impute: Russia
+  year_min: 1946
+  year_max: 1989
+
+# PAKISTAN (1789-1946)
+## 1947-1970 1839-1946 imperial power United Kingdom (Wimmer and Min 2006), 1886-1947 part of colony India (Cshapes 2.0), colonized in 1849 (Ertan et al. 2016)
+- country: Pakistan
+  country_impute: India
+  year_min: 1947
+  year_max: 1970
+
+# POLAND
+## Poland 1789-1808, 1868-1917, 1939-1943: no information 1800-1808, 1795-1914 mixed rule (Wimmer and Min 2006), 1939-1943 independent (Cshapes 2.0); [I favor no imputation].
+
+# ITALY (1789-1860)
+## 1814-1860 part of Austria-Hungary (Wimmer and Min 2006) [No imputation]
+## 1815-1860 part of Piedmont-Sardinia (Butcher and Griffiths 2020)
+- country: Italy
+  country_impute: Piedmont-Sardinia
+  year_min: 1815
+  year_max: 1860
+
+# NIGERIA (1789-1913)
+## 1861-1959 imperial power United Kingdom (Wimmer and Min 2006), colony of United Kingdom (Cshapes 2.0), colonized by United Kingdom in 1885 (Ertan et al. 2016); [I favor no imputation].
+
+# VIETNAM (1789-1944)
+## 1861-1953 imperial power France (Wimmer and Min 2006) or 1886-1893 independent and 1894-1954 colonized by France (Cshapes 2.0), colonized by France in 1867 (Ertan et al. 2016), independent 1802-1884 (Butcher and Griffiths 2020); [I favor no imputation].
+
+# UZBEKISTAN (1789-1911, 1921-1989)
+## 1865-1990 imperial power Russia (Wimmer and Min 2006), 1886-1991 part of Russia (Khiva and Bokhara partially as protectorates), not colonized (Ertan et al. 2016), Khiva and Bokhara as independent until -1872 and -1867.
+- country: Uzbekistan
+  country_impute: Russia
+  year_min: 1865
+  year_max: 1911
+- country: Uzbekistan
+  country_impute: Russia
+  year_min: 1921
+  year_max: 1989
+
+# KAZAKHSTAN (1789-1989)
+## 1730-1990 imperial power Russia (Wimmer and Min 2006), part of Russia 1886-1991 (Cshapes 2.0); not colonized (Ertan et al. 2016).
+- country: Kazakhstan
+  country_impute: Russia
+  year_min: 1730
+  year_max: 1990
+
+# MOZAMBIQUE (1789-1899, 1974-1993)
+## imperial power Portugal 1885-1974 (Wimmer and Min 2006); colony of Portugal 1886-1975 (Cshapes 2.0), colonized by Portugal, approximated as 1750 (Ertan et al. 2016); [I favor no imputation].
+
+# CZECHIA (1789-1917)
+## Imperial power Austria-Hungary 16th century-1917 (Wimmer and Min 2006), part of Austria-Hungary since at least 1886 (Cshapes 2.0), Czech part under Austrian control (Encyclopedia Britannica).
+- country: Czechia
+  country_impute: Austria
+  year_min: 1789
+  year_max: 1917
+
+# IRAN (1789-1899)
+## no imperial onset (Wimmer and Min 2006), independent since at least 1886 (Cshapes 2.0), not colonized (Ertan et al. 2016); [I favor no imputation].
+
+# BELARUS (1789-1989)
+## imperial power Russia 1795-1990 (Wimmer and Min 2006); 1886-1991 part of Russia (Cshapes 2.0), not mentioned in Ertan et al. (2016), independent since 1991 (Butcher and Griffiths 2020).
+- country: Belarus
+  country_impute: Russia
+  year_min: 1795
+  year_max: 1989
+
+# DEMOCRATIC REPUBLIC OF CONGO (1789-1899)
+## imperial power Belgium 1885-1959 (Wimmer and Min 2006), colonized in 1885 (Ertan et al. 2016); [I favor no imputation].
+
+# NORTH KOREA (1789-1944)
+## Korea since the 14th century until 1909, imperial power Japan 1910-1944 (Wimmer and Min 2006), independent Korea since at least 1886-1910, colony of Japan -1945 (Cshapes 2.0), not listed (Ertan et al. 2016)
+- country: North Korea
+  country_impute: Korea
+  year_min: 1789
+  year_max: 1910
+
+# SUDAN (1789-1899)
+## Egypt imperial power 1821-1881, mixed rule 1882-1955 (Wimmer and Min 2006), colony of United Kingdom 1898-1955 (CShapes 2.0), colonized by United Kingdom in 1898 (Ertan et al. 2016), independent 1885-1898 (Butcher and Griffiths 2020); in 1886, colony Egypt of United Kingdom covers little of today's Sudan (CShapes 2.0); Egypt invades Sudanese territory in 1820, indigenous forces surrender in 1821, Mahdists capture Khartoum from Egypt and the British in 1885 (Encyclopedia Britannica).
+- country: Sudan
+  country_impute: Egypt
+  year_min: 1821
+  year_max: 1884
+
+# SOUTH SUDAN (1789-2010)
+## not listed, but Egypt imperial power of Sudan 1821-1881, mixed rule 1882-1955 (Wimmer and Min 2006), colony of United Kingdom 1898-1955, part of Sudan until 2012 (Cshapes 2.0), colonized by United Kingdom in 1898 (Ertan et al. 2016), independent 1885-1898 (Butcher and Griffiths 2020).
+- country: South Sudan
+  country_impute: Egypt
+  year_min: 1821
+  year_max: 1884
+- country: South Sudan
+  country_impute: Sudan
+  year_min: 1900
+  year_max: 2010
+
+# IRELAND (1789-1918)
+## imperial power United Kingdom 11th century-1919 (Wimmer and Min 2006), part of United Kingdom since at least 1886-1922, independent since 1922 (Butcher and Griffiths 2020).
+- country: Ireland
+  country_impute: United Kingdom
+  year_min: 1789
+  year_max: 1918
+
+# AZERBAIJAN (1789-1989)
+## imperial power Russia 1813-1917, 1920-1990 (Wimmer and Min 2006), part of Russia since at least 1886-1991 (Cshapes 2.0) not colonized (Ertan et al. 2016).
+- country: Azerbaijan
+  country_impute: Russia
+  year_min: 1813
+  year_max: 1989
+
+
+
+
+
+
+
+
+# Federal Republic of Central America
+- country:
+    - Guatemala
+    - Honduras
+    - El Salvador
+    - Nicaragua
+    - Costa Rica
+  country_impute: Federal Republic of Central America
+  year_min: 1824
+  year_max: 1838
+
+
+# Czechoslovakia
+- country:
+    - Slovakia
+    - Czechia
+  country_impute: Czechoslovakia
+  year_min: 1918
+  year_max: 1992
+# Korea
+## Korea from Japan Colonisation (1910 - 1945)?
+- country:
+    - South Korea
+    - North Korea
+  country_impute: Korea (former)
+  year_min: 1800
+  year_max: 1910
+# Great Colombia
+- country:
+    - Venezuela
+    - Ecuador
+    - Panama
+    - Colombia
+  country_impute: Great Colombia
+  year_min: 1821
+  year_max: 1830
+# Colombia
+- country: Panama
+  country_impute: Colombia
+  year_min: 1832
+  year_max: 1902
+# Yugoslavia
+- country:
+    - Slovenia
+    - Croatia
+    - Montenegro
+    - Serbia
+    - Bosnia and Herzegovina
+    - Kosovo
+    - North Macedonia
+  country_impute: Yugoslavia
+  year_min: 1921
+  year_max: 1990
+# Serbia and Montenegro
+- country:
+    - Serbia
+    - Montenegro
+    - Kosovo
+  country_impute: Serbia and Montenegro
+  year_min: 1991
+  year_max: 2005
+# Serbia (with Kosovo)
+- country: Kosovo
+  country_impute: Serbia
+  year_min: 2006
+  year_max: 2011
+# USSR
+- country: Russia
+  country_impute: USSR
+  year_min: 1922
+  year_max: 1991
+- country:
+    - Ukraine
+    - Belarus
+    - Azerbaijan
+    - Armenia
+    - Georgia
+    - Turkmenistan
+    - Uzbekistan
+    - Kazakhstan
+    - Tajikistan
+    - Kyrgyzstan
+  country_impute: USSR
+  year_min: 1922
+  year_max: 1991
+- country:
+    - Lithuania
+    - Latvia
+    - Estonia
+  country_impute: USSR
+  year_min: 1941
+  year_max: 1991
+- country: Moldova
+  country_impute: USSR
+  year_min: 1940
+  year_max: 1991
+
+# Russian Empire
+- country:
+    - Belarus
+    - Georgia
+    - Turkmenistan
+    - Kazakhstan
+  country_impute: Russia
+  year_min: 1800
+  year_max: 1921
+- country: Tajikistan
+  country_impute: Russia
+  year_min: 1868
+  year_max: 1921
+- country: Kyrgyzstan
+  country_impute: Russia
+  year_min: 1868
+  year_max: 1921
+- country: Uzbekistan
+  country_impute: Russia
+  year_min: 1865
+  year_max: 1911
+- country: Moldova
+  country_impute: Russia
+  year_min: 1800
+  year_max: 1919
+- country: Azerbaijan
+  country_impute: Russia
+  year_min: 1813
+  year_max: 1921
+
+# Ethopia
+- country:
+    - Eritrea
+    - Ethiopia
+  country_impute: Ethiopia (former)
+  year_min: 1952
+  year_max: 1992
+# Pakistan
+- country:
+    - Pakistan
+    - Bangladesh
+  country_impute: Pakistan (former)
+  year_min: 1947
+  year_max: 1971
