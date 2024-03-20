@@ -38,6 +38,7 @@ important issues (since we use item_code to merge different datasets, and we use
 """
 
 import json
+import os
 import sys
 from copy import deepcopy
 from typing import Dict, List, Tuple
@@ -63,6 +64,10 @@ from shared import (
 from tqdm.auto import tqdm
 
 from etl.helpers import PathFinder
+
+# If environment variable SHOW_WARNING_DETAILS is set to True, show a detailed warning (e.g. when comparing discrepant
+# item names from data and metadata).
+SHOW_WARNING_DETAILS = bool(os.getenv("SHOW_WARNING_DETAILS", False))
 
 
 def create_dataset_descriptions_table_for_domain(table: Table, dataset_short_name: str) -> Table:
@@ -283,12 +288,19 @@ def create_items_table_for_domain(table: Table, metadata: Dataset, dataset_short
     different_items = compared[compared["fao_item_in_data"] != compared["fao_item_in_metadata"]]
     missing_item_codes = set(items_from_data["item_code"]) - set(_tb_items["item_code"])
     if len(missing_item_codes) > 0:
-        log.warning(f"{len(missing_item_codes)} item codes in {dataset_short_name} missing in metadata. ")
+        warning_message = f"{len(missing_item_codes)} item codes of {dataset_short_name} data missing in metadata. "
+        if SHOW_WARNING_DETAILS:
+            for item_code in missing_item_codes:
+                warning_message += f"\n* Item {item_code} from data: {items_from_data[items_from_data['item_code'] == item_code]['fao_item'].item()}"
+        log.warning(warning_message)
     if len(different_items) > 0:
         _frac_different = len(different_items) / len(set(compared["fao_item_in_data"]))
-        log.warning(
-            f"{len(different_items)} item codes of {dataset_short_name} in data ({_frac_different:.2%}) mapping to different items in metadata."
-        )
+        warning_message = f"{len(different_items)} item codes of {dataset_short_name} in data ({_frac_different:.2%}) mapping to different items in metadata."
+        if SHOW_WARNING_DETAILS:
+            for item_code, item_in_data, item_in_metadata in different_items.values:
+                warning_message += f"\n\n* Item {item_code} from     data: {item_in_data}"
+                warning_message += f"\n* Item {item_code} from metadata: {item_in_metadata}"
+        log.warning(warning_message)
 
     return items_from_data
 

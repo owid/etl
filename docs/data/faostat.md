@@ -261,11 +261,18 @@ If no dataset requires an update, the workflow stops here.
     etl run garden/faostat/YYYY-MM-DD
     ```
 
-    Optionally, set `INSPECT_ANOMALIES=True`, to visualize if anomalies that were detected in the previous version of the data are still present in the current version.
+    The first time running the steps after an update, set `INSPECT_ANOMALIES=True`, to visualize if anomalies that were detected in the previous version of the data are still present in the current version.
 
     ```bash
     INSPECT_ANOMALIES=True etl run garden/faostat/YYYY-MM-DD
     ```
+
+    If warnings are shown, set `SHOW_WARNING_DETAILS=True` and run the `faostat_metadata` step again. Check that differences between item names in the data and metadata are small (e.g. "Rodenticides   Other" -> "Rodenticides – Other"). If differences are not small, investigate the issue.
+
+    ```bash
+    SHOW_WARNING_DETAILS=True etl run garden/faostat/YYYY-MM-DD/faostat_metadata
+    ```
+
     !!! note
 
         If a new domain has been added to this version, you may need to manually add its meadow step as a dependency of garden/faostat/YYYY-MM-DD/faostat_metadata in the dag (this is a known bug).
@@ -280,10 +287,6 @@ If no dataset requires an update, the workflow stops here.
     ```bash
     etl run garden/faostat/YYYY-MM-DD
     ```
-
-    !!! note
-
-        Sometimes `garden/faostat/YYYY-MM-DD/faostat_metadata` raises the warning "X item codes in data mapping to different items in metadata.". This used to happen often. In the latest version, only once (`faostat_rp`, with 38 discrepant items). It usually means that there are small differences between the item name in FAO data and the item name (for the same item code) in FAO metadata. There usually are small differences, like "Rodenticides   Other" and "Rodenticides – Other". But after every update, if there are new (or many) discrepant items, check the content of `compared` inside `create_items_table_for_domain`, in the `faostat_metadata`step.
 
 7. Create new grapher steps.
 
