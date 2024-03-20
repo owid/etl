@@ -3,3 +3,5 @@ tables:
     variables:
       dummy_variable:
         title: Dummy abcsd
+        display:
+          numDecimalPlaces: 12
