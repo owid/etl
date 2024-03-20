@@ -44,9 +44,9 @@ definitions:
 
   welfare_equivalence: |-
     <% if table == "$2.15 a day" or table == "$3.65 a day" or table == "$6.85 a day" or table == "50% of median" or table == "Per capita income"%>
-    This is household income per capita. 'Per capita' means that the income of each household is attributed equally to each member of the household (including children).
+    This is current household income per capita. "Current" means that all income sources are added, including labor income, pensions, capital and benefits and transfers. "Per capita" means that the income of each household is attributed equally to each member of the household (including children).
     <% elif table == "Equivalized income" %>
-    Household income has been equivalized – adjusted to account for the fact that people in the same household can share costs like rent and heating.
+    This is current household income. "Current" means that all income sources are added, including labor income, pensions, capital and benefits and transfers. Income has been equivalized – adjusted to account for the fact that people in the same household can share costs like rent and heating.
     <%- endif -%>
 
 # Learn more about the available fields:
