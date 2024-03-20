@@ -134,7 +134,9 @@ def prepare_output_data(tb: Table) -> Table:
     index_columns = list({"Area Code", "Recipient Country Code", "Year", "Item Code", "Element Code"} & set(tb.columns))
     if tb.duplicated(subset=index_columns).any():
         log.warning("Index has duplicated keys.")
-    tb = tb.set_index(index_columns)
+
+    # Ensure all columns are snake-case, and set an index.
+    tb = tb.set_index(index_columns).underscore()
 
     return tb
 
@@ -165,9 +167,13 @@ def run(dest_dir: str) -> None:
     # Prepare output meadow table.
     tb = prepare_output_data(tb=tb_snapshot)
 
+    # Check that column "value" has an origin (other columns are not as important and may not have origins).
+    assert len(tb["value"].metadata.origins) == 1, f"Column 'value' of {dataset_short_name} must have one origin."
+
     #
     # Save outputs.
     #
     # Create a new meadow dataset.
-    ds_meadow = create_dataset(dest_dir=dest_dir, tables=[tb], check_variables_metadata=True)
+    # NOTE: Do not check if all variables have metadata. We asserted above that "value" has an origin.
+    ds_meadow = create_dataset(dest_dir=dest_dir, tables=[tb], check_variables_metadata=False)
     ds_meadow.save()

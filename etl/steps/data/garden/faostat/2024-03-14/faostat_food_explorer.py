@@ -10,8 +10,8 @@ The resulting dataset will later be loaded by the `explorer/food_explorer` which
 
 from pathlib import Path
 
+import owid.catalog.processing as pr
 from owid.catalog import Dataset, Table
-from owid.datautils import dataframes
 from shared import (
     CURRENT_DIR,
     FAO_POPULATION_ELEMENT_NAME,
@@ -392,8 +392,11 @@ def combine_qcl_and_fbsc(tb_qcl: Table, tb_fbsc: Table) -> Table:
     fbsc["item"] = [item for item in fbsc["item"]]
 
     rename_columns = {"item": "product"}
+    # combined = (
+    #     dataframes.concatenate([qcl, fbsc], ignore_index=True).rename(columns=rename_columns).reset_index(drop=True)
+    # )
     combined = (
-        dataframes.concatenate([qcl, fbsc], ignore_index=True).rename(columns=rename_columns).reset_index(drop=True)
+        pr.concat([qcl, fbsc], ignore_index=True).rename(columns=rename_columns, errors="raise").reset_index(drop=True)
     )
 
     # Sanity checks.
@@ -546,7 +549,9 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Initialise new garden dataset.
-    ds_garden = create_dataset(dest_dir=dest_dir, tables=[tb], default_metadata=ds_fbsc.metadata)
+    ds_garden = create_dataset(
+        dest_dir=dest_dir, tables=[tb], default_metadata=ds_fbsc.metadata, check_variables_metadata=True
+    )
 
     # Update dataset metadata and combine sources from qcl and fbsc datasets.
     ds_garden.metadata.title = DATASET_TITLE

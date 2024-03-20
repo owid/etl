@@ -215,6 +215,14 @@ def run(dest_dir: str) -> None:
     log.info("faostat_fbsc.prepare_wide_table", shape=tb.shape)
     tb_wide = prepare_wide_table(tb=tb)
 
+    # Check that column "value" has two origins (other columns are not as important and may not have origins).
+    error = f"Column 'value' of the long table of {dataset_short_name} must have two origins."
+    assert len(tb_long["value"].metadata.origins) == 2, error
+    error = f"All value columns of the wide table of {dataset_short_name} must have two origins."
+    assert all(
+        [len(tb_wide[column].metadata.origins) == 2 for column in tb_wide.columns if column not in ["area_code"]]
+    ), error
+
     #
     # Save outputs.
     #
@@ -225,7 +233,9 @@ def run(dest_dir: str) -> None:
     tb_wide.metadata.title = dataset_metadata["owid_dataset_title"] + ADDED_TITLE_TO_WIDE_TABLE
 
     # Initialise new garden dataset.
-    ds_garden = create_dataset(dest_dir=dest_dir, tables=[tb_long, tb_wide], default_metadata=ds_fbs.metadata)
+    ds_garden = create_dataset(
+        dest_dir=dest_dir, tables=[tb_long, tb_wide], default_metadata=ds_fbs.metadata, check_variables_metadata=False
+    )
 
     # Check that the title assigned here coincides with the one in custom_datasets.csv (for consistency).
     error = "Dataset title given to fbsc is different to the one in custom_datasets.csv. Update the latter file."

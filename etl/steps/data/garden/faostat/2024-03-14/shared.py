@@ -1873,6 +1873,14 @@ def run(dest_dir: str) -> None:
     # Create a wide table (with only country and year as index).
     tb_wide = prepare_wide_table(tb=tb)
 
+    # Check that column "value" has an origin (other columns are not as important and may not have origins).
+    error = f"Column 'value' of the long table of {dataset_short_name} must have one origin."
+    assert len(tb_long["value"].metadata.origins) == 1, error
+    error = f"All value columns of the wide table of {dataset_short_name} must have one origin."
+    assert all(
+        [len(tb_wide[column].metadata.origins) == 1 for column in tb_wide.columns if column not in ["area_code"]]
+    ), error
+
     #
     # Save outputs.
     #
@@ -1884,7 +1892,10 @@ def run(dest_dir: str) -> None:
 
     # Initialise new garden dataset.
     ds_garden = create_dataset(
-        dest_dir=dest_dir, tables=[tb_long, tb_wide], default_metadata=ds_meadow.metadata, check_variables_metadata=True
+        dest_dir=dest_dir,
+        tables=[tb_long, tb_wide],
+        default_metadata=ds_meadow.metadata,
+        check_variables_metadata=False,
     )
     # Update dataset metadata.
     # Add description of anomalies (if any) to the dataset description.
