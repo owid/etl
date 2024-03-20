@@ -64,9 +64,6 @@ from tqdm.auto import tqdm
 
 from etl.helpers import PathFinder
 
-# Minimum number of issues in the comparison of items and item codes from data and metadata to raise a warning.
-N_ISSUES_ON_ITEMS_FOR_WARNING = 1
-
 
 def create_dataset_descriptions_table_for_domain(table: Table, dataset_short_name: str) -> Table:
     """Create a single row table with the dataset name, title and description, for a given domain.
@@ -290,7 +287,7 @@ def create_items_table_for_domain(table: Table, metadata: Dataset, dataset_short
     if len(different_items) > 0:
         _frac_different = len(different_items) / len(set(compared["fao_item_in_data"]))
         log.warning(
-            f"{len(different_items)} item codes in data ({_frac_different:.2%}) mapping to different items in metadata."
+            f"{len(different_items)} item codes of {dataset_short_name} in data ({_frac_different:.2%}) mapping to different items in metadata."
         )
 
     return items_from_data
