@@ -1,6 +1,6 @@
 """Load a garden dataset and create a grapher dataset."""
 
-import pandas as pd
+import owid.catalog.processing as pr
 from owid.catalog import Table
 from owid.catalog.utils import underscore_table
 
@@ -14,59 +14,67 @@ def prepare_maize_and_wheat_in_the_context_of_the_ukraine_war(tb_maize_and_wheat
     # Prepare groupings that will be shown in a stacked discrete bar chart.
     # Ukraine and Russia exports of maize and wheat.
     ukraine_and_russia_exports = (
-        pd.merge(
-            tb_maize_and_wheat[["maize_exports", "wheat_exports"]].loc["Ukraine"],
-            tb_maize_and_wheat[["maize_exports", "wheat_exports"]].loc["Russia"],
-            left_index=True,
-            right_index=True,
+        tb_maize_and_wheat[tb_maize_and_wheat["country"] == "Ukraine"][["year", "maize_exports", "wheat_exports"]]
+        .merge(
+            tb_maize_and_wheat[tb_maize_and_wheat["country"] == "Russia"][["year", "maize_exports", "wheat_exports"]],
+            on="year",
             suffixes=(" Ukraine", " Russia"),
         )
         .assign(**{"country": "Ukraine and Russia exports"})
-        .reset_index()
     )
     # EU and UK maize and wheat used for animal feed.
     eu_and_uk_feed = (
-        pd.merge(
-            tb_maize_and_wheat[["maize_animal_feed", "wheat_animal_feed"]].loc["European Union (27)"],
-            tb_maize_and_wheat[["maize_animal_feed", "wheat_animal_feed"]].loc["United Kingdom"],
-            left_index=True,
-            right_index=True,
+        tb_maize_and_wheat[tb_maize_and_wheat["country"] == "European Union (27)"][
+            ["year", "maize_animal_feed", "wheat_animal_feed"]
+        ]
+        .merge(
+            tb_maize_and_wheat[tb_maize_and_wheat["country"] == "United Kingdom"][
+                ["year", "maize_animal_feed", "wheat_animal_feed"]
+            ],
+            on="year",
             suffixes=(" EU", " UK"),
         )
         .assign(**{"country": "EU and UK animal feed"})
-        .reset_index()
     )
     # EU and UK maize and wheat devoted to other uses (predominantly biofuels).
     eu_and_uk_biofuels = (
-        pd.merge(
-            tb_maize_and_wheat[["maize_other_uses", "wheat_other_uses"]].loc["European Union (27)"],
-            tb_maize_and_wheat[["maize_other_uses", "wheat_other_uses"]].loc["United Kingdom"],
-            left_index=True,
-            right_index=True,
+        tb_maize_and_wheat[tb_maize_and_wheat["country"] == "European Union (27)"][
+            ["year", "maize_other_uses", "wheat_other_uses"]
+        ]
+        .merge(
+            tb_maize_and_wheat[tb_maize_and_wheat["country"] == "United Kingdom"][
+                ["year", "maize_other_uses", "wheat_other_uses"]
+            ],
+            on="year",
             suffixes=(" EU", " UK"),
         )
         .assign(**{"country": "EU and UK biofuels"})
-        .reset_index()
     )
     # US maize and wheat used for animal feed.
     us_feed = (
-        tb_maize_and_wheat[["maize_animal_feed", "wheat_animal_feed"]]
-        .loc["United States"]
-        .rename(columns={"maize_animal_feed": "maize_animal_feed US", "wheat_animal_feed": "wheat_animal_feed US"})
+        tb_maize_and_wheat[tb_maize_and_wheat["country"] == "United States"][
+            ["year", "maize_animal_feed", "wheat_animal_feed"]
+        ]
+        .rename(
+            columns={"maize_animal_feed": "maize_animal_feed US", "wheat_animal_feed": "wheat_animal_feed US"},
+            errors="raise",
+        )
         .assign(**{"country": "US animal feed"})
-        .reset_index()
     )
     # US maize and wheat devoted to other uses (predominantly biofuels).
     us_biofuels = (
-        tb_maize_and_wheat[["maize_other_uses", "wheat_other_uses"]]
-        .loc["United States"]
-        .rename(columns={"maize_other_uses": "maize_other_uses US", "wheat_other_uses": "wheat_other_uses US"})
+        tb_maize_and_wheat[tb_maize_and_wheat["country"] == "United States"][
+            ["year", "maize_other_uses", "wheat_other_uses"]
+        ]
+        .rename(
+            columns={"maize_other_uses": "maize_other_uses US", "wheat_other_uses": "wheat_other_uses US"},
+            errors="raise",
+        )
         .assign(**{"country": "US biofuels"})
-        .reset_index()
     )
 
     # Combine all groupings.
-    combined = pd.concat(
+    combined = pr.concat(
         [ukraine_and_russia_exports, eu_and_uk_feed, eu_and_uk_biofuels, us_feed, us_biofuels], ignore_index=True
     )
 
@@ -86,7 +94,7 @@ def prepare_maize_and_wheat_in_the_context_of_the_ukraine_war(tb_maize_and_wheat
         combined[column].metadata.title = title
         combined[column].metadata.unit = "tonnes"
         combined[column].metadata.short_unit = "t"
-    combined = underscore_table(combined)
+    combined = combined.underscore()
 
     return combined
 
@@ -141,7 +149,7 @@ def run(dest_dir: str) -> None:
     tb_agriculture_land_use_evolution = ds_garden["agriculture_land_use_evolution"]
     tb_hypothetical_meat_consumption = ds_garden["hypothetical_meat_consumption"]
     tb_cereal_allocation = ds_garden["cereal_allocation"]
-    tb_maize_and_wheat = ds_garden["maize_and_wheat"]
+    tb_maize_and_wheat = ds_garden["maize_and_wheat"].reset_index()
     tb_fertilizer_exports = ds_garden["fertilizer_exports"]
 
     #
@@ -150,7 +158,7 @@ def run(dest_dir: str) -> None:
     # To insert table into grapher DB, change "item" column to "country" (which will be changed back in the admin).
     tb_area_used_per_crop_type = (
         tb_area_used_per_crop_type.reset_index()
-        .rename(columns={"item": "country"})
+        .rename(columns={"item": "country"}, errors="raise")
         .set_index(["country", "year"], verify_integrity=True)
         .sort_index()
     )
@@ -160,8 +168,8 @@ def run(dest_dir: str) -> None:
     tb_land_spared_by_increased_crop_yields = tb_land_spared_by_increased_crop_yields.reset_index()
     tb_land_spared_by_increased_crop_yields = (
         tb_land_spared_by_increased_crop_yields[tb_land_spared_by_increased_crop_yields["country"] == "World"]
-        .drop(columns=["country"])
-        .rename(columns={"item": "country"})
+        .drop(columns=["country"], errors="raise")
+        .rename(columns={"item": "country"}, errors="raise")
         .set_index(["country", "year"], verify_integrity=True)
         .sort_index()
     )
@@ -198,6 +206,7 @@ def run(dest_dir: str) -> None:
             tb_fertilizer_exports_in_the_context_of_the_ukraine_war,
         ],
         default_metadata=ds_garden.metadata,
+        check_variables_metadata=True,
     )
 
     # Save changes in the new grapher dataset.
