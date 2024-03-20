@@ -1,0 +1,43 @@
+dataset:
+  title: Global aviation emissions (Bergero et al. 2023)
+  description: Global trends in aviation demand, energy use, and carbon emissions from 1990 onwards.
+  licenses:
+    - {}
+tables:
+  aviation_emissions_bergero:
+    variables:
+      aviation_passengers_billionkm:
+        title: Passenger demand
+        unit: billion-kilometers
+        short_unit: billion-km
+        description: Passenger demand for aviation, measured in billions passenger-kilometers.
+      aviation_freight_milliontonkm:
+        title: Freight demand
+        unit: million-ton kilometers
+        short_unit: million-ton km
+        description: Freight demand for aviation, measured in million-ton kilometers.
+      aviation_energy_intensity:
+        title: Energy intensity
+        unit: MJ per passenger-km
+        short_unit: MJ
+        description: Energy intensity of aviation, measured as megajoules of energy per passenger-kilometer.
+      aviation_carbon_per_energy:
+        title: Carbon per unit energy
+        unit: grams CO2e per MJ
+        short_unit: gCO2/MJ
+        description: The amount of CO2 emitted per megajoule of energy used for aviation.
+      aviation_carbon_intensity:
+        title: Carbon intensity
+        unit: grams CO2 per passenger-km
+        short_unit: gCO2
+        description: The carbon intensity of aviation, measured as the amount of the CO2 emitted per passenger-kilometer.
+      aviation_co2_altitude:
+        title: CO2 emissions, altitude included
+        unit: billion tonnes
+        short_unit: Gt
+        description: Carbon dioxide emissions from aviation, with increased impacts of warming at altitude included.
+      aviation_co2:
+        title: CO2 emissions
+        unit: billion tonnes
+        short_unit: Gt
+        description: Carbon dioxide emissions from aviation, without altitude impacts included.
