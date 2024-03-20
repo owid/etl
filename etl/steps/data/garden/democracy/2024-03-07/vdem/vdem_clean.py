@@ -53,17 +53,18 @@ def estimate_mulpar_indicators(tb: Table) -> Table:
         "v2elmulpar_osp_codelow": "v2elmulpar_osp_low",
         # Create indicators for free and fair elections with imputed values between election-years
         "v2elfrfair_osp": "v2elfrfair_osp",
+        "v2elfrfair_osp_codehigh": "v2elfrfair_osp_high",
+        "v2elfrfair_osp_codelow": "v2elfrfair_osp_low",
     }
     columns_old = list(columns.keys())
     columns_new = list(columns.values())
 
     ## Forward fill indicators when there are regularly scheduled national elections on course, as stipulated by election law or well-established precedent
     mask = tb["v2x_elecreg"] == 1
-    tb.loc[mask, columns_new] = tb.groupby(["country"])[columns_old].ffill().loc[mask]
-
-    # Copy v2elfrfair_osp to v2elfrfair_osp_high and v2elfrfair_osp_low
-    tb["v2elfrfair_osp_high"] = tb["v2elfrfair_osp"].copy()
-    tb["v2elfrfair_osp_low"] = tb["v2elfrfair_osp"].copy()
+    tb[columns_new] = tb[columns_old].copy()
+    tb.loc[mask, columns_new] = tb.groupby(["country"])[columns_new].ffill().loc[mask]
+    # condition = (tb['v2x_elecreg'] == 1) & (tb['v2elmulpar_osp_imp'].isna())
+    # tb.loc[:, columns_new] = tb.groupby(["country"])[columns_old].transform(lambda x: x.ffill().where(x.bfill().eq(1)))
     return tb
 
 
@@ -650,7 +651,7 @@ def add_regime_amb_row(tb: Table) -> Table:
 
 def drop_columns(tb: Table) -> Table:
     """Drop columns that are not of interest."""
-    tb.drop(
+    tb = tb.drop(
         columns=[
             "v2x_regime",
             "v2x_regime_amb",

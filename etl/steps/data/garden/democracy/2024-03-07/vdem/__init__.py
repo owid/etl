@@ -1,5 +1,6 @@
 """Load a meadow dataset and create a garden dataset."""
 
+from copy import deepcopy
 from typing import cast
 
 import vdem_clean as clean  # VDEM's cleaning library
@@ -40,6 +41,9 @@ def run(dest_dir: str) -> None:
 
     # Sort
     tb = tb.sort_values(["country", "year"])
+
+    # %% Copy origins (some indicators will loose their 'origins' in metadata)
+    origins = deepcopy(tb["country"].metadata.origins)
 
     # (L76-L94) Create expanded and refined Regimes of the World indicator
     # %% Create indicators for multi-party elections, and free and fair elections
@@ -94,15 +98,17 @@ def run(dest_dir: str) -> None:
     tb.loc[(tb["wom_hos_vdem"].notna()) & (tb["v2exhoshog"] == 1), "wom_hog_vdem"] = tb["wom_hos_vdem"]
     tb = tb.drop(columns=["v2exhoshog"])
 
+    # %% Bring origins back
+    columns = [col for col in tb.columns if col not in ["country", "year"]]
+    for col in columns:
+        tb[col].metadata.origins = origins
+
     # %% Proceed
     # Harmonize country names
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
 
     # Set index
     tb = tb.set_index(["country", "year"], verify_integrity=True)
-
-    # Dtypes
-    tb = tb.astype(dtype={"v2exnamhos": "string"})
 
     # %% Save
     #
