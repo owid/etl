@@ -224,6 +224,16 @@ If no dataset requires an update, the workflow stops here.
     python etl/scripts/faostat/create_new_snapshots.py
     ```
 
+    !!! note
+
+        It has already happened a few times that FAOSTAT changes an indicator from one domain to another. If
+        `create_new_snapshot` raises a warning because a domain is no longer found, usually the indicators of the old
+        domain can be found in another domain. Go to the grapher dataset of the old domain and gather all pairs of
+        item code + element code that were used in charts. Then go to [the FAOSTAT definitions table](https://www.fao.org/faostat/en/#definitions)
+        and find the domain where that combination of item code and element code can be found. If we were not
+        downloading this domain, add it to the list `INCLUDED_DATASETS_CODES`. Then replace variables used in those
+        charts with the new ones.
+
 2. Create new meadow steps.
 
     !!! note
