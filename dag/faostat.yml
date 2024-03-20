@@ -328,18 +328,12 @@ steps:
   #
   data://meadow/faostat/2024-03-14/faostat_cahd:
     - snapshot://faostat/2024-03-14/faostat_cahd.zip
-  data://meadow/faostat/2024-03-14/faostat_ef:
-    - snapshot://faostat/2023-02-22/faostat_ef.zip
   data://meadow/faostat/2024-03-14/faostat_ei:
     - snapshot://faostat/2024-03-14/faostat_ei.zip
   data://meadow/faostat/2024-03-14/faostat_ek:
     - snapshot://faostat/2024-03-14/faostat_ek.zip
-  data://meadow/faostat/2024-03-14/faostat_el:
-    - snapshot://faostat/2023-06-12/faostat_el.zip
   data://meadow/faostat/2024-03-14/faostat_emn:
     - snapshot://faostat/2024-03-14/faostat_emn.zip
-  data://meadow/faostat/2024-03-14/faostat_ep:
-    - snapshot://faostat/2023-02-22/faostat_ep.zip
   data://meadow/faostat/2024-03-14/faostat_esb:
     - snapshot://faostat/2024-03-14/faostat_esb.zip
   data://meadow/faostat/2024-03-14/faostat_fa:
@@ -462,7 +456,6 @@ steps:
   data://garden/faostat/2024-03-14/faostat_metadata:
     - data://meadow/faostat/2024-03-14/faostat_rt
     - data://meadow/faostat/2024-03-14/faostat_scl
-    - data://meadow/faostat/2024-03-14/faostat_el
     - data://meadow/faostat/2024-03-14/faostat_sdgb
     - data://meadow/faostat/2024-03-14/faostat_qv
     - data://meadow/faostat/2024-03-14/faostat_emn
@@ -477,7 +470,6 @@ steps:
     - data://meadow/faostat/2024-03-14/faostat_ei
     - data://meadow/faostat/2024-03-14/faostat_rl
     - data://meadow/faostat/2024-03-14/faostat_ic
-    - data://meadow/faostat/2024-03-14/faostat_ef
     - data://meadow/faostat/2024-03-14/faostat_qi
     - data://meadow/faostat/2024-03-14/faostat_rfn
     - data://meadow/faostat/2024-03-14/faostat_rfb
@@ -487,7 +479,6 @@ steps:
     - data://meadow/faostat/2024-03-14/faostat_cahd
     - data://meadow/faostat/2024-03-14/faostat_fbs
     - data://meadow/faostat/2024-03-14/faostat_ti
-    - data://meadow/faostat/2024-03-14/faostat_ep
   data://garden/faostat/2024-03-14/faostat_qcl:
     - data://garden/faostat/2024-03-14/faostat_metadata
     - data://grapher/demography/2023-03-31/population
