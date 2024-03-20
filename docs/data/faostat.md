@@ -268,7 +268,7 @@ If no dataset requires an update, the workflow stops here.
     ```
     !!! note
 
-      If a new domain has been added to this version, you may need to manually add its meadow step as a dependency of garden/faostat/YYYY-MM-DD/faostat_metadata in the dag (this is a known bug).
+        If a new domain has been added to this version, you may need to manually add its meadow step as a dependency of garden/faostat/YYYY-MM-DD/faostat_metadata in the dag (this is a known bug).
 
 6. Inspect and update any possible changes of dataset/item/element/unit names and descriptions.
 
@@ -280,6 +280,10 @@ If no dataset requires an update, the workflow stops here.
     ```bash
     etl run garden/faostat/YYYY-MM-DD
     ```
+
+    !!! note
+
+        Sometimes `garden/faostat/YYYY-MM-DD/faostat_metadata` raises the warning "X item codes in data mapping to different items in metadata.". This used to happen often. In the latest version, only once (`faostat_rp`, with 38 discrepant items). It usually means that there are small differences between the item name in FAO data and the item name (for the same item code) in FAO metadata. There usually are small differences, like "Rodenticides   Other" and "Rodenticides – Other". But after every update, if there are new (or many) discrepant items, check the content of `compared` inside `create_items_table_for_domain`, in the `faostat_metadata`step.
 
 7. Create new grapher steps.
 

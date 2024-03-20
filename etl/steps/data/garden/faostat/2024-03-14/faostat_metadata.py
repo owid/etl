@@ -285,10 +285,12 @@ def create_items_table_for_domain(table: Table, metadata: Dataset, dataset_short
     )
     different_items = compared[compared["fao_item_in_data"] != compared["fao_item_in_metadata"]]
     missing_item_codes = set(items_from_data["item_code"]) - set(_tb_items["item_code"])
-    if (len(different_items) + len(missing_item_codes)) > N_ISSUES_ON_ITEMS_FOR_WARNING:
+    if len(missing_item_codes) > 0:
+        log.warning(f"{len(missing_item_codes)} item codes in {dataset_short_name} missing in metadata. ")
+    if len(different_items) > 0:
+        _frac_different = len(different_items) / len(set(compared["fao_item_in_data"]))
         log.warning(
-            f"{len(missing_item_codes)} item codes in {dataset_short_name} missing in metadata. "
-            f"{len(different_items)} item codes in data mapping to different items in metadata."
+            f"{len(different_items)} item codes in data ({_frac_different:.2%}) mapping to different items in metadata."
         )
 
     return items_from_data
