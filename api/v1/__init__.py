@@ -8,6 +8,7 @@ from fastapi import APIRouter, BackgroundTasks, HTTPException
 from git.repo import Repo
 from jsonschema import validate
 from jsonschema.exceptions import ValidationError
+from sqlalchemy.exc import NoResultFound
 from sqlmodel import Session
 
 from apps.backport.datasync.datasync import upload_gzip_dict
@@ -42,6 +43,10 @@ def health() -> dict:
 @v1.put("/api/v1/indicators")
 def update_indicator(update_request: UpdateIndicatorRequest, background_tasks: BackgroundTasks):
     _validate_data_api_url(update_request.dataApiUrl)
+
+    # if no changes, return empty YAML
+    if update_request.indicator.to_meta_dict() == {}:
+        return {"yaml": ""}
 
     # load indicator by catalog path
     db_indicator = _load_and_validate_indicator(update_request.catalogPath)
@@ -95,7 +100,13 @@ def _generate_yaml_string(meta_dict: Dict[str, Any], override_yml_path: Path) ->
 def _load_and_validate_indicator(catalog_path: str) -> gm.Variable:
     # update YAML file
     with Session(engine) as session:
-        db_indicator = gm.Variable.load_from_catalog_path(session, catalog_path)
+        try:
+            db_indicator = gm.Variable.load_from_catalog_path(session, catalog_path)
+        except NoResultFound:
+            raise HTTPException(
+                404,
+                f"Indicator with catalogPath {catalog_path} not found.",
+            )
 
     if db_indicator.catalogPath is None:
         raise HTTPException(403, "Only indicators from the ETL can be edited. Contact us if you really need this.")
