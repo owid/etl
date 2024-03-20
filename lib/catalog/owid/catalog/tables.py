@@ -1648,6 +1648,29 @@ def _resolve_collisions(
     return new_cols
 
 
+def multi_merge(tables: List[Table], *args, **kwargs) -> Table:
+    """Merge multiple tables.
+
+    This is a helper function when merging more than two tables on common columns.
+
+    Parameters
+    ----------
+    tables : List[Table]
+        Tables to merge.
+
+    Returns
+    -------
+    combined : Table
+        Merged table.
+
+    """
+    combined = tables[0].copy()
+    for table in tables[1:]:
+        combined = combined.merge(table, *args, **kwargs)
+
+    return combined
+
+
 def _extract_variables(t: Table, cols: Optional[Union[List[str], str]]) -> List[variables.Variable]:
     if not cols:
         return []
