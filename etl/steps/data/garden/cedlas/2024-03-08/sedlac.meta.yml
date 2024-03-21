@@ -104,17 +104,17 @@ tables:
           title_public: <<table>> - Poverty severity index
 
       gini:
-        title: Gini index (<<table>>) (Spell <<survey_number>>)
-        description_short: The [Gini index](#dod:gini) measures inequality on a scale from 0 to 100. Higher values indicate higher inequality.
+        title: Gini coefficient (<<table>>) (Spell <<survey_number>>)
+        description_short: The [Gini coefficient](#dod:gini) measures inequality on a scale from 0 to 1. Higher values indicate higher inequality.
         description_key:
           - "{definitions.welfare_equivalence}"
         unit: ''
         short_unit: ''
         display:
-          name: Gini index (<<table>>)
+          name: Gini coefficient (<<table>>)
           <<: *common-display
         presentation:
-          title_public: Gini index (<<table>>)
+          title_public: Gini coefficient (<<table>>)
 
       theil:
         title: Theil index (<<table>>) (Spell <<survey_number>>)
