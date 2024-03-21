@@ -823,7 +823,7 @@ if submitted:
         st.toast("Templates generated. Read the next steps.", icon="✅")
 
         # Update config
-        utils.update_wizard_config(form=form)
+        utils.update_wizard_defaults_from_form(form=form)
 
         # st.write(st.session_state)
     else:

@@ -46,4 +46,6 @@ site/
 .sanity-check
 
 .wizard
+.wizardcfg/*
+.streamlit/*
 .ipynb_lock
