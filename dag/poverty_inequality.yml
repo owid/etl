@@ -92,3 +92,13 @@ steps:
     - snapshot://wb/2024-01-22/thousand_bins_distribution.dta
   data://garden/wb/2024-01-22/thousand_bins_distribution:
     - data://meadow/wb/2024-01-22/thousand_bins_distribution
+
+  # Socio-Economic Database for Latin America and the Caribbean (SEDLAC)
+  data://meadow/cedlas/2024-03-08/sedlac:
+    - snapshot://cedlas/2024-03-08/sedlac_incomes.xlsx
+    - snapshot://cedlas/2024-03-08/sedlac_poverty.xlsx
+    - snapshot://cedlas/2024-03-08/sedlac_inequality.xlsx
+  data://garden/cedlas/2024-03-08/sedlac:
+    - data://meadow/cedlas/2024-03-08/sedlac
+  data://grapher/cedlas/2024-03-08/sedlac:
+    - data://garden/cedlas/2024-03-08/sedlac
