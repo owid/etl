@@ -131,7 +131,7 @@ st.selectbox(
         Options.START,
         Options.GUIDES,
         Options.PRINCIPLES,
-        Options.DEBUG,
+        # Options.DEBUG,
     ],
     index=1,
     help="Choosing a domain reduces the cost of the query to chatGPT, since only a subset of the documentation will be used in the query (i.e. fewer tokens used).",
@@ -141,20 +141,33 @@ st.selectbox(
 
 ## Examples
 EXAMPLE_QUERIES = [
-    "How can I add new dataset to ETL?",
-    "What is the difference between `description_key` and `description_from_producer`? Be concise.",
-    "Is the following snapshot title correct? 'Cherry Blossom Full Blook Dates in Kyoto, Japan'",
-    "What is the difference between an Origin and Dataset?",
+    "> In the metadata yaml file, which field should I use to disable the map tap view?",
+    "> In the metadata yaml file, how can I define a common `description_processing` that affects all indicators in a specific table?"
+    "> What is the difference between `description_key` and `description_from_producer`? Be concise.",
+    "> Is the following snapshot title correct? 'Cherry Blossom Full Blook Dates in Kyoto, Japan'",
+    "> What is the difference between an Origin and Dataset?",
 ]
 with st.popover("See examples"):
     for example in EXAMPLE_QUERIES:
-        st.caption(example)
+        st.markdown(example)
 
 # Sidebar with GPT config
+st.session_state.analytics = st.session_state.get("analytics", True)
 with st.sidebar:
     st.button(
         label="Clear chat",
         on_click=reset_messages,
+    )
+    st.divider()
+    st.toggle(
+        label="Collect data for analytics",
+        value=True,
+        on_change=lambda: set_states(
+            {
+                "analytics": not st.session_state.analytics,
+            }
+        ),
+        help="If enabled, we will collect usage data to improve the app. \n\nThis **is really helpful to improve** how we query chat GPT: E.g. which system prompt to use, optimise costs, and much more 😊. \n\nData collected: questions, responses and feedback submitted. \n\nYou can see how this data is collected [here](https://github.com/owid/etl/blob/master/apps/wizard/utils/db.py). \n\nRecords are anonymous.",
     )
     st.divider()
     st.markdown("## GPT Configuration")
@@ -259,7 +272,7 @@ if st.session_state.response:
     cost_msg = f"**Cost**: ≥{cost} USD.\n\n **Tokens**: ≥{num_tokens}."
     st.session_state.cost_last = cost
 
-    if DB_IS_SET_UP:
+    if DB_IS_SET_UP and st.session_state.analytics:
         # Get feedback only if DB is properly setup
         feedback = streamlit_feedback(
             feedback_type="thumbs",
