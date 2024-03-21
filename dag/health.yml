@@ -499,6 +499,10 @@ steps:
   # Global Mental Health Countdown
   data://meadow/health/2024-03-21/gmh_countdown:
     - snapshot://health/2024-03-21/gmh_countdown.xlsx
+  data://garden/health/2024-03-21/gmh_countdown:
+    - data://meadow/health/2024-03-21/gmh_countdown
+  data://grapher/health/2024-03-21/gmh_countdown:
+    - data://garden/health/2024-03-21/gmh_countdown
 
   # Global data on organ donation and transplantation
   data://meadow/health/2024-04-02/organ_donation_and_transplantation:
