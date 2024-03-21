@@ -1,0 +1,19 @@
+meta:
+  origin:
+    producer: Calculated by Our World in Data based on Lee et al. (2020); Bergero et al. (2023); and the Global Carbon Project.
+    title: aviation_emissions_lee_bergero_gcp
+    citation_full: |-
+      Lee et al. (2021) The contribution of global aviation to anthropogenic climate forcing for 2000 to 2018; Bergero et al. (2023). Pathways to net-zero emissions from aviation; Global Carbon Project (2023).
+    version_producer: Google Sheet
+    url_main: |-
+      https://www.sciencedirect.com/science/article/pii/S1352231020305689; https://www.nature.com/articles/s41893-022-01046-9; https://globalcarbonbudget.org/
+    url_download: |-
+      https://docs.google.com/spreadsheets/d/e/2PACX-1vQmI-STx5ZgYN5caELkGI7iUv_KIbZA8xsjRGY9mLjmJRgnwe_TdWTJT6YUz5h7fLmFn6YnobsxbFlQ/pub?output=csv
+    date_accessed: '2024-03-21'
+  name: Aviation share of CO2 emissions (Lee, Bergero et al. and GCP)
+  description: Aviation's share of global CO2 emissions since 1940.
+  license: {}
+outs:
+  - md5: c9b9b71a7713592828c5d1f82218c923
+    size: 2152
+    path: aviation_emissions_lee_bergero_gcp.csv
