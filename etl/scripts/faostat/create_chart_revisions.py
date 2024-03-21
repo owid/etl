@@ -199,7 +199,7 @@ def get_grapher_variable_id_mapping_for_two_dataset_versions(
         dataset_old=dataset_old, dataset_new=dataset_new
     )
 
-    if (grapher_variables_old is None) or (grapher_variables_new is None):
+    if (grapher_variables_old is None) or (grapher_variables_new is None) or (len(variables_mapping) == 0):
         return {}
 
     # Check that variable titles in ETL match those found in grapher DB.
