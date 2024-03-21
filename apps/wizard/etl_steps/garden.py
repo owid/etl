@@ -15,7 +15,7 @@ from apps.wizard import utils
 from etl.config import DB_HOST, DB_NAME
 from etl.db import get_session
 from etl.files import ruamel_dump, ruamel_load
-from etl.paths import BASE_DIR, DAG_DIR, DATA_DIR, GARDEN_DIR
+from etl.paths import BASE_DIR, DAG_DIR, DATA_DIR
 
 #########################################################
 # CONSTANTS #############################################
@@ -25,7 +25,7 @@ st.set_page_config(page_title="Wizard: Create a Garden step", page_icon="🪄")
 add_indentation()
 
 # Available namespaces
-OPTIONS_NAMESPACES = sorted(os.listdir(GARDEN_DIR))
+OPTIONS_NAMESPACES = utils.get_namespaces("garden")
 
 
 # Get current directory

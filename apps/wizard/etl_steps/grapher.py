@@ -9,7 +9,7 @@ from typing_extensions import Self
 
 from apps.utils.files import add_to_dag, generate_step_to_channel
 from apps.wizard import utils
-from etl.paths import DAG_DIR, GRAPHER_DIR
+from etl.paths import DAG_DIR
 
 #########################################################
 # CONSTANTS #############################################
@@ -19,7 +19,7 @@ st.set_page_config(page_title="Wizard: Create a Grapher step", page_icon="🪄")
 add_indentation()
 
 # Available namespaces
-OPTIONS_NAMESPACES = sorted(os.listdir(GRAPHER_DIR))
+OPTIONS_NAMESPACES = utils.get_namespaces("grapher")
 
 
 # Get current directory
