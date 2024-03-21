@@ -743,7 +743,7 @@ class Table(pd.DataFrame):
         if sort_rows:
             t = t.sort_index(axis=0)
 
-        return t.underscore(**kwargs).set_index(keys, verify_integrity=True).sort_index()
+        return t
 
     def dropna(self, *args, **kwargs) -> Optional["Table"]:
         tb = super().dropna(*args, **kwargs)
