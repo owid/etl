@@ -138,3 +138,5 @@ steps:
     - snapshot://fasttrack/latest/heat_deaths_zhao.csv
   data://grapher/fasttrack/latest/aviation_emissions_bergero:
     - snapshot://fasttrack/latest/aviation_emissions_bergero.csv
+  data://grapher/fasttrack/latest/aviation_emissions_lee_bergero_gcp:
+    - snapshot://fasttrack/latest/aviation_emissions_lee_bergero_gcp.csv

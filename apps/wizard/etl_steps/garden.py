@@ -5,12 +5,14 @@ from typing import List, cast
 
 import streamlit as st
 from owid.catalog import Dataset
+from sqlalchemy.exc import OperationalError
 from st_pages import add_indentation
 from typing_extensions import Self
 
 import etl.grapher_model as gm
 from apps.utils.files import add_to_dag, generate_step_to_channel
 from apps.wizard import utils
+from etl.config import DB_HOST, DB_NAME
 from etl.db import get_session
 from etl.files import ruamel_dump, ruamel_load
 from etl.paths import BASE_DIR, DAG_DIR, DATA_DIR, GARDEN_DIR
@@ -41,10 +43,144 @@ dummy_values = {
     "meadow_version": "2020-01-01",
     "topic_tags": ["Uncategorized"],
 }
+
 # Get list of available tags from DB (only those used as topic pages)
-with get_session() as session:
-    tag_list = gm.Tag.load_tags(session)
-tag_list = ["Uncategorized"] + sorted([tag.name for tag in tag_list])
+# If can't connect to DB, use TAGS_DEFAULT instead
+TAGS_DEFAULT = [
+    "Uncategorized",
+    "Access to Energy",
+    "Age Structure",
+    "Agricultural Production",
+    "Air Pollution",
+    "Alcohol Consumption",
+    "Animal Welfare",
+    "Artificial Intelligence",
+    "Biodiversity",
+    "Biological & Chemical Weapons",
+    "Books",
+    "Burden of Disease",
+    "CO2 & Greenhouse Gas Emissions",
+    "COVID-19",
+    "Cancer",
+    "Cardiovascular Diseases",
+    "Causes of Death",
+    "Child & Infant Mortality",
+    "Child Labor",
+    "Clean Water",
+    "Clean Water & Sanitation",
+    "Climate Change",
+    "Corruption",
+    "Crop Yields",
+    "Democracy",
+    "Diarrheal Diseases",
+    "Diet Compositions",
+    "Economic Growth",
+    "Economic Inequality",
+    "Economic Inequality by Gender",
+    "Education Spending",
+    "Electricity Mix",
+    "Employment in Agriculture",
+    "Energy",
+    "Energy Mix",
+    "Environmental Impacts of Food Production",
+    "Eradication of Diseases",
+    "Famines",
+    "Farm Size",
+    "Fertility Rate",
+    "Fertilizers",
+    "Financing Healthcare",
+    "Fish & Overfishing",
+    "Food Prices",
+    "Food Supply",
+    "Forests & Deforestation",
+    "Fossil Fuels",
+    "Gender Ratio",
+    "Global Education",
+    "Global Health",
+    "Government Spending",
+    "HIV/AIDS",
+    "Happiness & Life Satisfaction",
+    "Homelessness",
+    "Homicides",
+    "Human Development Index (HDI)",
+    "Human Height",
+    "Human Rights",
+    "Hunger & Undernourishment",
+    "Illicit Drug Use",
+    "Indoor Air Pollution",
+    "Influenza",
+    "Internet",
+    "LGBT+ Rights",
+    "Land Use",
+    "Lead Pollution",
+    "Life Expectancy",
+    "Light at Night",
+    "Literacy",
+    "Loneliness & Social Connections",
+    "Malaria",
+    "Marriages & Divorces",
+    "Maternal Mortality",
+    "Meat & Dairy Production",
+    "Mental Health",
+    "Micronutrient Deficiency",
+    "Migration",
+    "Military Personnel & Spending",
+    "Mpox (monkeypox)",
+    "Natural Disasters",
+    "Neurodevelopmental Disorders",
+    "Nuclear Energy",
+    "Nuclear Weapons",
+    "Obesity",
+    "Oil Spills",
+    "Outdoor Air Pollution",
+    "Ozone Layer",
+    "Pandemics",
+    "Pesticides",
+    "Plastic Pollution",
+    "Pneumonia",
+    "Polio",
+    "Population Growth",
+    "Poverty",
+    "Pre-Primary Education",
+    "Primary & Secondary Education",
+    "Quality of Education",
+    "Renewable Energy",
+    "Research & Development",
+    "Sanitation",
+    "Smallpox",
+    "Smoking",
+    "Space Exploration & Satellites",
+    "State Capacity",
+    "Suicides",
+    "Taxation",
+    "Technological Change",
+    "Terrorism",
+    "Tertiary Education",
+    "Tetanus",
+    "Time Use",
+    "Tourism",
+    "Trade & Globalization",
+    "Transport",
+    "Trust",
+    "Tuberculosis",
+    "Urbanization",
+    "Vaccination",
+    "Violence Against Children & Children's Rights",
+    "War & Peace",
+    "Waste Management",
+    "Water Use & Stress",
+    "Women's Employment",
+    "Women's Rights",
+    "Working Hours",
+]
+USING_TAGS_DEFAULT = False
+try:
+    with get_session() as session:
+        tag_list = gm.Tag.load_tags(session)
+        tag_list = ["Uncategorized"] + sorted([tag.name for tag in tag_list])
+except OperationalError:
+    USING_TAGS_DEFAULT = True
+    tag_list = TAGS_DEFAULT
 
 
 #########################################################
@@ -261,9 +397,12 @@ with form_widget.form("garden"):
         default_last=365,
     )
 
+    label = "Indicators tag"
+    if USING_TAGS_DEFAULT:
+        label += f"\n\n:red[Using a 2024 March snapshot of the tags. Couldn't connect to database `{DB_NAME}` in host `{DB_HOST}`.]"
     APP_STATE.st_widget(
         st_widget=st.multiselect,
-        label="Indicators tag",
+        label=label,
         help=(
             """
             This tag will be propagated to all dataset's indicators (it will not be assigned to the dataset).
