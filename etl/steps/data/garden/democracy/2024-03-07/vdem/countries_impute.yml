@@ -135,12 +135,39 @@
   year_min: 1813
   year_max: 1989
 
+# ROMANIA (1789-1830, 1854-1856, 1859-1899)
+## 1688-1858 imperial power Austria-Hungary (Wimmer and Min 2006), independent since at least 1886 (Cshapes 2.0), independent since 1878 (Butcher and Griffiths 2020), Transylvania part of Austria-Hungary, other parts under Ottoman influence; [I favor no imputation].
+
+# AUSTRIA (1939-1944)
+## 1938-1944 imperial power Germany (Wimmer and Min 2006), independent 1939-1944 (CShapes 2.0), independent 1918-1938 (Butcher and Griffiths 2020); [I favor no imputation].
+
+# PHILIPPINES (1789-1899)
+## imperial power Spain 16th century-1898, United States 1899-1945 (Wimmer and Min 2006), colony of Spain since at least 1886-1898, colony of United States 1899-1946 (Cshapes 2.0); [I favor no imputation].
+
+# GREECE (1789-1821)
+## imperial power Turkey 15th century - 1826, independent 1918-1919 (Wimmer and Min 2006, Cshapes 2.0); independent from 1828 to 1941 (Butcher and Griffiths 2020).
+- country: Greece
+  country_impute: Turkey
+  year_min: 1789
+  year_max: 1821
+
+# TANZANIA (1789-1914)
+## imperial power/colonized by Germany and United Kingdom (Wimmer and Min 2006, Cshapes 2.0); [I favor no imputation].
+
+## GEORGIA (1789-1989)
+## imperial power Russia 1801-1918, 1920-1990 (Wimmer and Min 2006), part of Russia since at least 1886-1991, not colonized (Ertan et al. 2016), independent since 1991 (Butcher and Griffiths 2020).
+- country: Georgia
+  country_impute: Russia
+  year_min: 1801
+  year_max: 1989
 
 
 
 
 
 
+
+#######################################
 
 # Federal Republic of Central America
 - country:
