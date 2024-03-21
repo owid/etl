@@ -80,7 +80,7 @@ MD_MEADOW = WIZARD_DIR / "etl_steps" / "markdown" / "meadow.md"
 MD_GARDEN = WIZARD_DIR / "etl_steps" / "markdown" / "garden.md"
 MD_GRAPHER = WIZARD_DIR / "etl_steps" / "markdown" / "grapher.md"
 
-
+# Dummy data
 DUMMY_DATA = {
     "namespace": "dummy",
     "short_name": "dummy",

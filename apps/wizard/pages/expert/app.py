@@ -3,7 +3,7 @@
 references:
 - https://docs.streamlit.io/knowledge-base/tutorials/build-conversational-apps#build-a-chatgpt-like-app
 """
-from typing import cast
+from typing import Any, Dict, cast
 
 import streamlit as st
 from st_pages import add_indentation
@@ -18,6 +18,7 @@ from apps.wizard.pages.expert.prompts import (
     SYSTEM_PROMPT_START,
 )
 from apps.wizard.utils import set_states
+from apps.wizard.utils.db import DB_IS_SET_UP, WizardDB
 from apps.wizard.utils.gpt import OpenAIWrapper, get_cost_and_tokens
 from etl.config import load_env
 
@@ -64,9 +65,20 @@ class Options:
 
 
 # Handle feedback
-def handle_feedback(feedback) -> None:
+def handle_feedback(feedback: Dict[str, Any]) -> None:
+    """Handle feedback."""
     print("handle feedback")
     print(feedback)
+    # st.write(feedback)
+    # st.write(st.session_state.prompt)
+    # st.write(st.session_state.response)
+    WizardDB().add_usage(
+        question=st.session_state.messages[-2]["content"],
+        answer=st.session_state.response,
+        feedback=1 if feedback["score"] == "👍" else 0,
+        feedback_text=feedback.get("text", None),
+        cost=st.session_state.cost_last,
+    )
 
 
 # Switch category function
@@ -98,10 +110,16 @@ def get_system_prompt() -> str:
     return system_prompt
 
 
-def handle_category_switch() -> None:
-    """Change the system prompt."""
-    system_prompt = get_system_prompt()
-    st.session_state.messages = [{"role": "system", "content": system_prompt}]
+# Reset chat history
+def reset_messages() -> None:
+    """Reset messages to default."""
+    set_states(
+        {
+            "messages": [{"role": "system", "content": get_system_prompt()}],
+            "response": None,
+            "prompt": None,
+        }
+    )
 
 
 # Category for the chat
@@ -118,7 +136,7 @@ st.selectbox(
     index=1,
     help="Choosing a domain reduces the cost of the query to chatGPT, since only a subset of the documentation will be used in the query (i.e. fewer tokens used).",
     key="category_gpt",
-    on_change=handle_category_switch,
+    on_change=reset_messages,
 )
 
 ## Examples
@@ -136,7 +154,7 @@ with st.popover("See examples"):
 with st.sidebar:
     st.button(
         label="Clear chat",
-        on_click=lambda: set_states({"messages": [{"role": "system", "content": get_system_prompt()}]}),
+        on_click=reset_messages,
     )
     st.divider()
     st.markdown("## GPT Configuration")
@@ -180,21 +198,31 @@ api = OpenAIWrapper()
 # ACTUAL APP
 # Initialize chat history
 if "messages" not in st.session_state:
-    st.session_state.messages = [{"role": "system", "content": SYSTEM_PROMPT_METADATA}]
+    reset_messages()
+
+# DEGUG
+# st.write([m for m in st.session_state.messages if m["role"] != "system"])
 
 # Display chat messages from history on app rerun
 for message in st.session_state.messages:
     if message["role"] != "system":
         with st.chat_message(message["role"]):
             st.markdown(message["content"])
-# Reduce to only systme prompt
+
+# Initialise session state
 st.session_state.response = st.session_state.get("response", None)
+st.session_state.prompt = st.session_state.get("prompt", None)
+st.session_state.feedback_key = st.session_state.get("feedback_key", 0)
+st.session_state.cost_last = st.session_state.get("cost_last", 0)
 
 # React to user input
-response = None
 if prompt := st.chat_input("Ask me!"):
+    st.session_state.feedback_key += 1
+    print("asking GPT...")
     # Display user message in chat message container
-    st.chat_message("user").markdown(prompt)
+    with st.chat_message("user"):
+        st.markdown(prompt)
+
     # Add user message to chat history
     st.session_state.messages.append({"role": "user", "content": prompt})
 
@@ -216,20 +244,31 @@ if prompt := st.chat_input("Ask me!"):
         )
         st.session_state.response = cast(str, st.write_stream(stream))
 
-if st.session_state.response:
-    feedback = streamlit_feedback(
-        feedback_type="thumbs",
-        # optional_text_label="[Optional] Please provide an explanation",
-        # align="flex-start",
-        key="fb_k",
-        on_submit=handle_feedback,
-    )
+        # Add new response by the System
+        st.session_state.messages.append({"role": "assistant", "content": st.session_state.response})
 
+        # Add prompt to session state
+        st.session_state.prompt = prompt
+
+        print("finished asking GPT...")
+
+if st.session_state.response:
     # Get cost & tokens
     text_in = "\n".join([m["content"] for m in st.session_state.messages])
     cost, num_tokens = get_cost_and_tokens(text_in, st.session_state.response, cast(str, model_name))
     cost_msg = f"**Cost**: ≥{cost} USD.\n\n **Tokens**: ≥{num_tokens}."
+    st.session_state.cost_last = cost
+
+    if DB_IS_SET_UP:
+        # Get feedback only if DB is properly setup
+        feedback = streamlit_feedback(
+            feedback_type="thumbs",
+            optional_text_label="[Optional] Please provide an explanation",
+            key=f"feedback_{st.session_state.feedback_key}",
+            on_submit=handle_feedback,
+        )
+    # Show cost below feedback
     st.info(cost_msg)
 
-    # Add new response by the System
-    st.session_state.messages.append({"role": "assistant", "content": st.session_state.response})
+# DEBUG
+# st.write([m for m in st.session_state.messages if m["role"] != "system"])
