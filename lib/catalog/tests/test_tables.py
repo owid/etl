@@ -49,6 +49,18 @@ def test_create_formatting():
     ## Check sorting
     assert (t.index == ["A", "B", "C"]).all()
 
+    # Check with default keys
+    t = Table({"GDP": [100, 104, 102], "country": ["A", "A", "B"], "year": [2001, 2000, 2000]}, short_name="GDP Table")
+    t = t.formatting()
+    ## Check underscore
+    assert t.columns == ["gdp"]
+    assert t.metadata.short_name == "gdp_table"
+    ## Check index
+    assert t.index.names == ["country", "year"]
+    ## Check sorting
+    index_check = pd.MultiIndex.from_tuples([("A", 2000), ("A", 2001), ("B", 2000)], names=["country", "year"])
+    assert index_check.equals(t.index)
+
     # Check error
     with pytest.raises(ValueError):
         t = Table({"GDP": [100, 104, 102], "country": ["A", "A", "B"]}, short_name="GDP Table")
