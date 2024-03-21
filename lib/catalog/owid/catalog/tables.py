@@ -689,6 +689,24 @@ class Table(pd.DataFrame):
 
         return t
 
+    def formatting(self, keys: Union[str, List[str]], **kwargs) -> "Table":
+        """Format the table according to OWID standards.
+
+        This includes underscoring column names, setting index, verifying there is only one entry per index, sorting by index.
+
+        ```
+        tb.formatting(["country", "year"])
+        ```
+
+        is equivalent to
+
+        ```
+        tb.underscore().set_index(["country", "year"], verify_integrity=True).sort_index()
+        ```
+        """
+        t = self
+        return t.underscore(**kwargs).set_index(keys, verify_integrity=True).sort_index()
+
     def dropna(self, *args, **kwargs) -> Optional["Table"]:
         tb = super().dropna(*args, **kwargs)
         # inplace returns None

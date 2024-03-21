@@ -38,6 +38,23 @@ def test_create_with_underscore():
     assert t.metadata.short_name == "gdp_table"
 
 
+def test_create_formatting():
+    t = Table({"GDP": [100, 104, 102], "country": ["C", "A", "B"]}, short_name="GDP Table")
+    t = t.formatting("country")
+    ## Check underscore
+    assert t.columns == ["gdp"]
+    assert t.metadata.short_name == "gdp_table"
+    ## Check index
+    assert t.index.names == ["country"]
+    ## Check sorting
+    assert (t.index == ["A", "B", "C"]).all()
+
+    # Check error
+    with pytest.raises(ValueError):
+        t = Table({"GDP": [100, 104, 102], "country": ["A", "A", "B"]}, short_name="GDP Table")
+        t = t.formatting("country")
+
+
 def test_add_table_metadata():
     t = Table({"gdp": [100, 102, 104], "country": ["AU", "SE", "CH"]})
 
