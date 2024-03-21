@@ -162,6 +162,28 @@
   year_max: 1989
 
 
+# * Slovakia 1789-1992: imperial power Austria-Hungary 16th century-1913, mixed rule 1914-1918, 1919-1992 imperial power Czechoslovakia (Wimmer and Min 2006), part of Austria-Hungary since at least 1886-1918, part of Czechoslovakia 1919-1992 (Cshapes 2.0), Slovak part under Hungarian control (Encyclopedia Britannica).
+# replace country_name_regime_imputed = "Hungary" if country_name == "Slovakia" & year >= 1789 & year <= 1918
+# replace country_name_regime_imputed = "Czechia" if country_name == "Slovakia" & year >= 1919 & year <= 1992
+# * South Africa 1789-1899: imperial power United Kingdom 1814-1909 (Wimmer and Min 2006); (mostly) colonized by United Kingdom 1886-1911 (Cshapes 2.0), colonized by United Kingdom in 1806, earlier also by Dutch settlers (Ertan et al. 2016); I favor no imputation.
+# * Cameroon 1789-1960: imperial power Germany 1884-1914, mixed rule 1915-1959 (Wimmer and Min 2006), colonized by Germany since at least 1886-1916, occupied by United Kingdom 1916-1919, mandate by France 1919-1959 (Cshapes 2.0); I favor no imputation.
+# * Tajikistan 1789-1989: imperial power Russia 1921-1990 (Wimmer and Min 2006), part of Russia, part of Russia's protectorate Bokhara 1886-1920, part of Russia 1920-1990 (Cshapes 2.0), independent since 1991, Bokhara independent 1816-1868 (Butcher and Griffiths 2020).
+# replace country_name_regime_imputed = "Russia" if country_name == "Tajikistan" & year >= 1868 & year <= 1989
+# * Palestine 1949-2019: no information (Wimmer and Min 2006, Ertan et al. 2016, Butcher and Griffiths 2020). V-Dem includes Gaza and West Bank separately; I therefore favor no imputation.
+# * Brazil 1824-1825: independent since 1822 (Wimmer and Min 2006, Butcher and Griffiths 2020); I favor no imputation.
+# * Serbia 1789-1833, 1932-1934: imperial power Turkey 14th century - 1877 (Wimmer and Min 2006); part of the Ottoman Empire (Encyclopedia Britannica); no imperial power 1932-1934 (Wimmer and Min 2006), independent 1932-1934 (Cshapes 2.0); I favor no imputation for later period.
+# replace country_name_regime_imputed = "Turkey" if country_name == "Serbia" & year >= 1789 & year <= 1833
+
+# SLOVAKIA (1789-1992)
+## imperial power Austria-Hungary 16th century-1913, mixed rule 1914-1918, 1919-1992 imperial power Czechoslovakia (Wimmer and Min 2006), part of Austria-Hungary since at least 1886-1918, part of Czechoslovakia 1919-1992 (Cshapes 2.0), Slovak part under Hungarian control (Encyclopedia Britannica).
+- country: Slovakia
+  country_impute: Austria-Hungary
+  year_min: 1789
+  year_max: 1918
+- country: Slovakia
+  country_impute: Czechia
+  year_min: 1919
+  year_max: 1992
 
 
 
