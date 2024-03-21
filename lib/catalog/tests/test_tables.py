@@ -38,9 +38,9 @@ def test_create_with_underscore():
     assert t.metadata.short_name == "gdp_table"
 
 
-def test_create_formatting():
+def test_create_format():
     t = Table({"GDP": [100, 104, 102], "country": ["C", "A", "B"]}, short_name="GDP Table")
-    t = t.formatting("country")
+    t = t.format("country")
     ## Check underscore
     assert t.columns == ["gdp"]
     assert t.metadata.short_name == "gdp_table"
@@ -51,7 +51,7 @@ def test_create_formatting():
 
     # Check with default keys
     t = Table({"GDP": [100, 104, 102], "country": ["A", "A", "B"], "year": [2001, 2000, 2000]}, short_name="GDP Table")
-    t = t.formatting()
+    t = t.format()
     ## Check underscore
     assert t.columns == ["gdp"]
     assert t.metadata.short_name == "gdp_table"
@@ -64,7 +64,7 @@ def test_create_formatting():
     # Check error
     with pytest.raises(ValueError):
         t = Table({"GDP": [100, 104, 102], "country": ["A", "A", "B"]}, short_name="GDP Table")
-        t = t.formatting("country")
+        t = t.format("country")
 
 
 def test_add_table_metadata():

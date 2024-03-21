@@ -689,13 +689,13 @@ class Table(pd.DataFrame):
 
         return t
 
-    def formatting(
+    def format(
         self,
         keys: Optional[Union[str, List[str]]] = None,
         verify_integrity: bool = True,
         underscore: bool = True,
         sort_rows: bool = True,
-        sort_columns: bool = True,
+        sort_columns: bool = False,
         **kwargs,
     ) -> "Table":
         """Format the table according to OWID standards.
@@ -703,7 +703,7 @@ class Table(pd.DataFrame):
         This includes underscoring column names, setting index, verifying there is only one entry per index, sorting by index.
 
         ```
-        tb.formatting(["country", "year"])
+        tb.format(["country", "year"])
         ```
 
         is equivalent to
@@ -712,7 +712,7 @@ class Table(pd.DataFrame):
         tb.underscore().set_index(["country", "year"], verify_integrity=True).sort_index()
         ```
 
-        NOTE: You can use default `tb.formatting()`, which uses keys = ['country', 'year'].
+        NOTE: You can use default `tb.format()`, which uses keys = ['country', 'year'].
 
         Parameters
         ----------
@@ -723,9 +723,9 @@ class Table(pd.DataFrame):
         underscore : bool, optional
             Underscore column names, by default True.
         sort_rows : bool, optional
-            Sort rows by index, by default True.
+            Sort rows by index (ascending), by default True.
         sort_columns : bool, optional
-            Sort columns, by default True.
+            Sort columns (ascending), by default False.
         kwargs : Any
             Passed to `Table.underscore` method.
         """
