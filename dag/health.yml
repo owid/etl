@@ -495,3 +495,7 @@ steps:
     - data://meadow/who/2024-03-24/self_inflicted_injuries
   data://grapher/who/2024-03-24/self_inflicted_injuries:
     - data://garden/who/2024-03-24/self_inflicted_injuries
+
+  # Global Mental Health Countdown
+  data://meadow/health/2024-03-21/gmh_countdown:
+    - snapshot://health/2024-03-21/gmh_countdown.xlsx
