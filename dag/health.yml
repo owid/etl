@@ -496,6 +496,10 @@ steps:
   data://grapher/who/2024-03-24/self_inflicted_injuries:
     - data://garden/who/2024-03-24/self_inflicted_injuries
 
+  # Global Mental Health Countdown
+  data://meadow/health/2024-03-21/gmh_countdown:
+    - snapshot://health/2024-03-21/gmh_countdown.xlsx
+
   # Global data on organ donation and transplantation
   data://meadow/health/2024-04-02/organ_donation_and_transplantation:
     - snapshot://health/2024-04-02/organ_donation_and_transplantation.xlsx
