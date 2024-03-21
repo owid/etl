@@ -14,6 +14,6 @@ meta:
   description: Aviation's share of global CO2 emissions since 1940.
   license: {}
 outs:
-  - md5: c9b9b71a7713592828c5d1f82218c923
-    size: 2152
+  - md5: 374006652297a7aca80d0df2d114f331
+    size: 2207
     path: aviation_emissions_lee_bergero_gcp.csv
