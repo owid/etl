@@ -102,3 +102,9 @@ steps:
     - data://meadow/cedlas/2024-03-08/sedlac
   data://grapher/cedlas/2024-03-08/sedlac:
     - data://garden/cedlas/2024-03-08/sedlac
+
+  # Inequality data from France (INSEE)
+  data://meadow/insee/2024-03-21/inequality_1999:
+    - snapshot://insee/2024-03-21/inequality_1999.csv
+  data://garden/insee/2024-03-21/inequality_1999:
+    - data://meadow/insee/2024-03-21/inequality_1999
