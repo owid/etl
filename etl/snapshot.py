@@ -82,7 +82,9 @@ class Snapshot:
         if downloaded_md5 != md5:
             # remove the downloaded file
             self.path.unlink()
-            raise ValueError(f"Checksum mismatch for {self.path}: expected {md5}, got {downloaded_md5}")
+            raise ValueError(
+                f"Checksum mismatch for {self.path}: expected {md5}, got {downloaded_md5}. It is possible that download got interrupted."
+            )
 
     def pull(self, force=True) -> None:
         """Pull file from S3."""
