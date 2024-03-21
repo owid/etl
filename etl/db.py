@@ -81,7 +81,9 @@ def open_db() -> Generator[DBUtils, None, None]:
             connection.close()
 
 
-def get_dataset_id(dataset_name: str, db_conn: Optional[MySQLdb.Connection] = None) -> Any:
+def get_dataset_id(
+    dataset_name: str, db_conn: Optional[MySQLdb.Connection] = None, version: Optional[str] = None
+) -> Any:
     """Get the dataset ID of a specific dataset name from database.
 
     If more than one dataset is found for the same name, or if no dataset is found, an error is raised.
@@ -92,6 +94,9 @@ def get_dataset_id(dataset_name: str, db_conn: Optional[MySQLdb.Connection] = No
         Dataset name.
     db_conn : MySQLdb.Connection
         Connection to database. Defaults to None, in which case a default connection is created (uses etl.config).
+    version : str
+        ETL version of the dataset. This is necessary when multiple datasets have the same title. In such a case, if
+        version is not given, the function will raise an error.
 
     Returns
     -------
@@ -107,6 +112,10 @@ def get_dataset_id(dataset_name: str, db_conn: Optional[MySQLdb.Connection] = No
         FROM datasets
         WHERE name = '{dataset_name}'
     """
+
+    if version:
+        query += f" AND version = '{version}'"
+
     with db_conn.cursor() as cursor:
         cursor.execute(query)
         result = cursor.fetchall()
