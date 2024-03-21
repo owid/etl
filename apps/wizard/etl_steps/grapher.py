@@ -304,7 +304,7 @@ if submitted:
         st.toast("Templates generated. Read the next steps.", icon="✅")
 
         # Update config
-        utils.update_wizard_config(form=form)
+        utils.update_wizard_defaults_from_form(form=form)
     else:
         st.write(form.errors)
         st.error("Form not submitted! Check errors!")
