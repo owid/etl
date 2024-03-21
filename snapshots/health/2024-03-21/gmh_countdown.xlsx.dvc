@@ -1,0 +1,24 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Countdown for Global Mental Health 2030
+    description: |-
+        The Global Mental Health 2030 Dashboard Dataset is an interactive, comprehensive platform developed in collaboration with leading health organizations including Global Mental Health at Harvard, WHO, UNICEF, GMHPN, and UnitedGMH. Aimed at highlighting the importance of mental health globally, with a special focus on young people, this dataset supports the Sustainable Development Agenda's goal to place mental health on the global stage. It offers a rich source of data on mental health determinants, the burden of mental health conditions, policies, access to care, and overall wellbeing. The dataset is structured to facilitate understanding and action across four main areas: mental health determinants, demand for mental health care, strength of mental health systems, and mental health wellbeing. It features quantitative and qualitative data, including country-specific information and identifies data gaps, making it a crucial tool for policymakers, researchers, and advocates. This resource aims to improve mental health care quality and accessibility, particularly for the youth, by informing policy, planning, and discussions to address comprehensive mental health needs effectively.
+    date_published: "2023-10-03"
+
+    # Citation
+    producer: UNICEF
+    citation_full: |-
+      Countdown for Global Mental Health 2030 (UNICEF, 2023)
+
+    # Files
+    url_main: https://data.unicef.org/resources/countdown-for-global-mental-health-2030-dashboard/
+    date_accessed: 2024-03-21
+
+    # License
+    license:
+      name: Creative Commons Attribution-NonCommercial 3.0 IGO license
+      url:  https://data.unicef.org/about-us/
+
