@@ -11,4 +11,4 @@ WIZARD_VARIABLES_DEFAULTS = WIZARD_CFG / "defaults.json"
 WIZARD_DB = WIZARD_CFG / "wizard.db"
 
 # STREAMLIT SECRETS
-STREAMLIT_SECRETS = BASE_DIR / ".streamlit" / "secrets.toml"
+STREAMLIT_SECRETS = BASE_DIR / ".streamlite" / "secrets.toml"
