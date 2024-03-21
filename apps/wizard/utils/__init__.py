@@ -36,6 +36,9 @@ from etl.paths import (
     DAG_DIR,
     LATEST_POPULATION_VERSION,
     LATEST_REGIONS_VERSION,
+    STEPS_GARDEN_DIR,
+    STEPS_GRAPHER_DIR,
+    STEPS_MEADOW_DIR,
 )
 from etl.steps import load_dag
 
@@ -96,6 +99,24 @@ DUMMY_DATA = {
     "url_main": "https://www.url-dummy.com/",
     "license_name": "MIT dummy license",
 }
+
+
+def get_namespaces(step_type: str) -> List[str]:
+    """Get list with namespaces.
+
+    Looks for namespaces in `etl/steps/data/<step_type>/`.
+    """
+    match step_type:
+        case "meadow":
+            folders = sorted(item for item in STEPS_MEADOW_DIR.iterdir() if item.is_dir())
+        case "garden":
+            folders = sorted(item for item in STEPS_GARDEN_DIR.iterdir() if item.is_dir())
+        case "grapher":
+            folders = sorted(item for item in STEPS_GRAPHER_DIR.iterdir() if item.is_dir())
+        case _:
+            raise ValueError(f"Step {step_type} not in ['meadow', 'garden', 'grapher'].")
+    namespaces = [folder.name for folder in folders]
+    return namespaces
 
 
 def remove_from_dag(step: str, dag_path: Path = DAG_WIZARD_PATH) -> None:
