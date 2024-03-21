@@ -111,7 +111,7 @@ def estimate_hos_indicators(tb: Table) -> Table:
     """Create indicators for multi-party head of state elections with imputed values between election-years."""
 
     def _set_mulpar_hos(tb: Table, column_new: str, column_ex: str, column_leg: str) -> Table:
-        # Iniitalize new column
+        # Initialize new column
         tb[column_new] = 0
         tb.loc[tb["v2x_elecreg"].isna(), column_new] = np.nan
         # Define mask
@@ -430,7 +430,13 @@ def compare_with_row_coding(tb: Table) -> Table:
     # Honduras in 1934 and 1935, Kazakhstan in 1990, and Turkmenistan in 1990 can be coded because I use information from the other criteria for democracies and autocracies in the absence of information from v2x_polyarchy
 
     # 13 observations own classification identifies as electoral autocracies, whereas RoW does not provide data
-    # tb.loc[(tb["regime_row_owid"] == 1) & (tb["v2x_regime"].isna() & (tb["year"] > 1900)), ["country", "year", "v2x_polyarchy"]]
+    assert (
+        tb.loc[
+            (tb["regime_row_owid"] == 1) & (tb["v2x_regime"].isna() & (tb["year"] > 1900)),
+            ["country", "year", "v2x_polyarchy"],
+        ].shape[0]
+        == 13
+    )
     # Observations can be coded because I use information from the other criteria for democracies and autocracies in the absence of information from v2x_polyarchy
 
     # 141 bservations own classification identifies as closed autocracies, whereas RoW identifies them as electoral autocracies
@@ -466,7 +472,7 @@ def compare_with_row_coding(tb: Table) -> Table:
     )
     # Examples include prominent heads of government which came to office in a rebellion or were appointed by a foreign power, such as Castro (Cuba 1959)
 
-    # 21 observations coded differently because I use v2ex_legconhog above for consistency, while RoW uses v2exaphogp instead. I defer to RoW coding in these cases. It may be that their data pipeline uses date-specific data which are superior to the year-end data used here.
+    # NOTE: 3 -> 21 observations coded differently because I use v2ex_legconhog above for consistency, while RoW uses v2exaphogp instead. I defer to RoW coding in these cases. It may be that their data pipeline uses date-specific data which are superior to the year-end data used here.
     assert (
         tb.loc[
             (tb["regime_row_owid"] == 0)
@@ -485,16 +491,16 @@ def compare_with_row_coding(tb: Table) -> Table:
         "regime_row_owid",
     ] = 1
 
-    # 270 bservations own classification identifies as electoral autocracies, whereas RoW identifies them as closed autocracies:
+    # NOTE: 136 -> 270 bservations own classification identifies as electoral autocracies, whereas RoW identifies them as closed autocracies:
     # tb.loc[(tb["regime_row_owid"] == 1) & (tb["v2x_regime"] == 0), ["country", "year"]]
 
-    # 180 observations with chief executives that were heads of state directly or indirectly elected chief executive and at least moderately multi-party elections for legislative, but which are affected by RoW's different standard filter (2elmulpar_osp_ex instead of v2elmulpar_osp_leg) above:
+    # NOTE: 130 -> 180 observations with chief executives that were heads of state directly or indirectly elected chief executive and at least moderately multi-party elections for legislative, but which are affected by RoW's different standard filter (2elmulpar_osp_ex instead of v2elmulpar_osp_leg) above:
     # tb.loc[
     #     (tb["regime_row_owid"] == 1) & (tb["v2x_regime"] == 0) & (tb["v2ex_hosw"] <= 1) & (tb["v2ex_hosw"] > 0.5),
     #     ["country", "year", "v2elmulpar_osp_leg_dich", "v2elmulpar_osp_hoe", "v2elmulpar_osp_ex", "v2elmulpar_osp_leg"],
     # ]
 
-    # 90 observations with chief executives that were heads of government directly or indirectly elected chief executive and at least moderately multi-party elections for legislative, but which are affected by RoW's different standard filter (v2elmulpar_osp instead of v2xlg_elecreg) above:
+    # NOTE: 6 -> 90 observations with chief executives that were heads of government directly or indirectly elected chief executive and at least moderately multi-party elections for legislative, but which are affected by RoW's different standard filter (v2elmulpar_osp instead of v2xlg_elecreg) above:
     # list v2elmulpar_osp_leg v2elmulpar_osp_hoe v2elmulpar_osp v2xlg_elecreg if regime_row_owid == 1 & v2x_regime == 0 & v2ex_hosw <= 0.5
     assert (
         tb.loc[

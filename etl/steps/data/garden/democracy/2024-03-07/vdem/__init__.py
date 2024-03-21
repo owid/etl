@@ -4,7 +4,8 @@ from copy import deepcopy
 from typing import cast
 
 import vdem_clean as clean  # VDEM's cleaning library
-import vdem_impute as impute  # VDEM's imputing library
+
+# import vdem_impute as impute  # VDEM's imputing library
 from owid.catalog import Table
 
 from etl.data_helpers import geo

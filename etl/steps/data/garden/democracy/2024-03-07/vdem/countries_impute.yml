@@ -6,376 +6,615 @@
 #   country_impute: Colombia
 #   year_min: 1832
 #   year_max: 1902
+#   annotation: Some text that could be surfaced in the metadata
 #
 # This means that we want to inherit the classifications for Panama from Colombia between 1832 and 1902.
 #
 # We note that `country` can also be a list of countries.
+#
+# Transcription from: https://github.com/owid/notebooks/blob/main/BastianHerre/democracy/scripts/vdem_row_impute.do
 
+
+# ALGERIA (1789-1899)
+- country: Algeria
+  annotation: |-
+    1789-1899: imperial power France 1848-1961 (Wimmer and Min 2006), colonized by France since at least 1886-1962 (Cshapes 2.0); We favor no imputation.
+
+# ANGOLA (1789-1899)
+- country: Angola
+  annotation: |-
+    Colony of Portugal 1886-1975 (CShapes 2.0); colony of imperial power Portugal 16th century-1974 (Wimmer and Min 2006); We favor no imputation.
+
+# ARMENIA (1789-1989)
+- country: Armenia
+  country_impute: Russia
+  year_min: 1918
+  year_max: 1989
+  annotation: |-
+    Mixed rule 17th century-1917, imperial power Russia 1918-1990 (Wimmer and Min 2006), part of Russia 1886-1991 (Cshapes 2.0); We favor no imputation for early years.
+
+# AUSTRIA (1939-1944)
+- country: Austria
+  annotation: |-
+    1938-1944 imperial power Germany (Wimmer and Min 2006), independent 1939-1944 (CShapes 2.0), independent 1918-1938 (Butcher and Griffiths 2020); We favor no imputation.
+
+# AZERBAIJAN (1789-1989)
+- country: Azerbaijan
+  country_impute: Russia
+  year_min: 1813
+  year_max: 1989
+  annotation: |-
+    Imperial power Russia 1813-1917, 1920-1990 (Wimmer and Min 2006), part of Russia since at least 1886-1991 (Cshapes 2.0) not colonized (Ertan et al. 2016).
 
 # BANGLADESH (1945-1948)
 - country: Bangladesh
-  imputes:
-  - country_impute: Pakistan
-    year_min: 1947
-    year_max: 1970
-    annotation: "1947-1970 imperial power/part of Pakistan (Wimmer and Min 2006, Cshapes 2.0)"
-  - country: Bangladesh
-    country_impute: Pakistan
-    year_min: 1789
-    year_max: 1946
-    annotation: "1765-1946 imperial power United Kingdom, 1886-1946 part of colony India (Cshapes 2.0), colonized in 1757 (Ertan et al. 2016)"
-
-# UKRAINE (1789-1989)
-- country: Ukraine
-  imputes:
-  - country_impute: Russia
-    year_min: 1946
-    year_max: 1989
-    annotation: |-
-      1946-1989 imperial power/part of Russia (Wimmer and Min 2006, Cshapes 2.0), 1921-1945 and 1816-1918 mixed rule (Wimmer and Min 2006).
-
-# PAKISTAN (1789-1946)
-- country: Pakistan
-  impute:
-  - country_impute: India
-    year_min: 1947
-    year_max: 1970
-    annotation: |-
-      1947-1970 1839-1946 imperial power United Kingdom (Wimmer and Min 2006), 1886-1947 part of colony India (Cshapes 2.0), colonized in 1849 (Ertan et al. 2016)
-
-# POLAND
-- country: Poland
+  country_impute: Pakistan
+  year_min: 1947
+  year_max: 1970
+  annotation: "1947-1970 imperial power/part of Pakistan (Wimmer and Min 2006, Cshapes 2.0)"
+- country: Bangladesh
+  country_impute: Pakistan
+  year_min: 1789
+  year_max: 1946
   annotation: |-
-    Poland 1789-1808, 1868-1917, 1939-1943: no information 1800-1808, 1795-1914 mixed rule (Wimmer and Min 2006), 1939-1943 independent (Cshapes 2.0); We favor no imputation.
+    1765-1946 imperial power United Kingdom, 1886-1946 part of colony India (Cshapes 2.0), colonized in 1757 (Ertan et al. 2016)
+
+# BELARUS (1789-1989)
+- country: Belarus
+  country_impute: Russia
+  year_min: 1795
+  year_max: 1989
+  annotation: |-
+    imperial power Russia 1795-1990 (Wimmer and Min 2006); 1886-1991 part of Russia (Cshapes 2.0), not mentioned in Ertan et al. (2016), independent since 1991 (Butcher and Griffiths 2020).
+
+# BELGIUM (1789-1829)
+- country: Belgium
+  country_impute: France
+  year_min: 1796
+  year_max: 1813
+  annotation: |-
+    Imperial power Netherlands 1814-1831 (Wimmer and Min 2006), part of Austria - 1794, part of France 1795-1813, part of Netherlands 1814-1831 (Encyclopedia Britannica).
+- country: Belgium
+  country_impute: Austria
+  year_min: 1789
+  year_max: 1790
+- country: Belgium
+  country_impute: Netherlands
+  year_min: 1814
+  year_max: 1829
+
+# BENIN (1789-1899)
+- country: Benin
+  annotation: |-
+    1789-1899: Colonized by France 1895-1961 (CShapes 2.0), imperial power 1863-1959 (Wimmer and Min 2006); I favor no imputation.
+
+# BOLIVIA (1789-1824)
+- country: Bolivia
+  annotation: |-
+    1789-1824: Imperial power Spain 16th century - 1823 (Wimmer and Min 2006), independence in 1825 (Butcher and Griffiths 2020); I favor no imputation.
+
+# BULGARIA (1789-1877)
+- country: Bulgaria
+  country_impute: Turkey
+  year_min: 1789
+  year_max: 1877
+  annotation: |-
+    Imperial power Turkey 15th century-1878, independent in 1886 (CShapes 2.0).
+
+# BURKINA FASO (1789-1918, 1932-1946)
+- country: Burkina Faso
+  annotation: |-
+    1789-1918, 1932-1946: imperial power France 1895-1959 (Wimmer and Min 2006); colony of France 1895-1960 (Cshapes 2.0); colonized by France in 1896 (Ertan et al. 2016); I favor no imputation.
+
+# BURUNDI (1789-1915)
+- country: Burundi
+  annotation: |-
+    1789-1915: imperial power Germany 1890-1922, Belgium 1923-1961 (Wimmer and Min 2006); I favor no imputation.
+
+# CAMEROON (1789-1960)
+- country: Cameroon
+  annotation: |-
+    Imperial power Germany 1884-1914, mixed rule 1915-1959 (Wimmer and Min 2006), colonized by Germany since at least 1886-1916, occupied by United Kingdom 1916-1919, mandate by France 1919-1959 (Cshapes 2.0); [I favor no imputation].
+
+# CAMBODIA (1789-1899)
+- country: Cambodia
+  annotation: |-
+    Colonized by France 1886-1953 (CShapes 2.0), imperial power France 1857-1952 (Wimmer and Min 2006), colonized in 1863 (Ertan et al. 2016); I favor no imputation.
+
+# CANADA (1789-1840)
+- country: Canada
+  annotation: |-
+    Independent since 1886 (CShapes 2.0), imperial power United Kingdom 1763-1866, colonized by Britain and France in 1700 (Ertan et al. 2016); I favor no imputation.
+
+# CENTRAL AFRICAN REPUBLIC (1789-1919)
+- country: Central African Republic
+  annotation: |-
+    1789-1919: Colonized by France 1900-1961 (CShapes 2.0), imperial power France 1890-1959 (Wimmer and Min 2006), colonized by France in 1887/1903 (Ertan et al. 2016); I favor no imputation.
+
+# COLOMBIA (1789-1809)
+- country: Colombia
+  annotation: |-
+    1789-1809: Imperial power Spain 16th century - 1820 (Wimmer and Min 2006), independence in 1819 (Butcher and Griffiths 2020); I favor no imputation.
+
+# COTE D'IVOIRE (1789-1899)
+- country: Cote d'Ivoire
+  annotation: |-
+    1789-1899: colonized by France 1890-1961 (CShapes 2.0), colonized by France 1887-1959 (Wimmer and Min 2006); I favor no imputation.
+
+# CROATIA (1945-1990)
+- country: Croatia
+  country_impute: Serbia
+  year_min: 1945
+  year_max: 1990
+  annotation: |-
+    Austria-Hungary imperial power 1699-1917, mixed rule 1918, Yugoslavia 1919-1990 (Wimmer and Min 2006); Austria-Hungary 1886-1918, 1919 partially Hungary and Yugoslavia, 1920-1992 Yugoslavia; I favor no imputation for earlier era.
+
+# CHAD (1789-1919)
+- country: Chad
+  annotation: |-
+    1789-1919: colonized by France 1900-1960 (CShapes 2.0), imperial power Sudan 1805-1889, France 1890-1959 (Wimmer and Min 2006); I favor no imputation.
+
+# CZECHIA (1789-1917)
+- country: Czechia
+  country_impute: Austria
+  year_min: 1789
+  year_max: 1917
+  annotation: |-
+    Imperial power Austria-Hungary 16th century-1917 (Wimmer and Min 2006), part of Austria-Hungary since at least 1886 (Cshapes 2.0), Czech part under Austrian control (Encyclopedia Britannica).
+
+# DEMOCRATIC REPUBLIC OF CONGO (1789-1899)
+- country: Democratic Republic of Congo
+  annotation: |-
+    1789-1899: imperial power Belgium 1885-1959 (Wimmer and Min 2006), colonized in 1885 (Ertan et al. 2016);
+
+# ESTONIA (1789-1917, 1940-1989)
+- country: Estonia
+  country_impute: Russia
+  year_min: 1789
+  year_max: 1917
+  annotation: |-
+    Part of Russia 1886-1918 and 1941-1991 (CShapes 2.0), imperial power Russia 1710-1918 and 1940-1990 (Wimmer and Min 2006).
+- country: Estonia
+  country_impute: Russia
+  year_min: 1940
+  year_max: 1989
+
+# FINLAND (1789-1862)
+- country: Finland
+  country_impute: Sweden
+  year_min: 1789
+  year_max: 1808
+  annotation: |-
+    Part of Russia 1886-1916 (CShapes 2.0), imperial power Russia 1809-1916 (Wimmer and Min 2006), independence in 1917 (Butcher and Griffiths 2020), part of Sweden 14th century-1808.
+- country: Finland
+  country_impute: Russia
+  year_min: 1809
+  year_max: 1862
+
+## GEORGIA (1789-1989)
+- country: Georgia
+  country_impute: Russia
+  year_min: 1801
+  year_max: 1989
+  annotation: |-
+    Imperial power Russia 1801-1918, 1920-1990 (Wimmer and Min 2006), part of Russia since at least 1886-1991, not colonized (Ertan et al. 2016), independent since 1991 (Butcher and Griffiths 2020).
+
+# GHANA (1789-1901)
+- country: Ghana
+  annotation: |-
+    Colonized by United Kingdom 1886-1957 (CShapes 2.0), imperial power Portugal 15th century - 1823, United Kingdom 1874-1956 (Wimmer and Min 2006); I favor no imputation.
+
+# GREECE (1789-1821)
+- country: Greece
+  country_impute: Turkey
+  year_min: 1789
+  year_max: 1821
+  annotation: |-
+    Imperial power Turkey 15th century - 1826, independent 1918-1919 (Wimmer and Min 2006, Cshapes 2.0); independent from 1828 to 1941 (Butcher and Griffiths 2020).
+
+# GUINEA (1789-1899)
+- country: Guinea
+  annotation: |-
+    1789-1899: colonized by France 1893-1958 (CShapes 2.0), imperial power France 1849-1957 (Wimmer and Min 2006); I favor no imputation.
+
+# ISRAEL (1789-1947)
+- country: Israel
+  country_impute: Turkey
+  year_min: 1789
+  year_max: 1919
+  annotation: |-
+    1789-1947: Imperial power Turkey 1516-1916, United Kingdom 1917-1947 (Wimmer and Min 2006), part of Turkey 1886-1920, occupied by United Kingdom 1921-1948 (CShapes 2.0); I favor no imputation.
+
+# IRAQ (1789-1919)
+- country: Iraq
+  country_impute: Turkey
+  year_min: 1789
+  year_max: 1919
+  annotation: |-
+    1789-1919: part of Turkey 1886-1920, mandate of United Kingdom 1921-1933 (CShapes 2.0); imperial power Turkey 16th century-1913, imperial power United Kingdom 1914-1931 (Wimmer and Min 2006).
+
+# IRAN (1789-1899)
+- country: Iran
+  annotation: |-
+    1789-1899: no imperial onset (Wimmer and Min 2006), independent since at least 1886 (Cshapes 2.0), not colonized (Ertan et al. 2016). We favor no imputation.
+
+# IRELAND (1789-1918)
+- country: Ireland
+  country_impute: United Kingdom
+  year_min: 1789
+  year_max: 1918
+  annotation: |-
+    Imperial power United Kingdom 11th century-1919 (Wimmer and Min 2006), part of United Kingdom since at least 1886-1922, independent since 1922 (Butcher and Griffiths 2020).
 
 # ITALY (1789-1860)
 - country: Italy
-  impute:
-    - annotation: 1814-1860 part of Austria-Hungary (Wimmer and Min 2006).
-    - country_impute: Piedmont-Sardinia
-      year_min: 1815
-      year_max: 1860
-      annotation: Part of Piedmont-Sardinia (Butcher and Griffiths 2020)
+  country_impute: Piedmont-Sardinia
+  year_min: 1815
+  year_max: 1860
+  annotation: |-
+    1814-1860 part of Austria-Hungary (Wimmer and Min 2006) or Piedmont-Sardinia since 1815 (Butcher and Griffiths 2020)
+
+# KAZAKHSTAN (1789-1989)
+- country: Kazakhstan
+  country_impute: Russia
+  year_min: 1789
+  year_max: 1990
+  annotation: |-
+    1789-1989: imperial power Russia 1730-1990 (Wimmer and Min 2006), part of Russia 1886-1991 (Cshapes 2.0); not colonized (Ertan et al. 2016).
+
+# KENYA (1789-1899)
+- country: Kenya
+  annotation: |-
+    1789-1899: protectorate of United Kingdom 1889-1920, colony of United Kingdom 1921-1963 (CShapes 2.0); imperial power United Kingdom 1895-1962 (Wimmer and Min 2006); I favor no imputation.
+
+# KYRGYZSTAN (1789-1989)
+- country: Kyrgyzstan
+  country_impute: Russia
+  year_min: 1876
+  year_max: 1989
+  annotation: |-
+    Imperial power Russia 1876-1990 (Wimmer and Min 2006), part of Russia since at least 1886-1991 (Cshapes 2.0), not colonized (Ertan et al. 2016), incorporated into Russia in mid-19th century (Encyclopedia Britannica).
+
+# LAOS (1789-1899)
+- country: Laos
+  country_impute: Thailand
+  year_min: 1789
+  year_max: 1892
+  annotation: |-
+    Part of Thailand 1886-1893, colonized by France 1894-1954 (CShapes 2.0), imperial power Thailand 1778-1889, France 1890-1952 (Wimmer and Min 2006).
+
+# LATVIA (1789-1919, 1940-1989)
+- country: Latvia
+  country_impute: Russia
+  year_min: 1789
+  year_max: 1919
+  annotation: |-
+    Part of Russia 1886-1918 and 1941-1991 (CShapes 2.0), imperial power Russia 1710-1918 and 1940-1990 (Wimmer and Min 2006); I include 1919.
+- country: Latvia
+  country_impute: Russia
+  year_min: 1940
+  year_max: 1989
+
+# LIBYA (1789-1899)
+- country: Libya
+  annotation: |-
+    1789-1899: Imperial power Turkey 1551-1911, Italy 1912-1942 (Wimmer and Min 2006), colonized by Italy in 1911 (Ertan et al. 2016); I favor no im
+
+# LITHUANIA (1789-1917)
+- country: Lithuania
+  country_impute: Russia
+  year_min: 1795
+  year_max: 1917
+  annotation: |-
+    Part of Russia 1886-1918 and 1941-1991 (CShapes 2.0), imperial power Russia 1795-1918 (Wimmer and Min 2006).
+- country: Lithuania
+  country_impute: Russia
+  year_min: 1940
+  year_max: 1989
+  annotation: |-
+    Imperial power Russia 1940-1990 (Wimmer and Min 2006), part of Russia 1940-1991 (CShapes 2.0), independent 1918-1940, 1991- (Butcher and Griffiths 2020).
+
+# MADAGASCAR (1789-1816)
+- country: Madagascar
+  annotation: |-
+    Independent 1886-1896 (CShapes 2.0), imperial power France 1894-1959 (Wimmer and Min 2006), independent 1816-1895 (Butcher and Griffiths 2020), no indication of being part of another country 1789-1816 (Encyclopedia Britannica); I favor no imputation.
+
+# MALAWI (1789-1899)
+- country: Malawi
+  annotation: |-
+    1789-1899: colonized by United Kingdom 1892-1964 (CShapes 2.0), imperial power United Kingdom 1889-1963 (Wimmer and Min 2006); I favor no imputation.
+
+# MALAYSIA (1789-1899)
+- country: Malaysia
+  annotation: |-
+    1789-1899: colonized by United Kingdom 1886-1957, imperial power United Kingdom 1795-1956 (Wimmer and Min 2006); I favor no imputation.
+
+# MALI (1789-1899)
+- country: Mali
+  annotation: |-
+    Colonized by France since 1896 (CShapes 2.0), imperial power France since 1895 (Wimmer and Min 2006); I favor no imputation.
+
+# MOLDOVA (1789-1989)
+- country: Moldova
+  country_impute: Russia
+  year_min: 1789
+  year_max: 1919
+  annotation: |-
+    Mixed rule 17th century-1939, imperial power Russia 1940-1990 (Wimmer and Min 2006), part of Russia since at least 1886-1919, part of Russia and Romania 1920-1939, part of Russia 1940-1991 (CShapes 2.0, Encyclopedia Britannica).
+- country: Moldova
+  country_impute: Russia
+  year_min: 1940
+  year_max: 1989
+  annotation: |-
+    Mixed rule 17th century-1939, imperial power Russia 1940-1990 (Wimmer and Min 2006), part of Russia since at least 1886-1919, part of Russia and Romania 1920-1939, part of Russia 1940-1991 (CShapes 2.0, Encyclopedia Britannica).
+
+# MOZAMBIQUE (1789-1899, 1974-1993)
+- country: Mozambique
+  annotation: |-
+    1789-1899, 1974-1993: imperial power Portugal 1885-1974 (Wimmer and Min 2006); colony of Portugal 1886-1975 (Cshapes 2.0), colonized by Portugal, approximated as 1750 (Ertan et al. 2016); We favor no imputation.
+
+# NETHERLANDS (1811-1812)
+- country: Netherlands
+  country_impute: France
+  year_min: 1811
+  year_max: 1812
+
+# NIGER (1789-1921)
+- country: Niger
+  annotation: |-
+    Colony of France 1896-1960 (CShapes 2.0), imperial power France 1904-1959 (Wimmer and Min 2006); I favor no imputation.
 
 # NIGERIA (1789-1913)
 - country: Nigeria
   annotation: |-
     1861-1959 imperial power United Kingdom (Wimmer and Min 2006), colony of United Kingdom (Cshapes 2.0), colonized by United Kingdom in 1885 (Ertan et al. 2016); We favor no imputation.
 
+# NORTH KOREA (1789-1944)
+- country: North Korea
+  country_impute: Korea
+  year_min: 1789
+  year_max: 1910
+  annotation: |-
+    Korea since the 14th century until 1909, imperial power Japan 1910-1944 (Wimmer and Min 2006), independent Korea since at least 1886-1910, colony of Japan -1945 (Cshapes 2.0), not listed (Ertan et al. 2016)
+
+# NORTH MACEDONIA (1789-1990)
+- country: North Macedonia
+  country_impute: Turkey
+  year_min: 1789
+  year_max: 1913
+- country: North Macedonia
+  country_impute: Serbia
+  year_min: 1914
+  year_max: 1990
+
+# PALESTINE (1949-2019)
+- country: Palestine
+  annotation: |-
+    No information no information (Wimmer and Min 2006, Ertan et al. 2016, Butcher and Griffiths 2020). V-Dem includes Gaza and West Bank separately; We therefore favor no imputation.
+
+# PAKISTAN (1789-1946)
+- country: Pakistan
+  country_impute: India
+  year_min: 1947
+  year_max: 1970
+  annotation: |-
+    1947-1970 1839-1946 imperial power United Kingdom (Wimmer and Min 2006), 1886-1947 part of colony India (Cshapes 2.0), colonized in 1849 (Ertan et al. 2016)
+
+# PAPUA NEW GUINEA (1789-1899)
+- country: Papua New Guinea
+  annotation: |-
+    1789-1899: Colonized by United Kingdom 1886-1920 and Germany 1886-1914, Australia 1915-1975 (CShapes 2.0), imperial power United Kingdom 1883-1904, Australia 1905-1974 (Wimmer and Min 2006), colonized by United Kingdom and Germany in 1884 (Ertan et al. 2016); I favor no imputation.
+
+# PERU (1789-1820)
+- country: Peru
+  annotation: |-
+    1789-1820: Imperial power Spain 16th century - 1824 (Wimmer and Min 2006), independence in 1821 (Butcher and Griffiths 2020); I favor no imputation.
+
+# PHILIPPINES (1789-1899)
+- country: Philippines
+  annotation: |-
+    Imperial power Spain 16th century-1898, United States 1899-1945 (Wimmer and Min 2006), colony of Spain since at least 1886-1898, colony of United States 1899-1946 (Cshapes 2.0); We favor no imputation.
+
+# POLAND
+- country: Poland
+  annotation: |-
+    Poland 1789-1808, 1868-1917, 1939-1943: no information 1800-1808, 1795-1914 mixed rule (Wimmer and Min 2006), 1939-1943 independent (Cshapes 2.0); We favor no imputation.
+
+# PUERTO RICO (1940, 1950-2021)
+- country: Puerto Rico
+  annotation: |-
+    1940, 1950-2021: colony of Spain since at least 1886-1898, colony of United States 1899- (CShapes 2.0), colony of Spain since 16th century (Encyclopedia Britannica); We favor no imputation.
+
+# ROMANIA (1789-1830, 1854-1856, 1859-1899)
+- country: Romania
+  annotation: |-
+    1688-1858 imperial power Austria-Hungary (Wimmer and Min 2006), independent since at least 1886 (Cshapes 2.0), independent since 1878 (Butcher and Griffiths 2020), Transylvania part of Austria-Hungary, other parts under Ottoman influence; We favor no imputation.
+
+# RWANDA (1789-1915)
+- country: Rwanda
+  annotation: |-
+    Colonized by Germany 1891-1916 (CShapes 2.0), imperial power Germany 1890-1915 (Wimmer and Min 2006); I favor no imputation.
+
+# SAUDI ARABIA (1819-1821)
+- country: Saudi Arabia
+  country_impute: Turkey
+  year_min: 1819
+  year_max: 1821
+  annotation: |-
+    Part of Turkey 1886-1919, nothing 1920-1932 (CShapes 2.0), not included (Wimmer and Min 2006), not colonized (Ertan et al. 2016), independent 1816-1818 (Butcher and Griffiths 2020), part of Ottoman Empire (Encyclopedia Britannica).
+
+# SENEGAL (1789-1903)
+- country: Senegal
+  annotation: |-
+    1789-1903: colonized by France 1886-1961 (CShapes 2.0), imperial power France 1854-1959 (Wimmer and Min 2006); I favor no imputation.
+
+# SERBIA (1789-1833, 1932-1934)
+- country: Serbia
+  country_impute: Turkey
+  year_min: 1789
+  year_max: 1833
+  annotation: |-
+    Im  perial power Turkey 14th century - 1877 (Wimmer and Min 2006); part of the Ottoman Empire (Encyclopedia Britannica); no imperial power 1932-1934 (Wimmer and Min 2006), independent 1932-1934 (Cshapes 2.0); We favor no imputation for later period.
+
+# SIERRA LEONE (1789-1899)
+- country: Sierra Leone
+  annotation: |-
+    1789-1899: Imperial power United Kingdom 1808-1960 (Wimmer and Min 2006), colonized by United Kingdom in 1808/1896 (Ertan et al. 2016); I favor no imputation.
+
+# SLOVAKIA (1789-1992)
+- country: Slovakia
+  country_impute: Austria-Hungary
+  year_min: 1789
+  year_max: 1918
+  annotation: |-
+    Imperial power Austria-Hungary 16th century-1913, mixed rule 1914-1918, 1919-1992 imperial power Czechoslovakia (Wimmer and Min 2006), part of Austria-Hungary since at least 1886-1918, part of Czechoslovakia 1919-1992 (Cshapes 2.0), Slovak part under Hungarian control (Encyclopedia Britannica).
+- country: Slovakia
+  country_impute: Czechia
+  year_min: 1919
+  year_max: 1992
+  annotation: |-
+    Imperial power Austria-Hungary 16th century-1913, mixed rule 1914-1918, 1919-1992 imperial power Czechoslovakia (Wimmer and Min 2006), part of Austria-Hungary since at least 1886-1918, part of Czechoslovakia 1919-1992 (Cshapes 2.0), Slovak part under Hungarian control (Encyclopedia Britannica).
+
+# SLOVENIA (1789-1988)
+- country: Slovenia
+  country_impute: Serbia
+  year_min: 1919
+  year_max: 1988
+  annotation: |-
+    Part of Austria-Hungary 1886-1918, of Austria 1919, of Yugoslavia 1920-1992 (CShapes 2.0), imperial power Austria-Hungary 1804-1917, Yugoslavia 1918-1990 (Wimmer and Min 2006), appears more closely affiliated with Austria, as Hungary barely referenced (Encyclopedia Britannica).
+- country: Slovenia
+  country_impute: Austria
+  year_min: 1804
+  year_max: 1918
+
+# SOMALIA (1789-1899)
+- country: Somalia
+  annotation: |-
+    1789-1899: colonized by United Kingdom 1886-1961, Italy 1890-1941 (CShapes 2.0), imperial power Turkey 1870-1883, United Kingdom 1884-1888, mixed rule 1889-1941 (Wimmer and Min 2006), occupied by Egypt 1870-1885 (Encyclopedia Britannica); I favor no imputation.
+
+# SOUTH AFRICA (1789-1899)
+- country: South Africa
+  annotation: |-
+    Imperial power United Kingdom 1814-1909 (Wimmer and Min 2006); (mostly) colonized by United Kingdom 1886-1911 (Cshapes 2.0), colonized by United Kingdom in 1806, earlier also by Dutch settlers (Ertan et al. 2016); We favor no imputation.
+
+# SOUTH SUDAN (1789-2010)
+- country: South Sudan
+  country_impute: Egypt
+  year_min: 1821
+  year_max: 1884
+  annotation: |-
+    not listed, but Egypt imperial power of Sudan 1821-1881, mixed rule 1882-1955 (Wimmer and Min 2006), colony of United Kingdom 1898-1955, part of Sudan until 2012 (Cshapes 2.0), colonized by United Kingdom in 1898 (Ertan et al. 2016), independent 1885-1898 (Butcher and Griffiths 2020).
+- country: South Sudan
+  country_impute: Sudan
+  year_min: 1900
+  year_max: 2010
+  anotation: |-
+    not listed, but Egypt imperial power of Sudan 1821-1881, mixed rule 1882-1955 (Wimmer and Min 2006), colony of United Kingdom 1898-1955, part of Sudan until 2012 (Cshapes 2.0), colonized by United Kingdom in 1898 (Ertan et al. 2016), independent 1885-1898 (Butcher and Griffiths 2020).
+
+# SRI LANKA (1789-1899)
+- country: Sri Lanka
+  annotation: |-
+    1789-1899: colonized by United Kingdom as Ceylon (Cshapes 2.0); I favor no imputation.
+
+# SUDAN (1789-1899)
+- country: Sudan
+  country_impute: Egypt
+  year_min: 1821
+  year_max: 1884
+  annotation: |-
+    Egypt imperial power 1821-1881, mixed rule 1882-1955 (Wimmer and Min 2006), colony of United Kingdom 1898-1955 (CShapes 2.0), colonized by United Kingdom in 1898 (Ertan et al. 2016), independent 1885-1898 (Butcher and Griffiths 2020); in 1886, colony Egypt of United Kingdom covers little of today's Sudan (CShapes 2.0); Egypt invades Sudanese territory in 1820, indigenous forces surrender in 1821, Mahdists capture Khartoum from Egypt and the British in 1885 (Encyclopedia Britannica).
+
+# SYRIA (1789-1917, 1920-1921)
+- country: Syria
+  country_impute: Turkey
+  year_min: 1789
+  year_max: 1830
+  annotation: |-
+    Part of Turkey 1886-1920 (CShapes 2.0), imperial power Turkey 1840-1919, France 1920-1943 (Wimmer and Min 2006), colonized by France in 1920 (Ertan et al. 2016), part of of Ottoman Empire 16th century-1830, of Egypt 1831-1839 (Encyclopedia Britannica).
+- country: Syria
+  country_impute: Egypt
+  year_min: 1831
+  year_max: 1839
+- country: Syria
+  country_impute: Turkey
+  year_min: 1840
+  year_max: 1917
+
+# TAIWAN (1789-1899)
+- country: Taiwan
+  country_impute: China
+  year_min: 1789
+  year_max: 1894
+  annotation: |-
+    Part of China 1886-1895, colony of Japan afterwards (CShapes 2.0), imperial power China 17th century - 1947 (Wimmer and Min 2006), colonized by Japan 1895-1945 (Ertan et al. 2016).
+
+# TAJIKISTAN (1789-1989)
+- country: Tajikistan
+  country_impute: Russia
+  year_min: 1868
+  year_max: 1989
+  annotation: |-
+    Imperial power Russia 1921-1990 (Wimmer and Min 2006), part of Russia, part of Russia's protectorate Bokhara 1886-1920, part of Russia 1920-1990 (Cshapes 2.0), independent since 1991, Bokhara independent 1816-1868 (Butcher and Griffiths 2020).
+
+# TANZANIA (1789-1914)
+- country: Tanzania
+  annotation: |-
+    Imperial power/colonized by Germany and United Kingdom (Wimmer and Min 2006, Cshapes 2.0); We favor no imputation.
+
+# TURKMENISTAN (1789-1989)
+- country: Turkmenistan
+  country_impute: Russia
+  year_min: 1896
+  year_max: 1989
+  annotation: |-
+    Imperial power Russia 1897-1990 (Wimmer and Min 2006), (mostly) part of Russia since 1886-1991, part protectorate Khiva 1886-1920 (Cshapes 2.0), not colonized (Ertan et al. 2016), resistance against Russia broken in 1881 (Encyclopedia Britannica).
+
+# UGANDA (1789-1899)
+- country: Uganda
+  annotation: |-
+    1789-1899: part of Kenya, protectorate of United Kingdom 1892-1894 (CShapes 2.0); own protectorate of United Kingdom 1895-1962; imperial power United Kingdom 1890-1961 (Wimmer and Min 2006); I favor no imputation.
+
+# UKRAINE (1789-1989)
+- country: Ukraine
+  country_impute: Russia
+  year_min: 1946
+  year_max: 1989
+  annotation: |-
+    1946-1989 imperial power/part of Russia (Wimmer and Min 2006, Cshapes 2.0), 1921-1945 and 1816-1918 mixed rule (Wimmer and Min 2006).
+
+# UZBEKISTAN (1789-1911, 1921-1989)
+- country: Uzbekistan
+  country_impute: Russia
+  year_min: 1865
+  year_max: 1911
+  annotation: |-
+    1865-1990 imperial power Russia (Wimmer and Min 2006), 1886-1991 part of Russia (Khiva and Bokhara partially as protectorates), not colonized (Ertan et al. 2016), Khiva and Bokhara as independent until -1872 and -1867.
+- country: Uzbekistan
+  country_impute: Russia
+  year_min: 1921
+  year_max: 1989
+  annotation: |-
+    1865-1990 imperial power Russia (Wimmer and Min 2006), 1886-1991 part of Russia (Khiva and Bokhara partially as protectorates), not colonized (Ertan et al. 2016), Khiva and Bokhara as independent until -1872 and -1867.
+
 # VIETNAM (1789-1944)
 - country: Vietnam
   annotation: |-
     1861-1953 imperial power France (Wimmer and Min 2006) or 1886-1893 independent and 1894-1954 colonized by France (Cshapes 2.0), colonized by France in 1867 (Ertan et al. 2016), independent 1802-1884 (Butcher and Griffiths 2020); We favor no imputation.
 
-# UZBEKISTAN (1789-1911, 1921-1989)
-# TODO: Split. 1865-1990 imperial power Russia (Wimmer and Min 2006), 1886-1991 part of Russia (Khiva and Bokhara partially as protectorates), not colonized (Ertan et al. 2016), Khiva and Bokhara as independent until -1872 and -1867.
-- country: Uzbekistan
-  impute:
-  - country_impute: Russia
-    year_min: 1865
-    year_max: 1911
-  - country_impute: Russia
-    year_min: 1921
-    year_max: 1989
-
-# KAZAKHSTAN (1789-1989)
-## 1730-1990 imperial power Russia (Wimmer and Min 2006), part of Russia 1886-1991 (Cshapes 2.0); not colonized (Ertan et al. 2016).
-- country: Kazakhstan
-  country_impute: Russia
-  year_min: 1730
-  year_max: 1990
-
-# MOZAMBIQUE (1789-1899, 1974-1993)
-## imperial power Portugal 1885-1974 (Wimmer and Min 2006); colony of Portugal 1886-1975 (Cshapes 2.0), colonized by Portugal, approximated as 1750 (Ertan et al. 2016); [I favor no imputation].
-
-# CZECHIA (1789-1917)
-## Imperial power Austria-Hungary 16th century-1917 (Wimmer and Min 2006), part of Austria-Hungary since at least 1886 (Cshapes 2.0), Czech part under Austrian control (Encyclopedia Britannica).
-- country: Czechia
-  country_impute: Austria
-  year_min: 1789
+# YEMEN (1851-1917)
+- country: Yemen
+  country_impute: Turkey
+  year_min: 1851
   year_max: 1917
+  annotation: |-
+    Mixed rule by Turkey and United Kingdom 1849-1918, part of Turkey 1886-1918 (CShapes 2.0), United Kingdom not on CShapes map.
 
-# IRAN (1789-1899)
-## no imperial onset (Wimmer and Min 2006), independent since at least 1886 (Cshapes 2.0), not colonized (Ertan et al. 2016); [I favor no imputation].
+# ZAMBIA (1789-1910)
+- country: Zambia
+  annotation: |-
+    Colonized by United Kingdom 1892-1964 (CShapes 2.0), imperial power United Kingdom 1890-1963 (Wimmer and Min 2006); I favor no imputation.
 
-# BELARUS (1789-1989)
-## imperial power Russia 1795-1990 (Wimmer and Min 2006); 1886-1991 part of Russia (Cshapes 2.0), not mentioned in Ertan et al. (2016), independent since 1991 (Butcher and Griffiths 2020).
-- country: Belarus
-  country_impute: Russia
-  year_min: 1795
-  year_max: 1989
-
-# DEMOCRATIC REPUBLIC OF CONGO (1789-1899)
-## imperial power Belgium 1885-1959 (Wimmer and Min 2006), colonized in 1885 (Ertan et al. 2016); [I favor no imputation].
-
-# NORTH KOREA (1789-1944)
-## Korea since the 14th century until 1909, imperial power Japan 1910-1944 (Wimmer and Min 2006), independent Korea since at least 1886-1910, colony of Japan -1945 (Cshapes 2.0), not listed (Ertan et al. 2016)
-- country: North Korea
-  country_impute: Korea
-  year_min: 1789
-  year_max: 1910
-
-# SUDAN (1789-1899)
-## Egypt imperial power 1821-1881, mixed rule 1882-1955 (Wimmer and Min 2006), colony of United Kingdom 1898-1955 (CShapes 2.0), colonized by United Kingdom in 1898 (Ertan et al. 2016), independent 1885-1898 (Butcher and Griffiths 2020); in 1886, colony Egypt of United Kingdom covers little of today's Sudan (CShapes 2.0); Egypt invades Sudanese territory in 1820, indigenous forces surrender in 1821, Mahdists capture Khartoum from Egypt and the British in 1885 (Encyclopedia Britannica).
-- country: Sudan
-  country_impute: Egypt
-  year_min: 1821
-  year_max: 1884
-
-# SOUTH SUDAN (1789-2010)
-## not listed, but Egypt imperial power of Sudan 1821-1881, mixed rule 1882-1955 (Wimmer and Min 2006), colony of United Kingdom 1898-1955, part of Sudan until 2012 (Cshapes 2.0), colonized by United Kingdom in 1898 (Ertan et al. 2016), independent 1885-1898 (Butcher and Griffiths 2020).
-- country: South Sudan
-  country_impute: Egypt
-  year_min: 1821
-  year_max: 1884
-- country: South Sudan
-  country_impute: Sudan
-  year_min: 1900
-  year_max: 2010
-
-# IRELAND (1789-1918)
-## imperial power United Kingdom 11th century-1919 (Wimmer and Min 2006), part of United Kingdom since at least 1886-1922, independent since 1922 (Butcher and Griffiths 2020).
-- country: Ireland
-  country_impute: United Kingdom
-  year_min: 1789
-  year_max: 1918
-
-# AZERBAIJAN (1789-1989)
-## imperial power Russia 1813-1917, 1920-1990 (Wimmer and Min 2006), part of Russia since at least 1886-1991 (Cshapes 2.0) not colonized (Ertan et al. 2016).
-- country: Azerbaijan
-  country_impute: Russia
-  year_min: 1813
-  year_max: 1989
-
-# ROMANIA (1789-1830, 1854-1856, 1859-1899)
-## 1688-1858 imperial power Austria-Hungary (Wimmer and Min 2006), independent since at least 1886 (Cshapes 2.0), independent since 1878 (Butcher and Griffiths 2020), Transylvania part of Austria-Hungary, other parts under Ottoman influence; [I favor no imputation].
-
-# AUSTRIA (1939-1944)
-## 1938-1944 imperial power Germany (Wimmer and Min 2006), independent 1939-1944 (CShapes 2.0), independent 1918-1938 (Butcher and Griffiths 2020); [I favor no imputation].
-
-# PHILIPPINES (1789-1899)
-## imperial power Spain 16th century-1898, United States 1899-1945 (Wimmer and Min 2006), colony of Spain since at least 1886-1898, colony of United States 1899-1946 (Cshapes 2.0); [I favor no imputation].
-
-# GREECE (1789-1821)
-## imperial power Turkey 15th century - 1826, independent 1918-1919 (Wimmer and Min 2006, Cshapes 2.0); independent from 1828 to 1941 (Butcher and Griffiths 2020).
-- country: Greece
-  country_impute: Turkey
-  year_min: 1789
-  year_max: 1821
-
-# TANZANIA (1789-1914)
-## imperial power/colonized by Germany and United Kingdom (Wimmer and Min 2006, Cshapes 2.0); [I favor no imputation].
-
-## GEORGIA (1789-1989)
-## imperial power Russia 1801-1918, 1920-1990 (Wimmer and Min 2006), part of Russia since at least 1886-1991, not colonized (Ertan et al. 2016), independent since 1991 (Butcher and Griffiths 2020).
-- country: Georgia
-  country_impute: Russia
-  year_min: 1801
-  year_max: 1989
-
-# SLOVAKIA (1789-1992)
-## imperial power Austria-Hungary 16th century-1913, mixed rule 1914-1918, 1919-1992 imperial power Czechoslovakia (Wimmer and Min 2006), part of Austria-Hungary since at least 1886-1918, part of Czechoslovakia 1919-1992 (Cshapes 2.0), Slovak part under Hungarian control (Encyclopedia Britannica).
-- country: Slovakia
-  country_impute: Austria-Hungary
-  year_min: 1789
-  year_max: 1918
-- country: Slovakia
-  country_impute: Czechia
-  year_min: 1919
-  year_max: 1992
-
-# SOUTH AFRICA (1789-1899)
-## imperial power United Kingdom 1814-1909 (Wimmer and Min 2006); (mostly) colonized by United Kingdom 1886-1911 (Cshapes 2.0), colonized by United Kingdom in 1806, earlier also by Dutch settlers (Ertan et al. 2016); [I favor no imputation].
-
-# CAMEROON (1789-1960)
-## imperial power Germany 1884-1914, mixed rule 1915-1959 (Wimmer and Min 2006), colonized by Germany since at least 1886-1916, occupied by United Kingdom 1916-1919, mandate by France 1919-1959 (Cshapes 2.0); [I favor no imputation].
-
-# TAJIKISTAN (1789-1989)
-## imperial power Russia 1921-1990 (Wimmer and Min 2006), part of Russia, part of Russia's protectorate Bokhara 1886-1920, part of Russia 1920-1990 (Cshapes 2.0), independent since 1991, Bokhara independent 1816-1868 (Butcher and Griffiths 2020).
-- country: Tajikistan
-  country_impute: Russia
-  year_min: 1868
-  year_max: 1989
-
-# PALESTINE (1949-2019)
-## no information no information (Wimmer and Min 2006, Ertan et al. 2016, Butcher and Griffiths 2020). V-Dem includes Gaza and West Bank separately; [I therefore favor no imputation].
-
-# BRAZIL (1824-1825)
-# independent since 1822 (Wimmer and Min 2006, Butcher and Griffiths 2020); [I favor no imputation].
-
-# SERBIA (1789-1833, 1932-1934)
-## imperial power Turkey 14th century - 1877 (Wimmer and Min 2006); part of the Ottoman Empire (Encyclopedia Britannica); no imperial power 1932-1934 (Wimmer and Min 2006), independent 1932-1934 (Cshapes 2.0); [I favor no imputation for later period].
-- country: Serbia
-  country_impute: Turkey
-  year_min: 1789
-  year_max: 1833
-
-# * Croatia 1789-1940, 1945-1990: Austria-Hungary imperial power 1699-1917, mixed rule 1918, Yugoslavia 1919-1990 (Wimmer and Min 2006); Austria-Hungary 1886-1918, 1919 partially Hungary and Yugoslavia, 1920-1992 Yugoslavia; I favor no imputation for earlier era.
-# replace country_name_regime_imputed = "Serbia" if country_name == "Croatia" & year >= 1945 & year <= 1990
-# * Algeria 1789-1899: imperial power France 1848-1961 (Wimmer and Min 2006), colonized by France since at least 1886-1962 (Cshapes 2.0); I favor no imputation.
-# * Bosnia and Herzegovina 1789-1991: imperial power Turkey 15th century-1878, Austria-Hungary 1879-1917, Yugoslavia 1918-1990 (Wimmer and Min 2006); occupied by Austria-Hungary since at least 1886-1908, part of Austria-Hungary 1909-1918, part of Yugoslavia 1919-1992 (Cshapes 2.0); Austrian-Hungary occupation while formally still part of Ottoman Empire, not more associated with either Austria or Hungary (Encyclopedia Britannica); I therefore favor no imputation for 1909-1918.
-# replace country_name_regime_imputed = "Turkey" if country_name == "Bosnia and Herzegovina" & year >= 1789 & year <= 1878
-# replace country_name_regime_imputed = "Serbia" if country_name == "Bosnia and Herzegovina" & year >= 1919 & year <= 1991
-# * Moldova 1789-1989: mixed rule 17th century-1939, imperial power Russia 1940-1990 (Wimmer and Min 2006), part of Russia since at least 1886-1919, part of Russia and Romania 1920-1939, part of Russia 1940-1991 (CShapes 2.0, Encyclopedia Britannica).
-# replace country_name_regime_imputed = "Russia" if country_name == "Moldova" & year >= 1789 & year <= 1919
-# replace country_name_regime_imputed = "Russia" if country_name == "Moldova" & year >= 1940 & year <= 1989
-# * Kyrgyzstan 1789-1989: imperial power Russia 1876-1990 (Wimmer and Min 2006), part of Russia since at least 1886-1991 (Cshapes 2.0), not colonized (Ertan et al. 2016), incorporated into Russia in mid-19th century (Encyclopedia Britannica).
-# replace country_name_regime_imputed = "Russia" if country_name == "Kyrgyzstan" & year >= 1876 & year <= 1989
-
-# CROATIA (1789-1940, 1945-1990)
-## Austria-Hungary imperial power 1699-1917, mixed rule 1918, Yugoslavia 1919-1990 (Wimmer and Min 2006); Austria-Hungary 1886-1918, 1919 partially Hungary and Yugoslavia, 1920-1992 Yugoslavia; [I favor no imputation for earlier era].
-- country: Croatia
-  country_impute: Serbia
-  year_min: 1945
-  year_max: 1990
-
-# ALGERIA (1789-1899)
-## imperial power France 1848-1961 (Wimmer and Min 2006), colonized by France since at least 1886-1962 (Cshapes 2.0); [I favor no imputation].
-
-# BOSNIA AND HERZEGOVINA (1789-1991)
-## imperial power Turkey 15th century-1878, Austria-Hungary 1879-1917, Yugoslavia 1918-1990 (Wimmer and Min 2006); occupied by Austria-Hungary since at least 1886-1908, part of Austria-Hungary 1909-1918, part of Yugoslavia 1919-1992 (Cshapes 2.0); Austrian-Hungary occupation while formally still part of Ottoman Empire, not
-
-
-#######################################
-
-# Federal Republic of Central America
-- country:
-    - Guatemala
-    - Honduras
-    - El Salvador
-    - Nicaragua
-    - Costa Rica
-  country_impute: Federal Republic of Central America
-  year_min: 1824
-  year_max: 1838
-
-
-# Czechoslovakia
-- country:
-    - Slovakia
-    - Czechia
-  country_impute: Czechoslovakia
-  year_min: 1918
-  year_max: 1992
-# Korea
-## Korea from Japan Colonisation (1910 - 1945)?
-- country:
-    - South Korea
-    - North Korea
-  country_impute: Korea (former)
-  year_min: 1800
-  year_max: 1910
-# Great Colombia
-- country:
-    - Venezuela
-    - Ecuador
-    - Panama
-    - Colombia
-  country_impute: Great Colombia
-  year_min: 1821
-  year_max: 1830
-# Colombia
-- country: Panama
-  country_impute: Colombia
-  year_min: 1832
-  year_max: 1902
-# Yugoslavia
-- country:
-    - Slovenia
-    - Croatia
-    - Montenegro
-    - Serbia
-    - Bosnia and Herzegovina
-    - Kosovo
-    - North Macedonia
-  country_impute: Yugoslavia
-  year_min: 1921
-  year_max: 1990
-# Serbia and Montenegro
-- country:
-    - Serbia
-    - Montenegro
-    - Kosovo
-  country_impute: Serbia and Montenegro
-  year_min: 1991
-  year_max: 2005
-# Serbia (with Kosovo)
-- country: Kosovo
-  country_impute: Serbia
-  year_min: 2006
-  year_max: 2011
-# USSR
-- country: Russia
-  country_impute: USSR
-  year_min: 1922
-  year_max: 1991
-- country:
-    - Ukraine
-    - Belarus
-    - Azerbaijan
-    - Armenia
-    - Georgia
-    - Turkmenistan
-    - Uzbekistan
-    - Kazakhstan
-    - Tajikistan
-    - Kyrgyzstan
-  country_impute: USSR
-  year_min: 1922
-  year_max: 1991
-- country:
-    - Lithuania
-    - Latvia
-    - Estonia
-  country_impute: USSR
-  year_min: 1941
-  year_max: 1991
-- country: Moldova
-  country_impute: USSR
-  year_min: 1940
-  year_max: 1991
-
-# Russian Empire
-- country:
-    - Belarus
-    - Georgia
-    - Turkmenistan
-    - Kazakhstan
-  country_impute: Russia
-  year_min: 1800
-  year_max: 1921
-- country: Tajikistan
-  country_impute: Russia
-  year_min: 1868
-  year_max: 1921
-- country: Kyrgyzstan
-  country_impute: Russia
-  year_min: 1868
-  year_max: 1921
-- country: Uzbekistan
-  country_impute: Russia
-  year_min: 1865
-  year_max: 1911
-- country: Moldova
-  country_impute: Russia
-  year_min: 1800
-  year_max: 1919
-- country: Azerbaijan
-  country_impute: Russia
-  year_min: 1813
-  year_max: 1921
-
-# Ethopia
-- country:
-    - Eritrea
-    - Ethiopia
-  country_impute: Ethiopia (former)
-  year_min: 1952
-  year_max: 1992
-# Pakistan
-- country:
-    - Pakistan
-    - Bangladesh
-  country_impute: Pakistan (former)
-  year_min: 1947
-  year_max: 1971
+# ZIMBABWE (1789-1899)
+- country: Zimbabwe
+  annotation: |-
+    1789-1899: Colonized by United Kingdom 1889-1965 (CShapes 2.0), imperial power United Kingdom 1890-1964 (Wimmer and Min 2006); I favor no imputation.
