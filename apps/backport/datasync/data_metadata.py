@@ -233,7 +233,6 @@ def _variable_metadata(
         presentation=_omit_nullable_values(presentation),
         license=license,
         descriptionKey=descriptionKey,
-        sort=sort,
     )
 
     assert variableMetadata["type"], "type must be set"
