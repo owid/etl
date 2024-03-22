@@ -52,10 +52,10 @@ def expand_observations(tb: Table) -> Table:
     return tb
 
 
-def impute(tb: Table) -> Table:
+def run(tb: Table) -> Table:
     """Impute values."""
     tb_imputed = []
-    for imp in impute.COUNTRIES_IMPUTE:
+    for imp in COUNTRIES_IMPUTE:
         if "country_impute" in imp:
             print(imp["country"])
 
@@ -90,9 +90,9 @@ def impute(tb: Table) -> Table:
 
             tb_imputed.append(tb_)
 
-        tb = concat(tb_imputed + [tb], ignore_index=True)
+    tb = concat(tb_imputed + [tb], ignore_index=True)
 
     # Check unique values
-    tb = tb.set_index(["country", "year"], verify_integrity=True).sort_index().reset_index()
+    tb.format(underscore=False).reset_index()
 
     return tb
