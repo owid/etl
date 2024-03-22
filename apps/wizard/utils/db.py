@@ -71,13 +71,12 @@ class WizardDB:
                 "url_patch",
                 "url_html",
             )
-            query = f"INSERT INTO {TB_PR} {fields} VALUES {tuple(f':{f}' for f in fields)};"
-
-            print(query)
+            values = ":" + ", :".join(fields)
+            aquery = f"INSERT INTO pull_requests {fields} VALUES ({values});"
             # Insert in table
             conn = st.connection(DB_NAME)
             with conn.session as s:
-                s.executemany(
+                s.execute(
                     query,
                     data_values,
                 )

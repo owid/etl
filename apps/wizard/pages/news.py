@@ -19,26 +19,6 @@ def _clean_date(dt_raw: str) -> str:
     return datetime.strptime(dt_raw, "%Y-%m-%dT%XZ").strftime("%c")
 
 
-def _clean_pr_data(data):
-    pr_data = []
-    for pr in data:
-        pr_data_ = {
-            "title": pr["title"],
-            "id": pr["number"],
-            "date_created": _clean_date(pr["created_at"]),
-            "date_merged": _clean_date(pr["merged_at"]) if pr["merged_at"] is not None else None,
-            "username": pr["user"]["login"],
-            "description": pr["body"],
-            "draft": pr["draft"],
-            "comments_url": pr["comments_url"],
-            "review_comments_url": pr["review_comments_url"],
-            "merge_commit_url": f"https://github.com/owid/etl/commit/{pr['merge_commit_sha']}",
-            "merged": pr["merged_at"] is not None,
-        }
-        pr_data.append(pr_data_)
-        return pr_data
-
-
 @st.cache_data()
 def check_and_load_news():
     DATE = datetime.now(pytz.timezone("Europe/London")).strftime("%Y%m%d")
@@ -67,3 +47,48 @@ def check_and_load_news():
             json.dump(pr_data, f)
 
         # Process information
+
+
+def get_json_url(url: str):
+    """Get JSON data from URL."""
+    response = requests.get(url, timeout=10)
+    if response.status_code == 200:
+        data = response.json()
+    else:
+        raise requests.ConnectionError("Error fetching GitHub information! Refresh.")
+    return data
+
+
+def get_latest_pr_data():
+    """Get latest PR data."""
+    # Access repo and get latest PR data
+    url = "https://api.github.com/repos/owid/etl/pulls?state=closed'"
+    data = get_json_url(url)
+    # Clean
+    data = _clean_pr_data(data)
+    # Get additional comment data
+    return data
+
+
+def _clean_pr_data(data):
+    pr_data = []
+    for pr in data:
+        pr_data_ = {
+            "id": pr["id"],
+            "number": pr["number"],
+            "title": pr["title"],
+            "username": pr["user"]["login"],
+            "date_created": _clean_date(pr["created_at"]),
+            "date_merged": _clean_date(pr["merged_at"]) if pr["merged_at"] is not None else None,
+            "labels": str([label["name"] for label in pr["labels"]]),
+            "description": pr["body"],
+            "merged": pr["merged_at"] is not None,
+            # "url_comments": pr["comments_url"],
+            # "url_review_comments": pr["review_comments_url"],
+            "url_merge_commit": f"https://github.com/owid/etl/commit/{pr['merge_commit_sha']}",
+            "url_diff": pr["diff_url"],
+            "url_patch": pr["patch_url"],
+            "url_html": pr["html_url"],
+        }
+        pr_data.append(pr_data_)
+    return pr_data
