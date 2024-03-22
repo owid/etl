@@ -5,7 +5,7 @@ definitions:
       topic_tags:
         - "Energy"
     description_processing: |-
-      - We rely on Ember as the primary source of electricity consumption data. While the Energy Institute (EI) provides primary energy (not just electricity) consumption data and it provides a longer time-series (dating back to 1965) than Ember (which only dates back to 1990), EI does not provide data for all countries or for all sources of electricity (for example, only Ember provides data on electricity from bioenergy). So, where data from Ember is available for a given country and year, we rely on it as the primary source. We then supplement this with data from EI where data from Ember is not available.
+      - We rely on Ember as the primary source of electricity data. While the Energy Institute (EI) provides primary energy (not just electricity) consumption data and it provides a longer time-series (dating back to 1965) than Ember (which only dates back to 1990), EI does not provide data for all countries or for all sources of electricity (for example, only Ember provides data on electricity from bioenergy). So, where data from Ember is available for a given country and year, we rely on it as the primary source. We then supplement this with data from EI where data from Ember is not available.
   description_short_twh: &description_short_twh |-
     Measured in terawatt-hours.
   description_short_pct: &description_short_pct |-
@@ -462,7 +462,7 @@ tables:
         presentation:
           title_public: Electricity demand
       total_electricity_share_of_primary_energy__pct:
-        title: Electricity as share of direct primary energy consumption - %
+        title: Electricity generation as share of direct primary energy consumption - %
         short_unit: '%'
         unit: '%'
         description_short: Measured as a percentage of total, direct primary energy consumption.
