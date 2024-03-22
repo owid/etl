@@ -25,7 +25,14 @@ def main():
     directly to live. This tool allows you to first create charts on the staging server and then synchronize
     them to the live environment after merging.
 
-    ⚠️ Tags are synced only for **new charts** in the source server, any edits to tags in existing charts are ignored.
+    """
+    )
+
+    st.info(
+        """
+    Note that tags are synced only for **new charts** in the source server, any edits to tags in existing charts are
+    ignored.
+
     """
     )
 
