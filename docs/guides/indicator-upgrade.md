@@ -96,6 +96,9 @@ For the chart approval process, feel free to involve other stakeholders (data ma
 
 Optionally, once the charts are approved, you can further fine-tune them in their respective edit pages.
 
+!!! note "Notes"
+    - There is a technical limitation related to chart tags: If you create a new chart and add tags to it, the `Chart Sync` tool (see below) will be able to transfer those tags from your current environment to production. However, if you edit the tags of an existing chart, those changes will not be synced.
+
 ## Merge your changes
 After approving all the new charts in your PR staging, and your PR code has been approved, you can merge your changes to the master branch.
 

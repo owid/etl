@@ -24,6 +24,8 @@ def main():
     before creating charts in the live environment. In some cases, it was even necessary to push your dataset
     directly to live. This tool allows you to first create charts on the staging server and then synchronize
     them to the live environment after merging.
+
+    ⚠️ Tags are synced only for **new charts** in the source server, any edits to tags in existing charts are ignored.
     """
     )
 
