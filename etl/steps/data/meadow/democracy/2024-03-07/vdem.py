@@ -216,6 +216,8 @@ COLUMNS_KEEP = [
     "v2xnp_pres",
     "v2xnp_pres_codehigh",
     "v2xnp_pres_codelow",
+    # Historical name
+    "histname",
 ]
 
 

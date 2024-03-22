@@ -53,7 +53,7 @@
   year_max: 1970
   annotation: "1947-1970 imperial power/part of Pakistan (Wimmer and Min 2006, Cshapes 2.0)"
 - country: Bangladesh
-  country_impute: Pakistan
+  country_impute: India
   year_min: 1789
   year_max: 1946
   annotation: |-
@@ -371,7 +371,7 @@
 
 # NORTH KOREA (1789-1944)
 - country: North Korea
-  country_impute: Korea
+  country_impute: South Korea
   year_min: 1789
   year_max: 1910
   annotation: |-
@@ -463,7 +463,7 @@
 
 # SLOVAKIA (1789-1992)
 - country: Slovakia
-  country_impute: Austria-Hungary
+  country_impute: Hungary
   year_min: 1789
   year_max: 1918
   annotation: |-
@@ -472,8 +472,6 @@
   country_impute: Czechia
   year_min: 1919
   year_max: 1992
-  annotation: |-
-    Imperial power Austria-Hungary 16th century-1913, mixed rule 1914-1918, 1919-1992 imperial power Czechoslovakia (Wimmer and Min 2006), part of Austria-Hungary since at least 1886-1918, part of Czechoslovakia 1919-1992 (Cshapes 2.0), Slovak part under Hungarian control (Encyclopedia Britannica).
 
 # SLOVENIA (1789-1988)
 - country: Slovenia
