@@ -140,15 +140,13 @@ def generate_area_used_for_production_per_crop_type(tb_qcl: Table) -> Table:
     )
 
     # Prepare variable description.
-    descriptions = "Definitions by FAOSTAT:"
+    descriptions = ""
     for item in sorted(set(area_by_crop_type["item"])):
-        descriptions += f"\n\nItem: {item}"
         item_description = area_by_crop_type[area_by_crop_type["item"] == item]["item_description"].fillna("").iloc[0]
         if len(item_description) > 0:
-            descriptions += f"\nDescription: {item_description}"
+            descriptions += f"\n\n- {item}: {item_description}"
 
-    descriptions += f"\n\nMetric: {area_by_crop_type['element'].iloc[0]}"
-    descriptions += f"\nDescription: {area_by_crop_type['element_description'].iloc[0]}"
+    descriptions += f"\n\n- {area_by_crop_type['element'].iloc[0]}: {area_by_crop_type['element_description'].iloc[0]}"
 
     # Select the necessary columns, set an appropriate index, and sort conveniently.
     tb_area_by_crop_type = (
@@ -160,7 +158,7 @@ def generate_area_used_for_production_per_crop_type(tb_qcl: Table) -> Table:
     tb_area_by_crop_type.metadata.short_name = "area_used_per_crop_type"
 
     # Add table description to the indicator's key description.
-    tb_area_by_crop_type["area_used_for_production"].metadata.description_key = descriptions
+    tb_area_by_crop_type["area_used_for_production"].metadata.description_from_producer = descriptions
 
     return tb_area_by_crop_type
 
@@ -483,10 +481,10 @@ def generate_food_available_for_consumption(tb_fbsc: Table) -> Table:
 
     # Prepare variable metadata.
     common_description = (
-        "Data represents the average daily per capita supply of calories from the full range of "
+        "This data represents the average daily per capita supply of calories from the full range of "
         "commodities, grouped by food categories. Note that these figures do not correct for waste at the "
-        "household/consumption level so may not directly reflect the quantity of food finally consumed by a given "
-        "individual.\n\nSpecific food commodities have been grouped into higher-level categories."
+        "household or consumption level, so they may not directly reflect the quantity of food finally consumed by a "
+        "given individual.\n\nSpecific food commodities have been grouped into higher-level categories."
     )
     for group in FOOD_GROUPS:
         item_names = list(tb_fbsc[tb_fbsc["item_code"].isin(FOOD_GROUPS[group])]["item"].unique())
@@ -501,7 +499,7 @@ def generate_food_available_for_consumption(tb_fbsc: Table) -> Table:
         ].metadata.title = f"Daily caloric intake per person from {group.lower().replace('other', 'other commodities')}"
         tb_food_available_for_consumption[underscore(group)].metadata.unit = CONSUMPTION_UNIT
         tb_food_available_for_consumption[underscore(group)].metadata.short_unit = "kcal"
-        tb_food_available_for_consumption[underscore(group)].metadata.description_key = description
+        tb_food_available_for_consumption[underscore(group)].metadata.description_key = [description]
 
     return tb_food_available_for_consumption
 
