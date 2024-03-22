@@ -4,6 +4,7 @@ from typing import cast
 
 import vdem_clean as clean  # VDEM's cleaning library
 import vdem_impute as impute  # VDEM's imputing library
+import vdem_refine as refine  # VDEM's imputing library
 from owid.catalog import Table
 
 from etl.helpers import PathFinder, create_dataset
@@ -38,28 +39,13 @@ def run(dest_dir: str) -> None:
     # The following lines concern imputing steps.
     # Equivalent to: https://github.com/owid/notebooks/blob/main/BastianHerre/democracy/scripts/vdem_row_impute.do
 
-    # %% Impute values from adjacent years
-    # Conditions for Australia and the year 1900
-    condition_australia_1900 = (tb["country"] == "Australia") & (tb["year"] == 1900)
-    # Perform replacements (is this just based on 1899?)
-    tb.loc[condition_australia_1900, "regime_row_owid"] = 3
-    tb.loc[condition_australia_1900, "regime_redux_row_owid"] = 2
-    tb.loc[condition_australia_1900, "regime_amb_row_owid"] = 8
+    tb = impute.run(tb)
 
-    # The following are other candidates, but we discarded them because there are too many years missing.
-    # - Honduras 1922-1933 (12 years missing)
-    #   I favor no imputation because of 12 years of missing data, and the country may have met the criteria for democracy.
-    # - Peru 1886-1891 (6 years missing)
-    #   I favor no imputation because of six years of missing data, and even though one criterion for electoral autocracy is not met, the country may have met the criteria for democracy (if unlikely), thereby overriding the former.
-
-    # %%
-    # 0. checks
-
-    # For each country:
-    # 2.
+    # %% PART 3: REFINE
+    tb = refine.run(tb)
 
     # %% Set index
-    tb = tb.set_index(["country", "year"], verify_integrity=True)
+    tb = tb.format()
 
     # %% Save
     #

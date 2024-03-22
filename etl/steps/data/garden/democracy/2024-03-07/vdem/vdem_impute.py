@@ -54,11 +54,24 @@ def expand_observations(tb: Table) -> Table:
 
 def run(tb: Table) -> Table:
     """Impute values."""
+    # %% Impute values from adjacent years
+    # Conditions for Australia and the year 1900
+    condition_australia_1900 = (tb["country"] == "Australia") & (tb["year"] == 1900)
+    # Perform replacements (is this just based on 1899?)
+    tb.loc[condition_australia_1900, "regime_row_owid"] = 3
+    tb.loc[condition_australia_1900, "regime_redux_row_owid"] = 2
+    tb.loc[condition_australia_1900, "regime_amb_row_owid"] = 8
+
+    # The following are other candidates, but we discarded them because there are too many years missing.
+    # - Honduras 1922-1933 (12 years missing)
+    #   I favor no imputation because of 12 years of missing data, and the country may have met the criteria for democracy.
+    # - Peru 1886-1891 (6 years missing)
+    #   I favor no imputation because of six years of missing data, and even though one criterion for electoral autocracy is not met, the country may have met the criteria for democracy (if unlikely), thereby overriding the former.
+
+    # %% Impute values based on historical equivalences
     tb_imputed = []
     for imp in COUNTRIES_IMPUTE:
         if "country_impute" in imp:
-            print(imp["country"])
-
             # Create a new subdataframe, and checkd
             tb_ = tb.loc[
                 (tb["country"] == imp["country_impute"])
@@ -81,6 +94,7 @@ def run(tb: Table) -> Table:
 
             # Check if there are overlaps; if so, and as expected, drop
             if not (merged := tb.merge(tb_, on=["country", "year"], how="inner")).empty:
+                paths.log.info(f"Imputing data for {imp['country']}")
                 assert imp["country"] in IMPUTED_OVERLAPS_EXPECTED, f"Unexpected overlap for {imp['country']}"
                 assert (
                     len(merged) == IMPUTED_OVERLAPS_EXPECTED[imp["country"]]
