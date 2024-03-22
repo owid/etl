@@ -38,6 +38,35 @@ def test_create_with_underscore():
     assert t.metadata.short_name == "gdp_table"
 
 
+def test_create_format():
+    t = Table({"GDP": [100, 104, 102], "country": ["C", "A", "B"]}, short_name="GDP Table")
+    t = t.format("country")
+    ## Check underscore
+    assert t.columns == ["gdp"]
+    assert t.metadata.short_name == "gdp_table"
+    ## Check index
+    assert t.index.names == ["country"]
+    ## Check sorting
+    assert (t.index == ["A", "B", "C"]).all()
+
+    # Check with default keys
+    t = Table({"GDP": [100, 104, 102], "country": ["A", "A", "B"], "year": [2001, 2000, 2000]}, short_name="GDP Table")
+    t = t.format()
+    ## Check underscore
+    assert t.columns == ["gdp"]
+    assert t.metadata.short_name == "gdp_table"
+    ## Check index
+    assert t.index.names == ["country", "year"]
+    ## Check sorting
+    index_check = pd.MultiIndex.from_tuples([("A", 2000), ("A", 2001), ("B", 2000)], names=["country", "year"])
+    assert index_check.equals(t.index)
+
+    # Check error
+    with pytest.raises(ValueError):
+        t = Table({"GDP": [100, 104, 102], "country": ["A", "A", "B"]}, short_name="GDP Table")
+        t = t.format("country")
+
+
 def test_add_table_metadata():
     t = Table({"gdp": [100, 102, 104], "country": ["AU", "SE", "CH"]})
 

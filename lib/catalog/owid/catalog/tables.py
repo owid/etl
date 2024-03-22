@@ -689,6 +689,62 @@ class Table(pd.DataFrame):
 
         return t
 
+    def format(
+        self,
+        keys: Optional[Union[str, List[str]]] = None,
+        verify_integrity: bool = True,
+        underscore: bool = True,
+        sort_rows: bool = True,
+        sort_columns: bool = False,
+        **kwargs,
+    ) -> "Table":
+        """Format the table according to OWID standards.
+
+        This includes underscoring column names, setting index, verifying there is only one entry per index, sorting by index.
+
+        ```
+        tb.format(["country", "year"])
+        ```
+
+        is equivalent to
+
+        ```
+        tb.underscore().set_index(["country", "year"], verify_integrity=True).sort_index()
+        ```
+
+        NOTE: You can use default `tb.format()`, which uses keys = ['country', 'year'].
+
+        Parameters
+        ----------
+        keys : Optional[Union[str, List[str]], optional
+            Index columns. If none is given, will use ["country", "year"].
+        verify_integrity : bool, optional
+            Verify that there is only one entry per index, by default True.
+        underscore : bool, optional
+            Underscore column names, by default True.
+        sort_rows : bool, optional
+            Sort rows by index (ascending), by default True.
+        sort_columns : bool, optional
+            Sort columns (ascending), by default False.
+        kwargs : Any
+            Passed to `Table.underscore` method.
+        """
+        t = self
+        # Underscore
+        if underscore:
+            t = t.underscore(**kwargs)
+        # Set index
+        if keys is None:
+            keys = ["country", "year"]
+        t = t.set_index(keys, verify_integrity=verify_integrity)
+        if sort_columns:
+            t = t.sort_index(axis=1)
+        # Sort rows
+        if sort_rows:
+            t = t.sort_index(axis=0)
+
+        return t
+
     def dropna(self, *args, **kwargs) -> Optional["Table"]:
         tb = super().dropna(*args, **kwargs)
         # inplace returns None
