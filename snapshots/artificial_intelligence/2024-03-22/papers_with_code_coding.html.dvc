@@ -1,0 +1,39 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/origin/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: AI Performance on Coding Problems
+    date_published: 2024-03-22
+    description_snapshot: |
+      Performance on the APPS coding dataset. The APPS dataset consists of problems collected from different open-access coding websites such as Codeforces, Kattis, and more. The APPS benchmark attempts to mirror how humans programmers are evaluated by posing coding problems in unrestricted natural language and evaluating the correctness of solutions. The problems range in difficulty from introductory to collegiate competition level and measure coding ability as well as problem-solving.
+
+    # Citation
+    producer: Papers with Code
+    citation_full: Code Generation on APPS. Papers with Code (2024)
+
+    # Files
+    url_main: https://paperswithcode.com/sota/code-generation-on-apps
+    url_download: https://paperswithcode.com/sota/code-generation-on-apps
+    date_accessed: 2024-03-22
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://creativecommons.org/licenses/by-sa/4.0/
+
+
+
+
+
+
+
+
+
+
+
+
+outs:
+  - md5: b7cd8b4f81112d388ea84948e7556468
+    size: 49504
+    path: papers_with_code_coding.html
