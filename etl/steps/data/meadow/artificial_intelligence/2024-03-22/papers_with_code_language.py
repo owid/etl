@@ -18,13 +18,13 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Retrieve snapshot.
-    snap = paths.load_snapshot("papers_with_code_coding.html")
+    snap = paths.load_snapshot("papers_with_code_language.html")
 
     # Load data from snapshot.
     with open(snap.path, "r") as file:
         html_content = file.read()
 
-    df = extract_html(html_content)
+    df = language_extract(html_content)
 
     #
     # Process data.
@@ -48,7 +48,7 @@ def run(dest_dir: str) -> None:
     ds_meadow.save()
 
 
-def extract_html(html_content):
+def language_extract(html_content):
     """
     Extracts table data from the HTML content of the language evaluation page on Papers with Code.
 
@@ -65,7 +65,7 @@ def extract_html(html_content):
     # Parse the HTML using BeautifulSoup
     soup = BeautifulSoup(html_content, "html.parser")
 
-    # Find the script with id="evaluation-table-data"
+    # Find the script with id="evaluation_data"
     evaluation_script = soup.find("script", id="evaluation-table-data")
 
     assert evaluation_script is not None, "Evaluation script not found in HTML content."
@@ -77,7 +77,7 @@ def extract_html(html_content):
     script_bytes = script_content.encode("utf-8")
 
     # Extract the entries using regex pattern
-    pattern = rb'{"table_id": 10864.*?(?=\{"table_id": 10864|$)'
+    pattern = rb'{"table_id": 15219.*?(?=\{"table_id": 15219|$)'
 
     entries = re.findall(pattern, script_bytes)
 
@@ -92,18 +92,26 @@ def extract_html(html_content):
 
         # Extract the desired fields using regex
         method_short_match = re.search(r'"method":\s*"([^"]*)"', entry_str)
-        competition_match = re.search(r'"Competition Pass@any":\s*"([^"]*)"', entry_str)
-        interview_match = re.search(r'"Interview Pass@any":\s*"([^"]*)"', entry_str)
+        average_match = re.search(r'"Average \(%\)":\s*"([^"]*)"', entry_str)
+        humanities_match = re.search(r'"Humanities":\s*([^,]*)', entry_str)
+        stem_match = re.search(r'"STEM":\s*([^,]*)', entry_str)
+        social_sciences_match = re.search(r'"Social Sciences":\s*([^,]*)', entry_str)
+        other_match = re.search(r'"Other":\s*([^,]*)', entry_str)
         evaluation_date_match = re.search(r'"evaluation_date":\s*"([^"]*)"', entry_str)
 
         # Extract the values from the match objects if available
         method_short = (
             method_short_match.group(1) if method_short_match and method_short_match.group(1) != "null" else np.nan
         )
-        competition = (
-            competition_match.group(1) if competition_match and competition_match.group(1) != "null" else np.nan
+        average = average_match.group(1) if average_match and average_match.group(1) != "null" else np.nan
+        humanities = humanities_match.group(1) if humanities_match and humanities_match.group(1) != "null" else np.nan
+        stem = stem_match.group(1) if stem_match and stem_match.group(1) != "null" else np.nan
+        social_sciences = (
+            social_sciences_match.group(1)
+            if social_sciences_match and social_sciences_match.group(1) != "null"
+            else np.nan
         )
-        interview = interview_match.group(1) if interview_match and interview_match.group(1) != "null" else np.nan
+        other = other_match.group(1) if other_match and other_match.group(1) != "null" else np.nan
         evaluation_date = (
             evaluation_date_match.group(1)
             if evaluation_date_match and evaluation_date_match.group(1) != "null"
@@ -111,20 +119,21 @@ def extract_html(html_content):
         )
 
         # Add the extracted data to the list
-        table_data.append((method_short, competition, interview, evaluation_date))
+        table_data.append((method_short, average, humanities, stem, social_sciences, other, evaluation_date))
 
     # Convert the table data to a DataFrame
     df = pd.DataFrame(
         table_data,
         columns=[
             "name",
-            "performance_code_any_competition",
-            "performance_code_any_interview",
+            "performance_language_average",
+            "performance_humanities",
+            "performance_stem",
+            "performance_social_sciences",
+            "performance_other",
             "date",
         ],
     )
-
     df = df.replace('"', "", regex=True)
-    df = df.replace("%", "", regex=True)
 
     return df
