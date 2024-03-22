@@ -63,9 +63,9 @@ def update_indicator(update_request: UpdateIndicatorRequest, background_tasks: B
         with open(db_indicator.override_yaml_path, "w") as f:
             f.write(yaml_str)
 
-    # try to commit and push before overwriting file in R2
-    if config.ETL_API_COMMIT:
-        _commit_and_push(db_indicator.override_yaml_path, ":robot: Metadata update by Admin")
+        # try to commit and push before overwriting file in R2
+        if config.ETL_API_COMMIT:
+            _commit_and_push(db_indicator.override_yaml_path, ":robot: Metadata update by Admin")
 
     if not update_request.dryRun:
         _update_indicator_in_r2(db_indicator, update_request.indicator)
@@ -131,6 +131,12 @@ def _load_and_validate_indicator(catalog_path: str) -> gm.Variable:
 def _commit_and_push(file_path: Path, commit_message: str) -> None:
     repo = Repo(paths.BASE_DIR)
     repo.git.add(file_path)
+
+    # Check if there are changes staged for commit
+    if not repo.index.diff("HEAD"):
+        log.info("No changes to commit", file_path=file_path)
+        return
+
     repo.index.commit(commit_message)
     log.info("git.commit", file_path=file_path)
     origin = repo.remote(name="origin")
