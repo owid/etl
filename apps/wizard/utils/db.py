@@ -14,6 +14,7 @@ DB_IS_SET_UP = STREAMLIT_SECRETS.exists() & WIZARD_DB.exists()
 # DB config
 DB_NAME = "wizard"
 TB_USAGE = "expert_usage"
+TB_PR = "pull_requests"
 
 
 class WizardDB:
@@ -45,5 +46,39 @@ class WizardDB:
                 s.execute(
                     query,
                     params=query_params,
+                )
+                s.commit()
+
+    def add_pr(
+        self,
+        data_values,
+    ) -> None:
+        """Add PR data to database table."""
+        if DB_IS_SET_UP:
+            # Prepare query
+            fields = (
+                "id",
+                "number",
+                "date_created",
+                "date_merged",
+                "title",
+                "username",
+                "description",
+                "merged",
+                "labels",
+                "url_merge_commit",
+                "url_diff",
+                "url_patch",
+                "url_html",
+            )
+            query = f"INSERT INTO {TB_PR} {fields} VALUES {tuple(f':{f}' for f in fields)};"
+
+            print(query)
+            # Insert in table
+            conn = st.connection(DB_NAME)
+            with conn.session as s:
+                s.executemany(
+                    query,
+                    data_values,
                 )
                 s.commit()
