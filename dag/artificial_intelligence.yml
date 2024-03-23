@@ -244,9 +244,15 @@ steps:
   # Artificial Intelligence Papers with Code (benchmarks) - 2024
   data://meadow/artificial_intelligence/2024-03-22/papers_with_code_coding:
     - snapshot://artificial_intelligence/2024-03-22/papers_with_code_coding.html
+  data://garden/artificial_intelligence/2024-03-22/papers_with_code_coding:
+    - data://meadow/artificial_intelligence/2024-03-22/papers_with_code_coding
 
   data://meadow/artificial_intelligence/2024-03-22/papers_with_code_language:
     - snapshot://artificial_intelligence/2024-03-22/papers_with_code_language.html
+  data://garden/artificial_intelligence/2024-03-22/papers_with_code_language:
+    - data://meadow/artificial_intelligence/2024-03-22/papers_with_code_language
 
   data://meadow/artificial_intelligence/2024-03-22/papers_with_code_math:
     - snapshot://artificial_intelligence/2024-03-22/papers_with_code_math.html
+  data://garden/artificial_intelligence/2024-03-22/papers_with_code_math:
+    - data://meadow/artificial_intelligence/2024-03-22/papers_with_code_math

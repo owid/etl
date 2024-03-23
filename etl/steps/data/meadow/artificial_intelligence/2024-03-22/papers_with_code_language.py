@@ -93,10 +93,6 @@ def language_extract(html_content):
         # Extract the desired fields using regex
         method_short_match = re.search(r'"method":\s*"([^"]*)"', entry_str)
         average_match = re.search(r'"Average \(%\)":\s*"([^"]*)"', entry_str)
-        humanities_match = re.search(r'"Humanities":\s*([^,]*)', entry_str)
-        stem_match = re.search(r'"STEM":\s*([^,]*)', entry_str)
-        social_sciences_match = re.search(r'"Social Sciences":\s*([^,]*)', entry_str)
-        other_match = re.search(r'"Other":\s*([^,]*)', entry_str)
         evaluation_date_match = re.search(r'"evaluation_date":\s*"([^"]*)"', entry_str)
 
         # Extract the values from the match objects if available
@@ -104,14 +100,7 @@ def language_extract(html_content):
             method_short_match.group(1) if method_short_match and method_short_match.group(1) != "null" else np.nan
         )
         average = average_match.group(1) if average_match and average_match.group(1) != "null" else np.nan
-        humanities = humanities_match.group(1) if humanities_match and humanities_match.group(1) != "null" else np.nan
-        stem = stem_match.group(1) if stem_match and stem_match.group(1) != "null" else np.nan
-        social_sciences = (
-            social_sciences_match.group(1)
-            if social_sciences_match and social_sciences_match.group(1) != "null"
-            else np.nan
-        )
-        other = other_match.group(1) if other_match and other_match.group(1) != "null" else np.nan
+
         evaluation_date = (
             evaluation_date_match.group(1)
             if evaluation_date_match and evaluation_date_match.group(1) != "null"
@@ -119,7 +108,7 @@ def language_extract(html_content):
         )
 
         # Add the extracted data to the list
-        table_data.append((method_short, average, humanities, stem, social_sciences, other, evaluation_date))
+        table_data.append((method_short, average, evaluation_date))
 
     # Convert the table data to a DataFrame
     df = pd.DataFrame(
@@ -127,10 +116,6 @@ def language_extract(html_content):
         columns=[
             "name",
             "performance_language_average",
-            "performance_humanities",
-            "performance_stem",
-            "performance_social_sciences",
-            "performance_other",
             "date",
         ],
     )
