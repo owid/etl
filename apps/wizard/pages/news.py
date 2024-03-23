@@ -67,9 +67,9 @@ def ask_gpt(df) -> Tuple[str, float, int]:
     )
     response = api.query_gpt(query=query, model=MODEL_NAME)
 
-    summary = response.message_content
+    summary = response.message_content  # type: ignore
     cost, num_tokens = get_cost_and_tokens(SYSTEM_PROMPT + USER_PROMPT, summary, MODEL_NAME)
-    return summary, cost, num_tokens
+    return summary, cost, num_tokens  # type: ignore
 
 
 tab_1, tab_2 = st.tabs(["Pull Requests: Summary", "Pull Requests: Last 7 days"])
