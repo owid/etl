@@ -3,13 +3,15 @@
 #  etl
 #
 
+import importlib.util
 import re
 import sys
 import tempfile
 from collections.abc import Generator
 from contextlib import contextmanager
 from pathlib import Path
-from typing import Any, Dict, Iterable, Iterator, List, Literal, Optional, Union, cast
+from types import ModuleType
+from typing import Any, Callable, Dict, Iterable, Iterator, List, Literal, Optional, Union, cast
 from urllib.parse import urljoin
 
 import jsonref
@@ -869,3 +871,102 @@ def write_to_dag_file(
     # Write the updated content back to the dag file.
     with open(dag_file, "w") as file:
         file.writelines(updated_lines)
+
+
+def import_module_from_path(module_path: Union[str, Path], module_name: str = "module_name") -> ModuleType:
+    """Import module from a given path to a .py file.
+
+    This function is particularly useful when attempting to import a function from a step file, whose name contains
+    numbers, and it's hence impossible to do a simple `from ..2024-01-01 import run`.
+
+    Parameters
+    ----------
+    module_path : Union[str, Path]
+        Path to .py file.
+    module_name : str, optional
+        Name to assign to the imported module, by default "module_name". This is only important if this function is used
+        multiple times, in which case the imported modules should be given different names.
+
+    Returns
+    -------
+    module : ModuleType
+        Module imported from the given path.
+
+    """
+    # Ensure the given path is a Path object.
+    module_path = Path(module_path)
+
+    # Ensure the path exists and is a Python file.
+    if module_path.suffix != ".py" or not module_path.is_file():
+        raise ImportError(f"No Python file found at path: {module_path}")
+
+    # Temporarily add the module's directory to the Python path.
+    # This is necessary in case the imported module imports other modules from the same directory.
+    module_dir = str(module_path.parent)
+    if module_dir not in sys.path:
+        sys.path.insert(0, module_dir)
+        remove_module_dir_from_path = True
+    else:
+        remove_module_dir_from_path = False
+
+    # Create a module spec from the file path.
+    spec = importlib.util.spec_from_file_location(module_name, str(module_path))
+    if spec is None:
+        raise ImportError(f"No module spec found for path: {module_path}")
+
+    # Create a module object from the spec.
+    module = importlib.util.module_from_spec(spec)
+
+    # Execute the module.
+    spec.loader.exec_module(module)  # type: ignore
+
+    # Remove the module directory from Python path if it was added by this function.
+    if remove_module_dir_from_path:
+        sys.path.remove(module_dir)
+
+    return module
+
+
+def load_run_from_previous_version(path_to_current_file: Union[str, Path], previous_version: str) -> Callable:
+    """Load 'run' function from a previous version of a given step file.
+
+    If you update a data step, say, of version "2024-01-01", and the code of the new step is identical to the previous
+    version, instead of duplicating the code, you can use this function.
+    The resulting data step would have just the following content:
+    ```
+    from etl.helpers import load_run_from_previous_version
+
+    run = load_run_from_previous_version(__file__, "2024-01-01")
+    ```
+
+    Parameters
+    ----------
+    path_to_current_file : Union[str, Path]
+        Path to the file corresponding to new data step (simply use __file__).
+    previous_version : str
+        Version of the previous step file, whose code will also be used in the new step.
+
+    Returns
+    -------
+    run : Callable
+        Function 'run' imported from the previous version of the step file.
+
+    """
+    # Ensure the given path is a Path object.
+    path_to_current_file = Path(path_to_current_file)
+
+    # Construct the path to the previous version file.
+    current_version = PathFinder(path_to_current_file.as_posix()).version
+    path_to_previous_file = path_to_current_file.as_posix().replace(current_version, previous_version)
+
+    # Load the module from the previous version file path
+    module = import_module_from_path(module_path=path_to_previous_file)
+
+    # Check if a 'run' function exists in the module.
+    if not hasattr(module, "run"):
+        raise ImportError(f"No 'run' function found in path: {path_to_previous_file}")
+
+    # Load 'run' function from the module.
+    run = getattr(module, "run")
+
+    return run
