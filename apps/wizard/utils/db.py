@@ -5,6 +5,7 @@ import os
 import time
 from typing import Optional
 
+import pandas as pd
 import streamlit as st
 
 from apps.wizard.utils.paths import STREAMLIT_SECRETS, WIZARD_DB
@@ -18,8 +19,9 @@ TB_PR = "pull_requests"
 
 
 class WizardDB:
+    @classmethod
     def add_usage(
-        self,
+        cls,
         question: str,
         answer: str,
         cost: float,
@@ -49,8 +51,9 @@ class WizardDB:
                 )
                 s.commit()
 
+    @classmethod
     def add_pr(
-        self,
+        cls,
         data_values,
     ) -> None:
         """Add PR data to database table."""
@@ -72,12 +75,30 @@ class WizardDB:
                 "url_html",
             )
             values = ":" + ", :".join(fields)
-            aquery = f"INSERT INTO pull_requests {fields} VALUES ({values});"
+            query = f"INSERT INTO pull_requests {fields} VALUES ({values});"
+            # Get IDs to update
+            ids = tuple(str(data["id"]) for data in data_values)
             # Insert in table
             conn = st.connection(DB_NAME)
             with conn.session as s:
+                s.execute(f"DELETE FROM pull_requests WHERE ID IN {ids};")
                 s.execute(
                     query,
                     data_values,
                 )
                 s.commit()
+
+    @classmethod
+    def get_pr(cls, num_days: int = 7):
+        """Get PR data from database."""
+        data = []
+        if DB_IS_SET_UP:
+            conn = st.connection(DB_NAME)
+            with conn.session as s:
+                query = f"SELECT * FROM {TB_PR} WHERE date_created >= :date_created;"
+                data = s.execute(
+                    query,
+                    {"date_created": dt.datetime.now(dt.timezone.utc) - dt.timedelta(days=num_days)},
+                )
+                data = data.fetchall()
+        return pd.DataFrame(data)

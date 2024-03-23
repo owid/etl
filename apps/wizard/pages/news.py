@@ -1,94 +1,100 @@
 """Display news from ETL."""
-import json
 from datetime import datetime
+from typing import Tuple
 
-import pytz
-import requests
 import streamlit as st
 from st_pages import add_indentation
 
-from etl.paths import BASE_DIR
+from apps.wizard.pages.expert.prompts import SYSTEM_PROMPT_GENERIC
+from apps.wizard.utils.db import WizardDB
+from apps.wizard.utils.gpt import GPTQuery, OpenAIWrapper, get_cost_and_tokens
 
 st.set_page_config(page_title="Wizard: News", page_icon="🪄")
 add_indentation()
 # st.title("🏐 Metadata playground")
 st.title("News 🗞️")
 
-
-def _clean_date(dt_raw: str) -> str:
-    return datetime.strptime(dt_raw, "%Y-%m-%dT%XZ").strftime("%c")
+# GPT
+MODEL_NAME = "gpt-4-turbo-preview"
 
 
 @st.cache_data()
-def check_and_load_news():
-    DATE = datetime.now(pytz.timezone("Europe/London")).strftime("%Y%m%d")
-    path = BASE_DIR / "wizard-news" / f"{DATE}.json"
-
-    if not path.parent.exists():
-        path.parent.mkdir(parents=True, exist_ok=True)
-
-    if path.exists():
-        print("news exist")
-    else:
-        # Download GitHub PR data
-        print("Getting GH info...")
-        url = "https://api.github.com/repos/owid/etl/pulls?state=closed'"
-        response = requests.get(url, timeout=10)
-        if response.status_code == 200:
-            data = response.json()
-        else:
-            st.error("Error fetching GitHub information! Refresh.")
-
-        # Clean pr data
-        pr_data = _clean_pr_data(data)
-
-        # Save data
-        with open(path, "w") as f:
-            json.dump(pr_data, f)
-
-        # Process information
-
-
-def get_json_url(url: str):
-    """Get JSON data from URL."""
-    response = requests.get(url, timeout=10)
-    if response.status_code == 200:
-        data = response.json()
-    else:
-        raise requests.ConnectionError("Error fetching GitHub information! Refresh.")
+def load_pr():
+    """Check and load news."""
+    # Load latest PR data
+    data = WizardDB.get_pr(num_days=7)
+    data = data.sort_values("DATE_MERGED", ascending=False)
+    data = data[data["MERGED"] == 1]
     return data
 
 
-def get_latest_pr_data():
-    """Get latest PR data."""
-    # Access repo and get latest PR data
-    url = "https://api.github.com/repos/owid/etl/pulls?state=closed'"
-    data = get_json_url(url)
-    # Clean
-    data = _clean_pr_data(data)
-    # Get additional comment data
-    return data
+def _clean_date(dt_raw: str) -> str:
+    """Show date nicely."""
+    return datetime.strptime(dt_raw, "%Y-%m-%dT%XZ").strftime("%a %d %b, %Y")
 
 
-def _clean_pr_data(data):
-    pr_data = []
-    for pr in data:
-        pr_data_ = {
-            "id": pr["id"],
-            "number": pr["number"],
-            "title": pr["title"],
-            "username": pr["user"]["login"],
-            "date_created": _clean_date(pr["created_at"]),
-            "date_merged": _clean_date(pr["merged_at"]) if pr["merged_at"] is not None else None,
-            "labels": str([label["name"] for label in pr["labels"]]),
-            "description": pr["body"],
-            "merged": pr["merged_at"] is not None,
-            # "url_comments": pr["comments_url"],
-            # "url_review_comments": pr["review_comments_url"],
-            "url_merge_commit": f"https://github.com/owid/etl/commit/{pr['merge_commit_sha']}",
-            "url_diff": pr["diff_url"],
-            "url_patch": pr["patch_url"],
-            "url_html": pr["html_url"],
-        }
-        pr_data.append(pr_data_)
-    return pr_data
+def render_expander(record):
+    """Render expander for each PR."""
+    with st.expander(f"{record['TITLE']} `by @{record['USERNAME']}`", expanded=False):
+        # st.markdown(
+        #     f"[See PR]({record['URL_HTML']})",
+        # )
+        st.markdown(f"[Go to Pull Request]({record['URL_HTML']})  |  [See diff]({record['URL_DIFF']})")
+        if record["DESCRIPTION"]:
+            st.markdown(record["DESCRIPTION"])
+
+
+@st.cache_data(show_spinner=False)
+def ask_gpt(df) -> Tuple[str, float, int]:
+    """Ask GPT for news."""
+    SYSTEM_PROMPT = f"""You will be given a markdown table with the pull requests merged in the etl repository in the last 7 days.
+
+    Summarise the main updates and interesting points from the pull requests. Use markdown syntax in your reply if needed.
+
+    To refer to users, use their username.
+
+    {SYSTEM_PROMPT_GENERIC}
+    """
+    USER_PROMPT = f"{df.to_markdown()}"
+    # Ask Chat GPT
+    api = OpenAIWrapper()
+
+    query = GPTQuery(
+        messages=[
+            {"role": "system", "content": SYSTEM_PROMPT},
+            {"role": "user", "content": USER_PROMPT},
+        ]
+    )
+    response = api.query_gpt(query=query, model=MODEL_NAME)
+
+    summary = response.message_content
+    cost, num_tokens = get_cost_and_tokens(SYSTEM_PROMPT + USER_PROMPT, summary, MODEL_NAME)
+    return summary, cost, num_tokens
+
+
+tab_1, tab_2 = st.tabs(["Pull Requests: Summary", "Pull Requests: Last 7 days"])
+# Get records
+df_pr = load_pr()
+records = df_pr.to_dict(orient="records")
+
+with tab_1:
+    # Summary
+    st.header("Pull Requests: Summary")
+    with st.popover("Config"):
+        st.selectbox("Time window for summary", options=["Last 24 hours", "Last 7 days"])
+    with st.spinner():
+        summary, cost, num_tokens = ask_gpt(df_pr)
+        st.markdown(summary)
+        st.divider()
+        st.info(f"Cost: ${cost:.2f}\nNumber tokens: {num_tokens}")
+
+with tab_2:
+    # Show last 7 day PR timeline
+    st.header("Pull Requests: Last 7 days")
+    LAST_DATE_HEADER = None
+    for record in records:
+        date_str = _clean_date(record["DATE_MERGED"])
+        if (LAST_DATE_HEADER is None) or (LAST_DATE_HEADER != date_str):
+            st.subheader(date_str)
+            LAST_DATE_HEADER = date_str
+        render_expander(record)
