@@ -1,10 +1,14 @@
 definitions:
+  common:
+    processing_level: major
+  description_from_producer: "Neuropsychiatric conditions has the following ICD 10 codes: F01-F99, G06-G98 (minus G14), U07.0, X41, X42, X44, X45."
+  description_key: Neuropsychiatric conditions category encompasses various disorders such as unipolar depressive disorders, bipolar disorder, schizophrenia, epilepsy, alcohol use disorders, Alzheimer's and other dementias, Parkinson's disease, multiple sclerosis, drug use disorders, post-traumatic stress disorder, obsessive-compulsive disorder, panic disorder, primary insomnia, migraine, mental retardation, and a range of other neuropsychiatric disorders.
   presentation:
     topic_tags:
     - Mental Health
 
 dataset:
-  title:  Missing data - Deaths from Neuropsychiatric conditions
+  title:  Missing data - Deaths from Neuropsychiatric Conditions
 
 tables:
   neuropsychiatric_conditions:
@@ -29,9 +33,5 @@ tables:
         short_unit: 'people'
         unit: ''
 
-      total_countries:
-        title: Total number of countries within each region
-        short_unit: ''
-        unit: ''
 
 

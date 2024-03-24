@@ -123,6 +123,8 @@ def run(dest_dir: str) -> None:
     df_final = pd.concat([region_details, income_details], axis=0)
     df_final = df_final.set_index(["region", "year"], verify_integrity=True)
     df_final["fraction_available_countries"] = 100 - df_final["fraction_missing_countries"]
+    df_final = df_final.drop(columns=["total_countries"])
+
     tb_garden = Table(df_final, short_name="neuropsychiatric_conditions")
 
     # Ensure metadata is correctly associated.
