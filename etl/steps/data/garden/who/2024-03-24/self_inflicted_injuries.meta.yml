@@ -38,7 +38,7 @@ tables:
         title: Percentage of deaths from self-inflicted injuries out of total deaths
         unit: '%'
         short_unit: '%'
-        description_short: Percentage of deaths from self-inflicted injuries out of all deaths in the population based on the [underlying cause](#dod:underlying-cause-of-death) listed on death certificates.
+        description_short: Percentage of deaths from self-inflicted injuries out of all deaths in the population, based on the [underlying cause](#dod:underlying-cause-of-death) listed on death certificates.
         description_from_producer: Underlying causes of death grouped under this heading are those grouped under the ICD codes X60-X84, Y870.
         display:
           numDecimalPlaces: 2
