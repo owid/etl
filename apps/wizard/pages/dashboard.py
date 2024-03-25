@@ -648,7 +648,7 @@ with st.container(border=True):
     # Create an operations list, that contains the steps (selected from the main steps table) we will operate upon.
     # Note: Selected steps might contain steps other those selected in the main steps table, based on user selections (e.g. dependencies).
     if st.session_state.selected_steps:
-        for step in st.session_state.selected_steps:
+        for index, step in enumerate(st.session_state.selected_steps):
             # Define the layout of the list.
             cols = st.columns([0.5, 3, 1, 1, 1, 1])
 
@@ -684,6 +684,8 @@ with st.container(border=True):
 
             # Display the operations list.
             for (action_name, key_suffix, help_text), col in zip(actions, cols):
+                # Create a unique key for the button (if any button is to be created).
+                unique_key = f"{key_suffix}_{step}_{index}"
                 # Write step URI
                 if key_suffix == "write":
                     if step in st.session_state.selected_steps_table:
@@ -694,7 +696,7 @@ with st.container(border=True):
                 elif key_suffix == "remove":
                     col.button(
                         label=action_name,
-                        key=f"{key_suffix}_{step}",
+                        key=unique_key,
                         on_click=lambda step=step: remove_step(step),
                         help=help_text,
                     )
@@ -702,7 +704,7 @@ with st.container(border=True):
                 else:
                     col.button(
                         label=action_name,
-                        key=f"{key_suffix}_{step}",
+                        key=unique_key,
                         on_click=lambda step=step, key_suffix=key_suffix: include_related_steps(step, key_suffix),
                         help=help_text,
                     )
@@ -712,6 +714,7 @@ with st.container(border=True):
             "Clear _Operations list_",
             help="Remove all steps currently in the _Operations list_.",
             type="secondary",
+            key="clear_operations_list",
             on_click=lambda: st.session_state.selected_steps.clear(),
         )
 
@@ -730,7 +733,8 @@ with st.container(border=True):
             help="Remove steps that cannot be updated (i.e. with `update_period_days=0`), and other auxiliary datasets, namely: "
             + "\n- ".join(sorted(NON_UPDATEABLE_IDENTIFIERS)),
             type="secondary",
-            on_click=remove_non_updateable_steps(),
+            key="remove_non_updateable",
+            on_click=remove_non_updateable_steps,
         )
 
         def upgrade_steps_in_operations_list():
@@ -753,7 +757,8 @@ with st.container(border=True):
             "Replace steps with their latest versions",
             help="Replace steps in the _Operations list_ by their latest version available. You may want to use this button after updating steps, to be able to operate on the newly created steps.",
             type="secondary",
-            on_click=upgrade_steps_in_operations_list(),
+            key="replace_with_latest",
+            on_click=upgrade_steps_in_operations_list,
         )
 
     else:
