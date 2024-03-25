@@ -77,7 +77,7 @@ class WizardDB:
                 "url_patch",
                 "url_html",
             )
-            query = _prepare_query_insert(TB_PR, fields)  # type: ignore
+            query = _prepare_query_insert(TB_PR, fields)
             # Get IDs to update
             ids = tuple(str(data["id"]) for data in data_values)
             # Insert in table
