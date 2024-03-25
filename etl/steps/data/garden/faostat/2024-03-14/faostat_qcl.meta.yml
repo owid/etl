@@ -1,0 +1,47 @@
+tables:
+  faostat_qcl_flat:
+    variables:
+      cereals__00001717__yield__005419__tonnes_per_hectare:
+        title: Cereals | 00001717 || Yield | 005419 || tonnes per hectare
+        unit: tonnes per hectare
+        short_unit: t/ha
+        description_short: Measured in tonnes per hectare.
+        description_key:
+          - Cereals include wheat, rice, maize, barley, oats, rye, millet, sorghum, buckwheat, and mixed grains.
+        description_from_producer: |
+          Cereals are generally of the gramineous family and, in the FAO concept, refer to crops harvested for dry grain only. Crops harvested green for forage, silage or grazingare classified as fodder crops. Also excluded are industrial crops, e.g. broom sorghum (Crude organic materials nes) and sweet sorghum when grown for syrup (Sugar crops nes). For international trade classifications, fresh cereals (other than sweet corn), whether or not suitable for use as fresh vegetables, are classified as cereals.
+
+          Cereals are identified according to their genus. However, when two or more genera are sown and harvested as a mixture they should be classified and reported as "mixed grains". Production data are reported in terms of clean, dry weight of grains (12-14 percent moisture) in the form usually marketed. Rice, however, is reported in terms of paddy. Apart from moisture content and inedible substances such as cellulose, cereal grains contain, along with traces of minerals and vitamins, carbohydrates - mainly starches - (comprising 65-75 percent of their total weight), as well as proteins (6-12 percent) and fat (1-5 percent).
+
+          The FAO definitions cover 17 primary cereals, of which one - white maize - is a component of maize. Each definition is listed along with its code, botanical name or names, and a short description. Cereal products derive either from the processing of grain through one or more mechanical or chemical operations, or from the processing of flour, meal or starch. Each cereal product is listed after the cereal from which it is derived.
+
+          Yield: Harvested production per unit of harvested area for crop products. In most of the cases yield data are not recorded but obtained by dividing the production data by the data on area harvested. Data on yields of permanent crops are not as reliable as those for temporary crops either because most of the area information may correspond to planted area, as for grapes, or because of the scarcity and unreliability of the area figures reported by the countries, as for example for cocoa and coffee. Source: FAO Statistics Division.
+        processing_level: major
+        presentation:
+          attribution_short: FAO
+          topic_tags:
+            - Agricultural Production
+            - Crop Yields
+          title_public: Cereal yields
+          grapher_config:
+            title: Cereal yields
+            subtitle: |-
+              Yields are measured in tonnes per hectare. Cereals include wheat, rice, maize, barley, oats, rye, millet, sorghum, buckwheat, and mixed grains.
+            originUrl: https://ourworldindata.org/crop-yields
+            hasMapTab: true
+            tab: map
+            yAxis:
+              max: 0
+              min: 0
+              facetDomain: shared
+            hideAnnotationFieldsInTitle:
+              time: true
+              entity: true
+              changeInPrefix: true
+            selectedEntityNames:
+              - World
+              - Asia
+              - Africa
+              - Northern America
+              - Europe
+              - South America

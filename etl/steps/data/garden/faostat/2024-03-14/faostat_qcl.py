@@ -542,11 +542,13 @@ def run(dest_dir: str) -> None:
         check_variables_metadata=False,
     )
 
-    # Update dataset metadata and add description of anomalies (if any) to the dataset description.
+    # Update dataset metadata.
+    ds_garden.metadata.update_period_days = 365
+    ds_garden.metadata.title = dataset_metadata["owid_dataset_title"]
+    # The following description is not publicly shown in charts; it is only visible when accessing the catalog.
     ds_garden.metadata.description = (
         dataset_metadata["owid_dataset_description"] + anomaly_descriptions + SLAUGHTERED_ANIMALS_ADDITIONAL_DESCRIPTION
     )
-    ds_garden.metadata.title = dataset_metadata["owid_dataset_title"]
 
     # Create garden dataset.
     ds_garden.save()
