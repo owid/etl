@@ -14,11 +14,11 @@ st.title("News 🗞️")
 st.markdown("Find news and updates from the [etl project](https://github.com/owid/etl).")
 
 # Only run this on live!
-# if (not DB_IS_SET_UP) | (not ENV_IS_REMOTE):
-#     st.warning(
-#         "This page is not available! Remember:\n\n- This page only works on live\n- You need to configure files `.streamlit/secrets.toml` and `.wizardcfg/wizard.db` correctly setup!"
-#     )
-#     st.stop()
+if (not DB_IS_SET_UP) | (not ENV_IS_REMOTE):
+    st.warning(
+        "This page is not available! Remember:\n\n- This page only works on live\n- You need to configure files `.streamlit/secrets.toml` and `.wizardcfg/wizard.db` correctly setup!"
+    )
+    st.stop()
 
 # GPT
 MODEL_NAME = "gpt-4-turbo-preview"
