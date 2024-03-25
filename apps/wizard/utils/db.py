@@ -3,7 +3,7 @@ import datetime as dt
 import hashlib
 import os
 import time
-from typing import Optional
+from typing import Any, Literal, Optional, Tuple
 
 import pandas as pd
 import streamlit as st
@@ -16,6 +16,9 @@ DB_IS_SET_UP = STREAMLIT_SECRETS.exists() & WIZARD_DB.exists()
 DB_NAME = "wizard"
 TB_USAGE = "expert_usage"
 TB_PR = "pull_requests"
+TB_NS = "etl_news"
+# Window accepted values
+WND_LITERAL = Literal["1d", "7d"]
 
 
 class WizardDB:
@@ -74,8 +77,7 @@ class WizardDB:
                 "url_patch",
                 "url_html",
             )
-            values = ":" + ", :".join(fields)
-            query = f"INSERT INTO pull_requests {fields} VALUES ({values});"
+            query = _prepare_query_insert(TB_PR, fields)  # type: ignore
             # Get IDs to update
             ids = tuple(str(data["id"]) for data in data_values)
             # Insert in table
@@ -89,7 +91,8 @@ class WizardDB:
                 s.commit()
 
     @classmethod
-    def get_pr(cls, num_days: int = 7):
+    @st.cache_data()
+    def get_pr(cls, num_days: int = 7) -> pd.DataFrame:
         """Get PR data from database."""
         data = []
         if DB_IS_SET_UP:
@@ -102,3 +105,58 @@ class WizardDB:
                 )
                 data = data.fetchall()
         return pd.DataFrame(data)
+
+    @classmethod
+    def add_news_summary(cls, summary: str, cost: float, window_type: WND_LITERAL) -> None:
+        """Add GPT summary entry."""
+        if DB_IS_SET_UP:
+            fields = ("id", "date", "cost", "summary", "window_type")
+            query = _prepare_query_insert(TB_NS, fields)  # type: ignore
+            code = hashlib.sha1(window_type.encode()).hexdigest()[:5]
+            query_params = {
+                "id": f"{round(time.time())}{code}",
+                "date": dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%XZ"),
+                "cost": cost,
+                "summary": summary,
+                "window_type": window_type,
+            }
+            conn = st.connection(DB_NAME)
+            with conn.session as s:
+                s.execute(
+                    query,
+                    params=query_params,
+                )
+                s.commit()
+
+    @classmethod
+    @st.cache_data()
+    def get_news_summary(cls, window_type: WND_LITERAL) -> Tuple[str, str, str] | None:
+        """Get nmews (latest) from DB."""
+        data = []
+        if DB_IS_SET_UP:
+            conn = st.connection(DB_NAME)
+            with conn.session as s:
+                # query = f"SELECT SUMMARY, DATE FROM {TB_NS} WHERE DATE(DATE) = DATE('now', 'utc') AND window_type = :window_type;"
+                query = f"""SELECT SUMMARY, DATE, COST, ABS(strftime('%s', DATE) - strftime('%s', 'now')) AS time_difference
+                FROM {TB_NS}
+                WHERE window_type = :window_type
+                ORDER BY time_difference ASC
+                LIMIT 1;
+                """
+                data = s.execute(query, params={"window_type": window_type})
+                data = data.fetchall()
+        if data:
+            if len(data) > 1:
+                raise ValueError("Multiple entries for the same day.")
+            return (
+                data[0][0],
+                data[0][1],
+                data[0][2],
+            )
+
+
+def _prepare_query_insert(tb_name: str, fields: Tuple[Any]) -> str:
+    # Prepare query
+    values = ":" + ", :".join(fields)
+    query = f"INSERT INTO {tb_name} {fields} VALUES ({values});"
+    return query
