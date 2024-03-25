@@ -3,7 +3,11 @@ meta:
     producer: Food and Agriculture Organization of the United Nations
     title: 'Forestry: Forestry Production and Trade'
     description: |-
-      The database contains data on the production and trade in roundwood and in primary wood and paper products for all countries and territories in the world.The main types of primary forest products included in this database are roundwood, sawnwood, wood-based panels, pulp, and paper and paperboard. These products are detailed further and defined in the Joint Forest Sector Questionnaire (JFSQ) (https://www.fao.org/forestry/statistics/80572/en/). The database contains details of the following topics: - Roundwood removals (production) by coniferous and non-coniferous wood and assortments, - production and trade in industrial roundwood, sawnwood, wood-based panels, wood charcoal, pulp, paper and paperboard, and other products. More detailed information on wood products, including definitions, can be found at https://www.fao.org/forestry/statistics/80572/en
+      The database contains data on the production and trade in roundwood and in primary wood and paper products for all countries and territories in the world.
+
+      The main types of primary forest products included in this database are roundwood, sawnwood, wood-based panels, pulp, and paper and paperboard. These products are detailed further and defined in [the Joint Forest Sector Questionnaire (JFSQ)](https://www.fao.org/forestry/statistics/80572/en/).
+
+      The database contains details of the following topics: - Roundwood removals (production) by coniferous and non-coniferous wood and assortments, - production and trade in industrial roundwood, sawnwood, wood-based panels, wood charcoal, pulp, paper and paperboard, and other products. More detailed information on wood products, including definitions, can be found at: https://www.fao.org/forestry/statistics/80572/en
     citation_full: 'Food and Agriculture Organization of the United Nations - Forestry: Forestry Production and Trade (2023).'
     attribution_short: FAOSTAT
     url_main: http://www.fao.org/faostat/en/#data/FO

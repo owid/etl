@@ -3,7 +3,9 @@ meta:
     producer: Food and Agriculture Organization of the United Nations
     title: 'Land, Inputs and Sustainability: Fertilizers by Nutrient'
     description: |-
-      The Fertilizers by Nutrient dataset contains information on the totals in nutrients for Production, Trade and Agriculture Use of inorganic (chemical or mineral) fertilizers, over the time series 1961-present. The data are provided for the three primary plant nutrients: nitrogen (N), phosphorus (expressed as P2O5) and potassium (expressed as K2O). Both straight and compound fertilizers are included. There is information on the methodology available at: https://fenixservices.fao.org/faostat/static/documents/RFN/RFN_EN_README.pdf
+      The Fertilizers by Nutrient dataset contains information on the totals in nutrients for Production, Trade and Agriculture Use of inorganic (chemical or mineral) fertilizers, over the time series 1961-present.
+
+      The data are provided for the three primary plant nutrients: nitrogen (N), phosphorus (expressed as P2O5) and potassium (expressed as K2O). Both straight and compound fertilizers are included. There is information on the methodology available at: https://fenixservices.fao.org/faostat/static/documents/RFN/RFN_EN_README.pdf
     citation_full: |-
       Food and Agriculture Organization of the United Nations - Land, Inputs and Sustainability: Fertilizers by Nutrient (2023).
     attribution_short: FAOSTAT

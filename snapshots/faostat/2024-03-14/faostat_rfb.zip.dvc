@@ -3,7 +3,9 @@ meta:
     producer: Food and Agriculture Organization of the United Nations
     title: 'Land, Inputs and Sustainability: Fertilizers by Product'
     description: |-
-      The Fertilizers by Product dataset contains information on the Production, Trade and Agriculture Use of inorganic (chemical or mineral) fertilizers products, over the time series 2002-present. The fertilizer statistics data are for a set of 23 product categories. Both straight and compound fertilizers are included. There is information available about methodology at: https://fenixservices.fao.org/faostat/static/documents/RFB/RFB_EN_README.pdf.
+      The Fertilizers by Product dataset contains information on the Production, Trade and Agriculture Use of inorganic (chemical or mineral) fertilizers products, over the time series 2002-present.
+
+      The fertilizer statistics data are for a set of 23 product categories. Both straight and compound fertilizers are included. There is information available about methodology at: https://fenixservices.fao.org/faostat/static/documents/RFB/RFB_EN_README.pdf
     citation_full: |-
       Food and Agriculture Organization of the United Nations - Land, Inputs and Sustainability: Fertilizers by Product (2023).
     attribution_short: FAOSTAT

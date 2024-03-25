@@ -334,7 +334,16 @@ accept or reject changes.
 
         In the future this could be handled automatically by one of the existing scripts.
 
-14. Archive unnecessary DB datasets, and move old, unnecessary etl steps in the dag to the archive dag.
+14. Manually improve the metadata, if needed. For example, inspect the snapshot metadata files, to improve the dataset descriptions:
+  - Insert line break after first sentence (which usually is the general description of the dataset).
+  - Remove spurious symbols.
+  - Insert spaces where missing (e.g. "end of sentence.Start of next sentence").
+  - Remove double spaces (e.g. "end of sentence.  Start of next sentence").
+  - Insert line breaks to create paragraphs (by context).
+  - Remove incomplete sentences (sometimes there are half sentences that may have been added by mistake).
+  - Remove mentions to links in FAOSTAT page (since they will not be seen from grapher).
+
+15. Archive unnecessary DB datasets, and move old, unnecessary etl steps in the dag to the archive dag.
     ```bash
     python etl/scripts/faostat/archive_old_datasets.py -e
     ```

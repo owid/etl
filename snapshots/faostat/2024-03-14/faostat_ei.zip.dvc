@@ -3,7 +3,9 @@ meta:
     producer: Food and Agriculture Organization of the United Nations
     title: 'Climate Change: Agrifood systems emissions: Emissions intensities'
     description: |-
-      The FAOSTAT domain Emissions intensities contains analytical data on the intensity of greenhouse gas (GHG) emissions by agricultural commodity. This indicator is defined as greenhouse gas emissions per kg of product. Data are available for a set of agricultural commodities (e.g. rice and other cereals, meat, milk, eggs), by country, with global coverage and relative to the period 1961–2020.
+      The FAOSTAT domain Emissions intensities contains analytical data on the intensity of greenhouse gas (GHG) emissions by agricultural commodity.
+
+      This indicator is defined as greenhouse gas emissions per kg of product. Data are available for a set of agricultural commodities (e.g. rice and other cereals, meat, milk, eggs), by country, with global coverage and relative to the period 1961-2020.
     citation_full: |-
       Food and Agriculture Organization of the United Nations - Climate Change: Agrifood systems emissions: Emissions intensities (2023).
     attribution_short: FAOSTAT

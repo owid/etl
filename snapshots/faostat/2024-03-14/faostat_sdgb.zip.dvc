@@ -3,7 +3,9 @@ meta:
     producer: Food and Agriculture Organization of the United Nations
     title: 'SDG Indicators: SDG Indicators'
     description: |-
-      As the custodian agency of 21 SDG indicators, the Food and Agriculture Organization of the United Nations (FAO) is responsible for curating and refining the methodologies of these indicators, collecting data from national sources, ensuring their quality and compatibility with applicable standards and classifications, and disseminating data at global level. This FAOSTAT domain complements the global SDG database administered by the United Nations Statistical Division, as well as FAO’s SDG indicators portal, by providing access to the available data for each of these indicators.  Please click the metadata link on the right hand navigation column for an abridged version of the methodology for compiling each of these indicators, a description of data sources and the relevant contact persons responsible for each indicator in the Organization. For a more detailed description of the methodology, data sources and reporting procedures, please follow the link to the official SDG indicator metadata document available at the bottom of each summary metadata page in the document on the right.
+      As the custodian agency of 21 SDG indicators, the Food and Agriculture Organization of the United Nations (FAO) is responsible for curating and refining the methodologies of these indicators, collecting data from national sources, ensuring their quality and compatibility with applicable standards and classifications, and disseminating data at global level.
+
+      This FAOSTAT domain complements the global SDG database administered by the United Nations Statistical Division, as well as FAO's SDG indicators portal, by providing access to the available data for each of these indicators.
     citation_full: 'Food and Agriculture Organization of the United Nations - SDG Indicators: SDG Indicators (2023).'
     attribution_short: FAOSTAT
     url_main: http://www.fao.org/faostat/en/#data/SDGB
