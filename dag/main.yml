@@ -672,6 +672,7 @@ steps:
   data://grapher/missing_data/2024-03-14/children_out_of_school:
     - data://garden/missing_data/2024-03-14/children_out_of_school
 
+  # Missing Data - Neuropsychiatric Conditions
   data://garden/missing_data/2024-03-19/who_neuropsychiatric_conditions:
     - data://garden/who/2023-08-01/mortality_database
     - data://garden/wb/2024-03-11/income_groups
@@ -680,7 +681,7 @@ steps:
   data://grapher/missing_data/2024-03-19/who_neuropsychiatric_conditions:
     - data://garden/missing_data/2024-03-19/who_neuropsychiatric_conditions
 
-
+  # Missing Data - Suicides
   data://garden/missing_data/2024-03-25/who_md_suicides:
     - data://garden/who/2024-03-24/self_inflicted_injuries
     - data://garden/wb/2024-03-11/income_groups
