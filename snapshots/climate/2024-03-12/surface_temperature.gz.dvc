@@ -5,7 +5,7 @@ meta:
     description: |-
       ERA5 is the latest climate reanalysis produced by ECMWF, providing hourly data on many atmospheric, land-surface and sea-state parameters together with estimates of uncertainty.
 
-      ERA5 data are available in the Climate Data Store on regular latitude-longitude grids at 0.25o x 0.25o resolution, with atmospheric parameters on 37 pressure levels.
+      ERA5 data are available in the Climate Data Store on regular latitude-longitude grids at 0.25° x 0.25° resolution, with atmospheric parameters on 37 pressure levels.
 
       ERA5 is available from 1940 and continues to be extended forward in time, with daily updates being made available 5 days behind real time
 
