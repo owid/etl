@@ -7,13 +7,14 @@ It has been slightly modified since then.
 import json
 from datetime import date, datetime
 from pathlib import Path
-from typing import Annotated, Any, Dict, List, Literal, Optional, TypedDict, Union
+from typing import Annotated, Any, Dict, List, Literal, Optional, TypedDict, Union, get_args
 from urllib.parse import quote
 
 import humps
 import pandas as pd
 import structlog
 from owid import catalog
+from owid.catalog.meta import VARIABLE_TYPE
 from sqlalchemy import (
     BigInteger,
     Computed,
@@ -1061,6 +1062,14 @@ class Variable(SQLModel, table=True):
     licenses: Optional[List[dict]] = Field(default=None, sa_column=Column("licenses", JSON))
     # NOTE: License should be the resulting license, given all licenses of the indicator’s origins and given the indicator’s processing level.
     license: Optional[dict] = Field(default=None, sa_column=Column("license", JSON))
+    type: Optional[VARIABLE_TYPE] = Field(default=None, sa_column=Column("type", ENUM(*get_args(VARIABLE_TYPE))))
+    sort: Optional[List[str]] = Field(
+        default=None,
+        sa_column=Column(
+            "sort",
+            JSON,
+        ),
+    )
 
     datasets: Optional["Dataset"] = Relationship(back_populates="variables")
     sources: Optional["Source"] = Relationship(back_populates="variables")
@@ -1121,6 +1130,7 @@ class Variable(SQLModel, table=True):
             ds.descriptionProcessing = self.descriptionProcessing
             ds.licenses = self.licenses
             ds.license = self.license
+            ds.type = self.type
             ds.updatedAt = datetime.utcnow()
             # do not update these fields unless they're specified
             if self.columnOrder is not None:
@@ -1131,6 +1141,8 @@ class Variable(SQLModel, table=True):
                 ds.originalMetadata = self.originalMetadata
             if self.grapherConfigETL is not None:
                 ds.grapherConfigETL = self.grapherConfigETL
+            if self.sort is not None:
+                ds.sort = self.sort
             assert self.grapherConfigAdmin is None, "grapherConfigETL should be used instead of grapherConfigAdmin"
 
         session.add(ds)
@@ -1196,6 +1208,8 @@ class Variable(SQLModel, table=True):
             descriptionProcessing=metadata.description_processing,
             licenses=[license.to_dict() for license in metadata.licenses] if metadata.licenses else None,
             license=metadata.license.to_dict() if metadata.license else None,
+            type=metadata.type,
+            sort=metadata.sort,
             **presentation_dict,
         )
 
@@ -1212,9 +1226,13 @@ class Variable(SQLModel, table=True):
         assert "#" in catalog_path, "catalog_path should end with #indicator_short_name"
         return session.exec(select(cls).where(cls.catalogPath == catalog_path)).one()
 
+    def infer_type(self, values: pd.Series) -> VARIABLE_TYPE:
+        """Set type and sort fields based on indicator values."""
+        return _infer_variable_type(values)
+
     def update_links(
         self, session: Session, db_origins: List["Origin"], faqs: List[catalog.FaqLink], tag_names: List[str]
-    ):
+    ) -> None:
         """
         Establishes relationships between the current variable and a list of origins and a list of posts.
         """
@@ -1252,7 +1270,9 @@ class Variable(SQLModel, table=True):
 
     def s3_metadata_path(self, typ: S3_PATH_TYP = "s3") -> str:
         """Path to S3 with metadata in JSON format for Grapher. Typically
-        s3://owid-api/v1/indicators/123.metadata.json."""
+        s3://owid-api/v1/indicators/123.metadata.json or
+        s3://owid-api-staging/name/v1/indicators/123.metadata.json
+        ."""
         if typ == "s3":
             return f"{config.BAKED_VARIABLES_PATH}/{self.id}.metadata.json"
         elif typ == "http":
@@ -1447,3 +1467,34 @@ def _remap_variable_ids(config: Union[List, Dict[str, Any]], remap_ids: Dict[int
         return [_remap_variable_ids(item, remap_ids) for item in config]
     else:
         return config
+
+
+def _infer_variable_type(values: pd.Series) -> VARIABLE_TYPE:
+    # values don't contain null values
+    assert values.notnull().all(), "values must not contain nulls"
+    assert values.map(lambda x: isinstance(x, str)).all(), "only works for strings"
+    if values.empty:
+        return "mixed"
+    try:
+        values = pd.to_numeric(values)
+        inferred_type = pd.api.types.infer_dtype(values)
+        if inferred_type == "floating":
+            return "float"
+        elif inferred_type == "integer":
+            return "int"
+        else:
+            raise NotImplementedError()
+    except ValueError:
+        if values.map(_is_float).any():
+            return "mixed"
+        else:
+            return "string"
+
+
+def _is_float(x):
+    try:
+        float(x)
+    except ValueError:
+        return False
+    else:
+        return True

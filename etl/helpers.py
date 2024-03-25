@@ -98,6 +98,14 @@ def grapher_checks(ds: catalog.Dataset, warn_title_public: bool = True) -> None:
                 tab[col].m.origins or tab[col].m.sources or ds.metadata.sources
             ), f"Column `{col}` must have either sources or origins"
 
+            # Validate ordinal variables
+            if tab[col].m.sort:
+                assert tab[col].m.type == "ordinal", f"Column `{col}` has a sort but is not of type ordinal"
+                extra_values = set(tab[col]) - set(tab[col].m.sort)
+                assert (
+                    not extra_values
+                ), f"Ordinal variable `{col}` has extra values that are not defined in field `sort`: {extra_values}"
+
             # Data Page title uses the following fallback
             # [title_public > grapher_config.title > display.name > title] - [attribution_short] - [title_variant]
             # the Table tab

@@ -203,12 +203,14 @@ def _variable_metadata(
     grapherConfigAdminJson = row.pop("grapherConfigAdmin")
     licenseJson = row.pop("license")
     descriptionKeyJson = row.pop("descriptionKey")
+    sortJson = row.pop("sort")
 
     display = json.loads(displayJson)
     grapherConfigETL = json.loads(grapherConfigETLJson) if grapherConfigETLJson else None
     grapherConfigAdmin = json.loads(grapherConfigAdminJson) if grapherConfigAdminJson else None
     license = json.loads(licenseJson) if licenseJson else None
     descriptionKey = json.loads(descriptionKeyJson) if descriptionKeyJson else None
+    sort = json.loads(sortJson) if sortJson else None
 
     # group fields from flat structure into presentation field
     presentation = dict(
@@ -224,7 +226,6 @@ def _variable_metadata(
 
     variableMetadata = dict(
         **_omit_nullable_values(variable),
-        type="mixed",  # precise type will be updated further down
         nonRedistributable=bool(nonRedistributable),
         display=display,
         schemaVersion=schemaVersion,
@@ -233,6 +234,8 @@ def _variable_metadata(
         license=license,
         descriptionKey=descriptionKey,
     )
+
+    assert variableMetadata["type"], "type must be set"
 
     # add source
     if sourceId:
@@ -268,16 +271,16 @@ def _variable_metadata(
         .to_dict(orient="records")
     )
 
-    variableData = variable_data[["year", "entityId", "value"]].rename(
-        columns={"year": "years", "entityId": "entities", "value": "values"}
-    )
-
-    variableMetadata["type"] = _infer_variable_type(variableData["values"])
-
+    # Create dimensions
     variableMetadata["dimensions"] = {
         "years": {"values": yearArray},
         "entities": {"values": entityArray},
     }
+    # Add values for ordinal variables
+    if sort:
+        dim_values = variableMetadata["dimensions"].get("values", {})
+        dim_values["values"] = [{"id": i, "name": v} for i, v in enumerate(sort)]
+        variableMetadata["dimensions"]["values"] = dim_values
 
     # convert timestamp to string
     time_format = "%Y-%m-%dT%H:%M:%S.000Z"
@@ -318,37 +321,6 @@ def variable_metadata(session: Session, variable_id: int, variable_data: pd.Data
         db_topic_tags=_load_topic_tags(session, variable_id),
         db_faqs=_load_faqs(session, variable_id),
     )
-
-
-def _infer_variable_type(values: pd.Series) -> str:
-    # values don't contain null values
-    assert values.notnull().all(), "values must not contain nulls"
-    assert values.map(lambda x: isinstance(x, str)).all(), "only works for strings"
-    if values.empty:
-        return "mixed"
-    try:
-        values = pd.to_numeric(values)
-        inferred_type = pd.api.types.infer_dtype(values)
-        if inferred_type == "floating":
-            return "float"
-        elif inferred_type == "integer":
-            return "int"
-        else:
-            raise NotImplementedError()
-    except ValueError:
-        if values.map(_is_float).any():
-            return "mixed"
-        else:
-            return "string"
-
-
-def _is_float(x):
-    try:
-        float(x)
-    except ValueError:
-        return False
-    else:
-        return True
 
 
 def _convert_strings_to_numeric(lst: List[str]) -> List[Union[int, float, str]]:
