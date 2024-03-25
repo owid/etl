@@ -1,0 +1,23 @@
+meta:
+  origin:
+    producer: Food and Agriculture Organization of the United Nations
+    title: 'Land, Inputs and Sustainability: Livestock Patterns'
+    description: |-
+      The Livestock Patterns domain of FAOSTAT contains data on livestock numbers, shares of major livestock species and densities of livestock units in the agricultural land area.
+
+      Values are calculated using Livestock Units (LSU), which facilitate aggregating information for different livestock types. Data are available by country, with global coverage, for the period 1961 to present, with annual updates. This methodology applies the LSU coefficients reported in the "Guidelines for the preparation of livestock sector reviews" (FAO, 2011). From this publication, LSU coefficients are computed by livestock type and by country. The reference unit used for the calculation of livestock units (=1 LSU) is the grazing equivalent of one adult dairy cow producing 3000 kg of milk annually, fed without additional concentrated foodstuffs.
+
+      FAOSTAT agri-environmental indicators on livestock patterns closely follow the structure of the indicators in EUROSTAT.
+    citation_full: 'Food and Agriculture Organization of the United Nations - Land, Inputs and Sustainability: Livestock Patterns (2023).'
+    attribution_short: FAOSTAT
+    url_main: http://www.fao.org/faostat/en/#data/EK
+    url_download: https://fenixservices.fao.org/faostat/static/bulkdownloads/Environment_LivestockPatterns_E_All_Data_(Normalized).zip
+    date_accessed: '2024-03-14'
+    date_published: '2023-08-30'
+    license:
+      name: CC BY-NC-SA 3.0 IGO
+      url: http://www.fao.org/contact-us/terms/db-terms-of-use/en
+outs:
+  - md5: 29bc9a0c4ae76ca22dda476799eac1e4
+    size: 3067161
+    path: faostat_ek.zip

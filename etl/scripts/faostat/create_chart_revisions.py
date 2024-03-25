@@ -5,6 +5,9 @@ This script may raise errors, possibly because the chart revision tool fails whe
 chart that is already in revision (when another variable previously triggered a revision for the same chart).
 When this happens, simply go through the approval tool and run this script again until it produces no more revisions.
 
+NOTE: This script assumes both old and new ETL steps involved have been executed already in the present environment.
+If not, execute them (e.g. `etl run faostat`, which may take a while).
+
 """
 
 import argparse
@@ -23,6 +26,7 @@ from etl.chart_revision.v1.revision import create_and_submit_charts_revisions
 from etl.paths import DATA_DIR
 from etl.scripts.faostat.shared import NAMESPACE
 
+# Initialize logger.
 log = get_logger()
 
 # Channel from which the dataset versions and variables will be loaded.
@@ -31,23 +35,8 @@ CHANNEL = "grapher"
 # Columns to not take as variables.
 COLUMNS_TO_IGNORE = ["country", "year", "index"]
 
-# WARNING: These definitions should coincide with those given in the shared module of the garden step.
-# So we will convert it into a string of this number of characters (integers will be prepended with zeros).
-N_CHARACTERS_ITEM_CODE = 8
-# Idem for faostat_sdgb (that has different item codes).
-N_CHARACTERS_ITEM_CODE_SDGB = 14
-# Maximum number of characters for element_code (integers will be prepended with zeros).
-N_CHARACTERS_ELEMENT_CODE = 6
-
-# This regex should extract item codes and element codes, which are made of numbers, sometimes "pc"
-# (for per capita variables), and "M" and "F" (for male and female, only for certain domains, like fs and sdgb).
-REGEX_TO_EXTRACT_ITEM_AND_ELEMENT = (
-    rf".*([0-9pcMF]{{{N_CHARACTERS_ITEM_CODE}}}).*([0-9pcMF]{{{N_CHARACTERS_ELEMENT_CODE}}})"
-)
-# Idem for faostat_sdgb.
-REGEX_TO_EXTRACT_ITEM_AND_ELEMENT_SDGB = (
-    rf".*([0-9A-Z]{{{N_CHARACTERS_ITEM_CODE_SDGB}}}).*([0-9pcMF]{{{N_CHARACTERS_ELEMENT_CODE}}})"
-)
+# This regex should extract item codes and element codes from variable names.
+REGEX_TO_EXTRACT_ITEM_AND_ELEMENT = r"\|\s*([^|]+)\s*\|\|\s*[^|]+\|\s*([^|]+)\s*\|\|"
 
 
 def extract_variables_from_dataset(dataset_short_name: str, version: str) -> List[str]:
@@ -64,11 +53,8 @@ def extract_variables_from_dataset(dataset_short_name: str, version: str) -> Lis
     return variable_titles
 
 
-def extract_identifiers_from_variable_name(variable: str, dataset_short_name: str) -> Dict[str, Any]:
-    if dataset_short_name == "faostat_sdgb":
-        matches = re.findall(REGEX_TO_EXTRACT_ITEM_AND_ELEMENT_SDGB, variable)
-    else:
-        matches = re.findall(REGEX_TO_EXTRACT_ITEM_AND_ELEMENT, variable)
+def extract_identifiers_from_variable_name(variable: str) -> Dict[str, Any]:
+    matches = re.findall(REGEX_TO_EXTRACT_ITEM_AND_ELEMENT, variable)
     error = f"Item code or element code could not be extracted for variable: {variable}"
     assert np.shape(matches) == (1, 2), error
     item_code, element_code = matches[0]
@@ -77,22 +63,10 @@ def extract_identifiers_from_variable_name(variable: str, dataset_short_name: st
     return variable_codes
 
 
-def map_old_to_new_variable_names(
-    variables_old: List[str], variables_new: List[str], dataset_short_name: str
-) -> Dict[str, str]:
+def map_old_to_new_variable_names(variables_old: List[str], variables_new: List[str]) -> Dict[str, str]:
     # Extract item codes and element codes from variable names.
-    codes_old = pd.DataFrame(
-        [
-            extract_identifiers_from_variable_name(variable=variable, dataset_short_name=dataset_short_name)
-            for variable in variables_old
-        ]
-    )
-    codes_new = pd.DataFrame(
-        [
-            extract_identifiers_from_variable_name(variable=variable, dataset_short_name=dataset_short_name)
-            for variable in variables_new
-        ]
-    )
+    codes_old = pd.DataFrame([extract_identifiers_from_variable_name(variable=variable) for variable in variables_old])
+    codes_new = pd.DataFrame([extract_identifiers_from_variable_name(variable=variable) for variable in variables_new])
 
     variables_matched = pd.merge(
         codes_old, codes_new, how="outer", on=["item_code", "element_code"], suffixes=("_old", "_new")
@@ -118,11 +92,23 @@ def map_old_to_new_variable_names(
 
 def get_grapher_data_for_old_and_new_variables(
     dataset_old: Dataset, dataset_new: Dataset
-) -> Tuple[pd.DataFrame, pd.DataFrame]:
+) -> Tuple[Optional[pd.DataFrame], Optional[pd.DataFrame]]:
     with db.get_connection() as db_conn:
-        # Get old and new dataset ids.
-        dataset_id_old = db.get_dataset_id(db_conn=db_conn, dataset_name=dataset_old.metadata.title)
-        dataset_id_new = db.get_dataset_id(db_conn=db_conn, dataset_name=dataset_new.metadata.title)
+        try:
+            # Get old and new dataset ids.
+            dataset_id_old = db.get_dataset_id(
+                db_conn=db_conn, dataset_name=dataset_old.metadata.title, version=dataset_old.metadata.version
+            )
+        except AssertionError:
+            log.error(f"Dataset {dataset_old.metadata.title} not found in grapher DB.")
+            return None, None
+        try:
+            dataset_id_new = db.get_dataset_id(
+                db_conn=db_conn, dataset_name=dataset_new.metadata.title, version=dataset_new.metadata.version
+            )
+        except AssertionError:
+            log.error(f"Dataset {dataset_new.metadata.title} not found in grapher DB.")
+            return None, None
 
         # Get variables from old dataset that have been used in at least one chart.
         grapher_variables_old = db.get_variables_in_dataset(
@@ -206,14 +192,15 @@ def get_grapher_variable_id_mapping_for_two_dataset_versions(
     variables_new = extract_variables_from_dataset(dataset_short_name=dataset_short_name, version=version_new)
 
     # Map old to new variable names.
-    variables_mapping = map_old_to_new_variable_names(
-        variables_old=variables_old, variables_new=variables_new, dataset_short_name=dataset_short_name
-    )
+    variables_mapping = map_old_to_new_variable_names(variables_old=variables_old, variables_new=variables_new)
 
     # Get data for old and new variables from grapher db.
     grapher_variables_old, grapher_variables_new = get_grapher_data_for_old_and_new_variables(
         dataset_old=dataset_old, dataset_new=dataset_new
     )
+
+    if (grapher_variables_old is None) or (grapher_variables_new is None) or (len(variables_mapping) == 0):
+        return {}
 
     # Check that variable titles in ETL match those found in grapher DB.
     error = "Mismatch between expected old variable titles in ETL and grapher DB."
@@ -250,13 +237,6 @@ def main(
 
     # List all datasets to map.
     dataset_short_names = [f"{NAMESPACE}_{domain.lower()}" for domain in domains]
-
-    ####################################################################################################################
-    # Temporarily ignore faostat_sdgb, which has changed item codes significantly.
-    dataset_short_names = [
-        dataset_short_name for dataset_short_name in dataset_short_names if dataset_short_name != "faostat_sdgb"
-    ]
-    ####################################################################################################################
 
     for dataset_short_name in dataset_short_names:
         log.info(f"Checking available versions for dataset {dataset_short_name}.")
