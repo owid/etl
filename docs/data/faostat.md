@@ -234,7 +234,16 @@ If no dataset requires an update, the workflow stops here.
         downloading this domain, add it to the list `INCLUDED_DATASETS_CODES`. Then replace variables used in those
         charts with the new ones.
 
-2. Create new meadow steps.
+2. Manually inspect the snapshot metadata files, and fix common issues in dataset descriptions:
+  - Insert line break after first sentence (which usually is the general description of the dataset).
+  - Remove spurious symbols.
+  - Insert spaces where missing (e.g. "end of sentence.Start of next sentence").
+  - Remove double spaces (e.g. "end of sentence.  Start of next sentence").
+  - Insert line breaks to create paragraphs (by context).
+  - Remove incomplete sentences (sometimes there are half sentences that may have been added by mistake).
+  - Remove mentions to links in FAOSTAT page (since they will not be seen from grapher).
+
+3. Create new meadow steps.
 
     !!! note
 
@@ -243,19 +252,19 @@ If no dataset requires an update, the workflow stops here.
     ```bash
     python etl/scripts/faostat/create_new_steps.py -c meadow -a
     ```
-3. Run the new etl meadow steps, to generate the meadow datasets.
+4. Run the new etl meadow steps, to generate the meadow datasets.
 
     ```bash
     etl run meadow/faostat/YYYY-MM-DD
     ```
 
-4. Create new garden steps.
+5. Create new garden steps.
 
     ```bash
     python etl/scripts/faostat/create_new_steps.py -c garden
     ```
 
-5. Run the new etl garden steps, to generate the garden datasets.
+6. Run the new etl garden steps, to generate the garden datasets.
 
     ```bash
     etl run garden/faostat/YYYY-MM-DD
@@ -277,7 +286,7 @@ If no dataset requires an update, the workflow stops here.
 
         If a new domain has been added to this version, you may need to manually add its meadow step as a dependency of garden/faostat/YYYY-MM-DD/faostat_metadata in the dag (this is a known bug).
 
-6. Inspect and update any possible changes of dataset/item/element/unit names and descriptions.
+7. Inspect and update any possible changes of dataset/item/element/unit names and descriptions.
 
     ```bash
     python etl/scripts/faostat/update_custom_metadata.py
@@ -288,19 +297,19 @@ If no dataset requires an update, the workflow stops here.
     etl run garden/faostat/YYYY-MM-DD
     ```
 
-7. Create new grapher steps.
+8. Create new grapher steps.
 
     ```bash
     python etl/scripts/faostat/create_new_steps.py -c grapher
     ```
 
-8. Run the new etl grapher steps, to generate the grapher charts.
+9. Run the new etl grapher steps, to generate the grapher charts.
 
     ```bash
     etl run faostat/YYYY-MM-DD --grapher
     ```
 
-9. Generate chart revisions (showing a chart using an old version of a variable and the same chart using the new
+10. Generate chart revisions (showing a chart using an old version of a variable and the same chart using the new
 version) for each dataset, to replace variables of a dataset from its second latest version to its latest version.
 
     ```bash
@@ -311,12 +320,12 @@ version) for each dataset, to replace variables of a dataset from its second lat
 
         This step may raise errors (because of limitations in our chart revision tool). If so, continue to the next step and come back to this one again. Keep repeating these two steps until there are no more errors (which may happen after two iterations).
 
-10. Use OWID's internal approval tool to visually inspect changes between the old and new versions of updated charts, and
+11. Use OWID's internal approval tool to visually inspect changes between the old and new versions of updated charts, and
 accept or reject changes.
 
-11. Update the explorers step `data://explorers/faostat/latest/food_explorer` (for the moment, this has to be done manually): Edit the version of its only dependency in the dag, so that it loads the latest garden step. It should be `data://garden/faostat/YYYY-MM-DD/faostat_food_explorer`.
+12. Update the explorers step `data://explorers/faostat/latest/food_explorer` (for the moment, this has to be done manually): Edit the version of its only dependency in the dag, so that it loads the latest garden step. It should be `data://garden/faostat/YYYY-MM-DD/faostat_food_explorer`.
 
-12. Run the new etl explorers step, to generate the csv files for the global food explorer.
+13. Run the new etl explorers step, to generate the csv files for the global food explorer.
 
     ```bash
     etl run explorers/faostat/latest/food_explorer
@@ -328,20 +337,11 @@ accept or reject changes.
 
         Sometimes items change in FAOSTAT. If that's the case, you may need to edit a file in the `owid-content` repository, namely `scripts/global-food-explorer/foods.csv`. Then, follow the instructions in `scripts/global-food-explorer/README.md`.
 
-13. Manually create a new garden dataset of additional variables `additional_variables` for the new version, and update its metadata. Then create a new grapher dataset too. Manually update all other datasets that use any faostat dataset as a dependency.
+14. Manually create a new garden dataset of additional variables `additional_variables` for the new version, and update its metadata. Then create a new grapher dataset too. Manually update all other datasets that use any faostat dataset as a dependency.
 
     !!! note
 
         In the future this could be handled automatically by one of the existing scripts.
-
-14. Manually improve the metadata, if needed. For example, inspect the snapshot metadata files, to improve the dataset descriptions:
-  - Insert line break after first sentence (which usually is the general description of the dataset).
-  - Remove spurious symbols.
-  - Insert spaces where missing (e.g. "end of sentence.Start of next sentence").
-  - Remove double spaces (e.g. "end of sentence.  Start of next sentence").
-  - Insert line breaks to create paragraphs (by context).
-  - Remove incomplete sentences (sometimes there are half sentences that may have been added by mistake).
-  - Remove mentions to links in FAOSTAT page (since they will not be seen from grapher).
 
 15. Archive unnecessary DB datasets, and move old, unnecessary etl steps in the dag to the archive dag.
     ```bash
@@ -410,6 +410,7 @@ which contains the following columns:
     * In the `custom_datasets.csv` file, all datasets are included (unlike other `custom_*.csv` files, where only customized
       fields are included).
     * Any empty `owid_*` field in the file will be assumed to be replaced with its corresponding `fao_*` field.
+    * The `owid_dataset_description` will only be used in combination with `fao_dataset_description` (see function `prepare_dataset_description` in the garden `shared` module). Its output is currently not visible anywhere in the website. It can only be seen by accessing `dataset.metadata.description`. What is publicly visible is the snapshot description.
 
 #### Customizing item names and descriptions
 
