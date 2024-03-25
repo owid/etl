@@ -141,7 +141,7 @@ sections:
         entrypoint: pages/harmonizer.py
         emoji: "🎶"
         image_url: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/C_triad.svg/2560px-C_triad.svg.png"
-      - title: "news"
+      - title: "News"
         alias: news
         description: "Latest ETL news"
         maintainer: "@lucas"
