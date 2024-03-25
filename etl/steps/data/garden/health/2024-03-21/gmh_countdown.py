@@ -37,22 +37,22 @@ def run(dest_dir: str) -> None:
         tb_pivoted[column].metadata.description_from_producer = description
         tb_pivoted[column].metadata.origins[0].producer = "WHO Mental Health Atlas 2020 via UNICEF"
 
-    # Simplify values
+    # Simplify categorical values
     simplify_dict = {
         "NO": "No",
         "YES": "Yes",
-        "Indicators were available and used in the last two years for monitoring and evaluating implementation of most or all components of current mental health policies / plans": "Used for most/all components",
-        "Indicators were available but not used in the last two years for monitoring and evaluating the implementation of current mental health policies / plans": "Available but not used",
-        "Indicators not available": "Not available",
-        "Indicators were available and used in the last two years for monitoring and evaluating implementation of some / a few components of current mental health policies / plans": "Used for some components",
-        "25% or less of inpatients receive timely diagnosis, treatment and follow-up for physical health conditions (e.g. cancer, diabetes or TB)": "25% or less",
-        "More than 75% of inpatients receive timely diagnosis, treatment and follow-up for physical health conditions (e.g. cancer, diabetes or TB)": "More than 75%",
-        "51%-75% of inpatients receive timely diagnosis, treatment and follow-up for physical health conditions (e.g. cancer, diabetes or TB)": "51%-75%",
-        "26%-50% of inpatients receive timely diagnosis, treatment and follow-up for physical health conditions (e.g. cancer, diabetes or TB)": "26%-50%",
-        "Mental health data (either in the public system, private system or both) have been compiled for general health statistics in the last two years, but not in a specific mental health report": "Data compiled, not in specific report",
-        "No mental health data have been compiled in a report for policy, planning or management purposes in the last two years": "No data compiled",
-        "A specific report focusing mental health activities in both the public and private sector has been published by the Health Department or any other responsible government unit in the last two years": "Report for public and private sector",
-        "A specific report focusing on mental health activities in the public sector only has been published by the Health Department or any other responsible government unit in the last two years": "Report for public sector only",
+        "Indicators were available and used in the last two years for monitoring and evaluating implementation of most or all components of current mental health policies / plans": "Indicators used for most/all components (last 2 years)",
+        "Indicators were available but not used in the last two years for monitoring and evaluating the implementation of current mental health policies / plans": "Indicators available but not used (last 2 years)",
+        "Indicators not available": "Indicators not available",
+        "Indicators were available and used in the last two years for monitoring and evaluating implementation of some / a few components of current mental health policies / plans": "Indicators used for some components (last 2 years)",
+        "25% or less of inpatients receive timely diagnosis, treatment and follow-up for physical health conditions (e.g. cancer, diabetes or TB) in the last two years": "≤25% inpatients receive timely care (last 2 years)",
+        "More than 75% of inpatients receive timely diagnosis, treatment and follow-up for physical health conditions (e.g. cancer, diabetes or TB) in the last two years": ">75% inpatients receive timely care (last 2 years)",
+        "51%-75% of inpatients receive timely diagnosis, treatment and follow-up for physical health conditions (e.g. cancer, diabetes or TB) in the last two years": "51%-75% inpatients receive timely care (last 2 years)",
+        "26%-50% of inpatients receive timely diagnosis, treatment and follow-up for physical health conditions (e.g. cancer, diabetes or TB) in the last two years": "26%-50% inpatients receive timely care (last 2 years)",
+        "Mental health data (either in the public system, private system or both) have been compiled for general health statistics in the last two years, but not in a specific mental health report": "Mental health data compiled for general stats, no specific report (last 2 years)",
+        "No mental health data have been compiled in a report for policy, planning or management purposes in the last two years": "No mental health data compiled in report (last 2 years)",
+        "A specific report focusing mental health activities in both the public and private sector has been published by the Health Department or any other responsible government unit in the last two years": "Specific report published for public and private sectors (last 2 years)",
+        "A specific report focusing on mental health activities in the public sector only has been published by the Health Department or any other responsible government unit in the last two years": "Specific report published for public sector only (last 2 years)",
     }
 
     for column in tb_pivoted.columns:
