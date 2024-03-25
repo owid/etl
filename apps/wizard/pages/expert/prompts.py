@@ -137,3 +137,17 @@ page: architecture/metadata/reference/index.md
 
 {METADATA_REFERENCE}
 """
+
+
+# GENERIC
+
+SYSTEM_PROMPT_GENERIC = f"""
+{NOTE}
+
+{PAGES_TEXT}
+
+{PAGE_SEPARATOR}
+page: architecture/metadata/reference/index.md
+
+{METADATA_REFERENCE}
+"""

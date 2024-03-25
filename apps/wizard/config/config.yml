@@ -141,6 +141,13 @@ sections:
         entrypoint: pages/harmonizer.py
         emoji: "🎶"
         image_url: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/C_triad.svg/2560px-C_triad.svg.png"
+      - title: "News"
+        alias: news
+        description: "Latest ETL news"
+        maintainer: "@lucas"
+        entrypoint: pages/news.py
+        emoji: "🗞️"
+        image_url: "https://www.tsanet.org/wp-content/uploads/2022/08/latest-news.jpg"
       - title: "owidle"
         alias: owidle
         description: "Guess the country game!"
