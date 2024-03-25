@@ -4,7 +4,8 @@ from datetime import datetime
 import streamlit as st
 from st_pages import add_indentation
 
-from apps.wizard.utils.db import WizardDB
+from apps.wizard.utils.db import DB_IS_SET_UP, WizardDB
+from etl.config import ENV_IS_REMOTE
 
 st.set_page_config(page_title="Wizard: News", page_icon="🪄")
 add_indentation()
@@ -12,6 +13,12 @@ add_indentation()
 st.title("News 🗞️")
 st.markdown("Find news and updates from the [etl project](https://github.com/owid/etl).")
 
+# Only run this on live!
+if (not DB_IS_SET_UP) | (not ENV_IS_REMOTE):
+    st.warning(
+        "This page is not available! Remember:\n\n- This page only works on live.\n- You need to configure files `.streamlit/secrets.toml` and `.wizardcfg/wizard.db` correctly setup!"
+    )
+    st.stop()
 
 # GPT
 MODEL_NAME = "gpt-4-turbo-preview"
