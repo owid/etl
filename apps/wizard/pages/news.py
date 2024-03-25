@@ -14,11 +14,11 @@ st.title("News 🗞️")
 st.markdown("Find news and updates from the [etl project](https://github.com/owid/etl).")
 
 # Only run this on live!
-if (not DB_IS_SET_UP) | (not ENV_IS_REMOTE):
-    st.warning(
-        "This page is not available! Remember:\n\n- This page only works on live.\n- You need to configure files `.streamlit/secrets.toml` and `.wizardcfg/wizard.db` correctly setup!"
-    )
-    st.stop()
+# if (not DB_IS_SET_UP) | (not ENV_IS_REMOTE):
+#     st.warning(
+#         "This page is not available! Remember:\n\n- This page only works on live\n- You need to configure files `.streamlit/secrets.toml` and `.wizardcfg/wizard.db` correctly setup!"
+#     )
+#     st.stop()
 
 # GPT
 MODEL_NAME = "gpt-4-turbo-preview"
@@ -78,12 +78,18 @@ else:
     raise ValueError("Invalid window type")
 records = df_pr.to_dict(orient="records")
 
+# Header
+st.header("Pull requests")
+with st.popover("ℹ️ How this works"):
+    st.markdown(
+        "Everyday, we pull the latest pull requests from the etl repository and ask Chat GPT to summarise the main updates and interesting points from the pull requests. This information is stored in a small sqlite database so that we can display it here. Only merged pull requests are considered."
+    )
 # Display retrieved info in tabs
-tab_1, tab_2 = st.tabs(["Pull Requests: Summary", "Pull Requests: Complete list"])
+tab_1, tab_2 = st.tabs(["Summary", "Complete list"])
 window_suffix = f":grey[({WINDOW_TYPES.get(st.session_state.window_type)})]"
 with tab_1:
     # Summary
-    st.header(f"Summary of Pull requests {window_suffix}")
+    st.subheader(f"Summary {window_suffix}")
     # with st.popover("Config"):
     with st.spinner():
         result = WizardDB.get_news_summary(window_type=st.session_state.window_type)
@@ -96,11 +102,11 @@ with tab_1:
 
 with tab_2:
     # Show last 7 day PR timeline
-    st.header(f"List of Pull requests {window_suffix}")
+    st.subheader(f"List {window_suffix}")
     LAST_DATE_HEADER = None
     for record in records:
         date_str = _clean_date(record["DATE_MERGED"])
         if (LAST_DATE_HEADER is None) or (LAST_DATE_HEADER != date_str):
-            st.subheader(date_str)
+            st.markdown(f"#### {date_str}")
             LAST_DATE_HEADER = date_str
         render_expander(record)
