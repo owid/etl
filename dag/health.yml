@@ -487,3 +487,11 @@ steps:
     - data://garden/who/2024-01-03/gho
   data://grapher/who/2024-02-14/gho_suicides:
     - data://garden/who/2024-02-14/gho_suicides
+
+  # Suicides based on WHO Mortality Database
+  data://meadow/who/2024-03-24/self_inflicted_injuries:
+    - snapshot://who/2024-03-24/self_inflicted_injuries.csv
+  data://garden/who/2024-03-24/self_inflicted_injuries:
+    - data://meadow/who/2024-03-24/self_inflicted_injuries
+  data://grapher/who/2024-03-24/self_inflicted_injuries:
+    - data://garden/who/2024-03-24/self_inflicted_injuries
