@@ -6,7 +6,7 @@ definitions:
       numDecimalPlaces: 1
       tolerance: 5
     description_processing: |-
-      Where there were multiple observations for a particular year, we selected the observation drawn from a more recent round of a survey.
+      Where there were multiple observations for a particular year, we selected the observation drawn from a more recent round of a survey, or, in the case of biannual surveys, the observation drawn from the second semester.
 
       The data is originally presented in separate survey rounds for each country, given different methodologies and aggregation levels considered. For this reason, these survey rounds are not directly comparable. Due to visualization limitations, we have connected each country series. For more detailed analysis, you can check these survey rounds on the [SEDLAC dataset website](https://www.cedlas.econo.unlp.edu.ar/wp/en/estadisticas/sedlac/estadisticas/).
     description_from_producer: |-
