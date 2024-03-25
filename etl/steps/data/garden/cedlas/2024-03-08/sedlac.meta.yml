@@ -1,7 +1,6 @@
 # NOTE: To learn more about the fields, hover over their names.
 definitions:
   common:
-    processing_level: major
     display: &common-display
       numDecimalPlaces: 1
       tolerance: 5
@@ -55,6 +54,8 @@ dataset:
 
 tables:
   sedlac:
+    common:
+      processing_level: minor
     variables:
       national_headcount_ratio:
         title: <<table>> - Share of population in poverty (Spell <<survey_number>>)
@@ -405,6 +406,7 @@ tables:
 
   sedlac_no_spells:
     common:
+      processing_level: major
       description_processing: |-
         Where there were multiple observations for a particular year, we selected the observation drawn from a more recent round of a survey, or, in the case of biannual surveys, the observation drawn from the second semester.
 
