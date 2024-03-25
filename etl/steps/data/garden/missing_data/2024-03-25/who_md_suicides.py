@@ -6,7 +6,6 @@ import pandas as pd
 from owid.catalog import Table
 
 from etl.data_helpers import geo
-from etl.data_helpers.misc import add_origins_to_mortality_database
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
@@ -32,16 +31,19 @@ INCOME_GROUPS = {  # Income groups.
 
 def run(dest_dir: str) -> None:
     # Load datasets.
-    ds_data = paths.load_dataset("mortality_database")
+    ds_data = paths.load_dataset("self_inflicted_injuries")
 
-    tb = ds_data["neuropsychiatric_conditions__both_sexes__all_ages"].reset_index()
-    tb = add_origins_to_mortality_database(tb_who=tb)
+    tb = ds_data["self_inflicted_injuries"].reset_index()
 
-    tb_data = tb.filter(
-        items=["country", "year"]
-        + [col for col in tb if col.startswith("deaths_from_neuropsychiatric_conditions_per_100_000_people")]
+    tb_data = tb.filter(items=["country", "year", "sex", "age_group", "death_rate_per_100_000_population"])
+    tb_data = tb_data.pivot(
+        index=["country", "year"], columns=["sex", "age_group"], values="death_rate_per_100_000_population"
     )
-    print(tb_data)
+    tb_data = tb_data.reset_index()
+    tb_data.columns = [" ".join(col).strip() for col in tb_data.columns.values if col not in ["country", "year"]]
+
+    tb_data = tb_data[["country", "year", "Both sexes all ages"]]
+    tb_data = tb_data.rename(columns={"Both sexes all ages": "death_rate_per_100_000_population"})
 
     ds_regions = paths.load_dataset("regions")
     ds_income_groups = paths.load_dataset("income_groups")
@@ -49,9 +51,7 @@ def run(dest_dir: str) -> None:
     tb_population = ds_population["population"].reset_index()
 
     # Clean data to include only years with data.
-    years_with_data = tb_data.dropna(
-        subset=["deaths_from_neuropsychiatric_conditions_per_100_000_people_in__both_sexes_aged_all_ages"]
-    )["year"].unique()
+    years_with_data = tb_data.dropna(subset=["death_rate_per_100_000_population"])["year"].unique()
     tb_data = tb_data[tb_data["year"].isin(years_with_data)]
 
     # Map countries to their regions and income groups.
@@ -86,8 +86,8 @@ def run(dest_dir: str) -> None:
     tb_merged = pd.merge(tb_data, tb_population, on=["country", "year"]).drop(columns="source")
 
     # Flag for 'deaths_from_neuropsychiatric_conditions_per_100_000_people_in__both_sexes_aged_all_ages' data presence.
-    tb_merged["deaths_from_neuropsychiatric_conditions_per_100_000_people_in__both_sexes_aged_all_ages"] = np.where(
-        tb_merged["deaths_from_neuropsychiatric_conditions_per_100_000_people_in__both_sexes_aged_all_ages"].isna(),
+    tb_merged["death_rate_per_100_000_population"] = np.where(
+        tb_merged["death_rate_per_100_000_population"].isna(),
         0,
         1,
     )
@@ -96,13 +96,9 @@ def run(dest_dir: str) -> None:
     def calculate_details(group_by_column):
         # Group by year and group, then calculate total countries.
         total_countries = tb_merged.groupby(["year", group_by_column]).size().reset_index(name="total_countries")
-        print(total_countries)
         # Calculate missing data for countries and population.
         missing_data = (
-            tb_merged[
-                tb_merged["deaths_from_neuropsychiatric_conditions_per_100_000_people_in__both_sexes_aged_all_ages"]
-                == 0
-            ]
+            tb_merged[tb_merged["death_rate_per_100_000_population"] == 0]
             .groupby(["year", group_by_column])
             .agg(missing_countries=("country", "size"), missing_population=("population", "sum"))
             .reset_index()
@@ -114,25 +110,30 @@ def run(dest_dir: str) -> None:
         ) * 100
 
         # Rename columns for consistency.
-        return detailed_data.rename(columns={group_by_column: "region"})
+        return detailed_data.rename(columns={group_by_column: "country"})
 
     # Calculate missing details for each region and income group.
     region_details = calculate_details("region")
     income_details = calculate_details("income_group")
-
     # Combine and prepare the final dataset.
     df_final = pd.concat([region_details, income_details], axis=0)
-    df_final = df_final.set_index(["region", "year"], verify_integrity=True)
     df_final["fraction_available_countries"] = 100 - df_final["fraction_missing_countries"]
     df_final = df_final.drop(columns=["total_countries"])
 
-    tb_garden = Table(df_final, short_name="neuropsychiatric_conditions")
+    combined = pd.concat(
+        [df_final, tb_merged[["country", "year", "death_rate_per_100_000_population", "region", "income_group"]]],
+        axis=0,
+    )
+    combined = combined.rename(
+        columns={"death_rate_per_100_000_population": "death_rate_per_100_000_population_missing"}
+    )
+
+    combined = combined.set_index(["country", "year"], verify_integrity=True)
+    tb_garden = Table(combined, short_name="who_md_suicides")
 
     # Ensure metadata is correctly associated.
     for column in tb_garden.columns:
-        tb_garden[column].metadata.origins = tb[
-            "deaths_from_neuropsychiatric_conditions_per_100_000_people_in__both_sexes_aged_all_ages"
-        ].metadata.origins
+        tb_garden[column].metadata.origins = tb["death_rate_per_100_000_population"].metadata.origins
 
     # Save the final dataset.
     ds_garden = create_dataset(dest_dir=dest_dir, tables=[tb_garden], check_variables_metadata=True)

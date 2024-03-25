@@ -680,6 +680,16 @@ steps:
   data://grapher/missing_data/2024-03-19/who_neuropsychiatric_conditions:
     - data://garden/missing_data/2024-03-19/who_neuropsychiatric_conditions
 
+
+  data://garden/missing_data/2024-03-25/who_md_suicides:
+    - data://garden/who/2024-03-24/self_inflicted_injuries
+    - data://garden/wb/2024-03-11/income_groups
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/demography/2023-03-31/population
+  data://grapher/missing_data/2024-03-25/who_md_suicides:
+    - data://garden/missing_data/2024-03-25/who_md_suicides
+
+
   ######################################################################################################################
   # Older versions to be archived once they are not used by any other steps.
 
@@ -710,8 +720,6 @@ steps:
   data://grapher/wb/2024-03-11/income_groups:
     - data://garden/wb/2024-03-11/income_groups
 
-  data://grapher/missing_data/2024-03-14/children_out_of_school:
-    - data://garden/missing_data/2024-03-14/children_out_of_school
 include:
   - dag/open_numbers.yml
   - dag/faostat.yml
