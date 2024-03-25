@@ -1,6 +1,5 @@
 """Load a garden dataset and create a grapher dataset."""
 
-
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
@@ -21,6 +20,7 @@ def run(dest_dir: str) -> None:
 
     # Get the year
     tb["year"] = tb["time"].astype(str).str[0:4]
+
     # Group by year and calculate the mean of the specified columns
     tb_annual_average = (
         tb.groupby(["year", "country"])
@@ -34,7 +34,11 @@ def run(dest_dir: str) -> None:
         )
         .reset_index()
     )
+    # Convert the 'year' column to integer type
+    tb_annual_average["year"] = tb_annual_average["year"].astype(int)
 
+    # Filter rows where the year is less than or equal to 2024
+    tb_annual_average = tb_annual_average[tb_annual_average["year"] < 2024]
     tb_annual_average = tb_annual_average.set_index(["year", "country"])
     # Save outputs.
     #
