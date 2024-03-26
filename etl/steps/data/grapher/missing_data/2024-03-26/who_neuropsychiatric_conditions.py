@@ -11,16 +11,10 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load garden dataset.
-    ds_garden = paths.load_dataset("children_out_of_school")
+    ds_garden = paths.load_dataset("who_neuropsychiatric_conditions")
 
     # Read table from garden dataset.
-    tb = ds_garden["children_out_of_school"].reset_index()
-
-    #
-    # Process data.
-    #
-    tb = tb.rename(columns={"region": "country"})
-    tb = tb.set_index(["country", "year"], verify_integrity=True)
+    tb = ds_garden["neuropsychiatric_conditions"]
     #
     # Save outputs.
     #

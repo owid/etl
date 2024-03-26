@@ -31,3 +31,18 @@ tables:
         title: Fraction of countries with available data data on children out of school
         short_unit: '%'
         unit: '%'
+
+      se_prm_uner_missing:
+        title: Is data on children out of school in primary education missing
+        short_unit: ''
+        unit: ''
+
+      region:
+        title: Region
+        short_unit: ''
+        unit: ''
+
+      income_group:
+        title: Income group
+        short_unit: ''
+        unit: ''

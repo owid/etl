@@ -11,16 +11,10 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load garden dataset.
-    ds_garden = paths.load_dataset("who_neuropsychiatric_conditions")
+    ds_garden = paths.load_dataset("children_out_of_school")
 
     # Read table from garden dataset.
-    tb = ds_garden["neuropsychiatric_conditions"].reset_index()
-
-    #
-    # Process data.
-    #
-    tb = tb.rename(columns={"region": "country"})
-    tb = tb.set_index(["country", "year"], verify_integrity=True)
+    tb = ds_garden["children_out_of_school"]
     #
     # Save outputs.
     #
@@ -28,6 +22,5 @@ def run(dest_dir: str) -> None:
     ds_grapher = create_dataset(
         dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=ds_garden.metadata
     )
-
     # Save changes in the new grapher dataset.
     ds_grapher.save()
