@@ -1,7 +1,7 @@
 """Load a garden dataset and create an explorers dataset."""
 
 import owid.catalog.processing as pr
-from owid.catalog import Table
+from owid.catalog import Table, warnings
 
 from etl.helpers import PathFinder, create_dataset
 
@@ -33,8 +33,9 @@ def run(dest_dir: str) -> None:
     tb_lis_percentiles_adults = ds_lis["lis_percentiles_adults"].reset_index()
     tb_wdi = ds_wdi["wdi"].reset_index()
 
-    # Process tables
-
+    #
+    # Process data.
+    #
     tb_pip_keyvars = create_keyvars_file_pip(tb_pip)
     tb_lis_keyvars = create_keyvars_file_lis(tb_lis, adults=False)
     tb_lis_keyvars_adults = create_keyvars_file_lis(tb_lis_adults, adults=True)
@@ -139,6 +140,9 @@ def run(dest_dir: str) -> None:
 
     tb_wdi = tb_wdi.set_index(["country", "year"], verify_integrity=True)
 
+    #
+    # Save outputs.
+    #
     # Create explorer dataset
     ds_explorer = create_dataset(
         dest_dir,
@@ -169,17 +173,13 @@ def create_keyvars_file_pip(tb: Table) -> Table:
     # Select the columns to keep
     tb = tb[["country", "year", "reporting_level", "welfare_type"] + indicators_list]
 
-    # Remove metadata for units to avoid conflict warnings
-    for column in tb.columns:
-        tb[column].metadata.unit = None
-        tb[column].metadata.short_unit = None
-
-    # Make pip table longer
-    tb = tb.melt(
-        id_vars=["country", "year", "reporting_level", "welfare_type"],
-        var_name="indicator_name",
-        value_name="value",
-    )
+    with warnings.ignore_warnings([warnings.DifferentValuesWarning]):
+        # Make pip table longer
+        tb = tb.melt(
+            id_vars=["country", "year", "reporting_level", "welfare_type"],
+            var_name="indicator_name",
+            value_name="value",
+        )
 
     # Rename welfare_type and reporting_level
     tb = tb.rename(columns={"welfare_type": "pipwelfare", "reporting_level": "pipreportinglevel"})
@@ -285,13 +285,9 @@ def create_keyvars_file_lis(tb: Table, adults: bool) -> Table:
     # Select the columns to keep
     tb = tb[["country", "year"] + indicators_list]
 
-    # Remove metadata for units to avoid conflict warnings
-    for column in tb.columns:
-        tb[column].metadata.unit = None
-        tb[column].metadata.short_unit = None
-
-    # Make lis table longer
-    tb = tb.melt(id_vars=["country", "year"], var_name="indicator_welfare_equivalization", value_name="value")
+    with warnings.ignore_warnings([warnings.DifferentValuesWarning]):
+        # Make lis table longer
+        tb = tb.melt(id_vars=["country", "year"], var_name="indicator_welfare_equivalization", value_name="value")
 
     # Split indicator_welfare_equivalization column into three columns, using the last two "_" as separators
     tb[["indicator_name", "welfare", "equivalization"]] = tb["indicator_welfare_equivalization"].str.rsplit(
@@ -397,13 +393,9 @@ def create_keyvars_file_wid(tb: Table, extrapolated: bool) -> Table:
     # Select the columns to keep
     tb = tb[["country", "year"] + indicators_list]
 
-    # Remove metadata for units to avoid conflict warnings
-    for column in tb.columns:
-        tb[column].metadata.unit = None
-        tb[column].metadata.short_unit = None
-
-    # Make wid table longer
-    tb = tb.melt(id_vars=["country", "year"], var_name="indicator_welfare", value_name="value")
+    with warnings.ignore_warnings([warnings.DifferentValuesWarning]):
+        # Make wid table longer
+        tb = tb.melt(id_vars=["country", "year"], var_name="indicator_welfare", value_name="value")
 
     # Replace the name posttax_nat with posttax
     tb["indicator_welfare"] = tb["indicator_welfare"].str.replace("posttax_nat", "posttax")
@@ -491,18 +483,14 @@ def create_percentiles_file_pip(tb: Table) -> Table:
     Process the percentiles table from PIP, to adapt it to a concatenated file with LIS and WID
     """
 
-    # Remove metadata for units to avoid conflict warnings
-    for column in tb.columns:
-        tb[column].metadata.unit = None
-        tb[column].metadata.short_unit = None
-
-    # Make pip table longer
-    tb = tb.melt(
-        id_vars=["country", "year", "reporting_level", "welfare_type", "percentile"],
-        value_vars=["thr", "avg", "share"],
-        var_name="indicator_name",
-        value_name="value",
-    )
+    with warnings.ignore_warnings([warnings.DifferentValuesWarning]):
+        # Make pip table longer
+        tb = tb.melt(
+            id_vars=["country", "year", "reporting_level", "welfare_type", "percentile"],
+            value_vars=["thr", "avg", "share"],
+            var_name="indicator_name",
+            value_name="value",
+        )
 
     # Reduce percentile column by 1 when variable is share or average (when it's different from thr)
     tb["percentile"] = tb["percentile"].where(tb["indicator_name"] == "thr", tb["percentile"] - 1)
@@ -571,18 +559,14 @@ def create_percentiles_file_pip_1000(tb: Table) -> Table:
     Process the percentiles table from PIP (1000 bins), to adapt it to a concatenated file with LIS and WID
     """
 
-    # Remove metadata for units to avoid conflict warnings
-    for column in tb.columns:
-        tb[column].metadata.unit = None
-        tb[column].metadata.short_unit = None
-
-    # Make pip table longer
-    tb = tb.melt(
-        id_vars=["country", "year", "quantile"],
-        value_vars=["avg"],
-        var_name="indicator_name",
-        value_name="value",
-    )
+    with warnings.ignore_warnings([warnings.DifferentValuesWarning]):
+        # Make pip table longer
+        tb = tb.melt(
+            id_vars=["country", "year", "quantile"],
+            value_vars=["avg"],
+            var_name="indicator_name",
+            value_name="value",
+        )
 
     # Rename quantile column
     tb = tb.rename(columns={"quantile": "percentile"})
@@ -658,18 +642,14 @@ def create_percentiles_file_lis(tb: Table, adults: bool) -> Table:
         pc_notation = "perCapita"
         pc_notation_human_readable = "Per capita"
 
-    # Remove metadata for units to avoid conflict warnings
-    for column in tb.columns:
-        tb[column].metadata.unit = None
-        tb[column].metadata.short_unit = None
-
-    # Make lis table longer
-    tb = tb.melt(
-        id_vars=["country", "year", "welfare", "equivalization", "percentile"],
-        value_vars=["thr", "avg", "share"],
-        var_name="indicator_name",
-        value_name="value",
-    )
+    with warnings.ignore_warnings([warnings.DifferentValuesWarning]):
+        # Make lis table longer
+        tb = tb.melt(
+            id_vars=["country", "year", "welfare", "equivalization", "percentile"],
+            value_vars=["thr", "avg", "share"],
+            var_name="indicator_name",
+            value_name="value",
+        )
 
     # Reduce percentile column by 1 when variable is share or average (when it's different from thr)
     tb["percentile"] = tb["percentile"].where(tb["indicator_name"] == "thr", tb["percentile"] - 1)
@@ -750,18 +730,14 @@ def create_percentiles_file_wid(tb) -> Table:
     """
     # WID PERCENTILES
 
-    # Remove metadata for units to avoid conflict warnings
-    for column in tb.columns:
-        tb[column].metadata.unit = None
-        tb[column].metadata.short_unit = None
-
-    # Make wid table longer
-    tb = tb.melt(
-        id_vars=["country", "year", "welfare", "p", "percentile"],
-        value_vars=["thr", "avg", "share", "thr_extrapolated", "avg_extrapolated", "share_extrapolated"],
-        var_name="indicator_name",
-        value_name="value",
-    )
+    with warnings.ignore_warnings([warnings.DifferentValuesWarning]):
+        # Make wid table longer
+        tb = tb.melt(
+            id_vars=["country", "year", "welfare", "p", "percentile"],
+            value_vars=["thr", "avg", "share", "thr_extrapolated", "avg_extrapolated", "share_extrapolated"],
+            var_name="indicator_name",
+            value_name="value",
+        )
 
     # Sort by country, year, welfare, equivalization, percentile and variable
     tb = tb.sort_values(["country", "year", "welfare", "indicator_name", "p"])
