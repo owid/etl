@@ -5,4 +5,4 @@ tables:
         title: Dummy
         display:
           numDecimalPlaces: 12
-        description_processing: as
+        description_processing: ''
