@@ -1,0 +1,23 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    processing_level: major
+    presentation:
+      topic_tags:
+        - Artificial Intelligence
+
+tables:
+  papers_with_code_language:
+    variables:
+
+      performance_language_average:
+        title: All knowledge tests
+        description_key:
+          - This benchmark assesses the average accuracy of models across all subjects based on the MMLU benchmark.
+          - The MMLU benchmark covers a wide range of 57 subjects, including STEM, humanities, social sciences, and more. It encompasses subjects of varying difficulty levels, spanning from elementary concepts to advanced professional topics. This comprehensive benchmark assesses not only world knowledge but also problem-solving abilities.
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+          zeroDay: '2019-01-01'
+          yearIsDay: true
