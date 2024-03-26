@@ -1,7 +1,5 @@
 """Load a meadow dataset and create a garden dataset."""
 
-"""Load a meadow dataset and create a garden dataset."""
-
 from owid.catalog import Table
 
 from etl.data_helpers.misc import add_origins_to_mortality_database
