@@ -2,6 +2,8 @@ definitions:
   common:
     processing_level: major
     description_from_producer: "Number of children, adolescents, and youth of primary, lower secondary, and upper secondary school age who are not enrolled or attending school during in a given academic year. For more information, consult the UNESCO Institute of Statistics website: http://www.uis.unesco.org/Education/. World Bank variable id: UIS.OFST.1T3.M.CP. Original source: UNESCO Institute for Statistics"
+    description_processing: First, we organized countries into groups based on geographical regions and income levels, aligning with World Bank classifications. To quantify data completeness, we identified entries with missing information in the indicator. For each grouping, we calculated the percentage of countries with missing data, thus mapping out the distribution of data gaps across different regions and income levels.
+
   presentation:
     topic_tags:
     - Education
