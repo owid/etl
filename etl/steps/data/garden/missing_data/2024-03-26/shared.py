@@ -114,7 +114,7 @@ def combine_and_prepare_final_dataset(region_details, income_details, df_merged,
         [df_final, df_merged[["country", "year", column_missing_data, "region", "income_group"]]],
         axis=0,
     )
-    combined = combined.rename(columns={column_missing_data: column_missing_data + "_missing"})
+    combined = combined.rename(columns={column_missing_data: column_missing_data + "_missing"})  # type: ignore
     combined = combined.set_index(["country", "year"], verify_integrity=True)
 
     return combined

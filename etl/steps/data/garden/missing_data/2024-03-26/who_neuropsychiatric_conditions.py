@@ -54,8 +54,6 @@ def run(dest_dir: str) -> None:
         "deaths_from_neuropsychiatric_conditions_per_100_000_people_in__both_sexes_aged_all_ages",
     )
     tb_garden = Table(combined, short_name="neuropsychiatric_conditions")
-    print(tb_garden)
-
     # Ensure metadata is correctly associated.
     for column in tb_garden.columns:
         tb_garden[column].metadata.origins = tb[
