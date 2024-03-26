@@ -3,7 +3,7 @@ import json
 from typing import Any, Dict
 
 import structlog
-from botocore.exceptions import EndpointConnectionError
+from botocore.exceptions import EndpointConnectionError, SSLError
 from owid.catalog import s3_utils
 from tenacity import Retrying
 from tenacity.retry import retry_if_exception_type
@@ -32,7 +32,7 @@ def upload_gzip_dict(d: Dict[str, Any], s3_path: str, private: bool = False) -> 
     for attempt in Retrying(
         wait=wait_exponential(min=5, max=100),
         stop=stop_after_attempt(7),
-        retry=retry_if_exception_type(EndpointConnectionError),
+        retry=retry_if_exception_type((EndpointConnectionError, SSLError)),
     ):
         with attempt:
             client.put_object(

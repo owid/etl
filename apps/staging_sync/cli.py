@@ -259,7 +259,7 @@ def cli(
                     # create new chart
                     if not publish:
                         # only published charts are synced
-                        assert target_chart.config["isPublished"]
+                        assert target_chart.config["isPublished"], "Unexpected error"
                         del target_chart.config["isPublished"]
 
                     chart_tags = source_chart.tags(source_session)
@@ -383,19 +383,26 @@ def _modified_chart_ids_by_admin(session: Session) -> Set[int]:
 
     -- charts revisions that were approved on staging, such charts would have publishedByUserId
     -- of the user that ran etlwiz locally, but would be updated by Admin
+    -- the chart must be published
     select
         chartId
     from suggested_chart_revisions
-    where updatedBy = 1 and status = 'approved'
+    where updatedBy = 1 and status = 'approved' and chartId in (
+        select id from charts where publishedAt is not null
+    )
     """
     return set(pd.read_sql(q, session.bind).chartId.tolist())
 
 
 def _get_git_branch_creation_date(branch_name: str) -> dt.datetime:
     js = requests.get(f"https://api.github.com/repos/owid/etl/pulls?state=all&head=owid:{branch_name}").json()
-    assert len(js) == 1, f"Branch {branch_name} not found in owid/etl repository"
+    assert len(js) > 0, f"Branch {branch_name} not found in owid/etl repository"
 
-    return dt.datetime.fromisoformat(js[0]["created_at"].rstrip("Z")).astimezone(pytz.utc).replace(tzinfo=None)
+    # There could be multiple old branches from the past, pick the most recent one
+    created_ats = [
+        dt.datetime.fromisoformat(pr["created_at"].rstrip("Z")).astimezone(pytz.utc).replace(tzinfo=None) for pr in js
+    ]
+    return max(created_ats)
 
 
 if __name__ == "__main__":

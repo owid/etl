@@ -264,13 +264,17 @@ class VersionTracker:
         "snapshot://dummy/2020-01-01/dummy_full.csv",
     ]
 
-    def __init__(self, connect_to_db: bool = True, warn_on_archivable: bool = True):
-        # Load dag of active and archive steps (a dictionary where each item is step: set of dependencies).
-        self.dag_all = load_dag(paths.DAG_ARCHIVE_FILE)
+    def __init__(self, connect_to_db: bool = True, warn_on_archivable: bool = True, ignore_archive: bool = False):
+        # Load dag of active steps (a dictionary step: set of dependencies).
+        self.dag_active = load_dag(paths.DAG_FILE)
+        if ignore_archive:
+            # Fully ignore the archive dag (so that all steps are only active steps, and there are no archive steps).
+            self.dag_all = self.dag_active.copy()
+        else:
+            # Load dag of active and archive steps.
+            self.dag_all = load_dag(paths.DAG_ARCHIVE_FILE)
         # Create a reverse dag (a dictionary where each item is step: set of usages).
         self.dag_all_reverse = reverse_graph(graph=self.dag_all)
-        # Load dag of active steps.
-        self.dag_active = load_dag(paths.DAG_FILE)
         # Create a reverse dag (a dictionary where each item is step: set of usages) of active steps.
         self.dag_active_reverse = reverse_graph(graph=self.dag_active)
         # Generate the dag of only archive steps.
