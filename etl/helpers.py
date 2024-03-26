@@ -98,6 +98,8 @@ def grapher_checks(ds: catalog.Dataset, warn_title_public: bool = True) -> None:
                 tab[col].m.origins or tab[col].m.sources or ds.metadata.sources
             ), f"Column `{col}` must have either sources or origins"
 
+            _validate_description_key(tab[col].m.description_key, col)
+
             # Data Page title uses the following fallback
             # [title_public > grapher_config.title > display.name > title] - [attribution_short] - [title_variant]
             # the Table tab
@@ -114,6 +116,13 @@ def grapher_checks(ds: catalog.Dataset, warn_title_public: bool = True) -> None:
                     f"Column {col} uses display.name but no presentation.title_public. Ensure the latter is also defined, otherwise display.name will be used as the indicator's title.",
                     warnings.DisplayNameWarning,
                 )
+
+
+def _validate_description_key(description_key: list[str], col: str) -> None:
+    if description_key:
+        assert not all(
+            len(x) == 1 for x in description_key
+        ), f"Column `{col}` uses string {description_key} as description_key, should be list of strings."
 
 
 def create_dataset(
