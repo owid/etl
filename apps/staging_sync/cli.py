@@ -259,7 +259,7 @@ def cli(
                     # create new chart
                     if not publish:
                         # only published charts are synced
-                        assert target_chart.config["isPublished"]
+                        assert target_chart.config["isPublished"], "Unexpected error"
                         del target_chart.config["isPublished"]
 
                     chart_tags = source_chart.tags(source_session)
@@ -383,10 +383,13 @@ def _modified_chart_ids_by_admin(session: Session) -> Set[int]:
 
     -- charts revisions that were approved on staging, such charts would have publishedByUserId
     -- of the user that ran etlwiz locally, but would be updated by Admin
+    -- the chart must be published
     select
         chartId
     from suggested_chart_revisions
-    where updatedBy = 1 and status = 'approved'
+    where updatedBy = 1 and status = 'approved' and chartId in (
+        select id from charts where publishedAt is not null
+    )
     """
     return set(pd.read_sql(q, session.bind).chartId.tolist())
 
