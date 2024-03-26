@@ -2,7 +2,7 @@ tables:
   dummy:
     variables:
       dummy_variable:
-        title: Dummy
+        title: Dummy test mojmir
         display:
           numDecimalPlaces: 12
         description_processing: ''
