@@ -393,9 +393,13 @@ def _modified_chart_ids_by_admin(session: Session) -> Set[int]:
 
 def _get_git_branch_creation_date(branch_name: str) -> dt.datetime:
     js = requests.get(f"https://api.github.com/repos/owid/etl/pulls?state=all&head=owid:{branch_name}").json()
-    assert len(js) == 1, f"Branch {branch_name} not found in owid/etl repository"
+    assert len(js) > 0, f"Branch {branch_name} not found in owid/etl repository"
 
-    return dt.datetime.fromisoformat(js[0]["created_at"].rstrip("Z")).astimezone(pytz.utc).replace(tzinfo=None)
+    # There could be multiple old branches from the past, pick the most recent one
+    created_ats = [
+        dt.datetime.fromisoformat(pr["created_at"].rstrip("Z")).astimezone(pytz.utc).replace(tzinfo=None) for pr in js
+    ]
+    return max(created_ats)
 
 
 if __name__ == "__main__":
