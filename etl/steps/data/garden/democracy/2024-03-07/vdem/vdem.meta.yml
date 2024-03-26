@@ -23,932 +23,1583 @@ tables:
       This snapshot contains all 500 V-Dem indicators and 245 indices + 57 other indicators from other data sources.
     variables:
       regime_imputed_country:
+        title: ''
         unit: ''
 
       histname:
+        title: ''
         unit: ''
 
+      # 2.1 V-Dem High-Level Democracy Indices
+
+      ## 2.1.1 Electoral democracy index
       electdem_vdem:
+        title: Electoral democracy index
+        description_short: ''
+        description_from_producer: &description_prod_electdem_vdem |-
+          Question: To what extent is the ideal of electoral democracy in its fullest sense achieved?
+          Clarification: The electoral principle of democracy seeks to embody the core value of making rulers responsive to citizens, achieved through electoral competition for the electorate’s approval under circumstances when suffrage is extensive; political and civil society organizations can operate freely; elections are clean and not marred by fraud or systematic irregularities; and elections affect the composition of the chief executive of the country. In between elections, there is freedom of expression and an independent media capable of presenting alternative views on matters of political relevance. In the V-Dem conceptual scheme, electoral democracy is understood as an essential element of any other conception of representative democracy — liberal, participatory, deliberative, egalitarian, or some other.
+
+          Scale: Interval, from low to high (0-1).
         unit: ''
         display:
           numDecimalPlaces: 3
 
       electdem_vdem_low:
+        title: "{tables.vdem.variables.electdem_vdem.title} (lower bound)"
+        description_from_producer: *description_prod_electdem_vdem
         unit: ''
         display:
           numDecimalPlaces: 3
 
       electdem_vdem_high:
+        title: "{tables.vdem.variables.electdem_vdem.title} (upper bound)"
+        description_from_producer: *description_prod_electdem_vdem
         unit: ''
         display:
           numDecimalPlaces: 3
 
+      ## 2.1.2 Liberal democracy index
       libdem_vdem:
+        title: ''
+        description_from_producer: &description_prod_libdem_vdem |-
+          Question: To what extent is the ideal of liberal democracy achieved?
+
+          Clarification: The liberal principle of democracy emphasizes the importance of protecting individual and minority rights against the tyranny of the state and the tyranny of the majority. The liberal model takes a "negative" view of political power insofar as it judges the quality of democracy by the limits placed on government. This is achieved by constitutionally protected civil liberties, strong rule of law, an independent judiciary, and effective checks and balances that, together, limit the exercise of executive power. To make this a measure of liberal democracy, the index also takes the level of electoral democracy into account.
+
+          Scale: Interval, from low to high (0-1).
         unit: ''
         display:
           numDecimalPlaces: 3
 
       libdem_vdem_low:
+        title: "{tables.vdem.variables.libdem_vdem.title} (lower bound)"
+        description_from_producer: *description_prod_libdem_vdem
         unit: ''
         display:
           numDecimalPlaces: 3
 
       libdem_vdem_high:
+        title: "{tables.vdem.variables.libdem_vdem.title} (upper bound)"
+        description_from_producer: *description_prod_libdem_vdem
         unit: ''
         display:
           numDecimalPlaces: 3
 
+      # 2.1.3 Participatory democracy index
       participdem_vdem:
+        title: Participatory democracy index
+        description_from_producer: &description_prod_participdem_vdem |-
+          Question: To what extent is the ideal of participatory democracy achieved?
+
+          Clarification: The participatory principle of democracy emphasizes active participation by citizens in all political processes, electoral and non-electoral. It is motivated by uneasiness about a bedrock practice of electoral democracy: delegating authority to representatives. Thus, direct rule by citizens is preferred, wherever practicable. This model of democracy thus takes suffrage for granted, emphasizing engagement in civil society organizations, direct democracy, and subnational elected bodies. To make it a measure of participatory democracy, the index also takes the level of electoral democracy into account.
+
+          Scale: Interval, from low to high (0-1).
         unit: ''
         display:
           numDecimalPlaces: 3
 
       participdem_vdem_low:
+        title: "{tables.vdem.variables.participdem_vdem.title} (lower bound)"
+        description_from_producer: *description_prod_participdem_vdem
         unit: ''
         display:
           numDecimalPlaces: 3
 
       participdem_vdem_high:
+        title: "{tables.vdem.variables.participdem_vdem.title} (upper bound)"
+        description_from_producer: *description_prod_participdem_vdem
         unit: ''
         display:
           numDecimalPlaces: 3
 
+      ## 2.1.4 Deliberative democracy index
       delibdem_vdem:
+        title: Deliberative democracy index
+        description_from_producer: &description_prod_delibdem_vdem |-
+          Question: To what extent is the ideal of deliberative democracy achieved?
+
+          Clarification:
+          The deliberative principle of democracy focuses on the process by which decisions are reached in a polity. A deliberative process is one in which public reasoning focused on the common good motivates political decisions—as contrasted with emotional appeals, solidary attachments, parochial interests, or coercion. According to this principle, democracy requires more than an aggregation of existing preferences. There should also be respectful dialogue at all levels—from preference formation to final decision—among informed and competent participants who are open to persuasion. To make it a measure of not only the deliberative principle but also of democracy, the index also takes the level of electoral democracy into account.
+
+          Scale: Interval, from low to high (0-1).
         unit: ''
         display:
           numDecimalPlaces: 3
 
       delibdem_vdem_low:
+        title: "{tables.vdem.variables.delibdem_vdem.title} (lower bound)"
+        description_from_producer: *description_prod_delibdem_vdem
         unit: ''
         display:
           numDecimalPlaces: 3
 
       delibdem_vdem_high:
+        title: "{tables.vdem.variables.delibdem_vdem.title} (upper bound)"
+        description_from_producer: *description_prod_delibdem_vdem
         unit: ''
         display:
           numDecimalPlaces: 3
 
+      ## 2.1.5 Egalitarian democracy index
       egaldem_vdem:
+        title: Egalitarian democracy index
+        description_from_producer: &description_prod_egaldem_vdem |-
+          Question: To what extent is the ideal of egalitarian democracy achieved?
+
+          Clarification:
+          The egalitarian principle of democracy holds that material and immaterial inequalities inhibit the exercise of formal rights and liberties, and diminish the ability of citizens from all social groups to participate. Egalitarian democracy is achieved when 1 rights and freedoms of individuals are protected equally across all social groups; and 2 resources are distributed equally across all social groups; 3 groups and individuals enjoy equal access to power. To make it a measure of egalitarian democracy, the index also takes the level of electoral democracy into account.
+
+          Scale: Interval, from low to high (0-1).
         unit: ''
         display:
           numDecimalPlaces: 3
 
       egaldem_vdem_low:
+        title: "{tables.vdem.variables.egaldem_vdem.title} (lower bound)"
+        description_from_producer: *description_prod_egaldem_vdem
         unit: ''
         display:
           numDecimalPlaces: 3
 
       egaldem_vdem_high:
+        title: "{tables.vdem.variables.egaldem_vdem.title} (upper bound)"
+        description_from_producer: *description_prod_egaldem_vdem
         unit: ''
         display:
           numDecimalPlaces: 3
 
+      ## 2.2.3 Freedom of Expression and Alternative Sources of Information index
       freeexpr_vdem:
+        title: Freedom of Expression and Alternative Sources of Information index
+        description_from_producer: &description_prod_freexpr_vdem |-
+          Question: To what extent does government respect press and media freedom, the freedom of ordinary people to discuss political matters at home and in the public sphere, as well as the freedom of academic and cultural expression?
+
+          Clarification: This index includes all variables in the two indices v2x_freexp and v2xme_altinf.
+
+          Scale: Interval, from low to high (0-1).
         unit: ''
         display:
           numDecimalPlaces: 3
 
       freeexpr_vdem_low:
+        title: "{tables.vdem.variables.freeexpr_vdem.title} (lower bound)"
+        description_from_producer: *description_prod_freexpr_vdem
         unit: ''
         display:
           numDecimalPlaces: 3
 
       freeexpr_vdem_high:
+        title: "{tables.vdem.variables.freeexpr_vdem.title} (upper bound)"
+        description_from_producer: *description_prod_freexpr_vdem
         unit: ''
         display:
           numDecimalPlaces: 3
 
+      ## 2.2.4 Freedom of association thick index
       freeassoc_vdem:
+        title: Freedom of association thick index
+        description_from_producer: &description_prod_freeassoc_vdem |-
+          Question: To what extent are parties, including opposition parties, allowed to form and to participate in elections, and to what extent are civil society organizations able to form and to operate freely?
+
+          Scale: Interval, from low to high (0-1).
         unit: ''
         display:
           numDecimalPlaces: 3
 
       freeassoc_vdem_low:
+        title: "{tables.vdem.variables.freeassoc_vdem.title} (lower bound)"
+        description_from_producer: *description_prod_freeassoc_vdem
         unit: ''
         display:
           numDecimalPlaces: 3
 
       freeassoc_vdem_high:
+        title: "{tables.vdem.variables.freeassoc_vdem.title} (upper bound)"
+        description_from_producer: *description_prod_freeassoc_vdem
         unit: ''
         display:
           numDecimalPlaces: 3
 
+      ## 2.2.5 Share of population with suffrage
       suffr_vdem:
-        unit: ''
+        title: Share of population with suffrage
+        description_from_producer: |-
+          Question: What share of adult citizens as defined by statute has the legal right to vote in national elections?
+
+          Clarification:
+          This question does not take into consideration restrictions based on age, residence, having been convicted for crime, or being legally incompetent. It covers legal de jure restrictions, not restrictions that may be operative in practice de facto. The adult population as defined by statute is defined by citizens in the case of independent countries or the people living in the territorial entity in the case of colonies. Universal suffrage is coded as 100%. Universal male suffrage only is coded as 50%. Years before electoral provisions are introduced are scored 0%. The scores do not reflect whether an electoral regime was interrupted or not. Only if new constitutions, electoral laws, or the like explicitly introduce new regulations of suffrage, the scores were adjusted accordingly if the changes suggested doing so. If qualifying criteria other than gender apply such as property, tax payments, income, literacy, region, race, ethnicity, religion, and/or ’economic independence’, estimates have been calculated by combining information on the restrictions with different kinds of statistical information on population size, age distribution, wealth distribution, literacy rates, size of ethnic groups, etc., secondary country-specific sources, and — in the case of very poor information — the conditions in similar countries or colonies. The scores reflect de jure provisions of suffrage extension in percentage of the adult population. If the suffrage law is revised in a way that affects the extension, the scores reflect this change as of the calendar year the law was enacted.
+        unit: '%'
         display:
           numDecimalPlaces: 3
 
+      ## 2.2.6 Clean elections index
       electfreefair_vdem:
+        title: Clean elections index
+        description_from_producer: &description_prod_electfreefair_vdem |-
+          Question: To what extent are elections free and fair?
+
+          Clarification: Free and fair connotes an absence of registration fraud, systematic irregularities, government intimidation of the opposition, vote buying, and election violence.
+
+          Scale: Interval, from low to high (0-1).
         unit: ''
         display:
           numDecimalPlaces: 3
 
       electfreefair_vdem_low:
+        title: "{tables.vdem.variables.electfreefair_vdem.title} (lower bound)"
+        description_from_producer: *description_prod_electfreefair_vdem
         unit: ''
         display:
           numDecimalPlaces: 3
 
       electfreefair_vdem_high:
+        title: "{tables.vdem.variables.electfreefair_vdem.title} (upper bound)"
+        description_from_producer: *description_prod_electfreefair_vdem
         unit: ''
         display:
           numDecimalPlaces: 3
 
+      ## 2.2.7 Elected officials index
       electoff_vdem:
+        title: Elected officials index
+        description_from_producer: |-
+          Question: Is the chief executive and legislature appointed through popular elections?
+
+          Clarification: This index attempts to measure (a) whether the chief executive is elected, either directly elected through popular elections or indirectly through a popularly elected legislature that then appoints the chief executive; and (b) whether the legislature, in presidential systems with a directly elected president that is also chief executive, is directly or indirectly elected. Note that a popular election is minimally defined and also includes sham elections with limited suffrage and no competition. Similarly, "appointment" by legislature only implies selection and/or approval, not the power to dismiss. This index is useful primarily for aggregating higher-order indices and should not necessarily be interpreted as an important element of democracy in its own right.
         unit: ''
         display:
           numDecimalPlaces: 3
 
+      ## 2.2.8 Liberal component index
       lib_vdem:
+        title: Liberal component index
+        description_from_producer: &description_prod_lib_vdem |-
+          Question: To what extent is the liberal principle of democracy achieved?
+
+          Clarification: The liberal principle of democracy emphasizes the importance of protecting individual and minority rights against the tyranny of the state and the tyranny of the majority. The liberal model takes a "negative" view of political power insofar as it judges the quality of democracy by the limits placed on government. This is achieved by constitutionally protected civil liberties, strong rule of law, an independent judiciary, and effective checks and balances that, together, limit the exercise of executive power.
+
+          Scale: Interval, from low to high (0-1).
         unit: ''
         display:
           numDecimalPlaces: 3
 
       lib_vdem_low:
+        title: "{tables.vdem.variables.lib_vdem.title} (lower bound)"
+        description_from_producer: *description_prod_lib_vdem
         unit: ''
         display:
           numDecimalPlaces: 3
 
       lib_vdem_high:
+        title: "{tables.vdem.variables.lib_vdem.title} (upper bound)"
+        description_from_producer: *description_prod_lib_vdem
         unit: ''
         display:
           numDecimalPlaces: 3
 
+      ## 2.2.9 Equality before the law and individual liberty index
       indiv_libs_vdem:
+        title: Equality before the law and individual liberty index
+        description_from_producer: &description_prod_indiv_libs_vdem |-
+          Question: To what extent are laws transparent and rigorously enforced and public administration impartial, and to what extent do citizens enjoy access to justice, secure property rights, freedom from forced labor, freedom of movement, physical integrity rights, and freedom of religion?
+
+          Scale: Interval, from low to high (0-1).
         unit: ''
         display:
           numDecimalPlaces: 3
 
       indiv_libs_vdem_low:
+        title: "{tables.vdem.variables.indiv_libs_vdem.title} (lower bound)"
+        description_from_producer: *description_prod_indiv_libs_vdem
         unit: ''
         display:
           numDecimalPlaces: 3
 
       indiv_libs_vdem_high:
+        title: "{tables.vdem.variables.indiv_libs_vdem.title} (upper bound)"
+        description_from_producer: *description_prod_indiv_libs_vdem
         unit: ''
         display:
           numDecimalPlaces: 3
 
+      ## 2.2.10 Judicial constraints on the executive index
       judicial_constr_vdem:
+        title: "Judicial constraints on the executive index"
+        description_from_producer: &description_prod_judicial_constr_vdem_low |-
+          Question: To what extent does the executive respect the constitution and comply with court rulings, and to what extent is the judiciary able to act in an independent fashion?
+
+          Scale: Interval, from low to high (0-1).
         unit: ''
         display:
           numDecimalPlaces: 3
 
       judicial_constr_vdem_low:
+        title: "{tables.vdem.variables.judicial_constr_vdem_low.title} (upper bound)"
+        description_from_producer: *description_prod_judicial_constr_vdem_low
         unit: ''
         display:
           numDecimalPlaces: 3
 
       judicial_constr_vdem_high:
+        title: "{tables.vdem.variables.judicial_constr_vdem_low.title} (lower bound)"
+        description_from_producer: *description_prod_judicial_constr_vdem_low
         unit: ''
         display:
           numDecimalPlaces: 3
 
+      ## 2.2.11 Legislative constraints on the executive index
       legis_constr_vdem:
+        title: Legislative constraints on the executive index
+        description_from_producer: &description_prod_legis_constr_vdem |-
+          Question: To what extent are the legislature and government agencies e.g., comptroller general, general prosecutor, or ombudsman capable of questioning, investigating, and exercising oversight over the executive?
+
+          Clarification: To what extent are the legislature and government agencies e.g., comptroller general, general prosecutor, or ombudsman capable of questioning, investigating, and exercising oversight over the executive?
+
+          Scale: Interval, from low to high (0-1).
         unit: ''
         display:
           numDecimalPlaces: 3
 
       legis_constr_vdem_low:
+        title: "{tables.vdem.variables.legis_constr_vdem.title} (lower bound)"
+        description_from_producer: *description_prod_legis_constr_vdem
         unit: ''
         display:
           numDecimalPlaces: 3
 
       legis_constr_vdem_high:
+        title: "{tables.vdem.variables.legis_constr_vdem.title} (upper bound)"
+        description_from_producer: *description_prod_legis_constr_vdem
         unit: ''
         display:
           numDecimalPlaces: 3
 
+      ## 2.2.12 Participatory component index
       particip_vdem:
+        title: Participatory component index
+        description_from_producer: &description_prod_particip_vdem |-
+          Question: To what extent is the participatory principle achieved?
+
+          Clarification:
+          The participatory principle of democracy emphasizes active participation by citizens in all political processes, electoral and non-electoral. It is motivated by uneasiness about a bedrock practice of electoral democracy: delegating authority to representatives. Thus, direct rule by citizens is preferred, wherever practicable. This model of democracy thus takes suffrage for granted, emphasizing engagement in civil society organizations, direct democracy, and subnational elected bodies.
+
+          Scale: Interval, from low to high (0-1).
         unit: ''
         display:
           numDecimalPlaces: 3
 
       particip_vdem_low:
+        title: "{tables.vdem.variables.particip_vdem.title} (lower bound)"
+        description_from_producer: *description_prod_particip_vdem
         unit: ''
         display:
           numDecimalPlaces: 3
 
       particip_vdem_high:
+        title: "{tables.vdem.variables.particip_vdem.title} (upper bound)"
+        description_from_producer: *description_prod_particip_vdem
         unit: ''
         display:
           numDecimalPlaces: 3
 
+      ## 2.2.13 Civil society participation index
       civsoc_particip_vdem:
+        title: Civil society participation index
+        description_from_producer: &description_prod_civsoc_particip_vdem |-
+          Question: Are major CSOs routinely consulted by policymakers; how large is the involvement of people in CSOs; are women prevented from participating; and is legislative candidate nomination within party organization highly decentralized or made through party primaries?
+
+          Clarification:
+          The sphere of civil society lies in the public space between the private sphere and the state. Here, citizens organize in groups to pursue their collective interests and ideals. We call these groups civil society organizations CSOs. CSOs include, but are by no means limited to, interest groups, labor unions, spiritual organizations if they are engaged in civic or political activities, social movements, professional associations, charities, and other non-governmental organizations.
+
+          The core civil society index CCSI is designed to provide a measure of a robust civil society, understood as one that enjoys autonomy from the state and in which citizens freely and actively pursue their political and civic goals, however conceived.
+
+          Scale:
+          Interval, from low to high (0-1).
         unit: ''
         display:
           numDecimalPlaces: 3
 
       civsoc_particip_vdem_low:
+        title: "{tables.vdem.variables.civsoc_particip_vdem.title} (lower bound)"
+        description_from_producer: *description_prod_civsoc_particip_vdem
         unit: ''
         display:
           numDecimalPlaces: 3
 
       civsoc_particip_vdem_high:
+        title: "{tables.vdem.variables.civsoc_particip_vdem.title} (upper bound)"
+        description_from_producer: *description_prod_civsoc_particip_vdem
         unit: ''
         display:
           numDecimalPlaces: 3
 
+      ## 2.2.14 Direct popular vote index
       dirpop_vote_vdem:
+        title: Direct popular vote index
+        description_from_producer: |-
+          Question: To what extent is the direct popular vote utilized?
+
+          Clarification: Direct popular voting refers here to an institutionalized process by which citizens of a region or country register their choice or opinion on specific issues through a ballot. It is intended to embrace initiatives, referendums, and plebiscites, as those terms are usually understood. It captures some aspects of the more general concept of direct democracy at the national level. The term does not encompass recall elections, deliberative assemblies, or settings in which the vote is not secret or the purview is restricted. Likewise, it does not apply to elections for representatives.
+
+          Scale: Interval, from low to high (0-1).
         unit: ''
         display:
           numDecimalPlaces: 3
 
+      ## 2.2.15 Local government index
       locelect_vdem:
+        title: "Local government index"
+        description_from_producer: &description_prod_locelect_vdem |-
+          Question: Are there elected local governments, and — if so — to what extent can they operate without interference from unelected bodies at the local level?
+
+          Clarification: The lowest score would be reserved for a country that has no elected local governments. A medium score would be accorded a country that has elected local governments but where those governments are subordinate to unelected officials at the local level perhaps appointed by a higher-level body. A high score would be accorded to a country in which local governments are elected and able to operate without restrictions from unelected actors at the local level with the exception of judicial bodies. Naturally, local governments remain subordinate to the regional and national governments.
+
+          Scale: Interval, from low to high (0-1).
         unit: ''
         display:
           numDecimalPlaces: 3
 
       locelect_vdem_low:
+        title: "{tables.vdem.variables.locelect_vdem.title} (lower bound)"
+        description_from_producer: *description_prod_locelect_vdem
         unit: ''
         display:
           numDecimalPlaces: 3
 
       locelect_vdem_high:
+        title:  "{tables.vdem.variables.locelect_vdem.title} (upper bound)"
+        description_from_producer: *description_prod_locelect_vdem
         unit: ''
         display:
           numDecimalPlaces: 3
 
+      ## 2.2.16 Regional government index
       regelect_vdem:
+        title: Regional government index
+        description_from_producer: &description_prod_regelect_vdem |-
+          Question: Are there elected regional governments, and — if so — to what extent can they operate without interference from unelected bodies at the regional level?
+
+          Clarification: The lowest score would be reserved for a country that has no elected regional governments. A medium score would be accorded a country that has elected regional governments but where those governments are subordinate to unelected officials at the regional level perhaps appointed by a higher-level body. A high score would be accorded to a country in which regional governments are elected and able to operate without restrictions from unelected actors at the regional level with the exception of judicial bodies. Naturally, regional governments remain subordinate to the national government.
+
+          Scale: Interval, from low to high (0-1).
         unit: ''
         display:
           numDecimalPlaces: 3
 
       regelect_vdem_low:
+        title: "{tables.vdem.variables.regelect_vdem.title} (lower bound)"
+        description_from_producer: *description_prod_regelect_vdem
         unit: ''
         display:
           numDecimalPlaces: 3
 
       regelect_vdem_high:
+        title: "{tables.vdem.variables.regelect_vdem.title} (upper bound)"
+        description_from_producer: *description_prod_regelect_vdem
         unit: ''
         display:
           numDecimalPlaces: 3
 
+      # 2.2.17 Deliberative component index
       delib_vdem:
+        title: Deliberative component index
+        description_from_producer: &description_prod_delib_vdem |-
+          Question: To what extent is the deliberative principle of democracy achieved?
+
+          Clarification:
+          The deliberative principle of democracy focuses on the process by which decisions are reached in a polity. A deliberative process is one in which public reasoning focused on the common good motivates political decisions—as contrasted with emotional appeals, solidary attachments, parochial interests, or coercion. According to this principle, democracy requires more than an aggregation of existing preferences. There should also be respectful dialogue at all levels—from preference formation to final decision—among informed and competent participants who are open to persuasion.
+
+          To measure these features of a polity we try to determine the extent to which political elites give public justifications for their positions on matters of public policy, justify their positions in terms of the public good, acknowledge and respect counter-arguments; and how wide the range of consultation is at elite levels.
+
+          Scale:
+          Interval, from low to high (0-1).
         unit: ''
         display:
           numDecimalPlaces: 3
 
       delib_vdem_low:
+        title: "{tables.vdem.variables.delib_vdem.title} (lower bound)"
+        description_from_producer: *description_prod_delib_vdem
         unit: ''
         display:
           numDecimalPlaces: 3
 
       delib_vdem_high:
+        title: "{tables.vdem.variables.delib_vdem.title} (upper bound)"
+        description_from_producer: *description_prod_delib_vdem
         unit: ''
         display:
           numDecimalPlaces: 3
 
+      ## 2.2.18 Egalitarian component index
       egal_vdem:
+        title: Egalitarian component index
+        description_from_producer: &description_prod_egal_vdem |-
+          Question: To what extent is the egalitarian principle achieved?
+
+          Clarification: The egalitarian principle of democracy holds that material and immaterial inequalities inhibit the exercise of formal rights and liberties, and diminish the ability of citizens from all social groups to participate. Egalitarian democracy is achieved when 1 rights and freedoms of individuals are protected equally across all social groups; 2 resources are distributed equally across all social groups; and 3 access to power is equally distributed by gender, socioeconomic class and social group.
+
+          Scale: Interval, from low to high (0-1).
         unit: ''
         display:
           numDecimalPlaces: 3
 
       egal_vdem_low:
+        title: "{tables.vdem.variables.egal_vdem.title} (lower bound)"
+        description_from_producer: *description_prod_egal_vdem
         unit: ''
         display:
           numDecimalPlaces: 3
 
       egal_vdem_high:
+        title: "{tables.vdem.variables.egal_vdem.title} (upper bound)"
+        description_from_producer: *description_prod_egal_vdem
         unit: ''
         display:
           numDecimalPlaces: 3
 
+      ## 2.2.19 Equal protection index
       equal_rights_vdem:
+        title: Equal protection index
+        description_from_producer: &description_prod_equal_rights_vdem |-
+          Question: How equal is the protection of rights and freedoms across social groups by the state?
+
+          Clarification: Equal protection means that the state grants and protects rights and freedoms evenly across social groups. To achieve equal protection of rights and freedoms, the state itself must not interfere in the ability of groups to participate and it must also take action to ensure that rights and freedoms of one social group are not threatened by the actions of another group or individual.
+
+          Scale: Interval, from low to high (0-1).
         unit: ''
         display:
           numDecimalPlaces: 3
 
       equal_rights_vdem_low:
+        title: "{tables.vdem.variables.equal_rights_vdem.title} (lower bound)"
+        description_from_producer: *description_prod_equal_rights_vdem
         unit: ''
         display:
           numDecimalPlaces: 3
 
       equal_rights_vdem_high:
+        title: "{tables.vdem.variables.equal_rights_vdem.title} (upper bound)"
+        description_from_producer: *description_prod_equal_rights_vdem
         unit: ''
         display:
           numDecimalPlaces: 3
 
+      ## 2.2.20 Equal access index
       equal_access_vdem:
+        title: Equal access index
+        description_from_producer: &description_prod_equal_access_vdem |-
+          Question: How equal is access to power?
+
+          Clarification: The Equal Access subcomponent is based on the idea that neither the protections of rights and freedoms nor the equal distribution of resources is sufficient to ensure adequate representation. Ideally, all groups should enjoy equal de facto capabilities to participate, to serve in positions of political power, to put issues on the agenda, and to influence policymaking.
+
+          Scale: Interval, from low to high (0-1).
         unit: ''
         display:
           numDecimalPlaces: 3
 
       equal_access_vdem_low:
+        title: "{tables.vdem.variables.equal_access_vdem.title} (lower bound)"
+        description_from_producer: *description_prod_equal_access_vdem
         unit: ''
         display:
           numDecimalPlaces: 3
 
       equal_access_vdem_high:
+        title: "{tables.vdem.variables.equal_access_vdem.title} (upper bound)"
+        description_from_producer: *description_prod_equal_access_vdem
         unit: ''
         display:
           numDecimalPlaces: 3
 
+      ## 2.2.21 Equal distribution of resources index
       equal_res_vdem:
+        title: Equal distribution of resources index
+        description_from_producer: &description_prod_equal_res_vdem |-
+          Question: How equal is the distribution of resources?
+
+          Clarification: This component measures the extent to which resources — both tangible and intangible — are distributed in society. An equal distribution of resources supports egalitarian democracy in two ways. First, lower poverty rates and the distribution of goods and services such as food, water, housing, education and healthcare ensure that all individuals are capable of participating in politics and government. In short, basic needs must be met in order for individuals to effectively exercise their rights and freedoms see, for example, Sen 1999, Maslow 1943. Second, high levels of resource inequality undermine the ability of poorer populations to participate meaningfully Aristotle, Dahl 2006. Thus, it is necessary to include not only measures of poverty and the distribution of goods and services, but also the levels of inequality in these distributions, and the proportion of the population who are not eligible for social services i.e. means-tests, particularistic distribution, etc.. This principle also implies that social or economic inequalities can translate into political inequalities, an issue addressed most notably by Walzer 1983, who argues that overlapping "spheres" of inequality are particularly harmful to society. To address these overlapping "spheres", this component also includes measures of the distribution of power in society amongst different socio-economic groups, genders, etc.
+
+          Scale: Interval, from low to high (0-1).
         unit: ''
         display:
           numDecimalPlaces: 3
 
       equal_res_vdem_low:
+        title: "{tables.vdem.variables.equal_res_vdem.title} (lower bound)"
+        description_from_producer: *description_prod_equal_res_vdem
         unit: ''
         display:
           numDecimalPlaces: 3
 
       equal_res_vdem_high:
+        title: "{tables.vdem.variables.equal_res_vdem.title} (upper bound)"
+        description_from_producer: *description_prod_equal_res_vdem
         unit: ''
         display:
           numDecimalPlaces: 3
 
+      ## 3.1.3.3 Election turnout
       turnout_vdem:
-        unit: ''
+        title: Election turnout
+        description_from_producer: |-
+          Question: In this national election, what percentage (%) of all registered voters cast a vote according to official results?
+        unit: '%'
         display:
           numDecimalPlaces: 2
 
+      # 3.4.2.18 HOS female
       wom_hos_vdem:
+        title: HOS female
+        description_from_producer: |-
+          If the head of state is a collective body, provide the gender of the person executing the most effective power over this body, or, if no such person exists, answer if any persons in the body are female.
         unit: ''
         display:
           numDecimalPlaces: 0
 
+      ## 3.4.3.16 HOG female
       wom_hog_vdem:
+        title: HOG female
+        description_from_producer: |-
+          Question: What is the gender of the head of government?
+
+          Clarification: If the head of government is a collective body, provide the gender of the person executing the most effective power over this body, or, if no such person exists, answer if any persons in the body are female.
+
+          Responses:
+          0: Male
+          1: Female
         unit: ''
         display:
           numDecimalPlaces: 0
 
+      ## 3.5.1.6 Legislature corrupt activities
       corr_leg_vdem:
+        title: Legislature corrupt activities
+        description_from_producer: &description_prod_corr_leg_vdem |-
+          Question: Do members of the legislature abuse their position for financial gain?
+
+          Clarification:
+          This includes any of the following: (a) accepting bribes, (b) helping to obtain government contracts for firms that the legislator (or his/her family/friends/political supporters) own, (c) doing favors for firms in exchange for the opportunity of employment after leaving the legislature, (d) stealing money from the state or from campaign donations for personal use.
+
+          Please make your best estimate, based upon what is known or suspected to be true.
+
+          For reasons of consistency, as of December, 2014, responses to this question are reversed so that the least democratic response is ”0” and the most democratic is ”4”.
+
+          Responses:
+          0: Commonly. Most legislators probably engage in these activities.
+          1: Often. Many legislators probably engage in these activities.
+          2: Sometimes. Some legislators probably engage in these activities.
+          3: Very occasionally. There may be a few legislators who engage in these activities but the vast majority do not.
+          4: Never, or hardly ever.
         unit: ''
         display:
           numDecimalPlaces: 3
 
       corr_leg_vdem_low:
+        title: "{tables.vdem.variables.corr_leg_vdem.title} (lower bound)"
+        description_from_producer: *description_prod_corr_leg_vdem
         unit: ''
         display:
           numDecimalPlaces: 3
 
       corr_leg_vdem_high:
+        title: "{tables.vdem.variables.corr_leg_vdem.title} (upper bound)"
+        description_from_producer: *description_prod_corr_leg_vdem
         unit: ''
         display:
           numDecimalPlaces: 3
 
+      ## 3.5.3.7 Lower chamber female legislators
       wom_parl_vdem:
-        unit: ''
+        title: Lower chamber female legislators
+        description_from_producer: |-
+          Question: What percentage (%) of the lower (or unicameral) chamber of the legislature is female?
+        unit: '%'
         display:
           numDecimalPlaces: 3
 
+      ## 3.6.0.1 Reasoned justification
       justified_polch_vdem:
+        title: Reasoned justification
+        description_from_producer: &description_prod_justified_polch_vdem |-
+          Question: When important policy changes are being considered, i.e. before a decision has been made, to what extent do political elites give public and reasoned justifications for their positions?
+
+          Clarification: Because discourse varies greatly from person to person, base your answer on the style that is most typical of prominent national political leaders.
+
+          Responses:
+
+          0: No justification. Elites almost always only dictate that something should or should not be done, but no reasoning about justification is given. For example, "We must cut spending."
+          1: Inferior justification. Elites tend to give reasons why someone should or should not be for doing or not doing something, but the reasons tend to be illogical or false, although they may appeal to many voters. For example, "We must cut spending. The state is inefficient." [The inference is incomplete because addressing inefficiencies would not necessarily reduce spending and it might undermine essential services.]
+          2: Qualified justification. Elites tend to offer a single simple reason justifying why the proposed policies contribute to or detract from an outcome. For example, "We must cut spending because taxpayers cannot afford to pay for current programs."
+          3: Sophisticated justification. Elites tend to offer more than one or more complex, nuanced and complete justification. For example, "We must cut spending because taxpayers cannot afford to pay for current government programs. Raising taxes would hurt economic growth, and deficit spending would lead to inflation."
         unit: ''
         display:
           numDecimalPlaces: 3
 
       justified_polch_vdem_low:
+        title: "{tables.vdem.variables.justified_polch_vdem.title} (lower bound)"
+        description_from_producer: *description_prod_justified_polch_vdem
         unit: ''
         display:
           numDecimalPlaces: 3
 
       justified_polch_vdem_high:
+        title: "{tables.vdem.variables.justified_polch_vdem.title} (upper bound)"
+        description_from_producer: *description_prod_justified_polch_vdem
         unit: ''
         display:
           numDecimalPlaces: 3
 
+      ## 3.6.0.2 Common good
       justcomgd_polch_vdem:
+        title: Common good
+        description_from_producer: &description_prod_justcomgd_polch_vdem |-
+          Question: Question: When important policy changes are being considered, to what extent do political elites justify their positions in terms of the common good?
+
+          Clarification: Because discourse varies greatly from person to person, base your answer on the style that is most typical of prominent national political leaders.
+
+          Responses:
+          0: Little or no justification in terms of the common good is usually offered.
+          1: Specific business, geographic, group, party, or constituency interests are for the most part offered as justifications.
+          2: Justifications are for the most part a mix of specific interests and the common good and it is impossible to say which justification is more common than the other.
+          3: Justifications are based on a mixture of references to constituency/party/group interests and on appeals to the common good.
+          4: Justifications are for the most part almost always based on explicit statements of the common good for society, understood either as the greatest good for the greatest number or as helping the least advantaged in a society.
         unit: ''
         display:
           numDecimalPlaces: 3
 
       justcomgd_polch_vdem_low:
+        title: "{tables.vdem.variables.justcomgd_polch_vdem.title} (lower bound)"
+        description_from_producer: *description_prod_justcomgd_polch_vdem
         unit: ''
         display:
           numDecimalPlaces: 3
 
       justcomgd_polch_vdem_high:
+        title: "{tables.vdem.variables.justcomgd_polch_vdem.title} (upper bound)"
+        description_from_producer: *description_prod_justcomgd_polch_vdem
         unit: ''
         display:
           numDecimalPlaces: 3
 
+      ## 3.6.0.3 Respect counterarguments
       counterarg_polch_vdem:
+        title: Respect counterarguments
+        description_from_producer: &description_prod_counterarg_polch_vdem |-
+          Question: When important policy changes are being considered, to what extent do political elites acknowledge and respect counterarguments?
+
+          Clarification: Because discourse varies greatly from person to person, base your answer on the style that is most typical of prominent national political leaders.
+
+          Responses:
+          0: Counterarguments are not allowed or if articulated, punished.
+          1: Counterarguments are allowed at least from some parties, but almost always are ignored. 2: Elites tend to acknowledge counterarguments but then explicitly degrade them by making a negative statement about them or the individuals and groups that propose them.
+          3: Elites tend to acknowledge counterarguments without making explicit negative or positive statements about them.
+          4: Elites almost always acknowledge counterarguments and explicitly value them, even if they ultimately reject them for the most part.
+          5: Elites almost always acknowledge counterarguments and explicitly value them, and frequently also even accept them and change their position.
+
+          Scale: Ordinal, converted to interval by the measurement model.
         unit: ''
         display:
           numDecimalPlaces: 3
 
       counterarg_polch_vdem_low:
+        title: "{tables.vdem.variables.counterarg_polch_vdem.title} (lower bound)"
+        description_from_producer: *description_prod_counterarg_polch_vdem
         unit: ''
         display:
           numDecimalPlaces: 3
 
       counterarg_polch_vdem_high:
+        title: "{tables.vdem.variables.counterarg_polch_vdem.title} (upper bound)"
+        description_from_producer: *description_prod_counterarg_polch_vdem
         unit: ''
         display:
           numDecimalPlaces: 3
 
+      ### 3.6.0.4 Range of consultation
       elitecons_polch_vdem:
+        title: Range of consultation
+        description_from_producer: &description_prod_elitecons_polch_vdem |-
+          Question: When important policy changes are being considered, how wide is the range of consultation at elite levels?
+
+          Clarification: Because practices vary greatly from policy to policy, base your answer on the style that is most typical of policymaking.
+
+          Responses:
+          0: No consultation. The leader or a very small group (e.g. military council) makes authoritative decisions on their own.
+          1: Very little and narrow. Consultation with only a narrow circle of loyal party/ruling elites. 2: Consultation includes the former plus a larger group that is loyal to the government, such as the ruling party's or parties' local executives and/or women, youth and other branches.
+          3: Consultation includes the former plus leaders of other parties.
+          4: Consultation includes the former plus a select range of society/labor/business representatives.
+          5: Consultation engages elites from essentially all parts of the political spectrum and all politically relevant sectors of society and business.
+
+          Scale: Ordinal, converted to interval by the measurement model.
         unit: ''
         display:
           numDecimalPlaces: 3
 
       elitecons_polch_vdem_low:
+        title: "{tables.vdem.variables.elitecons_polch_vdem.title} (lower bound)"
+        description_from_producer: *description_prod_elitecons_polch_vdem
         unit: ''
         display:
           numDecimalPlaces: 3
 
       elitecons_polch_vdem_high:
+        title: "{tables.vdem.variables.elitecons_polch_vdem.title} (upper bound)"
+        description_from_producer: *description_prod_elitecons_polch_vdem
         unit: ''
         display:
           numDecimalPlaces: 3
 
+      ## 3.6.0.5 Engaged society
       soccons_polch_vdem:
+        title: Engaged society
+        description_from_producer: &description_prod_soccons_polch_vdem |-
+          Question: When important policy changes are being considered, how wide and how independent are public deliberations?
+
+          Clarification: This question refers to deliberation as manifested in discussion, debate, and other public forums such as popular media.
+
+          Responses:
+          0: Public deliberation is never, or almost never allowed.
+          1: Some limited public deliberations are allowed but the public below the elite levels is almost always either unaware of major policy debates or unable to take part in them.
+          2: Public deliberation is not repressed but nevertheless infrequent and non-elite actors are typically controlled and/or constrained by the elites.
+          3: Public deliberation is actively encouraged and some autonomous non-elite groups participate, but it is confined to a small slice of specialized groups that tends to be the same across issue-areas.
+          4: Public deliberation is actively encouraged and a relatively broad segment of non-elite groups often participate and vary with different issue-areas.
+          5: Large numbers of non-elite groups as well as ordinary people tend to discuss major policies among themselves, in the media, in associations or neighborhoods, or in the streets. Grass-roots deliberation is common and unconstrained.
+
+          Scale: Ordinal, converted to interval by the measurement model.
         unit: ''
         display:
           numDecimalPlaces: 3
 
       soccons_polch_vdem_low:
+        title: "{tables.vdem.variables.soccons_polch_vdem.title} (lower bound)"
+        description_from_producer: *description_prod_soccons_polch_vdem
         unit: ''
         display:
           numDecimalPlaces: 3
 
       soccons_polch_vdem_high:
+        title: "{tables.vdem.variables.soccons_polch_vdem.title} (upper bound)"
+        description_from_producer: *description_prod_soccons_polch_vdem
         unit: ''
         display:
           numDecimalPlaces: 3
 
+      ## 3.7.0.6 Judicial corruption decision
       corr_jud_vdem:
+        title: Judicial corruption decision
+        description_from_producer: &description_prod_corr_jud_vdem |-
+          Question: How often do individuals or businesses make undocumented extra payments or bribes in order to speed up or delay the process or to obtain a favorable judicial decision?
+
+          Responses:
+          0: Always.
+          1: Usually.
+          2: About half of the time. 3: Not usually.
+          4: Never.
+
+          Scale: Ordinal, converted to interval by the measurement model.
+
+          Notes: For reasons of consistency, as of December, 2014, responses to this question are reversed so that the least democratic response is ”0” and the most democratic is ”4”.
         unit: ''
         display:
           numDecimalPlaces: 3
 
       corr_jud_vdem_low:
+        title: "{tables.vdem.variables.corr_jud_vdem.title} (lower bound)"
+        description_from_producer: *description_prod_corr_jud_vdem
         unit: ''
         display:
           numDecimalPlaces: 3
 
       corr_jud_vdem_high:
+        title: "{tables.vdem.variables.corr_jud_vdem.title} (upper bound)"
+        description_from_producer: *description_prod_corr_jud_vdem
         unit: ''
         display:
           numDecimalPlaces: 3
 
+      ## 3.8.2.2 Rigorous and impartial public administration
       public_admin_vdem:
+        title: Rigorous and impartial public administration
+        description_from_producer: &description_prod_public_admin_vdem |-
+          Question: Are public officials rigorous and impartial in the performance of their duties?
+
+          Clarification:
+          This question focuses on the extent to which public officials generally abide by the law and treat like cases alike, or conversely, the extent to which public administration is characterized by arbitrariness and biases (i.e., nepotism, cronyism, or discrimination).
+
+          The question covers the public officials that handle the cases of ordinary people. If no functioning public administration exists, the lowest score (0) applies.
+
+          Responses:
+          0: The law is not respected by public officials. Arbitrary or biased administration of the law is rampant.
+          1: The law is weakly respected by public officials. Arbitrary or biased administration of the law is widespread.
+          2: The law is modestly respected by public officials. Arbitrary or biased administration of the law is moderate.
+          3: The law is mostly respected by public officials. Arbitrary or biased administration of the law is limited.
+          4: The law is generally fully respected by the public officials. Arbitrary or biased administration of the law is very limited.
+
+          Scale: Ordinal, converted to interval by the measurement model.
         unit: ''
         display:
           numDecimalPlaces: 3
 
       public_admin_vdem_low:
+        title: "{tables.vdem.variables.public_admin_vdem.title} (lower bound)"
+        description_from_producer: *description_prod_public_admin_vdem
         unit: ''
         display:
           numDecimalPlaces: 3
 
       public_admin_vdem_high:
+        title: "{tables.vdem.variables.public_admin_vdem.title} (upper bound)"
+        description_from_producer: *description_prod_public_admin_vdem
         unit: ''
         display:
           numDecimalPlaces: 3
 
+      ## 3.8.2.6 Social group equality in respect for civil liberties
       socgr_civ_libs_vdem:
+        title: ''
+        description_from_producer: &description_prod_socgr_civ_libs_vdem |-
+          Question: Do all social groups, as distinguished by language, ethnicity, religion, race, region, or caste, enjoy the same level of civil liberties, or are some groups generally in a more favorable position?
+
+          Clarification: Here, civil liberties are understood to include access to justice, private property rights, freedom of movement, and freedom from forced labor.
+
+          Responses:
+          0: Members of some social groups enjoy much fewer civil liberties than the general population. 1: Members of some social groups enjoy substantially fewer civil liberties than the general population.
+          2: Members of some social groups enjoy moderately fewer civil liberties than the general population.
+          3: Members of some social groups enjoy slightly fewer civil liberties than the general population. 4: Members of all salient social groups enjoy the same level of civil liberties.
+
+          Scale: Ordinal, converted to interval by the measurement model.
         unit: ''
         display:
           numDecimalPlaces: 3
 
       socgr_civ_libs_vdem_low:
+        title: "{tables.vdem.variables.socgr_civ_libs_vdem.title} (lower bound)"
+        description_from_producer: *description_prod_socgr_civ_libs_vdem
         unit: ''
         display:
           numDecimalPlaces: 3
 
       socgr_civ_libs_vdem_high:
+        title: "{tables.vdem.variables.socgr_civ_libs_vdem.title} (upper bound)"
+        description_from_producer: *description_prod_socgr_civ_libs_vdem
         unit: ''
         display:
           numDecimalPlaces: 3
 
+      ## 3.9.0.1 Domestic autonomy
       dom_auton_vdem:
+        title: Domestic autonomy
+        description_from_producer: &description_prod_dom_auton_vdem |-
+          Question: Is the state autonomous from the control of other states with respect to the conduct of domestic policy?
+
+          Clarification: The question of domestic autonomy does not include restrictions emanating from treaties (e.g., NATO), international organizations (e.g., the WTO), or confederations (e.g., the European Union) if these agreements are freely negotiated by the state and if the state is free to exit from that treaty, organization, or confederation. Nor does it include restrictions on policymaking emanating from international market forces and trans-national corporations.
+
+          Responses:
+          0: Non-autonomous. National level authority is exercised by an external power, either by law or in practice. The most common examples of this are direct colonial rule and military occupation (e.g. quadripartite occupation of Germany in 1945). It also includes situations in which domestic actors provide de jure cover for de facto control by a foreign power (e.g. Vichy France). However, control of some part of the territory of a state by an enemy during war is not considered control by external actors if the sovereign government remains on scene and continues to wage conventional war (e.g., the USSR during WW II).
+          1: Semi-autonomous. An external political actor directly constrains the ability of domestic actors to rule, decides who can or cannot rule through formal rules or informal understandings, or precludes certain policies through explicit treaty provisions or well-understood rules of the game from which the subject state cannot withdraw. Examples include Soviet "satellite" states in Eastern Europe, and situations where colonial powers grant limited powers of national self- government to their possessions (e.g., protectorates and limited home government).
+          2: Autonomous. Domestic political actors exercise political authority free of the direct control of external political actors.
+
+          Scale: Ordinal, converted to interval by the measurement model.
         unit: ''
         display:
           numDecimalPlaces: 3
 
       dom_auton_vdem_low:
+        title: "{tables.vdem.variables.dom_auton_vdem.title} (lower bound)"
+        description_from_producer: *description_prod_dom_auton_vdem
         unit: ''
         display:
           numDecimalPlaces: 3
 
       dom_auton_vdem_high:
+        title: "{tables.vdem.variables.dom_auton_vdem.title} (upper bound)"
+        description_from_producer: *description_prod_dom_auton_vdem
         unit: ''
         display:
           numDecimalPlaces: 3
 
+      ## 3.9.0.2 International autonomy
       int_auton_vdem:
+        title: International autonomy
+        description_from_producer: &description_prod_int_auton_vdem |-
+          Question: Is the state autonomous from the control of other states with respect to the conduct of its foreign policy?
+
+          Responses:
+          0: Non-autonomous. Foreign policy is controlled by an external power, either de facto or de jure. The most common examples of this are colonial rule and military occupation (e.g. quadripartite occupation of Germany in 1945). Situations in which domestic actors provide de jure cover for de facto control by a foreign power should not be construed as semi-autonomy (e.g. Vichy France). Governments in exile that control underground forces waging unconventional warfare are not considered as mitigating an occupation regime (e.g. countries under German occupation during WWII).
+          1: Semi-autonomous. An external political actor directly constrains the ability of domestic actors to pursue an independent foreign policy course in some important areas. This may be the product of explicit treaty provisions or well-understood rules of the game from which the subject state cannot withdraw. Examples would include Soviet strictures over rule in so-called "satellite" states in Eastern Europe, and explicitly negotiated postwar settlements (e.g. Austria following WWII).
+          2: Autonomous. Domestic political actors exercise foreign policy free of the direct control of external political actors. Direct control is meant to exclude the exercise of constraint or the impact of interdependence in the international system. Treaties in which states concede some part of that control to a supra- or international organization voluntarily, and from which there is a possibility of exit should not be interpreted as a violation of autonomy.
         unit: ''
         display:
           numDecimalPlaces: 3
 
       int_auton_vdem_low:
+        title: "{tables.vdem.variables.int_auton_vdem.title} (lower bound)"
+        description_from_producer: *description_prod_int_auton_vdem
         unit: ''
         display:
           numDecimalPlaces: 3
 
       int_auton_vdem_high:
+        title: "{tables.vdem.variables.int_auton_vdem.title} (upper bound)"
+        description_from_producer: *description_prod_int_auton_vdem
         unit: ''
         display:
           numDecimalPlaces: 3
 
+      ## 3.9.0.3 State authority over territory
       terr_contr_vdem:
-        unit: ''
+        title: State authority over territory
+        description_from_producer: &description_prod_terr_contr_vdem |-
+          Question: Over what percentage (%) of the territory does the state have effective control?
+
+          Clarification:
+          With this question we seek to judge the extent of recognition of the preeminent authority of the state over its territory. We are not interested here in perfect control by the state, or whether it is relatively effective in comparison to other states, but an assessment of the areas over which it is hegemonic, e.g. where it is recognized as the preeminent authority and in a contest of wills it can assert its control over political forces that reject its authority. Several illustrative examples may help in this coding. During civil wars the claim of the state to rule is effectively neutralized by insurgent groups (e.g., the Tamil Tigers in Sri Lanka). There are also situations in which criminals or warlords exert control in contravention of state authority (e.g. opium growers in parts of Indochina). There are also cases of failed states where the central government cannot assert control over a share of its territory (e.g., contemporary Somalia). Here, we ask you to estimate the size of the territory that the state has effective control over, as a percentage (%) of the total territory that is officially part of the country.
+
+          By "officially part of the country" we refer to international law. In cases where international law is not entirely clear, we refer you to general understandings. For example, China claims sovereignty over Taiwan, but it remains under the control of its own government. For purposes of this question, Taiwan should not be considered a failure to control its territory by the government of the PRC.
+        unit: '%'
         display:
           numDecimalPlaces: 3
 
       terr_contr_vdem_low:
+        title: "{tables.vdem.variables.terr_contr_vdem.title} (lower bound)"
+        description_from_producer: *description_prod_terr_contr_vdem
         unit: ''
         display:
           numDecimalPlaces: 3
 
       terr_contr_vdem_high:
+        title: "{tables.vdem.variables.terr_contr_vdem.title} (upper bound)"
+        description_from_producer: *description_prod_terr_contr_vdem
         unit: ''
         display:
           numDecimalPlaces: 3
 
+      ## 3.12.0.2 Power distributed by social group
       socgr_pow_vdem:
+        title: Power distributed by social group
+        description_from_producer: &description_prod_socgr_pow_vdem |-
+          Question: Is political power distributed according to social groups?
+
+          Clarification: A social group is differentiated within a country by caste, ethnicity, language, race, region, religion, or some combination thereof. (It does not include identities grounded in sexual orientation or socioeconomic status.) Social group identity is contextually defined and is likely to vary across countries and through time. Social group identities are also likely to cross-cut, so that a given person could be defined in multiple ways, i.e., as part of multiple groups. Nonetheless, at any given point in time there are social groups within a society that are understood — by those residing within that society — to be different, in ways that may be politically relevant.
+
+          Responses:
+          0: Political power is monopolized by one social group comprising a minority of the population. This monopoly is institutionalized, i.e., not subject to frequent change.
+          1: Political power is monopolized by several social groups comprising a minority of the population. This monopoly is institutionalized, i.e., not subject to frequent change.
+          2: Political power is monopolized by several social groups comprising a majority of the population. This monopoly is institutionalized, i.e., not subject to frequent change.
+          3: Either all social groups possess some political power, with some groups having more power than others; or different social groups alternate in power, with one group controlling much of the political power for a period of time, followed by another — but all significant groups have a turn at the seat of power.
+          4: All social groups have roughly equal political power or there are no strong ethnic, caste, linguistic, racial, religious, or regional differences to speak of. Social group characteristics are not relevant to politics.
         unit: ''
         display:
           numDecimalPlaces: 3
 
       socgr_pow_vdem_low:
+        title: "{tables.vdem.variables.socgr_pow_vdem.title} (lower bound)"
+        description_from_producer: *description_prod_socgr_pow_vdem
         unit: ''
         display:
           numDecimalPlaces: 3
 
       socgr_pow_vdem_high:
+        title: "{tables.vdem.variables.socgr_pow_vdem.title} (upper bound)"
+        description_from_producer: *description_prod_socgr_pow_vdem
         unit: ''
         display:
           numDecimalPlaces: 3
 
+      ## 5.4.3 Presidentialism Index
       personalism_vdem:
+        title: Presidentialism Index
+        description_from_producer: &description_prod_personalism_vdem |-
+          Question: To what extent is the regime characterized by presidentialism?
+
+          Clarification:
+          Presidentialism means the "systemic concentration of political power in the hands of one individual who resists delegating all but the most trivial decision making tasks" (Bratton and Van de Walle, 1997: 63). It relates closely to V-Dem’s index of Horizontal Accountability (v2x_horacc) but focuses more specifically on the extent to which the President is free from constraints by other institutions or actors. The point estimates for this index have been reversed such that the directionality is opposite to the input variables. That is, lower scores indicate a normatively better situation (e.g. more democratic) and higher scores a normatively worse situation (e.g. less democratic). Note that this directionality is opposite of that of other V-Dem indices, which generally run from normatively worse to better.
+
+          Scale: Interval, from low to high (0-1).
         unit: ''
         display:
           numDecimalPlaces: 3
 
       personalism_vdem_low:
+        title: "{tables.vdem.variables.personalism_vdem.title} (lower bound)"
+        description_from_producer: *description_prod_personalism_vdem
         unit: ''
         display:
           numDecimalPlaces: 3
 
       personalism_vdem_high:
+        title: "{tables.vdem.variables.personalism_vdem.title} (upper bound)"
+        description_from_producer: *description_prod_personalism_vdem
         unit: ''
         display:
           numDecimalPlaces: 3
 
+      ## 5.5.1 Civil liberties index
       civ_libs_vdem:
+        title: Civil liberties index
+        description_from_producer: &description_prod_civ_libs_dem |-
+          Question: To what extent is civil liberty respected?
+
+          Clarification: Civil liberty is understood as liberal freedom, where freedom is a property of individuals. Civil liberty is constituted by the absence of physical violence committed by government agents and the absence of constraints of private liberties and political liberties by the government.
+
+          Scale: Interval, from low to high (0-1).
         unit: ''
         display:
           numDecimalPlaces: 3
 
       civ_libs_vdem_low:
+        title: "{tables.vdem.variables.civ_libs_vdem.title} (lower bound)"
+        description_from_producer: *description_prod_civ_libs_dem
         unit: ''
         display:
           numDecimalPlaces: 3
 
       civ_libs_vdem_high:
+        title: "{tables.vdem.variables.civ_libs_vdem.title} (upper bound)"
+        description_from_producer: *description_prod_civ_libs_dem
         unit: ''
         display:
           numDecimalPlaces: 3
 
+      ## 5.5.4 Private civil liberties index
       priv_libs_vdem:
+        title: Private civil liberties index
+        description_from_producer: &description_prod_priv_libs_vdem |-
+          Question: To what extent are private liberties respected?
+
+          Clarification: Private liberties are understood as freedom of movement, freedom of religion, freedom from forced labor, and property rights. The index is based on indicators that reflect government repression and that are not directly referring to elections.
+
+          Scale: Interval, from low to high (0-1).
         unit: ''
         display:
           numDecimalPlaces: 3
 
       priv_libs_vdem_low:
+        title: "{tables.vdem.variables.priv_libs_vdem.title} (lower bound)"
+        description_from_producer: *description_prod_priv_libs_vdem
         unit: ''
         display:
           numDecimalPlaces: 3
 
       priv_libs_vdem_high:
+        title: "{tables.vdem.variables.priv_libs_vdem.title} (upper bound)"
+        description_from_producer: *description_prod_priv_libs_vdem
         unit: ''
         display:
           numDecimalPlaces: 3
 
+      ## 5.5.3 Political civil liberties index
       pol_libs_vdem:
+        title: Political civil liberties index
+        description_from_producer: &description_prod_pol_libs_vdem |-
+          Question: To what extent are political liberties respected?
+
+          Clarification: Political liberties are understood as freedom of association and freedom of expression. Among the set of civil liberties, these liberal rights are the most relevant for political competition and accountability. The index is based on indicators that reflect government repression and that are not directly referring to elections.
+
+          Scale: Interval, from low to high (0-1).
         unit: ''
         display:
           numDecimalPlaces: 3
 
       pol_libs_vdem_low:
+        title: "{tables.vdem.variables.pol_libs_vdem.title} (lower bound)"
+        description_from_producer: *description_prod_pol_libs_vdem
         unit: ''
         display:
           numDecimalPlaces: 3
 
       pol_libs_vdem_high:
+        title: "{tables.vdem.variables.pol_libs_vdem.title} (upper bound)"
+        description_from_producer: *description_prod_pol_libs_vdem
         unit: ''
         display:
           numDecimalPlaces: 3
 
+      ##
       phys_integr_libs_vdem:
+        title: ''
         unit: ''
         display:
           numDecimalPlaces: 3
 
       phys_integr_libs_vdem_low:
+        title: ''
         unit: ''
         display:
           numDecimalPlaces: 3
 
       phys_integr_libs_vdem_high:
+        title: ''
         unit: ''
         display:
           numDecimalPlaces: 3
 
+      ##
       corruption_vdem:
+        title: ''
         unit: ''
         display:
           numDecimalPlaces: 3
 
       corruption_vdem_low:
+        title: ''
         unit: ''
         display:
           numDecimalPlaces: 3
 
       corruption_vdem_high:
+        title: ''
         unit: ''
         display:
           numDecimalPlaces: 3
 
+      ## 
       corr_publsec_vdem:
+        title: ''
         unit: ''
         display:
           numDecimalPlaces: 3
 
       corr_publsec_vdem_low:
+        title: ''
         unit: ''
         display:
           numDecimalPlaces: 3
 
       corr_publsec_vdem_high:
+        title: ''
         unit: ''
         display:
           numDecimalPlaces: 3
 
       corr_exec_vdem:
+        title: ''
         unit: ''
         display:
           numDecimalPlaces: 3
 
       corr_exec_vdem_low:
+        title: ''
         unit: ''
         display:
           numDecimalPlaces: 3
 
       corr_exec_vdem_high:
+        title: ''
         unit: ''
         display:
           numDecimalPlaces: 3
 
       wom_emp_vdem:
+        title: ''
         unit: ''
         display:
           numDecimalPlaces: 3
 
       wom_emp_vdem_low:
+        title: ''
         unit: ''
         display:
           numDecimalPlaces: 3
 
       wom_emp_vdem_high:
+        title: ''
         unit: ''
         display:
           numDecimalPlaces: 3
 
       wom_civ_libs_vdem:
+        title: ''
         unit: ''
         display:
           numDecimalPlaces: 3
 
       wom_civ_libs_vdem_low:
+        title: ''
         unit: ''
         display:
           numDecimalPlaces: 3
 
       wom_civ_libs_vdem_high:
+        title: ''
         unit: ''
         display:
           numDecimalPlaces: 3
 
       wom_civ_soc_vdem:
+        title: ''
         unit: ''
         display:
           numDecimalPlaces: 3
 
       wom_civ_soc_vdem_low:
+        title: ''
         unit: ''
         display:
           numDecimalPlaces: 3
 
       wom_civ_soc_vdem_high:
+        title: ''
         unit: ''
         display:
           numDecimalPlaces: 3
 
       wom_pol_par_vdem:
+        title: ''
         unit: ''
         display:
           numDecimalPlaces: 3
 
       wom_pol_par_vdem_low:
+        title: ''
         unit: ''
         display:
           numDecimalPlaces: 3
 
       wom_pol_par_vdem_high:
+        title: ''
         unit: ''
         display:
           numDecimalPlaces: 3
 
       rule_of_law_vdem:
+        title: ''
         unit: ''
         display:
           numDecimalPlaces: 3
 
       rule_of_law_vdem_low:
+        title: ''
         unit: ''
         display:
           numDecimalPlaces: 3
 
       rule_of_law_vdem_high:
+        title: ''
         unit: ''
         display:
           numDecimalPlaces: 3
 
       civ_soc_str_vdem:
+        title: ''
         unit: ''
         display:
           numDecimalPlaces: 3
 
       civ_soc_str_vdem_low:
+        title: ''
         unit: ''
         display:
           numDecimalPlaces: 3
 
       civ_soc_str_vdem_high:
+        title: ''
         unit: ''
         display:
           numDecimalPlaces: 3
 
       goveffective_vdem_wbgi:
+        title: ''
         unit: ''
         display:
           numDecimalPlaces: 3
 
       corruption_cpi:
+        title: ''
         unit: ''
         display:
           numDecimalPlaces: 0
 
       electmulpar_hoe_row_owid:
+        title: ''
         unit: ''
         display:
           numDecimalPlaces: 0
 
       electmulpar_hoe_high_row_owid:
+        title: ''
         unit: ''
         display:
           numDecimalPlaces: 0
 
       electmulpar_hoe_low_row_owid:
+        title: ''
         unit: ''
         display:
           numDecimalPlaces: 0
 
       electdem_dich_row_owid:
+        title: 'Electoral democracy'
         unit: ''
         display:
           numDecimalPlaces: 0
 
       electdem_dich_high_row_owid:
+        title: ''
         unit: ''
         display:
           numDecimalPlaces: 0
 
       electdem_dich_low_row_owid:
+        title: ''
         unit: ''
         display:
           numDecimalPlaces: 0
 
       electfreefair_row:
+        title: ''
         unit: ''
         display:
           numDecimalPlaces: 0
 
       electfreefair_high_row:
+        title: ''
         unit: ''
         display:
           numDecimalPlaces: 0
 
       electfreefair_low_row:
+        title: ''
         unit: ''
         display:
           numDecimalPlaces: 0
 
       electmulpar_row:
+        title: ''
         unit: ''
         display:
           numDecimalPlaces: 0
 
       electmulpar_high_row:
+        title: ''
         unit: ''
         display:
           numDecimalPlaces: 0
 
       electmulpar_low_row:
+        title: ''
         unit: ''
         display:
           numDecimalPlaces: 0
 
       lib_dich_row:
+        title: ''
         unit: ''
         display:
           numDecimalPlaces: 0
 
       lib_dich_high_row:
+        title: ''
         unit: ''
         display:
           numDecimalPlaces: 0
 
       lib_dich_low_row:
+        title: ''
         unit: ''
         display:
           numDecimalPlaces: 0
 
       accessjust_m_row:
+        title: ''
         unit: ''
         display:
           numDecimalPlaces: 0
 
       accessjust_m_high_row:
+        title: ''
         unit: ''
         display:
           numDecimalPlaces: 0
 
       accessjust_m_low_row:
+        title: ''
         unit: ''
         display:
           numDecimalPlaces: 0
 
       accessjust_w_row:
+        title: ''
         unit: ''
         display:
           numDecimalPlaces: 0
 
       accessjust_w_high_row:
+        title: ''
         unit: ''
         display:
           numDecimalPlaces: 0
 
       accessjust_w_low_row:
+        title: ''
         unit: ''
         display:
           numDecimalPlaces: 0
 
       transplaws_row:
+        title: ''
         unit: ''
         display:
           numDecimalPlaces: 0
 
       transplaws_high_row:
+        title: ''
         unit: ''
         display:
           numDecimalPlaces: 0
 
       transplaws_low_row:
+        title: ''
         unit: ''
         display:
           numDecimalPlaces: 0
 
       electmulpar_leg_row:
+        title: ''
         unit: ''
         display:
           numDecimalPlaces: 0
 
       electmulpar_leg_high_row:
+        title: ''
         unit: ''
         display:
           numDecimalPlaces: 0
 
       electmulpar_leg_low_row:
+        title: ''
         unit: ''
         display:
           numDecimalPlaces: 0
 
       regime_row_owid:
+        title: ''
         unit: ''
         display:
           numDecimalPlaces: 0
 
       regime_amb_row_owid:
+        title: ''
         unit: ''
         display:
           numDecimalPlaces: 0
 
       regime_redux_row_owid:
+        title: ''
         unit: ''
         display:
           numDecimalPlaces: 0
 
       wom_hoe_vdem:
+        title: ''
         unit: ''
         display:
           numDecimalPlaces: 0
 
       regime_imputed:
+        title: ''
         unit: ''
         display:
           numDecimalPlaces: 0
