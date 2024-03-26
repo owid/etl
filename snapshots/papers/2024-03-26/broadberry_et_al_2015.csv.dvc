@@ -1,0 +1,20 @@
+meta:
+  origin:
+    producer: Broadberry et al.
+    title: Long-term crop yields in UK
+    citation_full: |-
+      Broadberry, S., Campbell, B., Klein, A., Overton, M., & Van Leeuwen, B. (2015). British Economic Growth, 1270-1870. Cambridge: Cambridge University Press. doi:10.1017/CBO9781107707603
+      The data was manually extracted from Table 3.06 "Weighted national average crop yields per acre, gross of tithes and net of seed, 1270s-1860s (bushels; 10-year averages)".
+      The data in this table is based on the Medieval Accounts Database, the Early Modern Probate Inventories Database and the Modern Farm Accounts Database. Seed sown per acre from the Medieval and Modern Databases. Pulses for the modern period and all seeds sown for the early modern period are taken from Overton and Campbell (1996), Allen (2005).
+    url_main: https://www.cambridge.org/core/books/british-economic-growth-12701870/A270234C137117C8E0F1D1E7E6F0DA56
+    date_accessed: 2024-03-26
+    date_published: 2015-01-01
+    license:
+      name: Copyright Stephen Broadberry, Bruce M. S. Campbell, Alexander Klein, Mark Overton and Bas van Leeuwen 2015
+      url: https://www.cambridge.org/core/legal-notices/terms
+
+wdir: ../../../data/snapshots/papers/2024-03-26
+outs:
+  - md5: 0273151c5cd5b1bc50e275d65196a06a
+    size: 514
+    path: broadberry_et_al_2015.csv
