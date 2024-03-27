@@ -997,7 +997,7 @@ if st.session_state.owidle_difficulty == 2:
 
 # LAYOUT OTHERWISE
 if st.session_state.owidle_difficulty < 2:
-    with st.container(border=True):
+    with st.container(border=False):
         col1, col2, col3, col4 = st.columns(NOT_HARD_MODE_COL_SIZES)
         with col1:
             st.markdown("**Your guess**")
