@@ -1,6 +1,7 @@
 """Script to create a snapshot of dataset. Loads data from the EFFIS API and creates a snapshot of the dataset with weekly wildire numbers, area burnt and emissions.
 This script generates data from 2003-2023. The data for the year 2024 and above will be processed separately to avoid long processing times."""
 
+import datetime as dt
 from pathlib import Path
 
 import click
@@ -48,6 +49,9 @@ COUNTRIES = {
 def main(upload: bool) -> None:
     # Initialize a new snapshot object for storing data, using a predefined file path structure.
     snap = Snapshot(f"climate/{SNAPSHOT_VERSION}/weekly_wildfires.csv")
+
+    # Add date_accessed
+    snap = modify_metadata(snap)
 
     # Initialize an empty list to hold DataFrames for wildfire data.
     dfs_fires = []
@@ -167,6 +171,13 @@ def main(upload: bool) -> None:
 
     # Add the file to DVC and optionally upload it to S3, based on the `upload` parameter.
     snap.dvc_add(upload=upload)
+
+
+def modify_metadata(snap: Snapshot) -> Snapshot:
+    snap.metadata.origin.date_published = dt.date.today()  # type: ignore
+    snap.metadata.origin.date_accessed = dt.date.today()  # type: ignore
+    snap.metadata.save()
+    return snap
 
 
 if __name__ == "__main__":
