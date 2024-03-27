@@ -72,6 +72,8 @@ def add_citation_full(tb: Table) -> Table:
     CITATION_COPPEDGE = "Coppedge et al. (2015, V-Dem Working Paper Series 2015:6)"
     CITATION_PEMSTEIN = "Pemstein et al. (2024, V-Dem Working Paper Series 2024:21)"
     CITATION_SIGMAN = "Sigman et al. (2015, V-Dem Working Paper Series 2015:22)"
+    CITATION_MCMANN = "McMann et al. (2016, V-Dem Working Paper Series 2016:23)"
+    CITATION_SUNDSTROM = "Sundström et al. (2017, V-Dem Working Paper Series 2017:19)"
     DIMENSIONS = ["", "_low", "_high"]
     citation_coppedge = [
         *[f"libdem_vdem{dim}" for dim in DIMENSIONS],
@@ -104,9 +106,21 @@ def add_citation_full(tb: Table) -> Table:
         *[f"priv_libs_vdem{dim}" for dim in DIMENSIONS],
         *[f"pol_libs_vdem{dim}" for dim in DIMENSIONS],
     ]
+    citation_mcmann = [
+        *[f"corruption_vdem{dim}" for dim in DIMENSIONS],
+        *[f"corr_publsec_vdem{dim}" for dim in DIMENSIONS],
+        *[f"corr_exec_vdem{dim}" for dim in DIMENSIONS],
+    ]
     citation_full = {
+        # Single citations
+        **{i: CITATION_COPPEDGE for i in citation_coppedge},
+        **{i: CITATION_PEMSTEIN for i in citation_pemstein},
+        **{i: CITATION_MCMANN for i in citation_mcmann},
         **{f"electdem_vdem{dim}": "Teorell et al. (2019)" for dim in DIMENSIONS},
         **{f"egaldem_vdem{dim}": CITATION_SIGMAN for dim in DIMENSIONS},
+        **{f"wom_emp_vdem{dim}": CITATION_SUNDSTROM for dim in DIMENSIONS},
+        **{f"wom_pol_par_vdem{dim}": CITATION_SUNDSTROM for dim in DIMENSIONS},
+        # Combined citations
         **{f"egal_vdem{dim}": f"{CITATION_SIGMAN}; {CITATION_COPPEDGE}" for dim in DIMENSIONS},
         **{f"equal_rights_vdem{dim}": f"{CITATION_SIGMAN}; {CITATION_PEMSTEIN}" for dim in DIMENSIONS},
         **{f"equal_access_vdem{dim}": f"Sigman and Lindberg (2017); {CITATION_PEMSTEIN}" for dim in DIMENSIONS},
@@ -115,8 +129,8 @@ def add_citation_full(tb: Table) -> Table:
             f"description_from_producer{dim}": "Sigman and Lindberg (2017, V-Dem Working Paper Series 2017:56); Sigman and Lindberg (2018); {CITATION_PEMSTEIN}"
             for dim in DIMENSIONS
         },
-        **{i: CITATION_COPPEDGE for i in citation_coppedge},
-        **{i: CITATION_PEMSTEIN for i in citation_pemstein},
+        **{f"wom_civ_libs_vdem{dim}": f"{CITATION_SUNDSTROM}; {CITATION_PEMSTEIN}" for dim in DIMENSIONS},
+        **{f"wom_civ_soc_vdem{dim}": f"{CITATION_SUNDSTROM}; {CITATION_PEMSTEIN}" for dim in DIMENSIONS},
     }
     for indicator_name, citation_additional in citation_full.items():
         tb[indicator_name].metadata.origins[0].citation_full += f";\n\n{citation_additional}"

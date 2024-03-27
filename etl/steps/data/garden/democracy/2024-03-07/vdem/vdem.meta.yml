@@ -41,6 +41,8 @@ tables:
           Clarification: The electoral principle of democracy seeks to embody the core value of making rulers responsive to citizens, achieved through electoral competition for the electorate’s approval under circumstances when suffrage is extensive; political and civil society organizations can operate freely; elections are clean and not marred by fraud or systematic irregularities; and elections affect the composition of the chief executive of the country. In between elections, there is freedom of expression and an independent media capable of presenting alternative views on matters of political relevance. In the V-Dem conceptual scheme, electoral democracy is understood as an essential element of any other conception of representative democracy — liberal, participatory, deliberative, egalitarian, or some other.
 
           Scale: Interval, from low to high (0-1).
+
+          Indicator name: `v2x_polyarchy`
         unit: ''
         display:
           numDecimalPlaces: 3
@@ -68,6 +70,8 @@ tables:
           Clarification: The liberal principle of democracy emphasizes the importance of protecting individual and minority rights against the tyranny of the state and the tyranny of the majority. The liberal model takes a "negative" view of political power insofar as it judges the quality of democracy by the limits placed on government. This is achieved by constitutionally protected civil liberties, strong rule of law, an independent judiciary, and effective checks and balances that, together, limit the exercise of executive power. To make this a measure of liberal democracy, the index also takes the level of electoral democracy into account.
 
           Scale: Interval, from low to high (0-1).
+
+          Indicator name: `v2x_libdem`
         unit: ''
         display:
           numDecimalPlaces: 3
@@ -95,6 +99,8 @@ tables:
           Clarification: The participatory principle of democracy emphasizes active participation by citizens in all political processes, electoral and non-electoral. It is motivated by uneasiness about a bedrock practice of electoral democracy: delegating authority to representatives. Thus, direct rule by citizens is preferred, wherever practicable. This model of democracy thus takes suffrage for granted, emphasizing engagement in civil society organizations, direct democracy, and subnational elected bodies. To make it a measure of participatory democracy, the index also takes the level of electoral democracy into account.
 
           Scale: Interval, from low to high (0-1).
+
+          Indicator name: `v2x_partipdem`
         unit: ''
         display:
           numDecimalPlaces: 3
@@ -123,6 +129,8 @@ tables:
           The deliberative principle of democracy focuses on the process by which decisions are reached in a polity. A deliberative process is one in which public reasoning focused on the common good motivates political decisions—as contrasted with emotional appeals, solidary attachments, parochial interests, or coercion. According to this principle, democracy requires more than an aggregation of existing preferences. There should also be respectful dialogue at all levels—from preference formation to final decision—among informed and competent participants who are open to persuasion. To make it a measure of not only the deliberative principle but also of democracy, the index also takes the level of electoral democracy into account.
 
           Scale: Interval, from low to high (0-1).
+
+          Indicator name: `v2x_delibdem`
         unit: ''
         display:
           numDecimalPlaces: 3
@@ -151,6 +159,8 @@ tables:
           The egalitarian principle of democracy holds that material and immaterial inequalities inhibit the exercise of formal rights and liberties, and diminish the ability of citizens from all social groups to participate. Egalitarian democracy is achieved when 1 rights and freedoms of individuals are protected equally across all social groups; and 2 resources are distributed equally across all social groups; 3 groups and individuals enjoy equal access to power. To make it a measure of egalitarian democracy, the index also takes the level of electoral democracy into account.
 
           Scale: Interval, from low to high (0-1).
+
+          Indicator name: `v2x_egaldem`
         unit: ''
         display:
           numDecimalPlaces: 3
@@ -178,6 +188,8 @@ tables:
           Clarification: This index includes all variables in the two indices v2x_freexp and v2xme_altinf.
 
           Scale: Interval, from low to high (0-1).
+
+          Indicator name: `v2x_freexp_altinf`
         unit: ''
         display:
           numDecimalPlaces: 3
@@ -203,6 +215,8 @@ tables:
           Question: To what extent are parties, including opposition parties, allowed to form and to participate in elections, and to what extent are civil society organizations able to form and to operate freely?
 
           Scale: Interval, from low to high (0-1).
+
+          Indicator name: `v2x_frassoc_thick`
         unit: ''
         display:
           numDecimalPlaces: 3
@@ -228,7 +242,10 @@ tables:
           Question: What share of adult citizens as defined by statute has the legal right to vote in national elections?
 
           Clarification:
-          This question does not take into consideration restrictions based on age, residence, having been convicted for crime, or being legally incompetent. It covers legal de jure restrictions, not restrictions that may be operative in practice de facto. The adult population as defined by statute is defined by citizens in the case of independent countries or the people living in the territorial entity in the case of colonies. Universal suffrage is coded as 100%. Universal male suffrage only is coded as 50%. Years before electoral provisions are introduced are scored 0%. The scores do not reflect whether an electoral regime was interrupted or not. Only if new constitutions, electoral laws, or the like explicitly introduce new regulations of suffrage, the scores were adjusted accordingly if the changes suggested doing so. If qualifying criteria other than gender apply such as property, tax payments, income, literacy, region, race, ethnicity, religion, and/or ’economic independence’, estimates have been calculated by combining information on the restrictions with different kinds of statistical information on population size, age distribution, wealth distribution, literacy rates, size of ethnic groups, etc., secondary country-specific sources, and — in the case of very poor information — the conditions in similar countries or colonies. The scores reflect de jure provisions of suffrage extension in percentage of the adult population. If the suffrage law is revised in a way that affects the extension, the scores reflect this change as of the calendar year the law was enacted.
+          This question does not take into consideration restrictions based on age, residence, having been convicted for crime, or being legally incompetent. It covers legal de jure restrictions, not restrictions that may be operative in practice de facto. The adult population as defined by statute is defined by citizens in the case of independent countries or the people living in the territorial entity in the case of colonies. Universal suffrage is coded as 100%. Universal male suffrage only is coded as 50%. Years before electoral provisions are introduced are scored 0%. The scores do not reflect whether an electoral regime was interrupted or not. Only if new constitutions, electoral laws, or the like explicitly introduce new regulations of suffrage, the scores were adjusted accordingly if the changes suggested doing so. If qualifying criteria other than gender apply such as property, tax payments, income, literacy, region, race, ethnicity, religion, and/or 'economic independence', estimates have been calculated by combining information on the restrictions with different kinds of statistical information on population size, age distribution, wealth distribution, literacy rates, size of ethnic groups, etc., secondary country-specific sources, and — in the case of very poor information — the conditions in similar countries or colonies. The scores reflect de jure provisions of suffrage extension in percentage of the adult population. If the suffrage law is revised in a way that affects the extension, the scores reflect this change as of the calendar year the law was enacted.
+
+          Indicator name: `v2x_suffr`
+        description_processing: Converted ratio (0-1) into share (0-100%).
         unit: '%'
         display:
           numDecimalPlaces: 3
@@ -242,6 +259,8 @@ tables:
           Clarification: Free and fair connotes an absence of registration fraud, systematic irregularities, government intimidation of the opposition, vote buying, and election violence.
 
           Scale: Interval, from low to high (0-1).
+
+          Indicator name: `v2xel_frefair`
         unit: ''
         display:
           numDecimalPlaces: 3
@@ -267,6 +286,8 @@ tables:
           Question: Is the chief executive and legislature appointed through popular elections?
 
           Clarification: This index attempts to measure (a) whether the chief executive is elected, either directly elected through popular elections or indirectly through a popularly elected legislature that then appoints the chief executive; and (b) whether the legislature, in presidential systems with a directly elected president that is also chief executive, is directly or indirectly elected. Note that a popular election is minimally defined and also includes sham elections with limited suffrage and no competition. Similarly, "appointment" by legislature only implies selection and/or approval, not the power to dismiss. This index is useful primarily for aggregating higher-order indices and should not necessarily be interpreted as an important element of democracy in its own right.
+
+          Indicator name: `v2x_elecoff`
         unit: ''
         display:
           numDecimalPlaces: 3
@@ -280,6 +301,8 @@ tables:
           Clarification: The liberal principle of democracy emphasizes the importance of protecting individual and minority rights against the tyranny of the state and the tyranny of the majority. The liberal model takes a "negative" view of political power insofar as it judges the quality of democracy by the limits placed on government. This is achieved by constitutionally protected civil liberties, strong rule of law, an independent judiciary, and effective checks and balances that, together, limit the exercise of executive power.
 
           Scale: Interval, from low to high (0-1).
+
+          Indicator name: `v2x_liberal`
         unit: ''
         display:
           numDecimalPlaces: 3
@@ -305,6 +328,8 @@ tables:
           Question: To what extent are laws transparent and rigorously enforced and public administration impartial, and to what extent do citizens enjoy access to justice, secure property rights, freedom from forced labor, freedom of movement, physical integrity rights, and freedom of religion?
 
           Scale: Interval, from low to high (0-1).
+
+          Indicator name: `v2xcl_rol`
         unit: ''
         display:
           numDecimalPlaces: 3
@@ -330,6 +355,8 @@ tables:
           Question: To what extent does the executive respect the constitution and comply with court rulings, and to what extent is the judiciary able to act in an independent fashion?
 
           Scale: Interval, from low to high (0-1).
+
+          Indicator name: `v2x_jucon`
         unit: ''
         display:
           numDecimalPlaces: 3
@@ -357,6 +384,8 @@ tables:
           Clarification: To what extent are the legislature and government agencies e.g., comptroller general, general prosecutor, or ombudsman capable of questioning, investigating, and exercising oversight over the executive?
 
           Scale: Interval, from low to high (0-1).
+
+          Indicator name: `v2xlg_legcon`
         unit: ''
         display:
           numDecimalPlaces: 3
@@ -385,6 +414,8 @@ tables:
           The participatory principle of democracy emphasizes active participation by citizens in all political processes, electoral and non-electoral. It is motivated by uneasiness about a bedrock practice of electoral democracy: delegating authority to representatives. Thus, direct rule by citizens is preferred, wherever practicable. This model of democracy thus takes suffrage for granted, emphasizing engagement in civil society organizations, direct democracy, and subnational elected bodies.
 
           Scale: Interval, from low to high (0-1).
+
+          Indicator name: `v2x_partip`
         unit: ''
         display:
           numDecimalPlaces: 3
@@ -416,6 +447,8 @@ tables:
 
           Scale:
           Interval, from low to high (0-1).
+
+          Indicator name: `v2x_cspart`
         unit: ''
         display:
           numDecimalPlaces: 3
@@ -443,6 +476,8 @@ tables:
           Clarification: Direct popular voting refers here to an institutionalized process by which citizens of a region or country register their choice or opinion on specific issues through a ballot. It is intended to embrace initiatives, referendums, and plebiscites, as those terms are usually understood. It captures some aspects of the more general concept of direct democracy at the national level. The term does not encompass recall elections, deliberative assemblies, or settings in which the vote is not secret or the purview is restricted. Likewise, it does not apply to elections for representatives.
 
           Scale: Interval, from low to high (0-1).
+
+          Indicator name: `v2xdd_dd`
         unit: ''
         display:
           numDecimalPlaces: 3
@@ -456,6 +491,8 @@ tables:
           Clarification: The lowest score would be reserved for a country that has no elected local governments. A medium score would be accorded a country that has elected local governments but where those governments are subordinate to unelected officials at the local level perhaps appointed by a higher-level body. A high score would be accorded to a country in which local governments are elected and able to operate without restrictions from unelected actors at the local level with the exception of judicial bodies. Naturally, local governments remain subordinate to the regional and national governments.
 
           Scale: Interval, from low to high (0-1).
+
+          Indicator name: `v2xel_locelec`
         unit: ''
         display:
           numDecimalPlaces: 3
@@ -483,6 +520,8 @@ tables:
           Clarification: The lowest score would be reserved for a country that has no elected regional governments. A medium score would be accorded a country that has elected regional governments but where those governments are subordinate to unelected officials at the regional level perhaps appointed by a higher-level body. A high score would be accorded to a country in which regional governments are elected and able to operate without restrictions from unelected actors at the regional level with the exception of judicial bodies. Naturally, regional governments remain subordinate to the national government.
 
           Scale: Interval, from low to high (0-1).
+
+          Indicator name: `v2xel_regelec`
         unit: ''
         display:
           numDecimalPlaces: 3
@@ -514,6 +553,8 @@ tables:
 
           Scale:
           Interval, from low to high (0-1).
+
+          Indicator name: `v2xdl_delib`
         unit: ''
         display:
           numDecimalPlaces: 3
@@ -541,6 +582,8 @@ tables:
           Clarification: The egalitarian principle of democracy holds that material and immaterial inequalities inhibit the exercise of formal rights and liberties, and diminish the ability of citizens from all social groups to participate. Egalitarian democracy is achieved when 1 rights and freedoms of individuals are protected equally across all social groups; 2 resources are distributed equally across all social groups; and 3 access to power is equally distributed by gender, socioeconomic class and social group.
 
           Scale: Interval, from low to high (0-1).
+
+          Indicator name: `v2x_egal`
         unit: ''
         display:
           numDecimalPlaces: 3
@@ -568,6 +611,8 @@ tables:
           Clarification: Equal protection means that the state grants and protects rights and freedoms evenly across social groups. To achieve equal protection of rights and freedoms, the state itself must not interfere in the ability of groups to participate and it must also take action to ensure that rights and freedoms of one social group are not threatened by the actions of another group or individual.
 
           Scale: Interval, from low to high (0-1).
+
+          Indicator name: `v2xeg_eqprotec`
         unit: ''
         display:
           numDecimalPlaces: 3
@@ -595,6 +640,8 @@ tables:
           Clarification: The Equal Access subcomponent is based on the idea that neither the protections of rights and freedoms nor the equal distribution of resources is sufficient to ensure adequate representation. Ideally, all groups should enjoy equal de facto capabilities to participate, to serve in positions of political power, to put issues on the agenda, and to influence policymaking.
 
           Scale: Interval, from low to high (0-1).
+
+          Indicator name: `v2xeg_eqaccess`
         unit: ''
         display:
           numDecimalPlaces: 3
@@ -622,6 +669,8 @@ tables:
           Clarification: This component measures the extent to which resources — both tangible and intangible — are distributed in society. An equal distribution of resources supports egalitarian democracy in two ways. First, lower poverty rates and the distribution of goods and services such as food, water, housing, education and healthcare ensure that all individuals are capable of participating in politics and government. In short, basic needs must be met in order for individuals to effectively exercise their rights and freedoms see, for example, Sen 1999, Maslow 1943. Second, high levels of resource inequality undermine the ability of poorer populations to participate meaningfully Aristotle, Dahl 2006. Thus, it is necessary to include not only measures of poverty and the distribution of goods and services, but also the levels of inequality in these distributions, and the proportion of the population who are not eligible for social services i.e. means-tests, particularistic distribution, etc.. This principle also implies that social or economic inequalities can translate into political inequalities, an issue addressed most notably by Walzer 1983, who argues that overlapping "spheres" of inequality are particularly harmful to society. To address these overlapping "spheres", this component also includes measures of the distribution of power in society amongst different socio-economic groups, genders, etc.
 
           Scale: Interval, from low to high (0-1).
+
+          Indicator name: `v2xeg_eqdr`
         unit: ''
         display:
           numDecimalPlaces: 3
@@ -645,6 +694,8 @@ tables:
         title: Election turnout
         description_from_producer: |-
           Question: In this national election, what percentage (%) of all registered voters cast a vote according to official results?
+
+          Indicator name: `v2eltrnout`
         unit: '%'
         display:
           numDecimalPlaces: 2
@@ -654,6 +705,8 @@ tables:
         title: HOS female
         description_from_producer: |-
           If the head of state is a collective body, provide the gender of the person executing the most effective power over this body, or, if no such person exists, answer if any persons in the body are female.
+
+          Indicator name: `v2exfemhos`
         unit: ''
         display:
           numDecimalPlaces: 0
@@ -669,6 +722,8 @@ tables:
           Responses:
           0: Male
           1: Female
+
+          Indicator name: `v2exfemhog`
         unit: ''
         display:
           numDecimalPlaces: 0
@@ -692,6 +747,8 @@ tables:
           2: Sometimes. Some legislators probably engage in these activities.
           3: Very occasionally. There may be a few legislators who engage in these activities but the vast majority do not.
           4: Never, or hardly ever.
+
+          Indicator name: `v2lgcrrpt`
         unit: ''
         display:
           numDecimalPlaces: 3
@@ -715,6 +772,8 @@ tables:
         title: Lower chamber female legislators
         description_from_producer: |-
           Question: What percentage (%) of the lower (or unicameral) chamber of the legislature is female?
+
+          Indicator name: `v2lgfemleg`
         unit: '%'
         display:
           numDecimalPlaces: 3
@@ -733,6 +792,8 @@ tables:
           1: Inferior justification. Elites tend to give reasons why someone should or should not be for doing or not doing something, but the reasons tend to be illogical or false, although they may appeal to many voters. For example, "We must cut spending. The state is inefficient." [The inference is incomplete because addressing inefficiencies would not necessarily reduce spending and it might undermine essential services.]
           2: Qualified justification. Elites tend to offer a single simple reason justifying why the proposed policies contribute to or detract from an outcome. For example, "We must cut spending because taxpayers cannot afford to pay for current programs."
           3: Sophisticated justification. Elites tend to offer more than one or more complex, nuanced and complete justification. For example, "We must cut spending because taxpayers cannot afford to pay for current government programs. Raising taxes would hurt economic growth, and deficit spending would lead to inflation."
+
+          Indicator name: `v2dlreason`
         unit: ''
         display:
           numDecimalPlaces: 3
@@ -765,6 +826,8 @@ tables:
           2: Justifications are for the most part a mix of specific interests and the common good and it is impossible to say which justification is more common than the other.
           3: Justifications are based on a mixture of references to constituency/party/group interests and on appeals to the common good.
           4: Justifications are for the most part almost always based on explicit statements of the common good for society, understood either as the greatest good for the greatest number or as helping the least advantaged in a society.
+
+          Indicator name: `v2dlcommon`
         unit: ''
         display:
           numDecimalPlaces: 3
@@ -799,6 +862,8 @@ tables:
           5: Elites almost always acknowledge counterarguments and explicitly value them, and frequently also even accept them and change their position.
 
           Scale: Ordinal, converted to interval by the measurement model.
+
+          Indicator name: `v2dlcountr`
         unit: ''
         display:
           numDecimalPlaces: 3
@@ -833,6 +898,8 @@ tables:
           5: Consultation engages elites from essentially all parts of the political spectrum and all politically relevant sectors of society and business.
 
           Scale: Ordinal, converted to interval by the measurement model.
+
+          Indicator name: `v2dlconslt`
         unit: ''
         display:
           numDecimalPlaces: 3
@@ -868,6 +935,8 @@ tables:
           5: Large numbers of non-elite groups as well as ordinary people tend to discuss major policies among themselves, in the media, in associations or neighborhoods, or in the streets. Grass-roots deliberation is common and unconstrained.
 
           Scale: Ordinal, converted to interval by the measurement model.
+
+          Indicator name: `v2dlengage`
         unit: ''
         display:
           numDecimalPlaces: 3
@@ -901,6 +970,8 @@ tables:
           Scale: Ordinal, converted to interval by the measurement model.
 
           Notes: For reasons of consistency, as of December, 2014, responses to this question are reversed so that the least democratic response is ”0” and the most democratic is ”4”.
+
+          Indicator name: `v2jucorrdc`
         unit: ''
         display:
           numDecimalPlaces: 3
@@ -938,6 +1009,8 @@ tables:
           4: The law is generally fully respected by the public officials. Arbitrary or biased administration of the law is very limited.
 
           Scale: Ordinal, converted to interval by the measurement model.
+
+          Indicator name: `v2clrspct`
         unit: ''
         display:
           numDecimalPlaces: 3
@@ -970,6 +1043,8 @@ tables:
           3: Members of some social groups enjoy slightly fewer civil liberties than the general population. 4: Members of all salient social groups enjoy the same level of civil liberties.
 
           Scale: Ordinal, converted to interval by the measurement model.
+
+          Indicator name: `v2clsocgrp`
         unit: ''
         display:
           numDecimalPlaces: 3
@@ -1002,6 +1077,8 @@ tables:
           2: Autonomous. Domestic political actors exercise political authority free of the direct control of external political actors.
 
           Scale: Ordinal, converted to interval by the measurement model.
+
+          Indicator name: `v2svdomaut`
         unit: ''
         display:
           numDecimalPlaces: 3
@@ -1030,6 +1107,8 @@ tables:
           0: Non-autonomous. Foreign policy is controlled by an external power, either de facto or de jure. The most common examples of this are colonial rule and military occupation (e.g. quadripartite occupation of Germany in 1945). Situations in which domestic actors provide de jure cover for de facto control by a foreign power should not be construed as semi-autonomy (e.g. Vichy France). Governments in exile that control underground forces waging unconventional warfare are not considered as mitigating an occupation regime (e.g. countries under German occupation during WWII).
           1: Semi-autonomous. An external political actor directly constrains the ability of domestic actors to pursue an independent foreign policy course in some important areas. This may be the product of explicit treaty provisions or well-understood rules of the game from which the subject state cannot withdraw. Examples would include Soviet strictures over rule in so-called "satellite" states in Eastern Europe, and explicitly negotiated postwar settlements (e.g. Austria following WWII).
           2: Autonomous. Domestic political actors exercise foreign policy free of the direct control of external political actors. Direct control is meant to exclude the exercise of constraint or the impact of interdependence in the international system. Treaties in which states concede some part of that control to a supra- or international organization voluntarily, and from which there is a possibility of exit should not be interpreted as a violation of autonomy.
+
+          Indicator name: `v2svinlaut`
         unit: ''
         display:
           numDecimalPlaces: 3
@@ -1058,6 +1137,8 @@ tables:
           With this question we seek to judge the extent of recognition of the preeminent authority of the state over its territory. We are not interested here in perfect control by the state, or whether it is relatively effective in comparison to other states, but an assessment of the areas over which it is hegemonic, e.g. where it is recognized as the preeminent authority and in a contest of wills it can assert its control over political forces that reject its authority. Several illustrative examples may help in this coding. During civil wars the claim of the state to rule is effectively neutralized by insurgent groups (e.g., the Tamil Tigers in Sri Lanka). There are also situations in which criminals or warlords exert control in contravention of state authority (e.g. opium growers in parts of Indochina). There are also cases of failed states where the central government cannot assert control over a share of its territory (e.g., contemporary Somalia). Here, we ask you to estimate the size of the territory that the state has effective control over, as a percentage (%) of the total territory that is officially part of the country.
 
           By "officially part of the country" we refer to international law. In cases where international law is not entirely clear, we refer you to general understandings. For example, China claims sovereignty over Taiwan, but it remains under the control of its own government. For purposes of this question, Taiwan should not be considered a failure to control its territory by the government of the PRC.
+
+          Indicator name: `v2svstterr`
         unit: '%'
         display:
           numDecimalPlaces: 3
@@ -1090,6 +1171,8 @@ tables:
           2: Political power is monopolized by several social groups comprising a majority of the population. This monopoly is institutionalized, i.e., not subject to frequent change.
           3: Either all social groups possess some political power, with some groups having more power than others; or different social groups alternate in power, with one group controlling much of the political power for a period of time, followed by another — but all significant groups have a turn at the seat of power.
           4: All social groups have roughly equal political power or there are no strong ethnic, caste, linguistic, racial, religious, or regional differences to speak of. Social group characteristics are not relevant to politics.
+
+          Indicator name: `v2pepwrsoc`
         unit: ''
         display:
           numDecimalPlaces: 3
@@ -1118,6 +1201,8 @@ tables:
           Presidentialism means the "systemic concentration of political power in the hands of one individual who resists delegating all but the most trivial decision making tasks" (Bratton and Van de Walle, 1997: 63). It relates closely to V-Dem’s index of Horizontal Accountability (v2x_horacc) but focuses more specifically on the extent to which the President is free from constraints by other institutions or actors. The point estimates for this index have been reversed such that the directionality is opposite to the input variables. That is, lower scores indicate a normatively better situation (e.g. more democratic) and higher scores a normatively worse situation (e.g. less democratic). Note that this directionality is opposite of that of other V-Dem indices, which generally run from normatively worse to better.
 
           Scale: Interval, from low to high (0-1).
+
+          Indicator name: `v2xnp_pres`
         unit: ''
         display:
           numDecimalPlaces: 3
@@ -1145,6 +1230,8 @@ tables:
           Clarification: Civil liberty is understood as liberal freedom, where freedom is a property of individuals. Civil liberty is constituted by the absence of physical violence committed by government agents and the absence of constraints of private liberties and political liberties by the government.
 
           Scale: Interval, from low to high (0-1).
+
+          Indicator name: `v2x_civlib`
         unit: ''
         display:
           numDecimalPlaces: 3
@@ -1172,6 +1259,8 @@ tables:
           Clarification: Private liberties are understood as freedom of movement, freedom of religion, freedom from forced labor, and property rights. The index is based on indicators that reflect government repression and that are not directly referring to elections.
 
           Scale: Interval, from low to high (0-1).
+
+          Indicator name: `v2x_clpriv`
         unit: ''
         display:
           numDecimalPlaces: 3
@@ -1199,6 +1288,8 @@ tables:
           Clarification: Political liberties are understood as freedom of association and freedom of expression. Among the set of civil liberties, these liberal rights are the most relevant for political competition and accountability. The index is based on indicators that reflect government repression and that are not directly referring to elections.
 
           Scale: Interval, from low to high (0-1).
+
+          Indicator name: `v2x_clpol`
         unit: ''
         display:
           numDecimalPlaces: 3
@@ -1217,191 +1308,303 @@ tables:
         display:
           numDecimalPlaces: 3
 
-      ##
+      ## 5.5.2 Physical violence index
       phys_integr_libs_vdem:
-        title: ''
+        title: Physical violence index
+        description_from_producer: &description_prod_phys_integr_libs_vdem |-
+          Question: To what extent is physical integrity respected?
+
+          Clarification: Physical integrity is understood as freedom from political killings and torture by the government. Among the set of civil liberties, these liberal rights are the most relevant for political competition and accountability. The index is based on indicators that reflect violence committed by government agents and that are not directly referring to elections.
+
+          Scale: Interval, from low to high (0-1).
+
+          Indicator name: `v2x_clphy`
         unit: ''
         display:
           numDecimalPlaces: 3
 
       phys_integr_libs_vdem_low:
-        title: ''
+        title: "{tables.vdem.variables.phys_integr_libs_vdem.title} (lower bound)"
+        description_from_producer: *description_prod_phys_integr_libs_vdem
         unit: ''
         display:
           numDecimalPlaces: 3
 
       phys_integr_libs_vdem_high:
-        title: ''
+        title: "{tables.vdem.variables.phys_integr_libs_vdem.title} (upper bound)"
+        description_from_producer: *description_prod_phys_integr_libs_vdem
         unit: ''
         display:
           numDecimalPlaces: 3
 
-      ##
+      ## 5.7.1 Political corruption index
       corruption_vdem:
-        title: ''
+        title: Political corruption index
+        description_from_producer: &description_prod_corruption_vdem |-
+          Question: How pervasive is political corruption?
+
+          Clarification: The directionality of the V-Dem corruption index runs from less corrupt to more corrupt unlike the other V-Dem variables that generally run from less democratic to more democratic situation. The corruption index includes measures of six distinct types of corruption that cover both different areas and levels of the polity realm, distinguishing between executive, legislative and judicial corruption. Within the executive realm, the measures also distinguish between corruption mostly pertaining to bribery and corruption due to embezzlement. Finally, they differentiate between corruption in the highest echelons of the executive at the level of the rulers/cabinet on the one hand, and in the public sector at large on the other. The measures thus tap into several distinguished types of corruption: both 'petty' and 'grand'; both bribery and theft; both corruption aimed and influencing law making and that affecting implementation.
+
+          Scale: Interval, from low to high (0-1).
+
+          Indicator name: `v2x_corr`
         unit: ''
         display:
           numDecimalPlaces: 3
 
       corruption_vdem_low:
-        title: ''
+        title: "{tables.vdem.variables.corruption_vdem.title} (lower bound)"
+        description_from_producer: *description_prod_corruption_vdem
         unit: ''
         display:
           numDecimalPlaces: 3
 
       corruption_vdem_high:
-        title: ''
+        title: "{tables.vdem.variables.corruption_vdem.title} (upper bound)"
+        description_from_producer: *description_prod_corruption_vdem
         unit: ''
         display:
           numDecimalPlaces: 3
 
-      ## 
+      ## 5.7.3 Public sector corruption index
       corr_publsec_vdem:
-        title: ''
+        title: Public sector corruption index
+        description_from_producer: &description_prod_corr_publsec_vdem |-
+          Question: To what extent do public sector employees grant favors in exchange for bribes, kickbacks, or other material inducements, and how often do they steal, embezzle, or misappropriate public funds or other state resources for personal or family use?
+
+          Clarification: The point estimates for this index have been reversed such that the directionality is opposite to the input variables. That is, lower scores indicate a normatively better situation (e.g. more democratic) and higher scores a normatively worse situation (e.g. less democratic). Note that this directionality is opposite of that of other V-Dem indices, which generally run from normatively worse to better.
+
+          Scale: Interval, from low to high (0-1).
+
+          Indicator name: `v2x_pubcorr`
         unit: ''
         display:
           numDecimalPlaces: 3
 
       corr_publsec_vdem_low:
-        title: ''
+        title: "{tables.vdem.variables.corr_publsec_vdem.title} (lower bound)"
+        description_from_producer: *description_prod_corr_publsec_vdem
         unit: ''
         display:
           numDecimalPlaces: 3
 
       corr_publsec_vdem_high:
-        title: ''
+        title: "{tables.vdem.variables.corr_publsec_vdem.title} (upper bound)"
+        description_from_producer: *description_prod_corr_publsec_vdem
         unit: ''
         display:
           numDecimalPlaces: 3
 
+      ## 5.7.2 Executive corruption index
       corr_exec_vdem:
-        title: ''
+        title: Executive corruption index
+        description_from_producer: &description_prod_corr_exec_vdem |-
+          Question: How routinely do members of the executive, or their agents grant favors in exchange for bribes, kickbacks, or other material inducements, and how often do they steal, embezzle, or misappropriate public funds or other state resources for personal or family use?
+
+          Clarification: The point estimates for this index have been reversed such that the directionality is opposite to the input variables. That is, lower scores indicate a normatively better situation (e.g. more democratic) and higher scores a normatively worse situation (e.g. less democratic). Note that this directionality is opposite of that of other V-Dem indices, which generally run from normatively worse to better.
+
+          Scale: Interval, from low to high (0-1).
+
+          Indicator name: `v2x_execorr`
         unit: ''
         display:
           numDecimalPlaces: 3
 
       corr_exec_vdem_low:
-        title: ''
+        title: "{tables.vdem.variables.corr_exec_vdem.title} (lower bound)"
+        description_from_producer: *description_prod_corr_exec_vdem
         unit: ''
         display:
           numDecimalPlaces: 3
 
       corr_exec_vdem_high:
-        title: ''
+        title: "{tables.vdem.variables.corr_exec_vdem.title} (upper bound)"
+        description_from_producer: *description_prod_corr_exec_vdem
         unit: ''
         display:
           numDecimalPlaces: 3
 
+      ## 5.8.1 Women political empowerment index
       wom_emp_vdem:
-        title: ''
+        title: Women political empowerment index
+        description_from_producer: &description_prod_wom_emp_vdem |-
+          Question: How politically empowered are women?
+
+          Clarification: Women’s political empowerment is defined as a process of increasing capacity for women, leading to greater choice, agency, and participation in societal decision-making. It is understood to incorporate three equally-weighted dimensions: fundamental civil liberties, women’s open discussion of political issues and participation in civil society organizations, and the descriptive representation of women in formal political positions.
+
+          Scale: Interval, from low to high (0-1).
+
+          Indicator name: `v2x_gender`
         unit: ''
         display:
           numDecimalPlaces: 3
 
       wom_emp_vdem_low:
-        title: ''
+        title: "{tables.vdem.variables.wom_emp_vdem.title} (lower bound)"
+        description_from_producer: *description_prod_wom_emp_vdem
         unit: ''
         display:
           numDecimalPlaces: 3
 
       wom_emp_vdem_high:
-        title: ''
+        title: "{tables.vdem.variables.wom_emp_vdem.title} (upper bound)"
+        description_from_producer: *description_prod_wom_emp_vdem
         unit: ''
         display:
           numDecimalPlaces: 3
 
+      ## 5.8.2 Women civil liberties index
       wom_civ_libs_vdem:
-        title: ''
+        title: Women civil liberties index
+        description_from_producer: &description_prod_wom_civ_libs_vdem |-
+          Question: Do women have the ability to make meaningful decisions in key areas of their lives?
+
+          Clarification: Women’s civil liberties are understood to include freedom of domestic movement, the right to private property, freedom from forced labor, and access to justice.
+
+          Scale: Interval, from low to high (0-1).
+
+          Indicator name: `v2x_gencl`
         unit: ''
         display:
           numDecimalPlaces: 3
 
       wom_civ_libs_vdem_low:
-        title: ''
+        title: "{tables.vdem.variables.wom_civ_libs_vdem.title} (lower bound)"
+        description_from_producer: *description_prod_wom_civ_libs_vdem
         unit: ''
         display:
           numDecimalPlaces: 3
 
       wom_civ_libs_vdem_high:
-        title: ''
+        title: "{tables.vdem.variables.wom_civ_libs_vdem.title} (lower bound)"
+        description_from_producer: *description_prod_wom_civ_libs_vdem
         unit: ''
         display:
           numDecimalPlaces: 3
 
+      ## 5.8.3 Women civil society participation index
       wom_civ_soc_vdem:
-        title: ''
+        title: Women civil society participation index
+        description_from_producer: &description_prod_wom_civ_soc_vdem |-
+          Question: Do women have the ability to express themselves and to form and participate in groups?
+
+          Clarification: Women’s civil society participation is understood to include open discussion of political issues, participation in civil society organizations, and representation in the ranks of journalists.
+
+          Scale: Interval, from low to high (0-1).
+
+          Indicator name: `v2x_gencs`
         unit: ''
         display:
           numDecimalPlaces: 3
 
       wom_civ_soc_vdem_low:
-        title: ''
+        title: "{tables.vdem.variables.wom_civ_soc_vdem.title} (lower bound)"
+        description_from_producer: *description_prod_wom_civ_soc_vdem
         unit: ''
         display:
           numDecimalPlaces: 3
 
       wom_civ_soc_vdem_high:
-        title: ''
+        title: "{tables.vdem.variables.wom_civ_soc_vdem.title} (upper bound)"
+        description_from_producer: *description_prod_wom_civ_soc_vdem
         unit: ''
         display:
           numDecimalPlaces: 3
 
+      ## 5.8.4 Women political participation index
       wom_pol_par_vdem:
-        title: ''
+        title: Women political participation index
+        description_from_producer: &description_prod_wom_pol_par_vdem |-
+          Question: Are women descriptively represented in formal political positions?
+
+          Clarification: Women's political participation is understood to include women's descriptive representation in the legislature and an equal share in the overall distribution of power.
+
+          Scale: Interval, from low to high (0-1).
+
+          Indicator name: `v2x_genpp`
         unit: ''
         display:
           numDecimalPlaces: 3
 
       wom_pol_par_vdem_low:
-        title: ''
+        title: "{tables.vdem.variables.wom_pol_par_vdem.title} (lower bound)"
+        description_from_producer: *description_prod_wom_pol_par_vdem
         unit: ''
         display:
           numDecimalPlaces: 3
 
       wom_pol_par_vdem_high:
-        title: ''
+        title: "{tables.vdem.variables.wom_pol_par_vdem.title} (upper bound)"
+        description_from_producer: *description_prod_wom_pol_par_vdem
         unit: ''
         display:
           numDecimalPlaces: 3
 
+      ## 5.9.1 Rule of law index
       rule_of_law_vdem:
-        title: ''
+        title: Rule of law index
+        description_from_producer: &description_prod_rule_of_law_vdem |-
+          Question: To what extent are laws transparently, independently, predictably, impartially, and equally enforced, and to what extent do the actions of government officials comply with the law?
+
+          Scale: Interval, from low to high (0-1).
+
+          Indicator name: `v2x_rule`
         unit: ''
         display:
           numDecimalPlaces: 3
 
       rule_of_law_vdem_low:
-        title: ''
+        title: "{tables.vdem.variables.rule_of_law_vdem.title} (lower bound)"
+        description_from_producer: *description_prod_rule_of_law_vdem
         unit: ''
         display:
           numDecimalPlaces: 3
 
       rule_of_law_vdem_high:
-        title: ''
+        title: "{tables.vdem.variables.rule_of_law_vdem.title} (upper bound)"
+        description_from_producer: *description_prod_rule_of_law_vdem
         unit: ''
         display:
           numDecimalPlaces: 3
 
+      ## 5.11.1 Core civil society index
       civ_soc_str_vdem:
-        title: ''
+        title: Core civil society index
+        description_from_producer: &description_prod_civ_soc_str_vdem |-
+          Question: How robust is civil society?
+
+          Clarification: The sphere of civil society lies in the public space between the private sphere and the state. Here, citizens organize in groups to pursue their collective interests and ideals. We call these groups civil society organizations CSOs. CSOs include, but are by no means limited to, interest groups, labor unions, spiritual organizations if they are engaged in civic or political activities, social movements, professional associations, charities, and other non-governmental organizations.
+
+          The core civil society index CCSI is designed to provide a measure of a robust civil society, understood as one that enjoys autonomy from the state and in which citizens freely and actively pursue their political and civic goals, however conceived.
+
+          Scale: Interval, from low to high (0-1).
+
+          Indicator name: `v2xcs_ccsi`
         unit: ''
         display:
           numDecimalPlaces: 3
 
       civ_soc_str_vdem_low:
-        title: ''
+        title: "{tables.vdem.variables.civ_soc_str_vdem.title} (lower bound)"
+        description_from_producer: *description_prod_civ_soc_str_vdem
         unit: ''
         display:
           numDecimalPlaces: 3
 
       civ_soc_str_vdem_high:
-        title: ''
+        title: "{tables.vdem.variables.civ_soc_str_vdem.title} (upper bound)"
+        description_from_producer: *description_prod_civ_soc_str_vdem
         unit: ''
         display:
           numDecimalPlaces: 3
 
+      ## 9.4.2 Government effectiveness
       goveffective_vdem_wbgi:
-        title: ''
+        title: Government effectiveness
+        description_from_producer: &description_prod_goveffective_vdem_wbgi |-
+          "Government Effectiveness" combines into a single grouping responses on the quality of public service provision, the quality of the bureaucracy, the competence of civil servants, the independence of the civil service from political pressures, and the credibility of the government’s commitment to policies. The main focus of this index is on "inputs" required for the government to be able to produce and implement good policies and deliver public goods.
+
+          Indicator name: `e_wbgi_gee`
         unit: ''
         display:
           numDecimalPlaces: 3
