@@ -11,6 +11,7 @@ import yaml
 from rich_click.rich_command import RichCommand
 
 from etl import paths
+from etl.config import ADMIN_HOST
 from etl.db import can_connect, get_info_for_etl_datasets
 from etl.steps import extract_step_attributes, load_dag, reverse_graph
 
@@ -18,6 +19,12 @@ log = structlog.get_logger()
 
 # Define the temporary step that will depend on newly created snapshots before they are used by any active steps.
 DAG_TEMP_STEP = "data-private://meadow/temp/latest/step"
+
+# Define the base URL for the grapher datasets (which will be different depending on the environment).
+GRAPHER_DATASET_BASE_URL = f"{ADMIN_HOST}/admin/datasets/"
+
+# Get current date (used to estimate the number of days until the next update of each step).
+TODAY = datetime.now().strftime("%Y-%m-%d")
 
 
 def list_all_steps_in_dag(dag: Dict[str, Any]) -> List[str]:
@@ -257,13 +264,17 @@ class VersionTracker:
         "snapshot://dummy/2020-01-01/dummy_full.csv",
     ]
 
-    def __init__(self, connect_to_db: bool = True, warn_on_archivable: bool = True):
-        # Load dag of active and archive steps (a dictionary where each item is step: set of dependencies).
-        self.dag_all = load_dag(paths.DAG_ARCHIVE_FILE)
+    def __init__(self, connect_to_db: bool = True, warn_on_archivable: bool = True, ignore_archive: bool = False):
+        # Load dag of active steps (a dictionary step: set of dependencies).
+        self.dag_active = load_dag(paths.DAG_FILE)
+        if ignore_archive:
+            # Fully ignore the archive dag (so that all steps are only active steps, and there are no archive steps).
+            self.dag_all = self.dag_active.copy()
+        else:
+            # Load dag of active and archive steps.
+            self.dag_all = load_dag(paths.DAG_ARCHIVE_FILE)
         # Create a reverse dag (a dictionary where each item is step: set of usages).
         self.dag_all_reverse = reverse_graph(graph=self.dag_all)
-        # Load dag of active steps.
-        self.dag_active = load_dag(paths.DAG_FILE)
         # Create a reverse dag (a dictionary where each item is step: set of usages) of active steps.
         self.dag_active_reverse = reverse_graph(graph=self.dag_active)
         # Generate the dag of only archive steps.
@@ -287,6 +298,10 @@ class VersionTracker:
 
         # Warn about archivable steps.
         self.warn_on_archivable = warn_on_archivable
+
+        # Initialize a dataframe of steps that have a grapher dataset (with or without charts) but does not exist in the
+        # dag (active or archive) anymore.
+        self.unknown_steps_with_grapher_dataset_df = None
 
         # Dataframe of step attributes will only be initialized once it's called.
         # This dataframe will have one row per existing step.
@@ -518,8 +533,7 @@ class VersionTracker:
 
         return steps_df
 
-    @staticmethod
-    def _add_info_from_db(steps_df: pd.DataFrame) -> pd.DataFrame:
+    def _add_info_from_db(self, steps_df: pd.DataFrame) -> pd.DataFrame:
         steps_df = steps_df.copy()
         # Fetch all info about datasets from the DB.
         info_df = get_info_for_etl_datasets().rename(
@@ -528,35 +542,98 @@ class VersionTracker:
                 "dataset_name": "db_dataset_name",
                 "is_private": "db_private",
                 "is_archived": "db_archived",
+                "update_period_days": "update_period_days",
+                "views_7d": "charts_views_7d",
+                "views_365d": "charts_views_365d",
             },
             errors="raise",
         )
+        # NOTE: This dataframe may have more steps than steps_df, for different reasons:
+        #  * A grapher dataset was created by ETL, but the ETL step has been removed from the dag, while the
+        #    grapher dataset still exists. This shouldn't happen, but it does happen (mostly for fasttrack drafts).
+        #  * A grapher dataset (in production) has been created by ETL in a branch which is not yet merged. This,
+        #    again, should not happen, but it does happen every now and then, exceptionally.
+        # Identify these steps (and ignore archive DB datasets).
+        self.unknown_steps_with_grapher_dataset_df = info_df[
+            (~info_df["step"].isin(steps_df["step"])) & (~info_df["db_archived"])
+        ].reset_index(drop=True)
+        # Add info from db to steps dataframe.
         steps_df = pd.merge(
             steps_df,
-            info_df[["step", "chart_ids", "db_dataset_id", "db_dataset_name", "db_private", "db_archived"]],
+            info_df[
+                [
+                    "step",
+                    "chart_ids",
+                    "chart_slugs",
+                    "charts_views_7d",
+                    "charts_views_365d",
+                    "db_dataset_id",
+                    "db_dataset_name",
+                    "db_private",
+                    "db_archived",
+                    "update_period_days",
+                ]
+            ],
             on="step",
-            how="outer",
+            how="left",
         )
-        # Fill missing values.
-        for column in ["chart_ids", "all_usages"]:
+        # Fill missing values (e.g. "chart_ids" for steps that are not grapher steps).
+        for column in ["chart_ids", "chart_slugs", "charts_views_7d", "charts_views_365d", "all_usages"]:
             steps_df[column] = [row if isinstance(row, list) else [] for row in steps_df[column]]
         for column in ["db_dataset_id", "db_dataset_name"]:
             steps_df.loc[steps_df[column].isnull(), column] = None
         for column in ["db_private", "db_archived"]:
             steps_df[column] = steps_df[column].fillna(False)
-        # Create a dictionary step: chart_ids.
-        step_chart_ids = steps_df[["step", "chart_ids"]].set_index("step").to_dict()["chart_ids"]
+        # Create a dictionary mapping steps to chart ids,
+        # e.g. {"step_1": [123, 456], "step_2": [789, 1011], ...}.
+        step_to_chart_ids = steps_df[["step", "chart_ids"]].set_index("step").to_dict()["chart_ids"]
+        # Create a dictionary mapping steps to chart slugs,
+        # e.g. {"step_1": [(123, "slug_1"), (456, "slug_2")], "step_2": [], "step_3": ...}.
+        step_to_chart_slugs = steps_df[["step", "chart_slugs"]].set_index("step").to_dict()["chart_slugs"]
+        # Create a dictionary mapping steps to chart views,
+        # e.g. {"step_1": [(123, 1000), (456, 2000)], "step_2": [], "step_3": ...}.
+        step_to_chart_views = {}
+        for metric in ["views_7d", "views_365d"]:
+            step_to_chart_views[metric] = (
+                steps_df[["step", f"charts_{metric}"]].set_index("step").to_dict()[f"charts_{metric}"]
+            )
         # NOTE: Instead of this approach, an alternative would be to add grapher db datasets as steps of a different
         #   channel (e.g. "db").
         # Create a column with all chart ids of all dependencies of each step.
         # To achieve that, for each step, sum the list of chart ids from all its usages to the list of chart ids of
         # the step itself. Then create a sorted list of the set of all those chart ids.
         steps_df["all_chart_ids"] = [
-            sorted(set(sum([step_chart_ids[usage] for usage in row["all_usages"]], step_chart_ids[row["step"]])))  # type: ignore
+            sorted(set(sum([step_to_chart_ids[usage] for usage in row["all_usages"]], step_to_chart_ids[row["step"]])))  # type: ignore
+            for _, row in steps_df.iterrows()
+        ]
+        # Create a column with charts slugs, i.e. for each step, [(123, "some_chart"), (456, "some_other_chart"), ...].
+        steps_df["all_chart_slugs"] = [
+            sorted(
+                set(sum([step_to_chart_slugs[usage] for usage in row["all_usages"]], step_to_chart_slugs[row["step"]]))  # type: ignore
+            )
             for _, row in steps_df.iterrows()
         ]
         # Create a column with the number of charts affected (in any way possible) by each step.
-        steps_df["n_charts"] = [len(chart_ids) for chart_ids in steps_df["all_chart_ids"]]
+        steps_df["n_charts"] = [len(charts_ids) for charts_ids in steps_df["all_chart_ids"]]
+        # Add analytics for all charts.
+        for metric in ["views_7d", "views_365d"]:
+            # Create a column with the number of chart views, i.e. for each step, [(123, 1000), (456, 2000), ...].
+            steps_df[f"all_chart_{metric}"] = [
+                sorted(
+                    set(
+                        sum(
+                            [step_to_chart_views[metric][usage] for usage in row["all_usages"]],  # type: ignore
+                            step_to_chart_views[metric][row["step"]],
+                        )
+                    )
+                )
+                for _, row in steps_df.iterrows()
+            ]
+            # Create a column with the total number of views of all charts affected by each step.
+            steps_df[f"n_charts_{metric}"] = [
+                sum([chart_views[1] for chart_views in charts_views])
+                for charts_views in steps_df[f"all_chart_{metric}"]
+            ]
 
         # Remove all those rows that correspond to DB datasets which:
         # * Are archived.
@@ -587,6 +664,10 @@ class VersionTracker:
         steps_df["dag_file_name"] = [self.get_dag_file_for_step(step=step) for step in self.all_steps]
         steps_df["path_to_script"] = [self.get_path_to_script(step=step, omit_base_dir=True) for step in self.all_steps]
 
+        # Add column for the total number of all dependencies and usges.
+        steps_df["n_all_dependencies"] = [len(dependencies) for dependencies in steps_df["all_dependencies"]]
+        steps_df["n_all_usages"] = [len(usages) for usages in steps_df["all_usages"]]
+
         # Add attributes to steps.
         steps_df = pd.merge(steps_df, self.step_attributes_df, on="step", how="left")
 
@@ -594,8 +675,47 @@ class VersionTracker:
             # Add info from DB.
             steps_df = self._add_info_from_db(steps_df=steps_df)
 
+            # Add columns with the date and the number of days until the next update.
+            steps_df = add_days_to_update_columns(steps_df=steps_df)
+        else:
+            # Add empty columns.
+            for column in [
+                "chart_ids",
+                "chart_slugs",
+                "charts_views_7d",
+                "charts_views_365d",
+                "db_dataset_id",
+                "db_dataset_name",
+                "db_private",
+                "db_archived",
+                "update_period_days",
+                "date_of_next_update",
+                "days_to_update",
+                "all_chart_ids",
+                "all_chart_slugs",
+                "n_charts",
+                "n_charts_views_7d",
+                "n_charts_views_365d",
+            ]:
+                steps_df[column] = None
+
         # Add columns with the list of forward and backwards versions for each step.
         steps_df = self._add_columns_with_different_step_versions(steps_df=steps_df)
+
+        # For convenience, add full local path to dag files to steps dataframe.
+        steps_df["dag_file_path"] = [
+            (paths.DAG_DIR / dag_file_name).with_suffix(".yml") if dag_file_name else None
+            for dag_file_name in steps_df["dag_file_name"].fillna("")
+        ]
+        # For convenience, add full local path to script files.
+        steps_df["full_path_to_script"] = [
+            paths.BASE_DIR / script_file_name if script_file_name else None
+            for script_file_name in steps_df["path_to_script"].fillna("")
+        ]
+
+        # Add column that is true if the step is the latest version.
+        steps_df["is_latest"] = False
+        steps_df.loc[steps_df["version"] == steps_df["latest_version"], "is_latest"] = True
 
         return steps_df
 
@@ -621,11 +741,13 @@ class VersionTracker:
         return self._steps_df
 
     @staticmethod
-    def _log_warnings_and_errors(message, list_affected, warning_or_error):
+    def _log_warnings_and_errors(message, list_affected, warning_or_error, additional_info=None):
         error_message = message
         if len(list_affected) > 0:
-            for affected in list_affected:
+            for i, affected in enumerate(list_affected):
                 error_message += f"\n    {affected}"
+                if additional_info:
+                    error_message += f" - {additional_info[i]}"
             if warning_or_error == "error":
                 log.error(error_message)
             elif warning_or_error == "warning":
@@ -684,7 +806,10 @@ class VersionTracker:
         [self.get_path_to_script(step) for step in self.all_steps]
 
     def check_that_db_datasets_with_charts_are_not_archived(self) -> None:
-        """Check that DB datasets with public charts are not archived (though they may be private)."""
+        """Check that DB datasets with public charts are not archived (though they may be private).
+
+        This check can only be performed if we have access to the DB.
+        """
         archived_db_datasets = sorted(
             set(self.steps_df[(self.steps_df["n_charts"] > 0) & (self.steps_df["db_archived"])]["step"])
         )
@@ -695,7 +820,10 @@ class VersionTracker:
         )
 
     def check_that_db_datasets_with_charts_have_active_etl_steps(self) -> None:
-        """Check that DB datasets with public charts have active ETL steps."""
+        """Check that DB datasets with public charts have active ETL steps.
+
+        This check can only be performed if we have access to the DB.
+        """
         missing_etl_steps = sorted(
             set(
                 self.steps_df[
@@ -711,6 +839,30 @@ class VersionTracker:
             warning_or_error="error",
         )
 
+    def check_that_db_datasets_exist_in_etl(self) -> None:
+        """Check that all active DB datasets (with or without charts) exist in the ETL dag (active or archive).
+
+        This check can only be performed if we have access to the DB.
+        """
+        if self.connect_to_db:
+            # Ensure steps_df is calculated.
+            _ = self.steps_df
+
+        if self.unknown_steps_with_grapher_dataset_df is not None:
+            missing_df = self.unknown_steps_with_grapher_dataset_df.sort_values("db_dataset_name").reset_index(
+                drop=True
+            )
+            dataset_names = missing_df["db_dataset_name"].tolist()
+            dataset_urls = [
+                f"{GRAPHER_DATASET_BASE_URL}{int(dataset_id)}" for dataset_id in missing_df["db_dataset_id"]
+            ]
+            self._log_warnings_and_errors(
+                message="Some DB datasets do not exist in the ETL:",
+                list_affected=dataset_names,
+                warning_or_error="warning",
+                additional_info=dataset_urls,
+            )
+
     def apply_sanity_checks(self) -> None:
         """Apply all sanity checks."""
         self.check_that_active_dependencies_are_defined()
@@ -719,6 +871,7 @@ class VersionTracker:
         if self.connect_to_db:
             self.check_that_db_datasets_with_charts_are_not_archived()
             self.check_that_db_datasets_with_charts_have_active_etl_steps()
+            self.check_that_db_datasets_exist_in_etl()
         # The following check will warn of archivable steps (if warn_on_archivable is True).
         # Depending on whether connect_to_db is True or False, the criterion will be different.
         # When False, the criterion is rather a proxy; True uses a more meaningful criterion.
@@ -759,3 +912,58 @@ def run_version_tracker_checks(skip_db: bool = False, warn_on_archivable: bool =
     Run all version tracker sanity checks.
     """
     VersionTracker(connect_to_db=not skip_db, warn_on_archivable=warn_on_archivable).apply_sanity_checks()
+
+
+def add_days_to_update_columns(steps_df):
+    """Add columns to steps dataframe with the date of next update and the number of days until the next update.
+
+    We currently don't have a clear way to calculate the expected date of update of a dataset.
+    For now, we simply add update_period_days to the step's version.
+    But a dataset may have had a minor update since the main release (while the origins are still the same).
+
+    Alternatively, we could add update_period_days to the date_published of its snapshots.
+    However, if there are multiple snapshots, it is not clear which one to use as a reference.
+    For example, if a dataset uses the income groups dataset, that would have a date_published that is irrelevant.
+    We would need some way to decide which snapshot(s) is (are) the main one(s).
+
+    For now, one option is that, on a minor update, we manually edit update_period_days.
+    For example, if a dataset is expected to be updated every 365 days, but had a minor update after 1 month, we could
+    modify update_period_days to be 335.
+
+    Parameters
+    ----------
+    steps_df : pd.DataFrame
+        Steps dataframe.
+
+    Returns
+    -------
+    df : pd.DataFrame
+        Steps dataframe with the new columns "date_of_next_update" and "days_to_update".
+    """
+    df = steps_df.copy()
+
+    # Extract version from steps data frame, and make it a string.
+    version = df["version"].copy().astype(str)
+    # Assume first of January to those versions that are only given as years.
+    filter_years = (version.str.len() == 4) & (version.str.isdigit())
+    version[filter_years] = version[filter_years] + "-01-01"
+    # Convert version to datetime where possible, setting "latest" to NaT.
+    version_date = pd.to_datetime(version, errors="coerce", format="%Y-%m-%d")
+
+    # Extract update_period_days from steps dataframe, ensuring it is numeric, or NaT where it was None.
+    update_period_days = pd.to_numeric(df["update_period_days"], errors="coerce")
+
+    # Create a column with the date of next update where possible.
+    df["date_of_next_update"] = None
+    filter_dates = (version_date.notnull()) & (update_period_days > 0)
+    df.loc[filter_dates, "date_of_next_update"] = (
+        version_date[filter_dates] + pd.to_timedelta(update_period_days[filter_dates], unit="D")
+    ).dt.strftime("%Y-%m-%d")
+
+    # Create a column with the number of days until the next update.
+    df["days_to_update"] = None
+    df.loc[filter_dates, "days_to_update"] = (
+        pd.to_datetime(df.loc[filter_dates, "date_of_next_update"]) - pd.to_datetime(TODAY)
+    ).dt.days
+
+    return df

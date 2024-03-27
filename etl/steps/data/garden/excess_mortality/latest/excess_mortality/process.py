@@ -9,7 +9,7 @@ from etl.data_helpers import geo
 
 log = get_logger()
 # Maximum year
-YEAR_MAX = 2023
+YEAR_MAX = 2024
 
 
 def process_df(df: pd.DataFrame) -> pd.DataFrame:
@@ -67,19 +67,22 @@ def add_xm_and_p_score(df: pd.DataFrame) -> pd.DataFrame:
             suffix = f"_{digits}"
         else:
             raise ValueError(f"Unknown year {year}")
-        return df.assign(
-            **{
-                f"excess_avg{suffix}": df[year] - df["baseline_avg"],
-                f"p_avg{suffix}": (100 * (df[year] - df["baseline_avg"]) / df["baseline_avg"]).replace(
-                    [np.inf, -np.inf], np.nan
-                ),
-                f"excess_proj{suffix}": df[year] - df[f"baseline_proj{suffix}"],
-                f"p_proj{suffix}": (
-                    100 * (df[year] - df[f"baseline_proj{suffix}"]) / df[f"baseline_proj{suffix}"]
-                ).replace([np.inf, -np.inf], np.nan),
-            }
-        )
-        return df
+        new_indicators = {
+            f"excess_avg{suffix}": df[year] - df["baseline_avg"],
+            f"p_avg{suffix}": (100 * (df[year] - df["baseline_avg"]) / df["baseline_avg"]).replace(
+                [np.inf, -np.inf], np.nan
+            ),
+        }
+        if f"baseline_proj{suffix}" in df.columns:
+            new_indicators.update(
+                {
+                    f"excess_proj{suffix}": df[year] - df[f"baseline_proj{suffix}"],
+                    f"p_proj{suffix}": (
+                        100 * (df[year] - df[f"baseline_proj{suffix}"]) / df[f"baseline_proj{suffix}"]
+                    ).replace([np.inf, -np.inf], np.nan),
+                }
+            )
+        return df.assign(**new_indicators)
 
     def _get_p_scores(df: pd.DataFrame) -> pd.DataFrame:
         # get p-scores and make wide
@@ -88,7 +91,9 @@ def add_xm_and_p_score(df: pd.DataFrame) -> pd.DataFrame:
         for col in cols:
             metrics.append(col)
             for year in [str(year) for year in range(2021, YEAR_MAX + 1)]:
-                metrics.append(f"{col}_{year[-2:]}")
+                col_year = f"{col}_{year[-2:]}"
+                if col_year in df.columns:
+                    metrics.append(col_year)
         df_ = df[COLUMNS_IDX + ["age"] + metrics].copy()
         # Pivot
         df_ = df_.pivot(index=COLUMNS_IDX, columns="age", values=metrics)
@@ -136,28 +141,28 @@ def make_df_long(df: pd.DataFrame) -> pd.DataFrame:
     def _build_yearly_data(df, year, remove_w53):
         year = str(year)
         year_end = year[-2:]
-        df_ = df[
-            [
-                "entity",
-                "time",
-                "time_unit",
-                f"p_avg_{year_end}_0_14",
-                f"p_avg_{year_end}_15_64",
-                f"p_avg_{year_end}_65_74",
-                f"p_avg_{year_end}_75_84",
-                f"p_avg_{year_end}_85p",
-                f"p_avg_{year_end}_all_ages",
-                f"p_proj_{year_end}_0_14",
-                f"p_proj_{year_end}_15_64",
-                f"p_proj_{year_end}_65_74",
-                f"p_proj_{year_end}_75_84",
-                f"p_proj_{year_end}_85p",
-                f"p_proj_{year_end}_all_ages",
-                f"excess_proj_{year_end}_all_ages",
-                f"baseline_proj_{year_end}_all_ages",
-                f"deaths_{year}_all_ages",
-            ]
-        ].copy()
+        cols = [
+            "entity",
+            "time",
+            "time_unit",
+            f"p_avg_{year_end}_0_14",
+            f"p_avg_{year_end}_15_64",
+            f"p_avg_{year_end}_65_74",
+            f"p_avg_{year_end}_75_84",
+            f"p_avg_{year_end}_85p",
+            f"p_avg_{year_end}_all_ages",
+            f"p_proj_{year_end}_0_14",
+            f"p_proj_{year_end}_15_64",
+            f"p_proj_{year_end}_65_74",
+            f"p_proj_{year_end}_75_84",
+            f"p_proj_{year_end}_85p",
+            f"p_proj_{year_end}_all_ages",
+            f"excess_proj_{year_end}_all_ages",
+            f"baseline_proj_{year_end}_all_ages",
+            f"deaths_{year}_all_ages",
+        ]
+        cols = [c for c in cols if c in df.columns]
+        df_ = df[cols].copy()
         if remove_w53:
             # remove week 53 from YYYY, which is only there because of the 2020 projection
             df_ = df_[df_["time"] != 53]

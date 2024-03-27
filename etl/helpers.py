@@ -16,12 +16,13 @@ import jsonref
 import structlog
 import yaml
 from owid import catalog
-from owid.catalog import CHANNEL, DatasetMeta, Table
+from owid.catalog import CHANNEL, DatasetMeta, Table, warnings
 from owid.catalog.datasets import DEFAULT_FORMATS, FileFormat
 from owid.catalog.meta import SOURCE_EXISTS_OPTIONS
 from owid.catalog.tables import (
     combine_tables_description,
     combine_tables_title,
+    combine_tables_update_period_days,
     get_unique_licenses_from_tables,
     get_unique_sources_from_tables,
 )
@@ -97,6 +98,8 @@ def grapher_checks(ds: catalog.Dataset, warn_title_public: bool = True) -> None:
                 tab[col].m.origins or tab[col].m.sources or ds.metadata.sources
             ), f"Column `{col}` must have either sources or origins"
 
+            _validate_description_key(tab[col].m.description_key, col)
+
             # Data Page title uses the following fallback
             # [title_public > grapher_config.title > display.name > title] - [attribution_short] - [title_variant]
             # the Table tab
@@ -109,9 +112,17 @@ def grapher_checks(ds: catalog.Dataset, warn_title_public: bool = True) -> None:
             display_name = (tab[col].m.display or {}).get("name")
             title_public = getattr(tab[col].m.presentation, "title_public", None)
             if warn_title_public and display_name and not title_public:
-                log.warning(
+                warnings.warn(
                     f"Column {col} uses display.name but no presentation.title_public. Ensure the latter is also defined, otherwise display.name will be used as the indicator's title.",
+                    warnings.DisplayNameWarning,
                 )
+
+
+def _validate_description_key(description_key: list[str], col: str) -> None:
+    if description_key:
+        assert not all(
+            len(x) == 1 for x in description_key
+        ), f"Column `{col}` uses string {description_key} as description_key, should be list of strings."
 
 
 def create_dataset(
@@ -158,7 +169,10 @@ def create_dataset(
         licenses = get_unique_licenses_from_tables(tables=tables)
         if any(["origins" in table[column].metadata.to_dict() for table in tables for column in table.columns]):
             # If any of the variables contains "origins" this means that it is a recently created dataset.
-            default_metadata = DatasetMeta(licenses=licenses, title=title, description=description)
+            update_period_days_combined = combine_tables_update_period_days(tables=tables)
+            default_metadata = DatasetMeta(
+                licenses=licenses, title=title, description=description, update_period_days=update_period_days_combined
+            )
         else:
             # None of the variables includes "origins", which means it is an old dataset, with "sources".
             sources = get_unique_sources_from_tables(tables=tables)

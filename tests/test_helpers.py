@@ -7,7 +7,14 @@ import pytest
 from owid import catalog
 
 from etl import paths
-from etl.helpers import PathFinder, create_dataset, get_comments_above_step_in_dag, isolated_env, write_to_dag_file
+from etl.helpers import (
+    PathFinder,
+    _validate_description_key,
+    create_dataset,
+    get_comments_above_step_in_dag,
+    isolated_env,
+    write_to_dag_file,
+)
 
 
 def test_PathFinder_paths():
@@ -421,3 +428,23 @@ include:
         assert get_comments_above_step_in_dag(step="meadow_d", dag_file=temp_file) == "#\n"
         assert get_comments_above_step_in_dag(step="meadow_e", dag_file=temp_file) == "# Comment for meadow_e.\n"
         assert get_comments_above_step_in_dag(step="non_existing_step", dag_file=temp_file) == ""
+
+
+def test__validate_description_key():
+    # Test case 2: description_key with all single-character strings
+    description_key = ["a", "b", "c"]
+    col = "column2"
+    try:
+        _validate_description_key(description_key, col)
+    except AssertionError as e:
+        assert str(e) == f"Column `{col}` uses string {description_key} as description_key, should be list of strings."
+    else:
+        assert False, "AssertionError not raised for description_key with all single-character strings"
+
+    # Test case 3: Valid description_key
+    description_key = ["key1", "key2", "key3"]
+    col = "column3"
+    try:
+        _validate_description_key(description_key, col)
+    except AssertionError as e:
+        assert False, f"AssertionError raised for valid description_key: {description_key}"

@@ -1,0 +1,128 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Climate Change
+    processing_level: minor
+    display:
+      numDecimalPlaces: 0
+  desc_wildfires: &desc_wildfires
+    - Wildfires are detected through the use of satellite imagery obtained from MODIS (Moderate Resolution Imaging Spectroradiometer) and VIIRS (Visible Infrared Imaging Radiometer Suite). These satellite systems are capable of identifying thermal anomalies and alterations in landscape patterns, which are indicative of burning.
+    - The data provider is presently engaged in a global accuracy assessment and acknowledged that they might be underestimating the genuine impact of wildfires, primarily due to constraints imposed by the spatial resolution of the sensors they employ.
+  desc_update: The 2024 data is incomplete and was last updated {TODAY}.
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
+dataset:
+  update_period_days: 7
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
+tables:
+  weekly_wildfires:
+    # Learn more about the available fields:
+    # http://docs.owid.io/projects/etl/architecture/metadata/reference/indicator/
+    variables:
+        area_ha:
+          title: Area burnt by wildfires
+          unit: hectares
+          short_unit: ha
+          description_short: Area burnt by [wildfires](#dod:wildfires) in hectares. {definitions.desc_update}
+          description_key: *desc_wildfires
+
+        area_ha_cumulative:
+          title: Cumulative area burnt by wildfires
+          unit: hectares
+          short_unit: ha
+          description_short: Cumulative area burnt by [wildfires](#dod:wildfires) in hectares.
+          description_key: *desc_wildfires
+
+        share_area_ha:
+          title: Share of the total land area burnt by wildfires
+          unit: '%'
+          short_unit: '%'
+          description_short: The total area consumed by [wildfires](#dod:wildfires) is recorded for each fire event, even if fires occur in the same location multiple times. {definitions.desc_update}
+          description_processing: The share of the total land area burnt by wildfires is calculated by dividing the area burnt by wildfires by the total land area of the country.
+          description_key: *desc_wildfires
+
+
+        share_area_ha_cumulative:
+          title: Cumultive share of the total land area burnt by wildfires
+          unit: '%'
+          short_unit: '%'
+          description_short: Cumultive share of the total land area burnt by [wildfires](#dod:wildfires).
+          description_processing: The share of the total land area burnt by wildfires is calculated by dividing the area burnt by wildfires by the total land area of the country.
+          description_key: *desc_wildfires
+
+        events:
+          title: Number of fires
+          unit: wildfires
+          short_unit: ''
+          description_short: Number of [wildfires](#dod:wildfires). {definitions.desc_update}
+          description_key: *desc_wildfires
+
+        events_cumulative:
+          title: Cumulative number of fires
+          unit: wildfires
+          short_unit: ''
+          description_short: Cumulative number of [wildfires](#dod:wildfires).
+          description_key: *desc_wildfires
+
+        pm2_5:
+          title: PM2.5 emissions from wildfires
+          unit: tonnes
+          short_unit: t
+          description_short: PM2.5 emissions represent the quantity of fine particulate matter (diameter less than 2.5 micrometers) released by [wildfires](#dod:wildfires), in tonnes. {definitions.desc_update}
+          description_key:
+            - PM2.5 can penetrate deep into the respiratory tract, affecting the lungs and potentially entering the bloodstream.
+            - Exposure to PM2.5 is linked to respiratory and cardiovascular issues, and premature death in people with heart or lung disease.
+
+        pm2_5_cumulative:
+          title: Cumulative PM2.5 emissions from wildfires
+          unit: tonnes
+          short_unit: t
+          description_short: PM2.5 emissions represent the quantity of fine particulate matter (diameter less than 2.5 micrometers) released by [wildfires](#dod:wildfires), in tonnes.
+          description_key:
+            - PM2.5 can penetrate deep into the respiratory tract, affecting the lungs and potentially entering the bloodstream.
+            - Exposure to PM2.5 is linked to respiratory and cardiovascular issues, and premature death in people with heart or lung disease.
+
+        co2:
+          title: Carbon dioxide emissions
+          unit: tonnes
+          short_unit: t
+          description_short: Carbon dioxide released by [wildfires](#dod:wildfires) in tonnes. {definitions.desc_update}
+          description_key:
+            - CO₂ emissions contribute to the greenhouse effect, influencing global warming and climate change.
+
+        co2_cumulative:
+          title: Cumulative carbon dioxide emissions
+          unit: tonnes
+          short_unit: t
+          description_short: Carbon dioxide released by [wildfires](#dod:wildfires) in tonnes.
+          description_key:
+            - CO₂ emissions contribute to the greenhouse effect, influencing global warming and climate change.
+
+        area_ha_per_wildfire:
+          title: Area burnt per wildfire
+          unit: hectares
+          short_unit: ha
+          description_short: The average area burnt per [wildfire](#dod:wildfires), in hectares. {definitions.desc_update}
+          description_processing: The area burnt per wildfire is calculated by dividing the area burnt by wildfires by the number of fires.
+          description_key: *desc_wildfires
+
+
+        co2_ha_per_area:
+          title: Carbon dioxide emissions per hectare burnt
+          unit: tonnes
+          short_unit: t
+          description_short: Carbon dioxide emissions per hectare burnt by [wildfires](#dod:wildfires), in tonnes. {definitions.desc_update}
+          description_processing: The carbon dioxide emissions per hectare is calculated by dividing the carbon dioxide emissions by the area burnt by wildfires.
+          description_key: *desc_wildfires
+
+        pm2_5_ha_per_area:
+          title: PM2.5 emissions per hectare burnt
+          unit: tonnes
+          short_unit: t
+          description_short: PM2.5 emissions per hectare burnt by [wildfires](#dod:wildfires), in tonnes. {definitions.desc_update}
+          description_processing: The PM2.5 emissions per hectare is calculated by dividing the PM2.5 emissions by the area burnt by wildfires.
+          description_key: *desc_wildfires

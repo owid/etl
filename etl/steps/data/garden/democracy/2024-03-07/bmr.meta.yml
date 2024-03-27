@@ -1,0 +1,293 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Democracy
+    processing_level: "major"
+
+  others:
+    description_processing_main: &description_processing_main |-
+      Old data for some countries has been imputed based on former countries:
+
+          - Colombia (1821 - 1830): Great Colombia (former)
+          - Costa Rica (1824 - 1837): Federal Republic of Central America (former)
+          - Czechia (1918 - 1992): Czechoslovakia
+          - Ecuador (1821 - 1829): Great Colombia (former)
+          - El Salvador (1824 - 1838): Federal Republic of Central America (former)
+          - Guatemala (1824 - 1838): Federal Republic of Central America (former)
+          - Honduras (1824 - 1838): Federal Republic of Central America (former)
+          - Nicaragua (1824 - 1837): Federal Republic of Central America (former)
+          - North Korea (1800 - 1910): Korea (former)
+          - Panama (1821 - 1830): Great Colombia (former)
+          - Slovakia (1918 - 1992): Czechoslovakia
+          - South Korea (1800 - 1910): Korea (former)
+          - Venezuela (1821 - 1829): Great Colombia (former)
+          - Russia (1922 - 1991): USSR
+          - Ethiopia (1952 - 1992): Ethiopia (former)
+          - Eritrea (1952 - 1992): Ethiopia (former)
+          - Pakistan (1947 - 1971): Pakistan (former)
+          - Bangladesh (1947 - 1970): Pakistan (former)
+    description_key:
+      demoscracy_general: &dk_democracy_1 |-
+        Democracies are political systems in which political leaders are selected under broad suffrage in free and fair elections.
+      democracy_ws: &dk_democracy_ws_1 |-
+        Democracies are political systems in which political leaders are elected under broad suffrage for both men and women in free and fair elections.
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 0
+
+
+tables:
+  bmr:
+    variables:
+      regime:
+        title: Political regime
+        unit: ""
+        processing_level: "minor"
+        description_short: |-
+          Identifies the political regime of a country using the classification by political scientists Carles Boix, Michael Miller, and Sebastian Rosato.
+        description_key:
+          - This indicator distinguishes between (electoral) democracies (score 1) and non-democracies (score 0).
+          - *dk_democracy_1
+        description_processing: *description_processing_main
+        description_from_producer: |-
+          Indicator generated from `democracy_omitteddata`. This is the same measure as `democracy`, except it records an NA for countries occupied during an international war (e.g., the Netherlands 1940-44) or experiencing state collapse during a civil war (e.g., Lebanon 1976-89). The `democracy` variable instead fills in these years as continuations of the same regime type to avoid coding democratic transitions at the end of military occupations. Researchers who want to code this differently can fill in the NA values in `democracy_omitteddata` with 0.
+      regime_womsuffr:
+        title: Political regime (with women's suffrage)
+        unit: ""
+        description_short: |-
+          The variable identifies the political regime of a country using the classification by political scientists Carles Boix, Michael Miller, and Sebastian Rosato.
+        processing_level: "minor"
+        description_key:
+          - This indicator distinguishes between (electoral) democracies (score 1) and non-democracies (score 0).
+          - *dk_democracy_ws_1
+        description_processing: *description_processing_main
+        description_from_producer: |-
+          Indicator generated from `democracy_femalesuffrage:`. This adjusts democracy by also requiring that at least half of adult women have the right to vote. Thirty countries have changed values.
+
+      num_years_in_democracy_consecutive:
+        # formerly: dem_age_bmr_owid
+        title: "Age of democracy"
+        unit: "years"
+        description_short: |-
+          The number of consecutive years passed since the country last became a democracy(not necessarily including women's suffrage).
+        description_key:
+          - *dk_democracy_1
+      num_years_in_democracy:
+        # formerly: dem_exp_bmr_owid
+        title: "Experience with democracy"
+        unit: "years"
+        description_short: |-
+          The number of years a country has been a democracy (not necessarily including women's suffrage) since 1800. It sums all periods of democracy.
+        description_key:
+          - *dk_democracy_1
+      num_years_in_democracy_ws_consecutive:
+        # formerly: dem_ws_age_bmr_owid
+        title: "Age of democracy (with women's suffrage)"
+        unit: "years"
+        description_short: |-
+          The number of consecutive years passed since the country last became a democracy (including women's suffrage).
+        description_key:
+          - *dk_democracy_ws_1
+      num_years_in_democracy_ws:
+        # formerly: dem_ws_exp_bmr_owid
+        title: "Experience with democracy (with women's suffrage)"
+        unit: "years"
+        description_short: |-
+          The number of years a country has been a democracy (including women's suffrage) since 1800. It sums all periods of democracy.
+        description_key:
+          - *dk_democracy_ws_1
+
+  num_countries_regime:
+    common:
+      presentation:
+          grapher_config:
+            hasMapTab: false
+            selectedEntityNames:
+              - Africa
+              - Asia
+              - Europe
+              - North America
+              - Oceania
+              - South America
+    variables:
+      num_countries_regime:
+        title: |-
+          <% if category == 0 %>
+          Number of non-democracies
+          <% elif category == 1 %>
+          Number of democracies
+          <% else %>
+          Number of countries in an unknown regime
+          <% endif %>
+        unit: "countries"
+        description_short: |-
+          <% if category == 0 %>
+          The number of countries that are not democracies in a given year.
+          <% elif category == 1 %>
+          The number of countries that are democracies in a given year.
+          <% else %>
+          The number of countries in the region that are in an unknown regime in a given year.
+          <% endif %>
+        description_key:
+          - *dk_democracy_1
+      num_countries_regime_ws:
+        title: |-
+          <% if category == 0 %>
+          Number of non-democracies, including women's suffrage
+          <% elif category == 1 %>
+          Number of democracies, including women's suffrage
+          <% endif %>
+        unit: "countries"
+        description_short: |-
+          <% if category == 0 %>
+          The number of countries that are not democracies with women's suffrage in a given year.
+          <% elif category == 1 %>
+          The number of countries in the region that are democracies with women's suffrage in a given year.
+          <% endif %>
+        description_key:
+          - *dk_democracy_ws_1
+
+  num_countries_regime_years:
+    common:
+      presentation:
+          grapher_config:
+            hasMapTab: false
+            selectedEntityNames:
+              - Africa
+              - Asia
+              - Europe
+              - North America
+              - Oceania
+              - South America
+    variables:
+      num_countries_years_in_democracy_consec:
+        title: |-
+          <% if category == '91+' %>
+          Number of democracies aged 91 or older
+          <% else %>
+          Number of democracies aged << category >> years
+          <% endif %>
+        unit: "countries"
+        description_short: |-
+          <% if category == '91+' %>
+          The number of countries that have been democracies for 91 or more years straight.
+          <% else %>
+          The number of countries that have been democracies for << category >> years straight.
+          <% endif %>
+        description_key:
+          - *dk_democracy_1
+      num_countries_years_in_democracy_ws_consec:
+        title: |-
+          <% if category == '91+' %>
+          Number of democracies (incl. women's suffrage) aged 91 or older
+          <% else %>
+          Number of democracies (incl. women's suffrage) aged << category >> years
+          <% endif %>
+        unit: "countries"
+        description_short: |-
+          <% if category == '91+' %>
+          The number of countries that have been democracies (including women's suffrage) for 91 or more years straight.
+          <% else %>
+          The number of countries that have been democracies (including women's suffrage) for << category >> years straight.
+          <% endif %>
+        description_key:
+          - *dk_democracy_ws_1
+
+  population_regime:
+    common:
+      presentation:
+          grapher_config:
+            hasMapTab: false
+            selectedEntityNames:
+              - Africa
+              - Asia
+              - Europe
+              - North America
+              - Oceania
+              - South America
+    variables:
+      population_regime:
+        title: |-
+          <% if category == 0 %>
+          People living in non-democracies
+          <% elif category == 1 %>
+          People living in democracies
+          <% else %>
+          People living in countries without regime data
+          <% endif %>
+        unit: "people"
+        description_short: |-
+          <% if category == 0 %>
+          The number of people that live in countries that are not democracies.
+          <% elif category == 1 %>
+          The number of people that live in countries that are democracies.
+          <% else %>
+          The number of people that live in countries for which there is no data.
+          <% endif %>
+        description_key:
+          - *dk_democracy_1
+      population_regime_ws:
+        title: |-
+          <% if category == 0 %>
+          People living in non-democracies, including women's suffrage
+          <% elif category == 1 %>
+          People living in democracies, including women's suffrage
+          <% endif %>
+        unit: "people"
+        description_short: |-
+          <% if category == 0 %>
+          The number of people that live in countries that are not democracies with women's suffrage.
+          <% elif category == 1 %>
+          The number of people that live in countries that are democracies with women's suffrage.
+          <% endif %>
+        description_key:
+          - *dk_democracy_ws_1
+
+  population_regime_years:
+    common:
+      presentation:
+          grapher_config:
+            hasMapTab: false
+            selectedEntityNames:
+              - Africa
+              - Asia
+              - Europe
+              - North America
+              - Oceania
+              - South America
+    variables:
+      population_years_in_democracy_consec:
+        title: |-
+          <% if category == '91+' %>
+          People living in 91-year-old (or older) democracies
+          <% else %>
+          People living in (<< category >>)-year-old democracies
+          <% endif %>
+        unit: "people"
+        description_short: |-
+          <% if category == '91+' %>
+          The number of people that live in countries with 91-year-old democracies.
+          <% else %>
+          The number of people that live in countries with democracies aged << category >> years.
+          <% endif %>
+        description_key:
+          - *dk_democracy_1
+      population_years_in_democracy_ws_consec:
+        title: |-
+          <% if category == '91+' %>
+          People living in 91-year-old (or older) democracies (incl. women's suffrage)
+          <% else %>
+          People living in (<< category >>)-year-old democracies (incl. women's suffrage)
+          <% endif %>
+        unit: "people"
+        description_short: |-
+          <% if category == '91+' %>
+          The number of people that live in countries with 91-year-old democracies with women's suffrage.
+          <% else %>
+          The number of people that live in countries with democracies with women's suffrage aged << category >> years.
+          <% endif %>
+        description_key:
+          - *dk_democracy_ws_1

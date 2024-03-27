@@ -1,0 +1,8 @@
+tables:
+  dummy:
+    variables:
+      dummy_variable:
+        title: Dummy
+        display:
+          numDecimalPlaces: 12
+        description_processing: ''

@@ -1,0 +1,25 @@
+meta:
+  origin:
+    producer: Food and Agriculture Organization of the United Nations
+    title: 'Food Balances: Supply Utilization Accounts (2010-)'
+    description: |-
+      Supply Utilization Accounts (SUA's) present a comprehensive picture of the pattern of a country's food supply during a specified reference period.
+
+      The total quantity of foodstuffs produced in a country added to the total quantity imported and adjusted to any change in stocks that may have occurred since the beginning of the reference period gives the supply available during that period.
+
+      On the utilization side a distinction is made between the quantities exported, fed to livestock, used for seed, put to manufacture for food use and non-food uses, losses during storage and transportation, and food supplies available for human consumption.
+
+      The per caput supply of each such food item available for human consumption is then obtained by dividing the respective quantity by the related data on the population actually partaking of it. Data on per caput food supplies are expressed in terms of quantity and - by applying appropriate food composition factors for all primary and processed products - also in terms of caloric value and protein and fat content.
+    citation_full: 'Food and Agriculture Organization of the United Nations - Food Balances: Supply Utilization Accounts (2010-) (2023).'
+    attribution_short: FAOSTAT
+    url_main: http://www.fao.org/faostat/en/#data/SCL
+    url_download: https://fenixservices.fao.org/faostat/static/bulkdownloads/SUA_Crops_Livestock_E_All_Data_(Normalized).zip
+    date_accessed: '2024-03-14'
+    date_published: '2023-09-04'
+    license:
+      name: CC BY-NC-SA 3.0 IGO
+      url: http://www.fao.org/contact-us/terms/db-terms-of-use/en
+outs:
+  - md5: 7c12b0bb36fe2ff93ff6a57f5a6a419f
+    size: 75493417
+    path: faostat_scl.zip

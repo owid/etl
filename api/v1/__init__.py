@@ -5,9 +5,11 @@ import requests
 import structlog
 import yaml
 from fastapi import APIRouter, BackgroundTasks, HTTPException
+from git import PushInfo
 from git.repo import Repo
 from jsonschema import validate
 from jsonschema.exceptions import ValidationError
+from sqlalchemy.exc import NoResultFound
 from sqlmodel import Session
 
 from apps.backport.datasync.datasync import upload_gzip_dict
@@ -43,6 +45,10 @@ def health() -> dict:
 def update_indicator(update_request: UpdateIndicatorRequest, background_tasks: BackgroundTasks):
     _validate_data_api_url(update_request.dataApiUrl)
 
+    # if no changes, return empty YAML
+    if update_request.indicator.to_meta_dict() == {}:
+        return {"yaml": ""}
+
     # load indicator by catalog path
     db_indicator = _load_and_validate_indicator(update_request.catalogPath)
 
@@ -58,9 +64,9 @@ def update_indicator(update_request: UpdateIndicatorRequest, background_tasks: B
         with open(db_indicator.override_yaml_path, "w") as f:
             f.write(yaml_str)
 
-    # try to commit and push before overwriting file in R2
-    if config.ETL_API_COMMIT:
-        _commit_and_push(db_indicator.override_yaml_path, ":robot: Metadata update by Admin")
+        # try to commit and push before overwriting file in R2
+        if config.ETL_API_COMMIT:
+            _commit_and_push(db_indicator.override_yaml_path, ":robot: Metadata update by Admin")
 
     if not update_request.dryRun:
         _update_indicator_in_r2(db_indicator, update_request.indicator)
@@ -76,6 +82,7 @@ def _generate_yaml_string(meta_dict: Dict[str, Any], override_yml_path: Path) ->
     yaml_str = merge_or_create_yaml(
         meta_dict,
         override_yml_path,
+        delete_empty=True,
     )
 
     # reorder YAML and dump it back again in nice format
@@ -94,7 +101,13 @@ def _generate_yaml_string(meta_dict: Dict[str, Any], override_yml_path: Path) ->
 def _load_and_validate_indicator(catalog_path: str) -> gm.Variable:
     # update YAML file
     with Session(engine) as session:
-        db_indicator = gm.Variable.load_from_catalog_path(session, catalog_path)
+        try:
+            db_indicator = gm.Variable.load_from_catalog_path(session, catalog_path)
+        except NoResultFound:
+            raise HTTPException(
+                404,
+                f"Indicator with catalogPath {catalog_path} not found.",
+            )
 
     if db_indicator.catalogPath is None:
         raise HTTPException(403, "Only indicators from the ETL can be edited. Contact us if you really need this.")
@@ -119,10 +132,28 @@ def _load_and_validate_indicator(catalog_path: str) -> gm.Variable:
 def _commit_and_push(file_path: Path, commit_message: str) -> None:
     repo = Repo(paths.BASE_DIR)
     repo.git.add(file_path)
+
+    # Check if there are changes staged for commit
+    if not repo.index.diff("HEAD"):
+        log.info("No changes to commit", file_path=file_path)
+        return
+
     repo.index.commit(commit_message)
     log.info("git.commit", file_path=file_path)
     origin = repo.remote(name="origin")
-    origin.push()
+    origin.fetch()
+    repo.git.rebase("origin/master")
+    push_info_list = origin.push()
+
+    # Check each PushInfo result for errors or rejections
+    for info in push_info_list:
+        if info.flags & PushInfo.ERROR:
+            raise GitError(f"Push failed with error: {info.summary}")
+        elif info.flags & PushInfo.REJECTED:
+            raise GitError(f"Push rejected: {info.summary}")
+        else:
+            log.info(f"Pushed successfully: {info.summary}")
+
     log.info("git.push", msg=commit_message)
 
 
@@ -154,6 +185,12 @@ def _indicator_metadata_dict(indicator: Indicator, db_indicator: gm.Variable) ->
     if update_period_days:
         meta_dict["dataset"] = {"update_period_days": update_period_days}
 
+    # remove empty description keys
+    for table in meta_dict["tables"].values():
+        for variable in table["variables"].values():
+            if "description_key" in variable:
+                variable["description_key"] = [k for k in variable["description_key"] if k]
+
     return meta_dict
 
 
@@ -182,3 +219,7 @@ def _deep_update(original: Dict[Any, Any], update: Dict[Any, Any]) -> None:
             _deep_update(original[key], value)
         else:
             original[key] = value
+
+
+class GitError(Exception):
+    pass

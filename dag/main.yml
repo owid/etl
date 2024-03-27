@@ -663,6 +663,34 @@ steps:
   data://grapher/wb/2023-12-29/gender_statistics:
     - data://garden/wb/2023-12-29/gender_statistics
 
+  # Missing Data - Children out of school
+  data://garden/missing_data/2024-03-26/children_out_of_school:
+    - data://garden/wb/2023-12-29/gender_statistics
+    - data://garden/wb/2024-03-11/income_groups
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/demography/2023-03-31/population
+  data://grapher/missing_data/2024-03-26/children_out_of_school:
+    - data://garden/missing_data/2024-03-26/children_out_of_school
+
+  # Missing Data - Neuropsychiatric Conditions
+  data://garden/missing_data/2024-03-26/who_neuropsychiatric_conditions:
+    - data://garden/who/2023-08-01/mortality_database
+    - data://garden/wb/2024-03-11/income_groups
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/demography/2023-03-31/population
+  data://grapher/missing_data/2024-03-26/who_neuropsychiatric_conditions:
+    - data://garden/missing_data/2024-03-26/who_neuropsychiatric_conditions
+
+  # Missing Data - Suicides
+  data://garden/missing_data/2024-03-26/who_md_suicides:
+    - data://garden/who/2024-03-24/self_inflicted_injuries
+    - data://garden/wb/2024-03-11/income_groups
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/demography/2023-03-31/population
+  data://grapher/missing_data/2024-03-26/who_md_suicides:
+    - data://garden/missing_data/2024-03-26/who_md_suicides
+
+
   ######################################################################################################################
   # Older versions to be archived once they are not used by any other steps.
 
@@ -684,6 +712,14 @@ steps:
     - data://meadow/geography/2023-11-28/nat_earth_110
 
   ######################################################################################################################
+
+  # WB income groups
+  data://meadow/wb/2024-03-11/income_groups:
+    - snapshot://wb/2024-03-11/income_groups.xlsx
+  data://garden/wb/2024-03-11/income_groups:
+    - data://meadow/wb/2024-03-11/income_groups
+  data://grapher/wb/2024-03-11/income_groups:
+    - data://garden/wb/2024-03-11/income_groups
 
 include:
   - dag/open_numbers.yml
@@ -713,4 +749,5 @@ include:
   - dag/climate.yml
   - dag/urbanization.yml
   - dag/poverty_inequality.yml
+  - dag/democracy.yml
   - dag/temp.yml

@@ -21,7 +21,7 @@ class AdminAPI(object):
             self.session_id = _create_user_session(session, user.email)
             session.commit()
 
-        if engine.url.database == "live_grapher" and engine.url.host == "prod-db":
+        if engine.url.database == "live_grapher" and "prod-db" in str(engine.url.host):
             self.base_url = "https://owid.cloud"
         else:
             self.base_url = f"http://{engine.url.host}"

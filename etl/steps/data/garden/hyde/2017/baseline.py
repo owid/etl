@@ -24,9 +24,16 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
+    ## Harmonize country names
     tb = geo.harmonize_countries(
         df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
     )
+
+    # Replace year 0 with year 1
+    ## More: https://en.wikipedia.org/wiki/Year_zero#cite_note-7
+    # tb["year"] = tb["year"].replace(0, -1)
+
+    ## Set index
     tb = tb.set_index(["country", "year"], verify_integrity=True)
 
     #

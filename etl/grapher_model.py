@@ -275,7 +275,6 @@ class Chart(SQLModel, table=True):
     lastEditedAt: datetime = Field(sa_column=Column("lastEditedAt", DateTime, nullable=False))
     lastEditedByUserId: int = Field(sa_column=Column("lastEditedByUserId", Integer, nullable=False))
     is_indexable: int = Field(sa_column=Column("is_indexable", TINYINT(1), nullable=False, server_default=text("'0'")))
-    isExplorable: int = Field(sa_column=Column("isExplorable", TINYINT(1), nullable=False, server_default=text("'0'")))
     publishedAt: Optional[datetime] = Field(default=None, sa_column=Column("publishedAt", DateTime))
     publishedByUserId: Optional[int] = Field(default=None, sa_column=Column("publishedByUserId", Integer))
 
@@ -293,7 +292,17 @@ class Chart(SQLModel, table=True):
             cond = cls.id == chart_id
         elif slug:
             cond = _json_is(cls.config, "slug", slug)
-        return session.exec(select(cls).where(cond)).one()  # type: ignore
+        else:
+            raise ValueError("Either chart_id or slug must be provided")
+        charts = session.exec(select(cls).where(cond)).all()
+
+        # there can be multiple charts with the same slug, pick the published one
+        if len(charts) > 1:
+            charts = [c for c in charts if c.publishedAt is not None]
+        elif len(charts) == 0:
+            raise NoResultFound()
+
+        return charts[0]
 
     @classmethod
     def load_charts_using_variables(cls, session: Session, variable_ids: List[int]) -> List["Chart"]:

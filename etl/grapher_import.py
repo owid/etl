@@ -223,7 +223,11 @@ def upsert_table(
     # make sure we have unique (year, entity_id) pairs
     vc = table.index.value_counts()
     if (vc > 1).any():
-        raise AssertionError(f"Duplicate (year, entity_id) pairs:\n {vc[vc > 1].index.tolist()}")
+        with Session(engine) as session:
+            duplicates = [
+                (year, entity_id, _get_entity_name(session, entity_id)) for year, entity_id in vc[vc > 1].index.tolist()
+            ]
+        raise AssertionError(f"Duplicates (year, entity_id, entity_name):\n {duplicates}")
 
     if len(table.iloc[:, 0].metadata.sources) > 1:
         raise NotImplementedError(
@@ -302,8 +306,12 @@ def upsert_table(
 
         # upload them to R2
         with ThreadPoolExecutor() as executor:
-            executor.submit(upload_gzip_dict, var_data, db_variable.s3_data_path())
-            executor.submit(upload_gzip_dict, var_metadata, db_variable.s3_metadata_path())
+            futures = [
+                executor.submit(upload_gzip_dict, var_data, db_variable.s3_data_path()),
+                executor.submit(upload_gzip_dict, var_metadata, db_variable.s3_metadata_path()),
+            ]
+            # Wait for futures to complete in case exceptions are raised
+            [f.result() for f in futures]
 
         if verbose:
             log.info("upsert_table.uploaded_to_s3", size=len(table), variable_id=db_variable_id)
@@ -458,3 +466,9 @@ def cleanup_ghost_sources(dataset_id: int, upserted_source_ids: List[int]) -> No
             )
         if db.cursor.rowcount > 0:
             log.warning(f"Deleted {db.cursor.rowcount} ghost sources")
+
+
+def _get_entity_name(session: Session, entity_id: int) -> str:
+    q = select(gm.Entity).where(gm.Entity.id == entity_id)
+    entity = session.exec(q).one_or_none()
+    return entity.name if entity else ""

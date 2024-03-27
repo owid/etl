@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Literal, Optional
+from typing import Any, Dict, List, Literal, Optional, Union
 
 from pydantic import BaseModel, Extra
 
@@ -36,7 +36,7 @@ class Indicator(BaseModel):
     descriptionKey: Optional[List[str]] = None
     presentation: Optional[Presentation] = None
     processingLevel: Optional[Literal["minor", "major", ""]] = None
-    updatePeriodDays: Optional[int] = None
+    updatePeriodDays: Union[int, Literal[""], None] = None
 
     class Config:
         extra = Extra.forbid

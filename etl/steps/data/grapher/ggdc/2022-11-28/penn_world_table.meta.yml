@@ -22,7 +22,7 @@ definitions:
           name: Creative Commons BY 4.0
           url: https://www.rug.nl/ggdc/productivity/pwt
 dataset:
-  update_period_days: 365
+  update_period_days: 550
   sources: []
 tables:
   penn_world_table:

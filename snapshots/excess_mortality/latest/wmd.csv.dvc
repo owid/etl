@@ -1,10 +1,10 @@
 meta:
   source:
-    name: World Mortality Dataset (2023)
+    name: World Mortality Dataset (2024)
     description: |-
       World Mortality Dataset: international data on all-cause mortality.
 
-      This dataset contains country-level data on all-cause mortality in 2015–2022 collected from various sources. They are currently providing data for 122 countries and territories.
+      This dataset contains country-level data on all-cause mortality in 2015–2024 collected from various sources. They are currently providing data for 122 countries and territories.
 
       For a complete and up-to-date list of notes on the dataset, please refer to their GitHub page at https://github.com/akarlinsky/world_mortality/.
 
@@ -13,16 +13,16 @@ meta:
       Published paper available at https://elifesciences.org/articles/69336.
     url: https://github.com/akarlinsky/world_mortality/
     source_data_url: https://raw.githubusercontent.com/akarlinsky/world_mortality/main/world_mortality.csv
-    date_accessed: 2024-02-29
+    date_accessed: 2024-03-27
     publication_date: '2021-06-30'
     publication_year: 2021
     published_by: |-
       Karlinsky & Kobak 2021, Tracking excess mortality across countries during the COVID-19 pandemic with the World Mortality Dataset, eLife https://doi.org/10.7554/eLife.69336
-  name: World Mortality Dataset
+  name: World Mortality Dataset (2024)
   description: |-
     World Mortality Dataset: international data on all-cause mortality.
 
-    This dataset contains country-level data on all-cause mortality in 2015–2022 collected from various sources. They are currently providing data for 122 countries and territories.
+    This dataset contains country-level data on all-cause mortality in 2015–2024 collected from various sources. They are currently providing data for 122 countries and territories.
 
     For a complete and up-to-date list of notes on the dataset, please refer to their GitHub page at https://github.com/akarlinsky/world_mortality/.
 
@@ -33,6 +33,6 @@ meta:
     name: MIT License
     url: https://github.com/akarlinsky/world_mortality/blob/main/LICENSE
 outs:
-  - md5: e9c0abbdfe62f466e9358a78ca07918b
-    size: 1011460
+  - md5: dc4198df574b27da916abcc6cd29b57b
+    size: 1017063
     path: wmd.csv

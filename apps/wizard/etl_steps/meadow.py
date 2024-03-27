@@ -11,7 +11,7 @@ from typing_extensions import Self
 from apps.utils.files import add_to_dag, generate_step_to_channel
 from apps.wizard import utils
 from apps.wizard.etl_steps.utils import load_datasets
-from etl.paths import BASE_DIR, DAG_DIR, MEADOW_DIR
+from etl.paths import BASE_DIR, DAG_DIR
 from etl.steps import load_from_uri
 
 #########################################################
@@ -23,7 +23,7 @@ st.set_page_config(page_title="Wizard: Create a Meadow step", page_icon="🪄")
 add_indentation()
 
 # Available namespaces
-OPTIONS_NAMESPACES = sorted(os.listdir(MEADOW_DIR))
+OPTIONS_NAMESPACES = utils.get_namespaces("meadow")
 
 # Get current directory
 CURRENT_DIR = Path(__file__).parent
@@ -310,7 +310,7 @@ if submitted:
         st.toast("Templates generated. Read the next steps.", icon="✅")
 
         # Update config
-        utils.update_wizard_config(form=form)
+        utils.update_wizard_defaults_from_form(form=form)
     else:
         st.write(form.errors)
         st.error("Form not submitted! Check errors!")

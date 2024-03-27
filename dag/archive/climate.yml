@@ -1,1 +1,20 @@
 steps:
+  #
+  # Met Office Hadley Centre - Near surface temperature anomaly.
+  #
+  data://meadow/met_office_hadley_centre/2023-10-18/near_surface_temperature:
+    - snapshot://met_office_hadley_centre/2023-10-18/near_surface_temperature_global.csv
+    - snapshot://met_office_hadley_centre/2023-10-18/near_surface_temperature_northern_hemisphere.csv
+    - snapshot://met_office_hadley_centre/2023-10-18/near_surface_temperature_southern_hemisphere.csv
+  data://garden/met_office_hadley_centre/2023-10-18/near_surface_temperature:
+    - data://meadow/met_office_hadley_centre/2023-10-18/near_surface_temperature
+  data://grapher/met_office_hadley_centre/2023-10-18/near_surface_temperature:
+    - data://garden/met_office_hadley_centre/2023-10-18/near_surface_temperature
+  #
+  # IMBIE - Ice sheet mass balance.
+  #
+  data://meadow/imbie/2024-01-02/ice_sheet_mass_balance:
+    - snapshot://imbie/2024-01-02/ice_sheet_mass_balance_antarctica.csv
+    - snapshot://imbie/2024-01-02/ice_sheet_mass_balance_greenland.csv
+  data://garden/imbie/2024-01-02/ice_sheet_mass_balance:
+    - data://meadow/imbie/2024-01-02/ice_sheet_mass_balance

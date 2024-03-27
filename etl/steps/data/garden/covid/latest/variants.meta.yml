@@ -1,6 +1,7 @@
-default_display: &default_display
-  yearIsDay: true
-  zeroDay: '2020-01-21'
+definitions:
+  default_display: &default_display
+    yearIsDay: true
+    zeroDay: '2020-01-21'
 
 dataset:
   title: COVID-19 - Variants

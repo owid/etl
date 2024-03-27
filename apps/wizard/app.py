@@ -17,9 +17,15 @@ st.set_page_config(page_title="Wizard", page_icon="🪄")
 st.title("Wizard")
 
 # Initial apps (etl steps)
-toc = [
-    Page(str(CURRENT_DIR / "home.py"), "Home", icon="🏠"),
-]
+toc = []
+for step in WIZARD_CONFIG["main"].values():
+    toc.append(
+        Page(
+            path=str(CURRENT_DIR / step["entrypoint"]),
+            name=step["title"],
+            icon=step["emoji"],
+        )
+    )
 
 # ETL steps
 toc.append(Section(WIZARD_CONFIG["etl"]["title"]))
@@ -35,9 +41,10 @@ for step in WIZARD_CONFIG["etl"]["steps"].values():
 
 # Other apps specified in the config
 for section in WIZARD_CONFIG["sections"]:
-    toc.append(Section(section["title"]))
-    for app in section["apps"]:
-        if app["enable"]:
+    apps = [app for app in section["apps"] if app["enable"]]
+    if apps:
+        toc.append(Section(section["title"]))
+        for app in apps:
             toc.append(
                 Page(
                     path=str(CURRENT_DIR / app["entrypoint"]),

@@ -1,0 +1,45 @@
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
+tables:
+  weekly_wildfires:
+    # Learn more about the available fields:
+    # http://docs.owid.io/projects/etl/architecture/metadata/reference/indicator/
+    variables:
+        area_ha:
+          title: Annual area burnt by wildfires
+
+        area_ha_cumulative:
+          title: Annual cumulative area burnt by wildfires
+
+        share_area_ha:
+          title: Annual share of the total land area burnt by wildfires
+
+        share_area_ha_cumulative:
+          title: Annual cumultive share of the total land area burnt by wildfires
+
+        events:
+          title: Annual number of fires
+
+        events_cumulative:
+          title: Annual cumulative number of fires
+
+        pm2_5:
+          title: Annual PM2.5 emissions from wildfires
+
+        pm2_5_cumulative:
+          title: Annual cumulative PM2.5 emissions from wildfires
+
+        co2:
+          title: Annual carbon dioxide emissions
+
+        co2_cumulative:
+          title: Annual cumulative carbon dioxide emissions
+
+        area_ha_per_wildfire:
+          title: Annual area burnt per wildfire
+
+        co2_ha_per_area:
+          title: Annual carbon dioxide emissions per area burnt
+
+        pm2_5_ha_per_area:
+          title: Annual PM2.5 emissions per area burnt

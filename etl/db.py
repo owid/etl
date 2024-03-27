@@ -8,6 +8,7 @@ from urllib.parse import quote
 import MySQLdb
 import pandas as pd
 import structlog
+import validators
 from sqlalchemy import create_engine
 from sqlalchemy.engine import Engine
 from sqlmodel import Session
@@ -80,7 +81,9 @@ def open_db() -> Generator[DBUtils, None, None]:
             connection.close()
 
 
-def get_dataset_id(dataset_name: str, db_conn: Optional[MySQLdb.Connection] = None) -> Any:
+def get_dataset_id(
+    dataset_name: str, db_conn: Optional[MySQLdb.Connection] = None, version: Optional[str] = None
+) -> Any:
     """Get the dataset ID of a specific dataset name from database.
 
     If more than one dataset is found for the same name, or if no dataset is found, an error is raised.
@@ -91,6 +94,9 @@ def get_dataset_id(dataset_name: str, db_conn: Optional[MySQLdb.Connection] = No
         Dataset name.
     db_conn : MySQLdb.Connection
         Connection to database. Defaults to None, in which case a default connection is created (uses etl.config).
+    version : str
+        ETL version of the dataset. This is necessary when multiple datasets have the same title. In such a case, if
+        version is not given, the function will raise an error.
 
     Returns
     -------
@@ -106,6 +112,10 @@ def get_dataset_id(dataset_name: str, db_conn: Optional[MySQLdb.Connection] = No
         FROM datasets
         WHERE name = '{dataset_name}'
     """
+
+    if version:
+        query += f" AND version = '{version}'"
+
     with db_conn.cursor() as cursor:
         cursor.execute(query)
         result = cursor.fetchall()
@@ -183,6 +193,80 @@ def dict_to_object(d):
     return type("DynamicObject", (object,), d)()
 
 
+def get_charts_slugs(db_conn: Optional[MySQLdb.Connection] = None) -> pd.DataFrame:
+    if db_conn is None:
+        db_conn = get_connection()
+
+    # Get a dataframe chart_id,char_slug, for all charts that have variables with an ETL path.
+    query = """\
+    SELECT
+        c.id AS chart_id,
+        c.slug AS chart_slug
+    FROM charts c
+    LEFT JOIN chart_dimensions cd ON c.id = cd.chartId
+    LEFT JOIN variables v ON cd.variableId = v.id
+    WHERE
+        v.catalogPath IS NOT NULL
+    ORDER BY
+        c.id ASC;
+    """
+
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", UserWarning)
+        df = pd.read_sql(query, con=db_conn)
+
+    # Remove duplicated rows.
+    df = df.drop_duplicates().reset_index(drop=True)
+
+    if len(df[df.duplicated(subset="chart_id")]) > 0:
+        log.warning("There are duplicated chart ids in the chart_ids and slugs table.")
+
+    return df
+
+
+def get_charts_views(db_conn: Optional[MySQLdb.Connection] = None) -> pd.DataFrame:
+    if db_conn is None:
+        db_conn = get_connection()
+
+    # Assumed base url for all charts.
+    base_url = "https://ourworldindata.org/grapher/"
+
+    # Note that for now we extract data for all dates.
+    # It seems that the table only has data for the last day.
+    query = f"""\
+    SELECT
+        url,
+        views_7d,
+        views_14d,
+        views_365d
+    FROM
+        analytics_pageviews
+    WHERE
+        url LIKE '{base_url}%';
+    """
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", UserWarning)
+        df = pd.read_sql(query, con=db_conn)
+
+    # For some reason, there are spurious urls, clean some of them.
+    # Note that validators.url() returns a ValidationError object (instead of False) when the url has spaces.
+    is_url_invalid = [(validators.url(url) is False) or (" " in url) for url in df["url"]]
+    df = df.drop(df[is_url_invalid].index).reset_index(drop=True)
+
+    # Note that some of the returned urls may still be invalid, for example "https://ourworldindata.org/grapher/132".
+
+    # Add chart slug.
+    df["slug"] = [url.replace(base_url, "") for url in df["url"]]
+
+    # Remove url.
+    df = df.drop(columns=["url"], errors="raise")
+
+    if len(df[df.duplicated(subset="slug")]) > 0:
+        log.warning("There are duplicated slugs in the chart analytics table.")
+
+    return df
+
+
 def get_info_for_etl_datasets(db_conn: Optional[MySQLdb.Connection] = None) -> pd.DataFrame:
     if db_conn is None:
         db_conn = get_connection()
@@ -200,7 +284,8 @@ def get_info_for_etl_datasets(db_conn: Optional[MySQLdb.Connection] = None) -> p
         q1.etlPath AS etl_path,
         d.isArchived AS is_archived,
         d.isPrivate AS is_private,
-        q2.chartIds AS chart_ids
+        q2.chartIds AS chart_ids,
+        q2.updatePeriodDays AS update_period_days
     FROM
         (SELECT
             datasetId,
@@ -216,6 +301,7 @@ def get_info_for_etl_datasets(db_conn: Optional[MySQLdb.Connection] = None) -> p
             d.id AS datasetId,
             d.isArchived,
             d.isPrivate,
+            d.updatePeriodDays,
             GROUP_CONCAT(DISTINCT c.id) AS chartIds
         FROM
             datasets d
@@ -244,10 +330,37 @@ def get_info_for_etl_datasets(db_conn: Optional[MySQLdb.Connection] = None) -> p
             "This means that the list of chart ids will be incomplete in some cases. Consider increasing it."
         )
 
+    # Get mapping of chart ids to slugs.
+    chart_id_to_slug = get_charts_slugs(db_conn=db_conn).set_index("chart_id")["chart_slug"].to_dict()
+
     # Instead of having a string of chart ids, make chart_ids a column with lists of integers.
     df["chart_ids"] = [
         [int(chart_id) for chart_id in chart_ids.split(",")] if chart_ids else [] for chart_ids in df["chart_ids"]
     ]
+    # Add a column with lists of chart slugs.
+    # For each row, it will be a list of tuples (chart_id, chart_slug),
+    # e.g. [(123, "chart-slug"), (234, "another-chart-slug"), ...].
+    df["chart_slugs"] = [
+        [(chart_id, chart_id_to_slug[chart_id]) for chart_id in chart_ids] if chart_ids else []
+        for chart_ids in df["chart_ids"]
+    ]
+
+    # Add chart analytics.
+    views_df = get_charts_views(db_conn=db_conn).set_index("slug")
+    # Create a column for each of the views metrics.
+    # For each row, it will be a list of tuples (chart_id, views),
+    # e.g. [(123, 1000), (234, 2000), ...].
+    for metric in views_df.columns:
+        df[metric] = [
+            [
+                (chart_id, views_df[metric][chart_id_to_slug[chart_id]])
+                for chart_id in chart_ids
+                if chart_id_to_slug[chart_id] in views_df.index
+            ]
+            if chart_ids
+            else []
+            for chart_ids in df["chart_ids"]
+        ]
 
     # Make is_archived and is_private boolean columns.
     df["is_archived"] = df["is_archived"].astype(bool)

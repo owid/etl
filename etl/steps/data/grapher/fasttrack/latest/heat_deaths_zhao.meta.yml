@@ -1,0 +1,24 @@
+dataset:
+  title: Heat deaths by region (Zhao et al. 2021)
+  description: |-
+    The share of deaths across regions that are attributed to sub-optimal temperatures. This includes deaths related to cold and heat.
+  licenses:
+    - {}
+tables:
+  heat_deaths_zhao:
+    variables:
+      temp_deaths_fraction:
+        title: Temperature-related deaths (hot and cold)
+        unit: '%'
+        short_unit: '%'
+        description: Share of deaths attributed to sub-optimal temperatures. This includes cold and heat-related deaths.
+      cold_deaths_fraction:
+        title: Cold deaths
+        unit: '%'
+        short_unit: '%'
+        description: Share of deaths attributed to cold temperatures.
+      heat_deaths_fraction:
+        title: Heat deaths
+        unit: '%'
+        short_unit: '%'
+        description: Share of deaths attributed to heat (hot temperatures).

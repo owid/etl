@@ -36,7 +36,7 @@ from pandas.util._decorators import rewrite_axis_style_signature
 from owid.repack import repack_frame
 
 from . import processing_log as pl
-from . import variables
+from . import variables, warnings
 from .meta import (
     SOURCE_EXISTS_OPTIONS,
     License,
@@ -689,6 +689,62 @@ class Table(pd.DataFrame):
 
         return t
 
+    def format(
+        self,
+        keys: Optional[Union[str, List[str]]] = None,
+        verify_integrity: bool = True,
+        underscore: bool = True,
+        sort_rows: bool = True,
+        sort_columns: bool = False,
+        **kwargs,
+    ) -> "Table":
+        """Format the table according to OWID standards.
+
+        This includes underscoring column names, setting index, verifying there is only one entry per index, sorting by index.
+
+        ```
+        tb.format(["country", "year"])
+        ```
+
+        is equivalent to
+
+        ```
+        tb.underscore().set_index(["country", "year"], verify_integrity=True).sort_index()
+        ```
+
+        NOTE: You can use default `tb.format()`, which uses keys = ['country', 'year'].
+
+        Parameters
+        ----------
+        keys : Optional[Union[str, List[str]], optional
+            Index columns. If none is given, will use ["country", "year"].
+        verify_integrity : bool, optional
+            Verify that there is only one entry per index, by default True.
+        underscore : bool, optional
+            Underscore column names, by default True.
+        sort_rows : bool, optional
+            Sort rows by index (ascending), by default True.
+        sort_columns : bool, optional
+            Sort columns (ascending), by default False.
+        kwargs : Any
+            Passed to `Table.underscore` method.
+        """
+        t = self
+        # Underscore
+        if underscore:
+            t = t.underscore(**kwargs)
+        # Set index
+        if keys is None:
+            keys = ["country", "year"]
+        t = t.set_index(keys, verify_integrity=verify_integrity)
+        if sort_columns:
+            t = t.sort_index(axis=1)
+        # Sort rows
+        if sort_rows:
+            t = t.sort_index(axis=0)
+
+        return t
+
     def dropna(self, *args, **kwargs) -> Optional["Table"]:
         tb = super().dropna(*args, **kwargs)
         # inplace returns None
@@ -749,7 +805,7 @@ class Table(pd.DataFrame):
             )
         return self
 
-    def sort_values(self, by: str, *args, **kwargs) -> "Table":
+    def sort_values(self, by: Union[str, List[str]], *args, **kwargs) -> "Table":
         tb = super().sort_values(by=by, *args, **kwargs).copy()
         for column in list(tb.all_columns):
             if isinstance(by, str):
@@ -870,8 +926,9 @@ class Table(pd.DataFrame):
                 else:
                     by_type = "unknown"
                 if isinstance(by_type, str) and by_type == "category":
-                    log.warning(
-                        f"You're grouping by categorical variable `{by}` without using observed=True. This may lead to unexpected behaviour."
+                    warnings.warn(
+                        f"You're grouping by categorical variable `{by}` without using observed=True. This may lead to unexpected behaviour.",
+                        warnings.GroupingByCategoricalWarning,
                     )
 
         return TableGroupBy(
@@ -888,7 +945,7 @@ class Table(pd.DataFrame):
 
         for column in [column for column in self.columns if column not in ignore_columns]:
             if not self[column].metadata.origins:
-                log.warning(f"Variable {column} has no origins.")
+                warnings.warn(f"Variable {column} has no origins.", warnings.NoOriginsWarning)
 
     def rename_index_names(self, renames: Dict[str, str]) -> "Table":
         """Rename index."""
@@ -898,18 +955,22 @@ class Table(pd.DataFrame):
         tb = tb.set_index(column_idx_new)
         return tb
 
-    def fillna(self, value, **kwargs) -> "Table":
+    def fillna(self, value=None, **kwargs) -> "Table":
         """Usual fillna, but, if the object given to fill values with is a table, transfer its metadata to the filled
         table."""
-        tb = super().fillna(value, **kwargs)
+        if value is not None:
+            tb = super().fillna(value, **kwargs)
 
-        if type(value) == type(self):
-            for column in tb.columns:
-                if column in value.columns:
-                    tb._fields[column] = variables.combine_variables_metadata(
-                        variables=[tb[column], value[column]], operation="fillna", name=column
-                    )
+            if type(value) == type(self):
+                for column in tb.columns:
+                    if column in value.columns:
+                        tb._fields[column] = variables.combine_variables_metadata(
+                            variables=[tb[column], value[column]], operation="fillna", name=column
+                        )
+        else:
+            tb = super().fillna(**kwargs)
 
+        tb = cast(Table, tb)
         return tb
 
 
@@ -1588,6 +1649,25 @@ def combine_tables_metadata(tables: List[Table], short_name: Optional[str] = Non
     return metadata
 
 
+def combine_tables_update_period_days(tables: List[Table]) -> Optional[int]:
+    # NOTE: This is a metadata field that is extracted from the dataset, not the table itself.
+
+    # Gather all update_period_days from all tables (technically, from their dataset metadata).
+    update_period_days_gathered = [
+        getattr(table.metadata.dataset, "update_period_days")
+        for table in tables
+        if getattr(table.metadata, "dataset") and getattr(table.metadata.dataset, "update_period_days")
+    ]
+    if len(update_period_days_gathered) > 0:
+        # Get minimum period of all tables.
+        update_period_days_combined = min(update_period_days_gathered)
+    else:
+        # If no table had update_period_days defined, return None.
+        update_period_days_combined = None
+
+    return update_period_days_combined
+
+
 def check_all_variables_have_metadata(tables: List[Table], fields: Optional[List[str]] = None) -> None:
     if fields is None:
         fields = ["origins"]
@@ -1597,7 +1677,8 @@ def check_all_variables_have_metadata(tables: List[Table], fields: Optional[List
         for column in table.columns:
             for field in fields:
                 if not getattr(table[column].metadata, field):
-                    log.warning(f"Table {table_name}, column {column} has no {field}.")
+                    warning_class = warnings.NoOriginsWarning if field == "origins" else warnings.MetadataWarning
+                    warnings.warn(f"Table {table_name}, column {column} has no {field}.", warning_class)
 
 
 def _resolve_collisions(
@@ -1625,6 +1706,29 @@ def _resolve_collisions(
         else:
             raise NotImplementedError()
     return new_cols
+
+
+def multi_merge(tables: List[Table], *args, **kwargs) -> Table:
+    """Merge multiple tables.
+
+    This is a helper function when merging more than two tables on common columns.
+
+    Parameters
+    ----------
+    tables : List[Table]
+        Tables to merge.
+
+    Returns
+    -------
+    combined : Table
+        Merged table.
+
+    """
+    combined = tables[0].copy()
+    for table in tables[1:]:
+        combined = combined.merge(table, *args, **kwargs)
+
+    return combined
 
 
 def _extract_variables(t: Table, cols: Optional[Union[List[str], str]]) -> List[variables.Variable]:
