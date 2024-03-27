@@ -24,7 +24,12 @@ def run(dest_dir: str) -> None:
         df=tb,
         countries_file=paths.country_mapping_path,
     )
-    tb = tb.set_index(["country", "year", "spell", "spell_name"], verify_integrity=True)
+
+    # Remove observations for year 1972 (Altimir does not trust in Gas del Estado's methodology)
+    tb = tb[tb["year"] != 1972].reset_index(drop=True)
+
+    # Set index and sort
+    tb = tb.set_index(["country", "year", "spell", "spell_name"], verify_integrity=True).sort_index()
 
     #
     # Save outputs.

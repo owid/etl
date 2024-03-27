@@ -93,6 +93,11 @@ steps:
   data://garden/wb/2024-01-22/thousand_bins_distribution:
     - data://meadow/wb/2024-01-22/thousand_bins_distribution
 
+  # Chartbook of Economic Inequality
+  data://garden/chartbook/2024-03-21/chartbook_of_economic_inequality:
+  - data://garden/cedlas/2024-03-08/sedlac
+  - data://garden/chartbook/2024-03-21/altimir_1986
+
   # Socio-Economic Database for Latin America and the Caribbean (SEDLAC)
   data://meadow/cedlas/2024-03-08/sedlac:
     - snapshot://cedlas/2024-03-08/sedlac_incomes.xlsx
