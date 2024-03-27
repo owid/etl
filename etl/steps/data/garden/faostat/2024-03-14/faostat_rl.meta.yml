@@ -1,0 +1,148 @@
+dataset:
+  title: 'Inputs: Land Use'
+  update_period_days: 365
+
+definitions:
+  common:
+    processing_level: major
+    presentation:
+      topic_tags:
+        - Agricultural Production
+      attribution_short: FAO
+
+tables:
+  faostat_rl_flat:
+    title: 'Inputs: Land Use'
+    variables:
+      agricultural_land__00006610__area__005110__hectares:
+        title: Agricultural land | 00006610 || Area | 005110 || hectares
+        unit: hectares
+        short_unit: ha
+        processing_level: major
+        display:
+          name: Agricultural land - Area (hectares)
+          shortUnit: ha
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Agricultural land - Area (hectares)
+      agricultural_land__00006610__area__5110pc__hectares_per_capita:
+        title: Agricultural land | 00006610 || Area | 5110pc || hectares per capita
+        unit: hectares per capita
+        short_unit: ha
+        processing_level: major
+        display:
+          name: Agricultural land - Area (hectares per capita)
+          shortUnit: ha
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Agricultural land - Area (hectares per capita)
+      agriculture_area_certified_organic__00006672__area__005110__hectares:
+        title: Agriculture area certified organic | 00006672 || Area | 005110 || hectares
+        unit: hectares
+        short_unit: ha
+        processing_level: major
+        display:
+          name: Agriculture area certified organic - Area (hectares)
+          shortUnit: ha
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Agriculture area certified organic - Area (hectares)
+      agriculture_area_under_organic_agric__00006671__share_in_agricultural_land__007208__percent:
+        title: Agriculture area under organic agric. | 00006671 || Share in Agricultural land | 007208 || Percent
+        unit: Percent
+        short_unit: '%'
+        processing_level: major
+        display:
+          name: Agriculture area under organic agric. - Share in Agricultural land (Percent)
+          shortUnit: '%'
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Agriculture area under organic agric. - Share in Agricultural land (Percent)
+      agriculture__00006602__area__005110__hectares:
+        title: Agriculture | 00006602 || Area | 005110 || hectares
+        unit: hectares
+        short_unit: ha
+        processing_level: major
+        display:
+          name: Agriculture - Area (hectares)
+          shortUnit: ha
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Agriculture - Area (hectares)
+      arable_land__00006621__area__005110__hectares:
+        title: Arable land | 00006621 || Area | 005110 || hectares
+        unit: hectares
+        short_unit: ha
+        processing_level: major
+        display:
+          name: Arable land - Area (hectares)
+          shortUnit: ha
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Arable land - Area (hectares)
+      cropland__00006620__area__005110__hectares:
+        title: Cropland | 00006620 || Area | 005110 || hectares
+        unit: hectares
+        short_unit: ha
+        processing_level: major
+        display:
+          name: Cropland - Area (hectares)
+          shortUnit: ha
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Cropland - Area (hectares)
+      forest_land__00006646__area__005110__hectares:
+        title: Forest land | 00006646 || Area | 005110 || hectares
+        unit: hectares
+        short_unit: ha
+        processing_level: major
+        display:
+          name: Forest land - Area (hectares)
+          shortUnit: ha
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Forest land - Area (hectares)
+      naturally_regenerating_forest__00006717__area__005110__hectares:
+        title: Naturally regenerating forest | 00006717 || Area | 005110 || hectares
+        unit: hectares
+        short_unit: ha
+        processing_level: major
+        display:
+          name: Naturally regenerating forest - Area (hectares)
+          shortUnit: ha
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Naturally regenerating forest - Area (hectares)
+      permanent_meadows_and_pastures__00006655__area__005110__hectares:
+        title: Permanent meadows and pastures | 00006655 || Area | 005110 || hectares
+        unit: hectares
+        short_unit: ha
+        processing_level: major
+        display:
+          name: Permanent meadows and pastures - Area (hectares)
+          shortUnit: ha
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Permanent meadows and pastures - Area (hectares)
+      permanent_meadows_and_pastures__00006655__share_in_land_area__007209__percent:
+        title: Permanent meadows and pastures | 00006655 || Share in Land area | 007209 || Percent
+        unit: Percent
+        short_unit: '%'
+        processing_level: major
+        display:
+          name: Permanent meadows and pastures - Share in Land area (Percent)
+          shortUnit: '%'
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Permanent meadows and pastures - Share in Land area (Percent)
+      planted_forest__00006716__area__005110__hectares:
+        title: Planted Forest | 00006716 || Area | 005110 || hectares
+        unit: hectares
+        short_unit: ha
+        processing_level: major
+        display:
+          name: Planted Forest - Area (hectares)
+          shortUnit: ha
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Planted Forest - Area (hectares)

@@ -1,0 +1,27 @@
+dataset:
+  title: 'Investment: Credit to Agriculture'
+  update_period_days: 365
+
+definitions:
+  common:
+    processing_level: major
+    presentation:
+      topic_tags:
+        - Agricultural Production
+      attribution_short: FAO
+
+tables:
+  faostat_ic_flat:
+    title: 'Investment: Credit to Agriculture'
+    variables:
+      credit_to_agriculture__forestry_and_fishing__00023068__agriculture_orientation_index_usd__006159:
+        title: Credit to Agriculture, Forestry and Fishing | 00023068 || Agriculture orientation index US$ | 006159 ||
+        unit: ''
+        short_unit: ''
+        processing_level: major
+        display:
+          name: Credit to Agriculture, Forestry and Fishing - Agriculture orientation index US$ ()
+          shortUnit: ''
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Credit to Agriculture, Forestry and Fishing - Agriculture orientation index US$ ()

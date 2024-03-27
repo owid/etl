@@ -1,0 +1,27 @@
+dataset:
+  title: 'Production: Value of Agricultural Production'
+  update_period_days: 365
+
+definitions:
+  common:
+    processing_level: major
+    presentation:
+      topic_tags:
+        - Agricultural Production
+      attribution_short: FAO
+
+tables:
+  faostat_qv_flat:
+    title: 'Production: Value of Agricultural Production'
+    variables:
+      agriculture__00002051__gross_production_value__current_thousand_usd__000057__1000_usd:
+        title: Agriculture | 00002051 || Gross Production Value (current thousand US$) | 000057 || 1000 USD
+        unit: 1000 USD
+        short_unit: ''
+        processing_level: major
+        display:
+          name: Agriculture - Gross Production Value (current thousand US$) (1000 USD)
+          shortUnit: ''
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Agriculture - Gross Production Value (current thousand US$) (1000 USD)

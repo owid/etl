@@ -1,0 +1,64 @@
+dataset:
+  title: 'SDG Indicators: SDG Indicators'
+  update_period_days: 365
+
+definitions:
+  common:
+    processing_level: major
+    presentation:
+      topic_tags:
+        - Agricultural Production
+      attribution_short: FAO
+
+tables:
+  faostat_sdgb_flat:
+    title: 'SDG Indicators: SDG Indicators'
+    variables:
+      _12_3_1a_food_loss_percentage__000000000024044__value__006121__percent:
+        title: 12.3.1a Food loss percentage | 000000000024044 || Value | 006121 || Percent
+        unit: Percent
+        short_unit: '%'
+        processing_level: major
+        display:
+          name: 12.3.1a Food loss percentage - Value (Percent)
+          shortUnit: '%'
+          numDecimalPlaces: 2
+        presentation:
+          title_public: 12.3.1a Food loss percentage - Value (Percent)
+      _2_1_1_number_of_undernourished_people__000000000024001__value__006132__million_number:
+        title: 2.1.1 Number of undernourished people | 000000000024001 || Value | 006132 || million Number
+        unit: million Number
+        short_unit: million No
+        processing_level: major
+        display:
+          name: 2.1.1 Number of undernourished people - Value (million Number)
+          shortUnit: million No
+          numDecimalPlaces: 2
+        presentation:
+          title_public: 2.1.1 Number of undernourished people - Value (million Number)
+      _2_1_1_prevalence_of_undernourishment__000000000024000__value__006121__percent:
+        title: 2.1.1 Prevalence of undernourishment | 000000000024000 || Value | 006121 || Percent
+        unit: Percent
+        short_unit: '%'
+        processing_level: major
+        display:
+          name: 2.1.1 Prevalence of undernourishment - Value (Percent)
+          shortUnit: '%'
+          numDecimalPlaces: 2
+        presentation:
+          title_public: 2.1.1 Prevalence of undernourishment - Value (Percent)
+      ? |-
+        _2_1_2_prevalence_of_severe_food_insecurity__both_sexes_or_no_breakdown_by_sex__all_age_ranges_or_no_breakdown_by_age__no_breakdown_by_urbanisation__00000024003_ttt__value__006121__percent
+      : title: |-
+          2.1.2 Prevalence of severe food insecurity (both sexes or no breakdown by sex) (all age ranges or no breakdown by age) (no breakdown by urbanisation) | 00000024003-TTT || Value | 006121 || Percent
+        unit: Percent
+        short_unit: '%'
+        processing_level: major
+        display:
+          name: |-
+            2.1.2 Prevalence of severe food insecurity (both sexes or no breakdown by sex) (all age ranges or no breakdown by age) (no breakdown by urbanisation) - Value (Percent)
+          shortUnit: '%'
+          numDecimalPlaces: 2
+        presentation:
+          title_public: |-
+            2.1.2 Prevalence of severe food insecurity (both sexes or no breakdown by sex) (all age ranges or no breakdown by age) (no breakdown by urbanisation) - Value (Percent)

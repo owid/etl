@@ -3,6 +3,14 @@ dataset:
   description: |
     Additional variables created using data from different FAOSTAT datasets.
 
+definitions:
+  common:
+    processing_level: major
+    presentation:
+      topic_tags:
+        - Agricultural Production
+      attribution_short: FAO
+
 tables:
   arable_land_per_crop_output:
     variables:
@@ -34,8 +42,9 @@ tables:
         title: "Area used for production"
         unit: "hectares"
         short_unit: "ha"
-        # Description will be fetched from the original FAOSTAT item and element descriptions.
-        # description: |
+        description_short: |-
+          Total surface area used for production of a given crop.
+        # description_from_producer will be fetched from the original FAOSTAT item and element descriptions.
   share_of_sustainable_and_overexploited_fish:
     variables:
       sustainable_fish:

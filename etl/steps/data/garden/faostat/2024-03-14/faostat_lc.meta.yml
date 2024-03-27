@@ -1,0 +1,50 @@
+dataset:
+  title: 'Agri-Environmental Indicators: Land Cover'
+  update_period_days: 365
+
+definitions:
+  common:
+    processing_level: major
+    presentation:
+      topic_tags:
+        - Agricultural Production
+      attribution_short: FAO
+
+tables:
+  faostat_lc_flat:
+    title: 'Agri-Environmental Indicators: Land Cover'
+    variables:
+      artificial_surfaces__including_urban_and_associated_areas__00006970__area_from_cgls__005006__thousand_hectares:
+        title: Artificial surfaces (including urban and associated areas) | 00006970 || Area from CGLS | 005006 || thousand
+          Hectares
+        unit: thousand Hectares
+        short_unit: 1000 ha
+        processing_level: major
+        display:
+          name: Artificial surfaces (including urban and associated areas) - Area from CGLS (thousand Hectares)
+          shortUnit: 1000 ha
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Artificial surfaces (including urban and associated areas) - Area from CGLS (thousand Hectares)
+      inland_water_bodies__00006981__area_from_cgls__005006__thousand_hectares:
+        title: Inland water bodies | 00006981 || Area from CGLS | 005006 || thousand Hectares
+        unit: thousand Hectares
+        short_unit: 1000 ha
+        processing_level: major
+        display:
+          name: Inland water bodies - Area from CGLS (thousand Hectares)
+          shortUnit: 1000 ha
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Inland water bodies - Area from CGLS (thousand Hectares)
+      shrub_covered_areas__00006976__area_from_cci_lc__005008__thousand_hectares:
+        title: Shrub-covered areas | 00006976 || Area from CCI_LC | 005008 || thousand Hectares
+        unit: thousand Hectares
+        short_unit: 1000 ha
+        processing_level: major
+        display:
+          name: Shrub-covered areas - Area from CCI_LC (thousand Hectares)
+          shortUnit: 1000 ha
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Shrub-covered areas - Area from CCI_LC (thousand Hectares)
