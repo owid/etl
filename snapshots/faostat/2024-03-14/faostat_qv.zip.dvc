@@ -7,7 +7,7 @@ meta:
 
       The livestock value of production is measured in terms of indigenous meat.
     citation_full: 'Food and Agriculture Organization of the United Nations - Production: Value of Agricultural Production (2024).'
-    attribution_short: FAOSTAT
+    attribution_short: FAO
     url_main: http://www.fao.org/faostat/en/#data/QV
     url_download: https://fenixservices.fao.org/faostat/static/bulkdownloads/Value_of_Production_E_All_Data_(Normalized).zip
     date_accessed: '2024-03-14'

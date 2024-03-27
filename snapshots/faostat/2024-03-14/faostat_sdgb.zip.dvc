@@ -7,7 +7,7 @@ meta:
 
       This FAOSTAT domain complements the global SDG database administered by the United Nations Statistical Division, as well as FAO's SDG indicators portal, by providing access to the available data for each of these indicators.
     citation_full: 'Food and Agriculture Organization of the United Nations - SDG Indicators: SDG Indicators (2023).'
-    attribution_short: FAOSTAT
+    attribution_short: FAO
     url_main: http://www.fao.org/faostat/en/#data/SDGB
     url_download: https://fenixservices.fao.org/faostat/static/bulkdownloads/SDG_BulkDownloads_E_All_Data_(Normalized).zip
     date_accessed: '2024-03-14'

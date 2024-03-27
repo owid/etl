@@ -12,7 +12,7 @@ meta:
       Indicators are classified along the four dimensions of food security -- availability, access, utilization and stability.
     citation_full: |-
       Food and Agriculture Organization of the United Nations - Food Security and Nutrition: Suite of Food Security Indicators (2023).
-    attribution_short: FAOSTAT
+    attribution_short: FAO
     url_main: http://www.fao.org/faostat/en/#data/FS
     url_download: https://fenixservices.fao.org/faostat/static/bulkdownloads/Food_Security_Data_E_All_Data_(Normalized).zip
     date_accessed: '2024-03-14'
