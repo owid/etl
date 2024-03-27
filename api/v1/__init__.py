@@ -5,6 +5,7 @@ import requests
 import structlog
 import yaml
 from fastapi import APIRouter, BackgroundTasks, HTTPException
+from git import PushInfo
 from git.repo import Repo
 from jsonschema import validate
 from jsonschema.exceptions import ValidationError
@@ -140,7 +141,19 @@ def _commit_and_push(file_path: Path, commit_message: str) -> None:
     repo.index.commit(commit_message)
     log.info("git.commit", file_path=file_path)
     origin = repo.remote(name="origin")
-    origin.push()
+    origin.fetch()
+    repo.git.rebase("origin/master")
+    push_info_list = origin.push()
+
+    # Check each PushInfo result for errors or rejections
+    for info in push_info_list:
+        if info.flags & PushInfo.ERROR:
+            raise GitError(f"Push failed with error: {info.summary}")
+        elif info.flags & PushInfo.REJECTED:
+            raise GitError(f"Push rejected: {info.summary}")
+        else:
+            log.info(f"Pushed successfully: {info.summary}")
+
     log.info("git.push", msg=commit_message)
 
 
@@ -206,3 +219,7 @@ def _deep_update(original: Dict[Any, Any], update: Dict[Any, Any]) -> None:
             _deep_update(original[key], value)
         else:
             original[key] = value
+
+
+class GitError(Exception):
+    pass
