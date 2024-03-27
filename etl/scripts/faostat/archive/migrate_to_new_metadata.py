@@ -61,7 +61,7 @@ def main():
                     "title": variable["name"],
                     "unit": variable["unit"],
                     "short_unit": variable["shortUnit"],
-                    "description_from_producer": variable["description"],
+                    # "description_from_producer": variable["description"],
                     "processing_level": "major",
                     "display": {"name": display["name"], "shortUnit": variable["shortUnit"], "numDecimalPlaces": 2},
                     "presentation": {
