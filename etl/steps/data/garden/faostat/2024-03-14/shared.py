@@ -1743,18 +1743,13 @@ def prepare_wide_table(tb: Table) -> Table:
     # Add variable description.
     variable_name_mapping = _variable_name_map(tb, "variable_description")
     for column in tb_wide.columns:
-        tb_wide[column].metadata.description = variable_name_mapping[column]
+        tb_wide[column].metadata.description_from_producer = variable_name_mapping[column]
 
     # Add display and presentation parameters (for grapher).
-    for column in tb_wide.columns:
-        tb_wide[column].metadata.display = {}
-        tb_wide[column].metadata.presentation = VariablePresentationMeta()
-
-    # Display name.
     variable_name_mapping = _variable_name_map(tb, "variable_display_name")
     for column in tb_wide.columns:
-        tb_wide[column].metadata.display["name"] = variable_name_mapping[column]
-        tb_wide[column].metadata.presentation.title_public = variable_name_mapping[column]
+        tb_wide[column].metadata.display = {"name": variable_name_mapping[column]}
+        tb_wide[column].metadata.presentation = VariablePresentationMeta(title_public=variable_name_mapping[column])
 
     # Ensure columns have the optimal dtypes, but codes are categories.
     log.info("prepare_wide_table.optimize_table_dtypes", shape=tb_wide.shape)
