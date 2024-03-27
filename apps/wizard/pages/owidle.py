@@ -817,9 +817,9 @@ if st.session_state.owidle_difficulty == 2:
         col21, col22 = st.columns(HARD_MODE_COL_SIZES_2)
         col21.markdown(f"**Guessed Year**")
         col22.markdown(
-                "**Distance from Guessed Year to Correct**",
-                help="🔽/🔼: up to ±5 years\n\n🔽🔽/🔼🔼: up to ±15 years\n\n🔽🔽🔽/🔼🔼🔼: up to ±30 years\n\n🔽🔽🔽🔽/🔼🔼🔼🔼: >30 years difference",
-            )
+            "**Distance from Guessed Year to Correct**",
+            help="🔽/🔼: up to ±5 years\n\n🔽🔽/🔼🔼: up to ±15 years\n\n🔽🔽🔽/🔼🔼🔼: up to ±30 years\n\n🔽🔽🔽🔽/🔼🔼🔼🔼: >30 years difference",
+        )
 
 # LAYOUT OTHERWISE
 if st.session_state.owidle_difficulty < 2:
