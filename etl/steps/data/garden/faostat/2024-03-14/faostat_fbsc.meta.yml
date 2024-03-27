@@ -20,88 +20,88 @@ tables:
         short_unit: kcal/day
         processing_level: major
         display:
-          name: Alcoholic Beverages - Food available for consumption (kilocalories per day per capita)
+          name: Daily supply of calories from alcoholic beverages
           shortUnit: kcal/day
           numDecimalPlaces: 2
         presentation:
-          title_public: Alcoholic Beverages - Food available for consumption (kilocalories per day per capita)
+          title_public: Daily supply of calories from alcoholic beverages
       all_egg_products__00002744__food_available_for_consumption__0664pc__kilocalories_per_day_per_capita:
         title: All egg products | 00002744 || Food available for consumption | 0664pc || kilocalories per day per capita
         unit: kilocalories per day per capita
         short_unit: kcal/day
         processing_level: major
         display:
-          name: All egg products - Food available for consumption (kilocalories per day per capita)
+          name: Daily supply of calories from all egg products
           shortUnit: kcal/day
           numDecimalPlaces: 2
         presentation:
-          title_public: All egg products - Food available for consumption (kilocalories per day per capita)
+          title_public: Daily supply of calories from all egg products
       all_egg_products__00002744__food_available_for_consumption__0674pc__grams_of_protein_per_day_per_capita:
         title: All egg products | 00002744 || Food available for consumption | 0674pc || grams of protein per day per capita
         unit: grams of protein per day per capita
         short_unit: g/day
         processing_level: major
         display:
-          name: All egg products - Food available for consumption (grams of protein per day per capita)
+          name: Daily supply of proteins from egg products
           shortUnit: g/day
           numDecimalPlaces: 2
         presentation:
-          title_public: All egg products - Food available for consumption (grams of protein per day per capita)
+          title_public: Daily supply of proteins from egg products
       animal_products__00002941__food_available_for_consumption__0674pc__grams_of_protein_per_day_per_capita:
         title: Animal Products | 00002941 || Food available for consumption | 0674pc || grams of protein per day per capita
         unit: grams of protein per day per capita
         short_unit: g/day
         processing_level: major
         display:
-          name: Animal Products - Food available for consumption (grams of protein per day per capita)
+          name: Daily supply of proteins from animal products
           shortUnit: g/day
           numDecimalPlaces: 2
         presentation:
-          title_public: Animal Products - Food available for consumption (grams of protein per day per capita)
+          title_public: Daily supply of proteins from animal products
       animal_fats_group__00002946__food_available_for_consumption__0664pc__kilocalories_per_day_per_capita:
         title: Animal fats group | 00002946 || Food available for consumption | 0664pc || kilocalories per day per capita
         unit: kilocalories per day per capita
         short_unit: kcal/day
         processing_level: major
         display:
-          name: Animal fats group - Food available for consumption (kilocalories per day per capita)
+          name: Daily supply of calories from animal fats
           shortUnit: kcal/day
           numDecimalPlaces: 2
         presentation:
-          title_public: Animal fats group - Food available for consumption (kilocalories per day per capita)
+          title_public: Daily supply of calories from animal fats
       apples__00002617__food_available_for_consumption__0645pc__kilograms_per_year_per_capita:
         title: Apples | 00002617 || Food available for consumption | 0645pc || kilograms per year per capita
         unit: kilograms per year per capita
         short_unit: kg
         processing_level: major
         display:
-          name: Apples - Food available for consumption (kilograms per year per capita)
+          name: Per capita consumption of apples
           shortUnit: kg
           numDecimalPlaces: 2
         presentation:
-          title_public: Apples - Food available for consumption (kilograms per year per capita)
+          title_public: Per capita consumption of apples
       bananas__00002615__food_available_for_consumption__0645pc__kilograms_per_year_per_capita:
         title: Bananas | 00002615 || Food available for consumption | 0645pc || kilograms per year per capita
         unit: kilograms per year per capita
         short_unit: kg
         processing_level: major
         display:
-          name: Bananas - Food available for consumption (kilograms per year per capita)
+          name: Per capita consumption of bananas
           shortUnit: kg
           numDecimalPlaces: 2
         presentation:
-          title_public: Bananas - Food available for consumption (kilograms per year per capita)
+          title_public: Per capita consumption of bananas
       barley__00002513__food_available_for_consumption__0664pc__kilocalories_per_day_per_capita:
         title: Barley | 00002513 || Food available for consumption | 0664pc || kilocalories per day per capita
         unit: kilocalories per day per capita
         short_unit: kcal/day
         processing_level: major
         display:
-          name: Barley - Food available for consumption (kilocalories per day per capita)
+          name: Daily supply of calories from barley
           shortUnit: kcal/day
           numDecimalPlaces: 2
         presentation:
-          title_public: Barley - Food available for consumption (kilocalories per day per capita)
+          title_public: Daily supply of calories from barley
       cephalopods__00002766__production__005511__tonnes:
         title: Cephalopods | 00002766 || Production | 005511 || tonnes
         unit: tonnes
@@ -185,33 +185,33 @@ tables:
         short_unit: kcal/day
         processing_level: major
         display:
-          name: Cereals, Other - Food available for consumption (kilocalories per day per capita)
+          name: Daily supply of calories from other cereals
           shortUnit: kcal/day
           numDecimalPlaces: 2
         presentation:
-          title_public: Cereals, Other - Food available for consumption (kilocalories per day per capita)
+          title_public: Daily supply of calories from other cereals
       citrus__other__00002614__food_available_for_consumption__0645pc__kilograms_per_year_per_capita:
         title: Citrus, Other | 00002614 || Food available for consumption | 0645pc || kilograms per year per capita
         unit: kilograms per year per capita
         short_unit: kg
         processing_level: major
         display:
-          name: Citrus, Other - Food available for consumption (kilograms per year per capita)
+          name: Per capita consumption of other citrus
           shortUnit: kg
           numDecimalPlaces: 2
         presentation:
-          title_public: Citrus, Other - Food available for consumption (kilograms per year per capita)
+          title_public: Per capita consumption of other citrus
       cocoa_beans__00002633__food_available_for_consumption__0645pc__kilograms_per_year_per_capita:
         title: Cocoa beans | 00002633 || Food available for consumption | 0645pc || kilograms per year per capita
         unit: kilograms per year per capita
         short_unit: kg
         processing_level: major
         display:
-          name: Cocoa beans - Food available for consumption (kilograms per year per capita)
+          name: Per capita consumption of cocoa beans
           shortUnit: kg
           numDecimalPlaces: 2
         presentation:
-          title_public: Cocoa beans - Food available for consumption (kilograms per year per capita)
+          title_public: Per capita consumption of cocoa beans
       crustaceans__00002765__production__005511__tonnes:
         title: Crustaceans | 00002765 || Production | 005511 || tonnes
         unit: tonnes
@@ -229,11 +229,11 @@ tables:
         short_unit: kg
         processing_level: major
         display:
-          name: Dates - Food available for consumption (kilograms per year per capita)
+          name: Per capita consumption of dates
           shortUnit: kg
           numDecimalPlaces: 2
         presentation:
-          title_public: Dates - Food available for consumption (kilograms per year per capita)
+          title_public: Per capita consumption of dates
       demersal_fish__00002762__production__005511__tonnes:
         title: Demersal Fish | 00002762 || Production | 005511 || tonnes
         unit: tonnes
@@ -251,55 +251,55 @@ tables:
         short_unit: kg
         processing_level: major
         display:
-          name: Eggs - Food available for consumption (kilograms per year per capita)
+          name: Per capita consumption of eggs
           shortUnit: kg
           numDecimalPlaces: 2
         presentation:
-          title_public: Eggs - Food available for consumption (kilograms per year per capita)
+          title_public: Per capita consumption of eggs
       eggs__00002949__food_available_for_consumption__0664pc__kilocalories_per_day_per_capita:
         title: Eggs | 00002949 || Food available for consumption | 0664pc || kilocalories per day per capita
         unit: kilocalories per day per capita
         short_unit: kcal/day
         processing_level: major
         display:
-          name: Eggs - Food available for consumption (kilocalories per day per capita)
+          name: Daily supply of calories from eggs
           shortUnit: kcal/day
           numDecimalPlaces: 2
         presentation:
-          title_public: Eggs - Food available for consumption (kilocalories per day per capita)
+          title_public: Daily supply of calories from eggs
       fish_and_seafood__00002960__food_available_for_consumption__0645pc__kilograms_per_year_per_capita:
         title: Fish and seafood | 00002960 || Food available for consumption | 0645pc || kilograms per year per capita
         unit: kilograms per year per capita
         short_unit: kg
         processing_level: major
         display:
-          name: Fish and seafood - Food available for consumption (kilograms per year per capita)
+          name: Per capita consumption of fish and seafood
           shortUnit: kg
           numDecimalPlaces: 2
         presentation:
-          title_public: Fish and seafood - Food available for consumption (kilograms per year per capita)
+          title_public: Per capita consumption of fish and seafood
       fish_and_seafood__00002960__food_available_for_consumption__0664pc__kilocalories_per_day_per_capita:
         title: Fish and seafood | 00002960 || Food available for consumption | 0664pc || kilocalories per day per capita
         unit: kilocalories per day per capita
         short_unit: kcal/day
         processing_level: major
         display:
-          name: Fish and seafood - Food available for consumption (kilocalories per day per capita)
+          name: Daily supply of calories from fish and seafood
           shortUnit: kcal/day
           numDecimalPlaces: 2
         presentation:
-          title_public: Fish and seafood - Food available for consumption (kilocalories per day per capita)
+          title_public: Daily supply of calories from fish and seafood
       fish_and_seafood__00002960__food_available_for_consumption__0674pc__grams_of_protein_per_day_per_capita:
         title: Fish and seafood | 00002960 || Food available for consumption | 0674pc || grams of protein per day per capita
         unit: grams of protein per day per capita
         short_unit: g/day
         processing_level: major
         display:
-          name: Fish and seafood - Food available for consumption (grams of protein per day per capita)
+          name: Daily supply of proteins from fish and seafood
           shortUnit: g/day
           numDecimalPlaces: 2
         presentation:
-          title_public: Fish and seafood - Food available for consumption (grams of protein per day per capita)
+          title_public: Daily supply of proteins from fish and seafood
       fish_and_seafood__00002960__production__005511__tonnes:
         title: Fish and seafood | 00002960 || Production | 005511 || tonnes
         unit: tonnes
@@ -328,44 +328,44 @@ tables:
         short_unit: kg
         processing_level: major
         display:
-          name: Fruit - Food available for consumption (kilograms per year per capita)
+          name: Per capita consumption of fruit
           shortUnit: kg
           numDecimalPlaces: 2
         presentation:
-          title_public: Fruit - Food available for consumption (kilograms per year per capita)
+          title_public: Per capita consumption of fruit
       fruit__00002919__food_available_for_consumption__0664pc__kilocalories_per_day_per_capita:
         title: Fruit | 00002919 || Food available for consumption | 0664pc || kilocalories per day per capita
         unit: kilocalories per day per capita
         short_unit: kcal/day
         processing_level: major
         display:
-          name: Fruit - Food available for consumption (kilocalories per day per capita)
+          name: Daily supply of calories from fruit
           shortUnit: kcal/day
           numDecimalPlaces: 2
         presentation:
-          title_public: Fruit - Food available for consumption (kilocalories per day per capita)
+          title_public: Daily supply of calories from fruit
       fruits__other__00002625__food_available_for_consumption__0645pc__kilograms_per_year_per_capita:
         title: Fruits, other | 00002625 || Food available for consumption | 0645pc || kilograms per year per capita
         unit: kilograms per year per capita
         short_unit: kg
         processing_level: major
         display:
-          name: Fruits, other - Food available for consumption (kilograms per year per capita)
+          name: Per capita consumption of other fruits
           shortUnit: kg
           numDecimalPlaces: 2
         presentation:
-          title_public: Fruits, other - Food available for consumption (kilograms per year per capita)
+          title_public: Per capita consumption of other fruits
       grapefruit__00002613__food_available_for_consumption__0645pc__kilograms_per_year_per_capita:
         title: Grapefruit | 00002613 || Food available for consumption | 0645pc || kilograms per year per capita
         unit: kilograms per year per capita
         short_unit: kg
         processing_level: major
         display:
-          name: Grapefruit - Food available for consumption (kilograms per year per capita)
+          name: Per capita consumption of grapefruit
           shortUnit: kg
           numDecimalPlaces: 2
         presentation:
-          title_public: Grapefruit - Food available for consumption (kilograms per year per capita)
+          title_public: Per capita consumption of grapefruit
       grapes_and_products__excl_wine__00002620__food_available_for_consumption__0645pc__kilograms_per_year_per_capita:
         title: Grapes and products (excl wine) | 00002620 || Food available for consumption | 0645pc || kilograms per year
           per capita
@@ -373,33 +373,33 @@ tables:
         short_unit: kg
         processing_level: major
         display:
-          name: Grapes and products (excl wine) - Food available for consumption (kilograms per year per capita)
+          name: Per capita consumption of grapes and products, excluding wine
           shortUnit: kg
           numDecimalPlaces: 2
         presentation:
-          title_public: Grapes and products (excl wine) - Food available for consumption (kilograms per year per capita)
+          title_public: Per capita consumption of grapes and products, excluding wine
       lemons_and_limes__00002612__food_available_for_consumption__0645pc__kilograms_per_year_per_capita:
         title: Lemons and limes | 00002612 || Food available for consumption | 0645pc || kilograms per year per capita
         unit: kilograms per year per capita
         short_unit: kg
         processing_level: major
         display:
-          name: Lemons and limes - Food available for consumption (kilograms per year per capita)
+          name: Per capita consumption of lemons and limes
           shortUnit: kg
           numDecimalPlaces: 2
         presentation:
-          title_public: Lemons and limes - Food available for consumption (kilograms per year per capita)
+          title_public: Per capita consumption of lemons and limes
       maize__00002514__food_available_for_consumption__0664pc__kilocalories_per_day_per_capita:
         title: Maize | 00002514 || Food available for consumption | 0664pc || kilocalories per day per capita
         unit: kilocalories per day per capita
         short_unit: kcal/day
         processing_level: major
         display:
-          name: Maize - Food available for consumption (kilocalories per day per capita)
+          name: Daily supply of calories from maize
           shortUnit: kcal/day
           numDecimalPlaces: 2
         presentation:
-          title_public: Maize - Food available for consumption (kilocalories per day per capita)
+          title_public: Daily supply of calories from maize
       marine_fish__other__00002764__production__005511__tonnes:
         title: Marine Fish, Other | 00002764 || Production | 005511 || tonnes
         unit: tonnes
@@ -417,154 +417,154 @@ tables:
         short_unit: kg
         processing_level: major
         display:
-          name: Meat, Other - Food available for consumption (kilograms per year per capita)
+          name: Per capita consumption of other meat
           shortUnit: kg
           numDecimalPlaces: 2
         presentation:
-          title_public: Meat, Other - Food available for consumption (kilograms per year per capita)
+          title_public: Per capita consumption of other meat
       meat__other__00002735__food_available_for_consumption__0664pc__kilocalories_per_day_per_capita:
         title: Meat, Other | 00002735 || Food available for consumption | 0664pc || kilocalories per day per capita
         unit: kilocalories per day per capita
         short_unit: kcal/day
         processing_level: major
         display:
-          name: Meat, Other - Food available for consumption (kilocalories per day per capita)
+          name: Daily supply of calories from other meat
           shortUnit: kcal/day
           numDecimalPlaces: 2
         presentation:
-          title_public: Meat, Other - Food available for consumption (kilocalories per day per capita)
+          title_public: Daily supply of calories from other meat
       meat__other__00002735__food_available_for_consumption__0674pc__grams_of_protein_per_day_per_capita:
         title: Meat, Other | 00002735 || Food available for consumption | 0674pc || grams of protein per day per capita
         unit: grams of protein per day per capita
         short_unit: g/day
         processing_level: major
         display:
-          name: Meat, Other - Food available for consumption (grams of protein per day per capita)
+          name: Daily supply of proteins from other meat
           shortUnit: g/day
           numDecimalPlaces: 2
         presentation:
-          title_public: Meat, Other - Food available for consumption (grams of protein per day per capita)
+          title_public: Daily supply of proteins from other meat
       meat__beef__00002731__food_available_for_consumption__0645pc__kilograms_per_year_per_capita:
         title: Meat, beef | 00002731 || Food available for consumption | 0645pc || kilograms per year per capita
         unit: kilograms per year per capita
         short_unit: kg
         processing_level: major
         display:
-          name: Meat, beef - Food available for consumption (kilograms per year per capita)
+          name: Per capita consumption of beef
           shortUnit: kg
           numDecimalPlaces: 2
         presentation:
-          title_public: Meat, beef - Food available for consumption (kilograms per year per capita)
+          title_public: Per capita consumption of beef
       meat__beef__00002731__food_available_for_consumption__0664pc__kilocalories_per_day_per_capita:
         title: Meat, beef | 00002731 || Food available for consumption | 0664pc || kilocalories per day per capita
         unit: kilocalories per day per capita
         short_unit: kcal/day
         processing_level: major
         display:
-          name: Meat, beef - Food available for consumption (kilocalories per day per capita)
+          name: Daily supply of calories from beef
           shortUnit: kcal/day
           numDecimalPlaces: 2
         presentation:
-          title_public: Meat, beef - Food available for consumption (kilocalories per day per capita)
+          title_public: Daily supply of calories from beef
       meat__beef__00002731__food_available_for_consumption__0674pc__grams_of_protein_per_day_per_capita:
         title: Meat, beef | 00002731 || Food available for consumption | 0674pc || grams of protein per day per capita
         unit: grams of protein per day per capita
         short_unit: g/day
         processing_level: major
         display:
-          name: Meat, beef - Food available for consumption (grams of protein per day per capita)
+          name: Daily supply of proteins from beef
           shortUnit: g/day
           numDecimalPlaces: 2
         presentation:
-          title_public: Meat, beef - Food available for consumption (grams of protein per day per capita)
+          title_public: Daily supply of proteins from beef
       meat__pig__00002733__food_available_for_consumption__0645pc__kilograms_per_year_per_capita:
         title: Meat, pig | 00002733 || Food available for consumption | 0645pc || kilograms per year per capita
         unit: kilograms per year per capita
         short_unit: kg
         processing_level: major
         display:
-          name: Meat, pig - Food available for consumption (kilograms per year per capita)
+          name: Per capita consumption of pig meat
           shortUnit: kg
           numDecimalPlaces: 2
         presentation:
-          title_public: Meat, pig - Food available for consumption (kilograms per year per capita)
+          title_public: Per capita consumption of pig meat
       meat__pig__00002733__food_available_for_consumption__0664pc__kilocalories_per_day_per_capita:
         title: Meat, pig | 00002733 || Food available for consumption | 0664pc || kilocalories per day per capita
         unit: kilocalories per day per capita
         short_unit: kcal/day
         processing_level: major
         display:
-          name: Meat, pig - Food available for consumption (kilocalories per day per capita)
+          name: Daily supply of calories from pig meat
           shortUnit: kcal/day
           numDecimalPlaces: 2
         presentation:
-          title_public: Meat, pig - Food available for consumption (kilocalories per day per capita)
+          title_public: Daily supply of calories from pig meat
       meat__pig__00002733__food_available_for_consumption__0674pc__grams_of_protein_per_day_per_capita:
         title: Meat, pig | 00002733 || Food available for consumption | 0674pc || grams of protein per day per capita
         unit: grams of protein per day per capita
         short_unit: g/day
         processing_level: major
         display:
-          name: Meat, pig - Food available for consumption (grams of protein per day per capita)
+          name: Daily supply of proteins from pig meat
           shortUnit: g/day
           numDecimalPlaces: 2
         presentation:
-          title_public: Meat, pig - Food available for consumption (grams of protein per day per capita)
+          title_public: Daily supply of proteins from pig meat
       meat__poultry__00002734__food_available_for_consumption__0645pc__kilograms_per_year_per_capita:
         title: Meat, poultry | 00002734 || Food available for consumption | 0645pc || kilograms per year per capita
         unit: kilograms per year per capita
         short_unit: kg
         processing_level: major
         display:
-          name: Meat, poultry - Food available for consumption (kilograms per year per capita)
+          name: Per capita consumption of poultry meat
           shortUnit: kg
           numDecimalPlaces: 2
         presentation:
-          title_public: Meat, poultry - Food available for consumption (kilograms per year per capita)
+          title_public: Per capita consumption of poultry meat
       meat__poultry__00002734__food_available_for_consumption__0664pc__kilocalories_per_day_per_capita:
         title: Meat, poultry | 00002734 || Food available for consumption | 0664pc || kilocalories per day per capita
         unit: kilocalories per day per capita
         short_unit: kcal/day
         processing_level: major
         display:
-          name: Meat, poultry - Food available for consumption (kilocalories per day per capita)
+          name: Daily supply of calories from poultry meat
           shortUnit: kcal/day
           numDecimalPlaces: 2
         presentation:
-          title_public: Meat, poultry - Food available for consumption (kilocalories per day per capita)
+          title_public: Daily supply of calories from poultry meat
       meat__poultry__00002734__food_available_for_consumption__0674pc__grams_of_protein_per_day_per_capita:
         title: Meat, poultry | 00002734 || Food available for consumption | 0674pc || grams of protein per day per capita
         unit: grams of protein per day per capita
         short_unit: g/day
         processing_level: major
         display:
-          name: Meat, poultry - Food available for consumption (grams of protein per day per capita)
+          name: Daily supply of proteins from poultry meat
           shortUnit: g/day
           numDecimalPlaces: 2
         presentation:
-          title_public: Meat, poultry - Food available for consumption (grams of protein per day per capita)
+          title_public: Daily supply of proteins from poultry meat
       meat__sheep_and_goat__00002732__food_available_for_consumption__0645pc__kilograms_per_year_per_capita:
         title: Meat, sheep and goat | 00002732 || Food available for consumption | 0645pc || kilograms per year per capita
         unit: kilograms per year per capita
         short_unit: kg
         processing_level: major
         display:
-          name: Meat, sheep and goat - Food available for consumption (kilograms per year per capita)
+          name: Per capita consumption of sheep and goat meat
           shortUnit: kg
           numDecimalPlaces: 2
         presentation:
-          title_public: Meat, sheep and goat - Food available for consumption (kilograms per year per capita)
+          title_public: Per capita consumption of sheep and goat meat
       meat__sheep_and_goat__00002732__food_available_for_consumption__0664pc__kilocalories_per_day_per_capita:
         title: Meat, sheep and goat | 00002732 || Food available for consumption | 0664pc || kilocalories per day per capita
         unit: kilocalories per day per capita
         short_unit: kcal/day
         processing_level: major
         display:
-          name: Meat, sheep and goat - Food available for consumption (kilocalories per day per capita)
+          name: Daily supply of calories from sheep and goat meat
           shortUnit: kcal/day
           numDecimalPlaces: 2
         presentation:
-          title_public: Meat, sheep and goat - Food available for consumption (kilocalories per day per capita)
+          title_public: Daily supply of calories from sheep and goat meat
       meat__sheep_and_goat__00002732__food_available_for_consumption__0674pc__grams_of_protein_per_day_per_capita:
         title: Meat, sheep and goat | 00002732 || Food available for consumption | 0674pc || grams of protein per day per
           capita
@@ -572,66 +572,66 @@ tables:
         short_unit: g/day
         processing_level: major
         display:
-          name: Meat, sheep and goat - Food available for consumption (grams of protein per day per capita)
+          name: Daily supply of proteins from sheep and goat meat
           shortUnit: g/day
           numDecimalPlaces: 2
         presentation:
-          title_public: Meat, sheep and goat - Food available for consumption (grams of protein per day per capita)
+          title_public: Daily supply of proteins from sheep and goat meat
       meat__total__00002943__food_available_for_consumption__0645pc__kilograms_per_year_per_capita:
         title: Meat, total | 00002943 || Food available for consumption | 0645pc || kilograms per year per capita
         unit: kilograms per year per capita
         short_unit: kg
         processing_level: major
         display:
-          name: Meat, total - Food available for consumption (kilograms per year per capita)
+          name: Per capita consumption of meat
           shortUnit: kg
           numDecimalPlaces: 2
         presentation:
-          title_public: Meat, total - Food available for consumption (kilograms per year per capita)
+          title_public: Per capita consumption of meat
       meat__total__00002943__food_available_for_consumption__0664pc__kilocalories_per_day_per_capita:
         title: Meat, total | 00002943 || Food available for consumption | 0664pc || kilocalories per day per capita
         unit: kilocalories per day per capita
         short_unit: kcal/day
         processing_level: major
         display:
-          name: Meat, total - Food available for consumption (kilocalories per day per capita)
+          name: Daily supply of calories from meat
           shortUnit: kcal/day
           numDecimalPlaces: 2
         presentation:
-          title_public: Meat, total - Food available for consumption (kilocalories per day per capita)
+          title_public: Daily supply of calories from meat
       meat__total__00002943__food_available_for_consumption__0674pc__grams_of_protein_per_day_per_capita:
         title: Meat, total | 00002943 || Food available for consumption | 0674pc || grams of protein per day per capita
         unit: grams of protein per day per capita
         short_unit: g/day
         processing_level: major
         display:
-          name: Meat, total - Food available for consumption (grams of protein per day per capita)
+          name: Daily supply of proteins from meat
           shortUnit: g/day
           numDecimalPlaces: 2
         presentation:
-          title_public: Meat, total - Food available for consumption (grams of protein per day per capita)
+          title_public: Daily supply of proteins from meat
       milk__excluding_butter__00002848__food_available_for_consumption__0645pc__kilograms_per_year_per_capita:
         title: Milk - Excluding Butter | 00002848 || Food available for consumption | 0645pc || kilograms per year per capita
         unit: kilograms per year per capita
         short_unit: kg
         processing_level: major
         display:
-          name: Milk - Excluding Butter - Food available for consumption (kilograms per year per capita)
+          name: Per capita consumption of milk, excluding butter
           shortUnit: kg
           numDecimalPlaces: 2
         presentation:
-          title_public: Milk - Excluding Butter - Food available for consumption (kilograms per year per capita)
+          title_public: Per capita consumption of milk, excluding butter
       milk__excluding_butter__00002848__food_available_for_consumption__0664pc__kilocalories_per_day_per_capita:
         title: Milk - Excluding Butter | 00002848 || Food available for consumption | 0664pc || kilocalories per day per capita
         unit: kilocalories per day per capita
         short_unit: kcal/day
         processing_level: major
         display:
-          name: Milk - Excluding Butter - Food available for consumption (kilocalories per day per capita)
+          name: Daily supply of calories from milk, excluding butter
           shortUnit: kcal/day
           numDecimalPlaces: 2
         presentation:
-          title_public: Milk - Excluding Butter - Food available for consumption (kilocalories per day per capita)
+          title_public: Daily supply of calories from milk, excluding butter
       milk__excluding_butter__00002848__food_available_for_consumption__0674pc__grams_of_protein_per_day_per_capita:
         title: Milk - Excluding Butter | 00002848 || Food available for consumption | 0674pc || grams of protein per day per
           capita
@@ -639,44 +639,44 @@ tables:
         short_unit: g/day
         processing_level: major
         display:
-          name: Milk - Excluding Butter - Food available for consumption (grams of protein per day per capita)
+          name: Daily supply of proteins from milk, excluding butter
           shortUnit: g/day
           numDecimalPlaces: 2
         presentation:
-          title_public: Milk - Excluding Butter - Food available for consumption (grams of protein per day per capita)
+          title_public: Daily supply of proteins from milk, excluding butter
       milk__00002948__food_available_for_consumption__0664pc__kilocalories_per_day_per_capita:
         title: Milk | 00002948 || Food available for consumption | 0664pc || kilocalories per day per capita
         unit: kilocalories per day per capita
         short_unit: kcal/day
         processing_level: major
         display:
-          name: Milk - Food available for consumption (kilocalories per day per capita)
+          name: Daily supply of calories from milk
           shortUnit: kcal/day
           numDecimalPlaces: 2
         presentation:
-          title_public: Milk - Food available for consumption (kilocalories per day per capita)
+          title_public: Daily supply of calories from milk
       milk__00002948__food_available_for_consumption__0674pc__grams_of_protein_per_day_per_capita:
         title: Milk | 00002948 || Food available for consumption | 0674pc || grams of protein per day per capita
         unit: grams of protein per day per capita
         short_unit: g/day
         processing_level: major
         display:
-          name: Milk - Food available for consumption (grams of protein per day per capita)
+          name: Daily supply of proteins from milk
           shortUnit: g/day
           numDecimalPlaces: 2
         presentation:
-          title_public: Milk - Food available for consumption (grams of protein per day per capita)
+          title_public: Daily supply of proteins from milk
       miscellaneous_group__00002928__food_available_for_consumption__0664pc__kilocalories_per_day_per_capita:
         title: Miscellaneous group | 00002928 || Food available for consumption | 0664pc || kilocalories per day per capita
         unit: kilocalories per day per capita
         short_unit: kcal/day
         processing_level: major
         display:
-          name: Miscellaneous group - Food available for consumption (kilocalories per day per capita)
+          name: Daily supply of calories from other food commodities
           shortUnit: kcal/day
           numDecimalPlaces: 2
         presentation:
-          title_public: Miscellaneous group - Food available for consumption (kilocalories per day per capita)
+          title_public: Daily supply of calories from other food commodities
       molluscs__other__00002767__production__005511__tonnes:
         title: Molluscs, Other | 00002767 || Production | 005511 || tonnes
         unit: tonnes
@@ -694,33 +694,33 @@ tables:
         short_unit: kcal/day
         processing_level: major
         display:
-          name: Nuts - Food available for consumption (kilocalories per day per capita)
+          name: Daily supply of calories from nuts
           shortUnit: kcal/day
           numDecimalPlaces: 2
         presentation:
-          title_public: Nuts - Food available for consumption (kilocalories per day per capita)
+          title_public: Daily supply of calories from nuts
       oilcrops__00002913__food_available_for_consumption__0664pc__kilocalories_per_day_per_capita:
         title: Oilcrops | 00002913 || Food available for consumption | 0664pc || kilocalories per day per capita
         unit: kilocalories per day per capita
         short_unit: kcal/day
         processing_level: major
         display:
-          name: Oilcrops - Food available for consumption (kilocalories per day per capita)
+          name: Daily supply of calories from oilcrops
           shortUnit: kcal/day
           numDecimalPlaces: 2
         presentation:
-          title_public: Oilcrops - Food available for consumption (kilocalories per day per capita)
+          title_public: Daily supply of calories from oilcrops
       oranges__00002611__food_available_for_consumption__0645pc__kilograms_per_year_per_capita:
         title: Oranges | 00002611 || Food available for consumption | 0645pc || kilograms per year per capita
         unit: kilograms per year per capita
         short_unit: kg
         processing_level: major
         display:
-          name: Oranges - Food available for consumption (kilograms per year per capita)
+          name: Per capita consumption of oranges
           shortUnit: kg
           numDecimalPlaces: 2
         presentation:
-          title_public: Oranges - Food available for consumption (kilograms per year per capita)
+          title_public: Per capita consumption of oranges
       palm_oil__00002577__imports__005611__tonnes:
         title: Palm Oil | 00002577 || Imports | 005611 || tonnes
         unit: tonnes
@@ -749,22 +749,22 @@ tables:
         short_unit: kg
         processing_level: major
         display:
-          name: Pineapples - Food available for consumption (kilograms per year per capita)
+          name: Per capita consumption of pineapples
           shortUnit: kg
           numDecimalPlaces: 2
         presentation:
-          title_public: Pineapples - Food available for consumption (kilograms per year per capita)
+          title_public: Per capita consumption of pineapples
       plantains__00002616__food_available_for_consumption__0645pc__kilograms_per_year_per_capita:
         title: Plantains | 00002616 || Food available for consumption | 0645pc || kilograms per year per capita
         unit: kilograms per year per capita
         short_unit: kg
         processing_level: major
         display:
-          name: Plantains - Food available for consumption (kilograms per year per capita)
+          name: Per capita consumption of plantains
           shortUnit: kg
           numDecimalPlaces: 2
         presentation:
-          title_public: Plantains - Food available for consumption (kilograms per year per capita)
+          title_public: Per capita consumption of plantains
       population__00002501__total_population__both_sexes__000511__thousand_number:
         title: Population | 00002501 || Total Population - Both sexes | 000511 || thousand Number
         unit: thousand Number
@@ -782,22 +782,22 @@ tables:
         short_unit: kcal/day
         processing_level: major
         display:
-          name: Pulses - Food available for consumption (kilocalories per day per capita)
+          name: Daily supply of calories from pulses
           shortUnit: kcal/day
           numDecimalPlaces: 2
         presentation:
-          title_public: Pulses - Food available for consumption (kilocalories per day per capita)
+          title_public: Daily supply of calories from pulses
       rice__00002807__food_available_for_consumption__0664pc__kilocalories_per_day_per_capita:
         title: Rice | 00002807 || Food available for consumption | 0664pc || kilocalories per day per capita
         unit: kilocalories per day per capita
         short_unit: kcal/day
         processing_level: major
         display:
-          name: Rice - Food available for consumption (kilocalories per day per capita)
+          name: Daily supply of calories from rice
           shortUnit: kcal/day
           numDecimalPlaces: 2
         presentation:
-          title_public: Rice - Food available for consumption (kilocalories per day per capita)
+          title_public: Daily supply of calories from rice
       soybeans__00002555__feed__005521__tonnes:
         title: Soybeans | 00002555 || Feed | 005521 || tonnes
         unit: tonnes
@@ -837,33 +837,33 @@ tables:
         short_unit: kcal/day
         processing_level: major
         display:
-          name: Starchy Roots - Food available for consumption (kilocalories per day per capita)
+          name: Daily supply of calories from starchy roots
           shortUnit: kcal/day
           numDecimalPlaces: 2
         presentation:
-          title_public: Starchy Roots - Food available for consumption (kilocalories per day per capita)
+          title_public: Daily supply of calories from starchy roots
       sugar__and__sweeteners__00002909__food_available_for_consumption__0664pc__kilocalories_per_day_per_capita:
         title: Sugar & Sweeteners | 00002909 || Food available for consumption | 0664pc || kilocalories per day per capita
         unit: kilocalories per day per capita
         short_unit: kcal/day
         processing_level: major
         display:
-          name: Sugar & Sweeteners - Food available for consumption (kilocalories per day per capita)
+          name: Daily supply of calories from sugar and sweeteners
           shortUnit: kcal/day
           numDecimalPlaces: 2
         presentation:
-          title_public: Sugar & Sweeteners - Food available for consumption (kilocalories per day per capita)
+          title_public: Daily supply of calories from sugar and sweeteners
       sugar_crops__00002908__food_available_for_consumption__0664pc__kilocalories_per_day_per_capita:
         title: Sugar crops | 00002908 || Food available for consumption | 0664pc || kilocalories per day per capita
         unit: kilocalories per day per capita
         short_unit: kcal/day
         processing_level: major
         display:
-          name: Sugar crops - Food available for consumption (kilocalories per day per capita)
+          name: Daily supply of calories from sugar crops
           shortUnit: kcal/day
           numDecimalPlaces: 2
         presentation:
-          title_public: Sugar crops - Food available for consumption (kilocalories per day per capita)
+          title_public: Daily supply of calories from sugar crops
       total__00002901__food_available_for_consumption__000664__kilocalories_per_day:
         title: Total | 00002901 || Food available for consumption | 000664 || kilocalories per day
         unit: kilocalories per day
@@ -881,96 +881,96 @@ tables:
         short_unit: kcal/day
         processing_level: major
         display:
-          name: Total - Food available for consumption (kilocalories per day per capita)
+          name: Total daily supply of calories
           shortUnit: kcal/day
           numDecimalPlaces: 2
         presentation:
-          title_public: Total - Food available for consumption (kilocalories per day per capita)
+          title_public: Total daily supply of calories
       total__00002901__food_available_for_consumption__0674pc__grams_of_protein_per_day_per_capita:
         title: Total | 00002901 || Food available for consumption | 0674pc || grams of protein per day per capita
         unit: grams of protein per day per capita
         short_unit: g/day
         processing_level: major
         display:
-          name: Total - Food available for consumption (grams of protein per day per capita)
+          name: Total daily supply of proteins
           shortUnit: g/day
           numDecimalPlaces: 2
         presentation:
-          title_public: Total - Food available for consumption (grams of protein per day per capita)
+          title_public: Total daily supply of proteins
       total__00002901__food_available_for_consumption__0684pc__grams_of_fat_per_day_per_capita:
         title: Total | 00002901 || Food available for consumption | 0684pc || grams of fat per day per capita
         unit: grams of fat per day per capita
         short_unit: g/day
         processing_level: major
         display:
-          name: Total - Food available for consumption (grams of fat per day per capita)
+          name: Daily fat supply
           shortUnit: g/day
           numDecimalPlaces: 2
         presentation:
-          title_public: Total - Food available for consumption (grams of fat per day per capita)
+          title_public: Daily fat supply
       vegetable_oils__00002914__food_available_for_consumption__0664pc__kilocalories_per_day_per_capita:
         title: Vegetable Oils | 00002914 || Food available for consumption | 0664pc || kilocalories per day per capita
         unit: kilocalories per day per capita
         short_unit: kcal/day
         processing_level: major
         display:
-          name: Vegetable Oils - Food available for consumption (kilocalories per day per capita)
+          name: Daily supply of calories from vegetable oils
           shortUnit: kcal/day
           numDecimalPlaces: 2
         presentation:
-          title_public: Vegetable Oils - Food available for consumption (kilocalories per day per capita)
+          title_public: Daily supply of calories from vegetable oils
       vegetables__00002918__food_available_for_consumption__0645pc__kilograms_per_year_per_capita:
         title: Vegetables | 00002918 || Food available for consumption | 0645pc || kilograms per year per capita
         unit: kilograms per year per capita
         short_unit: kg
         processing_level: major
         display:
-          name: Vegetables - Food available for consumption (kilograms per year per capita)
+          name: Per capita consumption of vegetables
           shortUnit: kg
           numDecimalPlaces: 2
         presentation:
-          title_public: Vegetables - Food available for consumption (kilograms per year per capita)
+          title_public: Per capita consumption of vegetables
       vegetables__00002918__food_available_for_consumption__0664pc__kilocalories_per_day_per_capita:
         title: Vegetables | 00002918 || Food available for consumption | 0664pc || kilocalories per day per capita
         unit: kilocalories per day per capita
         short_unit: kcal/day
         processing_level: major
         display:
-          name: Vegetables - Food available for consumption (kilocalories per day per capita)
+          name: Daily supply of calories from vegetables
           shortUnit: kcal/day
           numDecimalPlaces: 2
         presentation:
-          title_public: Vegetables - Food available for consumption (kilocalories per day per capita)
+          title_public: Daily supply of calories from vegetables
       vegetal_products__00002903__food_available_for_consumption__0664pc__kilocalories_per_day_per_capita:
         title: Vegetal Products | 00002903 || Food available for consumption | 0664pc || kilocalories per day per capita
         unit: kilocalories per day per capita
         short_unit: kcal/day
         processing_level: major
         display:
-          name: Vegetal Products - Food available for consumption (kilocalories per day per capita)
+          name: Daily supply of calories from vegetal products
           shortUnit: kcal/day
           numDecimalPlaces: 2
         presentation:
-          title_public: Vegetal Products - Food available for consumption (kilocalories per day per capita)
+          title_public: Daily supply of calories from vegetal products
       vegetal_products__00002903__food_available_for_consumption__0674pc__grams_of_protein_per_day_per_capita:
         title: Vegetal Products | 00002903 || Food available for consumption | 0674pc || grams of protein per day per capita
         unit: grams of protein per day per capita
         short_unit: g/day
         processing_level: major
         display:
-          name: Vegetal Products - Food available for consumption (grams of protein per day per capita)
+          name: Daily supply of proteins from vegetal products
           shortUnit: g/day
           numDecimalPlaces: 2
         presentation:
-          title_public: Vegetal Products - Food available for consumption (grams of protein per day per capita)
+          title_public: Daily supply of proteins from vegetal products
       wheat__00002511__food_available_for_consumption__0664pc__kilocalories_per_day_per_capita:
         title: Wheat | 00002511 || Food available for consumption | 0664pc || kilocalories per day per capita
         unit: kilocalories per day per capita
         short_unit: kcal/day
         processing_level: major
         display:
-          name: Wheat - Food available for consumption (kilocalories per day per capita)
+          name: Daily supply of calories from wheat
           shortUnit: kcal/day
           numDecimalPlaces: 2
         presentation:
-          title_public: Wheat - Food available for consumption (kilocalories per day per capita)
+          title_public: Daily supply of calories from wheat
