@@ -1,0 +1,36 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/origin/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: 'World Bank Poverty and Inequality Platform (PIP): Percentiles'
+    description: |-
+      The Poverty and Inequality Platform: Percentiles database reports 100 points ranked according to the consumption or income distributions for country-year survey data available in the World Bank’s Poverty and Inequality Platform (PIP). There are, as of January 12, 2023, a total of 2,087 country-survey-year data points, which include 1,685 distributions based on microdata, 234 based on binned data, and 163 based on grouped data. For the grouped data, the percentiles are derived by fitting a parametric Lorenz distribution following Datt (1998). For ease of communication, all distributions are referred to as survey data henceforth, and the welfare variable is referred to as income.
+
+      The original files available in [World Bank's Databank](https://datacatalog.worldbank.org/search/dataset/0063646/_poverty_and_inequality_platform_pip_percentiles) were modified to include distributions from missing countries and regions with data available in PIP's API.
+    date_published: 2023-12-13
+    version_producer: Version 9
+
+    # Citation
+    producer: World Bank Poverty and Inequality Platform
+    citation_full: |-
+      - World Bank (2023). Poverty and Inequality Platform: percentiles [Data set]. World Bank Group. https://pip.worldbank.org/. Accessed January 17, 2024.
+      - World Bank (2024). Poverty and Inequality Platform (version 20240326_2017 and 20240326_2011) [Data set]. World Bank Group. https://pip.worldbank.org/. Accessed March 27, 2024.
+
+    # Files
+    url_main:
+      https://datacatalog.worldbank.org/search/dataset/0063646/_poverty_and_inequality_platform_pip_percentiles
+    date_accessed: 2024-03-27
+
+    # License
+    license:
+      name: CC0
+      url:
+        https://datacatalog.worldbank.org/search/dataset/0063646/_poverty_and_inequality_platform_pip_percentiles
+
+wdir: ../../../data/snapshots/wb/2024-01-17
+outs:
+- md5: 70a0e0ec5c4347a92c82451d83047813
+  size: 47749179
+  path: world_bank_pip_percentiles.csv
+
