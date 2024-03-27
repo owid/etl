@@ -1,15 +1,11 @@
 meta:
-  namespace: who
-  short_name: flunet
   name: FluNet, World Health Organization (2023)
-  version: latest
   publication_year: 2023
   publication_date: 2023-02-16
   source_name: FluNet, World Health Organization (2023)
   source_published_by: Global Influenza Surveillance and Response System, World Health Organization
   url: https://www.who.int/tools/flunet
   source_data_url: https://frontdoor-l4uikgap6gz3m.azurefd.net/FLUMART/VIW_FNT?&$format=csv
-  file_extension: csv
   license_url: https://www.who.int/about/policies/publishing/copyright
   license_name: CC BY-NC-SA 3.0 IGO
   date_accessed: 2023-02-16
