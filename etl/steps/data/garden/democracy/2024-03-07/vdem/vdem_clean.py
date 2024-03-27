@@ -410,7 +410,7 @@ def estimate_dichotomous_indicators(tb: Table) -> Table:
 
 
 def estimate_row_indicators(tb: Table) -> Table:
-    "Create indicators for Regimes of the World with expanded coverage and minor changes to coding."
+    """Create indicators for Regimes of the World with expanded coverage and minor changes to coding."""
     column_new = "regime_row_owid"
     tb[column_new] = np.nan
 
@@ -1023,7 +1023,7 @@ def standardise_country_names(tb: Table) -> Table:
 def estimate_gender_hoe_indicator(tb: Table) -> Table:
     """Create variable identifying gender of chief executive."""
     tb["wom_hoe_vdem"] = np.nan
-    # # If head of state is more powerful than head of government, and head of state is the head of the executive, then update wom_hoe_vdem accordingly
+    # If head of state is more powerful than head of government, and head of state is the head of the executive, then update wom_hoe_vdem accordingly
     tb.loc[(tb["v2ex_hosw"] <= 1) & (tb["v2ex_hosw"] > 0.5) & (tb["wom_hos_vdem"].notna()), "wom_hoe_vdem"] = tb[
         "wom_hos_vdem"
     ]

@@ -64,7 +64,19 @@ def run(dest_dir: str) -> None:
 
 
 # %%
-def add_citation_full(tb: Table) -> Table:
+def adjust_citation_full(tb: Table) -> Table:
+    """Adjust the citation_full metadata field for some indicators."""
+    tb = replace_citation_full(tb)
+    tb = append_citation_full(tb)
+    return tb
+
+
+def replace_citation_full(tb: Table) -> Table:
+    """Replace the citation_full metadata field for some indicators."""
+    return tb
+
+
+def append_citation_full(tb: Table) -> Table:
     """Add additional citations.
 
     Some indicators require additional citation information.
@@ -74,6 +86,8 @@ def add_citation_full(tb: Table) -> Table:
     CITATION_SIGMAN = "Sigman et al. (2015, V-Dem Working Paper Series 2015:22)"
     CITATION_MCMANN = "McMann et al. (2016, V-Dem Working Paper Series 2016:23)"
     CITATION_SUNDSTROM = "Sundström et al. (2017, V-Dem Working Paper Series 2017:19)"
+    CITATION_TEORELL = "Teorell et al. (2019)"
+    CITATION_LUHRMANN = "Lührmann, Anna, Marcus Tannnberg, and Staffan Lindberg. 2018. Regimes of the World (RoW): Opening New Avenues for the Comparative Study of Political Regimes. Politics and Governance 6(1): 60-77."
     DIMENSIONS = ["", "_low", "_high"]
     citation_coppedge = [
         *[f"libdem_vdem{dim}" for dim in DIMENSIONS],
@@ -82,6 +96,8 @@ def add_citation_full(tb: Table) -> Table:
         *[f"lib_vdem{dim}" for dim in DIMENSIONS],
         *[f"particip_vdem{dim}" for dim in DIMENSIONS],
         *[f"delib_vdem{dim}" for dim in DIMENSIONS],
+        # row indicators
+        *[f"lib_dich{dim}_row" for dim in DIMENSIONS],
     ]
     citation_pemstein = [
         *[f"freeexpr_vdem{dim}" for dim in DIMENSIONS],
@@ -105,18 +121,30 @@ def add_citation_full(tb: Table) -> Table:
         *[f"socgr_pow_vdem{dim}" for dim in DIMENSIONS],
         *[f"priv_libs_vdem{dim}" for dim in DIMENSIONS],
         *[f"pol_libs_vdem{dim}" for dim in DIMENSIONS],
+        # row indicators
+        *[f"transplaws{dim}_row" for dim in DIMENSIONS],
+        *[f"accessjust_w{dim}_row" for dim in DIMENSIONS],
+        *[f"accessjust_m{dim}_row" for dim in DIMENSIONS],
+        *[f"electfreefair{dim}_row" for dim in DIMENSIONS],
+        *[f"electmulpar{dim}_row" for dim in DIMENSIONS],
     ]
     citation_mcmann = [
         *[f"corruption_vdem{dim}" for dim in DIMENSIONS],
         *[f"corr_publsec_vdem{dim}" for dim in DIMENSIONS],
         *[f"corr_exec_vdem{dim}" for dim in DIMENSIONS],
     ]
+    citation_teorell = [
+        *[f"electdem_vdem{dim}" for dim in DIMENSIONS],
+        # row indicators
+        *[f"electdem_dich{dim}_row_owid" for dim in DIMENSIONS],
+    ]
+
     citation_full = {
         # Single citations
         **{i: CITATION_COPPEDGE for i in citation_coppedge},
         **{i: CITATION_PEMSTEIN for i in citation_pemstein},
         **{i: CITATION_MCMANN for i in citation_mcmann},
-        **{f"electdem_vdem{dim}": "Teorell et al. (2019)" for dim in DIMENSIONS},
+        **{i: CITATION_TEORELL for i in citation_teorell},
         **{f"egaldem_vdem{dim}": CITATION_SIGMAN for dim in DIMENSIONS},
         **{f"wom_emp_vdem{dim}": CITATION_SUNDSTROM for dim in DIMENSIONS},
         **{f"wom_pol_par_vdem{dim}": CITATION_SUNDSTROM for dim in DIMENSIONS},
@@ -135,4 +163,18 @@ def add_citation_full(tb: Table) -> Table:
     for indicator_name, citation_additional in citation_full.items():
         tb[indicator_name].metadata.origins[0].citation_full += f";\n\n{citation_additional}"
 
+    # Add citation for Luhrmann (at the beginning of the citation full)
+    citation_luhrmann = [
+        *[f"transplaws{dim}_row" for dim in DIMENSIONS],
+        *[f"accessjust_w{dim}_row" for dim in DIMENSIONS],
+        *[f"accessjust_m{dim}_row" for dim in DIMENSIONS],
+        *[f"lib_dich{dim}_row" for dim in DIMENSIONS],
+        *[f"electfreefair{dim}_row" for dim in DIMENSIONS],
+        *[f"electdem_dich{dim}_row_owid" for dim in DIMENSIONS],
+        *[f"electmulpar{dim}_row" for dim in DIMENSIONS],
+    ]
+    for indicator_name in citation_luhrmann:
+        tb[indicator_name].metadata.origins[0].citation_full = (
+            f"{CITATION_LUHRMANN};\n\n" + tb[indicator_name].metadata.origins[0].citation_full
+        )
     return tb

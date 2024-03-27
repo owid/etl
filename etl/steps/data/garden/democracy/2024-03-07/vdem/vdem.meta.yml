@@ -1601,7 +1601,7 @@ tables:
       ## 9.4.2 Government effectiveness
       goveffective_vdem_wbgi:
         title: Government effectiveness
-        description_from_producer: &description_prod_goveffective_vdem_wbgi |-
+        description_from_producer: |-
           "Government Effectiveness" combines into a single grouping responses on the quality of public service provision, the quality of the bureaucracy, the competence of civil servants, the independence of the civil service from political pressures, and the credibility of the government’s commitment to policies. The main focus of this index is on "inputs" required for the government to be able to produce and implement good policies and deliver public goods.
 
           Indicator name: `e_wbgi_gee`
@@ -1609,12 +1609,60 @@ tables:
         display:
           numDecimalPlaces: 3
 
+      ## 9.9.3 Corruption perception index
       corruption_cpi:
-        title: ''
+        title: Corruption perception index
+        description_from_producer: |-
+          The CPI focuses on corruption in the public sector and defines corruption as the abuse of public office for private gain. The surveys used in compiling the CPI tend to ask questions in line with the misuse of public power for private benefit, with a focus, for example, on bribe-taking by public officials in public procurement. The sources do not distinguish between administrative and political corruption. The CPI Score relates to perceptions of the degree of corruption as seen by business people, risk analysts and the general public and ranges between 100 (highly clean) and 0 (highly corrupt).
+
+          Notes: The data spans 2012–present due to the methodological incomparability with the data prior 2012.
         unit: ''
         display:
           numDecimalPlaces: 0
 
+      ## [RE-ESTIMATE] 3.1.2.5 Elections multiparty
+      electmulpar_row:
+        title: Elections multiparty (re-estimate)
+        description_short: |-
+          Best estimate of whether national multi-party elections were held or not.
+        description_from_producer: &description_prod_electmulpar_vdem |-
+          Question: Question: Was this national election multiparty?
+
+          Responses:
+          0: No. No-party or single-party and there is no meaningful competition (includes situations where a few parties are legal but they are all de facto controlled by the dominant party).
+          1: Not really. No-party or single-party (defined as above) but multiple candidates from the same party and/or independents contest legislative seats or the presidency.
+          2: Constrained. At least one real opposition party is allowed to contest but competition is highly constrained — legally or informally.
+          3: Almost. Elections are multiparty in principle but either one main opposition party is prevented (de jure or de facto) from contesting, or conditions such as civil unrest (excluding natural disasters) prevent competition in a portion of the territory.
+          4: Yes. Elections are multiparty, even though a few marginal parties may not be permitted to contest (e.g. far-right/left extremist parties, anti-democratic religious or ethnic parties).
+
+          Scale: Ordinal, converted to interval by the measurement model.
+        description_processing: &description_processing_electmulpar_row |-
+          We use a threshold of 2 on `v2elmulpar_osp` to classify the original indicator into 0 ("No") and 1 ("Yes") categories.
+        unit: ''
+        display:
+          numDecimalPlaces: 0
+
+      electmulpar_high_row:
+        title: "{tables.vdem.variables.electmulpar_row.title} (upper bound)"
+        description_short: |-
+          Upper-bound estimate of whether national multi-party elections were held or not.
+        description_from_producer: *description_prod_electmulpar_vdem
+        description_processing: *description_processing_electmulpar_row
+        unit: ''
+        display:
+          numDecimalPlaces: 0
+
+      electmulpar_low_row:
+        title: "{tables.vdem.variables.electmulpar_row.title} (lower bound)"
+        description_short: |-
+          Lower-bound estimate of whether national multi-party elections were held or not.
+        description_from_producer: *description_prod_electmulpar_vdem
+        description_processing: *description_processing_electmulpar_row
+        unit: ''
+        display:
+          numDecimalPlaces: 0
+
+      ## v2elmulpar_osp_hoe. TODO: extract from v2elmulpar_osp_hos, v2elmulpar_osp_hog
       electmulpar_hoe_row_owid:
         title: ''
         unit: ''
@@ -1633,132 +1681,7 @@ tables:
         display:
           numDecimalPlaces: 0
 
-      electdem_dich_row_owid:
-        title: 'Electoral democracy'
-        unit: ''
-        display:
-          numDecimalPlaces: 0
-
-      electdem_dich_high_row_owid:
-        title: ''
-        unit: ''
-        display:
-          numDecimalPlaces: 0
-
-      electdem_dich_low_row_owid:
-        title: ''
-        unit: ''
-        display:
-          numDecimalPlaces: 0
-
-      electfreefair_row:
-        title: ''
-        unit: ''
-        display:
-          numDecimalPlaces: 0
-
-      electfreefair_high_row:
-        title: ''
-        unit: ''
-        display:
-          numDecimalPlaces: 0
-
-      electfreefair_low_row:
-        title: ''
-        unit: ''
-        display:
-          numDecimalPlaces: 0
-
-      electmulpar_row:
-        title: ''
-        unit: ''
-        display:
-          numDecimalPlaces: 0
-
-      electmulpar_high_row:
-        title: ''
-        unit: ''
-        display:
-          numDecimalPlaces: 0
-
-      electmulpar_low_row:
-        title: ''
-        unit: ''
-        display:
-          numDecimalPlaces: 0
-
-      lib_dich_row:
-        title: ''
-        unit: ''
-        display:
-          numDecimalPlaces: 0
-
-      lib_dich_high_row:
-        title: ''
-        unit: ''
-        display:
-          numDecimalPlaces: 0
-
-      lib_dich_low_row:
-        title: ''
-        unit: ''
-        display:
-          numDecimalPlaces: 0
-
-      accessjust_m_row:
-        title: ''
-        unit: ''
-        display:
-          numDecimalPlaces: 0
-
-      accessjust_m_high_row:
-        title: ''
-        unit: ''
-        display:
-          numDecimalPlaces: 0
-
-      accessjust_m_low_row:
-        title: ''
-        unit: ''
-        display:
-          numDecimalPlaces: 0
-
-      accessjust_w_row:
-        title: ''
-        unit: ''
-        display:
-          numDecimalPlaces: 0
-
-      accessjust_w_high_row:
-        title: ''
-        unit: ''
-        display:
-          numDecimalPlaces: 0
-
-      accessjust_w_low_row:
-        title: ''
-        unit: ''
-        display:
-          numDecimalPlaces: 0
-
-      transplaws_row:
-        title: ''
-        unit: ''
-        display:
-          numDecimalPlaces: 0
-
-      transplaws_high_row:
-        title: ''
-        unit: ''
-        display:
-          numDecimalPlaces: 0
-
-      transplaws_low_row:
-        title: ''
-        unit: ''
-        display:
-          numDecimalPlaces: 0
-
+      ## v2elmulpar_osp_leg_dich. TODO: from v2elmulpar_osp_leg
       electmulpar_leg_row:
         title: ''
         unit: ''
@@ -1777,6 +1700,257 @@ tables:
         display:
           numDecimalPlaces: 0
 
+      ## [RE-ESTIMATE, BINARY CATEGORISATION] 2.1.1 Electoral democracy index
+      electdem_dich_row_owid:
+        title: Electoral democracy (re-estimate)
+        description_short: |-
+          Best estimate of whether the country is meaningfully an electoral democracy. This includes the extent to which political leaders are elected under comprehensive suffrage in free and fair elections, and freedoms of association and expression are guaranteed.
+        description_from_producer: *description_prod_electdem_vdem
+        description_processing: |-
+          We use a threshold of 0.5 on `v2x_polyarchy_osp` to classify the original indicator into 0 ("No") and 1 ("Yes") categories.
+        unit: ''
+        display:
+          numDecimalPlaces: 0
+
+      electdem_dich_high_row_owid:
+        title: "{tables.vdem.variables.electdem_dich_row_owid.title} (upper bound)"
+        description_short: |-
+          Upper-bound estimate of whether the country is meaningfully an electoral democracy. This includes the extent to which political leaders are elected under comprehensive suffrage in free and fair elections, and freedoms of association and expression are guaranteed.
+        description_from_producer: *description_prod_electdem_vdem
+        unit: ''
+        display:
+          numDecimalPlaces: 0
+
+      electdem_dich_low_row_owid:
+        title: "{tables.vdem.variables.electdem_dich_row_owid.title} (lower bound)"
+        description_short: |-
+          Lower-bound estimate of whether the country is meaningfully an electoral democracy. This includes the extent to which political leaders are elected under comprehensive suffrage in free and fair elections, and freedoms of association and expression are guaranteed.
+        description_from_producer: *description_prod_electdem_vdem
+        unit: ''
+        display:
+          numDecimalPlaces: 0
+
+      ## [RE-ESTIMATE, BINARY CATEGORISATION] 3.1.2.15 Election free and fair
+      electfreefair_row:
+        title: Election free and fair (re-estimate)
+        description_short: Best estimate of whether national elections were free and fair or not.
+        description_from_producer: &description_prod_electfreefair_row |-
+          Question: Taking all aspects of the pre-election period, election day, and the post-election process into account, would you consider this national election to be free and fair?
+
+          Clarification: The only thing that should not be considered in coding this is the extent of suffrage (by law). Thus, a free and fair election may occur even if the law excludes significant groups (an issue measured separately).
+
+          Responses:
+          0: No, not at all. The elections were fundamentally flawed and the official results had little if anything to do with the 'will of the people' (i.e., who became president; or who won the legislative majority).
+          1: Not really. While the elections allowed for some competition, the irregularities in the end affected the outcome of the election (i.e., who became president; or who won the legislative majority).
+          2: Ambiguous. There was substantial competition and freedom of participation but there were also significant irregularities. It is hard to determine whether the irregularities affected the outcome or not (as defined above).
+          3: Yes, somewhat. There were deficiencies and some degree of fraud and irregularities but these did not in the end affect the outcome (as defined above).
+          4: Yes. There was some amount of human error and logistical restrictions but these were largely unintentional and without significant consequences.
+
+          Scale: Ordinal, converted to interval by the measurement model.
+        description_processing: &description_processing_electfreefair_row |-
+          We use a threshold of 2 on `v2elfrfair_osp` to classify the original indicator into 0 ("No") and 1 ("Yes") categories.
+        unit: ''
+        display:
+          numDecimalPlaces: 0
+
+      electfreefair_high_row:
+        title: "{tables.vdem.variables.electfreefair_row.title} (upper bound)"
+        description_short: Upper-bound estimate of whether national elections were free and fair or not.
+        description_from_producer: *description_prod_electfreefair_row
+        description_processing: *description_processing_electfreefair_row
+        unit: ''
+        display:
+          numDecimalPlaces: 0
+
+      electfreefair_low_row:
+        title: "{tables.vdem.variables.electfreefair_row.title} (lower bound)"
+        description_short: Lower-bound estimate of whether national elections were free and fair or not.
+        description_from_producer: *description_prod_electfreefair_row
+        description_processing: *description_processing_electfreefair_row
+        unit: ''
+        display:
+          numDecimalPlaces: 0
+
+      ## [RE-ESTIMATE, BINARY CATEGORISATION] 2.2.8 Liberal component index
+      lib_dich_row:
+        title: Liberal component (re-estimate)
+        description_short: Best estimate of whether the country has meaningfully liberal political institutions
+        description_from_producer: *description_prod_lib_vdem
+        description_processing: &description_processing_lib_dich_row |-
+          We use a threshold of 0.8 on `v2x_liberal` to classify the original indicator into 0 ("No") and 1 ("Yes") categories.
+        unit: ''
+        display:
+          numDecimalPlaces: 0
+
+      lib_dich_high_row:
+        title: "{tables.vdem.variables.lib_dich_row.title} (upper bound)"
+        description_short: Upper-bound estimate of whether the country has meaningfully liberal political institutions
+        description_from_producer: *description_prod_lib_vdem
+        description_processing: *description_processing_lib_dich_row
+        unit: ''
+        display:
+          numDecimalPlaces: 0
+
+      lib_dich_low_row:
+        title: "{tables.vdem.variables.lib_dich_row.title} (lower bound)"
+        description_short: Lower-bound estimate of whether the country has meaningfully liberal political institutions
+        description_from_producer: *description_prod_lib_vdem
+        description_processing: *description_processing_lib_dich_row
+        unit: ''
+        display:
+          numDecimalPlaces: 0
+
+      ## [RE-ESTIMATE, BINARY CATEGORISATION] 3.8.2.3 Access to justice for men
+      accessjust_m_row:
+        title: Access to justice for women (re-estimate)
+        description_short: Best estimate of whether men have access to justice or not.
+        description_from_producer: &description_prod_accessjust_m_row |-
+          Question: Do men enjoy secure and effective access to justice?
+
+          Clarification: This question specifies the extent to which men can bring cases before the courts without risk to their personal safety, trials are fair, and men have effective ability to seek redress if public authorities violate their rights, including the rights to counsel, defense, and appeal.
+
+          This question does not ask you to assess the relative access to justice men and women. Thus, it is possible to assign the lowest possible score to a country even if men and women enjoy equal — and extremely limited — access to justice.
+
+          Responses:
+          0: Secure and effective access to justice for men is non-existent.
+          1: Secure and effective access to justice for men is usually not established or widely respected. 2: Secure and effective access to justice for men is inconsistently observed. Minor problems characterize most cases or occur rather unevenly across different parts of the country.
+          3: Secure and effective access to justice for men is usually observed.
+          4: Secure and effective access to justice for men is almost always observed.
+
+          Scale: Ordinal, converted to interval by the measurement model.
+        description_processing: &description_processing_accessjust_m_row |-
+          We use a threshold of 3 on `v2clacjstm_osp*` to classify the original indicator into 0 ("No") and 1 ("Yes") categories.
+        unit: ''
+        display:
+          numDecimalPlaces: 0
+
+      accessjust_m_high_row:
+        title: "{tables.vdem.variables.accessjust_m_high_row.title} (upper bound)"
+        description_short: Upper-bound estimate of whether men have access to justice or not.
+        description_from_producer: *description_prod_accessjust_m_row
+        description_processing: *description_processing_accessjust_m_row
+        unit: ''
+        display:
+          numDecimalPlaces: 0
+
+      accessjust_m_low_row:
+        title: "{tables.vdem.variables.accessjust_m_high_row.title} (lower bound)"
+        description_short: Lower-bound estimate of whether men have access to justice or not.
+        description_from_producer: *description_prod_accessjust_m_row
+        description_processing: *description_processing_accessjust_m_row
+        unit: ''
+        display:
+          numDecimalPlaces: 0
+
+      ## [RE-ESTIMATE, BINARY CATEGORISATION] 3.8.2.4 Access to justice for women
+      accessjust_w_row:
+        title: Access to justice for women (re-estimate)
+        description_short: Best estimate of whether women have access to justice or not.
+        description_from_producer: &description_prod_accessjust_w_row |-
+          Question: Do women enjoy equal, secure, and effective access to justice?
+
+          Clarification: This question specifies the extent to which women can bring cases before the courts without risk to their personal safety, trials are fair, and women have effective ability to seek redress if public authorities violate their rights, including the rights to counsel, defense, and appeal.
+
+          This question does not ask you to assess the relative access to justice men and women. Thus, it is possible to assign the lowest possible score to a country even if men and women enjoy equal — and extremely limited — access to justice.
+
+          Responses:
+          0: Secure and effective access to justice for women is non-existent.
+          1: Secure and effective access to justice for women is usually not established or widely respected. 2: Secure and effective access to justice for women is inconsistently observed. Minor problems characterize most cases or occur rather unevenly across different parts of the country.
+          3: Secure and effective access to justice for women is usually observed.
+          4: Secure and effective access to justice for women is almost always observed.
+
+          Scale: Ordinal, converted to interval by the measurement model.
+        description_processing: &description_processing_accessjust_w_row |-
+          We use a threshold of 3 on `v2clacjstw_osp*` to classify the original indicator into 0 ("No") and 1 ("Yes") categories.
+        unit: ''
+        display:
+          numDecimalPlaces: 0
+
+      accessjust_w_high_row:
+        title: "{tables.vdem.variables.accessjust_w_high_row.title} (upper bound)"
+        description_short: Upper-bound estimate of whether women have access to justice or not.
+        description_from_producer: *description_prod_accessjust_w_row
+        description_processing: *description_processing_accessjust_w_row
+        unit: ''
+        display:
+          numDecimalPlaces: 0
+
+      accessjust_w_low_row:
+        title: "{tables.vdem.variables.accessjust_w_low_row.title} (lower bound)"
+        description_short: Lower-bound estimate of whether women have access to justice or not.
+        description_from_producer: *description_prod_accessjust_w_row
+        description_processing: *description_processing_accessjust_w_row
+        unit: ''
+        display:
+          numDecimalPlaces: 0
+
+      ## [RE-ESTIMATE, BINARY CATEGORISATION] 3.8.2.1 Transparent laws with predictable enforcement
+      transplaws_row:
+        title: Transparent laws with predictable enforcement (re-estimate)
+        description_short: |-
+          Best estimate of whether laws are transparent, coherent, and relatively stable, and their enforcement predictable.
+        description_from_producer: &description_prod_transplaws |-
+          Question: Are the laws of the land clear, well publicized, coherent (consistent with each other), relatively stable from year to year, and enforced in a predictable manner?
+
+          Clarification: This question focuses on the transparency and predictability of the laws of the land.
+
+          Responses:
+          0: Transparency and predictability are almost non-existent. The laws of the land are created and/or enforced in completely arbitrary fashion.
+          1: Transparency and predictability are severely limited. The laws of the land are more often than not created and/or enforced in arbitrary fashion.
+          2: Transparency and predictability are somewhat limited. The laws of the land are mostly created in a non-arbitrary fashion but enforcement is rather arbitrary in some parts of the country.
+          3: Transparency and predictability are fairly strong. The laws of the land are usually created and enforced in a non-arbitrary fashion.
+          4: Transparency and predictability are very strong. The laws of the land are created and enforced in a non-arbitrary fashion.
+
+          Scale: Ordinal, converted to interval by the measurement model.
+        description_processing: &description_processing_transplaws |-
+          We use a threshold of 3 on `v2cltrnslw_osp` to classify the original indicator into 0 ("No") and 1 ("Yes") categories.
+        unit: ''
+        display:
+          numDecimalPlaces: 0
+
+      transplaws_high_row:
+        title: "{tables.vdem.variables.transplaws_row.title} (upper bound)"
+        description_short: |-
+          Upper estimate of whether laws are transparent, coherent, and relatively stable, and their enforcement predictable.
+        description_from_producer: *description_prod_transplaws
+        description_processing: *description_processing_transplaws
+        unit: ''
+        display:
+          numDecimalPlaces: 0
+
+      transplaws_low_row:
+        title: "{tables.vdem.variables.transplaws_row.title} (lower bound)"
+        description_short: |-
+          Lower estimate of whether laws are transparent, coherent, and relatively stable, and their enforcement predictable.
+        description_from_producer: *description_prod_transplaws
+        description_processing: *description_processing_transplaws
+        unit: ''
+        display:
+          numDecimalPlaces: 0
+
+      ## HOE female (custom)
+      # NOTE: Add adjustment in citation_full
+      wom_hoe_vdem:
+        title: HOE female
+        description_short: |-
+          The variable denotes whether the chief executive of government in office on December 31 is a woman.
+        description_processing: |-
+          Assigns the value based on the gender of the most powerful chief: either Head of state or Head of government.
+
+          Uses gender from HOS:
+            - If head of state is more powerful than head of government, and head of state is the head of the executive.
+            - If head of state is also head of government.
+            - If head of government is less powerful than head of state.
+
+          Uses HOG if:
+            - If head of state is less powerful than head of government
+
+          We derive this indicator from V-Dem indicators: v2exfemhos, v2exfemhog, v2ex_hosw, and v2ex_hogw.
+        unit: ''
+        display:
+          numDecimalPlaces: 0
+
+      ## Other regime indicators
       regime_row_owid:
         title: ''
         unit: ''
@@ -1790,12 +1964,6 @@ tables:
           numDecimalPlaces: 0
 
       regime_redux_row_owid:
-        title: ''
-        unit: ''
-        display:
-          numDecimalPlaces: 0
-
-      wom_hoe_vdem:
         title: ''
         unit: ''
         display:
