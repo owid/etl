@@ -11,6 +11,9 @@ This is done by combining the results of several queries to the API:
 Percentiles are partially constructed because the data officially published by the World Bank is missing some countries and all the regions.
 
 To run this code from scratch,
+    - Connect to the staging server of this pull request:
+        - Hit Cmd + Shift + P and select Remote-SSH: Connect to Host
+        - Type in owid@staging-site-{pull_request_name}
     - Delete the files in the cache folder:
         rm -rf .cache/pip*
     - Run the code. You have two options to see the output, in the terminal or in the background:
