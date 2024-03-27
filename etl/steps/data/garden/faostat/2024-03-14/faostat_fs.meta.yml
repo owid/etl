@@ -75,9 +75,8 @@ tables:
         presentation:
           title_public: Percentage of children under 5 years of age who are stunted (modelled estimates) (percent) - Value
             (Percent)
-      ? |-
-        prevalence_of_moderate_or_severe_food_insecurity_in_the_total_population__percent__3_year_average__00210091__value__006121__percent
-      : title: |-
+      prevalence_of_moderate_or_severe_food_insecurity_in_the_total_population__percent__3_year_average__00210091__value__006121__percent:
+        title: |-
           Prevalence of moderate or severe food insecurity in the total population (percent) (3-year average) | 00210091 || Value | 006121 || Percent
         unit: Percent
         short_unit: '%'
@@ -113,9 +112,8 @@ tables:
           numDecimalPlaces: 2
         presentation:
           title_public: Prevalence of undernourishment (percent) (annual value) - Value (Percent)
-      ? |-
-        share_of_dietary_energy_supply_derived_from_cereals__roots_and_tubers__kcal_cap_day__3_year_average__00021012__value__006121__percent
-      : title: |-
+      share_of_dietary_energy_supply_derived_from_cereals__roots_and_tubers__kcal_cap_day__3_year_average__00021012__value__006121__percent:
+        title: |-
           Share of dietary energy supply derived from cereals, roots and tubers (kcal/cap/day) (3-year average) | 00021012 || Value | 006121 || Percent
         unit: Percent
         short_unit: '%'
