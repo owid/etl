@@ -109,6 +109,10 @@ COLORS = [
     "#BE5915",
 ]
 
+# COLUMN SIZES
+NOT_HARD_MODE_COL_SIZES = [27, 10, 10, 7]
+HARD_MODE_COL_SIZES_1 = [21, 18, 18]
+HARD_MODE_COL_SIZES_2 = [5, 17]
 # EXTRA: have multiple rounds
 # seed_idx = st.selectbox(
 #     label="round",
@@ -979,31 +983,28 @@ with st.form("form_guess", border=False, clear_on_submit=True):
 if st.session_state.owidle_difficulty == 2:
     col1, col2 = st.columns([2, 1])
     with col1.container(border=False):
-        HARD_MODE_COL_SIZES_1 = [21, 18, 18]
         col11, col12, col13 = st.columns(HARD_MODE_COL_SIZES_1)
-        col11.markdown("**Guessed Country**")
-        col12.markdown("**Distance from Guessed Country to Correct**")
-        col13.markdown("**Direction from Guessed Country to Correct**")
+        col11.markdown("**Guessed country**")
+        col12.markdown("**Distance from _guessed country_ to _correct_**")
+        col13.markdown("**Direction from _guessed country_ to _correct_**")
     with col2.container(border=False):
-        HARD_MODE_COL_SIZES_2 = [5, 17]
         col21, col22 = st.columns(HARD_MODE_COL_SIZES_2)
-        col21.markdown(f"**Guessed Year**")
+        col21.markdown("**Guessed year**")
         col22.markdown(
-            "**Distance from Guessed Year to Correct**",
-            help="🔥: up to ±5 years\n\n🔽/🔼: between ±5 and ±15 years\n\n⏬️/⏫️🔼: between ±15 and ±30 years\n\n⏬️⏬️⏬️/⏫️⏫️⏫️: More than 30 (or less than -30) years difference",
+            "**Distance from _guessed year_ to _correct_**",
+            help="🔥: up to ±5 years\n\n🔽/🔼: between ±5 and ±15 years\n\n⏬️🔽/⏫️🔼: between ±15 and ±30 years\n\n⏬️⏬️⏬️/⏫️⏫️⏫️: More than 30 (or less than -30) years difference",
         )
 
 # LAYOUT OTHERWISE
 if st.session_state.owidle_difficulty < 2:
-    with st.container(border=False):
-        NOT_HARD_MODE_COL_SIZES = [27, 10, 10, 7]
+    with st.container(border=True):
         col1, col2, col3, col4 = st.columns(NOT_HARD_MODE_COL_SIZES)
         with col1:
-            st.markdown("**Your Guess**")
+            st.markdown("**Your guess**")
         with col2:
-            st.markdown("**Distance From Guess to Answer**")
+            st.markdown("**Distance from _guess_ to _correct_**")
         with col3:
-            st.markdown("**Direction from Guess to Answer**")
+            st.markdown("**Direction from _guess_ to _correct_**")
         with col4:
             st.markdown(
                 "**Score**",
