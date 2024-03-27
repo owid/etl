@@ -15,7 +15,7 @@ To run this code from scratch,
         - Hit Cmd + Shift + P and select Remote-SSH: Connect to Host
         - Type in owid@staging-site-{pull_request_name}
     - Delete the files in the cache folder:
-        rm -rf .cache/pip*
+        rm -rf .cache/*
     - Run the code. You have two options to see the output, in the terminal or in the background:
         python snapshots/wb/{version}/pip_api.py
         nohup poetry run python snapshots/wb/{version}/pip_api.py > output.log 2>&1 &
