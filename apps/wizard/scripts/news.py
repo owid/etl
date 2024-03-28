@@ -75,23 +75,22 @@ def ask_gpt(df) -> Tuple[str, float, int]:
 
     You should summarise the main updates and interesting points from the pull requests.
 
-    Some points to consider for the summary:
+    Sumarise the main and most interesting updates from the PRs. Things to consider for your summary:
+        - DON'T ADD A GENERAL TITLE TO THE SUMMARY!
         - Use markdown syntax in your reply.
         - Optionally, mention the users (by their `username`) involved in the update.
-        - Structure the summary in sections, one for each type of the PRs. The type of the PR is identified by the emoji at the start of its title. Find below the category name (in quotes) for each emoji type. Use this for section titles.
-            - 🎉: "New Features". New feature for the user
-            - ✨: "Improvements". Visible improvement over a current implementation without adding a new feature or fixing a bug.
-            - 🐛: "Bug fixes". Bug fix for the user.
-            - 🔨: "Refactors". A code change that neither fixes a bug nor adds a feature for the user.
-            - 📜: "Documentation". Changes to the documentation.
-            - ✅ : "Tests". Adding missing tests, refactoring tests, etc. No production code change.
-            - 🐝: "Depdencies and tooling". Upgrading dependencies, tooling, etc. No production code change.
-            - 💄: "Style". Formatting, missing semi colons, etc. No production code change.
-            - 🚧: "Work in progress". Intermediate PR that will be improved later on.
-            - 📊: "Data". Data-related PRs
-
+        - Structure the summary in sections, one for each type of the PRs. Use header 4 for section title. PR category is identified by emoji at the start of PR's title:
+            - 🎉: "New Features"
+            - ✨: "Improvements"
+            - 🐛: "Bug fixes"
+            - 🔨: "Refactors"
+            - 📜: "Documentation"
+            - ✅ : "Tests"
+            - 🐝: "Depdencies and tooling"
+            - 💄: "Style"
+            - 🚧: "Work in progress"
+            - 📊: "Data"
             Note: If no emoji is present, the category of the PR is "Other PRs".
-        - Headers: Don't add a header at the start of your summary. Use header 4 or of lower level.
 
     {SYSTEM_PROMPT_GENERIC}
     """
