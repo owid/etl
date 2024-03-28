@@ -20,52 +20,52 @@ tables:
         short_unit: t
         processing_level: major
         display:
-          name: Oil of sesame seed - Production (Tonnes)
+          name: Production of sesame seed oil
           shortUnit: t
           numDecimalPlaces: 2
         presentation:
-          title_public: Oil of sesame seed - Production (Tonnes)
+          title_public: Production of sesame seed oil
       rapeseed_or_canola_oil__crude__00000271__production__005510__tonnes:
         title: Rapeseed or canola oil, crude | 00000271 || Production | 005510 || Tonnes
         unit: Tonnes
         short_unit: t
         processing_level: major
         display:
-          name: Rapeseed or canola oil, crude - Production (Tonnes)
+          name: Production of rapeseed or canola oil
           shortUnit: t
           numDecimalPlaces: 2
         presentation:
-          title_public: Rapeseed or canola oil, crude - Production (Tonnes)
+          title_public: Production of rapeseed or canola oil
       safflower_seed_oil__crude__00000281__production__005510__tonnes:
         title: Safflower-seed oil, crude | 00000281 || Production | 005510 || Tonnes
         unit: Tonnes
         short_unit: t
         processing_level: major
         display:
-          name: Safflower-seed oil, crude - Production (Tonnes)
+          name: Production of safflower-seed oil
           shortUnit: t
           numDecimalPlaces: 2
         presentation:
-          title_public: Safflower-seed oil, crude - Production (Tonnes)
+          title_public: Production of safflower-seed oil
       soya_bean_oil__00000237__production__005510__tonnes:
         title: Soya bean oil | 00000237 || Production | 005510 || Tonnes
         unit: Tonnes
         short_unit: t
         processing_level: major
         display:
-          name: Soya bean oil - Production (Tonnes)
+          name: Production of soya bean oil
           shortUnit: t
           numDecimalPlaces: 2
         presentation:
-          title_public: Soya bean oil - Production (Tonnes)
+          title_public: Production of soya bean oil
       sunflower_seed_oil__crude__00000268__production__005510__tonnes:
         title: Sunflower-seed oil, crude | 00000268 || Production | 005510 || Tonnes
         unit: Tonnes
         short_unit: t
         processing_level: major
         display:
-          name: Sunflower-seed oil, crude - Production (Tonnes)
+          name: Production of sunflower-seed oil
           shortUnit: t
           numDecimalPlaces: 2
         presentation:
-          title_public: Sunflower-seed oil, crude - Production (Tonnes)
+          title_public: Production of sunflower-seed oil
