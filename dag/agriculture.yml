@@ -2,16 +2,16 @@ steps:
   #
   # Long-term wheat yields in Europe.
   #
-  data://garden/agriculture/2023-06-12/long_term_wheat_yields:
-    - data://garden/papers/2023-04-20/bayliss_smith_wanmali_1984
-    - data://garden/faostat/2023-06-12/faostat_qcl
+  data://garden/agriculture/2024-03-26/long_term_wheat_yields:
+    - data://garden/papers/2024-03-26/bayliss_smith_wanmali_1984
+    - data://garden/faostat/2024-03-14/faostat_qcl
   #
   # Long-term corn yields in United States.
   #
-  data://meadow/usda_nass/2023-04-20/us_corn_yields:
-    - snapshot://usda_nass/2023-04-20/us_corn_yields.csv
-  data://garden/usda_nass/2023-04-20/us_corn_yields:
-    - data://meadow/usda_nass/2023-04-20/us_corn_yields
+  data://meadow/usda_nass/2024-03-26/us_corn_yields:
+    - snapshot://usda_nass/2024-03-26/us_corn_yields.csv
+  data://garden/usda_nass/2024-03-26/us_corn_yields:
+    - data://meadow/usda_nass/2024-03-26/us_corn_yields
   #
   # Long-term yields in the United Kingdom.
   #
@@ -72,3 +72,21 @@ steps:
     - data://meadow/wb/2023-07-24/food_prices_for_nutrition
   data://grapher/wb/2023-07-24/food_prices_for_nutrition:
     - data://garden/wb/2023-07-24/food_prices_for_nutrition
+
+  ######################################################################################################################
+  # Older versions to be archived once they are not used by any other steps.
+  #
+  # Long-term wheat yields in Europe.
+  #
+  data://garden/agriculture/2023-06-12/long_term_wheat_yields:
+    - data://garden/papers/2023-04-20/bayliss_smith_wanmali_1984
+    - data://garden/faostat/2023-06-12/faostat_qcl
+  #
+  # Long-term corn yields in United States.
+  #
+  data://meadow/usda_nass/2023-04-20/us_corn_yields:
+    - snapshot://usda_nass/2023-04-20/us_corn_yields.csv
+  data://garden/usda_nass/2023-04-20/us_corn_yields:
+    - data://meadow/usda_nass/2023-04-20/us_corn_yields
+
+  ######################################################################################################################
