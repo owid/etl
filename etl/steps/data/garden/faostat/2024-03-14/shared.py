@@ -1743,18 +1743,13 @@ def prepare_wide_table(tb: Table) -> Table:
     # Add variable description.
     variable_name_mapping = _variable_name_map(tb, "variable_description")
     for column in tb_wide.columns:
-        tb_wide[column].metadata.description = variable_name_mapping[column]
+        tb_wide[column].metadata.description_from_producer = variable_name_mapping[column]
 
     # Add display and presentation parameters (for grapher).
-    for column in tb_wide.columns:
-        tb_wide[column].metadata.display = {}
-        tb_wide[column].metadata.presentation = VariablePresentationMeta()
-
-    # Display name.
     variable_name_mapping = _variable_name_map(tb, "variable_display_name")
     for column in tb_wide.columns:
-        tb_wide[column].metadata.display["name"] = variable_name_mapping[column]
-        tb_wide[column].metadata.presentation.title_public = variable_name_mapping[column]
+        tb_wide[column].metadata.display = {"name": variable_name_mapping[column]}
+        tb_wide[column].metadata.presentation = VariablePresentationMeta(title_public=variable_name_mapping[column])
 
     # Ensure columns have the optimal dtypes, but codes are categories.
     log.info("prepare_wide_table.optimize_table_dtypes", shape=tb_wide.shape)
@@ -1904,8 +1899,6 @@ def run(dest_dir: str) -> None:
         check_variables_metadata=False,
     )
     # Update dataset metadata.
-    ds_garden.metadata.update_period_days = 365
-    ds_garden.metadata.title = dataset_metadata["owid_dataset_title"]
     # The following description is not publicly shown in charts; it is only visible when accessing the catalog.
     ds_garden.metadata.description = dataset_metadata["owid_dataset_description"] + anomaly_descriptions
 

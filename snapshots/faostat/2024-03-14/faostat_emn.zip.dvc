@@ -9,7 +9,7 @@ meta:
 
       The following elements are disseminated: 1) Stocks; 2) Amount excreted in manure (N content);  3) Manure left on pasture (N content); 4) Manure left on pasture that volatilizes (N content); 5) Manure left on pasture that leaches (N content); 6) Manure treated (N content); 7) Losses from manure treated (N content); 8) Manure applied to soils (N content); 9) Manure applied to soils that volatilizes (N content); 10) Manure applied to soils that leaches (N content).
     citation_full: 'Food and Agriculture Organization of the United Nations - Land, Inputs and Sustainability: Livestock Manure (2023).'
-    attribution_short: FAOSTAT
+    attribution_short: FAO
     url_main: http://www.fao.org/faostat/en/#data/EMN
     url_download: https://fenixservices.fao.org/faostat/static/bulkdownloads/Environment_LivestockManure_E_All_Data_(Normalized).zip
     date_accessed: '2024-03-14'

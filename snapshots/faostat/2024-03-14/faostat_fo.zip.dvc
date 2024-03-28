@@ -9,7 +9,7 @@ meta:
 
       The database contains details of the following topics: - Roundwood removals (production) by coniferous and non-coniferous wood and assortments, - production and trade in industrial roundwood, sawnwood, wood-based panels, wood charcoal, pulp, paper and paperboard, and other products. More detailed information on wood products, including definitions, can be found at: https://www.fao.org/forestry/statistics/80572/en
     citation_full: 'Food and Agriculture Organization of the United Nations - Forestry: Forestry Production and Trade (2023).'
-    attribution_short: FAOSTAT
+    attribution_short: FAO
     url_main: http://www.fao.org/faostat/en/#data/FO
     url_download: https://fenixservices.fao.org/faostat/static/bulkdownloads/Forestry_E_All_Data_(Normalized).zip
     date_accessed: '2024-03-14'

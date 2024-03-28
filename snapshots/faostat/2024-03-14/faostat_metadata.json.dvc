@@ -4,7 +4,7 @@ meta:
     title: Metadata and identifiers
     description: Metadata and identifiers used in FAOSTAT datasets.
     citation_full: Food and Agriculture Organization of the United Nations (2024).
-    attribution_short: FAOSTAT
+    attribution_short: FAO
     url_main: http://www.fao.org/faostat/en/#data
     date_accessed: '2024-03-14'
     date_published: '2024-03-14'
