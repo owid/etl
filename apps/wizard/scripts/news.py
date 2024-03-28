@@ -73,9 +73,25 @@ def ask_gpt(df) -> Tuple[str, float, int]:
     """Ask GPT for news."""
     SYSTEM_PROMPT = f"""You will be given a markdown table with the pull requests merged in the etl repository in the last 7 days.
 
-    Summarise the main updates and interesting points from the pull requests. Use markdown syntax in your reply if needed.
+    You should summarise the main updates and interesting points from the pull requests.
 
-    To refer to users, use their `username`.
+    Some points to consider for the summary:
+        - Use markdown syntax in your reply.
+        - Optionally, mention the users (by their `username`) involved in the update.
+        - Structure the summary in sections, based on the type of the PRs. The type of the PR is identified by the emoji at the start of the title:
+            - 🎉: "New Features". New feature for the user
+            - ✨: "Improvements". Visible improvement over a current implementation without adding a new feature or fixing a bug.
+            - 🐛: "Bug fixes". Bug fix for the user.
+            - 🔨: "Refactors". A code change that neither fixes a bug nor adds a feature for the user.
+            - 📜: "Documentation". Changes to the documentation.
+            - ✅ : "Tests". Adding missing tests, refactoring tests, etc. No production code change.
+            - 🐝: "Depdencies and tooling". Upgrading dependencies, tooling, etc. No production code change.
+            - 💄: "Style". Formatting, missing semi colons, etc. No production code change.
+            - 🚧: "Work in progress". Intermediate PR that will be improved later on.
+            - 📊: "Data". Data-related PRs
+
+            Note: If no emoji is present, the category of the PR is "Other PRs".
+        - Don't provide a title for the summary. You can add sections starting with header level 3.
 
     {SYSTEM_PROMPT_GENERIC}
     """
