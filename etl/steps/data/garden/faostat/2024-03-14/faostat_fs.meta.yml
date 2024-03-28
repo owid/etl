@@ -27,20 +27,20 @@ tables:
           title_public: Minimum dietary energy requirement
       number_of_moderately_or_severely_food_insecure_people__million__3_year_average__00210081__value__006132__million_number:
         title: Number of moderately or severely food insecure people (million) (3-year average) | 00210081 || Value | 006132 || million Number
-        unit: million Number
-        short_unit: million No
+        unit: millions
+        short_unit: millions
         processing_level: major
         display:
           name: Number of moderately or severely food insecure people
-          shortUnit: million No
+          shortUnit: millions
           numDecimalPlaces: 0
         presentation:
           title_public: Number of moderately or severely food insecure people
           title_variant: 3-year average
       number_of_severely_food_insecure_people__million__3_year_average__00210071__value__006132__million_number:
         title: Number of severely food insecure people (million) (3-year average) | 00210071 || Value | 006132 || million Number
-        unit: million Number
-        short_unit: million No
+        unit: millions
+        short_unit: millions
         processing_level: major
         display:
           name: Number of severely food insecure people
@@ -51,8 +51,8 @@ tables:
           title_variant: 3-year average
       number_of_severely_food_insecure_people__million__annual_value__00210070__value__006132__million_number:
         title: Number of severely food insecure people (million) (annual value) | 00210070 || Value | 006132 || million Number
-        unit: million Number
-        short_unit: million No
+        unit: millions
+        short_unit: millions
         processing_level: major
         display:
           name: Number of severely food insecure people
@@ -67,11 +67,11 @@ tables:
         short_unit: '%'
         processing_level: major
         display:
-          name: Percentage of children under 5 years of age who are stunted
+          name: Percentage of children under five years of age who are stunted
           shortUnit: '%'
           numDecimalPlaces: 2
         presentation:
-          title_public: Percentage of children under 5 years of age who are stunted (Percent)
+          title_public: Percentage of children under five years of age who are stunted (Percent)
       prevalence_of_moderate_or_severe_food_insecurity_in_the_total_population__percent__3_year_average__00210091__value__006121__percent:
         title: Prevalence of moderate or severe food insecurity in the total population (percent) (3-year average) | 00210091 || Value | 006121 || Percent
         unit: percent

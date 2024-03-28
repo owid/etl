@@ -16,8 +16,8 @@ tables:
     variables:
       agriculture__00002051__gross_production_value__current_thousand_usd__000057__1000_usd:
         title: Agriculture | 00002051 || Gross Production Value (current thousand US$) | 000057 || 1000 USD
-        unit: 1000 USD
-        short_unit: ''
+        unit: current thousand US$
+        short_unit: '$'
         processing_level: major
         display:
           name: Gross production value of the agricultural sector

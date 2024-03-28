@@ -27,12 +27,12 @@ tables:
           title_public: Share of food lost in post-harvest processes
       _2_1_1_number_of_undernourished_people__000000000024001__value__006132__million_number:
         title: 2.1.1 Number of undernourished people | 000000000024001 || Value | 006132 || million Number
-        unit: million Number
-        short_unit: million No
+        unit: millions
+        short_unit: millions
         processing_level: major
         display:
           name: Number of people that are undernourished
-          shortUnit: million No
+          shortUnit: millions
           numDecimalPlaces: 0
         presentation:
           title_public: Number of people that are undernourished

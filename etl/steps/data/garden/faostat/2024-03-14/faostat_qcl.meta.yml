@@ -260,7 +260,7 @@ tables:
       cattle__00000866__stocks__005111__animals:
         title: Cattle | 00000866 || Stocks | 005111 || animals
         unit: animals
-        short_unit: animals
+        short_unit: ''
         processing_level: major
         display:
           name: Number of cattle
@@ -392,7 +392,7 @@ tables:
       eggs__00001783__yield__005410__kilograms_per_animal:
         title: Eggs | 00001783 || Yield | 005410 || kilograms per animal
         unit: kilograms per animal
-        short_unit: kg/animal
+        short_unit: kg
         processing_level: major
         display:
           name: Eggs per bird
@@ -535,7 +535,7 @@ tables:
       meat_of_cattle_with_the_bone__fresh_or_chilled__00000867__producing_or_slaughtered_animals__005320__animals:
         title: Meat of cattle with the bone, fresh or chilled | 00000867 || Producing or slaughtered animals | 005320 || animals
         unit: animals
-        short_unit: animals
+        short_unit: ''
         processing_level: major
         display:
           name: Number of cattle slaughtered for meat
@@ -546,7 +546,7 @@ tables:
       meat_of_cattle_with_the_bone__fresh_or_chilled__00000867__yield__005417__kilograms_per_animal:
         title: Meat of cattle with the bone, fresh or chilled | 00000867 || Yield | 005417 || kilograms per animal
         unit: kilograms per animal
-        short_unit: kg/animal
+        short_unit: kg
         processing_level: major
         display:
           name: Cattle meat yield per animal
@@ -579,7 +579,7 @@ tables:
       meat__chicken__00001058__producing_or_slaughtered_animals__005321__animals:
         title: Meat, chicken | 00001058 || Producing or slaughtered animals | 005321 || animals
         unit: animals
-        short_unit: animals
+        short_unit: ''
         processing_level: major
         display:
           name: Number of chickens slaughtered for meat
@@ -601,7 +601,7 @@ tables:
       meat__chicken__00001058__yield__005424__kilograms_per_animal:
         title: Meat, chicken | 00001058 || Yield | 005424 || kilograms per animal
         unit: kilograms per animal
-        short_unit: kg/animal
+        short_unit: kg
         processing_level: major
         display:
           name: Chicken meat yield per animal
@@ -612,7 +612,7 @@ tables:
       meat__duck__00001069__producing_or_slaughtered_animals__005321__animals:
         title: Meat, duck | 00001069 || Producing or slaughtered animals | 005321 || animals
         unit: animals
-        short_unit: animals
+        short_unit: ''
         processing_level: major
         display:
           name: Number of ducks slaughtered for meat
@@ -634,7 +634,7 @@ tables:
       meat__goat__00001017__producing_or_slaughtered_animals__005320__animals:
         title: Meat, goat | 00001017 || Producing or slaughtered animals | 005320 || animals
         unit: animals
-        short_unit: animals
+        short_unit: ''
         processing_level: major
         display:
           name: Number of goats slaughtered for meat
@@ -656,7 +656,7 @@ tables:
       meat__lamb_and_mutton__00000977__producing_or_slaughtered_animals__005320__animals:
         title: Meat, lamb and mutton | 00000977 || Producing or slaughtered animals | 005320 || animals
         unit: animals
-        short_unit: animals
+        short_unit: ''
         processing_level: major
         display:
           name: Number of sheep slaughtered for meat
@@ -667,7 +667,7 @@ tables:
       meat__pig__00001035__producing_or_slaughtered_animals__005320__animals:
         title: Meat, pig | 00001035 || Producing or slaughtered animals | 005320 || animals
         unit: animals
-        short_unit: animals
+        short_unit: ''
         processing_level: major
         display:
           name: Number of pigs slaughtered for meat
@@ -689,7 +689,7 @@ tables:
       meat__pig__00001035__yield__005417__kilograms_per_animal:
         title: Meat, pig | 00001035 || Yield | 005417 || kilograms per animal
         unit: kilograms per animal
-        short_unit: kg/animal
+        short_unit: kg
         processing_level: major
         display:
           name: Pig meat yield per animal
@@ -711,7 +711,7 @@ tables:
       meat__poultry__00001808__yield__005424__kilograms_per_animal:
         title: Meat, poultry | 00001808 || Yield | 005424 || kilograms per animal
         unit: kilograms per animal
-        short_unit: kg/animal
+        short_unit: kg
         processing_level: major
         display:
           name: Poultry meat yield per animal
@@ -744,7 +744,7 @@ tables:
       meat__turkey__00001080__producing_or_slaughtered_animals__005321__animals:
         title: Meat, turkey | 00001080 || Producing or slaughtered animals | 005321 || animals
         unit: animals
-        short_unit: animals
+        short_unit: ''
         processing_level: major
         display:
           name: Number of turkeys slaughtered for meat
@@ -766,7 +766,7 @@ tables:
       milk__00001780__yield__005420__kilograms_per_animal:
         title: Milk | 00001780 || Yield | 005420 || kilograms per animal
         unit: kilograms per animal
-        short_unit: kg/animal
+        short_unit: kg
         processing_level: major
         display:
           name: Milk yield per animal
@@ -964,7 +964,7 @@ tables:
       poultry__00002029__stocks__005112__animals:
         title: Poultry | 00002029 || Stocks | 005112 || animals
         unit: animals
-        short_unit: animals
+        short_unit: ''
         processing_level: major
         display:
           name: Number of poultry birds
@@ -1261,7 +1261,7 @@ tables:
       swine__pigs__00001034__stocks__005111__animals:
         title: Swine / pigs | 00001034 || Stocks | 005111 || animals
         unit: animals
-        short_unit: animals
+        short_unit: ''
         processing_level: major
         display:
           name: Number of pigs

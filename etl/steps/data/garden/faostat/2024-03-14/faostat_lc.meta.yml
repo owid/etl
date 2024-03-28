@@ -18,7 +18,7 @@ tables:
         title: Artificial surfaces (including urban and associated areas) | 00006970 || Area from CGLS | 005006 || thousand Hectares
         description_key:
           - Land cover information is based on maps from the European Copernicus Global Land Service (CGLS), with a spatial resolution of 100m.
-        unit: thousand Hectares
+        unit: thousand hectares
         short_unit: 1000 ha
         processing_level: major
         display:
@@ -31,7 +31,7 @@ tables:
         title: Inland water bodies | 00006981 || Area from CGLS | 005006 || thousand Hectares
         description_key:
           - Land cover information is based on maps from the European Copernicus Global Land Service (CGLS), with a spatial resolution of 100m.
-        unit: thousand Hectares
+        unit: thousand hectares
         short_unit: 1000 ha
         processing_level: major
         display:
@@ -44,7 +44,7 @@ tables:
         title: Shrub-covered areas | 00006976 || Area from CCI_LC | 005008 || thousand Hectares
         description_key:
           - Land cover information is based on maps from the European Spatial Agency (ESA) Climate Change Initiative (CCI) produced by the Université catholique de Louvain (UCL)-Geomatics and now under the European Copernicus Program.
-        unit: thousand Hectares
+        unit: thousand hectares
         short_unit: 1000 ha
         processing_level: major
         display:
