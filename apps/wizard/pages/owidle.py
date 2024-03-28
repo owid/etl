@@ -1,4 +1,5 @@
 """Game owidle."""
+
 import datetime as dt
 import math
 from itertools import product
@@ -108,6 +109,10 @@ COLORS = [
     "#BE5915",
 ]
 
+# COLUMN SIZES
+NOT_HARD_MODE_COL_SIZES = [27, 10, 10, 7]
+HARD_MODE_COL_SIZES_1 = [21, 18, 18]
+HARD_MODE_COL_SIZES_2 = [5, 17]
 # EXTRA: have multiple rounds
 # seed_idx = st.selectbox(
 #     label="round",
@@ -972,6 +977,44 @@ with st.form("form_guess", border=False, clear_on_submit=True):
 # SHOW GUESSES (this far)
 #
 ##########################################
+
+# Create column headers for guesses
+# LAYOUT IF HARD MODE
+if st.session_state.owidle_difficulty == 2:
+    col1, col2 = st.columns([2, 1])
+    with col1.container(border=False):
+        col11, col12, col13 = st.columns(HARD_MODE_COL_SIZES_1)
+        col11.markdown("**Guessed country**")
+        col12.markdown("**Distance from _guessed country_ to _correct_**")
+        col13.markdown("**Direction from _guessed country_ to _correct_**")
+    with col2.container(border=False):
+        col21, col22 = st.columns(HARD_MODE_COL_SIZES_2)
+        col21.markdown("**Guessed year**")
+        col22.markdown(
+            "**Distance from _guessed year_ to _correct_**",
+            help="🔥: up to ±5 years\n\n🔽/🔼: between ±5 and ±15 years\n\n⏬️🔽/⏫️🔼: between ±15 and ±30 years\n\n⏬️⏬️⏬️/⏫️⏫️⏫️: More than 30 (or less than -30) years difference",
+        )
+
+# LAYOUT OTHERWISE
+if st.session_state.owidle_difficulty < 2:
+    with st.container(border=False):
+        col1, col2, col3, col4 = st.columns(NOT_HARD_MODE_COL_SIZES)
+        with col1:
+            st.markdown("**Your guess**")
+        with col2:
+            st.markdown("**Distance from _guess_ to _correct_**")
+        with col3:
+            st.markdown("**Direction from _guess_ to _correct_**")
+        with col4:
+            st.markdown(
+                "**Score**",
+                help="""Your score is determined as the distance from your
+            guess to the correct answer as a percentage of the maximum distance one can measure on earth.
+            i.e. a score of 0% means your guess is as far away as is possible from the answer.
+            A score of 90% means your guess is 10% of the maximum distance on earth (so it is fairly close).""",
+            )
+
+# Display guesses
 guesses_display = []
 num_guesses_bound = min(st.session_state.num_guesses, NUM_GUESSES)
 for i in range(num_guesses_bound):
@@ -979,24 +1022,19 @@ for i in range(num_guesses_bound):
     if st.session_state.owidle_difficulty == 2:
         col1, col2 = st.columns([2, 1])
         with col1.container(border=True):
-            col11, col12, col13 = st.columns([30, 10, 7])
+            col11, col12, col13 = st.columns(HARD_MODE_COL_SIZES_1)
             col11.markdown(f"**{st.session_state.guesses[i]['name']}**")
             col12.markdown(f"{st.session_state.guesses[i]['distance']}km")
             col13.markdown(st.session_state.guesses[i]["direction"])
         with col2.container(border=True):
-            col21, col22 = st.columns(2)
+            col21, col22 = st.columns(HARD_MODE_COL_SIZES_2)
             col21.markdown(f"**{st.session_state.guesses[i]['year']}**")
-            if i == st.session_state.num_guesses - 1:
-                col22.markdown(
-                    st.session_state.guesses[i]["direction_year"],
-                    help="🔥: up to ±5 years\n\n🔽/🔼: between ±5 and ±15 years\n\n⏬️/⏫️🔼: between ±15 and ±30 years\n\n⏬️⏬️⏬️/⏫️⏫️⏫️: More than 30 (or less than -30) years difference",
-                )
-            else:
-                col22.markdown(st.session_state.guesses[i]["direction_year"])
+            col22.markdown(st.session_state.guesses[i]["direction_year"])
+
     # LAYOUT OTHERWISE
     else:
         with st.container(border=True):
-            col1, col2, col3, col4 = st.columns([30, 10, 7, 7])
+            col1, col2, col3, col4 = st.columns(NOT_HARD_MODE_COL_SIZES)
             with col1:
                 # st.text(st.session_state.guesses[i]["name"])
                 st.markdown(f"**{st.session_state.guesses[i]['name']}**")
