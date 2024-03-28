@@ -40,7 +40,7 @@ def run(dest_dir: str) -> None:
         df=tb,
         countries_file=paths.country_mapping_path,
     )
-    tb = tb.set_index(["aggregation", "country", "year", "spell"], verify_integrity=True)
+    tb = tb.format(["aggregation", "country", "year", "spell"])
 
     #
     # Save outputs.
