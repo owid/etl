@@ -28,9 +28,6 @@ def run(tb: Table) -> Table:
     # Sort
     tb = tb.sort_values(["country", "year"])
 
-    # Copy origins (some indicators will loose their 'origins' in metadata)
-    origins = deepcopy(tb["country"].metadata.origins)
-
     # %% Create expanded and refined Regimes of the World indicator
     # (L76-L94) Create indicators for multi-party elections, and free and fair elections
     tb = estimate_mulpar_indicators(tb)
@@ -74,11 +71,6 @@ def run(tb: Table) -> Table:
     # Estimate gender of HOG
     tb.loc[(tb["wom_hos_vdem"].notna()) & (tb["v2exhoshog"] == 1), "wom_hog_vdem"] = tb["wom_hos_vdem"]
     tb = tb.drop(columns=["v2exhoshog"])
-
-    # %% Bring origins back
-    columns = [col for col in tb.columns if col not in ["country", "year"]]
-    for col in columns:
-        tb[col].metadata.origins = origins
 
     return tb
 

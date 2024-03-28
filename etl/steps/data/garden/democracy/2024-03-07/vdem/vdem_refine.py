@@ -44,6 +44,8 @@ def add_years_in_democracy(tb: Table) -> Table:
     tb["num_years_in_electdem"] = tb.groupby("country")["regime_electdem"].cumsum()
     tb["num_years_in_libdem"] = tb.groupby("country")["regime_libdem"].cumsum()
 
+    # Drop unused columns
+    tb = tb.drop(columns=["regime_electdem", "regime_libdem"])
     return tb
 
 

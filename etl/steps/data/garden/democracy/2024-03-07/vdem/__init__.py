@@ -1,5 +1,6 @@
 """Load a meadow dataset and create a garden dataset."""
 
+from copy import deepcopy
 from typing import cast
 
 import vdem_clean as clean  # VDEM's cleaning library
@@ -28,6 +29,9 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
+    # %% Copy origins
+    # Copy origins (some indicators will loose their 'origins' in metadata)
+    origins = deepcopy(tb["country"].metadata.origins)
 
     # %% PART 1: CLEAN
     # The following lines (until "PART 2") are the cleaning steps.
@@ -44,8 +48,14 @@ def run(dest_dir: str) -> None:
     # %% PART 3: REFINE
     tb = refine.run(tb)
 
-    # %% Tweak citation full for some indicators
-    tb = add_citation_full(tb)
+    # %% Add origins in case any was lost, adjust citation full
+    # Bring origins back
+    columns = [col for col in tb.columns if col not in ["country", "year"]]
+    for col in columns:
+        tb[col].metadata.origins = origins
+
+    # Tweak citation full for some indicators
+    tb = adjust_citation_full(tb)
 
     # %% Set index
     tb = tb.format()
@@ -145,6 +155,7 @@ def append_citation_full(tb: Table) -> Table:
         **{i: CITATION_PEMSTEIN for i in citation_pemstein},
         **{i: CITATION_MCMANN for i in citation_mcmann},
         **{i: CITATION_TEORELL for i in citation_teorell},
+        ##
         **{f"egaldem_vdem{dim}": CITATION_SIGMAN for dim in DIMENSIONS},
         **{f"wom_emp_vdem{dim}": CITATION_SUNDSTROM for dim in DIMENSIONS},
         **{f"wom_pol_par_vdem{dim}": CITATION_SUNDSTROM for dim in DIMENSIONS},
@@ -152,9 +163,10 @@ def append_citation_full(tb: Table) -> Table:
         **{f"egal_vdem{dim}": f"{CITATION_SIGMAN}; {CITATION_COPPEDGE}" for dim in DIMENSIONS},
         **{f"equal_rights_vdem{dim}": f"{CITATION_SIGMAN}; {CITATION_PEMSTEIN}" for dim in DIMENSIONS},
         **{f"equal_access_vdem{dim}": f"Sigman and Lindberg (2017); {CITATION_PEMSTEIN}" for dim in DIMENSIONS},
+        ##
         **{f"equal_res_vdem{dim}": f"{CITATION_SIGMAN}; {CITATION_PEMSTEIN}" for dim in DIMENSIONS},
         **{
-            f"description_from_producer{dim}": "Sigman and Lindberg (2017, V-Dem Working Paper Series 2017:56); Sigman and Lindberg (2018); {CITATION_PEMSTEIN}"
+            f"personalism_vdem{dim}": "Sigman and Lindberg (2017, V-Dem Working Paper Series 2017:56); Sigman and Lindberg (2018); {CITATION_PEMSTEIN}"
             for dim in DIMENSIONS
         },
         **{f"wom_civ_libs_vdem{dim}": f"{CITATION_SUNDSTROM}; {CITATION_PEMSTEIN}" for dim in DIMENSIONS},
@@ -172,6 +184,8 @@ def append_citation_full(tb: Table) -> Table:
         *[f"electfreefair{dim}_row" for dim in DIMENSIONS],
         *[f"electdem_dich{dim}_row_owid" for dim in DIMENSIONS],
         *[f"electmulpar{dim}_row" for dim in DIMENSIONS],
+        *[f"electmulpar_hoe{dim}_row_owid" for dim in DIMENSIONS],
+        *[f"electmulpar_leg{dim}_row" for dim in DIMENSIONS],
     ]
     for indicator_name in citation_luhrmann:
         tb[indicator_name].metadata.origins[0].citation_full = (
