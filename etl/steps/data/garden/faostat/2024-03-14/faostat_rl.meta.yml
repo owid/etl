@@ -16,133 +16,141 @@ tables:
     variables:
       agricultural_land__00006610__area__005110__hectares:
         title: Agricultural land | 00006610 || Area | 005110 || hectares
+        description_short: |-
+          Land used for cultivation of crops and animal husbandry. The total of areas under cropland and permanent meadows and pastures.
         unit: hectares
         short_unit: ha
         processing_level: major
         display:
-          name: Agricultural land - Area (hectares)
+          name: Agricultural land use
           shortUnit: ha
           numDecimalPlaces: 2
         presentation:
-          title_public: Agricultural land - Area (hectares)
+          title_public: Agricultural land use
       agricultural_land__00006610__area__5110pc__hectares_per_capita:
         title: Agricultural land | 00006610 || Area | 5110pc || hectares per capita
         unit: hectares per capita
         short_unit: ha
         processing_level: major
         display:
-          name: Agricultural land - Area (hectares per capita)
+          name: Agricultural land use per capita
           shortUnit: ha
           numDecimalPlaces: 2
         presentation:
-          title_public: Agricultural land - Area (hectares per capita)
+          title_public: Agricultural land use per capita
       agriculture_area_certified_organic__00006672__area__005110__hectares:
         title: Agriculture area certified organic | 00006672 || Area | 005110 || hectares
         unit: hectares
         short_unit: ha
         processing_level: major
         display:
-          name: Agriculture area certified organic - Area (hectares)
+          name: Agricultural area certified organic
           shortUnit: ha
           numDecimalPlaces: 2
         presentation:
-          title_public: Agriculture area certified organic - Area (hectares)
+          title_public: Agricultural area certified organic
       agriculture_area_under_organic_agric__00006671__share_in_agricultural_land__007208__percent:
         title: Agriculture area under organic agric. | 00006671 || Share in Agricultural land | 007208 || Percent
+        description_short: |-
+          Organic arable land area is the sum of the area certified as organic by official standards, and land area in the conversion process to organic (which is assumed by the UN FAO as a two-year period prior to certification). Arable land is that used for crops (which does not include grazing land).
         unit: Percent
         short_unit: '%'
         processing_level: major
         display:
-          name: Agriculture area under organic agric. - Share in Agricultural land (Percent)
+          name: Share of arable land that is organic
           shortUnit: '%'
           numDecimalPlaces: 2
         presentation:
-          title_public: Agriculture area under organic agric. - Share in Agricultural land (Percent)
+          title_public: Share of arable land that is organic
       agriculture__00006602__area__005110__hectares:
         title: Agriculture | 00006602 || Area | 005110 || hectares
+        description_short: |-
+          Land used for agricultural purposes, including for cultivation of crops and animal husbandry, farm buildings, etc.
         unit: hectares
         short_unit: ha
         processing_level: major
         display:
-          name: Agriculture - Area (hectares)
+          name: Area used for agricultural purposes
           shortUnit: ha
           numDecimalPlaces: 2
         presentation:
-          title_public: Agriculture - Area (hectares)
+          title_public: Area used for agricultural purposes
       arable_land__00006621__area__005110__hectares:
         title: Arable land | 00006621 || Area | 005110 || hectares
         unit: hectares
         short_unit: ha
         processing_level: major
         display:
-          name: Arable land - Area (hectares)
+          name: Area of arable land
           shortUnit: ha
           numDecimalPlaces: 2
         presentation:
-          title_public: Arable land - Area (hectares)
+          title_public: Area of arable land
       cropland__00006620__area__005110__hectares:
         title: Cropland | 00006620 || Area | 005110 || hectares
         unit: hectares
         short_unit: ha
         processing_level: major
         display:
-          name: Cropland - Area (hectares)
+          name: Cropland area
           shortUnit: ha
           numDecimalPlaces: 2
         presentation:
-          title_public: Cropland - Area (hectares)
+          title_public: Cropland area
       forest_land__00006646__area__005110__hectares:
         title: Forest land | 00006646 || Area | 005110 || hectares
         unit: hectares
         short_unit: ha
         processing_level: major
         display:
-          name: Forest land - Area (hectares)
+          name: Area of forest
           shortUnit: ha
           numDecimalPlaces: 2
         presentation:
-          title_public: Forest land - Area (hectares)
+          title_public: Area of forest
       naturally_regenerating_forest__00006717__area__005110__hectares:
         title: Naturally regenerating forest | 00006717 || Area | 005110 || hectares
         unit: hectares
         short_unit: ha
         processing_level: major
         display:
-          name: Naturally regenerating forest - Area (hectares)
+          name: Area of naturally regenerating forest
           shortUnit: ha
           numDecimalPlaces: 2
         presentation:
-          title_public: Naturally regenerating forest - Area (hectares)
+          title_public: Area of naturally regenerating forest
       permanent_meadows_and_pastures__00006655__area__005110__hectares:
         title: Permanent meadows and pastures | 00006655 || Area | 005110 || hectares
         unit: hectares
         short_unit: ha
         processing_level: major
         display:
-          name: Permanent meadows and pastures - Area (hectares)
+          name: Area of permanent meadows and pastures
           shortUnit: ha
           numDecimalPlaces: 2
         presentation:
-          title_public: Permanent meadows and pastures - Area (hectares)
+          title_public: Area of permanent meadows and pastures
       permanent_meadows_and_pastures__00006655__share_in_land_area__007209__percent:
         title: Permanent meadows and pastures | 00006655 || Share in Land area | 007209 || Percent
+        description_short: |-
+          Permanent meadows and pastures are areas used permanently (five years or more) for herbaceous forage crops, either cultivated or growing wild (wild prairie or grazing land).
         unit: Percent
         short_unit: '%'
         processing_level: major
         display:
-          name: Permanent meadows and pastures - Share in Land area (Percent)
+          name: Share of land used for permanent meadows and pastures
           shortUnit: '%'
           numDecimalPlaces: 2
         presentation:
-          title_public: Permanent meadows and pastures - Share in Land area (Percent)
+          title_public: Share of land used for permanent meadows and pastures
       planted_forest__00006716__area__005110__hectares:
         title: Planted Forest | 00006716 || Area | 005110 || hectares
         unit: hectares
         short_unit: ha
         processing_level: major
         display:
-          name: Planted Forest - Area (hectares)
+          name: Area of planted forest
           shortUnit: ha
           numDecimalPlaces: 2
         presentation:
-          title_public: Planted Forest - Area (hectares)
+          title_public: Area of planted forest

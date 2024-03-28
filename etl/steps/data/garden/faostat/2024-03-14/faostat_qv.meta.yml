@@ -20,8 +20,8 @@ tables:
         short_unit: ''
         processing_level: major
         display:
-          name: Agriculture - Gross Production Value (current thousand US$) (1000 USD)
+          name: Gross production value of the agricultural sector
           shortUnit: ''
           numDecimalPlaces: 2
         presentation:
-          title_public: Agriculture - Gross Production Value (current thousand US$) (1000 USD)
+          title_public: Gross production value of the agricultural sector
