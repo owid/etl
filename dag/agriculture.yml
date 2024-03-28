@@ -15,31 +15,31 @@ steps:
   #
   # Long-term yields in the United Kingdom.
   #
-  data://garden/agriculture/2023-06-12/uk_long_term_yields:
-    - data://garden/papers/2023-04-21/broadberry_et_al_2015
-    - data://garden/papers/2023-04-21/brassley_2000
-    - data://garden/faostat/2023-06-12/faostat_qcl
+  data://garden/agriculture/2024-03-26/uk_long_term_yields:
+    - data://garden/papers/2024-03-26/broadberry_et_al_2015
+    - data://garden/papers/2024-03-26/brassley_2000
+    - data://garden/faostat/2024-03-14/faostat_qcl
   #
   # Food expenditure in US - USDA
   #
-  data://meadow/usda_ers/2023-06-07/food_expenditure_in_us_archive:
-    - snapshot://usda_ers/2023-06-07/food_expenditure_in_us_archive.xlsx
-  data://meadow/usda_ers/2023-06-07/food_expenditure_in_us:
-    - snapshot://usda_ers/2023-06-07/food_expenditure_in_us.xlsx
-  data://garden/usda_ers/2023-06-07/food_expenditure_in_us:
-    - data://meadow/usda_ers/2023-06-07/food_expenditure_in_us_archive
-    - data://meadow/usda_ers/2023-06-07/food_expenditure_in_us
-  data://grapher/usda_ers/2023-06-07/food_expenditure_in_us:
-    - data://garden/usda_ers/2023-06-07/food_expenditure_in_us
+  data://meadow/usda_ers/2024-03-26/food_expenditure_in_us_archive:
+    - snapshot://usda_ers/2024-03-26/food_expenditure_in_us_archive.xlsx
+  data://meadow/usda_ers/2024-03-26/food_expenditure_in_us:
+    - snapshot://usda_ers/2024-03-26/food_expenditure_in_us.xlsx
+  data://garden/usda_ers/2024-03-26/food_expenditure_in_us:
+    - data://meadow/usda_ers/2024-03-26/food_expenditure_in_us_archive
+    - data://meadow/usda_ers/2024-03-26/food_expenditure_in_us
+  data://grapher/usda_ers/2024-03-26/food_expenditure_in_us:
+    - data://garden/usda_ers/2024-03-26/food_expenditure_in_us
   #
   # Food expenditure - USDA
   #
-  data://meadow/usda_ers/2023-06-07/food_expenditure:
-    - snapshot://usda_ers/2023-06-07/food_expenditure.xlsx
-  data://garden/usda_ers/2023-06-07/food_expenditure:
-    - data://meadow/usda_ers/2023-06-07/food_expenditure
-  data://grapher/usda_ers/2023-06-07/food_expenditure:
-    - data://garden/usda_ers/2023-06-07/food_expenditure
+  data://meadow/usda_ers/2024-03-26/food_expenditure:
+    - snapshot://usda_ers/2024-03-26/food_expenditure.xlsx
+  data://garden/usda_ers/2024-03-26/food_expenditure:
+    - data://meadow/usda_ers/2024-03-26/food_expenditure
+  data://grapher/usda_ers/2024-03-26/food_expenditure:
+    - data://garden/usda_ers/2024-03-26/food_expenditure
   #
   # Long-run crop yields.
   #
@@ -88,5 +88,33 @@ steps:
     - snapshot://usda_nass/2023-04-20/us_corn_yields.csv
   data://garden/usda_nass/2023-04-20/us_corn_yields:
     - data://meadow/usda_nass/2023-04-20/us_corn_yields
+  #
+  # Long-term yields in the United Kingdom.
+  #
+  data://garden/agriculture/2023-06-12/uk_long_term_yields:
+    - data://garden/papers/2023-04-21/broadberry_et_al_2015
+    - data://garden/papers/2023-04-21/brassley_2000
+    - data://garden/faostat/2023-06-12/faostat_qcl
+  #
+  # Food expenditure in US - USDA
+  #
+  data://meadow/usda_ers/2023-06-07/food_expenditure_in_us_archive:
+    - snapshot://usda_ers/2023-06-07/food_expenditure_in_us_archive.xlsx
+  data://meadow/usda_ers/2023-06-07/food_expenditure_in_us:
+    - snapshot://usda_ers/2023-06-07/food_expenditure_in_us.xlsx
+  data://garden/usda_ers/2023-06-07/food_expenditure_in_us:
+    - data://meadow/usda_ers/2023-06-07/food_expenditure_in_us_archive
+    - data://meadow/usda_ers/2023-06-07/food_expenditure_in_us
+  data://grapher/usda_ers/2023-06-07/food_expenditure_in_us:
+    - data://garden/usda_ers/2023-06-07/food_expenditure_in_us
+  #
+  # Food expenditure - USDA
+  #
+  data://meadow/usda_ers/2023-06-07/food_expenditure:
+    - snapshot://usda_ers/2023-06-07/food_expenditure.xlsx
+  data://garden/usda_ers/2023-06-07/food_expenditure:
+    - data://meadow/usda_ers/2023-06-07/food_expenditure
+  data://grapher/usda_ers/2023-06-07/food_expenditure:
+    - data://garden/usda_ers/2023-06-07/food_expenditure
 
   ######################################################################################################################
