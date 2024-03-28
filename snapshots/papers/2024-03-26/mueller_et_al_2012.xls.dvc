@@ -1,0 +1,19 @@
+meta:
+  origin:
+    producer: Mueller et al.
+    title: Closing yield gaps through nutrient and water management
+    citation_full: |-
+      Mueller, N., Gerber, J., Johnston, M. et al. (2012) - Closing yield gaps through nutrient and water management. Nature 490, 254-257. https://doi.org/10.1038/nature11420
+    url_main: https://www.nature.com/articles/nature11420
+    url_download: https://static-content.springer.com/esm/art%3A10.1038%2Fnature11420/MediaObjects/41586_2012_BFnature11420_MOESM38_ESM.xls
+    date_accessed: 2024-03-26
+    date_published: 2012-08-29
+    license:
+      name: Copyright © 2012, Springer Nature Limited
+      url: https://s100.copyright.com/AppDispatchServlet?title=Closing%20yield%20gaps%20through%20nutrient%20and%20water%20management&author=Nathaniel%20D.%20Mueller%20et%20al&contentID=10.1038%2Fnature11420&copyright=Springer%20Nature%20Limited&publication=0028-0836&publicationDate=2012-08-29&publisherName=SpringerNature&orderBeanReset=true
+
+wdir: ../../../data/snapshots/papers/2024-03-26
+outs:
+  - md5: 11f6fddfb8f67ac3ff39083e65acae75
+    size: 763904
+    path: mueller_et_al_2012.xls

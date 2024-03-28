@@ -1,0 +1,38 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Food Prices
+      attribution_short: USDA/ERS
+
+dataset:
+  title: Food expenditure
+  update_period_days: 365
+
+tables:
+  food_expenditure:
+    variables:
+      food_as_share_of_all_expenditure:
+        title: Food as share of total consumer expenditure
+        short_unit: '%'
+        unit: '%'
+        description_short: |
+          Share of consumer expenditures that are spent on food. This only includes food eaten at home, and does not include alcoholic beverages and tobacco.
+      alcohol_and_tobacco_as_share_of_all_expenditure:
+        title: Alcohol and tobacco as share of total consumer expenditure
+        short_unit: '%'
+        unit: '%'
+        description_short: |
+          Share of consumer expenditures that are spent on alcohol and tobacco.
+      consumer_expenditure:
+        title: Total consumer expenditure
+        unit: "current US$"
+        short_unit: "$"
+        description_short: |
+          Total consumer expenditure on goods and services per year.
+      food_expenditure:
+        title: Total food expenditure
+        unit: "current US$"
+        short_unit: "$"
+        description_short: |
+          Amount of money spend on food in a given year. This only includes food eaten at home, and does not include alcoholic beverages and tobacco.
