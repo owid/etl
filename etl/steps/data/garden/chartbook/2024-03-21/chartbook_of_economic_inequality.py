@@ -4,6 +4,8 @@ Construct the Chartbook of Economic Inequality dataset.
 It comprises tables from multiple datasets, constructed as a long format table.
 """
 
+from owid.catalog import Table
+
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
@@ -70,7 +72,9 @@ def run(dest_dir: str) -> None:
         }
     )
 
-    tb_sedlac['short_reference'] = tb_sedlac.m.origins.
+    tb_sedlac = create_columns_from_origins(tb_sedlac, "gini")
+
+    print(tb_sedlac)
 
     # ARGENTINA
     # Select Argentina in SEDLAC
@@ -88,3 +92,13 @@ def run(dest_dir: str) -> None:
 
     # Save changes in the new garden dataset.
     ds_garden.save()
+
+
+def create_columns_from_origins(tb: Table, indicator: str) -> Table:
+    """Create columns with metadata from the origins of the indicator."""
+
+    tb["short_reference"] = tb[indicator].m.origins[0].producer
+    tb["long_reference"] = tb[indicator].m.origins[0].citation_full
+    tb["reference_url"] = tb[indicator].m.origins[0].url_main
+
+    return tb
