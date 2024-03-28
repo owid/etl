@@ -1,0 +1,51 @@
+definitions:
+  common:
+    processing_level: major
+    description_processing: First, we organized countries into groups based on geographical regions and income levels, aligning with World Bank classifications. To quantify data completeness, we identified entries with missing information in the indicator. For each grouping, we calculated the percentage of countries with missing data, thus mapping out the distribution of data gaps across different regions and income levels.
+    description_from_producer: "Neuropsychiatric conditions has the following ICD 10 codes: F01-F99, G06-G98 (minus G14), U07.0, X41, X42, X44, X45."
+    description_key:
+      - Neuropsychiatric conditions category encompasses various disorders such as unipolar depressive disorders, bipolar disorder, schizophrenia, epilepsy, alcohol use disorders, Alzheimer's and other dementias, Parkinson's disease, multiple sclerosis, drug use disorders, post-traumatic stress disorder, obsessive-compulsive disorder, panic disorder, primary insomnia, migraine, mental retardation, and a range of other neuropsychiatric disorders.
+  presentation:
+    topic_tags:
+    - Mental Health
+
+dataset:
+  title:  Missing data - Deaths from Neuropsychiatric Conditions
+
+tables:
+  neuropsychiatric_conditions:
+    variables:
+      missing_countries:
+        title: Number of countries with missing data on deaths from neuropsychiatric conditions
+        short_unit: ''
+        unit: ''
+
+      fraction_missing_countries:
+        title: Fraction of countries with missing data on deaths from neuropsychiatric conditions
+        short_unit: '%'
+        unit: '%'
+
+      fraction_available_countries:
+        title: Fraction of countries with available data on deaths from neuropsychiatric conditions
+        short_unit: '%'
+        unit: '%'
+
+      missing_population:
+        title: Total population of countries with missing data on deaths from  neuropsychiatric conditions
+        short_unit: 'people'
+        unit: ''
+
+      deaths_from_neuropsychiatric_conditions_per_100_000_people_in__both_sexes_aged_all_ages_missing:
+        title: Is data on deaths from neuropsychiatric conditions per 100,000 people in countries missing data
+        short_unit: ''
+        unit: ''
+
+      region:
+        title: Region
+        short_unit: ''
+        unit: ''
+
+      income_group:
+        title: Income group
+        short_unit: ''
+        unit: ''
