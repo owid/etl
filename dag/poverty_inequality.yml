@@ -93,6 +93,11 @@ steps:
   data://garden/wb/2024-01-22/thousand_bins_distribution:
     - data://meadow/wb/2024-01-22/thousand_bins_distribution
 
+  # Chartbook of Economic Inequality
+  data://garden/chartbook/2024-03-21/chartbook_of_economic_inequality:
+  - data://garden/cedlas/2024-03-08/sedlac
+  - data://garden/chartbook/2024-03-21/altimir_1986
+
   # Socio-Economic Database for Latin America and the Caribbean (SEDLAC)
   data://meadow/cedlas/2024-03-08/sedlac:
     - snapshot://cedlas/2024-03-08/sedlac_incomes.xlsx
@@ -102,3 +107,9 @@ steps:
     - data://meadow/cedlas/2024-03-08/sedlac
   data://grapher/cedlas/2024-03-08/sedlac:
     - data://garden/cedlas/2024-03-08/sedlac
+
+  # Altimir (1986) - Income distribution estimates in Argentina (1953-1980)
+  data://meadow/chartbook/2024-03-21/altimir_1986:
+    - snapshot://chartbook/2024-03-21/altimir_1986.csv
+  data://garden/chartbook/2024-03-21/altimir_1986:
+    - data://meadow/chartbook/2024-03-21/altimir_1986
