@@ -346,7 +346,8 @@ def _load_values(engine: Engine, variable_ids: list[int]) -> pd.DataFrame:
             "entityCode": "entity_code",
         }
     )
-    vf: pd.DataFrame = pd.read_sql(q, engine, params={"variable_ids": variable_ids})
+    with engine.connect() as con:
+        vf: pd.DataFrame = pd.read_sql(q, con, params={"variable_ids": variable_ids})
     df = df.merge(vf, on="variable_id")
 
     # try converting values to float if possible, this can make the data 50% smaller

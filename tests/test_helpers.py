@@ -446,5 +446,5 @@ def test__validate_description_key():
     col = "column3"
     try:
         _validate_description_key(description_key, col)
-    except AssertionError as e:
+    except AssertionError:
         assert False, f"AssertionError raised for valid description_key: {description_key}"

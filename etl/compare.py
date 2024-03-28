@@ -293,11 +293,12 @@ def read_dataset_from_db(env_path: str, namespace: str, version: str, dataset: s
     WHERE version = %(version)s and namespace = %(namespace)s and shortName = %(dataset)s
     """
 
-    df = pd.read_sql(
-        q,
-        engine,
-        params={"version": version, "namespace": namespace, "dataset": dataset},
-    )
+    with engine.connect() as con:
+        df = pd.read_sql(
+            q,
+            con,
+            params={"version": version, "namespace": namespace, "dataset": dataset},
+        )
 
     # drop uninteresting columns
     df = df.drop(["createdByUserId", "dataEditedAt", "metadataEditedAt", "updatedAt"], axis=1)
@@ -316,11 +317,12 @@ def read_variables_from_db(env_path: str, namespace: str, version: str, dataset:
     WHERE d.version = %(version)s and d.namespace = %(namespace)s and d.shortName = %(dataset)s
     """
 
-    df = pd.read_sql(
-        q,
-        engine,
-        params={"version": version, "namespace": namespace, "dataset": dataset},
-    )
+    with engine.connect() as con:
+        df = pd.read_sql(
+            q,
+            con,
+            params={"version": version, "namespace": namespace, "dataset": dataset},
+        )
 
     # drop uninteresting columns
     df = df.drop(["updatedAt", "createdAt", "catalogPath"], axis=1)
@@ -341,11 +343,12 @@ def read_sources_from_db(env_path: str, namespace: str, version: str, dataset: s
     WHERE d.version = %(version)s and d.namespace = %(namespace)s and d.shortName = %(dataset)s
     """
 
-    df = pd.read_sql(
-        q,
-        engine,
-        params={"version": version, "namespace": namespace, "dataset": dataset},
-    )
+    with engine.connect() as con:
+        df = pd.read_sql(
+            q,
+            con,
+            params={"version": version, "namespace": namespace, "dataset": dataset},
+        )
 
     # drop uninteresting columns
     df = df.drop(["updatedAt", "createdAt"], axis=1)
@@ -365,11 +368,12 @@ def read_values_from_s3(env_path: str, namespace: str, version: str, dataset: st
     JOIN datasets as d ON v.datasetId = d.id
     WHERE d.version = %(version)s and d.namespace = %(namespace)s and d.shortName = %(dataset)s
     """
-    vf = pd.read_sql(
-        q,
-        engine,
-        params={"version": version, "namespace": namespace, "dataset": dataset},
-    )
+    with engine.connect() as con:
+        vf = pd.read_sql(
+            q,
+            con,
+            params={"version": version, "namespace": namespace, "dataset": dataset},
+        )
 
     # read them from S3
     df = variable_data_df_from_s3(engine, variable_ids=vf.variableId.tolist(), workers=10)
