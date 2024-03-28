@@ -175,7 +175,7 @@ def run(live_api: bool) -> None:
         wb_api = WB_API("https://apiv2qa.worldbank.org/pip/v1")
 
     # Generate percentiles by extracting the raw files and processing them afterward
-    df_percentiles = generate_consolidated_percentiles(generate_percentiles_raw(wb_api), wb_api)
+    # df_percentiles = generate_consolidated_percentiles(generate_percentiles_raw(wb_api), wb_api)
 
     # Generate relative poverty indicators file
     df_relative = generate_relative_poverty(wb_api)
@@ -1282,7 +1282,7 @@ def generate_relative_poverty(wb_api: WB_API):
     )
 
     # Patch medians
-    df_country = median_patch(df_country, country_or_region="country")
+    # df_country = median_patch(df_country, country_or_region="country")
 
     # Run the main function to get the data
     concurrent_relative_function(df_country)
@@ -1292,23 +1292,23 @@ def generate_relative_poverty(wb_api: WB_API):
 
     # FOR REGIONS
     # Get data from the most common query
-    df_region = pip_query_region(
-        wb_api,
-        popshare_or_povline="povline",
-        value=2.15,
-        versions=versions,
-        country_code="all",
-        year="all",
-        welfare_type="all",
-        reporting_level="all",
-        ppp_version=2017,
-    )
+    # df_region = pip_query_region(
+    #     wb_api,
+    #     popshare_or_povline="povline",
+    #     value=2.15,
+    #     versions=versions,
+    #     country_code="all",
+    #     year="all",
+    #     welfare_type="all",
+    #     reporting_level="all",
+    #     ppp_version=2017,
+    # )
 
     # Patch medians
-    df_region = median_patch(df_region, country_or_region="region")
+    # df_region = median_patch(df_region, country_or_region="region")
 
     # Run the main function to get the data
-    concurrent_relative_region_function(df_region)
+    # concurrent_relative_region_function(df_region)
 
     # Add relative indicators from the results above
     df_region = add_relative_indicators(df=df_region, country_or_region="region")

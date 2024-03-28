@@ -661,14 +661,15 @@ def generate_percentiles_raw(wb_api: WB_API):
     # Obtain latest versions of the PIP dataset
     versions = pip_versions(wb_api)
 
-    # Run the main function
-    missing_countries, list_missing_countries = get_list_of_missing_countries()
-    log.info(
-        f"These countries are available in a common query but not in the percentile file: {list_missing_countries}"
-    )
+    # NOTE: Uncomment this when new percentile data is available
+    # # Run the main function
+    # missing_countries, list_missing_countries = get_list_of_missing_countries()
+    # log.info(
+    #     f"These countries are available in a common query but not in the percentile file: {list_missing_countries}"
+    # )
 
-    concurrent_percentiles_function(country_code=missing_countries)
-    log.info("Country files downloaded")
+    # concurrent_percentiles_function(country_code=missing_countries)
+    # log.info("Country files downloaded")
     concurrent_percentiles_region_function()
     log.info("Region files downloaded")
 
