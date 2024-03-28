@@ -16,7 +16,7 @@ tables:
     variables:
       oil_of_sesame_seed__00000290__production__005510__tonnes:
         title: Oil of sesame seed | 00000290 || Production | 005510 || Tonnes
-        unit: Tonnes
+        unit: tonnes
         short_unit: t
         processing_level: major
         display:
@@ -27,7 +27,7 @@ tables:
           title_public: Production of sesame seed oil
       rapeseed_or_canola_oil__crude__00000271__production__005510__tonnes:
         title: Rapeseed or canola oil, crude | 00000271 || Production | 005510 || Tonnes
-        unit: Tonnes
+        unit: tonnes
         short_unit: t
         processing_level: major
         display:
@@ -38,7 +38,7 @@ tables:
           title_public: Production of rapeseed or canola oil
       safflower_seed_oil__crude__00000281__production__005510__tonnes:
         title: Safflower-seed oil, crude | 00000281 || Production | 005510 || Tonnes
-        unit: Tonnes
+        unit: tonnes
         short_unit: t
         processing_level: major
         display:
@@ -49,7 +49,7 @@ tables:
           title_public: Production of safflower-seed oil
       soya_bean_oil__00000237__production__005510__tonnes:
         title: Soya bean oil | 00000237 || Production | 005510 || Tonnes
-        unit: Tonnes
+        unit: tonnes
         short_unit: t
         processing_level: major
         display:
@@ -60,7 +60,7 @@ tables:
           title_public: Production of soya bean oil
       sunflower_seed_oil__crude__00000268__production__005510__tonnes:
         title: Sunflower-seed oil, crude | 00000268 || Production | 005510 || Tonnes
-        unit: Tonnes
+        unit: tonnes
         short_unit: t
         processing_level: major
         display:

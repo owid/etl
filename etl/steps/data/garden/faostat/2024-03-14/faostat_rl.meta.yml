@@ -53,7 +53,7 @@ tables:
         title: Agriculture area under organic agric. | 00006671 || Share in Agricultural land | 007208 || Percent
         description_short: |-
           Organic arable land area is the sum of the area certified as organic by official standards, and land area in the conversion process to organic (which is assumed by the UN FAO as a two-year period prior to certification). Arable land is that used for crops (which does not include grazing land).
-        unit: Percent
+        unit: percent
         short_unit: '%'
         processing_level: major
         display:
@@ -134,7 +134,7 @@ tables:
         title: Permanent meadows and pastures | 00006655 || Share in Land area | 007209 || Percent
         description_short: |-
           Permanent meadows and pastures are areas used permanently (five years or more) for herbaceous forage crops, either cultivated or growing wild (wild prairie or grazing land).
-        unit: Percent
+        unit: percent
         short_unit: '%'
         processing_level: major
         display:

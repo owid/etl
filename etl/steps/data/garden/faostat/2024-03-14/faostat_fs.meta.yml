@@ -16,7 +16,7 @@ tables:
     variables:
       minimum_dietary_energy_requirement__kcal_cap_day__00021056__value__006128__kilocalories_per_capita_per_day:
         title: Minimum dietary energy requirement  (kcal/cap/day) | 00021056 || Value | 006128 || Kilocalories per capita per day
-        unit: Kilocalories per capita per day
+        unit: kilocalories per capita per day
         short_unit: kcal/cap/d
         processing_level: major
         display:
@@ -63,7 +63,7 @@ tables:
           title_variant: annual value
       percentage_of_children_under_5_years_of_age_who_are_stunted__modelled_estimates__percent__00021025__value__006121__percent:
         title: Percentage of children under 5 years of age who are stunted (modelled estimates) (percent) | 00021025 || Value | 006121 || Percent
-        unit: Percent
+        unit: percent
         short_unit: '%'
         processing_level: major
         display:
@@ -74,7 +74,7 @@ tables:
           title_public: Percentage of children under 5 years of age who are stunted (Percent)
       prevalence_of_moderate_or_severe_food_insecurity_in_the_total_population__percent__3_year_average__00210091__value__006121__percent:
         title: Prevalence of moderate or severe food insecurity in the total population (percent) (3-year average) | 00210091 || Value | 006121 || Percent
-        unit: Percent
+        unit: percent
         short_unit: '%'
         processing_level: major
         display:
@@ -86,7 +86,7 @@ tables:
           title_variant: 3-year average
       prevalence_of_severe_food_insecurity_in_the_total_population__percent__3_year_average__00210401__value__006121__percent:
         title: Prevalence of severe food insecurity in the total population (percent) (3-year average) | 00210401 || Value | 006121 || Percent
-        unit: Percent
+        unit: percent
         short_unit: '%'
         processing_level: major
         display:
@@ -98,7 +98,7 @@ tables:
           title_variant: 3-year average
       prevalence_of_undernourishment__percent__annual_value__00210040__value__006121__percent:
         title: Prevalence of undernourishment (percent) (annual value) | 00210040 || Value | 006121 || Percent
-        unit: Percent
+        unit: percent
         short_unit: '%'
         processing_level: major
         display:
@@ -110,7 +110,7 @@ tables:
           title_variant: annual value
       share_of_dietary_energy_supply_derived_from_cereals__roots_and_tubers__kcal_cap_day__3_year_average__00021012__value__006121__percent:
         title: Share of dietary energy supply derived from cereals, roots and tubers (kcal/cap/day) (3-year average) | 00021012 || Value | 006121 || Percent
-        unit: Percent
+        unit: percent
         short_unit: '%'
         processing_level: major
         display:
