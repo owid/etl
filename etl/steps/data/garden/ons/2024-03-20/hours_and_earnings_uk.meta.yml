@@ -1,0 +1,63 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    unit: ""
+    short_unit: ""
+    processing_level: major
+    description_processing: We estimated percentile ratios by dividing income in different thresholds and multiplying by 100.
+    description_from_producer: |-
+      Annual Survey of Hours and Earnings (ASHE) information relates to gross pay before tax, National Insurance or other deductions, and excludes payments in kind. With the exception of annual earnings, the results are restricted to earnings relating to the survey pay period and so exclude payments of arrears from another period made during the survey period; any payments due as a result of a pay settlement but not yet paid at the time of the survey will also be excluded.
+
+      ASHE is based on a 1% sample of employee jobs taken from HM Revenue and Customs Pay As You Earn (PAYE) records. Consequently, individuals with more than one job may appear in the sample more than once. Information on earnings and paid hours worked is obtained from employers and treated confidentially. ASHE does not cover the self-employed or employees not paid during the reference period.
+
+      <% if aggregation == "All employees" %>
+      All employees includes employees on adult rates, whose pay for the survey period was unaffected by absence. Estimates for 2020 and 2021 include employees who have been furloughed under the Coronavirus Job Retention Scheme (CJRS).
+      <% elif aggregation == "Full-time" %>
+      Full-time defined as employees working more than 30 paid hours per week (or 25 or more for the teaching professions).
+      <% elif aggregation == "Part-time" %>
+      Part-time defined as employees working 30 paid hours or less per week (or less than 25 for the teaching professions).
+    description_key:
+      - Income is ‘gross’ — measured before tax, National Insurance or other deductions, and exclude payments in kind.
+    display: &common-display
+      numDecimalPlaces: 1
+      tolerance: 5
+    presentation:
+      topic_tags:
+        - Poverty
+        - Economic Inequality
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+
+tables:
+  hours_and_earnings_uk:
+    variables:
+      p90_p50_ratio:
+        title: P90/P50 ratio (<<aggregation>>, spell <<spell>>)
+        description_short: The P90/P50 ratio measures the degree of inequality within the richest half of the population. A ratio of 2 means that someone just falling in the richest tenth of the population has twice the median income or consumption.
+        presentation:
+          title_public: P90/P50 ratio
+        display:
+          name: P90/P50 ratio
+          <<: *common-display
+      p90_p10_ratio:
+        title: P90/P10 ratio (<<aggregation>>, spell <<spell>>)
+        description_short: P90 and P10 are the levels of income below which 90% and 10% of the population live, respectively. This variable gives the ratio of the two. It is a measure of inequality that indicates the gap between the richest and poorest tenth of the population.
+        presentation:
+          title_public: P90/P10 ratio
+        display:
+          name: P90/P10 ratio
+          <<: *common-display
+      p50_p10_ratio:
+        title: P50/P10 ratio (<<aggregation>>, spell <<spell>>)
+        description_short: The P50/P10 ratio measures the degree of inequality within the poorest half of the population. A ratio of 2 means that the median income is two times higher than that of someone just falling in the poorest tenth of the population.
+        presentation:
+          title_public: P50/P10 ratio
+        display:
+          name: P50/P10 ratio
+          <<: *common-display
+

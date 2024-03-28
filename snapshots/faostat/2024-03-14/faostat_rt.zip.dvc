@@ -11,7 +11,7 @@ meta:
 
       The correspondence with the HS Nomenclature is shown in the table  at the Related Documents section. For these pesticides, this domain contains trade data (imports and exports) in both value (current 1000 US dollars) and quantity (net weight in tonnes), and the time series extends from 2007 onwards.
     citation_full: 'Food and Agriculture Organization of the United Nations - Land, Inputs and Sustainability: Pesticides Trade (2023).'
-    attribution_short: FAOSTAT
+    attribution_short: FAO
     url_main: http://www.fao.org/faostat/en/#data/RT
     url_download: https://fenixservices.fao.org/faostat/static/bulkdownloads/Inputs_Pesticides_Trade_E_All_Data_(Normalized).zip
     date_accessed: '2024-03-14'

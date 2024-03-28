@@ -1,6 +1,5 @@
 """Load a snapshot and create a meadow dataset."""
 
-import pandas as pd
 
 from etl.helpers import PathFinder, create_dataset
 
@@ -38,7 +37,6 @@ def run(dest_dir: str) -> None:
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
     tb = tb.underscore().set_index(["country", "year", "sex", "age_group"], verify_integrity=True).sort_index()
 
-    print(tb)
     #
     # Save outputs.
     #

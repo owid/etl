@@ -543,8 +543,6 @@ def run(dest_dir: str) -> None:
     )
 
     # Update dataset metadata.
-    ds_garden.metadata.update_period_days = 365
-    ds_garden.metadata.title = dataset_metadata["owid_dataset_title"]
     # The following description is not publicly shown in charts; it is only visible when accessing the catalog.
     ds_garden.metadata.description = (
         dataset_metadata["owid_dataset_description"] + anomaly_descriptions + SLAUGHTERED_ANIMALS_ADDITIONAL_DESCRIPTION

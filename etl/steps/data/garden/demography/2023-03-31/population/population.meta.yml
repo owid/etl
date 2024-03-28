@@ -16,7 +16,7 @@ definitions:
 
 dataset:
   title: Population (various sources, 2023.1)
-  update_period_days: 365
+  update_period_days: 500
   description: &dataset-description |-
     Our World in Data builds and maintains a long-run dataset on population by country, region, and for the world, based on various sources.
 

@@ -1,0 +1,115 @@
+dataset:
+  title: 'Inputs: Fertilizers by Nutrient'
+  update_period_days: 365
+
+definitions:
+  common:
+    processing_level: major
+    presentation:
+      topic_tags:
+        - Agricultural Production
+      attribution_short: FAO
+
+tables:
+  faostat_rfn_flat:
+    title: 'Inputs: Fertilizers by Nutrient'
+    variables:
+      nutrient_nitrogen_n__total__00003102__agricultural_use__005157__tonnes:
+        title: Nutrient nitrogen N (total) | 00003102 || Agricultural Use | 005157 || Tonnes
+        unit: tonnes
+        short_unit: t
+        processing_level: major
+        display:
+          name: Nitrogen fertilizer user
+          shortUnit: t
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Nitrogen fertilizer user
+      nutrient_nitrogen_n__total__00003102__production__005510__tonnes:
+        title: Nutrient nitrogen N (total) | 00003102 || Production | 005510 || Tonnes
+        unit: tonnes
+        short_unit: t
+        processing_level: major
+        display:
+          name: Nitrogen fertilizer production
+          shortUnit: t
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Nitrogen fertilizer production
+      nutrient_nitrogen_n__total__00003102__use_per_area_of_cropland__005159__kilograms_per_hectare:
+        title: Nutrient nitrogen N (total) | 00003102 || Use per area of cropland | 005159 || Kilograms per hectare
+        unit: kilograms per hectare
+        short_unit: kg/ha
+        processing_level: major
+        display:
+          name: Nitrogen fertilizer use per area of cropland
+          shortUnit: kg/ha
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Nitrogen fertilizer use per area of cropland
+      nutrient_phosphate_p2o5__total__00003103__agricultural_use__005157__tonnes:
+        title: Nutrient phosphate P2O5 (total) | 00003103 || Agricultural Use | 005157 || Tonnes
+        unit: tonnes
+        short_unit: t
+        processing_level: major
+        display:
+          name: Phosphate fertilizer use
+          shortUnit: t
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Phosphate fertilizer use
+      nutrient_phosphate_p2o5__total__00003103__production__005510__tonnes:
+        title: Nutrient phosphate P2O5 (total) | 00003103 || Production | 005510 || Tonnes
+        unit: tonnes
+        short_unit: t
+        processing_level: major
+        display:
+          name: Phosphate fertilizer production
+          shortUnit: t
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Phosphate fertilizer production
+      nutrient_phosphate_p2o5__total__00003103__use_per_area_of_cropland__005159__kilograms_per_hectare:
+        title: Nutrient phosphate P2O5 (total) | 00003103 || Use per area of cropland | 005159 || Kilograms per hectare
+        unit: kilograms per hectare
+        short_unit: kg/ha
+        processing_level: major
+        display:
+          name: Phosphate fertilizer use per area of cropland
+          shortUnit: kg/ha
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Phosphate fertilizer use per area of cropland
+      nutrient_potash_k2o__total__00003104__agricultural_use__005157__tonnes:
+        title: Nutrient potash K2O (total) | 00003104 || Agricultural Use | 005157 || Tonnes
+        unit: tonnes
+        short_unit: t
+        processing_level: major
+        display:
+          name: Potash fertilizer use
+          shortUnit: t
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Potash fertilizer use
+      nutrient_potash_k2o__total__00003104__production__005510__tonnes:
+        title: Nutrient potash K2O (total) | 00003104 || Production | 005510 || Tonnes
+        unit: tonnes
+        short_unit: t
+        processing_level: major
+        display:
+          name: Potash fertilizer production
+          shortUnit: t
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Potash fertilizer production
+      nutrient_potash_k2o__total__00003104__use_per_area_of_cropland__005159__kilograms_per_hectare:
+        title: Nutrient potash K2O (total) | 00003104 || Use per area of cropland | 005159 || Kilograms per hectare
+        unit: kilograms per hectare
+        short_unit: kg/ha
+        processing_level: major
+        display:
+          name: Potash fertilizer use per area of cropland
+          shortUnit: kg/ha
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Potash fertilizer use per area of cropland
