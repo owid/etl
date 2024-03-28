@@ -1,0 +1,49 @@
+definitions:
+  common:
+    unit: tonnes per hectare
+    short_unit: t/ha
+    presentation:
+      topic_tags:
+        - Crop Yields
+
+dataset:
+  title: Closing yield gaps through nutrient and water management
+  update_period_days: 0
+
+tables:
+  mueller_et_al_2012:
+    variables:
+      barley_attainable_yield:
+        title: Attainable yield for barley
+      cassava_attainable_yield:
+        title: Attainable yield for cassava
+      cotton_attainable_yield:
+        title: Attainable yield for cotton
+      groundnut_attainable_yield:
+        title: Attainable yield for groundnut
+      maize_attainable_yield:
+        title: Attainable yield for maize
+      millet_attainable_yield:
+        title: Attainable yield for millet
+      oilpalm_attainable_yield:
+        title: Attainable yield for oilpalm
+      potato_attainable_yield:
+        title: Attainable yield for potato
+      rapeseed_attainable_yield:
+        title: Attainable yield for rapeseed
+      rice_attainable_yield:
+        title: Attainable yield for rice
+      rye_attainable_yield:
+        title: Attainable yield for rye
+      sorghum_attainable_yield:
+        title: Attainable yield for sorghum
+      soybean_attainable_yield:
+        title: Attainable yield for soybean
+      sugarbeet_attainable_yield:
+        title: Attainable yield for sugarbeet
+      sugarcane_attainable_yield:
+        title: Attainable yield for sugarcane
+      sunflower_attainable_yield:
+        title: Attainable yield for sunflower
+      wheat_attainable_yield:
+        title: Attainable yield for wheat
