@@ -112,7 +112,7 @@ tables:
 
       # 2.1.3 Participatory democracy index
       participdem_vdem:
-        title: Participatory democracy index
+        title: Extent of direct popular votes
         description_short: |-
           Best estimate of the extent of suffrage, the freedom and fairness of elections, freedoms of association and expression, as well as the extent to which citizens can engage in regional and local government, civil society organizations, and direct democracy.
         description_from_producer: &description_prod_participdem_vdem |-
@@ -453,7 +453,7 @@ tables:
 
       ## 2.2.12 Participatory component index
       particip_vdem:
-        title: Participatory component index
+        title: Participatory political institutions
         description_short: |-
           Best estimate of the extent to which citizens can engage in regional and local government, civil society organizations, and direct democracy.
         description_from_producer: &description_prod_particip_vdem |-
@@ -537,7 +537,7 @@ tables:
 
       ## 2.2.15 Local government index
       locelect_vdem:
-        title: "Local government index"
+        title: "Elected local governments"
         description_short: |-
           Best estimate of the extent to which elected local governments exist and they operate without interference from local unelected bodies.
         description_from_producer: &description_prod_locelect_vdem |-
@@ -568,7 +568,7 @@ tables:
 
       ## 2.2.16 Regional government index
       regelect_vdem:
-        title: Regional government index
+        title: Elected regional governments
         description_short: |-
           Best estimate of the extent to which elected regional governments exist and they operate without interference from regional unelected bodies.
         description_from_producer: &description_prod_regelect_vdem |-
@@ -599,7 +599,7 @@ tables:
 
       # 2.2.17 Deliberative component index
       delib_vdem:
-        title: Deliberative component index
+        title: Deliberative political institutions index
         description_short: |-
           Best estimate of the extent to which political elites justify their positions, justify them with the common good, acknowledge counterarguments, consult elites in policy changes, and society deliberates policy changes.
         description_from_producer: &description_prod_delib_vdem |-
@@ -634,7 +634,7 @@ tables:
 
       ## 2.2.18 Egalitarian component index
       egal_vdem:
-        title: Egalitarian component index
+        title: Egalitarian political institutions index
         description_short: |-
           Best estimate of the extent to which the protection of rights, access to power, and distribution of resources is equal.
         description_from_producer: &description_prod_egal_vdem |-
@@ -665,7 +665,7 @@ tables:
 
       ## 2.2.19 Equal protection index
       equal_rights_vdem:
-        title: Equal protection index
+        title: Equal rights protection index
         description_short: |-
           Best estimate of the extent to which the state protects the rights and freedoms across social groups equally.
         description_from_producer: &description_prod_equal_rights_vdem |-
@@ -696,7 +696,7 @@ tables:
 
       ## 2.2.20 Equal access index
       equal_access_vdem:
-        title: Equal access index
+        title: Equal access to power index
         description_short: |-
           Best estimate of the extent to which access to power is equal across socioeconomic position, social group, and gender.
         description_from_producer: &description_prod_equal_access_vdem |-
@@ -727,7 +727,7 @@ tables:
 
       ## 2.2.21 Equal distribution of resources index
       equal_res_vdem:
-        title: Equal distribution of resources index
+        title: Equal resource distribution index
         description_short: |-
           Best estimate of the extent to which all social groups benefit from public spending, and have equal access to education, healthcare, and the welfare state.
         description_from_producer: &description_prod_equal_res_vdem |-
@@ -758,7 +758,7 @@ tables:
 
       ## 3.1.3.3 Election turnout
       turnout_vdem:
-        title: Election turnout
+        title: Voter turnout
         description_short: |-
           Denotes the voter turnout as a share of all registered voters in the national election according to official results.
 
@@ -771,8 +771,8 @@ tables:
           numDecimalPlaces: 2
 
       # 3.4.2.18 HOS female
-      wom_hos_vdem:
-        title: HOS female
+      wom_hos_vdem:  # wom_hos_vdem_owid
+        title: Woman head of state
         description_short: |-
           Denotes whether the head of state in office on December 31 is a woman.
         description_from_producer: |-
@@ -784,8 +784,8 @@ tables:
           numDecimalPlaces: 0
 
       ## 3.4.3.16 HOG female
-      wom_hog_vdem:
-        title: HOG female
+      wom_hog_vdem:  # wom_hog_vdem_owid
+        title: Woman head of government
         description_short: |-
           Denotes whether the head of government in office on December 31 is a woman.
         description_from_producer: |-
@@ -804,7 +804,7 @@ tables:
 
       ## 3.5.1.6 Legislature corrupt activities
       corr_leg_vdem:
-        title: Legislature corrupt activities
+        title: Legislative corruption
         description_from_producer: &description_prod_corr_leg_vdem |-
           Question: Do members of the legislature abuse their position for financial gain?
 
@@ -856,7 +856,7 @@ tables:
 
       ## 3.6.0.1 Reasoned justification
       justified_polch_vdem:
-        title: Reasoned justification
+        title: Justified political positions
         description_short: |-
           Best estimate of the extent to which political elites provide complex, nuanced, and complete justifications for their views when considering important policy changes.
         description_from_producer: &description_prod_justified_polch_vdem |-
@@ -892,7 +892,7 @@ tables:
 
       ## 3.6.0.2 Common good
       justcomgd_polch_vdem:
-        title: Common good
+        title: Common good justifications
         description_short: |-
           Best estimate of the extent to which political elites justify their views with the common good for society, either the greatest good for the greatest number of people, or as helping the least advantaged people in society when considering important policy changes.
         description_from_producer: &description_prod_justcomgd_polch_vdem |-
@@ -928,7 +928,7 @@ tables:
 
       ## 3.6.0.3 Respect counterarguments
       counterarg_polch_vdem:
-        title: Respect counterarguments
+        title: Respect for counterarguments
         description_short: |-
           Best estimate of the extent to which political elites acknowledge and respect counterarguments when considering important policy changes.
         description_from_producer: &description_prod_counterarg_polch_vdem |-
@@ -966,7 +966,7 @@ tables:
 
       ### 3.6.0.4 Range of consultation
       elitecons_polch_vdem:
-        title: Range of consultation
+        title: Elite consultation
         description_short: |-
           Best estimate of the extent to which political elites consult other elites across the political spectrum and from relevant sectors of society and business when considering important policy changes.
         description_from_producer: &description_prod_elitecons_polch_vdem |-
@@ -1043,7 +1043,7 @@ tables:
 
       ## 3.7.0.6 Judicial corruption decision
       corr_jud_vdem:
-        title: Judicial corruption decision
+        title: Judicial corruption
         description_from_producer: &description_prod_corr_jud_vdem |-
           Question: How often do individuals or businesses make undocumented extra payments or bribes in order to speed up or delay the process or to obtain a favorable judicial decision?
 
@@ -1119,7 +1119,7 @@ tables:
 
       ## 3.8.2.6 Social group equality in respect for civil liberties
       socgr_civ_libs_vdem:
-        title: Social group equality in respect for civil liberties
+        title: Equality of civil liberties across social groups
         description_short: |-
           Best estimate of the extent to which social groups — defined by language, ethnicity, religion, race, region, and/or caste — are free from forced labor, have property rights and access to the justice system, and enjoy freedoms of movement.
         description_from_producer: &description_prod_socgr_civ_libs_vdem |-
@@ -1155,7 +1155,7 @@ tables:
 
       ## 3.9.0.1 Domestic autonomy
       dom_auton_vdem:
-        title: Domestic autonomy
+        title: Domestic policymaking free from foreign influence
         description_short: |-
           Best estimate of the extent to which domestic policy is free from the interference of other states.
         description_from_producer: &description_prod_dom_auton_vdem |-
@@ -1191,7 +1191,7 @@ tables:
 
       ## 3.9.0.2 International autonomy
       int_auton_vdem:
-        title: International autonomy
+        title: Foreign policymaking free from foreign influence
         description_short: |-
           Best estimate of the extent to which foreign policy is free from the interference of other states.
         description_from_producer: &description_prod_int_auton_vdem |-
@@ -1223,7 +1223,7 @@ tables:
 
       ## 3.9.0.3 State authority over territory
       terr_contr_vdem:
-        title: State authority over territory
+        title: Territory under state control
         description_short: |-
           Best estimate of the percentage of territory controlled by the government.
         description_from_producer: &description_prod_terr_contr_vdem |-
@@ -1255,7 +1255,7 @@ tables:
 
       ## 3.12.0.2 Power distributed by social group
       socgr_pow_vdem:
-        title: Power distributed by social group
+        title: Equality of political power across social groups
         description_short: |-
           Best estimate of the extent to which social groups — defined by language, ethnicity, religion, race, region, and/or caste — are irrelevant to politics, or have similar political power.
         description_from_producer: &description_prod_socgr_pow_vdem |-
@@ -1416,7 +1416,7 @@ tables:
 
       ## 5.5.2 Physical violence index
       phys_integr_libs_vdem:
-        title: Physical violence index
+        title: Physical integrity liberties
         description_short: |-
           Central estimate of the extent to which people are free from government torture and political killings.
         description_from_producer: &description_prod_phys_integr_libs_vdem |-
@@ -1536,7 +1536,7 @@ tables:
 
       ## 5.8.1 Women political empowerment index
       wom_emp_vdem:
-        title: Women political empowerment index
+        title: Women's political empowerment index
         description_short: |-
           Best estimate of the extent to which women enjoy civil liberties, can participate in civil society, and are represented in politics.
         description_from_producer: &description_prod_wom_emp_vdem |-
@@ -1567,7 +1567,7 @@ tables:
 
       ## 5.8.2 Women civil liberties index
       wom_civ_libs_vdem:
-        title: Women civil liberties index
+        title: Women's civil rights index
         description_short: |-
           Best estimate of the extent to which women are free from forced labor, have property rights and access to the justice system, and enjoy freedom of movement.
         description_from_producer: &description_prod_wom_civ_libs_vdem |-
@@ -1598,7 +1598,7 @@ tables:
 
       ## 5.8.3 Women civil society participation index
       wom_civ_soc_vdem:
-        title: Women civil society participation index
+        title: Women's civil society participation index
         description_short: |-
           Best estimate of the extent to which women can discuss political issues, participate in civil society organizations, and are represented among journalists.
         description_from_producer: &description_prod_wom_civ_soc_vdem |-
@@ -1629,7 +1629,7 @@ tables:
 
       ## 5.8.4 Women political participation index
       wom_pol_par_vdem:
-        title: Women political participation index
+        title: Women's political participation index
         description_short: |-
           Best estimate of the extent to which women are represented in the legislature and have an equal share of political power.
         description_from_producer: &description_prod_wom_pol_par_vdem |-
@@ -1660,7 +1660,7 @@ tables:
 
       ## 5.9.1 Rule of law index
       rule_of_law_vdem:
-        title: Rule of law index
+        title: Rule of Law index
         description_short: |-
           Best estimate of the extent to which the government complies with the law, courts are independent, laws transparent, justice accessible, corruption absent, and the bureaucracy is impartial.
         description_from_producer: &description_prod_rule_of_law_vdem |-
@@ -1734,7 +1734,7 @@ tables:
 
       ## 9.9.3 Corruption perception index [not in use]
       corruption_cpi:
-        title: Corruption perception index
+        title: Corruption perceptions index
         description_from_producer: |-
           The CPI focuses on corruption in the public sector and defines corruption as the abuse of public office for private gain. The surveys used in compiling the CPI tend to ask questions in line with the misuse of public power for private benefit, with a focus, for example, on bribe-taking by public officials in public procurement. The sources do not distinguish between administrative and political corruption. The CPI Score relates to perceptions of the degree of corruption as seen by business people, risk analysts and the general public and ranges between 100 (highly clean) and 0 (highly corrupt).
 
@@ -1745,7 +1745,7 @@ tables:
 
       ## [RE-ESTIMATE] 3.1.2.5 Elections multiparty
       electmulpar_row:
-        title: Elections multiparty (re-estimate)
+        title: Multiparty elections (re-estimate)
         description_short: |-
           Best estimate of whether national multi-party elections were held or not.
         description_from_producer: &description_prod_electmulpar_vdem |-
@@ -1881,7 +1881,7 @@ tables:
 
       ## [RE-ESTIMATE, BINARY CATEGORISATION] 3.1.2.15 Election free and fair
       electfreefair_row:
-        title: Election free and fair (re-estimate)
+        title: Free and fair elections (re-estimate)
         description_short: Best estimate of whether national elections were free and fair or not.
         description_from_producer: &description_prod_electfreefair_row |-
           Question: Taking all aspects of the pre-election period, election day, and the post-election process into account, would you consider this national election to be free and fair?
@@ -1924,7 +1924,7 @@ tables:
 
       ## [RE-ESTIMATE, BINARY CATEGORISATION] 2.2.8 Liberal component index
       lib_dich_row:
-        title: Liberal component (re-estimate)
+        title: Liberal political institutions (re-estimate)
         description_short: Best estimate of whether the country has meaningfully liberal political institutions
         description_from_producer: *description_prod_lib_vdem
         description_processing: &description_processing_lib_dich_row |-
@@ -2089,8 +2089,8 @@ tables:
 
       ## HOE female (custom)
       # NOTE: Add adjustment in citation_full
-      wom_hoe_vdem:
-        title: HOE female
+      wom_hoe_vdem:  # wom_hoe_vdem_owid
+        title: Woman head of executive
         description_short: |-
           The variable denotes whether the chief executive of government in office on December 31 is a woman.
         description_processing: |-
@@ -2180,15 +2180,14 @@ tables:
         description_key: *description_key_num_libdem
         unit : ''
 
-
-      wom_parl_vdem_cat:
-        title: wom_parl_vdem_cat
-        description_short: ''
+      wom_parl_vdem_cat:  # wom_parl_gr_vdem_owid
+        title: Women in parliament (category)
+        description_short: Categorisation of women's political representation in parliament
         unit: ''
 
       # Not used
       regime_imputed:
-        title: 'Data imputed from another country'
+        title: Data imputed from another country
         description_short: Denotes whether we imputed regime information from another country this one was historically a part of.
         unit: ''
         display:
