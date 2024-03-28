@@ -16,6 +16,10 @@ To run this code from scratch,
         - Type in owid@staging-site-{pull_request_name}
     - Delete the files in the cache folder:
         rm -rf .cache/*
+    - Check if you need to update the poverty lines in the functions `poverty_lines_countries` and `poverty_lines_regions`. Run
+        - https://api.worldbank.org/pip/v1/pip?country=CHN&year=all&povline=80&fill_gaps=false&welfare_type=all&reporting_level=all&additional_ind=false&ppp_version=2017&identity=PROD&format=csv
+        - https://api.worldbank.org/pip/v1/pip-grp?country=OHI&year=all&povline=300&group_by=wb&welfare_type=all&reporting_level=all&additional_ind=false&ppp_version=2017&format=csv
+        - And see if any of the `headcount` values is lower than 0.99. If so, you need to add more poverty lines to the functions.
     - Run the code. You have two options to see the output, in the terminal or in the background:
         python snapshots/wb/{version}/pip_api.py
         nohup poetry run python snapshots/wb/{version}/pip_api.py > output.log 2>&1 &
