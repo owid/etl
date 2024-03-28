@@ -78,7 +78,7 @@ def ask_gpt(df) -> Tuple[str, float, int]:
     Some points to consider for the summary:
         - Use markdown syntax in your reply.
         - Optionally, mention the users (by their `username`) involved in the update.
-        - Structure the summary in sections, based on the type of the PRs. The type of the PR is identified by the emoji at the start of the title:
+        - Structure the summary in sections, one for each type of the PRs. The type of the PR is identified by the emoji at the start of its title. Find below the category name (in quotes) for each emoji type. Use this for section titles.
             - 🎉: "New Features". New feature for the user
             - ✨: "Improvements". Visible improvement over a current implementation without adding a new feature or fixing a bug.
             - 🐛: "Bug fixes". Bug fix for the user.
@@ -91,7 +91,7 @@ def ask_gpt(df) -> Tuple[str, float, int]:
             - 📊: "Data". Data-related PRs
 
             Note: If no emoji is present, the category of the PR is "Other PRs".
-        - Don't provide a title for the summary. You can add sections starting with header level 3.
+        - Headers: Don't add a header at the start of your summary. Use header 4 or of lower level.
 
     {SYSTEM_PROMPT_GENERIC}
     """
