@@ -2,7 +2,6 @@
 
 ref: https://github.com/owid/notebooks/blob/main/BastianHerre/democracy/scripts/vdem_row_do
 """
-from copy import deepcopy
 from typing import Union, cast
 
 import numpy as np
