@@ -65,55 +65,55 @@ tables:
         short_unit: ha
         processing_level: major
         display:
-          name: Apples - Area harvested (hectares)
+          name: Land used for apple production
           shortUnit: ha
           numDecimalPlaces: 2
         presentation:
-          title_public: Apples - Area harvested (hectares)
+          title_public: Land used for apple production
       apples__00000515__production__005510__tonnes:
         title: Apples | 00000515 || Production | 005510 || tonnes
         unit: tonnes
         short_unit: t
         processing_level: major
         display:
-          name: Apples - Production (tonnes)
+          name: Apple production
           shortUnit: t
           numDecimalPlaces: 2
         presentation:
-          title_public: Apples - Production (tonnes)
+          title_public: Apple production
       avocados__00000572__production__005510__tonnes:
         title: Avocados | 00000572 || Production | 005510 || tonnes
         unit: tonnes
         short_unit: t
         processing_level: major
         display:
-          name: Avocados - Production (tonnes)
+          name: Avocado production
           shortUnit: t
           numDecimalPlaces: 2
         presentation:
-          title_public: Avocados - Production (tonnes)
+          title_public: Avocado production
       bananas__00000486__area_harvested__005312__hectares:
         title: Bananas | 00000486 || Area harvested | 005312 || hectares
         unit: hectares
         short_unit: ha
         processing_level: major
         display:
-          name: Bananas - Area harvested (hectares)
+          name: Land used for banana production
           shortUnit: ha
           numDecimalPlaces: 2
         presentation:
-          title_public: Bananas - Area harvested (hectares)
+          title_public: Land used for banana production
       bananas__00000486__production__005510__tonnes:
         title: Bananas | 00000486 || Production | 005510 || tonnes
         unit: tonnes
         short_unit: t
         processing_level: major
         display:
-          name: Bananas - Production (tonnes)
+          name: Banana production
           shortUnit: t
           numDecimalPlaces: 2
         presentation:
-          title_public: Bananas - Production (tonnes)
+          title_public: Banana production
       bananas__00000486__yield__005419__tonnes_per_hectare:
         title: Bananas | 00000486 || Yield | 005419 || tonnes per hectare
         unit: tonnes per hectare
@@ -131,22 +131,22 @@ tables:
         short_unit: ha
         processing_level: major
         display:
-          name: Barley - Area harvested (hectares)
+          name: Land used for barley production
           shortUnit: ha
           numDecimalPlaces: 2
         presentation:
-          title_public: Barley - Area harvested (hectares)
+          title_public: Land used for barley production
       barley__00000044__production__005510__tonnes:
         title: Barley | 00000044 || Production | 005510 || tonnes
         unit: tonnes
         short_unit: t
         processing_level: major
         display:
-          name: Barley - Production (tonnes)
+          name: Barley production
           shortUnit: t
           numDecimalPlaces: 2
         presentation:
-          title_public: Barley - Production (tonnes)
+          title_public: Barley production
       barley__00000044__yield__005419__tonnes_per_hectare:
         title: Barley | 00000044 || Yield | 005419 || tonnes per hectare
         unit: tonnes per hectare
@@ -164,22 +164,22 @@ tables:
         short_unit: ha
         processing_level: major
         display:
-          name: Beans, dry - Area harvested (hectares)
+          name: Land used for bean production
           shortUnit: ha
           numDecimalPlaces: 2
         presentation:
-          title_public: Beans, dry - Area harvested (hectares)
+          title_public: Land used for bean production
       beans__dry__00000176__production__005510__tonnes:
         title: Beans, dry | 00000176 || Production | 005510 || tonnes
         unit: tonnes
         short_unit: t
         processing_level: major
         display:
-          name: Beans, dry - Production (tonnes)
+          name: Bean production
           shortUnit: t
           numDecimalPlaces: 2
         presentation:
-          title_public: Beans, dry - Production (tonnes)
+          title_public: Bean production
       beans__dry__00000176__yield__005419__tonnes_per_hectare:
         title: Beans, dry | 00000176 || Yield | 005419 || tonnes per hectare
         unit: tonnes per hectare
@@ -197,11 +197,11 @@ tables:
         short_unit: t
         processing_level: major
         display:
-          name: Cashew nuts - Production (tonnes)
+          name: Cashew nut production
           shortUnit: t
           numDecimalPlaces: 2
         presentation:
-          title_public: Cashew nuts - Production (tonnes)
+          title_public: Cashew nut production
       cashew_nuts__00000217__yield__005419__tonnes_per_hectare:
         title: Cashew nuts | 00000217 || Yield | 005419 || tonnes per hectare
         unit: tonnes per hectare
@@ -219,22 +219,22 @@ tables:
         short_unit: ha
         processing_level: major
         display:
-          name: Cassava - Area harvested (hectares)
+          name: Land used for cassava production
           shortUnit: ha
           numDecimalPlaces: 2
         presentation:
-          title_public: Cassava - Area harvested (hectares)
+          title_public: Land used for cassava production
       cassava__00000125__production__005510__tonnes:
         title: Cassava | 00000125 || Production | 005510 || tonnes
         unit: tonnes
         short_unit: t
         processing_level: major
         display:
-          name: Cassava - Production (tonnes)
+          name: Cassava production
           shortUnit: t
           numDecimalPlaces: 2
         presentation:
-          title_public: Cassava - Production (tonnes)
+          title_public: Cassava production
       cassava__00000125__yield__005419__tonnes_per_hectare:
         title: Cassava | 00000125 || Yield | 005419 || tonnes per hectare
         unit: tonnes per hectare
@@ -252,66 +252,66 @@ tables:
         short_unit: ha
         processing_level: major
         display:
-          name: Castor oil seed - Area harvested (hectares)
+          name: Land used for castor oil seed production
           shortUnit: ha
           numDecimalPlaces: 2
         presentation:
-          title_public: Castor oil seed - Area harvested (hectares)
+          title_public: Land used for castor oil seed production
       cattle__00000866__stocks__005111__animals:
         title: Cattle | 00000866 || Stocks | 005111 || animals
         unit: animals
         short_unit: animals
         processing_level: major
         display:
-          name: Cattle - Stocks (animals)
+          name: Number of cattle
           shortUnit: animals
-          numDecimalPlaces: 2
+          numDecimalPlaces: 0
         presentation:
-          title_public: Cattle - Stocks (animals)
+          title_public: Number of cattle
       cereals__00001717__area_harvested__005312__hectares:
         title: Cereals | 00001717 || Area harvested | 005312 || hectares
         unit: hectares
         short_unit: ha
         processing_level: major
         display:
-          name: Cereals - Area harvested (hectares)
+          name: Land used for cereal production
           shortUnit: ha
           numDecimalPlaces: 2
         presentation:
-          title_public: Cereals - Area harvested (hectares)
+          title_public: Land used for cereal production
       cereals__00001717__production__005510__tonnes:
         title: Cereals | 00001717 || Production | 005510 || tonnes
         unit: tonnes
         short_unit: t
         processing_level: major
         display:
-          name: Cereals - Production (tonnes)
+          name: Cereal production
           shortUnit: t
           numDecimalPlaces: 2
         presentation:
-          title_public: Cereals - Production (tonnes)
+          title_public: Cereal production
       cocoa_beans__00000661__area_harvested__005312__hectares:
         title: Cocoa beans | 00000661 || Area harvested | 005312 || hectares
         unit: hectares
         short_unit: ha
         processing_level: major
         display:
-          name: Cocoa beans - Area harvested (hectares)
+          name: Land used for cocoa bean production
           shortUnit: ha
           numDecimalPlaces: 2
         presentation:
-          title_public: Cocoa beans - Area harvested (hectares)
+          title_public: Land used for cocoa bean production
       cocoa_beans__00000661__production__005510__tonnes:
         title: Cocoa beans | 00000661 || Production | 005510 || tonnes
         unit: tonnes
         short_unit: t
         processing_level: major
         display:
-          name: Cocoa beans - Production (tonnes)
+          name: Cocoa bean production
           shortUnit: t
           numDecimalPlaces: 2
         presentation:
-          title_public: Cocoa beans - Production (tonnes)
+          title_public: Cocoa bean production
       cocoa_beans__00000661__yield__005419__tonnes_per_hectare:
         title: Cocoa beans | 00000661 || Yield | 005419 || tonnes per hectare
         unit: tonnes per hectare
@@ -329,33 +329,33 @@ tables:
         short_unit: t
         processing_level: major
         display:
-          name: Coconut oil - Production (tonnes)
+          name: Coconut oil production
           shortUnit: t
           numDecimalPlaces: 2
         presentation:
-          title_public: Coconut oil - Production (tonnes)
+          title_public: Coconut oil production
       coconuts__00000249__area_harvested__005312__hectares:
         title: Coconuts | 00000249 || Area harvested | 005312 || hectares
         unit: hectares
         short_unit: ha
         processing_level: major
         display:
-          name: Coconuts - Area harvested (hectares)
+          name: Land used for coconut production
           shortUnit: ha
           numDecimalPlaces: 2
         presentation:
-          title_public: Coconuts - Area harvested (hectares)
+          title_public: Land used for coconut production
       coffee__green__00000656__production__005510__tonnes:
         title: Coffee, green | 00000656 || Production | 005510 || tonnes
         unit: tonnes
         short_unit: t
         processing_level: major
         display:
-          name: Coffee, green - Production (tonnes)
+          name: Coffee bean production
           shortUnit: t
           numDecimalPlaces: 2
         presentation:
-          title_public: Coffee, green - Production (tonnes)
+          title_public: Coffee bean production
       coffee__green__00000656__yield__005419__tonnes_per_hectare:
         title: Coffee, green | 00000656 || Yield | 005419 || tonnes per hectare
         unit: tonnes per hectare
@@ -373,22 +373,22 @@ tables:
         short_unit: t
         processing_level: major
         display:
-          name: Cottonseed oil - Production (tonnes)
+          name: Cottonseed oil production
           shortUnit: t
           numDecimalPlaces: 2
         presentation:
-          title_public: Cottonseed oil - Production (tonnes)
+          title_public: Cottonseed oil production
       eggs__00001783__production__005510__tonnes:
         title: Eggs | 00001783 || Production | 005510 || tonnes
         unit: tonnes
         short_unit: t
         processing_level: major
         display:
-          name: Eggs - Production (tonnes)
+          name: Egg production
           shortUnit: t
           numDecimalPlaces: 2
         presentation:
-          title_public: Eggs - Production (tonnes)
+          title_public: Egg production
       eggs__00001783__yield__005410__kilograms_per_animal:
         title: Eggs | 00001783 || Yield | 005410 || kilograms per animal
         unit: kilograms per animal
@@ -406,33 +406,33 @@ tables:
         short_unit: t
         processing_level: major
         display:
-          name: Grapes - Production (tonnes)
+          name: Grape production
           shortUnit: t
           numDecimalPlaces: 2
         presentation:
-          title_public: Grapes - Production (tonnes)
+          title_public: Grape production
       groundnut_oil__00000244__production__005510__tonnes:
         title: Groundnut oil | 00000244 || Production | 005510 || tonnes
         unit: tonnes
         short_unit: t
         processing_level: major
         display:
-          name: Groundnut oil - Production (tonnes)
+          name: Groundnut oil production
           shortUnit: t
           numDecimalPlaces: 2
         presentation:
-          title_public: Groundnut oil - Production (tonnes)
+          title_public: Groundnut oil production
       groundnuts__00000242__area_harvested__005312__hectares:
         title: Groundnuts | 00000242 || Area harvested | 005312 || hectares
         unit: hectares
         short_unit: ha
         processing_level: major
         display:
-          name: Groundnuts - Area harvested (hectares)
+          name: Land used for groundnut production
           shortUnit: ha
           numDecimalPlaces: 2
         presentation:
-          title_public: Groundnuts - Area harvested (hectares)
+          title_public: Land used for groundnut production
       groundnuts__00000242__yield__005419__tonnes_per_hectare:
         title: Groundnuts | 00000242 || Yield | 005419 || tonnes per hectare
         unit: tonnes per hectare
@@ -450,11 +450,11 @@ tables:
         short_unit: ha
         processing_level: major
         display:
-          name: Karite nuts - Area harvested (hectares)
+          name: Land used for karite nut production
           shortUnit: ha
           numDecimalPlaces: 2
         presentation:
-          title_public: Karite nuts - Area harvested (hectares)
+          title_public: Land used for karite nut production
       lettuce__00000372__yield__005419__tonnes_per_hectare:
         title: Lettuce | 00000372 || Yield | 005419 || tonnes per hectare
         unit: tonnes per hectare
@@ -472,55 +472,55 @@ tables:
         short_unit: t
         processing_level: major
         display:
-          name: Linseed oil - Production (tonnes)
+          name: Linseed oil production
           shortUnit: t
           numDecimalPlaces: 2
         presentation:
-          title_public: Linseed oil - Production (tonnes)
+          title_public: Linseed oil production
       linseed__00000333__area_harvested__005312__hectares:
         title: Linseed | 00000333 || Area harvested | 005312 || hectares
         unit: hectares
         short_unit: ha
         processing_level: major
         display:
-          name: Linseed - Area harvested (hectares)
+          name: Land used for linseed production
           shortUnit: ha
           numDecimalPlaces: 2
         presentation:
-          title_public: Linseed - Area harvested (hectares)
+          title_public: Land used for linseed production
       maize_oil__00000060__production__005510__tonnes:
         title: Maize oil | 00000060 || Production | 005510 || tonnes
         unit: tonnes
         short_unit: t
         processing_level: major
         display:
-          name: Maize oil - Production (tonnes)
+          name: Maize oil production
           shortUnit: t
           numDecimalPlaces: 2
         presentation:
-          title_public: Maize oil - Production (tonnes)
+          title_public: Maize oil production
       maize__00000056__area_harvested__005312__hectares:
         title: Maize | 00000056 || Area harvested | 005312 || hectares
         unit: hectares
         short_unit: ha
         processing_level: major
         display:
-          name: Maize - Area harvested (hectares)
+          name: Land used for corn production
           shortUnit: ha
           numDecimalPlaces: 2
         presentation:
-          title_public: Maize - Area harvested (hectares)
+          title_public: Land used for corn production
       maize__00000056__production__005510__tonnes:
         title: Maize | 00000056 || Production | 005510 || tonnes
         unit: tonnes
         short_unit: t
         processing_level: major
         display:
-          name: Maize - Production (tonnes)
+          name: Maize production
           shortUnit: t
           numDecimalPlaces: 2
         presentation:
-          title_public: Maize - Production (tonnes)
+          title_public: Maize production
       maize__00000056__yield__005419__tonnes_per_hectare:
         title: Maize | 00000056 || Yield | 005419 || tonnes per hectare
         unit: tonnes per hectare
@@ -538,11 +538,11 @@ tables:
         short_unit: animals
         processing_level: major
         display:
-          name: Meat of cattle with the bone, fresh or chilled - Producing or slaughtered animals (animals)
+          name: Number of cattle slaughtered for meat
           shortUnit: animals
-          numDecimalPlaces: 2
+          numDecimalPlaces: 0
         presentation:
-          title_public: Meat of cattle with the bone, fresh or chilled - Producing or slaughtered animals (animals)
+          title_public: Number of cattle slaughtered for meat
       meat_of_cattle_with_the_bone__fresh_or_chilled__00000867__yield__005417__kilograms_per_animal:
         title: Meat of cattle with the bone, fresh or chilled | 00000867 || Yield | 005417 || kilograms per animal
         unit: kilograms per animal
@@ -560,44 +560,44 @@ tables:
         short_unit: t
         processing_level: major
         display:
-          name: Meat, beef and buffalo - Production (tonnes)
+          name: Beef and buffalo meat production
           shortUnit: t
           numDecimalPlaces: 2
         presentation:
-          title_public: Meat, beef and buffalo - Production (tonnes)
+          title_public: Beef and buffalo meat production
       meat__camel__00001127__production__005510__tonnes:
         title: Meat, camel | 00001127 || Production | 005510 || tonnes
         unit: tonnes
         short_unit: t
         processing_level: major
         display:
-          name: Meat, camel - Production (tonnes)
+          name: Camel meat production
           shortUnit: t
           numDecimalPlaces: 2
         presentation:
-          title_public: Meat, camel - Production (tonnes)
+          title_public: Camel meat production
       meat__chicken__00001058__producing_or_slaughtered_animals__005321__animals:
         title: Meat, chicken | 00001058 || Producing or slaughtered animals | 005321 || animals
         unit: animals
         short_unit: animals
         processing_level: major
         display:
-          name: Meat, chicken - Producing or slaughtered animals (animals)
+          name: Number of chickens slaughtered for meat
           shortUnit: animals
-          numDecimalPlaces: 2
+          numDecimalPlaces: 0
         presentation:
-          title_public: Meat, chicken - Producing or slaughtered animals (animals)
+          title_public: Number of chickens slaughtered for meat
       meat__chicken__00001058__production__005510__tonnes:
         title: Meat, chicken | 00001058 || Production | 005510 || tonnes
         unit: tonnes
         short_unit: t
         processing_level: major
         display:
-          name: Meat, chicken - Production (tonnes)
+          name: Chicken meat production
           shortUnit: t
           numDecimalPlaces: 2
         presentation:
-          title_public: Meat, chicken - Production (tonnes)
+          title_public: Chicken meat production
       meat__chicken__00001058__yield__005424__kilograms_per_animal:
         title: Meat, chicken | 00001058 || Yield | 005424 || kilograms per animal
         unit: kilograms per animal
@@ -615,77 +615,77 @@ tables:
         short_unit: animals
         processing_level: major
         display:
-          name: Meat, duck - Producing or slaughtered animals (animals)
+          name: Number of ducks slaughtered for meat
           shortUnit: animals
-          numDecimalPlaces: 2
+          numDecimalPlaces: 0
         presentation:
-          title_public: Meat, duck - Producing or slaughtered animals (animals)
+          title_public: Number of ducks slaughtered for meat
       meat__game__00001163__production__005510__tonnes:
         title: Meat, game | 00001163 || Production | 005510 || tonnes
         unit: tonnes
         short_unit: t
         processing_level: major
         display:
-          name: Meat, game - Production (tonnes)
+          name: Game meat production
           shortUnit: t
           numDecimalPlaces: 2
         presentation:
-          title_public: Meat, game - Production (tonnes)
+          title_public: Game meat production
       meat__goat__00001017__producing_or_slaughtered_animals__005320__animals:
         title: Meat, goat | 00001017 || Producing or slaughtered animals | 005320 || animals
         unit: animals
         short_unit: animals
         processing_level: major
         display:
-          name: Meat, goat - Producing or slaughtered animals (animals)
+          name: Number of goats slaughtered for meat
           shortUnit: animals
-          numDecimalPlaces: 2
+          numDecimalPlaces: 0
         presentation:
-          title_public: Meat, goat - Producing or slaughtered animals (animals)
+          title_public: Number of goats slaughtered for meat
       meat__horse__00001097__production__005510__tonnes:
         title: Meat, horse | 00001097 || Production | 005510 || tonnes
         unit: tonnes
         short_unit: t
         processing_level: major
         display:
-          name: Meat, horse - Production (tonnes)
+          name: Horse meat production
           shortUnit: t
           numDecimalPlaces: 2
         presentation:
-          title_public: Meat, horse - Production (tonnes)
+          title_public: Horse meat production
       meat__lamb_and_mutton__00000977__producing_or_slaughtered_animals__005320__animals:
         title: Meat, lamb and mutton | 00000977 || Producing or slaughtered animals | 005320 || animals
         unit: animals
         short_unit: animals
         processing_level: major
         display:
-          name: Meat, lamb and mutton - Producing or slaughtered animals (animals)
+          name: Number of sheep slaughtered for meat
           shortUnit: animals
-          numDecimalPlaces: 2
+          numDecimalPlaces: 0
         presentation:
-          title_public: Meat, lamb and mutton - Producing or slaughtered animals (animals)
+          title_public: Number of sheep slaughtered for meat
       meat__pig__00001035__producing_or_slaughtered_animals__005320__animals:
         title: Meat, pig | 00001035 || Producing or slaughtered animals | 005320 || animals
         unit: animals
         short_unit: animals
         processing_level: major
         display:
-          name: Meat, pig - Producing or slaughtered animals (animals)
+          name: Number of pigs slaughtered for meat
           shortUnit: animals
-          numDecimalPlaces: 2
+          numDecimalPlaces: 0
         presentation:
-          title_public: Meat, pig - Producing or slaughtered animals (animals)
+          title_public: Number of pigs slaughtered for meat
       meat__pig__00001035__production__005510__tonnes:
         title: Meat, pig | 00001035 || Production | 005510 || tonnes
         unit: tonnes
         short_unit: t
         processing_level: major
         display:
-          name: Meat, pig - Production (tonnes)
+          name: Pig meat production
           shortUnit: t
           numDecimalPlaces: 2
         presentation:
-          title_public: Meat, pig - Production (tonnes)
+          title_public: Pig meat production
       meat__pig__00001035__yield__005417__kilograms_per_animal:
         title: Meat, pig | 00001035 || Yield | 005417 || kilograms per animal
         unit: kilograms per animal
@@ -703,11 +703,11 @@ tables:
         short_unit: t
         processing_level: major
         display:
-          name: Meat, poultry - Production (tonnes)
+          name: Poutry meat production
           shortUnit: t
           numDecimalPlaces: 2
         presentation:
-          title_public: Meat, poultry - Production (tonnes)
+          title_public: Poutry meat production
       meat__poultry__00001808__yield__005424__kilograms_per_animal:
         title: Meat, poultry | 00001808 || Yield | 005424 || kilograms per animal
         unit: kilograms per animal
@@ -725,44 +725,44 @@ tables:
         short_unit: t
         processing_level: major
         display:
-          name: Meat, sheep and goat - Production (tonnes)
+          name: Sheep and goat meat production
           shortUnit: t
           numDecimalPlaces: 2
         presentation:
-          title_public: Meat, sheep and goat - Production (tonnes)
+          title_public: Sheep and goat meat production
       meat__total__00001765__production__005510__tonnes:
         title: Meat, total | 00001765 || Production | 005510 || tonnes
         unit: tonnes
         short_unit: t
         processing_level: major
         display:
-          name: Meat, total - Production (tonnes)
+          name: Total meat production
           shortUnit: t
           numDecimalPlaces: 2
         presentation:
-          title_public: Meat, total - Production (tonnes)
+          title_public: Total meat production
       meat__turkey__00001080__producing_or_slaughtered_animals__005321__animals:
         title: Meat, turkey | 00001080 || Producing or slaughtered animals | 005321 || animals
         unit: animals
         short_unit: animals
         processing_level: major
         display:
-          name: Meat, turkey - Producing or slaughtered animals (animals)
+          name: Number of turkeys slaughtered for meat
           shortUnit: animals
-          numDecimalPlaces: 2
+          numDecimalPlaces: 0
         presentation:
-          title_public: Meat, turkey - Producing or slaughtered animals (animals)
+          title_public: Number of turkeys slaughtered for meat
       milk__00001780__production__005510__tonnes:
         title: Milk | 00001780 || Production | 005510 || tonnes
         unit: tonnes
         short_unit: t
         processing_level: major
         display:
-          name: Milk - Production (tonnes)
+          name: Milk production
           shortUnit: t
           numDecimalPlaces: 2
         presentation:
-          title_public: Milk - Production (tonnes)
+          title_public: Milk production
       milk__00001780__yield__005420__kilograms_per_animal:
         title: Milk | 00001780 || Yield | 005420 || kilograms per animal
         unit: kilograms per animal
@@ -791,44 +791,44 @@ tables:
         short_unit: t
         processing_level: major
         display:
-          name: Olive oil - Production (tonnes)
+          name: Olive oil production
           shortUnit: t
           numDecimalPlaces: 2
         presentation:
-          title_public: Olive oil - Production (tonnes)
+          title_public: Olive oil production
       olives__00000260__area_harvested__005312__hectares:
         title: Olives | 00000260 || Area harvested | 005312 || hectares
         unit: hectares
         short_unit: ha
         processing_level: major
         display:
-          name: Olives - Area harvested (hectares)
+          name: Land used for olive production
           shortUnit: ha
           numDecimalPlaces: 2
         presentation:
-          title_public: Olives - Area harvested (hectares)
+          title_public: Land used for olive production
       oranges__00000490__area_harvested__005312__hectares:
         title: Oranges | 00000490 || Area harvested | 005312 || hectares
         unit: hectares
         short_unit: ha
         processing_level: major
         display:
-          name: Oranges - Area harvested (hectares)
+          name: Land used for orange production
           shortUnit: ha
           numDecimalPlaces: 2
         presentation:
-          title_public: Oranges - Area harvested (hectares)
+          title_public: Land used for orange production
       oranges__00000490__production__005510__tonnes:
         title: Oranges | 00000490 || Production | 005510 || tonnes
         unit: tonnes
         short_unit: t
         processing_level: major
         display:
-          name: Oranges - Production (tonnes)
+          name: Orange production
           shortUnit: t
           numDecimalPlaces: 2
         presentation:
-          title_public: Oranges - Production (tonnes)
+          title_public: Orange production
       oranges__00000490__yield__005419__tonnes_per_hectare:
         title: Oranges | 00000490 || Yield | 005419 || tonnes per hectare
         unit: tonnes per hectare
@@ -846,22 +846,22 @@ tables:
         short_unit: ha
         processing_level: major
         display:
-          name: Palm fruit oil - Area harvested (hectares)
+          name: Land used for palm fruit oil production
           shortUnit: ha
           numDecimalPlaces: 2
         presentation:
-          title_public: Palm fruit oil - Area harvested (hectares)
+          title_public: Land used for palm fruit oil production
       palm_fruit_oil__00000254__production__005510__tonnes:
         title: Palm fruit oil | 00000254 || Production | 005510 || tonnes
         unit: tonnes
         short_unit: t
         processing_level: major
         display:
-          name: Palm fruit oil - Production (tonnes)
+          name: Palm fruit oil production
           shortUnit: t
           numDecimalPlaces: 2
         presentation:
-          title_public: Palm fruit oil - Production (tonnes)
+          title_public: Palm fruit oil production
       palm_fruit_oil__00000254__yield__005419__tonnes_per_hectare:
         title: Palm fruit oil | 00000254 || Yield | 005419 || tonnes per hectare
         unit: tonnes per hectare
@@ -879,44 +879,44 @@ tables:
         short_unit: t
         processing_level: major
         display:
-          name: Palm kernel oil - Production (tonnes)
+          name: Palm kernel oil production
           shortUnit: t
           numDecimalPlaces: 2
         presentation:
-          title_public: Palm kernel oil - Production (tonnes)
+          title_public: Palm kernel oil production
       palm_oil__00000257__production__005510__tonnes:
         title: Palm oil | 00000257 || Production | 005510 || tonnes
         unit: tonnes
         short_unit: t
         processing_level: major
         display:
-          name: Palm oil - Production (tonnes)
+          name: Palm oil production
           shortUnit: t
           numDecimalPlaces: 2
         presentation:
-          title_public: Palm oil - Production (tonnes)
+          title_public: Palm oil production
       peas__dry__00000187__area_harvested__005312__hectares:
         title: Peas, dry | 00000187 || Area harvested | 005312 || hectares
         unit: hectares
         short_unit: ha
         processing_level: major
         display:
-          name: Peas, dry - Area harvested (hectares)
+          name: Land used for pea production
           shortUnit: ha
           numDecimalPlaces: 2
         presentation:
-          title_public: Peas, dry - Area harvested (hectares)
+          title_public: Land used for pea production
       peas__dry__00000187__production__005510__tonnes:
         title: Peas, dry | 00000187 || Production | 005510 || tonnes
         unit: tonnes
         short_unit: t
         processing_level: major
         display:
-          name: Peas, dry - Production (tonnes)
+          name: Pea production
           shortUnit: t
           numDecimalPlaces: 2
         presentation:
-          title_public: Peas, dry - Production (tonnes)
+          title_public: Pea production
       peas__dry__00000187__yield__005419__tonnes_per_hectare:
         title: Peas, dry | 00000187 || Yield | 005419 || tonnes per hectare
         unit: tonnes per hectare
@@ -934,22 +934,22 @@ tables:
         short_unit: ha
         processing_level: major
         display:
-          name: Potatoes - Area harvested (hectares)
+          name: Land used for potato production
           shortUnit: ha
           numDecimalPlaces: 2
         presentation:
-          title_public: Potatoes - Area harvested (hectares)
+          title_public: Land used for potato production
       potatoes__00000116__production__005510__tonnes:
         title: Potatoes | 00000116 || Production | 005510 || tonnes
         unit: tonnes
         short_unit: t
         processing_level: major
         display:
-          name: Potatoes - Production (tonnes)
+          name: Potato production
           shortUnit: t
           numDecimalPlaces: 2
         presentation:
-          title_public: Potatoes - Production (tonnes)
+          title_public: Potato production
       potatoes__00000116__yield__005419__tonnes_per_hectare:
         title: Potatoes | 00000116 || Yield | 005419 || tonnes per hectare
         unit: tonnes per hectare
@@ -967,33 +967,33 @@ tables:
         short_unit: animals
         processing_level: major
         display:
-          name: Poultry - Stocks (animals)
+          name: Number of poultry birds
           shortUnit: animals
-          numDecimalPlaces: 2
+          numDecimalPlaces: 0
         presentation:
-          title_public: Poultry - Stocks (animals)
+          title_public: Number of poultry birds
       rapeseed__00000270__area_harvested__005312__hectares:
         title: Rapeseed | 00000270 || Area harvested | 005312 || hectares
         unit: hectares
         short_unit: ha
         processing_level: major
         display:
-          name: Rapeseed - Area harvested (hectares)
+          name: Land used for rapeseed production
           shortUnit: ha
           numDecimalPlaces: 2
         presentation:
-          title_public: Rapeseed - Area harvested (hectares)
+          title_public: Land used for rapeseed production
       rapeseed__00000270__production__005510__tonnes:
         title: Rapeseed | 00000270 || Production | 005510 || tonnes
         unit: tonnes
         short_unit: t
         processing_level: major
         display:
-          name: Rapeseed - Production (tonnes)
+          name: Rapeseed production
           shortUnit: t
           numDecimalPlaces: 2
         presentation:
-          title_public: Rapeseed - Production (tonnes)
+          title_public: Rapeseed production
       rapeseed__00000270__yield__005419__tonnes_per_hectare:
         title: Rapeseed | 00000270 || Yield | 005419 || tonnes per hectare
         unit: tonnes per hectare
@@ -1011,22 +1011,22 @@ tables:
         short_unit: ha
         processing_level: major
         display:
-          name: Rice - Area harvested (hectares)
+          name: Land used for rice production
           shortUnit: ha
           numDecimalPlaces: 2
         presentation:
-          title_public: Rice - Area harvested (hectares)
+          title_public: Land used for rice production
       rice__00000027__production__005510__tonnes:
         title: Rice | 00000027 || Production | 005510 || tonnes
         unit: tonnes
         short_unit: t
         processing_level: major
         display:
-          name: Rice - Production (tonnes)
+          name: Rice production
           shortUnit: t
           numDecimalPlaces: 2
         presentation:
-          title_public: Rice - Production (tonnes)
+          title_public: Rice production
       rice__00000027__yield__005419__tonnes_per_hectare:
         title: Rice | 00000027 || Yield | 005419 || tonnes per hectare
         unit: tonnes per hectare
@@ -1044,44 +1044,44 @@ tables:
         short_unit: ha
         processing_level: major
         display:
-          name: Rye - Area harvested (hectares)
+          name: Land used for rye production
           shortUnit: ha
           numDecimalPlaces: 2
         presentation:
-          title_public: Rye - Area harvested (hectares)
+          title_public: Land used for rye production
       rye__00000071__production__005510__tonnes:
         title: Rye | 00000071 || Production | 005510 || tonnes
         unit: tonnes
         short_unit: t
         processing_level: major
         display:
-          name: Rye - Production (tonnes)
+          name: Rye production
           shortUnit: t
           numDecimalPlaces: 2
         presentation:
-          title_public: Rye - Production (tonnes)
+          title_public: Rye production
       safflower_seed__00000280__area_harvested__005312__hectares:
         title: Safflower seed | 00000280 || Area harvested | 005312 || hectares
         unit: hectares
         short_unit: ha
         processing_level: major
         display:
-          name: Safflower seed - Area harvested (hectares)
+          name: Land used for safflower seed production
           shortUnit: ha
           numDecimalPlaces: 2
         presentation:
-          title_public: Safflower seed - Area harvested (hectares)
+          title_public: Land used for safflower seed production
       seed_cotton__00000328__area_harvested__005312__hectares:
         title: Seed cotton | 00000328 || Area harvested | 005312 || hectares
         unit: hectares
         short_unit: ha
         processing_level: major
         display:
-          name: Seed cotton - Area harvested (hectares)
+          name: Land used for seed cotton production
           shortUnit: ha
           numDecimalPlaces: 2
         presentation:
-          title_public: Seed cotton - Area harvested (hectares)
+          title_public: Land used for seed cotton production
       seed_cotton__00000328__yield__005419__tonnes_per_hectare:
         title: Seed cotton | 00000328 || Yield | 005419 || tonnes per hectare
         unit: tonnes per hectare
@@ -1099,22 +1099,22 @@ tables:
         short_unit: ha
         processing_level: major
         display:
-          name: Sesame seed - Area harvested (hectares)
+          name: Land used for sesame seed production
           shortUnit: ha
           numDecimalPlaces: 2
         presentation:
-          title_public: Sesame seed - Area harvested (hectares)
+          title_public: Land used for sesame seed production
       sesame_seed__00000289__production__005510__tonnes:
         title: Sesame seed | 00000289 || Production | 005510 || tonnes
         unit: tonnes
         short_unit: t
         processing_level: major
         display:
-          name: Sesame seed - Production (tonnes)
+          name: Sesame seed production
           shortUnit: t
           numDecimalPlaces: 2
         presentation:
-          title_public: Sesame seed - Production (tonnes)
+          title_public: Sesame seed production
       sorghum__00000083__yield__005419__tonnes_per_hectare:
         title: Sorghum | 00000083 || Yield | 005419 || tonnes per hectare
         unit: tonnes per hectare
@@ -1132,22 +1132,22 @@ tables:
         short_unit: ha
         processing_level: major
         display:
-          name: Soybeans - Area harvested (hectares)
+          name: Land used for soybean production
           shortUnit: ha
           numDecimalPlaces: 2
         presentation:
-          title_public: Soybeans - Area harvested (hectares)
+          title_public: Land used for soybean production
       soybeans__00000236__production__005510__tonnes:
         title: Soybeans | 00000236 || Production | 005510 || tonnes
         unit: tonnes
         short_unit: t
         processing_level: major
         display:
-          name: Soybeans - Production (tonnes)
+          name: Soybean production
           shortUnit: t
           numDecimalPlaces: 2
         presentation:
-          title_public: Soybeans - Production (tonnes)
+          title_public: Soybean production
       soybeans__00000236__yield__005419__tonnes_per_hectare:
         title: Soybeans | 00000236 || Yield | 005419 || tonnes per hectare
         unit: tonnes per hectare
@@ -1165,44 +1165,44 @@ tables:
         short_unit: ha
         processing_level: major
         display:
-          name: Sugar beet - Area harvested (hectares)
+          name: Land used for sugar beet production
           shortUnit: ha
           numDecimalPlaces: 2
         presentation:
-          title_public: Sugar beet - Area harvested (hectares)
+          title_public: Land used for sugar beet production
       sugar_beet__00000157__production__005510__tonnes:
         title: Sugar beet | 00000157 || Production | 005510 || tonnes
         unit: tonnes
         short_unit: t
         processing_level: major
         display:
-          name: Sugar beet - Production (tonnes)
+          name: Sugar beet production
           shortUnit: t
           numDecimalPlaces: 2
         presentation:
-          title_public: Sugar beet - Production (tonnes)
+          title_public: Sugar beet production
       sugar_cane__00000156__area_harvested__005312__hectares:
         title: Sugar cane | 00000156 || Area harvested | 005312 || hectares
         unit: hectares
         short_unit: ha
         processing_level: major
         display:
-          name: Sugar cane - Area harvested (hectares)
+          name: Land used for sugar cane production
           shortUnit: ha
           numDecimalPlaces: 2
         presentation:
-          title_public: Sugar cane - Area harvested (hectares)
+          title_public: Land used for sugar cane production
       sugar_cane__00000156__production__005510__tonnes:
         title: Sugar cane | 00000156 || Production | 005510 || tonnes
         unit: tonnes
         short_unit: t
         processing_level: major
         display:
-          name: Sugar cane - Production (tonnes)
+          name: Sugar cane production
           shortUnit: t
           numDecimalPlaces: 2
         presentation:
-          title_public: Sugar cane - Production (tonnes)
+          title_public: Sugar cane production
       sugar_cane__00000156__yield__005419__tonnes_per_hectare:
         title: Sugar cane | 00000156 || Yield | 005419 || tonnes per hectare
         unit: tonnes per hectare
@@ -1220,22 +1220,22 @@ tables:
         short_unit: ha
         processing_level: major
         display:
-          name: Sunflower seed - Area harvested (hectares)
+          name: Land used for sunflower seed production
           shortUnit: ha
           numDecimalPlaces: 2
         presentation:
-          title_public: Sunflower seed - Area harvested (hectares)
+          title_public: Land used for sunflower seed production
       sunflower_seed__00000267__production__005510__tonnes:
         title: Sunflower seed | 00000267 || Production | 005510 || tonnes
         unit: tonnes
         short_unit: t
         processing_level: major
         display:
-          name: Sunflower seed - Production (tonnes)
+          name: Sunflower seed production
           shortUnit: t
           numDecimalPlaces: 2
         presentation:
-          title_public: Sunflower seed - Production (tonnes)
+          title_public: Sunflower seed production
       sunflower_seed__00000267__yield__005419__tonnes_per_hectare:
         title: Sunflower seed | 00000267 || Yield | 005419 || tonnes per hectare
         unit: tonnes per hectare
@@ -1253,66 +1253,66 @@ tables:
         short_unit: t
         processing_level: major
         display:
-          name: Sweet potatoes - Production (tonnes)
+          name: Sweet potato production
           shortUnit: t
           numDecimalPlaces: 2
         presentation:
-          title_public: Sweet potatoes - Production (tonnes)
+          title_public: Sweet potato production
       swine__pigs__00001034__stocks__005111__animals:
         title: Swine / pigs | 00001034 || Stocks | 005111 || animals
         unit: animals
         short_unit: animals
         processing_level: major
         display:
-          name: Swine / pigs - Stocks (animals)
+          name: Number of pigs
           shortUnit: animals
-          numDecimalPlaces: 2
+          numDecimalPlaces: 0
         presentation:
-          title_public: Swine / pigs - Stocks (animals)
+          title_public: Number of pigs
       tea__00000667__production__005510__tonnes:
         title: Tea | 00000667 || Production | 005510 || tonnes
         unit: tonnes
         short_unit: t
         processing_level: major
         display:
-          name: Tea - Production (tonnes)
+          name: Tea production
           shortUnit: t
           numDecimalPlaces: 2
         presentation:
-          title_public: Tea - Production (tonnes)
+          title_public: Tea production
       tobacco__00000826__production__005510__tonnes:
         title: Tobacco | 00000826 || Production | 005510 || tonnes
         unit: tonnes
         short_unit: t
         processing_level: major
         display:
-          name: Tobacco - Production (tonnes)
+          name: Tobacco production
           shortUnit: t
           numDecimalPlaces: 2
         presentation:
-          title_public: Tobacco - Production (tonnes)
+          title_public: Tobacco production
       tomatoes__00000388__area_harvested__005312__hectares:
         title: Tomatoes | 00000388 || Area harvested | 005312 || hectares
         unit: hectares
         short_unit: ha
         processing_level: major
         display:
-          name: Tomatoes - Area harvested (hectares)
+          name: Land used for tomato production
           shortUnit: ha
           numDecimalPlaces: 2
         presentation:
-          title_public: Tomatoes - Area harvested (hectares)
+          title_public: Land used for tomato production
       tomatoes__00000388__production__005510__tonnes:
         title: Tomatoes | 00000388 || Production | 005510 || tonnes
         unit: tonnes
         short_unit: t
         processing_level: major
         display:
-          name: Tomatoes - Production (tonnes)
+          name: Tomato production
           shortUnit: t
           numDecimalPlaces: 2
         presentation:
-          title_public: Tomatoes - Production (tonnes)
+          title_public: Tomato production
       tomatoes__00000388__yield__005419__tonnes_per_hectare:
         title: Tomatoes | 00000388 || Yield | 005419 || tonnes per hectare
         unit: tonnes per hectare
@@ -1330,33 +1330,33 @@ tables:
         short_unit: ha
         processing_level: major
         display:
-          name: Tung nuts - Area harvested (hectares)
+          name: Land used for tung nut production
           shortUnit: ha
           numDecimalPlaces: 2
         presentation:
-          title_public: Tung nuts - Area harvested (hectares)
+          title_public: Land used for tung nut production
       wheat__00000015__area_harvested__005312__hectares:
         title: Wheat | 00000015 || Area harvested | 005312 || hectares
         unit: hectares
         short_unit: ha
         processing_level: major
         display:
-          name: Wheat - Area harvested (hectares)
+          name: Land used for wheat production
           shortUnit: ha
           numDecimalPlaces: 2
         presentation:
-          title_public: Wheat - Area harvested (hectares)
+          title_public: Land used for wheat production
       wheat__00000015__production__005510__tonnes:
         title: Wheat | 00000015 || Production | 005510 || tonnes
         unit: tonnes
         short_unit: t
         processing_level: major
         display:
-          name: Wheat - Production (tonnes)
+          name: Wheat production
           shortUnit: t
           numDecimalPlaces: 2
         presentation:
-          title_public: Wheat - Production (tonnes)
+          title_public: Wheat production
       wheat__00000015__yield__005419__tonnes_per_hectare:
         title: Wheat | 00000015 || Yield | 005419 || tonnes per hectare
         unit: tonnes per hectare
@@ -1374,19 +1374,19 @@ tables:
         short_unit: t
         processing_level: major
         display:
-          name: Wine - Production (tonnes)
+          name: Wine production
           shortUnit: t
           numDecimalPlaces: 2
         presentation:
-          title_public: Wine - Production (tonnes)
+          title_public: Wine production
       yams__00000137__production__005510__tonnes:
         title: Yams | 00000137 || Production | 005510 || tonnes
         unit: tonnes
         short_unit: t
         processing_level: major
         display:
-          name: Yams - Production (tonnes)
+          name: Yam production
           shortUnit: t
           numDecimalPlaces: 2
         presentation:
-          title_public: Yams - Production (tonnes)
+          title_public: Yam production
