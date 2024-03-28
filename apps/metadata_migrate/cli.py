@@ -108,7 +108,8 @@ def cli(
         select config from charts
         where slug = '{chart_slug}'
         """
-        df = pd.read_sql(q, engine)
+        with engine.connect() as conn:
+            df = pd.read_sql(q, conn)
         if df.empty:
             raise ValueError(f"no chart found for slug {chart_slug}")
 
@@ -359,7 +360,8 @@ def _load_grapher_config(engine: Engine, col: str, ds_meta: DatasetMeta) -> Dict
         d.version = '{ds_meta.version}' and
         d.shortName = '{ds_meta.short_name}'
     """
-    cf = pd.read_sql(q, engine)
+    with engine.connect() as conn:
+        cf = pd.read_sql(q, conn)
     if len(cf) == 0:
         log.warning(f"no chart found for variable {col}")
         return {}

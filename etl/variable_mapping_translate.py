@@ -191,7 +191,8 @@ def _run_query_mapping_to_df(sql: Engine, variable_ids: Tuple[str, ...]) -> pd.D
         left join datasets on variables.datasetId=datasets.id
         where variables.id in %(variable_ids)s;
     """
-    df: pd.DataFrame = pd.read_sql_query(query, sql, params={"variable_ids": variable_ids})
+    with sql.connect() as con:
+        df: pd.DataFrame = pd.read_sql_query(query, con, params={"variable_ids": variable_ids})
     return df
 
 

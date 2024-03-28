@@ -381,3 +381,13 @@ def get_info_for_etl_datasets(db_conn: Optional[MySQLdb.Connection] = None) -> p
     df.loc[df["is_private"], "step"] = df[df["is_private"]]["step"].str.replace("data://", "data-private://")
 
     return df
+
+
+def read_sql(sql: str, *args, **kwargs) -> pd.DataFrame:
+    """Wrapper around pd.read_sql that creates a connection and closes it after reading the data.
+    This adds overhead, so if you need performance, reuse the same connection and cursor.
+    """
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", UserWarning)
+        with get_engine().connect() as con:
+            return pd.read_sql(sql, con.connection, *args, **kwargs)

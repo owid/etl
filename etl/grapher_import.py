@@ -213,10 +213,12 @@ def upsert_table(
         "Tables to be upserted must have no null values. Instead they" f" have:\n{table.loc[table.iloc[:, 0].isnull()]}"
     )
     table = table.reorder_levels(["year", "entity_id"])
-    assert table.index.dtypes[0] in gh.INT_TYPES, f"year must be of an integer type but was: {table.index.dtypes[0]}"
     assert (
-        table.index.dtypes[1] in gh.INT_TYPES
-    ), f"entity_id must be of an integer type but was: {table.index.dtypes[1]}"
+        table.index.dtypes.iloc[0] in gh.INT_TYPES
+    ), f"year must be of an integer type but was: {table.index.dtypes.iloc[0]}"
+    assert (
+        table.index.dtypes.iloc[1] in gh.INT_TYPES
+    ), f"entity_id must be of an integer type but was: {table.index.dtypes.iloc[1]}"
     utils.validate_underscore(table.metadata.short_name, "Table's short_name")
     utils.validate_underscore(table.columns[0], "Variable's name")
 

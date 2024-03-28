@@ -195,14 +195,15 @@ def _active_datasets(
         limit %(limit)s
         """
 
-    df = pd.read_sql(
-        q,
-        engine,
-        params={
-            "limit": limit,
-            "dataset_ids": dag_backported_ids + dataset_ids,
-        },
-    )
+    with engine.connect() as con:
+        df = pd.read_sql(
+            q,
+            con,
+            params={
+                "limit": limit,
+                "dataset_ids": dag_backported_ids + dataset_ids,
+            },
+        )
 
     df["short_name"] = df.name.map(underscore)
 

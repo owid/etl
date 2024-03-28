@@ -31,8 +31,8 @@ import rdata
 import structlog
 from pandas._typing import FilePath, ReadCsvBuffer, Scalar  # type: ignore
 from pandas.core.series import Series
-from pandas.util._decorators import rewrite_axis_style_signature
 
+# from pandas.util._decorators import rewrite_axis_style_signature
 from owid.repack import repack_frame
 
 from . import processing_log as pl
@@ -425,10 +425,10 @@ class Table(pd.DataFrame):
             and self._fields == table._fields
         )
 
-    @rewrite_axis_style_signature(
-        "mapper",
-        [("copy", True), ("inplace", False), ("level", None), ("errors", "ignore")],
-    )
+    # @rewrite_axis_style_signature(
+    #     "mapper",
+    #     [("copy", True), ("inplace", False), ("level", None), ("errors", "ignore")],
+    # )
     def rename(self, *args: Any, **kwargs: Any) -> Optional["Table"]:
         """Rename columns while keeping their metadata."""
         inplace = kwargs.get("inplace")
@@ -1300,13 +1300,17 @@ def pivot(
     short_name: Optional[str] = None,
     **kwargs,
 ) -> Table:
+    if index is not None:
+        kwargs["index"] = index
+    if columns is not None:
+        kwargs["columns"] = columns
+    if values is not None:
+        kwargs["values"] = values
+
     # Get the new pivot table.
     table = Table(
         pd.pivot(
             data=data,
-            index=index,
-            columns=columns,
-            values=values,
             **kwargs,
         )
     )
