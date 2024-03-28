@@ -9,7 +9,7 @@ meta:
 
       The dataset also provides statistics on the total credit to all industries, indicators on the share of credit to agricultural producers, and an agriculture orientation index (AOI) for credit that normalizes the share of credit to agriculture over total credit by dividing it by the share of agriculture in gross domestic product (GDP). As such, it can provide a more accurate indication of the relative importance that banking sectors place on financing the sector. An AOI lower than 1 indicates that the agriculture sector receives a credit share lower than its contribution to the economy, while an AOI greater than 1 indicates a credit share to the agriculture sector greater than its economic contribution.
     citation_full: 'Food and Agriculture Organization of the United Nations - Investment: Credit to Agriculture (2023).'
-    attribution_short: FAOSTAT
+    attribution_short: FAO
     url_main: http://www.fao.org/faostat/en/#data/IC
     url_download: https://fenixservices.fao.org/faostat/static/bulkdownloads/Investment_CreditAgriculture_E_All_Data_(Normalized).zip
     date_accessed: '2024-03-14'

@@ -10,7 +10,7 @@ meta:
       Data are available by country, with global coverage relative to the period 1961-2020, with annual updates.
     citation_full: |-
       Food and Agriculture Organization of the United Nations - Land, Inputs and Sustainability: Cropland Nutrient Balance (2023).
-    attribution_short: FAOSTAT
+    attribution_short: FAO
     url_main: http://www.fao.org/faostat/en/#data/ESB
     url_download: |-
       https://fenixservices.fao.org/faostat/static/bulkdownloads/Environment_Cropland_nutrient_budget_E_All_Data_(Normalized).zip

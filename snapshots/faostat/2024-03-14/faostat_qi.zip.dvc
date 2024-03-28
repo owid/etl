@@ -7,7 +7,7 @@ meta:
 
       Indices for meat production are computed based on data for production from indigenous animals.
     citation_full: 'Food and Agriculture Organization of the United Nations - Production: Production Indices (2024).'
-    attribution_short: FAOSTAT
+    attribution_short: FAO
     url_main: http://www.fao.org/faostat/en/#data/QI
     url_download: https://fenixservices.fao.org/faostat/static/bulkdownloads/Production_Indices_E_All_Data_(Normalized).zip
     date_accessed: '2024-03-14'

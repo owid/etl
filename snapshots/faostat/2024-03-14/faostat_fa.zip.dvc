@@ -5,7 +5,7 @@ meta:
     description: ''
     citation_full: |-
       Food and Agriculture Organization of the United Nations - Discontinued archives and data series: Food Aid Shipments (WFP) (2016).
-    attribution_short: FAOSTAT
+    attribution_short: FAO
     url_main: http://www.fao.org/faostat/en/#data/FA
     url_download: https://fenixservices.fao.org/faostat/static/bulkdownloads/Food_Aid_Shipments_WFP_E_All_Data_(Normalized).zip
     date_accessed: '2024-03-14'

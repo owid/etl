@@ -264,6 +264,13 @@ If no dataset requires an update, the workflow stops here.
     python etl/scripts/faostat/create_new_steps.py -c garden
     ```
 
+    !!! note
+
+        We used to handle custom definitions via custom_* files.
+        They let us handle individual definitions of items, elements and units (used by the food explorer).
+        However, for more common changes in an indicator's metadata, it is now better to directly modify the `faostat_*.meta.yml` files of the garden steps.
+        TODO: In the next data update, we will need to edit these scripts to be able to update not only the `custom_*` files, but also the `faostat_*.meta.yml` files, in case FAOSTAT definitions change.
+
 6. Run the new etl garden steps, to generate the garden datasets.
 
     ```bash

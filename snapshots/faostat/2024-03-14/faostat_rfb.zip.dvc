@@ -8,7 +8,7 @@ meta:
       The fertilizer statistics data are for a set of 23 product categories. Both straight and compound fertilizers are included. There is information available about methodology at: https://fenixservices.fao.org/faostat/static/documents/RFB/RFB_EN_README.pdf
     citation_full: |-
       Food and Agriculture Organization of the United Nations - Land, Inputs and Sustainability: Fertilizers by Product (2023).
-    attribution_short: FAOSTAT
+    attribution_short: FAO
     url_main: http://www.fao.org/faostat/en/#data/RFB
     url_download: https://fenixservices.fao.org/faostat/static/bulkdownloads/Inputs_FertilizersProduct_E_All_Data_(Normalized).zip
     date_accessed: '2024-03-14'
