@@ -1,0 +1,23 @@
+meta:
+  origin:
+    producer: World Bank, adapted from Herforth et al. (2022)
+    title: Food Prices for Nutrition
+    citation_full: |-
+      World Bank, adapted from Herforth, A., Venkat, A., Bai, Y., Costlow, L., Holleman, C. & Masters, W.A. (2022). Methods and options to monitor globally the cost and affordability of a healthy diet. Background paper for The State of Food Security and Nutrition in the World 2022. Rome, FAO.
+    description: |-
+      Food Prices for Nutrition provides indicators on the cost and affordability of healthy diets in each country, showing the population's physical and economic access to sufficient quantities of locally available items for an active and healthy life. It also provides indicators on the cost and affordability of an energy-sufficient diet and of a nutrient-adequate diet. These indicators are explained in detail in [the Food Prices for Nutrition DataHub](https://www.worldbank.org/foodpricesfornutrition).
+
+      Version 2.1 differs from Version 2.0 in that 2.1 reflects the latest income data from the World Bank's Poverty and Inequality Platform (PIP) that were updated in the fall of 2023, for the following diet affordability indicators: the share and volume of the population that cannot afford the diet, based on national income distributions expressed in 2017 PPP dollars. Furthermore, Version 2.1 updates and reports population data provided by World Development Indicators.
+    version_producer: "2.1"
+    url_main: https://databank.worldbank.org/source/food-prices-for-nutrition
+    date_accessed: 2024-03-26
+    date_published: 2023-12-01
+    license:
+      name: CC BY 4.0
+      url: https://www.worldbank.org/en/about/legal/terms-of-use-for-datasets
+
+wdir: ../../../data/snapshots/wb/2024-03-26
+outs:
+  - md5: 25e2b0b99e91433c6b0265de576c5db0
+    size: 2300974
+    path: food_prices_for_nutrition.csv
