@@ -1,5 +1,6 @@
 definitions:
   common:
+    processing_level: minor
     unit: tonnes per hectare
     short_unit: t/ha
     presentation:
@@ -7,11 +8,11 @@ definitions:
         - Crop Yields
 
 dataset:
-  title: Closing yield gaps through nutrient and water management
   update_period_days: 0
 
 tables:
   mueller_et_al_2012:
+    title: Closing yield gaps through nutrient and water management
     variables:
       barley_attainable_yield:
         title: Attainable yield for barley

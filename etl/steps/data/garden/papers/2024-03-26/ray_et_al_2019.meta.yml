@@ -1,15 +1,16 @@
 definitions:
   common:
+    processing_level: minor
     presentation:
       topic_tags:
         - Crop Yields
 
 dataset:
-  title: "Climate impact on crop yields"
   update_period_days: 0
 
 tables:
   ray_et_al_2019:
+    title: Climate impact on crop yields
     variables:
       barley_change_in_yield:
         title: "Barley yield change"

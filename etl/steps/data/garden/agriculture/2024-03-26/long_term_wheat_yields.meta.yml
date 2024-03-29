@@ -1,5 +1,4 @@
 dataset:
-  title: Long-term wheat yields
   update_period_days: 365
   description: |
     This dataset combines data for European countries from two key sources:
@@ -10,6 +9,7 @@ dataset:
 
 tables:
   long_term_wheat_yields:
+    title: Long-term wheat yields
     variables:
       wheat_yield:
         title: Long-run wheat yields
@@ -20,6 +20,7 @@ tables:
           - Data on yields of permanent crops are not as reliable as those for temporary crops.
         unit: tonnes per hectare
         short_unit: t/ha
+        processing_level: major
         presentation:
           topic_tags:
             - Crop Yields

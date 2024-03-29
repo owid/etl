@@ -1,66 +1,57 @@
+definitions:
+  common:
+    description_short: |-
+      Alcoholic beverages and tobacco are not included.
+    processing_level: minor
+    presentation:
+      topic_tags:
+        - Food Prices
+      attribution_short: USDA/ERS
+
 dataset:
-  title: "Food expenditure in the US (USDA/ERS, 2023)"
+  update_period_days: 365
 
 tables:
   food_expenditure_in_us:
+    title: Food expenditure in the US
     variables:
       food_as_share_of_disposable_income__at_and_away_from_home:
         title: "Food as share of disposable income (at and away from home)"
         unit: "%"
         short_unit: "%"
-        description: |
-          Data on food expenditure does not include alcoholic beverages or tobacco.
       food_consumed_at_home_as_share_of_disposable_income:
         title: "Food consumed at home as share of disposable income"
         unit: "%"
         short_unit: "%"
-        description: |
-          Data on food expenditure does not include alcoholic beverages or tobacco.
       food_consumed_away_from_home_as_share_of_disposable_income:
         title: "Food consumed away from home as share of disposable income"
         unit: "%"
         short_unit: "%"
-        description: |
-          Data on food expenditure does not include alcoholic beverages or tobacco.
       food_eaten_away_from_home_as_share_of_total_food_expenditure:
         title: "Food eaten away from home as share of total food expenditure"
         unit: "%"
         short_unit: "%"
-        description: |
-          Data on food expenditure does not include alcoholic beverages or tobacco.
       food_expenditure_at_home__constant_1988_prices:
         title: "Food expenditure at home (constant 1988 US$)"
         unit: "constant 1988 US$"
         short_unit: "$"
-        description: |
-          Data on food expenditure does not include alcoholic beverages or tobacco.
       food_expenditure_at_home__current_prices:
         title: "Food expenditure at home (current prices)"
         unit: "current US$"
         short_unit: "$"
-        description: |
-          Data on food expenditure does not include alcoholic beverages or tobacco.
       food_expenditure_away_from_home__constant_1988_prices:
         title: "Food expenditure away from home (constant 1988 US$)"
         unit: "constant 1988 US$"
         short_unit: "$"
-        description: |
-          Data on food expenditure does not include alcoholic beverages or tobacco.
       food_expenditure_away_from_home__current_prices:
         title: "Food expenditure away from home (current prices)"
         unit: "current US$"
         short_unit: "$"
-        description: |
-          Data on food expenditure does not include alcoholic beverages or tobacco.
       food_expenditure_total__constant_1988_prices:
         title: "Food expenditure total (constant 1988 US$)"
         unit: "constant 1988 US$"
         short_unit: "$"
-        description: |
-          Data on food expenditure does not include alcoholic beverages or tobacco.
       food_expenditure_total__current_prices:
         title: "Food expenditure total (current prices)"
         unit: "current US$"
         short_unit: "$"
-        description: |
-          Data on food expenditure does not include alcoholic beverages or tobacco.

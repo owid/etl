@@ -2,12 +2,12 @@ definitions:
   common:
     unit: tonnes per hectare
     short_unit: t/ha
+    processing_level: major
     presentation:
       topic_tags:
         - Crop Yields
 
 dataset:
-  title: Long-term yields in the United Kingdom (various sources, 2023b)
   update_period_days: 365
   description: |
     This dataset on agricultural yields in the United Kingdom was constructed from yield data from three key sources:
@@ -22,6 +22,7 @@ dataset:
 
 tables:
   uk_long_term_yields:
+    title: Long-term yields in the United Kingdom (various sources, 2023b)
     variables:
       barley_yield:
         title: Barley yields

@@ -1,5 +1,6 @@
 definitions:
   common:
+    processing_level: minor
     presentation:
       topic_tags:
         - Crop Yields

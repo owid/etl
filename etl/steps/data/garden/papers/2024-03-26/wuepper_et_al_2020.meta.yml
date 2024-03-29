@@ -1,9 +1,9 @@
 dataset:
-  title: Yield gaps versus nitrogen pollution
   update_period_days: 0
 
 tables:
   wuepper_et_al_2020:
+    title: Yield gaps versus nitrogen pollution
     variables:
       yield_gap_versus_nitrogen_pollution_effect:
         title: Yield gap versus nitrogen pollution effect
@@ -13,6 +13,7 @@ tables:
           Countries' estimated effect on their yield gaps versus their nitrogen pollution.
         description_key:
           - This metric shows how much nitrogen pollution countries are causing compared to how much they reduce their yield gaps (the difference between attainable and attained yields) relative to directly neighboring countries. Positive values indicate a country is overapplying nitrogen without gains in yield.
+        processing_level: minor
         presentation:
           topic_tags:
             - Crop Yields
