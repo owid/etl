@@ -292,7 +292,7 @@ def load_steps_df_to_display(show_all_channels: bool, reload_key: int) -> pd.Dat
 
     # Sort displayed data conveniently.
     df = df.sort_values(
-        by=["days_to_update", "n_charts_views_7d", "n_charts", "kind", "version"],
+        by=["days_to_update", "n_chart_views_365d", "n_charts", "kind", "version"],
         na_position="last",
         ascending=[True, False, False, False, True],
     )
@@ -305,8 +305,9 @@ def load_steps_df_to_display(show_all_channels: bool, reload_key: int) -> pd.Dat
             "days_to_update",
             "update_state",
             "n_charts",
-            "n_charts_views_7d",
-            "n_charts_views_365d",
+            # "n_chart_views_7d",
+            "n_chart_views_365d",
+            "update_period_days",
             "date_of_next_update",
             "namespace",
             "version",
@@ -315,7 +316,6 @@ def load_steps_df_to_display(show_all_channels: bool, reload_key: int) -> pd.Dat
             "kind",
             "dag_file_name",
             "n_versions",
-            "update_period_days",
             # "state",
             "full_path_to_script",
             "dag_file_path",
@@ -382,14 +382,14 @@ gb.configure_column("kind", headerName="Kind", width=100, headerTooltip="Kind of
 gb.configure_column(
     "n_charts", headerName="N. charts", width=120, headerTooltip="Number of charts that use data from the step."
 )
+# gb.configure_column(
+#     "n_chart_views_7d",
+#     headerName="7-day views",
+#     width=140,
+#     headerTooltip="Number of views of charts that use data from the step in the last 7 days.",
+# )
 gb.configure_column(
-    "n_charts_views_7d",
-    headerName="7-day views",
-    width=140,
-    headerTooltip="Number of views of charts that use data from the step in the last 7 days.",
-)
-gb.configure_column(
-    "n_charts_views_365d",
+    "n_chart_views_365d",
     headerName="365-day views",
     width=140,
     headerTooltip="Number of views of charts that use data from the step in the last 365 days.",
