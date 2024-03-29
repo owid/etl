@@ -950,7 +950,7 @@ def detect_overlapping_regions(
     """
     # Sum over all columns to get the total sum of each column for each country-year.
     tb_total = (
-        df.groupby([country_col, year_col])
+        df.groupby([country_col, year_col], observed=True)
         .agg({column: "sum" for column in df.columns if column not in index_columns})
         .reset_index()
     )
