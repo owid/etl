@@ -52,10 +52,7 @@ def run(dest_dir: str) -> None:
     combined = combine_two_overlapping_dataframes(df1=tb_qcl, df2=tb_bayliss, index_columns=["country", "year"])
 
     # Set an appropriate index and sort conveniently.
-    combined = combined.format()
-
-    # Create a new table with the processed data.
-    combined.metadata.short_name = paths.short_name
+    combined = combined.format(short_name=paths.short_name)
 
     #
     # Save outputs.

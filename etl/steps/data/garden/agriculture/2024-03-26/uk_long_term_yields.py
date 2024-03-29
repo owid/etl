@@ -79,10 +79,7 @@ def run(dest_dir: str) -> None:
     tb_garden = combine_two_overlapping_dataframes(df1=tb_qcl, df2=tb_historical, index_columns=["country", "year"])
 
     # Set an appropriate index and sort conveniently.
-    tb_garden = tb_garden.format()
-
-    # Rename table.
-    tb_garden.metadata.short_name = paths.short_name
+    tb_garden = tb_garden.format(short_name=paths.short_name)
 
     #
     # Save outputs.
