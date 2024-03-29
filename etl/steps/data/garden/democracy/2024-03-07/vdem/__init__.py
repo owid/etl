@@ -8,10 +8,49 @@ import vdem_impute as impute  # VDEM's imputing library
 import vdem_refine as refine  # VDEM's imputing library
 from owid.catalog import Table
 
+from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
+
+# REGION AGGREGATES
+REGIONS = {
+    "Africa": {
+        "additional_members": [
+            "Somaliland",
+            "Zanzibar",
+        ]
+    },
+    "Asia": {
+        "additional_members": [
+            "Palestine/Gaza",
+            "Palestine/West Bank",
+        ]
+    },
+    "North America": {},
+    "South America": {},
+    "Europe": {
+        "additional_members": [
+            "Brunswick",
+            "Duchy of Nassau",
+            "Hamburg",
+            "Hanover",
+            "Hesse Electoral",
+            "Hesse Grand Ducal",
+            "Mecklenburg Schwerin",
+            "Modena",
+            "Oldenburg",
+            "Piedmont-Sardinia",
+            "Saxe-Weimar-Eisenach",
+            "Saxony",
+            "Tuscany",
+            "Two Sicilies",
+            "Wurttemberg",
+        ]
+    },
+    "Oceania": {},
+}
 
 
 def run(dest_dir: str) -> None:
@@ -21,6 +60,8 @@ def run(dest_dir: str) -> None:
     #
     # Load meadow dataset.
     ds_meadow = paths.load_dataset("vdem")
+    ds_regions = paths.load_dataset("regions")
+    ds_population = paths.load_dataset("population")
 
     # Read table from meadow dataset.
     tb = ds_meadow["vdem"].reset_index()
