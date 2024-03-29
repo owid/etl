@@ -41,7 +41,7 @@ steps:
   data://grapher/usda_ers/2024-03-26/food_expenditure:
     - data://garden/usda_ers/2024-03-26/food_expenditure
   #
-  # Long-run crop yields.
+  # Long-term crop yields.
   #
   data://garden/agriculture/2024-03-26/long_term_crop_yields:
     - data://garden/faostat/2024-03-14/faostat_qcl
