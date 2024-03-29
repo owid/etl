@@ -1,0 +1,15 @@
+meta:
+  origin:
+    producer: OECD
+    title: OECD Income Distribution Database
+    version_producer: Google Sheet
+    url_download: |-
+      https://docs.google.com/spreadsheets/d/e/2PACX-1vSDqVa1hPj6yX_gHKMCjur1SBt3karTEKuWLBwsYaGAsO2NZtb3GOQICYK-z1rf-a708tELjv0Km3wa/pub?output=csv
+    date_accessed: '2024-03-29'
+  name: DRAFT JOE OECD IDD data on before and after tax inequality
+  description: ''
+  license: {}
+outs:
+  - md5: bffd683c1f9bc136ecdbadabc7663b7b
+    size: 15358
+    path: draft_joe_idd_oecd.csv
