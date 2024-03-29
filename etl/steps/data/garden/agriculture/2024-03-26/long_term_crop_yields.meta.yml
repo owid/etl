@@ -1,0 +1,356 @@
+definitions:
+  common:
+    processing_level: major
+    unit: tonnes per hectare
+    short_unit: t/ha
+    presentation:
+      topic_tags:
+        - Crop Yields
+
+dataset:
+  title: Long-term crop yields
+  update_period_days: 365
+  description: |-
+    This is a compilation of all our data on crop yields, extracted from different sources. The majority of the data comes from FAOSTAT, where the earliest information is of 1961. However, where possible, we complement that data with other sources, to have long-run series on crop yields, going back to even the XIII century.
+
+tables:
+  long_term_crop_yields:
+    variables:
+      maize_yield:
+        title: Maize yield
+      abaca__manila_hemp__raw_yield:
+        title: Abaca manila hemp raw yield
+      agave_fibres__raw__n_e_c__yield:
+        title: Agave fibres raw n.e.c. yield
+      almonds_yield:
+        title: Almonds yield
+      apples_yield:
+        title: Apples yield
+      apricots_yield:
+        title: Apricots yield
+      areca_nuts_yield:
+        title: Areca nuts yield
+      artichokes_yield:
+        title: Artichokes yield
+      asparagus_yield:
+        title: Asparagus yield
+      avocados_yield:
+        title: Avocados yield
+      bambara_beans__dry_yield:
+        title: Bambara beans dry yield
+      bananas_yield:
+        title: Bananas yield
+      barley_yield:
+        title: Barley yield
+      beans__dry_yield:
+        title: Beans dry yield
+      beans__green_yield:
+        title: Beans green yield
+      blueberries_yield:
+        title: Blueberries yield
+      broad_beans_and_horse_beans__green_yield:
+        title: Broad beans and horse beans green yield
+      broad_beans_yield:
+        title: Broad beans yield
+      buckwheat_yield:
+        title: Buckwheat yield
+      cabbages_yield:
+        title: Cabbages yield
+      canary_seed_yield:
+        title: Canary seed yield
+      carrots_and_turnips_yield:
+        title: Carrots and turnips yield
+      cashew_nuts_yield:
+        title: Cashew nuts yield
+      cashewapple_yield:
+        title: Cashewapple yield
+      cassava_leaves_yield:
+        title: Cassava leaves yield
+      cassava_yield:
+        title: Cassava yield
+      castor_oil_seed_yield:
+        title: Castor oil seed yield
+      cauliflowers_and_broccoli_yield:
+        title: Cauliflowers and broccoli yield
+      cereals_n_e_c__yield:
+        title: Cereals n.e.c. yield
+      cereals_yield:
+        title: Cereals yield
+      cherries_yield:
+        title: Cherries yield
+      chestnut_yield:
+        title: Chestnut yield
+      chickpeas_yield:
+        title: Chickpeas yield
+      chicory_roots_yield:
+        title: Chicory roots yield
+      chillies_and_peppers__green__capsicum_spp__and_pimenta_spp__yield:
+        title: Chillies and peppers green capsicum spp and pimenta spp yield
+      chillies_and_peppers_yield:
+        title: Chillies and peppers yield
+      cinnamon_and_cinnamon_tree_flowers__raw_yield:
+        title: Cinnamon and cinnamon tree flowers raw yield
+      citrus_fruit_yield:
+        title: Citrus fruit yield
+      cloves__whole_stems__raw_yield:
+        title: Cloves whole stems raw yield
+      cocoa_beans_yield:
+        title: Cocoa beans yield
+      coconuts_yield:
+        title: Coconuts yield
+      coffee__green_yield:
+        title: Coffee green yield
+      cow_peas_yield:
+        title: Cow peas yield
+      cranberries_yield:
+        title: Cranberries yield
+      cucumbers_and_gherkins_yield:
+        title: Cucumbers and gherkins yield
+      currants_yield:
+        title: Currants yield
+      dates_yield:
+        title: Dates yield
+      edible_roots_and_tubers_with_high_starch_or_inulin_content__n_e_c__fresh_yield:
+        title: Edible roots and tubers with high starch or inulin content n.e.c. fresh yield
+      eggplants_yield:
+        title: Eggplants yield
+      fibre_crops__fibre_equivalent_yield:
+        title: Fibre crops fibre equivalent yield
+      fibre_crops_yield:
+        title: Fibre crops yield
+      figs_yield:
+        title: Figs yield
+      flax__raw_or_retted_yield:
+        title: Flax raw or retted yield
+      fonio_yield:
+        title: Fonio yield
+      fruit_yield:
+        title: Fruit yield
+      garlic_yield:
+        title: Garlic yield
+      ginger__raw_yield:
+        title: Ginger raw yield
+      gooseberries_yield:
+        title: Gooseberries yield
+      grapefruit_yield:
+        title: Grapefruit yield
+      grapes_yield:
+        title: Grapes yield
+      green_maize_yield:
+        title: Green maize yield
+      groundnuts_yield:
+        title: Groundnuts yield
+      hazelnuts_yield:
+        title: Hazelnuts yield
+      hempseed_yield:
+        title: Hempseed yield
+      herbs__e_g__fennel__yield:
+        title: Herbs e g fennel yield
+      hop_cones_yield:
+        title: Hop cones yield
+      jojoba_seeds_yield:
+        title: Jojoba seeds yield
+      jute_yield:
+        title: Jute yield
+      kapok_fruit_yield:
+        title: Kapok fruit yield
+      karite_nuts_yield:
+        title: Karite nuts yield
+      kenaf__and_other_textile_bast_fibres__raw_or_retted_yield:
+        title: Kenaf and other textile bast fibres raw or retted yield
+      kiwi_yield:
+        title: Kiwi yield
+      kola_nuts_yield:
+        title: Kola nuts yield
+      leeks_yield:
+        title: Leeks yield
+      lemons_and_limes_yield:
+        title: Lemons and limes yield
+      lentils_yield:
+        title: Lentils yield
+      lettuce_yield:
+        title: Lettuce yield
+      linseed_yield:
+        title: Linseed yield
+      locust_beans__carobs__yield:
+        title: Locust beans carobs yield
+      lupins_yield:
+        title: Lupins yield
+      mangoes_yield:
+        title: Mangoes yield
+      mate_leaves_yield:
+        title: Mate leaves yield
+      melon_yield:
+        title: Melon yield
+      melonseed_yield:
+        title: Melonseed yield
+      millet_yield:
+        title: Millet yield
+      mixed_grains_yield:
+        title: Mixed grains yield
+      mustard_seed_yield:
+        title: Mustard seed yield
+      natural_rubber_in_primary_forms_yield:
+        title: Natural rubber in primary forms yield
+      nutmeg__mace__cardamoms__raw_yield:
+        title: Nutmeg mace cardamoms raw yield
+      oats_yield:
+        title: Oats yield
+      oilcrops__cake_equivalent_yield:
+        title: Oilcrops cake equivalent yield
+      oilcrops__oil_equivalent_yield:
+        title: Oilcrops oil equivalent yield
+      okra_yield:
+        title: Okra yield
+      olives_yield:
+        title: Olives yield
+      onions_and_shallots__green_yield:
+        title: Onions and shallots green yield
+      onions_yield:
+        title: Onions yield
+      oranges_yield:
+        title: Oranges yield
+      other_berries_and_fruits_of_the_genus_vaccinium_n_e_c__yield:
+        title: Other berries and fruits of the genus vaccinium n.e.c. yield
+      other_citrus_fruit__n_e_c__yield:
+        title: Other citrus fruit n.e.c. yield
+      other_fruits__n_e_c__yield:
+        title: Other fruits n.e.c. yield
+      other_nuts__excluding_wild_edible_nuts_and_groundnuts__in_shell__n_e_c__yield:
+        title: Other nuts excluding wild edible nuts and groundnuts in shell n.e.c. yield
+      other_oil_seeds__n_e_c__yield:
+        title: Other oil seeds n.e.c. yield
+      other_pome_fruits_yield:
+        title: Other pome fruits yield
+      other_pulses_n_e_c__yield:
+        title: Other pulses n.e.c. yield
+      other_stimulant__spice_and_aromatic_crops__n_e_c__yield:
+        title: Other stimulant spice and aromatic crops n.e.c. yield
+      other_stone_fruits_yield:
+        title: Other stone fruits yield
+      other_sugar_crops_n_e_c__yield:
+        title: Other sugar crops n.e.c. yield
+      other_tropical_fruits__n_e_c__yield:
+        title: Other tropical fruits n.e.c. yield
+      other_vegetables__fresh_n_e_c__yield:
+        title: Other vegetables fresh n.e.c. yield
+      palm_fruit_oil_yield:
+        title: Palm fruit oil yield
+      papayas_yield:
+        title: Papayas yield
+      peaches_and_nectarines_yield:
+        title: Peaches and nectarines yield
+      pears_yield:
+        title: Pears yield
+      peas__dry_yield:
+        title: Peas dry yield
+      peas__green_yield:
+        title: Peas green yield
+      pepper_yield:
+        title: Pepper yield
+      peppermint__spearmint_yield:
+        title: Peppermint spearmint yield
+      persimmons_yield:
+        title: Persimmons yield
+      pigeon_peas_yield:
+        title: Pigeon peas yield
+      pineapples_yield:
+        title: Pineapples yield
+      pistachios_yield:
+        title: Pistachios yield
+      plantains_yield:
+        title: Plantains yield
+      plums_yield:
+        title: Plums yield
+      poppy_seeds_yield:
+        title: Poppy seeds yield
+      potatoes_yield:
+        title: Potatoes yield
+      pulses_yield:
+        title: Pulses yield
+      pumpkins__squash_and_gourds_yield:
+        title: Pumpkins squash and gourds yield
+      pyrethrum__dried_flowers_yield:
+        title: Pyrethrum dried flowers yield
+      quinces_yield:
+        title: Quinces yield
+      quinoa_yield:
+        title: Quinoa yield
+      ramie__raw_or_retted_yield:
+        title: Ramie raw or retted yield
+      rapeseed_yield:
+        title: Rapeseed yield
+      raspberries_yield:
+        title: Raspberries yield
+      rice_yield:
+        title: Rice yield
+      roots_and_tubers_yield:
+        title: Roots and tubers yield
+      rye_yield:
+        title: Rye yield
+      safflower_seed_yield:
+        title: Safflower seed yield
+      seed_cotton_yield:
+        title: Seed cotton yield
+      sesame_seed_yield:
+        title: Sesame seed yield
+      sisal__raw_yield:
+        title: Sisal raw yield
+      sorghum_yield:
+        title: Sorghum yield
+      sour_cherries_yield:
+        title: Sour cherries yield
+      soybeans_yield:
+        title: Soybeans yield
+      spinach_yield:
+        title: Spinach yield
+      strawberries_yield:
+        title: Strawberries yield
+      string_beans_yield:
+        title: String beans yield
+      sugar_beet_yield:
+        title: Sugar beet yield
+      sugar_cane_yield:
+        title: Sugar cane yield
+      sugar_crops_yield:
+        title: Sugar crops yield
+      sunflower_seed_yield:
+        title: Sunflower seed yield
+      sweet_potatoes_yield:
+        title: Sweet potatoes yield
+      tallowtree_seeds_yield:
+        title: Tallowtree seeds yield
+      tangerines_yield:
+        title: Tangerines yield
+      taro_yield:
+        title: Taro yield
+      tea_yield:
+        title: Tea yield
+      tobacco_yield:
+        title: Tobacco yield
+      tomatoes_yield:
+        title: Tomatoes yield
+      treenuts_yield:
+        title: Treenuts yield
+      triticale_yield:
+        title: Triticale yield
+      true_hemp__raw_or_retted_yield:
+        title: True hemp raw or retted yield
+      tung_nuts_yield:
+        title: Tung nuts yield
+      vanilla__raw_yield:
+        title: Vanilla raw yield
+      vegetables_yield:
+        title: Vegetables yield
+      vetches_yield:
+        title: Vetches yield
+      walnuts_yield:
+        title: Walnuts yield
+      watermelons_yield:
+        title: Watermelons yield
+      wheat_yield:
+        title: Wheat yield
+      yams_yield:
+        title: Yams yield
+      yautia_yield:
+        title: Yautia yield
