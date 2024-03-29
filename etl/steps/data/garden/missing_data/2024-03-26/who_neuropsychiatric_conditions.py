@@ -47,9 +47,16 @@ def run(dest_dir: str) -> None:
         "income_group",
     )
 
+    global_details = shared.calculate_missing_data(
+        df_merged,
+        "deaths_from_neuropsychiatric_conditions_per_100_000_people_in__both_sexes_aged_all_ages",
+        "global",
+    )
+
     combined = shared.combine_and_prepare_final_dataset(
         region_details,
         income_details,
+        global_details,
         df_merged,
         "deaths_from_neuropsychiatric_conditions_per_100_000_people_in__both_sexes_aged_all_ages",
     )

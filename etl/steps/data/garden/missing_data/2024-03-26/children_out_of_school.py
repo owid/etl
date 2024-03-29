@@ -38,9 +38,16 @@ def run(dest_dir: str) -> None:
         "income_group",
     )
 
+    global_details = shared.calculate_missing_data(
+        df_merged,
+        "se_prm_uner",
+        "global",
+    )
+
     combined = shared.combine_and_prepare_final_dataset(
         region_details,
         income_details,
+        global_details,
         df_merged,
         "se_prm_uner",
     )

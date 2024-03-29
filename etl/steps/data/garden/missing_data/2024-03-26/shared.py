@@ -63,6 +63,7 @@ def map_countries_and_merge_data(tb_data, ds_regions, ds_income_groups, tb_popul
     # Map countries to their respective regions and income groups
     df["region"] = df["country"].map(country_to_region)
     df["income_group"] = df["country"].map(country_to_income_group)
+    df["global"] = "World"
 
     # Merge with population data.
     df = pd.merge(df, tb_population, on=["country", "year"]).drop(columns="source")
@@ -102,11 +103,11 @@ def calculate_missing_data(df, column_missing_data, group_by_column):
     return detailed_data.rename(columns={group_by_column: "country"})
 
 
-def combine_and_prepare_final_dataset(region_details, income_details, df_merged, column_missing_data):
+def combine_and_prepare_final_dataset(region_details, income_details, global_details, df_merged, column_missing_data):
     """
     Combine and prepare the final dataset.
     """
-    df_final = pd.concat([region_details, income_details], axis=0)
+    df_final = pd.concat([region_details, income_details, global_details], axis=0)
     df_final["fraction_available_countries"] = 100 - df_final["fraction_missing_countries"]
     df_final = df_final.drop(columns=["total_countries"])
 
