@@ -751,3 +751,4 @@ include:
   - dag/poverty_inequality.yml
   - dag/democracy.yml
   - dag/temp.yml
+  - dag/survey.yml

@@ -1,0 +1,88 @@
+definitions:
+  common:
+    processing_level: minor
+    presentation:
+      attribution_short: YouGov
+      topic_tags:
+        - Diet Compositions
+        - Animal Welfare
+        - Food Supply
+    display:
+      numDecimalPlaces: 0
+
+dataset:
+  update_period_days: 365
+
+tables:
+  dietary_choices_uk:
+    variables:
+      base:
+        title: Weighted number of responses
+        description_short: |-
+          Number of responses, after applying weights, of a particular group (e.g. "18-24" or "Female") and date.
+        unit: ""
+        short_unit: ""
+      base_unweighted:
+        title: Number of responses, before applying weights, of a particular group (e.g. "18-24" or "Female") and date.
+        unit: ""
+        short_unit: ""
+      meat_eater:
+        title: Percentage of meat eaters
+        description_short: |-
+          Percentage of participants who responded to the question "Which of these best describes your diet?" with "Meat eater: eat meat and/or poultry".
+        unit: "%"
+        short_unit: "%"
+        display:
+          name: Meat eaters
+        presentation:
+          title_public: Percentage of meat eaters
+      flexitarian:
+        title: Percentage of flexitarians
+        description_short: |-
+          Percentage of participants who responded to the question "Which of these best describes your diet?" with "Flexitarian: mainly vegetarian, but occasionally eat meat or fish".
+        unit: "%"
+        short_unit: "%"
+        display:
+          name: Flexitarians
+        presentation:
+          title_public: Percentage of flexitarians
+      pescetarian:
+        title: Percentage of pescetarians
+        description_short: |-
+          Percentage of participants who responded to the question "Which of these best describes your diet?" with "Pescetarian: eat fish but do not eat meat or poultry".
+        unit: "%"
+        short_unit: "%"
+        display:
+          name: Pescetarians
+        presentation:
+          title_public: Percentage of pescetarians
+      vegetarian:
+        title: Percentage of vegetarians
+        description_short: |-
+          Percentage of participants who responded to the question "Which of these best describes your diet?" with "Vegetarian: do not eat any meat, poultry, game, fish, or shellfish".
+        unit: "%"
+        short_unit: "%"
+        display:
+          name: Vegetarians
+        presentation:
+          title_public: Percentage of vegetarians
+      vegan:
+        title: Percentage of vegans
+        description_short: |-
+          Percentage of participants who responded to the question "Which of these best describes your diet?" with "Plant-based / Vegan: do not eat dairy products, eggs, or any other animal product".
+        unit: "%"
+        short_unit: "%"
+        display:
+          name: Vegans
+        presentation:
+          title_public: Percentage of vegans
+      none:
+        title: Percentage of people with other diets
+        description_short: |-
+          Percentage of participants who responded to the question "Which of these best describes your diet?" with "None of these".
+        unit: "%"
+        short_unit: "%"
+        display:
+          name: No answer
+        presentation:
+          title_public: Percentage of people with other diets
