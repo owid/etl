@@ -1,0 +1,20 @@
+meta:
+  origin:
+    producer: USDA Economic Research Service (ERS)
+    title: Food expenditure
+    citation_full: |-
+      Economic Research Service of the United States Department of Agriculture (USDA/ERS) - Food expenditure (2023).
+    attribution_short: USDA/ERS
+    url_main: https://www.ers.usda.gov/topics/international-markets-u-s-trade/international-consumer-and-food-industry-trends/
+    url_download: https://www.ers.usda.gov/media/rkpprmb5/data-on-expenditures-on-food-and-alcoholic-beverages-in-selected-countries_2018-2022.xlsx
+    date_accessed: 2024-03-26
+    date_published: 2023-09-15
+    license:
+      name: Public domain
+      url: https://www.ers.usda.gov/topics/international-markets-u-s-trade/international-consumer-and-food-industry-trends/
+
+wdir: ../../../data/snapshots/usda_ers/2024-03-26
+outs:
+  - md5: 9d93206556c052ddc2592f832ee72caf
+    size: 63237
+    path: food_expenditure.xlsx

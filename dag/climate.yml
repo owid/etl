@@ -210,7 +210,7 @@ steps:
   data://garden/climate/latest/weekly_wildfires:
     - data://meadow/climate/latest/weekly_wildfires
     - data://garden/regions/2023-01-01/regions
-    - data://garden/faostat/2023-06-12/faostat_rl
+    - data://garden/faostat/2024-03-14/faostat_rl
   data://grapher/climate/latest/weekly_wildfires:
     - data://garden/climate/latest/weekly_wildfires
   data://grapher/climate/latest/wildfires_by_year:

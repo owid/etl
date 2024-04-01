@@ -1,0 +1,232 @@
+definitions:
+  description_key_pct_of_population: &description_key_pct_of_population
+    - This percentage accounts for a portion of income that can be credibly reserved for food, based on observations that the population in low-income countries spend, on average, 52% of their income on food, as derived from the 2017 national accounts household expenditure data of the World Bank's International Comparison Programme (ICP).
+    - Income data are provided by the World Bank's Poverty and Inequality Platform. A value of zero indicates a null or a small number rounded down at the current precision level.
+  description_key_number_of_population: &description_key_number_of_population
+    - The indicator is computed by multiplying the percentage of the population in a country unable to afford a healthy diet by population data taken from the World Development Indicators (WDI) of the World Bank. A value of zero indicates a null or a small number rounded down at the current precision level.
+
+dataset:
+  update_period_days: 365
+  description: |
+    This dataset is based on the methodology developed in Herforth et al. (2022), which is a background paper for the UN agencies' annual report on The State of Food Security and Nutrition in the World 2022 (https://www.fao.org/publications/sofi). It is based on data on prices for locally available food items from the World Bank's International Comparison Program (ICP) (https://icp.worldbank.org/) matched to other data on food composition and dietary requirements.
+
+    The nutritional requirements used in this study are in line with the WHO's recommendations for the median woman of reproductive age. The authors note two key two reasons for this:
+    (1) Requirements fall roughly at the median of the entire population distribution, in the sense that least-cost diets to meet energy and nutrient requirements for people in this reference group approximate the median level of least costs for all sex-age groups over the entire life cycle. This reference group is therefore a good representation of the population as a whole.
+    (2) Women of reproductive age are typically a nutritionally vulnerable population group, as seen in their increased risk of dietary inadequacies (due to social practices and norms that often disadvantage them in terms of access to food), which have important consequences for themselves and their children. Previous studies have also based their analyses on this reference group.
+
+tables:
+  food_prices_for_nutrition:
+    title: Food prices for nutrition
+    variables:
+      cost_of_an_energy_sufficient_diet:
+        title: Cost of an energy sufficient diet
+        unit: international-$ in 2017 prices
+        short_unit: $
+        description_short: |-
+          Cost of the least expensive starchy staple for energy balance for a representative person at 2330 kcal/day.
+      affordability_of_an_energy_sufficient_diet__ratio_of_cost_to_food_expenditures:
+        title: "Affordability of an energy sufficient diet: ratio of cost to food expenditures"
+        unit: "%"
+        short_unit: "%"
+        description_short: |-
+          Percentage of the cost of an energy sufficient diet to total food expenditure per capita per day from national accounts.
+      percent_of_the_population_who_cannot_afford_sufficient_calories:
+        title: Share of the population who cannot afford sufficient calories
+        unit: "%"
+        short_unit: "%"
+        description_short: |-
+          Percentage of the total population unable to afford an energy sufficient diet. A healthy diet is considered unaffordable in a country when its cost exceeds 52% of income per capita per day.
+        description_key: *description_key_pct_of_population
+      affordability_of_an_energy_sufficient_diet__ratio_of_cost_to_the_food_poverty_line:
+        title: "Affordability of an energy sufficient diet: ratio of cost to the food poverty line"
+        unit: "%"
+        short_unit: "%"
+        description_short: |-
+          Percentage of the cost of an energy sufficient diet to the $1.12 food poverty line (52% of the international poverty line of 2.15 a day in 2017 international-$).
+      people_who_cannot_afford_sufficient_calories:
+        title: Number of people who cannot afford sufficient calories
+        unit: people
+        short_unit: ""
+        description_short: |-
+          Total number of people who cannot afford an energy-sufficient diet. A diet is deemed unaffordable if it costs more than 52% of a household's income.
+        description_key: *description_key_number_of_population
+      cost_of_a_healthy_diet:
+        title: Cost of a healthy diet
+        unit: current international-$ per person per day
+        short_unit: $
+        description_short: |-
+          Cost of purchasing the least expensive locally available foods to meet requirements for energy and food-based dietary guidelines (FBDGs) for a representative person within energy balance at 2330 kcal/day.
+        # description_key:
+        #   - PPPs in 2018, and/or 2019, and/or 2020, and/or 2021 are imputed by the Food and Agriculture Organization of the United Nations for the given countries of Argentina, Aruba, Bermuda, British Virgin Islands, Cayman Islands, Curaçao, Democratic Republic of the Congo, Dominica, Djibouti, Equatorial Guinea, Eswatini, Gabon, Kazakhstan, Liberia, Malawi, Myanmar, Sao Tome and Principe, Senegal, Seychelles, Sint Maarten (Dutch part), Suriname, Tajikistan, United Arab Emirates and Zimbabwe.
+      cost_of_a_healthy_diet_relative_to_the_cost_of_sufficient_energy_from_starchy_staples:
+        title: Cost of a healthy diet relative to the cost of sufficient energy from starchy staples
+        unit: ""
+        short_unit: ""
+        description_short: |-
+          Ratio between the cost of a healthy diet (CoHD) that meets requirements for energy and food-based dietary guidelines (FBDGs) and the cost of caloric adequacy (CoCA) that uses only starchy staples to meet energy requirements.
+      cost_of_animal_source_foods:
+        title: Cost of animal-source foods
+        unit: international-$ in 2017 prices
+        short_unit: $
+        description_short: |-
+          Cost of purchasing the least expensive locally available animal-source foods to meet daily intake levels recommended in food-based dietary guidelines (FBDGs). Animal-source foods are one of the six food groups within the Healthy Diet Basket.
+      cost_share_for_animal_sourced_foods_in_a_least_cost_healthy_diet:
+        title: Cost share for animal-sourced foods in a least-cost healthy diet
+        unit: "%"
+        short_unit: "%"
+        description_short: |-
+          Share of costs for the least expensive animal-source foods to meet daily recommendations in food-based dietary guidelines (FBDGs), as a percentage of the total cost of a healthy diet.
+      cost_of_animal_sourced_foods_relative_to_the_starchy_staples_in_a_least_cost_healthy_diet:
+        title: Cost of animal-sourced foods relative to the starchy staples in a least-cost healthy diet
+        unit: ""
+        short_unit: ""
+        description_short: |-
+          Cost of the least expensive animal-source foods as a multiple of the least expensive starchy staples to meet daily recommendations in food-based dietary guidelines (FBDGs).
+      cost_of_fruits:
+        title: Cost of fruits
+        unit: international-$ in 2017 prices
+        short_unit: $
+        description_short: |-
+          Cost of purchasing the least expensive locally available fruits to meet daily intake levels recommended in food-based dietary guidelines (FBDGs). Fruits are one of the six food groups within the Healthy Diet Basket.
+      cost_share_for_fruits_in_a_least_cost_healthy_diet:
+        title: Cost share for fruits in a least-cost healthy diet
+        unit: "%"
+        short_unit: "%"
+        description_short: |-
+          Share of costs for the least expensive fruits to meet daily recommendations in food-based dietary guidelines (FBDGs), as a percentage of the total cost of a healthy diet.
+      cost_of_fruits_relative_to_the_starchy_staples_in_a_least_cost_healthy_diet:
+        title: Cost of fruits relative to the starchy staples in a least-cost healthy diet
+        unit: ""
+        short_unit: ""
+        description_short: |-
+          Cost of the least expensive fruits as a multiple of the least expensive starchy staples to meet daily recommendations in food-based dietary guidelines (FBDGs).
+      affordability_of_a_healthy_diet__ratio_of_cost_to_food_expenditures:
+        title: "Affordability of a healthy diet: ratio of cost to food expenditures"
+        unit: "%"
+        short_unit: "%"
+        description_short: |-
+          Percentage of the cost of a healthy diet to total food expenditure per capita per day from national accounts.
+      percent_of_the_population_who_cannot_afford_a_healthy_diet:
+        title: Share of the population who cannot afford a healthy diet
+        unit: "%"
+        short_unit: "%"
+        description_short: |-
+          Percentage of the total population unable to afford a healthy diet. A healthy diet is considered unaffordable in a country when its cost exceeds 52% of income per capita per day.
+        description_key: *description_key_pct_of_population
+      cost_of_legumes__nuts_and_seeds:
+        title: Cost of legumes, nuts and seeds
+        unit: international-$ in 2017 prices
+        short_unit: $
+        description_short: |-
+          Cost of purchasing the least expensive locally available legumes, nuts and seeds to meet daily intake levels recommended in food-based dietary guidelines (FBDGs). Legumes, nuts and seeds are one of the six food groups within the Healthy Diet Basket.
+      cost_share_for_legumes__nuts_and_seeds_in_a_least_cost_healthy_diet:
+        title: Cost share for legumes, nuts and seeds in a least-cost healthy diet
+        unit: "%"
+        short_unit: "%"
+        description_short: |-
+          Share of costs for the least expensive legumes, nuts or seeds to meet daily recommendations in food-based dietary guidelines (FBDGs), as a percentage of the total cost of a healthy diet.
+      cost_of_legumes__nuts_and_seeds_relative_to_the_starchy_staples_in_a_least_cost_healthy_diet:
+        title: Cost of legumes, nuts and seeds relative to the starchy staples in a least-cost healthy diet
+        unit: ""
+        short_unit: ""
+        description_short: |-
+          Cost of the least expensive legumes, nuts and seeds as a multiple of the least expensive starchy staples to meet daily recommendations in food-based dietary guidelines (FBDGs).
+      cost_of_oils_and_fats:
+        title: Cost of oils and fats
+        unit: international-$ in 2017 prices
+        short_unit: $
+        description_short: |-
+          Cost of purchasing the least expensive locally available fats or oils to meet daily intake levels recommended in food-based dietary guidelines (FBDGs). Fats and oils are one of the six food groups within the Healthy Diet Basket.
+      cost_share_for_oils_and_fats_in_a_least_cost_healthy_diet:
+        title: Cost share for oils and fats in a least-cost healthy diet
+        unit: "%"
+        short_unit: "%"
+        description_short: |-
+          Share of costs for the least expensive oils or fats to meet daily recommendations in food-based dietary guidelines (FBDGs), as a percentage of the total cost of a healthy diet.
+      cost_of_oils_and_fats_relative_to_the_starchy_staples_in_a_least_cost_healthy_diet:
+        title: Cost of oils and fats relative to the starchy staples in a least-cost healthy diet
+        unit: ""
+        short_unit: ""
+        description_short: |-
+          Cost of the least expensive oils and fats as a multiple of the least expensive starchy staples to meet daily recommendations in food-based dietary guidelines (FBDGs).
+      affordability_of_a_healthy_diet__ratio_of_cost_to_the_food_poverty_line:
+        title: "Affordability of a healthy diet: ratio of cost to the food poverty line"
+        unit: "%"
+        short_unit: "%"
+        description_short: |-
+          Percentage of the cost of a healthy diet to the $1.12 food poverty line (52% of the international poverty line of 2.15 a day in 2017 international-$).
+      cost_of_starchy_staples:
+        title: Cost of starchy staples
+        unit: international-$ in 2017 prices
+        short_unit: $
+        description_short: |-
+          Cost of purchasing the least expensive locally available starchy staples to meet daily intake levels recommended in food-based dietary guidelines (FBDGs). Starchy staples are one of the six food groups within the Healthy Diet Basket.
+      cost_share_for_starchy_staples_in_a_least_cost_healthy_diet:
+        title: Cost share for starchy staples in a least-cost healthy diet
+        unit: "%"
+        short_unit: "%"
+        description_short: |-
+          Share of costs for the least expensive starchy staples to meet daily recommendations in food-based dietary guidelines (FBDGs), as a percentage of the total cost of a healthy diet.
+      people_who_cannot_afford_a_healthy_diet:
+        title: Number of people who cannot afford a healthy diet
+        unit: people
+        short_unit: ""
+        description_short: |-
+          Total number of people who cannot afford a healthy diet in a given country and year. A diet is deemed unaffordable if it costs more than 52% of a household's income.
+        description_key: *description_key_number_of_population
+      cost_of_vegetables:
+        title: Cost of vegetables
+        unit: international-$ in 2017 prices
+        short_unit: $
+        description_short: |-
+          Cost of purchasing the least expensive locally available vegetables to meet daily intake levels recommended in food-based dietary guidelines (FBDGs), in international-$ in 2017 prices. Vegetables are one of the six food groups within the Healthy Diet Basket.
+      cost_share_for_vegetables_in_a_least_cost_healthy_diet:
+        title: Cost share for vegetables in a least-cost healthy diet
+        unit: "%"
+        short_unit: "%"
+        description_short: |-
+          Share of costs for the least expensive vegetables to meet daily recommendations in food-based dietary guidelines (FBDGs), as a percentage of the total cost of a healthy diet.
+      cost_of_vegetables_relative_to_the_starchy_staples_in_a_least_cost_healthy_diet:
+        title: Cost of vegetables relative to the starchy staples in a least-cost healthy diet
+        unit: ""
+        short_unit: ""
+        description_short: |-
+          Cost of the least expensive vegetables as a multiple of the least expensive starchy staples to meet daily recommendations in food-based dietary guidelines (FBDGs).
+      cost_of_a_nutrient_adequate_diet:
+        title: Cost of a nutrient adequate diet
+        unit: international-$ in 2017 prices
+        short_unit: $
+        description_short: |-
+          Cost of the least expensive locally-available foods for nutrient adequacy for a representative person within upper and lower bounds for 23 essential macro- and micronutrients plus energy balance at 2330 kcal/day.
+      affordability_of_a_nutrient_adequate_diet__ratio_of_cost_to_food_expenditures:
+        title: "Affordability of a nutrient adequate diet: ratio of cost to food expenditures"
+        unit: "%"
+        short_unit: "%"
+        description_short: |-
+          Percentage of the cost of a nutrient adequate diet to total food expenditure per capita per day from national accounts.
+      percent_of_the_population_who_cannot_afford_nutrient_adequacy:
+        title: Share of the population who cannot afford nutrient adequacy
+        unit: "%"
+        short_unit: "%"
+        description_short: |-
+          Percentage of the total population unable to afford a nutrient adequate diet. A healthy diet is considered unaffordable in a country when its cost exceeds 52% of income per capita per day.
+        description_key: *description_key_pct_of_population
+      affordability_of_a_nutrient_adequate_diet__ratio_of_cost_to_the_food_poverty_line:
+        title: "Affordability of a nutrient adequate diet: ratio of cost to the food poverty line"
+        unit: "%"
+        short_unit: "%"
+        description_short: |-
+          Percentage of the cost of a nutrient adequate diet to the $1.12 food poverty line (52% of the international poverty line of 2.15 a day in 2017 international-$).
+      people_who_cannot_afford_nutrient_adequacy:
+        title: Number of people who cannot afford nutrient adequacy
+        unit: people
+        short_unit: ""
+        description_short: |-
+          Total number of people who cannot afford a nutrient adequate diet. A diet is deemed unaffordable if it costs more than 52% of a household's income.
+        description_key: *description_key_number_of_population
+      population:
+        title: Population according to the World Bank
+        unit: people
+        short_unit: people
+        description_short: |-
+          Total population is based on the de facto definition of population, which counts all residents regardless of legal status or citizenship. The values shown are midyear estimates.
