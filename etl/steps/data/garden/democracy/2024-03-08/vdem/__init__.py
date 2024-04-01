@@ -2,7 +2,7 @@
 from typing import cast
 
 import pandas as pd
-from owid.catalog import Table
+from owid.catalog import Dataset, Table
 from owid.catalog.processing import concat
 
 from etl.data_helpers import geo
@@ -29,6 +29,8 @@ REGIONS = {
     "South America": {},
     "Europe": {
         "additional_members": [
+            "Baden",
+            "Bavaria",
             "Brunswick",
             "Duchy of Nassau",
             "Hamburg",
@@ -38,6 +40,7 @@ REGIONS = {
             "Mecklenburg Schwerin",
             "Modena",
             "Oldenburg",
+            "Parma",
             "Piedmont-Sardinia",
             "Saxe-Weimar-Eisenach",
             "Saxony",
@@ -66,8 +69,10 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
-    # %% Aggregate: mean and sum of countries
+    # %% Remove imputed countries
     tb_ = tb.loc[~tb["regime_imputed"]].copy()
+
+    tb_["country"] = tb_["country"].astype("string")
 
     # %% Sanity check: all countries are in the regions
     members_tracked = set()
@@ -77,20 +82,10 @@ def run(dest_dir: str) -> None:
         )
     assert tb_["country"].isin(members_tracked).all(), "Some countries are not in the regions!"
 
-    # %% Dummies
-    tb_ = make_table_with_dummies(tb_)
-
-    # %% Get aggregates
-    tb_ = geo.add_regions_to_table(
-        tb_,
-        ds_regions,
-        regions=REGIONS,
-        # accepted_overlaps=COUNTRIES_OVERLAP,
-    )
-    # tb_ = tb_.loc[tb_["country"].isin(REGIONS.keys())]
-
-    # tb_w = tb_.groupby("year", as_index=False).sum().assign(country="World")
-    # tb_ = concat([tb_, tb_w], ignore_index=True, short_name="region_counts")
+    # %% Get counts
+    # Generate dummy indicators
+    tb_sum = make_table_countries_counts(tb_, ds_regions)
+    tb_avg = make_table_countries_avg(tb_, ds_regions)
 
     # %% Set index
     tb = tb.format()
@@ -108,7 +103,32 @@ def run(dest_dir: str) -> None:
     ds_garden.save()
 
 
-# %%
+def make_table_countries_counts(tb: Table, ds_regions: Dataset) -> Table:
+    """Get region indicators of type "Number of countries"."""
+    tb_ = tb.copy()
+    # Generate dummy indicators
+    tb_ = make_table_with_dummies(tb_)
+
+    tb_ = geo.add_regions_to_table(
+        tb_,
+        ds_regions,
+        regions=REGIONS,
+    )
+    # Keep only regions
+    tb_ = tb_.loc[tb_["country"].isin(REGIONS.keys())]
+
+    # Get value for the World and add to table
+    tb_w = tb_.groupby("year", as_index=False).sum().assign(country="World")
+    tb_ = concat([tb_, tb_w], ignore_index=True, short_name="region_counts")
+
+    return tb_
+
+
+def make_table_countries_avg(tb: Table, ds_regions: Dataset) -> Table:
+    tb_ = tb.copy()
+    return tb_
+
+
 def make_table_with_dummies(tb: Table) -> Table:
     """Format table to have dummy indicators.
 
