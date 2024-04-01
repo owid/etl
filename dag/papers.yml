@@ -16,62 +16,53 @@ steps:
   data://garden/papers/2023-12-12/nemet_2009:
     - data://meadow/papers/2023-12-12/nemet_2009
   #
-  # Bayliss-Smith & Wanmali (1984). Data on long-term wheat yields.
-  #
-  data://meadow/papers/2023-04-20/bayliss_smith_wanmali_1984:
-    - snapshot://papers/2023-04-20/bayliss_smith_wanmali_1984.csv
-  data://garden/papers/2023-04-20/bayliss_smith_wanmali_1984:
-    - data://meadow/papers/2023-04-20/bayliss_smith_wanmali_1984
-  #
-  # Broadberry et al. (2015). Data on long-term yields in United Kingdom.
-  #
-  data://meadow/papers/2023-04-21/broadberry_et_al_2015:
-    - snapshot://papers/2023-04-21/broadberry_et_al_2015.csv
-  data://garden/papers/2023-04-21/broadberry_et_al_2015:
-    - data://meadow/papers/2023-04-21/broadberry_et_al_2015
-  #
-  # Brassley et al. (2000). Data on long-term yields in United Kingdom.
-  #
-  data://meadow/papers/2023-04-21/brassley_2000:
-    - snapshot://papers/2023-04-21/brassley_2000.csv
-  data://garden/papers/2023-04-21/brassley_2000:
-    - data://meadow/papers/2023-04-21/brassley_2000
-  #
-  # Wuepper et al. (2020). Data on crop yields and nitrogen pollution.
-  #
-  data://meadow/papers/2023-05-26/wuepper_et_al_2020:
-    - snapshot://papers/2023-05-26/wuepper_et_al_2020.xlsx
-  data://garden/papers/2023-05-26/wuepper_et_al_2020:
-    - data://meadow/papers/2023-05-26/wuepper_et_al_2020
-  data://grapher/papers/2023-05-26/wuepper_et_al_2020:
-    - data://garden/papers/2023-05-26/wuepper_et_al_2020
-  #
-  # Ray et al. (2019). Climate impact on crop yields.
-  #
-  data://meadow/papers/2023-05-26/ray_et_al_2019:
-    - snapshot://papers/2023-05-26/ray_et_al_2019.xlsx
-  data://garden/papers/2023-05-26/ray_et_al_2019:
-    - data://meadow/papers/2023-05-26/ray_et_al_2019
-  data://grapher/papers/2023-05-26/ray_et_al_2019:
-    - data://garden/papers/2023-05-26/ray_et_al_2019
-  #
-  # Mueller et al. (2012). Attainable yields.
-  #
-  data://meadow/papers/2023-05-26/mueller_et_al_2012:
-    - snapshot://papers/2023-05-26/mueller_et_al_2012.xls
-  data://garden/papers/2023-05-26/mueller_et_al_2012:
-    - data://meadow/papers/2023-05-26/mueller_et_al_2012
-
   # GBD Snake Envenoming Collaborators (2022). Global mortality of snakebite envenoming between 1990 and 2019.
   # https://www.nature.com/articles/s41467-022-33627-9
+  #
   data://meadow/papers/2023-11-21/snakebite:
     - snapshot://papers/2023-11-21/snakebite.xlsx
   data://garden/papers/2023-11-21/snakebite:
     - data://meadow/papers/2023-11-21/snakebite
   data://grapher/papers/2023-11-21/snakebite:
     - data://garden/papers/2023-11-21/snakebite
+  #
+  # Bayliss-Smith & Wanmali (1984). Data on long-term wheat yields.
+  #
+  data://meadow/papers/2024-03-26/bayliss_smith_wanmali_1984:
+    - snapshot://papers/2024-03-26/bayliss_smith_wanmali_1984.csv
+  data://garden/papers/2024-03-26/bayliss_smith_wanmali_1984:
+    - data://meadow/papers/2024-03-26/bayliss_smith_wanmali_1984
+  #
+  # Broadberry et al. (2015). Data on long-term yields in United Kingdom.
+  #
+  data://meadow/papers/2024-03-26/broadberry_et_al_2015:
+    - snapshot://papers/2024-03-26/broadberry_et_al_2015.csv
+  data://garden/papers/2024-03-26/broadberry_et_al_2015:
+    - data://meadow/papers/2024-03-26/broadberry_et_al_2015
+  #
+  # Brassley et al. (2000). Data on long-term yields in United Kingdom.
+  #
+  data://meadow/papers/2024-03-26/brassley_2000:
+    - snapshot://papers/2024-03-26/brassley_2000.csv
+  data://garden/papers/2024-03-26/brassley_2000:
+    - data://meadow/papers/2024-03-26/brassley_2000
+  #
+  # Wuepper et al. (2020). Data on crop yields and nitrogen pollution.
+  #
+  data://meadow/papers/2024-03-26/wuepper_et_al_2020:
+    - snapshot://papers/2024-03-26/wuepper_et_al_2020.xlsx
+  data://garden/papers/2024-03-26/wuepper_et_al_2020:
+    - data://meadow/papers/2024-03-26/wuepper_et_al_2020
+  data://grapher/papers/2024-03-26/wuepper_et_al_2020:
+    - data://garden/papers/2024-03-26/wuepper_et_al_2020
+  #
+  # Mueller et al. (2012). Attainable yields.
+  #
+  data://meadow/papers/2024-03-26/mueller_et_al_2012:
+    - snapshot://papers/2024-03-26/mueller_et_al_2012.xls
+  data://garden/papers/2024-03-26/mueller_et_al_2012:
+    - data://meadow/papers/2024-03-26/mueller_et_al_2012
 
   ######################################################################################################################
   # Older versions to be archived once they are not used by any other steps.
-
   ######################################################################################################################

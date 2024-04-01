@@ -264,6 +264,13 @@ class VersionTracker:
         "snapshot://dummy/2020-01-01/dummy_full.csv",
     ]
 
+    # List of metrics to fetch related to analytics.
+    ANALYTICS_COLUMNS = [
+        # "views_7d",
+        # "views_14d",
+        "views_365d",
+    ]
+
     def __init__(self, connect_to_db: bool = True, warn_on_archivable: bool = True, ignore_archive: bool = False):
         # Load dag of active steps (a dictionary step: set of dependencies).
         self.dag_active = load_dag(paths.DAG_FILE)
@@ -543,8 +550,9 @@ class VersionTracker:
                 "is_private": "db_private",
                 "is_archived": "db_archived",
                 "update_period_days": "update_period_days",
-                "views_7d": "charts_views_7d",
-                "views_365d": "charts_views_365d",
+                "views_7d": "chart_views_7d",
+                "views_14d": "chart_views_14d",
+                "views_365d": "chart_views_365d",
             },
             errors="raise",
         )
@@ -557,6 +565,7 @@ class VersionTracker:
         self.unknown_steps_with_grapher_dataset_df = info_df[
             (~info_df["step"].isin(steps_df["step"])) & (~info_df["db_archived"])
         ].reset_index(drop=True)
+
         # Add info from db to steps dataframe.
         steps_df = pd.merge(
             steps_df,
@@ -565,20 +574,21 @@ class VersionTracker:
                     "step",
                     "chart_ids",
                     "chart_slugs",
-                    "charts_views_7d",
-                    "charts_views_365d",
                     "db_dataset_id",
                     "db_dataset_name",
                     "db_private",
                     "db_archived",
                     "update_period_days",
                 ]
+                + [f"chart_{metric}" for metric in self.ANALYTICS_COLUMNS]
             ],
             on="step",
             how="left",
         )
         # Fill missing values (e.g. "chart_ids" for steps that are not grapher steps).
-        for column in ["chart_ids", "chart_slugs", "charts_views_7d", "charts_views_365d", "all_usages"]:
+        for column in ["chart_ids", "chart_slugs", "all_usages"] + [
+            f"chart_{metric}" for metric in self.ANALYTICS_COLUMNS
+        ]:
             steps_df[column] = [row if isinstance(row, list) else [] for row in steps_df[column]]
         for column in ["db_dataset_id", "db_dataset_name"]:
             steps_df.loc[steps_df[column].isnull(), column] = None
@@ -593,9 +603,9 @@ class VersionTracker:
         # Create a dictionary mapping steps to chart views,
         # e.g. {"step_1": [(123, 1000), (456, 2000)], "step_2": [], "step_3": ...}.
         step_to_chart_views = {}
-        for metric in ["views_7d", "views_365d"]:
+        for metric in self.ANALYTICS_COLUMNS:
             step_to_chart_views[metric] = (
-                steps_df[["step", f"charts_{metric}"]].set_index("step").to_dict()[f"charts_{metric}"]
+                steps_df[["step", f"chart_{metric}"]].set_index("step").to_dict()[f"chart_{metric}"]
             )
         # NOTE: Instead of this approach, an alternative would be to add grapher db datasets as steps of a different
         #   channel (e.g. "db").
@@ -616,7 +626,7 @@ class VersionTracker:
         # Create a column with the number of charts affected (in any way possible) by each step.
         steps_df["n_charts"] = [len(charts_ids) for charts_ids in steps_df["all_chart_ids"]]
         # Add analytics for all charts.
-        for metric in ["views_7d", "views_365d"]:
+        for metric in self.ANALYTICS_COLUMNS:
             # Create a column with the number of chart views, i.e. for each step, [(123, 1000), (456, 2000), ...].
             steps_df[f"all_chart_{metric}"] = [
                 sorted(
@@ -630,7 +640,7 @@ class VersionTracker:
                 for _, row in steps_df.iterrows()
             ]
             # Create a column with the total number of views of all charts affected by each step.
-            steps_df[f"n_charts_{metric}"] = [
+            steps_df[f"n_chart_{metric}"] = [
                 sum([chart_views[1] for chart_views in charts_views])
                 for charts_views in steps_df[f"all_chart_{metric}"]
             ]
@@ -679,24 +689,24 @@ class VersionTracker:
             steps_df = add_days_to_update_columns(steps_df=steps_df)
         else:
             # Add empty columns.
-            for column in [
-                "chart_ids",
-                "chart_slugs",
-                "charts_views_7d",
-                "charts_views_365d",
-                "db_dataset_id",
-                "db_dataset_name",
-                "db_private",
-                "db_archived",
-                "update_period_days",
-                "date_of_next_update",
-                "days_to_update",
-                "all_chart_ids",
-                "all_chart_slugs",
-                "n_charts",
-                "n_charts_views_7d",
-                "n_charts_views_365d",
-            ]:
+            for column in (
+                [
+                    "chart_ids",
+                    "chart_slugs",
+                    "db_dataset_id",
+                    "db_dataset_name",
+                    "db_private",
+                    "db_archived",
+                    "update_period_days",
+                    "date_of_next_update",
+                    "days_to_update",
+                    "all_chart_ids",
+                    "all_chart_slugs",
+                    "n_charts",
+                ]
+                + [f"chart_{metric}" for metric in self.ANALYTICS_COLUMNS]
+                + [f"n_chart_{metric}" for metric in self.ANALYTICS_COLUMNS]
+            ):
                 steps_df[column] = None
 
         # Add columns with the list of forward and backwards versions for each step.

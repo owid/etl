@@ -29,8 +29,13 @@ def run(dest_dir: str) -> None:
     region_details = shared.calculate_missing_data(df_merged, "death_rate_per_100_000_population", "region")
     income_details = shared.calculate_missing_data(df_merged, "death_rate_per_100_000_population", "income_group")
 
+    global_details = shared.calculate_missing_data(
+        df_merged,
+        "death_rate_per_100_000_population",
+        "global",
+    )
     combined = shared.combine_and_prepare_final_dataset(
-        region_details, income_details, df_merged, "death_rate_per_100_000_population"
+        region_details, income_details, global_details, df_merged, "death_rate_per_100_000_population"
     )
     tb_garden = Table(combined, short_name="who_md_suicides")
 

@@ -696,6 +696,7 @@ class Table(pd.DataFrame):
         underscore: bool = True,
         sort_rows: bool = True,
         sort_columns: bool = False,
+        short_name: Optional[str] = None,
         **kwargs,
     ) -> "Table":
         """Format the table according to OWID standards.
@@ -726,6 +727,8 @@ class Table(pd.DataFrame):
             Sort rows by index (ascending), by default True.
         sort_columns : bool, optional
             Sort columns (ascending), by default False.
+        short_name : Optional[str], optional
+            Short name to assign to the output table.
         kwargs : Any
             Passed to `Table.underscore` method.
         """
@@ -742,6 +745,9 @@ class Table(pd.DataFrame):
         # Sort rows
         if sort_rows:
             t = t.sort_index(axis=0)
+        # Rename table.
+        if short_name:
+            t.metadata.short_name = short_name
 
         return t
 

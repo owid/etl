@@ -66,7 +66,7 @@ steps:
   # Population density
   data://garden/demography/2023-06-12/population_density:
     - data://garden/demography/2023-03-31/population
-    - data://garden/faostat/2023-06-12/faostat_rl
+    - data://garden/faostat/2024-03-14/faostat_rl
   data://grapher/demography/2023-06-12/population_density:
     - data://garden/demography/2023-06-12/population_density
 

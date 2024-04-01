@@ -142,3 +142,5 @@ steps:
     - snapshot://fasttrack/latest/agricultural_policies_wuepper.csv
   data://grapher/fasttrack/latest/tomitaka_2018:
     - snapshot://fasttrack/latest/tomitaka_2018.csv
+  data://grapher/fasttrack/latest/draft_joe_idd_oecd:
+    - snapshot://fasttrack/latest/draft_joe_idd_oecd.csv
