@@ -7,7 +7,7 @@ definitions:
         - Diet Compositions
         - Animal Welfare
         - Food Supply
-    display:
+    display:  &common-display
       numDecimalPlaces: 0
 
 dataset:
@@ -34,6 +34,7 @@ tables:
         short_unit: "%"
         display:
           name: Meat eater
+          <<: *common-display
         presentation:
           title_public: Percentage of meat eaters
       flexitarian:
@@ -44,6 +45,7 @@ tables:
         short_unit: "%"
         display:
           name: Flexitarian
+          <<: *common-display
         presentation:
           title_public: Percentage of flexitarians
       pescetarian:
@@ -54,6 +56,7 @@ tables:
         short_unit: "%"
         display:
           name: Pescetarian
+          <<: *common-display
         presentation:
           title_public: Percentage of pescetarians
       vegetarian:
@@ -64,6 +67,7 @@ tables:
         short_unit: "%"
         display:
           name: Vegetarian
+          <<: *common-display
         presentation:
           title_public: Percentage of vegetarians
       vegan:
@@ -74,6 +78,7 @@ tables:
         short_unit: "%"
         display:
           name: Vegan
+          <<: *common-display
         presentation:
           title_public: Percentage of vegans
       none:
@@ -84,5 +89,6 @@ tables:
         short_unit: "%"
         display:
           name: None of these
+          <<: *common-display
         presentation:
           title_public: Percentage of people with other diets
