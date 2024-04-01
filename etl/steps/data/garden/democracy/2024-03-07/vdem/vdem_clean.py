@@ -80,6 +80,15 @@ def initial_cleaning(tb: Table) -> Table:
     tb = tb.loc[~((tb["country"] == "Italy") & (tb["year"] == 1861))]
     tb.loc[(tb["country"] == "Piedmont-Sardinia") & (tb["year"] == 1861), "country"] = "Italy"
 
+    # Assign historical names
+    tb["country"] = tb["country"].astype("string")
+    tb.loc[(tb["country"] == "Yemen") & (tb["year"] <= 1990) & (tb["year"] >= 1918), "country"] = "Yemen Arab Republic"
+    tb.loc[
+        (tb["country"] == "Vietnam") & (tb["year"] <= 1975) & (tb["year"] >= 1945), "country"
+    ] = "Democratic Republic of Vietnam"
+    tb.loc[(tb["country"] == "Germany") & (tb["year"] <= 1990) & (tb["year"] >= 1949), "country"] = "West Germany"
+    tb["country"] = tb["country"].astype("category")
+
     # Goemans et al.'s (2009) Archigos dataset, rulers.org, and worldstatesmen.org identify non-elected General Raoul Cédras as the de-facto leader of Haiti from 1991 until 1994.
     tb.loc[(tb["country"] == "Haiti") & (tb["year"] >= 1991) & (tb["year"] <= 1993), "v2exnamhos"] = "Raoul Cédras"
     tb.loc[(tb["country"] == "Haiti") & (tb["year"] >= 1991) & (tb["year"] <= 1993), "v2ex_hosw"] = 1
