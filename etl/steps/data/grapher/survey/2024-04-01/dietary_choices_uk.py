@@ -1,5 +1,7 @@
 """Load a garden dataset and create a grapher dataset."""
 
+import pandas as pd
+
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
@@ -32,9 +34,15 @@ def run(dest_dir: str) -> None:
     error = "A survey group may have been renamed."
     assert set(tb["country"]) == set(SELECTED_GROUPS), error
 
+    # Prepare display metadata.
+    date_earliest = tb["year"].astype(str).min()
+    for column in tb.drop(columns=["country", "year"]).columns:
+        tb[column].metadata.display["yearIsDay"] = True
+        tb[column].metadata.display["zeroDay"] = date_earliest
+
     # Convert year column into a number of days since the earliest date in the table.
     tb["year"] = tb["year"].astype("datetime64")
-    tb["year"] = (tb["year"] - tb["year"].min()).dt.days
+    tb["year"] = (tb["year"] - pd.to_datetime(date_earliest)).dt.days
 
     # Ensure the table is well formatted.
     tb = tb.format()

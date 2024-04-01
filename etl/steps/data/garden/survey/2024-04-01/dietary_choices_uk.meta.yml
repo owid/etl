@@ -33,7 +33,7 @@ tables:
         unit: "%"
         short_unit: "%"
         display:
-          name: Meat eaters
+          name: Meat eater
         presentation:
           title_public: Percentage of meat eaters
       flexitarian:
@@ -43,7 +43,7 @@ tables:
         unit: "%"
         short_unit: "%"
         display:
-          name: Flexitarians
+          name: Flexitarian
         presentation:
           title_public: Percentage of flexitarians
       pescetarian:
@@ -53,7 +53,7 @@ tables:
         unit: "%"
         short_unit: "%"
         display:
-          name: Pescetarians
+          name: Pescetarian
         presentation:
           title_public: Percentage of pescetarians
       vegetarian:
@@ -63,7 +63,7 @@ tables:
         unit: "%"
         short_unit: "%"
         display:
-          name: Vegetarians
+          name: Vegetarian
         presentation:
           title_public: Percentage of vegetarians
       vegan:
@@ -73,7 +73,7 @@ tables:
         unit: "%"
         short_unit: "%"
         display:
-          name: Vegans
+          name: Vegan
         presentation:
           title_public: Percentage of vegans
       none:
@@ -83,6 +83,6 @@ tables:
         unit: "%"
         short_unit: "%"
         display:
-          name: No answer
+          name: None of these
         presentation:
           title_public: Percentage of people with other diets
