@@ -51,6 +51,20 @@ REGIONS = {
     },
     "Oceania": {},
 }
+# INDICATORS THAT FOR SOME UNKNOWN REASON HAVE LOST THEIR ORIGINS DURING THE PROCESSING
+INDICATORS_NO_ORIGINS = [
+    "regime_row_owid",
+    "regime_amb_row_owid",
+    "regime_redux_row_owid",
+    "wom_hoe_vdem",
+    "regime_imputed",
+    "num_years_in_electdem_consecutive",
+    "num_years_in_libdem_consecutive",
+    "num_years_in_electdem",
+    "num_years_in_libdem",
+    "num_years_in_electdem_cat",
+    "num_years_in_libdem_cat",
+]
 
 
 def run(dest_dir: str) -> None:
@@ -114,7 +128,7 @@ def run(dest_dir: str) -> None:
 
     tables = [
         # Main indicators (uni-dimensional)
-        tb_uni,
+        tb_uni,  # some have 0 origins
         # Main indicators (multi-dimensional) without regions
         tb_multi_without_regions,
         # Main indicators (multi-dimensional) with regions
@@ -125,18 +139,23 @@ def run(dest_dir: str) -> None:
         tb_population_counts,
     ]
 
-    # Add origins in case any was lost, adjust citation full
+    # %% Add origins in case any was lost, adjust citation full
     for tb in tables:
-        columns = [col for col in tb.columns if col not in ["country", "year"]]
-        for col in columns:
-            tb[col].metadata.origins = deepcopy(origins)
+        for col in tb.columns:
+            if col in INDICATORS_NO_ORIGINS:
+                assert (
+                    len(tb[col].metadata.origins) == 0
+                ), f"No origins expected for indicator {col} in table {tb.m.short_name}"
+                tb[col].metadata.origins = origins
+            if len(tb[col].metadata.origins) == 0:
+                raise ValueError(f"No source for indicator {col} in table {tb.m.short_name}")
 
     # %% Save
     #
     # Save outputs.
     #
     # Tweak citation full for some indicators
-    # tb = adjust_citation_full(tb.copy())
+    tb = adjust_citation_full(tb.copy())
 
     # %% Set index
     # tb = tb.format()
@@ -179,55 +198,55 @@ def append_citation_full(tb: Table) -> Table:
     CITATION_SUNDSTROM = "Sundström et al. (2017, V-Dem Working Paper Series 2017:19)"
     CITATION_TEORELL = "Teorell et al. (2019)"
     CITATION_LUHRMANN = "Lührmann, Anna, Marcus Tannnberg, and Staffan Lindberg. 2018. Regimes of the World (RoW): Opening New Avenues for the Comparative Study of Political Regimes. Politics and Governance 6(1): 60-77."
-    DIMENSIONS = ["", "_low", "_high"]
+
     citation_coppedge = [
-        *[f"libdem_vdem{dim}" for dim in DIMENSIONS],
-        *[f"participdem_vdem{dim}" for dim in DIMENSIONS],
-        *[f"delibdem_vdem{dim}" for dim in DIMENSIONS],
-        *[f"lib_vdem{dim}" for dim in DIMENSIONS],
-        *[f"particip_vdem{dim}" for dim in DIMENSIONS],
-        *[f"delib_vdem{dim}" for dim in DIMENSIONS],
+        "libdem_vdem",
+        "participdem_vdem",
+        "delibdem_vdem",
+        "lib_vdem",
+        "particip_vdem",
+        "delib_vdem",
         # row indicators
-        *[f"lib_dich{dim}_row" for dim in DIMENSIONS],
+        "lib_dich_row",
     ]
     citation_pemstein = [
-        *[f"freeexpr_vdem{dim}" for dim in DIMENSIONS],
-        *[f"freeassoc_vdem{dim}" for dim in DIMENSIONS],
-        *[f"electfreefair_vdem{dim}" for dim in DIMENSIONS],
-        *[f"indiv_libs_vdem{dim}" for dim in DIMENSIONS],
-        *[f"judicial_constr_vdem{dim}" for dim in DIMENSIONS],
-        *[f"legis_constr_vdem{dim}" for dim in DIMENSIONS],
-        *[f"civsoc_particip_vdem{dim}" for dim in DIMENSIONS],
-        *[f"corr_leg_vdem{dim}" for dim in DIMENSIONS],
-        *[f"justified_polch_vdem{dim}" for dim in DIMENSIONS],
-        *[f"justcomgd_polch_vdem{dim}" for dim in DIMENSIONS],
-        *[f"counterarg_polch_vdem{dim}" for dim in DIMENSIONS],
-        *[f"elitecons_polch_vdem{dim}" for dim in DIMENSIONS],
-        *[f"soccons_polch_vdem{dim}" for dim in DIMENSIONS],
-        *[f"corr_jud_vdem{dim}" for dim in DIMENSIONS],
-        *[f"public_admin_vdem{dim}" for dim in DIMENSIONS],
-        *[f"socgr_civ_libs_vdem{dim}" for dim in DIMENSIONS],
-        *[f"dom_auton_vdem{dim}" for dim in DIMENSIONS],
-        *[f"int_auton_vdem{dim}" for dim in DIMENSIONS],
-        *[f"socgr_pow_vdem{dim}" for dim in DIMENSIONS],
-        *[f"priv_libs_vdem{dim}" for dim in DIMENSIONS],
-        *[f"pol_libs_vdem{dim}" for dim in DIMENSIONS],
+        "freeexpr_vdem",
+        "freeassoc_vdem",
+        "electfreefair_vdem",
+        "indiv_libs_vdem",
+        "judicial_constr_vdem",
+        "legis_constr_vdem",
+        "civsoc_particip_vdem",
+        "corr_leg_vdem",
+        "justified_polch_vdem",
+        "justcomgd_polch_vdem",
+        "counterarg_polch_vdem",
+        "elitecons_polch_vdem",
+        "soccons_polch_vdem",
+        "corr_jud_vdem",
+        "public_admin_vdem",
+        "socgr_civ_libs_vdem",
+        "dom_auton_vdem",
+        "int_auton_vdem",
+        "socgr_pow_vdem",
+        "priv_libs_vdem",
+        "pol_libs_vdem",
         # row indicators
-        *[f"transplaws{dim}_row" for dim in DIMENSIONS],
-        *[f"accessjust_w{dim}_row" for dim in DIMENSIONS],
-        *[f"accessjust_m{dim}_row" for dim in DIMENSIONS],
-        *[f"electfreefair{dim}_row" for dim in DIMENSIONS],
-        *[f"electmulpar{dim}_row" for dim in DIMENSIONS],
+        "transplaws_row",
+        "accessjust_w_row",
+        "accessjust_m_row",
+        "electfreefair_row",
+        "electmulpar_row",
     ]
     citation_mcmann = [
-        *[f"corruption_vdem{dim}" for dim in DIMENSIONS],
-        *[f"corr_publsec_vdem{dim}" for dim in DIMENSIONS],
-        *[f"corr_exec_vdem{dim}" for dim in DIMENSIONS],
+        "corruption_vdem",
+        "corr_publsec_vdem",
+        "corr_exec_vdem",
     ]
     citation_teorell = [
-        *[f"electdem_vdem{dim}" for dim in DIMENSIONS],
+        "electdem_vdem",
         # row indicators
-        *[f"electdem_dich{dim}_row_owid" for dim in DIMENSIONS],
+        "electdem_dich_row_owid",
     ]
 
     citation_full = {
@@ -237,37 +256,36 @@ def append_citation_full(tb: Table) -> Table:
         **{i: CITATION_MCMANN for i in citation_mcmann},
         **{i: CITATION_TEORELL for i in citation_teorell},
         ##
-        **{f"egaldem_vdem{dim}": CITATION_SIGMAN for dim in DIMENSIONS},
-        **{f"wom_emp_vdem{dim}": CITATION_SUNDSTROM for dim in DIMENSIONS},
-        **{f"wom_pol_par_vdem{dim}": CITATION_SUNDSTROM for dim in DIMENSIONS},
+        "egaldem_vdem": CITATION_SIGMAN,
+        "wom_emp_vdem": CITATION_SUNDSTROM,
+        "wom_pol_par_vdem": CITATION_SUNDSTROM,
         # Combined citations
-        **{f"egal_vdem{dim}": f"{CITATION_SIGMAN};\n\n {CITATION_COPPEDGE}" for dim in DIMENSIONS},
-        **{f"equal_rights_vdem{dim}": f"{CITATION_SIGMAN};\n\n {CITATION_PEMSTEIN}" for dim in DIMENSIONS},
-        **{f"equal_access_vdem{dim}": f"Sigman and Lindberg (2017);\n\n {CITATION_PEMSTEIN}" for dim in DIMENSIONS},
+        "egal_vdem{dim}": f"{CITATION_SIGMAN};\n\n {CITATION_COPPEDGE}",
+        "equal_rights_vdem{dim}": f"{CITATION_SIGMAN};\n\n {CITATION_PEMSTEIN}",
+        "equal_access_vdem{dim}": f"Sigman and Lindberg (2017);\n\n {CITATION_PEMSTEIN}",
         ##
-        **{f"equal_res_vdem{dim}": f"{CITATION_SIGMAN};\n\n {CITATION_PEMSTEIN}" for dim in DIMENSIONS},
-        **{
-            f"personalism_vdem{dim}": "Sigman and Lindberg (2017, V-Dem Working Paper Series 2017:56); Sigman and Lindberg (2018); {CITATION_PEMSTEIN}"
-            for dim in DIMENSIONS
-        },
-        **{f"wom_civ_libs_vdem{dim}": f"{CITATION_SUNDSTROM};\n\n {CITATION_PEMSTEIN}" for dim in DIMENSIONS},
-        **{f"wom_civ_soc_vdem{dim}": f"{CITATION_SUNDSTROM};\n\n {CITATION_PEMSTEIN}" for dim in DIMENSIONS},
+        "equal_res_vdem{dim}": f"{CITATION_SIGMAN};\n\n {CITATION_PEMSTEIN}",
+        "personalism_vdem{dim}": "Sigman and Lindberg (2017, V-Dem Working Paper Series 2017:56); Sigman and Lindberg (2018); {CITATION_PEMSTEIN}",
+        "wom_civ_libs_vdem{dim}": f"{CITATION_SUNDSTROM};\n\n {CITATION_PEMSTEIN}",
+        "wom_civ_soc_vdem{dim}": f"{CITATION_SUNDSTROM};\n\n {CITATION_PEMSTEIN}",
     }
+    citation_full = {col: citation for col, citation in citation_full.items() if col in tb.columns}
     for indicator_name, citation_additional in citation_full.items():
         tb[indicator_name].metadata.origins[0].citation_full += f";\n\n{citation_additional}"
 
     # Add citation for Luhrmann (at the beginning of the citation full)
     citation_luhrmann = [
-        *[f"transplaws{dim}_row" for dim in DIMENSIONS],
-        *[f"accessjust_w{dim}_row" for dim in DIMENSIONS],
-        *[f"accessjust_m{dim}_row" for dim in DIMENSIONS],
-        *[f"lib_dich{dim}_row" for dim in DIMENSIONS],
-        *[f"electfreefair{dim}_row" for dim in DIMENSIONS],
-        *[f"electdem_dich{dim}_row_owid" for dim in DIMENSIONS],
-        *[f"electmulpar{dim}_row" for dim in DIMENSIONS],
-        *[f"electmulpar_hoe{dim}_row_owid" for dim in DIMENSIONS],
-        *[f"electmulpar_leg{dim}_row" for dim in DIMENSIONS],
+        "transplaws_row",
+        "accessjust_w_row",
+        "accessjust_m_row",
+        "lib_dich_row",
+        "electfreefair_row",
+        "electdem_dich_row_owid",
+        "electmulpar_row",
+        "electmulpar_hoe_row_owid",
+        "electmulpar_leg_row",
     ]
+    citation_luhrmann = [col for col in citation_luhrmann if col in tb.columns]
     for indicator_name in citation_luhrmann:
         tb[indicator_name].metadata.origins[0].citation_full = (
             f"{CITATION_LUHRMANN};\n\n" + tb[indicator_name].metadata.origins[0].citation_full

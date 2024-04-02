@@ -283,37 +283,19 @@ tables:
   ##################################################################################################
   # TABLE: MULTI-DIMENSIONAL TABLES, WITH REGIONS
   vdem_multi_with_regions:
+    common:
+      description_processing: |-
+        <% if aggregate_method == 'average' %>
+        The regional aggregates (including values for World) have been estimated by averaging the country values.
+        <% elif aggregate_method < 'population-weighted average' %>
+        The regional aggregates (including values for World) have been estimated by averaging the country values weighed by popupalation. $\alpha$. The population values are from the UN WPP 2022 revision dataset.
+        <% endif %>
     variables:
-      ## 3.6.0.5 Engaged society
-      soccons_polch_vdem:
-        title: Engaged society (<< estimate >> estimate)
-        description_short: |-
-          << estimate.title() >> estimate of the extent to which ordinary people independently discuss considered important policy changes among themselves, in the media, in associations or neighborhoods, or in the streets.
-        description_from_producer: |-
-          Question: When important policy changes are being considered, how wide and how independent are public deliberations?
-
-          Clarification: This question refers to deliberation as manifested in discussion, debate, and other public forums such as popular media.
-
-          Responses:
-          0: Public deliberation is never, or almost never allowed.
-          1: Some limited public deliberations are allowed but the public below the elite levels is almost always either unaware of major policy debates or unable to take part in them.
-          2: Public deliberation is not repressed but nevertheless infrequent and non-elite actors are typically controlled and/or constrained by the elites.
-          3: Public deliberation is actively encouraged and some autonomous non-elite groups participate, but it is confined to a small slice of specialized groups that tends to be the same across issue-areas.
-          4: Public deliberation is actively encouraged and a relatively broad segment of non-elite groups often participate and vary with different issue-areas.
-          5: Large numbers of non-elite groups as well as ordinary people tend to discuss major policies among themselves, in the media, in associations or neighborhoods, or in the streets. Grass-roots deliberation is common and unconstrained.
-
-          Scale: Ordinal, converted to interval by the measurement model.
-
-          Indicator name: `v2dlengage`
-        unit: ''
-        display:
-          numDecimalPlaces: 3
-
       # 2.1 V-Dem High-Level Democracy Indices
       ## 2.1.1 Electoral democracy index
       electdem_vdem:
         title: |-
-          Electoral democracy index (<< estimate >> estimate)
+          Electoral democracy index (<< estimate >> estimate, aggregate: << aggregate_method >>)
         description_short: |-
           << estimate.title() >> estimate of the extent to which political leaders are elected under comprehensive suffrage in free and fair elections, and freedoms of association and expression are guaranteed.
         description_from_producer: &description_prod_electdem_vdem |-
@@ -330,7 +312,7 @@ tables:
       ## 2.1.2 Liberal democracy index
       libdem_vdem:
         title: |-
-          Liberal democracy index (<< estimate >> estimate)
+          Liberal democracy index (<< estimate >> estimate, aggregate: << aggregate_method >>)
         description_short: |-
           << estimate.title() >> estimate of the extent of suffrage, the freedom and fairness of elections, freedoms of association and expression, individual and minority rights, equality before the law, and executive constraints.
         description_from_producer: |-
@@ -347,7 +329,8 @@ tables:
 
       # 2.1.3 Participatory democracy index
       participdem_vdem:
-        title: Extent of direct popular votes (<< estimate >> estimate)
+        title: |-
+          Extent of direct popular votes (<< estimate >> estimate, aggregate: << aggregate_method >>)
         description_short: |-
           << estimate.title() >> estimate of the extent of suffrage, the freedom and fairness of elections, freedoms of association and expression, as well as the extent to which citizens can engage in regional and local government, civil society organizations, and direct democracy.
         description_from_producer: |-
@@ -364,7 +347,8 @@ tables:
 
       ## 2.1.4 Deliberative democracy index
       delibdem_vdem:
-        title: Deliberative democracy index (<< estimate >> estimate)
+        title: |-
+          Deliberative democracy index (<< estimate >> estimate, aggregate: << aggregate_method >>)
         description_short:
           << estimate.title() >> estimate of the extent of suffrage, the freedom and fairness of elections, freedoms of association and expression, as well as the extent to which political elites justify their positions, justify them with the common good, acknowledge counterarguments, consult elites in policy changes, and society deliberates policy changes.
         description_from_producer: |-
@@ -382,7 +366,8 @@ tables:
 
       ## 2.2.18 Egalitarian component index
       egal_vdem:
-        title: Egalitarian political institutions index (<< estimate >> estimate)
+        title: |-
+          Egalitarian political institutions index (<< estimate >> estimate, aggregate: << aggregate_method >>)
         description_short: |-
           << estimate.title() >> estimate of the extent to which the protection of rights, access to power, and distribution of resources is equal.
         description_from_producer: |-
@@ -399,7 +384,8 @@ tables:
 
       ## 3.5.1.6 Legislature corrupt activities
       corr_leg_vdem:
-        title: Legislative corruption (<< estimate >> estimate)
+        title: |-
+          Legislative corruption (<< estimate >> estimate, aggregate: << aggregate_method >>)
         description_from_producer: |-
           Question: Do members of the legislature abuse their position for financial gain?
 
@@ -424,7 +410,8 @@ tables:
 
       ## 3.5.3.7 Lower chamber female legislators
       wom_parl_vdem:
-        title: Lower chamber female legislators
+        title: |-
+          Lower chamber female legislators (aggregate: << aggregate_method >>)
         description_short: |-
           Percentage of women in the lower or single chamber of the legislature.
         description_from_producer: |-
@@ -435,12 +422,10 @@ tables:
         display:
           numDecimalPlaces: 3
 
-
-
-
       ## 3.7.0.6 Judicial corruption decision
       corr_jud_vdem:
-        title: Judicial corruption (<< estimate >> estimate)
+        title: |-
+          Judicial corruption (<< estimate >> estimate, aggregate: << aggregate_method >>)
         description_from_producer: |-
           Question: How often do individuals or businesses make undocumented extra payments or bribes in order to speed up or delay the process or to obtain a favorable judicial decision?
 
@@ -461,7 +446,8 @@ tables:
 
       ## 3.8.2.2 Rigorous and impartial public administration
       public_admin_vdem:
-        title: Rigorous and impartial public administration (<< estimate >> estimate)
+        title: |-
+          Rigorous and impartial public administration (<< estimate >> estimate, aggregate: << aggregate_method >>)
         description_short: |-
           << estimate.title() >> estimate of the extent to which public officials respect the law, and administer it without arbitrariness and bias.
         description_from_producer: |-
@@ -488,7 +474,8 @@ tables:
 
       ## 3.8.2.6 Social group equality in respect for civil liberties
       socgr_civ_libs_vdem:
-        title: Equality of civil liberties across social groups (<< estimate >> estimate)
+        title: |-
+          Equality of civil liberties across social groups (<< estimate >> estimate, aggregate: << aggregate_method >>)
         description_short: |-
           << estimate.title() >> estimate of the extent to which social groups — defined by language, ethnicity, religion, race, region, and/or caste — are free from forced labor, have property rights and access to the justice system, and enjoy freedoms of movement.
         description_from_producer: |-
@@ -510,7 +497,8 @@ tables:
 
       ## 3.9.0.1 Domestic autonomy
       dom_auton_vdem:
-        title: Domestic policymaking free from foreign influence (<< estimate >> estimate)
+        title: |-
+          Domestic policymaking free from foreign influence (<< estimate >> estimate, aggregate: << aggregate_method >>)
         description_short: |-
           << estimate.title() >> estimate of the extent to which domestic policy is free from the interference of other states.
         description_from_producer: |-
@@ -532,7 +520,8 @@ tables:
 
       ## 3.9.0.2 International autonomy
       int_auton_vdem:
-        title: Foreign policymaking free from foreign influence (<< estimate >> estimate)
+        title: |-
+          Foreign policymaking free from foreign influence (<< estimate >> estimate, aggregate: << aggregate_method >>)
         description_short: |-
           << estimate.title() >> estimate of the extent to which foreign policy is free from the interference of other states.
         description_from_producer: |-
@@ -550,7 +539,8 @@ tables:
 
       ## 3.9.0.3 State authority over territory
       terr_contr_vdem:
-        title: Territory under state control (<< estimate >> estimate)
+        title: |-
+          Territory under state control (<< estimate >> estimate, aggregate: << aggregate_method >>)
         description_short: |-
           << estimate.title() >> estimate of the percentage of territory controlled by the government.
         description_from_producer: |-
@@ -568,7 +558,8 @@ tables:
 
       ## 3.12.0.2 Power distributed by social group
       socgr_pow_vdem:
-        title: Equality of political power across social groups (<< estimate >> estimate)
+        title: |-
+          Equality of political power across social groups (<< estimate >> estimate, aggregate: << aggregate_method >>)
         description_short: |-
           << estimate.title() >> estimate of the extent to which social groups — defined by language, ethnicity, religion, race, region, and/or caste — are irrelevant to politics, or have similar political power.
         description_from_producer: |-
@@ -590,7 +581,8 @@ tables:
 
       ## 5.4.3 Presidentialism Index
       personalism_vdem:
-        title: Presidentialism Index (<< estimate >> estimate)
+        title: |-
+          Presidentialism index (<< estimate >> estimate, aggregate: << aggregate_method >>)
         description_short: |-
           << estimate.title() >> estimate of the extent to which the executive is unconstrained by the legislature, judiciary, electoral managementbody, and other oversight.
         description_from_producer: |-
@@ -608,9 +600,10 @@ tables:
 
       ## 5.5.1 Civil liberties index
       civ_libs_vdem:
-        title: Civil liberties index (<< estimate >> estimate)
+        title: |-
+          Civil liberties index (<< estimate >> estimate, aggregate: << aggregate_method >>)
         description_short: |-
-          Central estimate of the extent to which people are free from government torture, political killings, and forced labor, they have property rights, and enjoy the freedoms of movement, religion, expression, and association.
+          << estimate.title() >> estimate of the extent to which people are free from government torture, political killings, and forced labor, they have property rights, and enjoy the freedoms of movement, religion, expression, and association.
         description_from_producer: |-
           Question: To what extent is civil liberty respected?
 
@@ -625,9 +618,10 @@ tables:
 
       ## 5.5.4 Private civil liberties index
       priv_libs_vdem:
-        title: Private civil liberties index (<< estimate >> estimate)
+        title: |-
+          Private civil liberties index (<< estimate >> estimate, aggregate: << aggregate_method >>)
         description_short: |-
-          Central estimate of  the extent to which people are free from forced labor, have property rights, and enjoy the freedoms of movement and religion.
+          << estimate.title() >> estimate of the extent to which people are free from forced labor, have property rights, and enjoy the freedoms of movement and religion.
         description_from_producer: |-
           Question: To what extent are private liberties respected?
 
@@ -642,9 +636,10 @@ tables:
 
       ## 5.5.3 Political civil liberties index
       pol_libs_vdem:
-        title: Political civil liberties index (<< estimate >> estimate)
+        title: |-
+          Political civil liberties index (<< estimate >> estimate, aggregate: << aggregate_method >>)
         description_short: |-
-          Central estimate of the extent to which people enjoy the freedoms of expression and association.
+          << estimate.title() >> estimate of the extent to which people enjoy the freedoms of expression and association.
         description_from_producer: |-
           Question: To what extent are political liberties respected?
 
@@ -659,9 +654,10 @@ tables:
 
       ## 5.5.2 Physical violence index
       phys_integr_libs_vdem:
-        title: Physical integrity liberties (<< estimate >> estimate)
+        title: |-
+          Physical violence index (<< estimate >> estimate, aggregate: << aggregate_method >>)
         description_short: |-
-          Central estimate of the extent to which people are free from government torture and political killings.
+          << estimate.title() >> estimate of the extent to which people are free from government torture and political killings.
         description_from_producer: |-
           Question: To what extent is physical integrity respected?
 
@@ -676,7 +672,8 @@ tables:
 
       ## 5.7.1 Political corruption index
       corruption_vdem:
-        title: Political corruption index (<< estimate >> estimate)
+        title: |-
+          Political corruption index (<< estimate >> estimate, aggregate: << aggregate_method >>)
         description_short: |-
           << estimate.title() >> estimate of the extent to which a country is affected by political corruption.
         description_from_producer: |-
@@ -693,7 +690,8 @@ tables:
 
       ## 5.7.3 Public sector corruption index [Not in use]
       corr_publsec_vdem:
-        title: Public sector corruption index (<< estimate >> estimate)
+        title: |-
+          Public sector corruption index (<< estimate >> estimate, aggregate: << aggregate_method >>)
         description_from_producer: |-
           Question: To what extent do public sector employees grant favors in exchange for bribes, kickbacks, or other material inducements, and how often do they steal, embezzle, or misappropriate public funds or other state resources for personal or family use?
 
@@ -708,7 +706,8 @@ tables:
 
       ## 5.7.2 Executive corruption index [Not in use]
       corr_exec_vdem:
-        title: Executive corruption index (<< estimate >> estimate)
+        title: |-
+          Executive corruption index (<< estimate >> estimate, aggregate: << aggregate_method >>)
         description_from_producer: |-
           Question: How routinely do members of the executive, or their agents grant favors in exchange for bribes, kickbacks, or other material inducements, and how often do they steal, embezzle, or misappropriate public funds or other state resources for personal or family use?
 
@@ -723,7 +722,8 @@ tables:
 
       ## 5.8.1 Women political empowerment index
       wom_emp_vdem:
-        title: Women's political empowerment index (<< estimate >> estimate)
+        title: |-
+          Women's political empowerment index (<< estimate >> estimate, aggregate: << aggregate_method >>)
         description_short: |-
           << estimate.title() >> estimate of the extent to which women enjoy civil liberties, can participate in civil society, and are represented in politics.
         description_from_producer: |-
@@ -740,7 +740,8 @@ tables:
 
       ## 5.8.2 Women civil liberties index
       wom_civ_libs_vdem:
-        title: Women's civil rights index (<< estimate >> estimate)
+        title: |-
+          Women's civil rights index (<< estimate >> estimate, aggregate: << aggregate_method >>)
         description_short: |-
           << estimate.title() >> estimate of the extent to which women are free from forced labor, have property rights and access to the justice system, and enjoy freedom of movement.
         description_from_producer: |-
@@ -757,7 +758,8 @@ tables:
 
       ## 5.8.3 Women civil society participation index
       wom_civ_soc_vdem:
-        title: Women's civil society participation index (<< estimate >> estimate)
+        title: |-
+          Women's civil society participation index (<< estimate >> estimate, aggregate: << aggregate_method >>)
         description_short: |-
           << estimate.title() >> estimate of the extent to which women can discuss political issues, participate in civil society organizations, and are represented among journalists.
         description_from_producer: |-
@@ -774,7 +776,8 @@ tables:
 
       ## 5.8.4 Women political participation index
       wom_pol_par_vdem:
-        title: Women's political participation index (<< estimate >> estimate)
+        title: |-
+          Women's political participation index (<< estimate >> estimate, aggregate: << aggregate_method >>)
         description_short: |-
           << estimate.title() >> estimate of the extent to which women are represented in the legislature and have an equal share of political power.
         description_from_producer: |-
@@ -791,7 +794,8 @@ tables:
 
       ## 5.9.1 Rule of law index
       rule_of_law_vdem:
-        title: Rule of Law index (<< estimate >> estimate)
+        title: |-
+          Rule of Law index (<< estimate >> estimate, aggregate: << aggregate_method >>)
         description_short: |-
           << estimate.title() >> estimate of the extent to which the government complies with the law, courts are independent, laws transparent, justice accessible, corruption absent, and the bureaucracy is impartial.
         description_from_producer: |-
@@ -806,7 +810,8 @@ tables:
 
       ## 5.11.1 Core civil society index [not in use]
       civ_soc_str_vdem:
-        title: Core civil society index (<< estimate >> estimate)
+        title: |-
+          Core civil society index (<< estimate >> estimate, aggregate: << aggregate_method >>)
         description_from_producer: |-
           Question: How robust is civil society?
 
@@ -1348,6 +1353,31 @@ tables:
           Scale: Interval, from low to high (0-1).
 
           Indicator name: `v2xel_regelec`
+        unit: ''
+        display:
+          numDecimalPlaces: 3
+
+      ## 3.6.0.5 Engaged society
+      soccons_polch_vdem:
+        title: "Engaged society (<< estimate >> estimate)"
+        description_short: |-
+          << estimate.title() >> estimate of the extent to which ordinary people independently discuss considered important policy changes among themselves, in the media, in associations or neighborhoods, or in the streets.
+        description_from_producer: |-
+          Question: When important policy changes are being considered, how wide and how independent are public deliberations?
+
+          Clarification: This question refers to deliberation as manifested in discussion, debate, and other public forums such as popular media.
+
+          Responses:
+          0: Public deliberation is never, or almost never allowed.
+          1: Some limited public deliberations are allowed but the public below the elite levels is almost always either unaware of major policy debates or unable to take part in them.
+          2: Public deliberation is not repressed but nevertheless infrequent and non-elite actors are typically controlled and/or constrained by the elites.
+          3: Public deliberation is actively encouraged and some autonomous non-elite groups participate, but it is confined to a small slice of specialized groups that tends to be the same across issue-areas.
+          4: Public deliberation is actively encouraged and a relatively broad segment of non-elite groups often participate and vary with different issue-areas.
+          5: Large numbers of non-elite groups as well as ordinary people tend to discuss major policies among themselves, in the media, in associations or neighborhoods, or in the streets. Grass-roots deliberation is common and unconstrained.
+
+          Scale: Ordinal, converted to interval by the measurement model.
+
+          Indicator name: `v2dlengage`
         unit: ''
         display:
           numDecimalPlaces: 3

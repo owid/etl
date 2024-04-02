@@ -92,7 +92,7 @@ def run(tb: Table, ds_regions: Dataset, ds_population: Dataset) -> Tuple[Table, 
     tb_countries_counts, tb_countries_avg = make_table_countries(tb, ds_regions)
 
     # Create table with population-weighted averages
-    tb_population_counts, tb_population_avg = make_table_population(tb, ds_regions, ds_population)
+    tb_population_counts, tb_population_avg = make_table_population(tb, ds_regions, ds_population=ds_population)
 
     # Consolidate main table with additional regional aggregates
     tb_uni, tb_multi_without_regions, tb_multi_with_regions = make_main_tables(tb, tb_countries_avg, tb_population_avg)
@@ -433,7 +433,7 @@ def make_main_tables(tb: Table, tb_countries_avg: Table, tb_population_avg: Tabl
     # Merge multi-dimensional table with region aggregates.
     # Since there are two ways of estimating the regional aggregates, we create two versions of the indicators
     tb_multi_with_regions["aggregate_method"] = "average"
-    tb_multi_with_regions_popw = tb_multi.copy()
+    tb_multi_with_regions_popw = tb_multi_with_regions.copy()
     tb_multi_with_regions_popw["aggregate_method"] = "population-weighted average"
     tb_countries_avg["aggregate_method"] = "average"
     tb_population_avg["aggregate_method"] = "population-weighted average"
