@@ -19,7 +19,7 @@ def run(tb: Table) -> Table:
     )
 
     tb_ = cast(Table, tb_)
-    return tb
+    return tb_
 
 
 def add_years_in_democracy(tb: Table) -> Table:
