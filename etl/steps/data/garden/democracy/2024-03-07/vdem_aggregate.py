@@ -8,7 +8,7 @@ from owid.catalog.processing import concat
 from shared import add_population_in_dummies, expand_observations, from_wide_to_long
 
 from etl.data_helpers import geo
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -167,7 +167,7 @@ def make_table_countries_avg(tb: Table, ds_regions: Dataset) -> Table:
     tb_ = add_regions_and_global_aggregates(
         tb=tb_,
         ds_regions=ds_regions,
-        aggregations={k: "mean" for k in INDICATORS_REGION_AVERAGES},
+        aggregations={k: "mean" for k in INDICATORS_REGION_AVERAGES},  # type: ignore
     )
 
     # Sanity check on output shape
@@ -317,7 +317,7 @@ def make_table_population_avg(tb: Table, ds_regions: Dataset, ds_population: Dat
     tb_ = add_regions_and_global_aggregates(
         tb=tb_,
         ds_regions=ds_regions,
-        aggregations={k: "mean" for k in INDICATORS_REGION_AVERAGES},
+        aggregations={k: "mean" for k in INDICATORS_REGION_AVERAGES},  # type: ignore
     )
 
     # Rename columns

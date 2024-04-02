@@ -12,7 +12,7 @@ def run(dest_dir: str) -> None:
     #
     # Load garden dataset.
     ds_garden = paths.load_dataset("vdem")
-    ds_garden2 = paths.load_dataset("vdem_2")
+    # ds_garden2 = paths.load_dataset("vdem_2")
 
     # Read table from garden dataset.
     tb = ds_garden["vdem"]
