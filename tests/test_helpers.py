@@ -462,7 +462,9 @@ steps:
     # NOTE: This is not necessarily desired behavior, but it is the one to be expected.
     # Comments that come after a step definition are considered belonging to the next step.
     # Therefore, they will appear right above the next step (and the line breaks will be below the previous step).
-    _assert_write_to_dag_file(old_content, expected_content, dag_part={"meadow_a": ["snapshot_a"], "meadow_b": ["snapshot_b", "snapshot_c"]})
+    _assert_write_to_dag_file(
+        old_content, expected_content, dag_part={"meadow_a": ["snapshot_a"], "meadow_b": ["snapshot_b", "snapshot_c"]}
+    )
 
 
 def test_get_comments_above_step_in_dag():
