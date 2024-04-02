@@ -37,7 +37,11 @@
   ],
   "files.exclude": {
     "etl/steps/archive": true,
-    "snapshots/archive": true
+    "snapshots/archive": true,
+    "**/dataset_*_config.json": true,
+    "**/dataset_*_values.json": true,
+    "**/dataset_*.json.dvc": true,
+    "**/dataset_*.feather.dvc": true
   },
   "search.exclude": {
     "etl/steps/archive": true,
