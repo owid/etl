@@ -13,7 +13,7 @@ meta:
       Published paper available at https://elifesciences.org/articles/69336.
     url: https://github.com/akarlinsky/world_mortality/
     source_data_url: https://raw.githubusercontent.com/akarlinsky/world_mortality/main/world_mortality.csv
-    date_accessed: 2024-04-01
+    date_accessed: 2024-04-02
     publication_date: '2021-06-30'
     publication_year: 2021
     published_by: |-
@@ -33,6 +33,6 @@ meta:
     name: MIT License
     url: https://github.com/akarlinsky/world_mortality/blob/main/LICENSE
 outs:
-  - md5: dc4198df574b27da916abcc6cd29b57b
-    size: 1017063
+  - md5: b16534e3e07e1b9f3d92b9c28e275d53
+    size: 1020056
     path: wmd.csv
