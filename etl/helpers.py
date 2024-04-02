@@ -814,6 +814,8 @@ def write_to_dag_file(
 
     # Initialize a list with the new lines that will be written to the dag file.
     updated_lines = []
+    # Initialize a list of comments preceding the next step after a given step.
+    comments_next_step = []
     # Initialize a flag to skip lines until the next step.
     skip_until_next_step = False
     # Initialize a set to keep track of the steps that were found in the original dag file.
@@ -823,7 +825,10 @@ def write_to_dag_file(
         stripped_line = line.strip()
 
         # Identify the start of a step, e.g. "  data://meadow/temp/latest/step:".
-        if stripped_line.endswith(":") and not stripped_line.startswith("-"):
+        if stripped_line.endswith(":") and not stripped_line.startswith("-") and not stripped_line.startswith("steps:"):
+            if comments_next_step:
+                updated_lines.extend(comments_next_step)
+                comments_next_step = []
             # Extract the name of the step (without the ":" at the end).
             current_step = ":".join(stripped_line.split(":")[:-1])
             if current_step in dag_part:
@@ -835,6 +840,8 @@ def write_to_dag_file(
                     updated_lines.append(" " * indent_dependency + f"- {dep}\n")
                 # Skip the following lines until the next step is found.
                 skip_until_next_step = True
+                # Start tracking possible comments of the next step.
+                comments_next_step = []
                 # Add the current step to the set of steps found in the dag file.
                 steps_found.add(current_step)
                 continue
@@ -843,8 +850,15 @@ def write_to_dag_file(
                 skip_until_next_step = False
 
         # Skip dependencies and comments among dependencies of the step being updated.
-        if skip_until_next_step and stripped_line.startswith(("-", "#")):
-            continue
+        if skip_until_next_step:
+            if stripped_line.startswith("-"):
+                # Remove comments among dependencies.
+                comments_next_step = []
+                continue
+            elif stripped_line.startswith("#"):
+                # Add comments that may potentially be related to the next step.
+                comments_next_step.append(line)
+                continue
 
         # Add lines that should not be skipped.
         updated_lines.append(line)
