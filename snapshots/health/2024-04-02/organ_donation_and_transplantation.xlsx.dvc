@@ -5,6 +5,10 @@ meta:
     # Data product / Snapshot
     title: Global data on organ donation and transplantation
     date_published: "2024-01-01"
+    description: |-
+      The global database on donation and transplantation represents the most comprehensive source to date of worldwide data concerning activities in organ donation and transplantation derived from official sources, as well as information on legal and organizational aspects.
+
+      The main direct collaboration between the World Health Organization (WHO) and the Spanish Transplant Organization, Organización Nacional de Trasplantes (ONT) has been focused on this collection of global data, which lead to the joint ONT-WHO Global Observatory on Donation and Transplantation.
 
     # Citation
     producer: Global Observatory on Donation and Transplantation

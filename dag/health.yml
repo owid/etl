@@ -501,5 +501,6 @@ steps:
     - snapshot://health/2024-04-02/organ_donation_and_transplantation.xlsx
   data://garden/health/2024-04-02/organ_donation_and_transplantation:
     - data://meadow/health/2024-04-02/organ_donation_and_transplantation
+    - data://garden/demography/2023-03-31/population
   data://grapher/health/2024-04-02/organ_donation_and_transplantation:
     - data://garden/health/2024-04-02/organ_donation_and_transplantation
