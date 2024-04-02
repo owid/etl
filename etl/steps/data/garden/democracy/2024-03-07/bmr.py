@@ -445,7 +445,7 @@ def make_tables_population_counters(tb: Table, ds_regions: Dataset, ds_populatio
 
     # Add population in dummies (population value replaces 1, 0 otherwise)
     tb_ = add_population_in_dummies(
-        tb,
+        tb_,
         ds_population,
         expected_countries_without_population=[
             "Pakistan (former)",
