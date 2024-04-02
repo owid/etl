@@ -76,7 +76,6 @@ def run(dest_dir: str) -> None:
 
     # Load population dataset and read its main table.
     ds_population = paths.load_dataset("population")
-    tb_population = ds_population["population"].reset_index()
 
     #
     # Process data.
