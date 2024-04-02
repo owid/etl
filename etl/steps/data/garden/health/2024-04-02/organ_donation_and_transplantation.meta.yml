@@ -7,23 +7,25 @@ definitions:
     processing_level: minor
     unit: ""
     short_unit: ""
-
+    display:
+      numDecimalPlaces: 0
 
 dataset:
   update_period_days: 365
-
 
 tables:
   organ_donation_and_transplantation:
     variables:
       n_organ_donors:
         title: Total number of actual deceased organ donors
+        description_short: |-
+          Actual donors are those individuals from whom one or more organs have been recovered for the purpose of transplantation.
       n_donors_after_brain_death:
         title: Number of actual donors after brain death
-        description_short: Actual deceased organ donors in whom death has been determined by neurological criteria.
+        description_short: Deceased organ donors in whom death has been determined by neurological criteria.
       n_donors_after_circulatory_death:
         title: Number of actual donors after circulatory death
-        description_short: Actual deceased organ donors in whom death has been determined by circulatory criteria.
+        description_short: Deceased organ donors in whom death has been determined by circulatory criteria.
       n_utilized_organ_donors:
         title: Total number of utilized deceased organ donors
       n_utilized_donors_after_brain_death:
