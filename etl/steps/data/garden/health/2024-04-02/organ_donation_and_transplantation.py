@@ -90,7 +90,7 @@ def run(dest_dir: str) -> None:
     tb = geo.add_population_to_table(tb=tb, ds_population=ds_population)
 
     # Add indicators per million people.
-    for column in tb.drop(columns=["country", "year"]).columns:
+    for column in tb.drop(columns=["country", "year", "population"]).columns:
         tb[f"{column}_per_million_people"] = tb[column] / tb["population"] * 1e6
 
     # Set an index and sort.

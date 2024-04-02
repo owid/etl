@@ -133,4 +133,6 @@ tables:
       n_small_bowel_transplantation_per_million_people:
         title: Total number of small bowel transplantations per million people
         processing_level: major
-
+      population:
+        title: Population
+        processing_level: major
