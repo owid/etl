@@ -1270,6 +1270,23 @@ tables:
         display:
           numDecimalPlaces: 3
 
+      ## 2.2.8 Liberal component index
+      lib_vdem:
+        title: Liberal component index (<< estimate >> estimate)
+        description_short: |-
+          << estimate.title() >> estimate of the extent of individual and minority rights, equality before the law, and executive constraints.
+        description_from_producer: &description_prod_lib_vdem |-
+          Question: To what extent is the liberal principle of democracy achieved?
+
+          Clarification: The liberal principle of democracy emphasizes the importance of protecting individual and minority rights against the tyranny of the state and the tyranny of the majority. The liberal model takes a "negative" view of political power insofar as it judges the quality of democracy by the limits placed on government. This is achieved by constitutionally protected civil liberties, strong rule of law, an independent judiciary, and effective checks and balances that, together, limit the exercise of executive power.
+
+          Scale: Interval, from low to high (0-1).
+
+          Indicator name: `v2x_liberal`
+        unit: ''
+        display:
+          numDecimalPlaces: 3
+
       ## [RE-ESTIMATE, BINARY CATEGORISATION] 2.2.8 Liberal component index
       lib_dich_row:
         title: Liberal political institutions (<< estimate >> estimate) (re-estimate)
@@ -1282,23 +1299,6 @@ tables:
         unit: ''
         display:
           numDecimalPlaces: 0
-
-      ## 2.2.8 Liberal component index
-      lib_vdem:
-        title: Liberal component index (<< estimate >> estimate)
-        description_short: |-
-          << estimate.title() >> estimate of the extent of individual and minority rights, equality before the law, and executive constraints.
-        description_from_producer: |-
-          Question: To what extent is the liberal principle of democracy achieved?
-
-          Clarification: The liberal principle of democracy emphasizes the importance of protecting individual and minority rights against the tyranny of the state and the tyranny of the majority. The liberal model takes a "negative" view of political power insofar as it judges the quality of democracy by the limits placed on government. This is achieved by constitutionally protected civil liberties, strong rule of law, an independent judiciary, and effective checks and balances that, together, limit the exercise of executive power.
-
-          Scale: Interval, from low to high (0-1).
-
-          Indicator name: `v2x_liberal`
-        unit: ''
-        display:
-          numDecimalPlaces: 3
 
       ## 2.2.15 Local government index
       locelect_vdem:
