@@ -37,9 +37,13 @@ def run(dest_dir: str) -> None:
         "HellaSwag": "Predictive reasoning",
         "HumanEval": "Code generation",
         "SuperGLUE": "Nuanced language interpretation",
-        "GSM8K": "Math problem-solving",
+        "GSK8k": "Math problem-solving",
     }
     tb["assessment_domain"] = tb["benchmark"].map(mapping)
+
+    assert (
+        not tb["assessment_domain"].isnull().any()
+    ), "There are NaN values in the 'assessment_domain' column. Make sure you've mapped all benchmarks to their respective assessment domains."
 
     tb = tb.set_index(["benchmark", "year"], verify_integrity=True)
 
