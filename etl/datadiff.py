@@ -1,6 +1,7 @@
 import difflib
 import os
 import re
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from typing import Any, Callable, Dict, Iterable, List, Optional, cast
 
@@ -17,6 +18,7 @@ from rich.panel import Panel
 from rich.syntax import Syntax
 
 from etl.files import yaml_dump
+from etl.steps import load_dag
 from etl.tempcompare import series_equals
 
 log = structlog.get_logger()
@@ -318,6 +320,11 @@ def cli(
     path_to_ds_a = _load_catalog_datasets(path_a, channel, include, exclude)
     path_to_ds_b = _load_catalog_datasets(path_b, channel, include, exclude)
 
+    # only keep datasets in DAG
+    dag_steps = {s.split("://")[1] for s in load_dag().keys()}
+    path_to_ds_a = {k: v for k, v in path_to_ds_a.items() if k in dag_steps}
+    path_to_ds_b = {k: v for k, v in path_to_ds_b.items() if k in dag_steps}
+
     any_diff = False
     any_error = False
 
@@ -425,7 +432,11 @@ def _data_diff(
             lines.append(f"- {dim}: {detail}")
 
     # changes in values
-    if table_a[col].dtype in ("category", "object", "string") or _is_datetime(table_a[col].dtype):
+    if (
+        table_a[col].dtype in ("category", "object", "string")
+        or table_b[col].dtype in ("category", "object", "string")
+        or _is_datetime(table_a[col].dtype)
+    ):
         vals_a = set(table_a.loc[~eq, col].dropna().astype(str))
         vals_b = set(table_b.loc[~eq, col].dropna().astype(str))
         if vals_a - vals_b:
@@ -583,6 +594,18 @@ def _local_catalog_datasets(
     return mapping
 
 
+def _fetch_remote_dataset(path: str, frame: pd.DataFrame) -> RemoteDataset:
+    uri = f"{OWID_CATALOG_URI}{path}/index.json"
+    js = requests.get(uri).json()
+    # drop origins for backward compatibility
+    js.pop("origins", None)
+    ds_meta = DatasetMeta(**js)
+    # TODO: channel should be in DatasetMeta by default
+    ds_meta.channel = path.split("/")[0]  # type: ignore
+    table_names = frame.loc[frame["ds_paths"] == path, "table"].tolist()
+    return RemoteDataset(ds_meta, table_names)
+
+
 def _remote_catalog_datasets(channels: Iterable[CHANNEL], include: str, exclude: Optional[str]) -> Dict[str, Dataset]:
     """Return a mapping from dataset path to Dataset object of remote catalog."""
     rc = RemoteCatalog(channels=channels)
@@ -606,19 +629,15 @@ def _remote_catalog_datasets(channels: Iterable[CHANNEL], include: str, exclude:
     if len(ds_paths) >= 10:
         log.warning(f"Fetching {len(ds_paths)} datasets from the remote catalog, this may get slow...")
 
-    mapping = {}
-    for path in ds_paths:
-        uri = f"{OWID_CATALOG_URI}{path}/index.json"
-        js = requests.get(uri).json()
-        # drop origins for backward compatibility
-        js.pop("origins", None)
-        ds_meta = DatasetMeta(**js)
-        # TODO: channel should be in DatasetMeta by default
-        ds_meta.channel = path.split("/")[0]  # type: ignore
-        table_names = frame.loc[frame["ds_paths"] == path, "table"].tolist()
-        mapping[path] = RemoteDataset(ds_meta, table_names)
+    with ThreadPoolExecutor(max_workers=20) as executor:
+        results = executor.map(
+            lambda path: _fetch_remote_dataset(path, frame),
+            ds_paths,
+        )
 
-    return mapping
+    mapping = {path: result for path, result in zip(ds_paths, results)}
+
+    return mapping  # type: ignore
 
 
 def dataset_uri(ds: Dataset) -> str:
