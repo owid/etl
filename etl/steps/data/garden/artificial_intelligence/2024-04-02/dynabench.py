@@ -27,17 +27,17 @@ def run(dest_dir: str) -> None:
 
     mapping = {
         "MNIST": "Handwriting recognition",
-        "GLUE": "Broad language understanding",
-        "ImageNet": "Image classification",
-        "SQuAD 1.1": "Text-based question answering",
-        "SQuAD 2.0": "Reading comprehension",
-        "BBH": "Creative reasoning and problem solving",
-        "Switchboard": "Conversational language processing",
-        "MMLU": "Language based knowledge tests",
-        "HellaSwag": "Contextual reasoning and prediction",
-        "HumanEval": "Programming and code generation",
+        "Switchboard": "Speech recognition",
+        "ImageNet": "Image recognition",
+        "BBH": "Complex reasoning",
+        "GLUE": "Language understanding",
+        "SQuAD 1.1": "Reading comprehension",
+        "SQuAD 2.0": "Reading comprehension with unanswerable questions",
+        "MMLU": "General knowledge tests",
+        "HellaSwag": "Predictive reasoning",
+        "HumanEval": "Code generation",
         "SuperGLUE": "Nuanced language interpretation",
-        "GSK8k": "Mathematical reasoning and logic",
+        "GSM8K": "Math problem-solving",
     }
     tb["assessment_domain"] = tb["benchmark"].map(mapping)
 
