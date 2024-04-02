@@ -32,8 +32,8 @@ tables:
   dynabench:
     variables:
       performance:
-        title: AI test scores relative to human benchmark
-        description_short: Test scores of AI relative to human performance. Human performance, as the benchmark, is set to zero. The capability of each AI system is normalized to an initial performance of -1.
+        title: Test scores of the AI relative to human performance
+        description_short: Human performance, as the benchmark, is set to zero. The capability of each AI system is normalized to an initial performance of -1.
 
       assessment_domain:
         title: Assessment domain
