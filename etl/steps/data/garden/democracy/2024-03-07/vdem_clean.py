@@ -8,13 +8,9 @@ import numpy as np
 from owid.catalog import Table
 
 from etl.data_helpers import geo
-from etl.helpers import PathFinder
-
-# Get paths and naming conventions for current step.
-paths = PathFinder(__file__)
 
 
-def run(tb: Table) -> Table:
+def run(tb: Table, country_mapping_path) -> Table:
     tb = cast(Table, tb)
     tb = initial_cleaning(tb)
 
@@ -22,7 +18,7 @@ def run(tb: Table) -> Table:
     tb = clean_female_flag(tb)
 
     # Harmonize country names
-    tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
+    tb = geo.harmonize_countries(df=tb, countries_file=country_mapping_path)
 
     # Sort
     tb = tb.sort_values(["country", "year"])

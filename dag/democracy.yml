@@ -16,9 +16,5 @@ steps:
     - data://meadow/democracy/2024-03-07/vdem
     - data://garden/regions/2023-01-01/regions
     - data://garden/demography/2023-03-31/population
-  data://garden/democracy/2024-03-08/vdem:
-    - data://garden/democracy/2024-03-07/vdem
-    - data://garden/regions/2023-01-01/regions
-    - data://garden/demography/2023-03-31/population
   data://grapher/democracy/2024-03-07/vdem:
     - data://garden/democracy/2024-03-07/vdem

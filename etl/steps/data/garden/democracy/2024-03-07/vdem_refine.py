@@ -1,3 +1,5 @@
+from typing import cast
+
 import numpy as np
 import pandas as pd
 from owid.catalog import Table, Variable
@@ -7,6 +9,16 @@ def run(tb: Table) -> Table:
     tb = add_years_in_democracy(tb)
     tb = add_categories_years_in_democracy(tb)
     tb = add_categories_women_in_parliament(tb)
+    # Ensure int types
+    tb_ = tb.astype(
+        {
+            "regime_row_owid": "Int64",
+            "regime_amb_row_owid": "Int64",
+            "wom_hoe_vdem": "Int64",
+        }
+    )
+
+    tb_ = cast(Table, tb_)
     return tb
 
 
@@ -63,11 +75,11 @@ def add_categories_years_in_democracy(tb: Table) -> Table:
         np.inf,
     ]
     labels = [
-        "1-18",
-        "19-30",
-        "31-60",
-        "61-90",
-        "91+",
+        "1-18 years",
+        "19-30 years",
+        "31-60 years",
+        "61-90 years",
+        "91+ years",
     ]
     # 1. Create variable for age group of electoral demcoracies:
     column = "num_years_in_electdem"
@@ -100,6 +112,7 @@ def add_categories_years_in_democracy(tb: Table) -> Table:
 def add_categories_women_in_parliament(tb: Table) -> Table:
     """Add categorical variable on the percentage of women in parliament."""
     bins = [
+        -np.inf,
         0,
         10,
         20,
@@ -109,6 +122,7 @@ def add_categories_women_in_parliament(tb: Table) -> Table:
         np.inf,
     ]
     labels = [
+        "0% women",
         "0-10% women",
         "10-20% women",
         "20-30% women",

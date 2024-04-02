@@ -12,9 +12,12 @@ def run(dest_dir: str) -> None:
     #
     # Load garden dataset.
     ds_garden = paths.load_dataset("vdem")
+    ds_garden2 = paths.load_dataset("vdem_2")
 
     # Read table from garden dataset.
     tb = ds_garden["vdem"]
+    # tb_num_countries = ds_garden2["vdem_num_countries"]
+    # tb_population = ds_garden2["vdem_population"]
 
     #
     # Process data.
@@ -34,8 +37,13 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new grapher dataset with the same metadata as the garden dataset.
+    tables = [
+        tb,
+        # tb_num_countries,
+        # tb_population,
+    ]
     ds_grapher = create_dataset(
-        dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=ds_garden.metadata
+        dest_dir, tables=tables, check_variables_metadata=True, default_metadata=ds_garden.metadata
     )
 
     # Save changes in the new grapher dataset.

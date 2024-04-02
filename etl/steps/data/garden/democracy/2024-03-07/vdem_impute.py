@@ -9,7 +9,7 @@ from etl.helpers import PathFinder
 paths = PathFinder(__file__)
 
 # IMPUTE: We will infer indicator values for some countries based on their historical equivalences.
-path = paths.directory / "countries_impute.yml"
+path = paths.directory / "vdem.countries_impute.yml"
 COUNTRIES_IMPUTE = yaml.safe_load(path.read_text())
 
 # Expected overlaps
