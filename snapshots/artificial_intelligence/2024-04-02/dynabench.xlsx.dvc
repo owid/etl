@@ -1,0 +1,39 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: "Dynabench: Rethinking Benchmarking in NLP"
+    description: |-
+      This dataset captures the progression of AI evaluation benchmarks, reflecting their adaptation to the rapid advancements in AI technology. The benchmarks cover a wide range of tasks, from language understanding to image processing, and are designed to test AI models' capabilities in various domains. The dataset includes performance metrics for each benchmark, providing insights into AI models' proficiency in different areas of machine learning research.
+
+        - BBH (BIG-Bench Hard): This benchmark serves as a rigorous evaluation framework for advanced language models, targeting their capacity for complex reasoning and problem-solving. It identifies tasks where AI models traditionally underperform compared to human benchmarks, emphasizing the enhancement of AI reasoning through innovative prompting methods like Chain-of-Thought.
+        - GLUE (General Language Understanding Evaluation): GLUE is a comprehensive benchmark suite designed to assess the breadth of an AI model's language understanding capabilities across a variety of tasks, including sentiment analysis, textual entailment, and question answering. It aims to advance the field towards more generalized models of language comprehension.
+        - GSM8K: This dataset challenges AI models with a collection of grade-level math word problems, designed to test computational and reasoning abilities. By requiring models to perform a sequence of arithmetic operations, GSM8K evaluates the AI's capacity for engaging in multi-step mathematical problem-solving.
+        - HellaSwag: HellaSwag assesses AI models on their ability to predict the continuation of scenarios, demanding a nuanced understanding of context and narrative. This benchmark pushes the boundaries of predictive modeling and contextual comprehension within AI systems.
+        - HumanEval: Targeting the intersection of AI and software development, HumanEval presents programming challenges to evaluate the code generation capabilities of AI models. This benchmark tests models' understanding of coding logic and their ability to produce functional code solutions.
+        - ImageNet: A cornerstone in the field of computer vision, ImageNet provides a large-scale dataset for object recognition and classification tasks. It benchmarks the ability of AI models to accurately identify and categorize images, serving as a foundational tool for visual AI research.
+        - MMLU (Massive Multitask Language Understanding): MMLU offers a diverse set of language understanding challenges, testing AI models across a broad spectrum of domains and task types. It aims to evaluate and promote the development of AI systems with comprehensive and adaptable language capabilities.
+        - MNIST: As a fundamental benchmark in image processing and computer vision, MNIST tests AI models on their ability to recognize handwritten digits. This dataset is pivotal in assessing the basic perceptual and pattern recognition capabilities of AI systems.
+        - SQuAD 1.1 and 2.0 (Stanford Question Answering Dataset): These benchmarks evaluate the reading comprehension abilities of AI models, requiring them to extract or infer answers from textual passages. SQuAD 2.0 further introduces the challenge of discerning unanswerable questions, adding a layer of complexity in judgment and inference.
+        - SuperGLUE: An extension of GLUE, SuperGLUE presents a set of more demanding language understanding tasks, designed to test the limits of AI models' reasoning, comprehension, and inference capabilities. It serves as a metric for cutting-edge advancements in natural language processing.
+        - Switchboard: This benchmark focuses on the processing and understanding of conversational speech, testing AI models on their ability to navigate the complexities of human dialogue. It highlights the challenges in speech recognition and natural language understanding within spontaneous communication.
+    date_published: "2023"
+
+    # Citation
+    producer: Kiela et al.
+    citation_full: |-
+      Kiela, D., Thrush, T., Ethayarajh, K., & Singh, A. (2023) 'Plotting Progress in AI', Contextual AI Blog. Available at: https://contextual.ai/blog/plotting-progress (Accessed: 02 April 2024).
+
+    # Files
+    url_main: https://contextual.ai/plotting-progress-in-ai/#contact
+    date_accessed: 2024-04-02
+
+    # License
+    license:
+      name: © 2024 Contextual AI
+
+outs:
+  - md5: 9ebb4c2ff159700565010d5a299d04b3
+    size: 11432
+    path: dynabench.xlsx
