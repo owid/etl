@@ -89,7 +89,10 @@ def expand_observations(tb: Table) -> Table:
 
 
 def add_population_in_dummies(
-    tb: Table, ds_population: Dataset, expected_countries_without_population: Optional[List[str]] = None
+    tb: Table,
+    ds_population: Dataset,
+    expected_countries_without_population: Optional[List[str]] = None,
+    drop_population: bool = True,
 ):
     # Add population column
     tb = geo.add_population_to_table(
@@ -104,7 +107,8 @@ def add_population_in_dummies(
     meta = {col: tb[col].metadata for col in cols} | {"population": tb["population"].metadata}
     ## Encode population in indicators: Population if 1, 0 otherwise
     tb[cols] = tb[cols].multiply(tb["population"], axis=0)
-    tb = tb.drop(columns="population")
+    if drop_population:
+        tb = tb.drop(columns="population")
     ## Add metadata back (combine origins from population)
     for col in cols:
         metadata = meta[col]

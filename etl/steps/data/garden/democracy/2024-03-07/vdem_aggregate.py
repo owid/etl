@@ -311,14 +311,21 @@ def make_table_population_avg(tb: Table, ds_regions: Dataset, ds_population: Dat
             "Democratic Republic of Vietnam",
             "Republic of Vietnam",
         ],
+        drop_population=False,
     )
 
     # Get region aggregates
     tb_ = add_regions_and_global_aggregates(
         tb=tb_,
         ds_regions=ds_regions,
-        aggregations={k: "mean" for k in INDICATORS_REGION_AVERAGES},  # type: ignore
+        aggregations={k: "sum" for k in INDICATORS_REGION_AVERAGES} | {"population": "sum"},  # type: ignore
     )
+
+    # Normalize by region's populatino
+    columns_index = ["year", "country"]
+    columns_indicators = [col for col in tb_.columns if col not in columns_index + ["population"]]
+    tb_[columns_indicators] = tb_[columns_indicators].div(tb_["population"], axis=0)
+    tb_ = tb_.drop(columns="population")
 
     # Rename columns
     # tb_ = tb_.rename(columns={col: f"popw_{col}" for col in INDICATORS_REGION_AVERAGES})
