@@ -1,6 +1,5 @@
 """Load a meadow dataset and create a garden dataset."""
 
-from copy import deepcopy
 from typing import cast
 
 import vdem_aggregate as aggregate  # VDEM's aggregating library
