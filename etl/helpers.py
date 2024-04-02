@@ -101,14 +101,6 @@ def grapher_checks(ds: catalog.Dataset, warn_title_public: bool = True) -> None:
             _validate_description_key(tab[col].m.description_key, col)
             _validate_ordinal_variables(tab, col)
 
-            # Validate ordinal variables
-            if tab[col].m.sort:
-                assert tab[col].m.type == "ordinal", f"Column `{col}` has a sort but is not of type ordinal"
-                extra_values = set(tab[col]) - set(tab[col].m.sort)
-                assert (
-                    not extra_values
-                ), f"Ordinal variable `{col}` has extra values that are not defined in field `sort`: {extra_values}"
-
             # Data Page title uses the following fallback
             # [title_public > grapher_config.title > display.name > title] - [attribution_short] - [title_variant]
             # the Table tab
