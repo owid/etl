@@ -262,3 +262,12 @@ steps:
     - data://meadow/artificial_intelligence/2024-03-22/papers_with_code_math
   data://grapher/artificial_intelligence/2024-03-22/papers_with_code_math:
     - data://garden/artificial_intelligence/2024-03-22/papers_with_code_math
+
+
+  # Dataset on AI performance across different benchmarks from Dynabench
+  data://meadow/artificial_intelligence/2024-04-02/dynabench:
+    - snapshot://artificial_intelligence/2024-04-02/dynabench.xlsx
+  data://garden/artificial_intelligence/2024-04-02/dynabench:
+    - data://meadow/artificial_intelligence/2024-04-02/dynabench
+  data://grapher/artificial_intelligence/2024-04-02/dynabench:
+    - data://garden/artificial_intelligence/2024-04-02/dynabench

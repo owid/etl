@@ -1,0 +1,39 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: "Dynabench: Rethinking Benchmarking in NLP"
+    description: |-
+      This dataset captures the progression of AI evaluation benchmarks, reflecting their adaptation to the rapid advancements in AI technology. The benchmarks cover a wide range of tasks, from language understanding to image processing, and are designed to test AI models' capabilities in various domains. The dataset includes performance metrics for each benchmark, providing insights into AI models' proficiency in different areas of machine learning research.
+
+      - MMLU (Massive Multitask Language Understanding): Tests AI's understanding across multiple disciplines, with metrics for knowledge comprehension and application.
+      - BBH (BigBench Hard): Focuses on highly challenging tasks, evaluating models on creativity and complex reasoning. Metrics indicate capability in difficult scenarios.
+      - GSM8K: A dataset of 8.5K diverse grade school math problems for multi-step mathematical reasoning, with performance measured by accuracy in solving problems through basic arithmetic.
+      - HellaSwag: Benchmarks common sense reasoning and text completion, with metrics evaluating logical understanding and scenario reasoning.
+      - HumanEval: Targets code generation skills, measuring the correctness and efficiency of solutions to programming problems.
+      - SuperGLUE: An advanced language understanding benchmark, with metrics assessing accuracy and understanding in nuanced text interpretation.
+      - MNIST: A database of handwritten digits for image processing, using accuracy in digit identification as its metric.
+      - GLUE (General Language Understanding Evaluation): Assesses general language understanding, with metrics across tasks like sentiment analysis, providing a broad view of language capabilities.
+      - ImageNet: A large visual database for object recognition, measuring precision in classifying and detecting images.
+      - SQuAD 1.1 (Stanford Question Answering Dataset): Challenges models to answer text-based questions, with accuracy and precision metrics for the provided answers.
+      - Switchboard: Evaluates speech recognition and natural language processing, with metrics for transcription accuracy and conversational language understanding.
+    date_published: "2023"
+
+    # Citation
+    producer: Kiela et al. 2023
+    citation_full: |-
+      Kiela, D., Thrush, T., Ethayarajh, K., & Singh, A. (2023) 'Plotting Progress in AI', Contextual AI Blog. Available at: https://contextual.ai/blog/plotting-progress (Accessed: 02 April 2024).
+
+    # Files
+    url_main: https://contextual.ai/plotting-progress-in-ai/#contact
+    date_accessed: 2024-04-02
+
+    # License
+    license:
+      name: © 2024 Contextual AI
+
+outs:
+  - md5: 9ebb4c2ff159700565010d5a299d04b3
+    size: 11432
+    path: dynabench.xlsx
