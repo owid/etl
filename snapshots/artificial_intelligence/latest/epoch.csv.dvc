@@ -4,7 +4,7 @@ meta:
   origin:
     # Data product / Snapshot
     title: Parameter, Compute and Data Trends in Machine Learning
-    date_published: 2024-03-04
+    date_published: 2024-04-03
     description_snapshot: |
       We update this chart with the latest available data from our source every month.
 
@@ -26,11 +26,11 @@ meta:
     # Files
     url_main: https://epochai.org/mlinputs/visualization
     url_download: https://epochai.org/data/epochdb/all_systems.csv
-    date_accessed: 2024-03-04
+    date_accessed: 2024-04-03
     # License
     license:
       name: Public domain
 outs:
-  - md5: 911ec92d34ab6d707703ef7009109bb7
-    size: 1633550
+  - md5: af44b116d7107981041c14c750a266a9
+    size: 1833003
     path: epoch.csv

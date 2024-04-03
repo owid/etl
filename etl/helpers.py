@@ -99,6 +99,7 @@ def grapher_checks(ds: catalog.Dataset, warn_title_public: bool = True) -> None:
             ), f"Column `{col}` must have either sources or origins"
 
             _validate_description_key(tab[col].m.description_key, col)
+            _validate_ordinal_variables(tab, col)
 
             # Data Page title uses the following fallback
             # [title_public > grapher_config.title > display.name > title] - [attribution_short] - [title_variant]
@@ -123,6 +124,14 @@ def _validate_description_key(description_key: list[str], col: str) -> None:
         assert not all(
             len(x) == 1 for x in description_key
         ), f"Column `{col}` uses string {description_key} as description_key, should be list of strings."
+
+
+def _validate_ordinal_variables(tab: Table, col: str) -> None:
+    if tab[col].m.sort:
+        extra_values = set(tab[col]) - set(tab[col].m.sort)
+        assert (
+            not extra_values
+        ), f"Ordinal variable `{col}` has extra values that are not defined in field `sort`: {extra_values}"
 
 
 def create_dataset(

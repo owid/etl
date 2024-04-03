@@ -495,3 +495,12 @@ steps:
     - data://meadow/who/2024-03-24/self_inflicted_injuries
   data://grapher/who/2024-03-24/self_inflicted_injuries:
     - data://garden/who/2024-03-24/self_inflicted_injuries
+
+  # Global data on organ donation and transplantation
+  data://meadow/health/2024-04-02/organ_donation_and_transplantation:
+    - snapshot://health/2024-04-02/organ_donation_and_transplantation.xlsx
+  data://garden/health/2024-04-02/organ_donation_and_transplantation:
+    - data://meadow/health/2024-04-02/organ_donation_and_transplantation
+    - data://garden/demography/2023-03-31/population
+  data://grapher/health/2024-04-02/organ_donation_and_transplantation:
+    - data://garden/health/2024-04-02/organ_donation_and_transplantation
