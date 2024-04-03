@@ -167,7 +167,9 @@ def get_variables_in_dataset(
 
 
 def _get_variables_data_with_filter(
-    field_name: str, field_values: List[Any], db_conn: Optional[MySQLdb.Connection] = None
+    field_name: Optional[str] = None,
+    field_values: Optional[List[Any]] = None,
+    db_conn: Optional[MySQLdb.Connection] = None,
 ) -> Any:
     if db_conn is None:
         db_conn = get_connection()
@@ -178,7 +180,7 @@ def _get_variables_data_with_filter(
     # Construct the SQL query with a placeholder for each value in the list.
     query = "SELECT * FROM variables"
 
-    if len(field_values) > 0:
+    if (field_name is not None) and (len(field_values) > 0):
         query += f"\nWHERE {field_name} IN ({', '.join(['%s'] * len(field_values))});"
 
     # Execute the query.
