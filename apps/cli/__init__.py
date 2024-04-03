@@ -162,6 +162,7 @@ GROUPS = (
                 "graphviz": "etl.to_graphviz.to_graphviz",
                 "compare": "etl.compare.cli",
                 "update": "apps.step_update.cli.cli",
+                "explorer-update": "apps.explorer_update.cli.cli",
             },
         },
         {
@@ -181,7 +182,7 @@ GROUPS = (
             },
         },
     ]
-    # Add subroups (don't moddify)
+    # Add subgroups (don't modify)
     + subgroups
     # Others (not so relevant, maybe deprecated one day...)
     + [

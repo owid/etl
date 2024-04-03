@@ -233,7 +233,3 @@ def cli(
 
         # Update variable ids in the explorer file.
         update_explorer(explorer_file=explorer_file, dry_run=dry_run)
-
-
-if __name__ == "__main__":
-    cli()
