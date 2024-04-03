@@ -64,6 +64,9 @@ def run(dest_dir: str) -> None:
     # Reset the index
     merged_df.reset_index(drop=True, inplace=True)
 
+    # Deterministic sorting
+    merged_df = merged_df.sort_values("options")
+
     # Create a new table and ensure all columns are snake-case.
     tb = Table(merged_df, short_name=paths.short_name, underscore=True)
 
