@@ -1,10 +1,10 @@
-import re
 from pathlib import Path
 from typing import List, Optional, Union
 
 import click
 from rich_click.rich_command import RichCommand
 from structlog import get_logger
+from tqdm.auto import tqdm
 
 from etl.db import get_variables_data
 from etl.paths import BASE_DIR
@@ -18,7 +18,7 @@ EXPLORERS_DIR = BASE_DIR.parent / "owid-content/explorers"
 
 
 def extract_variable_ids_from_explorer_content(explorer: str) -> List[int]:
-    variable_ids_all = ""
+    variable_ids_all = []
     for line in explorer.split("\n"):
         # Select the lines that correspond to subtables.
         if line.startswith("\t"):
@@ -27,31 +27,25 @@ def extract_variable_ids_from_explorer_content(explorer: str) -> List[int]:
                 continue
             else:
                 # Assume the first column contains variable ids (one or more), separated by tabs.
-                variable_ids_all += line.split("\t")[1]
+                variable_ids_all.append(line.lstrip().split("\t")[0])
 
     # Extract all substrings of digits that should be variable ids.
-    variable_ids = sorted(set([int(variable_id) for variable_id in re.findall(r"\d{5,6}", variable_ids_all)]))
+    variable_ids = sorted(
+        set(
+            [
+                int(variable_id)
+                for line in variable_ids_all
+                for variable_id in line.split()
+                if variable_id.isdigit() and len(variable_id) >= 5
+            ]
+        )
+    )
 
     return variable_ids
 
 
-@click.command(name="explorer-update", cls=RichCommand, help=__doc__)
-# @click.argument("explorer_name", type=str or List[str], nargs=-1)
-@click.argument("explorer_name", type=str)
-@click.option(
-    "--explorers-dir", type=str, default=EXPLORERS_DIR, help=f"Path to explorer files. Default: {EXPLORERS_DIR}"
-)
-def cli(explorer_name: str, explorers_dir: Optional[Union[Path, str]] = None) -> None:
-    """Update variable ids in indicator-based explorer files."""
-
-    if explorers_dir is None:
-        # If explorer folder is not provided, assume owid-content is in the same folder as ETL.
-        explorers_dir = EXPLORERS_DIR
-    elif isinstance(explorers_dir, str):
-        explorers_dir = Path(explorers_dir)
-
-    # Define path to explorer file.
-    explorer_file = (explorers_dir / explorer_name).with_suffix(".explorer.tsv")
+def update_explorer(explorer_file: Path, dry_run: bool = False) -> None:
+    """Update variable ids in a single indicator-based explorer."""
 
     if not explorer_file.is_file():
         raise FileNotFoundError(f"Explorer file not found: {explorer_file}")
@@ -61,8 +55,10 @@ def cli(explorer_name: str, explorers_dir: Optional[Union[Path, str]] = None) ->
         explorer = f.read()
 
     if "yVariableIds" not in explorer:
-        log.info("This may not be an indicator-based explorer ('yVariableIds' not found).")
+        # log.info("This may not be an indicator-based explorer ('yVariableIds' not found).")
         return None
+    else:
+        log.info(f"Updating indicator-based explorer: {explorer_file.stem}")
 
     # Extract all possible variable ids from the explorer file.
     variable_ids = extract_variable_ids_from_explorer_content(explorer=explorer)
@@ -78,7 +74,11 @@ def cli(explorer_name: str, explorers_dir: Optional[Union[Path, str]] = None) ->
     variables_wihout_path = set(variable_data[variable_data["catalogPath"].isnull()]["id"])
     if len(variables_wihout_path) > 0:
         log.warning(f"Variable ids without catalogPath: {variables_wihout_path}\nThey may need to be updated manually.")
-        variable_data = variable_data[variable_data["catalogPath"].isnull()].reset_index(drop=True)
+        variable_data = variable_data[variable_data["catalogPath"].notnull()].reset_index(drop=True)
+
+    if len(variable_data) == 0:
+        log.info("No variable ids can be automatically updated.")
+        return None
 
     # Select relevant columns.
     variables_df = variable_data[["id", "catalogPath", "name"]].copy()
@@ -99,9 +99,17 @@ def cli(explorer_name: str, explorers_dir: Optional[Union[Path, str]] = None) ->
     # For now, assume all steps are public, hence using the prefix "data://".
     missing_steps = set(variables_df["step"]) - set(steps_df["step"])
     if len(missing_steps) > 0:
-        log.warning(
-            f"Steps not found in ETL: {missing_steps}\nTry using prefix 'data-private://' instead of 'data://'."
-        )
+        private_steps = [
+            step for step in missing_steps if step.replace("data://", "data-private://") in set(variables_df["step"])
+        ]
+        other_missing_steps = missing_steps - set(private_steps)
+        if len(private_steps) > 0:
+            log.warning(
+                f"Unexpected private steps found in explorer: {private_steps}\nUnclear if this should be allowed."
+            )
+        if len(other_missing_steps) > 0:
+            log.warning(f"Steps not found in ETL: {missing_steps}\nThey may have been accidentally archived.")
+        variables_df = variables_df[~variables_df["step"].isin(missing_steps)].reset_index(drop=True)
 
     # Combine variable data with steps data.
     variables_df = variables_df.merge(steps_df[["step", "same_steps_latest", "version"]], on="step", how="left")
@@ -176,20 +184,55 @@ def cli(explorer_name: str, explorers_dir: Optional[Union[Path, str]] = None) ->
             message += "  Name change:\n"
             message += f"  {row['name']} ->\n  {row['name_new']}\n"
     log.info(message)
-    input("Press Enter to rewrite the explorer file.")
 
-    # Write to explorer file, to replace old variable ids with new ones.
-    with open(explorer_file, "w") as f:
-        f.write(explorer_new)
+    if not dry_run:
+        # Write to explorer file, to replace old variable ids with new ones.
+        with open(explorer_file, "w") as f:
+            f.write(explorer_new)
 
 
-# # Apply the function to all explorer files.
-# explorers_dir = EXPLORERS_DIR
+@click.command(name="explorer-update", cls=RichCommand, help=__doc__)
+@click.argument("explorer_names", type=str or List[str], nargs=-1)
+@click.option(
+    "--explorers-dir", type=str, default=EXPLORERS_DIR, help=f"Path to explorer files. Default: {EXPLORERS_DIR}"
+)
+@click.option(
+    "--dry-run",
+    is_flag=True,
+    default=False,
+    type=bool,
+    help="Do not write to explorer files, simply print potential changes. Default: False.",
+)
+def cli(
+    explorer_names: Optional[Union[List[str], str]] = None,
+    explorers_dir: Optional[Union[Path, str]] = None,
+    dry_run: bool = False,
+) -> None:
+    """Update variable ids in one or more indicator-based explorers."""
 
-# for explorer_file in list(explorers_dir.glob("*.tsv")):
-#     explorer_name = explorer_file.stem
-#     print(explorer_name)
-#     cli(explorer_name, explorers_dir=explorers_dir)
+    if explorers_dir is None:
+        # If explorer folder is not provided, assume owid-content is in the same folder as ETL.
+        explorers_dir = EXPLORERS_DIR
+    elif isinstance(explorers_dir, str):
+        # Ensure explorer folder is a Path object.
+        explorers_dir = Path(explorers_dir)
+
+    if not explorers_dir.is_dir():
+        raise NotADirectoryError(f"Explorer directory not found: {explorers_dir}")
+
+    if explorer_names is None:
+        # If no explorer name is provided, update all explorers in the folder.
+        explorer_names = [explorer_file.stem for explorer_file in sorted(explorers_dir.glob("*.tsv"))]
+    if isinstance(explorer_names, str):
+        # If only one explorer name is provided, convert it into a list.
+        explorer_names = [explorer_names]
+
+    for explorer_name in tqdm(explorer_names):
+        # Define path to explorer file.
+        explorer_file = (explorers_dir / explorer_name).with_suffix(".explorer.tsv")
+
+        # Update variable ids in the explorer file.
+        update_explorer(explorer_file=explorer_file, dry_run=dry_run)
 
 
 if __name__ == "__main__":
