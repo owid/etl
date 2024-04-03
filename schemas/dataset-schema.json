@@ -1667,6 +1667,7 @@
                 },
                 "sort": {
                   "title": "Ordered categorical values for ordinal type",
+                  "description": "",
                   "type": "array",
                   "items": {
                     "type": "string"
