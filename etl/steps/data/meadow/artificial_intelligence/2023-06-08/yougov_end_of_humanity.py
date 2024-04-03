@@ -61,11 +61,11 @@ def run(dest_dir: str) -> None:
     merged_df = pd.merge(merged_df, df_q3, on="options", how="outer")
     merged_df = pd.merge(merged_df, df_q3_age, on="options", how="outer")
 
-    # Reset the index
-    merged_df.reset_index(drop=True, inplace=True)
-
     # Deterministic sorting
     merged_df = merged_df.sort_values("options")
+
+    # Reset the index
+    merged_df.reset_index(drop=True, inplace=True)
 
     # Create a new table and ensure all columns are snake-case.
     tb = Table(merged_df, short_name=paths.short_name, underscore=True)
