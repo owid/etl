@@ -55,7 +55,7 @@ def update_explorer(explorer_file: Path, dry_run: bool = False) -> None:
         explorer = f.read()
 
     if "yVariableIds" not in explorer:
-        # log.info("This may not be an indicator-based explorer ('yVariableIds' not found).")
+        log.info("Nothing to update (not an indicator-based explorer).")
         return None
     else:
         log.info(f"Updating indicator-based explorer: {explorer_file.stem}")
@@ -100,7 +100,7 @@ def update_explorer(explorer_file: Path, dry_run: bool = False) -> None:
     missing_steps = set(variables_df["step"]) - set(steps_df["step"])
     if len(missing_steps) > 0:
         private_steps = [
-            step for step in missing_steps if step.replace("data://", "data-private://") in set(variables_df["step"])
+            step for step in missing_steps if step.replace("data://", "data-private://") in set(steps_df["step"])
         ]
         other_missing_steps = missing_steps - set(private_steps)
         if len(private_steps) > 0:
@@ -175,8 +175,8 @@ def update_explorer(explorer_file: Path, dry_run: bool = False) -> None:
     if len(old_variables_remaining) > 0:
         log.warning(f"Old variable ids cannot be replaced in the new explorer content: {old_variables_remaining}")
 
-    message = "Variables to be replaced in explorer file (showing ids, versions and names):\n"
-    for i, row in combined.iterrows():
+    message = "Variable ids (and their ETL version) to be replaced in explorer file:\n"
+    for _, row in combined.iterrows():
         assert int(row["id_new"]) > int(row["id"]), "New variable id should be greater than old variable id."
         assert row["version_new"] > row["version"], "New version should be greater than old version."
         message += f"{row['id']} ({row['version']}) -> {row['id_new']} ({row['version_new']})\n"
@@ -192,7 +192,7 @@ def update_explorer(explorer_file: Path, dry_run: bool = False) -> None:
 
 
 @click.command(name="explorer-update", cls=RichCommand, help=__doc__)
-@click.argument("explorer_names", type=str or List[str], nargs=-1)
+@click.argument("explorer-names", type=str or List[str], nargs=-1)
 @click.option(
     "--explorers-dir", type=str, default=EXPLORERS_DIR, help=f"Path to explorer files. Default: {EXPLORERS_DIR}"
 )
@@ -205,22 +205,19 @@ def update_explorer(explorer_file: Path, dry_run: bool = False) -> None:
 )
 def cli(
     explorer_names: Optional[Union[List[str], str]] = None,
-    explorers_dir: Optional[Union[Path, str]] = None,
+    explorers_dir: Union[Path, str] = EXPLORERS_DIR,
     dry_run: bool = False,
 ) -> None:
     """Update variable ids in one or more indicator-based explorers."""
 
-    if explorers_dir is None:
-        # If explorer folder is not provided, assume owid-content is in the same folder as ETL.
-        explorers_dir = EXPLORERS_DIR
-    elif isinstance(explorers_dir, str):
+    if isinstance(explorers_dir, str):
         # Ensure explorer folder is a Path object.
         explorers_dir = Path(explorers_dir)
 
     if not explorers_dir.is_dir():
         raise NotADirectoryError(f"Explorer directory not found: {explorers_dir}")
 
-    if explorer_names is None:
+    if explorer_names is None or len(explorer_names) == 0:
         # If no explorer name is provided, update all explorers in the folder.
         explorer_names = [explorer_file.stem for explorer_file in sorted(explorers_dir.glob("*.tsv"))]
     if isinstance(explorer_names, str):
