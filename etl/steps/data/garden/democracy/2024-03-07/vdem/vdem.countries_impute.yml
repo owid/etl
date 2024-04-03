@@ -93,6 +93,20 @@
   annotation: |-
     1789-1824: Imperial power Spain 16th century - 1823 (Wimmer and Min 2006), independence in 1825 (Butcher and Griffiths 2020); I favor no imputation.
 
+# BOSNIA
+- country: Bosnia and Herzegovina
+  country_impute: Turkey
+  year_min: 1789
+  year_max: 1878
+  annotation: |-
+    Imperial power Turkey 15th century-1878.
+- country: Bosnia and Herzegovina
+  country_impute: Serbia
+  year_min: 1919
+  year_max: 1991
+  annotation: |-
+    Austria-Hungary 1879-1917, Yugoslavia 1918-1990 (Wimmer and Min 2006); occupied by Austria-Hungary since at least 1886-1908, part of Austria-Hungary 1909-1918, part of Yugoslavia 1919-1992 (Cshapes 2.0); Austrian-Hungary occupation while formally still part of Ottoman Empire, not more associated with either Austria or Hungary (Encyclopedia Britannica); I therefore favor no imputation for 1909-1918.
+
 # BULGARIA (1789-1877)
 - country: Bulgaria
   country_impute: Turkey
@@ -395,10 +409,11 @@
 # PAKISTAN (1789-1946)
 - country: Pakistan
   country_impute: India
-  year_min: 1947
-  year_max: 1970
+  year_min: 1839
+  year_max: 1946
   annotation: |-
-    1947-1970 1839-1946 imperial power United Kingdom (Wimmer and Min 2006), 1886-1947 part of colony India (Cshapes 2.0), colonized in 1849 (Ertan et al. 2016)
+    1839-1946 imperial power United Kingdom (Wimmer and Min 2006), 1886-1947 part of colony India (Cshapes 2.0), colonized in 1849 (Ertan et al. 2016).
+
 
 # PAPUA NEW GUINEA (1789-1899)
 - country: Papua New Guinea
