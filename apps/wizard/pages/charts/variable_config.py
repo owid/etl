@@ -274,7 +274,7 @@ def ask_and_get_variable_mapping(search_form) -> "VariableConfig":
                 if search_form.enable_explore_mode:
                     ## Explore mode checkbox
                     element_check = grid_variables_manual.toggle(
-                        "Explore", key=f"auto-explore-{i}", label_visibility="collapsed"
+                        "Explore", key=f"manual-explore-{i}", label_visibility="collapsed"
                     )
                     ## Explore mode plot
                     with grid_variables_manual.container():
