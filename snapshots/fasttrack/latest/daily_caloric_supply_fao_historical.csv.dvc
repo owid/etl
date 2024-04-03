@@ -1,0 +1,23 @@
+meta:
+  origin:
+    producer: Andre et al. (2024). Globally representative evidence on the actual and perceived support for climate action.
+    title: daily_caloric_supply_fao_historical
+    description: |-
+      This dataset has been constructed by Our World in Data from multiple sources.
+
+      All data from 1961 onwards is sourced from the Food and Agriculture Organization of the United Nations. Available at: https://www.fao.org/faostat/en/#data/FBS
+
+      Pre-1961 data is available for some countries, based on a range of historical reconstructions.
+
+      We provide further details of all of these sources, and how this dataset is constructed here: https://ourworldindata.org/calorie-supply-sources
+    version_producer: Google Sheet
+    url_download: |-
+      https://docs.google.com/spreadsheets/d/e/2PACX-1vRo0RuD5-axqDW3PdFizuHnIfsye7CKZqe8wxIUWfKwaLfvPOOnv82KXOVltSOiSlpPXQEzktCQ15-p/pub?output=csv
+    date_accessed: '2024-04-03'
+  name: Daily supply of calories per person (OWID based on UN FAO & historical sources)
+  description: Daily supply of calories, combining recent UN FAO data with historical sources for some countries
+  license: {}
+outs:
+  - md5: 6d6d3661b9f564ac2a8fcf0c7ddb8d51
+    size: 221467
+    path: daily_caloric_supply_fao_historical.csv
