@@ -2,7 +2,7 @@ import traceback
 import warnings
 from collections.abc import Generator
 from contextlib import contextmanager
-from typing import Any, Dict, Optional
+from typing import Any, Dict, List, Optional
 from urllib.parse import quote
 
 import MySQLdb
@@ -164,6 +164,84 @@ def get_variables_in_dataset(
         warnings.simplefilter("ignore", UserWarning)
         variables_data = pd.read_sql(query, con=db_conn)
     return variables_data
+
+
+def _get_variables_data_with_filter(
+    field_name: Optional[str] = None,
+    field_values: Optional[List[Any]] = None,
+    db_conn: Optional[MySQLdb.Connection] = None,
+) -> Any:
+    if db_conn is None:
+        db_conn = get_connection()
+
+    if field_values is None:
+        field_values = []
+
+    # Construct the SQL query with a placeholder for each value in the list.
+    query = "SELECT * FROM variables"
+
+    if (field_name is not None) and (len(field_values) > 0):
+        query += f"\nWHERE {field_name} IN ({', '.join(['%s'] * len(field_values))});"
+
+    # Execute the query.
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", UserWarning)
+        variables_data = pd.read_sql(query, con=db_conn, params=field_values)
+
+    assert set(variables_data[field_name]) <= set(field_values), f"Unexpected values for {field_name}."
+
+    # Warn about values that were not found.
+    missing_values = set(field_values) - set(variables_data[field_name])
+    if len(missing_values) > 0:
+        log.warning(f"Values of {field_name} not found in database: {missing_values}")
+
+    return variables_data
+
+
+def get_variables_data(
+    filter: Optional[Dict[str, Any]] = None,
+    condition: Optional[str] = "OR",
+    db_conn: Optional[MySQLdb.Connection] = None,
+) -> pd.DataFrame:
+    """Get data from variables table, given a certain condition.
+
+    Parameters
+    ----------
+    filter : Optional[Dict[str, Any]], optional
+        Filter to apply to the data, which must contain a field name and a list of field values,
+        e.g. {"id": [123456, 234567, 345678]}.
+        In principle, multiple filters can be given.
+    condition : Optional[str], optional
+        In case multiple filters are given, this parameter specifies whether the output filters should be the union
+        ("OR") or the intersection ("AND").
+    db_conn : MySQLdb.Connection
+        Connection to database. Defaults to None, in which case a default connection is created (uses etl.config).
+
+    Returns
+    -------
+    df : pd.DataFrame
+        Variables data.
+
+    """
+    # NOTE: This function should be optimized. Instead of fetching data for each filter, their conditions should be
+    # combined with OR or AND before executing the query.
+
+    # Initialize an empty dataframe.
+    if filter is not None:
+        df = pd.DataFrame({"id": []}).astype({"id": int})
+        for field_name, field_values in filter.items():
+            _df = _get_variables_data_with_filter(field_name=field_name, field_values=field_values, db_conn=db_conn)
+            if condition == "OR":
+                df = pd.concat([df, _df], axis=0)
+            elif condition == "AND":
+                df = pd.merge(df, _df, on="id", how="inner")
+            else:
+                raise ValueError(f"Invalid condition: {condition}")
+    else:
+        # Fetch data for all variables.
+        df = _get_variables_data_with_filter(db_conn=db_conn)
+
+    return df
 
 
 def get_all_datasets(archived: bool = True, db_conn: Optional[MySQLdb.Connection] = None) -> pd.DataFrame:
