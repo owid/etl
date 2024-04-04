@@ -2,6 +2,7 @@
 from itertools import chain
 from typing import Dict, Optional, Tuple, cast
 
+import numpy as np
 import pandas as pd
 from owid.catalog import Dataset, Table
 from owid.catalog.processing import concat
@@ -115,7 +116,9 @@ def make_table_countries(tb: Table, ds_regions: Dataset) -> Tuple[Table, Table]:
         members_tracked |= set(
             geo.list_members_of_region(region, ds_regions, additional_members=region_props.get("additional_members"))
         )
-    assert tb_["country"].isin(members_tracked).all(), "Some countries are not in the regions!"
+    countries_found = set(tb_["country"])
+    countries_nottracked = countries_found - members_tracked
+    assert not countries_nottracked, f"Some countries are not in the regions: {countries_nottracked}!"
 
     # Generate counts of countries in X category
     tb_sum = make_table_countries_counts(tb_, ds_regions)
@@ -168,6 +171,7 @@ def make_table_countries_avg(tb: Table, ds_regions: Dataset) -> Table:
         tb=tb_,
         ds_regions=ds_regions,
         aggregations={k: "mean" for k in INDICATORS_REGION_AVERAGES},  # type: ignore
+        aggregations_world={k: np.mean for k in INDICATORS_REGION_AVERAGES},  # type: ignore
     )
 
     # Sanity check on output shape
@@ -504,7 +508,10 @@ def _add_note_on_region_averages(tb: Table) -> Table:
 
 # %% OTHERS
 def add_regions_and_global_aggregates(
-    tb: Table, ds_regions: Dataset, aggregations: Optional[Dict[str, str]] = None
+    tb: Table,
+    ds_regions: Dataset,
+    aggregations: Optional[Dict[str, str]] = None,
+    aggregations_world: Optional[Dict[str, str]] = None,
 ) -> Table:
     """Add regions, and world aggregates."""
     tb = geo.add_regions_to_table(
@@ -516,7 +523,10 @@ def add_regions_and_global_aggregates(
     tb = tb.loc[tb["country"].isin(REGIONS.keys())]
 
     # Add world
-    tb_w = tb.groupby("year", as_index=False).sum(numeric_only=True).assign(country="World")
+    if aggregations_world is None:
+        tb_w = tb.groupby("year", as_index=False).sum(numeric_only=True).assign(country="World")
+    else:
+        tb_w = tb.groupby("year", as_index=False).agg(aggregations_world).assign(country="World")
     tb = concat([tb, tb_w], ignore_index=True, short_name="region_counts")
 
     return tb

@@ -412,20 +412,18 @@ def estimate_row_indicators(tb: Table) -> Table:
 
     # Replace regime_row_owid based on conditions
     tb.loc[
-        (tb["v2elfrfair_osp_dich"] == 1)
-        & (tb["v2elmulpar_osp_dich"] == 1)
-        & (tb["v2x_polyarchy_dich"] == 1)
-        & (tb["v2x_liberal_dich"] == 1)
-        & (tb["v2clacjstm_osp_dich"] == 1)
-        & (tb["v2clacjstw_osp_dich"] == 1)
-        & (tb["v2cltrnslw_osp_dich"] == 1),
+        ((tb["v2elfrfair_osp_dich"] == 1) & (tb["v2elmulpar_osp_dich"] == 1) & (tb["v2x_polyarchy_dich"] == 1))
+        & (
+            (tb["v2x_liberal_dich"] == 1)
+            & (tb["v2clacjstm_osp_dich"] == 1)
+            & (tb["v2clacjstw_osp_dich"] == 1)
+            & (tb["v2cltrnslw_osp_dich"] == 1)
+        ),
         column_new,
     ] = 3
 
     tb.loc[
-        (tb["v2elfrfair_osp_dich"] == 1)
-        & (tb["v2elmulpar_osp_dich"] == 1)
-        & (tb["v2x_polyarchy_dich"] == 1)
+        ((tb["v2elfrfair_osp_dich"] == 1) & (tb["v2elmulpar_osp_dich"] == 1) & (tb["v2x_polyarchy_dich"] == 1))
         & (
             (tb["v2x_liberal_dich"] == 0)
             | (tb["v2clacjstm_osp_dich"] == 0)
@@ -437,8 +435,7 @@ def estimate_row_indicators(tb: Table) -> Table:
 
     tb.loc[
         ((tb["v2elfrfair_osp_dich"] == 0) | (tb["v2elmulpar_osp_dich"] == 0) | (tb["v2x_polyarchy_dich"] == 0))
-        & (tb["v2elmulpar_osp_hoe"] == 1)
-        & (tb["v2elmulpar_osp_leg_dich"] == 1),
+        & ((tb["v2elmulpar_osp_hoe"] == 1) & (tb["v2elmulpar_osp_leg_dich"] == 1)),
         column_new,
     ] = 1
 
@@ -461,8 +458,7 @@ def estimate_row_indicators(tb: Table) -> Table:
     # This also means that if one criteria for electoral democracy is not met, yet both criteria for an electoral autocracy is met, it must be an electoral autocracy
     tb.loc[
         ((tb["v2elfrfair_osp_dich"] == 0) | (tb["v2elmulpar_osp_dich"] == 0) | (tb["v2x_polyarchy_dich"] == 0))
-        & (tb["v2elmulpar_osp_hoe"] == 1)
-        & (tb["v2elmulpar_osp_leg_dich"] == 1)
+        & ((tb["v2elmulpar_osp_hoe"] == 1) & (tb["v2elmulpar_osp_leg_dich"] == 1))
         & (tb[column_new].isna()),
         column_new,
     ] = 1
