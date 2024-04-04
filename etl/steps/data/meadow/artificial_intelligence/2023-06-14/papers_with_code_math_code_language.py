@@ -46,9 +46,9 @@ def run(dest_dir: str) -> None:
     df_math = extract_math_data_papers_with_code(html_content, "math")
     df_math.drop("additional_data", axis=1, inplace=True)
 
-    df_code_math = pd.merge(df_code, df_math, on=["date", "name"], how="outer")
+    df_code_math = pd.merge(df_code, df_math, on=["date", "name"], how="outer", validate="1:1")
 
-    all_dfs = pd.merge(df_code_math, df_lang, on=["date", "name"], how="outer")
+    all_dfs = pd.merge(df_code_math, df_lang, on=["date", "name"], how="outer", validate="1:1")
     all_dfs.reset_index(inplace=True, drop=True)
 
     #
@@ -61,7 +61,7 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new meadow dataset with the same metadata as the snapshot.
-    ds_meadow = create_dataset(dest_dir, tables=[tb], default_metadata=None)
+    ds_meadow = create_dataset(dest_dir, tables=[tb.set_index(["date", "name"])], default_metadata=None)
 
     # Save changes in the new garden dataset.
     ds_meadow.save()
@@ -259,9 +259,11 @@ def extract_math_data_papers_with_code(html_content, metric):
         uses_additional_data = match[6]
 
         # Append the extracted information to the data list
-        data.append({"date": x, "performance_" + metric: y, "name": name, "additional_data": uses_additional_data})
+        data.append(
+            {"date": x, "performance_" + metric: y, "name": name.strip(), "additional_data": uses_additional_data}
+        )
 
     # Create the DataFrame from the data list
     df = pd.DataFrame(data)
 
-    return df
+    return df.drop_duplicates(["name", "date"])
