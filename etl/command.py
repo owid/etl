@@ -244,7 +244,6 @@ def main(
         dry_run=dry_run,
         force=force,
         private=private,
-        include_grapher_channel=grapher,
         downstream=downstream,
         only=only,
         excludes=excludes,
@@ -293,7 +292,6 @@ def run_dag(
     dry_run: bool = False,
     force: bool = False,
     private: bool = False,
-    include_grapher_channel: bool = False,
     downstream: bool = False,
     only: bool = False,
     excludes: Optional[List[str]] = None,
@@ -308,9 +306,6 @@ def run_dag(
     looking at their checksum.
     """
     excludes = excludes or []
-    if not include_grapher_channel:
-        # exclude grapher channel
-        excludes.append("data://grapher")
 
     _validate_private_steps(dag)
 
