@@ -232,6 +232,13 @@ def update_explorer(explorer_file: Path, dry_run: bool = False) -> None:
     # Initialize variable for the updated explorer content.
     explorer_new = None
 
+    # TODO: Future improvements based on Sophia's inputs:
+    #  * To follow the same order as grapher, first check for indicator-based, then file-based, then other explorers
+    #    (although this will probably make no difference).
+    #  * The correct way to know if an explorer is file-based is to check if there is a `table` keyword in the very
+    #    first column of the explorer config.
+    #  * Explorers don't care about the order of columns, so technically, it's not safe to assume that variable IDs are
+    #    always in the first column.
     if ("yVariableIds" not in explorer) and (CATALOG_URL not in explorer):
         log.info("Nothing to update (it may be a grapher-based explorer).")
 
