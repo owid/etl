@@ -146,3 +146,5 @@ steps:
     - snapshot://fasttrack/latest/draft_joe_idd_oecd.csv
   data://grapher/fasttrack/latest/daily_caloric_supply_fao_historical:
     - snapshot://fasttrack/latest/daily_caloric_supply_fao_historical.csv
+  data://grapher/fasttrack/latest/north_atlantic_hurricanes_noaa:
+    - snapshot://fasttrack/latest/north_atlantic_hurricanes_noaa.csv

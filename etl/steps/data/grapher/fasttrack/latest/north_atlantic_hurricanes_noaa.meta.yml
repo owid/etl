@@ -1,0 +1,31 @@
+dataset:
+  title: North Atlantic Hurricanes (HURDAT, NOAA 2024)
+  description: The number of hurricanes in the North Atlantic and landfalling in the United States since 1851.
+  licenses:
+    - {}
+tables:
+  north_atlantic_hurricanes_noaa:
+    variables:
+      number_north_atlantic_hurricanes:
+        title: North Atlantic hurricanes
+        unit: hurricanes
+        description: The number of hurricanes in the North Atlantic, of any size.
+      number_major_north_atlantic_hurricanes:
+        title: Major North Atlantic hurricanes
+        unit: hurricanes
+        description: |-
+          The number of major hurricanes in the North Atlantic. Major hurricanes score 3 or higher on the Saffir–Simpson hurricane wind scale (SSHWS).
+      number_usa_hurricanes:
+        title: US hurricanes
+        unit: hurricanes
+        description: The number of hurricanes that make landfall in the US, of any size.
+      number_major_usa_hurricanes:
+        title: Major US hurricanes
+        unit: hurricanes
+        description: |-
+          The number of major hurricanes that make landfall in the US. Major hurricanes score 3 or higher on the Saffir–Simpson hurricane wind scale (SSHWS).
+      accumulated_cyclone_energy:
+        title: Acumulated cyclone energy index
+        unit: ''
+        description: |-
+          An index that combines the numbers of systems, how long they existed and how intense they became. It is calculated by squaring the maximum sustained surface wind in the system every six hours that the cyclone is a Named Storm and summing it up for the season.
