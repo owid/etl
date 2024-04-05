@@ -12,6 +12,6 @@ meta:
   description: Weather and climate indicators such as temperature, precipitation, and droughts in the United States.
   license: {}
 outs:
-  - md5: feadee9ba09070b44ca85ee73c142519
-    size: 22371
+  - md5: 91fa47a3534c59704e1c696635670497
+    size: 21034
     path: usa_weather_climate_noaa.csv
