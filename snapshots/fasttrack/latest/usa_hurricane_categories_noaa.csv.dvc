@@ -1,0 +1,25 @@
+meta:
+  origin:
+    producer: HURDAT, National Oceanic and Atmospheric Administration
+    title: usa_hurricane_categories_noaa
+    description: |-
+      Data on Continental US Hurricane Impacts/Landfalls as published in the HURDAT (Hurricane Database) of the National Oceanic & Atmospheric Administration (NOAA).
+
+      This data runs from 1851 through to the latest annual data.
+
+      Hurricanes are categorised by the Saffir–Simpson hurricane wind scale (SSHWS) which classifies by five categories (1 being the lowest; 5 the highest) based on the intensity of sustained winds. This scale estimates potential property damage. Hurricanes reaching Category 3 and higher are considered major hurricanes because of their potential for significant loss of life and damage.
+
+      The NOAA notes that because of the sparseness of towns and cities before 1900 in some coastal locations along the United States, the data prior to 1900 may not be complete for all states.
+    citation_full: HURDAT, National Oceanic and Atmospheric Administration (2024)
+    version_producer: Google Sheet
+    url_main: https://www.aoml.noaa.gov/hrd/hurdat/All_U.S._Hurricanes.html
+    url_download: |-
+      https://docs.google.com/spreadsheets/d/e/2PACX-1vTDPiNpIyEFu5UIu-FsD31SX8HVW2LKFZUr9QOovfV4irJxRrGNTHN5-fLZRcgvXqwVQ88cpdpJ8kVy/pub?output=csv
+    date_accessed: '2024-04-05'
+  name: USA Hurricanes by category (HURDAT, NOAA 2024)
+  description: The number of landfalling hurricanes in the United States, by category.
+  license: {}
+outs:
+  - md5: b5d24d9d88e3355955eedb0d17478188
+    size: 5106
+    path: usa_hurricane_categories_noaa.csv
