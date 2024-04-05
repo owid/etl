@@ -122,7 +122,7 @@ def make_table_countries(tb: Table, ds_regions: Dataset) -> Tuple[Table, Table]:
 
     # Generate counts of countries in X category
     tb_sum = make_table_countries_counts(tb_, ds_regions)
-    # Generate averages of countries in X category
+    # Generate averages in regions (over countries) in X category
     tb_avg = make_table_countries_avg(tb_, ds_regions)
 
     # Merge tb_sum and tb_avg. Sanity-check that there is no overlap in columns (except for index)
@@ -514,20 +514,20 @@ def add_regions_and_global_aggregates(
     aggregations_world: Optional[Dict[str, str]] = None,
 ) -> Table:
     """Add regions, and world aggregates."""
-    tb = geo.add_regions_to_table(
-        tb,
+    tb_regions = geo.add_regions_to_table(
+        tb.copy(),
         ds_regions,
         regions=REGIONS,
         aggregations=aggregations,
     )
-    tb = tb.loc[tb["country"].isin(REGIONS.keys())]
+    tb_regions = tb_regions.loc[tb_regions["country"].isin(REGIONS.keys())]
 
     # Add world
     if aggregations_world is None:
-        tb_w = tb.groupby("year", as_index=False).sum(numeric_only=True).assign(country="World")
+        tb_world = tb.groupby("year", as_index=False).sum(numeric_only=True).assign(country="World")
     else:
-        tb_w = tb.groupby("year", as_index=False).agg(aggregations_world).assign(country="World")
-    tb = concat([tb, tb_w], ignore_index=True, short_name="region_counts")
+        tb_world = tb.groupby("year", as_index=False).agg(aggregations_world).assign(country="World")
+    tb = concat([tb_regions, tb_world], ignore_index=True, short_name="region_counts")
 
     return tb
 
