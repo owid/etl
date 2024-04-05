@@ -150,3 +150,5 @@ steps:
     - snapshot://fasttrack/latest/north_atlantic_hurricanes_noaa.csv
   data://grapher/fasttrack/latest/usa_hurricane_categories_noaa:
     - snapshot://fasttrack/latest/usa_hurricane_categories_noaa.csv
+  data://grapher/fasttrack/latest/usa_weather_climate_noaa:
+    - snapshot://fasttrack/latest/usa_weather_climate_noaa.csv

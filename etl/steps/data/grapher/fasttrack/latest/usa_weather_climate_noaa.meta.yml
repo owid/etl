@@ -1,0 +1,137 @@
+dataset:
+  title: US Weather and Climate (NOAA via EPA, 2024)
+  description: Weather and climate indicators such as temperature, precipitation, and droughts in the United States.
+  licenses:
+    - {}
+tables:
+  usa_weather_climate_noaa:
+    variables:
+      palmer_drought_annual:
+        title: Palmer drought index
+        unit: ''
+        description: |-
+          The Palmer Drought Severity Index is the most widely used index to measure drought severity over time. An index value ofzero represents the average moisture conditions observed between 1931 and 1990. Positive values mean wetter thanaverage, negatives mean drier than average.
+      palmer_drought_9yr:
+        title: Palmer drought (Smoothed)
+        unit: ''
+        description: |-
+          The Palmer Drought Severity Index is the most widely used index to measure drought severity over time. An index value ofzero represents the average moisture conditions observed between 1931 and 1990. Positive values mean wetter thanaverage, negatives mean drier than average.
+      extreme_one_day_precipitation:
+        title: Extreme one-day precipitation
+        unit: '%'
+        short_unit: '%'
+        description: |-
+          The share of land area in the United States which experienced over a threshold percentage of precipitation in an extremesingle-day event.
+      extreme_precipitation_9yr:
+        title: Extreme one-day precipitation (smoothed)
+        unit: '%'
+        short_unit: '%'
+        description: |-
+          The share of land area in the United States which experienced over a threshold percentage of precipitation in an extremesingle-day event.
+      share_area_unusual_precipitation:
+        title: Unusually high precipitation
+        unit: '%'
+        short_unit: '%'
+        description: |-
+          Share of land area in the United States which experienced unusually high annual precipitation in a given year. This comparesactual yearly precipitation totals with expected totals based on historical data.
+      unusual_precipitation_9yr:
+        title: Unusually high precipitation (smoothed)
+        unit: '%'
+        short_unit: '%'
+        description: |-
+          Share of land area in the United States which experienced unusually high annual precipitation in a given year. This comparesactual yearly precipitation totals with expected totals based on historical data.
+      us_precipitation_anomaly:
+        title: US precipitation anomaly
+        unit: inches
+        short_unit: in
+        description: |-
+          This indicator shows annual anomalies compared with the average precipitation from 1901 to 2000 based on rainfall and snowfall measurements from land-based weather stations.
+      global_precipitation_anomaly:
+        title: Global precipitation anomaly
+        unit: inches
+        short_unit: in
+        description: |-
+          This indicator shows annual anomalies compared with the average precipitation from 1901 to 2000 based on rainfall and snowfall measurements from land-based weather stations worldwide.
+      heatwave_index:
+        title: Heatwave Index
+        unit: ''
+      hot_daily_highs:
+        title: Hot summer days
+        unit: '%'
+        short_unit: '%'
+        display:
+          conversionFactor: 100.0
+        description: |-
+          Unusually hot summers are defined based on daily maximum temperatures. At each station, the recorded highs are
+          compared with the full set of historical records. After averaging over a particular month or season of interest, the warmest 10
+          percent of years are defined as “unusually hot.”
+      hot_daily_highs_smoothed:
+        title: Hot summer days (smoothed)
+        unit: '%'
+        short_unit: '%'
+        display:
+          conversionFactor: 100.0
+        description: |-
+          Unusually hot summers are defined based on daily maximum temperatures. At each station, the recorded highs are
+          compared with the full set of historical records. After averaging over a particular month or season of interest, the warmest 10
+          percent of years are defined as “unusually hot.”
+      hot_daily_lows:
+        title: hot_daily_lows
+        unit: '%'
+        short_unit: '%'
+        display:
+          conversionFactor: 100.0
+      hot_daily_lows_smoothed:
+        title: hot_daily_lows_smoothed
+        unit: '%'
+        short_unit: '%'
+        display:
+          conversionFactor: 100.0
+      cold_daily_highs:
+        title: cold_daily_highs
+        unit: '%'
+        short_unit: '%'
+        display:
+          conversionFactor: 100.0
+      cold_daily_highs_smoothed:
+        title: cold_daily_highs_smoothed
+        unit: '%'
+        short_unit: '%'
+        display:
+          conversionFactor: 100.0
+      cold_daily_lows:
+        title: Cold winter days
+        unit: '%'
+        short_unit: '%'
+        display:
+          conversionFactor: 100.0
+        description: |-
+          Unusually cold winter temperatures are measured based on daily minimum temperatures. At each station, the recorded lowsare compared with the full set of historical records. After averaging over a particular month or season of interest, the coldest10 percent of years are defined as “unusually cold.”
+      cold_daily_lows_smoothed:
+        title: Cold winter (smoothed)
+        unit: '%'
+        short_unit: '%'
+        display:
+          conversionFactor: 100.0
+        description: |-
+          Unusually cold winter temperatures are measured based on daily minimum temperatures. At each station, the recorded lowsare compared with the full set of historical records. After averaging over a particular month or season of interest, the coldest10 percent of years are defined as “unusually cold.”
+      winter_temp_anomaly:
+        title: Winter
+        unit: °F
+        short_unit: °F
+        description: Temperature anomaly in winter, compared to the 1901–2000 average. "Winter" includes December to February.
+      spring_temp_anomaly:
+        title: Spring
+        unit: °F
+        short_unit: °F
+        description: Temperature anomaly in spring, compared to the 1901–2000 average. "Spring" includes March to May.
+      summer_temp_anomaly:
+        title: Summer
+        unit: °F
+        short_unit: °F
+        description: Temperature anomaly in summer, compared to the 1901–2000 average. "Summer" includes June to August.
+      fall_temp_anomaly:
+        title: Fall
+        unit: °F
+        short_unit: °F
+        description: Temperature anomaly in fall, compared to the 1901–2000 average. "Fall" includes September to November.
