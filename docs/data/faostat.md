@@ -293,6 +293,8 @@ If no dataset requires an update, the workflow stops here.
 
         If a new domain has been added to this version, you may need to manually add its meadow step as a dependency of garden/faostat/YYYY-MM-DD/faostat_metadata in the dag (this is a known bug).
 
+        TODO: The descriptions of anomalies used to appear in `description`, but now they are not included in any indicator metadata. Ideally they should appear in `description_processing`. Consider doing this in the next update.
+
 7. Inspect and update any possible changes of dataset/item/element/unit names and descriptions.
 
     ```bash
