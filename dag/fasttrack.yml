@@ -152,3 +152,5 @@ steps:
     - snapshot://fasttrack/latest/usa_hurricane_categories_noaa.csv
   data://grapher/fasttrack/latest/usa_weather_climate_noaa:
     - snapshot://fasttrack/latest/usa_weather_climate_noaa.csv
+  data://grapher/fasttrack/latest/global_precipitation_anomaly_noaa:
+    - snapshot://fasttrack/latest/global_precipitation_anomaly_noaa.csv
