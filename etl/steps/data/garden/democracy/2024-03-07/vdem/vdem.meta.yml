@@ -979,7 +979,7 @@ tables:
 
       ## [RE-ESTIMATE, BINARY CATEGORISATION] 2.1.1 Electoral democracy index
       electdem_dich_row_owid:
-        title: Electoral democracy (re-estimate)
+        title: Electoral democracy (<< estimate >> estimate) (re-estimate)
         description_short: |-
           << estimate.title() >> estimate of whether the country is meaningfully an electoral democracy. This includes the extent to which political leaders are elected under comprehensive suffrage in free and fair elections, and freedoms of association and expression are guaranteed.
         description_from_producer: *description_prod_electdem_vdem
