@@ -592,7 +592,7 @@ def make_table_with_dummies(tb: Table) -> Table:
             "has_na": True,
         },
         {
-            "name": "num_years_in_electdem_cat",
+            "name": "num_years_in_electdem_consecutive_cat",
             "name_new": "num_countries_years_in_electdem",
             "values_expected": {
                 "closed autocracy",
@@ -606,7 +606,7 @@ def make_table_with_dummies(tb: Table) -> Table:
             "has_na": True,
         },
         {
-            "name": "num_years_in_libdem_cat",
+            "name": "num_years_in_libdem_consecutive_cat",
             "name_new": "num_countries_years_in_libdem",
             "values_expected": {
                 "closed autocracy",

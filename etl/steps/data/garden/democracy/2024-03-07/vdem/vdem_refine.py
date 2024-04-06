@@ -82,7 +82,7 @@ def add_categories_years_in_democracy(tb: Table) -> Table:
         "91+ years",
     ]
     # 1. Create variable for age group of electoral demcoracies:
-    column = "num_years_in_electdem"
+    column = "num_years_in_electdem_consecutive"
     column_cat = f"{column}_cat"
     tb[column_cat] = pd.cut(tb[column], bins=bins, labels=labels)
     tb[column_cat] = Variable(tb[column_cat]).copy_metadata(tb.loc[:, column])
@@ -93,7 +93,7 @@ def add_categories_years_in_democracy(tb: Table) -> Table:
     tb.loc[(tb["regime_row_owid"] == 0) & tb[column_cat].isna(), column_cat] = "closed autocracy"
 
     # 2. Create variable for age group of liberal democracies
-    column = "num_years_in_libdem"
+    column = "num_years_in_libdem_consecutive"
     column_cat = f"{column}_cat"
     tb[column_cat] = pd.cut(tb[column], bins=bins, labels=labels)
     tb[column_cat] = Variable(tb[column_cat]).copy_metadata(tb.loc[:, column])

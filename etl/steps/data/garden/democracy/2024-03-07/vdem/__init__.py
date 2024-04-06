@@ -61,8 +61,8 @@ INDICATORS_NO_ORIGINS = [
     "num_years_in_libdem_consecutive",
     "num_years_in_electdem",
     "num_years_in_libdem",
-    "num_years_in_electdem_cat",
-    "num_years_in_libdem_cat",
+    "num_years_in_electdem_consecutive_cat",
+    "num_years_in_libdem_consecutive_cat",
 ]
 
 

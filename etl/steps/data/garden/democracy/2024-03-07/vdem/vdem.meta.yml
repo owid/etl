@@ -90,7 +90,7 @@ tables:
           Indicator name: `e_wbgi_gee`
         unit: ''
         display:
-          numDecimalPlaces: 3
+          numDecimalPlaces: 2
 
       # Historical state name
       histname:
@@ -111,7 +111,7 @@ tables:
         description_key: *description_key_num_electdem
         unit: years
 
-      num_years_in_electdem_cat:  # electdem_age_group_row_owid
+      num_years_in_electdem_consecutive_cat:  # electdem_age_group_row_owid
         title: Electoral democracy age group
         description_short: Category of electoral democracies based on the country's age of electoral democracy.
         description_key: *description_key_num_electdem
@@ -130,7 +130,7 @@ tables:
         description_key: *description_key_num_libdem
         unit : years
 
-      num_years_in_libdem_cat:  # libdem_age_group_row_owid
+      num_years_in_libdem_consecutive_cat:  # libdem_age_group_row_owid
         title: Liberal democracy age group
         description_short: Category of liberal democracies based on the country's age of liberal democracy.
         description_processing: Number of consecutive years in liberal democracy.
