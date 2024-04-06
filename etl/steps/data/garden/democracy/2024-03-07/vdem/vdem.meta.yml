@@ -787,6 +787,9 @@ tables:
   vdem_multi_without_regions:
     title: ""
     description: ""
+    common:
+      display:
+          numDecimalPlaces: 2
     variables:
       ## [RE-ESTIMATE, BINARY CATEGORISATION] 3.8.2.3 Access to justice for men
       accessjust_m_row:
@@ -858,8 +861,6 @@ tables:
 
           Indicator name: `v2x_cspart`
         unit: ''
-        display:
-          numDecimalPlaces: 3
 
       ## 3.6.0.3 Respect counterarguments
       counterarg_polch_vdem:
@@ -882,8 +883,6 @@ tables:
 
           Indicator name: `v2dlcountr`
         unit: ''
-        display:
-          numDecimalPlaces: 3
 
       # 2.2.17 Deliberative component index
       delib_vdem:
@@ -903,8 +902,6 @@ tables:
 
           Indicator name: `v2xdl_delib`
         unit: ''
-        display:
-          numDecimalPlaces: 3
 
       ## 2.1.5 Egalitarian democracy index
       egaldem_vdem:
@@ -921,8 +918,6 @@ tables:
 
           Indicator name: `v2x_egaldem`
         unit: ''
-        display:
-          numDecimalPlaces: 3
 
       ## [RE-ESTIMATE, BINARY CATEGORISATION] 2.1.1 Electoral democracy index
       electdem_dich_row_owid:
@@ -977,8 +972,6 @@ tables:
 
           Indicator name: `v2xel_frefair`
         unit: ''
-        display:
-          numDecimalPlaces: 3
 
       ## [CUSTOM]
       electmulpar_hoe_row_owid:
@@ -1053,8 +1046,6 @@ tables:
 
           Indicator name: `v2dlconslt`
         unit: ''
-        display:
-          numDecimalPlaces: 3
 
       ## 2.2.20 Equal access index
       equal_access_vdem:
@@ -1070,8 +1061,6 @@ tables:
 
           Indicator name: `v2xeg_eqaccess`
         unit: ''
-        display:
-          numDecimalPlaces: 3
 
       ## 2.2.19 Equal protection index
       equal_rights_vdem:
@@ -1087,8 +1076,6 @@ tables:
 
           Indicator name: `v2xeg_eqprotec`
         unit: ''
-        display:
-          numDecimalPlaces: 3
 
       ## 2.2.21 Equal distribution of resources index
       equal_res_vdem:
@@ -1104,8 +1091,6 @@ tables:
 
           Indicator name: `v2xeg_eqdr`
         unit: ''
-        display:
-          numDecimalPlaces: 3
 
       ## 2.2.4 Freedom of association thick index
       freeassoc_vdem:
@@ -1119,8 +1104,6 @@ tables:
 
           Indicator name: `v2x_frassoc_thick`
         unit: ''
-        display:
-          numDecimalPlaces: 3
 
       ## 2.2.3 Freedom of Expression and Alternative Sources of Information index
       freeexpr_vdem:
@@ -1136,8 +1119,6 @@ tables:
 
           Indicator name: `v2x_freexp_altinf`
         unit: ''
-        display:
-          numDecimalPlaces: 3
 
         ## 2.2.9 Equality before the law and individual liberty index
       indiv_libs_vdem:
@@ -1151,8 +1132,6 @@ tables:
 
           Indicator name: `v2xcl_rol`
         unit: ''
-        display:
-          numDecimalPlaces: 3
 
       ## 2.2.10 Judicial constraints on the executive index
       judicial_constr_vdem:
@@ -1166,8 +1145,6 @@ tables:
 
           Indicator name: `v2x_jucon`
         unit: ''
-        display:
-          numDecimalPlaces: 3
 
       ## 3.6.0.2 Common good
       justcomgd_polch_vdem:
@@ -1188,8 +1165,6 @@ tables:
 
           Indicator name: `v2dlcommon`
         unit: ''
-        display:
-          numDecimalPlaces: 3
 
       ## 3.6.0.1 Reasoned justification
       justified_polch_vdem:
@@ -1210,8 +1185,6 @@ tables:
 
           Indicator name: `v2dlreason`
         unit: ''
-        display:
-          numDecimalPlaces: 3
 
       ## 2.2.11 Legislative constraints on the executive index
       legis_constr_vdem:
@@ -1227,8 +1200,6 @@ tables:
 
           Indicator name: `v2xlg_legcon`
         unit: ''
-        display:
-          numDecimalPlaces: 3
 
       ## 2.2.8 Liberal component index
       lib_vdem:
@@ -1244,8 +1215,6 @@ tables:
 
           Indicator name: `v2x_liberal`
         unit: ''
-        display:
-          numDecimalPlaces: 3
 
       ## [RE-ESTIMATE, BINARY CATEGORISATION] 2.2.8 Liberal component index
       lib_dich_row:
@@ -1274,8 +1243,6 @@ tables:
 
           Indicator name: `v2xel_locelec`
         unit: ''
-        display:
-          numDecimalPlaces: 3
 
       ## 2.2.12 Participatory component index
       particip_vdem:
@@ -1292,8 +1259,6 @@ tables:
 
           Indicator name: `v2x_partip`
         unit: ''
-        display:
-          numDecimalPlaces: 3
 
       ## 2.2.16 Regional government index
       regelect_vdem:
@@ -1309,8 +1274,6 @@ tables:
 
           Indicator name: `v2xel_regelec`
         unit: ''
-        display:
-          numDecimalPlaces: 3
 
       ## 3.6.0.5 Engaged society
       soccons_polch_vdem:
@@ -1334,8 +1297,6 @@ tables:
 
           Indicator name: `v2dlengage`
         unit: ''
-        display:
-          numDecimalPlaces: 3
 
       ## [RE-ESTIMATE, BINARY CATEGORISATION] 3.8.2.1 Transparent laws with predictable enforcement
       transplaws_row:
