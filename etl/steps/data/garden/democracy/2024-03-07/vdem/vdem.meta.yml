@@ -298,6 +298,9 @@ tables:
         <% elif aggregate_method < 'population-weighted average' %>
         The regional aggregates (including values for World) have been estimated by averaging the country values weighed by popupalation. $\alpha$. The population values are from the UN WPP 2022 revision dataset.
         <% endif %>
+      display:
+        numDecimalPlaces: 2
+
     variables:
       # 2.1 V-Dem High-Level Democracy Indices
       ## 2.1.1 Electoral democracy index
@@ -314,8 +317,6 @@ tables:
 
           Indicator name: `v2x_polyarchy`
         unit: ''
-        display:
-          numDecimalPlaces: 3
 
       ## 2.1.2 Liberal democracy index
       libdem_vdem:
@@ -332,8 +333,6 @@ tables:
 
           Indicator name: `v2x_libdem`
         unit: ''
-        display:
-          numDecimalPlaces: 3
 
       # 2.1.3 Participatory democracy index
       participdem_vdem:
@@ -350,8 +349,6 @@ tables:
 
           Indicator name: `v2x_partipdem`
         unit: ''
-        display:
-          numDecimalPlaces: 3
 
       ## 2.1.4 Deliberative democracy index
       delibdem_vdem:
@@ -369,8 +366,6 @@ tables:
 
           Indicator name: `v2x_delibdem`
         unit: ''
-        display:
-          numDecimalPlaces: 3
 
       ## 2.2.18 Egalitarian component index
       egal_vdem:
@@ -387,8 +382,6 @@ tables:
 
           Indicator name: `v2x_egal`
         unit: ''
-        display:
-          numDecimalPlaces: 3
 
       ## 3.5.1.6 Legislature corrupt activities
       corr_leg_vdem:
@@ -413,8 +406,6 @@ tables:
 
           Indicator name: `v2lgcrrpt`
         unit: ''
-        display:
-          numDecimalPlaces: 3
 
       ## 3.5.3.7 Lower chamber female legislators
       wom_parl_vdem:
@@ -427,8 +418,6 @@ tables:
 
           Indicator name: `v2lgfemleg`
         unit: '%'
-        display:
-          numDecimalPlaces: 3
 
       ## 3.7.0.6 Judicial corruption decision
       corr_jud_vdem:
@@ -449,8 +438,6 @@ tables:
 
           Indicator name: `v2jucorrdc`
         unit: ''
-        display:
-          numDecimalPlaces: 3
 
       ## 3.8.2.2 Rigorous and impartial public administration
       public_admin_vdem:
@@ -477,8 +464,6 @@ tables:
 
           Indicator name: `v2clrspct`
         unit: ''
-        display:
-          numDecimalPlaces: 3
 
       ## 3.8.2.6 Social group equality in respect for civil liberties
       socgr_civ_libs_vdem:
@@ -500,8 +485,6 @@ tables:
 
           Indicator name: `v2clsocgrp`
         unit: ''
-        display:
-          numDecimalPlaces: 3
 
       ## 3.9.0.1 Domestic autonomy
       dom_auton_vdem:
@@ -523,8 +506,6 @@ tables:
 
           Indicator name: `v2svdomaut`
         unit: ''
-        display:
-          numDecimalPlaces: 3
 
       ## 3.9.0.2 International autonomy
       int_auton_vdem:
@@ -542,8 +523,6 @@ tables:
 
           Indicator name: `v2svinlaut`
         unit: ''
-        display:
-          numDecimalPlaces: 3
 
       ## 3.9.0.3 State authority over territory
       terr_contr_vdem:
@@ -561,8 +540,6 @@ tables:
 
           Indicator name: `v2svstterr`
         unit: '%'
-        display:
-          numDecimalPlaces: 3
 
       ## 3.12.0.2 Power distributed by social group
       socgr_pow_vdem:
@@ -584,8 +561,6 @@ tables:
 
           Indicator name: `v2pepwrsoc`
         unit: ''
-        display:
-          numDecimalPlaces: 3
 
       ## 5.4.3 Presidentialism Index
       personalism_vdem:
@@ -603,8 +578,6 @@ tables:
 
           Indicator name: `v2xnp_pres`
         unit: ''
-        display:
-          numDecimalPlaces: 3
 
       ## 5.5.1 Civil liberties index
       civ_libs_vdem:
@@ -621,8 +594,6 @@ tables:
 
           Indicator name: `v2x_civlib`
         unit: ''
-        display:
-          numDecimalPlaces: 3
 
       ## 5.5.4 Private civil liberties index
       priv_libs_vdem:
@@ -639,8 +610,6 @@ tables:
 
           Indicator name: `v2x_clpriv`
         unit: ''
-        display:
-          numDecimalPlaces: 3
 
       ## 5.5.3 Political civil liberties index
       pol_libs_vdem:
@@ -657,8 +626,6 @@ tables:
 
           Indicator name: `v2x_clpol`
         unit: ''
-        display:
-          numDecimalPlaces: 3
 
       ## 5.5.2 Physical violence index
       phys_integr_libs_vdem:
@@ -675,8 +642,6 @@ tables:
 
           Indicator name: `v2x_clphy`
         unit: ''
-        display:
-          numDecimalPlaces: 3
 
       ## 5.7.1 Political corruption index
       corruption_vdem:
@@ -693,8 +658,6 @@ tables:
 
           Indicator name: `v2x_corr`
         unit: ''
-        display:
-          numDecimalPlaces: 3
 
       ## 5.7.3 Public sector corruption index [Not in use]
       corr_publsec_vdem:
@@ -709,8 +672,6 @@ tables:
 
           Indicator name: `v2x_pubcorr`
         unit: ''
-        display:
-          numDecimalPlaces: 3
 
       ## 5.7.2 Executive corruption index [Not in use]
       corr_exec_vdem:
@@ -725,8 +686,6 @@ tables:
 
           Indicator name: `v2x_execorr`
         unit: ''
-        display:
-          numDecimalPlaces: 3
 
       ## 5.8.1 Women political empowerment index
       wom_emp_vdem:
@@ -743,8 +702,6 @@ tables:
 
           Indicator name: `v2x_gender`
         unit: ''
-        display:
-          numDecimalPlaces: 3
 
       ## 5.8.2 Women civil liberties index
       wom_civ_libs_vdem:
@@ -761,8 +718,6 @@ tables:
 
           Indicator name: `v2x_gencl`
         unit: ''
-        display:
-          numDecimalPlaces: 3
 
       ## 5.8.3 Women civil society participation index
       wom_civ_soc_vdem:
@@ -779,8 +734,6 @@ tables:
 
           Indicator name: `v2x_gencs`
         unit: ''
-        display:
-          numDecimalPlaces: 3
 
       ## 5.8.4 Women political participation index
       wom_pol_par_vdem:
@@ -797,8 +750,6 @@ tables:
 
           Indicator name: `v2x_genpp`
         unit: ''
-        display:
-          numDecimalPlaces: 3
 
       ## 5.9.1 Rule of law index
       rule_of_law_vdem:
@@ -813,8 +764,6 @@ tables:
 
           Indicator name: `v2x_rule`
         unit: ''
-        display:
-          numDecimalPlaces: 3
 
       ## 5.11.1 Core civil society index [not in use]
       civ_soc_str_vdem:
@@ -831,8 +780,6 @@ tables:
 
           Indicator name: `v2xcs_ccsi`
         unit: ''
-        display:
-          numDecimalPlaces: 3
 
   ##################################################################################################
   ##################################################################################################
