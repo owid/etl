@@ -1,0 +1,27 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: World Health Organization - Acute Flaccid Paralysis
+    date_published: "2024-04-04"
+
+    # Citation
+    producer: World Health Organization
+    citation_full: |-
+      World Health Organization (2024)
+    attribution_short: WHO
+
+    # Files
+    url_main: https://extranet.who.int/polis/public/CaseCount.aspx
+    date_accessed: 2024-04-08
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://www.who.int/about/policies/terms-of-use
+
+outs:
+  - md5: 00d57ac66f4507ae66a35fecec365971
+    size: 156591
+    path: polio_afp.csv

@@ -512,3 +512,9 @@ steps:
     - data://garden/demography/2023-03-31/population
   data://grapher/health/2024-04-02/organ_donation_and_transplantation:
     - data://garden/health/2024-04-02/organ_donation_and_transplantation
+
+  # Polio AFP surveillance
+  data://meadow/who/2024-04-08/polio_afp:
+    - snapshot://who/2024-04-08/polio_afp.csv
+  data://garden/who/2024-04-08/polio_afp:
+    - data://meadow/who/2024-04-08/polio_afp
