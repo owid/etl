@@ -196,6 +196,7 @@ def ruamel_dump(d: Dict[str, Any]) -> str:
 
 def ruamel_load(f: io.TextIOWrapper) -> Dict[str, Any]:
     yaml = YAML(typ="rt")  # Create a YAML object with round-trip type
+    yaml.preserve_quotes = True
     return yaml.load(f)  # Load the content using the new API
 
 
