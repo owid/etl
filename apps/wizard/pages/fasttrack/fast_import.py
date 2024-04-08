@@ -1,6 +1,7 @@
 """Definition of FasttrackImport object (mainly backend)."""
 import datetime as dt
 import difflib
+import html
 from pathlib import Path
 from typing import Optional, Tuple
 
@@ -237,7 +238,7 @@ class FasttrackImport:
         else:
             return (
                 True,
-                f'<iframe srcdoc="{html_diff}" width="100%" height="400px" style="border: 1px solid black; background: white"></iframe>',
+                f'<iframe srcdoc="{html.escape(html_diff)}" width="100%" height="400px" style="border: 1px solid black; background: white"></iframe>',
             )
 
     def commit_and_push(self) -> str:
