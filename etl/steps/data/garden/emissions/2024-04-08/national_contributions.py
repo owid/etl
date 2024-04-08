@@ -1,6 +1,5 @@
 """Load a meadow dataset and create a garden dataset."""
 
-from typing import List
 
 import owid.catalog.processing as pr
 from owid.catalog import Dataset, Table, Variable
@@ -314,7 +313,11 @@ def run(dest_dir: str) -> None:
     #  big negative values. For example for Ireland's value in 2022 is of -2.93e+08!
     #  I will look into this, but, for now, I'll ignore those negative values (we are not using these indicators in
     #  any chart).
-    columns_that_cannot_be_negative = [column for column in columns_that_cannot_be_negative if column not in ["cumulative_emissions_ch4_fossil", "cumulative_emissions_ghg_fossil"]]
+    columns_that_cannot_be_negative = [
+        column
+        for column in columns_that_cannot_be_negative
+        if column not in ["cumulative_emissions_ch4_fossil", "cumulative_emissions_ghg_fossil"]
+    ]
     ####################################################################################################################
     for column in columns_that_cannot_be_negative:
         # Ensure all negative values are just numerical noise.
