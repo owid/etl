@@ -538,7 +538,9 @@ def concatenate(dfs: List[pd.DataFrame], **kwargs: Any) -> pd.DataFrame:
         for df in dfs:
             df[col] = pd.Categorical(df[col].values, categories=uc.categories)
 
-    return pd.concat(dfs, **kwargs)
+    with warnings.catch_warnings():
+        warnings.simplefilter(action="ignore", category=FutureWarning)
+        return pd.concat(dfs, **kwargs)
 
 
 def apply_on_categoricals(cat_series: List[pd.Series], func: Callable[..., str]) -> pd.Series:

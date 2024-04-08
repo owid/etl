@@ -58,10 +58,10 @@ def run(dest_dir: str) -> None:
         # Check if any year for the current country is not NaN
         if not group["released_national_strategy_on_ai"].isna().all():
             # Forward fill NaN values after "Released"
-            group["released_national_strategy_on_ai"].fillna(method="ffill", inplace=True)
+            group["released_national_strategy_on_ai"] = group["released_national_strategy_on_ai"].fillna(method="ffill")
 
         # Fill remaining NaN values with "Not Released"
-        group["released_national_strategy_on_ai"].fillna("Not released", inplace=True)
+        group["released_national_strategy_on_ai"] = group["released_national_strategy_on_ai"].fillna("Not released")
         df_merged.loc[group.index] = group
     df_merged.drop("released", axis=1, inplace=True)
     tb = Table(df_merged, short_name=paths.short_name, underscore=True)

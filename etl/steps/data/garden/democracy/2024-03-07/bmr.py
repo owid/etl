@@ -274,7 +274,7 @@ def add_imputes(tb: Table) -> Table:
     tb = concat(tb_imputed + [tb], ignore_index=True)
 
     # Set to False by default (for non-imputed countries)
-    tb["regime_imputed"] = tb["regime_imputed"].fillna(False)
+    tb["regime_imputed"] = tb["regime_imputed"].fillna(False).astype(bool)
 
     # Re-order columns
     cols = [
