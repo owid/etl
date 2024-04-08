@@ -15,6 +15,7 @@ from typing import Any, Dict, Generator, List, Optional, Set, TextIO, Union
 
 import ruamel.yaml
 import yaml
+from ruamel.yaml import YAML
 from yaml.dumper import Dumper
 
 from etl.paths import BASE_DIR
@@ -194,7 +195,8 @@ def ruamel_dump(d: Dict[str, Any]) -> str:
 
 
 def ruamel_load(f: io.TextIOWrapper) -> Dict[str, Any]:
-    return ruamel.yaml.load(f, Loader=ruamel.yaml.RoundTripLoader, preserve_quotes=True)
+    yaml = YAML(typ="rt")  # Create a YAML object with round-trip type
+    return yaml.load(f)  # Load the content using the new API
 
 
 def _strip_lines(s: str) -> str:
