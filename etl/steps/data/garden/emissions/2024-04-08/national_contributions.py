@@ -10,13 +10,6 @@ from etl.helpers import PathFinder, create_dataset
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
-# Minimum year to consider.
-# There is data from 1830 for some variables and from 1850 for others.
-# However, when inspecting data between 1830 and 1850 (e.g. total CO2 emissions) it seems there is an abrupt jump
-# between 1849 and 1850, which happens for many countries.
-# This jump seems to be spurious, and therefore we start all time series from 1850.
-YEAR_MIN = 1850
-
 # Conversion factor to change from teragrams to tonnes.
 TERAGRAMS_TO_TONNES = 1e6
 # Conversion factor to change from petagrams to tonnes.
@@ -126,7 +119,7 @@ def add_kuwaiti_oil_fires_to_kuwait(tb: Table) -> Table:
     tb_oil_fires = tb[tb["country"] == oil_fires].drop(columns="country").fillna(0).set_index(["year"])
     tb_combined = (tb_kuwait + tb_oil_fires).reset_index().assign(**{"country": kuwait})
 
-    # Replace the origina data for Kuwait by the combined data.
+    # Replace the original data for Kuwait by the combined data.
     tb_updated = pr.concat([tb[tb["country"] != kuwait].reset_index(drop=True), tb_combined], ignore_index=True)
 
     # Sort conveniently.
@@ -166,31 +159,6 @@ def add_emissions_in_co2_equivalents(tb: Table) -> Table:
     return tb
 
 
-def add_region_aggregates(tb: Table, ds_regions: Dataset, ds_income_groups: Dataset) -> Table:
-    for region in REGIONS:
-        # List members in this region.
-        members = geo.list_members_of_region(
-            region=region,
-            ds_regions=ds_regions,
-            ds_income_groups=ds_income_groups,
-            additional_regions=REGIONS[region].get("additional_regions", None),
-            excluded_regions=REGIONS[region].get("excluded_regions", None),
-            additional_members=REGIONS[region].get("additional_members", None),
-            excluded_members=REGIONS[region].get("excluded_members", None),
-        )
-        tb = geo.add_region_aggregates(
-            df=tb,
-            region=region,
-            countries_in_region=members,
-            countries_that_must_have_data=[],
-            # Here we allow aggregating even when there are few countries informed.
-            # However, if absolutely all countries have nan, we want the aggregate to be nan, not zero.
-            frac_allowed_nans_per_year=0.999,
-        )
-
-    return tb
-
-
 def add_share_variables(tb: Table) -> Table:
     tb = tb.copy()
 
@@ -198,14 +166,14 @@ def add_share_variables(tb: Table) -> Table:
     # To do that, first create a separate table for global data, and add it to the main table.
     tb_global = tb[tb["country"] == "World"][["year"] + SHARE_VARIABLES].reset_index(drop=True)
 
-    tb = pr.merge(tb, tb_global, on=["year"], how="left", suffixes=("", "_global"))
+    tb = tb.merge(tb_global, on=["year"], how="left", suffixes=("", "_global"))
     # For a list of variables, add the percentage with respect to global.
     for variable in SHARE_VARIABLES:
         new_variable = f"share_of_{variable.replace('_co2eq', '')}"
         tb[new_variable] = 100 * tb[variable] / tb[f"{variable}_global"]
 
     # Drop unnecessary columns for global data.
-    tb = tb.drop(columns=[column for column in tb.columns if column.endswith("_global")])
+    tb = tb.drop(columns=[column for column in tb.columns if column.endswith("_global")], errors="raise")
 
     return tb
 
@@ -225,7 +193,29 @@ def add_per_capita_variables(tb: Table, ds_population: Dataset) -> Table:
         tb[f"{variable}_per_capita"] = tb[variable] / tb["population"]
 
     # Drop population column.
-    tb = tb.drop(columns="population")
+    tb = tb.drop(columns="population", errors="raise")
+
+    return tb
+
+
+def fix_emissions_jump_in_1850(tb: Table) -> Table:
+    # There is data from 1830 for some variables and from 1850 for others.
+    # However, when inspecting data between 1830 and 1850 (e.g. annual_emissions_co2_total) there is an abrupt jump
+    # between 1849 and 1850, which happens for many countries (e.g. Spain, or World).
+    # This jump seems to be spurious, and therefore we start all time series from 1850.
+
+    # First check that the jump is still in the data.
+    emissions_before_jump = tb[(tb["country"] == "World") & (tb["year"] == 1849)]["annual_emissions_co2_total"].item()
+    emissions_after_jump = tb[(tb["country"] == "World") & (tb["year"] == 1850)]["annual_emissions_co2_total"].item()
+    error = "Spurious jump between 1849 and 1850 is not in the data anymore. Remove this part of the code."
+    assert emissions_after_jump / emissions_before_jump > 10, error
+
+    # Visually inspect the jump.
+    # import plotly.express as px
+    # px.line(tb[tb["country"]=="World"], x="year", y="annual_emissions_co2_total", markers=True)
+
+    # Start all data after the jump.
+    tb = tb[tb["year"] >= 1850].reset_index(drop=True)
 
     return tb
 
@@ -316,7 +306,9 @@ def run(dest_dir: str) -> None:
     )
 
     # Add region aggregates.
-    tb = add_region_aggregates(tb=tb, ds_regions=ds_regions, ds_income_groups=ds_income_groups)
+    tb = geo.add_regions_to_table(
+        tb=tb, ds_regions=ds_regions, ds_income_groups=ds_income_groups, regions=REGIONS, min_num_values_per_year=1
+    )
 
     # Add columns for emissions in terms of CO2 equivalents.
     tb = add_emissions_in_co2_equivalents(tb=tb)
@@ -327,18 +319,18 @@ def run(dest_dir: str) -> None:
     # Add per-capita variables.
     tb = add_per_capita_variables(tb=tb, ds_population=ds_population)
 
-    # Ensure data starts from a certain fixed year (see notes above).
-    tb = tb[tb["year"] >= YEAR_MIN].reset_index(drop=True)
+    # Fix spurious jump in the data in 1850.
+    tb = fix_emissions_jump_in_1850(tb=tb)
 
     # Sanity checks.
     run_sanity_checks_on_outputs(tb=tb)
 
     # Set an appropriate index and sort conveniently.
-    tb = tb.set_index(["country", "year"], verify_integrity=True).sort_index()
+    tb = tb.format()
 
     #
     # Save outputs.
     #
-    # Create a new garden dataset with the same metadata as the meadow dataset.
+    # Create a new garden dataset.
     ds_garden = create_dataset(dest_dir, tables=[tb], check_variables_metadata=True)
     ds_garden.save()
