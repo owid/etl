@@ -1103,6 +1103,23 @@ class Variable(SQLModel, table=True):
             )
             ds = session.exec(q).one_or_none()
 
+        # there's a unique index on `name` which can cause conflict if we swap names of two variables
+        # in that case, we append "(conflict)" to the name of the conflicting variable (it will be cleaned
+        # after all variables are upserted)
+        # we wouldn't need this if we dropped the requirement for unique index on `name`, but I'm afraid
+        # of other functions in owid-grapher that could rely on it
+        if ds and ds.shortName:
+            q = select(cls).where(
+                cls.name == self.name,
+                cls.shortName != self.shortName,
+                cls.datasetId == self.datasetId,
+            )
+            conflict = session.exec(q).one_or_none()
+            if conflict:
+                conflict.name = f"{conflict.name} (conflict)"
+                session.add(conflict)
+                session.commit()
+
         if not ds:
             ds = self
         else:
