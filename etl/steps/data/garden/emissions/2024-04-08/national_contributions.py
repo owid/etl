@@ -1,5 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
 
+from typing import List
+
 import owid.catalog.processing as pr
 from owid.catalog import Dataset, Table, Variable
 from owid.datautils.dataframes import map_series
@@ -304,6 +306,21 @@ def run(dest_dir: str) -> None:
         warn_on_missing_countries=True,
         warn_on_unused_countries=True,
     )
+
+    # Replace spurious negative values with zeros (and ensure they are small numbers, within the uncertainty).
+    columns_that_cannot_be_negative = [column for column in tb.columns if "fossil" in column]
+    ####################################################################################################################
+    # TODO: For some reason, cumulative_emissions_ch4_fossil (and therefore cumulative_emissions_ghg_fossil) have
+    #  big negative values. For example for Ireland's value in 2022 is of -2.93e+08!
+    #  I will look into this, but, for now, I'll ignore those negative values (we are not using these indicators in
+    #  any chart).
+    columns_that_cannot_be_negative = [column for column in columns_that_cannot_be_negative if column not in ["cumulative_emissions_ch4_fossil", "cumulative_emissions_ghg_fossil"]]
+    ####################################################################################################################
+    for column in columns_that_cannot_be_negative:
+        # Ensure all negative values are just numerical noise.
+        assert (tb[column].fillna(0) >= -2e-4).all()
+        # Replace those values by zero.
+        tb[column] = tb[column].clip(lower=0)
 
     # Add region aggregates.
     tb = geo.add_regions_to_table(
