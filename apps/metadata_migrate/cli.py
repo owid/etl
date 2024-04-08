@@ -3,7 +3,6 @@ import webbrowser
 from typing import Any, Dict, List, Optional
 
 import click
-import pandas as pd
 import structlog
 from owid.catalog import Dataset, DatasetMeta, License, Origin, Source, Table
 from rich import print
@@ -16,7 +15,7 @@ from sqlmodel import Session
 from etl import config
 from etl import grapher_model as gm
 from etl.command import main as etl_main
-from etl.db import get_engine
+from etl.db import get_engine, read_sql
 from etl.metadata_export import merge_or_create_yaml, reorder_fields
 from etl.paths import BASE_DIR, DAG_FILE, DATA_DIR, STEP_DIR
 
@@ -108,7 +107,7 @@ def cli(
         select config from charts
         where slug = '{chart_slug}'
         """
-        df = pd.read_sql(q, engine)
+        df = read_sql(q, engine)
         if df.empty:
             raise ValueError(f"no chart found for slug {chart_slug}")
 
@@ -359,7 +358,7 @@ def _load_grapher_config(engine: Engine, col: str, ds_meta: DatasetMeta) -> Dict
         d.version = '{ds_meta.version}' and
         d.shortName = '{ds_meta.short_name}'
     """
-    cf = pd.read_sql(q, engine)
+    cf = read_sql(q, engine)
     if len(cf) == 0:
         log.warning(f"no chart found for variable {col}")
         return {}

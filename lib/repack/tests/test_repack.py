@@ -1,3 +1,4 @@
+import datetime as dt
 from typing import Any
 
 import numpy as np
@@ -226,3 +227,21 @@ def test_series_eq():
     a = pd.Series([1, np.nan], dtype="float64")
     b = pd.Series([1, np.nan], dtype="float64")
     assert repack.series_eq(a, b, cast=float)
+
+
+def test_repack_object_np_str():
+    s = pd.Series(["a", np.str_("b")], dtype=object)
+    v = repack.repack_series(s)
+    assert v.dtype.name == "category"
+
+
+def test_repack_with_inf():
+    s = pd.Series([0, np.inf], dtype=object)
+    v = repack.repack_series(s)
+    assert v.dtype.name == "float32"
+
+
+def test_repack_with_datetime():
+    s = pd.Series([dt.datetime.today(), dt.date.today()], dtype=object)
+    v = repack.repack_series(s)
+    assert v.dtype.name == "category"
