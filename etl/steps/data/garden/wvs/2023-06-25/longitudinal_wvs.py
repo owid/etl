@@ -44,6 +44,7 @@ def run(dest_dir: str) -> None:
     merge_q1_q2_q3 = pd.merge(merge_q1_q2, q3, on=["country", "year"], how="outer")
     tb = Table(merge_q1_q2_q3, short_name=paths.short_name, underscore=True)
     tb.set_index(["country", "year"], inplace=True)
+    tb = tb.dropna(how="all")
 
     #
     # Save outputs.
