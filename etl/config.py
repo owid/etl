@@ -150,6 +150,8 @@ BUGSNAG_API_KEY = env.get("BUGSNAG_API_KEY")
 
 OPENAI_API_KEY = env.get("OPENAI_API_KEY", None)
 
+OWIDBOT_ACCESS_TOKEN = env.get("OWIDBOT_ACCESS_TOKEN", None)
+
 
 def enable_bugsnag() -> None:
     if BUGSNAG_API_KEY:

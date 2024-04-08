@@ -1,6 +1,7 @@
 import difflib
 import os
 import re
+import traceback
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from typing import Any, Callable, Dict, Iterable, List, Optional, Union, cast
@@ -365,7 +366,7 @@ def cli(
     $ etl diff other-data/ data/ --include maddison
     ```
     """
-    console = Console(tab_size=2)
+    console = Console(tab_size=2, soft_wrap=True)
 
     path_to_ds_a = _load_catalog_datasets(path_a, channel, include, exclude)
     path_to_ds_b = _load_catalog_datasets(path_b, channel, include, exclude)
@@ -423,7 +424,7 @@ def cli(
                     lines = [f"[bold red]⚠ Error: {e}[/bold red]"]
                 except Exception as e:
                     # soft fail and continue with another dataset
-                    log.error(e, exc_info=True)
+                    log.error("\n".join(traceback.format_exception(type(e), e, e.__traceback__)))
                     any_error = True
                     lines = []
                     continue

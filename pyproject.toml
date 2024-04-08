@@ -70,6 +70,7 @@ cdsapi = "^0.6.1"
 rioxarray = "^0.15.1"
 tiktoken = "^0.6.0"
 html2text = "^2020.1.16"
+pygithub = "^2.3.0"
 
 [tool.poetry.group.api.dependencies]
 fastapi = "^0.109.0"
