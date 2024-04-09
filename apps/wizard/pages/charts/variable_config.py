@@ -386,13 +386,15 @@ def plot_comparison_two_variables(df, variable_old, variable_new, var_id_to_disp
     # st.write(countries)
     # if countries:
     #     df_variables = df_variables[df_variables["entityName"].isin(countries)]
-    score = round(100 - df_variables["Relative difference (abs, %)"].mean(), 1)
+    relative_diff = df_variables["Relative difference (abs, %)"]
+    relative_diff.loc[relative_diff == float("inf")] = float("nan")
+    score = round(100 - relative_diff.mean(), 1)
     if score == 100:
-        score = round(100 - df_variables["Relative difference (abs, %)"].mean(), 2)
+        score = round(100 - relative_diff.mean(), 2)
         if score == 100:
-            score = round(100 - df_variables["Relative difference (abs, %)"].mean(), 3)
+            score = round(100 - relative_diff.mean(), 3)
             if score == 100:
-                score = round(100 - df_variables["Relative difference (abs, %)"].mean(), 4)
+                score = round(100 - relative_diff.mean(), 4)
     num_nan_score = df_variables["Relative difference (abs, %)"].isna().sum()
 
     nrows_0 = df_variables.shape[0]
