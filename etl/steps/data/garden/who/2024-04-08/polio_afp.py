@@ -79,6 +79,8 @@ def add_screening_and_testing(tb: Table, year=SCREENING_YEAR) -> Table:
         (tb["non_polio_afp_rate"] < 2.0) & (tb["pct_adequate_stool_collection"] < 80) & (tb["year"] == SCREENING_YEAR),
         "polio_surveillance_status",
     ] = "Inadequate screening and testing"
+    # Not sure if this is the best way to handle this, the code fails because this indicator doesn't have origins otherwise
+    tb["polio_surveillance_status"].metadata.origins = tb["non_polio_afp_rate"].metadata.origins
     return tb
 
 
@@ -123,6 +125,8 @@ def add_correction_factor(tb: Table) -> Table:
     # For China 1989-92 we set the correction factor to 1.11 and in Oman in 1988.
     tb["correction_factor"][(tb["country"] == "China") & (tb["year"].isin([1989, 1990, 1991, 1992]))] = 1.11
     tb["correction_factor"][(tb["country"] == "Oman") & (tb["year"].isin([1988]))] = 1.11
+    # Not sure if this is the best way to handle this, the code fails because this indicator doesn't have origins otherwise
+    tb["correction_factor"].metadata.origins = tb["non_polio_afp_rate"].metadata.origins
     return tb
 
 

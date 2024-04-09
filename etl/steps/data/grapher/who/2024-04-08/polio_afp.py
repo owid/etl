@@ -19,7 +19,7 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
-
+    tb = tb.drop(columns="footnote")
     #
     # Save outputs.
     #

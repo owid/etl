@@ -24,7 +24,7 @@ tables:
         description_key: ["Acute flaccid paralysis (AFP) surveillance is the gold standard for detecting cases of poliomyelitis.", "At least one case of non-polio AFP should be detected annually per 100,000 population aged less than 15 years. In endemic regions, to ensure even higher sensitivity, this rate should be two per 100 000."]
         unit: cases per 100,000 children
       pct_adequate_stool_collection:
-        title: Aqueate stool collection (%)
+        title: Adequate stool collection (%)
         description_short: "The share of acute flaccid paralysis (AFP) cases, where stool samples were tested for poliovirus and reported to the WHO"
         unit: "%"
         short_unit: "%"
