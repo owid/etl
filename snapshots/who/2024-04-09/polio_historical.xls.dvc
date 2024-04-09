@@ -1,0 +1,27 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: WHO Historical Polio Dataset
+    date_published: "2019-12-10"
+
+    # Citation
+    producer: World Health Organization
+    citation_full: |-
+      World Health Organization (2019)
+    attribution_short: WHO
+
+    # Files
+    url_main: https://web.archive.org/web/20200101000000*/http://www.who.int/entity/immunization/monitoring_surveillance/data/incidence_series.xls?ua=1
+    date_accessed: 2024-04-09
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://www.who.int/about/policies/terms-of-use
+
+outs:
+  - md5: 189201470a046c95b5f38c05a77fd6c2
+    size: 612864
+    path: polio_historical.xls

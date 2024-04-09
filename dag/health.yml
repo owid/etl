@@ -520,3 +520,5 @@ steps:
     - data://meadow/who/2024-04-08/polio_afp
   data://grapher/who/2024-04-08/polio_afp:
     - data://garden/who/2024-04-08/polio_afp
+  data://meadow/who/2024-04-09/polio_historical:
+    - snapshot://who/2024-04-09/polio_historical.xls
