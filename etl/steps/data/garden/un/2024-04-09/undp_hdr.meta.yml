@@ -1,0 +1,161 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Human Development Index (HDI)
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  title: Human Development Report
+  update_period_days: 365
+
+tables:
+  undp_hdr:
+    title: Human Development Report
+    description: |-
+      The 2023/24 Human Development Report assesses the dangerous gridlock resulting from uneven development progress, intensifying inequality, and escalating political polarization, that we must urgently tackle. The report emphasizes how global interdependence is being reconfigured and proposes a path forward where multilateralism plays a pivotal role.
+
+      Additional resources related to the 2023/2024 Human Development Report can be found online at http://hdr.undp.org. Resources on the website include digital versions and translations of the Report and the overview in multiple languages, an interactive web version of the Report, a set of background papers and think pieces commissioned for the Report, interactive data visualizations and databases of human development indicators, full explanations of the sources and methodologies used in the Report's composite indices, country insights and other background materials, and previous global, regional and national Human Development Reports. Corrections and addenda are also available online.
+
+      Technical notes (region definitions, reports, etc.) can be found at https://hdr.undp.org/sites/default/files/2023-24_HDR/hdr2023-24_technical_notes.pdf.
+    common:
+      display:
+        numDecimalPlaces: 2
+
+    variables:
+      abr:
+        title: Adolescent Birth Rate
+        unit: births per 1,000 women ages 15-19
+        description_short: |-
+          Annual number of births to women aged 15-19 years per 1,000 women in that age group. It is also referred to as the age-specific fertility rate for women aged 15-19.
+
+      co2_prod:
+        title: Carbon dioxide emissions per capita (production)
+        unit: "tonnes per capita"
+        description_short: |-
+          Carbon dioxide emissions produced as a consequence of human activities (use of coal, oil and gas for combustion and industrial processes, gas flaring and cement manufacture), divided by midyear population. Values are territorial emissions, meaning that emissions are attributed to the country in which they physically occur.
+
+      coef_ineq:
+        unit: ''
+
+      diff_hdi_phdi:
+        unit: ''
+
+      eys:
+        unit: ''
+
+      eys_f:
+        unit: ''
+
+      eys_m:
+        unit: ''
+
+      gdi:
+        unit: ''
+
+      gdi_group:
+        unit: ''
+        display:
+          numDecimalPlaces: 0
+
+      gii:
+        unit: ''
+
+      gii_rank:
+        unit: ''
+        display:
+          numDecimalPlaces: 0
+
+      gni_pc_f:
+        unit: ''
+
+      gni_pc_m:
+        unit: ''
+
+      gnipc:
+        unit: ''
+
+      hdi:
+        unit: ''
+
+      hdi_f:
+        unit: ''
+
+      hdi_m:
+        unit: ''
+
+      hdi_rank:
+        unit: ''
+        display:
+          numDecimalPlaces: 0
+
+      ihdi:
+        unit: ''
+
+      ineq_edu:
+        unit: ''
+
+      ineq_inc:
+        unit: ''
+
+      ineq_le:
+        unit: ''
+
+      le:
+        unit: ''
+
+      le_f:
+        unit: ''
+
+      le_m:
+        unit: ''
+
+      lfpr_f:
+        unit: ''
+
+      lfpr_m:
+        unit: ''
+
+      loss:
+        unit: ''
+
+      mf:
+        unit: ''
+
+      mmr:
+        unit: ''
+
+      mys:
+        unit: ''
+
+      mys_f:
+        unit: ''
+
+      mys_m:
+        unit: ''
+
+      phdi:
+        unit: ''
+
+      pop_total:
+        unit: ''
+
+      pr_f:
+        unit: ''
+
+      pr_m:
+        unit: ''
+
+      rankdiff_hdi_phdi:
+        unit: ''
+        display:
+          numDecimalPlaces: 0
+
+      se_f:
+        unit: ''
+
+      se_m:
+        unit: ''
+

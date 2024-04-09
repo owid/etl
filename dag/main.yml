@@ -178,6 +178,10 @@ steps:
   data://grapher/un/2022-11-29/undp_hdr:
     - data://garden/un/2022-11-29/undp_hdr
 
+  data://meadow/un/2024-04-09/undp_hdr:
+    - snapshot://un/2024-04-09/undp_hdr.csv
+  data://garden/un/2024-04-09/undp_hdr:
+    - data://meadow/un/2024-04-09/undp_hdr
   #
   # EM-DAT Natural disasters (2023).
   #
