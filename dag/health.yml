@@ -518,3 +518,5 @@ steps:
     - snapshot://who/2024-04-08/polio_afp.csv
   data://garden/who/2024-04-08/polio_afp:
     - data://meadow/who/2024-04-08/polio_afp
+  data://grapher/who/2024-04-08/polio_afp:
+    - data://garden/who/2024-04-08/polio_afp

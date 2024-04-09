@@ -6,49 +6,52 @@ definitions:
         - Global Health
         - Eradication of Diseases
 
-
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
   update_period_days: 365
 
-
 tables:
   polio_afp:
     variables:
-      # testing_variable:
-      #   title: Testing variable title
-      #   unit: arbitrary units
-      #   short_unit: au
-      #   description_short: Short description of testing variable.
-      #   description_processing: Description of processing of testing variable.
-      #   description_key: List of key points about the indicator.
-      #   description_from_producer: Description of testing variable from producer.
-      #   processing_level: minor
-      #   presentation:
-      #     attribution:
-      #     attribution_short:
-      #     faqs:
-      #     grapher_config:
-      #     title_public:
-      #     title_variant:
-      #     topic_tags:
-      #   display:
-      #     color:
-      #     conversionFactor: 1
-      #     description:
-      #     entityAnnotationsMap: Test annotation
-      #     includeInTable:
-      #     isProjection: false
-      #     name: Testing variable
-      #     numDecimalPlaces: 0
-      #     shortUnit: au
-      #     tableDisplay:
-      #       hideAbsoluteChange:
-      #       hideRelativeChange:
-      #     tolerance: 0
-      #     unit: arbitrary units
-      #     yearIsDay: false
-      #     zeroDay:
-      {}
-
+      afp_cases:
+        title: Acute Flaccid Paralysis (AFP) cases
+        description_short: Number of new cases of acute flaccid paralysis (AFP) reported in a given year.
+        unit: cases
+      non_polio_afp_rate:
+        title: Non-Polio acute flaccid paralysis (afp) rate
+        description_short: The number of cases of acute flaccid paralysis (AFP) per 100,000 children aged 15 or under, not attributed to polio, that were detected and reported to the WHO.
+        description_key: ["Acute flaccid paralysis (AFP) surveillance is the gold standard for detecting cases of poliomyelitis.", "At least one case of non-polio AFP should be detected annually per 100,000 population aged less than 15 years. In endemic regions, to ensure even higher sensitivity, this rate should be two per 100 000."]
+        unit: cases per 100,000 children
+      pct_adequate_stool_collection:
+        title: Aqueate stool collection (%)
+        description_short: "The share of acute flaccid paralysis (AFP) cases, where stool samples were tested for poliovirus and reported to the WHO"
+        unit: "%"
+        short_unit: "%"
+      pending:
+        title: Pending
+        description_short: "The number of acute flaccid paralysis (AFP) cases pending classification by the WHO"
+        unit: cases
+      wild_poliovirus_cases:
+        title: Wild Poliovirus cases
+        description_short: "The number of cases of wild poliovirus detected in a given year"
+        unit: cases
+      cvdpv_cases:
+        title: Circulating Vaccine-Derived Poliovirus (cVDPV) cases
+        description_short: "The number of cases of circulating vaccine-derived poliovirus detected in a given year"
+        unit: cases
+      compatibles:
+        title: Compatibles
+        unit: ""
+      footnote:
+        title: Footnote
+        unit: ""
+      correction_factor:
+        title: Correction factor
+        description_short: "Correction factor applied to the number of reported polio cases to account for underreporting"
+        unit: factor
+      polio_surveillance_status:
+        title: Polio surveillance status
+        description_short: "The status of polio surveillance in a given country"
+        description_key: ["A country is considered to have adequate screening if it has a non-polio AFP rate of at least 2 per 100,000 children aged 15 or under.", "A country is considered to have adequate testing if it has a percentage adequate stool collection of at least 80%.", "Countries are labelled 'low risk' if they were considered low risk by the risk assessment carried out for the [2022 GPEI surveillance action plan](https://polioeradication.org/wp-content/uploads/2022/05/GPSAP-2022-2024-EN.pdf)"]
+        unit: ""
