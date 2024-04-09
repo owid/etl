@@ -351,10 +351,14 @@ def run_dag(
     total_expected_time_seconds = sum(_get_execution_time(str(step)) or 0 for step in steps)
 
     if dry_run:
-        print(f"--- Would run {len(steps)} steps {_create_expected_time_message(total_expected_time_seconds)}:")
+        print(
+            f"--- Would run {len(steps)} steps{_create_expected_time_message(total_expected_time_seconds, prepend_message=' (at least ')}:"
+        )
         return enumerate_steps(steps)
     elif workers == 1:
-        print(f"--- Running {len(steps)} steps {_create_expected_time_message(total_expected_time_seconds)}:")
+        print(
+            f"--- Running {len(steps)} steps{_create_expected_time_message(total_expected_time_seconds, prepend_message=' (at least ')}:"
+        )
         return exec_steps(steps, strict=strict)
     else:
         print(f"--- Running {len(steps)} steps with {workers} processes:")
@@ -364,7 +368,7 @@ def run_dag(
 def exec_steps(steps: List[Step], strict: Optional[bool] = None) -> None:
     execution_times = {}
     for i, step in enumerate(steps, 1):
-        print(f"--- {i}. {step} {_create_expected_time_message(_get_execution_time(step_name=str(step)))}")
+        print(f"--- {i}. {step}{_create_expected_time_message(_get_execution_time(step_name=str(step)))}")
 
         # Determine strictness level for the current step
         strict = _detect_strictness_level(step, strict)
@@ -374,7 +378,7 @@ def exec_steps(steps: List[Step], strict: Optional[bool] = None) -> None:
             time_taken = timed_run(lambda: step.run())
             execution_times[str(step)] = time_taken
 
-            click.echo(f"{click.style('OK', fg='blue')} ({time_taken: .2f}s)")
+            click.echo(f"{click.style('OK', fg='blue')}{_create_expected_time_message(time_taken)}")
             print()
 
         # Write the recorded execution times to the file after all steps have been executed
@@ -461,7 +465,9 @@ def exec_graph_parallel(
                 topological_sorter.done(task)
 
 
-def _create_expected_time_message(expected_time: Optional[float]) -> str:
+def _create_expected_time_message(
+    expected_time: Optional[float], prepend_message: str = " (", append_message: str = ")"
+) -> str:
     minutes, seconds = divmod(expected_time or 0, 60)
     if minutes < 1:
         partial_message = f"{seconds:.1f}s"
@@ -471,7 +477,7 @@ def _create_expected_time_message(expected_time: Optional[float]) -> str:
     if (expected_time is None) or (expected_time == 0):
         return ""
     else:
-        return f"(expected at least {partial_message})"
+        return prepend_message + partial_message + append_message
 
 
 def _exec_step_job(
@@ -484,7 +490,7 @@ def _exec_step_job(
     :param dag: The original DAG used to create Step object. This must be the same DAG as given to ETL.
     :param strict: The strictness level for the step execution.
     """
-    print(f"--- Starting {step_name} {_create_expected_time_message(_get_execution_time(step_name))}")
+    print(f"--- Starting {step_name}{_create_expected_time_message(_get_execution_time(step_name))}")
     assert dag
     step = parse_step(step_name, dag)
     strict = _detect_strictness_level(step, strict)
@@ -529,7 +535,7 @@ def _get_execution_time(step_name: str) -> Optional[float]:
 
 def enumerate_steps(steps: List[Step]) -> None:
     for i, step in enumerate(steps, 1):
-        print(f"{i}. {step}")
+        print(f"{i}. {step}{_create_expected_time_message(_get_execution_time(str(step)))}")
 
 
 def _detect_strictness_level(step: Step, strict: Optional[bool] = None) -> bool:
