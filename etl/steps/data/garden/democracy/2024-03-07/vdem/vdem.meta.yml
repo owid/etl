@@ -34,6 +34,10 @@ tables:
       The project is managed by the V-Dem Institute, based at the University of Gothenburg in Sweden.
 
       This snapshot contains all 500 V-Dem indicators and 245 indices + 57 other indicators from other data sources.
+    common:
+      display:
+          numDecimalPlaces: 0
+
     variables:
       ## 9.9.3 Corruption perception index [not in use]
       corruption_cpi:
@@ -43,8 +47,6 @@ tables:
 
           Notes: The data spans 2012-present due to the methodological incomparability with the data prior 2012.
         unit: ''
-        display:
-          numDecimalPlaces: 0
 
       ## 2.2.14 Direct popular vote index
       dirpop_vote_vdem:
@@ -61,7 +63,7 @@ tables:
           Indicator name: `v2xdd_dd`
         unit: ''
         display:
-          numDecimalPlaces: 3
+          numDecimalPlaces: 2
 
       ## 2.2.7 Elected officials index
       electoff_vdem:
@@ -76,7 +78,7 @@ tables:
           Indicator name: `v2x_elecoff`
         unit: ''
         display:
-          numDecimalPlaces: 3
+          numDecimalPlaces: 2
 
       ## 9.4.2 Government effectiveness
       goveffective_vdem_wbgi:
@@ -155,7 +157,7 @@ tables:
           {definitions.common.description_processing}
         unit: '%'
         display:
-          numDecimalPlaces: 3
+          numDecimalPlaces: 2
 
       ## 3.1.3.3 Election turnout
       turnout_vdem:
@@ -168,8 +170,6 @@ tables:
 
           Indicator name: `v2eltrnout`
         unit: '%'
-        display:
-          numDecimalPlaces: 2
 
       # 3.4.2.18 HOS female
       wom_hos_vdem:  # wom_hos_vdem_owid
@@ -181,8 +181,6 @@ tables:
 
           Indicator name: `v2exfemhos`
         unit: ''
-        display:
-          numDecimalPlaces: 0
 
       ## 3.4.3.16 HOG female
       wom_hog_vdem:  # wom_hog_vdem_owid
@@ -200,8 +198,6 @@ tables:
 
           Indicator name: `v2exfemhog`
         unit: ''
-        display:
-          numDecimalPlaces: 0
 
       ## HOE female (custom)
       wom_hoe_vdem:  # wom_hoe_vdem_owid
@@ -221,8 +217,6 @@ tables:
 
           We derive this indicator from V-Dem indicators: `v2exfemhos`, `v2exfemhog`, `v2ex_hosw`, and `v2ex_hogw`.
         unit: ''
-        display:
-          numDecimalPlaces: 0
 
       wom_parl_vdem_cat:  # wom_parl_gr_vdem_owid
         title: Women in parliament (category)
@@ -242,8 +236,6 @@ tables:
           - In _electoral autocracies_, citizens have the right to choose the chief executive and the legislature through multi-party elections; but they lack some freedoms, such as the freedoms of association or expression, that make the elections meaningful, free, and fair.
           - In _electoral democracies_, citizens have the right to participate in meaningful, free and fair, and multi-party elections.
           - In _liberal demoracies_, citizens have further individual and minority rights, are equal before the law, and the actions of the executive are constrained by the legislative and the courts.
-        display:
-          numDecimalPlaces: 0
 
       regime_amb_row_owid:
         title: Political regime (inc. ambiguous categories)
@@ -258,8 +250,6 @@ tables:
           - In liberal democracies, citizens have further individual and minority rights, are equal before the law, and the actions of the executive are constrained by the legislative and the courts.
           - It further includes intermediate categories for closed autocracies that may be electoral autocracies (score 1), electoral autocracies that may be closed autocracies (score 2), electoral autocracies that may be electoral democracies (score 4), electoral democracies that may be electoral autocracies (score 5), electoral democracies that may be liberal democracies (score 7) and liberal democracies that may be electoral democracies (score 8).
         description_processing: "{definitions.auxiliary.description_processing_row}"
-        display:
-          numDecimalPlaces: 0
 
       regime_redux_row_owid:
         title: Political regime (reduced)
@@ -272,16 +262,12 @@ tables:
           - In electoral democracies, citizens have the right to participate in meaningful, free and fair, and multi-party elections.
         description_processing: "{definitions.auxiliary.description_processing_row}"
         unit: ''
-        display:
-          numDecimalPlaces: 0
 
       # Not used
       regime_imputed:
         title: Data imputed from another country
         description_short: Denotes whether we imputed regime information from another country this one was historically a part of.
         unit: ''
-        display:
-          numDecimalPlaces: 0
 
       regime_imputed_country:
         title: 'Country name (imputed country)'
