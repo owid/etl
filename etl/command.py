@@ -59,13 +59,6 @@ log = structlog.get_logger()
     is_flag=True,
     help="Run private steps.",
 )
-# TODO: once grapher channel stops using the grapher db, remove this flag
-@click.option(
-    "--grapher-channel/--no-grapher-channel",
-    default=True,
-    type=bool,
-    help="Include grapher channel datasets _(OWID staff only, DB access required)_.",
-)
 @click.option(
     "--grapher/--no-grapher",
     "-g/-ng",
@@ -144,7 +137,6 @@ def main_cli(
     dry_run: bool = False,
     force: bool = False,
     private: bool = False,
-    grapher_channel: bool = True,
     grapher: bool = False,
     backport: bool = False,
     ipdb: bool = False,
@@ -181,9 +173,6 @@ def main_cli(
     """
     _update_open_file_limit()
 
-    # enable grapher channel when called with --grapher
-    grapher_channel = grapher_channel or grapher
-
     # make everything single threaded, useful for debugging
     if not use_threads:
         config.GRAPHER_INSERT_WORKERS = 1
@@ -196,7 +185,6 @@ def main_cli(
         dry_run=dry_run,
         force=force,
         private=private,
-        grapher_channel=grapher_channel,
         grapher=grapher,
         backport=backport,
         downstream=downstream,
@@ -230,7 +218,6 @@ def main(
     dry_run: bool = False,
     force: bool = False,
     private: bool = False,
-    grapher_channel: bool = True,
     grapher: bool = False,
     backport: bool = False,
     downstream: bool = False,
@@ -257,7 +244,6 @@ def main(
         dry_run=dry_run,
         force=force,
         private=private,
-        include_grapher_channel=grapher_channel,
         downstream=downstream,
         only=only,
         excludes=excludes,
@@ -306,7 +292,6 @@ def run_dag(
     dry_run: bool = False,
     force: bool = False,
     private: bool = False,
-    include_grapher_channel: bool = False,
     downstream: bool = False,
     only: bool = False,
     excludes: Optional[List[str]] = None,
@@ -321,14 +306,15 @@ def run_dag(
     looking at their checksum.
     """
     excludes = excludes or []
-    if not include_grapher_channel:
-        # exclude grapher channel
-        excludes.append("data://grapher")
 
     _validate_private_steps(dag)
 
     if not private:
         excludes.append("-private://")
+
+    # Exclude grapher regions, they're fetched by owid-grapher as CSV from catalog
+    # but are not supposed to be in DB
+    excludes.append("grapher://grapher/regions/latest/regions")
 
     steps = compile_steps(dag, includes, excludes, downstream=downstream, only=only)
 

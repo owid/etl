@@ -150,6 +150,8 @@ def subset_and_clean_data(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def pivot_fluid(df: pd.DataFrame) -> pd.DataFrame:
+    # drop spurious duplicates
+    df = df.drop_duplicates()
     df_piv = df.pivot(
         index=["country", "hemisphere", "date"],
         columns=["case_info"],

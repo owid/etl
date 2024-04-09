@@ -144,3 +144,13 @@ steps:
     - snapshot://fasttrack/latest/tomitaka_2018.csv
   data://grapher/fasttrack/latest/draft_joe_idd_oecd:
     - snapshot://fasttrack/latest/draft_joe_idd_oecd.csv
+  data://grapher/fasttrack/latest/daily_caloric_supply_fao_historical:
+    - snapshot://fasttrack/latest/daily_caloric_supply_fao_historical.csv
+  data://grapher/fasttrack/latest/north_atlantic_hurricanes_noaa:
+    - snapshot://fasttrack/latest/north_atlantic_hurricanes_noaa.csv
+  data://grapher/fasttrack/latest/usa_hurricane_categories_noaa:
+    - snapshot://fasttrack/latest/usa_hurricane_categories_noaa.csv
+  data://grapher/fasttrack/latest/usa_weather_climate_noaa:
+    - snapshot://fasttrack/latest/usa_weather_climate_noaa.csv
+  data://grapher/fasttrack/latest/global_precipitation_anomaly_noaa:
+    - snapshot://fasttrack/latest/global_precipitation_anomaly_noaa.csv

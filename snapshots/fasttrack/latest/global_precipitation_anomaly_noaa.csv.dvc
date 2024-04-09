@@ -1,0 +1,17 @@
+meta:
+  origin:
+    producer: National Oceanic and Atmospheric Administration via the US EPA
+    title: global_precipitation_anomaly_noaa
+    citation_full: National Oceanic and Atmospheric Administration via the US EPA
+    version_producer: Google Sheet
+    url_main: https://www.epa.gov/climate-indicators/view-indicators
+    url_download: |-
+      https://docs.google.com/spreadsheets/d/e/2PACX-1vR4Ew8HBLdaUXRWpXdhgzJSNqXB-9nyzjtkBoshLMMoQOWKV1N60v0rWwA1aGztD76x4hSBRDy5n8Eu/pub?output=csv
+    date_accessed: '2024-04-05'
+  name: Global precipitation anomaly (NOAA via EPA, 2024)
+  description: ''
+  license: {}
+outs:
+  - md5: 30773a1025c2f4ab2c5cc89ace5d774d
+    size: 2675
+    path: global_precipitation_anomaly_noaa.csv

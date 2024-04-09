@@ -118,6 +118,9 @@ def cli(
     etl chart-sync staging-site-my-branch .env.prod.write --approve-revisions
     ```
     """
+    _validate_env(source)
+    _validate_env(target)
+
     source_engine = _get_engine_for_env(source)
     target_engine = _get_engine_for_env(target)
 
@@ -283,7 +286,11 @@ def _get_staging_created_at(source: Path, staging_created_at: Optional[str]) -> 
         if not _is_env(source):
             return _get_git_branch_creation_date(str(source).replace("staging-site-", ""))
         else:
-            raise click.BadParameter("staging-created-at is required when source is not a staging server name")
+            log.warning(
+                "--staging-created-at is not provided while using the local environment, it's assumed that you began working less than one week ago."
+            )
+            return dt.datetime.now() - dt.timedelta(weeks=1)
+            # raise click.BadParameter("staging-created-at is required when source is not a staging server name")
     else:
         return pd.to_datetime(staging_created_at)
 
@@ -306,6 +313,12 @@ def _get_container_name(branch_name):
     container_name = f"staging-site-{normalized_branch[:50]}"
     # Remove trailing hyphens
     return container_name.rstrip("-")
+
+
+def _validate_env(env: Path) -> None:
+    # if `env` is a path, it must exist (otherwise we'd confuse it with a staging server name)s
+    if str(env).startswith(".") and "env" in str(env) and not env.exists():
+        raise click.BadParameter(f"File {env} does not exist")
 
 
 def _get_engine_for_env(env: Path) -> Engine:

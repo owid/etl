@@ -1,0 +1,17 @@
+meta:
+  origin:
+    producer: HURDAT, National Oceanic and Atmospheric Administration
+    title: north_atlantic_hurricanes_noaa
+    citation_full: HURDAT, National Oceanic and Atmospheric Administration (2024)
+    version_producer: Google Sheet
+    url_main: https://www.aoml.noaa.gov/hrd/hurdat/comparison_table.html
+    url_download: |-
+      https://docs.google.com/spreadsheets/d/e/2PACX-1vQQQzn4zN3aMA3w6yaxDr1y5EZjgFyy6ak0DRibJJ00WF5JEI0VpzP0N5e8bIjwU0Ay1pvjhQ0OGSqx/pub?output=csv
+    date_accessed: '2024-04-04'
+  name: North Atlantic Hurricanes (HURDAT, NOAA 2024)
+  description: The number of hurricanes in the North Atlantic and landfalling in the United States since 1851.
+  license: {}
+outs:
+  - md5: 31c980706d7b57343b65c337661dd3f5
+    size: 5565
+    path: north_atlantic_hurricanes_noaa.csv
