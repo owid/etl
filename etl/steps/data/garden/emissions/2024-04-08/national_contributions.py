@@ -302,8 +302,6 @@ def run(dest_dir: str) -> None:
         tb,
         countries_file=paths.country_mapping_path,
         excluded_countries_file=paths.excluded_countries_path,
-        warn_on_missing_countries=True,
-        warn_on_unused_countries=True,
     )
 
     # Replace spurious negative values with zeros (and ensure they are small numbers, within the uncertainty).

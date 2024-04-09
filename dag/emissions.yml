@@ -76,20 +76,6 @@ steps:
   data://grapher/rff/2023-10-19/emissions_weighted_carbon_price:
     - data://garden/rff/2023-10-19/emissions_weighted_carbon_price
   #
-  # Jones et al. (2023) - National contributions to climate change.
-  #
-  data://meadow/emissions/2023-11-23/national_contributions:
-    - snapshot://emissions/2023-11-23/national_contributions_annual_emissions.csv
-    - snapshot://emissions/2023-11-23/national_contributions_cumulative_emissions.csv
-    - snapshot://emissions/2023-11-23/national_contributions_temperature_response.csv
-  data://garden/emissions/2023-11-23/national_contributions:
-    - data://meadow/emissions/2023-11-23/national_contributions
-    - data://garden/regions/2023-01-01/regions
-    - data://garden/demography/2023-03-31/population
-    - data://garden/wb/2023-04-30/income_groups
-  data://grapher/emissions/2023-11-23/national_contributions:
-    - data://garden/emissions/2023-11-23/national_contributions
-  #
   # IPCC - Emission Factor Database (2023-10-24).
   #
   data://meadow/emissions/2023-10-24/emission_factors:
@@ -124,18 +110,8 @@ steps:
   data://garden/emissions/2024-02-26/gdp_and_co2_decoupling:
     - data://garden/gcp/2023-12-12/global_carbon_budget
     - data://garden/worldbank_wdi/2023-05-29/wdi
-
-  ######################################################################################################################
-  # Older versions that should be archived once they are not used by any other steps.
-
-  ######################################################################################################################
-
-  ######################################################################################################################
-  # Older versions that can safely be archived at any point, if needed.
-
-  ######################################################################################################################
   #
-  # Jones et al. (2023) - National contributions to climate change.
+  # Jones et al. - National contributions to climate change.
   #
   data://meadow/emissions/2024-04-08/national_contributions:
     - snapshot://emissions/2024-04-08/national_contributions_temperature_response.csv
@@ -148,3 +124,27 @@ steps:
     - data://garden/regions/2023-01-01/regions
   data://grapher/emissions/2024-04-08/national_contributions:
     - data://garden/emissions/2024-04-08/national_contributions
+
+  ######################################################################################################################
+  # Older versions that should be archived once they are not used by any other steps.
+  #
+  # Jones et al. (2023) - National contributions to climate change.
+  #
+  data://meadow/emissions/2023-11-23/national_contributions:
+    - snapshot://emissions/2023-11-23/national_contributions_annual_emissions.csv
+    - snapshot://emissions/2023-11-23/national_contributions_cumulative_emissions.csv
+    - snapshot://emissions/2023-11-23/national_contributions_temperature_response.csv
+  data://garden/emissions/2023-11-23/national_contributions:
+    - data://meadow/emissions/2023-11-23/national_contributions
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/demography/2023-03-31/population
+    - data://garden/wb/2023-04-30/income_groups
+  data://grapher/emissions/2023-11-23/national_contributions:
+    - data://garden/emissions/2023-11-23/national_contributions
+
+  ######################################################################################################################
+
+  ######################################################################################################################
+  # Older versions that can safely be archived at any point, if needed.
+
+  ######################################################################################################################

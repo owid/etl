@@ -27,6 +27,32 @@ DATA_FILES = [
 ]
 
 
+@click.command()
+@click.option(
+    "--upload/--skip-upload",
+    default=True,
+    type=bool,
+    help="Upload dataset to Snapshot",
+)
+def main(upload: bool) -> None:
+    for data_file in DATA_FILES:
+        # Create a new snapshot.
+        snap = Snapshot(f"emissions/{SNAPSHOT_VERSION}/national_contributions_{data_file}")
+
+        # Get the publication date (it needs to be done only once).
+        extracted_fields = extract_metadata_from_main_page(snap)
+
+        for field in extracted_fields:
+            # Replace metadata fields with the new extracted fields.
+            setattr(snap.metadata.origin, field, extracted_fields[field])
+
+        # Rewrite metadata to dvc file.
+        snap.metadata_path.write_text(snap.metadata.to_yaml())
+
+        # Download data from source, add file to DVC and upload to S3.
+        snap.create_snapshot(upload=upload)
+
+
 def extract_metadata_from_main_page(snap: Snapshot) -> Dict[str, str]:
     """Extract the publication date."""
     # Get the full HTML content of the main page.
@@ -60,7 +86,8 @@ def extract_metadata_from_main_page(snap: Snapshot) -> Dict[str, str]:
 
     # The full citation is not included in the HTML and is fetched from an API.
     response_citation = requests.get(
-        response_final.replace("records/", "api/records/"), headers={"Accept": "text/x-bibliography"}
+        response_final.replace("records/", "api/records/") + "?style=chicago-fullnote-bibliography",
+        headers={"Accept": "text/x-bibliography"},
     )
 
     # Extract the full citation.
@@ -75,32 +102,6 @@ def extract_metadata_from_main_page(snap: Snapshot) -> Dict[str, str]:
     }
 
     return extracted_fields
-
-
-@click.command()
-@click.option(
-    "--upload/--skip-upload",
-    default=True,
-    type=bool,
-    help="Upload dataset to Snapshot",
-)
-def main(upload: bool) -> None:
-    for data_file in DATA_FILES:
-        # Create a new snapshot.
-        snap = Snapshot(f"emissions/{SNAPSHOT_VERSION}/national_contributions_{data_file}")
-
-        # Get the publication date (it needs to be done only once).
-        extracted_fields = extract_metadata_from_main_page(snap)
-
-        for field in extracted_fields:
-            # Replace metadata fields with the new extracted fields.
-            setattr(snap.metadata.origin, field, extracted_fields[field])
-
-        # Rewrite metadata to dvc file.
-        snap.metadata_path.write_text(snap.metadata.to_yaml())
-
-        # Download data from source, add file to DVC and upload to S3.
-        snap.create_snapshot(upload=upload)
 
 
 if __name__ == "__main__":
