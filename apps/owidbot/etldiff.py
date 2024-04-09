@@ -100,6 +100,10 @@ def format_etl_diff(lines: list[str]) -> Tuple[str, str]:
             result = line
             continue
 
+        # skip some lines
+        if "this may get slow" in line or "comparison with compare" in line:
+            continue
+
         if line.strip().startswith("-"):
             line = "-" + line[1:]
         if line.strip().startswith("+"):

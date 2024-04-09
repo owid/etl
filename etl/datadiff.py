@@ -758,6 +758,9 @@ def _local_catalog_datasets(
 
         datasets += channel_datasets
 
+    # only compare public datasets
+    datasets = [ds for ds in datasets if ds.is_public]
+
     # keep only relative path of dataset
     mapping = {str(Path(ds.path).relative_to(catalog_dir)): ds for ds in datasets}
 
