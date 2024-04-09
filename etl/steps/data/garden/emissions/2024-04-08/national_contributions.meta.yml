@@ -26,9 +26,9 @@ definitions:
       - CO2 & Greenhouse Gas Emissions
 
 dataset:
-  update_period_days: 0
+  update_period_days: 365
   description: |-
-    Jones et al. (2023) quantify national and regional contributions to the increase of global mean surface temperature over the last few centuries.
+    Jones et al. quantify national and regional contributions to the increase of global mean surface temperature over the last few centuries.
 
 tables:
   national_contributions:
@@ -39,173 +39,237 @@ tables:
         unit: tonnes
         short_unit: t
         description_short: *measured-in-tonnes
+        presentation:
+          title_public: Annual methane emissions from fossil fuels and industry
       annual_emissions_ch4_land:
         title: Annual methane emissions from agriculture and land use
         unit: tonnes
         short_unit: t
         description_short: *measured-in-tonnes
+        presentation:
+          title_public: Annual methane emissions from agriculture and land use
       annual_emissions_ch4_total:
         title: Annual methane emissions
         unit: tonnes
         short_unit: t
         description_short: *measured-in-tonnes
+        presentation:
+          title_public: Annual methane emissions
       annual_emissions_co2_fossil:
         title: Annual CO₂ emissions from fossil fuels and industry
         unit: tonnes
         short_unit: t
         description_short: *measured-in-tonnes
+        presentation:
+          title_public: Annual CO₂ emissions from fossil fuels and industry
       annual_emissions_co2_land:
         title: Annual CO₂ emissions from agriculture and land use
         unit: tonnes
         short_unit: t
         description_short: *measured-in-tonnes
+        presentation:
+          title_public: Annual CO₂ emissions from agriculture and land use
       annual_emissions_co2_total:
         title: Annual CO₂ emissions
         unit: tonnes
         short_unit: t
         description_short: *measured-in-tonnes
+        presentation:
+          title_public: Annual CO₂ emissions
       annual_emissions_n2o_fossil:
         title: Annual nitrous oxide emissions from fossil fuels and industry
         unit: tonnes
         short_unit: t
         description_short: *measured-in-tonnes
+        presentation:
+          title_public: Annual nitrous oxide emissions from fossil fuels and industry
       annual_emissions_n2o_land:
         title: Annual nitrous oxide emissions from agriculture and land use
         unit: tonnes
         short_unit: t
         description_short: *measured-in-tonnes
+        presentation:
+          title_public: Annual nitrous oxide emissions from agriculture and land use
       annual_emissions_n2o_total:
         title: Annual nitrous oxide emissions
         unit: tonnes
         short_unit: t
         description_short: *measured-in-tonnes
+        presentation:
+          title_public: Annual nitrous oxide emissions
       # Emissions (calculated by OWID) of CH4, CO2, N2O in tonnes of CO2eq, as well as combined GHG emissions in CO2eq.
       annual_emissions_ghg_fossil_co2eq:
         title: Annual greenhouse gas emissions from fossil fuels and industry in CO₂ equivalents
-        unit: tonnes
+        unit: tonnes of CO₂ equivalents
         short_unit: t
         description_short: *ghg-emissions
         description_processing: *processing-greenhouse-gases
+        presentation:
+          title_public: Annual greenhouse gas emissions from fossil fuels and industry
       annual_emissions_ghg_land_co2eq:
         title: Annual greenhouse gas emissions from agriculture and land use in CO₂ equivalents
-        unit: tonnes
+        unit: tonnes of CO₂ equivalents
         short_unit: t
         description_short: *ghg-emissions
         description_processing: *processing-greenhouse-gases
+        presentation:
+          title_public: Annual greenhouse gas emissions from agriculture and land use
       annual_emissions_ghg_total_co2eq:
         title: Annual greenhouse gas emissions in CO₂ equivalents
-        unit: tonnes
+        unit: tonnes of CO₂ equivalents
         short_unit: t
         description_short: *ghg-emissions
         description_processing: *processing-greenhouse-gases
+        presentation:
+          title_public: Annual greenhouse gas emissions
       annual_emissions_ch4_fossil_co2eq:
         title: Annual methane emissions from fossil fuels and industry in CO₂ equivalents
-        unit: tonnes
+        unit: tonnes of CO₂ equivalents
         short_unit: t
         description_short: *measured-in-co2-eq
         description_processing: *processing-methane
+        presentation:
+          title_public: Annual methane emissions from fossil fuels and industry
       annual_emissions_ch4_land_co2eq:
         title: Annual methane emissions from agriculture and land use in CO₂ equivalents
-        unit: tonnes
+        unit: tonnes of CO₂ equivalents
         short_unit: t
         description_short: *measured-in-co2-eq
         description_processing: *processing-methane
+        presentation:
+          title_public: Annual methane emissions from agriculture and land use
       annual_emissions_ch4_total_co2eq:
         title: Annual methane emissions in CO₂ equivalents
-        unit: tonnes
+        unit: tonnes of CO₂ equivalents
         short_unit: t
         description_short: *measured-in-co2-eq
         description_processing: *processing-methane
+        presentation:
+          title_public: Annual methane emissions
       annual_emissions_n2o_fossil_co2eq:
         title: Annual nitrous oxide emissions from fossil fuels and industry in CO₂ equivalents
-        unit: tonnes
+        unit: tonnes of CO₂ equivalents
         short_unit: t
         description_short: *measured-in-co2-eq
         description_processing: *processing-nitrous-oxide
+        presentation:
+          title_public: Annual nitrous oxide emissions from fossil fuels and industry
       annual_emissions_n2o_land_co2eq:
         title: Annual nitrous oxide emissions from agriculture and land use in CO₂ equivalents
-        unit: tonnes
+        unit: tonnes of CO₂ equivalents
         short_unit: t
         description_short: *measured-in-co2-eq
         description_processing: *processing-nitrous-oxide
+        presentation:
+          title_public: Annual nitrous oxide emissions from agriculture and land use
       annual_emissions_n2o_total_co2eq:
         title: Annual nitrous oxide emissions in CO₂ equivalents
-        unit: tonnes
+        unit: tonnes of CO₂ equivalents
         short_unit: t
         description_short: *measured-in-co2-eq
         description_processing: *processing-nitrous-oxide
+        presentation:
+          title_public: Annual nitrous oxide emissions
       # Cumulative emissions of CH4, CO2, N2O and GHG, in tonnes of CO2eq (as originally given in the data).
       cumulative_emissions_ghg_fossil:
         title: Cumulative greenhouse gas emissions from fossil fuels and industry
-        unit: tonnes
+        unit: tonnes of CO₂ equivalents
         short_unit: t
         description_short: *ghg-emissions
+        presentation:
+          title_public: Cumulative greenhouse gas emissions from fossil fuels and industry
       cumulative_emissions_ghg_land:
         title: Cumulative greenhouse gas emissions from agriculture and land use
-        unit: tonnes
+        unit: tonnes of CO₂ equivalents
         short_unit: t
         description_short: *ghg-emissions
+        presentation:
+          title_public: Cumulative greenhouse gas emissions from agriculture and land use
       cumulative_emissions_ghg_total:
         title: Cumulative greenhouse gas emissions
-        unit: tonnes
+        unit: tonnes of CO₂ equivalents
         short_unit: t
         description_short: *ghg-emissions
+        presentation:
+          title_public: Cumulative greenhouse gas emissions
       cumulative_emissions_ch4_fossil:
         title: Cumulative methane emissions from fossil fuels and industry
-        unit: tonnes
+        unit: tonnes of CO₂ equivalents
         short_unit: t
         description_short: *measured-in-co2-eq
+        presentation:
+          title_public: Cumulative methane emissions from fossil fuels and industry
       cumulative_emissions_ch4_land:
         title: Cumulative methane emissions from agriculture and land use
-        unit: tonnes
+        unit: tonnes of CO₂ equivalents
         short_unit: t
         description_short: *measured-in-co2-eq
+        presentation:
+          title_public: Cumulative methane emissions from agriculture and land use
       cumulative_emissions_ch4_total:
         title: Cumulative methane emissions
-        unit: tonnes
+        unit: tonnes of CO₂ equivalents
         short_unit: t
         description_short: *measured-in-co2-eq
+        presentation:
+          title_public: Cumulative methane emissions
       cumulative_emissions_co2_fossil:
         title: Cumulative CO₂ emissions from fossil fuels and industry
         unit: tonnes
         short_unit: t
         description_short: *measured-in-tonnes
+        presentation:
+          title_public: Cumulative CO₂ emissions from fossil fuels and industry
       cumulative_emissions_co2_land:
         title: Cumulative CO₂ emissions from agriculture and land use
         unit: tonnes
         short_unit: t
         description_short: *measured-in-tonnes
+        presentation:
+          title_public: Cumulative CO₂ emissions from agriculture and land use
       cumulative_emissions_co2_total:
         title: Cumulative CO₂ emissions
         unit: tonnes
         short_unit: t
         description_short: *measured-in-tonnes
+        presentation:
+          title_public: Cumulative CO₂ emissions
       cumulative_emissions_n2o_fossil:
         title: Cumulative nitrous oxide emissions from fossil fuels and industry
-        unit: tonnes
+        unit: tonnes of CO₂ equivalents
         short_unit: t
         description_short: *measured-in-co2-eq
+        presentation:
+          title_public: Cumulative nitrous oxide emissions from fossil fuels and industry
       cumulative_emissions_n2o_land:
         title: Cumulative nitrous oxide emissions from agriculture and land use
-        unit: tonnes
+        unit: tonnes of CO₂ equivalents
         short_unit: t
         description_short: *measured-in-co2-eq
+        presentation:
+          title_public: Cumulative nitrous oxide emissions from agriculture and land use
       cumulative_emissions_n2o_total:
         title: Cumulative nitrous oxide emissions
-        unit: tonnes
+        unit: tonnes of CO₂ equivalents
         short_unit: t
         description_short: *measured-in-co2-eq
+        presentation:
+          title_public: Cumulative nitrous oxide emissions
       # Temperature response to emissions of CH4, CO2, N2O and GHG, in °C (as originally given in the data).
       temperature_response_ghg_fossil:
         title: Change in global mean surface temperature caused by greenhouse gas emissions from fossil fuels and industry
         unit: °C
         short_unit: °C
         description_short: *measured-in-celsius
+        presentation:
+          title_public: Change in global mean surface temperature caused by greenhouse gas emissions from fossil fuels and industry
       temperature_response_ghg_land:
         title: Change in global mean surface temperature caused by greenhouse gas emissions from agriculture and land use
         unit: °C
         short_unit: °C
         description_short: *measured-in-celsius
+        presentation:
+          title_public: Change in global mean surface temperature caused by greenhouse gas emissions from agriculture and land use
       temperature_response_ghg_total:
         title: Change in global mean surface temperature caused by greenhouse gas emissions
         unit: °C
@@ -214,16 +278,22 @@ tables:
         description_key:
           - This temperature change measures each country's contribution to global mean surface temperature (GMST) rise from its cumulative emissions of carbon dioxide, methane and nitrous oxide.
           - The warming effects of each gas are calculated based on cumulative CO₂-equivalent emissions using the Global Warming Potential (GWP*) approach.
+        presentation:
+          title_public: Change in global mean surface temperature caused by greenhouse gas emissions
       temperature_response_ch4_fossil:
         title: Change in global mean surface temperature caused by methane emissions from fossil fuels and industry
         unit: °C
         short_unit: °C
         description_short: *measured-in-celsius
+        presentation:
+          title_public: Change in global mean surface temperature caused by methane emissions from fossil fuels and industry
       temperature_response_ch4_land:
         title: Change in global mean surface temperature caused by methane emissions from agriculture and land use
         unit: °C
         short_unit: °C
         description_short: *measured-in-celsius
+        presentation:
+          title_public: Change in global mean surface temperature caused by methane emissions from agriculture and land use
       temperature_response_ch4_total:
         title: Change in global mean surface temperature caused by methane emissions
         unit: °C
@@ -232,16 +302,22 @@ tables:
         description_key:
           - This temperature change measures each country's contribution to global mean surface temperature (GMST) rise from its cumulative emissions of methane.
           - The warming effects of each gas are calculated based on cumulative CO₂-equivalent emissions using the Global Warming Potential (GWP*) approach.
+        presentation:
+          title_public: Change in global mean surface temperature caused by methane emissions
       temperature_response_co2_fossil:
         title: Change in global mean surface temperature caused by CO₂ emissions from fossil fuels and industry
         unit: °C
         short_unit: °C
         description_short: *measured-in-celsius
+        presentation:
+          title_public: Change in global mean surface temperature caused by CO₂ emissions from fossil fuels and industry
       temperature_response_co2_land:
         title: Change in global mean surface temperature caused by CO₂ emissions from agriculture and land use
         unit: °C
         short_unit: °C
         description_short: *measured-in-celsius
+        presentation:
+          title_public: Change in global mean surface temperature caused by CO₂ emissions from agriculture and land use
       temperature_response_co2_total:
         title: Change in global mean surface temperature caused by CO₂ emissions
         unit: °C
@@ -250,16 +326,22 @@ tables:
         description_key:
           - This temperature change measures each country's contribution to global mean surface temperature (GMST) rise from its cumulative emissions of carbon dioxide.
           - The warming effects of each gas are calculated based on cumulative CO₂-equivalent emissions using the Global Warming Potential (GWP*) approach.
+        presentation:
+          title_public: Change in global mean surface temperature caused by CO₂ emissions
       temperature_response_n2o_fossil:
         title: Change in global mean surface temperature caused by nitrous oxide emissions from fossil fuels and industry
         unit: °C
         short_unit: °C
         description_short: *measured-in-celsius
+        presentation:
+          title_public: Change in global mean surface temperature caused by nitrous oxide emissions from fossil fuels and industry
       temperature_response_n2o_land:
         title: Change in global mean surface temperature caused by nitrous oxide emissions from agriculture and land use
         unit: °C
         short_unit: °C
         description_short: *measured-in-celsius
+        presentation:
+          title_public: Change in global mean surface temperature caused by nitrous oxide emissions from agriculture and land use
       temperature_response_n2o_total:
         title: Change in global mean surface temperature caused by nitrous oxide emissions
         unit: °C
@@ -268,6 +350,8 @@ tables:
         description_key:
           - This temperature change measures each country's contribution to global mean surface temperature (GMST) rise from its cumulative emissions of nitrous oxide.
           - The warming effects of each gas are calculated based on cumulative CO₂-equivalent emissions using the Global Warming Potential (GWP*) approach.
+        presentation:
+          title_public: Change in global mean surface temperature caused by nitrous oxide emissions
       # Share of emissions (calculated by OWID), e.g. methane emissions as a percentage of global methane emissions.
       # NOTE: Using CO2eq or tonnes of the original gas is irrelevant when calculated as a share of global emissions.
       share_of_annual_emissions_ghg_total:
@@ -276,21 +360,29 @@ tables:
         short_unit: "%"
         description_short: "Measured as a percentage of the world's greenhouse gas emissions."
         description_processing: *processing-greenhouse-gases
+        presentation:
+          title_public: Share of global greenhouse gas emissions
       share_of_annual_emissions_ch4_total:
         title: Share of global methane emissions
         unit: "%"
         short_unit: "%"
         description_short: "Measured as a percentage of the world's methane emissions."
+        presentation:
+          title_public: Share of global methane emissions
       share_of_annual_emissions_co2_total:
         title: Share of global CO₂ emissions
         unit: "%"
         short_unit: "%"
         description_short: "Measured as a percentage of the world's carbon dioxide emissions."
+        presentation:
+          title_public: Share of global CO₂ emissions
       share_of_annual_emissions_n2o_total:
         title: Share of global nitrous oxide emissions
         unit: "%"
         short_unit: "%"
         description_short: "Measured as a percentage of the world's nitrous oxide emissions."
+        presentation:
+          title_public: Share of global nitrous oxide emissions
       # Share of global temperature change caused by greenhouse gas emissions from each country (calculated by OWID).
       share_of_temperature_response_ghg_total:
         title: Share of contribution to global warming
@@ -300,27 +392,37 @@ tables:
         description_key:
           - This temperature change measures each country's contribution to global mean surface temperature (GMST) rise from its cumulative emissions of carbon dioxide, methane and nitrous oxide.
           - The warming effects of each gas are calculated based on cumulative CO₂-equivalent emissions using the Global Warming Potential (GWP*) approach.
+        presentation:
+          title_public: Share of contribution to global warming
       # Per capita emissions (calculated by OWID).
       annual_emissions_co2_total_per_capita:
         title: Per-capita CO₂ emissions
         unit: tonnes
         short_unit: t
         description_short: *measured-in-tonnes-per-person
+        presentation:
+          title_public: Per-capita CO₂ emissions
       annual_emissions_ch4_total_co2eq_per_capita:
         title: Per-capita methane emissions in CO₂ equivalents
-        unit: tonnes
+        unit: tonnes of CO₂ equivalents
         short_unit: t
         description_short: *measured-in-co2-eq-per-person
         description_processing: *processing-methane
+        presentation:
+          title_public: Per-capita methane emissions
       annual_emissions_n2o_total_co2eq_per_capita:
         title: Per-capita nitrous oxide emissions in CO₂ equivalents
-        unit: tonnes
+        unit: tonnes of CO₂ equivalents
         short_unit: t
         description_short: *measured-in-co2-eq-per-person
         description_processing: *processing-nitrous-oxide
+        presentation:
+          title_public: Per-capita nitrous oxide emissions
       annual_emissions_ghg_total_co2eq_per_capita:
         title: Per-capita greenhouse gas emissions in CO₂ equivalents
-        unit: tonnes
+        unit: tonnes of CO₂ equivalents
         short_unit: t
         description_short: *ghg-emissions-per-person
         description_processing: *processing-greenhouse-gases
+        presentation:
+          title_public: Per-capita greenhouse gas emissions

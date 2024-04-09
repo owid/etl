@@ -36,16 +36,15 @@ def run(dest_dir: str) -> None:
         short_name=paths.short_name,
     )
 
+    # Rename columns conveniently.
+    tb = tb.rename(columns={"cntr_name": "country"}, errors="raise")
+
     # Set an appropriate index and sort conveniently.
-    tb = (
-        tb.rename(columns={"cntr_name": "country"}, errors="raise")
-        .set_index(["country", "year", "file", "gas", "component"], verify_integrity=True)
-        .sort_index()
-    )
+    tb = tb.format(keys=["country", "year", "file", "gas", "component"])
 
     #
     # Save outputs.
     #
-    # Create a new meadow dataset with the same metadata as one of the snapshot.
+    # Create a new meadow dataset.
     ds_meadow = create_dataset(dest_dir, tables=[tb], check_variables_metadata=True)
     ds_meadow.save()
