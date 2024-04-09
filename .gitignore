@@ -49,3 +49,5 @@ site/
 .wizardcfg/*
 .streamlit/*
 .ipynb_lock
+.execution_time.json
+
