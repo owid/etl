@@ -31,8 +31,11 @@ def run(dest_dir: str) -> None:
 
     # Remove data from before 2001.
     tb = remove_pre_2001_data(tb)
+    # Remove values > 100% for "Adequate stool collection".
     tb = clean_adequate_stool_collection(tb)
+    # Add correction factor to estimate polio cases based on reported cases.
     tb = add_correction_factor(tb)
+    # Add polio surveillance status based on the screening and testing rates.
     tb = add_screening_and_testing(tb)
     tb = tb.set_index(["country", "year"], verify_integrity=True)
 
