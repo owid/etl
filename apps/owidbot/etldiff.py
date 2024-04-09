@@ -15,6 +15,9 @@ from etl.paths import BASE_DIR
 log = structlog.get_logger()
 
 
+EXCLUDE_DATASETS = "weekly_wildfires|excess_mortality|covid|fluid|flunet"
+
+
 @click.command(name="owidbot-etl-diff", cls=RichCommand, help=__doc__)
 @click.option(
     "--branch",
@@ -49,6 +52,8 @@ def cli(
 ```diff
 {diff}
 ```
+
+Automatically updated datasets matching _{EXCLUDE_DATASETS}_ are not included
 </details>
 
 _Edited: {dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%d %H:%M:%S")}_
@@ -125,6 +130,8 @@ def call_etl_diff() -> list[str]:
         "data/",
         "--include",
         "garden",
+        "--exclude",
+        EXCLUDE_DATASETS,
         "--verbose",
     ]
 
