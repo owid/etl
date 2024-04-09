@@ -134,7 +134,7 @@ def call_etl_diff() -> list[str]:
         EXCLUDE_DATASETS,
         "--verbose",
         "--workers",
-        3,
+        "3",
     ]
 
     result = subprocess.Popen(cmd, cwd=BASE_DIR, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
