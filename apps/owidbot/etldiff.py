@@ -56,7 +56,7 @@ def cli(
 Automatically updated datasets matching _{EXCLUDE_DATASETS}_ are not included
 </details>
 
-_Edited: {dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%d %H:%M:%S")}_
+_Edited: {dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%d %H:%M:%S")} UTC_
     """.strip()
 
     if dry_run:
@@ -133,6 +133,8 @@ def call_etl_diff() -> list[str]:
         "--exclude",
         EXCLUDE_DATASETS,
         "--verbose",
+        "--workers",
+        3,
     ]
 
     result = subprocess.Popen(cmd, cwd=BASE_DIR, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
