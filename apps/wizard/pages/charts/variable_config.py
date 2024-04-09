@@ -386,6 +386,8 @@ def plot_comparison_two_variables(df, variable_old, variable_new, var_id_to_disp
     #     df_variables = df_variables[df_variables["entityName"].isin(countries)]
     ## Keep only rows with relative difference != 0
     df_variables = df_variables[df_variables["Relative difference (abs, %)"] != 0]
+    ## Keep only rows with different values (old vs new)
+    df_variables = df_variables[df_variables[variable_old] != df_variables[variable_new]]
 
     # Row sanity check
     ## (Streamlit has a limit on the number of rows it can show)
