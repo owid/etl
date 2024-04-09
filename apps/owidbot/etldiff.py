@@ -120,7 +120,7 @@ def call_etl_diff() -> list[str]:
         "REMOTE",
         "data/",
         "--include",
-        "garden/biodiversity/2024-01-25/cherry_blossom",
+        "garden",
         "--verbose",
     ]
 
