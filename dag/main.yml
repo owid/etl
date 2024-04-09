@@ -724,6 +724,8 @@ steps:
     - data://meadow/wb/2024-03-11/income_groups
   data://grapher/wb/2024-03-11/income_groups:
     - data://garden/wb/2024-03-11/income_groups
+  data://grapher/un/2024-04-09/undp_hdr:
+    - data://garden/un/2024-04-09/undp_hdr
 
 include:
   - dag/open_numbers.yml
