@@ -18,6 +18,8 @@ tables:
         title: Acute Flaccid Paralysis (AFP) cases
         description_short: Number of new cases of acute flaccid paralysis (AFP) reported in a given year.
         unit: cases
+        display:
+          numDecimalPlaces: 0
       non_polio_afp_rate:
         title: Non-Polio acute flaccid paralysis (afp) rate
         description_short: The number of cases of acute flaccid paralysis (AFP) per 100,000 children aged 15 or under, not attributed to polio, that were detected and reported to the WHO.
@@ -36,10 +38,14 @@ tables:
         title: Wild Poliovirus cases
         description_short: "The number of cases of wild poliovirus detected in a given year"
         unit: cases
+        display:
+          numDecimalPlaces: 0
       cvdpv_cases:
         title: Circulating Vaccine-Derived Poliovirus (cVDPV) cases
         description_short: "The number of cases of circulating vaccine-derived poliovirus detected in a given year"
         unit: cases
+        display:
+          numDecimalPlaces: 0
       compatibles:
         title: Compatibles
         unit: ""
@@ -55,3 +61,15 @@ tables:
         description_short: "The status of polio surveillance in a given country"
         description_key: ["A country is considered to have adequate screening if it has a non-polio AFP rate of at least 2 per 100,000 children aged 15 or under.", "A country is considered to have adequate testing if it has a percentage adequate stool collection of at least 80%.", "Countries are labelled 'low risk' if they were considered low risk by the risk assessment carried out for the [2022 GPEI surveillance action plan](https://polioeradication.org/wp-content/uploads/2022/05/GPSAP-2022-2024-EN.pdf)"]
         unit: ""
+      total_cases:
+        title: Total polio cases
+        description_short: The sum of wild poliovirus cases and circulating vaccine derived poliovirus cases
+        unit: cases
+        display:
+          numDecimalPlaces: 0
+      estimated_cases:
+        title: Estimated polio cases
+        description_short: The total estimated number of polio cases, using Tebbens et al.
+        unit: cases
+        display:
+          numDecimalPlaces: 0
