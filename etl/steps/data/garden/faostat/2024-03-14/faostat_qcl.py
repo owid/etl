@@ -1,6 +1,5 @@
 """FAOSTAT garden step for faostat_qcl dataset."""
 
-from pathlib import Path
 
 import numpy as np
 import owid.catalog.processing as pr
@@ -31,18 +30,34 @@ ITEM_POULTRY = "Meat, poultry"
 ITEM_CODE_MEAT_POULTRY = "00001808"
 # Item code for 'Meat, chicken'.
 ITEM_CODE_MEAT_CHICKEN = "00001058"
-# List item codes to sum as part of "Meat, total" (avoiding double-counting items).
+# Given that the number of slaughtered animals to produce all meat is not provided, we estimate it by aggregating the
+# number of slaughtered animals for each meat item.
+# List item codes to sum as part of "Meat, Total" (avoiding double-counting items).
+# This list can be found in https://www.fao.org/faostat/en/#definitions
+# by clicking on "Item Group" and selecting Item Code 1765 ("Meat, Total" with Domain Code "QCL").
 MEAT_TOTAL_ITEM_CODES = [
-    "00000977",  # 'Meat, lamb and mutton' (previously 'Meat, lamb and mutton')
-    "00001035",  # 'Meat of pig with the bone, fresh or chilled' (previously 'Meat, pig')
-    "00001097",  # 'Horse meat, fresh or chilled' (previously 'Meat, horse')
-    "00001108",  # 'Meat of asses, fresh or chilled' (previously 'Meat, ass')
-    "00001111",  # 'Meat of mules, fresh or chilled' (previously 'Meat, mule')
-    "00001127",  # 'Meat of camels, fresh or chilled' (previously 'Meat, camel')
-    "00001141",  # 'Meat of rabbits and hares, fresh or chilled' (previously 'Meat, rabbit')
-    "00001806",  # 'Meat, beef and buffalo' (previously 'Meat, beef and buffalo')
-    "00001807",  # 'Meat, sheep and goat' (previously 'Meat, sheep and goat')
-    ITEM_CODE_MEAT_POULTRY,  # 'Meat, poultry' (previously 'Meat, poultry')
+    "00001058",  # 'Meat of chickens, fresh or chilled',
+    "00001069",  # 'Meat of ducks, fresh or chilled',
+    "00001035",  # 'Meat of pig with the bone, fresh or chilled',
+    "00001017",  # 'Meat of goat, fresh or chilled',
+    "00000977",  # 'Meat of sheep, fresh or chilled',
+    "00000867",  # 'Meat of cattle with the bone, fresh or chilled',
+    "00000947",  # 'Meat of buffalo, fresh or chilled',
+    "00001127",  # 'Meat of camels, fresh or chilled',
+    "00001097",  # 'Horse meat, fresh or chilled',
+    "00001080",  # 'Meat of turkeys, fresh or chilled',
+    "00001141",  # 'Meat of rabbits and hares, fresh or chilled',
+    "00001163",  # 'Game meat, fresh, chilled or frozen',
+    "00001108",  # 'Meat of asses, fresh or chilled',
+    "00001073",  # 'Meat of geese, fresh or chilled',
+    "00001111",  # 'Meat of mules, fresh or chilled',
+    "00001166",  # 'Other meat n.e.c. (excluding mammals), fresh, chilled or frozen',
+    "00001158",  # 'Meat of other domestic camelids, fresh or chilled',
+    "00001151",  # 'Meat of other domestic rodents, fresh or chilled',
+    "00001089",  # 'Meat of pigeons and other birds n.e.c., fresh, chilled or frozen',
+    "00001176",  # 'Snails, fresh, chilled, frozen, dried, salted or in brine, except sea snails',
+    # Items that were in the list of "Meat, Total", but were not in the data:
+    # "00001083",  # 'Other birds',
 ]
 
 # List of element codes for "Producing or slaughtered animals" (they have different items assigned).
@@ -163,17 +178,10 @@ def add_slaughtered_animals_to_meat_total(tb: Table) -> Table:
 
     error = f"Some items required to get the aggregate '{TOTAL_MEAT_ITEM}' are missing in data."
     assert set(MEAT_TOTAL_ITEM_CODES) < set(tb["item_code"]), error
-    assert SLAUGHTERED_ANIMALS_ELEMENT in tb["element"].unique()
-    assert SLAUGHTERED_ANIMALS_UNIT in tb["unit"].unique()
+    assert SLAUGHTERED_ANIMALS_ELEMENT in set(tb["element"])
+    assert SLAUGHTERED_ANIMALS_UNIT in set(tb["unit"])
 
-    # Check that, indeed, the number of slaughtered animals for total meat is not given in the original data.
-    assert tb[
-        (tb["item"] == TOTAL_MEAT_ITEM)
-        & (tb["element"] == SLAUGHTERED_ANIMALS_ELEMENT)
-        & (tb["unit"] == SLAUGHTERED_ANIMALS_UNIT)
-    ].empty
-
-    # There are two element codes for the same element (they have different items assigned).
+    # Check that there are two element codes for the same element (they have different items assigned).
     error = "Element codes for 'Producing or slaughtered animals' may have changed."
     assert (
         tb[(tb["element"] == SLAUGHTERED_ANIMALS_ELEMENT) & ~(tb["element_code"].str.contains("pc"))]["element_code"]
@@ -181,6 +189,13 @@ def add_slaughtered_animals_to_meat_total(tb: Table) -> Table:
         .tolist()
         == SLAUGHTERED_ANIMALS_ELEMENT_CODES
     ), error
+
+    # Check that they use the same unit.
+    error = "Unit for element 'Producing or slaughtered animals' may have changed."
+    assert set(tb[(tb["element"] == SLAUGHTERED_ANIMALS_ELEMENT)]["unit"]) == set(["animals"]), error
+
+    # Check that, indeed, the number of slaughtered animals for total meat is not given in the original data.
+    assert tb[(tb["item"] == TOTAL_MEAT_ITEM) & (tb["element"] == SLAUGHTERED_ANIMALS_ELEMENT)].empty
 
     # Check that the items assigned to each the two element codes do not overlap.
     error = "Element codes for 'Producing or slaughtered animals' have overlapping items."
@@ -437,7 +452,7 @@ def run(dest_dir: str) -> None:
     # Load data.
     #
     # Fetch the dataset short name from dest_dir.
-    dataset_short_name = Path(dest_dir).name
+    dataset_short_name = f"{NAMESPACE}_qcl"
 
     # Define path to current step file.
     current_step_file = (CURRENT_DIR / dataset_short_name).with_suffix(".py")
