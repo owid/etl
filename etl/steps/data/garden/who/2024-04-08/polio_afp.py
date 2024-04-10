@@ -2,6 +2,7 @@
 
 import pandas as pd
 from owid.catalog import Table
+from owid.catalog import processing as pr
 
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
@@ -18,10 +19,14 @@ def run(dest_dir: str) -> None:
     #
     # Load meadow dataset.
     ds_meadow = paths.load_dataset("polio_afp")
+    ds_historical = paths.load_dataset("polio_historical")
 
     # Read table from meadow dataset.
     tb = ds_meadow["polio_afp"].reset_index()
-
+    tb_hist = ds_historical["polio_historical"].reset_index()
+    tb_hist = tb_hist.rename(columns={"cases": "total_cases"})
+    # Only need this for data prior to 2001
+    tb_hist = tb_hist[tb_hist["year"] < 2001]
     #
     # Process data.
     #
@@ -33,10 +38,16 @@ def run(dest_dir: str) -> None:
     tb = remove_pre_2001_data(tb)
     # Remove values > 100% for "Adequate stool collection".
     tb = clean_adequate_stool_collection(tb)
+    # Add total cases
+    tb["total_cases"] = tb["wild_poliovirus_cases"] + tb["cvdpv_cases"]
+    # Need to deal with overlapping years
+    tb = pr.concat([tb, tb_hist], axis=0)
     # Add correction factor to estimate polio cases based on reported cases.
     tb = add_correction_factor(tb)
+    tb["estimated_cases"] = tb["total_cases"] * tb["correction_factor"]
     # Add polio surveillance status based on the screening and testing rates.
     tb = add_screening_and_testing(tb)
+
     tb = tb.set_index(["country", "year"], verify_integrity=True)
 
     #
