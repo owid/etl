@@ -1,0 +1,34 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: OECD Income Distribution Database
+    description: |-
+      The OECD Income Distribution database (IDD) has been developed to benchmark and monitor countries’ performance in the field of income inequality and poverty. It contains a number of standardised indicators based on the central concept of “equivalised household disposable income”, i.e. the total income received by the households less the current taxes and transfers they pay, adjusted for household size with an equivalence scale. While household income is only one of the factors shaping people’s economic well-being, it is also the one for which comparable data for all OECD countries are most common. Income distribution has a long-standing tradition among household-level statistics, with regular data collections going back to the 1980s (and sometimes earlier) in many OECD countries.
+
+      Achieving comparability in this field is a challenge, as national practices differ widely in terms of concepts, measures, and statistical sources. In order to maximise international comparability as well as inter-temporal consistency of data, the IDD data collection and compilation process is based on a common set of statistical conventions (e.g. on income concepts and components). The information obtained by the OECD through a network of national data providers, via a standardized questionnaire, is based on national sources that are deemed to be most representative for each country.
+
+      Small changes in estimates between years should be treated with caution as they may not be statistically significant.
+    date_published: "2024-03-22"
+
+    # Citation
+    producer: OECD Income Distribution Database
+    citation_full: |-
+      OECD (2024). Income Distribution Database, https://www.oecd.org/social/income-distribution-database.htm
+    attribution_short: OECD
+
+    # Files
+    url_main: https://www.oecd.org/social/income-distribution-database.htm
+    url_download: https://sdmx.oecd.org/public/rest/data/OECD.WISE.INE,DSD_WISE_IDD@DF_IDD,1.0/.A.INC_GROSS_GINI+INC_MRKT_GINI+PR_INC_MRKT+D5_1_INC_DISP+D9_5_INC_DISP+D9_1_INC_DISP+PAL_INC_DISP+QR_INC_DISP+PR_INC_DISP+INC_DISP_GINI...Y_GT65+Y18T65+_T.METH2012.D_CUR.?dimensionAtObservation=AllDimensions&format=csvfilewithlabels
+    date_accessed: 2024-04-10
+
+    # License
+    license:
+      name: OECD Terms and Conditions
+      url: https://www.oecd.org/termsandconditions/
+
+outs:
+  - md5: 9af9f06e82449979cddd07e7b96c4acf
+    size: 7519474
+    path: income_distribution_database.csv
