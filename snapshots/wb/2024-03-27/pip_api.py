@@ -1426,13 +1426,13 @@ def generate_key_indicators(wb_api: WB_API):
     # I check if the set of countries is the same in the df and in the aux table (list of countries)
     aux_dict = pip_aux_tables(wb_api, table="countries")
     assert set(results["country"].unique()) == set(aux_dict["countries"]["country_name"].unique()), log.fatal(
-        "List of countries is not the same!"
+        f"List of countries is not the same! Differences: {set(results['country'].unique()) - set(aux_dict['countries']['country_name'].unique())}"
     )
 
     # I check if the set of regions is the same in the df and in the aux table (list of regions)
     aux_dict = pip_aux_tables(wb_api, table="regions")
     assert set(results_region["country"].unique()) == set(aux_dict["regions"]["region"].unique()), log.fatal(
-        "List of regions is not the same!"
+        f"List of regions is not the same! Differences: {set(results_region['country'].unique()) - set(aux_dict['regions']['region'].unique())}"
     )
 
     # Concatenate df_country and df_region
