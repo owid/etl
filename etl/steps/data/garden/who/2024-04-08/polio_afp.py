@@ -4,13 +4,17 @@ import pandas as pd
 from owid.catalog import Table
 from owid.catalog import processing as pr
 
-from etl.data_helpers import geo
+from etl.data_helpers.geo import add_regions_to_table, harmonize_countries
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
+# Year to use for the screening and testing rates.
+# Should be the most recent year of complete data.
 SCREENING_YEAR = 2023
+
+REGIONS = ["North America", "South America", "Europe", "Africa", "Asia", "Oceania", "World"]
 
 
 def run(dest_dir: str) -> None:
@@ -20,6 +24,10 @@ def run(dest_dir: str) -> None:
     # Load meadow dataset.
     ds_meadow = paths.load_dataset("polio_afp")
     ds_historical = paths.load_dataset("polio_historical")
+    # Load regions dataset.
+    ds_regions = paths.load_dataset("regions")
+    # Load income groups dataset.
+    ds_income_groups = paths.load_dataset("income_groups")
 
     # Read table from meadow dataset.
     tb = ds_meadow["polio_afp"].reset_index()
@@ -30,7 +38,7 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
-    tb = geo.harmonize_countries(
+    tb = harmonize_countries(
         df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
     )
 
@@ -42,6 +50,15 @@ def run(dest_dir: str) -> None:
     tb["total_cases"] = tb["wild_poliovirus_cases"] + tb["cvdpv_cases"]
     # Need to deal with overlapping years
     tb = pr.concat([tb, tb_hist], axis=0)
+    # Add region aggregates.
+    tb_reg = add_regions_to_table(
+        tb[["country", "year", "afp_cases", "wild_poliovirus_cases", "cvdpv_cases", "total_cases"]],
+        regions=REGIONS,
+        ds_regions=ds_regions,
+        ds_income_groups=ds_income_groups,
+        min_num_values_per_year=1,
+    )
+    tb_reg = tb_reg[tb_reg["country"].isin(REGIONS)]
     # Add correction factor to estimate polio cases based on reported cases.
     tb = add_correction_factor(tb)
     tb["estimated_cases"] = tb["total_cases"] * tb["correction_factor"]
