@@ -182,6 +182,9 @@ def regional_aggregations(tb: Table, tb_pop: Table) -> Table:
     # Define non-colonies identifiers for `colonizer`
     non_colonies = ["zz. Colonizer", "zzz. Not colonized", "zzzz. No longer colonized"]
 
+    # Backwards compatibility
+    tb_regions["colonizer"] = tb_regions["colonizer"].astype(object).fillna(np.nan)
+
     # Define colony_number, which is 1 if countries are not in non_colonies and colony_pop, which is the product of colony and population
     tb_regions["colony_number"] = tb_regions["colonizer"].apply(lambda x: 0 if x in non_colonies else 1)
     tb_regions["colony_pop"] = tb_regions["population"] * tb_regions["colony_number"]

@@ -32,6 +32,9 @@ def run(dest_dir: str) -> None:
     log.info("longitudinal_wvs.harmonize_countries")
     tb: Table = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
 
+    cols = [c for c in tb.columns if c not in ["country", "year"]]
+    tb[cols] = tb[cols].astype(float)
+
     # Compute the ratio of responses indicating a great deal or very much worry about terrorist attacks
     q1 = question_1(tb)
     # Compute the ratio of agree to disagree responses regarding the effects of immigrants on the risks of terrorism.

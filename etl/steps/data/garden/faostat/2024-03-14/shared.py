@@ -974,8 +974,11 @@ def remove_overlapping_data_between_historical_regions_and_successors(
             columns
         ].drop_duplicates()
         # Find unique years where the above combinations of item-element-years of region and successors overlap.
-        overlapping_years = pr.concat([historical_region_years, historical_successors_years], ignore_index=True)
-        overlapping_years = overlapping_years[overlapping_years.duplicated()]
+        if historical_region_years.empty and historical_successors_years.empty:
+            overlapping_years = pd.DataFrame()
+        else:
+            overlapping_years = pr.concat([historical_region_years, historical_successors_years], ignore_index=True)
+            overlapping_years = overlapping_years[overlapping_years.duplicated()]
         if not overlapping_years.empty:
             log.warning(
                 f"Removing rows where historical region {historical_region} overlaps with its successors "
@@ -1298,7 +1301,7 @@ def convert_variables_given_per_capita_to_total_value(tb: Table, elements_metada
     # All variables in the custom_elements_and_units.csv file with "was_per_capita" True will be converted into
     # total (non-per-capita) values.
     element_codes_that_were_per_capita = list(
-        elements_metadata[elements_metadata["was_per_capita"]]["element_code"].unique()
+        elements_metadata[elements_metadata["was_per_capita"] == 1]["element_code"].unique()
     )
     if len(element_codes_that_were_per_capita) > 0:
         tb = tb.copy()
@@ -1349,7 +1352,7 @@ def add_per_capita_variables(tb: Table, elements_metadata: Table) -> Table:
 
     # Find element codes that have to be made per capita.
     element_codes_to_make_per_capita = list(
-        elements_metadata[elements_metadata["make_per_capita"]]["element_code"].unique()
+        elements_metadata[elements_metadata["make_per_capita"] == 1]["element_code"].unique()
     )
     if len(element_codes_to_make_per_capita) > 0:
         log.info("add_per_capita_variables", shape=tb_with_pc_variables.shape)
