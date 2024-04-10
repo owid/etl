@@ -20,7 +20,7 @@ from apps.backport.datasync.datasync import upload_gzip_dict
 from etl import config, paths
 from etl import grapher_model as gm
 from etl.backport_helpers import GrapherConfig
-from etl.db import get_engine
+from etl.db import get_engine, read_sql
 from etl.files import checksum_str
 from etl.snapshot import Snapshot, SnapshotMeta
 
@@ -346,7 +346,7 @@ def _load_values(engine: Engine, variable_ids: list[int]) -> pd.DataFrame:
             "entityCode": "entity_code",
         }
     )
-    vf: pd.DataFrame = pd.read_sql(q, engine, params={"variable_ids": variable_ids})
+    vf = read_sql(q, engine, params={"variable_ids": variable_ids})
     df = df.merge(vf, on="variable_id")
 
     # try converting values to float if possible, this can make the data 50% smaller

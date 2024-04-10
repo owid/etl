@@ -3,7 +3,7 @@ import os
 import re
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
-from typing import Any, Callable, Dict, Iterable, List, Optional, cast
+from typing import Any, Callable, Dict, Iterable, List, Optional, Union, cast
 
 import numpy as np
 import pandas as pd
@@ -11,7 +11,7 @@ import requests
 import rich
 import rich_click as click
 import structlog
-from owid.catalog import Dataset, DatasetMeta, LocalCatalog, RemoteCatalog, Table, find
+from owid.catalog import Dataset, DatasetMeta, LocalCatalog, RemoteCatalog, Table, VariableMeta, find
 from owid.catalog.catalogs import CHANNEL, OWID_CATALOG_URI
 from rich.console import Console
 from rich.panel import Panel
@@ -111,16 +111,33 @@ tb = {_snippet_dataset(ds_b, table_name)}
             for col in ds_b[table_name].columns:
                 self.p(f"\t\t[green]+ Column [b]{col}[/b]")
         else:
-            table_a = ds_a[table_name]
-            table_b = ds_b[table_name]
+            # get both tables in parallel
+            with ThreadPoolExecutor() as executor:
+                future_a = executor.submit(ds_a.__getitem__, table_name)
+                future_b = executor.submit(ds_b.__getitem__, table_name)
+
+                table_a = future_a.result()
+                table_b = future_b.result()
 
             # set default index for datasets that don't have one
             if table_a.index.names == [None] and table_b.index.names == [None]:
                 candidates = {"entity", "date", "country", "year"}
-                new_index = list(candidates & set(table_a.columns) & set(table_b.columns))
-                if new_index:
-                    table_a = table_a.set_index(new_index)
-                    table_b = table_b.set_index(new_index)
+                new_index_cols = list(candidates & set(table_a.columns) & set(table_b.columns))
+                if new_index_cols:
+                    table_a = table_a.set_index(new_index_cols)
+                    table_b = table_b.set_index(new_index_cols)
+
+            # if using default index, it is possible that we have non-determinstic order
+            # try sorting by the first two columns
+            if (
+                table_a.index.names == [None]
+                and table_b.index.names == [None]
+                and len(table_a) == len(table_b)
+                and table_a.index[-1] == len(table_a) - 1
+                and len(table_a) <= 1000
+            ):
+                table_a = table_a.sort_values(list(table_a.columns)).reset_index(drop=True)
+                table_b = table_b.sort_values(list(table_b.columns)).reset_index(drop=True)
 
             # indexes differ, reset them to make them somehow comparable
             if table_a.index.names != table_b.index.names:
@@ -131,21 +148,19 @@ tb = {_snippet_dataset(ds_b, table_name)}
 
             # only sort index if different to avoid unnecessary sorting for huge datasets such as ghe
             if len(table_a) != len(table_b) or not _index_equals(table_a, table_b):
-                index_diff = True
-                table_a, table_b, eq_index = _align_tables(table_a, table_b)
-
-                # if only index order has changed, don't report it
-                if eq_index.all():
-                    index_diff = False
+                table_a, table_b, eq_index, new_index, removed_index = _align_tables(table_a, table_b)
             else:
-                index_diff = False
                 eq_index = pd.Series(True, index=table_a.index)
+                new_index = pd.Series(False, index=table_a.index)
+                removed_index = pd.Series(False, index=table_a.index)
 
             # resetting index will make comparison easier
-            dims = table_a.index.names
+            dims = [dim for dim in table_a.index.names if dim is not None]
             table_a: Table = table_a.reset_index()
             table_b: Table = table_b.reset_index()
-            eq_index = eq_index.reset_index(drop=True)
+            eq_index = cast(pd.Series, eq_index.reset_index(drop=True))
+            new_index = cast(pd.Series, new_index.reset_index(drop=True))
+            removed_index = cast(pd.Series, removed_index.reset_index(drop=True))
 
             # compare table metadata
             diff = _dict_diff(_table_metadata_dict(table_a), _table_metadata_dict(table_b), tabs=3)
@@ -157,8 +172,31 @@ tb = {_snippet_dataset(ds_b, table_name)}
             else:
                 self.p(f"\t[white]= Table [b]{table_name}[/b]")
 
+            # compare index
+            if not eq_index.all():
+                for dim in dims:
+                    if eq_index.all():
+                        self.p(f"\t\t[white]= Dim [b]{dim}[/b]")
+                    else:
+                        self.p(f"\t\t[yellow]~ Dim [b]{dim}[/b]")
+                        if self.verbose:
+                            dims_without_dim = [d for d in dims if d != dim]
+                            out = _data_diff(
+                                table_a,
+                                table_b,
+                                dim,
+                                dims_without_dim,
+                                eq_index,
+                                eq_index,
+                                new_index,
+                                removed_index,
+                                tabs=4,
+                            )
+                            if out:
+                                self.p(out)
+
             # compare columns
-            all_cols = sorted(set(table_a.columns) | set(table_b.columns))
+            all_cols = sorted((set(table_a.columns) | set(table_b.columns)) - set(dims))
             for col in all_cols:
                 if self.cols and not re.search(self.cols, col):
                     continue
@@ -171,31 +209,33 @@ tb = {_snippet_dataset(ds_b, table_name)}
                     col_a = table_a[col]
                     col_b = table_b[col]
 
-                    # equality on index and series
-                    eq_data = series_equals(table_a[col], table_b[col])
-                    data_diff = (~eq_data).any()
-                    eq = eq_index & eq_data
-
-                    col_a_meta = col_a.metadata.to_dict()
-                    col_b_meta = col_b.metadata.to_dict()
-
-                    meta_diff = _dict_diff(col_a_meta, col_b_meta, tabs=4)
-
-                    changed = (
-                        (["data"] if data_diff else [])
-                        + (["metadata"] if meta_diff else [])
-                        + (["index"] if index_diff else [])
+                    # metadata diff
+                    meta_diff = _dict_diff(
+                        _column_metadata_dict(col_a.metadata), _column_metadata_dict(col_b.metadata), tabs=4
                     )
 
+                    # equality on index and series
+                    eq_data = series_equals(table_a[col], table_b[col])
+
+                    changed = []
+                    if meta_diff:
+                        changed.append("changed [u]metadata[/u]")
+                    if new_index.any():
+                        changed.append("new [u]data[/u]")
+                    if (~eq_data[~new_index]).any():
+                        changed.append("changed [u]data[/u]")
+
                     if changed:
-                        self.p(f"\t\t[yellow]~ Column [b]{col}[/b] (changed [u]{' & '.join(changed)}[/u])")
+                        self.p(f"\t\t[yellow]~ Column [b]{col}[/b] ({', '.join(changed)})")
                         if self.verbose:
                             if meta_diff:
-                                self.p(_dict_diff(col_a_meta, col_b_meta, tabs=4))
-                            if data_diff or index_diff:
+                                self.p(meta_diff)
+                            if new_index.any() or removed_index.any() or (~eq_data).any():
                                 if meta_diff:
                                     self.p("")
-                                out = _data_diff(table_a, table_b, col, dims, tabs=4, eq=eq)
+                                out = _data_diff(
+                                    table_a, table_b, col, dims, eq_data, eq_index, new_index, removed_index, tabs=4
+                                )
                                 if out:
                                     self.p(out)
                     else:
@@ -279,6 +319,13 @@ class RemoteDataset:
     is_flag=True,
     help="Print code snippet for loading both tables, useful for debugging in notebook",
 )
+@click.option(
+    "--workers",
+    "-w",
+    type=int,
+    help="Use multiple threads.",
+    default=1,
+)
 def cli(
     path_a: str,
     path_b: str,
@@ -288,10 +335,13 @@ def cli(
     exclude: Optional[str],
     verbose: bool,
     snippet: bool,
+    workers: int,
 ) -> None:
     """Compare all datasets from two catalogs and print out a summary of their differences.
 
     Compare all the datasets from catalog in `PATH_A` with all the datasets in catalog `PATH_B`. The catalog paths link to the `data/` folder with all the datasets (it contains a `catalog.meta.json` file)
+
+    You can also use a path to a dataset.
 
     Note that you can use the keyword "REMOTE" as the path, if you want to run a comparison with the remote catalog.
 
@@ -320,14 +370,24 @@ def cli(
     path_to_ds_a = _load_catalog_datasets(path_a, channel, include, exclude)
     path_to_ds_b = _load_catalog_datasets(path_b, channel, include, exclude)
 
-    # only keep datasets in DAG
+    # only keep datasets in DAG, unless there's only one dataset selected by precise path
     dag_steps = {s.split("://")[1] for s in load_dag().keys()}
-    path_to_ds_a = {k: v for k, v in path_to_ds_a.items() if k in dag_steps}
-    path_to_ds_b = {k: v for k, v in path_to_ds_b.items() if k in dag_steps}
+    if len(path_to_ds_a) > 1:
+        path_to_ds_a = {k: v for k, v in path_to_ds_a.items() if k in dag_steps}
+    if len(path_to_ds_b) > 1:
+        path_to_ds_b = {k: v for k, v in path_to_ds_b.items() if k in dag_steps}
+
+    if not path_to_ds_a:
+        console.print(f"[yellow]❓ No datasets found in {path_a}[/yellow]")
+        exit(0)
+    if not path_to_ds_b:
+        console.print(f"[yellow]❓ No datasets found in {path_b}[/yellow]")
+        exit(0)
 
     any_diff = False
     any_error = False
 
+    matched_datasets = []
     for path in sorted(set(path_to_ds_a.keys()) | set(path_to_ds_b.keys())):
         ds_a = _match_dataset(path_to_ds_a, path)
         ds_b = _match_dataset(path_to_ds_b, path)
@@ -337,27 +397,65 @@ def cli(
             # to improve performance. Source checksum should be enough
             continue
 
-        lines = []
+        matched_datasets.append((ds_a, ds_b))
 
-        def _append_and_print(x):
-            lines.append(x)
-            console.print(x)
+    if workers > 1:
+        futures = []
 
-        try:
-            differ = DatasetDiff(ds_a, ds_b, cols=cols, print=_append_and_print, verbose=verbose, snippet=snippet)
-            differ.summary()
-        except DatasetError as e:
-            # soft fail and continue with another dataset
-            _append_and_print(f"[bold red]⚠ Error: {e}[/bold red]")
-            continue
-        except Exception as e:
-            # soft fail and continue with another dataset
-            log.error(e, exc_info=True)
-            any_error = True
-            continue
+        with ThreadPoolExecutor(max_workers=workers) as executor:
+            for ds_a, ds_b in matched_datasets:
 
-        if any("~" in line for line in lines if isinstance(line, str)):
-            any_diff = True
+                def func(ds_a, ds_b):
+                    lines = []
+                    differ = DatasetDiff(
+                        ds_a, ds_b, cols=cols, print=lambda x: lines.append(x), verbose=verbose, snippet=snippet
+                    )
+                    differ.summary()
+                    return lines
+
+                futures.append(executor.submit(func, ds_a, ds_b))
+
+            for future in futures:
+                try:
+                    lines = future.result()
+                except DatasetError as e:
+                    # soft fail and continue with another dataset
+                    lines = [f"[bold red]⚠ Error: {e}[/bold red]"]
+                except Exception as e:
+                    # soft fail and continue with another dataset
+                    log.error(e, exc_info=True)
+                    any_error = True
+                    lines = []
+                    continue
+
+                for line in lines:
+                    console.print(line)
+
+                    if "~" in line:
+                        any_diff = True
+    else:
+        for ds_a, ds_b in matched_datasets:
+            lines = []
+
+            def _append_and_print(x):
+                lines.append(x)
+                console.print(x)
+
+            try:
+                differ = DatasetDiff(ds_a, ds_b, cols=cols, print=_append_and_print, verbose=verbose, snippet=snippet)
+                differ.summary()
+            except DatasetError as e:
+                # soft fail and continue with another dataset
+                _append_and_print(f"[bold red]⚠ Error: {e}[/bold red]")
+                continue
+            except Exception as e:
+                # soft fail and continue with another dataset
+                log.error(e, exc_info=True)
+                any_error = True
+                continue
+
+            if any("~" in line for line in lines if isinstance(line, str)):
+                any_diff = True
 
     console.print()
     if not path_to_ds_a and not path_to_ds_b:
@@ -388,8 +486,8 @@ def _index_equals(table_a: pd.DataFrame, table_b: pd.DataFrame, sample: int = 10
         index_a = table_a.index
         index_b = table_b.index
     else:
-        index_a = table_a.sample(sample, random_state=0).index
-        index_b = table_b.sample(sample, random_state=0).index
+        index_a = table_a.sample(sample, random_state=0, replace=True).index
+        index_b = table_b.sample(sample, random_state=0, replace=True).index
 
     return index_a.equals(index_b)
 
@@ -413,23 +511,82 @@ def _dict_diff(dict_a: Dict[str, Any], dict_b: Dict[str, Any], tabs: int = 0, **
         return "\t" * tabs + "".join(lines).replace("\n", "\n" + "\t" * tabs).rstrip()
 
 
+def _df_to_str(df: pd.DataFrame, limit: int = 5) -> list[str]:
+    lines = []
+    if len(df) > limit:
+        df_samp = df.sample(limit, random_state=0).sort_index()
+    else:
+        df_samp = df
+
+    for line in df_samp.to_string(index=False).split("\n"):  # type: ignore
+        lines.append("  " + line)
+    return lines
+
+
 def _data_diff(
-    table_a: Table, table_b: Table, col: str, dims: list[str], tabs: int, eq: Optional[pd.Series] = None
+    table_a: Table,
+    table_b: Table,
+    col: str,
+    dims: list[str],
+    eq_data: pd.Series,
+    eq_index: pd.Series,
+    new_index: pd.Series,
+    removed_index: pd.Series,
+    tabs: int = 0,
 ) -> str:
     """Return summary of data differences."""
-    if eq is None:
-        eq = series_equals(table_a[col], table_b[col])
+    # eq = eq_data & eq_index
+    n = (eq_index | new_index).sum()
 
-    lines = [
-        f"- Changed values: {(~eq).sum()} / {len(eq)} ({(~eq).sum() / len(eq) * 100:.2f}%)",
-    ]
+    lines = []
 
+    cols = [d for d in dims if d is not None] + [col]
+
+    # new values
+    if new_index.any():
+        lines.append(
+            f"+ New values: {new_index.sum()} / {n} ({new_index.sum() / n * 100:.2f}%)",
+        )
+        lines += _df_to_str(table_b.loc[new_index, cols])
+
+    # removed values
+    if removed_index.any():
+        lines.append(
+            f"- Removed values: {removed_index.sum()} / {n} ({removed_index.sum() / n * 100:.2f}%)",
+        )
+        lines += _df_to_str(table_a.loc[removed_index, cols])
+
+    # changed values
+    neq = ~eq_data & eq_index
+    if neq.any():
+        lines.append(
+            f"~ Changed values: {neq.sum()} / {n} ({neq.sum() / n * 100:.2f}%)",
+        )
+        samp_a = table_a.loc[neq, cols]
+        samp_b = table_b.loc[neq, cols]
+        both = samp_a.merge(samp_b, on=dims, suffixes=(" -", " +"))
+        lines += _df_to_str(both)
+
+    # add color
+    lines = ["[violet]" + line for line in lines]
+
+    if not lines:
+        return ""
+    else:
+        # add tabs
+        return "\t" * tabs + "\n".join(lines).replace("\n", "\n" + "\t" * tabs).rstrip()
+
+    """OLD CODE, PARTS OF IT COULD BE STILL USEFUL
     # changes in index
     for dim in dims:
         if dim is not None:
             diff_elements = table_a.loc[~eq, dim].dropna().astype(str).sort_values().unique().tolist()
             detail = f"{len(diff_elements)} affected" if len(diff_elements) > 5 else ", ".join(diff_elements)
-            lines.append(f"- {dim}: {detail}")
+            lines.append(f"- Dim `{dim}`: {detail}")
+
+    lines.append(
+        f"- Changed values: {(~eq).sum()} / {len(eq)} ({(~eq).sum() / len(eq) * 100:.2f}%)",
+    )
 
     # changes in values
     if (
@@ -452,15 +609,7 @@ def _data_diff(
         rel_diff = abs_diff / mean if not pd.isnull(mean) and mean != 0 else np.nan
 
         lines.append(f"- Avg. change: {abs_diff:.2f} ({rel_diff:.0%})")
-
-    # add color
-    lines = ["[violet]" + line for line in lines]
-
-    if not lines:
-        return ""
-    else:
-        # add tabs
-        return "\t" * tabs + "\n".join(lines).replace("\n", "\n" + "\t" * tabs).rstrip()
+    """
 
 
 def _is_datetime(dtype: Any) -> bool:
@@ -470,7 +619,7 @@ def _is_datetime(dtype: Any) -> bool:
         return False
 
 
-def _align_tables(table_a: Table, table_b: Table) -> tuple[Table, Table, pd.Series]:
+def _align_tables(table_a: Table, table_b: Table) -> tuple[Table, Table, pd.Series, pd.Series, pd.Series]:
     if not table_a.index.is_unique or not table_b.index.is_unique:
         raise DatasetError("Index must be unique.")
 
@@ -488,11 +637,14 @@ def _align_tables(table_a: Table, table_b: Table) -> tuple[Table, Table, pd.Seri
     table_b["_x"] = 1
     table_a, table_b = table_a.align(table_b, join="outer", copy=False)
 
-    eq_index = table_a["_x"].notnull() & table_b["_x"].notnull()
+    new_index = table_a["_x"].isnull()
+    removed_index = table_b["_x"].isnull()
+
+    eq_index = ~(new_index | removed_index)
     table_a.drop(columns="_x", inplace=True)
     table_b.drop(columns="_x", inplace=True)
 
-    return cast(Table, table_a), cast(Table, table_b), eq_index
+    return cast(Table, table_a), cast(Table, table_b), eq_index, new_index, removed_index
 
 
 def _sort_index(df: Table) -> Table:
@@ -554,7 +706,17 @@ def _table_metadata_dict(tab: Table) -> Dict[str, Any]:
     # for col in tab.columns:
     #     d["columns"][col] = tab[col].metadata.to_dict()
 
+    # sort primary key
+    if "primary_key" in d:
+        d["primary_key"] = sorted(d["primary_key"])
+
     del d["dataset"]
+    return d
+
+
+def _column_metadata_dict(meta: VariableMeta) -> Dict[str, Any]:
+    d = meta.to_dict()
+    d.pop("processing_log", None)
     return d
 
 
@@ -571,10 +733,21 @@ def _dataset_metadata_dict(ds: Dataset) -> Dict[str, Any]:
 
 
 def _local_catalog_datasets(
-    catalog_path: str, channels: Iterable[CHANNEL], include: Optional[str], exclude: Optional[str]
+    catalog_path: Union[str, Path], channels: Iterable[CHANNEL], include: Optional[str], exclude: Optional[str]
 ) -> Dict[str, Dataset]:
     """Return a mapping from dataset path to Dataset object of local catalog."""
-    lc_a = LocalCatalog(catalog_path, channels=channels)
+    catalog_path = Path(catalog_path)
+    catalog_dir = catalog_path
+
+    # it is possible to use subset of a data catalog
+    while not (catalog_dir / "catalog.meta.json").exists() and catalog_dir != catalog_dir.parent:
+        catalog_dir = catalog_dir.parent
+
+    if catalog_dir != catalog_path:
+        assert include is None, "Include pattern is not supported for subset of a catalog"
+        include = str(catalog_path.relative_to(catalog_dir))
+
+    lc_a = LocalCatalog(catalog_dir, channels=channels)
     datasets = []
     for chan in lc_a.channels:
         channel_datasets = list(lc_a.iter_datasets(chan, include=include))
@@ -585,7 +758,7 @@ def _local_catalog_datasets(
         datasets += channel_datasets
 
     # keep only relative path of dataset
-    mapping = {str(Path(ds.path).relative_to(catalog_path)): ds for ds in datasets}
+    mapping = {str(Path(ds.path).relative_to(catalog_dir)): ds for ds in datasets}
 
     if exclude:
         re_exclude = re.compile(exclude)
@@ -619,10 +792,10 @@ def _remote_catalog_datasets(channels: Iterable[CHANNEL], include: str, exclude:
     ds_paths = frame["ds_paths"]
 
     if include:
-        ds_paths = ds_paths[ds_paths.str.contains(include)]
+        ds_paths = ds_paths[ds_paths.str.contains(include, regex=True)]
 
     if exclude:
-        ds_paths = ds_paths[~ds_paths.str.contains(exclude)]
+        ds_paths = ds_paths[~ds_paths.str.contains(exclude, regex=True)]
 
     ds_paths = set(ds_paths)
 
