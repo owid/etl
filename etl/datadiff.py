@@ -370,10 +370,19 @@ def cli(
     path_to_ds_a = _load_catalog_datasets(path_a, channel, include, exclude)
     path_to_ds_b = _load_catalog_datasets(path_b, channel, include, exclude)
 
-    # only keep datasets in DAG
+    # only keep datasets in DAG, unless there's only one dataset selected by precise path
     dag_steps = {s.split("://")[1] for s in load_dag().keys()}
-    path_to_ds_a = {k: v for k, v in path_to_ds_a.items() if k in dag_steps}
-    path_to_ds_b = {k: v for k, v in path_to_ds_b.items() if k in dag_steps}
+    if len(path_to_ds_a) > 1:
+        path_to_ds_a = {k: v for k, v in path_to_ds_a.items() if k in dag_steps}
+    if len(path_to_ds_b) > 1:
+        path_to_ds_b = {k: v for k, v in path_to_ds_b.items() if k in dag_steps}
+
+    if not path_to_ds_a:
+        console.print(f"[yellow]❓ No datasets found in {path_a}[/yellow]")
+        exit(0)
+    if not path_to_ds_b:
+        console.print(f"[yellow]❓ No datasets found in {path_b}[/yellow]")
+        exit(0)
 
     any_diff = False
     any_error = False
