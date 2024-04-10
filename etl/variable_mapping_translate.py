@@ -9,6 +9,8 @@ from dotenv import dotenv_values
 from sqlalchemy import create_engine
 from sqlalchemy.engine.base import Engine
 
+from etl.db import read_sql
+
 log = structlog.get_logger()
 
 
@@ -191,8 +193,7 @@ def _run_query_mapping_to_df(sql: Engine, variable_ids: Tuple[str, ...]) -> pd.D
         left join datasets on variables.datasetId=datasets.id
         where variables.id in %(variable_ids)s;
     """
-    df: pd.DataFrame = pd.read_sql_query(query, sql, params={"variable_ids": variable_ids})
-    return df
+    return read_sql(query, sql, params={"variable_ids": variable_ids})
 
 
 def _build_dfs(sql: Engine, mapping: Dict[str, str]) -> Tuple[pd.DataFrame, pd.DataFrame]:

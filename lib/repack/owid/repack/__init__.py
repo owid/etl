@@ -1,3 +1,4 @@
+import datetime as dt
 from typing import Any, Dict, List, Optional, cast
 
 import numpy as np
@@ -65,7 +66,7 @@ def repack_series(s: pd.Series) -> pd.Series:
         for strategy in [to_int, to_float, to_category]:
             try:
                 return strategy(s)
-            except (ValueError, TypeError):
+            except (ValueError, TypeError, OverflowError):
                 continue
 
     return s
@@ -126,7 +127,7 @@ def to_float(s: pd.Series) -> pd.Series:
 def to_category(s: pd.Series) -> pd.Series:
     types = set(s.dropna().apply(type).unique())
 
-    if types.difference({str, type(None)}):
+    if types.difference({str, np.str_, dt.datetime, dt.date, type(None)}):
         raise ValueError()
 
     return s.astype("category")
