@@ -518,7 +518,8 @@ class DataStep(Step):
         return catalog.Dataset(self._dest_dir.as_posix())
 
     def checksum_output(self) -> str:
-        return self._output_dataset.checksum()
+        # output checksum is checksum of all ingredients
+        return self.checksum_input()
 
     def _step_files(self) -> List[str]:
         "Return a list of code files defining this step."
@@ -714,12 +715,7 @@ class SnapshotStep(Step):
         return True
 
     def checksum_output(self) -> str:
-        # NOTE: we could use the checksum from `_dvc_path` to
-        # speed this up. Test the performance on
-        # time poetry run etl run garden --dry-run
-        # Make sure that the checksum below is the same as DVC checksum! It
-        # looks like it might be different for some reason
-        return files.checksum_file(self._dvc_path)
+        return Snapshot(self.path).m.outs[0]["md5"]
 
     @property
     def _dvc_path(self) -> str:
