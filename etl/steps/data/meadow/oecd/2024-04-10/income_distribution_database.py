@@ -8,6 +8,9 @@ paths = PathFinder(__file__)
 # Define variables to keep
 VARS_TO_KEEP = ["Reference area", "TIME_PERIOD", "Measure", "Poverty line", "Age", "OBS_VALUE"]
 
+# Define new names for columns
+INDICATOR_NAMES = {"Reference area": "country", "TIME_PERIOD": "year", "OBS_VALUE": "value"}
+
 
 def run(dest_dir: str) -> None:
     #
@@ -25,7 +28,7 @@ def run(dest_dir: str) -> None:
     tb = tb[VARS_TO_KEEP]
 
     # Rename "Reference area" to "country", "TIME_PERIOD" to "year" and "OBS_VALUE" to "value".
-    tb = tb.rename(columns={"Reference area": "country", "TIME_PERIOD": "year", "OBS_VALUE": "value"})
+    tb = tb.rename(columns=INDICATOR_NAMES, errors="raise")
 
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
     tb = tb.format(["country", "year", "measure", "poverty_line", "age"])

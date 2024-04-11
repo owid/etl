@@ -31,7 +31,7 @@ INDICATOR_NAMES = {
 }
 
 POVERTY_LINES = {
-    "Not applicable": "Not applicable",
+    "Not applicable": "not_applicable",
     "50% of the national\xa0median disposable income": "50_median",
     "60% of the national\xa0median disposable income": "60_median",
 }
@@ -63,7 +63,7 @@ def run(dest_dir: str) -> None:
         countries_file=paths.country_mapping_path,
     )
 
-    tb = sanity_checks(tb)
+    sanity_checks(tb)
 
     tb = tb.format(["country", "year", "age"])
 
@@ -85,13 +85,11 @@ def rename_and_create_columns(tb: Table) -> Table:
     Also, add a gini_reduction column.
     """
     # Assert if all keys of dictionary are in the columns.
-    assert set(INDICATOR_NAMES.keys()) == set(
-        tb["measure"].unique()
-    ), "Not all expected categories are in the measure column"
+    assert set(INDICATOR_NAMES.keys()) == set(tb["measure"]), "Not all expected categories are in the measure column"
     assert set(POVERTY_LINES.keys()) == set(
-        tb["poverty_line"].unique()
+        tb["poverty_line"]
     ), "Not all expected categories are in the poverty_line column"
-    assert set(AGE_GROUPS.keys()) == set(tb["age"].unique()), "Not all expected categories are in the age column"
+    assert set(AGE_GROUPS.keys()) == set(tb["age"]), "Not all expected categories are in the age column"
 
     # Rename categories in measure, poverty_line and age columns.
     tb["measure"] = tb["measure"].replace(INDICATOR_NAMES)
@@ -116,8 +114,8 @@ def create_relative_poverty_columns(tb: Table) -> Table:
     tb_poverty = tb.copy()
 
     # Filter poverty_line column
-    tb_inequality = tb_inequality[tb_inequality["poverty_line"] == "Not applicable"].reset_index(drop=True)
-    tb_poverty = tb_poverty[tb_poverty["poverty_line"] != "Not applicable"].reset_index(drop=True)
+    tb_inequality = tb_inequality[tb_inequality["poverty_line"] == "not_applicable"].reset_index(drop=True)
+    tb_poverty = tb_poverty[tb_poverty["poverty_line"] != "not_applicable"].reset_index(drop=True)
 
     # Define columns for both tables: tb_inequality has all the columns not containing headcount_ratio
     # tb_poverty has all the columns containing headcount_ratio
@@ -129,17 +127,11 @@ def create_relative_poverty_columns(tb: Table) -> Table:
 
     # Make tb_poverty wider
     tb_poverty = tb_poverty.pivot(
-        index=["country", "year", "age"], columns="poverty_line", values=poverty_columns
-    ).reset_index()
-
-    # Flatten the columns
-    tb_poverty.columns = ["_".join(col).strip() for col in tb_poverty.columns.values]
-
-    # Remove _ at the end of the columns
-    tb_poverty.columns = [c.replace("_", "") if c.endswith("_") else c for c in tb_poverty.columns]
+        index=["country", "year", "age"], columns="poverty_line", values=poverty_columns, join_column_levels_with="_"
+    ).reset_index(drop=True)
 
     # Remove poverty_line column in tb_inequality
-    tb_inequality = tb_inequality.drop(columns=["poverty_line"])
+    tb_inequality = tb_inequality.drop(columns=["poverty_line"], errors="raise")
 
     # Merge both tables
     tb = pr.merge(tb_inequality, tb_poverty, on=["country", "year", "age"])
@@ -147,7 +139,7 @@ def create_relative_poverty_columns(tb: Table) -> Table:
     return tb
 
 
-def sanity_checks(tb: Table) -> Table:
+def sanity_checks(tb: Table) -> None:
     """Run several sanity checks on the table."""
 
     # Define headcount ratio columns
@@ -156,7 +148,7 @@ def sanity_checks(tb: Table) -> Table:
     # Divide headcount_ratio columns by 100
     tb[headcount_ratio_columns] = tb[headcount_ratio_columns] / 100
 
-    tb = check_between_0_and_1(
+    check_between_0_and_1(
         tb,
         [
             "gini_disposable",
@@ -169,12 +161,12 @@ def sanity_checks(tb: Table) -> Table:
     # Multiply headcount_ratio columns by 100
     tb[headcount_ratio_columns] = tb[headcount_ratio_columns] * 100
 
-    tb = check_negative_values(tb)
+    check_negative_values(tb)
 
-    return tb
+    return None
 
 
-def check_between_0_and_1(tb: Table, variables: List[str]):
+def check_between_0_and_1(tb: Table, variables: List[str]) -> None:
     """
     Check that indicators are between 0 and 1
     """
@@ -192,10 +184,10 @@ def check_between_0_and_1(tb: Table, variables: List[str]):
                 {tabulate(tb_error[['country', 'year', 'poverty_line', 'age', v]], headers = 'keys', tablefmt = TABLEFMT)}"""
             )
 
-    return tb
+    return None
 
 
-def check_negative_values(tb: Table):
+def check_negative_values(tb: Table) -> None:
     """
     Check if there are negative values in the variables
     """
@@ -216,4 +208,4 @@ def check_negative_values(tb: Table):
                 {tabulate(tb_error[['country', 'year', 'poverty_line', 'age', v]], headers = 'keys', tablefmt = TABLEFMT)}"""
             )
 
-    return tb
+    return None
