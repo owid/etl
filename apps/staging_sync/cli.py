@@ -18,7 +18,7 @@ from sqlmodel import Session
 from etl import grapher_model as gm
 from etl.config import GRAPHER_USER_ID
 from etl.datadiff import _dict_diff
-from etl.db import Engine, get_engine
+from etl.db import Engine, get_engine, read_sql
 
 from .admin_api import AdminAPI
 
@@ -404,7 +404,7 @@ def _modified_chart_ids_by_admin(session: Session) -> Set[int]:
         select id from charts where publishedAt is not null
     )
     """
-    return set(pd.read_sql(q, session.bind).chartId.tolist())
+    return set(read_sql(q, session.bind).chartId.tolist())  # type: ignore
 
 
 def _get_git_branch_creation_date(branch_name: str) -> dt.datetime:
