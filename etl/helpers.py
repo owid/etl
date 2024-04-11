@@ -390,11 +390,8 @@ class PathFinder:
     def __init__(self, __file__: str, is_private: Optional[bool] = None):
         self.f = Path(__file__)
 
-        # Load dag.
-        if "/archive/" in __file__:
-            self.dag = load_dag(paths.DAG_ARCHIVE_FILE)
-        else:
-            self.dag = load_dag()
+        # Lazy load dag when needed.
+        self._dag = None
 
         # Current file should be a data step.
         if not self.f.as_posix().startswith(paths.STEP_DIR.as_posix()):
@@ -411,6 +408,16 @@ class PathFinder:
 
         # Default logger
         self.log = structlog.get_logger(step=f"{self.namespace}/{self.channel}/{self.version}/{self.short_name}")
+
+    @property
+    def dag(self):
+        """Lazy loading of DAG."""
+        if self._dag is None:
+            if "/archive/" in str(self.f):
+                self._dag = load_dag(paths.DAG_ARCHIVE_FILE)
+            else:
+                self._dag = load_dag()
+        return self._dag
 
     @property
     def channel(self) -> str:
