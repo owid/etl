@@ -725,11 +725,11 @@ steps:
   # EM-DAT Natural disasters (2023).
   #
   data://meadow/emdat/2024-04-11/natural_disasters:
-    - snapshot://emdat/2023-09-20/natural_disasters.xlsx
+    - snapshot://emdat/2024-04-11/natural_disasters.xlsx
 
   # The following dataset has a table for yearly data and another for decadal data.
   data://garden/emdat/2024-04-11/natural_disasters:
-    - data://meadow/emdat/2023-09-20/natural_disasters
+    - data://meadow/emdat/2024-04-11/natural_disasters
     - data://garden/demography/2023-03-31/population
     - data://garden/wb/2024-03-11/income_groups
     - data://garden/regions/2023-01-01/regions
@@ -737,15 +737,15 @@ steps:
 
   # The following dataset has all (yearly and decadal) variables together.
   data://grapher/emdat/2024-04-11/natural_disasters:
-    - data://garden/emdat/2023-09-20/natural_disasters
-
-  # Natural disasters explorer.
-  data://explorers/emdat/latest/natural_disasters:
-    - data://garden/emdat/2023-09-20/natural_disasters
+    - data://garden/emdat/2024-04-11/natural_disasters
 
   # The following dataset has only global data, and entity corresponds to the type of disaster.
   data://grapher/emdat/2024-04-11/natural_disasters_global_by_type:
-    - data://garden/emdat/2023-09-20/natural_disasters
+    - data://garden/emdat/2024-04-11/natural_disasters
+
+  # Natural disasters explorer.
+  data://explorers/emdat/latest/natural_disasters:
+    - data://garden/emdat/2024-04-11/natural_disasters
 
 include:
   - dag/open_numbers.yml
