@@ -1,0 +1,8 @@
+steps:
+  # OECD Income Distribution Database
+  data://meadow/oecd/2023-06-06/income_distribution_database:
+    - snapshot://oecd/2023-06-06/income_distribution_database.csv
+  data://garden/oecd/2023-06-06/income_distribution_database:
+    - data://meadow/oecd/2023-06-06/income_distribution_database
+  data://grapher/oecd/2023-06-06/income_distribution_database:
+    - data://garden/oecd/2023-06-06/income_distribution_database
