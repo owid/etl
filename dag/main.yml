@@ -178,28 +178,6 @@ steps:
   data://grapher/un/2022-11-29/undp_hdr:
     - data://garden/un/2022-11-29/undp_hdr
 
-  #
-  # EM-DAT Natural disasters (2023).
-  #
-  data://meadow/emdat/2023-09-20/natural_disasters:
-    - snapshot://emdat/2023-09-20/natural_disasters.xlsx
-  # The following dataset has a table for yearly data and another for decadal data.
-  data://garden/emdat/2023-09-20/natural_disasters:
-    - data://meadow/emdat/2023-09-20/natural_disasters
-    - data://garden/demography/2023-03-31/population
-    - data://garden/wb/2023-04-30/income_groups
-    - data://garden/regions/2023-01-01/regions
-    - data://garden/worldbank_wdi/2023-05-29/wdi
-  # The following dataset has all (yearly and decadal) variables together.
-  data://grapher/emdat/2023-09-20/natural_disasters:
-    - data://garden/emdat/2023-09-20/natural_disasters
-  # The following dataset has only global data, and entity corresponds to the type of disaster.
-  data://grapher/emdat/2023-09-20/natural_disasters_global_by_type:
-    - data://garden/emdat/2023-09-20/natural_disasters
-  # Natural disasters explorer.
-  data://explorers/emdat/2023-09-20/natural_disasters:
-    - data://garden/emdat/2023-09-20/natural_disasters
-
   # Country profiles - overview
   data://garden/country_profile/2022/overview:
     - backport://backport/owid/latest/dataset_5599_ihme__global_burden_of_disease__deaths_and_dalys__institute_for_health_metrics_and_evaluation__2022_04
@@ -722,7 +700,7 @@ steps:
     - data://garden/wb/2024-03-11/income_groups
 
   #
-  # EM-DAT Natural disasters (2023).
+  # EM-DAT Natural disasters.
   #
   data://meadow/emdat/2024-04-11/natural_disasters:
     - snapshot://emdat/2024-04-11/natural_disasters.xlsx
@@ -746,6 +724,32 @@ steps:
   # Natural disasters explorer.
   data://explorers/emdat/latest/natural_disasters:
     - data://garden/emdat/2024-04-11/natural_disasters
+
+  ######################################################################################################################
+  # Older versions that should be archived once they are not used by any other steps.
+  #
+  # EM-DAT Natural disasters (2023).
+  #
+  data://meadow/emdat/2023-09-20/natural_disasters:
+    - snapshot://emdat/2023-09-20/natural_disasters.xlsx
+  # The following dataset has a table for yearly data and another for decadal data.
+  data://garden/emdat/2023-09-20/natural_disasters:
+    - data://meadow/emdat/2023-09-20/natural_disasters
+    - data://garden/demography/2023-03-31/population
+    - data://garden/wb/2023-04-30/income_groups
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/worldbank_wdi/2023-05-29/wdi
+  # The following dataset has all (yearly and decadal) variables together.
+  data://grapher/emdat/2023-09-20/natural_disasters:
+    - data://garden/emdat/2023-09-20/natural_disasters
+  # The following dataset has only global data, and entity corresponds to the type of disaster.
+  data://grapher/emdat/2023-09-20/natural_disasters_global_by_type:
+    - data://garden/emdat/2023-09-20/natural_disasters
+  # Natural disasters explorer.
+  data://explorers/emdat/2023-09-20/natural_disasters:
+    - data://garden/emdat/2023-09-20/natural_disasters
+
+  ######################################################################################################################
 
 include:
   - dag/open_numbers.yml

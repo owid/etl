@@ -12,16 +12,20 @@ def run(dest_dir: str) -> None:
     tb = ds_garden["natural_disasters_yearly"].reset_index()
 
     # Select data for the World and remove unnecessary columns.
-    tb_global = tb[tb["country"] == "World"].drop(columns=["country", "population", "gdp"]).reset_index(drop=True)
+    tb_global = (
+        tb[tb["country"] == "World"]
+        .drop(columns=["country", "population", "gdp"], errors="raise")
+        .reset_index(drop=True)
+    )
     # Assign human-readable names to disaster types.
     tb_global["type"] = tb_global["type"].replace(
         {disaster_type: disaster_type.capitalize().replace("_", " ") for disaster_type in tb_global["type"].unique()}
     )
     # Treat column for disaster type as the new entity (so they can be selected in grapher as if they were countries).
-    tb_global = tb_global.rename(columns={"type": "country"})
+    tb_global = tb_global.rename(columns={"type": "country"}, errors="raise")
 
     # Set an appropriate index.
-    tb_global = tb_global.set_index(["country", "year"], verify_integrity=True).sort_index()
+    tb_global = tb_global.format()
 
     tb_global.metadata.title = GRAPHER_DATASET_TITLE
     tb_global.metadata.short_name = GRAPHER_DATASET_SHORT_NAME

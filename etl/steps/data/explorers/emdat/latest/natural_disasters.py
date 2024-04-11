@@ -77,7 +77,7 @@ def create_wide_tables(table: Table) -> Table:
     ]
 
     # Set an appropriate index and sort conveniently.
-    table_wide = table_wide.set_index(["country", "year"], verify_integrity=True).sort_index()
+    table_wide = table_wide.format()
 
     return table_wide
 

@@ -21,10 +21,12 @@ def create_wide_tables(table: Table, is_decade: bool) -> Table:
         table_wide[column].metadata.title += (
             " - " + column.split("-")[-1].capitalize().replace("_", " ") + variable_title_suffix
         )
-        table_wide = table_wide.rename(columns={column: column.replace("-", "_") + variable_name_suffix})
+        table_wide = table_wide.rename(
+            columns={column: column.replace("-", "_") + variable_name_suffix}, errors="raise"
+        )
 
     # Set an appropriate index and sort conveniently.
-    table_wide = table_wide.set_index(["country", "year"], verify_integrity=True).sort_index()
+    table_wide = table_wide.format()
 
     return table_wide
 

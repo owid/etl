@@ -3,9 +3,10 @@
 Before running this script, the data needs to be downloaded:
 * Register at https://public.emdat.be/ and verify email.
 * Access https://public.emdat.be/data and select:
-  * "Natural" in the list of "Disaster Classification".
-  * All regions in "Location".
+  * "Natural" in the list of "Classification".
+  * All regions in "Countries".
   * All years.
+* Activate "Include Historical events (pre-2000)".
 * Then click on "Download".
 * Run this script using the argument --path-to-file followed by the path to the downloaded file.
 
@@ -32,15 +33,7 @@ SNAPSHOT_VERSION = Path(__file__).parent.name
 def main(path_to_file: str, upload: bool) -> None:
     # Create a new snapshot.
     snap = Snapshot(f"emdat/{SNAPSHOT_VERSION}/natural_disasters.xlsx")
-
-    # Ensure destination folder exists.
-    snap.path.parent.mkdir(exist_ok=True, parents=True)
-
-    # Copy local data file to snapshots data folder.
-    snap.path.write_bytes(Path(path_to_file).read_bytes())
-
-    # Add file to DVC and upload to S3.
-    snap.dvc_add(upload=upload)
+    snap.create_snapshot(filename=path_to_file, upload=upload)
 
 
 if __name__ == "__main__":

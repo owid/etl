@@ -44,18 +44,19 @@ paths = PathFinder(__file__)
 # For completeness, add all existing types here, and rename them as np.nan if they should not be used.
 # If new types are included on a data update, simply add them here.
 EXPECTED_DISASTER_TYPES = {
-    "Animal accident": np.nan,
+    "Animal incident": np.nan,
     "Drought": "Drought",
     "Earthquake": "Earthquake",
     "Epidemic": np.nan,
     "Extreme temperature": "Extreme temperature",
     "Flood": "Flood",
     "Fog": "Fog",
-    "Glacial lake outburst": "Glacial lake outburst",
+    "Glacial lake outburst flood": "Glacial lake outburst flood",
     "Impact": np.nan,
-    "Insect infestation": np.nan,
-    "Landslide": "Landslide",
+    "Infestation": np.nan,
+    # "Landslide (dry)": "Landslide",
     "Mass movement (dry)": "Dry mass movement",
+    "Mass movement (wet)": "Wet mass movement",
     "Storm": "Extreme weather",
     "Volcanic activity": "Volcanic activity",
     "Wildfire": "Wildfire",
@@ -64,7 +65,6 @@ EXPECTED_DISASTER_TYPES = {
 # List of columns to select from raw data, and how to rename them.
 COLUMNS = {
     "country": "country",
-    "year": "year",
     "type": "type",
     "total_dead": "total_dead",
     "injured": "injured",
@@ -114,6 +114,9 @@ def prepare_input_data(tb: Table) -> Table:
     """Prepare input data, and fix some known issues."""
     # Select and rename columns.
     tb = tb[list(COLUMNS)].rename(columns=COLUMNS, errors="raise")
+
+    # Add a year column (assume the start of the event).
+    tb["year"] = tb["start_year"].copy()
 
     # Correct wrong data points (defined above in DATA_CORRECTIONS).
     tb = correct_data_points(tb=tb, corrections=DATA_CORRECTIONS)
@@ -588,10 +591,10 @@ def run(dest_dir: str) -> None:
     sanity_checks_on_outputs(tb=tb_decadal, is_decade=True)
 
     # Set an appropriate index to yearly data and sort conveniently.
-    tb = tb.set_index(["country", "year", "type"], verify_integrity=True).sort_index().sort_index()
+    tb = tb.format(keys=["country", "year", "type"], sort_columns=True)
 
     # Set an appropriate index to decadal data and sort conveniently.
-    tb_decadal = tb_decadal.set_index(["country", "year", "type"], verify_integrity=True).sort_index().sort_index()
+    tb_decadal = tb_decadal.format(keys=["country", "year", "type"], sort_columns=True)
 
     # Rename yearly and decadal tables.
     tb.metadata.short_name = "natural_disasters_yearly"
