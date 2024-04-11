@@ -51,6 +51,7 @@ from sqlmodel.sql.expression import Select, SelectOfScalar
 
 from etl import config, paths
 from etl.config import GRAPHER_USER_ID
+from etl.db import read_sql
 
 log = structlog.get_logger()
 
@@ -717,9 +718,9 @@ class Source(SQLModel, table=True):
         ) t
         order by t.id
         """
-        sources = pd.read_sql(
+        sources = read_sql(
             q,
-            session.bind,
+            session.bind,  # type: ignore
             params={
                 "datasetId": dataset_id,
                 # NOTE: query doesn't work with empty list so we use a dummy value
@@ -737,7 +738,7 @@ class Source(SQLModel, table=True):
             )
             sources.datasetId = sources.datasetId.fillna(dataset_id).astype(int)
 
-        return [cls(**d) for d in sources.to_dict(orient="records") if cls.validate(d)]
+        return [cls(**d) for d in sources.to_dict(orient="records") if cls.validate(d)]  # type: ignore
 
 
 class SuggestedChartRevisions(SQLModel, table=True):
