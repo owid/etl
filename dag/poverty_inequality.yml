@@ -66,13 +66,13 @@ steps:
   data://grapher/ophi/2023-07-05/multidimensional_poverty_index:
     - data://garden/ophi/2023-07-05/multidimensional_poverty_index
 
-  # OECD Income Distribution Database
-  data://meadow/oecd/2023-06-06/income_distribution_database:
-    - snapshot://oecd/2023-06-06/income_distribution_database.csv
-  data://garden/oecd/2023-06-06/income_distribution_database:
-    - data://meadow/oecd/2023-06-06/income_distribution_database
-  data://grapher/oecd/2023-06-06/income_distribution_database:
-    - data://garden/oecd/2023-06-06/income_distribution_database
+  # # OECD Income Distribution Database
+  data://meadow/oecd/2024-04-10/income_distribution_database:
+    - snapshot://oecd/2024-04-10/income_distribution_database.csv
+  data://garden/oecd/2024-04-10/income_distribution_database:
+    - data://meadow/oecd/2024-04-10/income_distribution_database
+  data://grapher/oecd/2024-04-10/income_distribution_database:
+    - data://garden/oecd/2024-04-10/income_distribution_database
 
   # Historical poverty data - Moatsos (2021)
   data://meadow/moatsos/2023-10-09/moatsos_historical_poverty:
@@ -108,11 +108,3 @@ steps:
     - snapshot://ons/2024-03-20/hours_and_earnings_uk.xlsx
   data://garden/ons/2024-03-20/hours_and_earnings_uk:
     - data://meadow/ons/2024-03-20/hours_and_earnings_uk
-
-  # OECD Income Distribution Database
-  data://meadow/oecd/2024-04-10/income_distribution_database:
-    - snapshot://oecd/2024-04-10/income_distribution_database.csv
-  data://garden/oecd/2024-04-10/income_distribution_database:
-    - data://meadow/oecd/2024-04-10/income_distribution_database
-  data://grapher/oecd/2024-04-10/income_distribution_database:
-    - data://garden/oecd/2024-04-10/income_distribution_database
