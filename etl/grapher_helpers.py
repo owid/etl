@@ -12,8 +12,9 @@ import structlog
 from jinja2 import Environment
 from owid import catalog
 from owid.catalog.utils import underscore
+from sqlalchemy.engine import Engine
 
-from etl.db import get_connection, read_sql
+from etl.db import get_engine, read_sql
 from etl.db_utils import DBUtils
 from etl.files import checksum_str
 
@@ -301,17 +302,21 @@ def long_to_wide_tables(
         yield cast(catalog.Table, t)
 
 
-def _get_entities_from_db(countries: Set[str], by: Literal["name", "code"]) -> Dict[str, int]:
+def _get_entities_from_db(
+    countries: Set[str], by: Literal["name", "code"], engine: Engine | None = None
+) -> Dict[str, int]:
     q = f"select id as entity_id, {by} from entities where {by} in %(names)s"
-    df = read_sql(q, params={"names": list(countries)})
+    df = read_sql(q, engine, params={"names": list(countries)})
     return cast(Dict[str, int], df.set_index(by).entity_id.to_dict())
 
 
-def _get_and_create_entities_in_db(countries: Set[str]) -> Dict[str, int]:
-    cursor = get_connection().cursor()
-    db = DBUtils(cursor)
-    log.info("Creating entities in DB", countries=countries)
-    return {name: db.get_or_create_entity(name) for name in countries}
+def _get_and_create_entities_in_db(countries: Set[str], engine: Engine | None = None) -> Dict[str, int]:
+    engine = engine or get_engine()
+    with engine.connect() as con:
+        cursor = con.connection.cursor()
+        db = DBUtils(cursor)
+        log.info("Creating entities in DB", countries=countries)
+        return {name: db.get_or_create_entity(name) for name in countries}
 
 
 def country_to_entity_id(
@@ -319,6 +324,7 @@ def country_to_entity_id(
     create_entities: bool = False,
     errors: Literal["raise", "ignore", "warn"] = "raise",
     by: Literal["name", "code"] = "name",
+    engine: Engine | None = None,
 ) -> pd.Series:
     """Convert country name to grapher entity_id. Most of countries should be in countries_regions.csv,
     however some regions could be only in `entities` table in MySQL or doesn't exist at all.
@@ -331,7 +337,7 @@ def country_to_entity_id(
     :param by: use `name` if you use country names, `code` if you use ISO codes
     """
     # fill entities from DB
-    db_entities = _get_entities_from_db(set(country), by=by)
+    db_entities = _get_entities_from_db(set(country), by=by, engine=engine)
     entity_id = country.map(db_entities).astype(float)
 
     # create entities in DB
@@ -339,7 +345,7 @@ def country_to_entity_id(
         assert by == "name", "create_entities works only with `by='name'`"
         ix = entity_id.isnull()
         # cast to float to fix issues with categories
-        entity_id[ix] = country[ix].map(_get_and_create_entities_in_db(set(country[ix]))).astype(float)
+        entity_id[ix] = country[ix].map(_get_and_create_entities_in_db(set(country[ix]), engine=engine)).astype(float)
 
     if entity_id.isnull().any():
         msg = f"Some countries have not been mapped: {set(country[entity_id.isnull()])}"
@@ -460,7 +466,7 @@ def _adapt_dataset_metadata_for_grapher(
 
 
 def _adapt_table_for_grapher(
-    table: catalog.Table, country_col: str = "country", year_col: str = "year"
+    table: catalog.Table, engine: Engine | None = None, country_col: str = "country", year_col: str = "year"
 ) -> catalog.Table:
     """Adapt table (from a garden dataset) to be used in a grapher step. This function
     is not meant to be run explicitly, but by default in the grapher step.
@@ -501,7 +507,7 @@ def _adapt_table_for_grapher(
     table[country_col] = table[country_col].astype(str)
 
     # Grapher needs a column entity id, that is constructed based on the unique entity names in the database.
-    table["entity_id"] = country_to_entity_id(table[country_col], create_entities=True)
+    table["entity_id"] = country_to_entity_id(table[country_col], create_entities=True, engine=engine)
     table = table.drop(columns=[country_col]).rename(columns={year_col: "year"})
 
     table = table.set_index(["entity_id", "year"] + dim_names)

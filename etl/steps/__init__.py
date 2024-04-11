@@ -829,7 +829,7 @@ class GrapherStep(Step):
                     cols += [c for c in table.columns if c in {"year", "country"} and c not in cols]
                     table = table.loc[:, cols]
 
-                table = gh._adapt_table_for_grapher(table)
+                table = gh._adapt_table_for_grapher(table, engine)
 
                 for t in gh._yield_wide_table(table, na_action="drop"):
                     i += 1
