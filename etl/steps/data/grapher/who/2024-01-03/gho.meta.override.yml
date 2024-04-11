@@ -1,0 +1,6 @@
+tables:
+  prevalence_of_overweight_among_adults__bmi__gt__25__age_standardized_estimate__pct:
+    variables:
+      ? |-
+        prevalence_of_overweight_among_adults__bmi__gt__25__age_standardized_estimate__pct__sex_both_sexes__age_group_18plus__years
+      : title: Share of adults who are overweight (age-standardized)
