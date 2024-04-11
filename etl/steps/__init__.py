@@ -14,6 +14,7 @@ import warnings
 from collections import defaultdict
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import dataclass, field
+from functools import cache
 from glob import glob
 from importlib import import_module
 from pathlib import Path
@@ -130,6 +131,7 @@ def traverse(graph: Graph, nodes: Set[str]) -> Graph:
     return dict(reachable)
 
 
+@cache
 def load_dag(filename: Union[str, Path] = paths.DEFAULT_DAG_FILE) -> Dict[str, Any]:
     return _load_dag(filename, {})
 
@@ -827,7 +829,7 @@ class GrapherStep(Step):
                     cols += [c for c in table.columns if c in {"year", "country"} and c not in cols]
                     table = table.loc[:, cols]
 
-                table = gh._adapt_table_for_grapher(table)
+                table = gh._adapt_table_for_grapher(table, engine)
 
                 for t in gh._yield_wide_table(table, na_action="drop"):
                     i += 1

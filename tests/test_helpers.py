@@ -73,7 +73,7 @@ tables: {}""".strip()
 def test_PathFinder_with_private_steps():
     pf = PathFinder(str(paths.STEP_DIR / "data/garden/namespace/2023/name/__init__.py"))
 
-    pf.dag = {
+    pf._dag = {
         "data://garden/namespace/2023/name": {
             "snapshot://namespace/2023/snapshot_a",
             "snapshot-private://namespace/2023/snapshot_b",
@@ -88,7 +88,7 @@ def test_PathFinder_with_private_steps():
     # assume it's public, unless explicitly stated otherwise.
     assert pf.get_dependency_step_name("snapshot_a", is_private=True) == "snapshot-private://namespace/2023/snapshot_a"
 
-    pf.dag = {
+    pf._dag = {
         "data-private://garden/namespace/2023/name": {
             "snapshot-private://namespace/2023/name",
         }
