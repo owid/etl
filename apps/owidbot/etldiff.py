@@ -24,6 +24,12 @@ EXCLUDE_DATASETS = "weekly_wildfires|excess_mortality|covid|fluid|flunet"
     type=str,
 )
 @click.option(
+    "--include",
+    type=str,
+    default="garden",
+    help="Include datasets matching this regex.",
+)
+@click.option(
     "--dry-run/--no-dry-run",
     default=False,
     type=bool,
@@ -31,6 +37,7 @@ EXCLUDE_DATASETS = "weekly_wildfires|excess_mortality|covid|fluid|flunet"
 )
 def cli(
     branch: str,
+    include: str,
     dry_run: bool,
 ) -> None:
     """Post result of `etl diff` to Github PR.
@@ -41,7 +48,7 @@ def cli(
     $ python apps/owidbot/etldiff.py --branch my-branch
     ```
     """
-    lines = call_etl_diff()
+    lines = call_etl_diff(include)
     diff, result = format_etl_diff(lines)
 
     body = f"""
@@ -120,7 +127,7 @@ def format_etl_diff(lines: list[str]) -> Tuple[str, str]:
     return diff, result
 
 
-def call_etl_diff() -> list[str]:
+def call_etl_diff(include: str) -> list[str]:
     cmd = [
         "poetry",
         "run",
@@ -129,7 +136,7 @@ def call_etl_diff() -> list[str]:
         "REMOTE",
         "data/",
         "--include",
-        "garden",
+        include,
         "--exclude",
         EXCLUDE_DATASETS,
         "--verbose",
