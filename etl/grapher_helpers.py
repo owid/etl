@@ -13,7 +13,7 @@ from jinja2 import Environment
 from owid import catalog
 from owid.catalog.utils import underscore
 
-from etl.db import get_connection, get_engine
+from etl.db import get_connection, read_sql
 from etl.db_utils import DBUtils
 from etl.files import checksum_str
 
@@ -303,7 +303,7 @@ def long_to_wide_tables(
 
 def _get_entities_from_db(countries: Set[str], by: Literal["name", "code"]) -> Dict[str, int]:
     q = f"select id as entity_id, {by} from entities where {by} in %(names)s"
-    df = pd.read_sql(q, get_engine(), params={"names": list(countries)})
+    df = read_sql(q, params={"names": list(countries)})
     return cast(Dict[str, int], df.set_index(by).entity_id.to_dict())
 
 
@@ -497,6 +497,8 @@ def _adapt_table_for_grapher(
 
     assert {"year", country_col} <= set(table.columns), f"Table must have columns {country_col} and year."
     assert "entity_id" not in table.columns, "Table must not have column entity_id."
+
+    table[country_col] = table[country_col].astype(str)
 
     # Grapher needs a column entity id, that is constructed based on the unique entity names in the database.
     table["entity_id"] = country_to_entity_id(table[country_col], create_entities=True)

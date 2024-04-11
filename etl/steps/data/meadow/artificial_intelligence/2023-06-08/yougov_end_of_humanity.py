@@ -61,6 +61,8 @@ def run(dest_dir: str) -> None:
     merged_df = pd.merge(merged_df, df_q3, on="options", how="outer")
     merged_df = pd.merge(merged_df, df_q3_age, on="options", how="outer")
 
+    assert "Somewhat" in merged_df.options.values
+
     # Deterministic sorting
     merged_df = merged_df.sort_values("options")
 
@@ -125,8 +127,8 @@ def question_1_df(snap: Snapshot, question: str) -> pd.DataFrame:
     concern_df = pd.DataFrame({"options": question1.iloc[:, 1], question: question1.iloc[:, -2]})
 
     # Clean up the data in the question column (remove % sign and dots and convert to numeric)
-    concern_df[question] = concern_df[question].str.replace("%", "", regex=True)
-    concern_df[question] = concern_df[question].str.replace(".", "", regex=True)
+    concern_df[question] = concern_df[question].str.replace("%", "", regex=False)
+    concern_df[question] = concern_df[question].str.replace(".", "", regex=False)
     concern_df[question] = pd.to_numeric(concern_df[question])
 
     # Drop completely empty rows

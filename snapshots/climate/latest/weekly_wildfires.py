@@ -65,7 +65,8 @@ def main(upload: bool) -> None:
             "https://api2.effis.emergency.copernicus.eu/statistics/v2/gwis/weekly?country={country_code}&year={year}"
         )
         url = base_url.format(country_code=country, year=YEAR)
-        response = requests.get(url)
+        # timeout after 30s, they have occasional outages
+        response = requests.get(url, timeout=30)
         if response.status_code == 200:
             data = response.json()
 

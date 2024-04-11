@@ -5,13 +5,17 @@
 
 import difflib
 import itertools
+import json
 import re
 import resource
 import sys
 import time
+from collections.abc import MutableMapping
 from concurrent.futures import FIRST_COMPLETED, Future, ProcessPoolExecutor, ThreadPoolExecutor, wait
 from contextlib import contextmanager
+from functools import partial
 from graphlib import TopologicalSorter
+from multiprocessing import Manager
 from os import environ
 from pathlib import Path
 from typing import Any, Callable, Dict, Iterator, List, Optional, Set
@@ -343,11 +347,18 @@ def run_dag(
         print("--- All datasets up to date!")
         return
 
+    # Calculate total expected time for all steps (if run sequentially)
+    total_expected_time_seconds = sum(_get_execution_time(str(step)) or 0 for step in steps)
+
     if dry_run:
-        print(f"--- Running {len(steps)} steps:")
+        print(
+            f"--- Would run {len(steps)} steps{_create_expected_time_message(total_expected_time_seconds, prepend_message=' (at least ')}:"
+        )
         return enumerate_steps(steps)
     elif workers == 1:
-        print(f"--- Running {len(steps)} steps:")
+        print(
+            f"--- Running {len(steps)} steps{_create_expected_time_message(total_expected_time_seconds, prepend_message=' (at least ')}:"
+        )
         return exec_steps(steps, strict=strict)
     else:
         print(f"--- Running {len(steps)} steps with {workers} processes:")
@@ -355,13 +366,23 @@ def run_dag(
 
 
 def exec_steps(steps: List[Step], strict: Optional[bool] = None) -> None:
+    execution_times = {}
     for i, step in enumerate(steps, 1):
-        print(f"--- {i}. {step}...")
+        print(f"--- {i}. {step}{_create_expected_time_message(_get_execution_time(step_name=str(step)))}")
+
+        # Determine strictness level for the current step
         strict = _detect_strictness_level(step, strict)
+
         with strictness_level(strict):
+            # Execute the step and measure the time taken
             time_taken = timed_run(lambda: step.run())
-            click.echo(f"{click.style('OK', fg='blue')} ({time_taken:.1f}s)")
+            execution_times[str(step)] = time_taken
+
+            click.echo(f"{click.style('OK', fg='blue')}{_create_expected_time_message(time_taken)}")
             print()
+
+        # Write the recorded execution times to the file after all steps have been executed
+        _write_execution_times(execution_times)
 
 
 def _steps_sort_key(step: Step) -> int:
@@ -384,16 +405,27 @@ def exec_steps_parallel(steps: List[Step], workers: int, dag: DAG, strict: Optio
     # the load on MySQL
     steps = sorted(steps, key=_steps_sort_key)
 
-    # create execution graph from steps
-    exec_graph = {}
-    steps_str = {str(step) for step in steps}
-    for step in steps:
-        # only add dependencies that are in the list of steps (i.e. are dirty)
-        # NOTE: we have to compare their string versions, the actual objects might have
-        # different attributes
-        exec_graph[str(step)] = {str(dep) for dep in step.dependencies if str(dep) in steps_str}
+    # Use a Manager dict to collect execution times in parallel execution
+    with Manager() as manager:
+        execution_times = manager.dict()
 
-    exec_graph_parallel(exec_graph, _exec_step_job, workers, dag=dag, strict=strict)
+        # Create execution graph from steps
+        exec_graph = {}
+        steps_str = {str(step) for step in steps}
+        for step in steps:
+            # only add dependencies that are in the list of steps (i.e. are dirty)
+            # NOTE: we have to compare their string versions, the actual objects might have
+            # different attributes
+            exec_graph[str(step)] = {str(dep) for dep in step.dependencies if str(dep) in steps_str}
+
+        # Prepare a function for execution that includes the necessary arguments
+        exec_func = partial(_exec_step_job, execution_times=execution_times, dag=dag, strict=strict)
+
+        # Execute the graph of tasks in parallel
+        exec_graph_parallel(exec_graph, exec_func, workers)
+
+        # After all tasks have completed, write the execution times to the file
+        _write_execution_times(dict(execution_times))
 
 
 def exec_graph_parallel(
@@ -433,7 +465,24 @@ def exec_graph_parallel(
                 topological_sorter.done(task)
 
 
-def _exec_step_job(step_name: str, dag: Optional[DAG] = None, strict: Optional[bool] = None) -> None:
+def _create_expected_time_message(
+    expected_time: Optional[float], prepend_message: str = " (", append_message: str = ")"
+) -> str:
+    minutes, seconds = divmod(expected_time or 0, 60)
+    if minutes < 1:
+        partial_message = f"{seconds:.1f}s"
+    else:
+        partial_message = f"{int(minutes)}m{seconds: .1f}s"
+
+    if (expected_time is None) or (expected_time == 0):
+        return ""
+    else:
+        return prepend_message + partial_message + append_message
+
+
+def _exec_step_job(
+    step_name: str, execution_times: MutableMapping, dag: Optional[DAG] = None, strict: Optional[bool] = None
+) -> None:
     """
     Executes a step.
 
@@ -441,19 +490,52 @@ def _exec_step_job(step_name: str, dag: Optional[DAG] = None, strict: Optional[b
     :param dag: The original DAG used to create Step object. This must be the same DAG as given to ETL.
     :param strict: The strictness level for the step execution.
     """
-    print(f"--- Starting {step_name}", flush=True)
+    print(f"--- Starting {step_name}{_create_expected_time_message(_get_execution_time(step_name))}")
     assert dag
     step = parse_step(step_name, dag)
     strict = _detect_strictness_level(step, strict)
     with strictness_level(strict):
-        time_taken = timed_run(lambda: step.run())
+        execution_times[step_name] = timed_run(lambda: step.run())
+    print(f"--- Finished {step_name} ({execution_times[step_name]:.1f}s)")
 
-    print(f"--- Finished {step_name} ({time_taken:.0f}s)", flush=True)
+
+def _write_execution_times(execution_times: Dict) -> None:
+    # Write the recorded execution times to a hidden json file that contains the time it took to execute each step
+    execution_time_file = paths.EXECUTION_TIME_FILE
+    if execution_time_file.exists():
+        with open(execution_time_file, "r") as file:
+            stored_times = json.load(file)
+    else:
+        stored_times = {}
+
+    stored_times.update(execution_times)
+    with open(execution_time_file, "w") as file:
+        json.dump(stored_times, file, indent=4, sort_keys=True)
+
+
+def _get_step_identifier(step_name: str) -> str:
+    return step_name.replace(step_name.split("/")[-2] + "/", "")
+
+
+def _get_execution_time(step_name: str) -> Optional[float]:
+    # Read execution time of a given step from the hidden json file
+    # If it doesn't exist, try to read another version of the same step, and if no other version exists, return None
+    if not paths.EXECUTION_TIME_FILE.exists():
+        return None
+    else:
+        with open(paths.EXECUTION_TIME_FILE, "r") as file:
+            execution_times = json.load(file)
+        execution_time = execution_times.get(step_name)
+        if not execution_time:
+            # If the step has not been timed yet, try to find a previous version
+            step_identifiers = {_get_step_identifier(step): value for step, value in execution_times.items()}
+            execution_time = step_identifiers.get(_get_step_identifier(step_name))
+        return execution_time
 
 
 def enumerate_steps(steps: List[Step]) -> None:
     for i, step in enumerate(steps, 1):
-        print(f"{i}. {step}")
+        print(f"{i}. {step}{_create_expected_time_message(_get_execution_time(str(step)))}")
 
 
 def _detect_strictness_level(step: Step, strict: Optional[bool] = None) -> bool:

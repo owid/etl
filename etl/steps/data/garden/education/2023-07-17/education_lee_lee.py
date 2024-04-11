@@ -74,13 +74,17 @@ def run(dest_dir: str) -> None:
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
 
     # Replace age group values with descriptive labels
-    tb["age_group"] = tb["age_group"].replace(
-        {
-            "15.0-64.0": "Youth and Adults (15-64 years)",
-            "15.0-24.0": "Youth (15-24 years)",
-            "25.0-64.0": "Adults (25-64 years)",
-            "not specified": "Age not specified",
-        }
+    tb["age_group"] = (
+        tb["age_group"]
+        .astype(str)
+        .replace(
+            {
+                "15.0-64.0": "Youth and Adults (15-64 years)",
+                "15.0-24.0": "Youth (15-24 years)",
+                "25.0-64.0": "Adults (25-64 years)",
+                "not specified": "Age not specified",
+            }
+        )
     )
 
     # Prepare enrollment and attainment data
