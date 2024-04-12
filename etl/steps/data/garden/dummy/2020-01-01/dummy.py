@@ -17,8 +17,6 @@ def run(dest_dir: str) -> None:
     # Read table from meadow dataset.
     tb = ds_meadow["dummy"].reset_index()
 
-    tb.dummy_variable += 1
-
     #
     # Process data.
     #

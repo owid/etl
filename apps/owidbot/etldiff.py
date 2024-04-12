@@ -149,7 +149,7 @@ def format_etl_diff(lines: list[str]) -> Tuple[str, str]:
     #        ~ Column A
     # = Dataset grapher/agriculture/2024-03-26/attainable_yields
     #     = Table attainable_yields
-    pattern = r"(= Dataset.*(?:\n\s+=.*)+)\n(?== Dataset|\n)"
+    pattern = r"(= Dataset.*(?:\n\s+=.*)+)\n(?=. Dataset|\n)"
     diff = re.sub(pattern, "", diff)
 
     return diff, result
