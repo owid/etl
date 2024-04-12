@@ -21,13 +21,15 @@ def run(dest_dir: str) -> None:
     #
     # Load inputs.
     #
-    # Load meadow dataset.
+    # Load meadow acute flaccid paralysis dataset.
     ds_meadow = paths.load_dataset("polio_afp")
     # Load historical polio dataset
     ds_historical = paths.load_dataset("polio_historical")
     # Load fasttrack Global Polio Eradication Initiative on circulating vaccine derived polio cases
     snap_cvdpv = paths.load_snapshot("gpei.csv")
     tb_cvdpv = snap_cvdpv.read()
+    # Dropping this as the total_cvdpv is also in the polio_afp table and has more historical data
+    tb_cvdpv = tb_cvdpv.drop(columns=["total_cvdpv"])
     # Load regions dataset.
     ds_regions = paths.load_dataset("regions")
     # Load income groups dataset.
@@ -55,10 +57,21 @@ def run(dest_dir: str) -> None:
     # Need to deal with overlapping years
     tb = pr.concat([tb, tb_hist], axis=0)
     tb = tb.merge(tb_cvdpv, on=["country", "year"], how="left")
-
     # Add region aggregates.
     tb_reg = add_regions_to_table(
-        tb[["country", "year", "afp_cases", "wild_poliovirus_cases", "cvdpv_cases", "total_cases"]],
+        tb[
+            [
+                "country",
+                "year",
+                "afp_cases",
+                "wild_poliovirus_cases",
+                "cvdpv_cases",
+                "total_cases",
+                "cvdpv1",
+                "cvdpv2",
+                "cvdpv3",
+            ]
+        ],
         regions=REGIONS,
         ds_regions=ds_regions,
         ds_income_groups=ds_income_groups,
@@ -73,6 +86,7 @@ def run(dest_dir: str) -> None:
     tb = add_screening_and_testing(tb)
 
     tb = tb.set_index(["country", "year"], verify_integrity=True)
+    tb.metadata.short_name = "polio"
 
     #
     # Save outputs.

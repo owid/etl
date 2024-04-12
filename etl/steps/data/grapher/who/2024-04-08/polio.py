@@ -11,10 +11,10 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load garden dataset.
-    ds_garden = paths.load_dataset("polio_afp")
+    ds_garden = paths.load_dataset("polio")
 
     # Read table from garden dataset.
-    tb = ds_garden["polio_afp"]
+    tb = ds_garden["polio"]
 
     #
     # Process data.
