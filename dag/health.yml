@@ -523,7 +523,7 @@ steps:
   data://garden/who/2024-04-09/polio_historical:
     - data://meadow/who/2024-04-09/polio_historical
 
-  # Combinging polio datasets
+  # Combining polio datasets
   data://garden/who/2024-04-08/polio:
     - data://meadow/who/2024-04-08/polio_afp
     - data://meadow/who/2024-04-09/polio_historical
@@ -535,5 +535,14 @@ steps:
     - data://garden/who/2024-04-08/polio
 
   # Polio certification status
+  data://garden/health/2024-04-12/polio_status:
+    - data://meadow/health/2024-04-12/polio_status
+    - data://meadow/health/2024-04-12/polio_free_countries
   data://meadow/health/2024-04-12/polio_status:
     - snapshot://health/2024-04-12/polio_status.csv
+
+  # Polio free countries
+  data://garden/health/2024-04-12/polio_free_countries:
+    - data://meadow/health/2024-04-12/polio_free_countries
+  data://meadow/health/2024-04-12/polio_free_countries:
+    - snapshot://health/2024-04-12/polio_free_countries.csv
