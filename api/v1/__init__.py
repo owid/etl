@@ -179,8 +179,12 @@ def _indicator_metadata_dict(indicator: Indicator, db_indicator: gm.Variable) ->
     indicator_update_dict = indicator.to_meta_dict()
     update_period_days = indicator_update_dict.pop("update_period_days", None)
 
+    # if indicator has dimensions, use its original name
+    original_short_name = (db_indicator.dimensions or {}).get("originalShortName")
+    short_name = original_short_name or db_indicator.shortName
+
     # create dictionary for metadata
-    meta_dict = {"tables": {db_indicator.table_name: {"variables": {db_indicator.shortName: indicator_update_dict}}}}
+    meta_dict = {"tables": {db_indicator.table_name: {"variables": {short_name: indicator_update_dict}}}}
 
     if update_period_days:
         meta_dict["dataset"] = {"update_period_days": update_period_days}
