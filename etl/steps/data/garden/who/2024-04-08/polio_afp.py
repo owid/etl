@@ -59,6 +59,7 @@ def run(dest_dir: str) -> None:
         min_num_values_per_year=1,
     )
     tb_reg = tb_reg[tb_reg["country"].isin(REGIONS)]
+    tb = pr.concat([tb, tb_reg], axis=0)
     # Add correction factor to estimate polio cases based on reported cases.
     tb = add_correction_factor(tb)
     tb["estimated_cases"] = tb["total_cases"] * tb["correction_factor"]
