@@ -1,0 +1,26 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Polio-Free Countries
+    date_published: "2016"
+
+    # Citation
+    producer: Global Polio Eradication Initiative
+    citation_full: |-
+      Global Polio Eradication Initiative (2016)
+
+    # Files
+    url_main: https://polioeradication.org/where-we-work/polio-free-countries/
+    date_accessed: 2024-04-12
+
+    # License
+    license:
+      name: CC BY-NC-SA 3.0 IGO
+      url: https://polioeradication.org/terms-of-use/
+
+outs:
+  - md5: 3670959ed02bcdb84fc0080734fc1bf7
+    size: 5123
+    path: polio_free_countries.csv
