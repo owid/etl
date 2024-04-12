@@ -73,3 +73,27 @@ tables:
         unit: cases
         display:
           numDecimalPlaces: 0
+      cvdpv1:
+        title: Circulating Vaccine-Derived Poliovirus type 1 (cVDPV1) cases
+        description_short: "The number of cases of circulating vaccine-derived poliovirus type 1 detected in a given year"
+        unit: cases
+        display:
+          numDecimalPlaces: 0
+      cvdpv2:
+        title: Circulating Vaccine-Derived Poliovirus type 2 (cVDPV2) cases
+        description_short: "The number of cases of circulating vaccine-derived poliovirus type 2 detected in a given year"
+        unit: cases
+        display:
+          numDecimalPlaces: 0
+      cvdpv3:
+        title: Circulating Vaccine-Derived Poliovirus type 3 (cVDPV3) cases
+        description_short: "The number of cases of circulating vaccine-derived poliovirus type 3 detected in a given year"
+        unit: cases
+        display:
+          numDecimalPlaces: 0
+      total_cvdpv:
+        title: Total Circulating Vaccine-Derived Poliovirus (cVDPV) cases
+        description_short: "The sum of circulating vaccine-derived poliovirus type 1, 2, and 3 cases"
+        unit: cases
+        display:
+          numDecimalPlaces: 0

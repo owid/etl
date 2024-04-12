@@ -23,7 +23,11 @@ def run(dest_dir: str) -> None:
     #
     # Load meadow dataset.
     ds_meadow = paths.load_dataset("polio_afp")
+    # Load historical polio dataset
     ds_historical = paths.load_dataset("polio_historical")
+    # Load fasttrack Global Polio Eradication Initiative on circulating vaccine derived polio cases
+    snap_cvdpv = paths.load_snapshot("gpei.csv")
+    tb_cvdpv = snap_cvdpv.read()
     # Load regions dataset.
     ds_regions = paths.load_dataset("regions")
     # Load income groups dataset.
@@ -50,6 +54,8 @@ def run(dest_dir: str) -> None:
     tb["total_cases"] = tb["wild_poliovirus_cases"] + tb["cvdpv_cases"]
     # Need to deal with overlapping years
     tb = pr.concat([tb, tb_hist], axis=0)
+    tb = tb.merge(tb_cvdpv, on=["country", "year"], how="left")
+
     # Add region aggregates.
     tb_reg = add_regions_to_table(
         tb[["country", "year", "afp_cases", "wild_poliovirus_cases", "cvdpv_cases", "total_cases"]],

@@ -521,6 +521,7 @@ steps:
     - data://meadow/who/2024-04-09/polio_historical
     - data://garden/wb/2023-04-30/income_groups
     - data://garden/regions/2023-01-01/regions
+    - snapshot://fasttrack/latest/gpei.csv
   data://grapher/who/2024-04-08/polio_afp:
     - data://garden/who/2024-04-08/polio_afp
 
