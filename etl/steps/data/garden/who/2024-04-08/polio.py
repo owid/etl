@@ -32,6 +32,7 @@ def run(dest_dir: str) -> None:
     tb_cvdpv = tb_cvdpv.drop(columns=["total_cvdpv"])
     # Load regions dataset.
     ds_regions = paths.load_dataset("regions")
+
     # Load income groups dataset.
     ds_income_groups = paths.load_dataset("income_groups")
 

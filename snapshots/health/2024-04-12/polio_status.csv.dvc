@@ -1,0 +1,26 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Global Polio Eradication Initiative - Certification Status
+    date_published: "2021"
+    # Citation
+    producer: Global Polio Eradication Initiative
+    citation_full: |-
+      Global Polio Eradication Initiative (2024)
+    attribution: Global Polio Eradication Initiative (2024)
+    attribution_short: GPEI
+
+    # Files
+    url_main: https://www.transplant-observatory.org/
+    date_accessed: 2024-04-12
+
+    # License
+    license:
+      name: https://polioeradication.org/terms-of-use/
+      url: https://polioeradication.org/terms-of-use/
+outs:
+  - md5: e9052b2095a1c01afe2f954eda183344
+    size: 140
+    path: polio_status.csv
