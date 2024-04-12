@@ -1,4 +1,5 @@
 import datetime as dt
+import re
 import subprocess
 from typing import Tuple
 
@@ -9,6 +10,7 @@ from rich import print
 from rich.ansi import AnsiDecoder
 from rich_click.rich_command import RichCommand
 
+from apps.staging_sync.cli import _normalise_branch
 from etl import config
 from etl.paths import BASE_DIR
 
@@ -24,6 +26,12 @@ EXCLUDE_DATASETS = "weekly_wildfires|excess_mortality|covid|fluid|flunet"
     type=str,
 )
 @click.option(
+    "--include",
+    type=str,
+    default="garden",
+    help="Include datasets matching this regex.",
+)
+@click.option(
     "--dry-run/--no-dry-run",
     default=False,
     type=bool,
@@ -31,6 +39,7 @@ EXCLUDE_DATASETS = "weekly_wildfires|excess_mortality|covid|fluid|flunet"
 )
 def cli(
     branch: str,
+    include: str,
     dry_run: bool,
 ) -> None:
     """Post result of `etl diff` to Github PR.
@@ -41,10 +50,22 @@ def cli(
     $ python apps/owidbot/etldiff.py --branch my-branch
     ```
     """
-    lines = call_etl_diff()
+    lines = call_etl_diff(include)
     diff, result = format_etl_diff(lines)
 
+    nbranch = _normalise_branch(branch) if branch else "dry-run"
+
     body = f"""
+<details>
+
+<summary><b>Staging server</b>: </summary>
+
+- **Admin**: http://staging-site-{nbranch}/admin/login
+- **Site**: http://staging-site-{nbranch}/
+- **Login**: `ssh owid@staging-site-{nbranch}`
+- **Site-screenshots**: https://github.com/owid/site-screenshots/compare/{nbranch}
+</details>
+
 <details>
 
 <summary><b>etl diff</b>: {result}</summary>
@@ -117,10 +138,24 @@ def format_etl_diff(lines: list[str]) -> Tuple[str, str]:
         new_lines.append(line)
 
     diff = "\n".join(new_lines)
+
+    # Some datasets might have different checksum, but be the same (this is caused by checksum_input and checksum_output
+    # problem). Hotfix this by removing matching datasets from the output.
+    # Example:
+    # = Dataset meadow/agriculture/2024-03-26/attainable_yields
+    #     = Table attainable_yields
+    # = Dataset garden/agriculture/2024-03-26/attainable_yields
+    #     = Table attainable_yields
+    #        ~ Column A
+    # = Dataset grapher/agriculture/2024-03-26/attainable_yields
+    #     = Table attainable_yields
+    pattern = r"(= Dataset.*(?:\n\s+=.*)+)\n(?=. Dataset|\n)"
+    diff = re.sub(pattern, "", diff)
+
     return diff, result
 
 
-def call_etl_diff() -> list[str]:
+def call_etl_diff(include: str) -> list[str]:
     cmd = [
         "poetry",
         "run",
@@ -129,7 +164,7 @@ def call_etl_diff() -> list[str]:
         "REMOTE",
         "data/",
         "--include",
-        "garden",
+        include,
         "--exclude",
         EXCLUDE_DATASETS,
         "--verbose",
