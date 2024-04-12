@@ -533,3 +533,7 @@ steps:
     - snapshot://health/2024-04-12/polio_status.csv
   data://grapher/who/2024-04-08/polio:
     - data://garden/who/2024-04-08/polio
+
+  # Polio certification status
+  data://meadow/health/2024-04-12/polio_status:
+    - snapshot://health/2024-04-12/polio_status.csv
