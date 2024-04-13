@@ -151,7 +151,9 @@ def run(dest_dir: str) -> None:
     # Create spell tables to separate different survey spells in the explorers
     spell_tables_inc = create_survey_spells(tb=tb_inc_2017)
     spell_tables_cons = create_survey_spells(tb=tb_cons_2017)
-    spell_tables_inc_or_cons = create_survey_spells(tb=tb_inc_or_cons_2017)
+
+    # For income and consumption we combine the tables to not lose information from tb_inc_or_cons_2017
+    spell_tables_inc_or_cons = create_survey_spells_inc_cons(tb_inc=tb_inc_2017, tb_cons=tb_cons_2017)
 
     # Drop columns not needed
     tb_inc_2011 = drop_columns(tb_inc_2011)
@@ -972,6 +974,29 @@ def create_survey_spells(tb: Table) -> list:
         tb_var.metadata.short_name = f"{tb_var.metadata.short_name}_{select_var}"
 
         spell_tables.append(tb_var)
+
+    return spell_tables
+
+
+def create_survey_spells_inc_cons(tb_inc: Table, tb_cons: Table) -> list:
+    """
+    Create table for each indicator and survey spells, to be able to graph them in explorers.
+    This version recombines income and consumption tables to not lose dropped rows.
+    """
+
+    tb_inc = tb_inc.reset_index().copy()
+    tb_cons = tb_cons.reset_index().copy()
+
+    # Concatenate the two tables
+    tb_inc_or_cons_2017_spells = pr.concat([tb_inc, tb_cons], ignore_index=True, short_name="income_consumption_2017")
+
+    # Set index and sort
+    tb_inc_or_cons_2017_spells = set_index_and_sort(
+        tb=tb_inc_or_cons_2017_spells, index_cols=["country", "year", "reporting_level", "welfare_type"]
+    )
+
+    # Create spells
+    spell_tables = create_survey_spells(tb_inc_or_cons_2017_spells)
 
     return spell_tables
 
