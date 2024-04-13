@@ -1087,7 +1087,7 @@ def check_jumps_in_grapher_dataset(tb: Table) -> Table:
         if not tb_error.empty:
             log.warning(
                 f"""There are {len(tb_error)} observations with abnormal jumps for {col}:
-                {tabulate(tb_error[['ppp_version', 'country', 'year', 'reporting_level', col, 'check_diff_column', 'check_diff_year']].sort_values('year'), headers = 'keys', tablefmt = TABLEFMT, floatfmt=".1f")}"""
+                {tabulate(tb_error[['ppp_version', 'country', 'year', 'reporting_level', col, 'check_diff_column', 'check_diff_year']].sort_values('year').reset_index(drop=True), headers = 'keys', tablefmt = TABLEFMT, floatfmt=".1f")}"""
             )
             # tb = tb[~mask].reset_index(drop=True)
 
