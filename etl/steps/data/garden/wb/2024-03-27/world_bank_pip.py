@@ -755,9 +755,9 @@ def inc_or_cons_data(tb: Table) -> Tuple[Table, Table, Table]:
     ]
     tb_inc_or_cons.drop(columns=["duplicate_flag"], inplace=True)
 
-    # print(f'After dropping duplicates there were {len(tb_inc_or_cons)} rows.')
-
     tb_inc_or_cons = check_jumps_in_grapher_dataset(tb_inc_or_cons)
+
+    tb_inc_or_cons = remove_confusing_datapoints_in_grapher_dataset(tb_inc_or_cons)
 
     return tb_inc, tb_cons, tb_inc_or_cons
 
@@ -1127,5 +1127,68 @@ def check_jumps_in_grapher_dataset(tb: Table) -> Table:
             "check_diff_welfare_type",
         ]
     )
+
+    return tb
+
+
+def remove_confusing_datapoints_in_grapher_dataset(tb: Table) -> Table:
+    """
+    Remove datapoints that are confusing when we are showing a unique series for both income and consumption.
+    """
+
+    # Define columns to keep data. Inequality is mostly not affected by the income/consumption choice
+    cols_to_keep = [
+        "country",
+        "year",
+        "reporting_level",
+        "welfare_type",
+        "gini",
+        "mld",
+        "decile1_share",
+        "decile2_share",
+        "decile3_share",
+        "decile4_share",
+        "decile5_share",
+        "decile6_share",
+        "decile7_share",
+        "decile8_share",
+        "decile9_share",
+        "decile10_share",
+        "bottom50_share",
+        "middle40_share",
+        "headcount_40_median",
+        "headcount_50_median",
+        "headcount_60_median",
+        "headcount_ratio_40_median",
+        "headcount_ratio_50_median",
+        "headcount_ratio_60_median",
+        "income_gap_ratio_40_median",
+        "income_gap_ratio_50_median",
+        "income_gap_ratio_60_median",
+        "poverty_gap_index_40_median",
+        "poverty_gap_index_50_median",
+        "poverty_gap_index_60_median",
+        "avg_shortfall_40_median",
+        "avg_shortfall_50_median",
+        "avg_shortfall_60_median",
+        "total_shortfall_40_median",
+        "total_shortfall_50_median",
+        "total_shortfall_60_median",
+        "poverty_severity_40_median",
+        "poverty_severity_50_median",
+        "poverty_severity_60_median",
+        "waits_40_median",
+        "waits_50_median",
+        "waits_60_median",
+        "palma_ratio",
+        "s80_s20_ratio",
+        "p90_p10_ratio",
+        "p90_p50_ratio",
+        "p50_p10_ratio",
+    ]
+
+    # Make nan the data for Poland from 2020 onwards, except for columns in cols_to_keep
+    mask = (tb["country"] == "Poland") & (tb["year"] >= 2020)
+    tb.loc[mask, tb.columns.difference(cols_to_keep)] = np.nan
 
     return tb
