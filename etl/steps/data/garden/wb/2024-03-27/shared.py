@@ -220,6 +220,8 @@ You can find the data with all available income and consumption data points in o
         "description": "Depending on the country and year, the data relates to income measured after taxes and benefits, or to consumption, per capita. 'Per capita' means that the income of each household is attributed equally to each member of the household (including children).",
         "processing_description": """For a small number of country-year observations, the World Bank PIP data contains two estimates: one based on income data and one based on consumption data. In these cases we keep only the consumption estimate in order to obtain a single series for each country.
 
+To avoid data misinterpretations, we dropped income estimates for absolute poverty in Poland after 2020 because they differ considerably from the consumption estimates kept from previous years.
+
 You can find the data with all available income and consumption data points, including these overlapping estimates, in our [complete dataset](https://github.com/owid/poverty-data#a-global-dataset-of-poverty-and-inequality-measures-prepared-by-our-world-in-data-from-the-world-banks-poverty-and-inequality-platform-pip-database) of the World Bank PIP data.""",
     },
 }
