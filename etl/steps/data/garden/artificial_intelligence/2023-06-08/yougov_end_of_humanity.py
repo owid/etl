@@ -61,6 +61,7 @@ def run(dest_dir: str) -> None:
 
     # Transform the 'melted_df_all_age_groups' dataframe into a pivot table with 'options' as index and
     # each unique value in 'melted_columns' as a column. Store the pivot table in 'pivot_df_all_age_groups'.
+    melted_df_all_age_groups = melted_df_all_age_groups.astype({"melted_columns": "category"})
     pivot_df_all_age_groups = melted_df_all_age_groups.pivot_table(
         index=["options"], columns="melted_columns", values="value"
     )
