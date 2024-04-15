@@ -2035,7 +2035,7 @@
     - "TLS"
     - "LKA"
 - code: WHO_WPAC
-- name: "WHO Western Pacific region"
+  name: "WHO Western Pacific region"
   region_type: "aggregate"
   members:
     - "AUS"
