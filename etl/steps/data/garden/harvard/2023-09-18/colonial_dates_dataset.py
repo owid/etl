@@ -330,7 +330,7 @@ def correct_european_countries(tb: Table) -> Table:
     european_countries = geo.list_countries_in_region(region="Europe")
 
     # If the country is in european_countries and last_colonizer is not "zzzz. Never colonized", assign nan to colonizer
-    for col in ["colonizer", "colonizer_grouped", "last_colonizer", "last_colonizer_grouped"]:
+    for col in ["colonizer", "colonizer_grouped", "last_colonizer", "years_colonized", "last_colonizer_grouped"]:
         tb[col] = tb[col].where(
             ~((tb["country"].isin(european_countries)) & (tb["last_colonizer_grouped"] == "zzzz. Never colonized")),
             np.nan,
