@@ -17,7 +17,7 @@ from etl.paths import BASE_DIR
 log = structlog.get_logger()
 
 
-EXCLUDE_DATASETS = "weekly_wildfires|excess_mortality|covid|fluid|flunet"
+EXCLUDE_DATASETS = "weekly_wildfires|excess_mortality|covid|fluid|flunet|country_profile"
 
 
 @click.command(name="owidbot-etl-diff", cls=RichCommand, help=__doc__)
