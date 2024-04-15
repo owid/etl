@@ -138,3 +138,28 @@ steps:
     - data://garden/wb/2023-04-30/income_groups
   data://grapher/gcp/2023-12-05/global_carbon_budget:
     - data://garden/gcp/2023-12-05/global_carbon_budget
+  #
+  # Emissions - CO2 dataset (2023-12-12).
+  #
+  data://garden/emissions/2023-12-12/owid_co2:
+    - data://garden/emissions/2023-11-23/national_contributions
+    - data://garden/gcp/2023-12-12/global_carbon_budget
+    - data://garden/climate_watch/2023-10-31/emissions_by_sector
+    - data://garden/energy/2023-12-12/primary_energy_consumption
+    - data://garden/demography/2023-03-31/population
+    - data://garden/ggdc/2020-10-01/ggdc_maddison
+    - data://garden/regions/2023-01-01/regions
+  #
+  # Jones et al. (2023) - National contributions to climate change.
+  #
+  data://meadow/emissions/2023-11-23/national_contributions:
+    - snapshot://emissions/2023-11-23/national_contributions_annual_emissions.csv
+    - snapshot://emissions/2023-11-23/national_contributions_cumulative_emissions.csv
+    - snapshot://emissions/2023-11-23/national_contributions_temperature_response.csv
+  data://garden/emissions/2023-11-23/national_contributions:
+    - data://meadow/emissions/2023-11-23/national_contributions
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/demography/2023-03-31/population
+    - data://garden/wb/2023-04-30/income_groups
+  data://grapher/emissions/2023-11-23/national_contributions:
+    - data://garden/emissions/2023-11-23/national_contributions
