@@ -1851,7 +1851,7 @@
 # WHO regios
 - code: WHO_AMR
   name: "WHO Americas region"
-  region_type: "continent"
+  region_type: "who_region"
   members:
     - "ATG"
     - "ARG"
@@ -1888,7 +1888,7 @@
 
 - code: WHO_AFR
   name: "WHO African region"
-  region_type: "continent"
+  region_type: "who_region"
   members:
     - "DZA"
     - "AGO"
@@ -1939,7 +1939,7 @@
     - "ZWE"
 - code: WHO_EMR
   name: "WHO Eastern Mediterranean region"
-  region_type: "continent"
+  region_type: "who_region"
   members:
     - "AFG"
     - "BHR"
@@ -1964,7 +1964,7 @@
     - "YEM"
 - code: WHO_EUR
   name: "WHO European region"
-  region_type: "continent"
+  region_type: "who_region"
   members:
     - "ALB"
     - "AND"
@@ -2021,7 +2021,7 @@
     - "UZB"
 - code: WHO_SEAR
   name: "WHO South-East Asia region"
-  region_type: "continent"
+  region_type: "who_region"
   members:
     - "BGD"
     - "BTN"
@@ -2036,7 +2036,7 @@
     - "LKA"
 - code: WHO_WPAC
 - name: "WHO Western Pacific region"
-  region_type: "continent"
+  region_type: "who_region"
   members:
     - "AUS"
     - "BRN"
