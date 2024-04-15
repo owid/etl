@@ -33,8 +33,13 @@ ITEM_CODE_MEAT_CHICKEN = "00001058"
 # Given that the number of slaughtered animals to produce all meat is not provided, we estimate it by aggregating the
 # number of slaughtered animals for each meat item.
 # List item codes to sum as part of "Meat, Total" (avoiding double-counting items).
-# This list can be found in https://www.fao.org/faostat/en/#definitions
-# by clicking on "Item Group" and selecting Item Code 1765 ("Meat, Total" with Domain Code "QCL").
+# This list can be found following these steps:
+# * Go to: https://www.fao.org/faostat/en/#definitions
+# * Click on "Item Group" (on the left column).
+# * Type "1765" in the search bar (which is the Item Group Code corresponding to Item Group "Meat, Total").
+# * Download the output of the search as a CSV file.
+# * Open the file, filter by Item Group Code "1765" and Domain Code "QCL".
+# * The list of item codes and item names are in columns "Item Code" and "Item".
 MEAT_TOTAL_ITEM_CODES = [
     "00001058",  # 'Meat of chickens, fresh or chilled',
     "00001069",  # 'Meat of ducks, fresh or chilled',
