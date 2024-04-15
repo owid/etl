@@ -1,8 +1,8 @@
-"""Garden step that combines various datasets related to greenhouse emissions and produces the OWID CO2 dataset (2022).
+"""Garden step that combines various datasets related to greenhouse emissions and produces the OWID CO2 dataset.
 
 Datasets combined:
 * Global Carbon Budget - Global Carbon Project.
-* National contributions to climate change - Jones et al. (2023).
+* National contributions to climate change - Jones et al.
 * Greenhouse gas emissions by sector - Climate Watch.
 * Primary energy consumption - EI & EIA.
 
