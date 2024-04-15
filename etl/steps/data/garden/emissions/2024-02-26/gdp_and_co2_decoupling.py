@@ -9,6 +9,7 @@ The data in the current step is not used by any grapher step, but will be used b
 TODO: Include link to the updated static chart once it is created.
 
 """
+
 from structlog import get_logger
 
 from etl.helpers import PathFinder, create_dataset

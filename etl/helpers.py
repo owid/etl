@@ -8,6 +8,7 @@ import sys
 import tempfile
 from collections.abc import Generator
 from contextlib import contextmanager
+from functools import cache
 from pathlib import Path
 from typing import Any, Dict, Iterable, Iterator, List, Literal, Optional, Union, cast
 from urllib.parse import urljoin
@@ -377,6 +378,10 @@ class WrongStepName(ExceptionFromDocstring):
     """Wrong step name. If this step was in the dag, it should be corrected."""
 
 
+# loading DAG can take up to 1 second, so cache it
+load_dag_cached = cache(load_dag)
+
+
 class PathFinder:
     """Helper object with naming conventions. It uses your module path (__file__) and
     extracts from it commonly used attributes like channel / namespace / version / short_name or
@@ -390,11 +395,8 @@ class PathFinder:
     def __init__(self, __file__: str, is_private: Optional[bool] = None):
         self.f = Path(__file__)
 
-        # Load dag.
-        if "/archive/" in __file__:
-            self.dag = load_dag(paths.DAG_ARCHIVE_FILE)
-        else:
-            self.dag = load_dag()
+        # Lazy load dag when needed.
+        self._dag = None
 
         # Current file should be a data step.
         if not self.f.as_posix().startswith(paths.STEP_DIR.as_posix()):
@@ -411,6 +413,16 @@ class PathFinder:
 
         # Default logger
         self.log = structlog.get_logger(step=f"{self.namespace}/{self.channel}/{self.version}/{self.short_name}")
+
+    @property
+    def dag(self):
+        """Lazy loading of DAG."""
+        if self._dag is None:
+            if "/archive/" in str(self.f):
+                self._dag = load_dag_cached(paths.DAG_ARCHIVE_FILE)
+            else:
+                self._dag = load_dag_cached()
+        return self._dag
 
     @property
     def channel(self) -> str:

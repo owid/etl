@@ -4,6 +4,7 @@ import json
 from typing import Any
 
 import numpy as np
+import owid.catalog.processing as pr
 import pandas as pd
 import structlog
 from owid.catalog import Table, VariableMeta
@@ -208,7 +209,11 @@ def merge_identical_tables(tables: list[Table]) -> list[Table]:
         for k, existing_tb in enumerate(new_tables):
             if existing_tb.m.short_name == tb.m.short_name:
                 # It's possible that new table has different index
-                new_tables[k] = existing_tb.reset_index().append(tb.reset_index()).set_index(existing_tb.index.names)
+                new_tables[k] = (
+                    pr.concat([existing_tb.reset_index(), tb.reset_index()], ignore_index=True)
+                    .set_index(existing_tb.index.names)
+                    .copy_metadata(existing_tb)
+                )
                 new_tables[k] = new_tables[k][~new_tables[k].index.duplicated()]
                 break
 

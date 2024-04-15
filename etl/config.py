@@ -12,6 +12,7 @@ import pwd
 from os import environ as env
 
 import bugsnag
+import pandas as pd
 from dotenv import load_dotenv
 
 from etl.paths import BASE_DIR
@@ -30,6 +31,10 @@ def load_env():
 
 
 load_env()
+
+
+pd.set_option("future.no_silent_downcasting", True)
+
 # When DEBUG is on
 # - run steps in the same process (speeding up ETL)
 DEBUG = env.get("DEBUG") in ("True", "true", "1")
@@ -131,7 +136,7 @@ SUBSET = env.get("SUBSET", None)
 MAX_VIRTUAL_MEMORY_LINUX = 32 * 2**30  # 32 GB
 
 # increment this to force a full rebuild of all datasets
-ETL_EPOCH = 4
+ETL_EPOCH = 5
 
 # any garden or grapher dataset after this date will have strict mode enabled
 STRICT_AFTER = "2023-06-25"
@@ -149,6 +154,8 @@ ADMIN_HOST = env.get("ADMIN_HOST", "http://localhost:3030")
 BUGSNAG_API_KEY = env.get("BUGSNAG_API_KEY")
 
 OPENAI_API_KEY = env.get("OPENAI_API_KEY", None)
+
+OWIDBOT_ACCESS_TOKEN = env.get("OWIDBOT_ACCESS_TOKEN", None)
 
 
 def enable_bugsnag() -> None:
