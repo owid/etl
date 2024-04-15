@@ -257,7 +257,7 @@ def calculate_yearly_impacts(tb: Table) -> Table:
     # Go row by row, and create a new disaster event with the impact normalized by the fraction of days it happened
     # in a specific year.
     added_events = Table().copy_metadata(tb)
-    for i, row in multi_year_rows.iterrows():
+    for _, row in multi_year_rows.iterrows():
         # Start dataframe for new event.
         new_event = Table(row).transpose().copy_metadata(tb)
         # Years spanned by the disaster.
@@ -272,11 +272,12 @@ def calculate_yearly_impacts(tb: Table) -> Table:
                 # Fraction of days affected this year.
                 days_fraction = days_affected_in_year / days_total
                 # Impacts this years.
-                impacts = (row[IMPACT_COLUMNS] * days_fraction).astype(int)  # type: ignore
+                # impacts = (row[IMPACT_COLUMNS] * days_fraction).astype(int)  # type: ignore
+                impacts = pd.DataFrame(row[IMPACT_COLUMNS] * days_fraction).transpose().astype(int)
                 # Start a series that counts the impacts accumulated over the years.
                 cumulative_impacts = impacts
                 # Normalize data by the number of days affected in this year.
-                new_event[IMPACT_COLUMNS] = impacts
+                new_event.loc[:, IMPACT_COLUMNS] = impacts
                 # Correct dates.
                 new_event["end_date"] = pd.Timestamp(year=year, month=12, day=31)
             elif years[0] < year < years[-1]:
@@ -284,18 +285,19 @@ def calculate_yearly_impacts(tb: Table) -> Table:
                 # Note: Ignore leap years.
                 days_fraction = 365 / days_total
                 # Impacts this year.
-                impacts = (row[IMPACT_COLUMNS] * days_fraction).astype(int)  # type: ignore
+                impacts = pd.DataFrame(row[IMPACT_COLUMNS] * days_fraction).transpose().astype(int)
+                # impacts = (row[IMPACT_COLUMNS] * days_fraction).astype(int)  # type: ignore
                 # Add impacts to the cumulative impacts series.
                 cumulative_impacts += impacts  # type: ignore
                 # Normalize data by the number of days affected in this year.
-                new_event[IMPACT_COLUMNS] = impacts
+                new_event.loc[:, IMPACT_COLUMNS] = impacts
                 # Correct dates.
                 new_event["start_date"] = pd.Timestamp(year=year, month=1, day=1)
                 new_event["end_date"] = pd.Timestamp(year=year, month=12, day=31)
             else:
                 # Assign all remaining impacts to the last year.
-                impacts = row[IMPACT_COLUMNS] - cumulative_impacts  # type: ignore
-                new_event[IMPACT_COLUMNS] = impacts
+                impacts = pd.DataFrame(row[IMPACT_COLUMNS] - cumulative_impacts).transpose()  # type: ignore
+                new_event.loc[:, IMPACT_COLUMNS] = impacts
                 # Correct dates.
                 new_event["start_date"] = pd.Timestamp(year=year, month=1, day=1)
             added_events = pr.concat([added_events, new_event], ignore_index=True)
