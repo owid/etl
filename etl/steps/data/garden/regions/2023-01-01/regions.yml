@@ -1848,10 +1848,11 @@
   successors:
     - "ZAF"
 
-# WHO regios
+# WHO regions
 - code: WHO_AMR
-  name: "WHO Americas region"
+  name: "Americas (WHO)"
   region_type: "aggregate"
+  defined_by: who
   members:
     - "ATG"
     - "ARG"
@@ -1887,8 +1888,9 @@
     - "VEN"
 
 - code: WHO_AFR
-  name: "WHO African region"
+  name: "Africa (WHO)"
   region_type: "aggregate"
+  defined_by: who
   members:
     - "DZA"
     - "AGO"
@@ -1938,8 +1940,9 @@
     - "ZMB"
     - "ZWE"
 - code: WHO_EMR
-  name: "WHO Eastern Mediterranean region"
+  name: "Eastern Mediterranean (WHO)"
   region_type: "aggregate"
+  defined_by: who
   members:
     - "AFG"
     - "BHR"
@@ -1963,8 +1966,9 @@
     - "ARE"
     - "YEM"
 - code: WHO_EUR
-  name: "WHO European region"
+  name: "Europe (WHO)"
   region_type: "aggregate"
+  defined_by: who
   members:
     - "ALB"
     - "AND"
@@ -2020,8 +2024,9 @@
     - "GBR"
     - "UZB"
 - code: WHO_SEAR
-  name: "WHO South-East Asia region"
+  name: "South-East Asia (WHO)"
   region_type: "aggregate"
+  defined_by: who
   members:
     - "BGD"
     - "BTN"
@@ -2035,8 +2040,9 @@
     - "TLS"
     - "LKA"
 - code: WHO_WPAC
-  name: "WHO Western Pacific region"
+  name: "Western Pacific (WHO)"
   region_type: "aggregate"
+  defined_by: who
   members:
     - "AUS"
     - "BRN"
