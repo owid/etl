@@ -55,6 +55,10 @@ def cli(
 
     nbranch = _normalise_branch(branch) if branch else "dry-run"
 
+    # TODO: only include site-screenshots if the PR is from owid-grapher. Similarly, don't
+    # run etl diff if the PR is from etl repo.
+    # - **Site-screenshots**: https://github.com/owid/site-screenshots/compare/{nbranch}
+
     body = f"""
 <details>
 
@@ -63,7 +67,6 @@ def cli(
 - **Admin**: http://staging-site-{nbranch}/admin/login
 - **Site**: http://staging-site-{nbranch}/
 - **Login**: `ssh owid@staging-site-{nbranch}`
-- **Site-screenshots**: https://github.com/owid/site-screenshots/compare/{nbranch}
 </details>
 
 <details>
