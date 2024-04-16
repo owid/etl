@@ -1215,6 +1215,26 @@ def concat(
                 **kwargs,
             )
         )
+        ################################################################################################################
+        # In pandas 2.2.1, pd.concat() does not return a copy when one of the input dataframes is empty.
+        # This causes the following unexpected behavior:
+        # df_0 = pd.DataFrame({"a": ["original value"]})
+        # df_1 = pd.concat([pd.DataFrame(), df_0], ignore_index=True)
+        # df_0.loc[:, "a"] = "new value"
+        # df_1["a"]  # This will return "new value" instead of "original value".
+        # In pandas `1.4.0`, the behavior was as expected (returning "original value").
+        # Note that this happens even if `copy=True` is passed to `pd.concat()`.
+        if any([len(obj) == 0 for obj in objs]):
+            if pd.__version__ != "2.2.1":
+                # Check if patch is no longer needed.
+                df_0 = pd.DataFrame({"a": ["original value"]})
+                df_1 = pd.concat([pd.DataFrame(), df_0], ignore_index=True)
+                df_0.loc[:, "a"] = "new value"
+                if df_1["a"].item() != "new value":
+                    log.warning("Remove patch in owid.catalog.tables.concat, which is no longer necessary.")
+            # Ensure concat returns a copy.
+            table = table.copy()
+        ################################################################################################################
 
     if (axis == 1) or (axis == "columns"):
         # Original function pd.concat allows returning a dataframe with multiple columns with the same name.
