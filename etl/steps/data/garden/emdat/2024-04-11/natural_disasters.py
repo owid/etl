@@ -526,7 +526,7 @@ def sanity_checks_on_outputs(tb: Table, is_decade: bool) -> None:
 
 def run(dest_dir: str) -> None:
     #
-    # Load data.
+    # Load inputs.
     #
     # Load natural disasters dataset from meadow and read its main table.
     ds_meadow = paths.load_dataset("natural_disasters")

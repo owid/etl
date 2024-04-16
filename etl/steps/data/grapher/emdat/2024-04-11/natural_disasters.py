@@ -32,15 +32,28 @@ def create_wide_tables(table: Table, is_decade: bool) -> Table:
 
 
 def run(dest_dir: str) -> None:
+    #
+    # Load inputs.
+    #
     # Load garden tables and remove unnecessary columns.
     ds_garden = paths.load_dataset("natural_disasters")
-    tb_yearly = ds_garden["natural_disasters_yearly"].drop(columns=["population", "gdp"], errors="raise")
-    tb_decadal = ds_garden["natural_disasters_decadal"].drop(columns=["population", "gdp"], errors="raise")
+    tb_yearly = ds_garden["natural_disasters_yearly"]
+    tb_decadal = ds_garden["natural_disasters_decadal"]
+
+    #
+    # Process data.
+    #
+    # Remove unnecessary columns.
+    tb_yearly = tb_yearly.drop(columns=["population", "gdp"], errors="raise")
+    tb_decadal = tb_decadal.drop(columns=["population", "gdp"], errors="raise")
 
     # Create wide tables.
     tb_yearly_wide = create_wide_tables(table=tb_yearly, is_decade=False)
     tb_decadal_wide = create_wide_tables(table=tb_decadal, is_decade=True)
 
+    #
+    # Save outputs.
+    #
     # Create new grapher dataset, add tables, and save dataset.
     ds_grapher = create_dataset(
         dest_dir,
