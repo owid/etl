@@ -258,8 +258,8 @@ def calculate_yearly_impacts(tb: Table) -> Table:
     # in a specific year.
     added_events = Table().copy_metadata(tb)
     for _, row in multi_year_rows.iterrows():
-        # Start dataframe for new event.
-        new_event = Table(row).transpose().copy_metadata(tb)
+        # Start table for new event.
+        new_event = Table(row).transpose().reset_index(drop=True).copy_metadata(tb)
         # Years spanned by the disaster.
         years = np.arange(row["start_date"].year, row["end_date"].year + 1).tolist()
         # Calculate the total number of days spanned by the disaster (and add 1 day to include the day of the end date).
@@ -272,13 +272,16 @@ def calculate_yearly_impacts(tb: Table) -> Table:
                 # Fraction of days affected this year.
                 days_fraction = days_affected_in_year / days_total
                 # Impacts this years.
-                # impacts = (row[IMPACT_COLUMNS] * days_fraction).astype(int)  # type: ignore
                 impacts = pd.DataFrame(row[IMPACT_COLUMNS] * days_fraction).transpose().astype(int)
+                # Ensure "total_affected" is the sum of "injured", "affected" and "homeless".
+                # Note that the previous line may have introduced rounding errors.
+                impacts["total_affected"] = impacts["injured"] + impacts["affected"] + impacts["homeless"]
                 # Start a series that counts the impacts accumulated over the years.
                 cumulative_impacts = impacts
                 # Normalize data by the number of days affected in this year.
-                new_event.loc[:, IMPACT_COLUMNS] = impacts
-                # Correct dates.
+                new_event.loc[:, IMPACT_COLUMNS] = impacts.values
+                # Correct year and dates.
+                new_event["year"] = year
                 new_event["end_date"] = pd.Timestamp(year=year, month=12, day=31)
             elif years[0] < year < years[-1]:
                 # The entire year was affected by the disaster.
@@ -286,21 +289,26 @@ def calculate_yearly_impacts(tb: Table) -> Table:
                 days_fraction = 365 / days_total
                 # Impacts this year.
                 impacts = pd.DataFrame(row[IMPACT_COLUMNS] * days_fraction).transpose().astype(int)
-                # impacts = (row[IMPACT_COLUMNS] * days_fraction).astype(int)  # type: ignore
+                # Ensure "total_affected" is the sum of "injured", "affected" and "homeless".
+                # Note that the previous line may have introduced rounding errors.
+                impacts["total_affected"] = impacts["injured"] + impacts["affected"] + impacts["homeless"]
                 # Add impacts to the cumulative impacts series.
                 cumulative_impacts += impacts  # type: ignore
                 # Normalize data by the number of days affected in this year.
-                new_event.loc[:, IMPACT_COLUMNS] = impacts
-                # Correct dates.
+                new_event.loc[:, IMPACT_COLUMNS] = impacts.values
+                # Correct year and dates.
+                new_event["year"] = year
                 new_event["start_date"] = pd.Timestamp(year=year, month=1, day=1)
                 new_event["end_date"] = pd.Timestamp(year=year, month=12, day=31)
             else:
                 # Assign all remaining impacts to the last year.
-                impacts = pd.DataFrame(row[IMPACT_COLUMNS] - cumulative_impacts).transpose()  # type: ignore
-                new_event.loc[:, IMPACT_COLUMNS] = impacts
-                # Correct dates.
+                impacts = (pd.Series(row[IMPACT_COLUMNS]) - cumulative_impacts).astype(int)  # type: ignore
+                new_event.loc[:, IMPACT_COLUMNS] = impacts.values
+                # Correct year and dates.
+                new_event["year"] = year
                 new_event["start_date"] = pd.Timestamp(year=year, month=1, day=1)
-            added_events = pr.concat([added_events, new_event], ignore_index=True)
+                new_event["end_date"] = row["end_date"]
+            added_events = pr.concat([added_events, new_event], ignore_index=True).copy()
 
     # Remove multi-year rows from main dataframe, and add those rows after separating events year by year.
     tb_yearly = pr.concat([tb[~(multi_year_rows_mask)], added_events], ignore_index=True)  # type: ignore
@@ -328,6 +336,10 @@ def get_total_count_of_yearly_impacts(tb: Table) -> Table:
     )
     # Copy metadata from any other column into the new column of counts of events.
     counts["n_events"] = counts["n_events"].copy_metadata(tb["total_dead"])
+    # Ensure columns have the right type.
+    tb = tb.astype(
+        {column: int for column in tb.columns if column not in ["country", "year", "type", "start_date", "end_date"]}
+    )
     # Get the sum of impacts per country, year and type of disaster.
     tb = tb.groupby(["country", "year", "type"], observed=True).sum(numeric_only=True, min_count=1).reset_index()
     # Add the column of the number of events.
@@ -356,9 +368,7 @@ def create_a_new_type_for_all_disasters_combined(tb: Table) -> Table:
 def create_additional_variables(tb: Table, ds_population: Dataset, tb_gdp: Table) -> Table:
     """Create additional variables, namely damages per GDP, and impacts per 100,000 people."""
     # Add population to table.
-    tb = geo.add_population_to_table(
-        tb=tb, ds_population=ds_population, expected_countries_without_population=["North Yemen", "South Yemen"]
-    )
+    tb = geo.add_population_to_table(tb=tb, ds_population=ds_population)
 
     # Combine natural disasters with GDP data.
     tb = tb.merge(tb_gdp.rename(columns={"ny_gdp_mktp_cd": "gdp"}), on=["country", "year"], how="left")
