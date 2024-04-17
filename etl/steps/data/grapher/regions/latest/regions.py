@@ -6,6 +6,7 @@ This dataset is not meant to be imported to MySQL and is excluded from automatic
 
 import ast
 import re
+from typing import Any, cast
 
 import pandas as pd
 from owid.catalog import Dataset, Table
@@ -299,6 +300,15 @@ def run(dest_dir: str) -> None:
     regions["members"] = (
         members["members"].astype(object).apply(lambda x: ";".join(ast.literal_eval(x)) if pd.notna(x) else "")
     )
+
+    # Add owid_continent for convenience.
+    regions["owid_continent"] = None
+    continents = regions[regions["region_type"] == "continent"]
+    for continent in continents.itertuples():
+        continent = cast(Any, continent)
+        continent_members = continent.members.split(";")
+        assert regions.loc[continent_members, "owid_continent"].isnull().all(), "Some regions already have a continent"
+        regions.loc[continent_members, "owid_continent"] = continent.name
 
     #
     # Save outputs.
