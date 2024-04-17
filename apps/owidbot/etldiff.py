@@ -10,7 +10,7 @@ from rich import print
 from rich.ansi import AnsiDecoder
 from rich_click.rich_command import RichCommand
 
-from apps.staging_sync.cli import _normalise_branch
+from apps.staging_sync.cli import _get_container_name
 from etl import config
 from etl.paths import BASE_DIR
 
@@ -55,7 +55,7 @@ def cli(
     lines = call_etl_diff(include)
     diff, result = format_etl_diff(lines)
 
-    nbranch = _normalise_branch(branch) if branch else "dry-run"
+    container_name = _get_container_name(branch) if branch else "dry-run"
 
     # TODO: only include site-screenshots if the PR is from owid-grapher. Similarly, don't
     # run etl diff if the PR is from etl repo.
@@ -66,9 +66,9 @@ def cli(
 
 <summary><b>Staging server</b>: </summary>
 
-- **Admin**: http://staging-site-{nbranch}/admin/login
-- **Site**: http://staging-site-{nbranch}/
-- **Login**: `ssh owid@staging-site-{nbranch}`
+- **Admin**: http://{container_name}/admin/login
+- **Site**: http://{container_name}/
+- **Login**: `ssh owid@{container_name}`
 </details>
 
 <details>
