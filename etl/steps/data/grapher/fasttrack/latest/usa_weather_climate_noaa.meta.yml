@@ -33,13 +33,13 @@ tables:
         unit: '%'
         short_unit: '%'
         description: |-
-          Share of land area in the United States which experienced unusually high annual precipitation in a given year. This comparesactual yearly precipitation totals with expected totals based on historical data.
+          Share of land area in the United States which experienced unusually high annual precipitation in a given year. This compares actual yearly precipitation totals with expected totals based on historical data.
       unusual_precipitation_9yr:
         title: Unusually high precipitation (smoothed)
         unit: '%'
         short_unit: '%'
         description: |-
-          Share of land area in the United States which experienced unusually high annual precipitation in a given year. This comparesactual yearly precipitation totals with expected totals based on historical data.
+          Share of land area in the United States which experienced unusually high annual precipitation in a given year. This compares actual yearly precipitation totals with expected totals based on historical data.
       us_precipitation_anomaly:
         title: US precipitation anomaly
         unit: inches
@@ -126,6 +126,26 @@ tables:
         description: Temperature anomaly in summer, compared to the 1901–2000 average. "Summer" includes June to August.
       fall_temp_anomaly:
         title: Fall
+        unit: °F
+        short_unit: °F
+        description: Temperature anomaly in fall, compared to the 1901–2000 average. "Fall" includes September to November.
+      winter_temp_anomaly_rolling:
+        title: Winter (rolling average)
+        unit: °F
+        short_unit: °F
+        description: Temperature anomaly in winter, compared to the 1901–2000 average. "Winter" includes December to February.
+      spring_temp_anomaly_rolling:
+        title: Spring (rolling average)
+        unit: °F
+        short_unit: °F
+        description: Temperature anomaly in spring, compared to the 1901–2000 average. "Spring" includes March to May.
+      fall_temp_anomaly_rolling:
+        title: Summer (rolling average)
+        unit: °F
+        short_unit: °F
+        description: Temperature anomaly in summer, compared to the 1901–2000 average. "Summer" includes June to August.
+      summer_temp_anomaly_rolling:
+        title: Fall (rolling average)
         unit: °F
         short_unit: °F
         description: Temperature anomaly in fall, compared to the 1901–2000 average. "Fall" includes September to November.

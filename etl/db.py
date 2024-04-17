@@ -1,5 +1,6 @@
+import functools
 import warnings
-from typing import Any, Dict, List, Optional, cast
+from typing import Any, Dict, List, Optional
 from urllib.parse import quote
 
 import MySQLdb
@@ -42,17 +43,18 @@ def get_session(**kwargs) -> Session:
     return Session(get_engine(**kwargs))
 
 
+@functools.cache
+def _get_engine_cached(cf: Any) -> Engine:
+    return create_engine(
+        f"mysql://{cf.DB_USER}:{quote(cf.DB_PASS)}@{cf.DB_HOST}:{cf.DB_PORT}/{cf.DB_NAME}",
+        pool_size=30,  # Increase the pool size to allow higher GRAPHER_WORKERS
+        max_overflow=30,  # Increase the max overflow limit to allow higher GRAPHER_WORKERS
+    )
+
+
 def get_engine(conf: Optional[Dict[str, Any]] = None) -> Engine:
     cf: Any = dict_to_object(conf) if conf else config
-
-    return cast(
-        Engine,
-        create_engine(
-            f"mysql://{cf.DB_USER}:{quote(cf.DB_PASS)}@{cf.DB_HOST}:{cf.DB_PORT}/{cf.DB_NAME}",
-            pool_size=30,  # Increase the pool size to allow higher GRAPHER_WORKERS
-            max_overflow=30,  # Increase the max overflow limit to allow higher GRAPHER_WORKERS
-        ),
-    )
+    return _get_engine_cached(cf)
 
 
 def get_dataset_id(
