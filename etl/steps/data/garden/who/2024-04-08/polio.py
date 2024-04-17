@@ -4,7 +4,7 @@ import pandas as pd
 from owid.catalog import Table
 from owid.catalog import processing as pr
 
-from etl.data_helpers.geo import add_population_to_table, add_regions_to_table, harmonize_countries
+from etl.data_helpers.geo import add_regions_to_table, harmonize_countries
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
@@ -52,7 +52,7 @@ def run(dest_dir: str) -> None:
     # Add total cases
     tb["total_cases"] = tb["wild_poliovirus_cases"] + tb["cvdpv_cases"]
     # Need to deal with overlapping years
-    tb = pr.concat([tb, tb_hist], axis=0)
+    tb = pr.concat([tb_hist, tb], axis=0)
     tb = harmonize_countries(
         df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
     )

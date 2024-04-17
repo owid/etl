@@ -94,13 +94,15 @@ tables:
           numDecimalPlaces: 1
       estimated_cases:
         title: Estimated polio cases
-        description_short: The total estimated number of polio cases, using Tebbens et al.
+        description_short: The total estimated number of polio cases.
+        description_processing: Total estimated cases are calculated from reported cases using correction factors from Tebbens et al (2010).
         unit: cases
         display:
           numDecimalPlaces: 0
       estimated_cases_per_million:
         title: Estimated polio cases per million
-        description_short: The total estimated number of polio cases per million people, using Tebbens et al.
+        description_short: The total estimated number of polio cases per million people.
+        description_processing: Total estimated cases are calculated from reported cases using correction factors from Tebbens et al (2010).
         unit: cases per million
         display:
           numDecimalPlaces: 1

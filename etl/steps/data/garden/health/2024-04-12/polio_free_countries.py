@@ -22,7 +22,7 @@ def run(dest_dir: str) -> None:
     tb = ds_meadow["polio_free_countries"].reset_index()
 
     # Assign polio free countries.
-    tb = define_polio_free(tb)
+    tb = define_polio_free_new(tb, latest_year=LATEST_YEAR)
     # Set an index and sort.
     tb = tb.format()
 
@@ -34,27 +34,35 @@ def run(dest_dir: str) -> None:
     ds_garden.save()
 
 
-def define_polio_free(tb: Table) -> Table:
+def define_polio_free_new(tb: Table, latest_year: int) -> Table:
     """Define the polio free countries table."""
+    # Make a copy of the DataFrame to avoid modifying the original DataFrame
+    tb = tb.copy()
 
     # Clean the data
     tb["year"] = tb["year"].astype(str)
-    # Drop countries with missing values
-    tb = tb[tb["year"] != "data not available"]
-    # Change pre 1985 to 1984
-    tb["year"] = tb["year"].replace("pre 1985", "1984")
-    # Change ongoing to LATEST_YEAR + 1
-    tb["year"] = tb["year"].replace("ongoing", LATEST_YEAR + 1)
+
+    # Drop countries with missing values explicitly copying to avoid setting on a slice warning
+    tb = tb[tb["year"] != "data not available"].copy()
+
+    # Change 'pre 1985' to 1984 and 'ongoing' to LATEST_YEAR + 1
+    tb.loc[tb["year"] == "pre 1985", "year"] = "1984"
+    tb.loc[tb["year"] == "ongoing", "year"] = str(latest_year + 1)
+
     tb["year"] = tb["year"].astype(int)
+    # Rename year to latest year
+    tb = tb.rename(columns={"year": "latest_year_wild_polio_case"})
+    # Create a product of all countries and all years from 1910 to LATEST_YEAR
+    tb_prod = Table(product(tb["country"].unique(), range(1910, latest_year + 1)), columns=["country", "year"])
 
-    years = list(range(1910, LATEST_YEAR + 1))
-    tb_prod = Table(product(tb["country"], years), columns=["country", "year"])
-
+    # Define polio status based on the year comparison
     tb_prod["status"] = tb_prod.apply(
         lambda row: "Endemic"
-        if row["year"] < tb[tb["country"] == row["country"]]["year"].values[0]
+        if row["year"] < tb[tb["country"] == row["country"]]["latest_year_wild_polio_case"].min()
         else "Polio-free (not certified)",
         axis=1,
     )
 
-    return tb_prod
+    tb = tb.merge(tb_prod, on="country")
+
+    return tb
