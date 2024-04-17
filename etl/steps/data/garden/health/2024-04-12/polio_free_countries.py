@@ -26,7 +26,7 @@ def run(dest_dir: str) -> None:
 
     tb = tb[tb["country"] != "West Bank and Gaza"]
     ##### There are also two values for Somalia, I will drop the least recent one
-    tb = tb[~((tb["country"] == "Somalia") & (tb["year"] == 2000))]
+    tb = tb[~((tb["country"] == "Somalia") & (tb["year"] == "2000"))]
 
     # Adding the regional status to the polio free countries table
     ds_region_status = paths.load_dataset(short_name="polio_status", channel="meadow")
@@ -41,7 +41,7 @@ def run(dest_dir: str) -> None:
     tb, tb_status = define_polio_free_new(tb, latest_year=LATEST_YEAR)
     # Set an index and sort.
     tb = tb.format()
-    tb = tb.set_index(["country"]).sort_index()
+    # tb = tb.set_index(["country"]).sort_index()
     tb_status = tb_status.format()
 
     #
