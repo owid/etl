@@ -2,9 +2,9 @@
 
 from itertools import product
 
-from owid.catalog import Table
+from owid.catalog import Dataset, Table
 
-from etl.data_helpers.geo import harmonize_countries
+from etl.data_helpers.geo import harmonize_countries, list_members_of_region
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
@@ -32,6 +32,9 @@ def run(dest_dir: str) -> None:
     ds_region_status = paths.load_dataset(short_name="polio_status", channel="meadow")
     tb_region_status = ds_region_status["polio_status"].reset_index()
 
+    ds_regions = paths.load_dataset("regions")
+    tb_regions = ds_regions["regions"].reset_index()
+    who_regions = tb_regions[tb_regions["defined_by"] == "who"]
     # Adding regions data
     # ds_regions = paths.load_dataset("regions")
     # Assign polio free countries.
@@ -39,6 +42,8 @@ def run(dest_dir: str) -> None:
     tb = harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
 
     tb, tb_status = define_polio_free_new(tb, latest_year=LATEST_YEAR)
+
+    tb_status = add_polio_region_certification(tb_status, tb_region_status, who_regions, ds_regions)
     # Set an index and sort.
     tb = tb.format()
     # tb = tb.set_index(["country"]).sort_index()
@@ -50,6 +55,32 @@ def run(dest_dir: str) -> None:
     # Create a new garden dataset.
     ds_garden = create_dataset(dest_dir, tables=[tb, tb_status], check_variables_metadata=True)
     ds_garden.save()
+
+
+def add_polio_region_certification(
+    tb_status: Table, tb_region_status: Table, who_regions: Table, ds_regions: Dataset
+) -> Table:
+    # Append "(WHO)" suffix to the "who_region" to match the region names in the who_regions table
+    tb_region_status["who_region"] = tb_region_status["who_region"].astype(str) + " (WHO)"
+
+    # Correct mapping of regions to status updates by ensuring 'region' matches the modified 'who_region' entries
+    for region in who_regions["name"]:
+        # Generate country list for the current region
+        country_list = list_members_of_region(region=region, ds_regions=ds_regions)
+        if not country_list:
+            raise ValueError(f"No countries found for region {region}")
+
+        # Find the year of certification for the current region
+        year_certified = tb_region_status.loc[tb_region_status["who_region"] == region, "year_certified_polio_free"]
+
+        # Check if there is a valid year of certification
+        if not year_certified.empty and year_certified.notna().all():
+            # Set the status for all relevant countries and years
+            tb_status.loc[
+                (tb_status["country"].isin(country_list)) & (tb_status["year"] >= int(year_certified)), "status"
+            ] = "WHO Region certified polio-free"
+
+    return tb_status
 
 
 def define_polio_free_new(tb: Table, latest_year: int) -> Table:
