@@ -1,0 +1,23 @@
+dataset:
+  title: DRAFT conflict_deaths_combined
+  description: ''
+  licenses:
+    - {}
+tables:
+  conflict_deaths_combined:
+    variables:
+      onesided_deaths:
+        title: onesided_deaths
+        unit: ''
+      nonstate_deaths:
+        title: nonstate_deaths
+        unit: ''
+      intrastate_deaths:
+        title: intrastate_deaths
+        unit: ''
+      interstate_deaths:
+        title: interstate_deaths
+        unit: ''
+      all_deaths:
+        title: all_deaths
+        unit: ''
