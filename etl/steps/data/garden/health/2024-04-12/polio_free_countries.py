@@ -3,6 +3,7 @@
 from itertools import product
 
 from owid.catalog import Dataset, Table
+from owid.catalog import processing as pr
 
 from etl.data_helpers.geo import harmonize_countries, list_members_of_region
 from etl.helpers import PathFinder, create_dataset
@@ -28,37 +29,33 @@ def run(dest_dir: str) -> None:
     ##### There are also two values for Somalia, I will drop the least recent one
     tb = tb[~((tb["country"] == "Somalia") & (tb["year"] == "2000"))]
 
-    # Adding the regional status to the polio free countries table
+    # Loading the polio status data for WHO regions
     ds_region_status = paths.load_dataset(short_name="polio_status", channel="meadow")
     tb_region_status = ds_region_status["polio_status"].reset_index()
 
+    # Loading in the regions table so we know which countries are in each WHO region
     ds_regions = paths.load_dataset("regions")
     tb_regions = ds_regions["regions"].reset_index()
-    who_regions = tb_regions[tb_regions["defined_by"] == "who"]
-    # Adding regions data
-    # ds_regions = paths.load_dataset("regions")
-    # Assign polio free countries.
+    who_regions = tb_regions[(tb_regions["defined_by"] == "who") & (tb_regions["region_type"] == "aggregate")]
 
     tb = harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
 
-    tb, tb_status = define_polio_free_new(tb, latest_year=LATEST_YEAR)
+    # Assign polio free countries.
+    tb = define_polio_free_new(tb, latest_year=LATEST_YEAR)
 
-    tb_status = add_polio_region_certification(tb_status, tb_region_status, who_regions, ds_regions)
+    tb = add_polio_region_certification(tb, tb_region_status, who_regions, ds_regions)
     # Set an index and sort.
     tb = tb.format()
-    # tb = tb.set_index(["country"]).sort_index()
-    tb_status = tb_status.format()
-    tb_status.metadata.short_name = "polio_free_countries_status"
     #
     # Save outputs.
     #
     # Create a new garden dataset.
-    ds_garden = create_dataset(dest_dir, tables=[tb, tb_status], check_variables_metadata=True)
+    ds_garden = create_dataset(dest_dir, tables=[tb], check_variables_metadata=True)
     ds_garden.save()
 
 
 def add_polio_region_certification(
-    tb_status: Table, tb_region_status: Table, who_regions: Table, ds_regions: Dataset
+    tb: Table, tb_region_status: Table, who_regions: Table, ds_regions: Dataset
 ) -> Table:
     # Append "(WHO)" suffix to the "who_region" to match the region names in the who_regions table
     tb_region_status["who_region"] = tb_region_status["who_region"].astype(str) + " (WHO)"
@@ -76,34 +73,33 @@ def add_polio_region_certification(
         # Check if there is a valid year of certification
         if not year_certified.empty and year_certified.notna().all():
             # Set the status for all relevant countries and years
-            tb_status.loc[
-                (tb_status["country"].isin(country_list)) & (tb_status["year"] >= int(year_certified)), "status"
+            tb.loc[
+                (tb["country"].isin(country_list)) & (tb["year"] >= int(year_certified)), "status"
             ] = "WHO Region certified polio-free"
 
-    return tb_status
+    return tb
 
 
 def define_polio_free_new(tb: Table, latest_year: int) -> Table:
     """Define the polio free countries table."""
-    # Make a copy of the DataFrame to avoid modifying the original DataFrame
-    tb = tb.copy()
 
     # Clean the data
     tb["year"] = tb["year"].astype(str)
 
     # Drop countries with missing values explicitly copying to avoid setting on a slice warning
-    tb = tb[tb["year"] != "data not available"].copy()
+    tb = tb[tb["year"] != "data not available"]
 
     # Change 'pre 1985' to 1984 and 'ongoing' to LATEST_YEAR + 1
     tb.loc[tb["year"] == "pre 1985", "year"] = "1984"
     tb.loc[tb["year"] == "ongoing", "year"] = str(latest_year + 1)
 
-    tb["year"] = tb["year"].astype(int)
+    tb["year"] = tb["year"].astype(int).copy()
     # Rename year to latest year
     tb = tb.rename(columns={"year": "latest_year_wild_polio_case"})
     tb["year"] = latest_year
     # Create a product of all countries and all years from 1910 to LATEST_YEAR
     tb_prod = Table(product(tb["country"].unique(), range(1910, latest_year + 1)), columns=["country", "year"])
+    tb_prod = tb_prod.copy_metadata(from_table=tb)
 
     # Define polio status based on the year comparison
     tb_prod["status"] = tb_prod.apply(
@@ -112,5 +108,7 @@ def define_polio_free_new(tb: Table, latest_year: int) -> Table:
         else "Polio-free (not certified)",
         axis=1,
     )
+    # Merge the two tables
+    tb = pr.merge(tb, tb_prod, on=["country", "year"], how="right")
 
-    return tb, tb_prod
+    return tb
