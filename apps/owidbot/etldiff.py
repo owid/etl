@@ -1,6 +1,6 @@
 import datetime as dt
-import re
 import subprocess
+import time
 from typing import Tuple
 
 import click
@@ -50,6 +50,8 @@ def cli(
     $ python apps/owidbot/etldiff.py --branch my-branch
     ```
     """
+    t = time.time()
+
     lines = call_etl_diff(include)
     diff, result = format_etl_diff(lines)
 
@@ -81,6 +83,7 @@ Automatically updated datasets matching _{EXCLUDE_DATASETS}_ are not included
 </details>
 
 _Edited: {dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%d %H:%M:%S")} UTC_
+_Execution time: {time.time() - t:.2f} seconds_
     """.strip()
 
     if dry_run:

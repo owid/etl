@@ -83,7 +83,13 @@ def add_entity_code_and_name(session: Session, df: pd.DataFrame) -> pd.DataFrame
         df["entityCode"] = []
         return df
 
-    entities = _fetch_entities(session, list(df["entityId"].unique()))
+    unique_entities = df["entityId"].unique()
+
+    entities = _fetch_entities(session, list(unique_entities))
+
+    if set(unique_entities) - set(entities.entityId):
+        missing_entities = set(unique_entities) - set(entities.entityId)
+        raise ValueError(f"Missing entities in the database: {missing_entities}")
 
     return pd.merge(df, entities, on="entityId")
 
