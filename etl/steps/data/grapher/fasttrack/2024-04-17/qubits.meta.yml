@@ -4,6 +4,7 @@ dataset:
   licenses:
     - name: Creative Commons Attribution-ShareAlike 3.0
       url: https://en.wikipedia.org/wiki/Wikipedia:Text_of_the_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License
+  update_period_days: '365'
 tables:
   qubits:
     variables:
@@ -13,4 +14,32 @@ tables:
         short_unit: qb
         display:
           numDecimalPlaces: 0
+        description_key:
+          - '['
+          - '"'
+          - t
+          - e
+          - s
+          - t
+          - ''
+          - '1'
+          - '"'
+          - ','
+          - ''
+          - '"'
+          - t
+          - e
+          - s
+          - t
+          - ''
+          - '2'
+          - '"'
+          - ']'
+        description_from_producer: |-
+          This list contains quantum processors, also known as quantum processing units (QPUs). Some devices listed below have only been announced at press conferences so far, with no actual demonstrations or scientific publications characterizing the performance.
+
+          Quantum processors are difficult to compare due to the different architectures and approaches. Due to this, published qubit numbers do not reflect the performance levels of the processor. This is instead achieved through benchmarking metrics such as quantum volume, randomized benchmarking or circuit layer operations per second (CLOPS).
+
+          These QPUs are based on the quantum circuit and quantum logic gate-based model of computing.
+        processing_level: minor
         description: Highest number of quantum bits in a single circuit-based quantum processor over time
