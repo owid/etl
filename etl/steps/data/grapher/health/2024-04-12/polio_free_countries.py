@@ -13,10 +13,9 @@ def run(dest_dir: str) -> None:
     # Load garden dataset and read its main table.
     ds_garden = paths.load_dataset("polio_free_countries")
     tb = ds_garden["polio_free_countries"]
-    tb_status = ds_garden["polio_countries_status"]
     #
     # Save outputs.
     #
     # Create a new grapher dataset.
-    ds_grapher = create_dataset(dest_dir, tables=[tb, tb_status], check_variables_metadata=True)
+    ds_grapher = create_dataset(dest_dir, tables=[tb], check_variables_metadata=True)
     ds_grapher.save()

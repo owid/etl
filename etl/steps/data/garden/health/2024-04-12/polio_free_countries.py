@@ -111,5 +111,6 @@ def define_polio_free(tb: Table, latest_year: int) -> Table:
     )
     # Merge the two tables
     tb = pr.merge(tb, tb_prod, on=["country", "year"], how="right")
-
+    # Issues with status not having origins or source, not sure this is the best way to solve
+    tb["status"] = tb["status"].copy_metadata(tb["latest_year_wild_polio_case"])
     return tb
