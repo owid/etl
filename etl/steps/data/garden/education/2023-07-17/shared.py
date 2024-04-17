@@ -135,7 +135,11 @@ def add_region_aggregates_education(
             def weighted_mean(x, w):
                 values = np.ma.masked_invalid(x.astype("float64"))
                 weights = np.ma.masked_invalid(w.astype("float64"))
-                return np.ma.average(values, weights=weights)
+                out = np.ma.average(values, weights=weights)
+                if np.ma.is_masked(out):
+                    return np.nan
+                else:
+                    return out
 
             # Create a closure to define variable_agg with specific weights
             def make_weighted_mean(weights):
@@ -149,7 +153,7 @@ def add_region_aggregates_education(
         else:
             variable_agg = aggregations[variable]
 
-        aggs[variable] = variable_agg
+        aggs[variable] = variable_agg  # type: ignore
 
     df_region = groupby_agg(
         df=df_countries,

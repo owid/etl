@@ -38,7 +38,7 @@ def run(dest_dir: str) -> None:
 
     df1 = process_job_title_data(snap.path, questions[0])
     df2 = process_activity_data(snap.path, questions[1])
-    merged_df = pd.merge(df1, df2, how="outer")
+    merged_df = pd.merge(df1, df2, how="outer", validate="1:1")
 
     # Create a new table and ensure all columns are snake-case.
     tb = Table(merged_df, short_name=paths.short_name, underscore=True)

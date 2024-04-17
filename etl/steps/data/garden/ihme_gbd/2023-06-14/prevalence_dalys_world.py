@@ -102,7 +102,7 @@ def make_table_prevalence(ds: Dataset) -> Table:
         "share_eating_disorders": "Eating disorders",
         "share_schizophrenia_disorders": "Schizophrenia",
     }
-    tb = tb.rename(columns=column_rename)[set(column_rename.values()) | {"year"}]
+    tb = tb.rename(columns=column_rename)[list(set(column_rename.values()) | {"year"})]
     # Unpivot
     tb = tb.melt(id_vars=["year"], var_name="cause", value_name="share_rate")
 

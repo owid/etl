@@ -50,9 +50,6 @@ def main(upload: bool) -> None:
     # Initialize a new snapshot object for storing data, using a predefined file path structure.
     snap = Snapshot(f"climate/{SNAPSHOT_VERSION}/weekly_wildfires.csv")
 
-    # Add date_accessed
-    snap = modify_metadata(snap)
-
     # Initialize an empty list to hold DataFrames for wildfire data.
     dfs_fires = []
 
@@ -169,6 +166,9 @@ def main(upload: bool) -> None:
     df_final = pd.concat([dfs_fires, dfs_emissions])
     # Save the final DataFrame to the specified file path in the snapshot.
     df_to_file(df_final, file_path=snap.path)
+
+    # Add date_accessed
+    snap = modify_metadata(snap)
 
     # Add the file to DVC and optionally upload it to S3, based on the `upload` parameter.
     snap.dvc_add(upload=upload)

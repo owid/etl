@@ -8,7 +8,6 @@ import json
 from datetime import date, datetime
 from pathlib import Path
 from typing import Annotated, Any, Dict, List, Literal, Optional, TypedDict, Union, get_args
-from urllib.parse import quote
 
 import humps
 import pandas as pd
@@ -35,7 +34,6 @@ from sqlalchemy.dialects.mysql import (
     VARCHAR,
 )
 from sqlalchemy.exc import NoResultFound
-from sqlalchemy.future import Engine as _FutureEngine
 from sqlmodel import JSON as _JSON
 from sqlmodel import (
     Column,
@@ -43,7 +41,6 @@ from sqlmodel import (
     Relationship,
     Session,
     SQLModel,
-    create_engine,
     or_,
     select,
 )
@@ -51,6 +48,7 @@ from sqlmodel.sql.expression import Select, SelectOfScalar
 
 from etl import config, paths
 from etl.config import GRAPHER_USER_ID
+from etl.db import read_sql
 
 log = structlog.get_logger()
 
@@ -65,13 +63,6 @@ metadata = SQLModel.metadata
 
 # persist the value None as a SQL NULL value, not the JSON encoding of null
 JSON = _JSON(none_as_null=True)
-
-
-def get_engine() -> _FutureEngine:
-    return create_engine(
-        f"mysql://{config.DB_USER}:{quote(config.DB_PASS)}@{config.DB_HOST}:{config.DB_PORT}/{config.DB_NAME}",
-        future=False,
-    )
 
 
 t_active_datasets = Table(
@@ -717,9 +708,9 @@ class Source(SQLModel, table=True):
         ) t
         order by t.id
         """
-        sources = pd.read_sql(
+        sources = read_sql(
             q,
-            session.bind,
+            session.bind,  # type: ignore
             params={
                 "datasetId": dataset_id,
                 # NOTE: query doesn't work with empty list so we use a dummy value
@@ -737,7 +728,7 @@ class Source(SQLModel, table=True):
             )
             sources.datasetId = sources.datasetId.fillna(dataset_id).astype(int)
 
-        return [cls(**d) for d in sources.to_dict(orient="records") if cls.validate(d)]
+        return [cls(**d) for d in sources.to_dict(orient="records") if cls.validate(d)]  # type: ignore
 
 
 class SuggestedChartRevisions(SQLModel, table=True):

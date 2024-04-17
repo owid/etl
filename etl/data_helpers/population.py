@@ -111,7 +111,7 @@ def add_population(
 
         # Build age groups
         df_pop = []
-        pop["age"] = pop["age"].replace({"100+": 100}).astype("uint")
+        pop["age"] = pop["age"].astype(str).replace({"100+": 100}).astype("uint")
         for age_group_name, age_ranges in age_group_mapping.items():
             if not age_ranges:
                 age_ranges = [None, None]

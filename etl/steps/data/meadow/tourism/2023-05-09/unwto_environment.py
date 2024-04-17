@@ -1,4 +1,5 @@
 """Load a snapshot and create a meadow dataset."""
+
 import pandas as pd
 import shared as shrd
 from owid.catalog import Table

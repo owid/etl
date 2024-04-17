@@ -33,13 +33,13 @@ tables:
         unit: '%'
         short_unit: '%'
         description: |-
-          Share of land area in the United States which experienced unusually high annual precipitation in a given year. This comparesactual yearly precipitation totals with expected totals based on historical data.
+          Share of land area in the United States which experienced unusually high annual precipitation in a given year. This compares actual yearly precipitation totals with expected totals based on historical data.
       unusual_precipitation_9yr:
         title: Unusually high precipitation (smoothed)
         unit: '%'
         short_unit: '%'
         description: |-
-          Share of land area in the United States which experienced unusually high annual precipitation in a given year. This comparesactual yearly precipitation totals with expected totals based on historical data.
+          Share of land area in the United States which experienced unusually high annual precipitation in a given year. This compares actual yearly precipitation totals with expected totals based on historical data.
       us_precipitation_anomaly:
         title: US precipitation anomaly
         unit: inches
@@ -109,23 +109,14 @@ tables:
           conversionFactor: 100.0
         description: |-
           Unusually cold winter temperatures are measured based on daily minimum temperatures. At each station, the recorded lowsare compared with the full set of historical records. After averaging over a particular month or season of interest, the coldest10 percent of years are defined as “unusually cold.”
-      winter_temp_anomaly:
-        title: Winter
+      seasonal_temp_anomaly:
+        title: Temperature anomaly
         unit: °F
         short_unit: °F
-        description: Temperature anomaly in winter, compared to the 1901–2000 average. "Winter" includes December to February.
-      spring_temp_anomaly:
-        title: Spring
+        description: |-
+          Temperature anomaly in different seasons, compared to the 1901–2000 average. "Winter" includes December to February. "Spring" includes March to May. "Summer" includes June to August. "Fall" includes September to November.
+      seasonal_temp_anomaly_rolling:
+        title: Temperature anomaly (smoothed)
         unit: °F
         short_unit: °F
         description: Temperature anomaly in spring, compared to the 1901–2000 average. "Spring" includes March to May.
-      summer_temp_anomaly:
-        title: Summer
-        unit: °F
-        short_unit: °F
-        description: Temperature anomaly in summer, compared to the 1901–2000 average. "Summer" includes June to August.
-      fall_temp_anomaly:
-        title: Fall
-        unit: °F
-        short_unit: °F
-        description: Temperature anomaly in fall, compared to the 1901–2000 average. "Fall" includes September to November.

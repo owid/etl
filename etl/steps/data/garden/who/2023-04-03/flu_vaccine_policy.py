@@ -1,7 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
 import numpy as np
 import pandas as pd
-from owid.catalog import Dataset, Table
+from owid.catalog import Table
 from structlog import get_logger
 
 from etl.data_helpers import geo
@@ -20,13 +20,13 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load meadow dataset.
-    ds_meadow: Dataset = paths.load_dependency("flu_vaccine_policy")
+    ds_meadow = paths.load_dataset("flu_vaccine_policy")
 
     # Read table from meadow dataset.
     tb_meadow = ds_meadow["flu_vaccine_policy"]
 
     # Create a dataframe with data from the table.
-    df = pd.DataFrame(tb_meadow).reset_index()
+    df = pd.DataFrame(tb_meadow).reset_index().astype(str).astype({"year": int})
 
     #
     # Process data.
@@ -36,7 +36,7 @@ def run(dest_dir: str) -> None:
         df=df, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
     )
     # Replacing value codes with either missing data or a more descriptive value
-    df = df.replace({"ND": np.NaN, "NR": "Not relevant", "Unknown": np.NaN})
+    df = df.replace({"ND": np.NaN, "nan": np.NaN, "NR": "Not relevant", "Unknown": np.NaN})
     # Removing strings from some values e.g. commas in numbers but not full-stops
     df["how_many_doses_of_influenza_vaccine_were_distributed"] = df[
         "how_many_doses_of_influenza_vaccine_were_distributed"
