@@ -1,10 +1,10 @@
 """Load a meadow dataset and create a garden dataset."""
 
 import pandas as pd
-from owid.catalog import Table
+from owid.catalog import Dataset, Table
 from owid.catalog import processing as pr
 
-from etl.data_helpers.geo import add_regions_to_table, harmonize_countries
+from etl.data_helpers.geo import add_regions_to_table, harmonize_countries, list_members_of_region
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
@@ -35,6 +35,7 @@ def run(dest_dir: str) -> None:
     tb_cvdpv = tb_cvdpv.drop(columns=["total_cvdpv"])
     # Load regions dataset.
     ds_regions = paths.load_dataset("regions")
+    tb_regions = ds_regions["regions"].reset_index()
     # Load income groups dataset.
     ds_income_groups = paths.load_dataset("income_groups")
 
@@ -124,7 +125,19 @@ def add_cases_per_million(tb: Table, tb_population: Table) -> Table:
     return tb
 
 
-def identify_low_risk_countries(tb: Table) -> Table:
+def list_of_who_countries(tb_regions: Table, ds_regions: Dataset) -> list:
+    """List of countries as defined by WHO."""
+    who_countries = []
+    who_regions = tb_regions[tb_regions["defined_by"] == "who"]
+    for region in who_regions["name"]:
+        country_list = list_members_of_region(region=region, ds_regions=ds_regions)
+        if not country_list:
+            raise ValueError(f"No countries found for region {region}")
+        who_countries.extend(country_list)
+    return who_countries
+
+
+def identify_low_risk_countries(tb: Table, tb_regions: Table, ds_regions: Dataset) -> Table:
     # Identify low-risk countries (where the surveillance status can be disregarded)
     # High risk entities are those identified in the table on page 48 in this document: https://polioeradication.org/wp-content/uploads/2022/04/GPSAP-2022-2024-EN.pdf
     higher_risk_entities = [
@@ -206,10 +219,11 @@ def identify_low_risk_countries(tb: Table) -> Table:
 
     # Combine conditions and update 'polio_surveillance_status' for matching rows
     tb.loc[not_high_risk & is_screening_year, "polio_surveillance_status"] = "Low risk"
+
     return tb
 
 
-def add_screening_and_testing(tb: Table, year=SCREENING_YEAR) -> Table:
+def add_screening_and_testing(tb: Table, tb_regions: Dataset, ds_regions: Dataset) -> Table:
     """
     Adds the polio surveillance status based on the screening and testing rates.
     For use in this chart: https://ourworldindata.org/grapher/polio-screening-and-testing
@@ -221,6 +235,12 @@ def add_screening_and_testing(tb: Table, year=SCREENING_YEAR) -> Table:
     Returns:
     - Modified table with a new column for polio surveillance status.
     """
+    # Ensuring we have all the countries in the WHO regions - even if there isn't other polio data for them
+    who_countries = list_of_who_countries(tb_regions, ds_regions)
+    who_tb = Table({"country": who_countries, "year": SCREENING_YEAR}).copy_metadata(from_table=tb)
+    tb = tb.merge(who_tb, on=["country", "year"], how="outer")
+
+    # Add the polio surveillance status based on the screening and testing rates
     tb.loc[
         (tb["non_polio_afp_rate"] >= 2.0)
         & (tb["pct_adequate_stool_collection"] >= 80)
