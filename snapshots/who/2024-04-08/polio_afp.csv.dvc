@@ -3,7 +3,7 @@
 meta:
   origin:
     # Data product / Snapshot
-    title: World Health Organization - Acute Flaccid Paralysis
+    title: Polio cases - World Health Organization
     date_published: "2024-04-04"
 
     # Citation
@@ -11,7 +11,6 @@ meta:
     citation_full: |-
       World Health Organization (2024)
     attribution_short: WHO
-
     # Files
     url_main: https://extranet.who.int/polis/public/CaseCount.aspx
     date_accessed: 2024-04-08
