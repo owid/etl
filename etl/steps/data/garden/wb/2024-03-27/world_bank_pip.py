@@ -148,16 +148,16 @@ def run(dest_dir: str) -> None:
     # Define index cols
     index_cols = ["country", "year"]
     index_cols_percentiles = ["country", "year", "reporting_level", "welfare_type", "percentile"]
-    tb_inc_2011 = set_index_and_sort(tb=tb_inc_2011, index_cols=index_cols)
-    tb_cons_2011 = set_index_and_sort(tb=tb_cons_2011, index_cols=index_cols)
-    tb_inc_or_cons_2011 = set_index_and_sort(tb=tb_inc_or_cons_2011, index_cols=index_cols)
+    tb_inc_2011 = tb_inc_2011.format(keys=index_cols)
+    tb_cons_2011 = tb_cons_2011.format(keys=index_cols)
+    tb_inc_or_cons_2011 = tb_inc_or_cons_2011.format(keys=index_cols)
 
-    tb_inc_2017 = set_index_and_sort(tb=tb_inc_2017, index_cols=index_cols)
-    tb_cons_2017 = set_index_and_sort(tb=tb_cons_2017, index_cols=index_cols)
-    tb_inc_or_cons_2017 = set_index_and_sort(tb=tb_inc_or_cons_2017, index_cols=index_cols)
+    tb_inc_2017 = tb_inc_2017.format(keys=index_cols)
+    tb_cons_2017 = tb_cons_2017.format(keys=index_cols)
+    tb_inc_or_cons_2017 = tb_inc_or_cons_2017.format(keys=index_cols)
 
-    tb_percentiles_2011 = set_index_and_sort(tb=tb_percentiles_2011, index_cols=index_cols_percentiles)
-    tb_percentiles_2017 = set_index_and_sort(tb=tb_percentiles_2017, index_cols=index_cols_percentiles)
+    tb_percentiles_2011 = tb_percentiles_2011.format(keys=index_cols_percentiles)
+    tb_percentiles_2017 = tb_percentiles_2017.format(keys=index_cols_percentiles)
 
     # Create spell tables to separate different survey spells in the explorers
     spell_tables_inc = create_survey_spells(tb=tb_inc_2017)
@@ -901,16 +901,6 @@ def survey_count(tb: Table) -> Table:
     return tb
 
 
-def set_index_and_sort(tb: Table, index_cols: list) -> Table:
-    """
-    Add index and sort
-    """
-
-    tb = tb.set_index(index_cols, verify_integrity=True).sort_index()
-
-    return tb
-
-
 def drop_columns(tb: Table) -> Table:
     """
     Drop columns not needed
@@ -1011,8 +1001,8 @@ def create_survey_spells_inc_cons(tb_inc: Table, tb_cons: Table) -> list:
     tb_inc_or_cons_2017_spells = pr.concat([tb_inc, tb_cons], ignore_index=True, short_name="income_consumption_2017")
 
     # Set index and sort
-    tb_inc_or_cons_2017_spells = set_index_and_sort(
-        tb=tb_inc_or_cons_2017_spells, index_cols=["country", "year", "reporting_level", "welfare_type"]
+    tb_inc_or_cons_2017_spells = tb_inc_or_cons_2017_spells.format(
+        keys=["country", "year", "reporting_level", "welfare_type"]
     )
 
     # Create spells
