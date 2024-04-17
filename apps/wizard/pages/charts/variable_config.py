@@ -1,4 +1,5 @@
 """Concerns the second stage of wizard charts, when the variable mapping is constructed."""
+
 from typing import Any, Dict, List
 
 import pandas as pd
@@ -312,13 +313,12 @@ def ask_and_get_variable_mapping(search_form) -> "VariableConfig":
 def show_explore_df(df_data, variable_old, variable_new, variable_id_to_display, element_check) -> None:
     if element_check:  # type: ignore
         with st.container(border=True):
-            plot_comparison_two_variables(df_data, variable_old, variable_new, variable_id_to_display)  # type: ignore
-            # try:
-            #     plot_comparison_two_variables(df_data, variable_old, variable_new, variable_id_to_display)  # type: ignore
-            # except Exception:
-            #     st.error(
-            #         "Something went wrong! This can be due to several reasons: One (or both) of the variables are not numeric, `values` for one of the variables does not have the columns `entityName` and `year`. Please check the error message below. Report the error #002001"
-            #     )
+            try:
+                plot_comparison_two_variables(df_data, variable_old, variable_new, variable_id_to_display)  # type: ignore
+            except Exception:
+                st.error(
+                    "Something went wrong! This can be due to several reasons: One (or both) of the variables are not numeric, `values` for one of the variables does not have the columns `entityName` and `year`. Please check the error message below. Report the error #002001"
+                )
     else:
         st.empty()
 
