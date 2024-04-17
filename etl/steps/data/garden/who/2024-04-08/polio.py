@@ -4,7 +4,7 @@ import pandas as pd
 from owid.catalog import Table
 from owid.catalog import processing as pr
 
-from etl.data_helpers.geo import add_regions_to_table, harmonize_countries
+from etl.data_helpers.geo import add_population_to_table, add_regions_to_table, harmonize_countries
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
@@ -27,7 +27,7 @@ def run(dest_dir: str) -> None:
     ds_historical = paths.load_dataset("polio_historical")
     # Load population data to calculate cases per million population
     ds_population = paths.load_dataset("population")
-    tb_population = ds_population["population"]
+    tb_population = ds_population["population"].reset_index()
     # Load fasttrack Global Polio Eradication Initiative on circulating vaccine derived polio cases
     snap_cvdpv = paths.load_snapshot("gpei.csv")
     tb_cvdpv = snap_cvdpv.read()
@@ -35,7 +35,6 @@ def run(dest_dir: str) -> None:
     tb_cvdpv = tb_cvdpv.drop(columns=["total_cvdpv"])
     # Load regions dataset.
     ds_regions = paths.load_dataset("regions")
-
     # Load income groups dataset.
     ds_income_groups = paths.load_dataset("income_groups")
 
@@ -45,12 +44,6 @@ def run(dest_dir: str) -> None:
     tb_hist = tb_hist.rename(columns={"cases": "total_cases"})
     # Only need this for data prior to 2001
     tb_hist = tb_hist[tb_hist["year"] < 2001]
-    #
-    # Process data.
-    #
-    tb = harmonize_countries(
-        df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
-    )
 
     # Remove data from before 2001.
     tb = remove_pre_2001_data(tb)
@@ -60,6 +53,9 @@ def run(dest_dir: str) -> None:
     tb["total_cases"] = tb["wild_poliovirus_cases"] + tb["cvdpv_cases"]
     # Need to deal with overlapping years
     tb = pr.concat([tb, tb_hist], axis=0)
+    tb = harmonize_countries(
+        df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
+    )
     tb = tb.merge(tb_cvdpv, on=["country", "year"], how="left")
     # Add region aggregates.
     tb_reg = add_regions_to_table(
@@ -88,7 +84,7 @@ def run(dest_dir: str) -> None:
     tb["estimated_cases"] = tb["total_cases"] * tb["correction_factor"]
     # Add polio surveillance status based on the screening and testing rates.
     tb = add_screening_and_testing(tb)
-
+    tb = add_cases_per_million(tb, tb_population)
     tb = tb.set_index(["country", "year"], verify_integrity=True)
     tb.metadata.short_name = "polio"
 
@@ -104,14 +100,27 @@ def run(dest_dir: str) -> None:
     ds_garden.save()
 
 
-def cases_per_million(tb: Table, ds_population: Table) -> Table:
+def add_cases_per_million(tb: Table, tb_population: Table) -> Table:
     """
-    Add cases per million population for each country.
+    Add cases per million population for each country, for the columns concerning each type of polio cases.
     """
-    tb = tb.reset_index()
-    tb = tb.merge(ds_population, on=["country", "year"], how="left")
-    tb["cases_per_million"] = tb["total_cases"] / tb["population"] * 1_000_000
-    tb = tb.set_index(["country", "year"], verify_integrity=True)
+    tb_population = tb_population[["country", "year", "population"]]
+    tb = tb.merge(tb_population, on=["country", "year"], how="left")
+
+    cols_to_divide = [
+        "afp_cases",
+        "wild_poliovirus_cases",
+        "cvdpv_cases",
+        "total_cases",
+        "estimated_cases",
+        "cvdpv1",
+        "cvdpv2",
+        "cvdpv3",
+    ]
+    for col in cols_to_divide:
+        tb[f"{col}_per_million"] = tb[col] / tb["population"] * 1_000_000
+
+    tb = tb.drop(columns=["population"])
     return tb
 
 
