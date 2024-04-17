@@ -1,4 +1,5 @@
 import functools
+import os
 import warnings
 from typing import Any, Dict, List, Optional
 from urllib.parse import quote
@@ -44,7 +45,7 @@ def get_session(**kwargs) -> Session:
 
 
 @functools.cache
-def _get_engine_cached(cf: Any) -> Engine:
+def _get_engine_cached(cf: Any, pid: int) -> Engine:
     return create_engine(
         f"mysql://{cf.DB_USER}:{quote(cf.DB_PASS)}@{cf.DB_HOST}:{cf.DB_PORT}/{cf.DB_NAME}",
         pool_size=30,  # Increase the pool size to allow higher GRAPHER_WORKERS
@@ -54,7 +55,9 @@ def _get_engine_cached(cf: Any) -> Engine:
 
 def get_engine(conf: Optional[Dict[str, Any]] = None) -> Engine:
     cf: Any = dict_to_object(conf) if conf else config
-    return _get_engine_cached(cf)
+    # pid in memoization makes sure every process gets its own Engine
+    pid = os.getpid()
+    return _get_engine_cached(cf, pid)
 
 
 def get_dataset_id(
