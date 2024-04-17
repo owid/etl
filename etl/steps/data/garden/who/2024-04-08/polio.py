@@ -124,6 +124,91 @@ def add_cases_per_million(tb: Table, tb_population: Table) -> Table:
     return tb
 
 
+def identify_low_risk_countries(tb: Table) -> Table:
+    # Identify low-risk countries (where the surveillance status can be disregarded)
+    # High risk entities are those identified in the table on page 48 in this document: https://polioeradication.org/wp-content/uploads/2022/04/GPSAP-2022-2024-EN.pdf
+    higher_risk_entities = [
+        "Chad",
+        "Democratic Republic of Congo",
+        "Ethiopia",
+        "Niger",
+        "Nigeria",
+        "Afghanistan",
+        "Pakistan",
+        "Somalia",
+        "Angola",
+        "Burkina Faso",
+        "Cameroon",
+        "Central African Republic",
+        "Guinea",
+        "Kenya",
+        "Mali",
+        "South Sudan",
+        "Yemen",
+        "Benin",
+        "Cote d'Ivoire",
+        "Equatorial Guinea",
+        "Guinea-Bissau",
+        "Madagascar",
+        "Mozambique",
+        "Togo",
+        "Iraq",
+        "Sudan",
+        "Syria",
+        "Myanmar",
+        "Papua New Guinea",
+        "Philippines",
+        "Burundi",
+        "Congo",
+        "Gabon",
+        "Gambia",
+        "Ghana",
+        "Liberia",
+        "Senegal",
+        "Sierra Leone",
+        "Uganda",
+        "Zambia",
+        "Djibouti",
+        "Egypt",
+        "Iran",
+        "Libya",
+        "Tajikistan",
+        "Ukraine",
+        "Indonesia",
+        "Nepal",
+        "Haiti",
+        "Laos",
+        "China",
+        "Eritrea",
+        "Malawi",
+        "Mauritania",
+        "Namibia",
+        "Rwanda",
+        "Tanzania",
+        "Zimbabwe",
+        "Lebanon",
+        "Bangladesh",
+        "India",
+        "East Timor",
+        "Bolivia",
+        "Cambodia",
+        "Malaysia",
+    ]
+
+    difference = [item for item in higher_risk_entities if item not in tb["country"].unique()]
+    assert difference == [], f"Entities in the high-risk list that are not in the dataset: {difference}"
+
+    # Define the condition for which countries are not in high-risk entities
+    not_high_risk = ~tb["country"].isin(higher_risk_entities)
+
+    # Define the condition for screening year
+    is_screening_year = tb["year"] == SCREENING_YEAR
+
+    # Combine conditions and update 'polio_surveillance_status' for matching rows
+    tb.loc[not_high_risk & is_screening_year, "polio_surveillance_status"] = "Low risk"
+    return tb
+
+
 def add_screening_and_testing(tb: Table, year=SCREENING_YEAR) -> Table:
     """
     Adds the polio surveillance status based on the screening and testing rates.
@@ -136,7 +221,6 @@ def add_screening_and_testing(tb: Table, year=SCREENING_YEAR) -> Table:
     Returns:
     - Modified table with a new column for polio surveillance status.
     """
-    # tb["polio_surveillance_status"] = pd.NA
     tb.loc[
         (tb["non_polio_afp_rate"] >= 2.0)
         & (tb["pct_adequate_stool_collection"] >= 80)
@@ -155,6 +239,8 @@ def add_screening_and_testing(tb: Table, year=SCREENING_YEAR) -> Table:
         (tb["non_polio_afp_rate"] < 2.0) & (tb["pct_adequate_stool_collection"] < 80) & (tb["year"] == SCREENING_YEAR),
         "polio_surveillance_status",
     ] = "Inadequate screening and testing"
+
+    tb = identify_low_risk_countries(tb)
     # Not sure if this is the best way to handle this, the code fails because this indicator doesn't have origins otherwise
     tb["polio_surveillance_status"].metadata.origins = tb["non_polio_afp_rate"].metadata.origins
     return tb
