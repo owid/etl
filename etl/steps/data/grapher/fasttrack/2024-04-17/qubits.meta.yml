@@ -1,0 +1,16 @@
+dataset:
+  title: Quantum processors over time
+  description: ''
+  licenses:
+    - name: Creative Commons Attribution-ShareAlike 3.0
+      url: https://en.wikipedia.org/wiki/Wikipedia:Text_of_the_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License
+tables:
+  qubits:
+    variables:
+      qubits:
+        title: Record number of quantum bits per processor
+        unit: qubits
+        short_unit: qb
+        display:
+          numDecimalPlaces: 0
+        description: Highest number of quantum bits in a single circuit-based quantum processor over time
