@@ -8,7 +8,6 @@ import json
 from datetime import date, datetime
 from pathlib import Path
 from typing import Annotated, Any, Dict, List, Literal, Optional, TypedDict, Union, get_args
-from urllib.parse import quote
 
 import humps
 import pandas as pd
@@ -35,7 +34,6 @@ from sqlalchemy.dialects.mysql import (
     VARCHAR,
 )
 from sqlalchemy.exc import NoResultFound
-from sqlalchemy.future import Engine as _FutureEngine
 from sqlmodel import JSON as _JSON
 from sqlmodel import (
     Column,
@@ -43,7 +41,6 @@ from sqlmodel import (
     Relationship,
     Session,
     SQLModel,
-    create_engine,
     or_,
     select,
 )
@@ -66,13 +63,6 @@ metadata = SQLModel.metadata
 
 # persist the value None as a SQL NULL value, not the JSON encoding of null
 JSON = _JSON(none_as_null=True)
-
-
-def get_engine() -> _FutureEngine:
-    return create_engine(
-        f"mysql://{config.DB_USER}:{quote(config.DB_PASS)}@{config.DB_HOST}:{config.DB_PORT}/{config.DB_NAME}",
-        future=False,
-    )
 
 
 t_active_datasets = Table(
