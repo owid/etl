@@ -25,6 +25,9 @@ def run(dest_dir: str) -> None:
     ds_meadow = paths.load_dataset("polio_afp")
     # Load historical polio dataset
     ds_historical = paths.load_dataset("polio_historical")
+    # Load population data to calculate cases per million population
+    ds_population = paths.load_dataset("population")
+    tb_population = ds_population["population"]
     # Load fasttrack Global Polio Eradication Initiative on circulating vaccine derived polio cases
     snap_cvdpv = paths.load_snapshot("gpei.csv")
     tb_cvdpv = snap_cvdpv.read()
@@ -101,6 +104,17 @@ def run(dest_dir: str) -> None:
     ds_garden.save()
 
 
+def cases_per_million(tb: Table, ds_population: Table) -> Table:
+    """
+    Add cases per million population for each country.
+    """
+    tb = tb.reset_index()
+    tb = tb.merge(ds_population, on=["country", "year"], how="left")
+    tb["cases_per_million"] = tb["total_cases"] / tb["population"] * 1_000_000
+    tb = tb.set_index(["country", "year"], verify_integrity=True)
+    return tb
+
+
 def add_screening_and_testing(tb: Table, year=SCREENING_YEAR) -> Table:
     """
     Adds the polio surveillance status based on the screening and testing rates.
@@ -174,10 +188,10 @@ def add_correction_factor(tb: Table) -> Table:
     # tb.loc[tb["year"] == 2021, "correction_factor"] = np.nan
 
     # Namibia had 'percent_adequate_stool_collection' > 100 in 2011 and 2014 but for other years it's correction factor is 1.11 so we set it as 1.11 for 2011 and 2014.
-    tb["correction_factor"][(tb["country"] == "Namibia") & (tb["year"].isin([2011, 2014]))] = 1.11
+    tb.loc[(tb["country"] == "Namibia") & (tb["year"].isin([2011, 2014])), "correction_factor"] = 1.11
     # For China 1989-92 we set the correction factor to 1.11 and in Oman in 1988.
-    tb["correction_factor"][(tb["country"] == "China") & (tb["year"].isin([1989, 1990, 1991, 1992]))] = 1.11
-    tb["correction_factor"][(tb["country"] == "Oman") & (tb["year"].isin([1988]))] = 1.11
+    tb.loc[(tb["country"] == "China") & (tb["year"].isin([1989, 1990, 1991, 1992])), "correction_factor"] = 1.11
+    tb.loc[(tb["country"] == "Oman") & (tb["year"].isin([1988])), "correction_factor"] = 1.11
     # Not sure if this is the best way to handle this, the code fails because this indicator doesn't have origins otherwise
     tb["correction_factor"].metadata.origins = tb["non_polio_afp_rate"].metadata.origins
     return tb
@@ -187,7 +201,7 @@ def clean_adequate_stool_collection(tb: Table) -> Table:
     """
     Some values for "Adequate stool collection" are over 100%, we should set these to NA.
     """
-    tb["pct_adequate_stool_collection"][tb["pct_adequate_stool_collection"] > 100] = pd.NA
+    tb.loc[tb["pct_adequate_stool_collection"] > 100, "pct_adequate_stool_collection"] = pd.NA
     return tb
 
 
