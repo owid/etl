@@ -26,6 +26,6 @@ meta:
 
 wdir: ../../../data/snapshots/wb/2024-01-17
 outs:
-  - md5: 5fb032d2de430f79f25e1bdf1259c9bf
-    size: 35764784
+  - md5: 89a74ce0a636f6b0e317664b99eebd51
+    size: 35912832
     path: world_bank_pip.csv
