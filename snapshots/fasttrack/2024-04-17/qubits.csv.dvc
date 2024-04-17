@@ -1,0 +1,24 @@
+meta:
+  origin:
+    producer: Wikipedia
+    title: List of quantum processors
+    title_snapshot: Circuit-based quantum processors
+    citation_full: Wikipedia, List of quantum processors, Circuit-based quantum processors
+    version_producer: Google Sheet
+    url_main: https://en.wikipedia.org/wiki/List_of_quantum_processors
+    url_download: |-
+      https://docs.google.com/spreadsheets/d/e/2PACX-1vSVB8MqM1U7xLUV68Fd8TUeMiv2jWWGeT8EteyP-0Nvi4getanr9gxxlM0V1JhIlRkhfruB7vjfBTIy/pub?output=csv
+    date_accessed: '2024-04-17'
+    date_published: '2024'
+    license:
+      name: CC BY-SA
+      url: https://en.wikipedia.org/wiki/Wikipedia:Copyrights
+  name: Quantum processors over time
+  description: ''
+  license:
+    name: Creative Commons Attribution-ShareAlike 3.0
+    url: https://en.wikipedia.org/wiki/Wikipedia:Text_of_the_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License
+outs:
+  - md5: 33a1d150a0261088258fa8b4b4a51a34
+    size: 135
+    path: qubits.csv

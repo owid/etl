@@ -21,7 +21,9 @@ def run(dest_dir: str) -> None:
     ds_meadow = cast(Dataset, paths.load_dependency("ai_national_strategy"))
     # Load region dataset to find all possible countries and later fill the ones that don't exist in the spreadsheet as not released (according to source that's the implication)
     ds_regions = cast(Dataset, paths.load_dependency("regions"))
-    countries_national_ai = pd.DataFrame(ds_regions["regions"]["name"])
+    tb_regions = ds_regions["regions"]
+    tb_regions = tb_regions[tb_regions["defined_by"] == "owid"]
+    countries_national_ai = pd.DataFrame(tb_regions["name"])
     countries_national_ai.reset_index(drop=True, inplace=True)
     countries_national_ai["released"] = np.NaN
     # Generate the column names from "2017" to "2022"

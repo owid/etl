@@ -52,7 +52,7 @@ tables:
           conversionFactor: 1
 
       years_colonized:
-        title: Years the country has been colonized
+        title: Years a country was an European overseas colony
         unit: "years"
         short_unit: "years"
         description_short: |
@@ -64,7 +64,7 @@ tables:
         description_from_producer: ""
         processing_level: major
         display:
-          name: Years colonized
+          name: Years a country was an European overseas colony
           entityAnnotationsMap: ""
           numDecimalPlaces: 0
           conversionFactor: 1
