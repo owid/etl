@@ -543,5 +543,6 @@ steps:
   data://garden/health/2024-04-12/polio_free_countries:
     - data://meadow/health/2024-04-12/polio_status
     - data://meadow/health/2024-04-12/polio_free_countries
+    - data://garden/regions/2023-01-01/regions
   data://meadow/health/2024-04-12/polio_free_countries:
     - snapshot://health/2024-04-12/polio_free_countries.csv

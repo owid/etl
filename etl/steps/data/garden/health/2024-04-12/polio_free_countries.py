@@ -43,7 +43,7 @@ def run(dest_dir: str) -> None:
     tb = tb.format()
     # tb = tb.set_index(["country"]).sort_index()
     tb_status = tb_status.format()
-
+    tb_status.metadata.short_name = "polio_free_countries_status"
     #
     # Save outputs.
     #
