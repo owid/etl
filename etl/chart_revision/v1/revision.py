@@ -15,7 +15,7 @@ from structlog import get_logger
 from etl.chart_revision.v1.chart import Chart
 from etl.chart_revision.v1.variables import VariablesUpdate
 from etl.config import GRAPHER_USER_ID
-from etl.db import get_engine, open_db
+from etl.db import get_engine
 
 log = get_logger()
 # The maximum length of the suggested revision reason can't exceed the maximum length specified by the datatype "suggestedReason" in grapher.suggested_chart_revisions table.
@@ -341,10 +341,10 @@ def submit_revisions_to_grapher(revisions: List[ChartVariableUpdateRevision]):
     """Submit chart revisions to Grapher."""
     n_before = 0
     try:
-        with open_db() as db:
-            n_before = db.fetch_one("SELECT COUNT(id) FROM suggested_chart_revisions")[0]
+        with get_engine().connect() as con:
+            n_before = con.execute("SELECT COUNT(id) FROM suggested_chart_revisions").fetchone()[0]  # type: ignore
 
-            res = db.fetch_many(
+            res = con.execute(
                 """
                 SELECT *
                 FROM (
@@ -356,7 +356,7 @@ def submit_revisions_to_grapher(revisions: List[ChartVariableUpdateRevision]):
                     ) as grouped
                 WHERE grouped.c > 1
             """
-            )
+            ).fetchmany()
             if len(res):
                 raise RuntimeError(
                     "Two or more suggested chart revisions with status IN "
@@ -387,13 +387,13 @@ def submit_revisions_to_grapher(revisions: List[ChartVariableUpdateRevision]):
                 VALUES
                     (%s, %s, %s, %s, %s, %s, %s, NOW(), NOW())
             """
-            db.upsert_many(query, tuples)
+            con.execute(query, tuples)
 
             # checks if any of the affected chartIds now has multiple
             # pending suggested revisions. If so, then rejects the whole
             # insert and tell the user which suggested chart revisions need
             # to be approved/rejected.
-            res = db.fetch_many(
+            res = con.execute(
                 f"""
                 SELECT id, scr.chartId, c, createdAt
                 FROM (
@@ -411,7 +411,7 @@ def submit_revisions_to_grapher(revisions: List[ChartVariableUpdateRevision]):
                 WHERE grouped.c > 1
                 ORDER BY createdAt ASC
             """
-            )
+            ).fetchmany()
             if len(res):
                 df = pd.DataFrame(res, columns=["id", "chart_id", "count", "created_at"])
                 df["drop"] = df.groupby("chart_id")["created_at"].transform(lambda gp: gp == gp.max())
@@ -441,8 +441,8 @@ def submit_revisions_to_grapher(revisions: List[ChartVariableUpdateRevision]):
         log.info(f"INSERT operation into `suggested_chart_revisions` cancelled. Error: {e}")
         raise e
     finally:
-        with open_db() as db:
-            n_after = db.fetch_one("SELECT COUNT(id) FROM suggested_chart_revisions")[0]
+        with get_engine().connect() as con:
+            n_after = con.execute("SELECT COUNT(id) FROM suggested_chart_revisions").fetchone()[0]  # type: ignore
 
         log.info(f"{n_after - n_before} of {len(revisions)} suggested chart revisions inserted.")
 
@@ -452,23 +452,23 @@ def _get_chart_update_reason(variable_ids: List[int]) -> str:
 
     Accesses DB and finds out the name of the recently added dataset with the new variables."""
     try:
-        with open_db() as db:
+        with get_engine().connect() as con:
             if len(variable_ids) == 1:
-                results = db.fetch_many(
+                results = con.execute(
                     f"""
                         SELECT variables.name, datasets.name, datasets.version FROM datasets
                             JOIN variables ON datasets.id = variables.datasetId
                             WHERE variables.id IN ({variable_ids[0]})
                         """
-                )
+                ).fetchmany()
             else:
-                results = db.fetch_many(
+                results = con.execute(
                     f"""
                         SELECT variables.name, datasets.name, datasets.version FROM datasets
                             JOIN variables ON datasets.id = variables.datasetId
                             WHERE variables.id IN {*variable_ids,}
                         """
-                )
+                ).fetchmany()
     except Exception:
         log.error(
             "Problem found when accessing the DB trying to get details on the newly added variables"

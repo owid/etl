@@ -23,6 +23,7 @@ help:
 	@echo '  make format-all 	Format code (including modules in lib/)'
 	@echo '  make full      	Fetch all data and run full transformations'
 	@echo '  make grapher   	Publish supported datasets to Grapher'
+	@echo '  make sync.catalog  Sync catalog from R2 into local data/ folder'
 	@echo '  make lab       	Start a Jupyter Lab server'
 	@echo '  make publish   	Publish the generated catalog to S3'
 	@echo '  make api   		Start the ETL API on port 8081'
@@ -117,6 +118,14 @@ reindex: .venv
 prune: .venv
 	@echo '==> Prune datasets with no recipe from catalog'
 	poetry run etl d prune
+
+# Syncing catalog is useful if you want to avoid rebuilding it locally from scratch
+# which could take a few hours. This will download ~10gb from the main channels
+# (meadow, garden, open_numbers) and is especially useful when we increase ETL_EPOCH
+# or update regions.
+sync.catalog: .venv
+	@echo '==> Sync catalog from R2 into local data/ folder (~10gb)'
+	rclone sync owid-r2:owid-catalog/ data/ --verbose --fast-list --transfers=64 --checkers=64 --include "/meadow/**" --include "/garden/**" --include "/open_numbers/**"
 
 grapher: .venv
 	@echo '==> Running full etl with grapher upsert'

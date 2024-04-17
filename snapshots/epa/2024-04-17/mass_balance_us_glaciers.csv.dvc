@@ -1,0 +1,28 @@
+meta:
+  origin:
+    producer: United States Environmental Protection Agency
+    title: 'Climate Change Indicators: Glaciers'
+    description: |-
+      This dataset examines the balance between snow accumulation and melting in glaciers, and it describes how glaciers have changed over time.
+
+    title_snapshot: 'Climate Change Indicators: Glaciers - US Glaciers'
+    citation_full: |-
+      United States Environmental Protection Agency (EPA) - Climate Change Indicators: Glaciers (2021)
+
+      The underlying data comes from the United States Geological Survey (USGS). Glacier-wide mass balance and compiled data inputs: USGS benchmark glaciers (ver. 4.0, November 2019). Accessed December 2020. https://alaska.usgs.gov/products/data.php?dataid=79. doi:10.5066/F7HD7SRF.
+
+      More details can be found on [the EPA's technical documentation](https://www.epa.gov/sites/default/files/2021-03/documents/glaciers_td.pdf).
+    attribution: EPA based on various sources (2021)
+    attribution_short: EPA
+    url_main: https://www.epa.gov/climate-indicators/climate-change-indicators-glaciers
+    url_download: https://www.epa.gov/sites/default/files/2021-03/glaciers_fig-2.csv
+    date_accessed: '2024-04-17'
+    date_published: '2021-04-01'
+    license:
+      name: Public domain
+      url: https://edg.epa.gov/epa_data_license.html
+wdir: ../../../data/snapshots/epa/2024-04-17
+outs:
+  - md5: 98571ba4a0568f2f3ab78bc2aa9c9c3f
+    size: 2257
+    path: mass_balance_us_glaciers.csv

@@ -451,7 +451,7 @@ def cli(
                 continue
             except Exception as e:
                 # soft fail and continue with another dataset
-                log.error(e, exc_info=True)
+                log.error("\n".join(traceback.format_exception(type(e), e, e.__traceback__)))
                 any_error = True
                 continue
 

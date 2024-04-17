@@ -53,6 +53,9 @@ def parse_raw_definitions(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def run_sanity_checks(df: pd.DataFrame) -> None:
+    # Check that all regions have a name.
+    assert df[df["name"].isnull()].empty, f"Some regions do not have a name: {set(df[df['name'].isnull()]['code'])}"
+
     # Check that there are no repeated codes.
     duplicated_codes = df[df["code"].duplicated()]["code"].tolist()
     assert len(duplicated_codes) == 0, f"Duplicated codes found: {duplicated_codes}"
@@ -124,6 +127,9 @@ def run(dest_dir: str) -> None:
         tb_regions[column] = tb_regions.groupby("code")[column].transform(
             lambda x: json.dumps(sum(list(x), [])) if pd.notna(x.values) else x
         )
+
+    # Ensure "is_historical" is boolean.
+    tb_regions = tb_regions.astype({"is_historical": bool})
 
     # Set an appropriate index and sort conveniently.
     tb_regions = tb_regions.set_index("code", verify_integrity=True).sort_index()

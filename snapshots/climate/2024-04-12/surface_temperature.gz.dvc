@@ -1,0 +1,27 @@
+meta:
+  origin:
+    title_snapshot: ERA5 Monthly Averaged Data on Single Levels from 1940 to Present - Monthly Averages of 2m Surface Temperature
+    title: ERA5 monthly averaged data on single levels from 1940 to present
+    description: |-
+      ERA5 is the latest climate reanalysis produced by ECMWF, providing hourly data on many atmospheric, land-surface and sea-state parameters together with estimates of uncertainty.
+
+      ERA5 data are available in the Climate Data Store on regular latitude-longitude grids at 0.25° x 0.25° resolution, with atmospheric parameters on 37 pressure levels.
+
+      ERA5 is available from 1940 and continues to be extended forward in time, with daily updates being made available 5 days behind real time
+
+      Initial release data, i.e., data no more than three months behind real time, are called ERA5T.
+    producer: Copernicus Climate Change Service
+    version_producer: 2
+    citation_full: |-
+      Hersbach, H., Bell, B., Berrisford, P., Biavati, G., Horányi, A., Muñoz Sabater, J., Nicolas, J., Peubey, C., Radu, R., Rozum, I., Schepers, D., Simmons, A., Soci, C., Dee, D., Thépaut, J-N. (2023): ERA5 monthly averaged data on single levels from 1940 to present. Copernicus Climate Change Service (C3S) Climate Data Store (CDS), DOI: 10.24381/cds.f17050d7 (Accessed on 13-Feb-2024)
+    url_main: https://cds.climate.copernicus.eu/cdsapp#!/dataset/reanalysis-era5-single-levels-monthly-means?tab=overview
+    date_accessed: 2024-04-12
+    date_published: 2019-04-18
+    license:
+      name: Copernicus License
+      url: https://cds.climate.copernicus.eu/api/v2/terms/static/licence-to-use-copernicus-products.pdf
+
+outs:
+  - md5: 715bc2845ee71aaf0dca48dfec2f2c58
+    size: 1702330442
+    path: surface_temperature.gz

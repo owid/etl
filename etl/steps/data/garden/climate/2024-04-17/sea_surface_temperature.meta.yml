@@ -1,0 +1,29 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+      - Climate Change
+    processing_level: minor
+
+dataset:
+  title: Sea surface temperature
+  update_period_days: 60
+
+tables:
+  sea_surface_temperature:
+    variables:
+      sea_temperature_anomaly:
+        title: "Monthly sea surface temperature anomaly"
+        description_short: Measured in degrees Celsius.
+        unit: °C
+        short_unit: °C
+      sea_temperature_anomaly_low:
+        title: "Monthly sea surface temperature anomaly (lower bound)"
+        description_short: Measured in degrees Celsius.
+        unit: °C
+        short_unit: °C
+      sea_temperature_anomaly_high:
+        title: "Monthly sea surface temperature anomaly (upper bound)"
+        description_short: Measured in degrees Celsius.
+        unit: °C
+        short_unit: °C
