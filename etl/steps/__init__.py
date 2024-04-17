@@ -888,7 +888,7 @@ class GrapherStep(Step):
             dataset_upsert_results.dataset_id,
             upserted_variable_ids,
         )
-        gi.cleanup_ghost_sources(dataset_upsert_results.dataset_id, upserted_source_ids)
+        gi.cleanup_ghost_sources(engine, dataset_upsert_results.dataset_id, upserted_source_ids)
         # TODO: cleanup origins that are not used by any variable
 
 

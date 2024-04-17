@@ -30,7 +30,6 @@ from apps.backport.datasync.data_metadata import (
 )
 from apps.backport.datasync.datasync import upload_gzip_dict
 from etl import config
-from etl.db import open_db
 
 from . import grapher_helpers as gh
 from . import grapher_model as gm
@@ -447,29 +446,29 @@ def cleanup_ghost_variables(engine: Engine, dataset_id: int, upserted_variable_i
         )
 
 
-def cleanup_ghost_sources(dataset_id: int, upserted_source_ids: List[int]) -> None:
+def cleanup_ghost_sources(engine: Engine, dataset_id: int, upserted_source_ids: List[int]) -> None:
     """Remove all leftover sources that didn't get upserted into DB during grapher step.
     This could happen when you rename or delete sources.
     :param dataset_id: ID of the dataset
     :param upserted_source_ids: sources upserted in grapher step
     """
-    with open_db() as db:
+    with engine.connect() as con:
         if upserted_source_ids:
-            db.cursor.execute(
+            result = con.execute(
                 """
                 DELETE FROM sources WHERE datasetId=%(dataset_id)s AND id NOT IN %(source_ids)s
             """,
                 {"dataset_id": dataset_id, "source_ids": upserted_source_ids},
             )
         else:
-            db.cursor.execute(
+            result = con.execute(
                 """
                 DELETE FROM sources WHERE datasetId=%(dataset_id)s
             """,
                 {"dataset_id": dataset_id},
             )
-        if db.cursor.rowcount > 0:
-            log.warning(f"Deleted {db.cursor.rowcount} ghost sources")
+        if result.rowcount > 0:
+            log.warning(f"Deleted {result.rowcount} ghost sources")
 
 
 def _get_entity_name(session: Session, entity_id: int) -> str:
