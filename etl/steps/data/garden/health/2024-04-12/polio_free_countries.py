@@ -41,7 +41,7 @@ def run(dest_dir: str) -> None:
     tb = harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
 
     # Assign polio free countries.
-    tb = define_polio_free_new(tb, latest_year=LATEST_YEAR)
+    tb = define_polio_free(tb, latest_year=LATEST_YEAR)
 
     tb = add_polio_region_certification(tb, tb_region_status, who_regions, ds_regions)
     # Set an index and sort.
@@ -72,22 +72,23 @@ def add_polio_region_certification(
 
         # Check if there is a valid year of certification
         if not year_certified.empty and year_certified.notna().all():
+            year_certified_int = int(year_certified.iloc[0])
             # Set the status for all relevant countries and years
             tb.loc[
-                (tb["country"].isin(country_list)) & (tb["year"] >= int(year_certified)), "status"
+                (tb["country"].isin(country_list)) & (tb["year"] >= year_certified_int), "status"
             ] = "WHO Region certified polio-free"
 
     return tb
 
 
-def define_polio_free_new(tb: Table, latest_year: int) -> Table:
+def define_polio_free(tb: Table, latest_year: int) -> Table:
     """Define the polio free countries table."""
-
+    tb = tb.copy()
     # Clean the data
     tb["year"] = tb["year"].astype(str)
 
     # Drop countries with missing values explicitly copying to avoid setting on a slice warning
-    tb = tb[tb["year"] != "data not available"]
+    tb = tb[tb["year"] != "data not available"].copy()
 
     # Change 'pre 1985' to 1984 and 'ongoing' to LATEST_YEAR + 1
     tb.loc[tb["year"] == "pre 1985", "year"] = "1984"
