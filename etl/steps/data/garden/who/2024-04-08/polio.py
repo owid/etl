@@ -84,7 +84,7 @@ def run(dest_dir: str) -> None:
     tb = add_correction_factor(tb)
     tb["estimated_cases"] = tb["total_cases"] * tb["correction_factor"]
     # Add polio surveillance status based on the screening and testing rates.
-    tb = add_screening_and_testing(tb)
+    tb = add_screening_and_testing(tb, tb_regions, ds_regions)
     tb = add_cases_per_million(tb, tb_population)
     tb = tb.set_index(["country", "year"], verify_integrity=True)
     tb.metadata.short_name = "polio"
@@ -260,7 +260,7 @@ def add_screening_and_testing(tb: Table, tb_regions: Dataset, ds_regions: Datase
         "polio_surveillance_status",
     ] = "Inadequate screening and testing"
 
-    tb = identify_low_risk_countries(tb)
+    tb = identify_low_risk_countries(tb, tb_regions, ds_regions)
     # Not sure if this is the best way to handle this, the code fails because this indicator doesn't have origins otherwise
     tb["polio_surveillance_status"].metadata.origins = tb["non_polio_afp_rate"].metadata.origins
     return tb
