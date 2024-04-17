@@ -5,12 +5,13 @@ definitions:
       topic_tags:
         - Global Health
         - Eradication of Diseases
-  surveillance_sort: &surveillance_sort
-    - Inadequate screening and testing
-    - Inadequate screening
-    - Indaqueate testing
-    - Adequate screening and testing
-    - Low risk
+#  surveillance_sort: &surveillance_sort
+#    - Inadequate screening and testing
+#    - Inadequate screening
+#    - Inadequate testing
+#    - Adequate screening and testing
+#    - Low risk
+#    - nan
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
@@ -85,8 +86,8 @@ tables:
         description_short: "The status of polio surveillance in a given country"
         description_key: ["A country is considered to have adequate screening if it has a non-polio AFP rate of at least 2 per 100,000 children aged 15 or under.", "A country is considered to have adequate testing if it has a percentage adequate stool collection of at least 80%.", "Countries are labelled 'low risk' if they were considered low risk by the risk assessment carried out for the [2022 GPEI surveillance action plan](https://polioeradication.org/wp-content/uploads/2022/05/GPSAP-2022-2024-EN.pdf)"]
         unit: ""
-        type: ordinal
-        sort: *surveillance_sort
+        #type: ordinal
+        #sort: *surveillance_sort
       total_cases:
         title: Total polio cases
         description_short: The sum of wild poliovirus cases and circulating vaccine derived poliovirus cases
