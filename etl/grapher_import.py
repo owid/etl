@@ -30,7 +30,6 @@ from apps.backport.datasync.data_metadata import (
 )
 from apps.backport.datasync.datasync import upload_gzip_dict
 from etl import config
-from etl.db import open_db
 
 from . import grapher_helpers as gh
 from . import grapher_model as gm
@@ -359,7 +358,7 @@ def set_dataset_checksum_and_editedAt(dataset_id: int, checksum: str) -> None:
         session.commit()
 
 
-def cleanup_ghost_variables(dataset_id: int, upserted_variable_ids: List[int]) -> None:
+def cleanup_ghost_variables(engine: Engine, dataset_id: int, upserted_variable_ids: List[int]) -> None:
     """Remove all leftover variables that didn't get upserted into DB during grapher step.
     This could happen when you rename or delete a variable in ETL.
     Raise an error if we try to delete variable used by any chart.
@@ -368,15 +367,14 @@ def cleanup_ghost_variables(dataset_id: int, upserted_variable_ids: List[int]) -
     :param upserted_variable_ids: variables upserted in grapher step
     :param workers: delete variables in parallel
     """
-    with open_db() as db:
+    with engine.connect() as con:
         # get all those variables first
-        db.cursor.execute(
+        rows = con.execute(
             """
             SELECT id FROM variables WHERE datasetId=%(dataset_id)s AND id NOT IN %(variable_ids)s
         """,
             {"dataset_id": dataset_id, "variable_ids": upserted_variable_ids or [-1]},
-        )
-        rows = db.cursor.fetchall()
+        ).fetchall()
 
         variable_ids_to_delete = [row[0] for row in rows]
 
@@ -387,19 +385,18 @@ def cleanup_ghost_variables(dataset_id: int, upserted_variable_ids: List[int]) -
         log.info("cleanup_ghost_variables.start", size=len(variable_ids_to_delete))
 
         # raise an exception if they're used in any charts
-        db.cursor.execute(
+        rows = con.execute(
             """
             SELECT chartId, variableId FROM chart_dimensions WHERE variableId IN %(variable_ids)s
         """,
             {"dataset_id": dataset_id, "variable_ids": variable_ids_to_delete},
-        )
-        rows = db.cursor.fetchall()
+        ).fetchall()
         if rows:
             rows = pd.DataFrame(rows, columns=["chartId", "variableId"])
             raise ValueError(f"Variables used in charts will not be deleted automatically:\n{rows}")
 
         # then variables themselves with related data in other tables
-        db.cursor.execute(
+        con.execute(
             """
             DELETE FROM country_latest_data WHERE variable_id IN %(variable_ids)s
         """,
@@ -407,19 +404,19 @@ def cleanup_ghost_variables(dataset_id: int, upserted_variable_ids: List[int]) -
         )
 
         # delete relationships
-        db.cursor.execute(
+        con.execute(
             """
             DELETE FROM origins_variables WHERE variableId IN %(variable_ids)s
         """,
             {"variable_ids": variable_ids_to_delete},
         )
-        db.cursor.execute(
+        con.execute(
             """
             DELETE FROM tags_variables_topic_tags WHERE variableId IN %(variable_ids)s
         """,
             {"variable_ids": variable_ids_to_delete},
         )
-        db.cursor.execute(
+        con.execute(
             """
             DELETE FROM posts_gdocs_variables_faqs WHERE variableId IN %(variable_ids)s
         """,
@@ -427,7 +424,7 @@ def cleanup_ghost_variables(dataset_id: int, upserted_variable_ids: List[int]) -
         )
 
         # delete them from explorers
-        db.cursor.execute(
+        con.execute(
             """
             DELETE FROM explorer_variables WHERE variableId IN %(variable_ids)s
         """,
@@ -435,7 +432,7 @@ def cleanup_ghost_variables(dataset_id: int, upserted_variable_ids: List[int]) -
         )
 
         # finally delete variables
-        db.cursor.execute(
+        result = con.execute(
             """
             DELETE FROM variables WHERE datasetId=%(dataset_id)s AND id IN %(variable_ids)s
         """,
@@ -444,34 +441,34 @@ def cleanup_ghost_variables(dataset_id: int, upserted_variable_ids: List[int]) -
 
         log.warning(
             "cleanup_ghost_variables.end",
-            size=db.cursor.rowcount,
+            size=result.rowcount,
             variables=variable_ids_to_delete,
         )
 
 
-def cleanup_ghost_sources(dataset_id: int, upserted_source_ids: List[int]) -> None:
+def cleanup_ghost_sources(engine: Engine, dataset_id: int, upserted_source_ids: List[int]) -> None:
     """Remove all leftover sources that didn't get upserted into DB during grapher step.
     This could happen when you rename or delete sources.
     :param dataset_id: ID of the dataset
     :param upserted_source_ids: sources upserted in grapher step
     """
-    with open_db() as db:
+    with engine.connect() as con:
         if upserted_source_ids:
-            db.cursor.execute(
+            result = con.execute(
                 """
                 DELETE FROM sources WHERE datasetId=%(dataset_id)s AND id NOT IN %(source_ids)s
             """,
                 {"dataset_id": dataset_id, "source_ids": upserted_source_ids},
             )
         else:
-            db.cursor.execute(
+            result = con.execute(
                 """
                 DELETE FROM sources WHERE datasetId=%(dataset_id)s
             """,
                 {"dataset_id": dataset_id},
             )
-        if db.cursor.rowcount > 0:
-            log.warning(f"Deleted {db.cursor.rowcount} ghost sources")
+        if result.rowcount > 0:
+            log.warning(f"Deleted {result.rowcount} ghost sources")
 
 
 def _get_entity_name(session: Session, entity_id: int) -> str:

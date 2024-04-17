@@ -1,6 +1,6 @@
 import datetime as dt
-import re
 import subprocess
+import time
 from typing import Tuple
 
 import click
@@ -10,7 +10,7 @@ from rich import print
 from rich.ansi import AnsiDecoder
 from rich_click.rich_command import RichCommand
 
-from apps.staging_sync.cli import _normalise_branch
+from apps.staging_sync.cli import _get_container_name
 from etl import config
 from etl.paths import BASE_DIR
 
@@ -50,10 +50,12 @@ def cli(
     $ python apps/owidbot/etldiff.py --branch my-branch
     ```
     """
+    t = time.time()
+
     lines = call_etl_diff(include)
     diff, result = format_etl_diff(lines)
 
-    nbranch = _normalise_branch(branch) if branch else "dry-run"
+    container_name = _get_container_name(branch) if branch else "dry-run"
 
     # TODO: only include site-screenshots if the PR is from owid-grapher. Similarly, don't
     # run etl diff if the PR is from etl repo.
@@ -64,9 +66,9 @@ def cli(
 
 <summary><b>Staging server</b>: </summary>
 
-- **Admin**: http://staging-site-{nbranch}/admin/login
-- **Site**: http://staging-site-{nbranch}/
-- **Login**: `ssh owid@staging-site-{nbranch}`
+- **Admin**: http://{container_name}/admin/login
+- **Site**: http://{container_name}/
+- **Login**: `ssh owid@{container_name}`
 </details>
 
 <details>
@@ -81,6 +83,7 @@ Automatically updated datasets matching _{EXCLUDE_DATASETS}_ are not included
 </details>
 
 _Edited: {dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%d %H:%M:%S")} UTC_
+_Execution time: {time.time() - t:.2f} seconds_
     """.strip()
 
     if dry_run:
@@ -142,6 +145,7 @@ def format_etl_diff(lines: list[str]) -> Tuple[str, str]:
 
     diff = "\n".join(new_lines)
 
+    # NOTE: we don't need this anymore, we now have consistent checksums on local and remote
     # Some datasets might have different checksum, but be the same (this is caused by checksum_input and checksum_output
     # problem). Hotfix this by removing matching datasets from the output.
     # Example:
@@ -152,8 +156,8 @@ def format_etl_diff(lines: list[str]) -> Tuple[str, str]:
     #        ~ Column A
     # = Dataset grapher/agriculture/2024-03-26/attainable_yields
     #     = Table attainable_yields
-    pattern = r"(= Dataset.*(?:\n\s+=.*)+)\n(?=. Dataset|\n)"
-    diff = re.sub(pattern, "", diff)
+    # pattern = r"(= Dataset.*(?:\n\s+=.*)+)\n(?=. Dataset|\n)"
+    # diff = re.sub(pattern, "", diff)
 
     return diff, result
 
