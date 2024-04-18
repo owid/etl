@@ -1,8 +1,7 @@
-import traceback
+import functools
+import os
 import warnings
-from collections.abc import Generator
-from contextlib import contextmanager
-from typing import Any, Dict, List, Optional, cast
+from typing import Any, Dict, List, Optional
 from urllib.parse import quote
 
 import MySQLdb
@@ -14,7 +13,6 @@ from sqlalchemy.engine import Engine
 from sqlmodel import Session
 
 from etl import config
-from etl.db_utils import DBUtils
 
 log = structlog.get_logger()
 
@@ -46,42 +44,20 @@ def get_session(**kwargs) -> Session:
     return Session(get_engine(**kwargs))
 
 
-def get_engine(conf: Optional[Dict[str, Any]] = None) -> Engine:
-    cf: Any = dict_to_object(conf) if conf else config
-
-    return cast(
-        Engine,
-        create_engine(
-            f"mysql://{cf.DB_USER}:{quote(cf.DB_PASS)}@{cf.DB_HOST}:{cf.DB_PORT}/{cf.DB_NAME}",
-            pool_size=30,  # Increase the pool size to allow higher GRAPHER_WORKERS
-            max_overflow=30,  # Increase the max overflow limit to allow higher GRAPHER_WORKERS
-        ),
+@functools.cache
+def _get_engine_cached(cf: Any, pid: int) -> Engine:
+    return create_engine(
+        f"mysql://{cf.DB_USER}:{quote(cf.DB_PASS)}@{cf.DB_HOST}:{cf.DB_PORT}/{cf.DB_NAME}",
+        pool_size=30,  # Increase the pool size to allow higher GRAPHER_WORKERS
+        max_overflow=30,  # Increase the max overflow limit to allow higher GRAPHER_WORKERS
     )
 
 
-@contextmanager
-def open_db() -> Generator[DBUtils, None, None]:
-    connection = None
-    cursor = None
-    try:
-        connection = get_connection()
-        connection.autocommit(False)
-        cursor = connection.cursor()
-        yield DBUtils(cursor)
-        connection.commit()
-    except Exception as e:
-        log.error(f"Error encountered during import: {e}")
-        log.error("Rolling back changes...")
-        if connection:
-            connection.rollback()
-        if config.DEBUG:
-            traceback.print_exc()
-        raise e
-    finally:
-        if cursor:
-            cursor.close()
-        if connection:
-            connection.close()
+def get_engine(conf: Optional[Dict[str, Any]] = None) -> Engine:
+    cf: Any = dict_to_object(conf) if conf else config
+    # pid in memoization makes sure every process gets its own Engine
+    pid = os.getpid()
+    return _get_engine_cached(cf, pid)
 
 
 def get_dataset_id(

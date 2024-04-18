@@ -1,5 +1,4 @@
 import copy
-import warnings
 from copy import deepcopy
 from dataclasses import dataclass, field, is_dataclass
 from pathlib import Path
@@ -10,12 +9,12 @@ import numpy as np
 import pandas as pd
 import structlog
 from jinja2 import Environment
+from MySQLdb import IntegrityError
 from owid import catalog
 from owid.catalog.utils import underscore
 from sqlalchemy.engine import Engine
 
 from etl.db import get_engine, read_sql
-from etl.db_utils import DBUtils
 from etl.files import checksum_str
 
 log = structlog.get_logger()
@@ -313,16 +312,41 @@ def _get_entities_from_db(
 def _get_and_create_entities_in_db(countries: Set[str], engine: Engine | None = None) -> Dict[str, int]:
     engine = engine or get_engine()
     with engine.connect() as con:
-        cursor = con.connection.cursor()
-        db = DBUtils(cursor)
         log.info("Creating entities in DB", countries=countries)
-        return {name: db.get_or_create_entity(name) for name in countries}
+        out = {}
+        for name in countries:
+            try:
+                con.execute(
+                    """
+                    INSERT INTO entities
+                        (name, displayName, validated, createdAt, updatedAt)
+                    VALUES
+                        (%(name)s, '', FALSE, NOW(), NOW())
+                """,
+                    {"name": name},
+                )
+            except IntegrityError:
+                # If another process inserted the same entity before us, we can
+                # safely ignore the error and fetch the ID
+                pass
+
+            row = con.execute(
+                """
+                SELECT id FROM entities
+                WHERE name = %(name)s
+            """,
+                {"name": name},
+            ).fetchone()
+            assert row
+
+            out[name] = row[0]
+
+    return out
 
 
 def country_to_entity_id(
     country: pd.Series,
     create_entities: bool = False,
-    errors: Literal["raise", "ignore", "warn"] = "raise",
     by: Literal["name", "code"] = "name",
     engine: Engine | None = None,
 ) -> pd.Series:
@@ -347,19 +371,9 @@ def country_to_entity_id(
         # cast to float to fix issues with categories
         entity_id[ix] = country[ix].map(_get_and_create_entities_in_db(set(country[ix]), engine=engine)).astype(float)
 
-    if entity_id.isnull().any():
-        msg = f"Some countries have not been mapped: {set(country[entity_id.isnull()])}"
-        if errors == "raise":
-            raise ValueError(msg)
-        elif errors == "warn":
-            warnings.warn(msg)
-        elif errors == "ignore":
-            pass
+    assert not entity_id.isnull().any(), f"Some countries have not been mapped: {set(country[entity_id.isnull()])}"
 
-        # Int64 allows NaN values
-        return cast(pd.Series, entity_id.astype("Int64"))
-    else:
-        return cast(pd.Series, entity_id.astype(int))
+    return cast(pd.Series, entity_id.astype(int))
 
 
 def _unique(x: List[Any]) -> List[Any]:

@@ -158,3 +158,5 @@ steps:
     - snapshot://fasttrack/latest/gpei.csv
   data-private://grapher/fasttrack/latest/conflict_deaths_combined:
     - snapshot-private://fasttrack/latest/conflict_deaths_combined.csv
+  data://grapher/fasttrack/2024-04-17/qubits:
+    - snapshot://fasttrack/2024-04-17/qubits.csv

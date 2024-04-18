@@ -21,7 +21,7 @@ from MySQLdb import IntegrityError
 from tqdm import tqdm
 
 from etl.config import DEBUG, GRAPHER_USER_ID
-from etl.db import open_db
+from etl.db import get_engine
 from etl.grapher_helpers import IntRange
 
 log = structlog.get_logger()
@@ -179,23 +179,23 @@ class ChartRevisionSuggester:
 
         Accesses DB and finds out the name of the recently added dataset with the new variables."""
         try:
-            with open_db() as db:
+            with get_engine().connect() as con:
                 if len(variable_ids) == 1:
-                    results = db.fetch_many(
+                    results = con.execute(
                         f"""
                         SELECT variables.name, datasets.name, datasets.version FROM datasets
                             JOIN variables ON datasets.id = variables.datasetId
                             WHERE variables.id IN ({variable_ids[0]})
                         """
-                    )
+                    ).fetchmany()
                 else:
-                    results = db.fetch_many(
+                    results = con.execute(
                         f"""
                         SELECT variables.name, datasets.name, datasets.version FROM datasets
                             JOIN variables ON datasets.id = variables.datasetId
                             WHERE variables.id IN {*variable_ids,}
                         """
-                    )
+                    ).fetchmany()
         except Exception:
             self.report_error(
                 "Problem found when accessing the DB trying to get details on the newly added variables"
@@ -220,10 +220,10 @@ class ChartRevisionSuggester:
     def insert(self, suggested_chart_revisions: List[dict[str, Any]]) -> None:
         n_before = 0
         try:
-            with open_db() as db:
-                n_before = db.fetch_one("SELECT COUNT(id) FROM suggested_chart_revisions")[0]
+            with get_engine().connect() as con:
+                n_before = con.execute("SELECT COUNT(id) FROM suggested_chart_revisions").fetchone()[0]  # type: ignore
 
-                res = db.fetch_many(
+                res = con.execute(
                     """
                     SELECT *
                     FROM (
@@ -235,7 +235,7 @@ class ChartRevisionSuggester:
                         ) as grouped
                     WHERE grouped.c > 1
                 """
-                )
+                ).fetchmany()
                 if len(res):
                     raise RuntimeError(
                         "Two or more suggested chart revisions with status IN "
@@ -267,13 +267,13 @@ class ChartRevisionSuggester:
                     VALUES
                         (%s, %s, %s, %s, %s, %s, NOW(), NOW())
                 """
-                db.upsert_many(query, tuples)
+                con.execute(query, tuples)
 
                 # checks if any of the affected chartIds now has multiple
                 # pending suggested revisions. If so, then rejects the whole
                 # insert and tell the user which suggested chart revisions need
                 # to be approved/rejected.
-                res = db.fetch_many(
+                res = con.execute(
                     f"""
                     SELECT id, scr.chartId, c, createdAt
                     FROM (
@@ -291,7 +291,7 @@ class ChartRevisionSuggester:
                     WHERE grouped.c > 1
                     ORDER BY createdAt ASC
                 """
-                )
+                ).fetchmany()
                 if len(res):
                     df = pd.DataFrame(res, columns=["id", "chart_id", "count", "created_at"])
                     df["drop"] = df.groupby("chart_id")["created_at"].transform(lambda gp: gp == gp.max())
@@ -321,8 +321,8 @@ class ChartRevisionSuggester:
             self.report_error(f"INSERT operation into `suggested_chart_revisions` cancelled. Error: {e}")
             raise e
         finally:
-            with open_db() as db:
-                n_after = db.fetch_one("SELECT COUNT(id) FROM suggested_chart_revisions")[0]
+            with get_engine().connect() as con:
+                n_after = con.execute("SELECT COUNT(id) FROM suggested_chart_revisions").fetchone()[0]  # type: ignore
 
             self.report_info(
                 f"{n_after - n_before} of {len(suggested_chart_revisions)} suggested chart revisions inserted."
@@ -343,18 +343,18 @@ class ChartRevisionSuggester:
                 df_chart_dimensions: dataframe of chart_dimensions rows.
                 df_chart_revisions: dataframe of chart_revisions rows.
         """
-        with open_db() as db:
+        with get_engine().connect() as con:
             # retrieves chart_dimensions
             variable_ids = list(self.old_var_id2new_var_id.keys())
             variable_ids_str = ",".join([str(_id) for _id in variable_ids])
             columns = ["id", "chartId", "variableId", "property", "order"]
-            rows = db.fetch_many(
+            rows = con.execute(
                 f"""
                 SELECT {','.join([f'`{col}`' for col in columns])}
                 FROM chart_dimensions
                 WHERE variableId IN ({variable_ids_str})
             """
-            )
+            ).fetchmany()
             df_chart_dimensions = pd.DataFrame(rows, columns=columns)
 
             # retrieves charts
@@ -369,40 +369,40 @@ class ChartRevisionSuggester:
                 "lastEditedAt",
                 "publishedAt",
             ]
-            rows = db.fetch_many(
+            rows = con.execute(
                 f"""
                 SELECT {','.join(columns)}
                 FROM charts
                 WHERE id IN ({chart_ids_str})
             """
-            )
+            ).fetchmany()
             df_charts = pd.DataFrame(rows, columns=columns)
 
             # retrieves chart_revisions
             columns = ["id", "chartId", "userId", "config", "createdAt", "updatedAt"]
-            rows = db.fetch_many(
+            rows = con.execute(
                 f"""
                 SELECT {','.join(columns)}
                 FROM chart_revisions
                 WHERE chartId IN ({chart_ids_str})
             """
-            )
+            ).fetchmany()
             df_chart_revisions = pd.DataFrame(rows, columns=columns)
         return df_charts, df_chart_dimensions, df_chart_revisions
 
     def _get_variable_year_ranges(self) -> Dict[int, List[int]]:
-        with open_db() as db:
+        with get_engine().connect() as con:
             all_var_ids = list(self.old_var_id2new_var_id.keys()) + list(self.old_var_id2new_var_id.values())
             variable_ids_str = ",".join([str(_id) for _id in all_var_ids])
             raise NotImplementedError("data_values was deprecated")
-            rows = db.fetch_many(
+            rows = con.execute(
                 f"""
                 SELECT variableId, MIN(year) AS minYear, MAX(year) AS maxYear
                 FROM data_values
                 WHERE variableId IN ({variable_ids_str})
                 GROUP BY variableId
             """
-            )
+            ).fetchmany()
             var_id2year_range = {}
             for variable_id, min_year, max_year in rows:
                 var_id2year_range[variable_id] = [min_year, max_year]
