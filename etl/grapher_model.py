@@ -331,7 +331,11 @@ class Chart(SQLModel, table=True):
         return variables
 
     def migrate_to_db(
-        self, source_session: Session, target_session: Session, exclude: Optional[str] = None
+        self,
+        source_session: Session,
+        target_session: Session,
+        include: Optional[str] = None,
+        exclude: Optional[str] = None,
     ) -> Optional["Chart"]:
         """Remap variable ids from source to target session. Variable in source is uniquely identified
         by its catalogPath if available, or by name and datasetId otherwise. It is looked up
@@ -343,12 +347,23 @@ class Chart(SQLModel, table=True):
         assert self.id, "Chart must come from a database"
         source_variables = self.load_chart_variables(source_session)
 
-        remap_ids = {}
-        for source_var_id, source_var in source_variables.items():
-            # if chart contains a variable that is excluded, skip the whole chart
-            if exclude and source_var.catalogPath and re.search(exclude, source_var.catalogPath):
+        # if chart contains a variable that is excluded, skip the whole chart
+        if exclude:
+            for source_var in source_variables.values():
+                if source_var.catalogPath and re.search(exclude, source_var.catalogPath):
+                    return None
+
+        # a chart must contain at least one variable matching include, otherwise skip it
+        if include:
+            matching = False
+            for source_var in source_variables.values():
+                if source_var.catalogPath and re.search(include, source_var.catalogPath):
+                    matching = True
+            if not matching:
                 return None
 
+        remap_ids = {}
+        for source_var_id, source_var in source_variables.items():
             if source_var.catalogPath:
                 try:
                     target_var = Variable.load_from_catalog_path(target_session, source_var.catalogPath)

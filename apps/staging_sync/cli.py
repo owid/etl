@@ -54,6 +54,12 @@ log = structlog.get_logger()
     updated in production. Default is branch creation date.""",
 )
 @click.option(
+    "--include",
+    default=None,
+    type=str,
+    help="""Include only charts with variables whose catalogPath matches the provided string.""",
+)
+@click.option(
     "--exclude",
     default=None,
     type=str,
@@ -78,6 +84,7 @@ def cli(
     publish: bool,
     approve_revisions: bool,
     staging_created_at: Optional[dt.datetime],
+    include: Optional[str],
     exclude: Optional[str],
     errors: Literal["warn", "raise"],
     dry_run: bool,
@@ -159,7 +166,9 @@ def cli(
                 _remove_nonexisting_column_slug(source_chart, source_session)
 
                 try:
-                    target_chart = source_chart.migrate_to_db(source_session, target_session, exclude=exclude)
+                    target_chart = source_chart.migrate_to_db(
+                        source_session, target_session, include=include, exclude=exclude
+                    )
                 except ValueError as e:
                     if errors == "warn":
                         log.warning("staging_sync.error", chart_id=chart_id, error=str(e))
@@ -171,11 +180,11 @@ def cli(
                             raise e
 
                 # exclude charts with variables whose catalogPath matches the provided string
-                if target_chart is None and exclude:
+                if target_chart is None:
                     log.info(
                         "staging_sync.skip",
                         slug=source_chart.config["slug"],
-                        reason=f"excluded by --exclude {exclude}",
+                        reason="filtered by --include/--exclude",
                         chart_id=chart_id,
                     )
                     continue
