@@ -31,7 +31,6 @@ import rdata
 import structlog
 from pandas._typing import FilePath, ReadCsvBuffer, Scalar  # type: ignore
 from pandas.core.series import Series
-from pandas.util._decorators import rewrite_axis_style_signature
 
 from owid.repack import repack_frame
 
@@ -425,10 +424,24 @@ class Table(pd.DataFrame):
             and self._fields == table._fields
         )
 
-    @rewrite_axis_style_signature(
-        "mapper",
-        [("copy", True), ("inplace", False), ("level", None), ("errors", "ignore")],
-    )
+    @overload
+    def rename(
+        self,
+        mapper: Any = None,
+        *,
+        inplace: Literal[True],
+        **kwargs: Any,
+    ) -> None:
+        ...
+
+    @overload
+    def rename(self, mapper: Any = None, *, inplace: Literal[False], **kwargs: Any) -> "Table":
+        ...
+
+    @overload
+    def rename(self, *args: Any, **kwargs: Any) -> "Table":
+        ...
+
     def rename(self, *args: Any, **kwargs: Any) -> Optional["Table"]:
         """Rename columns while keeping their metadata."""
         inplace = kwargs.get("inplace")
@@ -917,29 +930,9 @@ class Table(pd.DataFrame):
     def sort_index(self, *args, **kwargs) -> "Table":
         return super().sort_index(*args, **kwargs)  # type: ignore
 
-    def groupby(self, *args, observed=False, **kwargs) -> "TableGroupBy":
+    def groupby(self, *args, **kwargs) -> "TableGroupBy":
         """Groupby that preserves metadata."""
-        if observed is False and args:
-            by_list = [args[0]] if isinstance(args[0], str) else args[0]
-            for by in by_list:
-                if isinstance(by, str):
-                    try:
-                        by_type = self.dtypes[by] if by in self.dtypes else self.index.dtypes[by]  # type: ignore
-                    except AttributeError:
-                        by_type = by
-                elif isinstance(by, pd.Series):
-                    by_type = by.dtype
-                else:
-                    by_type = "unknown"
-                if isinstance(by_type, str) and by_type == "category":
-                    warnings.warn(
-                        f"You're grouping by categorical variable `{by}` without using observed=True. This may lead to unexpected behaviour.",
-                        warnings.GroupingByCategoricalWarning,
-                    )
-
-        return TableGroupBy(
-            pd.DataFrame.groupby(self.copy(deep=False), *args, observed=observed, **kwargs), self.metadata, self._fields
-        )
+        return TableGroupBy(pd.DataFrame.groupby(self.copy(deep=False), *args, **kwargs), self.metadata, self._fields)
 
     def check_metadata(self, ignore_columns: Optional[List[str]] = None) -> None:
         """Check that all variables in the table have origins."""
@@ -978,6 +971,12 @@ class Table(pd.DataFrame):
 
         tb = cast(Table, tb)
         return tb
+
+    @classmethod
+    def from_records(cls, *args, **kwargs) -> "Table":
+        """Calling Table.from_records returns a Table, but does not call __init__ and misses metadata."""
+        df = super().from_records(*args, **kwargs)
+        return Table(df)
 
 
 def _create_table(df: pd.DataFrame, metadata: TableMeta, fields: Dict[str, VariableMeta]) -> Table:
@@ -1030,7 +1029,7 @@ class TableGroupBy:
             return func
         else:
             self.__annotations__[name] = VariableGroupBy
-            return VariableGroupBy(getattr(self.groupby, name), name, self._fields[name])
+            return VariableGroupBy(getattr(self.groupby, name), name, self._fields[name], self.metadata)
 
     @overload
     def __getitem__(self, key: str) -> "VariableGroupBy":
@@ -1045,7 +1044,7 @@ class TableGroupBy:
             return TableGroupBy(self.groupby[key], self.metadata, self._fields)
         else:
             self.__annotations__[key] = VariableGroupBy
-            return VariableGroupBy(self.groupby[key], key, self._fields[key])
+            return VariableGroupBy(self.groupby[key], key, self._fields[key], self.metadata)
 
     def __iter__(self) -> Iterator[Tuple[Any, "Table"]]:
         for name, group in self.groupby:
@@ -1072,12 +1071,18 @@ class TableGroupBy:
 
 
 class VariableGroupBy:
-    def __init__(self, groupby: pd.core.groupby.SeriesGroupBy, name: str, metadata: VariableMeta):
+    def __init__(
+        self, groupby: pd.core.groupby.SeriesGroupBy, name: str, metadata: VariableMeta, table_metadata: TableMeta
+    ):
         self.groupby = groupby
         self.metadata = metadata
         self.name = name
+        self.table_metadata = table_metadata
 
     def __getattr__(self, funcname) -> Callable[..., "Table"]:
+        if funcname == "groupings":
+            return self.groupby.groupings
+
         def func(*args, **kwargs):
             """Apply function and return variable with proper metadata."""
             # out = getattr(self.groupby, funcname)(*args, **kwargs)
@@ -1087,6 +1092,7 @@ class VariableGroupBy:
             # this happens when we use e.g. agg([min, max]), propagate metadata from the original then
             if isinstance(out, Table):
                 out._fields = defaultdict(VariableMeta, {k: self.metadata for k in out.columns})
+                out.metadata = self.table_metadata.copy()
                 return out
             elif isinstance(out, variables.Variable):
                 out.metadata = self.metadata.copy()
@@ -1118,7 +1124,16 @@ def merge(
     # Create merged table.
     tb = Table(
         pd.merge(
-            left=left, right=right, how=how, on=on, left_on=left_on, right_on=right_on, suffixes=suffixes, **kwargs
+            # There's a weird bug that removes metadata of the left table. I could not replicate it with unit test
+            # It is necessary to copy metadata here to avoid mutating passed left.
+            left=left.copy(deep=False),
+            right=right.copy(deep=False),
+            how=how,
+            on=on,
+            left_on=left_on,
+            right_on=right_on,
+            suffixes=suffixes,
+            **kwargs,
         )
     )
 
@@ -1189,7 +1204,37 @@ def concat(
     **kwargs,
 ) -> Table:
     # TODO: Add more logic to this function to handle indexes and possibly other arguments.
-    table = Table(pd.concat(objs=objs, axis=axis, join=join, ignore_index=ignore_index, **kwargs))  # type: ignore
+    with warnings.catch_warnings():
+        warnings.simplefilter(action="ignore", category=FutureWarning)
+        table = Table(
+            pd.concat(
+                objs=objs,
+                axis=axis,  # type: ignore
+                join=join,
+                ignore_index=ignore_index,
+                **kwargs,
+            )
+        )
+        ################################################################################################################
+        # In pandas 2.2.1, pd.concat() does not return a copy when one of the input dataframes is empty.
+        # This causes the following unexpected behavior:
+        # df_0 = pd.DataFrame({"a": ["original value"]})
+        # df_1 = pd.concat([pd.DataFrame(), df_0], ignore_index=True)
+        # df_0.loc[:, "a"] = "new value"
+        # df_1["a"]  # This will return "new value" instead of "original value".
+        # In pandas `1.4.0`, the behavior was as expected (returning "original value").
+        # Note that this happens even if `copy=True` is passed to `pd.concat()`.
+        if any([len(obj) == 0 for obj in objs]):
+            if pd.__version__ != "2.2.1":
+                # Check if patch is no longer needed.
+                df_0 = pd.DataFrame({"a": ["original value"]})
+                df_1 = pd.concat([pd.DataFrame(), df_0], ignore_index=True)
+                df_0.loc[:, "a"] = "new value"
+                if df_1["a"].item() != "new value":
+                    log.warning("Remove patch in owid.catalog.tables.concat, which is no longer necessary.")
+            # Ensure concat returns a copy.
+            table = table.copy()
+        ################################################################################################################
 
     if (axis == 1) or (axis == "columns"):
         # Original function pd.concat allows returning a dataframe with multiple columns with the same name.
@@ -1306,13 +1351,17 @@ def pivot(
     short_name: Optional[str] = None,
     **kwargs,
 ) -> Table:
+    if index is not None:
+        kwargs["index"] = index
+    if columns is not None:
+        kwargs["columns"] = columns
+    if values is not None:
+        kwargs["values"] = values
+
     # Get the new pivot table.
     table = Table(
         pd.pivot(
             data=data,
-            index=index,
-            columns=columns,
-            values=values,
             **kwargs,
         )
     )
@@ -1609,18 +1658,22 @@ def copy_metadata(from_table: Table, to_table: Table, deep=False) -> Table:
 
 def get_unique_sources_from_tables(tables: List[Table]) -> List[Source]:
     # Make a list of all sources of all variables in all tables.
-    sources = sum([table._fields[column].sources for table in tables for column in list(table.all_columns)], [])
-
-    # Get unique array of tuples of source fields (respecting the order).
-    return pd.unique(sources).tolist()
+    sources = []
+    for table in tables:
+        for column in list(table.all_columns):
+            # Get unique array of tuples of source fields (respecting the order).
+            sources += [source for source in table._fields[column].sources if source not in sources]
+    return sources
 
 
 def get_unique_licenses_from_tables(tables: List[Table]) -> List[License]:
     # Make a list of all licenses of all variables in all tables.
-    licenses = sum([table._fields[column].licenses for table in tables for column in list(table.all_columns)], [])
-
-    # Get unique array of tuples of source fields (respecting the order).
-    return pd.unique(licenses).tolist()
+    licenses = []
+    for table in tables:
+        for column in list(table.all_columns):
+            # Get unique array of tuples of source fields (respecting the order).
+            licenses += [license for license in table._fields[column].licenses if license not in licenses]
+    return licenses
 
 
 def _get_metadata_value_from_tables_if_all_identical(tables: List[Table], field: str) -> Optional[Any]:

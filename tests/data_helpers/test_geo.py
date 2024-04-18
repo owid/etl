@@ -652,9 +652,7 @@ class TestAddRegionAggregates:
         df_in = self.df_in.copy()
 
         # Add NaN value for Country 2
-        df_in = df_in.append(
-            {"country": "Country 2", "year": 2021, "var_01": np.nan, "var_02": np.nan}, ignore_index=True
-        )
+        df_in.loc[len(df_in)] = {"country": "Country 2", "year": 2021, "var_01": np.nan, "var_02": np.nan}
 
         df = geo.add_region_aggregates(
             df=df_in,

@@ -29,6 +29,7 @@ from owid import catalog
 from owid.walden import CATALOG as WALDEN_CATALOG
 from owid.walden import Catalog as WaldenCatalog
 from owid.walden import Dataset as WaldenDataset
+from sqlalchemy.engine import Engine
 
 from etl import config, files, git, paths
 from etl import grapher_helpers as gh
@@ -518,7 +519,8 @@ class DataStep(Step):
         return catalog.Dataset(self._dest_dir.as_posix())
 
     def checksum_output(self) -> str:
-        return self._output_dataset.checksum()
+        # output checksum is checksum of all ingredients
+        return self.checksum_input()
 
     def _step_files(self) -> List[str]:
         "Return a list of code files defining this step."
@@ -714,12 +716,7 @@ class SnapshotStep(Step):
         return True
 
     def checksum_output(self) -> str:
-        # NOTE: we could use the checksum from `_dvc_path` to
-        # speed this up. Test the performance on
-        # time poetry run etl run garden --dry-run
-        # Make sure that the checksum below is the same as DVC checksum! It
-        # looks like it might be different for some reason
-        return files.checksum_file(self._dvc_path)
+        return Snapshot(self.path).m.outs[0]["md5"]
 
     @property
     def _dvc_path(self) -> str:
@@ -827,7 +824,7 @@ class GrapherStep(Step):
                     cols += [c for c in table.columns if c in {"year", "country"} and c not in cols]
                     table = table.loc[:, cols]
 
-                table = gh._adapt_table_for_grapher(table)
+                table = gh._adapt_table_for_grapher(table, engine)
 
                 for t in gh._yield_wide_table(table, na_action="drop"):
                     i += 1
@@ -857,7 +854,7 @@ class GrapherStep(Step):
             variable_upsert_results = [future.result() for future in as_completed(futures)]
 
         if not config.GRAPHER_FILTER and not config.SUBSET:
-            self._cleanup_ghost_resources(dataset_upsert_results, variable_upsert_results)
+            self._cleanup_ghost_resources(engine, dataset_upsert_results, variable_upsert_results)
 
             # set checksum and updatedAt timestamps after all data got inserted
             gi.set_dataset_checksum_and_editedAt(dataset_upsert_results.dataset_id, self.data_step.checksum_input())
@@ -868,6 +865,7 @@ class GrapherStep(Step):
     @classmethod
     def _cleanup_ghost_resources(
         cls,
+        engine: Engine,
         dataset_upsert_results,
         variable_upsert_results: List[Any],
     ) -> None:
@@ -886,10 +884,11 @@ class GrapherStep(Step):
         # Try to cleanup ghost variables, but make sure to raise an error if they are used
         # in any chart
         gi.cleanup_ghost_variables(
+            engine,
             dataset_upsert_results.dataset_id,
             upserted_variable_ids,
         )
-        gi.cleanup_ghost_sources(dataset_upsert_results.dataset_id, upserted_source_ids)
+        gi.cleanup_ghost_sources(engine, dataset_upsert_results.dataset_id, upserted_source_ids)
         # TODO: cleanup origins that are not used by any variable
 
 

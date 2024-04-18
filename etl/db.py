@@ -1,7 +1,6 @@
-import traceback
+import functools
+import os
 import warnings
-from collections.abc import Generator
-from contextlib import contextmanager
 from typing import Any, Dict, List, Optional
 from urllib.parse import quote
 
@@ -14,7 +13,6 @@ from sqlalchemy.engine import Engine
 from sqlmodel import Session
 
 from etl import config
-from etl.db_utils import DBUtils
 
 log = structlog.get_logger()
 
@@ -46,9 +44,8 @@ def get_session(**kwargs) -> Session:
     return Session(get_engine(**kwargs))
 
 
-def get_engine(conf: Optional[Dict[str, Any]] = None) -> Engine:
-    cf: Any = dict_to_object(conf) if conf else config
-
+@functools.cache
+def _get_engine_cached(cf: Any, pid: int) -> Engine:
     return create_engine(
         f"mysql://{cf.DB_USER}:{quote(cf.DB_PASS)}@{cf.DB_HOST}:{cf.DB_PORT}/{cf.DB_NAME}",
         pool_size=30,  # Increase the pool size to allow higher GRAPHER_WORKERS
@@ -56,29 +53,11 @@ def get_engine(conf: Optional[Dict[str, Any]] = None) -> Engine:
     )
 
 
-@contextmanager
-def open_db() -> Generator[DBUtils, None, None]:
-    connection = None
-    cursor = None
-    try:
-        connection = get_connection()
-        connection.autocommit(False)
-        cursor = connection.cursor()
-        yield DBUtils(cursor)
-        connection.commit()
-    except Exception as e:
-        log.error(f"Error encountered during import: {e}")
-        log.error("Rolling back changes...")
-        if connection:
-            connection.rollback()
-        if config.DEBUG:
-            traceback.print_exc()
-        raise e
-    finally:
-        if cursor:
-            cursor.close()
-        if connection:
-            connection.close()
+def get_engine(conf: Optional[Dict[str, Any]] = None) -> Engine:
+    cf: Any = dict_to_object(conf) if conf else config
+    # pid in memoization makes sure every process gets its own Engine
+    pid = os.getpid()
+    return _get_engine_cached(cf, pid)
 
 
 def get_dataset_id(
@@ -459,3 +438,14 @@ def get_info_for_etl_datasets(db_conn: Optional[MySQLdb.Connection] = None) -> p
     df.loc[df["is_private"], "step"] = df[df["is_private"]]["step"].str.replace("data://", "data-private://")
 
     return df
+
+
+def read_sql(sql: str, engine: Optional[Engine] = None, *args, **kwargs) -> pd.DataFrame:
+    """Wrapper around pd.read_sql that creates a connection and closes it after reading the data.
+    This adds overhead, so if you need performance, reuse the same connection and cursor.
+    """
+    engine = engine or get_engine()
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", UserWarning)
+        with engine.connect() as con:
+            return pd.read_sql(sql, con.connection, *args, **kwargs)

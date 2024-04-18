@@ -1,6 +1,5 @@
 """Load a garden dataset and create a grapher dataset."""
 
-
 import owid.catalog.processing as pr
 
 from etl.helpers import PathFinder, create_dataset

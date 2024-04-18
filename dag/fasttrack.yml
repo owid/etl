@@ -154,3 +154,9 @@ steps:
     - snapshot://fasttrack/latest/usa_weather_climate_noaa.csv
   data://grapher/fasttrack/latest/global_precipitation_anomaly_noaa:
     - snapshot://fasttrack/latest/global_precipitation_anomaly_noaa.csv
+  data://grapher/fasttrack/latest/gpei:
+    - snapshot://fasttrack/latest/gpei.csv
+  data-private://grapher/fasttrack/latest/conflict_deaths_combined:
+    - snapshot-private://fasttrack/latest/conflict_deaths_combined.csv
+  data://grapher/fasttrack/2024-04-17/qubits:
+    - snapshot://fasttrack/2024-04-17/qubits.csv

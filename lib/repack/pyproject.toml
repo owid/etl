@@ -10,9 +10,9 @@ repository = "https://github.com/owid/owid-catalog-py"
 homepage = "https://github.com/owid/owid-catalog-py"
 
 [tool.poetry.dependencies]
-python = ">=3.8.1"
+python = ">=3.9"
 numpy = ">=1.24.0"
-pandas = ">=1.5.2"
+pandas = "^2.2.1"
 
 [tool.poetry.group.dev.dependencies]
 pytest = ">=7.2.0"

@@ -1304,7 +1304,7 @@ def convert_variables_given_per_capita_to_total_value(
     # All variables in the custom_elements_and_units.csv file with "was_per_capita" True will be converted into
     # total (non-per-capita) values.
     element_codes_that_were_per_capita = list(
-        elements_metadata[elements_metadata["was_per_capita"]]["element_code"].unique()
+        elements_metadata[elements_metadata["was_per_capita"] == 1]["element_code"].unique()
     )
     if len(element_codes_that_were_per_capita) > 0:
         data = data.copy()
@@ -1355,7 +1355,7 @@ def add_per_capita_variables(data: pd.DataFrame, elements_metadata: pd.DataFrame
 
     # Find element codes that have to be made per capita.
     element_codes_to_make_per_capita = list(
-        elements_metadata[elements_metadata["make_per_capita"]]["element_code"].unique()
+        elements_metadata[elements_metadata["make_per_capita"] == 1]["element_code"].unique()
     )
     if len(element_codes_to_make_per_capita) > 0:
         log.info("add_per_capita_variables", shape=data.shape)

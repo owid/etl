@@ -8,11 +8,11 @@ meta:
     url_main: https://www.nature.com/articles/s43016-024-00945-8
     url_download: |-
       https://docs.google.com/spreadsheets/d/e/2PACX-1vTxYlN0qXIUUXEok-T_1QmKXw-9eGRG1cQD2EKQSrC8kpWiI_C_f0oJFKU3SuOksmPKjxIS3UQwpU8l/pub?output=csv
-    date_accessed: '2024-03-26'
+    date_accessed: '2024-04-15'
   name: Agricultural policies (Wuepper et al. 2024)
   description: The number and stringency of agricultural-environmental policies by country.
   license: {}
 outs:
-  - md5: 08b93261bfecce404931598400f219f5
-    size: 10062
+  - md5: 616cb47603ee7f243557db1dd54b02e1
+    size: 10089
     path: agricultural_policies_wuepper.csv

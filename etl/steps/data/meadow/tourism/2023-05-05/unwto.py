@@ -83,13 +83,13 @@ def process_sheet(excel_object: pd.ExcelFile, sheet_name: str, year_range: tuple
     df = df.melt(id_vars=non_year_cols, value_vars=years, var_name="year")
 
     # Fill missing country names with the previous valid value
-    df["country"].fillna(method="ffill", inplace=True)
+    df["country"] = df["country"].ffill()
 
     # Drop rows with all NaN values in columns other than 'country', 'year', and 'value'
     df.dropna(subset=df.columns.difference(["country", "year", "value"]), how="all", inplace=True)
     if sheet_name in ["Inbound Tourism-Accommodation", "Domestic Tourism-Accommodation"]:
         cols_to_fill = [col for col in df.columns if col not in ["country", "year", "value", "Unnamed: 6"]]
-        df[cols_to_fill] = df[cols_to_fill].fillna(method="ffill")
+        df[cols_to_fill] = df[cols_to_fill].ffill()
 
     # Combine remaining columns to create the 'indicator' column
     df["indicator"] = df.drop(columns=["country", "value", "year"]).apply(
@@ -138,6 +138,7 @@ def process_data(excel_object: pd.ExcelFile, year_range: tuple, matched_sheet_na
 
     # Concatenate all the processed DataFrames
     df_concat = pd.concat(data_frames, axis=0)
+    df_concat = df_concat.astype({"value": float})
     df_concat.reset_index(inplace=True)
 
     # Pivot the DataFrame to have 'indicator' as columns and 'value' as cell values

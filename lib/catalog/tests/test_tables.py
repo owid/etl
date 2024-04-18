@@ -574,6 +574,12 @@ def test_merge_with_left_on_and_right_on_argument(table_1, table_2, sources, ori
     assert tb.metadata.description is None
 
 
+def test_merge_keeps_metadata(table_1, table_2, origins) -> None:
+    table_1.a.m.origins = [origins[1]]
+    _ = tables.merge(table_1, table_2, on=["country", "year"])
+    assert table_1.a.m.origins == [origins[1]]
+
+
 def test_concat_with_axis_0(table_1, table_2, sources, origins, licenses) -> None:
     tb = tables.concat([table_1, table_2])
     # Column "country" has the same title on both tables, and has description only on table_1, therefore when combining
@@ -996,6 +1002,14 @@ def test_groupby_levels(table_1) -> None:
     gt = table_1.groupby(level=[0, 1]).last()
     assert gt.values.tolist() == [[3, 6], [1, 4], [2, 5]]
     assert gt.a.m.title == "Title of Table 1 Variable a"
+
+
+def test_groupby_as_index(table_1) -> None:
+    table_1.m.title = "Table 1"
+    table_1 = table_1.astype({"country": "category"})
+    gt = table_1.groupby(["country", "year"], as_index=False)["a"].min()
+    assert gt.m.primary_key == []
+    assert gt.m.title == "Table 1"
 
 
 def test_set_columns(table_1) -> None:

@@ -154,7 +154,7 @@ def calculate_percentage(df, column, valid_responses_dict, column_to_split_by):
     df_filtered = df[[column_to_split_by, "year", column]][valid_responses].reset_index(drop=True)
 
     # Group by country and year
-    grouped = df_filtered.groupby([column_to_split_by, "year"])
+    grouped = df_filtered.groupby([column_to_split_by, "year"], observed=True)
 
     # Count valid responses
     counts = grouped[column].value_counts().reset_index(name="count")
@@ -343,7 +343,7 @@ def pivot_by_category(df, question):
     # Iterate over each pivot column
     for pivot_col in cols_pivot:
         # Pivot the dataframe for the current pivot column
-        pivoted_df = pd.pivot_table(df, values=question, index=["country", "year"], columns=pivot_col)
+        pivoted_df = pd.pivot_table(df, values=question, index=["country", "year"], columns=pivot_col, observed=True)
         # Append the pivot table to the list
         pivot_tables.append(pivoted_df)
 
