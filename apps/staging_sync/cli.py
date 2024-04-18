@@ -2,7 +2,7 @@ import copy
 import datetime as dt
 import re
 from pathlib import Path
-from typing import Any, Dict, Optional, Set
+from typing import Any, Dict, Literal, Optional, Set
 
 import click
 import pandas as pd
@@ -54,16 +54,16 @@ log = structlog.get_logger()
     updated in production. Default is branch creation date.""",
 )
 @click.option(
-    "--include",
-    default=None,
-    type=str,
-    help="""Include only variables which catalogPath includes the provided string.""",
-)
-@click.option(
     "--exclude",
     default=None,
     type=str,
-    help="""Exclude variables which catalogPath includes the provided string.""",
+    help="""Exclude charts with variables whose catalogPath matches the provided string.""",
+)
+@click.option(
+    "--errors",
+    default="raise",
+    type=click.Choice(["raise", "warn"]),
+    help="""How to handle errors when syncing charts. 'warn' will skip the chart and continue.""",
 )
 @click.option(
     "--dry-run/--no-dry-run",
@@ -78,8 +78,8 @@ def cli(
     publish: bool,
     approve_revisions: bool,
     staging_created_at: Optional[dt.datetime],
-    include: Optional[str],
     exclude: Optional[str],
+    errors: Literal["warn", "raise"],
     dry_run: bool,
 ) -> None:
     """Sync Grapher charts and revisions from an environment to the main environment.
@@ -159,12 +159,26 @@ def cli(
                 _remove_nonexisting_column_slug(source_chart, source_session)
 
                 try:
-                    target_chart = source_chart.migrate_to_db(source_session, target_session)
+                    target_chart = source_chart.migrate_to_db(source_session, target_session, exclude=exclude)
                 except ValueError as e:
-                    if "variables.catalogPath not found in target" in str(e):
-                        raise ValueError("ETL deploy hasn't finished yet. Check the repository.") from e
+                    if errors == "warn":
+                        log.warning("staging_sync.error", chart_id=chart_id, error=str(e))
+                        continue
                     else:
-                        raise e
+                        if "variables.catalogPath not found in target" in str(e):
+                            raise ValueError("ETL deploy hasn't finished yet. Check the repository.") from e
+                        else:
+                            raise e
+
+                # exclude charts with variables whose catalogPath matches the provided string
+                if target_chart is None and exclude:
+                    log.info(
+                        "staging_sync.skip",
+                        slug=source_chart.config["slug"],
+                        reason=f"excluded by --exclude {exclude}",
+                        chart_id=chart_id,
+                    )
+                    continue
 
                 # try getting chart with the same slug
                 try:
