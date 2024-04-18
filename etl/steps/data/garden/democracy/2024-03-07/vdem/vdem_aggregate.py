@@ -98,6 +98,12 @@ def run(tb: Table, ds_regions: Dataset, ds_population: Dataset) -> Tuple[Table, 
     # Consolidate main table with additional regional aggregates
     tb_uni, tb_multi_without_regions, tb_multi_with_regions = make_main_tables(tb, tb_countries_avg, tb_population_avg)
 
+    # Only have one origin in tb_multi_with_regions
+    origin = tb_multi_with_regions["civ_libs_vdem"].m.origins[0]
+    assert origin.producer == "V-Dem", "Assigned origin should be V-Dem!"
+    for col in tb_multi_with_regions.columns:
+        tb_multi_with_regions[col].metadata.origins = [origin]
+
     return tb_uni, tb_multi_without_regions, tb_multi_with_regions, tb_countries_counts, tb_population_counts
 
 
