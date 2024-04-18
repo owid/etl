@@ -24,6 +24,7 @@ import numpy as np
 import owid.catalog.processing as pr
 import pandas as pd
 from owid.catalog import Dataset, Table, utils
+from owid.datautils.dataframes import map_series
 from shared import (
     HISTORIC_TO_CURRENT_REGION,
     REGIONS,
@@ -129,7 +130,9 @@ def prepare_input_data(tb: Table) -> Table:
     assert set(tb["type"]) == set(EXPECTED_DISASTER_TYPES), error
 
     # Rename disaster types conveniently.
-    tb["type"] = tb["type"].replace(EXPECTED_DISASTER_TYPES)
+    tb["type"] = map_series(
+        series=tb["type"], mapping=EXPECTED_DISASTER_TYPES, warn_on_missing_mappings=True, warn_on_unused_mappings=True
+    )
 
     # Drop rows for disaster types that are not relevant.
     tb = tb.dropna(subset="type").reset_index(drop=True)
