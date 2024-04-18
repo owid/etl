@@ -107,7 +107,7 @@ def run(tb: Table) -> Table:
     tb = concat(tb_imputed + [tb], ignore_index=True)
 
     # Fill NaNs with False
-    tb["regime_imputed"] = tb["regime_imputed"].fillna(False)
+    tb["regime_imputed"] = tb["regime_imputed"].fillna(False).astype(bool)
 
     # Check unique values
     tb.format(underscore=False).reset_index()
