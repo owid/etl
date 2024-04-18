@@ -312,13 +312,13 @@ def ask_and_get_variable_mapping(search_form) -> "VariableConfig":
 def show_explore_df(df_data, variable_old, variable_new, variable_id_to_display, element_check) -> None:
     if element_check:  # type: ignore
         with st.container(border=True):
-            plot_comparison_two_variables(df_data, variable_old, variable_new, variable_id_to_display)  # type: ignore
-            # try:
-            #     plot_comparison_two_variables(df_data, variable_old, variable_new, variable_id_to_display)  # type: ignore
-            # except Exception:
-            #     st.error(
-            #         "Something went wrong! This can be due to several reasons: One (or both) of the variables are not numeric, `values` for one of the variables does not have the columns `entityName` and `year`. Please check the error message below. Report the error #002001"
-            #     )
+            # plot_comparison_two_variables(df_data, variable_old, variable_new, variable_id_to_display)  # type: ignore
+            try:
+                plot_comparison_two_variables(df_data, variable_old, variable_new, variable_id_to_display)  # type: ignore
+            except Exception:
+                st.error(
+                    "Something went wrong! This can be due to several reasons: One (or both) of the variables are not numeric, `values` for one of the variables does not have the columns `entityName` and `year`. Please check the error message below. Report the error #002001"
+                )
     else:
         st.empty()
 
@@ -363,9 +363,15 @@ def build_df_comparison_two_variables_cached(df, variable_old, variable_new, var
     df_variables.loc[:, "value"] = df_variables.value.astype(float)
     # Reshape dataframe
     df_variables = df_variables.pivot(index=["entityName", "year"], columns="variableId", values="value").reset_index()
-    df_variables["Relative difference (abs, %)"] = (
-        (100 * (df_variables[variable_old] - df_variables[variable_new]) / df_variables[variable_old]).round(2)
+    mask = df_variables[variable_old] == 0
+    df_variables.loc[~mask, "Relative difference (abs, %)"] = (
+        (
+            100
+            * (df_variables.loc[~mask, variable_old] - df_variables.loc[~mask, variable_new])
+            / df_variables.loc[~mask, variable_old]
+        ).round(2)
     ).abs()
+    df_variables.loc[mask, "Relative difference (abs, %)"] = float("inf")
     df_variables = df_variables.rename(columns=var_id_to_display).sort_values(
         "Relative difference (abs, %)", ascending=False
     )
