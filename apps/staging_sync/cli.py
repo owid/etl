@@ -54,6 +54,18 @@ log = structlog.get_logger()
     updated in production. Default is branch creation date.""",
 )
 @click.option(
+    "--include",
+    default=None,
+    type=str,
+    help="""Include only variables which catalogPath includes the provided string.""",
+)
+@click.option(
+    "--exclude",
+    default=None,
+    type=str,
+    help="""Exclude variables which catalogPath includes the provided string.""",
+)
+@click.option(
     "--dry-run/--no-dry-run",
     default=False,
     type=bool,
@@ -66,6 +78,8 @@ def cli(
     publish: bool,
     approve_revisions: bool,
     staging_created_at: Optional[dt.datetime],
+    include: Optional[str],
+    exclude: Optional[str],
     dry_run: bool,
 ) -> None:
     """Sync Grapher charts and revisions from an environment to the main environment.
