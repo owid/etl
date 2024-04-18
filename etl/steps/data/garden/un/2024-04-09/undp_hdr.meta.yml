@@ -4,7 +4,10 @@ definitions:
     presentation:
       topic_tags:
         - Human Development Index (HDI)
-
+      grapher_config:
+        tab: map
+        selectedEntityNames:
+          - World
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
