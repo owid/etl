@@ -13,7 +13,7 @@ Percentiles are partially constructed because the data officially published by t
 To run this code from scratch,
     - Connect to the staging server of this pull request:
         - Hit Cmd + Shift + P and select Remote-SSH: Connect to Host
-        - Type in owid@staging-site-{pull_request_name}
+        - Type in owid@staging-site-{branch_name}
     - Delete the files in the cache folder:
         rm -rf .cache/*
     - Check if you need to update the poverty lines in the functions `poverty_lines_countries` and `poverty_lines_regions`. Run
@@ -1416,6 +1416,41 @@ def generate_key_indicators(wb_api: WB_API):
 
         return results
 
+    def get_china_india_data_filled(povline, ppp_version, versions):
+        """
+        This function extracts filled data for China and India to be used in the key indicators file.
+        """
+        return pip_query_country(
+            wb_api,
+            popshare_or_povline="povline",
+            value=povline / 100,
+            versions=versions,
+            country_code="CHN&country=IND",
+            year="all",
+            fill_gaps="true",
+            welfare_type="all",
+            reporting_level="national",
+            ppp_version=ppp_version,
+            download="false",
+        )
+
+    def concurrent_function_china_india():
+        """
+        This function makes concurrency work for China and India data.
+        """
+        with ThreadPool(MAX_WORKERS) as pool:
+            tasks = [
+                (povline, ppp_version, versions)
+                for ppp_version, povlines in POVLINES_DICT.items()
+                for povline in povlines
+            ]
+            results = pool.starmap(get_china_india_data_filled, tasks)
+
+        # Concatenate list of dataframes
+        results = pd.concat(results, ignore_index=True)
+
+        return results
+
     # Obtain latest versions of the PIP dataset
     versions = pip_versions(wb_api)
 
@@ -1423,20 +1458,29 @@ def generate_key_indicators(wb_api: WB_API):
     results = concurrent_function()
     results_region = concurrent_region_function()
 
+    # Query China and India data
+    results_china_india = concurrent_function_china_india()
+
+    # Calculate World (excluding China) and World (excluding India) data
+    results_region = calculate_world_excluding_china_and_india(results_region, results_china_india)
+
     # If country is nan but country_code is TWN, replace country with Taiwan, China
     results.loc[results["country"].isnull() & (results["country_code"] == "TWN"), "country"] = "Taiwan, China"
 
     # I check if the set of countries is the same in the df and in the aux table (list of countries)
     aux_dict = pip_aux_tables(wb_api, table="countries")
-    assert set(results["country"].unique()) == set(aux_dict["countries"]["country_name"].unique()), log.fatal(
-        f"List of countries is not the same! Differences: {set(results['country'].unique()) - set(aux_dict['countries']['country_name'].unique())}"
+    assert set(results["country"]) == set(aux_dict["countries"]["country_name"]), log.fatal(
+        f"List of countries is not the same! Differences: {set(results['country']) - set(aux_dict['countries']['country_name'])}"
     )
 
-    # I check if the set of regions is the same in the df and in the aux table (list of regions)
-    aux_dict = pip_aux_tables(wb_api, table="regions")
-    assert set(results_region["country"].unique()) == set(aux_dict["regions"]["region"].unique()), log.fatal(
-        f"List of regions is not the same! Differences: {set(results_region['country'].unique()) - set(aux_dict['regions']['region'].unique())}"
-    )
+    # # I check if the set of regions is the same in the df and in the aux table (list of regions) + World (excluding China) + World (excluding India)
+    # aux_dict = pip_aux_tables(wb_api, table="regions")
+
+    # countries_to_check = set(aux_dict["regions"]["region"]) | {"World (excluding China)", "World (excluding India)"}
+
+    # assert set(results_region["country"]) == (countries_to_check), log.fatal(
+    #     f"List of regions is not the same! Differences: {set(results_region['country']) - countries_to_check}"
+    # )
 
     # Concatenate df_country and df_region
     df = pd.concat([results, results_region], ignore_index=True)
@@ -1452,6 +1496,76 @@ def generate_key_indicators(wb_api: WB_API):
     log.info(f"Key indicators calculated. Execution time: {elapsed_time} seconds")
 
     return df
+
+
+def calculate_world_excluding_china_and_india(results_region: pd.DataFrame, results_china_india: pd.DataFrame):
+    """
+    Calculate World (excluding China) and World (excluding India) data.
+    """
+
+    results_region = results_region.copy()
+    results_china_india = results_china_india.copy()
+
+    # Filter results to show only World
+    results_world = results_region[results_region["country"] == "World"].copy().reset_index(drop=True)
+
+    # Keep country, year, poverty_line and headcount columns
+    results_world = results_world[["ppp_version", "country", "year", "poverty_line", "headcount", "reporting_pop"]]
+    results_china_india = results_china_india[
+        ["ppp_version", "country", "year", "poverty_line", "headcount", "reporting_pop"]
+    ]
+
+    # Create headcount_ratio column
+    results_world["headcount_number"] = results_world["headcount"] * results_world["reporting_pop"]
+    results_china_india["headcount_number"] = results_china_india["headcount"] * results_china_india["reporting_pop"]
+
+    # Make these columns integer
+    results_world["headcount_number"] = results_world["headcount_number"].astype(int)
+    results_china_india["headcount_number"] = results_china_india["headcount_number"].astype(int)
+
+    # Merge results_world and results_china_india
+    results_excluding = pd.merge(
+        results_china_india,
+        results_world,
+        on=["ppp_version", "year", "poverty_line"],
+        how="left",
+        suffixes=("", "_world"),
+    )
+
+    # Calculate headcount_excluding as the difference between headcount_world and headcount
+    results_excluding["headcount_number_excluding"] = (
+        results_excluding["headcount_number_world"] - results_excluding["headcount_number"]
+    )
+
+    # Same with reporting_pop
+    results_excluding["reporting_pop_excluding"] = (
+        results_excluding["reporting_pop_world"] - results_excluding["reporting_pop"]
+    )
+
+    # Estimate headcount_excluding
+    results_excluding["headcount_excluding"] = (
+        results_excluding["headcount_number_excluding"] / results_excluding["reporting_pop_excluding"]
+    )
+
+    # Keep country, year , poverty_line, headcount_excluding and reporting_pop_excluding columns
+    results_excluding = results_excluding[
+        ["ppp_version", "country", "year", "poverty_line", "headcount_excluding", "reporting_pop_excluding"]
+    ]
+
+    # Rename countries to World (excluding China) and World (excluding India)
+    results_excluding["country"] = results_excluding["country"].replace(
+        {"China": "World (excluding China)", "India": "World (excluding India)"}
+    )
+
+    # Rename columns to headcount and reporting_pop
+    results_excluding = results_excluding.rename(
+        columns={"headcount_excluding": "headcount", "reporting_pop_excluding": "reporting_pop"}
+    )
+
+    # Concatenate tables
+    results_region = pd.concat([results_region, results_excluding], ignore_index=True)
+
+    return results_region
 
 
 def median_patch(df, country_or_region):

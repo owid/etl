@@ -30,6 +30,7 @@ from apps.backport.datasync.data_metadata import (
 )
 from apps.backport.datasync.datasync import upload_gzip_dict
 from etl import config
+from etl.db import get_engine
 
 from . import grapher_helpers as gh
 from . import grapher_model as gm
@@ -333,7 +334,7 @@ def fetch_db_checksum(dataset: catalog.Dataset) -> Optional[str]:
     assert dataset.metadata.version, "Dataset must have a version"
     assert dataset.metadata.namespace, "Dataset must have a namespace"
 
-    with Session(gm.get_engine()) as session:
+    with Session(get_engine()) as session:
         q = select(gm.Dataset).where(
             gm.Dataset.shortName == dataset.metadata.short_name,
             gm.Dataset.version == dataset.metadata.version,
@@ -344,7 +345,7 @@ def fetch_db_checksum(dataset: catalog.Dataset) -> Optional[str]:
 
 
 def set_dataset_checksum_and_editedAt(dataset_id: int, checksum: str) -> None:
-    with Session(gm.get_engine()) as session:
+    with Session(get_engine()) as session:
         q = (
             update(gm.Dataset)
             .where(gm.Dataset.id == dataset_id)

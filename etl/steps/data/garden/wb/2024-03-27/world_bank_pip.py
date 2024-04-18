@@ -29,13 +29,13 @@ log = get_logger()
 
 # Define absolute poverty lines used depending on PPP version
 # NOTE: Modify if poverty lines are updated from source
-povlines_dict = {
+POVLINES_DICT = {
     2011: [100, 190, 320, 550, 1000, 2000, 3000, 4000],
     2017: [100, 215, 365, 685, 1000, 2000, 3000, 4000],
 }
 
 # Define regions in the dataset
-regions_list = [
+REGIONS_LIST = [
     "East Asia and Pacific (PIP)",
     "Eastern and Southern Africa (PIP)",
     "Europe and Central Asia (PIP)",
@@ -46,6 +46,8 @@ regions_list = [
     "Sub-Saharan Africa (PIP)",
     "Western and Central Africa (PIP)",
     "World",
+    "World (excluding China)",
+    "World (excluding India)",
 ]
 
 # Set table format when printing
@@ -78,8 +80,8 @@ def run(dest_dir: str) -> None:
     tb_percentiles: Table = geo.harmonize_countries(df=tb_percentiles, countries_file=paths.country_mapping_path)
 
     # Show regional data from 1990 onwards
-    tb = regional_data_from_1990(tb, regions_list)
-    tb_percentiles = regional_data_from_1990(tb_percentiles, regions_list)
+    tb = regional_data_from_1990(tb, REGIONS_LIST)
+    tb_percentiles = regional_data_from_1990(tb_percentiles, REGIONS_LIST)
 
     # Amend the entity to reflect if data refers to urban or rural only
     tb = identify_rural_urban(tb)
@@ -90,18 +92,18 @@ def run(dest_dir: str) -> None:
 
     # Create stacked variables from headcount and headcount_ratio
     tb_2011, col_stacked_n_2011, col_stacked_pct_2011 = create_stacked_variables(
-        tb_2011, povlines_dict, ppp_version=2011
+        tb_2011, POVLINES_DICT, ppp_version=2011
     )
     tb_2017, col_stacked_n_2017, col_stacked_pct_2017 = create_stacked_variables(
-        tb_2017, povlines_dict, ppp_version=2017
+        tb_2017, POVLINES_DICT, ppp_version=2017
     )
 
     # Sanity checks. I don't run for percentile tables because that process was done in the extraction
     tb_2011 = sanity_checks(
-        tb_2011, povlines_dict, ppp_version=2011, col_stacked_n=col_stacked_n_2011, col_stacked_pct=col_stacked_pct_2011
+        tb_2011, POVLINES_DICT, ppp_version=2011, col_stacked_n=col_stacked_n_2011, col_stacked_pct=col_stacked_pct_2011
     )
     tb_2017 = sanity_checks(
-        tb_2017, povlines_dict, ppp_version=2017, col_stacked_n=col_stacked_n_2017, col_stacked_pct=col_stacked_pct_2017
+        tb_2017, POVLINES_DICT, ppp_version=2017, col_stacked_n=col_stacked_n_2017, col_stacked_pct=col_stacked_pct_2017
     )
 
     # Separate out consumption-only, income-only. Also, create a table with both income and consumption
@@ -582,7 +584,9 @@ def sanity_checks(
     cols_to_check = (
         col_headcount + col_headcount_ratio + col_povertygap + col_tot_shortfall + col_stacked_n + col_stacked_pct
     )
-    mask = tb[cols_to_check].isna().any(axis=1)
+    mask = (tb[cols_to_check].isna().any(axis=1)) & (
+        ~tb["country"].isin(["World (excluding China)", "World (excluding India)"])
+    )
     tb_error = tb[mask].reset_index(drop=True).copy()
 
     if not tb_error.empty:
@@ -781,7 +785,14 @@ def regional_headcount(tb: Table) -> Table:
 
     # Remove Western and Central and Eastern and Southern Africa. It's redundant with Sub-Saharan Africa (PIP)
     tb_regions = tb_regions[
-        ~tb_regions["country"].isin(["Western and Central Africa (PIP)", "Eastern and Southern Africa (PIP)"])
+        ~tb_regions["country"].isin(
+            [
+                "Western and Central Africa (PIP)",
+                "Eastern and Southern Africa (PIP)",
+                "World (excluding China)",
+                "World (excluding India)",
+            ]
+        )
     ].reset_index(drop=True)
 
     # Select needed columns and pivot
@@ -847,7 +858,7 @@ def survey_count(tb: Table) -> Table:
     Create survey count indicator, by counting the number of surveys available for each country in the past decade
     """
     # Remove regions from the table
-    tb_survey = tb[~tb["reporting_level"].isnull()].reset_index(drop=True).copy()
+    tb_survey = tb[~tb["country"].isin(REGIONS_LIST)].reset_index(drop=True).copy()
 
     min_year = int(tb_survey["year"].min())
     max_year = int(tb_survey["year"].max())
@@ -885,7 +896,7 @@ def survey_count(tb: Table) -> Table:
     tb_survey = tb_survey[["country", "year", "surveys_past_decade"]]
 
     # Merge with original table
-    tb = pr.merge(tb_survey, tb, on=["country", "year"], how="left")
+    tb = pr.merge(tb_survey, tb, on=["country", "year"], how="outer")
 
     return tb
 
@@ -1043,7 +1054,7 @@ def define_columns_for_ppp_comparison(tb: Table, id_cols: list, ppp_version: int
 
     tb = tb.reset_index()
     # Define poverty lines
-    povlines_list = povlines_dict[ppp_version]
+    povlines_list = POVLINES_DICT[ppp_version]
 
     # Define groups of columns
     headcount_absolute_cols = [f"headcount_{p}" for p in povlines_list]

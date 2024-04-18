@@ -125,7 +125,7 @@ prune: .venv
 # or update regions.
 sync.catalog: .venv
 	@echo '==> Sync catalog from R2 into local data/ folder (~10gb)'
-	rclone sync owid-r2:owid-catalog/ data/ --verbose --fast-list --transfers=64 --checkers=64 --include "/meadow/**" --include "/garden/**" --include "/open_numbers/**"
+	rclone copy owid-r2:owid-catalog/ data/ --verbose --fast-list --transfers=64 --checkers=64 --include "/meadow/**" --include "/garden/**" --include "/open_numbers/**"
 
 grapher: .venv
 	@echo '==> Running full etl with grapher upsert'
